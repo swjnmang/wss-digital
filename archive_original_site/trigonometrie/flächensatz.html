@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flächensatz Aufgabengenerator</title>
+    <style>
+        /* Grundlegendes Styling für den Generator */
+        #flaechensatz-generator {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            max-width: 700px; /* Maximale Breite für bessere Lesbarkeit */
+            margin: 20px auto; /* Zentrieren und Abstand */
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        }
+
+        #flaechensatz-generator h2 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #flaechensatz-generator p {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .task-type-selection {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .task-type-selection label {
+            margin: 0 10px;
+            font-weight: bold;
+        }
+
+        #flaechensatz-generator button {
+            display: block; /* Button nimmt die volle Breite ein */
+            width: 80%;
+            margin: 15px auto; /* Zentrieren */
+            padding: 12px 20px;
+            font-size: 1.1em;
+            cursor: pointer;
+            background-color: #5cb85c; /* Grüne Farbe */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        #flaechensatz-generator button:hover {
+            background-color: #4cae4c; /* Dunkleres Grün beim Hover */
+        }
+
+        #task-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        #task-description {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-left: 4px solid #5cb85c; /* Grüne Leiste links */
+            background-color: #eef; /* Hellblau Hintergrund */
+            border-radius: 4px;
+        }
+
+        #task-sketch {
+            text-align: center;
+            margin-bottom: 20px;
+            /* Ensure container allows flex/block layout for SVG */
+            display: block;
+            width: 100%; /* Ensure container takes available width */
+            overflow: hidden; /* Hide potential overflow */
+        }
+
+        #task-sketch svg {
+            max-width: 100%; /* SVG responsiv machen */
+            height: auto; /* Höhe automatisch anpassen */
+            display: block; /* SVG als Block-Element behandeln */
+            margin: 0 auto; /* Zentrieren des SVG */
+            border: 1px dashed #ccc; /* Gestrichelter Rand um die Skizze */
+            padding: 10px;
+            background-color: #fff;
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+
+        #solution {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0; /* Hellgrau Hintergrund */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: none; /* Standardmäßig versteckt */
+        }
+
+        #solution h3 {
+            margin-top: 0;
+            color: #555;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        #solution p {
+            margin-bottom: 10px;
+            text-align: left; /* Text linksbündig in der Lösung */
+        }
+
+        /* Styling für mathematische Ausdrücke ohne MathJax */
+        .math-expression {
+            font-family: 'Consolas', 'Courier New', monospace; /* Monospace-Schrift für Formeln */
+            white-space: pre-wrap; /* Zeilenumbrüche in Formeln erlauben */
+            display: block; /* Block-Element für Formeln */
+            margin: 10px 0;
+        }
+    </style>
+    </head>
+<body>
+
+<div id="flaechensatz-generator">
+    <h2>Aufgabe: Flächensatz im Dreieck</h2>
+
+    <p>Wählen Sie den Aufgabentyp und klicken Sie auf "Neue Aufgabe".</p>
+
+    <div class="task-type-selection">
+        <input type="radio" id="task-type-area" name="task-type" value="area" checked>
+        <label for="task-type-area">Flächeninhalt berechnen</label>
+        <input type="radio" id="task-type-unknown" name="task-type" value="unknown">
+        <label for="task-type-unknown">Winkel oder Strecke berechnen</label>
+    </div>
+
+    <button id="generate-task-btn">Neue Aufgabe</button>
+
+    <div id="task-container">
+        <div id="task-description">
+            </div>
+        <div id="task-sketch">
+            </div>
+        <button id="toggle-solution-btn" style="display: none;">Lösung anzeigen/verbergen</button>
+        <div id="solution">
+            </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const generateBtn = document.getElementById('generate-task-btn');
+    const toggleSolutionBtn = document.getElementById('toggle-solution-btn');
+    const taskDescriptionDiv = document.getElementById('task-description');
+    const taskSketchDiv = document.getElementById('task-sketch');
+    const solutionDiv = document.getElementById('solution');
+    const taskTypeAreaRadio = document.getElementById('task-type-area');
+    const taskTypeUnknownRadio = document.getElementById('task-type-unknown');
+
+
+    // Helper function to generate random number in range (inclusive)
+    function getRandom(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    // Helper function to convert degrees to radians
+    function degToRad(degrees) {
+        return degrees * (Math.PI / 180);
+    }
+
+    // Helper function to convert radians to degrees
+    function radToDeg(radians) {
+        return radians * (180 / Math.PI);
+    }
+
+    // Helper function to round to specified decimal places
+    function round(value, decimals) {
+        // Handle potential floating point issues
+        const factor = Math.pow(10, decimals);
+        return Math.round(value * factor) / factor;
+    }
+
+    // Function to generate valid triangle angles (summing to 180)
+    function generateTriangleAngles() {
+        let alpha_deg, beta_deg, gamma_deg;
+        // Ensure angles are reasonable (avoiding degenerate triangles)
+        do {
+            alpha_deg = getRandom(20, 140);
+            beta_deg = getRandom(20, 140);
+            gamma_deg = 180 - alpha_deg - beta_deg;
+        } while (gamma_deg < 20 || gamma_deg > 140); // Ensure gamma is also reasonable
+
+        return {
+            alpha_deg: alpha_deg,
+            beta_deg: beta_deg,
+            gamma_deg: gamma_deg,
+            alpha_rad: degToRad(alpha_deg),
+            beta_rad: degToRad(beta_deg),
+            gamma_rad: degToRad(gamma_deg)
+        };
+    }
+
+    // Function to calculate side lengths using Sine Rule (given angles and one side)
+    function calculateSides(angles, sideA) {
+         // Use side 'a' as the known side to calculate 'b' and 'c'
+        const b = (sideA * Math.sin(angles.beta_rad)) / Math.sin(angles.alpha_rad);
+        const c = (sideA * Math.sin(angles.gamma_rad)) / Math.sin(angles.alpha_rad);
+        return { a: sideA, b: b, c: c };
+    }
+
+    // Function to create SVG sketch based on angles and known/unknown elements
+    function createTriangleSketch(angles, sides, formulaType, unknownElement) {
+        const svgBaseWidth = 350; // Base width for internal calculations
+        const svgBaseHeight = 250; // Base height for internal calculations
+        const padding = 30;
+
+        // Approximate vertex positions based on angles for a rough shape
+        // Vertex A at bottom-left
+        const pointA = { x: padding, y: svgBaseHeight - padding };
+
+        // Vertex B at bottom-right
+        const pointB = { x: svgBaseWidth - padding, y: svgBaseHeight - padding };
+
+        // Vertex C position calculation (more dynamic)
+        // We'll use the angles to determine the direction from A and B
+        // This is a simplified approach to *look* like the angle, not geometrically precise side lengths
+        const angleA_rad = angles.alpha_rad; // Angle at A
+        const angleB_rad = angles.beta_rad;  // Angle at B
+
+        const tanA = Math.tan(-angleA_rad); // Negative for SVG y-coords
+        const tanB = Math.tan(Math.PI + angleB_rad); // Adjusted for SVG y-coords
+
+        let pointC = { x: svgBaseWidth / 2, y: padding }; // Default fallback
+
+        if (Math.abs(tanA - tanB) > 1e-6) { // Avoid division by zero if lines are parallel
+             pointC.x = (tanA * pointA.x - pointA.y - tanB * pointB.x + pointB.y) / (tanA - tanB);
+             pointC.y = tanA * (pointC.x - pointA.x) + pointA.y;
+        }
+
+        const points = [pointA, pointB, pointC];
+
+        // Calculate the bounding box of the triangle points to set the viewBox
+        const minX = Math.min(points[0].x, points[1].x, points[2].x);
+        const minY = Math.min(points[0].y, points[1].y, points[2].y);
+        const maxX = Math.max(points[0].x, points[1].x, points[2].x);
+        const maxY = Math.max(points[0].y, points[1].y, points[2].y);
+
+        const viewBoxX = minX - padding/2; // Add some padding to the viewBox
+        const viewBoxY = minY - padding/2;
+        const viewBoxWidth = (maxX - minX) + padding;
+        const viewBoxHeight = (maxY - minY) + padding;
+
+
+        // Set explicit width and height but rely on viewBox and CSS for scaling
+        let svgContent = `<svg width="${svgBaseWidth}" height="${svgBaseHeight}" viewBox="${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">`;
+
+
+        // Draw triangle lines
+        svgContent += `<polygon points="${points[0].x},${points[0].y} ${points[1].x},${points[1].y} ${points[2].x},${points[2].y}" style="fill:none;stroke:black;stroke-width:1.5" />`;
+
+        // Add vertex labels (A, B, C)
+        svgContent += `<text x="${points[0].x - 5}" y="${points[0].y + 10}" font-size="14" text-anchor="end" fill="#333">A</text>`;
+        svgContent += `<text x="${points[1].x + 5}" y="${points[1].y + 10}" font-size="14" text-anchor="start" fill="#333">B</text>`;
+        svgContent += `<text x="${points[2].x}" y="${points[2].y - 5}" font-size="14" text-anchor="middle" fill="#333">C</text>`;
+
+
+        // Calculate midpoints for side labels (approximate positions)
+        const midAB = { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 + 8 };
+        const midBC = { x: (points[1].x + points[2].x) / 2 + 10, y: (points[1].y + points[2].y) / 2 };
+        const midAC = { x: (points[0].x + points[2].x) / 2 - 10, y: (points[0].y + points[2].y) / 2 };
+
+        // Add side labels (a, b, c)
+        // Side a is opposite A (line BC)
+        // Side b is opposite B (line AC)
+        // Side c is opposite C (line AB)
+
+        let labelA = 'a';
+        let labelB = 'b';
+        let labelC = 'c';
+
+        // Determine which side is unknown based on the formula type and unknown element
+        if (unknownElement && unknownElement.startsWith('unknown-side')) {
+            const unknownSideLetter = unknownElement.slice('unknown-side-'.length);
+            if (unknownSideLetter === 'a') labelA = '?';
+            if (unknownSideLetter === 'b') labelB = '?';
+            if (unknownSideLetter === 'c') labelC = '?';
+        }
+
+        // Use standard text for labels
+        svgContent += `<text x="${midBC.x}" y="${midBC.y}" font-size="16" text-anchor="start" fill="${labelA === '?' ? 'red' : 'black'}">${labelA}</text>`; // Side a (BC)
+        svgContent += `<text x="${midAC.x}" y="${midAC.y}" font-size="16" text-anchor="end" fill="${labelB === '?' ? 'red' : 'black'}">${labelB}</text>`; // Side b (AC)
+        svgContent += `<text x="${midAB.x}" y="${midAB.y}" font-size="16" text-anchor="middle" fill="${labelC === '?' ? 'red' : 'black'}">${labelC}</text>`; // Side c (AB)
+
+
+        // Add angle labels (alpha, beta, gamma)
+        const angleLabelOffset = 15; // Distance from vertex
+
+        // Function to add angle arc and label
+        function addAngleLabel(vertexPoint, adjacentPoint1, adjacentPoint2, angleLabel, isUnknown, angleNameForFormula) {
+             if (isUnknown) {
+                 const angleLabelPos = { x: vertexPoint.x + (adjacentPoint1.x > vertexPoint.x ? 20 : -20), y: vertexPoint.y + (adjacentPoint1.y > vertexPoint.y ? 20 : -5) }; // Position near vertex
+                 svgContent += `<text x="${angleLabelPos.x}" y="${angleLabelPos.y}" font-size="18" text-anchor="middle" fill="red">?</text>`;
+             } else {
+                // Add arc for the angle
+                 const angleArcRadius = 20;
+                 const vec1 = { x: adjacentPoint1.x - vertexPoint.x, y: adjacentPoint1.y - vertexPoint.y };
+                 const vec2 = { x: adjacentPoint2.x - vertexPoint.x, y: adjacentPoint2.y - vertexPoint.y };
+
+                 const angle1_rad = Math.atan2(vec1.y, vec1.x);
+                 const angle2_rad = Math.atan2(vec2.y, vec2.x);
+
+                 let startAngle = Math.min(angle1_rad, angle2_rad);
+                 let endAngle = Math.max(angle1_rad, angle2_rad);
+
+                 if (endAngle - startAngle > Math.PI) {
+                     [startAngle, endAngle] = [endAngle, startAngle + 2 * Math.PI];
+                 } else if (endAngle - startAngle < -Math.PI) {
+                      [startAngle, endAngle] = [endAngle - 2 * Math.PI, startAngle];
+                 }
+
+
+                const startX = vertexPoint.x + angleArcRadius * Math.cos(startAngle);
+                const startY = vertexPoint.y + angleArcRadius * Math.sin(startAngle);
+                const endX = vertexPoint.x + angleArcRadius * Math.cos(endAngle);
+                const endY = vertexPoint.y + angleArcRadius * Math.sin(endAngle);
+                svgContent += `<path d="M ${startX},${startY} A ${angleArcRadius},${angleArcRadius} 0 0 ${endAngle > startAngle ? 1 : 0} ${endX},${endY}" fill="none" stroke="black" stroke-width="1"/>`;
+
+
+                // Position for the angle label
+                 const midAngleRad = (startAngle + endAngle) / 2;
+                 const labelX = vertexPoint.x + (angleArcRadius + angleLabelOffset) * Math.cos(midAngleRad);
+                 const labelY = vertexPoint.y + (angleArcRadius + angleLabelOffset) * Math.sin(midAngleRad);
+                 svgContent += `<text x="${labelX}" y="${labelY}" font-size="14" text-anchor="middle" fill="${formulaType === angleNameForFormula ? 'blue' : 'black'}">${angleLabel}</text>`;
+             }
+        }
+
+        // Add angle labels using the helper function
+        addAngleLabel(points[0], points[2], points[1], 'alpha', unknownElement === 'unknown-angle-alpha', 'alpha'); // Angle Alpha at A
+        addAngleLabel(points[1], points[0], points[2], 'beta', unknownElement === 'unknown-angle-beta', 'beta');   // Angle Beta at B
+        addAngleLabel(points[2], points[0], points[1], 'gamma', unknownElement === 'unknown-angle-gamma', 'gamma'); // Angle Gamma at C
+
+
+        svgContent += `</svg>`;
+        return svgContent;
+    }
+
+
+    // Main function to generate a task
+    function generateTask() {
+        // Hide solution initially
+        solutionDiv.style.display = 'none';
+        toggleSolutionBtn.style.display = 'none'; // Hide button until task is generated
+        solutionDiv.innerHTML = ''; // Clear previous solution
+
+        // Get selected task type
+        const selectedTaskType = document.querySelector('input[name="task-type"]:checked').value;
+
+        // Generate valid triangle angles
+        const angles = generateTriangleAngles();
+
+        // Choose a base side length (e.g., side 'a')
+        const baseSideA = getRandom(5, 15);
+        const sides = calculateSides(angles, baseSideA);
+
+        // Round all values for the problem
+        const roundedSides = {
+            a: round(sides.a, 2),
+            b: round(sides.b, 2),
+            c: round(sides.c, 2)
+        };
+        const roundedAngles = {
+            alpha: round(angles.alpha_deg, 1),
+            beta: round(angles.beta_deg, 1),
+            gamma: round(angles.gamma_deg, 1)
+        };
+
+        // Calculate the area using one of the formulas
+        const area_ab_gamma = 0.5 * roundedSides.a * roundedSides.b * Math.sin(degToRad(roundedAngles.gamma));
+        const area_bc_alpha = 0.5 * roundedSides.b * roundedSides.c * Math.sin(degToRad(roundedAngles.alpha));
+        const area_ac_beta = 0.5 * roundedSides.a * roundedSides.c * Math.sin(degToRad(roundedAngles.beta));
+
+        // Round the area (can use any of the calculated areas, they should be very close)
+        const roundedArea = round(area_ab_gamma, 2);
+
+        let taskDescription = "";
+        let solutionSteps = [];
+        let sketchSVG = "";
+        let unknownElement = null; // To indicate what is unknown in the sketch
+
+        // Choose which formula variation to use for the problem (randomly, regardless of task type)
+        const formulaVariation = Math.floor(Math.random() * 3);
+        const formulaMapping = {
+            0: { sides: ['a', 'b'], angle: 'gamma', formula: 'A = 1/2 * a * b * sin(gamma)' },
+            1: { sides: ['b', 'c'], angle: 'alpha', formula: 'A = 1/2 * b * c * sin(alpha)' },
+            2: { sides: ['a', 'c'], angle: 'beta', 'formula': 'A = 1/2 * a * c * sin(beta)' }
+        };
+        const chosenFormula = formulaMapping[formulaVariation];
+        const side1 = chosenFormula.sides[0];
+        const side2 = chosenFormula.sides[1];
+        const angle = chosenFormula.angle;
+        const formulaText = chosenFormula.formula; // Use text formula
+
+        const side1Value = roundedSides[side1];
+        const side2Value = roundedSides[side2];
+        const angleValue = roundedAngles[angle];
+
+
+        if (selectedTaskType === 'area') { // Find Area
+            taskDescription = `Berechnen Sie den Flächeninhalt eines Dreiecks mit den Seitenlängen ${side1} = ${side1Value} cm und ${side2} = ${side2Value} cm sowie dem eingeschlossenen Winkel ${angle} = ${angleValue}°.`;
+            solutionSteps.push({
+                heading: "Schritt 1: Formel aufschreiben",
+                text: `Der Flächeninhalt eines Dreiecks kann mit der Formel berechnet werden, wenn zwei Seiten und der eingeschlossene Winkel bekannt sind:
+                <span class="math-expression">${formulaText}</span>`
+            });
+             solutionSteps.push({
+                heading: "Schritt 2: Werte einsetzen",
+                text: `Setzen Sie die gegebenen Werte in die Formel ein:
+                <span class="math-expression">A = 1/2 * ${side1Value} cm * ${side2Value} cm * sin(${angleValue}°)</span>`
+            });
+             solutionSteps.push({
+                heading: "Schritt 3: Berechnen",
+                text: `Berechnen Sie den Flächeninhalt:
+                <span class="math-expression">A ≈ ${roundedArea} cm²</span>`
+            });
+            sketchSVG = createTriangleSketch(angles, roundedSides, angle, null); // Area is unknown, but we show all knowns
+
+        } else { // Find Side or Angle (selectedTaskType === 'unknown')
+             // Randomly choose whether to find a side or an angle
+            const findSideOrAngle = Math.random() < 0.5 ? 'side' : 'angle';
+
+            if (findSideOrAngle === 'side') { // Find Side
+                // Randomly choose which of the two sides in the formula is unknown
+                const unknownSideIndex = Math.floor(Math.random() * 2); // 0 or 1
+                const unknownSide = chosenFormula.sides[unknownSideIndex];
+                const knownSide = chosenFormula.sides[1 - unknownSideIndex]; // The other side
+
+                const unknownSideValue = roundedSides[unknownSide]; // This is the value we are looking for
+                const knownSideValue = roundedSides[knownSide];
+                const angleValue = roundedAngles[angle];
+                const areaValue = roundedArea;
+
+
+                taskDescription = `Ein Dreieck hat den Flächeninhalt A = ${areaValue} cm². Eine Seite hat die Länge ${knownSide} = ${knownSideValue} cm, und der eingeschlossene Winkel beträgt ${angle} = ${angleValue}°. Berechnen Sie die Länge der Seite ${unknownSide}.`;
+                unknownElement = `unknown-side-${unknownSide}`;
+
+                solutionSteps.push({
+                    heading: "Schritt 1: Formel aufschreiben",
+                    text: `Die Formel für den Flächeninhalt lautet:
+                    <span class="math-expression">${formulaText}</span>`
+                });
+                 solutionSteps.push({
+                    heading: "Schritt 2: Formel umstellen",
+                    text: `Um die unbekannte Seite ${unknownSide} zu finden, stellen wir die Formel um. Angenommen, wir suchen ${unknownSide}:
+                    <span class="math-expression">${unknownSide} = (2 * A) / (${knownSide} * sin(${angle}))</span>`
+                });
+                 solutionSteps.push({
+                    heading: "Schritt 3: Werte einsetzen",
+                    text: `Setzen Sie die gegebenen Werte ein:
+                    <span class="math-expression">${unknownSide} = (2 * ${areaValue} cm²) / (${knownSideValue} cm * sin(${angleValue}°))</span>`
+                });
+                 solutionSteps.push({
+                    heading: "Schritt 4: Berechnen",
+                    text: `Berechnen Sie die Länge der Seite:
+                    <span class="math-expression">${unknownSide} ≈ ${unknownSideValue} cm</span>`
+                });
+
+                sketchSVG = createTriangleSketch(angles, roundedSides, angle, unknownElement);
+
+
+            } else { // Find Angle
+                // We need to give Area and the two sides that enclose the angle
+                const side1Value = roundedSides[side1];
+                const side2Value = roundedSides[side2];
+                const angleValue = roundedAngles[angle]; // This is the value we are looking for
+                const areaValue = roundedArea;
+
+                // Calculate sin(angle) based on the given area and sides
+                const sin_angle_calc = (2 * areaValue) / (side1Value * side2Value);
+                 // Clamp value to [-1, 1] range in case of minor floating point errors
+                const sin_angle_clamped = Math.max(-1, Math.min(1, sin_angle_calc));
+
+                // Calculate the principal angle in radians using arcsin
+                const angle_rad_arcsin = Math.asin(sin_angle_clamped);
+                const angle_deg_arcsin = radToDeg(angle_rad_arcsin);
+
+                // Handle the two possible angles for a given sine value in 0-180 degrees
+                 let possibleAngle1 = round(angle_deg_arcsin, 1);
+                 let possibleAngle2 = round(180 - angle_deg_arcsin, 1);
+
+                 let solutionExplanation = "";
+                 // Check which possible angle is the correct one based on the original generated angle
+                 if (Math.abs(possibleAngle1 - angleValue) < Math.abs(possibleAngle2 - angleValue)) {
+                     // The principal angle is the correct one
+                      solutionExplanation = `<span class="math-expression">sin(${angle}) = (2 * A) / (${side1} * ${side2}) = (2 * ${areaValue} cm²) / (${side1Value} cm * ${side2Value} cm) ≈ ${round(sin_angle_clamped, 3)}</span>
+                      Nun verwenden wir die Umkehrfunktion, den Arkussinus (arcsin):
+                      <span class="math-expression">${angle} = arcsin(${round(sin_angle_clamped, 3)}) ≈ ${possibleAngle1}°</span>
+                      Da der Winkel im Dreieck zwischen 0° und 180° liegen muss und sin(${angle}) positiv ist, gibt es potenziell auch die Lösung 180° - ${possibleAngle1}° = ${possibleAngle2}°.
+                      Basierend auf der Geometrie des Dreiecks ist die gesuchte Lösung ${angle} ≈ ${angleValue}°.`; // Show the actual value
+
+                 } else {
+                      // The supplementary angle (180 - angle) is the correct one
+                     solutionExplanation = `<span class="math-expression">sin(${angle}) = (2 * A) / (${side1} * ${side2}) = (2 * ${areaValue} cm²) / (${side1Value} cm * ${side2Value} cm) ≈ ${round(sin_angle_clamped, 3)}</span>
+                     Nun verwenden wir die Umkehrfunktion, den Arkussinus (arcsin):
+                     <span class="math-expression">${angle} = arcsin(${round(sin_angle_clamped, 3)}) ≈ ${possibleAngle1}°</span>
+                     Für einen Winkel im Dreieck, der zwischen 0° und 180° liegt und denselben Sinuswert hat, gibt es auch die Lösung 180° - ${possibleAngle1}° = ${possibleAngle2}°.
+                     Basierend auf der Geometrie des Dreiecks ist die gesuchte Lösung ${angle} ≈ ${angleValue}°.`; // Show the actual value
+                 }
+
+
+                taskDescription = `Ein Dreieck hat den Flächeninhalt A = ${areaValue} cm². Zwei Seiten, die den Winkel ${angle} einschließen, haben die Längen ${side1} = ${side1Value} cm und ${side2} = ${side2Value} cm. Berechnen Sie die Größe des Winkels ${angle}.`;
+                unknownElement = `unknown-angle-${angle}`;
+
+                 solutionSteps.push({
+                    heading: "Schritt 1: Formel aufschreiben",
+                    text: `Die Formel für den Flächeninhalt lautet:
+                    <span class="math-expression">${formulaText}</span>`
+                });
+                 solutionSteps.push({
+                    heading: "Schritt 2: Formel umstellen",
+                    text: `Um den Winkel ${angle} zu finden, stellen wir die Formel nach sin(${angle}) um:
+                    <span class="math-expression">sin(${angle}) = (2 * A) / (${side1} * ${side2})</span>`
+                });
+                 solutionSteps.push({
+                    heading: "Schritt 3: Werte einsetzen und sin(${angle}) berechnen",
+                    text: solutionExplanation // This step includes the calculation and arcsin
+                });
+                 solutionSteps.push({
+                    heading: "Schritt 4: Ergebnis",
+                    text: `Der Winkel beträgt ${angle} ≈ ${angleValue}°.`
+                });
+
+                sketchSVG = createTriangleSketch(angles, roundedSides, angle, unknownElement);
+            }
+        }
+
+
+        // Display the generated content
+        taskDescriptionDiv.innerHTML = taskDescription;
+        taskSketchDiv.innerHTML = sketchSVG;
+
+        // Build the solution HTML with steps
+        let solutionHTML = "<h3>Lösung</h3>";
+        solutionSteps.forEach(step => {
+            solutionHTML += `<h4>${step.heading}</h4><p>${step.text}</p>`;
+        });
+        solutionDiv.innerHTML = solutionHTML;
+
+
+        // Show the toggle button
+        toggleSolutionBtn.style.display = 'block';
+
+        // MathJax Aufrufe entfernt
+    }
+
+    // Event listeners
+    generateBtn.addEventListener('click', generateTask);
+    toggleSolutionBtn.addEventListener('click', () => {
+        if (solutionDiv.style.display === 'none') {
+            solutionDiv.style.display = 'block';
+            toggleSolutionBtn.textContent = 'Lösung verbergen';
+        } else {
+            solutionDiv.style.display = 'none';
+            toggleSolutionBtn.textContent = 'Lösung anzeigen';
+        }
+    });
+
+    // Generate the first task when the page loads
+    generateTask();
+});
+</script>
+
+</body>
+</html>

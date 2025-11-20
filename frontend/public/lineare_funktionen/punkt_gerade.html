@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aufgabengenerator: Punktprobe bei Geraden</title>
+    <style>
+        /* Modernes & ansprechendes Design */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        #task-generator-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 25px 30px;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            position: relative;
+        }
+        #task-generator-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        #difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .difficulty-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+        .difficulty-button.active {
+            background-color: #0073aa;
+            color: white;
+            border-color: #0073aa;
+            font-weight: bold;
+        }
+        #task-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #495057;
+        }
+        .equation-display {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #005a87;
+            font-family: 'Courier New', Courier, monospace;
+            display: block;
+            margin-top: 8px;
+            word-break: break-word;
+        }
+        .point-display {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #005a87;
+            font-family: 'Courier New', Courier, monospace;
+            display: block;
+            margin-top: 15px; /* Increased margin for more space */
+            word-break: break-word;
+        }
+        #solution-input-container {
+            margin-bottom: 15px;
+        }
+        #number-input-mask {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        #coord-input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1.2em;
+            width: 100px;
+            text-align: center;
+        }
+        #boolean-input-mask button {
+            padding: 10px 30px;
+            font-size: 1.2em;
+            width: 100px;
+        }
+        #feedback-output {
+            min-height: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .correct { color: #28a745; }
+        .incorrect { color: #dc3545; }
+        #solution-output {
+            background-color: #e9f5e9;
+            border: 1px solid #c8e6c9;
+            color: #2e7d32;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.8;
+            word-break: break-word;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .generator-button {
+            background: linear-gradient(145deg, #0078b3, #005f8e);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .generator-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .generator-button:disabled {
+            background: linear-gradient(145deg, #c0c0c0, #a9a9a9);
+            cursor: not-allowed;
+            transform: none;
+        }
+        .check-button { background: linear-gradient(145deg, #28a745, #218838); }
+        .secondary-button { background: linear-gradient(145deg, #6c757d, #5a6268); }
+        .video-button { background: linear-gradient(145deg, #ff0000, #cc0000); } /* Distinct color for video */
+    </style>
+</head>
+<body>
+
+<div id="task-generator-container">
+    <a href="index.html" style="display: block; margin-bottom: 15px; color: #0073aa; text-decoration: none; font-weight: 500;">
+        ← Zurück zur Übersicht
+    </a>
+    <h2>Punktprobe bei Geraden</h2>
+
+    <div id="difficulty-selector">
+        <button class="difficulty-button" id="diff-easy" onclick="setDifficulty('easy')">Leicht</button>
+        <button class="difficulty-button" id="diff-medium" onclick="setDifficulty('medium')">Mittel</button>
+        <button class="difficulty-button" id="diff-hard" onclick="setDifficulty('hard')">Schwer</button>
+    </div>
+
+    <div id="task-output">Klicke auf "Neue Aufgabe" um zu starten.</div>
+
+    <div id="solution-input-container">
+        <!-- Input for calculating a coordinate -->
+        <div id="number-input-mask" style="display: none;">
+             <span id="input-prefix"></span>
+             <input type="text" id="coord-input" placeholder="Ergebnis">
+        </div>
+        <!-- Input for Ja/Nein check -->
+        <div id="boolean-input-mask" class="button-container" style="display: none;">
+            <button class="generator-button check-button" onclick="checkSolution(true)">Ja</button>
+            <button class="generator-button incorrect" style="background: #dc3545;" onclick="checkSolution(false)">Nein</button>
+        </div>
+    </div>
+    
+    <div id="feedback-output"></div>
+
+    <div class="button-container">
+        <button class="generator-button" onclick="generateNewTask()">Neue Aufgabe</button>
+        <button class="generator-button check-button" id="check-btn" onclick="checkSolution()">Lösung prüfen</button>
+        <button class="generator-button secondary-button" id="show-answer-btn" onclick="showAnswer()">Lösung anzeigen</button>
+        <button class="generator-button video-button" onclick="openVideo()">Erklärvideo</button>
+    </div>
+
+    <div id="solution-output" style="display: none;"></div>
+</div>
+
+<script>
+    let correctAnswer;
+    let solutionSteps = "";
+    let currentTaskType = "";
+    let currentDifficulty = "easy";
+
+    function setDifficulty(level) {
+        currentDifficulty = level;
+        document.querySelectorAll('.difficulty-button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`diff-${level}`).classList.add('active');
+        generateNewTask();
+    }
+    
+    function formatNumber(num) {
+        // Runde auf 2 Dezimalstellen für die Anzeige
+        return Math.round(num * 100) / 100;
+    }
+
+    function generateNewTask() {
+        // Reset UI
+        document.getElementById('feedback-output').textContent = '';
+        document.getElementById('coord-input').value = '';
+        document.getElementById('solution-output').style.display = 'none';
+        document.getElementById('show-answer-btn').disabled = true;
+
+        const randomInt = (max, min = 0) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const randomChoice = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        
+        let m, t;
+
+        // Generate m and t based on difficulty
+        switch (currentDifficulty) {
+            case 'medium':
+                m = randomChoice([0.5, -0.5, 1.5, -1.5, 2.5, -2.5, randomInt(3, -3)]);
+                if (m === 0) m = 1.5;
+                t = randomInt(10, -10) / randomChoice([1, 2]); // Integers or .5 decimals
+                break;
+            case 'hard':
+                m = randomInt(300, -300) / 100; // m with up to 2 decimal places
+                if (m === 0) m = 1.25;
+                t = randomInt(1000, -1000) / 100; // t with up to 2 decimal places
+                break;
+            case 'easy':
+            default:
+                m = randomInt(5, -5);
+                if (m === 0) m = 1;
+                t = randomInt(10, -10);
+                break;
+        }
+        
+        m = formatNumber(m);
+        t = formatNumber(t);
+
+        let m_str = (m === 1) ? "" : (m === -1) ? "-" : m;
+        let t_str = (t === 0) ? "" : (t > 0) ? ` + ${t}` : ` - ${Math.abs(t)}`;
+        const equationString = `g: y = ${m_str}x${t_str}`;
+
+        // Select task type
+        const taskTypeRand = Math.random();
+        currentTaskType = taskTypeRand < 0.33 ? 'check_point' : taskTypeRand < 0.66 ? 'find_y' : 'find_x';
+
+        document.getElementById('number-input-mask').style.display = 'none';
+        document.getElementById('boolean-input-mask').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'none';
+
+        let p = { x: randomInt(10, -10), y: 0 };
+        const pointName = String.fromCharCode(65 + randomInt(15)); // Random letter A-P
+        let taskText = "";
+        let pointDisplay = "";
+
+        if (currentTaskType === 'check_point') {
+            document.getElementById('boolean-input-mask').style.display = 'flex';
+            const isOnLine = Math.random() < 0.5;
+            if (isOnLine) {
+                p.y = formatNumber(m * p.x + t);
+                correctAnswer = true;
+            } else {
+                p.y = formatNumber(m * p.x + t + randomInt(5, 1) * (Math.random() < 0.5 ? 1 : -1));
+                correctAnswer = false;
+            }
+            taskText = 'Berechne, ob der nachfolgende Punkt auf der Geraden liegt.';
+            pointDisplay = `${pointName}(${p.x}|${p.y})`;
+            const calcResult = formatNumber(m * p.x + t);
+            solutionSteps = `
+                <strong>Probe:</strong> Setze die Koordinaten von ${pointName}(${p.x}|${p.y}) ein.<br>
+                ${p.y} = ${m} * ${p.x} + ${t}<br>
+                ${p.y} = ${calcResult}<br>
+                <strong>Ergebnis:</strong> Die Aussage ist <strong>${(Math.abs(p.y - calcResult) < 0.01) ? 'wahr' : 'falsch'}</strong>.
+            `;
+        } else if (currentTaskType === 'find_y') {
+            document.getElementById('number-input-mask').style.display = 'flex';
+            document.getElementById('check-btn').style.display = 'block';
+            correctAnswer = formatNumber(m * p.x + t);
+            taskText = `Der Punkt ${pointName} liegt auf der Geraden. Berechne die fehlende y-Koordinate.`;
+            pointDisplay = `${pointName}(${p.x}|y)`;
+            document.getElementById('input-prefix').textContent = "y = ";
+             solutionSteps = `
+                <strong>Ansatz:</strong> Setze die x-Koordinate in die Geradengleichung ein.<br>
+                y = ${m} * ${p.x} + ${t}<br>
+                y = ${formatNumber(m * p.x)} + ${t}<br>
+                <strong>Ergebnis:</strong> y = ${correctAnswer}
+            `;
+        } else { // find_x
+            document.getElementById('number-input-mask').style.display = 'flex';
+            document.getElementById('check-btn').style.display = 'block';
+            const temp_x = randomInt(10, -10);
+            p.y = formatNumber(m * temp_x + t);
+            correctAnswer = temp_x;
+            taskText = `Der Punkt ${pointName} liegt auf der Geraden. Berechne die fehlende x-Koordinate.`;
+            pointDisplay = `${pointName}(x|${p.y})`;
+            document.getElementById('input-prefix').textContent = "x = ";
+            solutionSteps = `
+                <strong>Ansatz:</strong> Setze die y-Koordinate ein und löse nach x auf.<br>
+                ${p.y} = ${m} * x + ${t}<br>
+                ${formatNumber(p.y - t)} = ${m} * x<br>
+                <strong>Ergebnis:</strong> x = ${correctAnswer}
+            `;
+        }
+        
+        document.getElementById('task-output').innerHTML = `
+            ${taskText}<br>
+            <div class="equation-display">${equationString}</div>
+            <div class="point-display">${pointDisplay}</div>
+        `;
+    }
+
+    function checkSolution(userAnswer) {
+        const feedback = document.getElementById('feedback-output');
+        const showAnswerBtn = document.getElementById('show-answer-btn');
+        let isCorrect = false;
+
+        if (currentTaskType === 'check_point') {
+            isCorrect = (userAnswer === correctAnswer);
+        } else {
+            const userInput = document.getElementById('coord-input').value.replace(',', '.');
+            if (userInput === '') {
+                feedback.textContent = 'Bitte gib eine Lösung ein.';
+                feedback.className = 'incorrect';
+                return;
+            }
+            const userCoord = parseFloat(userInput);
+            isCorrect = (Math.abs(userCoord - correctAnswer) < 0.01);
+        }
+        
+        if (isCorrect) {
+            feedback.textContent = 'Richtig! Sehr gut!';
+            feedback.className = 'correct';
+            showAnswerBtn.disabled = true;
+        } else {
+            feedback.textContent = 'Leider nicht richtig. Versuche es noch einmal!';
+            feedback.className = 'incorrect';
+            showAnswerBtn.disabled = false;
+        }
+    }
+
+    function showAnswer() {
+        const solutionDiv = document.getElementById('solution-output');
+        solutionDiv.innerHTML = solutionSteps;
+        solutionDiv.style.display = 'block';
+        document.getElementById('show-answer-btn').disabled = true;
+    }
+
+    function openVideo() {
+        window.open("https://youtu.be/W14DzAUEMCA?si=Mxaz6IO3p8T-N_A", "_blank");
+    }
+
+    window.onload = function() {
+        setDifficulty('easy');
+    };
+
+</script>
+
+</body>
+</html>

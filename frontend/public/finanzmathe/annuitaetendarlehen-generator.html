@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annuitätendarlehen Tilgungsplan Aufgabe</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th {
+            background-color: #f9fafb;
+        }
+        .table-input {
+            width: 100px;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-align: right;
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .feedback-icon {
+            font-size: 1.2em;
+        }
+        .correct-icon { color: var(--success-color); }
+        .incorrect-icon { color: var(--error-color); }
+        .input-correct { border-color: var(--success-color); }
+        .input-incorrect { border-color: var(--error-color); }
+        #tip-area {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #eff6ff; /* blue-50 */
+            border: 1px solid #93c5fd; /* blue-300 */
+            color: #1d4ed8; /* blue-700 */
+            border-radius: 8px;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Zurück zur Übersicht</a>
+        <h1>Aufgabe: Tilgungsplan Annuitätendarlehen</h1>
+
+        <div id="task-description" class="mb-6 text-center">
+            <p id="task-intro"></p>
+            <p id="loan-details-text"></p>
+            <p>Füllen Sie die fehlenden Felder in der folgenden Tabelle aus.</p>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Jahr (v)</th>
+                        <th>Schulden zu Jahresbeginn in €</th>
+                        <th>Zinsen in €</th>
+                        <th>Tilgung in €</th>
+                        <th>Annuität in €</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-k0" class="table-input" placeholder="K₀"><span id="feedback-k0" class="feedback-icon"></span></div></td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-z1" class="table-input" placeholder="Z₁"><span id="feedback-z1" class="feedback-icon"></span></div></td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-t1" class="table-input" placeholder="T₁"><span id="feedback-t1" class="feedback-icon"></span></div></td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-a1" class="table-input" placeholder="A"><span id="feedback-a1" class="feedback-icon"></span></div></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-k1" class="table-input" placeholder="K₁"><span id="feedback-k1" class="feedback-icon"></span></div></td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-z2" class="table-input" placeholder="Z₂"><span id="feedback-z2" class="feedback-icon"></span></div></td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-t2" class="table-input" placeholder="T₂"><span id="feedback-t2" class="feedback-icon"></span></div></td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-a2" class="table-input" placeholder="A"><span id="feedback-a2" class="feedback-icon"></span></div></td>
+                    </tr>
+                    <tr id="separator-row"><td colspan="5" style="border-top: 2px solid var(--border-color); padding: 0;"></td></tr>
+                    <tr id="intermediate-row">
+                        <td id="intermediate-year-display"></td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-kv-1" class="table-input" placeholder="Kᵥ₋₁"><span id="feedback-kv-1" class="feedback-icon"></span></div></td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-zv" class="table-input" placeholder="Zᵥ"><span id="feedback-zv" class="feedback-icon"></span></div></td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-tv" class="table-input" placeholder="Tᵥ"><span id="feedback-tv" class="feedback-icon"></span></div></td>
+                        <td><div class="input-container"><input type="number" step="0.01" id="input-av" class="table-input" placeholder="A"><span id="feedback-av" class="feedback-icon"></span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-6 flex justify-center space-x-4">
+            <button id="generate-task" class="btn btn-secondary">Neue Aufgabe</button>
+            <button id="check-answers" class="btn btn-primary">Antworten prüfen</button>
+            <button id="show-tip" class="btn" style="background-color: #f59e0b;">Tipp anzeigen</button>
+        </div>
+
+        <div id="feedback" class="mt-6 text-center font-bold"></div>
+        <div id="tip-area" class="hidden">
+            <strong>Tipp:</strong> <span id="tip-text"></span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const taskIntroParagraph = document.getElementById('task-intro');
+            const loanDetailsText = document.getElementById('loan-details-text');
+            const allInputs = Array.from(document.querySelectorAll('.table-input'));
+            const generateButton = document.getElementById('generate-task');
+            const checkButton = document.getElementById('check-answers');
+            const showTipButton = document.getElementById('show-tip');
+            const feedbackDiv = document.getElementById('feedback');
+            const tipArea = document.getElementById('tip-area');
+            const tipTextSpan = document.getElementById('tip-text');
+            const intermediateYearDisplay = document.getElementById('intermediate-year-display');
+            const intermediateRow = document.getElementById('intermediate-row');
+            const separatorRow = document.getElementById('separator-row');
+
+            let correctValues = {};
+            let randomYear = 0;
+            let activeInputId = null;
+            let currentK0, currentRate, currentN, calculatedAnnuity;
+
+            const introTexts = [
+                "Ein Unternehmen nimmt ein Annuitätendarlehen auf, um eine neue Maschine zu finanzieren.",
+                "Zur Anschaffung neuer Betriebsmittel nimmt ein Betrieb ein Annuitätendarlehen auf.",
+                "Ein Kreditinstitut vergibt ein Annuitätendarlehen an einen Kunden.",
+                "Ein Darlehen wird als Annuitätendarlehen mit konstanter Annuität vereinbart."
+            ];
+            const loanDetailTemplates = [
+                "Das Darlehen hat eine anfängliche Schuldenhöhe (K₀) von <strong>{k0}</strong>, eine Gesamtlaufzeit (n) von <strong>{n} Jahren</strong> und einen jährlichen Zinssatz von <strong>{rate} % p.a.</strong>",
+                "Vereinbart wurde ein Annuitätendarlehen über <strong>{k0}</strong> mit einer Laufzeit von <strong>{n} Jahren</strong> und einem Zinssatz von <strong>{rate} % p.a.</strong>"
+            ];
+
+            allInputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    activeInputId = input.id;
+                    tipArea.classList.add('hidden');
+                });
+                input.addEventListener('blur', () => {
+                    setTimeout(() => { if (document.activeElement !== showTipButton) activeInputId = null; }, 10);
+                });
+            });
+
+            function generateTask() {
+                const k0 = Math.floor(Math.random() * 100000) + 50000;
+                const n = Math.floor(Math.random() * 22) + 9;
+                const annualRateRaw = (Math.random() * 0.09) + 0.01;
+                const ratePercentRounded = (annualRateRaw * 100).toFixed(1);
+                const exactRate = parseFloat(ratePercentRounded) / 100;
+
+                currentK0 = k0;
+                currentRate = exactRate;
+                currentN = n;
+
+                const q = 1 + exactRate;
+                const A = k0 * (Math.pow(q, n) * (q - 1)) / (Math.pow(q, n) - 1);
+                calculatedAnnuity = A;
+
+                randomYear = Math.floor(Math.random() * (n - 4)) + 4;
+                intermediateYearDisplay.textContent = randomYear;
+                intermediateRow.style.display = '';
+                separatorRow.style.display = '';
+
+                taskIntroParagraph.textContent = introTexts[Math.floor(Math.random() * introTexts.length)];
+                const formattedK0 = k0.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+                loanDetailsText.innerHTML = loanDetailTemplates[Math.floor(Math.random() * loanDetailTemplates.length)]
+                    .replace('{k0}', formattedK0).replace('{n}', n).replace('{rate}', ratePercentRounded);
+
+                let currentDebt = k0;
+                let Z1 = currentDebt * exactRate;
+                let T1 = A - Z1;
+                let K1 = currentDebt - T1;
+                currentDebt = K1;
+                let Z2 = currentDebt * exactRate;
+                let T2 = A - Z2;
+                
+                currentDebt = k0;
+                for (let i = 1; i < randomYear; i++) {
+                    const Zi = currentDebt * exactRate;
+                    const Ti = A - Zi;
+                    currentDebt -= Ti;
+                }
+                let Kv_1_intermediate = currentDebt;
+                let Zv_intermediate = Kv_1_intermediate * exactRate;
+                let Tv_intermediate = A - Zv_intermediate;
+
+                correctValues = {
+                    'input-k0': k0, 'input-z1': Z1, 'input-t1': T1, 'input-a1': A,
+                    'input-k1': K1, 'input-z2': Z2, 'input-t2': T2, 'input-a2': A,
+                    'input-kv-1': Kv_1_intermediate, 'input-zv': Zv_intermediate, 'input-tv': Tv_intermediate, 'input-av': A
+                };
+
+                resetUI();
+            }
+
+            function resetUI() {
+                allInputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('input-correct', 'input-incorrect');
+                    const feedbackIcon = document.getElementById(input.id.replace('input-', 'feedback-'));
+                    if(feedbackIcon) feedbackIcon.innerHTML = '';
+                });
+                feedbackDiv.textContent = '';
+                tipArea.classList.add('hidden');
+            }
+
+            function checkAnswers() {
+                let allCorrect = true;
+                const feedbackMessages = [];
+                const tolerance = 0.02;
+
+                allInputs.forEach(input => {
+                    const id = input.id;
+                    const feedbackIconSpan = document.getElementById(id.replace('input-', 'feedback-'));
+                    const userAnswer = parseFloat(input.value);
+                    const correctAnswer = correctValues[id];
+                    
+                    input.classList.remove('input-correct', 'input-incorrect');
+
+                    if (isNaN(userAnswer)) {
+                        feedbackMessages.push(`${input.placeholder}: Ungültige Eingabe`);
+                        input.classList.add('input-incorrect');
+                        if(feedbackIconSpan) feedbackIconSpan.innerHTML = '<i class="fas fa-times-circle incorrect-icon"></i>';
+                        allCorrect = false;
+                    } else if (Math.abs(userAnswer - correctAnswer) < tolerance) {
+                        input.classList.add('input-correct');
+                        if(feedbackIconSpan) feedbackIconSpan.innerHTML = '<i class="fas fa-check-circle correct-icon"></i>';
+                    } else {
+                        feedbackMessages.push(`${input.placeholder}: Falsch (Korrekt: ${correctAnswer.toFixed(2)} €)`);
+                        input.classList.add('input-incorrect');
+                        if(feedbackIconSpan) feedbackIconSpan.innerHTML = '<i class="fas fa-times-circle incorrect-icon"></i>';
+                        allCorrect = false;
+                    }
+                });
+
+                feedbackDiv.innerHTML = feedbackMessages.join('<br>');
+                feedbackDiv.className = allCorrect ? 'mt-6 text-center font-bold correct-feedback' : 'mt-6 text-center font-bold incorrect-feedback';
+                if (allCorrect) {
+                    feedbackDiv.innerHTML = 'Alle Antworten sind korrekt!';
+                }
+            }
+
+            function showTip() {
+                let tip = '';
+                const A = calculatedAnnuity;
+                const n = currentN;
+
+                switch (activeInputId) {
+                    case 'input-k0':
+                        tip = `Die anfänglichen Schulden (K₀) sind im Aufgabentext angegeben.`;
+                        break;
+                    case 'input-z1':
+                        tip = `Zinsen Jahr 1 (Z₁) = Schulden zu Jahresbeginn Jahr 1 (K₀) * Zinssatz. (K₀ = ${currentK0.toFixed(2)} €, Zinssatz = ${(currentRate * 100).toFixed(1)}%)`;
+                        break;
+                    case 'input-t1':
+                         tip = `Tilgung Jahr 1 (T₁) = Annuität (A) - Zinsen Jahr 1 (Z₁). (A ≈ ${A.toFixed(2)} €)`;
+                         break;
+                    case 'input-a1':
+                    case 'input-a2':
+                    case 'input-av':
+                         tip = `Die Annuität (A) ist bei einem Annuitätendarlehen über die gesamte Laufzeit konstant. A = K₀ * (qⁿ * (q-1)) / (qⁿ - 1), wobei q = 1 + Zinssatz. (K₀ = ${currentK0.toFixed(2)} €, n = ${n}, Zinssatz = ${(currentRate * 100).toFixed(1)}%)`;
+                         break;
+                    case 'input-k1':
+                        tip = `Schulden zu Jahresbeginn Jahr 2 (K₁) = Schulden zu Jahresbeginn Jahr 1 (K₀) - Tilgung Jahr 1 (T₁).`;
+                        break;
+                    case 'input-z2':
+                         tip = `Zinsen Jahr 2 (Z₂) = Schulden zu Jahresbeginn Jahr 2 (K₁) * Zinssatz. (Zinssatz = ${(currentRate * 100).toFixed(1)}%)`;
+                         break;
+                    case 'input-t2':
+                         tip = `Tilgung Jahr 2 (T₂) = Annuität (A) - Zinsen Jahr 2 (Z₂). (A ≈ ${A.toFixed(2)} €)`;
+                         break;
+                    case 'input-kv-1':
+                         tip = `Schulden zu Jahresbeginn Jahr ${randomYear} (Kᵥ₋₁) = Schulden zu Jahresbeginn des Vorjahres - Tilgung des Vorjahres. Wiederholen Sie diesen Schritt beginnend bei K₀.`;
+                         break;
+                    case 'input-zv':
+                         tip = `Zinsen Jahr ${randomYear} (Zᵥ) = Schulden zu Jahresbeginn Jahr ${randomYear} (Kᵥ₋₁) * Zinssatz. (Zinssatz = ${(currentRate * 100).toFixed(1)}%)`;
+                         break;
+                    case 'input-tv':
+                         tip = `Tilgung Jahr ${randomYear} (Tᵥ) = Annuität (A) - Zinsen Jahr ${randomYear} (Zᵥ). (A ≈ ${A.toFixed(2)} €)`;
+                         break;
+                    default:
+                        tip = 'Wählen Sie ein Feld in der Tabelle aus, um einen Tipp zu erhalten.';
+                }
+
+                tipTextSpan.textContent = tip;
+                tipArea.classList.remove('hidden');
+            }
+
+            generateButton.addEventListener('click', generateTask);
+            checkButton.addEventListener('click', checkAnswers);
+            showTipButton.addEventListener('click', showTip);
+
+            generateTask();
+        });
+    </script>
+</body>
+</html>

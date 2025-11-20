@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aufgabengenerator: Eigenschaften von Parabeln</title>
+    <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+    <style>
+        /* Modernes & ansprechendes Design */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        #task-generator-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 20px; /* smaller padding */
+            width: 100%;
+            max-width: 550px; /* smaller max-width */
+            margin: 20px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            transition: all 0.3s ease-in-out;
+            box-sizing: border-box;
+            position: relative;
+        }
+        #score-counter {
+            background-color: #0073aa;
+            color: white;
+            padding: 10px 18px; /* Match button padding */
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px; /* Match button font-size */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #task-generator-container h2 {
+            color: #333; margin-bottom: 20px; font-size: 1.4em; /* smaller font-size */
+        }
+        #ggb-container {
+            width: 80%; /* Verkleinert */
+            margin: 0 auto 10px auto; /* Zentriert mit unterem Abstand */
+            aspect-ratio: 1 / 1; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            border: 1px solid #dcdcdc;
+            background-color: white;
+        }
+        #graph-hint {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        #mc-questions-container {
+            margin-bottom: 20px;
+        }
+        .question-block {
+            background-color: #f8f9fa; border: 1px solid #dcdcdc; border-radius: 8px; padding: 12px; /* smaller padding */
+        }
+        .question-block p {
+            margin-top: 0; font-weight: bold; color: #495057;
+        }
+        .answer-buttons {
+            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+        }
+        .mc-answer-btn {
+            flex: 1; min-width: 140px; padding: 8px; font-size: 0.9em; cursor: pointer; /* smaller */
+            border: 1px solid #ccc; border-radius: 8px; background-color: white;
+            transition: all 0.2s ease;
+        }
+        #feedback-output {
+            min-height: 20px; font-weight: bold; margin-bottom: 15px;
+        }
+        .correct { color: #28a745; }
+        .incorrect { color: #dc3545; }
+        #solution-output {
+            background-color: #e9f5e9; border: 1px solid #c8e6c9; color: #2e7d32;
+            border-radius: 8px; padding: 15px; margin-top: 20px; text-align: left;
+            font-family: 'Courier New', Courier, monospace; line-height: 1.8;
+            word-break: break-word;
+        }
+        .button-container {
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            flex-wrap: wrap;
+            align-items: center; /* Vertically align items */
+        }
+        .generator-button {
+            background: linear-gradient(145deg, #0078b3, #005f8e); color: white;
+            border: none; border-radius: 8px; padding: 10px 18px; /* smaller */
+            font-size: 14px; /* smaller */
+            font-weight: 500; cursor: pointer; transition: all 0.3s ease;
+        }
+        .generator-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .generator-button:disabled {
+            background: linear-gradient(145deg, #c0c0c0, #a9a9a9); cursor: not-allowed;
+            transform: none;
+        }
+        .secondary-button { background: linear-gradient(145deg, #6c757d, #5a6268); }
+    </style>
+</head>
+<body>
+
+<div id="task-generator-container">
+    <a href="index.html" style="display: block; margin-bottom: 15px; color: #0073aa; text-decoration: none; font-weight: 500;">
+        ← Zurück zur Übersicht
+    </a>
+    <h2>Eigenschaften von Parabeln der Form y=ax²</h2>
+
+    <div id="ggb-container">
+        <div id="ggb-element"></div>
+    </div>
+    <div id="graph-hint">Du kannst das Koordinatensystem mit der Maus verschieben und mit dem Mausrad zoomen.</div>
+    
+    <div id="mc-questions-container">
+        <div class="question-block" id="question-1" style="display: none;">
+            <p>1. Im Vergleich zur Normalparabel (gestrichelt) ist der Funktionsgraph...</p>
+            <div class="answer-buttons">
+                <button class="mc-answer-btn" onclick="checkAnswer(1, 'gestreckt')">...gestreckt (schmaler).</button>
+                <button class="mc-answer-btn" onclick="checkAnswer(1, 'gestaucht')">...gestaucht (breiter).</button>
+            </div>
+        </div>
+        <div class="question-block" id="question-2" style="display: none;">
+            <p>2. Der Funktionsgraph ist...</p>
+            <div class="answer-buttons">
+                <button class="mc-answer-btn" onclick="checkAnswer(2, 'oben')">...nach oben geöffnet.</button>
+                <button class="mc-answer-btn" onclick="checkAnswer(2, 'unten')">...nach unten geöffnet.</button>
+            </div>
+        </div>
+        <div class="question-block" id="question-3" style="display: none;">
+            <p>3. Welche ist die korrekte Funktionsgleichung?</p>
+            <div class="answer-buttons" id="equation-answers">
+                <!-- Buttons will be generated by JS -->
+            </div>
+        </div>
+        <div class="question-block" id="question-4" style="display: none;">
+            <p>4. Der Scheitelpunkt S ist in diesem Fall der...</p>
+            <div class="answer-buttons">
+                <button class="mc-answer-btn" onclick="checkAnswer(4, 'hoechster')">...höchste Punkt der Parabel.</button>
+                <button class="mc-answer-btn" onclick="checkAnswer(4, 'niedrigster')">...niedrigste Punkt der Parabel.</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="feedback-output"></div>
+
+    <div class="button-container">
+        <button class="generator-button" onclick="generateNewTask()">Neue Aufgabe</button>
+        <button class="generator-button secondary-button" id="show-answer-btn" onclick="showAnswer()">Lösung anzeigen</button>
+        <div id="score-counter">Punkte: 0</div>
+    </div>
+
+    <div id="solution-output" style="display: none;"></div>
+</div>
+
+<script>
+    let correctAnswers = {};
+    let currentQuestion = 1;
+    let solutionSteps = "";
+    let currentScore = 0;
+    var ggbApplet;
+
+    function updateScore(points) {
+        currentScore += points;
+        document.getElementById('score-counter').textContent = `Punkte: ${currentScore}`;
+    }
+
+    function generateNewTask() {
+        if (!ggbApplet) return;
+
+        // Reset UI
+        document.getElementById('feedback-output').textContent = '';
+        document.getElementById('solution-output').style.display = 'none';
+        document.getElementById('show-answer-btn').disabled = true;
+        
+        const randomChoice = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        
+        // a=1 and a=-1 are excluded so the first question always makes sense
+        const possibleA = [-4, -3, -2, -1.5, -0.5, 0.5, 1.5, 2, 3, 4];
+        const a = randomChoice(possibleA);
+        
+        // Determine correct answers
+        correctAnswers = {
+            1: Math.abs(a) > 1 ? 'gestreckt' : 'gestaucht',
+            2: a > 0 ? 'oben' : 'unten',
+            3: `y = ${a}x²`,
+            4: a > 0 ? 'niedrigster' : 'hoechster'
+        };
+        
+        // Update GeoGebra
+        ggbApplet.reset();
+        ggbApplet.evalCommand(`f(x) = ${a}*x^2`);
+        ggbApplet.evalCommand('n(x) = x^2');
+        ggbApplet.setLineStyle('n', 1);
+        ggbApplet.setColor('n', 150, 150, 150);
+        ggbApplet.evalCommand('S=(0,0)');
+        ggbApplet.setLabelVisible('S', true);
+        
+        // Generate equation choices for question 3
+        const equationAnswersContainer = document.getElementById('equation-answers');
+        equationAnswersContainer.innerHTML = '';
+        let options = [correctAnswers[3]];
+        options.push(`y = ${-a}x²`);
+        options.push(`y = x²`);
+        
+        // Shuffle options
+        options.sort(() => Math.random() - 0.5);
+        
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'mc-answer-btn';
+            btn.textContent = opt;
+            btn.onclick = () => checkAnswer(3, opt);
+            equationAnswersContainer.appendChild(btn);
+        });
+
+        solutionSteps = `
+            Der Formfaktor ist <strong>a = ${a}</strong>.<br><br>
+            <strong>Frage 1 (Form):</strong><br>
+            Der Betrag von a ist |${a}| = ${Math.abs(a)}.<br>
+            Da |a| ${Math.abs(a) > 1 ? '>' : '<'} 1, ist die Parabel <strong>${correctAnswers[1]}</strong>.<br><br>
+            <strong>Frage 2 (Öffnung):</strong><br>
+            Da a ${a > 0 ? '>' : '<'} 0, ist die Parabel <strong>nach ${correctAnswers[2]} geöffnet</strong>.<br><br>
+            <strong>Frage 3 (Gleichung):</strong><br>
+            Aus den Eigenschaften folgt die Gleichung <strong>${correctAnswers[3]}</strong>.<br><br>
+            <strong>Frage 4 (Scheitelpunkt):</strong><br>
+            Weil die Parabel nach ${correctAnswers[2]} geöffnet ist, ist der Scheitelpunkt S ihr <strong>${correctAnswers[4]}ster Punkt</strong>.
+        `;
+
+        // Start with the first question
+        currentQuestion = 1;
+        showQuestion(currentQuestion);
+    }
+    
+    function showQuestion(qNumber) {
+        document.querySelectorAll('.question-block').forEach(q => q.style.display = 'none');
+        const nextQ = document.getElementById(`question-${qNumber}`);
+        if(nextQ) {
+            nextQ.style.display = 'block';
+        } else {
+             document.getElementById('feedback-output').textContent = 'Sehr gut! Alle Fragen richtig beantwortet.';
+             document.getElementById('feedback-output').className = 'correct';
+        }
+    }
+
+    function checkAnswer(questionNumber, userAnswer) {
+        const feedback = document.getElementById('feedback-output');
+        const showAnswerBtn = document.getElementById('show-answer-btn');
+
+        if (userAnswer === correctAnswers[questionNumber]) {
+            feedback.textContent = 'Richtig!';
+            feedback.className = 'correct';
+            showAnswerBtn.disabled = true;
+            updateScore(1);
+            
+            setTimeout(() => {
+                feedback.textContent = '';
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            }, 1000);
+        } else {
+            feedback.textContent = 'Leider falsch. Versuche es erneut!';
+            feedback.className = 'incorrect';
+            showAnswerBtn.disabled = false;
+            updateScore(-0.5);
+        }
+    }
+
+    function showAnswer() {
+        const solutionDiv = document.getElementById('solution-output');
+        solutionDiv.innerHTML = solutionSteps;
+        solutionDiv.style.display = 'block';
+        document.getElementById('show-answer-btn').disabled = true;
+    }
+
+    var params = {
+        "appName": "classic", 
+        "width": 800, 
+        "height": 800, // Make applet square
+        "showToolBar": false, 
+        "showAlgebraInput": false, 
+        "showMenuBar": false,
+        "perspective": "G",
+        "xMin": -4, // Set initial coordinates directly
+        "xMax": 4,
+        "yMin": -4,
+        "yMax": 4,
+        "useBrowserForJS": true,
+        "enableShiftDragZoom": true, 
+        "showResetIcon": true, 
+        "appletOnLoad": function(api) {
+            ggbApplet = api; 
+            generateNewTask();
+        }
+    };
+    var applet = new GGBApplet(params, true);
+    window.addEventListener("load", function() { 
+        applet.inject('ggb-element');
+    });
+
+</script>
+
+</body>
+</html>

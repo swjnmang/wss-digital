@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aufgabengenerator: Kombinierte Zinsrechnung</title>
+    
+    <!-- 1. MathJax-Konfiguration -->
+    <script>
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']], 
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
+    
+    <!-- 2. MathJax-Skript laden -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #005a9e;
+            --secondary-color: #1a73e8;
+            --success-color: #1e8e3e;
+            --danger-color: #d93025;
+            --light-green-bg: #f1f8e9;
+            --light-gray-bg: #f8f9fa;
+            --border-color: #dee2e6;
+            --text-color: #212529;
+            --text-light: #495057;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f7f6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        #generator-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        header h2 {
+            margin: 0;
+            font-size: 1.9em;
+            font-weight: 600;
+        }
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 30px;
+        }
+
+        #controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px; /* Reduzierter Abstand */
+            flex-wrap: wrap;
+        }
+        
+        /* NEU: Styling für die spezifische Auswahl */
+        #specific-controls {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fdfdfd;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        #specific-controls p {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 1.1em;
+        }
+        .specific-btn {
+            background-color: #5f6368; /* Grauton */
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        .specific-btn:hover {
+            background-color: #3c4043;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(60, 64, 67, 0.2);
+        }
+        /* --- Ende NEU --- */
+
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+        }
+
+        button#solution-btn {
+            background-color: var(--success-color);
+        }
+        button#solution-btn:hover {
+            background-color: #155724;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+        }
+        button#check-btn {
+            background-color: #e8710a;
+            flex-shrink: 0; /* Verhindert Schrumpfen */
+        }
+        button#check-btn:hover {
+            background-color: #c45f06;
+            box-shadow: 0 4px 15px rgba(232, 113, 10, 0.2);
+        }
+
+        .output-box {
+            background-color: var(--light-gray-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 20px;
+            min-height: 100px;
+        }
+
+        #task-output p {
+            font-size: 1.15em;
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        #task-output strong {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* --- Anpassungen Eingabebereich --- */
+        #user-input-section {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* Kleinerer Abstand */
+            align-items: center;
+        }
+        #user-input-field {
+            flex: 1 1 180px; /* Flexibel wachsen, Basis 180px */
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        /* NEU: Label für die Einheit */
+        #input-unit {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-light);
+            padding-right: 5px;
+        }
+
+        #check-result {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-align: center;
+            display: none; 
+            margin-top: 10px; /* Abstand nach oben */
+        }
+        #check-result.correct {
+            background-color: var(--light-green-bg);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+            display: block;
+        }
+        #check-result.incorrect {
+            background-color: #fdecea;
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+            display: block;
+        }
+        /* --- Ende Eingabebereich --- */
+
+
+        #solution-output {
+            display: none; 
+            background-color: var(--light-green-bg);
+            border-color: #c3e6cb;
+            margin-top: 30px;
+        }
+        
+        #solution-output h3 {
+            font-size: 1.4em;
+            color: var(--success-color);
+            border-bottom: 2px solid #bde3c5;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+
+        #solution-output ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        #solution-output li {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+        
+        .formula-box {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dce8d8;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        #solution-final {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="generator-container">
+        <header>
+            <h2>Aufgabengenerator</h2>
+            <p>Kombinierte Zinseszins- & Rentenrechnung</p>
+        </header>
+        <main>
+            <div id="controls">
+                <button id="generate-random-btn">Zufällige Aufgabe</button>
+                <button id="solution-btn">Lösung anzeigen</button>
+            </div>
+
+            <!-- NEU: Spezifische Auswahl -->
+            <div id="specific-controls">
+                <p>... oder wähle, was gesucht werden soll:</p>
+                <div>
+                    <button class="specific-btn" id="generate-kn-btn">Gesucht: $K_n$</button>
+                    <button class="specific-btn" id="generate-k0-btn">Gesucht: $K_0$</button>
+                    <button class="specific-btn" id="generate-r-btn">Gesucht: $r$</button>
+                    <button class="specific-btn" id="generate-n-btn">Gesucht: $n$</button>
+                </div>
+            </div>
+
+            <div id="task-output" class="output-box">
+                <p>Klicken Sie auf "Neue Aufgabe generieren", um zu starten.</p>
+            </div>
+
+            <!-- Anpassung: Einheit-Label hinzugefügt -->
+            <div id="user-input-section" style="display: none;">
+                <input type="number" id="user-input-field" placeholder="Deine Antwort...">
+                <span id="input-unit"></span>
+                <button id="check-btn">Prüfen</button>
+                <div id="check-result"></div>
+            </div>
+
+            <div id="solution-output" class="output-box">
+                <!-- Lösungs-Inhalt wird hier per JS eingefügt -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // UI-Elemente
+            const generateRandomBtn = document.getElementById('generate-random-btn'); // Umbenannt
+            const solutionBtn = document.getElementById('solution-btn');
+            const taskOutput = document.getElementById('task-output');
+            const solutionOutput = document.getElementById('solution-output');
+            
+            // NEU: Spezifische Buttons
+            const generateKnBtn = document.getElementById('generate-kn-btn');
+            const generateK0Btn = document.getElementById('generate-k0-btn');
+            const generateRBtn = document.getElementById('generate-r-btn');
+            const generateNBtn = document.getElementById('generate-n-btn');
+            
+            // Eingabe-UI-Elemente
+            const userInputSection = document.getElementById('user-input-section');
+            const userInputField = document.getElementById('user-input-field');
+            const checkBtn = document.getElementById('check-btn');
+            const checkResult = document.getElementById('check-result');
+            const inputUnit = document.getElementById('input-unit'); 
+
+            let currentSolutionData = null; 
+
+            // Event Listeners
+            generateRandomBtn.addEventListener('click', () => generateTask(null)); // Parameter übergeben
+            solutionBtn.addEventListener('click', toggleSolution);
+            checkBtn.addEventListener('click', checkAnswer);
+
+            // NEU: Event Listeners für spezifische Buttons
+            generateKnBtn.addEventListener('click', () => generateTask('Kn'));
+            generateK0Btn.addEventListener('click', () => generateTask('K0'));
+            generateRBtn.addEventListener('click', () => generateTask('r'));
+            generateNBtn.addEventListener('click', () => generateTask('n'));
+
+            function checkAnswer() {
+                if (!currentSolutionData) return;
+
+                const userValue = parseFloat(userInputField.value);
+                const correctValue = currentSolutionData.solutionValueForCheck;
+                const unknown = currentSolutionData.unknown;
+
+                if (isNaN(userValue)) {
+                    checkResult.textContent = 'Bitte gib eine Zahl ein.';
+                    checkResult.className = 'incorrect';
+                    checkResult.style.display = 'block';
+                    return;
+                }
+                
+                let isCorrect = false;
+                let tolerance = 0.02; // Toleranz für Rundungsfehler bei Währung
+
+                if (unknown === 'n') {
+                    // Bei 'n' (Jahre) muss die gerundete Ganzzahl exakt stimmen
+                    tolerance = 0;
+                    isCorrect = (userValue === correctValue);
+                } else {
+                    // Bei K0, Kn, r
+                    isCorrect = (Math.abs(userValue - correctValue) <= tolerance);
+                }
+
+                if (isCorrect) {
+                    checkResult.textContent = 'Richtig! Sehr gut.';
+                    checkResult.className = 'correct';
+                } else {
+                    let unit = (unknown === 'n') ? 'Jahre' : '€';
+                    checkResult.textContent = `Leider nicht ganz. Die korrekte Antwort ist ${correctValue} ${unit}. Schau dir den Lösungsweg an.`;
+                    checkResult.className = 'incorrect';
+                }
+                checkResult.style.display = 'block';
+            }
+
+            function toggleSolution() {
+                const isHidden = solutionOutput.style.display === 'none' || solutionOutput.style.display === '';
+                
+                if (isHidden) {
+                    if (currentSolutionData) {
+                        solutionOutput.innerHTML = `
+                            <h3>Lösungsweg</h3>
+                            <p><strong>Gesucht:</strong> ${currentSolutionData.gesuchtLabel}</p>
+                            <p><strong>Gegeben:</strong></p>
+                            <ul>${currentSolutionData.gegeben}</ul>
+                            <p><strong>Grundformel:</strong></p>
+                            <div class="formula-box" id="formula-general">
+                                ${currentSolutionData.formulaGeneral}
+                            </div>
+                            <p><strong>Rechenweg:</strong></p>
+                            <div class="formula-box" id="formula-calculation">
+                                ${currentSolutionData.calculationText}
+                            </div>
+                            <p id="solution-final">
+                                <strong>${currentSolutionData.solutionText}</strong>
+                            </p>
+                        `;
+                    }
+                    solutionOutput.style.display = 'block';
+                    solutionBtn.textContent = 'Lösung verbergen';
+                    
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([solutionOutput])
+                            .catch((err) => console.log('MathJax Typeset Error: ', err));
+                    }
+                } else {
+                    solutionOutput.style.display = 'none';
+                    solutionBtn.textContent = 'Lösung anzeigen';
+                }
+            }
+
+            function generateTask(forcedUnknown = null) { // Parameter hinzugefügt
+                // UI zurücksetzen
+                solutionOutput.style.display = 'none';
+                solutionBtn.textContent = 'Lösung anzeigen';
+                checkResult.style.display = 'none';
+                userInputField.value = '';
+                currentSolutionData = null; 
+
+                let task = {};
+                let solution = {};
+                let validTask = false;
+
+                while (!validTask) {
+                    // 1. Parameter auswählen
+                    if (forcedUnknown) {
+                        task.unknown = forcedUnknown; // Verwende den erzwungenen Wert
+                    } else {
+                        task.unknown = ["Kn", "K0", "r", "n"][getRandomInt(0, 3)]; // Zufall
+                    }
+                    task.type = ["mehrung", "minderung"][getRandomInt(0, 1)];
+                    task.timing = ["nach", "vor"][getRandomInt(0, 1)];
+                    
+                    // 2. Grundwerte generieren
+                    task.p = getRandomFloat(1.5, 6.5); 
+                    task.q = 1 + (task.p / 100);
+                    task.n = getRandomInt(5, 30); 
+                    task.r = getRandomInt(50, 500) * 10; 
+                    task.K0 = getRandomInt(100, 1000) * 50; 
+
+                    // 3. Werte anpassen für logische Aufgaben
+                    let K0_compounded = task.K0 * Math.pow(task.q, task.n);
+                    
+                    if (task.unknown === "Kn") {
+                        if (task.type === "minderung" && K0_compounded < (task.r * task.n * 1.2)) {
+                           task.K0 *= 2; 
+                        }
+                    } else if (task.unknown === "K0") {
+                        if (task.type === "mehrung") {
+                            task.Kn = K0_compounded + (task.r * task.n * 1.5);
+                        } else {
+                            task.Kn = K0_compounded * getRandomFloat(0.1, 0.7); 
+                            if (task.Kn < 0) task.Kn = 0;
+                        }
+                    } else if (task.unknown === "r") {
+                        if (task.type === "mehrung") {
+                            task.Kn = K0_compounded * getRandomFloat(1.2, 2.5);
+                        } else {
+                            // KORREKTUR: Stelle sicher, dass Kn < K0 für logische "Entnahme"-Aufgaben
+                            task.Kn = task.K0 * getRandomFloat(0.1, 0.7); 
+                        }
+                    } else if (task.unknown === "n") {
+                        if (task.type === "mehrung") {
+                            task.Kn = task.K0 * getRandomFloat(1.5, 4.0);
+                        } else {
+                            task.Kn = task.K0 * getRandomFloat(0.1, 0.7);
+                        }
+                    }
+
+                    // 4. Lösung berechnen
+                    solution = solveTask(task);
+
+                    // 5. Gültigkeit prüfen
+                    if (solution.value !== null && isFinite(solution.value) && (solution.value > 0 || task.unknown === "Kn" || (task.unknown === "K0" && solution.value >= 0))) { 
+                        if (task.unknown === "n" && solution.value < 1.0) {
+                             continue; 
+                        }
+                        validTask = true;
+                    }
+                } 
+
+                // 6. Text erstellen
+                currentSolutionData = buildText(task, solution);
+                taskOutput.innerHTML = `<p>${currentSolutionData.problemText}</p>`;
+                
+                // 7. Eingabebereich konfigurieren (Platzhalter + Einheit)
+                userInputSection.style.display = 'flex';
+                checkResult.style.display = 'none';
+                userInputField.placeholder = "Deine Antwort..."; // Neutraler Platzhalter
+                
+                if (currentSolutionData.unknown === 'n') {
+                    inputUnit.textContent = 'Jahre';
+                } else {
+                    inputUnit.textContent = '€';
+                }
+            }
+
+            function solveTask(task) {
+                const { K0, Kn, r, n, q, type, timing, unknown } = task;
+                let value = null;
+                const R_Faktor = (timing === 'vor') ? q : 1;
+                const R_Barwertfaktor = (Math.pow(q, n) - 1) / (q - 1);
+                const K0_Teil = K0 * Math.pow(q, n);
+                const R_Teil = r * R_Faktor * R_Barwertfaktor;
+
+                try {
+                    switch (unknown) {
+                        case "Kn":
+                            value = (type === "mehrung") ? (K0_Teil + R_Teil) : (K0_Teil - R_Teil);
+                            break;
+                        case "K0":
+                            value = (type === "mehrung") ? ((Kn - R_Teil) / Math.pow(q, n)) : ((Kn + R_Teil) / Math.pow(q, n));
+                            break;
+                        case "r":
+                            value = (type === "mehrung") ? ((Kn - K0_Teil) / (R_Faktor * R_Barwertfaktor)) : ((K0_Teil - Kn) / (R_Faktor * R_Barwertfaktor));
+                            break;
+                        case "n":
+                            const C = r * R_Faktor;
+                            const qm1 = q - 1;
+                            let numerator, denominator;
+                            if (type === "mehrung") {
+                                numerator = Kn * qm1 + C;
+                                denominator = K0 * qm1 + C;
+                            } else {
+                                numerator = Kn * qm1 - C;
+                                denominator = K0 * qm1 - C;
+                            }
+                            if (numerator / denominator <= 0) throw new Error("Logarithmus-Argument nicht positiv");
+                            value = Math.log(numerator / denominator) / Math.log(q); 
+                            break;
+                    }
+                } catch (e) {
+                    console.warn("Ungültige Aufgabe generiert, versuche erneut.", e.message, task);
+                    return { value: null }; 
+                }
+                
+                return { value: value };
+            }
+
+            function buildText(task, solution) {
+                const { K0, Kn, r, n, p, q, type, timing, unknown } = task;
+                const solutionValue = solution.value; 
+                
+                // Formatierungs-Konstanten
+                const k_precision = 2; 
+                const r_precision = 2; 
+                const n_precision = 4; 
+
+                // Formatierte Werte für Formeln
+                const K0_f = K0.toFixed(k_precision);
+                const Kn_f = (Kn !== undefined) ? Kn.toFixed(k_precision) : '0.00'; // <-- HIER IST DIE KORREKTUR
+                const r_f = r.toFixed(r_precision);
+                const q_f = q.toFixed(4);
+                const qm1_f = (q - 1).toFixed(4);
+
+                // --- Textbausteine ---
+                const people = ["Herr Schmidt", "Frau Müller", "Eine clevere Studentin", "Ein junger Unternehmer", "Eine Ärztin", "Familie Wagner", "Ein Autor", "Ein Startup-Gründer"];
+                const male_names = ["Herr Schmidt", "Ein junger Unternehmer", "Ein Autor", "Ein Startup-Gründer"];
+                
+                const goals_mehrung = ["für eine Weltreise sparen", "sich ein Elektroauto kaufen", "ein Polster für die Rente aufbauen", "für die Ausbildung der Kinder vorsorgen", "für ein eigenes Haus sparen", "ein Sabbatical finanzieren"];
+                const goals_minderung = ["ihre Rente aufbessern", "eine monatliche Auszahlung für ein Sabbatical finanzieren", "davon die Lebenshaltungskosten decken", "sich einen langen Urlaub finanzieren", "die Studiengebühren der Tochter bezahlen"];
+                
+                const verbs_mehrung = ["zahlt", "legt", "investiert", "spart"];
+                const verbs_minderung = ["entnimmt", "lässt sich auszahlen", "hebt", "benötigt"];
+
+                // --- Pronomen & Satzbau-Logik ---
+                const t_person = getRandomItem(people);
+                const t_pronoun = (male_names.includes(t_person) || t_person.startsWith("Herr")) ? "er" : "sie";
+                const t_pronoun_cap = (male_names.includes(t_person) || t_person.startsWith("Herr")) ? "Er" : "Sie";
+                
+                let t_goal = (type === "mehrung") ? getRandomItem(goals_mehrung) : getRandomItem(goals_minderung);
+                if(t_goal.startsWith("ihre")) {
+                    t_goal = (t_pronoun === "er") ? t_goal.replace("ihre", "seine") : t_goal;
+                } else if (t_goal.startsWith("die")) {
+                     t_goal = (t_pronoun === "er") ? t_goal.replace("der", "des") : t_goal; 
+                }
+                
+                const t_verb = (type === 'mehrung') ? getRandomItem(verbs_mehrung) : getRandomItem(verbs_minderung);
+                const t_timing_text = (timing === "vor") ? "am Jahresanfang" : "am Jahresende";
+                const t_timing_adv = (timing === "vor") ? "vorschüssig" : "nachschüssig";
+
+                // --- MathJax-Formeln & Zwischenwerte ---
+                const sign = (type === "mehrung") ? "+" : "-";
+                const sign_reversed = (type === "mehrung") ? "-" : "+";
+                
+                const R_Faktor_val = (timing === 'vor') ? q : 1;
+                const R_Faktor_str_math = (timing === 'vor') ? `r \\cdot q` : `r`; // Symbolisch
+                const R_Faktor_str_num = (timing === 'vor') ? `\\cdot ${q_f}` : ''; // Numerisch
+                
+                const formulaGeneral = `$$ K_n = K_0 \\cdot q^n ${sign} ${R_Faktor_str_math} \\cdot \\frac{q^n - 1}{q - 1} $$`;
+                
+                let problemText = "";
+                let solutionText = "";
+                let gesuchtLabel = ""; 
+                let gegeben = "";
+                let calculationText = "";
+                let solutionValueForCheck = 0; 
+
+                // --- Gegeben-Werte (mit $ für MathJax) ---
+                if (unknown !== "K0") gegeben += `<li>Startkapital $K_0$: ${formatCurrency(K0)}</li>`;
+                if (unknown !== "Kn") gegeben += `<li>Endkapital $K_n$: ${formatCurrency(Kn)}</li>`;
+                if (unknown !== "r") gegeben += `<li>Rate $r$: ${formatCurrency(r)} (jährlich, ${t_timing_adv})</li>`;
+                if (unknown !== "n") gegeben += `<li>Laufzeit $n$: ${n} Jahre</li>`;
+                gegeben += `<li>Zinssatz $p$: ${formatPercent(p)}%</li>`;
+                gegeben += `<li>Zinsfaktor $q$: ${q_f}</li>`;
+
+                // --- Aufgabentexte und Lösungsformatierung ---
+                switch (unknown) {
+                    case "Kn":
+                        gesuchtLabel = "Endkapital ($K_n$)";
+                        problemText = `${t_person} legt <strong>${formatCurrency(K0)}</strong> als Startkapital an, um ${t_goal}. ${t_pronoun_cap} plant, <strong>${n} Jahre</strong> lang zusätzlich <strong>${formatCurrency(r)}</strong> jeweils <strong>${t_timing_text}</strong> ${type === 'mehrung' ? 'einzuzahlen' : 'zu entnehmen'}. Der Zinssatz beträgt <strong>${formatPercent(p)}%</strong> p.a. <br><br>Wie hoch ist das Kapital nach ${n} Jahren?`;
+                        
+                        solutionValueForCheck = parseFloat(solutionValue.toFixed(k_precision));
+                        calculationText = `<p>Werte in die Grundformel einsetzen:</p>
+                                         $$ K_n = ${K0_f} \\cdot ${q_f}^{${n}} ${sign} ${r_f} ${R_Faktor_str_num} \\cdot \\frac{${q_f}^{${n}} - 1}{${q_f} - 1} $$
+                                         $$ K_n \\approx ${solutionValue.toFixed(k_precision)} $$`;
+                        solutionText = `Das Endkapital beträgt ${formatCurrency(solutionValue)}.`;
+                        break;
+
+                    case "K0":
+                        gesuchtLabel = "Startkapital ($K_0$)";
+                        problemText = `${t_person} möchte in <strong>${n} Jahren</strong> über <strong>${formatCurrency(Kn)}</strong> verfügen, um ${t_goal}. ${t_pronoun_cap} ${t_verb} dafür jährlich <strong>${formatCurrency(r)}</strong> <strong>${t_timing_text}</strong>. Der Zinssatz liegt bei <strong>${formatPercent(p)}%</strong> p.a. <br><br>Welches Startkapital muss ${t_person} heute anlegen, um dieses Ziel zu erreichen?`;
+                        
+                        solutionValueForCheck = parseFloat(solutionValue.toFixed(k_precision));
+                        
+                        const R_Barwertfaktor_K0 = (Math.pow(q, n) - 1) / (q - 1);
+                        const R_Teil_K0 = r * R_Faktor_val * R_Barwertfaktor_K0;
+                        const q_n_K0 = Math.pow(q, n);
+
+                        calculationText = `<p>Werte in die Grundformel einsetzen:</p>
+                                         $$ ${Kn_f} = K_0 \\cdot ${q_f}^{${n}} ${sign} ${r_f} ${R_Faktor_str_num} \\cdot \\frac{${q_f}^{${n}} - 1}{${q_f} - 1} $$
+                                         <p>Zuerst den Renten-Teil und den $q^n$-Teil berechnen:</p>
+                                         $$ R_{Teil} = ${r_f} ${R_Faktor_str_num} \\cdot \\frac{${q_f}^{${n}} - 1}{${qm1_f}} \\approx ${R_Teil_K0.toFixed(k_precision)} $$
+                                         $$ q^n = ${q_f}^{${n}} \\approx ${q_n_K0.toFixed(n_precision)} $$
+                                         <p>Werte in die vereinfachte Formel einsetzen:</p>
+                                         $$ ${Kn_f} = K_0 \\cdot ${q_n_K0.toFixed(n_precision)} ${sign} ${R_Teil_K0.toFixed(k_precision)} $$
+                                         <p>Nach $K_0$ auflösen:</p>
+                                         $$ K_0 \\cdot ${q_n_K0.toFixed(n_precision)} = ${Kn_f} ${sign_reversed} ${R_Teil_K0.toFixed(k_precision)} $$
+                                         $$ K_0 = \\frac{${Kn_f} ${sign_reversed} ${R_Teil_K0.toFixed(k_precision)}}{${q_n_K0.toFixed(n_precision)}} $$
+                                         $$ K_0 \\approx ${solutionValue.toFixed(k_precision)} $$`;
+                        solutionText = `Das benötigte Startkapital beträgt ${formatCurrency(solutionValue)}.`;
+                        break;
+
+                    case "r":
+                        gesuchtLabel = "Jährliche Rate ($r$)";
+                        problemText = `${t_person} legt <strong>${formatCurrency(K0)}</strong> als Startkapital an. Das Ziel ist es, in <strong>${n} Jahren</strong> ein Kapital von <strong>${formatCurrency(Kn)}</strong> zu erreichen, um ${t_goal}. Der Zinssatz beträgt <strong>${formatPercent(p)}%</strong> p.a. <br><br>Welche jährliche Rate muss ${t_person} <strong>${t_timing_text}</strong> ${type === 'mehrung' ? 'einzahlen' : 'entnehmen'}, um dieses Ziel zu erreichen?`;
+                        
+                        solutionValueForCheck = parseFloat(solutionValue.toFixed(r_precision));
+                        
+                        const K0_Teil_r = K0 * Math.pow(q, n);
+                        const R_Faktor_r = R_Faktor_val * ((Math.pow(q, n) - 1) / (q - 1));
+
+                        calculationText = `<p>Werte in die Grundformel einsetzen:</p>
+                                         $$ ${Kn_f} = ${K0_f} \\cdot ${q_f}^{${n}} ${sign} r ${R_Faktor_str_num} \\cdot \\frac{${q_f}^{${n}} - 1}{${qm1_f}} $$
+                                         <p>Zuerst den Zinseszins-Teil ($K_0$) und den Renten-Faktor berechnen:</p>
+                                         $$ K_0 \\cdot q^n = ${K0_f} \\cdot ${q_f}^{${n}} \\approx ${K0_Teil_r.toFixed(k_precision)} $$
+                                         $$ R_{Faktor} = ${R_Faktor_val === 1 ? '1' : q_f} \\cdot \\frac{${q_f}^{${n}} - 1}{${qm1_f}} \\approx ${R_Faktor_r.toFixed(n_precision)} $$
+                                         <p>Werte in die vereinfachte Formel einsetzen:</p>
+                                         $$ ${Kn_f} = ${K0_Teil_r.toFixed(k_precision)} ${sign} r \\cdot ${R_Faktor_r.toFixed(n_precision)} $$
+                                         <p>Nach $r$ auflösen:</p>
+                                         $$ r \\cdot ${R_Faktor_r.toFixed(n_precision)} = ${Kn_f} - ${K0_Teil_r.toFixed(k_precision)} $$
+                                         $$ r = \\frac{${Kn_f} - ${K0_Teil_r.toFixed(k_precision)}}{${R_Faktor_r.toFixed(n_precision)}} $$
+                                         <p>(Bei Kapitalminderung: $r = \\frac{K_0 \\cdot q^n - K_n}{R_{Faktor}}$)</p>
+                                         $$ r \\approx ${solutionValue.toFixed(r_precision)} $$`;
+                        solutionText = `Die ${t_timing_adv}e Rate beträgt ${formatCurrency(solutionValue)}.`;
+                        break;
+
+                    case "n":
+                        gesuchtLabel = "Laufzeit ($n$)";
+                        const rounded_n = Math.ceil(solutionValue); 
+                        solutionValueForCheck = rounded_n; 
+
+                        problemText = `${t_person} verfügt über <strong>${formatCurrency(K0)}</strong> Startkapital und möchte ${t_goal}. ${t_pronoun_cap} ${t_verb} dafür <strong>${t_timing_text}</strong> eine Rate von <strong>${formatCurrency(r)}</strong>. Bei einem Zinssatz von <strong>${formatPercent(p)}%</strong> p.a., wie viele Jahre dauert es, bis das Kapital <strong>${formatCurrency(Kn)}</strong> beträgt? (Runde auf volle Jahre auf.)`;
+                        
+                        const C_val_n = r * R_Faktor_val;
+                        const C_str_n = `${r_f} ${R_Faktor_str_num}`;
+                        const qm1_val_n = q - 1;
+                        
+                        const numerator_n = (type === 'mehrung') ? (Kn * qm1_val_n + C_val_n) : (Kn * qm1_val_n - C_val_n);
+                        const denominator_n = (type === 'mehrung') ? (K0 * qm1_val_n + C_val_n) : (K0 * qm1_val_n - C_val_n);
+
+                        calculationText = `<p>Werte in die Grundformel einsetzen:</p>
+                                         $$ ${Kn_f} = ${K0_f} \\cdot ${q_f}^n ${sign} ${r_f} ${R_Faktor_str_num} \\cdot \\frac{${q_f}^n - 1}{${qm1_f}} $$
+                                         <p>Umstellen nach $q^n$ (siehe Formelsammlung für die Umstellung):</p>
+                                         $$ q^n = \\frac{K_n \\cdot (q-1) ${sign} C}{K_0 \\cdot (q-1) ${sign} C} $$
+                                         <p>Mit $C = ${C_str_n} \\approx ${C_val_n.toFixed(k_precision)}$ und $(q-1) = ${qm1_f}$:</p>
+                                         $$ q^n = \\frac{${Kn_f} \\cdot ${qm1_f} ${sign} ${C_val_n.toFixed(k_precision)}}{${K0_f} \\cdot ${qm1_f} ${sign} ${C_val_n.toFixed(k_precision)}} $$
+                                         $$ q^n = \\frac{${numerator_n.toFixed(k_precision)}}{${denominator_n.toFixed(k_precision)}} \\approx ${(numerator_n / denominator_n).toFixed(n_precision)} $$
+                                         <p>Logarithmus anwenden:</p>
+                                         $$ n = \\frac{\\ln(${(numerator_n / denominator_n).toFixed(n_precision)})}{\\ln(${q_f})} \\approx ${solutionValue.toFixed(n_precision)} $$
+                                         <p>Sachlogisch muss auf das nächste volle Jahr aufgerundet werden:</p>
+                                         $$ n = ${rounded_n} $$`;
+                        solutionText = `Die Laufzeit beträgt ${rounded_n} Jahre (aufgerundet auf das nächste volle Jahr).`;
+                        break;
+                }
+
+                return { 
+                    problemText, solutionText, gesuchtLabel, gegeben, 
+                    formulaGeneral, calculationText,
+                    solutionValueForCheck, unknown
+                };
+            }
+
+            // --- Hilfsfunktionen ---
+            function getRandomInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+            function getRandomFloat(min, max) {
+                return parseFloat((Math.random() * (max - min) + min).toFixed(2));
+            }
+            function getRandomItem(arr) {
+                return arr[Math.floor(Math.random() * arr.length)];
+            }
+            function formatCurrency(value) {
+                if (value === null || isNaN(value)) return "FEHLER";
+                return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
+            }
+            function formatPercent(value) {
+                return new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+            }
+
+            // Beim Start die erste Aufgabe generieren
+            generateTask(null); // Beim ersten Laden eine zufällige Aufgabe
+        });
+    </script>
+
+</body>
+</html>
+

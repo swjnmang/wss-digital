@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentenrechnung: Endwert (vorschüssig und nachschüssig)</title>
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\(', '\)']],
+                displayMath: [['$$', '$$'], ['\[', '\]']],
+                packages: {'[+]': ['textmacros']}
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .feedback { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; text-align: center; font-weight: 600; }
+        .feedback.correct { background-color: #dcfce7; color: #166534; }
+        .feedback.incorrect { background-color: #fee2e2; color: #991b1b; }
+        .feedback.notice { background-color: #fef3c7; color: #92400e; }
+        .solution { margin-top: 1rem; padding: 1rem; border-radius: 8px; background-color: #eff6ff; color: #1e40af; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link" style="margin-bottom: 1rem;">← Zurück zur Übersicht</a>
+        <header style="text-align: center; margin-bottom: 1.5rem;">
+            <h1>Rentenrechnung: Endwert</h1>
+        </header>
+        <p>(vorschüssig und nachschüssig)</p>
+
+        <div id="problem-area" class="mb-6 text-lg text-center p-4 bg-gray-50 rounded-lg"></div>
+
+        <div class="mb-6">
+            <label for="user-answer" class="block text-gray-700 font-semibold mb-2">Deine Antwort:</label>
+            <div class="flex items-center">
+                <input type="number" id="user-answer" step="0.01" class="form-input">
+                <span id="answer-unit" class="ml-2 text-gray-700 text-lg"></span>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center gap-4">
+            <button id="check-button" class="btn btn-primary w-1/3">Prüfen</button>
+            <button id="show-solution-button" class="btn btn-secondary w-1/3">Musterlösung</button>
+            <button id="new-problem-button" class="btn btn-secondary w-1/3" style="background-color: #6b7280;">Neue Aufgabe</button>
+        </div>
+
+        <div id="result-area" class="feedback hidden"></div>
+        <div id="solution-area" class="solution hidden">
+            <h3 class="font-bold mb-2">Musterlösung:</h3>
+            <p id="solution-text"></p>
+        </div>
+    </div>
+
+    <script>
+        let correctAnswer = 0;
+        let targetVariable = '';
+        let paymentType = '';
+        let problemData = {};
+
+        function getRandomNumber(min, max, isInteger = true) {
+            const val = Math.random() * (max - min) + min;
+            return isInteger ? Math.floor(val) : parseFloat(val.toFixed(2));
+        }
+
+        function generateProblem() {
+            const variables = ['Kn', 'n', 'r'];
+            targetVariable = variables[Math.floor(Math.random() * variables.length)];
+            const types = ['vorschuessig', 'nachschuessig'];
+            paymentType = types[Math.floor(Math.random() * types.length)];
+
+            const base_n = getRandomNumber(5, 20);
+            const base_p = getRandomNumber(1, 5, false);
+            const base_r = getRandomNumber(100, 1000);
+            const base_q = 1 + base_p / 100;
+            let base_Kn = base_r * (Math.pow(base_q, base_n) - 1) / (base_q - 1);
+            if (paymentType === 'vorschuessig') {
+                base_Kn *= base_q;
+            }
+            
+            problemData = { n: base_n, p: base_p, r: base_r, q: base_q, Kn: base_Kn, paymentType: paymentType };
+
+            let problemText = '';
+            let answerUnit = '';
+            const timingText = paymentType === 'vorschuessig' ? 'zu Beginn des Jahres' : 'am Ende des Jahres';
+
+            if (targetVariable === 'Kn') {
+                correctAnswer = base_Kn;
+                answerUnit = '€';
+                problemText = `Du legst jedes Jahr ${base_r} € auf einem Sparkonto an. Der jährliche Zinssatz beträgt ${base_p.toFixed(2)} % p.a. Die Einzahlung erfolgt ${timingText}. Welchen Betrag hast du nach ${base_n} Jahren angespart?`;
+            } else if (targetVariable === 'n') {
+                let term = (base_Kn * (base_q - 1) / base_r) + 1;
+                if (paymentType === 'vorschuessig') {
+                    term = (base_Kn * (base_q - 1) / (base_r * base_q)) + 1;
+                }
+                if (term <= 0) { generateProblem(); return; }
+                correctAnswer = Math.log(term) / Math.log(base_q);
+                answerUnit = 'Jahre';
+                problemText = `Du möchtest ${base_Kn.toFixed(2)} € sparen. Jedes Jahr kannst du ${base_r} € auf einem Konto einzahlen, das einen jährlichen Zinssatz von ${base_p.toFixed(2)} % p.a. bietet. Die Einzahlung erfolgt ${timingText}. Wie viele Jahre musst du sparen? (Runde auf ganze Jahre)`;
+            } else if (targetVariable === 'r') {
+                let denominator = (Math.pow(base_q, base_n) - 1) / (base_q - 1);
+                if (paymentType === 'vorschuessig') {
+                    denominator *= base_q;
+                }
+                if (denominator === 0) { generateProblem(); return; }
+                correctAnswer = base_Kn / denominator;
+                answerUnit = '€';
+                problemText = `Du möchtest in ${base_n} Jahren ${base_Kn.toFixed(2)} € gespart haben. Dein Sparkonto bietet ${base_p.toFixed(2)} % p.a. Zinsen. Die jährliche Sparrate wird ${timingText} eingezahlt. Wie hoch muss die jährliche Rate sein?`;
+            }
+
+            document.getElementById('problem-area').innerHTML = problemText;
+            document.getElementById('user-answer').value = '';
+            document.getElementById('result-area').style.display = 'none';
+            document.getElementById('solution-area').style.display = 'none';
+            document.getElementById('answer-unit').textContent = answerUnit;
+            if (window.MathJax) {
+                MathJax.typesetPromise([document.getElementById('problem-area')]);
+            }
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseFloat(document.getElementById('user-answer').value);
+            const resultArea = document.getElementById('result-area');
+            const tolerance = 0.01;
+            let isCorrect = false;
+            let feedbackText = '';
+
+            resultArea.classList.remove('correct', 'incorrect', 'notice');
+
+            if (isNaN(userAnswer)) {
+                feedbackText = 'Bitte gib eine Zahl ein.';
+                resultArea.classList.add('notice');
+            } else {
+                if (targetVariable === 'n') {
+                    isCorrect = Math.round(userAnswer) === Math.round(correctAnswer);
+                } else {
+                    isCorrect = Math.abs(userAnswer - correctAnswer) < tolerance;
+                }
+                if (isCorrect) {
+                    feedbackText = 'Richtig!';
+                    resultArea.classList.add('correct');
+                } else {
+                    feedbackText = `Leider falsch.`;
+                    resultArea.classList.add('incorrect');
+                }
+            }
+            resultArea.innerHTML = feedbackText;
+            resultArea.style.display = 'block';
+        }
+
+        function showSolution() {
+            const solutionArea = document.getElementById('solution-area');
+            const solutionText = document.getElementById('solution-text');
+            const { n, p, r, q, Kn, paymentType } = problemData;
+            let solutionLines = [];
+            solutionLines.push(`Die gesuchte Größe (${targetVariable}) ist ${correctAnswer.toFixed(targetVariable === 'n' ? 0 : 2)} ${document.getElementById('answer-unit').textContent}.`);
+            const timingText = paymentType === 'vorschuessig' ? 'vorschüssig' : 'nachschüssig';
+            solutionLines.push(`Rechenweg (${timingText}):`);
+            let givenValues = `Gegeben:`;
+            if (targetVariable !== 'Kn') givenValues += ` $K_n = ${Kn.toFixed(2)}$ €`;
+            if (targetVariable !== 'n') givenValues += `, $n = ${n}$ Jahre`;
+            if (targetVariable !== 'r') givenValues += `, $r = ${r}$ €`;
+            givenValues += `, $p = ${p.toFixed(2)}\% \text{ p.a.}$, $q = 1 + \frac{p}{100} = ${q.toFixed(4)}$.`;
+            solutionLines.push(givenValues);
+            const formula = paymentType === 'vorschuessig' ? `Formel (vorschüssig): $$K_n = r \cdot \frac{q^n - 1}{q - 1} \cdot q$$` : `Formel (nachschüssig): $$K_n = r \cdot \frac{q^n - 1}{q - 1}$$`;
+            solutionLines.push(formula);
+            solutionText.innerHTML = solutionLines.join('<br>');
+            solutionArea.style.display = 'block';
+            if (window.MathJax) {
+                 MathJax.typesetPromise([solutionArea]);
+            }
+        }
+
+        document.getElementById('check-button').addEventListener('click', checkAnswer);
+        document.getElementById('new-problem-button').addEventListener('click', generateProblem);
+        document.getElementById('show-solution-button').addEventListener('click', showSolution);
+
+        window.onload = function() {
+             if (window.MathJax) {
+                MathJax.startup.promise.then(() => generateProblem());
+            } else {
+                generateProblem();
+            }
+        };
+    </script>
+</body>
+</html>

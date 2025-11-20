@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brüche kürzen und erweitern - Übungen</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto; /* Added top/bottom margin */
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6; /* Improved readability */
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Slightly enhanced shadow */
+        }
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 10px; /* Space between buttons */
+            margin-bottom: 20px;
+        }
+        .difficulty-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease; /* Smoother transition */
+        }
+        .difficulty-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #easy { background-color: #2ecc71; color: white; }
+        #medium { background-color: #f39c12; color: white; }
+        #hard { background-color: #e74c3c; color: white; }
+
+        .task-container {
+            background-color: #f9f9f9;
+            padding: 20px; /* Increased padding */
+            border: 1px solid #eee; /* Subtle border */
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.2em; /* Relative font size */
+        }
+        .exercise-type {
+            font-weight: bold;
+            margin-bottom: 15px; /* Increased spacing */
+            color: #7f8c8d;
+            font-size: 0.9em; /* Slightly smaller type label */
+        }
+        /* Style for fractions in the task display */
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 1.5em; /* Larger fractions */
+            margin: 0 5px; /* Spacing around fractions */
+            line-height: 1.1; /* Adjust line height for fraction display */
+        }
+        .fraction .num {
+            display: block;
+            border-bottom: 2px solid black; /* Thicker line */
+            padding: 0 8px;
+        }
+        .fraction .den {
+            display: block;
+            padding: 2px 8px 0; /* Add slight padding top */
+        }
+        .operation {
+            margin: 0 15px;
+            font-size: 1.5em;
+            vertical-align: middle;
+            display: inline-block;
+            color: #3498db; /* Color for the arrow */
+        }
+        .input-container {
+            margin: 25px 0; /* Increased spacing */
+            text-align: center;
+        }
+
+        /* --- Fraction Input Styling --- */
+        .fraction-input {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .fraction-input .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 1.1em; /* Slightly smaller than task fraction */
+            line-height: 1; /* Reset line height for inputs */
+        }
+        /* General input style within fraction */
+        .fraction-input input[type="number"] {
+            display: block;
+            width: 70px; /* Slightly wider */
+            text-align: center;
+            padding: 8px 5px; /* More padding */
+            font-size: 1.1em; /* Match fraction size */
+            border: 2px solid #bdc3c7; /* Default border */
+            margin: 0 auto;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease; /* Smooth border color transition */
+             /* Hide spinner buttons for cleaner look */
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        .fraction-input input[type="number"]::-webkit-outer-spin-button,
+        .fraction-input input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* Numerator specific */
+        .fraction-input input.num {
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+        }
+        /* Fraction line specific */
+        .fraction-input .fraction-line {
+            display: block;
+            border-top: 2px solid black;
+            margin: 0 auto;
+            width: 70px; /* Match input width */
+        }
+        /* Denominator specific */
+        .fraction-input input.den {
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        /* --- Visual Feedback Classes --- */
+        .fraction-input input.input-correct {
+            border-color: #2ecc71; /* Green border for correct */
+            background-color: #e9f9e9; /* Light green background */
+        }
+        .fraction-input input.input-incorrect {
+            border-color: #e74c3c; /* Red border for incorrect */
+            background-color: #f9e9e9; /* Light red background */
+        }
+        /* --- End Fraction Input Styling --- */
+
+        .buttons {
+            text-align: center;
+            margin: 25px 0;
+            display: flex; /* Use flexbox for button alignment */
+            justify-content: center;
+            gap: 15px; /* Space between buttons */
+            flex-wrap: wrap; /* Allow wrapping */
+        }
+        button { /* General button style */
+            padding: 12px 25px; /* Larger buttons */
+            margin: 0; /* Remove margin as gap is used */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em; /* Consistent font size */
+            transition: all 0.3s ease;
+        }
+        #check-btn { background-color: #3498db; color: white; }
+        #solution-btn { background-color: #34495e; color: white; }
+        #next-btn { background-color: #9b59b6; color: white; }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        button:active {
+             transform: translateY(0px); /* Press down effect */
+             box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        }
+
+        .feedback {
+            text-align: center;
+            margin: 20px 0;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.1em; /* Slightly larger feedback text */
+        }
+        .correct { background-color: #dff0d8; color: #3c763d; border: 1px solid #d6e9c6; }
+        .incorrect { background-color: #f2dede; color: #a94442; border: 1px solid #ebccd1; }
+
+        .solution {
+            display: none;
+            background-color: #d9edf7;
+            color: #31708f;
+            padding: 15px;
+            border: 1px solid #bce8f1;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+         .solution .fraction { /* Ensure fractions in solution look good */
+            font-size: 1.2em; /* Slightly smaller than task fraction */
+            vertical-align: baseline; /* Align better with text */
+         }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            align-items: center; /* Vertically align items */
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e8f4f8;
+            border-radius: 5px;
+            border: 1px solid #d1e8f0;
+        }
+        .stat-item { text-align: center; }
+        .stat-value {
+            font-size: 1.8em; /* Larger stat values */
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .stat-label { font-size: 0.9em; color: #555; } /* Clearer label */
+        .streak { text-align: center; }
+        .streak-count {
+            font-size: 2em; /* Larger streak count */
+            font-weight: bold;
+            color: #e67e22;
+            display: flex; /* Align flame and number */
+            align-items: center;
+            justify-content: center;
+        }
+        .streak-label { font-size: 0.9em; color: #7f8c8d; }
+        .streak-flame { font-size: 1.5em; margin-right: 5px; line-height: 1; } /* Adjust flame size/position */
+
+        .instructions {
+            background-color: #ecf0f1; /* Lighter grey */
+            color: #34495e; /* Darker text for contrast */
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid #dce4e8;
+        }
+        .instructions h3 { margin-top: 0; color: #2c3e50; }
+        .instructions p { margin-bottom: 8px; } /* Adjust spacing */
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .container { padding: 15px; }
+            .difficulty-selector { flex-direction: column; align-items: center; }
+            .difficulty-btn { width: 80%; max-width: 300px; } /* Responsive width */
+            .buttons { flex-direction: column; align-items: center; gap: 10px; }
+            button { width: 80%; max-width: 300px; }
+            .stats { flex-direction: column; gap: 15px; }
+            h1 { font-size: 1.8em; }
+            .task-container { font-size: 1.1em; }
+            .fraction { font-size: 1.3em; }
+            .operation { font-size: 1.3em; }
+            .fraction-input input[type="number"] { width: 60px; font-size: 1em; padding: 6px 4px;}
+            .fraction-input .fraction-line { width: 60px; }
+            .feedback, .solution { font-size: 1em; }
+            .stat-value { font-size: 1.5em; }
+            .streak-count { font-size: 1.7em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="text-blue-600 hover:underline mb-4 inline-block">
+            &larr; Zurück zur Bruch-Übersicht
+        </a>
+        <h1>Brüche kürzen und erweitern</h1>
+
+        <div class="instructions">
+            <h3>Anleitung:</h3>
+            <p>1. Wähle eine Schwierigkeitsstufe (Leicht, Mittel, Schwer).</p>
+            <p>2. Die Aufgabe (Kürzen oder Erweitern) wird angezeigt.</p>
+            <p>3. Gib die Lösung als Bruch in die Felder ein (Zähler oben, Nenner unten).</p>
+            <p>4. Klicke auf "Überprüfen" oder drücke Enter.</p>
+            <p>5. Bei jeder richtigen Antwort steigt dein 🔥-Streak!</p>
+        </div>
+
+        <div class="difficulty-selector">
+            <button id="easy" class="difficulty-btn">Leicht</button>
+            <button id="medium" class="difficulty-btn">Mittel</button>
+            <button id="hard" class="difficulty-btn">Schwer</button>
+        </div>
+
+        <div class="task-container" id="task-display" style="display: none;">
+            <div class="exercise-type" id="exercise-type"></div>
+            <div class="task" id="task"></div>
+            <div class="input-container" id="input-container">
+                </div>
+        </div>
+
+        <div class="buttons" id="buttons" style="display: none;">
+            <button id="check-btn">Überprüfen</button>
+            <button id="solution-btn">Lösung zeigen</button>
+            <button id="next-btn">Nächste Aufgabe</button>
+        </div>
+
+        <div class="feedback" id="feedback" style="display: none;"></div>
+        <div class="solution" id="solution"></div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="correct-count">0</div>
+                <div class="stat-label">Richtig</div>
+            </div>
+            <div class="streak">
+                <div class="streak-count"><span class="streak-flame">🔥</span><span id="streak-count">0</span></div>
+                <div class="streak-label">Streak</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-label">Gesamt</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Global Variables ---
+        let currentTask = {};
+        let difficulty = 'easy'; // Default difficulty
+        let correctCount = 0;
+        let totalCount = 0;
+        let streakCount = 0;
+        // No need for global isCorrect flag
+
+        // --- DOM Element References ---
+        const taskDisplay = document.getElementById('task-display');
+        const taskElement = document.getElementById('task');
+        const exerciseTypeElement = document.getElementById('exercise-type');
+        const inputContainer = document.getElementById('input-container');
+        const feedbackElement = document.getElementById('feedback');
+        const solutionElement = document.getElementById('solution');
+        const buttonsElement = document.getElementById('buttons');
+        const correctCountElement = document.getElementById('correct-count');
+        const totalCountElement = document.getElementById('total-count');
+        const streakCountElement = document.getElementById('streak-count');
+        const difficultyButtons = {
+            easy: document.getElementById('easy'),
+            medium: document.getElementById('medium'),
+            hard: document.getElementById('hard')
+        };
+        const actionButtons = {
+            check: document.getElementById('check-btn'),
+            solution: document.getElementById('solution-btn'),
+            next: document.getElementById('next-btn')
+        };
+
+        // --- Event Listeners ---
+
+        // Difficulty Selection
+        Object.keys(difficultyButtons).forEach(level => {
+            difficultyButtons[level].addEventListener('click', () => setDifficulty(level));
+        });
+
+        // Action Buttons
+        actionButtons.check.addEventListener('click', checkAnswer);
+        actionButtons.solution.addEventListener('click', showSolution);
+        actionButtons.next.addEventListener('click', () => generateTask(difficulty));
+
+        // Enter key listener (delegated to input container)
+        inputContainer.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent potential form submission
+                checkAnswer();
+            }
+        });
+
+        // --- Core Functions ---
+
+        function setDifficulty(level) {
+            difficulty = level;
+            // Optional: Add visual indication for selected difficulty
+            Object.values(difficultyButtons).forEach(btn => btn.style.opacity = "0.7");
+            difficultyButtons[level].style.opacity = "1";
+
+            generateTask(level);
+            taskDisplay.style.display = 'block';
+            buttonsElement.style.display = 'flex'; // Use flex for button display
+        }
+
+        function generateTask(level) {
+            resetUI(); // Reset feedback, solution, and input styles
+
+            const taskType = Math.random() > 0.5 ? 'shorten' : 'expand';
+
+            if (taskType === 'shorten') {
+                generateShortenTask(level);
+                exerciseTypeElement.textContent = 'Kürze den Bruch vollständig:';
+            } else {
+                generateExpandTask(level);
+                exerciseTypeElement.textContent = 'Erweitere den Bruch:';
+            }
+             // Set focus to the numerator input field for quicker input
+            const numInput = document.getElementById('input-num');
+            if(numInput) {
+                numInput.focus();
+            }
+        }
+
+        function generateShortenTask(level) {
+            let numDen = generateFraction(level, true); // Generate a simplified base fraction
+            let simplifiedNum = numDen.numerator;
+            let simplifiedDen = numDen.denominator;
+
+            let factor;
+            switch(level) {
+                case 'easy': factor = selectFromRange(2, 5); break;
+                case 'medium': factor = selectFromRange(2, 10); break;
+                case 'hard': factor = selectFromRange(3, 15); break; // Slightly higher min factor for hard
+                default: factor = selectFromRange(2, 7);
+            }
+
+            // Create the fraction to be displayed (the one to be shortened)
+            let displayNum = simplifiedNum * factor;
+            let displayDen = simplifiedDen * factor;
+
+            currentTask = {
+                type: 'shorten',
+                displayNumerator: displayNum,
+                displayDenominator: displayDen,
+                expectedNumerator: simplifiedNum, // The actual simplified result
+                expectedDenominator: simplifiedDen,
+                factor: factor // Store the factor for the solution display
+            };
+
+            taskElement.innerHTML = createFractionHTML(displayNum, displayDen);
+            inputContainer.innerHTML = createFractionInputHTML('Zähler eingeben', 'Nenner eingeben');
+        }
+
+        function generateExpandTask(level) {
+            let numDen = generateFraction(level, false); // Generate a base fraction (might be simplifiable, doesn't matter here)
+            let baseNum = numDen.numerator;
+            let baseDen = numDen.denominator;
+
+            let factor;
+             switch(level) {
+                case 'easy': factor = selectFromRange(2, 5); break;
+                case 'medium': factor = selectFromRange(2, 10); break;
+                case 'hard': factor = selectFromRange(3, 15); break;
+                default: factor = selectFromRange(2, 7);
+            }
+
+            currentTask = {
+                type: 'expand',
+                baseNumerator: baseNum,
+                baseDenominator: baseDen,
+                factor: factor,
+                expectedNumerator: baseNum * factor,
+                expectedDenominator: baseDen * factor
+            };
+
+            taskElement.innerHTML = `
+                ${createFractionHTML(baseNum, baseDen)}
+                <span class="operation" aria-hidden="true">→</span>
+                <span style="vertical-align: middle;">Erweitere mit ${factor}</span>
+            `;
+            inputContainer.innerHTML = createFractionInputHTML('Erweiterten Zähler eingeben', 'Erweiterten Nenner eingeben');
+        }
+
+        function generateFraction(level, ensureSimplifiedBase) {
+            let num, den;
+            let minDen = 2; // Denominator must be at least 2
+
+            do {
+                switch(level) {
+                    case 'easy':
+                        num = selectFromRange(1, 5);
+                        den = selectFromRange(num + 1, 10); // Ensure den > num for proper fractions initially
+                        break;
+                    case 'medium':
+                        num = selectFromRange(2, 15);
+                        den = selectFromRange(num + 1, 25);
+                        break;
+                    case 'hard':
+                        num = selectFromRange(3, 30);
+                        den = selectFromRange(num + 1, 50);
+                        break;
+                    default:
+                        num = selectFromRange(1, 10);
+                        den = selectFromRange(num + 1, 20);
+                }
+            // If we need a simplified base for shortening tasks, check GCD. Regenerate if not 1.
+            } while (ensureSimplifiedBase && findGCD(num, den) !== 1);
+
+            // For expansion tasks, it doesn't strictly matter if the base is simplified,
+            // but we can still return the potentially simplified version if needed.
+             if (!ensureSimplifiedBase) {
+                 // Optional: Allow improper fractions sometimes for variety in expansion?
+                 // if (Math.random() > 0.7) { // e.g., 30% chance
+                 //    num = selectFromRange(den + 1, den + 10); // Make numerator larger
+                 // }
+             }
+
+
+            return { numerator: num, denominator: den };
+        }
+
+        function checkAnswer() {
+            const inputNumElement = document.getElementById('input-num');
+            const inputDenElement = document.getElementById('input-den');
+
+            // Clear previous visual feedback
+            inputNumElement.classList.remove('input-correct', 'input-incorrect');
+            inputDenElement.classList.remove('input-correct', 'input-incorrect');
+            feedbackElement.style.display = 'none'; // Hide previous text feedback
+            solutionElement.style.display = 'none'; // Hide solution
+
+            if (!inputNumElement || !inputDenElement) {
+                console.error("Input elements not found!");
+                displayFeedback('Fehler: Eingabefelder nicht gefunden.', false);
+                return;
+            }
+
+            const inputNumStr = inputNumElement.value.trim();
+            const inputDenStr = inputDenElement.value.trim();
+
+            if (inputNumStr === '' || inputDenStr === '') {
+                 displayFeedback('Bitte gib Zähler und Nenner ein.', false);
+                 if (inputNumStr === '') inputNumElement.classList.add('input-incorrect');
+                 if (inputDenStr === '') inputDenElement.classList.add('input-incorrect');
+                 return;
+            }
+
+
+            const inputNum = parseInt(inputNumStr);
+            const inputDen = parseInt(inputDenStr);
+
+
+            if (isNaN(inputNum) || isNaN(inputDen) || !Number.isInteger(inputNum) || !Number.isInteger(inputDen)) {
+                displayFeedback('Bitte gib ganze Zahlen für Zähler und Nenner ein.', false);
+                inputNumElement.classList.add('input-incorrect');
+                inputDenElement.classList.add('input-incorrect');
+                return;
+            }
+
+            if (inputDen === 0) {
+                displayFeedback('Der Nenner darf nicht 0 sein!', false);
+                inputDenElement.classList.add('input-incorrect');
+                return;
+            }
+            if (inputDen < 0) {
+                displayFeedback('Der Nenner sollte positiv sein. Kürze ggf. das Vorzeichen.', false);
+                inputDenElement.classList.add('input-incorrect');
+                 // Optionally correct numerator sign too if needed
+                 if (inputNum !== 0) inputNumElement.classList.add('input-incorrect');
+                return;
+            }
+
+             // Only count attempt if input is valid numeric input
+             if (!feedbackElement.textContent.startsWith('Bitte') && !feedbackElement.textContent.startsWith('Der Nenner')) {
+                totalCount++;
+                totalCountElement.textContent = totalCount;
+             }
+
+
+            let isCorrect = false;
+            let feedbackMsg = '';
+
+            if (currentTask.type === 'shorten') {
+                isCorrect = (inputNum === currentTask.expectedNumerator && inputDen === currentTask.expectedDenominator);
+                const inputGCD = findGCD(inputNum, inputDen);
+                const isSimplifiedInput = (inputGCD === 1 || inputNum === 0); // 0/N is considered simplified
+
+                if (isCorrect && isSimplifiedInput) {
+                    feedbackMsg = 'Richtig! Gut gekürzt!';
+                    correctCount++;
+                    streakCount++;
+                } else {
+                    streakCount = 0; // Reset streak on any incorrectness
+                    const expectedRatio = currentTask.expectedNumerator / currentTask.expectedDenominator;
+                    const inputRatio = inputNum / inputDen;
+                    // Use a tolerance for floating point comparison
+                    const isCorrectRatio = Math.abs(expectedRatio - inputRatio) < 0.0001;
+
+                    if (isCorrectRatio && !isSimplifiedInput) {
+                        feedbackMsg = `Fast! Der Bruch ${createFractionHTML(inputNum, inputDen)} ist wertgleich, aber nicht vollständig gekürzt. Die Lösung ist ${createFractionHTML(currentTask.expectedNumerator, currentTask.expectedDenominator)}.`;
+                    } else {
+                        feedbackMsg = `Leider falsch. Die richtige Lösung ist ${createFractionHTML(currentTask.expectedNumerator, currentTask.expectedDenominator)}.`;
+                    }
+                }
+
+            } else { // expand
+                isCorrect = (inputNum === currentTask.expectedNumerator && inputDen === currentTask.expectedDenominator);
+                if (isCorrect) {
+                    feedbackMsg = 'Richtig! Gut erweitert!';
+                    correctCount++;
+                    streakCount++;
+                } else {
+                    feedbackMsg = `Leider falsch. Die richtige Lösung ist ${createFractionHTML(currentTask.expectedNumerator, currentTask.expectedDenominator)}.`;
+                    streakCount = 0;
+                }
+            }
+
+            // Display feedback text and visual cues
+            displayFeedback(feedbackMsg, isCorrect);
+            inputNumElement.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
+            inputDenElement.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
+
+
+            // Update stats
+            correctCountElement.textContent = correctCount;
+            streakCountElement.textContent = streakCount;
+        }
+
+        function showSolution() {
+            let solutionHTML = '<p><strong>Lösung:</strong></p>';
+
+            if (currentTask.type === 'shorten') {
+                const factor = currentTask.factor || findGCD(currentTask.displayNumerator, currentTask.displayDenominator); // Calculate factor if not stored
+                solutionHTML += `
+                    <p>Der Bruch ${createFractionHTML(currentTask.displayNumerator, currentTask.displayDenominator)} wird vollständig gekürzt, indem Zähler und Nenner durch ihren größten gemeinsamen Teiler (${factor}) geteilt werden:</p>
+                    <p>Zähler: ${currentTask.displayNumerator} ÷ ${factor} = ${currentTask.expectedNumerator}</p>
+                    <p>Nenner: ${currentTask.displayDenominator} ÷ ${factor} = ${currentTask.expectedDenominator}</p>
+                    <p>Ergebnis: ${createFractionHTML(currentTask.expectedNumerator, currentTask.expectedDenominator)}</p>
+                `;
+            } else { // expand
+                solutionHTML += `
+                    <p>Der Bruch ${createFractionHTML(currentTask.baseNumerator, currentTask.baseDenominator)} wird mit ${currentTask.factor} erweitert:</p>
+                    <p>Neuer Zähler: ${currentTask.baseNumerator} &times; ${currentTask.factor} = ${currentTask.expectedNumerator}</p>
+                    <p>Neuer Nenner: ${currentTask.baseDenominator} &times; ${currentTask.factor} = ${currentTask.expectedDenominator}</p>
+                     <p>Ergebnis: ${createFractionHTML(currentTask.expectedNumerator, currentTask.expectedDenominator)}</p>
+                `;
+            }
+
+            solutionElement.innerHTML = solutionHTML;
+            solutionElement.style.display = 'block';
+            feedbackElement.style.display = 'none'; // Hide feedback when solution is shown
+             // Clear input field styles when showing solution
+             clearInputStyles();
+        }
+
+        // --- Utility Functions ---
+
+        function resetUI() {
+            feedbackElement.style.display = 'none';
+            solutionElement.style.display = 'none';
+            taskElement.innerHTML = ''; // Clear previous task display
+            inputContainer.innerHTML = ''; // Clear previous input fields
+            clearInputStyles(); // Ensure input styles are reset
+        }
+
+        function clearInputStyles() {
+             const inputNumElement = document.getElementById('input-num');
+             const inputDenElement = document.getElementById('input-den');
+             if (inputNumElement) inputNumElement.classList.remove('input-correct', 'input-incorrect');
+             if (inputDenElement) inputDenElement.classList.remove('input-correct', 'input-incorrect');
+        }
+
+
+        function displayFeedback(message, isCorrect) {
+            feedbackElement.innerHTML = message; // Use innerHTML to render fraction HTML if included
+            feedbackElement.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedbackElement.style.display = 'block';
+        }
+
+        function createFractionHTML(num, den) {
+            // Creates the HTML string for displaying a fraction
+            return `<span class="fraction"><span class="num">${num}</span><span class="den">${den}</span></span>`;
+        }
+
+        function createFractionInputHTML(numLabel = 'Zähler', denLabel = 'Nenner') {
+             // Creates the HTML string for the fraction input fields
+             // Added aria-label for accessibility
+            return `
+                <div class="fraction-input">
+                    <div class="fraction">
+                        <label for="input-num" class="visually-hidden">${numLabel}</label>
+                        <input type="number" id="input-num" class="num" min="0" required aria-label="${numLabel}">
+                        <div class="fraction-line" aria-hidden="true"></div>
+                        <label for="input-den" class="visually-hidden">${denLabel}</label>
+                        <input type="number" id="input-den" class="den" min="1" required aria-label="${denLabel}">
+                    </div>
+                </div>
+                <style>.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }</style>
+            `;
+        }
+
+
+        function selectFromRange(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function findGCD(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            if (b === 0) return a;
+            return findGCD(b, a % b);
+        }
+
+        // --- Initial State ---
+        // No task generated initially, user must select difficulty first.
+        taskDisplay.style.display = 'none';
+        buttonsElement.style.display = 'none';
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+[
+  {
+  "id": "rechnen_lernen",
+  "title": "Rechnen lernen",
+  "description": "Grundlagen der Arithmetik, Brüche, Potenzen und mehr.",
+  "path": "/rechnen_lernen/index.html",
+  "reactPath": "/rechnen_lernen",
+  "icon": "fas fa-calculator"
+  },
+  {
+    "id": "finanzmathe",
+    "title": "Finanzmathematik",
+    "description": "Zinsen, Zinseszins und Darlehensberechnungen verstehen.",
+    "path": "/finanzmathe/index.html",
+    "icon": "fa-solid fa-sack-dollar"
+  },
+  {
+    "id": "lineare_funktionen",
+    "title": "Lineare Funktionen",
+    "description": "Lerne, Geradengleichungen aufzustellen, Nullstellen zu berechnen und Graphen zu zeichnen.",
+    "path": "/lineare_funktionen/index.html",
+    "reactPath": "/lineare_funktionen",
+    "icon": "fas fa-chart-line"
+  },
+  {
+    "id": "quadratische_funktionen",
+    "title": "Quadratische Funktionen",
+    "description": "Parabeln, Scheitelpunkte und Schnittpunkte meistern.",
+    "path": "/quadratische_funktionen/index.html",
+    "reactPath": "/quadratische_funktionen",
+    "icon": "fas fa-bezier-curve"
+  },
+  {
+    "id": "daten_und_zufall",
+    "title": "Daten und Zufall",
+    "description": "Grundlagen der Wahrscheinlichkeit und Baumdiagramme.",
+    "path": "/daten_und_zufall/index.html",
+    "icon": "fas fa-dice"
+  },
+  {
+    "id": "trigonometrie",
+    "title": "Trigonometrie",
+    "description": "Berechnungen an Dreiecken mit Sinus, Kosinus und Tangens.",
+    "path": "/trigonometrie/index.html",
+    "icon": "fa-solid fa-play"
+  }
+]

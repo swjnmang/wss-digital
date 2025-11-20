@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aufgabengenerator Trigonometrie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        canvas {
+            border: 1px solid #000;
+            margin-bottom: 20px;
+            background-color: #f0f0f0;
+        }
+        .red-text {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="p-4 bg-gray-100 min-h-screen flex flex-col items-center">
+
+    <div class="container mx-auto bg-white p-6 rounded-lg shadow-md max-w-2xl">
+        <h1 class="text-2xl font-bold mb-4 text-center">Aufgabengenerator: Rechtwinkliges Dreieck</h1>
+
+        <canvas id="triangleCanvas" width="400" height="300" class="mx-auto rounded-md"></canvas>
+
+        <div id="taskDescription" class="text-lg mb-4 text-center"></div>
+
+        <div class="flex flex-col md:flex-row items-center justify-center mb-4 space-y-2 md:space-y-0 md:space-x-4">
+            <label for="userAnswer" class="text-lg">Deine Antwort:</label>
+            <input type="number" id="userAnswer" step="0.01" class="p-2 border border-gray-300 rounded-md text-center">
+            <button id="checkAnswerBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out">Antwort überprüfen</button>
+        </div>
+
+        <div id="feedback" class="text-center text-lg mb-4"></div>
+
+        <div class="flex justify-center space-x-4">
+            <button id="generateTaskBtn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out">Neue Aufgabe</button>
+            <button id="showTipBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out">Tipp anzeigen</button>
+        </div>
+
+        <div id="tip" class="mt-4 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-md hidden"></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('triangleCanvas');
+        const ctx = canvas.getContext('2d');
+        const taskDescription = document.getElementById('taskDescription');
+        const userAnswerInput = document.getElementById('userAnswer');
+        const checkAnswerBtn = document.getElementById('checkAnswerBtn');
+        const feedbackDiv = document.getElementById('feedback');
+        const generateTaskBtn = document.getElementById('generateTaskBtn');
+        const showTipBtn = document.getElementById('showTipBtn');
+        const tipDiv = document.getElementById('tip');
+
+        let currentTask = {}; // Stores the current task details (given, to find, answer, rightAngleVertex)
+
+        // Function to convert degrees to radians
+        function degToRad(degrees) {
+            return degrees * (Math.PI / 180);
+        }
+
+        // Function to convert radians to degrees
+        function radToDeg(radians) {
+            return radians * (180 / Math.PI);
+        }
+
+        // Function to draw the right-angled triangle dynamically
+        function drawTriangle(a, b, c, alpha, beta, gamma, toFind, rightAngleVertex) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const padding = 50;
+            const availableWidth = canvas.width - 2 * padding;
+            const availableHeight = canvas.height - 2 * padding;
+
+            let pA, pB, pC; // Vertex coordinates
+
+            // Determine vertex positions based on the right angle location
+            if (rightAngleVertex === 'C') {
+                // Right angle at C (bottom-left)
+                const scaleFactor = Math.min(availableWidth / b, availableHeight / a);
+                const scaledA = a * scaleFactor;
+                const scaledB = b * scaleFactor;
+                pC = { x: padding, y: canvas.height - padding };
+                pA = { x: padding, y: pC.y - scaledA };
+                pB = { x: pC.x + scaledB, y: canvas.height - padding };
+            } else if (rightAngleVertex === 'A') {
+                // Right angle at A (bottom-left)
+                const scaleFactor = Math.min(availableWidth / c, availableHeight / b);
+                const scaledB = b * scaleFactor; // AB is c, AC is b
+                const scaledC = c * scaleFactor;
+                 pA = { x: padding, y: canvas.height - padding };
+                 pB = { x: pA.x + scaledC, y: canvas.height - padding };
+                 pC = { x: padding, y: pA.y - scaledB };
+            } else { // rightAngleVertex === 'B'
+                // Right angle at B (bottom-right)
+                const scaleFactor = Math.min(availableWidth / c, availableHeight / a);
+                const scaledA = a * scaleFactor; // BC is a, AC is c
+                const scaledC = c * scaleFactor;
+                pB = { x: canvas.width - padding, y: canvas.height - padding };
+                pA = { x: pB.x - scaledC, y: canvas.height - padding };
+                pC = { x: canvas.width - padding, y: pB.y - scaledA };
+            }
+
+
+            // Draw sides
+            ctx.beginPath();
+            ctx.moveTo(pA.x, pA.y);
+            ctx.lineTo(pC.x, pC.y);
+            ctx.lineTo(pB.x, pB.y);
+            ctx.closePath();
+            ctx.stroke();
+
+            // Draw right angle symbol
+            const angleBoxSize = 15;
+            ctx.beginPath();
+            if (rightAngleVertex === 'C') {
+                ctx.moveTo(pC.x, pC.y - angleBoxSize);
+                ctx.lineTo(pC.x + angleBoxSize, pC.y - angleBoxSize);
+                ctx.lineTo(pC.x + angleBoxSize, pC.y);
+            } else if (rightAngleVertex === 'A') {
+                 ctx.moveTo(pA.x, pA.y - angleBoxSize);
+                 ctx.lineTo(pA.x + angleBoxSize, pA.y - angleBoxSize);
+                 ctx.lineTo(pA.x + angleBoxSize, pA.y);
+            } else { // rightAngleVertex === 'B'
+                 ctx.moveTo(pB.x, pB.y - angleBoxSize);
+                 ctx.lineTo(pB.x - angleBoxSize, pB.y - angleBoxSize);
+                 ctx.lineTo(pB.x - angleBoxSize, pB.y);
+            }
+            ctx.stroke();
+
+            // Labels for vertices
+            ctx.font = '16px Arial';
+            ctx.fillStyle = 'black';
+            ctx.fillText('A', pA.x - (rightAngleVertex === 'C' ? 20 : 0), pA.y + (rightAngleVertex === 'A' ? 20 : (rightAngleVertex === 'B' ? 0 : 0)));
+            ctx.fillText('B', pB.x + (rightAngleVertex === 'C' ? 5 : (rightAngleVertex === 'A' ? 5 : -20)), pB.y + (rightAngleVertex === 'C' ? 15 : (rightAngleVertex === 'A' ? 15 : 0)));
+            ctx.fillText('C', pC.x - (rightAngleVertex === 'C' ? 20 : (rightAngleVertex === 'A' ? 20 : 0)), pC.y - (rightAngleVertex === 'C' ? 5 : (rightAngleVertex === 'A' ? 5 : -5)));
+
+
+            // Labels for sides (opposite to vertices)
+            ctx.font = '14px Arial';
+
+            // Side a (opposite A)
+            const midA = { x: (pC.x + pB.x) / 2, y: (pC.y + pB.y) / 2 };
+            ctx.fillStyle = (toFind === 'a') ? 'red' : 'black';
+            ctx.fillText((toFind === 'a' ? 'a (gesucht)' : 'a'), midA.x + (rightAngleVertex === 'C' ? 5 : (rightAngleVertex === 'A' ? -15 : 5)), midA.y + (rightAngleVertex === 'C' ? -5 : (rightAngleVertex === 'A' ? 15 : -5)));
+
+            // Side b (opposite B)
+            const midB = { x: (pA.x + pC.x) / 2, y: (pA.y + pC.y) / 2 };
+            ctx.fillStyle = (toFind === 'b') ? 'red' : 'black';
+            ctx.fillText((toFind === 'b' ? 'b (gesucht)' : 'b'), midB.x + (rightAngleVertex === 'C' ? -20 : (rightAngleVertex === 'A' ? 5 : -20)), midB.y + (rightAngleVertex === 'C' ? 0 : (rightAngleVertex === 'A' ? -5 : 5)));
+
+            // Side c (opposite C - hypotenuse)
+            const midC = { x: (pA.x + pB.x) / 2, y: (pA.y + pB.y) / 2 };
+            ctx.fillStyle = (toFind === 'c') ? 'red' : 'black';
+            ctx.fillText((toFind === 'c' ? 'c (gesucht)' : 'c'), midC.x + (rightAngleVertex === 'C' ? 0 : (rightAngleVertex === 'A' ? 0 : 0)), midC.y + (rightAngleVertex === 'C' ? 15 : (rightAngleVertex === 'A' ? -5 : 15)));
+
+
+            // Labels for angles
+            ctx.font = '14px Arial';
+
+            // Angle alpha at A
+            ctx.fillStyle = (toFind === 'alpha') ? 'red' : 'black';
+            ctx.fillText((toFind === 'alpha' ? 'α (gesucht)' : `α`), pA.x + (rightAngleVertex === 'C' ? 10 : (rightAngleVertex === 'A' ? 20 : 10)), pA.y + (rightAngleVertex === 'C' ? -10 : (rightAngleVertex === 'A' ? -10 : 20)));
+
+            // Angle beta at B
+            ctx.fillStyle = (toFind === 'beta') ? 'red' : 'black';
+            ctx.fillText((toFind === 'beta' ? 'β (gesucht)' : `β`), pB.x + (rightAngleVertex === 'C' ? -30 : (rightAngleVertex === 'A' ? -40 : -30)), pB.y + (rightAngleVertex === 'C' ? -10 : (rightAngleVertex === 'A' ? -10 : -10)));
+
+            // Angle gamma at C
+            ctx.fillStyle = (toFind === 'gamma') ? 'red' : 'black';
+            if (rightAngleVertex !== 'C') {
+                ctx.fillText((toFind === 'gamma' ? 'γ (gesucht)' : `γ`), pC.x + (rightAngleVertex === 'A' ? 10 : -30), pC.y + (rightAngleVertex === 'A' ? 20 : 20));
+            }
+            // Removed the text label for the right angle
+
+
+             ctx.fillStyle = 'black'; // Reset color
+        }
+
+        // Function to generate a new task
+        function generateTask() {
+            feedbackDiv.textContent = '';
+            tipDiv.textContent = '';
+            tipDiv.classList.add('hidden');
+            userAnswerInput.value = '';
+
+            let a, b, c, alpha, beta, gamma;
+            const rightAngleVertex = ['A', 'B', 'C'][Math.floor(Math.random() * 3)];
+
+            // Generate two random values and calculate the rest based on the right angle vertex
+            const givenType = Math.random();
+
+            if (rightAngleVertex === 'C') {
+                 gamma = 90;
+                 if (givenType < 0.4) { // Given two sides (a, b, or c)
+                     const side1 = Math.random() * 10 + 2; // Length between 2 and 12
+                     const side2 = Math.random() * 10 + 2;
+
+                     const sideCase = Math.random();
+                     if (sideCase < 0.33) { // Given a and b, find c, alpha, beta
+                         a = side1;
+                         b = side2;
+                         c = Math.sqrt(a * a + b * b);
+                         alpha = radToDeg(Math.atan(a / b));
+                         beta = radToDeg(Math.atan(b / a));
+                     } else if (sideCase < 0.66) { // Given a and c, find b, alpha, beta
+                         // Ensure c is larger than a
+                         c = Math.max(side1, side2);
+                         a = Math.min(side1, side2);
+                         b = Math.sqrt(c * c - a * a);
+                         alpha = radToDeg(Math.asin(a / c));
+                         beta = radToDeg(Math.acos(a / c));
+                     } else { // Given b and c, find a, alpha, beta
+                         // Ensure c is larger than b
+                         c = Math.max(side1, side2);
+                         b = Math.min(side1, side2);
+                         a = Math.sqrt(c * c - b * b);
+                         alpha = radToDeg(Math.acos(b / c));
+                         beta = radToDeg(Math.asin(b / c));
+                     }
+                 } else { // Given one side and one acute angle (alpha or beta)
+                     const side = Math.random() * 10 + 2; // Length between 2 and 12
+                     const angleDeg = Math.random() * 80 + 5; // Angle between 5 and 85 degrees
+                     const angleRad = degToRad(angleDeg);
+
+                     const angleSideCase = Math.random();
+                     if (angleSideCase < 0.33) { // Given alpha and a, find b, c, beta
+                         alpha = angleDeg;
+                         a = side;
+                         beta = 90 - alpha;
+                         b = a / Math.tan(angleRad);
+                         c = a / Math.sin(angleRad);
+                     } else if (angleSideCase < 0.66) { // Given alpha and b, find a, c, beta
+                         alpha = angleDeg;
+                         b = side;
+                         beta = 90 - alpha;
+                         a = b * Math.tan(angleRad);
+                         c = b / Math.cos(angleRad);
+                     } else { // Given alpha and c, find a, b, beta
+                         alpha = angleDeg;
+                         c = side;
+                         beta = 90 - alpha;
+                         a = c * Math.sin(angleRad);
+                         b = c * Math.cos(angleRad);
+                     }
+                 }
+            } else if (rightAngleVertex === 'A') {
+                alpha = 90;
+                 if (givenType < 0.4) { // Given two sides (a, b, or c)
+                     const side1 = Math.random() * 10 + 2; // Length between 2 and 12
+                     const side2 = Math.random() * 10 + 2;
+
+                     const sideCase = Math.random();
+                     if (sideCase < 0.33) { // Given b and c, find a, beta, gamma
+                         b = side1;
+                         c = side2;
+                         a = Math.sqrt(b * b + c * c);
+                         beta = radToDeg(Math.atan(b / c));
+                         gamma = radToDeg(Math.atan(c / b));
+                     } else if (sideCase < 0.66) { // Given b and a, find c, beta, gamma
+                         // Ensure a is larger than b
+                         a = Math.max(side1, side2);
+                         b = Math.min(side1, side2);
+                         c = Math.sqrt(a * a - b * b);
+                         beta = radToDeg(Math.asin(b / a));
+                         gamma = radToDeg(Math.acos(b / a));
+                     } else { // Given c and a, find b, beta, gamma
+                         // Ensure a is larger than c
+                         a = Math.max(side1, side2);
+                         c = Math.min(side1, side2);
+                         b = Math.sqrt(a * a - c * c);
+                         beta = radToDeg(Math.acos(c / a));
+                         gamma = radToDeg(Math.asin(c / a));
+                     }
+                 } else { // Given one side and one acute angle (beta or gamma)
+                     const side = Math.random() * 10 + 2; // Length between 2 and 12
+                     const angleDeg = Math.random() * 80 + 5; // Angle between 5 and 85 degrees
+                     const angleRad = degToRad(angleDeg);
+
+                     const angleSideCase = Math.random();
+                     if (angleSideCase < 0.33) { // Given beta and b, find a, c, gamma
+                         beta = angleDeg;
+                         b = side;
+                         gamma = 90 - beta;
+                         c = b / Math.tan(angleRad);
+                         a = b / Math.sin(angleRad);
+                     } else if (angleSideCase < 0.66) { // Given beta and c, find a, b, gamma
+                         beta = angleDeg;
+                         c = side;
+                         gamma = 90 - beta;
+                         b = c * Math.tan(angleRad);
+                         a = c / Math.cos(angleRad);
+                     } else { // Given beta and a, find b, c, gamma
+                         beta = angleDeg;
+                         a = side;
+                         gamma = 90 - beta;
+                         b = a * Math.sin(angleRad);
+                         c = a * Math.cos(angleRad);
+                     }
+                 }
+            } else { // rightAngleVertex === 'B'
+                 beta = 90;
+                 if (givenType < 0.4) { // Given two sides (a, b, or c)
+                     const side1 = Math.random() * 10 + 2; // Length between 2 and 12
+                     const side2 = Math.random() * 10 + 2;
+
+                     const sideCase = Math.random();
+                     if (sideCase < 0.33) { // Given a and c, find b, alpha, gamma
+                         a = side1;
+                         c = side2;
+                         b = Math.sqrt(a * a + c * c);
+                         alpha = radToDeg(Math.atan(a / c));
+                         gamma = radToDeg(Math.atan(c / a));
+                     } else if (sideCase < 0.66) { // Given a and b, find c, alpha, gamma
+                         // Ensure b is larger than a
+                         b = Math.max(side1, side2);
+                         a = Math.min(side1, side2);
+                         c = Math.sqrt(b * b - a * a);
+                         alpha = radToDeg(Math.asin(a / b));
+                         gamma = radToDeg(Math.acos(a / b));
+                     } else { // Given c and b, find a, alpha, gamma
+                         // Ensure b is larger than c
+                         b = Math.max(side1, side2);
+                         c = Math.min(side1, side2);
+                         a = Math.sqrt(b * b - c * c);
+                         alpha = radToDeg(Math.acos(c / b));
+                         gamma = radToDeg(Math.asin(c / b));
+                     }
+                 } else { // Given one side and one acute angle (alpha or gamma)
+                     const side = Math.random() * 10 + 2; // Length between 2 and 12
+                     const angleDeg = Math.random() * 80 + 5; // Angle between 5 and 85 degrees
+                     const angleRad = degToRad(angleDeg);
+
+                     const angleSideCase = Math.random();
+                     if (angleSideCase < 0.33) { // Given alpha and a, find b, c, gamma
+                         alpha = angleDeg;
+                         a = side;
+                         gamma = 90 - alpha;
+                         c = a / Math.tan(angleRad);
+                         b = a / Math.sin(angleRad);
+                     } else if (angleSideCase < 0.66) { // Given alpha and c, find b, a, gamma
+                         alpha = angleDeg;
+                         c = side;
+                         gamma = 90 - alpha;
+                         a = c * Math.tan(angleRad);
+                         b = c / Math.cos(angleRad);
+                     } else { // Given alpha and b, find a, c, gamma
+                         alpha = angleDeg;
+                         b = side;
+                         gamma = 90 - alpha;
+                         a = b * Math.sin(angleRad);
+                         c = b * Math.cos(angleRad);
+                     }
+                 }
+            }
+
+
+            // Ensure positive lengths and valid angles
+            a = Math.abs(a);
+            b = Math.abs(b);
+            c = Math.abs(c);
+            alpha = Math.abs(alpha);
+            beta = Math.abs(beta);
+            gamma = Math.abs(gamma);
+
+
+            // Choose what to find - ensure it's not the right angle
+            const toFindOptions = ['a', 'b', 'c'];
+            if (rightAngleVertex !== 'A') toFindOptions.push('alpha');
+            if (rightAngleVertex !== 'B') toFindOptions.push('beta');
+            if (rightAngleVertex !== 'C') toFindOptions.push('gamma');
+
+            const toFind = toFindOptions[Math.floor(Math.random() * toFindOptions.length)];
+
+            let correctAnswer;
+            let taskText = `Gegeben ist ein rechtwinkliges Dreieck mit dem rechten Winkel bei Punkt ${rightAngleVertex}.`;
+            let tipText = "";
+
+            // Determine given values and correct answer based on toFind and rightAngleVertex
+            if (toFind === 'a') {
+                correctAnswer = a;
+                if (rightAngleVertex === 'A') {
+                     taskText += ` Gegeben: b = ${b.toFixed(2)}, c = ${c.toFixed(2)}. Berechne die Seitenlänge a.`;
+                     tipText = "Betrachte die Winkel Beta und Gamma und nutze die Definitionen von Sinus, Kosinus oder Tangens.";
+                } else if (rightAngleVertex === 'B') {
+                     taskText += ` Gegeben: b = ${b.toFixed(2)}, γ = ${gamma.toFixed(1)}°. Berechne die Seitenlänge a.`;
+                     tipText = "Nutze die Tangens-Funktion (Gegenkathete durch Ankathete) bezüglich Winkel Gamma oder die Sinus-Funktion (Gegenkathete durch Hypotenuse) bezüglich Winkel Alpha.";
+                } else { // rightAngleVertex === 'C'
+                     taskText += ` Gegeben: b = ${b.toFixed(2)}, α = ${alpha.toFixed(1)}°. Berechne die Seitenlänge a.`;
+                     tipText = "Nutze die Tangens-Funktion (Gegenkathete durch Ankathete) bezüglich Winkel Alpha oder die Sinus-Funktion (Gegenkathete durch Hypotenuse) bezüglich Winkel Alpha.";
+                }
+            } else if (toFind === 'b') {
+                correctAnswer = b;
+                 if (rightAngleVertex === 'A') {
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, c = ${c.toFixed(2)}. Berechne die Seitenlänge b.`;
+                     tipText = "Nutze die Tangens-Funktion (Gegenkathete durch Ankathete) bezüglich Winkel Gamma oder die Sinus-Funktion (Gegenkathete durch Hypotenuse) bezüglich Winkel Beta.";
+                } else if (rightAngleVertex === 'B') {
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, c = ${c.toFixed(2)}. Berechne die Seitenlänge b.`;
+                     tipText = "Betrachte die Winkel Alpha und Gamma und nutze die Definitionen von Sinus, Kosinus oder Tangens.";
+                } else { // rightAngleVertex === 'C'
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, β = ${beta.toFixed(1)}°. Berechne die Seitenlänge b.`;
+                     tipText = "Nutze die Tangens-Funktion (Gegenkathete durch Ankathete) bezüglich Winkel Beta oder die Sinus-Funktion (Gegenkathete durch Hypotenuse) bezüglich Winkel Beta.";
+                }
+            } else if (toFind === 'c') {
+                correctAnswer = c;
+                 if (rightAngleVertex === 'A') {
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, b = ${b.toFixed(2)}. Berechne die Seitenlänge c.`;
+                     tipText = "Nutze die Kosinus-Funktion (Ankathete durch Hypotenuse) bezüglich Winkel Beta oder die Tangens-Funktion (Gegenkathete durch Ankathete) bezüglich Winkel Gamma.";
+                } else if (rightAngleVertex === 'B') {
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, b = ${b.toFixed(2)}. Berechne die Seitenlänge c.`;
+                     tipText = "Nutze die Kosinus-Funktion (Ankathete durch Hypotenuse) bezüglich Winkel Alpha oder die Tangens-Funktion (Gegenkathete durch Ankathete) bezüglich Winkel Gamma.";
+                } else { // rightAngleVertex === 'C'
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, b = ${b.toFixed(2)}. Berechne die Seitenlänge c.`;
+                     tipText = "Nutze die Kosinus-Funktion (Ankathete durch Hypotenuse) bezüglich Winkel Beta oder die Sinus-Funktion (Gegenkathete durch Hypotenuse) bezüglich Winkel Alpha.";
+                }
+            } else if (toFind === 'alpha') {
+                correctAnswer = alpha;
+                 if (rightAngleVertex === 'A') {
+                     taskText += ` Gegeben: b = ${b.toFixed(2)}, c = ${c.toFixed(2)}. Berechne den Winkel α.`;
+                     tipText = "Der Winkel Alpha ist der rechte Winkel und beträgt 90 Grad.";
+                 } else if (rightAngleVertex === 'B') {
+                      taskText += ` Gegeben: a = ${a.toFixed(2)}, b = ${b.toFixed(2)}. Berechne den Winkel α.`;
+                      tipText = "Nutze die Sinus-Funktion (Gegenkathete durch Hypotenuse) oder die Tangens-Funktion (Gegenkathete durch Ankathete) bezüglich Winkel Alpha.";
+                 } else { // rightAngleVertex === 'C'
+                      taskText += ` Gegeben: a = ${a.toFixed(2)}, b = ${b.toFixed(2)}. Berechne den Winkel α.`;
+                      tipText = "Nutze die Tangens-Funktion (Gegenkathete durch Ankathete) oder die Sinus-Funktion (Gegenkathete durch Hypotenuse) oder die Kosinus-Funktion (Ankathete durch Hypotenuse) bezüglich Winkel Alpha.";
+                 }
+            } else if (toFind === 'beta') {
+                correctAnswer = beta;
+                 if (rightAngleVertex === 'A') {
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, c = ${c.toFixed(2)}. Berechne den Winkel β.`;
+                     tipText = "Nutze die Sinus-Funktion (Gegenkathete durch Hypotenuse) oder die Tangens-Funktion (Gegenkathete durch Ankathete) bezüglich Winkel Beta.";
+                 } else if (rightAngleVertex === 'B') {
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, c = ${c.toFixed(2)}. Berechne den Winkel β.`;
+                     tipText = "Der Winkel Beta ist der rechte Winkel und beträgt 90 Grad.";
+                 } else { // rightAngleVertex === 'C'
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, b = ${b.toFixed(2)}. Berechne den Winkel β.`;
+                     tipText = "Nutze die Tangens-Funktion (Gegenkathete durch Ankathete) oder die Sinus-Funktion (Gegenkathete durch Hypotenuse) oder die Kosinus-Funktion (Ankathete durch Hypotenuse) bezüglich Winkel Beta.";
+                 }
+            } else if (toFind === 'gamma') {
+                correctAnswer = gamma;
+                 if (rightAngleVertex === 'A') {
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, b = ${b.toFixed(2)}. Berechne den Winkel γ.`;
+                     tipText = "Nutze die Sinus-Funktion (Gegenkathete durch Hypotenuse) oder die Tangens-Funktion (Gegenkathete durch Ankathete) bezüglich Winkel Gamma.";
+                 } else if (rightAngleVertex === 'B') {
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, b = ${b.toFixed(2)}. Berechne den Winkel γ.`;
+                     tipText = "Nutze die Sinus-Funktion (Gegenkathete durch Hypotenuse) oder die Kosinus-Funktion (Ankathete durch Hypotenuse) bezüglich Winkel Gamma.";
+                 } else { // rightAngleVertex === 'C'
+                     taskText += ` Gegeben: a = ${a.toFixed(2)}, b = ${b.toFixed(2)}. Berechne den Winkel γ.`;
+                     tipText = "Der Winkel Gamma ist der rechte Winkel und beträgt 90 Grad.";
+                 }
+            }
+
+
+            currentTask = { a, b, c, alpha, beta, gamma, toFind, correctAnswer, tipText, rightAngleVertex };
+            taskDescription.textContent = taskText;
+            drawTriangle(a, b, c, alpha, beta, gamma, toFind, rightAngleVertex);
+        }
+
+        // Function to check the user's answer
+        function checkAnswer() {
+            const userAnswer = parseFloat(userAnswerInput.value);
+            const correctAnswer = currentTask.correctAnswer;
+            const tolerance = 0.05; // Allow for small rounding errors
+
+            if (isNaN(userAnswer)) {
+                feedbackDiv.textContent = 'Bitte gib eine Zahl ein.';
+                feedbackDiv.style.color = 'orange';
+            } else if (Math.abs(userAnswer - correctAnswer) < tolerance) {
+                feedbackDiv.textContent = 'Richtig!';
+                feedbackDiv.style.color = 'green';
+            } else {
+                feedbackDiv.textContent = `Leider falsch. Die richtige Antwort ist ${correctAnswer.toFixed(2)}.`;
+                feedbackDiv.style.color = 'red';
+            }
+        }
+
+        // Function to show the tip
+        function showTip() {
+            tipDiv.textContent = currentTask.tipText; // Use textContent for plain text
+            tipDiv.classList.remove('hidden');
+            // No MathJax call needed for plain text
+        }
+
+        // Event listeners
+        generateTaskBtn.addEventListener('click', generateTask);
+        checkAnswerBtn.addEventListener('click', checkAnswer);
+        showTipBtn.addEventListener('click', showTip);
+
+        // Initial task generation
+        generateTask();
+
+        // No need to load MathJax if not used
+        // const script = document.createElement('script');
+        // script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+        // script.async = true;
+        // document.head.appendChild(script);
+
+    </script>
+</body>
+</html>

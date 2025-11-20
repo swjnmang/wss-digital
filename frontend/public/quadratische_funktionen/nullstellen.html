@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nullstellen Quadratischer Funktionen - Modern</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px 10px; 
+            background-color: #eef2f7; 
+            color: #334155; 
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 6px 10px rgba(0, 0, 0, 0.06); 
+            width: 95%;
+            max-width: 850px; 
+            margin-top: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #005a4d; 
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.9em;
+        }
+
+        .score-display {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 1.15em;
+            font-weight: 600; 
+            color: #00796b; 
+            background-color: #e0f2f1; 
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid #b2dfdb; 
+        }
+
+        .aufgabe, .eingabe, #musterloesungBereich {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e2e8f0; 
+            border-radius: 8px;
+            background-color: #f8fafc; 
+        }
+
+        .aufgabe p strong { color: #00796b; }
+
+        #funktionsgleichung {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #d81b60; 
+            text-align: center;
+            margin: 15px 0;
+            word-break: break-word;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .input-group label {
+            margin-bottom: 6px;
+            font-weight: 500; 
+            color: #475569; 
+        }
+
+        input[type="text"], select {
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #fff;
+            color: #334155;
+            font-size: 1em;
+        }
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #00796b;
+            box-shadow: 0 0 0 2px rgba(0, 121, 107, 0.2);
+        }
+
+
+        #controls {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #00796b; 
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            font-size: 0.95em;
+            font-weight: 500;
+            min-width: 160px;
+        }
+        button:hover {
+            background-color: #00695c; 
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0px);
+        }
+        button.secondary {
+            background-color: #546e7a; 
+        }
+        button.secondary:hover { background-color: #455a64; }
+       
+
+        .feedback {
+            font-weight: 500;
+            margin-top: 20px;
+            padding: 12px 15px;
+            border-radius: 6px;
+        }
+        .correct { color: #004d40; background-color: #c8e6c9; border: 1px solid #a5d6a7;}
+        .incorrect { color: #b71c1c; background-color: #ffcdd2; border: 1px solid #ef9a9a;}
+        .hinweis { color: #f57f17; background-color: #fff9c4; border: 1px solid #fff59d;}
+        .hidden { display: none; }
+        .formula-display { font-style: italic; color: #475569; margin-bottom: 20px; text-align: center; }
+        #musterloesungBereich p { margin-bottom: 12px; line-height: 1.6;}
+        #graphContainer {
+            width: 100%;
+            max-width: 500px; 
+            margin: 20px auto; 
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden; 
+        }
+        #graphSvg {
+            display: block; 
+            width: 100%;
+            height: auto; 
+        }
+
+
+        @media (min-width: 600px) {
+            .input-group {
+                flex-direction: row;
+                align-items: center;
+            }
+            .input-group label {
+                min-width: 230px;
+                margin-bottom: 0;
+                margin-right: 10px;
+            }
+            input[type="text"] {
+                width: calc(100% - 240px);
+            }
+            select {
+                 width: auto;
+            }
+            button {
+                flex-grow: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { padding: 20px; }
+            h1 { font-size: 1.6em; }
+            #funktionsgleichung { font-size: 1.4em; }
+            .score-display { font-size: 1em; top: 15px; right: 15px; padding: 6px 10px;}
+            button { font-size: 0.9em; padding: 10px 15px; min-width: 130px;}
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container" id="appContainer">
+        <a href="index.html" style="display: inline-block; margin-bottom: 15px; color: #00796b; text-decoration: none; font-weight: bold;">
+            ← Zurück zur Übersicht
+        </a>
+        <div id="score" class="score-display">Punkte: 0</div>
+        <h1>Nullstellen Quadratischer Funktionen 📐</h1>
+        <p class="formula-display">Die Mitternachtsformel (oder abc-Formel) zur Berechnung der Nullstellen $x_{1,2}$ einer quadratischen Funktion $ax^2 + bx + c = 0$ lautet:
+            <br><strong>$x_{1,2} = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$</strong>
+        </p>
+
+        <div class="aufgabe">
+            <p><strong>Arbeitsauftrag:</strong> Berechne die Nullstelle(n) der folgenden Funktion:</p>
+            <p id="funktionsgleichung"></p>
+        </div>
+
+        <div class="eingabe">
+            <div class="input-group">
+                <label for="anzahlNullstellen">Wie viele reelle Nullstellen erwartest du?</label>
+                <select id="anzahlNullstellen">
+                    <option value="2">Zwei Nullstellen</option>
+                    <option value="1">Eine Nullstelle</option>
+                    <option value="0">Keine Nullstellen</option>
+                </select>
+            </div>
+            <div id="nullstellenFelder">
+                <div class="input-group">
+                    <label for="x1" id="label_x1">Erste Nullstelle $x_1$ (kleinere zuerst):</label>
+                    <input type="text" id="x1" name="x1" placeholder="z.B. -2.5">
+                </div>
+                <div class="input-group" id="feld_x2">
+                    <label for="x2">Zweite Nullstelle $x_2$:</label>
+                    <input type="text" id="x2" name="x2" placeholder="z.B. 3">
+                </div>
+            </div>
+        </div>
+
+        <div id="controls">
+            <button onclick="neueAufgabe()">Neue Aufgabe</button>
+            <button onclick="loesungPruefen()">Meine Lösung prüfen</button>
+            <button onclick="musterloesungZeigen()" class="secondary">Musterlösung anzeigen</button>
+            </div>
+
+        <div id="feedbackBereich" class="feedback hidden"></div>
+        
+        <div id="musterloesungBereich" class="hidden">
+            <h4>Musterlösung:</h4>
+            <p>Die allgemeine Mitternachtsformel lautet:</p>
+            <p id="m_general_formula_display"></p> 
+
+            <p id="m_gleichung_info"></p> 
+            <p>Koeffizienten: a = <span id="m_a_val"></span>, b = <span id="m_b_val"></span>, c = <span id="m_c_val"></span></p> 
+            <p>Einsetzen der Koeffizienten in die Mitternachtsformel:</p>
+            <p id="m_substituted_formula_display"></p> 
+
+            <p>Berechnung der Diskriminante $D = b^2 - 4ac$ (der Term unter der Wurzel):</p>
+            <p id="m_D_formula_display"></p> 
+
+            <div id="m_fall_unterscheidung">
+                <div id="m_zwei_loesungen" class="hidden">
+                    <p>Da $D > 0$, gibt es zwei verschiedene reelle Nullstellen. Wir setzen den Wert von $D$ in die Formel von oben ein:</p>
+                    <p id="m_x1_formula_display"></p> 
+                    <p id="m_x2_formula_display"></p> 
+                </div>
+                <div id="m_eine_loesung" class="hidden">
+                    <p>Da $D = 0$, gibt es genau eine reelle Nullstelle (doppelte Nullstelle). Wir setzen $D=0$ in die Formel von oben ein (oder nutzen $x_0 = -b/(2a)$):</p>
+                    <p id="m_x0_formula_display"></p> 
+                </div>
+                <div id="m_keine_loesung" class="hidden">
+                    <p>Da $D < 0$, ist der Wert unter der Wurzel negativ. Es gibt keine reellen Nullstellen.</p>
+                </div>
+            </div>
+            <p><strong>Graph der Funktion:</strong></p>
+            <div id="graphContainer">
+                <svg id="graphSvg" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentA, currentB, currentC;
+        let anzahlEchteNullstellen;
+        let echteNullstellen = []; 
+        let aktuellerPunktestand = 0;
+        let aufgabeSchonVersucht = false;
+        let loesungAngezeigtFuerAktuelleAufgabe = false;
+        // const appContainer = document.getElementById('appContainer'); // No longer needed for fullscreen
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function smartFormat(num, digits = 2) { 
+            if (num === null || typeof num === 'undefined') return "";
+            if (Math.abs(num) < 1e-9) return "0"; 
+            if (Math.abs(num - Math.round(num)) < 1e-9) { 
+                return Math.round(num).toString();
+            }
+            return parseFloat(num.toFixed(digits)).toString(); 
+        }
+        
+         function formatCoeff(num, forLatex = false) {
+            const numStr = smartFormat(num, 4); 
+            if (forLatex) {
+                return parseFloat(numStr) < 0 ? `(${numStr})` : numStr;
+            }
+            return numStr;
+        }
+
+
+        function updatePunkteAnzeige() {
+            document.getElementById('score').innerText = "Punkte: " + aktuellerPunktestand;
+        }
+
+        function neueAufgabe() {
+            aufgabeSchonVersucht = false;
+            loesungAngezeigtFuerAktuelleAufgabe = false;
+            document.getElementById('feedbackBereich').classList.add('hidden');
+            document.getElementById('feedbackBereich').innerHTML = "";
+            document.getElementById('musterloesungBereich').classList.add('hidden');
+            document.getElementById('m_zwei_loesungen').classList.add('hidden');
+            document.getElementById('m_eine_loesung').classList.add('hidden');
+            document.getElementById('m_keine_loesung').classList.add('hidden');
+            document.getElementById('x1').value = "";
+            document.getElementById('x2').value = "";
+            document.getElementById('anzahlNullstellen').value = "2"; 
+            toggleNullstellenFelder(); 
+
+            let fall = getRandomInt(1, 3); 
+
+            if (fall === 1) { 
+                anzahlEchteNullstellen = 2;
+                let x1_root, x2_root;
+                do {
+                    x1_root = getRandomInt(-6, 6); 
+                    x2_root = getRandomInt(-6, 6);
+                } while (x1_root === x2_root ); 
+
+                currentA = getRandomInt(1, 2) * (Math.random() < 0.5 ? 1 : -1); 
+                currentB = -currentA * (x1_root + x2_root); 
+                currentC = currentA * x1_root * x2_root;   
+                
+                echteNullstellen = [x1_root, x2_root].sort((a,b) => a-b);
+
+
+            } else if (fall === 2) { 
+                anzahlEchteNullstellen = 1;
+                let x0_root = getRandomInt(-5, 5);
+                currentA = getRandomInt(1, 2) * (Math.random() < 0.5 ? 1 : -1);
+                currentB = -2 * currentA * x0_root; 
+                currentC = currentA * x0_root * x0_root; 
+                echteNullstellen = [x0_root];
+
+            } else { 
+                anzahlEchteNullstellen = 0;
+                currentA = getRandomInt(1, 2) * (Math.random() < 0.5 ? 1 : -1); 
+
+                let xv = getRandomInt(-4, 4); 
+                let yv_abs = getRandomInt(1, 10); 
+                let yv_sign = (currentA > 0) ? 1 : -1; 
+                                
+                currentB = -2 * currentA * xv; 
+                currentC = currentA * xv * xv + yv_sign * yv_abs; 
+                echteNullstellen = [];
+            }
+
+            if (currentA === 0) currentA = 1; 
+
+            let funcStr = "f(x) = ";
+            if (currentA === 1) funcStr += "x²";
+            else if (currentA === -1) funcStr += "-x²";
+            else funcStr += formatCoeff(currentA) + "x²";
+
+            if (currentB !== 0) {
+                if (currentB > 0 && funcStr !== "f(x) = ") funcStr += " + ";
+                else if (currentB < 0) funcStr += " - ";
+                else if (currentB > 0 && funcStr === "f(x) = ") {} 
+                funcStr += (Math.abs(currentB) === 1 ? "" : Math.abs(currentB)) + "x";
+            }
+
+
+            if (currentC !== 0) {
+                 if (currentC > 0 && funcStr !== "f(x) = ") funcStr += " + ";
+                 else if (currentC < 0) funcStr += " - ";
+                 else if (currentC > 0 && funcStr === "f(x) = ") {}
+                funcStr += Math.abs(currentC);
+            }
+            
+            if (funcStr === "f(x) = " || (currentA === 0 && currentB === 0 && currentC === 0) ) {
+                 currentA=1; currentB=2; currentC=1; anzahlEchteNullstellen = 1; echteNullstellen = [-1];
+                 funcStr = "f(x) = x² + 2x + 1";
+            }
+            
+            document.getElementById('funktionsgleichung').innerHTML = funcStr;
+            document.getElementById('m_gleichung_info').innerText = "Gegebene Funktion (gleich Null gesetzt): " + funcStr + " = 0"; 
+            
+            document.getElementById('m_a_val').innerText = formatCoeff(currentA);
+            document.getElementById('m_b_val').innerText = formatCoeff(currentB);
+            document.getElementById('m_c_val').innerText = formatCoeff(currentC);
+            
+            updatePunkteAnzeige();
+            if (typeof MathJax !== 'undefined' && typeof MathJax.typesetPromise === 'function') {
+                MathJax.typesetPromise().catch(function (err) { console.error('MathJax typeset error:', err); });
+            }
+        }
+
+        document.getElementById('anzahlNullstellen').addEventListener('change', toggleNullstellenFelder);
+
+        function toggleNullstellenFelder() {
+            const anzahlGewaehlt = document.getElementById('anzahlNullstellen').value;
+            const nullstellenFelderDiv = document.getElementById('nullstellenFelder');
+            const x1Input = document.getElementById('x1'); 
+            const x2Input = document.getElementById('x2');
+            const labelX1 = document.getElementById('label_x1');
+            const feldX2Div = document.getElementById('feld_x2'); 
+
+            if (anzahlGewaehlt === "0") {
+                nullstellenFelderDiv.classList.add('hidden');
+            } else if (anzahlGewaehlt === "1") {
+                nullstellenFelderDiv.classList.remove('hidden');
+                labelX1.innerHTML = "Nullstelle $x_0$:"; 
+                feldX2Div.classList.add('hidden'); 
+                x2Input.value = ""; 
+            } else { 
+                nullstellenFelderDiv.classList.remove('hidden');
+                labelX1.innerHTML = "Erste Nullstelle $x_1$ (kleinere zuerst):"; 
+                feldX2Div.classList.remove('hidden'); 
+            }
+             if (typeof MathJax !== 'undefined' && typeof MathJax.typesetPromise === 'function') {
+                MathJax.typesetPromise([labelX1.parentElement]).catch(function (err) { console.error('MathJax typeset error:', err); });
+            }
+        }
+
+        function loesungPruefen() {
+            const feedbackDiv = document.getElementById('feedbackBereich');
+            feedbackDiv.classList.remove('hidden'); 
+            document.getElementById('musterloesungBereich').classList.add('hidden'); 
+
+            const anzahlGewaehlt = parseInt(document.getElementById('anzahlNullstellen').value);
+            
+            let anzahlKorrekt = (anzahlGewaehlt === anzahlEchteNullstellen);
+            let werteKorrekt = false;
+            let feedbackMsg = "";
+
+            if (!anzahlKorrekt) {
+                feedbackMsg = `Die Anzahl der Nullstellen ist nicht korrekt. Diese Funktion hat ${anzahlEchteNullstellen} reelle Nullstelle(n).`;
+                feedbackDiv.className = 'feedback incorrect';
+            } else {
+                if (anzahlEchteNullstellen === 0) {
+                    werteKorrekt = true; 
+                    feedbackMsg = 'Korrekt! Die Funktion hat keine reellen Nullstellen.';
+                    feedbackDiv.className = 'feedback correct';
+                } else if (anzahlEchteNullstellen === 1) {
+                    const x0_user_str = document.getElementById('x1').value.trim().replace(',', '.'); 
+                    if (x0_user_str === "") {
+                        feedbackMsg = 'Bitte gib die Nullstelle ein.';
+                        feedbackDiv.className = 'feedback hinweis';
+                    } else {
+                        const x0_user = parseFloat(x0_user_str);
+                        if (isNaN(x0_user)) {
+                             feedbackMsg = 'Ungültige Eingabe für die Nullstelle. Bitte eine Zahl eingeben.';
+                             feedbackDiv.className = 'feedback hinweis';
+                        } else if (Math.abs(x0_user - echteNullstellen[0]) < 0.001) { 
+                            werteKorrekt = true;
+                            feedbackMsg = `Korrekt! Die Nullstelle ist $x_0 = ${smartFormat(echteNullstellen[0])}$`;
+                            feedbackDiv.className = 'feedback correct';
+                        } else {
+                            feedbackMsg = `Die Nullstelle $x_0 = ${smartFormat(x0_user)}$ ist nicht korrekt.`;
+                            feedbackDiv.className = 'feedback incorrect';
+                        }
+                    }
+                } else { 
+                    const x1_user_str = document.getElementById('x1').value.trim().replace(',', '.');
+                    const x2_user_str = document.getElementById('x2').value.trim().replace(',', '.');
+
+                    if (x1_user_str === "" || x2_user_str === "") {
+                        feedbackMsg = 'Bitte gib beide Nullstellen ein.';
+                        feedbackDiv.className = 'feedback hinweis';
+                    } else {
+                        const x1_user = parseFloat(x1_user_str);
+                        const x2_user = parseFloat(x2_user_str);
+
+                        if (isNaN(x1_user) || isNaN(x2_user)) {
+                            feedbackMsg = 'Ungültige Eingabe für eine oder beide Nullstellen. Bitte Zahlen eingeben.';
+                            feedbackDiv.className = 'feedback hinweis';
+                        } else {
+                            const userNullstellen = [x1_user, x2_user].sort((a,b) => a-b);
+                            if (Math.abs(userNullstellen[0] - echteNullstellen[0]) < 0.001 && Math.abs(userNullstellen[1] - echteNullstellen[1]) < 0.001) {
+                                werteKorrekt = true;
+                                feedbackMsg = `Korrekt! Die Nullstellen sind $x_1 = ${smartFormat(echteNullstellen[0])}$ und $x_2 = ${smartFormat(echteNullstellen[1])}$`;
+                                feedbackDiv.className = 'feedback correct';
+                            } else {
+                                feedbackMsg = `Die eingegebenen Nullstellen ($x_1 = ${smartFormat(userNullstellen[0])}, x_2 = ${smartFormat(userNullstellen[1])}$) sind nicht korrekt.`;
+                                feedbackDiv.className = 'feedback incorrect';
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (anzahlKorrekt && werteKorrekt && !loesungAngezeigtFuerAktuelleAufgabe) {
+                if (!aufgabeSchonVersucht) { 
+                    aktuellerPunktestand += 10;
+                    feedbackMsg += " (+10 Punkte)";
+                } else { 
+                    aktuellerPunktestand += 5;
+                     feedbackMsg += " (+5 Punkte)";
+                }
+                updatePunkteAnzeige();
+            }
+            aufgabeSchonVersucht = true; 
+
+            feedbackDiv.innerHTML = feedbackMsg;
+            if (typeof MathJax !== 'undefined' && typeof MathJax.typesetPromise === 'function') {
+                MathJax.typesetPromise([feedbackDiv]).catch(function (err) { console.error('MathJax typeset error:', err); });
+            }
+        }
+
+        function musterloesungZeigen() {
+            loesungAngezeigtFuerAktuelleAufgabe = true; 
+            document.getElementById('feedbackBereich').classList.add('hidden'); 
+            
+            document.getElementById('m_general_formula_display').innerHTML = "$x_{1,2} = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$";
+
+            let substituted_formula_latex = `x_{1,2} = \\frac{-(${formatCoeff(currentB, true)}) \\pm \\sqrt{(${formatCoeff(currentB, true)})^2 - 4 \\cdot ${formatCoeff(currentA, true)} \\cdot ${formatCoeff(currentC, true)}}}{2 \\cdot ${formatCoeff(currentA, true)}}`;
+            document.getElementById('m_substituted_formula_display').innerHTML = `$${substituted_formula_latex}$`;
+
+            const D_val = currentB * currentB - 4 * currentA * currentC; 
+            let d_calculation_latex = `D = (${formatCoeff(currentB, true)})^2 - 4 \\cdot ${formatCoeff(currentA, true)} \\cdot ${formatCoeff(currentC, true)}`;
+            d_calculation_latex += ` = ${currentB * currentB} - (${formatCoeff(4 * currentA * currentC, true)})`;
+            d_calculation_latex += ` = ${smartFormat(D_val)}`;
+            document.getElementById('m_D_formula_display').innerHTML = `$${d_calculation_latex}$`;
+
+
+            document.getElementById('m_zwei_loesungen').classList.add('hidden');
+            document.getElementById('m_eine_loesung').classList.add('hidden');
+            document.getElementById('m_keine_loesung').classList.add('hidden');
+
+            if (D_val > 1e-9) { 
+                let x1_val = (-currentB - Math.sqrt(D_val)) / (2 * currentA);
+                let x2_val = (-currentB + Math.sqrt(D_val)) / (2 * currentA);
+                if (x1_val > x2_val) {[x1_val, x2_val] = [x2_val, x1_val];} 
+
+                let x1_latex = `x_1 = \\frac{-(${formatCoeff(currentB, true)}) - \\sqrt{${smartFormat(D_val)}}}{2 \\cdot ${formatCoeff(currentA, true)}}`;
+                x1_latex += ` = \\frac{${formatCoeff(-currentB)} - ${smartFormat(Math.sqrt(D_val))}}{${formatCoeff(2 * currentA)}}`;
+                x1_latex += ` = \\frac{${smartFormat(-currentB - Math.sqrt(D_val))}}{${formatCoeff(2*currentA)}} = \\mathbf{${smartFormat(x1_val)}}`;
+                document.getElementById('m_x1_formula_display').innerHTML = `$${x1_latex}$`;
+                
+                let x2_latex = `x_2 = \\frac{-(${formatCoeff(currentB, true)}) + \\sqrt{${smartFormat(D_val)}}}{2 \\cdot ${formatCoeff(currentA, true)}}`;
+                x2_latex += ` = \\frac{${formatCoeff(-currentB)} + ${smartFormat(Math.sqrt(D_val))}}{${formatCoeff(2 * currentA)}}`;
+                x2_latex += ` = \\frac{${smartFormat(-currentB + Math.sqrt(D_val))}}{${formatCoeff(2*currentA)}} = \\mathbf{${smartFormat(x2_val)}}`;
+                document.getElementById('m_x2_formula_display').innerHTML = `$${x2_latex}$`;
+                
+                document.getElementById('m_zwei_loesungen').classList.remove('hidden');
+
+            } else if (Math.abs(D_val) < 1e-9) { 
+                let x0_val = (-currentB) / (2 * currentA);
+                if (Object.is(x0_val, -0)) { x0_val = 0; } 
+
+                let x0_latex = `x_0 = \\frac{-(${formatCoeff(currentB,true)})}{2 \\cdot ${formatCoeff(currentA,true)}}`;
+                x0_latex += ` = \\frac{${formatCoeff(-currentB)}}{${formatCoeff(2*currentA)}} = \\mathbf{${smartFormat(x0_val)}}`;
+                document.getElementById('m_x0_formula_display').innerHTML = `$${x0_latex}$`;
+                document.getElementById('m_eine_loesung').classList.remove('hidden');
+            } else { 
+                document.getElementById('m_keine_loesung').classList.remove('hidden');
+            }
+            
+            drawGraph(currentA, currentB, currentC, echteNullstellen);
+
+            document.getElementById('musterloesungBereich').classList.remove('hidden'); 
+            if (typeof MathJax !== 'undefined' && typeof MathJax.typesetPromise === 'function') {
+                 MathJax.typesetPromise([document.getElementById('musterloesungBereich')]).catch(function (err) { console.error('MathJax typeset error:', err); });
+            }
+        }
+
+        function drawGraph(a, b, c, roots) {
+            const svg = document.getElementById('graphSvg');
+            svg.innerHTML = ''; // Clear previous graph
+
+            const width = 500; // SVG viewbox width
+            const height = 400; // SVG viewbox height
+            const padding = 50;
+
+            // Calculate vertex
+            const xv = -b / (2 * a);
+            const yv = a * xv * xv + b * xv + c;
+
+            // Determine plot range
+            let xMin = xv - 5;
+            let xMax = xv + 5;
+            if (roots.length > 0) {
+                xMin = Math.min(xMin, roots[0] - 2);
+                xMax = Math.max(xMax, roots[roots.length -1] + 2);
+            }
+             // Ensure a minimum range if roots are very close or only one root
+            if (xMax - xMin < 4) {
+                xMin -= 2;
+                xMax += 2;
+            }
+
+
+            // Calculate yMin and yMax based on vertex and function behavior in the xRange
+            let yMin = (a > 0) ? yv : a * xMin * xMin + b * xMin + c;
+            let yMax = (a < 0) ? yv : a * xMin * xMin + b * xMin + c;
+            
+            // Check function values at xMin and xMax to ensure they are included in yRange
+            const yAtXMin = a * xMin * xMin + b * xMin + c;
+            const yAtXMax = a * xMax * xMax + b * xMax + c;
+            yMin = Math.min(yMin, yAtXMin, yAtXMax);
+            yMax = Math.max(yMax, yAtXMin, yAtXMax);
+
+            // Add padding to yRange, ensure y=0 is visible if roots are present or close
+            if (roots.length > 0 || (yMin < 5 && yMax > -5) ) { // if roots or y=0 is near
+                 yMin = Math.min(yMin, -1);
+                 yMax = Math.max(yMax, 1);
+            }
+            
+            const yRange = yMax - yMin;
+            yMin -= yRange * 0.15; // Add 15% padding
+            yMax += yRange * 0.15;
+            if (yMin === yMax) { // Avoid division by zero if flat (should not happen for parabola)
+                yMin -=1; yMax +=1;
+            }
+
+
+            const xScale = (width - 2 * padding) / (xMax - xMin);
+            const yScale = (height - 2 * padding) / (yMax - yMin);
+
+            const toSvgX = (x) => padding + (x - xMin) * xScale;
+            const toSvgY = (y) => height - padding - (y - yMin) * yScale;
+
+            // Draw axes
+            const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            xAxis.setAttribute("x1", padding);
+            xAxis.setAttribute("y1", toSvgY(0));
+            xAxis.setAttribute("x2", width - padding);
+            xAxis.setAttribute("y2", toSvgY(0));
+            xAxis.setAttribute("stroke", "#94a3b8"); // Lighter axis color
+            xAxis.setAttribute("stroke-width", "1.5");
+            svg.appendChild(xAxis);
+
+            const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            yAxis.setAttribute("x1", toSvgX(0));
+            yAxis.setAttribute("y1", padding);
+            yAxis.setAttribute("x2", toSvgX(0));
+            yAxis.setAttribute("y2", height - padding);
+            yAxis.setAttribute("stroke", "#94a3b8");
+            yAxis.setAttribute("stroke-width", "1.5");
+            svg.appendChild(yAxis);
+            
+            // Add axis labels (Origin, X, Y)
+            const originLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            originLabel.setAttribute("x", toSvgX(0) - 10);
+            originLabel.setAttribute("y", toSvgY(0) + 15);
+            originLabel.textContent = "0";
+            originLabel.setAttribute("font-size", "12");
+            originLabel.setAttribute("fill", "#475569");
+            svg.appendChild(originLabel);
+
+            const xLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            xLabel.setAttribute("x", width - padding + 5);
+            xLabel.setAttribute("y", toSvgY(0) + 5);
+            xLabel.textContent = "x";
+            xLabel.setAttribute("font-size", "14");
+            xLabel.setAttribute("fill", "#475569");
+            svg.appendChild(xLabel);
+
+            const yLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            yLabel.setAttribute("x", toSvgX(0) + 5);
+            yLabel.setAttribute("y", padding - 5);
+            yLabel.textContent = "y";
+            yLabel.setAttribute("font-size", "14");
+            yLabel.setAttribute("fill", "#475569");
+            svg.appendChild(yLabel);
+
+
+            // Draw parabola
+            let pathData = "M";
+            const steps = 100;
+            for (let i = 0; i <= steps; i++) {
+                const x = xMin + (xMax - xMin) * i / steps;
+                const y = a * x * x + b * x + c;
+                if (i === 0) {
+                    pathData += `${toSvgX(x)},${toSvgY(y)}`;
+                } else {
+                    pathData += ` L${toSvgX(x)},${toSvgY(y)}`;
+                }
+            }
+            const parabola = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            parabola.setAttribute("d", pathData);
+            parabola.setAttribute("stroke", "#d81b60"); // Function color
+            parabola.setAttribute("stroke-width", "2.5");
+            parabola.setAttribute("fill", "none");
+            svg.appendChild(parabola);
+
+            // Draw vertex
+            const vertexCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            vertexCircle.setAttribute("cx", toSvgX(xv));
+            vertexCircle.setAttribute("cy", toSvgY(yv));
+            vertexCircle.setAttribute("r", "5");
+            vertexCircle.setAttribute("fill", "#00796b"); // Primary color for vertex
+            svg.appendChild(vertexCircle);
+            const vertexText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            vertexText.setAttribute("x", toSvgX(xv) + 7);
+            vertexText.setAttribute("y", toSvgY(yv) + 4);
+            vertexText.textContent = `S(${smartFormat(xv)}, ${smartFormat(yv)})`;
+            vertexText.setAttribute("font-size", "12");
+            vertexText.setAttribute("fill", "#005a4d");
+            svg.appendChild(vertexText);
+
+
+            // Draw roots
+            roots.forEach(root => {
+                const rootCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                rootCircle.setAttribute("cx", toSvgX(root));
+                rootCircle.setAttribute("cy", toSvgY(0));
+                rootCircle.setAttribute("r", "5");
+                rootCircle.setAttribute("fill", "#ef4444"); // Red for roots
+                svg.appendChild(rootCircle);
+                const rootText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                rootText.setAttribute("x", toSvgX(root) + (root > 0 || roots.length === 1 ? 7 : -30) ); // Adjust label position
+                rootText.setAttribute("y", toSvgY(0) - 7);
+                rootText.textContent = `N(${smartFormat(root)}, 0)`;
+                rootText.setAttribute("font-size", "12");
+                rootText.setAttribute("fill", "#b91c1c");
+                svg.appendChild(rootText);
+            });
+        }
+
+        // Fullscreen functions and listeners are removed.
+        
+        window.onload = function() {
+            window.MathJax = {
+                tex: {
+                    inlineMath: [['$', '$'], ['\\(', '\\)']], 
+                    displayMath: [['$$', '$$'], ['\\[', '\\]']], 
+                    macros: { 
+                    }
+                },
+                svg: {
+                    fontCache: 'global' 
+                }
+            };
+
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.id = 'MathJax-script';
+            script.async = true;
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+            script.onload = function () {
+                // handleFullscreenChange(); // Removed
+                neueAufgabe();
+                toggleNullstellenFelder();
+            };
+            script.onerror = function () {
+                console.error("MathJax konnte nicht geladen werden. LaTeX-Formeln werden nicht korrekt dargestellt.");
+                neueAufgabe();
+                toggleNullstellenFelder();
+            };
+            document.head.appendChild(script);
+        };
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Interaktive Mathe-Übungen zu verschiedenen Themen wie lineare Funktionen, Finanzmathematik und mehr." />
+    <title>Mathe-Übungen</title>
+    <!-- legacy global stylesheet (kept for compatibility) -->
+    <link rel="stylesheet" href="/style.css">
+    <!-- Font Awesome für Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax für LaTeX Rendering (Zeichnen von Potenzen, Wurzeln etc.) -->
+    <script>
+      window.MathJax = {
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+        svg: { fontCache: 'global' }
+      };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <!-- Vite will inject the module script -->
+  </head>
+  <body>
+    <!-- React root -->
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

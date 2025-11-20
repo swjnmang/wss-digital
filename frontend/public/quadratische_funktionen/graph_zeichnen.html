@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aufgabengenerator: Parabeln zeichnen</title>
+    <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+    <style>
+        /* Modernes & ansprechendes Design */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        #task-generator-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 25px 30px;
+            width: 100%;
+            max-width: 700px; /* Etwas schmaler */
+            margin: 20px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+            text-align: center;
+        }
+        #task-generator-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        #task-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #495057;
+            text-align: left;
+        }
+        .equation-display {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #005a87;
+            font-family: 'Courier New', Courier, monospace;
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            word-break: break-all;
+        }
+        #solution-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        #ggb-container {
+            flex: 2;
+            min-width: 280px;
+            aspect-ratio: 4 / 3; /* Weniger hoch */
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #dcdcdc;
+        }
+        #table-container {
+            flex: 1;
+            min-width: 180px;
+            border-radius: 8px;
+            border: 1px solid #dcdcdc;
+            max-height: 400px; /* Weniger hoch */
+            overflow-y: auto;
+        }
+        #table-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #table-container th, #table-container td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        #table-container th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .generator-button {
+            background: linear-gradient(145deg, #0078b3, #005f8e);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .generator-button:hover {
+            transform: translateY(-2px);
+        }
+        .solution-button {
+             background: linear-gradient(145deg, #4a90e2, #2c6eb5);
+        }
+        .video-button {
+            background: linear-gradient(145deg, #ff0000, #cc0000); /* Roter Farbverlauf */
+        }
+    </style>
+</head>
+<body>
+
+<div id="task-generator-container">
+    <a href="index.html" style="display: block; margin-bottom: 15px; color: #0073aa; text-decoration: none; font-weight: 500;">
+        ← Zurück zur Übersicht
+    </a>
+    <h2>Parabeln zeichnen (Allgemeine Form)</h2>
+
+    <div id="task-output">
+        <p>Zeichne den Graphen der folgenden Funktion in ein Koordinatensystem auf einem Blatt Papier. Erstelle dazu eine Wertetabelle für den x-Bereich von -5 bis 5 mit einer Schrittweite von 0,5.</p>
+        <div id="equation-display">y = x² + 2x - 1</div>
+    </div>
+
+    <div id="solution-container" style="display: none;">
+        <div id="ggb-container">
+            <div id="ggb-element"></div>
+        </div>
+        <div id="table-container"></div>
+    </div>
+
+    <div class="button-container">
+        <button class="generator-button" onclick="generateNewTask()">Neue Aufgabe</button>
+        <button class="generator-button solution-button" onclick="drawGraphAndTable()">Lösung (Graph & Tabelle) anzeigen</button>
+        <button class="generator-button video-button" onclick="openVideo()">Erklärvideo</button>
+    </div>
+</div>
+
+<script>
+    let currentEquation = "";
+    let currentParams = {};
+    var ggbApplet;
+
+    function formatNumber(num) {
+        return Math.round(num * 100) / 100;
+    }
+
+    function generateNewTask() {
+        // Hide solution for the new task
+        document.getElementById('solution-container').style.display = 'none';
+        document.getElementById('table-container').innerHTML = '';
+        if (ggbApplet) {
+            ggbApplet.reset();
+        }
+
+        const randomInt = (max, min = 0) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const randomHalfInt = (max, min) => randomInt(max * 2, min * 2) / 2;
+        
+        let a, b, c;
+        
+        a = randomHalfInt(3, -3);
+        while (Math.abs(a) < 0.2) { // Ensure 'a' is not too close to zero
+            a = randomHalfInt(3, -3);
+        }
+        
+        b = randomHalfInt(3, -3);
+        c = randomHalfInt(3, -3);
+
+        currentParams = { a, b, c };
+
+        // Build the display string
+        let a_str = (a === 1) ? "x²" : (a === -1) ? "-x²" : `${a}x²`;
+        let b_str = (b === 1) ? " + x" : (b === -1) ? " - x" : (b > 0) ? ` + ${b}x` : (b < 0) ? ` - ${Math.abs(b)}x` : "";
+        let c_str = (c > 0) ? ` + ${c}` : (c < 0) ? ` - ${Math.abs(c)}` : "";
+        
+        document.getElementById('equation-display').innerHTML = `y = ${a_str}${b_str}${c_str}`;
+
+        // Store GeoGebra equation command
+        currentEquation = `f(x) = ${a}*x^2 + ${b}*x + ${c}`;
+    }
+
+    function drawGraphAndTable() {
+        const solutionContainer = document.getElementById('solution-container');
+        solutionContainer.style.display = 'flex';
+
+        // Force GeoGebra to resize/re-render after its container becomes visible
+        setTimeout(() => {
+            if(ggbApplet) window.dispatchEvent(new Event('resize'));
+        }, 50);
+
+        if (ggbApplet && currentEquation) {
+            // 1. Draw the graph
+            ggbApplet.evalCommand(currentEquation);
+
+            // 2. Generate and display HTML table
+            const tableContainer = document.getElementById('table-container');
+            let tableHTML = '<table><thead><tr><th>x</th><th>y</th></tr></thead><tbody>';
+            
+            for (let x = -5; x <= 5; x += 0.5) {
+                const y = currentParams.a * x * x + currentParams.b * x + currentParams.c;
+                tableHTML += `<tr><td>${x}</td><td>${formatNumber(y)}</td></tr>`;
+            }
+
+            tableHTML += '</tbody></table>';
+            tableContainer.innerHTML = tableHTML;
+        }
+    }
+
+    // Function to open the explanation video
+    function openVideo() {
+        window.open("https://www.youtube.com/watch?v=jUJ9rB0XVy4", "_blank");
+    }
+
+    // GeoGebra Applet Initialisierung
+    var params = {
+        "appName": "classic", 
+        "width": 800, 
+        "height": 600, 
+        "showToolBar": false, 
+        "showAlgebraInput": false, 
+        "showMenuBar": false,
+        "perspective": "G",
+        "useBrowserForJS": true,
+        "enableShiftDragZoom": true, 
+        "showResetIcon": true, 
+        "appletOnLoad": function(api) {
+            ggbApplet = api; 
+            generateNewTask();
+        }
+    };
+    var applet = new GGBApplet(params, true);
+    window.addEventListener("load", function() { 
+        applet.inject('ggb-element');
+    });
+
+</script>
+
+</body>
+</html>

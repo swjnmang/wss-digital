@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ratendarlehen Aufgabengenerator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .aufgabe {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            border-left: 5px solid #3498db;
+        }
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .loesungseingabe {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            border-left: 5px solid #2ecc71;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .correct {
+            color: #2ecc71;
+        }
+        .incorrect {
+            color: #e74c3c;
+        }
+        .loesung {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            border-left: 5px solid #f39c12;
+            display: none;
+        }
+        .schritte {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .info-box {
+            background-color: #e8f4f8;
+            border-left: 5px solid #3498db;
+            padding: 10px 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" style="display: inline-block; margin-bottom: 15px; color: #3498db; text-decoration: none; font-weight: bold;">
+            ← Zurück zur Übersicht
+        </a>
+        <h1>Ratendarlehen Aufgabengenerator</h1>
+        
+        <div class="info-box">
+            <p>Bei einem Ratendarlehen bleibt die jährliche Tilgungsrate konstant, während sich Zinsen und Annuität jährlich ändern. Löse die Aufgaben mit Hilfe einer passenden Formel aus deiner Merkhilfe und überprüfe deine Antworten.</p>
+        </div>
+
+        <div class="controls">
+            <button id="generateTask">Neue Aufgabe generieren</button>
+            <button id="showSolution">Lösung anzeigen</button>
+            <button id="hideSolution">Lösung ausblenden</button>
+        </div>
+
+        <div class="aufgabe" id="taskContainer">
+            <p>Klicke auf "Neue Aufgabe generieren", um eine zufällige Aufgabe zu erstellen.</p>
+        </div>
+
+        <div class="loesungseingabe" id="answerContainer" style="display: none;">
+            <p>Deine Antwort:</p>
+            <input type="number" id="userAnswer" step="0.01"> €
+            <button id="checkAnswer">Antwort prüfen</button>
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <div class="loesung" id="solutionContainer">
+            <h3>Lösung</h3>
+            <div id="solutionText"></div>
+            <h4>Rechenschritte:</h4>
+            <div class="schritte" id="solutionSteps"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateTaskBtn = document.getElementById('generateTask');
+            const showSolutionBtn = document.getElementById('showSolution');
+            const hideSolutionBtn = document.getElementById('hideSolution');
+            const taskContainer = document.getElementById('taskContainer');
+            const answerContainer = document.getElementById('answerContainer');
+            const solutionContainer = document.getElementById('solutionContainer');
+            const userAnswerInput = document.getElementById('userAnswer');
+            const checkAnswerBtn = document.getElementById('checkAnswer');
+            const feedbackDiv = document.getElementById('feedback');
+            const solutionTextDiv = document.getElementById('solutionText');
+            const solutionStepsDiv = document.getElementById('solutionSteps');
+
+            let currentTask = null;
+            let correctAnswer = null;
+
+            // Aufgabentypen
+            const taskTypes = [
+                {type: 'tilgung', text: 'Berechne die Tilgung im {v}. Jahr.'},
+                {type: 'zins', text: 'Berechne den Zins im {v}. Jahr.'},
+                {type: 'annuitaet', text: 'Berechne die Annuität im {v}. Jahr.'},
+                {type: 'restschuld', text: 'Berechne die Restschuld am Ende des {v}. Jahres.'}
+            ];
+
+            // Aufgabe generieren
+            function generateTask() {
+                // Parameter zufällig festlegen
+                const K0 = Math.round(randInt(10000, 100000) / 1000) * 1000; // Anfangskapital
+                const n = randInt(10, 30); // Laufzeit
+                const p = (Math.random() * 5 + 1).toFixed(2); // Zinssatz zwischen 1% und 6%
+                const v = randInt(1, n); // Jahr
+                
+                // Aufgabentyp zufällig wählen
+                const taskType = taskTypes[randInt(0, taskTypes.length - 1)];
+                
+                // Aufgabentext erstellen
+                let taskText = `Ein Kredit in Höhe von ${formatNumber(K0)} € wird als Ratendarlehen mit einer Laufzeit von ${n} Jahren vergeben. Der Zinssatz beträgt ${p}% p.a. `;
+                taskText += taskType.text.replace('{v}', v);
+
+                // Lösung berechnen
+                const r = K0 / n; // Tilgungsrate
+                let solution = null;
+                let solutionSteps = '';
+                
+                if (taskType.type === 'tilgung') {
+                    solution = r;
+                    solutionSteps = `
+                        <p>Die jährliche Tilgungsrate bei einem Ratendarlehen berechnet sich als:</p>
+                        <p>r = K₀ / n</p>
+                        <p>r = ${formatNumber(K0)} € / ${n} = ${formatNumber(solution)} €</p>
+                    `;
+                } else if (taskType.type === 'zins') {
+                    // Restschuld zu Beginn des Jahres v berechnen
+                    const KvStart = K0 - r * (v - 1);
+                    solution = KvStart * (p / 100);
+                    solutionSteps = `
+                        <p>Um den Zins im ${v}. Jahr zu berechnen, bestimmen wir zuerst die Restschuld zu Beginn des ${v}. Jahres:</p>
+                        <p>K<sub>${v-1}</sub> = K₀ - (v-1) · r</p>
+                        <p>K<sub>${v-1}</sub> = ${formatNumber(K0)} € - (${v-1}) · ${formatNumber(r)} € = ${formatNumber(KvStart)} €</p>
+                        <p>Der Zins im ${v}. Jahr beträgt dann:</p>
+                        <p>Z<sub>${v}</sub> = K<sub>${v-1}</sub> · p/100</p>
+                        <p>Z<sub>${v}</sub> = ${formatNumber(KvStart)} € · ${p}/100 = ${formatNumber(solution)} €</p>
+                    `;
+                } else if (taskType.type === 'annuitaet') {
+                    // Restschuld zu Beginn des Jahres v berechnen
+                    const KvStart = K0 - r * (v - 1);
+                    const zins = KvStart * (p / 100);
+                    solution = r + zins;
+                    solutionSteps = `
+                        <p>Um die Annuität im ${v}. Jahr zu berechnen, bestimmen wir zuerst die Restschuld zu Beginn des ${v}. Jahres:</p>
+                        <p>K<sub>${v-1}</sub> = K₀ - (v-1) · r</p>
+                        <p>K<sub>${v-1}</sub> = ${formatNumber(K0)} € - (${v-1}) · ${formatNumber(r)} € = ${formatNumber(KvStart)} €</p>
+                        <p>Der Zins im ${v}. Jahr beträgt:</p>
+                        <p>Z<sub>${v}</sub> = K<sub>${v-1}</sub> · p/100</p>
+                        <p>Z<sub>${v}</sub> = ${formatNumber(KvStart)} € · ${p}/100 = ${formatNumber(zins)} €</p>
+                        <p>Die Annuität im ${v}. Jahr ist die Summe aus Tilgung und Zins:</p>
+                        <p>A<sub>${v}</sub> = r + Z<sub>${v}</sub></p>
+                        <p>A<sub>${v}</sub> = ${formatNumber(r)} € + ${formatNumber(zins)} € = ${formatNumber(solution)} €</p>
+                    `;
+                } else if (taskType.type === 'restschuld') {
+                    solution = K0 - r * v;
+                    solutionSteps = `
+                        <p>Die Restschuld am Ende des ${v}. Jahres berechnet sich als:</p>
+                        <p>K<sub>${v}</sub> = K₀ - v · r</p>
+                        <p>K<sub>${v}</sub> = ${formatNumber(K0)} € - ${v} · ${formatNumber(r)} € = ${formatNumber(solution)} €</p>
+                    `;
+                }
+
+                // Aufgabe anzeigen
+                taskContainer.innerHTML = `<p>${taskText}</p>`;
+                solutionTextDiv.innerHTML = `<p>Die Lösung ist ${formatNumber(solution)} €.</p>`;
+                solutionStepsDiv.innerHTML = solutionSteps;
+                
+                // Aktuelle Aufgabe und Lösung speichern
+                currentTask = {
+                    K0: K0,
+                    n: n,
+                    p: p,
+                    v: v,
+                    taskType: taskType.type
+                };
+                correctAnswer = solution;
+                
+                // Eingabefeld anzeigen und zurücksetzen
+                answerContainer.style.display = 'block';
+                userAnswerInput.value = '';
+                feedbackDiv.innerHTML = '';
+                
+                // Lösung ausblenden
+                solutionContainer.style.display = 'none';
+            }
+
+            // Lösung anzeigen
+            function showSolution() {
+                if (currentTask) {
+                    solutionContainer.style.display = 'block';
+                }
+            }
+
+            // Lösung ausblenden
+            function hideSolution() {
+                solutionContainer.style.display = 'none';
+            }
+
+            // Antwort überprüfen
+            function checkAnswer() {
+                if (!currentTask) return;
+                
+                const userAnswer = parseFloat(userAnswerInput.value.replace(',', '.'));
+                
+                if (isNaN(userAnswer)) {
+                    feedbackDiv.innerHTML = 'Bitte gib eine gültige Zahl ein.';
+                    feedbackDiv.className = 'feedback incorrect';
+                    return;
+                }
+                
+                // Toleranz von 0.1€ für Rundungsfehler
+                const tolerance = 0.1;
+                if (Math.abs(userAnswer - correctAnswer) <= tolerance) {
+                    feedbackDiv.innerHTML = 'Richtig! Deine Antwort ist korrekt.';
+                    feedbackDiv.className = 'feedback correct';
+                } else {
+                    feedbackDiv.innerHTML = `Leider falsch. Versuche es noch einmal oder schaue dir die Lösung an.`;
+                    feedbackDiv.className = 'feedback incorrect';
+                }
+            }
+
+            // Hilfsfunktionen
+            function randInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            function formatNumber(num) {
+                return num.toFixed(2).replace('.', ',');
+            }
+
+            // Event-Listener
+            generateTaskBtn.addEventListener('click', generateTask);
+            showSolutionBtn.addEventListener('click', showSolution);
+            hideSolutionBtn.addEventListener('click', hideSolution);
+            checkAnswerBtn.addEventListener('click', checkAnswer);
+            userAnswerInput.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+
+            // Erste Aufgabe generieren
+            generateTask();
+        });
+    </script>
+</body>
+</html>

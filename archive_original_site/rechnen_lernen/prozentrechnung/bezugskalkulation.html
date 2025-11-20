@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bezugskalkulation Aufgaben</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content.center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+        #problem-text {
+            font-size: 1.1rem;
+            text-align: left;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: #edf2f7;
+        }
+        .calculation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .calculation-table th, .calculation-table td {
+            border: 1px solid #cbd5e0;
+            padding: 10px;
+            text-align: left;
+        }
+        .calculation-table th {
+            background-color: #e2e8f0;
+            font-weight: bold;
+        }
+        .calculation-table td input[type="number"] {
+            width: 100px; /* Fixed width for input */
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: right;
+            font-size: 1rem;
+        }
+        .calculation-table td:last-child {
+            text-align: right;
+        }
+        .icon {
+            margin-right: 5px;
+        }
+        .feedback-icon {
+            margin-left: 5px;
+            font-size: 1rem;
+        }
+        .correct-feedback {
+            color: #10b981; /* Green */
+        }
+        .incorrect-feedback {
+            color: #ef4444; /* Red */
+        }
+        #solution-area {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            text-align: left;
+            white-space: pre-wrap; /* Preserve line breaks */
+            word-wrap: break-word; /* Break long words */
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Space between buttons */
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-height-screen bg-gray-100">
+    <div class="container">
+        <h1 class="text-2xl font-bold mb-6 text-center">Bezugskalkulation Aufgaben</h1>
+
+        <div class="mb-6 text-center">
+            <button id="generateBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                <i class="fas fa-sync-alt icon"></i> Neue Aufgabe
+            </button>
+        </div>
+
+        <div id="problem-text">
+            </div>
+
+        <table class="calculation-table">
+            <thead>
+                <tr>
+                    <th>Posten</th>
+                    <th>Betrag (€)</th>
+                    <th>Feedback</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Listenpreis</td>
+                    <td><input type="number" id="listenpreis" step="0.01" readonly></td>
+                    <td id="feedback-listenpreis"></td>
+                </tr>
+                <tr>
+                    <td>- Rabatt (<span id="rabatt-prozent"></span>%)</td>
+                    <td><input type="number" id="rabatt-betrag" step="0.01"></td>
+                    <td id="feedback-rabatt-betrag"></td>
+                </tr>
+                <tr>
+                    <td>= Zieleinkaufspreis</td>
+                    <td><input type="number" id="zieleinkaufspreis" step="0.01"></td>
+                    <td id="feedback-zieleinkaufspreis"></td>
+                </tr>
+                <tr>
+                    <td>- Skonto (<span id="skonto-prozent"></span>%)</td>
+                    <td><input type="number" id="skonto-betrag" step="0.01"></td>
+                    <td id="feedback-skonto-betrag"></td>
+                </tr>
+                <tr>
+                    <td>= Bareinkaufspreis</td>
+                    <td><input type="number" id="bareinkaufspreis" step="0.01"></td>
+                    <td id="feedback-bareinkaufspreis"></td>
+                </tr>
+                 <tr>
+                    <td>+ Bezugskosten</td>
+                    <td><input type="number" id="bezugskosten" step="0.01" readonly></td>
+                    <td id="feedback-bezugskosten"></td>
+                </tr>
+                <tr>
+                    <td>= Bezugspreis</td>
+                    <td><input type="number" id="bezugspreis" step="0.01"></td>
+                    <td id="feedback-bezugspreis"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="button-group">
+             <button id="checkBtn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                 <i class="fas fa-check icon"></i> Überprüfen
+            </button>
+             <button id="showSolutionBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                <i class="fas fa-info-circle icon"></i> Musterlösung anzeigen
+            </button>
+        </div>
+
+
+        <div id="overall-feedback" class="mt-6 text-center text-xl font-semibold">
+            </div>
+
+        <div id="solution-area" class="hidden">
+            </div>
+
+        <div id="progressDisplay" class="mt-4 text-center text-gray-700">
+            Richtig gelöst: 0 von 0 Aufgaben
+        </div>
+    </div>
+
+    <script>
+        const generateBtn = document.getElementById('generateBtn');
+        const problemTextDiv = document.getElementById('problem-text');
+        const rabattProzentSpan = document.getElementById('rabatt-prozent');
+        const skontoProzentSpan = document.getElementById('skonto-prozent');
+
+        const listenpreisInput = document.getElementById('listenpreis');
+        const rabattBetragInput = document.getElementById('rabatt-betrag');
+        const zieleinkaufspreisInput = document.getElementById('zieleinkaufspreis');
+        const skontoBetragInput = document.getElementById('skonto-betrag');
+        const bareinkaufspreisInput = document.getElementById('bareinkaufspreis');
+        const bezugskostenInput = document.getElementById('bezugskosten');
+        const bezugspreisInput = document.getElementById('bezugspreis');
+
+        const feedbackListenpreis = document.getElementById('feedback-listenpreis');
+        const feedbackRabattBetrag = document.getElementById('feedback-rabatt-betrag');
+        const feedbackZieleinkaufspreis = document.getElementById('feedback-zieleinkaufspreis');
+        const feedbackSkontoBetrag = document.getElementById('feedback-skonto-betrag');
+        const feedbackBareinkaufspreis = document.getElementById('feedback-bareinkaufspreis');
+        const feedbackBezugskosten = document.getElementById('feedback-bezugskosten');
+        const feedbackBezugspreis = document.getElementById('feedback-bezugspreis');
+
+        const checkBtn = document.getElementById('checkBtn');
+        const showSolutionBtn = document.getElementById('showSolutionBtn'); // New button
+        const overallFeedbackDiv = document.getElementById('overall-feedback');
+        const solutionAreaDiv = document.getElementById('solution-area'); // New solution area
+        const progressDisplay = document.getElementById('progressDisplay');
+
+        let correctValues = {}; // Stores the correct calculated values for each step
+        let correctAnswers = 0;
+        let totalProblems = 0;
+
+        // Funktion zur Aktualisierung der Fortschrittsanzeige
+        function updateProgress() {
+            progressDisplay.textContent = `Richtig gelöst: ${correctAnswers} von ${totalProblems} Aufgaben`;
+        }
+
+        // Funktion zum Runden auf 2 Nachkommastellen
+        function roundToTwoDecimals(num) {
+            return parseFloat(num.toFixed(2));
+        }
+
+        // Funktion zur Generierung einer Bezugskalkulation Aufgabe
+        function generateProblem() {
+            // Generate random values
+            const listenpreis = roundToTwoDecimals(Math.random() * 500 + 100); // Listenpreis zwischen 100 und 600
+            const rabattProzent = roundToTwoDecimals(Math.random() * 20 + 5); // Rabatt zwischen 5% und 25%
+            const skontoProzent = roundToTwoDecimals(Math.random() * 3 + 1); // Skonto zwischen 1% und 4%
+            const bezugskosten = roundToTwoDecimals(Math.random() * 50 + 10); // Bezugskosten zwischen 10 und 60
+
+            // Calculate correct values for each step, rounding at each monetary step
+            const rabattBetrag = roundToTwoDecimals(listenpreis * (rabattProzent / 100));
+            const zieleinkaufspreis = roundToTwoDecimals(listenpreis - rabattBetrag);
+            const skontoBetrag = roundToTwoDecimals(zieleinkaufspreis * (skontoProzent / 100));
+            const bareinkaufspreis = roundToTwoDecimals(zieleinkaufspreis - skontoBetrag);
+            const bezugspreis = roundToTwoDecimals(bareinkaufspreis + bezugskosten);
+
+            // Store correct values
+            correctValues = {
+                listenpreis: listenpreis,
+                rabattProzent: rabattProzent, // Store percentage for solution text
+                rabattBetrag: rabattBetrag,
+                zieleinkaufspreis: zieleinkaufspreis,
+                skontoProzent: skontoProzent, // Store percentage for solution text
+                skontoBetrag: skontoBetrag,
+                bareinkaufspreis: bareinkaufspreis,
+                bezugskosten: bezugskosten,
+                bezugspreis: bezugspreis
+            };
+
+            // Define different problem text templates
+            const problemTemplates = [
+                `Ein Unternehmen kauft Waren mit einem Listenpreis von ${listenpreis}€.
+                 Der Lieferant gewährt ${rabattProzent}% Rabatt.
+                 Bei Zahlung innerhalb von 10 Tagen werden zusätzlich ${skontoProzent}% Skonto gewährt.
+                 Die Bezugskosten (z.B. Transport, Versicherung) betragen ${bezugskosten}€.
+                 Berechnen Sie den Bezugspreis.`,
+
+                `Für eine Bestellung wird ein Listenpreis von ${listenpreis}€ vereinbart.
+                 Es wird ein Handelsrabatt von ${rabattProzent}% gewährt.
+                 Zusätzlich kann bei prompter Zahlung ein Skonto von ${skontoProzent}% abgezogen werden.
+                 Die anfallenden Bezugskosten belaufen sich auf ${bezugskosten}€.
+                 Ermitteln Sie den Bezugspreis.`,
+
+                `Der Katalogpreis für ein Produkt beträgt ${listenpreis}€.
+                 Sie erhalten einen Mengenrabatt von ${rabattProzent}%.
+                 Bei sofortiger Bezahlung ist ein Skontoabzug von ${skontoProzent}% möglich.
+                 Für Lieferung und Versicherung fallen Bezugskosten von ${bezugskosten}€ an.
+                 Wie hoch ist der Bezugspreis?`
+            ];
+
+            // Select a random template
+            const randomTemplate = problemTemplates[Math.floor(Math.random() * problemTemplates.length)];
+
+            // Display problem text and fixed values in the table
+            problemTextDiv.innerHTML = randomTemplate; // Use the selected template
+            rabattProzentSpan.textContent = rabattProzent.toFixed(2); // Display with 2 decimals
+            skontoProzentSpan.textContent = skontoProzent.toFixed(2); // Display with 2 decimals
+            listenpreisInput.value = listenpreis.toFixed(2); // Display with 2 decimals
+            bezugskostenInput.value = bezugskosten.toFixed(2); // Display with 2 decimals
+
+            // Clear user inputs and feedback
+            rabattBetragInput.value = '';
+            zieleinkaufspreisInput.value = '';
+            skontoBetragInput.value = '';
+            bareinkaufspreisInput.value = '';
+            bezugspreisInput.value = '';
+
+            feedbackListenpreis.textContent = '';
+            feedbackRabattBetrag.textContent = '';
+            feedbackZieleinkaufspreis.textContent = '';
+            feedbackSkontoBetrag.textContent = '';
+            feedbackBareinkaufspreis.textContent = '';
+            feedbackBezugskosten.textContent = '';
+            feedbackBezugspreis.textContent = '';
+            overallFeedbackDiv.textContent = '';
+            overallFeedbackDiv.className = 'mt-6 text-center text-xl font-semibold'; // Reset class
+
+            // Hide the solution area when a new problem is generated
+            solutionAreaDiv.classList.add('hidden');
+        }
+
+        // Funktion zur Überprüfung der Antwort
+        function checkAnswer() {
+            totalProblems++;
+
+            const studentValues = {
+                rabattBetrag: parseFloat(rabattBetragInput.value),
+                zieleinkaufspreis: parseFloat(zieleinkaufspreisInput.value),
+                skontoBetrag: parseFloat(skontoBetragInput.value),
+                bareinkaufspreis: parseFloat(bareinkaufspreisInput.value),
+                bezugspreis: parseFloat(bezugspreisInput.value)
+            };
+
+            const feedbackElements = {
+                rabattBetrag: feedbackRabattBetrag,
+                zieleinkaufspreis: feedbackZieleinkaufspreis,
+                skontoBetrag: feedbackSkontoBetrag,
+                bareinkaufspreis: feedbackBareinkaufspreis,
+                bezugspreis: feedbackBezugspreis
+            };
+
+            let allCorrect = true;
+            const tolerance = 0.01; // Tolerance for rounding errors
+
+            // Check each input field
+            for (const key in studentValues) {
+                const studentValue = studentValues[key];
+                const correctValue = correctValues[key];
+                const feedbackElement = feedbackElements[key];
+
+                feedbackElement.textContent = ''; // Clear previous feedback
+
+                if (isNaN(studentValue)) {
+                    feedbackElement.innerHTML = '<i class="fas fa-times-circle incorrect-feedback"></i>'; // Red X icon
+                    allCorrect = false;
+                } else {
+                    // Compare with tolerance
+                    if (Math.abs(studentValue - correctValue) < tolerance) {
+                        feedbackElement.innerHTML = '<i class="fas fa-check-circle correct-feedback"></i>'; // Green check icon
+                    } else {
+                        feedbackElement.innerHTML = '<i class="fas fa-times-circle incorrect-feedback"></i>'; // Red X icon
+                        allCorrect = false;
+                    }
+                }
+            }
+
+            // Provide overall feedback
+            if (allCorrect) {
+                overallFeedbackDiv.textContent = 'Sehr gut! Die Bezugskalkulation ist korrekt.';
+                overallFeedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-green-500';
+                correctAnswers++;
+            } else {
+                overallFeedbackDiv.textContent = 'Leider sind noch nicht alle Werte korrekt. Überprüfe deine Berechnungsschritte.';
+                overallFeedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-red-500';
+            }
+
+            updateProgress();
+        }
+
+        // Funktion zur Anzeige der Musterlösung
+        function showSolution() {
+            const solutionText = `
+                Musterlösung:
+
+                Listenpreis: ${correctValues.listenpreis.toFixed(2)} €
+                - Rabatt (${correctValues.rabattProzent.toFixed(2)}%): ${correctValues.rabattBetrag.toFixed(2)} €
+                  (Berechnung: ${correctValues.listenpreis.toFixed(2)} € * ${correctValues.rabattProzent.toFixed(2)} / 100)
+                = Zieleinkaufspreis: ${correctValues.zieleinkaufspreis.toFixed(2)} €
+                  (Berechnung: ${correctValues.listenpreis.toFixed(2)} € - ${correctValues.rabattBetrag.toFixed(2)} €)
+                - Skonto (${correctValues.skontoProzent.toFixed(2)}%): ${correctValues.skontoBetrag.toFixed(2)} €
+                  (Berechnung: ${correctValues.zieleinkaufspreis.toFixed(2)} € * ${correctValues.skontoProzent.toFixed(2)} / 100)
+                = Bareinkaufspreis: ${correctValues.bareinkaufspreis.toFixed(2)} €
+                  (Berechnung: ${correctValues.zieleinkaufspreis.toFixed(2)} € - ${correctValues.skontoBetrag.toFixed(2)} €)
+                + Bezugskosten: ${correctValues.bezugskosten.toFixed(2)} €
+                = Bezugspreis: ${correctValues.bezugspreis.toFixed(2)} €
+                  (Berechnung: ${correctValues.bareinkaufspreis.toFixed(2)} € + ${correctValues.bezugskosten.toFixed(2)} €)
+            `;
+            solutionAreaDiv.textContent = solutionText;
+            solutionAreaDiv.classList.remove('hidden'); // Show the solution area
+        }
+
+
+        // Event Listener
+        generateBtn.addEventListener('click', generateProblem);
+        checkBtn.addEventListener('click', checkAnswer);
+        showSolutionBtn.addEventListener('click', showSolution); // Event listener for the new button
+
+        // Erste Aufgabe beim Laden der Seite generieren und Fortschritt initialisieren
+        generateProblem();
+        updateProgress(); // Initialisiere die Anzeige beim Laden
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handelskalkulation Rückwärts mit Vorwärts Tabelle Responsive</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content.center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px; /* Reduced padding for small screens */
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px; /* Reduced padding for small screens */
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        #problem-text {
+            font-size: 1rem; /* Slightly smaller font for small screens */
+            text-align: left;
+            margin-bottom: 20px;
+            padding: 10px; /* Reduced padding */
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: #edf2f7;
+        }
+        .calculation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .calculation-table th, .calculation-table td {
+            border: 1px solid #cbd5e0;
+            padding: 8px;
+            text-align: left;
+        }
+        .calculation-table th {
+            background-color: #e2e8f0;
+            font-weight: bold;
+        }
+        .calculation-table td input[type="number"] {
+            width: 100px; /* Fixed width for input */
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: right;
+            font-size: 0.9rem;
+        }
+        .calculation-table td:last-child {
+            text-align: right;
+            width: 30px; /* Fixed width for feedback icons */
+        }
+         .calculation-table td:nth-child(2) {
+             width: 120px; /* Fixed width for amount column */
+         }
+        .icon {
+            margin-right: 5px;
+        }
+        .feedback-icon {
+            margin-left: 5px;
+            font-size: 1rem;
+        }
+        .correct-feedback {
+            color: #10b981; /* Green */
+        }
+        .incorrect-feedback {
+            color: #ef4444; /* Red */
+        }
+        #solution-area {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            text-align: left;
+            white-space: pre-wrap; /* Preserve line breaks */
+            word-wrap: break-word; /* Break long words */
+            font-size: 0.9rem; /* Smaller font for solution on small screens */
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column; /* Stack buttons on small screens */
+            justify-content: center;
+            gap: 10px; /* Space between buttons */
+            margin-top: 20px;
+        }
+         .button-group button {
+             width: 100%; /* Full width buttons on small screens */
+         }
+
+        /* Responsive Table Styles */
+        @media (max-width: 600px) {
+            .calculation-table thead {
+                display: none; /* Hide table header on small screens */
+            }
+            .calculation-table, .calculation-table tbody, .calculation-table tr, .calculation-table td {
+                display: block; /* Make table elements block level */
+                width: 100%;
+            }
+            .calculation-table tr {
+                margin-bottom: 15px;
+                border: 1px solid #cbd5e0;
+                border-radius: 8px;
+                padding: 10px;
+                background-color: #ffffff;
+            }
+            .calculation-table td {
+                text-align: right;
+                padding-left: 50%; /* Space for the data label */
+                position: relative;
+            }
+            .calculation-table td::before {
+                content: attr(data-label); /* Display data-label as a pseudo-element */
+                position: absolute;
+                left: 10px;
+                width: calc(50% - 20px); /* Adjust width */
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                text-align: left;
+            }
+             .calculation-table td input[type="number"] {
+                 width: 100%; /* Make input fill the available space */
+                 text-align: right;
+             }
+             .calculation-table td:last-child {
+                 text-align: right;
+                 width: auto; /* Auto width for feedback cell */
+                 padding-left: 10px; /* Adjust padding */
+             }
+             .button-group {
+                flex-direction: column; /* Ensure buttons are stacked */
+             }
+             .button-group button {
+                 width: 100%; /* Ensure buttons take full width */
+             }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-height-screen bg-gray-100">
+    <div class="container">
+        <h1 class="text-2xl font-bold mb-6 text-center">Handelskalkulation Rückwärts Aufgaben</h1>
+
+        <div class="mb-6 text-center">
+            <button id="generateBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded rounded-md focus:outline-none focus:shadow-outline">
+                <i class="fas fa-sync-alt icon"></i> Neue Aufgabe
+            </button>
+        </div>
+
+        <div id="problem-text">
+            </div>
+
+        <table class="calculation-table">
+            <thead>
+                <tr>
+                    <th>Posten</th>
+                    <th>Betrag (€)</th>
+                    <th>Feedback</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Posten">Listeneinkaufspreis netto</td>
+                    <td data-label="Betrag (€)"><input type="number" id="listeneinkaufspreis-netto" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-listeneinkaufspreis-netto"></td>
+                </tr>
+                <tr>
+                    <td data-label="Posten">- Liefererrabatt (<span id="liefererrabatt-prozent"></span>%)</td>
+                    <td data-label="Betrag (€)"><input type="number" id="liefererrabatt-betrag" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-liefererrabatt-betrag"></td>
+                </tr>
+                <tr>
+                    <td data-label="Posten">= Zieleinkaufspreis</td>
+                    <td data-label="Betrag (€)"><input type="number" id="zieleinkaufspreis-einkauf" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-zieleinkaufspreis-einkauf"></td>
+                </tr>
+                <tr>
+                    <td data-label="Posten">- Liefererskonto (<span id="liefererskonto-prozent"></span>%)</td>
+                    <td data-label="Betrag (€)"><input type="number" id="liefererskonto-betrag" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-liefererskonto-betrag"></td>
+                </tr>
+                <tr>
+                    <td data-label="Posten">= Bareinkaufspreis</td>
+                    <td data-label="Betrag (€)"><input type="number" id="bareinkaufspreis" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-bareinkaufspreis"></td>
+                </tr>
+                 <tr>
+                    <td data-label="Posten">+ Bezugskosten</td>
+                    <td data-label="Betrag (€)"><input type="number" id="bezugskosten" step="0.01" readonly></td> <td data-label="Feedback" id="feedback-bezugskosten"></td>
+                </tr>
+                <tr>
+                    <td data-label="Posten">= Bezugspreis</td>
+                    <td data-label="Betrag (€)"><input type="number" id="bezugspreis" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-bezugspreis"></td>
+                </tr>
+                <tr>
+                    <td data-label="Posten">+ Handlungskostenzuschlag (<span id="handlungskostenzuschlag-prozent"></span>%)</td>
+                    <td data-label="Betrag (€)"><input type="number" id="handlungskostenzuschlag-betrag" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-handlungskostenzuschlag-betrag"></td>
+                </tr>
+                <tr>
+                    <td data-label="Posten">= Selbstkosten</td>
+                    <td data-label="Betrag (€)"><input type="number" id="selbstkosten" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-selbstkosten"></td>
+                </tr>
+                <tr>
+                    <td data-label="Posten">+ Gewinn (<span id="gewinn-prozent"></span>%)</td>
+                    <td data-label="Betrag (€)"><input type="number" id="gewinn-betrag" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-gewinn-betrag"></td>
+                </tr>
+                <tr>
+                    <td data-label="Posten">= Barverkaufspreis</td>
+                    <td data-label="Betrag (€)"><input type="number" id="barverkaufspreis-verkauf" step="0.01"></td> <td data-label="Feedback" id="feedback-barverkaufspreis-verkauf"></td>
+                </tr>
+                 <tr>
+                    <td data-label="Posten">+ Kundenskonto (<span id="kundenskonto-prozent"></span>%)</td>
+                    <td data-label="Betrag (€)"><input type="number" id="kundenskonto-betrag" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-kundenskonto-betrag"></td>
+                </tr>
+                <tr>
+                    <td data-label="Posten">= Zielverkaufspreis</td>
+                    <td data-label="Betrag (€)"><input type="number" id="zielverkaufspreis" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-zielverkaufspreis"></td>
+                </tr>
+                 <tr>
+                    <td data-label="Posten">+ Kundenrabatt (<span id="kundenrabatt-prozent"></span>%)</td>
+                    <td data-label="Betrag (€)"><input type="number" id="kundenrabatt-betrag" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-kundenrabatt-betrag"></td>
+                </tr>
+                 <tr>
+                    <td data-label="Posten">= Nettoverkaufspreis</td>
+                    <td data-label="Betrag (€)"><input type="number" id="nettoverkaufspreis" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-nettoverkaufspreis"></td>
+                </tr>
+                 <tr>
+                    <td data-label="Posten">+ Umsatzsteuer (<span id="umsatzsteuer-prozent"></span>%)</td>
+                    <td data-label="Betrag (€)"><input type="number" id="umsatzsteuer-betrag" step="0.01"></td>
+                    <td data-label="Feedback" id="feedback-umsatzsteuer-betrag"></td>
+                </tr>
+                 <tr>
+                    <td data-label="Posten">= Bruttoverkaufspreis</td>
+                    <td data-label="Betrag (€)"><input type="number" id="bruttoverkaufspreis" step="0.01" readonly></td> <td data-label="Feedback" id="feedback-bruttoverkaufspreis"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="button-group">
+             <button id="checkBtn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded rounded-md focus:outline-none focus:shadow-outline">
+                 <i class="fas fa-check icon"></i> Überprüfen
+            </button>
+             <button id="showSolutionBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded rounded-md focus:outline-none focus:shadow-outline">
+                <i class="fas fa-info-circle icon"></i> Musterlösung anzeigen
+            </button>
+        </div>
+
+
+        <div id="overall-feedback" class="mt-6 text-center text-xl font-semibold">
+            </div>
+
+        <div id="solution-area" class="hidden">
+            </div>
+
+        <div id="progressDisplay" class="mt-4 text-center text-gray-700">
+            Richtig gelöst: 0 von 0 Aufgaben
+        </div>
+    </div>
+
+    <script>
+        console.log("Script started");
+
+        const generateBtn = document.getElementById('generateBtn');
+        const problemTextDiv = document.getElementById('problem-text');
+
+        // Spans for percentages
+        const liefererrabattProzentSpan = document.getElementById('liefererrabatt-prozent');
+        const liefererskontoProzentSpan = document.getElementById('liefererskonto-prozent');
+        const handlungskostenzuschlagProzentSpan = document.getElementById('handlungskostenzuschlag-prozent');
+        const gewinnProzentSpan = document.getElementById('gewinn-prozent');
+        const kundenskontoProzentSpan = document.getElementById('kundenskonto-prozent');
+        const kundenrabattProzentSpan = document.getElementById('kundenrabatt-prozent');
+        const umsatzsteuerProzentSpan = document.getElementById('umsatzsteuer-prozent');
+
+
+        // Input fields (in forward order of table)
+        const listeneinkaufspreisNettoInput = document.getElementById('listeneinkaufspreis-netto');
+        const liefererrabattBetragInput = document.getElementById('liefererrabatt-betrag');
+        const zieleinkaufspreisEinkaufInput = document.getElementById('zieleinkaufspreis-einkauf');
+        const liefererskontoBetragInput = document.getElementById('liefererskonto-betrag');
+        const bareinkaufspreisInput = document.getElementById('bareinkaufspreis');
+        const bezugskostenInput = document.getElementById('bezugskosten');
+        const bezugspreisInput = document.getElementById('bezugspreis');
+        const handlungskostenzuschlagBetragInput = document.getElementById('handlungskostenzuschlag-betrag');
+        const selbstkostenInput = document.getElementById('selbstkosten');
+        const gewinnBetragInput = document.getElementById('gewinn-betrag');
+        const barverkaufspreisVerkaufInput = document.getElementById('barverkaufspreis-verkauf');
+        const kundenskontoBetragInput = document.getElementById('kundenskonto-betrag');
+        const zielverkaufspreisInput = document.getElementById('zielverkaufspreis');
+        const kundenrabattBetragInput = document.getElementById('kundenrabatt-betrag');
+        const nettoverkaufspreisInput = document.getElementById('nettoverkaufspreis');
+        const umsatzsteuerBetragInput = document.getElementById('umsatzsteuer-betrag');
+        const bruttoverkaufspreisInput = document.getElementById('bruttoverkaufspreis');
+
+
+        // Feedback elements (in forward order of table)
+        const feedbackListeneinkaufspreisNetto = document.getElementById('feedback-listeneinkaufspreis-netto');
+        const feedbackLiefererrabattBetrag = document.getElementById('feedback-liefererrabatt-betrag');
+        const feedbackZieleinkaufspreisEinkauf = document.getElementById('feedback-zieleinkaufspreis-einkauf');
+        const feedbackLiefererskontoBetrag = document.getElementById('feedback-liefererskonto-betrag');
+        const feedbackBareinkaufspreis = document.getElementById('feedback-bareinkaufspreis');
+        const feedbackBezugskosten = document.getElementById('feedback-bezugskosten');
+        const feedbackBezugspreis = document.getElementById('feedback-bezugspreis');
+        const feedbackHandlungskostenzuschlagBetrag = document.getElementById('feedback-handlungskostenzuschlag-betrag');
+        const feedbackSelbstkosten = document.getElementById('feedback-selbstkosten');
+        const feedbackGewinnBetrag = document.getElementById('feedback-gewinn-betrag');
+        const feedbackBarverkaufspreisVerkauf = document.getElementById('feedback-barverkaufspreis-verkauf');
+        const feedbackKundenskontoBetrag = document.getElementById('feedback-kundenskonto-betrag');
+        const feedbackZielverkaufspreis = document.getElementById('feedback-zielverkaufspreis');
+        const feedbackKundenrabattBetrag = document.getElementById('feedback-kundenrabatt-betrag');
+        const feedbackNettoverkaufspreis = document.getElementById('feedback-nettoverkaufspreis');
+        const feedbackUmsatzsteuerBetrag = document.getElementById('feedback-umsatzsteuer-betrag');
+        const feedbackBruttoverkaufspreis = document.getElementById('feedback-bruttoverkaufspreis');
+
+
+        const checkBtn = document.getElementById('checkBtn');
+        const showSolutionBtn = document.getElementById('showSolutionBtn');
+        const overallFeedbackDiv = document.getElementById('overall-feedback');
+        const solutionAreaDiv = document.getElementById('solution-area');
+        const progressDisplay = document.getElementById('progressDisplay');
+
+        let correctValues = {};
+        let correctAnswers = 0;
+        let totalProblems = 0;
+
+        // Funktion zur Aktualisierung der Fortschrittsanzeige
+        function updateProgress() {
+            progressDisplay.textContent = `Richtig gelöst: ${correctAnswers} von ${totalProblems} Aufgaben`;
+        }
+
+        // Funktion zum Runden auf 2 Nachkommastellen
+        function roundToTwoDecimals(num) {
+            return parseFloat(num.toFixed(2));
+        }
+
+        // Funktion zum Runden auf .0 oder .5 Nachkommastellen für Prozentwerte
+        function roundToPointFive(num) {
+             return Math.round(num * 2) / 2;
+        }
+
+        // Funktion zur Generierung einer Handelskalkulation Rückwärts Aufgabe
+        function generateProblem() {
+             console.log("generateProblem called");
+
+            // Generate random values for percentages and Bezugskosten
+            const liefererrabattProzent = roundToPointFive(Math.random() * 15 + 5); // Liefererrabatt zwischen 5% und 20%
+            const liefererskontoProzent = roundToPointFive(Math.random() * 2 + 1); // Liefererskonto zwischen 1% und 3%
+            const bezugskosten = roundToTwoDecimals(Math.random() * 40 + 10); // Bezugskosten zwischen 10 und 50
+            const handlungskostenzuschlagProzent = roundToPointFive(Math.random() * 20 + 10); // Handlungskosten zwischen 10% und 30%
+            const gewinnProzent = roundToPointFive(Math.random() * 15 + 5); // Gewinn zwischen 5% und 20%
+            const kundenskontoProzent = roundToPointFive(Math.random() * 2 + 1); // Kundenskonto zwischen 1% und 3%
+            const kundenrabattProzent = roundToPointFive(Math.random() * 10 + 2); // Kundenrabatt zwischen 2% und 12%
+            const umsatzsteuerProzent = 19; // Assuming 19% Umsatzsteuer
+
+            // Generate a reasonable Bruttoverkaufspreis and calculate backwards
+            const bruttoverkaufspreis = roundToTwoDecimals(Math.random() * 800 + 200); // Bruttoverkaufspreis zwischen 200 und 1000
+
+            // Calculate backwards based on the schema and standard percentage definitions
+            const umsatzsteuerBetrag = roundToTwoDecimals(bruttoverkaufspreis / (100 + umsatzsteuerProzent) * umsatzsteuerProzent);
+            const nettoverkaufspreis = roundToTwoDecimals(bruttoverkaufspreis - umsatzsteuerBetrag);
+
+            // Kundenrabatt is % of Nettoverkaufspreis, deducted from Nettoverkaufspreis to get Zielverkaufspreis
+            const kundenrabattBetrag = roundToTwoDecimals(nettoverkaufspreis * (kundenrabattProzent / 100));
+            const zielverkaufspreis = roundToTwoDecimals(nettoverkaufspreis - kundenrabattBetrag);
+
+            // Kundenskonto is % of Zielverkaufspreis, deducted from Zielverkaufspreis to get Barverkaufspreis
+            const kundenskontoBetrag = roundToTwoDecimals(zielverkaufspreis * (kundenskontoProzent / 100));
+            const barverkaufspreisVerkauf = roundToTwoDecimals(zielverkaufspreis - kundenskontoBetrag);
+
+            // Gewinn is % of Selbstkosten, added to Selbstkosten to get Barverkaufspreis
+            const gewinnBetrag = roundToTwoDecimals(barverkaufspreisVerkauf / (100 + gewinnProzent) * gewinnProzent);
+            const selbstkosten = roundToTwoDecimals(barverkaufspreisVerkauf - gewinnBetrag);
+
+            // Handlungskosten is % of Bezugspreis, added to Bezugspreis to get Selbstkosten
+            const handlungskostenzuschlagBetrag = roundToTwoDecimals(selbstkosten / (100 + handlungskostenzuschlagProzent) * handlungskostenzuschlagProzent);
+            const bezugspreis = roundToTwoDecimals(selbstkosten - handlungskostenzuschlagBetrag);
+
+            // Bezugskosten are a fixed deduction from Bezugspreis to get Bareinkaufspreis
+            const bareinkaufspreis = roundToTwoDecimals(bezugspreis - bezugskosten);
+
+            // Liefererskonto is % of Zieleinkaufspreis (Einkauf), deducted from Zieleinkaufspreis to get Bareinkaufspreis
+            const liefererskontoBetrag = roundToTwoDecimals(bareinkaufspreis / (100 - liefererskontoProzent) * liefererskontoProzent);
+            const zieleinkaufspreisEinkauf = roundToTwoDecimals(bareinkaufspreis + liefererskontoBetrag);
+
+            // Liefererrabatt is % of Listeneinkaufspreis netto, deducted from Listeneinkaufspreis netto to get Zieleinkaufspreis (Einkauf)
+            const liefererrabattBetrag = roundToTwoDecimals(zieleinkaufspreisEinkauf / (100 - liefererrabattProzent) * liefererrabattProzent);
+            const listeneinkaufspreisNetto = roundToTwoDecimals(zieleinkaufspreisEinkauf + liefererrabattBetrag);
+
+
+            // Store correct values
+            correctValues = {
+                listeneinkaufspreisNetto: listeneinkaufspreisNetto,
+                liefererrabattProzent: liefererrabattProzent,
+                liefererrabattBetrag: liefererrabattBetrag,
+                zieleinkaufspreisEinkauf: zieleinkaufspreisEinkauf,
+                liefererskontoProzent: liefererskontoProzent,
+                liefererskontoBetrag: liefererskontoBetrag,
+                bareinkaufspreis: bareinkaufspreis,
+                bezugskosten: bezugskosten,
+                bezugspreis: bezugspreis,
+                handlungskostenzuschlagProzent: handlungskostenzuschlagProzent,
+                handlungskostenzuschlagBetrag: handlungskostenzuschlagBetrag,
+                selbstkosten: selbstkosten,
+                gewinnProzent: gewinnProzent,
+                gewinnBetrag: gewinnBetrag,
+                barverkaufspreisVerkauf: barverkaufspreisVerkauf,
+                kundenskontoProzent: kundenskontoProzent,
+                kundenskontoBetrag: kundenskontoBetrag,
+                zielverkaufspreis: zielverkaufspreis,
+                kundenrabattProzent: kundenrabattProzent,
+                kundenrabattBetrag: kundenrabattBetrag,
+                nettoverkaufspreis: nettoverkaufspreis,
+                umsatzsteuerProzent: umsatzsteuerProzent,
+                umsatzsteuerBetrag: umsatzsteuerBetrag,
+                bruttoverkaufspreis: bruttoverkaufspreis
+            };
+
+            // Define different problem text templates
+            const problemTemplates = [
+                `Der Bruttoverkaufspreis für eine Ware beträgt ${bruttoverkaufspreis.toFixed(2)}€.
+                 Die Umsatzsteuer beträgt ${umsatzsteuerProzent.toFixed(0)}%.
+                 Kunden erhalten ${kundenrabattProzent.toFixed(1)}% Kundenrabatt (vom Nettoverkaufspreis) und ${kundenskontoProzent.toFixed(1)}% Skonto (vom Zielverkaufspreis).
+                 Der Gewinn beträgt ${gewinnProzent.toFixed(1)}% der Selbstkosten.
+                 Die Handlungskosten machen ${handlungskostenzuschlagProzent.toFixed(1)}% des Bezugspreises aus.
+                 Die Bezugskosten betragen ${bezugskosten.toFixed(2)}€.
+                 Der Lieferant gewährt ${liefererskontoProzent.toFixed(1)}% Liefererskonto (vom Zieleinkaufspreis) und ${liefererrabattProzent.toFixed(1)}% Liefererrabatt (vom Listeneinkaufspreis netto).
+                 Erstellen Sie die Handelskalkulation rückwärts bis zum Listeneinkaufspreis netto.`,
+
+                `Führen Sie die Rückwärtskalkulation durch mit folgenden Angaben:
+                 Bruttoverkaufspreis: ${bruttoverkaufspreis.toFixed(2)}€
+                 Umsatzsteuer: ${umsatzsteuerProzent.toFixed(0)}%
+                 Kundenrabatt: ${kundenrabattProzent.toFixed(1)}% (vom Nettoverkaufspreis)
+                 Kundenskonto: ${kundenskontoProzent.toFixed(1)}% (vom Zielverkaufspreis)
+                 Gewinnzuschlag: ${gewinnProzent.toFixed(1)}% (der Selbstkosten)
+                 Handlungskostenzuschlag: ${handlungskostenzuschlagProzent.toFixed(1)}% (des Bezugspreises)
+                 Bezugskosten: ${bezugskosten.toFixed(2)}€
+                 Liefererskonto: ${liefererskontoProzent.toFixed(1)}% (vom Zieleinkaufspreis)
+                 Liefererrabatt: ${liefererrabattProzent.toFixed(1)}% (vom Listeneinkaufspreis netto)`
+            ];
+
+            // Select a random template
+            const randomTemplate = problemTemplates[Math.floor(Math.random() * problemTemplates.length)];
+
+            // Display problem text and fixed values in the table
+            problemTextDiv.innerHTML = randomTemplate;
+            bruttoverkaufspreisInput.value = bruttoverkaufspreis.toFixed(2);
+            bezugskostenInput.value = bezugskosten.toFixed(2); // Bezugskosten are fixed input in this direction
+
+            umsatzsteuerProzentSpan.textContent = umsatzsteuerProzent.toFixed(0);
+            kundenrabattProzentSpan.textContent = kundenrabattProzent.toFixed(1);
+            kundenskontoProzentSpan.textContent = kundenskontoProzent.toFixed(1);
+            gewinnProzentSpan.textContent = gewinnProzent.toFixed(1);
+            handlungskostenzuschlagProzentSpan.textContent = handlungskostenzuschlagProzent.toFixed(1);
+            liefererskontoProzentSpan.textContent = liefererskontoProzent.toFixed(1);
+            liefererrabattProzentSpan.textContent = liefererrabattProzent.toFixed(1);
+
+
+            // Clear user inputs and feedback and set readonly status
+            listeneinkaufspreisNettoInput.value = '';
+            listeneinkaufspreisNettoInput.readOnly = false; // Make input fields editable
+
+            liefererrabattBetragInput.value = '';
+            liefererrabattBetragInput.readOnly = false;
+
+            zieleinkaufspreisEinkaufInput.value = '';
+            zieleinkaufspreisEinkaufInput.readOnly = false;
+
+            liefererskontoBetragInput.value = '';
+            liefererskontoBetragInput.readOnly = false;
+
+            bareinkaufspreisInput.value = '';
+            bareinkaufspreisInput.readOnly = false;
+
+            bezugspreisInput.value = '';
+            bezugspreisInput.readOnly = false;
+
+            handlungskostenzuschlagBetragInput.value = '';
+            handlungskostenzuschlagBetragInput.readOnly = false;
+
+            selbstkostenInput.value = '';
+            selbstkostenInput.readOnly = false;
+
+            gewinnBetragInput.value = '';
+            gewinnBetragInput.readOnly = false;
+
+            barverkaufspreisVerkaufInput.value = '';
+            barverkaufspreisVerkaufInput.readOnly = false;
+
+            kundenskontoBetragInput.value = '';
+            kundenskontoBetragInput.readOnly = false;
+
+            zielverkaufspreisInput.value = '';
+            zielverkaufspreisInput.readOnly = false;
+
+            kundenrabattBetragInput.value = '';
+            kundenrabattBetragInput.readOnly = false;
+
+            nettoverkaufspreisInput.value = '';
+            nettoverkaufspreisInput.readOnly = false;
+
+            umsatzsteuerBetragInput.value = '';
+            umsatzsteuerBetragInput.readOnly = false;
+
+            // bruttoverkaufspreisInput and bezugskostenInput remain readonly
+
+
+            // Clear feedback elements
+            feedbackListeneinkaufspreisNetto.textContent = '';
+            feedbackLiefererrabattBetrag.textContent = '';
+            feedbackZieleinkaufspreisEinkauf.textContent = '';
+            feedbackLiefererskontoBetrag.textContent = '';
+            feedbackBareinkaufspreis.textContent = '';
+            feedbackBezugskosten.textContent = '';
+            feedbackBezugspreis.textContent = '';
+            feedbackHandlungskostenzuschlagBetrag.textContent = '';
+            feedbackSelbstkosten.textContent = '';
+            feedbackGewinnBetrag.textContent = '';
+            feedbackBarverkaufspreisVerkauf.textContent = '';
+            feedbackKundenskontoBetrag.textContent = '';
+            feedbackZielverkaufspreis.textContent = '';
+            feedbackKundenrabattBetrag.textContent = '';
+            feedbackNettoverkaufspreis.textContent = '';
+            feedbackUmsatzsteuerBetrag.textContent = '';
+            feedbackBruttoverkaufspreis.textContent = '';
+
+
+            overallFeedbackDiv.textContent = '';
+            overallFeedbackDiv.className = 'mt-6 text-center text-xl font-semibold';
+
+            // Hide the solution area when a new problem is generated
+            solutionAreaDiv.classList.add('hidden');
+             console.log("generateProblem finished");
+        }
+
+        // Funktion zur Überprüfung der Antwort
+        function checkAnswer() {
+            console.log("checkAnswer called");
+
+            totalProblems++;
+
+            // Get student values from inputs (matching the table order)
+            const studentValues = {
+                 listeneinkaufspreisNetto: parseFloat(listeneinkaufspreisNettoInput.value),
+                 liefererrabattBetrag: parseFloat(liefererrabattBetragInput.value),
+                 zieleinkaufspreisEinkauf: parseFloat(zieleinkaufspreisEinkaufInput.value),
+                 liefererskontoBetrag: parseFloat(liefererskontoBetragInput.value),
+                 bareinkaufspreis: parseFloat(bareinkaufspreisInput.value),
+                 // bezugskosten is readonly
+                 bezugspreis: parseFloat(bezugspreisInput.value),
+                 handlungskostenzuschlagBetrag: parseFloat(handlungskostenzuschlagBetragInput.value),
+                 selbstkosten: parseFloat(selbstkostenInput.value),
+                 gewinnBetrag: parseFloat(gewinnBetragInput.value),
+                 barverkaufspreisVerkauf: parseFloat(barverkaufspreisVerkaufInput.value),
+                 kundenskontoBetrag: parseFloat(kundenskontoBetragInput.value),
+                 zielverkaufspreis: parseFloat(zielverkaufspreisInput.value),
+                 kundenrabattBetrag: parseFloat(kundenrabattBetragInput.value),
+                 nettoverkaufspreis: parseFloat(nettoverkaufspreisInput.value),
+                 umsatzsteuerBetrag: parseFloat(umsatzsteuerBetragInput.value),
+                 // bruttoverkaufspreis is readonly
+            };
+
+            // Feedback elements (matching the table order)
+            const feedbackElements = {
+                 listeneinkaufspreisNetto: feedbackListeneinkaufspreisNetto,
+                 liefererrabattBetrag: feedbackLiefererrabattBetrag,
+                 zieleinkaufspreisEinkauf: feedbackZieleinkaufspreisEinkauf,
+                 liefererskontoBetrag: feedbackLiefererskontoBetrag,
+                 bareinkaufspreis: feedbackBareinkaufspreis,
+                 bezugspreis: feedbackBezugspreis,
+                 handlungskostenzuschlagBetrag: feedbackHandlungskostenzuschlagBetrag,
+                 selbstkosten: feedbackSelbstkosten,
+                 gewinnBetrag: feedbackGewinnBetrag,
+                 barverkaufspreisVerkauf: feedbackBarverkaufspreisVerkauf,
+                 kundenskontoBetrag: feedbackKundenskontoBetrag,
+                 zielverkaufspreis: feedbackZielverkaufspreis,
+                 kundenrabattBetrag: feedbackKundenrabattBetrag,
+                 nettoverkaufspreis: feedbackNettoverkaufspreis,
+                 umsatzsteuerBetrag: feedbackUmsatzsteuerBetrag,
+            };
+
+            let allCorrect = true;
+            const tolerance = 0.01; // Tolerance for rounding errors
+
+            // Check each input field that is not readonly
+            const editableInputs = [
+                'listeneinkaufspreisNetto', 'liefererrabattBetrag', 'zieleinkaufspreisEinkauf',
+                'liefererskontoBetrag', 'bareinkaufspreis', 'bezugspreis',
+                'handlungskostenzuschlagBetrag', 'selbstkosten', 'gewinnBetrag',
+                'barverkaufspreisVerkauf', 'kundenskontoBetrag', 'zielverkaufspreis',
+                'kundenrabattBetrag', 'nettoverkaufspreis', 'umsatzsteuerBetrag'
+            ];
+
+
+            editableInputs.forEach(key => {
+                 if (studentValues.hasOwnProperty(key) && correctValues.hasOwnProperty(key)) {
+                    const studentValue = studentValues[key];
+                    const correctValue = correctValues[key];
+                    const feedbackElement = feedbackElements[key];
+
+                    feedbackElement.textContent = ''; // Clear previous feedback
+
+                    if (isNaN(studentValue)) {
+                        feedbackElement.innerHTML = '<i class="fas fa-times-circle incorrect-feedback"></i>'; // Red X icon
+                        allCorrect = false;
+                    } else {
+                        // Compare with tolerance
+                        if (Math.abs(studentValue - correctValue) < tolerance) {
+                            feedbackElement.innerHTML = '<i class="fas fa-check-circle correct-feedback"></i>'; // Green check icon
+                        } else {
+                            feedbackElement.innerHTML = '<i class="fas fa-times-circle incorrect-feedback"></i>'; // Red X icon
+                            allCorrect = false;
+                        }
+                    }
+                 }
+            });
+
+
+            // Provide overall feedback
+            if (allCorrect) {
+                overallFeedbackDiv.textContent = 'Sehr gut! Die Handelskalkulation ist korrekt.';
+                overallFeedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-green-500';
+                correctAnswers++;
+            } else {
+                overallFeedbackDiv.textContent = 'Leider sind noch nicht alle Werte korrekt. Überprüfe deine Berechnungsschritte.';
+                overallFeedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-red-500';
+            }
+
+            updateProgress();
+             console.log("checkAnswer finished");
+        }
+
+        // Funktion zur Anzeige der Musterlösung
+        function showSolution() {
+            console.log("showSolution called");
+
+            const solutionText = `
+                Musterlösung (Rückwärtskalkulation):
+
+                Bruttoverkaufspreis: ${correctValues.bruttoverkaufspreis.toFixed(2)} €
+                - Umsatzsteuer (${correctValues.umsatzsteuerProzent.toFixed(0)}%): ${correctValues.umsatzsteuerBetrag.toFixed(2)} €
+                  (Berechnung: ${correctValues.bruttoverkaufspreis.toFixed(2)} € / (100 + ${correctValues.umsatzsteuerProzent.toFixed(0)}) * ${correctValues.umsatzsteuerProzent.toFixed(0)})
+                = Nettoverkaufspreis: ${correctValues.nettoverkaufspreis.toFixed(2)} €
+                  (Berechnung: ${correctValues.bruttoverkaufspreis.toFixed(2)} € - ${correctValues.umsatzsteuerBetrag.toFixed(2)} €)
+                - Kundenrabatt (${correctValues.kundenrabattProzent.toFixed(1)}%): ${correctValues.kundenrabattBetrag.toFixed(2)} €
+                  (Berechnung: ${correctValues.nettoverkaufspreis.toFixed(2)} € * ${correctValues.kundenrabattProzent.toFixed(1)} / 100)
+                = Zielverkaufspreis: ${correctValues.zielverkaufspreis.toFixed(2)} €
+                  (Berechnung: ${correctValues.nettoverkaufspreis.toFixed(2)} € - ${correctValues.kundenrabattBetrag.toFixed(2)} €)
+                - Kundenskonto (${correctValues.kundenskontoProzent.toFixed(1)}%): ${correctValues.kundenskontoBetrag.toFixed(2)} €
+                  (Berechnung: ${correctValues.zielverkaufspreis.toFixed(2)} € * ${correctValues.kundenskontoProzent.toFixed(1)} / 100)
+                = Barverkaufspreis: ${correctValues.barverkaufspreisVerkauf.toFixed(2)} €
+                  (Berechnung: ${correctValues.zielverkaufspreis.toFixed(2)} € - ${correctValues.kundenskontoBetrag.toFixed(2)} €)
+                - Gewinn (${correctValues.gewinnProzent.toFixed(1)}%): ${correctValues.gewinnBetrag.toFixed(2)} €
+                  (Berechnung: ${correctValues.barverkaufspreisVerkauf.toFixed(2)} € / (100 + ${correctValues.gewinnProzent.toFixed(1)}) * ${correctValues.gewinnProzent.toFixed(1)})
+                = Selbstkosten: ${correctValues.selbstkosten.toFixed(2)} €
+                  (Berechnung: ${correctValues.barverkaufspreisVerkauf.toFixed(2)} € - ${correctValues.gewinnBetrag.toFixed(2)} €)
+                - Handlungskostenzuschlag (${correctValues.handlungskostenzuschlagProzent.toFixed(1)}%): ${correctValues.handlungskostenzuschlagBetrag.toFixed(2)} €
+                  (Berechnung: ${correctValues.selbstkosten.toFixed(2)} € / (100 + ${correctValues.handlungskostenzuschlagProzent.toFixed(1)}) * ${correctValues.handlungskostenzuschlagProzent.toFixed(1)})
+                = Bezugspreis: ${correctValues.bezugspreis.toFixed(2)} €
+                  (Berechnung: ${correctValues.selbstkosten.toFixed(2)} € - ${correctValues.handlungskostenzuschlagBetrag.toFixed(2)} €)
+                - Bezugskosten: ${correctValues.bezugskosten.toFixed(2)} €
+                = Bareinkaufspreis: ${correctValues.bareinkaufspreis.toFixed(2)} €
+                  (Berechnung: ${correctValues.bezugspreis.toFixed(2)} € - ${correctValues.bezugskosten.toFixed(2)} €)
+                + Liefererskonto (${correctValues.liefererskontoProzent.toFixed(1)}%): ${correctValues.liefererskontoBetrag.toFixed(2)} €
+                  (Berechnung: ${correctValues.bareinkaufspreis.toFixed(2)} € / (100 - ${correctValues.liefererskontoProzent.toFixed(1)}) * ${correctValues.liefererskontoProzent.toFixed(1)})
+                = Zieleinkaufspreis: ${correctValues.zieleinkaufspreisEinkauf.toFixed(2)} €
+                  (Berechnung: ${correctValues.bareinkaufspreis.toFixed(2)} € + ${correctValues.liefererskontoBetrag.toFixed(2)} €)
+                + Liefererrabatt (${correctValues.liefererrabattProzent.toFixed(1)}%): ${correctValues.liefererrabattBetrag.toFixed(2)} €
+                  (Berechnung: ${correctValues.zieleinkaufspreisEinkauf.toFixed(2)} € / (100 - ${correctValues.liefererrabattProzent.toFixed(1)}) * ${correctValues.liefererrabattProzent.toFixed(1)})
+                = Listeneinkaufspreis netto: ${correctValues.listeneinkaufspreisNetto.toFixed(2)} €
+                  (Berechnung: ${correctValues.zieleinkaufspreisEinkauf.toFixed(2)} € + ${correctValues.liefererrabattBetrag.toFixed(2)} €)
+            `;
+            solutionAreaDiv.textContent = solutionText;
+            solutionAreaDiv.classList.remove('hidden');
+             console.log("showSolution finished");
+        }
+
+
+        // Event Listener
+        generateBtn.addEventListener('click', generateProblem);
+        checkBtn.addEventListener('click', checkAnswer);
+        showSolutionBtn.addEventListener('click', showSolution);
+
+        // Erste Aufgabe beim Laden der Seite generieren und Fortschritt initialisieren
+        generateProblem();
+        updateProgress();
+
+        console.log("Script initialization finished");
+
+    </script>
+</body>
+</html>

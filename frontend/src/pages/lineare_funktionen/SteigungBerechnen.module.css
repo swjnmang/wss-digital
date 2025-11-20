@@ -1,0 +1,27 @@
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+  border: 1px solid #e6e6e6;
+}
+.streak {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+.taskPoints {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+}
+.solutionOutput {
+  background:#e9f5e9;
+  border-radius:8px;
+  padding:0.75rem;
+  margin-top:0.75rem;
+}

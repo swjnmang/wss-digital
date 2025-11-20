@@ -1,0 +1,12 @@
+.container { padding: 1rem }
+.back { display:inline-block; margin-bottom:0.5rem; color:#0366d6 }
+.card { background:white; padding:1rem; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.06) }
+.inputRow { display:flex; gap:0.75rem; align-items:center; margin-bottom:0.75rem }
+.label { font-weight:600 }
+.input { border:1px solid #d1d5db; padding:0.4rem 0.5rem; border-radius:6px; width:120px }
+.actions { display:flex; gap:0.5rem }
+.primary { background:#10b981; color:white; padding:0.5rem 0.75rem; border-radius:6px; border:none }
+.secondary { background:#64748b; color:white; padding:0.5rem 0.75rem; border-radius:6px; border:none }
+.ghost { background:transparent; border:1px solid #cbd5e1; padding:0.4rem 0.6rem; border-radius:6px }
+.feedback { margin-top:0.75rem; font-weight:600 }
+.solution { margin-top:0.75rem; background:#f1f5f9; padding:0.75rem; border-radius:6px }

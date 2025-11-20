@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aufgabengenerator: Scheitelform aus Graph berechnen</title>
+    <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+    <style>
+        /* Modernes & ansprechendes Design */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        #task-generator-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            position: relative;
+        }
+        @keyframes correct-flash {
+            0% { box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(40, 167, 69, 0.5); }
+            50% { box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1), 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+        .correct-flash-animation {
+            animation: correct-flash 0.7s ease-out;
+        }
+        #streak-counter {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background-color: #ff9800;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease-in-out;
+        }
+        #streak-counter.streaked {
+            transform: scale(1.15);
+        }
+        #task-generator-container h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        #ggb-container {
+            width: 100%;
+            max-width: 450px;
+            aspect-ratio: 1 / 1;
+            margin: 0 auto 15px auto;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #dcdcdc;
+        }
+        #task-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 1em;
+            line-height: 1.5;
+            color: #495057;
+        }
+        .task-data {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #005a87;
+            font-family: 'Courier New', Courier, monospace;
+            display: block;
+            margin-top: 8px;
+        }
+        #solution-input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            font-family: 'Courier New', Courier, monospace;
+            flex-wrap: wrap;
+        }
+        .equation-input {
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            width: 60px;
+            text-align: center;
+            font-family: inherit;
+        }
+        #feedback-output {
+            min-height: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .correct { color: #28a745; }
+        .incorrect { color: #dc3545; }
+        #solution-output {
+            background-color: #e9f5e9;
+            border: 1px solid #c8e6c9;
+            color: #2e7d32;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.8;
+            word-break: break-word;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .generator-button {
+            background: linear-gradient(145deg, #0078b3, #005f8e);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .generator-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .generator-button:disabled {
+            background: linear-gradient(145deg, #c0c0c0, #a9a9a9);
+            cursor: not-allowed;
+            transform: none;
+        }
+        .check-button { background: linear-gradient(145deg, #28a745, #218838); }
+        .secondary-button { background: linear-gradient(145deg, #6c757d, #5a6268); }
+        .video-button { background: linear-gradient(145deg, #ff0000, #cc0000); }
+    </style>
+</head>
+<body>
+
+<div id="task-generator-container">
+    <a href="index.html" style="display: block; margin-bottom: 15px; color: #0073aa; text-decoration: none; font-weight: 500;">
+        ← Zurück zur Übersicht
+    </a>
+    <div id="streak-counter">🔥 0</div>
+    <h2>Funktionsgleichung in Scheitelform bestimmen</h2>
+
+    <div id="main-content">
+        <div id="ggb-container">
+            <div id="ggb-element"></div>
+        </div>
+
+        <div id="task-output">
+            <p>Bestimme die Funktionsgleichung der abgebildeten Parabel in Scheitelform (y = a(x-xₛ)²+yₛ). Gegeben sind der Scheitelpunkt S und ein weiterer Punkt P.</p>
+            <div id="task-data"></div>
+        </div>
+
+        <div id="solution-input-container">
+            y = <input type="text" id="a-input" class="equation-input" placeholder="a">(x <input type="text" id="xs-input" class="equation-input" placeholder="±xₛ">)² <input type="text" id="ys-input" class="equation-input" placeholder="±yₛ">
+        </div>
+        
+        <div id="feedback-output"></div>
+
+        <div class="button-container">
+            <button class="generator-button" onclick="generateNewTask()">Neue Aufgabe</button>
+            <button class="generator-button check-button" id="check-btn" onclick="checkSolution()">Lösung prüfen</button>
+            <button class="generator-button secondary-button" id="show-answer-btn" onclick="showAnswer()">Lösung anzeigen</button>
+            <button class="generator-button video-button" onclick="openVideo()">Erklärvideo</button>
+        </div>
+
+        <div id="solution-output" style="display: none;"></div>
+    </div>
+</div>
+
+<script>
+    let correctA, correctXs, correctYs;
+    let solutionSteps = "";
+    let isFirstTry = true;
+    let currentStreak = 0;
+    const VIDEO_URL = "https://www.youtube.com/watch?v=xgiAK3rLCow&t";
+
+    function updateStreak(correct) {
+        const streakCounter = document.getElementById('streak-counter');
+        if (correct) {
+            currentStreak++;
+            streakCounter.classList.add('streaked');
+            setTimeout(() => streakCounter.classList.remove('streaked'), 200);
+        } else {
+            currentStreak = 0;
+        }
+        streakCounter.textContent = `🔥 ${currentStreak}`;
+    }
+    
+    function formatNumber(num) {
+        return Math.round(num * 100) / 100;
+    }
+
+    function generateNewTask() {
+        if (!ggbApplet) return;
+
+        isFirstTry = true;
+        // Reset UI
+        document.getElementById('feedback-output').textContent = '';
+        document.getElementById('a-input').value = '';
+        document.getElementById('xs-input').value = '';
+        document.getElementById('ys-input').value = '';
+        document.getElementById('solution-output').style.display = 'none';
+        document.getElementById('show-answer-btn').disabled = true;
+
+        const randomInt = (max, min = 1) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const randomChoice = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        
+        let a, xs, ys;
+        let p = {};
+        
+        a = randomChoice([0.5, -0.5, 1.5, -1.5, 2, -2]);
+        xs = randomInt(4, -4);
+        ys = randomInt(4, -4);
+        p.x = xs + randomChoice([1, -1, 2, -2]);
+
+        correctA = formatNumber(a);
+        correctXs = formatNumber(xs);
+        correctYs = formatNumber(ys);
+        p.y = formatNumber(correctA * Math.pow(p.x - correctXs, 2) + correctYs);
+
+        document.getElementById('task-data').textContent = `S(${correctXs}|${correctYs}) und P(${p.x}|${p.y})`;
+        
+        ggbApplet.reset();
+        ggbApplet.evalCommand(`f(x) = ${correctA}*(x - (${correctXs}))^2 + ${correctYs}`);
+        ggbApplet.evalCommand(`S=(${correctXs}, ${correctYs})`);
+        ggbApplet.evalCommand(`P=(${p.x}, ${p.y})`);
+
+        const viewMargin = 5; 
+        const xMin = correctXs - viewMargin;
+        const xMax = correctXs + viewMargin;
+        const yMin = correctYs - viewMargin;
+        const yMax = correctYs + viewMargin; 
+        
+        setTimeout(() => {
+            if(ggbApplet) {
+                ggbApplet.setCoordSystem(xMin, xMax, yMin, yMax);
+            }
+        }, 100);
+        
+        const xsTermForInput = formatNumber(-correctXs);
+        const ysTermForInput = correctYs;
+
+        solutionSteps = `
+            <strong>1. Scheitelpunkt S(xₛ|yₛ) ablesen und einsetzen:</strong><br>
+            Aus S(${correctXs}|${correctYs}) folgt: xₛ = ${correctXs} und yₛ = ${correctYs}.<br>
+            Ansatz: y = a(x - ${correctXs})² + ${correctYs}<br><br>
+            <strong>2. Punkt P einsetzen, um a zu berechnen:</strong><br>
+            Setze P(${p.x}|${p.y}) für x und y ein.<br>
+            ${p.y} = a(${p.x} - ${correctXs})² + ${correctYs} | -${correctYs}<br>
+            ${formatNumber(p.y - correctYs)} = a * ${Math.pow(p.x - correctXs, 2)} | / ${Math.pow(p.x - correctXs, 2)}<br>
+            a = ${correctA}<br><br>
+            <strong>3. Werte in die Lösungsmaske eintragen:</strong><br>
+            - Für 'a' gibst du ${correctA} ein.<br>
+            - In der Klammer (x...) wird das Vorzeichen von xₛ umgedreht: -(${correctXs}) = ${xsTermForInput}. Du gibst also <strong>${xsTermForInput > 0 ? '+' : ''}${xsTermForInput}</strong> ein.<br>
+            - Der letzte Wert ist yₛ direkt: Du gibst also <strong>${ysTermForInput > 0 ? '+' : ''}${ysTermForInput}</strong> ein.
+        `;
+    }
+
+    function checkSolution() {
+        const feedback = document.getElementById('feedback-output');
+        const showAnswerBtn = document.getElementById('show-answer-btn');
+        const container = document.getElementById('task-generator-container');
+        
+        const aUserInput = document.getElementById('a-input').value.replace(',', '.');
+        const xsUserInput = document.getElementById('xs-input').value.replace(',', '.');
+        const ysUserInput = document.getElementById('ys-input').value.replace(',', '.');
+
+        if (aUserInput === '' || xsUserInput === '' || ysUserInput === '') {
+            feedback.textContent = 'Bitte fülle alle drei Felder aus.';
+            feedback.className = 'incorrect';
+            return;
+        }
+
+        const aUser = parseFloat(aUserInput);
+        const xsUser = parseFloat(xsUserInput);
+        const ysUser = parseFloat(ysUserInput);
+        
+        const correctXsForInput = formatNumber(-correctXs);
+        const correctYsForInput = correctYs;
+        
+        const isACorrect = Math.abs(aUser - correctA) < 0.01;
+        const isXsCorrect = Math.abs(xsUser - correctXsForInput) < 0.01;
+        const isYsCorrect = Math.abs(ysUser - correctYsForInput) < 0.01;
+
+        if (isACorrect && isXsCorrect && isYsCorrect) {
+            feedback.textContent = 'Richtig! Ausgezeichnet!';
+            feedback.className = 'correct';
+            showAnswerBtn.disabled = true;
+            if (isFirstTry) {
+                updateStreak(true);
+                container.classList.add('correct-flash-animation');
+                setTimeout(() => {
+                    container.classList.remove('correct-flash-animation');
+                }, 700);
+            }
+            setTimeout(generateNewTask, 1200);
+        } else {
+            feedback.textContent = 'Leider nicht ganz richtig. Überprüfe deine Werte und Vorzeichen!';
+            feedback.className = 'incorrect';
+            showAnswerBtn.disabled = false;
+            if(isFirstTry) {
+                updateStreak(false);
+            }
+        }
+        isFirstTry = false;
+    }
+
+    function showAnswer() {
+        const solutionDiv = document.getElementById('solution-output');
+        solutionDiv.innerHTML = solutionSteps;
+        solutionDiv.style.display = 'block';
+        document.getElementById('show-answer-btn').disabled = true;
+        updateStreak(false);
+        isFirstTry = false;
+    }
+
+    function openVideo() {
+        window.open(VIDEO_URL, "_blank");
+    }
+    
+    var params = {
+        "appName": "classic", 
+        "width": 800, 
+        "height": 600, 
+        "showToolBar": false, 
+        "showAlgebraInput": false, 
+        "showMenuBar": false,
+        "perspective": "G",
+        "useBrowserForJS": true,
+        "enableShiftDragZoom": true,
+        "showResetIcon": true,
+        "appletOnLoad": function(api) {
+            ggbApplet = api; 
+            generateNewTask();
+        }
+    };
+    var applet = new GGBApplet(params, true);
+    window.addEventListener("load", function() { 
+        applet.inject('ggb-element');
+    });
+
+</script>
+
+</body>
+</html>

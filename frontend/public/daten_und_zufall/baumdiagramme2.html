@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktives Baumdiagramm-Training</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        #canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: #f9fafb;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        /* kleinere Eingabefelder (kompakter) */
+        .prob-input-part {
+            width: 28px;
+            height: 22px;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            border: 1.5px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--card-background);
+            -moz-appearance: textfield;
+            padding: 2px;
+        }
+
+        /* kleines Chip-Element, das beim Klick das volle Eingabefeld öffnet */
+        .prob-chip {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: white;
+            border: 1.5px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+            z-index: 20;
+            transform: translate(-50%, -50%);
+        }
+
+        .fraction-container {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translate(-50%, -50%);
+            z-index: 25;
+            /* kleine Animation beim Öffnen */
+            transition: transform 0.12s ease, opacity 0.12s ease;
+        }
+        .fraction-line {
+            width: 45px;
+            height: 2px;
+            background-color: var(--text-primary);
+            margin: 2px 0;
+        }
+        .prob-input-part.correct {
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+        .prob-input-part.incorrect {
+            border-color: var(--error-color);
+            color: var(--error-color);
+        }
+        .feedback {
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        .feedback.correct {
+            color: var(--success-color);
+        }
+        .feedback.incorrect {
+            color: var(--error-color);
+        }
+        /* --- FIX: verhindert Überlappen der Eingabefelder in der mittleren (2.) Stufe --- */
+        /* Breite Auswahl an Selektoren, falls die Klassen im Projekt anders heißen */
+        .tree .middle-column,
+        .tree .second-stage,
+        .middle-column,
+        .second-stage,
+        .stage-2 {
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          gap: 10px !important;         /* vertikaler Abstand zwischen Feldern */
+          min-height: 320px;           /* genügend Platz für alle Eingaben */
+        }
+
+        /* Eingabefelder nicht absolut positionieren lassen */
+        .tree .prob-input,
+        .prob-input,
+        input.prob-input,
+        div.prob-input {
+          position: static !important;
+          top: auto !important;
+          left: auto !important;
+          transform: none !important;
+          margin: 0 !important;
+          z-index: 5 !important;
+          pointer-events: auto !important;
+        }
+
+        /* Falls Linien/Verbindungen über den Feldern liegen: Eingabefelder in den Vordergrund */
+        .tree .node, .prob-input, .stage-2 .node {
+          z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Zurück zur Übersicht</a>
+        <h1>Interaktives Baumdiagramm-Training</h1>
+        <p>Löse die Aufgabe, indem du die Wahrscheinlichkeiten in die Felder einträgst.</p>
+
+        <div class="bg-gray-50 p-6 rounded-lg shadow-inner border">
+            <h2>Deine Aufgabe:</h2>
+            <p id="taskDescription" class="text-lg"></p>
+            <div class="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+                <button id="checkBtn" class="btn btn-primary">Lösung prüfen</button>
+                <button id="newTaskBtn" class="btn btn-secondary">Neue Aufgabe</button>
+            </div>
+             <div id="feedback" class="feedback mt-4"></div>
+        </div>
+
+        <div id="canvas-container">
+            <canvas id="treeCanvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('treeCanvas');
+            const ctx = canvas.getContext('2d');
+            const canvasContainer = document.getElementById('canvas-container');
+            const taskDescEl = document.getElementById('taskDescription');
+            const feedbackEl = document.getElementById('feedback');
+            const checkBtn = document.getElementById('checkBtn');
+            const newTaskBtn = document.getElementById('newTaskBtn');
+            
+            let currentTaskData = {};
+
+            const taskScenarios = [
+                { type: "Urne", text: "In einer Urne befinden sich {items}. Du ziehst zweimal {replacement}." },
+                { type: "Lostrommel", text: "In einer Lostrommel sind {items}. Du ziehst zwei Lose nacheinander." },
+                { type: "Glücksrad", text: "Ein Glücksrad mit {total} Feldern ({items}) wird zweimal gedreht." }
+            ];
+
+            const mapColor = (name) => {
+                const colorMap = {
+                    'rot': '#ef4444', 'blau': '#3b82f6', 'gelb': '#eab308', 'grün': '#22c55e',
+                    'gewinn': '#22c55e', 'niete': '#ef4444', 'grau': '#6b7280', 'weiss': '#f9fafb'
+                };
+                return colorMap[name.toLowerCase()] || '#9ca3af';
+            };
+            
+            const drawNode = (x, y, color, label, radius, fontSize) => {
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = mapColor(color);
+                ctx.fill();
+                ctx.strokeStyle = '#4b5563';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                const textColor = (color.toLowerCase() === 'weiss' || color.toLowerCase() === 'gelb' || color.toLowerCase() === 'gewinn') ? '#1f2937' : 'white';
+                ctx.fillStyle = textColor;
+                ctx.font = `bold ${fontSize}px Inter`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(label.toUpperCase(), x, y);
+            };
+
+            const drawLine = (startX, startY, endX, endY, lineWidth) => {
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.strokeStyle = '#6b7280';
+                ctx.lineWidth = lineWidth;
+                ctx.stroke();
+            };
+
+            const drawCurrentTask = () => {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.width * 0.7;
+                feedbackEl.textContent = '';
+                feedbackEl.className = 'feedback mt-4';
+                // entferne sowohl sichtbare Chips als auch geöffnete Fraction-Container vor dem Neuzeichnen
+                canvasContainer.querySelectorAll('.fraction-container, .prob-chip').forEach(el => el.remove());
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (!currentTaskData.urn) return;
+                const { colors } = currentTaskData;
+                const nodeRadius = canvas.width * 0.025;
+                const fontSize = canvas.width * 0.012;
+                const lineWidth = canvas.width * 0.0015;
+                const startX = canvas.width * 0.1;
+                const level1X = canvas.width * 0.4;
+                const level2X = canvas.width * 0.75;
+                drawNode(startX, canvas.height / 2, 'grau', 'Start', nodeRadius, fontSize);
+                const level1Spacing = (canvas.height - (canvas.height * 0.1)) / colors.length;
+                colors.forEach((color1, i) => {
+                    const y1 = (canvas.height * 0.05) + (i * level1Spacing) + (level1Spacing / 2);
+                    drawLine(startX + nodeRadius, canvas.height / 2, level1X - nodeRadius, y1, lineWidth);
+                    drawNode(level1X, y1, color1, color1, nodeRadius, fontSize);
+                    createInput(`s1_${color1}`, (startX + level1X) / 2, (canvas.height / 2 + y1) / 2, i, colors.length, canvas.height * 0.035);
+                    const level2Spacing = level1Spacing / Math.max(colors.length, 2.5);
+                    colors.forEach((color2, j) => {
+                        const y2 = (y1 - level1Spacing / 2) + (j * level2Spacing) + (level2Spacing / 2);
+                        drawLine(level1X + nodeRadius, y1, level2X - nodeRadius, y2, lineWidth);
+                        drawNode(level2X, y2, color2, color2, nodeRadius, fontSize);
+                        createInput(`s2_${color1}_${color2}`, (level1X + level2X) / 2, (y1 + y2) / 2, j, colors.length, canvas.height * 0.04);
+                    });
+                });
+            };
+
+            const generateNewTask = () => {
+                const scenario = taskScenarios[Math.floor(Math.random() * taskScenarios.length)];
+                let withReplacement = scenario.type === "Glücksrad" ? true : (scenario.type === "Lostrommel" ? false : Math.random() > 0.5);
+                const availableItems = scenario.type === "Lostrommel" ? ['Gewinn', 'Niete'] : ['rot', 'blau', 'gelb', 'grün'];
+                const numColors = scenario.type === "Lostrommel" ? 2 : (Math.random() > 0.4 ? 2 : 3);
+                let urn = {}, colors = [], totalBalls = 0, itemsText = '';
+                for(let i=0; i < numColors; i++) {
+                    const color = availableItems[i];
+                    const count = Math.floor(Math.random() * 6) + 3;
+                    urn[color] = count;
+                    colors.push(color);
+                    totalBalls += count;
+                    if (color === 'Niete') itemsText += `${count} ${count > 1 ? 'Nieten' : 'Niete'}, `;
+                    else if (color === 'Gewinn') itemsText += `${count} ${count > 1 ? 'Gewinne' : 'Gewinn'}, `;
+                    else itemsText += `${count} ${color}e, `;
+                }
+                itemsText = itemsText.slice(0, -2);
+                taskDescEl.textContent = scenario.text.replace('{items}', itemsText).replace('{total}', totalBalls).replace('{replacement}', withReplacement ? 'mit Zurücklegen' : 'ohne Zurücklegen');
+                let solution = { stage1: {}, stage2: {} };
+                colors.forEach(color1 => {
+                    solution.stage1[color1] = `${urn[color1]}/${totalBalls}`;
+                    colors.forEach(color2 => {
+                        let num, den;
+                        if(withReplacement) { num = urn[color2]; den = totalBalls; }
+                        else { den = totalBalls - 1; num = (color1 === color2) ? urn[color2] - 1 : urn[color2]; }
+                        solution.stage2[`${color1}_${color2}`] = `${num < 0 ? 0 : num}/${den}`;
+                    });
+                });
+                currentTaskData = { urn, colors, withReplacement, totalBalls, solution };
+                drawCurrentTask();
+            };
+            
+            // Erzeugt zuerst ein kleines "?"-Chip; erst bei Klick wird das vollständige Eingabe-Formular angezeigt
+            const createInput = (id, x, y, index, total, baseOffset) => {
+                let yOffset = 0;
+                if (total > 1) {
+                    if (index === 0) yOffset = -baseOffset;
+                    else if (index === total - 1) yOffset = baseOffset;
+                }
+                const topPos = y + yOffset;
+
+                const chip = document.createElement('div');
+                chip.className = 'prob-chip';
+                chip.style.left = `${x}px`;
+                chip.style.top = `${topPos}px`;
+                chip.textContent = '?';
+                chip.addEventListener('click', () => {
+                    // ersetze Chip durch das Eingabefeld (Bruch)
+                    const container = document.createElement('div');
+                    container.className = 'fraction-container';
+                    container.style.left = `${x}px`;
+                    container.style.top = `${topPos}px`;
+                    container.innerHTML = `
+                        <input type="number" class="prob-input-part" id="${id}_num" placeholder="?">
+                        <div class="fraction-line"></div>
+                        <input type="number" class="prob-input-part" id="${id}_den" placeholder="?">
+                    `;
+                    // Füge Fokus auf ersten Input
+                    canvasContainer.replaceChild(container, chip);
+                    const numInput = container.querySelector(`#${id}_num`);
+                    setTimeout(() => numInput && numInput.focus(), 50);
+                }, { once: true });
+
+                canvasContainer.appendChild(chip);
+            };
+
+            const checkSolution = () => {
+                if (!currentTaskData.solution) return;
+                let allCorrect = true;
+                const { solution } = currentTaskData;
+                const checkSingleFraction = (baseId, correctFractionStr) => {
+                    const numInput = document.getElementById(`${baseId}_num`);
+                    const denInput = document.getElementById(`${baseId}_den`);
+                    if (!numInput || !denInput) return;
+                    numInput.classList.remove('correct', 'incorrect');
+                    denInput.classList.remove('correct', 'incorrect');
+                    const [correctNum, correctDen] = correctFractionStr.split('/').map(Number);
+                    const userNum = parseInt(numInput.value, 10);
+                    const userDen = parseInt(denInput.value, 10);
+                    if (!isNaN(userNum) && !isNaN(userDen) && userDen !== 0 && (userNum / userDen === correctNum / correctDen)) {
+                        numInput.classList.add('correct');
+                        denInput.classList.add('correct');
+                    } else {
+                        numInput.classList.add('incorrect');
+                        denInput.classList.add('incorrect');
+                        allCorrect = false;
+                    }
+                };
+                for (const color1 in solution.stage1) checkSingleFraction(`s1_${color1}`, solution.stage1[color1]);
+                for (const path in solution.stage2) checkSingleFraction(`s2_${path}`, solution.stage2[path]);
+                
+                feedbackEl.className = 'feedback mt-4';
+                if (allCorrect) {
+                    feedbackEl.textContent = "Super! Alles richtig gelöst.";
+                    feedbackEl.classList.add('correct');
+                } else {
+                    feedbackEl.textContent = "Leider nicht ganz richtig. Schau dir die roten Felder nochmal an.";
+                    feedbackEl.classList.add('incorrect');
+                }
+            };
+
+            newTaskBtn.addEventListener('click', generateNewTask);
+            checkBtn.addEventListener('click', checkSolution);
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => drawCurrentTask(), 100);
+            });
+            generateNewTask();
+        });
+    </script>
+</body>
+</html>

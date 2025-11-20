@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemischte Bruchaufgaben</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 700px; /* Increased max-width for longer problems */
+            width: 100%;
+        }
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            margin: 0 5px; /* Reduced margin for more space */
+        }
+        .fraction span {
+            display: block;
+        }
+        .numerator {
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+            margin-bottom: 2px;
+        }
+        .denominator {
+            padding-top: 2px;
+        }
+        .answer-fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 10px;
+            position: relative;
+        }
+        .answer-fraction input {
+            width: 80px;
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .answer-fraction .numerator-input {
+            margin-bottom: 2px;
+        }
+         .answer-fraction .denominator-input {
+            margin-top: 2px;
+        }
+        .answer-fraction::after {
+            content: '';
+            position: absolute;
+            left: 5%;
+            right: 5%;
+            top: 50%;
+            border-bottom: 1px solid #000;
+            transform: translateY(-50%);
+        }
+        .icon {
+            margin-right: 5px;
+        }
+        #problem {
+            font-size: 1.8rem; /* Slightly smaller font for longer problems */
+            text-align: center;
+            margin-bottom: 20px;
+            overflow-x: auto; /* Add horizontal scroll if needed */
+            white-space: nowrap; /* Prevent wrapping */
+            padding-bottom: 10px; /* Space for scrollbar */
+        }
+         #problem::-webkit-scrollbar {
+            height: 8px;
+        }
+         #problem::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">
+            &larr; Zurück zur Bruch-Übersicht
+        </a>
+        <h1>Gemischte Bruchaufgaben</h1>
+
+        <div class="form-group">
+            <label for="difficulty">Schwierigkeit:</label>
+            <i class="fas fa-level-up-alt icon"></i> <select id="difficulty">
+                <option value="easy">Einfach</option>
+                <option value="medium">Mittel</option>
+                <option value="hard">Schwer</option>
+                <option value="ultimativ">Ultimativ</option>
+            </select>
+            <button id="generateBtn">
+                <i class="fas fa-sync-alt icon"></i>Neue Aufgabe
+            </button>
+        </div>
+
+        <div id="problem">
+            </div>
+
+        <div class="text-center mb-6">
+            <label for="answerNumerator">Deine Antwort:</label>
+            <div>
+                 <div class="answer-fraction">
+                    <input type="text" id="answerNumerator" placeholder="Zähler" class="numerator-input">
+                    <input type="text" id="answerDenominator" placeholder="Nenner" class="denominator-input">
+                 </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button id="checkBtn">Überprüfen</button>
+        </div>
+
+        <div id="feedback" class="mt-6 text-center text-xl font-semibold">
+            </div>
+
+        <div id="progressDisplay" class="mt-4 text-center text-gray-700">
+            Richtig gelöst: 0 von 0 Aufgaben
+        </div>
+    </div>
+
+    <script>
+        const difficultySelect = document.getElementById('difficulty');
+        const generateBtn = document.getElementById('generateBtn');
+        const problemDiv = document.getElementById('problem');
+        const answerNumeratorInput = document.getElementById('answerNumerator');
+        const answerDenominatorInput = document.getElementById('answerDenominator');
+        const checkBtn = document.getElementById('checkBtn');
+        const feedbackDiv = document.getElementById('feedback');
+        const progressDisplay = document.getElementById('progressDisplay');
+
+        let currentProblem = {};
+        let correctAnswers = 0;
+        let totalProblems = 0;
+
+        // Funktion zur Aktualisierung der Fortschrittsanzeige
+        function updateProgress() {
+            progressDisplay.textContent = `Richtig gelöst: ${correctAnswers} von ${totalProblems} Aufgaben`;
+        }
+
+        // Funktion zur Berechnung des größten gemeinsamen Teilers (ggT)
+        function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                [a, b] = [b, a % b];
+            }
+            return a;
+        }
+
+        // Funktion zur Vereinfachung eines Bruchs
+        function simplifyFraction(numerator, denominator) {
+            if (denominator === 0) return { numerator: NaN, denominator: NaN };
+            const common = gcd(numerator, denominator);
+            if (common === 0) return { numerator: numerator, denominator: denominator };
+            // Handle negative results correctly
+            if (denominator < 0) {
+                numerator = -numerator;
+                denominator = -denominator;
+            }
+            const simplifiedNum = numerator / common;
+            const simplifiedDen = denominator / common;
+
+            return { numerator: simplifiedNum, denominator: simplifiedDen };
+        }
+
+        // Funktion zur Anzeige eines Bruchs - Angepasst, um ganze Zahlen anzuzeigen, wenn Nenner 1 ist
+        function displayFraction(numerator, denominator, numVariable = '', denVariable = '') {
+            let numeratorContent = numerator;
+            if (numVariable) {
+                if (numerator === 1 && !(denominator === 1 && denVariable)) {
+                     numeratorContent = numVariable;
+                } else {
+                     numeratorContent = `${numerator}${numVariable}`;
+                }
+            }
+
+            let denominatorContent = denominator;
+             if (denVariable) {
+                 if (denominator === 1 && !(numerator === 1 && numVariable)) {
+                      denominatorContent = denVariable;
+                 } else {
+                      denominatorContent = `${denominator}${denVariable}`;
+                 }
+            }
+
+            // Wenn der Nenner 1 ist und keine Variable im Nenner ist, als ganze Zahl anzeigen
+            if (denominator === 1 && !denVariable) {
+                 return `<span class="whole-number">${numeratorContent}</span>`;
+            }
+
+
+            // Ansonsten als Bruch mit Zähler und Nenner anzeigen
+            return `<div class="fraction"><span class="numerator">${numeratorContent}</span><span class="denominator">${denominatorContent}</span></div>`;
+        }
+
+        // Helper function to perform fraction arithmetic
+        function performOperation(frac1, operator, frac2) {
+            let resultNum, resultDen;
+
+            // Handle variables - for calculation, we only use numerical values
+            // The variables are for display and conceptual understanding in hard/ultimativ
+            const num1 = frac1.num;
+            const den1 = frac1.den;
+            const num2 = frac2.num;
+            const den2 = frac2.den;
+
+            if (operator === '*') {
+                resultNum = num1 * num2;
+                resultDen = den1 * den2;
+            } else if (operator === ':') {
+                resultNum = num1 * den2;
+                resultDen = den1 * num2;
+            } else if (operator === '+') {
+                resultNum = num1 * den2 + num2 * den1;
+                resultDen = den1 * den2;
+            } else if (operator === '-') {
+                resultNum = num1 * den2 - num2 * den1;
+                resultDen = den1 * den2;
+            } else {
+                console.error("Ungültiger Operator:", operator);
+                return { numerator: NaN, denominator: NaN };
+            }
+
+            return simplifyFraction(resultNum, resultDen);
+        }
+
+        // Funktion zur Generierung einer Aufgabe mit gemischten Operationen
+        function generateProblem() {
+            const difficulty = difficultySelect.value;
+            let problemString = '';
+            let numFractions = 2;
+            let fractions = [];
+            let operators = [];
+            const possibleOperators = ['*', ':', '+', '-'];
+
+            if (difficulty === 'medium') {
+                numFractions = Math.floor(Math.random() * 1) + 2; // 2 or 3 fractions
+            } else if (difficulty === 'hard') {
+                 numFractions = Math.floor(Math.random() * 2) + 3; // 3 or 4 fractions
+            } else if (difficulty === 'ultimativ') {
+                numFractions = Math.floor(Math.random() * 2) + 4; // 4 or 5 fractions
+            }
+
+
+            // Generate fractions
+            for (let i = 0; i < numFractions; i++) {
+                let num = Math.floor(Math.random() * 10) + 1;
+                let den = Math.floor(Math.random() * 10) + 1;
+                 while (den === 0) { // Ensure denominator is not zero
+                    den = Math.floor(Math.random() * 10) + 1;
+                }
+
+                let numVar = '';
+                let denVar = '';
+
+                if (difficulty === 'hard') {
+                     numVar = Math.random() < 0.5 ? (Math.random() < 0.5 ? 'x' : 'y') : '';
+                } else if (difficulty === 'ultimativ') {
+                     const varType = Math.random();
+                     if (varType < 0.3) numVar = (Math.random() < 0.5 ? 'x' : 'y');
+                     else if (varType < 0.6) denVar = (Math.random() < 0.5 ? 'x' : 'y');
+                     else if (varType < 0.9) {
+                         numVar = (Math.random() < 0.5 ? 'x' : 'y');
+                         denVar = (Math.random() < 0.5 ? 'x' : 'y');
+                     }
+                }
+
+                fractions.push({ num, den, numVar, denVar });
+            }
+
+            // Generate operators
+            for (let i = 0; i < numFractions - 1; i++) {
+                let operator;
+                // For easy difficulty, use all four operators
+                if (difficulty === 'easy') {
+                    operator = possibleOperators[Math.floor(Math.random() * possibleOperators.length)]; // Use all operators for easy
+                } else {
+                    operator = possibleOperators[Math.floor(Math.random() * possibleOperators.length)]; // Mix operators for other difficulties
+                }
+                operators.push(operator);
+            }
+
+            // Build the problem string
+            problemString += displayFraction(fractions[0].num, fractions[0].den, fractions[0].numVar, fractions[0].denVar);
+            for (let i = 0; i < operators.length; i++) {
+                problemString += ` ${operators[i]} `;
+                problemString += displayFraction(fractions[i + 1].num, fractions[i + 1].den, fractions[i + 1].numVar, fractions[i + 1].denVar);
+            }
+            problemString += ' =';
+
+            // Calculate the correct answer respecting order of operations
+            // A simple approach: first handle multiplication and division, then addition and subtraction
+            let calculationFractions = [...fractions]; // Copy fractions for calculation
+            let calculationOperators = [...operators]; // Copy operators
+
+            // Step 1: Handle multiplication and division
+            let i = 0;
+            while (i < calculationOperators.length) {
+                const operator = calculationOperators[i];
+                if (operator === '*' || operator === ':') {
+                    const result = performOperation(calculationFractions[i], operator, calculationFractions[i + 1]);
+                    // Replace the two fractions and the operator with the result
+                    calculationFractions.splice(i, 2, { num: result.numerator, den: result.denominator, numVar: '', denVar: '' }); // Remove variables for calculation
+                    calculationOperators.splice(i, 1);
+                } else {
+                    i++;
+                }
+            }
+
+            // Step 2: Handle addition and subtraction
+            i = 0;
+            while (i < calculationOperators.length) {
+                 const operator = calculationOperators[i];
+                 if (operator === '+' || operator === '-') {
+                    const result = performOperation(calculationFractions[i], operator, calculationFractions[i + 1]);
+                     // Replace the two fractions and the operator with the result
+                    calculationFractions.splice(i, 2, { num: result.numerator, den: result.denominator, numVar: '', denVar: '' }); // Remove variables for calculation
+                    calculationOperators.splice(i, 1);
+                 } else {
+                     i++; // Should not happen if only + and - are left
+                 }
+            }
+
+            // The final result is the single remaining fraction
+            const finalResult = calculationFractions[0];
+            correctAnswer = simplifyFraction(finalResult.num, finalResult.den);
+
+
+            currentProblem = {...correctAnswer, operationType: 'mixed'}; // Store operation type for feedback
+            problemDiv.innerHTML = problemString;
+
+            feedbackDiv.textContent = '';
+            feedbackDiv.className = 'mt-6 text-center text-xl font-semibold'; // Reset class
+            answerNumeratorInput.value = '';
+            answerDenominatorInput.value = '';
+        }
+
+        // Funktion zur Überprüfung der Antwort
+        function checkAnswer() {
+            const studentNumerator = parseInt(answerNumeratorInput.value);
+            const studentDenominator = parseInt(answerDenominatorInput.value);
+
+            if (isNaN(studentNumerator) || isNaN(studentDenominator)) {
+                feedbackDiv.textContent = 'Bitte gib sowohl Zähler als auch Nenner ein.';
+                feedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-red-500';
+                return;
+            }
+             if (studentDenominator === 0) {
+                feedbackDiv.textContent = 'Der Nenner darf nicht Null sein.';
+                feedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-red-500';
+                return;
+            }
+
+
+            // Erhöhe die Gesamtzahl der versuchten Aufgaben
+            totalProblems++;
+
+            // Vereinfachte Antwort des Schülers
+            const simplifiedStudentAnswer = simplifyFraction(studentNumerator, studentDenominator);
+            // Vereinfachte korrekte Antwort
+            const simplifiedCorrectAnswer = simplifyFraction(currentProblem.numerator, currentProblem.denominator);
+
+            // Überprüfung auf rechnerische Korrektheit (vereinfachte Brüche vergleichen)
+            const isNumericallyCorrect = simplifiedStudentAnswer.numerator === simplifiedCorrectAnswer.numerator &&
+                                         simplifiedStudentAnswer.denominator === simplifiedCorrectAnswer.denominator;
+
+            // Überprüfung, ob die eingegebene Schülerantwort bereits vereinfacht war
+            const isStudentAnswerSimplified = studentNumerator === simplifiedStudentAnswer.numerator &&
+                                              studentDenominator === simplifiedStudentAnswer.denominator;
+
+            const difficulty = difficultySelect.value;
+
+            if (isNumericallyCorrect) {
+                if (isStudentAnswerSimplified) {
+                    feedbackDiv.textContent = 'Richtig!';
+                    feedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-green-500';
+                    correctAnswers++; // Erhöhe den Zähler für richtige Antworten
+                } else {
+                    feedbackDiv.textContent = 'Richtig, aber der Bruch kann noch gekürzt werden. Suche nach einem gemeinsamen Teiler für Zähler und Nenner.';
+                    feedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-yellow-600'; // Gelbe Farbe für Hinweis
+                     // Zählen wir unvollständig gekürzte als "richtig genug" für den Fortschritt?
+                     // Ich zähle sie hier als richtig, da die rechnerische Lösung stimmt.
+                    correctAnswers++;
+                }
+            } else {
+                let hint = 'Leider falsch.';
+                // For all difficulties now, provide a general hint about calculation steps and order of operations
+                hint += ' Überprüfe deine Berechnungsschritte und die Reihenfolge der Operationen (Punkt vor Strich).';
+                feedbackDiv.textContent = hint;
+                feedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-red-500';
+            }
+
+            // Aktualisiere die Fortschrittsanzeige nach jeder Überprüfung
+            updateProgress();
+        }
+
+        // Event Listener
+        generateBtn.addEventListener('click', generateProblem);
+        checkBtn.addEventListener('click', checkAnswer);
+
+        // Erste Aufgabe beim Laden der Seite generieren und Fortschritt initialisieren
+        generateProblem();
+        updateProgress(); // Initialisiere die Anzeige beim Laden
+
+    </script>
+</body>
+</html>

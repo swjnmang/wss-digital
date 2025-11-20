@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potenzschreibweise Übung</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            line-height: 1.6;
+            padding: 15px; /* Add padding for better mobile view */
+            background-color: #f4f4f4; /* Light grey background */
+            border-radius: 8px; /* Rounded corners for the body area */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        p {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .settings {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e9e9e9;
+            border-radius: 5px;
+        }
+        .settings label {
+            margin-right: 10px;
+        }
+        .aufgabe {
+            font-size: 1.4em; /* Slightly larger font for the problem */
+            margin-bottom: 20px;
+            min-height: 1.8em; /* Ensure space even if content is short */
+            padding: 15px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 5px;
+            text-align: center;
+            word-wrap: break-word; /* Prevent overflow on small screens */
+        }
+        .eingabe {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        /* Style for the single input box (Potenz -> Produkt) */
+        .eingabe .single-input {
+             padding: 10px;
+             font-size: 1.1em;
+             margin-right: 10px;
+             border: 1px solid #ccc;
+             border-radius: 4px;
+             box-sizing: border-box;
+             width: calc(70% - 25px);
+             max-width: 200px;
+        }
+
+        /* Container for the base and exponent inputs (Produkt -> Potenz) */
+        .eingabe .potenz-input-container {
+            display: inline-flex; /* Align items in a row */
+            align-items: flex-end; /* Align items to the bottom */
+            margin-right: 10px;
+            position: relative; /* Needed for absolute positioning of exponent */
+            padding-right: 40px; /* Make space for the exponent */
+        }
+
+        .eingabe .potenz-input-container input {
+            padding: 5px; /* Smaller padding for these inputs */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center; /* Center text in inputs */
+        }
+
+        .eingabe .potenz-input-container input.basis-input {
+            width: 60px; /* Slightly wider for basis */
+            font-size: 1.2em; /* Slightly larger font for basis */
+            margin-right: 2px; /* Small space between basis and where exponent will be */
+        }
+
+        .eingabe .potenz-input-container input.exponent-input {
+            width: 40px; /* Smaller width for exponent */
+            font-size: 0.9em; /* Smaller font for exponent */
+            position: absolute; /* Position relative to the container */
+            top: 0; /* Align to the top of the container */
+            right: 0; /* Align to the right of the container */
+            line-height: 1; /* Compact line height */
+            padding: 2px 4px; /* Adjust padding */
+        }
+
+
+        .button {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            cursor: pointer;
+            background-color: #5cb85c; /* Green button */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease; /* Smooth hover effect */
+        }
+        .button:hover {
+            background-color: #4cae4c; /* Darker green on hover */
+        }
+        .button:active {
+             background-color: #4cae4c; /* Darker green on click */
+             transform: translateY(1px); /* Slight press effect */
+        }
+         .button:disabled {
+            background-color: #cccccc; /* Grey out disabled button */
+            cursor: not-allowed;
+        }
+        #naechsteAufgabeButton {
+             background-color: #0275d8; /* Blue button */
+             margin-top: 10px; /* Space above the next button */
+        }
+         #naechsteAufgabeButton:hover {
+             background-color: #025aa5; /* Darker blue on hover */
+         }
+         #naechsteAufgabeButton:active {
+             background-color: #025aa5; /* Darker blue on click */
+         }
+         #hinweisButton {
+             background-color: #f0ad4e; /* Orange button */
+             margin-left: 10px; /* Space to the check button */
+         }
+         #hinweisButton:hover {
+             background-color: #ec971f; /* Darker orange */
+         }
+          #hinweisButton:active {
+             background-color: #ec971f; /* Darker orange */
+         }
+
+
+        .feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            min-height: 1.5em; /* Ensure space for feedback */
+            text-align: center;
+        }
+        .feedback .icon {
+            margin-right: 5px;
+        }
+        .richtig {
+            color: green;
+        }
+        .richtig .icon {
+             color: green; /* Ensure icon is green */
+        }
+        .falsch {
+            color: red;
+        }
+         .falsch .icon {
+             color: red; /* Ensure icon is red */
+         }
+         .hinweis {
+             color: #555;
+             font-weight: normal;
+             margin-top: 10px;
+             font-style: italic;
+         }
+
+
+        /* Hide elements based on task type */
+        .single-input-container.hidden,
+        .potenz-input-container.hidden {
+            display: none;
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .eingabe .single-input,
+            .eingabe .potenz-input-container {
+                width: calc(100% - 20px); /* Full width on small screens */
+                margin-right: 0;
+                margin-bottom: 10px; /* Space below input */
+                display: block; /* Stack input/container and button */
+            }
+             .button {
+                 width: 100%; /* Full width buttons */
+                 margin-bottom: 10px;
+             }
+             #naechsteAufgabeButton {
+                 margin-top: 0; /* Remove extra top margin */
+             }
+             .eingabe .potenz-input-container {
+                 display: flex; /* Use flex for stacking on small screens */
+                 justify-content: center; /* Center the inputs */
+                 align-items: flex-end; /* Align items to the bottom */
+                 padding-right: 0; /* Remove padding on small screens */
+                 position: static; /* Remove absolute positioning on small screens */
+             }
+             .eingabe .potenz-input-container input.basis-input,
+             .eingabe .potenz-input-container input.exponent-input {
+                 width: auto; /* Auto width on small screens */
+                 flex-grow: 1; /* Allow inputs to grow */
+                 position: static; /* Remove absolute positioning on small screens */
+                 margin-left: 5px; /* Add space between inputs */
+                 margin-right: 5px; /* Add space between inputs */
+                 vertical-align: baseline; /* Reset vertical alignment */
+                 font-size: 1.1em; /* Reset font size */
+             }
+             #hinweisButton {
+                 margin-left: 0; /* Remove left margin on small screens */
+                 margin-top: 10px; /* Add top margin to stack */
+             }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="display: block; text-align: center; margin-bottom: 15px; color: #0275d8; text-decoration: none; font-weight: bold;">
+        ← Zurück zur Potenz-Übersicht
+    </a>
+    <h1>Potenzschreibweise Übung</h1>
+
+    <p>Wandle das Produkt in eine Potenz um oder umgekehrt. Wähle einen Schwierigkeitsgrad und klicke auf "Nächste Aufgabe".</p>
+
+    <div class="settings">
+        <label for="difficulty">Schwierigkeitsgrad:</label>
+        <select id="difficulty">
+            <option value="leicht">Leicht (Zahlen bis 10, Exponenten bis 3)</option>
+            <option value="mittel">Mittel (Zahlen bis 15, Exponenten bis 5, Variablen)</option>
+            <option value="schwer">Schwer (Zahlen bis 20, Exponenten bis 6, Variablen, gemischt)</option>
+        </select>
+    </div>
+
+
+    <div class="aufgabe" id="aufgabe">Aufgabe wird geladen...</div>
+
+    <div class="eingabe">
+        <span class="single-input-container">
+             Deine Antwort: <input type="text" id="antwortInputSingle" class="single-input">
+        </span>
+
+        <span class="potenz-input-container">
+            Deine Antwort:
+            <input type="text" id="antwortInputBasis" class="basis-input">
+            <input type="text" id="antwortInputExponent" class="exponent-input">
+        </span>
+
+        <button class="button" id="ueberpruefenButton" onclick="ueberpruefeAntwort()">Überprüfen</button>
+        <button class="button" id="hinweisButton" onclick="zeigeHinweis()" style="display: none;">Hinweis</button> </div>
+
+    <button class="button" id="naechsteAufgabeButton" onclick="neueAufgabe()">Nächste Aufgabe</button>
+
+    <div class="feedback" id="feedback"></div>
+     <div class="feedback hinweis" id="hinweisText"></div> <script>
+        // Referenzen auf HTML-Elemente
+        const aufgabeElement = document.getElementById('aufgabe');
+        const antwortInputSingle = document.getElementById('antwortInputSingle');
+        const antwortInputBasis = document.getElementById('antwortInputBasis');
+        const antwortInputExponent = document.getElementById('antwortInputExponent');
+        const feedbackElement = document.getElementById('feedback');
+        const ueberpruefenButton = document.getElementById('ueberpruefenButton');
+        const naechsteAufgabeButton = document.getElementById('naechsteAufgabeButton');
+        const hinweisButton = document.getElementById('hinweisButton');
+        const hinweisTextElement = document.getElementById('hinweisText');
+        const singleInputContainer = document.querySelector('.single-input-container');
+        const potenzInputContainer = document.querySelector('.potenz-input-container');
+        const difficultySelect = document.getElementById('difficulty');
+
+
+        // Variablen für die aktuelle Aufgabe
+        let aktuelleAufgabeTyp; // 'produktToPotenz' oder 'potenzToProdukt'
+        let basis;
+        let exponent;
+        let variableChar; // Store the variable character
+        let falscheVersuche = 0; // Zähler für falsche Versuche
+
+
+        // Funktion zur Generierung einer zufälligen Ganzzahl zwischen min und max (inklusive)
+        function generiereZufallszahl(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Funktion zur Generierung einer Aufgabe: Produkt -> Potenz
+        function generiereProduktToPotenz() {
+            aktuelleAufgabeTyp = 'produktToPotenz';
+            falscheVersuche = 0; // Zähler zurücksetzen
+            hinweisButton.style.display = 'none'; // Hinweis-Button verstecken
+            hinweisTextElement.textContent = ''; // Hinweistext leeren
+            feedbackElement.textContent = ''; // Feedback leeren
+            feedbackElement.className = 'feedback'; // Feedback-Klasse zurücksetzen
+
+
+            // Felder für Potenz-Eingabe anzeigen, Einzel-Eingabe verstecken
+            singleInputContainer.classList.add('hidden');
+            potenzInputContainer.classList.remove('hidden');
+
+            antwortInputBasis.value = ''; // Eingabe leeren
+            antwortInputExponent.value = ''; // Eingabe leeren
+            antwortInputBasis.disabled = false; // Eingabe aktivieren
+            antwortInputExponent.disabled = false; // Eingabe aktivieren
+            ueberpruefenButton.disabled = false; // Überprüfen-Button aktivieren
+
+
+            const difficulty = difficultySelect.value;
+            let maxBasisZahl, maxExponentZahl, useVariableProbability;
+
+            // Einstellungen basierend auf Schwierigkeitsgrad
+            switch (difficulty) {
+                case 'leicht':
+                    maxBasisZahl = 10;
+                    maxExponentZahl = 3;
+                    useVariableProbability = 0; // Keine Variablen auf leicht
+                    break;
+                case 'mittel':
+                    maxBasisZahl = 15;
+                    maxExponentZahl = 5;
+                    useVariableProbability = 0.6; // Wahrscheinlichkeit für Variablen
+                    break;
+                case 'schwer':
+                    maxBasisZahl = 20;
+                    maxExponentZahl = 6;
+                    useVariableProbability = 0.8; // Höhere Wahrscheinlichkeit für Variablen
+                    break;
+            }
+
+
+            const useVariable = Math.random() < useVariableProbability;
+
+            if (useVariable) {
+                // Zufälliger Kleinbuchstabe als Basis
+                variableChar = String.fromCharCode(generiereZufallszahl(97, 122));
+                basis = variableChar;
+                // Exponent basierend auf Schwierigkeit
+                exponent = generiereZufallszahl(2, maxExponentZahl);
+                let produktString = variableChar;
+                for (let i = 1; i < exponent; i++) {
+                    produktString += ' * ' + variableChar;
+                }
+                aufgabeElement.textContent = `Wandle folgendes Produkt in eine Potenz um: ${produktString}`;
+            } else {
+                // Zufällige Zahl als Basis
+                basis = generiereZufallszahl(2, maxBasisZahl);
+                // Exponent basierend auf Schwierigkeit
+                exponent = generiereZufallszahl(2, Math.min(maxExponentZahl, 4)); // Exponenten für Zahlen etwas kleiner halten
+                let produktString = basis;
+                for (let i = 1; i < exponent; i++) {
+                    produktString += ' * ' + basis;
+                }
+                aufgabeElement.textContent = `Wandle folgendes Produkt in eine Potenz um: ${produktString}`;
+            }
+             antwortInputBasis.focus(); // Fokus auf das Basis-Eingabefeld setzen
+        }
+
+        // Funktion zur Generierung einer Aufgabe: Potenz -> Produkt
+        function generierePotenzToProdukt() {
+            aktuelleAufgabeTyp = 'potenzToProdukt';
+            falscheVersuche = 0; // Zähler zurücksetzen
+            hinweisButton.style.display = 'none'; // Hinweis-Button verstecken
+            hinweisTextElement.textContent = ''; // Hinweistext leeren
+            feedbackElement.textContent = ''; // Feedback leeren
+            feedbackElement.className = 'feedback'; // Feedback-Klasse zurücksetzen
+
+            // Einzel-Eingabe anzeigen, Felder für Potenz-Eingabe verstecken
+            singleInputContainer.classList.remove('hidden');
+            potenzInputContainer.classList.add('hidden');
+
+            antwortInputSingle.value = ''; // Eingabe leeren
+            antwortInputSingle.disabled = false; // Eingabe aktivieren
+            ueberpruefenButton.disabled = false; // Überprüfen-Button aktivieren
+
+            const difficulty = difficultySelect.value;
+            let maxBasisZahl, maxExponentZahl, useVariableProbability;
+
+            // Einstellungen basierend auf Schwierigkeitsgrad
+            switch (difficulty) {
+                case 'leicht':
+                    maxBasisZahl = 10;
+                    maxExponentZahl = 3;
+                    useVariableProbability = 0; // Keine Variablen auf leicht
+                    break;
+                case 'mittel':
+                    maxBasisZahl = 15;
+                    maxExponentZahl = 5;
+                    useVariableProbability = 0.6; // Wahrscheinlichkeit für Variablen
+                    break;
+                case 'schwer':
+                    maxBasisZahl = 20;
+                    maxExponentZahl = 6;
+                    useVariableProbability = 0.8; // Höhere Wahrscheinlichkeit für Variablen
+                    break;
+            }
+
+            const useVariable = Math.random() < useVariableProbability;
+
+            if (useVariable) {
+                 // Zufälliger Kleinbuchstabe als Basis
+                 variableChar = String.fromCharCode(generiereZufallszahl(97, 122));
+                 basis = variableChar;
+                 // Exponent basierend auf Schwierigkeit
+                 exponent = generiereZufallszahl(2, maxExponentZahl);
+                 // Darstellung der Potenz mit <sup> Tag
+                 aufgabeElement.innerHTML = `Wandle folgende Potenz in ein Produkt um: ${basis}<sup>${exponent}</sup>`;
+            } else {
+                // Zufällige Zahl als Basis
+                basis = generiereZufallszahl(2, maxBasisZahl);
+                // Exponent basierend auf Schwierigkeit
+                exponent = generiereZufallszahl(2, Math.min(maxExponentZahl, 4));
+                // Darstellung der Potenz mit <sup> Tag
+                aufgabeElement.innerHTML = `Wandle folgende Potenz in ein Produkt um: ${basis}<sup>${exponent}</sup>`;
+            }
+            antwortInputSingle.focus(); // Fokus auf das Einzel-Eingabefeld setzen
+        }
+
+        // Funktion zur Generierung einer neuen zufälligen Aufgabe
+        function neueAufgabe() {
+            // Zufällig entscheiden, welcher Aufgabentyp generiert wird
+            const aufgabeTyp = Math.random() < 0.5 ? 'produktToPotenz' : 'potenzToProdukt';
+            if (aufgabeTyp === 'produktToPotenz') {
+                generiereProduktToPotenz();
+            } else {
+                generierePotenzToProdukt();
+            }
+        }
+
+        // Funktion zur Überprüfung der Schülerantwort
+        function ueberpruefeAntwort() {
+            feedbackElement.textContent = ''; // Altes Feedback leeren
+            feedbackElement.className = 'feedback'; // Feedback-Klasse zurücksetzen
+            hinweisTextElement.textContent = ''; // Hinweistext leeren
+
+            let istRichtig = false;
+            let richtigeAntwortString = ''; // Für die Anzeige der richtigen Antwort im Feedback
+
+            if (aktuelleAufgabeTyp === 'produktToPotenz') {
+                // Antwort aus den zwei Feldern holen
+                const schuelerBasis = antwortInputBasis.value.trim();
+                const schuelerExponent = antwortInputExponent.value.trim();
+
+                // Korrekte Antwort für Vergleich
+                const korrekteBasis = basis.toString();
+                const korrekterExponent = exponent.toString();
+
+                // Richtige Antwort als String für Feedback formatieren
+                richtigeAntwortString = `${korrekteBasis}<sup>${korrekterExponent}</sup>`;
+
+                // Überprüfung
+                if (schuelerBasis === korrekteBasis && schuelerExponent === korrekterExponent) {
+                    istRichtig = true;
+                } else {
+                    // Spezifischeres Feedback
+                    if (schuelerBasis !== korrekteBasis && schuelerExponent !== korrekterExponent) {
+                         feedbackElement.innerHTML = `<span class="icon">❌</span> Basis und Exponent sind falsch. Die richtige Antwort wäre ${richtigeAntwortString} gewesen.`;
+                    } else if (schuelerBasis !== korrekteBasis) {
+                         feedbackElement.innerHTML = `<span class="icon">❌</span> Die Basis ist falsch. Die richtige Antwort wäre ${korrekteBasis} gewesen.`;
+                    } else { // schuelerExponent !== korrekterExponent
+                         feedbackElement.innerHTML = `<span class="icon">❌</span> Der Exponent ist falsch. Die richtige Antwort wäre ${korrekterExponent} gewesen.`;
+                    }
+                    feedbackElement.className = 'feedback falsch';
+                    falscheVersuche++; // Zähler erhöhen
+                }
+
+
+                 if (istRichtig) {
+                     feedbackElement.innerHTML = '<span class="icon">✅</span> Richtig!'; // Use innerHTML to render sup tag and icon
+                     feedbackElement.className = 'feedback richtig';
+                     antwortInputBasis.disabled = true; // Eingabe deaktivieren nach richtiger Antwort
+                     antwortInputExponent.disabled = true; // Eingabe deaktivieren nach richtiger Antwort
+                     ueberpruefenButton.disabled = true; // Überprüfen-Button deaktivieren
+                     hinweisButton.style.display = 'none'; // Hinweis-Button verstecken
+                 }
+
+            } else if (aktuelleAufgabeTyp === 'potenzToProdukt') {
+                // Antwort aus dem einzelnen Feld holen
+                const schuelerAntwort = antwortInputSingle.value.trim();
+
+                // Korrekte Antwort als Produkt-String erstellen
+                let produktArray = [];
+                for (let i = 0; i < exponent; i++) {
+                    produktArray.push(basis);
+                }
+                const richtigeAntwortProduktString = produktArray.join(' * ');
+                 richtigeAntwortString = richtigeAntwortProduktString; // Für Feedback
+
+                // Vereinfachte Überprüfung: Entferne alle Leerzeichen und vergleiche
+                const bereinigteSchuelerAntwort = schuelerAntwort.replace(/\s/g, '');
+                const bereinigteRichtigeAntwort = richtigeAntwortProduktString.replace(/\s/g, '');
+
+                 if (bereinigteSchuelerAntwort === bereinigteRichtigeAntwort) {
+                    istRichtig = true;
+                 } else {
+                     // Versuche, einfache Variationen zu erkennen (z.B. nur die Basen)
+                     const regexNurBasen = new RegExp(`^${basis.toString().repeat(exponent)}$`); // z.B. xxx oder 555
+
+                     if (regexNurBasen.test(bereinigteSchuelerAntwort)) {
+                         istRichtig = true; // Akzeptiere auch nur die Basen ohne *
+                     }
+                 }
+
+                 if (istRichtig) {
+                    feedbackElement.innerHTML = '<span class="icon">✅</span> Richtig!';
+                    feedbackElement.className = 'feedback richtig';
+                    antwortInputSingle.disabled = true; // Eingabe deaktivieren nach richtiger Antwort
+                    ueberpruefenButton.disabled = true; // Überprüfen-Button deaktivieren
+                    hinweisButton.style.display = 'none'; // Hinweis-Button verstecken
+                 } else {
+                     // Spezifischeres Feedback für Produkt
+                     let feedbackText = `<span class="icon">❌</span> Falsch. Die richtige Antwort wäre ${richtigeAntwortString} gewesen.`;
+
+                     // Rudimentäre Analyse, was falsch sein könnte
+                     const schuelerBasen = schuelerAntwort.split('*').map(item => item.trim()).filter(item => item !== '');
+                     const korrekteBasen = produktArray.map(String);
+
+                     if (schuelerBasen.length !== korrekteBasen.length) {
+                         feedbackText = `<span class="icon">❌</span> Falsch. Du hast nicht die richtige Anzahl an Faktoren (${exponent}) verwendet. Die richtige Antwort wäre ${richtigeAntwortString} gewesen.`;
+                     } else {
+                         // Prüfen, ob die Basen stimmen (unabhängig von der Reihenfolge, vereinfacht)
+                         const schuelerBasenSorted = schuelerBasen.sort().join('');
+                         const korrekteBasenSorted = korrekteBasen.sort().join('');
+
+                         if (schuelerBasenSorted !== korrekteBasenSorted) {
+                              feedbackText = `<span class="icon">❌</span> Falsch. Die verwendeten Faktoren stimmen nicht überein. Die richtige Antwort wäre ${richtigeAntwortString} gewesen.`;
+                         }
+                         // Wenn die Anzahl stimmt und die Basen (sortiert) stimmen, aber der String nicht exakt passt, liegt es wahrscheinlich an der Formatierung
+                     }
+
+
+                     feedbackElement.innerHTML = feedbackText;
+                     feedbackElement.className = 'feedback falsch';
+                     falscheVersuche++; // Zähler erhöhen
+                 }
+            }
+
+            // Hinweis-Button nach 2 falschen Versuchen anzeigen
+            if (falscheVersuche >= 2) {
+                hinweisButton.style.display = 'inline-block';
+            }
+        }
+
+        // Funktion zum Anzeigen eines Hinweises
+        function zeigeHinweis() {
+            if (aktuelleAufgabeTyp === 'produktToPotenz') {
+                 hinweisTextElement.textContent = `Hinweis: Zähle, wie oft die Basis (${basis}) multipliziert wird. Das ist dein Exponent.`;
+            } else if (aktuelleAufgabeTyp === 'potenzToProdukt') {
+                 hinweisTextElement.textContent = `Hinweis: Die Basis (${basis}) wird ${exponent} Mal mit sich selbst multipliziert. Schreibe sie entsprechend oft mit Multiplikationszeichen auf.`;
+            }
+        }
+
+
+        // Event Listener, um die Antwort auch mit Enter zu überprüfen
+        antwortInputSingle.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && !antwortInputSingle.disabled) {
+                ueberpruefeAntwort();
+            }
+        });
+
+         antwortInputBasis.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && !antwortInputBasis.disabled) {
+                // Wenn Enter in der Basis gedrückt wird, springe zum Exponentenfeld, falls leer
+                if (antwortInputExponent.value.trim() === '') {
+                    antwortInputExponent.focus();
+                } else {
+                    ueberpruefeAntwort(); // Ansonsten überprüfen
+                }
+            }
+        });
+
+         antwortInputExponent.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && !antwortInputExponent.disabled) {
+                ueberpruefeAntwort(); // Überprüfen, wenn Enter im Exponenten gedrückt wird
+            }
+        });
+
+         // Event Listener für den Schwierigkeitsgrad-Wechsel
+         difficultySelect.addEventListener('change', neueAufgabe);
+
+
+        // Erste Aufgabe beim Laden der Seite generieren
+        neueAufgabe();
+
+    </script>
+</body>
+</html>

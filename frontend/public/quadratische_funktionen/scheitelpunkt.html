@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="de" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheitelpunkt-Trainer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .math-function {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.5em; /* Larger for functions */
+            letter-spacing: 1px;
+            line-height: 1.8;
+            word-break: break-all;
+        }
+        .math-function sup {
+            font-size: 0.7em; vertical-align: super; margin-left: 0.5px;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+        .dark ::-webkit-scrollbar-thumb { background: #4b5563; }
+
+        /* Focus states */
+        .input-field:focus-visible, .btn:focus-visible, .theme-switch input:focus-visible + .slider, #fullscreenBtn:focus-visible {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4); /* Indigo focus ring */
+        }
+        .dark .input-field:focus-visible, .dark .btn:focus-visible, .dark .theme-switch input:focus-visible + .slider, .dark #fullscreenBtn:focus-visible {
+             box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.4); /* Indigo focus ring for dark */
+        }
+
+        /* Control wrapper for dark mode and fullscreen */
+        .controls-wrapper {
+            position: fixed; top: 1.5rem; right: 1.5rem; z-index: 50; display: flex;
+            align-items: center; padding: 0.5rem; background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 9999px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); backdrop-filter: blur(5px);
+            gap: 0.75rem; /* Gap between toggle and fullscreen button */
+        }
+        .dark .controls-wrapper { background-color: rgba(31, 41, 55, 0.8); } /* gray-800 */
+
+        .theme-switch-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-switch { display: inline-block; height: 22px; position: relative; width: 40px; margin: 0 0.5rem; }
+        .theme-switch input { display:none; }
+        .slider { background-color: #e5e7eb; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; }
+        .dark .slider { background-color: #4b5563; } /* gray-600 */
+        .slider:before { background-color: #fff; bottom: 2px; content: ""; height: 18px; left: 2px; position: absolute; transition: .4s; width: 18px; }
+        .dark .slider:before { background-color: #e5e7eb; } /* gray-200 */
+        input:checked + .slider { background-color: #4f46e5; } /* indigo-600 */
+        .dark input:checked + .slider { background-color: #6366f1; } /* indigo-500 */
+        input:checked + .slider:before { transform: translateX(18px); }
+        .slider.round { border-radius: 22px; }
+        .slider.round:before { border-radius: 50%; }
+
+        #fullscreenBtn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem; /* Small padding for the icon button */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #fullscreenBtn:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        .dark #fullscreenBtn:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+
+        .streak-counter {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 50;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #4f46e5; /* indigo-600 */
+            border-radius: 0.5rem;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+        }
+        .dark .streak-counter {
+            background-color: rgba(31, 41, 55, 0.8); /* gray-800 */
+            color: #818cf8; /* indigo-400 */
+        }
+        .streak-counter svg { margin-right: 0.5rem; }
+    </style>
+    <script>
+        tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', "Segoe UI", 'Roboto', "Helvetica Neue", 'Arial', "Noto Sans", 'sans-serif', "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"],
+              },
+              colors: {
+                // Light theme
+                primary: { DEFAULT: '#4f46e5', hover: '#4338ca' }, // Indigo-600, Indigo-700
+                secondary: { DEFAULT: '#6b7280', hover: '#4b5563' }, // Gray-500, Gray-600
+                background: '#f3f4f6', // Gray-100
+                card: '#ffffff',
+                text_primary: '#111827', // Gray-900
+                text_secondary: '#374151', // Gray-700
+                text_muted: '#6b7280', // Gray-500
+                border_light: '#e5e7eb', // Gray-200
+                // Dark theme
+                dark_primary: { DEFAULT: '#6366f1', hover: '#4f46e5' }, // Indigo-500, Indigo-600
+                dark_secondary: { DEFAULT: '#9ca3af', hover: '#6b7280' }, // Gray-400, Gray-500
+                dark_background: '#111827', // Gray-900
+                dark_card: '#1f2937', // Gray-800
+                dark_text_primary: '#f3f4f6', // Gray-100
+                dark_text_secondary: '#d1d5db', // Gray-300
+                dark_text_muted: '#9ca3af', // Gray-400
+                dark_border_light: '#374151', // Gray-700
+              }
+            }
+          }
+        }
+      </script>
+</head>
+<body class="bg-background dark:bg-dark_background text-text_primary dark:text-dark_text_primary min-h-screen flex flex-col items-center justify-center p-4 selection:bg-primary selection:text-white dark:selection:bg-dark_primary">
+
+    <a href="index.html" class="back-link absolute top-6 left-6 text-primary dark:text-dark_primary hover:underline z-50">
+        ← Zurück zur Übersicht
+    </a>
+    <div class="controls-wrapper">
+        <div class="theme-switch-container">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text_muted dark:text-dark_text_muted">
+                <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <label class="theme-switch" for="darkModeToggle">
+                <input type="checkbox" id="darkModeToggle">
+                <span class="slider round"></span>
+            </label>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text_muted dark:text-dark_text_muted">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </div>
+        <button id="fullscreenBtn" title="Vollbildmodus umschalten">
+            <svg id="enterFullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text_muted dark:text-dark_text_muted">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+            <svg id="exitFullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text_muted dark:text-dark_text_muted hidden">
+                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+            </svg>
+        </button>
+    </div>
+
+    <div class="streak-counter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 17.5L10 20l-5-5 7.5-7.5L20 10Z"></path><path d="m18 12 2-2"></path><path d="m13.5 2.5 2-2"></path><path d="m2.5 13.5 2-2"></path><path d="M20 20h-5.5"></path><path d="M4 4l2.5 2.5"></path></svg>
+        <span id="streakCount">0</span>&nbsp;Streak
+    </div>
+
+    <main class="task-card w-full max-w-xl bg-card dark:bg-dark_card border border-border_light dark:border-dark_border_light rounded-xl shadow-xl p-6 md:p-10">
+        <h1 class="text-2xl md:text-3xl font-semibold text-center text-primary dark:text-dark_primary mb-8 md:mb-10">Scheitelpunkt-Trainer</h1>
+        
+        <div class="mb-8">
+            <label class="input-label text-md font-medium text-center text-text_secondary dark:text-dark_text_secondary mb-3">Schwierigkeitsstufe:</label>
+            <div class="flex flex-wrap justify-center gap-3">
+                <button id="levelBtn1" class="btn text-sm font-medium py-2 px-4 rounded-md bg-slate-200 dark:bg-slate-700 text-text_secondary dark:text-dark_text_secondary hover:bg-slate-300 dark:hover:bg-slate-600" onclick="selectDifficulty(1)">Leicht (aus Form ablesen)</button>
+                <button id="levelBtn2" class="btn text-sm font-medium py-2 px-4 rounded-md bg-slate-200 dark:bg-slate-700 text-text_secondary dark:text-dark_text_secondary hover:bg-slate-300 dark:hover:bg-slate-600" onclick="selectDifficulty(2)">Mittel (Formel anwenden)</button>
+                <button id="levelBtn3" class="btn text-sm font-medium py-2 px-4 rounded-md bg-slate-200 dark:bg-slate-700 text-text_secondary dark:text-dark_text_secondary hover:bg-slate-300 dark:hover:bg-slate-600" onclick="selectDifficulty(3)">Schwer (Umformen/Formel)</button>
+            </div>
+        </div>
+
+        <div class="bg-slate-100 dark:bg-gray-700/50 border border-border_light dark:border-dark_border_light rounded-lg p-5 md:p-6 mb-8 shadow-sm">
+            <h2 class="text-lg font-medium text-text_secondary dark:text-dark_text_secondary mb-3">Quadratische Funktion:</h2>
+            <p id="functionDisplay" class="text-xl md:text-2xl text-center font-mono py-4 bg-white dark:bg-slate-800 rounded-md math-function text-text_primary dark:text-dark_text_primary shadow-sm">f(x) = ...</p>
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-lg font-medium text-text_secondary dark:text-dark_text_secondary mb-4">Scheitelpunkt S (x | y):</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="xVertex" class="input-label text-sm font-normal text-text_muted dark:text-dark_text_muted mb-1.5">x-Koordinate:</label>
+                    <input type="number" step="any" id="xVertex" class="input-field text-base bg-slate-50 dark:bg-slate-700 border-slate-300 dark:border-dark_border_light text-text_primary dark:text-dark_text_primary placeholder-text_muted dark:placeholder-dark_text_muted rounded-md py-2.5 px-3.5 focus:border-primary dark:focus:border-dark_primary" placeholder="x Wert">
+                </div>
+                <div>
+                    <label for="yVertex" class="input-label text-sm font-normal text-text_muted dark:text-dark_text_muted mb-1.5">y-Koordinate:</label>
+                    <input type="number" step="any" id="yVertex" class="input-field text-base bg-slate-50 dark:bg-slate-700 border-slate-300 dark:border-dark_border_light text-text_primary dark:text-dark_text_primary placeholder-text_muted dark:placeholder-dark_text_muted rounded-md py-2.5 px-3.5 focus:border-primary dark:focus:border-dark_primary" placeholder="y Wert">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-center gap-4 mt-10">
+            <button onclick="checkAnswer()" class="btn text-base font-semibold py-3 px-6 rounded-lg bg-primary hover:bg-primary-hover text-white w-full sm:w-auto shadow-md hover:shadow-lg">Antwort prüfen</button>
+            <button onclick="generateNewTask()" class="btn text-base font-medium py-3 px-6 rounded-lg bg-slate-200 dark:bg-slate-600 text-text_secondary dark:text-dark_text_secondary hover:bg-slate-300 dark:hover:bg-slate-500 w-full sm:w-auto">Neue Aufgabe</button>
+        </div>
+         <button id="hintButton" onclick="showHint()" class="btn text-sm font-medium py-2 px-4 rounded-md bg-transparent border border-primary dark:border-dark_primary text-primary dark:text-dark_primary hover:bg-primary/10 dark:hover:bg-dark_primary/20 w-full mt-4">Hinweis anzeigen</button>
+
+        <div id="feedback" class="feedback hidden mt-6 p-4 rounded-lg text-sm"></div>
+    </main>
+
+    <script>
+        let currentFunctionData = {};
+        let currentDifficulty = 1;
+        let streak = 0;
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const enterFullscreenIcon = document.getElementById('enterFullscreenIcon');
+        const exitFullscreenIcon = document.getElementById('exitFullscreenIcon');
+        const htmlElement = document.documentElement;
+
+        // Dark Mode Logic
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+            darkModeToggle.checked = true;
+        } else {
+            htmlElement.classList.remove('dark');
+            darkModeToggle.checked = false;
+        }
+        darkModeToggle.addEventListener('change', () => {
+            htmlElement.classList.toggle('dark');
+            localStorage.setItem('theme', htmlElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // Fullscreen Logic
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    // console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                    // Fallback for browsers that might not fully support it or if user denies
+                    alert(`Vollbildmodus konnte nicht aktiviert werden: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                enterFullscreenIcon.classList.add('hidden');
+                exitFullscreenIcon.classList.remove('hidden');
+            } else {
+                enterFullscreenIcon.classList.remove('hidden');
+                exitFullscreenIcon.classList.add('hidden');
+            }
+        });
+
+
+        function updateStreakCounter() {
+            document.getElementById('streakCount').textContent = streak;
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        function formatNum(n) {
+            if (n < 0) return `- ${Math.abs(n)}`;
+            return `+ ${n}`;
+        }
+        function formatNumLead(n) {
+            if (n === 1) return "";
+            if (n === -1) return "-";
+            return n;
+        }
+
+        function generateFunction() {
+            let funcString = "f(x) = ";
+            let x_s, y_s;
+            let hint = "";
+
+            if (currentDifficulty === 1) { 
+                const a = getRandomInt(1, 3) * (Math.random() < 0.5 ? 1 : -1); 
+                const h = getRandomInt(-5, 5);
+                const k = getRandomInt(-5, 5);
+                x_s = h;
+                y_s = k;
+
+                funcString += `${formatNumLead(a)}(x ${formatNum(-h)})<sup>2</sup> ${formatNum(k)}`;
+                funcString = funcString.replace(/\+ -/g, '- ').replace(/\(x - 0\)/g, 'x').replace(/\(x \+ 0\)/g, 'x');
+                if (a === 1 && (h !== 0)) funcString = funcString.replace("1(x", "(x");
+                if (a === -1 && (h !== 0)) funcString = funcString.replace("-1(x", "-(x");
+                if (a === 1 && h === 0) funcString = funcString.replace("1x<sup>2</sup>", "x<sup>2</sup>");
+                if (a === -1 && h === 0) funcString = funcString.replace("-1x<sup>2</sup>", "-x<sup>2</sup>");
+                hint = `Bei der Scheitelpunktform f(x) = a(x-d)<sup>2</sup> + e ist der Scheitelpunkt S(d|e). Achte auf das Vorzeichen bei d!`;
+            } else if (currentDifficulty === 2) { 
+                const a = getRandomInt(1, 3) * (Math.random() < 0.5 ? 1 : -1);
+                x_s = getRandomInt(-4, 4); 
+                const b = -2 * a * x_s; 
+                const c = getRandomInt(-10, 10);
+                y_s = a * x_s * x_s + b * x_s + c;
+
+                funcString += `${formatNumLead(a)}x<sup>2</sup> `;
+                if (b !== 0) funcString += `${formatNum(b)}x `;
+                if (c !== 0 || (b===0 && a===0)) funcString += `${formatNum(c)}`; 
+                funcString = funcString.replace(/\+ -/g, '- ').trim();
+                if (a === 1) funcString = funcString.replace("1x<sup>2</sup>", "x<sup>2</sup>");
+                if (a === -1) funcString = funcString.replace("-1x<sup>2</sup>", "-x<sup>2</sup>");
+                if (funcString.endsWith(" + 0")) funcString = funcString.slice(0, -4);
+                if (funcString.endsWith(" - 0")) funcString = funcString.slice(0, -4);
+                hint = `Für f(x) = ax<sup>2</sup> + bx + c ist die x-Koordinate des Scheitelpunkts x<sub>s</sub> = -b / (2a). Setze x<sub>s</sub> in f(x) ein, um y<sub>s</sub> zu erhalten.`;
+            } else { 
+                const a = getRandomInt(1, 4) * (Math.random() < 0.5 ? 1 : -1);
+                const b = getRandomInt(-8, 8);
+                const c = getRandomInt(-10, 10);
+                x_s = -b / (2 * a);
+                y_s = a * x_s * x_s + b * x_s + c;
+                x_s = Math.round(x_s * 100) / 100;
+                y_s = Math.round(y_s * 100) / 100;
+
+                funcString += `${formatNumLead(a)}x<sup>2</sup> `;
+                if (b !== 0) funcString += `${formatNum(b)}x `;
+                if (c !== 0 || (b===0 && a===0)) funcString += `${formatNum(c)}`;
+                funcString = funcString.replace(/\+ -/g, '- ').trim();
+                if (a === 1) funcString = funcString.replace("1x<sup>2</sup>", "x<sup>2</sup>");
+                if (a === -1) funcString = funcString.replace("-1x<sup>2</sup>", "-x<sup>2</sup>");
+                if (funcString.endsWith(" + 0")) funcString = funcString.slice(0, -4);
+                if (funcString.endsWith(" - 0")) funcString = funcString.slice(0, -4);
+                hint = `Nutze x<sub>s</sub> = -b / (2a) und y<sub>s</sub> = f(x<sub>s</sub>). Manchmal ist auch die quadratische Ergänzung hilfreich, um die Scheitelpunktform zu finden.`;
+            }
+            
+            if (funcString === "f(x) = ") funcString = "f(x) = 0"; 
+            document.getElementById('functionDisplay').innerHTML = funcString;
+            currentFunctionData = { x_s, y_s, hint };
+            console.log("Generated function:", funcString, "Vertex:", currentFunctionData);
+        }
+
+        function showHint() {
+            const feedbackEl = document.getElementById('feedback');
+            if (currentFunctionData.hint) {
+                feedbackEl.innerHTML = `<strong class="text-primary dark:text-dark_primary">Hinweis:</strong> ${currentFunctionData.hint}`;
+                feedbackEl.className = 'feedback bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300';
+                feedbackEl.classList.remove('hidden');
+            }
+        }
+        
+        function checkAnswer() {
+            const userXText = document.getElementById('xVertex').value;
+            const userYText = document.getElementById('yVertex').value;
+            const feedbackEl = document.getElementById('feedback');
+
+            if (userXText === "" || userYText === "") {
+                feedbackEl.innerHTML = "Bitte gib sowohl die x- als auch die y-Koordinate des Scheitelpunkts ein.";
+                feedbackEl.className = 'feedback bg-yellow-50 dark:bg-yellow-900/30 border-yellow-400 dark:border-yellow-600 text-yellow-700 dark:text-yellow-300';
+                feedbackEl.classList.remove('hidden');
+                return;
+            }
+
+            const userX = parseFloat(userXText);
+            const userY = parseFloat(userYText);
+
+            if (isNaN(userX) || isNaN(userY)) {
+                feedbackEl.innerHTML = "Die Koordinaten müssen Zahlen sein.";
+                feedbackEl.className = 'feedback bg-red-100 dark:bg-red-900/30 border-red-400 dark:border-red-600 text-red-700 dark:text-red-300';
+                feedbackEl.classList.remove('hidden');
+                return;
+            }
+
+            const tolerance = 0.01; 
+            const isXCorrect = Math.abs(userX - currentFunctionData.x_s) < tolerance;
+            const isYCorrect = Math.abs(userY - currentFunctionData.y_s) < tolerance;
+
+            if (isXCorrect && isYCorrect) {
+                streak++;
+                feedbackEl.innerHTML = `🎉 Korrekt! Der Scheitelpunkt ist S(${currentFunctionData.x_s} | ${currentFunctionData.y_s}). Super gemacht!`;
+                feedbackEl.className = 'feedback bg-green-50 dark:bg-green-900/30 border-green-400 dark:border-green-600 text-green-700 dark:text-green-300';
+            } else {
+                streak = 0;
+                let errorMsg = `Leider nicht ganz richtig. `;
+                if(!isXCorrect && !isYCorrect) errorMsg += `Sowohl x- als auch y-Koordinate sind nicht korrekt.`;
+                else if (!isXCorrect) errorMsg += `Die x-Koordinate ist nicht korrekt.`;
+                else errorMsg += `Die y-Koordinate ist nicht korrekt.`;
+                
+                errorMsg += ` Der richtige Scheitelpunkt ist S(${currentFunctionData.x_s} | ${currentFunctionData.y_s}).`;
+                if (currentFunctionData.hint) {
+                    errorMsg += `<br><small class="text-text_muted dark:text-dark_text_muted">Tipp: ${currentFunctionData.hint}</small>`;
+                }
+                feedbackEl.innerHTML = errorMsg;
+                feedbackEl.className = 'feedback bg-red-100 dark:bg-red-900/30 border-red-400 dark:border-red-600 text-red-700 dark:text-red-300';
+            }
+            updateStreakCounter();
+            feedbackEl.classList.remove('hidden');
+        }
+
+        function generateNewTask() {
+            generateFunction();
+            document.getElementById('xVertex').value = '';
+            document.getElementById('yVertex').value = '';
+            document.getElementById('feedback').classList.add('hidden');
+            document.getElementById('xVertex').focus();
+        }
+
+        function selectDifficulty(level) {
+            currentDifficulty = level;
+            document.querySelectorAll('.difficulty-btn-group button').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white', 'dark:bg-dark_primary', 'dark:text-white');
+                btn.classList.add('bg-slate-200', 'dark:bg-slate-700', 'text-text_secondary', 'dark:text-dark_text_secondary', 'hover:bg-slate-300', 'dark:hover:bg-slate-600');
+            });
+            const activeButton = document.getElementById('levelBtn' + level);
+            activeButton.classList.add('bg-primary', 'text-white', 'dark:bg-dark_primary', 'dark:text-white');
+            activeButton.classList.remove('bg-slate-200', 'dark:bg-slate-700', 'text-text_secondary', 'dark:text-dark_text_secondary');
+            generateNewTask();
+        }
+
+        window.onload = () => {
+            selectDifficulty(1); 
+            updateStreakCounter();
+        };
+    </script>
+</body>
+</html>

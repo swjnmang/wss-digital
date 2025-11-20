@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aufgabengenerator: Scheitelpunkt berechnen/ablesen</title>
+    <style>
+        /* Modernes & ansprechendes Design */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        #task-generator-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 25px 30px;
+            width: 100%;
+            max-width: 750px; 
+            margin: 20px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        
+        #task-generator-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        #difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .difficulty-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+        .difficulty-button.active {
+            background-color: #0073aa;
+            color: white;
+            border-color: #0073aa;
+            font-weight: bold;
+        }
+        
+        #task-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #495057;
+        }
+        .equation-display {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #005a87;
+            font-family: 'Courier New', Courier, monospace;
+            display: block;
+            margin-top: 8px;
+            word-break: break-word;
+        }
+        #solution-input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .coord-input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            width: 80px;
+            text-align: center;
+            font-family: inherit;
+        }
+        #feedback-output {
+            min-height: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .correct { color: #28a745; }
+        .incorrect { color: #dc3545; }
+        #solution-output {
+            background-color: #e9f5e9;
+            border: 1px solid #c8e6c9;
+            color: #2e7d32;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.8;
+            word-break: break-word;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .generator-button {
+            background: linear-gradient(145deg, #0078b3, #005f8e);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .generator-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .generator-button:disabled {
+            background: linear-gradient(145deg, #c0c0c0, #a9a9a9);
+            cursor: not-allowed;
+            transform: none;
+        }
+        .check-button { background: linear-gradient(145deg, #28a745, #218838); }
+        .secondary-button { background: linear-gradient(145deg, #6c757d, #5a6268); }
+        .video-button { background: linear-gradient(145deg, #ff0000, #cc0000); } 
+
+        /* Responsive Anpassungen */
+        @media (max-width: 640px) {
+            #task-generator-container {
+                padding: 15px;
+                margin: 10px;
+                max-width: 100%;
+            }
+            #task-generator-container h2 {
+                font-size: 1.3em;
+            }
+            .difficulty-button, .generator-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            #solution-input-container {
+                font-size: 1.2em;
+            }
+            .coord-input {
+                width: 70px;
+            }
+        }
+        @media (max-width: 480px) {
+             #solution-input-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="task-generator-container">
+    <a href="index.html" style="display: block; margin-bottom: 15px; color: #0073aa; text-decoration: none; font-weight: 500;">
+        ← Zurück zur Übersicht
+    </a>
+    <h2>Scheitelpunkt berechnen/ablesen</h2>
+
+    <div id="difficulty-selector">
+        <button class="difficulty-button" id="diff-easy" onclick="setDifficulty('easy')">Leicht</button>
+        <button class="difficulty-button" id="diff-medium" onclick="setDifficulty('medium')">Mittel</button>
+        <button class="difficulty-button" id="diff-hard" onclick="setDifficulty('hard')">Schwer</button>
+    </div>
+
+    <div id="task-output">Klicke auf "Neue Aufgabe" um zu starten.</div>
+
+    <div id="solution-input-container">
+        S( <input type="text" id="xs-input" class="coord-input" placeholder="xₛ"> | <input type="text" id="ys-input" class="coord-input" placeholder="yₛ"> )
+    </div>
+    
+    <div id="feedback-output"></div>
+
+    <div class="button-container">
+        <button class="generator-button" onclick="generateNewTask()">Neue Aufgabe</button>
+        <button class="generator-button check-button" id="check-btn" onclick="checkSolution()">Lösung prüfen</button>
+        <button class="generator-button secondary-button" id="show-answer-btn" onclick="showAnswer()">Lösung anzeigen</button>
+        <button class="generator-button video-button" onclick="openVideo()">Erklärvideo</button>
+    </div>
+
+    <div id="solution-output" style="display: none;"></div>
+</div>
+
+<script>
+    let correctXs, correctYs;
+    let solutionSteps = "";
+    let currentTaskType = ""; // 'general_form' or 'vertex_form'
+    let currentDifficulty = "easy";
+    const VIDEO_URL = "https://www.youtube.com/watch?v=VgsmYGAI-_8&list=PLI8kX0XEfSugainT6dHh9wGTGikzJ76d2&index=6";
+
+    function setDifficulty(level) {
+        currentDifficulty = level;
+        document.querySelectorAll('.difficulty-button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`diff-${level}`).classList.add('active');
+        generateNewTask();
+    }
+    
+    function formatNumber(num) {
+        return Math.round(num * 100) / 100;
+    }
+
+    function generateNewTask() {
+        // Reset UI
+        document.getElementById('feedback-output').textContent = '';
+        document.getElementById('xs-input').value = '';
+        document.getElementById('ys-input').value = '';
+        document.getElementById('solution-output').style.display = 'none';
+        document.getElementById('show-answer-btn').disabled = true;
+
+        const randomInt = (max, min = 0) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const randomChoice = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        
+        let a, b, c; // For general form: y = ax² + bx + c
+        let xs, ys;   // For vertex form: y = a(x - xs)² + ys
+        
+        currentTaskType = Math.random() < 0.5 ? 'general_form' : 'vertex_form';
+
+        if (currentTaskType === 'general_form') {
+            switch (currentDifficulty) {
+                case 'medium':
+                    a = randomChoice([-2, -1.5, -0.5, 0.5, 1.5, 2]);
+                    b = randomInt(8, -8) / 2;
+                    c = randomInt(10, -10) / 2;
+                    break;
+                case 'hard':
+                    a = randomChoice([-0.75, -0.25, 0.25, 0.75, randomInt(3, -3)]);
+                    b = randomInt(12, -12) / 3;
+                    c = randomInt(15, -15) / 4;
+                    break;
+                case 'easy':
+                default:
+                    a = randomChoice([1, -1, 2, -2]);
+                    b = randomInt(6, -6);
+                    c = randomInt(10, -10);
+                    break;
+            }
+            if (a === 0) a = 1; // Ensure a is not zero
+
+            a = formatNumber(a); b = formatNumber(b); c = formatNumber(c);
+
+            // Calculate vertex from general form
+            correctXs = formatNumber(-b / (2 * a));
+            correctYs = formatNumber(a * correctXs * correctXs + b * correctXs + c);
+
+            let b_str = (b === 0) ? "" : (b > 0) ? ` + ${b}x` : ` - ${Math.abs(b)}x`;
+            let c_str = (c === 0) ? "" : (c > 0) ? ` + ${c}` : ` - ${Math.abs(c)}`;
+            const equationString = `y = ${a}x²${b_str}${c_str}`;
+
+            document.getElementById('task-output').innerHTML = `
+                Berechne den Scheitelpunkt der Parabel:<br>
+                <div class="equation-display">${equationString}</div>
+            `;
+            solutionSteps = `
+                <strong>1. x-Koordinate des Scheitelpunkts (x<sub>s</sub>) berechnen:</strong><br>
+                Formel: x<sub>s</sub> = -b / (2a)<br>
+                x<sub>s</sub> = -(${b}) / (2 * ${a})<br>
+                x<sub>s</sub> = ${correctXs}<br><br>
+                <strong>2. y-Koordinate des Scheitelpunkts (y<sub>s</sub>) berechnen:</strong><br>
+                Setze x<sub>s</sub> in die Funktionsgleichung ein.<br>
+                y<sub>s</sub> = ${a}(${correctXs})² + ${b}(${correctXs}) + ${c}<br>
+                y<sub>s</sub> = ${correctYs}<br><br>
+                <strong>Scheitelpunkt: S(${correctXs}|${correctYs})</strong>
+            `;
+
+        } else { // currentTaskType === 'vertex_form'
+            switch (currentDifficulty) {
+                case 'medium':
+                    a = randomChoice([-2, -1.5, -0.5, 0.5, 1.5, 2]);
+                    xs = randomInt(8, -8) / 2;
+                    ys = randomInt(8, -8) / 2;
+                    break;
+                case 'hard':
+                    a = randomChoice([-0.75, -0.25, 0.25, 0.75, randomInt(3, -3)]);
+                    xs = randomInt(16, -16) / 4;
+                    ys = randomInt(16, -16) / 4;
+                    break;
+                case 'easy':
+                default:
+                    a = randomChoice([1, -1, 2, -2]);
+                    xs = randomInt(5, -5);
+                    ys = randomInt(5, -5);
+                    break;
+            }
+            if (a === 0) a = 1;
+
+            let correctA = formatNumber(a);
+            correctXs = formatNumber(xs);
+            correctYs = formatNumber(ys);
+
+            let xs_str = (correctXs >= 0) ? ` - ${correctXs}` : ` + ${Math.abs(correctXs)}`;
+            let ys_str = (correctYs >= 0) ? ` + ${correctYs}` : ` - ${Math.abs(correctYs)}`;
+            const equationString = `y = ${correctA}(x${xs_str})²${ys_str}`;
+
+            document.getElementById('task-output').innerHTML = `
+                Lese den Scheitelpunkt der Parabel ab:<br>
+                <div class="equation-display">${equationString}</div>
+            `;
+            solutionSteps = `
+                <strong>1. x-Koordinate des Scheitelpunkts (x<sub>s</sub>) ablesen:</strong><br>
+                In der Form y = a(x - x<sub>s</sub>)² + y<sub>s</sub> wird das Vorzeichen von x<sub>s</sub> umgedreht.<br>
+                Aus der Gleichung liest man ${xs_str} ab, also ist x<sub>s</sub> = ${correctXs}.<br><br>
+                <strong>2. y-Koordinate des Scheitelpunkts (y<sub>s</sub>) ablesen:</strong><br>
+                Der Wert y<sub>s</sub> wird direkt abgelesen.<br>
+                Aus der Gleichung liest man ${ys_str} ab, also ist y<sub>s</sub> = ${correctYs}.<br><br>
+                <strong>Scheitelpunkt: S(${correctXs}|${correctYs})</strong>
+            `;
+        }
+    }
+
+    function checkSolution() {
+        const feedback = document.getElementById('feedback-output');
+        const showAnswerBtn = document.getElementById('show-answer-btn');
+        
+        const xsUserInput = document.getElementById('xs-input').value.replace(',', '.');
+        const ysUserInput = document.getElementById('ys-input').value.replace(',', '.');
+
+        if (xsUserInput === '' || ysUserInput === '') {
+            feedback.textContent = 'Bitte fülle beide Felder (xₛ und yₛ) aus.';
+            feedback.className = 'incorrect';
+            return;
+        }
+
+        const xsUser = parseFloat(xsUserInput);
+        const ysUser = parseFloat(ysUserInput);
+        
+        const isXsCorrect = Math.abs(xsUser - correctXs) < 0.01;
+        const isYsCorrect = Math.abs(ysUser - correctYs) < 0.01;
+
+        if (isXsCorrect && isYsCorrect) {
+            feedback.textContent = 'Richtig! Ausgezeichnet!';
+            feedback.className = 'correct';
+            showAnswerBtn.disabled = true;
+        } else {
+            feedback.textContent = 'Leider nicht ganz richtig. Überprüfe die Koordinaten des Scheitelpunkts!';
+            feedback.className = 'incorrect';
+            showAnswerBtn.disabled = false;
+        }
+    }
+
+    function showAnswer() {
+        const solutionDiv = document.getElementById('solution-output');
+        solutionDiv.innerHTML = solutionSteps;
+        solutionDiv.style.display = 'block';
+        document.getElementById('show-answer-btn').disabled = true;
+    }
+    
+    // Function to open the explanation video
+    function openVideo() {
+        window.open(VIDEO_URL, "_blank");
+    }
+
+    window.onload = function() {
+        setDifficulty('easy');
+    };
+
+</script>
+
+</body>
+</html>

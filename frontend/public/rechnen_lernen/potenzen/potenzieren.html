@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potenzen potenzieren</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']], // Use $...$ for inline math
+                displayMath: [['$$', '$$'], ['\\[', '\\]']] // Use $$...$$ for display math
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content.center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+        .power-of-power {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 5px;
+            font-size: 2rem; /* Base font size for the whole expression */
+            line-height: 1.2;
+        }
+        .power-of-power .inner-power {
+            display: inline-block;
+        }
+        .power-of-power .inner-power sup {
+            font-size: 0.6em; /* Inner exponent size */
+            vertical-align: super;
+        }
+         .power-of-power .outer-exponent {
+             font-size: 0.7em; /* Outer exponent size relative to the base (inner power) */
+             vertical-align: super;
+         }
+        .operator {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 10px;
+            font-size: 2rem;
+        }
+        /* --- Answer Input Styling --- */
+        .answer-input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .answer-power-input-flex { /* Container for the base and exponent inputs */
+            display: inline-flex; /* Keep base and exponent together */
+            align-items: flex-start; /* Align items to the top */
+            margin: 0 auto; /* Center the input group */
+        }
+
+        .answer-power-input-flex input { /* General style for inputs in this group */
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            margin: 0; /* Remove default margin */
+        }
+
+        .answer-power-input-flex #answerBase {
+            width: 80px; /* Width for base input */
+            font-size: 1.2rem; /* Font size for the base */
+            /* No margin-right needed with flexbox alignment */
+        }
+
+        .answer-power-input-flex #answerExponent {
+            width: 50px; /* Smaller width for exponent input */
+            font-size: 0.9rem; /* Smaller font for the exponent */
+            padding: 4px; /* Smaller padding for the exponent */
+            align-self: flex-start; /* Align to the top within the flex container */
+            margin-left: -10px; /* Pull the exponent input closer to the base */
+            margin-top: -0.5em; /* Adjust vertical position to simulate superscript */
+        }
+
+         /* Styling for the special 'answer is 1' input */
+         .answer-input-group #answerOne {
+             width: 80px; /* Match base input width */
+             font-size: 1.2rem;
+             padding: 8px;
+             border: 1px solid #ccc;
+             border-radius: 5px;
+             text-align: center;
+             margin: 0 auto; /* Center this input when visible */
+         }
+
+         /* Hide one of the input groups based on context */
+         .answer-power-input-flex.hidden,
+         #answerOne.hidden {
+             display: none;
+         }
+
+
+         /* --- End Answer Input Styling --- */
+
+        .icon {
+            margin-right: 5px;
+        }
+        #problem {
+            font-size: 2rem; /* Increased font size for better visibility */
+            text-align: center;
+            margin-bottom: 20px;
+             min-height: 2.5em; /* Ensure space */
+             display: flex;
+             align-items: center;
+             justify-content: center;
+        }
+
+        /* Difficulty Button Styling */
+        .difficulty-buttons button {
+            margin: 0 5px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            border: none;
+        }
+
+        /* Default inactive state */
+         .difficulty-buttons button.inactive {
+             background-color: #e5e7eb; /* Gray 200 */
+             color: #4b5563; /* Gray 600 */
+         }
+
+        /* Active states with specific colors */
+        .difficulty-buttons #easyBtn.active {
+            background-color: #22c55e; /* Green 500 */
+            color: white;
+        }
+        /* Removed mediumBtn active style */
+        .difficulty-buttons #hardBtn.active {
+            background-color: #ef4444; /* Red 500 */
+            color: white;
+        }
+
+         /* Hover states for inactive buttons */
+         .difficulty-buttons button.inactive:hover {
+             background-color: #d1d5db; /* Gray 300 */
+         }
+
+         /* Rules Explanation Area */
+         #rulesExplanation {
+             margin-top: 20px;
+             padding: 15px;
+             border: 1px solid #ccc;
+             border-radius: 8px;
+             background-color: #f9f9f9;
+             text-align: left;
+             white-space: pre-wrap; /* Preserve line breaks */
+             word-wrap: break-word; /* Break long words */
+             font-size: 1rem;
+         }
+
+         #rulesExplanation h3 {
+             font-weight: bold;
+             margin-bottom: 10px;
+             font-size: 1.1rem;
+         }
+
+         #rulesExplanation p {
+             margin-bottom: 8px;
+         }
+
+         /* Style for rendered math from MathJax */
+         .MathJax {
+             font-size: 1.1em; /* Slightly larger font for formulas */
+         }
+
+         .hidden {
+             display: none;
+         }
+
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="container">
+        <a href="index.html" class="text-blue-600 hover:underline mb-4 inline-block">
+            &larr; Zurück zur Potenz-Übersicht
+        </a>
+        <h1 class="text-2xl font-bold mb-6 text-center">Potenzen potenzieren</h1>
+
+        <div class="mb-6 text-center">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Schwierigkeit:</label>
+            <div class="difficulty-buttons">
+                <button id="easyBtn" class="active">Einfach</button>
+                <button id="hardBtn" class="inactive">Schwer</button>
+            </div>
+        </div>
+
+        <div class="mb-6 text-center">
+            <button id="generateBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                <i class="fas fa-sync-alt icon"></i> Neue Aufgabe
+            </button>
+        </div>
+
+        <div id="problem">
+            </div>
+
+        <div class="text-center mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Deine Antwort:</label>
+            <div class="answer-input-group">
+                 <div id="regularAnswerInputs" class="answer-power-input-flex">
+                     <input type="text" id="answerBase" placeholder="Basis">
+                     <input type="number" id="answerExponent" placeholder="Exponent">
+                 </div>
+                 <input type="number" id="answerOne" placeholder="Antwort" class="hidden">
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button id="checkBtn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Überprüfen</button>
+             <button id="rulesBtn" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-4">
+                 <i class="fas fa-info-circle icon"></i> Regeln
+            </button>
+        </div>
+
+        <div id="feedback" class="mt-6 text-center text-xl font-semibold">
+            </div>
+
+        <div id="progressDisplay" class="mt-4 text-center text-gray-700">
+            Punkte: 0.0
+        </div>
+
+        <div id="rulesExplanation" class="hidden">
+            <h3>Regel für Potenzen potenzieren:</h3>
+            <p>Wenn eine Potenz potenziert wird, multipliziert man die Exponenten.</p>
+            <p>Formel: $(a^m)^n = a^{m \times n}$</p>
+            <p>Beispiel: $(3^2)^3 = 3^{2 \times 3} = 3^6$</p>
+             <br>
+            <p>Sonderfall: Jede Zahl (außer 0) potenziert mit 0 ergibt 1.</p>
+            <p>Formel: $a^0 = 1$ (für $a \neq 0$)</p>
+             <br>
+             <p>Diese Regeln gelten für numerische und variable Basen sowie für positive und negative Exponenten.</p>
+        </div>
+
+    </div>
+
+    <script>
+        const easyBtn = document.getElementById('easyBtn');
+        // const mediumBtn = document.getElementById('mediumBtn'); // Removed
+        const hardBtn = document.getElementById('hardBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const problemDiv = document.getElementById('problem');
+        const regularAnswerInputsDiv = document.getElementById('regularAnswerInputs'); // New reference
+        const answerBaseInput = document.getElementById('answerBase');
+        const answerExponentInput = document.getElementById('answerExponent');
+        const answerOneInput = document.getElementById('answerOne'); // New reference for the '1' input
+        const checkBtn = document.getElementById('checkBtn');
+        const rulesBtn = document.getElementById('rulesBtn');
+        const feedbackDiv = document.getElementById('feedback');
+        const progressDisplay = document.getElementById('progressDisplay');
+        const rulesExplanationDiv = document.getElementById('rulesExplanation');
+
+        let currentProblem = {}; // Stores the correct base and exponent
+        let points = 0;
+        let currentDifficulty = 'easy'; // Default difficulty
+
+        // Funktion zur Aktualisierung der Fortschrittsanzeige
+        function updateProgress() {
+            progressDisplay.textContent = `Punkte: ${points.toFixed(1)}`;
+        }
+
+        // Funktion zur Anzeige einer Potenz (Basis^Exponent) - Angepasst für $(a^m)^n$ Darstellung
+        function displayPowerOfPower(base, innerExponent, outerExponent) {
+             let baseDisplay = base;
+             if (typeof base === 'number' && base < 0) {
+                 baseDisplay = `(${base})`; // Klammern um negative Basen
+             } else if (typeof base === 'string') {
+                 baseDisplay = base; // Variable Basen ohne Klammern (üblich)
+             } else {
+                 baseDisplay = base; // Positive numerische Basen
+             }
+
+             return `<span class="power-of-power">(${baseDisplay}<sup>${innerExponent}</sup>)<sup>${outerExponent}</sup></span>`;
+        }
+
+
+        // Funktion zur Generierung einer Aufgabe basierend auf der Schwierigkeit
+        function generateProblem() {
+            let base;
+            let innerExponent;
+            let outerExponent;
+            let isVariableBase = false;
+
+            // Set parameters based on difficulty
+            if (currentDifficulty === 'easy') {
+                base = Math.floor(Math.random() * 3) + 2; // Numerische Basis zwischen 2 und 4
+                innerExponent = Math.floor(Math.random() * 2) + 2; // Exponent zwischen 2 und 3
+                outerExponent = Math.floor(Math.random()) + 2; // Exponent ist 2
+                isVariableBase = false;
+            } else if (currentDifficulty === 'hard') {
+                // Zufällig entscheiden, ob numerische oder variable Basis
+                if (Math.random() < 0.5) {
+                     const variables = ['x', 'y', 'z'];
+                     base = variables[Math.floor(Math.random() * variables.length)]; // Variable Basis
+                     isVariableBase = true;
+                } else {
+                     base = Math.floor(Math.random() * 5) + 2; // Numerische Basis zwischen 2 und 6
+                     if (Math.random() < 0.3) base = -base; // 30% Chance für negative Basis
+                     isVariableBase = false;
+                }
+
+                innerExponent = Math.floor(Math.random() * 10) - 5; // Exponent zwischen -5 und 5
+                outerExponent = Math.floor(Math.random() * 8) - 4; // Exponent zwischen -4 und 4
+                 // Avoid zero exponents in both positions simultaneously if possible, or make it simple
+                 if (innerExponent === 0 && outerExponent === 0) {
+                     if (Math.random() < 0.5) innerExponent = 1; else outerExponent = 1;
+                 }
+            }
+
+            // Calculate the correct resulting exponent
+            const correctExponent = innerExponent * outerExponent;
+
+            currentProblem = { base: base, exponent: correctExponent, isVariable: isVariableBase };
+            problemDiv.innerHTML = displayPowerOfPower(base, innerExponent, outerExponent) + ' =';
+
+            // Dynamische Anpassung des Input-Typs für die Basis
+            if (isVariableBase) {
+                answerBaseInput.type = 'text';
+                answerBaseInput.placeholder = 'Variable (z.B. x)';
+            } else {
+                answerBaseInput.type = 'number';
+                answerBaseInput.placeholder = 'Basis';
+            }
+
+            // Show/hide input fields based on whether the correct exponent is 0
+            if (correctExponent === 0) {
+                 // For exponent 0, show only the 'answerOne' input
+                 regularAnswerInputsDiv.classList.add('hidden');
+                 answerOneInput.classList.remove('hidden');
+                 answerOneInput.value = ''; // Clear the input
+            } else {
+                 // For non-zero exponent, show regular base and exponent inputs
+                 regularAnswerInputsDiv.classList.remove('hidden');
+                 answerOneInput.classList.add('hidden');
+                 answerBaseInput.value = ''; // Clear inputs
+                 answerExponentInput.value = '';
+            }
+
+
+            feedbackDiv.textContent = '';
+            feedbackDiv.className = 'mt-6 text-center text-xl font-semibold'; // Reset class
+
+            // Hide rules explanation when a new problem is generated
+            rulesExplanationDiv.classList.add('hidden');
+        }
+
+        // Funktion zur Überprüfung der Antwort
+        function checkAnswer() {
+            let isCorrect = false;
+
+            if (currentProblem.exponent === 0) {
+                 // Check the 'answerOne' input
+                 const studentAnswer = parseInt(answerOneInput.value);
+                 if (!isNaN(studentAnswer) && studentAnswer === 1) {
+                     isCorrect = true;
+                 }
+            } else {
+                 // Check the regular base and exponent inputs
+                 let studentBase;
+                 const studentExponent = parseInt(answerExponentInput.value);
+
+                 // Lese die Basis basierend auf dem Input-Typ
+                 if (currentProblem.isVariable) {
+                      studentBase = answerBaseInput.value.trim(); // Lese als String
+                 } else {
+                      studentBase = parseInt(answerBaseInput.value); // Lese als Zahl
+                 }
+
+                 // Grundlegende Eingabevalidierung
+                 if (currentProblem.isVariable) {
+                      if (studentBase === '' || isNaN(studentExponent)) {
+                          feedbackDiv.textContent = 'Bitte gib eine Variable für die Basis und eine Zahl für den Exponenten ein.';
+                          feedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-red-500';
+                          return;
+                      }
+                      // Für variable Basen, prüfe ob die eingegebene Variable gültig ist (x, y, z)
+                      const validVariables = ['x', 'y', 'z'];
+                      if (!validVariables.includes(studentBase)) {
+                           feedbackDiv.textContent = 'Bitte gib eine gültige Variable (x, y oder z) für die Basis ein.';
+                           feedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-red-500';
+                           return;
+                      }
+
+                 } else { // Numerische Basis
+                      if (isNaN(studentBase) || isNaN(studentExponent)) {
+                          feedbackDiv.textContent = 'Bitte gib sowohl Basis als auch Exponent als Zahlen ein.';
+                          feedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-red-500';
+                          return;
+                      }
+                 }
+
+                 // Überprüfung der Basis und des Exponenten
+                 isCorrect = studentBase === currentProblem.base && studentExponent === currentProblem.exponent;
+            }
+
+
+            if (isCorrect) {
+                feedbackDiv.textContent = 'Richtig!';
+                feedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-green-500';
+                // Punkte hinzufügen
+                if (currentDifficulty === 'easy') {
+                    points += 1;
+                } else if (currentDifficulty === 'hard') { // Only Easy and Hard now
+                    points += 3;
+                }
+            } else {
+                feedbackDiv.textContent = 'Leider nicht korrekt, versuche es erneut.';
+                feedbackDiv.className = 'mt-6 text-center text-xl font-semibold text-red-500';
+                // Punkte abziehen
+                points -= 0.5;
+                // Punkte nicht unter 0 fallen lassen
+                if (points < 0) {
+                    points = 0;
+                }
+            }
+
+            updateProgress();
+            // Hide rules explanation when checking answer
+            rulesExplanationDiv.classList.add('hidden');
+        }
+
+        // Funktion zur Aktualisierung der Button-Klassen
+        function updateDifficultyButtonClasses() {
+             easyBtn.classList.remove('active', 'inactive');
+             // mediumBtn.classList.remove('active', 'inactive'); // Removed
+             hardBtn.classList.remove('active', 'inactive');
+
+             if (currentDifficulty === 'easy') {
+                 easyBtn.classList.add('active');
+                 // mediumBtn.classList.add('inactive'); // Removed
+                 hardBtn.classList.add('inactive');
+             } else if (currentDifficulty === 'hard') { // Only Easy and Hard now
+                 easyBtn.classList.add('inactive');
+                 // mediumBtn.classList.add('inactive'); // Removed
+                 hardBtn.classList.add('active');
+             }
+        }
+
+        // Funktion zum Anzeigen/Ausblenden der Regelerklärung
+        function toggleRulesExplanation() {
+            rulesExplanationDiv.classList.toggle('hidden');
+            // Trigger MathJax rendering when showing the explanation
+            if (!rulesExplanationDiv.classList.contains('hidden')) {
+                 MathJax.typesetPromise([rulesExplanationDiv]);
+            }
+        }
+
+        // Event Listener für Schwierigkeits-Buttons
+        easyBtn.addEventListener('click', () => {
+            currentDifficulty = 'easy';
+            updateDifficultyButtonClasses();
+            generateProblem(); // Generate new problem with selected difficulty
+        });
+
+        // Removed Medium Button Event Listener
+        // mediumBtn.addEventListener('click', () => {
+        //     currentDifficulty = 'medium';
+        //     updateDifficultyButtonClasses();
+        //     generateProblem(); // Generate new problem with selected difficulty
+        // });
+
+        hardBtn.addEventListener('click', () => {
+            currentDifficulty = 'hard';
+            updateDifficultyButtonClasses();
+            generateProblem(); // Generate new problem with selected difficulty
+        });
+
+        // Event Listener für Generieren und Überprüfen
+        generateBtn.addEventListener('click', generateProblem);
+        checkBtn.addEventListener('click', checkAnswer);
+        rulesBtn.addEventListener('click', toggleRulesExplanation);
+
+        // Erste Aufgabe beim Laden der Seite generieren und Fortschritt initialisieren
+        generateProblem();
+        updateProgress();
+        updateDifficultyButtonClasses();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aufgabengenerator: Schnittpunkt zweier Geraden</title>
+    <style>
+        /* Modernes & ansprechendes Design */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        #task-generator-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 25px 30px;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+            text-align: center;
+        }
+        #task-generator-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        #difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .difficulty-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+        .difficulty-button.active {
+            background-color: #0073aa;
+            color: white;
+            border-color: #0073aa;
+            font-weight: bold;
+        }
+        #task-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #495057;
+        }
+        .task-data {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #005a87;
+            font-family: 'Courier New', Courier, monospace;
+            display: block;
+            margin-top: 10px;
+        }
+        #solution-input-container {
+            margin-bottom: 15px;
+        }
+        .intersection-input {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.5em;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .coord-input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            width: 80px;
+            text-align: center;
+            font-family: inherit;
+        }
+        #no-intersection-container {
+            margin-top: 15px;
+        }
+        #feedback-output {
+            min-height: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .correct { color: #28a745; }
+        .incorrect { color: #dc3545; }
+        #solution-output {
+            background-color: #e9f5e9;
+            border: 1px solid #c8e6c9;
+            color: #2e7d32;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.8;
+            word-break: break-word;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .generator-button {
+            background: linear-gradient(145deg, #0078b3, #005f8e);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .generator-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .generator-button:disabled {
+            background: linear-gradient(145deg, #c0c0c0, #a9a9a9);
+            cursor: not-allowed;
+            transform: none;
+        }
+        .check-button { background: linear-gradient(145deg, #28a745, #218838); }
+        .secondary-button { background: linear-gradient(145deg, #6c757d, #5a6268); }
+        .geogebra-button { background: linear-gradient(145deg, #4a90e2, #2c6eb5); }
+    </style>
+</head>
+<body>
+
+<div id="task-generator-container">
+    <a href="index.html" style="display: block; margin-bottom: 15px; color: #0073aa; text-decoration: none; font-weight: 500;">
+        ← Zurück zur Übersicht
+    </a>
+    <h2>Schnittpunkt zweier Geraden berechnen</h2>
+
+    <div id="difficulty-selector">
+        <button class="difficulty-button" id="diff-easy" onclick="setDifficulty('easy')">Leicht</button>
+        <button class="difficulty-button" id="diff-medium" onclick="setDifficulty('medium')">Mittel</button>
+        <button class="difficulty-button" id="diff-hard" onclick="setDifficulty('hard')">Schwer</button>
+    </div>
+
+    <div id="task-output">Klicke auf "Neue Aufgabe" um zu starten.</div>
+
+    <div id="solution-input-container">
+        <div class="intersection-input">
+            S( <input type="text" id="x-input" class="coord-input" placeholder="x"> | <input type="text" id="y-input" class="coord-input" placeholder="y"> )
+        </div>
+        <div id="no-intersection-container">
+            <input type="checkbox" id="no-intersection-checkbox">
+            <label for="no-intersection-checkbox">Die Geraden haben keinen Schnittpunkt.</label>
+        </div>
+    </div>
+    
+    <div id="feedback-output"></div>
+
+    <div class="button-container">
+        <button class="generator-button" onclick="generateNewTask()">Neue Aufgabe</button>
+        <button class="generator-button check-button" id="check-btn" onclick="checkSolution()">Lösung prüfen</button>
+        <button class="generator-button secondary-button" id="show-answer-btn" onclick="showAnswer()">Lösung anzeigen</button>
+        <button class="generator-button geogebra-button" onclick="openGeoGebra()">Zeichnerische Lösung</button>
+    </div>
+
+    <div id="solution-output" style="display: none;"></div>
+</div>
+
+<script>
+    let correctAnswer;
+    let solutionSteps = "";
+    let currentDifficulty = "easy";
+    let isFirstTask = true; 
+    let currentGeoGebraURL = ""; // Hinzugefügt für GeoGebra
+
+    function setDifficulty(level) {
+        currentDifficulty = level;
+        document.querySelectorAll('.difficulty-button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`diff-${level}`).classList.add('active');
+        generateNewTask();
+    }
+    
+    function formatNumber(num) {
+        return Math.round(num * 100) / 100;
+    }
+
+    function openGeoGebra() {
+        if (currentGeoGebraURL) {
+            window.open(currentGeoGebraURL, '_blank');
+        }
+    }
+
+    function generateNewTask() {
+        // Reset UI
+        document.getElementById('feedback-output').textContent = '';
+        document.getElementById('x-input').value = '';
+        document.getElementById('y-input').value = '';
+        document.getElementById('no-intersection-checkbox').checked = false;
+        document.getElementById('solution-output').style.display = 'none';
+        document.getElementById('show-answer-btn').disabled = true;
+        document.getElementById('x-input').disabled = false;
+        document.getElementById('y-input').disabled = false;
+        currentGeoGebraURL = "";
+
+        const randomInt = (max, min = 0) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const randomChoice = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        
+        let m1, t1, m2, t2;
+        const taskText = "Bestimme den Schnittpunkt der beiden Geraden. Runde auf zwei Nachkommastellen.";
+        
+        let generateParallel;
+        if (isFirstTask) {
+            generateParallel = false; 
+            isFirstTask = false;
+        } else {
+            generateParallel = Math.random() < 0.1; 
+        }
+
+        switch (currentDifficulty) {
+            case 'medium':
+                m1 = randomChoice([0.5, -0.5, 1.5, -1.5, 2.5, -2.5, randomInt(3, -3)]);
+                if (m1 === 0) m1 = 1.5;
+                t1 = randomInt(10, -10) / randomChoice([1, 2]);
+                m2 = generateParallel ? m1 : m1 + randomChoice([0.5, -0.5, 1, -1]);
+                t2 = generateParallel ? t1 + randomInt(5, 1) : randomInt(10, -10) / randomChoice([1, 2]);
+                break;
+            case 'hard':
+                m1 = randomInt(300, -300) / 100;
+                if (m1 === 0) m1 = 1.25;
+                t1 = randomInt(1000, -1000) / 100;
+                m2 = generateParallel ? m1 : formatNumber(m1 + (randomInt(200, -200) / 100) + 0.1);
+                t2 = generateParallel ? t1 + (randomInt(500, 100) / 100) : randomInt(1000, -1000) / 100;
+                break;
+            case 'easy':
+            default:
+                m1 = randomInt(5, -5);
+                if (m1 === 0) m1 = 1;
+                t1 = randomInt(10, -10);
+                do {
+                    m2 = randomInt(5, -5);
+                } while (m1 === m2);
+                const x_intersect = randomInt(10, -10);
+                t2 = (m1 - m2) * x_intersect + t1;
+                if (generateParallel) {
+                    m2 = m1;
+                    t2 = t1 + randomInt(5,1) * (Math.random() < 0.5 ? 1 : -1);
+                }
+                break;
+        }
+
+        m1 = formatNumber(m1); t1 = formatNumber(t1);
+        m2 = formatNumber(m2); t2 = formatNumber(t2);
+
+        const formatG = (m, t, name) => {
+            let m_str = (m === 1) ? "x" : (m === -1) ? "-x" : `${m}x`;
+            let t_str = (t === 0) ? "" : (t > 0) ? ` + ${t}` : ` - ${Math.abs(t)}`;
+            return `${name}: y = ${m_str}${t_str}`;
+        };
+
+        const g1_str = formatG(m1, t1, 'g<sub>1</sub>');
+        const g2_str = formatG(m2, t2, 'g<sub>2</sub>');
+        
+        // Create GeoGebra URL and Solution Steps
+        const geogebra_g1 = `y=${m1}*x+(${t1})`;
+        const geogebra_g2 = `y=${m2}*x+(${t2})`;
+        let combined_commands = `${geogebra_g1};${geogebra_g2}`;
+
+        if (Math.abs(m1 - m2) < 0.001) { // Parallel or identical
+            correctAnswer = 'none';
+            solutionSteps = `
+                <strong>1. Steigungen vergleichen:</strong><br>
+                m1 = ${m1}, m2 = ${m2}.<br>
+                Da die Steigungen gleich sind (m1 = m2), aber die y-Achsenabschnitte verschieden (t1 ≠ t2), sind die Geraden parallel.<br><br>
+                <strong>Ergebnis: Es gibt keinen Schnittpunkt.</strong>
+            `;
+        } else {
+            const x = (t2 - t1) / (m1 - m2);
+            const y = m1 * x + t1;
+            correctAnswer = { x: formatNumber(x), y: formatNumber(y) };
+
+            // Add intersection point and its label to GeoGebra command
+            const intersect_command = `S=(${correctAnswer.x}, ${correctAnswer.y})`;
+            const label_command = `SetCaption(S, "%v")`; // %v zeigt den Wert (Koordinaten) an
+            combined_commands += `;${intersect_command};${label_command}`;
+            
+            solutionSteps = `
+                <strong>1. Gleichungen gleichsetzen:</strong><br>
+                g<sub>1</sub> = g<sub>2</sub><br>
+                ${m1}x + ${t1} = ${m2}x + ${t2}<br><br>
+                <strong>2. Nach x auflösen:</strong><br>
+                ${formatNumber(m1 - m2)}x = ${formatNumber(t2 - t1)}<br>
+                x = ${correctAnswer.x}<br><br>
+                <strong>3. x in g<sub>1</sub> (oder g<sub>2</sub>) einsetzen, um y zu finden:</strong><br>
+                y = ${m1} * ${correctAnswer.x} + ${t1}<br>
+                y = ${correctAnswer.y}<br><br>
+                <strong>Schnittpunkt: S(${correctAnswer.x}|${correctAnswer.y})</strong>
+            `;
+        }
+        
+        currentGeoGebraURL = `https://www.geogebra.org/graphing?command=${encodeURIComponent(combined_commands)}`;
+        
+        document.getElementById('task-output').innerHTML = `
+            ${taskText}<br>
+            <div class="task-data">${g1_str}</div>
+            <div class="task-data">${g2_str}</div>
+        `;
+    }
+
+    document.getElementById('no-intersection-checkbox').addEventListener('change', function() {
+        const isChecked = this.checked;
+        document.getElementById('x-input').disabled = isChecked;
+        document.getElementById('y-input').disabled = isChecked;
+    });
+
+    function checkSolution() {
+        const feedback = document.getElementById('feedback-output');
+        const showAnswerBtn = document.getElementById('show-answer-btn');
+        
+        const isChecked = document.getElementById('no-intersection-checkbox').checked;
+        let isCorrect = false;
+
+        if (isChecked) {
+            isCorrect = (correctAnswer === 'none');
+        } else {
+            const xUserInput = document.getElementById('x-input').value.replace(',', '.');
+            const yUserInput = document.getElementById('y-input').value.replace(',', '.');
+
+            if (xUserInput === '' || yUserInput === '') {
+                feedback.textContent = 'Bitte fülle beide Koordinatenfelder aus.';
+                feedback.className = 'incorrect';
+                return;
+            }
+            if (correctAnswer === 'none') {
+                isCorrect = false;
+            } else {
+                const xUser = parseFloat(xUserInput);
+                const yUser = parseFloat(yUserInput);
+                isCorrect = (Math.abs(xUser - correctAnswer.x) < 0.01 && Math.abs(yUser - correctAnswer.y) < 0.01);
+            }
+        }
+
+        if (isCorrect) {
+            feedback.textContent = 'Richtig! Sehr gut!';
+            feedback.className = 'correct';
+            showAnswerBtn.disabled = true;
+        } else {
+            feedback.textContent = 'Leider nicht richtig. Überprüfe deine Rechnung!';
+            feedback.className = 'incorrect';
+            showAnswerBtn.disabled = false;
+        }
+    }
+
+    function showAnswer() {
+        const solutionDiv = document.getElementById('solution-output');
+        solutionDiv.innerHTML = solutionSteps;
+        solutionDiv.style.display = 'block';
+        document.getElementById('show-answer-btn').disabled = true;
+    }
+
+    window.onload = function() {
+        setDifficulty('easy');
+    };
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abschlusstest Mathe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .latex {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 1.2em;
+        }
+        .certificate {
+            border: 10px solid #f3f4f6; /* Tailwind gray-100 */
+            padding: 2rem;
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        @media print {
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            body * {
+                visibility: hidden;
+            }
+            .certificate-container, .certificate-container * {
+                visibility: visible;
+            }
+            .certificate-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .certificate {
+                border-width: 8px;
+                padding: 1rem;
+                box-shadow: none;
+            }
+            .certificate h1 {
+                font-size: 1.8rem;
+                margin-bottom: 0.5rem;
+            }
+            .certificate h2 {
+                font-size: 1.1rem;
+                margin-bottom: 0.4rem;
+                padding-bottom: 0.2rem;
+            }
+            .certificate p {
+                font-size: 0.8rem;
+                line-height: 1.15;
+            }
+            .certificate .mb-8 {
+                margin-bottom: 1rem;
+            }
+            .certificate .text-xl {
+                font-size: 0.9rem;
+            }
+            .certificate #cert-score {
+                font-size: 1.1rem;
+                margin-top: 0.5rem;
+            }
+            .certificate #results .p-4 {
+                padding: 0.4rem;
+            }
+             .certificate #results .space-y-4 > * + * {
+                margin-top: 0.3rem;
+            }
+            .certificate .latex {
+                font-size: 0.9em;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-2xl mx-auto">
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="bg-white p-8 rounded-xl shadow-lg text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Abschlusstest Mathematik</h1>
+            <p class="text-gray-600 mb-6">Zehnerpotenzen, Wurzeln & Gleichungen</p>
+            <div class="space-y-4">
+                <div>
+                    <label for="name" class="block text-left text-sm font-medium text-gray-700">Name:</label>
+                    <input type="text" id="name" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+                <div>
+                    <label for="class" class="block text-left text-sm font-medium text-gray-700">Klasse:</label>
+                    <input type="text" id="class" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+            </div>
+             <div id="error-message" class="text-red-500 mt-4 h-6"></div>
+            <button onclick="startTest()" class="w-full mt-4 bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition duration-300 ease-in-out transform hover:-translate-y-1">
+                Test starten
+            </button>
+        </div>
+
+        <!-- Test Screen -->
+        <div id="test-screen" class="hidden bg-white p-8 rounded-xl shadow-lg">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Aufgabe <span id="question-number">1</span> von 15</h2>
+                <div class="text-gray-600 font-semibold" id="student-info-display"></div>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-lg mb-6 min-h-[120px] flex items-center justify-center">
+                <p id="question-text" class="text-xl text-gray-900 text-center latex"></p>
+            </div>
+            <div class="mb-2">
+                <p class="text-sm text-gray-600 mb-4">
+                    <b>Wichtiger Hinweis:</b> Bitte dokumentiere deinen Rechenweg auf einem separaten Blatt Papier.
+                </p>
+                <!-- Standard Answer -->
+                <div id="standard-answer-container">
+                    <label for="answer" class="block text-sm font-medium text-gray-700">Deine Antwort:</label>
+                    <input type="text" id="answer" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Ergebnis hier eingeben...">
+                </div>
+                 <!-- Powers of Ten Answer -->
+                <div id="powers-of-ten-answer-container" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700">Deine Antwort:</label>
+                    <div class="flex items-center justify-center mt-2 space-x-1">
+                        <input type="text" id="pot-mantissa" class="w-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-center">
+                        <span class="text-2xl font-semibold">&times; 10</span>
+                        <input type="text" id="pot-exponent" class="w-16 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-center self-start -translate-y-2 text-sm">
+                    </div>
+                </div>
+                <!-- Quadratic Answer -->
+                <div id="quadratic-answer-container" class="hidden space-y-4">
+                     <p class="text-sm text-gray-600">
+                        Wähle zuerst die Anzahl der Lösungen aus. Gib danach deine Lösung(en) ein.
+                    </p>
+                    <div id="solution-choice-container" class="flex flex-col sm:flex-row sm:space-x-8 space-y-2 sm:space-y-0 pt-2 pb-2">
+                        <div class="flex items-center">
+                            <input type="radio" id="sol-none" name="solution-choice" value="none" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                            <label for="sol-none" class="ml-2 block text-sm font-medium text-gray-900">Es gibt keine Lösung</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="sol-one" name="solution-choice" value="one" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                            <label for="sol-one" class="ml-2 block text-sm font-medium text-gray-900">Es gibt eine Lösung</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="sol-two" name="solution-choice" value="two" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                            <label for="sol-two" class="ml-2 block text-sm font-medium text-gray-900">Es gibt zwei Lösungen</label>
+                        </div>
+                    </div>
+                    
+                    <div id="one-solution-container" class="hidden">
+                        <label for="answer-single" class="block text-sm font-medium text-gray-700">Lösung (x):</label>
+                        <input type="text" id="answer-single" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                    </div>
+
+                    <div id="two-solutions-container" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="answer-1" class="block text-sm font-medium text-gray-700">Lösung 1 (x₁):</label>
+                            <input type="text" id="answer-1" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label for="answer-2" class="block text-sm font-medium text-gray-700">Lösung 2 (x₂):</label>
+                            <input type="text" id="answer-2" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between mt-6">
+                <button onclick="goBack()" id="back-button" class="bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-300 transition duration-300 ease-in-out">
+                    Zurück
+                </button>
+                <button onclick="submitAnswer()" id="submit-button" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition duration-300 ease-in-out flex-grow ml-4">
+                    Nächste Frage
+                </button>
+            </div>
+        </div>
+
+        <!-- Certificate Screen -->
+        <div id="certificate-screen" class="hidden">
+            <div class="certificate-container">
+                <div class="certificate">
+                    <div class="text-center mb-8">
+                        <h1 class="text-4xl font-bold text-indigo-700">Testzertifikat</h1>
+                        <p class="text-lg text-gray-600 mt-2">Mathematik</p>
+                    </div>
+                    <div class="mb-8 text-center">
+                        <p class="text-xl"><strong>Schüler/in:</strong> <span id="cert-name"></span></p>
+                        <p class="text-xl"><strong>Klasse:</strong> <span id="cert-class"></span></p>
+                        <p class="text-xl"><strong>Datum:</strong> <span id="cert-date"></span></p>
+                        <p class="text-2xl font-bold mt-4 text-indigo-600" id="cert-score"></p>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-semibold mb-4 text-gray-800 border-b-2 pb-2">Zusammenfassung deiner Antworten</h2>
+                        <div id="results" class="space-y-4 mt-4"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-6 no-print">
+                <button onclick="window.print()" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition duration-300 ease-in-out">
+                    Zertifikat als PDF herunterladen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Question Pool ---
+        const questions = {
+             powersOfTen: [
+                { q: "Stelle als Dezimalzahl dar: 5 &times; 10<sup>5</sup>", a: "500000", subtype: "to_decimal" },
+                { q: "Stelle als Dezimalzahl dar: 0.3 &times; 10<sup>8</sup>", a: "30000000", subtype: "to_decimal" },
+                { q: "Stelle als Dezimalzahl dar: 2 &times; 10<sup>-4</sup>", a: "0.0002", subtype: "to_decimal" },
+                { q: "Stelle als Zehnerpotenz dar: 0,000 000 009", a: "9e-9", subtype: "to_power" },
+                { q: "Stelle als Zehnerpotenz dar: 200 000 000 000", a: "2e11", subtype: "to_power" },
+                { q: "Stelle als Dezimalzahl dar: 7.89 &times; 10<sup>6</sup>", a: "7890000", subtype: "to_decimal" },
+                { q: "Stelle als Zehnerpotenz dar: 123 000 000", a: "1.23e8", subtype: "to_power" },
+                { q: "Stelle als Dezimalzahl dar: 1.5 &times; 10<sup>3</sup>", a: "1500", subtype: "to_decimal" },
+                { q: "Stelle als Dezimalzahl dar: 3.2 &times; 10<sup>-2</sup>", a: "0.032", subtype: "to_decimal" },
+                { q: "Stelle als Zehnerpotenz dar: 45000", a: "4.5e4", subtype: "to_power" },
+                { q: "Stelle als Zehnerpotenz dar: 0.0071", a: "7.1e-3", subtype: "to_power" },
+                { q: "Stelle als Dezimalzahl dar: 6.02 &times; 10<sup>-5</sup>", a: "0.0000602", subtype: "to_decimal"},
+                { q: "Stelle als Zehnerpotenz dar: 910000", a: "9.1e5", subtype: "to_power" },
+                { q: "Stelle als Dezimalzahl dar: 8 &times; 10<sup>7</sup>", a: "80000000", subtype: "to_decimal"},
+                { q: "Stelle als Zehnerpotenz dar: 0.00015", a: "1.5e-4", subtype: "to_power"},
+            ],
+            roots: [
+                { q: "Vereinfache: <math><msqrt><mn>4</mn></msqrt></math>", a: "2" },
+                { q: "Vereinfache: <math><msqrt><msup><mi>x</mi><mn>2</mn></msup></msqrt></math>", a: "x" },
+                { q: "Vereinfache: <math><msqrt><mrow><mn>225</mn><msup><mi>x</mi><mn>2</mn></msup></mrow></msqrt></math>", a: "15x" },
+                { q: "Vereinfache: <math><mroot><mn>729</mn><mn>3</mn></mroot></math>", a: "9" },
+                { q: "Vereinfache: <math><mroot><mrow><mn>27</mn><msup><mi>x</mi><mn>3</mn></msup></mrow><mn>3</mn></mroot></math>", a: "3x" },
+                { q: "Vereinfache: <math><mroot><msup><mi>x</mi><mn>5</mn></msup><mn>5</mn></mroot></math>", a: "x" },
+                { q: "Vereinfache: <math><mroot><mrow><mn>32</mn><msup><mi>y</mi><mn>5</mn></msup></mrow><mn>5</mn></mroot></math>", a: "2y" },
+                { q: "Vereinfache: <math><msqrt><mn>196</mn></msqrt></math>", a: "14" },
+                { q: "Vereinfache: <math><msqrt><mn>625</mn></msqrt></math>", a: "25" },
+                { q: "Vereinfache: <math><mroot><mn>125</mn><mn>3</mn></mroot></math>", a: "5" },
+                { q: "Vereinfache: <math><msqrt><mrow><mn>400</mn><msup><mi>y</mi><mn>2</mn></msup></mrow></msqrt></math>", a: "20y" },
+                { q: "Vereinfache: <math><mroot><mrow><mn>64</mn><msup><mi>a</mi><mn>3</mn></msup></mrow><mn>3</mn></mroot></math>", a: "4a" },
+                { q: "Vereinfache: <math><msqrt><mn>144</mn></msqrt></math>", a: "12" },
+                { q: "Vereinfache: <math><mroot><mn>1000</mn><mn>3</mn></mroot></math>", a: "10" },
+                { q: "Vereinfache: <math><msqrt><mrow><mn>9</mn><msup><mi>b</mi><mn>2</mn></msup></mrow></msqrt></math>", a: "3b" },
+            ],
+            linearEquations: [
+                { q: "Löse: 5x + 7 = 3x + 15", a: "4" },
+                { q: "Löse: 3(x + 5) = 4x + 10", a: "5" },
+                { q: "Löse: 7x - 5 = 3x + 11", a: "4" },
+                { q: "Löse: 4(x + 2) = 20", a: "3" },
+                { q: "Löse: 4x + 5 = 2x + 8", a: "1.5" },
+                { q: "Löse: 8x - 6 = 2(x + 6)", a: "3" },
+                { q: "Löse: 10x - 4 = 5x + 1", a: "1" },
+                { q: "Löse: 2(3x - 1) = 4x + 8", a: "5" },
+                { q: "Löse: 5x + 15 = 3(x + 8)", a: "4.5" },
+                { q: "Löse: 9x - 3 = 6(x+1)", a: "3"},
+                { q: "Löse: 12x + 3 = 5x + 17", a: "2" },
+                { q: "Löse: 5(x - 2) = 3x + 4", a: "7" },
+                { q: "Löse: 6x - 9 = x + 1", a: "2" },
+                { q: "Löse: 2x = 4(x - 3)", a: "6" },
+                { q: "Löse: 2x(x + 3) + 5x = 2x<sup>2</sup> + 22", a: "2" },
+                { q: "Löse: 10x<sup>2</sup> + 4(x - 1) = 5(2x<sup>2</sup> + 2)", a: "3.5" },
+                { q: "Löse: 15x + 3x(x - 1) = 3x<sup>2</sup> + 24", a: "2" },
+            ],
+            quadraticEquations: [
+                { q: "Löse: x<sup>2</sup> &minus; 16 = 0", a: ["4", "-4"] },
+                { q: "Löse: 2x<sup>2</sup> &minus; 50 = 0", a: ["5", "-5"] },
+                { q: "Löse: x<sup>2</sup> + 25 = 0", a: "no_solution" },
+                { q: "Löse: 4x<sup>2</sup> - 1 = 0", a: ["0.5", "-0.5"] },
+                { q: "Löse: x<sup>2</sup> &minus; 81 = 0", a: ["9", "-9"] },
+                { q: "Löse: 3x<sup>2</sup> = 12", a: ["2", "-2"] },
+                { q: "Löse: 5(x<sup>2</sup> &minus; 4) = 4x<sup>2</sup> + 5", a: ["5", "-5"] },
+                { q: "Löse: 3x<sup>2</sup> + 10 = x<sup>2</sup> + 42", a: ["4", "-4"] },
+                { q: "Löse: 6(x<sup>2</sup> + 1) = 5x<sup>2</sup> + 22", a: ["4", "-4"] },
+                { q: "Löse: 3x<sup>2</sup> + 5x = 3(x<sup>2</sup> + x + 4)", a: ["6"] },
+                { q: "Löse: 8x<sup>2</sup> + 2(x&minus;3) = 4(2x<sup>2</sup> + 1)", a: ["5"] },
+                { q: "Löse: 2x<sup>2</sup> + 10 = 10", a: ["0"] },
+                { q: "Löse: 10x<sup>2</sup> - 5 = 2(5x<sup>2</sup> + 5)", a: "no_solution" },
+                { q: "Löse: x<sup>2</sup> - 100 = 0", a: ["10", "-10"] },
+                { q: "Löse: 5x<sup>2</sup> = 20", a: ["2", "-2"] },
+                { q: "Löse: 2x<sup>2</sup> + 3x = 2(x<sup>2</sup> + x) + 9", a: ["9"] },
+                { q: "Löse: 3x(x + 5) - 15x = 75", a: ["5", "-5"] },
+                { q: "Löse: 2(x<sup>2</sup> + 10) + 10x = 10(x + 7)", a: ["5", "-5"]},
+                { q: "Löse: 6x<sup>2</sup> + 4(x + 5) = 2(2x + 2x<sup>2</sup>) + 70", a: ["5", "-5"]},
+            ]
+        };
+
+        Object.keys(questions).forEach(key => {
+            questions[key].forEach(q => q.type = key);
+        });
+
+        let studentName = '', studentClass = '', currentQuestionIndex = 0, testQuestions = [], userAnswers = [];
+        
+        const startScreen = document.getElementById('start-screen');
+        const testScreen = document.getElementById('test-screen');
+        const certificateScreen = document.getElementById('certificate-screen');
+        const errorMessage = document.getElementById('error-message');
+        const questionText = document.getElementById('question-text');
+        const questionNumber = document.getElementById('question-number');
+        const answerInput = document.getElementById('answer');
+        const submitButton = document.getElementById('submit-button');
+        const backButton = document.getElementById('back-button');
+        const standardAnswerContainer = document.getElementById('standard-answer-container');
+        const powersOfTenAnswerContainer = document.getElementById('powers-of-ten-answer-container');
+        const potMantissaInput = document.getElementById('pot-mantissa');
+        const potExponentInput = document.getElementById('pot-exponent');
+        const quadraticAnswerContainer = document.getElementById('quadratic-answer-container');
+        const twoSolutionsContainer = document.getElementById('two-solutions-container');
+        const answer1Input = document.getElementById('answer-1');
+        const answer2Input = document.getElementById('answer-2');
+        const solutionChoiceRadios = document.querySelectorAll('input[name="solution-choice"]');
+        const oneSolutionContainer = document.getElementById('one-solution-container');
+        const answerSingleInput = document.getElementById('answer-single');
+
+
+        solutionChoiceRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                const choice = event.target.value;
+                oneSolutionContainer.classList.add('hidden');
+                twoSolutionsContainer.classList.add('hidden');
+
+                if (choice === 'one') {
+                    oneSolutionContainer.classList.remove('hidden');
+                    answerSingleInput.focus();
+                } else if (choice === 'two') {
+                    twoSolutionsContainer.classList.remove('hidden');
+                    answer1Input.focus();
+                }
+            });
+        });
+
+        function shuffle(a) {
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function startTest() {
+            studentName = document.getElementById('name').value.trim();
+            studentClass = document.getElementById('class').value.trim();
+
+            if (!studentName || !studentClass) {
+                errorMessage.textContent = 'Bitte gib deinen Namen und deine Klasse ein.';
+                return;
+            }
+            errorMessage.textContent = '';
+            
+            document.getElementById('student-info-display').textContent = `${studentName}, ${studentClass}`;
+
+            const toDecimalQs = shuffle([...questions.powersOfTen.filter(q => q.subtype === 'to_decimal')]);
+            const toPowerQs = shuffle([...questions.powersOfTen.filter(q => q.subtype === 'to_power')]);
+            
+            const powersOfTenQs = [...toDecimalQs.slice(0, 2), ...toPowerQs.slice(0, 2)];
+            const rootsQs = shuffle([...questions.roots]).slice(0, 4);
+            const linearQs = shuffle([...questions.linearEquations]).slice(0, 4);
+            const quadraticQs = shuffle([...questions.quadraticEquations]).slice(0, 3);
+            
+            testQuestions = shuffle([...powersOfTenQs, ...rootsQs, ...linearQs, ...quadraticQs]);
+            
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            startScreen.classList.add('hidden');
+            testScreen.classList.remove('hidden');
+            displayQuestion();
+        }
+
+        function clearInputs() {
+            answerInput.value = '';
+            potMantissaInput.value = '';
+            potExponentInput.value = '';
+            solutionChoiceRadios.forEach(radio => radio.checked = false);
+            oneSolutionContainer.classList.add('hidden');
+            twoSolutionsContainer.classList.add('hidden');
+            answerSingleInput.value = '';
+            answer1Input.value = '';
+            answer2Input.value = '';
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex < testQuestions.length) {
+                const question = testQuestions[currentQuestionIndex];
+                questionText.innerHTML = question.q;
+                questionNumber.textContent = currentQuestionIndex + 1;
+                
+                standardAnswerContainer.classList.add('hidden');
+                quadraticAnswerContainer.classList.add('hidden');
+                powersOfTenAnswerContainer.classList.add('hidden');
+                
+                clearInputs();
+
+                backButton.classList.toggle('hidden', currentQuestionIndex === 0);
+                backButton.disabled = currentQuestionIndex === 0;
+
+                if (question.type === 'powersOfTen' && question.subtype === 'to_power') {
+                    powersOfTenAnswerContainer.classList.remove('hidden');
+                } else if (question.type === 'quadraticEquations') {
+                    quadraticAnswerContainer.classList.remove('hidden');
+                } else {
+                    standardAnswerContainer.classList.remove('hidden');
+                }
+
+                const storedAnswer = userAnswers[currentQuestionIndex];
+                if (storedAnswer && storedAnswer.userInput) {
+                    const userInput = storedAnswer.userInput;
+                    if (question.type === 'powersOfTen' && question.subtype === 'to_power') {
+                        potMantissaInput.value = userInput.mantissa || '';
+                        potExponentInput.value = userInput.exponent || '';
+                    } else if (question.type === 'quadraticEquations') {
+                        if (userInput.choice) {
+                            const radio = document.getElementById(`sol-${userInput.choice}`);
+                            if(radio) {
+                                radio.checked = true;
+                                radio.dispatchEvent(new Event('change'));
+                            }
+                            if (userInput.choice === 'one') {
+                                answerSingleInput.value = userInput.values[0] || '';
+                            } else if (userInput.choice === 'two') {
+                                answer1Input.value = userInput.values[0] || '';
+                                answer2Input.value = userInput.values[1] || '';
+                            }
+                        }
+                    } else {
+                        answerInput.value = userInput.value || '';
+                    }
+                } else {
+                    if (question.type === 'powersOfTen' && question.subtype === 'to_power') potMantissaInput.focus();
+                    else if (question.type !== 'quadraticEquations') answerInput.focus();
+                }
+
+                submitButton.textContent = (currentQuestionIndex === testQuestions.length - 1) ? 'Test beenden & Zertifikat anzeigen' : 'Nächste Frage';
+            }
+        }
+
+        function goBack() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function submitAnswer() {
+            const question = testQuestions[currentQuestionIndex];
+            let userAnswer, userAnswerForDisplay, userInputData = {};
+
+            if (question.type === 'powersOfTen' && question.subtype === 'to_power') {
+                const mantissa = potMantissaInput.value.trim().replace(',', '.');
+                const exponent = potExponentInput.value.trim().replace(',', '.');
+                userAnswer = `${mantissa}e${exponent}`;
+                userAnswerForDisplay = `${mantissa} &times; 10<sup class="text-sm">${exponent}</sup>`;
+                userInputData = { mantissa, exponent };
+            } else if (question.type === 'quadraticEquations') {
+                const selectedChoice = document.querySelector('input[name="solution-choice"]:checked');
+                
+                if (!selectedChoice) {
+                    userAnswer = [];
+                    userAnswerForDisplay = 'Keine Auswahl';
+                    userInputData = { choice: null, values: [] };
+                } else {
+                    const choiceValue = selectedChoice.value;
+                    if (choiceValue === 'none') {
+                        userAnswer = 'no_solution';
+                        userAnswerForDisplay = 'Keine Lösung';
+                        userInputData = { choice: 'none', values: [] };
+                    } else if (choiceValue === 'one') {
+                        const ans = answerSingleInput.value.trim().replace(',', '.');
+                        userAnswer = [ans];
+                        userAnswerForDisplay = ans;
+                        userInputData = { choice: 'one', values: [ans] };
+                    } else if (choiceValue === 'two') {
+                        const ans1 = answer1Input.value.trim().replace(',', '.');
+                        const ans2 = answer2Input.value.trim().replace(',', '.');
+                        userAnswer = [ans1, ans2].filter(Boolean).sort();
+                        userAnswerForDisplay = userAnswer.join('; ');
+                        userInputData = { choice: 'two', values: [ans1, ans2] };
+                    }
+                }
+            } else {
+                userAnswer = answerInput.value.trim().replace(',', '.');
+                userAnswerForDisplay = userAnswer;
+                userInputData = { value: userAnswer };
+            }
+
+            if (userAnswerForDisplay === '' || userAnswerForDisplay.includes('<sup></sup>')) userAnswerForDisplay = 'Keine Antwort';
+
+            const isCorrect = checkAnswer(userAnswer, question.a);
+            
+            userAnswers[currentQuestionIndex] = {
+                question: question.q,
+                userAnswerForDisplay,
+                userInput: userInputData,
+                correctAnswer: question.a,
+                isCorrect
+            };
+
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < testQuestions.length) {
+                displayQuestion();
+            } else {
+                showCertificate();
+            }
+        }
+        
+        function checkAnswer(userAns, correctAns) {
+            if (typeof userAns === 'string' && userAns.toLowerCase().includes('e')) {
+                 userAns = Number(userAns);
+            }
+            if (typeof correctAns === 'string' && correctAns.toLowerCase().includes('e')) {
+                 correctAns = Number(correctAns);
+            }
+
+            if (Array.isArray(correctAns)) {
+                if (!Array.isArray(userAns)) return false;
+                const normUser = userAns.map(v => isNaN(parseFloat(v)) ? v : parseFloat(v)).sort();
+                const normCorrect = correctAns.map(v => isNaN(parseFloat(v)) ? v : parseFloat(v)).sort();
+                return JSON.stringify(normUser) === JSON.stringify(normCorrect);
+            } else if (correctAns === 'no_solution') {
+                return userAns === 'no_solution';
+            } else {
+                try {
+                    if (!isNaN(parseFloat(userAns)) && !isNaN(parseFloat(correctAns))) {
+                         return Math.abs(parseFloat(userAns) - parseFloat(correctAns)) < 0.01;
+                    }
+                } catch(e) { /* Ignore eval errors */ }
+                
+                return userAns.toString().toLowerCase() === correctAns.toString().toLowerCase();
+            }
+        }
+        
+        function formatAnswerForDisplay(answer) {
+             if (typeof answer === 'string' && answer.toLowerCase().includes('e')) {
+                const parts = answer.split('e');
+                return `${parts[0]} &times; 10<sup class="text-sm">${parts[1]}</sup>`;
+            }
+            if (answer === 'no_solution') return 'Keine Lösung';
+            if (Array.isArray(answer)) {
+                if(answer.length === 1) return `x = ${answer[0]}`;
+                if(answer.length === 2) {
+                    const sorted = answer.map(Number).sort((a,b) => a-b);
+                    return `x₁=${sorted[0]}, x₂=${sorted[1]}`;
+                }
+            };
+            return answer;
+        }
+
+        function showCertificate() {
+            testScreen.classList.add('hidden');
+            certificateScreen.classList.remove('hidden');
+
+            document.getElementById('cert-name').textContent = studentName;
+            document.getElementById('cert-class').textContent = studentClass;
+            document.getElementById('cert-date').textContent = new Date().toLocaleDateString('de-DE');
+
+            const validAnswers = userAnswers.filter(a => a !== undefined);
+            const score = validAnswers.filter(a => a.isCorrect).length;
+            document.getElementById('cert-score').textContent = `Ergebnis: ${score} von ${testQuestions.length} richtig`;
+
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            testQuestions.forEach((question, index) => {
+                const item = userAnswers[index] || { userAnswerForDisplay: 'Nicht beantwortet', isCorrect: false, correctAnswer: question.a };
+                const resultElement = document.createElement('div');
+                resultElement.className = 'p-4 bg-gray-50 rounded-lg border border-gray-200';
+                
+                const correctIndicator = item.isCorrect 
+                    ? '<span class="text-green-600 font-bold ml-2">&#10003; Richtig</span>'
+                    : `<span class="text-red-600 font-bold ml-2">&#10007; Falsch</span><br><span class="text-sm text-gray-700">Richtige Antwort: <strong>${formatAnswerForDisplay(item.correctAnswer)}</strong></span>`;
+
+                resultElement.innerHTML = `
+                    <p class="font-semibold text-gray-700">Frage ${index + 1}: <span class="latex">${question.q}</span></p>
+                    <p class="mt-2 text-indigo-800">
+                        <strong>Deine Antwort:</strong> <span class="latex">${item.userAnswerForDisplay}</span>
+                        ${correctIndicator}
+                    </p>
+                `;
+                resultsContainer.appendChild(resultElement);
+            });
+        }
+        
+        answerInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitButton.click();
+            }
+        });
+
+    </script>
+</body>
+</html>
+

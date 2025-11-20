@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wahrscheinlichkeits-Aufgabengenerator (Baumdiagramm)</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Additional styles specific to this page */
+        svg {
+            border: 1px solid var(--border-color);
+            margin-top: 1rem;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+        }
+        .feedback {
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        .feedback.correct {
+            color: var(--success-color);
+        }
+        .feedback.incorrect {
+            color: var(--error-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Zurück zur Übersicht</a>
+        <h1>Wahrscheinlichkeiten mit Baumdiagrammen</h1>
+        
+        <div class="aufgabe">
+            <p id="aufgabentext" class="text-lg"></p>
+            <div id="baumdiagramm"></div>
+            <p class="mt-4">Wie groß ist die Wahrscheinlichkeit für das Ereignis: <b id="ereignistext"></b>?</p>
+            
+            <div class="flex justify-center items-center gap-4 mt-4">
+                <label for="antwort">Antwort (z.B. 3/16):</label>
+                <input type="text" id="antwort" class="form-input w-32 text-center">
+                <button onclick="prüfen()" class="btn btn-primary">Antwort prüfen</button>
+            </div>
+
+            <p id="feedback" class="feedback"></p>
+        </div>
+        
+        <button onclick="generiereAufgabe()" class="btn btn-secondary mt-6">Neue Aufgabe generieren 🔄</button>
+    </div>
+
+    <script>
+        let richtigeWahrscheinlichkeit = "";
+
+        function generiereAufgabe() {
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("feedback").className = "feedback";
+            document.getElementById("antwort").value = "";
+
+            const farben = ["rot", "blau"];
+            const kugeln = {
+                rot: Math.floor(Math.random() * 3) + 1,
+                blau: Math.floor(Math.random() * 3) + 1
+            };
+            const gesamt = kugeln.rot + kugeln.blau;
+            const pRot = kugeln.rot / gesamt;
+            const pBlau = kugeln.blau / gesamt;
+
+            const aufgabe = `In einer Urne befinden sich ${kugeln.rot} rote und ${kugeln.blau} blaue Kugeln. Es wird zweimal mit Zurücklegen gezogen.`;
+            document.getElementById("aufgabentext").innerText = aufgabe;
+
+            const ereignis = "mindestens einmal rot";
+            document.getElementById("ereignistext").innerText = ereignis;
+
+            const pBeideBlau = pBlau * pBlau;
+            const pMind1Rot = 1 - pBeideBlau;
+
+            richtigeWahrscheinlichkeit = kürzeBruch(pMind1Rot);
+
+            const svg = `
+                <svg width="400" height="180" viewBox="0 0 400 180">
+                  <text x="10" y="20" font-family="Inter, sans-serif">Start</text>
+                  <line x1="20" y1="25" x2="100" y2="50" stroke="black"/>
+                  <line x1="20" y1="25" x2="100" y2="100" stroke="black"/>
+                  <text x="100" y="45" font-family="Inter, sans-serif">${farben[0]} (${kugeln.rot}/${gesamt})</text>
+                  <text x="100" y="95" font-family="Inter, sans-serif">${farben[1]} (${kugeln.blau}/${gesamt})</text>
+                  <line x1="100" y1="50" x2="200" y2="30" stroke="black"/>
+                  <line x1="100" y1="50" x2="200" y2="70" stroke="black"/>
+                  <line x1="100" y1="100" x2="200" y2="110" stroke="black"/>
+                  <line x1="100" y1="100" x2="200" y2="150" stroke="black"/>
+                  <text x="200" y="25" font-family="Inter, sans-serif">${farben[0]}</text>
+                  <text x="200" y="65" font-family="Inter, sans-serif">${farben[1]}</text>
+                  <text x="200" y="105" font-family="Inter, sans-serif">${farben[0]}</text>
+                  <text x="200" y="145" font-family="Inter, sans-serif">${farben[1]}</text>
+                </svg>`;
+            document.getElementById("baumdiagramm").innerHTML = svg;
+        }
+
+        function kürzeBruch(dezimal) {
+            let zähler = Math.round(dezimal * 10000);
+            let nenner = 10000;
+            const ggt = (a, b) => b === 0 ? a : ggt(b, a % b);
+            const teiler = ggt(zähler, nenner);
+            zähler /= teiler;
+            nenner /= teiler;
+            return `${zähler}/${nenner}`;
+        }
+
+        function prüfen() {
+            const eingabe = document.getElementById("antwort").value.trim().replace(/\s/g, "");
+            const feedback = document.getElementById("feedback");
+            if (eingabe === richtigeWahrscheinlichkeit) {
+                feedback.innerText = "✔️ Richtig!";
+                feedback.className = "feedback correct";
+            } else {
+                feedback.innerText = `❌ Leider falsch. Die richtige Antwort ist: ${richtigeWahrscheinlichkeit}`;
+                feedback.className = "feedback incorrect";
+            }
+        }
+
+        generiereAufgabe();
+    </script>
+</body>
+</html>
