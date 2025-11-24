@@ -73,6 +73,18 @@ import SchnittpunkteQF from './pages/quadratische_funktionen/Schnittpunkte';
 import Schnittpunkte2QF from './pages/quadratische_funktionen/Schnittpunkte2';
 import SpielNullstellenQF from './pages/quadratische_funktionen/SpielNullstellen';
 import AbschlusstestQF from './pages/quadratische_funktionen/Abschlusstest';
+// Trigonometrie
+import TrigonometrieIndex from './pages/TrigonometrieIndex';
+import Rechtwinklig2 from './pages/trigonometrie/Rechtwinklig2';
+import Sinussatz from './pages/trigonometrie/Sinussatz';
+import Kosinussatz from './pages/trigonometrie/Kosinussatz';
+import Flaechensatz from './pages/trigonometrie/Flaechensatz';
+import GemischteAufgaben from './pages/trigonometrie/GemischteAufgaben';
+// Daten und Zufall
+import DatenUndZufallIndex from './pages/DatenUndZufallIndex';
+import StatistischeKennwerte from './pages/daten_und_zufall/StatistischeKennwerte';
+import Baumdiagramme2 from './pages/daten_und_zufall/Baumdiagramme2';
+import DiagrammeErstellen from './pages/daten_und_zufall/DiagrammeErstellen';
 // ... other imports will be added as files are created
 
 export default function App() {
@@ -153,6 +165,19 @@ export default function App() {
           <Route path="/quadratische_funktionen/spiel_nullstellen" element={<SpielNullstellenQF />} />
           <Route path="/quadratische_funktionen/abschlusstest" element={<AbschlusstestQF />} />
           
+          <Route path="/trigonometrie" element={<TrigonometrieIndex />} />
+          <Route path="/trigonometrie/rechtwinklig2" element={<Rechtwinklig2 />} />
+          <Route path="/trigonometrie/sinussatz" element={<Sinussatz />} />
+          <Route path="/trigonometrie/kosinussatz" element={<Kosinussatz />} />
+          <Route path="/trigonometrie/flaechensatz" element={<Flaechensatz />} />
+          <Route path="/trigonometrie/gemischte-aufgaben" element={<GemischteAufgaben />} />
+          
+          {/* Daten und Zufall */}
+          <Route path="/daten-und-zufall" element={<DatenUndZufallIndex />} />
+          <Route path="/daten-und-zufall/statistische-kennwerte" element={<StatistischeKennwerte />} />
+          <Route path="/daten-und-zufall/diagramme-erstellen" element={<DiagrammeErstellen />} />
+          <Route path="/daten-und-zufall/baumdiagramme2" element={<Baumdiagramme2 />} />
+
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

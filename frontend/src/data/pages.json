@@ -36,6 +36,7 @@
     "title": "Daten und Zufall",
     "description": "Grundlagen der Wahrscheinlichkeit und Baumdiagramme.",
     "path": "/daten_und_zufall/index.html",
+    "reactPath": "/daten-und-zufall",
     "icon": "fas fa-dice"
   },
   {
@@ -43,6 +44,7 @@
     "title": "Trigonometrie",
     "description": "Berechnungen an Dreiecken mit Sinus, Kosinus und Tangens.",
     "path": "/trigonometrie/index.html",
+    "reactPath": "/trigonometrie",
     "icon": "fa-solid fa-play"
   }
 ]

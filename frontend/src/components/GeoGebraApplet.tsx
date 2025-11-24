@@ -12,6 +12,7 @@ interface GeoGebraAppletProps {
   onAppletReady?: (api: any) => void;
   filename?: string;
   commands?: string[];
+  coordSystem?: { xmin: number; xmax: number; ymin: number; ymax: number };
 }
 
 const DEPLOY_GGB_URL = 'https://www.geogebra.org/apps/deployggb.js';
@@ -33,7 +34,8 @@ const GeoGebraApplet: React.FC<GeoGebraAppletProps> = ({
   showMenuBar = false,
   onAppletReady,
   filename,
-  commands = []
+  commands = [],
+  coordSystem
 }) => {
   const appletRef = useRef<HTMLDivElement>(null);
   const ggbScriptLoaded = useRef(false);
@@ -48,12 +50,18 @@ const GeoGebraApplet: React.FC<GeoGebraAppletProps> = ({
   useEffect(() => {
     if (appletObj.current && commands.length > 0) {
       appletObj.current.reset();
-      appletObj.current.setCoordSystem(-5, 5, -5, 5);
+      
+      if (coordSystem) {
+        appletObj.current.setCoordSystem(coordSystem.xmin, coordSystem.xmax, coordSystem.ymin, coordSystem.ymax);
+      } else {
+        appletObj.current.setCoordSystem(-5, 5, -5, 5);
+      }
+      
       appletObj.current.setAxesVisible(true, true);
       appletObj.current.setGridVisible(true);
       commands.forEach(cmd => appletObj.current.evalCommand(cmd));
     }
-  }, [commands]);
+  }, [commands, coordSystem]);
 
   useEffect(() => {
     // Lade deployggb.js nur einmal
@@ -109,7 +117,13 @@ const GeoGebraApplet: React.FC<GeoGebraAppletProps> = ({
         // Execute commands
         if (commands && commands.length > 0) {
             api.reset();
-            api.setCoordSystem(-5, 5, -5, 5);
+            
+            if (coordSystem) {
+                api.setCoordSystem(coordSystem.xmin, coordSystem.xmax, coordSystem.ymin, coordSystem.ymax);
+            } else {
+                api.setCoordSystem(-5, 5, -5, 5);
+            }
+
             api.setAxesVisible(true, true);
             api.setGridVisible(true);
             commands.forEach((cmd: string) => api.evalCommand(cmd));
