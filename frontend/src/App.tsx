@@ -85,6 +85,7 @@ import DatenUndZufallIndex from './pages/DatenUndZufallIndex';
 import StatistischeKennwerte from './pages/daten_und_zufall/StatistischeKennwerte';
 import Baumdiagramme2 from './pages/daten_und_zufall/Baumdiagramme2';
 import DiagrammeErstellen from './pages/daten_und_zufall/DiagrammeErstellen';
+import Wahrscheinlichkeiten from './pages/daten_und_zufall/Wahrscheinlichkeiten';
 // ... other imports will be added as files are created
 
 export default function App() {
@@ -177,6 +178,7 @@ export default function App() {
           <Route path="/daten-und-zufall/statistische-kennwerte" element={<StatistischeKennwerte />} />
           <Route path="/daten-und-zufall/diagramme-erstellen" element={<DiagrammeErstellen />} />
           <Route path="/daten-und-zufall/baumdiagramme2" element={<Baumdiagramme2 />} />
+          <Route path="/daten-und-zufall/wahrscheinlichkeiten" element={<Wahrscheinlichkeiten />} />
 
           <Route path="*" element={<Home />} />
         </Routes>
