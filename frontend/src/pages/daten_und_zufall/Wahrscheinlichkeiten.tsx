@@ -64,6 +64,55 @@ const spinnerGradient = spinnerSegments
     .map(segment => `${segment.color} ${segment.startAngle ?? 0}deg ${segment.endAngle ?? 0}deg`)
     .join(', ');
 
+const diceSums = Array.from({ length: 11 }, (_, index) => index + 2);
+
+const createEmptySumCounts = (): Record<number, number> => {
+    const counts: Record<number, number> = {};
+    diceSums.forEach(sum => {
+        counts[sum] = 0;
+    });
+    return counts;
+};
+
+const pipPatterns: Record<number, number[]> = {
+    1: [4],
+    2: [0, 8],
+    3: [0, 4, 8],
+    4: [0, 2, 6, 8],
+    5: [0, 2, 4, 6, 8],
+    6: [0, 2, 3, 5, 6, 8]
+};
+
+interface UrnEntry {
+    label: string;
+    color: string;
+    count: number;
+}
+
+const urnConfig: UrnEntry[] = [
+    { label: 'Rot', color: '#ef4444', count: 5 },
+    { label: 'Blau', color: '#3b82f6', count: 3 },
+    { label: 'Gelb', color: '#facc15', count: 2 },
+    { label: 'Grün', color: '#22c55e', count: 2 }
+];
+
+const totalUrnBalls = urnConfig.reduce((sum, entry) => sum + entry.count, 0);
+
+const urnPoolLabels = urnConfig.flatMap(entry => Array.from({ length: entry.count }, () => entry.label));
+
+const urnColorMap = urnConfig.reduce((acc, entry) => {
+    acc[entry.label] = entry.color;
+    return acc;
+}, {} as Record<string, string>);
+
+const createEmptyUrnCounts = (): Record<string, number> => {
+    const counts: Record<string, number> = {};
+    urnConfig.forEach(entry => {
+        counts[entry.label] = 0;
+    });
+    return counts;
+};
+
 const probabilityTasks: ProbabilityTask[] = [
     {
         id: 'prob-01',
@@ -298,6 +347,69 @@ const probabilityTasks: ProbabilityTask[] = [
         question: 'Wie groß ist die Wahrscheinlichkeit, dass bei zwei Drehs mindestens einmal eine warme Farbe auftaucht?',
         answer: 1 - (8 / 12) * (8 / 12),
         solution: 'Keine warme Farbe bedeutet zwei Mal kalte Farbe ⇒ (8/12)² = (2/3)² = 4/9. Komplement: 1 - 4/9 = 5/9 ≈ 0,5556.'
+    },
+    {
+        id: 'prob-32',
+        title: 'Würfel-Labor: Summe genau 8',
+        category: 'Mehrstufiges Experiment',
+        scenario: 'Nutze das Würfel-Labor und beobachte die Summenverteilung der zwei Würfelwürfe.',
+        question: 'Wie groß ist die Wahrscheinlichkeit, dass die Augensumme exakt 8 beträgt?',
+        answer: 5 / 36,
+        solution: 'Günstige Paare: (2,6), (3,5), (4,4), (5,3), (6,2). Das sind 5 von 36 möglichen Ergebnissen ⇒ P = 5/36 ≈ 0,1389.'
+    },
+    {
+        id: 'prob-33',
+        title: 'Würfel-Labor: Summe kleiner als 5',
+        category: 'Mehrstufiges Experiment',
+        scenario: 'Schau dir die Balken im Würfel-Labor an und schätze die relative Häufigkeit kleiner Summen.',
+        question: 'Wie groß ist die Wahrscheinlichkeit, dass die Augensumme kleiner als 5 ist?',
+        answer: 6 / 36,
+        solution: 'Summen 2, 3, 4 liefern 1 + 2 + 3 = 6 günstige Ergebnisse. Mit 36 Gesamtmöglichkeiten gilt P = 6/36 = 1/6 ≈ 0,1667.'
+    },
+    {
+        id: 'prob-34',
+        title: 'Würfel-Labor: Pasch',
+        category: 'Mehrstufiges Experiment',
+        scenario: 'Beobachte im Würfel-Labor, wie oft zwei gleiche Augenzahlen fallen.',
+        question: 'Wie groß ist die Wahrscheinlichkeit für einen Pasch (beide Würfel zeigen dieselbe Zahl)?',
+        answer: 6 / 36,
+        solution: 'Es gibt sechs Pasch-Ergebnisse (1,1) bis (6,6). Damit P = 6/36 = 1/6 ≈ 0,1667.'
+    },
+    {
+        id: 'prob-35',
+        title: 'Urnen-Labor: Rote Kugel',
+        category: 'Einstufiges Experiment',
+        scenario: 'Im Urnen-Labor liegen 5 rote, 3 blaue, 2 gelbe und 2 grüne Kugeln.',
+        question: 'Wie groß ist die Wahrscheinlichkeit, bei einer Ziehung (mit Zurücklegen) eine rote Kugel zu erhalten?',
+        answer: 5 / totalUrnBalls,
+        solution: 'Es liegen 5 rote Kugeln unter insgesamt 12 ⇒ P = 5/12 ≈ 0,4167.'
+    },
+    {
+        id: 'prob-36',
+        title: 'Urnen-Labor: Gelb oder Grün',
+        category: 'Einstufiges Experiment',
+        scenario: 'Schau dir die Legende des Urnen-Labors an.',
+        question: 'Wie groß ist die Wahrscheinlichkeit, dass eine gezogene Kugel gelb oder grün ist?',
+        answer: (2 + 2) / totalUrnBalls,
+        solution: 'Gelb und Grün haben je 2 Kugeln ⇒ 4 von 12 sind günstig. P = 4/12 = 1/3 ≈ 0,3333.'
+    },
+    {
+        id: 'prob-37',
+        title: 'Urnen-Labor: Mindestens einmal Blau',
+        category: 'Mehrstufiges Experiment',
+        scenario: 'Ziehe zwei Mal mit Zurücklegen im Urnen-Labor.',
+        question: 'Wie groß ist die Wahrscheinlichkeit, dass in zwei Ziehungen mindestens einmal blau erscheint?',
+        answer: 1 - ((totalUrnBalls - 3) / totalUrnBalls) * ((totalUrnBalls - 3) / totalUrnBalls),
+        solution: 'Blau hat 3 von 12 Kugeln. Keine blaue Kugel ⇒ (9/12)² = (3/4)² = 9/16. Komplement liefert P = 1 - 9/16 = 7/16 = 0,4375.'
+    },
+    {
+        id: 'prob-38',
+        title: 'Urnen-Labor: Genau eine rote Kugel',
+        category: 'Mehrstufiges Experiment',
+        scenario: 'Ziehe zweimal mit Zurücklegen wie im Urnen-Labor.',
+        question: 'Wie groß ist die Wahrscheinlichkeit, dass genau eine rote Kugel gezogen wird?',
+        answer: 2 * (5 / totalUrnBalls) * ((totalUrnBalls - 5) / totalUrnBalls),
+        solution: 'Fall (rot, nicht rot) und (nicht rot, rot). P = 2 · (5/12) · (7/12) = 70/144 = 35/72 ≈ 0,4861.'
     },
     {
         id: 'prob-25',
@@ -549,13 +661,214 @@ const SpinnerShowcase: React.FC = () => {
     );
 };
 
-const Wahrscheinlichkeiten: React.FC = () => {
-    const spinnerTaskIds = useMemo(
-        () => new Set(['prob-21', 'prob-22', 'prob-23', 'prob-24', 'prob-30', 'prob-31']),
-        []
+const DiceFace: React.FC<{ value: number }> = ({ value }) => {
+    const activePattern = pipPatterns[value] ?? [];
+    return (
+        <div className="w-20 h-20 bg-white border-4 border-slate-800 rounded-2xl grid grid-cols-3 grid-rows-3 gap-1 p-2 shadow-md">
+            {Array.from({ length: 9 }).map((_, index) => (
+                <div key={index} className="flex items-center justify-center">
+                    {activePattern.includes(index) && <span className="w-2.5 h-2.5 bg-slate-800 rounded-full" />}
+                </div>
+            ))}
+        </div>
     );
+};
+
+const DiceFrequencyLab: React.FC = () => {
+    const [diceValues, setDiceValues] = useState<[number, number]>([1, 1]);
+    const [sumCounts, setSumCounts] = useState<Record<number, number>>(() => createEmptySumCounts());
+    const [totalRolls, setTotalRolls] = useState(0);
+
+    const rollDice = (times: number) => {
+        let latest: [number, number] = diceValues;
+        setSumCounts(prev => {
+            const updated = { ...prev };
+            for (let i = 0; i < times; i += 1) {
+                const first = randomInt(1, 6);
+                const second = randomInt(1, 6);
+                latest = [first, second];
+                const sum = first + second;
+                updated[sum] = (updated[sum] ?? 0) + 1;
+            }
+            return updated;
+        });
+        setDiceValues(latest);
+        setTotalRolls(prev => prev + times);
+    };
+
+    const resetLab = () => {
+        setSumCounts(createEmptySumCounts());
+        setTotalRolls(0);
+        setDiceValues([1, 1]);
+    };
+
+    const maxCount = Math.max(1, ...diceSums.map(sum => sumCounts[sum]));
+    const currentSum = diceValues[0] + diceValues[1];
+
+    return (
+        <div className="bg-white border border-indigo-100 rounded-2xl p-6 space-y-5 shadow">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+                <div className="flex items-center gap-4">
+                    <DiceFace value={diceValues[0]} />
+                    <DiceFace value={diceValues[1]} />
+                </div>
+                <div className="flex-1 space-y-2">
+                    <h2 className="text-2xl font-bold text-indigo-900">Interaktives Würfel-Labor</h2>
+                    <p className="text-gray-700">
+                        Wirf zwei faire Würfel live und beobachte, wie sich die Summen im Säulendiagramm verteilen. Nutze die Buttons,
+                        um einzelne oder mehrere Würfe durchzuführen und eine Stichprobe aufzubauen.
+                    </p>
+                    <p className="text-sm text-slate-600">
+                        Letztes Ergebnis: <span className="font-semibold text-slate-900">{diceValues[0]} + {diceValues[1]} = {currentSum}</span>
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                        <button onClick={() => rollDice(1)} className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
+                            1× würfeln
+                        </button>
+                        <button onClick={() => rollDice(10)} className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg font-semibold hover:bg-indigo-200">
+                            10× würfeln
+                        </button>
+                        <button onClick={resetLab} className="px-4 py-2 border border-slate-300 rounded-lg font-semibold text-slate-700 hover:bg-slate-50">
+                            Zurücksetzen
+                        </button>
+                    </div>
+                    <p className="text-xs text-slate-500">Gesamtanzahl Würfe: {totalRolls}</p>
+                </div>
+            </div>
+            <div>
+                <p className="text-sm font-semibold text-slate-700 mb-2">Summenverteilung (2 bis 12)</p>
+                <div className="flex items-end gap-2 h-48">
+                    {diceSums.map(sum => {
+                        const count = sumCounts[sum];
+                        const height = maxCount === 0 ? 0 : Math.round((count / maxCount) * 100);
+                        return (
+                            <div key={sum} className="flex flex-col items-center flex-1 min-w-[2rem]">
+                                <div className="w-full bg-indigo-200 rounded-t-lg transition-all duration-300" style={{ height: `${height}%` }} />
+                                <span className="mt-1 text-sm font-semibold text-slate-800">{sum}</span>
+                                <span className="text-xs text-slate-500">{count}</span>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const UrnVisualLab: React.FC = () => {
+    const [drawCounts, setDrawCounts] = useState<Record<string, number>>(() => createEmptyUrnCounts());
+    const [lastDraw, setLastDraw] = useState<string | null>(null);
+    const [totalDraws, setTotalDraws] = useState(0);
+
+    const drawBall = () => {
+        const result = randomChoice(urnPoolLabels);
+        setLastDraw(result);
+        setDrawCounts(prev => ({
+            ...prev,
+            [result]: (prev[result] ?? 0) + 1
+        }));
+        setTotalDraws(prev => prev + 1);
+    };
+
+    const resetUrn = () => {
+        setDrawCounts(createEmptyUrnCounts());
+        setLastDraw(null);
+        setTotalDraws(0);
+    };
+
+    return (
+        <div className="bg-white border border-emerald-100 rounded-2xl p-6 space-y-5 shadow">
+            <div className="space-y-2">
+                <h2 className="text-2xl font-bold text-emerald-900">Urnenexperiment mit Visualisierung</h2>
+                <p className="text-gray-700">
+                    In der Urne liegen 5 rote, 3 blaue, 2 gelbe und 2 grüne Kugeln. Ziehe Zufallsergebnisse (mit Zurücklegen) und
+                    vergleiche deine Beobachtung mit den theoretischen Anteilen.
+                </p>
+            </div>
+            <div className="grid gap-6 lg:grid-cols-2">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="relative w-52 h-52 bg-slate-50 border-4 border-emerald-700 rounded-[40%] flex flex-wrap content-start p-4 gap-2">
+                        {urnPoolLabels.map((label, index) => (
+                            <span
+                                key={`${label}-${index}`}
+                                className="w-6 h-6 rounded-full border border-white shadow"
+                                style={{ backgroundColor: urnColorMap[label] }}
+                            />
+                        ))}
+                    </div>
+                    <div className="flex flex-wrap justify-center gap-3">
+                        {urnConfig.map(entry => (
+                            <span key={entry.label} className="flex items-center gap-1 text-sm text-slate-600">
+                                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                                {entry.label}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+                <div className="space-y-3">
+                    <div className="flex flex-wrap gap-3">
+                        <button onClick={drawBall} className="px-4 py-2 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700">
+                            Kugel ziehen
+                        </button>
+                        <button onClick={resetUrn} className="px-4 py-2 border border-slate-300 rounded-lg font-semibold text-slate-700 hover:bg-slate-50">
+                            Statistik löschen
+                        </button>
+                        <div className="text-sm text-slate-600 flex items-center">Ziehungen: {totalDraws}</div>
+                    </div>
+                    <p className="text-sm text-slate-600">
+                        Letztes Ergebnis:{' '}
+                        <span className="font-semibold text-slate-900">{lastDraw ? lastDraw : 'Noch keine Ziehung'}</span>
+                    </p>
+                    <div className="space-y-4">
+                        {urnConfig.map(entry => {
+                            const theoreticalPercent = Math.round((entry.count / totalUrnBalls) * 100);
+                            const experimentalPercent = totalDraws === 0 ? 0 : Math.round((drawCounts[entry.label] / totalDraws) * 100);
+                            return (
+                                <div key={entry.label} className="space-y-1">
+                                    <div className="flex justify-between text-sm text-slate-700">
+                                        <span>{entry.label}</span>
+                                        <span>{drawCounts[entry.label]} Ziehungen</span>
+                                    </div>
+                                    <div className="h-4 bg-slate-200 rounded-full relative overflow-hidden">
+                                        <div
+                                            className="absolute inset-y-0 left-0 bg-amber-200"
+                                            style={{ width: `${theoreticalPercent}%` }}
+                                        />
+                                        <div
+                                            className="absolute inset-y-0 left-0 bg-emerald-500/80"
+                                            style={{ width: `${experimentalPercent}%` }}
+                                        />
+                                    </div>
+                                    <div className="flex justify-between text-xs text-slate-500">
+                                        <span>Theorie: {theoreticalPercent}%</span>
+                                        <span>Experiment: {experimentalPercent}%</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const Wahrscheinlichkeiten: React.FC = () => {
+    const spinnerTaskIds = useMemo(() => new Set(['prob-21', 'prob-22', 'prob-23', 'prob-24', 'prob-30', 'prob-31']), []);
+    const diceTaskIds = useMemo(() => new Set(['prob-32', 'prob-33', 'prob-34']), []);
+    const urnTaskIds = useMemo(() => new Set(['prob-35', 'prob-36', 'prob-37', 'prob-38']), []);
+
     const spinnerTasks = useMemo(() => probabilityTasks.filter(task => spinnerTaskIds.has(task.id)), [spinnerTaskIds]);
-    const otherTasks = useMemo(() => probabilityTasks.filter(task => !spinnerTaskIds.has(task.id)), [spinnerTaskIds]);
+    const diceTasks = useMemo(() => probabilityTasks.filter(task => diceTaskIds.has(task.id)), [diceTaskIds]);
+    const urnTasks = useMemo(() => probabilityTasks.filter(task => urnTaskIds.has(task.id)), [urnTaskIds]);
+    const otherTasks = useMemo(
+        () =>
+            probabilityTasks.filter(
+                task => !spinnerTaskIds.has(task.id) && !diceTaskIds.has(task.id) && !urnTaskIds.has(task.id)
+            ),
+        [spinnerTaskIds, diceTaskIds, urnTaskIds]
+    );
+
     const spinnerLabelMap = useMemo(() => {
         const map: Record<string, string> = {};
         spinnerTasks.forEach((task, index) => {
@@ -563,17 +876,34 @@ const Wahrscheinlichkeiten: React.FC = () => {
         });
         return map;
     }, [spinnerTasks]);
+
+    const diceLabelMap = useMemo(() => {
+        const map: Record<string, string> = {};
+        diceTasks.forEach((task, index) => {
+            map[task.id] = `Aufgabe 2.${index + 1}`;
+        });
+        return map;
+    }, [diceTasks]);
+
+    const urnLabelMap = useMemo(() => {
+        const map: Record<string, string> = {};
+        urnTasks.forEach((task, index) => {
+            map[task.id] = `Aufgabe 3.${index + 1}`;
+        });
+        return map;
+    }, [urnTasks]);
+
     const otherTaskLabelMap = useMemo(() => {
         const map: Record<string, string> = {};
-        let counter = 2;
+        let counter = 4;
         probabilityTasks.forEach(task => {
-            if (!spinnerTaskIds.has(task.id)) {
+            if (!spinnerTaskIds.has(task.id) && !diceTaskIds.has(task.id) && !urnTaskIds.has(task.id)) {
                 map[task.id] = `Aufgabe ${counter}`;
                 counter += 1;
             }
         });
         return map;
-    }, [spinnerTaskIds]);
+    }, [spinnerTaskIds, diceTaskIds, urnTaskIds]);
     const taskOrderMap = useMemo(
         () =>
             probabilityTasks.reduce((acc, task, index) => {
@@ -736,10 +1066,10 @@ const Wahrscheinlichkeiten: React.FC = () => {
                 <div>
                     <h1 className="text-3xl font-bold text-blue-900 mb-3">Wahrscheinlichkeiten berechnen</h1>
                     <p className="text-gray-700">
-                        Dich erwarten jetzt 31 Aufgaben zu ein- und mehrstufigen Zufallsexperimenten. Ein interaktives Glücksrad sowie
-                        fünf zusätzliche Simulationen (Münzen, Würfel, Mini-Rad, Urne, Karten) helfen dir, Zufallsergebnisse selbst zu
-                        erleben. Gib deine Lösung als Bruch, Dezimalzahl oder Prozentwert an. Die Musterlösung erscheint erst, nachdem
-                        du mindestens einen Fehlversuch hattest.
+                        Dich erwarten jetzt 37 Aufgaben zu ein- und mehrstufigen Zufallsexperimenten. Ein interaktives Glücksrad, ein
+                        Würfel-Labor und eine Urnen-Simulation sowie fünf zusätzliche Mini-Experimente (Münzen, Würfel, Mini-Rad, Urne,
+                        Karten) helfen dir, Zufallsergebnisse selbst zu erleben. Gib deine Lösung als Bruch, Dezimalzahl oder
+                        Prozentwert an. Die Musterlösung erscheint erst, nachdem du mindestens einen Fehlversuch hattest.
                     </p>
                 </div>
 
@@ -753,6 +1083,38 @@ const Wahrscheinlichkeiten: React.FC = () => {
                         </div>
                         <div className="grid gap-5">
                             {spinnerTasks.map(task => renderTask(task, spinnerLabelMap[task.id]))}
+                        </div>
+                    </div>
+                </section>
+
+                <section className="space-y-4">
+                    <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-6 space-y-6">
+                        <DiceFrequencyLab />
+                        <div className="bg-white border border-indigo-100 rounded-2xl p-5 space-y-3">
+                            <h2 className="text-2xl font-bold text-indigo-900">Aufgabe 2 – Rechnen mit dem Würfel-Labor</h2>
+                            <p className="text-gray-700">
+                                Löse die Aufgaben 2.1 bis {diceTasks.length ? `2.${diceTasks.length}` : '2.n'} direkt im Anschluss an die
+                                Beobachtungen aus dem Würfel-Labor.
+                            </p>
+                            <div className="grid gap-5">
+                                {diceTasks.map(task => renderTask(task, diceLabelMap[task.id]))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="space-y-4">
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-6">
+                        <UrnVisualLab />
+                        <div className="bg-white border border-emerald-100 rounded-2xl p-5 space-y-3">
+                            <h2 className="text-2xl font-bold text-emerald-900">Aufgabe 3 – Rechnen mit dem Urnen-Labor</h2>
+                            <p className="text-gray-700">
+                                Die Aufgaben 3.1 bis {urnTasks.length ? `3.${urnTasks.length}` : '3.n'} beziehen sich direkt auf die
+                                dargestellten Kugelanteile.
+                            </p>
+                            <div className="grid gap-5">
+                                {urnTasks.map(task => renderTask(task, urnLabelMap[task.id]))}
+                            </div>
                         </div>
                     </div>
                 </section>

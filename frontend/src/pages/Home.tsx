@@ -28,7 +28,12 @@ export default function Home() {
       </main>
 
       <footer className="w-full py-6 text-center text-gray-500 bg-white/80 border-t mt-8">
-        <p>© 2025 Mathenkik. Alle Rechte vorbehalten.</p>
+        <p>
+          © 2025 Mathenkik. Alle Rechte vorbehalten. ·{' '}
+          <Link to="/impressum" className="text-blue-600 hover:text-blue-800 font-semibold">
+            Impressum
+          </Link>
+        </p>
       </footer>
     </div>
   )

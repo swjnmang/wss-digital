@@ -37,6 +37,8 @@ import Potenzen from './pages/rechnen_lernen/Potenzen'
 import Wurzeln from './pages/rechnen_lernen/Wurzeln'
 import Prozentrechnung from './pages/rechnen_lernen/Prozentrechnung'
 import Gleichungen from './pages/rechnen_lernen/Gleichungen'
+import Impressum from './pages/Impressum'
+import CookieBanner from './components/CookieBanner'
 // lineare funktionen pages
 import SteigungBerechnen from './pages/lineare_funktionen/SteigungBerechnen'
 import Funktionsgleichung from './pages/lineare_funktionen/Funktionsgleichung'
@@ -91,10 +93,25 @@ import Wahrscheinlichkeiten from './pages/daten_und_zufall/Wahrscheinlichkeiten'
 export default function App() {
   return (
     <div className="app-root">
-      <header className="app-header">
-        <nav>
-          <Link to="/">Start</Link>
-        </nav>
+      <header className="app-header bg-white/90 backdrop-blur sticky top-0 z-30 border-b border-slate-200">
+        <div className="max-w-6xl mx-auto w-full px-4 py-3 flex flex-col gap-3 items-center sm:flex-row sm:justify-between">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              to="/"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-2 text-white text-lg font-semibold shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700"
+            >
+              Start
+            </Link>
+          </div>
+          <a
+            href="https://swjnmang.github.io/wss-digital/index.html"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 bg-white shadow-sm hover:bg-slate-50"
+          >
+            Zurück zu WSS-Digital
+          </a>
+        </div>
       </header>
       <main>
         <Routes>
@@ -120,6 +137,7 @@ export default function App() {
           <Route path="/rechnen_lernen/wurzeln/wurzeln" element={<WurzelnUebung />} />
           <Route path="/rechnen_lernen/prozentrechnung" element={<Prozentrechnung />} />
           <Route path="/rechnen_lernen/prozentrechnung/prozentrechnung" element={<ProzentrechnungUebung />} />
+          <Route path="/rechnen_lernen/prozentrechnung/bezugskalkulation" element={<Bezugskalkulation />} />
           <Route path="/rechnen_lernen/prozentrechnung/handelskalkvw" element={<Handelskalkvw />} />
           <Route path="/rechnen_lernen/prozentrechnung/handelskalkrw" element={<Handelskalkrw />} />
           <Route path="/rechnen_lernen/prozentrechnung/handelskalkdif" element={<Handelskalkdif />} />
@@ -180,9 +198,12 @@ export default function App() {
           <Route path="/daten-und-zufall/baumdiagramme2" element={<Baumdiagramme2 />} />
           <Route path="/daten-und-zufall/wahrscheinlichkeiten" element={<Wahrscheinlichkeiten />} />
 
+          <Route path="/impressum" element={<Impressum />} />
+
           <Route path="*" element={<Home />} />
         </Routes>
       </main>
+      <CookieBanner />
     </div>
   )
 }
