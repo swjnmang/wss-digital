@@ -5,7 +5,7 @@ Dieses Verzeichnis enthält ein kleines Vite + React (TypeScript) Grundgerüst f
 Schnellstart (in PowerShell):
 
 ```powershell
-cd frontend
+cd mathe-trainer
 npm install
 npm run dev
 ```
@@ -19,7 +19,7 @@ npm run preview
 
 Deployment auf Vercel:
 
-- Wenn du das gesamte Repo deployen willst, lege beim Vercel-Projekt den Project Root / Root Directory auf `frontend` fest.
+- Wenn du das gesamte Repo deployen willst, lege beim Vercel-Projekt den Project Root / Root Directory auf `mathe-trainer` fest.
 - Build Command: `npm run build`, Output Directory: `dist` (oder verwende die automatisch erkannten Einstellungen)
 
 Nächste Schritte:

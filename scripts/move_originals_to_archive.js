@@ -4,7 +4,7 @@ const path = require('path')
 const repoRoot = path.resolve(__dirname, '..')
 const archiveRoot = path.join(repoRoot, 'archive_original_site')
 
-const IGNORE_TOP = new Set(['.git', 'node_modules', 'frontend', 'scripts', '.vscode', 'archive_original_site'])
+const IGNORE_TOP = new Set(['.git', 'node_modules', 'mathe-trainer', 'scripts', '.vscode', 'archive_original_site'])
 const EXT_ALLOW = new Set(['.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.gif', '.ico', '.json'])
 
 function ensureDir(dir){ if(!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }) }

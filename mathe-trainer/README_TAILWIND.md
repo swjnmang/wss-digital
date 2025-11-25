@@ -7,7 +7,7 @@ What I changed:
 - Converted the `lineare_funktionen` topic pages into React components under `src/pages/lineare_funktionen/` and used a small CSS Module for shared styles.
 
 What you need to do locally:
-1. From the `frontend` folder run:
+1. From the `mathe-trainer` folder run:
 
 ```powershell
 npm install

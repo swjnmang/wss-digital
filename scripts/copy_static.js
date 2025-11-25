@@ -2,9 +2,9 @@ const fs = require('fs')
 const path = require('path')
 
 const repoRoot = path.resolve(__dirname, '..')
-const frontendPublic = path.join(repoRoot, 'frontend', 'public')
+const appPublic = path.join(repoRoot, 'mathe-trainer', 'public')
 
-const IGNORES = ['node_modules', '.git', 'frontend', '.vscode', 'dist']
+const IGNORES = ['node_modules', '.git', 'mathe-trainer', '.vscode', 'dist']
 const EXT_ALLOW = ['.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.gif', '.ico', '.json']
 
 function ensureDirSync(dir){
@@ -26,7 +26,7 @@ function walkAndCopy(dir){
     } else if(e.isFile()){
       const ext = path.extname(e.name).toLowerCase()
       if(EXT_ALLOW.includes(ext)){
-        const dest = path.join(frontendPublic, rel)
+        const dest = path.join(appPublic, rel)
         ensureDirSync(path.dirname(dest))
         fs.copyFileSync(full, dest)
         console.log('copied', rel)
@@ -35,6 +35,6 @@ function walkAndCopy(dir){
   }
 }
 
-ensureDirSync(frontendPublic)
+ensureDirSync(appPublic)
 walkAndCopy(repoRoot)
 console.log('done')
