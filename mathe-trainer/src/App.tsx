@@ -88,6 +88,15 @@ import StatistischeKennwerte from './pages/daten_und_zufall/StatistischeKennwert
 import Baumdiagramme2 from './pages/daten_und_zufall/Baumdiagramme2';
 import DiagrammeErstellen from './pages/daten_und_zufall/DiagrammeErstellen';
 import Wahrscheinlichkeiten from './pages/daten_und_zufall/Wahrscheinlichkeiten';
+// Raum und Form
+import RaumUndFormIndex from './pages/RaumUndFormIndex';
+import Flaechengeometrie from './pages/raum_und_form/Flaechengeometrie';
+import SatzDesPythagoras from './pages/raum_und_form/SatzDesPythagoras';
+import Kugel from './pages/raum_und_form/Kugel';
+import Kegel from './pages/raum_und_form/Kegel';
+import Pyramide from './pages/raum_und_form/Pyramide';
+import Zylinder from './pages/raum_und_form/Zylinder';
+import Prisma from './pages/raum_und_form/Prisma';
 // ... other imports will be added as files are created
 
 export default function App() {
@@ -197,6 +206,16 @@ export default function App() {
           <Route path="/daten-und-zufall/diagramme-erstellen" element={<DiagrammeErstellen />} />
           <Route path="/daten-und-zufall/baumdiagramme2" element={<Baumdiagramme2 />} />
           <Route path="/daten-und-zufall/wahrscheinlichkeiten" element={<Wahrscheinlichkeiten />} />
+
+          {/* Raum und Form */}
+          <Route path="/raum-und-form" element={<RaumUndFormIndex />} />
+          <Route path="/raum-und-form/flaechengeometrie" element={<Flaechengeometrie />} />
+          <Route path="/raum-und-form/satz-des-pythagoras" element={<SatzDesPythagoras />} />
+          <Route path="/raum-und-form/kugel" element={<Kugel />} />
+          <Route path="/raum-und-form/kegel" element={<Kegel />} />
+          <Route path="/raum-und-form/pyramide" element={<Pyramide />} />
+          <Route path="/raum-und-form/zylinder" element={<Zylinder />} />
+          <Route path="/raum-und-form/prisma" element={<Prisma />} />
 
           <Route path="/impressum" element={<Impressum />} />
 

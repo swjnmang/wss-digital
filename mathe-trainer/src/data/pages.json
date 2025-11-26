@@ -40,6 +40,14 @@
     "icon": "fas fa-dice"
   },
   {
+    "id": "raum_und_form",
+    "title": "Raum & Form",
+    "description": "Flächen- und Körperberechnungen mit Aufgaben-Generatoren.",
+    "path": "/raum_und_form/index.html",
+    "reactPath": "/raum-und-form",
+    "icon": "fa-solid fa-cube"
+  },
+  {
     "id": "trigonometrie",
     "title": "Trigonometrie",
     "description": "Berechnungen an Dreiecken mit Sinus, Kosinus und Tangens.",
