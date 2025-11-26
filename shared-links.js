@@ -2,7 +2,7 @@
   const LINK_CONFIG = {
     'mathe-trainer': {
       url: 'https://ws-mathe-trainer.vercel.app/',
-      newTab: true,
+      newTab: false,
     },
     'digitale-bildung': {
       url: '#',
