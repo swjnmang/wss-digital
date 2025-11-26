@@ -104,7 +104,7 @@ export default function App() {
             </Link>
           </div>
           <a
-            href="https://swjnmang.github.io/wss-digital/index.html"
+            href="https://swjnmang.github.io/wss-digital/"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 bg-white shadow-sm hover:bg-slate-50"
