@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import type { RefObject } from 'react';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import { Link } from 'react-router-dom';
 import { letterAssignments, type LetterAssignment } from '../data/letterAssignments';
 
 interface LetterFields {
-  sender: string;
   recipientLines: string[];
   recipientAdditions: string[];
   recipientType: 'business' | 'private';
@@ -18,11 +20,6 @@ interface LetterFields {
   closingCompany: string;
   attachments: string;
   infoBlock: InfoBlockFields;
-}
-
-interface RecipientPiece {
-  id: string;
-  text: string;
 }
 
 interface InfoBlockFields {
@@ -44,15 +41,9 @@ interface ValidationItem {
   message: string;
 }
 
-const today = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date());
 const firstAssignment = letterAssignments[0];
 const recipientTypeGuidance: Record<'business' | 'private', string[]> = {
-  business: [
-    'Zeile 1: Unternehmen (ggf. fett).',
-    'Zeile 2: Ansprechpartner mit Titel.',
-    'Zeile 3–4: Straße/Postfach + PLZ Ort.',
-    'Weitere Zeilen für Abteilung, Referenz, Versandhinweis.'
-  ],
+  business: [],
   private: [
     'Zeile 1: Anrede + Vor- und Nachname.',
     'Zeile 2: Straße oder Postfach.',
@@ -61,26 +52,11 @@ const recipientTypeGuidance: Record<'business' | 'private', string[]> = {
   ]
 };
 
-function buildRecipientPieces(assignment: LetterAssignment): RecipientPiece[] {
-  return assignment.recipientPieces.map((text, index) => ({
-    id: `${assignment.id}-${index}`,
-    text
-  }));
-}
-
-function shufflePieces(pieces: RecipientPiece[]): RecipientPiece[] {
-  const copy = [...pieces];
-  for (let i = copy.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
 
 const spacingHints = [
   {
     title: 'Absender → Zusatz-/Vermerkzone',
-    detail: '1 Leerzeile nach dem Firmenkopf, dann beginnt die 5-zeilige Zusatzzone.'
+    detail: '1 Leerzeile nach dem Firmenkopf, dann folgt die kompakte Zusatzzeile (Zeile 5).'
   },
   {
     title: 'Zusatz-/Vermerkzone → Empfänger',
@@ -108,21 +84,35 @@ const spacingHints = [
   }
 ];
 
+const infoBlockFieldMeta: Array<{ key: keyof InfoBlockFields; label: string }> = [
+  { key: 'reference', label: 'Ihr Zeichen' },
+  { key: 'clientMessageDate', label: 'Ihre Nachricht vom' },
+  { key: 'ourReference', label: 'Unser Zeichen' },
+  { key: 'ourMessageDate', label: 'Unsere Nachricht vom' },
+  { key: 'contactName', label: 'Name' },
+  { key: 'phone', label: 'Telefon' },
+  { key: 'fax', label: 'Fax' },
+  { key: 'mail', label: 'E-Mail' },
+  { key: 'infoDate', label: 'Datum' }
+];
+
+const bodyFieldMeta: Array<{ key: 'bodyIntro' | 'bodyMain' | 'bodyClosing'; label: string; helper: string }> = [
+  { key: 'bodyIntro', label: 'Einstieg', helper: 'Worum geht es?' },
+  { key: 'bodyMain', label: 'Hauptteil', helper: 'Details + Forderung' },
+  { key: 'bodyClosing', label: 'Abschluss', helper: 'Ausblick oder Bitte' }
+];
+
 export default function Geschaeftsbriefe() {
   const [assignmentId, setAssignmentId] = useState(firstAssignment.id);
   const [fields, setFields] = useState<LetterFields>(() => createTemplate(firstAssignment));
-  const [availablePieces, setAvailablePieces] = useState<RecipientPiece[]>(() =>
-    shufflePieces(buildRecipientPieces(firstAssignment))
-  );
-  const [linePieceMap, setLinePieceMap] = useState<(string | null)[]>(() => Array(9).fill(null));
-  const [activeRecipientLine, setActiveRecipientLine] = useState<number | null>(null);
+  const letterPreviewRef = useRef<HTMLDivElement | null>(null);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   const currentAssignment = useMemo(() => {
     return letterAssignments.find(item => item.id === assignmentId) ?? firstAssignment;
   }, [assignmentId]);
 
   const validations = useMemo(() => validateFields(fields), [fields]);
-  const recipientPieces = useMemo(() => buildRecipientPieces(currentAssignment), [currentAssignment]);
 
   const handleAssignmentChange = (nextId: string) => {
     const nextAssignment = letterAssignments.find(item => item.id === nextId);
@@ -131,107 +121,73 @@ export default function Geschaeftsbriefe() {
     }
     setAssignmentId(nextId);
     setFields(createTemplate(nextAssignment));
-    setAvailablePieces(shufflePieces(buildRecipientPieces(nextAssignment)));
-    setLinePieceMap(Array(9).fill(null));
-    setActiveRecipientLine(null);
-  };
-
-  const handleRecipientLineInput = (index: number, value: string) => {
-    const existingPieceId = linePieceMap[index];
-    if (existingPieceId) {
-      const piece = recipientPieces.find(token => token.id === existingPieceId);
-      if (piece && piece.text !== value) {
-        setAvailablePieces(prev => [...prev, piece]);
-        setLinePieceMap(prev => {
-          const next = [...prev];
-          next[index] = null;
-          return next;
-        });
-      }
-    }
-
-    setFields(prev => {
-      const recipientLines = [...prev.recipientLines];
-      recipientLines[index] = value;
-      return { ...prev, recipientLines };
-    });
-    setActiveRecipientLine(index);
-  };
-
-  const handleApplyPiece = (pieceId: string) => {
-    const piece = availablePieces.find(item => item.id === pieceId);
-    if (!piece) {
-      return;
-    }
-    const fallbackIndex = fields.recipientLines.findIndex(line => line.trim() === '');
-    const targetIndex = activeRecipientLine ?? fallbackIndex;
-    if (targetIndex === null || targetIndex === -1) {
-      return;
-    }
-
-    const previousPieceId = linePieceMap[targetIndex];
-    if (previousPieceId) {
-      const previousPiece = recipientPieces.find(item => item.id === previousPieceId);
-      if (previousPiece) {
-        setAvailablePieces(prev => [...prev, previousPiece]);
-      }
-    }
-
-    setLinePieceMap(prev => {
-      const next = [...prev];
-      next[targetIndex] = piece.id;
-      return next;
-    });
-
-    setFields(prev => {
-      const recipientLines = [...prev.recipientLines];
-      recipientLines[targetIndex] = piece.text;
-      return { ...prev, recipientLines };
-    });
-
-    setAvailablePieces(prev => prev.filter(item => item.id !== piece.id));
-    setActiveRecipientLine(targetIndex < fields.recipientLines.length - 1 ? targetIndex + 1 : targetIndex);
-  };
-
-  const handleReturnPiece = (lineIndex: number) => {
-    const pieceId = linePieceMap[lineIndex];
-    if (!pieceId) {
-      return;
-    }
-    const piece = recipientPieces.find(item => item.id === pieceId);
-    if (piece) {
-      setAvailablePieces(prev => [...prev, piece]);
-    }
-    setLinePieceMap(prev => {
-      const next = [...prev];
-      next[lineIndex] = null;
-      return next;
-    });
-    setFields(prev => {
-      const recipientLines = [...prev.recipientLines];
-      recipientLines[lineIndex] = '';
-      return { ...prev, recipientLines };
-    });
-  };
-
-  const handleResetRecipientLines = () => {
-    setFields(prev => ({ ...prev, recipientLines: Array(9).fill('') }));
-    setLinePieceMap(Array(9).fill(null));
-    setAvailablePieces(shufflePieces(recipientPieces));
-    setActiveRecipientLine(null);
   };
 
   const handleFieldChange = (key: keyof LetterFields, value: string) => {
     setFields(prev => ({ ...prev, [key]: value }));
   };
 
-  const combinedBody = [fields.bodyIntro, fields.bodyMain, fields.bodyClosing].filter(Boolean).join('\n\n');
+  const handleRecipientAdditionChange = (index: number, value: string) => {
+    setFields(prev => {
+      const recipientAdditions = [...prev.recipientAdditions];
+      recipientAdditions[index] = value;
+      return { ...prev, recipientAdditions };
+    });
+  };
 
-  const derivedRecipient = useMemo(
-    () => buildRecipientBlock(fields.recipientAdditions, fields.recipientLines),
-    [fields.recipientAdditions, fields.recipientLines]
-  );
-  const builderSections = getBuilderSections(handleFieldChange, fields);
+  const handleRecipientLineChange = (index: number, value: string) => {
+    setFields(prev => {
+      const recipientLines = [...prev.recipientLines];
+      recipientLines[index] = value;
+      return { ...prev, recipientLines };
+    });
+  };
+
+  const handleInfoFieldChange = (key: keyof InfoBlockFields, value: string) => {
+    setFields(prev => ({
+      ...prev,
+      infoBlock: {
+        ...prev.infoBlock,
+        [key]: value
+      }
+    }));
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!letterPreviewRef.current || isExportingPdf) {
+      return;
+    }
+    setIsExportingPdf(true);
+    try {
+      const canvas = await html2canvas(letterPreviewRef.current, {
+        scale: 2,
+        backgroundColor: '#ffffff'
+      });
+      const imageData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const canvasRatio = canvas.width / canvas.height;
+      const maxWidth = pageWidth - 20;
+      const maxHeight = pageHeight - 20;
+      let renderWidth = maxWidth;
+      let renderHeight = renderWidth / canvasRatio;
+      if (renderHeight > maxHeight) {
+        renderHeight = maxHeight;
+        renderWidth = renderHeight * canvasRatio;
+      }
+      const offsetX = (pageWidth - renderWidth) / 2;
+      const offsetY = (pageHeight - renderHeight) / 2;
+      pdf.addImage(imageData, 'PNG', offsetX, offsetY, renderWidth, renderHeight);
+      pdf.save(buildPdfFileName(currentAssignment.subject));
+    } catch (error) {
+      console.error('PDF-Export fehlgeschlagen', error);
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
+
+  const combinedBody = [fields.bodyIntro, fields.bodyMain, fields.bodyClosing].filter(Boolean).join('\n\n');
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -286,76 +242,32 @@ export default function Geschaeftsbriefe() {
           <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
             <h2 className="text-lg font-bold mb-6">Briefbausteine ausfüllen</h2>
             <div className="space-y-8">
-              <SenderAdditionInput
-                value={fields.recipientAdditions[4] ?? ''}
-                onChange={value =>
-                  setFields(prev => {
-                    const recipientAdditions = [...prev.recipientAdditions];
-                    recipientAdditions[4] = value;
-                    return { ...prev, recipientAdditions };
-                  })
-                }
-              />
-              <StructuredAddressInputs
-                recipientLines={fields.recipientLines}
-                recipientType={fields.recipientType}
-                availablePieces={availablePieces}
-                linePieceMap={linePieceMap}
-                activeLineIndex={activeRecipientLine}
-                onRecipientLineChange={handleRecipientLineInput}
-                onPieceApply={handleApplyPiece}
-                onPieceReturn={handleReturnPiece}
-                onResetPieces={handleResetRecipientLines}
-                onActiveLineChange={setActiveRecipientLine}
-                onRecipientTypeChange={type => handleFieldChange('recipientType', type)}
-              />
-              <InfoBlockInputs
-                info={fields.infoBlock}
-                onChange={(info: InfoBlockFields) => setFields(prev => ({ ...prev, infoBlock: info }))}
-              />
-              <SubjectInput
-                value={fields.subject}
-                onChange={value => handleFieldChange('subject', value)}
-              />
-              <ClosingBlockInputs
-                company={fields.closingCompany}
-                greeting={fields.greeting}
-                signature={fields.signature}
-                onChange={(field, value) => handleFieldChange(field, value)}
-              />
-              <div className="rounded-3xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900">
-                Der gesamte Brieftext wurde bereits in das erste Textfeld übertragen und enthält absichtlich keine Leerzeilen. Teile ihn in sinnvolle Abschnitte und ergänze Leerzeilen, falls du eine sauberere Darstellung brauchst.
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 space-y-3">
+                <h3 className="text-sm font-bold text-slate-700">So bearbeitest du den Brief</h3>
+                <ul className="text-sm text-slate-600 space-y-2 list-disc pl-5">
+                  <li>Klicke rechts in der Live-Vorschau auf Datum, Betreff, Anrede oder Textfelder und tippe direkt hinein.</li>
+                  <li>Adressblock, Infoblock und Briefschluss lassen sich ebenfalls direkt im Vorschaubereich eingeben.</li>
+                  <li>Nutze Absätze für Einleitung, Hauptteil und Schluss, damit der Text gut lesbar bleibt.</li>
+                </ul>
               </div>
-              <div className="space-y-5">
-                {builderSections.map(section => (
-                  <div key={section.id}>
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm font-semibold text-slate-700">{section.label}</label>
-                      <span className="text-xs text-slate-400">{section.helper}</span>
-                    </div>
-                    {section.type === 'textarea' ? (
-                      <textarea
-                        value={section.value}
-                        onChange={event => section.onChange(event.target.value)}
-                        rows={section.rows}
-                        className="mt-2 w-full rounded-2xl border border-slate-300 p-3 text-sm font-mono focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        value={section.value}
-                        onChange={event => section.onChange(event.target.value)}
-                        className="mt-2 w-full rounded-2xl border border-slate-300 p-3 text-sm font-mono focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                      />
-                    )}
-                  </div>
-                ))}
+              <div className="rounded-3xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900">
+                Bearbeite alle Inhalte direkt rechts in der Live-Vorschau. Du kannst jeden Abschnitt anklicken und textlich anpassen – ganz ohne separate Eingabefelder.
               </div>
             </div>
           </div>
 
           <div className="space-y-6">
-            <LetterPreview fields={fields} recipientBlock={derivedRecipient} />
+            <LetterPreview
+              fields={fields}
+              previewRef={letterPreviewRef}
+              onDownloadPdf={handleDownloadPdf}
+              isExportingPdf={isExportingPdf}
+              onInfoFieldChange={handleInfoFieldChange}
+              onRecipientAdditionChange={handleRecipientAdditionChange}
+              onRecipientLineChange={handleRecipientLineChange}
+              onRecipientTypeChange={type => handleFieldChange('recipientType', type)}
+              onFieldChange={handleFieldChange}
+            />
             <ValidationList
               items={validations}
               combinedBody={combinedBody}
@@ -370,11 +282,10 @@ export default function Geschaeftsbriefe() {
 
 function createTemplate(currentAssignment: LetterAssignment): LetterFields {
   return {
-    sender: currentAssignment.companyAddress,
-    recipientAdditions: Array(5).fill(''),
-    recipientLines: Array(9).fill(''),
+    recipientAdditions: [''],
+    recipientLines: createRecipientLineTemplate(currentAssignment.recipientPieces.length),
     recipientType: currentAssignment.recipientType,
-    date: today,
+    date: '',
     subject: '',
     salutation: '',
     bodyIntro: currentAssignment.bodyDraft,
@@ -398,70 +309,8 @@ function createTemplate(currentAssignment: LetterAssignment): LetterFields {
   };
 }
 
-function getBuilderSections(
-  handleFieldChange: (key: keyof LetterFields, value: string) => void,
-  fields: LetterFields
-) {
-  return [
-    {
-      id: 'sender',
-      label: 'Absender (max. 3 Zeilen)',
-      helper: 'Zeilen 1–3',
-      type: 'textarea',
-      rows: 3,
-      value: fields.sender,
-      onChange: (value: string) => handleFieldChange('sender', value)
-    },
-    {
-      id: 'date',
-      label: 'Datum',
-      helper: 'rechtsbündig',
-      type: 'input',
-      rows: 1,
-      value: fields.date,
-      onChange: (value: string) => handleFieldChange('date', value)
-    },
-    {
-      id: 'salutation',
-      label: 'Anrede',
-      helper: 'z. B. „Sehr geehrte …,“ + 1 Leerzeile danach',
-      type: 'input',
-      rows: 1,
-      value: fields.salutation,
-      onChange: (value: string) => handleFieldChange('salutation', value)
-    },
-    {
-      id: 'bodyIntro',
-      label: 'Brieftext',
-      helper: '1 Absatz',
-      type: 'textarea',
-      rows: 3,
-      value: fields.bodyIntro,
-      onChange: (value: string) => handleFieldChange('bodyIntro', value)
-    }
-  ];
-}
-
-function SenderAdditionInput({ value, onChange }: { value: string; onChange: (value: string) => void }) {
-  return (
-    <div className="rounded-3xl border border-slate-200 p-5 bg-white">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-bold text-slate-700">Absender in der Zusatz-/Vermerkzone</h3>
-          <p className="text-xs text-slate-500">Diese Eingabe landet automatisch in Zeile 5 der Zusatz- und Vermerkzone.</p>
-        </div>
-        <span className="text-[10px] uppercase tracking-widest text-slate-400">Zeile 5</span>
-      </div>
-      <input
-        type="text"
-        value={value}
-        onChange={event => onChange(event.target.value)}
-        placeholder="z. B. MÖBELFABRIK · Meindlstraße 8a · 81373 München"
-        className="mt-3 w-full rounded-2xl border border-slate-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-      />
-      <p className="text-xs text-blue-600 mt-2">Nutze 1 Zeile mit Trennzeichen (z. B. Mittelpunkte), damit die Zeile schlank bleibt.</p>
-    </div>
-  );
+function createRecipientLineTemplate(count: number) {
+  return Array(Math.max(count, 1)).fill('');
 }
 
 function AssignmentSelector({
@@ -492,7 +341,6 @@ function AssignmentSelector({
 }
 
 function validateFields(fields: LetterFields): ValidationItem[] {
-  const senderLines = fields.sender.trim().split(/\n+/).filter(Boolean);
   const subjectHasWord = /betreff/i.test(fields.subject);
   const dateValid = /^\d{2}\.\d{2}\.\d{4}$/.test(fields.date.trim());
   const greetingText = fields.greeting.trim().toLowerCase();
@@ -511,16 +359,12 @@ function validateFields(fields: LetterFields): ValidationItem[] {
 
   return [
     {
-      id: 'sender',
-      label: 'Absender max. 3 Zeilen',
-      status: senderLines.length > 0 && senderLines.length <= 3 ? 'ok' : 'warn',
-      message: senderLines.length <= 3 ? 'Format passt.' : 'Kürze den Absender auf höchstens 3 Zeilen.'
-    },
-    {
       id: 'additionZone',
-      label: 'Zusatz- & Vermerkzone (5 Zeilen)',
+      label: 'Zusatz- & Vermerkzone (1 Zeile)',
       status: additionFilled ? 'ok' : 'warn',
-      message: additionFilled ? 'Absender/Versand stehen oben links.' : 'Trage den Absender in die Zusatz-/Vermerkzone ein.'
+      message: additionFilled
+        ? 'Absenderzeile steht korrekt über der Empfängeradresse.'
+        : 'Trage deine Absenderadresse kompakt in Zeile 5 ein.'
     },
     {
       id: 'recipient',
@@ -587,48 +431,203 @@ function validateFields(fields: LetterFields): ValidationItem[] {
   ];
 }
 
-function LetterPreview({ fields, recipientBlock }: { fields: LetterFields; recipientBlock: string }) {
-  const infoLines = buildInfoBlockLines(fields.infoBlock);
+function LetterPreview({
+  fields,
+  previewRef,
+  onDownloadPdf,
+  isExportingPdf,
+  onInfoFieldChange,
+  onRecipientAdditionChange,
+  onRecipientLineChange,
+  onRecipientTypeChange,
+  onFieldChange
+}: {
+  fields: LetterFields;
+  previewRef: RefObject<HTMLDivElement | null>;
+  onDownloadPdf: () => void;
+  isExportingPdf: boolean;
+  onInfoFieldChange: (key: keyof InfoBlockFields, value: string) => void;
+  onRecipientAdditionChange: (index: number, value: string) => void;
+  onRecipientLineChange: (index: number, value: string) => void;
+  onRecipientTypeChange: (type: 'business' | 'private') => void;
+  onFieldChange: (key: keyof LetterFields, value: string) => void;
+}) {
   return (
     <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-bold">Live-Vorschau</h2>
-        <span className="text-xs text-slate-500">nicht maßstabsgetreu</span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-slate-500">nicht maßstabsgetreu</span>
+          <button
+            type="button"
+            onClick={onDownloadPdf}
+            disabled={isExportingPdf}
+            className="text-xs font-semibold rounded-full border border-blue-500 px-3 py-1 text-blue-600 hover:bg-blue-50 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isExportingPdf ? 'PDF wird erstellt …' : 'PDF herunterladen'}
+          </button>
+        </div>
       </div>
-      <div className="border border-slate-200 rounded-3xl p-6 bg-slate-50">
+      <div ref={previewRef} className="border border-slate-200 rounded-3xl p-6 bg-slate-50">
         <div className="grid gap-6 md:grid-cols-[2fr_1fr] text-sm">
           <div className="space-y-3">
-            <pre className="font-mono whitespace-pre-wrap text-slate-700">{fields.sender || 'Absender GmbH\nStraße 1\n12345 Stadt'}</pre>
-            <pre className="font-mono whitespace-pre-wrap text-slate-700">{recipientBlock}</pre>
+            <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 space-y-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-slate-500 font-semibold">Zusatz- & Vermerkzone</p>
+                  <p className="text-[11px] text-slate-400">Zeile 5 – hier gehört deine Absenderadresse hin.</p>
+                </div>
+                <div className="flex gap-2 text-[11px]">
+                  {(['business', 'private'] as const).map(type => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => onRecipientTypeChange(type)}
+                      className={`px-3 py-1 rounded-full border ${fields.recipientType === type ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600'}`}
+                    >
+                      {type === 'business' ? 'Unternehmen' : 'Privatperson'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <label className="space-y-1 text-[11px] uppercase tracking-widest text-slate-500 block">
+                Absenderadresse (eine Zeile)
+                {fields.recipientAdditions.map((line, index) => (
+                  <input
+                    key={`addition-${index}`}
+                    type="text"
+                    value={line}
+                    onChange={event => onRecipientAdditionChange(index, event.target.value)}
+                    className="w-full rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-mono tracking-[0.2em] text-slate-700 focus:border-blue-400 focus:bg-white focus:outline-none"
+                  />
+                ))}
+              </label>
+              <div className="pt-3 border-t border-dashed border-slate-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs uppercase tracking-widest text-slate-500 font-semibold">Empfängeradresse</p>
+                  <span className="text-[11px] text-slate-400">max. 9 Zeilen</span>
+                </div>
+                <div className="space-y-1">
+                  {fields.recipientLines.map((line, index) => (
+                    <input
+                      key={`recipient-${index}`}
+                      type="text"
+                      value={line}
+                      onChange={event => onRecipientLineChange(index, event.target.value)}
+                      placeholder={`Empfänger Zeile ${index + 1}`}
+                      className="w-full rounded-xl border border-transparent bg-transparent px-2 py-1 font-mono text-sm text-slate-800 focus:border-blue-400 focus:bg-white focus:outline-none"
+                    />
+                  ))}
+                </div>
+                {recipientTypeGuidance[fields.recipientType].length > 0 && (
+                  <ul className="text-[11px] text-slate-500 list-disc pl-4">
+                    {recipientTypeGuidance[fields.recipientType].map(item => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
           </div>
           <div className="border border-slate-300 rounded-2xl p-4 bg-white text-xs text-slate-700 font-mono">
-            {infoLines.map(line => (
-              <div key={line.label} className="flex justify-between gap-2 border-b border-dashed border-slate-200 py-1 last:border-b-0">
-                <span>{line.label}</span>
-                <span className="text-right">{line.value || '–'}</span>
-              </div>
-            ))}
+            <p className="uppercase tracking-widest text-[10px] text-slate-500 mb-2">Infoblock direkt bearbeiten</p>
+            <div className="space-y-2">
+              {infoBlockFieldMeta.map(field => (
+                <label key={field.key} className="flex flex-col gap-1 border-b border-dashed border-slate-200 pb-2 last:border-b-0 last:pb-0">
+                  <span className="text-[10px] uppercase tracking-widest text-slate-500">{field.label}</span>
+                  <input
+                    type="text"
+                    value={fields.infoBlock[field.key]}
+                    onChange={event => onInfoFieldChange(field.key, event.target.value)}
+                    className="bg-slate-50 rounded-xl border border-slate-200 px-2 py-1 text-xs text-slate-700 focus:border-blue-400 focus:ring-1 focus:ring-blue-200"
+                  />
+                </label>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="text-right text-slate-600 text-sm mt-6">{fields.date || today}</div>
-        <div className="font-semibold text-slate-900 mt-4">{fields.subject || 'Thema des Schreibens'}</div>
-        <div className="mt-3">{fields.salutation || 'Sehr geehrte Damen und Herren,'}</div>
+        <div className="text-right text-slate-600 text-sm mt-6">
+          <input
+            type="text"
+            value={fields.date}
+            onChange={event => onFieldChange('date', event.target.value)}
+            placeholder="TT.MM.JJJJ"
+            className="w-full border border-transparent bg-transparent px-3 py-1 font-mono text-right text-sm text-slate-700 focus:border-blue-400 focus:bg-white focus:outline-none rounded-xl"
+          />
+        </div>
+        <div className="mt-4">
+          <input
+            type="text"
+            value={fields.subject}
+            onChange={event => onFieldChange('subject', event.target.value)}
+            placeholder="Thema des Schreibens"
+            className="w-full border border-transparent bg-transparent px-3 py-2 text-base font-semibold uppercase tracking-wide text-slate-900 focus:border-blue-400 focus:bg-white focus:outline-none rounded-2xl"
+          />
+        </div>
+        <div className="mt-3">
+          <input
+            type="text"
+            value={fields.salutation}
+            onChange={event => onFieldChange('salutation', event.target.value)}
+            placeholder="Sehr geehrte Damen und Herren,"
+            className="w-full border border-transparent bg-transparent px-3 py-1 text-base text-slate-900 focus:border-blue-400 focus:bg-white focus:outline-none rounded-2xl"
+          />
+        </div>
         <div className="space-y-4 text-slate-700 mt-4">
-          {[fields.bodyIntro, fields.bodyMain, fields.bodyClosing].filter(Boolean).map((paragraph, index) => (
-            <p key={`${paragraph}-${index}`}>{paragraph}</p>
+          {bodyFieldMeta.map(field => (
+            <label key={field.key} className="block space-y-1">
+              <span className="text-[11px] uppercase tracking-widest text-slate-400">{field.label}</span>
+              <textarea
+                value={fields[field.key]}
+                onChange={event => onFieldChange(field.key, event.target.value)}
+                rows={field.key === 'bodyMain' ? 4 : 3}
+                placeholder={field.helper}
+                className="w-full border border-transparent bg-transparent px-3 py-2 text-sm leading-relaxed text-slate-800 rounded-2xl resize-none focus:border-blue-400 focus:bg-white focus:outline-none"
+              />
+            </label>
           ))}
         </div>
-        <div className="mt-6 space-y-2">
-          <p className="font-semibold text-slate-800">{fields.closingCompany || 'Unternehmen GmbH'}</p>
-          <p>{fields.greeting || 'Freundliche Grüße'}</p>
-          <div className="h-10" />
-          <pre className="font-mono whitespace-pre-wrap text-slate-700">{fields.signature || 'i. A. Max Beispiel\nVertrieb'}</pre>
+        <div className="mt-6 space-y-3">
+          <label className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold block">
+            Firmenname / Absenderorganisation
+            <input
+              type="text"
+              value={fields.closingCompany}
+              onChange={event => onFieldChange('closingCompany', event.target.value)}
+              placeholder="Unternehmen GmbH"
+              className="mt-1 w-full border border-transparent bg-transparent px-3 py-2 text-sm font-semibold text-slate-800 rounded-2xl focus:border-blue-400 focus:bg-white focus:outline-none"
+            />
+          </label>
+          <label className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold block">
+            Grußformel
+            <input
+              type="text"
+              value={fields.greeting}
+              onChange={event => onFieldChange('greeting', event.target.value)}
+              placeholder="Freundliche Grüße"
+              className="mt-1 w-full border border-transparent bg-transparent px-3 py-2 text-sm text-slate-800 rounded-2xl focus:border-blue-400 focus:bg-white focus:outline-none"
+            />
+          </label>
+          <label className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold block">
+            i. A. + Vor- und Nachname
+            <textarea
+              value={fields.signature}
+              onChange={event => onFieldChange('signature', event.target.value)}
+              rows={3}
+              placeholder={'i. A. Max Beispiel\nVertrieb'}
+              className="mt-1 w-full border border-transparent bg-transparent px-3 py-2 text-sm font-mono whitespace-pre-wrap text-slate-800 rounded-2xl resize-none focus:border-blue-400 focus:bg-white focus:outline-none"
+            />
+          </label>
         </div>
-        {fields.attachments && (
-          <div className="text-slate-600 text-sm border-t border-dashed border-slate-300 pt-3 mt-4">
-            {fields.attachments}
-          </div>
-        )}
+        <div className="text-slate-600 text-sm border-t border-dashed border-slate-300 pt-3 mt-4">
+          <input
+            type="text"
+            value={fields.attachments}
+            onChange={event => onFieldChange('attachments', event.target.value)}
+            placeholder="Anlage: Angebotsliste"
+            className="w-full border border-transparent bg-transparent px-3 py-2 text-sm text-slate-700 rounded-2xl focus:border-blue-400 focus:bg-white focus:outline-none"
+          />
+        </div>
       </div>
     </div>
   );
@@ -705,269 +704,13 @@ function SpacingCoach() {
   );
 }
 
-function StructuredAddressInputs({
-  recipientLines,
-  recipientType,
-  availablePieces,
-  linePieceMap,
-  activeLineIndex,
-  onRecipientLineChange,
-  onRecipientTypeChange,
-  onPieceApply,
-  onPieceReturn,
-  onResetPieces,
-  onActiveLineChange
-}: {
-  recipientLines: string[];
-  recipientType: 'business' | 'private';
-  availablePieces: RecipientPiece[];
-  linePieceMap: (string | null)[];
-  activeLineIndex: number | null;
-  onRecipientLineChange: (index: number, value: string) => void;
-  onRecipientTypeChange: (type: 'business' | 'private') => void;
-  onPieceApply: (pieceId: string) => void;
-  onPieceReturn: (lineIndex: number) => void;
-  onResetPieces: () => void;
-  onActiveLineChange: (index: number | null) => void;
-}) {
-  return (
-    <div className="rounded-3xl border border-slate-200 p-5 bg-slate-50 shadow-inner space-y-4">
-      <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-bold text-slate-700">Anschriftenfeld</h3>
-        <p className="text-xs text-slate-500">
-          5 Zeilen Zusatz-/Vermerkzone für Absender + Versandhinweis, anschließend 9 Zeilen Empfängeradresse.
-        </p>
-        <div className="flex gap-2 text-xs">
-          {(['business', 'private'] as const).map(type => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => onRecipientTypeChange(type)}
-              className={`px-3 py-1 rounded-full border ${recipientType === type ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600'}`}
-            >
-              {type === 'business' ? 'Unternehmen' : 'Privatperson'}
-            </button>
-          ))}
-        </div>
-        <ul className="text-xs text-slate-600 list-disc pl-4">
-          {recipientTypeGuidance[recipientType].map(item => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
-      {/* Zusatz- & Vermerkzone entfällt – Absender wird bereits oben abgefragt */}
-      <RecipientPiecesBoard
-        pieces={availablePieces}
-        onApply={onPieceApply}
-        onReset={onResetPieces}
-        activeLineIndex={activeLineIndex}
-      />
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-xs uppercase tracking-widest text-slate-500 font-semibold">Empfängeradresse</p>
-          <p className="text-[11px] text-slate-400">Tipp: Zeile auswählen, dann Baustein klicken.</p>
-        </div>
-        <div className="grid gap-2">
-          {recipientLines.map((line, index) => (
-            <div key={`line-${index}`} className="flex items-center gap-2">
-              <input
-                type="text"
-                value={line}
-                placeholder={`Empfänger Zeile ${index + 1}`}
-                onFocus={() => onActiveLineChange(index)}
-                onChange={event => onRecipientLineChange(index, event.target.value)}
-                className={`flex-1 rounded-2xl border px-3 py-2 text-sm font-mono ${linePieceMap[index] ? 'border-blue-400 bg-white' : 'border-slate-300'}`}
-              />
-              <button
-                type="button"
-                onClick={() => onPieceReturn(index)}
-                disabled={!linePieceMap[index]}
-                className={`text-xs px-3 py-2 rounded-2xl border ${linePieceMap[index] ? 'border-blue-500 text-blue-700' : 'border-slate-200 text-slate-400 cursor-not-allowed'}`}
-              >
-                {linePieceMap[index] ? 'Baustein zurück' : 'leer'}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RecipientPiecesBoard({
-  pieces,
-  onApply,
-  onReset,
-  activeLineIndex
-}: {
-  pieces: RecipientPiece[];
-  onApply: (pieceId: string) => void;
-  onReset: () => void;
-  activeLineIndex: number | null;
-}) {
-  const activeLabel = activeLineIndex === null ? 'keine Zeile gewählt' : `Zeile ${activeLineIndex + 1}`;
-  return (
-    <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-slate-700">Adressbausteine ({pieces.length})</p>
-        <button
-          type="button"
-          onClick={onReset}
-          className="text-xs text-blue-700 font-semibold hover:underline"
-        >
-          Alles zurücksetzen
-        </button>
-      </div>
-      <p className="text-xs text-slate-500">Klicke zuerst auf die Zielzeile, danach auf einen Baustein.</p>
-      {pieces.length === 0 ? (
-        <p className="text-sm text-emerald-600">Alle Bausteine sind verteilt. Prüfe nun die Reihenfolge.</p>
-      ) : (
-        <div className="flex flex-wrap gap-2">
-          {pieces.map(piece => (
-            <button
-              key={piece.id}
-              type="button"
-              onClick={() => onApply(piece.id)}
-              className="px-3 py-1 rounded-full border border-blue-200 bg-blue-50 text-blue-700 text-sm"
-            >
-              {piece.text}
-            </button>
-          ))}
-        </div>
-      )}
-      <p className="text-[11px] text-slate-500">Aktive Zeile: {activeLabel}</p>
-    </div>
-  );
-}
-
-function SubjectInput({ value, onChange }: { value: string; onChange: (value: string) => void }) {
-  return (
-    <div className="rounded-3xl border border-slate-200 p-5 bg-white">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-bold text-slate-700">Betreff formulieren</h3>
-          <p className="text-xs text-slate-500">Eine Zeile, ohne das Wort „Betreff“. Vor und nach dieser Zeile bleiben jeweils zwei Leerzeilen frei.</p>
-        </div>
-        <span className="text-[10px] uppercase tracking-widest text-slate-400">Zeile 19–20</span>
-      </div>
-      <input
-        type="text"
-        value={value}
-        onChange={event => onChange(event.target.value)}
-        className="mt-3 w-full rounded-2xl border border-slate-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-      />
-      <p className="text-xs text-blue-600 mt-2">Tipp: Oberbegriff + Vorgangsnummer wirkt professionell.</p>
-    </div>
-  );
-}
-
-function ClosingBlockInputs({
-  company,
-  greeting,
-  signature,
-  onChange
-}: {
-  company: string;
-  greeting: string;
-  signature: string;
-  onChange: (field: 'closingCompany' | 'greeting' | 'signature', value: string) => void;
-}) {
-  return (
-    <div className="rounded-3xl border border-slate-200 p-5 bg-white space-y-4">
-      <div>
-        <p className="text-xs text-slate-500">Reihenfolge: Firmenname → Grußformel → i. A. + Vor- & Nachname.</p>
-      </div>
-      <label className="text-xs uppercase tracking-widest text-slate-500 font-semibold space-y-1">
-        Firmenname
-        <input
-          type="text"
-          value={company}
-          onChange={event => onChange('closingCompany', event.target.value)}
-          className="w-full rounded-2xl border border-slate-300 px-3 py-2 text-sm font-mono"
-        />
-      </label>
-      <label className="text-xs uppercase tracking-widest text-slate-500 font-semibold space-y-1">
-        Grußformel
-        <input
-          type="text"
-          value={greeting}
-          placeholder="Freundliche Grüße"
-          onChange={event => onChange('greeting', event.target.value)}
-          className="w-full rounded-2xl border border-slate-300 px-3 py-2 text-sm font-mono"
-        />
-      </label>
-      <label className="text-xs uppercase tracking-widest text-slate-500 font-semibold space-y-1">
-        i. A. + Vor- und Nachname
-        <textarea
-          value={signature}
-          placeholder="i. A. Vorname Nachname\nFunktion"
-          onChange={event => onChange('signature', event.target.value)}
-          rows={3}
-          className="w-full rounded-2xl border border-slate-300 px-3 py-2 text-sm font-mono"
-        />
-      </label>
-      <div className="rounded-2xl bg-slate-50 p-3 text-xs text-slate-600">
-        <p>Leerzeilen-Regel:</p>
-        <ul className="list-disc pl-4 mt-1 space-y-1">
-          <li>1 Leerzeile zwischen Text und Grußformel</li>
-          <li>3 Leerzeilen zwischen Grußformel und i. A.</li>
-          <li>„i. A.“ immer klein schreiben und mit Name kombinieren</li>
-        </ul>
-      </div>
-    </div>
-  );
-}
-
-function InfoBlockInputs({ info, onChange }: { info: InfoBlockFields; onChange: (info: InfoBlockFields) => void }) {
-  const update = (key: keyof InfoBlockFields, value: string) => {
-    onChange({ ...info, [key]: value });
-  };
-  return (
-    <div className="rounded-3xl border border-slate-200 p-5 bg-slate-50 shadow-inner">
-      <h3 className="text-sm font-bold text-slate-700 mb-4">Infoblock</h3>
-      <div className="grid md:grid-cols-2 gap-3">
-        <InputField label="Ihr Zeichen" value={info.reference} onChange={value => update('reference', value)} />
-        <InputField label="Ihre Nachricht vom" value={info.clientMessageDate} onChange={value => update('clientMessageDate', value)} />
-        <InputField label="Unser Zeichen" value={info.ourReference} onChange={value => update('ourReference', value)} />
-        <InputField label="Unsere Nachricht vom" value={info.ourMessageDate} onChange={value => update('ourMessageDate', value)} />
-        <InputField label="Name" value={info.contactName} onChange={value => update('contactName', value)} />
-        <InputField label="Telefon" value={info.phone} onChange={value => update('phone', value)} />
-        <InputField label="Fax" value={info.fax} onChange={value => update('fax', value)} />
-        <InputField label="E-Mail" value={info.mail} onChange={value => update('mail', value)} />
-        <InputField label="Datum" value={info.infoDate} onChange={value => update('infoDate', value)} />
-      </div>
-    </div>
-  );
-}
-
-function InputField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return (
-    <label className="text-xs uppercase tracking-widest text-slate-500 font-semibold space-y-1">
-      {label}
-      <input
-        type="text"
-        value={value}
-        onChange={event => onChange(event.target.value)}
-        className="w-full rounded-2xl border border-slate-300 px-3 py-2 text-sm font-mono"
-      />
-    </label>
-  );
-}
-
-function buildRecipientBlock(additions: string[], lines: string[]) {
-  return [...additions, ...lines].join('\n');
-}
-
-function buildInfoBlockLines(info: InfoBlockFields) {
-  return [
-    { label: 'Ihr Zeichen', value: info.reference },
-    { label: 'Ihre Nachricht vom', value: info.clientMessageDate },
-    { label: 'Unser Zeichen', value: info.ourReference },
-    { label: 'Unsere Nachricht vom', value: info.ourMessageDate },
-    { label: 'Name', value: info.contactName },
-    { label: 'Telefon', value: info.phone },
-    { label: 'Fax', value: info.fax },
-    { label: 'E-Mail', value: info.mail },
-    { label: 'Datum', value: info.infoDate }
-  ];
+function buildPdfFileName(subject: string) {
+  const base = subject?.trim() || 'Geschaeftsbrief';
+  const simplified = base
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return `${simplified || 'geschaeftsbrief'}.pdf`;
 }
