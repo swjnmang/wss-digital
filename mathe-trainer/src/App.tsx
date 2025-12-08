@@ -104,22 +104,23 @@ export default function App() {
   return (
     <div className="app-root">
       <header className="app-header bg-white/90 backdrop-blur sticky top-0 z-30 border-b border-slate-200">
-        <div className="max-w-6xl mx-auto w-full px-4 py-3 flex flex-col gap-3 items-center sm:flex-row sm:justify-between">
-          <div className="flex flex-wrap items-center gap-3">
-            <Link
-              to="/"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-2 text-white text-lg font-semibold shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700"
-            >
-              Start
-            </Link>
-          </div>
+        <div className="max-w-6xl mx-auto w-full px-3 py-2 flex items-center justify-between">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-4 py-1.5 text-white text-sm sm:text-base font-semibold shadow-md shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700"
+          >
+            <span className="hidden sm:inline">Startseite</span>
+            <span className="sm:hidden">Start</span>
+          </Link>
+          
           <a
             href="https://swjnmang.github.io/wss-digital/"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 bg-white shadow-sm hover:bg-slate-50"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-3 py-1.5 text-xs sm:text-sm font-semibold text-slate-700 bg-white shadow-sm hover:bg-slate-50"
           >
-            Zurück zu WSS-Digital
+            <span className="hidden sm:inline">Zurück zu WSS-Digital</span>
+            <span className="sm:hidden">WSS-Digital</span>
           </a>
         </div>
       </header>
