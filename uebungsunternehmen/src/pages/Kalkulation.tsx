@@ -338,6 +338,102 @@ export default function Kalkulation() {
     doc.save('Zertifikat_Kalkulation.pdf');
   };
 
+  const generateWorksheet = () => {
+    const doc = new jsPDF();
+    const tasks: CalcTask[] = [
+      generateTask('Bezugskalkulation', 'Vorwärts'),
+      generateTask('Bezugskalkulation', 'Rückwärts'),
+      generateTask('Handelskalkulation', 'Vorwärts'),
+      generateTask('Handelskalkulation', 'Rückwärts'),
+      generateTask('Handelskalkulation', 'Differenz')
+    ];
+
+    // Page 1: Tasks
+    doc.setFontSize(18);
+    doc.text("Übungsaufgaben Kalkulation", 20, 20);
+    
+    let y = 40;
+    tasks.forEach((t, i) => {
+      if (y > 250) {
+        doc.addPage();
+        y = 20;
+      }
+      
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      const title = `Aufgabe ${i + 1}: ${t.schema} (${t.direction})`;
+      doc.text(title, 20, y);
+      y += 7;
+      
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      const splitText = doc.splitTextToSize(t.description, 170);
+      doc.text(splitText, 20, y);
+      y += splitText.length * 6 + 10;
+    });
+
+    // Page 2: Solutions
+    doc.addPage();
+    doc.setFontSize(18);
+    doc.text("Lösungen", 20, 20);
+    
+    y = 40;
+    tasks.forEach((t, i) => {
+      // Estimate height needed for this solution
+      const rows = SCHEMA_ROWS.filter(row => {
+        if (t.schema === 'Bezugskalkulation') {
+          // Include up to 'bp'
+          const index = SCHEMA_ROWS.findIndex(r => r.key === 'bp');
+          const thisIndex = SCHEMA_ROWS.findIndex(r => r.key === row.key);
+          return thisIndex <= index;
+        }
+        return true;
+      });
+      
+      const heightNeeded = rows.length * 6 + 20;
+      
+      if (y + heightNeeded > 280) {
+        doc.addPage();
+        y = 20;
+      }
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Lösung Aufgabe ${i + 1}`, 20, y);
+      y += 8;
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+
+      rows.forEach(row => {
+        const val = t.values[row.key];
+        const op = row.operator || '';
+        
+        doc.text(op, 20, y);
+        doc.text(row.label, 28, y);
+        
+        // Percentage?
+        if (row.percentageKey) {
+          const pVal = t.percentages[row.percentageKey];
+          doc.text(`${pVal} %`, 100, y, { align: 'right' });
+        }
+        
+        doc.text(`${val.toFixed(2).replace('.', ',')} €`, 160, y, { align: 'right' });
+        y += 6;
+      });
+      
+      // Add Gewinn % for Differenz
+      if (t.direction === 'Differenz') {
+         doc.text(`Gewinnzuschlag: ${t.percentages.gewinn_p.toFixed(2).replace('.', ',')} %`, 28, y);
+         y += 6;
+      }
+
+      y += 10;
+    });
+
+    doc.save("Kalkulation_Uebungsblatt.pdf");
+  };
+
   const handleInputChange = (key: string, value: string) => {
     setUserInputs(prev => ({ ...prev, [key]: value }));
     // Clear feedback for this field when edited
@@ -439,12 +535,20 @@ export default function Kalkulation() {
           </h1>
         </div>
         {mode === 'practice' && (
-          <button 
-            onClick={() => setMode('exam-intro')}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm"
-          >
-            Zum Prüfungsmodus
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={generateWorksheet}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm"
+            >
+              Übungsblatt PDF
+            </button>
+            <button 
+              onClick={() => setMode('exam-intro')}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm"
+            >
+              Zum Prüfungsmodus
+            </button>
+          </div>
         )}
         {mode !== 'practice' && mode !== 'exam-result' && (
           <button 
