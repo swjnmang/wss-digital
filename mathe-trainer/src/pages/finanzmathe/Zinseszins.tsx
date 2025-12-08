@@ -234,10 +234,10 @@ export default function Zinseszins() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-4xl min-h-[400px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
+      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-4 sm:px-4 md:px-8">
+        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-4xl min-h-[400px] flex flex-col items-center p-4 sm:p-8 md:p-12">
           <button type="button" onClick={handleBack} className="text-blue-600 hover:underline mb-4 self-start">&larr; Zurück</button>
-          <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Zinseszins-Rechner</h1>
+          <h1 className="text-2xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Zinseszins-Rechner</h1>
           
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6 w-full max-w-2xl text-center">
             <div className="text-lg font-serif mb-2">
@@ -257,38 +257,40 @@ export default function Zinseszins() {
           </div>
 
           {task && (
-            <div className="w-full max-w-xl bg-slate-100 border border-slate-200 rounded-lg p-6 mb-4">
-              <div className="text-lg mb-4">
+            <div className="w-full max-w-xl bg-slate-100 border border-slate-200 rounded-lg p-4 sm:p-6 mb-4">
+              <div className="text-base md:text-lg mb-4">
                 {task.question}
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-gray-700 whitespace-nowrap">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <span className="font-bold text-gray-700 whitespace-nowrap mb-1 sm:mb-0">
                   {task.type === 'k_end' && <span>Endkapital <InlineMath math="K_n" />:</span>}
                   {task.type === 'k_start' && <span>Anfangskapital <InlineMath math="K_0" />:</span>}
                   {task.type === 'p' && <span>Zinssatz <InlineMath math="p" />:</span>}
                   {task.type === 'n' && <span>Laufzeit <InlineMath math="n" />:</span>}
                 </span>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  className="flex-1 border-2 border-slate-300 rounded-lg p-2 text-lg focus:outline-blue-400"
-                  value={userAnswer}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserAnswer(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder={task.type === 'n' ? 'z.B. 5' : 'z.B. 1234,56'}
-                />
-                <span className="text-xl font-bold text-gray-600">
-                  {task.type === 'k_end' || task.type === 'k_start' ? '€' : task.type === 'p' ? '% p.a.' : 'Jahre'}
-                </span>
+                <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    className="flex-1 border-2 border-slate-300 rounded-lg p-2 text-lg focus:outline-blue-400 min-w-[100px]"
+                    value={userAnswer}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserAnswer(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder={task.type === 'n' ? 'z.B. 5' : 'z.B. 1234,56'}
+                  />
+                  <span className="text-lg sm:text-xl font-bold text-gray-600 whitespace-nowrap">
+                    {task.type === 'k_end' || task.type === 'k_start' ? '€' : task.type === 'p' ? '% p.a.' : 'Jahre'}
+                  </span>
+                </div>
               </div>
             </div>
           )}
 
-          <div className="flex flex-wrap gap-4 mb-4">
-            <button onClick={checkAnswer} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Überprüfen</button>
-            <button onClick={showSolution} className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-6 rounded shadow transition-colors">Lösung zeigen</button>
-            <button onClick={generateNewTask} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Nächste Aufgabe</button>
+          <div className="flex flex-col sm:flex-row gap-3 mb-4 w-full sm:w-auto">
+            <button onClick={checkAnswer} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full sm:w-auto">Überprüfen</button>
+            <button onClick={showSolution} className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full sm:w-auto">Lösung zeigen</button>
+            <button onClick={generateNewTask} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full sm:w-auto">Nächste Aufgabe</button>
           </div>
 
           {feedback && (
