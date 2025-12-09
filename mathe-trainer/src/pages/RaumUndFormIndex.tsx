@@ -1,98 +1,134 @@
-import { Link } from 'react-router-dom';
-import type { LucideIcon } from 'lucide-react';
-import { Ruler, Triangle, Circle, Cone, Pyramid, Cylinder, Boxes } from 'lucide-react';
+﻿import { Link } from "react-router-dom";
+import type { LucideIcon } from "lucide-react";
+import { Ruler, Triangle, Circle, Cone, Pyramid, Cylinder, Boxes, ArrowLeft } from "lucide-react";
 
-const items: Array<{ title: string; desc: string; href: string; accent: string; icon: LucideIcon }> = [
+type Item = { title: string; desc: string; href: string; tag: string; icon: LucideIcon };
+
+const surfaceItems: Item[] = [
   {
-    title: 'Flächengeometrie',
-    desc: 'Rechtecke, Dreiecke, Trapeze und Kreise – berechne Flächen präzise.',
-    href: 'flaechengeometrie',
-    accent: 'bg-rose-100 text-rose-700',
+    title: "Flächengeometrie",
+    desc: "Rechtecke, Dreiecke, Trapeze und Kreise in ruhigem Layout  mit klaren Skizzen und Einheiten.",
+    href: "flaechengeometrie",
+    tag: "Flächen",
     icon: Ruler
   },
   {
-    title: 'Satz des Pythagoras',
-    desc: 'Finde Hypotenusen und Katheten in praxisnahen Szenarien.',
-    href: 'satz-des-pythagoras',
-    accent: 'bg-indigo-100 text-indigo-700',
+    title: "Satz des Pythagoras",
+    desc: "Hypotenuse oder Kathete finden  rechtwinklige Dreiecke ohne Ballast.",
+    href: "satz-des-pythagoras",
+    tag: "Dreiecke",
     icon: Triangle
-  },
+  }
+];
+
+const solidItems: Item[] = [
   {
-    title: 'Kugel',
-    desc: 'Volumen und Oberfläche für kugelförmige Bauteile.',
-    href: 'kugel',
-    accent: 'bg-emerald-100 text-emerald-700',
+    title: "Kugel",
+    desc: "Volumen und Oberfläche für Kugeln, sauber beschriftet.",
+    href: "kugel",
+    tag: "Körper",
     icon: Circle
   },
   {
-    title: 'Kegel',
-    desc: 'Berechne Volumen oder Mantel für konische Körper.',
-    href: 'kegel',
-    accent: 'bg-amber-100 text-amber-700',
+    title: "Kegel",
+    desc: "Mantel und Volumen mit klaren Höhen- und Radiusangaben.",
+    href: "kegel",
+    tag: "Körper",
     icon: Cone
   },
   {
-    title: 'Pyramide',
-    desc: 'Grundfläche und Höhe geschickt kombinieren.',
-    href: 'pyramide',
-    accent: 'bg-violet-100 text-violet-700',
+    title: "Pyramide",
+    desc: "Grundfläche, Höhe, Mantel  kompakt dargestellt.",
+    href: "pyramide",
+    tag: "Körper",
     icon: Pyramid
   },
   {
-    title: 'Zylinder',
-    desc: 'Oberfläche und Volumen für Tanks & Displays.',
-    href: 'zylinder',
-    accent: 'bg-cyan-100 text-cyan-700',
+    title: "Zylinder",
+    desc: "Tank- und Dosenaufgaben mit sauberen Netzen.",
+    href: "zylinder",
+    tag: "Körper",
     icon: Cylinder
   },
   {
-    title: 'Prisma',
-    desc: 'Quader- und Dreiecksprismen mit realen Maßangaben.',
-    href: 'prisma',
-    accent: 'bg-emerald-100 text-emerald-700',
+    title: "Prisma",
+    desc: "Quader-, Dreiecks- und Trapezprismen mit eindeutigen Kanten.",
+    href: "prisma",
+    tag: "Körper",
     icon: Boxes
   }
 ];
 
+const cardBase =
+  "group rounded-2xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm transition-colors p-5 flex flex-col gap-3";
+const tagBase = "inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500";
+const buttonBase =
+  "inline-flex items-center justify-center gap-2 rounded-xl border border-slate-900 text-slate-50 bg-slate-900 px-4 py-2 text-sm font-semibold hover:bg-slate-800";
+
 export default function RaumUndFormIndex() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-slate-50 to-white text-slate-900">
-      <header className="w-full py-12 px-4 md:px-12 bg-white/90 backdrop-blur border-b border-slate-200">
-        <h1 className="text-4xl font-bold mb-3 text-slate-900">Raum &amp; Form</h1>
-        <p className="text-lg text-slate-600 max-w-3xl">Übungsaufgaben zur Flächen- und Körpergeometrie</p>
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <header className="border-b border-slate-200 bg-white/90">
+        <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col gap-4">
+          <div className="flex items-center gap-3 text-sm text-slate-500">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            <Link to="/" className="hover:text-slate-800 font-semibold">
+              Zurück zur Hauptübersicht
+            </Link>
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Raum &amp; Form</p>
+            <h1 className="text-3xl md:text-4xl font-bold leading-tight">Übersicht der Teilgebiete</h1>
+            <p className="text-base md:text-lg text-slate-600 max-w-3xl leading-relaxed">
+              Kompakte Übungskarten mit ruhigem Layout, klaren Skizzen und eindeutigen Einheiten. Wähle ein Teilgebiet und starte direkt.
+            </p>
+          </div>
+        </div>
       </header>
 
-      <div className="w-full max-w-6xl mx-auto px-4 mt-6">
-        <Link to="/" className="inline-block text-slate-500 hover:text-slate-900 mb-4">
-          ← Zurück zur Hauptübersicht
-        </Link>
-      </div>
+      <main className="max-w-6xl mx-auto px-4 py-10 space-y-10">
+        <Section title="Flächen & Dreiecke" items={surfaceItems} />
+        <Section title="Körpergeometrie" items={solidItems} />
+      </main>
+    </div>
+  );
+}
 
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 pb-16 grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+function Section({ title, items }: { title: string; items: Item[] }) {
+  return (
+    <section className="space-y-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+        <p className="text-sm text-slate-500">Direkter Einstieg in die Aufgabengeneratoren</p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map(item => {
           const Icon = item.icon;
           return (
-            <div
-              key={item.href}
-              className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 flex flex-col text-slate-900"
-            >
-              <span
-                className={`text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full inline-block mb-4 text-center w-full ${item.accent}`}
-              >
-                {item.title}
+            <div key={item.href} className={cardBase}>
+              <span className={tagBase}>
+                <span className="h-2 w-2 rounded-full bg-slate-400" aria-hidden="true" />
+                {item.tag}
               </span>
-              <p className="text-slate-600 flex-1">{item.desc}</p>
-              <Link
-                to={`/raum-und-form/${item.href}`}
-                className="mt-6 inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 text-white font-semibold py-2 px-4 hover:bg-slate-800"
-              >
-                <Icon className="w-4 h-4" aria-hidden="true" />
-                Jetzt üben
-              </Link>
+              <div className="flex items-start gap-3">
+                <div className="rounded-xl bg-slate-100 text-slate-700 p-2">
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold leading-tight">{item.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+              <div className="pt-1">
+                <Link to={`/raum-und-form/${item.href}`} className={buttonBase}>
+                  Jetzt öffnen
+                  <span aria-hidden="true"></span>
+                </Link>
+              </div>
             </div>
           );
         })}
-      </main>
-    </div>
+      </div>
+    </section>
   );
 }
