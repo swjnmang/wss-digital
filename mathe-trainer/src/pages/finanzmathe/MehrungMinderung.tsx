@@ -19,6 +19,7 @@ interface Task {
   q: number;
   question: React.ReactNode;
   solutionValue: number;
+  solutionRaw?: number;
 }
 
 const randomFloat = (min: number, max: number, decimals: number) => {
@@ -31,6 +32,11 @@ const getRandomItem = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.le
 
 const formatCurrency = (val: number) => val.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const formatNumber = (val: number, decimals: number = 2) => val.toLocaleString('de-DE', { maximumFractionDigits: decimals });
+const formatMathNumber = (val: number, decimals: number = 2) => val.toLocaleString('de-DE', { maximumFractionDigits: decimals, minimumFractionDigits: decimals, useGrouping: false });
+const roundYearsLogical = (years: number, type: TaskType) => {
+  const rounded = type === 'mehrung' ? Math.ceil(years) : Math.floor(years);
+  return Math.max(1, rounded);
+};
 
 export default function MehrungMinderung() {
   const navigate = useNavigate();
@@ -114,11 +120,15 @@ export default function MehrungMinderung() {
         let finalKn = Kn;
         let finalR = r;
         let finalN = n;
+        let solutionValue = sol;
         
         if (unknown === 'Kn') finalKn = sol;
         if (unknown === 'K0') finalK0 = sol;
         if (unknown === 'r') finalR = sol;
-        if (unknown === 'n') finalN = Math.round(sol); // For n, we usually want an integer in the task, but here n is the result.
+        if (unknown === 'n') {
+          finalN = roundYearsLogical(sol, type);
+          solutionValue = finalN;
+        }
 
         // Re-verify if n was unknown, that the integer n produces close enough result? 
         // Or just accept the calculated float n for internal logic but display rounded?
@@ -128,7 +138,8 @@ export default function MehrungMinderung() {
           type, timing, unknown,
           K0: finalK0, Kn: finalKn, r: finalR, n: finalN, p, q,
           question: null, // Will build below
-          solutionValue: sol
+          solutionValue,
+          solutionRaw: unknown === 'n' ? sol : undefined
         };
         validTask = true;
       }
@@ -150,7 +161,9 @@ export default function MehrungMinderung() {
     try {
       switch (unknown) {
         case 'Kn':
-          return (type === 'mehrung') ? (K0_Teil + R_Teil) : (K0_Teil - R_Teil);
+          return (type === 'mehrung')
+            ? (K0_Teil + R_Teil)
+            : Math.max(0, K0_Teil - R_Teil);
         case 'K0':
           return (type === 'mehrung') ? ((Kn - R_Teil) / Math.pow(q, n)) : ((Kn + R_Teil) / Math.pow(q, n));
         case 'r':
@@ -237,22 +250,19 @@ export default function MehrungMinderung() {
       return;
     }
 
-    let tolerance = 0.05;
-    if (task.unknown === 'n') tolerance = 0.1; // Years might be float in calculation but integer in input?
-    // Actually for 'n', the user usually enters an integer or 1 decimal.
-    
+    const tolerance = task.unknown === 'n' ? 0.01 : 0.05;
     const diff = Math.abs(input - task.solutionValue);
     
     setTotalCount(c => c + 1);
 
-    if (diff <= tolerance || (task.unknown === 'n' && Math.abs(Math.round(input) - Math.round(task.solutionValue)) <= 0)) {
+    if (task.unknown === 'n' ? Math.round(input) === Math.round(task.solutionValue) : diff <= tolerance) {
       setFeedback('Richtig! Hervorragend.');
       setFeedbackType('correct');
       setCorrectCount(c => c + 1);
       setStreak(s => s + 1);
     } else {
       let unit = task.unknown === 'n' ? 'Jahre' : '€';
-      let correctDisplay = formatNumber(task.solutionValue, task.unknown === 'n' ? 1 : 2);
+      let correctDisplay = formatNumber(task.solutionValue, task.unknown === 'n' ? 0 : 2);
       
       setFeedback(
         <div>
@@ -277,11 +287,93 @@ export default function MehrungMinderung() {
     
     const sign = type === 'mehrung' ? '+' : '-';
     const r_factor = timing === 'vor' ? ` \\cdot ${formatNumber(q, 4)}` : '';
+    const rFactorNumeric = timing === 'vor' ? q : 1;
+    const qPowN = Math.pow(q, n);
+    const rentenFaktor = (qPowN - 1) / (q - 1);
+    const rentenFaktorLatex = formatMathNumber(rentenFaktor, 4);
+    const qLatex = formatMathNumber(q, 4);
+    const nLatex = formatMathNumber(n, 1);
+    const k0Latex = formatMathNumber(K0, 2).replace('.', '\\,');
+    const knLatex = Kn ? formatMathNumber(Kn, 2).replace('.', '\\,') : '';
+    const rLatex = formatMathNumber(r, 2).replace('.', '\\,');
+    const rfLatex = timing === 'vor' ? `${qLatex}` : '1';
     
     let steps: React.ReactNode;
     
     // Basic formula display
     const formulaBase = `K_n = K_0 \\cdot q^n ${sign} r ${timing === 'vor' ? '\\cdot q' : ''} \\cdot \\frac{q^n - 1}{q - 1}`;
+
+    const substituted = (() => {
+      const left = task.unknown === 'Kn' ? 'K_n' : knLatex || 'K_n';
+      const k0Term = task.unknown === 'K0' ? 'K_0' : k0Latex;
+      const rTerm = task.unknown === 'r' ? 'r' : rLatex;
+      const nTerm = task.unknown === 'n' ? 'n' : nLatex;
+      return `${left} = ${k0Term} \\cdot ${qLatex}^{${nTerm}} ${sign} ${rTerm} \\cdot ${rfLatex} \\cdot \\frac{${qLatex}^{${nTerm}} - 1}{${qLatex} - 1}`;
+    })();
+
+    const buildSolveLatex = () => {
+      if (task.unknown === 'Kn') {
+        const annuityPart = r * rFactorNumeric * rentenFaktor;
+        const resultLatex = formatMathNumber(task.solutionValue, 2).replace('.', '\\,');
+        return `\\begin{aligned}
+K_n &= ${k0Latex} \\cdot ${qLatex}^{${nLatex}} ${sign} ${rLatex} \\cdot ${rfLatex} \\cdot ${rentenFaktorLatex}\\\\
+      &= ${formatMathNumber(K0 * qPowN, 2)} ${sign} ${formatMathNumber(annuityPart, 2)}\\\\
+&\\approx ${resultLatex}\\,€
+\\end{aligned}`;
+      }
+
+      if (task.unknown === 'K0') {
+        const numerator = type === 'mehrung'
+          ? `${knLatex} - ${rLatex} \\cdot ${rfLatex} \\cdot ${rentenFaktorLatex}`
+          : `${knLatex} + ${rLatex} \\cdot ${rfLatex} \\cdot ${rentenFaktorLatex}`;
+        const resultLatex = formatMathNumber(task.solutionValue, 2).replace('.', '\\,');
+        return `\\begin{aligned}
+${knLatex} &= K_0 \\cdot ${qLatex}^{${nLatex}} ${sign} ${rLatex} \\cdot ${rfLatex} \\cdot ${rentenFaktorLatex}\\\\
+${knLatex} &= K_0 \\cdot ${formatMathNumber(qPowN, 4)} ${sign} ${formatMathNumber(r * rFactorNumeric * rentenFaktor, 2)}\\\\
+K_0 &= \\frac{${numerator}}{${qLatex}^{${nLatex}}}\\\\
+&\\approx ${resultLatex}\\,€
+\\end{aligned}`;
+      }
+
+      if (task.unknown === 'r') {
+        const numerator = type === 'mehrung'
+          ? `${knLatex} - ${k0Latex} \\cdot ${qLatex}^{${nLatex}}`
+          : `${k0Latex} \\cdot ${qLatex}^{${nLatex}} - ${knLatex}`;
+        const resultLatex = formatMathNumber(task.solutionValue, 2).replace('.', '\\,');
+        return `\\begin{aligned}
+${knLatex} &= ${k0Latex} \\cdot ${qLatex}^{${nLatex}} ${sign} r \\cdot ${rfLatex} \\cdot ${rentenFaktorLatex}\\\\
+${knLatex} &= ${k0Latex} \\cdot ${formatMathNumber(qPowN, 4)} ${sign} r \\cdot ${formatMathNumber(rFactorNumeric * rentenFaktor, 4)}\\\\
+r &= \\frac{${numerator}}{${rfLatex} \\cdot ${rentenFaktorLatex}}\\\\
+&\\approx ${resultLatex}\\,€
+\\end{aligned}`;
+      }
+
+      // unknown n
+      const qm1 = q - 1;
+      const qm1Latex = formatMathNumber(qm1, 4);
+      const C = r * rFactorNumeric;
+      const CLatex = formatMathNumber(C, 2);
+      const numValue = type === 'mehrung'
+        ? (Kn ?? 0) * qm1 + C
+        : (Kn ?? 0) * qm1 - C;
+      const denValue = type === 'mehrung'
+        ? K0 * qm1 + C
+        : K0 * qm1 - C;
+      const num = formatMathNumber(numValue, 2);
+      const den = formatMathNumber(denValue, 2);
+      const resultLatex = formatMathNumber(task.solutionValue, 0);
+      const rawLatex = formatMathNumber(task.solutionRaw ?? task.solutionValue, 2);
+      return `\\begin{aligned}
+    &${knLatex} = ${k0Latex} \\cdot q^n ${sign} ${rLatex} \\cdot ${rfLatex} \\cdot \\frac{q^n-1}{q-1}\\\\
+    &${knLatex} = ${k0Latex} \\cdot ${qLatex}^n ${sign} ${rLatex} \\cdot ${rfLatex} \\cdot \\frac{${qLatex}^n-1}{${qLatex}-1}\\\\
+    &\\Rightarrow \\frac{${num}}{${den}} = q^n\\\\
+    &\\Rightarrow n = \\log_{${qLatex}}\\left(\\frac{${num}}{${den}}\\right)\\\\
+    n_{\\text{berechnet}} &\\approx ${rawLatex}\\ \\text{Jahre}\\\\
+    n_{\\text{sachlogisch}} &= ${resultLatex}\\ \\text{Jahre}
+    \\end{aligned}`;
+    };
+
+    const solveLatex = buildSolveLatex();
     
     steps = (
       <div>
@@ -297,8 +389,18 @@ export default function MehrungMinderung() {
         </ul>
         
         <p className="mb-2"><strong>Grundformel:</strong></p>
-        <div className="overflow-x-auto mb-4 p-2 bg-gray-50 rounded border border-gray-200">
-          <BlockMath math={formulaBase} />
+        <div className="overflow-x-hidden mb-4 p-2 bg-gray-50 rounded border border-gray-200 text-[15px] leading-7 md:text-base">
+          <BlockMath math={formulaBase} className="math-compact" />
+        </div>
+
+        <p className="mb-2"><strong>Einsetzen:</strong></p>
+        <div className="mb-4 p-2 bg-gray-50 rounded border border-gray-200 text-[15px] leading-7 md:text-base overflow-x-hidden">
+          <BlockMath math={substituted} className="math-compact" />
+        </div>
+
+        <p className="mb-2"><strong>Auflösen nach der gesuchten Größe:</strong></p>
+        <div className="mb-4 p-2 bg-gray-50 rounded border border-gray-200 text-[15px] leading-7 md:text-base overflow-x-hidden">
+          <BlockMath math={solveLatex} className="math-compact" />
         </div>
         
         <p className="mb-2"><strong>Ergebnis:</strong></p>
@@ -306,7 +408,11 @@ export default function MehrungMinderung() {
           {task.unknown === 'Kn' && <InlineMath math={`K_n \\approx ${formatCurrency(task.solutionValue)} €`} />}
           {task.unknown === 'K0' && <InlineMath math={`K_0 \\approx ${formatCurrency(task.solutionValue)} €`} />}
           {task.unknown === 'r' && <InlineMath math={`r \\approx ${formatCurrency(task.solutionValue)} €`} />}
-          {task.unknown === 'n' && <InlineMath math={`n \\approx ${formatNumber(task.solutionValue, 2)} Jahre`} />}
+          {task.unknown === 'n' && (
+            <InlineMath
+              math={`n_{\\text{berechnet}} \\approx ${formatNumber(task.solutionRaw ?? task.solutionValue, 2)}\\ \\text{Jahre}\\;\\Rightarrow\\; n_{\\text{sachlogisch}} = ${formatNumber(task.solutionValue, 0)}\\ \\text{Jahre}`}
+            />
+          )}
         </p>
       </div>
     );
@@ -353,7 +459,7 @@ export default function MehrungMinderung() {
                   value={userAnswer}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserAnswer(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={task.unknown === 'n' ? 'z.B. 10.5' : 'z.B. 1234,56'}
+                  placeholder={task.unknown === 'n' ? 'z.B. 10' : 'z.B. 1234,56'}
                 />
                 <span className="text-xl font-bold text-gray-600">
                   {task.unknown === 'n' ? 'Jahre' : '€'}
@@ -375,7 +481,7 @@ export default function MehrungMinderung() {
           )}
           
           {solution && (
-            <div className="w-full max-w-xl bg-blue-50 border border-blue-200 rounded p-4 text-blue-900 mb-2 text-base md:text-lg">
+            <div className="w-full max-w-2xl bg-blue-50 border border-blue-200 rounded p-4 text-blue-900 mb-2 text-base md:text-lg">
               <b>Musterlösung:</b>
               <div className="mt-2 space-y-2">
                 {solution}

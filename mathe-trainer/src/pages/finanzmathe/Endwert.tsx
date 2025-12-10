@@ -28,6 +28,7 @@ const getRandomItem = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.le
 
 const formatCurrency = (val: number) => val.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const formatNumber = (val: number, decimals: number = 2) => val.toLocaleString('de-DE', { maximumFractionDigits: decimals });
+const formatMathNumber = (val: number, decimals: number = 2) => val.toLocaleString('de-DE', { maximumFractionDigits: decimals, minimumFractionDigits: decimals, useGrouping: false });
 
 export default function Endwert() {
   const [unknownType, setUnknownType] = useState<Unknown | 'random'>('random');
@@ -165,11 +166,63 @@ export default function Endwert() {
     const timing = task.timing;
     
     const r_factor = timing === 'vor' ? ` \\cdot q` : '';
+    const rFactorNumeric = timing === 'vor' ? q : 1;
+    const rentenFaktor = (Math.pow(q, n) - 1) / (q - 1);
+    const qLatex = formatMathNumber(q, 4);
+    const nLatex = formatMathNumber(n, 1);
+    const rLatex = formatMathNumber(r, 2).replace('.', '\\,');
+    const knLatex = Kn ? formatMathNumber(Kn, 2).replace('.', '\\,') : 'K_n';
+    const rentenFaktorLatex = formatMathNumber(rentenFaktor, 4);
+    const rfLatex = timing === 'vor' ? qLatex : '1';
     
     let steps: React.ReactNode;
     
     // Formula
     const formulaBase = `K_n = r ${r_factor} \\cdot \\frac{q^n - 1}{q - 1}`;
+
+    const substituted = (() => {
+      const left = task.unknown === 'Kn' ? 'K_n' : knLatex;
+      const rTerm = task.unknown === 'r' ? 'r' : rLatex;
+      const nTerm = task.unknown === 'n' ? 'n' : nLatex;
+      return `${left} = ${rTerm} \\cdot ${rfLatex} \\cdot \\frac{${qLatex}^{${nTerm}} - 1}{${qLatex} - 1}`;
+    })();
+
+    const buildSolveLatex = () => {
+      if (task.unknown === 'Kn') {
+        const annuityPart = r * rFactorNumeric * rentenFaktor;
+        const resultLatex = formatMathNumber(task.solutionValue, 2).replace('.', '\\,');
+        return `\\begin{aligned}
+K_n &= ${rLatex} \\cdot ${rfLatex} \\cdot ${rentenFaktorLatex}\\\\
+&= ${formatMathNumber(r * rFactorNumeric, 2)} \\cdot ${rentenFaktorLatex}\\\\
+&= ${formatMathNumber(annuityPart, 2)}\\,€
+\\end{aligned}`;
+      }
+
+      if (task.unknown === 'r') {
+        const resultLatex = formatMathNumber(task.solutionValue, 2).replace('.', '\\,');
+        return `\\begin{aligned}
+${knLatex} &= r \\cdot ${rfLatex} \\cdot ${rentenFaktorLatex}\\\\
+    r &= \\frac{${knLatex}}{${rfLatex} \\cdot ${rentenFaktorLatex}}\\\\
+    &= \\frac{${formatMathNumber(Kn ?? 0, 2)}}{${formatMathNumber(rFactorNumeric, 4)} \\cdot ${rentenFaktorLatex}}\\\\
+    &\\approx ${resultLatex}\\,€
+\\end{aligned}`;
+      }
+
+      // unknown n
+      const qm1 = q - 1;
+      const baseValue = ( (Kn ?? 0) * qm1 ) / (r * rFactorNumeric) + 1;
+      const baseLatex = formatMathNumber(baseValue, 4);
+      const resultLatex = formatMathNumber(task.solutionValue, 2);
+      return `\\begin{aligned}
+${knLatex} &= ${rLatex} \\cdot ${rfLatex} \\cdot \\frac{q^n-1}{q-1}\\\\
+${knLatex} \\cdot (q-1) &= ${rLatex} \\cdot ${rfLatex} \\cdot (q^n-1)\\\\
+\\frac{${knLatex} \\cdot (${formatMathNumber(qm1, 4)})}{${rLatex} \\cdot ${rfLatex}} + 1 &= q^n\\\\
+&\\Rightarrow n = \\log_{${qLatex}}(${baseLatex})\\\\
+&\\approx ${resultLatex}\\ \text{Jahre}
+\\end{aligned}`;
+    };
+
+    const solveLatex = buildSolveLatex();
     
     steps = (
       <div>
@@ -183,8 +236,18 @@ export default function Endwert() {
         </ul>
         
         <p className="mb-2"><strong>Formel:</strong></p>
-        <div className="overflow-x-auto mb-4 p-2 bg-gray-50 rounded border border-gray-200">
+        <div className="overflow-x-hidden mb-4 p-2 bg-gray-50 rounded border border-gray-200 text-[15px] leading-7 md:text-base">
           <BlockMath math={formulaBase} />
+        </div>
+
+        <p className="mb-2"><strong>Einsetzen:</strong></p>
+        <div className="mb-4 p-2 bg-gray-50 rounded border border-gray-200 text-[15px] leading-7 md:text-base overflow-x-hidden">
+          <BlockMath math={substituted} />
+        </div>
+
+        <p className="mb-2"><strong>Auflösen nach der gesuchten Größe:</strong></p>
+        <div className="mb-4 p-2 bg-gray-50 rounded border border-gray-200 text-[15px] leading-7 md:text-base overflow-x-hidden">
+          <BlockMath math={solveLatex} />
         </div>
         
         <p className="mb-2"><strong>Ergebnis:</strong></p>
@@ -259,7 +322,7 @@ export default function Endwert() {
           )}
           
           {solution && (
-            <div className="w-full max-w-xl bg-blue-50 border border-blue-200 rounded p-4 text-blue-900 mb-2 text-base md:text-lg">
+            <div className="w-full max-w-2xl bg-blue-50 border border-blue-200 rounded p-4 text-blue-900 mb-2 text-base md:text-lg">
               <b>Musterlösung:</b>
               <div className="mt-2 space-y-2">
                 {solution}

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 const topics = [
   { href: "/raum-und-form/flaechengeometrie/dreiecke", label: "Dreiecke" },
+  { href: "/raum-und-form/flaechengeometrie/formen-erkennen", label: "Formen erkennen" },
   { href: "/raum-und-form/flaechengeometrie/trapez", label: "Trapez" },
   { href: "/raum-und-form/flaechengeometrie/rechteck", label: "Rechteck" },
   { href: "/raum-und-form/flaechengeometrie/parallelogramm", label: "Parallelogramm" },

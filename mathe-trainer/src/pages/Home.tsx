@@ -4,33 +4,45 @@ import { Link } from 'react-router-dom'
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <header className="w-full py-8 px-4 md:px-12 flex flex-col items-center bg-white/80 shadow-sm">
-        <h1 className="text-4xl md:text-5xl font-bold mb-2 text-blue-900">Mathe-Trainer</h1>
-        <p className="text-lg md:text-xl text-blue-800 mb-1">Interaktiver Aufgaben-Generator für die Wirtschaftsschule.</p>
-        <p className="max-w-3xl text-center text-gray-700">Trainiere lineare und quadratische Funktionen, Finanzmathematik, Trigonometrie, Daten &amp; Zufall und vieles mehr. Jede Rubrik enthält adaptive Aufgabengeneratoren mit Lösungen und Tests, damit du gezielt üben und deinen Fortschritt direkt prüfen kannst.</p>
-      </header>
+    <div className="min-h-screen bg-[var(--bg-color)] flex flex-col text-slate-900">
+      <section className="w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white pb-14 pt-16 px-4">
+        <div className="app-shell text-center space-y-3">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
+            Mathe-Trainer <span className="text-[var(--accent)]">Digital</span>
+          </h1>
+          <p className="text-base sm:text-lg text-slate-200 max-w-3xl mx-auto">
+            Wähle einen Bereich, um zu starten – übe Funktionen, Finanzmathematik, Trigonometrie, Daten & Zufall und mehr.
+          </p>
+        </div>
+      </section>
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-8 grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {pages.map((p) => (
-          <div key={p.id} className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col items-center p-6 hover:shadow-xl transition-shadow">
-            <div className="card-icon text-4xl mb-3 text-blue-700"><i className={p.icon}></i></div>
-            <h3 className="text-xl font-semibold mb-1 text-blue-900">{p.title}</h3>
-            <p className="text-gray-700 mb-4 text-center">{p.description}</p>
-            <Link
-              to={p.reactPath ? p.reactPath : p.path.replace('.html', '')}
-              className="mt-auto inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow transition-colors"
-            >
-              Jetzt üben
-            </Link>
+      <main className="flex-1 w-full pt-8 pb-12">
+        <div className="app-shell">
+          <div className="grid gap-6 sm:gap-7 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {pages.map((p) => (
+              <div
+                key={p.id}
+                className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 sm:p-7 flex flex-col items-center text-center hover:shadow-xl hover:-translate-y-1 transition-transform"
+              >
+                <div className="text-4xl mb-4 text-[var(--accent)]"><i className={p.icon}></i></div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">{p.title}</h3>
+                <p className="text-slate-600 mb-5 leading-relaxed">{p.description}</p>
+                <Link
+                  to={p.reactPath ? p.reactPath : p.path.replace('.html', '')}
+                  className="btn-pill btn-blue text-sm w-full justify-center"
+                >
+                  Jetzt üben
+                </Link>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </main>
 
-      <footer className="w-full py-6 text-center text-gray-500 bg-white/80 border-t mt-8">
+      <footer className="w-full py-8 text-center text-slate-500 bg-white border-t border-slate-200">
         <p>
           © 2025 Mathenkik. Alle Rechte vorbehalten. ·{' '}
-          <Link to="/impressum" className="text-blue-600 hover:text-blue-800 font-semibold">
+          <Link to="/impressum" className="text-[var(--accent)] hover:text-blue-700 font-semibold">
             Impressum
           </Link>
         </p>

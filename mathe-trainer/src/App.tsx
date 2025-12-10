@@ -100,6 +100,7 @@ import Pyramide from './pages/raum_und_form/Pyramide';
 import Zylinder from './pages/raum_und_form/Zylinder';
 import Prisma from './pages/raum_und_form/Prisma';
 import Dreiecke from './pages/raum_und_form/Dreiecke';
+import FormenErkennen from './pages/raum_und_form/FormenErkennen';
 import Trapez from './pages/raum_und_form/Trapez';
 import Rechteck from './pages/raum_und_form/Rechteck';
 import Parallelogramm from './pages/raum_und_form/Parallelogramm';
@@ -110,24 +111,20 @@ import Kreis from './pages/raum_und_form/Kreis';
 export default function App() {
   return (
     <div className="app-root">
-      <header className="app-header bg-white/90 backdrop-blur sticky top-0 z-30 border-b border-slate-200">
-        <div className="max-w-6xl mx-auto w-full px-3 py-2 flex items-center justify-between">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-4 py-1.5 text-white text-sm sm:text-base font-semibold shadow-md shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700"
-          >
-            <span className="hidden sm:inline">Startseite</span>
-            <span className="sm:hidden">Start</span>
-          </Link>
-          
+      <header className="app-header">
+        <div className="app-shell flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Link to="/" className="ghost-link text-sm sm:text-base">
+              ← Zurück
+            </Link>
+            <div className="hidden sm:block w-px h-6 bg-slate-200" aria-hidden />
+            <span className="text-lg sm:text-xl font-bold text-slate-800">Mathe-Trainer</span>
+          </div>
           <a
             href="https://swjnmang.github.io/wss-digital/"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-3 py-1.5 text-xs sm:text-sm font-semibold text-slate-700 bg-white shadow-sm hover:bg-slate-50"
+            className="ghost-link text-xs sm:text-sm"
           >
-            <span className="hidden sm:inline">Zurück zu WSS-Digital</span>
-            <span className="sm:hidden">WSS-Digital</span>
+            WSS-Digital
           </a>
         </div>
       </header>
@@ -228,6 +225,7 @@ export default function App() {
           <Route path="/raum-und-form/zylinder" element={<Zylinder />} />
           <Route path="/raum-und-form/prisma" element={<Prisma />} />
           <Route path="/raum-und-form/flaechengeometrie/dreiecke" element={<Dreiecke />} />
+          <Route path="/raum-und-form/flaechengeometrie/formen-erkennen" element={<FormenErkennen />} />
           <Route path="/raum-und-form/flaechengeometrie/trapez" element={<Trapez />} />
           <Route path="/raum-und-form/flaechengeometrie/rechteck" element={<Rechteck />} />
           <Route path="/raum-und-form/flaechengeometrie/parallelogramm" element={<Parallelogramm />} />
