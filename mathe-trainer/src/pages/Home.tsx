@@ -18,7 +18,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1 w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12 flex items-center justify-center">
-        <div className="w-full max-w-6xl mx-auto grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-6 sm:gap-8">
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {pages.map((p) => (
             <Link
               key={p.id}
