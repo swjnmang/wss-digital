@@ -14,14 +14,14 @@ const topics = [
 export default function Flaechengeometrie() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      <div className="max-w-4xl mx-auto px-4 py-12 space-y-6">
+      <div className="max-w-6xl mx-auto px-6 py-12 space-y-8">
         <div className="space-y-2 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Flächengeometrie</p>
           <h1 className="text-3xl font-bold">Wähle ein Unterthema</h1>
           <p className="text-slate-600">Dreiecke, Vierecke und Kreis als einzelne Übungspfade.</p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           {topics.map(topic => (
             <Link
               key={topic.href}
