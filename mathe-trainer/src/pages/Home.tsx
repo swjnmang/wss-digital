@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--bg-color)] flex flex-col text-slate-900">
       <section className="w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white pb-14 pt-16 px-4">
-        <div className="app-shell text-center space-y-3">
+        <div className="w-full max-w-[1440px] mx-auto px-4 text-center space-y-3">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
             Mathe-Trainer <span className="text-[var(--accent)]">Digital</span>
           </h1>

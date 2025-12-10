@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -30,8 +29,6 @@ const getDays30360 = (d1: Date, d2: Date) => {
 const formatDate = (d: Date) => d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
 export default function Zinstage() {
-  const navigate = useNavigate();
-  const handleBack = () => navigate(-1);
   const [mode, setMode] = useState<'practice' | 'calculator'>('practice');
 
   // Practice State
@@ -126,7 +123,6 @@ export default function Zinstage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-emerald-100">
       <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
         <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-4xl min-h-[400px] flex flex-col items-center p-6 sm:p-12">
-          <button type="button" onClick={handleBack} className="text-green-600 hover:underline mb-4 self-start">&larr; Zurück</button>
           
           <div className="flex gap-4 mb-6">
             <button 

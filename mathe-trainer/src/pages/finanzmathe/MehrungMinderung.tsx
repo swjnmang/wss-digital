@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import 'katex/dist/katex.min.css';
 import { BlockMath, InlineMath } from 'react-katex';
-import { useNavigate } from 'react-router-dom';
 
 type TaskType = 'mehrung' | 'minderung';
 type Timing = 'vor' | 'nach';
@@ -39,8 +38,6 @@ const roundYearsLogical = (years: number, type: TaskType) => {
 };
 
 export default function MehrungMinderung() {
-  const navigate = useNavigate();
-  const handleBack = () => navigate(-1);
   const [unknownType, setUnknownType] = useState<Unknown | 'random'>('random');
   const [task, setTask] = useState<Task | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
@@ -430,7 +427,6 @@ r &= \\frac{${numerator}}{${rfLatex} \\cdot ${rentenFaktorLatex}}\\\\
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
       <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
         <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-4xl min-h-[400px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
-          <button type="button" onClick={handleBack} className="text-blue-600 hover:underline mb-4 self-start">&larr; Zurück</button>
           <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Kapitalmehrung und - minderung</h1>
           <p className="text-gray-600 mb-6 text-center">Kombinierte Zinseszins- und Rentenrechnung</p>
 

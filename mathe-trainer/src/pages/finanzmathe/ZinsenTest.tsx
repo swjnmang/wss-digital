@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 
 interface Question {
   id: number;
@@ -31,8 +30,6 @@ const getDays30360 = (d1: Date, d2: Date) => {
 };
 
 export default function ZinsenTest() {
-  const navigate = useNavigate();
-  const handleBack = () => navigate(-1);
   const [step, setStep] = useState<'start' | 'quiz' | 'results'>('start');
   const [studentName, setStudentName] = useState('');
   const [studentClass, setStudentClass] = useState('');
@@ -171,7 +168,6 @@ export default function ZinsenTest() {
         
         {step === 'start' && (
           <div className="bg-white rounded-2xl shadow-lg border border-teal-100 w-full max-w-lg p-8">
-            <button type="button" onClick={handleBack} className="text-teal-600 hover:underline mb-6 block">&larr; Zurück</button>
             <h1 className="text-3xl font-bold text-teal-800 mb-2 text-center">Test: Zinsrechnung</h1>
             <p className="text-gray-600 mb-8 text-center">Bitte gib deine Daten ein, um den Test zu starten.</p>
             
@@ -314,9 +310,6 @@ export default function ZinsenTest() {
             <div className="flex justify-center gap-4 print:hidden">
               <button onClick={() => window.print()} className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-6 rounded shadow">
                 Ergebnis drucken
-              </button>
-              <button type="button" onClick={handleBack} className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded shadow">
-                Zurück
               </button>
             </div>
           </div>

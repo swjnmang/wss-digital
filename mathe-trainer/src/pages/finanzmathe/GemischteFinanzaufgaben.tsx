@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import 'katex/dist/katex.min.css';
 import { InlineMath } from 'react-katex';
-import { useNavigate } from 'react-router-dom';
 
 const TASK_COUNT = 10;
 const POINTS_PER_CORRECT = 10;
@@ -1219,7 +1218,6 @@ const createCards = (filter: FilterType): TaskCard[] => {
 };
 
 export default function GemischteFinanzaufgaben() {
-  const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterType>('mixed');
   const [cards, setCards] = useState<TaskCard[]>(() => createCards('mixed'));
   const [stats, setStats] = useState(() => createInitialStats());
@@ -1228,8 +1226,6 @@ export default function GemischteFinanzaufgaben() {
     setCards(createCards(filter));
     setStats(createInitialStats());
   }, [filter]);
-
-  const handleBack = () => navigate(-1);
 
   const regenerateCard = (id: number) => {
     setCards(prev =>
@@ -1343,9 +1339,6 @@ export default function GemischteFinanzaufgaben() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-100">
       <div className="flex-1 flex flex-col items center px-3 py-8 sm:px-6">
         <div className="w-full max-w-5xl bg-white/95 backdrop-blur rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-10">
-          <button type="button" onClick={handleBack} className="text-blue-600 hover:underline mb-5">
-            &larr; Zurück
-          </button>
           <div className="text-center mb-6">
             <p className="text-sm uppercase tracking-[0.3em] text-blue-500 font-semibold">Finanzmathematik</p>
             <h1 className="text-3xl md:text-4xl font-bold text-blue-900">Gemischte Übungsaufgaben</h1>

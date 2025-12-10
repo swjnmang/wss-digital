@@ -26,7 +26,7 @@ import Handelskalkdif from './pages/rechnen_lernen/prozentrechnung/Handelskalkdi
 import GeneratorLineare from './pages/rechnen_lernen/gleichungen/Generator_lineare';
 import Quadratisch from './pages/rechnen_lernen/gleichungen/Quadratisch';
 import Abschlusstest from './pages/rechnen_lernen/gleichungen/Abschlusstest';
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 import Home from './pages/Home'
 import LineareIndex from './pages/LineareIndex'
 import QuadratischeIndex from './pages/QuadratischeIndex'
@@ -109,14 +109,24 @@ import Kreis from './pages/raum_und_form/Kreis';
 // ... other imports will be added as files are created
 
 export default function App() {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <div className="app-root">
       <header className="app-header">
         <div className="app-shell flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link to="/" className="ghost-link text-sm sm:text-base">
+            <button onClick={handleBack} className="ghost-link text-sm sm:text-base">
               ← Zurück
-            </Link>
+            </button>
             <div className="hidden sm:block w-px h-6 bg-slate-200" aria-hidden />
             <span className="text-lg sm:text-xl font-bold text-slate-800">Mathe-Trainer</span>
           </div>
