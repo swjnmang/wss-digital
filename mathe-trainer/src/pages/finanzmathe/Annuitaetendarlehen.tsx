@@ -51,6 +51,8 @@ export default function Annuitaetendarlehen() {
   const [totalCount, setTotalCount] = useState(0);
   const [explanationTitle, setExplanationTitle] = useState<string | null>(null);
   const [explanationText, setExplanationText] = useState<string | null>(null);
+  const [unlockedV, setUnlockedV] = useState(false);
+  const [encouragement, setEncouragement] = useState<string | null>(null);
 
   useEffect(() => {
     generateNewTask();
@@ -84,6 +86,8 @@ export default function Annuitaetendarlehen() {
     });
     setFeedback({});
     setShowSolution(false);
+    setUnlockedV(false);
+    setEncouragement(null);
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -141,6 +145,14 @@ export default function Annuitaetendarlehen() {
     };
 
     setFeedback(newFeedback);
+    const baseFields = ['k0','z1','t1','a1','k1','z2','t2','a2'];
+    const baseCorrect = baseFields.every(f => newFeedback[f] === 'correct');
+    if (baseCorrect) {
+      setUnlockedV(true);
+      setEncouragement(`Super gemacht! Trage jetzt mit Hilfe der Merkhilfe-Formeln die Werte für das ${task?.v}. Jahr in die Tabelle ein.`);
+    } else {
+      setEncouragement(null);
+    }
     
     const allCorrect = Object.values(newFeedback).every(s => s === 'correct');
     if (allCorrect && !showSolution) {
@@ -268,7 +280,7 @@ export default function Annuitaetendarlehen() {
                   <th className="p-3 border text-right">Schuld (Anfang)</th>
                   <th className="p-3 border text-right">Tilgung</th>
                   <th className="p-3 border text-right">Zinsen</th>
-                  <th className="p-3 border text-right">Annuität (Rate)</th>
+                  <th className="p-3 border text-right">Annuität</th>
                 </tr>
               </thead>
               <tbody>
@@ -394,71 +406,88 @@ export default function Annuitaetendarlehen() {
                   </td>
                 </tr>
 
-                {/* Separator */}
-                <tr>
-                  <td colSpan={5} className="p-2 border bg-gray-50 text-center text-gray-400">...</td>
-                </tr>
+                {/* Separator / gating */}
+                {!unlockedV && !showSolution && (
+                  <tr>
+                    <td colSpan={5} className="p-3 border bg-gray-50 text-center text-gray-600 text-sm">
+                      Das weitere Jahr wird freigeschaltet, sobald Jahr 1 und 2 korrekt sind.
+                    </td>
+                  </tr>
+                )}
 
-                {/* Year v */}
-                <tr>
-                  <td className="p-3 border font-bold text-center">{task.v}</td>
-                  <td className="p-2 border">
-                    <input 
-                      type="text" 
-                      value={inputs.kv} 
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('kv', e.target.value)}
-                      className={getInputClass('kv')}
-                      placeholder={`K${task.v-1}`}
-                    />
-                    {showSolution && (
-                      <button type="button" onClick={() => showExplanation('kv')} className="text-xs text-blue-600 text-right mt-1 underline">
-                        {formatCurrency(getSol('kv'))}
-                      </button>
-                    )}
-                  </td>
-                  <td className="p-2 border">
-                    <input 
-                      type="text" 
-                      value={inputs.tv} 
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('tv', e.target.value)}
-                      className={getInputClass('tv')}
-                      placeholder={`T${task.v}`}
-                    />
-                    {showSolution && (
-                      <button type="button" onClick={() => showExplanation('tv')} className="text-xs text-blue-600 text-right mt-1 underline">
-                        {formatCurrency(getSol('tv'))}
-                      </button>
-                    )}
-                  </td>
-                  <td className="p-2 border">
-                    <input 
-                      type="text" 
-                      value={inputs.zv} 
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('zv', e.target.value)}
-                      className={getInputClass('zv')}
-                      placeholder={`Z${task.v}`}
-                    />
-                    {showSolution && (
-                      <button type="button" onClick={() => showExplanation('zv')} className="text-xs text-blue-600 text-right mt-1 underline">
-                        {formatCurrency(getSol('zv'))}
-                      </button>
-                    )}
-                  </td>
-                  <td className="p-2 border">
-                    <input 
-                      type="text" 
-                      value={inputs.av} 
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('av', e.target.value)}
-                      className={getInputClass('av')}
-                      placeholder="A"
-                    />
-                    {showSolution && (
-                      <button type="button" onClick={() => showExplanation('av')} className="text-xs text-blue-600 text-right mt-1 underline">
-                        {formatCurrency(getSol('av'))}
-                      </button>
-                    )}
-                  </td>
-                </tr>
+                {/* Arbeitsauftrag und Jahr v */}
+                {(unlockedV || showSolution) && (
+                  <>
+                    <tr>
+                      <td colSpan={5} className="p-3 border bg-yellow-50 text-center text-yellow-900 text-base font-medium">
+                        {`Arbeitsauftrag: Trage nun die Werte für das ${task.v}. Jahr mit Hilfe der Formeln aus der Merkhilfe in die folgende Zeile ein.`}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 border font-bold text-center">{task.v}</td>
+                      <td className="p-2 border">
+                        <input 
+                          type="text" 
+                          value={inputs.kv} 
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('kv', e.target.value)}
+                          className={getInputClass('kv')}
+                          placeholder={`K${task.v-1}`}
+                          disabled={!unlockedV && !showSolution}
+                        />
+                        {showSolution && (
+                          <button type="button" onClick={() => showExplanation('kv')} className="text-xs text-blue-600 text-right mt-1 underline">
+                            {formatCurrency(getSol('kv'))}
+                          </button>
+                        )}
+                      </td>
+                      <td className="p-2 border">
+                        <input 
+                          type="text" 
+                          value={inputs.tv} 
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('tv', e.target.value)}
+                          className={getInputClass('tv')}
+                          placeholder={`T${task.v}`}
+                          disabled={!unlockedV && !showSolution}
+                        />
+                        {showSolution && (
+                          <button type="button" onClick={() => showExplanation('tv')} className="text-xs text-blue-600 text-right mt-1 underline">
+                            {formatCurrency(getSol('tv'))}
+                          </button>
+                        )}
+                      </td>
+                      <td className="p-2 border">
+                        <input 
+                          type="text" 
+                          value={inputs.zv} 
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('zv', e.target.value)}
+                          className={getInputClass('zv')}
+                          placeholder={`Z${task.v}`}
+                          disabled={!unlockedV && !showSolution}
+                        />
+                        {showSolution && (
+                          <button type="button" onClick={() => showExplanation('zv')} className="text-xs text-blue-600 text-right mt-1 underline">
+                            {formatCurrency(getSol('zv'))}
+                          </button>
+                        )}
+                      </td>
+                      <td className="p-2 border">
+                        <input 
+                          type="text" 
+                          value={inputs.av} 
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('av', e.target.value)}
+                          className={getInputClass('av')}
+                          placeholder="A"
+                          disabled={!unlockedV && !showSolution}
+                        />
+                        {showSolution && (
+                          <button type="button" onClick={() => showExplanation('av')} className="text-xs text-blue-600 text-right mt-1 underline">
+                            {formatCurrency(getSol('av'))}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  </>
+                )}
               </tbody>
             </table>
           </div>
@@ -476,6 +505,12 @@ export default function Annuitaetendarlehen() {
             <div className="flex flex-col items-center"><div className="text-2xl font-bold text-blue-800">{correctCount}</div><div className="text-gray-600 text-sm">Richtig</div></div>
             <div className="flex flex-col items-center"><div className="text-2xl font-bold text-blue-800">{totalCount}</div><div className="text-gray-600 text-sm">Gesamt</div></div>
           </div>
+
+          {encouragement && (
+            <div className="mt-4 w-full max-w-3xl border border-green-200 bg-green-50 text-green-800 px-4 py-3 rounded">
+              {encouragement}
+            </div>
+          )}
 
           {explanationText && (
             <div className="mt-6 w-full max-w-3xl border border-slate-200 rounded-lg bg-slate-50 p-4">
