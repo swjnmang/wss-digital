@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { InlineMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
 
 interface Task {
   K0: number;
@@ -16,9 +18,21 @@ const randomFloat = (min: number, max: number, decimals: number) => {
 
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const getRandomItem = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+const round2 = (val: number) => Math.round(val * 100) / 100;
+const parseNumberInput = (raw: string) => {
+  // Accept thousand separators (dot, space, apostrophe) and comma as decimal
+  let s = raw.trim().replace(/\s|'/g, '');
+  if (s.includes(',')) {
+    s = s.replace(/\./g, '').replace(',', '.');
+  } else {
+    s = s.replace(/,/g, '');
+  }
+  return parseFloat(s);
+};
 
 const formatCurrency = (val: number) => val.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const formatNumber = (val: number, decimals: number = 2) => val.toLocaleString('de-DE', { maximumFractionDigits: decimals });
+const texNum = (val: number, decimals = 2) => val.toFixed(decimals);
 
 export default function Annuitaetendarlehen() {
   const [task, setTask] = useState<Task | null>(null);
@@ -35,6 +49,8 @@ export default function Annuitaetendarlehen() {
   const [showSolution, setShowSolution] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+  const [explanationTitle, setExplanationTitle] = useState<string | null>(null);
+  const [explanationText, setExplanationText] = useState<string | null>(null);
 
   useEffect(() => {
     generateNewTask();
@@ -43,11 +59,11 @@ export default function Annuitaetendarlehen() {
   const generateNewTask = () => {
     const K0 = randomInt(50, 150) * 1000;
     const n = randomInt(5, 25);
-    const p = randomFloat(1.5, 8.0, 2);
+    const p = round2(randomFloat(1.5, 8.0, 2));
     const v = randomInt(3, n - 1);
     
     const q = 1 + p / 100;
-    const A = K0 * (Math.pow(q, n) * (q - 1)) / (Math.pow(q, n) - 1);
+    const A = round2(K0 * (Math.pow(q, n) * (q - 1)) / (Math.pow(q, n) - 1));
 
     const intros = [
       "Ein Bauherr nimmt ein Annuitätendarlehen auf.",
@@ -77,48 +93,48 @@ export default function Annuitaetendarlehen() {
   const checkAnswers = () => {
     if (!task) return;
 
-    const tolerance = 0.05;
-    const check = (val: string, expected: number): 'correct' | 'incorrect' => {
-      const num = parseFloat(val.replace(',', '.'));
+    const toleranceDefault = 0.01;
+    const tolerancePrincipal = 0.05;
+    const check = (val: string, expected: number, usePrincipalTol = false): 'correct' | 'incorrect' => {
+      const num = parseNumberInput(val);
       if (isNaN(num)) return 'incorrect';
-      return Math.abs(num - expected) <= tolerance ? 'correct' : 'incorrect';
+      const tol = usePrincipalTol ? tolerancePrincipal : toleranceDefault;
+      return Math.abs(num - expected) <= tol ? 'correct' : 'incorrect';
     };
 
-    const exactRate = task.p / 100;
+    const exactRate = round2(task.p) / 100; // q = 1 + p
     const q = 1 + exactRate;
-    const A = task.A;
-    
-    // Year 1
-    const Z1 = task.K0 * exactRate;
-    const T1 = A - Z1;
-    const K1 = task.K0 - T1; // Debt at start of year 2
+    const A = round2(task.A); // A = K0 * q^n * (q-1) / (q^n - 1)
 
-    // Year 2
-    const Z2 = K1 * exactRate;
-    const T2 = A - Z2;
-    const K2 = K1 - T2; 
+    // Tilgungsanteil Jahr 1 aus Formelblatt: T1 = K0*(q-1)/(q^n -1)
+    const T1 = round2(task.K0 * (q - 1) / (Math.pow(q, task.n) - 1));
+    const Z1 = round2(A - T1); // Z1 = K0*(q-1)
+    const K1 = round2(task.K0 - T1); // Schuld zu Jahresbeginn 2
 
-    // Year v
-    // Debt at start of year v (end of v-1)
-    // Formula: R_k = K0 * (q^n - q^k) / (q^n - 1)
-    const Kv_start = task.K0 * (Math.pow(q, task.n) - Math.pow(q, task.v - 1)) / (Math.pow(q, task.n) - 1);
-    
-    const Zv = Kv_start * exactRate;
-    const Tv = A - Zv;
-    // Av is constant A
+    // Jahr 2
+    const K_before_2 = round2(task.K0 * Math.pow(q, 1) - A * (Math.pow(q, 1) - 1) / (q - 1));
+    const Z2 = round2(K_before_2 * (q - 1));
+    const T2 = round2(A - Z2);
+
+    // Jahr v
+    const qPowVminus1 = Math.pow(q, task.v - 1);
+    const qPowV = Math.pow(q, task.v);
+    const K_before_v = round2(task.K0 * qPowVminus1 - A * (qPowV - 1) / (q - 1));
+    const Zv = round2(K_before_v * (q - 1));
+    const Tv = round2(A - Zv);
 
     const newFeedback = {
-      k0: check(inputs.k0, task.K0),
+      k0: check(inputs.k0, task.K0, true),
       z1: check(inputs.z1, Z1),
       t1: check(inputs.t1, T1),
       a1: check(inputs.a1, A),
       
-      k1: check(inputs.k1, K1),
+      k1: check(inputs.k1, K1, true),
       z2: check(inputs.z2, Z2),
       t2: check(inputs.t2, T2),
       a2: check(inputs.a2, A),
       
-      kv: check(inputs.kv, Kv_start),
+      kv: check(inputs.kv, K_before_v, true),
       zv: check(inputs.zv, Zv),
       tv: check(inputs.tv, Tv),
       av: check(inputs.av, A),
@@ -137,6 +153,46 @@ export default function Annuitaetendarlehen() {
     setShowSolution(true);
   };
 
+  const showExplanation = (field: string) => {
+    if (!task) return;
+    const exactRate = round2(task.p) / 100;
+    const q = 1 + exactRate;
+    const qPowN = Math.pow(q, task.n);
+    const qPowVminus1 = Math.pow(q, task.v - 1);
+    const qPowV = Math.pow(q, task.v);
+    const qMinus1 = q - 1;
+    const A = round2(task.A);
+    const T1 = round2(task.K0 * (qMinus1) / (qPowN - 1));
+    const Z1 = round2(A - T1);
+    const K1 = round2(task.K0 - T1);
+    const K_before_2 = round2(task.K0 * Math.pow(q, 1) - A * (Math.pow(q, 1) - 1) / (qMinus1));
+    const Z2 = round2(K_before_2 * (qMinus1));
+    const T2 = round2(A - Z2);
+    const K_before_v = round2(task.K0 * qPowVminus1 - A * (qPowV - 1) / (qMinus1));
+    const Zv = round2(K_before_v * (qMinus1));
+    const Tv = round2(A - Zv);
+
+    const lines: Record<string, { title: string; text: string }> = {
+      k0: { title: 'K₀', text: String.raw`K_0 = ${texNum(task.K0, 2)}\,€` },
+      a1: { title: 'A', text: String.raw`A = \dfrac{K_0\,q^{n}\,(q-1)}{q^{n}-1} = \dfrac{${texNum(task.K0, 2)}\,€ \cdot ${texNum(q, 4)}^{${task.n}} \cdot (${texNum(q, 4)}-1)}{${texNum(q, 4)}^{${task.n}}-1} = ${texNum(A, 2)}\,€` },
+      t1: { title: 'T₁', text: String.raw`T_1 = \dfrac{K_0\,(q-1)}{q^{n}-1} = \dfrac{${texNum(task.K0, 2)}\,€ \cdot (${texNum(q, 4)}-1)}{${texNum(q, 4)}^{${task.n}}-1} = ${texNum(T1, 2)}\,€` },
+      z1: { title: 'Z₁', text: String.raw`Z_1 = A - T_1 = ${texNum(A, 2)}\,€ - ${texNum(T1, 2)}\,€ = ${texNum(Z1, 2)}\,€` },
+      k1: { title: 'K₁', text: String.raw`K_1 = K_0 - T_1 = ${texNum(task.K0, 2)}\,€ - ${texNum(T1, 2)}\,€ = ${texNum(K1, 2)}\,€` },
+      t2: { title: 'T₂', text: String.raw`T_2 = T_1 \cdot q^{2-1} = ${texNum(T1, 2)}\,€ \cdot ${texNum(q, 4)} = ${texNum(T2, 2)}\,€` },
+      z2: { title: 'Z₂', text: String.raw`Z_2 = A - T_2 = ${texNum(A, 2)}\,€ - ${texNum(T2, 2)}\,€ = ${texNum(Z2, 2)}\,€` },
+      kv: { title: `K${task.v-1}`, text: String.raw`K_v = K_0\,q^{v-1} - A\,\dfrac{q^{v}-1}{q-1} = ${texNum(task.K0, 2)}\,€ \cdot ${texNum(q, 4)}^{(${task.v}-1)} - ${texNum(A, 2)}\,€ \cdot \dfrac{${texNum(q, 4)}^{${task.v}}-1}{${texNum(q, 4)}-1} = ${texNum(K_before_v, 2)}\,€` },
+      tv: { title: `T${task.v}`, text: String.raw`T_v = T_1\,q^{v-1} = ${texNum(T1, 2)}\,€ \cdot ${texNum(q, 4)}^{(${task.v}-1)} = ${texNum(Tv, 2)}\,€` },
+      zv: { title: `Z${task.v}`, text: String.raw`Z_v = A - T_v = ${texNum(A, 2)}\,€ - ${texNum(Tv, 2)}\,€ = ${texNum(Zv, 2)}\,€` },
+      av: { title: 'A', text: String.raw`A \text{ bleibt konstant}: ${texNum(A, 2)}\,€` },
+    };
+
+    const entry = lines[field];
+    if (entry) {
+      setExplanationTitle(entry.title);
+      setExplanationText(entry.text);
+    }
+  };
+
   if (!task) return <div>Lade...</div>;
 
   const getInputClass = (field: string) => {
@@ -151,18 +207,21 @@ export default function Annuitaetendarlehen() {
   const getSol = (field: string) => {
     const exactRate = task.p / 100;
     const q = 1 + exactRate;
-    const A = task.A;
+    const A = round2(task.A);
+    const qPowVminus1 = Math.pow(q, task.v - 1);
+    const qPowV = Math.pow(q, task.v);
     
-    const Z1 = task.K0 * exactRate;
-    const T1 = A - Z1;
-    const K1 = task.K0 - T1;
+    const T1 = round2(task.K0 * (q - 1) / (Math.pow(q, task.n) - 1));
+    const Z1 = round2(A - T1);
+    const K1 = round2(task.K0 - T1);
     
-    const Z2 = K1 * exactRate;
-    const T2 = A - Z2;
+    const K_before_2 = round2(task.K0 * Math.pow(q, 1) - A * (Math.pow(q, 1) - 1) / (q - 1));
+    const Z2 = round2(K_before_2 * (q - 1));
+    const T2 = round2(A - Z2);
     
-    const Kv_start = task.K0 * (Math.pow(q, task.n) - Math.pow(q, task.v - 1)) / (Math.pow(q, task.n) - 1);
-    const Zv = Kv_start * exactRate;
-    const Tv = A - Zv;
+    const K_before_v = round2(task.K0 * qPowVminus1 - A * (qPowV - 1) / (q - 1));
+    const Zv = round2(K_before_v * (q - 1));
+    const Tv = round2(A - Zv);
 
     switch(field) {
       case 'k0': return task.K0;
@@ -173,7 +232,7 @@ export default function Annuitaetendarlehen() {
       case 'z2': return Z2;
       case 't2': return T2;
       case 'a2': return A;
-      case 'kv': return Kv_start;
+      case 'kv': return K_before_v;
       case 'zv': return Zv;
       case 'tv': return Tv;
       case 'av': return A;
@@ -205,10 +264,10 @@ export default function Annuitaetendarlehen() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-100 text-gray-700">
-                  <th className="p-3 border text-left">Jahr</th>
+                  <th className="p-3 border text-left">Jahr (v)</th>
                   <th className="p-3 border text-right">Schuld (Anfang)</th>
-                  <th className="p-3 border text-right">Zinsen</th>
                   <th className="p-3 border text-right">Tilgung</th>
+                  <th className="p-3 border text-right">Zinsen</th>
                   <th className="p-3 border text-right">Annuität (Rate)</th>
                 </tr>
               </thead>
@@ -224,17 +283,11 @@ export default function Annuitaetendarlehen() {
                       className={getInputClass('k0')}
                       placeholder="K₀"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('k0'))}</div>}
-                  </td>
-                  <td className="p-2 border">
-                    <input 
-                      type="text" 
-                      value={inputs.z1} 
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('z1', e.target.value)}
-                      className={getInputClass('z1')}
-                      placeholder="Z₁"
-                    />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('z1'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('k0')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('k0'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -244,7 +297,25 @@ export default function Annuitaetendarlehen() {
                       className={getInputClass('t1')}
                       placeholder="T₁"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('t1'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('t1')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('t1'))}
+                      </button>
+                    )}
+                  </td>
+                  <td className="p-2 border">
+                    <input 
+                      type="text" 
+                      value={inputs.z1} 
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('z1', e.target.value)}
+                      className={getInputClass('z1')}
+                      placeholder="Z₁"
+                    />
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('z1')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('z1'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -254,7 +325,11 @@ export default function Annuitaetendarlehen() {
                       className={getInputClass('a1')}
                       placeholder="A"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('a1'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('a1')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('a1'))}
+                      </button>
+                    )}
                   </td>
                 </tr>
 
@@ -269,17 +344,11 @@ export default function Annuitaetendarlehen() {
                       className={getInputClass('k1')}
                       placeholder="K₁"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('k1'))}</div>}
-                  </td>
-                  <td className="p-2 border">
-                    <input 
-                      type="text" 
-                      value={inputs.z2} 
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('z2', e.target.value)}
-                      className={getInputClass('z2')}
-                      placeholder="Z₂"
-                    />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('z2'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('k1')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('k1'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -289,7 +358,25 @@ export default function Annuitaetendarlehen() {
                       className={getInputClass('t2')}
                       placeholder="T₂"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('t2'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('t2')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('t2'))}
+                      </button>
+                    )}
+                  </td>
+                  <td className="p-2 border">
+                    <input 
+                      type="text" 
+                      value={inputs.z2} 
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('z2', e.target.value)}
+                      className={getInputClass('z2')}
+                      placeholder="Z₂"
+                    />
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('z2')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('z2'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -299,7 +386,11 @@ export default function Annuitaetendarlehen() {
                       className={getInputClass('a2')}
                       placeholder="A"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('a2'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('a2')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('a2'))}
+                      </button>
+                    )}
                   </td>
                 </tr>
 
@@ -319,17 +410,11 @@ export default function Annuitaetendarlehen() {
                       className={getInputClass('kv')}
                       placeholder={`K${task.v-1}`}
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('kv'))}</div>}
-                  </td>
-                  <td className="p-2 border">
-                    <input 
-                      type="text" 
-                      value={inputs.zv} 
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('zv', e.target.value)}
-                      className={getInputClass('zv')}
-                      placeholder={`Z${task.v}`}
-                    />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('zv'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('kv')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('kv'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -339,7 +424,25 @@ export default function Annuitaetendarlehen() {
                       className={getInputClass('tv')}
                       placeholder={`T${task.v}`}
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('tv'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('tv')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('tv'))}
+                      </button>
+                    )}
+                  </td>
+                  <td className="p-2 border">
+                    <input 
+                      type="text" 
+                      value={inputs.zv} 
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('zv', e.target.value)}
+                      className={getInputClass('zv')}
+                      placeholder={`Z${task.v}`}
+                    />
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('zv')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('zv'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -349,7 +452,11 @@ export default function Annuitaetendarlehen() {
                       className={getInputClass('av')}
                       placeholder="A"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('av'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('av')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('av'))}
+                      </button>
+                    )}
                   </td>
                 </tr>
               </tbody>
@@ -369,6 +476,15 @@ export default function Annuitaetendarlehen() {
             <div className="flex flex-col items-center"><div className="text-2xl font-bold text-blue-800">{correctCount}</div><div className="text-gray-600 text-sm">Richtig</div></div>
             <div className="flex flex-col items-center"><div className="text-2xl font-bold text-blue-800">{totalCount}</div><div className="text-gray-600 text-sm">Gesamt</div></div>
           </div>
+
+          {explanationText && (
+            <div className="mt-6 w-full max-w-3xl border border-slate-200 rounded-lg bg-slate-50 p-4">
+              <div className="text-sm font-semibold text-slate-700 mb-1">Rechenweg {explanationTitle}</div>
+              <div className="text-sm text-slate-800 flex flex-wrap items-center gap-2">
+                <InlineMath math={explanationText} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

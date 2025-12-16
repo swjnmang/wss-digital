@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { InlineMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
 
 interface Task {
   K0: number;
@@ -16,9 +18,21 @@ const randomFloat = (min: number, max: number, decimals: number) => {
 
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const getRandomItem = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+const round2 = (val: number) => Math.round(val * 100) / 100;
+const parseNumberInput = (raw: string) => {
+  // Accept thousand separators (dot, space, apostrophe) and comma as decimal
+  let s = raw.trim().replace(/\s|'/g, '');
+  if (s.includes(',')) {
+    s = s.replace(/\./g, '').replace(',', '.');
+  } else {
+    s = s.replace(/,/g, '');
+  }
+  return parseFloat(s);
+};
 
 const formatCurrency = (val: number) => val.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const formatNumber = (val: number, decimals: number = 2) => val.toLocaleString('de-DE', { maximumFractionDigits: decimals });
+const texNum = (val: number, decimals = 2) => val.toFixed(decimals);
 
 export default function Ratendarlehen() {
   const [task, setTask] = useState<Task | null>(null);
@@ -34,6 +48,8 @@ export default function Ratendarlehen() {
   const [showSolution, setShowSolution] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+  const [explanationTitle, setExplanationTitle] = useState<string | null>(null);
+  const [explanationText, setExplanationText] = useState<string | null>(null);
 
   useEffect(() => {
     generateNewTask();
@@ -42,7 +58,7 @@ export default function Ratendarlehen() {
   const generateNewTask = () => {
     const K0 = randomInt(50, 150) * 1000;
     const n = randomInt(9, 30);
-    const p = randomFloat(1.0, 10.0, 1);
+    const p = round2(randomFloat(1.0, 10.0, 2));
     const v = randomInt(4, n - 1);
     const T = K0 / n;
 
@@ -74,45 +90,47 @@ export default function Ratendarlehen() {
   const checkAnswers = () => {
     if (!task) return;
 
-    const tolerance = 0.05;
-    const check = (val: string, expected: number): 'correct' | 'incorrect' => {
-      const num = parseFloat(val.replace(',', '.'));
+    const toleranceDefault = 0.01;
+    const tolerancePrincipal = 0.05;
+    const check = (val: string, expected: number, usePrincipalTol = false): 'correct' | 'incorrect' => {
+      const num = parseNumberInput(val);
       if (isNaN(num)) return 'incorrect';
-      return Math.abs(num - expected) <= tolerance ? 'correct' : 'incorrect';
+      const tol = usePrincipalTol ? tolerancePrincipal : toleranceDefault;
+      return Math.abs(num - expected) <= tol ? 'correct' : 'incorrect';
     };
 
-    const exactRate = task.p / 100;
-    
-    // Year 1
-    const Z1 = task.K0 * exactRate;
-    const A1 = task.T + Z1;
-    const K1 = task.K0 - task.T; // Debt at start of year 2
+    const exactRate = round2(task.p) / 100; // q = 1 + p
+    const q = 1 + exactRate;
+    const T = round2(task.K0 / task.n); // T = K0 / n (konstant)
 
-    // Year 2
-    const Z2 = K1 * exactRate;
-    const A2 = task.T + Z2;
-    const K2 = K1 - task.T; // Debt at start of year 3 (not asked, but needed for logic if we went further)
+    // Jahr 1 (v = 1)
+    const Z1 = round2(T * (q - 1) * task.n); // Z1 = T*(q-1)*(n-1+1)
+    const A1 = round2(T + Z1);            // A1 = T + Z1
+    const K1 = round2(T * (task.n - 1));  // K1 = T*(n-1) (Schuld zu Jahresbeginn Jahr 2)
 
-    // Year v
-    // Debt at start of year v is K0 - (v-1)*T
-    const Kv_start = task.K0 - (task.v - 1) * task.T;
-    const Zv = Kv_start * exactRate;
-    const Av = task.T + Zv;
+    // Jahr 2 (v = 2)
+    const Z2 = round2(T * (q - 1) * (task.n - 1));
+    const A2 = round2(T + Z2);
+
+    // Jahr v (Schuld zu Jahresbeginn v = K_{v-1} = T*(n-v+1))
+    const Kv_start = round2(T * (task.n - task.v + 1));
+    const Zv = round2(T * (q - 1) * (task.n - task.v + 1));
+    const Av = round2(T + Zv);
 
     const newFeedback = {
-      k0: check(inputs.k0, task.K0),
+      k0: check(inputs.k0, task.K0, true),
       z1: check(inputs.z1, Z1),
-      t1: check(inputs.t1, task.T),
+      t1: check(inputs.t1, T),
       a1: check(inputs.a1, A1),
       
-      k1: check(inputs.k1, K1),
+      k1: check(inputs.k1, K1, true),
       z2: check(inputs.z2, Z2),
-      t2: check(inputs.t2, task.T),
+      t2: check(inputs.t2, T),
       a2: check(inputs.a2, A2),
       
-      kv: check(inputs.kv, Kv_start),
+      kv: check(inputs.kv, Kv_start, true),
       zv: check(inputs.zv, Zv),
-      tv: check(inputs.tv, task.T),
+      tv: check(inputs.tv, T),
       av: check(inputs.av, Av),
     };
 
@@ -129,6 +147,42 @@ export default function Ratendarlehen() {
     setShowSolution(true);
   };
 
+  const showExplanation = (field: string) => {
+    if (!task) return;
+    const exactRate = round2(task.p) / 100;
+    const q = 1 + exactRate;
+    const T = round2(task.K0 / task.n);
+    const Z1 = round2(T * (q - 1) * task.n);
+    const A1 = round2(T + Z1);
+    const K1 = round2(T * (task.n - 1));
+    const Z2 = round2(T * (q - 1) * (task.n - 1));
+    const A2 = round2(T + Z2);
+    const Kv_start = round2(T * (task.n - task.v + 1));
+    const Zv = round2(T * (q - 1) * (task.n - task.v + 1));
+    const Av = round2(T + Zv);
+
+    const lines: Record<string, { title: string; text: string }> = {
+      k0: { title: 'K₀', text: String.raw`K_0 = T \cdot n = ${texNum(T, 2)}\,€ \cdot ${task.n} = ${texNum(task.K0, 2)}\,€` },
+      t1: { title: 'T', text: String.raw`T = \dfrac{K_0}{n} = \dfrac{${texNum(task.K0, 2)}\,€}{${task.n}} = ${texNum(T, 2)}\,€` },
+      z1: { title: 'Z₁', text: String.raw`Z_1 = T\,(q-1)\,n = ${texNum(T, 2)}\,€ \cdot (${texNum(q, 4)}-1) \cdot ${task.n} = ${texNum(Z1, 2)}\,€` },
+      a1: { title: 'A₁', text: String.raw`A_1 = T + Z_1 = ${texNum(T, 2)}\,€ + ${texNum(Z1, 2)}\,€ = ${texNum(A1, 2)}\,€` },
+      k1: { title: 'K₁', text: String.raw`K_1 = T\,(n-1) = ${texNum(T, 2)}\,€ \cdot (${task.n}-1) = ${texNum(K1, 2)}\,€` },
+      z2: { title: 'Z₂', text: String.raw`Z_2 = T\,(q-1)\,(n-1) = ${texNum(T, 2)}\,€ \cdot (${texNum(q, 4)}-1) \cdot (${task.n}-1) = ${texNum(Z2, 2)}\,€` },
+      t2: { title: 'T', text: String.raw`T = ${texNum(T, 2)}\,€ \text{ (konstant)}` },
+      a2: { title: 'A₂', text: String.raw`A_2 = T + Z_2 = ${texNum(T, 2)}\,€ + ${texNum(Z2, 2)}\,€ = ${texNum(A2, 2)}\,€` },
+      kv: { title: `K${task.v-1}`, text: String.raw`K_{v-1} = T\,(n-v+1) = ${texNum(T, 2)}\,€ \cdot (${task.n}-${task.v}+1) = ${texNum(Kv_start, 2)}\,€` },
+      zv: { title: `Z${task.v}`, text: String.raw`Z_v = T\,(q-1)\,(n-v+1) = ${texNum(T, 2)}\,€ \cdot (${texNum(q, 4)}-1) \cdot (${task.n}-${task.v}+1) = ${texNum(Zv, 2)}\,€` },
+      tv: { title: 'T', text: String.raw`T = ${texNum(T, 2)}\,€ \text{ (konstant)}` },
+      av: { title: `A${task.v}`, text: String.raw`A_v = T + Z_v = ${texNum(T, 2)}\,€ + ${texNum(Zv, 2)}\,€ = ${texNum(Av, 2)}\,€` },
+    };
+
+    const entry = lines[field];
+    if (entry) {
+      setExplanationTitle(entry.title);
+      setExplanationText(entry.text);
+    }
+  };
+
   if (!task) return <div>Lade...</div>;
 
   const getInputClass = (field: string) => {
@@ -142,27 +196,29 @@ export default function Ratendarlehen() {
   // Helper to get solution value for display
   const getSol = (field: string) => {
     const exactRate = task.p / 100;
-    const Z1 = task.K0 * exactRate;
-    const A1 = task.T + Z1;
-    const K1 = task.K0 - task.T;
-    const Z2 = K1 * exactRate;
-    const A2 = task.T + Z2;
-    const Kv_start = task.K0 - (task.v - 1) * task.T;
-    const Zv = Kv_start * exactRate;
-    const Av = task.T + Zv;
+    const q = 1 + exactRate;
+    const T = round2(task.K0 / task.n);
+    const Z1 = round2(T * (q - 1) * task.n);
+    const A1 = round2(T + Z1);
+    const K1 = round2(T * (task.n - 1));
+    const Z2 = round2(T * (q - 1) * (task.n - 1));
+    const A2 = round2(T + Z2);
+    const Kv_start = round2(T * (task.n - task.v + 1));
+    const Zv = round2(T * (q - 1) * (task.n - task.v + 1));
+    const Av = round2(T + Zv);
 
     switch(field) {
       case 'k0': return task.K0;
       case 'z1': return Z1;
-      case 't1': return task.T;
+      case 't1': return T;
       case 'a1': return A1;
       case 'k1': return K1;
       case 'z2': return Z2;
-      case 't2': return task.T;
+      case 't2': return T;
       case 'a2': return A2;
       case 'kv': return Kv_start;
       case 'zv': return Zv;
-      case 'tv': return task.T;
+      case 'tv': return T;
       case 'av': return Av;
       default: return 0;
     }
@@ -180,7 +236,7 @@ export default function Ratendarlehen() {
             <p className="mb-2">
               Darlehenshöhe: <strong>{formatCurrency(task.K0)} €</strong>, 
               Laufzeit: <strong>{task.n} Jahre</strong>, 
-              Zinssatz: <strong>{formatNumber(task.p, 1)} % p.a.</strong>.
+              Zinssatz: <strong>{formatNumber(task.p, 2)} % p.a.</strong>.
             </p>
             <p className="text-sm text-gray-600">
               Fülle die Tabelle für die ersten beiden Jahre und das {task.v}. Jahr aus.
@@ -192,10 +248,10 @@ export default function Ratendarlehen() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-100 text-gray-700">
-                  <th className="p-3 border text-left">Jahr</th>
+                  <th className="p-3 border text-left">Jahr (v)</th>
                   <th className="p-3 border text-right">Schuld (Anfang)</th>
-                  <th className="p-3 border text-right">Zinsen</th>
                   <th className="p-3 border text-right">Tilgung</th>
+                  <th className="p-3 border text-right">Zinsen</th>
                   <th className="p-3 border text-right">Annuität (Rate)</th>
                 </tr>
               </thead>
@@ -211,17 +267,11 @@ export default function Ratendarlehen() {
                       className={getInputClass('k0')}
                       placeholder="K₀"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('k0'))}</div>}
-                  </td>
-                  <td className="p-2 border">
-                    <input 
-                      type="text" 
-                      value={inputs.z1} 
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('z1', e.target.value)}
-                      className={getInputClass('z1')}
-                      placeholder="Z₁"
-                    />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('z1'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('k0')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('k0'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -231,7 +281,25 @@ export default function Ratendarlehen() {
                       className={getInputClass('t1')}
                       placeholder="T"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('t1'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('t1')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('t1'))}
+                      </button>
+                    )}
+                  </td>
+                  <td className="p-2 border">
+                    <input 
+                      type="text" 
+                      value={inputs.z1} 
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('z1', e.target.value)}
+                      className={getInputClass('z1')}
+                      placeholder="Z₁"
+                    />
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('z1')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('z1'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -241,7 +309,11 @@ export default function Ratendarlehen() {
                       className={getInputClass('a1')}
                       placeholder="A₁"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('a1'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('a1')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('a1'))}
+                      </button>
+                    )}
                   </td>
                 </tr>
 
@@ -256,17 +328,11 @@ export default function Ratendarlehen() {
                       className={getInputClass('k1')}
                       placeholder="K₁"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('k1'))}</div>}
-                  </td>
-                  <td className="p-2 border">
-                    <input 
-                      type="text" 
-                      value={inputs.z2} 
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('z2', e.target.value)}
-                      className={getInputClass('z2')}
-                      placeholder="Z₂"
-                    />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('z2'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('k1')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('k1'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -276,7 +342,25 @@ export default function Ratendarlehen() {
                       className={getInputClass('t2')}
                       placeholder="T"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('t2'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('t2')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('t2'))}
+                      </button>
+                    )}
+                  </td>
+                  <td className="p-2 border">
+                    <input 
+                      type="text" 
+                      value={inputs.z2} 
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('z2', e.target.value)}
+                      className={getInputClass('z2')}
+                      placeholder="Z₂"
+                    />
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('z2')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('z2'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -286,7 +370,11 @@ export default function Ratendarlehen() {
                       className={getInputClass('a2')}
                       placeholder="A₂"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('a2'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('a2')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('a2'))}
+                      </button>
+                    )}
                   </td>
                 </tr>
 
@@ -306,17 +394,11 @@ export default function Ratendarlehen() {
                       className={getInputClass('kv')}
                       placeholder={`K${task.v-1}`}
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('kv'))}</div>}
-                  </td>
-                  <td className="p-2 border">
-                    <input 
-                      type="text" 
-                      value={inputs.zv} 
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('zv', e.target.value)}
-                      className={getInputClass('zv')}
-                      placeholder={`Z${task.v}`}
-                    />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('zv'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('kv')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('kv'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -326,7 +408,25 @@ export default function Ratendarlehen() {
                       className={getInputClass('tv')}
                       placeholder="T"
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('tv'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('tv')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('tv'))}
+                      </button>
+                    )}
+                  </td>
+                  <td className="p-2 border">
+                    <input 
+                      type="text" 
+                      value={inputs.zv} 
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('zv', e.target.value)}
+                      className={getInputClass('zv')}
+                      placeholder={`Z${task.v}`}
+                    />
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('zv')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('zv'))}
+                      </button>
+                    )}
                   </td>
                   <td className="p-2 border">
                     <input 
@@ -336,7 +436,11 @@ export default function Ratendarlehen() {
                       className={getInputClass('av')}
                       placeholder={`A${task.v}`}
                     />
-                    {showSolution && <div className="text-xs text-blue-600 text-right mt-1">{formatCurrency(getSol('av'))}</div>}
+                    {showSolution && (
+                      <button type="button" onClick={() => showExplanation('av')} className="text-xs text-blue-600 text-right mt-1 underline">
+                        {formatCurrency(getSol('av'))}
+                      </button>
+                    )}
                   </td>
                 </tr>
               </tbody>
@@ -356,8 +460,18 @@ export default function Ratendarlehen() {
             <div className="flex flex-col items-center"><div className="text-2xl font-bold text-blue-800">{correctCount}</div><div className="text-gray-600 text-sm">Richtig</div></div>
             <div className="flex flex-col items-center"><div className="text-2xl font-bold text-blue-800">{totalCount}</div><div className="text-gray-600 text-sm">Gesamt</div></div>
           </div>
+
+          {explanationText && (
+            <div className="mt-6 w-full max-w-3xl border border-slate-200 rounded-lg bg-slate-50 p-4">
+              <div className="text-sm font-semibold text-slate-700 mb-1">Rechenweg {explanationTitle}</div>
+              <div className="text-sm text-slate-800 flex flex-wrap items-center gap-2">
+                <InlineMath math={explanationText} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
+
