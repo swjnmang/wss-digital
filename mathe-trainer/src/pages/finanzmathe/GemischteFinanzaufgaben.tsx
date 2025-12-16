@@ -1127,12 +1127,11 @@ const createAnnuitaetPlanTask = (): Task => {
     <div className="space-y-3">
       <p>{randomChoice(annuitaetPlanContexts)}</p>
       <p>
-        Zinssatz: <strong>{formatNumber(rate, 2)} %</strong>, Laufzeit <strong>{years} Jahre</strong>. Die Annuität bleibt
-        konstant.
+        Darlehenshöhe: <strong>{formatCurrency(loan)} €</strong>, Laufzeit: <strong>{years} Jahre</strong>, Zinssatz:{' '}
+        <strong>{formatNumber(rate, 2)} %</strong>. Die Annuität bleibt konstant.
       </p>
       <p className="text-blue-900 font-semibold">
-        Bestimme für Jahr 1, Jahr 2 sowie Jahr {targetYears[targetYears.length - 1]} jeweils Schuld, Zinsanteil, Tilgung
-        und Annuität.
+        Ergänze die Werte für Jahr 1, Jahr 2 sowie Jahr {targetYears[targetYears.length - 1]} (Schuld, Zinsanteil, Tilgung, Annuität).
       </p>
     </div>
   );
