@@ -1,13 +1,3 @@
-// PDF Download topics
-const FINANZMATHE_TOPICS: { id: TaskType; label: string }[] = [
-  { id: 'simple_interest', label: 'Zinsrechnung' },
-  { id: 'zinseszins', label: 'Zinseszins' },
-  { id: 'kapitalmehrung', label: 'Kapitalmehrung' },
-  { id: 'kapitalminderung', label: 'Kapitalminderung' },
-  { id: 'renten_endwert', label: 'Rentenrechnung' },
-  { id: 'ratendarlehen_plan', label: 'Ratentilgung' },
-  { id: 'annuitaet_plan', label: 'Annuitätentilgung' },
-];
 import React, { useEffect, useState } from 'react';
 import 'katex/dist/katex.min.css';
 import { InlineMath } from 'react-katex';
@@ -1227,26 +1217,6 @@ const createCards = (filter: FilterType): TaskCard[] => {
 };
 
 export default function GemischteFinanzaufgaben() {
-  // PDF Modal State
-  const [pdfModalOpen, setPdfModalOpen] = useState(false);
-  const [selectedTopics, setSelectedTopics] = useState<Set<TaskType>>(
-    new Set(FINANZMATHE_TOPICS.map(t => t.id))
-  );
-  const [pdfTaskCount, setPdfTaskCount] = useState(15);
-
-  const handleTopicToggle = (topic: TaskType) => {
-    setSelectedTopics(prev => {
-      const next = new Set(prev);
-      if (next.has(topic)) next.delete(topic);
-      else next.add(topic);
-      return next;
-    });
-  };
-
-  const handlePdfDownload = () => {
-    // PDF generation logic will be implemented here
-    setPdfModalOpen(false);
-  };
   const [filter, setFilter] = useState<FilterType>('mixed');
   const [cards, setCards] = useState<TaskCard[]>(() => createCards('mixed'));
   const [stats, setStats] = useState(() => createInitialStats());
@@ -1366,70 +1336,6 @@ export default function GemischteFinanzaufgaben() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-100">
-      {/* PDF Download Button */}
-      <div className="flex justify-end max-w-5xl mx-auto w-full pt-8 pr-8">
-        <button
-          className="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded shadow"
-          onClick={() => setPdfModalOpen(true)}
-        >
-          PDF-Download
-        </button>
-      </div>
-
-      {/* PDF Modal */}
-      {pdfModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              onClick={() => setPdfModalOpen(false)}
-              aria-label="Schließen"
-            >
-              ×
-            </button>
-            <h2 className="text-lg font-bold mb-4">PDF-Download konfigurieren</h2>
-            <div className="mb-4">
-              <label className="block font-semibold mb-2">Themen auswählen:</label>
-              <div className="grid grid-cols-1 gap-2">
-                {FINANZMATHE_TOPICS.map(topic => (
-                  <label key={topic.id} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedTopics.has(topic.id)}
-                      onChange={() => handleTopicToggle(topic.id)}
-                    />
-                    {topic.label}
-                  </label>
-                ))}
-              </div>
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-2" htmlFor="pdf-task-count">Anzahl Aufgaben:</label>
-              <input
-                id="pdf-task-count"
-                type="number"
-                min={1}
-                max={50}
-                className="border rounded px-2 py-1 w-20"
-                value={pdfTaskCount}
-                onChange={e => setPdfTaskCount(Number(e.target.value))}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <button
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded"
-                onClick={() => setPdfModalOpen(false)}
-              >Abbrechen</button>
-              <button
-                className="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded"
-                onClick={handlePdfDownload}
-                disabled={selectedTopics.size === 0 || pdfTaskCount < 1}
-              >PDF generieren</button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="flex-1 flex flex-col items center px-3 py-8 sm:px-6">
         <div className="w-full max-w-5xl bg-white/95 backdrop-blur rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-10">
           <div className="text-center mb-6">
