@@ -46,6 +46,8 @@ export default function Annuitaetendarlehen() {
   });
 
   const [feedback, setFeedback] = useState<{[key: string]: 'correct' | 'incorrect' | null}>({});
+  const [awarded, setAwarded] = useState<{[key: string]: boolean}>({});
+  const [points, setPoints] = useState(0);
   const [showSolution, setShowSolution] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -85,6 +87,8 @@ export default function Annuitaetendarlehen() {
       kv: '', zv: '', tv: '', av: ''
     });
     setFeedback({});
+    setAwarded({});
+    setPoints(0);
     setShowSolution(false);
     setUnlockedV(false);
     setEncouragement(null);
@@ -138,6 +142,10 @@ export default function Annuitaetendarlehen() {
     setInputs(prev => ({ ...prev, [field]: value }));
     const validationResult = validateField(field, value);
     setFeedback(prev => ({ ...prev, [field]: validationResult }));
+    if (validationResult === 'correct' && !showSolution && !awarded[field]) {
+      setAwarded(prev => ({ ...prev, [field]: true }));
+      setPoints(prev => prev + 0.5);
+    }
   };
 
   const checkAnswers = () => {
@@ -547,6 +555,7 @@ export default function Annuitaetendarlehen() {
           <div className="flex flex-wrap justify-center gap-8 mt-6 w-full max-w-2xl">
             <div className="flex flex-col items-center"><div className="text-2xl font-bold text-blue-800">{correctCount}</div><div className="text-gray-600 text-sm">Richtig</div></div>
             <div className="flex flex-col items-center"><div className="text-2xl font-bold text-blue-800">{totalCount}</div><div className="text-gray-600 text-sm">Gesamt</div></div>
+            <div className="flex flex-col items-center"><div className="text-2xl font-bold text-green-700">{points.toFixed(1)}</div><div className="text-gray-600 text-sm">Punkte</div></div>
           </div>
 
           {encouragement && (
