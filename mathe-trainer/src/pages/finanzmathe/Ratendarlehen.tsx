@@ -85,7 +85,6 @@ export default function Ratendarlehen() {
     });
     setFeedback({});
     setAwarded({});
-    setPoints(0);
     setShowSolution(false);
     setUnlockedV(false);
     setEncouragement(null);
@@ -292,6 +291,13 @@ export default function Ratendarlehen() {
     }
   };
 
+  // Small badge shown when a field is first awarded
+  const renderBadge = (field: string) => (
+    awarded[field] && !showSolution ? (
+      <span className="ml-2 inline-block bg-green-600 text-white text-xs rounded-full px-2 py-0.5 pop-badge">+0.5</span>
+    ) : null
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
       <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
@@ -335,6 +341,7 @@ export default function Ratendarlehen() {
                       className={getInputClass('k0')}
                       placeholder="K₀"
                     />
+                    {renderBadge('k0')}
                     {showSolution && (
                       <button type="button" onClick={() => showExplanation('k0')} className="text-xs text-blue-600 text-right mt-1 underline">
                         {formatCurrency(getSol('k0'))}
@@ -349,6 +356,7 @@ export default function Ratendarlehen() {
                       className={getInputClass('t1')}
                       placeholder="T"
                     />
+                    {renderBadge('t1')}
                     {showSolution && (
                       <button type="button" onClick={() => showExplanation('t1')} className="text-xs text-blue-600 text-right mt-1 underline">
                         {formatCurrency(getSol('t1'))}
@@ -363,6 +371,7 @@ export default function Ratendarlehen() {
                       className={getInputClass('z1')}
                       placeholder="Z₁"
                     />
+                    {renderBadge('z1')}
                     {showSolution && (
                       <button type="button" onClick={() => showExplanation('z1')} className="text-xs text-blue-600 text-right mt-1 underline">
                         {formatCurrency(getSol('z1'))}
@@ -377,6 +386,7 @@ export default function Ratendarlehen() {
                       className={getInputClass('a1')}
                       placeholder="A₁"
                     />
+                    {renderBadge('a1')}
                     {showSolution && (
                       <button type="button" onClick={() => showExplanation('a1')} className="text-xs text-blue-600 text-right mt-1 underline">
                         {formatCurrency(getSol('a1'))}
@@ -396,6 +406,7 @@ export default function Ratendarlehen() {
                       className={getInputClass('k1')}
                       placeholder="K₁"
                     />
+                    {renderBadge('k1')}
                     {showSolution && (
                       <button type="button" onClick={() => showExplanation('k1')} className="text-xs text-blue-600 text-right mt-1 underline">
                         {formatCurrency(getSol('k1'))}
@@ -410,6 +421,7 @@ export default function Ratendarlehen() {
                       className={getInputClass('t2')}
                       placeholder="T"
                     />
+                    {renderBadge('t2')}
                     {showSolution && (
                       <button type="button" onClick={() => showExplanation('t2')} className="text-xs text-blue-600 text-right mt-1 underline">
                         {formatCurrency(getSol('t2'))}
@@ -424,6 +436,7 @@ export default function Ratendarlehen() {
                       className={getInputClass('z2')}
                       placeholder="Z₂"
                     />
+                    {renderBadge('z2')}
                     {showSolution && (
                       <button type="button" onClick={() => showExplanation('z2')} className="text-xs text-blue-600 text-right mt-1 underline">
                         {formatCurrency(getSol('z2'))}
@@ -438,6 +451,7 @@ export default function Ratendarlehen() {
                       className={getInputClass('a2')}
                       placeholder="A₂"
                     />
+                    {renderBadge('a2')}
                     {showSolution && (
                       <button type="button" onClick={() => showExplanation('a2')} className="text-xs text-blue-600 text-right mt-1 underline">
                         {formatCurrency(getSol('a2'))}
@@ -474,6 +488,7 @@ export default function Ratendarlehen() {
                           placeholder={`K${task.v-1}`}
                           disabled={!unlockedV && !showSolution}
                         />
+                        {renderBadge('kv')}
                         {showSolution && (
                           <button type="button" onClick={() => showExplanation('kv')} className="text-xs text-blue-600 text-right mt-1 underline">
                             {formatCurrency(getSol('kv'))}
@@ -489,6 +504,7 @@ export default function Ratendarlehen() {
                           placeholder="T"
                           disabled={!unlockedV && !showSolution}
                         />
+                        {renderBadge('tv')}
                         {showSolution && (
                           <button type="button" onClick={() => showExplanation('tv')} className="text-xs text-blue-600 text-right mt-1 underline">
                             {formatCurrency(getSol('tv'))}
@@ -504,6 +520,7 @@ export default function Ratendarlehen() {
                           placeholder={`Z${task.v}`}
                           disabled={!unlockedV && !showSolution}
                         />
+                        {renderBadge('zv')}
                         {showSolution && (
                           <button type="button" onClick={() => showExplanation('zv')} className="text-xs text-blue-600 text-right mt-1 underline">
                             {formatCurrency(getSol('zv'))}
@@ -519,6 +536,7 @@ export default function Ratendarlehen() {
                           placeholder={`A${task.v}`}
                           disabled={!unlockedV && !showSolution}
                         />
+                        {renderBadge('av')}
                         {showSolution && (
                           <button type="button" onClick={() => showExplanation('av')} className="text-xs text-blue-600 text-right mt-1 underline">
                             {formatCurrency(getSol('av'))}
