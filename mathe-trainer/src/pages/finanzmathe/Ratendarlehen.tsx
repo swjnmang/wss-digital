@@ -87,8 +87,56 @@ export default function Ratendarlehen() {
     setEncouragement(null);
   };
 
+  const validateField = (field: string, value: string) => {
+    if (!task) return null;
+    
+    const toleranceDefault = 0.01;
+    const tolerancePrincipal = 0.05;
+    const check = (val: string, expected: number, usePrincipalTol = false): 'correct' | 'incorrect' | null => {
+      if (!val.trim()) return null; // Don't validate empty fields
+      const num = parseNumberInput(val);
+      if (isNaN(num)) return 'incorrect';
+      const tol = usePrincipalTol ? tolerancePrincipal : toleranceDefault;
+      return Math.abs(num - expected) <= tol ? 'correct' : 'incorrect';
+    };
+
+    const exactRate = task.p / 100;
+    const q = 1 + exactRate;
+    const T = task.T;
+    const Z1 = round2(task.K0 * exactRate);
+    const T1 = T;
+    const A1 = round2(Z1 + T1);
+    const K1 = round2(task.K0 - T1);
+    const K_before_2 = K1;
+    const Z2 = round2(K_before_2 * exactRate);
+    const T2 = T;
+    const A2 = round2(Z2 + T2);
+    const K_before_v = round2(task.K0 - T * (task.v - 1));
+    const Zv = round2(K_before_v * exactRate);
+    const Tv = T;
+    const Av = round2(Zv + Tv);
+
+    switch (field) {
+      case 'k0': return check(value, task.K0, true);
+      case 'z1': return check(value, Z1);
+      case 't1': return check(value, T1);
+      case 'a1': return check(value, A1);
+      case 'k1': return check(value, K1, true);
+      case 'z2': return check(value, Z2);
+      case 't2': return check(value, T2);
+      case 'a2': return check(value, A2);
+      case 'kv': return check(value, K_before_v, true);
+      case 'zv': return check(value, Zv);
+      case 'tv': return check(value, Tv);
+      case 'av': return check(value, Av);
+      default: return null;
+    }
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setInputs(prev => ({ ...prev, [field]: value }));
+    const validationResult = validateField(field, value);
+    setFeedback(prev => ({ ...prev, [field]: validationResult }));
   };
 
   const checkAnswers = () => {

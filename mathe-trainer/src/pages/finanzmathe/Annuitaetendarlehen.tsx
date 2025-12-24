@@ -90,8 +90,55 @@ export default function Annuitaetendarlehen() {
     setEncouragement(null);
   };
 
+  const validateField = (field: string, value: string) => {
+    if (!task) return null;
+    
+    const toleranceDefault = 0.01;
+    const tolerancePrincipal = 0.05;
+    const check = (val: string, expected: number, usePrincipalTol = false): 'correct' | 'incorrect' | null => {
+      if (!val.trim()) return null; // Don't validate empty fields
+      const num = parseNumberInput(val);
+      if (isNaN(num)) return 'incorrect';
+      const tol = usePrincipalTol ? tolerancePrincipal : toleranceDefault;
+      return Math.abs(num - expected) <= tol ? 'correct' : 'incorrect';
+    };
+
+    const exactRate = round2(task.p) / 100;
+    const q = 1 + exactRate;
+    const A = round2(task.A);
+    const T1 = round2(task.K0 * (q - 1) / (Math.pow(q, task.n) - 1));
+    const Z1 = round2(A - T1);
+    const K1 = round2(task.K0 - T1);
+    const K_before_2 = round2(task.K0 * Math.pow(q, 1) - A * (Math.pow(q, 1) - 1) / (q - 1));
+    const Z2 = round2(K_before_2 * (q - 1));
+    const T2 = round2(A - Z2);
+    const qPowVminus1 = Math.pow(q, task.v - 1);
+    const qPowV = Math.pow(q, task.v);
+    const K_before_v = round2(task.K0 * qPowVminus1 - A * (qPowV - 1) / (q - 1));
+    const Zv = round2(K_before_v * (q - 1));
+    const Tv = round2(A - Zv);
+
+    switch (field) {
+      case 'k0': return check(value, task.K0, true);
+      case 'z1': return check(value, Z1);
+      case 't1': return check(value, T1);
+      case 'a1': return check(value, A);
+      case 'k1': return check(value, K1, true);
+      case 'z2': return check(value, Z2);
+      case 't2': return check(value, T2);
+      case 'a2': return check(value, A);
+      case 'kv': return check(value, K_before_v, true);
+      case 'zv': return check(value, Zv);
+      case 'tv': return check(value, Tv);
+      case 'av': return check(value, A);
+      default: return null;
+    }
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setInputs(prev => ({ ...prev, [field]: value }));
+    const validationResult = validateField(field, value);
+    setFeedback(prev => ({ ...prev, [field]: validationResult }));
   };
 
   const checkAnswers = () => {
