@@ -90,7 +90,7 @@ export default function Ratendarlehen() {
   const validateField = (field: string, value: string) => {
     if (!task) return null;
     
-    const toleranceDefault = 0.01;
+    const toleranceDefault = 0.05;
     const tolerancePrincipal = 0.05;
     const check = (val: string, expected: number, usePrincipalTol = false): 'correct' | 'incorrect' | null => {
       if (!val.trim()) return null; // Don't validate empty fields
@@ -142,7 +142,7 @@ export default function Ratendarlehen() {
   const checkAnswers = () => {
     if (!task) return;
 
-    const toleranceDefault = 0.01;
+    const toleranceDefault = 0.05;
     const tolerancePrincipal = 0.05;
     const check = (val: string, expected: number, usePrincipalTol = false): 'correct' | 'incorrect' => {
       const num = parseNumberInput(val);
