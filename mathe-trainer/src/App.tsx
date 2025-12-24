@@ -106,6 +106,10 @@ import Parallelogramm from './pages/raum_und_form/Parallelogramm';
 import Raute from './pages/raum_und_form/Raute';
 import Kreis from './pages/raum_und_form/Kreis';
 import GemischteFlaechenaufgaben from './pages/raum_und_form/GemischteFlaechenaufgaben';
+// Pythagoras
+import KathetenHypotenuse from './pages/raum_und_form/pythagoras/KathetenHypotenuse';
+import SeitenBerechnen from './pages/raum_und_form/pythagoras/SeitenBerechnen';
+import Anwendungsaufgaben from './pages/raum_und_form/pythagoras/Anwendungsaufgaben';
 // ... other imports will be added as files are created
 
 export default function App() {
@@ -232,6 +236,9 @@ export default function App() {
           <Route path="/raum-und-form" element={<RaumUndFormIndex />} />
           <Route path="/raum-und-form/flaechengeometrie" element={<Flaechengeometrie />} />
           <Route path="/raum-und-form/satz-des-pythagoras" element={<SatzDesPythagoras />} />
+          <Route path="/raum-und-form/satz-des-pythagoras/katheten-hypotenuse" element={<KathetenHypotenuse />} />
+          <Route path="/raum-und-form/satz-des-pythagoras/berechnen" element={<SeitenBerechnen />} />
+          <Route path="/raum-und-form/satz-des-pythagoras/anwendung" element={<Anwendungsaufgaben />} />
           <Route path="/raum-und-form/strahlensaetze" element={<Strahlensaetze />} />
           <Route path="/raum-und-form/kugel" element={<Kugel />} />
           <Route path="/raum-und-form/kegel" element={<Kegel />} />

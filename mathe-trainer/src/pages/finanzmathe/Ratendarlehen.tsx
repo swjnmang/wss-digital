@@ -231,14 +231,14 @@ export default function Ratendarlehen() {
     const lines: Record<string, { title: string; text: string }> = {
       k0: { title: 'K₀', text: String.raw`K_0 = T \cdot n = ${texNum(T, 2)}\,€ \cdot ${task.n} = ${texNum(task.K0, 2)}\,€` },
       t1: { title: 'T', text: String.raw`T = \dfrac{K_0}{n} = \dfrac{${texNum(task.K0, 2)}\,€}{${task.n}} = ${texNum(T, 2)}\,€` },
-      z1: { title: 'Z₁', text: String.raw`Z_1 = T\,(q-1)\,n = ${texNum(T, 2)}\,€ \cdot (${texNum(q, 4)}-1) \cdot ${task.n} = ${texNum(Z1, 2)}\,€` },
+      z1: { title: 'Z₁', text: String.raw`\text{Weg 1: } Z_1 = T\,(q-1)\,n = ${texNum(T, 2)}\,€ \cdot (${texNum(q, 4)}-1) \cdot ${task.n} = ${texNum(Z1, 2)}\,€ \\[0.5em] \text{Weg 2: } Z_1 = K_0 \cdot ${texNum(task.p, 2)}\% = ${texNum(task.K0, 2)}\,€ \cdot ${texNum(task.p / 100, 4)} = ${texNum(Z1, 2)}\,€` },
       a1: { title: 'A₁', text: String.raw`A_1 = T + Z_1 = ${texNum(T, 2)}\,€ + ${texNum(Z1, 2)}\,€ = ${texNum(A1, 2)}\,€` },
       k1: { title: 'K₁', text: String.raw`K_1 = T\,(n-1) = ${texNum(T, 2)}\,€ \cdot (${task.n}-1) = ${texNum(K1, 2)}\,€` },
-      z2: { title: 'Z₂', text: String.raw`Z_2 = T\,(q-1)\,(n-1) = ${texNum(T, 2)}\,€ \cdot (${texNum(q, 4)}-1) \cdot (${task.n}-1) = ${texNum(Z2, 2)}\,€` },
+      z2: { title: 'Z₂', text: String.raw`\text{Weg 1: } Z_2 = T\,(q-1)\,(n-1) = ${texNum(T, 2)}\,€ \cdot (${texNum(q, 4)}-1) \cdot (${task.n}-1) = ${texNum(Z2, 2)}\,€ \\[0.5em] \text{Weg 2: } Z_2 = K_1 \cdot ${texNum(task.p, 2)}\% = ${texNum(K1, 2)}\,€ \cdot ${texNum(task.p / 100, 4)} = ${texNum(Z2, 2)}\,€` },
       t2: { title: 'T', text: String.raw`T = ${texNum(T, 2)}\,€ \text{ (konstant)}` },
       a2: { title: 'A₂', text: String.raw`A_2 = T + Z_2 = ${texNum(T, 2)}\,€ + ${texNum(Z2, 2)}\,€ = ${texNum(A2, 2)}\,€` },
       kv: { title: `K${task.v-1}`, text: String.raw`K_{v-1} = T\,(n-v+1) = ${texNum(T, 2)}\,€ \cdot (${task.n}-${task.v}+1) = ${texNum(Kv_start, 2)}\,€` },
-      zv: { title: `Z${task.v}`, text: String.raw`Z_v = T\,(q-1)\,(n-v+1) = ${texNum(T, 2)}\,€ \cdot (${texNum(q, 4)}-1) \cdot (${task.n}-${task.v}+1) = ${texNum(Zv, 2)}\,€` },
+      zv: { title: `Z${task.v}`, text: String.raw`\text{Weg 1: } Z_v = T\,(q-1)\,(n-v+1) = ${texNum(T, 2)}\,€ \cdot (${texNum(q, 4)}-1) \cdot (${task.n}-${task.v}+1) = ${texNum(Zv, 2)}\,€ \\[0.5em] \text{Weg 2: } Z_v = K_{v-1} \cdot ${texNum(task.p, 2)}\% = ${texNum(Kv_start, 2)}\,€ \cdot ${texNum(task.p / 100, 4)} = ${texNum(Zv, 2)}\,€` },
       tv: { title: 'T', text: String.raw`T = ${texNum(T, 2)}\,€ \text{ (konstant)}` },
       av: { title: `A${task.v}`, text: String.raw`A_v = T + Z_v = ${texNum(T, 2)}\,€ + ${texNum(Zv, 2)}\,€ = ${texNum(Av, 2)}\,€` },
     };

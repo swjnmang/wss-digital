@@ -1,5 +1,5 @@
-import ComingSoon from "../../components/ComingSoon";
+import PythagorasIndex from "./pythagoras/PythagorasIndex";
 
 export default function SatzDesPythagoras() {
-  return <ComingSoon title="Satz des Pythagoras" />;
+  return <PythagorasIndex />;
 }

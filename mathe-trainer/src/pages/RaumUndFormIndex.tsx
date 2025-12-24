@@ -10,7 +10,7 @@ const sections: SectionData[] = [
     title: "Geometrie – Raum und Form",
     items: [
       { icon: Ruler, title: "Flächengeometrie", desc: "Unterthemen öffnen", href: "flaechengeometrie" },
-      { icon: Triangle, title: "Satz des Pythagoras", desc: "Coming Soon", href: "satz-des-pythagoras" },
+      { icon: Triangle, title: "Satz des Pythagoras", desc: "Katheten und Hypotenuse verstehen", href: "satz-des-pythagoras" },
       { icon: Expand, title: "Strahlensätze", desc: "Coming Soon", href: "strahlensaetze" },
       { icon: Circle, title: "Kugel", desc: "Coming Soon", href: "kugel" },
       { icon: Box, title: "Prisma", desc: "Coming Soon", href: "prisma" },

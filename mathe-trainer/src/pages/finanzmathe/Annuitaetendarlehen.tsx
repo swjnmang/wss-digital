@@ -239,13 +239,13 @@ export default function Annuitaetendarlehen() {
       k0: { title: 'K₀', text: String.raw`K_0 = ${texNum(task.K0, 2)}\,€` },
       a1: { title: 'A', text: String.raw`A = \dfrac{K_0\,q^{n}\,(q-1)}{q^{n}-1} = \dfrac{${texNum(task.K0, 2)}\,€ \cdot ${texNum(q, 4)}^{${task.n}} \cdot (${texNum(q, 4)}-1)}{${texNum(q, 4)}^{${task.n}}-1} = ${texNum(A, 2)}\,€` },
       t1: { title: 'T₁', text: String.raw`T_1 = \dfrac{K_0\,(q-1)}{q^{n}-1} = \dfrac{${texNum(task.K0, 2)}\,€ \cdot (${texNum(q, 4)}-1)}{${texNum(q, 4)}^{${task.n}}-1} = ${texNum(T1, 2)}\,€` },
-      z1: { title: 'Z₁', text: String.raw`Z_1 = A - T_1 = ${texNum(A, 2)}\,€ - ${texNum(T1, 2)}\,€ = ${texNum(Z1, 2)}\,€` },
+      z1: { title: 'Z₁', text: String.raw`\text{Weg 1: } Z_1 = A - T_1 = ${texNum(A, 2)}\,€ - ${texNum(T1, 2)}\,€ = ${texNum(Z1, 2)}\,€ \\[0.5em] \text{Weg 2: } Z_1 = K_0 \cdot ${texNum(task.p, 2)}\% = ${texNum(task.K0, 2)}\,€ \cdot ${texNum(task.p / 100, 4)} = ${texNum(Z1, 2)}\,€` },
       k1: { title: 'K₁', text: String.raw`K_1 = K_0 - T_1 = ${texNum(task.K0, 2)}\,€ - ${texNum(T1, 2)}\,€ = ${texNum(K1, 2)}\,€` },
       t2: { title: 'T₂', text: String.raw`T_2 = T_1 \cdot q^{2-1} = ${texNum(T1, 2)}\,€ \cdot ${texNum(q, 4)} = ${texNum(T2, 2)}\,€` },
-      z2: { title: 'Z₂', text: String.raw`Z_2 = A - T_2 = ${texNum(A, 2)}\,€ - ${texNum(T2, 2)}\,€ = ${texNum(Z2, 2)}\,€` },
+      z2: { title: 'Z₂', text: String.raw`\text{Weg 1: } Z_2 = A - T_2 = ${texNum(A, 2)}\,€ - ${texNum(T2, 2)}\,€ = ${texNum(Z2, 2)}\,€ \\[0.5em] \text{Weg 2: } Z_2 = K_1 \cdot ${texNum(task.p, 2)}\% = ${texNum(K_before_2, 2)}\,€ \cdot ${texNum(task.p / 100, 4)} = ${texNum(Z2, 2)}\,€` },
       kv: { title: `K${task.v - 1}`, text: String.raw`K_{v-1} = K_0\,q^{v-1} - A\,\dfrac{q^{v-1}-1}{q-1} = ${texNum(task.K0, 2)}\,€ \cdot ${texNum(q, 4)}^{${task.v - 1}} - ${texNum(A, 2)}\,€ \cdot \dfrac{${texNum(q, 4)}^{${task.v - 1}}-1}{${texNum(q, 4)}-1} = ${texNum(K_before_v, 2)}\,€` },
       tv: { title: `T${task.v}`, text: String.raw`T_v = T_1\,q^{v-1} = ${texNum(T1, 2)}\,€ \cdot ${texNum(q, 4)}^{(${task.v}-1)} = ${texNum(Tv, 2)}\,€` },
-      zv: { title: `Z${task.v}`, text: String.raw`Z_v = A - T_v = ${texNum(A, 2)}\,€ - ${texNum(Tv, 2)}\,€ = ${texNum(Zv, 2)}\,€` },
+      zv: { title: `Z${task.v}`, text: String.raw`\text{Weg 1: } Z_v = A - T_v = ${texNum(A, 2)}\,€ - ${texNum(Tv, 2)}\,€ = ${texNum(Zv, 2)}\,€ \\[0.5em] \text{Weg 2: } Z_v = K_{v-1} \cdot ${texNum(task.p, 2)}\% = ${texNum(K_before_v, 2)}\,€ \cdot ${texNum(task.p / 100, 4)} = ${texNum(Zv, 2)}\,€` },
       av: { title: 'A', text: String.raw`A \text{ bleibt konstant}: ${texNum(A, 2)}\,€` },
     };
 
