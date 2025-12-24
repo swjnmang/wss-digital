@@ -112,8 +112,8 @@ export default function Annuitaetendarlehen() {
     const K_before_2 = round2(task.K0 * Math.pow(q, 1) - A * (Math.pow(q, 1) - 1) / (q - 1));
     const Z2 = round2(K_before_2 * (q - 1));
     const T2 = round2(A - Z2);
-    const qPowV = Math.pow(q, task.v);
-    const K_before_v = round2(task.K0 * qPowV - A * (qPowV - 1) / (q - 1));
+    const qPowVminus1 = Math.pow(q, task.v - 1);
+    const K_before_v = round2(task.K0 * qPowVminus1 - A * (qPowVminus1 - 1) / (q - 1));
     const Zv = round2(K_before_v * (q - 1));
     const Tv = round2(A - Zv);
 
@@ -167,8 +167,8 @@ export default function Annuitaetendarlehen() {
     const T2 = round2(A - Z2);
 
     // Jahr v
-    const qPowV = Math.pow(q, task.v);
-    const K_before_v = round2(task.K0 * qPowV - A * (qPowV - 1) / (q - 1));
+    const qPowVminus1 = Math.pow(q, task.v - 1);
+    const K_before_v = round2(task.K0 * qPowVminus1 - A * (qPowVminus1 - 1) / (q - 1));
     const Zv = round2(K_before_v * (q - 1));
     const Tv = round2(A - Zv);
 
@@ -215,7 +215,7 @@ export default function Annuitaetendarlehen() {
     const exactRate = round2(task.p) / 100;
     const q = 1 + exactRate;
     const qPowN = Math.pow(q, task.n);
-    const qPowV = Math.pow(q, task.v);
+    const qPowVminus1 = Math.pow(q, task.v - 1);
     const qMinus1 = q - 1;
     const A = round2(task.A);
     const T1 = round2(task.K0 * (qMinus1) / (qPowN - 1));
@@ -224,7 +224,7 @@ export default function Annuitaetendarlehen() {
     const K_before_2 = round2(task.K0 * Math.pow(q, 1) - A * (Math.pow(q, 1) - 1) / (qMinus1));
     const Z2 = round2(K_before_2 * (qMinus1));
     const T2 = round2(A - Z2);
-    const K_before_v = round2(task.K0 * qPowV - A * (qPowV - 1) / (qMinus1));
+    const K_before_v = round2(task.K0 * qPowVminus1 - A * (qPowVminus1 - 1) / (qMinus1));
     const Zv = round2(K_before_v * (qMinus1));
     const Tv = round2(A - Zv);
 
@@ -236,7 +236,7 @@ export default function Annuitaetendarlehen() {
       k1: { title: 'K₁', text: String.raw`K_1 = K_0 - T_1 = ${texNum(task.K0, 2)}\,€ - ${texNum(T1, 2)}\,€ = ${texNum(K1, 2)}\,€` },
       t2: { title: 'T₂', text: String.raw`T_2 = T_1 \cdot q^{2-1} = ${texNum(T1, 2)}\,€ \cdot ${texNum(q, 4)} = ${texNum(T2, 2)}\,€` },
       z2: { title: 'Z₂', text: String.raw`Z_2 = A - T_2 = ${texNum(A, 2)}\,€ - ${texNum(T2, 2)}\,€ = ${texNum(Z2, 2)}\,€` },
-      kv: { title: `K${task.v}`, text: String.raw`K_v = K_0\,q^{v} - A\,\dfrac{q^{v}-1}{q-1} = ${texNum(task.K0, 2)}\,€ \cdot ${texNum(q, 4)}^{${task.v}} - ${texNum(A, 2)}\,€ \cdot \dfrac{${texNum(q, 4)}^{${task.v}}-1}{${texNum(q, 4)}-1} = ${texNum(K_before_v, 2)}\,€` },
+      kv: { title: `K${task.v}`, text: String.raw`K_${task.v} = K_0\,q^{${task.v}-1} - A\,\dfrac{q^{${task.v}-1}-1}{q-1} = ${texNum(task.K0, 2)}\,€ \cdot ${texNum(q, 4)}^{${task.v - 1}} - ${texNum(A, 2)}\,€ \cdot \dfrac{${texNum(q, 4)}^{${task.v - 1}}-1}{${texNum(q, 4)}-1} = ${texNum(K_before_v, 2)}\,€` },
       tv: { title: `T${task.v}`, text: String.raw`T_v = T_1\,q^{v-1} = ${texNum(T1, 2)}\,€ \cdot ${texNum(q, 4)}^{(${task.v}-1)} = ${texNum(Tv, 2)}\,€` },
       zv: { title: `Z${task.v}`, text: String.raw`Z_v = A - T_v = ${texNum(A, 2)}\,€ - ${texNum(Tv, 2)}\,€ = ${texNum(Zv, 2)}\,€` },
       av: { title: 'A', text: String.raw`A \text{ bleibt konstant}: ${texNum(A, 2)}\,€` },
