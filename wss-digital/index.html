@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wirtschaftsschule digital</title>
+    <title>Wirtschaftsschule digital - Online Übungsaufgaben und Unternehmensplanspiel</title>
+    <meta name="description" content="Digitale Lernplattform der Wirtschaftsschule mit interaktiven Mathe-Aufgaben, Finanzmathematik und kostenlosem Unternehmensplanspiel für Schulklassen.">
+    <meta name="keywords" content="Mathe Wirtschaftsschule, wss-digital, Wirtschaftsschule Bayern, Übungsaufgaben Mathe, Finanzmathematik, Ratendarlehen, Digitale Bildung, Unternehmensplanspiel, Planspiel Schule">
+    <meta name="author" content="Wirtschaftsschule digital">
+    <meta property="og:title" content="Wirtschaftsschule digital - Lernplattform">
+    <meta property="og:description" content="Kostenlose Übungsaufgaben und Unternehmensplanspiel für Wirtschaftsschulen">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://wss-digital.de/">
     <style>
         /* --- CSS Variablen für einfaches Anpassen --- */
         :root {
@@ -184,8 +191,127 @@
         .nav-card .nav-card-note {
             margin-top: 0.75rem;
             font-size: 0.95rem;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        /* --- Features Slider --- */
+        .features-section {
+            width: 100%;
+            max-width: 1200px;
+            margin: 3rem auto 0;
+            padding: 3rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .features-section h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
             color: var(--text-main);
-            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .slider-container {
+            width: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .slider-wrapper {
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .slider {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slider-item {
+            min-width: 100%;
+            background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid #e0e7ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .slider-item-icon {
+            font-size: 3rem;
+            line-height: 1;
+        }
+
+        .slider-item-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .slider-item-text {
+            font-size: 1rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .slider-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .slider-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: background 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .slider-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .slider-dots {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .slider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border: none;
+            padding: 0;
+        }
+
+        .slider-dot.active {
+            background: var(--primary);
         }
 
         /* --- Footer --- */
@@ -430,8 +556,7 @@
                     </svg>
                 </div>
                 <h2>Wirtschaftsplanspiel</h2>
-                <p>Simulieren Sie Marktsituationen und treffen Sie strategische Entscheidungen.</p>
-                <p class="nav-card-note">Markt-Match 5 - kostenfreies Unternehmensplanspiel für Schulklassen oder andere Gruppen</p>
+                <p>Markt-Match 5 - kostenfreies Unternehmensplanspiel für Schulklassen oder andere Gruppen</p>
             </a>
 
             <!-- Karte 4 -->
@@ -449,6 +574,35 @@
 
         </div>
     </main>
+
+    <!-- Features Slider Section -->
+    <section class="features-section">
+        <h2>Unsere Lernbereiche</h2>
+        <div class="slider-container">
+            <button class="slider-btn" id="prevBtn" aria-label="Vorheriger Beitrag">❮</button>
+            <div class="slider-wrapper">
+                <div class="slider" id="slider">
+                    <div class="slider-item">
+                        <div class="slider-item-icon">📚</div>
+                        <div class="slider-item-title">Mathe-Trainer</div>
+                        <div class="slider-item-text">Interaktive Rechenaufgaben mit detaillierten Lösungen. Perfekt zur Vorbereitung auf Prüfungen und zur Verbesserung deiner mathematischen Fähigkeiten.</div>
+                    </div>
+                    <div class="slider-item">
+                        <div class="slider-item-icon">📊</div>
+                        <div class="slider-item-title">Markt-Match 5 Wirtschaftsplanspiel</div>
+                        <div class="slider-item-text">Erlebe realistische Marktsituationen und triff strategische Entscheidungen als Unternehmensführung. Ein kostenfreies Planspiel für Schulklassen und Gruppen mit echtem Lerneffekt.</div>
+                    </div>
+                    <div class="slider-item">
+                        <div class="slider-item-icon">🏢</div>
+                        <div class="slider-item-title">Übungsunternehmen</div>
+                        <div class="slider-item-text">Arbeite in verschiedenen Abteilungen eines virtuellen Unternehmens und sammle praktische Erfahrungen. Praxisnahes Lernen für deine berufliche Zukunft.</div>
+                    </div>
+                </div>
+            </div>
+            <button class="slider-btn" id="nextBtn" aria-label="Nächster Beitrag">❯</button>
+        </div>
+        <div class="slider-dots" id="dots"></div>
+    </section>
 
     <div class="impressum-panel" id="impressumPanel" role="dialog" aria-modal="true" aria-labelledby="impressumTitle" aria-hidden="true">
         <h2 id="impressumTitle">Impressum</h2>
@@ -556,6 +710,55 @@
                     }
                 });
             }
+        })();
+
+        // Slider functionality
+        (function() {
+            const slider = document.getElementById('slider');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const dotsContainer = document.getElementById('dots');
+            const items = document.querySelectorAll('.slider-item');
+            let currentIndex = 0;
+
+            // Create dots
+            items.forEach((_, index) => {
+                const dot = document.createElement('button');
+                dot.classList.add('slider-dot');
+                if (index === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(index));
+                dotsContainer.appendChild(dot);
+            });
+
+            const dots = document.querySelectorAll('.slider-dot');
+
+            function updateSlider() {
+                const offset = -currentIndex * 100;
+                slider.style.transform = `translateX(${offset}%)`;
+                dots.forEach(dot => dot.classList.remove('active'));
+                dots[currentIndex].classList.add('active');
+            }
+
+            function goToSlide(index) {
+                currentIndex = (index + items.length) % items.length;
+                updateSlider();
+            }
+
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % items.length;
+                updateSlider();
+            }
+
+            function prevSlide() {
+                currentIndex = (currentIndex - 1 + items.length) % items.length;
+                updateSlider();
+            }
+
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            // Auto-advance slides every 8 seconds
+            setInterval(nextSlide, 8000);
         })();
     </script>
 </body>
