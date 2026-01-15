@@ -276,32 +276,57 @@
 
         .slider-item {
             min-width: 100%;
-            background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
-            padding: 2rem;
-            border-radius: 12px;
-            border: 2px solid #e0e7ff;
+            background-color: var(--card-bg);
+            padding: 3rem 2.5rem;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            gap: 1rem;
+            gap: 1.5rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .slider-item-icon {
-            font-size: 3rem;
-            line-height: 1;
+            background-color: #eff6ff;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Farbbalken oben für Konsistenz mit nav-card */
+        .slider-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+            z-index: 4;
         }
 
         .slider-item-title {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.35rem;
+            font-weight: 600;
             color: var(--text-main);
+            margin-bottom: 0.25rem;
         }
 
         .slider-item-text {
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--text-light);
             line-height: 1.6;
+            max-width: 650px;
         }
 
         .slider-controls {
@@ -632,7 +657,6 @@
 
     <!-- Features Slider Section -->
     <section class="features-section">
-        <h2>Unsere Lernbereiche</h2>
         <div class="slider-container">
             <button class="slider-btn" id="prevBtn" aria-label="Vorheriger Beitrag">❮</button>
             <div class="slider-wrapper">
@@ -640,17 +664,17 @@
                     <div class="slider-item">
                         <div class="slider-item-icon">📚</div>
                         <div class="slider-item-title">Mathe-Trainer</div>
-                        <div class="slider-item-text">Interaktive Rechenaufgaben mit detaillierten Lösungen. Perfekt zur Vorbereitung auf Prüfungen und zur Verbesserung deiner mathematischen Fähigkeiten.</div>
+                        <div class="slider-item-text">Interaktive Übungsumgebung für alle wichtigen Themen der Wirtschaftsschule. Von den Grundlagen (Rechnen lernen, Brüche, Potenzen) über Lineare und Quadratische Funktionen bis hin zur Finanzmathematik (Zins- und Rentenrechnung) und Trigonometrie. Mit detaillierten Schritt-für-Schritt-Lösungen, Zufallsgeneratoren für Aufgaben und gezielter Prüfungsvorbereitung.</div>
                     </div>
                     <div class="slider-item">
                         <div class="slider-item-icon">📊</div>
                         <div class="slider-item-title">Markt-Match 5 Wirtschaftsplanspiel</div>
-                        <div class="slider-item-text">Erlebe realistische Marktsituationen und triff strategische Entscheidungen als Unternehmensführung. Ein kostenfreies Planspiel für Schulklassen und Gruppen mit echtem Lerneffekt.</div>
+                        <div class="slider-item-text">Ein realistisches Unternehmensplanspiel speziell für den Einstieg. Schlüpfe in die Rolle der Geschäftsführung und triff strategische Entscheidungen über Preisgestaltung, Produktionsmengen, Marketingbudget und Forschungsinvestitionen. Tritt gegen andere Gruppen an und lerne spielerisch wirtschaftliche Zusammenhänge wie Fixkosten, Deckungsbeiträge und Marktdynamik kennen.</div>
                     </div>
                     <div class="slider-item">
                         <div class="slider-item-icon">🏢</div>
                         <div class="slider-item-title">Übungsunternehmen</div>
-                        <div class="slider-item-text">Arbeite in verschiedenen Abteilungen eines virtuellen Unternehmens und sammle praktische Erfahrungen. Praxisnahes Lernen für deine berufliche Zukunft.</div>
+                        <div class="slider-item-text">Bereichsübergreifendes, praxisnahes Lernen in einem virtuellen Unternehmen. Trainiere wichtige kaufmännische Kompetenzen: vom professionellen Angebotsvergleich und Kalkulationen über das Erstellen rechtssicherer Geschäftsbriefe bis hin zur korrekten Adressierung und dem Buchen von Geschäftsvorfällen. Die ideale Vorbereitung auf die Arbeit in modernen Büroumgebungen.</div>
                     </div>
                 </div>
             </div>
