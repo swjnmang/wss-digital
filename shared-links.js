@@ -9,8 +9,8 @@
       newTab: false,
     },
     'wirtschaftsplanspiel': {
-      url: 'planspiel/index.html',
-      newTab: false,
+      url: 'https://marktmatch5.vercel.app/',
+      newTab: true,
     },
     'uebungsunternehmen': {
       url: 'https://wss-digital-uebungsunternehmen.vercel.app/',
