@@ -3,8 +3,9 @@ import numpy as np
 from matplotlib.patches import FancyArrowPatch
 import os
 
-# Erstelle das public/images Verzeichnis falls nicht vorhanden
-os.makedirs('public/images', exist_ok=True)
+# Erstelle das public/images Verzeichnis im mathe-trainer Verzeichnis
+images_dir = os.path.join(os.path.dirname(__file__), 'public', 'images')
+os.makedirs(images_dir, exist_ok=True)
 
 def create_aufgabe1():
     """Aufgabe 1: Strahlensätze mit parallelen Linien"""
@@ -56,12 +57,10 @@ def create_aufgabe1():
     ax.plot(*strahl1_end, 'ko', markersize=7)
     ax.plot(*strahl2_end, 'ko', markersize=7)
     
-    ax.set_xlim(-2, 13)
-    ax.set_ylim(-3, 19)
     ax.set_aspect('equal')
     ax.axis('off')
     plt.tight_layout()
-    plt.savefig('public/images/strahlensaetze_aufgabe1.png', dpi=150, bbox_inches='tight', facecolor='white')
+    plt.savefig(os.path.join(images_dir, 'strahlensaetze_aufgabe1.png'), dpi=150, bbox_inches='tight', facecolor='white')
     plt.close()
     print("✓ Aufgabe 1 erstellt")
 
@@ -113,7 +112,7 @@ def create_aufgabe2():
     ax.set_aspect('equal')
     ax.axis('off')
     plt.tight_layout()
-    plt.savefig('public/images/strahlensaetze_aufgabe2.png', dpi=150, bbox_inches='tight', facecolor='white')
+    plt.savefig(os.path.join(images_dir, 'strahlensaetze_aufgabe2.png'), dpi=150, bbox_inches='tight', facecolor='white')
     plt.close()
     print("✓ Aufgabe 2 erstellt")
 
@@ -166,7 +165,7 @@ def create_aufgabe3():
     ax.set_aspect('equal')
     ax.axis('off')
     plt.tight_layout()
-    plt.savefig('public/images/strahlensaetze_aufgabe3.png', dpi=150, bbox_inches='tight', facecolor='white')
+    plt.savefig(os.path.join(images_dir, 'strahlensaetze_aufgabe3.png'), dpi=150, bbox_inches='tight', facecolor='white')
     plt.close()
     print("✓ Aufgabe 3 erstellt")
 
@@ -224,7 +223,7 @@ def create_aufgabe4():
     ax.set_aspect('equal')
     ax.axis('off')
     plt.tight_layout()
-    plt.savefig('public/images/strahlensaetze_aufgabe4.png', dpi=150, bbox_inches='tight', facecolor='white')
+    plt.savefig(os.path.join(images_dir, 'strahlensaetze_aufgabe4.png'), dpi=150, bbox_inches='tight', facecolor='white')
     plt.close()
     print("✓ Aufgabe 4 erstellt")
 
