@@ -90,15 +90,6 @@ const exercises: Exercise[] = [
     title: "Aufgabe 4: Zwei Variablen mit Strahlensatz",
     description: "Berechne beide unbekannten Längen x und y.",
     image: "/images/strahlensaetze_aufgabe4.png",
-      
-        <!-- Punkte auf zweite Strahle -->
-      <circle cx="240" cy="310" r="6" fill="#4f46e5"/>
-      <circle cx="490" cy="120" r="6" fill="#4f46e5"/>
-      <circle cx="750" cy="180" r="6" fill="#000"/>
-      
-      <!-- Label Z -->
-      <text x="50" y="525" font-size="18" font-weight="bold">Z</text>
-    </svg>`,
     questions: [
       { variable: "x", label: "Berechne x (in cm):", answer: 24 },
       { variable: "y", label: "Berechne y (in cm):", answer: 48 }
