@@ -106,6 +106,8 @@ import Parallelogramm from './pages/raum_und_form/Parallelogramm';
 import Raute from './pages/raum_und_form/Raute';
 import Kreis from './pages/raum_und_form/Kreis';
 import GemischteFlaechenaufgaben from './pages/raum_und_form/GemischteFlaechenaufgaben';
+import AnwendungsUebungsaufgaben from './pages/raum_und_form/AnwendungsUebungsaufgaben';
+import Pausenhof from './pages/raum_und_form/Pausenhof';
 // Pythagoras
 import KathetenHypotenuse from './pages/raum_und_form/pythagoras/KathetenHypotenuse';
 import SeitenBerechnen from './pages/raum_und_form/pythagoras/SeitenBerechnen';
@@ -252,6 +254,8 @@ export default function App() {
           <Route path="/raum-und-form/flaechengeometrie/raute" element={<Raute />} />
           <Route path="/raum-und-form/flaechengeometrie/kreis" element={<Kreis />} />
           <Route path="/raum-und-form/flaechengeometrie/gemischte-aufgaben" element={<GemischteFlaechenaufgaben />} />
+          <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben" element={<AnwendungsUebungsaufgaben />} />
+          <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/pausenhof" element={<Pausenhof />} />
 
           <Route path="/impressum" element={<Impressum />} />
 
