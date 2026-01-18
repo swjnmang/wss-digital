@@ -20,36 +20,43 @@ const exercises: Exercise[] = [
     id: 1,
     title: "Aufgabe 1: Strahlensätze mit parallelen Linien",
     description: "Zwei sich schneidende Geraden werden von zwei parallelen Linien geschnitten. Berechne x.",
-    svg: `<svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+    svg: `<svg viewBox="0 0 800 550" xmlns="http://www.w3.org/2000/svg">
       <!-- Strahlen von Punkt Z -->
-      <line x1="80" y1="300" x2="420" y2="50" stroke="#333" stroke-width="2"/>
-      <line x1="80" y1="300" x2="460" y2="80" stroke="#333" stroke-width="2"/>
+      <line x1="100" y1="450" x2="600" y2="100" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+      <line x1="100" y1="450" x2="650" y2="150" stroke="#000" stroke-width="3" stroke-linecap="round"/>
       
-      <!-- Parallele Linien (blau) -->
-      <line x1="120" y1="280" x2="160" y2="180" stroke="#4f46e5" stroke-width="4"/>
-      <line x1="280" y1="160" x2="320" y2="80" stroke="#4f46e5" stroke-width="4"/>
+      <!-- Erste parallele Linie (blau, dicker) -->
+      <line x1="150" y1="420" x2="220" y2="280" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
       
-      <!-- Hilfslinien für Beschriftungen -->
-      <line x1="120" y1="280" x2="120" y2="315" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
-      <line x1="280" y1="160" x2="280" y2="315" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+      <!-- Zweite parallele Linie (blau, dicker) -->
+      <line x1="380" y1="240" x2="450" y2="140" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
       
-      <!-- Beschriftungen Abschnitte auf untere Strahlenlinie -->
-      <text x="195" y="330" font-size="14" font-weight="bold" text-anchor="middle">50 cm</text>
-      <text x="360" y="330" font-size="14" font-weight="bold" text-anchor="middle" fill="#d32f2f">x</text>
+      <!-- Hilfslinien für Beschriftungen (gestrichelt, dünn) -->
+      <line x1="150" y1="420" x2="150" y2="480" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="380" y1="240" x2="380" y2="480" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="600" y1="100" x2="600" y2="480" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
       
-      <!-- Beschriftungen Abschnitte auf obere Strahlenlinie -->
-      <text x="200" y="120" font-size="14" font-weight="bold" text-anchor="middle">20 cm</text>
-      <text x="390" y="60" font-size="14" font-weight="bold" text-anchor="middle">60 cm</text>
+      <!-- Basislinie für Beschriftungen -->
+      <line x1="100" y1="480" x2="650" y2="480" stroke="#ccc" stroke-width="1"/>
       
-      <!-- Punkte -->
-      <circle cx="80" cy="300" r="5" fill="#333"/>
-      <circle cx="120" cy="280" r="4" fill="#4f46e5"/>
-      <circle cx="160" cy="180" r="4" fill="#4f46e5"/>
-      <circle cx="280" cy="160" r="4" fill="#4f46e5"/>
-      <circle cx="320" cy="80" r="4" fill="#4f46e5"/>
+      <!-- Beschriftungen auf unterer Strahle -->
+      <text x="265" y="520" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">50 cm</text>
+      <text x="490" y="520" font-size="22" font-weight="bold" text-anchor="middle" fill="#d32f2f">x</text>
       
-      <!-- Label Z -->
-      <text x="65" y="320" font-size="12" font-weight="bold">Z</text>
+      <!-- Beschriftungen auf oberer Strahle -->
+      <text x="270" y="180" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">20 cm</text>
+      <text x="550" y="120" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">60 cm</text>
+      
+      <!-- Punkte (große, deutliche Punkte) -->
+      <circle cx="100" cy="450" r="8" fill="#000"/>
+      <circle cx="150" cy="420" r="6" fill="#4f46e5"/>
+      <circle cx="220" cy="280" r="6" fill="#4f46e5"/>
+      <circle cx="380" cy="240" r="6" fill="#4f46e5"/>
+      <circle cx="450" cy="140" r="6" fill="#4f46e5"/>
+      <circle cx="600" cy="100" r="6" fill="#333"/>
+      
+      <!-- Label Z (größer) -->
+      <text x="75" y="475" font-size="18" font-weight="bold" fill="#000">Z</text>
     </svg>`,
     questions: [
       { variable: "x", label: "Berechne x (in cm):", answer: 75 }
@@ -74,35 +81,41 @@ const exercises: Exercise[] = [
     id: 2,
     title: "Aufgabe 2: Ähnliche Dreiecke",
     description: "Zwei ähnliche Dreiecke. Berechne die unbekannte Seitenlänge x.",
-    svg: `<svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+    svg: `<svg viewBox="0 0 800 550" xmlns="http://www.w3.org/2000/svg">
       <!-- Großes Dreieck -->
-      <polygon points="50,300 200,80 350,300" fill="none" stroke="#333" stroke-width="2"/>
+      <polygon points="80,480 400,80 720,480" fill="none" stroke="#000" stroke-width="3"/>
       
-      <!-- Kleines Dreieck (ähnlich, gestrichelt) -->
-      <polygon points="130,260 200,160 270,260" fill="none" stroke="#4f46e5" stroke-width="2" stroke-dasharray="5,5"/>
+      <!-- Kleines ähnliches Dreieck (gestrichelt) -->
+      <polygon points="220,400 400,200 580,400" fill="none" stroke="#4f46e5" stroke-width="3" stroke-dasharray="6,6"/>
       
-      <!-- Höhenlinien für Breiten -->
-      <line x1="50" y1="300" x2="50" y2="320" stroke="#333" stroke-width="1"/>
-      <line x1="350" y1="300" x2="350" y2="320" stroke="#333" stroke-width="1"/>
-      <line x1="50" y1="310" x2="350" y2="310" stroke="#333" stroke-width="1"/>
+      <!-- Höhen des großen Dreiecks (gestrichelt) -->
+      <line x1="400" y1="80" x2="400" y2="480" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
       
-      <line x1="130" y1="260" x2="130" y2="280" stroke="#4f46e5" stroke-width="1"/>
-      <line x1="270" y1="260" x2="270" y2="280" stroke="#4f46e5" stroke-width="1"/>
-      <line x1="130" y1="270" x2="270" y2="270" stroke="#4f46e5" stroke-width="1"/>
+      <!-- Höhen des kleinen Dreiecks (gestrichelt) -->
+      <line x1="400" y1="200" x2="400" y2="400" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
       
-      <!-- Höhenlinien für Höhen -->
-      <line x1="200" y1="80" x2="200" y2="300" stroke="#999" stroke-width="1" stroke-dasharray="3,3"/>
-      <line x1="200" y1="160" x2="200" y2="260" stroke="#999" stroke-width="1" stroke-dasharray="3,3"/>
+      <!-- Basisbeschriftungen großes Dreieck -->
+      <line x1="80" y1="490" x2="720" y2="490" stroke="#ccc" stroke-width="1"/>
+      <text x="250" y="530" font-size="20" font-weight="bold" text-anchor="middle" fill="#000">30 mm</text>
+      <text x="550" y="530" font-size="20" font-weight="bold" text-anchor="middle" fill="#000">30 mm</text>
       
-      <!-- Beschriftungen großes Dreieck -->
-      <text x="200" y="335" font-size="14" font-weight="bold" text-anchor="middle">30 mm</text>
-      <text x="200" y="50" font-size="14" font-weight="bold" text-anchor="middle">20 mm</text>
-      <text x="30" y="195" font-size="13" font-weight="bold">25 mm</text>
-      <text x="360" y="195" font-size="13" font-weight="bold">25 mm</text>
+      <!-- Basisbeschriftungen kleines Dreieck -->
+      <text x="310" y="435" font-size="18" font-weight="bold" text-anchor="middle" fill="#4f46e5">14 mm</text>
+      <text x="490" y="435" font-size="18" font-weight="bold" text-anchor="middle" fill="#4f46e5">14 mm</text>
       
-      <!-- Beschriftungen kleines Dreieck -->
-      <text x="200" y="290" font-size="13" font-weight="bold" text-anchor="middle" fill="#4f46e5">14 mm</text>
-      <text x="200" y="145" font-size="13" font-weight="bold" text-anchor="middle" fill="#d32f2f">x</text>
+      <!-- Höhenbeschriftung großes Dreieck -->
+      <text x="430" y="280" font-size="20" font-weight="bold" fill="#000">20 mm</text>
+      
+      <!-- Höhenbeschriftung kleines Dreieck (unbekannt) -->
+      <text x="430" y="300" font-size="20" font-weight="bold" fill="#d32f2f">x</text>
+      
+      <!-- Punkte -->
+      <circle cx="80" cy="480" r="7" fill="#000"/>
+      <circle cx="400" cy="80" r="7" fill="#000"/>
+      <circle cx="720" cy="480" r="7" fill="#000"/>
+      <circle cx="220" cy="400" r="6" fill="#4f46e5"/>
+      <circle cx="400" cy="200" r="6" fill="#4f46e5"/>
+      <circle cx="580" cy="400" r="6" fill="#4f46e5"/>
     </svg>`,
     questions: [
       { variable: "x", label: "Berechne x (in mm):", answer: 9.33 }
@@ -126,34 +139,43 @@ const exercises: Exercise[] = [
     id: 3,
     title: "Aufgabe 3: Strahlensätze mit Schnittpunkt",
     description: "Zwei Strahlen von einem Punkt werden von parallelen Linien geschnitten. Berechne x.",
-    svg: `<svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+    svg: `<svg viewBox="0 0 800 550" xmlns="http://www.w3.org/2000/svg">
       <!-- Strahlen von Punkt Z -->
-      <line x1="70" y1="280" x2="420" y2="60" stroke="#333" stroke-width="2"/>
-      <line x1="70" y1="280" x2="480" y2="100" stroke="#333" stroke-width="2"/>
+      <line x1="100" y1="480" x2="620" y2="80" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+      <line x1="100" y1="480" x2="680" y2="120" stroke="#000" stroke-width="3" stroke-linecap="round"/>
       
-      <!-- Parallele Linien (blau) -->
-      <line x1="100" y1="270" x2="150" y2="170" stroke="#4f46e5" stroke-width="4"/>
-      <line x1="250" y1="190" x2="300" y2="110" stroke="#4f46e5" stroke-width="4"/>
+      <!-- Erste parallele Linie (blau) -->
+      <line x1="140" y1="450" x2="190" y2="310" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
       
-      <!-- Beschriftungen -->
-      <text x="80" y="310" font-size="14" font-weight="bold">50 cm</text>
-      <text x="165" y="240" font-size="14" font-weight="bold">70 cm</text>
-      <text x="280" y="150" font-size="14" font-weight="bold" fill="#d32f2f">x</text>
-      <text x="410" y="70" font-size="14" font-weight="bold">60 cm</text>
+      <!-- Zweite parallele Linie (blau) -->
+      <line x1="380" y1="260" x2="430" y2="140" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
       
-      <!-- Hilfslinien -->
-      <line x1="100" y1="270" x2="100" y2="320" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
-      <line x1="250" y1="190" x2="250" y2="320" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+      <!-- Hilfslinien für Beschriftungen (gestrichelt) -->
+      <line x1="140" y1="450" x2="140" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="380" y1="260" x2="380" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="620" y1="80" x2="620" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      
+      <!-- Basislinie -->
+      <line x1="100" y1="510" x2="680" y2="510" stroke="#ccc" stroke-width="1"/>
+      
+      <!-- Beschriftungen auf unterer Strahle -->
+      <text x="260" y="550" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">50 cm</text>
+      <text x="500" y="550" font-size="22" font-weight="bold" text-anchor="middle" fill="#d32f2f">x</text>
+      
+      <!-- Beschriftungen auf oberer Strahle -->
+      <text x="280" y="200" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">70 cm</text>
+      <text x="560" y="120" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">60 cm</text>
       
       <!-- Punkte -->
-      <circle cx="70" cy="280" r="5" fill="#333"/>
-      <circle cx="100" cy="270" r="4" fill="#4f46e5"/>
-      <circle cx="150" cy="170" r="4" fill="#4f46e5"/>
-      <circle cx="250" cy="190" r="4" fill="#4f46e5"/>
-      <circle cx="300" cy="110" r="4" fill="#4f46e5"/>
+      <circle cx="100" cy="480" r="8" fill="#000"/>
+      <circle cx="140" cy="450" r="6" fill="#4f46e5"/>
+      <circle cx="190" cy="310" r="6" fill="#4f46e5"/>
+      <circle cx="380" cy="260" r="6" fill="#4f46e5"/>
+      <circle cx="430" cy="140" r="6" fill="#4f46e5"/>
+      <circle cx="620" cy="80" r="6" fill="#333"/>
       
-      <!-- Label -->
-      <text x="50" y="300" font-size="12" font-weight="bold">Z</text>
+      <!-- Label Z -->
+      <text x="75" y="505" font-size="18" font-weight="bold" fill="#000">Z</text>
     </svg>`,
     questions: [
       { variable: "x", label: "Berechne x (in cm):", answer: 42 }
@@ -176,33 +198,46 @@ const exercises: Exercise[] = [
     id: 4,
     title: "Aufgabe 4: Zwei Variablen mit Strahlensatz",
     description: "Berechne beide unbekannten Längen x und y.",
-    svg: `<svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+    svg: `<svg viewBox="0 0 800 550" xmlns="http://www.w3.org/2000/svg">
       <!-- Strahlen von Punkt Z -->
-      <line x1="60" y1="300" x2="420" y2="50" stroke="#333" stroke-width="2"/>
-      <line x1="60" y1="300" x2="440" y2="80" stroke="#333" stroke-width="2"/>
+      <line x1="100" y1="480" x2="600" y2="80" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+      <line x1="100" y1="480" x2="650" y2="120" stroke="#000" stroke-width="3" stroke-linecap="round"/>
       
-      <!-- Parallele Linien (blau) -->
-      <line x1="90" y1="285" x2="140" y2="170" stroke="#4f46e5" stroke-width="4"/>
-      <line x1="270" y1="175" x2="320" y2="95" stroke="#4f46e5" stroke-width="4"/>
+      <!-- Erste parallele Linie (blau) -->
+      <line x1="150" y1="450" x2="210" y2="310" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
       
-      <!-- Beschriftungen erste Strahlenlinie -->
-      <text x="150" y="330" font-size="14" font-weight="bold">40 cm</text>
-      <text x="320" y="250" font-size="14" font-weight="bold" fill="#d32f2f">y</text>
-      <text x="450" y="120" font-size="14" font-weight="bold">50 cm</text>
+      <!-- Zweite parallele Linie (blau) -->
+      <line x1="380" y1="260" x2="440" y2="140" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
       
-      <!-- Beschriftungen zweite Strahlenlinie -->
-      <text x="180" y="150" font-size="14" font-weight="bold" fill="#d32f2f">x</text>
-      <text x="380" y="80" font-size="14" font-weight="bold">30 cm</text>
+      <!-- Hilfslinien für Beschriftungen (gestrichelt) -->
+      <line x1="150" y1="450" x2="150" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="380" y1="260" x2="380" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="600" y1="80" x2="600" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      
+      <!-- Basislinie -->
+      <line x1="100" y1="510" x2="650" y2="510" stroke="#ccc" stroke-width="1"/>
+      
+      <!-- Beschriftungen auf unterer Strahle -->
+      <text x="265" y="550" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">40 cm</text>
+      <text x="490" y="550" font-size="22" font-weight="bold" text-anchor="middle" fill="#d32f2f">y</text>
+      
+      <!-- Beschriftungen auf oberer Strahle -->
+      <text x="280" y="200" font-size="22" font-weight="bold" text-anchor="middle" fill="#d32f2f">x</text>
+      <text x="560" y="120" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">50 cm</text>
+      
+      <!-- Zusatzbeschriftung -->
+      <text x="520" y="380" font-size="20" font-weight="bold" text-anchor="middle" fill="#000">30 cm</text>
       
       <!-- Punkte -->
-      <circle cx="60" cy="300" r="5" fill="#333"/>
-      <circle cx="90" cy="285" r="4" fill="#4f46e5"/>
-      <circle cx="140" cy="170" r="4" fill="#4f46e5"/>
-      <circle cx="270" cy="175" r="4" fill="#4f46e5"/>
-      <circle cx="320" cy="95" r="4" fill="#4f46e5"/>
+      <circle cx="100" cy="480" r="8" fill="#000"/>
+      <circle cx="150" cy="450" r="6" fill="#4f46e5"/>
+      <circle cx="210" cy="310" r="6" fill="#4f46e5"/>
+      <circle cx="380" cy="260" r="6" fill="#4f46e5"/>
+      <circle cx="440" cy="140" r="6" fill="#4f46e5"/>
+      <circle cx="600" cy="80" r="6" fill="#333"/>
       
-      <!-- Label -->
-      <text x="40" y="320" font-size="12" font-weight="bold">Z</text>
+      <!-- Label Z -->
+      <text x="75" y="505" font-size="18" font-weight="bold" fill="#000">Z</text>
     </svg>`,
     questions: [
       { variable: "x", label: "Berechne x (in cm):", answer: 24 },
@@ -211,7 +246,7 @@ const exercises: Exercise[] = [
     solution: [
       "Mit Strahlensätzen bei parallelen Linien:",
       "",
-      "Für x: Verhältnis der Abschnitte auf erster Strahle",
+      "Für x: Verhältnis der Abschnitte",
       "40 / (40 + 50) = x / (x + 30)",
       "40 / 90 = x / (x + 30)",
       "",
@@ -222,12 +257,11 @@ const exercises: Exercise[] = [
       "x = 24 cm",
       "",
       "Für y:",
-      "40 / 90 = y / (y + 30 + 50)",
-      "40 / 90 = y / (y + 80)",
-      "40 × (y + 80) = 90 × y",
-      "40y + 3200 = 90y",
-      "3200 = 50y",
-      "y ≈ 64 cm (oder y = 48 cm mit anderen Maßen)"
+      "40 / 90 = y / (y + 50)",
+      "40 × (y + 50) = 90 × y",
+      "40y + 2000 = 90y",
+      "2000 = 50y",
+      "y = 40 cm"
     ]
   }
 ];
