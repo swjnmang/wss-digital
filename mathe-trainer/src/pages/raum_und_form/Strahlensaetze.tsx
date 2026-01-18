@@ -6,7 +6,7 @@ type Exercise = {
   id: number;
   title: string;
   description: string;
-  svg: string;
+  image: string;
   questions: {
     variable: string;
     label: string;
@@ -20,39 +20,7 @@ const exercises: Exercise[] = [
     id: 1,
     title: "Aufgabe 1: Strahlensätze mit parallelen Linien",
     description: "Zwei sich schneidende Geraden werden von zwei parallelen Linien geschnitten. Berechne x.",
-    svg: `<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
-      <!-- Strahlen von Punkt Z (V-Form) -->
-      <line x1="80" y1="500" x2="700" y2="80" stroke="#000" stroke-width="3"/>
-      <line x1="80" y1="500" x2="750" y2="200" stroke="#000" stroke-width="3"/>
-      
-      <!-- Erste parallele Linie -->
-      <line x1="200" y1="370" x2="250" y2="270" stroke="#4f46e5" stroke-width="5"/>
-      
-      <!-- Zweite parallele Linie -->
-      <line x1="450" y1="180" x2="500" y2="80" stroke="#4f46e5" stroke-width="5"/>
-      
-      <!-- Beschriftungen erste Strahle (oben) -->
-      <text x="330" y="140" font-size="20" font-weight="bold" fill="#000">20 cm</text>
-      <text x="590" y="110" font-size="20" font-weight="bold" fill="#000">60 cm</text>
-      
-      <!-- Beschriftungen zweite Strahle (unten) -->
-      <text x="325" y="390" font-size="20" font-weight="bold" fill="#000">50 cm</text>
-      <text x="600" y="380" font-size="20" font-weight="bold" fill="#d32f2f">x</text>
-      
-      <!-- Punkte auf erster Strahle -->
-      <circle cx="80" cy="500" r="7" fill="#000"/>
-      <circle cx="200" cy="370" r="6" fill="#4f46e5"/>
-      <circle cx="450" cy="180" r="6" fill="#4f46e5"/>
-      <circle cx="700" cy="80" r="6" fill="#000"/>
-      
-      <!-- Punkte auf zweiter Strahle -->
-      <circle cx="250" cy="270" r="6" fill="#4f46e5"/>
-      <circle cx="500" cy="80" r="6" fill="#4f46e5"/>
-      <circle cx="750" cy="200" r="6" fill="#000"/>
-      
-      <!-- Label Z -->
-      <text x="50" y="525" font-size="18" font-weight="bold">Z</text>
-    </svg>`,
+    image: "/images/strahlensaetze_aufgabe1.png",
     questions: [
       { variable: "x", label: "Berechne x (in cm):", answer: 75 }
     ],
@@ -76,35 +44,7 @@ const exercises: Exercise[] = [
     id: 2,
     title: "Aufgabe 2: Ähnliche Dreiecke",
     description: "Zwei ähnliche Dreiecke. Berechne die unbekannte Seitenlänge x.",
-    svg: `<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
-      <!-- Großes Dreieck -->
-      <polygon points="100,500 650,80 700,500" fill="none" stroke="#000" stroke-width="3"/>
-      
-      <!-- Kleines ähnliches Dreieck (gestrichelt, blau) -->
-      <polygon points="250,400 500,150 550,400" fill="none" stroke="#4f46e5" stroke-width="3" stroke-dasharray="8,8"/>
-      
-      <!-- Höhe großes Dreieck (gestrichelt) -->
-      <line x1="650" y1="80" x2="650" y2="500" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
-      
-      <!-- Höhe kleines Dreieck (gestrichelt) -->
-      <line x1="500" y1="150" x2="500" y2="400" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
-      
-      <!-- Basisbeschriftungen großes Dreieck -->
-      <text x="375" y="550" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">30 mm</text>
-      <text x="650" y="540" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">20 mm</text>
-      
-      <!-- Basisbeschriftungen kleines Dreieck -->
-      <text x="375" y="425" font-size="20" font-weight="bold" text-anchor="middle" fill="#4f46e5">14 mm</text>
-      <text x="500" y="420" font-size="20" font-weight="bold" text-anchor="middle" fill="#d32f2f">x</text>
-      
-      <!-- Punkte -->
-      <circle cx="100" cy="500" r="7" fill="#000"/>
-      <circle cx="700" cy="500" r="7" fill="#000"/>
-      <circle cx="650" cy="80" r="7" fill="#000"/>
-      <circle cx="250" cy="400" r="6" fill="#4f46e5"/>
-      <circle cx="550" cy="400" r="6" fill="#4f46e5"/>
-      <circle cx="500" cy="150" r="6" fill="#4f46e5"/>
-    </svg>`,
+    image: "/images/strahlensaetze_aufgabe2.png",
     questions: [
       { variable: "x", label: "Berechne x (in mm):", answer: 9.33 }
     ],
@@ -127,39 +67,7 @@ const exercises: Exercise[] = [
     id: 3,
     title: "Aufgabe 3: Strahlensätze mit Schnittpunkt",
     description: "Zwei Strahlen von einem Punkt werden von parallelen Linien geschnitten. Berechne x.",
-    svg: `<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
-      <!-- Strahlen von Punkt Z (V-Form) -->
-      <line x1="80" y1="500" x2="680" y2="80" stroke="#000" stroke-width="3"/>
-      <line x1="80" y1="500" x2="750" y2="150" stroke="#000" stroke-width="3"/>
-      
-      <!-- Erste parallele Linie -->
-      <line x1="180" y1="410" x2="230" y2="310" stroke="#4f46e5" stroke-width="5"/>
-      
-      <!-- Zweite parallele Linie -->
-      <line x1="430" y1="220" x2="480" y2="120" stroke="#4f46e5" stroke-width="5"/>
-      
-      <!-- Beschriftungen erste Strahle -->
-      <text x="305" y="160" font-size="20" font-weight="bold" fill="#000">70 cm</text>
-      <text x="580" y="120" font-size="20" font-weight="bold" fill="#000">60 cm</text>
-      
-      <!-- Beschriftungen zweite Strahle -->
-      <text x="305" y="420" font-size="20" font-weight="bold" fill="#000">50 cm</text>
-      <text x="600" y="380" font-size="20" font-weight="bold" fill="#d32f2f">x</text>
-      
-      <!-- Punkte auf erste Strahle -->
-      <circle cx="80" cy="500" r="7" fill="#000"/>
-      <circle cx="180" cy="410" r="6" fill="#4f46e5"/>
-      <circle cx="430" cy="220" r="6" fill="#4f46e5"/>
-      <circle cx="680" cy="80" r="6" fill="#000"/>
-      
-      <!-- Punkte auf zweite Strahle -->
-      <circle cx="230" cy="310" r="6" fill="#4f46e5"/>
-      <circle cx="480" cy="120" r="6" fill="#4f46e5"/>
-      <circle cx="750" cy="150" r="6" fill="#000"/>
-      
-      <!-- Label Z -->
-      <text x="50" y="525" font-size="18" font-weight="bold">Z</text>
-    </svg>`,
+    image: "/images/strahlensaetze_aufgabe3.png",
     questions: [
       { variable: "x", label: "Berechne x (in cm):", answer: 42 }
     ],
@@ -181,35 +89,9 @@ const exercises: Exercise[] = [
     id: 4,
     title: "Aufgabe 4: Zwei Variablen mit Strahlensatz",
     description: "Berechne beide unbekannten Längen x und y.",
-    svg: `<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
-      <!-- Strahlen von Punkt Z (V-Form) -->
-      <line x1="80" y1="500" x2="680" y2="80" stroke="#000" stroke-width="3"/>
-      <line x1="80" y1="500" x2="750" y2="180" stroke="#000" stroke-width="3"/>
+    image: "/images/strahlensaetze_aufgabe4.png",
       
-      <!-- Erste parallele Linie -->
-      <line x1="180" y1="410" x2="240" y2="310" stroke="#4f46e5" stroke-width="5"/>
-      
-      <!-- Zweite parallele Linie -->
-      <line x1="430" y1="220" x2="490" y2="120" stroke="#4f46e5" stroke-width="5"/>
-      
-      <!-- Beschriftungen erste Strahle (oben) -->
-      <text x="310" y="160" font-size="20" font-weight="bold" fill="#000">x</text>
-      <text x="580" y="120" font-size="20" font-weight="bold" fill="#000">50 cm</text>
-      
-      <!-- Beschriftungen zweite Strahle (unten) -->
-      <text x="310" y="420" font-size="20" font-weight="bold" fill="#000">40 cm</text>
-      <text x="600" y="380" font-size="20" font-weight="bold" fill="#d32f2f">y</text>
-      
-      <!-- Zusatzbeschriftung -->
-      <text x="560" y="240" font-size="18" font-weight="bold" fill="#000">30 cm</text>
-      
-      <!-- Punkte auf erste Strahle -->
-      <circle cx="80" cy="500" r="7" fill="#000"/>
-      <circle cx="180" cy="410" r="6" fill="#4f46e5"/>
-      <circle cx="430" cy="220" r="6" fill="#4f46e5"/>
-      <circle cx="680" cy="80" r="6" fill="#000"/>
-      
-      <!-- Punkte auf zweite Strahle -->
+        <!-- Punkte auf zweite Strahle -->
       <circle cx="240" cy="310" r="6" fill="#4f46e5"/>
       <circle cx="490" cy="120" r="6" fill="#4f46e5"/>
       <circle cx="750" cy="180" r="6" fill="#000"/>
@@ -329,8 +211,13 @@ export default function Strahlensaetze() {
         </div>
 
         {/* Skizze/Diagramm */}
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
-          <div dangerouslySetInnerHTML={{ __html: exercise.svg }} />
+        <div className="rounded-lg border border-slate-200 bg-white p-6 flex justify-center">
+          <img 
+            src={exercise.image} 
+            alt={exercise.title}
+            className="max-w-full h-auto"
+            style={{ maxHeight: "600px" }}
+          />
         </div>
 
         {/* Eingabefelder */}
