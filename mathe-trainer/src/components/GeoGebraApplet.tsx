@@ -147,4 +147,5 @@ export default function GeoGebraApplet({
     <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>
       Keine GeoGebra-Material angegeben (materialId oder filename erforderlich)
     </div>
-
+  );
+}
