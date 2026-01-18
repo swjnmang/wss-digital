@@ -16,105 +16,26 @@ type Exercise = {
 };
 
 const exercises: Exercise[] = [
-  {
-    id: 1,
-    title: "Aufgabe 1: Strahlensätze mit parallelen Linien",
-    description: "Zwei sich schneidende Geraden werden von zwei parallelen Linien geschnitten. Berechne x.",
-    image: "/images/strahlensaetze_aufgabe1.png",
-    questions: [
-      { variable: "x", label: "Berechne x (in cm):", answer: 75 }
-    ],
-    solution: [
-      "Strahlensatz: Bei zwei parallelen Linien auf zwei Strahlen",
-      "verhalten sich die Abschnitte proportional.",
-      "",
-      "20 / 60 = 50 / x",
-      "",
-      "Kreuzweise multiplizieren:",
-      "20 × x = 60 × 50",
-      "20x = 3000",
-      "x = 150 cm",
-      "",
-      "Alternative: Mit Verhältnis",
-      "Verhältnis 1:3, daher:",
-      "50 × 3 = 150 cm"
-    ]
-  },
-  {
-    id: 2,
-    title: "Aufgabe 2: Ähnliche Dreiecke",
-    description: "Zwei ähnliche Dreiecke. Berechne die unbekannte Seitenlänge x.",
-    image: "/images/strahlensaetze_aufgabe2.png",
-    questions: [
-      { variable: "x", label: "Berechne x (in mm):", answer: 9.33 }
-    ],
-    solution: [
-      "Bei ähnlichen Dreiecken sind die Seitenverhältnisse gleich:",
-      "",
-      "Verhältnis der Basen:",
-      "30 : 14 ≈ 2,14",
-      "",
-      "Daher ist auch die Höhe im gleichen Verhältnis:",
-      "20 : x = 30 : 14",
-      "",
-      "Auflösen nach x:",
-      "x = (20 × 14) / 30",
-      "x = 280 / 30",
-      "x ≈ 9,33 mm"
-    ]
-  },
-  {
-    id: 3,
-    title: "Aufgabe 3: Strahlensätze mit Schnittpunkt",
-    description: "Zwei Strahlen von einem Punkt werden von parallelen Linien geschnitten. Berechne x.",
-    image: "/images/strahlensaetze_aufgabe3.png",
-    questions: [
-      { variable: "x", label: "Berechne x (in cm):", answer: 42 }
-    ],
-    solution: [
-      "Strahlensatz: Wenn zwei parallele Linien zwei Strahlen schneiden,",
-      "dann verhalten sich die Abschnitte wie die Strahlenabschnitte.",
-      "",
-      "50 / (50 + 70) = 60 / (60 + x)",
-      "50 / 120 = 60 / (60 + x)",
-      "",
-      "Kreuzweise multiplizieren:",
-      "50 × (60 + x) = 60 × 120",
-      "3000 + 50x = 7200",
-      "50x = 4200",
-      "x = 84 cm"
-    ]
-  },
-  {
-    id: 4,
-    title: "Aufgabe 4: Zwei Variablen mit Strahlensatz",
-    description: "Berechne beide unbekannten Längen x und y.",
-    image: "/images/strahlensaetze_aufgabe4.png",
-    questions: [
-      { variable: "x", label: "Berechne x (in cm):", answer: 24 },
-      { variable: "y", label: "Berechne y (in cm):", answer: 48 }
-    ],
-    solution: [
-      "Mit Strahlensätzen bei parallelen Linien:",
-      "",
-      "Für x: Verhältnis der Abschnitte",
-      "40 / (40 + 50) = x / (x + 30)",
-      "40 / 90 = x / (x + 30)",
-      "",
-      "Kreuzweise multiplizieren:",
-      "40 × (x + 30) = 90 × x",
-      "40x + 1200 = 90x",
-      "1200 = 50x",
-      "x = 24 cm",
-      "",
-      "Für y:",
-      "40 / 90 = y / (y + 50)",
-      "40 × (y + 50) = 90 × y",
-      "40y + 2000 = 90y",
-      "2000 = 50y",
-      "y = 40 cm"
-    ]
-  }
+  { id: 1, title: "Aufgabe 1", description: "Berechne x mithilfe der Strahlensätze", image: "/images/strahlensaetze_aufgabe1.png", questions: [{ variable: "x", label: "x (cm):", answer: 120 }], solution: ["Strahlensatz anwenden:", "12/50 = 30/x", "x = 125 cm"] },
+  { id: 2, title: "Aufgabe 2", description: "Finde die unbekannte Strecke", image: "/images/strahlensaetze_aufgabe2.png", questions: [{ variable: "x", label: "x (cm):", answer: 45 }], solution: ["Verhältnis der Strahlenabschnitte:", "18/36 = 30/x", "x = 60 cm"] },
+  { id: 3, title: "Aufgabe 3", description: "Bestimme x", image: "/images/strahlensaetze_aufgabe3.png", questions: [{ variable: "x", label: "x (cm):", answer: 40 }], solution: ["Strahlensatz für parallele Linien:", "20/30 = 24/x", "x = 36 cm"] },
+  { id: 4, title: "Aufgabe 4", description: "Berechne die fehlende Länge", image: "/images/strahlensaetze_aufgabe4.png", questions: [{ variable: "x", label: "x (cm):", answer: 42 }], solution: ["Proportionale Abschnitte:", "14/35 = 12/x", "x = 30 cm"] },
+  { id: 5, title: "Aufgabe 5", description: "Löse für x auf", image: "/images/strahlensaetze_aufgabe5.png", questions: [{ variable: "x", label: "x (cm):", answer: 42 }], solution: ["Strahlensatzformel:", "21/28 = 18/x", "x = 24 cm"] },
+  { id: 6, title: "Aufgabe 6", description: "Ermittle x", image: "/images/strahlensaetze_aufgabe6.png", questions: [{ variable: "x", label: "x (cm):", answer: 46.5 }], solution: ["Verhältnis berechnen:", "13/31 = 13/x", "x = 31 cm"] },
+  { id: 7, title: "Aufgabe 7", description: "Berechne x", image: "/images/strahlensaetze_aufgabe7.png", questions: [{ variable: "x", label: "x (cm):", answer: 20 }], solution: ["Symmetrisches Verhältnis:", "10/20 = 10/x", "x = 20 cm"] },
+  { id: 8, title: "Aufgabe 8", description: "Finde x", image: "/images/strahlensaetze_aufgabe8.png", questions: [{ variable: "x", label: "x (cm):", answer: 66 }], solution: ["Proportionalitätssatz:", "24/48 = 24/x", "x = 48 cm"] },
+  { id: 9, title: "Aufgabe 9", description: "Bestimme x", image: "/images/strahlensaetze_aufgabe9.png", questions: [{ variable: "x", label: "x (cm):", answer: 67.5 }], solution: ["Strahlensatz anwenden:", "15/37.5 = 15/x", "x = 37.5 cm"] },
+  { id: 10, title: "Aufgabe 10", description: "Berechne x", image: "/images/strahlensaetze_aufgabe10.png", questions: [{ variable: "x", label: "x (cm):", answer: 15 }], solution: ["Verhältnis berechnen:", "18/30 = 15/x", "x = 25 cm"] },
+  { id: 11, title: "Aufgabe 11", description: "Löse die Aufgabe", image: "/images/strahlensaetze_aufgabe11.png", questions: [{ variable: "x", label: "x (cm):", answer: 48 }], solution: ["Strahlensatzformel:", "16/32 = 16/x", "x = 32 cm"] },
+  { id: 12, title: "Aufgabe 12", description: "Ermittle x", image: "/images/strahlensaetze_aufgabe12.png", questions: [{ variable: "x", label: "x (cm):", answer: 21 }], solution: ["Proportionale Verhältnisse:", "21/37 = 21/x", "x = 37 cm"] },
+  { id: 13, title: "Aufgabe 13", description: "Berechne x", image: "/images/strahlensaetze_aufgabe13.png", questions: [{ variable: "x", label: "x (cm):", answer: 30 }], solution: ["Strahlensatz:", "24/36 = 20/x", "x = 30 cm"] },
+  { id: 14, title: "Aufgabe 14", description: "Bestimme x", image: "/images/strahlensaetze_aufgabe14.png", questions: [{ variable: "x", label: "x (cm):", answer: 36 }], solution: ["Gleichmäßiges Verhältnis:", "12/24 = 12/x", "x = 24 cm"] },
+  { id: 15, title: "Aufgabe 15", description: "Finde x", image: "/images/strahlensaetze_aufgabe15.png", questions: [{ variable: "x", label: "x (cm):", answer: 54 }], solution: ["Strahlensatzformel:", "18/36 = 18/x", "x = 36 cm"] },
+  { id: 16, title: "Aufgabe 16", description: "Berechne x", image: "/images/strahlensaetze_aufgabe16.png", questions: [{ variable: "x", label: "x (cm):", answer: 20 }], solution: ["Verhältnis berechnen:", "22/44 = 20/x", "x = 40 cm"] },
+  { id: 17, title: "Aufgabe 17", description: "Löse für x auf", image: "/images/strahlensaetze_aufgabe17.png", questions: [{ variable: "x", label: "x (cm):", answer: 52.5 }], solution: ["Strahlensatz:", "21/31.5 = 18/x", "x = 27 cm"] },
+  { id: 18, title: "Aufgabe 18", description: "Ermittle x", image: "/images/strahlensaetze_aufgabe18.png", questions: [{ variable: "x", label: "x (cm):", answer: 45 }], solution: ["Proportionalität:", "15/30 = 13/x", "x = 26 cm"] },
+  { id: 19, title: "Aufgabe 19", description: "Berechne x", image: "/images/strahlensaetze_aufgabe19.png", questions: [{ variable: "x", label: "x (cm):", answer: 42 }], solution: ["Strahlensatz anwenden:", "16/32 = 14/x", "x = 28 cm"] },
+  { id: 20, title: "Aufgabe 20", description: "Bestimme x", image: "/images/strahlensaetze_aufgabe20.png", questions: [{ variable: "x", label: "x (cm):", answer: 49 }], solution: ["Verhältnis berechnen:", "24/40 = 21/x", "x = 35 cm"] }
 ];
 
 export default function Strahlensaetze() {
