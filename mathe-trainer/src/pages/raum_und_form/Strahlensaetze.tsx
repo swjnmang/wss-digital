@@ -20,43 +20,38 @@ const exercises: Exercise[] = [
     id: 1,
     title: "Aufgabe 1: Strahlensätze mit parallelen Linien",
     description: "Zwei sich schneidende Geraden werden von zwei parallelen Linien geschnitten. Berechne x.",
-    svg: `<svg viewBox="0 0 800 550" xmlns="http://www.w3.org/2000/svg">
-      <!-- Strahlen von Punkt Z -->
-      <line x1="100" y1="450" x2="600" y2="100" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-      <line x1="100" y1="450" x2="650" y2="150" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    svg: `<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+      <!-- Strahlen von Punkt Z (V-Form) -->
+      <line x1="80" y1="500" x2="700" y2="80" stroke="#000" stroke-width="3"/>
+      <line x1="80" y1="500" x2="750" y2="200" stroke="#000" stroke-width="3"/>
       
-      <!-- Erste parallele Linie (blau, dicker) -->
-      <line x1="150" y1="420" x2="220" y2="280" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+      <!-- Erste parallele Linie -->
+      <line x1="200" y1="370" x2="250" y2="270" stroke="#4f46e5" stroke-width="5"/>
       
-      <!-- Zweite parallele Linie (blau, dicker) -->
-      <line x1="380" y1="240" x2="450" y2="140" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+      <!-- Zweite parallele Linie -->
+      <line x1="450" y1="180" x2="500" y2="80" stroke="#4f46e5" stroke-width="5"/>
       
-      <!-- Hilfslinien für Beschriftungen (gestrichelt, dünn) -->
-      <line x1="150" y1="420" x2="150" y2="480" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
-      <line x1="380" y1="240" x2="380" y2="480" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
-      <line x1="600" y1="100" x2="600" y2="480" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      <!-- Beschriftungen erste Strahle (oben) -->
+      <text x="330" y="140" font-size="20" font-weight="bold" fill="#000">20 cm</text>
+      <text x="590" y="110" font-size="20" font-weight="bold" fill="#000">60 cm</text>
       
-      <!-- Basislinie für Beschriftungen -->
-      <line x1="100" y1="480" x2="650" y2="480" stroke="#ccc" stroke-width="1"/>
+      <!-- Beschriftungen zweite Strahle (unten) -->
+      <text x="325" y="390" font-size="20" font-weight="bold" fill="#000">50 cm</text>
+      <text x="600" y="380" font-size="20" font-weight="bold" fill="#d32f2f">x</text>
       
-      <!-- Beschriftungen auf unterer Strahle -->
-      <text x="265" y="520" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">50 cm</text>
-      <text x="490" y="520" font-size="22" font-weight="bold" text-anchor="middle" fill="#d32f2f">x</text>
+      <!-- Punkte auf erster Strahle -->
+      <circle cx="80" cy="500" r="7" fill="#000"/>
+      <circle cx="200" cy="370" r="6" fill="#4f46e5"/>
+      <circle cx="450" cy="180" r="6" fill="#4f46e5"/>
+      <circle cx="700" cy="80" r="6" fill="#000"/>
       
-      <!-- Beschriftungen auf oberer Strahle -->
-      <text x="270" y="180" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">20 cm</text>
-      <text x="550" y="120" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">60 cm</text>
+      <!-- Punkte auf zweiter Strahle -->
+      <circle cx="250" cy="270" r="6" fill="#4f46e5"/>
+      <circle cx="500" cy="80" r="6" fill="#4f46e5"/>
+      <circle cx="750" cy="200" r="6" fill="#000"/>
       
-      <!-- Punkte (große, deutliche Punkte) -->
-      <circle cx="100" cy="450" r="8" fill="#000"/>
-      <circle cx="150" cy="420" r="6" fill="#4f46e5"/>
-      <circle cx="220" cy="280" r="6" fill="#4f46e5"/>
-      <circle cx="380" cy="240" r="6" fill="#4f46e5"/>
-      <circle cx="450" cy="140" r="6" fill="#4f46e5"/>
-      <circle cx="600" cy="100" r="6" fill="#333"/>
-      
-      <!-- Label Z (größer) -->
-      <text x="75" y="475" font-size="18" font-weight="bold" fill="#000">Z</text>
+      <!-- Label Z -->
+      <text x="50" y="525" font-size="18" font-weight="bold">Z</text>
     </svg>`,
     questions: [
       { variable: "x", label: "Berechne x (in cm):", answer: 75 }
@@ -81,41 +76,34 @@ const exercises: Exercise[] = [
     id: 2,
     title: "Aufgabe 2: Ähnliche Dreiecke",
     description: "Zwei ähnliche Dreiecke. Berechne die unbekannte Seitenlänge x.",
-    svg: `<svg viewBox="0 0 800 550" xmlns="http://www.w3.org/2000/svg">
+    svg: `<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
       <!-- Großes Dreieck -->
-      <polygon points="80,480 400,80 720,480" fill="none" stroke="#000" stroke-width="3"/>
+      <polygon points="100,500 650,80 700,500" fill="none" stroke="#000" stroke-width="3"/>
       
-      <!-- Kleines ähnliches Dreieck (gestrichelt) -->
-      <polygon points="220,400 400,200 580,400" fill="none" stroke="#4f46e5" stroke-width="3" stroke-dasharray="6,6"/>
+      <!-- Kleines ähnliches Dreieck (gestrichelt, blau) -->
+      <polygon points="250,400 500,150 550,400" fill="none" stroke="#4f46e5" stroke-width="3" stroke-dasharray="8,8"/>
       
-      <!-- Höhen des großen Dreiecks (gestrichelt) -->
-      <line x1="400" y1="80" x2="400" y2="480" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      <!-- Höhe großes Dreieck (gestrichelt) -->
+      <line x1="650" y1="80" x2="650" y2="500" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
       
-      <!-- Höhen des kleinen Dreiecks (gestrichelt) -->
-      <line x1="400" y1="200" x2="400" y2="400" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      <!-- Höhe kleines Dreieck (gestrichelt) -->
+      <line x1="500" y1="150" x2="500" y2="400" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
       
       <!-- Basisbeschriftungen großes Dreieck -->
-      <line x1="80" y1="490" x2="720" y2="490" stroke="#ccc" stroke-width="1"/>
-      <text x="250" y="530" font-size="20" font-weight="bold" text-anchor="middle" fill="#000">30 mm</text>
-      <text x="550" y="530" font-size="20" font-weight="bold" text-anchor="middle" fill="#000">30 mm</text>
+      <text x="375" y="550" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">30 mm</text>
+      <text x="650" y="540" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">20 mm</text>
       
       <!-- Basisbeschriftungen kleines Dreieck -->
-      <text x="310" y="435" font-size="18" font-weight="bold" text-anchor="middle" fill="#4f46e5">14 mm</text>
-      <text x="490" y="435" font-size="18" font-weight="bold" text-anchor="middle" fill="#4f46e5">14 mm</text>
-      
-      <!-- Höhenbeschriftung großes Dreieck -->
-      <text x="430" y="280" font-size="20" font-weight="bold" fill="#000">20 mm</text>
-      
-      <!-- Höhenbeschriftung kleines Dreieck (unbekannt) -->
-      <text x="430" y="300" font-size="20" font-weight="bold" fill="#d32f2f">x</text>
+      <text x="375" y="425" font-size="20" font-weight="bold" text-anchor="middle" fill="#4f46e5">14 mm</text>
+      <text x="500" y="420" font-size="20" font-weight="bold" text-anchor="middle" fill="#d32f2f">x</text>
       
       <!-- Punkte -->
-      <circle cx="80" cy="480" r="7" fill="#000"/>
-      <circle cx="400" cy="80" r="7" fill="#000"/>
-      <circle cx="720" cy="480" r="7" fill="#000"/>
-      <circle cx="220" cy="400" r="6" fill="#4f46e5"/>
-      <circle cx="400" cy="200" r="6" fill="#4f46e5"/>
-      <circle cx="580" cy="400" r="6" fill="#4f46e5"/>
+      <circle cx="100" cy="500" r="7" fill="#000"/>
+      <circle cx="700" cy="500" r="7" fill="#000"/>
+      <circle cx="650" cy="80" r="7" fill="#000"/>
+      <circle cx="250" cy="400" r="6" fill="#4f46e5"/>
+      <circle cx="550" cy="400" r="6" fill="#4f46e5"/>
+      <circle cx="500" cy="150" r="6" fill="#4f46e5"/>
     </svg>`,
     questions: [
       { variable: "x", label: "Berechne x (in mm):", answer: 9.33 }
@@ -139,43 +127,38 @@ const exercises: Exercise[] = [
     id: 3,
     title: "Aufgabe 3: Strahlensätze mit Schnittpunkt",
     description: "Zwei Strahlen von einem Punkt werden von parallelen Linien geschnitten. Berechne x.",
-    svg: `<svg viewBox="0 0 800 550" xmlns="http://www.w3.org/2000/svg">
-      <!-- Strahlen von Punkt Z -->
-      <line x1="100" y1="480" x2="620" y2="80" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-      <line x1="100" y1="480" x2="680" y2="120" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    svg: `<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+      <!-- Strahlen von Punkt Z (V-Form) -->
+      <line x1="80" y1="500" x2="680" y2="80" stroke="#000" stroke-width="3"/>
+      <line x1="80" y1="500" x2="750" y2="150" stroke="#000" stroke-width="3"/>
       
-      <!-- Erste parallele Linie (blau) -->
-      <line x1="140" y1="450" x2="190" y2="310" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+      <!-- Erste parallele Linie -->
+      <line x1="180" y1="410" x2="230" y2="310" stroke="#4f46e5" stroke-width="5"/>
       
-      <!-- Zweite parallele Linie (blau) -->
-      <line x1="380" y1="260" x2="430" y2="140" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+      <!-- Zweite parallele Linie -->
+      <line x1="430" y1="220" x2="480" y2="120" stroke="#4f46e5" stroke-width="5"/>
       
-      <!-- Hilfslinien für Beschriftungen (gestrichelt) -->
-      <line x1="140" y1="450" x2="140" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
-      <line x1="380" y1="260" x2="380" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
-      <line x1="620" y1="80" x2="620" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      <!-- Beschriftungen erste Strahle -->
+      <text x="305" y="160" font-size="20" font-weight="bold" fill="#000">70 cm</text>
+      <text x="580" y="120" font-size="20" font-weight="bold" fill="#000">60 cm</text>
       
-      <!-- Basislinie -->
-      <line x1="100" y1="510" x2="680" y2="510" stroke="#ccc" stroke-width="1"/>
+      <!-- Beschriftungen zweite Strahle -->
+      <text x="305" y="420" font-size="20" font-weight="bold" fill="#000">50 cm</text>
+      <text x="600" y="380" font-size="20" font-weight="bold" fill="#d32f2f">x</text>
       
-      <!-- Beschriftungen auf unterer Strahle -->
-      <text x="260" y="550" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">50 cm</text>
-      <text x="500" y="550" font-size="22" font-weight="bold" text-anchor="middle" fill="#d32f2f">x</text>
+      <!-- Punkte auf erste Strahle -->
+      <circle cx="80" cy="500" r="7" fill="#000"/>
+      <circle cx="180" cy="410" r="6" fill="#4f46e5"/>
+      <circle cx="430" cy="220" r="6" fill="#4f46e5"/>
+      <circle cx="680" cy="80" r="6" fill="#000"/>
       
-      <!-- Beschriftungen auf oberer Strahle -->
-      <text x="280" y="200" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">70 cm</text>
-      <text x="560" y="120" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">60 cm</text>
-      
-      <!-- Punkte -->
-      <circle cx="100" cy="480" r="8" fill="#000"/>
-      <circle cx="140" cy="450" r="6" fill="#4f46e5"/>
-      <circle cx="190" cy="310" r="6" fill="#4f46e5"/>
-      <circle cx="380" cy="260" r="6" fill="#4f46e5"/>
-      <circle cx="430" cy="140" r="6" fill="#4f46e5"/>
-      <circle cx="620" cy="80" r="6" fill="#333"/>
+      <!-- Punkte auf zweite Strahle -->
+      <circle cx="230" cy="310" r="6" fill="#4f46e5"/>
+      <circle cx="480" cy="120" r="6" fill="#4f46e5"/>
+      <circle cx="750" cy="150" r="6" fill="#000"/>
       
       <!-- Label Z -->
-      <text x="75" y="505" font-size="18" font-weight="bold" fill="#000">Z</text>
+      <text x="50" y="525" font-size="18" font-weight="bold">Z</text>
     </svg>`,
     questions: [
       { variable: "x", label: "Berechne x (in cm):", answer: 42 }
@@ -198,46 +181,41 @@ const exercises: Exercise[] = [
     id: 4,
     title: "Aufgabe 4: Zwei Variablen mit Strahlensatz",
     description: "Berechne beide unbekannten Längen x und y.",
-    svg: `<svg viewBox="0 0 800 550" xmlns="http://www.w3.org/2000/svg">
-      <!-- Strahlen von Punkt Z -->
-      <line x1="100" y1="480" x2="600" y2="80" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-      <line x1="100" y1="480" x2="650" y2="120" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    svg: `<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+      <!-- Strahlen von Punkt Z (V-Form) -->
+      <line x1="80" y1="500" x2="680" y2="80" stroke="#000" stroke-width="3"/>
+      <line x1="80" y1="500" x2="750" y2="180" stroke="#000" stroke-width="3"/>
       
-      <!-- Erste parallele Linie (blau) -->
-      <line x1="150" y1="450" x2="210" y2="310" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+      <!-- Erste parallele Linie -->
+      <line x1="180" y1="410" x2="240" y2="310" stroke="#4f46e5" stroke-width="5"/>
       
-      <!-- Zweite parallele Linie (blau) -->
-      <line x1="380" y1="260" x2="440" y2="140" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+      <!-- Zweite parallele Linie -->
+      <line x1="430" y1="220" x2="490" y2="120" stroke="#4f46e5" stroke-width="5"/>
       
-      <!-- Hilfslinien für Beschriftungen (gestrichelt) -->
-      <line x1="150" y1="450" x2="150" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
-      <line x1="380" y1="260" x2="380" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
-      <line x1="600" y1="80" x2="600" y2="510" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+      <!-- Beschriftungen erste Strahle (oben) -->
+      <text x="310" y="160" font-size="20" font-weight="bold" fill="#000">x</text>
+      <text x="580" y="120" font-size="20" font-weight="bold" fill="#000">50 cm</text>
       
-      <!-- Basislinie -->
-      <line x1="100" y1="510" x2="650" y2="510" stroke="#ccc" stroke-width="1"/>
-      
-      <!-- Beschriftungen auf unterer Strahle -->
-      <text x="265" y="550" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">40 cm</text>
-      <text x="490" y="550" font-size="22" font-weight="bold" text-anchor="middle" fill="#d32f2f">y</text>
-      
-      <!-- Beschriftungen auf oberer Strahle -->
-      <text x="280" y="200" font-size="22" font-weight="bold" text-anchor="middle" fill="#d32f2f">x</text>
-      <text x="560" y="120" font-size="22" font-weight="bold" text-anchor="middle" fill="#000">50 cm</text>
+      <!-- Beschriftungen zweite Strahle (unten) -->
+      <text x="310" y="420" font-size="20" font-weight="bold" fill="#000">40 cm</text>
+      <text x="600" y="380" font-size="20" font-weight="bold" fill="#d32f2f">y</text>
       
       <!-- Zusatzbeschriftung -->
-      <text x="520" y="380" font-size="20" font-weight="bold" text-anchor="middle" fill="#000">30 cm</text>
+      <text x="560" y="240" font-size="18" font-weight="bold" fill="#000">30 cm</text>
       
-      <!-- Punkte -->
-      <circle cx="100" cy="480" r="8" fill="#000"/>
-      <circle cx="150" cy="450" r="6" fill="#4f46e5"/>
-      <circle cx="210" cy="310" r="6" fill="#4f46e5"/>
-      <circle cx="380" cy="260" r="6" fill="#4f46e5"/>
-      <circle cx="440" cy="140" r="6" fill="#4f46e5"/>
-      <circle cx="600" cy="80" r="6" fill="#333"/>
+      <!-- Punkte auf erste Strahle -->
+      <circle cx="80" cy="500" r="7" fill="#000"/>
+      <circle cx="180" cy="410" r="6" fill="#4f46e5"/>
+      <circle cx="430" cy="220" r="6" fill="#4f46e5"/>
+      <circle cx="680" cy="80" r="6" fill="#000"/>
+      
+      <!-- Punkte auf zweite Strahle -->
+      <circle cx="240" cy="310" r="6" fill="#4f46e5"/>
+      <circle cx="490" cy="120" r="6" fill="#4f46e5"/>
+      <circle cx="750" cy="180" r="6" fill="#000"/>
       
       <!-- Label Z -->
-      <text x="75" y="505" font-size="18" font-weight="bold" fill="#000">Z</text>
+      <text x="50" y="525" font-size="18" font-weight="bold">Z</text>
     </svg>`,
     questions: [
       { variable: "x", label: "Berechne x (in cm):", answer: 24 },
