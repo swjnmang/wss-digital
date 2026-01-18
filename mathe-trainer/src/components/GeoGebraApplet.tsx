@@ -1,61 +1,24 @@
-import React from "react";
+import React, { useEffect, useRef } from 'react';
 
-type GeoGebraAppletProps = {
-  materialId: string;
+interface GeoGebraAppletProps {
+  // Für Online-Material IDs (GeoGebra Cloud)
+  materialId?: string;
+  
+  // Für lokale .ggb-Dateien
+  filename?: string;
+  
   width?: number;
   height?: number;
-  borderColor?: string; // hex without #, e.g. 888888
+  borderColor?: string;
   showMenuBar?: boolean;
   showToolBar?: boolean;
   showToolBarHelp?: boolean;
   showResetIcon?: boolean;
   enableRightClick?: boolean;
-  language?: string; // e.g. "de"
-};
-
-export default function GeoGebraApplet({
-  materialId,
-  width = 800,
-  height = 600,
-  borderColor = "888888",
-  showMenuBar = true,
-  showToolBar = true,
-  showToolBarHelp = false,
-  showResetIcon = true,
-  enableRightClick = true,
-  language = "de",
-}: GeoGebraAppletProps) {
-  // GeoGebra iframe embed parameters
-  const url = `https://www.geogebra.org/material/iframe/id/${materialId}/width/${width}/height/${height}/border/${borderColor}/smb/${showMenuBar}/stb/${showToolBar}/stbh/${showToolBarHelp}/sri/${showResetIcon}/rc/${enableRightClick}/lang/${language}`;
-
-  return (
-    <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-      <iframe
-        title={`GeoGebra ${materialId}`}
-        src={url}
-        width={width}
-        height={height}
-        style={{ border: `1px solid #${borderColor}`, borderRadius: 8 }}
-        allow="fullscreen"
-      />
-    </div>
-  );
-}
-import React, { useEffect, useRef } from 'react';
-
-interface GeoGebraAppletProps {
-  m?: number;
-  t?: number;
-  width?: number;
-  height?: number;
-  id?: string;
-  showToolBar?: boolean;
-  showAlgebraInput?: boolean;
-  showMenuBar?: boolean;
+  language?: string;
+  
+  // Für dynamische API-basierte Erstellung
   onAppletReady?: (api: any) => void;
-  filename?: string;
-  commands?: string[];
-  coordSystem?: { xmin: number; xmax: number; ymin: number; ymax: number };
 }
 
 const DEPLOY_GGB_URL = 'https://www.geogebra.org/apps/deployggb.js';
@@ -66,123 +29,122 @@ declare global {
   }
 }
 
-const GeoGebraApplet: React.FC<GeoGebraAppletProps> = ({ 
-  m, 
-  t, 
-  width = 480, 
-  height = 360,
-  id = 'ggb-element',
-  showToolBar = false,
-  showAlgebraInput = false,
-  showMenuBar = false,
-  onAppletReady,
+export default function GeoGebraApplet({
+  materialId,
   filename,
-  commands = [],
-  coordSystem
-}) => {
+  width = 800,
+  height = 600,
+  borderColor = "888888",
+  showMenuBar = true,
+  showToolBar = true,
+  showToolBarHelp = false,
+  showResetIcon = true,
+  enableRightClick = true,
+  language = "de",
+  onAppletReady,
+}: GeoGebraAppletProps) {
   const appletRef = useRef<HTMLDivElement>(null);
   const ggbScriptLoaded = useRef(false);
   const appletObj = useRef<any>(null);
-  const onAppletReadyRef = useRef(onAppletReady);
 
-  useEffect(() => {
-    onAppletReadyRef.current = onAppletReady;
-  }, [onAppletReady]);
+  // Fallback: Nutze GeoGebra Online-Embed über iframe
+  if (materialId && !filename) {
+    const url = `https://www.geogebra.org/material/iframe/id/${materialId}/width/${width}/height/${height}/border/${borderColor}/smb/${showMenuBar}/stb/${showToolBar}/stbh/${showToolBarHelp}/sri/${showResetIcon}/rc/${enableRightClick}/lang/${language}`;
 
-  // Handle commands update without full re-render if applet exists
-  useEffect(() => {
-    if (appletObj.current && commands.length > 0) {
-      appletObj.current.reset();
-      
-      if (coordSystem) {
-        appletObj.current.setCoordSystem(coordSystem.xmin, coordSystem.xmax, coordSystem.ymin, coordSystem.ymax);
-      } else {
-        appletObj.current.setCoordSystem(-5, 5, -5, 5);
-      }
-      
-      appletObj.current.setAxesVisible(true, true);
-      appletObj.current.setGridVisible(true);
-      commands.forEach(cmd => appletObj.current.evalCommand(cmd));
-    }
-  }, [commands, coordSystem]);
+    return (
+      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        <iframe
+          title={`GeoGebra ${materialId}`}
+          src={url}
+          width={width}
+          height={height}
+          style={{ border: `1px solid #${borderColor}`, borderRadius: 8 }}
+          allow="fullscreen"
+        />
+      </div>
+    );
+  }
 
+  // Für lokale .ggb-Dateien mit GeoGebra API
   useEffect(() => {
-    // Lade deployggb.js nur einmal
+    if (!filename || !appletRef.current) return;
+
+    // Lade GeoGebra deployggb.js Script wenn noch nicht geladen
     if (!ggbScriptLoaded.current && !window.GGBApplet) {
       const script = document.createElement('script');
       script.src = DEPLOY_GGB_URL;
       script.async = true;
       script.onload = () => {
         ggbScriptLoaded.current = true;
-        renderApplet();
+        initializeApplet();
       };
       document.body.appendChild(script);
-    } else {
-      renderApplet();
+    } else if (window.GGBApplet && ggbScriptLoaded.current) {
+      initializeApplet();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [m, t, width, height, id, showToolBar, showAlgebraInput, showMenuBar, filename]); // Removed commands from here to avoid full reload
 
-  function renderApplet() {
-    if (!window.GGBApplet || !appletRef.current) return;
-    
-    // Unique ID for multiple applets
-    const uniqueId = id + '-' + Math.random().toString(36).substr(2, 9);
-    // Create a container with this ID inside our ref
-    appletRef.current.innerHTML = `<div id="${uniqueId}"></div>`;
+    const initializeApplet = () => {
+      if (!appletRef.current) return;
 
-    const params = {
-      appName: 'classic',
-      width,
-      height,
-      showToolBar,
-      showAlgebraInput,
-      showMenuBar,
-      perspective: 'G',
-      enableShiftDragZoom: true,
-      showResetIcon: true,
-      useBrowserForJS: true,
-      ...(filename ? { filename } : {}),
-      appletOnLoad: (api: any) => {
-        appletObj.current = api;
-        
-        // Legacy support for m and t props
-        if (m !== undefined && t !== undefined) {
-             api.reset();
-             api.setCoordSystem(-5, 5, -5, 5);
-             api.setAxesVisible(true, true);
-             api.setGridVisible(true);
-             api.evalCommand(`f(x) = ${m}*x + ${t}`);
-             api.setColor('f', 0, 0, 255);
-             api.setLineThickness('f', 3);
-        }
+      const parameters = {
+        filename: `/geogebra/${filename}`,
+        width,
+        height,
+        showMenuBar,
+        showToolBar,
+        showToolBarHelp,
+        showResetIcon,
+        enableRightClick,
+        language,
+        showAlgebraInput: false,
+        showSpreadsheet: false,
+        showCAS: false,
+        border: 2,
+        borderColor: borderColor,
+        rounding: "10 places",
+      };
 
-        // Execute commands
-        if (commands && commands.length > 0) {
-            api.reset();
-            
-            if (coordSystem) {
-                api.setCoordSystem(coordSystem.xmin, coordSystem.xmax, coordSystem.ymin, coordSystem.ymax);
-            } else {
-                api.setCoordSystem(-5, 5, -5, 5);
+      appletRef.current!.innerHTML = '';
+      appletObj.current = new window.GGBApplet(parameters, '5.0');
+      appletObj.current.setHTML5Codebase('/geogebra/', true);
+      appletObj.current.inject(appletRef.current!.id);
+
+      // Callback wenn verfügbar
+      if (onAppletReady) {
+        setTimeout(() => {
+          if (appletObj.current && appletObj.current.getAppletObject) {
+            try {
+              const api = appletObj.current.getAppletObject();
+              onAppletReady(api);
+            } catch (e) {
+              console.warn('GeoGebra API nicht verfügbar:', e);
             }
-
-            api.setAxesVisible(true, true);
-            api.setGridVisible(true);
-            commands.forEach((cmd: string) => api.evalCommand(cmd));
-        }
-
-        if (onAppletReadyRef.current) {
-          onAppletReadyRef.current(api);
-        }
+          }
+        }, 1000);
       }
     };
+  }, [filename, width, height, showMenuBar, showToolBar, showToolBarHelp, showResetIcon, enableRightClick, language, borderColor, onAppletReady]);
 
-    const applet = new window.GGBApplet(params, true);
-    applet.inject(uniqueId);
+  // Für .ggb-Dateien mit GeoGebra API
+  if (filename) {
+    return (
+      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        <div
+          ref={appletRef}
+          id={`ggb-applet-${filename}`}
+          style={{
+            border: `2px solid #${borderColor}`,
+            borderRadius: 8,
+            overflow: 'hidden',
+          }}
+        />
+      </div>
+    );
   }
 
-  return <div ref={appletRef} className="flex justify-center" style={{ width: '100%' }}></div>;
-};
+  // Fallback wenn keine Props gegeben
+  return (
+    <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>
+      Keine GeoGebra-Material angegeben (materialId oder filename erforderlich)
+    </div>
 
-export default GeoGebraApplet;

@@ -7,7 +7,7 @@ interface Exercise {
   id: number;
   title: string;
   description: string;
-  materialId: string; // GeoGebra Material ID
+  filename: string; // Lokale .ggb-Datei
   questions: {
     variable: string;
     label: string;
@@ -19,9 +19,9 @@ interface Exercise {
 const exercises: Exercise[] = [
   {
     id: 1,
-    title: "Aufgabe 1: Strahlensätze mit Parallelen",
-    description: "GeoGebra-Applet: Zwei Strahlen mit zwei parallelen Geraden und markierten Schnittpunkten.",
-    materialId: "REPLACE_WITH_MATERIAL_ID_1",
+    title: "Aufgabe 1: Strahlensätze Standard",
+    description: "Zwei Strahlen mit zwei parallelen Geraden. Berechne die fehlende Länge x.",
+    filename: "aufgabe1.ggb",
     questions: [
       { variable: "x", label: "Berechne x (in cm):", answer: 16 }
     ],
@@ -35,18 +35,82 @@ const exercises: Exercise[] = [
   },
   {
     id: 2,
-    title: "Aufgabe 2: Strahlensätze - Zweite Unbekannte",
-    description: "GeoGebra-Applet mit alternativer Strahlenanordnung und parallelen Geraden.",
-    materialId: "REPLACE_WITH_MATERIAL_ID_2",
+    title: "Aufgabe 2: Strahlensätze Variante",
+    description: "Unterschiedliche Strahlenkonfiguration. Berechne y.",
+    filename: "aufgabe2.ggb",
     questions: [
-      { variable: "y", label: "Berechne y (in cm):", answer: 18 }
+      { variable: "y", label: "Berechne y (in cm):", answer: 48 }
     ],
     solution: [
-      "Nach dem Strahlensatz: ZC/CE = ZD/DF",
-      "18/28 = y/35",
-      "28 × y = 18 × 35",
-      "28y = 630",
-      "y ≈ 22,5 cm"
+      "Nach dem Strahlensatz: ZA/ZA' = AB/A'B'",
+      "18/24 = 32/y",
+      "18 × y = 24 × 32",
+      "18y = 768",
+      "y = 42,67 cm (ca. 43 cm)"
+    ]
+  },
+  {
+    id: 3,
+    title: "Aufgabe 3: Strahlensätze enge Anordnung",
+    description: "Engere Strahlenkonfiguration. Berechne x.",
+    filename: "aufgabe3.ggb",
+    questions: [
+      { variable: "x", label: "Berechne x (in cm):", answer: 23.33 }
+    ],
+    solution: [
+      "Nach dem Strahlensatz: ZA/AB = ZA'/A'B'",
+      "12/28 = 10/x",
+      "12 × x = 28 × 10",
+      "12x = 280",
+      "x = 23,33 cm"
+    ]
+  },
+  {
+    id: 4,
+    title: "Aufgabe 4: Strahlensätze breite Anordnung",
+    description: "Breitere Strahlenkonfiguration. Berechne x.",
+    filename: "aufgabe4.ggb",
+    questions: [
+      { variable: "x", label: "Berechne x (in cm):", answer: 20 }
+    ],
+    solution: [
+      "Nach dem Strahlensatz: ZA/AB = ZA'/A'B'",
+      "20/25 = 16/x",
+      "20 × x = 25 × 16",
+      "20x = 400",
+      "x = 20 cm"
+    ]
+  },
+  {
+    id: 5,
+    title: "Aufgabe 5: Strahlensätze spitzer Winkel",
+    description: "Spitzere Strahlenkonfiguration. Berechne y.",
+    filename: "aufgabe5.ggb",
+    questions: [
+      { variable: "y", label: "Berechne y (in cm):", answer: 43.2 }
+    ],
+    solution: [
+      "Nach dem Strahlensatz: ZA/ZA' = AB/A'B'",
+      "10/12 = 30/y",
+      "10 × y = 12 × 30",
+      "10y = 360",
+      "y = 36 cm"
+    ]
+  },
+  {
+    id: 6,
+    title: "Aufgabe 6: Strahlensätze stumpfer Winkel",
+    description: "Stumpfere Strahlenkonfiguration. Berechne x und y.",
+    filename: "aufgabe6.ggb",
+    questions: [
+      { variable: "x", label: "Berechne x (in cm):", answer: 28 },
+      { variable: "y", label: "Berechne y (in cm):", answer: 21 }
+    ],
+    solution: [
+      "Nach dem Strahlensatz: ZA/AB = ZA'/A'B'",
+      "21/21 = y/x",
+      "Zusätzlich: ZA'/A'B' = 16/x",
+      "Mit den gegebenen Längenverhältnissen: x = 28 cm und y = 21 cm"
     ]
   }
 ];
@@ -133,7 +197,7 @@ export default function Strahlensaetze() {
 
         {/* GeoGebra Applet */}
         <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <GeoGebraApplet materialId={exercise.materialId} width={800} height={500} />
+          <GeoGebraApplet filename={exercise.filename} width={800} height={500} />
         </div>
 
         {/* Aufgabenteile */}
