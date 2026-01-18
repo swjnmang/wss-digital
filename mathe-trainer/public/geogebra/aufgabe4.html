@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strahlensatz Aufgabe</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        svg {
+            border: 2px solid #cccccc;
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+        <!-- Hintergrund -->
+        <rect width="600" height="600" fill="white"/>
+        
+        <!-- Gitternetz -->
+        <defs>
+            <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#f0f0f0" stroke-width="1"/>
+            </pattern>
+        </defs>
+        <rect width="600" height="600" fill="url(#grid)" />
+        
+        <!-- Strahlen -->
+        <line x1="100" y1="300" x2="244.62721217947134" y2="472.35999970177005" stroke="black" stroke-width="2"/>
+        <line x1="100" y1="300" x2="284.3092099650231" y2="429.05469817898535" stroke="black" stroke-width="2"/>
+        
+        <!-- Parallele Geraden (gestrichelt) -->
+        <line x1="157.85088487178854" y1="368.943999880708" x2="173.72368398600923" y2="351.62187927159414" 
+              stroke="blue" stroke-width="2" stroke-dasharray="5,5"/>
+        <line x1="208.4704091346035" y1="429.26999977632755" x2="238.23190747376734" y2="396.791023634239" 
+              stroke="blue" stroke-width="2" stroke-dasharray="5,5"/>
+        
+        <!-- Punkte -->
+        <circle cx="100" cy="300" r="5" fill="black"/>
+        <circle cx="157.85088487178854" cy="368.943999880708" r="5" fill="darkblue"/>
+        <circle cx="173.72368398600923" cy="351.62187927159414" r="5" fill="darkblue"/>
+        <circle cx="208.4704091346035" cy="429.26999977632755" r="5" fill="darkblue"/>
+        <circle cx="238.23190747376734" cy="396.791023634239" r="5" fill="darkblue"/>
+        
+        <!-- Punkt-Labels -->
+        <text x="80" y="285" font-size="16" font-weight="bold">Z</text>
+        <text x="137.85088487178854" y="353.943999880708" font-size="16" font-weight="bold" fill="darkblue">A</text>
+        <text x="183.72368398600923" y="336.62187927159414" font-size="16" font-weight="bold" fill="darkblue">A'</text>
+        <text x="188.4704091346035" y="454.26999977632755" font-size="16" font-weight="bold" fill="darkblue">B</text>
+        <text x="248.23190747376734" y="421.791023634239" font-size="16" font-weight="bold" fill="darkblue">B'</text>
+        
+        <!-- Längenlabels -->
+        <text x="88.92544243589427" y="329.471999940354" font-size="13" fill="green">ZA: 20 cm</text>
+        <text x="143.160647003196" y="419.1069998285178" font-size="13" fill="green">AB: 25 cm</text>
+        <text x="156.86184199300462" y="320.81093963579707" font-size="13" fill="green">ZA': 16 cm</text>
+        <text x="225.97779572988827" y="394.20645145291655" font-size="13" fill="red">
+            A'B': x cm
+        </text>
+    </svg>
+</body>
+</html>
