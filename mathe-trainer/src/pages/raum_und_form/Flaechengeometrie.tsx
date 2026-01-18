@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
-import { Circle, Diamond, Layers, Ruler, Shuffle, Square, Triangle } from "lucide-react";
+import { Circle, Diamond, Layers, Ruler, Shuffle, Square, Triangle, BookOpen } from "lucide-react";
 
 const topics: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/raum-und-form/flaechengeometrie/dreiecke", label: "Dreiecke", icon: Triangle },
@@ -9,7 +9,8 @@ const topics: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/raum-und-form/flaechengeometrie/parallelogramm", label: "Parallelogramm", icon: Layers },
   { href: "/raum-und-form/flaechengeometrie/raute", label: "Raute", icon: Diamond },
   { href: "/raum-und-form/flaechengeometrie/kreis", label: "Kreis", icon: Circle },
-  { href: "/raum-und-form/flaechengeometrie/gemischte-aufgaben", label: "Gemischte Übungsaufgaben", icon: Shuffle }
+  { href: "/raum-und-form/flaechengeometrie/gemischte-aufgaben", label: "Gemischte Übungsaufgaben", icon: Shuffle },
+  { href: "/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben", label: "Anwendungs- und Übungsaufgaben", icon: BookOpen }
 ];
 
 export default function Flaechengeometrie() {
