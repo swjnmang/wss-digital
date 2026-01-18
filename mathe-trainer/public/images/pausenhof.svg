@@ -1,0 +1,69 @@
+<svg viewBox="0 0 900 700" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="900" height="700" fill="#e0f2ff"/>
+  
+  <!-- Main rectangle (Pausenhof) -->
+  <rect x="50" y="50" width="750" height="500" fill="none" stroke="#333" stroke-width="2"/>
+  
+  <!-- Labels for rectangle corners -->
+  <text x="20" y="70" font-size="20" font-weight="bold">D</text>
+  <text x="800" y="70" font-size="20" font-weight="bold">C</text>
+  <text x="20" y="580" font-size="20" font-weight="bold">A</text>
+  <text x="800" y="580" font-size="20" font-weight="bold">B</text>
+  
+  <!-- Top dimension (30) -->
+  <text x="400" y="30" font-size="16" text-anchor="middle" fill="#333">30</text>
+  
+  <!-- Left side dimension (500 = height) -->
+  <text x="10" y="300" font-size="14" text-anchor="middle" fill="#333">500</text>
+  
+  <!-- Blue circular/semi-circular shape (Teich - blaue Fläche oben) -->
+  <circle cx="250" cy="200" r="80" fill="#6366f1" opacity="0.7"/>
+  
+  <!-- Viertelkreis oben rechts -->
+  <circle cx="680" cy="200" r="100" fill="#6366f1" opacity="0.7"/>
+  
+  <!-- Halbkreis unten -->
+  <ellipse cx="300" cy="420" rx="120" ry="90" fill="#6366f1" opacity="0.7"/>
+  
+  <!-- Label Pausenhof -->
+  <text x="500" y="320" font-size="18" fill="#1e40af" font-weight="bold">Pausenhof</text>
+  
+  <!-- Circle (Säule) top right -->
+  <circle cx="750" cy="100" r="35" fill="#888" opacity="0.8"/>
+  <text x="750" y="105" font-size="14" fill="white" text-anchor="middle" font-weight="bold">Säule</text>
+  
+  <!-- Trapezoid (Käfig) bottom left -->
+  <polygon points="100,520 180,520 220,610 80,610" fill="#f4a460" opacity="0.6" stroke="#333" stroke-width="2"/>
+  
+  <!-- Trapezoid labels -->
+  <text x="140" y="580" font-size="14" fill="#d97706" font-weight="bold">Käfig</text>
+  <text x="75" y="560" font-size="12" fill="#d97706">4.47</text>
+  <text x="200" y="560" font-size="12" fill="#d97706">5.66</text>
+  <text x="140" y="635" font-size="12" fill="#d97706">10</text>
+  <text x="60" y="590" font-size="12" fill="#d97706">4</text>
+  
+  <!-- Dashed diagonal line (36.06) -->
+  <line x1="50" y1="50" x2="800" y2="550" stroke="#ff0000" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="450" y="320" font-size="16" fill="#ff0000" font-weight="bold">36.06</text>
+  
+  <!-- Dimensions for blue area -->
+  <g stroke="#333" stroke-width="1" stroke-dasharray="3,3" fill="none">
+    <!-- Box around top circle -->
+    <rect x="170" y="120" width="160" height="160" stroke="#333"/>
+    <text x="250" y="115" font-size="12" text-anchor="middle">10</text>
+    <text x="155" y="200" font-size="12">3</text>
+    
+    <!-- Box around right area -->
+    <rect x="580" y="100" width="140" height="140" stroke="#333"/>
+    <text x="650" y="95" font-size="12" text-anchor="middle">7</text>
+  </g>
+  
+  <!-- Vertical dimension lines for trapezoid -->
+  <line x1="45" y1="520" x2="45" y2="610" stroke="#333" stroke-width="1"/>
+  <text x="35" y="570" font-size="12">3</text>
+  <text x="165" y="520" font-size="12">4</text>
+  
+  <!-- Radius dimension for circle -->
+  <text x="730" y="175" font-size="12" fill="#888">r</text>
+</svg>

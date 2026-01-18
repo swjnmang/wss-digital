@@ -102,7 +102,7 @@ export default function Pausenhof() {
         {/* Bild */}
         <div className="rounded-lg border border-slate-200 bg-white p-6">
           <img 
-            src="/images/pausenhof.png" 
+            src="/images/pausenhof.svg" 
             alt="Pausenhof Skizze" 
             className="w-full rounded-lg"
           />
