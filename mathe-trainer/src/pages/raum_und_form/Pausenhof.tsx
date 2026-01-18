@@ -136,9 +136,6 @@ export default function Pausenhof() {
       setCurrentQuestion(currentQuestion - 1);
       setShowFeedback(selectedAnswerIdx !== null);
       setShowSolution(false);
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
-      setShowFeedback(selectedAnswerIdx !== null);
     }
   };
 
