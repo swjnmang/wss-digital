@@ -136,18 +136,6 @@ export default function Pausenhof() {
       setCurrentQuestion(currentQuestion - 1);
       setShowFeedback(selectedAnswerIdx !== null);
       setShowSolution(false);
-    setAnswers(newAnswers);
-    setShowFeedback(true);
-  };
-
-  const handleNext = () => {
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-      setShowFeedback(false);
-    }
-  };
-
-  const handlePrevious = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
       setShowFeedback(selectedAnswerIdx !== null);
