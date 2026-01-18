@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, BookOpen } from "lucide-react";
-import StrahlensatzDiagram from "../../components/StrahlensatzDiagram";
+import GeoGebraApplet from "../../components/GeoGebraApplet";
 
 interface Exercise {
   id: number;
   title: string;
   description: string;
-  diagramConfig: any;
+  materialId: string; // GeoGebra Material ID
   questions: {
     variable: string;
     label: string;
@@ -20,29 +20,8 @@ const exercises: Exercise[] = [
   {
     id: 1,
     title: "Aufgabe 1: Strahlensätze mit Parallelen",
-    description: "Zwei Strahlen von Zentrum Z werden von zwei parallelen Geraden geschnitten. Berechne die unbekannte Strecke x.",
-    diagramConfig: {
-      centerX: 80,
-      centerY: 250,
-      ray1Angle: 60,
-      ray1Length: 300,
-      ray2Angle: 20,
-      ray2Length: 280,
-      parallel1_t: 0.33,
-      parallel2_t: 0.67,
-      centerLabel: "Z",
-      point1aLabel: "A",
-      point1bLabel: "A'",
-      point2aLabel: "B",
-      point2bLabel: "B'",
-      showMeasurements: true,
-      measurements: {
-        za: 15,
-        ab: 20,
-        za_strich: 12,
-        ab_strich: "x"
-      }
-    },
+    description: "GeoGebra-Applet: Zwei Strahlen mit zwei parallelen Geraden und markierten Schnittpunkten.",
+    materialId: "REPLACE_WITH_MATERIAL_ID_1",
     questions: [
       { variable: "x", label: "Berechne x (in cm):", answer: 16 }
     ],
@@ -57,29 +36,8 @@ const exercises: Exercise[] = [
   {
     id: 2,
     title: "Aufgabe 2: Strahlensätze - Zweite Unbekannte",
-    description: "Berechne y mithilfe der Strahlensätze.",
-    diagramConfig: {
-      centerX: 80,
-      centerY: 250,
-      ray1Angle: 50,
-      ray1Length: 320,
-      ray2Angle: 25,
-      ray2Length: 300,
-      parallel1_t: 0.3,
-      parallel2_t: 0.65,
-      centerLabel: "Z",
-      point1aLabel: "C",
-      point1bLabel: "D",
-      point2aLabel: "E",
-      point2bLabel: "F",
-      showMeasurements: true,
-      measurements: {
-        za: 18,
-        ab: 28,
-        za_strich: "y",
-        ab_strich: 35
-      }
-    },
+    description: "GeoGebra-Applet mit alternativer Strahlenanordnung und parallelen Geraden.",
+    materialId: "REPLACE_WITH_MATERIAL_ID_2",
     questions: [
       { variable: "y", label: "Berechne y (in cm):", answer: 18 }
     ],
@@ -173,9 +131,9 @@ export default function Strahlensaetze() {
           <p className="text-slate-600">{exercise.description}</p>
         </div>
 
-        {/* Diagramm */}
+        {/* GeoGebra Applet */}
         <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <StrahlensatzDiagram config={exercise.diagramConfig} />
+          <GeoGebraApplet materialId={exercise.materialId} width={800} height={500} />
         </div>
 
         {/* Aufgabenteile */}

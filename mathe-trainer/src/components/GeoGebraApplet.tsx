@@ -1,3 +1,46 @@
+import React from "react";
+
+type GeoGebraAppletProps = {
+  materialId: string;
+  width?: number;
+  height?: number;
+  borderColor?: string; // hex without #, e.g. 888888
+  showMenuBar?: boolean;
+  showToolBar?: boolean;
+  showToolBarHelp?: boolean;
+  showResetIcon?: boolean;
+  enableRightClick?: boolean;
+  language?: string; // e.g. "de"
+};
+
+export default function GeoGebraApplet({
+  materialId,
+  width = 800,
+  height = 600,
+  borderColor = "888888",
+  showMenuBar = true,
+  showToolBar = true,
+  showToolBarHelp = false,
+  showResetIcon = true,
+  enableRightClick = true,
+  language = "de",
+}: GeoGebraAppletProps) {
+  // GeoGebra iframe embed parameters
+  const url = `https://www.geogebra.org/material/iframe/id/${materialId}/width/${width}/height/${height}/border/${borderColor}/smb/${showMenuBar}/stb/${showToolBar}/stbh/${showToolBarHelp}/sri/${showResetIcon}/rc/${enableRightClick}/lang/${language}`;
+
+  return (
+    <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+      <iframe
+        title={`GeoGebra ${materialId}`}
+        src={url}
+        width={width}
+        height={height}
+        style={{ border: `1px solid #${borderColor}`, borderRadius: 8 }}
+        allow="fullscreen"
+      />
+    </div>
+  );
+}
 import React, { useEffect, useRef } from 'react';
 
 interface GeoGebraAppletProps {
