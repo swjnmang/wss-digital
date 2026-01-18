@@ -109,6 +109,7 @@ import GemischteFlaechenaufgaben from './pages/raum_und_form/GemischteFlaechenau
 import AnwendungsUebungsaufgaben from './pages/raum_und_form/AnwendungsUebungsaufgaben';
 import Pausenhof from './pages/raum_und_form/Pausenhof';
 import Fussballplatz from './pages/raum_und_form/Fussballplatz';
+import Haus from './pages/raum_und_form/Haus';
 // Pythagoras
 import KathetenHypotenuse from './pages/raum_und_form/pythagoras/KathetenHypotenuse';
 import SeitenBerechnen from './pages/raum_und_form/pythagoras/SeitenBerechnen';
@@ -258,6 +259,7 @@ export default function App() {
           <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben" element={<AnwendungsUebungsaufgaben />} />
           <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/pausenhof" element={<Pausenhof />} />
           <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/fussballplatz" element={<Fussballplatz />} />
+          <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/haus" element={<Haus />} />
 
           <Route path="/impressum" element={<Impressum />} />
 

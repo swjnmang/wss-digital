@@ -16,6 +16,12 @@ const applications: ApplicationItem[] = [
     label: "Fußballplatz", 
     desc: "Berechne Rasen, Linien und Strecken",
     icon: BookOpen 
+  },
+  { 
+    href: "/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/haus", 
+    label: "Das Haus", 
+    desc: "Berechne Flächen und Strecken am Hausplan",
+    icon: BookOpen 
   }
 ];
 
