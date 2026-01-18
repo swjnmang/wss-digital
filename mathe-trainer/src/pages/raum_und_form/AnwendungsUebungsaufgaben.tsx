@@ -10,6 +10,12 @@ const applications: ApplicationItem[] = [
     label: "Der Pausenhof", 
     desc: "Berechne Flächen, Umfang und mehr",
     icon: BookOpen 
+  },
+  { 
+    href: "/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/fussballplatz", 
+    label: "Fußballplatz", 
+    desc: "Berechne Rasen, Linien und Strecken",
+    icon: BookOpen 
   }
 ];
 
