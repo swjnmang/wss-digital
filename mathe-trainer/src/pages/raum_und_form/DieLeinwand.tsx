@@ -73,8 +73,8 @@ const exercises: Exercise[] = [
   {
     id: 4,
     question: "Beim grünen Parallelogramm sind die Strecken OR und PR jeweils 2 Meter lang. Berechne den Flächeninhalt. Hinweis: Nutze die Skizze um die Höhe zu bestimmen.",
-    expectedAnswer: 2.98,
-    tolerance: 0.2,
+    expectedAnswer: 4,
+    tolerance: 0.1,
     unit: "m²",
     hint: "Nutze die Parallelogramm-Formel A = a × h. Die Höhe h findest du in der Skizze!",
     solution: [
@@ -83,12 +83,11 @@ const exercises: Exercise[] = [
       "",
       "Aus der Skizze können wir bestimmen:",
       "- Die Basis a = 2 m (z.B. OR)",
-      "- Die senkrechte Höhe h muss aus der Skizze abgelesen oder berechnet werden",
+      "- Die Höhe h = 2 m (senkrechte Höhe aus der Skizze)",
       "",
-      "Mit den Maßen aus der Skizze:",
-      "Höhe h ≈ 1,49 m (abgelesen oder berechnet)",
-      "A = 2 × 1,49",
-      "A ≈ 2,98 m²"
+      "Berechnung:",
+      "A = 2 × 2",
+      "A = 4 m²"
     ]
   },
   {
@@ -299,7 +298,7 @@ export default function DieLeinwand() {
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-10 space-y-8">
-        {/* Einleitung und Bild - nur bei erster Aufgabe */}
+        {/* Einleitung - nur bei erster Aufgabe */}
         {currentExercise === 0 && (
           <div className="bg-white rounded-lg border border-slate-200 p-8 space-y-4">
             <div className="prose prose-sm max-w-none">
@@ -308,15 +307,17 @@ export default function DieLeinwand() {
                 Halte deine Rechenwege schriftlich fest, da du deine Zwischenergebnisse im Verlauf der Aufgaben benötigst.
               </p>
             </div>
-            <div className="mt-6 rounded-lg overflow-hidden border border-slate-200">
-              <img 
-                src="/images/leinwand.png" 
-                alt="Leinwand mit verschiedenen Formen" 
-                className="w-full h-auto"
-              />
-            </div>
           </div>
         )}
+
+        {/* Bild bei allen Aufgaben sichtbar */}
+        <div className="bg-white rounded-lg border border-slate-200 p-8">
+          <img 
+            src="/images/leinwand.png" 
+            alt="Leinwand mit verschiedenen Formen" 
+            className="w-full h-auto rounded-lg"
+          />
+        </div>
 
         {/* Aufgabenfrage */}
         <div className="bg-white rounded-lg border border-slate-200 p-8 space-y-6">
