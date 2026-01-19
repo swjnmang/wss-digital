@@ -19,7 +19,7 @@ type FilterType = TaskType | 'mixed' | 'renten_bundled';
 type SimpleInterestVariant = 'Z' | 'K' | 'p' | 't';
 type ZinseszinsVariant = 'Kn' | 'K0' | 'p' | 'n';
 type KapitalmehrungVariant = 'Kn' | 'K0' | 'r' | 'n';
-type RentenVariant = 'Kn' | 'r' | 'n';
+type RentenVariant = 'Kn' | 'K0' | 'r' | 'n';
 type KapitalminderungVariant = 'Kn' | 'K0' | 'r' | 'n';
 
 interface TaskInput {
@@ -788,7 +788,7 @@ const createRentenEndwertTask = (): Task => {
   const q = 1 + p / 100;
   const qn = Math.pow(q, n);
   const Kn = (r * (qn - 1)) / (q - 1);
-  const variant = randomChoice<RentenVariant>(['Kn', 'r', 'n']);
+  const variant = randomChoice<RentenVariant>(['Kn', 'K0', 'r', 'n']);
 
   const story = <p>{randomChoice(rentenContexts)}</p>;
   const areaLabel = 'nachschüssige Rentensparrate';
