@@ -6,9 +6,10 @@ type Exercise = {
   id: number;
   question: string;
   expectedAnswer: number;
-  tolerance: number; // Toleranz für die Überprüfung
+  tolerance: number;
   solution: string[];
   unit: string;
+  hint: string;
 };
 
 const exercises: Exercise[] = [
@@ -18,6 +19,7 @@ const exercises: Exercise[] = [
     expectedAnswer: 2,
     tolerance: 0.1,
     unit: "m",
+    hint: "Nutze die Trapez-Flächenformel: A = (a + b) / 2 × h. Stelle diese nach h um!",
     solution: [
       "Trapez-Flächenformel: A = (a + b) / 2 × h",
       "Gegebene Werte: A = 6 m², a = FG = 4 m, b = IH = 2 m, h = ?",
@@ -36,6 +38,7 @@ const exercises: Exercise[] = [
     expectedAnswer: 1.75,
     tolerance: 0.05,
     unit: "m",
+    hint: "Nutze die Kreis-Flächenformel A = πr² und löse nach r auf!",
     solution: [
       "Kreis-Flächenformel: A = πr²",
       "Gegeben: A = 9,62 m²",
@@ -55,6 +58,7 @@ const exercises: Exercise[] = [
     expectedAnswer: 11.00,
     tolerance: 0.2,
     unit: "m",
+    hint: "Nutze die Kreis-Umfangsformel: U = 2πr",
     solution: [
       "Kreis-Umfangsformel: U = 2πr",
       "Gegeben: r = 1,75 m",
@@ -72,6 +76,7 @@ const exercises: Exercise[] = [
     expectedAnswer: 2.98,
     tolerance: 0.2,
     unit: "m²",
+    hint: "Nutze die Parallelogramm-Formel A = a × h. Die Höhe h findest du in der Skizze!",
     solution: [
       "Parallelogramm-Flächenformel: A = a × h",
       "Gegeben: Seitenlänge OR = 2 m, PR = 2 m",
@@ -92,6 +97,7 @@ const exercises: Exercise[] = [
     expectedAnswer: 2.83,
     tolerance: 0.2,
     unit: "m",
+    hint: "Du kannst hier den Kosinussatz oder Pythagoras nutzen, je nach dem Winkel in der Skizze!",
     solution: [
       "Das Parallelogramm kann über die Skizze analysiert werden.",
       "Die Diagonale OP kann mit dem Kosinussatz oder Pythagoras berechnet werden.",
@@ -113,6 +119,7 @@ const exercises: Exercise[] = [
     expectedAnswer: 4.0,
     tolerance: 0.2,
     unit: "m",
+    hint: "Mit einem rechten Winkel nutzt du den Satz des Pythagoras. Achte darauf, wo der rechte Winkel liegt!",
     solution: [
       "Mit einem rechten Winkel im Dreieck JKL können wir den Satz des Pythagoras nutzen.",
       "Gegeben: JK = 3,61 m, KL = 2 m",
@@ -141,6 +148,7 @@ const exercises: Exercise[] = [
     expectedAnswer: 3.0,
     tolerance: 0.2,
     unit: "m²",
+    hint: "Nutze die Dreieck-Flächenformel A = (g × h) / 2. Was sind Grundseite und Höhe?",
     solution: [
       "Dreieck-Flächenformel: A = (g × h) / 2",
       "Gegeben: JL = 3 m (Grundseite), KL = 2 m (Höhe bei rechtem Winkel)",
@@ -157,6 +165,7 @@ const exercises: Exercise[] = [
     expectedAnswer: 1.5,
     tolerance: 0.2,
     unit: "m",
+    hint: "Nutze den Strahlensatz oder ähnliche Dreiecke, wenn MN parallel zu KL ist!",
     solution: [
       "Mit dem Strahlensatz oder ähnlichen Dreiecken kann MN berechnet werden.",
       "Gegeben: KL = 2 m, JK = 3,61 m, JL = 3 m, JN = 1,5 m",
@@ -177,6 +186,7 @@ const exercises: Exercise[] = [
     expectedAnswer: 33.41,
     tolerance: 2,
     unit: "%",
+    hint: "Addiere alle bemalten Flächen und teile durch die Gesamtfläche, dann × 100!",
     solution: [
       "Gesamtfläche der Leinwand: 40 m²",
       "",
@@ -197,14 +207,18 @@ const exercises: Exercise[] = [
   }
 ];
 
-export default function DieLinewand() {
+export default function DieLeinwand() {
   const [currentExercise, setCurrentExercise] = useState(0);
   const [answers, setAnswers] = useState<(string | null)[]>(new Array(exercises.length).fill(null));
   const [feedback, setFeedback] = useState<string | null>(null);
   const [showSolution, setShowSolution] = useState(false);
+  const [hasAttempted, setHasAttempted] = useState<boolean[]>(new Array(exercises.length).fill(false));
+  const [isWrong, setIsWrong] = useState<boolean[]>(new Array(exercises.length).fill(false));
 
   const exercise = exercises[currentExercise];
   const currentAnswer = answers[currentExercise];
+  const currentHasAttempted = hasAttempted[currentExercise];
+  const currentIsWrong = isWrong[currentExercise];
   const isAnswered = currentAnswer !== null && currentAnswer !== "";
 
   const handleInputChange = (value: string) => {
@@ -226,11 +240,22 @@ export default function DieLinewand() {
       return;
     }
 
+    const newHasAttempted = [...hasAttempted];
+    newHasAttempted[currentExercise] = true;
+    setHasAttempted(newHasAttempted);
+
     const difference = Math.abs(userValue - exercise.expectedAnswer);
     if (difference <= exercise.tolerance) {
       setFeedback(`✓ Richtig! Die Antwort ist ${exercise.expectedAnswer} ${exercise.unit}`);
+      const newIsWrong = [...isWrong];
+      newIsWrong[currentExercise] = false;
+      setIsWrong(newIsWrong);
     } else {
-      setFeedback(`✗ Nicht ganz richtig. Die richtige Antwort ist ${exercise.expectedAnswer} ${exercise.unit}`);
+      // Bei falscher Antwort: Hinweis statt Lösung
+      setFeedback(`✗ Das ist nicht ganz richtig. ${exercise.hint}`);
+      const newIsWrong = [...isWrong];
+      newIsWrong[currentExercise] = true;
+      setIsWrong(newIsWrong);
     }
   };
 
@@ -334,7 +359,7 @@ export default function DieLinewand() {
               className={`rounded-lg p-4 text-sm font-medium ${
                 feedback.startsWith("✓")
                   ? "bg-green-50 text-green-900 border border-green-200"
-                  : "bg-red-50 text-red-900 border border-red-200"
+                  : "bg-yellow-50 text-yellow-900 border border-yellow-200"
               }`}
             >
               {feedback}
@@ -342,27 +367,36 @@ export default function DieLinewand() {
           )}
         </div>
 
-        {/* Lösungsweg */}
-        <div className="bg-white rounded-lg border border-slate-200 p-8 space-y-4">
-          <button
-            onClick={() => setShowSolution(!showSolution)}
-            className="flex items-center gap-2 text-slate-900 hover:text-slate-700 font-semibold"
-          >
-            <BookOpen className="h-5 w-5" />
-            {showSolution ? "Rechenweg ausblenden" : "Rechenweg anzeigen"}
-          </button>
+        {/* Lösungsweg - nur nach falscher Antwort sichtbar */}
+        {currentIsWrong && (
+          <div className="bg-white rounded-lg border border-slate-200 p-8 space-y-4">
+            <button
+              onClick={() => setShowSolution(!showSolution)}
+              className="flex items-center gap-2 text-slate-900 hover:text-slate-700 font-semibold"
+            >
+              <BookOpen className="h-5 w-5" />
+              {showSolution ? "Rechenweg ausblenden" : "Rechenweg anzeigen"}
+            </button>
 
-          {showSolution && (
-            <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 space-y-2">
-              <h3 className="font-semibold text-blue-900 text-sm">Rechenweg:</h3>
-              <div className="text-sm text-blue-900 space-y-1 font-mono">
-                {exercise.solution.map((line, idx) => (
-                  <div key={idx}>{line}</div>
-                ))}
+            {showSolution && (
+              <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 space-y-2">
+                <h3 className="font-semibold text-blue-900 text-sm">Rechenweg:</h3>
+                <div className="text-sm text-blue-900 space-y-1 font-mono">
+                  {exercise.solution.map((line, idx) => (
+                    <div key={idx}>{line}</div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
+
+        {/* Hinweis, wenn noch nicht versucht */}
+        {!currentHasAttempted && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
+            <p>💡 Der Rechenweg wird nach einer falschen Antwort angezeigt.</p>
+          </div>
+        )}
 
         {/* Navigation */}
         <div className="flex gap-3 justify-between pt-4 border-t border-slate-200">
