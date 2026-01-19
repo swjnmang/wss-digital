@@ -1019,7 +1019,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
       '€',
       'z.B. 100.000,00',
       row.restStart,
-      1
+      0.02
     ),
     createInputField(
       `${prefix}_y${row.year}_interest`,
@@ -1027,7 +1027,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
       '€',
       'z.B. 3.200,00',
       row.interest,
-      1
+      0.02
     ),
     createInputField(
       `${prefix}_y${row.year}_tilgung`,
@@ -1035,7 +1035,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
       '€',
       'z.B. 12.500,00',
       row.tilgung,
-      1
+      0.02
     ),
     createInputField(
       `${prefix}_y${row.year}_annuity`,
@@ -1043,7 +1043,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
       '€',
       'z.B. 15.700,00',
       row.annuity,
-      1
+      0.02
     ),
   ]);
 
@@ -1121,6 +1121,7 @@ const createAnnuitaetPlanTask = (): Task => {
       rows.push({ year, restStart: rest, interest, tilgung, annuity });
     }
     rest -= tilgung;
+    rest = Math.round(rest * 100) / 100;  // Round to 2 decimals to avoid floating-point errors
   }
 
   const question = (
