@@ -152,7 +152,7 @@ const exercises: Exercise[] = [
   {
     id: 8,
     question: "Berechne die Länge der Strecke MN im orangen Dreieck, wenn folgende Maße bekannt sind: KL = 2 Meter, JK = 3,61 Meter, JL = 3 Meter, JN = 1,5 Meter.",
-    expectedAnswer: 1.5,
+    expectedAnswer: 1,
     tolerance: 0.2,
     unit: "m",
     hint: "Nutze den Strahlensatz oder ähnliche Dreiecke, wenn MN parallel zu KL ist!",
