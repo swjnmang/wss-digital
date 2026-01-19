@@ -445,7 +445,7 @@ const createZinseszinsTask = (): Task => {
       solution = (
         <div className="space-y-1">
           <p>
-            <InlineMath math={latex`n = \frac{\ln \left(\frac{K_n}{K_0}\right)}{\ln(q)}`} />
+            <InlineMath math={latex`n = \log_q \left(\frac{K_n}{K_0}\right)`} />
           </p>
           <p>
             <InlineMath math={latex`q = 1 + \frac{${mathNumber(p)}}{100} = ${mathNumber(q, 4)}`} />
@@ -607,7 +607,7 @@ const createKapitalmehrungTask = (): Task => {
             <InlineMath math={latex`q^n = \frac{${mathNumber(Kn)} \cdot (${mathNumber(qMinus1, 4)}) + ${mathNumber(r)}}{${mathNumber(K0)} \cdot (${mathNumber(qMinus1, 4)}) + ${mathNumber(r)}} = ${mathNumber(isoQN, 4)}`} />
           </p>
           <p>
-            <InlineMath math={latex`n = \frac{\ln(q^n)}{\ln(q)} = \frac{\ln(${mathNumber(isoQN, 4)})}{\ln(${mathNumber(q, 4)})} = ${n}`} />
+            <InlineMath math={latex`n = \log_q(q^n) = \log_q(${mathNumber(isoQN, 4)}) = ${n}`} />
           </p>
         </div>
       );
@@ -763,7 +763,7 @@ const createKapitalminderungTask = (): Task => {
             <InlineMath math={latex`q^n = \frac{${mathNumber(Kn)} \cdot (${mathNumber(q, 4)} - 1) - ${mathNumber(r)}}{${mathNumber(K0)} \cdot (${mathNumber(q, 4)} - 1) - ${mathNumber(r)}} = ${mathNumber(qnIso, 4)}`} />
           </p>
           <p>
-            <InlineMath math={latex`n = \frac{\ln(q^n)}{\ln(q)} = \frac{\ln(${mathNumber(qnIso, 4)})}{\ln(${mathNumber(q, 4)})} = ${n}`} />
+            <InlineMath math={latex`n = \log_q(q^n) = \log_q(${mathNumber(qnIso, 4)}) = ${n}`} />
           </p>
         </div>
       );
@@ -881,7 +881,7 @@ const createRentenEndwertTask = (): Task => {
             <InlineMath math={latex`q^n = 1 + \frac{${mathNumber(Kn)} \cdot (${mathNumber(q, 4)} - 1)}{${mathNumber(r)}} = ${mathNumber(qn, 4)}`} />
           </p>
           <p>
-            <InlineMath math={latex`n = \frac{\ln(q^n)}{\ln(q)} = \frac{\ln(${mathNumber(qn, 4)})}{\ln(${mathNumber(q, 4)})} = ${n}`} />
+            <InlineMath math={latex`n = \log_q(q^n) = \log_q(${mathNumber(qn, 4)}) = ${n}`} />
           </p>
         </div>
       );
