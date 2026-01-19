@@ -19,7 +19,7 @@ type FilterType = TaskType | 'mixed' | 'renten_bundled';
 type SimpleInterestVariant = 'Z' | 'K' | 'p' | 't';
 type ZinseszinsVariant = 'Kn' | 'K0' | 'p' | 'n';
 type KapitalmehrungVariant = 'Kn' | 'K0' | 'r' | 'n';
-type RentenVariant = 'Kn' | 'r';
+type RentenVariant = 'Kn' | 'r' | 'p' | 'n';
 type KapitalminderungVariant = 'Kn' | 'K0' | 'r' | 'n';
 
 interface TaskInput {
@@ -788,7 +788,7 @@ const createRentenEndwertTask = (): Task => {
   const q = 1 + p / 100;
   const qn = Math.pow(q, n);
   const Kn = (r * (qn - 1)) / (q - 1);
-  const variant = randomChoice<RentenVariant>(['Kn', 'r']);
+  const variant = randomChoice<RentenVariant>(['Kn', 'r', 'p', 'n']);
 
   const story = <p>{randomChoice(rentenContexts)}</p>;
   const areaLabel = 'nachschüssige Rentensparrate';
@@ -856,6 +856,67 @@ const createRentenEndwertTask = (): Task => {
       );
       break;
     }
+    case 'p':
+      question = (
+        <div className="space-y-2">
+          {story}
+          <p>
+            Rate: <strong>{formatCurrency(r)} €</strong>, Endwert: <strong>{formatCurrency(Kn)} €</strong>, Laufzeit:{' '}
+            <strong>{n} Jahre</strong>.
+          </p>
+          <p className="text-sm text-slate-600">
+            Nachschüssige Rente ohne Startkapital: Der Zinssatz bestimmt das Wachstum.
+          </p>
+          <p className="text-blue-900 font-semibold">Welcher Zinssatz steckt dahinter?</p>
+        </div>
+      );
+      inputs = [createInputField('p', 'Zinssatz', '%', 'z.B. 3,2', p, 0.05, 2)];
+      solution = (
+        <div className="space-y-2">
+          {solutionIntro}
+          <p>
+            <InlineMath math={latex`\frac{K_n}{r} = \frac{q^n - 1}{q - 1}`} />
+          </p>
+          <p>
+            Diese Gleichung wird nach <InlineMath math={latex`q`} /> gelöst (z.&nbsp;B. Tabellenkalkulation/Solver).
+          </p>
+          <p>
+            Für die gegebenen Werte erhält man <InlineMath math={latex`q \approx ${mathNumber(q, 4)}`} /> und damit{' '}
+            <InlineMath math={latex`p = (q - 1) \cdot 100 = ${formatNumber(p, 2)}\,\%`} />.
+          </p>
+        </div>
+      );
+      break;
+    case 'n':
+      question = (
+        <div className="space-y-2">
+          {story}
+          <p>
+            Rate: <strong>{formatCurrency(r)} €</strong>, Zinssatz: <strong>{formatNumber(p, 2)} %</strong>, Endwert:{' '}
+            <strong>{formatCurrency(Kn)} €</strong>.
+          </p>
+          <p className="text-sm text-slate-600">
+            Alle Einzahlungen erfolgen nachschüssig bei leerem Startkonto.
+          </p>
+          <p className="text-blue-900 font-semibold">Wie lange muss gespart werden?</p>
+        </div>
+      );
+      inputs = [createInputField('n', 'Jahre', 'Jahre', 'z.B. 6', n, 0.05, 0)];
+      solution = (
+        <div className="space-y-1">
+          {solutionIntro}
+          <p>
+            <InlineMath math={latex`q^n = 1 + \frac{K_n (q - 1)}{r}`} />
+          </p>
+          <p>
+            <InlineMath math={latex`q^n = 1 + \frac{${mathNumber(Kn)} \cdot (${mathNumber(q, 4)} - 1)}{${mathNumber(r)}} = ${mathNumber(qn, 4)}`} />
+          </p>
+          <p>
+            <InlineMath math={latex`n = \frac{\ln(q^n)}{\ln(q)} = \frac{\ln(${mathNumber(qn, 4)})}{\ln(${mathNumber(q, 4)})} = ${n}`} />
+          </p>
+        </div>
+      );
+      break;
     default:
       break;
   }
