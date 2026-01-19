@@ -41,6 +41,11 @@ export default function AnwendungsUebungsaufgaben() {
           <p className="text-slate-600">Löse realistische Anwendungsaufgaben zur Flächengeometrie.</p>
         </div>
 
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-900">
+          <p className="font-semibold mb-2">⚠️ Achtung!</p>
+          <p>In den abgebildeten Aufgaben werden folgende Themen geprüft: Flächengeometrie (z.B. Raute, Trapez, Kreis), der Satz des Pythagoras und die Srahlensätze. Du solltest diese Themen gut beherrschen :-)</p>
+        </div>
+
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
           {applications.map(({ href, label, desc, icon: Icon }) => (
             <Link
