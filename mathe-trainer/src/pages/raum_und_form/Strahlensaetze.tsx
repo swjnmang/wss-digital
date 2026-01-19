@@ -352,16 +352,19 @@ function drawRays(api: any, task: RayTask) {
     const angle1 = 35;
     const angle2 = -35;
 
+    // Startpunkt O
     api.evalCommand(`O=(${originX},${originY})`);
     api.setPointStyle("O", 0);
     api.setLabelVisible("O", true);
 
+    // Zwei Strahlen von O
     const rad1 = (angle1 * Math.PI) / 180;
     const endX1 = originX + 10 * Math.cos(rad1);
     const endY1 = originY + 10 * Math.sin(rad1);
     api.evalCommand(`ray1 = Ray(O, (${endX1.toFixed(2)}, ${endY1.toFixed(2)}))`);
     api.setColor("ray1", 100, 150, 200);
     api.setLineThickness("ray1", 2);
+    api.setLabelVisible("ray1", false);
 
     const rad2 = (angle2 * Math.PI) / 180;
     const endX2 = originX + 10 * Math.cos(rad2);
@@ -369,12 +372,15 @@ function drawRays(api: any, task: RayTask) {
     api.evalCommand(`ray2 = Ray(O, (${endX2.toFixed(2)}, ${endY2.toFixed(2)}))`);
     api.setColor("ray2", 150, 100, 200);
     api.setLineThickness("ray2", 2);
+    api.setLabelVisible("ray2", false);
 
-    const p = task.p / 2;
-    const q = task.q / 2;
-    const r = task.r / 2;
+    // Skalierung für Punkte
+    const p = task.p / 2.5;
+    const q = task.q / 2.5;
+    const r = task.r / 2.5;
     const s = (p * r) / q;
 
+    // Punkte auf den Strahlen
     const x_p = originX + p * Math.cos(rad1);
     const y_p = originY + p * Math.sin(rad1);
     const x_q = originX + q * Math.cos(rad1);
@@ -384,28 +390,48 @@ function drawRays(api: any, task: RayTask) {
     const x_s = originX + s * Math.cos(rad2);
     const y_s = originY + s * Math.sin(rad2);
 
+    // Punkte definieren
     api.evalCommand(`P=(${x_p.toFixed(2)}, ${y_p.toFixed(2)})`);
     api.evalCommand(`Q=(${x_q.toFixed(2)}, ${y_q.toFixed(2)})`);
     api.evalCommand(`R=(${x_r.toFixed(2)}, ${y_r.toFixed(2)})`);
     api.evalCommand(`S=(${x_s.toFixed(2)}, ${y_s.toFixed(2)})`);
 
+    // Punkte styling
     ["P", "Q", "R", "S"].forEach(pt => {
       api.setPointStyle(pt, 0);
       api.setLabelVisible(pt, true);
     });
 
+    // ERSTE parallele Gerade: durch P und R
     if (task.type.includes("ray1")) {
+      // Richtungsvektor perpendicular zu den Strahlen für die parallelen Geraden
+      const perpDir = { x: -Math.sin(rad1), y: Math.cos(rad1) };
+      
+      // Erste Gerade durch P und R (mit etwas Offset perpendicular)
+      const g1_start_x = x_p + 0.5 * perpDir.x;
+      const g1_start_y = y_p + 0.5 * perpDir.y;
+      const g1_end_x = x_r + 0.5 * perpDir.x;
+      const g1_end_y = y_r + 0.5 * perpDir.y;
+      
       api.evalCommand(
-        `g1 = Line(P, (${(x_p + 1).toFixed(2)}, ${(y_p + 0.5).toFixed(2)}))`
+        `g1 = Line((${g1_start_x.toFixed(2)}, ${g1_start_y.toFixed(2)}), (${g1_end_x.toFixed(2)}, ${g1_end_y.toFixed(2)}))`
       );
       api.setColor("g1", 50, 150, 50);
       api.setLineThickness("g1", 2);
+      api.setLabelVisible("g1", false);
 
+      // ZWEITE parallele Gerade: durch Q und S
+      const g2_start_x = x_q + 0.5 * perpDir.x;
+      const g2_start_y = y_q + 0.5 * perpDir.y;
+      const g2_end_x = x_s + 0.5 * perpDir.x;
+      const g2_end_y = y_s + 0.5 * perpDir.y;
+      
       api.evalCommand(
-        `g2 = Line(Q, (${(x_q + 1).toFixed(2)}, ${(y_q + 0.5).toFixed(2)}))`
+        `g2 = Line((${g2_start_x.toFixed(2)}, ${g2_start_y.toFixed(2)}), (${g2_end_x.toFixed(2)}, ${g2_end_y.toFixed(2)}))`
       );
       api.setColor("g2", 50, 150, 50);
       api.setLineThickness("g2", 2);
+      api.setLabelVisible("g2", false);
     }
 
     api.setCoordSystem(-1, 11, -4, 6);
