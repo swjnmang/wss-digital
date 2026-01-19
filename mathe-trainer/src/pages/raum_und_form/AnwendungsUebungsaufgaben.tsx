@@ -22,6 +22,12 @@ const applications: ApplicationItem[] = [
     label: "Das Haus", 
     desc: "Berechne Flächen und Strecken am Hausplan",
     icon: BookOpen 
+  },
+  { 
+    href: "/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/die-leinwand", 
+    label: "Die Leinwand", 
+    desc: "Löse realistische Anwendungsaufgaben mit verschiedenen Formen",
+    icon: BookOpen 
   }
 ];
 
