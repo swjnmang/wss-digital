@@ -17,28 +17,44 @@ type RayTask = {
 };
 
 function generateTask(): RayTask {
-  const taskType = Math.floor(Math.random() * 5);
-  
+  // Zufällig eine der 8 Aufgaben auswählen
+  const taskIndex = Math.floor(Math.random() * 8);
   const p = randomBetween(2, 5);
   const q = randomBetween(6, 10);
   const r = randomBetween(3, 6);
 
+  const createTask = (
+    type: "ray1_segment" | "ray1_ratio" | "ray2_segment" | "ray2_ratio" | "similarity",
+    scenario: number,
+    expectedAnswer: number,
+    description: string,
+    hint: string,
+    solution: string[]
+  ): RayTask => ({
+    type,
+    scenario,
+    p,
+    q,
+    r,
+    expectedAnswer,
+    unit: "cm",
+    tolerance: 0.2,
+    description,
+    hint,
+    solution
+  });
+
   const tasks: RayTask[] = [
-    // Strahlensatz 1 - Aufgabe 1: |OS| berechnen
-    {
-      type: "ray1_segment",
-      scenario: 0,
-      p,
-      q,
-      r,
-      expectedAnswer: (q * r) / p,
-      unit: "cm",
-      tolerance: 0.2,
-      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
+    // Aufgabe 0: |OS| berechnen
+    createTask(
+      "ray1_segment",
+      0,
+      (q * r) / p,
+      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
       Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
       Gesucht ist: |OS|`,
-      hint: "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OS| um!",
-      solution: [
+      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OS| um!",
+      [
         "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
         "",
         `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/|OS|`,
@@ -46,22 +62,17 @@ function generateTask(): RayTask {
         `|OS| = ${r.toFixed(1)} × ${q.toFixed(1)} / ${p.toFixed(1)}`,
         `|OS| = ${((q * r) / p).toFixed(2)} cm`
       ]
-    },
-    // Strahlensatz 1 - Aufgabe 2: |OQ| berechnen
-    {
-      type: "ray1_segment",
-      scenario: 1,
-      p,
+    ),
+    // Aufgabe 1: |OQ| berechnen
+    createTask(
+      "ray1_segment",
+      1,
       q,
-      r,
-      expectedAnswer: q,
-      unit: "cm",
-      tolerance: 0.2,
-      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm, |OS| = ${((q * r) / p).toFixed(1)} cm.
+      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm, |OS| = ${((q * r) / p).toFixed(1)} cm.
       Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
       Gesucht ist: |OQ|`,
-      hint: "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OQ| um!",
-      solution: [
+      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OQ| um!",
+      [
         "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
         "",
         `${p.toFixed(1)}/|OQ| = ${r.toFixed(1)}/${((q * r) / p).toFixed(1)}`,
@@ -69,22 +80,17 @@ function generateTask(): RayTask {
         `|OQ| = ${p.toFixed(1)} × ${((q * r) / p).toFixed(1)} / ${r.toFixed(1)}`,
         `|OQ| = ${q.toFixed(2)} cm`
       ]
-    },
-    // Strahlensatz 1 - Aufgabe 3: |OR| berechnen
-    {
-      type: "ray1_segment",
-      scenario: 2,
-      p,
-      q,
-      r,
-      expectedAnswer: (p * r) / q,
-      unit: "cm",
-      tolerance: 0.2,
-      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OS| = ${r.toFixed(1)} cm.
+    ),
+    // Aufgabe 2: |OR| berechnen
+    createTask(
+      "ray1_segment",
+      2,
+      (p * r) / q,
+      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OS| = ${r.toFixed(1)} cm.
       Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
       Gesucht ist: |OR|`,
-      hint: "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OR| um!",
-      solution: [
+      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OR| um!",
+      [
         "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
         "",
         `${p.toFixed(1)}/${q.toFixed(1)} = |OR|/${r.toFixed(1)}`,
@@ -92,44 +98,34 @@ function generateTask(): RayTask {
         `|OR| = ${p.toFixed(1)} × ${r.toFixed(1)} / ${q.toFixed(1)}`,
         `|OR| = ${((p * r) / q).toFixed(2)} cm`
       ]
-    },
-    // Strahlensatz 1 - Aufgabe 4: |PQ| berechnen
-    {
-      type: "ray1_segment",
-      scenario: 3,
-      p,
-      q,
-      r,
-      expectedAnswer: q - p,
-      unit: "cm",
-      tolerance: 0.2,
-      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
+    ),
+    // Aufgabe 3: |PQ| berechnen
+    createTask(
+      "ray1_segment",
+      3,
+      q - p,
+      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
       Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
       Gesucht ist: |PQ| (die Strecke zwischen P und Q auf dem ersten Strahl)`,
-      hint: "|PQ| = |OQ| - |OP|",
-      solution: [
+      "|PQ| = |OQ| - |OP|",
+      [
         "Die Strecke |PQ| ist die Differenz zwischen |OQ| und |OP|.",
         "",
         `|PQ| = |OQ| - |OP|`,
         `|PQ| = ${q.toFixed(1)} - ${p.toFixed(1)}`,
         `|PQ| = ${(q - p).toFixed(2)} cm`
       ]
-    },
-    // Strahlensatz 2 - Aufgabe 5: |CD| berechnen
-    {
-      type: "ray2_segment",
-      scenario: 4,
-      p,
-      q,
-      r,
-      expectedAnswer: (r * q) / p,
-      unit: "cm",
-      tolerance: 0.2,
-      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |AB| = ${r.toFixed(1)} cm.
+    ),
+    // Aufgabe 4: |CD| berechnen
+    createTask(
+      "ray2_segment",
+      4,
+      (r * q) / p,
+      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |AB| = ${r.toFixed(1)} cm.
       Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Die Geraden durch P und R sowie durch Q und S sind parallel.
       Gesucht ist: |CD| (Länge der zweiten parallelen Gerade)`,
-      hint: "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|. Stelle nach |CD| um!",
-      solution: [
+      "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|. Stelle nach |CD| um!",
+      [
         "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|",
         "",
         `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/|CD|`,
@@ -137,22 +133,17 @@ function generateTask(): RayTask {
         `|CD| = ${r.toFixed(1)} × ${q.toFixed(1)} / ${p.toFixed(1)}`,
         `|CD| = ${((r * q) / p).toFixed(2)} cm`
       ]
-    },
-    // Strahlensatz 1 - Aufgabe 6: |RS| berechnen
-    {
-      type: "ray1_segment",
-      scenario: 5,
-      p,
-      q,
-      r,
-      expectedAnswer: ((q * r) / p) - r,
-      unit: "cm",
-      tolerance: 0.2,
-      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
+    ),
+    // Aufgabe 5: |RS| berechnen
+    createTask(
+      "ray1_segment",
+      5,
+      ((q * r) / p) - r,
+      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
       Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
       Gesucht ist: |RS| (die Strecke zwischen R und S auf dem zweiten Strahl)`,
-      hint: "Berechne zuerst |OS| mit dem Strahlensatz, dann |RS| = |OS| - |OR|",
-      solution: [
+      "Berechne zuerst |OS| mit dem Strahlensatz, dann |RS| = |OS| - |OR|",
+      [
         "Zuerst berechnen wir |OS| mit Strahlensatz 1:",
         `|OP|/|OQ| = |OR|/|OS|`,
         `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/|OS|`,
@@ -163,22 +154,17 @@ function generateTask(): RayTask {
         `|RS| = ${((q * r) / p).toFixed(2)} - ${r.toFixed(1)}`,
         `|RS| = ${(((q * r) / p) - r).toFixed(2)} cm`
       ]
-    },
-    // Strahlensatz 2 - Aufgabe 7: |AB| berechnen
-    {
-      type: "ray2_segment",
-      scenario: 6,
-      p,
-      q,
-      r,
-      expectedAnswer: (r * p) / q,
-      unit: "cm",
-      tolerance: 0.2,
-      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |CD| = ${r.toFixed(1)} cm.
+    ),
+    // Aufgabe 6: |AB| berechnen
+    createTask(
+      "ray2_segment",
+      6,
+      (r * p) / q,
+      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |CD| = ${r.toFixed(1)} cm.
       Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Die Geraden durch P und R sowie durch Q und S sind parallel.
       Gesucht ist: |AB| (Länge der ersten parallelen Gerade)`,
-      hint: "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|. Stelle nach |AB| um!",
-      solution: [
+      "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|. Stelle nach |AB| um!",
+      [
         "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|",
         "",
         `${p.toFixed(1)}/${q.toFixed(1)} = |AB|/${r.toFixed(1)}`,
@@ -186,22 +172,17 @@ function generateTask(): RayTask {
         `|AB| = ${p.toFixed(1)} × ${r.toFixed(1)} / ${q.toFixed(1)}`,
         `|AB| = ${((r * p) / q).toFixed(2)} cm`
       ]
-    },
-    // Strahlensatz 1 - Aufgabe 8: Weitere Variante
-    {
-      type: "ray1_segment",
-      scenario: 7,
-      p,
-      q,
-      r,
-      expectedAnswer: (q * r) / p,
-      unit: "cm",
-      tolerance: 0.2,
-      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
+    ),
+    // Aufgabe 7: |OS| berechnen (Wiederholung mit neuen Werten)
+    createTask(
+      "ray1_segment",
+      7,
+      (q * r) / p,
+      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
       Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
       Gesucht ist: |OS|`,
-      hint: "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OS| um!",
-      solution: [
+      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OS| um!",
+      [
         "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
         "",
         `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/|OS|`,
@@ -209,10 +190,10 @@ function generateTask(): RayTask {
         `|OS| = ${r.toFixed(1)} × ${q.toFixed(1)} / ${p.toFixed(1)}`,
         `|OS| = ${((q * r) / p).toFixed(2)} cm`
       ]
-    }
+    )
   ];
 
-  return tasks[taskType % tasks.length];
+  return tasks[taskIndex];
 }
 
 const cardClass = "rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6";
@@ -421,33 +402,58 @@ function drawRays(api: any, task: RayTask) {
     api.reset();
     api.setGridVisible(false);
     api.setAxesVisible(false, false);
-    api.setPointSize(5);
+    api.setPointSize(6);
 
-    const originX = 2;
-    const originY = 1;
-    const angle1 = 35;
-    const angle2 = -35;
+    // Zufällige Position und Winkel für O
+    const originVariant = Math.floor(Math.random() * 4);
+    let originX, originY, angle1, angle2;
+    
+    if (originVariant === 0) {
+      // Links unten
+      originX = 1.5;
+      originY = 1.5;
+      angle1 = 30;
+      angle2 = -30;
+    } else if (originVariant === 1) {
+      // Rechts oben
+      originX = 8;
+      originY = 3.5;
+      angle1 = 160;
+      angle2 = -160;
+    } else if (originVariant === 2) {
+      // Mitte
+      originX = 4;
+      originY = 2;
+      angle1 = 50;
+      angle2 = -50;
+    } else {
+      // Rechts unten
+      originX = 7.5;
+      originY = 1;
+      angle1 = 120;
+      angle2 = -120;
+    }
 
     // Startpunkt O
     api.evalCommand(`O=(${originX},${originY})`);
     api.setPointStyle("O", 0);
     api.setLabelVisible("O", true);
 
-    // Zwei Strahlen von O
+    // Zwei Strahlen - SCHWARZ und DICK
     const rad1 = (angle1 * Math.PI) / 180;
     const endX1 = originX + 10 * Math.cos(rad1);
     const endY1 = originY + 10 * Math.sin(rad1);
     api.evalCommand(`ray1 = Ray(O, (${endX1.toFixed(2)}, ${endY1.toFixed(2)}))`);
-    api.setColor("ray1", 100, 150, 200);
-    api.setLineThickness("ray1", 2);
+    api.setColor("ray1", 0, 0, 0);
+    api.setLineThickness("ray1", 4);
     api.setLabelVisible("ray1", false);
 
     const rad2 = (angle2 * Math.PI) / 180;
     const endX2 = originX + 10 * Math.cos(rad2);
     const endY2 = originY + 10 * Math.sin(rad2);
     api.evalCommand(`ray2 = Ray(O, (${endX2.toFixed(2)}, ${endY2.toFixed(2)}))`);
-    api.setColor("ray2", 150, 100, 200);
-    api.setLineThickness("ray2", 2);
+    api.setColor("ray2", 0, 0, 0);
+    api.setLineThickness("ray2", 4);
     api.setLabelVisible("ray2", false);
 
     // Skalierung für Punkte
@@ -478,18 +484,18 @@ function drawRays(api: any, task: RayTask) {
       api.setLabelVisible(pt, true);
     });
 
-    // Parallele Geraden (wenn Strahlensatz 1)
+    // Parallele Geraden - GRÜN und DICK
     if (task.type.includes("ray1")) {
       // Gerade 1 durch Q und R
       api.evalCommand(`g1 = Line(Q, R)`);
-      api.setColor("g1", 50, 150, 50);
-      api.setLineThickness("g1", 2);
+      api.setColor("g1", 34, 139, 34);
+      api.setLineThickness("g1", 3);
       api.setLabelVisible("g1", false);
 
       // Gerade 2 durch P und S (parallel zu g1)
       api.evalCommand(`g2 = Line(P, S)`);
-      api.setColor("g2", 50, 150, 50);
-      api.setLineThickness("g2", 2);
+      api.setColor("g2", 34, 139, 34);
+      api.setLineThickness("g2", 3);
       api.setLabelVisible("g2", false);
     }
 
