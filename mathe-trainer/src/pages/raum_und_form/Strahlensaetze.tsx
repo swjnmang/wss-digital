@@ -399,15 +399,16 @@ function drawRays(api: any, task: RayTask) {
       api.setLabelVisible(pt, true);
     });
 
-    // ERSTE parallele Gerade: durch P und R
+    // Parallele Geraden (wenn Strahlensatz 1)
     if (task.type.includes("ray1")) {
-      api.evalCommand(`g1 = Line(P, R)`);
+      // Gerade 1 durch Q und R
+      api.evalCommand(`g1 = Line(Q, R)`);
       api.setColor("g1", 50, 150, 50);
       api.setLineThickness("g1", 2);
       api.setLabelVisible("g1", false);
 
-      // ZWEITE parallele Gerade: durch Q und S
-      api.evalCommand(`g2 = Line(Q, S)`);
+      // Gerade 2 durch P und S (parallel zu g1)
+      api.evalCommand(`g2 = Line(P, S)`);
       api.setColor("g2", 50, 150, 50);
       api.setLineThickness("g2", 2);
       api.setLabelVisible("g2", false);
