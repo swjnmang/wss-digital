@@ -383,13 +383,6 @@ export default function DieLeinwand() {
           </div>
         )}
 
-        {/* Hinweis, wenn noch nicht versucht */}
-        {!currentHasAttempted && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
-            <p>💡 Der Rechenweg wird nach einer falschen Antwort angezeigt.</p>
-          </div>
-        )}
-
         {/* Navigation */}
         <div className="flex gap-3 justify-between pt-4 border-t border-slate-200">
           <button
