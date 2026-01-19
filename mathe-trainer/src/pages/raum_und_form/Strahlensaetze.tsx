@@ -34,8 +34,8 @@ function generateTask(): RayTask {
       expectedAnswer: (q * r) / p,
       unit: "cm",
       tolerance: 0.2,
-      description: `Gegeben sind: Zwei Strahlen mit gemeinsamen Startpunkt O werden von zwei parallelen Geraden geschnitten.
-      |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
+      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
+      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
       Gesucht ist: |OS|`,
       hint: "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OS| um!",
       solution: [
@@ -54,20 +54,20 @@ function generateTask(): RayTask {
       p,
       q,
       r,
-      expectedAnswer: (p * r) / q + p,
+      expectedAnswer: q,
       unit: "cm",
-      tolerance: 0.3,
-      description: `Gegeben sind: Zwei Strahlen mit gemeinsamen Startpunkt O werden von zwei parallelen Geraden geschnitten.
-      |OP| = ${p.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm, |OS| = ${((p * r) / q + r).toFixed(1)} cm.
+      tolerance: 0.2,
+      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm, |OS| = ${((q * r) / p).toFixed(1)} cm.
+      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
       Gesucht ist: |OQ|`,
       hint: "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OQ| um!",
       solution: [
         "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
         "",
-        `${p.toFixed(1)}/|OQ| = ${r.toFixed(1)}/${((p * r) / q + r).toFixed(1)}`,
+        `${p.toFixed(1)}/|OQ| = ${r.toFixed(1)}/${((q * r) / p).toFixed(1)}`,
         "",
-        `|OQ| = ${p.toFixed(1)} × ${((p * r) / q + r).toFixed(1)} / ${r.toFixed(1)}`,
-        `|OQ| = ${(p * ((p * r) / q + r) / r).toFixed(2)} cm`
+        `|OQ| = ${p.toFixed(1)} × ${((q * r) / p).toFixed(1)} / ${r.toFixed(1)}`,
+        `|OQ| = ${q.toFixed(2)} cm`
       ]
     },
     // Strahlensatz 1 - Aufgabe 3: |OR| berechnen
@@ -80,8 +80,8 @@ function generateTask(): RayTask {
       expectedAnswer: (p * r) / q,
       unit: "cm",
       tolerance: 0.2,
-      description: `Gegeben sind: Zwei Strahlen mit gemeinsamen Startpunkt O werden von zwei parallelen Geraden geschnitten.
-      |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OS| = ${r.toFixed(1)} cm.
+      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OS| = ${r.toFixed(1)} cm.
+      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
       Gesucht ist: |OR|`,
       hint: "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OR| um!",
       solution: [
@@ -93,7 +93,7 @@ function generateTask(): RayTask {
         `|OR| = ${((p * r) / q).toFixed(2)} cm`
       ]
     },
-    // Strahlensatz 1 - Aufgabe 4: PQ-Strecke berechnen
+    // Strahlensatz 1 - Aufgabe 4: |PQ| berechnen
     {
       type: "ray1_segment",
       scenario: 3,
@@ -103,19 +103,19 @@ function generateTask(): RayTask {
       expectedAnswer: q - p,
       unit: "cm",
       tolerance: 0.2,
-      description: `Gegeben sind: Zwei Strahlen mit gemeinsamen Startpunkt O werden von zwei parallelen Geraden geschnitten.
-      |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
-      Gesucht ist: |PQ| (die Strecke zwischen P und Q)`,
+      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
+      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
+      Gesucht ist: |PQ| (die Strecke zwischen P und Q auf dem ersten Strahl)`,
       hint: "|PQ| = |OQ| - |OP|",
       solution: [
-        "Die Strecke |PQ| ist der Abstand zwischen den Punkten P und Q auf dem Strahl.",
+        "Die Strecke |PQ| ist die Differenz zwischen |OQ| und |OP|.",
         "",
         `|PQ| = |OQ| - |OP|`,
         `|PQ| = ${q.toFixed(1)} - ${p.toFixed(1)}`,
         `|PQ| = ${(q - p).toFixed(2)} cm`
       ]
     },
-    // Strahlensatz 2 - Aufgabe 5: Parallele Strecke berechnen
+    // Strahlensatz 2 - Aufgabe 5: |CD| berechnen
     {
       type: "ray2_segment",
       scenario: 4,
@@ -125,9 +125,9 @@ function generateTask(): RayTask {
       expectedAnswer: (r * q) / p,
       unit: "cm",
       tolerance: 0.2,
-      description: `Gegeben sind: Zwei Strahlen werden von zwei parallelen Geraden geschnitten.
-      |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |AB| = ${r.toFixed(1)} cm (erste parallele Gerade).
-      Gesucht ist: |CD| (zweite parallele Gerade)`,
+      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |AB| = ${r.toFixed(1)} cm.
+      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Die Geraden durch P und R sowie durch Q und S sind parallel.
+      Gesucht ist: |CD| (Länge der zweiten parallelen Gerade)`,
       hint: "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|. Stelle nach |CD| um!",
       solution: [
         "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|",
@@ -138,7 +138,7 @@ function generateTask(): RayTask {
         `|CD| = ${((r * q) / p).toFixed(2)} cm`
       ]
     },
-    // Strahlensatz 1 - Aufgabe 6: RS-Strecke berechnen
+    // Strahlensatz 1 - Aufgabe 6: |RS| berechnen
     {
       type: "ray1_segment",
       scenario: 5,
@@ -148,9 +148,9 @@ function generateTask(): RayTask {
       expectedAnswer: ((q * r) / p) - r,
       unit: "cm",
       tolerance: 0.2,
-      description: `Gegeben sind: Zwei Strahlen mit gemeinsamen Startpunkt O werden von zwei parallelen Geraden geschnitten.
-      |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
-      Gesucht ist: |RS| (die Strecke zwischen R und S)`,
+      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
+      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
+      Gesucht ist: |RS| (die Strecke zwischen R und S auf dem zweiten Strahl)`,
       hint: "Berechne zuerst |OS| mit dem Strahlensatz, dann |RS| = |OS| - |OR|",
       solution: [
         "Zuerst berechnen wir |OS| mit Strahlensatz 1:",
@@ -164,7 +164,7 @@ function generateTask(): RayTask {
         `|RS| = ${(((q * r) / p) - r).toFixed(2)} cm`
       ]
     },
-    // Strahlensatz 2 - Aufgabe 7: Andere Parallele berechnen
+    // Strahlensatz 2 - Aufgabe 7: |AB| berechnen
     {
       type: "ray2_segment",
       scenario: 6,
@@ -174,9 +174,9 @@ function generateTask(): RayTask {
       expectedAnswer: (r * p) / q,
       unit: "cm",
       tolerance: 0.2,
-      description: `Gegeben sind: Zwei Strahlen werden von zwei parallelen Geraden geschnitten.
-      |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |CD| = ${r.toFixed(1)} cm (zweite parallele Gerade).
-      Gesucht ist: |AB| (erste parallele Gerade)`,
+      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |CD| = ${r.toFixed(1)} cm.
+      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Die Geraden durch P und R sowie durch Q und S sind parallel.
+      Gesucht ist: |AB| (Länge der ersten parallelen Gerade)`,
       hint: "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|. Stelle nach |AB| um!",
       solution: [
         "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|",
@@ -187,27 +187,27 @@ function generateTask(): RayTask {
         `|AB| = ${((r * p) / q).toFixed(2)} cm`
       ]
     },
-    // Strahlensatz 1 - Aufgabe 8: OP berechnen
+    // Strahlensatz 1 - Aufgabe 8: Weitere Variante
     {
       type: "ray1_segment",
       scenario: 7,
       p,
       q,
       r,
-      expectedAnswer: (p * r) / (q - p + r),
+      expectedAnswer: (q * r) / p,
       unit: "cm",
-      tolerance: 0.3,
-      description: `Gegeben sind: Zwei Strahlen mit gemeinsamen Startpunkt O werden von zwei parallelen Geraden geschnitten.
-      |PQ| = ${(q-p).toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm, |RS| = ${((q * r) / p - r).toFixed(1)} cm.
-      Gesucht ist: |OP|`,
-      hint: "Nutze: |PQ|/|RS| = |OP|/|OR| (Folgerung aus Strahlensatz 1)",
+      tolerance: 0.2,
+      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
+      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
+      Gesucht ist: |OS|`,
+      hint: "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OS| um!",
       solution: [
-        "Aus dem Strahlensatz folgt: |PQ|/|RS| = |OP|/|OR|",
+        "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
         "",
-        `${(q-p).toFixed(1)}/${((q * r) / p - r).toFixed(1)} = |OP|/${r.toFixed(1)}`,
+        `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/|OS|`,
         "",
-        `|OP| = ${(q-p).toFixed(1)} × ${r.toFixed(1)} / ${((q * r) / p - r).toFixed(1)}`,
-        `|OP| ≈ ${((p * r) / (q - p + r)).toFixed(2)} cm`
+        `|OS| = ${r.toFixed(1)} × ${q.toFixed(1)} / ${p.toFixed(1)}`,
+        `|OS| = ${((q * r) / p).toFixed(2)} cm`
       ]
     }
   ];
