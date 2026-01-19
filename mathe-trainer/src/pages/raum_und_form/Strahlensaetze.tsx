@@ -34,17 +34,19 @@ function generateTask(): RayTask {
       expectedAnswer: (q * r) / p,
       unit: "cm",
       tolerance: 0.2,
-      description: `Gegeben sind: Zwei Strahlen mit gemeinsamen Startpunkt O. Parallele Geraden schneiden die Strahlen.
-      P = ${p.toFixed(1)} cm, Q = ${q.toFixed(1)} cm, R = ${r.toFixed(1)} cm.
-      Gesucht ist: Die Strecke S.`,
-      hint: "Nutze den 1. Strahlensatz: P/Q = R/S. Stelle nach S um!",
+      description: `Gegeben sind: Zwei Strahlen mit gemeinsamen Startpunkt O werden von zwei parallelen Geraden geschnitten.
+      |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
+      Gesucht ist: Die Länge der Strecke |OS|.`,
+      hint: "Nutze den 1. Strahlensatz: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OS| um!",
       solution: [
-        "Strahlensatz 1: P/Q = R/S",
+        "Strahlensatz 1 (1. Strahlensatz): Wenn zwei Geraden von zwei Strahlen parallel geschnitten werden, dann verhalten sich die Abschnitte auf dem einen Strahl wie die entsprechenden Abschnitte auf dem anderen Strahl.",
         "",
-        `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/S`,
+        "|OP|/|OQ| = |OR|/|OS|",
         "",
-        `S = ${r.toFixed(1)} × ${q.toFixed(1)} / ${p.toFixed(1)}`,
-        `S = ${((q * r) / p).toFixed(2)} cm`
+        `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/|OS|`,
+        "",
+        `|OS| = ${r.toFixed(1)} × ${q.toFixed(1)} / ${p.toFixed(1)}`,
+        `|OS| = ${((q * r) / p).toFixed(2)} cm`
       ]
     },
     // Strahlensatz 1: Verhältnis
@@ -57,14 +59,14 @@ function generateTask(): RayTask {
       expectedAnswer: p / q,
       unit: "",
       tolerance: 0.01,
-      description: `Gegeben sind: P = ${p.toFixed(1)} cm, Q = ${q.toFixed(1)} cm, R = ${r.toFixed(1)} cm, S = ${((q * r) / p).toFixed(1)} cm.
-      Gesucht ist: Das Verhältnis P:Q als Dezimalzahl.`,
-      hint: "Berechne P ÷ Q!",
+      description: `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm, |OS| = ${((q * r) / p).toFixed(1)} cm.
+      Gesucht ist: Das Verhältnis |OP| : |OQ| als Dezimalzahl.`,
+      hint: "Berechne |OP| ÷ |OQ|!",
       solution: [
-        "Verhältnis P:Q = P ÷ Q",
+        "Verhältnis |OP| : |OQ| = |OP| ÷ |OQ|",
         "",
-        `P:Q = ${p.toFixed(1)} ÷ ${q.toFixed(1)}`,
-        `P:Q = ${(p / q).toFixed(3)}`
+        `|OP| : |OQ| = ${p.toFixed(1)} ÷ ${q.toFixed(1)}`,
+        `|OP| : |OQ| = ${(p / q).toFixed(3)}`
       ]
     },
     // Strahlensatz 2
@@ -77,16 +79,19 @@ function generateTask(): RayTask {
       expectedAnswer: (r * q) / p,
       unit: "cm",
       tolerance: 0.2,
-      description: `Gegeben sind: Innere Strecke = ${p.toFixed(1)} cm, Äußere Strecke = ${q.toFixed(1)} cm, Erste parallele Strecke = ${r.toFixed(1)} cm.
-      Gesucht ist: Die zweite parallele Strecke.`,
-      hint: "Strahlensatz 2: p/q = parallele1/parallele2",
+      description: `Gegeben sind: Zwei Strahlen werden von zwei parallelen Geraden geschnitten.
+      |OP| = ${p.toFixed(1)} cm (innere Strecke), |PQ| = ${(q-p).toFixed(1)} cm (äußere Strecke), |AB| = ${r.toFixed(1)} cm (erste parallele Strecke).
+      Gesucht ist: Die Länge der zweiten parallelen Strecke |CD|.`,
+      hint: "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|",
       solution: [
-        "Strahlensatz 2: p/q = parallele1/parallele2",
+        "Strahlensatz 2: Wenn zwei parallele Geraden von zwei Strahlen geschnitten werden, dann verhalten sich die parallelen Strecken wie die Abschnitte auf einem Strahl.",
         "",
-        `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/parallele2`,
+        "|OP|/|OQ| = |AB|/|CD|",
         "",
-        `parallele2 = ${r.toFixed(1)} × ${q.toFixed(1)} / ${p.toFixed(1)}`,
-        `parallele2 = ${((r * q) / p).toFixed(2)} cm`
+        `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/|CD|`,
+        "",
+        `|CD| = ${r.toFixed(1)} × ${q.toFixed(1)} / ${p.toFixed(1)}`,
+        `|CD| = ${((r * q) / p).toFixed(2)} cm`
       ]
     },
     // Ähnlichkeit
@@ -99,12 +104,14 @@ function generateTask(): RayTask {
       expectedAnswer: p / q,
       unit: "",
       tolerance: 0.01,
-      description: `Gegeben sind: Zwei ähnliche Dreiecke. Seite des ersten Dreiecks = ${p.toFixed(1)} cm, entsprechende Seite des zweiten Dreiecks = ${q.toFixed(1)} cm.
-      Gesucht ist: Der Ähnlichkeitsfaktor k (Verhältnis der ähnlichen Dreiecke).`,
-      hint: "Ähnlichkeitsfaktor k = kleinere Seite ÷ größere Seite",
+      description: `Gegeben sind: Zwei ähnliche Dreiecke ABC und DEF.
+      |AB| = ${p.toFixed(1)} cm (Dreieck 1), |DE| = ${q.toFixed(1)} cm (entsprechende Seite in Dreieck 2).
+      Gesucht ist: Der Ähnlichkeitsfaktor k (Verhältnis der entsprechenden Seitenlängen).`,
+      hint: "Ähnlichkeitsfaktor k = (kleinere Seitenlänge) ÷ (größere Seitenlänge)",
       solution: [
-        "Ähnlichkeitsfaktor k = kleinere ÷ größere Seite",
+        "Ähnlichkeitsfaktor k ist das Verhältnis entsprechender Seitenlängen ähnlicher Figuren.",
         "",
+        `k = |AB| ÷ |DE|`,
         `k = ${p.toFixed(1)} ÷ ${q.toFixed(1)}`,
         `k = ${(p / q).toFixed(3)}`
       ]
@@ -119,16 +126,17 @@ function generateTask(): RayTask {
       expectedAnswer: (p * r) / q,
       unit: "cm",
       tolerance: 0.2,
-      description: `Gegeben sind: Q = ${q.toFixed(1)} cm, P = ${p.toFixed(1)} cm, R = ${r.toFixed(1)} cm.
-      Gesucht ist: Die Strecke S.`,
-      hint: "Q/P = S/R",
+      description: `Gegeben sind: Zwei Strahlen mit Startpunkt O werden von zwei parallelen Geraden geschnitten.
+      |OQ| = ${q.toFixed(1)} cm, |OP| = ${p.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
+      Gesucht ist: Die Länge der Strecke |OS|.`,
+      hint: "|OQ|/|OP| = |OS|/|OR|. Stelle nach |OS| um!",
       solution: [
-        "Q/P = S/R",
+        "Strahlensatz 1: |OQ|/|OP| = |OS|/|OR|",
         "",
-        `${q.toFixed(1)}/${p.toFixed(1)} = S/${r.toFixed(1)}`,
+        `${q.toFixed(1)}/${p.toFixed(1)} = |OS|/${r.toFixed(1)}`,
         "",
-        `S = ${r.toFixed(1)} × ${p.toFixed(1)} / ${q.toFixed(1)}`,
-        `S = ${((p * r) / q).toFixed(2)} cm`
+        `|OS| = ${r.toFixed(1)} × ${p.toFixed(1)} / ${q.toFixed(1)}`,
+        `|OS| = ${((p * r) / q).toFixed(2)} cm`
       ]
     }
   ];
