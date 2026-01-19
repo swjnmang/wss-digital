@@ -116,22 +116,22 @@ function generateTask(): RayTask {
         `|PQ| = ${(q - p).toFixed(2)} cm`
       ]
     ),
-    // Aufgabe 4: |CD| berechnen
+    // Aufgabe 4: |OQ| berechnen (Variante 2)
     createTask(
-      "ray2_segment",
+      "ray1_segment",
       4,
-      (r * q) / p,
-      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |AB| = ${r.toFixed(1)} cm.
-      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Die Geraden durch P und R sowie durch Q und S sind parallel.
-      Gesucht ist: |CD| (Länge der zweiten parallelen Gerade)`,
-      "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|. Stelle nach |CD| um!",
+      q,
+      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm, |OS| = ${((q * r) / p).toFixed(1)} cm.
+      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
+      Gesucht ist: |OQ|`,
+      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OQ| um!",
       [
-        "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|",
+        "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
         "",
-        `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/|CD|`,
+        `${p.toFixed(1)}/|OQ| = ${r.toFixed(1)}/${((q * r) / p).toFixed(1)}`,
         "",
-        `|CD| = ${r.toFixed(1)} × ${q.toFixed(1)} / ${p.toFixed(1)}`,
-        `|CD| = ${((r * q) / p).toFixed(2)} cm`
+        `|OQ| = ${p.toFixed(1)} × ${((q * r) / p).toFixed(1)} / ${r.toFixed(1)}`,
+        `|OQ| = ${q.toFixed(2)} cm`
       ]
     ),
     // Aufgabe 5: |RS| berechnen
@@ -155,22 +155,22 @@ function generateTask(): RayTask {
         `|RS| = ${(((q * r) / p) - r).toFixed(2)} cm`
       ]
     ),
-    // Aufgabe 6: |AB| berechnen
+    // Aufgabe 6: |OR| berechnen (Variante 2)
     createTask(
-      "ray2_segment",
+      "ray1_segment",
       6,
-      (r * p) / q,
-      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |CD| = ${r.toFixed(1)} cm.
-      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Die Geraden durch P und R sowie durch Q und S sind parallel.
-      Gesucht ist: |AB| (Länge der ersten parallelen Gerade)`,
-      "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|. Stelle nach |AB| um!",
+      (p * r) / q,
+      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OS| = ${r.toFixed(1)} cm.
+      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
+      Gesucht ist: |OR|`,
+      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OR| um!",
       [
-        "Strahlensatz 2: |OP|/|OQ| = |AB|/|CD|",
+        "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
         "",
-        `${p.toFixed(1)}/${q.toFixed(1)} = |AB|/${r.toFixed(1)}`,
+        `${p.toFixed(1)}/${q.toFixed(1)} = |OR|/${r.toFixed(1)}`,
         "",
-        `|AB| = ${p.toFixed(1)} × ${r.toFixed(1)} / ${q.toFixed(1)}`,
-        `|AB| = ${((r * p) / q).toFixed(2)} cm`
+        `|OR| = ${p.toFixed(1)} × ${r.toFixed(1)} / ${q.toFixed(1)}`,
+        `|OR| = ${((p * r) / q).toFixed(2)} cm`
       ]
     ),
     // Aufgabe 7: |OS| berechnen (Wiederholung mit neuen Werten)
