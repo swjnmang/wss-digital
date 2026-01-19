@@ -575,7 +575,7 @@ const createKapitalmehrungTask = (): Task => {
             <InlineMath math={latex`q = 1 + \frac{${mathNumber(p)}}{100} = ${mathNumber(q, 4)}`} />
           </p>
           <p>
-            <InlineMath math={latex`r = \left(${mathNumber(Kn)} - ${mathNumber(K0)} \\cdot ${mathNumber(q, 4)}^{${n}}\right) \\cdot \\frac{${mathNumber(q, 4)} - 1}{${mathNumber(q, 4)}^{${n}} - 1} = ${mathNumber(r, 4)}`} />
+            <InlineMath math={latex`r = \left(${mathNumber(Kn)} - ${mathNumber(K0)} \cdot ${mathNumber(q, 4)}^{${n}}\right) \cdot \frac{${mathNumber(q, 4)} - 1}{${mathNumber(q, 4)}^{${n}} - 1} = ${mathNumber(r, 4)}`} />
           </p>
         </div>
       );
@@ -670,7 +670,7 @@ const createKapitalminderungTask = (): Task => {
         <div className="space-y-1">
           {solutionIntro}
           <p>
-            <InlineMath math={latex`K_n = ${mathNumber(K0)} \\, ${mathNumber(q, 4)}^{${n}} - ${mathNumber(r)} \\cdot \\frac{${mathNumber(q, 4)}^{${n}} - 1}{${mathNumber(q, 4)} - 1} = ${mathNumber(Kn, 4)}`} />
+            <InlineMath math={latex`K_n = ${mathNumber(K0)} \, ${mathNumber(q, 4)}^{${n}} - ${mathNumber(r)} \cdot \frac{${mathNumber(q, 4)}^{${n}} - 1}{${mathNumber(q, 4)} - 1} = ${mathNumber(Kn, 4)}`} />
           </p>
         </div>
       );
@@ -699,7 +699,7 @@ const createKapitalminderungTask = (): Task => {
             <InlineMath math={latex`K_0 = \frac{K_n + r \cdot \frac{q^n - 1}{q - 1}}{q^n}`} />
           </p>
           <p>
-            <InlineMath math={latex`K_0 = \frac{${mathNumber(Kn)} + ${mathNumber(r)} \\cdot \\frac{${mathNumber(q, 4)}^{${n}} - 1}{${mathNumber(q, 4)} - 1}}{${mathNumber(q, 4)}^{${n}}} = ${mathNumber(startCapital, 4)}`} />
+            <InlineMath math={latex`K_0 = \frac{${mathNumber(Kn)} + ${mathNumber(r)} \cdot \frac{${mathNumber(q, 4)}^{${n}} - 1}{${mathNumber(q, 4)} - 1}}{${mathNumber(q, 4)}^{${n}}} = ${mathNumber(startCapital, 4)}`} />
           </p>
         </div>
       );
@@ -729,7 +729,7 @@ const createKapitalminderungTask = (): Task => {
             <InlineMath math={latex`r = (K_0 q^n - K_n) \cdot \frac{q - 1}{q^n - 1}`} />
           </p>
           <p>
-            <InlineMath math={latex`r = (${mathNumber(K0)} \\cdot ${mathNumber(q, 4)}^{${n}} - ${mathNumber(Kn)}) \\cdot \\frac{${mathNumber(q, 4)} - 1}{${mathNumber(q, 4)}^{${n}} - 1} = ${mathNumber(rate, 4)}`} />
+            <InlineMath math={latex`r = (${mathNumber(K0)} \cdot ${mathNumber(q, 4)}^{${n}} - ${mathNumber(Kn)}) \cdot \frac{${mathNumber(q, 4)} - 1}{${mathNumber(q, 4)}^{${n}} - 1} = ${mathNumber(rate, 4)}`} />
           </p>
         </div>
       );
@@ -822,7 +822,7 @@ const createRentenEndwertTask = (): Task => {
             <InlineMath math={latex`q = 1 + \frac{${mathNumber(p)}}{100} = ${mathNumber(q, 4)}`} />
           </p>
           <p>
-            <InlineMath math={latex`K_n = ${mathNumber(r)} \\cdot \\frac{${mathNumber(q, 4)}^{${n}} - 1}{${mathNumber(q, 4)} - 1} = ${mathNumber(Kn, 4)}`} />
+            <InlineMath math={latex`K_n = ${mathNumber(r)} \cdot \frac{${mathNumber(q, 4)}^{${n}} - 1}{${mathNumber(q, 4)} - 1} = ${mathNumber(Kn, 4)}`} />
           </p>
         </div>
       );
@@ -850,7 +850,7 @@ const createRentenEndwertTask = (): Task => {
             <InlineMath math={latex`q = 1 + \frac{${mathNumber(p)}}{100} = ${mathNumber(q, 4)}`} />
           </p>
           <p>
-            <InlineMath math={latex`r = ${mathNumber(Kn)} \\cdot \\frac{${mathNumber(q, 4)} - 1}{${mathNumber(q, 4)}^{${n}} - 1} = ${mathNumber(r, 4)}`} />
+            <InlineMath math={latex`r = ${mathNumber(Kn)} \cdot \frac{${mathNumber(q, 4)} - 1}{${mathNumber(q, 4)}^{${n}} - 1} = ${mathNumber(r, 4)}`} />
           </p>
         </div>
       );
