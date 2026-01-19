@@ -34,11 +34,10 @@ function generateTask(): RayTask {
       expectedAnswer: (q * r) / p,
       unit: "cm",
       tolerance: 0.2,
-      description: `Strahlensatz 1: Zwei Strahlen werden von parallelen Geraden geschnitten.
-      Auf dem ersten Strahl: P = ${p.toFixed(1)} cm, Q = ${q.toFixed(1)} cm.
-      Auf dem zweiten Strahl: R = ${r.toFixed(1)} cm.
-      Berechne S auf dem zweiten Strahl.`,
-      hint: "P/Q = R/S. Stelle nach S um!",
+      description: `Gegeben sind: Zwei Strahlen mit gemeinsamen Startpunkt O. Parallele Geraden schneiden die Strahlen.
+      P = ${p.toFixed(1)} cm, Q = ${q.toFixed(1)} cm, R = ${r.toFixed(1)} cm.
+      Gesucht ist: Die Strecke S.`,
+      hint: "Nutze den 1. Strahlensatz: P/Q = R/S. Stelle nach S um!",
       solution: [
         "Strahlensatz 1: P/Q = R/S",
         "",
@@ -58,8 +57,8 @@ function generateTask(): RayTask {
       expectedAnswer: p / q,
       unit: "",
       tolerance: 0.01,
-      description: `Strahlensatz 1: P = ${p.toFixed(1)} cm, Q = ${q.toFixed(1)} cm.
-      Berechne das Verhältnis P:Q als Dezimalzahl.`,
+      description: `Gegeben sind: P = ${p.toFixed(1)} cm, Q = ${q.toFixed(1)} cm, R = ${r.toFixed(1)} cm, S = ${((q * r) / p).toFixed(1)} cm.
+      Gesucht ist: Das Verhältnis P:Q als Dezimalzahl.`,
       hint: "Berechne P ÷ Q!",
       solution: [
         "Verhältnis P:Q = P ÷ Q",
@@ -78,11 +77,9 @@ function generateTask(): RayTask {
       expectedAnswer: (r * q) / p,
       unit: "cm",
       tolerance: 0.2,
-      description: `Strahlensatz 2: Zwei Strahlen werden von parallelen Geraden geschnitten.
-      Innere Strecke: ${p.toFixed(1)} cm, Äußere Strecke: ${q.toFixed(1)} cm.
-      Erste parallele Strecke: ${r.toFixed(1)} cm.
-      Berechne die zweite parallele Strecke.`,
-      hint: "p/q = parallele1/parallele2",
+      description: `Gegeben sind: Innere Strecke = ${p.toFixed(1)} cm, Äußere Strecke = ${q.toFixed(1)} cm, Erste parallele Strecke = ${r.toFixed(1)} cm.
+      Gesucht ist: Die zweite parallele Strecke.`,
+      hint: "Strahlensatz 2: p/q = parallele1/parallele2",
       solution: [
         "Strahlensatz 2: p/q = parallele1/parallele2",
         "",
@@ -102,8 +99,8 @@ function generateTask(): RayTask {
       expectedAnswer: p / q,
       unit: "",
       tolerance: 0.01,
-      description: `Ähnliche Dreiecke: Seite 1 = ${p.toFixed(1)} cm, Seite 2 = ${q.toFixed(1)} cm.
-      Berechne den Ähnlichkeitsfaktor k.`,
+      description: `Gegeben sind: Zwei ähnliche Dreiecke. Seite des ersten Dreiecks = ${p.toFixed(1)} cm, entsprechende Seite des zweiten Dreiecks = ${q.toFixed(1)} cm.
+      Gesucht ist: Der Ähnlichkeitsfaktor k (Verhältnis der ähnlichen Dreiecke).`,
       hint: "Ähnlichkeitsfaktor k = kleinere Seite ÷ größere Seite",
       solution: [
         "Ähnlichkeitsfaktor k = kleinere ÷ größere Seite",
@@ -122,8 +119,8 @@ function generateTask(): RayTask {
       expectedAnswer: (p * r) / q,
       unit: "cm",
       tolerance: 0.2,
-      description: `Strahlensatz 1: Q = ${q.toFixed(1)} cm, P = ${p.toFixed(1)} cm, R = ${r.toFixed(1)} cm.
-      Berechne S.`,
+      description: `Gegeben sind: Q = ${q.toFixed(1)} cm, P = ${p.toFixed(1)} cm, R = ${r.toFixed(1)} cm.
+      Gesucht ist: Die Strecke S.`,
       hint: "Q/P = S/R",
       solution: [
         "Q/P = S/R",
@@ -404,31 +401,13 @@ function drawRays(api: any, task: RayTask) {
 
     // ERSTE parallele Gerade: durch P und R
     if (task.type.includes("ray1")) {
-      // Richtungsvektor perpendicular zu den Strahlen für die parallelen Geraden
-      const perpDir = { x: -Math.sin(rad1), y: Math.cos(rad1) };
-      
-      // Erste Gerade durch P und R (mit etwas Offset perpendicular)
-      const g1_start_x = x_p + 0.5 * perpDir.x;
-      const g1_start_y = y_p + 0.5 * perpDir.y;
-      const g1_end_x = x_r + 0.5 * perpDir.x;
-      const g1_end_y = y_r + 0.5 * perpDir.y;
-      
-      api.evalCommand(
-        `g1 = Line((${g1_start_x.toFixed(2)}, ${g1_start_y.toFixed(2)}), (${g1_end_x.toFixed(2)}, ${g1_end_y.toFixed(2)}))`
-      );
+      api.evalCommand(`g1 = Line(P, R)`);
       api.setColor("g1", 50, 150, 50);
       api.setLineThickness("g1", 2);
       api.setLabelVisible("g1", false);
 
       // ZWEITE parallele Gerade: durch Q und S
-      const g2_start_x = x_q + 0.5 * perpDir.x;
-      const g2_start_y = y_q + 0.5 * perpDir.y;
-      const g2_end_x = x_s + 0.5 * perpDir.x;
-      const g2_end_y = y_s + 0.5 * perpDir.y;
-      
-      api.evalCommand(
-        `g2 = Line((${g2_start_x.toFixed(2)}, ${g2_start_y.toFixed(2)}), (${g2_end_x.toFixed(2)}, ${g2_end_y.toFixed(2)}))`
-      );
+      api.evalCommand(`g2 = Line(Q, S)`);
       api.setColor("g2", 50, 150, 50);
       api.setLineThickness("g2", 2);
       api.setLabelVisible("g2", false);
