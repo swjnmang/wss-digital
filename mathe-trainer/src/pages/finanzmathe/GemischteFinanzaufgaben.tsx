@@ -96,16 +96,25 @@ const formatDateLabel = (date: Date) =>
 
 const randomInterestDateRange = (): InterestDateRange => {
   const year = 2025;
-  const span = randomInt(30, 250);
-  const startDay = randomInt(1, 360 - span);
-  const startDate = new Date(year, 0, 1);
-  startDate.setDate(startDate.getDate() + startDay);
-  const endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() + span);
+  
+  // Generiere zwei verschiedene Monate im selben Jahr
+  const startMonth = randomInt(1, 11); // 1-11, damit Platz für Endmonat bleibt
+  const endMonth = randomInt(startMonth + 1, 12); // Endmonat nach Startmonat
+  
+  // Generiere Tage (vereinfacht auf 1-28 um Gültigkeit zu sichern)
+  const startDay = randomInt(1, 28);
+  const endDay = randomInt(1, 28);
+  
+  const startDate = new Date(year, startMonth - 1, startDay);
+  const endDate = new Date(year, endMonth - 1, endDay);
+  
+  // Berechne Zinstage nach Schulformel: t = (monat2 - monat1) * 30 + (tag2 - tag1)
+  const days = (endMonth - startMonth) * 30 + (endDay - startDay);
+  
   return {
     startLabel: formatDateLabel(startDate),
     endLabel: formatDateLabel(endDate),
-    days: span,
+    days: days,
   };
 };
 
@@ -198,6 +207,7 @@ const createSimpleInterestTask = (): Task => {
     t = dateRange.days;
   }
   const Z = (K * p * t) / (100 * 360);
+  const Z_rounded = parseFloat(Z.toFixed(2)); // Gerundete Version für Darstellung und weitere Berechnungen
 
   const durationInfo = useDateRange ? (
     <p>
@@ -232,7 +242,7 @@ const createSimpleInterestTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welche Zinsen fallen an?</p>
         </div>
       );
-      inputs = [createInputField('Z', 'Zinsen', '€', 'z.B. 248,50', Z, Math.max(Z * 0.002, 0.5))];
+      inputs = [createInputField('Z', 'Zinsen', '€', 'z.B. 248,50', Z_rounded, Math.max(Z_rounded * 0.002, 0.5))];
       solution = (
         <div className="space-y-1">
           <p>
@@ -241,18 +251,18 @@ const createSimpleInterestTask = (): Task => {
           <p>
             <InlineMath math={latex`Z = \frac{${mathNumber(K)} \cdot ${mathNumber(p)} \cdot ${mathNumber(t)}}{36000}`} />
           </p>
-          <p><strong>{formatCurrency(Z)} €</strong></p>
+          <p><strong>{formatCurrency(Z_rounded)} €</strong></p>
         </div>
       );
       break;
     }
     case 'K': {
-      const capital = (Z * 100 * 360) / (p * t);
+      const capital = (Z_rounded * 100 * 360) / (p * t);
       question = (
         <div className="space-y-2">
           {baseStory}
           <p>
-            Zinssatz: <strong>{formatNumber(p, 2)} %</strong>, Zinsen: <strong>{formatCurrency(Z)} €</strong>.
+            Zinssatz: <strong>{formatNumber(p, 2)} %</strong>, Zinsen: <strong>{formatCurrency(Z_rounded)} €</strong>.
           </p>
           {durationInfo}
           <p className="text-blue-900 font-semibold">Welches Startkapital wurde angelegt?</p>
@@ -265,7 +275,7 @@ const createSimpleInterestTask = (): Task => {
             <InlineMath math={latex`K = \frac{Z \cdot 100 \cdot 360}{p \cdot t}`} />
           </p>
           <p>
-            <InlineMath math={latex`K = \frac{${mathNumber(Z)} \cdot 36000}{${mathNumber(p)} \cdot ${mathNumber(t)}}`} />
+            <InlineMath math={latex`K = \frac{${mathNumber(Z_rounded)} \cdot 36000}{${mathNumber(p)} \cdot ${mathNumber(t)}}`} />
           </p>
           <p><strong>{formatCurrency(capital)} €</strong></p>
         </div>
@@ -273,12 +283,12 @@ const createSimpleInterestTask = (): Task => {
       break;
     }
     case 'p': {
-      const rate = (Z * 100 * 360) / (K * t);
+      const rate = (Z_rounded * 100 * 360) / (K * t);
       question = (
         <div className="space-y-2">
           {baseStory}
           <p>
-            Startkapital: <strong>{formatCurrency(K)} €</strong>, Zinsen: <strong>{formatCurrency(Z)} €</strong>.
+            Startkapital: <strong>{formatCurrency(K)} €</strong>, Zinsen: <strong>{formatCurrency(Z_rounded)} €</strong>.
           </p>
           {durationInfo}
           <p className="text-blue-900 font-semibold">Wie hoch war der Zinssatz?</p>
@@ -291,7 +301,7 @@ const createSimpleInterestTask = (): Task => {
             <InlineMath math={latex`p = \frac{Z \cdot 100 \cdot 360}{K \cdot t}`} />
           </p>
           <p>
-            <InlineMath math={latex`p = \frac{${mathNumber(Z)} \cdot 36000}{${mathNumber(K)} \cdot ${mathNumber(t)}}`} />
+            <InlineMath math={latex`p = \frac{${mathNumber(Z_rounded)} \cdot 36000}{${mathNumber(K)} \cdot ${mathNumber(t)}}`} />
           </p>
           <p><strong>{formatNumber(rate, 2)} %</strong></p>
         </div>
@@ -299,13 +309,13 @@ const createSimpleInterestTask = (): Task => {
       break;
     }
     case 't': {
-      const days = (Z * 100 * 360) / (K * p);
+      const days = (Z_rounded * 100 * 360) / (K * p);
       question = (
         <div className="space-y-2">
           {baseStory}
           <p>
             Startkapital: <strong>{formatCurrency(K)} €</strong>, Zinssatz: <strong>{formatNumber(p, 2)} %</strong>, Zinsen:{' '}
-            <strong>{formatCurrency(Z)} €</strong>.
+            <strong>{formatCurrency(Z_rounded)} €</strong>.
           </p>
           <p className="text-blue-900 font-semibold">Wie viele Tage war das Geld angelegt?</p>
         </div>
@@ -317,7 +327,7 @@ const createSimpleInterestTask = (): Task => {
             <InlineMath math={latex`t = \frac{Z \cdot 100 \cdot 360}{K \cdot p}`} />
           </p>
           <p>
-            <InlineMath math={latex`t = \frac{${mathNumber(Z)} \cdot 36000}{${mathNumber(K)} \cdot ${mathNumber(p)}}`} />
+            <InlineMath math={latex`t = \frac{${mathNumber(Z_rounded)} \cdot 36000}{${mathNumber(K)} \cdot ${mathNumber(p)}}`} />
           </p>
           <p><strong>{formatNumber(days, 1)} Tage</strong></p>
         </div>
