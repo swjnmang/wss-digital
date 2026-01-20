@@ -280,10 +280,9 @@ function generateTask(): RayTask {
       solution: selectedType.solution
     };
   } else {
-    // 4. DIAGONALEN MIT STRAHLENSÄTZEN - QR und PS über ähnliche Dreiecke
-    // Q liegt auf ray1, R liegt auf ray2 → QR ist eine Diagonale
-    // P liegt auf ray1, S liegt auf ray2 → PS ist eine Diagonale
-    // Diese Diagonalen können mit Strahlensätzen über ähnliche Dreiecke berechnet werden
+    // 4. DIAGONALEN MIT STRAHLENSÄTZEN - QR und PS berechenbar via ähnliche Dreiecke
+    // Ähnliche Dreiecke: OQR ~ OPS
+    // Verhältnis: OQ/OP = OR/OS = QR/PS (Strahlensatz!)
     
     const angle = 60 * (Math.PI / 180);
     
@@ -293,53 +292,46 @@ function generateTask(): RayTask {
     const rX = r * Math.cos(angle), rY = r * Math.sin(angle);       // R auf ray2
     const sX = os * Math.cos(angle), sY = os * Math.sin(angle);     // S auf ray2
     
-    // Diagonalen
+    // Diagonalen (für Berechnung)
     const qr = Math.sqrt((rX - qX) ** 2 + (rY - qY) ** 2);  // Von Q zu R
     const ps = Math.sqrt((sX - pX) ** 2 + (sY - pY) ** 2);  // Von P zu S
     
-    // Mit Strahlensätzen über ähnliche Dreiecke:
-    // Dreieck OQR ist ähnlich zu Dreieck OPS
-    // Daher: QR/PS = OQ/OP = OR/OS
+    // Verhältnis aus Strahlensatz
+    const ratio = q / p;  // = OQ/OP, sollte auch = OR/OS = QR/PS sein
     
     const diagonalTypes = [
       {
-        name: "QR_diagonal",
+        name: "QR_berechnen",
         expectedAnswer: qr,
-        description: `Gegeben sind: $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, und ein Winkel von 60° zwischen den Strahlen. Zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{QR}$ (von Q auf dem ersten Strahl zu R auf dem zweiten Strahl).`,
-        hint: "Die Strecke QR verbindet zwei Punkte auf unterschiedlichen Strahlen. Nutze ein Koordinatensystem: Q = (OQ, 0) und R = (OR·cos(60°), OR·sin(60°)). Mit Strahlensätzen über ähnliche Dreiecke kannst du die Länge berechnen.",
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm, $\\overline{PS} = ${ps.toFixed(2)}$ cm. Zwei ähnliche Dreiecke OPS und OQR entstehen durch zwei Strahlen mit gemeinsamen Startpunkt O. Berechne mit Strahlensätzen die Länge der Strecke $\\overline{QR}$.`,
+        hint: "Die Dreiecke OQR und OPS sind ähnlich! Nutze den Strahlensatz: $\\frac{\\overline{OQ}}{\\overline{OP}} = \\frac{\\overline{QR}}{\\overline{PS}}$. Stelle nach $\\overline{QR}$ um!",
         solution: [
-          "Mit ähnlichen Dreiecken und Strahlensätzen:",
+          "Mit ähnlichen Dreiecken OQR ~ OPS gilt der Strahlensatz:",
+          `$\\frac{\\overline{OQ}}{\\overline{OP}} = \\frac{\\overline{QR}}{\\overline{PS}}$`,
           "",
-          "Koordinatensystem mit O im Ursprung, ray1 auf x-Achse, Winkel 60° zwischen Strahlen:",
-          `Punkt Q: (${q.toFixed(1)}, 0)`,
-          `Punkt R: (${r.toFixed(1)} · cos(60°), ${r.toFixed(1)} · sin(60°)) = (${(r * Math.cos(angle)).toFixed(2)}, ${(r * Math.sin(angle)).toFixed(2)})`,
+          `$\\frac{${q.toFixed(1)}}{${p.toFixed(1)}} = \\frac{\\overline{QR}}{${ps.toFixed(2)}}$`,
           "",
-          "Abstand QR:",
-          `$\\overline{QR} = \\sqrt{(${(rX - qX).toFixed(2)})^2 + (${rY.toFixed(2)})^2}$`,
-          `$\\overline{QR} = \\sqrt{${((rX - qX) ** 2).toFixed(2)} + ${(rY ** 2).toFixed(2)}}$`,
+          `$\\overline{QR} = ${ps.toFixed(2)} \\times \\frac{${q.toFixed(1)}}{${p.toFixed(1)}}$`,
           `$\\overline{QR} = ${qr.toFixed(2)}$ cm`,
           "",
-          "Bemerkung: Die ähnlichen Dreiecke OQR und OPS stehen im Verhältnis OQ:OP = OR:OS (Strahlensatz 1)."
+          `Probe: $\\frac{\\overline{OR}}{\\overline{OS}} = \\frac{${r.toFixed(1)}}{${os.toFixed(2)}} = ${(r/os).toFixed(3)}$ sollte auch = $\\frac{${q.toFixed(1)}}{${p.toFixed(1)}} = ${(q/p).toFixed(3)}$ sein ✓`
         ]
       },
       {
-        name: "PS_diagonal",
+        name: "PS_berechnen",
         expectedAnswer: ps,
-        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm, und ein Winkel von 60° zwischen den Strahlen. Zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{PS}$ (von P auf dem ersten Strahl zu S auf dem zweiten Strahl).`,
-        hint: "Die Strecke PS verbindet zwei Punkte auf unterschiedlichen Strahlen. Nutze ein Koordinatensystem: P = (OP, 0) und S = (OS·cos(60°), OS·sin(60°)). Mit Strahlensätzen über ähnliche Dreiecke kannst du die Länge berechnen.",
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm, $\\overline{QR} = ${qr.toFixed(2)}$ cm. Zwei ähnliche Dreiecke OPS und OQR entstehen durch zwei Strahlen mit gemeinsamen Startpunkt O. Berechne mit Strahlensätzen die Länge der Strecke $\\overline{PS}$.`,
+        hint: "Die Dreiecke OQR und OPS sind ähnlich! Nutze den Strahlensatz: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{PS}}{\\overline{QR}}$. Stelle nach $\\overline{PS}$ um!",
         solution: [
-          "Mit ähnlichen Dreiecken und Strahlensätzen:",
+          "Mit ähnlichen Dreiecken OPS ~ OQR gilt der Strahlensatz:",
+          `$\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{PS}}{\\overline{QR}}$`,
           "",
-          "Koordinatensystem mit O im Ursprung, ray1 auf x-Achse, Winkel 60° zwischen Strahlen:",
-          `Punkt P: (${p.toFixed(1)}, 0)`,
-          `Punkt S: (${os.toFixed(1)} · cos(60°), ${os.toFixed(1)} · sin(60°)) = (${(os * Math.cos(angle)).toFixed(2)}, ${(os * Math.sin(angle)).toFixed(2)})`,
+          `$\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = \\frac{\\overline{PS}}{${qr.toFixed(2)}}$`,
           "",
-          "Abstand PS:",
-          `$\\overline{PS} = \\sqrt{(${(sX - pX).toFixed(2)})^2 + (${sY.toFixed(2)})^2}$`,
-          `$\\overline{PS} = \\sqrt{${((sX - pX) ** 2).toFixed(2)} + ${(sY ** 2).toFixed(2)}}$`,
+          `$\\overline{PS} = ${qr.toFixed(2)} \\times \\frac{${p.toFixed(1)}}{${q.toFixed(1)}}$`,
           `$\\overline{PS} = ${ps.toFixed(2)}$ cm`,
           "",
-          "Bemerkung: Die ähnlichen Dreiecke OPS und OQR stehen im Verhältnis OP:OQ = OS:OR (Strahlensatz 1)."
+          `Probe: $\\frac{\\overline{OR}}{\\overline{OS}} = \\frac{${r.toFixed(1)}}{${os.toFixed(2)}} = ${(r/os).toFixed(3)}$ sollte auch = $\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = ${(p/q).toFixed(3)}$ sein ✓`
         ]
       }
     ];
