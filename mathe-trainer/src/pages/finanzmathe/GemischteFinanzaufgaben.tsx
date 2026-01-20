@@ -819,7 +819,7 @@ const createRentenEndwertTask = (): Task => {
             <strong>{n} Jahre</strong>.
           </p>
           <p className="text-sm text-slate-600">
-            Es gibt kein Startkapital – die Sparrate wird nach den Zinsen am Jahresende eingezahlt.
+            Es gibt kein Startkapital – die Sparrate wird am Ende eines jeden Jahres nach den Zinsen eingezahlt.
           </p>
           <p className="text-blue-900 font-semibold">Wie groß ist der Endwert?</p>
         </div>
@@ -847,7 +847,7 @@ const createRentenEndwertTask = (): Task => {
             <strong>{n} Jahre</strong>.
           </p>
           <p className="text-sm text-slate-600">
-            Gesucht ist die nachschüssige Jahresrate ohne Startkapital.
+            Die Jahresrate wird am Ende eines jeden Jahres eingezahlt, ohne Startkapital.
           </p>
           <p className="text-blue-900 font-semibold">Wie hoch muss die Jahresrate sein?</p>
         </div>
@@ -875,7 +875,7 @@ const createRentenEndwertTask = (): Task => {
             <strong>{formatCurrency(Kn)} €</strong>.
           </p>
           <p className="text-sm text-slate-600">
-            Alle Einzahlungen erfolgen nachschüssig bei leerem Startkonto.
+            Die Einzahlungen erfolgen jeweils am Ende eines jeden Jahres bei einem leeren Startkonto.
           </p>
           <p className="text-blue-900 font-semibold">Wie lange muss gespart werden?</p>
         </div>
