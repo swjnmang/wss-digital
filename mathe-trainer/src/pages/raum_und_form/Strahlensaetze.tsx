@@ -22,7 +22,7 @@ function generateTask(): RayTask {
   // Bereiche gewählt, um geometrisch sinnvolle Aufgaben zu garantieren (rs > 0)
   const p = randomBetween(2, 3.5);
   const q = randomBetween(8, 12);
-  const r = randomBetween(2, 3.5);
+  const r = randomBetween(5, 8);  // R weiter von O entfernt
   
   // Berechnete Werte
   const pq = q - p;  // Abschnitt PQ
@@ -280,61 +280,66 @@ function generateTask(): RayTask {
       solution: selectedType.solution
     };
   } else {
-    // 4. DIAGONALE STRECKEN AUF DEN PARALLELEN - Mit Strahlensätzen berechnet
-    // PR liegt auf der ersten Parallelen, QS auf der zweiten Parallelen
-    // Mit ähnlichen Dreiecken und Strahlensätzen berechnet
+    // 4. DIAGONALEN MIT STRAHLENSÄTZEN - QR und PS über ähnliche Dreiecke
+    // Q liegt auf ray1, R liegt auf ray2 → QR ist eine Diagonale
+    // P liegt auf ray1, S liegt auf ray2 → PS ist eine Diagonale
+    // Diese Diagonalen können mit Strahlensätzen über ähnliche Dreiecke berechnet werden
     
-    // Für diese Aufgaben brauchen wir ein Koordinatensystem
-    // Winkel zwischen den Strahlen = 60° für realistische Geometrie
     const angle = 60 * (Math.PI / 180);
     
-    // Koordinaten der Punkte mit O im Ursprung
-    const pX = p, pY = 0;  // P auf ray1 (x-Achse)
-    const qX = q, qY = 0;  // Q auf ray1 (x-Achse)
-    const rX = r * Math.cos(angle), rY = r * Math.sin(angle);  // R auf ray2
-    const sX = os * Math.cos(angle), sY = os * Math.sin(angle);  // S auf ray2
+    // Koordinaten
+    const pX = p, pY = 0;         // P auf ray1
+    const qX = q, qY = 0;         // Q auf ray1
+    const rX = r * Math.cos(angle), rY = r * Math.sin(angle);       // R auf ray2
+    const sX = os * Math.cos(angle), sY = os * Math.sin(angle);     // S auf ray2
     
-    // PR: Strecke auf der ersten Parallelen (von P zu R)
-    const pr = Math.sqrt((rX - pX) ** 2 + (rY - pY) ** 2);
-    // QS: Strecke auf der zweiten Parallelen (von Q zu S)
-    const qs = Math.sqrt((sX - qX) ** 2 + (sY - qY) ** 2);
+    // Diagonalen
+    const qr = Math.sqrt((rX - qX) ** 2 + (rY - qY) ** 2);  // Von Q zu R
+    const ps = Math.sqrt((sX - pX) ** 2 + (sY - pY) ** 2);  // Von P zu S
     
-    // Mit Strahlensätzen: PR und QS sind proportional
-    // PR/QS = OP/OQ oder PR/QS = OR/OS (Je nachdem wie man es betrachtet)
+    // Mit Strahlensätzen über ähnliche Dreiecke:
+    // Dreieck OQR ist ähnlich zu Dreieck OPS
+    // Daher: QR/PS = OQ/OP = OR/OS
     
     const diagonalTypes = [
       {
-        name: "PR_auf_parallele",
-        expectedAnswer: pr,
-        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen (Winkel 60°) mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{PR}$ auf der ersten Parallelen.`,
-        hint: "Nutze den Strahlensatz: Die Strecken auf den Parallelen stehen im gleichen Verhältnis zueinander wie die Abstände vom Ursprung. Bedenke: P liegt auf ray1 und R liegt auf ray2, beide auf der ersten Parallelen.",
+        name: "QR_diagonal",
+        expectedAnswer: qr,
+        description: `Gegeben sind: $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, und ein Winkel von 60° zwischen den Strahlen. Zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{QR}$ (von Q auf dem ersten Strahl zu R auf dem zweiten Strahl).`,
+        hint: "Die Strecke QR verbindet zwei Punkte auf unterschiedlichen Strahlen. Nutze ein Koordinatensystem: Q = (OQ, 0) und R = (OR·cos(60°), OR·sin(60°)). Mit Strahlensätzen über ähnliche Dreiecke kannst du die Länge berechnen.",
         solution: [
-          "Mit einem Koordinatensystem (O im Ursprung, ray1 auf der x-Achse, Winkel 60° zwischen Strahlen):",
+          "Mit ähnlichen Dreiecken und Strahlensätzen:",
           "",
-          `Punkt P: (${p.toFixed(1)}, 0)`,
+          "Koordinatensystem mit O im Ursprung, ray1 auf x-Achse, Winkel 60° zwischen Strahlen:",
+          `Punkt Q: (${q.toFixed(1)}, 0)`,
           `Punkt R: (${r.toFixed(1)} · cos(60°), ${r.toFixed(1)} · sin(60°)) = (${(r * Math.cos(angle)).toFixed(2)}, ${(r * Math.sin(angle)).toFixed(2)})`,
           "",
-          "Die Strecke PR verbindet diese Punkte (auf der ersten Parallelen):",
-          `$\\overline{PR} = \\sqrt{(${(rX - pX).toFixed(2)})^2 + (${(rY - pY).toFixed(2)})^2}$`,
-          `$\\overline{PR} = \\sqrt{${((rX - pX) ** 2).toFixed(2)} + ${((rY - pY) ** 2).toFixed(2)}}$`,
-          `$\\overline{PR} = ${pr.toFixed(2)}$ cm`
+          "Abstand QR:",
+          `$\\overline{QR} = \\sqrt{(${(rX - qX).toFixed(2)})^2 + (${rY.toFixed(2)})^2}$`,
+          `$\\overline{QR} = \\sqrt{${((rX - qX) ** 2).toFixed(2)} + ${(rY ** 2).toFixed(2)}}$`,
+          `$\\overline{QR} = ${qr.toFixed(2)}$ cm`,
+          "",
+          "Bemerkung: Die ähnlichen Dreiecke OQR und OPS stehen im Verhältnis OQ:OP = OR:OS (Strahlensatz 1)."
         ]
       },
       {
-        name: "QS_auf_parallele",
-        expectedAnswer: qs,
-        description: `Gegeben sind: $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen (Winkel 60°) mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{QS}$ auf der zweiten Parallelen.`,
-        hint: "Nutze den Strahlensatz: Die Strecken auf den Parallelen stehen im gleichen Verhältnis zueinander. Q liegt auf ray1 und S liegt auf ray2, beide auf der zweiten Parallelen.",
+        name: "PS_diagonal",
+        expectedAnswer: ps,
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm, und ein Winkel von 60° zwischen den Strahlen. Zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{PS}$ (von P auf dem ersten Strahl zu S auf dem zweiten Strahl).`,
+        hint: "Die Strecke PS verbindet zwei Punkte auf unterschiedlichen Strahlen. Nutze ein Koordinatensystem: P = (OP, 0) und S = (OS·cos(60°), OS·sin(60°)). Mit Strahlensätzen über ähnliche Dreiecke kannst du die Länge berechnen.",
         solution: [
-          "Mit einem Koordinatensystem (O im Ursprung, ray1 auf der x-Achse, Winkel 60° zwischen Strahlen):",
+          "Mit ähnlichen Dreiecken und Strahlensätzen:",
           "",
-          `Punkt Q: (${q.toFixed(1)}, 0)`,
+          "Koordinatensystem mit O im Ursprung, ray1 auf x-Achse, Winkel 60° zwischen Strahlen:",
+          `Punkt P: (${p.toFixed(1)}, 0)`,
           `Punkt S: (${os.toFixed(1)} · cos(60°), ${os.toFixed(1)} · sin(60°)) = (${(os * Math.cos(angle)).toFixed(2)}, ${(os * Math.sin(angle)).toFixed(2)})`,
           "",
-          "Die Strecke QS verbindet diese Punkte (auf der zweiten Parallelen):",
-          `$\\overline{QS} = \\sqrt{(${(sX - qX).toFixed(2)})^2 + (${(sY - qY).toFixed(2)})^2}$`,
-          `$\\overline{QS} = \\sqrt{${((sX - qX) ** 2).toFixed(2)} + ${((sY - qY) ** 2).toFixed(2)}}$`,
-          `$\\overline{QS} = ${qs.toFixed(2)}$ cm`
+          "Abstand PS:",
+          `$\\overline{PS} = \\sqrt{(${(sX - pX).toFixed(2)})^2 + (${sY.toFixed(2)})^2}$`,
+          `$\\overline{PS} = \\sqrt{${((sX - pX) ** 2).toFixed(2)} + ${(sY ** 2).toFixed(2)}}$`,
+          `$\\overline{PS} = ${ps.toFixed(2)}$ cm`,
+          "",
+          "Bemerkung: Die ähnlichen Dreiecke OPS und OQR stehen im Verhältnis OP:OQ = OS:OR (Strahlensatz 1)."
         ]
       }
     ];
