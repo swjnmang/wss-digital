@@ -24,6 +24,26 @@ interface PruefungsAufgabe {
   isCorrect: boolean | null;
 }
 
+// Nur serialisierbare Daten für localStorage
+interface PruefungsAufgabeSerialized {
+  id: string;
+  type: string;
+  points: number;
+  inputs: any[];
+  userAnswers: Record<string, string>;
+  isCorrect: boolean | null;
+}
+
+interface PruefungsZustandSerialized {
+  name: string;
+  klasse: string;
+  aufgaben: PruefungsAufgabeSerialized[];
+  aktuelleAufgabeIndex: number;
+  gestartet: boolean;
+  beendet: boolean;
+  termsAkzeptiert: boolean;
+}
+
 interface PruefungsZustand {
   name: string;
   klasse: string;
@@ -96,6 +116,47 @@ const generatePruefungsaufgaben = (): PruefungsAufgabe[] => {
   }
 
   return aufgaben;
+};
+
+// Hilfsfunktionen für Serialisierung
+const serializePruefung = (zustand: PruefungsZustand): PruefungsZustandSerialized => {
+  return {
+    name: zustand.name,
+    klasse: zustand.klasse,
+    aufgaben: zustand.aufgaben.map(a => ({
+      id: a.id,
+      type: a.type,
+      points: a.points,
+      inputs: a.inputs,
+      userAnswers: a.userAnswers,
+      isCorrect: a.isCorrect,
+    })),
+    aktuelleAufgabeIndex: zustand.aktuelleAufgabeIndex,
+    gestartet: zustand.gestartet,
+    beendet: zustand.beendet,
+    termsAkzeptiert: zustand.termsAkzeptiert,
+  };
+};
+
+const deserializePruefung = (serialized: PruefungsZustandSerialized): PruefungsZustand => {
+  return {
+    name: serialized.name,
+    klasse: serialized.klasse,
+    aufgaben: serialized.aufgaben.map(a => ({
+      id: a.id,
+      type: a.type,
+      points: a.points,
+      question: null as any, // Wird nicht benötigt im Exam/Results Screen
+      solution: null as any,
+      inputs: a.inputs,
+      userAnswers: a.userAnswers,
+      isCorrect: a.isCorrect,
+    })),
+    aktuelleAufgabeIndex: serialized.aktuelleAufgabeIndex,
+    gestartet: serialized.gestartet,
+    beendet: serialized.beendet,
+    termsAkzeptiert: serialized.termsAkzeptiert,
+  };
 };
 
 const StartScreen: React.FC<{
@@ -500,7 +561,9 @@ export const PruefungsModus: React.FC = () => {
     const gespeichert = localStorage.getItem(STORAGE_KEY);
     if (gespeichert) {
       try {
-        setZustand(JSON.parse(gespeichert));
+        const serialized = JSON.parse(gespeichert) as PruefungsZustandSerialized;
+        const restored = deserializePruefung(serialized);
+        setZustand(restored);
       } catch (e) {
         console.error('Fehler beim Laden des Prüfungszustands:', e);
       }
@@ -509,7 +572,8 @@ export const PruefungsModus: React.FC = () => {
 
   const saveZustand = (neuerZustand: PruefungsZustand) => {
     setZustand(neuerZustand);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(neuerZustand));
+    const serialized = serializePruefung(neuerZustand);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
   };
 
   const handleStart = (name: string, klasse: string) => {
