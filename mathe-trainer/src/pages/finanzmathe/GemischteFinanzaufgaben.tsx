@@ -143,7 +143,7 @@ const kapitalminderungContexts = [
 ] as const;
 
 const rentenContexts = [
-  'Ein Schulteam spart nachschüssig für eine Abschlussreise und zahlt am Ende jedes Jahres denselben Betrag ein.',
+  'Ein Schulteam spart für eine Abschlussreise und zahlt am Ende jedes Jahres denselben Betrag ein.',
   'Der Theaterkurs plant Kulissen und legt jedes Jahr Honorar-Reste zur Seite.',
   'Der Chor sammelt für eine Konzerttournee und überweist regelmäßig Vereinsbeiträge.',
 ] as const;
@@ -490,7 +490,7 @@ const createKapitalmehrungTask = (): Task => {
   const variant = randomChoice<KapitalmehrungVariant>(['Kn', 'K0', 'r', 'n']);
 
   const story = <p>{randomChoice(kapitalmehrungContexts)}</p>;
-  const areaLabel = 'nachschüssige Kapitalmehrung';
+  const areaLabel = 'Kapitalmehrung';
   const baseFormula = latex`K_n = K_0 \cdot q^n + r \cdot \frac{q^n - 1}{q - 1}`;
   const solutionIntro = renderSolutionIntro(areaLabel, baseFormula);
 
@@ -508,7 +508,7 @@ const createKapitalmehrungTask = (): Task => {
             <strong>{formatNumber(p, 2)} %</strong>, Laufzeit: <strong>{n} Jahre</strong>.
           </p>
           <p className="text-sm text-slate-600">
-            Am Jahresende (nachschüssig) wird nach den Zinsen jeweils {formatCurrency(r)} € auf ein Startpolster von{' '}
+            Am Ende eines jeden Jahres wird nach den Zinsen jeweils {formatCurrency(r)} € auf ein Startpolster von{' '}
             {formatCurrency(K0)} € gelegt – typische Kapitalmehrung.
           </p>
           <p className="text-blue-900 font-semibold">Wie hoch ist der Endwert?</p>
@@ -536,7 +536,7 @@ const createKapitalmehrungTask = (): Task => {
             <strong>{formatNumber(p, 2)} %</strong>, Laufzeit: <strong>{n} Jahre</strong>.
           </p>
           <p className="text-sm text-slate-600">
-            Die nachschüssigen Jahresraten von {formatCurrency(r)} € wachsen mit; gesucht ist das anfängliche Guthaben, das
+            Die Jahresraten von {formatCurrency(r)} €, die am Ende jeden Jahres eingezahlt werden, wachsen mit; gesucht ist das anfängliche Guthaben, das
             zusammen mit diesen Einzahlungen den Endwert erreicht.
           </p>
           <p className="text-blue-900 font-semibold">Welcher Startbetrag war nötig?</p>
@@ -568,10 +568,10 @@ const createKapitalmehrungTask = (): Task => {
             <strong>{formatNumber(p, 2)} %</strong>, Laufzeit: <strong>{n} Jahre</strong>.
           </p>
           <p className="text-sm text-slate-600">
-            Kapitalmehrung mit nachschüssigen Raten: Das Anfangskonto soll zusammen mit gleich hohen Jahreszahlungen den
+            Kapitalmehrung: Das Anfangskonto soll zusammen mit gleich hohen Jahreszahlungen, die am Ende eines jeden Jahres eingezahlt werden, den
             Endwert erreichen.
           </p>
-          <p className="text-blue-900 font-semibold">Wie hoch ist die nachschüssige Rate?</p>
+          <p className="text-blue-900 font-semibold">Wie hoch ist die jährliche Rate?</p>
         </div>
       );
       inputs = [createInputField('r', 'Jahresrate', '€', 'z.B. 3.200,00', rate, Math.max(rate * 0.005, 1.5))];
@@ -600,7 +600,7 @@ const createKapitalmehrungTask = (): Task => {
             <strong>{formatNumber(p, 2)} %</strong>, Endwert: <strong>{formatCurrency(Kn)} €</strong>.
           </p>
           <p className="text-sm text-slate-600">
-            Nachschüssige Kapitalmehrung: Auf das Startguthaben folgen jedes Jahresende identische Einzahlungen.
+            Kapitalmehrung: Auf das Startguthaben folgen am Ende eines jeden Jahres identische Einzahlungen.
           </p>
           <p className="text-blue-900 font-semibold">Wie viele Jahre dauerte der Plan?</p>
         </div>
@@ -650,7 +650,7 @@ const createKapitalminderungTask = (): Task => {
   const variant = randomChoice<KapitalminderungVariant>(['Kn', 'K0', 'r', 'n']);
 
   const story = <p>{randomChoice(kapitalminderungContexts)}</p>;
-  const areaLabel = 'nachschüssige Kapitalminderung';
+  const areaLabel = 'Kapitalminderung';
   const baseFormula = latex`K_n = K_0 \cdot q^n - r \cdot \frac{q^n - 1}{q - 1}`;
   const solutionIntro = renderSolutionIntro(areaLabel, baseFormula);
 
@@ -669,8 +669,7 @@ const createKapitalminderungTask = (): Task => {
             <strong>{n} Jahre</strong>.
           </p>
           <p className="text-sm text-slate-600">
-            Das Kapital wird verzinst, erst danach wird am Jahresende eine feste Summe entnommen – nachschüssige
-            Kapitalminderung.
+            Das Kapital wird verzinst; am Ende eines jeden Jahres wird dann eine feste Summe entnommen – Kapitalminderung.
           </p>
           <p className="text-blue-900 font-semibold">Wie hoch ist die Restkasse nach allen Entnahmen?</p>
         </div>
@@ -695,7 +694,7 @@ const createKapitalminderungTask = (): Task => {
             <strong>{formatNumber(p, 2)} %</strong>, Laufzeit: <strong>{n} Jahre</strong>.
           </p>
           <p className="text-sm text-slate-600">
-            Es wird nachschüssig entnommen. Wie groß musste der Anfangsbestand sein, damit nach den festen Entnahmen noch
+            Die Entnahmen erfolgen am Ende eines jeden Jahres. Wie groß musste der Anfangsbestand sein, damit nach den festen Entnahmen noch
             {formatCurrency(Kn)} € übrig bleiben?
           </p>
           <p className="text-blue-900 font-semibold">Wie groß war das ursprüngliche Kapital?</p>
@@ -725,7 +724,7 @@ const createKapitalminderungTask = (): Task => {
             <strong>{formatNumber(p, 2)} %</strong>, Laufzeit: <strong>{n} Jahre</strong>.
           </p>
           <p className="text-sm text-slate-600">
-            Nachschüssige Entnahmen: Nach jeder Verzinsung stehen konstante Zuschüsse zur Verfügung – wie hoch dürfen sie
+            Entnahmen am Ende eines jeden Jahres: Nach jeder Verzinsung stehen konstante Zuschüsse zur Verfügung – wie hoch dürfen sie
             sein?
           </p>
           <p className="text-blue-900 font-semibold">Wie groß darf die jährliche Entnahme sein?</p>
@@ -757,7 +756,7 @@ const createKapitalminderungTask = (): Task => {
             <strong>{formatNumber(p, 2)} %</strong>, Restkapital: <strong>{formatCurrency(Kn)} €</strong>.
           </p>
           <p className="text-sm text-slate-600">
-            Das Kapital wird nachschüssig vermindert: fixe Entnahmen nach jeder Verzinsung.
+            Das Kapital wird vermindert: Fixe Entnahmen erfolgen am Ende eines jeden Jahres nach der Verzinsung.
           </p>
           <p className="text-blue-900 font-semibold">Wie viele Jahre reichen die Entnahmen?</p>
         </div>
@@ -801,7 +800,7 @@ const createRentenEndwertTask = (): Task => {
   const variant = randomChoice<RentenVariant>(['Kn', 'r', 'n']);
 
   const story = <p>{randomChoice(rentenContexts)}</p>;
-  const areaLabel = 'nachschüssige Rentensparrate';
+  const areaLabel = 'Rentensparrate';
   const baseFormula = latex`K_n = r \cdot \frac{q^n - 1}{q - 1}`;
   const solutionIntro = renderSolutionIntro(areaLabel, baseFormula);
 
