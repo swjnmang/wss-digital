@@ -798,7 +798,7 @@ const createRentenEndwertTask = (): Task => {
   const q = 1 + p / 100;
   const qn = Math.pow(q, n);
   const Kn = (r * (qn - 1)) / (q - 1);
-  const variant = randomChoice<RentenVariant>(['Kn', 'K0', 'r', 'n']);
+  const variant = randomChoice<RentenVariant>(['Kn', 'r', 'n']);
 
   const story = <p>{randomChoice(rentenContexts)}</p>;
   const areaLabel = 'nachschüssige Rentensparrate';
