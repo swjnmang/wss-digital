@@ -515,20 +515,18 @@ function drawRays(api: any, task: RayTask) {
       api.setLabelVisible(pt, true);
     });
 
-    // Parallele Geraden - GRÜN und DICK
-    if (task.type.includes("ray1")) {
-      // Gerade 1 durch Q und R
-      api.evalCommand(`g1 = Line(Q, R)`);
-      api.setColor("g1", 34, 139, 34);
-      api.setLineThickness("g1", 3);
-      api.setLabelVisible("g1", false);
+    // Parallele Geraden - GRÜN und DICK (für beide Strahlensatz-Typen)
+    // Gerade 1 durch Q und R
+    api.evalCommand(`g1 = Line(Q, R)`);
+    api.setColor("g1", 34, 139, 34);
+    api.setLineThickness("g1", 3);
+    api.setLabelVisible("g1", false);
 
-      // Gerade 2 durch P und S (parallel zu g1)
-      api.evalCommand(`g2 = Line(P, S)`);
-      api.setColor("g2", 34, 139, 34);
-      api.setLineThickness("g2", 3);
-      api.setLabelVisible("g2", false);
-    }
+    // Gerade 2 durch P und S (parallel zu g1)
+    api.evalCommand(`g2 = Line(P, S)`);
+    api.setColor("g2", 34, 139, 34);
+    api.setLineThickness("g2", 3);
+    api.setLabelVisible("g2", false);
 
     api.setCoordSystem(-1, 11, -4, 6);
   } catch (err) {
