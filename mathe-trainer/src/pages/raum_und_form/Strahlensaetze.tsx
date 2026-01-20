@@ -184,6 +184,19 @@ function generateTask(): RayTask {
 const cardClass = "rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6";
 const buttonClass = "inline-flex items-center justify-center gap-2 rounded-xl border border-slate-900 text-slate-50 bg-slate-900 px-4 py-2 text-sm font-semibold hover:bg-slate-800";
 
+// Helper function to render mixed text/math content
+function renderMixedMath(text: string) {
+  const parts = text.split(/(\$[^$]+\$)/);
+  return parts.map((part, idx) => {
+    if (part.startsWith('$') && part.endsWith('$')) {
+      // Remove dollar signs and render as math
+      const mathContent = part.slice(1, -1);
+      return <InlineMath key={idx} math={mathContent} />;
+    }
+    return part ? <span key={idx}>{part}</span> : null;
+  });
+}
+
 export default function Strahlensaetze() {
   const [task, setTask] = useState<RayTask>(() => generateTask());
   const [input, setInput] = useState("");
@@ -246,8 +259,8 @@ export default function Strahlensaetze() {
 
           <RaySketch task={task} />
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900 text-center">
-            <InlineMath math={task.description} />
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
+            {renderMixedMath(task.description)}
           </div>
 
           <div className="space-y-2">
