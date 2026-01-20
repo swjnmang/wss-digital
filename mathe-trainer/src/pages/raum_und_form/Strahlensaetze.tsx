@@ -32,8 +32,11 @@ function generateTask(): RayTask {
   // Zufällig zwischen 1. und 2. Strahlensatz wählen (50/50)
   const useTheorem2 = Math.random() > 0.5;
   
-  if (useTheorem2) {
-    // 2. STRAHLENSATZ - Aufgabentypen
+  // Zufällig Task-Kategorie wählen: 1) Theorem 1, 2) Theorem 2, 3) Parallele Geraden
+  const taskCategory = Math.floor(Math.random() * 3);
+  
+  if (taskCategory === 2) {
+    // 2. STRAHLENSATZ - Aufgabentypen (zwischen Parallelen auf den Strahlen)
     const theorem2Types = [
       {
         name: "PQ_berechnen",
@@ -97,6 +100,56 @@ function generateTask(): RayTask {
     
     return {
       type: "ray2_segment",
+      scenario: Math.floor(Math.random() * 4),
+      p,
+      q,
+      r,
+      expectedAnswer: selectedType.expectedAnswer,
+      unit: "cm",
+      tolerance: 0.2,
+      description: selectedType.description,
+      hint: selectedType.hint,
+      solution: selectedType.solution
+    };
+  } else if (taskCategory === 1) {
+    // PARALLEL LINES - Aufgabentypen (auf den Parallelen)
+    // Strecke zwischen den Parallelen auf der ersten Linie = pq
+    // Strecke zwischen den Parallelen auf der zweiten Linie = rs
+    const parallelTypes = [
+      {
+        name: "PQ_auf_parallel",
+        expectedAnswer: pq,
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{PQ}$ (die Strecke zwischen den beiden parallelen Geraden auf dem ersten Strahl).`,
+        hint: "Die Strecke PQ liegt auf der ersten Parallelen zwischen den Punkten P und Q. Das ist einfach die Differenz!",
+        solution: [
+          `$\\overline{PQ} = \\overline{OQ} - \\overline{OP}$`,
+          `$\\overline{PQ} = ${q.toFixed(1)} - ${p.toFixed(1)}$`,
+          `$\\overline{PQ} = ${pq.toFixed(2)}$ cm`
+        ]
+      },
+      {
+        name: "RS_auf_parallel",
+        expectedAnswer: rs,
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{RS}$ (die Strecke zwischen den beiden parallelen Geraden auf dem zweiten Strahl).`,
+        hint: "Berechne zuerst $\\overline{OS}$ mit dem Strahlensatz 1, dann $\\overline{RS} = \\overline{OS} - \\overline{OR}$.",
+        solution: [
+          "Zuerst berechnen wir $\\overline{OS}$ mit Strahlensatz 1:",
+          `$\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$`,
+          `$\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = \\frac{${r.toFixed(1)}}{\\overline{OS}}$`,
+          `$\\overline{OS} = ${os.toFixed(2)}$ cm`,
+          "",
+          "Dann berechnen wir $\\overline{RS}$:",
+          `$\\overline{RS} = \\overline{OS} - \\overline{OR}$`,
+          `$\\overline{RS} = ${os.toFixed(2)} - ${r.toFixed(1)}$`,
+          `$\\overline{RS} = ${rs.toFixed(2)}$ cm`
+        ]
+      }
+    ];
+    
+    const selectedType = parallelTypes[Math.floor(Math.random() * parallelTypes.length)];
+    
+    return {
+      type: "parallel_segment",
       scenario: Math.floor(Math.random() * 4),
       p,
       q,
