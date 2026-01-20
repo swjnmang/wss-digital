@@ -1235,6 +1235,12 @@ export default function GemischteFinanzaufgaben() {
     );
   };
 
+  const isInputCorrect = (input: TaskInput, userValue: string): boolean => {
+    if (!userValue.trim()) return false;
+    const parsed = parseFloat(userValue.replace(',', '.'));
+    return !Number.isNaN(parsed) && Math.abs(parsed - input.correctValue) <= input.tolerance;
+  };
+
   const checkAnswer = (id: number) => {
     let attempt: 'correct' | 'incorrect' | 'invalid' = 'invalid';
 
@@ -1424,18 +1430,24 @@ export default function GemischteFinanzaufgaben() {
                                 <td className="p-2 text-center font-semibold text-slate-600">{row.year}</td>
                                 {PLAN_COLUMNS.map(col => {
                                   const input = row.cells[col.key];
+                                  const userValue = card.userAnswers[input.id];
+                                  const isCorrect = isInputCorrect(input, userValue);
                                   return (
                                     <td key={col.key} className="p-2 align-middle">
                                       <div className="flex items-center gap-2">
                                         <input
                                           type="text"
                                           aria-label={`${col.label} Jahr ${row.year}`}
-                                          value={card.userAnswers[input.id]}
+                                          value={userValue}
                                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                             handleInputChange(card.id, input.id, e.target.value)
                                           }
                                           placeholder={input.placeholder}
-                                          className="w-full border-2 border-slate-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:border-blue-400"
+                                          className={`w-full border-2 rounded-xl px-3 py-2 text-base focus:outline-none ${
+                                            userValue && isCorrect
+                                              ? 'border-green-500 bg-green-50 focus:border-green-600'
+                                              : 'border-slate-300 focus:border-blue-400'
+                                          }`}
                                         />
                                         <span className="text-base font-semibold text-slate-600">{input.unit}</span>
                                       </div>
