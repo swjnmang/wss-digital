@@ -314,7 +314,7 @@ function generateTask(): RayTask {
           `$\\overline{QR} = ${ps.toFixed(2)} \\times \\frac{${q.toFixed(1)}}{${p.toFixed(1)}}$`,
           `$\\overline{QR} = ${qr.toFixed(2)}$ cm`,
           "",
-          `Probe: $\\frac{\\overline{OR}}{\\overline{OS}} = \\frac{${r.toFixed(1)}}{${os.toFixed(2)}} = ${(r/os).toFixed(3)}$ sollte auch = $\\frac{${q.toFixed(1)}}{${p.toFixed(1)}} = ${(q/p).toFixed(3)}$ sein ✓`
+          `Probe: $\\frac{\\overline{OR}}{\\overline{OS}} = \\frac{${r.toFixed(1)}}{${os.toFixed(2)}} = ${(r/os).toFixed(3)}$ und $\\frac{\\overline{OQ}}{\\overline{OP}} = \\frac{${q.toFixed(1)}}{${p.toFixed(1)}} = ${(q/p).toFixed(3)}$ ✓`
         ]
       },
       {
@@ -331,7 +331,7 @@ function generateTask(): RayTask {
           `$\\overline{PS} = ${qr.toFixed(2)} \\times \\frac{${p.toFixed(1)}}{${q.toFixed(1)}}$`,
           `$\\overline{PS} = ${ps.toFixed(2)}$ cm`,
           "",
-          `Probe: $\\frac{\\overline{OR}}{\\overline{OS}} = \\frac{${r.toFixed(1)}}{${os.toFixed(2)}} = ${(r/os).toFixed(3)}$ sollte auch = $\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = ${(p/q).toFixed(3)}$ sein ✓`
+          `Probe: $\\frac{\\overline{OR}}{\\overline{OS}} = \\frac{${r.toFixed(1)}}{${os.toFixed(2)}} = ${(r/os).toFixed(3)}$ und $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = ${(p/q).toFixed(3)}$ ✓`
         ]
       }
     ];
