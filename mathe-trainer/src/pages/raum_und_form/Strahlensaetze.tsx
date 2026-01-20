@@ -19,18 +19,18 @@ type RayTask = {
 
 function generateTask(): RayTask {
   // Zufällig Zahlenwerte generieren
-  const p = randomBetween(2, 5);
-  const q = randomBetween(6, 10);
-  const r = randomBetween(3, 6);
+  // Bereiche gewählt, um geometrisch sinnvolle Aufgaben zu garantieren (rs > 0)
+  const p = randomBetween(2, 3);
+  const q = randomBetween(8, 10);
+  const r = randomBetween(2, 3);
   
   // Berechnete Werte
   const pq = q - p;  // Abschnitt PQ
   const os = (q * r) / p;  // OS nach Strahlensatz 1
   const rs = os - r;  // Abschnitt RS
 
-  // Zufällig zwischen 1. und 2. Strahlensatz wählen
-  // Aber nur Theorem 2 wenn RS positiv ist (geometrisch sinnvoll)
-  const useTheorem2 = rs > 0 && Math.random() > 0.5;
+  // Zufällig zwischen 1. und 2. Strahlensatz wählen (50/50)
+  const useTheorem2 = Math.random() > 0.5;
   
   if (useTheorem2) {
     // 2. STRAHLENSATZ - Aufgabentypen
