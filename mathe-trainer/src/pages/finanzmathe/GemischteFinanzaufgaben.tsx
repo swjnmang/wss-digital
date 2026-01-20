@@ -130,22 +130,136 @@ const zinseszinsContexts = [
   'Ein eSports-Schulteam legt seine Gewinne auf einem Festgeldkonto an.',
 ] as const;
 
-const kapitalmehrungContexts = [
+// Kapitalmehrung: Fall Kn (Endkapital gesucht)
+const kapitalmehrungKnContexts = [
   'Die Nachhaltigkeits-AG startet mit einem Grundstock und zahlt am Jahresende zusätzliche Beträge ein.',
   'Der Makerspace spart für einen Lasercutter und füttert das Konto jede Saison mit Projektbeiträgen.',
   'Eine Schülerfirma investiert ihre Jahresgewinne in einen Innovationsfonds.',
+  'Der Förderverein sammelt Spendenmittel und macht regelmäßige Jahresverstärkungen.',
+  'Eine Jugendgruppe baute sich ein Kapital auf, mit jährlichen Zusätzen zum Sparen.',
+  'Ein junges Unternehmen wächst: Mit Startkapital und Reinvestitionen zum Erfolg.',
+  'Der Schulverein plant: Stiftungsgründung durch Kapitalaufbau mit Jahresbeiträgen.',
+  'Eine Familie spart auf ein Ziel hin: Kombination aus Erbschaft und jährlichen Sparbeiträgen.',
 ] as const;
 
-const kapitalminderungContexts = [
+// Kapitalmehrung: Fall K0 (Startkapital gesucht)
+const kapitalmehrungK0Contexts = [
+  'Mit welchem Startkapital und jährlichen Zusatzzahlungen erreicht man ein bestimmtes Endziel?',
+  'Ein Projekt braucht eine Anschubfinanzierung: Welches Startkapital ist nötig bei regelmäßigen Jahresverstärkungen?',
+  'Rückwärts rechnen: Bei bekanntem Sparplan, welches Startguthaben war erforderlich?',
+  'Die Finanzplanung: Welcher Anfangsbetrag und jährliche Raten führen zum Ziel?',
+  'Startbudget berechnen: Wie viel muss am Anfang eingezahlt werden bei dem gegebenen Sparplan?',
+  'Ein Ziel ist bekannt, die jährlichen Raten feststehen – wie viel Startgeld war nötig?',
+  'Investitionsrechnung rückwärts: Welches Anfangskapital ist erforderlich?',
+  'Mit diesem Kapitalaufbau zum bekannten Endziel: Welcher Anfangsbetrag?',
+] as const;
+
+// Kapitalmehrung: Fall r (Rate gesucht)
+const kapitalmehrungRContexts = [
+  'Mit einem festen Startguthaben und gezielten Jahresraten zum Endziel sparen.',
+  'Das Startkapital ist bekannt: Wie viel muss jährlich zusätzlich eingezahlt werden?',
+  'Der Sparplan: Welche Jahresrate führt mit Startkapital zum angestrebten Betrag?',
+  'Mit bekanntem Anfangskapital: Welche Jahreseinzahlung ist für das Ziel notwendig?',
+  'Die Spardauer ist festgelegt: Welche jährliche Rate braucht man zum geplanten Kapital?',
+  'Bei dieser Laufzeit und diesem Ziel: Welche konstanten Jahresraten sind erforderlich?',
+  'Wie viel muss jährlich dazu kommen, um diesen Plan zu erfüllen?',
+  'Die Investitionsstrategie: Welche jährliche Verstärkung führt zum Erfolg?',
+] as const;
+
+// Kapitalmehrung: Fall n (Laufzeit gesucht)
+const kapitalmehrungNContexts = [
+  'Mit Startkapital und fester Jahresrate sparen: Wie lange bis zum Ziel?',
+  'Zeitrahmen planen: Nach wie vielen Jahren ist das Endziel erreicht?',
+  'Sparplanung: Wann ist die Sparsumme mit gegebener Rate zusammen?',
+  'Die Geduld wird gelohnt: In wie vielen Jahren zeichnet sich das Ersparte ab?',
+  'Laufzeitberechnung: Wie lange spart man bei konstanter Jahresrate zum Erfolg?',
+  'Bei diesem Aufbau: Wie lange braucht das Projekt zum Zielkapital?',
+  'Wie lange reicht die Sparzeit mit dieser Strategie?',
+  'Investitionsplanung: In wie vielen Jahren ist das Zielbudget erreicht?',
+] as const;
+
+// Kapitalminderung: Fall Kn (Restkapital gesucht)
+const kapitalminderungKnContexts = [
   'Der Förderverein entnimmt jedes Jahr Geld aus dem Rücklagenkonto, um eine soziale Initiative zu finanzieren.',
   'Ein Schulorchester zahlt sich jährlich Reisezuschüsse aus seiner Startkasse aus.',
   'Die Umwelt-AG reduziert ihren Klimafonds, indem sie jedes Jahr Projektgelder entnimmt.',
+  'Ein Stiftungskapital wird durch Jahresentnahmen aufgebraucht: Wie viel bleibt am Ende?',
+  'Mit regelmäßigen Entnahmen vom Ersparten leben: Welches Restkapital ist nach der Laufzeit noch da?',
+  'Ein Rentenfonds schrumpft durch regelmäßige Auszahlungen: Wie viel ist noch übrig?',
+  'Die Altersvorsorge wird aufgebraucht: Nach der Laufzeit, wie viel fehlt noch zum Ziel?',
+  'Rückgang durch Rückzahlungen: Welcher Betrag verbleibt nach allen Entnahmen?',
 ] as const;
 
-const rentenContexts = [
-  'Ein Schulteam spart für eine Abschlussreise und zahlt am Ende jedes Jahres denselben Betrag ein.',
-  'Der Theaterkurs plant Kulissen und legt jedes Jahr Honorar-Reste zur Seite.',
-  'Der Chor sammelt für eine Konzerttournee und überweist jedes Jahr Vereinsbeiträge.',
+// Kapitalminderung: Fall K0 (Startkapital gesucht)
+const kapitalminderungK0Contexts = [
+  'Welches Anfangskapital war nötig, um über Jahre hinweg regelmäßige Entnahmen zu machen?',
+  'Rückwärts planen: Bei bekannten Entnahmen und geplanten Restkapital, wie viel war am Anfang nötig?',
+  'Das Startbudget: Welches Anfangskapital ermöglicht regelmäßige Auszahlungen über die Zeit?',
+  'Kapitalplanung: Mit welchem Startkapital und Entnahmen führt die Rechnung zu diesem Endzustand?',
+  'Anfangsbestand berechnen: Welcher Betrag war erforderlich für den gegebenen Entnahmeplan?',
+  'Rückwärtsrechnung: Bei dieser Entnahmerate bis zum Restkapital, welcher Anfangsbetrag?',
+  'Wie hoch muss das Anfangskapital sein für diesen Entnahmeplan?',
+  'Kapitalanlage-Berechnung: Welche Einzahlung ist nötig für diese Auszahlungsserie?',
+] as const;
+
+// Kapitalminderung: Fall r (Entnahme gesucht)
+const kapitalminderungRContexts = [
+  'Mit einem Startguthaben und bekannter Ziellaufzeit: Welche Jahresentnahmen sind möglich?',
+  'Das verfügbare Kapital und die geplante Nutzungsdauer sind bekannt: Wie viel kann man jährlich entnehmen?',
+  'Rente vom Ersparten: Welche feste Jahresentnahme ist möglich?',
+  'Jahresentnahmen berechnen: Bei gegebenem Anfangs- und Endkapital, welche Rate ist möglich?',
+  'Die Frage nach der möglichen Auszahlung: Welcher Betrag kann regelmäßig entnommen werden?',
+  'Wie viel darf ich monatlich, entschuldigung, jährlich entnehmen?',
+  'Bei diesem Kapital und dieser Dauer: Welche konstanten Entnahmen sind erlaubt?',
+  'Rentensicherung: Welche regelmäßige Auszahlung ist möglich?',
+] as const;
+
+// Kapitalminderung: Fall n (Laufzeit gesucht)
+const kapitalminderungNContexts = [
+  'Mit festen Jahresentnahmen vom Konto: Wie lange reicht das Kapital?',
+  'Die Entnahmerate ist bekannt: Nach wie vielen Jahren ist das Geld aufgebraucht?',
+  'Wie lange hält das Geld bei gegebenen Jahrzahlungen?',
+  'Entnahmeplan: In wie vielen Jahren ist der Kapitalbestand aufgebraucht?',
+  'Lebensdauer des Kapitals: Wie lange kann man bei dieser Rate entnehmen?',
+  'Restlaufzeit berechnen: Nach wie vielen Jahren erreicht man das Endziel?',
+  'Rentendauer planen: Wie lange reichen die Mittel?',
+  'Countdown zum Kapitalende: Wie viele Jahre liegen noch vor uns?',
+] as const;
+
+// Rentenrechnung: Fall Kn (Endwert gesucht)
+const rentenKnContexts = [
+  'Ein Schulteam spart für eine Abschlussreise: Jedes Jahr werden die gleichen Beträge am Jahresende eingezahlt.',
+  'Der Theaterkurs plant die Anschaffung von Kulissen: Legen Sie das Budget als Jahresrenten an.',
+  'Der Chor sammelt für eine Konzerttournee: Jährliche Einzahlungen am Ende des Jahres sollen sich aufzinsen.',
+  'Ein Student möchte nach dem Abitur ein Auslandssemester finanzieren: Jedes Jahr Ersparnisse anlegen.',
+  'Die Robotik-AG spart für neue Ausrüstung: Gleichmäßige Jahresrenten mit Zinseffekt aufgebaut.',
+  'Eine Klasse träumt von einer Studienfahrt und spart mit gleichbleibenden Jahrbeiträgen.',
+  'Der Schülerrat legt für ein Sommerfest Rücklagen an: Monatliche Einzahlungen bringen Zinsertrag.',
+  'Eine Sportgruppe sammelt für neue Trainingsmaterialien durch regelmäßiges Sparen.',
+] as const;
+
+// Rentenrechnung: Fall r (Rate gesucht)
+const rentenRContexts = [
+  'Für die Abschlussfahrt wird ein festes Sparziel angestrebt: Welche gleiche Jahresrate muss eingezahlt werden?',
+  'Die Schülerfirma will einen bestimmten Betrag sparen: Wie viel muss jährlich eingezahlt werden?',
+  'Ein Schulverein legt einen Rücklagenbetrag an: Welche Jahresrate wird benötigt, um dieses Ziel zu erreichen?',
+  'Für den neuen Sportplatz wird durch Jahresrenten gesammelt: Welche Jahresrate braucht man für das Zielbudget?',
+  'Der Musikverein möchte sein Instrumentenbudget aufbauen: Wie hoch muss die jährliche Einzahlung sein?',
+  'Welche regelmäßige Sparsumme führt zum angestrebten Traum-Endziel?',
+  'Mit gleichen Jahrauszahlungen zu einem konkreten Ersparten: Wie hoch muss jeder Jahresbetrag sein?',
+  'Ein Projekt braucht Sparmittel: Welche konstante Jahresrate ist erforderlich?',
+] as const;
+
+// Rentenrechnung: Fall n (Zeit gesucht)
+const rentenNContexts = [
+  'Mit fester Jahresrate sparen: Wie lange dauert es, bis die Sparsumme erreicht ist?',
+  'Die Sportgruppe spart mit gleichbleibenden Jahresbeiträgen: Nach wie vielen Jahren ist das Ziel erreicht?',
+  'Ein Projekt wird durch jährliche gleiche Einzahlungen finanziert: Wann reicht das gesparte Kapital?',
+  'Die AG spart mit konstanter Jahresrate: Wie lange bis zum geplanten Projekt?',
+  'Mit regelmäßigen Jahreseinzahlungen sparen: Nach wie vielen Jahren liegt genug Geld vor?',
+  'Der Traum rückt näher: Wie lange reichen die Jahrzahlungen zum Ziel?',
+  'Welche Spardauer ist notwendig, um die Endsumme zu erreichen?',
+  'Mit konstanten jährlichen Beiträgen zum Erfolg: Wie viele Jahre dauert es?',
 ] as const;
 
 const ratendarlehenContexts = [
@@ -489,7 +603,21 @@ const createKapitalmehrungTask = (): Task => {
   const Kn = K0 * qn + (r * (qn - 1)) / qMinus1;
   const variant = randomChoice<KapitalmehrungVariant>(['Kn', 'K0', 'r', 'n']);
 
-  const story = <p>{randomChoice(kapitalmehrungContexts)}</p>;
+  let story: React.ReactNode = null;
+  let contextText: string = '';
+  
+  // Wähle Kontext basierend auf Variant
+  if (variant === 'Kn') {
+    contextText = randomChoice(kapitalmehrungKnContexts);
+  } else if (variant === 'K0') {
+    contextText = randomChoice(kapitalmehrungK0Contexts);
+  } else if (variant === 'r') {
+    contextText = randomChoice(kapitalmehrungRContexts);
+  } else if (variant === 'n') {
+    contextText = randomChoice(kapitalmehrungNContexts);
+  }
+  
+  story = <p>{contextText}</p>;
   const areaLabel = 'Kapitalmehrung';
   const baseFormula = latex`K_n = K_0 \cdot q^n + r \cdot \frac{q^n - 1}{q - 1}`;
   const solutionIntro = renderSolutionIntro(areaLabel, baseFormula);
@@ -630,7 +758,21 @@ const createKapitalminderungTask = (): Task => {
   const Kn = K0 * qn - (r * (qn - 1)) / qMinus1;
   const variant = randomChoice<KapitalminderungVariant>(['Kn', 'K0', 'r', 'n']);
 
-  const story = <p>{randomChoice(kapitalminderungContexts)}</p>;
+  let story: React.ReactNode = null;
+  let contextText: string = '';
+  
+  // Wähle Kontext basierend auf Variant
+  if (variant === 'Kn') {
+    contextText = randomChoice(kapitalminderungKnContexts);
+  } else if (variant === 'K0') {
+    contextText = randomChoice(kapitalminderungK0Contexts);
+  } else if (variant === 'r') {
+    contextText = randomChoice(kapitalminderungRContexts);
+  } else if (variant === 'n') {
+    contextText = randomChoice(kapitalminderungNContexts);
+  }
+  
+  story = <p>{contextText}</p>;
   const areaLabel = 'Kapitalminderung';
   const baseFormula = latex`K_n = K_0 \cdot q^n - r \cdot \frac{q^n - 1}{q - 1}`;
   const solutionIntro = renderSolutionIntro(areaLabel, baseFormula);
@@ -761,7 +903,19 @@ const createRentenEndwertTask = (): Task => {
   const Kn = (r * (qn - 1)) / (q - 1);
   const variant = randomChoice<RentenVariant>(['Kn', 'r', 'n']);
 
-  const story = <p>{randomChoice(rentenContexts)}</p>;
+  let story: React.ReactNode = null;
+  let contextText: string = '';
+  
+  // Wähle Kontext basierend auf Variant
+  if (variant === 'Kn') {
+    contextText = randomChoice(rentenKnContexts);
+  } else if (variant === 'r') {
+    contextText = randomChoice(rentenRContexts);
+  } else if (variant === 'n') {
+    contextText = randomChoice(rentenNContexts);
+  }
+  
+  story = <p>{contextText}</p>;
   const areaLabel = 'Rentensparrate';
   const baseFormula = latex`K_n = r \cdot \frac{q^n - 1}{q - 1}`;
   const solutionIntro = renderSolutionIntro(areaLabel, baseFormula);
