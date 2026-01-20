@@ -164,91 +164,250 @@ interface LoanContractProps {
   annuity?: number;
 }
 
-const LoanContract: React.FC<LoanContractProps> = ({
+type ContractDesign = 'classic' | 'modern' | 'compact' | 'minimal' | 'detailed';
+
+const getRandomContractDesign = (): ContractDesign => {
+  const designs: ContractDesign[] = ['classic', 'modern', 'compact', 'minimal', 'detailed'];
+  return randomChoice(designs);
+};
+
+// Design 1: Classic - Zeitloses Design mit Rahmen
+const LoanContractClassic: React.FC<LoanContractProps> = ({
   lender,
   borrower,
   loanAmount,
   interestRate,
   duration,
   type,
-  tilgung,
-  annuity,
-}) => {
+}) => (
+  <div className="mb-6 border-2 border-gray-800 p-6 bg-white rounded-lg shadow-md max-w-3xl">
+    <div className="text-center mb-6 border-b-2 border-gray-800 pb-4">
+      <h2 className="text-2xl font-bold tracking-wide">Darlehensvertrag</h2>
+      <p className="text-sm text-gray-600 mt-2">zwischen</p>
+    </div>
 
-  return (
-    <div className="mb-6 border-2 border-gray-800 p-6 bg-white rounded-lg shadow-md max-w-3xl">
-      {/* Überschrift */}
-      <div className="text-center mb-6 border-b-2 border-gray-800 pb-4">
-        <h2 className="text-2xl font-bold tracking-wide">Darlehensvertrag</h2>
-        <p className="text-sm text-gray-600 mt-2">zwischen</p>
+    <div className="grid grid-cols-2 gap-8 mb-6 text-sm">
+      <div>
+        <p className="font-bold mb-2">{lender.name}</p>
+        <p className="text-gray-700">{lender.street}</p>
+        <p className="text-gray-700">{lender.postal} {lender.city}</p>
+        <p className="text-gray-600 text-xs mt-2">(nachfolgend Darlehensgeber genannt)</p>
       </div>
+      <div>
+        <p className="font-bold mb-2">{borrower.name}</p>
+        <p className="text-gray-700">{borrower.street}</p>
+        <p className="text-gray-700">{borrower.postal} {borrower.city}</p>
+        <p className="text-gray-600 text-xs mt-2">(nachfolgend Darlehensnehmer genannt)</p>
+      </div>
+    </div>
 
-      {/* Vertragsparteien */}
-      <div className="grid grid-cols-2 gap-8 mb-6 text-sm">
-        {/* Darlehensgeber */}
-        <div>
-          <p className="font-bold mb-2">{lender.name}</p>
+    <p className="text-center text-sm mb-6 text-gray-700">wird folgender Vertrag geschlossen.</p>
+
+    <div className="space-y-4 text-sm">
+      <div>
+        <h3 className="font-bold mb-1">§ 1 Darlehensbetrag</h3>
+        <p className="text-gray-700">Der Darlehensgeber gewährt dem Darlehensnehmern ein Darlehen in Höhe von <span className="font-semibold">{formatCurrency(loanAmount)} €</span>.</p>
+      </div>
+      <div>
+        <h3 className="font-bold mb-1">§ 2 Laufzeit</h3>
+        <p className="text-gray-700">Das Darlehen hat eine Laufzeit von <span className="font-semibold">{duration} Jahren</span> ab dem Auszahlungsdatum.</p>
+      </div>
+      <div>
+        <h3 className="font-bold mb-1">§ 3 Zinsen</h3>
+        <p className="text-gray-700">Das Darlehen ist mit <span className="font-semibold">{formatNumber(interestRate, type === 'rate' ? 1 : 2)} % p.a.</span> zu verzinsen. Die Zinsen werden jährlich berechnet.</p>
+      </div>
+      <div>
+        <h3 className="font-bold mb-1">§ 4 Tilgung</h3>
+        {type === 'rate' ? (
+          <p className="text-gray-700">Das Darlehen ist in jährlich gleichbleibenden Tilgungsraten jeweils zum 31.12. eines jeden Jahres zu tilgen.</p>
+        ) : (
+          <p className="text-gray-700">Das Darlehen ist durch jährlich gleiche Annuitäten jeweils zum 31.12. eines jeden Jahres zu tilgen. Die Annuität setzt sich aus Zinsanteil und Tilgungsanteil zusammen.</p>
+        )}
+      </div>
+    </div>
+  </div>
+);
+
+// Design 2: Modern - Modernes Design mit Farben
+const LoanContractModern: React.FC<LoanContractProps> = ({
+  lender,
+  borrower,
+  loanAmount,
+  interestRate,
+  duration,
+  type,
+}) => (
+  <div className="mb-6 bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-lg max-w-3xl border border-blue-300">
+    <div className="text-center mb-6 pb-4">
+      <h2 className="text-3xl font-bold text-blue-900">Darlehensvertrag</h2>
+      <div className="h-1 bg-blue-400 mt-3 mx-auto w-24 rounded-full"></div>
+    </div>
+
+    <div className="grid grid-cols-2 gap-6 mb-6 text-sm">
+      <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500">
+        <p className="font-bold text-blue-900 mb-1">{lender.name}</p>
+        <p className="text-gray-600">{lender.street}</p>
+        <p className="text-gray-600">{lender.postal} {lender.city}</p>
+      </div>
+      <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500">
+        <p className="font-bold text-blue-900 mb-1">{borrower.name}</p>
+        <p className="text-gray-600">{borrower.street}</p>
+        <p className="text-gray-600">{borrower.postal} {borrower.city}</p>
+      </div>
+    </div>
+
+    <div className="space-y-3 text-sm">
+      <div className="bg-white p-3 rounded-lg">
+        <p className="text-blue-900 font-bold">Darlehensbetrag: <span className="text-lg">{formatCurrency(loanAmount)} €</span></p>
+      </div>
+      <div className="bg-white p-3 rounded-lg">
+        <p className="text-blue-900 font-bold">Laufzeit: <span className="text-lg">{duration} Jahre</span></p>
+      </div>
+      <div className="bg-white p-3 rounded-lg">
+        <p className="text-blue-900 font-bold">Zinssatz: <span className="text-lg">{formatNumber(interestRate, type === 'rate' ? 1 : 2)} % p.a.</span></p>
+      </div>
+      <div className="bg-white p-3 rounded-lg">
+        <p className="text-blue-900 font-bold">Tilgungsmodus: <span className="text-lg">{type === 'rate' ? 'Gleichbleibende Tilgungsraten' : 'Annuitätendarlehen'}</span></p>
+      </div>
+    </div>
+  </div>
+);
+
+// Design 3: Compact - Kompaktes Design
+const LoanContractCompact: React.FC<LoanContractProps> = ({
+  lender,
+  borrower,
+  loanAmount,
+  interestRate,
+  duration,
+  type,
+}) => (
+  <div className="mb-6 bg-slate-100 p-4 rounded-lg max-w-3xl border-l-4 border-slate-700">
+    <h2 className="text-xl font-bold mb-3 text-slate-800">Darlehensvertrag</h2>
+    
+    <div className="grid grid-cols-2 gap-4 mb-4 text-xs">
+      <div>
+        <p className="font-bold text-slate-700">{lender.name}</p>
+        <p className="text-slate-600">{lender.street}, {lender.postal} {lender.city}</p>
+      </div>
+      <div>
+        <p className="font-bold text-slate-700">{borrower.name}</p>
+        <p className="text-slate-600">{borrower.street}, {borrower.postal} {borrower.city}</p>
+      </div>
+    </div>
+
+    <div className="grid grid-cols-2 gap-3 text-xs bg-white p-3 rounded">
+      <div><span className="font-bold">Betrag:</span> {formatCurrency(loanAmount)} €</div>
+      <div><span className="font-bold">Laufzeit:</span> {duration} J.</div>
+      <div><span className="font-bold">Zins:</span> {formatNumber(interestRate, type === 'rate' ? 1 : 2)} %</div>
+      <div><span className="font-bold">Tilgung:</span> {type === 'rate' ? 'Raten' : 'Annuität'}</div>
+    </div>
+  </div>
+);
+
+// Design 4: Minimal - Minimalistisches Design
+const LoanContractMinimal: React.FC<LoanContractProps> = ({
+  lender,
+  borrower,
+  loanAmount,
+  interestRate,
+  duration,
+  type,
+}) => (
+  <div className="mb-6 p-4 max-w-3xl">
+    <h2 className="text-2xl font-bold mb-4">Darlehensvertrag</h2>
+    
+    <div className="text-sm text-gray-700 space-y-2 mb-4">
+      <p><span className="font-bold">Gläubiger:</span> {lender.name}, {lender.street}, {lender.postal} {lender.city}</p>
+      <p><span className="font-bold">Schuldner:</span> {borrower.name}, {borrower.street}, {borrower.postal} {borrower.city}</p>
+    </div>
+
+    <div className="text-sm space-y-1 border-t border-b border-gray-300 py-3 mb-4">
+      <p>• Darlehensbetrag: <span className="font-semibold">{formatCurrency(loanAmount)} €</span></p>
+      <p>• Laufzeit: <span className="font-semibold">{duration} Jahre</span></p>
+      <p>• Zinssatz: <span className="font-semibold">{formatNumber(interestRate, type === 'rate' ? 1 : 2)} %</span> p.a.</p>
+      <p>• Tilgung: <span className="font-semibold">{type === 'rate' ? 'Gleichbleibende Raten' : 'Annuität'}</span></p>
+    </div>
+  </div>
+);
+
+// Design 5: Detailed - Detailliertes Design mit mehr Struktur
+const LoanContractDetailed: React.FC<LoanContractProps> = ({
+  lender,
+  borrower,
+  loanAmount,
+  interestRate,
+  duration,
+  type,
+}) => (
+  <div className="mb-6 border-2 border-green-700 p-6 bg-green-50 rounded-lg max-w-3xl">
+    <div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-green-700">
+      <h2 className="text-2xl font-bold text-green-900">Darlehensvertrag</h2>
+      <div className="text-xs text-green-700 font-bold">Finanzdokument</div>
+    </div>
+
+    <div className="mb-6">
+      <h3 className="font-bold text-green-900 mb-2">Vertragsbeteiligte</h3>
+      <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+        <div className="bg-green-100 p-3 rounded">
+          <p className="text-green-900 font-bold text-xs mb-1">DARLEHENSGEBER</p>
+          <p className="font-semibold">{lender.name}</p>
           <p className="text-gray-700">{lender.street}</p>
           <p className="text-gray-700">{lender.postal} {lender.city}</p>
-          <p className="text-gray-600 text-xs mt-2">(nachfolgend Darlehensgeber genannt)</p>
         </div>
-
-        {/* Darlehensnehmer */}
-        <div>
-          <p className="font-bold mb-2">{borrower.name}</p>
+        <div className="bg-green-100 p-3 rounded">
+          <p className="text-green-900 font-bold text-xs mb-1">DARLEHENSNEHMER</p>
+          <p className="font-semibold">{borrower.name}</p>
           <p className="text-gray-700">{borrower.street}</p>
           <p className="text-gray-700">{borrower.postal} {borrower.city}</p>
-          <p className="text-gray-600 text-xs mt-2">(nachfolgend Darlehensnehmer genannt)</p>
-        </div>
-      </div>
-
-      <p className="text-center text-sm mb-6 text-gray-700">wird folgender Vertrag geschlossen.</p>
-
-      {/* Vertragsparagraphen */}
-      <div className="space-y-4 text-sm">
-        {/* § 1 */}
-        <div>
-          <h3 className="font-bold mb-1">§ 1 Darlehensbetrag</h3>
-          <p className="text-gray-700">
-            Der Darlehensgeber gewährt dem Darlehensnehmern ein Darlehen in Höhe von{' '}
-            <span className="font-semibold">{formatCurrency(loanAmount)} €</span>.
-          </p>
-        </div>
-
-        {/* § 2 */}
-        <div>
-          <h3 className="font-bold mb-1">§ 2 Laufzeit</h3>
-          <p className="text-gray-700">
-            Das Darlehen hat eine Laufzeit von <span className="font-semibold">{duration} Jahren</span> ab dem Auszahlungsdatum.
-          </p>
-        </div>
-
-        {/* § 3 */}
-        <div>
-          <h3 className="font-bold mb-1">§ 3 Zinsen</h3>
-          <p className="text-gray-700">
-            Das Darlehen ist mit <span className="font-semibold">{formatNumber(interestRate, type === 'rate' ? 1 : 2)} % p.a.</span> zu verzinsen.
-            Die Zinsen werden jährlich berechnet.
-          </p>
-        </div>
-
-        {/* § 4 */}
-        <div>
-          <h3 className="font-bold mb-1">§ 4 Tilgung</h3>
-          {type === 'rate' ? (
-            <p className="text-gray-700">
-              Das Darlehen ist in jährlich gleichbleibenden Tilgungsraten jeweils zum 31.12. eines jeden Jahres zu tilgen.
-            </p>
-          ) : (
-            <p className="text-gray-700">
-              Das Darlehen ist durch jährlich gleiche Annuitäten jeweils zum 31.12. eines jeden Jahres zu tilgen.
-              Die Annuität setzt sich aus Zinsanteil und Tilgungsanteil zusammen.
-            </p>
-          )}
         </div>
       </div>
     </div>
-  );
+
+    <div className="mb-4">
+      <h3 className="font-bold text-green-900 mb-2">Vertragsbedingungen</h3>
+      <table className="w-full text-sm">
+        <tbody>
+          <tr className="border-b border-green-300">
+            <td className="py-2 font-semibold text-green-900">Darlehensbetrag</td>
+            <td className="py-2 text-right font-semibold">{formatCurrency(loanAmount)} €</td>
+          </tr>
+          <tr className="border-b border-green-300">
+            <td className="py-2 font-semibold text-green-900">Laufzeit</td>
+            <td className="py-2 text-right font-semibold">{duration} Jahre</td>
+          </tr>
+          <tr className="border-b border-green-300">
+            <td className="py-2 font-semibold text-green-900">Zinssatz (p.a.)</td>
+            <td className="py-2 text-right font-semibold">{formatNumber(interestRate, type === 'rate' ? 1 : 2)} %</td>
+          </tr>
+          <tr>
+            <td className="py-2 font-semibold text-green-900">Tilgungsmodus</td>
+            <td className="py-2 text-right font-semibold">{type === 'rate' ? 'Ratendarlehen' : 'Annuitätendarlehen'}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+// Wrapper-Komponente, die zufällig ein Design auswählt
+const LoanContract: React.FC<LoanContractProps> = (props) => {
+  const design = getRandomContractDesign();
+  
+  switch (design) {
+    case 'classic':
+      return <LoanContractClassic {...props} />;
+    case 'modern':
+      return <LoanContractModern {...props} />;
+    case 'compact':
+      return <LoanContractCompact {...props} />;
+    case 'minimal':
+      return <LoanContractMinimal {...props} />;
+    case 'detailed':
+      return <LoanContractDetailed {...props} />;
+    default:
+      return <LoanContractClassic {...props} />;
+  }
 };
 
 const simpleInterestContexts = [
