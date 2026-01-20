@@ -231,7 +231,7 @@ const ExamScreen: React.FC<ExamScreenProps> = ({ zustand, onUpdateAnswer, onNavi
           {/* Aufgabentext */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Aufgabe</h2>
-            <div className="prose max-w-none">
+            <div className="prose prose-table:w-full prose-th:bg-blue-100 prose-th:text-blue-900 prose-th:font-bold prose-td:border prose-td:border-gray-300 prose-td:px-3 prose-td:py-2 prose-th:border prose-th:border-gray-300 prose-th:px-3 prose-th:py-2 max-w-none">
               {aktuelleAufgabe.question}
             </div>
           </div>
