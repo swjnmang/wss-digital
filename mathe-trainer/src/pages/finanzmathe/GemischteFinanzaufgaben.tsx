@@ -19,7 +19,7 @@ type FilterType = TaskType | 'mixed' | 'renten_bundled';
 type SimpleInterestVariant = 'Z' | 'K' | 'p' | 't';
 type ZinseszinsVariant = 'Kn' | 'K0' | 'p' | 'n';
 type KapitalmehrungVariant = 'Kn' | 'K0' | 'r' | 'n';
-type RentenVariant = 'Kn' | 'K0' | 'r' | 'n';
+type RentenVariant = 'Kn' | 'r' | 'n';
 type KapitalminderungVariant = 'Kn' | 'K0' | 'r' | 'n';
 
 interface TaskInput {
