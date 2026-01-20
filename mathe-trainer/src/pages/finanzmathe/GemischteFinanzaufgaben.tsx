@@ -174,11 +174,6 @@ const LoanContract: React.FC<LoanContractProps> = ({
   tilgung,
   annuity,
 }) => {
-  const contractDate = new Date().toLocaleDateString('de-DE', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
 
   return (
     <div className="mb-6 border-2 border-gray-800 p-6 bg-white rounded-lg shadow-md max-w-3xl">
@@ -252,20 +247,6 @@ const LoanContract: React.FC<LoanContractProps> = ({
               Die Annuität setzt sich aus Zinsanteil und Tilgungsanteil zusammen.
             </p>
           )}
-        </div>
-      </div>
-
-      {/* Unterschriftszeile */}
-      <div className="grid grid-cols-2 gap-8 mt-8 pt-6 border-t-2 border-gray-800 text-xs">
-        <div>
-          <p className="text-gray-600">{contractDate}</p>
-          <p className="text-gray-600 mt-2">Ort und Datum</p>
-          <div className="h-10 mt-4"></div>
-          <p className="text-gray-600">Darlehensgeber</p>
-        </div>
-        <div>
-          <div className="h-10 mt-2"></div>
-          <p className="text-gray-600">Darlehensnehmer</p>
         </div>
       </div>
     </div>
@@ -1268,14 +1249,6 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
       '€',
       'z.B. 12.500,00',
       row.tilgung,
-      0.02
-    ),
-    createInputField(
-      `${prefix}_y${row.year}_annuity`,
-      `Jahr ${row.year} • Annuität`,
-      '€',
-      'z.B. 15.700,00',
-      row.annuity,
       0.02
     ),
   ]);
