@@ -1235,9 +1235,23 @@ export default function GemischteFinanzaufgaben() {
     );
   };
 
+  // Parst deutsche Zahlenformate: "99.000,00" oder "99000,00" oder "99000"
+  const parseGermanNumber = (str: string): number => {
+    let cleaned = str.trim();
+    
+    // Wenn Komma vorhanden, ist das der Dezimaltrennzeichen
+    // Alle Punkte davor sind Tausender-Trennzeichen
+    if (cleaned.includes(',')) {
+      cleaned = cleaned.replace(/\./g, ''); // Entferne Punkte (Tausender-Trennzeichen)
+      cleaned = cleaned.replace(',', '.'); // Ersetze Komma durch Punkt
+    }
+    
+    return parseFloat(cleaned);
+  };
+
   const isInputCorrect = (input: TaskInput, userValue: string): boolean => {
     if (!userValue.trim()) return false;
-    const parsed = parseFloat(userValue.replace(',', '.'));
+    const parsed = parseGermanNumber(userValue);
     return !Number.isNaN(parsed) && Math.abs(parsed - input.correctValue) <= input.tolerance;
   };
 
@@ -1261,7 +1275,7 @@ export default function GemischteFinanzaufgaben() {
         const wrongFields: TaskInput[] = [];
 
         card.task.inputs.forEach(input => {
-          const parsed = parseFloat(card.userAnswers[input.id].replace(',', '.'));
+          const parsed = parseGermanNumber(card.userAnswers[input.id]);
           if (Number.isNaN(parsed) || Math.abs(parsed - input.correctValue) > input.tolerance) {
             wrongFields.push(input);
           }
