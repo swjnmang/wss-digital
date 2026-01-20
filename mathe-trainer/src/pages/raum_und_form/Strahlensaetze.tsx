@@ -18,8 +18,8 @@ type RayTask = {
 };
 
 function generateTask(): RayTask {
-  // Zufällig eine der 8 Aufgaben auswählen
-  const taskIndex = Math.floor(Math.random() * 8);
+  // Zufällig eine der 16 Aufgaben auswählen
+  const taskIndex = Math.floor(Math.random() * 16);
   const p = randomBetween(2, 5);
   const q = randomBetween(6, 10);
   const r = randomBetween(3, 6);
@@ -174,6 +174,135 @@ function generateTask(): RayTask {
         "",
         `$\\overline{OS} = ${r.toFixed(1)} \\times \\frac{${q.toFixed(1)}}{${p.toFixed(1)}}$`,
         `$\\overline{OS} = ${((q * r) / p).toFixed(2)}$ cm`
+      ]
+    ),
+    // ===== STRAHLENSATZ 2 AUFGABEN =====
+    // Aufgabe 8: |PQ| berechnen (2. Strahlensatz)
+    createTask(
+      "ray2_segment",
+      0,
+      (p * ((q * r) / p - r)) / r,
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{RS} = ${(((q * r) / p) - r).toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{PQ}$ (zwischen den parallelen Geraden auf dem ersten Strahl).`,
+      "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OR}}$. Stelle nach $\\overline{PQ}$ um!",
+      [
+        "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OR}}$",
+        "",
+        `$\\frac{\\overline{PQ}}{${(((q * r) / p) - r).toFixed(1)}} = \\frac{${p.toFixed(1)}}{${r.toFixed(1)}}$`,
+        "",
+        `$\\overline{PQ} = ${(((q * r) / p) - r).toFixed(1)} \\times \\frac{${p.toFixed(1)}}{${r.toFixed(1)}}$`,
+        `$\\overline{PQ} = ${((p * ((q * r) / p - r)) / r).toFixed(2)}$ cm`
+      ]
+    ),
+    // Aufgabe 9: |RS| berechnen (2. Strahlensatz)
+    createTask(
+      "ray2_segment",
+      1,
+      ((q - p) * r) / p,
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{PQ} = ${(q - p).toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{RS}$ (zwischen den parallelen Geraden auf dem zweiten Strahl).`,
+      "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OR}}$. Stelle nach $\\overline{RS}$ um!",
+      [
+        "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OR}}$",
+        "",
+        `$\\frac{${(q - p).toFixed(1)}}{\\overline{RS}} = \\frac{${p.toFixed(1)}}{${r.toFixed(1)}}$`,
+        "",
+        `$\\overline{RS} = ${(q - p).toFixed(1)} \\times \\frac{${r.toFixed(1)}}{${p.toFixed(1)}}$`,
+        `$\\overline{RS} = ${(((q - p) * r) / p).toFixed(2)}$ cm`
+      ]
+    ),
+    // Aufgabe 10: |OP| berechnen (2. Strahlensatz)
+    createTask(
+      "ray2_segment",
+      2,
+      (p * r) / ((q - p) * r / p + r),
+      `Gegeben sind: $\\overline{PQ} = ${(q - p).toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{RS} = ${(((q - p) * r) / p).toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OP}$.`,
+      "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OR}}$. Stelle nach $\\overline{OP}$ um!",
+      [
+        "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OR}}$",
+        "",
+        `$\\frac{${(q - p).toFixed(1)}}{${(((q - p) * r) / p).toFixed(1)}} = \\frac{\\overline{OP}}{${r.toFixed(1)}}$`,
+        "",
+        `$\\overline{OP} = ${r.toFixed(1)} \\times \\frac{${(q - p).toFixed(1)}}{${(((q - p) * r) / p).toFixed(1)}}$`,
+        `$\\overline{OP} = ${p.toFixed(2)}$ cm`
+      ]
+    ),
+    // Aufgabe 11: |OR| berechnen (2. Strahlensatz)
+    createTask(
+      "ray2_segment",
+      3,
+      r,
+      `Gegeben sind: $\\overline{PQ} = ${(q - p).toFixed(1)}$ cm, $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{RS} = ${(((q - p) * r) / p).toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OR}$.`,
+      "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OR}}$. Stelle nach $\\overline{OR}$ um!",
+      [
+        "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OR}}$",
+        "",
+        `$\\frac{${(q - p).toFixed(1)}}{${(((q - p) * r) / p).toFixed(1)}} = \\frac{${p.toFixed(1)}}{\\overline{OR}}$`,
+        "",
+        `$\\overline{OR} = ${p.toFixed(1)} \\times \\frac{${(((q - p) * r) / p).toFixed(1)}}{${(q - p).toFixed(1)}}$`,
+        `$\\overline{OR} = ${r.toFixed(2)}$ cm`
+      ]
+    ),
+    // Aufgabe 12: |PQ| berechnen (2. Strahlensatz, Variante 2)
+    createTask(
+      "ray2_segment",
+      4,
+      (p * r) / q,
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{RS} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{PQ}$.`,
+      "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OQ}}$. Stelle nach $\\overline{PQ}$ um!",
+      [
+        "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OQ}}$",
+        "",
+        `$\\frac{\\overline{PQ}}{${r.toFixed(1)}} = \\frac{${p.toFixed(1)}}{${q.toFixed(1)}}$`,
+        "",
+        `$\\overline{PQ} = ${r.toFixed(1)} \\times \\frac{${p.toFixed(1)}}{${q.toFixed(1)}}$`,
+        `$\\overline{PQ} = ${((p * r) / q).toFixed(2)}$ cm`
+      ]
+    ),
+    // Aufgabe 13: |RS| berechnen (2. Strahlensatz, Variante 2)
+    createTask(
+      "ray2_segment",
+      5,
+      (q * r) / p,
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{PQ} = ${(q - p).toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{RS}$.`,
+      "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OQ}}$. Stelle nach $\\overline{RS}$ um!",
+      [
+        "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OQ}}$",
+        "",
+        `$\\frac{${(q - p).toFixed(1)}}{\\overline{RS}} = \\frac{${p.toFixed(1)}}{${q.toFixed(1)}}$`,
+        "",
+        `$\\overline{RS} = ${(q - p).toFixed(1)} \\times \\frac{${q.toFixed(1)}}{${p.toFixed(1)}}$`,
+        `$\\overline{RS} = ${((q * r) / p).toFixed(2)}$ cm`
+      ]
+    ),
+    // Aufgabe 14: |OP| berechnen (2. Strahlensatz, Variante 2)
+    createTask(
+      "ray2_segment",
+      6,
+      p,
+      `Gegeben sind: $\\overline{PQ} = ${(q - p).toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{RS} = ${((q * r) / p).toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OP}$.`,
+      "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OQ}}$. Stelle nach $\\overline{OP}$ um!",
+      [
+        "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OQ}}$",
+        "",
+        `$\\frac{${(q - p).toFixed(1)}}{${((q * r) / p).toFixed(1)}} = \\frac{\\overline{OP}}{${q.toFixed(1)}}$`,
+        "",
+        `$\\overline{OP} = ${q.toFixed(1)} \\times \\frac{${(q - p).toFixed(1)}}{${((q * r) / p).toFixed(1)}}$`,
+        `$\\overline{OP} = ${p.toFixed(2)}$ cm`
+      ]
+    ),
+    // Aufgabe 15: |OQ| berechnen (2. Strahlensatz, Variante 2)
+    createTask(
+      "ray2_segment",
+      7,
+      q,
+      `Gegeben sind: $\\overline{PQ} = ${(q - p).toFixed(1)}$ cm, $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{RS} = ${((q * r) / p).toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OQ}$.`,
+      "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OQ}}$. Stelle nach $\\overline{OQ}$ um!",
+      [
+        "Strahlensatz 2: $\\frac{\\overline{PQ}}{\\overline{RS}} = \\frac{\\overline{OP}}{\\overline{OQ}}$",
+        "",
+        `$\\frac{${(q - p).toFixed(1)}}{${((q * r) / p).toFixed(1)}} = \\frac{${p.toFixed(1)}}{\\overline{OQ}}$`,
+        "",
+        `$\\overline{OQ} = ${p.toFixed(1)} \\times \\frac{${((q * r) / p).toFixed(1)}}{${(q - p).toFixed(1)}}$`,
+        `$\\overline{OQ} = ${q.toFixed(2)}$ cm`
       ]
     )
   ];
