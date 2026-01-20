@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { InlineMath } from "react-katex";
 
 type RayTask = {
-  type: "ray1_segment" | "ray1_ratio" | "ray2_segment" | "ray2_ratio" | "similarity";
+  type: "ray1_segment" | "ray1_ratio" | "ray2_segment" | "ray2_ratio" | "similarity" | "parallel_segment" | "diagonal_segment";
   scenario: number;
   p: number;
   q: number;
@@ -32,8 +32,8 @@ function generateTask(): RayTask {
   // Zufällig zwischen 1. und 2. Strahlensatz wählen (50/50)
   const useTheorem2 = Math.random() > 0.5;
   
-  // Zufällig Task-Kategorie wählen: 1) Theorem 1, 2) Theorem 2, 3) Parallele Geraden
-  const taskCategory = Math.floor(Math.random() * 3);
+  // Zufällig Task-Kategorie wählen: 1) Theorem 1, 2) Theorem 2, 3) Parallele Geraden, 4) Diagonale Strecken
+  const taskCategory = Math.floor(Math.random() * 4);
   
   if (taskCategory === 2) {
     // 2. STRAHLENSATZ - Aufgabentypen (zwischen Parallelen auf den Strahlen)
@@ -187,7 +187,7 @@ function generateTask(): RayTask {
       hint: selectedType.hint,
       solution: selectedType.solution
     };
-  } else {
+  } else if (taskCategory === 0) {
     // 1. STRAHLENSATZ - Aufgabentypen
     const theorem1Types = [
       {
@@ -268,6 +268,81 @@ function generateTask(): RayTask {
     
     return {
       type: "ray1_segment",
+      scenario: Math.floor(Math.random() * 4),
+      p,
+      q,
+      r,
+      expectedAnswer: selectedType.expectedAnswer,
+      unit: "cm",
+      tolerance: 0.2,
+      description: selectedType.description,
+      hint: selectedType.hint,
+      solution: selectedType.solution
+    };
+  } else {
+    // 4. DIAGONALE STRECKEN - Diagonalen PS und RQ im Trapez
+    // Mit Koordinaten-Modell und Satz des Pythagoras
+    // Annahme: Winkel zwischen den Strahlen = 60° (für realistische Geometrie)
+    const angle = 60 * (Math.PI / 180);
+    
+    // Koordinaten der Punkte
+    // O ist Ursprung
+    const oX = 0, oY = 0;
+    // P auf Strahl 1 (horizontal)
+    const pX = p, pY = 0;
+    // Q auf Strahl 1 (horizontal)
+    const qX = q, qY = 0;
+    // R auf Strahl 2 (60° Winkel)
+    const rX = r * Math.cos(angle), rY = r * Math.sin(angle);
+    // S auf Strahl 2 (60° Winkel)
+    const sX = os * Math.cos(angle), sY = os * Math.sin(angle);
+    
+    // Diagonale PS: von P (p, 0) zu S (os*cos(60°), os*sin(60°))
+    const ps = Math.sqrt((sX - pX) ** 2 + (sY - pY) ** 2);
+    // Diagonale RQ: von R zu Q
+    const rq = Math.sqrt((qX - rX) ** 2 + (qY - rY) ** 2);
+    
+    const diagonalTypes = [
+      {
+        name: "PS_berechnen",
+        expectedAnswer: ps,
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm, und ein Winkel von 60° zwischen den Strahlen. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Diagonalen $\\overline{PS}$ (von P auf der ersten Parallelen zu S auf der zweiten Parallelen).`,
+        hint: "Nutze den Satz des Pythagoras: Die Punkte P und S haben in einem Koordinatensystem die Koordinaten P = (OP, 0) und S = (OS·cos(60°), OS·sin(60°)). Berechne die Entfernung!",
+        solution: [
+          "Wir nutzen ein Koordinatensystem mit O im Ursprung und dem ersten Strahl auf der x-Achse.",
+          "",
+          `Punkt P: (${p.toFixed(1)}, 0)`,
+          `Punkt S: (${os.toFixed(1)} · cos(60°), ${os.toFixed(1)} · sin(60°)) = (${(os * Math.cos(angle)).toFixed(2)}, ${(os * Math.sin(angle)).toFixed(2)})`,
+          "",
+          "Mit dem Satz des Pythagoras:",
+          `$\\overline{PS} = \\sqrt{(${(sX - pX).toFixed(2)})^2 + (${(sY - pY).toFixed(2)})^2}$`,
+          `$\\overline{PS} = \\sqrt{${((sX - pX) ** 2).toFixed(2)} + ${((sY - pY) ** 2).toFixed(2)}}$`,
+          `$\\overline{PS} = ${ps.toFixed(2)}$ cm`
+        ]
+      },
+      {
+        name: "RQ_berechnen",
+        expectedAnswer: rq,
+        description: `Gegeben sind: $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, und ein Winkel von 60° zwischen den Strahlen. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Diagonalen $\\overline{RQ}$ (von R auf der zweiten Parallelen zu Q auf der ersten Parallelen).`,
+        hint: "Nutze den Satz des Pythagoras: Die Punkte R und Q haben in einem Koordinatensystem die Koordinaten R = (OR·cos(60°), OR·sin(60°)) und Q = (OQ, 0). Berechne die Entfernung!",
+        solution: [
+          "Wir nutzen ein Koordinatensystem mit O im Ursprung und dem ersten Strahl auf der x-Achse.",
+          "",
+          `Punkt R: (${r.toFixed(1)} · cos(60°), ${r.toFixed(1)} · sin(60°)) = (${(r * Math.cos(angle)).toFixed(2)}, ${(r * Math.sin(angle)).toFixed(2)})`,
+          `Punkt Q: (${q.toFixed(1)}, 0)`,
+          "",
+          "Mit dem Satz des Pythagoras:",
+          `$\\overline{RQ} = \\sqrt{(${(qX - rX).toFixed(2)})^2 + (${(qY - rY).toFixed(2)})^2}$`,
+          `$\\overline{RQ} = \\sqrt{${((qX - rX) ** 2).toFixed(2)} + ${((qY - rY) ** 2).toFixed(2)}}$`,
+          `$\\overline{RQ} = ${rq.toFixed(2)}$ cm`
+        ]
+      }
+    ];
+    
+    const selectedType = diagonalTypes[Math.floor(Math.random() * diagonalTypes.length)];
+    
+    return {
+      type: "diagonal_segment",
       scenario: Math.floor(Math.random() * 4),
       p,
       q,
