@@ -237,13 +237,11 @@ const LoanContract: React.FC<LoanContractProps> = ({
           <h3 className="font-bold mb-1">§ 4 Tilgung</h3>
           {type === 'rate' ? (
             <p className="text-gray-700">
-              Das Darlehen ist in jährlich gleichbleibenden Tilgungsraten in Höhe von je{' '}
-              <span className="font-semibold">{formatCurrency(tilgung)} €</span> jeweils zum 31.12. eines jeden Jahres zu tilgen.
+              Das Darlehen ist in jährlich gleichbleibenden Tilgungsraten jeweils zum 31.12. eines jeden Jahres zu tilgen.
             </p>
           ) : (
             <p className="text-gray-700">
-              Das Darlehen ist durch jährlich gleiche Annuitäten in Höhe von je{' '}
-              <span className="font-semibold">{formatCurrency(annuity)} €</span> jeweils zum 31.12. eines jeden Jahres zu tilgen.
+              Das Darlehen ist durch jährlich gleiche Annuitäten jeweils zum 31.12. eines jeden Jahres zu tilgen.
               Die Annuität setzt sich aus Zinsanteil und Tilgungsanteil zusammen.
             </p>
           )}
@@ -1249,6 +1247,14 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
       '€',
       'z.B. 12.500,00',
       row.tilgung,
+      0.02
+    ),
+    createInputField(
+      `${prefix}_y${row.year}_annuity`,
+      `Jahr ${row.year} • Annuität`,
+      '€',
+      'z.B. 15.700,00',
+      row.annuity,
       0.02
     ),
   ]);
