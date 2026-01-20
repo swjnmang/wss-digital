@@ -852,7 +852,7 @@ const createRentenEndwertTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie hoch muss die Jahresrate sein?</p>
         </div>
       );
-      inputs = [createInputField('r', 'Jahresrate', '€', 'z.B. 1.150,00', rate, Math.max(rate * 0.005, 1))];}
+      inputs = [createInputField('r', 'Jahresrate', '€', 'z.B. 1.150,00', rate, Math.max(rate * 0.005, 1))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
