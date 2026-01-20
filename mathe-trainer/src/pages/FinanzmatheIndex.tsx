@@ -42,6 +42,11 @@ export default function FinanzmatheIndex() {
             <h2 className="text-xl font-bold text-indigo-900 mb-2">Gemischte Übungsaufgaben</h2>
             <p className="text-gray-600">Querschnitt mit Zinsen, Zinseszins, Sparplänen und Darlehen.</p>
           </Link>
+
+          <Link to="/finanzmathe/pruefungsmodus" className="block p-6 bg-green-50 rounded-xl hover:bg-green-100 transition border border-green-200">
+            <h2 className="text-xl font-bold text-green-800 mb-2">🎓 Prüfungsmodus</h2>
+            <p className="text-gray-600">10 gemischte Aufgaben unter Prüfungsbedingungen mit PDF-Zertifikat.</p>
+          </Link>
         </div>
       </div>
     </div>

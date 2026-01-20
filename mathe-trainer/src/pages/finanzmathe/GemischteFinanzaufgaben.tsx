@@ -1608,6 +1608,17 @@ const createCards = (filter: FilterType): TaskCard[] => {
   return Array.from({ length: TASK_COUNT }, (_, index) => buildCard(createTaskForFilter(filter), index));
 };
 
+// Exports für Prüfungsmodus
+export {
+  createSimpleInterestTask,
+  createZinseszinsTask,
+  createKapitalmehrungTask,
+  createKapitalminderungTask,
+  createRentenEndwertTask,
+  createRatendarlehenPlanTask,
+  createAnnuitaetPlanTask,
+};
+
 export default function GemischteFinanzaufgaben() {
   const [filter, setFilter] = useState<FilterType>('mixed');
   const [cards, setCards] = useState<TaskCard[]>(() => createCards('mixed'));
