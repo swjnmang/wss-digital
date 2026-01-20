@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { InlineMath } from "react-katex";
 
 type RayTask = {
   type: "ray1_segment" | "ray1_ratio" | "ray2_segment" | "ray2_ratio" | "similarity";
@@ -50,17 +51,15 @@ function generateTask(): RayTask {
       "ray1_segment",
       0,
       (q * r) / p,
-      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
-      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
-      Gesucht ist: |OS|`,
-      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OS| um!",
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OS}$.`,
+      "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OS}$ um!",
       [
-        "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
+        "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$",
         "",
-        `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/|OS|`,
+        `$\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = \\frac{${r.toFixed(1)}}{\\overline{OS}}$`,
         "",
-        `|OS| = ${r.toFixed(1)} × ${q.toFixed(1)} / ${p.toFixed(1)}`,
-        `|OS| = ${((q * r) / p).toFixed(2)} cm`
+        `$\\overline{OS} = ${r.toFixed(1)} \\times \\frac{${q.toFixed(1)}}{${p.toFixed(1)}}$`,
+        `$\\overline{OS} = ${((q * r) / p).toFixed(2)}$ cm`
       ]
     ),
     // Aufgabe 1: |OQ| berechnen
@@ -68,17 +67,15 @@ function generateTask(): RayTask {
       "ray1_segment",
       1,
       q,
-      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm, |OS| = ${((q * r) / p).toFixed(1)} cm.
-      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
-      Gesucht ist: |OQ|`,
-      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OQ| um!",
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{OS} = ${((q * r) / p).toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OQ}$.`,
+      "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OQ}$ um!",
       [
-        "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
+        "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$",
         "",
-        `${p.toFixed(1)}/|OQ| = ${r.toFixed(1)}/${((q * r) / p).toFixed(1)}`,
+        `$\\frac{${p.toFixed(1)}}{\\overline{OQ}} = \\frac{${r.toFixed(1)}}{${((q * r) / p).toFixed(1)}}$`,
         "",
-        `|OQ| = ${p.toFixed(1)} × ${((q * r) / p).toFixed(1)} / ${r.toFixed(1)}`,
-        `|OQ| = ${q.toFixed(2)} cm`
+        `$\\overline{OQ} = ${p.toFixed(1)} \\times \\frac{${((q * r) / p).toFixed(1)}}{${r.toFixed(1)}}$`,
+        `$\\overline{OQ} = ${q.toFixed(2)}$ cm`
       ]
     ),
     // Aufgabe 2: |OR| berechnen
@@ -86,17 +83,15 @@ function generateTask(): RayTask {
       "ray1_segment",
       2,
       (p * r) / q,
-      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OS| = ${r.toFixed(1)} cm.
-      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
-      Gesucht ist: |OR|`,
-      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OR| um!",
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OS} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OR}$.`,
+      "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OR}$ um!",
       [
-        "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
+        "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$",
         "",
-        `${p.toFixed(1)}/${q.toFixed(1)} = |OR|/${r.toFixed(1)}`,
+        `$\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = \\frac{\\overline{OR}}{${r.toFixed(1)}}$`,
         "",
-        `|OR| = ${p.toFixed(1)} × ${r.toFixed(1)} / ${q.toFixed(1)}`,
-        `|OR| = ${((p * r) / q).toFixed(2)} cm`
+        `$\\overline{OR} = ${p.toFixed(1)} \\times \\frac{${r.toFixed(1)}}{${q.toFixed(1)}}$`,
+        `$\\overline{OR} = ${((p * r) / q).toFixed(2)}$ cm`
       ]
     ),
     // Aufgabe 3: |PQ| berechnen
@@ -104,16 +99,14 @@ function generateTask(): RayTask {
       "ray1_segment",
       3,
       q - p,
-      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
-      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
-      Gesucht ist: |PQ| (die Strecke zwischen P und Q auf dem ersten Strahl)`,
-      "|PQ| = |OQ| - |OP|",
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{PQ}$ auf dem ersten Strahl.`,
+      "Die Strecke $\\overline{PQ}$ ist die Differenz zwischen $\\overline{OQ}$ und $\\overline{OP}$.",
       [
-        "Die Strecke |PQ| ist die Differenz zwischen |OQ| und |OP|.",
+        "Die Strecke $\\overline{PQ}$ liegt zwischen den Punkten P und Q auf dem ersten Strahl.",
         "",
-        `|PQ| = |OQ| - |OP|`,
-        `|PQ| = ${q.toFixed(1)} - ${p.toFixed(1)}`,
-        `|PQ| = ${(q - p).toFixed(2)} cm`
+        `$\\overline{PQ} = \\overline{OQ} - \\overline{OP}$`,
+        `$\\overline{PQ} = ${q.toFixed(1)} - ${p.toFixed(1)}$`,
+        `$\\overline{PQ} = ${(q - p).toFixed(2)}$ cm`
       ]
     ),
     // Aufgabe 4: |OQ| berechnen (Variante 2)
@@ -121,17 +114,15 @@ function generateTask(): RayTask {
       "ray1_segment",
       4,
       q,
-      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm, |OS| = ${((q * r) / p).toFixed(1)} cm.
-      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
-      Gesucht ist: |OQ|`,
-      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OQ| um!",
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{OS} = ${((q * r) / p).toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OQ}$.`,
+      "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OQ}$ um!",
       [
-        "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
+        "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$",
         "",
-        `${p.toFixed(1)}/|OQ| = ${r.toFixed(1)}/${((q * r) / p).toFixed(1)}`,
+        `$\\frac{${p.toFixed(1)}}{\\overline{OQ}} = \\frac{${r.toFixed(1)}}{${((q * r) / p).toFixed(1)}}$`,
         "",
-        `|OQ| = ${p.toFixed(1)} × ${((q * r) / p).toFixed(1)} / ${r.toFixed(1)}`,
-        `|OQ| = ${q.toFixed(2)} cm`
+        `$\\overline{OQ} = ${p.toFixed(1)} \\times \\frac{${((q * r) / p).toFixed(1)}}{${r.toFixed(1)}}$`,
+        `$\\overline{OQ} = ${q.toFixed(2)}$ cm`
       ]
     ),
     // Aufgabe 5: |RS| berechnen
@@ -139,20 +130,18 @@ function generateTask(): RayTask {
       "ray1_segment",
       5,
       ((q * r) / p) - r,
-      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
-      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
-      Gesucht ist: |RS| (die Strecke zwischen R und S auf dem zweiten Strahl)`,
-      "Berechne zuerst |OS| mit dem Strahlensatz, dann |RS| = |OS| - |OR|",
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{RS}$ auf dem zweiten Strahl.`,
+      "Berechne zuerst $\\overline{OS}$ mit dem Strahlensatz, dann $\\overline{RS} = \\overline{OS} - \\overline{OR}$",
       [
-        "Zuerst berechnen wir |OS| mit Strahlensatz 1:",
-        `|OP|/|OQ| = |OR|/|OS|`,
-        `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/|OS|`,
-        `|OS| = ${((q * r) / p).toFixed(2)} cm`,
+        "Zuerst berechnen wir $\\overline{OS}$ mit Strahlensatz 1:",
+        `$\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$`,
+        `$\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = \\frac{${r.toFixed(1)}}{\\overline{OS}}$`,
+        `$\\overline{OS} = ${((q * r) / p).toFixed(2)}$ cm`,
         "",
-        "Dann berechnen wir |RS|:",
-        `|RS| = |OS| - |OR|`,
-        `|RS| = ${((q * r) / p).toFixed(2)} - ${r.toFixed(1)}`,
-        `|RS| = ${(((q * r) / p) - r).toFixed(2)} cm`
+        "Dann berechnen wir $\\overline{RS}$:",
+        `$\\overline{RS} = \\overline{OS} - \\overline{OR}$`,
+        `$\\overline{RS} = ${((q * r) / p).toFixed(2)} - ${r.toFixed(1)}$`,
+        `$\\overline{RS} = ${(((q * r) / p) - r).toFixed(2)}$ cm`
       ]
     ),
     // Aufgabe 6: |OR| berechnen (Variante 2)
@@ -160,17 +149,15 @@ function generateTask(): RayTask {
       "ray1_segment",
       6,
       (p * r) / q,
-      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OS| = ${r.toFixed(1)} cm.
-      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
-      Gesucht ist: |OR|`,
-      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OR| um!",
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OS} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OR}$.`,
+      "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OR}$ um!",
       [
-        "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
+        "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$",
         "",
-        `${p.toFixed(1)}/${q.toFixed(1)} = |OR|/${r.toFixed(1)}`,
+        `$\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = \\frac{\\overline{OR}}{${r.toFixed(1)}}$`,
         "",
-        `|OR| = ${p.toFixed(1)} × ${r.toFixed(1)} / ${q.toFixed(1)}`,
-        `|OR| = ${((p * r) / q).toFixed(2)} cm`
+        `$\\overline{OR} = ${p.toFixed(1)} \\times \\frac{${r.toFixed(1)}}{${q.toFixed(1)}}$`,
+        `$\\overline{OR} = ${((p * r) / q).toFixed(2)}$ cm`
       ]
     ),
     // Aufgabe 7: |OS| berechnen (Wiederholung mit neuen Werten)
@@ -178,17 +165,15 @@ function generateTask(): RayTask {
       "ray1_segment",
       7,
       (q * r) / p,
-      `Gegeben sind: |OP| = ${p.toFixed(1)} cm, |OQ| = ${q.toFixed(1)} cm, |OR| = ${r.toFixed(1)} cm.
-      Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O.
-      Gesucht ist: |OS|`,
-      "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|. Stelle nach |OS| um!",
+      `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OS}$.`,
+      "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OS}$ um!",
       [
-        "Strahlensatz 1: |OP|/|OQ| = |OR|/|OS|",
+        "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$",
         "",
-        `${p.toFixed(1)}/${q.toFixed(1)} = ${r.toFixed(1)}/|OS|`,
+        `$\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = \\frac{${r.toFixed(1)}}{\\overline{OS}}$`,
         "",
-        `|OS| = ${r.toFixed(1)} × ${q.toFixed(1)} / ${p.toFixed(1)}`,
-        `|OS| = ${((q * r) / p).toFixed(2)} cm`
+        `$\\overline{OS} = ${r.toFixed(1)} \\times \\frac{${q.toFixed(1)}}{${p.toFixed(1)}}$`,
+        `$\\overline{OS} = ${((q * r) / p).toFixed(2)}$ cm`
       ]
     )
   ];
@@ -254,12 +239,16 @@ export default function Strahlensaetze() {
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Aufgabe</p>
-              <h2 className="text-lg font-bold">{task.description.split('\n')[0]}</h2>
+              <h2 className="text-lg font-bold">Strahlensätze anwenden</h2>
             </div>
             <button className={buttonClass} onClick={handleNew}>Neue Aufgabe</button>
           </div>
 
           <RaySketch task={task} />
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900 text-center">
+            <InlineMath math={task.description} />
+          </div>
 
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700">
@@ -304,9 +293,15 @@ export default function Strahlensaetze() {
                 {showSolution ? "Lösung ausblenden" : "Lösung anzeigen"}
               </button>
               {showSolution && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900 space-y-1">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900 space-y-2">
                   {task.solution.map((line, idx) => (
-                    <div key={idx} className="font-mono">{line}</div>
+                    <div key={idx}>
+                      {line.includes('$') ? (
+                        <InlineMath math={line} />
+                      ) : (
+                        <div className="font-mono text-slate-700">{line}</div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
