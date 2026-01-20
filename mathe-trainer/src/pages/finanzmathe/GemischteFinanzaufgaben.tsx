@@ -655,9 +655,9 @@ const createKapitalmehrungTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Am Ende eines jeden Jahres werden <strong>{formatCurrency(r)} €</strong> eingezahlt. Nach <strong>{n} Jahren</strong> mit einem Zinssatz von <strong>{formatNumber(p, 2)} %</strong> p.a. soll <strong>{formatCurrency(Kn)} €</strong> auf dem Konto sein.
+            Nach <strong>{n} Jahren</strong> mit jährlichen Zusatzeinzahlungen von <strong>{formatCurrency(r)} €</strong> (am Jahresende) soll <strong>{formatCurrency(Kn)} €</strong> erreicht sein. Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a.
           </p>
-          <p className="text-blue-900 font-semibold">Welcher Startbetrag war am Anfang notwendig?</p>
+          <p className="text-blue-900 font-semibold">Welcher Startbetrag war erforderlich?</p>
         </div>
       );
       inputs = [createInputField('K0', 'Startkapital', '€', 'z.B. 28.000,00', K0, Math.max(K0 * 0.005, 2))];
@@ -682,9 +682,9 @@ const createKapitalmehrungTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Mit einem Startguthaben von <strong>{formatCurrency(K0)} €</strong> und gleichmäßigen Einzahlungen (am Ende jeden Jahres) soll nach <strong>{n} Jahren</strong> bei <strong>{formatNumber(p, 2)} %</strong> Zinsen p.a. ein Betrag von <strong>{formatCurrency(Kn)} €</strong> erreicht werden.
+            Startkapital: <strong>{formatCurrency(K0)} €</strong>, Zielwert nach <strong>{n} Jahren</strong>: <strong>{formatCurrency(Kn)} €</strong>. Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a. (Einzahlungen jeweils am Jahresende).
           </p>
-          <p className="text-blue-900 font-semibold">Wie hoch muss die jährliche Einzahlung sein?</p>
+          <p className="text-blue-900 font-semibold">Welche jährliche Einzahlung ist notwendig?</p>
         </div>
       );
       inputs = [createInputField('r', 'Jahresrate', '€', 'z.B. 3.200,00', rate, Math.max(rate * 0.005, 1.5))];
@@ -709,9 +709,9 @@ const createKapitalmehrungTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Mit einem Startguthaben von <strong>{formatCurrency(K0)} €</strong> und jährlichen Einzahlungen von <strong>{formatCurrency(r)} €</strong> (am Ende jeden Jahres) bei <strong>{formatNumber(p, 2)} %</strong> Zinsen p.a. sollen <strong>{formatCurrency(Kn)} €</strong> erreicht werden.
+            Mit <strong>{formatCurrency(K0)} €</strong> Startkapital und jährlichen Einzahlungen von <strong>{formatCurrency(r)} €</strong> (jeweils zum Jahresende) sollen <strong>{formatCurrency(Kn)} €</strong> erreicht werden. Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a.
           </p>
-          <p className="text-blue-900 font-semibold">Nach wie vielen Jahren ist der Zielwert erreicht?</p>
+          <p className="text-blue-900 font-semibold">Nach wie vielen Jahren ist das Zielkapital erreicht?</p>
         </div>
       );
       inputs = [createInputField('n', 'Jahre', 'Jahre', 'z.B. 5', n, 0.05, 0)];
@@ -808,9 +808,9 @@ const createKapitalminderungTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Am Ende eines jeden Jahres wird <strong>{formatCurrency(r)} €</strong> entnommen. Nach <strong>{n} Jahren</strong> sollen noch <strong>{formatCurrency(Kn)} €</strong> auf dem Konto sein. Der Zinssatz liegt bei <strong>{formatNumber(p, 2)} %</strong> p.a.
+            Jährliche Entnahmen: <strong>{formatCurrency(r)} €</strong> am Jahresende. Nach <strong>{n} Jahren</strong> sollen noch <strong>{formatCurrency(Kn)} €</strong> übrig sein. Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a.
           </p>
-          <p className="text-blue-900 font-semibold">Welches Anfangsguthaben war notwendig?</p>
+          <p className="text-blue-900 font-semibold">Welches Startkapital war erforderlich?</p>
         </div>
       );
       inputs = [createInputField('K0', 'Startkapital', '€', 'z.B. 35.000,00', startCapital, Math.max(startCapital * 0.005, 2))];
@@ -833,9 +833,9 @@ const createKapitalminderungTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Mit einem Startguthaben von <strong>{formatCurrency(K0)} €</strong> und regelmäßigen Entnahmen (am Ende jeden Jahres) soll nach <strong>{n} Jahren</strong> bei <strong>{formatNumber(p, 2)} %</strong> Zinsen p.a. ein Betrag von <strong>{formatCurrency(Kn)} €</strong> übrig sein.
+            Startkapital: <strong>{formatCurrency(K0)} €</strong>, Restkapital nach <strong>{n} Jahren</strong>: <strong>{formatCurrency(Kn)} €</strong>. Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a. (Entnahmen am Jahresende).
           </p>
-          <p className="text-blue-900 font-semibold">Wie hoch muss die jährliche Entnahme sein?</p>
+          <p className="text-blue-900 font-semibold">Welche jährliche Entnahme ist möglich?</p>
         </div>
       );
       inputs = [createInputField('r', 'Entnahme', '€', 'z.B. 4.500,00', rate, Math.max(rate * 0.005, 1.5))];
@@ -860,9 +860,9 @@ const createKapitalminderungTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Mit <strong>{formatCurrency(K0)} €</strong> Startguthaben werden jährlich <strong>{formatCurrency(r)} €</strong> am Ende jeden Jahres entnommen. Bei <strong>{formatNumber(p, 2)} %</strong> Zinsen p.a. sollen danach noch <strong>{formatCurrency(Kn)} €</strong> übrig sein.
+            Mit <strong>{formatCurrency(K0)} €</strong> Startkapital werden jährlich <strong>{formatCurrency(r)} €</strong> am Jahresende entnommen. Noch übriges Kapital: <strong>{formatCurrency(Kn)} €</strong>, Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a.
           </p>
-          <p className="text-blue-900 font-semibold">Nach wie vielen Jahren ist dieser Wert erreicht?</p>
+          <p className="text-blue-900 font-semibold">Nach wie vielen Jahren ist dieser Zustand erreicht?</p>
         </div>
       );
       inputs = [createInputField('n', 'Jahre', 'Jahre', 'z.B. 5', n, 0.05, 0)];
@@ -930,9 +930,9 @@ const createRentenEndwertTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Sie zahlen am Ende eines jeden Jahres jeweils <strong>{formatCurrency(r)} €</strong> ein. Ihre Bank bietet einen Zinssatz von <strong>{formatNumber(p, 2)} %</strong> p.a. Über einen Zeitraum von <strong>{n} Jahren</strong>.
+            Die Sparquote liegt bei <strong>{formatCurrency(r)} €</strong> pro Jahr (Einzahlung am Ende des Jahres). Die Bank bietet <strong>{formatNumber(p, 2)} %</strong> Verzinsung p.a.
           </p>
-          <p className="text-blue-900 font-semibold">Welcher Betrag sammelt sich am Ende an?</p>
+          <p className="text-blue-900 font-semibold">Wie viel Geld hat sich nach {n} Jahren angesammelt?</p>
         </div>
       );
       inputs = [createInputField('Kn', 'Endwert', '€', 'z.B. 18.700,00', Kn, Math.max(Kn * 0.005, 1.5))];
@@ -954,9 +954,9 @@ const createRentenEndwertTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Zielwert: <strong>{formatCurrency(Kn)} €</strong>. Der Zinssatz der Bank beträgt <strong>{formatNumber(p, 2)} %</strong> p.a., Laufzeit <strong>{n} Jahre</strong>. Die Einzahlungen erfolgen am Ende eines jeden Jahres.
+            Zielkapital: <strong>{formatCurrency(Kn)} €</strong>. Zeitraum: <strong>{n} Jahre</strong>, Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a., Einzahlungen jeweils am Jahresende.
           </p>
-          <p className="text-blue-900 font-semibold">Welche Jahresrate muss eingezahlt werden?</p>
+          <p className="text-blue-900 font-semibold">Welcher gleiche Jahresbetrag muss eingezahlt werden?</p>
         </div>
       );
       inputs = [createInputField('r', 'Jahresrate', '€', 'z.B. 1.150,00', rate, Math.max(rate * 0.005, 1))];
@@ -978,9 +978,9 @@ const createRentenEndwertTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Jedes Jahr wird am Ende des Jahres <strong>{formatCurrency(r)} €</strong> eingezahlt. Der Zinssatz beträgt <strong>{formatNumber(p, 2)} %</strong> p.a. Ziel ist, <strong>{formatCurrency(Kn)} €</strong> zu sparen.
+            Jährliche Sparquote: <strong>{formatCurrency(r)} €</strong> (jeweils am Jahresende eingezahlt). Zielkapital: <strong>{formatCurrency(Kn)} €</strong>, Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a.
           </p>
-          <p className="text-blue-900 font-semibold">Nach wie vielen Jahren ist das Sparziel erreicht?</p>
+          <p className="text-blue-900 font-semibold">Wie viele Jahre sind erforderlich, um das Ziel zu erreichen?</p>
         </div>
       );
       inputs = [createInputField('n', 'Jahre', 'Jahre', 'z.B. 6', n, 0.05, 0)];
