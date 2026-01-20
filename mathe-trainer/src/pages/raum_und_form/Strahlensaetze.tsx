@@ -32,8 +32,6 @@ function generateTask(): RayTask {
   // Zufällig zwischen 1. und 2. Strahlensatz wählen (50/50)
   const useTheorem2 = Math.random() > 0.5;
   
-  console.log(`Task: Theorem ${useTheorem2 ? 2 : 1}, p=${p.toFixed(2)}, q=${q.toFixed(2)}, r=${r.toFixed(2)}, rs=${rs.toFixed(2)}`);
-  
   if (useTheorem2) {
     // 2. STRAHLENSATZ - Aufgabentypen
     const theorem2Types = [
