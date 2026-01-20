@@ -242,7 +242,7 @@ const createSimpleInterestTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welche Zinsen fallen an?</p>
         </div>
       );
-      inputs = [createInputField('Z', 'Zinsen', '€', 'z.B. 248,50', Z_rounded, Math.max(Z_rounded * 0.002, 0.5))];
+      inputs = [createInputField('Z', 'Zinsen', '€', 'z.B. 248,50', Z_rounded, Math.max(Z_rounded * 0.005, 0.5))];
       solution = (
         <div className="space-y-1">
           <p>
@@ -268,7 +268,7 @@ const createSimpleInterestTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welches Startkapital wurde angelegt?</p>
         </div>
       );
-      inputs = [createInputField('K', 'Kapital', '€', 'z.B. 18.500,00', capital, Math.max(capital * 0.002, 1))];
+      inputs = [createInputField('K', 'Kapital', '€', 'z.B. 18.500,00', capital, Math.max(capital * 0.005, 1))];
       solution = (
         <div className="space-y-1">
           <p>
@@ -373,7 +373,7 @@ const createZinseszinsTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie groß ist das Endkapital?</p>
         </div>
       );
-      inputs = [createInputField('Kn', 'Endkapital', '€', 'z.B. 14.200,00', Kn, Math.max(Kn * 0.002, 1.5))];
+      inputs = [createInputField('Kn', 'Endkapital', '€', 'z.B. 14.200,00', Kn, Math.max(Kn * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
           <p>
@@ -399,7 +399,7 @@ const createZinseszinsTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welches Anfangskapital wurde angelegt?</p>
         </div>
       );
-      inputs = [createInputField('K0', 'Anfangskapital', '€', 'z.B. 12.000,00', K0, Math.max(K0 * 0.002, 1.5))];
+      inputs = [createInputField('K0', 'Anfangskapital', '€', 'z.B. 12.000,00', K0, Math.max(K0 * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
           <p>
@@ -514,7 +514,7 @@ const createKapitalmehrungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie hoch ist der Endwert?</p>
         </div>
       );
-      inputs = [createInputField('Kn', 'Endwert', '€', 'z.B. 42.500,00', Kn, Math.max(Kn * 0.002, 2))];
+      inputs = [createInputField('Kn', 'Endwert', '€', 'z.B. 42.500,00', Kn, Math.max(Kn * 0.005, 2))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -542,7 +542,7 @@ const createKapitalmehrungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welcher Startbetrag war nötig?</p>
         </div>
       );
-      inputs = [createInputField('K0', 'Startkapital', '€', 'z.B. 28.000,00', K0, Math.max(K0 * 0.002, 2))];
+      inputs = [createInputField('K0', 'Startkapital', '€', 'z.B. 28.000,00', K0, Math.max(K0 * 0.005, 2))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -574,7 +574,7 @@ const createKapitalmehrungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie hoch ist die nachschüssige Rate?</p>
         </div>
       );
-      inputs = [createInputField('r', 'Jahresrate', '€', 'z.B. 3.200,00', rate, Math.max(rate * 0.002, 1.5))];
+      inputs = [createInputField('r', 'Jahresrate', '€', 'z.B. 3.200,00', rate, Math.max(rate * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -675,7 +675,7 @@ const createKapitalminderungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie hoch ist die Restkasse nach allen Entnahmen?</p>
         </div>
       );
-      inputs = [createInputField('Kn', 'Restkapital', '€', 'z.B. 14.800,00', Kn, Math.max(Kn * 0.002, 1.5))];
+      inputs = [createInputField('Kn', 'Restkapital', '€', 'z.B. 14.800,00', Kn, Math.max(Kn * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -701,7 +701,7 @@ const createKapitalminderungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie groß war das ursprüngliche Kapital?</p>
         </div>
       );
-      inputs = [createInputField('K0', 'Startkapital', '€', 'z.B. 35.000,00', startCapital, Math.max(startCapital * 0.002, 2))];
+      inputs = [createInputField('K0', 'Startkapital', '€', 'z.B. 35.000,00', startCapital, Math.max(startCapital * 0.005, 2))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -731,7 +731,7 @@ const createKapitalminderungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie groß darf die jährliche Entnahme sein?</p>
         </div>
       );
-      inputs = [createInputField('r', 'Entnahme', '€', 'z.B. 4.500,00', rate, Math.max(rate * 0.002, 1.5))];
+      inputs = [createInputField('r', 'Entnahme', '€', 'z.B. 4.500,00', rate, Math.max(rate * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -824,7 +824,7 @@ const createRentenEndwertTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie groß ist der Endwert?</p>
         </div>
       );
-      inputs = [createInputField('Kn', 'Endwert', '€', 'z.B. 18.700,00', Kn, Math.max(Kn * 0.002, 1.5))];
+      inputs = [createInputField('Kn', 'Endwert', '€', 'z.B. 18.700,00', Kn, Math.max(Kn * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -852,7 +852,7 @@ const createRentenEndwertTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie hoch muss die Jahresrate sein?</p>
         </div>
       );
-      inputs = [createInputField('r', 'Jahresrate', '€', 'z.B. 1.150,00', rate, Math.max(rate * 0.002, 1))];
+      inputs = [createInputField('r', 'Jahresrate', '€', 'z.B. 1.150,00', rate, Math.max(rate * 0.005, 1))];}
       solution = (
         <div className="space-y-1">
           {solutionIntro}
