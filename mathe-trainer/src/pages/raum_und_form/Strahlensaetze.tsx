@@ -280,61 +280,61 @@ function generateTask(): RayTask {
       solution: selectedType.solution
     };
   } else {
-    // 4. DIAGONALE STRECKEN - Diagonalen PS und RQ im Trapez
-    // Mit Koordinaten-Modell und Satz des Pythagoras
-    // Annahme: Winkel zwischen den Strahlen = 60° (für realistische Geometrie)
+    // 4. DIAGONALE STRECKEN AUF DEN PARALLELEN - Mit Strahlensätzen berechnet
+    // PR liegt auf der ersten Parallelen, QS auf der zweiten Parallelen
+    // Mit ähnlichen Dreiecken und Strahlensätzen berechnet
+    
+    // Für diese Aufgaben brauchen wir ein Koordinatensystem
+    // Winkel zwischen den Strahlen = 60° für realistische Geometrie
     const angle = 60 * (Math.PI / 180);
     
-    // Koordinaten der Punkte
-    // O ist Ursprung
-    const oX = 0, oY = 0;
-    // P auf Strahl 1 (horizontal)
-    const pX = p, pY = 0;
-    // Q auf Strahl 1 (horizontal)
-    const qX = q, qY = 0;
-    // R auf Strahl 2 (60° Winkel)
-    const rX = r * Math.cos(angle), rY = r * Math.sin(angle);
-    // S auf Strahl 2 (60° Winkel)
-    const sX = os * Math.cos(angle), sY = os * Math.sin(angle);
+    // Koordinaten der Punkte mit O im Ursprung
+    const pX = p, pY = 0;  // P auf ray1 (x-Achse)
+    const qX = q, qY = 0;  // Q auf ray1 (x-Achse)
+    const rX = r * Math.cos(angle), rY = r * Math.sin(angle);  // R auf ray2
+    const sX = os * Math.cos(angle), sY = os * Math.sin(angle);  // S auf ray2
     
-    // Diagonale PS: von P (p, 0) zu S (os*cos(60°), os*sin(60°))
-    const ps = Math.sqrt((sX - pX) ** 2 + (sY - pY) ** 2);
-    // Diagonale RQ: von R zu Q
-    const rq = Math.sqrt((qX - rX) ** 2 + (qY - rY) ** 2);
+    // PR: Strecke auf der ersten Parallelen (von P zu R)
+    const pr = Math.sqrt((rX - pX) ** 2 + (rY - pY) ** 2);
+    // QS: Strecke auf der zweiten Parallelen (von Q zu S)
+    const qs = Math.sqrt((sX - qX) ** 2 + (sY - qY) ** 2);
+    
+    // Mit Strahlensätzen: PR und QS sind proportional
+    // PR/QS = OP/OQ oder PR/QS = OR/OS (Je nachdem wie man es betrachtet)
     
     const diagonalTypes = [
       {
-        name: "PS_berechnen",
-        expectedAnswer: ps,
-        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm, und ein Winkel von 60° zwischen den Strahlen. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Diagonalen $\\overline{PS}$ (von P auf der ersten Parallelen zu S auf der zweiten Parallelen).`,
-        hint: "Nutze den Satz des Pythagoras: Die Punkte P und S haben in einem Koordinatensystem die Koordinaten P = (OP, 0) und S = (OS·cos(60°), OS·sin(60°)). Berechne die Entfernung!",
+        name: "PR_auf_parallele",
+        expectedAnswer: pr,
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen (Winkel 60°) mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{PR}$ auf der ersten Parallelen.`,
+        hint: "Nutze den Strahlensatz: Die Strecken auf den Parallelen stehen im gleichen Verhältnis zueinander wie die Abstände vom Ursprung. Bedenke: P liegt auf ray1 und R liegt auf ray2, beide auf der ersten Parallelen.",
         solution: [
-          "Wir nutzen ein Koordinatensystem mit O im Ursprung und dem ersten Strahl auf der x-Achse.",
+          "Mit einem Koordinatensystem (O im Ursprung, ray1 auf der x-Achse, Winkel 60° zwischen Strahlen):",
           "",
           `Punkt P: (${p.toFixed(1)}, 0)`,
-          `Punkt S: (${os.toFixed(1)} · cos(60°), ${os.toFixed(1)} · sin(60°)) = (${(os * Math.cos(angle)).toFixed(2)}, ${(os * Math.sin(angle)).toFixed(2)})`,
+          `Punkt R: (${r.toFixed(1)} · cos(60°), ${r.toFixed(1)} · sin(60°)) = (${(r * Math.cos(angle)).toFixed(2)}, ${(r * Math.sin(angle)).toFixed(2)})`,
           "",
-          "Mit dem Satz des Pythagoras:",
-          `$\\overline{PS} = \\sqrt{(${(sX - pX).toFixed(2)})^2 + (${(sY - pY).toFixed(2)})^2}$`,
-          `$\\overline{PS} = \\sqrt{${((sX - pX) ** 2).toFixed(2)} + ${((sY - pY) ** 2).toFixed(2)}}$`,
-          `$\\overline{PS} = ${ps.toFixed(2)}$ cm`
+          "Die Strecke PR verbindet diese Punkte (auf der ersten Parallelen):",
+          `$\\overline{PR} = \\sqrt{(${(rX - pX).toFixed(2)})^2 + (${(rY - pY).toFixed(2)})^2}$`,
+          `$\\overline{PR} = \\sqrt{${((rX - pX) ** 2).toFixed(2)} + ${((rY - pY) ** 2).toFixed(2)}}$`,
+          `$\\overline{PR} = ${pr.toFixed(2)}$ cm`
         ]
       },
       {
-        name: "RQ_berechnen",
-        expectedAnswer: rq,
-        description: `Gegeben sind: $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, und ein Winkel von 60° zwischen den Strahlen. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Diagonalen $\\overline{RQ}$ (von R auf der zweiten Parallelen zu Q auf der ersten Parallelen).`,
-        hint: "Nutze den Satz des Pythagoras: Die Punkte R und Q haben in einem Koordinatensystem die Koordinaten R = (OR·cos(60°), OR·sin(60°)) und Q = (OQ, 0). Berechne die Entfernung!",
+        name: "QS_auf_parallele",
+        expectedAnswer: qs,
+        description: `Gegeben sind: $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen (Winkel 60°) mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{QS}$ auf der zweiten Parallelen.`,
+        hint: "Nutze den Strahlensatz: Die Strecken auf den Parallelen stehen im gleichen Verhältnis zueinander. Q liegt auf ray1 und S liegt auf ray2, beide auf der zweiten Parallelen.",
         solution: [
-          "Wir nutzen ein Koordinatensystem mit O im Ursprung und dem ersten Strahl auf der x-Achse.",
+          "Mit einem Koordinatensystem (O im Ursprung, ray1 auf der x-Achse, Winkel 60° zwischen Strahlen):",
           "",
-          `Punkt R: (${r.toFixed(1)} · cos(60°), ${r.toFixed(1)} · sin(60°)) = (${(r * Math.cos(angle)).toFixed(2)}, ${(r * Math.sin(angle)).toFixed(2)})`,
           `Punkt Q: (${q.toFixed(1)}, 0)`,
+          `Punkt S: (${os.toFixed(1)} · cos(60°), ${os.toFixed(1)} · sin(60°)) = (${(os * Math.cos(angle)).toFixed(2)}, ${(os * Math.sin(angle)).toFixed(2)})`,
           "",
-          "Mit dem Satz des Pythagoras:",
-          `$\\overline{RQ} = \\sqrt{(${(qX - rX).toFixed(2)})^2 + (${(qY - rY).toFixed(2)})^2}$`,
-          `$\\overline{RQ} = \\sqrt{${((qX - rX) ** 2).toFixed(2)} + ${((qY - rY) ** 2).toFixed(2)}}$`,
-          `$\\overline{RQ} = ${rq.toFixed(2)}$ cm`
+          "Die Strecke QS verbindet diese Punkte (auf der zweiten Parallelen):",
+          `$\\overline{QS} = \\sqrt{(${(sX - qX).toFixed(2)})^2 + (${(sY - qY).toFixed(2)})^2}$`,
+          `$\\overline{QS} = \\sqrt{${((sX - qX) ** 2).toFixed(2)} + ${((sY - qY) ** 2).toFixed(2)}}$`,
+          `$\\overline{QS} = ${qs.toFixed(2)}$ cm`
         ]
       }
     ];
