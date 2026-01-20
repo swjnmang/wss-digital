@@ -143,6 +143,34 @@ function generateTask(): RayTask {
           `$\\overline{RS} = ${os.toFixed(2)} - ${r.toFixed(1)}$`,
           `$\\overline{RS} = ${rs.toFixed(2)}$ cm`
         ]
+      },
+      {
+        name: "OQ_auf_strahl",
+        expectedAnswer: q,
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OQ}$ auf dem ersten Strahl.`,
+        hint: "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OQ}$ um!",
+        solution: [
+          "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$",
+          "",
+          `$\\frac{${p.toFixed(1)}}{\\overline{OQ}} = \\frac{${r.toFixed(1)}}{${os.toFixed(1)}}$`,
+          "",
+          `$\\overline{OQ} = ${p.toFixed(1)} \\times \\frac{${os.toFixed(1)}}{${r.toFixed(1)}}$`,
+          `$\\overline{OQ} = ${q.toFixed(2)}$ cm`
+        ]
+      },
+      {
+        name: "OS_auf_strahl",
+        expectedAnswer: os,
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OS}$ auf dem zweiten Strahl.`,
+        hint: "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OS}$ um!",
+        solution: [
+          "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$",
+          "",
+          `$\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = \\frac{${r.toFixed(1)}}{\\overline{OS}}$`,
+          "",
+          `$\\overline{OS} = ${r.toFixed(1)} \\times \\frac{${q.toFixed(1)}}{${p.toFixed(1)}}$`,
+          `$\\overline{OS} = ${os.toFixed(2)}$ cm`
+        ]
       }
     ];
     
@@ -279,6 +307,7 @@ export default function Strahlensaetze() {
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [showSolution, setShowSolution] = useState(false);
+  const [lastAnswer, setLastAnswer] = useState<number | null>(null);
 
   const handleCheck = () => {
     const val = parseFloat(input.replace(",", "."));
@@ -300,7 +329,14 @@ export default function Strahlensaetze() {
   };
 
   const handleNew = () => {
-    setTask(generateTask());
+    let newTask: RayTask;
+    // Stelle sicher, dass die nächste Aufgabe eine andere expectedAnswer hat
+    do {
+      newTask = generateTask();
+    } while (lastAnswer !== null && Math.abs(newTask.expectedAnswer - lastAnswer) < 0.01);
+    
+    setTask(newTask);
+    setLastAnswer(newTask.expectedAnswer);
     setInput("");
     setFeedback(null);
     setShowSolution(false);
