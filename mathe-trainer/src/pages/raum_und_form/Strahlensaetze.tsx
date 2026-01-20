@@ -29,7 +29,8 @@ function generateTask(): RayTask {
   const rs = os - r;  // Abschnitt RS
 
   // Zufällig zwischen 1. und 2. Strahlensatz wählen
-  const useTheorem2 = Math.random() > 0.5;
+  // Aber nur Theorem 2 wenn RS positiv ist (geometrisch sinnvoll)
+  const useTheorem2 = rs > 0 && Math.random() > 0.5;
   
   if (useTheorem2) {
     // 2. STRAHLENSATZ - Aufgabentypen
