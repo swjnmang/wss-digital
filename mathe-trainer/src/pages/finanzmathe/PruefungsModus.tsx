@@ -139,19 +139,35 @@ const serializePruefung = (zustand: PruefungsZustand): PruefungsZustandSerialize
 };
 
 const deserializePruefung = (serialized: PruefungsZustandSerialized): PruefungsZustand => {
+  const generatoren: Record<string, () => any> = {
+    simple_interest: createSimpleInterestTask,
+    zinseszins: createZinseszinsTask,
+    kapitalmehrung: createKapitalmehrungTask,
+    kapitalminderung: createKapitalminderungTask,
+    renten_endwert: createRentenEndwertTask,
+    ratendarlehen_plan: createRatendarlehenPlanTask,
+    annuitaet_plan: createAnnuitaetPlanTask,
+  };
+
   return {
     name: serialized.name,
     klasse: serialized.klasse,
-    aufgaben: serialized.aufgaben.map(a => ({
-      id: a.id,
-      type: a.type,
-      points: a.points,
-      question: null as any, // Wird nicht benötigt im Exam/Results Screen
-      solution: null as any,
-      inputs: a.inputs,
-      userAnswers: a.userAnswers,
-      isCorrect: a.isCorrect,
-    })),
+    aufgaben: serialized.aufgaben.map(a => {
+      // Regeneriere die Aufgabe basierend auf ihrem Type
+      const generator = generatoren[a.type];
+      const task = generator ? generator() : { question: 'Fehler', solution: 'Fehler', inputs: [] };
+      
+      return {
+        id: a.id,
+        type: a.type,
+        points: a.points,
+        question: task.question,
+        solution: task.solution,
+        inputs: a.inputs,
+        userAnswers: a.userAnswers,
+        isCorrect: a.isCorrect,
+      };
+    }),
     aktuelleAufgabeIndex: serialized.aktuelleAufgabeIndex,
     gestartet: serialized.gestartet,
     beendet: serialized.beendet,
@@ -300,22 +316,98 @@ const ExamScreen: React.FC<ExamScreenProps> = ({ zustand, onUpdateAnswer, onNavi
           {/* Eingabefelder */}
           <div className="bg-gray-50 rounded-lg p-6 mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Deine Antworten:</h3>
-            <div className="space-y-4">
-              {aktuelleAufgabe.inputs.map(input => (
-                <div key={input.id}>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {input.label} {input.unit && `(${input.unit})`}
-                  </label>
-                  <input
-                    type="text"
-                    value={aktuelleAufgabe.userAnswers[input.id] || ''}
-                    onChange={(e) => onUpdateAnswer(zustand.aktuelleAufgabeIndex, input.id, e.target.value)}
-                    placeholder={input.placeholder}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              ))}
-            </div>
+            
+            {/* Prüfe, ob es Tilgungsplan-Inputs sind (ratendarlehen oder annuitaet) */}
+            {(aktuelleAufgabe.type === 'ratendarlehen_plan' || aktuelleAufgabe.type === 'annuitaet_plan') ? (
+              // Tabellarische Darstellung für Tilgungspläne
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm border border-gray-300 bg-white mb-4">
+                  <thead>
+                    <tr className="bg-blue-100">
+                      <th className="p-3 text-left border border-gray-300 font-bold text-blue-900">Jahr</th>
+                      <th className="p-3 text-left border border-gray-300 font-bold text-blue-900">Schuld (€)</th>
+                      <th className="p-3 text-left border border-gray-300 font-bold text-blue-900">Zins (€)</th>
+                      <th className="p-3 text-left border border-gray-300 font-bold text-blue-900">Tilgung (€)</th>
+                      <th className="p-3 text-left border border-gray-300 font-bold text-blue-900">Annuität (€)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Extrahiere Jahre aus den Input-IDs und gruppiere sie */}
+                    {(() => {
+                      const years = new Set<number>();
+                      const prefix = aktuelleAufgabe.type === 'ratendarlehen_plan' ? 'rate' : 'ann';
+                      
+                      aktuelleAufgabe.inputs.forEach(input => {
+                        const match = input.id.match(/_y(\d+)_/);
+                        if (match) years.add(parseInt(match[1]));
+                      });
+                      
+                      const sortedYears = Array.from(years).sort((a, b) => a - b);
+                      
+                      return sortedYears.map(year => (
+                        <tr key={year} className="border-t border-gray-300 hover:bg-blue-50">
+                          <td className="p-3 border border-gray-300 font-semibold">{year}</td>
+                          <td className="p-3 border border-gray-300">
+                            <input
+                              type="text"
+                              value={aktuelleAufgabe.userAnswers[`${prefix}_y${year}_debt`] || ''}
+                              onChange={(e) => onUpdateAnswer(zustand.aktuelleAufgabeIndex, `${prefix}_y${year}_debt`, e.target.value)}
+                              placeholder="z.B. 100.000,00"
+                              className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                            />
+                          </td>
+                          <td className="p-3 border border-gray-300">
+                            <input
+                              type="text"
+                              value={aktuelleAufgabe.userAnswers[`${prefix}_y${year}_interest`] || ''}
+                              onChange={(e) => onUpdateAnswer(zustand.aktuelleAufgabeIndex, `${prefix}_y${year}_interest`, e.target.value)}
+                              placeholder="z.B. 3.200,00"
+                              className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                            />
+                          </td>
+                          <td className="p-3 border border-gray-300">
+                            <input
+                              type="text"
+                              value={aktuelleAufgabe.userAnswers[`${prefix}_y${year}_tilgung`] || ''}
+                              onChange={(e) => onUpdateAnswer(zustand.aktuelleAufgabeIndex, `${prefix}_y${year}_tilgung`, e.target.value)}
+                              placeholder="z.B. 12.500,00"
+                              className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                            />
+                          </td>
+                          <td className="p-3 border border-gray-300">
+                            <input
+                              type="text"
+                              value={aktuelleAufgabe.userAnswers[`${prefix}_y${year}_annuity`] || ''}
+                              onChange={(e) => onUpdateAnswer(zustand.aktuelleAufgabeIndex, `${prefix}_y${year}_annuity`, e.target.value)}
+                              placeholder="z.B. 15.700,00"
+                              className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                            />
+                          </td>
+                        </tr>
+                      ));
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              // Normale Darstellung für andere Aufgabentypen
+              <div className="space-y-4">
+                {aktuelleAufgabe.inputs.map(input => (
+                  <div key={input.id}>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {input.label} {input.unit && `(${input.unit})`}
+                    </label>
+                    <input
+                      type="text"
+                      value={aktuelleAufgabe.userAnswers[input.id] || ''}
+                      onChange={(e) => onUpdateAnswer(zustand.aktuelleAufgabeIndex, input.id, e.target.value)}
+                      placeholder={input.placeholder}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Navigationstasten */}
