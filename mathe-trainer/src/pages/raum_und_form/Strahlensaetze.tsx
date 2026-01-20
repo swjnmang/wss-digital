@@ -112,15 +112,13 @@ function generateTask(): RayTask {
       solution: selectedType.solution
     };
   } else if (taskCategory === 1) {
-    // PARALLEL LINES - Aufgabentypen (auf den Parallelen)
-    // Strecke zwischen den Parallelen auf der ersten Linie = pq
-    // Strecke zwischen den Parallelen auf der zweiten Linie = rs
+    // PARALLEL LINES - Aufgabentypen (auf den Parallelen und Strahlen)
     const parallelTypes = [
       {
         name: "PQ_auf_parallel",
         expectedAnswer: pq,
-        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{PQ}$ (die Strecke zwischen den beiden parallelen Geraden auf dem ersten Strahl).`,
-        hint: "Die Strecke PQ liegt auf der ersten Parallelen zwischen den Punkten P und Q. Das ist einfach die Differenz!",
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{PQ}$ auf dem ersten Strahl.`,
+        hint: "Die Strecke PQ liegt auf dem ersten Strahl zwischen den Punkten P und Q.",
         solution: [
           `$\\overline{PQ} = \\overline{OQ} - \\overline{OP}$`,
           `$\\overline{PQ} = ${q.toFixed(1)} - ${p.toFixed(1)}$`,
@@ -128,9 +126,9 @@ function generateTask(): RayTask {
         ]
       },
       {
-        name: "RS_auf_parallel",
+        name: "RS_auf_strahl",
         expectedAnswer: rs,
-        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{RS}$ (die Strecke zwischen den beiden parallelen Geraden auf dem zweiten Strahl).`,
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{RS}$ auf dem zweiten Strahl.`,
         hint: "Berechne zuerst $\\overline{OS}$ mit dem Strahlensatz 1, dann $\\overline{RS} = \\overline{OS} - \\overline{OR}$.",
         solution: [
           "Zuerst berechnen wir $\\overline{OS}$ mit Strahlensatz 1:",
@@ -145,31 +143,31 @@ function generateTask(): RayTask {
         ]
       },
       {
-        name: "OQ_auf_strahl",
-        expectedAnswer: q,
-        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OQ}$ auf dem ersten Strahl.`,
-        hint: "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OQ}$ um!",
+        name: "OP_auf_strahl",
+        expectedAnswer: p,
+        description: `Gegeben sind: $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OP}$ auf dem ersten Strahl.`,
+        hint: "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OP}$ um!",
         solution: [
           "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$",
           "",
-          `$\\frac{${p.toFixed(1)}}{\\overline{OQ}} = \\frac{${r.toFixed(1)}}{${os.toFixed(1)}}$`,
+          `$\\frac{\\overline{OP}}{${q.toFixed(1)}} = \\frac{${r.toFixed(1)}}{${os.toFixed(1)}}$`,
           "",
-          `$\\overline{OQ} = ${p.toFixed(1)} \\times \\frac{${os.toFixed(1)}}{${r.toFixed(1)}}$`,
-          `$\\overline{OQ} = ${q.toFixed(2)}$ cm`
+          `$\\overline{OP} = ${q.toFixed(1)} \\times \\frac{${r.toFixed(1)}}{${os.toFixed(1)}}$`,
+          `$\\overline{OP} = ${p.toFixed(2)}$ cm`
         ]
       },
       {
-        name: "OS_auf_strahl",
-        expectedAnswer: os,
-        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OR} = ${r.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OS}$ auf dem zweiten Strahl.`,
-        hint: "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OS}$ um!",
+        name: "OR_auf_strahl",
+        expectedAnswer: r,
+        description: `Gegeben sind: $\\overline{OP} = ${p.toFixed(1)}$ cm, $\\overline{OQ} = ${q.toFixed(1)}$ cm, $\\overline{OS} = ${os.toFixed(1)}$ cm. Zwei parallele Geraden schneiden zwei Strahlen mit gemeinsamen Startpunkt O. Berechne die Länge der Strecke $\\overline{OR}$ auf dem zweiten Strahl.`,
+        hint: "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$. Stelle nach $\\overline{OR}$ um!",
         solution: [
           "Strahlensatz 1: $\\frac{\\overline{OP}}{\\overline{OQ}} = \\frac{\\overline{OR}}{\\overline{OS}}$",
           "",
-          `$\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = \\frac{${r.toFixed(1)}}{\\overline{OS}}$`,
+          `$\\frac{${p.toFixed(1)}}{${q.toFixed(1)}} = \\frac{\\overline{OR}}{${os.toFixed(1)}}$`,
           "",
-          `$\\overline{OS} = ${r.toFixed(1)} \\times \\frac{${q.toFixed(1)}}{${p.toFixed(1)}}$`,
-          `$\\overline{OS} = ${os.toFixed(2)}$ cm`
+          `$\\overline{OR} = ${p.toFixed(1)} \\times \\frac{${os.toFixed(1)}}{${q.toFixed(1)}}$`,
+          `$\\overline{OR} = ${r.toFixed(2)}$ cm`
         ]
       }
     ];
@@ -304,10 +302,14 @@ function renderMixedMath(text: string) {
 
 export default function Strahlensaetze() {
   const [task, setTask] = useState<RayTask>(() => generateTask());
+  const [lastAnswer, setLastAnswer] = useState<number>(() => {
+    const initialTask = generateTask();
+    setTask(initialTask);
+    return initialTask.expectedAnswer;
+  });
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [showSolution, setShowSolution] = useState(false);
-  const [lastAnswer, setLastAnswer] = useState<number | null>(null);
 
   const handleCheck = () => {
     const val = parseFloat(input.replace(",", "."));
@@ -333,7 +335,7 @@ export default function Strahlensaetze() {
     // Stelle sicher, dass die nächste Aufgabe eine andere expectedAnswer hat
     do {
       newTask = generateTask();
-    } while (lastAnswer !== null && Math.abs(newTask.expectedAnswer - lastAnswer) < 0.01);
+    } while (Math.abs(newTask.expectedAnswer - lastAnswer) < 0.01);
     
     setTask(newTask);
     setLastAnswer(newTask.expectedAnswer);
