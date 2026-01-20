@@ -19,7 +19,7 @@ const Impressum: React.FC = () => {
                     <p>Jonathan Mangold</p>
                     <p>Schenkenstraße 10</p>
                     <p>74544 Michelbach</p>
-                    <p>E-Mail: <a href="mailto:info@nachhilfe-wirtschaftsschule.de" className="text-blue-600 hover:text-blue-800">info@nachhilfe-wirtschaftsschule.de</a></p>
+                    <p>E-Mail: <a href="mailto:info@wss-digital.de" className="text-blue-600 hover:text-blue-800">info@wss-digital.de</a></p>
                 </section>
                 <section className="space-y-2 text-slate-700">
                     <p>
