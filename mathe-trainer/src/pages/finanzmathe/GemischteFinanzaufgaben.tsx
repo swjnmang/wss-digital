@@ -133,7 +133,7 @@ const zinseszinsContexts = [
 const kapitalmehrungContexts = [
   'Die Nachhaltigkeits-AG startet mit einem Grundstock und zahlt am Jahresende zusätzliche Beträge ein.',
   'Der Makerspace spart für einen Lasercutter und füttert das Konto jede Saison mit Projektbeiträgen.',
-  'Eine Schülerfirma investiert ihre Monatsgewinne in einen Innovationsfonds.',
+  'Eine Schülerfirma investiert ihre Jahresgewinne in einen Innovationsfonds.',
 ] as const;
 
 const kapitalminderungContexts = [
@@ -145,7 +145,7 @@ const kapitalminderungContexts = [
 const rentenContexts = [
   'Ein Schulteam spart für eine Abschlussreise und zahlt am Ende jedes Jahres denselben Betrag ein.',
   'Der Theaterkurs plant Kulissen und legt jedes Jahr Honorar-Reste zur Seite.',
-  'Der Chor sammelt für eine Konzerttournee und überweist regelmäßig Vereinsbeiträge.',
+  'Der Chor sammelt für eine Konzerttournee und überweist jedes Jahr Vereinsbeiträge.',
 ] as const;
 
 const ratendarlehenContexts = [
