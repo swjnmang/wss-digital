@@ -127,8 +127,8 @@ export default function Endwert() {
       return;
     }
 
-    let tolerance = 0.05;
-    if (task.unknown === 'n') tolerance = 0.1; 
+    // Toleranz: 0,5% für € Beträge, 0,1 Jahre für n
+    let tolerance = task.unknown === 'n' ? 0.1 : task.solutionValue * 0.005; 
     
     const diff = Math.abs(input - task.solutionValue);
     
@@ -253,6 +253,12 @@ ${knLatex} \\cdot (q-1) &= ${rLatex} \\cdot ${rfLatex} \\cdot (q^n-1)\\\\
           {task.unknown === 'r' && <InlineMath math={`r \\approx ${formatCurrency(task.solutionValue)} €`} />}
           {task.unknown === 'n' && <InlineMath math={`n \\approx ${formatNumber(task.solutionValue, 2)} Jahre`} />}
         </p>
+
+        {/* Info-Box zu Rundungen */}
+        <div className="mt-6 p-4 bg-amber-50 border border-amber-300 rounded text-amber-900 text-sm md:text-base">
+          <p className="font-semibold mb-2">💡 Hinweis:</p>
+          <p>Rundungen bei Zwischenschritten (z.B. Multiplikationen oder Divisionen auf 2-4 Dezimalstellen) können zu minimal abweichenden Endergebnissen führen. Solche Lösungen werden in der Schule akzeptiert und sind mathematisch korrekt.</p>
+        </div>
       </div>
     );
 
