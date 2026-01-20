@@ -691,14 +691,9 @@ const createKapitalminderungTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Startkapital: <strong>{formatCurrency(K0)} €</strong>, Restkapital: <strong>{formatCurrency(Kn)} €</strong>, Zinssatz:{' '}
-            <strong>{formatNumber(p, 2)} %</strong>, Laufzeit: <strong>{n} Jahre</strong>.
+            Mit einem Startguthaben von <strong>{formatCurrency(K0)} €</strong> und regelmäßigen Entnahmen (am Ende jeden Jahres) soll nach <strong>{n} Jahren</strong> bei <strong>{formatNumber(p, 2)} %</strong> Zinsen p.a. ein Betrag von <strong>{formatCurrency(Kn)} €</strong> übrig sein.
           </p>
-          <p className="text-sm text-slate-600">
-            Entnahmen am Ende eines jeden Jahres: Nach jeder Verzinsung stehen konstante Zuschüsse zur Verfügung – wie hoch dürfen sie
-            sein?
-          </p>
-          <p className="text-blue-900 font-semibold">Wie groß darf die jährliche Entnahme sein?</p>
+          <p className="text-blue-900 font-semibold">Wie hoch muss die jährliche Entnahme sein?</p>
         </div>
       );
       inputs = [createInputField('r', 'Entnahme', '€', 'z.B. 4.500,00', rate, Math.max(rate * 0.005, 1.5))];
@@ -723,13 +718,9 @@ const createKapitalminderungTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Startkapital: <strong>{formatCurrency(K0)} €</strong>, Entnahme: <strong>{formatCurrency(r)} €</strong>, Zinssatz:{' '}
-            <strong>{formatNumber(p, 2)} %</strong>, Restkapital: <strong>{formatCurrency(Kn)} €</strong>.
+            Mit <strong>{formatCurrency(K0)} €</strong> Startguthaben werden jährlich <strong>{formatCurrency(r)} €</strong> am Ende jeden Jahres entnommen. Bei <strong>{formatNumber(p, 2)} %</strong> Zinsen p.a. sollen danach noch <strong>{formatCurrency(Kn)} €</strong> übrig sein.
           </p>
-          <p className="text-sm text-slate-600">
-            Das Kapital wird vermindert: Fixe Entnahmen erfolgen am Ende eines jeden Jahres nach der Verzinsung.
-          </p>
-          <p className="text-blue-900 font-semibold">Wie viele Jahre reichen die Entnahmen?</p>
+          <p className="text-blue-900 font-semibold">Nach wie vielen Jahren ist dieser Wert erreicht?</p>
         </div>
       );
       inputs = [createInputField('n', 'Jahre', 'Jahre', 'z.B. 5', n, 0.05, 0)];
