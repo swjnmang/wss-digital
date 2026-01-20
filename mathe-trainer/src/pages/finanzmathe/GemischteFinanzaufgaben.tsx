@@ -118,6 +118,160 @@ const randomInterestDateRange = (): InterestDateRange => {
   };
 };
 
+// Namen für Darlehensverträge
+const lenderNames = ['Stadtsparkasse München', 'Raiffeisenbank Schwabing', 'Commerzbank', 'Deutsche Bank', 'Santander', 'Hypovereinsbank'];
+const lenderAddresses = ['Marienplatz 8, 80331 München', 'Schwabing 12, 80804 München', 'Karlsplatz 1, 80333 München', 'Neuhauser Str. 5, 80331 München'];
+
+const borrowerFirstNames = ['Anna', 'Benjamin', 'Caroline', 'David', 'Emma', 'Frank', 'Greta', 'Heinrich', 'Iris', 'Jonas', 'Katharina', 'Laura', 'Markus', 'Natalia', 'Oliver', 'Petra', 'Quirin', 'Rita', 'Stefan', 'Theresa', 'Ulrich', 'Vanessa', 'Werner', 'Xiomara', 'Yannick', 'Zenobia'];
+const borrowerLastNames = ['Müller', 'Schmidt', 'Schneider', 'Fischer', 'Weber', 'Meyer', 'Wagner', 'Becker', 'Schulz', 'Hoffmann', 'Schäfer', 'Koch', 'Richter', 'Kaiser', 'Krämer', 'Blum', 'Spitz', 'Roth', 'Friedrich', 'Bergmann'];
+
+interface LoanParty {
+  name: string;
+  street: string;
+  postal: string;
+  city: string;
+}
+
+const generateLoanParty = (type: 'lender' | 'borrower'): LoanParty => {
+  if (type === 'lender') {
+    return {
+      name: randomChoice(lenderNames),
+      street: 'Hauptstr. ' + randomInt(1, 200),
+      postal: '800' + randomInt(0, 9) + randomInt(0, 9),
+      city: 'München',
+    };
+  } else {
+    const firstName = randomChoice(borrowerFirstNames);
+    const lastName = randomChoice(borrowerLastNames);
+    return {
+      name: firstName + ' ' + lastName,
+      street: randomChoice(['Schillerstr.', 'Ludwigstr.', 'Maximilianstr.', 'Leopoldstr.', 'Fürstenstr.']) + ' ' + randomInt(1, 150),
+      postal: '800' + randomInt(0, 9) + randomInt(0, 9),
+      city: randomChoice(['München', 'Schwabing', 'Neuhausen', 'Pasing', 'Bogenhausen']),
+    };
+  }
+};
+
+// Vertragskomponenten
+interface LoanContractProps {
+  lender: LoanParty;
+  borrower: LoanParty;
+  loanAmount: number;
+  interestRate: number;
+  duration: number;
+  type: 'rate' | 'annuity';
+  tilgung?: number;
+  annuity?: number;
+}
+
+const LoanContract: React.FC<LoanContractProps> = ({
+  lender,
+  borrower,
+  loanAmount,
+  interestRate,
+  duration,
+  type,
+  tilgung,
+  annuity,
+}) => {
+  const contractDate = new Date().toLocaleDateString('de-DE', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+
+  return (
+    <div className="mb-6 border-2 border-gray-800 p-6 bg-white rounded-lg shadow-md max-w-3xl">
+      {/* Überschrift */}
+      <div className="text-center mb-6 border-b-2 border-gray-800 pb-4">
+        <h2 className="text-2xl font-bold tracking-wide">Darlehensvertrag</h2>
+        <p className="text-sm text-gray-600 mt-2">zwischen</p>
+      </div>
+
+      {/* Vertragsparteien */}
+      <div className="grid grid-cols-2 gap-8 mb-6 text-sm">
+        {/* Darlehensgeber */}
+        <div>
+          <p className="font-bold mb-2">{lender.name}</p>
+          <p className="text-gray-700">{lender.street}</p>
+          <p className="text-gray-700">{lender.postal} {lender.city}</p>
+          <p className="text-gray-600 text-xs mt-2">(nachfolgend Darlehensgeber genannt)</p>
+        </div>
+
+        {/* Darlehensnehmer */}
+        <div>
+          <p className="font-bold mb-2">{borrower.name}</p>
+          <p className="text-gray-700">{borrower.street}</p>
+          <p className="text-gray-700">{borrower.postal} {borrower.city}</p>
+          <p className="text-gray-600 text-xs mt-2">(nachfolgend Darlehensnehmer genannt)</p>
+        </div>
+      </div>
+
+      <p className="text-center text-sm mb-6 text-gray-700">wird folgender Vertrag geschlossen.</p>
+
+      {/* Vertragsparagraphen */}
+      <div className="space-y-4 text-sm">
+        {/* § 1 */}
+        <div>
+          <h3 className="font-bold mb-1">§ 1 Darlehensbetrag</h3>
+          <p className="text-gray-700">
+            Der Darlehensgeber gewährt dem Darlehensnehmern ein Darlehen in Höhe von{' '}
+            <span className="font-semibold">{formatCurrency(loanAmount)} €</span>.
+          </p>
+        </div>
+
+        {/* § 2 */}
+        <div>
+          <h3 className="font-bold mb-1">§ 2 Laufzeit</h3>
+          <p className="text-gray-700">
+            Das Darlehen hat eine Laufzeit von <span className="font-semibold">{duration} Jahren</span> ab dem Auszahlungsdatum.
+          </p>
+        </div>
+
+        {/* § 3 */}
+        <div>
+          <h3 className="font-bold mb-1">§ 3 Zinsen</h3>
+          <p className="text-gray-700">
+            Das Darlehen ist mit <span className="font-semibold">{formatNumber(interestRate, type === 'rate' ? 1 : 2)} % p.a.</span> zu verzinsen.
+            Die Zinsen werden jährlich berechnet.
+          </p>
+        </div>
+
+        {/* § 4 */}
+        <div>
+          <h3 className="font-bold mb-1">§ 4 Tilgung</h3>
+          {type === 'rate' ? (
+            <p className="text-gray-700">
+              Das Darlehen ist in jährlich gleichbleibenden Tilgungsraten in Höhe von je{' '}
+              <span className="font-semibold">{formatCurrency(tilgung)} €</span> jeweils zum 31.12. eines jeden Jahres zu tilgen.
+            </p>
+          ) : (
+            <p className="text-gray-700">
+              Das Darlehen ist durch jährlich gleiche Annuitäten in Höhe von je{' '}
+              <span className="font-semibold">{formatCurrency(annuity)} €</span> jeweils zum 31.12. eines jeden Jahres zu tilgen.
+              Die Annuität setzt sich aus Zinsanteil und Tilgungsanteil zusammen.
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Unterschriftszeile */}
+      <div className="grid grid-cols-2 gap-8 mt-8 pt-6 border-t-2 border-gray-800 text-xs">
+        <div>
+          <p className="text-gray-600">{contractDate}</p>
+          <p className="text-gray-600 mt-2">Ort und Datum</p>
+          <div className="h-10 mt-4"></div>
+          <p className="text-gray-600">Darlehensgeber</p>
+        </div>
+        <div>
+          <div className="h-10 mt-2"></div>
+          <p className="text-gray-600">Darlehensnehmer</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const simpleInterestContexts = [
   'Die Schülerfirma SolarJuice legt einen Teil ihrer Smoothie-Einnahmen kurzfristig bei der Schülerbank an.',
   'Der Nachhaltigkeitsclub verwaltet Sponsorengelder für ein Urban-Gardening-Projekt.',
@@ -1132,6 +1286,9 @@ const createRatendarlehenPlanTask = (): Task => {
   const rate = randomFloat(1.5, 4.0, 1);
   const tilgung = loan / years;
 
+  const lender = generateLoanParty('lender');
+  const borrower = generateLoanParty('borrower');
+
   const extraYear = randomInt(5, years);
   const targetYears = Array.from(new Set([1, 2, extraYear])).sort((a, b) => a - b);
 
@@ -1147,23 +1304,30 @@ const createRatendarlehenPlanTask = (): Task => {
   const contextLine = randomChoice(ratendarlehenContexts);
 
   const question = (
-    <div className="space-y-3">
-      <p>{contextLine}</p>
-      <p>
-        Darlehenshöhe: <strong>{formatCurrency(loan)} €</strong>, Laufzeit: <strong>{years} Jahre</strong>, Zinssatz:{' '}
-        <strong>{formatNumber(rate, 1)} %</strong>. Die Tilgung ist jedes Jahr gleich.
-      </p>
-      <p className="text-blue-900 font-semibold">
-        Ergänze die Werte für Jahr 1, Jahr 2 sowie Jahr {targetYears[targetYears.length - 1]} (Schuld, Zins, Tilgung,
-        Annuität).
-      </p>
+    <div className="space-y-4">
+      <LoanContract
+        lender={lender}
+        borrower={borrower}
+        loanAmount={loan}
+        interestRate={rate}
+        duration={years}
+        type="rate"
+        tilgung={tilgung}
+      />
+      <div>
+        <p className="mb-3">{contextLine}</p>
+        <p className="text-blue-900 font-semibold">
+          Ergänze die Werte für Jahr 1, Jahr 2 sowie Jahr {targetYears[targetYears.length - 1]} (Schuld, Zins, Tilgung,
+          Annuität).
+        </p>
+      </div>
     </div>
   );
 
   const solution = (
     <div className="space-y-2">
       <p>
-        Tilgung = {formatCurrency(tilgung)} € pro Jahr, Zins = Restschuld · {formatNumber(rate, 1)} %.
+        Tilgung T = {formatCurrency(tilgung)} € pro Jahr, Zins = Restschuld · {formatNumber(rate, 1)} %.
       </p>
       {renderPlanSolution(rows)}
     </div>
@@ -1186,6 +1350,9 @@ const createAnnuitaetPlanTask = (): Task => {
   const tilgungFirst = (loan * (q - 1)) / (qn - 1);
   const annuity = tilgungFirst * qn;
 
+  const lender = generateLoanParty('lender');
+  const borrower = generateLoanParty('borrower');
+
   const extraYear = randomInt(5, years);
   const targetYears = Array.from(new Set([1, 2, extraYear])).sort((a, b) => a - b);
 
@@ -1204,15 +1371,22 @@ const createAnnuitaetPlanTask = (): Task => {
   }
 
   const question = (
-    <div className="space-y-3">
-      <p>{randomChoice(annuitaetPlanContexts)}</p>
-      <p>
-        Darlehenshöhe: <strong>{formatCurrency(loan)} €</strong>, Laufzeit: <strong>{years} Jahre</strong>, Zinssatz:{' '}
-        <strong>{formatNumber(rate, 2)} %</strong>. Die Annuität bleibt konstant.
-      </p>
-      <p className="text-blue-900 font-semibold">
-        Ergänze die Werte für Jahr 1, Jahr 2 sowie Jahr {targetYears[targetYears.length - 1]} (Schuld, Zinsanteil, Tilgung, Annuität).
-      </p>
+    <div className="space-y-4">
+      <LoanContract
+        lender={lender}
+        borrower={borrower}
+        loanAmount={loan}
+        interestRate={rate}
+        duration={years}
+        type="annuity"
+        annuity={annuity}
+      />
+      <div>
+        <p className="mb-3">{randomChoice(annuitaetPlanContexts)}</p>
+        <p className="text-blue-900 font-semibold">
+          Ergänze die Werte für Jahr 1, Jahr 2 sowie Jahr {targetYears[targetYears.length - 1]} (Schuld, Zinsanteil, Tilgung, Annuität).
+        </p>
+      </div>
     </div>
   );
 
