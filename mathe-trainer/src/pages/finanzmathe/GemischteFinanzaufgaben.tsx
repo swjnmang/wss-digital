@@ -411,15 +411,19 @@ const LoanContract: React.FC<LoanContractProps> = (props) => {
 };
 
 const simpleInterestContexts = [
-  'Die Schülerfirma SolarJuice legt einen Teil ihrer Smoothie-Einnahmen kurzfristig bei der Schülerbank an.',
-  'Der Nachhaltigkeitsclub verwaltet Sponsorengelder für ein Urban-Gardening-Projekt.',
-  'Eine Abschlussklasse erhält eine Reisekasse und möchte das Geld bis zur Fahrt verzinst parken.',
+  'Markus hat von seinem Opa Geld geschenkt bekommen und legt es für kurze Zeit bei der Bank an.',
+  'Sophie hat bei einem Wettbewerb gewonnen und parkt das Geld vorübergehend auf einem Tagesgeldkonto.',
+  'Der Sportverein erhält ein Sponsoring und lässt das Geld kurzfristig arbeiten.',
+  'Ein Handwerksbetrieb legt Reserven für ein paar Monate bei der Bank an.',
+  'Die Familie Müller spart auf eine Reise und legt das Geld mit Zinsen an.',
 ] as const;
 
 const zinseszinsContexts = [
-  'Lilly lässt ihr Preisgeld mit jährlicher Verzinsung ruhen – ohne Entnahmen.',
-  'Der Schulsanitätsdienst spart Spenden für neue Ausrüstung und lässt das Kapital wachsen.',
-  'Ein eSports-Schulteam legt seine Gewinne auf einem Festgeldkonto an.',
+  'Lilly hat 10.000,00 € gewonnen und diesen Betrag auf ihr Sparkonto einbezahlt. Wie lange dauert es bei einem Zinssatz von 3,36 % p.a., bis sie einen bestimmten Betrag hat?',
+  'Tom erbt 15.000,00 € und lässt das Geld ohne Abhebungen am Kapitalmarkt wachsen. Wie viel hat er nach einigen Jahren bei regelmäßiger Verzinsung?',
+  'Die Familie Schmidt legt 25.000,00 € an und möchte wissen, wie viel daraus nach mehreren Jahren wird, wenn die Bank 2,8 % pro Jahr zahlt.',
+  'Alex hat beim Spielen Preisgeld gewonnen und möchte dieses anlegen, um es mehren zu lassen. Wie lange muss er warten, bis sich sein Geld bei einem bestimmten Zinssatz verdoppelt?',
+  'Ein Schüler legt sein Ersparte an und möchte ausrechnen, wie viel er nach einigen Jahren angespart hat.',
 ] as const;
 
 // Kapitalmehrung: Fall Kn (Endkapital gesucht)
@@ -642,10 +646,10 @@ const createSimpleInterestTask = (): Task => {
         <div className="space-y-2">
           {baseStory}
           <p>
-            Einlage: <strong>{formatCurrency(K)} €</strong>, Zinssatz: <strong>{formatNumber(p, 2)} %</strong>.
+            Er/Sie legt <strong>{formatCurrency(K)} €</strong> an. Die Bank bietet einen Zinssatz von <strong>{formatNumber(p, 2)} %</strong> p.a.
           </p>
           {durationInfo}
-          <p className="text-blue-900 font-semibold">Welche Zinsen fallen an?</p>
+          <p className="text-blue-900 font-semibold">Wie viel Zinsen bekommt er/sie gutgeschrieben?</p>
         </div>
       );
       inputs = [createInputField('Z', 'Zinsen', '€', 'z.B. 248,50', Z_rounded, Math.max(Z_rounded * 0.005, 0.5))];
@@ -668,10 +672,13 @@ const createSimpleInterestTask = (): Task => {
         <div className="space-y-2">
           {baseStory}
           <p>
-            Zinssatz: <strong>{formatNumber(p, 2)} %</strong>, Zinsen: <strong>{formatCurrency(Z_rounded)} €</strong>.
+            Die Bank bietet einen Zinssatz von <strong>{formatNumber(p, 2)} %</strong> p.a. an.
           </p>
           {durationInfo}
-          <p className="text-blue-900 font-semibold">Welches Startkapital wurde angelegt?</p>
+          <p>
+            Am Ende der Anlagezeit werden ihm/ihr <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen gutgeschrieben.
+          </p>
+          <p className="text-blue-900 font-semibold">Welcher Betrag wurde ursprünglich angelegt?</p>
         </div>
       );
       inputs = [createInputField('K', 'Kapital', '€', 'z.B. 18.500,00', capital, Math.max(capital * 0.005, 1))];
@@ -694,10 +701,13 @@ const createSimpleInterestTask = (): Task => {
         <div className="space-y-2">
           {baseStory}
           <p>
-            Startkapital: <strong>{formatCurrency(K)} €</strong>, Zinsen: <strong>{formatCurrency(Z_rounded)} €</strong>.
+            Er/Sie legt <strong>{formatCurrency(K)} €</strong> an.
           </p>
           {durationInfo}
-          <p className="text-blue-900 font-semibold">Wie hoch war der Zinssatz?</p>
+          <p>
+            Nach der Anlagezeit erhält er/sie <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen.
+          </p>
+          <p className="text-blue-900 font-semibold">Wie hoch war der vereinbarte Zinssatz?</p>
         </div>
       );
       inputs = [createInputField('p', 'Zinssatz', '%', 'z.B. 4,25', rate, 0.05, 2)];
@@ -720,10 +730,12 @@ const createSimpleInterestTask = (): Task => {
         <div className="space-y-2">
           {baseStory}
           <p>
-            Startkapital: <strong>{formatCurrency(K)} €</strong>, Zinssatz: <strong>{formatNumber(p, 2)} %</strong>, Zinsen:{' '}
-            <strong>{formatCurrency(Z_rounded)} €</strong>.
+            Er/Sie legt <strong>{formatCurrency(K)} €</strong> an einem Konto mit <strong>{formatNumber(p, 2)} %</strong> Zinsen p.a. an.
           </p>
-          <p className="text-blue-900 font-semibold">Wie viele Tage war das Geld angelegt?</p>
+          <p>
+            Als die Anlage beendet wird, erhält er/sie <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen.
+          </p>
+          <p className="text-blue-900 font-semibold">Wie lange war das Geld angelegt?</p>
         </div>
       );
       inputs = [createInputField('t', 'Tage', 'Tage', 'z.B. 180', days, 0.5, 1)];
@@ -773,10 +785,10 @@ const createZinseszinsTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Startkapital: <strong>{formatCurrency(K0)} €</strong>, Zinssatz: <strong>{formatNumber(p, 2)} %</strong>, Laufzeit:{' '}
-            <strong>{n} Jahre</strong>.
+            Startsumme: <strong>{formatCurrency(K0)} €</strong>, Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a.
           </p>
-          <p className="text-blue-900 font-semibold">Wie groß ist das Endkapital?</p>
+          <p>Nach {n} Jahren und ohne Abhebungen oder Einzahlungen:</p>
+          <p className="text-blue-900 font-semibold">Wie viel Geld befindet sich dann auf dem Konto?</p>
         </div>
       );
       inputs = [createInputField('Kn', 'Endkapital', '€', 'z.B. 14.200,00', Kn, Math.max(Kn * 0.005, 1.5))];
@@ -799,10 +811,9 @@ const createZinseszinsTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Endkapital: <strong>{formatCurrency(Kn)} €</strong>, Zinssatz: <strong>{formatNumber(p, 2)} %</strong>, Laufzeit:{' '}
-            <strong>{n} Jahre</strong>.
+            Nach {n} Jahren liegt der Kontostand bei <strong>{formatCurrency(Kn)} €</strong>. Der Zinssatz war die ganze Zeit <strong>{formatNumber(p, 2)} %</strong> p.a.
           </p>
-          <p className="text-blue-900 font-semibold">Welches Anfangskapital wurde angelegt?</p>
+          <p className="text-blue-900 font-semibold">Welchen Betrag muss er/sie ursprünglich eingezahlt haben?</p>
         </div>
       );
       inputs = [createInputField('K0', 'Anfangskapital', '€', 'z.B. 12.000,00', K0, Math.max(K0 * 0.005, 1.5))];
@@ -825,10 +836,9 @@ const createZinseszinsTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Startkapital: <strong>{formatCurrency(K0)} €</strong>, Endkapital: <strong>{formatCurrency(Kn)} €</strong>, Laufzeit:{' '}
-            <strong>{n} Jahre</strong>.
+            Er/Sie legt <strong>{formatCurrency(K0)} €</strong> an. Nach <strong>{n} Jahren</strong> ist das Geld auf <strong>{formatCurrency(Kn)} €</strong> gewachsen (keine Abhebungen oder Einzahlungen dazwischen).
           </p>
-          <p className="text-blue-900 font-semibold">Welcher Zinssatz führte zu diesem Wachstum?</p>
+          <p className="text-blue-900 font-semibold">Wie hoch war der jährliche Zinssatz?</p>
         </div>
       );
       inputs = [createInputField('p', 'Zinssatz', '%', 'z.B. 3,8', p, 0.05, 2)];
@@ -851,10 +861,9 @@ const createZinseszinsTask = (): Task => {
         <div className="space-y-2">
           {story}
           <p>
-            Startkapital: <strong>{formatCurrency(K0)} €</strong>, Endkapital: <strong>{formatCurrency(Kn)} €</strong>, Zinssatz:{' '}
-            <strong>{formatNumber(p, 2)} %</strong>.
+            Startbetrag: <strong>{formatCurrency(K0)} €</strong>, angestrebter Endbetrag: <strong>{formatCurrency(Kn)} €</strong>, Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a.
           </p>
-          <p className="text-blue-900 font-semibold">Wie viele volle Jahre sind nötig?</p>
+          <p className="text-blue-900 font-semibold">Wie lange muss das Geld angelegt werden, um den Endbetrag zu erreichen?</p>
         </div>
       );
       inputs = [createInputField('n', 'Jahre', 'Jahre', 'z.B. 4', n, 0.05, 0)];
