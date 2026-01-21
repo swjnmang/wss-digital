@@ -258,9 +258,20 @@ const StartScreen: React.FC<{
 const parseGermanNumber = (str: string): number => {
   let cleaned = str.trim();
   
+  // Akzeptiere verschiedene Formate:
+  // - Kaufmännisch: 30.000,00 oder 30.000
+  // - Ohne Trennzeichen: 30000 oder 30000,00
+  // - Englisch mit Punkt als Dezimal wäre falsch (30,000 = 30)
+  
+  // Wenn ein Komma vorhanden ist, ist es immer das Dezimaltrennzeichen
   if (cleaned.includes(',')) {
+    // Entferne alle Punkte (das sind Tausender-Trennzeichen)
     cleaned = cleaned.replace(/\./g, '');
+    // Ersetze Komma durch Punkt
     cleaned = cleaned.replace(',', '.');
+  } else {
+    // Kein Komma: Entferne auch alle Punkte (die sind Tausender-Trennzeichen)
+    cleaned = cleaned.replace(/\./g, '');
   }
   
   return parseFloat(cleaned);
