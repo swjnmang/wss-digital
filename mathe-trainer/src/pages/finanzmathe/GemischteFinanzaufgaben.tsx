@@ -1831,6 +1831,11 @@ export default function GemischteFinanzaufgaben() {
   const [stats, setStats] = useState(() => createInitialStats());
   const [notifications, setNotifications] = useState<Array<{ id: string; points: number }>>([]);
 
+  // Debug: Log wenn Stats sich ändern
+  useEffect(() => {
+    console.log('Stats changed:', stats);
+  }, [stats]);
+
   useEffect(() => {
     setCards(createCards(filter));
     setStats(createInitialStats());
@@ -2083,6 +2088,12 @@ export default function GemischteFinanzaufgaben() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-100">
       <div className="flex-1 flex flex-col items center px-3 py-8 sm:px-6">
         <div className="w-full max-w-5xl bg-white/95 backdrop-blur rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-10">
+          {/* DEBUG PANEL */}
+          <div className="bg-yellow-100 border-2 border-yellow-400 rounded p-3 mb-4 text-sm font-mono">
+            <div>DEBUG - Stats: {JSON.stringify(stats)}</div>
+            <div>Filter: {filter}</div>
+          </div>
+
           <div className="text-center mb-6">
             <p className="text-sm uppercase tracking-[0.3em] text-blue-500 font-semibold">Finanzmathematik</p>
             <h1 className="text-3xl md:text-4xl font-bold text-blue-900">Gemischte Übungsaufgaben</h1>
