@@ -1618,21 +1618,45 @@ const createIncompleteTilgungsplanTask = (): Task => {
     }
   }
   
-  // Erstelle halb ausgefüllten Plan mit zufällig fehlenden Zellen
-  const incompleteRows = rows.map(row => {
+  // Erstelle halb ausgefüllten Plan mit gezielt fehlenden Zellen
+  // Sicherstelle, dass genug Informationen vorhanden sind, um fehlende Werte zu berechnen
+  const incompleteRows = rows.map((row, yearIndex) => {
     const hide = new Set<string>();
-    // Verstecke 2-3 Zellen pro Zeile
-    const fieldsToHide = randomInt(2, 3);
-    const fields = ['restStart', 'interest', 'tilgung', 'annuity'];
-    const selectedFields: string[] = [];
-    while (selectedFields.length < fieldsToHide && selectedFields.length < fields.length) {
-      const field = fields[randomInt(0, fields.length - 1)];
-      if (!selectedFields.includes(field)) {
-        selectedFields.push(field);
-        hide.add(field);
+    
+    // Für Ratentilgung und Annuitätentilgung unterschiedliche Strategien
+    if (isRatenplan) {
+      // Ratentilgung: Tilgung ist konstant
+      // Strategie: Verstecke 2 Werte, aber lasse mindestens eines von (restStart, annuity) sichtbar
+      const fieldsToHide = ['interest', 'tilgung', 'annuity'];
+      
+      if (yearIndex === 0) {
+        // Jahr 1: Verstecke 2 zufällige Felder, aber nicht beide wichtigen
+        // Lasse immer restStart sichtbar (ermöglicht Berechnung der Zinsrate)
+        const hideTwo = [fieldsToHide[randomInt(0, 2)], fieldsToHide[randomInt(0, 2)]];
+        hideTwo.forEach(f => hide.add(f));
+        // Falls 'annuity' nicht versteckt ist, kann man Tilgung berechnen
+        // Falls 'interest' nicht versteckt ist, kann man die Rate berechnen
+      } else {
+        // Jahr 2: Verstecke 2 zufällige, lasse aber entweder Tilgung oder Schuld sichtbar
+        // Damit kann man durch die Konstanz der Tilgung berechnen
+        const hideTwo = [fieldsToHide[randomInt(0, 2)], fieldsToHide[randomInt(0, 2)]];
+        hideTwo.forEach(f => hide.add(f));
+      }
+    } else {
+      // Annuitätentilgung: Annuität ist konstant
+      // Strategie: Verstecke max 2, lasse Annuität und/oder restStart sichtbar
+      const fieldsToHide = ['interest', 'tilgung'];
+      const chooseTwo = Math.random() < 0.5;
+      if (chooseTwo && yearIndex === 0) {
+        // Jahr 1: Verstecke beide (interest + tilgung), aber Schuld+Annuität sind sichtbar
+        hide.add('interest');
+        hide.add('tilgung');
+      } else {
+        // Verstecke nur 1-2, lasse mehr sichtbar
+        hide.add(fieldsToHide[randomInt(0, 1)]);
       }
     }
-    
+
     return {
       year: row.year,
       restStart: row.restStart,
