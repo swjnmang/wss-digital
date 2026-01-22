@@ -12,7 +12,8 @@ type TaskType =
   | 'kapitalminderung'
   | 'renten_endwert'
   | 'ratendarlehen_plan'
-  | 'annuitaet_plan';
+  | 'annuitaet_plan'
+  | 'incomplete_tilgungsplan';
 
 type FilterType = TaskType | 'mixed' | 'renten_bundled';
 
@@ -27,9 +28,11 @@ interface TaskInput {
   label: string;
   unit: string;
   placeholder: string;
-  correctValue: number;
+  correctValue: number | string;
   tolerance: number;
   displayDecimals?: number;
+  type?: 'number' | 'select';
+  options?: string[];
 }
 
 interface Task {
@@ -1560,6 +1563,175 @@ const createAnnuitaetPlanTask = (): Task => {
   };
 };
 
+const createIncompleteTilgungsplanTask = (): Task => {
+  const isRatenplan = Math.random() < 0.5;
+  const loan = randomInt(50, 200) * 1000;
+  const years = randomInt(5, 10);
+  const rate = randomFloat(1.5, 4.0, isRatenplan ? 1 : 2);
+  
+  let rows: PlanRow[] = [];
+  let tilgungsart: 'Ratentilgung' | 'Annuitätentilgung';
+  
+  if (isRatenplan) {
+    tilgungsart = 'Ratentilgung';
+    const tilgung = loan / years;
+    for (let year = 1; year <= 3; year++) {
+      const restStart = loan - tilgung * (year - 1);
+      const interest = restStart * rate / 100;
+      const annuity = tilgung + interest;
+      rows.push({ year, restStart, interest, tilgung, annuity });
+    }
+  } else {
+    tilgungsart = 'Annuitätentilgung';
+    const q = 1 + rate / 100;
+    const qn = Math.pow(q, years);
+    const tilgungFirst = (loan * (q - 1)) / (qn - 1);
+    const annuity = tilgungFirst * qn;
+    
+    let rest = loan;
+    for (let year = 1; year <= 3; year++) {
+      const interest = rest * rate / 100;
+      const tilgung = annuity - interest;
+      rows.push({ year, restStart: rest, interest, tilgung, annuity });
+      rest -= tilgung;
+    }
+  }
+  
+  // Erstelle halb ausgefüllten Plan mit zufällig fehlenden Zellen
+  const incompleteRows = rows.map(row => {
+    const hide = new Set<string>();
+    // Verstecke 2-3 Zellen pro Zeile
+    const fieldsToHide = randomInt(2, 3);
+    const fields = ['restStart', 'interest', 'tilgung', 'annuity'];
+    for (let i = 0; i < fieldsToHide; i++) {
+      hide.add(fields[randomInt(0, fields.length - 1)]);
+    }
+    
+    return {
+      ...row,
+      hiddenFields: hide,
+    };
+  });
+
+  const question = (
+    <div className="space-y-4">
+      <p className="text-gray-700">
+        <strong>Aufgabe:</strong> Vervollständige den Tilgungsplan und gib an, um welche Tilgungsart es sich handelt.
+      </p>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
+        <p><strong>Darlehensbetrag:</strong> {formatCurrency(loan)} €</p>
+        <p><strong>Laufzeit:</strong> {years} Jahre</p>
+        <p><strong>Zinssatz (p.a.):</strong> {formatNumber(rate, isRatenplan ? 1 : 2)} %</p>
+      </div>
+      
+      {/* Halb ausgefüllter Tilgungsplan */}
+      <div className="overflow-x-auto">
+        <table className="w-full border border-slate-200 text-sm">
+          <thead>
+            <tr className="bg-slate-100">
+              <th className="p-2 text-left">Jahr</th>
+              <th className="p-2 text-left">Schuld (Anfang)</th>
+              <th className="p-2 text-left">Zins</th>
+              <th className="p-2 text-left">Tilgung</th>
+              <th className="p-2 text-left">Annuität</th>
+            </tr>
+          </thead>
+          <tbody>
+            {incompleteRows.map((row: any) => (
+              <tr key={row.year} className="border-t border-slate-200">
+                <td className="p-2 font-semibold">{row.year}</td>
+                <td className="p-2">
+                  {row.hiddenFields.has('restStart') ? '?' : formatCurrency(row.restStart) + ' €'}
+                </td>
+                <td className="p-2">
+                  {row.hiddenFields.has('interest') ? '?' : formatCurrency(row.interest) + ' €'}
+                </td>
+                <td className="p-2">
+                  {row.hiddenFields.has('tilgung') ? '?' : formatCurrency(row.tilgung) + ' €'}
+                </td>
+                <td className="p-2">
+                  {row.hiddenFields.has('annuity') ? '?' : formatCurrency(row.annuity) + ' €'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const solution = (
+    <div className="space-y-2">
+      <p><strong>Tilgungsart:</strong> {tilgungsart}</p>
+      {renderPlanSolution(rows)}
+    </div>
+  );
+
+  // Erstelle Inputs für alle fehlenden Zellen
+  const inputs: TaskInput[] = [];
+  incompleteRows.forEach((row: any) => {
+    if (row.hiddenFields.has('restStart')) {
+      inputs.push(createInputField(
+        `incomplete_y${row.year}_debt`,
+        `Jahr ${row.year} • Schuld`,
+        '€',
+        'z.B. 100.000,00',
+        row.restStart,
+        0.02
+      ));
+    }
+    if (row.hiddenFields.has('interest')) {
+      inputs.push(createInputField(
+        `incomplete_y${row.year}_interest`,
+        `Jahr ${row.year} • Zins`,
+        '€',
+        'z.B. 3.200,00',
+        row.interest,
+        0.02
+      ));
+    }
+    if (row.hiddenFields.has('tilgung')) {
+      inputs.push(createInputField(
+        `incomplete_y${row.year}_tilgung`,
+        `Jahr ${row.year} • Tilgung`,
+        '€',
+        'z.B. 12.500,00',
+        row.tilgung,
+        0.02
+      ));
+    }
+    if (row.hiddenFields.has('annuity')) {
+      inputs.push(createInputField(
+        `incomplete_y${row.year}_annuity`,
+        `Jahr ${row.year} • Annuität`,
+        '€',
+        'z.B. 15.700,00',
+        row.annuity,
+        0.02
+      ));
+    }
+  });
+
+  // Füge Select für Tilgungsart hinzu
+  inputs.push({
+    id: 'tilgungsart',
+    label: 'Tilgungsart',
+    unit: '',
+    placeholder: 'Wähle aus',
+    correctValue: tilgungsart,
+    tolerance: 0,
+    type: 'select',
+    options: ['Ratentilgung', 'Annuitätentilgung'],
+  });
+
+  return {
+    type: 'incomplete_tilgungsplan',
+    question,
+    solution,
+    inputs,
+  };
+};
+
 const generators: Record<TaskType, () => Task> = {
   simple_interest: createSimpleInterestTask,
   zinseszins: createZinseszinsTask,
@@ -1568,6 +1740,7 @@ const generators: Record<TaskType, () => Task> = {
   renten_endwert: createRentenEndwertTask,
   ratendarlehen_plan: createRatendarlehenPlanTask,
   annuitaet_plan: createAnnuitaetPlanTask,
+  incomplete_tilgungsplan: createIncompleteTilgungsplanTask,
 };
 
 const randomTaskType = (): TaskType => randomChoice<TaskType>(taskTypes);
@@ -1638,6 +1811,7 @@ export default function GemischteFinanzaufgaben() {
   const [filter, setFilter] = useState<FilterType>('mixed');
   const [cards, setCards] = useState<TaskCard[]>(() => createCards('mixed'));
   const [stats, setStats] = useState(() => createInitialStats());
+  const [notifications, setNotifications] = useState<Array<{ id: string; points: number }>>([]);
 
   useEffect(() => {
     setCards(createCards(filter));
@@ -1692,18 +1866,24 @@ export default function GemischteFinanzaufgaben() {
 
   const isInputCorrect = (input: TaskInput, userValue: string): boolean => {
     if (!userValue.trim()) return false;
+    
+    // Für Select-Felder: direkter String-Vergleich
+    if (input.type === 'select') {
+      return userValue === input.correctValue;
+    }
+    
+    // Für Zahlfelder: numerischer Vergleich
     const parsed = parseGermanNumber(userValue);
-    return !Number.isNaN(parsed) && Math.abs(parsed - input.correctValue) <= input.tolerance;
+    return !Number.isNaN(parsed) && Math.abs(parsed - (input.correctValue as number)) <= input.tolerance;
   };
 
   const checkAnswer = (id: number) => {
     let attempt: 'correct' | 'incorrect' | 'invalid' = 'invalid';
-    let card: TaskCard | undefined;
+    let updatedCards: TaskCard[] = [];
 
-    setCards(prev =>
-      prev.map(c => {
+    setCards(prev => {
+      updatedCards = prev.map(c => {
         if (c.id !== id) return c;
-        card = c;
 
         // Wenn Lösung bereits angezeigt wurde, keine Punkte mehr
         if (c.solutionVisible) {
@@ -1755,8 +1935,9 @@ export default function GemischteFinanzaufgaben() {
           ),
           feedbackType: isCorrect ? 'correct' : 'incorrect',
         };
-      })
-    );
+      });
+      return updatedCards;
+    });
 
     if (attempt !== 'invalid') {
       setStats(prev => ({
@@ -1765,41 +1946,52 @@ export default function GemischteFinanzaufgaben() {
         streak: attempt === 'correct' ? prev.streak + 1 : 0,
         points: prev.points + (attempt === 'correct' ? POINTS_PER_CORRECT : 0),
       }));
-    }
-
-    // Nach checkAnswer auch Tilgungspläne checken
-    if (card && attempt !== 'invalid') {
-      setTimeout(() => checkCellsAutomatically(id), 0);
+      // Nach checkAnswer auch Tilgungspläne checken
+      checkCellsAutomatically(id, updatedCards);
     }
   };
 
-  const checkCellsAutomatically = (id: number) => {
+  const checkCellsAutomatically = (cardId: number, updatedCards: TaskCard[]) => {
     // Automatisches Scoring für Tilgungspläne: +2 Punkte pro korrekte Zelle
-    const card = cards.find(c => c.id === id);
+    const card = updatedCards.find(c => c.id === cardId);
     if (!card) return;
 
     // Nur für Tilgungspläne aktivieren
-    if (card.task.type !== 'ratendarlehen_plan' && card.task.type !== 'annuitaet_plan') return;
+    if (card.task.type !== 'ratendarlehen_plan' && card.task.type !== 'annuitaet_plan' && card.task.type !== 'incomplete_tilgungsplan') return;
 
     // Nicht wenn Lösung angezeigt wurde
     if (card.solutionVisible) return;
 
     // Zähle korrekte Zellen
-    let correctCells = 0;
-    card.task.inputs.forEach(input => {
+    let totalPoints = 0;
+    card.task.inputs.forEach((input, index) => {
       const userValue = card.userAnswers[input.id];
       if (userValue?.trim()) {
-        const parsed = parseGermanNumber(userValue);
-        if (!Number.isNaN(parsed) && Math.abs(parsed - input.correctValue) <= input.tolerance) {
-          correctCells++;
+        let isCorrect = false;
+        
+        if (input.type === 'select') {
+          isCorrect = userValue === input.correctValue;
+        } else {
+          const parsed = parseGermanNumber(userValue);
+          isCorrect = !Number.isNaN(parsed) && Math.abs(parsed - (input.correctValue as number)) <= input.tolerance;
+        }
+        
+        if (isCorrect) {
+          totalPoints += 2;
+          // Notification für diese Zelle
+          const notifId = `${cardId}-${index}-${Date.now()}`;
+          setNotifications(prev => [...prev, { id: notifId, points: 2 }]);
+          setTimeout(() => {
+            setNotifications(prev => prev.filter(n => n.id !== notifId));
+          }, 2000);
         }
       }
     });
 
-    if (correctCells > 0) {
+    if (totalPoints > 0) {
       setStats(prev => ({
         ...prev,
-        points: prev.points + (correctCells * 2),
+        points: prev.points + totalPoints,
       }));
     }
   };
@@ -1885,15 +2077,32 @@ export default function GemischteFinanzaufgaben() {
                           <div key={input.id} className="flex flex-col sm:flex-row sm:items-center gap-2">
                             <label className="font-semibold text-slate-600 sm:min-w-[220px]">{input.label}:</label>
                             <div className="flex-1 flex items-center gap-2">
-                              <input
-                                type="text"
-                                value={card.userAnswers[input.id]}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                  handleInputChange(card.id, input.id, e.target.value)
-                                }
-                                placeholder={input.placeholder}
-                                className="flex-1 border-2 border-slate-300 rounded-xl px-4 py-2 text-lg focus:outline-none focus:border-blue-400"
-                              />
+                              {input.type === 'select' ? (
+                                <select
+                                  value={card.userAnswers[input.id] || ''}
+                                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                                    handleInputChange(card.id, input.id, e.target.value)
+                                  }
+                                  className="flex-1 border-2 border-slate-300 rounded-xl px-4 py-2 text-lg focus:outline-none focus:border-blue-400 bg-white"
+                                >
+                                  <option value="">{input.placeholder}</option>
+                                  {input.options?.map(opt => (
+                                    <option key={opt} value={opt}>
+                                      {opt}
+                                    </option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={card.userAnswers[input.id]}
+                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    handleInputChange(card.id, input.id, e.target.value)
+                                  }
+                                  placeholder={input.placeholder}
+                                  className="flex-1 border-2 border-slate-300 rounded-xl px-4 py-2 text-lg focus:outline-none focus:border-blue-400"
+                                />
+                              )}
                               <span className="text-xl font-bold text-slate-600">{input.unit}</span>
                             </div>
                           </div>
@@ -2021,6 +2230,43 @@ export default function GemischteFinanzaufgaben() {
               <p className="text-sm text-slate-600">Versuche</p>
             </div>
           </div>
+
+          {/* Notifications für Punkt-Popups */}
+          <div className="fixed top-8 left-1/2 transform -translate-x-1/2 pointer-events-none">
+            {notifications.map((notif, idx) => (
+              <div
+                key={notif.id}
+                className="animate-bounce mb-2 bg-green-500 text-white font-bold px-4 py-2 rounded-full shadow-lg text-lg"
+                style={{
+                  animation: `slideIn 0.5s ease-out, slideOut 0.5s ease-out 1.5s forwards`,
+                }}
+              >
+                +{notif.points}
+              </div>
+            ))}
+          </div>
+          <style>{`
+            @keyframes slideIn {
+              from {
+                opacity: 0;
+                transform: translateY(-20px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+            @keyframes slideOut {
+              from {
+                opacity: 1;
+                transform: translateY(0);
+              }
+              to {
+                opacity: 0;
+                transform: translateY(-20px);
+              }
+            }
+          `}</style>
         </div>
       </div>
     </div>
