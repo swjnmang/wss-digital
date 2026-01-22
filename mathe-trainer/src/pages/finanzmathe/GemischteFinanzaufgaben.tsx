@@ -2487,7 +2487,13 @@ export default function GemischteFinanzaufgaben() {
                           <InlineMath math={card.task.formula} />
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{card.task.formula}</p>
+                        <div className="space-y-2 text-sm text-gray-700">
+                          {typeof card.task.formula === 'string' && 
+                            card.task.formula.split('\n').map((line, idx) => (
+                              line.trim() && <p key={idx}>{line.trim()}</p>
+                            ))
+                          }
+                        </div>
                       )}
                     </div>
                   </div>
