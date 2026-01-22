@@ -1478,28 +1478,6 @@ const createRatendarlehenPlanTask = (): Task => {
 
   const rows = targetYears.map(buildRow);
 
-  // Erstelle Hidden-Fields Map für intelligente Versteckung
-  const hiddenFields = new Map<number, Set<string>>();
-  rows.forEach((row, yearIndex) => {
-    const hide = new Set<string>();
-    
-    if (yearIndex === 0) {
-      // Jahr 1: restStart + Tilgung sichtbar → Schüler sieht konstante Tilgung
-      hide.add('interest');
-      hide.add('annuity');
-    } else if (yearIndex === 1) {
-      // Jahr 2: Tilgung + Annuität sichtbar → Tilgung ist gleich (Erkennungsmerkmal!)
-      hide.add('restStart');
-      hide.add('interest');
-    } else {
-      // Weitere Jahre: Mix variieren
-      hide.add('restStart');
-      hide.add('interest');
-    }
-    
-    hiddenFields.set(yearIndex, hide);
-  });
-
   const contextLine = randomChoice(ratendarlehenContexts);
 
   const question = (
@@ -1537,7 +1515,6 @@ const createRatendarlehenPlanTask = (): Task => {
     question,
     solution,
     inputs: buildPlanInputs('rate', rows),
-    _hiddenFields: hiddenFields, // Speichere für Rendering
   };
 };
 
@@ -1590,27 +1567,6 @@ const createAnnuitaetPlanTask = (): Task => {
     </div>
   );
 
-  // Erstelle Hidden-Fields Map für intelligente Versteckung
-  const hiddenFields = new Map<number, Set<string>>();
-  rows.forEach((row, yearIndex) => {
-    const hide = new Set<string>();
-    
-    if (yearIndex === 0) {
-      // Jahr 1: restStart + Annuität sichtbar → Schüler sieht konstante Annuität
-      hide.add('interest');
-      hide.add('tilgung');
-    } else if (yearIndex === 1) {
-      // Jahr 2: Tilgung + Annuität sichtbar → Annuität ist gleich (Erkennungsmerkmal!)
-      hide.add('restStart');
-      hide.add('interest');
-    } else {
-      // Weitere Jahre: Mix variieren
-      hide.add('restStart');
-      hide.add('interest');
-    }
-    
-    hiddenFields.set(yearIndex, hide);
-  });
 
   const solution = (
     <div className="space-y-2">
@@ -1626,7 +1582,6 @@ const createAnnuitaetPlanTask = (): Task => {
     question,
     solution,
     inputs: buildPlanInputs('ann', rows),
-    _hiddenFields: hiddenFields, // Speichere für Rendering
   };
 };
 
@@ -2314,23 +2269,10 @@ export default function GemischteFinanzaufgaben() {
                                 <td className="p-2 text-center font-semibold text-slate-600">{row.year}</td>
                                 {PLAN_COLUMNS.map(col => {
                                   const input = row.cells[col.key];
-                                  const hiddenFields = (card.task as any)._hiddenFields;
-                                  const isHidden = hiddenFields?.get(index)?.has(col.key);
-                                  
-                                  if (!input || isHidden) {
-                                    // Spalte nicht als Input vorhanden ODER versteckt - zeige Wert
-                                    if (input) {
-                                      // Es gibt einen Input, aber er ist versteckt - zeige den korrekten Wert
-                                      return (
-                                        <td key={col.key} className="p-2 text-center text-slate-700 font-semibold">
-                                          {formatCurrency(input.correctValue as number)} €
-                                        </td>
-                                      );
-                                    }
-                                    // Spalte existiert gar nicht als Input
+                                  if (!input) {
+                                    // Spalte existiert nicht als Input
                                     return <td key={col.key} className="p-2"></td>;
                                   }
-                                  
                                   const userValue = card.userAnswers[input.id];
                                   const isCorrect = isInputCorrect(input, userValue);
                                   return (
