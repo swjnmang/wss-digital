@@ -797,15 +797,14 @@ const createZinseszinsTask = (): Task => {
       inputs = [createInputField('Kn', 'Endkapital', '€', 'z.B. 14.200,00', Kn, Math.max(Kn * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
-          <p>
-            <InlineMath math={latex`K_n = K_0 \cdot q^n`} />
-          </p>
-          <p>
-            <InlineMath math={latex`q = 1 + \frac{${mathNumber(p)}}{100} = ${mathNumber(q, 4)}`} />
-          </p>
-          <p>
-            <InlineMath math={latex`K_n = ${mathNumber(K0)} \cdot ${mathNumber(q, 4)}^{${n}} = ${mathNumber(Kn, 4)}`} />
-          </p>
+          <p><strong>Gegeben:</strong> <InlineMath math={latex`K_0 = ${mathNumber(K0)}\,€; \quad p = ${mathNumber(p, 2)}\,\%; \quad n = ${n}\text{ Jahre}`} /></p>
+          <p><strong>Gesucht:</strong> <InlineMath math={latex`K_n`} /></p>
+          <p><strong>Ursprungsformel:</strong> <InlineMath math={latex`K_n = K_0 \cdot q^n`} /></p>
+          <p><strong>Werte einsetzen:</strong> <InlineMath math={latex`q = 1 + \frac{${mathNumber(p, 2)}}{100} = ${mathNumber(q, 4)}`} /></p>
+          <p><InlineMath math={latex`K_n = ${mathNumber(K0)} \cdot ${mathNumber(q, 4)}^{${n}}`} /></p>
+          <p><strong>Berechnung:</strong> <InlineMath math={latex`${mathNumber(q, 4)}^{${n}} = ${mathNumber(qn, 4)}`} /></p>
+          <p><InlineMath math={latex`K_n = ${mathNumber(K0)} \cdot ${mathNumber(qn, 4)} = ${mathNumber(Kn, 2)}`} /></p>
+          <p><strong>Ergebnis:</strong> <InlineMath math={latex`K_n = ${mathNumber(Kn, 2)}\,€`} /></p>
         </div>
       );
       break;
@@ -822,15 +821,15 @@ const createZinseszinsTask = (): Task => {
       inputs = [createInputField('K0', 'Anfangskapital', '€', 'z.B. 12.000,00', K0, Math.max(K0 * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
-          <p>
-            <InlineMath math={latex`K_0 = \frac{K_n}{q^n}`} />
-          </p>
-          <p>
-            <InlineMath math={latex`q = 1 + \frac{${mathNumber(p)}}{100} = ${mathNumber(q, 4)}`} />
-          </p>
-          <p>
-            <InlineMath math={latex`K_0 = \frac{${mathNumber(Kn)}}{${mathNumber(q, 4)}^{${n}}} = ${mathNumber(K0, 4)}`} />
-          </p>
+          <p><strong>Gegeben:</strong> <InlineMath math={latex`K_n = ${mathNumber(Kn, 2)}\,€; \quad p = ${mathNumber(p, 2)}\,\%; \quad n = ${n}\text{ Jahre}`} /></p>
+          <p><strong>Gesucht:</strong> <InlineMath math={latex`K_0`} /></p>
+          <p><strong>Ursprungsformel:</strong> <InlineMath math={latex`K_n = K_0 \cdot q^n`} /></p>
+          <p><strong>Werte einsetzen:</strong> <InlineMath math={latex`q = 1 + \frac{${mathNumber(p, 2)}}{100} = ${mathNumber(q, 4)}`} /></p>
+          <p><InlineMath math={latex`${mathNumber(Kn, 2)} = K_0 \cdot ${mathNumber(q, 4)}^{${n}}`} /></p>
+          <p><strong>Berechnung:</strong> <InlineMath math={latex`${mathNumber(q, 4)}^{${n}} = ${mathNumber(qn, 4)}`} /></p>
+          <p><InlineMath math={latex`${mathNumber(Kn, 2)} = K_0 \cdot ${mathNumber(qn, 4)}`} /></p>
+          <p><strong>Umformen nach K₀:</strong> <InlineMath math={latex`K_0 = \frac{${mathNumber(Kn, 2)}}{${mathNumber(qn, 4)}} = ${mathNumber(K0, 2)}`} /></p>
+          <p><strong>Ergebnis:</strong> <InlineMath math={latex`K_0 = ${mathNumber(K0, 2)}\,€`} /></p>
         </div>
       );
       break;
@@ -847,15 +846,14 @@ const createZinseszinsTask = (): Task => {
       inputs = [createInputField('p', 'Zinssatz', '%', 'z.B. 3,8', p, 0.05, 2)];
       solution = (
         <div className="space-y-1">
-          <p>
-            <InlineMath math={latex`\frac{K_n}{K_0} = q^n`} />
-          </p>
-          <p>
-            <InlineMath math={latex`q = \sqrt[${n}]{\frac{${mathNumber(Kn)}}{${mathNumber(K0)}}} = ${mathNumber(q, 4)}`} />
-          </p>
-          <p>
-            <InlineMath math={latex`p = (q - 1) \cdot 100 = ${formatNumber(p, 2)}\,\%`} />
-          </p>
+          <p><strong>Gegeben:</strong> <InlineMath math={latex`K_0 = ${mathNumber(K0)}\,€; \quad K_n = ${mathNumber(Kn, 2)}\,€; \quad n = ${n}\text{ Jahre}`} /></p>
+          <p><strong>Gesucht:</strong> <InlineMath math={latex`p`} /></p>
+          <p><strong>Ursprungsformel:</strong> <InlineMath math={latex`K_n = K_0 \cdot q^n`} /></p>
+          <p><strong>Werte einsetzen:</strong> <InlineMath math={latex`${mathNumber(Kn, 2)} = ${mathNumber(K0)} \cdot q^{${n}}`} /></p>
+          <p><strong>Umformen nach q:</strong> <InlineMath math={latex`q^{${n}} = \frac{${mathNumber(Kn, 2)}}{${mathNumber(K0)}} = ${mathNumber(qn, 4)}`} /></p>
+          <p><InlineMath math={latex`q = \sqrt[${n}]{${mathNumber(qn, 4)}} = ${mathNumber(q, 4)}`} /></p>
+          <p><strong>Umformen nach p:</strong> <InlineMath math={latex`p = (q - 1) \cdot 100 = (${mathNumber(q, 4)} - 1) \cdot 100 = ${mathNumber(p, 2)}`} /></p>
+          <p><strong>Ergebnis:</strong> <InlineMath math={latex`p = ${mathNumber(p, 2)}\,\%`} /></p>
         </div>
       );
       break;
@@ -872,15 +870,15 @@ const createZinseszinsTask = (): Task => {
       inputs = [createInputField('n', 'Jahre', 'Jahre', 'z.B. 4', n, 0.05, 0)];
       solution = (
         <div className="space-y-1">
-          <p>
-            <InlineMath math={latex`n = \log_q \left(\frac{K_n}{K_0}\right)`} />
-          </p>
-          <p>
-            <InlineMath math={latex`q = 1 + \frac{${mathNumber(p)}}{100} = ${mathNumber(q, 4)}`} />
-          </p>
-          <p>
-            <InlineMath math={latex`n = \frac{\ln\left(\frac{${mathNumber(Kn)}}{${mathNumber(K0)}}\right)}{\ln(${mathNumber(q, 4)})} = ${n}`} />
-          </p>
+          <p><strong>Gegeben:</strong> <InlineMath math={latex`K_0 = ${mathNumber(K0)}\,€; \quad K_n = ${mathNumber(Kn, 2)}\,€; \quad p = ${mathNumber(p, 2)}\,\%`} /></p>
+          <p><strong>Gesucht:</strong> <InlineMath math={latex`n`} /></p>
+          <p><strong>Ursprungsformel:</strong> <InlineMath math={latex`K_n = K_0 \cdot q^n`} /></p>
+          <p><strong>Werte einsetzen:</strong> <InlineMath math={latex`q = 1 + \frac{${mathNumber(p, 2)}}{100} = ${mathNumber(q, 4)}`} /></p>
+          <p><InlineMath math={latex`${mathNumber(Kn, 2)} = ${mathNumber(K0)} \cdot ${mathNumber(q, 4)}^{n}`} /></p>
+          <p><strong>Umformen nach n:</strong> <InlineMath math={latex`${mathNumber(q, 4)}^{n} = \frac{${mathNumber(Kn, 2)}}{${mathNumber(K0)}} = ${mathNumber(qn, 4)}`} /></p>
+          <p><InlineMath math={latex`n \cdot \ln(${mathNumber(q, 4)}) = \ln(${mathNumber(qn, 4)})`} /></p>
+          <p><InlineMath math={latex`n = \frac{\ln(${mathNumber(qn, 4)})}{\ln(${mathNumber(q, 4)})} = ${n}`} /></p>
+          <p><strong>Ergebnis:</strong> <InlineMath math={latex`n = ${n}\text{ Jahre}`} /></p>
         </div>
       );
       break;
