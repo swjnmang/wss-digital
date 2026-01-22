@@ -1349,7 +1349,7 @@ const extractPlanTable = (inputs: TaskInput[]): PlanTableRow[] | null => {
   let hasPlanPattern = false;
 
   inputs.forEach(input => {
-    const match = input.id.match(/_y(\d+)_(debt|interest|tilgung|annuity)$/);
+    const match = input.id.match(/(?:incomplete_plan_)?_y(\d+)_(debt|interest|tilgung|annuity)$/);
     if (!match) return;
     hasPlanPattern = true;
     const year = Number(match[1]);
@@ -1682,7 +1682,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
   incompleteRows.forEach((row) => {
     if (row.hiddenFields.has('restStart')) {
       inputs.push({
-        id: `incomplete_y${row.year}_debt`,
+        id: `incomplete_plan_y${row.year}_debt`,
         label: `Jahr ${row.year} • Schuld`,
         unit: '€',
         placeholder: 'z.B. 100.000,00',
@@ -1693,7 +1693,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     }
     if (row.hiddenFields.has('interest')) {
       inputs.push({
-        id: `incomplete_y${row.year}_interest`,
+        id: `incomplete_plan_y${row.year}_interest`,
         label: `Jahr ${row.year} • Zins`,
         unit: '€',
         placeholder: 'z.B. 3.200,00',
@@ -1704,7 +1704,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     }
     if (row.hiddenFields.has('tilgung')) {
       inputs.push({
-        id: `incomplete_y${row.year}_tilgung`,
+        id: `incomplete_plan_y${row.year}_tilgung`,
         label: `Jahr ${row.year} • Tilgung`,
         unit: '€',
         placeholder: 'z.B. 12.500,00',
@@ -1715,7 +1715,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     }
     if (row.hiddenFields.has('annuity')) {
       inputs.push({
-        id: `incomplete_y${row.year}_annuity`,
+        id: `incomplete_plan_y${row.year}_annuity`,
         label: `Jahr ${row.year} • Annuität`,
         unit: '€',
         placeholder: 'z.B. 15.700,00',
