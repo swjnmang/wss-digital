@@ -1564,7 +1564,7 @@ const createRatendarlehenPlanTask = (): Task => {
     question,
     solution,
     inputs: buildPlanInputs('rate', rows),
-    formula: latex`T = \frac{K_0}{n}`,
+    formula: '1. Die Tilgung ist konstant: T = Darlehen ÷ Laufzeit\n2. Für jedes Jahr: Zinsen = Restschuld × Zinssatz\n3. Annuität = Tilgung + Zinsen\n4. Neue Restschuld = Restschuld − Tilgung',
     pointsAwarded: 12,
   };
 };
@@ -1633,7 +1633,7 @@ const createAnnuitaetPlanTask = (): Task => {
     question,
     solution,
     inputs: buildPlanInputs('ann', rows),
-    formula: latex`A = T_1 \cdot q^n`,
+    formula: '1. Die Annuität ist konstant: A = T₁ × q^n (bereits gegeben oder zu berechnen)\n2. Für jedes Jahr: Zinsen = Restschuld × Zinssatz\n3. Tilgung = Annuität − Zinsen\n4. Neue Restschuld = Restschuld − Tilgung',
     pointsAwarded: 12,
   };
 };
@@ -1799,7 +1799,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     question,
     solution,
     inputs,
-    formula: latex`K_n = K_0 \cdot q^n - r \cdot \frac{q^n - 1}{q - 1}`,
+    formula: 'Erkenne das Muster: Ist die Tilgung konstant (Ratentilgung) oder die Annuität konstant (Annuitätentilgung)? Das verrät die Tilgungsart. Nutze dann:\n• Bei Ratentilgung: T konstant, Zinsen = Restschuld × p%, Annuität = T + Zinsen\n• Bei Annuitätentilgung: A konstant, Zinsen = Restschuld × p%, Tilgung = A − Zinsen',
     _incompleteRows: incompleteRows, // Speichere die Reihen für das Rendering
     pointsAwarded: 8,
   };
@@ -2480,9 +2480,15 @@ export default function GemischteFinanzaufgaben() {
 
                 {card.tipVisible && card.task.formula && (
                   <div className="mb-3 rounded-2xl px-4 py-3 bg-amber-50 border-2 border-amber-200 text-amber-900">
-                    <p className="font-semibold mb-2">📝 Grundformel:</p>
-                    <div className="bg-white rounded-lg px-3 py-2 overflow-x-auto">
-                      <InlineMath math={card.task.formula} />
+                    <p className="font-semibold mb-2">� Hinweis:</p>
+                    <div className="bg-white rounded-lg px-3 py-2">
+                      {typeof card.task.formula === 'string' && /[\^=]|q\^|K_n|K_0|frac|cdot|times/.test(card.task.formula) ? (
+                        <div className="overflow-x-auto">
+                          <InlineMath math={card.task.formula} />
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{card.task.formula}</p>
+                      )}
                     </div>
                   </div>
                 )}
