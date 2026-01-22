@@ -2233,7 +2233,7 @@ export default function GemischteFinanzaufgaben() {
                       <div className="flex flex-col items-center gap-3 mb-3">
                         {card.task.inputs.map(input => (
                           <div key={input.id} className="w-full max-w-sm flex flex-col sm:flex-row sm:items-center gap-2 justify-center">
-                            <label className="font-semibold text-slate-600 sm:min-w-[150px]">{input.label}:</label>
+                            <label className="font-semibold text-slate-600 sm:min-w-[150px]">{input.label}</label>
                             <div className="flex items-center gap-2 flex-1 max-w-xs">
                               {input.type === 'select' ? (
                                 <select
@@ -2275,7 +2275,7 @@ export default function GemischteFinanzaufgaben() {
                       <div className="space-y-4">
                         {/* Dropdown für Tilgungsart */}
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                          <label className="font-semibold text-slate-600 sm:min-w-[220px]">{tilgungsartInput.label}:</label>
+                          <label className="font-semibold text-slate-600 sm:min-w-[220px]">{tilgungsartInput.label}</label>
                           <select
                             value={card.userAnswers[tilgungsartInput.id] || ''}
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
