@@ -1604,12 +1604,21 @@ const createIncompleteTilgungsplanTask = (): Task => {
     // Verstecke 2-3 Zellen pro Zeile
     const fieldsToHide = randomInt(2, 3);
     const fields = ['restStart', 'interest', 'tilgung', 'annuity'];
-    for (let i = 0; i < fieldsToHide; i++) {
-      hide.add(fields[randomInt(0, fields.length - 1)]);
+    const selectedFields: string[] = [];
+    while (selectedFields.length < fieldsToHide && selectedFields.length < fields.length) {
+      const field = fields[randomInt(0, fields.length - 1)];
+      if (!selectedFields.includes(field)) {
+        selectedFields.push(field);
+        hide.add(field);
+      }
     }
     
     return {
-      ...row,
+      year: row.year,
+      restStart: row.restStart,
+      interest: row.interest,
+      tilgung: row.tilgung,
+      annuity: row.annuity,
       hiddenFields: hide,
     };
   });
@@ -1638,7 +1647,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
             </tr>
           </thead>
           <tbody>
-            {incompleteRows.map((row: any) => (
+            {incompleteRows.map((row) => (
               <tr key={row.year} className="border-t border-slate-200">
                 <td className="p-2 font-semibold">{row.year}</td>
                 <td className="p-2">
@@ -1670,7 +1679,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
 
   // Erstelle Inputs für alle fehlenden Zellen
   const inputs: TaskInput[] = [];
-  incompleteRows.forEach((row: any) => {
+  incompleteRows.forEach((row) => {
     if (row.hiddenFields.has('restStart')) {
       inputs.push({
         id: `incomplete_y${row.year}_debt`,
