@@ -1058,7 +1058,7 @@ const createKapitalmehrungTask = (): Task => {
     question,
     solution,
     inputs,
-    pointsAwarded: unknown === 'n' ? 15 : 8, // 15 für n berechnen (schwer), 8 für K_n (mittel)
+    pointsAwarded: variant === 'n' ? 15 : 8, // 15 für n berechnen (sehr schwer), 8 für andere (mittel)
   };
 };
 
@@ -1210,7 +1210,7 @@ const createKapitalminderungTask = (): Task => {
     question,
     solution,
     inputs,
-    pointsAwarded: unknown === 'n' ? 15 : 8, // 15 für n berechnen (schwer), 8 für K_n (mittel)
+    pointsAwarded: variant === 'n' ? 15 : 8, // 15 für n berechnen (sehr schwer), 8 für andere (mittel)
   };
 };
 
@@ -2011,7 +2011,7 @@ export default function GemischteFinanzaufgaben() {
           return {
             ...c,
             feedback: 'Lösung wurde bereits angezeigt. Diese Aufgabe bringt keine Punkte mehr.',
-            feedbackType: 'incorrect',
+            feedbackType: 'incorrect' as const,
           };
         }
 
@@ -2089,7 +2089,9 @@ export default function GemischteFinanzaufgaben() {
 
         c.task.inputs.forEach(input => {
           const parsed = parseGermanNumber(c.userAnswers[input.id]);
-          if (Number.isNaN(parsed) || Math.abs(parsed - input.correctValue) > input.tolerance) {
+          // Nur Zahlen-Felder überprüfen, Select-Felder skip
+          if (input.type === 'select') return;
+          if (Number.isNaN(parsed) || Math.abs(parsed - (input.correctValue as number)) > input.tolerance) {
             wrongFields.push(input);
           }
         });
@@ -2124,7 +2126,7 @@ export default function GemischteFinanzaufgaben() {
                 {wrongFields.map(field => (
                   <li key={field.id}>
                     <strong>{field.label}:</strong>{' '}
-                    {formatValueWithUnit(field.correctValue, field.unit, field.displayDecimals ?? 2)}
+                    {formatValueWithUnit(field.correctValue as number, field.unit, field.displayDecimals ?? 2)}
                   </li>
                 ))}
               </ul>
