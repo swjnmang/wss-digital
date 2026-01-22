@@ -180,7 +180,7 @@ const LoanContractClassic: React.FC<LoanContractProps> = ({
   duration,
   type,
 }) => (
-  <div className="mb-6 border-2 border-gray-800 p-6 bg-white rounded-lg shadow-md max-w-3xl">
+  <div className="mb-6 border-2 border-gray-800 p-6 bg-white rounded-lg shadow-md max-w-3xl mx-auto">
     <div className="text-center mb-6 border-b-2 border-gray-800 pb-4">
       <h2 className="text-2xl font-bold tracking-wide">Darlehensvertrag</h2>
       <p className="text-sm text-gray-600 mt-2">zwischen</p>
@@ -237,7 +237,7 @@ const LoanContractModern: React.FC<LoanContractProps> = ({
   duration,
   type,
 }) => (
-  <div className="mb-6 bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-lg max-w-3xl border border-blue-300">
+  <div className="mb-6 bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-lg max-w-3xl border border-blue-300 mx-auto">
     <div className="text-center mb-6 pb-4">
       <h2 className="text-3xl font-bold text-blue-900">Darlehensvertrag</h2>
       <div className="h-1 bg-blue-400 mt-3 mx-auto w-24 rounded-full"></div>
@@ -282,7 +282,7 @@ const LoanContractCompact: React.FC<LoanContractProps> = ({
   duration,
   type,
 }) => (
-  <div className="mb-6 bg-slate-100 p-4 rounded-lg max-w-3xl border-l-4 border-slate-700">
+  <div className="mb-6 bg-slate-100 p-4 rounded-lg max-w-3xl border-l-4 border-slate-700 mx-auto">
     <h2 className="text-xl font-bold mb-3 text-slate-800">Darlehensvertrag</h2>
     
     <div className="grid grid-cols-2 gap-4 mb-4 text-xs">
@@ -314,7 +314,7 @@ const LoanContractMinimal: React.FC<LoanContractProps> = ({
   duration,
   type,
 }) => (
-  <div className="mb-6 p-4 max-w-3xl">
+  <div className="mb-6 p-4 max-w-3xl mx-auto">
     <h2 className="text-2xl font-bold mb-4">Darlehensvertrag</h2>
     
     <div className="text-sm text-gray-700 space-y-2 mb-4">
@@ -340,7 +340,7 @@ const LoanContractDetailed: React.FC<LoanContractProps> = ({
   duration,
   type,
 }) => (
-  <div className="mb-6 border-2 border-green-700 p-6 bg-green-50 rounded-lg max-w-3xl">
+  <div className="mb-6 border-2 border-green-700 p-6 bg-green-50 rounded-lg max-w-3xl mx-auto">
     <div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-green-700">
       <h2 className="text-2xl font-bold text-green-900">Darlehensvertrag</h2>
       <div className="text-xs text-green-700 font-bold">Finanzdokument</div>
