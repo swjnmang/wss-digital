@@ -1672,44 +1672,48 @@ const createIncompleteTilgungsplanTask = (): Task => {
   const inputs: TaskInput[] = [];
   incompleteRows.forEach((row: any) => {
     if (row.hiddenFields.has('restStart')) {
-      inputs.push(createInputField(
-        `incomplete_y${row.year}_debt`,
-        `Jahr ${row.year} • Schuld`,
-        '€',
-        'z.B. 100.000,00',
-        row.restStart,
-        0.02
-      ));
+      inputs.push({
+        id: `incomplete_y${row.year}_debt`,
+        label: `Jahr ${row.year} • Schuld`,
+        unit: '€',
+        placeholder: 'z.B. 100.000,00',
+        correctValue: row.restStart,
+        tolerance: 0.02,
+        displayDecimals: 2,
+      });
     }
     if (row.hiddenFields.has('interest')) {
-      inputs.push(createInputField(
-        `incomplete_y${row.year}_interest`,
-        `Jahr ${row.year} • Zins`,
-        '€',
-        'z.B. 3.200,00',
-        row.interest,
-        0.02
-      ));
+      inputs.push({
+        id: `incomplete_y${row.year}_interest`,
+        label: `Jahr ${row.year} • Zins`,
+        unit: '€',
+        placeholder: 'z.B. 3.200,00',
+        correctValue: row.interest,
+        tolerance: 0.02,
+        displayDecimals: 2,
+      });
     }
     if (row.hiddenFields.has('tilgung')) {
-      inputs.push(createInputField(
-        `incomplete_y${row.year}_tilgung`,
-        `Jahr ${row.year} • Tilgung`,
-        '€',
-        'z.B. 12.500,00',
-        row.tilgung,
-        0.02
-      ));
+      inputs.push({
+        id: `incomplete_y${row.year}_tilgung`,
+        label: `Jahr ${row.year} • Tilgung`,
+        unit: '€',
+        placeholder: 'z.B. 12.500,00',
+        correctValue: row.tilgung,
+        tolerance: 0.02,
+        displayDecimals: 2,
+      });
     }
     if (row.hiddenFields.has('annuity')) {
-      inputs.push(createInputField(
-        `incomplete_y${row.year}_annuity`,
-        `Jahr ${row.year} • Annuität`,
-        '€',
-        'z.B. 15.700,00',
-        row.annuity,
-        0.02
-      ));
+      inputs.push({
+        id: `incomplete_y${row.year}_annuity`,
+        label: `Jahr ${row.year} • Annuität`,
+        unit: '€',
+        placeholder: 'z.B. 15.700,00',
+        correctValue: row.annuity,
+        tolerance: 0.02,
+        displayDecimals: 2,
+      });
     }
   });
 
@@ -1723,6 +1727,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     tolerance: 0,
     type: 'select',
     options: ['Ratentilgung', 'Annuitätentilgung'],
+    displayDecimals: 0,
   });
 
   return {
