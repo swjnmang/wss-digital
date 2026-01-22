@@ -1963,7 +1963,8 @@ export default function GemischteFinanzaufgaben() {
       if (attempt === 'solutionShown') {
         // Lösung angezeigt: nur Versuch zählen, keine Punkte
         setStats(prev => ({
-          ...prev,
+          correct: prev.correct, // Unverändert
+          points: prev.points,   // Unverändert
           total: prev.total + 1,
           streak: 0, // Streak bricht ab
         }));
@@ -1992,19 +1993,18 @@ export default function GemischteFinanzaufgaben() {
     // Nicht wenn Lösung angezeigt wurde
     if (card.solutionVisible) return;
 
-    // Zähle korrekte Zellen
+    // Zähle korrekte Zellen - ABER IGNORIERE den Tilgungsart Dropdown!
     let totalPoints = 0;
     card.task.inputs.forEach((input, index) => {
+      // Überspringe Select-Felder (Tilgungsart Dropdown)
+      if (input.type === 'select') return;
+      
       const userValue = card.userAnswers[input.id];
       if (userValue?.trim()) {
         let isCorrect = false;
         
-        if (input.type === 'select') {
-          isCorrect = userValue === input.correctValue;
-        } else {
-          const parsed = parseGermanNumber(userValue);
-          isCorrect = !Number.isNaN(parsed) && Math.abs(parsed - (input.correctValue as number)) <= input.tolerance;
-        }
+        const parsed = parseGermanNumber(userValue);
+        isCorrect = !Number.isNaN(parsed) && Math.abs(parsed - (input.correctValue as number)) <= input.tolerance;
         
         if (isCorrect) {
           totalPoints += 2;
