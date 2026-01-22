@@ -1731,6 +1731,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     question,
     solution,
     inputs,
+    _incompleteRows: incompleteRows, // Speichere die Reihen für das Rendering
   };
 };
 
@@ -2169,6 +2170,23 @@ export default function GemischteFinanzaufgaben() {
                                     {PLAN_COLUMNS.map(col => {
                                       const input = row.cells[col.key];
                                       if (!input) {
+                                        // Bekannter Wert - aus incompleteRows auslesen
+                                        const incRow = (card.task as any)._incompleteRows?.find((r: any) => r.year === row.year);
+                                        if (incRow) {
+                                          const fieldMap: Record<string, string> = {
+                                            'debt': 'restStart',
+                                            'interest': 'interest',
+                                            'tilgung': 'tilgung',
+                                            'annuity': 'annuity',
+                                          };
+                                          const fieldName = fieldMap[col.key];
+                                          const value = (incRow as any)[fieldName];
+                                          return (
+                                            <td key={col.key} className="p-2 text-center text-slate-700 font-semibold">
+                                              {formatCurrency(value)} €
+                                            </td>
+                                          );
+                                        }
                                         return <td key={col.key} className="p-2"></td>;
                                       }
                                       const userValue = card.userAnswers[input.id];
