@@ -1858,16 +1858,6 @@ export default function GemischteFinanzaufgaben() {
     setStats(createInitialStats());
   };
 
-  const handleInputChange = (cardId: number, inputId: string, value: string) => {
-    setCards(prev =>
-      prev.map(card =>
-        card.id === cardId
-          ? { ...card, userAnswers: { ...card.userAnswers, [inputId]: value } }
-          : card
-      )
-    );
-  };
-
   // Parst deutsche Zahlenformate: "99.000,00" oder "99000,00" oder "99000"
   const parseGermanNumber = (str: string): number => {
     let cleaned = str.trim();
@@ -1893,6 +1883,55 @@ export default function GemischteFinanzaufgaben() {
     // Für Zahlfelder: numerischer Vergleich
     const parsed = parseGermanNumber(userValue);
     return !Number.isNaN(parsed) && Math.abs(parsed - (input.correctValue as number)) <= input.tolerance;
+  };
+
+  const handleInputChange = (cardId: number, inputId: string, value: string) => {
+    setCards(prev => {
+      const updatedCards = prev.map(card => {
+        if (card.id !== cardId) return card;
+        return { ...card, userAnswers: { ...card.userAnswers, [inputId]: value } };
+      });
+      
+      // Nach State-Update: Tilgungspläne auto-score wenn nicht gelöst angezeigt
+      const card = updatedCards.find(c => c.id === cardId);
+      if (card && (card.task.type === 'ratendarlehen_plan' || card.task.type === 'annuitaet_plan' || card.task.type === 'incomplete_tilgungsplan') && !card.solutionVisible) {
+        // Zähle korrekte Zellen
+        let totalPoints = 0;
+        const notifications: Array<{ id: string; points: number }> = [];
+        
+        card.task.inputs.forEach((input) => {
+          // Überspringe Select-Felder
+          if (input.type === 'select') return;
+          
+          const userValue = card.userAnswers[input.id];
+          if (userValue?.trim()) {
+            const isCorrect = isInputCorrect(input, userValue);
+            if (isCorrect) {
+              totalPoints += 2;
+              const notifId = `${cardId}-${input.id}-${Date.now()}`;
+              notifications.push({ id: notifId, points: 2 });
+            }
+          }
+        });
+        
+        if (totalPoints > 0) {
+          setStats(prev => ({
+            ...prev,
+            points: prev.points + totalPoints,
+          }));
+          
+          // Zeige Notifications
+          setNotifications(prev => [...prev, ...notifications]);
+          notifications.forEach(notif => {
+            setTimeout(() => {
+              setNotifications(prev => prev.filter(n => n.id !== notif.id));
+            }, 2000);
+          });
+        }
+      }
+      
+      return updatedCards;
+    });
   };
 
   const checkAnswer = (id: number) => {
@@ -1995,21 +2034,18 @@ export default function GemischteFinanzaufgaben() {
 
     // Zähle korrekte Zellen - ABER IGNORIERE den Tilgungsart Dropdown!
     let totalPoints = 0;
-    card.task.inputs.forEach((input, index) => {
+    card.task.inputs.forEach((input) => {
       // Überspringe Select-Felder (Tilgungsart Dropdown)
       if (input.type === 'select') return;
       
       const userValue = card.userAnswers[input.id];
       if (userValue?.trim()) {
-        let isCorrect = false;
-        
-        const parsed = parseGermanNumber(userValue);
-        isCorrect = !Number.isNaN(parsed) && Math.abs(parsed - (input.correctValue as number)) <= input.tolerance;
+        const isCorrect = isInputCorrect(input, userValue);
         
         if (isCorrect) {
           totalPoints += 2;
           // Notification für diese Zelle
-          const notifId = `${cardId}-${index}-${Date.now()}`;
+          const notifId = `${cardId}-${input.id}-${Date.now()}`;
           setNotifications(prev => [...prev, { id: notifId, points: 2 }]);
           setTimeout(() => {
             setNotifications(prev => prev.filter(n => n.id !== notifId));
