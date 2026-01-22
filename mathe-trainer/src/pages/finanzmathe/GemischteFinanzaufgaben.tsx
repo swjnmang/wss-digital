@@ -419,11 +419,14 @@ const simpleInterestContexts = [
 ] as const;
 
 const zinseszinsContexts = [
-  'Lilly hat 10.000,00 € gewonnen und diesen Betrag auf ihr Sparkonto einbezahlt. Wie lange dauert es bei einem Zinssatz von 3,36 % p.a., bis sie einen bestimmten Betrag hat?',
-  'Tom erbt 15.000,00 € und lässt das Geld ohne Abhebungen am Kapitalmarkt wachsen. Wie viel hat er nach einigen Jahren bei regelmäßiger Verzinsung?',
-  'Die Familie Schmidt legt 25.000,00 € an und möchte wissen, wie viel daraus nach mehreren Jahren wird, wenn die Bank 2,8 % pro Jahr zahlt.',
-  'Alex hat beim Spielen Preisgeld gewonnen und möchte dieses anlegen, um es mehren zu lassen. Wie lange muss er warten, bis sich sein Geld bei einem bestimmten Zinssatz verdoppelt?',
-  'Ein Schüler legt sein Ersparte an und möchte ausrechnen, wie viel er nach einigen Jahren angespart hat.',
+  'Ein Schüler erhält eine Erbschaft und möchte diese sicher anlegen, um sie langfristig wachsen zu lassen.',
+  'Eine Familie möchte einen Betrag sparen und mit Zinseszins aufbauen.',
+  'Jemand legt Geld an und interessiert sich für die zukünftige Entwicklung des Vermögens.',
+  'Eine Person spart auf ein Ziel hin und möchte mit Zinseszins rechnen.',
+  'Ein Schüler erhält Preisgeld und möchte wissen, wie sich dieses entwickelt.',
+  'Jemand möchte sein Ersparte sicher und mit guten Zinsen anlegen.',
+  'Eine Familie plant eine Geldanlage mit regelmäßiger Verzinsung.',
+  'Ein Schüler rechnet mit Zinseszins für verschiedene Szenarien.',
 ] as const;
 
 // Kapitalmehrung: Fall Kn (Endkapital gesucht)
