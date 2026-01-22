@@ -1940,18 +1940,20 @@ export default function GemischteFinanzaufgaben() {
   };
 
   const checkAnswer = (id: number) => {
-    console.log('checkAnswer called for card:', id);
-    let attempt: 'correct' | 'incorrect' | 'solutionShown' | 'invalid' = 'invalid';
-    let updatedCards: TaskCard[] = [];
-
     setCards(prev => {
-      updatedCards = prev.map(c => {
+      const updatedCards = prev.map(c => {
         if (c.id !== id) return c;
         console.log('Checking card', id, 'taskType:', c.task.type);
 
         // Wenn Lösung bereits angezeigt wurde, keine Punkte mehr - aber als Versuch zählen
         if (c.solutionVisible) {
-          attempt = 'solutionShown';
+          // Lösung angezeigt: nur Versuch zählen, keine Punkte
+          setStats(prev => ({
+            correct: prev.correct, // Unverändert
+            points: prev.points,   // Unverändert
+            total: prev.total + 1,
+            streak: 0, // Streak bricht ab
+          }));
           return {
             ...c,
             feedback: 'Lösung wurde bereits angezeigt. Diese Aufgabe bringt keine Punkte mehr.',
@@ -1989,7 +1991,22 @@ export default function GemischteFinanzaufgaben() {
           });
 
           const isCorrect = correctCells === totalCells && tilgungsartCorrect;
-          attempt = isCorrect ? 'correct' : 'incorrect';
+
+          if (isCorrect) {
+            setStats(prev => ({
+              correct: prev.correct + 1,
+              total: prev.total + 1,
+              streak: prev.streak + 1,
+              points: prev.points + POINTS_PER_CORRECT,
+            }));
+          } else {
+            setStats(prev => ({
+              correct: prev.correct,
+              total: prev.total + 1,
+              streak: 0,
+              points: prev.points,
+            }));
+          }
 
           return {
             ...c,
@@ -2006,7 +2023,6 @@ export default function GemischteFinanzaufgaben() {
         const missingInput = c.task.inputs.some(input => !c.userAnswers[input.id]?.trim());
         
         if (missingInput) {
-          attempt = 'invalid';
           return {
             ...c,
             feedback: 'Bitte alle Felder ausfüllen (Komma oder Punkt sind erlaubt).',
@@ -2024,7 +2040,22 @@ export default function GemischteFinanzaufgaben() {
         });
 
         const isCorrect = wrongFields.length === 0;
-        attempt = isCorrect ? 'correct' : 'incorrect';
+
+        if (isCorrect) {
+          setStats(prev => ({
+            correct: prev.correct + 1,
+            total: prev.total + 1,
+            streak: prev.streak + 1,
+            points: prev.points + POINTS_PER_CORRECT,
+          }));
+        } else {
+          setStats(prev => ({
+            correct: prev.correct,
+            total: prev.total + 1,
+            streak: 0,
+            points: prev.points,
+          }));
+        }
 
         return {
           ...c,
@@ -2048,28 +2079,6 @@ export default function GemischteFinanzaufgaben() {
       });
       return updatedCards;
     });
-
-    // Statistik immer aktualisieren (außer bei ungültigen Inputs)
-    console.log('FINAL attempt:', attempt);
-    if (attempt !== 'invalid') {
-      if (attempt === 'solutionShown') {
-        // Lösung angezeigt: nur Versuch zählen, keine Punkte
-        setStats(prev => ({
-          correct: prev.correct, // Unverändert
-          points: prev.points,   // Unverändert
-          total: prev.total + 1,
-          streak: 0, // Streak bricht ab
-        }));
-      } else {
-        // Normal: Punkte vergeben wenn correct
-        setStats(prev => ({
-          correct: prev.correct + (attempt === 'correct' ? 1 : 0),
-          total: prev.total + 1,
-          streak: attempt === 'correct' ? prev.streak + 1 : 0,
-          points: prev.points + (attempt === 'correct' ? POINTS_PER_CORRECT : 0),
-        }));
-      }
-    }
   };
 
   const showSolution = (id: number) => {
@@ -2091,12 +2100,6 @@ export default function GemischteFinanzaufgaben() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-100">
       <div className="flex-1 flex flex-col items center px-3 py-8 sm:px-6">
         <div className="w-full max-w-5xl bg-white/95 backdrop-blur rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-10">
-          {/* DEBUG PANEL */}
-          <div className="bg-yellow-100 border-2 border-yellow-400 rounded p-3 mb-4 text-sm font-mono">
-            <div>DEBUG - Stats: {JSON.stringify(stats)}</div>
-            <div>Filter: {filter}</div>
-          </div>
-
           <div className="text-center mb-6">
             <p className="text-sm uppercase tracking-[0.3em] text-blue-500 font-semibold">Finanzmathematik</p>
             <h1 className="text-3xl md:text-4xl font-bold text-blue-900">Gemischte Übungsaufgaben</h1>
