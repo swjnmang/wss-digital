@@ -1886,7 +1886,6 @@ export default function GemischteFinanzaufgaben() {
   };
 
   const handleInputChange = (cardId: number, inputId: string, value: string) => {
-    console.log('handleInputChange called:', cardId, inputId, value);
     setCards(prev => {
       const updatedCards = prev.map(card => {
         if (card.id !== cardId) return card;
@@ -1953,11 +1952,51 @@ export default function GemischteFinanzaufgaben() {
           };
         }
 
-        console.log('Card inputs:', c.task.inputs.map(i => ({ id: i.id, filled: !!c.userAnswers[i.id]?.trim(), value: c.userAnswers[i.id] })));
-        
+        // Spezial-Handling für Tilgungspläne: Prüfe NICHT task.inputs (nur Dropdown), prüfe die Plan-Zellen direkt
+        if (c.task.type === 'ratendarlehen_plan' || c.task.type === 'annuitaet_plan' || c.task.type === 'incomplete_tilgungsplan') {
+          // Für Tilgungspläne: Zähle korrekte Zellen und prüfe Tilgungsart
+          let correctCells = 0;
+          let totalCells = 0;
+          let tilgungsartCorrect = true;
+
+          // Prüfe Plan-Zellen (nicht Select-Felder)
+          c.task.inputs.forEach(input => {
+            if (input.type === 'select') {
+              // Prüfe Tilgungsart
+              const userValue = c.userAnswers[input.id];
+              if (!userValue || userValue !== input.correctValue) {
+                tilgungsartCorrect = false;
+              }
+              return;
+            }
+            
+            // Plan-Zelle
+            totalCells++;
+            const userValue = c.userAnswers[input.id];
+            if (userValue?.trim()) {
+              const isCorrect = isInputCorrect(input, userValue);
+              if (isCorrect) {
+                correctCells++;
+              }
+            }
+          });
+
+          const isCorrect = correctCells === totalCells && tilgungsartCorrect;
+          attempt = isCorrect ? 'correct' : 'incorrect';
+
+          return {
+            ...c,
+            feedback: isCorrect ? (
+              `Stark! Alle Werte stimmen und die Tilgungsart ist korrekt. (+${POINTS_PER_CORRECT} Punkte)`
+            ) : (
+              `Es wurden ${correctCells} von ${totalCells} Zellen korrekt ausgefüllt. ${tilgungsartCorrect ? '' : 'Die Tilgungsart ist falsch.'}`
+            ),
+            feedbackType: isCorrect ? 'correct' : 'incorrect',
+          };
+        }
+
+        // Für NORMALE Aufgaben: Prüfe alle task.inputs
         const missingInput = c.task.inputs.some(input => !c.userAnswers[input.id]?.trim());
-        const missingInputs = c.task.inputs.filter(input => !c.userAnswers[input.id]?.trim());
-        console.log('missingInputs:', missingInputs.map(i => i.id));
         
         if (missingInput) {
           attempt = 'invalid';
@@ -2004,11 +2043,9 @@ export default function GemischteFinanzaufgaben() {
     });
 
     // Statistik immer aktualisieren (außer bei ungültigen Inputs)
-    console.log('checkAnswer attempt:', attempt);
     if (attempt !== 'invalid') {
       if (attempt === 'solutionShown') {
         // Lösung angezeigt: nur Versuch zählen, keine Punkte
-        console.log('solutionShown - updating stats');
         setStats(prev => ({
           correct: prev.correct, // Unverändert
           points: prev.points,   // Unverändert
@@ -2017,61 +2054,13 @@ export default function GemischteFinanzaufgaben() {
         }));
       } else {
         // Normal: Punkte vergeben wenn correct
-        console.log('attempt:', attempt, 'points to add:', attempt === 'correct' ? POINTS_PER_CORRECT : 0);
-        setStats(prev => {
-          const newStats = {
-            correct: prev.correct + (attempt === 'correct' ? 1 : 0),
-            total: prev.total + 1,
-            streak: attempt === 'correct' ? prev.streak + 1 : 0,
-            points: prev.points + (attempt === 'correct' ? POINTS_PER_CORRECT : 0),
-          };
-          console.log('new stats:', newStats);
-          return newStats;
-        });
-        // Nach checkAnswer auch Tilgungspläne checken
-        checkCellsAutomatically(id, updatedCards);
+        setStats(prev => ({
+          correct: prev.correct + (attempt === 'correct' ? 1 : 0),
+          total: prev.total + 1,
+          streak: attempt === 'correct' ? prev.streak + 1 : 0,
+          points: prev.points + (attempt === 'correct' ? POINTS_PER_CORRECT : 0),
+        }));
       }
-    }
-  };
-
-  const checkCellsAutomatically = (cardId: number, updatedCards: TaskCard[]) => {
-    // Automatisches Scoring für Tilgungspläne: +2 Punkte pro korrekte Zelle
-    const card = updatedCards.find(c => c.id === cardId);
-    if (!card) return;
-
-    // Nur für Tilgungspläne aktivieren
-    if (card.task.type !== 'ratendarlehen_plan' && card.task.type !== 'annuitaet_plan' && card.task.type !== 'incomplete_tilgungsplan') return;
-
-    // Nicht wenn Lösung angezeigt wurde
-    if (card.solutionVisible) return;
-
-    // Zähle korrekte Zellen - ABER IGNORIERE den Tilgungsart Dropdown!
-    let totalPoints = 0;
-    card.task.inputs.forEach((input) => {
-      // Überspringe Select-Felder (Tilgungsart Dropdown)
-      if (input.type === 'select') return;
-      
-      const userValue = card.userAnswers[input.id];
-      if (userValue?.trim()) {
-        const isCorrect = isInputCorrect(input, userValue);
-        
-        if (isCorrect) {
-          totalPoints += 2;
-          // Notification für diese Zelle
-          const notifId = `${cardId}-${input.id}-${Date.now()}`;
-          setNotifications(prev => [...prev, { id: notifId, points: 2 }]);
-          setTimeout(() => {
-            setNotifications(prev => prev.filter(n => n.id !== notifId));
-          }, 2000);
-        }
-      }
-    });
-
-    if (totalPoints > 0) {
-      setStats(prev => ({
-        ...prev,
-        points: prev.points + totalPoints,
-      }));
     }
   };
 
