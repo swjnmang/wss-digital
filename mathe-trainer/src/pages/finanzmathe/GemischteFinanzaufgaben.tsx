@@ -1674,8 +1674,6 @@ export default function GemischteFinanzaufgaben() {
           : card
       )
     );
-    // Automatisch Punkte für Tilgungspläne überprüfen
-    checkCellsAutomatically(cardId);
   };
 
   // Parst deutsche Zahlenformate: "99.000,00" oder "99000,00" oder "99000"
@@ -1700,25 +1698,27 @@ export default function GemischteFinanzaufgaben() {
 
   const checkAnswer = (id: number) => {
     let attempt: 'correct' | 'incorrect' | 'invalid' = 'invalid';
+    let card: TaskCard | undefined;
 
     setCards(prev =>
-      prev.map(card => {
-        if (card.id !== id) return card;
+      prev.map(c => {
+        if (c.id !== id) return c;
+        card = c;
 
         // Wenn Lösung bereits angezeigt wurde, keine Punkte mehr
-        if (card.solutionVisible) {
+        if (c.solutionVisible) {
           return {
-            ...card,
+            ...c,
             feedback: 'Lösung wurde bereits angezeigt. Diese Aufgabe bringt keine Punkte mehr.',
             feedbackType: 'incorrect',
           };
         }
 
-        const missingInput = card.task.inputs.some(input => !card.userAnswers[input.id]?.trim());
+        const missingInput = c.task.inputs.some(input => !c.userAnswers[input.id]?.trim());
         if (missingInput) {
           attempt = 'invalid';
           return {
-            ...card,
+            ...c,
             feedback: 'Bitte alle Felder ausfüllen (Komma oder Punkt sind erlaubt).',
             feedbackType: 'incorrect',
           };
@@ -1726,8 +1726,8 @@ export default function GemischteFinanzaufgaben() {
 
         const wrongFields: TaskInput[] = [];
 
-        card.task.inputs.forEach(input => {
-          const parsed = parseGermanNumber(card.userAnswers[input.id]);
+        c.task.inputs.forEach(input => {
+          const parsed = parseGermanNumber(c.userAnswers[input.id]);
           if (Number.isNaN(parsed) || Math.abs(parsed - input.correctValue) > input.tolerance) {
             wrongFields.push(input);
           }
@@ -1737,7 +1737,7 @@ export default function GemischteFinanzaufgaben() {
         attempt = isCorrect ? 'correct' : 'incorrect';
 
         return {
-          ...card,
+          ...c,
           feedback: isCorrect ? (
             `Stark! Alle Werte stimmen. (+${POINTS_PER_CORRECT} Punkte)`
           ) : (
@@ -1765,6 +1765,11 @@ export default function GemischteFinanzaufgaben() {
         streak: attempt === 'correct' ? prev.streak + 1 : 0,
         points: prev.points + (attempt === 'correct' ? POINTS_PER_CORRECT : 0),
       }));
+    }
+
+    // Nach checkAnswer auch Tilgungspläne checken
+    if (card && attempt !== 'invalid') {
+      setTimeout(() => checkCellsAutomatically(id), 0);
     }
   };
 
