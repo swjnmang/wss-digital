@@ -2176,6 +2176,10 @@ export default function GemischteFinanzaufgaben() {
                                 <td className="p-2 text-center font-semibold text-slate-600">{row.year}</td>
                                 {PLAN_COLUMNS.map(col => {
                                   const input = row.cells[col.key];
+                                  if (!input) {
+                                    // Spalte existiert nicht als Input (z.B. nicht versteckt bei incomplete_tilgungsplan)
+                                    return <td key={col.key} className="p-2"></td>;
+                                  }
                                   const userValue = card.userAnswers[input.id];
                                   const isCorrect = isInputCorrect(input, userValue);
                                   return (
