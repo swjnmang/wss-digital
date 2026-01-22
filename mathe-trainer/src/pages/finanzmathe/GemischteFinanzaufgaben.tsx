@@ -2230,18 +2230,18 @@ export default function GemischteFinanzaufgaben() {
                   
                   if (!planTable) {
                     return (
-                      <div className="grid gap-3 mb-3">
+                      <div className="flex flex-col items-center gap-3 mb-3">
                         {card.task.inputs.map(input => (
-                          <div key={input.id} className="flex flex-col sm:flex-row sm:items-center gap-2">
-                            <label className="font-semibold text-slate-600 sm:min-w-[220px]">{input.label}:</label>
-                            <div className="flex-1 flex items-center gap-2">
+                          <div key={input.id} className="w-full max-w-sm flex flex-col sm:flex-row sm:items-center gap-2 justify-center">
+                            <label className="font-semibold text-slate-600 sm:min-w-[150px]">{input.label}:</label>
+                            <div className="flex items-center gap-2 flex-1 max-w-xs">
                               {input.type === 'select' ? (
                                 <select
                                   value={card.userAnswers[input.id] || ''}
                                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                                     handleInputChange(card.id, input.id, e.target.value)
                                   }
-                                  className="flex-1 border-2 border-slate-300 rounded-xl px-4 py-2 text-lg focus:outline-none focus:border-blue-400 bg-white"
+                                  className="flex-1 border-2 border-slate-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:border-blue-400 bg-white"
                                 >
                                   <option value="">{input.placeholder}</option>
                                   {input.options?.map(opt => (
@@ -2258,10 +2258,10 @@ export default function GemischteFinanzaufgaben() {
                                     handleInputChange(card.id, input.id, e.target.value)
                                   }
                                   placeholder={input.placeholder}
-                                  className="flex-1 border-2 border-slate-300 rounded-xl px-4 py-2 text-lg focus:outline-none focus:border-blue-400"
+                                  className="flex-1 border-2 border-slate-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:border-blue-400"
                                 />
                               )}
-                              <span className="text-xl font-bold text-slate-600">{input.unit}</span>
+                              <span className="text-base font-bold text-slate-600">{input.unit}</span>
                             </div>
                           </div>
                         ))}
