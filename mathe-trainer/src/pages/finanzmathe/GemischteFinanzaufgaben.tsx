@@ -59,6 +59,7 @@ const taskTypes: TaskType[] = [
   'renten_endwert',
   'ratendarlehen_plan',
   'annuitaet_plan',
+  'incomplete_tilgungsplan',
 ];
 
 const taskFilterButtons: { id: FilterType; label: string }[] = [
