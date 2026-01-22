@@ -20,7 +20,7 @@ type FilterType = TaskType | 'mixed' | 'renten_bundled';
 type SimpleInterestVariant = 'Z' | 'K' | 'p' | 't';
 type ZinseszinsVariant = 'Kn' | 'K0' | 'p' | 'n';
 type KapitalmehrungVariant = 'Kn' | 'K0' | 'r' | 'n';
-type RentenVariant = 'Kn' | 'r' | 'n';
+type RentenVariant = 'Kn' | 'r' | 'K0' | 'n';
 type KapitalminderungVariant = 'Kn' | 'K0' | 'r' | 'n';
 
 interface TaskInput {
@@ -41,6 +41,7 @@ interface Task {
   solution: React.ReactNode;
   inputs: TaskInput[];
   pointsAwarded?: number; // Punkte für diese Aufgabe basierend auf Schwierigkeit
+  formula?: string; // Grundformel für Tipp (LaTeX)
   _incompleteRows?: Array<{ year: number; restStart: number; interest: number; tilgung: number; annuity: number; hiddenFields: Set<string> }>;
   _hiddenFields?: Map<number, Set<string>>;
 }
@@ -52,6 +53,7 @@ interface TaskCard {
   feedback: React.ReactNode | null;
   feedbackType: 'correct' | 'incorrect' | null;
   solutionVisible: boolean;
+  tipVisible?: boolean;
 }
 
 const taskTypes: TaskType[] = [
@@ -662,7 +664,7 @@ const createSimpleInterestTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie viel Zinsen bekommt er/sie gutgeschrieben?</p>
         </div>
       );
-      inputs = [createInputField('Z', 'Zinsen', '€', 'z.B. 248,50', Z_rounded, Math.max(Z_rounded * 0.005, 0.5))];
+      inputs = [createInputField('Z', '', '€', 'z.B. 248,50', Z_rounded, Math.max(Z_rounded * 0.005, 0.5))];
       solution = (
         <div className="space-y-1">
           <p>
@@ -691,7 +693,7 @@ const createSimpleInterestTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welcher Betrag wurde ursprünglich angelegt?</p>
         </div>
       );
-      inputs = [createInputField('K', 'Kapital', '€', 'z.B. 18.500,00', capital, Math.max(capital * 0.005, 1))];
+      inputs = [createInputField('K', '', '€', 'z.B. 18.500,00', capital, Math.max(capital * 0.005, 1))];
       solution = (
         <div className="space-y-1">
           <p>
@@ -720,7 +722,7 @@ const createSimpleInterestTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie hoch war der vereinbarte Zinssatz?</p>
         </div>
       );
-      inputs = [createInputField('p', 'Zinssatz', '%', 'z.B. 4,25', rate, 0.05, 2)];
+      inputs = [createInputField('p', '', '%', 'z.B. 4,25', rate, 0.05, 2)];
       solution = (
         <div className="space-y-1">
           <p>
@@ -748,7 +750,7 @@ const createSimpleInterestTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie lange war das Geld angelegt?</p>
         </div>
       );
-      inputs = [createInputField('t', 'Tage', 'Tage', 'z.B. 180', days, 0.5, 1)];
+      inputs = [createInputField('t', '', 'Tage', 'z.B. 180', days, 0.5, 1)];
       solution = (
         <div className="space-y-1">
           <p>
@@ -802,7 +804,7 @@ const createZinseszinsTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie viel Geld befindet sich dann auf dem Konto?</p>
         </div>
       );
-      inputs = [createInputField('Kn', 'Endkapital', '€', 'z.B. 14.200,00', Kn, Math.max(Kn * 0.005, 1.5))];
+      inputs = [createInputField('Kn', '', '€', 'z.B. 14.200,00', Kn, Math.max(Kn * 0.005, 1.5))];
       solution = (
         <div className="space-y-1 text-sm">
           <p><strong>Gegeben:</strong> <InlineMath math={latex`K_0 = ${mathNumber(K0)}\,€; \quad p = ${mathNumber(p, 2)}\,\%; \quad n = ${n}\text{ Jahre}`} /></p>
@@ -827,7 +829,7 @@ const createZinseszinsTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welchen Betrag muss er/sie ursprünglich eingezahlt haben?</p>
         </div>
       );
-      inputs = [createInputField('K0', 'Anfangskapital', '€', 'z.B. 12.000,00', K0, Math.max(K0 * 0.005, 1.5))];
+      inputs = [createInputField('K0', '', '€', 'z.B. 12.000,00', K0, Math.max(K0 * 0.005, 1.5))];
       solution = (
         <div className="space-y-1 text-sm">
           <p><strong>Gegeben:</strong> <InlineMath math={latex`K_n = ${mathNumber(Kn, 2)}\,€; \quad p = ${mathNumber(p, 2)}\,\%; \quad n = ${n}\text{ Jahre}`} /></p>
@@ -852,7 +854,7 @@ const createZinseszinsTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie hoch war der jährliche Zinssatz?</p>
         </div>
       );
-      inputs = [createInputField('p', 'Zinssatz', '%', 'z.B. 3,8', p, 0.05, 2)];
+      inputs = [createInputField('p', '', '%', 'z.B. 3,8', p, 0.05, 2)];
       solution = (
         <div className="space-y-1 text-sm">
           <p><strong>Gegeben:</strong> <InlineMath math={latex`K_0 = ${mathNumber(K0)}\,€; \quad K_n = ${mathNumber(Kn, 2)}\,€; \quad n = ${n}\text{ Jahre}`} /></p>
@@ -879,7 +881,7 @@ const createZinseszinsTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie lange muss das Geld angelegt werden, um den Endbetrag zu erreichen?</p>
         </div>
       );
-      inputs = [createInputField('n', 'Jahre', 'Jahre', 'z.B. 4', n, 0.05, 0)];
+      inputs = [createInputField('n', '', 'Jahre', 'z.B. 4', n, 0.05, 0)];
       solution = (
         <div className="space-y-1 text-sm">
           <p><strong>Gegeben:</strong> <InlineMath math={latex`K_0 = ${mathNumber(K0)}\,€; \quad K_n = ${mathNumber(Kn, 2)}\,€; \quad p = ${mathNumber(p, 2)}\,\%`} /></p>
@@ -953,7 +955,7 @@ const createKapitalmehrungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welcher Endbetrag hat sich nach {n} Jahren angesammelt?</p>
         </div>
       );
-      inputs = [createInputField('Kn', 'Endwert', '€', 'z.B. 42.500,00', Kn, Math.max(Kn * 0.005, 2))];
+      inputs = [createInputField('Kn', '', '€', 'z.B. 42.500,00', Kn, Math.max(Kn * 0.005, 2))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -976,7 +978,7 @@ const createKapitalmehrungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welcher Startbetrag war erforderlich?</p>
         </div>
       );
-      inputs = [createInputField('K0', 'Startkapital', '€', 'z.B. 28.000,00', K0, Math.max(K0 * 0.005, 2))];
+      inputs = [createInputField('K0', '', '€', 'z.B. 28.000,00', K0, Math.max(K0 * 0.005, 2))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -1003,7 +1005,7 @@ const createKapitalmehrungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welche jährliche Einzahlung ist notwendig?</p>
         </div>
       );
-      inputs = [createInputField('r', 'Jahresrate', '€', 'z.B. 3.200,00', rate, Math.max(rate * 0.005, 1.5))];
+      inputs = [createInputField('r', '', '€', 'z.B. 3.200,00', rate, Math.max(rate * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -1109,7 +1111,7 @@ const createKapitalminderungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welcher Betrag bleibt am Ende nach allen Entnahmen übrig?</p>
         </div>
       );
-      inputs = [createInputField('Kn', 'Restkapital', '€', 'z.B. 14.800,00', Kn, Math.max(Kn * 0.005, 1.5))];
+      inputs = [createInputField('Kn', '', '€', 'z.B. 14.800,00', Kn, Math.max(Kn * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -1130,7 +1132,7 @@ const createKapitalminderungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welches Startkapital war erforderlich?</p>
         </div>
       );
-      inputs = [createInputField('K0', 'Startkapital', '€', 'z.B. 35.000,00', startCapital, Math.max(startCapital * 0.005, 2))];
+      inputs = [createInputField('K0', '', '€', 'z.B. 35.000,00', startCapital, Math.max(startCapital * 0.005, 2))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -1155,7 +1157,7 @@ const createKapitalminderungTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welche jährliche Entnahme ist möglich?</p>
         </div>
       );
-      inputs = [createInputField('r', 'Entnahme', '€', 'z.B. 4.500,00', rate, Math.max(rate * 0.005, 1.5))];
+      inputs = [createInputField('r', '', '€', 'z.B. 4.500,00', rate, Math.max(rate * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -1219,7 +1221,16 @@ const createRentenEndwertTask = (): Task => {
   const q = 1 + p / 100;
   const qn = Math.pow(q, n);
   const Kn = (r * (qn - 1)) / (q - 1);
-  const variant = randomChoice<RentenVariant>(['Kn', 'r', 'n']);
+  const variant = randomChoice<RentenVariant>(['Kn', 'r', 'K0', 'n']);
+
+  // Determine points based on variant
+  const getPointsForVariant = (v: RentenVariant): number => {
+    if (v === 'Kn') return 8;      // Mittel
+    if (v === 'r') return 15;      // Sehr schwer - Rate bestimmen
+    if (v === 'K0') return 15;     // Sehr schwer - Anfangskapital bestimmen
+    if (v === 'n') return 15;      // Sehr schwer - Zeit bestimmen
+    return 8;
+  };
 
   let story: React.ReactNode = null;
   let contextText: string = '';
@@ -1229,6 +1240,8 @@ const createRentenEndwertTask = (): Task => {
     contextText = randomChoice(rentenKnContexts);
   } else if (variant === 'r') {
     contextText = randomChoice(rentenRContexts);
+  } else if (variant === 'K0') {
+    contextText = randomChoice(rentenKnContexts); // Verwende ähnliche Kontexte
   } else if (variant === 'n') {
     contextText = randomChoice(rentenNContexts);
   }
@@ -1241,6 +1254,7 @@ const createRentenEndwertTask = (): Task => {
   let question: React.ReactNode = null;
   let inputs: TaskInput[] = [];
   let solution: React.ReactNode = null;
+  let formula = baseFormula;
 
   switch (variant) {
     case 'Kn':
@@ -1253,7 +1267,7 @@ const createRentenEndwertTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie viel Geld hat sich nach {n} Jahren angesammelt?</p>
         </div>
       );
-      inputs = [createInputField('Kn', 'Endwert', '€', 'z.B. 18.700,00', Kn, Math.max(Kn * 0.005, 1.5))];
+      inputs = [createInputField('Kn', '', '€', 'z.B. 18.700,00', Kn, Math.max(Kn * 0.005, 1.5))];
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -1277,7 +1291,8 @@ const createRentenEndwertTask = (): Task => {
           <p className="text-blue-900 font-semibold">Welcher gleiche Jahresbetrag muss eingezahlt werden?</p>
         </div>
       );
-      inputs = [createInputField('r', 'Jahresrate', '€', 'z.B. 1.150,00', rate, Math.max(rate * 0.005, 1))];
+      inputs = [createInputField('r', '', '€', 'z.B. 1.150,00', rate, Math.max(rate * 0.005, 1))];
+      formula = latex`r = K_n \cdot \frac{q - 1}{q^n - 1}`;
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -1285,7 +1300,31 @@ const createRentenEndwertTask = (): Task => {
             <InlineMath math={latex`q = 1 + \frac{${mathNumber(p)}}{100} = ${mathNumber(q, 4)}`} />
           </p>
           <p>
-            <InlineMath math={latex`r = ${mathNumber(Kn)} \cdot \frac{${mathNumber(q, 4)} - 1}{${mathNumber(q, 4)}^{${n}} - 1} = ${mathNumber(r, 4)}`} />
+            <InlineMath math={latex`r = ${mathNumber(Kn)} \cdot \frac{${mathNumber(q, 4)} - 1}{${mathNumber(q, 4)}^{${n}} - 1} = ${mathNumber(rate, 4)}`} />
+          </p>
+        </div>
+      );
+      break;
+    }
+    case 'K0': {
+      // K0 (Anfangskapital): Lege Betrag an, der sich ansammelt
+      const K0 = Kn / qn;
+      question = (
+        <div className="space-y-2">
+          {story}
+          <p>
+            Nach <strong>{n} Jahren</strong> mit jährlichen Zusatzeinzahlungen von <strong>{formatCurrency(r)} €</strong> (jeweils am Jahresende) soll <strong>{formatCurrency(Kn)} €</strong> erreicht sein. Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a.
+          </p>
+          <p className="text-blue-900 font-semibold">Welches Anfangskapital war notwendig?</p>
+        </div>
+      );
+      inputs = [createInputField('K0', '', '€', 'z.B. 8.500,00', K0, Math.max(K0 * 0.005, 1))];
+      formula = latex`K_0 = \frac{K_n}{q^n}`;
+      solution = (
+        <div className="space-y-1">
+          {solutionIntro}
+          <p>
+            <InlineMath math={latex`K_0 = \frac{${mathNumber(Kn)}}{${mathNumber(q, 4)}^{${n}}} = ${mathNumber(K0, 4)}`} />
           </p>
         </div>
       );
@@ -1301,7 +1340,8 @@ const createRentenEndwertTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie viele Jahre sind erforderlich, um das Ziel zu erreichen?</p>
         </div>
       );
-      inputs = [createInputField('n', 'Jahre', 'Jahre', 'z.B. 6', n, 0.05, 0)];
+      inputs = [createInputField('n', '', 'Jahre', 'z.B. 6', n, 0.05, 0)];
+      formula = latex`n = \log_q\left(1 + \frac{K_n (q - 1)}{r}\right)`;
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -1326,7 +1366,8 @@ const createRentenEndwertTask = (): Task => {
     question,
     solution,
     inputs,
-    pointsAwarded: 8,
+    formula, // Grundformel für Tipp
+    pointsAwarded: getPointsForVariant(variant),
   };
 };
 
@@ -1433,7 +1474,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
   rows.flatMap(row => [
     createInputField(
       `${prefix}_y${row.year}_debt`,
-      `Jahr ${row.year} • Schuld`,
+      '',
       '€',
       'z.B. 100.000,00',
       row.restStart,
@@ -1441,7 +1482,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
     ),
     createInputField(
       `${prefix}_y${row.year}_interest`,
-      `Jahr ${row.year} • Zins`,
+      '',
       '€',
       'z.B. 3.200,00',
       row.interest,
@@ -1449,7 +1490,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
     ),
     createInputField(
       `${prefix}_y${row.year}_tilgung`,
-      `Jahr ${row.year} • Tilgung`,
+      '',
       '€',
       'z.B. 12.500,00',
       row.tilgung,
@@ -1457,7 +1498,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
     ),
     createInputField(
       `${prefix}_y${row.year}_annuity`,
-      `Jahr ${row.year} • Annuität`,
+      '',
       '€',
       'z.B. 15.700,00',
       row.annuity,
@@ -1708,7 +1749,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     if (row.hiddenFields.has('restStart')) {
       inputs.push({
         id: `incomplete_plan_y${row.year}_debt`,
-        label: `Jahr ${row.year} • Schuld`,
+        label: '',
         unit: '€',
         placeholder: 'z.B. 100.000,00',
         correctValue: row.restStart,
@@ -1719,7 +1760,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     if (row.hiddenFields.has('interest')) {
       inputs.push({
         id: `incomplete_plan_y${row.year}_interest`,
-        label: `Jahr ${row.year} • Zins`,
+        label: '',
         unit: '€',
         placeholder: 'z.B. 3.200,00',
         correctValue: row.interest,
@@ -1730,7 +1771,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     if (row.hiddenFields.has('tilgung')) {
       inputs.push({
         id: `incomplete_plan_y${row.year}_tilgung`,
-        label: `Jahr ${row.year} • Tilgung`,
+        label: '',
         unit: '€',
         placeholder: 'z.B. 12.500,00',
         correctValue: row.tilgung,
@@ -1741,7 +1782,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     if (row.hiddenFields.has('annuity')) {
       inputs.push({
         id: `incomplete_plan_y${row.year}_annuity`,
-        label: `Jahr ${row.year} • Annuität`,
+        label: '',
         unit: '€',
         placeholder: 'z.B. 15.700,00',
         correctValue: row.annuity,
@@ -1802,6 +1843,7 @@ const createCards = (filter: FilterType): TaskCard[] => {
     feedback: null,
     feedbackType: null,
     solutionVisible: false,
+    tipVisible: false,
   });
 
   if (filter === 'mixed') {
@@ -1864,6 +1906,7 @@ export default function GemischteFinanzaufgaben() {
           feedback: null,
           feedbackType: null,
           solutionVisible: false,
+          tipVisible: false,
         };
       })
     );
@@ -2104,6 +2147,16 @@ export default function GemischteFinanzaufgaben() {
               feedback: null,
               feedbackType: null,
             }
+          : card
+      )
+    );
+  };
+
+  const showTip = (id: number) => {
+    setCards(prev =>
+      prev.map(card =>
+        card.id === id
+          ? { ...card, tipVisible: !card.tipVisible }
           : card
       )
     );
@@ -2394,6 +2447,14 @@ export default function GemischteFinanzaufgaben() {
                   >
                     Überprüfen
                   </button>
+                  {card.task.formula && (
+                    <button
+                      onClick={() => showTip(card.id)}
+                      className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-xl shadow"
+                    >
+                      💡 Tipp
+                    </button>
+                  )}
                   <button
                     onClick={() => showSolution(card.id)}
                     className="bg-slate-800 hover:bg-slate-900 text-white font-semibold px-4 py-2 rounded-xl shadow"
@@ -2411,6 +2472,15 @@ export default function GemischteFinanzaufgaben() {
                     }`}
                   >
                     {card.feedback}
+                  </div>
+                )}
+
+                {card.tipVisible && card.task.formula && (
+                  <div className="mb-3 rounded-2xl px-4 py-3 bg-amber-50 border-2 border-amber-200 text-amber-900">
+                    <p className="font-semibold mb-2">📝 Grundformel:</p>
+                    <div className="bg-white rounded-lg px-3 py-2 overflow-x-auto">
+                      <InlineMath math={card.task.formula} />
+                    </div>
                   </div>
                 )}
 
