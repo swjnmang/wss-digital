@@ -1421,41 +1421,59 @@ const renderPlanSolution = (rows: PlanRow[]) => (
   </table>
 );
 
-const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
-  rows.flatMap(row => [
-    createInputField(
-      `${prefix}_y${row.year}_debt`,
-      `Jahr ${row.year} • Schuld`,
-      '€',
-      'z.B. 100.000,00',
-      row.restStart,
-      0.02
-    ),
-    createInputField(
-      `${prefix}_y${row.year}_interest`,
-      `Jahr ${row.year} • Zins`,
-      '€',
-      'z.B. 3.200,00',
-      row.interest,
-      0.02
-    ),
-    createInputField(
-      `${prefix}_y${row.year}_tilgung`,
-      `Jahr ${row.year} • Tilgung`,
-      '€',
-      'z.B. 12.500,00',
-      row.tilgung,
-      0.02
-    ),
-    createInputField(
-      `${prefix}_y${row.year}_annuity`,
-      `Jahr ${row.year} • Annuität`,
-      '€',
-      'z.B. 15.700,00',
-      row.annuity,
-      0.02
-    ),
-  ]);
+const buildPlanInputs = (prefix: string, rows: PlanRow[], hiddenFields?: Map<number, Set<string>>) =>
+  rows.flatMap((row, yearIndex) => {
+    // Wenn hiddenFields definiert ist, erstelle nur Inputs für sichtbare Felder
+    const hidden = hiddenFields?.get(yearIndex) || new Set<string>();
+    
+    const inputs: TaskInput[] = [];
+    
+    if (!hidden.has('restStart')) {
+      inputs.push(createInputField(
+        `${prefix}_y${row.year}_debt`,
+        `Jahr ${row.year} • Schuld`,
+        '€',
+        'z.B. 100.000,00',
+        row.restStart,
+        0.02
+      ));
+    }
+    
+    if (!hidden.has('interest')) {
+      inputs.push(createInputField(
+        `${prefix}_y${row.year}_interest`,
+        `Jahr ${row.year} • Zins`,
+        '€',
+        'z.B. 3.200,00',
+        row.interest,
+        0.02
+      ));
+    }
+    
+    if (!hidden.has('tilgung')) {
+      inputs.push(createInputField(
+        `${prefix}_y${row.year}_tilgung`,
+        `Jahr ${row.year} • Tilgung`,
+        '€',
+        'z.B. 12.500,00',
+        row.tilgung,
+        0.02
+      ));
+    }
+    
+    if (!hidden.has('annuity')) {
+      inputs.push(createInputField(
+        `${prefix}_y${row.year}_annuity`,
+        `Jahr ${row.year} • Annuität`,
+        '€',
+        'z.B. 15.700,00',
+        row.annuity,
+        0.02
+      ));
+    }
+    
+    return inputs;
+  });
 
 const createRatendarlehenPlanTask = (): Task => {
   const loan = randomInt(50, 140) * 1000;
@@ -1477,6 +1495,28 @@ const createRatendarlehenPlanTask = (): Task => {
   };
 
   const rows = targetYears.map(buildRow);
+
+  // Erstelle Hidden-Fields Map für intelligente Versteckung
+  const hiddenFields = new Map<number, Set<string>>();
+  rows.forEach((row, yearIndex) => {
+    const hide = new Set<string>();
+    
+    if (yearIndex === 0) {
+      // Jahr 1: restStart + Tilgung sichtbar → Schüler sieht konstante Tilgung
+      hide.add('interest');
+      hide.add('annuity');
+    } else if (yearIndex === 1) {
+      // Jahr 2: Tilgung + Annuität sichtbar → Tilgung ist gleich (Erkennungsmerkmal!)
+      hide.add('restStart');
+      hide.add('interest');
+    } else {
+      // Weitere Jahre: Mix variieren
+      hide.add('restStart');
+      hide.add('interest');
+    }
+    
+    hiddenFields.set(yearIndex, hide);
+  });
 
   const contextLine = randomChoice(ratendarlehenContexts);
 
@@ -1514,7 +1554,7 @@ const createRatendarlehenPlanTask = (): Task => {
     type: 'ratendarlehen_plan',
     question,
     solution,
-    inputs: buildPlanInputs('rate', rows),
+    inputs: buildPlanInputs('rate', rows, hiddenFields),
   };
 };
 
@@ -1567,6 +1607,28 @@ const createAnnuitaetPlanTask = (): Task => {
     </div>
   );
 
+  // Erstelle Hidden-Fields Map für intelligente Versteckung
+  const hiddenFields = new Map<number, Set<string>>();
+  rows.forEach((row, yearIndex) => {
+    const hide = new Set<string>();
+    
+    if (yearIndex === 0) {
+      // Jahr 1: restStart + Annuität sichtbar → Schüler sieht konstante Annuität
+      hide.add('interest');
+      hide.add('tilgung');
+    } else if (yearIndex === 1) {
+      // Jahr 2: Tilgung + Annuität sichtbar → Annuität ist gleich (Erkennungsmerkmal!)
+      hide.add('restStart');
+      hide.add('interest');
+    } else {
+      // Weitere Jahre: Mix variieren
+      hide.add('restStart');
+      hide.add('interest');
+    }
+    
+    hiddenFields.set(yearIndex, hide);
+  });
+
   const solution = (
     <div className="space-y-2">
       <p>
@@ -1580,7 +1642,7 @@ const createAnnuitaetPlanTask = (): Task => {
     type: 'annuitaet_plan',
     question,
     solution,
-    inputs: buildPlanInputs('ann', rows),
+    inputs: buildPlanInputs('ann', rows, hiddenFields),
   };
 };
 
