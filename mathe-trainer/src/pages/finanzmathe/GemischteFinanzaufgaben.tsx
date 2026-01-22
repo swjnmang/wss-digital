@@ -1367,8 +1367,9 @@ const extractPlanTable = (inputs: TaskInput[]): PlanTableRow[] | null => {
   return Object.values(rows)
     .map(row => {
       const cells: Record<string, TaskInput> = {};
-      const hasIncompletePattern = Object.keys(row.cells).length > 0 && 
-        Array.from(Object.values(row.cells))[0]?.id?.includes('incomplete_plan');
+      const cellsArray = Object.values(row.cells);
+      const hasIncompletePattern = cellsArray.length > 0 && 
+        cellsArray[0]?.id?.includes('incomplete_plan');
       
       if (hasIncompletePattern) {
         // Für incomplete plans: Nur die Felder verwenden, die vorhanden sind
