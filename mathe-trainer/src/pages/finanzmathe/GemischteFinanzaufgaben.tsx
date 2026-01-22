@@ -882,7 +882,7 @@ const createZinseszinsTask = (): Task => {
           <p className="ml-4"><InlineMath math={latex`${mathNumber(Kn, 2)} = ${mathNumber(K0)} \cdot ${mathNumber(q, 4)}^{n} \quad | : ${mathNumber(K0)}`} /></p>
           <p><strong>Nach n auflösen:</strong></p>
           <p className="ml-4"><InlineMath math={latex`${mathNumber(q, 4)}^{n} = \frac{${mathNumber(Kn, 2)}}{${mathNumber(K0)}} \quad | \log_{${mathNumber(q, 4)}}`} /></p>
-          <p className="ml-4"><InlineMath math={latex`n = \frac{\log\left(\frac{${mathNumber(Kn, 2)}}{${mathNumber(K0)}}\right)}{\log(${mathNumber(q, 4)})} = \frac{\log(${mathNumber(Kn/K0, 4)})}{\log(${mathNumber(q, 4)})} = ${n}`} /></p>
+          <p className="ml-4"><InlineMath math={latex`n = \log_{${mathNumber(q, 4)}}\left(\frac{${mathNumber(Kn, 2)}}{${mathNumber(K0)}}\right) = ${n}`} /></p>
           <p><strong>Ergebnis:</strong> <InlineMath math={latex`n = ${n}\text{ Jahre}`} /></p>
         </div>
       );
