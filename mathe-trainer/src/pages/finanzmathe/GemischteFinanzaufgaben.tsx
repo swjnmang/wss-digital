@@ -1349,7 +1349,7 @@ const extractPlanTable = (inputs: TaskInput[]): PlanTableRow[] | null => {
   let hasPlanPattern = false;
 
   inputs.forEach(input => {
-    const match = input.id.match(/(?:incomplete_plan_)?_y(\d+)_(debt|interest|tilgung|annuity)$/);
+    const match = input.id.match(/(?:_y|incomplete_plan_y)(\d+)_(debt|interest|tilgung|annuity)$/);
     if (!match) return;
     hasPlanPattern = true;
     const year = Number(match[1]);
