@@ -1596,7 +1596,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
   if (isRatenplan) {
     tilgungsart = 'Ratentilgung';
     const tilgung = loan / years;
-    for (let year = 1; year <= 3; year++) {
+    for (let year = 1; year <= 2; year++) {
       const restStart = loan - tilgung * (year - 1);
       const interest = restStart * rate / 100;
       const annuity = tilgung + interest;
@@ -1610,7 +1610,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     const annuity = tilgungFirst * qn;
     
     let rest = loan;
-    for (let year = 1; year <= 3; year++) {
+    for (let year = 1; year <= 2; year++) {
       const interest = rest * rate / 100;
       const tilgung = annuity - interest;
       rows.push({ year, restStart: rest, interest, tilgung, annuity });
@@ -1648,11 +1648,6 @@ const createIncompleteTilgungsplanTask = (): Task => {
       <p className="text-gray-700">
         <strong>Aufgabe:</strong> Vervollständige den Tilgungsplan und gib an, um welche Tilgungsart es sich handelt.
       </p>
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
-        <p><strong>Darlehensbetrag:</strong> {formatCurrency(loan)} €</p>
-        <p><strong>Laufzeit:</strong> {years} Jahre</p>
-        <p><strong>Zinssatz (p.a.):</strong> {formatNumber(rate, isRatenplan ? 1 : 2)} %</p>
-      </div>
     </div>
   );
 
