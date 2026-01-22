@@ -773,6 +773,7 @@ const createSimpleInterestTask = (): Task => {
     question,
     solution,
     inputs,
+    formula: latex`Z = \frac{K \cdot p \cdot t}{100 \cdot 360}`,
     pointsAwarded: 5,
   };
 };
@@ -906,6 +907,7 @@ const createZinseszinsTask = (): Task => {
     question,
     solution,
     inputs,
+    formula: latex`K_n = K_0 \cdot q^n`,
     pointsAwarded: 5,
   };
 };
@@ -1058,6 +1060,7 @@ const createKapitalmehrungTask = (): Task => {
     question,
     solution,
     inputs,
+    formula: latex`K_n = K_0 \cdot q^n + r \cdot \frac{q^n - 1}{q - 1}`,
     pointsAwarded: variant === 'n' ? 15 : 8, // 15 für n berechnen (sehr schwer), 8 für andere (mittel)
   };
 };
@@ -1210,6 +1213,7 @@ const createKapitalminderungTask = (): Task => {
     question,
     solution,
     inputs,
+    formula: latex`K_n = K_0 \cdot q^n - r \cdot \frac{q^n - 1}{q - 1}`,
     pointsAwarded: variant === 'n' ? 15 : 8, // 15 für n berechnen (sehr schwer), 8 für andere (mittel)
   };
 };
@@ -1254,7 +1258,6 @@ const createRentenEndwertTask = (): Task => {
   let question: React.ReactNode = null;
   let inputs: TaskInput[] = [];
   let solution: React.ReactNode = null;
-  let formula = baseFormula;
 
   switch (variant) {
     case 'Kn':
@@ -1292,7 +1295,6 @@ const createRentenEndwertTask = (): Task => {
         </div>
       );
       inputs = [createInputField('r', '', '€', 'z.B. 1.150,00', rate, Math.max(rate * 0.005, 1))];
-      formula = latex`r = K_n \cdot \frac{q - 1}{q^n - 1}`;
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -1319,7 +1321,6 @@ const createRentenEndwertTask = (): Task => {
         </div>
       );
       inputs = [createInputField('K0', '', '€', 'z.B. 8.500,00', K0, Math.max(K0 * 0.005, 1))];
-      formula = latex`K_0 = \frac{K_n}{q^n}`;
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -1341,7 +1342,6 @@ const createRentenEndwertTask = (): Task => {
         </div>
       );
       inputs = [createInputField('n', '', 'Jahre', 'z.B. 6', n, 0.05, 0)];
-      formula = latex`n = \log_q\left(1 + \frac{K_n (q - 1)}{r}\right)`;
       solution = (
         <div className="space-y-1">
           {solutionIntro}
@@ -1366,7 +1366,7 @@ const createRentenEndwertTask = (): Task => {
     question,
     solution,
     inputs,
-    formula, // Grundformel für Tipp
+    formula: latex`K_n = r \cdot \frac{q^n - 1}{q - 1}`,
     pointsAwarded: getPointsForVariant(variant),
   };
 };
@@ -1564,6 +1564,7 @@ const createRatendarlehenPlanTask = (): Task => {
     question,
     solution,
     inputs: buildPlanInputs('rate', rows),
+    formula: latex`T = \frac{K_0}{n}`,
     pointsAwarded: 12,
   };
 };
@@ -1632,6 +1633,7 @@ const createAnnuitaetPlanTask = (): Task => {
     question,
     solution,
     inputs: buildPlanInputs('ann', rows),
+    formula: latex`A = T_1 \cdot q^n`,
     pointsAwarded: 12,
   };
 };
@@ -1797,6 +1799,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     question,
     solution,
     inputs,
+    formula: latex`K_n = K_0 \cdot q^n - r \cdot \frac{q^n - 1}{q - 1}`,
     _incompleteRows: incompleteRows, // Speichere die Reihen für das Rendering
     pointsAwarded: 8,
   };
@@ -2449,14 +2452,12 @@ export default function GemischteFinanzaufgaben() {
                   >
                     Überprüfen
                   </button>
-                  {card.task.formula && (
-                    <button
-                      onClick={() => showTip(card.id)}
-                      className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-xl shadow"
-                    >
-                      💡 Tipp
-                    </button>
-                  )}
+                  <button
+                    onClick={() => showTip(card.id)}
+                    className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-xl shadow"
+                  >
+                    💡 Tipp
+                  </button>
                   <button
                     onClick={() => showSolution(card.id)}
                     className="bg-slate-800 hover:bg-slate-900 text-white font-semibold px-4 py-2 rounded-xl shadow"
