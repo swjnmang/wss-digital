@@ -1625,37 +1625,29 @@ const createIncompleteTilgungsplanTask = (): Task => {
     const hide = new Set<string>();
     
     if (isRatenplan) {
-      // Ratentilgung: Tilgung ist konstant
-      // NICHT verstecken: Tilgung (damit Schüler das Muster erkennt!)
-      // Verstecke statt dessen: restStart, interest, annuity
-      // Aber lasse genug sichtbar, um zu berechnen
+      // Ratentilgung: Tilgung ist konstant und IMMER sichtbar
+      // Pro Jahr unterschiedliche Kombinationen verstecken
       
       if (yearIndex === 0) {
-        // Jahr 1: Verstecke interest + annuity, lasse restStart sichtbar
-        // restStart + Tilgung + interest sind sichtbar → kann annuity berechnen
+        // Jahr 1: restStart + Tilgung sichtbar → Schüler kann Zinsen + Annuität berechnen
+        hide.add('interest');
         hide.add('annuity');
       } else {
-        // Jahr 2: Verstecke restStart + annuity, lasse interest sichtbar
-        // Tilgung ist sichtbar (konstant!), interest ist sichtbar → annuity = tilgung + interest
+        // Jahr 2: Tilgung + Annuität sichtbar → Schüler kann Zinsen + restStart berechnen
         hide.add('restStart');
-        hide.add('annuity');
+        hide.add('interest');
       }
     } else {
-      // Annuitätentilgung: Annuität ist konstant
-      // NICHT verstecken: Annuität (damit Schüler das Muster erkennt!)
-      // Verstecke statt dessen: restStart, interest, tilgung
-      // Aber lasse genug sichtbar, um zu berechnen
+      // Annuitätentilgung: Annuität ist konstant und IMMER sichtbar
+      // Pro Jahr unterschiedliche Kombinationen verstecken
       
       if (yearIndex === 0) {
-        // Jahr 1: Verstecke restStart + tilgung, lasse interest sichtbar
-        // Annuität + interest sind sichtbar → tilgung = annuität - interest
-        hide.add('restStart');
+        // Jahr 1: restStart + Annuität sichtbar → Schüler kann Zinsen + Tilgung berechnen
+        hide.add('interest');
         hide.add('tilgung');
       } else {
-        // Jahr 2: Verstecke interest + tilgung, lasse restStart sichtbar
-        // Aber das ist schwierig... lass mich anders denken
-        // Verstecke nur interest, lasse rest sichtbar
-        // Annuität ist sichtbar, Tilgung ist sichtbar → interest = annuität - tilgung
+        // Jahr 2: Tilgung + Annuität sichtbar → Schüler kann Zinsen berechnen
+        hide.add('restStart');
         hide.add('interest');
       }
     }
