@@ -1653,40 +1653,6 @@ const createIncompleteTilgungsplanTask = (): Task => {
         <p><strong>Laufzeit:</strong> {years} Jahre</p>
         <p><strong>Zinssatz (p.a.):</strong> {formatNumber(rate, isRatenplan ? 1 : 2)} %</p>
       </div>
-      
-      {/* Halb ausgefüllter Tilgungsplan */}
-      <div className="overflow-x-auto">
-        <table className="w-full border border-slate-200 text-sm">
-          <thead>
-            <tr className="bg-slate-100">
-              <th className="p-2 text-left">Jahr</th>
-              <th className="p-2 text-left">Schuld (Anfang)</th>
-              <th className="p-2 text-left">Zins</th>
-              <th className="p-2 text-left">Tilgung</th>
-              <th className="p-2 text-left">Annuität</th>
-            </tr>
-          </thead>
-          <tbody>
-            {incompleteRows.map((row) => (
-              <tr key={row.year} className="border-t border-slate-200">
-                <td className="p-2 font-semibold">{row.year}</td>
-                <td className="p-2">
-                  {row.hiddenFields.has('restStart') ? '?' : formatCurrency(row.restStart) + ' €'}
-                </td>
-                <td className="p-2">
-                  {row.hiddenFields.has('interest') ? '?' : formatCurrency(row.interest) + ' €'}
-                </td>
-                <td className="p-2">
-                  {row.hiddenFields.has('tilgung') ? '?' : formatCurrency(row.tilgung) + ' €'}
-                </td>
-                <td className="p-2">
-                  {row.hiddenFields.has('annuity') ? '?' : formatCurrency(row.annuity) + ' €'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 
@@ -1697,8 +1663,22 @@ const createIncompleteTilgungsplanTask = (): Task => {
     </div>
   );
 
-  // Erstelle Inputs für alle fehlenden Zellen
+  // Füge Select für Tilgungsart hinzu - ZUERST in der Array
   const inputs: TaskInput[] = [];
+  
+  inputs.push({
+    id: 'tilgungsart',
+    label: 'Tilgungsart',
+    unit: '',
+    placeholder: 'Wähle aus',
+    correctValue: tilgungsart,
+    tolerance: 0,
+    type: 'select',
+    options: ['Ratentilgung', 'Annuitätentilgung'],
+    displayDecimals: 0,
+  });
+
+  // Dann Inputs für alle fehlenden Zellen
   incompleteRows.forEach((row) => {
     if (row.hiddenFields.has('restStart')) {
       inputs.push({
@@ -1744,19 +1724,6 @@ const createIncompleteTilgungsplanTask = (): Task => {
         displayDecimals: 2,
       });
     }
-  });
-
-  // Füge Select für Tilgungsart hinzu
-  inputs.push({
-    id: 'tilgungsart',
-    label: 'Tilgungsart',
-    unit: '',
-    placeholder: 'Wähle aus',
-    correctValue: tilgungsart,
-    tolerance: 0,
-    type: 'select',
-    options: ['Ratentilgung', 'Annuitätentilgung'],
-    displayDecimals: 0,
   });
 
   return {
@@ -2104,7 +2071,9 @@ export default function GemischteFinanzaufgaben() {
                 <div className="text-base text-slate-800 leading-relaxed mb-4">{card.task.question}</div>
 
                 {(() => {
-                  const planTable = extractPlanTable(card.task.inputs);
+                  const planTable = extractPlanTable(card.task.inputs.filter(i => i.type !== 'select'));
+                  const tilgungsartInput = card.task.inputs.find(i => i.type === 'select');
+                  
                   if (!planTable) {
                     return (
                       <div className="grid gap-3 mb-3">
@@ -2142,6 +2111,97 @@ export default function GemischteFinanzaufgaben() {
                             </div>
                           </div>
                         ))}
+                      </div>
+                    );
+                  }
+
+                  // Für incomplete_tilgungsplan: Dropdown oben + einzelne Tabelle mit allen Werten
+                  if (tilgungsartInput) {
+                    return (
+                      <div className="space-y-4">
+                        {/* Dropdown für Tilgungsart */}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                          <label className="font-semibold text-slate-600 sm:min-w-[220px]">{tilgungsartInput.label}:</label>
+                          <select
+                            value={card.userAnswers[tilgungsartInput.id] || ''}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                              handleInputChange(card.id, tilgungsartInput.id, e.target.value)
+                            }
+                            className="flex-1 border-2 border-slate-300 rounded-xl px-4 py-2 text-lg focus:outline-none focus:border-blue-400 bg-white max-w-sm"
+                          >
+                            <option value="">{tilgungsartInput.placeholder}</option>
+                            {tilgungsartInput.options?.map(opt => (
+                              <option key={opt} value={opt}>
+                                {opt}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Einzelne Tabelle mit bekannten und unbekannten Werten */}
+                        <div className="overflow-x-auto">
+                          <table className="w-full border border-slate-200 text-sm">
+                            <thead>
+                              <tr className="bg-slate-100 text-slate-700">
+                                <th className="p-2 text-center font-semibold">Jahr</th>
+                                {PLAN_COLUMNS.map(col => (
+                                  <th key={col.key} className="p-2 text-center font-semibold">
+                                    {col.label}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {planTable.map((row, index) => {
+                                const rowsToRender: React.ReactNode[] = [];
+                                if (index > 0 && row.year - planTable[index - 1].year > 1) {
+                                  rowsToRender.push(
+                                    <tr key={`gap-${row.year}`}>
+                                      <td colSpan={PLAN_COLUMNS.length + 1} className="p-2 text-center text-slate-400">
+                                        …
+                                      </td>
+                                    </tr>
+                                  );
+                                }
+                                rowsToRender.push(
+                                  <tr key={`plan-row-${row.year}`} className="border-t border-slate-200">
+                                    <td className="p-2 text-center font-semibold text-slate-600">{row.year}</td>
+                                    {PLAN_COLUMNS.map(col => {
+                                      const input = row.cells[col.key];
+                                      if (!input) {
+                                        return <td key={col.key} className="p-2"></td>;
+                                      }
+                                      const userValue = card.userAnswers[input.id];
+                                      const isCorrect = isInputCorrect(input, userValue);
+                                      return (
+                                        <td key={col.key} className="p-2 align-middle">
+                                          <div className="flex items-center gap-2">
+                                            <input
+                                              type="text"
+                                              aria-label={`${col.label} Jahr ${row.year}`}
+                                              value={userValue}
+                                              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                                handleInputChange(card.id, input.id, e.target.value)
+                                              }
+                                              placeholder={input.placeholder}
+                                              className={`w-full border-2 rounded-xl px-3 py-2 text-base focus:outline-none ${
+                                                userValue && isCorrect
+                                                  ? 'border-green-500 bg-green-50 focus:border-green-600'
+                                                  : 'border-slate-300 focus:border-blue-400'
+                                              }`}
+                                            />
+                                            <span className="text-base font-semibold text-slate-600">{input.unit}</span>
+                                          </div>
+                                        </td>
+                                      );
+                                    })}
+                                  </tr>
+                                );
+                                return rowsToRender;
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     );
                   }
