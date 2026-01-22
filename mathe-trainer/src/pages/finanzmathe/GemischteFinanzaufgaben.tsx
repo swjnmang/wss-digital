@@ -1998,9 +1998,11 @@ export default function GemischteFinanzaufgaben() {
     });
 
     // Statistik immer aktualisieren (außer bei ungültigen Inputs)
+    console.log('checkAnswer attempt:', attempt);
     if (attempt !== 'invalid') {
       if (attempt === 'solutionShown') {
         // Lösung angezeigt: nur Versuch zählen, keine Punkte
+        console.log('solutionShown - updating stats');
         setStats(prev => ({
           correct: prev.correct, // Unverändert
           points: prev.points,   // Unverändert
@@ -2009,12 +2011,17 @@ export default function GemischteFinanzaufgaben() {
         }));
       } else {
         // Normal: Punkte vergeben wenn correct
-        setStats(prev => ({
-          correct: prev.correct + (attempt === 'correct' ? 1 : 0),
-          total: prev.total + 1,
-          streak: attempt === 'correct' ? prev.streak + 1 : 0,
-          points: prev.points + (attempt === 'correct' ? POINTS_PER_CORRECT : 0),
-        }));
+        console.log('attempt:', attempt, 'points to add:', attempt === 'correct' ? POINTS_PER_CORRECT : 0);
+        setStats(prev => {
+          const newStats = {
+            correct: prev.correct + (attempt === 'correct' ? 1 : 0),
+            total: prev.total + 1,
+            streak: attempt === 'correct' ? prev.streak + 1 : 0,
+            points: prev.points + (attempt === 'correct' ? POINTS_PER_CORRECT : 0),
+          };
+          console.log('new stats:', newStats);
+          return newStats;
+        });
         // Nach checkAnswer auch Tilgungspläne checken
         checkCellsAutomatically(id, updatedCards);
       }
