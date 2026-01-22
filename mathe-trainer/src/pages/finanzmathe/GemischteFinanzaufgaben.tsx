@@ -1940,12 +1940,14 @@ export default function GemischteFinanzaufgaben() {
   };
 
   const checkAnswer = (id: number) => {
+    console.log('checkAnswer called for card:', id);
     let attempt: 'correct' | 'incorrect' | 'solutionShown' | 'invalid' = 'invalid';
     let updatedCards: TaskCard[] = [];
 
     setCards(prev => {
       updatedCards = prev.map(c => {
         if (c.id !== id) return c;
+        console.log('Checking card', id, 'taskType:', c.task.type);
 
         // Wenn Lösung bereits angezeigt wurde, keine Punkte mehr - aber als Versuch zählen
         if (c.solutionVisible) {
@@ -2048,6 +2050,7 @@ export default function GemischteFinanzaufgaben() {
     });
 
     // Statistik immer aktualisieren (außer bei ungültigen Inputs)
+    console.log('FINAL attempt:', attempt);
     if (attempt !== 'invalid') {
       if (attempt === 'solutionShown') {
         // Lösung angezeigt: nur Versuch zählen, keine Punkte
