@@ -40,6 +40,9 @@ interface Task {
   question: React.ReactNode;
   solution: React.ReactNode;
   inputs: TaskInput[];
+  pointsAwarded?: number; // Punkte für diese Aufgabe basierend auf Schwierigkeit
+  _incompleteRows?: Array<{ year: number; restStart: number; interest: number; tilgung: number; annuity: number; hiddenFields: Set<string> }>;
+  _hiddenFields?: Map<number, Set<string>>;
 }
 
 interface TaskCard {
@@ -768,6 +771,7 @@ const createSimpleInterestTask = (): Task => {
     question,
     solution,
     inputs,
+    pointsAwarded: 5,
   };
 };
 
@@ -900,6 +904,7 @@ const createZinseszinsTask = (): Task => {
     question,
     solution,
     inputs,
+    pointsAwarded: 5,
   };
 };
 
@@ -1051,6 +1056,7 @@ const createKapitalmehrungTask = (): Task => {
     question,
     solution,
     inputs,
+    pointsAwarded: unknown === 'n' ? 15 : 8, // 15 für n berechnen (schwer), 8 für K_n (mittel)
   };
 };
 
@@ -1202,6 +1208,7 @@ const createKapitalminderungTask = (): Task => {
     question,
     solution,
     inputs,
+    pointsAwarded: unknown === 'n' ? 15 : 8, // 15 für n berechnen (schwer), 8 für K_n (mittel)
   };
 };
 
@@ -1319,6 +1326,7 @@ const createRentenEndwertTask = (): Task => {
     question,
     solution,
     inputs,
+    pointsAwarded: 8,
   };
 };
 
@@ -1515,6 +1523,7 @@ const createRatendarlehenPlanTask = (): Task => {
     question,
     solution,
     inputs: buildPlanInputs('rate', rows),
+    pointsAwarded: 12,
   };
 };
 
@@ -1582,6 +1591,7 @@ const createAnnuitaetPlanTask = (): Task => {
     question,
     solution,
     inputs: buildPlanInputs('ann', rows),
+    pointsAwarded: 12,
   };
 };
 
@@ -1747,6 +1757,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     solution,
     inputs,
     _incompleteRows: incompleteRows, // Speichere die Reihen für das Rendering
+    pointsAwarded: 8,
   };
 };
 
@@ -1991,13 +2002,14 @@ export default function GemischteFinanzaufgaben() {
           });
 
           const isCorrect = correctCells === totalCells && tilgungsartCorrect;
+          const pointsToAward = c.task.pointsAwarded || POINTS_PER_CORRECT;
 
           if (isCorrect) {
             setStats(prev => ({
               correct: prev.correct + 1,
               total: prev.total + 1,
               streak: prev.streak + 1,
-              points: prev.points + POINTS_PER_CORRECT,
+              points: prev.points + pointsToAward,
             }));
           } else {
             setStats(prev => ({
@@ -2011,7 +2023,7 @@ export default function GemischteFinanzaufgaben() {
           return {
             ...c,
             feedback: isCorrect ? (
-              `Stark! Alle Werte stimmen und die Tilgungsart ist korrekt. (+${POINTS_PER_CORRECT} Punkte)`
+              `Stark! Alle Werte stimmen und die Tilgungsart ist korrekt. (+${pointsToAward} Punkte)`
             ) : (
               `Es wurden ${correctCells} von ${totalCells} Zellen korrekt ausgefüllt. ${tilgungsartCorrect ? '' : 'Die Tilgungsart ist falsch.'}`
             ),
@@ -2040,13 +2052,14 @@ export default function GemischteFinanzaufgaben() {
         });
 
         const isCorrect = wrongFields.length === 0;
+        const pointsToAward = c.task.pointsAwarded || POINTS_PER_CORRECT;
 
         if (isCorrect) {
           setStats(prev => ({
             correct: prev.correct + 1,
             total: prev.total + 1,
             streak: prev.streak + 1,
-            points: prev.points + POINTS_PER_CORRECT,
+            points: prev.points + pointsToAward,
           }));
         } else {
           setStats(prev => ({
@@ -2060,7 +2073,7 @@ export default function GemischteFinanzaufgaben() {
         return {
           ...c,
           feedback: isCorrect ? (
-            `Stark! Alle Werte stimmen. (+${POINTS_PER_CORRECT} Punkte)`
+            `Stark! Alle Werte stimmen. (+${pointsToAward} Punkte)`
           ) : (
             <div>
               Nicht ganz. Richtige Werte:
