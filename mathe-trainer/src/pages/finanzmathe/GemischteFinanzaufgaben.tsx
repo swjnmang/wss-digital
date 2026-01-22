@@ -119,7 +119,7 @@ const randomInterestDateRange = (): InterestDateRange => {
 };
 
 // Namen für Darlehensverträge
-const lenderNames = ['Stadtsparkasse München', 'Raiffeisenbank Schwabing', 'Commerzbank', 'Deutsche Bank', 'Santander', 'Hypovereinsbank'];
+const lenderNames = ['Alpina Bank', 'Bergland Kreditbank', 'Stadtische Sparbank', 'Mittelwald Finance', 'Nordlicht Finanzhaus', 'Waldviertel Darlehensgesellschaft'];
 const lenderAddresses = ['Marienplatz 8, 80331 München', 'Schwabing 12, 80804 München', 'Karlsplatz 1, 80333 München', 'Neuhauser Str. 5, 80331 München'];
 
 const borrowerFirstNames = ['Anna', 'Benjamin', 'Caroline', 'David', 'Emma', 'Frank', 'Greta', 'Heinrich', 'Iris', 'Jonas', 'Katharina', 'Laura', 'Markus', 'Natalia', 'Oliver', 'Petra', 'Quirin', 'Rita', 'Stefan', 'Theresa', 'Ulrich', 'Vanessa', 'Werner', 'Xiomara', 'Yannick', 'Zenobia'];
