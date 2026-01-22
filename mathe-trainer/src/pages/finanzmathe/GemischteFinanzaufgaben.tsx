@@ -1952,7 +1952,11 @@ export default function GemischteFinanzaufgaben() {
           };
         }
 
+        console.log('Card inputs:', c.task.inputs.map(i => ({ id: i.id, filled: !!c.userAnswers[i.id]?.trim() })));
+        
         const missingInput = c.task.inputs.some(input => !c.userAnswers[input.id]?.trim());
+        console.log('missingInput:', missingInput);
+        
         if (missingInput) {
           attempt = 'invalid';
           return {
