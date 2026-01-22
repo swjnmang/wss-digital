@@ -1362,17 +1362,36 @@ const extractPlanTable = (inputs: TaskInput[]): PlanTableRow[] | null => {
 
   if (!hasPlanPattern) return null;
 
+  // Für incomplete_tilgungsplan: Akzeptiere auch unvollständige Reihen (nur versteckte Felder)
+  // Für andere Plans: Verlange alle 4 Spalten
   return Object.values(rows)
-    .map(row => ({
-      year: row.year,
-      cells: PLAN_COLUMNS.reduce((acc, col) => {
-        if (!row.cells[col.key]) {
-          throw new Error(`Missing ${col.key} input for Jahr ${row.year}`);
-        }
-        acc[col.key] = row.cells[col.key];
-        return acc;
-      }, {} as Record<PlanColumnKey, TaskInput>),
-    }))
+    .map(row => {
+      const cells: Record<string, TaskInput> = {};
+      const hasIncompletePattern = Object.keys(row.cells).length > 0 && 
+        Array.from(Object.values(row.cells))[0]?.id?.includes('incomplete_plan');
+      
+      if (hasIncompletePattern) {
+        // Für incomplete plans: Nur die Felder verwenden, die vorhanden sind
+        PLAN_COLUMNS.forEach(col => {
+          if (row.cells[col.key]) {
+            cells[col.key] = row.cells[col.key];
+          }
+        });
+      } else {
+        // Für normale plans: Alle 4 Spalten verlangen
+        PLAN_COLUMNS.forEach(col => {
+          if (!row.cells[col.key]) {
+            throw new Error(`Missing ${col.key} input for Jahr ${row.year}`);
+          }
+          cells[col.key] = row.cells[col.key];
+        });
+      }
+      
+      return {
+        year: row.year,
+        cells: cells as Record<PlanColumnKey, TaskInput>,
+      };
+    })
     .sort((a, b) => a.year - b.year);
 };
 
