@@ -1674,6 +1674,8 @@ export default function GemischteFinanzaufgaben() {
           : card
       )
     );
+    // Automatisch Punkte für Tilgungspläne überprüfen
+    checkCellsAutomatically(cardId);
   };
 
   // Parst deutsche Zahlenformate: "99.000,00" oder "99000,00" oder "99000"
@@ -1702,6 +1704,15 @@ export default function GemischteFinanzaufgaben() {
     setCards(prev =>
       prev.map(card => {
         if (card.id !== id) return card;
+
+        // Wenn Lösung bereits angezeigt wurde, keine Punkte mehr
+        if (card.solutionVisible) {
+          return {
+            ...card,
+            feedback: 'Lösung wurde bereits angezeigt. Diese Aufgabe bringt keine Punkte mehr.',
+            feedbackType: 'incorrect',
+          };
+        }
 
         const missingInput = card.task.inputs.some(input => !card.userAnswers[input.id]?.trim());
         if (missingInput) {
@@ -1753,6 +1764,37 @@ export default function GemischteFinanzaufgaben() {
         total: prev.total + 1,
         streak: attempt === 'correct' ? prev.streak + 1 : 0,
         points: prev.points + (attempt === 'correct' ? POINTS_PER_CORRECT : 0),
+      }));
+    }
+  };
+
+  const checkCellsAutomatically = (id: number) => {
+    // Automatisches Scoring für Tilgungspläne: +2 Punkte pro korrekte Zelle
+    const card = cards.find(c => c.id === id);
+    if (!card) return;
+
+    // Nur für Tilgungspläne aktivieren
+    if (card.task.type !== 'ratendarlehen_plan' && card.task.type !== 'annuitaet_plan') return;
+
+    // Nicht wenn Lösung angezeigt wurde
+    if (card.solutionVisible) return;
+
+    // Zähle korrekte Zellen
+    let correctCells = 0;
+    card.task.inputs.forEach(input => {
+      const userValue = card.userAnswers[input.id];
+      if (userValue?.trim()) {
+        const parsed = parseGermanNumber(userValue);
+        if (!Number.isNaN(parsed) && Math.abs(parsed - input.correctValue) <= input.tolerance) {
+          correctCells++;
+        }
+      }
+    });
+
+    if (correctCells > 0) {
+      setStats(prev => ({
+        ...prev,
+        points: prev.points + (correctCells * 2),
       }));
     }
   };
