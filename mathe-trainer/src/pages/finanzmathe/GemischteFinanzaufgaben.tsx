@@ -1421,59 +1421,41 @@ const renderPlanSolution = (rows: PlanRow[]) => (
   </table>
 );
 
-const buildPlanInputs = (prefix: string, rows: PlanRow[], hiddenFields?: Map<number, Set<string>>) =>
-  rows.flatMap((row, yearIndex) => {
-    // Wenn hiddenFields definiert ist, erstelle nur Inputs für sichtbare Felder
-    const hidden = hiddenFields?.get(yearIndex) || new Set<string>();
-    
-    const inputs: TaskInput[] = [];
-    
-    if (!hidden.has('restStart')) {
-      inputs.push(createInputField(
-        `${prefix}_y${row.year}_debt`,
-        `Jahr ${row.year} • Schuld`,
-        '€',
-        'z.B. 100.000,00',
-        row.restStart,
-        0.02
-      ));
-    }
-    
-    if (!hidden.has('interest')) {
-      inputs.push(createInputField(
-        `${prefix}_y${row.year}_interest`,
-        `Jahr ${row.year} • Zins`,
-        '€',
-        'z.B. 3.200,00',
-        row.interest,
-        0.02
-      ));
-    }
-    
-    if (!hidden.has('tilgung')) {
-      inputs.push(createInputField(
-        `${prefix}_y${row.year}_tilgung`,
-        `Jahr ${row.year} • Tilgung`,
-        '€',
-        'z.B. 12.500,00',
-        row.tilgung,
-        0.02
-      ));
-    }
-    
-    if (!hidden.has('annuity')) {
-      inputs.push(createInputField(
-        `${prefix}_y${row.year}_annuity`,
-        `Jahr ${row.year} • Annuität`,
-        '€',
-        'z.B. 15.700,00',
-        row.annuity,
-        0.02
-      ));
-    }
-    
-    return inputs;
-  });
+const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
+  rows.flatMap(row => [
+    createInputField(
+      `${prefix}_y${row.year}_debt`,
+      `Jahr ${row.year} • Schuld`,
+      '€',
+      'z.B. 100.000,00',
+      row.restStart,
+      0.02
+    ),
+    createInputField(
+      `${prefix}_y${row.year}_interest`,
+      `Jahr ${row.year} • Zins`,
+      '€',
+      'z.B. 3.200,00',
+      row.interest,
+      0.02
+    ),
+    createInputField(
+      `${prefix}_y${row.year}_tilgung`,
+      `Jahr ${row.year} • Tilgung`,
+      '€',
+      'z.B. 12.500,00',
+      row.tilgung,
+      0.02
+    ),
+    createInputField(
+      `${prefix}_y${row.year}_annuity`,
+      `Jahr ${row.year} • Annuität`,
+      '€',
+      'z.B. 15.700,00',
+      row.annuity,
+      0.02
+    ),
+  ]);
 
 const createRatendarlehenPlanTask = (): Task => {
   const loan = randomInt(50, 140) * 1000;
@@ -1554,7 +1536,8 @@ const createRatendarlehenPlanTask = (): Task => {
     type: 'ratendarlehen_plan',
     question,
     solution,
-    inputs: buildPlanInputs('rate', rows, hiddenFields),
+    inputs: buildPlanInputs('rate', rows),
+    _hiddenFields: hiddenFields, // Speichere für Rendering
   };
 };
 
@@ -1642,7 +1625,8 @@ const createAnnuitaetPlanTask = (): Task => {
     type: 'annuitaet_plan',
     question,
     solution,
-    inputs: buildPlanInputs('ann', rows, hiddenFields),
+    inputs: buildPlanInputs('ann', rows),
+    _hiddenFields: hiddenFields, // Speichere für Rendering
   };
 };
 
@@ -2330,10 +2314,23 @@ export default function GemischteFinanzaufgaben() {
                                 <td className="p-2 text-center font-semibold text-slate-600">{row.year}</td>
                                 {PLAN_COLUMNS.map(col => {
                                   const input = row.cells[col.key];
-                                  if (!input) {
-                                    // Spalte existiert nicht als Input (z.B. nicht versteckt bei incomplete_tilgungsplan)
+                                  const hiddenFields = (card.task as any)._hiddenFields;
+                                  const isHidden = hiddenFields?.get(index)?.has(col.key);
+                                  
+                                  if (!input || isHidden) {
+                                    // Spalte nicht als Input vorhanden ODER versteckt - zeige Wert
+                                    if (input) {
+                                      // Es gibt einen Input, aber er ist versteckt - zeige den korrekten Wert
+                                      return (
+                                        <td key={col.key} className="p-2 text-center text-slate-700 font-semibold">
+                                          {formatCurrency(input.correctValue as number)} €
+                                        </td>
+                                      );
+                                    }
+                                    // Spalte existiert gar nicht als Input
                                     return <td key={col.key} className="p-2"></td>;
                                   }
+                                  
                                   const userValue = card.userAnswers[input.id];
                                   const isCorrect = isInputCorrect(input, userValue);
                                   return (
