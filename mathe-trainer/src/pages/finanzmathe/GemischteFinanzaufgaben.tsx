@@ -1886,6 +1886,7 @@ export default function GemischteFinanzaufgaben() {
   };
 
   const handleInputChange = (cardId: number, inputId: string, value: string) => {
+    console.log('handleInputChange called:', cardId, inputId, value);
     setCards(prev => {
       const updatedCards = prev.map(card => {
         if (card.id !== cardId) return card;
@@ -1952,10 +1953,11 @@ export default function GemischteFinanzaufgaben() {
           };
         }
 
-        console.log('Card inputs:', c.task.inputs.map(i => ({ id: i.id, filled: !!c.userAnswers[i.id]?.trim() })));
+        console.log('Card inputs:', c.task.inputs.map(i => ({ id: i.id, filled: !!c.userAnswers[i.id]?.trim(), value: c.userAnswers[i.id] })));
         
         const missingInput = c.task.inputs.some(input => !c.userAnswers[input.id]?.trim());
-        console.log('missingInput:', missingInput);
+        const missingInputs = c.task.inputs.filter(input => !c.userAnswers[input.id]?.trim());
+        console.log('missingInputs:', missingInputs.map(i => i.id));
         
         if (missingInput) {
           attempt = 'invalid';
