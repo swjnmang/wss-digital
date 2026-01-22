@@ -1896,15 +1896,16 @@ export default function GemischteFinanzaufgaben() {
   };
 
   const checkAnswer = (id: number) => {
-    let attempt: 'correct' | 'incorrect' | 'invalid' = 'invalid';
+    let attempt: 'correct' | 'incorrect' | 'solutionShown' | 'invalid' = 'invalid';
     let updatedCards: TaskCard[] = [];
 
     setCards(prev => {
       updatedCards = prev.map(c => {
         if (c.id !== id) return c;
 
-        // Wenn Lösung bereits angezeigt wurde, keine Punkte mehr
+        // Wenn Lösung bereits angezeigt wurde, keine Punkte mehr - aber als Versuch zählen
         if (c.solutionVisible) {
+          attempt = 'solutionShown';
           return {
             ...c,
             feedback: 'Lösung wurde bereits angezeigt. Diese Aufgabe bringt keine Punkte mehr.',
@@ -1957,15 +1958,26 @@ export default function GemischteFinanzaufgaben() {
       return updatedCards;
     });
 
+    // Statistik immer aktualisieren (außer bei ungültigen Inputs)
     if (attempt !== 'invalid') {
-      setStats(prev => ({
-        correct: prev.correct + (attempt === 'correct' ? 1 : 0),
-        total: prev.total + 1,
-        streak: attempt === 'correct' ? prev.streak + 1 : 0,
-        points: prev.points + (attempt === 'correct' ? POINTS_PER_CORRECT : 0),
-      }));
-      // Nach checkAnswer auch Tilgungspläne checken
-      checkCellsAutomatically(id, updatedCards);
+      if (attempt === 'solutionShown') {
+        // Lösung angezeigt: nur Versuch zählen, keine Punkte
+        setStats(prev => ({
+          ...prev,
+          total: prev.total + 1,
+          streak: 0, // Streak bricht ab
+        }));
+      } else {
+        // Normal: Punkte vergeben wenn correct
+        setStats(prev => ({
+          correct: prev.correct + (attempt === 'correct' ? 1 : 0),
+          total: prev.total + 1,
+          streak: attempt === 'correct' ? prev.streak + 1 : 0,
+          points: prev.points + (attempt === 'correct' ? POINTS_PER_CORRECT : 0),
+        }));
+        // Nach checkAnswer auch Tilgungspläne checken
+        checkCellsAutomatically(id, updatedCards);
+      }
     }
   };
 
