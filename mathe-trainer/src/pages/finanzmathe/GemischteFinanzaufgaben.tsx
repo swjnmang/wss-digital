@@ -1930,9 +1930,9 @@ export default function GemischteFinanzaufgaben() {
           if (userValue?.trim()) {
             const isCorrect = isInputCorrect(input, userValue);
             if (isCorrect) {
-              totalPoints += 2;
+              totalPoints += 1;
               const notifId = `${cardId}-${input.id}-${Date.now()}`;
-              notifications.push({ id: notifId, points: 2 });
+              notifications.push({ id: notifId, points: 1 });
             }
           }
         });
@@ -2320,6 +2320,8 @@ export default function GemischteFinanzaufgaben() {
                                               className={`w-full border-2 rounded-xl px-3 py-2 text-base focus:outline-none ${
                                                 userValue && isCorrect
                                                   ? 'border-green-500 bg-green-50 focus:border-green-600'
+                                                  : userValue && !isCorrect
+                                                  ? 'border-red-500 bg-red-50 focus:border-red-600'
                                                   : 'border-slate-300 focus:border-blue-400'
                                               }`}
                                             />
@@ -2389,6 +2391,8 @@ export default function GemischteFinanzaufgaben() {
                                           className={`w-full border-2 rounded-xl px-3 py-2 text-base focus:outline-none ${
                                             userValue && isCorrect
                                               ? 'border-green-500 bg-green-50 focus:border-green-600'
+                                              : userValue && !isCorrect
+                                              ? 'border-red-500 bg-red-50 focus:border-red-600'
                                               : 'border-slate-300 focus:border-blue-400'
                                           }`}
                                         />
