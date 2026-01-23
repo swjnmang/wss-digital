@@ -2009,7 +2009,8 @@ export default function GemischteFinanzaufgaben() {
           });
 
           const isCorrect = correctCells === totalCells && tilgungsartCorrect;
-          const pointsToAward = c.task.pointsAwarded || POINTS_PER_CORRECT;
+          // Pro richtige Zelle: 1 Punkt
+          const pointsToAward = isCorrect ? correctCells : 0;
 
           if (isCorrect) {
             setStats(prev => ({
