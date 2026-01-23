@@ -2443,17 +2443,16 @@ export default function GemischteFinanzaufgaben() {
                   <div className="mb-3 rounded-2xl px-4 py-3 bg-amber-50 border-2 border-amber-200 text-amber-900">
                     <p className="font-semibold mb-2">� Hinweis:</p>
                     <div className="bg-white rounded-lg px-3 py-2">
-                      {typeof card.task.formula === 'string' && /[\^=]|q\^|K_n|K_0|frac|cdot|times/.test(card.task.formula) ? (
-                        <div className="overflow-x-auto">
-                          <InlineMath math={card.task.formula} />
+                      {typeof card.task.formula === 'string' && (card.task.formula.includes('\n') || card.task.formula.includes('konstant') || card.task.formula.includes('Erkenne') || card.task.formula.includes('jährlich')) ? (
+                        <div className="space-y-2 text-sm text-gray-700">
+                          {card.task.formula.split('\n').map((line, idx) => (
+                            line.trim() && <p key={idx}>{line.trim()}</p>
+                          ))
+                          }
                         </div>
                       ) : (
-                        <div className="space-y-2 text-sm text-gray-700">
-                          {typeof card.task.formula === 'string' && 
-                            card.task.formula.split('\n').map((line, idx) => (
-                              line.trim() && <p key={idx}>{line.trim()}</p>
-                            ))
-                          }
+                        <div className="overflow-x-auto">
+                          <InlineMath math={card.task.formula} />
                         </div>
                       )}
                     </div>
