@@ -1918,38 +1918,26 @@ export default function GemischteFinanzaufgaben() {
       // Nach State-Update: Tilgungspläne auto-score wenn nicht gelöst angezeigt
       const card = updatedCards.find(c => c.id === cardId);
       if (card && (card.task.type === 'ratendarlehen_plan' || card.task.type === 'annuitaet_plan' || card.task.type === 'incomplete_tilgungsplan') && !card.solutionVisible) {
-        // Zähle korrekte Zellen
-        let totalPoints = 0;
-        const notifications: Array<{ id: string; points: number }> = [];
-        
-        card.task.inputs.forEach((input) => {
-          // Überspringe Select-Felder
-          if (input.type === 'select') return;
-          
-          const userValue = card.userAnswers[input.id];
+        // Finde die gerade eingefüllte Input
+        const changedInput = card.task.inputs.find(i => i.id === inputId);
+        if (changedInput && changedInput.type !== 'select') {
+          const userValue = card.userAnswers[inputId];
           if (userValue?.trim()) {
-            const isCorrect = isInputCorrect(input, userValue);
+            const isCorrect = isInputCorrect(changedInput, userValue);
             if (isCorrect) {
-              totalPoints += 1;
-              const notifId = `${cardId}-${input.id}-${Date.now()}`;
-              notifications.push({ id: notifId, points: 1 });
+              // Nur für diese neue Eingabe: Punkt und Notification
+              setStats(prev => ({
+                ...prev,
+                points: prev.points + 1,
+              }));
+              
+              const notifId = `${cardId}-${inputId}-${Date.now()}`;
+              setNotifications(prev => [...prev, { id: notifId, points: 1 }]);
+              setTimeout(() => {
+                setNotifications(prev => prev.filter(n => n.id !== notifId));
+              }, 2000);
             }
           }
-        });
-        
-        if (totalPoints > 0) {
-          setStats(prev => ({
-            ...prev,
-            points: prev.points + totalPoints,
-          }));
-          
-          // Zeige Notifications
-          setNotifications(prev => [...prev, ...notifications]);
-          notifications.forEach(notif => {
-            setTimeout(() => {
-              setNotifications(prev => prev.filter(n => n.id !== notif.id));
-            }, 2000);
-          });
         }
       }
       
