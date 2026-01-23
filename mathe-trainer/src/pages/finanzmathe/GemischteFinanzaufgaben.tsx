@@ -391,7 +391,7 @@ const LoanContractDetailed: React.FC<LoanContractProps> = ({
           </tr>
           <tr>
             <td className="py-2 font-semibold text-green-900">Tilgungsmodus</td>
-            <td className="py-2 text-right font-semibold">{type === 'rate' ? 'Ratendarlehen' : 'Annuitätendarlehen'}</td>
+            <td className="py-2 text-right font-semibold">{type === 'rate' ? 'Ratentilgung' : 'Annuitätentilgung: Die Summe aus Zins und Tilgung ist jedes Jahr gleich'}</td>
           </tr>
         </tbody>
       </table>
@@ -631,22 +631,11 @@ const createSimpleInterestTask = (): Task => {
   const Z = (K * p * t) / (100 * 360);
   const Z_rounded = parseFloat(Z.toFixed(2)); // Gerundete Version für Darstellung und weitere Berechnungen
 
-  const durationInfo = useDateRange ? (
-    <p>
-      Zeitraum: <strong>{dateRange!.startLabel} bis {dateRange!.endLabel}</strong> (bankübliches 360-Tage-Jahr).
-    </p>
-  ) : (
-    <p>
-      Dauer: <strong>{t} Tage</strong>.
-    </p>
-  );
+  const durationInfo = useDateRange ? 
+    `Zeitraum: ${dateRange!.startLabel} bis ${dateRange!.endLabel} (bankübliches 360-Tage-Jahr).` : 
+    `Dauer: ${t} Tage.`;
 
-  const baseStory = (
-    <div className="space-y-2">
-      <p>{randomChoice(simpleInterestContexts)}</p>
-      <p>Alle Angaben beziehen sich auf dieselbe Geldanlage.</p>
-    </div>
-  );
+  const baseStory = `${randomChoice(simpleInterestContexts)} Alle Angaben beziehen sich auf dieselbe Geldanlage.`;
 
   let question: React.ReactNode = null;
   let inputs: TaskInput[] = [];
@@ -655,14 +644,9 @@ const createSimpleInterestTask = (): Task => {
   switch (variant) {
     case 'Z': {
       question = (
-        <div className="space-y-2">
-          {baseStory}
-          <p>
-            Er/Sie legt <strong>{formatCurrency(K)} €</strong> an. Die Bank bietet einen Zinssatz von <strong>{formatNumber(p, 2)} %</strong> p.a.
-          </p>
-          {durationInfo}
-          <p className="text-blue-900 font-semibold">Wie viel Zinsen bekommt er/sie gutgeschrieben?</p>
-        </div>
+        <p>
+          {baseStory} Er/Sie legt <strong>{formatCurrency(K)} €</strong> an. Die Bank bietet einen Zinssatz von <strong>{formatNumber(p, 2)} %</strong> p.a. {durationInfo} <span className="text-blue-900 font-semibold">Wie viel Zinsen bekommt er/sie gutgeschrieben?</span>
+        </p>
       );
       inputs = [createInputField('Z', '', '€', 'z.B. 248,50', Z_rounded, Math.max(Z_rounded * 0.005, 0.5))];
       solution = (
@@ -681,17 +665,9 @@ const createSimpleInterestTask = (): Task => {
     case 'K': {
       const capital = (Z_rounded * 100 * 360) / (p * t);
       question = (
-        <div className="space-y-2">
-          {baseStory}
-          <p>
-            Die Bank bietet einen Zinssatz von <strong>{formatNumber(p, 2)} %</strong> p.a. an.
-          </p>
-          {durationInfo}
-          <p>
-            Am Ende der Anlagezeit werden ihm/ihr <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen gutgeschrieben.
-          </p>
-          <p className="text-blue-900 font-semibold">Welcher Betrag wurde ursprünglich angelegt?</p>
-        </div>
+        <p>
+          {baseStory} Die Bank bietet einen Zinssatz von <strong>{formatNumber(p, 2)} %</strong> p.a. an. {durationInfo} Am Ende der Anlagezeit werden ihm/ihr <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen gutgeschrieben. <span className="text-blue-900 font-semibold">Welcher Betrag wurde ursprünglich angelegt?</span>
+        </p>
       );
       inputs = [createInputField('K', '', '€', 'z.B. 18.500,00', capital, Math.max(capital * 0.005, 1))];
       solution = (
@@ -710,17 +686,9 @@ const createSimpleInterestTask = (): Task => {
     case 'p': {
       const rate = (Z_rounded * 100 * 360) / (K * t);
       question = (
-        <div className="space-y-2">
-          {baseStory}
-          <p>
-            Er/Sie legt <strong>{formatCurrency(K)} €</strong> an.
-          </p>
-          {durationInfo}
-          <p>
-            Nach der Anlagezeit erhält er/sie <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen.
-          </p>
-          <p className="text-blue-900 font-semibold">Wie hoch war der vereinbarte Zinssatz?</p>
-        </div>
+        <p>
+          {baseStory} Er/Sie legt <strong>{formatCurrency(K)} €</strong> an. {durationInfo} Nach der Anlagezeit erhält er/sie <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen. <span className="text-blue-900 font-semibold">Wie hoch war der vereinbarte Zinssatz?</span>
+        </p>
       );
       inputs = [createInputField('p', '', '%', 'z.B. 4,25', rate, 0.05, 2)];
       solution = (
@@ -739,16 +707,9 @@ const createSimpleInterestTask = (): Task => {
     case 't': {
       const days = (Z_rounded * 100 * 360) / (K * p);
       question = (
-        <div className="space-y-2">
-          {baseStory}
-          <p>
-            Er/Sie legt <strong>{formatCurrency(K)} €</strong> an einem Konto mit <strong>{formatNumber(p, 2)} %</strong> Zinsen p.a. an.
-          </p>
-          <p>
-            Als die Anlage beendet wird, erhält er/sie <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen.
-          </p>
-          <p className="text-blue-900 font-semibold">Wie lange war das Geld angelegt?</p>
-        </div>
+        <p>
+          {baseStory} Er/Sie legt <strong>{formatCurrency(K)} €</strong> an einem Konto mit <strong>{formatNumber(p, 2)} %</strong> Zinsen p.a. an. Als die Anlage beendet wird, erhält er/sie <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen. <span className="text-blue-900 font-semibold">Wie lange war das Geld angelegt?</span>
+        </p>
       );
       inputs = [createInputField('t', '', 'Tage', 'z.B. 180', days, 0.5, 1)];
       solution = (
@@ -2232,8 +2193,8 @@ export default function GemischteFinanzaufgaben() {
                     return (
                       <div className="flex flex-col items-center justify-center gap-3 mb-3">
                         {card.task.inputs.map(input => (
-                          <div key={input.id} className="max-w-sm flex flex-col sm:flex-row sm:items-center gap-2">
-                            <label className="font-semibold text-slate-600 sm:min-w-[150px]">{input.label}</label>
+                          <div key={input.id} className="max-w-sm flex flex-col items-center gap-1">
+                            <label className="font-semibold text-slate-600">{input.label}</label>
                             <div className="flex items-center gap-2 flex-1 max-w-xs">
                               {input.type === 'select' ? (
                                 <select
