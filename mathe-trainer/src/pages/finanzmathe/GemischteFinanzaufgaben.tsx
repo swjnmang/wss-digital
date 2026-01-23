@@ -1909,40 +1909,47 @@ export default function GemischteFinanzaufgaben() {
   };
 
   const handleInputChange = (cardId: number, inputId: string, value: string) => {
-    setCards(prev => {
-      const updatedCards = prev.map(card => {
-        if (card.id !== cardId) return card;
-        return { ...card, userAnswers: { ...card.userAnswers, [inputId]: value } };
-      });
-      
-      // Nach State-Update: Tilgungspläne auto-score wenn nicht gelöst angezeigt
-      const card = updatedCards.find(c => c.id === cardId);
-      if (card && (card.task.type === 'ratendarlehen_plan' || card.task.type === 'annuitaet_plan' || card.task.type === 'incomplete_tilgungsplan') && !card.solutionVisible) {
-        // Finde die gerade eingefüllte Input
-        const changedInput = card.task.inputs.find(i => i.id === inputId);
-        if (changedInput && changedInput.type !== 'select') {
-          const userValue = card.userAnswers[inputId];
-          if (userValue?.trim()) {
-            const isCorrect = isInputCorrect(changedInput, userValue);
-            if (isCorrect) {
-              // Nur für diese neue Eingabe: Punkt und Notification
-              setStats(prev => ({
-                ...prev,
-                points: prev.points + 1,
-              }));
-              
-              const notifId = `${cardId}-${inputId}-${Date.now()}`;
-              setNotifications(prev => [...prev, { id: notifId, points: 1 }]);
-              setTimeout(() => {
-                setNotifications(prev => prev.filter(n => n.id !== notifId));
-              }, 2000);
-            }
+    // Erst Cards aktualisieren
+    const oldCards = cards;
+    const updatedCards = oldCards.map(card => {
+      if (card.id !== cardId) return card;
+      return { ...card, userAnswers: { ...card.userAnswers, [inputId]: value } };
+    });
+    setCards(updatedCards);
+    
+    // DANN: Tilgungspläne auto-score wenn nicht gelöst angezeigt
+    const card = updatedCards.find(c => c.id === cardId);
+    if (card && (card.task.type === 'ratendarlehen_plan' || card.task.type === 'annuitaet_plan' || card.task.type === 'incomplete_tilgungsplan') && !card.solutionVisible) {
+      // Finde die gerade eingefüllte Input
+      const changedInput = card.task.inputs.find(i => i.id === inputId);
+      if (changedInput && changedInput.type !== 'select') {
+        const userValue = card.userAnswers[inputId];
+        if (userValue?.trim()) {
+          const isCorrect = isInputCorrect(changedInput, userValue);
+          if (isCorrect) {
+            // Nur für diese neue Eingabe: Punkt und Notification
+            setStats(prev => ({
+              ...prev,
+              points: prev.points + 1,
+            }));
+            
+            const notifId = `${cardId}-${inputId}-${Date.now()}`;
+            const newNotif = { id: notifId, points: 1 };
+            
+            // Notification anzeigen
+            setNotifications(prev => [...prev, newNotif]);
+            
+            // Nach 2 Sekunden entfernen
+            const timerId = setTimeout(() => {
+              setNotifications(prev => prev.filter(n => n.id !== notifId));
+            }, 2000);
+            
+            // Cleanup wenn component unmounted
+            return () => clearTimeout(timerId);
           }
         }
       }
-      
-      return updatedCards;
-    });
+    }
   };
 
   const checkAnswer = (id: number) => {
