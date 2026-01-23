@@ -2489,13 +2489,13 @@ export default function GemischteFinanzaufgaben() {
           </div>
 
           {/* Notifications für Punkt-Popups */}
-          <div className="fixed top-8 left-1/2 transform -translate-x-1/2 pointer-events-none">
-            {notifications.map((notif, idx) => (
+          <div className="fixed top-20 left-1/2 transform -translate-x-1/2 pointer-events-none z-50">
+            {notifications.map((notif) => (
               <div
                 key={notif.id}
-                className="animate-bounce mb-2 bg-green-500 text-white font-bold px-4 py-2 rounded-full shadow-lg text-lg"
+                className="mb-3 bg-green-500 text-white font-bold px-6 py-3 rounded-full shadow-2xl text-2xl animate-pulse"
                 style={{
-                  animation: `slideIn 0.5s ease-out, slideOut 0.5s ease-out 1.5s forwards`,
+                  animation: `popupFloat 2s ease-out forwards`,
                 }}
               >
                 +{notif.points}
@@ -2503,24 +2503,14 @@ export default function GemischteFinanzaufgaben() {
             ))}
           </div>
           <style>{`
-            @keyframes slideIn {
-              from {
-                opacity: 0;
-                transform: translateY(-20px);
-              }
-              to {
+            @keyframes popupFloat {
+              0% {
                 opacity: 1;
                 transform: translateY(0);
               }
-            }
-            @keyframes slideOut {
-              from {
-                opacity: 1;
-                transform: translateY(0);
-              }
-              to {
+              100% {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(-40px);
               }
             }
           `}</style>
