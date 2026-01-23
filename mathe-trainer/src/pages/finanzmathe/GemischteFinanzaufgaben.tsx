@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import 'katex/dist/katex.min.css';
 import { InlineMath } from 'react-katex';
 
+// Gamification System für Finanzmathematik Trainer
 const TASK_COUNT = 10;
 const POINTS_PER_CORRECT = 10;
 
