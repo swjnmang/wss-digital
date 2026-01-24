@@ -21,7 +21,7 @@ type FilterType = TaskType | 'mixed' | 'renten_bundled';
 type SimpleInterestVariant = 'Z' | 'K' | 'p' | 't';
 type ZinseszinsVariant = 'Kn' | 'K0' | 'p' | 'n';
 type KapitalmehrungVariant = 'Kn' | 'K0' | 'r' | 'n';
-type RentenVariant = 'Kn' | 'r' | 'K0' | 'n';
+type RentenVariant = 'Kn' | 'r' | 'n';
 type KapitalminderungVariant = 'Kn' | 'K0' | 'r' | 'n';
 
 interface TaskInput {
@@ -1187,13 +1187,12 @@ const createRentenEndwertTask = (): Task => {
   const q = 1 + p / 100;
   const qn = Math.pow(q, n);
   const Kn = (r * (qn - 1)) / (q - 1);
-  const variant = randomChoice<RentenVariant>(['Kn', 'r', 'K0', 'n']);
+  const variant = randomChoice<RentenVariant>(['Kn', 'r', 'n']);
 
   // Determine points based on variant
   const getPointsForVariant = (v: RentenVariant): number => {
     if (v === 'Kn') return 8;      // Mittel
     if (v === 'r') return 15;      // Sehr schwer - Rate bestimmen
-    if (v === 'K0') return 15;     // Sehr schwer - Anfangskapital bestimmen
     if (v === 'n') return 15;      // Sehr schwer - Zeit bestimmen
     return 8;
   };
@@ -1206,8 +1205,6 @@ const createRentenEndwertTask = (): Task => {
     contextText = randomChoice(rentenKnContexts);
   } else if (variant === 'r') {
     contextText = randomChoice(rentenRContexts);
-  } else if (variant === 'K0') {
-    contextText = randomChoice(rentenKnContexts); // Verwende ähnliche Kontexte
   } else if (variant === 'n') {
     contextText = randomChoice(rentenNContexts);
   }
@@ -1265,29 +1262,6 @@ const createRentenEndwertTask = (): Task => {
           </p>
           <p>
             <InlineMath math={latex`r = ${mathNumber(Kn)} \cdot \frac{${mathNumber(q, 4)} - 1}{${mathNumber(q, 4)}^{${n}} - 1} = ${mathNumber(rate, 4)}`} />
-          </p>
-        </div>
-      );
-      break;
-    }
-    case 'K0': {
-      // K0 (Anfangskapital): Lege Betrag an, der sich ansammelt
-      const K0 = Kn / qn;
-      question = (
-        <div className="space-y-2">
-          {story}
-          <p>
-            Nach <strong>{n} Jahren</strong> mit jährlichen Zusatzeinzahlungen von <strong>{formatCurrency(r)} €</strong> (jeweils am Jahresende) soll <strong>{formatCurrency(Kn)} €</strong> erreicht sein. Zinssatz: <strong>{formatNumber(p, 2)} %</strong> p.a.
-          </p>
-          <p className="text-blue-900 font-semibold">Welches Anfangskapital war notwendig?</p>
-        </div>
-      );
-      inputs = [createInputField('K0', '', '€', 'z.B. 8.500,00', K0, Math.max(K0 * 0.005, 1))];
-      solution = (
-        <div className="space-y-1">
-          {solutionIntro}
-          <p>
-            <InlineMath math={latex`K_0 = \frac{${mathNumber(Kn)}}{${mathNumber(q, 4)}^{${n}}} = ${mathNumber(K0, 4)}`} />
           </p>
         </div>
       );
@@ -1440,7 +1414,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
       '€',
       'z.B. 100.000,00',
       row.restStart,
-      0.02
+      row.restStart * 0.01
     ),
     createInputField(
       `${prefix}_y${row.year}_interest`,
@@ -1448,7 +1422,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
       '€',
       'z.B. 3.200,00',
       row.interest,
-      0.02
+      row.interest * 0.01
     ),
     createInputField(
       `${prefix}_y${row.year}_tilgung`,
@@ -1456,7 +1430,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
       '€',
       'z.B. 12.500,00',
       row.tilgung,
-      0.02
+      row.tilgung * 0.01
     ),
     createInputField(
       `${prefix}_y${row.year}_annuity`,
@@ -1464,7 +1438,7 @@ const buildPlanInputs = (prefix: string, rows: PlanRow[]) =>
       '€',
       'z.B. 15.700,00',
       row.annuity,
-      0.02
+      row.annuity * 0.01
     ),
   ]);
 
@@ -1717,7 +1691,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
         unit: '€',
         placeholder: 'z.B. 100.000,00',
         correctValue: row.restStart,
-        tolerance: 0.02,
+        tolerance: row.restStart * 0.01,
         displayDecimals: 2,
       });
     }
@@ -1728,7 +1702,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
         unit: '€',
         placeholder: 'z.B. 3.200,00',
         correctValue: row.interest,
-        tolerance: 0.02,
+        tolerance: row.interest * 0.01,
         displayDecimals: 2,
       });
     }
@@ -1739,7 +1713,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
         unit: '€',
         placeholder: 'z.B. 12.500,00',
         correctValue: row.tilgung,
-        tolerance: 0.02,
+        tolerance: row.tilgung * 0.01,
         displayDecimals: 2,
       });
     }
@@ -1750,7 +1724,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
         unit: '€',
         placeholder: 'z.B. 15.700,00',
         correctValue: row.annuity,
-        tolerance: 0.02,
+        tolerance: row.annuity * 0.01,
         displayDecimals: 2,
       });
     }
