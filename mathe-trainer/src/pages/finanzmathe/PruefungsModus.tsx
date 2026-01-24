@@ -21,7 +21,7 @@ interface PruefungsAufgabe {
   solution: React.ReactNode;
   inputs: any[];
   userAnswers: Record<string, string>;
-  isCorrect: boolean | null;
+  earnedPoints: number;
 }
 
 // Nur serialisierbare Daten für localStorage
@@ -41,7 +41,7 @@ interface PruefungsAufgabeSerialized {
     options?: string[];
   }>;
   userAnswers: Record<string, string>;
-  isCorrect: boolean | null;
+  earnedPoints: number;
 }
 
 interface PruefungsZustandSerialized {
@@ -103,15 +103,21 @@ const generatePruefungsaufgaben = (): PruefungsAufgabe[] => {
     const generator = generatoren[config.generatorKey];
     const task = generator();
 
+    // WICHTIG: Setze Toleranz auf 0,5% für alle Aufgaben im Prüfungsmodus
+    const adjustedInputs = task.inputs.map((input: any) => ({
+      ...input,
+      tolerance: Math.max(input.correctValue * 0.005, 0.01), // 0,5% relative Toleranz
+    }));
+
     aufgaben.push({
       id: `aufgabe_${i}`,
       type: config.generatorKey,
       points: config.points,
       question: task.question,
       solution: task.solution,
-      inputs: task.inputs,
+      inputs: adjustedInputs,
       userAnswers: {},
-      isCorrect: null,
+      earnedPoints: 0,
     });
   }
 
@@ -129,7 +135,7 @@ const serializePruefung = (zustand: PruefungsZustand): PruefungsZustandSerialize
       points: a.points,
       inputs: a.inputs,
       userAnswers: a.userAnswers,
-      isCorrect: a.isCorrect,
+      earnedPoints: a.earnedPoints,
     })),
     aktuelleAufgabeIndex: zustand.aktuelleAufgabeIndex,
     gestartet: zustand.gestartet,
@@ -167,7 +173,7 @@ const deserializePruefung = (serialized: PruefungsZustandSerialized): PruefungsZ
         solution: task.solution,
         inputs: a.inputs, // Use serialized inputs, not newly generated ones!
         userAnswers: a.userAnswers,
-        isCorrect: a.isCorrect,
+        earnedPoints: a.earnedPoints,
       };
     }),
     aktuelleAufgabeIndex: serialized.aktuelleAufgabeIndex,
@@ -464,7 +470,7 @@ interface ResultsScreenProps {
 
 const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => {
   const totalPoints = zustand.aufgaben.reduce((sum, aufgabe) => {
-    return sum + (aufgabe.isCorrect ? aufgabe.points : 0);
+    return sum + aufgabe.earnedPoints;
   }, 0);
   
   const maxPoints = zustand.aufgaben.reduce((sum, aufgabe) => sum + aufgabe.points, 0);
@@ -475,99 +481,154 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 15;
+    const margin = 12;
     let currentY = margin;
 
     // Header
-    doc.setFontSize(20);
+    doc.setFontSize(22);
     doc.setFont(undefined, 'bold');
     doc.text('Prüfungszertifikat', pageWidth / 2, currentY, { align: 'center' });
     
-    currentY += 15;
-    doc.setFontSize(11);
+    currentY += 10;
+    doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
-    doc.text('wss-digital.de | Finanzmathe Prüfung', pageWidth / 2, currentY, { align: 'center' });
+    doc.text('Finanzmathe Prüfung | wss-digital.de', pageWidth / 2, currentY, { align: 'center' });
+    
+    // Trennlinie
+    currentY += 8;
+    doc.setDrawColor(0, 0, 0);
+    doc.line(margin, currentY, pageWidth - margin, currentY);
+    currentY += 5;
 
     // Studentinformation
-    currentY += 20;
     doc.setFont(undefined, 'bold');
-    doc.text('Studentische Daten:', margin, currentY);
-    currentY += 7;
+    doc.setFontSize(11);
+    doc.text('Schüler/in:', margin, currentY);
+    currentY += 6;
     doc.setFont(undefined, 'normal');
-    doc.text(`Name: ${zustand.name}`, margin + 5, currentY);
-    currentY += 7;
-    doc.text(`Klasse: ${zustand.klasse}`, margin + 5, currentY);
-    currentY += 7;
-    doc.text(`Datum: ${new Date().toLocaleDateString('de-DE')}`, margin + 5, currentY);
+    doc.setFontSize(10);
+    doc.text(`Name: ${zustand.name}`, margin + 8, currentY);
+    currentY += 5;
+    doc.text(`Klasse: ${zustand.klasse}`, margin + 8, currentY);
+    currentY += 5;
+    doc.text(`Datum: ${new Date().toLocaleDateString('de-DE')}`, margin + 8, currentY);
 
     // Ergebnisse
-    currentY += 15;
+    currentY += 8;
     doc.setFont(undefined, 'bold');
+    doc.setFontSize(11);
     doc.text('Ergebnisse:', margin, currentY);
-    currentY += 10;
+    currentY += 6;
     doc.setFont(undefined, 'normal');
-    doc.text(`Erreichte Punkte: ${totalPoints} / ${maxPoints}`, margin + 5, currentY);
-    currentY += 7;
-    doc.text(`Prozentangabe: ${percentage}%`, margin + 5, currentY);
-    currentY += 10;
+    doc.setFontSize(10);
+    doc.text(`Erreichte Punkte: ${totalPoints.toFixed(1)} / ${maxPoints} Punkte`, margin + 8, currentY);
+    currentY += 5;
+    doc.text(`Erfolgsquote: ${percentage}%`, margin + 8, currentY);
+    currentY += 8;
 
-    // Status Badge
+    // Status
     doc.setFont(undefined, 'bold');
+    doc.setFontSize(12);
     if (passed) {
       doc.setTextColor(34, 197, 94); // green
-      doc.text(`✓ BESTANDEN`, margin + 5, currentY);
+      doc.text('✓ BESTANDEN', margin + 8, currentY);
     } else {
-      doc.setTextColor(239, 68, 68); // red
-      doc.text(`✗ NICHT BESTANDEN (mind. 50% erforderlich)`, margin + 5, currentY);
+      doc.setTextColor(220, 38, 38); // red
+      doc.text('✗ NICHT BESTANDEN', margin + 8, currentY);
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      currentY += 5;
+      doc.text('(Mindestens 50% erforderlich)', margin + 8, currentY);
     }
     doc.setTextColor(0, 0, 0);
 
-    // Aufgabenliste
-    currentY += 20;
+    // Aufgaben Details
+    currentY += 12;
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(11);
+    doc.text('Aufgabenübersicht:', margin, currentY);
+    currentY += 8;
+
+    // Kleine Aufgabenliste
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'normal');
+    zustand.aufgaben.forEach((aufgabe, index) => {
+      if (currentY > pageHeight - 25) {
+        doc.addPage();
+        currentY = margin;
+      }
+      
+      const earned = aufgabe.earnedPoints;
+      const status = earned === aufgabe.points ? '✓' : earned > 0 ? '◐' : '✗';
+      doc.text(`${status} Aufgabe ${index + 1}: ${aufgabe.points} Punkte (${earned.toFixed(1)} erreicht)`, margin + 2, currentY);
+      currentY += 4;
+    });
+
+    // Neue Seite für detaillierte Lösungen
+    doc.addPage();
+    currentY = margin;
     doc.setFont(undefined, 'bold');
     doc.setFontSize(12);
-    doc.text('Aufgaben und Lösungen:', margin, currentY);
+    doc.text('Detaillierte Lösungen:', margin, currentY);
     currentY += 8;
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
 
+    // Detaillierte Aufgaben
     zustand.aufgaben.forEach((aufgabe, index) => {
-      // Prüfe, ob eine neue Seite nötig ist
-      if (currentY > pageHeight - 40) {
+      if (currentY > pageHeight - 30) {
         doc.addPage();
         currentY = margin;
       }
 
-      // Aufgabe
+      // Aufgabentitel
       doc.setFont(undefined, 'bold');
-      doc.text(`Aufgabe ${index + 1} (${aufgabe.points} Punkte) - ${aufgabe.type}`, margin, currentY);
-      currentY += 6;
+      doc.setFontSize(10);
+      const statusText = aufgabe.earnedPoints === aufgabe.points ? '✓' : aufgabe.earnedPoints > 0 ? '◐' : '✗';
+      doc.text(`Aufgabe ${index + 1} - ${statusText}`, margin, currentY);
+      currentY += 5;
 
       doc.setFont(undefined, 'normal');
-      const maxWidth = pageWidth - 2 * margin;
+      doc.setFontSize(9);
       
-      // Korrekte Antwort
-      const correctAnswers = aufgabe.inputs
-        .map(input => {
-          const userValue = aufgabe.userAnswers[input.id] || '(keine Antwort)';
-          const isCorrect = aufgabe.userAnswers[input.id] && isInputCorrect(input, aufgabe.userAnswers[input.id]);
-          return `${input.label}: ${userValue} (erwartet: ${input.correctValue.toFixed(input.displayDecimals || 2)}) ${isCorrect ? '✓' : '✗'}`;
-        })
-        .join(' | ');
-      
-      const wrappedText = doc.splitTextToSize(correctAnswers, maxWidth - 5);
-      doc.text(wrappedText, margin + 5, currentY);
-      currentY += wrappedText.length * 5 + 4;
+      // Input-Details
+      const maxWidth = pageWidth - 2 * margin - 4;
+      aufgabe.inputs.forEach(input => {
+        if (currentY > pageHeight - 15) {
+          doc.addPage();
+          currentY = margin;
+        }
+
+        const userValue = aufgabe.userAnswers[input.id];
+        const isCorrect = userValue && isInputCorrect(input, userValue);
+        const status = isCorrect ? '✓' : userValue ? '✗' : '−';
+        
+        const label = input.label || input.id;
+        const unit = input.unit ? ` (${input.unit})` : '';
+        const expected = `${input.correctValue.toFixed(input.displayDecimals || 2)}`;
+        const answered = userValue || '−';
+
+        // Kompaktes Format
+        const line = `${status} ${label}${unit}: ${answered} [erw. ${expected}]`;
+        const wrappedLines = doc.splitTextToSize(line, maxWidth);
+        doc.text(wrappedLines, margin + 4, currentY);
+        currentY += wrappedLines.length * 3.5 + 1;
+      });
+
+      currentY += 3;
     });
 
     // Footer
-    currentY = pageHeight - 15;
-    doc.setFontSize(9);
-    doc.setFont(undefined, 'italic');
-    doc.text('Dies ist ein automatisch generiertes Dokument.', margin, currentY);
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFont(undefined, 'italic');
+      doc.setFontSize(8);
+      doc.text(`Seite ${i} von ${totalPages}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+    }
 
     // Speichern
-    doc.save(`Pruefungszertifikat_${zustand.name}_${new Date().toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' })}.pdf`);
+    const filename = `Pruefungszertifikat_${zustand.name.replace(/\s+/g, '_')}_${new Date().toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' })}.pdf`;
+    doc.save(filename);
   };
 
   return (
@@ -717,13 +778,29 @@ export const PruefungsModus: React.FC = () => {
   const handleFinish = () => {
     if (!zustand) return;
 
-    // Überprüfe alle Antworten
-    const aufgabenMitErgebnissen = zustand.aufgaben.map(aufgabe => ({
-      ...aufgabe,
-      isCorrect: aufgabe.inputs.every(input => 
-        aufgabe.userAnswers[input.id] && isInputCorrect(input, aufgabe.userAnswers[input.id])
-      ),
-    }));
+    // Bewerte alle Aufgaben mit flexibler Punkt-Vergabe
+    const aufgabenMitErgebnissen = zustand.aufgaben.map(aufgabe => {
+      let earnedPoints = 0;
+
+      // Für Tilgungspläne: 0,5 Punkte pro richtige Zelle
+      if (aufgabe.type === 'ratendarlehen_plan' || aufgabe.type === 'annuitaet_plan') {
+        const correctCells = aufgabe.inputs.filter(input =>
+          aufgabe.userAnswers[input.id] && isInputCorrect(input, aufgabe.userAnswers[input.id])
+        ).length;
+        earnedPoints = Math.min(correctCells * 0.5, aufgabe.points);
+      } else {
+        // Für andere Aufgaben: Alle Inputs müssen richtig sein (alles-oder-nichts)
+        const allCorrect = aufgabe.inputs.every(input =>
+          aufgabe.userAnswers[input.id] && isInputCorrect(input, aufgabe.userAnswers[input.id])
+        );
+        earnedPoints = allCorrect ? aufgabe.points : 0;
+      }
+
+      return {
+        ...aufgabe,
+        earnedPoints: Math.round(earnedPoints * 10) / 10, // Runde auf 0,1 Punkte
+      };
+    });
 
     const neuerZustand = {
       ...zustand,
