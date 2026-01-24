@@ -64,6 +64,10 @@ export default function ExercisesDownload() {
     setSelectedTypes(new Set());
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   const getInputDescription = (taskType: TaskType, input: any) => {
     // Beschreibungen basierend auf Task-Type und Input-ID
     const descriptions: Record<TaskType, Record<string, string>> = {
@@ -374,6 +378,13 @@ export default function ExercisesDownload() {
                 className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 disabled:opacity-50"
               >
                 Abbrechen
+              </button>
+              <button
+                onClick={handlePrint}
+                disabled={isGenerating || selectedTypes.size === 0}
+                className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50"
+              >
+                Ausdrucken
               </button>
               <button
                 onClick={generatePDF}
