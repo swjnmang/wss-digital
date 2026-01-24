@@ -120,7 +120,7 @@ export default function ExercisesDownload() {
 
       for (const item of tasks) {
         // Prüfe ob neuer Seitenumbruch nötig ist (mit Platz für Aufgabe)
-        if (currentY > pageHeight - 60) {
+        if (currentY > pageHeight - 70) {
           doc.addPage();
           pageNum++;
           addHeader(pageNum);
@@ -136,23 +136,21 @@ export default function ExercisesDownload() {
           margin,
           currentY
         );
-        currentY += 8;
+        currentY += 7;
 
-        // Aufgabentext - vereinfachte Darstellung
+        // Eingabe-Labels mit Platz für Antwort
         doc.setTextColor(0, 0, 0);
         doc.setFont('Helvetica', 'normal');
-        doc.setFontSize(11);
-        
-        // Fallback Text
-        const aufgabenText = `[Aufgabe ${item.number}: ${taskTypeLabels[item.type as TaskType]}]`;
-        const lines = doc.splitTextToSize(aufgabenText, contentWidth - 4);
-        doc.text(lines, margin + 2, currentY);
-        currentY += lines.length * 5 + 3;
+        doc.setFontSize(10);
 
-        // Eingabefeld für Antwort
-        doc.setDrawColor(180, 180, 180);
-        doc.rect(margin + 2, currentY, contentWidth - 4, 25);
-        currentY += 30;
+        // Zeige alle Input-Felder
+        for (const input of item.task.inputs) {
+          const inputLine = `${input.label} (${input.unit}): _________________`;
+          doc.text(inputLine, margin + 2, currentY);
+          currentY += 5;
+        }
+
+        currentY += 3;
 
         // Trennlinie
         doc.setDrawColor(230, 230, 230);
@@ -174,7 +172,7 @@ export default function ExercisesDownload() {
 
       for (const item of tasks) {
         // Neuer Seitenumbruch wenn nötig
-        if (currentY > pageHeight - 40) {
+        if (currentY > pageHeight - 50) {
           doc.addPage();
           pageNum++;
           addHeader(pageNum);
@@ -188,15 +186,25 @@ export default function ExercisesDownload() {
         doc.text(`Lösung Aufgabe ${item.number}`, margin, currentY);
         currentY += 7;
 
-        // Lösungstext
+        // Lösungswerte
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
         doc.setFont('Helvetica', 'normal');
-        
-        const lösungsText = `[Lösung für Aufgabe ${item.number}]`;
-        const lösungsLines = doc.splitTextToSize(lösungsText, contentWidth - 4);
-        doc.text(lösungsLines, margin + 2, currentY);
-        currentY += lösungsLines.length * 5 + 8;
+
+        for (const input of item.task.inputs) {
+          const displayValue = typeof input.correctValue === 'number' 
+            ? input.correctValue.toLocaleString('de-DE', { 
+                minimumFractionDigits: input.displayDecimals || 2, 
+                maximumFractionDigits: input.displayDecimals || 2 
+              })
+            : input.correctValue;
+          
+          const lösungsText = `${input.label}: ${displayValue} ${input.unit}`;
+          doc.text(lösungsText, margin + 2, currentY);
+          currentY += 5;
+        }
+
+        currentY += 3;
 
         // Trennlinie
         doc.setDrawColor(230, 230, 230);
