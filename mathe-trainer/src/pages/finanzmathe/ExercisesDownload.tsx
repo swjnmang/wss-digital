@@ -109,7 +109,7 @@ export default function ExercisesDownload() {
       let currentY = margin;
 
       // Kopfzeile mit Website
-      const addHeader = (page: number) => {
+      const addHeader = () => {
         doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
         doc.text('wss-digital.de - wirtschaftsschule digital - Portal für die Wirtschaftsschule', pageWidth / 2, 7, { align: 'center' });
@@ -117,7 +117,15 @@ export default function ExercisesDownload() {
         doc.line(margin, 10, pageWidth - margin, 10);
       };
 
+      // Helper: Füge neue Seite hinzu
+      const addNewPage = () => {
+        doc.addPage();
+        addHeader();
+        currentY = margin + 15;
+      };
+
       // Titel auf erster Seite
+      addHeader();
       doc.setFontSize(20);
       doc.setTextColor(0, 0, 139);
       doc.text('Übungsaufgaben Finanzmathematik', pageWidth / 2, currentY + 10, { align: 'center' });
@@ -144,15 +152,11 @@ export default function ExercisesDownload() {
       // Aufgaben auf Seiten
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
-      let pageNum = 1;
 
       for (const item of tasks) {
-        // Prüfe ob neuer Seitenumbruch nötig ist (mit Platz für Aufgabe)
-        if (currentY > pageHeight - 70) {
-          doc.addPage();
-          pageNum++;
-          addHeader(pageNum);
-          currentY = margin + 15;
+        // Prüfe ob neuer Seitenumbruch nötig ist
+        if (currentY > pageHeight - 80) {
+          addNewPage();
         }
 
         // Aufgabennummer und Typ
@@ -164,48 +168,67 @@ export default function ExercisesDownload() {
           margin,
           currentY
         );
-        currentY += 7;
+        currentY += 8;
 
-        // Eingabe-Labels mit Platz für Antwort
+        // Aufgaben-Text: Zeige alle Inputs außer dem letzten (der letzte ist normalerweise der gesuchte)
         doc.setTextColor(0, 0, 0);
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(10);
 
-        // Zeige alle Input-Felder
-        for (const input of item.task.inputs) {
+        // Zeige die gegebenen Werte (alle außer dem letzten Input-Feld)
+        const givenInputs = item.task.inputs.slice(0, -1);
+        for (const input of givenInputs) {
           const description = getInputDescription(item.type, input);
-          const inputLine = `${description} (${input.unit}): _________________`;
-          doc.text(inputLine, margin + 2, currentY);
-          currentY += 5;
+          const displayValue = typeof input.correctValue === 'number' 
+            ? input.correctValue.toLocaleString('de-DE', { 
+                minimumFractionDigits: input.displayDecimals || 2, 
+                maximumFractionDigits: input.displayDecimals || 2 
+              })
+            : input.correctValue;
+          
+          const givenLine = `Gegeben: ${description} = ${displayValue} ${input.unit}`;
+          const wrappedGiven = doc.splitTextToSize(givenLine, contentWidth - 4);
+          doc.text(wrappedGiven, margin + 2, currentY);
+          currentY += wrappedGiven.length * 4;
         }
 
-        currentY += 3;
+        // Zeige das gesuchte Feld (letzter Input)
+        if (item.task.inputs.length > 0) {
+          const lastInput = item.task.inputs[item.task.inputs.length - 1];
+          const description = getInputDescription(item.type, lastInput);
+          const soughtLine = `Gesucht: ${description} (${lastInput.unit})`;
+          doc.setFont('Helvetica', 'bold');
+          doc.setTextColor(0, 0, 139);
+          doc.text(soughtLine, margin + 2, currentY);
+          currentY += 6;
+
+          // Eingabefeld
+          doc.setTextColor(0, 0, 0);
+          doc.setFont('Helvetica', 'normal');
+          doc.setDrawColor(150, 150, 150);
+          doc.rect(margin + 2, currentY, contentWidth - 4, 8);
+          currentY += 12;
+        }
 
         // Trennlinie
-        doc.setDrawColor(230, 230, 230);
+        doc.setDrawColor(200, 200, 200);
         doc.line(margin, currentY, pageWidth - margin, currentY);
-        currentY += 4;
+        currentY += 5;
       }
 
-      // Lösungsseiten
-      doc.addPage();
-      pageNum++;
-      addHeader(pageNum);
-      currentY = margin + 15;
+      // === LÖSUNGSSEITEN ===
+      addNewPage();
 
       doc.setFontSize(16);
       doc.setTextColor(0, 0, 139);
       doc.setFont('Helvetica', 'bold');
       doc.text('Musterlösungen', pageWidth / 2, currentY, { align: 'center' });
-      currentY += 15;
+      currentY += 12;
 
       for (const item of tasks) {
         // Neuer Seitenumbruch wenn nötig
-        if (currentY > pageHeight - 50) {
-          doc.addPage();
-          pageNum++;
-          addHeader(pageNum);
-          currentY = margin + 15;
+        if (currentY > pageHeight - 60) {
+          addNewPage();
         }
 
         // Lösungstitel
@@ -215,12 +238,13 @@ export default function ExercisesDownload() {
         doc.text(`Lösung Aufgabe ${item.number}`, margin, currentY);
         currentY += 7;
 
-        // Lösungswerte
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
+        // Givenene Werte
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
         doc.setFont('Helvetica', 'normal');
-
-        for (const input of item.task.inputs) {
+        
+        const givenInputs = item.task.inputs.slice(0, -1);
+        for (const input of givenInputs) {
           const description = getInputDescription(item.type, input);
           const displayValue = typeof input.correctValue === 'number' 
             ? input.correctValue.toLocaleString('de-DE', { 
@@ -229,15 +253,35 @@ export default function ExercisesDownload() {
               })
             : input.correctValue;
           
-          const lösungsText = `${description}: ${displayValue} ${input.unit}`;
-          doc.text(lösungsText, margin + 2, currentY);
-          currentY += 5;
+          const givenLine = `${description} = ${displayValue} ${input.unit}`;
+          doc.text(givenLine, margin + 2, currentY);
+          currentY += 4;
         }
 
-        currentY += 3;
+        currentY += 2;
+
+        // Lösungswerte (Rechnung)
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('Helvetica', 'bold');
+
+        if (item.task.inputs.length > 0) {
+          const lastInput = item.task.inputs[item.task.inputs.length - 1];
+          const description = getInputDescription(item.type, lastInput);
+          const displayValue = typeof lastInput.correctValue === 'number' 
+            ? lastInput.correctValue.toLocaleString('de-DE', { 
+                minimumFractionDigits: lastInput.displayDecimals || 2, 
+                maximumFractionDigits: lastInput.displayDecimals || 2 
+              })
+            : lastInput.correctValue;
+          
+          const lösungsText = `${description} = ${displayValue} ${lastInput.unit}`;
+          doc.text(lösungsText, margin + 2, currentY);
+          currentY += 7;
+        }
 
         // Trennlinie
-        doc.setDrawColor(230, 230, 230);
+        doc.setDrawColor(200, 200, 200);
         doc.line(margin, currentY, pageWidth - margin, currentY);
         currentY += 4;
       }
