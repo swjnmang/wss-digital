@@ -64,6 +64,34 @@ export default function ExercisesDownload() {
     setSelectedTypes(new Set());
   };
 
+  const getInputDescription = (taskType: TaskType, input: any) => {
+    // Beschreibungen basierend auf Task-Type und Input-ID
+    const descriptions: Record<TaskType, Record<string, string>> = {
+      simple_interest: { Z: 'Zinsen', K: 'Kapital', p: 'Zinssatz', t: 'Tage' },
+      zinseszins: { Kn: 'Endkapital', K0: 'Anfangskapital', p: 'Zinssatz', n: 'Jahre' },
+      kapitalmehrung: { Kn: 'Endkapital', K0: 'Anfangskapital', r: 'Jahresrate', n: 'Jahre' },
+      kapitalminderung: { Kn: 'Endkapital', K0: 'Anfangskapital', r: 'Jahresrate', n: 'Jahre' },
+      renten_endwert: { Kn: 'Endwert', r: 'Jahresrate', n: 'Jahre' },
+      ratendarlehen_plan: { debt: 'Schuld', interest: 'Zinsen', rate: 'Tilgung' },
+      annuitaet_plan: { debt: 'Schuld', interest: 'Zinsen', annuity: 'Annuität' },
+    };
+
+    const taskDesc = descriptions[taskType];
+    if (!taskDesc) return input.label || input.id || '?';
+
+    // Prüfe ob es ein dynamisches Feld ist (z.B. "plan_y2_debt")
+    if (input.id.includes('_y')) {
+      const match = input.id.match(/_y(\d+)_(.*)/);
+      if (match) {
+        const [, year, type] = match;
+        const typeDesc = descriptions[taskType]?.[type] || type;
+        return `Jahr ${year}: ${typeDesc}`;
+      }
+    }
+
+    return taskDesc[input.id] || input.label || input.id || '?';
+  };
+
   const generatePDF = async () => {
     if (selectedTypes.size === 0) {
       alert('Bitte wähle mindestens einen Aufgabentyp aus!');
@@ -82,9 +110,9 @@ export default function ExercisesDownload() {
 
       // Kopfzeile mit Website
       const addHeader = (page: number) => {
-        doc.setFontSize(9);
+        doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
-        doc.text('www.wss-digital.de', pageWidth / 2, 7, { align: 'center' });
+        doc.text('wss-digital.de - wirtschaftsschule digital - Portal für die Wirtschaftsschule', pageWidth / 2, 7, { align: 'center' });
         doc.setDrawColor(220, 220, 220);
         doc.line(margin, 10, pageWidth - margin, 10);
       };
@@ -145,7 +173,8 @@ export default function ExercisesDownload() {
 
         // Zeige alle Input-Felder
         for (const input of item.task.inputs) {
-          const inputLine = `${input.label} (${input.unit}): _________________`;
+          const description = getInputDescription(item.type, input);
+          const inputLine = `${description} (${input.unit}): _________________`;
           doc.text(inputLine, margin + 2, currentY);
           currentY += 5;
         }
@@ -192,6 +221,7 @@ export default function ExercisesDownload() {
         doc.setFont('Helvetica', 'normal');
 
         for (const input of item.task.inputs) {
+          const description = getInputDescription(item.type, input);
           const displayValue = typeof input.correctValue === 'number' 
             ? input.correctValue.toLocaleString('de-DE', { 
                 minimumFractionDigits: input.displayDecimals || 2, 
@@ -199,7 +229,7 @@ export default function ExercisesDownload() {
               })
             : input.correctValue;
           
-          const lösungsText = `${input.label}: ${displayValue} ${input.unit}`;
+          const lösungsText = `${description}: ${displayValue} ${input.unit}`;
           doc.text(lösungsText, margin + 2, currentY);
           currentY += 5;
         }
