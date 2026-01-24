@@ -481,47 +481,67 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 12;
+    const margin = 15;
+    const textWidth = pageWidth - 2 * margin; // Verfügbare Breite für Text
     let currentY = margin;
+
+    // Helper-Funktion für Text mit Umbruch und Sicherheit
+    const addWrappedText = (text: string, x: number, fontSize: number, maxWidth: number) => {
+      doc.setFontSize(fontSize);
+      const lines = doc.splitTextToSize(text, maxWidth);
+      const lineHeight = fontSize * 0.35; // Zeilenabstand
+      
+      lines.forEach((line, idx) => {
+        if (currentY > pageHeight - 15) {
+          doc.addPage();
+          currentY = margin;
+        }
+        doc.text(line, x, currentY);
+        currentY += lineHeight + 2;
+      });
+      return lines.length;
+    };
 
     // Header
     doc.setFontSize(22);
     doc.setFont(undefined, 'bold');
     doc.text('Prüfungszertifikat', pageWidth / 2, currentY, { align: 'center' });
+    currentY += 12;
     
-    currentY += 10;
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
     doc.text('Finanzmathe Prüfung | wss-digital.de', pageWidth / 2, currentY, { align: 'center' });
+    currentY += 10;
     
     // Trennlinie
-    currentY += 8;
-    doc.setDrawColor(0, 0, 0);
+    doc.setDrawColor(100, 100, 100);
     doc.line(margin, currentY, pageWidth - margin, currentY);
-    currentY += 5;
+    currentY += 8;
 
     // Studentinformation
     doc.setFont(undefined, 'bold');
     doc.setFontSize(11);
     doc.text('Schüler/in:', margin, currentY);
     currentY += 6;
+    
     doc.setFont(undefined, 'normal');
     doc.setFontSize(10);
-    doc.text(`Name: ${zustand.name}`, margin + 8, currentY);
+    doc.text(`Name: ${zustand.name.substring(0, 50)}`, margin + 8, currentY);
     currentY += 5;
-    doc.text(`Klasse: ${zustand.klasse}`, margin + 8, currentY);
+    doc.text(`Klasse: ${zustand.klasse.substring(0, 30)}`, margin + 8, currentY);
     currentY += 5;
     doc.text(`Datum: ${new Date().toLocaleDateString('de-DE')}`, margin + 8, currentY);
+    currentY += 10;
 
     // Ergebnisse
-    currentY += 8;
     doc.setFont(undefined, 'bold');
     doc.setFontSize(11);
     doc.text('Ergebnisse:', margin, currentY);
     currentY += 6;
+    
     doc.setFont(undefined, 'normal');
     doc.setFontSize(10);
-    doc.text(`Erreichte Punkte: ${totalPoints.toFixed(1)} / ${maxPoints} Punkte`, margin + 8, currentY);
+    doc.text(`Erreichte Punkte: ${totalPoints.toFixed(1)} / ${maxPoints}`, margin + 8, currentY);
     currentY += 5;
     doc.text(`Erfolgsquote: ${percentage}%`, margin + 8, currentY);
     currentY += 8;
@@ -530,10 +550,10 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
     doc.setFont(undefined, 'bold');
     doc.setFontSize(12);
     if (passed) {
-      doc.setTextColor(34, 197, 94); // green
+      doc.setTextColor(34, 197, 94);
       doc.text('✓ BESTANDEN', margin + 8, currentY);
     } else {
-      doc.setTextColor(220, 38, 38); // red
+      doc.setTextColor(220, 38, 38);
       doc.text('✗ NICHT BESTANDEN', margin + 8, currentY);
       doc.setFont(undefined, 'normal');
       doc.setFontSize(9);
@@ -542,30 +562,34 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
       doc.text('(Mindestens 50% erforderlich)', margin + 8, currentY);
     }
     doc.setTextColor(0, 0, 0);
+    currentY += 10;
 
-    // Aufgaben Details
-    currentY += 12;
+    // Aufgabenübersicht
+    if (currentY > pageHeight - 40) {
+      doc.addPage();
+      currentY = margin;
+    }
+    
     doc.setFont(undefined, 'bold');
     doc.setFontSize(11);
     doc.text('Aufgabenübersicht:', margin, currentY);
-    currentY += 8;
+    currentY += 7;
 
-    // Kleine Aufgabenliste
-    doc.setFontSize(9);
     doc.setFont(undefined, 'normal');
+    doc.setFontSize(9);
     zustand.aufgaben.forEach((aufgabe, index) => {
-      if (currentY > pageHeight - 25) {
+      if (currentY > pageHeight - 20) {
         doc.addPage();
         currentY = margin;
       }
-      
       const earned = aufgabe.earnedPoints;
       const status = earned === aufgabe.points ? '✓' : earned > 0 ? '◐' : '✗';
-      doc.text(`${status} Aufgabe ${index + 1}: ${aufgabe.points} Punkte (${earned.toFixed(1)} erreicht)`, margin + 2, currentY);
-      currentY += 4;
+      const line = `${status} Aufgabe ${index + 1}: ${aufgabe.points} Pkt. (${earned.toFixed(1)} erhalten)`;
+      doc.text(line, margin + 4, currentY);
+      currentY += 4.5;
     });
 
-    // Neue Seite für detaillierte Lösungen
+    // === Seite 2: Detaillierte Lösungen ===
     doc.addPage();
     currentY = margin;
     doc.setFont(undefined, 'bold');
@@ -575,7 +599,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
 
     // Detaillierte Aufgaben
     zustand.aufgaben.forEach((aufgabe, index) => {
-      if (currentY > pageHeight - 30) {
+      if (currentY > pageHeight - 25) {
         doc.addPage();
         currentY = margin;
       }
@@ -584,16 +608,16 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
       doc.setFont(undefined, 'bold');
       doc.setFontSize(10);
       const statusText = aufgabe.earnedPoints === aufgabe.points ? '✓' : aufgabe.earnedPoints > 0 ? '◐' : '✗';
-      doc.text(`Aufgabe ${index + 1} - ${statusText}`, margin, currentY);
-      currentY += 5;
+      const titleLine = `Aufgabe ${index + 1} - ${statusText} (${aufgabe.earnedPoints.toFixed(1)}/${aufgabe.points} Pkt.)`;
+      doc.text(titleLine, margin, currentY);
+      currentY += 6;
 
       doc.setFont(undefined, 'normal');
-      doc.setFontSize(9);
+      doc.setFontSize(8);
       
-      // Input-Details
-      const maxWidth = pageWidth - 2 * margin - 4;
+      // Input-Details mit sicherer Textumbruchlogik
       aufgabe.inputs.forEach(input => {
-        if (currentY > pageHeight - 15) {
+        if (currentY > pageHeight - 12) {
           doc.addPage();
           currentY = margin;
         }
@@ -602,32 +626,40 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
         const isCorrect = userValue && isInputCorrect(input, userValue);
         const status = isCorrect ? '✓' : userValue ? '✗' : '−';
         
-        const label = input.label || input.id;
+        const label = (input.label || input.id).substring(0, 30);
         const unit = input.unit ? ` (${input.unit})` : '';
-        const expected = `${input.correctValue.toFixed(input.displayDecimals || 2)}`;
-        const answered = userValue || '−';
+        const expected = input.correctValue.toFixed(input.displayDecimals || 2).substring(0, 20);
+        const answered = (userValue || '−').substring(0, 20);
 
-        // Kompaktes Format
+        // Kompaktes Format mit Sicherheit
         const line = `${status} ${label}${unit}: ${answered} [erw. ${expected}]`;
-        const wrappedLines = doc.splitTextToSize(line, maxWidth);
-        doc.text(wrappedLines, margin + 4, currentY);
-        currentY += wrappedLines.length * 3.5 + 1;
+        const wrappedLines = doc.splitTextToSize(line, textWidth - 8);
+        
+        wrappedLines.forEach((wrappedLine, idx) => {
+          if (currentY > pageHeight - 10) {
+            doc.addPage();
+            currentY = margin;
+          }
+          doc.text(wrappedLine, margin + 4, currentY);
+          currentY += 3.5;
+        });
       });
 
-      currentY += 3;
+      currentY += 2;
     });
 
-    // Footer
+    // Footer auf allen Seiten
     const totalPages = doc.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
       doc.setPage(i);
       doc.setFont(undefined, 'italic');
       doc.setFontSize(8);
-      doc.text(`Seite ${i} von ${totalPages}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+      doc.text(`Seite ${i} von ${totalPages}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
     }
 
     // Speichern
-    const filename = `Pruefungszertifikat_${zustand.name.replace(/\s+/g, '_')}_${new Date().toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' })}.pdf`;
+    const safeName = zustand.name.replace(/[^a-zA-Z0-9äöüß\-_]/g, '_').substring(0, 50);
+    const filename = `Pruefungszertifikat_${safeName}_${new Date().toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' })}.pdf`;
     doc.save(filename);
   };
 
