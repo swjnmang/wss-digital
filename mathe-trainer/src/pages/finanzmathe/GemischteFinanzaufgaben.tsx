@@ -1228,7 +1228,7 @@ const createRentenEndwertTask = (): Task => {
   }
   
   story = <p>{contextText}</p>;
-  const areaLabel = 'Rentensparrate';
+  const areaLabel = 'Endwert, nachschüssig';
   const baseFormula = latex`K_n = r \cdot \frac{q^n - 1}{q - 1}`;
   const solutionIntro = renderSolutionIntro(areaLabel, baseFormula);
 
@@ -1321,7 +1321,7 @@ const createRentenEndwertTask = (): Task => {
     solution,
     inputs,
     formula: latex`K_n = r \cdot \frac{q^n - 1}{q - 1}`,
-    topic: 'Rentensparrate, nachschüssig',
+    topic: 'Endwert, nachschüssig',
     pointsAwarded: getPointsForVariant(variant),
   };
 };
@@ -2438,28 +2438,19 @@ export default function GemischteFinanzaufgaben() {
 
                 {card.tipVisible && card.task.formula && (
                   <div className="mb-3 rounded-2xl px-4 py-3 bg-amber-50 border-2 border-amber-200 text-amber-900">
-                    <p className="font-semibold mb-2">💡 Hinweis:</p>
-                    <div className="bg-white rounded-lg px-3 py-2 space-y-2">
-                      {card.task.topic && (
-                        <p className="text-sm text-gray-700">
-                          <strong>Thema:</strong> {card.task.topic}
-                        </p>
-                      )}
-                      <p className="text-sm text-gray-700">
-                        <strong>Grundformel:</strong>
-                      </p>
-                      {typeof card.task.formula === 'string' && (card.task.formula.includes('\n') || card.task.formula.includes('konstant') || card.task.formula.includes('Erkenne') || card.task.formula.includes('jährlich')) ? (
-                        <div className="space-y-2 text-sm text-gray-700">
-                          {card.task.formula.split('\n').map((line, idx) => (
-                            line.trim() && <p key={idx}>{line.trim()}</p>
-                          ))
-                          }
-                        </div>
-                      ) : (
-                        <div className="overflow-x-auto">
-                          <InlineMath math={card.task.formula} />
-                        </div>
-                      )}
+                    <div className="bg-white rounded-lg px-3 py-2">
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-gray-700">
+                        <span className="font-semibold">💡 Thema:</span>
+                        <span>{card.task.topic || 'N/A'}</span>
+                        <span className="font-semibold ml-2">Grundformel:</span>
+                        <span className="inline-block">
+                          {typeof card.task.formula === 'string' && (card.task.formula.includes('\n') || card.task.formula.includes('konstant') || card.task.formula.includes('Erkenne') || card.task.formula.includes('jährlich')) ? (
+                            <span>{card.task.formula.split('\n')[0].trim()}</span>
+                          ) : (
+                            <InlineMath math={card.task.formula} />
+                          )}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
