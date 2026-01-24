@@ -706,11 +706,15 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
             <h2 className="text-xl font-bold text-gray-900 mb-4">Aufgabenrückmeldung</h2>
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {zustand.aufgaben.map((aufgabe, index) => (
-                <div key={aufgabe.id} className={`p-4 rounded-lg border-l-4 ${aufgabe.isCorrect ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}>
+                <div key={aufgabe.id} className={`p-4 rounded-lg border-l-4 ${
+                  aufgabe.earnedPoints === aufgabe.points ? 'bg-green-50 border-green-500' : aufgabe.earnedPoints > 0 ? 'bg-blue-50 border-blue-500' : 'bg-red-50 border-red-500'
+                }`}>
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className={`font-semibold ${aufgabe.isCorrect ? 'text-green-900' : 'text-red-900'}`}>
-                        Aufgabe {index + 1}: {aufgabe.type} {aufgabe.isCorrect ? '✓' : '✗'}
+                      <h3 className={`font-semibold ${
+                        aufgabe.earnedPoints === aufgabe.points ? 'text-green-900' : aufgabe.earnedPoints > 0 ? 'text-blue-900' : 'text-red-900'
+                      }`}>
+                        Aufgabe {index + 1}: {aufgabe.type} {aufgabe.earnedPoints === aufgabe.points ? '✓' : aufgabe.earnedPoints > 0 ? '◐' : '✗'}
                       </h3>
                       <div className="text-sm mt-2 space-y-1">
                         {aufgabe.inputs.map(input => (
@@ -721,8 +725,10 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
                         ))}
                       </div>
                     </div>
-                    <div className={`text-lg font-bold ${aufgabe.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                      {aufgabe.isCorrect ? aufgabe.points : 0}/{aufgabe.points}
+                    <div className={`text-lg font-bold ${
+                      aufgabe.earnedPoints === aufgabe.points ? 'text-green-600' : aufgabe.earnedPoints > 0 ? 'text-blue-600' : 'text-red-600'
+                    }`}>
+                      {aufgabe.earnedPoints.toFixed(1)}/{aufgabe.points}
                     </div>
                   </div>
                 </div>
@@ -816,9 +822,22 @@ export const PruefungsModus: React.FC = () => {
 
       // Für Tilgungspläne: 0,5 Punkte pro richtige Zelle
       if (aufgabe.type === 'ratendarlehen_plan' || aufgabe.type === 'annuitaet_plan') {
-        const correctCells = aufgabe.inputs.filter(input =>
-          aufgabe.userAnswers[input.id] && isInputCorrect(input, aufgabe.userAnswers[input.id])
-        ).length;
+        const correctCells = aufgabe.inputs.filter(input => {
+          const userValue = aufgabe.userAnswers[input.id];
+          const hasValue = userValue && userValue.trim();
+          const isCorrect = hasValue && isInputCorrect(input, userValue);
+          
+          console.log(`[${aufgabe.type}] Input ${input.id}:`, {
+            userValue: userValue || '(empty)',
+            correctValue: input.correctValue,
+            tolerance: input.tolerance,
+            isCorrect,
+          });
+          
+          return isCorrect;
+        }).length;
+        
+        console.log(`[${aufgabe.type}] Correct cells: ${correctCells}/${aufgabe.inputs.length}`);
         earnedPoints = Math.min(correctCells * 0.5, aufgabe.points);
       } else {
         // Für andere Aufgaben: Alle Inputs müssen richtig sein (alles-oder-nichts)
@@ -827,6 +846,8 @@ export const PruefungsModus: React.FC = () => {
         );
         earnedPoints = allCorrect ? aufgabe.points : 0;
       }
+
+      console.log(`Aufgabe ${aufgabe.type}: earned=${earnedPoints}/${aufgabe.points}`);
 
       return {
         ...aufgabe,
