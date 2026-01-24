@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg10" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg10)" />
+  <!-- Checkmark in Kreis (Erfolg/Gelöst) -->
+  <circle cx="64" cy="64" r="28" fill="none" stroke="#93c5fd" stroke-width="2.5"/>
+  <!-- Checkmark -->
+  <path d="M 48 65 L 58 75 L 82 48" stroke="#93c5fd" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

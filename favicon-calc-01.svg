@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bgcalc1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bgcalc1)" />
+  <!-- WSS Text oben -->
+  <text x="64" y="28" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">WSS</text>
+  <!-- Taschenrechner -->
+  <rect x="30" y="40" width="68" height="75" rx="4" fill="none" stroke="#93c5fd" stroke-width="2.5"/>
+  <!-- Display -->
+  <rect x="36" y="46" width="56" height="16" rx="2" fill="#0f172a" />
+  <line x1="36" y1="65" x2="98" y2="65" stroke="#60a5fa" stroke-width="0.5" opacity="0.4"/>
+  <!-- Buttons Grid -->
+  <circle cx="44" cy="75" r="4" fill="#93c5fd"/>
+  <circle cx="64" cy="75" r="4" fill="#93c5fd"/>
+  <circle cx="84" cy="75" r="4" fill="#93c5fd"/>
+  <circle cx="44" cy="90" r="4" fill="#93c5fd"/>
+  <circle cx="64" cy="90" r="4" fill="#93c5fd"/>
+  <circle cx="84" cy="90" r="4" fill="#93c5fd"/>
+  <!-- Rechtsseite Operation -->
+  <rect x="95" y="75" width="5" height="15" rx="1" fill="#60a5fa"/>
+</svg>

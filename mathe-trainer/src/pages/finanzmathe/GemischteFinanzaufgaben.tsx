@@ -692,7 +692,7 @@ const createSimpleInterestTask = (): Task => {
           {baseStory} Er/Sie legt <strong>{formatCurrency(K)} €</strong> an. {durationInfo} Nach der Anlagezeit erhält er/sie <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen. <span className="text-blue-900 font-semibold">Wie hoch war der vereinbarte Zinssatz?</span>
         </p>
       );
-      inputs = [createInputField('p', '', '%', 'z.B. 4,25', rate, 0.05, 2)];
+      inputs = [createInputField('p', '', '% p.a.', 'z.B. 4,25', rate, 0.05, 2)];
       solution = (
         <div className="space-y-1">
           <p>
@@ -832,7 +832,7 @@ const createZinseszinsTask = (): Task => {
           <p className="text-blue-900 font-semibold">Wie hoch war der jährliche Zinssatz?</p>
         </div>
       );
-      inputs = [createInputField('p', '', '%', 'z.B. 3,8', p, 0.05, 2)];
+      inputs = [createInputField('p', '', '% p.a.', 'z.B. 3,8', p, 0.05, 2)];
       solution = (
         <div className="space-y-1 text-sm">
           <p><strong>Gegeben:</strong> <InlineMath math={latex`K_0 = ${mathNumber(K0)}\,€; \quad K_n = ${mathNumber(Kn, 2)}\,€; \quad n = ${n}\text{ Jahre}`} /></p>

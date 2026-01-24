@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg2)" />
+  <!-- Funktionsgraph / Kurve -->
+  <path d="M 25 85 Q 40 65 50 55 T 70 40 T 95 25" stroke="#93c5fd" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Achsen -->
+  <line x1="25" y1="90" x2="100" y2="90" stroke="#60a5fa" stroke-width="1.5"/>
+  <line x1="25" y1="90" x2="25" y2="25" stroke="#60a5fa" stroke-width="1.5"/>
+  <!-- Punkte auf der Kurve -->
+  <circle cx="50" cy="55" r="3" fill="#fbbf24"/>
+  <circle cx="70" cy="40" r="3" fill="#fbbf24"/>
+</svg>

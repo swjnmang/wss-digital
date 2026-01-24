@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg5)" />
+  <!-- Parabel / Quadratische Funktion -->
+  <path d="M 25 65 Q 50 25 64 20 Q 78 25 103 65" stroke="#93c5fd" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Scheitel-Punkt -->
+  <circle cx="64" cy="20" r="4" fill="#fbbf24"/>
+  <!-- Y-Achse -->
+  <line x1="25" y1="90" x2="25" y2="20" stroke="#60a5fa" stroke-width="1.5" opacity="0.6"/>
+</svg>

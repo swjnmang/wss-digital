@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favicon Vorschläge - WSS Digital</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 50px;
+            font-size: 1.1em;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .favicon-display {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            border: 2px solid #e2e8f0;
+        }
+        .favicon-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .favicon-desc {
+            color: #64748b;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        .badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-top: 15px;
+        }
+        .copy-button {
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+        .copy-button:hover {
+            background: #2563eb;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #64748b;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Favicon Vorschläge</h1>
+        <p class="subtitle">Wähle einen Design, der dir gefällt</p>
+        
+        <div class="grid">
+            <!-- Favicon 1: Bestehendes Design (W + SS) -->
+            <div class="card">
+                <div class="favicon-display">📊</div>
+                <div class="favicon-title">1. Klassisch (aktuell)</div>
+                <div class="favicon-desc">W + SS auf Gradient-Hintergrund - Modern und Business</div>
+                <span class="badge">Einfach</span>
+                <button class="copy-button">Code kopieren</button>
+            </div>
+
+            <!-- Favicon 2: Taschenrechner -->
+            <div class="card">
+                <div class="favicon-display">🧮</div>
+                <div class="favicon-title">2. Taschenrechner</div>
+                <div class="favicon-desc">Klassisches Taschenrechner-Icon - Universell erkannt</div>
+                <span class="badge">Mathematisch</span>
+                <button class="copy-button">Code kopieren</button>
+            </div>
+
+            <!-- Favicon 3: Funktionsgraph -->
+            <div class="card">
+                <div class="favicon-display">📈</div>
+                <div class="favicon-title">3. Funktionsgraph</div>
+                <div class="favicon-desc">Steigende Kurve - Zeigt Funktion & Fortschritt</div>
+                <span class="badge">Akademisch</span>
+                <button class="copy-button">Code kopieren</button>
+            </div>
+
+            <!-- Favicon 4: Pi-Symbol -->
+            <div class="card">
+                <div class="favicon-display">π</div>
+                <div class="favicon-title">4. Pi-Symbol</div>
+                <div class="favicon-desc">Das Math-Symbol schlechthin - Zeitlos und elegant</div>
+                <span class="badge">Klassisch</span>
+                <button class="copy-button">Code kopieren</button>
+            </div>
+
+            <!-- Favicon 5: Sigma (Summe) -->
+            <div class="card">
+                <div class="favicon-display">Σ</div>
+                <div class="favicon-title">5. Sigma-Symbol</div>
+                <div class="favicon-desc">Mathematisches Summen-Symbol - Professionell</div>
+                <span class="badge">Fortgeschritten</span>
+                <button class="copy-button">Code kopieren</button>
+            </div>
+
+            <!-- Favicon 6: Zahnrad + Zahl -->
+            <div class="card">
+                <div class="favicon-display">⚙️</div>
+                <div class="favicon-title">6. Zahnrad</div>
+                <div class="favicon-desc">Zahnrad mit 7 - Technik trifft Mathematik</div>
+                <span class="badge">Hybrid</span>
+                <button class="copy-button">Code kopieren</button>
+            </div>
+
+            <!-- Favicon 7: Datenvisualisierung -->
+            <div class="card">
+                <div class="favicon-display">📉</div>
+                <div class="favicon-title">7. Balkendiagramm</div>
+                <div class="favicon-desc">Stilisiertes Balkendiagramm - Daten & Visualisierung</div>
+                <span class="badge">Modern</span>
+                <button class="copy-button">Code kopieren</button>
+            </div>
+
+            <!-- Favicon 8: Quadratische Funktion -->
+            <div class="card">
+                <div class="favicon-display">∞</div>
+                <div class="favicon-title">8. Unendlich-Symbol</div>
+                <div class="favicon-desc">Das Unendlich-Zeichen - Grenzenlose Möglichkeiten</div>
+                <span class="badge">Philosophisch</span>
+                <button class="copy-button">Code kopieren</button>
+            </div>
+
+            <!-- Favicon 9: Blaue Welle -->
+            <div class="card">
+                <div class="favicon-display">〰️</div>
+                <div class="favicon-title">9. Sinuskurve</div>
+                <div class="favicon-desc">Mathematische Welle - Elegant und fließend</div>
+                <span class="badge">Geometrisch</span>
+                <button class="copy-button">Code kopieren</button>
+            </div>
+
+            <!-- Favicon 10: Blaues Quadrat mit Symbol -->
+            <div class="card">
+                <div class="favicon-display">✓</div>
+                <div class="favicon-title">10. Haken in Quadrat</div>
+                <div class="favicon-desc">Lösen / Erfolg - Positive Leistung symbolisieren</div>
+                <span class="badge">Optimistisch</span>
+                <button class="copy-button">Code kopieren</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Tipp:</strong> Rechtsklick auf jedes Icon → "Open Link in New Tab" um es vergrößert anzuschauen!</p>
+            <p style="margin-top: 20px; font-size: 0.9em;">Welcher Design gefällt dir am besten? Sag Bescheid, dann implementiere ich ihn! 😊</p>
+        </div>
+    </div>
+</body>
+</html>
