@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF Generation Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <h1>Test PDF Generator</h1>
+    <button onclick="testPDF()">Generiere Test PDF</button>
+    
+    <script>
+        function testPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 10;
+            let currentY = margin;
+            
+            // Kopfzeile
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text('wss-digital.de - wirtschaftsschule digital - Portal für die Wirtschaftsschule', 
+                    pageWidth / 2, 7, { align: 'center' });
+            doc.setDrawColor(220, 220, 220);
+            doc.line(margin, 10, pageWidth - margin, 10);
+            
+            // Titel
+            doc.setFontSize(20);
+            doc.setTextColor(0, 0, 139);
+            doc.text('Übungsaufgaben Finanzmathematik', pageWidth / 2, currentY + 10, { align: 'center' });
+            currentY += 25;
+            
+            // Test Aufgabe
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 139);
+            doc.setFont('Helvetica', 'bold');
+            doc.text('Aufgabe 1: Zinsrechnung', margin, currentY);
+            currentY += 7;
+            
+            // Test Input-Felder
+            doc.setTextColor(0, 0, 0);
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(10);
+            
+            const testInputs = [
+                { description: 'Zinsen', unit: '€' },
+                { description: 'Kapital', unit: '€' },
+                { description: 'Zinssatz', unit: '%' }
+            ];
+            
+            for (const input of testInputs) {
+                const line = `${input.description} (${input.unit}): _________________`;
+                doc.text(line, margin + 2, currentY);
+                currentY += 5;
+            }
+            
+            // Speichern
+            doc.save('test-übungsaufgaben.pdf');
+            alert('PDF wurde generiert: test-übungsaufgaben.pdf');
+        }
+    </script>
+</body>
+</html>

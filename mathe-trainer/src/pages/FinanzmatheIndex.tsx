@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import ExercisesDownload from './finanzmathe/ExercisesDownload';
 
 export default function FinanzmatheIndex() {
   return (
@@ -48,8 +47,6 @@ export default function FinanzmatheIndex() {
             <h2 className="text-xl font-bold text-green-800 mb-2">🎓 Prüfungsmodus</h2>
             <p className="text-gray-600">10 gemischte Aufgaben unter Prüfungsbedingungen mit PDF-Zertifikat.</p>
           </Link>
-
-          <ExercisesDownload />
         </div>
       </div>
     </div>

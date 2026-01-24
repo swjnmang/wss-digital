@@ -2148,6 +2148,13 @@ export default function GemischteFinanzaufgaben() {
                 {btn.label}
               </button>
             ))}
+            <button
+              onClick={() => window.print()}
+              className="px-3 py-1.5 rounded-full text-sm font-semibold transition border bg-green-600 border-green-600 text-white hover:bg-green-700"
+              title="Öffnet den Browser-Druck-Dialog zum PDF-Export"
+            >
+              🖨️ Drucken
+            </button>
           </div>
 
           <div className="flex flex-wrap gap-3 justify-end mb-6">
