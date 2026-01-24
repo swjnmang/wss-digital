@@ -27,6 +27,7 @@ import GeneratorLineare from './pages/rechnen_lernen/gleichungen/Generator_linea
 import Quadratisch from './pages/rechnen_lernen/gleichungen/Quadratisch';
 import Abschlusstest from './pages/rechnen_lernen/gleichungen/Abschlusstest';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react';
 import Home from './pages/Home'
 import LineareIndex from './pages/LineareIndex'
 import QuadratischeIndex from './pages/QuadratischeIndex'
@@ -133,6 +134,7 @@ export default function App() {
 
   return (
     <div className="app-root">
+      <Analytics />
       {!hideHeader && (
         <header className="app-header">
           <div className="app-shell flex items-center justify-between gap-3">
