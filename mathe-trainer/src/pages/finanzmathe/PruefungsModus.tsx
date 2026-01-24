@@ -29,7 +29,17 @@ interface PruefungsAufgabeSerialized {
   id: string;
   type: string;
   points: number;
-  inputs: any[];
+  inputs: Array<{
+    id: string;
+    label: string;
+    unit: string;
+    placeholder: string;
+    correctValue: number;
+    tolerance: number;
+    displayDecimals?: number;
+    type?: string;
+    options?: string[];
+  }>;
   userAnswers: Record<string, string>;
   isCorrect: boolean | null;
 }
@@ -80,26 +90,16 @@ const generatePruefungsaufgaben = (): PruefungsAufgabe[] => {
     annuitaet_plan: createAnnuitaetPlanTask,
   };
 
-  // Gleichmäßige Verteilung: Versuche, jede Aufgabenart gleich oft zu verwenden
-  const auswahl: typeof aufgabenkonfig[] = [];
-  const typenProAufgabe = Math.ceil(MAX_AUFGABEN / aufgabenkonfig.length);
+  // NEUE STRATEGIE: Wähle genau eine Aufgabe pro Typ aus (max 1x pro Typ)
+  // Das gewährleistet keine Duplikate
+  const sortedConfigs = [...aufgabenkonfig].sort(() => Math.random() - 0.5);
   
-  for (let i = 0; i < typenProAufgabe && auswahl.length < MAX_AUFGABEN; i++) {
-    for (const config of aufgabenkonfig) {
-      if (auswahl.length >= MAX_AUFGABEN) break;
-      auswahl.push(config);
-    }
-  }
+  // Begrenze auf MAX_AUFGABEN Arten, aber nimm alle, wenn weniger als MAX_AUFGABEN
+  const selectedConfigs = sortedConfigs.slice(0, Math.min(MAX_AUFGABEN, aufgabenkonfig.length));
 
-  // Shuffle die Auswahl
-  for (let i = auswahl.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [auswahl[i], auswahl[j]] = [auswahl[j], auswahl[i]];
-  }
-
-  // Generiere Aufgaben
-  for (let i = 0; i < MAX_AUFGABEN; i++) {
-    const config = auswahl[i];
+  // Generiere Aufgaben - eine pro ausgewähltem Typ
+  for (let i = 0; i < selectedConfigs.length; i++) {
+    const config = selectedConfigs[i];
     const generator = generatoren[config.generatorKey];
     const task = generator();
 
@@ -153,17 +153,19 @@ const deserializePruefung = (serialized: PruefungsZustandSerialized): PruefungsZ
     name: serialized.name,
     klasse: serialized.klasse,
     aufgaben: serialized.aufgaben.map(a => {
-      // Regeneriere die Aufgabe basierend auf ihrem Type
+      // Regeneriere die Aufgabe basierend auf ihrem Type, um question/solution zu erhalten
       const generator = generatoren[a.type];
       const task = generator ? generator() : { question: 'Fehler', solution: 'Fehler', inputs: [] };
       
+      // WICHTIG: Benutze DIE GESPEICHERTEN inputs (mit correctValue etc), nicht die neu generierten!
+      // Das stellt sicher, dass wir die gleichen Werte zur Bewertung verwenden
       return {
         id: a.id,
         type: a.type,
         points: a.points,
         question: task.question,
         solution: task.solution,
-        inputs: a.inputs,
+        inputs: a.inputs, // Use serialized inputs, not newly generated ones!
         userAnswers: a.userAnswers,
         isCorrect: a.isCorrect,
       };
@@ -406,7 +408,7 @@ const ExamScreen: React.FC<ExamScreenProps> = ({ zustand, onUpdateAnswer, onNavi
                 {aktuelleAufgabe.inputs.map(input => (
                   <div key={input.id}>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {input.label} {input.unit && `(${input.unit})`}
+                      {input.label || input.id} {input.unit && `(${input.unit})`}
                     </label>
                     <input
                       type="text"
