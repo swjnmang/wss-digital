@@ -43,6 +43,7 @@ interface Task {
   inputs: TaskInput[];
   pointsAwarded?: number; // Punkte für diese Aufgabe basierend auf Schwierigkeit
   formula?: string; // Grundformel für Tipp (LaTeX)
+  topic?: string; // Thema für Tipp (z.B. "Kapitalmehrung, nachschüssig")
   _incompleteRows?: Array<{ year: number; restStart: number; interest: number; tilgung: number; annuity: number; hiddenFields: Set<string> }>;
   _hiddenFields?: Map<number, Set<string>>;
 }
@@ -624,7 +625,7 @@ const createSimpleInterestTask = (): Task => {
   let t = randomInt(30, 340);
   const variant = randomChoice<SimpleInterestVariant>(['Z', 'K', 'p', 't']);
 
-  const useDateRange = variant !== 't' && Math.random() < 0.5;
+  const useDateRange = Math.random() < 0.5; // 50% Chance für Datumangaben bei allen Varianten
   const dateRange = useDateRange ? randomInterestDateRange() : null;
   if (dateRange) {
     t = dateRange.days;
@@ -707,13 +708,26 @@ const createSimpleInterestTask = (): Task => {
     }
     case 't': {
       const days = (Z_rounded * 100 * 360) / (K * p);
-      question = (
+      question = useDateRange ? (
+        <p>
+          {baseStory} Er/Sie legt <strong>{formatCurrency(K)} €</strong> an einem Konto mit <strong>{formatNumber(p, 2)} %</strong> Zinsen p.a. an. Die Anlage wird von <strong>{dateRange!.startLabel}</strong> bis <strong>{dateRange!.endLabel}</strong> durchgeführt. Am Ende erhält er/sie <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen. <span className="text-blue-900 font-semibold">Wie viele Tage war das Geld angelegt (nach Schulformel)?</span>
+        </p>
+      ) : (
         <p>
           {baseStory} Er/Sie legt <strong>{formatCurrency(K)} €</strong> an einem Konto mit <strong>{formatNumber(p, 2)} %</strong> Zinsen p.a. an. Als die Anlage beendet wird, erhält er/sie <strong>{formatCurrency(Z_rounded)} €</strong> an Zinsen. <span className="text-blue-900 font-semibold">Wie lange war das Geld angelegt?</span>
         </p>
       );
       inputs = [createInputField('t', '', 'Tage', 'z.B. 180', days, 0.5, 1)];
-      solution = (
+      solution = useDateRange ? (
+        <div className="space-y-1">
+          <p><strong>Gegeben:</strong> Vom <strong>{dateRange!.startLabel}</strong> bis <strong>{dateRange!.endLabel}</strong></p>
+          <p><strong>Schulformel für Zinstage:</strong> <InlineMath math={latex`t = (M_2 - M_1) \\times 30 + (T_2 - T_1)`} /></p>
+          <p><strong>Werte einsetzen:</strong></p>
+          <p className="ml-4"><InlineMath math={latex`t = (${dateRange!.endLabel.split('.')[1]} - ${dateRange!.startLabel.split('.')[1]}) \\times 30 + (${dateRange!.endLabel.split('.')[0]} - ${dateRange!.startLabel.split('.')[0]})`} /></p>
+          <p className="ml-4"><InlineMath math={latex`t = ${mathNumber(days, 0)}`} /></p>
+          <p><strong>Ergebnis:</strong> <strong>{formatNumber(days, 0)} Tage</strong></p>
+        </div>
+      ) : (
         <div className="space-y-1">
           <p>
             <InlineMath math={latex`t = \frac{Z \cdot 100 \cdot 360}{K \cdot p}`} />
@@ -736,6 +750,7 @@ const createSimpleInterestTask = (): Task => {
     solution,
     inputs,
     formula: latex`Z = \frac{K \cdot p \cdot t}{100 \cdot 360}`,
+    topic: 'Zinsrechnung',
     pointsAwarded: 5,
   };
 };
@@ -853,9 +868,9 @@ const createZinseszinsTask = (): Task => {
           <p><strong>Werte einsetzen:</strong></p>
           <p className="ml-4"><InlineMath math={latex`q = 1 + \frac{${mathNumber(p, 2)}}{100} = ${mathNumber(q, 4)}`} /></p>
           <p className="ml-4"><InlineMath math={latex`${mathNumber(Kn, 2)} = ${mathNumber(K0)} \cdot ${mathNumber(q, 4)}^{n} \quad | : ${mathNumber(K0)}`} /></p>
-          <p><strong>Nach n auflösen:</strong></p>
-          <p className="ml-4"><InlineMath math={latex`${mathNumber(q, 4)}^{n} = \frac{${mathNumber(Kn, 2)}}{${mathNumber(K0)}} \quad | \log_{${mathNumber(q, 4)}}`} /></p>
-          <p className="ml-4"><InlineMath math={latex`n = \log_{${mathNumber(q, 4)}}\left(\frac{${mathNumber(Kn, 2)}}{${mathNumber(K0)}}\right) = ${n}`} /></p>
+          <p><strong>Nach n auflösen (Logarithmus):</strong></p>
+          <p className="ml-4"><InlineMath math={latex`${mathNumber(q, 4)}^{n} = \frac{${mathNumber(Kn, 2)}}{${mathNumber(K0)}}`} /></p>
+          <p className="ml-4"><InlineMath math={latex`n = \log_{${mathNumber(q, 4)}}\left(\frac{${mathNumber(Kn, 2)}}{${mathNumber(K0)}}\right)`} /></p>
           <p><strong>Ergebnis:</strong> <InlineMath math={latex`n = ${n}\text{ Jahre}`} /></p>
         </div>
       );
@@ -870,6 +885,7 @@ const createZinseszinsTask = (): Task => {
     solution,
     inputs,
     formula: latex`K_n = K_0 \cdot q^n`,
+    topic: 'Zinseszins',
     pointsAwarded: 5,
   };
 };
@@ -1023,6 +1039,7 @@ const createKapitalmehrungTask = (): Task => {
     solution,
     inputs,
     formula: latex`K_n = K_0 \cdot q^n + r \cdot \frac{q^n - 1}{q - 1}`,
+    topic: 'Kapitalmehrung, nachschüssig',
     pointsAwarded: variant === 'n' ? 15 : 8, // 15 für n berechnen (sehr schwer), 8 für andere (mittel)
   };
 };
@@ -1176,6 +1193,7 @@ const createKapitalminderungTask = (): Task => {
     solution,
     inputs,
     formula: latex`K_n = K_0 \cdot q^n - r \cdot \frac{q^n - 1}{q - 1}`,
+    topic: 'Kapitalminderung, nachschüssig',
     pointsAwarded: variant === 'n' ? 15 : 8, // 15 für n berechnen (sehr schwer), 8 für andere (mittel)
   };
 };
@@ -1303,6 +1321,7 @@ const createRentenEndwertTask = (): Task => {
     solution,
     inputs,
     formula: latex`K_n = r \cdot \frac{q^n - 1}{q - 1}`,
+    topic: 'Rentensparrate, nachschüssig',
     pointsAwarded: getPointsForVariant(variant),
   };
 };
@@ -1501,6 +1520,7 @@ const createRatendarlehenPlanTask = (): Task => {
     solution,
     inputs: buildPlanInputs('rate', rows),
     formula: '1. Die Tilgung ist konstant: T = Darlehen ÷ Laufzeit\n2. Für jedes Jahr: Zinsen = Restschuld × Zinssatz\n3. Annuität = Tilgung + Zinsen\n4. Neue Restschuld = Restschuld − Tilgung',
+    topic: 'Ratentilgung (Tilgungsplan)',
     pointsAwarded: 12,
   };
 };
@@ -1570,6 +1590,7 @@ const createAnnuitaetPlanTask = (): Task => {
     solution,
     inputs: buildPlanInputs('ann', rows),
     formula: '1. Die Annuität ist konstant: A = T₁ × q^n (bereits gegeben oder zu berechnen)\n2. Für jedes Jahr: Zinsen = Restschuld × Zinssatz\n3. Tilgung = Annuität − Zinsen\n4. Neue Restschuld = Restschuld − Tilgung',
+    topic: 'Annuitätentilgung (Tilgungsplan)',
     pointsAwarded: 12,
   };
 };
@@ -1636,9 +1657,9 @@ const createIncompleteTilgungsplanTask = (): Task => {
         hide.add('interest');
         hide.add('tilgung');
       } else {
-        // Jahr 2: Tilgung + Annuität sichtbar → Schüler kann Zinsen berechnen
+        // Jahr 2: Annuität + Zinsen sichtbar → Schüler kann Tilgung + restStart berechnen
         hide.add('restStart');
-        hide.add('interest');
+        hide.add('tilgung');
       }
     }
 
@@ -1736,6 +1757,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     solution,
     inputs,
     formula: 'Erkenne das Muster: Ist die Tilgung konstant (Ratentilgung) oder die Annuität konstant (Annuitätentilgung)? Das verrät die Tilgungsart. Nutze dann:\n• Bei Ratentilgung: T konstant, Zinsen = Restschuld × p%, Annuität = T + Zinsen\n• Bei Annuitätentilgung: A konstant, Zinsen = Restschuld × p%, Tilgung = A − Zinsen',
+    topic: 'Tilgungsplananalyse',
     _incompleteRows: incompleteRows, // Speichere die Reihen für das Rendering
     pointsAwarded: 8,
   };
@@ -2416,8 +2438,16 @@ export default function GemischteFinanzaufgaben() {
 
                 {card.tipVisible && card.task.formula && (
                   <div className="mb-3 rounded-2xl px-4 py-3 bg-amber-50 border-2 border-amber-200 text-amber-900">
-                    <p className="font-semibold mb-2">� Hinweis:</p>
-                    <div className="bg-white rounded-lg px-3 py-2">
+                    <p className="font-semibold mb-2">💡 Hinweis:</p>
+                    <div className="bg-white rounded-lg px-3 py-2 space-y-2">
+                      {card.task.topic && (
+                        <p className="text-sm text-gray-700">
+                          <strong>Thema:</strong> {card.task.topic}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-700">
+                        <strong>Grundformel:</strong>
+                      </p>
                       {typeof card.task.formula === 'string' && (card.task.formula.includes('\n') || card.task.formula.includes('konstant') || card.task.formula.includes('Erkenne') || card.task.formula.includes('jährlich')) ? (
                         <div className="space-y-2 text-sm text-gray-700">
                           {card.task.formula.split('\n').map((line, idx) => (
