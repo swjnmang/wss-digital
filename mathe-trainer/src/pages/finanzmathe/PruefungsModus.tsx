@@ -173,7 +173,7 @@ const deserializePruefung = (serialized: PruefungsZustandSerialized): PruefungsZ
         solution: task.solution,
         inputs: a.inputs, // Use serialized inputs, not newly generated ones!
         userAnswers: a.userAnswers,
-        earnedPoints: a.earnedPoints,
+        earnedPoints: a.earnedPoints || 0, // Fallback für alte Prüfungen
       };
     }),
     aktuelleAufgabeIndex: serialized.aktuelleAufgabeIndex,
@@ -470,11 +470,12 @@ interface ResultsScreenProps {
 
 const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => {
   const totalPoints = zustand.aufgaben.reduce((sum, aufgabe) => {
-    return sum + aufgabe.earnedPoints;
+    const earned = aufgabe.earnedPoints || 0; // Fallback für alte Prüfungen
+    return sum + earned;
   }, 0);
   
   const maxPoints = zustand.aufgaben.reduce((sum, aufgabe) => sum + aufgabe.points, 0);
-  const percentage = Math.round((totalPoints / maxPoints) * 100);
+  const percentage = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
   const passed = percentage >= 50;
 
   const generatePDF = () => {
@@ -582,7 +583,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
         doc.addPage();
         currentY = margin;
       }
-      const earned = aufgabe.earnedPoints;
+      const earned = aufgabe.earnedPoints || 0; // Fallback für alte Prüfungen
       const status = earned === aufgabe.points ? '✓' : earned > 0 ? '◐' : '✗';
       const line = `${status} Aufgabe ${index + 1}: ${aufgabe.points} Pkt. (${earned.toFixed(1)} erhalten)`;
       doc.text(line, margin + 4, currentY);
@@ -607,8 +608,9 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
       // Aufgabentitel
       doc.setFont(undefined, 'bold');
       doc.setFontSize(10);
-      const statusText = aufgabe.earnedPoints === aufgabe.points ? '✓' : aufgabe.earnedPoints > 0 ? '◐' : '✗';
-      const titleLine = `Aufgabe ${index + 1} - ${statusText} (${aufgabe.earnedPoints.toFixed(1)}/${aufgabe.points} Pkt.)`;
+      const earned = aufgabe.earnedPoints || 0; // Fallback für alte Prüfungen
+      const statusText = earned === aufgabe.points ? '✓' : earned > 0 ? '◐' : '✗';
+      const titleLine = `Aufgabe ${index + 1} - ${statusText} (${earned.toFixed(1)}/${aufgabe.points} Pkt.)`;
       doc.text(titleLine, margin, currentY);
       currentY += 6;
 
@@ -712,9 +714,9 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className={`font-semibold ${
-                        aufgabe.earnedPoints === aufgabe.points ? 'text-green-900' : aufgabe.earnedPoints > 0 ? 'text-blue-900' : 'text-red-900'
+                        (aufgabe.earnedPoints || 0) === aufgabe.points ? 'text-green-900' : (aufgabe.earnedPoints || 0) > 0 ? 'text-blue-900' : 'text-red-900'
                       }`}>
-                        Aufgabe {index + 1}: {aufgabe.type} {aufgabe.earnedPoints === aufgabe.points ? '✓' : aufgabe.earnedPoints > 0 ? '◐' : '✗'}
+                        Aufgabe {index + 1}: {aufgabe.type} {(aufgabe.earnedPoints || 0) === aufgabe.points ? '✓' : (aufgabe.earnedPoints || 0) > 0 ? '◐' : '✗'}
                       </h3>
                       <div className="text-sm mt-2 space-y-1">
                         {aufgabe.inputs.map(input => (
@@ -728,7 +730,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
                     <div className={`text-lg font-bold ${
                       aufgabe.earnedPoints === aufgabe.points ? 'text-green-600' : aufgabe.earnedPoints > 0 ? 'text-blue-600' : 'text-red-600'
                     }`}>
-                      {aufgabe.earnedPoints.toFixed(1)}/{aufgabe.points}
+                      {(aufgabe.earnedPoints || 0).toFixed(1)}/{aufgabe.points}
                     </div>
                   </div>
                 </div>
