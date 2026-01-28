@@ -12,10 +12,9 @@ type TaskType =
   | 'kapitalmehrung'
   | 'kapitalminderung'
   | 'renten_endwert'
-  | 'ratendarlehen_erkunden'
-  | 'ratendarlehen_gemischt'
-  | 'annuitaet_erkunden'
-  | 'annuitaet_gemischt';
+  | 'ratendarlehen_plan'
+  | 'annuitaet_plan'
+  | 'incomplete_tilgungsplan';
 
 type FilterType = TaskType | 'mixed' | 'renten_bundled';
 
@@ -65,10 +64,9 @@ const taskTypes: TaskType[] = [
   'kapitalmehrung',
   'kapitalminderung',
   'renten_endwert',
-  'ratendarlehen_erkunden',
-  'ratendarlehen_gemischt',
-  'annuitaet_erkunden',
-  'annuitaet_gemischt',
+  'ratendarlehen_plan',
+  'annuitaet_plan',
+  'incomplete_tilgungsplan',
 ];
 
 const taskFilterButtons: { id: FilterType; label: string }[] = [
@@ -76,10 +74,8 @@ const taskFilterButtons: { id: FilterType; label: string }[] = [
   { id: 'simple_interest', label: 'Zinsrechnung' },
   { id: 'zinseszins', label: 'Zinseszins' },
   { id: 'renten_bundled', label: 'Rentenrechnung' },
-  { id: 'ratendarlehen_erkunden', label: 'Ratentilgung: Erkunden' },
-  { id: 'ratendarlehen_gemischt', label: 'Ratentilgung: Gemischt' },
-  { id: 'annuitaet_erkunden', label: 'Annuitätentilgung: Erkunden' },
-  { id: 'annuitaet_gemischt', label: 'Annuitätentilgung: Gemischt' },
+  { id: 'ratendarlehen_plan', label: 'Ratentilgung' },
+  { id: 'annuitaet_plan', label: 'Annuitätentilgung' },
 ];
 
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -1357,9 +1353,7 @@ const extractPlanTable = (inputs: TaskInput[]): PlanTableRow[] | null => {
   let hasPlanPattern = false;
 
   inputs.forEach(input => {
-    // Erweiterte Regex: erkenne alle Varianten
-    // Pattern: ...y{jahr}_(debt|interest|tilgung|annuity)
-    const match = input.id.match(/y(\d+)_(debt|interest|tilgung|annuity)$/);
+    const match = input.id.match(/(?:_y|incomplete_plan_y)(\d+)_(debt|interest|tilgung|annuity)$/);
     if (!match) return;
     hasPlanPattern = true;
     const year = Number(match[1]);
@@ -1372,18 +1366,31 @@ const extractPlanTable = (inputs: TaskInput[]): PlanTableRow[] | null => {
 
   if (!hasPlanPattern) return null;
 
-  // Akzeptiere auch unvollständige Reihen
+  // Für incomplete_tilgungsplan: Akzeptiere auch unvollständige Reihen (nur versteckte Felder)
+  // Für andere Plans: Verlange alle 4 Spalten
   return Object.values(rows)
     .map(row => {
       const cells: Record<string, TaskInput> = {};
       const cellsArray = Object.values(row.cells);
+      const hasIncompletePattern = cellsArray.length > 0 && 
+        cellsArray[0]?.id?.includes('incomplete_plan');
       
-      // Alle neuen Typen erlauben unvollständige Reihen
-      PLAN_COLUMNS.forEach(col => {
-        if (row.cells[col.key]) {
+      if (hasIncompletePattern) {
+        // Für incomplete plans: Nur die Felder verwenden, die vorhanden sind
+        PLAN_COLUMNS.forEach(col => {
+          if (row.cells[col.key]) {
+            cells[col.key] = row.cells[col.key];
+          }
+        });
+      } else {
+        // Für normale plans: Alle 4 Spalten verlangen
+        PLAN_COLUMNS.forEach(col => {
+          if (!row.cells[col.key]) {
+            throw new Error(`Missing ${col.key} input for Jahr ${row.year}`);
+          }
           cells[col.key] = row.cells[col.key];
-        }
-      });
+        });
+      }
       
       return {
         year: row.year,
@@ -1588,561 +1595,171 @@ const createAnnuitaetPlanTask = (): Task => {
   };
 };
 
-// NEUE AUFGABENTYPEN FÜR TILGUNGSPLÄNE
-// Logik: Schüler soll ALLES aus dem Plan selbst deduzieren - keine expliziten Angaben!
-
-/**
- * Ratentilgung Typ 1: "Erkunden"
- * Gegeben: Jahr 1 + 3 komplett (beide mit GLEICHER Tilgung T)
- * Versteckt: Jahr 2 komplett
- * Schüler erkennt: T ist konstant → Ratentilgung
- * Schüler berechnet: p% aus Z1/(S0), dann Jahr 2
- */
-const createRatendarlehenErkundenTask = (): Task => {
-  const s0 = randomInt(30, 200) * 1000;
-  const n = randomInt(5, 8);
-  const rate = randomFloat(2, 5, 1);
+const createIncompleteTilgungsplanTask = (): Task => {
+  const isRatenplan = Math.random() < 0.5;
+  const loan = randomInt(50, 200) * 1000;
+  const years = randomInt(5, 10);
+  const rate = randomFloat(1.5, 4.0, isRatenplan ? 1 : 2);
   
-  const tilgung = s0 / n;
   let rows: PlanRow[] = [];
+  let tilgungsart: 'Ratentilgung' | 'Annuitätentilgung';
   
-  for (let year = 1; year <= 3; year++) {
-    const restStart = s0 - tilgung * (year - 1);
-    const interest = restStart * rate / 100;
-    const annuity = tilgung + interest;
-    rows.push({ year, restStart, interest, tilgung, annuity });
+  if (isRatenplan) {
+    tilgungsart = 'Ratentilgung';
+    const tilgung = loan / years;
+    for (let year = 1; year <= 2; year++) {
+      const restStart = loan - tilgung * (year - 1);
+      const interest = restStart * rate / 100;
+      const annuity = tilgung + interest;
+      rows.push({ year, restStart, interest, tilgung, annuity });
+    }
+  } else {
+    tilgungsart = 'Annuitätentilgung';
+    const q = 1 + rate / 100;
+    const qn = Math.pow(q, years);
+    const tilgungFirst = (loan * (q - 1)) / (qn - 1);
+    const annuity = tilgungFirst * qn;
+    
+    let rest = loan;
+    for (let year = 1; year <= 2; year++) {
+      const interest = rest * rate / 100;
+      const tilgung = annuity - interest;
+      rows.push({ year, restStart: rest, interest, tilgung, annuity });
+      rest -= tilgung;
+    }
   }
-
-  // Jahr 1: S0, T sichtbar → Schüler berechnet Z1, A1
-  // Jahr 2: GAR NICHTS sichtbar
-  // Jahr 3: T, Z sichtbar → Schüler sieht T = konstant!
-  const hiddenFieldsMap = new Map<number, Set<string>>();
-  hiddenFieldsMap.set(1, new Set(['interest', 'annuity']));
-  hiddenFieldsMap.set(2, new Set(['restStart', 'interest', 'tilgung', 'annuity'])); // Ganz versteckt
-  hiddenFieldsMap.set(3, new Set(['restStart', 'annuity']));
-
-  const inputs: TaskInput[] = [];
-
-  // Tilgungsart-Dropdown (MUSS ausgefüllt sein!)
-  inputs.push({
-    id: 'erkunden_tilgungsart',
-    label: 'Tilgungsart',
-    unit: '',
-    placeholder: 'Wähle aus',
-    correctValue: 'Ratentilgung',
-    tolerance: 0,
-    type: 'select',
-    options: ['Ratentilgung', 'Annuitätentilgung'],
-    displayDecimals: 0,
-  });
   
-  // Jahr 1
-  inputs.push({
-    id: `erkundeny1_interest`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 3.000,00',
-    correctValue: rows[0].interest,
-    tolerance: rows[0].interest * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `erkundeny1_annuity`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 15.000,00',
-    correctValue: rows[0].annuity,
-    tolerance: rows[0].annuity * 0.01,
-    displayDecimals: 2,
-  });
+  // Erstelle halb ausgefüllten Plan mit gezielt fehlenden Zellen
+  // Wichtig: Das definierende Merkmal (konstante Tilgung oder Annuität) MUSS sichtbar sein,
+  // damit der Schüler die Tilgungsart erkennen kann!
+  const incompleteRows = rows.map((row, yearIndex) => {
+    const hide = new Set<string>();
+    
+    if (isRatenplan) {
+      // Ratentilgung: Tilgung ist konstant und IMMER sichtbar
+      // Pro Jahr unterschiedliche Kombinationen verstecken
+      
+      if (yearIndex === 0) {
+        // Jahr 1: restStart + Tilgung sichtbar → Schüler kann Zinsen + Annuität berechnen
+        hide.add('interest');
+        hide.add('annuity');
+      } else {
+        // Jahr 2: Tilgung + Annuität sichtbar → Schüler kann Zinsen + restStart berechnen
+        hide.add('restStart');
+        hide.add('interest');
+      }
+    } else {
+      // Annuitätentilgung: Annuität ist konstant und IMMER sichtbar
+      // Pro Jahr unterschiedliche Kombinationen verstecken
+      
+      if (yearIndex === 0) {
+        // Jahr 1: restStart + Annuität sichtbar → Schüler kann Zinsen + Tilgung berechnen
+        hide.add('interest');
+        hide.add('tilgung');
+      } else {
+        // Jahr 2: Annuität + Zinsen sichtbar → Schüler kann Tilgung + restStart berechnen
+        hide.add('restStart');
+        hide.add('tilgung');
+      }
+    }
 
-  // Jahr 2 - ALLE Felder
-  inputs.push({
-    id: `erkundeny2_debt`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 100.000,00',
-    correctValue: rows[1].restStart,
-    tolerance: rows[1].restStart * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `erkundeny2_interest`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 2.500,00',
-    correctValue: rows[1].interest,
-    tolerance: rows[1].interest * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `erkundeny2_tilgung`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 6.000,00',
-    correctValue: rows[1].tilgung,
-    tolerance: rows[1].tilgung * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `erkundeny2_annuity`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 8.500,00',
-    correctValue: rows[1].annuity,
-    tolerance: rows[1].annuity * 0.01,
-    displayDecimals: 2,
-  });
-
-  // Jahr 3
-  inputs.push({
-    id: `erkundeny3_debt`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 80.000,00',
-    correctValue: rows[2].restStart,
-    tolerance: rows[2].restStart * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `erkundeny3_annuity`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 7.500,00',
-    correctValue: rows[2].annuity,
-    tolerance: rows[2].annuity * 0.01,
-    displayDecimals: 2,
+    return {
+      year: row.year,
+      restStart: row.restStart,
+      interest: row.interest,
+      tilgung: row.tilgung,
+      annuity: row.annuity,
+      hiddenFields: hide,
+    };
   });
 
   const question = (
-    <div className="space-y-3">
-      <p className="font-semibold">Aufgabe: Vervollständige den Tilgungsplan (Ratentilgung)</p>
-      <p className="text-sm text-gray-600">Beobachte: Welche Größe bleibt konstant? Nutze diese Erkenntnis zum Berechnen.</p>
+    <div className="space-y-4">
+      <p className="text-gray-700">
+        <strong>Aufgabe:</strong> Vervollständige den Tilgungsplan und gib an, um welche Tilgungsart es sich handelt.
+      </p>
     </div>
   );
 
   const solution = (
     <div className="space-y-2">
-      <p className="font-semibold">Lösungsweg:</p>
-      <ul className="list-disc list-inside text-sm space-y-1">
-        <li>Erkenne: Tilgung T = konstant</li>
-        <li>Berechne Zinssatz: p% = {(rows[0].interest / s0 * 100).toFixed(1)}%</li>
-        <li>Berechne alle anderen Felder mit T = konstant</li>
-      </ul>
+      <p><strong>Tilgungsart:</strong> {tilgungsart}</p>
       {renderPlanSolution(rows)}
     </div>
   );
 
-  return {
-    type: 'ratendarlehen_erkunden',
-    question,
-    solution,
-    inputs,
-    formula: 'Ratentilgung: T = konstant, Z = S * p%, A = T + Z',
-    topic: 'Ratentilgung erkennen & berechnen',
-    _hiddenFields: hiddenFieldsMap,
-    pointsAwarded: 9,
-  };
-};
-
-/**
- * Ratentilgung Typ 2: "Gemischt"
- * Gegeben: Zufällige Zellen aus 3 Jahren, aber konsistent
- * Schüler muss Zellen kombinieren um p% zu deduzieren
- */
-const createRatendarlehenGemischtTask = (): Task => {
-  const s0 = randomInt(40, 150) * 1000;
-  const n = randomInt(5, 8);
-  const rate = randomFloat(2.5, 4.5, 1);
-  
-  const tilgung = s0 / n;
-  let rows: PlanRow[] = [];
-  
-  for (let year = 1; year <= 3; year++) {
-    const restStart = s0 - tilgung * (year - 1);
-    const interest = restStart * rate / 100;
-    const annuity = tilgung + interest;
-    rows.push({ year, restStart, interest, tilgung, annuity });
-  }
-
-  // Jahr 1: S0, Z sichtbar → berechne p%!
-  // Jahr 2: T, A sichtbar → deduziere Z = A - T
-  // Jahr 3: S, T, Z sichtbar
-  const hiddenFieldsMap = new Map<number, Set<string>>();
-  hiddenFieldsMap.set(1, new Set(['tilgung', 'annuity']));
-  hiddenFieldsMap.set(2, new Set(['restStart', 'interest']));
-  hiddenFieldsMap.set(3, new Set(['annuity']));
-
+  // Füge Select für Tilgungsart hinzu - ZUERST in der Array
   const inputs: TaskInput[] = [];
-
-  // Tilgungsart-Dropdown
+  
   inputs.push({
-    id: 'gemischt_tilgungsart',
+    id: 'tilgungsart',
     label: 'Tilgungsart',
     unit: '',
     placeholder: 'Wähle aus',
-    correctValue: 'Ratentilgung',
+    correctValue: tilgungsart,
     tolerance: 0,
     type: 'select',
     options: ['Ratentilgung', 'Annuitätentilgung'],
     displayDecimals: 0,
   });
-  
-  // Jahr 1: Z gegeben
-  inputs.push({
-    id: `ratengemischt_y1_tilgung`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 8.000,00',
-    correctValue: rows[0].tilgung,
-    tolerance: rows[0].tilgung * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `ratengemischt_y1_annuity`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 10.000,00',
-    correctValue: rows[0].annuity,
-    tolerance: rows[0].annuity * 0.01,
-    displayDecimals: 2,
-  });
 
-  // Jahr 2
-  inputs.push({
-    id: `ratengemischt_y2_debt`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 92.000,00',
-    correctValue: rows[1].restStart,
-    tolerance: rows[1].restStart * 0.01,
-    displayDecimals: 2,
+  // Dann Inputs für alle fehlenden Zellen
+  incompleteRows.forEach((row) => {
+    if (row.hiddenFields.has('restStart')) {
+      inputs.push({
+        id: `incomplete_plan_y${row.year}_debt`,
+        label: '',
+        unit: '€',
+        placeholder: 'z.B. 100.000,00',
+        correctValue: row.restStart,
+        tolerance: row.restStart * 0.01,
+        displayDecimals: 2,
+      });
+    }
+    if (row.hiddenFields.has('interest')) {
+      inputs.push({
+        id: `incomplete_plan_y${row.year}_interest`,
+        label: '',
+        unit: '€',
+        placeholder: 'z.B. 3.200,00',
+        correctValue: row.interest,
+        tolerance: row.interest * 0.01,
+        displayDecimals: 2,
+      });
+    }
+    if (row.hiddenFields.has('tilgung')) {
+      inputs.push({
+        id: `incomplete_plan_y${row.year}_tilgung`,
+        label: '',
+        unit: '€',
+        placeholder: 'z.B. 12.500,00',
+        correctValue: row.tilgung,
+        tolerance: row.tilgung * 0.01,
+        displayDecimals: 2,
+      });
+    }
+    if (row.hiddenFields.has('annuity')) {
+      inputs.push({
+        id: `incomplete_plan_y${row.year}_annuity`,
+        label: '',
+        unit: '€',
+        placeholder: 'z.B. 15.700,00',
+        correctValue: row.annuity,
+        tolerance: row.annuity * 0.01,
+        displayDecimals: 2,
+      });
+    }
   });
-  inputs.push({
-    id: `ratengemischt_y2_interest`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 2.300,00',
-    correctValue: rows[1].interest,
-    tolerance: rows[1].interest * 0.01,
-    displayDecimals: 2,
-  });
-
-  // Jahr 3
-  inputs.push({
-    id: `ratengemischt_y3_annuity`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 9.400,00',
-    correctValue: rows[2].annuity,
-    tolerance: rows[2].annuity * 0.01,
-    displayDecimals: 2,
-  });
-
-  const question = (
-    <div className="space-y-3">
-      <p className="font-semibold">Aufgabe: Vervollständige den Tilgungsplan (Ratentilgung)</p>
-      <p className="text-sm text-gray-600">Tipp: Erkenne zuerst das Tilgungsmuster, dann berechne den Zinssatz.</p>
-    </div>
-  );
-
-  const solution = (
-    <div className="space-y-2">
-      <p className="font-semibold">Lösungsweg:</p>
-      <ul className="list-disc list-inside text-sm space-y-1">
-        <li>Erkenne: T = konstant</li>
-        <li>Berechne p% = {(rows[0].interest / s0 * 100).toFixed(1)}%</li>
-        <li>Berechne schrittweise mit A = T + Z, S_neu = S_alt - T</li>
-      </ul>
-      {renderPlanSolution(rows)}
-    </div>
-  );
 
   return {
-    type: 'ratendarlehen_gemischt',
+    type: 'incomplete_tilgungsplan',
     question,
     solution,
     inputs,
-    formula: 'Ratentilgung: T = konstant, p% konstant, Z = S * p%, A = T + Z',
-    topic: 'Ratentilgung - Musteranalyse',
-    _hiddenFields: hiddenFieldsMap,
-    pointsAwarded: 10,
-  };
-};
-
-/**
- * Annuitätentilgung Typ 1: "Erkunden"
- * Gegeben: Jahr 1 + Jahre 2,3 mit sichtbarer Annuität
- * Versteckt: Teile von Jahr 1
- * Schüler erkennt: A konstant → Annuitätentilgung
- */
-const createAnnuitaetErkundenTask = (): Task => {
-  const s0 = randomInt(80, 200) * 1000;
-  const n = randomInt(6, 10);
-  const rate = randomFloat(2.5, 4.5, 1);
-  
-  const q = 1 + rate / 100;
-  const qn = Math.pow(q, n);
-  const annuity = (s0 * (q - 1) * qn) / (qn - 1);
-  
-  let rows: PlanRow[] = [];
-  let rest = s0;
-  
-  for (let year = 1; year <= 3; year++) {
-    const interest = rest * rate / 100;
-    const tilgung = annuity - interest;
-    rows.push({ year, restStart: rest, interest, tilgung, annuity });
-    rest -= tilgung;
-  }
-
-  // Jahr 1: S0, Z sichtbar → berechne T, A
-  // Jahr 2: T, A sichtbar → berechne S, Z
-  // Jahr 3: A, Z sichtbar → berechne T, S
-  const hiddenFieldsMap = new Map<number, Set<string>>();
-  hiddenFieldsMap.set(1, new Set(['tilgung', 'annuity']));
-  hiddenFieldsMap.set(2, new Set(['restStart', 'interest']));
-  hiddenFieldsMap.set(3, new Set(['restStart', 'tilgung']));
-
-  const inputs: TaskInput[] = [];
-
-  // Tilgungsart-Dropdown
-  inputs.push({
-    id: 'annuitaet_erk_tilgungsart',
-    label: 'Tilgungsart',
-    unit: '',
-    placeholder: 'Wähle aus',
-    correctValue: 'Annuitätentilgung',
-    tolerance: 0,
-    type: 'select',
-    options: ['Ratentilgung', 'Annuitätentilgung'],
-    displayDecimals: 0,
-  });
-  
-  // Jahr 1
-  inputs.push({
-    id: `annuitaet_erk_y1_tilgung`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 12.000,00',
-    correctValue: rows[0].tilgung,
-    tolerance: rows[0].tilgung * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `annuitaet_erk_y1_annuity`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 16.000,00',
-    correctValue: rows[0].annuity,
-    tolerance: rows[0].annuity * 0.01,
-    displayDecimals: 2,
-  });
-
-  // Jahr 2
-  inputs.push({
-    id: `annuitaet_erk_y2_debt`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 150.000,00',
-    correctValue: rows[1].restStart,
-    tolerance: rows[1].restStart * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `annuitaet_erk_y2_interest`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 3.500,00',
-    correctValue: rows[1].interest,
-    tolerance: rows[1].interest * 0.01,
-    displayDecimals: 2,
-  });
-
-  // Jahr 3
-  inputs.push({
-    id: `annuitaet_erk_y3_debt`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 140.000,00',
-    correctValue: rows[2].restStart,
-    tolerance: rows[2].restStart * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `annuitaet_erk_y3_tilgung`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 12.500,00',
-    correctValue: rows[2].tilgung,
-    tolerance: rows[2].tilgung * 0.01,
-    displayDecimals: 2,
-  });
-
-  const question = (
-    <div className="space-y-3">
-      <p className="font-semibold">Aufgabe: Vervollständige den Tilgungsplan (Annuitätentilgung)</p>
-      <p className="text-sm text-gray-600">Beobachte: Welche Größe bleibt konstant?</p>
-    </div>
-  );
-
-  const solution = (
-    <div className="space-y-2">
-      <p className="font-semibold">Lösungsweg:</p>
-      <ul className="list-disc list-inside text-sm space-y-1">
-        <li>Erkenne: Annuität A = konstant = {annuity.toFixed(2)} €</li>
-        <li>Berechne p% = {(rows[0].interest / s0 * 100).toFixed(1)}%</li>
-        <li>Für jedes Jahr: T = A - Z, S_neu = S_alt - T</li>
-      </ul>
-      {renderPlanSolution(rows)}
-    </div>
-  );
-
-  return {
-    type: 'annuitaet_erkunden',
-    question,
-    solution,
-    inputs,
-    formula: 'Annuitatentilgung: A = konstant, Z = S * p%, T = A - Z',
-    topic: 'Annuitätentilgung erkennen & berechnen',
-    _hiddenFields: hiddenFieldsMap,
-    pointsAwarded: 9,
-  };
-};
-
-/**
- * Annuitätentilgung Typ 2: "Gemischt"
- * Gegeben: Verschiedene Zellkombinationen über 3 Jahre
- */
-const createAnnuitaetGemischtTask = (): Task => {
-  const s0 = randomInt(100, 200) * 1000;
-  const n = randomInt(6, 10);
-  const rate = randomFloat(2.5, 4.5, 1);
-  
-  const q = 1 + rate / 100;
-  const qn = Math.pow(q, n);
-  const annuity = (s0 * (q - 1) * qn) / (qn - 1);
-  
-  let rows: PlanRow[] = [];
-  let rest = s0;
-  
-  for (let year = 1; year <= 3; year++) {
-    const interest = rest * rate / 100;
-    const tilgung = annuity - interest;
-    rows.push({ year, restStart: rest, interest, tilgung, annuity });
-    rest -= tilgung;
-  }
-
-  // Jahr 1: S0, A sichtbar
-  // Jahr 2: Z, A sichtbar → berechne T = A - Z
-  // Jahr 3: T, A sichtbar → berechne Z = A - T
-  const hiddenFieldsMap = new Map<number, Set<string>>();
-  hiddenFieldsMap.set(1, new Set(['interest', 'tilgung']));
-  hiddenFieldsMap.set(2, new Set(['restStart', 'tilgung']));
-  hiddenFieldsMap.set(3, new Set(['restStart', 'interest']));
-
-  const inputs: TaskInput[] = [];
-
-  // Tilgungsart-Dropdown
-  inputs.push({
-    id: 'annuitaet_gem_tilgungsart',
-    label: 'Tilgungsart',
-    unit: '',
-    placeholder: 'Wähle aus',
-    correctValue: 'Annuitätentilgung',
-    tolerance: 0,
-    type: 'select',
-    options: ['Ratentilgung', 'Annuitätentilgung'],
-    displayDecimals: 0,
-  });
-  
-  // Jahr 1
-  inputs.push({
-    id: `annuitaet_gem_y1_interest`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 4.000,00',
-    correctValue: rows[0].interest,
-    tolerance: rows[0].interest * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `annuitaet_gem_y1_tilgung`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 10.000,00',
-    correctValue: rows[0].tilgung,
-    tolerance: rows[0].tilgung * 0.01,
-    displayDecimals: 2,
-  });
-
-  // Jahr 2
-  inputs.push({
-    id: `annuitaet_gem_y2_debt`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 180.000,00',
-    correctValue: rows[1].restStart,
-    tolerance: rows[1].restStart * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `annuitaet_gem_y2_tilgung`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 10.500,00',
-    correctValue: rows[1].tilgung,
-    tolerance: rows[1].tilgung * 0.01,
-    displayDecimals: 2,
-  });
-
-  // Jahr 3
-  inputs.push({
-    id: `annuitaet_gem_y3_debt`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 170.000,00',
-    correctValue: rows[2].restStart,
-    tolerance: rows[2].restStart * 0.01,
-    displayDecimals: 2,
-  });
-  inputs.push({
-    id: `annuitaet_gem_y3_interest`,
-    label: '',
-    unit: '€',
-    placeholder: 'z.B. 3.500,00',
-    correctValue: rows[2].interest,
-    tolerance: rows[2].interest * 0.01,
-    displayDecimals: 2,
-  });
-
-  const question = (
-    <div className="space-y-3">
-      <p className="font-semibold">Aufgabe: Vervollständige den Tilgungsplan (Annuitätentilgung)</p>
-      <p className="text-sm text-gray-600">Tipp: A bleibt konstant über alle Jahre!</p>
-    </div>
-  );
-
-  const solution = (
-    <div className="space-y-2">
-      <p className="font-semibold">Lösungsweg:</p>
-      <ul className="list-disc list-inside text-sm space-y-1">
-        <li>Erkenne: A = konstant = {annuity.toFixed(2)} €</li>
-        <li>Berechne p% aus Jahr 1: p% = {(rows[0].interest / s0 * 100).toFixed(1)}%</li>
-        <li>Nutze: T = A - Z und S_neu = S_alt - T</li>
-      </ul>
-      {renderPlanSolution(rows)}
-    </div>
-  );
-
-  return {
-    type: 'annuitaet_gemischt',
-    question,
-    solution,
-    inputs,
-    formula: 'Annuitatentilgung: A = konstant, Z = S * p%, T = A - Z',
-    topic: 'Annuitätentilgung - Musteranalyse',
-    _hiddenFields: hiddenFieldsMap,
-    pointsAwarded: 10,
+    formula: 'Erkenne das Muster: Ist die Tilgung konstant (Ratentilgung) oder die Annuität konstant (Annuitätentilgung)? Das verrät die Tilgungsart. Nutze dann:\n• Bei Ratentilgung: T konstant, Zinsen = Restschuld × p%, Annuität = T + Zinsen\n• Bei Annuitätentilgung: A konstant, Zinsen = Restschuld × p%, Tilgung = A − Zinsen',
+    topic: 'Tilgungsplananalyse',
+    _incompleteRows: incompleteRows, // Speichere die Reihen für das Rendering
+    pointsAwarded: 8,
   };
 };
 
@@ -2152,10 +1769,9 @@ const generators: Record<TaskType, () => Task> = {
   kapitalmehrung: createKapitalmehrungTask,
   kapitalminderung: createKapitalminderungTask,
   renten_endwert: createRentenEndwertTask,
-  ratendarlehen_erkunden: createRatendarlehenErkundenTask,
-  ratendarlehen_gemischt: createRatendarlehenGemischtTask,
-  annuitaet_erkunden: createAnnuitaetErkundenTask,
-  annuitaet_gemischt: createAnnuitaetGemischtTask,
+  ratendarlehen_plan: createRatendarlehenPlanTask,
+  annuitaet_plan: createAnnuitaetPlanTask,
+  incomplete_tilgungsplan: createIncompleteTilgungsplanTask,
 };
 
 const randomTaskType = (): TaskType => randomChoice<TaskType>(taskTypes);
@@ -2355,67 +1971,8 @@ export default function GemischteFinanzaufgaben() {
           };
         }
 
-        // Spezial-Handling für neue Tilgungspläne: Prüfe ALLE Plan-Zellen + Dropdown
-        if (c.task.type === 'ratendarlehen_erkunden' || c.task.type === 'ratendarlehen_gemischt' || 
-            c.task.type === 'annuitaet_erkunden' || c.task.type === 'annuitaet_gemischt') {
-          let correctCells = 0;
-          let totalCells = 0;
-          let tilgungsartCorrect = true;
-
-          // Prüfe alle Inputs
-          c.task.inputs.forEach(input => {
-            if (input.type === 'select') {
-              // Prüfe Tilgungsart-Dropdown
-              const userValue = c.userAnswers[input.id];
-              if (!userValue || userValue !== input.correctValue) {
-                tilgungsartCorrect = false;
-              }
-              return;
-            }
-            
-            totalCells++;
-            const userValue = c.userAnswers[input.id];
-            if (userValue?.trim()) {
-              const isCorrect = isInputCorrect(input, userValue);
-              if (isCorrect) {
-                correctCells++;
-              }
-            }
-          });
-
-          // BEIDE müssen stimmen: Tilgungsart UND alle Zellen
-          const isCorrect = correctCells === totalCells && tilgungsartCorrect;
-          const pointsToAward = c.task.pointsAwarded || POINTS_PER_CORRECT;
-
-          if (isCorrect) {
-            setStats(prev => ({
-              correct: prev.correct + 1,
-              total: prev.total + 1,
-              streak: prev.streak + 1,
-              points: prev.points + pointsToAward,
-            }));
-          } else {
-            setStats(prev => ({
-              correct: prev.correct,
-              total: prev.total + 1,
-              streak: 0,
-              points: prev.points,
-            }));
-          }
-
-          return {
-            ...c,
-            feedback: isCorrect ? (
-              `Stark! Alle Werte stimmen und die Tilgungsart ist korrekt. (+${pointsToAward} Punkte)`
-            ) : (
-              `Es wurden ${correctCells} von ${totalCells} Zellen korrekt ausgefüllt. ${tilgungsartCorrect ? '' : 'Die Tilgungsart ist falsch.'}`
-            ),
-            feedbackType: isCorrect ? 'correct' : 'incorrect',
-          };
-        }
-
-        // Spezial-Handling für ALTE Tilgungspläne (falls noch vorhanden): Prüfe NICHT task.inputs (nur Dropdown), prüfe die Plan-Zellen direkt
-        if (c.task.type === 'ratendarlehen_plan' || c.task.type === 'annuitaet_plan') {
+        // Spezial-Handling für Tilgungspläne: Prüfe NICHT task.inputs (nur Dropdown), prüfe die Plan-Zellen direkt
+        if (c.task.type === 'ratendarlehen_plan' || c.task.type === 'annuitaet_plan' || c.task.type === 'incomplete_tilgungsplan') {
           // Für Tilgungspläne: Zähle korrekte Zellen und prüfe Tilgungsart
           let correctCells = 0;
           let totalCells = 0;
@@ -2625,111 +2182,6 @@ export default function GemischteFinanzaufgaben() {
                   const planTable = extractPlanTable(card.task.inputs.filter(i => i.type !== 'select'));
                   const tilgungsartInput = card.task.inputs.find(i => i.type === 'select');
                   
-                  // Neue Aufgabentypen: Nutze _hiddenFields statt _incompleteRows
-                  if (card.task.type === 'ratendarlehen_erkunden' || card.task.type === 'ratendarlehen_gemischt' ||
-                      card.task.type === 'annuitaet_erkunden' || card.task.type === 'annuitaet_gemischt') {
-                    
-                    const hiddenFieldsMap = (card.task as any)._hiddenFields as Map<number, Set<string>> | undefined;
-                    if (!hiddenFieldsMap || !planTable) {
-                      return <div>Fehler beim Laden der Aufgabe.</div>;
-                    }
-
-                    return (
-                      <div className="space-y-4">
-                        {/* Dropdown für Tilgungsart */}
-                        {tilgungsartInput && (
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                            <label className="font-semibold text-slate-600 sm:min-w-[220px]">{tilgungsartInput.label}</label>
-                            <select
-                              value={card.userAnswers[tilgungsartInput.id] || ''}
-                              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                                handleInputChange(card.id, tilgungsartInput.id, e.target.value)
-                              }
-                              className="flex-1 border-2 border-slate-300 rounded-xl px-4 py-2 text-lg focus:outline-none focus:border-blue-400 bg-white max-w-sm"
-                            >
-                              <option value="">{tilgungsartInput.placeholder}</option>
-                              {tilgungsartInput.options?.map(opt => (
-                                <option key={opt} value={opt}>
-                                  {opt}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Tabelle mit Input-Feldern */}
-                        <div className="overflow-x-auto">
-                          <table className="w-full border border-slate-200 text-sm">
-                            <thead>
-                              <tr className="bg-slate-100 text-slate-700">
-                                <th className="p-2 text-center font-semibold">Jahr</th>
-                                {PLAN_COLUMNS.map(col => (
-                                  <th key={col.key} className="p-2 text-center font-semibold">
-                                    {col.label}
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {planTable.map((row, index) => {
-                                const rowsToRender: React.ReactNode[] = [];
-                                if (index > 0 && row.year - planTable[index - 1].year > 1) {
-                                  rowsToRender.push(
-                                    <tr key={`gap-${row.year}`}>
-                                      <td colSpan={PLAN_COLUMNS.length + 1} className="p-2 text-center text-slate-400">
-                                        …
-                                      </td>
-                                    </tr>
-                                  );
-                                }
-                                rowsToRender.push(
-                                  <tr key={`plan-row-${row.year}`} className="border-t border-slate-200">
-                                    <td className="p-2 text-center font-semibold text-slate-600">{row.year}</td>
-                                    {PLAN_COLUMNS.map(col => {
-                                      const input = row.cells[col.key];
-                                      
-                                      if (!input) {
-                                        // Sichtbarer Wert - nicht eingeben
-                                        return <td key={col.key} className="p-2"></td>;
-                                      }
-                                      
-                                      // Inputfeld für versteckte Werte
-                                      const userValue = card.userAnswers[input.id];
-                                      const isCorrect = userValue?.trim() ? isInputCorrect(input, userValue) : null;
-                                      
-                                      return (
-                                        <td key={col.key} className="p-2 align-middle">
-                                          <div className="flex items-center gap-1">
-                                            <input
-                                              type="text"
-                                              aria-label={`${col.label} Jahr ${row.year}`}
-                                              value={userValue || ''}
-                                              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                                handleInputChange(card.id, input.id, e.target.value)
-                                              }
-                                              placeholder={input.placeholder}
-                                              className={`w-24 border rounded px-2 py-1 text-center text-sm focus:outline-none ${
-                                                isCorrect === null ? 'border-slate-300 focus:border-blue-400' :
-                                                isCorrect ? 'border-green-500 bg-green-50' :
-                                                'border-red-500 bg-red-50'
-                                              }`}
-                                            />
-                                            <span className="text-xs font-bold text-slate-500">{input.unit}</span>
-                                          </div>
-                                        </td>
-                                      );
-                                    })}
-                                  </tr>
-                                );
-                                return rowsToRender;
-                              })}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    );
-                  }
-                  
                   if (!planTable) {
                     return (
                       <div className="flex flex-col items-center justify-center gap-3 mb-3">
@@ -2771,7 +2223,7 @@ export default function GemischteFinanzaufgaben() {
                     );
                   }
 
-                  // Für alte incomplete_tilgungsplan: Dropdown oben + einzelne Tabelle mit allen Werten
+                  // Für incomplete_tilgungsplan: Dropdown oben + einzelne Tabelle mit allen Werten
                   if (tilgungsartInput) {
                     return (
                       <div className="space-y-4">
