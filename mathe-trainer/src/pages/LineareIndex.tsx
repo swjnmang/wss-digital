@@ -21,12 +21,12 @@ export default function LineareIndex() {
       </header>
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-8 grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {items.map((it) => (
-          <div key={it.title} className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col items-center p-6 hover:shadow-xl transition-shadow">
+          <Link key={it.title} to={`/lineare_funktionen/${it.href}`} className="bg-white rounded-2xl border border-slate-200 flex flex-col items-center p-6 hover:shadow-lg transition-shadow hover:border-blue-300">
             <div className="card-icon text-3xl mb-3 text-blue-700"><i className={it.icon}></i></div>
             <h3 className="text-lg font-semibold mb-1 text-blue-900">{it.title}</h3>
-            <p className="text-gray-700 mb-4 text-center">{it.desc}</p>
-              <Link to={`/lineare_funktionen/${it.href}`} className="mt-auto inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow transition-colors"></Link>
-          </div>
+            <p className="text-gray-700 mb-4 text-center flex-1">{it.desc}</p>
+            <span className="mt-auto inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">Start</span>
+          </Link>
         ))}
       </main>
     </div>
