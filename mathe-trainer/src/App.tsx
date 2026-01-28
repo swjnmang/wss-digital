@@ -117,6 +117,8 @@ import DieLeinwand from './pages/raum_und_form/DieLeinwand';
 import KathetenHypotenuse from './pages/raum_und_form/pythagoras/KathetenHypotenuse';
 import SeitenBerechnen from './pages/raum_und_form/pythagoras/SeitenBerechnen';
 import Anwendungsaufgaben from './pages/raum_und_form/pythagoras/Anwendungsaufgaben';
+// Excel Trainer
+import { ExcelTrainer } from './pages/ExcelTrainer';
 // ... other imports will be added as files are created
 
 export default function App() {
@@ -266,6 +268,9 @@ export default function App() {
           <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/fussballplatz" element={<Fussballplatz />} />
           <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/haus" element={<Haus />} />
           <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/die-leinwand" element={<DieLeinwand />} />
+
+          {/* Excel Trainer */}
+          <Route path="/excel-trainer" element={<ExcelTrainer />} />
 
           <Route path="/impressum" element={<Impressum />} />
 

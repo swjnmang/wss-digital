@@ -1,0 +1,109 @@
+{
+  "tasks": [
+    {
+      "id": "task-summe-01",
+      "title": "Summe berechnen",
+      "description": "Berechne die Summe der vorgegebenen Zahlen",
+      "instruction": "Verwende die SUMME-Formel in Zelle B6, um alle Werte von B2 bis B5 zu addieren.",
+      "difficulty": "einfach",
+      "category": "formeln-grundlagen",
+      "data": {
+        "headers": ["Wert"],
+        "rows": [
+          ["10"],
+          ["25"],
+          ["15"],
+          ["30"],
+          ["Summe:"],
+          [""]
+        ]
+      },
+      "validation": {
+        "type": "formula",
+        "cell": "B6",
+        "expectedFormula": "=SUMME(B2:B5)",
+        "expectedValue": 80,
+        "feedback": {
+          "correct": "✅ Korrekt! Die Summe ist 80.",
+          "wrongFormula": "❌ Die Formel ist nicht ganz richtig. Achte auf die Syntax: =SUMME(B2:B5)",
+          "wrongValue": "❌ Das Ergebnis ist nicht korrekt. Überprüfe deine Formel.",
+          "hint": "💡 Hinweis: SUMME addiert alle Werte in einem Bereich. Syntaxis: =SUMME(Start:Ende)"
+        }
+      }
+    },
+    {
+      "id": "task-min-max",
+      "title": "MIN und MAX finden",
+      "description": "Finde die minimale und maximale Temperatur",
+      "instruction": "Berechne in C2 den MIN-Wert und in C3 den MAX-Wert der Temperaturen (B2:B6).",
+      "difficulty": "einfach",
+      "category": "formeln-grundlagen",
+      "data": {
+        "headers": ["Tag", "Temperatur (°C)"],
+        "rows": [
+          ["Montag", "18"],
+          ["Dienstag", "22"],
+          ["Mittwoch", "20"],
+          ["Donnerstag", "25"],
+          ["Freitag", "19"]
+        ]
+      },
+      "validation": [
+        {
+          "type": "formula",
+          "cell": "C2",
+          "expectedFormula": "=MIN(B2:B6)",
+          "expectedValue": 18,
+          "label": "Minimum",
+          "feedback": {
+            "correct": "✅ Minimum korrekt!",
+            "wrongFormula": "❌ Überprüfe die MIN-Formel",
+            "hint": "💡 MIN findet den kleinsten Wert"
+          }
+        },
+        {
+          "type": "formula",
+          "cell": "C3",
+          "expectedFormula": "=MAX(B2:B6)",
+          "expectedValue": 25,
+          "label": "Maximum",
+          "feedback": {
+            "correct": "✅ Maximum korrekt!",
+            "wrongFormula": "❌ Überprüfe die MAX-Formel",
+            "hint": "💡 MAX findet den größten Wert"
+          }
+        }
+      ]
+    },
+    {
+      "id": "task-mittelwert",
+      "title": "Mittelwert berechnen",
+      "description": "Berechne den Durchschnitt von Schülernoten",
+      "instruction": "Verwende die MITTELWERT-Formel in Zelle C7 für alle Noten (C2:C6).",
+      "difficulty": "einfach",
+      "category": "formeln-grundlagen",
+      "data": {
+        "headers": ["Schüler", "Note"],
+        "rows": [
+          ["Anna", "2"],
+          ["Ben", "1"],
+          ["Clara", "3"],
+          ["David", "2"],
+          ["Emma", "1"],
+          ["Mittelwert:", ""]
+        ]
+      },
+      "validation": {
+        "type": "formula",
+        "cell": "C6",
+        "expectedFormula": "=MITTELWERT(C2:C6)",
+        "expectedValue": 1.8,
+        "feedback": {
+          "correct": "✅ Korrekt! Der Durchschnitt ist 1,8",
+          "wrongFormula": "❌ Überprüfe die MITTELWERT-Formel",
+          "hint": "💡 MITTELWERT berechnet den Durchschnitt: Summe ÷ Anzahl"
+        }
+      }
+    }
+  ]
+}
