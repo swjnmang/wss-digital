@@ -119,7 +119,7 @@ import DieLeinwand from './pages/raum_und_form/DieLeinwand';
 // Pythagoras
 import KathetenHypotenuse from './pages/raum_und_form/pythagoras/KathetenHypotenuse';
 import SeitenBerechnen from './pages/raum_und_form/pythagoras/SeitenBerechnen';
-import Anwendungsaufgaben from './pages/raum_und_form/pythagoras/Anwendungsaufgaben';
+import AnwendungsaufgabenPythagoras from './pages/raum_und_form/pythagoras/Anwendungsaufgaben';
 // Excel Trainer
 import { ExcelTrainer } from './pages/ExcelTrainer';
 // ... other imports will be added as files are created
@@ -255,7 +255,7 @@ export default function App() {
           <Route path="/raum-und-form/satz-des-pythagoras" element={<SatzDesPythagoras />} />
           <Route path="/raum-und-form/satz-des-pythagoras/katheten-hypotenuse" element={<KathetenHypotenuse />} />
           <Route path="/raum-und-form/satz-des-pythagoras/berechnen" element={<SeitenBerechnen />} />
-          <Route path="/raum-und-form/satz-des-pythagoras/anwendung" element={<Anwendungsaufgaben />} />
+          <Route path="/raum-und-form/satz-des-pythagoras/anwendung" element={<AnwendungsaufgabenPythagoras />} />
           <Route path="/raum-und-form/strahlensaetze" element={<Strahlensaetze />} />
           <Route path="/raum-und-form/kugel" element={<Kugel />} />
           <Route path="/raum-und-form/kegel" element={<Kegel />} />
