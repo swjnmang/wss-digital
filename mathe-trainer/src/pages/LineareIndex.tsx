@@ -25,7 +25,6 @@ export default function LineareIndex() {
             <div className="card-icon text-3xl mb-3 text-blue-700"><i className={it.icon}></i></div>
             <h3 className="text-lg font-semibold mb-1 text-blue-900">{it.title}</h3>
             <p className="text-gray-700 mb-4 text-center flex-1">{it.desc}</p>
-            <span className="mt-auto inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">Start</span>
           </Link>
         ))}
       </main>
