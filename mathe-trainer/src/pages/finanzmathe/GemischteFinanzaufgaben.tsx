@@ -1604,10 +1604,11 @@ const createIncompleteTilgungsplanTask = (): Task => {
   let rows: PlanRow[] = [];
   let tilgungsart: 'Ratentilgung' | 'Annuitätentilgung';
   
+  // Erstelle 3 Jahre Tilgungsplan
   if (isRatenplan) {
     tilgungsart = 'Ratentilgung';
     const tilgung = loan / years;
-    for (let year = 1; year <= 2; year++) {
+    for (let year = 1; year <= 3; year++) {
       const restStart = loan - tilgung * (year - 1);
       const interest = restStart * rate / 100;
       const annuity = tilgung + interest;
@@ -1621,45 +1622,57 @@ const createIncompleteTilgungsplanTask = (): Task => {
     const annuity = tilgungFirst * qn;
     
     let rest = loan;
-    for (let year = 1; year <= 2; year++) {
+    for (let year = 1; year <= 3; year++) {
       const interest = rest * rate / 100;
       const tilgung = annuity - interest;
       rows.push({ year, restStart: rest, interest, tilgung, annuity });
       rest -= tilgung;
+      rest = Math.round(rest * 100) / 100; // Runde auf 2 Dezimalstellen
     }
   }
   
   // Erstelle halb ausgefüllten Plan mit gezielt fehlenden Zellen
-  // Wichtig: Das definierende Merkmal (konstante Tilgung oder Annuität) MUSS sichtbar sein,
-  // damit der Schüler die Tilgungsart erkennen kann!
+  // Logik: Genug Werte sind sichtbar, damit Student alles berechnen kann
   const incompleteRows = rows.map((row, yearIndex) => {
     const hide = new Set<string>();
     
     if (isRatenplan) {
-      // Ratentilgung: Tilgung ist konstant und IMMER sichtbar
-      // Pro Jahr unterschiedliche Kombinationen verstecken
+      // Ratentilgung: T ist konstant
+      // Jahr 1: restStart + tilgung sichtbar → Student berechnet interest + annuity
+      // Jahr 2: tilgung + annuity sichtbar → Student berechnet interest + restStart
+      // Jahr 3: tilgung + interest sichtbar → Student berechnet restStart + annuity
       
       if (yearIndex === 0) {
-        // Jahr 1: restStart + Tilgung sichtbar → Schüler kann Zinsen + Annuität berechnen
+        // Jahr 1: restStart + tilgung sichtbar
         hide.add('interest');
         hide.add('annuity');
-      } else {
-        // Jahr 2: Tilgung + Annuität sichtbar → Schüler kann Zinsen + restStart berechnen
+      } else if (yearIndex === 1) {
+        // Jahr 2: tilgung + annuity sichtbar
         hide.add('restStart');
         hide.add('interest');
+      } else {
+        // Jahr 3: tilgung + interest sichtbar
+        hide.add('restStart');
+        hide.add('annuity');
       }
     } else {
-      // Annuitätentilgung: Annuität ist konstant und IMMER sichtbar
-      // Pro Jahr unterschiedliche Kombinationen verstecken
+      // Annuitätentilgung: A ist konstant
+      // Jahr 1: restStart + annuity sichtbar → Student berechnet interest + tilgung
+      // Jahr 2: annuity + interest sichtbar → Student berechnet tilgung + restStart
+      // Jahr 3: annuity + tilgung sichtbar → Student berechnet interest + restStart
       
       if (yearIndex === 0) {
-        // Jahr 1: restStart + Annuität sichtbar → Schüler kann Zinsen + Tilgung berechnen
+        // Jahr 1: restStart + annuity sichtbar
         hide.add('interest');
         hide.add('tilgung');
-      } else {
-        // Jahr 2: Annuität + Zinsen sichtbar → Schüler kann Tilgung + restStart berechnen
+      } else if (yearIndex === 1) {
+        // Jahr 2: annuity + interest sichtbar
         hide.add('restStart');
         hide.add('tilgung');
+      } else {
+        // Jahr 3: annuity + tilgung sichtbar
+        hide.add('restStart');
+        hide.add('interest');
       }
     }
 
@@ -1759,7 +1772,7 @@ const createIncompleteTilgungsplanTask = (): Task => {
     formula: 'Erkenne das Muster: Ist die Tilgung konstant (Ratentilgung) oder die Annuität konstant (Annuitätentilgung)? Das verrät die Tilgungsart. Nutze dann:\n• Bei Ratentilgung: T konstant, Zinsen = Restschuld × p%, Annuität = T + Zinsen\n• Bei Annuitätentilgung: A konstant, Zinsen = Restschuld × p%, Tilgung = A − Zinsen',
     topic: 'Tilgungsplananalyse',
     _incompleteRows: incompleteRows, // Speichere die Reihen für das Rendering
-    pointsAwarded: 8,
+    pointsAwarded: 10,
   };
 };
 
@@ -1769,6 +1782,7 @@ const generators: Record<TaskType, () => Task> = {
   kapitalmehrung: createKapitalmehrungTask,
   kapitalminderung: createKapitalminderungTask,
   renten_endwert: createRentenEndwertTask,
+  incomplete_tilgungsplan: createIncompleteTilgungsplanTask,
   ratendarlehen_plan: createRatendarlehenPlanTask,
   annuitaet_plan: createAnnuitaetPlanTask,
   incomplete_tilgungsplan: createIncompleteTilgungsplanTask,
