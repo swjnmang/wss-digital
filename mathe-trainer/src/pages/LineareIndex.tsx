@@ -2,15 +2,16 @@ import { Link } from 'react-router-dom'
 
 export default function LineareIndex() {
   const items = [
-    { title: '1. Steigung berechnen', desc: 'Lerne, die Steigung einer Geraden aus zwei Punkten zu ermitteln.', href: 'steigung_berechnen', icon: 'fa-solid fa-chart-line' },
-    { title: '2. Funktionsgleichung aufstellen', desc: 'Stelle die Gleichung einer Geraden aus gegebenen Informationen auf.', href: 'funktionsgleichung', icon: 'fa-solid fa-pen-ruler' },
-    { title: '3. Funktionsgleichung ablesen', desc: 'Lese die Funktionsgleichung direkt aus einem Graphen ab.', href: 'ablesen', icon: 'fa-solid fa-eye' },
-    { title: '4. Graphen zeichnen', desc: 'Übe das Zeichnen von linearen Funktionen im Koordinatensystem.', href: 'zeichnen', icon: 'fa-solid fa-pencil' },
-    { title: '5. Nullstellen berechnen', desc: 'Finde den Schnittpunkt einer Geraden mit der x-Achse.', href: 'nullstellen', icon: 'fa-solid fa-arrows-down-to-line' },
-    { title: '6. Punkt auf Gerade prüfen', desc: 'Überprüfe rechnerisch, ob ein Punkt auf einer Geraden liegt.', href: 'punkt_gerade', icon: 'fa-solid fa-magnifying-glass-chart' },
+    { title: '1. Graph zeichnen', desc: 'Übe das Zeichnen von linearen Funktionen im Koordinatensystem.', href: 'zeichnen', icon: 'fa-solid fa-pencil' },
+    { title: '2. Funktionsgleichung ablesen', desc: 'Lese die Funktionsgleichung direkt aus einem Graphen ab.', href: 'ablesen', icon: 'fa-solid fa-eye' },
+    { title: '3. Steigung berechnen', desc: 'Lerne, die Steigung einer Geraden aus zwei Punkten zu ermitteln.', href: 'steigung_berechnen', icon: 'fa-solid fa-chart-line' },
+    { title: '4. Funktionsgleichung aufstellen', desc: 'Stelle die Gleichung einer Geraden aus gegebenen Informationen auf.', href: 'funktionsgleichung', icon: 'fa-solid fa-pen-ruler' },
+    { title: '5. Punkt auf Gerade prüfen', desc: 'Überprüfe rechnerisch, ob ein Punkt auf einer Geraden liegt.', href: 'punkt_gerade', icon: 'fa-solid fa-magnifying-glass-chart' },
+    { title: '6. Nullstellen berechnen', desc: 'Finde den Schnittpunkt einer Geraden mit der x-Achse.', href: 'nullstellen', icon: 'fa-solid fa-arrows-down-to-line' },
     { title: '7. Schnittpunkt zweier Geraden', desc: 'Berechne den gemeinsamen Schnittpunkt von zwei Geraden.', href: 'schnittpunkt', icon: 'fa-solid fa-arrows-turn-to-dots' },
-    { title: '8. Spiel: Münzen sammeln', desc: 'Eine spielerische Anwendung zum Thema lineare Funktionen.', href: 'spiel_muenzen', icon: 'fa-solid fa-gamepad' },
-    { title: '9. Abschlusstest', desc: 'Teste dein Wissen über lineare Funktionen.', href: 'test', icon: 'fa-solid fa-graduation-cap' }
+    { title: '8. Gemischte Übungsaufgaben', desc: 'Gemischte Aufgaben zu allen Themen der linearen Funktionen.', href: 'gemischte-aufgaben', icon: 'fa-solid fa-shuffle' },
+    { title: '9. Spiel: Münzen sammeln', desc: 'Eine spielerische Anwendung zum Thema lineare Funktionen.', href: 'spiel_muenzen', icon: 'fa-solid fa-gamepad' },
+    { title: '10. Abschlusstest', desc: 'Teste dein Wissen über lineare Funktionen.', href: 'test', icon: 'fa-solid fa-graduation-cap' }
   ]
 
   return (
