@@ -7,6 +7,7 @@ export default function Zeichnen(){
   const [equation, setEquation] = useState<string>('y = 2x + 1')
   const [geogebraURL, setGeogebraURL] = useState<string>('')
   const [rangeHint, setRangeHint] = useState<string>('')
+  const [showTipps, setShowTipps] = useState<boolean>(false)
 
   useEffect(() => {
     generateNewTask(difficulty)
@@ -111,10 +112,89 @@ export default function Zeichnen(){
 
           <div className="flex justify-center gap-4 flex-wrap">
             <button className="generator-button bg-gradient-to-br from-sky-600 to-sky-700 text-white rounded-md px-5 py-3 shadow" onClick={() => generateNewTask(difficulty)}>Neue Aufgabe</button>
+            <button className="generator-button bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-md px-5 py-3 shadow" onClick={() => setShowTipps(true)}>Tipps</button>
             <button className="generator-button bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-md px-5 py-3 shadow" onClick={openGeoGebra}>Lösungskontrolle anzeigen</button>
           </div>
         </div>
       </div>
+
+      {showTipps && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-blue-600">Tipps zum Zeichnen von Funktionsgraphen</h3>
+              <button
+                onClick={() => setShowTipps(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div>
+                <h4 className="font-bold text-lg text-blue-600 mb-2">1. Wertetabelle erstellen</h4>
+                <p className="text-gray-700 mb-3">Erstelle eine Wertetabelle, indem du mehrere x-Werte in die Funktionsgleichung einsetzt und die entsprechenden y-Werte berechnest.</p>
+                <div className="bg-blue-50 border-l-4 border-blue-600 p-3 text-sm text-gray-700">
+                  <strong>Beispiel:</strong> Für y = 2x - 1<br/>
+                  x = -1 → y = 2(-1) - 1 = -3<br/>
+                  x = 0 → y = 2(0) - 1 = -1<br/>
+                  x = 1 → y = 2(1) - 1 = 1<br/>
+                  x = 2 → y = 2(2) - 1 = 3
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg text-blue-600 mb-2">2. Zwei wichtige Punkte berechnen</h4>
+                <p className="text-gray-700 mb-3">Du brauchst mindestens zwei Punkte, um eine Gerade zu zeichnen. Besonders einfach sind:</p>
+                <ul className="list-disc list-inside text-gray-700 space-y-2">
+                  <li><strong>Y-Achsenabschnitt:</strong> Setze x = 0 ein. Der y-Wert ist direkt der konstante Term in der Gleichung.</li>
+                  <li><strong>X-Achsenabschnitt (Nullstelle):</strong> Setze y = 0 und löse nach x auf.</li>
+                </ul>
+                <div className="bg-blue-50 border-l-4 border-blue-600 p-3 text-sm text-gray-700 mt-3">
+                  <strong>Beispiel:</strong> Für y = 2x - 1<br/>
+                  Y-Achsenabschnitt: x = 0 → y = -1, also Punkt (0 | -1)<br/>
+                  X-Achsenabschnitt: 0 = 2x - 1 → x = 0,5, also Punkt (0,5 | 0)
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg text-blue-600 mb-2">3. Steigung ablesen und nutzen</h4>
+                <p className="text-gray-700 mb-3">Die Steigung m zeigt dir, wie steil die Gerade ist. Wenn du einen Punkt hast, kannst du von dort aus die Steigung nutzen, um weitere Punkte zu finden:</p>
+                <ul className="list-disc list-inside text-gray-700 space-y-2">
+                  <li>Positive Steigung: Gerade verläuft von links unten nach rechts oben</li>
+                  <li>Negative Steigung: Gerade verläuft von links oben nach rechts unten</li>
+                  <li>Steigung m = 2 bedeutet: Wenn du 1 Einheit nach rechts gehst, gehst du 2 Einheiten nach oben</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg text-blue-600 mb-2">4. Punkte ins Koordinatensystem eintragen</h4>
+                <p className="text-gray-700 mb-3">Trage die berechneten Punkte genau ins Koordinatensystem ein. Markiere sie deutlich als kleine Kreuze oder Punkte.</p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg text-blue-600 mb-2">5. Gerade zeichnen</h4>
+                <p className="text-gray-700 mb-3">Verbinde die Punkte mit einem Lineal zu einer geraden Linie. Verlängere die Linie über die markierten Punkte hinaus, um zu zeigen, dass sie sich unendlich fortsetzt.</p>
+              </div>
+
+              <div className="bg-green-50 border-l-4 border-green-600 p-4">
+                <h4 className="font-bold text-green-700 mb-2">💡 Profi-Tipp:</h4>
+                <p className="text-gray-700">Verwende mindestens 3-4 Punkte, um sicherzugehen, dass deine Gerade korrekt ist. Wenn alle Punkte auf einer Linie liegen, hast du alles richtig gemacht!</p>
+              </div>
+            </div>
+
+            <div className="bg-gray-100 border-t border-gray-200 p-4 flex justify-end">
+              <button
+                onClick={() => setShowTipps(false)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
+              >
+                Schließen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
