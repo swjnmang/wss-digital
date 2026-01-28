@@ -2,6 +2,7 @@
   max-width: 720px;
   margin: 0 auto;
   padding: 1rem;
+  text-align: center;
 }
 .card {
   background: white;
@@ -10,6 +11,8 @@
   box-shadow: 0 6px 24px rgba(0,0,0,0.08);
   border: 1px solid #e6e6e6;
 }
+.inputRow { display: flex; gap: 0.75rem; align-items: center; justify-content: center; margin: 1rem 0; }
+.actions { display: flex; gap: 0.5rem; justify-content: center; margin: 1rem 0; }
 .streak {
   position: absolute;
   top: 1rem;
