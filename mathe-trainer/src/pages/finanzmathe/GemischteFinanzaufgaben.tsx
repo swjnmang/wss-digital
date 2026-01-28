@@ -1639,13 +1639,12 @@ const createIncompleteTilgungsplanTask = (): Task => {
     
     if (isRatenplan) {
       // Ratentilgung: T ist konstant
-      // Jahr 1: restStart + tilgung sichtbar → Student berechnet interest + annuity
-      // Jahr 2: tilgung + annuity sichtbar → Student berechnet interest + restStart
-      // Jahr 3: tilgung + interest sichtbar → Student berechnet restStart + annuity
+      // Jahr 1: restStart + tilgung + interest sichtbar → nur annuity versteckt
+      // Jahr 2: tilgung + annuity sichtbar → restStart + interest versteckt
+      // Jahr 3: tilgung + interest sichtbar → restStart + annuity versteckt
       
       if (yearIndex === 0) {
-        // Jahr 1: restStart + tilgung sichtbar
-        hide.add('interest');
+        // Jahr 1: restStart + tilgung + interest sichtbar
         hide.add('annuity');
       } else if (yearIndex === 1) {
         // Jahr 2: tilgung + annuity sichtbar
@@ -1658,13 +1657,12 @@ const createIncompleteTilgungsplanTask = (): Task => {
       }
     } else {
       // Annuitätentilgung: A ist konstant
-      // Jahr 1: restStart + annuity sichtbar → Student berechnet interest + tilgung
-      // Jahr 2: annuity + interest sichtbar → Student berechnet tilgung + restStart
-      // Jahr 3: annuity + tilgung sichtbar → Student berechnet interest + restStart
+      // Jahr 1: restStart + annuity + interest sichtbar → nur tilgung versteckt
+      // Jahr 2: annuity + interest sichtbar → restStart + tilgung versteckt
+      // Jahr 3: annuity + tilgung sichtbar → restStart + interest versteckt
       
       if (yearIndex === 0) {
-        // Jahr 1: restStart + annuity sichtbar
-        hide.add('interest');
+        // Jahr 1: restStart + annuity + interest sichtbar
         hide.add('tilgung');
       } else if (yearIndex === 1) {
         // Jahr 2: annuity + interest sichtbar
