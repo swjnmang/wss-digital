@@ -43,6 +43,11 @@ export default function FinanzmatheIndex() {
             <p className="text-gray-600">Querschnitt mit Zinsen, Zinseszins, Sparplänen und Darlehen.</p>
           </Link>
 
+          <Link to="/finanzmathe/anwendungsaufgaben" className="block p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200">
+            <h2 className="text-xl font-bold text-purple-900 mb-2">Anwendungsaufgaben</h2>
+            <p className="text-gray-600">Praktische Anwendungsaufgaben zur Finanzmathematik.</p>
+          </Link>
+
           <Link to="/finanzmathe/pruefungsmodus" className="block p-6 bg-green-50 rounded-xl hover:bg-green-100 transition border border-green-200">
             <h2 className="text-xl font-bold text-green-800 mb-2">🎓 Prüfungsmodus</h2>
             <p className="text-gray-600">10 gemischte Aufgaben unter Prüfungsbedingungen mit PDF-Zertifikat.</p>
