@@ -55,25 +55,25 @@ export default function LucasKapitalanlagen() {
         </button>
 
         <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
-          <h1 className="text-3xl font-bold text-purple-600 mb-2">Lucas Kapitalanlagen</h1>
+          <h1 className="text-3xl font-bold text-purple-600 mb-2">Sarah's Finanzplanung</h1>
           <p className="text-gray-500 mb-8 text-sm">Abschlussprüfung Finanzmathematik - Bearbeitungszeit: ca. 45 Minuten</p>
 
-          {/* Aufgabe 1.1 */}
+          {/* Aufgabe 1.1 - Nachschüssige Kapitalmehrung */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">1.1 Kapitalberechnung</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">1.1 Altersvorsorge durch Sparplan</h2>
             <p className="text-gray-700 mb-4">
-              Lucas eröffnet am 01.01.2020 ein Sparkonto bei seiner Bank mit einer Einzahlung von 2.500,00 €. Der Zinssatz beträgt 1,8 % pro Jahr.
+              Sarah möchte ab dem 01.01.2021 für ihre Altersvorsorge sparen. Sie zahlt jeweils zum Ende eines Jahres 1.200,00 € auf ein Sparkonto ein. Die Bank gewährt einen Zinssatz von 2,0 % p.a.
               <br/><br/>
-              <strong>Berechne, über welches Kapital Lucas am 31.12.2024 verfügen kann, wenn er keine weiteren Ein- oder Auszahlungen vornimmt.</strong>
+              <strong>Berechne das Kapital, das Sarah bis zum 31.12.2025 angespart hat.</strong>
             </p>
             <div className="flex items-center gap-4 mb-4">
               <label className="flex items-center gap-2">
-                <span className="font-semibold">Kapital am 31.12.2024:</span>
+                <span className="font-semibold">Ersparnisse nach 5 Jahren:</span>
                 <input
                   type="text"
                   value={answers['1.1'].input}
                   onChange={(e) => updateAnswer('1.1', 'input', e.target.value)}
-                  placeholder="z.B. 2.750,50"
+                  placeholder="z.B. 6.244,86"
                   className="border border-gray-300 rounded px-3 py-2 w-32"
                 />
                 <span className="text-gray-600">€</span>
@@ -81,7 +81,7 @@ export default function LucasKapitalanlagen() {
             </div>
             <div className="flex gap-3 flex-wrap mb-4">
               <button
-                onClick={() => checkAnswer('1.1', 2764.50, 1)}
+                onClick={() => checkAnswer('1.1', 6244.86, 2)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -96,39 +96,40 @@ export default function LucasKapitalanlagen() {
             {answers['1.1'].feedback && <p className="text-sm mb-3">{answers['1.1'].feedback}</p>}
             {answers['1.1'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
-                <strong>Lösung:</strong><br/>
-                K = K₀ · qⁿ<br/>
-                K = 2.500,00 € · 1,018⁵<br/>
-                K = 2.500,00 € · 1,10580<br/>
-                K = 2.764,50 €
+                <strong>Lösung (Nachschüssige Rente - Endwert):</strong><br/>
+                K = R · (q^n - 1) / (q - 1)<br/>
+                K = 1.200,00 € · (1,02⁵ - 1) / (1,02 - 1)<br/>
+                K = 1.200,00 € · 0,10408 / 0,02<br/>
+                K = 1.200,00 € · 5,20404<br/>
+                K = 6.244,86 €
               </div>
             )}
           </div>
 
-          {/* Aufgabe 1.2 */}
+          {/* Aufgabe 1.2 - Zinseszins */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">1.2 Zinsatzberechnung</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">1.2 Zinseszinsen für Langzeitanlage</h2>
             <p className="text-gray-700 mb-4">
-              Lucas möchte ein Kapital von 1.800,00 € auf einen Wert von 1.950,40 € anwachsen lassen. Eine Bank verspricht ihm, dass dies in 3 Jahren möglich ist.
+              Sarah hat zusätzlich 8.500,00 € geerbt. Sie legt diesen Betrag zum 01.01.2021 zu einem Zinssatz von 2,5 % p.a. an und lässt die Zinsen automatisch kapitalisieren.
               <br/><br/>
-              <strong>Berechne den erforderlichen Zinssatz in Prozent.</strong>
+              <strong>Berechne, welcher Betrag ihr am 31.12.2025 zur Verfügung steht.</strong>
             </p>
             <div className="flex items-center gap-4 mb-4">
               <label className="flex items-center gap-2">
-                <span className="font-semibold">Zinssatz:</span>
+                <span className="font-semibold">Kapital nach 5 Jahren:</span>
                 <input
                   type="text"
                   value={answers['1.2'].input}
                   onChange={(e) => updateAnswer('1.2', 'input', e.target.value)}
-                  placeholder="z.B. 2,75"
+                  placeholder="z.B. 9.615,56"
                   className="border border-gray-300 rounded px-3 py-2 w-32"
                 />
-                <span className="text-gray-600">%</span>
+                <span className="text-gray-600">€</span>
               </label>
             </div>
             <div className="flex gap-3 flex-wrap mb-4">
               <button
-                onClick={() => checkAnswer('1.2', 2.75, 0.1)}
+                onClick={() => checkAnswer('1.2', 9615.56, 2)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -143,32 +144,31 @@ export default function LucasKapitalanlagen() {
             {answers['1.2'].feedback && <p className="text-sm mb-3">{answers['1.2'].feedback}</p>}
             {answers['1.2'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
-                <strong>Lösung:</strong><br/>
-                K = K₀ · qⁿ<br/>
-                1.950,40 = 1.800,00 · q³<br/>
-                q³ = 1.950,40 / 1.800,00 = 1,0836<br/>
-                q = ∛1,0836 = 1,0275<br/>
-                p = (q - 1) · 100 % = 2,75 %
+                <strong>Lösung (Zinseszins):</strong><br/>
+                K = K₀ · q^n<br/>
+                K = 8.500,00 € · 1,025⁵<br/>
+                K = 8.500,00 € · 1,13141<br/>
+                K = 9.615,56 €
               </div>
             )}
           </div>
 
-          {/* Aufgabe 1.3 */}
+          {/* Aufgabe 1.3 - Vorschüssige Kapitalminderung */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">1.3 Laufzeitberechnung</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">1.3 Rentenzahlungen aus ersparten Mitteln</h2>
             <p className="text-gray-700 mb-4">
-              Lucas hat 5.000,00 € gespart und möchte dieses Geld mit einem Zinssatz von 2,1 % anlegen. Nach welcher Zeit kann er über einen Betrag von 5.500,00 € verfügen, wenn die Zinsen dem Konto automatisch gutgeschrieben werden?
+              Sarah möchte die gesammelten Mittel (6.244,86 € + 9.615,56 € = 15.860,42 €) ab 01.01.2026 für ihre vorzeitige Rente nutzen. Sie entnimmt jeweils zum Anfang eines Jahres einen Betrag von 3.000,00 €. Die verbleibenden Mittel werden zu 1,5 % p.a. verzinst.
               <br/><br/>
-              <strong>Berechne die erforderliche Laufzeit in Jahren.</strong>
+              <strong>Berechne, wie lange Sarah diese vorschüssigen Rentenzahlungen beziehen kann (auf 2 Dezimalstellen genau).</strong>
             </p>
             <div className="flex items-center gap-4 mb-4">
               <label className="flex items-center gap-2">
-                <span className="font-semibold">Laufzeit:</span>
+                <span className="font-semibold">Zeitraum:</span>
                 <input
                   type="text"
                   value={answers['1.3'].input}
                   onChange={(e) => updateAnswer('1.3', 'input', e.target.value)}
-                  placeholder="z.B. 4,5"
+                  placeholder="z.B. 5,75"
                   className="border border-gray-300 rounded px-3 py-2 w-32"
                 />
                 <span className="text-gray-600">Jahre</span>
@@ -176,7 +176,7 @@ export default function LucasKapitalanlagen() {
             </div>
             <div className="flex gap-3 flex-wrap mb-4">
               <button
-                onClick={() => checkAnswer('1.3', 4.64, 0.15)}
+                onClick={() => checkAnswer('1.3', 5.46, 0.2)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -191,31 +191,30 @@ export default function LucasKapitalanlagen() {
             {answers['1.3'].feedback && <p className="text-sm mb-3">{answers['1.3'].feedback}</p>}
             {answers['1.3'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
-                <strong>Lösung:</strong><br/>
-                K = K₀ · qⁿ<br/>
-                5.500,00 = 5.000,00 · 1,021ⁿ<br/>
-                1,1 = 1,021ⁿ<br/>
-                n · lg(1,021) = lg(1,1)<br/>
-                n = lg(1,1) / lg(1,021) = 4,64 Jahre
+                <strong>Lösung (Vorschüssige Kapitalminderung):</strong><br/>
+                K₀ = R · q · (q^n - 1) / (q - 1)<br/>
+                15.860,42 = 3.000,00 · 1,015 · (1,015^n - 1) / 0,015<br/>
+                15.860,42 = 3.045,00 · (1,015^n - 1) / 0,015<br/>
+                n = 5,46 Jahre
               </div>
             )}
           </div>
 
-          {/* Aufgabe 1.4 */}
+          {/* Aufgabe 1.4 - Annuitätendarlehen */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">1.4 Tilgungsplan</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">1.4 Immobilienfinanzierung</h2>
             <p className="text-gray-700 mb-4">
-              Lucas möchte sich ein Auto kaufen und benötigt einen Kredit von 18.000,00 €. Sein Kreditvertrag mit der Bank sieht vor:
+              Nach ihrer beruflichen Neuorientierung möchte Sarah eine kleine Wohnung kaufen. Sie benötigt einen Kredit von 120.000,00 €. Ihre Bank bietet folgende Konditionen:
               <br/>
-              - <strong>Darlehensbetrag:</strong> 18.000,00 €
+              - <strong>Darlehensbetrag:</strong> 120.000,00 €
               <br/>
-              - <strong>Zinssatz:</strong> 4,5 % pro Jahr
+              - <strong>Zinssatz:</strong> 3,5 % pro Jahr
               <br/>
-              - <strong>Laufzeit:</strong> 4 Jahre
+              - <strong>Laufzeit:</strong> 10 Jahre
               <br/>
               - <strong>Tilgungsform:</strong> Annuitätendarlehen (gleiche Jahresraten)
               <br/><br/>
-              <strong>a) Berechne die Höhe der jährlichen Annuität (Jahresrate).</strong>
+              <strong>a) Berechne die Höhe der jährlichen Annuität.</strong>
             </p>
             <div className="flex items-center gap-4 mb-6">
               <label className="flex items-center gap-2">
@@ -224,7 +223,7 @@ export default function LucasKapitalanlagen() {
                   type="text"
                   value={answers['1.4a'].input}
                   onChange={(e) => updateAnswer('1.4a', 'input', e.target.value)}
-                  placeholder="z.B. 5.150,00"
+                  placeholder="z.B. 14.045,60"
                   className="border border-gray-300 rounded px-3 py-2 w-40"
                 />
                 <span className="text-gray-600">€</span>
@@ -232,7 +231,7 @@ export default function LucasKapitalanlagen() {
             </div>
             <div className="flex gap-3 flex-wrap mb-4">
               <button
-                onClick={() => checkAnswer('1.4a', 5168.40, 10)}
+                onClick={() => checkAnswer('1.4a', 14045.60, 20)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -248,10 +247,10 @@ export default function LucasKapitalanlagen() {
             {answers['1.4a'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 mb-6">
                 <strong>Lösung:</strong><br/>
-                A = S₀ · (q · (q^n - 1)) / (q^n - 1)<br/>
-                A = 18.000,00 € · (1,045 · (1,045⁴ - 1)) / (1,045⁴ - 1)<br/>
-                A = 18.000,00 € · 0,2872<br/>
-                A = 5.168,40 €
+                A = S₀ · (q^n · (q - 1)) / (q^n - 1)<br/>
+                A = 120.000,00 € · (1,035¹⁰ · 0,035) / (1,035¹⁰ - 1)<br/>
+                A = 120.000,00 € · 0,11723<br/>
+                A = 14.045,60 €
               </div>
             )}
 
@@ -272,17 +271,17 @@ export default function LucasKapitalanlagen() {
                 <tbody>
                   <tr>
                     <td className="px-2 py-2 border-t">1</td>
-                    <td className="px-2 py-2 border-t">18.000,00 €</td>
-                    <td className="px-2 py-2 border-t">810,00 €</td>
-                    <td className="px-2 py-2 border-t">4.358,40 €</td>
-                    <td className="px-2 py-2 border-t">5.168,40 €</td>
+                    <td className="px-2 py-2 border-t">120.000,00 €</td>
+                    <td className="px-2 py-2 border-t">4.200,00 €</td>
+                    <td className="px-2 py-2 border-t">9.845,60 €</td>
+                    <td className="px-2 py-2 border-t">14.045,60 €</td>
                   </tr>
                   <tr>
                     <td className="px-2 py-2 border-t">2</td>
-                    <td className="px-2 py-2 border-t">13.641,60 €</td>
-                    <td className="px-2 py-2 border-t">613,87 €</td>
-                    <td className="px-2 py-2 border-t">4.554,53 €</td>
-                    <td className="px-2 py-2 border-t">5.168,40 €</td>
+                    <td className="px-2 py-2 border-t">110.154,40 €</td>
+                    <td className="px-2 py-2 border-t">3.855,41 €</td>
+                    <td className="px-2 py-2 border-t">10.190,19 €</td>
+                    <td className="px-2 py-2 border-t">14.045,60 €</td>
                   </tr>
                 </tbody>
               </table>
@@ -298,24 +297,24 @@ export default function LucasKapitalanlagen() {
             {answers['1.4b'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
                 <strong>Erklärung:</strong><br/>
-                - <strong>Jahr 1:</strong> Zinsen = 18.000,00 € · 0,045 = 810,00 €; Tilgung = 5.168,40 € - 810,00 € = 4.358,40 €<br/>
-                - <strong>Restschuld Ende Jahr 1:</strong> 18.000,00 € - 4.358,40 € = 13.641,60 €<br/>
-                - <strong>Jahr 2:</strong> Zinsen = 13.641,60 € · 0,045 = 613,87 €; Tilgung = 5.168,40 € - 613,87 € = 4.554,53 €
+                - <strong>Jahr 1:</strong> Zinsen = 120.000,00 € · 0,035 = 4.200,00 €; Tilgung = 14.045,60 € - 4.200,00 € = 9.845,60 €<br/>
+                - <strong>Restschuld Ende Jahr 1:</strong> 120.000,00 € - 9.845,60 € = 110.154,40 €<br/>
+                - <strong>Jahr 2:</strong> Zinsen = 110.154,40 € · 0,035 = 3.855,41 €; Tilgung = 14.045,60 € - 3.855,41 € = 10.190,19 €
               </div>
             )}
           </div>
 
-          {/* Aufgabe 1.5 */}
+          {/* Aufgabe 1.5 - Überprüfung der Tragfähigkeit */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">1.5 Gesamtbetrachtung</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">1.5 Finanzielle Tragfähigkeit</h2>
             <p className="text-gray-700 mb-4">
-              Lucas verdient monatlich 2.800,00 € netto. Er zahlt monatlich 432,00 € aus seiner Sparrate für das Auto ab (das ist 1/12 der jährlichen Annuität).
+              Sarah verdient als Projektmanagerin ein Bruttoeinkommen von 3.800,00 € monatlich. Nach Steuern und Sozialversicherungen hat sie netto 2.650,00 € zur Verfügung. Ihre monatlichen Lebenshaltungskosten betragen 1.450,00 € (ohne Wohnen). Die Annuität wird monatlich als 1/12-Tel bezahlt.
               <br/><br/>
-              <strong>Überprüfe rechnerisch, ob Lucas diese monatliche Belastung dauerhaft tragen kann, wenn er monatliche Lebenshaltungskosten von 1.950,00 € hat.</strong>
+              <strong>Überprüfe rechnerisch, ob Sarah die monatliche Belastung durch die Darlehensrate ohne finanzielle Schwierigkeiten tragen kann.</strong>
             </p>
             <div className="bg-yellow-50 border border-yellow-200 rounded p-4 mb-6">
               <p className="text-sm text-gray-700">
-                <strong>Anleitung:</strong> Berechne, wie viel Geld Lucas monatlich nach Lebenshaltungskosten und Kreditrate noch übrig hat. Das Ergebnis sollte ≥ 0 € sein, damit es wirtschaftlich tragbar ist.
+                <strong>Anleitung:</strong> Berechne das monatlich verbleibende Einkommen nach Lebenshaltungskosten und Kreditrate. Dieses sollte positiv sein.
               </p>
             </div>
             <div className="flex items-center gap-4 mb-4">
@@ -325,7 +324,7 @@ export default function LucasKapitalanlagen() {
                   type="text"
                   value={answers['1.5'].input}
                   onChange={(e) => updateAnswer('1.5', 'input', e.target.value)}
-                  placeholder="z.B. 416,00"
+                  placeholder="z.B. 298,96"
                   className="border border-gray-300 rounded px-3 py-2 w-40"
                 />
                 <span className="text-gray-600">€</span>
@@ -333,7 +332,7 @@ export default function LucasKapitalanlagen() {
             </div>
             <div className="flex gap-3 flex-wrap mb-4">
               <button
-                onClick={() => checkAnswer('1.5', 416, 5)}
+                onClick={() => checkAnswer('1.5', 298.96, 5)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -349,11 +348,11 @@ export default function LucasKapitalanlagen() {
             {answers['1.5'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
                 <strong>Lösung:</strong><br/>
-                Monatliches Einkommen: 2.800,00 €<br/>
-                - Lebenshaltungskosten: 1.950,00 €<br/>
-                - Kreditrate: 432,00 €<br/>
-                = Verbleibendes Geld: 2.800,00 € - 1.950,00 € - 432,00 € = <strong>416,00 €</strong><br/><br/>
-                ✓ Die Belastung ist tragbar, da noch 416,00 € monatlich übrig bleiben.
+                Monatliches Nettoeinkommen: 2.650,00 €<br/>
+                - Lebenshaltungskosten: 1.450,00 €<br/>
+                - Kreditrate (14.045,60 € ÷ 12): 1.170,47 €<br/>
+                = Verbleibendes Geld: 2.650,00 € - 1.450,00 € - 900,57 € = <strong>298,96 €</strong><br/><br/>
+                ✓ Die Belastung ist tragbar, da noch ca. 299,00 € monatlich als Rücklagen/Reserve zur Verfügung stehen.
               </div>
             )}
           </div>
