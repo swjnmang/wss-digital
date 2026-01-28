@@ -1725,9 +1725,9 @@ const createRatendarlehenErkundenTask = (): Task => {
     <div className="space-y-2">
       <p className="font-semibold">Lösungsweg:</p>
       <ul className="list-disc list-inside text-sm space-y-1">
-        <li>Erkenne: Tilgung T = konstant = S₀ / n</li>
-        <li>Berechne Zinssatz: p% = Z₁ / S₀ × 100 = {(rows[0].interest / s0 * 100).toFixed(1)}%</li>
-        <li>Für jedes Jahr: S_i = S_{i-1} - T, Z_i = S_i × p%, A_i = T + Z_i</li>
+        <li>Erkenne: Tilgung T = konstant</li>
+        <li>Berechne Zinssatz: p% = {(rows[0].interest / s0 * 100).toFixed(1)}%</li>
+        <li>Berechne alle anderen Felder mit T = konstant</li>
       </ul>
       {renderPlanSolution(rows)}
     </div>
@@ -1738,7 +1738,7 @@ const createRatendarlehenErkundenTask = (): Task => {
     question,
     solution,
     inputs,
-    formula: 'T = S₀ / n (konstant)\nZ_i = S_i × p%\nA_i = T + Z_i\nS_i = S_{i-1} - T',
+    formula: 'Ratentilgung: T = konstant, Z = S * p%, A = T + Z',
     topic: 'Ratentilgung erkennen & berechnen',
     _hiddenFields: hiddenFieldsMap,
     pointsAwarded: 9,
@@ -1850,8 +1850,8 @@ const createRatendarlehenGemischtTask = (): Task => {
     <div className="space-y-2">
       <p className="font-semibold">Lösungsweg:</p>
       <ul className="list-disc list-inside text-sm space-y-1">
-        <li>Erkenne: T = konstant = {tilgung.toFixed(2)} €</li>
-        <li>Zinssatz: p% = ({rows[0].interest.toFixed(2)} / {s0}) × 100 = {rate.toFixed(1)}%</li>
+        <li>Erkenne: T = konstant</li>
+        <li>Berechne p% = {(rows[0].interest / s0 * 100).toFixed(1)}%</li>
         <li>Berechne schrittweise mit A = T + Z, S_neu = S_alt - T</li>
       </ul>
       {renderPlanSolution(rows)}
@@ -1863,7 +1863,7 @@ const createRatendarlehenGemischtTask = (): Task => {
     question,
     solution,
     inputs,
-    formula: 'T = konstant (Erkennungszeichen!)\np% = (Z / S) × 100\nA = T + Z\nS_neu = S_alt - T',
+    formula: 'Ratentilgung: T = konstant, p% konstant, Z = S * p%, A = T + Z',
     topic: 'Ratentilgung - Musteranalyse',
     _hiddenFields: hiddenFieldsMap,
     pointsAwarded: 10,
@@ -1990,8 +1990,8 @@ const createAnnuitaetErkundenTask = (): Task => {
       <p className="font-semibold">Lösungsweg:</p>
       <ul className="list-disc list-inside text-sm space-y-1">
         <li>Erkenne: Annuität A = konstant = {annuity.toFixed(2)} €</li>
-        <li>Berechne Zinssatz: p% = Z₁ / S₀ × 100 = {(rows[0].interest / s0 * 100).toFixed(1)}%</li>
-        <li>Für jedes Jahr: T_i = A - Z_i, S_i = S_{i-1} - T_i</li>
+        <li>Berechne p% = {(rows[0].interest / s0 * 100).toFixed(1)}%</li>
+        <li>Für jedes Jahr: T = A - Z, S_neu = S_alt - T</li>
       </ul>
       {renderPlanSolution(rows)}
     </div>
@@ -2002,7 +2002,7 @@ const createAnnuitaetErkundenTask = (): Task => {
     question,
     solution,
     inputs,
-    formula: 'A = konstant (Erkennungszeichen!)\nZ_i = S_i × p%\nT_i = A - Z_i\nS_i = S_{i-1} - T_i',
+    formula: 'Annuitatentilgung: A = konstant, Z = S * p%, T = A - Z',
     topic: 'Annuitätentilgung erkennen & berechnen',
     _hiddenFields: hiddenFieldsMap,
     pointsAwarded: 9,
@@ -2127,7 +2127,7 @@ const createAnnuitaetGemischtTask = (): Task => {
       <p className="font-semibold">Lösungsweg:</p>
       <ul className="list-disc list-inside text-sm space-y-1">
         <li>Erkenne: A = konstant = {annuity.toFixed(2)} €</li>
-        <li>Berechne p% aus Jahr 1: p% = ({rows[0].interest.toFixed(2)} / {s0}) × 100 = {rate.toFixed(1)}%</li>
+        <li>Berechne p% aus Jahr 1: p% = {(rows[0].interest / s0 * 100).toFixed(1)}%</li>
         <li>Nutze: T = A - Z und S_neu = S_alt - T</li>
       </ul>
       {renderPlanSolution(rows)}
@@ -2139,7 +2139,7 @@ const createAnnuitaetGemischtTask = (): Task => {
     question,
     solution,
     inputs,
-    formula: 'A = konstant\nZ_i = S_i × p%\nT_i = A - Z_i\nS_i = S_{i-1} - T_i',
+    formula: 'Annuitatentilgung: A = konstant, Z = S * p%, T = A - Z',
     topic: 'Annuitätentilgung - Musteranalyse',
     _hiddenFields: hiddenFieldsMap,
     pointsAwarded: 10,
