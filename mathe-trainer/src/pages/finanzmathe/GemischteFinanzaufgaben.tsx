@@ -76,6 +76,7 @@ const taskFilterButtons: { id: FilterType; label: string }[] = [
   { id: 'renten_bundled', label: 'Rentenrechnung' },
   { id: 'ratendarlehen_plan', label: 'Ratentilgung' },
   { id: 'annuitaet_plan', label: 'Annuitätentilgung' },
+  { id: 'incomplete_tilgungsplan', label: 'Tilgungsplan ergänzen' },
 ];
 
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
