@@ -23,6 +23,10 @@ export default function Anwendungsaufgaben() {
               <h2 className="text-xl font-bold text-purple-800 mb-2">Ardas Kapitalanlagen</h2>
               <p className="text-gray-600">Abschlussprüfung WS 2019 - Nachschüssige Rente, Zinseszins, vorschüssige Kapitalminderung, Annuitätendarlehen und Sondertilgung.</p>
             </Link>
+            <Link to="/finanzmathe/anwendungsaufgaben/sportladen-eröffnung" className="block p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200">
+              <h2 className="text-xl font-bold text-purple-800 mb-2">Sportladen Eröffnung</h2>
+              <p className="text-gray-600">Gründungsfinanzierung eines Sportladens - Vorschüssige Rente, Zinsberechnung, Kapitalminderung, Ratendarlehen und Zinsen aus Gewinnen.</p>
+            </Link>
           </div>
         </div>
       </div>

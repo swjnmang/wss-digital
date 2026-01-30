@@ -65,6 +65,7 @@ import ZinsenTest from './pages/finanzmathe/ZinsenTest';
 import GemischteFinanzaufgaben from './pages/finanzmathe/GemischteFinanzaufgaben';
 import Anwendungsaufgaben from './pages/finanzmathe/Anwendungsaufgaben';
 import ArdasKapitalanlagen from './pages/finanzmathe/ArdasKapitalanlagen';
+import SportladenEröffnung from './pages/finanzmathe/SportladenEröffnung';
 import PruefungsModus from './pages/finanzmathe/PruefungsModus';
 // Quadratische Funktionen
 import QuadratischeFunktionenMenu from './pages/quadratische_funktionen/QuadratischeFunktionenMenu';
@@ -215,6 +216,7 @@ export default function App() {
           <Route path="/finanzmathe/gemischte-aufgaben" element={<GemischteFinanzaufgaben />} />
           <Route path="/finanzmathe/anwendungsaufgaben" element={<Anwendungsaufgaben />} />
           <Route path="/finanzmathe/anwendungsaufgaben/ardas-kapitalanlagen" element={<ArdasKapitalanlagen />} />
+          <Route path="/finanzmathe/anwendungsaufgaben/sportladen-eröffnung" element={<SportladenEröffnung />} />
           <Route path="/finanzmathe/zinsen_test" element={<ZinsenTest />} />
           <Route path="/finanzmathe/pruefungsmodus" element={<PruefungsModus />} />
 
