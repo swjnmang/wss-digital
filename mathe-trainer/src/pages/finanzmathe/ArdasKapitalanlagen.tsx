@@ -61,9 +61,9 @@ export default function ArdasKapitalanlagen() {
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
             <h2 className="text-xl font-bold text-gray-800 mb-4">1.1 Kapitalentwicklung bis 18. Geburtstag (2 Punkte)</h2>
             <p className="text-gray-700 mb-4">
-              Zur Geburt seines Sohnes Luca am 01.01.2001 hat Herr Abel 3.000,00 € auf ein Konto seiner Hausbank angelegt. Des Weiteren überweist er zukünftig jeweils am Jahresende eine gleichbleibende Summe auf dieses Konto. Am Ende des Jahres 2001 erhielt Herr Abel einen Kontoauszug von seiner Hausbank.
+              Zur Geburt seines Sohnes Arda am 01.01.2001 hat Herr Abel 3.000,00 € auf ein Konto seiner Hausbank angelegt. Des Weiteren überweist er zukünftig jeweils am Jahresende eine gleichbleibende Summe auf dieses Konto. Am Ende des Jahres 2001 erhielt Herr Abel einen Kontoauszug von seiner Hausbank.
               <br/><br/>
-              <strong>Berechnen Sie über wie viel Geld Luca zu seinem 18. Geburtstag verfügen kann.</strong>
+              <strong>Berechnen Sie über wie viel Geld Arda zu seinem 18. Geburtstag verfügen kann.</strong>
             </p>
 
             {/* Kontoauszug */}
@@ -147,7 +147,7 @@ export default function ArdasKapitalanlagen() {
             <p className="text-gray-700 mb-4">
               Luca möchte das angesparte Kapital in Höhe von 33.331,84 € zunächst auf dem Konto belassen. Damit er in drei Jahren ohne weitere Einzahlungen über die Summe von 35.000,00 € verfügen kann, verhandelt er mit der Bank einen höheren Zinssatz.
               <br/><br/>
-              <strong>Berechnen Sie, welchen gleichbleibenden Zinssatz die Bank Luca anbieten müsste.</strong>
+              <strong>Berechnen Sie, welchen gleichbleibenden Zinssatz die Bank Arda anbieten müsste.</strong>
             </p>
             <div className="flex items-center gap-4 mb-4">
               <label className="flex items-center gap-2">
@@ -193,9 +193,9 @@ export default function ArdasKapitalanlagen() {
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
             <h2 className="text-xl font-bold text-gray-800 mb-4">1.3 Laufzeitberechnung - Vorschüssige Kapitalminderung (4 Punkte)</h2>
             <p className="text-gray-700 mb-4">
-              Nachdem Luca für Auto und Urlaub einiges von dem Geld benötigt hat, befinden sich noch 20.000,00 € auf dem Konto. Davon möchte er sich zukünftig jeweils am Jahresanfang 4.500,00 € für die Finanzierung seines Studiums auszahlen lassen.
+              Nachdem Arda für Auto und Urlaub einiges von dem Geld benötigt hat, befinden sich noch 20.000,00 € auf dem Konto. Davon möchte er sich zukünftig jeweils am Jahresanfang 4.500,00 € für die Finanzierung seines Studiums auszahlen lassen.
               <br/><br/>
-              <strong>Berechnen Sie, wie viele Jahre sich Luca den vollen Betrag bei einem Zinssatz von 1,64 % auszahlen lassen kann.</strong>
+              <strong>Berechnen Sie, wie viele Jahre sich Arda den vollen Betrag bei einem Zinssatz von 1,64 % auszahlen lassen kann.</strong>
             </p>
             <div className="flex items-center gap-4 mb-4">
               <label className="flex items-center gap-2">
