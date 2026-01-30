@@ -79,8 +79,8 @@ export default function ArdasKapitalanlagen() {
           {/* Aufgabe 1 */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Aufgabe 1</h2>
-            <p className="text-gray-700 mb-4">
-              Herr Abel eröffnet zu Ardasgeburt am 01.01.2001 ein Sparkonto mit 3.000,00 €. Jedes Jahr überweist er zum Jahresende denselben Betrag dazu. Der Kontoauszug vom Ende 2001 zeigt die Kontoentwicklung mit einem Zinssatz von 1,1%.
+            <p className="text-gray-700 mb-4 text-center">
+              Herr Abel eröffnet zu Ardas Geburt am 01.01.2001 ein Sparkonto mit 3.000,00 €. Jedes Jahr überweist er zum Jahresende denselben Betrag dazu. Der Kontoauszug vom Ende 2001 zeigt die Kontoentwicklung mit einem Zinssatz von 1,1%.
               <br/><br/>
               <strong>Wie viel Geld wird Arda nach 18 Jahren auf seinem Konto haben?</strong>
             </p>
@@ -121,20 +121,20 @@ export default function ArdasKapitalanlagen() {
               <p className="text-xs text-gray-600 mt-2">Moneybank Niederbayern-Mitte</p>
             </div>
 
-            <div className="flex items-center gap-4 mb-4">
-              <label className="flex items-center gap-2">
+            <div className="flex flex-col items-center gap-4 mb-4">
+              <label className="flex items-center gap-2 justify-center">
                 <span className="font-semibold">Kapital am 01.01.2019:</span>
                 <input
                   type="text"
                   value={answers['1'].input}
                   onChange={(e) => updateAnswer('1', 'input', e.target.value)}
                   placeholder="z.B. 33.331,84"
-                  className="border border-gray-300 rounded px-3 py-2 w-40"
+                  className="border border-gray-300 rounded px-3 py-2 w-40 text-center"
                 />
                 <span className="text-gray-600">€</span>
               </label>
             </div>
-            <div className="flex gap-3 flex-wrap mb-4">
+            <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
                 onClick={() => checkAnswer('1', 33331.84, 100)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
@@ -148,9 +148,9 @@ export default function ArdasKapitalanlagen() {
                 {answers['1'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
             </div>
-            {answers['1'].feedback && <p className="text-sm mb-3">{answers['1'].feedback}</p>}
+            {answers['1'].feedback && <p className="text-sm mb-3 text-center">{answers['1'].feedback}</p>}
             {answers['1'].showSolution && (
-              <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
+              <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 text-center">
                 <strong>Lösung:</strong>
                 <BlockMath math="K_n = K_0 \cdot q^n + R \cdot \frac{q^n - 1}{q - 1}" />
                 <p>Mit <InlineMath math="q = 1,011" />, <InlineMath math="K_0 = 3.000 \text{ €}" />, <InlineMath math="R = 1.500 \text{ €}" />, <InlineMath math="n = 18" /> Jahre:</p>
@@ -163,25 +163,25 @@ export default function ArdasKapitalanlagen() {
           {/* Aufgabe 2 */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Aufgabe 2</h2>
-            <p className="text-gray-700 mb-4">
+            <p className="text-gray-700 mb-4 text-center">
               Das angesparte Kapital von 33.331,84 € soll nicht angetastet werden. Arda möchte in 3 Jahren insgesamt 35.000,00 € zur Verfügung haben. Dafür benötigt er einen besseren Zinssatz.
               <br/><br/>
               <strong>Berechnen Sie, mit welchem jährlichen Zinssatz dies möglich ist.</strong>
             </p>
-            <div className="flex items-center gap-4 mb-4">
-              <label className="flex items-center gap-2">
+            <div className="flex flex-col items-center gap-4 mb-4">
+              <label className="flex items-center gap-2 justify-center">
                 <span className="font-semibold">Zinssatz p:</span>
                 <input
                   type="text"
                   value={answers['2'].input}
                   onChange={(e) => updateAnswer('2', 'input', e.target.value)}
                   placeholder="z.B. 1,65"
-                  className="border border-gray-300 rounded px-3 py-2 w-32"
+                  className="border border-gray-300 rounded px-3 py-2 w-32 text-center"
                 />
                 <span className="text-gray-600">%</span>
               </label>
             </div>
-            <div className="flex gap-3 flex-wrap mb-4">
+            <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
                 onClick={() => checkAnswer('2', 1.65, 0.1)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
@@ -195,9 +195,9 @@ export default function ArdasKapitalanlagen() {
                 {answers['2'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
             </div>
-            {answers['2'].feedback && <p className="text-sm mb-3">{answers['2'].feedback}</p>}
+            {answers['2'].feedback && <p className="text-sm mb-3 text-center">{answers['2'].feedback}</p>}
             {answers['2'].showSolution && (
-              <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
+              <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 text-center">
                 <strong>Lösung:</strong>
                 <BlockMath math="K_n = K_0 \cdot q^n" />
                 <BlockMath math="35.000 = 33.331,84 \cdot q^3" />
@@ -211,25 +211,25 @@ export default function ArdasKapitalanlagen() {
           {/* Aufgabe 3 */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Aufgabe 3</h2>
-            <p className="text-gray-700 mb-4">
-              Nach verschiedenen Ausgaben für Auto und Freizeit verbleiben noch 20.000,00 € auf Ardassparkonto. Von diesem Guthaben möchte er sich am Anfang jeden Jahres 4.500,00 € auszahlen lassen.
+            <p className="text-gray-700 mb-4 text-center">
+              Nach verschiedenen Ausgaben für Auto und Freizeit verbleiben noch 20.000,00 € auf Ardas Sparkonto. Von diesem Guthaben möchte er sich am Anfang jeden Jahres 4.500,00 € auszahlen lassen.
               <br/><br/>
               <strong>Wie lange kann Arda diese jährliche Auszahlung durchführen, wenn der Zinssatz 1,64 % beträgt?</strong>
             </p>
-            <div className="flex items-center gap-4 mb-4">
-              <label className="flex items-center gap-2">
+            <div className="flex flex-col items-center gap-4 mb-4">
+              <label className="flex items-center gap-2 justify-center">
                 <span className="font-semibold">Anzahl Jahre:</span>
                 <input
                   type="text"
                   value={answers['3'].input}
                   onChange={(e) => updateAnswer('3', 'input', e.target.value)}
                   placeholder="z.B. 4"
-                  className="border border-gray-300 rounded px-3 py-2 w-32"
+                  className="border border-gray-300 rounded px-3 py-2 w-32 text-center"
                 />
                 <span className="text-gray-600">Jahre</span>
               </label>
             </div>
-            <div className="flex gap-3 flex-wrap mb-4">
+            <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
                 onClick={() => checkAnswer('3', 4, 1)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
@@ -243,9 +243,9 @@ export default function ArdasKapitalanlagen() {
                 {answers['3'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
             </div>
-            {answers['3'].feedback && <p className="text-sm mb-3">{answers['3'].feedback}</p>}
+            {answers['3'].feedback && <p className="text-sm mb-3 text-center">{answers['3'].feedback}</p>}
             {answers['3'].showSolution && (
-              <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
+              <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 text-center">
                 <strong>Lösung (Vorschüssige Kapitalminderung):</strong>
                 <BlockMath math="K_0 = R \cdot q \cdot \frac{q^n - 1}{q - 1}" />
                 <BlockMath math="20.000 = 4.500 \cdot 1,0164 \cdot \frac{1,0164^n - 1}{0,0164}" />
@@ -257,7 +257,7 @@ export default function ArdasKapitalanlagen() {
           {/* Aufgabe 4 */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Aufgabe 4</h2>
-            <p className="text-gray-700 mb-4">
+            <p className="text-gray-700 mb-4 text-center">
               Herr Abel plant eine Hausrenovierung und benötigt einen Kreditvertrag von seiner Bank. Die Konditionen sind dem Vertrag unten zu entnehmen.
               <br/><br/>
               <strong>Erstellen Sie einen Tilgungsplan für die ersten beiden Jahre.</strong><br/>
@@ -292,12 +292,12 @@ export default function ArdasKapitalanlagen() {
                 </div>
                 <div>
                   <strong>§4 Sondertilgung</strong><br/>
-                  Der Darlehenehmerkann erstmalig nach fünf Jahren das Darlehen zum 01.01.2025 durch eine Sondertilgung vollständig zurückzahlen.
+                  Der Darlehensnehmer kann erstmalig nach fünf Jahren das Darlehen zum 01.01.2025 durch eine Sondertilgung vollständig zurückzahlen.
                 </div>
               </div>
             </div>
 
-            <p className="text-gray-700 mb-4">Erstelle einen Tilgungsplan für die ersten zwei Jahre:</p>
+            <p className="text-gray-700 mb-4 text-center">Erstellen Sie einen Tilgungsplan für die ersten zwei Jahre:</p>
 
             {/* Tilgungsplan Tabelle */}
             <div className="bg-gray-50 border border-gray-200 rounded p-4 mb-6 overflow-x-auto">
@@ -330,7 +330,7 @@ export default function ArdasKapitalanlagen() {
               </table>
             </div>
 
-            <div className="flex gap-3 flex-wrap mb-4">
+            <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
                 onClick={() => updateAnswer('4', 'showSolution', !answers['4'].showSolution)}
                 className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
@@ -339,7 +339,7 @@ export default function ArdasKapitalanlagen() {
               </button>
             </div>
             {answers['4'].showSolution && (
-              <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
+              <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 text-center">
                 <strong>Erklärung (Annuitätendarlehen):</strong>
                 <BlockMath math="A = K_0 \cdot \frac{q^n \cdot (q - 1)}{q^n - 1}" />
                 <BlockMath math="A = 40.000 \cdot \frac{1,014^{10} \cdot 0,014}{1,014^{10} - 1} \approx 4.314,42 \text{ €}" />
@@ -357,25 +357,25 @@ export default function ArdasKapitalanlagen() {
           {/* Aufgabe 5 */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Aufgabe 5</h2>
-            <p className="text-gray-700 mb-4">
+            <p className="text-gray-700 mb-4 text-center">
               Eine alte Geldanlage von Herr Abel wird fällig und erbringt 21.000,00 €. Mit diesem Geld möchte er das Darlehen zum frühestmöglichen Zeitpunkt ablösen und nutzt die im Vertrag vereinbarte Sondertilgungsmöglichkeit.
               <br/><br/>
               <strong>Überprüfen Sie durch Rechnung, ob die verfügbaren Mittel ausreichen.</strong>
             </p>
-            <div className="flex items-center gap-4 mb-4">
-              <label className="flex items-center gap-2">
+            <div className="flex flex-col items-center gap-4 mb-4">
+              <label className="flex items-center gap-2 justify-center">
                 <span className="font-semibold">Restschuld am 01.01.2025:</span>
                 <input
                   type="text"
                   value={answers['5'].input}
                   onChange={(e) => updateAnswer('5', 'input', e.target.value)}
                   placeholder="z.B. 19.500,00"
-                  className="border border-gray-300 rounded px-3 py-2 w-40"
+                  className="border border-gray-300 rounded px-3 py-2 w-40 text-center"
                 />
                 <span className="text-gray-600">€</span>
               </label>
             </div>
-            <div className="flex gap-3 flex-wrap mb-4">
+            <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
                 onClick={() => checkAnswer('5', 19500, 100)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
@@ -389,9 +389,9 @@ export default function ArdasKapitalanlagen() {
                 {answers['5'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
             </div>
-            {answers['5'].feedback && <p className="text-sm mb-3">{answers['5'].feedback}</p>}
+            {answers['5'].feedback && <p className="text-sm mb-3 text-center">{answers['5'].feedback}</p>}
             {answers['5'].showSolution && (
-              <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
+              <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 text-center">
                 <strong>Lösung (Restschuldformel):</strong>
                 <BlockMath math="K_v = K_0 \cdot q^v - A \cdot \frac{q^v - 1}{q - 1}" />
                 <BlockMath math="K_v = 40.000 \cdot 1,014^5 - 4.314,42 \cdot \frac{1,014^5 - 1}{0,014}" />
