@@ -7,7 +7,7 @@ interface PartAnswer {
   showSolution: boolean
 }
 
-export default function LucasKapitalanlagen() {
+export default function SarahKapitalanlagen() {
   const navigate = useNavigate()
   const [answers, setAnswers] = useState<Record<string, PartAnswer>>({
     '1.1': { input: '', feedback: '', showSolution: false },
@@ -28,7 +28,7 @@ export default function LucasKapitalanlagen() {
     return parseFloat(value.replace(',', '.'))
   }
 
-  const checkAnswer = (part: string, correctValue: number, tolerance: number = 50) => {
+  const checkAnswer = (part: string, correctValue: number, tolerance: number = 1) => {
     const userValue = parseInput(answers[part].input)
     if (isNaN(userValue)) {
       updateAnswer(part, 'feedback', '❌ Bitte eine gültige Zahl eingeben.')
@@ -36,9 +36,9 @@ export default function LucasKapitalanlagen() {
     }
     
     if (Math.abs(userValue - correctValue) <= tolerance) {
-      updateAnswer(part, 'feedback', '✅ Richtig!')
+      updateAnswer(part, 'feedback', '✅ Richtig! Gute Arbeit.')
     } else {
-      updateAnswer(part, 'feedback', `❌ Versuche es nochmal oder schau dir die Lösung an.`)
+      updateAnswer(part, 'feedback', `❌ Nicht ganz richtig. Versuche es nochmal oder schau dir die Lösung an.`)
     }
   }
 
@@ -54,21 +54,21 @@ export default function LucasKapitalanlagen() {
         </button>
 
         <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
-          <h1 className="text-3xl font-bold text-purple-600 mb-2">Finanzmathematik - Aufgabenteil B</h1>
-          <p className="text-gray-500 mb-8 text-sm">Abschlussprüfung WS 2019 - Gesamtpunkte: 15</p>
+          <h1 className="text-3xl font-bold text-purple-600 mb-2">Sarah's Finanzplanung</h1>
+          <p className="text-gray-500 mb-8 text-sm">Abschlussprüfung Finanzmathematik - Bearbeitungszeit: ca. 45 Minuten</p>
 
-          {/* Aufgabe 1.1 */}
+          {/* Aufgabe 1.1 - Zinseszins mit Kontoauszug */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">1.1 Kapitalentwicklung bis 18. Geburtstag (2 Punkte)</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">1.1 Kapitalentwicklung</h2>
             <p className="text-gray-700 mb-4">
-              Zur Geburt seines Sohnes Luca am 01.01.2001 hat Herr Abel 3.000,00 € auf ein Konto seiner Hausbank angelegt. Des Weiteren überweist er zukünftig jeweils am Jahresende die bestimmte Summe auf dieses Konto. Am Ende des Jahres 2001 erhielt Herr Abel einen Kontoauszug von seiner Hausbank.
+              Sarah erhält zu ihrem 18. Geburtstag am 15.03.2016 von ihren Großeltern eine Geldanlage von 4.000,00 €. Diesen Betrag legt sie bei ihrer Bank an. Nach Abzug aller Kosten erhält sie jährlich 1,2 % Zinsen auf ihr Guthaben.
               <br/><br/>
-              <strong>Berechnen Sie über wie viel Geld Luca zu seinem 18. Geburtstag verfügen kann.</strong>
+              <strong>Berechne, über welches Kapital Sarah am 31.12.2020 verfügen kann.</strong>
             </p>
 
             {/* Kontoauszug */}
             <div className="bg-gray-50 border border-gray-300 rounded p-4 mb-6 overflow-x-auto">
-              <h3 className="font-bold text-center mb-3 text-sm">Kontoauszug - Geschäftsgiro S-ONLINE 10103554</h3>
+              <h3 className="font-bold text-center mb-3 text-sm">Kontoauszug Sarah M. - Anlagekonto</h3>
               <table className="w-full text-xs">
                 <thead>
                   <tr className="bg-gray-300">
@@ -80,44 +80,61 @@ export default function LucasKapitalanlagen() {
                 </thead>
                 <tbody>
                   <tr className="bg-white">
-                    <td className="px-2 py-2 border">01.01.2001</td>
-                    <td className="px-2 py-2 border">Kontostand (Anfang)</td>
-                    <td className="px-2 py-2 text-right border">—</td>
-                    <td className="px-2 py-2 text-right border font-semibold">3.000,00</td>
+                    <td className="px-2 py-2 border">15.03.2016</td>
+                    <td className="px-2 py-2 border">Einzahlung Geschenk Großeltern</td>
+                    <td className="px-2 py-2 text-right border">4.000,00</td>
+                    <td className="px-2 py-2 text-right border font-semibold">4.000,00</td>
                   </tr>
                   <tr className="bg-blue-50">
-                    <td className="px-2 py-2 border">31.12.2001</td>
-                    <td className="px-2 py-2 border">Überweisung Einzahlung Martin Abel</td>
-                    <td className="px-2 py-2 text-right border">1.500,00</td>
-                    <td className="px-2 py-2 text-right border font-semibold">4.500,00</td>
+                    <td className="px-2 py-2 border">31.12.2016</td>
+                    <td className="px-2 py-2 border">Zinsgutschrift 1,2%</td>
+                    <td className="px-2 py-2 text-right border">48,00</td>
+                    <td className="px-2 py-2 text-right border font-semibold">4.048,00</td>
                   </tr>
                   <tr className="bg-white">
-                    <td className="px-2 py-2 border">31.12.2001</td>
-                    <td className="px-2 py-2 border">Zinsen (p = 1,1%)</td>
-                    <td className="px-2 py-2 text-right border">33,00</td>
-                    <td className="px-2 py-2 text-right border font-semibold">4.533,00</td>
+                    <td className="px-2 py-2 border">31.12.2017</td>
+                    <td className="px-2 py-2 border">Zinsgutschrift 1,2%</td>
+                    <td className="px-2 py-2 text-right border">48,58</td>
+                    <td className="px-2 py-2 text-right border font-semibold">4.096,58</td>
+                  </tr>
+                  <tr className="bg-blue-50">
+                    <td className="px-2 py-2 border">31.12.2018</td>
+                    <td className="px-2 py-2 border">Zinsgutschrift 1,2%</td>
+                    <td className="px-2 py-2 text-right border">49,16</td>
+                    <td className="px-2 py-2 text-right border font-semibold">4.145,74</td>
+                  </tr>
+                  <tr className="bg-white">
+                    <td className="px-2 py-2 border">31.12.2019</td>
+                    <td className="px-2 py-2 border">Zinsgutschrift 1,2%</td>
+                    <td className="px-2 py-2 text-right border">49,75</td>
+                    <td className="px-2 py-2 text-right border font-semibold">4.195,49</td>
+                  </tr>
+                  <tr className="bg-blue-50">
+                    <td className="px-2 py-2 border">31.12.2020</td>
+                    <td className="px-2 py-2 border">Zinsgutschrift 1,2%</td>
+                    <td className="px-2 py-2 text-right border">50,35</td>
+                    <td className="px-2 py-2 text-right border font-semibold">4.245,84</td>
                   </tr>
                 </tbody>
               </table>
-              <p className="text-xs text-gray-600 mt-2">Moneybank Niederbayern-Mitte</p>
             </div>
 
             <div className="flex items-center gap-4 mb-4">
               <label className="flex items-center gap-2">
-                <span className="font-semibold">Kapital am 01.01.2019 (18. Geburtstag):</span>
+                <span className="font-semibold">Kapital am 31.12.2020:</span>
                 <input
                   type="text"
                   value={answers['1.1'].input}
                   onChange={(e) => updateAnswer('1.1', 'input', e.target.value)}
-                  placeholder="z.B. 33.331,84"
-                  className="border border-gray-300 rounded px-3 py-2 w-40"
+                  placeholder="z.B. 4.245,84"
+                  className="border border-gray-300 rounded px-3 py-2 w-32"
                 />
                 <span className="text-gray-600">€</span>
               </label>
             </div>
             <div className="flex gap-3 flex-wrap mb-4">
               <button
-                onClick={() => checkAnswer('1.1', 33331.84, 100)}
+                onClick={() => checkAnswer('1.1', 4245.84, 2)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -132,22 +149,22 @@ export default function LucasKapitalanlagen() {
             {answers['1.1'].feedback && <p className="text-sm mb-3">{answers['1.1'].feedback}</p>}
             {answers['1.1'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
-                <strong>Lösung (Nachschüssige Rente + Anfangskapital):</strong><br/>
-                K_n = K₀ · q^n + R · (q^n - 1) / (q - 1)<br/>
-                Mit q = 1,011, K₀ = 3.000€, R = 1.500€, n = 18 Jahre<br/>
-                K₁₈ = 3.000 · 1,011^18 + 1.500 · (1,011^18 - 1) / 0,011<br/>
-                K₁₈ ≈ 33.331,84 €
+                <strong>Lösung (Zinseszinsformel):</strong><br/>
+                K_n = K₀ · q^n<br/>
+                K_n = 4.000,00 € · 1,012⁴,8<br/>
+                (von 15.03.2016 bis 31.12.2020 ≈ 4,8 Jahre)<br/>
+                K_n ≈ 4.245,84 €
               </div>
             )}
           </div>
 
-          {/* Aufgabe 1.2 */}
+          {/* Aufgabe 1.2 - Zinsatzberechnung */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">1.2 Zinsatzberechnung (3 Punkte)</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">1.2 Zinsatzberechnung</h2>
             <p className="text-gray-700 mb-4">
-              Luca möchte das angesparte Kapital in Höhe von 33.331,84 € zunächst auf dem Konto belassen. Damit er in drei Jahren ohne weitere Einzahlungen über die Summe von 35.000,00 € verfügen kann, verhandelt er mit der Bank einen höheren Zinssatz.
+              Sarah überlegt, einen Betrag von 3.500,00 € auf dem Sparkonto anzulegen. Sie möchte, dass dieser Betrag nach 6 Jahren auf 3.750,00 € anwächst.
               <br/><br/>
-              <strong>Berechnen Sie, welchen gleichbleibenden Zinssatz die Bank Luca anbieten müsste.</strong>
+              <strong>Berechne den erforderlichen Zinssatz in Prozent pro Jahr.</strong>
             </p>
             <div className="flex items-center gap-4 mb-4">
               <label className="flex items-center gap-2">
@@ -156,7 +173,7 @@ export default function LucasKapitalanlagen() {
                   type="text"
                   value={answers['1.2'].input}
                   onChange={(e) => updateAnswer('1.2', 'input', e.target.value)}
-                  placeholder="z.B. 1,65"
+                  placeholder="z.B. 1,05"
                   className="border border-gray-300 rounded px-3 py-2 w-32"
                 />
                 <span className="text-gray-600">%</span>
@@ -164,7 +181,7 @@ export default function LucasKapitalanlagen() {
             </div>
             <div className="flex gap-3 flex-wrap mb-4">
               <button
-                onClick={() => checkAnswer('1.2', 1.65, 0.1)}
+                onClick={() => checkAnswer('1.2', 1.05, 0.15)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -179,23 +196,23 @@ export default function LucasKapitalanlagen() {
             {answers['1.2'].feedback && <p className="text-sm mb-3">{answers['1.2'].feedback}</p>}
             {answers['1.2'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
-                <strong>Lösung (Zinseszinsformel):</strong><br/>
+                <strong>Lösung:</strong><br/>
                 K_n = K₀ · q^n<br/>
-                35.000,00 = 33.331,84 · q³<br/>
-                q³ = 35.000,00 / 33.331,84 = 1,05000<br/>
-                q = ³√1,05000 ≈ 1,0165<br/>
-                p = (q - 1) · 100 = 1,65 %
+                3.750,00 = 3.500,00 · q⁶<br/>
+                q⁶ = 3.750,00 / 3.500,00 = 1,0714<br/>
+                q = ⁶√1,0714 ≈ 1,0105<br/>
+                p = (q - 1) · 100 = 1,05 %
               </div>
             )}
           </div>
 
-          {/* Aufgabe 1.3 */}
+          {/* Aufgabe 1.3 - Laufzeitberechnung */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">1.3 Laufzeitberechnung - Vorschüssige Kapitalminderung (4 Punkte)</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">1.3 Laufzeitberechnung</h2>
             <p className="text-gray-700 mb-4">
-              Nachdem Luca für Auto und Urlaub einiges von dem Geld benötigt hat, befinden sich noch 20.000,00 € auf dem Konto. Davon möchte er sich zukünftig jeweils am Jahresanfang 4.500,00 € für die Finanzierung seines Studiums auszahlen lassen.
+              Sarah hat 2.500,00 € auf einem Sparkonto und möchte über 3.500,00 € verfügen. Die Bank bietet einen Zinssatz von 1,8 % pro Jahr.
               <br/><br/>
-              <strong>Berechnen Sie, wie viele Jahre sich Luca den vollen Betrag bei einem Zinssatz von 1,64 % auszahlen lassen kann.</strong>
+              <strong>Berechne, wie lange Sarah warten muss, bis sie über den gewünschten Betrag verfügt.</strong>
             </p>
             <div className="flex items-center gap-4 mb-4">
               <label className="flex items-center gap-2">
@@ -204,7 +221,7 @@ export default function LucasKapitalanlagen() {
                   type="text"
                   value={answers['1.3'].input}
                   onChange={(e) => updateAnswer('1.3', 'input', e.target.value)}
-                  placeholder="z.B. 4"
+                  placeholder="z.B. 19,50"
                   className="border border-gray-300 rounded px-3 py-2 w-32"
                 />
                 <span className="text-gray-600">Jahre</span>
@@ -212,7 +229,7 @@ export default function LucasKapitalanlagen() {
             </div>
             <div className="flex gap-3 flex-wrap mb-4">
               <button
-                onClick={() => checkAnswer('1.3', 4, 1)}
+                onClick={() => checkAnswer('1.3', 19.50, 0.5)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -227,85 +244,93 @@ export default function LucasKapitalanlagen() {
             {answers['1.3'].feedback && <p className="text-sm mb-3">{answers['1.3'].feedback}</p>}
             {answers['1.3'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
-                <strong>Lösung (Vorschüssige Kapitalminderung):</strong><br/>
-                K₀ = R · q · (q^n - 1) / (q - 1)<br/>
-                20.000,00 = 4.500,00 · 1,0164 · (1,0164^n - 1) / 0,0164<br/>
-                Nach Auflösen: n ≈ 4 Jahre (exakt: n ≈ 4,51 Jahre)
+                <strong>Lösung:</strong><br/>
+                K_n = K₀ · q^n<br/>
+                3.500,00 = 2.500,00 · 1,018^n<br/>
+                1,4 = 1,018^n<br/>
+                n · lg(1,018) = lg(1,4)<br/>
+                n = lg(1,4) / lg(1,018) ≈ 19,50 Jahre
               </div>
             )}
           </div>
 
-          {/* Aufgabe 1.4 */}
+          {/* Aufgabe 1.4 - Tilgungsplan mit Darlehensvertrag */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">1.4 Tilgungsplan (3 Punkte)</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">1.4 Tilgungsplan</h2>
             <p className="text-gray-700 mb-4">
-              Herr Abel benötigt für die Modernisierung seines Hauses einen Kredit. Von seiner Hausbank erhält er einen Darlehensvertrag (siehe unten).
-              <br/><br/>
-              <strong>Erstellen Sie einen Tilgungsplan für die ersten zwei Jahre.</strong><br/>
-              <em className="text-gray-600">(Zwischenergebnis: A = 4.314,42 €)</em>
+              Sarah möchte eine Eigentumswohnung kaufen. Sie benötigt dafür einen Kreditvertrag mit ihrer Bank. Der Darlehensvertrag ist nachfolgend abgedruckt:
             </p>
 
             {/* Darlehensvertrag */}
-            <div className="bg-gray-50 border-2 border-gray-400 rounded p-6 mb-6 text-sm">
-              <h3 className="font-bold text-center mb-4">Darlehensvertrag</h3>
-              <div className="mb-4">
-                <p className="font-semibold mb-2">zwischen</p>
-                <p className="mb-2">Martin Abel<br/>Hans Carossa Str. 5<br/>94447 Plattling<br/><span className="text-xs text-gray-600">– im Folgendem „Darlehensnehmer" –</span></p>
-                <p className="font-semibold mb-2 mt-4">und</p>
-                <p>Moneybank Niederbayern-Mitte<br/>Frühlingsstraße 12<br/>94469 Deggendorf<br/><span className="text-xs text-gray-600">– im Folgendem „Darlehensgeber" –</span></p>
-              </div>
-              <p className="text-center mb-4">wird folgender Vertrag geschlossen.</p>
+            <div className="bg-gray-50 border border-gray-400 rounded p-6 mb-6 text-sm">
+              <h3 className="font-bold text-center mb-4">DARLEHENSVERTRAG</h3>
+              <p className="mb-4">
+                <strong>Zwischen</strong><br/>
+                STADTBANK München GmbH<br/>
+                Bankstraße 42<br/>
+                80802 München<br/>
+                <strong>und</strong><br/>
+                Sarah M.<br/>
+                Musterstraße 15<br/>
+                80001 München<br/>
+                <br/>
+                <strong>wird folgender Vertrag geschlossen:</strong>
+              </p>
 
               <div className="space-y-3">
-                <div>
-                  <strong>§1 Darlehensbetrag</strong><br/>
-                  Der Darlehensgeber stellt dem Darlehensnehmern einen Betrag von <strong>40.000,00 €</strong> als Darlehen zur Verfügung.
-                </div>
-                <div>
-                  <strong>§2 Verzinsung</strong><br/>
-                  Das Darlehen ist über den gesamten Zeitraum mit <strong>1,40 % p.a.</strong> zu verzinsen.
-                </div>
-                <div>
-                  <strong>§3 Laufzeit</strong><br/>
-                  (1) Der Darlehensgeber gewährt dem Darlehenehmenden den in §1 vereinbarten Kreditvertrag für die Dauer von <strong>10 Jahren</strong> nach Kreditaufnahme.<br/>
-                  (2) Das Darlehen ist mit jährlich gleichen Raten (Tilgung + Zinsen) jeweils zum <strong>31.12.</strong> eines jeden Jahres zu tilgen.<br/>
-                  (3) Die Laufzeit beginnt mit dem <strong>01.01.2020.</strong>
-                </div>
-                <div>
+                <p>
+                  <strong>§1 Darlehensbetrag und Auszahlung</strong><br/>
+                  Der Darlehensgeber stellt dem Darlehensnehmer einen Betrag von 80.000,00 € zur Verfügung.
+                </p>
+
+                <p>
+                  <strong>§2 Zinssatz</strong><br/>
+                  Das Darlehen ist über den gesamten Zeitraum mit 2,5 % pro Jahr zu verzinsen.
+                </p>
+
+                <p>
+                  <strong>§3 Laufzeit und Tilgung</strong><br/>
+                  (1) Die Darlehenslaufzeit beträgt 5 Jahre ab dem 01.01.2021.<br/>
+                  (2) Das Darlehen ist mit jährlich gleichen Raten (Annuität) jeweils zum 31.12. eines jeden Jahres zu tilgen.<br/>
+                  (3) Die Laufzeit endet am 31.12.2025.
+                </p>
+
+                <p>
                   <strong>§4 Sondertilgung</strong><br/>
-                  Der Darlehenehmerkann erstmalig nach fünf Jahren das Darlehen zum 01.01.2025 durch eine Sondertilgung vollständig zurückzahlen.
-                </div>
+                  Der Darlehensnehmer kann jederzeit nach fünf Jahren das Darlehen durch eine Sondertilgung vollständig zurückzahlen.
+                </p>
               </div>
             </div>
 
-            <p className="text-gray-700 mb-4">Erstelle einen Tilgungsplan für die ersten zwei Jahre:</p>
+            <p className="text-gray-700 mb-4">
+              <strong>Erstelle einen Tilgungsplan für die ersten zwei Jahre.</strong>
+            </p>
 
-            {/* Tilgungsplan Tabelle */}
             <div className="bg-gray-50 border border-gray-200 rounded p-4 mb-6 overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-300">
                     <th className="px-2 py-2 text-left border">Jahr</th>
-                    <th className="px-2 py-2 text-right border">Restschuld Anfang (€)</th>
-                    <th className="px-2 py-2 text-right border">Zinsen (€)</th>
-                    <th className="px-2 py-2 text-right border">Tilgung (€)</th>
-                    <th className="px-2 py-2 text-right border">Annuität (€)</th>
+                    <th className="px-2 py-2 text-right border">Restschuld</th>
+                    <th className="px-2 py-2 text-right border">Zinsen</th>
+                    <th className="px-2 py-2 text-right border">Tilgung</th>
+                    <th className="px-2 py-2 text-right border">Annuität</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="bg-white">
                     <td className="px-2 py-2 border font-semibold">1</td>
-                    <td className="px-2 py-2 text-right border">40.000,00</td>
-                    <td className="px-2 py-2 text-right border">560,00</td>
-                    <td className="px-2 py-2 text-right border">3.754,42</td>
-                    <td className="px-2 py-2 text-right border font-semibold">4.314,42</td>
+                    <td className="px-2 py-2 text-right border">80.000,00 €</td>
+                    <td className="px-2 py-2 text-right border">2.000,00 €</td>
+                    <td className="px-2 py-2 text-right border">16.909,60 €</td>
+                    <td className="px-2 py-2 text-right border font-semibold">18.909,60 €</td>
                   </tr>
                   <tr className="bg-blue-50">
                     <td className="px-2 py-2 border font-semibold">2</td>
-                    <td className="px-2 py-2 text-right border">36.245,58</td>
-                    <td className="px-2 py-2 text-right border">507,44</td>
-                    <td className="px-2 py-2 text-right border">3.806,98</td>
-                    <td className="px-2 py-2 text-right border font-semibold">4.314,42</td>
+                    <td className="px-2 py-2 text-right border">63.090,40 €</td>
+                    <td className="px-2 py-2 text-right border">1.577,26 €</td>
+                    <td className="px-2 py-2 text-right border">17.332,34 €</td>
+                    <td className="px-2 py-2 text-right border font-semibold">18.909,60 €</td>
                   </tr>
                 </tbody>
               </table>
@@ -321,37 +346,37 @@ export default function LucasKapitalanlagen() {
             </div>
             {answers['1.4'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
-                <strong>Erklärung (Annuitätendarlehen):</strong><br/>
+                <strong>Erklärung der Annuität:</strong><br/>
                 A = K₀ · (q^n · (q - 1)) / (q^n - 1)<br/>
-                A = 40.000,00 · (1,014^10 · 0,014) / (1,014^10 - 1)<br/>
-                A ≈ 4.314,42 €<br/><br/>
+                A = 80.000,00 € · (1,025⁵ · 0,025) / (1,025⁵ - 1)<br/>
+                A = 80.000,00 € · 0,2364 ≈ 18.909,60 €<br/><br/>
                 <strong>Jahr 1:</strong><br/>
-                Zinsen = 40.000,00 · 0,014 = 560,00 €<br/>
-                Tilgung = 4.314,42 - 560,00 = 3.754,42 €<br/>
-                Restschuld = 40.000,00 - 3.754,42 = 36.245,58 €<br/><br/>
+                Zinsen = 80.000,00 € · 0,025 = 2.000,00 €<br/>
+                Tilgung = 18.909,60 € - 2.000,00 € = 16.909,60 €<br/>
+                Restschuld = 80.000,00 € - 16.909,60 € = 63.090,40 €<br/><br/>
                 <strong>Jahr 2:</strong><br/>
-                Zinsen = 36.245,58 · 0,014 = 507,44 €<br/>
-                Tilgung = 4.314,42 - 507,44 = 3.806,98 €
+                Zinsen = 63.090,40 € · 0,025 = 1.577,26 €<br/>
+                Tilgung = 18.909,60 € - 1.577,26 € = 17.332,34 €
               </div>
             )}
           </div>
 
-          {/* Aufgabe 1.5 */}
+          {/* Aufgabe 1.5 - Restschuld berechnen */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">1.5 Sondertilgung (3 Punkte)</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">1.5 Restschuld nach 5 Jahren</h2>
             <p className="text-gray-700 mb-4">
-              Herr Abel möchte mit Hilfe eines fälligen Sparbriefes in Höhe von 21.000,00 € das Darlehen zum erstmöglichen Zeitpunkt vollständig zurückzahlen. Darum plant er von seinem vereinbarten Sondertilgungsrecht Gebrauch zu machen.
+              Sarah denkt über eine Sondertilgung nach. Zur Vorbereitung ihrer Finanzplanung benötigt sie zu wissen, welche Restschuld nach 5 Jahren noch vorhanden ist.
               <br/><br/>
-              <strong>Überprüfen Sie rechnerisch, ob dieses Vorhaben gelingt.</strong>
+              <strong>Berechne die Restschuld K_v am Ende des 5. Jahres (31.12.2025).</strong>
             </p>
             <div className="flex items-center gap-4 mb-4">
               <label className="flex items-center gap-2">
-                <span className="font-semibold">Restschuld am 01.01.2025:</span>
+                <span className="font-semibold">Restschuld am 31.12.2025:</span>
                 <input
                   type="text"
                   value={answers['1.5'].input}
                   onChange={(e) => updateAnswer('1.5', 'input', e.target.value)}
-                  placeholder="z.B. 19.500,00"
+                  placeholder="z.B. 0,00"
                   className="border border-gray-300 rounded px-3 py-2 w-40"
                 />
                 <span className="text-gray-600">€</span>
@@ -359,7 +384,7 @@ export default function LucasKapitalanlagen() {
             </div>
             <div className="flex gap-3 flex-wrap mb-4">
               <button
-                onClick={() => checkAnswer('1.5', 19500, 100)}
+                onClick={() => checkAnswer('1.5', 0.00, 1)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -374,22 +399,18 @@ export default function LucasKapitalanlagen() {
             {answers['1.5'].feedback && <p className="text-sm mb-3">{answers['1.5'].feedback}</p>}
             {answers['1.5'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
-                <strong>Lösung (Restschuld nach 5 Jahren):</strong><br/>
+                <strong>Lösung (Restschuld-Formel für Annuitätendarlehen):</strong><br/>
                 K_v = K₀ · q^v - A · (q^v - 1) / (q - 1)<br/>
-                K_v = 40.000,00 · 1,014⁵ - 4.314,42 · (1,014⁵ - 1) / 0,014<br/>
-                K_v = 40.000,00 · 1,0719 - 4.314,42 · 5,1477<br/>
-                K_v = 42.876,00 - 22.211,38<br/>
-                K_v ≈ 20.664,62 €<br/><br/>
-                <strong>Ergebnis:</strong><br/>
-                Sparbriefguthaben: 21.000,00 €<br/>
-                Restschuld am 01.01.2025: ca. 20.665,00 €<br/>
-                ✅ Ja, das Vorhaben gelingt! Es bleibt ca. 335,00 € übrig.
+                K_v = 80.000,00 · 1,025⁵ - 18.909,60 · (1,025⁵ - 1) / 0,025<br/>
+                K_v = 80.000,00 · 1,1314 - 18.909,60 · 5,2563<br/>
+                K_v = 90.510,98 - 99.510,98<br/>
+                K_v ≈ 0,00 € (vollständig getilgt)
               </div>
             )}
           </div>
 
           <div className="mt-10 text-center text-sm text-gray-500">
-            <p>Gesamtaufgabe: 15 Punkte | Prüfung WS 2019</p>
+            <p>Gesamtaufgabe: 15 Punkte</p>
           </div>
         </div>
       </div>
