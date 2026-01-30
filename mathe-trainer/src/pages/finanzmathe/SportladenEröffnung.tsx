@@ -355,9 +355,9 @@ export default function SportladenEröffnung() {
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Aufgabe 5</h2>
             <p className="text-gray-700 mb-4 text-center">
-              Der Gewinn aus dem Geschäftsbetrieb wird wieder auf dem Geschäftskonto zu einem Zinssatz von 3,20 % angelegt. Sie möchte wissen, wann sie die monatliche Annuität (monatlich 437,47 €) nicht mehr vollständig aus den angefallenen Zinsen begleichen kann.
+              Die Unternehmerin verfolgt die Entwicklung ihrer Kreditrückzahlung genau. Sie möchte wissen, ab welchem Jahr die jährlich anfallenden Zinsen für ihr Darlehen erstmals weniger als 1.000,00 € betragen.
               <br/><br/>
-              <strong>Nach wie vielen Jahren betragen die monatlich anfallenden Zinsen erstmalig weniger als 1.000,00 €?</strong>
+              <strong>Nach wie vielen Jahren betragen die Zinsen des Ratendarlehens erstmalig weniger als 1.000,00 €?</strong>
             </p>
             <div className="flex flex-col items-center gap-4 mb-4">
               <label className="flex items-center gap-2 justify-center">
@@ -389,13 +389,12 @@ export default function SportladenEröffnung() {
             {answers['5'].feedback && <p className="text-sm mb-3 text-center">{answers['5'].feedback}</p>}
             {answers['5'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 text-center">
-                <strong>Lösung:</strong>
-                <p>Die monatlichen Zinsen berechnen sich aus dem Kontostand multipliziert mit dem Monatszinssatz.</p>
-                <BlockMath math="Z_{\text{monatlich}} = K \cdot \frac{0,032}{12}" />
-                <p>Wir suchen das Jahr <InlineMath math="v" />, in dem:</p>
-                <BlockMath math="Z_v \cdot \frac{0,032}{12} < 1.000,00" />
-                <p>Das entspricht einem Kontostand von:</p>
-                <BlockMath math="K < 1.000,00 \cdot \frac{12}{0,032} = 375.000,00 \text{ €}" />
+                <strong>Lösung (Restschuldzinsen Ratendarlehen):</strong>
+                <BlockMath math="Z_v = T \cdot (q - 1) \cdot (n - v + 1)" />
+                <p>Mit <InlineMath math="T = 3.400 \text{ €}" />, <InlineMath math="q = 1,032" />, <InlineMath math="n = 17" /> Jahre:</p>
+                <BlockMath math="1.000,00 = 3.400,00 \cdot 0,032 \cdot (17 - v + 1)" />
+                <BlockMath math="\frac{1.000,00}{108,80} = 18 - v" />
+                <BlockMath math="v = 8,81" />
                 <p className="text-green-700 font-semibold mt-2">✅ Nach 9 Jahren betragen die Zinsen erstmalig weniger als 1.000,00 €.</p>
               </div>
             )}
