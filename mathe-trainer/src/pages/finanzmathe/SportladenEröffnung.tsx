@@ -213,7 +213,7 @@ export default function SportladenEröffnung() {
             <p className="text-gray-700 mb-4 text-center">
               Für die Finanzierung ihrer Geschäftsausstattung benötigt die Unternehmerin einen Kreditvertrag. Sie erhält einen Kredit von 40.000,00 €. Sie plant, von diesem Guthaben jeweils zu Jahresbeginn 5.200,00 € zur Bezahlung ihrer Werbepartner zu entnehmen.
               <br/><br/>
-              <strong>Berechnen Sie, wie viele volle Jahre die Unternehmerin diese jährliche Entnahme durchführen kann, wenn der Kontozinssatz 1,80 % pro Jahr beträgt.</strong>
+              <strong>Berechnen Sie, wie viele volle Jahre die Unternehmerin diese jährliche Entnahme durchführen kann, bis ihr Konto leer ist. Der Zinssatz beträgt 1,80 % pro Jahr.</strong>
             </p>
             <div className="flex flex-col items-center gap-4 mb-4">
               <label className="flex items-center gap-2 justify-center">
@@ -246,12 +246,15 @@ export default function SportladenEröffnung() {
             {answers['3'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 text-center">
                 <strong>Lösung (Vorschüssige Kapitalminderung):</strong>
-                <BlockMath math="K_0 = R \cdot q \cdot \frac{q^n - 1}{q - 1}" />
-                <p>Mit <InlineMath math="q = 1,018" />, <InlineMath math="R = 5.200 \text{ €}" />, <InlineMath math="K_0 = 40.000 \text{ €}" />:</p>
-                <BlockMath math="40.000 = 5.200 \cdot 1,018 \cdot \frac{1,018^n - 1}{0,018}" />
+                <BlockMath math="K_n' = K_0 \cdot q^n - r \cdot q \cdot \frac{q^n - 1}{q - 1}" />
+                <p>Mit <InlineMath math="q = 1,018" />, <InlineMath math="r = 5.200 \text{ €}" />, <InlineMath math="K_0 = 40.000 \text{ €}" />:</p>
                 <BlockMath math="0 = 40.000 \cdot 1,018^n - 5.200 \cdot 1,018 \cdot \frac{1,018^n - 1}{0,018}" />
-                <BlockMath math="n = \log_{1,018}(1,1574)" />
-                <BlockMath math="n \approx 8,19" />
+                <BlockMath math="0 = 720 \cdot 1,018^n - 5.293,60 \cdot (1,018^n - 1)" />
+                <BlockMath math="0 = 720 \cdot 1,018^n - 5.293,60 \cdot 1,018^n + 5.293,60" />
+                <BlockMath math="- 5.293,60 = (720 - 5.293,60) \cdot 1,018^n" />
+                <BlockMath math="- 5.293,60 = - 4.573,60 \cdot 1,018^n" />
+                <BlockMath math="1,018^n = \frac{5.293,60}{4.573,60} = 1,1574" />
+                <BlockMath math="n = \log_{1,018}(1,1574) \approx 8,19" />
                 <p className="text-green-700 font-semibold mt-2">✅ Die Unternehmerin kann 8 volle Jahre lang die jährliche Entnahme durchführen.</p>
               </div>
             )}
