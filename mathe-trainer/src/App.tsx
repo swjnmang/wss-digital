@@ -64,7 +64,7 @@ import Annuitaetendarlehen from './pages/finanzmathe/Annuitaetendarlehen';
 import ZinsenTest from './pages/finanzmathe/ZinsenTest';
 import GemischteFinanzaufgaben from './pages/finanzmathe/GemischteFinanzaufgaben';
 import Anwendungsaufgaben from './pages/finanzmathe/Anwendungsaufgaben';
-import LucasKapitalanlagen from './pages/finanzmathe/LucasKapitalanlagen';
+import SarahKapitalanlagen from './pages/finanzmathe/SarahKapitalanlagen';
 import PruefungsModus from './pages/finanzmathe/PruefungsModus';
 // Quadratische Funktionen
 import QuadratischeFunktionenMenu from './pages/quadratische_funktionen/QuadratischeFunktionenMenu';
@@ -214,7 +214,7 @@ export default function App() {
           <Route path="/finanzmathe/annuitaetendarlehen" element={<Annuitaetendarlehen />} />
           <Route path="/finanzmathe/gemischte-aufgaben" element={<GemischteFinanzaufgaben />} />
           <Route path="/finanzmathe/anwendungsaufgaben" element={<Anwendungsaufgaben />} />
-          <Route path="/finanzmathe/anwendungsaufgaben/lucas-kapitalanlagen" element={<LucasKapitalanlagen />} />
+          <Route path="/finanzmathe/anwendungsaufgaben/sarah-kapitalanlagen" element={<SarahKapitalanlagen />} />
           <Route path="/finanzmathe/zinsen_test" element={<ZinsenTest />} />
           <Route path="/finanzmathe/pruefungsmodus" element={<PruefungsModus />} />
 
