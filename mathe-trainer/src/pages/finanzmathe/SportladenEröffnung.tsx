@@ -211,13 +211,13 @@ export default function SportladenEröffnung() {
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Aufgabe 3</h2>
             <p className="text-gray-700 mb-4 text-center">
-              Zur Finanzierung von Renovierungen und Geschäftsausstattung hat sich die Unternehmerin bei der Bank einen Kredit in Höhe von 40.000,00 € besorgt. Sie möchte davon monatlich jeweils am Ende eines Monats einen festen Betrag von 5.200,00 € entnehmen.
+              Für die Finanzierung ihrer Geschäftsausstattung benötigt die Unternehmerin einen Kreditvertrag. Sie erhält einen Kredit von 40.000,00 €. Sie plant, von diesem Guthaben jeweils zu Jahresbeginn 5.200,00 € zur Bezahlung ihrer Werbepartner zu entnehmen.
               <br/><br/>
-              <strong>Berechnen Sie, wie viele volle Monate sie diese monatliche Entnahme durchführen kann, wenn der Kontozinssatz 3,20 % pro Jahr beträgt.</strong>
+              <strong>Berechnen Sie, wie viele volle Jahre die Unternehmerin diese jährliche Entnahme durchführen kann, wenn der Kontozinssatz 1,80 % pro Jahr beträgt.</strong>
             </p>
             <div className="flex flex-col items-center gap-4 mb-4">
               <label className="flex items-center gap-2 justify-center">
-                <span className="font-semibold">Anzahl Monate:</span>
+                <span className="font-semibold">Anzahl Jahre:</span>
                 <input
                   type="text"
                   value={answers['3'].input}
@@ -225,7 +225,7 @@ export default function SportladenEröffnung() {
                   placeholder="z.B. 8"
                   className="border border-gray-300 rounded px-3 py-2 w-32 text-center"
                 />
-                <span className="text-gray-600">Monate</span>
+                <span className="text-gray-600">Jahre</span>
               </label>
             </div>
             <div className="flex gap-3 flex-wrap mb-4 justify-center">
@@ -245,12 +245,14 @@ export default function SportladenEröffnung() {
             {answers['3'].feedback && <p className="text-sm mb-3 text-center">{answers['3'].feedback}</p>}
             {answers['3'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 text-center">
-                <strong>Lösung (Nachschüssige Kapitalminderung):</strong>
-                <p className="mb-2">Monatlicher Zinssatz: <InlineMath math="i = \frac{3,20\%}{12} \approx 0,2667\%" /> mit <InlineMath math="q = 1,002667" /></p>
-                <BlockMath math="K_0 = R \cdot \frac{q^n - 1}{(q - 1) \cdot q^n}" />
-                <BlockMath math="40.000 = 5.200 \cdot \frac{1,002667^n - 1}{0,002667 \cdot 1,002667^n}" />
-                <p>Nach Umformen und Lösen: <InlineMath math="n \approx 8,19" /> Monate</p>
-                <p className="text-green-700 font-semibold mt-2">✅ Sie kann 8 volle Monate die Entnahme durchführen.</p>
+                <strong>Lösung (Vorschüssige Kapitalminderung):</strong>
+                <BlockMath math="K_0 = R \cdot q \cdot \frac{q^n - 1}{q - 1}" />
+                <p>Mit <InlineMath math="q = 1,018" />, <InlineMath math="R = 5.200 \text{ €}" />, <InlineMath math="K_0 = 40.000 \text{ €}" />:</p>
+                <BlockMath math="40.000 = 5.200 \cdot 1,018 \cdot \frac{1,018^n - 1}{0,018}" />
+                <BlockMath math="0 = 40.000 \cdot 1,018^n - 5.200 \cdot 1,018 \cdot \frac{1,018^n - 1}{0,018}" />
+                <BlockMath math="n = \log_{1,018}(1,1574)" />
+                <BlockMath math="n \approx 8,19" />
+                <p className="text-green-700 font-semibold mt-2">✅ Die Unternehmerin kann 8 volle Jahre lang die jährliche Entnahme durchführen.</p>
               </div>
             )}
           </div>
