@@ -263,7 +263,7 @@ export default function EhepaartTempel() {
           {/* Kontext für Aufgaben 1.3-1.5 */}
           <div className="mb-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-500">
             <p className="text-gray-700 text-center leading-relaxed">
-              Die Kosten für das Haus mit Grundstück belaufen sich auf <strong>450.000,00 €</strong>. Zu ihrem Eigenkapital erhalten das Ehepaar Tempel weitere finanzielle Unterstützung von ihren Eltern. Damit verfügen sie insgesamt über <strong>65.000,00 € Eigenkapital</strong>. Für den restlichen Finanzierungsbetrag verlangt die Bank einen <strong>Zinssatz von 1,25 % p.a.</strong>
+              Die Kosten für das Haus mit Grundstück belaufen sich auf <strong>450.000,00 €</strong>. Zu ihrem Eigenkapital erhalten das Ehepaar Müller weitere finanzielle Unterstützung von ihren Eltern. Damit verfügen sie insgesamt über <strong>65.000,00 € Eigenkapital</strong>. Für den restlichen Finanzierungsbetrag verlangt die Bank einen <strong>Zinssatz von 1,25 % p.a.</strong>
             </p>
           </div>
 
