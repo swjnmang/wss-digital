@@ -293,7 +293,7 @@ export default function EhepaartTempel() {
                     <td className="border border-gray-400 px-2 py-1 text-right">385.000,00 €</td>
                     <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
                     <td className="border border-gray-400 px-2 py-1 text-right">9.497,50 €</td>
-                    <td className="border border-gray-400 px-2 py-1 text-right">14.310,00 €</td>
+                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
                   </tr>
                   <tr>
                     <td className="border border-gray-400 px-2 py-1 text-center font-semibold">2</td>
