@@ -38,7 +38,24 @@ export default function EhepaartTempel() {
   })
 
   const parseInput = (value: string): number | null => {
-    const parsed = parseFloat(value.replace(',', '.').trim())
+    let cleaned = value.trim()
+    
+    // Finde das letzte Punkt oder Komma
+    const lastCommaIdx = cleaned.lastIndexOf(',')
+    const lastDotIdx = cleaned.lastIndexOf('.')
+    const lastSeparatorIdx = Math.max(lastCommaIdx, lastDotIdx)
+    
+    if (lastSeparatorIdx !== -1) {
+      // Es gibt mindestens ein Punkt oder Komma - behandle das letzte als Dezimaltrennzeichen
+      const beforeDecimal = cleaned.substring(0, lastSeparatorIdx).replace(/[,.]/g, '')
+      const afterDecimal = cleaned.substring(lastSeparatorIdx + 1)
+      cleaned = beforeDecimal + '.' + afterDecimal
+    } else {
+      // Kein Dezimaltrennzeichen, entferne alle Punkte und Kommas
+      cleaned = cleaned.replace(/[,.]/g, '')
+    }
+    
+    const parsed = parseFloat(cleaned)
     return isNaN(parsed) ? null : parsed
   }
 
@@ -50,7 +67,7 @@ export default function EhepaartTempel() {
       '1.1': [1.0, 1.4],
       '1.2': [37700, 37900],
       '1.4': [170000, 171000],
-      '1.5': [29.0, 29.8],
+      '1.5': [29.0, 30.5],
     }
 
     if (tolerances[key]) {
