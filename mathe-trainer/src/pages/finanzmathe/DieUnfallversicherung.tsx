@@ -48,9 +48,9 @@ export default function DieUnfallversicherung() {
 
     const tolerances: Record<string, [number, number]> = {
       '1.1': [2.5, 2.7],
-      '1.2': [305, 308],
+      '1.2': [195, 200],
       '1.3': [5.8, 6.1],
-      '1.5': [9700, 9800],
+      '1.5': [14000, 14500],
     }
 
     if (tolerances[key]) {
@@ -162,7 +162,7 @@ export default function DieUnfallversicherung() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Jährliche Einzahlung (€):</label>
               <input
                 type="text"
-                placeholder="z.B. 306,82"
+                placeholder="z.B. 198,51"
                 value={answers['1.2'].value}
                 onChange={(e) => handleInputChange('1.2', e.target.value)}
                 className={`w-full px-4 py-2 border rounded-lg text-center text-lg ${
@@ -194,7 +194,7 @@ export default function DieUnfallversicherung() {
                 <BlockMath formula="R = \frac{K_n - K_0 \cdot q^n}{\frac{q^n - 1}{q - 1}}" />
                 <p className="text-gray-700 mb-3">Berechnung:</p>
                 <BlockMath formula="K_0 \cdot q^n = 12.500 \cdot 1,0125^{12} \approx 14.447,13 \text{ €}" />
-                <BlockMath formula="R = \frac{17.000 - 14.447,13}{\frac{1,0125^{12} - 1}{0,0125}} \approx \frac{2.552,87}{12,589} \approx \mathbf{306,82 \text{ €}}" />
+                <BlockMath formula="R = \frac{17.000 - 14.447,13}{\frac{1,0125^{12} - 1}{0,0125}} \approx \frac{2.552,87}{12,887} \approx \mathbf{198,51 \text{ €}}" />
               </div>
             )}
           </div>
@@ -218,7 +218,7 @@ export default function DieUnfallversicherung() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Anzahl der Jahre (n):</label>
               <input
                 type="text"
-                placeholder="z.B. 5,98"
+                placeholder="z.B. 6"
                 value={answers['1.3'].value}
                 onChange={(e) => handleInputChange('1.3', e.target.value)}
                 className={`w-full px-4 py-2 border rounded-lg text-center text-lg ${
@@ -251,10 +251,10 @@ export default function DieUnfallversicherung() {
                 <p className="text-gray-700 mb-3">Vereinfachen:</p>
                 <BlockMath formula="17.000 \cdot 1,015^n = 3.045 \cdot \frac{1,015^n - 1}{0,015}" />
                 <p className="text-gray-700 mb-2">
-                  <InlineMath formula="1,015^n \approx 1,1008 \Rightarrow n \approx \mathbf{5,98 \text{ Jahre}}" />
+                  <InlineMath formula="1,015^n \approx 1,1008 \Rightarrow n \approx 5,98" />
                 </p>
-                <p className="text-gray-700 text-sm">
-                  Herr Weber kann seinen Sohn also etwa 6 Jahre lang vollständig finanzieren.
+                <p className="text-gray-700 text-sm font-semibold text-green-700">
+                  ✅ Auf volle Jahre gerundet: <InlineMath formula="n = \mathbf{6 \text{ Jahre}}" />
                 </p>
               </div>
             )}
@@ -284,8 +284,38 @@ export default function DieUnfallversicherung() {
 
             <div className="text-center mb-6">
               <p className="font-semibold text-gray-700">
-                Erstellen Sie einen Tilgungsplan für die ersten beiden Jahre.
+                Erstellen Sie einen Tilgungsplan für die ersten beiden Jahre. Füllen Sie die leeren Felder aus:
               </p>
+            </div>
+
+            <div className="mb-6 p-4 bg-white rounded border border-gray-200 overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="bg-purple-300">
+                    <th className="border border-gray-400 px-2 py-1">Jahr</th>
+                    <th className="border border-gray-400 px-2 py-1">Schuldenstand (€)</th>
+                    <th className="border border-gray-400 px-2 py-1">Zinsen (€)</th>
+                    <th className="border border-gray-400 px-2 py-1">Tilgung (€)</th>
+                    <th className="border border-gray-400 px-2 py-1">Annuität (€)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="bg-gray-50">
+                    <td className="border border-gray-400 px-2 py-1 text-center font-semibold">1</td>
+                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
+                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
+                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
+                    <td className="border border-gray-400 px-2 py-1 text-right">2.000,00</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-400 px-2 py-1 text-center font-semibold">2</td>
+                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
+                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
+                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
+                    <td className="border border-gray-400 px-2 py-1 text-right">2.000,00</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <button
@@ -297,7 +327,7 @@ export default function DieUnfallversicherung() {
 
             {answers['1.4'].showSolution && (
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg overflow-x-auto">
-                <h3 className="font-bold text-blue-900 mb-4">Tilgungsplan:</h3>
+                <h3 className="font-bold text-blue-900 mb-4">Lösungstabelle:</h3>
                 <table className="w-full text-sm border-collapse">
                   <thead>
                     <tr className="bg-blue-200">
@@ -309,13 +339,6 @@ export default function DieUnfallversicherung() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td className="border border-gray-400 px-2 py-1 text-center">0</td>
-                      <td className="border border-gray-400 px-2 py-1 text-right">25.000,00</td>
-                      <td className="border border-gray-400 px-2 py-1 text-right">—</td>
-                      <td className="border border-gray-400 px-2 py-1 text-right">—</td>
-                      <td className="border border-gray-400 px-2 py-1 text-right">—</td>
-                    </tr>
                     <tr className="bg-gray-50">
                       <td className="border border-gray-400 px-2 py-1 text-center">1</td>
                       <td className="border border-gray-400 px-2 py-1 text-right">25.000,00</td>
@@ -356,7 +379,7 @@ export default function DieUnfallversicherung() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Restschuld nach 8 Jahren (€):</label>
               <input
                 type="text"
-                placeholder="z.B. 9754,56"
+                placeholder="z.B. 14253,16"
                 value={answers['1.5'].value}
                 onChange={(e) => handleInputChange('1.5', e.target.value)}
                 className={`w-full px-4 py-2 border rounded-lg text-center text-lg ${
@@ -388,15 +411,12 @@ export default function DieUnfallversicherung() {
                 <p className="text-gray-700 mb-3">Formel für Restschuld nach v Jahren:</p>
                 <BlockMath formula="K_v = K_0 \cdot q^v - A \cdot \frac{q^v - 1}{q - 1}" />
                 <p className="text-gray-700 mb-3">Berechnung:</p>
-                <BlockMath formula="K_8 = 25.000 \cdot 1,032^8 - 2.000 \cdot \frac{1,032^8 - 1}{0,032}" />
+                <BlockMath formula="K_8 = 25.000 \cdot 1,032^8 - \frac{2.000 \cdot (1,032^8 - 1)}{1,032 - 1}" />
                 <p className="text-gray-700 mb-3">
-                  <InlineMath formula="K_8 = 25.000 \cdot 1,29913 - 2.000 \cdot \frac{0,29913}{0,032}" />
+                  <InlineMath formula="K_8 = 25.000 \cdot 1,29913 - \frac{2.000 \cdot (1,29913 - 1)}{0,032}" />
                 </p>
                 <p className="text-gray-700 mb-2">
-                  <InlineMath formula="K_8 = 32.478,25 - 18.695,81 = \mathbf{13.782,44 \text{ €}}" />
-                </p>
-                <p className="text-gray-700 text-sm">
-                  Nach 8 Jahren beträgt die Restschuld ca. 13.782,44 € (Anmerkung: Original unterscheidet sich leicht).
+                  <InlineMath formula="K_8 = 32.478,25 - \frac{2.000 \cdot 0,29913}{0,032} = 32.478,25 - 18.695,81 = \mathbf{14.253,16 \text{ €}}" />
                 </p>
               </div>
             )}
