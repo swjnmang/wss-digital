@@ -67,6 +67,7 @@ import Anwendungsaufgaben from './pages/finanzmathe/Anwendungsaufgaben';
 import ArdasKapitalanlagen from './pages/finanzmathe/ArdasKapitalanlagen';
 import SportladenEröffnung from './pages/finanzmathe/SportladenEröffnung';
 import DieUnfallversicherung from './pages/finanzmathe/DieUnfallversicherung';
+import EhepaartTempel from './pages/finanzmathe/EhepaartTempel';
 import PruefungsModus from './pages/finanzmathe/PruefungsModus';
 // Quadratische Funktionen
 import QuadratischeFunktionenMenu from './pages/quadratische_funktionen/QuadratischeFunktionenMenu';
@@ -219,6 +220,7 @@ export default function App() {
           <Route path="/finanzmathe/anwendungsaufgaben/ardas-kapitalanlagen" element={<ArdasKapitalanlagen />} />
           <Route path="/finanzmathe/anwendungsaufgaben/sportladen-eröffnung" element={<SportladenEröffnung />} />
           <Route path="/finanzmathe/anwendungsaufgaben/die-unfallversicherung" element={<DieUnfallversicherung />} />
+          <Route path="/finanzmathe/anwendungsaufgaben/ehepaar-tempel" element={<EhepaartTempel />} />
           <Route path="/finanzmathe/zinsen_test" element={<ZinsenTest />} />
           <Route path="/finanzmathe/pruefungsmodus" element={<PruefungsModus />} />
 

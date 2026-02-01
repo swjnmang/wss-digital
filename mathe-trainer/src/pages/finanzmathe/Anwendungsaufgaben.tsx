@@ -31,6 +31,10 @@ export default function Anwendungsaufgaben() {
               <h2 className="text-xl font-bold text-purple-800 mb-2">Die Unfallversicherung</h2>
               <p className="text-gray-600">Versicherungssumme mit Zinseszins, nachschüssige Rente, vorschüssige Kapitalminderung, Ratendarlehen und Restschuldberechnung.</p>
             </Link>
+            <Link to="/finanzmathe/anwendungsaufgaben/ehepaar-tempel" className="block p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200">
+              <h2 className="text-xl font-bold text-purple-800 mb-2">Ehepaar Tempel</h2>
+              <p className="text-gray-600">Kapitalanlagen mit Zinseszins, Eigenkapitalberechnung, Tilgungsplan und Restschuldberechnung bei Fremdfinanzierung.</p>
+            </Link>
           </div>
         </div>
       </div>
