@@ -95,7 +95,7 @@ export default function EhepaartTempel() {
             <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.1 (3 Punkte)</h2>
             
             <div className="mb-6 overflow-x-auto">
-              <p className="text-sm font-semibold text-gray-700 mb-3">Kapitalanlage Nadine Tempel - Finanzbank Würzburg:</p>
+              <p className="text-sm font-semibold text-gray-700 mb-3">Kapitalanlage Sandra Tempel - Finanzbank Würzburg:</p>
               <table className="w-full text-sm border-collapse">
                 <tbody>
                   <tr className="bg-gray-100">
@@ -162,7 +162,7 @@ export default function EhepaartTempel() {
 
             <div className="text-center mb-6">
               <p className="font-semibold text-gray-700">
-                Geben Sie an, welche Kapitalanlage der höhere Zinssatz zugrunde liegt.
+                Berechne den Zinssatz, den Sandra Tempel erhalten hat.
               </p>
             </div>
 
@@ -194,7 +194,7 @@ export default function EhepaartTempel() {
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="font-bold text-blue-900 mb-3">Lösung:</h3>
                 <p className="text-gray-700 mb-3">
-                  Gegeben: Nadine: <InlineMath formula="K_0 = 20.500 \text{ €}, K_n = 24.516,67 \text{ €}, n = 15" />
+                  Gegeben: Sandra: <InlineMath formula="K_0 = 20.500 \text{ €}, K_n = 24.516,67 \text{ €}, n = 15" />
                 </p>
                 <p className="text-gray-700 mb-3">Formel für Zinseszins:</p>
                 <BlockMath formula="K_n = K_0 \cdot q^n" />
@@ -216,7 +216,7 @@ export default function EhepaartTempel() {
             <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.2 (3 Punkte)</h2>
             <div className="text-center mb-6">
               <p className="font-semibold text-gray-700">
-                Bestimmen Sie die Höhe des gemeinsamen Eigenkapitals zum 31.12.2018.
+                Berechne die Höhe des gemeinsamen Eigenkapitals zum 31.12.2018.
               </p>
             </div>
 
@@ -251,10 +251,20 @@ export default function EhepaartTempel() {
                   Klaus-Konto: <InlineMath formula="K_n = K_0 \cdot q^n = 10.500 \cdot 1,024^{10} = 13.310,33 \text{ €}" />
                 </p>
                 <p className="text-gray-700 mb-3">
+                  Sandra-Konto: <InlineMath formula="24.516,67 \text{ €}" />
+                </p>
+                <p className="text-gray-700 mb-3">
                   Gemeinsames Eigenkapital: <InlineMath formula="13.310,33 + 24.516,67 = \mathbf{37.827,00 \text{ €}}" />
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Kontext für Aufgaben 1.3-1.5 */}
+          <div className="mb-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+            <p className="text-gray-700 text-center leading-relaxed">
+              Die Kosten für das Haus mit Grundstück belaufen sich auf <strong>450.000,00 €</strong>. Zu ihrem Eigenkapital erhalten das Ehepaar Tempel weitere finanzielle Unterstützung von ihren Eltern. Damit verfügen sie insgesamt über <strong>65.000,00 € Eigenkapital</strong>. Für den restlichen Finanzierungsbetrag verlangt die Bank einen <strong>Zinssatz von 1,25 % p.a.</strong>
+            </p>
           </div>
 
           {/* Aufgabe 1.3 */}
@@ -262,7 +272,7 @@ export default function EhepaartTempel() {
             <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.3 (2 Punkte)</h2>
             <div className="text-center mb-6">
               <p className="font-semibold text-gray-700">
-                Vervollständigen Sie die leeren Felder im vorliefgenden Tilgungsplan.
+                Vervollständigen Sie die leeren Felder im Tilgungsplan.
               </p>
             </div>
 
@@ -348,7 +358,7 @@ export default function EhepaartTempel() {
             <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.4 (2 Punkte)</h2>
             <div className="text-center mb-6">
               <p className="font-semibold text-gray-700">
-                Berechnen Sie die Restschuld der Fremdfinanzierung nach 20 Jahren.
+                Berechne die Restschuld der Fremdfinanzierung nach 20 Jahren.
               </p>
             </div>
 
@@ -398,7 +408,7 @@ export default function EhepaartTempel() {
             <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.5 (5 Punkte)</h2>
             <div className="text-center mb-6">
               <p className="font-semibold text-gray-700">
-                Berechnen Sie, nach wie vielen Jahren die Restschuld erstmals unter 50.000,00 € liegt.
+                Berechne, nach wie vielen Jahren die Restschuld erstmals unter 50.000,00 € liegt.
               </p>
             </div>
 
