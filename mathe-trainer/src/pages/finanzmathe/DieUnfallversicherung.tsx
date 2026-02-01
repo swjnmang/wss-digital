@@ -108,7 +108,7 @@ export default function DieUnfallversicherung() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Zinssatz (p%):</label>
               <input
                 type="text"
-                placeholder="z.B. 2,6"
+                placeholder="z.B. 2,5"
                 value={answers['1.1'].value}
                 onChange={(e) => handleInputChange('1.1', e.target.value)}
                 className={`w-full px-4 py-2 border rounded-lg text-center text-lg ${
@@ -162,7 +162,7 @@ export default function DieUnfallversicherung() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Jährliche Einzahlung (€):</label>
               <input
                 type="text"
-                placeholder="z.B. 198,51"
+                placeholder="z.B. 250"
                 value={answers['1.2'].value}
                 onChange={(e) => handleInputChange('1.2', e.target.value)}
                 className={`w-full px-4 py-2 border rounded-lg text-center text-lg ${
@@ -218,7 +218,7 @@ export default function DieUnfallversicherung() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Anzahl der Jahre (n):</label>
               <input
                 type="text"
-                placeholder="z.B. 6"
+                placeholder="z.B. 5"
                 value={answers['1.3'].value}
                 onChange={(e) => handleInputChange('1.3', e.target.value)}
                 className={`w-full px-4 py-2 border rounded-lg text-center text-lg ${
@@ -379,7 +379,7 @@ export default function DieUnfallversicherung() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Restschuld nach 8 Jahren (€):</label>
               <input
                 type="text"
-                placeholder="z.B. 14253,16"
+                placeholder="z.B. 12000"
                 value={answers['1.5'].value}
                 onChange={(e) => handleInputChange('1.5', e.target.value)}
                 className={`w-full px-4 py-2 border rounded-lg text-center text-lg ${
