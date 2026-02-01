@@ -87,7 +87,7 @@ export default function EhepaartTempel() {
         </button>
 
         <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
-          <h1 className="text-3xl font-bold text-purple-600 mb-2 text-center">Ehepaar Tempel</h1>
+          <h1 className="text-3xl font-bold text-purple-600 mb-2 text-center">Ehepaar Müller</h1>
           <p className="text-gray-600 text-center mb-8">Löse alle Aufgaben und überprüfe deine Ergebnisse</p>
 
           {/* Aufgabe 1.1 */}
@@ -95,7 +95,7 @@ export default function EhepaartTempel() {
             <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.1 (3 Punkte)</h2>
             
             <div className="mb-6 overflow-x-auto">
-              <p className="text-sm font-semibold text-gray-700 mb-3">Kapitalanlage Sandra Tempel - Finanzbank Würzburg:</p>
+              <p className="text-sm font-semibold text-gray-700 mb-3">Kapitalanlage Anna Müller - Stadtsparkasse München:</p>
               <table className="w-full text-sm border-collapse">
                 <tbody>
                   <tr className="bg-gray-100">
@@ -126,7 +126,7 @@ export default function EhepaartTempel() {
             </div>
 
             <div className="mb-6 overflow-x-auto">
-              <p className="text-sm font-semibold text-gray-700 mb-3">Kapitalanlage Klaus Tempel - Hausbaubank Karlstadt:</p>
+              <p className="text-sm font-semibold text-gray-700 mb-3">Kapitalanlage Thomas Müller - Süddeutsche Baubank:</p>
               <table className="w-full text-sm border-collapse">
                 <tbody>
                   <tr className="bg-gray-100">
@@ -162,7 +162,7 @@ export default function EhepaartTempel() {
 
             <div className="text-center mb-6">
               <p className="font-semibold text-gray-700">
-                Berechne den Zinssatz, den Sandra Tempel erhalten hat.
+                Berechne den Zinssatz, den Anna Müller erhalten hat.
               </p>
             </div>
 
@@ -194,7 +194,7 @@ export default function EhepaartTempel() {
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="font-bold text-blue-900 mb-3">Lösung:</h3>
                 <p className="text-gray-700 mb-3">
-                  Gegeben: Sandra: <InlineMath formula="K_0 = 20.500 \text{ €}, K_n = 24.516,67 \text{ €}, n = 15" />
+                  Gegeben: Anna: <InlineMath formula="K_0 = 20.500 \text{ €}, K_n = 24.516,67 \text{ €}, n = 15" />
                 </p>
                 <p className="text-gray-700 mb-3">Formel für Zinseszins:</p>
                 <BlockMath formula="K_n = K_0 \cdot q^n" />
@@ -216,7 +216,7 @@ export default function EhepaartTempel() {
             <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.2 (3 Punkte)</h2>
             <div className="text-center mb-6">
               <p className="font-semibold text-gray-700">
-                Berechne die Höhe des gemeinsamen Eigenkapitals zum 31.12.2018.
+                Berechne die Höhe des gemeinsamen Eigenkapitals zum 31.12.2018 des Ehepaares Müller.
               </p>
             </div>
 
@@ -248,10 +248,10 @@ export default function EhepaartTempel() {
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="font-bold text-blue-900 mb-3">Lösung:</h3>
                 <p className="text-gray-700 mb-3">
-                  Klaus-Konto: <InlineMath formula="K_n = K_0 \cdot q^n = 10.500 \cdot 1,024^{10} = 13.310,33 \text{ €}" />
+                  Thomas-Konto: <InlineMath formula="K_n = K_0 \cdot q^n = 10.500 \cdot 1,024^{10} = 13.310,33 \text{ €}" />
                 </p>
                 <p className="text-gray-700 mb-3">
-                  Sandra-Konto: <InlineMath formula="24.516,67 \text{ €}" />
+                  Anna-Konto: <InlineMath formula="24.516,67 \text{ €}" />
                 </p>
                 <p className="text-gray-700 mb-3">
                   Gemeinsames Eigenkapital: <InlineMath formula="13.310,33 + 24.516,67 = \mathbf{37.827,00 \text{ €}}" />
