@@ -9,6 +9,14 @@ interface PartAnswer {
   showSolution: boolean
 }
 
+interface TilgungsplanRow {
+  jahr: number
+  restschuld: string
+  zinsen: string
+  tilgung: string
+  annuitaet: string
+}
+
 function InlineMath({ formula }: { formula: string }) {
   try {
     const html = katex.renderToString(formula, { throwOnError: false })
@@ -36,6 +44,11 @@ export default function FamilieKessler() {
     '1.4': { value: '', isCorrect: false, showSolution: false },
     '1.5': { value: '', isCorrect: false, showSolution: false },
   })
+
+  const [tilgungsplan, setTilgungsplan] = useState<TilgungsplanRow[]>([
+    { jahr: 1, restschuld: '', zinsen: '', tilgung: '', annuitaet: '' },
+    { jahr: 2, restschuld: '', zinsen: '', tilgung: '', annuitaet: '' },
+  ])
 
   const parseInput = (value: string): number | null => {
     let cleaned = value.trim()
@@ -76,6 +89,46 @@ export default function FamilieKessler() {
       return numValue >= min && numValue <= max
     }
     return false
+  }
+
+  const checkTilgungsplanValue = (jahr: number, field: string, value: string): 'correct' | 'incorrect' | 'empty' => {
+    if (value.trim() === '') return 'empty'
+
+    const numValue = parseInput(value)
+    if (numValue === null) return 'incorrect'
+
+    // Korrekte Werte für den Tilgungsplan
+    const correctValues: Record<string, Record<string, number>> = {
+      '1': {
+        restschuld: 60000,
+        zinsen: 1620,
+        tilgung: 5000,
+        annuitaet: 6620,
+      },
+      '2': {
+        restschuld: 55000,
+        zinsen: 1485,
+        tilgung: 5000,
+        annuitaet: 6485,
+      },
+    }
+
+    const correct = correctValues[jahr.toString()]?.[field]
+    if (correct === undefined) return 'empty'
+
+    // Toleranz: ±0,5% oder minimum 1€
+    const tolerance = Math.max(correct * 0.005, 1)
+    const isCorrect = numValue >= correct - tolerance && numValue <= correct + tolerance
+
+    return isCorrect ? 'correct' : 'incorrect'
+  }
+
+  const handleTilgungsplanChange = (jahr: number, field: string, value: string) => {
+    setTilgungsplan(prev =>
+      prev.map(row =>
+        row.jahr === jahr ? { ...row, [field]: value } : row
+      )
+    )
   }
 
   const handleInputChange = (key: string, value: string) => {
@@ -344,20 +397,34 @@ export default function FamilieKessler() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="bg-gray-50">
-                    <td className="border border-gray-400 px-2 py-1 text-center font-semibold">1</td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
-                  </tr>
-                  <tr>
-                    <td className="border border-gray-400 px-2 py-1 text-center font-semibold">2</td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
-                  </tr>
+                  {tilgungsplan.map((row) => (
+                    <tr key={row.jahr} className={row.jahr === 1 ? 'bg-gray-50' : ''}>
+                      <td className="border border-gray-400 px-2 py-1 text-center font-semibold">{row.jahr}</td>
+                      {(['restschuld', 'zinsen', 'tilgung', 'annuitaet'] as const).map((field) => {
+                        const status = checkTilgungsplanValue(row.jahr, field, row[field])
+                        const borderColor = 
+                          status === 'correct' ? 'border-green-500' :
+                          status === 'incorrect' ? 'border-red-500' :
+                          'border-gray-300'
+                        const bgColor =
+                          status === 'correct' ? 'bg-green-50' :
+                          status === 'incorrect' ? 'bg-red-50' :
+                          'bg-white'
+
+                        return (
+                          <td key={field} className={`border border-gray-400 px-2 py-1 text-right`}>
+                            <input
+                              type="text"
+                              className={`w-full border-2 rounded px-2 py-1 ${borderColor} ${bgColor}`}
+                              placeholder="€"
+                              value={row[field]}
+                              onChange={(e) => handleTilgungsplanChange(row.jahr, field, e.target.value)}
+                            />
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
