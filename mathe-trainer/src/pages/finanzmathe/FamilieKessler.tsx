@@ -108,25 +108,22 @@ export default function FamilieKessler() {
           <h1 className="text-3xl font-bold text-purple-600 mb-2 text-center">Familie Kessler</h1>
           <p className="text-gray-600 text-center mb-8">Löse alle Aufgaben und überprüfe deine Ergebnisse</p>
 
-          {/* Einleitungstext */}
-          <div className="mb-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-            <p className="text-gray-700 leading-relaxed">
-              Frau Eva Kessler ist Rentnerin und möchte bereits zu Lebzeiten einen Teil ihrer Erbschaft regeln. Sie verkauft ein Grundstück und zahlt ihrem Sohn Markus <strong>100.000,00 €</strong> und ihren beiden Enkelkindern David und Sophie jeweils <strong>30.000,00 €</strong> vorab aus.
-            </p>
-          </div>
-
-          {/* Sophie-Kontext */}
-          <div className="mb-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-            <p className="text-gray-700 leading-relaxed">
-              Bis zu Sophies Volljährigkeit in sechs Jahren verbleibt ihr Anteil auf einem Festgeldkonto mit <strong>1,75 % jährlicher Verzinsung</strong>.
-            </p>
-          </div>
-
           {/* Aufgabe 1.1 */}
           <div className="mb-12 p-6 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-            <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.1 (3 Punkte)</h2>
+            <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.1</h2>
+            
+            <div className="text-gray-700 leading-relaxed mb-6 space-y-4">
+              <p>
+                Frau Eva Kessler ist Rentnerin und möchte bereits zu Lebzeiten einen Teil ihrer Erbschaft regeln. Sie verkauft ein Grundstück und zahlt ihrem Sohn Markus <strong>100.000,00 €</strong> und ihren beiden Enkelkindern David und Sophie jeweils <strong>30.000,00 €</strong> vorab aus.
+              </p>
+              
+              <p>
+                Bis zu Sophies Volljährigkeit in sechs Jahren verbleibt ihr Anteil auf einem Festgeldkonto mit <strong>1,75 % jährlicher Verzinsung</strong>.
+              </p>
+            </div>
+
             <div className="text-center mb-6">
-              <p className="font-semibold text-gray-700 mb-4">
+              <p className="font-semibold text-gray-700">
                 Berechne, über welchen Betrag Sophie bei Vollendung ihres 18. Geburtstags verfügen kann.
               </p>
             </div>
@@ -171,17 +168,16 @@ export default function FamilieKessler() {
 
           {/* Aufgabe 1.2 */}
           <div className="mb-12 p-6 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-            <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.2 (3 Punkte)</h2>
+            <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.2</h2>
             
-            {/* David-Kontext */}
-            <div className="mb-6 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-              <p className="text-gray-700 leading-relaxed mb-3">
+            <div className="text-gray-700 leading-relaxed mb-6 space-y-4">
+              <p>
                 David hat nach seiner Ausbildung ein Start-up Unternehmen gegründet und möchte mit dem Geld in den kommenden vier Jahren den Markeintritt seines Produktes finanziell begleiten. Er plant die <strong>30.000,00 €</strong> bei der Bank zu <strong>2,25 % p.a.</strong> anzulegen und sich jeweils <strong>zu Beginn des Jahres</strong> einen festen Betrag auszahlen zu lassen.
               </p>
             </div>
 
             <div className="text-center mb-6">
-              <p className="font-semibold text-gray-700 mb-4">
+              <p className="font-semibold text-gray-700">
                 Berechne den Betrag, den David verwenden kann, wenn er nach vier Jahren noch 10.000,00 € übrig haben möchte.
               </p>
             </div>
@@ -228,17 +224,16 @@ export default function FamilieKessler() {
 
           {/* Aufgabe 1.3 */}
           <div className="mb-12 p-6 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-            <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.3 (3 Punkte)</h2>
+            <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.3</h2>
             
-            {/* David-Rücklage Kontext */}
-            <div className="mb-6 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-              <p className="text-gray-700 leading-relaxed mb-3">
+            <div className="text-gray-700 leading-relaxed mb-6 space-y-4">
+              <p>
                 Nach erfolgreicher Produkteinführung kann es sich David mittlerweile leisten, Rücklagen zu bilden. Zu den verbleibenden <strong>10.000,00 €</strong> zählt er fortan am Jahresende <strong>6.000,00 €</strong> ein. Die jährliche Verzinsung bleibt bei <strong>2,25 %</strong>.
               </p>
             </div>
 
             <div className="text-center mb-6">
-              <p className="font-semibold text-gray-700 mb-4">
+              <p className="font-semibold text-gray-700">
                 Berechne, nach wie vielen Jahren David 50.000,00 € an Rücklage erreicht hat.
               </p>
             </div>
@@ -285,7 +280,7 @@ export default function FamilieKessler() {
 
           {/* Aufgabe 1.4 */}
           <div className="mb-12 p-6 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-            <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.4 (3 Punkte)</h2>
+            <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.4</h2>
             <div className="text-center mb-6">
               <p className="font-semibold text-gray-700 mb-4">
                 Erstellen Sie einen Tilgungsplan für die ersten zwei Jahre.
@@ -410,7 +405,7 @@ export default function FamilieKessler() {
 
           {/* Aufgabe 1.5 */}
           <div className="mb-12 p-6 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-            <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.5 (3 Punkte)</h2>
+            <h2 className="text-2xl font-bold text-purple-800 mb-4">Aufgabe 1.5</h2>
             <div className="text-center mb-6">
               <p className="font-semibold text-gray-700 mb-4">
                 Berechne die neue Gesamtlaufzeit des Darlehens.
