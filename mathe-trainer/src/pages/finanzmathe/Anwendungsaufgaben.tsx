@@ -20,23 +20,23 @@ export default function Anwendungsaufgaben() {
           
           <div className="grid grid-cols-1 gap-6">
             <Link to="/finanzmathe/anwendungsaufgaben/ardas-kapitalanlagen" className="block p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200">
-              <h2 className="text-xl font-bold text-purple-800 mb-2">Ardas Kapitalanlagen</h2>
+              <h2 className="text-xl font-bold text-purple-800 mb-2"><i className="fa-solid fa-chart-line mr-2 text-purple-600"></i>Ardas Kapitalanlagen</h2>
               <p className="text-gray-600">Nachschüssige Rente, Zinseszins, vorschüssige Kapitalminderung, Annuitätendarlehen und Sondertilgung.</p>
             </Link>
             <Link to="/finanzmathe/anwendungsaufgaben/sportladen-eröffnung" className="block p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200">
-              <h2 className="text-xl font-bold text-purple-800 mb-2">Sportladen Eröffnung</h2>
+              <h2 className="text-xl font-bold text-purple-800 mb-2"><i className="fa-solid fa-store mr-2 text-purple-600"></i>Sportladen Eröffnung</h2>
               <p className="text-gray-600">Gründungsfinanzierung eines Sportladens - Vorschüssige Rente, Zinsberechnung, Kapitalminderung, Ratendarlehen und Zinsen aus Gewinnen.</p>
             </Link>
             <Link to="/finanzmathe/anwendungsaufgaben/die-unfallversicherung" className="block p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200">
-              <h2 className="text-xl font-bold text-purple-800 mb-2">Die Unfallversicherung</h2>
+              <h2 className="text-xl font-bold text-purple-800 mb-2"><i className="fa-solid fa-shield mr-2 text-purple-600"></i>Die Unfallversicherung</h2>
               <p className="text-gray-600">Versicherungssumme mit Zinseszins, nachschüssige Rente, vorschüssige Kapitalminderung, Ratendarlehen und Restschuldberechnung.</p>
             </Link>
             <Link to="/finanzmathe/anwendungsaufgaben/ehepaar-tempel" className="block p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200">
-              <h2 className="text-xl font-bold text-purple-800 mb-2">Ehepaar Tempel</h2>
+              <h2 className="text-xl font-bold text-purple-800 mb-2"><i className="fa-solid fa-home mr-2 text-purple-600"></i>Ehepaar Tempel</h2>
               <p className="text-gray-600">Kapitalanlagen mit Zinseszins, Eigenkapitalberechnung, Tilgungsplan und Restschuldberechnung bei Fremdfinanzierung.</p>
             </Link>
             <Link to="/finanzmathe/anwendungsaufgaben/familie-kessler" className="block p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200">
-              <h2 className="text-xl font-bold text-purple-800 mb-2">Familie Kessler</h2>
+              <h2 className="text-xl font-bold text-purple-800 mb-2"><i className="fa-solid fa-people-roof mr-2 text-purple-600"></i>Familie Kessler</h2>
               <p className="text-gray-600">Festgeldkonto mit Zinseszins, nachschüssige Rente, Rücklage mit regelmäßigen Einzahlungen, Tilgungsplan und Laufzeitveränderung.</p>
             </Link>
           </div>
