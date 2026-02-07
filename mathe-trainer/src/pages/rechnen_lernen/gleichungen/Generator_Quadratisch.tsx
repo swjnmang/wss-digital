@@ -195,6 +195,30 @@ const areEquivalentSolutions = (userInput: string, solutions: [number, number]):
   return checkMatch(sol1) || checkMatch(sol2);
 };
 
+const validateDualSolution = (value1: string, value2: string, solutions: [number, number]): boolean => {
+  const [sol1, sol2] = solutions;
+  
+  const checkMatch = (userInput: string, targetValue: number) => {
+    const userInputLower = userInput.toLowerCase().trim();
+    const absVal = Math.abs(targetValue);
+    if (absVal < 0.0001) return userInputLower === '0';
+    const rounded = Math.round(targetValue * 100) / 100;
+    return (
+      userInputLower === targetValue.toString() ||
+      userInputLower === rounded.toString() ||
+      userInputLower === targetValue.toFixed(1) ||
+      userInputLower === targetValue.toFixed(2) ||
+      userInputLower === targetValue.toFixed(3)
+    );
+  };
+
+  // Prüfe: (value1 = sol1 && value2 = sol2) ODER (value1 = sol2 && value2 = sol1)
+  return (
+    (checkMatch(value1, sol1) && checkMatch(value2, sol2)) ||
+    (checkMatch(value1, sol2) && checkMatch(value2, sol1))
+  );
+};
+
 const Generator_Quadratisch: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState(0);
   const [answers, setAnswers] = useState<Record<string, { value1: string; value2: string; isCorrect: boolean | null }>>({});
@@ -213,11 +237,7 @@ const Generator_Quadratisch: React.FC = () => {
     let isCorrect: boolean | null = null;
     if (trimmedValue1 && trimmedValue2) {
       // Beide Werte vorhanden - vollständig validieren
-      isCorrect = 
-        (areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[0], aufgabe.loesungen[1]]) &&
-          areEquivalentSolutions(trimmedValue2, [aufgabe.loesungen[0], aufgabe.loesungen[1]])) ||
-        (areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[1], aufgabe.loesungen[0]]) &&
-          areEquivalentSolutions(trimmedValue2, [aufgabe.loesungen[1], aufgabe.loesungen[0]]));
+      isCorrect = validateDualSolution(trimmedValue1, trimmedValue2, aufgabe.loesungen);
     } else if (trimmedValue1 || trimmedValue2) {
       // Nur ein Wert vorhanden - noch unvollständig, null lassen
       isCorrect = null;
