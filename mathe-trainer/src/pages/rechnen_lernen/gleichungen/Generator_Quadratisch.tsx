@@ -274,19 +274,19 @@ const Generator_Quadratisch: React.FC = () => {
             return (
               <div key={aufgabe.id} className="space-y-1">
                 {/* Aufgabe in einer Zeile */}
-                <div className="bg-white rounded p-2 shadow border-l-2 border-blue-300 flex items-center gap-2">
+                <div className="bg-white rounded p-2 shadow border-l-2 border-blue-300 flex items-center gap-2 overflow-x-auto">
                   {/* Nummer */}
-                  <span className="text-sm font-bold text-gray-600 whitespace-nowrap">
+                  <span className="text-sm font-bold text-gray-600 whitespace-nowrap flex-shrink-0">
                     {index + 1})
                   </span>
 
                   {/* Aufgabe */}
-                  <div className="text-sm font-mono bg-gray-50 px-2 py-1 rounded border border-gray-200 whitespace-nowrap">
+                  <div className="text-sm font-mono bg-gray-50 px-2 py-1 rounded border border-gray-200 whitespace-nowrap flex-shrink-0">
                     {aufgabe.aufgabe}
                   </div>
 
                   {/* Gleichheitszeichen */}
-                  <span className="text-lg font-bold text-gray-500">=</span>
+                  <span className="text-lg font-bold text-gray-500 flex-shrink-0">=</span>
 
                   {/* Input 1 */}
                   <input
@@ -294,7 +294,7 @@ const Generator_Quadratisch: React.FC = () => {
                     placeholder="..."
                     value={answer.value1}
                     onChange={(e) => handleInputChange(aufgabe.id, e.target.value, answer.value2)}
-                    className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
+                    className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all flex-shrink-0 ${
                       answer.isCorrect === null
                         ? 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
                         : answer.isCorrect
@@ -309,7 +309,7 @@ const Generator_Quadratisch: React.FC = () => {
                     placeholder="..."
                     value={answer.value2}
                     onChange={(e) => handleInputChange(aufgabe.id, answer.value1, e.target.value)}
-                    className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
+                    className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all flex-shrink-0 ${
                       answer.isCorrect === null
                         ? 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
                         : answer.isCorrect
@@ -319,7 +319,7 @@ const Generator_Quadratisch: React.FC = () => {
                   />
 
                   {/* Status Indicator */}
-                  <div className="w-5 h-5 flex items-center justify-center">
+                  <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                     {answer.isCorrect === true && (
                       <span className="text-green-600 font-bold text-sm">✓</span>
                     )}
@@ -331,7 +331,7 @@ const Generator_Quadratisch: React.FC = () => {
                   {/* Button */}
                   <button
                     onClick={() => toggleSolution(aufgabe.id)}
-                    className="text-sm px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all whitespace-nowrap font-semibold"
+                    className="text-sm px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all whitespace-nowrap font-semibold flex-shrink-0"
                   >
                     {showSolution ? '✕' : '?'}
                   </button>
