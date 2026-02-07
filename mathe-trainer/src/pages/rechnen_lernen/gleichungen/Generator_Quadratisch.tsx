@@ -214,19 +214,19 @@ const Generator_Quadratisch: React.FC = () => {
     if (trimmedValue1 && trimmedValue2) {
       // Beide Werte vorhanden - vollständig validieren
       isCorrect = 
-        (areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[0]]) &&
-          areEquivalentSolutions(trimmedValue2, [aufgabe.loesungen[1]])) ||
-        (areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[1]]) &&
-          areEquivalentSolutions(trimmedValue2, [aufgabe.loesungen[0]]));
+        (areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[0], aufgabe.loesungen[1]]) &&
+          areEquivalentSolutions(trimmedValue2, [aufgabe.loesungen[0], aufgabe.loesungen[1]])) ||
+        (areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[1], aufgabe.loesungen[0]]) &&
+          areEquivalentSolutions(trimmedValue2, [aufgabe.loesungen[1], aufgabe.loesungen[0]]));
     } else if (trimmedValue1 || trimmedValue2) {
       // Nur ein Wert vorhanden - noch unvollständig, null lassen
       isCorrect = null;
     }
 
-    setAnswers({
-      ...answers,
+    setAnswers(prevAnswers => ({
+      ...prevAnswers,
       [aufgabenId]: { value1: trimmedValue1, value2: trimmedValue2, isCorrect },
-    });
+    }));
   };
 
   const toggleSolution = (aufgabenId: string) => {
@@ -292,12 +292,16 @@ const Generator_Quadratisch: React.FC = () => {
                   <div className="flex gap-1 flex-shrink-0">
                     {/* Input 1 */}
                     <input
+                      key={`input1-${aufgabe.id}`}
                       type="text"
                       inputMode="text"
                       autoComplete="off"
                       placeholder="..."
                       value={answer.value1}
-                      onChange={(e) => handleInputChange(aufgabe.id, e.target.value, answer.value2)}
+                      onChange={(e) => {
+                        const newValue1 = e.target.value;
+                        handleInputChange(aufgabe.id, newValue1, answer.value2);
+                      }}
                       style={{ pointerEvents: 'auto' }}
                       className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all outline-none cursor-text ${
                         answer.isCorrect === null
@@ -310,12 +314,16 @@ const Generator_Quadratisch: React.FC = () => {
 
                     {/* Input 2 */}
                     <input
+                      key={`input2-${aufgabe.id}`}
                       type="text"
                       inputMode="text"
                       autoComplete="off"
                       placeholder="..."
                       value={answer.value2}
-                      onChange={(e) => handleInputChange(aufgabe.id, answer.value1, e.target.value)}
+                      onChange={(e) => {
+                        const newValue2 = e.target.value;
+                        handleInputChange(aufgabe.id, answer.value1, newValue2);
+                      }}
                       style={{ pointerEvents: 'auto' }}
                       className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all outline-none cursor-text ${
                         answer.isCorrect === null
