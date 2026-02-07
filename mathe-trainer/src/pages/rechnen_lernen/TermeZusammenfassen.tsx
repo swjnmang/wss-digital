@@ -1985,11 +1985,11 @@ const TermeZusammenfassen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-3">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50 p-3">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-purple-900 mb-1">Terme zusammenfassen</h1>
+          <h1 className="text-2xl font-bold text-orange-900 mb-1">Terme zusammenfassen</h1>
           <p className="text-xs text-gray-600">
             Wähle eine Kategorie und löse die Aufgaben. Tippe deine Antwort ein und überprüfe automatisch!
           </p>
@@ -2003,8 +2003,8 @@ const TermeZusammenfassen: React.FC = () => {
               onClick={() => setSelectedCategory(index)}
               className={`px-3 py-1 text-sm rounded font-semibold transition-all ${
                 selectedCategory === index
-                  ? 'bg-purple-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
+                  ? 'bg-orange-500 text-white shadow-lg'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:border-orange-300'
               }`}
             >
               {kategorie.name}
@@ -2013,71 +2013,70 @@ const TermeZusammenfassen: React.FC = () => {
         </div>
 
         {/* Aufgaben */}
-        <div className="space-y-2">
+        <div className="space-y-1">
           {currentAufgaben.map((aufgabe, index) => {
             const answer = answers[aufgabe.id] || { value: '', isCorrect: null };
             const showSolution = showSolutions[aufgabe.id] || false;
 
             return (
-              <div
-                key={aufgabe.id}
-                className="bg-white rounded p-3 shadow border-l-2 border-purple-300"
-              >
-                {/* Aufgabe Nummer und Text */}
-                <div className="flex flex-col gap-1 mb-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-semibold text-purple-600">
-                      Aufgabe {index + 1}
-                    </p>
-                    {answer.isCorrect === true && (
-                      <p className="text-xs text-green-600 font-semibold">✓ Korrekt!</p>
-                    )}
-                    {answer.isCorrect === false && (
-                      <p className="text-xs text-red-600 font-semibold">✗ Falsch</p>
-                    )}
-                  </div>
-                  <p className="text-sm font-mono bg-gray-50 p-1.5 rounded border border-gray-200">
-                    {aufgabe.aufgabe}
-                  </p>
-                </div>
+              <div key={aufgabe.id} className="space-y-1">
+                {/* Aufgabe in einer Zeile */}
+                <div className="bg-white rounded p-2 shadow border-l-2 border-orange-300 flex items-center gap-2">
+                  {/* Nummer */}
+                  <span className="text-xs font-bold text-gray-600 whitespace-nowrap">
+                    {index + 1})
+                  </span>
 
-                {/* Input Feld */}
-                <div className="mb-2">
+                  {/* Aufgabe */}
+                  <div className="text-xs font-mono bg-gray-50 px-1.5 py-1 rounded border border-gray-200 whitespace-nowrap">
+                    {aufgabe.aufgabe}
+                  </div>
+
+                  {/* Input */}
                   <input
                     type="text"
-                    placeholder="Antwort..."
+                    placeholder="..."
                     value={answer.value}
                     onChange={(e) => handleInputChange(aufgabe.id, e.target.value)}
-                    className={`w-full px-2 py-1.5 rounded border-2 font-mono text-sm transition-all ${
+                    className={`flex-1 min-w-0 px-2 py-1 rounded border-2 font-mono text-xs transition-all ${
                       answer.isCorrect === null
-                        ? 'border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-200'
+                        ? 'border-gray-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-200'
                         : answer.isCorrect
                         ? 'border-green-500 bg-green-50 focus:ring-1 focus:ring-green-200'
                         : 'border-red-500 bg-red-50 focus:ring-1 focus:ring-red-200'
                     }`}
                   />
+
+                  {/* Status Indicator */}
+                  <div className="w-5 h-5 flex items-center justify-center">
+                    {answer.isCorrect === true && (
+                      <span className="text-green-600 font-bold text-xs">✓</span>
+                    )}
+                    {answer.isCorrect === false && (
+                      <span className="text-red-600 font-bold text-xs">✗</span>
+                    )}
+                  </div>
+
+                  {/* Button */}
+                  <button
+                    onClick={() => toggleSolution(aufgabe.id)}
+                    className="text-xs px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-all whitespace-nowrap"
+                  >
+                    {showSolution ? '✕' : '?'}
+                  </button>
                 </div>
 
-                {/* Button */}
-                <button
-                  onClick={() => toggleSolution(aufgabe.id)}
-                  className="text-xs px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all"
-                >
-                  {showSolution ? 'Weg ✕' : 'Weg ?'}
-                </button>
-
-                {/* Rechenweg */}
+                {/* Rechenweg - ausklappbar unter der Aufgabe */}
                 {showSolution && (
-                  <div className="mt-2 p-2 bg-blue-50 rounded border-l-2 border-blue-400 text-xs">
-                    <p className="font-semibold text-blue-900 mb-1">Lösungsweg:</p>
-                    <div className="space-y-0.5 mb-1">
+                  <div className="p-2 bg-orange-50 rounded border-l-2 border-orange-400 text-xs ml-8">
+                    <div className="space-y-0.5">
                       {aufgabe.rechenweg.map((schritt, i) => (
-                        <p key={i} className="text-blue-800 text-xs">
+                        <p key={i} className="text-gray-700">
                           {i > 0 && '→ '} {schritt}
                         </p>
                       ))}
                     </div>
-                    <p className="font-semibold text-blue-900">
+                    <p className="font-semibold text-orange-900 mt-1">
                       Lösung: <span className="font-mono bg-white px-1 rounded">{aufgabe.loesung}</span>
                     </p>
                   </div>
@@ -2095,7 +2094,7 @@ const TermeZusammenfassen: React.FC = () => {
           </p>
           <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
             <div
-              className="bg-purple-600 h-2 rounded-full transition-all"
+              className="bg-orange-500 h-2 rounded-full transition-all"
               style={{
                 width: `${
                   (Object.values(answers).filter((a) => a.isCorrect === true).length /
