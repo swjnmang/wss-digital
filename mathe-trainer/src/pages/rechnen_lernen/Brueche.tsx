@@ -35,10 +35,10 @@ export default function Brueche() {
           <Link
             key={a.title}
             to={a.path}
-            className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col items-center p-6 hover:shadow-xl transition-shadow no-underline text-inherit"
+            className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col items-center justify-center p-8 hover:shadow-xl transition-shadow no-underline text-inherit min-h-[240px]"
           >
-            <h3 className="text-lg font-semibold mb-1 text-blue-900">{a.title}</h3>
-            <p className="text-gray-700 text-center">{a.description}</p>
+            <h3 className="text-lg font-semibold mb-3 text-blue-900 text-center">{a.title}</h3>
+            <p className="text-gray-700 text-center leading-relaxed">{a.description}</p>
           </Link>
         ))}
       </main>
