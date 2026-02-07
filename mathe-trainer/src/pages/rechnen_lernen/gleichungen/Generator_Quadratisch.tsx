@@ -274,49 +274,52 @@ const Generator_Quadratisch: React.FC = () => {
             return (
               <div key={aufgabe.id} className="space-y-1">
                 {/* Aufgabe in einer Zeile */}
-                <div className="bg-white rounded p-2 shadow border-l-2 border-blue-300 flex items-center gap-2 overflow-x-auto">
+                <div className="bg-white rounded p-2 shadow border-l-2 border-blue-300 flex items-center gap-2">
                   {/* Nummer */}
                   <span className="text-sm font-bold text-gray-600 whitespace-nowrap flex-shrink-0">
                     {index + 1})
                   </span>
 
                   {/* Aufgabe */}
-                  <div className="text-sm font-mono bg-gray-50 px-2 py-1 rounded border border-gray-200 whitespace-nowrap flex-shrink-0">
+                  <div className="text-sm font-mono bg-gray-50 px-2 py-1 rounded border border-gray-200 whitespace-nowrap flex-shrink-0 min-w-0">
                     {aufgabe.aufgabe}
                   </div>
 
                   {/* Gleichheitszeichen */}
                   <span className="text-lg font-bold text-gray-500 flex-shrink-0">=</span>
 
-                  {/* Input 1 */}
-                  <input
-                    type="text"
-                    placeholder="..."
-                    value={answer.value1}
-                    onChange={(e) => handleInputChange(aufgabe.id, e.target.value, answer.value2)}
-                    className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all flex-shrink-0 ${
-                      answer.isCorrect === null
-                        ? 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
-                        : answer.isCorrect
-                        ? 'border-green-500 bg-green-50 focus:ring-1 focus:ring-green-200'
-                        : 'border-red-500 bg-red-50 focus:ring-1 focus:ring-red-200'
-                    }`}
-                  />
+                  {/* Input Container */}
+                  <div className="flex gap-1 flex-shrink-0">
+                    {/* Input 1 */}
+                    <input
+                      type="text"
+                      placeholder="..."
+                      value={answer.value1}
+                      onChange={(e) => handleInputChange(aufgabe.id, e.target.value, answer.value2)}
+                      className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
+                        answer.isCorrect === null
+                          ? 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
+                          : answer.isCorrect
+                          ? 'border-green-500 bg-green-50 focus:ring-1 focus:ring-green-200'
+                          : 'border-red-500 bg-red-50 focus:ring-1 focus:ring-red-200'
+                      }`}
+                    />
 
-                  {/* Input 2 */}
-                  <input
-                    type="text"
-                    placeholder="..."
-                    value={answer.value2}
-                    onChange={(e) => handleInputChange(aufgabe.id, answer.value1, e.target.value)}
-                    className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all flex-shrink-0 ${
-                      answer.isCorrect === null
-                        ? 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
-                        : answer.isCorrect
-                        ? 'border-green-500 bg-green-50 focus:ring-1 focus:ring-green-200'
-                        : 'border-red-500 bg-red-50 focus:ring-1 focus:ring-red-200'
-                    }`}
-                  />
+                    {/* Input 2 */}
+                    <input
+                      type="text"
+                      placeholder="..."
+                      value={answer.value2}
+                      onChange={(e) => handleInputChange(aufgabe.id, answer.value1, e.target.value)}
+                      className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
+                        answer.isCorrect === null
+                          ? 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
+                          : answer.isCorrect
+                          ? 'border-green-500 bg-green-50 focus:ring-1 focus:ring-green-200'
+                          : 'border-red-500 bg-red-50 focus:ring-1 focus:ring-red-200'
+                      }`}
+                    />
+                  </div>
 
                   {/* Status Indicator */}
                   <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
