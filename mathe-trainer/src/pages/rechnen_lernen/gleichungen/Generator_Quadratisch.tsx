@@ -293,10 +293,13 @@ const Generator_Quadratisch: React.FC = () => {
                     {/* Input 1 */}
                     <input
                       type="text"
+                      inputMode="text"
+                      autoComplete="off"
                       placeholder="..."
                       value={answer.value1}
                       onChange={(e) => handleInputChange(aufgabe.id, e.target.value, answer.value2)}
-                      className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
+                      style={{ pointerEvents: 'auto' }}
+                      className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all outline-none cursor-text ${
                         answer.isCorrect === null
                           ? 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
                           : answer.isCorrect
@@ -308,10 +311,13 @@ const Generator_Quadratisch: React.FC = () => {
                     {/* Input 2 */}
                     <input
                       type="text"
+                      inputMode="text"
+                      autoComplete="off"
                       placeholder="..."
                       value={answer.value2}
                       onChange={(e) => handleInputChange(aufgabe.id, answer.value1, e.target.value)}
-                      className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
+                      style={{ pointerEvents: 'auto' }}
+                      className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all outline-none cursor-text ${
                         answer.isCorrect === null
                           ? 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
                           : answer.isCorrect
