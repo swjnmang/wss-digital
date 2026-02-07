@@ -1953,26 +1953,26 @@ const TermeZusammenfassen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-3">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-purple-900 mb-2">Terme zusammenfassen</h1>
-          <p className="text-gray-600">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-purple-900 mb-1">Terme zusammenfassen</h1>
+          <p className="text-xs text-gray-600">
             Wähle eine Kategorie und löse die Aufgaben. Tippe deine Antwort ein und überprüfe automatisch!
           </p>
         </div>
 
         {/* Kategorie Tabs */}
-        <div className="flex flex-wrap gap-3 mb-8">
+        <div className="flex flex-wrap gap-2 mb-4">
           {AUFGABEN_KATEGORIEN.map((kategorie, index) => (
             <button
               key={index}
               onClick={() => setSelectedCategory(index)}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+              className={`px-3 py-1 text-sm rounded font-semibold transition-all ${
                 selectedCategory === index
                   ? 'bg-purple-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-purple-300'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
               }`}
             >
               {kategorie.name}
@@ -1981,7 +1981,7 @@ const TermeZusammenfassen: React.FC = () => {
         </div>
 
         {/* Aufgaben */}
-        <div className="space-y-4">
+        <div className="space-y-2">
           {currentAufgaben.map((aufgabe, index) => {
             const answer = answers[aufgabe.id] || { value: '', isCorrect: null };
             const showSolution = showSolutions[aufgabe.id] || false;
@@ -1989,70 +1989,64 @@ const TermeZusammenfassen: React.FC = () => {
             return (
               <div
                 key={aufgabe.id}
-                className="bg-white rounded-lg p-6 shadow-md border-l-4 border-purple-300"
+                className="bg-white rounded p-3 shadow border-l-2 border-purple-300"
               >
                 {/* Aufgabe Nummer und Text */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-purple-600 mb-1">
+                <div className="flex flex-col gap-1 mb-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-purple-600">
                       Aufgabe {index + 1}
                     </p>
-                    <p className="text-lg font-semibold text-gray-800 font-mono bg-gray-100 p-3 rounded">
-                      {aufgabe.aufgabe}
-                    </p>
+                    {answer.isCorrect === true && (
+                      <p className="text-xs text-green-600 font-semibold">✓ Korrekt!</p>
+                    )}
+                    {answer.isCorrect === false && (
+                      <p className="text-xs text-red-600 font-semibold">✗ Falsch</p>
+                    )}
                   </div>
+                  <p className="text-sm font-mono bg-gray-50 p-1.5 rounded border border-gray-200">
+                    {aufgabe.aufgabe}
+                  </p>
                 </div>
 
                 {/* Input Feld */}
-                <div className="mb-4">
+                <div className="mb-2">
                   <input
                     type="text"
-                    placeholder="Deine Antwort eingeben..."
+                    placeholder="Antwort..."
                     value={answer.value}
                     onChange={(e) => handleInputChange(aufgabe.id, e.target.value)}
-                    className={`w-full px-4 py-3 rounded-lg border-2 font-mono text-lg transition-all ${
+                    className={`w-full px-2 py-1.5 rounded border-2 font-mono text-sm transition-all ${
                       answer.isCorrect === null
-                        ? 'border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200'
+                        ? 'border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-200'
                         : answer.isCorrect
-                        ? 'border-green-500 bg-green-50 focus:ring-2 focus:ring-green-200'
-                        : 'border-red-500 bg-red-50 focus:ring-2 focus:ring-red-200'
+                        ? 'border-green-500 bg-green-50 focus:ring-1 focus:ring-green-200'
+                        : 'border-red-500 bg-red-50 focus:ring-1 focus:ring-red-200'
                     }`}
                   />
-                  {answer.isCorrect === true && (
-                    <p className="text-green-600 font-semibold mt-2 flex items-center gap-2">
-                      ✓ Korrekt!
-                    </p>
-                  )}
-                  {answer.isCorrect === false && (
-                    <p className="text-red-600 font-semibold mt-2 flex items-center gap-2">
-                      ✗ Nicht ganz richtig
-                    </p>
-                  )}
                 </div>
 
-                {/* Buttons */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => toggleSolution(aufgabe.id)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-all"
-                  >
-                    {showSolution ? 'Rechenweg ausblenden' : 'Rechenweg anzeigen'}
-                  </button>
-                </div>
+                {/* Button */}
+                <button
+                  onClick={() => toggleSolution(aufgabe.id)}
+                  className="text-xs px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all"
+                >
+                  {showSolution ? 'Weg ✕' : 'Weg ?'}
+                </button>
 
                 {/* Rechenweg */}
                 {showSolution && (
-                  <div className="mt-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                    <p className="font-semibold text-blue-900 mb-2">Lösungsweg:</p>
-                    <div className="space-y-1">
+                  <div className="mt-2 p-2 bg-blue-50 rounded border-l-2 border-blue-400 text-xs">
+                    <p className="font-semibold text-blue-900 mb-1">Lösungsweg:</p>
+                    <div className="space-y-0.5 mb-1">
                       {aufgabe.rechenweg.map((schritt, i) => (
-                        <p key={i} className="text-blue-800 text-sm">
+                        <p key={i} className="text-blue-800 text-xs">
                           {i > 0 && '→ '} {schritt}
                         </p>
                       ))}
                     </div>
-                    <p className="font-semibold text-blue-900 mt-3">
-                      Lösung: <span className="font-mono bg-white p-2 rounded">{aufgabe.loesung}</span>
+                    <p className="font-semibold text-blue-900">
+                      Lösung: <span className="font-mono bg-white px-1 rounded">{aufgabe.loesung}</span>
                     </p>
                   </div>
                 )}
@@ -2062,14 +2056,14 @@ const TermeZusammenfassen: React.FC = () => {
         </div>
 
         {/* Fortschritt */}
-        <div className="mt-8 p-6 bg-white rounded-lg shadow-md">
-          <p className="text-lg font-semibold text-gray-800">
+        <div className="mt-4 p-3 bg-white rounded shadow border border-gray-200">
+          <p className="text-sm font-semibold text-gray-800">
             Fortschritt: {Object.values(answers).filter((a) => a.isCorrect === true).length} /{' '}
             {currentAufgaben.length} korrekt
           </p>
-          <div className="w-full bg-gray-200 rounded-full h-4 mt-3">
+          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
             <div
-              className="bg-purple-600 h-4 rounded-full transition-all"
+              className="bg-purple-600 h-2 rounded-full transition-all"
               style={{
                 width: `${
                   (Object.values(answers).filter((a) => a.isCorrect === true).length /
