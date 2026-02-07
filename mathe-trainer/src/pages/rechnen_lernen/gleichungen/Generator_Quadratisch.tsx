@@ -176,19 +176,20 @@ const AUFGABEN_KATEGORIEN = [
 ];
 
 const areEquivalentSolutions = (userInput: string, solutions: [number, number]): boolean => {
-  const userInputLower = userInput.toLowerCase().trim();
+  // Komma zu Punkt konvertieren (deutsche Dezimalschreibweise)
+  const normalized = userInput.toLowerCase().trim().replace(',', '.');
   const [sol1, sol2] = solutions;
   
   const checkMatch = (val: number) => {
     const absVal = Math.abs(val);
-    if (absVal < 0.0001) return userInputLower === '0';
+    if (absVal < 0.0001) return normalized === '0';
     const rounded = Math.round(val * 100) / 100;
     return (
-      userInputLower === val.toString() ||
-      userInputLower === rounded.toString() ||
-      userInputLower === val.toFixed(1) ||
-      userInputLower === val.toFixed(2) ||
-      userInputLower === val.toFixed(3)
+      normalized === val.toString() ||
+      normalized === rounded.toString() ||
+      normalized === val.toFixed(1) ||
+      normalized === val.toFixed(2) ||
+      normalized === val.toFixed(3)
     );
   };
 
@@ -199,16 +200,17 @@ const validateDualSolution = (value1: string, value2: string, solutions: [number
   const [sol1, sol2] = solutions;
   
   const checkMatch = (userInput: string, targetValue: number) => {
-    const userInputLower = userInput.toLowerCase().trim();
+    // Komma zu Punkt konvertieren (deutsche Dezimalschreibweise)
+    const normalized = userInput.toLowerCase().trim().replace(',', '.');
     const absVal = Math.abs(targetValue);
-    if (absVal < 0.0001) return userInputLower === '0';
+    if (absVal < 0.0001) return normalized === '0';
     const rounded = Math.round(targetValue * 100) / 100;
     return (
-      userInputLower === targetValue.toString() ||
-      userInputLower === rounded.toString() ||
-      userInputLower === targetValue.toFixed(1) ||
-      userInputLower === targetValue.toFixed(2) ||
-      userInputLower === targetValue.toFixed(3)
+      normalized === targetValue.toString() ||
+      normalized === rounded.toString() ||
+      normalized === targetValue.toFixed(1) ||
+      normalized === targetValue.toFixed(2) ||
+      normalized === targetValue.toFixed(3)
     );
   };
 
