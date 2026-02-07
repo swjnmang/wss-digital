@@ -1,6 +1,7 @@
 // Rechnen lernen: Terme
 import Ohnevariablen from './pages/rechnen_lernen/terme/Ohnevariablen';
 import Zusammenfassen from './pages/rechnen_lernen/terme/Zusammenfassen';
+import TermeZusammenfassen from './pages/rechnen_lernen/TermeZusammenfassen';
 import Zusammenfassenpotenz from './pages/rechnen_lernen/terme/Zusammenfassenpotenz';
 // Rechnen lernen: Brüche
 import Kuerzenerweitern from './pages/rechnen_lernen/brueche/Kuerzenerweitern';
@@ -169,7 +170,7 @@ export default function App() {
           <Route path="/rechnen_lernen" element={<RechnenLernenIndex />} />
           <Route path="/rechnen_lernen/terme" element={<Terme />} />
           <Route path="/rechnen_lernen/terme/ohnevariablen" element={<Ohnevariablen />} />
-          <Route path="/rechnen_lernen/terme/zusammenfassen" element={<Zusammenfassen />} />
+          <Route path="/rechnen_lernen/terme/zusammenfassen" element={<TermeZusammenfassen />} />
           <Route path="/rechnen_lernen/terme/zusammenfassenpotenz" element={<Zusammenfassenpotenz />} />
           <Route path="/rechnen_lernen/brueche" element={<Brueche />} />
           <Route path="/rechnen_lernen/brueche/kuerzenerweitern" element={<Kuerzenerweitern />} />
