@@ -42,10 +42,18 @@ function parseSimpleTerm(term: string): Term[] {
  * 1. Splitting bei + und -
  * 2. Kombinieren von gleichartigen Termen
  * 3. Sortieren der Variablen alphabetisch
+ * 4. Normalisierung verschiedener Schreibweisen (4y, y4, 4*y, y*4)
  */
 function normalizeExpression(expr: string): Map<string, number> {
   // Entferne Leerzeichen und normalisiere
   expr = expr.replace(/\s+/g, '').toLowerCase();
+  
+  // Normalisiere verschiedene Multiplikationsschreibweisen
+  // z.B. "y4" -> "4*y", "y*4" -> "4*y"
+  expr = expr.replace(/(\d+)\*([a-z]+)/g, '$1*$2'); // 4*y bleibt 4*y
+  expr = expr.replace(/([a-z]+)\*(\d+)/g, '$2*$1'); // y*4 -> 4*y
+  expr = expr.replace(/([a-z])(\d+)(?![*])/g, '$2*$1'); // y4 -> 4*y (wenn kein * danach)
+  expr = expr.replace(/(\d+)([a-z])(?![*])/g, '$1*$2'); // 4y -> 4*y (wenn kein * danach)
   
   // Ersetze - mit +- für besseres Splitting
   expr = expr.replace(/^-/, '0-').replace(/-/g, '+-');
@@ -57,26 +65,50 @@ function normalizeExpression(expr: string): Map<string, number> {
   const parts = expr.split('+').filter((p) => p.trim());
 
   for (const part of parts) {
-    const trimmed = part.trim();
+    let trimmed = part.trim();
     if (!trimmed) continue;
 
     // Extrahiere Koeffizient und Variable(n)
-    const match = trimmed.match(/^([+-]?\d*\.?\d*)(.*)$/);
-    if (!match) continue;
+    // Behandle sowohl "4*y" als auch "4" oder "y"
+    let coeffNum = 1;
+    let variable = '';
 
-    let coeff = match[1];
-    let variable = match[2] || '';
+    // Versuche das Pattern "koeff*variable" oder "variable*koeff" zu matchen
+    let match = trimmed.match(/^([+-]?\d*\.?\d+)\*([a-z]+)$/);
+    if (match) {
+      coeffNum = parseFloat(match[1]);
+      variable = match[2];
+    } else {
+      // Versuche nur Koeffizient oder Variable
+      match = trimmed.match(/^([+-]?\d*\.?\d+)(.*)$/);
+      if (match) {
+        const coeff = match[1];
+        const possibleVar = match[2] || '';
 
-    // Behandle implizite 1 oder -1
-    if (coeff === '' || coeff === '+') coeff = '1';
-    if (coeff === '-') coeff = '-1';
-    if (coeff === '') coeff = '1';
+        if (coeff === '' || coeff === '+') {
+          coeffNum = 1;
+        } else if (coeff === '-') {
+          coeffNum = -1;
+        } else {
+          coeffNum = parseFloat(coeff);
+        }
 
-    const coeffNum = parseFloat(coeff);
+        variable = possibleVar;
+      } else {
+        // Nur Variable, z.B. "x" oder "-x"
+        if (trimmed.startsWith('-')) {
+          coeffNum = -1;
+          variable = trimmed.substring(1);
+        } else {
+          coeffNum = 1;
+          variable = trimmed;
+        }
+      }
+    }
+
     if (isNaN(coeffNum)) continue;
 
     // Sortiere Variablen alphabetisch und normalisiere
-    // z.B. "ba" → "ab", "2xy" → "xy"
     const sortedVariable = variable
       .replace(/\d/g, '') // Entferne Zahlen
       .split('')
