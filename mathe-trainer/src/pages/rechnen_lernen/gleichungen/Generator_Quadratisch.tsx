@@ -211,14 +211,16 @@ const Generator_Quadratisch: React.FC = () => {
 
     // Beide Werte müssen zusammen mit den Lösungen übereinstimmen
     let isCorrect: boolean | null = null;
-    if (trimmedValue1 || trimmedValue2) {
-      const userValues = [trimmedValue1, trimmedValue2].filter(v => v !== '');
+    if (trimmedValue1 && trimmedValue2) {
+      // Beide Werte vorhanden - vollständig validieren
       isCorrect = 
-        userValues.length === 2 &&
-        ((areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[0]]) &&
+        (areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[0]]) &&
           areEquivalentSolutions(trimmedValue2, [aufgabe.loesungen[1]])) ||
-         (areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[1]]) &&
-          areEquivalentSolutions(trimmedValue2, [aufgabe.loesungen[0]])));
+        (areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[1]]) &&
+          areEquivalentSolutions(trimmedValue2, [aufgabe.loesungen[0]]));
+    } else if (trimmedValue1 || trimmedValue2) {
+      // Nur ein Wert vorhanden - noch unvollständig, null lassen
+      isCorrect = null;
     }
 
     setAnswers({
