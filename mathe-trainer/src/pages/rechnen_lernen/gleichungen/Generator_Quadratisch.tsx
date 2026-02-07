@@ -197,22 +197,33 @@ const areEquivalentSolutions = (userInput: string, solutions: [number, number]):
 
 const Generator_Quadratisch: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, { value: string; isCorrect: boolean | null }>>({});
+  const [answers, setAnswers] = useState<Record<string, { value1: string; value2: string; isCorrect: boolean | null }>>({});
   const [showSolutions, setShowSolutions] = useState<Record<string, boolean>>({});
 
   const currentKategorie = AUFGABEN_KATEGORIEN[selectedCategory];
   const currentAufgaben = currentKategorie.aufgaben;
 
-  const handleInputChange = (aufgabenId: string, value: string) => {
-    const trimmedValue = value.trim();
+  const handleInputChange = (aufgabenId: string, value1: string, value2: string) => {
+    const trimmedValue1 = value1.trim();
+    const trimmedValue2 = value2.trim();
     const aufgabe = currentAufgaben.find((a) => a.id === aufgabenId);
     if (!aufgabe) return;
 
-    const isCorrect = trimmedValue ? areEquivalentSolutions(trimmedValue, aufgabe.loesungen) : null;
+    // Beide Werte müssen zusammen mit den Lösungen übereinstimmen
+    let isCorrect: boolean | null = null;
+    if (trimmedValue1 || trimmedValue2) {
+      const userValues = [trimmedValue1, trimmedValue2].filter(v => v !== '');
+      isCorrect = 
+        userValues.length === 2 &&
+        ((areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[0]]) &&
+          areEquivalentSolutions(trimmedValue2, [aufgabe.loesungen[1]])) ||
+         (areEquivalentSolutions(trimmedValue1, [aufgabe.loesungen[1]]) &&
+          areEquivalentSolutions(trimmedValue2, [aufgabe.loesungen[0]])));
+    }
 
     setAnswers({
       ...answers,
-      [aufgabenId]: { value: trimmedValue, isCorrect },
+      [aufgabenId]: { value1: trimmedValue1, value2: trimmedValue2, isCorrect },
     });
   };
 
@@ -255,7 +266,7 @@ const Generator_Quadratisch: React.FC = () => {
         <div className="space-y-1">
           <p className="text-sm font-semibold text-gray-700 mb-2">Löse die Gleichung</p>
           {currentAufgaben.map((aufgabe, index) => {
-            const answer = answers[aufgabe.id] || { value: '', isCorrect: null };
+            const answer = answers[aufgabe.id] || { value1: '', value2: '', isCorrect: null };
             const showSolution = showSolutions[aufgabe.id] || false;
 
             return (
@@ -275,13 +286,28 @@ const Generator_Quadratisch: React.FC = () => {
                   {/* Gleichheitszeichen */}
                   <span className="text-lg font-bold text-gray-500">=</span>
 
-                  {/* Input */}
+                  {/* Input 1 */}
                   <input
                     type="text"
                     placeholder="..."
-                    value={answer.value}
-                    onChange={(e) => handleInputChange(aufgabe.id, e.target.value)}
-                    className={`flex-1 min-w-0 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
+                    value={answer.value1}
+                    onChange={(e) => handleInputChange(aufgabe.id, e.target.value, answer.value2)}
+                    className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
+                      answer.isCorrect === null
+                        ? 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
+                        : answer.isCorrect
+                        ? 'border-green-500 bg-green-50 focus:ring-1 focus:ring-green-200'
+                        : 'border-red-500 bg-red-50 focus:ring-1 focus:ring-red-200'
+                    }`}
+                  />
+
+                  {/* Input 2 */}
+                  <input
+                    type="text"
+                    placeholder="..."
+                    value={answer.value2}
+                    onChange={(e) => handleInputChange(aufgabe.id, answer.value1, e.target.value)}
+                    className={`w-16 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
                       answer.isCorrect === null
                         ? 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
                         : answer.isCorrect
