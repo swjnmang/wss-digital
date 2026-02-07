@@ -13,8 +13,8 @@ const aufgaben = [
   },
   {
     title: '3. Terme mit Potenzen',
-    description: 'Fasse Terme zusammen, die auch Potenzen enthalten.',
-    path: '/rechnen_lernen/terme/zusammenfassenpotenz',
+    description: 'Fasse Terme zusammen, die auch Potenzen enthalten. Lerne Potenzregeln!',
+    path: '/rechnen_lernen/terme/mitpotenzen',
   },
 ];
 
