@@ -2014,6 +2014,7 @@ const TermeZusammenfassen: React.FC = () => {
 
         {/* Aufgaben */}
         <div className="space-y-1">
+          <p className="text-sm font-semibold text-gray-700 mb-2">Vereinfache die Terme</p>
           {currentAufgaben.map((aufgabe, index) => {
             const answer = answers[aufgabe.id] || { value: '', isCorrect: null };
             const showSolution = showSolutions[aufgabe.id] || false;
@@ -2023,14 +2024,17 @@ const TermeZusammenfassen: React.FC = () => {
                 {/* Aufgabe in einer Zeile */}
                 <div className="bg-white rounded p-2 shadow border-l-2 border-orange-300 flex items-center gap-2">
                   {/* Nummer */}
-                  <span className="text-xs font-bold text-gray-600 whitespace-nowrap">
+                  <span className="text-sm font-bold text-gray-600 whitespace-nowrap">
                     {index + 1})
                   </span>
 
                   {/* Aufgabe */}
-                  <div className="text-xs font-mono bg-gray-50 px-1.5 py-1 rounded border border-gray-200 whitespace-nowrap">
+                  <div className="text-sm font-mono bg-gray-50 px-2 py-1 rounded border border-gray-200 whitespace-nowrap">
                     {aufgabe.aufgabe}
                   </div>
+
+                  {/* Gleichheitszeichen */}
+                  <span className="text-lg font-bold text-gray-500">=</span>
 
                   {/* Input */}
                   <input
@@ -2038,7 +2042,7 @@ const TermeZusammenfassen: React.FC = () => {
                     placeholder="..."
                     value={answer.value}
                     onChange={(e) => handleInputChange(aufgabe.id, e.target.value)}
-                    className={`flex-1 min-w-0 px-2 py-1 rounded border-2 font-mono text-xs transition-all ${
+                    className={`flex-1 min-w-0 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
                       answer.isCorrect === null
                         ? 'border-gray-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-200'
                         : answer.isCorrect
@@ -2050,17 +2054,17 @@ const TermeZusammenfassen: React.FC = () => {
                   {/* Status Indicator */}
                   <div className="w-5 h-5 flex items-center justify-center">
                     {answer.isCorrect === true && (
-                      <span className="text-green-600 font-bold text-xs">✓</span>
+                      <span className="text-green-600 font-bold text-sm">✓</span>
                     )}
                     {answer.isCorrect === false && (
-                      <span className="text-red-600 font-bold text-xs">✗</span>
+                      <span className="text-red-600 font-bold text-sm">✗</span>
                     )}
                   </div>
 
                   {/* Button */}
                   <button
                     onClick={() => toggleSolution(aufgabe.id)}
-                    className="text-xs px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-all whitespace-nowrap"
+                    className="text-sm px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-all whitespace-nowrap font-semibold"
                   >
                     {showSolution ? '✕' : '?'}
                   </button>
@@ -2068,7 +2072,7 @@ const TermeZusammenfassen: React.FC = () => {
 
                 {/* Rechenweg - ausklappbar unter der Aufgabe */}
                 {showSolution && (
-                  <div className="p-2 bg-orange-50 rounded border-l-2 border-orange-400 text-xs ml-8">
+                  <div className="p-2 bg-orange-50 rounded border-l-2 border-orange-400 text-sm ml-8">
                     <div className="space-y-0.5">
                       {aufgabe.rechenweg.map((schritt, i) => (
                         <p key={i} className="text-gray-700">
