@@ -51,11 +51,11 @@ export default function RechnenLernenIndex() {
             <Link
               key={s.title}
               to={s.path}
-              className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col items-center p-6 hover:shadow-xl transition-shadow no-underline text-inherit"
+              className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col justify-center items-center p-8 min-h-64 hover:shadow-xl transition-shadow no-underline text-inherit text-center"
             >
               <div className="card-icon text-4xl mb-3 text-blue-700"><i className={s.icon}></i></div>
-              <h3 className="text-lg font-semibold mb-1 text-blue-900">{s.title}</h3>
-              <p className="text-gray-700 text-center">{s.description}</p>
+              <h3 className="text-xl font-semibold mb-3 text-blue-900">{s.title}</h3>
+              <p className="text-gray-700">{s.description}</p>
             </Link>
           ))}
       </main>
