@@ -30,10 +30,10 @@ export default function Gleichungen() {
               <Link
                 key={a.title}
                 to={a.path}
-                className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col items-center p-6 hover:shadow-xl transition-shadow no-underline text-inherit"
+                className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col justify-center items-center p-8 min-h-64 hover:shadow-xl transition-shadow no-underline text-inherit text-center"
               >
-                <h3 className="text-lg font-semibold mb-1 text-blue-900">{a.title}</h3>
-                <p className="text-gray-700 text-center">{a.description}</p>
+                <h3 className="text-xl font-semibold mb-3 text-blue-900">{a.title}</h3>
+                <p className="text-gray-700">{a.description}</p>
               </Link>
             ))}
       </main>
