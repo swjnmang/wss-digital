@@ -199,8 +199,8 @@ export default function TipiAufgabe() {
         </div>
 
         {/* Tipi Bild */}
-        <div className="mb-6 p-4 bg-gray-100 rounded-lg">
-          <img src="/images/tipi.jpg" alt="Tipi-Koordinatensystem" className="w-full h-auto rounded-lg shadow-md" />
+        <div className="mb-6 p-4 bg-gray-100 rounded-lg flex justify-center">
+          <img src="/images/tipi.jpg" alt="Tipi-Koordinatensystem" className="w-4/5 h-auto rounded-lg shadow-md" />
         </div>
 
         {/* Aktuelle Aufgabe */}
@@ -217,8 +217,8 @@ export default function TipiAufgabe() {
                 <div className="space-y-4">
                   <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">f(x) = </label>
                       <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-gray-700 whitespace-nowrap">f(x) = </label>
                         <input
                           type="text"
                           value={((inputs[currentTask] as Record<string, string>) || {})['f(x): m'] || ''}
@@ -248,9 +248,8 @@ export default function TipiAufgabe() {
                         />
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">g(x) = </label>
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium text-gray-700 whitespace-nowrap">g(x) = </label>
                         <input
                           type="text"
                           value={((inputs[currentTask] as Record<string, string>) || {})['g(x): m'] || ''}
