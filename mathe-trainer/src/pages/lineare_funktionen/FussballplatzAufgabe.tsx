@@ -154,15 +154,13 @@ export default function FussballplatzAufgabe() {
           </p>
         </div>
 
-        {/* Bild Platzhalter */}
-        <div className="mb-6 p-4 bg-gray-100 rounded-lg border-2 border-dashed border-gray-400">
-          <div className="w-full h-64 flex items-center justify-center bg-white rounded">
-            <p className="text-gray-500 text-center">
-              [Fußballfeld-Koordinatensystem mit Mittellinie, Mittelkreis, Tor, Punkten A, B, H, I, K, F, G]
-              <br />
-              <small>Das Bild wird hier eingefügt</small>
-            </p>
-          </div>
+        {/* Fußballfeld Bild */}
+        <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+          <img 
+            src="/images/fussballplatz.jpg" 
+            alt="Fußballfeld-Koordinatensystem"
+            className="w-full h-auto rounded-lg shadow-md"
+          />
         </div>
 
         {/* Aktuelle Aufgabe */}
