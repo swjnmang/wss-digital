@@ -10,12 +10,20 @@ function randInt(min: number, max: number) {
 }
 
 export default function Ablesen() {
-  const [m, setM] = useState<number>(1)
-  const [t, setT] = useState<number>(0)
-  const [mInput, setMInput] = useState('')
-  const [tInput, setTInput] = useState('')
-  const [feedback, setFeedback] = useState('')
-  const [showSolution, setShowSolution] = useState(false)
+  const [geogebraSize, setGeogebraSize] = useState(350)
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (typeof window !== 'undefined') {
+        if (window.innerWidth >= 1025) setGeogebraSize(550)
+        else if (window.innerWidth >= 641) setGeogebraSize(450)
+        else setGeogebraSize(350)
+      }
+    }
+    updateSize()
+    window.addEventListener('resize', updateSize)
+    return () => window.removeEventListener('resize', updateSize)
+  }, [])
   const ggbRef = useRef<HTMLDivElement | null>(null)
   const ggbInstance = useRef<any>(null)
 
@@ -273,7 +281,7 @@ export default function Ablesen() {
         <p>Ableseaufgabe: Lies Steigung m und y-Achsenabschnitt t aus dem Graphen ab.</p>
 
         <div id="ggb-container" className={styles.svgWrap}>
-          <div id="ggb-element" ref={ggbRef} style={{ width: 350, height: 350, border: '1px solid #ccc', borderRadius: 8, background: 'white' }} />
+          <div id="ggb-element" ref={ggbRef} style={{ width: geogebraSize, height: geogebraSize, border: '1px solid #ccc', borderRadius: 8, background: 'white' }} />
         </div>
 
         <div className={styles.inputRow}>

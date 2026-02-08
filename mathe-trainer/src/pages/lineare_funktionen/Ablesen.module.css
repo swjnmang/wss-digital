@@ -1,13 +1,26 @@
-.container { padding: 1rem }
+.container { padding: 1rem; max-width: 1200px; margin: 0 auto }
 .back { display:inline-block; margin-bottom:0.5rem; color:#0366d6 }
 .card { background:white; padding:1rem; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.06) }
-.svgWrap { display:flex; justify-content:center; margin-bottom:0.75rem }
-.inputRow { display:flex; gap:0.75rem; align-items:center; margin-bottom:0.75rem; justify-content:center }
+.svgWrap { display:flex; justify-content:center; align-items:center; margin-bottom:1.5rem; width: 100%; height: auto }
+.inputRow { display:flex; gap:0.75rem; align-items:center; margin-bottom:0.75rem; justify-content:center; flex-wrap: wrap }
 .label { font-weight:600 }
 .input { border:1px solid #d1d5db; padding:0.4rem 0.5rem; border-radius:6px; width:100px }
-.actions { display:flex; gap:0.5rem; justify-content:center }
-.primary { background:#10b981; color:white; padding:0.5rem 0.75rem; border-radius:6px; border:none }
-.secondary { background:#64748b; color:white; padding:0.5rem 0.75rem; border-radius:6px; border:none }
-.ghost { background:transparent; border:1px solid #cbd5e1; padding:0.4rem 0.6rem; border-radius:6px }
+.actions { display:flex; gap:0.5rem; justify-content:center; flex-wrap: wrap }
+.primary { background:#10b981; color:white; padding:0.5rem 0.75rem; border-radius:6px; border:none; cursor: pointer }
+.secondary { background:#64748b; color:white; padding:0.5rem 0.75rem; border-radius:6px; border:none; cursor: pointer }
+.ghost { background:transparent; border:1px solid #cbd5e1; padding:0.4rem 0.6rem; border-radius:6px; cursor: pointer }
 .feedback { margin-top:0.75rem; font-weight:600; text-align:center }
 .solution { margin-top:0.75rem; background:#f1f5f9; padding:0.75rem; border-radius:6px }
+
+/* Responsive sizes for GeoGebra container */
+@media (max-width: 640px) {
+  .svgWrap { min-height: 350px }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .svgWrap { min-height: 450px }
+}
+
+@media (min-width: 1025px) {
+  .svgWrap { min-height: 550px }
+}
