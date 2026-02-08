@@ -107,13 +107,18 @@ export default function FussballplatzAufgabe() {
     let isCorrect = false
 
     if (solution.type === 'number') {
-      const numInput = parseFloat(input.replace(',', '.'))
+      // Akzeptiere sowohl , als auch . als Dezimaltrennzeichen
+      const normalizedInput = input.replace(',', '.')
+      const numInput = parseFloat(normalizedInput)
       if (!isNaN(numInput)) {
         const tolerance = solution.tolerance || 0.01
         isCorrect = Math.abs(numInput - (solution.answer as number)) <= tolerance
       }
     } else {
-      isCorrect = input.toLowerCase().replace(/\s+/g, '') === (solution.answer as string).toLowerCase().replace(/\s+/g, '')
+      // Normalisiere auch Kommas in Text-Antworten
+      const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.')
+      const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(',', '.')
+      isCorrect = normalizedInput === normalizedAnswer
     }
 
     if (isCorrect) {
