@@ -7,8 +7,8 @@ const aufgaben = [
     path: '/rechnen_lernen/terme/ohnevariablen',
   },
   {
-    title: '2. Terme zusammenfassen',
-    description: 'Lerne, gleichartige Terme mit Variablen zu addieren und subtrahieren.',
+    title: '2. Terme mit Variablen',
+    description: 'Lerne, gleichartige Terme mit Variablen zusammenzufassen.',
     path: '/rechnen_lernen/terme/zusammenfassen',
   },
   {
