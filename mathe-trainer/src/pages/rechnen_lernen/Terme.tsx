@@ -25,7 +25,7 @@ export default function Terme() {
         <h1 className="text-3xl md:text-4xl font-bold mb-2 text-blue-900">Terme</h1>
         <p className="text-lg text-blue-800">Wähle eine Aufgabe aus der folgenden Liste aus.</p>
       </header>
-      <main className="flex-1 w-full mx-auto px-4 py-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-center max-w-6xl">
+      <main className="flex-1 w-full mx-auto px-4 py-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-center justify-items-center max-w-6xl">
         {aufgaben.map((a) => (
           <Link
             key={a.title}
