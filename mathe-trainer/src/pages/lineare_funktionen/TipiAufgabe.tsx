@@ -29,9 +29,10 @@ export default function TipiAufgabe() {
       question:
         'Bestimmen Sie rechnerisch die Funktionsgleichungen der beiden Geraden f und g. Punkt A (4|9) und B (−6| − 9) liegen auf f. Punkt C (4| − 4.6) und D (1|0.65) liegen auf g.',
       solution: {
-        type: 'text',
-        labels: ['f(x)', 'g(x)'],
-        answers: ['f(x) = 1.8x + 1.8', 'g(x) = -1.75x + 2.4'],
+        type: 'number',
+        labels: ['f(x): m', 'f(x): t', 'g(x): m', 'g(x): t'],
+        answers: [1.8, 1.8, -1.75, 2.4],
+        tolerance: 0.05,
       },
       hint: 'Nutze zwei Punkte pro Gerade um m und t mit der Punkt-Steigungsform zu berechnen.',
     },
@@ -209,29 +210,104 @@ export default function TipiAufgabe() {
 
           {/* Input */}
           {currentTaskData.solution.answers && currentTaskData.solution.labels ? (
-            // Mehrteilige Eingabe (z.B. f(x) und g(x))
-            <div className="mb-4 space-y-3">
-              {currentTaskData.solution.labels.map((label, index) => {
-                const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
-                return (
-                  <div key={index}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{label}:</label>
-                    <input
-                      type="text"
-                      value={currentInputs[label] || ''}
-                      onChange={(e) => handleMultiInputChange(label, e.target.value)}
-                      placeholder={`Gib ${label} ein...`}
-                      className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
-                        feedbackState === 'correct'
-                          ? 'border-green-500 bg-green-50'
-                          : feedbackState === 'incorrect'
-                            ? 'border-red-500 bg-red-50'
-                            : 'border-gray-300 focus:border-blue-500'
-                      }`}
-                    />
+            // Mehrteilige Eingabe (z.B. m und t für Funktionsgleichungen)
+            <div className="mb-4 space-y-4">
+              {currentTask === 0 ? (
+                // Spezialformat für Aufgabe 3.1: strukturierte Funktionsgleichungen
+                <div className="space-y-4">
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">f(x) = </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={((inputs[currentTask] as Record<string, string>) || {})['f(x): m'] || ''}
+                          onChange={(e) => handleMultiInputChange('f(x): m', e.target.value)}
+                          placeholder="m"
+                          className={`w-16 px-3 py-2 border-2 rounded-lg focus:outline-none transition text-center ${
+                            feedbackState === 'correct'
+                              ? 'border-green-500 bg-green-50'
+                              : feedbackState === 'incorrect'
+                                ? 'border-red-500 bg-red-50'
+                                : 'border-gray-300 focus:border-blue-500'
+                          }`}
+                        />
+                        <span className="text-gray-700 font-medium">x +</span>
+                        <input
+                          type="text"
+                          value={((inputs[currentTask] as Record<string, string>) || {})['f(x): t'] || ''}
+                          onChange={(e) => handleMultiInputChange('f(x): t', e.target.value)}
+                          placeholder="t"
+                          className={`w-16 px-3 py-2 border-2 rounded-lg focus:outline-none transition text-center ${
+                            feedbackState === 'correct'
+                              ? 'border-green-500 bg-green-50'
+                              : feedbackState === 'incorrect'
+                                ? 'border-red-500 bg-red-50'
+                                : 'border-gray-300 focus:border-blue-500'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">g(x) = </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={((inputs[currentTask] as Record<string, string>) || {})['g(x): m'] || ''}
+                          onChange={(e) => handleMultiInputChange('g(x): m', e.target.value)}
+                          placeholder="m"
+                          className={`w-16 px-3 py-2 border-2 rounded-lg focus:outline-none transition text-center ${
+                            feedbackState === 'correct'
+                              ? 'border-green-500 bg-green-50'
+                              : feedbackState === 'incorrect'
+                                ? 'border-red-500 bg-red-50'
+                                : 'border-gray-300 focus:border-blue-500'
+                          }`}
+                        />
+                        <span className="text-gray-700 font-medium">x +</span>
+                        <input
+                          type="text"
+                          value={((inputs[currentTask] as Record<string, string>) || {})['g(x): t'] || ''}
+                          onChange={(e) => handleMultiInputChange('g(x): t', e.target.value)}
+                          placeholder="t"
+                          className={`w-16 px-3 py-2 border-2 rounded-lg focus:outline-none transition text-center ${
+                            feedbackState === 'correct'
+                              ? 'border-green-500 bg-green-50'
+                              : feedbackState === 'incorrect'
+                                ? 'border-red-500 bg-red-50'
+                                : 'border-gray-300 focus:border-blue-500'
+                          }`}
+                        />
+                      </div>
+                    </div>
                   </div>
-                )
-              })}
+                </div>
+              ) : (
+                // Standard mehrteilige Eingabe für andere Aufgaben
+                <div className="space-y-3">
+                  {currentTaskData.solution.labels.map((label, index) => {
+                    const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
+                    return (
+                      <div key={index}>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{label}:</label>
+                        <input
+                          type="text"
+                          value={currentInputs[label] || ''}
+                          onChange={(e) => handleMultiInputChange(label, e.target.value)}
+                          placeholder={`Gib ${label} ein...`}
+                          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
+                            feedbackState === 'correct'
+                              ? 'border-green-500 bg-green-50'
+                              : feedbackState === 'incorrect'
+                                ? 'border-red-500 bg-red-50'
+                                : 'border-gray-300 focus:border-blue-500'
+                          }`}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           ) : (
             // Einzelne Eingabe
