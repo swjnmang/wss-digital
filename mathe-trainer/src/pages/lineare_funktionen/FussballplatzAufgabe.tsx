@@ -4,6 +4,8 @@ interface Solution {
   type: 'number' | 'text'
   answer: string | number
   tolerance?: number
+  labels?: string[] // für mehrteilige Antworten (z.B. x, y)
+  answers?: (string | number)[] // für mehrteilige Antworten
 }
 
 interface Task {
@@ -16,7 +18,7 @@ interface Task {
 
 export default function FussballplatzAufgabe() {
   const [currentTask, setCurrentTask] = useState(0)
-  const [inputs, setInputs] = useState<Record<number, string>>({})
+  const [inputs, setInputs] = useState<Record<number, string | Record<string, string>>>({})
   const [feedback, setFeedback] = useState<Record<number, string>>({})
   const [showSolution, setShowSolution] = useState<Record<number, boolean>>({})
 
@@ -57,13 +59,14 @@ export default function FussballplatzAufgabe() {
     {
       id: 4,
       title: 'Aufgabe 2.4',
-      question: 'In Punkt H steht ein Spieler, der einen Pass Richtung Punkt I nach rechts spielt. Die dazugehörige Funktionsgleichung laute v: y = −0.3x + 2.2. An welcher Stelle kreuzen sich die beiden Pässe theoretisch? Berechne die x-Koordinate des Schnittpunkts.',
+      question: 'In Punkt H steht ein Spieler, der einen Pass Richtung Punkt I nach rechts spielt. Die dazugehörige Funktionsgleichung laute v: y = −0.3x + 2.2. An welcher Stelle kreuzen sich die beiden Pässe theoretisch? Berechne den Schnittpunkt (x- und y-Koordinate).',
       solution: {
         type: 'number',
-        answer: 1.78,
+        labels: ['x-Wert', 'y-Wert'],
+        answers: [1.78, 2.93],
         tolerance: 0.1,
       },
-      hint: 'Setze beide Funktionsgleichungen gleich: 0.6x + 0.6 = -0.3x + 2.2',
+      hint: 'Setze beide Funktionsgleichungen gleich: 0.6x + 0.6 = -0.3x + 2.2 und berechne dann y.',
     },
     {
       id: 5,
@@ -96,29 +99,61 @@ export default function FussballplatzAufgabe() {
     setFeedback({ ...feedback, [currentTask]: '' })
   }
 
-  const validateAnswer = () => {
-    const input = inputs[currentTask]?.trim() || ''
-    if (!input) {
-      setFeedback({ ...feedback, [currentTask]: 'Bitte gib eine Antwort ein.' })
-      return
-    }
+  const handleMultiInputChange = (key: string, value: string) => {
+    const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
+    setInputs({ ...inputs, [currentTask]: { ...currentInputs, [key]: value } })
+    setFeedback({ ...feedback, [currentTask]: '' })
+  }
 
+  const validateAnswer = () => {
     const solution = currentTaskData.solution
     let isCorrect = false
 
-    if (solution.type === 'number') {
-      // Akzeptiere sowohl , als auch . als Dezimaltrennzeichen
-      const normalizedInput = input.replace(',', '.')
-      const numInput = parseFloat(normalizedInput)
-      if (!isNaN(numInput)) {
+    // Mehrteilige Antwort (z.B. x und y für Schnittpunkt)
+    if (solution.answers && solution.labels) {
+      const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
+      
+      // Überprüfe, ob alle Felder ausgefüllt sind
+      const allFilled = solution.labels.every(label => currentInputs[label]?.trim())
+      if (!allFilled) {
+        setFeedback({ ...feedback, [currentTask]: 'Bitte fülle alle Felder aus.' })
+        return
+      }
+
+      isCorrect = true
+      for (let i = 0; i < solution.labels.length; i++) {
+        const label = solution.labels[i]
+        const input = currentInputs[label]?.trim() || ''
+        const normalizedInput = input.replace(',', '.')
+        const numInput = parseFloat(normalizedInput)
         const tolerance = solution.tolerance || 0.01
-        isCorrect = Math.abs(numInput - (solution.answer as number)) <= tolerance
+        const expectedAnswer = solution.answers[i] as number
+
+        if (isNaN(numInput) || Math.abs(numInput - expectedAnswer) > tolerance) {
+          isCorrect = false
+          break
+        }
       }
     } else {
-      // Normalisiere auch Kommas in Text-Antworten
-      const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.')
-      const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(',', '.')
-      isCorrect = normalizedInput === normalizedAnswer
+      // Einzelne Antwort
+      const input = (inputs[currentTask] as string)?.trim() || ''
+      if (!input) {
+        setFeedback({ ...feedback, [currentTask]: 'Bitte gib eine Antwort ein.' })
+        return
+      }
+
+      if (solution.type === 'number') {
+        const normalizedInput = input.replace(',', '.')
+        const numInput = parseFloat(normalizedInput)
+        if (!isNaN(numInput)) {
+          const tolerance = solution.tolerance || 0.01
+          isCorrect = Math.abs(numInput - (solution.answer as number)) <= tolerance
+        }
+      } else {
+        const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.')
+        const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(',', '.')
+        isCorrect = normalizedInput === normalizedAnswer
+      }
     }
 
     if (isCorrect) {
@@ -174,21 +209,49 @@ export default function FussballplatzAufgabe() {
           <p className="text-lg text-gray-800 mb-6">{currentTaskData.question}</p>
 
           {/* Input */}
-          <div className="mb-4">
-            <input
-              type="text"
-              value={inputs[currentTask] || ''}
-              onChange={(e) => handleInputChange(e.target.value)}
-              placeholder="Gib deine Antwort ein..."
-              className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
-                feedbackState === 'correct'
-                  ? 'border-green-500 bg-green-50'
-                  : feedbackState === 'incorrect'
-                    ? 'border-red-500 bg-red-50'
-                    : 'border-gray-300 focus:border-blue-500'
-              }`}
-            />
-          </div>
+          {currentTaskData.solution.answers && currentTaskData.solution.labels ? (
+            // Mehrteilige Eingabe (z.B. x und y)
+            <div className="mb-4 space-y-3">
+              {currentTaskData.solution.labels.map((label, index) => {
+                const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
+                return (
+                  <div key={index}>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{label}:</label>
+                    <input
+                      type="text"
+                      value={currentInputs[label] || ''}
+                      onChange={(e) => handleMultiInputChange(label, e.target.value)}
+                      placeholder={`Gib den ${label} ein...`}
+                      className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
+                        feedbackState === 'correct'
+                          ? 'border-green-500 bg-green-50'
+                          : feedbackState === 'incorrect'
+                            ? 'border-red-500 bg-red-50'
+                            : 'border-gray-300 focus:border-blue-500'
+                      }`}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            // Einzelne Eingabe
+            <div className="mb-4">
+              <input
+                type="text"
+                value={(inputs[currentTask] as string) || ''}
+                onChange={(e) => handleInputChange(e.target.value)}
+                placeholder="Gib deine Antwort ein..."
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
+                  feedbackState === 'correct'
+                    ? 'border-green-500 bg-green-50'
+                    : feedbackState === 'incorrect'
+                      ? 'border-red-500 bg-red-50'
+                      : 'border-gray-300 focus:border-blue-500'
+                }`}
+              />
+            </div>
+          )}
 
           {/* Feedback */}
           {feedbackState === 'correct' && <div className="p-3 bg-green-100 text-green-800 rounded-lg mb-4 font-semibold">✓ Richtig!</div>}
