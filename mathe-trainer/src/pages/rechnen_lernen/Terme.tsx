@@ -25,12 +25,12 @@ export default function Terme() {
         <h1 className="text-3xl md:text-4xl font-bold mb-2 text-blue-900">Terme</h1>
         <p className="text-lg text-blue-800">Wähle eine Aufgabe aus der folgenden Liste aus.</p>
       </header>
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 py-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-center">
+      <main className="flex-1 w-full mx-auto px-4 py-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-center max-w-4xl">
         {aufgaben.map((a) => (
           <Link
             key={a.title}
             to={a.path}
-            className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col justify-center items-center p-6 hover:shadow-xl transition-shadow no-underline text-inherit text-center"
+            className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col justify-center items-center p-6 hover:shadow-xl transition-shadow no-underline text-inherit text-center max-w-sm"
           >
             <h3 className="text-lg font-semibold mb-2 text-blue-900">{a.title}</h3>
             <p className="text-base text-gray-700">{a.description}</p>
