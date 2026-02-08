@@ -278,7 +278,6 @@ export default function TipiAufgabe() {
                         }`}
                       />
                     </div>
-                    </div>
                   </div>
                 </div>
               ) : (
