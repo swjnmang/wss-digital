@@ -40,7 +40,7 @@ export default function SpielMuenzen() {
   const TOPF_Y = CANVAS_HEIGHT - 60
   const TOPF_WIDTH = 60
   const TOPF_X = CANVAS_WIDTH / 2 - TOPF_WIDTH / 2
-  const GRAVITY = 0.5
+  const GRAVITY = 0.15
   const COIN_RADIUS = 8
 
   // Parse function input
@@ -213,9 +213,9 @@ export default function SpielMuenzen() {
       if (coin.onGraph) {
         const potCenter = TOPF_X + TOPF_WIDTH / 2
         if (coin.x < potCenter - 5) {
-          coin.vx = 2
+          coin.vx = 0.8
         } else if (coin.x > potCenter + 5) {
-          coin.vx = -2
+          coin.vx = -0.8
         } else {
           coin.vx = 0
         }
