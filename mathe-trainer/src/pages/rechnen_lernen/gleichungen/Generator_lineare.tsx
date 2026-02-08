@@ -330,14 +330,14 @@ const LineareGleichungen: React.FC = () => {
         </div>
 
         {/* Aufgaben */}
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-gray-700 mb-2">Löse die Gleichung</p>
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <p className="text-sm font-semibold text-gray-700 mb-2 col-span-full">Löse die Gleichung</p>
           {currentAufgaben.map((aufgabe, index) => {
             const answer = answers[aufgabe.id] || { value: '', isCorrect: null };
             const showSolution = showSolutions[aufgabe.id] || false;
 
             return (
-              <div key={aufgabe.id} className="space-y-1">
+              <div key={aufgabe.id} className="space-y-0 col-span-1">
                 {/* Aufgabe in einer Zeile */}
                 <div className="bg-white rounded p-2 shadow border-l-2 border-orange-300 flex items-center gap-2">
                   {/* Nummer */}
