@@ -53,6 +53,7 @@ import Schnittpunkt from './pages/lineare_funktionen/Schnittpunkt'
 import SpielMuenzen from './pages/lineare_funktionen/SpielMuenzen'
 import TestLF from './pages/lineare_funktionen/Test'
 import GemischteAufgabenLF from './pages/lineare_funktionen/GemischteAufgaben'
+import AnwendungsaufgabenLF from './pages/lineare_funktionen/Anwendungsaufgaben'
 // Finanzmathe
 import FinanzmatheIndex from './pages/FinanzmatheIndex';
 import ZinsrechnungMenu from './pages/finanzmathe/ZinsrechnungMenu';
@@ -207,6 +208,7 @@ export default function App() {
           <Route path="/lineare_funktionen/punkt_gerade" element={<PunktGerade />} />
           <Route path="/lineare_funktionen/schnittpunkt" element={<Schnittpunkt />} />
           <Route path="/lineare_funktionen/gemischte-aufgaben" element={<GemischteAufgabenLF />} />
+          <Route path="/lineare_funktionen/anwendungsaufgaben" element={<AnwendungsaufgabenLF />} />
           <Route path="/lineare_funktionen/spiel_muenzen" element={<SpielMuenzen />} />
           <Route path="/lineare_funktionen/test" element={<TestLF />} />
           
