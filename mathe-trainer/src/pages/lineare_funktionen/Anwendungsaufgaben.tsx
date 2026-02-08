@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 export default function Anwendungsaufgaben() {
   const aufgaben = [
     { title: '1. Der Fußballplatz', desc: 'Löse Aufgaben rund um einen Pass auf einem Fußballfeld mit linearen Funktionen.', href: 'fussballplatz' },
+    { title: '2. Das Tipi', desc: 'Berechne die Maße eines Tipis anhand von zwei linearen Funktionsgleichungen.', href: 'tipi' },
   ]
 
   return (
