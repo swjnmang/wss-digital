@@ -250,34 +250,34 @@ export default function TipiAufgabe() {
                     </div>
                     <div className="flex items-center gap-2">
                       <label className="text-sm font-medium text-gray-700 whitespace-nowrap">g(x) = </label>
-                        <input
-                          type="text"
-                          value={((inputs[currentTask] as Record<string, string>) || {})['g(x): m'] || ''}
-                          onChange={(e) => handleMultiInputChange('g(x): m', e.target.value)}
-                          placeholder="m"
-                          className={`w-16 px-3 py-2 border-2 rounded-lg focus:outline-none transition text-center ${
-                            feedbackState === 'correct'
-                              ? 'border-green-500 bg-green-50'
-                              : feedbackState === 'incorrect'
-                                ? 'border-red-500 bg-red-50'
-                                : 'border-gray-300 focus:border-blue-500'
-                          }`}
-                        />
-                        <span className="text-gray-700 font-medium">x +</span>
-                        <input
-                          type="text"
-                          value={((inputs[currentTask] as Record<string, string>) || {})['g(x): t'] || ''}
-                          onChange={(e) => handleMultiInputChange('g(x): t', e.target.value)}
-                          placeholder="t"
-                          className={`w-16 px-3 py-2 border-2 rounded-lg focus:outline-none transition text-center ${
-                            feedbackState === 'correct'
-                              ? 'border-green-500 bg-green-50'
-                              : feedbackState === 'incorrect'
-                                ? 'border-red-500 bg-red-50'
-                                : 'border-gray-300 focus:border-blue-500'
-                          }`}
-                        />
-                      </div>
+                      <input
+                        type="text"
+                        value={((inputs[currentTask] as Record<string, string>) || {})['g(x): m'] || ''}
+                        onChange={(e) => handleMultiInputChange('g(x): m', e.target.value)}
+                        placeholder="m"
+                        className={`w-16 px-3 py-2 border-2 rounded-lg focus:outline-none transition text-center ${
+                          feedbackState === 'correct'
+                            ? 'border-green-500 bg-green-50'
+                            : feedbackState === 'incorrect'
+                              ? 'border-red-500 bg-red-50'
+                              : 'border-gray-300 focus:border-blue-500'
+                        }`}
+                      />
+                      <span className="text-gray-700 font-medium">x +</span>
+                      <input
+                        type="text"
+                        value={((inputs[currentTask] as Record<string, string>) || {})['g(x): t'] || ''}
+                        onChange={(e) => handleMultiInputChange('g(x): t', e.target.value)}
+                        placeholder="t"
+                        className={`w-16 px-3 py-2 border-2 rounded-lg focus:outline-none transition text-center ${
+                          feedbackState === 'correct'
+                            ? 'border-green-500 bg-green-50'
+                            : feedbackState === 'incorrect'
+                              ? 'border-red-500 bg-red-50'
+                              : 'border-gray-300 focus:border-blue-500'
+                        }`}
+                      />
+                    </div>
                     </div>
                   </div>
                 </div>
