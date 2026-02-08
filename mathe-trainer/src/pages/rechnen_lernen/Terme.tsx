@@ -30,7 +30,7 @@ export default function Terme() {
           <Link
             key={a.title}
             to={a.path}
-            className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col justify-center items-center p-6 hover:shadow-xl transition-shadow no-underline text-inherit text-center max-w-sm"
+            className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col justify-center items-center p-6 hover:shadow-xl transition-shadow no-underline text-inherit text-center max-w-sm w-fit"
           >
             <h3 className="text-lg font-semibold mb-2 text-blue-900">{a.title}</h3>
             <p className="text-base text-gray-700">{a.description}</p>
