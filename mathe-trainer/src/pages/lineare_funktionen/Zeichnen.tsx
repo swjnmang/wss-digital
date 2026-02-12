@@ -77,7 +77,8 @@ export default function Zeichnen(){
     setRangeHint('Ein guter Zeichenbereich für die x-Achse ist von -5 bis +5, die Länge der y-Achse musst du selbst festlegen, häufig reicht hier ebenfalls -5 bis +5.')
 
     const geogebra_equation = `y = ${m}*x + ${t}`
-    setGeogebraURL(`https://www.geogebra.org/graphing?command=${encodeURIComponent(geogebra_equation)}`)
+    setGeogebraURL(`https://www.geogebra.org/graphing?command=${encodeURIComponent(geogebra_equation)}&toolbar=false&menuBar=false&inputBar=false&settingsBar=false`)
+    setShowSolution(false)
   }
 
   function openGeoGebra(){
