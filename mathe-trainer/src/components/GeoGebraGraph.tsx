@@ -15,6 +15,7 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const appletRef = useRef<any>(null);
+  const elementIdRef = useRef<string>(`ggb_${Math.random().toString(36).substr(2, 9)}`);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -31,35 +32,41 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
     const timer = setTimeout(() => {
       if (typeof window !== 'undefined' && (window as any).GGBApplet) {
         const parameters = {
-          id: `ggb_${Math.random().toString(36).substr(2, 9)}`,
+          id: elementIdRef.current,
+          appName: 'graphing',
           width: typeof width === 'number' ? width : '100%',
           height: typeof height === 'number' ? height : 500,
+          
+          // UI-Elemente ausblenden - WICHTIG: false als Wert (nicht "false")
+          showMenuBar: false,
           showToolBar: false,
           showAlgebraInput: false,
-          showMenuBar: false,
-          enableShiftDragZoom: true,
           showResetIcon: false,
-          algebraInputPosition: 'top',
+          showFullscreenButton: false,
+          enableShiftDragZoom: true,
+          
+          // Diese Parameter sind optional aber hilfreich
+          enableRightClick: false,
+          enableCAS: false,
           enableFileMenu: false,
           enableUndoRedo: false,
-          showCasButton: false,
-          showFullscreenButton: false,
-          perspective: 'G',
-          appName: 'graphing'
+          perspective: 'G'
         };
 
         const applet = new (window as any).GGBApplet(parameters, true);
         appletRef.current = applet;
+        
+        // Injiziere das Applet in den Container
         applet.inject(containerRef.current);
 
         // Setze die Gleichung nach dem Laden
         setTimeout(() => {
-          if (applet.getXML) {
-            applet.evalCommand(`f(x) = ${m}*x + ${t}`);
+          if (applet.evalCommand) {
+            applet.evalCommand(`y = ${m}*x + ${t}`);
           }
-        }, 500);
+        }, 1000);
       }
-    }, 100);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [m, t, width, height]);
@@ -67,6 +74,7 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
   return (
     <div 
       ref={containerRef}
+      id={elementIdRef.current}
       className="geogebra-graph-container" 
       style={{ 
         width: typeof width === 'number' ? `${width}px` : width, 
