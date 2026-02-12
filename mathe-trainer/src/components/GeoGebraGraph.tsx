@@ -1,5 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 
+declare global {
+  interface Window {
+    GGBApplet: any;
+  }
+}
+
 interface GeoGebraGraphProps {
   m: number;
   t: number;
@@ -14,76 +20,86 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
   height = 500
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const appletRef = useRef<any>(null);
-  const elementIdRef = useRef<string>(`ggb_${Math.random().toString(36).substr(2, 9)}`);
+  const elementIdRef = useRef<string>(`ggb-element-${Math.random().toString(36).substr(2, 9)}`);
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
 
-    // Lade deployggb.js wenn noch nicht geladen
+    const initApplet = () => {
+      if (!window.GGBApplet) return;
+
+      const params = {
+        id: elementIdRef.current,
+        appName: 'graphing',
+        width: typeof width === 'number' ? width : '100%',
+        height: typeof height === 'number' ? height : 500,
+        
+        // UI verstecken
+        showMenuBar: false,
+        showToolBar: false,
+        showAlgebraInput: false,
+        showResetIcon: false,
+        showFullscreenButton: false,
+        enableShiftDragZoom: true,
+        enableRightClick: false,
+        useBrowserForJS: false,
+        
+        // Initial equation
+        ggbBase64: ''
+      };
+
+      // Warte kurz und injiziere dann
+      setTimeout(() => {
+        try {
+          const applet = new window.GGBApplet(params, true);
+          applet.inject(elementIdRef.current);
+
+          // Setze die Gleichung nach dem Laden
+          setTimeout(() => {
+            if (applet.evalCommand) {
+              applet.evalCommand(`y = ${m}*x + ${t}`);
+            }
+          }, 800);
+        } catch (e) {
+          console.error('GeoGebra Applet Injection Error:', e);
+        }
+      }, 100);
+    };
+
     const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
     if (!existing) {
       const s = document.createElement('script');
       s.src = 'https://www.geogebra.org/apps/deployggb.js';
-      document.head.appendChild(s);
+      s.async = true;
+      s.onload = () => initApplet();
+      document.body.appendChild(s);
+    } else {
+      initApplet();
     }
-
-    // Warte bis GeoGebra bereit ist
-    const timer = setTimeout(() => {
-      if (typeof window !== 'undefined' && (window as any).GGBApplet) {
-        const parameters = {
-          id: elementIdRef.current,
-          appName: 'graphing',
-          width: typeof width === 'number' ? width : '100%',
-          height: typeof height === 'number' ? height : 500,
-          
-          // UI-Elemente ausblenden - WICHTIG: false als Wert (nicht "false")
-          showMenuBar: false,
-          showToolBar: false,
-          showAlgebraInput: false,
-          showResetIcon: false,
-          showFullscreenButton: false,
-          enableShiftDragZoom: true,
-          
-          // Diese Parameter sind optional aber hilfreich
-          enableRightClick: false,
-          enableCAS: false,
-          enableFileMenu: false,
-          enableUndoRedo: false,
-          perspective: 'G'
-        };
-
-        const applet = new (window as any).GGBApplet(parameters, true);
-        appletRef.current = applet;
-        
-        // Injiziere das Applet in den Container
-        applet.inject(containerRef.current);
-
-        // Setze die Gleichung nach dem Laden
-        setTimeout(() => {
-          if (applet.evalCommand) {
-            applet.evalCommand(`y = ${m}*x + ${t}`);
-          }
-        }, 1000);
-      }
-    }, 200);
-
-    return () => clearTimeout(timer);
   }, [m, t, width, height]);
 
   return (
     <div 
       ref={containerRef}
-      id={elementIdRef.current}
-      className="geogebra-graph-container" 
+      className="geogebra-container"
       style={{ 
         width: typeof width === 'number' ? `${width}px` : width, 
         height: typeof height === 'number' ? `${height}px` : height,
         margin: '0 auto',
-        borderRadius: '8px',
-        overflow: 'hidden'
+        position: 'relative'
       }}
-    />
+    >
+      <div 
+        id={elementIdRef.current}
+        className="geogebra-element"
+        style={{
+          width: '100%',
+          height: '100%'
+        }}
+      />
+    </div>
   );
 };
 
