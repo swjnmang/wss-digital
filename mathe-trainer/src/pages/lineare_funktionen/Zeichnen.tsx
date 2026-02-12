@@ -82,7 +82,7 @@ export default function Zeichnen(){
     setM(m)
     setT(t)
     const geogebra_equation = `y = ${m}*x + ${t}`
-    setGeogebraURL(`https://www.geogebra.org/graphing/embed?command=${encodeURIComponent(geogebra_equation)}&showMenuBar=false&showAlgebraInput=false&showToolBar=false`)
+    setGeogebraURL(`https://www.geogebra.org/graphing/embed?command=${encodeURIComponent(geogebra_equation)}&toolbar=false&menuBar=false`)
     setShowSolution(false)
   }
 
@@ -134,6 +134,11 @@ export default function Zeichnen(){
                   ✕
                 </button>
               </div>
+              <style>{`
+                iframe[src*="geogebra.org"] {
+                  display: block !important;
+                }
+              `}</style>
               <iframe
                 src={geogebraURL}
                 style={{
