@@ -33,7 +33,11 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
       // Wenn bereits ein Applet existiert, aktualisiere die Gleichung
       if (appletRef.current && appletRef.current.evalCommand) {
         try {
-          appletRef.current.evalCommand(`y = ${m}*x + ${t}`);
+          appletRef.current.reset();
+          appletRef.current.evalCommand(`f(x) = ${m}*x + ${t}`);
+          // Stelle sicher dass Achsen und Grid sichtbar sind
+          try { appletRef.current.setAxesVisible(true, true) } catch (e) {}
+          try { appletRef.current.setGridVisible(true) } catch (e) {}
         } catch (e) {
           console.error('Fehler beim Aktualisieren der Gleichung:', e);
         }
@@ -69,14 +73,11 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
         setTimeout(() => {
           if (applet.evalCommand) {
             try {
-              applet.evalCommand(`y = ${m}*x + ${t}`);
+              applet.reset();
+              applet.evalCommand(`f(x) = ${m}*x + ${t}`);
               // Stelle sicher dass Achsen und Grid sichtbar sind
-              if (applet.setAxisVisible) {
-                applet.setAxesVisible(true, true);
-              }
-              if (applet.setGridVisible) {
-                applet.setGridVisible(true);
-              }
+              try { applet.setAxesVisible(true, true) } catch (e) {}
+              try { applet.setGridVisible(true) } catch (e) {}
             } catch (e) {
               console.error('Fehler beim Setzen der Gleichung:', e);
             }
