@@ -136,7 +136,6 @@ export default function Zeichnen(){
                 t={t} 
                 width="100%" 
                 height={500}
-                hideUI={true}
               />
             </div>
           )}

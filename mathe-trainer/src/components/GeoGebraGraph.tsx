@@ -1,45 +1,72 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface GeoGebraGraphProps {
   m: number;
   t: number;
   width?: number | string;
   height?: number | string;
-  hideUI?: boolean;
-  showGrid?: boolean;
 }
 
-// Verbesserte GeoGebra-Komponente für konsistente Graph-Anzeige
 const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({ 
   m, 
   t, 
   width = '100%', 
-  height = 500,
-  hideUI = true,
-  showGrid = true
+  height = 500
 }) => {
-  const equation = `y=${m}*x+${t}`;
-  
-  // Baue die URL mit optimierten Parametern
-  const params = new URLSearchParams();
-  params.append('command', equation);
-  params.append('embed', '1');
-  
-  if (hideUI) {
-    params.append('ui', '0');
-    params.append('toolbar', '0');
-    params.append('inputbar', '0');
-    params.append('menubar', '0');
-    params.append('resetIcon', '0');
-    params.append('cas', '0');
-    params.append('algebra', '0');
-    params.append('perspective', 'G');
-  }
-  
-  const url = `https://www.geogebra.org/graphing?${params.toString()}`;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const appletRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // Lade deployggb.js wenn noch nicht geladen
+    const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
+    if (!existing) {
+      const s = document.createElement('script');
+      s.src = 'https://www.geogebra.org/apps/deployggb.js';
+      document.head.appendChild(s);
+    }
+
+    // Warte bis GeoGebra bereit ist
+    const timer = setTimeout(() => {
+      if (typeof window !== 'undefined' && (window as any).GGBApplet) {
+        const parameters = {
+          id: `ggb_${Math.random().toString(36).substr(2, 9)}`,
+          width: typeof width === 'number' ? width : '100%',
+          height: typeof height === 'number' ? height : 500,
+          showToolBar: false,
+          showAlgebraInput: false,
+          showMenuBar: false,
+          enableShiftDragZoom: true,
+          showResetIcon: false,
+          algebraInputPosition: 'top',
+          enableFileMenu: false,
+          enableUndoRedo: false,
+          showCasButton: false,
+          showFullscreenButton: false,
+          perspective: 'G',
+          appName: 'graphing'
+        };
+
+        const applet = new (window as any).GGBApplet(parameters, true);
+        appletRef.current = applet;
+        applet.inject(containerRef.current);
+
+        // Setze die Gleichung nach dem Laden
+        setTimeout(() => {
+          if (applet.getXML) {
+            applet.evalCommand(`f(x) = ${m}*x + ${t}`);
+          }
+        }, 500);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [m, t, width, height]);
 
   return (
     <div 
+      ref={containerRef}
       className="geogebra-graph-container" 
       style={{ 
         width: typeof width === 'number' ? `${width}px` : width, 
@@ -48,19 +75,7 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
         borderRadius: '8px',
         overflow: 'hidden'
       }}
-    >
-      <iframe
-        title="GeoGebra Graphing"
-        src={url}
-        style={{ 
-          width: '100%',
-          height: '100%',
-          border: 'none',
-          borderRadius: '8px'
-        }}
-        allowFullScreen
-      />
-    </div>
+    />
   );
 };
 
