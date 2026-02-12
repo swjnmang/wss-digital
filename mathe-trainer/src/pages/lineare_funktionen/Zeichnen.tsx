@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import styles from './LFCommon.module.css'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import GeoGebraApplet from 'react-geogebra'
 
 export default function Zeichnen(){
   const [difficulty, setDifficulty] = useState<'easy'|'medium'|'hard'>('easy')
@@ -11,6 +11,7 @@ export default function Zeichnen(){
   const [showSolution, setShowSolution] = useState<boolean>(false)
   const [m, setM] = useState<number>(2)
   const [t, setT] = useState<number>(1)
+  const [geogebraURL, setGeogebraURL] = useState<string>('')
 
   useEffect(() => {
     generateNewTask(difficulty)
@@ -80,6 +81,8 @@ export default function Zeichnen(){
 
     setM(m)
     setT(t)
+    const geogebra_equation = `y = ${m}*x + ${t}`
+    setGeogebraURL(`https://www.geogebra.org/graphing/embed?command=${encodeURIComponent(geogebra_equation)}&showMenuBar=false&showAlgebraInput=false&showToolBar=false`)
     setShowSolution(false)
   }
 
@@ -121,44 +124,26 @@ export default function Zeichnen(){
           </div>
 
           {showSolution && (
-            <div className="mt-6 flex justify-center">
-              <div style={{ width: '100%', maxWidth: '600px', height: '400px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={Array.from({ length: 101 }, (_, i) => ({
-                      x: -5 + (i * 0.1),
-                      y: m * (-5 + (i * 0.1)) + t
-                    }))}
-                    margin={{ top: 20, right: 30, left: 0, bottom: 20 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                    <XAxis 
-                      dataKey="x" 
-                      type="number" 
-                      domain={[-5, 5]}
-                      tick={{ fontSize: 12 }}
-                      stroke="#666"
-                    />
-                    <YAxis 
-                      domain={[-10, 10]}
-                      tick={{ fontSize: 12 }}
-                      stroke="#666"
-                    />
-                    <Tooltip 
-                      formatter={(value) => value.toFixed(2)}
-                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '4px' }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="y" 
-                      stroke="#2563eb" 
-                      strokeWidth={2}
-                      dot={false}
-                      isAnimationActive={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-blue-600">Lösungsgraph</h3>
+                <button
+                  onClick={() => setShowSolution(false)}
+                  className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                >
+                  ✕
+                </button>
               </div>
+              <iframe
+                src={geogebraURL}
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: 'none',
+                  borderRadius: '8px'
+                }}
+                allowFullScreen
+              />
             </div>
           )}
         </div>
