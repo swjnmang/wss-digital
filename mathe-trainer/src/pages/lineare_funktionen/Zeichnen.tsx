@@ -134,7 +134,7 @@ export default function Zeichnen(){
               <GeoGebraGraph 
                 m={m} 
                 t={t} 
-                width="100%" 
+                width={700} 
                 height={500}
               />
             </div>
