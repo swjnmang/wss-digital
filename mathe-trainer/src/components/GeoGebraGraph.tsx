@@ -19,17 +19,23 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
   width = '100%', 
   height = 500
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
   const elementIdRef = useRef<string>(`ggb-element-${Math.random().toString(36).substr(2, 9)}`);
-  const hasInitialized = useRef(false);
+  const appletRef = useRef<any>(null);
 
   useEffect(() => {
-    if (hasInitialized.current) return;
-    hasInitialized.current = true;
-
     const initApplet = () => {
-      if (!window.GGBApplet) return;
+      if (!window.GGBApplet) {
+        console.warn('GGBApplet nicht verfügbar');
+        return;
+      }
 
+      // Wenn bereits ein Applet existiert, versuche es zu aktualisieren
+      if (appletRef.current && appletRef.current.evalCommand) {
+        appletRef.current.evalCommand(`y = ${m}*x + ${t}`);
+        return;
+      }
+
+      // Neues Applet erstellen
       const params = {
         id: elementIdRef.current,
         appName: 'graphing',
@@ -44,31 +50,27 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
         showFullscreenButton: false,
         enableShiftDragZoom: true,
         enableRightClick: false,
-        useBrowserForJS: false,
-        
-        // Initial equation
-        ggbBase64: ''
+        useBrowserForJS: false
       };
 
-      // Warte kurz und injiziere dann
-      setTimeout(() => {
-        try {
-          const applet = new window.GGBApplet(params, true);
-          applet.inject(elementIdRef.current);
+      try {
+        const applet = new window.GGBApplet(params, true);
+        appletRef.current = applet;
+        applet.inject(elementIdRef.current);
 
-          // Setze die Gleichung nach dem Laden
-          setTimeout(() => {
-            if (applet.evalCommand) {
-              applet.evalCommand(`y = ${m}*x + ${t}`);
-            }
-          }, 800);
-        } catch (e) {
-          console.error('GeoGebra Applet Injection Error:', e);
-        }
-      }, 100);
+        // Setze die Gleichung nach dem Laden
+        setTimeout(() => {
+          if (applet.evalCommand) {
+            applet.evalCommand(`y = ${m}*x + ${t}`);
+          }
+        }, 600);
+      } catch (e) {
+        console.error('GeoGebra Applet Error:', e);
+      }
     };
 
     const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
+    
     if (!existing) {
       const s = document.createElement('script');
       s.src = 'https://www.geogebra.org/apps/deployggb.js';
@@ -82,13 +84,13 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
 
   return (
     <div 
-      ref={containerRef}
       className="geogebra-container"
       style={{ 
         width: typeof width === 'number' ? `${width}px` : width, 
         height: typeof height === 'number' ? `${height}px` : height,
         margin: '0 auto',
-        position: 'relative'
+        position: 'relative',
+        backgroundColor: 'white'
       }}
     >
       <div 
