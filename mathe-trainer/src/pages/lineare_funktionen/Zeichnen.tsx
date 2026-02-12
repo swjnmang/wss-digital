@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import styles from './LFCommon.module.css'
-import GeoGebraApplet from 'react-geogebra'
+import GeoGebraGraph from '../../components/GeoGebraGraph'
 
 export default function Zeichnen(){
   const [difficulty, setDifficulty] = useState<'easy'|'medium'|'hard'>('easy')
@@ -11,7 +11,6 @@ export default function Zeichnen(){
   const [showSolution, setShowSolution] = useState<boolean>(false)
   const [m, setM] = useState<number>(2)
   const [t, setT] = useState<number>(1)
-  const [geogebraURL, setGeogebraURL] = useState<string>('')
 
   useEffect(() => {
     generateNewTask(difficulty)
@@ -81,8 +80,6 @@ export default function Zeichnen(){
 
     setM(m)
     setT(t)
-    const geogebra_equation = `y = ${m}*x + ${t}`
-    setGeogebraURL(`https://www.geogebra.org/graphing/embed?command=${encodeURIComponent(geogebra_equation)}&toolbar=false&menuBar=false`)
     setShowSolution(false)
   }
 
@@ -134,20 +131,12 @@ export default function Zeichnen(){
                   ✕
                 </button>
               </div>
-              <style>{`
-                iframe[src*="geogebra.org"] {
-                  display: block !important;
-                }
-              `}</style>
-              <iframe
-                src={geogebraURL}
-                style={{
-                  width: '100%',
-                  height: '500px',
-                  border: 'none',
-                  borderRadius: '8px'
-                }}
-                allowFullScreen
+              <GeoGebraGraph 
+                m={m} 
+                t={t} 
+                width="100%" 
+                height={500}
+                hideUI={true}
               />
             </div>
           )}

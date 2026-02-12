@@ -1,29 +1,63 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 interface GeoGebraGraphProps {
   m: number;
   t: number;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
+  hideUI?: boolean;
+  showGrid?: boolean;
 }
 
-// Lädt das GeoGebra Applet als iframe mit passender Gerade, nur Koordinatensystem und Graph
-const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({ m, t, width = 480, height = 360 }) => {
-  // Baue die GeoGebra Graphing-URL mit der Geradengleichung und reduzierten UI-Parametern
+// Verbesserte GeoGebra-Komponente für konsistente Graph-Anzeige
+const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({ 
+  m, 
+  t, 
+  width = '100%', 
+  height = 500,
+  hideUI = true,
+  showGrid = true
+}) => {
   const equation = `y=${m}*x+${t}`;
-  // Nutze den /graphing Endpunkt für ein reines Koordinatensystem ohne UI
-  const url =
-    `https://www.geogebra.org/graphing?embed&ui=0&toolbar=0&inputbar=0&menubar=0&resetIcon=0&cas=0&algebra=0&perspective=G` +
-    `&command=${encodeURIComponent(equation)}`;
+  
+  // Baue die URL mit optimierten Parametern
+  const params = new URLSearchParams();
+  params.append('command', equation);
+  params.append('embed', '1');
+  
+  if (hideUI) {
+    params.append('ui', '0');
+    params.append('toolbar', '0');
+    params.append('inputbar', '0');
+    params.append('menubar', '0');
+    params.append('resetIcon', '0');
+    params.append('cas', '0');
+    params.append('algebra', '0');
+    params.append('perspective', 'G');
+  }
+  
+  const url = `https://www.geogebra.org/graphing?${params.toString()}`;
 
   return (
-    <div className="geogebra-graph-container" style={{ width, height, margin: '0 auto' }}>
+    <div 
+      className="geogebra-graph-container" 
+      style={{ 
+        width: typeof width === 'number' ? `${width}px` : width, 
+        height: typeof height === 'number' ? `${height}px` : height,
+        margin: '0 auto',
+        borderRadius: '8px',
+        overflow: 'hidden'
+      }}
+    >
       <iframe
-        title="GeoGebra Graph"
+        title="GeoGebra Graphing"
         src={url}
-        width={width}
-        height={height}
-        style={{ border: 0 }}
+        style={{ 
+          width: '100%',
+          height: '100%',
+          border: 'none',
+          borderRadius: '8px'
+        }}
         allowFullScreen
       />
     </div>
