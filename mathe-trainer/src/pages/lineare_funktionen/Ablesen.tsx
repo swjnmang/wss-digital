@@ -16,17 +16,39 @@ export default function Ablesen() {
   const [tInput, setTInput] = useState('')
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
+  const [appletSize, setAppletSize] = useState({ width: 500, height: 500 })
   const ggbRef = useRef<HTMLDivElement | null>(null)
   const ggbInstance = useRef<any>(null)
 
   // Load GeoGebra script once and initialize applet
   useEffect(() => {
+    // Set responsive size based on window width
+    const updateSize = () => {
+      const width = window.innerWidth
+      if (width >= 1280) {
+        // XL screens: 800x800
+        setAppletSize({ width: 800, height: 800 })
+      } else if (width >= 1024) {
+        // LG screens: 700x700
+        setAppletSize({ width: 700, height: 700 })
+      } else if (width >= 768) {
+        // MD screens: 600x600
+        setAppletSize({ width: 600, height: 600 })
+      } else {
+        // SM/mobile: 500x500
+        setAppletSize({ width: 500, height: 500 })
+      }
+    }
+    
+    updateSize()
+    window.addEventListener('resize', updateSize)
+    
     const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]')
     function initApplet() {
       if (!window.GGBApplet || !ggbRef.current) return
       const params: any = {
         // match the original static page: use classic app and Graphics-only perspective
-        appName: 'classic', width: 350, height: 350,
+        appName: 'classic', width: appletSize.width, height: appletSize.height,
         showToolBar: false, showAlgebraInput: false, showMenuBar: false,
         perspective: 'G', useBrowserForJS: true,
         appletOnLoad: (api: any) => {
@@ -107,8 +129,12 @@ export default function Ablesen() {
     } else {
       initApplet()
     }
+    
+    return () => {
+      window.removeEventListener('resize', updateSize)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [appletSize])
 
   // --- Helper: hide left-side GeoGebra panel by observing DOM changes ---
   function installLeftPanelHider() {
@@ -273,7 +299,7 @@ export default function Ablesen() {
         <p>Ableseaufgabe: Lies Steigung m und y-Achsenabschnitt t aus dem Graphen ab.</p>
 
         <div id="ggb-container" className={styles.svgWrap}>
-          <div id="ggb-element" ref={ggbRef} style={{ width: 350, height: 350, border: '1px solid #ccc', borderRadius: 8, background: 'white' }} />
+          <div id="ggb-element" ref={ggbRef} style={{ width: appletSize.width, height: appletSize.height, border: '1px solid #ccc', borderRadius: 8, background: 'white', maxWidth: '100%' }} />
         </div>
 
         <div className={styles.inputRow}>
