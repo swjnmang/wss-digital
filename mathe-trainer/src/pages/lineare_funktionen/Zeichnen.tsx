@@ -8,6 +8,7 @@ export default function Zeichnen(){
   const [geogebraURL, setGeogebraURL] = useState<string>('')
   const [rangeHint, setRangeHint] = useState<string>('')
   const [showTipps, setShowTipps] = useState<boolean>(false)
+  const [showSolution, setShowSolution] = useState<boolean>(false)
 
   useEffect(() => {
     generateNewTask(difficulty)
@@ -80,7 +81,7 @@ export default function Zeichnen(){
   }
 
   function openGeoGebra(){
-    if (geogebraURL) window.open(geogebraURL, '_blank')
+    setShowSolution(true)
   }
 
   return (
@@ -115,6 +116,30 @@ export default function Zeichnen(){
             <button className="generator-button bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-md px-5 py-3 shadow" onClick={() => setShowTipps(true)}>Tipps</button>
             <button className="generator-button bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-md px-5 py-3 shadow" onClick={openGeoGebra}>Lösungskontrolle anzeigen</button>
           </div>
+
+          {showSolution && (
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-blue-600">Lösungsgraph</h3>
+                <button
+                  onClick={() => setShowSolution(false)}
+                  className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+              <iframe
+                src={geogebraURL}
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: 'none',
+                  borderRadius: '8px'
+                }}
+                allowFullScreen
+              />
+            </div>
+          )}
         </div>
       </div>
 
