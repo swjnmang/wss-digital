@@ -19,54 +19,44 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
   width = 600, 
   height = 500
 }) => {
-  const elementIdRef = useRef<string>(`ggb-element-${Math.random().toString(36).substr(2, 9)}`);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const appletRef = useRef<any>(null);
-  const containerIdRef = useRef<string>(`ggb-container-${Math.random().toString(36).substr(2, 9)}`);
-  const initDoneRef = useRef(false);
+  const elementIdRef = useRef<string>(`ggb-elem-${Math.random().toString(36).substr(2, 9)}`);
 
-  // Effekt nur für Initialization - läuft nur einmal
+  // Initialisiere GeoGebra einmalig
   useEffect(() => {
-    if (initDoneRef.current) return;
-
+    const elementId = elementIdRef.current;
+    
     const initApplet = () => {
       if (!window.GGBApplet || appletRef.current) return;
 
       const params = {
-        id: elementIdRef.current,
-        appName: 'graphing',
+        appName: 'classic', // WICHTIG: Muss 'classic' sein, nicht 'graphing'!
         width: width,
         height: height,
-        
-        // UI verstecken
-        showMenuBar: false,
+        perspective: 'G', // Nur die Graphik-Ansicht
         showToolBar: false,
         showAlgebraInput: false,
+        showMenuBar: false,
         showResetIcon: false,
         showFullscreenButton: false,
-        enableShiftDragZoom: true,
-        enableRightClick: false,
-        showZoomButtons: true
+        useBrowserForJS: true,
+        appletOnLoad: (api: any) => {
+          appletRef.current = api;
+          // Setze die initiale Gleichung
+          updateGraph(api, m, t);
+        }
       };
 
       try {
         const applet = new window.GGBApplet(params, true);
-        applet.inject(elementIdRef.current);
-        appletRef.current = applet;
-        
-        // Setze Graph nach längerer Zeit
-        setTimeout(() => {
-          if (appletRef.current && appletRef.current.evalCommand) {
-            appletRef.current.evalCommand(`y = ${m}*x + ${t}`);
-          }
-        }, 1500);
-        
-        initDoneRef.current = true;
+        applet.inject(elementId);
       } catch (e) {
-        console.error('GeoGebra Applet Error:', e);
+        console.error('GeoGebra Error beim Injizieren:', e);
       }
     };
 
-    // Lade deployggb.js
+    // Lade deployggb.js script wenn es noch nicht existiert
     const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
     
     if (!existing) {
@@ -74,36 +64,40 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
       s.src = 'https://www.geogebra.org/apps/deployggb.js';
       s.async = true;
       s.onload = () => {
-        setTimeout(() => initApplet(), 300);
+        setTimeout(() => initApplet(), 100);
       };
       document.body.appendChild(s);
     } else {
       initApplet();
     }
-  }, []); // Nur beim Mount
+  }, [width, height]);
 
-  // Effekt für Gleichungs-Updates
+  // Update Graph wenn m oder t sich ändert
   useEffect(() => {
-    if (!appletRef.current || !appletRef.current.evalCommand) return;
-
-    // Warte kurz, dann update
-    const timer = setTimeout(() => {
-      try {
-        appletRef.current.evalCommand(`y = ${m}*x + ${t}`);
-      } catch (e) {
-        console.error('Error updating graph:', e);
-      }
-    }, 200);
-
-    return () => clearTimeout(timer);
+    if (appletRef.current && appletRef.current.evalCommand) {
+      updateGraph(appletRef.current, m, t);
+    }
   }, [m, t]);
+
+  const updateGraph = (api: any, m: number, t: number) => {
+    try {
+      api.reset();
+      api.evalCommand(`f(x) = ${m}*x + ${t}`);
+    } catch (e) {
+      console.error('Fehler beim Update der Gleichung:', e);
+    }
+  };
 
   return (
     <div 
-      id={containerIdRef.current}
+      ref={containerRef}
       style={{ 
         width: '100%',
-        height: 'auto'
+        display: 'flex',
+        justifyContent: 'center',
+        backgroundColor: '#f9f9f9',
+        padding: '10px',
+        borderRadius: '8px'
       }}
     >
       <div 
@@ -111,10 +105,8 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
         style={{
           width: `${width}px`,
           height: `${height}px`,
-          margin: '0 auto',
-          border: '1px solid #ccc',
-          borderRadius: '8px',
-          backgroundColor: 'white'
+          border: '1px solid #ddd',
+          borderRadius: '4px'
         }}
       />
     </div>
