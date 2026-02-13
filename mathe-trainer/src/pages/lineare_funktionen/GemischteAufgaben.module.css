@@ -1,70 +1,67 @@
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
   min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 2rem 1rem;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .header {
-  text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #0c4a6e;
-  margin: 0;
-  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
 }
 
 .subtitle {
-  font-size: 1.1rem;
-  color: #0369a1;
+  color: #6b7280;
+  font-size: 1rem;
   margin: 0;
-  font-weight: 500;
 }
 
 .newButton {
   display: block;
-  margin: 0 auto 2rem;
-  padding: 0.75rem 2rem;
-  background: #06b6d4;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #3b82f6;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+  transition: background-color 0.2s;
 }
 
 .newButton:hover {
-  background: #0891b2;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
+  background-color: #2563eb;
 }
 
 .aufgabenContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
 }
 
 .aufgabeCard {
-  background: white;
-  border-radius: 12px;
+  background-color: white;
+  border-radius: 0.5rem;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-left: 5px solid #3b82f6;
-  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
 }
 
 .aufgabeCard:hover {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.aufgabeCard.cardCorrect {
+  border-left: 4px solid #10b981;
 }
 
 .aufgabeHeader {
@@ -73,74 +70,153 @@
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .aufgabenNummer {
-  font-weight: 700;
+  font-weight: 600;
   color: #1f2937;
-  font-size: 0.95rem;
 }
 
 .themaLabel {
-  background: #dbeafe;
-  color: #1e40af;
+  background-color: #f0f4f8;
+  color: #3b82f6;
   padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .frage {
   font-size: 1rem;
   color: #374151;
-  margin: 0 0 1rem 0;
+  margin-bottom: 1rem;
   line-height: 1.5;
-  font-weight: 500;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .graphContainer {
+  width: 100%;
   display: flex;
   justify-content: center;
-  margin: 1.5rem 0;
+  background-color: #f9fafb;
   padding: 1rem;
-  background: #f9fafb;
-  border-radius: 8px;
+  border-radius: 0.375rem;
   border: 1px solid #e5e7eb;
 }
 
-.eingabeContainer {
+.inputSection {
   display: flex;
-  gap: 0.5rem;
-  margin: 1.5rem 0;
-  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.input {
+.yesNoButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.yesNoBtn {
   flex: 1;
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   border: 2px solid #d1d5db;
-  border-radius: 6px;
+  background-color: white;
+  border-radius: 0.375rem;
   font-size: 1rem;
-  transition: all 0.2s;
   font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #374151;
 }
 
-.input:focus {
+.yesNoBtn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.yesNoBtn.selected {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.mtSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mtInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.mtGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.mtGroup label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.mtInput {
+  padding: 0.625rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.mtInput:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.input.correct {
+.livePreview {
+  padding: 0.75rem;
+  background-color: #f0f4f8;
+  border-left: 3px solid #3b82f6;
+  border-radius: 0.375rem;
+}
+
+.mathDisplay {
+  font-size: 1rem;
+}
+
+.standardInput {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.standardInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.standardInput.correct {
+  background-color: #dcfce7;
   border-color: #10b981;
-  background-color: #f0fdf4;
+  color: #065f46;
 }
 
 .buttonGroup {
   display: flex;
   gap: 0.75rem;
-  margin: 1rem 0;
 }
 
 .checkBtn,
@@ -148,49 +224,50 @@
   flex: 1;
   padding: 0.75rem 1rem;
   border: none;
-  border-radius: 6px;
-  font-weight: 600;
+  border-radius: 0.375rem;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.95rem;
 }
 
 .checkBtn {
-  background: #10b981;
+  background-color: #3b82f6;
   color: white;
 }
 
 .checkBtn:hover {
-  background: #059669;
-  transform: translateY(-1px);
+  background-color: #2563eb;
+}
+
+.checkBtn:active {
+  transform: scale(0.98);
 }
 
 .solutionBtn {
-  background: #6366f1;
-  color: white;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
 }
 
 .solutionBtn:hover {
-  background: #4f46e5;
-  transform: translateY(-1px);
+  background-color: #e5e7eb;
 }
 
 .feedbackBox {
-  background: #dcfce7;
-  border: 2px solid #10b981;
-  border-radius: 8px;
-  padding: 0.75rem;
-  color: #16a34a;
-  font-weight: 700;
-  text-align: center;
-  margin-top: 0.75rem;
-  animation: slideDown 0.3s ease;
+  padding: 0.75rem 1rem;
+  background-color: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 0.375rem;
+  color: #065f46;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
 }
 
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-0.5rem);
   }
   to {
     opacity: 1;
@@ -199,47 +276,15 @@
 }
 
 .lösungBox {
-  background: #f3f4f6;
-  border-left: 4px solid #6366f1;
-  border-radius: 6px;
   padding: 1rem;
-  margin-top: 1rem;
+  background-color: #f9fafb;
+  border-left: 3px solid #6366f1;
+  border-radius: 0.375rem;
+  margin-top: 0.5rem;
 }
 
-.lösungTitle {
+.lösungBox h4 {
   margin: 0 0 0.75rem 0;
-  color: #4f46e5;
-  font-weight: 700;
+  color: #1f2937;
   font-size: 0.95rem;
-}
-
-.mathDisplay {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin: 0.5rem 0;
-  text-align: center;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .aufgabenContainer {
-    grid-template-columns: 1fr;
-  }
-
-  .title {
-    font-size: 2rem;
-  }
-
-  .aufgabeCard {
-    padding: 1rem;
-  }
-
-  .buttonGroup {
-    flex-direction: column;
-  }
-
-  .checkBtn,
-  .solutionBtn {
-    width: 100%;
-  }
 }

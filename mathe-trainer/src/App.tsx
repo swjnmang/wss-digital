@@ -56,6 +56,8 @@ import GemischteAufgabenLF from './pages/lineare_funktionen/GemischteAufgaben'
 import AnwendungsaufgabenLF from './pages/lineare_funktionen/Anwendungsaufgaben'
 import FussballplatzAufgabe from './pages/lineare_funktionen/FussballplatzAufgabe'
 import TipiAufgabe from './pages/lineare_funktionen/TipiAufgabe'
+import Wertetabelle from './pages/lineare_funktionen/Wertetabelle'
+import ParallelSenkrecht from './pages/lineare_funktionen/ParallelSenkrecht'
 // Finanzmathe
 import FinanzmatheIndex from './pages/FinanzmatheIndex';
 import ZinsrechnungMenu from './pages/finanzmathe/ZinsrechnungMenu';
@@ -202,12 +204,14 @@ export default function App() {
           <Route path="/rechnen_lernen/gleichungen/quadratisch" element={<Quadratisch />} />
           <Route path="/rechnen_lernen/gleichungen/abschlusstest" element={<Abschlusstest />} />
           <Route path="/lineare_funktionen" element={<LineareIndex />} />
+          <Route path="/lineare_funktionen/wertetabelle" element={<Wertetabelle />} />
+          <Route path="/lineare_funktionen/zeichnen" element={<Zeichnen />} />
+          <Route path="/lineare_funktionen/ablesen" element={<Ablesen />} />
           <Route path="/lineare_funktionen/steigung_berechnen" element={<SteigungBerechnen />} />
           <Route path="/lineare_funktionen/funktionsgleichung" element={<Funktionsgleichung />} />
-          <Route path="/lineare_funktionen/ablesen" element={<Ablesen />} />
-          <Route path="/lineare_funktionen/zeichnen" element={<Zeichnen />} />
-          <Route path="/lineare_funktionen/nullstellen" element={<Nullstellen />} />
           <Route path="/lineare_funktionen/punkt_gerade" element={<PunktGerade />} />
+          <Route path="/lineare_funktionen/parallel_senkrecht" element={<ParallelSenkrecht />} />
+          <Route path="/lineare_funktionen/nullstellen" element={<Nullstellen />} />
           <Route path="/lineare_funktionen/schnittpunkt" element={<Schnittpunkt />} />
           <Route path="/lineare_funktionen/gemischte-aufgaben" element={<GemischteAufgabenLF />} />
           <Route path="/lineare_funktionen/anwendungsaufgaben" element={<AnwendungsaufgabenLF />} />

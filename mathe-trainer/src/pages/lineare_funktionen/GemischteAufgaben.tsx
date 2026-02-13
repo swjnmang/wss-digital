@@ -34,7 +34,7 @@ const aufgabenBanks = {
       isGraph: true,
       m,
       t,
-      antwort: { m, t },
+      antwort: `${m};${t}`,
       lösungsweg: `Der y-Achsenabschnitt ist t = ${t}. Die Steigung ist m = ${m}.`
     }
   },
@@ -47,12 +47,12 @@ const aufgabenBanks = {
     return {
       typ: 'ablesen',
       thema: '2. Funktionsgleichung ablesen',
-      frage: `Lies m und t ab! Gib ein: m; t (z.B. 2;-3)`,
+      frage: `Lies m und t aus dem Graphen ab`,
       isGraph: true,
       m,
       t,
       antwort: `${m};${t}`,
-      lösungsweg: `Der y-Achsenabschnitt ist $$t = ${t}$$. Die Steigung ist $$m = ${m}$$. Also: $$y = ${m}x ${t >= 0 ? '+' : '-'} ${Math.abs(t)}$$`
+      lösungsweg: `Der y-Achsenabschnitt ist t = ${t}. Die Steigung ist m = ${m}. Also: y = ${m}x ${t >= 0 ? '+' : '-'} ${Math.abs(t)}`
     }
   },
 
@@ -92,7 +92,7 @@ const aufgabenBanks = {
     return {
       typ: 'funktionsgleichung',
       thema: '4. Funktionsgleichung aufstellen',
-      frage: `Stelle die Gleichung auf: P₁(${x1}|${y1}), P₂(${x2}|${y2}). Gib ein: m; t`,
+      frage: `Stelle die Gleichung auf: P₁(${x1}|${y1}), P₂(${x2}|${y2})`,
       antwort: `${mRound};${tRound}`,
       lösungsweg: `$$m = \\dfrac{${y2 - y1}}{${x2 - x1}} = ${mRound}$$\n$$t = ${y1} - ${mRound} \\cdot ${x1} = ${tRound}$$\n$$y = ${mRound}x ${tRound >= 0 ? '+' : '-'} ${Math.abs(tRound)}$$`
     }
@@ -116,7 +116,7 @@ const aufgabenBanks = {
     return {
       typ: 'punktAufGerade',
       thema: '5. Punkt auf Gerade prüfen',
-      frage: `Liegt P(${x}|${testY}) auf y = ${m}x ${t >= 0 ? '+' : '-'} ${Math.abs(t)}? (ja/nein)`,
+      frage: `Liegt P(${x}|${testY}) auf y = ${m}x ${t >= 0 ? '+' : '-'} ${Math.abs(t)}?`,
       antwort,
       lösungsweg: `Einsetzen: $$y = ${m} \\cdot ${x} ${t >= 0 ? '+' : '-'} ${Math.abs(t)} = ${y}$$. Der Punkt ${antwort === 'ja' ? 'liegt' : 'liegt nicht'} auf der Geraden.`
     }
@@ -173,7 +173,7 @@ interface Aufgabe {
 
 export default function GemischteAufgaben() {
   const [aufgaben, setAufgaben] = useState<Aufgabe[]>([])
-  const [antworten, setAntworten] = useState<{ [key: number]: string }>({})
+  const [antworten, setAntworten] = useState<{ [key: number]: { m?: string; t?: string; value?: string } }>({})
   const [validiert, setValidiert] = useState<{ [key: number]: boolean }>({})
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
 
@@ -211,44 +211,63 @@ export default function GemischteAufgaben() {
     generiereAufgaben()
   }, [])
 
-  function validateAnswer(index: number, value: string): boolean {
+  function validateAnswer(index: number, inputData: any): boolean {
     const aufgabe = aufgaben[index]
     if (!aufgabe) return false
-
-    const inputVal = value.replace(',', '.').trim()
     
-    if (inputVal === '') return false
-
-    // Verschiedene Validierungslogiken
-    if (aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen') {
-      const parts = inputVal.split(';').map(p => p.trim())
-      if (parts.length !== 2) return false
-      const m = parseFloat(parts[0])
-      const t = parseFloat(parts[1])
+    if (aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen' || aufgabe.typ === 'graphZeichnen') {
+      const m = parseFloat((inputData.m || '').replace(',', '.'))
+      const t = parseFloat((inputData.t || '').replace(',', '.'))
+      if (isNaN(m) || isNaN(t)) return false
       const expectedParts = (aufgabe.antwort as string).split(';').map(p => parseFloat(p.trim()))
       return Math.abs(m - expectedParts[0]) < 0.02 && Math.abs(t - expectedParts[1]) < 0.02
     } else if (aufgabe.typ === 'punktAufGerade') {
-      return inputVal.toLowerCase() === aufgabe.antwort
+      return (inputData.value || '').toLowerCase() === aufgabe.antwort
     } else {
-      const num = parseFloat(inputVal)
+      const num = parseFloat((inputData.value || '').replace(',', '.'))
       return Math.abs(num - aufgabe.antwort) < 0.02
     }
   }
 
-  function handleAnswerChange(index: number, value: string) {
-    setAntworten({ ...antworten, [index]: value })
+  function checkAnswer(index: number) {
+    const isCorrect = validateAnswer(index, antworten[index] || {})
+    setValidiert({ ...validiert, [index]: isCorrect })
   }
 
-  function checkAnswer(index: number) {
-    const isCorrect = validateAnswer(index, antworten[index] || '')
-    setValidiert({ ...validiert, [index]: isCorrect })
+  function handleMtChange(index: number, field: 'm' | 't', value: string) {
+    setAntworten({
+      ...antworten,
+      [index]: {
+        ...antworten[index],
+        [field]: value
+      }
+    })
+  }
+
+  function handleValueChange(index: number, value: string) {
+    setAntworten({
+      ...antworten,
+      [index]: {
+        ...antworten[index],
+        value
+      }
+    })
+  }
+
+  function handleYesNo(index: number, answer: 'ja' | 'nein') {
+    setAntworten({
+      ...antworten,
+      [index]: {
+        value: answer
+      }
+    })
   }
 
   return (
     <div className={`prose ${styles.container}`}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Gemischte Übungsaufgaben</h1>
-        <p className={styles.subtitle}>Löse die Aufgaben und überprüfe deine Ergebnisse!</p>
+        <h1 className={styles.title}>Übungsaufgaben</h1>
+        <p className={styles.subtitle}>Löse die Aufgaben und überprüfe deine Ergebnisse</p>
       </div>
 
       <button onClick={generiereAufgaben} className={styles.newButton}>
@@ -257,57 +276,118 @@ export default function GemischteAufgaben() {
 
       <div className={styles.aufgabenContainer}>
         {aufgaben.map((aufgabe, index) => (
-          <div key={index} className={styles.aufgabeCard}>
+          <div key={index} className={`${styles.aufgabeCard} ${validiert[index] ? styles.cardCorrect : ''}`}>
             <div className={styles.aufgabeHeader}>
               <span className={styles.aufgabenNummer}>Aufgabe {index + 1}</span>
               <span className={styles.themaLabel}>{aufgabe.thema}</span>
             </div>
 
-            <p className={styles.frage}>{aufgabe.frage}</p>
+            <div className={styles.content}>
+              <p className={styles.frage}>{aufgabe.frage}</p>
 
-            {/* Graph-Anzeige für Ablesen und Graph-Zeichnen */}
-            {aufgabe.isGraph && aufgabe.m !== undefined && aufgabe.t !== undefined && (
-              <div className={styles.graphContainer}>
-                <GeoGebraGraph m={aufgabe.m} t={aufgabe.t} width={400} height={400} />
+              {/* Graph-Anzeige */}
+              {aufgabe.isGraph && aufgabe.m !== undefined && aufgabe.t !== undefined && (
+                <div className={styles.graphContainer}>
+                  <GeoGebraGraph m={aufgabe.m} t={aufgabe.t} width={500} height={400} />
+                </div>
+              )}
+
+              {/* Eingabe-Bereich */}
+              <div className={styles.inputSection}>
+                {/* ja/nein Buttons */}
+                {aufgabe.typ === 'punktAufGerade' && (
+                  <div className={styles.yesNoButtons}>
+                    <button 
+                      className={`${styles.yesNoBtn} ${antworten[index]?.value === 'ja' ? styles.selected : ''}`}
+                      onClick={() => handleYesNo(index, 'ja')}
+                    >
+                      Ja
+                    </button>
+                    <button 
+                      className={`${styles.yesNoBtn} ${antworten[index]?.value === 'nein' ? styles.selected : ''}`}
+                      onClick={() => handleYesNo(index, 'nein')}
+                    >
+                      Nein
+                    </button>
+                  </div>
+                )}
+
+                {/* M und T Eingabe mit Live-Anzeige */}
+                {(aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen' || aufgabe.typ === 'graphZeichnen') && (
+                  <div className={styles.mtSection}>
+                    <div className={styles.mtInputs}>
+                      <div className={styles.mtGroup}>
+                        <label>m =</label>
+                        <input
+                          type="text"
+                          placeholder="z.B. 2"
+                          value={antworten[index]?.m || ''}
+                          onChange={(e) => handleMtChange(index, 'm', e.target.value)}
+                          className={styles.mtInput}
+                        />
+                      </div>
+                      <div className={styles.mtGroup}>
+                        <label>t =</label>
+                        <input
+                          type="text"
+                          placeholder="z.B. -3"
+                          value={antworten[index]?.t || ''}
+                          onChange={(e) => handleMtChange(index, 't', e.target.value)}
+                          className={styles.mtInput}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Live-Anzeige */}
+                    {antworten[index]?.m && antworten[index]?.t && (
+                      <div className={styles.livePreview}>
+                        <MathDisplay latex={`$$y = ${antworten[index]?.m}x ${parseFloat(antworten[index]?.t || '0') >= 0 ? '+' : ''} ${antworten[index]?.t}$$`} />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Standard Zahleneingabe */}
+                {aufgabe.typ !== 'funktionsgleichung' && aufgabe.typ !== 'ablesen' && aufgabe.typ !== 'graphZeichnen' && aufgabe.typ !== 'punktAufGerade' && (
+                  <input
+                    type="text"
+                    placeholder="Ergebnis eingeben"
+                    value={antworten[index]?.value || ''}
+                    onChange={(e) => handleValueChange(index, e.target.value)}
+                    className={styles.standardInput}
+                    onKeyPress={(e) => e.key === 'Enter' && checkAnswer(index)}
+                  />
+                )}
               </div>
-            )}
 
-            {/* Eingabe-Feld */}
-            <div className={styles.eingabeContainer}>
-              <input
-                type="text"
-                placeholder={aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen' ? 'm; t' : 'Ergebnis'}
-                value={antworten[index] || ''}
-                onChange={(e) => handleAnswerChange(index, e.target.value)}
-                className={`${styles.input} ${validiert[index] ? styles.correct : ''}`}
-                onKeyPress={(e) => e.key === 'Enter' && checkAnswer(index)}
-              />
+              {/* Buttons */}
+              <div className={styles.buttonGroup}>
+                <button onClick={() => checkAnswer(index)} className={styles.checkBtn}>
+                  Prüfen
+                </button>
+                <button 
+                  onClick={() => setShowLösung({ ...showLösung, [index]: !showLösung[index] })} 
+                  className={styles.solutionBtn}
+                >
+                  {showLösung[index] ? 'Lösung ausblenden' : 'Lösung anzeigen'}
+                </button>
+              </div>
+
+              {/* Feedback */}
+              {validiert[index] && (
+                <div className={styles.feedbackBox}>
+                  ✓ Richtig!
+                </div>
+              )}
+
+              {/* Lösung */}
+              {showLösung[index] && (
+                <div className={styles.lösungBox}>
+                  <h4>Lösungsweg:</h4>
+                  <MathDisplay latex={aufgabe.lösungsweg} />
+                </div>
+              )}
             </div>
-
-            <div className={styles.buttonGroup}>
-              <button onClick={() => checkAnswer(index)} className={styles.checkBtn}>
-                ✓ Prüfen
-              </button>
-              <button 
-                onClick={() => setShowLösung({ ...showLösung, [index]: !showLösung[index] })} 
-                className={styles.solutionBtn}
-              >
-                {showLösung[index] ? '✕ Lösung ausblenden' : '? Lösung anzeigen'}
-              </button>
-            </div>
-
-            {validiert[index] && (
-              <div className={styles.feedbackBox}>
-                ✓ Richtig!
-              </div>
-            )}
-
-            {showLösung[index] && (
-              <div className={styles.lösungBox}>
-                <h4 className={styles.lösungTitle}>Lösungsweg:</h4>
-                <MathDisplay latex={aufgabe.lösungsweg} />
-              </div>
-            )}
           </div>
         ))}
       </div>
