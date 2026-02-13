@@ -52,7 +52,7 @@ const aufgabenBanks = {
       m,
       t,
       antwort: `${m};${t}`,
-      lösungsweg: `Der y-Achsenabschnitt ist t = ${t}. Die Steigung ist m = ${m}. Also: y = ${m}x ${t >= 0 ? '+' : '-'} ${Math.abs(t)}`
+      lösungsweg: `Der y-Achsenabschnitt ist $$t = ${t}$$. Die Steigung ist $$m = ${m}$$. Also: $$y = ${m}x ${t >= 0 ? '+' : '-'} ${Math.abs(t)}$$`
     }
   },
 
@@ -118,7 +118,7 @@ const aufgabenBanks = {
       thema: '5. Punkt auf Gerade prüfen',
       frage: `Liegt P(${x}|${testY}) auf y = ${m}x ${t >= 0 ? '+' : '-'} ${Math.abs(t)}? (ja/nein)`,
       antwort,
-      lösungsweg: `Einsetzen: y = ${m} \\cdot ${x} ${t >= 0 ? '+' : '-'} ${Math.abs(t)} = ${y}. Der Punkt ${antwort === 'ja' ? 'liegt' : 'liegt nicht'} auf der Geraden.`
+      lösungsweg: `Einsetzen: $$y = ${m} \\cdot ${x} ${t >= 0 ? '+' : '-'} ${Math.abs(t)} = ${y}$$. Der Punkt ${antwort === 'ja' ? 'liegt' : 'liegt nicht'} auf der Geraden.`
     }
   },
 
@@ -305,7 +305,7 @@ export default function GemischteAufgaben() {
             {showLösung[index] && (
               <div className={styles.lösungBox}>
                 <h4 className={styles.lösungTitle}>Lösungsweg:</h4>
-                <MathDisplay latex={`$$${aufgabe.lösungsweg}$$`} />
+                <MathDisplay latex={aufgabe.lösungsweg} />
               </div>
             )}
           </div>
