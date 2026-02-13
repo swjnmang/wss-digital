@@ -16,8 +16,33 @@ export default function Ablesen() {
   const [tInput, setTInput] = useState('')
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
+  const [geoSize, setGeoSize] = useState<{width: number, height: number}>({width: 600, height: 600})
   const ggbRef = useRef<HTMLDivElement | null>(null)
   const ggbInstance = useRef<any>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
+
+  // Berechne responsive Größe basierend auf verfügbarer Breite
+  useEffect(() => {
+    const calculateSize = () => {
+      if (!containerRef.current) return
+      const parentWidth = containerRef.current.offsetWidth
+      // Responsive Größe: 90% der verfügbaren Breite, max 800px
+      const size = Math.min(Math.max(parentWidth * 0.9, 300), 800)
+      setGeoSize({ width: size, height: size })
+    }
+
+    calculateSize()
+    window.addEventListener('resize', calculateSize)
+    return () => window.removeEventListener('resize', calculateSize)
+  }, [])
+
+  // Update GeoGebraSize im DOM element styles
+  useEffect(() => {
+    if (ggbRef.current) {
+      ggbRef.current.style.width = `${geoSize.width}px`
+      ggbRef.current.style.height = `${geoSize.height}px`
+    }
+  }, [geoSize])
 
   // Load GeoGebra script once and initialize applet
   useEffect(() => {
@@ -26,8 +51,9 @@ export default function Ablesen() {
       if (!window.GGBApplet || !ggbRef.current) return
       const params: any = {
         // match the original static page: use classic app and Graphics-only perspective
-        appName: 'classic', width: 350, height: 350,
+        appName: 'classic', width: geoSize.width, height: geoSize.height,
         showToolBar: false, showAlgebraInput: false, showMenuBar: false,
+        showZoomButtons: true,
         perspective: 'G', useBrowserForJS: true,
         appletOnLoad: (api: any) => {
           ggbInstance.current = api
@@ -272,8 +298,8 @@ export default function Ablesen() {
         <h2>Funktionsgleichung ablesen</h2>
         <p>Ableseaufgabe: Lies Steigung m und y-Achsenabschnitt t aus dem Graphen ab.</p>
 
-        <div id="ggb-container" className={styles.svgWrap}>
-          <div id="ggb-element" ref={ggbRef} style={{ width: 350, height: 350, border: '1px solid #ccc', borderRadius: 8, background: 'white' }} />
+        <div id="ggb-container" className={styles.svgWrap} ref={containerRef}>
+          <div id="ggb-element" ref={ggbRef} className={styles.geoGebraContainer} style={{ width: geoSize.width, height: geoSize.height, border: '1px solid #ccc', borderRadius: 8, background: 'white' }} />
         </div>
 
         <div className={styles.inputRow}>

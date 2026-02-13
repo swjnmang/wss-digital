@@ -1,7 +1,8 @@
 .container { padding: 1rem }
 .back { display:inline-block; margin-bottom:0.5rem; color:#0366d6 }
 .card { background:white; padding:1rem; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.06) }
-.svgWrap { display:flex; justify-content:center; margin-bottom:0.75rem }
+.svgWrap { display:flex; justify-content:center; margin-bottom:0.75rem; width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; }
+.geoGebraContainer { width: 100%; aspect-ratio: 1 / 1; border: 1px solid #ccc; border-radius: 8px; background: white; }
 .inputRow { display:flex; gap:0.75rem; align-items:center; margin-bottom:0.75rem; justify-content:center }
 .label { font-weight:600 }
 .input { border:1px solid #d1d5db; padding:0.4rem 0.5rem; border-radius:6px; width:100px }
