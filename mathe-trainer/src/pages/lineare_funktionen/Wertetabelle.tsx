@@ -75,7 +75,7 @@ function generateRechenbeispiele(m: number, t: number): Array<{ x: number; y: nu
     const y = Math.round((m * x + t) * 100) / 100
     
     // Formatiere x-Wert mit Klammern wenn negativ
-    const xFormatted = x < 0 ? `\\textcolor{red}{(${x})}` : `\\textcolor{red}{${x}}`
+    const xFormatted = x < 0 ? `{\\color{red}(-${x})}` : `{\\color{red}${x}}`
     
     // Formatiere die Berechnung mathematisch
     let berechnung = ''
