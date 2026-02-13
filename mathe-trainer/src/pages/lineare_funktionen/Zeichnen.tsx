@@ -45,7 +45,11 @@ export default function Zeichnen(){
       case 'medium':
         m = randomChoice<number | any>([randomInt(2, -2), 0.5, -0.5, 1.5, -1.5, 2.5, -2.5])
         if (m === 0) m = 1.5
-        t = randomChoice<number>([randomInt(5, -5), randomInt(9, -9) / 2])
+        // m constraint: -3 bis 3
+        m = Math.max(-3, Math.min(3, m))
+        // t constraint: -4 bis 4
+        t = randomChoice<number>([randomInt(4, -4), randomInt(8, -8) / 2])
+        t = Math.max(-4, Math.min(4, t))
         break
       case 'hard':
         const numerators = [-9,-8,-7,-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8,9]
@@ -55,12 +59,16 @@ export default function Zeichnen(){
         if (Math.abs(m) < 0.1) m = 2/3
         t = randomChoice(numerators.slice(4,-4)) / randomChoice(denominators)
         t = Math.round(t * 4) / 4
+        // t constraint: -4 bis 4
+        t = Math.max(-4, Math.min(4, t))
         break
       case 'easy':
       default:
+        // m constraint: -3 bis 3
         m = randomInt(3, -3)
         if (m === 0) m = 1
-        t = randomInt(8, -8)
+        // t constraint: -4 bis 4
+        t = randomInt(4, -4)
         break
     }
 
