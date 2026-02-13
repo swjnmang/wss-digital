@@ -60,11 +60,38 @@ function formatEquationLatex(m: number, t: number): string {
   return `$$${equation}$$`
 }
 
+// Generiert 2 Rechenbeispiele für die Lösungsanzeige
+function generateRechenbeispiele(m: number, t: number): Array<{ x: number; y: number; berechnung: string }> {
+  const beispiele: Array<{ x: number; y: number; berechnung: string }> = []
+  
+  // Wähle 2 verschiedene zufällige x-Werte
+  const xWerte = new Set<number>()
+  while (xWerte.size < 2) {
+    xWerte.add(randInt(-3, 3))
+  }
+  
+  xWerte.forEach(x => {
+    const y = Math.round((m * x + t) * 100) / 100
+    
+    // Formatiere die Berechnung
+    let berechnung = `y = ${m} \\cdot ${x} + ${t}`
+    if (m === 1) berechnung = `y = ${x} + ${t}`
+    else if (m === -1) berechnung = `y = -${x} + ${t}`
+    
+    berechnung += ` = ${y}`
+    
+    beispiele.push({ x, y, berechnung })
+  })
+  
+  return beispiele
+}
+
 // ===== Aufgabengenerator =====
 const aufgabenBanks = {
   // Typ 1: Völlig leere Wertetabelle ausfüllen
   leereTabelleAusfüllen: () => {
     const { m, t } = generateRandomMT()
+    const rechenbeispiele = generateRechenbeispiele(m, t)
     
     return {
       typ: 'leereTabelleAusfüllen',
@@ -75,7 +102,8 @@ const aufgabenBanks = {
       funktionsgleichung: formatEquation(m, t),
       funktionsgleichungLatex: formatEquationLatex(m, t),
       numZeilen: 4,
-      lösungsweg: `Setze verschiedene x-Werte in die Funktionsgleichung ein und berechne die entsprechenden y-Werte.`
+      lösungsweg: `Setze verschiedene x-Werte in die Funktionsgleichung ein und berechne die entsprechenden y-Werte.`,
+      rechenbeispiele
     }
   },
 
@@ -106,7 +134,7 @@ const aufgabenBanks = {
     return {
       typ: 'teilweisgefülltVervollständigen',
       thema: '2. Wertetabelle vervollständigen',
-      frage: `Vervollständige die Wertetabelle für die Funktionsgleichung ${formatEquation(m, t)}. Beachte: Es ist immer ENTWEDER der x-ODER der y-Wert gegeben!`,
+      frage: `Vervollständige die Wertetabelle für die Funktionsgleichung ${formatEquation(m, t)}.`,
       m,
       t,
       funktionsgleichung: formatEquation(m, t),
