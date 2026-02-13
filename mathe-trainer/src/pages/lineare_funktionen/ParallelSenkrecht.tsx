@@ -94,6 +94,23 @@ const aufgabenBanks = {
     
     const t2 = y - m2 * x
     
+    // Generiere MC-Optionen
+    const correctAnswer = `y=${Math.round(m2 * 100) / 100}x${t2 >= 0 ? '+' : '-'}${Math.abs(Math.round(t2 * 100) / 100)}`
+    const mcOptions = [{ label: correctAnswer, value: correctAnswer, isCorrect: true }]
+    
+    for (let i = 0; i < 2; i++) {
+      let mOpt = m2 + randInt(-2, 2) / 100
+      while (Math.abs(mOpt - m2) < 0.01) mOpt = m2 + randInt(-2, 2) / 100
+      
+      let tOpt = t2 + randInt(-3, 3)
+      while (tOpt === t2) tOpt = t2 + randInt(-3, 3)
+      
+      const label = `y=${Math.round(mOpt * 100) / 100}x${tOpt >= 0 ? '+' : '-'}${Math.abs(Math.round(tOpt * 100) / 100)}`
+      mcOptions.push({ label, value: label, isCorrect: false })
+    }
+    
+    const shuffledOptions = mcOptions.sort(() => Math.random() - 0.5)
+    
     return {
       typ: 'geradeDurchPunkt',
       nummer: 2,
@@ -105,6 +122,7 @@ const aufgabenBanks = {
       punkt: { x, y },
       m2: Math.round(m2 * 100) / 100,
       t2: Math.round(t2 * 100) / 100,
+      mcOptions: shuffledOptions,
       lösungsweg: `
       \\text{Schritt 1: Steigung bestimmen}\\n
       ${aufgabentyp === 'parallel' ? `m_2 = m_1 = ${m1}` : `m_1 \\cdot m_2 = -1 \\Rightarrow m_2 = -\\frac{1}{${m1}} = ${Math.round(m2 * 100) / 100}`}\\n\\n
@@ -175,17 +193,19 @@ export default function ParallelSenkrecht() {
 
   const prüfeAntwort = (index: number) => {
     const aufgabe = aufgaben[index]
-    const antwort = antworten[index].trim().toLowerCase()
+    const antwort = antworten[index].trim()
 
     let isCorrect = false
 
     if (aufgabe.typ === 'gleichungenPrüfen') {
-      const expected = aufgabe.beziehung
-      isCorrect =
-        antwort.includes('parallel') && aufgabe.beziehung === 'parallel' ||
-        antwort.includes('senkrecht') && aufgabe.beziehung === 'senkrecht' ||
-        (antwort.includes('keine') || antwort.includes('egal') || antwort.includes('unterschied')) &&
-        aufgabe.beziehung === 'keine'
+      isCorrect = antwort === aufgabe.beziehung
+    } else if (aufgabe.typ === 'geradeDurchPunkt') {
+      const correctAnswer = `y=${aufgabe.m2}x${aufgabe.t2 >= 0 ? '+' : '-'}${Math.abs(aufgabe.t2)}`
+      isCorrect = antwort === correctAnswer
+    } else if (aufgabe.typ === 'mehrereGeraden') {
+      const parts = antwort.split('|')
+      const expected = ['parallel', 'senkrecht', 'keine']
+      isCorrect = parts.length === 3 && parts.every((p, i) => p === expected[i])
     }
 
     setValidiert(prev => {
@@ -234,21 +254,92 @@ export default function ParallelSenkrecht() {
             <div className={styles.content}>
               <p className={styles.frage}>{aufgabe.frage}</p>
 
-              <div className={styles.inputGroup}>
-                <textarea
-                  value={antworten[index]}
-                  onChange={e =>
-                    setAntworten(prev => {
-                      const newA = [...prev]
-                      newA[index] = e.target.value
-                      return newA
-                    })
-                  }
-                  placeholder="Schreibe deine Lösung hier auf..."
-                  className={styles.answerInput}
-                  rows={4}
-                />
-              </div>
+              {aufgabe.typ === 'gleichungenPrüfen' && (
+                <div className={styles.inputGroup}>
+                  <p className={styles.inputLabel}>Wähle die richtige Antwort:</p>
+                  <div className={styles.mcOptions}>
+                    {['parallel', 'senkrecht', 'keine'].map(option => (
+                      <label key={option} className={styles.mcOption}>
+                        <input
+                          type="radio"
+                          name={`aufgabe_${index}`}
+                          value={option}
+                          checked={antworten[index] === option}
+                          onChange={e =>
+                            setAntworten(prev => {
+                              const newA = [...prev]
+                              newA[index] = e.target.value
+                              return newA
+                            })
+                          }
+                        />
+                        <span className={styles.mcLabel}>
+                          {option === 'parallel' && 'Die Geraden sind parallel'}
+                          {option === 'senkrecht' && 'Die Geraden sind senkrecht'}
+                          {option === 'keine' && 'Keine spezielle Beziehung'}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {aufgabe.typ === 'geradeDurchPunkt' && (
+                <div className={styles.inputGroup}>
+                  <p className={styles.inputLabel}>Wähle die richtige Gleichung:</p>
+                  <div className={styles.mcOptions}>
+                    {aufgabe.mcOptions.map((option: any, i: number) => (
+                      <label key={i} className={styles.mcOption}>
+                        <input
+                          type="radio"
+                          name={`aufgabe_${index}`}
+                          value={option.value}
+                          checked={antworten[index] === option.value}
+                          onChange={e =>
+                            setAntworten(prev => {
+                              const newA = [...prev]
+                              newA[index] = e.target.value
+                              return newA
+                            })
+                          }
+                        />
+                        <span className={styles.mcLabel}>{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {aufgabe.typ === 'mehrereGeraden' && (
+                <div className={styles.inputGroup}>
+                  <p className={styles.inputLabel}>Ordne die Geraden zu:</p>
+                  <div className={styles.zuordnungContainer}>
+                    {['g₂', 'g₃', 'g₄'].map((label, i) => (
+                      <div key={label} className={styles.zuordnungItem}>
+                        <span className={styles.zuordnungLabel}>{label}:</span>
+                        <select
+                          value={antworten[index].split('|')[i] || ''}
+                          onChange={e => {
+                            const parts = antworten[index].split('|')
+                            parts[i] = e.target.value
+                            setAntworten(prev => {
+                              const newA = [...prev]
+                              newA[index] = parts.join('|')
+                              return newA
+                            })
+                          }}
+                          className={styles.zuordnungSelect}
+                        >
+                          <option value="">-- wähle --</option>
+                          <option value="parallel">parallel</option>
+                          <option value="senkrecht">senkrecht</option>
+                          <option value="keine">keine</option>
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className={styles.buttonGroup}>
                 <button
