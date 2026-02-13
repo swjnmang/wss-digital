@@ -74,24 +74,21 @@ function generateRechenbeispiele(m: number, t: number): Array<{ x: number; y: nu
   xWerte.forEach(x => {
     const y = Math.round((m * x + t) * 100) / 100
     
-    // Formatiere x-Wert mit Klammern wenn negativ
-    const xFormatted = x < 0 ? `{\\color{red}(-${x})}` : `{\\color{red}${x}}`
+    // Formatiere x-Wert: Klammern wenn negativ, rot eingefärbt
+    const xDisplay = x < 0 ? `(-${x})` : `${x}`
+    const xRot = `{\\color{red}${xDisplay}}`
     
-    // Formatiere die Berechnung mathematisch
-    let berechnung = ''
-    
-    // Formatiere m * x mit korrekter Klammer
+    // Baue m · x Teil
     let mxPart = ''
     if (m === 1) {
-      mxPart = xFormatted
+      mxPart = xRot
     } else if (m === -1) {
-      mxPart = `-${xFormatted}`
+      mxPart = `-${xRot}`
     } else {
-      // Für beliebige m-Werte
-      mxPart = `${m} \\cdot ${xFormatted}`
+      mxPart = `${m} \\cdot ${xRot}`
     }
     
-    // Formatiere t mit Vorzeichen
+    // Baue t Teil mit Vorzeichen
     let tPart = ''
     if (t > 0) {
       tPart = `+ ${t}`
@@ -99,7 +96,8 @@ function generateRechenbeispiele(m: number, t: number): Array<{ x: number; y: nu
       tPart = `- ${Math.abs(t)}`
     }
     
-    berechnung = `y = ${mxPart} ${tPart} = ${y}`
+    // Komplette Berechnung
+    const berechnung = `y = ${mxPart} ${tPart} = ${y}`
     
     beispiele.push({ x, y, berechnung })
   })
