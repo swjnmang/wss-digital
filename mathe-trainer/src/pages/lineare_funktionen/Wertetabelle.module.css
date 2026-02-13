@@ -165,6 +165,18 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.inputCorrect {
+  border-color: #10b981 !important;
+  background-color: #dcfce7 !important;
+  color: #065f46 !important;
+  font-weight: 500 !important;
+}
+
+.inputCorrect:focus {
+  border-color: #059669 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
 .buttonGroup {
   display: flex;
   gap: 0.75rem;

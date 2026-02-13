@@ -83,33 +83,38 @@ const aufgabenBanks = {
   teilweisgefülltVervollständigen: () => {
     const { m, t } = generateRandomMT()
     
-    // X-Werte fix
-    const xWerte = [-2, -1, 0, 1, 2]
-    const yWerte = xWerte.map(x => Math.round((m * x + t) * 100) / 100)
+    // Generiere 5 Wertepaare mit zufälligen x-Werten
+    const xWerte: number[] = []
+    const yWerte: number[] = []
+    const gebenXWert: boolean[] = [] // true = x gegeben, y versteckt; false = y gegeben, x versteckt
     
-    // Zufällig einige y-Werte verstecken (mindestens 2, maximal 4)
-    const verstecktIndizes: number[] = []
-    const anzahlVersteckt = randInt(2, 4)
-    while (verstecktIndizes.length < anzahlVersteckt) {
-      const idx = randInt(0, xWerte.length - 1)
-      if (!verstecktIndizes.includes(idx)) {
-        verstecktIndizes.push(idx)
+    // Generiere 5 verschiedene zufällige x-Werte
+    const verwendeteX = new Set<number>()
+    while (xWerte.length < 5) {
+      const x = randInt(-5, 5)
+      if (!verwendeteX.has(x)) {
+        verwendeteX.add(x)
+        xWerte.push(x)
+        const y = Math.round((m * x + t) * 100) / 100
+        yWerte.push(y)
+        
+        // Zufällig entscheiden: x oder y geben
+        gebenXWert.push(Math.random() > 0.5)
       }
     }
     
     return {
       typ: 'teilweisgefülltVervollständigen',
       thema: '2. Wertetabelle vervollständigen',
-      frage: `Vervollständige die Wertetabelle für die Funktionsgleichung ${formatEquation(m, t)}.`,
+      frage: `Vervollständige die Wertetabelle für die Funktionsgleichung ${formatEquation(m, t)}. Beachte: Es ist immer ENTWEDER der x-ODER der y-Wert gegeben!`,
       m,
       t,
       funktionsgleichung: formatEquation(m, t),
       funktionsgleichungLatex: formatEquationLatex(m, t),
       xWerte,
       yWerte,
-      gebenY: yWerte.map((_, idx) => !verstecktIndizes.includes(idx)),
-      verstecktIndizes,
-      lösungsweg: `Setze die x-Werte in die Funktionsgleichung ein: ${formatEquationLatex(m, t)}`
+      gebenXWert, // true = x gegeben, y versteckt; false = y gegeben, x versteckt
+      lösungsweg: `Nutze die Funktionsgleichung ${formatEquationLatex(m, t)} und berechne den fehlenden Wert (x oder y) aus dem gegebenen Wert.`
     }
   }
 }
@@ -131,6 +136,7 @@ export default function Wertetabelle() {
   const [validiert, setValidiert] = useState<{ [key: number]: boolean }>({})
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
   const [showGraph, setShowGraph] = useState<{ [key: number]: boolean }>({})
+  const [validierteZellen, setValidierteZellen] = useState<{ [key: string]: boolean }>({})
 
   // MathJax laden
   useEffect(() => {
@@ -162,6 +168,7 @@ export default function Wertetabelle() {
     setValidiert({})
     setShowLösung({})
     setShowGraph({})
+    setValidierteZellen({})
   }
 
   useEffect(() => {
@@ -201,9 +208,10 @@ export default function Wertetabelle() {
     const t = aufgabe.t
     const tolerance = 0.02
     
-    // Prüfe nur die y-Werte für versteckte Indizes
+    // Prüfe alle Wertepaare basierend auf gebenXWert
     for (let i = 0; i < eingaben.length; i++) {
-      if (!aufgabe.gebenY[i]) {
+      if (aufgabe.gebenXWert[i]) {
+        // X ist gegeben, y muss geprüft werden
         const y = parseFloat(eingaben[i].y.replace(',', '.'))
         if (isNaN(y)) return false
         
@@ -211,10 +219,46 @@ export default function Wertetabelle() {
         if (Math.abs(y - expectedY) > tolerance) {
           return false
         }
+      } else {
+        // Y ist gegeben, x muss geprüft werden
+        const x = parseFloat(eingaben[i].x.replace(',', '.'))
+        if (isNaN(x)) return false
+        
+        const expectedX = aufgabe.xWerte[i]
+        if (Math.abs(x - expectedX) > tolerance) {
+          return false
+        }
       }
     }
     
     return true
+  }
+
+  function validateSingleCell(aufgabeIndex: number, rowIndex: number, aufgabe: Aufgabe): boolean {
+    const eingaben = antworten[aufgabeIndex]
+    if (!eingaben || !eingaben[rowIndex]) return false
+    
+    const m = aufgabe.m
+    const t = aufgabe.t
+    const tolerance = 0.02
+    
+    if (aufgabe.typ === 'teilweisgefülltVervollständigen') {
+      if (aufgabe.gebenXWert[rowIndex]) {
+        // X ist gegeben, y muss geprüft werden
+        const y = parseFloat(eingaben[rowIndex].y.replace(',', '.'))
+        if (isNaN(y)) return false
+        const expectedY = aufgabe.yWerte[rowIndex]
+        return Math.abs(y - expectedY) <= tolerance
+      } else {
+        // Y ist gegeben, x muss geprüft werden
+        const x = parseFloat(eingaben[rowIndex].x.replace(',', '.'))
+        if (isNaN(x)) return false
+        const expectedX = aufgabe.xWerte[rowIndex]
+        return Math.abs(x - expectedX) <= tolerance
+      }
+    }
+    
+    return false
   }
 
   function checkAnswer(index: number) {
@@ -234,6 +278,52 @@ export default function Wertetabelle() {
     }
     
     currentAnswers[rowIndex][field] = value
+    
+    // Validiere diese Zelle für Typ 2
+    const aufgabe = aufgaben[aufgabeIndex]
+    if (aufgabe?.typ === 'teilweisgefülltVervollständigen') {
+      const cellKey = `${aufgabeIndex}-${rowIndex}`
+      
+      // Prüfe ob beide Felder filled sind
+      const xFilled = aufgabe.gebenXWert[rowIndex] || currentAnswers[rowIndex].x.trim() !== ''
+      const yFilled = !aufgabe.gebenXWert[rowIndex] || currentAnswers[rowIndex].y.trim() !== ''
+      
+      if (xFilled && yFilled) {
+        // Validiere die Zelle
+        const m = aufgabe.m
+        const t = aufgabe.t
+        const tolerance = 0.02
+        let isValid = false
+        
+        if (aufgabe.gebenXWert[rowIndex]) {
+          // X gegeben, y eingegeben
+          const y = parseFloat(currentAnswers[rowIndex].y.replace(',', '.'))
+          if (!isNaN(y)) {
+            const expectedY = aufgabe.yWerte[rowIndex]
+            isValid = Math.abs(y - expectedY) <= tolerance
+          }
+        } else {
+          // Y gegeben, x eingegeben
+          const x = parseFloat(currentAnswers[rowIndex].x.replace(',', '.'))
+          if (!isNaN(x)) {
+            const expectedX = aufgabe.xWerte[rowIndex]
+            isValid = Math.abs(x - expectedX) <= tolerance
+          }
+        }
+        
+        setValidierteZellen({
+          ...validierteZellen,
+          [cellKey]: isValid
+        })
+      } else {
+        // Noch nicht komplett gefüllt, clear validation
+        const cellKey = `${aufgabeIndex}-${rowIndex}`
+        const newValidierteZellen = { ...validierteZellen }
+        delete newValidierteZellen[cellKey]
+        setValidierteZellen(newValidierteZellen)
+      }
+    }
+    
     setAntworten({
       ...antworten,
       [aufgabeIndex]: currentAnswers
@@ -312,14 +402,26 @@ export default function Wertetabelle() {
                       <tr>
                         <th>x</th>
                         {aufgabe.xWerte.map((x: number, i: number) => (
-                          <td key={`x-${i}`} className={styles.xCell}>{x}</td>
+                          <td key={`x-${i}`}>
+                            {aufgabe.gebenXWert[i] ? (
+                              <span className={styles.givenValue}>{x}</span>
+                            ) : (
+                              <input
+                                type="text"
+                                placeholder="?"
+                                value={antworten[index]?.[i]?.x || ''}
+                                onChange={(e) => updateTableValue(index, i, 'x', e.target.value)}
+                                className={`${styles.tableInput} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
+                              />
+                            )}
+                          </td>
                         ))}
                       </tr>
                       <tr className={styles.yRow}>
                         <th>y</th>
                         {aufgabe.yWerte.map((y: number, i: number) => (
                           <td key={`y-${i}`}>
-                            {aufgabe.gebenY[i] ? (
+                            {!aufgabe.gebenXWert[i] ? (
                               <span className={styles.givenValue}>{y}</span>
                             ) : (
                               <input
@@ -327,7 +429,7 @@ export default function Wertetabelle() {
                                 placeholder="?"
                                 value={antworten[index]?.[i]?.y || ''}
                                 onChange={(e) => updateTableValue(index, i, 'y', e.target.value)}
-                                className={styles.tableInput}
+                                className={`${styles.tableInput} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
                               />
                             )}
                           </td>
