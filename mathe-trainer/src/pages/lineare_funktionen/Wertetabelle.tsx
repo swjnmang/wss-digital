@@ -67,18 +67,35 @@ function generateRechenbeispiele(m: number, t: number): Array<{ x: number; y: nu
   // Wähle 2 verschiedene zufällige x-Werte
   const xWerte = new Set<number>()
   while (xWerte.size < 2) {
-    xWerte.add(randInt(-3, 3))
+    const x = randInt(-3, 3)
+    xWerte.add(x)
   }
   
   xWerte.forEach(x => {
     const y = Math.round((m * x + t) * 100) / 100
     
-    // Formatiere die Berechnung
-    let berechnung = `y = ${m} \\cdot ${x} + ${t}`
-    if (m === 1) berechnung = `y = ${x} + ${t}`
-    else if (m === -1) berechnung = `y = -${x} + ${t}`
+    // Formatiere die Berechnung mathematisch
+    let berechnung = ''
     
-    berechnung += ` = ${y}`
+    // Formatiere m * x
+    let mxPart = ''
+    if (m === 1) {
+      mxPart = `${x}`
+    } else if (m === -1) {
+      mxPart = `-${x}`
+    } else {
+      mxPart = `${m} \\cdot ${x}`
+    }
+    
+    // Formatiere t mit Vorzeichen
+    let tPart = ''
+    if (t > 0) {
+      tPart = `+ ${t}`
+    } else if (t < 0) {
+      tPart = `- ${Math.abs(t)}`
+    }
+    
+    berechnung = `y = ${mxPart} ${tPart} = ${y}`
     
     beispiele.push({ x, y, berechnung })
   })
@@ -110,6 +127,7 @@ const aufgabenBanks = {
   // Typ 2: Teilweise gefüllte Wertetabelle vervollständigen
   teilweisgefülltVervollständigen: () => {
     const { m, t } = generateRandomMT()
+    const rechenbeispiele = generateRechenbeispiele(m, t)
     
     // Generiere 5 Wertepaare mit zufälligen x-Werten
     const xWerte: number[] = []
@@ -142,7 +160,8 @@ const aufgabenBanks = {
       xWerte,
       yWerte,
       gebenXWert, // true = x gegeben, y versteckt; false = y gegeben, x versteckt
-      lösungsweg: `Nutze die Funktionsgleichung ${formatEquationLatex(m, t)} und berechne den fehlenden Wert (x oder y) aus dem gegebenen Wert.`
+      lösungsweg: `Nutze die Funktionsgleichung ${formatEquationLatex(m, t)} und berechne den fehlenden Wert (x oder y) aus dem gegebenen Wert.`,
+      rechenbeispiele
     }
   }
 }
@@ -534,6 +553,20 @@ export default function Wertetabelle() {
                 <div className={styles.lösungBox}>
                   <h4>Tipp:</h4>
                   <MathDisplay latex={aufgabe.lösungsweg} />
+                  
+                  {/* Rechenbeispiele */}
+                  {aufgabe.rechenbeispiele && aufgabe.rechenbeispiele.length > 0 && (
+                    <div className={styles.rechenbeispiele}>
+                      <h5>Rechenbeispiele:</h5>
+                      {aufgabe.rechenbeispiele.map((beispiel: any, i: number) => (
+                        <div key={i} className={styles.beispiel}>
+                          <MathDisplay latex={`$$${beispiel.berechnung}$$`} />
+                          <p className={styles.beispielText}>→ Punkt: ({beispiel.x} | {beispiel.y})</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
                   {aufgabe.typ === 'teilweisgefülltVervollständigen' && (
                     <div className={styles.lösungTabelle}>
                       <table className={styles.wertetabelle}>
@@ -541,13 +574,13 @@ export default function Wertetabelle() {
                           <tr>
                             <th>x</th>
                             {aufgabe.xWerte.map((x: number, i: number) => (
-                              <td key={`sol-x-${i}`} className={styles.xCell}>{x}</td>
+                              <td key={`sol-x-${i}`} className={!aufgabe.gebenXWert[i] ? styles.sollution : styles.xCell}>{x}</td>
                             ))}
                           </tr>
                           <tr className={styles.yRow}>
                             <th>y</th>
                             {aufgabe.yWerte.map((y: number, i: number) => (
-                              <td key={`sol-y-${i}`} className={!aufgabe.gebenY[i] ? styles.sollution : ''}>
+                              <td key={`sol-y-${i}`} className={aufgabe.gebenXWert[i] ? styles.sollution : ''}>
                                 {y}
                               </td>
                             ))}
