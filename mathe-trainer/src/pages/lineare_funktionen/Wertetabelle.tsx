@@ -567,15 +567,45 @@ export default function Wertetabelle() {
                   {aufgabe.rechenbeispiele && aufgabe.rechenbeispiele.length > 0 && (
                     <div className={styles.rechenbeispiele}>
                       <h5>Rechenbeispiele:</h5>
-                      {aufgabe.rechenbeispiele.map((beispiel: any, i: number) => (
-                        <div key={i} className={styles.beispiel}>
-                          <p className={styles.beispielErklaerung}>
-                            Wir setzen für x = <span className={styles.xWertRot}>{beispiel.x}</span> ein:
-                          </p>
-                          <p className={styles.berechnung}>{beispiel.berechnung}</p>
-                          <p className={styles.beispielText}>→ Punkt: ({beispiel.x} | {beispiel.y})</p>
-                        </div>
-                      ))}
+                      {aufgabe.rechenbeispiele.map((beispiel: any, i: number) => {
+                        const m = aufgabe.m
+                        const t = aufgabe.t
+                        const x = beispiel.x
+                        const y = beispiel.y
+                        
+                        // Formatiere x-Wert mit Klammern wenn negativ
+                        const xDisplay = x < 0 ? `(-${Math.abs(x)})` : `${x}`
+                        
+                        // Baue m · x Teil (mit speziellen Fällen für m=1, m=-1)
+                        let mxText = ''
+                        if (m === 1) {
+                          mxText = xDisplay
+                        } else if (m === -1) {
+                          mxText = '-' + xDisplay
+                        } else {
+                          mxText = m + ' · ' + xDisplay
+                        }
+                        
+                        // t Teil mit Vorzeichen
+                        let tText = ''
+                        if (t > 0) {
+                          tText = '+ ' + t
+                        } else if (t < 0) {
+                          tText = '- ' + Math.abs(t)
+                        }
+                        
+                        return (
+                          <div key={i} className={styles.beispiel}>
+                            <p className={styles.beispielErklaerung}>
+                              Wir setzen für x = <span className={styles.xWertRot}>{beispiel.x}</span> ein:
+                            </p>
+                            <p className={styles.berechnung}>
+                              y = {m} · <span className={styles.xWertRot}>{xDisplay}</span> {tText} = {y}
+                            </p>
+                            <p className={styles.beispielText}>→ Punkt: ({beispiel.x} | {beispiel.y})</p>
+                          </div>
+                        )
+                      })}
                     </div>
                   )}
                   
