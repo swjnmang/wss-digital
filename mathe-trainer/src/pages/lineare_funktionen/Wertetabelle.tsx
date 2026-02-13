@@ -19,21 +19,60 @@ function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+// Generiert zufällige m und t Werte im Bereich -10 bis 10 mit Schrittweite 0.5
+function generateRandomMT() {
+  const möglicheWerte = []
+  for (let v = -10; v <= 10; v += 0.5) {
+    möglicheWerte.push(Math.round(v * 10) / 10)
+  }
+  
+  let m = möglicheWerte[randInt(0, möglicheWerte.length - 1)]
+  let t = möglicheWerte[randInt(0, möglicheWerte.length - 1)]
+  
+  // m darf nicht 0 sein
+  while (m === 0) {
+    m = möglicheWerte[randInt(0, möglicheWerte.length - 1)]
+  }
+  
+  return { m, t }
+}
+
+// Formatiert die Funktionsgleichung korrekt
+function formatEquation(m: number, t: number): string {
+  let equation = `y = ${m}x`
+  
+  if (t !== 0) {
+    equation += t > 0 ? ` + ${t}` : ` - ${Math.abs(t)}`
+  }
+  
+  return equation
+}
+
+// LaTeX-Version für MathJax
+function formatEquationLatex(m: number, t: number): string {
+  let equation = `y = ${m}x`
+  
+  if (t !== 0) {
+    equation += t > 0 ? ` + ${t}` : ` - ${Math.abs(t)}`
+  }
+  
+  return `$$${equation}$$`
+}
+
 // ===== Aufgabengenerator =====
 const aufgabenBanks = {
   // Typ 1: Völlig leere Wertetabelle ausfüllen
   leereTabelleAusfüllen: () => {
-    const slopes = [-3, -2.5, -2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2, 2.5, 3]
-    const m = slopes[randInt(0, slopes.length - 1)]
-    const t = randInt(-3, 3)
+    const { m, t } = generateRandomMT()
     
     return {
       typ: 'leereTabelleAusfüllen',
       thema: '1. Wertetabelle aus Funktionsgleichung',
-      frage: `Gegeben ist die Funktionsgleichung y = ${m}x ${t >= 0 ? '+' : ''} ${t === 0 ? '' : Math.abs(t)}. Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.`,
+      frage: `Gegeben ist die Funktionsgleichung ${formatEquation(m, t)}. Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.`,
       m,
       t,
-      funktionsgleichung: `y = ${m}x ${t >= 0 ? '+' : ''} ${t === 0 ? '' : Math.abs(t)}`,
+      funktionsgleichung: formatEquation(m, t),
+      funktionsgleichungLatex: formatEquationLatex(m, t),
       numZeilen: 4,
       lösungsweg: `Setze verschiedene x-Werte in die Funktionsgleichung ein und berechne die entsprechenden y-Werte.`
     }
@@ -41,9 +80,7 @@ const aufgabenBanks = {
 
   // Typ 2: Teilweise gefüllte Wertetabelle vervollständigen
   teilweisgefülltVervollständigen: () => {
-    const slopes = [-3, -2.5, -2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2, 2.5, 3]
-    const m = slopes[randInt(0, slopes.length - 1)]
-    const t = randInt(-3, 3)
+    const { m, t } = generateRandomMT()
     
     // X-Werte fix
     const xWerte = [-2, -1, 0, 1, 2]
@@ -62,15 +99,16 @@ const aufgabenBanks = {
     return {
       typ: 'teilweisgefülltVervollständigen',
       thema: '2. Wertetabelle vervollständigen',
-      frage: `Vervollständige die Wertetabelle für die Funktionsgleichung y = ${m}x ${t >= 0 ? '+' : ''} ${t === 0 ? '' : Math.abs(t)}.`,
+      frage: `Vervollständige die Wertetabelle für die Funktionsgleichung ${formatEquation(m, t)}.`,
       m,
       t,
-      funktionsgleichung: `y = ${m}x ${t >= 0 ? '+' : ''} ${t === 0 ? '' : Math.abs(t)}`,
+      funktionsgleichung: formatEquation(m, t),
+      funktionsgleichungLatex: formatEquationLatex(m, t),
       xWerte,
       yWerte,
       gebenY: yWerte.map((_, idx) => !verstecktIndizes.includes(idx)),
       verstecktIndizes,
-      lösungsweg: `Setze die x-Werte in die Funktionsgleichung ein: $$y = ${m} \\cdot x ${t >= 0 ? '+' : ''} ${t === 0 ? '' : Math.abs(t)}$$`
+      lösungsweg: `Setze die x-Werte in die Funktionsgleichung ein: ${formatEquationLatex(m, t)}`
     }
   }
 }
@@ -82,6 +120,7 @@ interface Aufgabe {
   m: number
   t: number
   funktionsgleichung: string
+  funktionsgleichungLatex: string
   [key: string]: any
 }
 
@@ -104,15 +143,16 @@ export default function Wertetabelle() {
     document.head.appendChild(mathjaxScript)
   }, [])
 
-  // 10 vermischte Aufgaben generieren
+  // 10 vermischte Aufgaben generieren (unterschiedliche m/t Kombinationen)
   function generiereAufgaben() {
     const neue: Aufgabe[] = []
-    const themen = Object.keys(aufgabenBanks) as (keyof typeof aufgabenBanks)[]
     
-    // Zufällig Themen auswählen
+    // Generiere 10 verschiedene Aufgaben mit zufälligen m/t
     for (let i = 0; i < 10; i++) {
-      const thema = themen[randInt(0, themen.length - 1)]
-      neue.push(aufgabenBanks[thema]())
+      // Zufällig zwischen Typ 1 und Typ 2 wählen
+      const typ = Math.random() > 0.5 ? 'leereTabelleAusfüllen' : 'teilweisgefülltVervollständigen'
+      const aufgabenGenerator = aufgabenBanks[typ as keyof typeof aufgabenBanks]
+      neue.push(aufgabenGenerator())
     }
     
     setAufgaben(neue)
@@ -196,7 +236,6 @@ export default function Wertetabelle() {
       [aufgabeIndex]: currentAnswers
     })
     
-    // Validate button wird angeklickt, nicht auto-validate
     setValidiert({ ...validiert, [aufgabeIndex]: false })
   }
 
@@ -222,7 +261,7 @@ export default function Wertetabelle() {
             <div className={styles.content}>
               <p className={styles.frage}>{aufgabe.frage}</p>
               
-              <MathDisplay latex={`$$${aufgabe.funktionsgleichung}$$`} />
+              <MathDisplay latex={aufgabe.funktionsgleichungLatex} />
 
               {/* Typ 1: Leere Wertetabelle */}
               {aufgabe.typ === 'leereTabelleAusfüllen' && (
