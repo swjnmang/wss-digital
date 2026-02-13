@@ -310,3 +310,15 @@
   color: #374151;
   font-size: 0.9rem;
 }
+
+.beispielErklaerung {
+  margin: 0 0 0.5rem 0;
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.xWertRot {
+  color: #dc2626;
+  font-weight: 700;
+}

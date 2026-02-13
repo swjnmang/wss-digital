@@ -560,6 +560,9 @@ export default function Wertetabelle() {
                       <h5>Rechenbeispiele:</h5>
                       {aufgabe.rechenbeispiele.map((beispiel: any, i: number) => (
                         <div key={i} className={styles.beispiel}>
+                          <p className={styles.beispielErklaerung}>
+                            Wir setzen für x = <span className={styles.xWertRot}>{beispiel.x}</span> ein:
+                          </p>
                           <MathDisplay latex={`$$${beispiel.berechnung}$$`} />
                           <p className={styles.beispielText}>→ Punkt: ({beispiel.x} | {beispiel.y})</p>
                         </div>
