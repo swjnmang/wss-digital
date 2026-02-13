@@ -1,5 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import styles from './Funktionsgleichung.module.css'
+
+// MathJax-Komponente
+const MathDisplay = ({ latex }: { latex: string }) => {
+  const ref = useRef<HTMLDivElement>(null)
+  
+  useEffect(() => {
+    if (ref.current && (window as any).MathJax) {
+      (window as any).MathJax.contentDocument = document
+      ;(window as any).MathJax.typesetPromise?.([ref.current]).catch((err: any) => console.log(err))
+    }
+  }, [latex])
+  
+  return <div ref={ref} className={styles.mathDisplay}>{latex}</div>
+}
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -15,6 +29,19 @@ export default function Funktionsgleichung(){
   const [tInput, setTInput] = useState('')
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
+
+  // MathJax laden
+  useEffect(() => {
+    const script = document.createElement('script')
+    script.src = 'https://polyfill.io/v3/polyfill.min.js?features=es6'
+    document.head.appendChild(script)
+
+    const mathjaxScript = document.createElement('script')
+    mathjaxScript.id = 'MathJax-script'
+    mathjaxScript.async = true
+    mathjaxScript.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+    document.head.appendChild(mathjaxScript)
+  }, [])
 
   useEffect(() => {
     const m = (p2.y - p1.y) / (p2.x - p1.x)
@@ -63,10 +90,10 @@ export default function Funktionsgleichung(){
     }
     const ok = Math.abs(mi - mCorrect) < 0.02 && Math.abs(ti - tCorrect) < 0.02
     if (ok) {
-      setFeedback('Richtig! Die Funktionsgleichung lautet y = ' + mCorrect + 'x ' + (tCorrect >= 0 ? '+ ' + tCorrect : '- ' + Math.abs(tCorrect)))
+      setFeedback('✓ Richtig!')
       setShowSolution(false)
     } else {
-      setFeedback('Leider nicht korrekt. Versuche es noch einmal oder zeige die Lösung.')
+      setFeedback('✗ Leider nicht korrekt. Versuche es noch einmal oder zeige die Lösung.')
       setShowSolution(false)
     }
   }
@@ -103,19 +130,36 @@ export default function Funktionsgleichung(){
           <label>t = <input value={tInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTInput(e.target.value)} className={styles.input} placeholder="y-Achsenabschnitt" /></label>
         </div>
 
+        {feedback && (
+          <div className={`${styles.feedback} ${feedback.includes('✓') ? styles.success : styles.error}`}>
+            {feedback}
+          </div>
+        )}
+
         <div className={styles.actions}>
           <button onClick={check} className={styles.primary}>Lösung prüfen</button>
           <button onClick={showSol} className={styles.secondary}>Lösung anzeigen</button>
         </div>
 
-        {feedback && <div className={styles.feedback}>{feedback}</div>}
-
         {showSolution && (
-          <div className={styles.solution}>
-            <h3>Lösungsschritte</h3>
-            <p>1) Steigung berechnen: m = (y₂ - y₁) / (x₂ - x₁) = {( (p2.y - p1.y) / (p2.x - p1.x) ).toFixed(2)}</p>
-            <p>2) y-Achsenabschnitt: t = y₁ - m x₁ = {( (p1.y - ((p2.y - p1.y) / (p2.x - p1.x)) * p1.x) ).toFixed(2)}</p>
-            <p>Gleichung: y = {mCorrect}x {tCorrect >= 0 ? '+ ' + tCorrect : '- ' + Math.abs(tCorrect)}</p>
+          <div className={styles.solutionOutput}>
+            <h3 className={styles.solutionTitle}>Lösungsweg</h3>
+            <div className={styles.solutionStep}>
+              {mode === 'twoPoints' ? (
+                <>
+                  <MathDisplay latex={`$$P_1(${p1.x}|${p1.y}) \\quad P_2(${p2.x}|${p2.y})$$`} />
+                  <MathDisplay latex={`$$m = \\dfrac{${p2.y} - (${p1.y})}{${p2.x} - (${p1.x})} = \\dfrac{${p2.y - p1.y}}{${p2.x - p1.x}} = ${mCorrect}$$`} />
+                </>
+              ) : (
+                <>
+                  <MathDisplay latex={`$$P(${p1.x}|${p1.y}) \\quad m = ${(p2.y - p1.y) / (p2.x - p1.x)}$$`} />
+                </>
+              )}
+              <MathDisplay latex={`$$t = y_1 - m \\cdot x_1 = ${p1.y} - ${mCorrect} \\cdot ${p1.x} = ${tCorrect}$$`} />
+            </div>
+            <div className={styles.answerBox}>
+              <MathDisplay latex={`$$y = ${mCorrect}x ${tCorrect >= 0 ? '+' : '-'} ${Math.abs(tCorrect)}$$`} />
+            </div>
           </div>
         )}
       </div>
