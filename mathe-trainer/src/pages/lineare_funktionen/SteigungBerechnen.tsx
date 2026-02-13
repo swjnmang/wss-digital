@@ -20,6 +20,13 @@ function randomInt(max: number, min = 0) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+// Erlaubte Steigungswerte für Graph-Aufgaben
+const allowedSlopes = [-3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3] as const
+
+function getRandomSlope() {
+  return allowedSlopes[Math.floor(Math.random() * allowedSlopes.length)]
+}
+
 // Formatiere Brüche mathematisch korrekt mit echtem Bruchstrich
 function FractionDisplay({ numerator, denominator }: { numerator: number; denominator: number }) {
   if (denominator === 0) return <>undefined</>
@@ -99,10 +106,10 @@ export default function SteigungBerechnen() {
     setPoint2Input({ x: '', y: '' })
     
     // Generiere zufällige Steigung und Intercept
-    const m = randomInt(3, -3)
+    const m = getRandomSlope()
     const t = randomInt(4, -4)
     
-    setGraphM(m || 1)
+    setGraphM(m)
     setGraphT(t)
   }
 
