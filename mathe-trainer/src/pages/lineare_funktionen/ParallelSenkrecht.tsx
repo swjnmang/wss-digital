@@ -232,7 +232,7 @@ export default function ParallelSenkrecht() {
       <div className={styles.header}>
         <h1 className={styles.title}>Parallele und senkrechte Geraden</h1>
         <p className={styles.subtitle}>
-          Untersuche Beziehungen zwischen Geraden rechnerisch
+          Untersuche die Beziehungen zwischen Geraden rechnerisch
         </p>
       </div>
 
