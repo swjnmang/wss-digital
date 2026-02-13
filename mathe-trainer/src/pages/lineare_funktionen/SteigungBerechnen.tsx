@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import styles from './SteigungBerechnen.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
 
@@ -6,20 +6,27 @@ function randomInt(max: number, min = 0) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-// Formatiere Brüche mathematisch korrekt
-function formatFraction(numerator: number, denominator: number): string {
-  if (denominator === 0) return 'undefined'
-  if (denominator === 1) return numerator.toString()
+// Formatiere Brüche mathematisch korrekt mit echtem Bruchstrich
+function FractionDisplay({ numerator, denominator }: { numerator: number; denominator: number }) {
+  if (denominator === 0) return <>undefined</>
+  if (denominator === 1) return <>{numerator}</>
+  
   const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b)
   const divisor = gcd(Math.abs(numerator), Math.abs(denominator))
   const num = numerator / divisor
   const den = denominator / divisor
   
   // Negatives Vorzeichen nach oben
-  if (den < 0) {
-    return `−${Math.abs(num)}/${Math.abs(den)}`
-  }
-  return `${num}/${den}`
+  const finalNum = den < 0 ? -num : num
+  const finalDen = Math.abs(den)
+  
+  return (
+    <span className={styles.fraction}>
+      <span className={styles.numerator}>{finalNum}</span>
+      <span className={styles.fractionLine}></span>
+      <span className={styles.denominator}>{finalDen}</span>
+    </span>
+  )
 }
 
 export default function SteigungBerechnen() {
@@ -30,31 +37,26 @@ export default function SteigungBerechnen() {
   const [input, setInput] = useState('')
   const [feedback, setFeedback] = useState<string>('')
   const [streak, setStreak] = useState(0)
-  const [solutionSteps, setSolutionSteps] = useState<string>('')
   const [showSolution, setShowSolution] = useState(false)
 
   // Graph-Aufgabe State
-  const [graphP1, setGraphP1] = useState({ x: -2, y: -4 })
-  const [graphP2, setGraphP2] = useState({ x: 3, y: 6 })
   const [graphM, setGraphM] = useState(2)
   const [graphT, setGraphT] = useState(0)
   const [graphInput, setGraphInput] = useState('')
   const [graphFeedback, setGraphFeedback] = useState('')
   const [graphShowSolution, setGraphShowSolution] = useState(false)
+  const [selectedPoints, setSelectedPoints] = useState<Array<{x: number, y: number}>>([])
+  const [selectionMode, setSelectionMode] = useState(false)
+  const [instruction, setInstruction] = useState('Gib die Koordinaten von zwei Punkten ein, die auf der Geraden liegen.')
+  const [point1Input, setPoint1Input] = useState({ x: '', y: '' })
+  const [point2Input, setPoint2Input] = useState({ x: '', y: '' })
 
-  const graphCorrectSlope = (graphP2.y - graphP1.y) / (graphP2.x - graphP1.x)
+  const graphCorrectSlope = selectedPoints.length === 2 
+    ? (selectedPoints[1].y - selectedPoints[0].y) / (selectedPoints[1].x - selectedPoints[0].x)
+    : 0
 
   useEffect(() => {
     setCorrectSlope((p2.y - p1.y) / (p2.x - p1.x))
-    const deltaY = p2.y - p1.y
-    const deltaX = p2.x - p1.x
-    const slope = deltaY / deltaX
-    const roundedSlope = Math.round(slope * 100) / 100
-    
-    const fractionStr = formatFraction(deltaY, deltaX)
-    setSolutionSteps(
-      `m = (y₂ - y₁) / (x₂ - x₁)\nm = (${p2.y} - (${p1.y})) / (${p2.x} - (${p1.x}))\nm = ${deltaY} / ${deltaX}\nm = ${fractionStr}\nm ≈ ${roundedSlope}`
-    )
   }, [p1, p2])
 
   function generateNewTask() {
@@ -76,26 +78,53 @@ export default function SteigungBerechnen() {
     setGraphFeedback('')
     setGraphInput('')
     setGraphShowSolution(false)
+    setSelectedPoints([])
+    setSelectionMode(true)
+    setInstruction('Gib die Koordinaten von zwei Punkten ein, die auf der Geraden liegen.')
+    setPoint1Input({ x: '', y: '' })
+    setPoint2Input({ x: '', y: '' })
     
-    // Generiere zufällige Steigung (-3 bis 3) und Intercept (-4 bis 4)
+    // Generiere zufällige Steigung und Intercept
     const m = randomInt(3, -3)
     const t = randomInt(4, -4)
     
     setGraphM(m || 1)
     setGraphT(t)
+  }
+
+  function addGraphPoint1() {
+    if (!point1Input.x || !point1Input.y) {
+      setGraphFeedback('Bitte gib beide Koordinaten für Punkt 1 ein.')
+      return
+    }
+    const x = parseFloat(point1Input.x.replace(',', '.'))
+    const y = parseFloat(point1Input.y.replace(',', '.'))
     
-    // Generiere zwei zufällige Punkte auf der Geraden
-    let x1, x2
-    do {
-      x1 = randomInt(5, -5)
-      x2 = randomInt(5, -5)
-    } while (x1 === x2)
+    if (isNaN(x) || isNaN(y)) {
+      setGraphFeedback('Ungültige Koordinaten für Punkt 1.')
+      return
+    }
     
-    const y1 = (m || 1) * x1 + t
-    const y2 = (m || 1) * x2 + t
+    setSelectedPoints([{ x, y }])
+    setInstruction(`Punkt 1 ausgewählt: (${x}|${y}) - Gib nun Punkt 2 ein.`)
+  }
+
+  function addGraphPoint2() {
+    if (!point2Input.x || !point2Input.y) {
+      setGraphFeedback('Bitte gib beide Koordinaten für Punkt 2 ein.')
+      return
+    }
+    const x = parseFloat(point2Input.x.replace(',', '.'))
+    const y = parseFloat(point2Input.y.replace(',', '.'))
     
-    setGraphP1({ x: x1, y: y1 })
-    setGraphP2({ x: x2, y: y2 })
+    if (isNaN(x) || isNaN(y)) {
+      setGraphFeedback('Ungültige Koordinaten für Punkt 2.')
+      return
+    }
+    
+    setSelectedPoints([...selectedPoints, { x, y }])
+    setSelectionMode(false)
+    setInstruction('Berechne jetzt die Steigung!')
   }
 
   function checkSolution() {
@@ -120,6 +149,10 @@ export default function SteigungBerechnen() {
   }
 
   function checkGraphSolution() {
+    if (selectedPoints.length !== 2) {
+      setGraphFeedback('Bitte wähle zuerst zwei Punkte im Graphen aus.')
+      return
+    }
     if (graphInput.trim() === '') {
       setGraphFeedback('Bitte gib die Steigung ein.')
       return
@@ -149,6 +182,9 @@ export default function SteigungBerechnen() {
     setGraphShowSolution(true)
     setStreak(0)
   }
+
+  const deltaY = selectedPoints.length === 2 ? selectedPoints[1].y - selectedPoints[0].y : 0
+  const deltaX = selectedPoints.length === 2 ? selectedPoints[1].x - selectedPoints[0].x : 0
 
   return (
     <div className={`prose ${styles.container}`}>
@@ -202,9 +238,17 @@ export default function SteigungBerechnen() {
             </div>
 
             {showSolution && (
-              <pre className={styles.solutionOutput}>
-                {solutionSteps}
-              </pre>
+              <div className={styles.solutionOutput}>
+                <p><strong>Allgemeine Formel:</strong></p>
+                <p>
+                  m = <FractionDisplay numerator={p2.y - p1.y} denominator={p2.x - p1.x} />
+                </p>
+                <p><strong>Eingesetzt:</strong></p>
+                <p>
+                  m = <FractionDisplay numerator={p2.y - p1.y} denominator={p2.x - p1.x} />
+                </p>
+                <p><strong>Dezimal:</strong> m ≈ {Math.round(((p2.y - p1.y) / (p2.x - p1.x)) * 100) / 100}</p>
+              </div>
             )}
           </div>
         )}
@@ -213,17 +257,93 @@ export default function SteigungBerechnen() {
         {taskType === 'graph' && (
           <div>
             <div className={styles.taskBox}>
-              <p className={styles.taskDescription}>Wähle zwei Punkte auf dem Funktionsgraph aus und berechne die Steigung m.</p>
+              <p className={styles.taskDescription}>{instruction}</p>
             </div>
 
             <div className={styles.graphContainer}>
               <GeoGebraGraph m={graphM} t={graphT} width={600} height={600} />
             </div>
 
-            <div className={styles.pointsDisplay}>
-              <span>Punkt 1: ({graphP1.x}|{graphP1.y})</span>
-              <span>Punkt 2: ({graphP2.x}|{graphP2.y})</span>
-            </div>
+            {/* Point Input Section */}
+            {selectionMode && selectedPoints.length < 2 && (
+              <div className={styles.pointInputSection}>
+                {selectedPoints.length === 0 && (
+                  <div className={styles.pointInputBox}>
+                    <p className={styles.pointInputLabel}>Punkt 1: (x | y)</p>
+                    <div className={styles.pointInputRow}>
+                      <input 
+                        type="number" 
+                        step="0.1"
+                        value={point1Input.x} 
+                        onChange={(e) => setPoint1Input({...point1Input, x: e.target.value})} 
+                        className={styles.coordInput} 
+                        placeholder="x" 
+                      />
+                      <span>|</span>
+                      <input 
+                        type="number" 
+                        step="0.1"
+                        value={point1Input.y} 
+                        onChange={(e) => setPoint1Input({...point1Input, y: e.target.value})} 
+                        className={styles.coordInput} 
+                        placeholder="y" 
+                      />
+                      <button onClick={addGraphPoint1} className={styles.addPointBtn}>Punkt 1 annehmen</button>
+                    </div>
+                  </div>
+                )}
+
+                {selectedPoints.length === 1 && (
+                  <div className={styles.pointInputBox}>
+                    <p className={styles.pointInputLabel}>Punkt 2: (x | y)</p>
+                    <div className={styles.pointInputRow}>
+                      <input 
+                        type="number" 
+                        step="0.1"
+                        value={point2Input.x} 
+                        onChange={(e) => setPoint2Input({...point2Input, x: e.target.value})} 
+                        className={styles.coordInput} 
+                        placeholder="x" 
+                      />
+                      <span>|</span>
+                      <input 
+                        type="number" 
+                        step="0.1"
+                        value={point2Input.y} 
+                        onChange={(e) => setPoint2Input({...point2Input, y: e.target.value})} 
+                        className={styles.coordInput} 
+                        placeholder="y" 
+                      />
+                      <button onClick={addGraphPoint2} className={styles.addPointBtn}>Punkt 2 annehmen</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {selectedPoints.length > 0 && (
+              <div className={styles.pointsDisplay}>
+                {selectedPoints.map((point, idx) => (
+                  <span key={idx}>Punkt {idx + 1}: ({point.x}|{point.y})</span>
+                ))}
+                <button 
+                  onClick={() => generateNewGraphTask()} 
+                  className={styles.resetPointsBtn}
+                >
+                  Punkte neu eingeben
+                </button>
+              </div>
+            )}
+
+            {selectedPoints.length === 2 && (
+              <div className={styles.calculationBox}>
+                <p><strong>Steigung berechnen:</strong></p>
+                <p>
+                  m = <FractionDisplay numerator={deltaY} denominator={deltaX} />
+                </p>
+                <p><strong>Dezimal:</strong> m = {Math.round(graphCorrectSlope * 100) / 100}</p>
+              </div>
+            )}
 
             <div className={styles.inputContainer}>
               <span>m =</span>
@@ -243,14 +363,16 @@ export default function SteigungBerechnen() {
               <button onClick={onShowGraphAnswer} className={styles.btnSecondary}>Lösung anzeigen</button>
             </div>
 
-            {graphShowSolution && (
+            {graphShowSolution && selectedPoints.length === 2 && (
               <div className={styles.solutionOutput}>
-                <p><strong>Steigung berechnet aus:</strong></p>
-                <p>m = (y₂ - y₁) / (x₂ - x₁)</p>
-                <p>m = ({graphP2.y} - ({graphP1.y})) / ({graphP2.x} - ({graphP1.x}))</p>
-                <p>m = {graphP2.y - graphP1.y} / {graphP2.x - graphP1.x}</p>
-                <p>m = {formatFraction(graphP2.y - graphP1.y, graphP2.x - graphP1.x)}</p>
-                <p>m ≈ {Math.round(graphCorrectSlope * 100) / 100}</p>
+                <p><strong>Du hast die Punkte richtig gewählt:</strong></p>
+                <p>Punkt 1: ({selectedPoints[0].x}|{selectedPoints[0].y})</p>
+                <p>Punkt 2: ({selectedPoints[1].x}|{selectedPoints[1].y})</p>
+                <p><strong>Steigung berechnet:</strong></p>
+                <p>
+                  m = <FractionDisplay numerator={deltaY} denominator={deltaX} />
+                </p>
+                <p><strong>Dezimal:</strong> m = {Math.round(graphCorrectSlope * 100) / 100}</p>
               </div>
             )}
           </div>

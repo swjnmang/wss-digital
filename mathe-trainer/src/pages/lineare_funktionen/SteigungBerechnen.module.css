@@ -10,6 +10,34 @@
   padding: 1.25rem;
   box-shadow: 0 6px 24px rgba(0,0,0,0.08);
   border: 1px solid #e6e6e6;
+  position: relative;
+}
+
+/* Bruchdarstellung */
+.fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0 4px;
+  font-size: 1.1em;
+}
+
+.numerator {
+  display: block;
+  line-height: 1;
+}
+
+.fractionLine {
+  display: block;
+  width: 30px;
+  height: 2px;
+  background: currentColor;
+}
+
+.denominator {
+  display: block;
+  line-height: 1;
 }
 
 .typeToggle {
@@ -162,13 +190,26 @@
   margin-top: 1rem;
   text-align: left;
   border-left: 4px solid #16a34a;
-  font-family: 'Courier New', monospace;
-  line-height: 1.6;
+  line-height: 1.8;
   color: #1b5e20;
 }
 
 .solutionOutput p {
   margin: 0.5rem 0;
+}
+
+.calculationBox {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 4px solid #3b82f6;
+  line-height: 1.8;
+}
+
+.calculationBox p {
+  margin: 0.5rem 0;
+  font-weight: 500;
 }
 
 .graphContainer {
@@ -187,6 +228,23 @@
   padding: 0.75rem;
   border-radius: 6px;
   flex-wrap: wrap;
+  align-items: center;
+}
+
+.resetPointsBtn {
+  padding: 0.5rem 0.75rem;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.resetPointsBtn:hover {
+  background: #dc2626;
 }
 
 .streak {
@@ -194,4 +252,63 @@
   top: 1rem;
   right: 1rem;
   font-size: 1.5rem;
+}
+
+/* Point Input */
+.pointInputSection {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #fef3c7;
+  border-radius: 8px;
+  border-left: 4px solid #f59e0b;
+}
+
+.pointInputBox {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.pointInputLabel {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.pointInputRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.coordInput {
+  width: 80px;
+  padding: 0.5rem;
+  border: 2px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.coordInput:focus {
+  outline: none;
+  border-color: #f59e0b;
+}
+
+.addPointBtn {
+  padding: 0.5rem 1rem;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.addPointBtn:hover {
+  background: #d97706;
 }
