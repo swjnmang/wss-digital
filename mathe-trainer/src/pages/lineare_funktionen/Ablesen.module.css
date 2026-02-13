@@ -3,9 +3,10 @@
 .card { background:white; padding:1rem; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.06) }
 .svgWrap { display:flex; justify-content:center; margin-bottom:0.75rem; width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; }
 .geoGebraContainer { width: 100%; aspect-ratio: 1 / 1; border: 1px solid #ccc; border-radius: 8px; background: white; }
-.inputRow { display:flex; gap:0.75rem; align-items:center; margin-bottom:0.75rem; justify-content:center }
+.inputRow { display:flex; gap:0.75rem; align-items:center; margin-bottom:0.75rem; justify-content:center; flex-wrap: wrap; }
 .label { font-weight:600 }
 .input { border:1px solid #d1d5db; padding:0.4rem 0.5rem; border-radius:6px; width:100px }
+.equation { font-size:1.1rem; font-weight:600; color:#0366d6; padding:0.5rem 1rem; background:#eff6ff; border-radius:6px; border-left:4px solid #0366d6; }
 .actions { display:flex; gap:0.5rem; justify-content:center }
 .primary { background:#10b981; color:white; padding:0.5rem 0.75rem; border-radius:6px; border:none }
 .secondary { background:#64748b; color:white; padding:0.5rem 0.75rem; border-radius:6px; border:none }

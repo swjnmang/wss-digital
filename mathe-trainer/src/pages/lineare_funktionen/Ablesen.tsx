@@ -305,6 +305,11 @@ export default function Ablesen() {
         <div className={styles.inputRow}>
           <label className={styles.label}>m = <input value={mInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMInput(e.target.value)} className={styles.input} placeholder="z.B. 1.5" /></label>
           <label className={styles.label}>t = <input value={tInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTInput(e.target.value)} className={styles.input} placeholder="z.B. 2" /></label>
+          {mInput && tInput && (
+            <div className={styles.equation}>
+              y = {mInput}x {parseFloat(tInput) >= 0 ? '+' : ''} {tInput}
+            </div>
+          )}
         </div>
 
         <div className={styles.actions}>
