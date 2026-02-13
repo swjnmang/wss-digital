@@ -2,6 +2,20 @@ import React, { useEffect, useState, useRef } from 'react'
 import styles from './SteigungBerechnen.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
 
+// MathJax-Komponente
+const MathDisplay = ({ latex }: { latex: string }) => {
+  const ref = useRef<HTMLDivElement>(null)
+  
+  useEffect(() => {
+    if (ref.current && (window as any).MathJax) {
+      (window as any).MathJax.contentDocument = document
+      ;(window as any).MathJax.typesetPromise?.([ref.current]).catch((err: any) => console.log(err))
+    }
+  }, [latex])
+  
+  return <div ref={ref} className={styles.mathDisplay}>{latex}</div>
+}
+
 function randomInt(max: number, min = 0) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
@@ -212,6 +226,20 @@ export default function SteigungBerechnen() {
   const deltaY = selectedPoints.length === 2 ? selectedPoints[1].y - selectedPoints[0].y : 0
   const deltaX = selectedPoints.length === 2 ? selectedPoints[1].x - selectedPoints[0].x : 0
 
+  useEffect(() => {
+    // MathJax Script laden
+    const script = document.createElement('script')
+    script.src = 'https://polyfill.io/v3/polyfill.min.js?features=es6'
+    script.async = true
+    document.body.appendChild(script)
+
+    const script2 = document.createElement('script')
+    script2.id = 'MathJax-script'
+    script2.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+    script2.async = true
+    document.body.appendChild(script2)
+  }, [])
+
   return (
     <div className={`prose ${styles.container}`}>
       <div className={styles.card}>
@@ -265,15 +293,31 @@ export default function SteigungBerechnen() {
 
             {showSolution && (
               <div className={styles.solutionOutput}>
-                <p><strong>Allgemeine Formel:</strong></p>
-                <p>
-                  m = <FractionDisplay numerator={p2.y - p1.y} denominator={p2.x - p1.x} />
-                </p>
-                <p><strong>Eingesetzt:</strong></p>
-                <p>
-                  m = <FractionDisplay numerator={p2.y - p1.y} denominator={p2.x - p1.x} />
-                </p>
-                <p><strong>Dezimal:</strong> m ≈ {Math.round(((p2.y - p1.y) / (p2.x - p1.x)) * 100) / 100}</p>
+                <h3 className={styles.solutionTitle}>Vollständiger Lösungsweg</h3>
+                
+                <div className={styles.solutionStep}>
+                  <p className={styles.stepTitle}><strong>Schritt 1: Punkte aufschreiben</strong></p>
+                  <MathDisplay latex={`$$P_1(${p1.x}|${p1.y}) \\quad P_2(${p2.x}|${p2.y})$$`} />
+                </div>
+
+                <div className={styles.solutionStep}>
+                  <p className={styles.stepTitle}><strong>Schritt 2: Steigungsformel aufschreiben</strong></p>
+                  <MathDisplay latex="$$m = \\frac{y_2 - y_1}{x_2 - x_1}$$" />
+                </div>
+
+                <div className={styles.solutionStep}>
+                  <p className={styles.stepTitle}><strong>Schritt 3: Werte einsetzen</strong></p>
+                  <MathDisplay latex={`$$m = \\frac{${p2.y} - (${p1.y})}{${p2.x} - (${p1.x})}$$`} />
+                </div>
+
+                <div className={styles.solutionStep}>
+                  <p className={styles.stepTitle}><strong>Schritt 4: Berechnung durchführen</strong></p>
+                  <MathDisplay latex={`$$m = \\frac{${p2.y - p1.y}}{${p2.x - p1.x}} = ${Math.round(((p2.y - p1.y) / (p2.x - p1.x)) * 100) / 100}$$`} />
+                </div>
+
+                <div className={styles.answerBox}>
+                  <MathDisplay latex={`$$\\boxed{m = ${Math.round(((p2.y - p1.y) / (p2.x - p1.x)) * 100) / 100}}$$`} />
+                </div>
               </div>
             )}
           </div>
@@ -361,15 +405,7 @@ export default function SteigungBerechnen() {
               </div>
             )}
 
-            {selectedPoints.length === 2 && (
-              <div className={styles.calculationBox}>
-                <p><strong>Steigung berechnen:</strong></p>
-                <p>
-                  m = <FractionDisplay numerator={deltaY} denominator={deltaX} />
-                </p>
-                <p><strong>Dezimal:</strong> m = {Math.round(graphCorrectSlope * 100) / 100}</p>
-              </div>
-            )}
+
 
             <div className={styles.inputContainer}>
               <span>m =</span>
@@ -391,14 +427,31 @@ export default function SteigungBerechnen() {
 
             {graphShowSolution && selectedPoints.length === 2 && (
               <div className={styles.solutionOutput}>
-                <p><strong>Du hast die Punkte richtig gewählt:</strong></p>
-                <p>Punkt 1: ({selectedPoints[0].x}|{selectedPoints[0].y})</p>
-                <p>Punkt 2: ({selectedPoints[1].x}|{selectedPoints[1].y})</p>
-                <p><strong>Steigung berechnet:</strong></p>
-                <p>
-                  m = <FractionDisplay numerator={deltaY} denominator={deltaX} />
-                </p>
-                <p><strong>Dezimal:</strong> m = {Math.round(graphCorrectSlope * 100) / 100}</p>
+                <h3 className={styles.solutionTitle}>Vollständiger Lösungsweg</h3>
+                
+                <div className={styles.solutionStep}>
+                  <p className={styles.stepTitle}><strong>Schritt 1: Punkte aufschreiben</strong></p>
+                  <MathDisplay latex={`$$P_1(${selectedPoints[0].x}|${selectedPoints[0].y}) \\quad P_2(${selectedPoints[1].x}|${selectedPoints[1].y})$$`} />
+                </div>
+
+                <div className={styles.solutionStep}>
+                  <p className={styles.stepTitle}><strong>Schritt 2: Steigungsformel aufschreiben</strong></p>
+                  <MathDisplay latex="$$m = \\frac{y_2 - y_1}{x_2 - x_1}$$" />
+                </div>
+
+                <div className={styles.solutionStep}>
+                  <p className={styles.stepTitle}><strong>Schritt 3: Werte einsetzen</strong></p>
+                  <MathDisplay latex={`$$m = \\frac{${selectedPoints[1].y} - (${selectedPoints[0].y})}{${selectedPoints[1].x} - (${selectedPoints[0].x})}$$`} />
+                </div>
+
+                <div className={styles.solutionStep}>
+                  <p className={styles.stepTitle}><strong>Schritt 4: Berechnung durchführen</strong></p>
+                  <MathDisplay latex={`$$m = \\frac{${deltaY}}{${deltaX}} = ${Math.round(graphCorrectSlope * 100) / 100}$$`} />
+                </div>
+
+                <div className={styles.answerBox}>
+                  <MathDisplay latex={`$$\\boxed{m = ${Math.round(graphCorrectSlope * 100) / 100}}$$`} />
+                </div>
               </div>
             )}
           </div>

@@ -312,3 +312,45 @@
 .addPointBtn:hover {
   background: #d97706;
 }
+
+/* MathJax Display */
+.mathDisplay {
+  font-size: 1.1rem;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  line-height: 1.8;
+}
+
+/* Solution Steps */
+.solutionTitle {
+  text-align: center;
+  color: #10b981;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 3px solid #10b981;
+  padding-bottom: 0.5rem;
+}
+
+.solutionStep {
+  background: #f9fafb;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 6px;
+  border-left: 4px solid #3b82f6;
+}
+
+.stepTitle {
+  margin: 0 0 0.5rem 0;
+  color: #0c4a6e;
+  font-weight: 600;
+}
+
+.answerBox {
+  background: #dcfce7;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 3px solid #16a34a;
+  margin-top: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+}
