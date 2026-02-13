@@ -74,7 +74,7 @@ function generateRechenbeispiele(m: number, t: number): Array<{ x: number; y: nu
   xWerte.forEach(x => {
     const y = Math.round((m * x + t) * 100) / 100
     
-    // Formatiere x-Wert: Klammern wenn negativ
+    // Formatiere x-Wert mit Klammern wenn negativ
     let xDisplay = ''
     if (x < 0) {
       xDisplay = '(-' + Math.abs(x) + ')'
@@ -82,29 +82,29 @@ function generateRechenbeispiele(m: number, t: number): Array<{ x: number; y: nu
       xDisplay = '' + x
     }
     
-    // Rot gefärbter x-Wert für LaTeX
-    const xRot = '\\textcolor{red}{' + xDisplay + '}'
+    // Baue die Berechnung als normalen Text (kein LaTeX)
+    let berechnung = ''
     
-    // Baue m · x Teil
-    let mxPart = ''
+    // m * x Teil
+    let mxText = ''
     if (m === 1) {
-      mxPart = xRot
+      mxText = xDisplay
     } else if (m === -1) {
-      mxPart = '-' + xRot
+      mxText = '-' + xDisplay
     } else {
-      mxPart = m + ' \\cdot ' + xRot
+      mxText = m + ' · ' + xDisplay
     }
     
-    // Baue t Teil mit Vorzeichen
-    let tPart = ''
+    // t Teil mit Vorzeichen
+    let tText = ''
     if (t > 0) {
-      tPart = '+ ' + t
+      tText = '+ ' + t
     } else if (t < 0) {
-      tPart = '- ' + Math.abs(t)
+      tText = '- ' + Math.abs(t)
     }
     
-    // Komplette Berechnung
-    const berechnung = 'y = ' + mxPart + ' ' + tPart + ' = ' + y
+    // Komplette Berechnung als normaler mathematischer Text
+    berechnung = 'y = ' + mxText + ' ' + tText + ' = ' + y
     
     beispiele.push({ x, y, berechnung })
   })
@@ -572,7 +572,7 @@ export default function Wertetabelle() {
                           <p className={styles.beispielErklaerung}>
                             Wir setzen für x = <span className={styles.xWertRot}>{beispiel.x}</span> ein:
                           </p>
-                          <MathDisplay latex={`$$${beispiel.berechnung}$$`} />
+                          <p className={styles.berechnung}>{beispiel.berechnung}</p>
                           <p className={styles.beispielText}>→ Punkt: ({beispiel.x} | {beispiel.y})</p>
                         </div>
                       ))}

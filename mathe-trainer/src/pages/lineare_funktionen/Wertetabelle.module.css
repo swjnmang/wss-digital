@@ -322,3 +322,11 @@
   color: #dc2626;
   font-weight: 700;
 }
+
+.berechnung {
+  margin: 0.5rem 0;
+  color: #1f2937;
+  font-size: 0.95rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-weight: 500;
+}
