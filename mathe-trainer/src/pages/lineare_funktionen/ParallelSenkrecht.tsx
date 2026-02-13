@@ -21,12 +21,6 @@ function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-function formatEquationLatex(m: number, t: number): string {
-  const tSign = t >= 0 ? '+' : '−'
-  const tAbs = Math.abs(t)
-  return `y = ${m}x \\; ${tSign} \\; ${tAbs}`
-}
-
 // ===== Aufgabengenerator =====
 const aufgabenBanks = {
   // Typ 1: Zwei Funktionsgleichungen - Parallel oder Senkrecht?
@@ -66,17 +60,17 @@ const aufgabenBanks = {
       typ: 'gleichungenPrüfen',
       nummer: 1,
       thema: 'Gleichungen prüfen',
-      frage: `Gegeben sind die Funktionsgleichungen g₁: ${formatEquationLatex(m1, t1)} und g₂: ${formatEquationLatex(Math.round(m2 * 100) / 100, t2)}.\\n\\nPrüfe rechnerisch, ob die Geraden parallel, senkrecht zueinander oder keine spezielle Beziehung haben.`,
+      frage: `Gegeben sind die Funktionsgleichungen g₁: y = ${m1}x ${t1 >= 0 ? '+' : '-'} ${Math.abs(t1)} und g₂: y = ${Math.round(m2 * 100) / 100}x ${t2 >= 0 ? '+' : '-'} ${Math.abs(t2)}.\n\nPrüfe rechnerisch, ob die Geraden parallel, senkrecht zueinander oder keine spezielle Beziehung haben.`,
       m1,
       t1,
       m2: Math.round(m2 * 100) / 100,
       t2,
       beziehung,
       lösungsweg: `
-      Bedingungen:\\n
+      \\text{Bedingungen:}\\n
       \\text{Parallel:} \\quad m_1 = m_2\\n
       \\text{Senkrecht:} \\quad m_1 \\cdot m_2 = -1\\n
-      \\text{Sonst:} \\quad \\text{keine Beziehung}
+      \\text{Vergleich:} \\quad m_1 = ${m1}, \\; m_2 = ${Math.round(m2 * 100) / 100}
       `
     }
   },
@@ -105,7 +99,7 @@ const aufgabenBanks = {
       nummer: 2,
       thema: 'Gerade konstruieren',
       aufgabentyp,
-      frage: `Gegeben ist die Gerade g: ${formatEquationLatex(m1, t1)} und der Punkt P(${x}|${y}).\\n\\n Bestimme die Gleichung der Geraden, die ${aufgabentyp === 'parallel' ? 'parallel' : 'senkrecht'} zu g verläuft und durch P geht. Zeige deinen Rechenweg:`,
+      frage: `Gegeben ist die Gerade g: y = ${m1}x ${t1 >= 0 ? '+' : '-'} ${Math.abs(t1)} und der Punkt P(${x}|${y}).\n\nBestimme die Gleichung der Geraden, die ${aufgabentyp === 'parallel' ? 'parallel' : 'senkrecht'} zu g verläuft und durch P geht. Zeige deinen Rechenweg:`,
       m1,
       t1,
       punkt: { x, y },
@@ -113,7 +107,7 @@ const aufgabenBanks = {
       t2: Math.round(t2 * 100) / 100,
       lösungsweg: `
       \\text{Schritt 1: Steigung bestimmen}\\n
-      ${aufgabentyp === 'parallel' ? `m_2 = m_1 = ${m1}` : `m_1 \\cdot m_2 = -1 \\Rightarrow m_2 = -\\frac{1}{m_1} = ${Math.round(m2 * 100) / 100}`}\\n\\n
+      ${aufgabentyp === 'parallel' ? `m_2 = m_1 = ${m1}` : `m_1 \\cdot m_2 = -1 \\Rightarrow m_2 = -\\frac{1}{${m1}} = ${Math.round(m2 * 100) / 100}`}\\n\\n
       \\text{Schritt 2: Punkt einsetzen in } y = m \\cdot x + t\\n
       ${y} = ${Math.round(m2 * 100) / 100} \\cdot ${x} + t\\n
       t = ${Math.round(t2 * 100) / 100}
@@ -145,7 +139,7 @@ const aufgabenBanks = {
       typ: 'mehrereGeraden',
       nummer: 3,
       thema: 'Mehrere Geraden kategorisieren',
-      frage: `Gegeben ist die Gerade g₁: ${formatEquationLatex(m1, t1)}.\\n\\nOrdne die folgenden Geraden zu:\\n\\ng₂: y = ${m2}x + ${t2}\\n\\ng₃: y = ${Math.round(m3 * 100) / 100}x + ${t3}\\n\\ng₄: y = ${m4}x + ${t4}\\n\\nWelche Geraden sind parallel zu g₁? Welche sind senkrecht? Zeige deinen Rechenweg.`,
+      frage: `Gegeben ist die Gerade g₁: y = ${m1}x ${t1 >= 0 ? '+' : '-'} ${Math.abs(t1)}.\n\nOrdne die folgenden Geraden zu:\n\ng₂: y = ${m2}x ${t2 >= 0 ? '+' : '-'} ${Math.abs(t2)}\n\ng₃: y = ${Math.round(m3 * 100) / 100}x ${t3 >= 0 ? '+' : '-'} ${Math.abs(t3)}\n\ng₄: y = ${m4}x ${t4 >= 0 ? '+' : '-'} ${Math.abs(t4)}\n\nWelche Geraden sind parallel zu g₁? Welche sind senkrecht? Zeige deinen Rechenweg.`,
       m1,
       t1,
       geraden: [
@@ -238,9 +232,7 @@ export default function ParallelSenkrecht() {
             </div>
 
             <div className={styles.content}>
-              <p className={styles.frage}>
-                <MathDisplay latex={`$${aufgabe.frage}$`} />
-              </p>
+              <p className={styles.frage}>{aufgabe.frage}</p>
 
               <div className={styles.inputGroup}>
                 <textarea
