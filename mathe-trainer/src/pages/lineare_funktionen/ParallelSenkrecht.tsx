@@ -278,50 +278,60 @@ export default function ParallelSenkrecht() {
               {showLösung[index] && (
                 <div className={styles.lösungBox}>
                   <h4>Lösungsweg:</h4>
-                  <MathDisplay latex={`$$${aufgabe.lösungsweg}$$`} />
 
                   {aufgabe.typ === 'gleichungenPrüfen' && (
                     <div className={styles.lösungsDetails}>
-                      <p>
-                        <strong>Vergleich:</strong> m₁ = {aufgabe.m1}, m₂ = {aufgabe.m2}
-                      </p>
+                      <p><strong>Bedingungen zur Prüfung:</strong></p>
+                      <MathDisplay latex={`$$\\text{Parallel:} \\quad m_1 = m_2$$`} />
+                      <MathDisplay latex={`$$\\text{Senkrecht:} \\quad m_1 \\cdot m_2 = -1$$`} />
+                      
+                      <p style={{ marginTop: '1rem' }}><strong>Steigungen:</strong></p>
+                      <MathDisplay latex={`$$m_1 = ${aufgabe.m1} \\quad m_2 = ${aufgabe.m2}$$`} />
+                      
+                      <p style={{ marginTop: '1rem' }}><strong>Ergebnis:</strong></p>
                       {aufgabe.beziehung === 'parallel' && (
-                        <p style={{ color: '#10b981' }}>
-                          ✓ m₁ = m₂ → <strong>parallel</strong>
-                        </p>
+                        <p style={{ color: '#10b981' }}>✓ m₁ = m₂ → die Geraden sind <strong>parallel</strong></p>
                       )}
                       {aufgabe.beziehung === 'senkrecht' && (
                         <p style={{ color: '#10b981' }}>
-                          ✓ m₁ · m₂ = {aufgabe.m1} · {aufgabe.m2} = -1 →{' '}
-                          <strong>senkrecht</strong>
+                          ✓ m₁ · m₂ = {aufgabe.m1} · {aufgabe.m2} = -1 → die Geraden sind <strong>senkrecht</strong>
                         </p>
                       )}
                       {aufgabe.beziehung === 'keine' && (
-                        <p style={{ color: '#10b981' }}>
-                          Keine der Bedingungen erfüllt → <strong>keine Beziehung</strong>
-                        </p>
+                        <p style={{ color: '#10b981' }}>Die Geraden haben <strong>keine spezielle Beziehung</strong></p>
                       )}
                     </div>
                   )}
 
                   {aufgabe.typ === 'geradeDurchPunkt' && (
                     <div className={styles.lösungsDetails}>
-                      <p>
-                        <strong>Antwort:</strong> y = {aufgabe.m2}x{' '}
-                        {aufgabe.t2 >= 0 ? '+' : '−'} {Math.abs(aufgabe.t2)}
+                      <p><strong>Schritt 1: Steigung bestimmen</strong></p>
+                      {aufgabe.aufgabentyp === 'parallel' ? (
+                        <MathDisplay latex={`$$m_2 = m_1 = ${aufgabe.m1}$$`} />
+                      ) : (
+                        <MathDisplay latex={`$$m_1 \\cdot m_2 = -1 \\Rightarrow m_2 = -\\frac{1}{${aufgabe.m1}} = ${aufgabe.m2}$$`} />
+                      )}
+                      
+                      <p style={{ marginTop: '1rem' }}><strong>Schritt 2: Punkt P({aufgabe.punkt.x}|{aufgabe.punkt.y}) einsetzen</strong></p>
+                      <MathDisplay latex={`$$${aufgabe.punkt.y} = ${aufgabe.m2} \\cdot ${aufgabe.punkt.x} + t$$`} />
+                      <MathDisplay latex={`$$t = ${aufgabe.t2}$$`} />
+                      
+                      <p style={{ marginTop: '1rem', color: '#10b981', fontWeight: 'bold' }}>
+                        Lösung: y = {aufgabe.m2}x {aufgabe.t2 >= 0 ? '+' : '−'} {Math.abs(aufgabe.t2)}
                       </p>
                     </div>
                   )}
 
                   {aufgabe.typ === 'mehrereGeraden' && (
                     <div className={styles.lösungsDetails}>
+                      <p><strong>Vergleiche die Steigungen mit m₁ = {aufgabe.m1}:</strong></p>
                       {aufgabe.geraden.map((g, i) => (
-                        <p key={i}>
+                        <p key={i} style={{ marginTop: '0.5rem' }}>
                           <strong>{g.label}:</strong> m = {g.m} →{' '}
                           {g.beziehung === 'parallel'
-                            ? 'parallel'
+                            ? 'parallel (m₁ = m)'
                             : g.beziehung === 'senkrecht'
-                            ? 'senkrecht'
+                            ? `senkrecht (m₁ · m = -1)`
                             : 'keine Beziehung'}
                         </p>
                       ))}
