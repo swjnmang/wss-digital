@@ -1,5 +1,5 @@
 .container {
-  max-width: 720px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 1rem;
   text-align: center;
@@ -11,20 +11,187 @@
   box-shadow: 0 6px 24px rgba(0,0,0,0.08);
   border: 1px solid #e6e6e6;
 }
-.inputRow { display: flex; gap: 0.75rem; align-items: center; justify-content: center; margin: 1rem 0; }
-.actions { display: flex; gap: 0.5rem; justify-content: center; margin: 1rem 0; }
+
+.typeToggle {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.toggleButton {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #d1d5db;
+  background: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #666;
+}
+
+.toggleButton:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.toggleButton.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.taskBox {
+  background: #f0f9ff;
+  border-left: 4px solid #3b82f6;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.taskPoints {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #0c4a6e;
+}
+
+.taskDescription {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.95rem;
+  color: #476569;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.input {
+  border: 2px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  width: 120px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.feedback {
+  padding: 0.75rem;
+  margin: 1rem 0;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.feedback.success {
+  background: #dcfce7;
+  color: #16a34a;
+  border-left: 4px solid #16a34a;
+}
+
+.feedback.error {
+  background: #fee2e2;
+  color: #dc2626;
+  border-left: 4px solid #dc2626;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.btnPrimary,
+.btnSuccess,
+.btnSecondary {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.btnPrimary {
+  background: #06b6d4;
+  color: white;
+}
+
+.btnPrimary:hover {
+  background: #0891b2;
+}
+
+.btnSuccess {
+  background: #16a34a;
+  color: white;
+}
+
+.btnSuccess:hover {
+  background: #15803d;
+}
+
+.btnSecondary {
+  background: #64748b;
+  color: white;
+}
+
+.btnSecondary:hover {
+  background: #475569;
+}
+
+.solutionOutput {
+  background: #e9f5e9;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  text-align: left;
+  border-left: 4px solid #16a34a;
+  font-family: 'Courier New', monospace;
+  line-height: 1.6;
+  color: #1b5e20;
+}
+
+.solutionOutput p {
+  margin: 0.5rem 0;
+}
+
+.graphContainer {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.pointsDisplay {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin: 1rem 0;
+  font-weight: 600;
+  background: #f3f4f6;
+  padding: 0.75rem;
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+
 .streak {
   position: absolute;
   top: 1rem;
   right: 1rem;
-}
-.taskPoints {
-  font-family: 'Courier New', monospace;
-  font-weight: 700;
-}
-.solutionOutput {
-  background:#e9f5e9;
-  border-radius:8px;
-  padding:0.75rem;
-  margin-top:0.75rem;
+  font-size: 1.5rem;
 }
