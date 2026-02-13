@@ -22,36 +22,22 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
   const elementIdRef = useRef<string>(`ggb-element-${Math.random().toString(36).substr(2, 9)}`);
   const appletRef = useRef<any>(null);
   const containerIdRef = useRef<string>(`ggb-container-${Math.random().toString(36).substr(2, 9)}`);
+  const initDoneRef = useRef(false);
 
+  // Effekt nur für Initialization - läuft nur einmal
   useEffect(() => {
+    if (initDoneRef.current) return;
+
     const initApplet = () => {
-      if (!window.GGBApplet) {
-        console.warn('GGBApplet nicht verfügbar');
-        return;
-      }
+      if (!window.GGBApplet || appletRef.current) return;
 
-      // Wenn bereits ein Applet existiert, aktualisiere die Gleichung
-      if (appletRef.current && appletRef.current.evalCommand) {
-        try {
-          appletRef.current.reset();
-          appletRef.current.evalCommand(`f(x) = ${m}*x + ${t}`);
-          // Stelle sicher dass Achsen und Grid sichtbar sind
-          try { appletRef.current.setAxesVisible(true, true) } catch (e) {}
-          try { appletRef.current.setGridVisible(true) } catch (e) {}
-        } catch (e) {
-          console.error('Fehler beim Aktualisieren der Gleichung:', e);
-        }
-        return;
-      }
-
-      // Neues Applet erstellen
       const params = {
         id: elementIdRef.current,
         appName: 'graphing',
         width: width,
         height: height,
         
-        // UI verstecken - WICHTIG: Explizit false setzen
+        // UI verstecken
         showMenuBar: false,
         showToolBar: false,
         showAlgebraInput: false,
@@ -64,31 +50,23 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
 
       try {
         const applet = new window.GGBApplet(params, true);
+        applet.inject(elementIdRef.current);
         appletRef.current = applet;
         
-        // Injiziere mit der String-ID
-        applet.inject(elementIdRef.current);
-
-        // Setze die Gleichung nach dem Laden
+        // Setze Graph nach längerer Zeit
         setTimeout(() => {
-          if (applet.evalCommand) {
-            try {
-              applet.reset();
-              applet.evalCommand(`f(x) = ${m}*x + ${t}`);
-              // Stelle sicher dass Achsen und Grid sichtbar sind
-              try { applet.setAxesVisible(true, true) } catch (e) {}
-              try { applet.setGridVisible(true) } catch (e) {}
-            } catch (e) {
-              console.error('Fehler beim Setzen der Gleichung:', e);
-            }
+          if (appletRef.current && appletRef.current.evalCommand) {
+            appletRef.current.evalCommand(`y = ${m}*x + ${t}`);
           }
-        }, 1000);
+        }, 1500);
+        
+        initDoneRef.current = true;
       } catch (e) {
-        console.error('GeoGebra Applet Creation Error:', e);
+        console.error('GeoGebra Applet Error:', e);
       }
     };
 
-    // Überprüfe ob deployggb.js bereits geladen ist
+    // Lade deployggb.js
     const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
     
     if (!existing) {
@@ -96,14 +74,29 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
       s.src = 'https://www.geogebra.org/apps/deployggb.js';
       s.async = true;
       s.onload = () => {
-        setTimeout(() => initApplet(), 200);
+        setTimeout(() => initApplet(), 300);
       };
       document.body.appendChild(s);
     } else {
-      // Script ist schon geladen, initialisiere direkt
-      setTimeout(() => initApplet(), 100);
+      initApplet();
     }
-  }, [m, t, width, height]);
+  }, []); // Nur beim Mount
+
+  // Effekt für Gleichungs-Updates
+  useEffect(() => {
+    if (!appletRef.current || !appletRef.current.evalCommand) return;
+
+    // Warte kurz, dann update
+    const timer = setTimeout(() => {
+      try {
+        appletRef.current.evalCommand(`y = ${m}*x + ${t}`);
+      } catch (e) {
+        console.error('Error updating graph:', e);
+      }
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [m, t]);
 
   return (
     <div 
