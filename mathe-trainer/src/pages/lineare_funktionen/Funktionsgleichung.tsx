@@ -147,15 +147,44 @@ export default function Funktionsgleichung(){
             <div className={styles.solutionStep}>
               {mode === 'twoPoints' ? (
                 <>
+                  <MathDisplay latex={`$$\\textbf{Schritt 1: Punkte aufschreiben}$$`} />
                   <MathDisplay latex={`$$P_1(${p1.x}|${p1.y}) \\quad P_2(${p2.x}|${p2.y})$$`} />
-                  <MathDisplay latex={`$$m = \\dfrac{${p2.y} - (${p1.y})}{${p2.x} - (${p1.x})} = \\dfrac{${p2.y - p1.y}}{${p2.x - p1.x}} = ${mCorrect}$$`} />
+                  
+                  <MathDisplay latex={`$$\\textbf{Schritt 2: Ansatz}$$`} />
+                  <MathDisplay latex={`$$y = m \\cdot x + t$$`} />
+                  
+                  <MathDisplay latex={`$$\\textbf{Schritt 3: Steigung m berechnen}$$`} />
+                  <MathDisplay latex={`$$m = \\dfrac{y_2 - y_1}{x_2 - x_1} = \\dfrac{${p2.y} - (${p1.y})}{${p2.x} - (${p1.x})} = \\dfrac{${p2.y - p1.y}}{${p2.x - p1.x}} = ${mCorrect}$$`} />
+                  
+                  <MathDisplay latex={`$$\\textbf{Schritt 4: m einsetzen}$$`} />
+                  <MathDisplay latex={`$$y = ${mCorrect} \\cdot x + t$$`} />
+                  
+                  <MathDisplay latex={`$$\\textbf{Schritt 5: Punkt } P_1(${p1.x}|${p1.y}) \\textbf{ einsetzen}$$`} />
+                  <MathDisplay latex={`$$${p1.y} = ${mCorrect} \\cdot ${p1.x} + t$$`} />
+                  
+                  <MathDisplay latex={`$$\\textbf{Schritt 6: Nach t auflösen}$$`} />
+                  <MathDisplay latex={`$$${p1.y} = ${Math.round(mCorrect * p1.x * 100) / 100} + t \\quad | - ${Math.round(mCorrect * p1.x * 100) / 100}$$`} />
+                  <MathDisplay latex={`$$t = ${p1.y} - ${Math.round(mCorrect * p1.x * 100) / 100} = ${tCorrect}$$`} />
                 </>
               ) : (
                 <>
-                  <MathDisplay latex={`$$P(${p1.x}|${p1.y}) \\quad m = ${(p2.y - p1.y) / (p2.x - p1.x)}$$`} />
+                  <MathDisplay latex={`$$\\textbf{Schritt 1: Punkt und Steigung}$$`} />
+                  <MathDisplay latex={`$$P(${p1.x}|${p1.y}) \\quad m = ${mCorrect}$$`} />
+                  
+                  <MathDisplay latex={`$$\\textbf{Schritt 2: Ansatz}$$`} />
+                  <MathDisplay latex={`$$y = m \\cdot x + t$$`} />
+                  
+                  <MathDisplay latex={`$$\\textbf{Schritt 3: m einsetzen}$$`} />
+                  <MathDisplay latex={`$$y = ${mCorrect} \\cdot x + t$$`} />
+                  
+                  <MathDisplay latex={`$$\\textbf{Schritt 4: Punkt } P(${p1.x}|${p1.y}) \\textbf{ einsetzen}$$`} />
+                  <MathDisplay latex={`$$${p1.y} = ${mCorrect} \\cdot ${p1.x} + t$$`} />
+                  
+                  <MathDisplay latex={`$$\\textbf{Schritt 5: Nach t auflösen}$$`} />
+                  <MathDisplay latex={`$$${p1.y} = ${Math.round(mCorrect * p1.x * 100) / 100} + t \\quad | - ${Math.round(mCorrect * p1.x * 100) / 100}$$`} />
+                  <MathDisplay latex={`$$t = ${p1.y} - ${Math.round(mCorrect * p1.x * 100) / 100} = ${tCorrect}$$`} />
                 </>
               )}
-              <MathDisplay latex={`$$t = y_1 - m \\cdot x_1 = ${p1.y} - ${mCorrect} \\cdot ${p1.x} = ${tCorrect}$$`} />
             </div>
             <div className={styles.answerBox}>
               <MathDisplay latex={`$$y = ${mCorrect}x ${tCorrect >= 0 ? '+' : '-'} ${Math.abs(tCorrect)}$$`} />
