@@ -13,7 +13,9 @@ const MathDisplay = ({ latex }: { latex: string }) => {
     }
   }, [latex])
 
-  return <div ref={ref} className={styles.mathDisplay}>{latex}</div>
+  return <div ref={ref} className={styles.mathDisplay}>
+    {latex}
+  </div>
 }
 
 // ===== Hilfsfunktionen =====
