@@ -279,11 +279,47 @@ export default function Wertetabelle() {
     
     currentAnswers[rowIndex][field] = value
     
-    // Validiere diese Zelle für Typ 2
+    // Validiere diese Zelle
     const aufgabe = aufgaben[aufgabeIndex]
-    if (aufgabe?.typ === 'teilweisgefülltVervollständigen') {
-      const cellKey = `${aufgabeIndex}-${rowIndex}`
+    const cellKey = `${aufgabeIndex}-${rowIndex}`
+    
+    if (aufgabe?.typ === 'leereTabelleAusfüllen') {
+      // Typ 1: Beide Felder müssen gefüllt sein
+      const xFilled = currentAnswers[rowIndex].x.trim() !== ''
+      const yFilled = currentAnswers[rowIndex].y.trim() !== ''
       
+      if (xFilled && yFilled) {
+        // Validiere die Zelle
+        const x = parseFloat(currentAnswers[rowIndex].x.replace(',', '.'))
+        const y = parseFloat(currentAnswers[rowIndex].y.replace(',', '.'))
+        
+        if (!isNaN(x) && !isNaN(y)) {
+          const m = aufgabe.m
+          const t = aufgabe.t
+          const tolerance = 0.02
+          
+          // Prüfe, ob y = m*x + t
+          const expectedY = Math.round((m * x + t) * 100) / 100
+          const isValid = Math.abs(y - expectedY) <= tolerance
+          
+          setValidierteZellen({
+            ...validierteZellen,
+            [cellKey]: isValid
+          })
+        } else {
+          // Ungültige Zahlen eingegeben
+          const newValidierteZellen = { ...validierteZellen }
+          delete newValidierteZellen[cellKey]
+          setValidierteZellen(newValidierteZellen)
+        }
+      } else {
+        // Noch nicht komplett gefüllt, clear validation
+        const newValidierteZellen = { ...validierteZellen }
+        delete newValidierteZellen[cellKey]
+        setValidierteZellen(newValidierteZellen)
+      }
+    } else if (aufgabe?.typ === 'teilweisgefülltVervollständigen') {
+      // Typ 2: Entweder x ODER y ist gegeben
       // Prüfe ob beide Felder filled sind
       const xFilled = aufgabe.gebenXWert[rowIndex] || currentAnswers[rowIndex].x.trim() !== ''
       const yFilled = !aufgabe.gebenXWert[rowIndex] || currentAnswers[rowIndex].y.trim() !== ''
@@ -317,7 +353,6 @@ export default function Wertetabelle() {
         })
       } else {
         // Noch nicht komplett gefüllt, clear validation
-        const cellKey = `${aufgabeIndex}-${rowIndex}`
         const newValidierteZellen = { ...validierteZellen }
         delete newValidierteZellen[cellKey]
         setValidierteZellen(newValidierteZellen)
@@ -370,7 +405,7 @@ export default function Wertetabelle() {
                               placeholder="x"
                               value={antworten[index]?.[i]?.x || ''}
                               onChange={(e) => updateTableValue(index, i, 'x', e.target.value)}
-                              className={styles.tableInput}
+                              className={`${styles.tableInput} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
                             />
                           </td>
                         ))}
@@ -384,7 +419,7 @@ export default function Wertetabelle() {
                               placeholder="y"
                               value={antworten[index]?.[i]?.y || ''}
                               onChange={(e) => updateTableValue(index, i, 'y', e.target.value)}
-                              className={styles.tableInput}
+                              className={`${styles.tableInput} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
                             />
                           </td>
                         ))}
