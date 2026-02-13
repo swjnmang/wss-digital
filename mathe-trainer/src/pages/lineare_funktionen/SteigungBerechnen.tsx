@@ -300,30 +300,13 @@ export default function SteigungBerechnen() {
 
             {showSolution && (
               <div className={styles.solutionOutput}>
-                <h3 className={styles.solutionTitle}>Vollständiger Lösungsweg</h3>
-                
+                <h3 className={styles.solutionTitle}>Lösungsweg</h3>
                 <div className={styles.solutionStep}>
-                  <p className={styles.stepTitle}><strong>Schritt 1: Punkte aufschreiben</strong></p>
                   <MathDisplay latex={`$$P_1(${p1.x}|${p1.y}) \\quad P_2(${p2.x}|${p2.y})$$`} />
+                  <MathDisplay latex={`$$m = \\dfrac{y_2 - y_1}{x_2 - x_1} = \\dfrac{${p2.y} - (${p1.y})}{${p2.x} - (${p1.x})} = \\dfrac{${p2.y - p1.y}}{${p2.x - p1.x}} = ${Math.round(((p2.y - p1.y) / (p2.x - p1.x)) * 100) / 100}$$`} />
                 </div>
-
-                <div className={styles.solutionStep}>
-                  <p className={styles.stepTitle}><strong>Schritt 2: Steigungsformel aufschreiben</strong></p>
-                  <MathDisplay latex="$$m = \\frac{y_2 - y_1}{x_2 - x_1}$$" />
-                </div>
-
-                <div className={styles.solutionStep}>
-                  <p className={styles.stepTitle}><strong>Schritt 3: Werte einsetzen</strong></p>
-                  <MathDisplay latex={`$$m = \\frac{${p2.y} - (${p1.y})}{${p2.x} - (${p1.x})}$$`} />
-                </div>
-
-                <div className={styles.solutionStep}>
-                  <p className={styles.stepTitle}><strong>Schritt 4: Berechnung durchführen</strong></p>
-                  <MathDisplay latex={`$$m = \\frac{${p2.y - p1.y}}{${p2.x - p1.x}} = ${Math.round(((p2.y - p1.y) / (p2.x - p1.x)) * 100) / 100}$$`} />
-                </div>
-
                 <div className={styles.answerBox}>
-                  <MathDisplay latex={`$$\\boxed{m = ${Math.round(((p2.y - p1.y) / (p2.x - p1.x)) * 100) / 100}}$$`} />
+                  <MathDisplay latex={`$$m = ${Math.round(((p2.y - p1.y) / (p2.x - p1.x)) * 100) / 100}$$`} />
                 </div>
               </div>
             )}
@@ -434,30 +417,13 @@ export default function SteigungBerechnen() {
 
             {graphShowSolution && selectedPoints.length === 2 && (
               <div className={styles.solutionOutput}>
-                <h3 className={styles.solutionTitle}>Vollständiger Lösungsweg</h3>
-                
+                <h3 className={styles.solutionTitle}>Lösungsweg</h3>
                 <div className={styles.solutionStep}>
-                  <p className={styles.stepTitle}><strong>Schritt 1: Punkte aufschreiben</strong></p>
                   <MathDisplay latex={`$$P_1(${selectedPoints[0].x}|${selectedPoints[0].y}) \\quad P_2(${selectedPoints[1].x}|${selectedPoints[1].y})$$`} />
+                  <MathDisplay latex={`$$m = \\dfrac{y_2 - y_1}{x_2 - x_1} = \\dfrac{${selectedPoints[1].y} - (${selectedPoints[0].y})}{${selectedPoints[1].x} - (${selectedPoints[0].x})} = \\dfrac{${deltaY}}{${deltaX}} = ${Math.round(graphCorrectSlope * 100) / 100}$$`} />
                 </div>
-
-                <div className={styles.solutionStep}>
-                  <p className={styles.stepTitle}><strong>Schritt 2: Steigungsformel aufschreiben</strong></p>
-                  <MathDisplay latex="$$m = \\frac{y_2 - y_1}{x_2 - x_1}$$" />
-                </div>
-
-                <div className={styles.solutionStep}>
-                  <p className={styles.stepTitle}><strong>Schritt 3: Werte einsetzen</strong></p>
-                  <MathDisplay latex={`$$m = \\frac{${selectedPoints[1].y} - (${selectedPoints[0].y})}{${selectedPoints[1].x} - (${selectedPoints[0].x})}$$`} />
-                </div>
-
-                <div className={styles.solutionStep}>
-                  <p className={styles.stepTitle}><strong>Schritt 4: Berechnung durchführen</strong></p>
-                  <MathDisplay latex={`$$m = \\frac{${deltaY}}{${deltaX}} = ${Math.round(graphCorrectSlope * 100) / 100}$$`} />
-                </div>
-
                 <div className={styles.answerBox}>
-                  <MathDisplay latex={`$$\\boxed{m = ${Math.round(graphCorrectSlope * 100) / 100}}$$`} />
+                  <MathDisplay latex={`$$m = ${Math.round(graphCorrectSlope * 100) / 100}$$`} />
                 </div>
               </div>
             )}
