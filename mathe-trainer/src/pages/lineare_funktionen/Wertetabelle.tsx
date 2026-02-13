@@ -88,11 +88,7 @@ function generateRechenbeispiele(m: number, t: number): Array<{ x: number; y: nu
       mxPart = `-${xFormatted}`
     } else {
       // Für beliebige m-Werte
-      if (x < 0) {
-        mxPart = `${m} \\cdot \\textcolor{red}{(${x})}`
-      } else {
-        mxPart = `${m} \\cdot \\textcolor{red}{${x}}`
-      }
+      mxPart = `${m} \\cdot ${xFormatted}`
     }
     
     // Formatiere t mit Vorzeichen
