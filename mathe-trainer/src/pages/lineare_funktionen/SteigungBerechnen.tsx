@@ -105,8 +105,18 @@ export default function SteigungBerechnen() {
       return
     }
     
+    // Überprüfe, ob der Punkt auf der Geraden liegt
+    const expectedY = graphM * x + graphT
+    const tolerance = 0.15
+    
+    if (Math.abs(y - expectedY) > tolerance) {
+      setGraphFeedback(`Punkt 1 liegt nicht auf der Geraden! Für x=${x} sollte y=${Math.round(expectedY * 100) / 100} sein.`)
+      return
+    }
+    
     setSelectedPoints([{ x, y }])
-    setInstruction(`Punkt 1 ausgewählt: (${x}|${y}) - Gib nun Punkt 2 ein.`)
+    setInstruction(`Punkt 1 akzeptiert: (${x}|${y}) - Gib nun Punkt 2 ein.`)
+    setGraphFeedback('')
   }
 
   function addGraphPoint2() {
@@ -122,9 +132,25 @@ export default function SteigungBerechnen() {
       return
     }
     
+    // Überprüfe, ob der Punkt auf der Geraden liegt
+    const expectedY = graphM * x + graphT
+    const tolerance = 0.15
+    
+    if (Math.abs(y - expectedY) > tolerance) {
+      setGraphFeedback(`Punkt 2 liegt nicht auf der Geraden! Für x=${x} sollte y=${Math.round(expectedY * 100) / 100} sein.`)
+      return
+    }
+    
+    // Überprüfe, dass die beiden Punkte nicht identisch sind
+    if (selectedPoints[0].x === x && selectedPoints[0].y === y) {
+      setGraphFeedback('Punkt 2 muss unterschiedlich von Punkt 1 sein!')
+      return
+    }
+    
     setSelectedPoints([...selectedPoints, { x, y }])
     setSelectionMode(false)
     setInstruction('Berechne jetzt die Steigung!')
+    setGraphFeedback('')
   }
 
   function checkSolution() {
