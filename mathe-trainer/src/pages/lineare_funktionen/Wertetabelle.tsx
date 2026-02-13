@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './Wertetabelle.module.css'
+import GeoGebraGraph from '../../components/GeoGebraGraph'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -129,6 +130,7 @@ export default function Wertetabelle() {
   const [antworten, setAntworten] = useState<{ [key: number]: Array<{ x: string; y: string }> }>({})
   const [validiert, setValidiert] = useState<{ [key: number]: boolean }>({})
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
+  const [showGraph, setShowGraph] = useState<{ [key: number]: boolean }>({})
 
   // MathJax laden
   useEffect(() => {
@@ -159,6 +161,7 @@ export default function Wertetabelle() {
     setAntworten({})
     setValidiert({})
     setShowLösung({})
+    setShowGraph({})
   }
 
   useEffect(() => {
@@ -346,6 +349,12 @@ export default function Wertetabelle() {
                 >
                   {showLösung[index] ? 'Lösung ausblenden' : 'Lösung anzeigen'}
                 </button>
+                <button 
+                  onClick={() => setShowGraph({ ...showGraph, [index]: !showGraph[index] })} 
+                  className={styles.graphBtn}
+                >
+                  {showGraph[index] ? 'Graph ausblenden' : 'Graph anzeigen'}
+                </button>
               </div>
 
               {/* Feedback */}
@@ -382,6 +391,14 @@ export default function Wertetabelle() {
                       </table>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Graph */}
+              {showGraph[index] && (
+                <div className={styles.graphBox}>
+                  <h4>Funktionsgraph:</h4>
+                  <GeoGebraGraph m={aufgabe.m} t={aufgabe.t} width={600} height={400} />
                 </div>
               )}
             </div>

@@ -172,7 +172,8 @@
 }
 
 .checkBtn,
-.solutionBtn {
+.solutionBtn,
+.graphBtn {
   flex: 1;
   padding: 0.75rem 1rem;
   border: none;
@@ -196,13 +197,15 @@
   transform: scale(0.98);
 }
 
-.solutionBtn {
+.solutionBtn,
+.graphBtn {
   background-color: #f3f4f6;
   color: #374151;
   border: 1px solid #d1d5db;
 }
 
-.solutionBtn:hover {
+.solutionBtn:hover,
+.graphBtn:hover {
   background-color: #e5e7eb;
 }
 
@@ -249,4 +252,23 @@
   background-color: #fef3c7;
   font-weight: 600;
   color: #92400e;
+}
+
+.graphBox {
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-left: 3px solid #8b5cf6;
+  border-radius: 0.375rem;
+  margin-top: 0.5rem;
+}
+
+.graphBox h4 {
+  margin: 0 0 1rem 0;
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.graphBox > div {
+  display: flex;
+  justify-content: center;
 }
