@@ -40,6 +40,7 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
         showMenuBar: false,
         showResetIcon: false,
         showFullscreenButton: false,
+        showZoomButtons: true, // Zoom + / - Buttons anzeigen
         useBrowserForJS: true,
         appletOnLoad: (api: any) => {
           appletRef.current = api;
