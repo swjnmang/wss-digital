@@ -20,72 +20,71 @@ const MathDisplay = ({ latex }: { latex: string }) => {
 interface WertetabelleProps {
   m: number
   t: number
-  onValuesChange: (validCount: number) => void
   value: any
+  onChange: (newValues: any, validCount: number) => void
+  validierteZellen: { [key: string]: boolean }
 }
 
-const Wertetabelle = ({ m, t, onValuesChange, value }: WertetabelleProps) => {
+const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleProps) => {
   const xValues = [-2, -1, 0, 1, 2]
-  
-  const handleYChange = (index: number, yValue: string) => {
+  const tolerance = 0.02
+
+  const handleValueChange = (xIndex: number, field: 'x' | 'y', inputValue: string) => {
     const newValues = { ...value }
-    newValues[xValues[index]] = yValue
-    onValuesChange(newValues)
+    if (!newValues[xIndex]) {
+      newValues[xIndex] = { x: '', y: '' }
+    }
+    newValues[xIndex][field] = inputValue
+
+    // Live-Validierung
+    const cellKey = `graph-${xIndex}`
+    const newValidierteZellen = { ...validierteZellen }
+
+    const x = parseFloat(newValues[xIndex].x.replace(',', '.'))
+    const y = parseFloat(newValues[xIndex].y.replace(',', '.'))
+
+    if (!isNaN(x) && !isNaN(y) && newValues[xIndex].x !== '' && newValues[xIndex].y !== '') {
+      const expectedY = Math.round((m * x + t) * 100) / 100
+      newValidierteZellen[cellKey] = Math.abs(y - expectedY) <= tolerance
+    } else {
+      delete newValidierteZellen[cellKey]
+    }
+
+    const validCount = Object.values(newValidierteZellen).filter(Boolean).length
+    onChange(newValues, newValidierteZellen)
   }
-
-  const getValidationStatus = (x: number, yInput: string): 'correct' | 'incorrect' | 'empty' => {
-    if (yInput === '') return 'empty'
-    const yExpected = Math.round((m * x + t) * 100) / 100
-    const yValue = parseFloat(yInput.replace(',', '.'))
-    if (isNaN(yValue)) return 'incorrect'
-    return Math.abs(yValue - yExpected) < 0.02 ? 'correct' : 'incorrect'
-  }
-
-  const correctCount = xValues.filter(x => {
-    const yInput = value?.[x] || ''
-    return getValidationStatus(x, yInput) === 'correct'
-  }).length
-
-  useEffect(() => {
-    onValuesChange(correctCount)
-  }, [correctCount, onValuesChange])
 
   return (
     <div className={styles.wertetabelleContainer}>
       <table className={styles.wertetabelle}>
         <tbody>
           <tr>
-            <td className={styles.headerCell}>x</td>
-            {xValues.map(x => (
-              <td key={`x-${x}`} className={styles.headerCell}>{x}</td>
+            <th className={styles.tableHeader}>x</th>
+            {xValues.map((x, idx) => (
+              <td key={`x-header-${idx}`} className={styles.tableHeaderCell}>
+                {x}
+              </td>
             ))}
           </tr>
           <tr>
-            <td className={styles.headerCell}>y</td>
-            {xValues.map((x, idx) => {
-              const yInput = value?.[x] || ''
-              const status = getValidationStatus(x, yInput)
-              return (
-                <td
-                  key={`y-${x}`}
-                  className={`${styles.yCell} ${
-                    status === 'correct' ? styles.yCorrect : status === 'incorrect' ? styles.yIncorrect : ''
-                  }`}
-                >
-                  <input
-                    type="text"
-                    placeholder="y"
-                    value={yInput}
-                    onChange={(e) => handleYChange(idx, e.target.value)}
-                    className={styles.yInput}
-                  />
-                </td>
-              )
-            })}
+            <th className={styles.tableHeader}>y</th>
+            {xValues.map((x, idx) => (
+              <td key={`y-${idx}`} className={styles.tableCell}>
+                <input
+                  type="text"
+                  placeholder="y"
+                  value={value?.[idx]?.y || ''}
+                  onChange={(e) => handleValueChange(idx, 'y', e.target.value)}
+                  className={`${styles.tableInput} ${validierteZellen[`graph-${idx}`] ? styles.inputCorrect : ''}`}
+                />
+              </td>
+            ))}
           </tr>
         </tbody>
       </table>
-      <p className={styles.hint}>{correctCount} / {xValues.length} korrekt</p>
+      <p className={styles.hint}>
+        {Object.values(validierteZellen).filter(Boolean).length} / {xValues.length} korrekt
+      </p>
     </div>
   )
 }
@@ -247,10 +246,10 @@ interface Aufgabe {
 
 export default function GemischteAufgaben() {
   const [aufgaben, setAufgaben] = useState<Aufgabe[]>([])
-  const [antworten, setAntworten] = useState<{ [key: number]: { m?: string; t?: string; x?: string; y?: string; value?: string; [key: number]: string } }>({})
+  const [antworten, setAntworten] = useState<{ [key: number]: { m?: string; t?: string; x?: string; y?: string; value?: string; [key: number]: any } }>({})
   const [validiert, setValidiert] = useState<{ [key: number]: boolean }>({})
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
-  const [wertetabelleValidCount, setWertetabelleValidCount] = useState<{ [key: number]: number }>({})
+  const [validierteZellen, setValidierteZellen] = useState<{ [key: number | string]: { [key: string]: boolean } }>({})
   useEffect(() => {
     const script = document.createElement('script')
     script.src = 'https://polyfill.io/v3/polyfill.min.js?features=es6'
@@ -290,7 +289,9 @@ export default function GemischteAufgaben() {
     
     if (aufgabe.typ === 'graphZeichnen') {
       // Wertetabelle: mindestens 3 von 5 Werten korrekt
-      return wertetabelleValidCount[index] >= 3
+      const cellsForThisTask = validierteZellen[index] || {}
+      const correctCount = Object.values(cellsForThisTask).filter(Boolean).length
+      return correctCount >= 3
     } else if (aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen') {
       const m = parseFloat((inputData.m || '').replace(',', '.'))
       const t = parseFloat((inputData.t || '').replace(',', '.'))
@@ -377,8 +378,8 @@ export default function GemischteAufgaben() {
             <div className={styles.content}>
               <p className={styles.frage}>{aufgabe.frage}</p>
 
-              {/* Graph-Anzeige */}
-              {aufgabe.isGraph && aufgabe.m !== undefined && aufgabe.t !== undefined && (
+              {/* Graph-Anzeige - NUR bei ablesen, nicht bei graphZeichnen */}
+              {aufgabe.isGraph && aufgabe.typ !== 'graphZeichnen' && aufgabe.m !== undefined && aufgabe.t !== undefined && (
                 <div className={styles.graphContainer}>
                   <GeoGebraGraph m={aufgabe.m} t={aufgabe.t} width={500} height={400} />
                 </div>
@@ -446,10 +447,12 @@ export default function GemischteAufgaben() {
                     <Wertetabelle
                       m={aufgabe.m}
                       t={aufgabe.t}
-                      onValuesChange={(validCount) => {
-                        setWertetabelleValidCount({ ...wertetabelleValidCount, [index]: validCount })
-                      }}
                       value={antworten[index] || {}}
+                      onChange={(newValues: any, newValidierteZellen: any) => {
+                        setAntworten({ ...antworten, [index]: newValues })
+                        setValidierteZellen({ ...validierteZellen, [index]: newValidierteZellen })
+                      }}
+                      validierteZellen={validierteZellen[index] || {}}
                     />
                   </div>
                 )}
@@ -520,6 +523,14 @@ export default function GemischteAufgaben() {
                 <div className={styles.lösungBox}>
                   <h4>Lösungsweg:</h4>
                   <MathDisplay latex={aufgabe.lösungsweg} />
+                  
+                  {/* Graph für graphZeichnen */}
+                  {aufgabe.typ === 'graphZeichnen' && aufgabe.m !== undefined && aufgabe.t !== undefined && (
+                    <div className={styles.graphContainer} style={{ marginTop: '1.5rem' }}>
+                      <p style={{ marginBottom: '1rem', fontWeight: 500 }}>So sieht dein Graph aus:</p>
+                      <GeoGebraGraph m={aufgabe.m} t={aufgabe.t} width={500} height={400} />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
