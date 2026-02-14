@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './GemischteAufgaben.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
+import GeoGebraMultiGraph from '../../components/GeoGebraMultiGraph'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -239,6 +240,41 @@ const aufgabenBanks = {
       antwort: { x, y },
       lösungsweg: `Gleichsetzen: ${m1}x ${t1 >= 0 ? '+' : '-'} ${Math.abs(t1)} = ${m2}x ${t2 >= 0 ? '+' : '-'} ${Math.abs(t2)}\n$$x = ${x}, \\quad y = ${y}$$\nSchnittpunkt: (${x}|${y})`
     }
+  },
+
+  // 8. Graphen zuordnen (Zuordnungsaufgaben)
+  graphZuordnen: () => {
+    // Generiere 4 zufällige Funktionsgleichungen
+    const functions = Array.from({ length: 4 }).map(() => ({
+      m: randInt(-3, 3, [0]),
+      t: randInt(-3, 3)
+    }))
+
+    // Mische die Funktionen für die Anzeige (damit nicht Graph 1 = Gleichung 1 ist)
+    const shuffled = [...functions].sort(() => Math.random() - 0.5)
+
+    // Erstelle die Lösungszuordnung (welche Gleichung zu welchem Graphen)
+    const antwort: { [key: number]: string } = {}
+    functions.forEach((fn, idx) => {
+      const eqStr = `y = ${fn.m}x ${fn.t >= 0 ? '+' : ''} ${fn.t}`
+      antwort[idx] = eqStr
+    })
+
+    const frage = `Ordne die Funktionsgleichungen den Graphen (1, 2, 3, 4) zu.`
+    const lösungsweg = `Die Funktionsgleichungen entsprechen den Graphen:\n${functions
+      .map((fn, idx) => `Graph ${idx + 1}: y = ${fn.m}x ${fn.t >= 0 ? '+' : '-'} ${Math.abs(fn.t)}`)
+      .join('\n')}`
+
+    return {
+      typ: 'graphZuordnen',
+      thema: '8. Graphen zuordnen',
+      frage,
+      isGraph: true,
+      functions,
+      shuffledEquations: shuffled,
+      antwort,
+      lösungsweg
+    }
   }
 }
 
@@ -317,6 +353,17 @@ export default function GemischteAufgaben() {
       const toleranzX = Math.max(Math.abs(expected.x) * 0.01, 0.02)
       const toleranzY = Math.max(Math.abs(expected.y) * 0.01, 0.02)
       return Math.abs(x - expected.x) <= toleranzX && Math.abs(y - expected.y) <= toleranzY
+    } else if (aufgabe.typ === 'graphZuordnen') {
+      // Alle 4 Zuordnungen müssen stimmen
+      const mappings = inputData as { [key: number]: string }
+      const correctAnswer = aufgabe.antwort as { [key: number]: string }
+      
+      for (let i = 0; i < 4; i++) {
+        if (!mappings[i] || mappings[i] !== correctAnswer[i]) {
+          return false
+        }
+      }
+      return true
     } else if (aufgabe.typ === 'punktAufGerade') {
       return (inputData.value || '').toLowerCase() === aufgabe.antwort
     } else {
@@ -393,10 +440,17 @@ export default function GemischteAufgaben() {
             <div className={styles.content}>
               <p className={styles.frage}>{aufgabe.frage}</p>
 
-              {/* Graph-Anzeige - NUR bei ablesen, nicht bei graphZeichnen */}
+              {/* Graph-Anzeige - NUR bei ablesen und graphZuordnen */}
               {aufgabe.isGraph && aufgabe.typ !== 'graphZeichnen' && aufgabe.m !== undefined && aufgabe.t !== undefined && (
                 <div className={styles.graphContainer}>
                   <GeoGebraGraph m={aufgabe.m} t={aufgabe.t} width={500} height={400} />
+                </div>
+              )}
+
+              {/* Multi-Graph für graphZuordnen */}
+              {aufgabe.typ === 'graphZuordnen' && aufgabe.functions && (
+                <div className={styles.graphContainer}>
+                  <GeoGebraMultiGraph functions={aufgabe.functions} width={500} height={400} />
                 </div>
               )}
 
@@ -500,8 +554,45 @@ export default function GemischteAufgaben() {
                   </div>
                 )}
 
+                {/* Graphen zuordnen */}
+                {aufgabe.typ === 'graphZuordnen' && aufgabe.functions && (
+                  <div className={styles.zuordnungSection}>
+                    {aufgabe.functions.map((fn: any, idx: number) => {
+                      const equationStr = `y = ${fn.m}x ${fn.t >= 0 ? '+' : ''} ${fn.t}`
+                      return (
+                        <div key={idx} className={styles.zuordnungRow}>
+                          <span className={styles.graphLabel}>Graph {idx + 1}</span>
+                          <select
+                            value={antworten[index]?.[idx] || ''}
+                            onChange={(e) => {
+                              setAntworten({
+                                ...antworten,
+                                [index]: {
+                                  ...antworten[index],
+                                  [idx]: e.target.value
+                                }
+                              })
+                            }}
+                            className={styles.zuordnungSelect}
+                          >
+                            <option value="">-- Gleichung wählen --</option>
+                            {aufgabe.shuffledEquations.map((eqFn: any, eqIdx: number) => {
+                              const eqStr = `y = ${eqFn.m}x ${eqFn.t >= 0 ? '+' : ''} ${eqFn.t}`
+                              return (
+                                <option key={eqIdx} value={equationStr}>
+                                  {eqStr}
+                                </option>
+                              )
+                            })}
+                          </select>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
                 {/* Standard Zahleneingabe */}
-                {aufgabe.typ !== 'funktionsgleichung' && aufgabe.typ !== 'ablesen' && aufgabe.typ !== 'graphZeichnen' && aufgabe.typ !== 'punktAufGerade' && aufgabe.typ !== 'schnittpunkt' && (
+                {aufgabe.typ !== 'funktionsgleichung' && aufgabe.typ !== 'ablesen' && aufgabe.typ !== 'graphZeichnen' && aufgabe.typ !== 'punktAufGerade' && aufgabe.typ !== 'schnittpunkt' && aufgabe.typ !== 'graphZuordnen' && (
                   <input
                     type="text"
                     placeholder="Ergebnis eingeben"
