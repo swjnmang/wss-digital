@@ -59,7 +59,6 @@ const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleP
 
   return (
     <div className={styles.wertetabelleContainer}>
-      <p className={styles.wertetabelleNote}>Runde deine Ergebnisse auf 2 Stellen nach dem Komma!</p>
       <table className={styles.wertetabelle}>
         <tbody>
           <tr>
@@ -376,6 +375,7 @@ export default function GemischteAufgaben() {
       <div className={styles.header}>
         <h1 className={styles.title}>Übungsaufgaben</h1>
         <p className={styles.subtitle}>Löse die Aufgaben und überprüfe deine Ergebnisse</p>
+        <p className={styles.roundingNote}>💡 Wichtig: Runde deine Ergebnisse auf 2 Stellen nach dem Komma!</p>
       </div>
 
       <button onClick={generiereAufgaben} className={styles.newButton}>
