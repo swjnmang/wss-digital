@@ -88,7 +88,7 @@ const GeoGebraMultiGraph: React.FC<GeoGebraMultiGraphProps> = ({
 
   const updateGraphs = (api: any, fns: Array<{ m: number; t: number }>) => {
     try {
-      // RGB Farben für bessere Unterstützung
+      // RGB Farben für bestechende Unterscheidung
       const rgbColors = [
         { r: 255, g: 0, b: 0 },     // Rot
         { r: 0, g: 0, b: 255 },     // Blau
@@ -99,6 +99,7 @@ const GeoGebraMultiGraph: React.FC<GeoGebraMultiGraphProps> = ({
       fns.forEach((fn, idx) => {
         const funcName = `f${idx + 1}`;
         
+        // Lösche alte Funktion
         try {
           api.deleteObject(funcName);
         } catch (e) {
@@ -108,31 +109,20 @@ const GeoGebraMultiGraph: React.FC<GeoGebraMultiGraphProps> = ({
         // Definiere die Funktion
         api.evalCommand(`${funcName}(x) = ${fn.m}*x + ${fn.t}`);
         
-        // Setze die Farbe mit RGB-Werten
+        // Setze Farbe und Dicke
         try {
           api.setColor(funcName, rgbColors[idx].r, rgbColors[idx].g, rgbColors[idx].b);
           api.setLineThickness(funcName, 4);
+          
+          // Setze Label auf dem Graphen selbst
+          api.setLabelVisible(funcName, true);
+          api.setLabel(funcName, String(idx + 1));
         } catch (e) {
-          console.warn(`Konnte Farbe für ${funcName} nicht setzen:`, e);
+          console.warn(`Konnte Einstellungen für ${funcName} nicht setzen:`, e);
         }
-        
-        // Erstelle einen Punkt auf der y-Achse (x=0) mit Label
-        const pointName = `P${idx + 1}`;
-        try {
-          api.deleteObject(pointName);
-        } catch (e) {
-          // OK
-        }
-        
-        const labelY = fn.t;
-        api.evalCommand(`${pointName} = (0, ${labelY})`);
-        api.setColor(pointName, rgbColors[idx].r, rgbColors[idx].g, rgbColors[idx].b);
-        api.setPointSize(pointName, 8);
-        api.setLabelVisible(pointName, true);
-        api.setLabel(pointName, `${idx + 1}`);
       });
       
-      console.log('Graphs with colors updated');
+      console.log('All 4 graphs updated with labels');
     } catch (e) {
       console.error('Fehler beim Update der Graphen:', e);
     }
