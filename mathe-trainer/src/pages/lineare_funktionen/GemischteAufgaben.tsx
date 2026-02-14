@@ -579,7 +579,7 @@ export default function GemischteAufgaben() {
                             {aufgabe.shuffledEquations.map((eqFn: any, eqIdx: number) => {
                               const eqStr = `y = ${eqFn.m}x ${eqFn.t >= 0 ? '+' : ''} ${eqFn.t}`
                               return (
-                                <option key={eqIdx} value={equationStr}>
+                                <option key={eqIdx} value={eqStr}>
                                   {eqStr}
                                 </option>
                               )
