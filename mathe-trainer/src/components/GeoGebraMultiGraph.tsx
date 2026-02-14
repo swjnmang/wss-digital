@@ -88,46 +88,31 @@ const GeoGebraMultiGraph: React.FC<GeoGebraMultiGraphProps> = ({
 
   const updateGraphs = (api: any, fns: Array<{ m: number; t: number }>) => {
     try {
-      // NICHT reset() aufrufen - das löscht alles!
-      // Stattdessen alte Funktionen entfernen
-      for (let i = 1; i <= 4; i++) {
-        try {
-          api.deleteObject(`f${i}`);
-          api.deleteObject(`P${i}`);
-          api.deleteObject(`txt${i}`);
-        } catch (e) {
-          // Ignorieren, falls Objekt nicht existiert
-        }
-      }
-      
       const colors = ['red', 'blue', 'green', 'purple'];
       
       fns.forEach((fn, idx) => {
         const funcName = `f${idx + 1}`;
-        const pointName = `P${idx + 1}`;
-        const textName = `txt${idx + 1}`;
         
-        // Definiere die Funktion
+        try {
+          // Versuche die Funktion zu löschen
+          api.deleteObject(funcName);
+        } catch (e) {
+          // OK, wenn nicht vorhanden
+        }
+        
+        // Definiere die Funktion neu
         api.evalCommand(`${funcName}(x) = ${fn.m}*x + ${fn.t}`);
         
-        // Setze Farbe und Dicke
-        api.setColor(funcName, colors[idx]);
-        api.setLineThickness(funcName, 3);
-        
-        // Erstelle einen Punkt auf der y-Achse (x=0)
-        const labelY = fn.t;
-        api.evalCommand(`${pointName} = (0, ${labelY})`);
-        api.setColor(pointName, colors[idx]);
-        api.setPointSize(pointName, 12);
-        api.setLabelVisible(pointName, true);
-        api.setLabel(pointName, String(idx + 1));
-        
-        // Text-Label für bessere Sichtbarkeit
-        api.evalCommand(`${textName} = Text("Graph ${idx + 1}", (-0.5, ${labelY + 0.8}), true, true)`);
-        api.setColor(textName, colors[idx]);
+        // Setze die Farbe
+        try {
+          api.setColor(funcName, colors[idx]);
+          api.setLineThickness(funcName, 3);
+        } catch (e) {
+          console.warn(`Konnte Farbe für ${funcName} nicht setzen:`, e);
+        }
       });
       
-      console.log('Updated', fns.length, 'graphs successfully');
+      console.log('Graphs updated successfully');
     } catch (e) {
       console.error('Fehler beim Update der Graphen:', e);
     }
