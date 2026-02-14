@@ -619,14 +619,11 @@ export default function GemischteAufgaben() {
                             className={styles.zuordnungSelect}
                           >
                             <option value="">-- Gleichung wählen --</option>
-                            {aufgabe.shuffledEquations.map((eqFn: any, eqIdx: number) => {
-                              const eqStr = `y = ${eqFn.m}x ${eqFn.t >= 0 ? '+' : ''} ${eqFn.t}`
-                              return (
-                                <option key={eqIdx} value={eqStr}>
-                                  {eqStr}
-                                </option>
-                              )
-                            })}
+                            {aufgabe.shuffledEquations.map((eqStr: string, eqIdx: number) => (
+                              <option key={eqIdx} value={eqStr}>
+                                {eqStr}
+                              </option>
+                            ))}
                           </select>
                         </div>
                       )
