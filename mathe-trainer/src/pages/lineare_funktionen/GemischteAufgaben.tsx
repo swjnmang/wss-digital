@@ -27,7 +27,6 @@ interface WertetabelleProps {
 
 const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleProps) => {
   const numRows = 4 // Schüler kann 4 Wertepaare eingeben
-  const tolerance = 0.02
 
   const handleChange = (rowIndex: number, field: 'x' | 'y', inputValue: string) => {
     const newValues = { ...value }
@@ -46,7 +45,9 @@ const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleP
     // Beide Felder müssen gefüllt sein UND gültige Zahlen sein
     if (!isNaN(x) && !isNaN(y) && newValues[rowIndex].x !== '' && newValues[rowIndex].y !== '') {
       const expectedY = Math.round((m * x + t) * 100) / 100
-      newValidierteZellen[cellKey] = Math.abs(y - expectedY) <= tolerance
+      // Toleranz: 1% des erwarteten Wertes oder 0.02, je größer
+      const maxError = Math.max(Math.abs(expectedY) * 0.01, 0.02)
+      newValidierteZellen[cellKey] = Math.abs(y - expectedY) <= maxError
     } else {
       delete newValidierteZellen[cellKey]
     }
@@ -58,34 +59,37 @@ const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleP
 
   return (
     <div className={styles.wertetabelleContainer}>
+      <p className={styles.wertetabelleNote}>Runde deine Ergebnisse auf 2 Stellen nach dem Komma!</p>
       <table className={styles.wertetabelle}>
         <tbody>
           <tr>
             <th className={styles.tableHeader}>x</th>
-            <th className={styles.tableHeader}>y</th>
+            {Array.from({ length: numRows }).map((_, idx) => (
+              <td key={`x-input-${idx}`} className={styles.tableCell}>
+                <input
+                  type="text"
+                  placeholder="x"
+                  value={value?.[idx]?.x || ''}
+                  onChange={(e) => handleChange(idx, 'x', e.target.value)}
+                  className={`${styles.tableInput} ${validierteZellen[`graph-${idx}`] ? styles.inputCorrect : ''}`}
+                />
+              </td>
+            ))}
           </tr>
-          {Array.from({ length: numRows }).map((_, rowIndex) => (
-            <tr key={`row-${rowIndex}`}>
-              <td className={styles.tableCell}>
+          <tr>
+            <th className={styles.tableHeader}>y</th>
+            {Array.from({ length: numRows }).map((_, idx) => (
+              <td key={`y-input-${idx}`} className={styles.tableCell}>
                 <input
                   type="text"
-                  placeholder="x eingeben"
-                  value={value?.[rowIndex]?.x || ''}
-                  onChange={(e) => handleChange(rowIndex, 'x', e.target.value)}
-                  className={`${styles.tableInput} ${validierteZellen[`graph-${rowIndex}`] ? styles.inputCorrect : ''}`}
+                  placeholder="y"
+                  value={value?.[idx]?.y || ''}
+                  onChange={(e) => handleChange(idx, 'y', e.target.value)}
+                  className={`${styles.tableInput} ${validierteZellen[`graph-${idx}`] ? styles.inputCorrect : ''}`}
                 />
               </td>
-              <td className={styles.tableCell}>
-                <input
-                  type="text"
-                  placeholder="y eingeben"
-                  value={value?.[rowIndex]?.y || ''}
-                  onChange={(e) => handleChange(rowIndex, 'y', e.target.value)}
-                  className={`${styles.tableInput} ${validierteZellen[`graph-${rowIndex}`] ? styles.inputCorrect : ''}`}
-                />
-              </td>
-            </tr>
-          ))}
+            ))}
+          </tr>
         </tbody>
       </table>
       <p className={styles.hint}>
@@ -126,7 +130,7 @@ const aufgabenBanks = {
     return {
       typ: 'ablesen',
       thema: '2. Funktionsgleichung ablesen',
-      frage: `Lies m und t aus dem Graphen ab`,
+      frage: `Wie lautet die Funktionsgleichung des abgebildeten Funktionsgraphen? Lies m und t aus dem Graphen ab.`,
       isGraph: true,
       m,
       t,
@@ -303,18 +307,23 @@ export default function GemischteAufgaben() {
       const t = parseFloat((inputData.t || '').replace(',', '.'))
       if (isNaN(m) || isNaN(t)) return false
       const expectedParts = (aufgabe.antwort as string).split(';').map(p => parseFloat(p.trim()))
-      return Math.abs(m - expectedParts[0]) < 0.02 && Math.abs(t - expectedParts[1]) < 0.02
+      const toleranzM = Math.max(Math.abs(expectedParts[0]) * 0.01, 0.02)
+      const toleranzT = Math.max(Math.abs(expectedParts[1]) * 0.01, 0.02)
+      return Math.abs(m - expectedParts[0]) <= toleranzM && Math.abs(t - expectedParts[1]) <= toleranzT
     } else if (aufgabe.typ === 'schnittpunkt') {
       const x = parseFloat((inputData.x || '').replace(',', '.'))
       const y = parseFloat((inputData.y || '').replace(',', '.'))
       if (isNaN(x) || isNaN(y)) return false
       const expected = aufgabe.antwort as { x: number; y: number }
-      return Math.abs(x - expected.x) < 0.02 && Math.abs(y - expected.y) < 0.02
+      const toleranzX = Math.max(Math.abs(expected.x) * 0.01, 0.02)
+      const toleranzY = Math.max(Math.abs(expected.y) * 0.01, 0.02)
+      return Math.abs(x - expected.x) <= toleranzX && Math.abs(y - expected.y) <= toleranzY
     } else if (aufgabe.typ === 'punktAufGerade') {
       return (inputData.value || '').toLowerCase() === aufgabe.antwort
     } else {
       const num = parseFloat((inputData.value || '').replace(',', '.'))
-      return Math.abs(num - aufgabe.antwort) < 0.02
+      const toleranz = Math.max(Math.abs(aufgabe.antwort) * 0.01, 0.02)
+      return Math.abs(num - aufgabe.antwort) <= toleranz
     }
   }
 

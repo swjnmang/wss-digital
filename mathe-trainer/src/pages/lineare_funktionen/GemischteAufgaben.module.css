@@ -347,6 +347,14 @@
   border-radius: 0.375rem;
 }
 
+.wertetabelleNote {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+}
+
 .wertetabelle {
   width: 100%;
   border-collapse: collapse;
@@ -355,9 +363,10 @@
 
 .wertetabelle tbody tr {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 60px repeat(4, 1fr);
   gap: 0.5rem;
   padding: 0.25rem 0;
+  align-items: center;
 }
 
 .tableHeader {
@@ -368,6 +377,7 @@
   background-color: #eff6ff;
   border: 1px solid #bfdbfe;
   border-radius: 0.25rem;
+  min-width: 60px;
 }
 
 .tableCell {
