@@ -88,31 +88,51 @@ const GeoGebraMultiGraph: React.FC<GeoGebraMultiGraphProps> = ({
 
   const updateGraphs = (api: any, fns: Array<{ m: number; t: number }>) => {
     try {
-      const colors = ['red', 'blue', 'green', 'purple'];
+      // RGB Farben für bessere Unterstützung
+      const rgbColors = [
+        { r: 255, g: 0, b: 0 },     // Rot
+        { r: 0, g: 0, b: 255 },     // Blau
+        { r: 0, g: 153, b: 0 },     // Grün
+        { r: 178, g: 0, b: 178 }    // Magenta
+      ];
       
       fns.forEach((fn, idx) => {
         const funcName = `f${idx + 1}`;
         
         try {
-          // Versuche die Funktion zu löschen
           api.deleteObject(funcName);
         } catch (e) {
-          // OK, wenn nicht vorhanden
+          // OK
         }
         
-        // Definiere die Funktion neu
+        // Definiere die Funktion
         api.evalCommand(`${funcName}(x) = ${fn.m}*x + ${fn.t}`);
         
-        // Setze die Farbe
+        // Setze die Farbe mit RGB-Werten
         try {
-          api.setColor(funcName, colors[idx]);
-          api.setLineThickness(funcName, 3);
+          api.setColor(funcName, rgbColors[idx].r, rgbColors[idx].g, rgbColors[idx].b);
+          api.setLineThickness(funcName, 4);
         } catch (e) {
           console.warn(`Konnte Farbe für ${funcName} nicht setzen:`, e);
         }
+        
+        // Erstelle einen Punkt auf der y-Achse (x=0) mit Label
+        const pointName = `P${idx + 1}`;
+        try {
+          api.deleteObject(pointName);
+        } catch (e) {
+          // OK
+        }
+        
+        const labelY = fn.t;
+        api.evalCommand(`${pointName} = (0, ${labelY})`);
+        api.setColor(pointName, rgbColors[idx].r, rgbColors[idx].g, rgbColors[idx].b);
+        api.setPointSize(pointName, 8);
+        api.setLabelVisible(pointName, true);
+        api.setLabel(pointName, `${idx + 1}`);
       });
       
-      console.log('Graphs updated successfully');
+      console.log('Graphs with colors updated');
     } catch (e) {
       console.error('Fehler beim Update der Graphen:', e);
     }
