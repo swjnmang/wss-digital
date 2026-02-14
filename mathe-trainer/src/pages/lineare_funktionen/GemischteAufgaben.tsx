@@ -244,11 +244,17 @@ const aufgabenBanks = {
 
   // 8. Graphen zuordnen (Zuordnungsaufgaben)
   graphZuordnen: () => {
-    // Generiere 4 zufällige Funktionsgleichungen
-    const functions = Array.from({ length: 4 }).map(() => ({
-      m: randInt(-3, 3, [0]),
-      t: randInt(-3, 3)
-    }))
+    // Generiere 4 zufällige Funktionsgleichungen (m darf nicht 0 sein!)
+    const functions = Array.from({ length: 4 }).map(() => {
+      let m = 0;
+      while (m === 0) {
+        m = randInt(-3, 3);
+      }
+      return {
+        m,
+        t: randInt(-3, 3)
+      }
+    })
 
     // Mische die Funktionen für die Anzeige (damit nicht Graph 1 = Gleichung 1 ist)
     const shuffled = [...functions].sort(() => Math.random() - 0.5)
