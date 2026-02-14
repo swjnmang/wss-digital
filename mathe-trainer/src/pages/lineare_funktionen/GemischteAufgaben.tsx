@@ -348,8 +348,14 @@ export default function GemischteAufgaben() {
     const neue: Aufgabe[] = []
     const themen = Object.keys(aufgabenBanks) as (keyof typeof aufgabenBanks)[]
     
-    // Zufällig Themen auswählen
-    for (let i = 0; i < 10; i++) {
+    // Zuerst jeden Aufgabentyp mindestens einmal hinzufügen (shuffled)
+    const shuffledThemen = [...themen].sort(() => Math.random() - 0.5)
+    shuffledThemen.forEach((thema) => {
+      neue.push(aufgabenBanks[thema]())
+    })
+    
+    // Dann die verbleibenden Aufgaben zufällig auswählen (10 - Anzahl Themen)
+    for (let i = 0; i < 10 - themen.length; i++) {
       const thema = themen[randInt(0, themen.length - 1)]
       neue.push(aufgabenBanks[thema]())
     }
