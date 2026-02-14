@@ -244,17 +244,23 @@ const aufgabenBanks = {
 
   // 8. Graphen zuordnen (Zuordnungsaufgaben)
   graphZuordnen: () => {
-    // Generiere 4 zufällige Funktionsgleichungen (m darf nicht 0 sein!)
-    const functions = Array.from({ length: 4 }).map(() => {
+    // Generiere 3 zufällige Funktionsgleichungen mit unterschiedlichen Steigungen
+    const mValues: number[] = [];
+    while (mValues.length < 3) {
       let m = 0;
       while (m === 0) {
         m = randInt(-3, 3);
       }
-      return {
-        m,
-        t: randInt(-3, 3)
+      // Überprüfe, ob dieser m-Wert bereits vorhanden ist
+      if (!mValues.includes(m)) {
+        mValues.push(m);
       }
-    })
+    }
+    
+    const functions = mValues.map((m) => ({
+      m,
+      t: randInt(-3, 3)
+    }));
 
     // Mische die Funktionen für die Anzeige (damit nicht Graph 1 = Gleichung 1 ist)
     const shuffled = [...functions].sort(() => Math.random() - 0.5)
@@ -266,7 +272,7 @@ const aufgabenBanks = {
       antwort[idx] = eqStr
     })
 
-    const frage = `Ordne die Funktionsgleichungen den Graphen (1, 2, 3, 4) zu.`
+    const frage = `Ordne die Funktionsgleichungen den Graphen (1, 2, 3) zu.`
     const lösungsweg = `Die Funktionsgleichungen entsprechen den Graphen:\n${functions
       .map((fn, idx) => `Graph ${idx + 1}: y = ${fn.m}x ${fn.t >= 0 ? '+' : '-'} ${Math.abs(fn.t)}`)
       .join('\n')}`

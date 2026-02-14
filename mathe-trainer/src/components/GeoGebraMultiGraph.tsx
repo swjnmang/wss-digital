@@ -88,23 +88,24 @@ const GeoGebraMultiGraph: React.FC<GeoGebraMultiGraphProps> = ({
 
   const updateGraphs = (api: any, fns: Array<{ m: number; t: number }>) => {
     try {
-      // RGB Farben für bestechende Unterscheidung
+      // RGB Farben für 3 Graphen
       const rgbColors = [
         { r: 255, g: 0, b: 0 },     // Rot
         { r: 0, g: 0, b: 255 },     // Blau
-        { r: 0, g: 153, b: 0 },     // Grün
-        { r: 178, g: 0, b: 178 }    // Magenta
+        { r: 0, g: 153, b: 0 }      // Grün
       ];
       
-      fns.forEach((fn, idx) => {
-        const funcName = `f${idx + 1}`;
-        
-        // Lösche alte Funktion
+      // Lösche alte Graphen
+      for (let i = 1; i <= 4; i++) {
         try {
-          api.deleteObject(funcName);
+          api.deleteObject(`f${i}`);
         } catch (e) {
           // OK
         }
+      }
+      
+      fns.forEach((fn, idx) => {
+        const funcName = `f${idx + 1}`;
         
         // Definiere die Funktion
         api.evalCommand(`${funcName}(x) = ${fn.m}*x + ${fn.t}`);
@@ -122,7 +123,7 @@ const GeoGebraMultiGraph: React.FC<GeoGebraMultiGraphProps> = ({
         }
       });
       
-      console.log('All 4 graphs updated with labels');
+      console.log('All 3 graphs updated with labels');
     } catch (e) {
       console.error('Fehler beim Update der Graphen:', e);
     }
