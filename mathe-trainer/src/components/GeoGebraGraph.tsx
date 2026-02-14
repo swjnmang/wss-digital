@@ -22,6 +22,8 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const appletRef = useRef<any>(null);
   const elementIdRef = useRef<string>(`ggb-elem-${Math.random().toString(36).substr(2, 9)}`);
+  const [scriptLoaded, setScriptLoaded] = React.useState<boolean>(!!window.GGBApplet);
+  const [error, setError] = React.useState<boolean>(false);
 
   // Initialisiere GeoGebra einmalig
   useEffect(() => {
@@ -54,6 +56,7 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
         applet.inject(elementId);
       } catch (e) {
         console.error('GeoGebra Error beim Injizieren:', e);
+        setError(true);
       }
     };
 
@@ -65,11 +68,17 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
       s.src = 'https://www.geogebra.org/apps/deployggb.js';
       s.async = true;
       s.onload = () => {
-        setTimeout(() => initApplet(), 100);
+        setScriptLoaded(true);
+        setTimeout(() => initApplet(), 150);
+      };
+      s.onerror = () => {
+        console.error('Fehler beim Laden von GeoGebra Script');
+        setError(true);
       };
       document.body.appendChild(s);
     } else {
-      initApplet();
+      setScriptLoaded(true);
+      setTimeout(() => initApplet(), 50);
     }
   }, [width, height]);
 
@@ -101,15 +110,67 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
         borderRadius: '8px'
       }}
     >
-      <div 
-        id={elementIdRef.current}
-        style={{
-          width: `${width}px`,
-          height: `${height}px`,
-          border: '1px solid #ddd',
-          borderRadius: '4px'
-        }}
-      />
+      {error ? (
+        <div 
+          style={{
+            width: `${width}px`,
+            height: `${height}px`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '2px dashed #d1d5db',
+            borderRadius: '4px',
+            backgroundColor: '#f3f4f6',
+            flexDirection: 'column',
+            gap: '10px',
+            color: '#6b7280',
+            fontSize: '14px'
+          }}
+        >
+          <span>⚠️ Graph konnte nicht geladen werden</span>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '13px'
+            }}
+          >
+            Seite neu laden
+          </button>
+        </div>
+      ) : !scriptLoaded ? (
+        <div 
+          style={{
+            width: `${width}px`,
+            height: `${height}px`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '1px solid #e5e7eb',
+            borderRadius: '4px',
+            backgroundColor: '#f9fafb',
+            color: '#6b7280',
+            fontSize: '14px'
+          }}
+        >
+          ⏳ Graph wird geladen...
+        </div>
+      ) : (
+        <div 
+          id={elementIdRef.current}
+          style={{
+            width: `${width}px`,
+            height: `${height}px`,
+            border: '1px solid #ddd',
+            borderRadius: '4px'
+          }}
+        />
+      )}
     </div>
   );
 };
