@@ -48,7 +48,21 @@ const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleP
       const expectedY = Math.round((m * x + t) * 100) / 100
       // Toleranz: 1% des erwarteten Wertes oder 0.02, je größer
       const maxError = Math.max(Math.abs(expectedY) * 0.01, 0.02)
-      newValidierteZellen[cellKey] = Math.abs(y - expectedY) <= maxError
+      
+      // Überprüfe, ob dieses Wertepaar bereits existiert (Duplikat-Prüfung)
+      let isDuplicate = false
+      for (let i = 0; i < numRows; i++) {
+        if (i !== rowIndex && newValues[i]?.x && newValues[i]?.y) {
+          const otherX = parseFloat(newValues[i].x.replace(',', '.'))
+          const otherY = parseFloat(newValues[i].y.replace(',', '.'))
+          if (!isNaN(otherX) && !isNaN(otherY) && otherX === x && otherY === y) {
+            isDuplicate = true
+            break
+          }
+        }
+      }
+      
+      newValidierteZellen[cellKey] = !isDuplicate && Math.abs(y - expectedY) <= maxError
     } else {
       delete newValidierteZellen[cellKey]
     }
