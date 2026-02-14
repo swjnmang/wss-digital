@@ -90,25 +90,32 @@ const GeoGebraMultiGraph: React.FC<GeoGebraMultiGraphProps> = ({
     try {
       api.reset();
       
-      // Definiere die Funktionen mit unterschiedlichen Farben und Labels
-      const colors = ['#FF0000', '#0000FF', '#00AA00', '#AA00AA']; // Rot, Blau, Grün, Magenta
-      const labels = ['1', '2', '3', '4'];
+      // Farben für die 4 Graphen
+      const colors = ['red', 'blue', 'green', 'purple'];
       
       fns.forEach((fn, idx) => {
         const funcName = `f${idx + 1}`;
+        // Definiere die Funktion
         api.evalCommand(`${funcName}(x) = ${fn.m}*x + ${fn.t}`);
+        
+        // Setze Farbe und Dicke
         api.setColor(funcName, colors[idx]);
-        api.setPointSize(funcName, 5);
         api.setLineThickness(funcName, 3);
         
-        // Zeige einen Punkt mit Label auf dem Graphen
-        const labelX = 0.5;
-        const labelY = fn.m * labelX + fn.t;
-        api.evalCommand(`p${idx + 1} = (${labelX}, ${labelY})`);
-        api.setColor(`p${idx + 1}`, colors[idx]);
-        api.setPointSize(`p${idx + 1}`, 8);
-        api.setLabelVisible(`p${idx + 1}`, true);
-        api.setLabel(`p${idx + 1}`, labels[idx]);
+        // Erstelle einen Punkt auf der Funktion und gib ihm ein Label
+        const labelX = 0;
+        const labelY = fn.t;
+        const pointName = `P${idx + 1}`;
+        api.evalCommand(`${pointName} = (${labelX}, ${labelY})`);
+        api.setColor(pointName, colors[idx]);
+        api.setPointSize(pointName, 12);
+        api.setLabelVisible(pointName, true);
+        api.setLabel(pointName, String(idx + 1));
+        
+        // Text-Label daneben für bessere Sichtbarkeit
+        const textName = `txt${idx + 1}`;
+        api.evalCommand(`${textName} = Text("${idx + 1}", (0.3, ${labelY}), true)`);
+        api.setColor(textName, colors[idx]);
       });
     } catch (e) {
       console.error('Fehler beim Update der Graphen:', e);
