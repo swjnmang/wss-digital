@@ -16,6 +16,80 @@ const MathDisplay = ({ latex }: { latex: string }) => {
   return <div ref={ref} className={styles.mathDisplay}>{latex}</div>
 }
 
+// Wertetabelle-Komponente für graphZeichnen
+interface WertetabelleProps {
+  m: number
+  t: number
+  onValuesChange: (validCount: number) => void
+  value: any
+}
+
+const Wertetabelle = ({ m, t, onValuesChange, value }: WertetabelleProps) => {
+  const xValues = [-2, -1, 0, 1, 2]
+  
+  const handleYChange = (index: number, yValue: string) => {
+    const newValues = { ...value }
+    newValues[xValues[index]] = yValue
+    onValuesChange(newValues)
+  }
+
+  const getValidationStatus = (x: number, yInput: string): 'correct' | 'incorrect' | 'empty' => {
+    if (yInput === '') return 'empty'
+    const yExpected = Math.round((m * x + t) * 100) / 100
+    const yValue = parseFloat(yInput.replace(',', '.'))
+    if (isNaN(yValue)) return 'incorrect'
+    return Math.abs(yValue - yExpected) < 0.02 ? 'correct' : 'incorrect'
+  }
+
+  const correctCount = xValues.filter(x => {
+    const yInput = value?.[x] || ''
+    return getValidationStatus(x, yInput) === 'correct'
+  }).length
+
+  useEffect(() => {
+    onValuesChange(correctCount)
+  }, [correctCount, onValuesChange])
+
+  return (
+    <div className={styles.wertetabelleContainer}>
+      <table className={styles.wertetabelle}>
+        <tbody>
+          <tr>
+            <td className={styles.headerCell}>x</td>
+            {xValues.map(x => (
+              <td key={`x-${x}`} className={styles.headerCell}>{x}</td>
+            ))}
+          </tr>
+          <tr>
+            <td className={styles.headerCell}>y</td>
+            {xValues.map((x, idx) => {
+              const yInput = value?.[x] || ''
+              const status = getValidationStatus(x, yInput)
+              return (
+                <td
+                  key={`y-${x}`}
+                  className={`${styles.yCell} ${
+                    status === 'correct' ? styles.yCorrect : status === 'incorrect' ? styles.yIncorrect : ''
+                  }`}
+                >
+                  <input
+                    type="text"
+                    placeholder="y"
+                    value={yInput}
+                    onChange={(e) => handleYChange(idx, e.target.value)}
+                    className={styles.yInput}
+                  />
+                </td>
+              )
+            })}
+          </tr>
+        </tbody>
+      </table>
+      <p className={styles.hint}>{correctCount} / {xValues.length} korrekt</p>
+    </div>
+  )
+}
+
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
@@ -30,7 +104,7 @@ const aufgabenBanks = {
     return {
       typ: 'graphZeichnen',
       thema: '1. Graph zeichnen',
-      frage: `Skizziere den Graphen für: y = ${m}x ${t >= 0 ? '+' : '-'} ${Math.abs(t)}`,
+      frage: `Erstelle eine Wertetabelle für y = ${m}x ${t >= 0 ? '+' : '-'} ${Math.abs(t)} und zeichne den Funktionsgraph in ein selbst erstelltes Koordinatensystem.`,
       isGraph: true,
       m,
       t,
@@ -70,7 +144,7 @@ const aufgabenBanks = {
     return {
       typ: 'steigungBerechnen',
       thema: '3. Steigung berechnen',
-      frage: `Berechne m zwischen P₁(${x1}|${y1}) und P₂(${x2}|${y2})`,
+      frage: `Wie groß ist die Steigung m zwischen P₁(${x1}|${y1}) und P₂(${x2}|${y2})? Berechne!`,
       antwort: mRound,
       lösungsweg: `$$m = \\dfrac{${y2} - (${y1})}{${x2} - (${x1})} = \\dfrac{${y2 - y1}}{${x2 - x1}} = ${mRound}$$`
     }
@@ -92,7 +166,7 @@ const aufgabenBanks = {
     return {
       typ: 'funktionsgleichung',
       thema: '4. Funktionsgleichung aufstellen',
-      frage: `Stelle die Gleichung auf: P₁(${x1}|${y1}), P₂(${x2}|${y2})`,
+      frage: `Wie lautet die Funktionsgleichung der Geraden, die durch die Punkte P₁(${x1}|${y1}), P₂(${x2}|${y2}) verläuft? Berechne!`,
       antwort: `${mRound};${tRound}`,
       lösungsweg: `$$m = \\dfrac{${y2 - y1}}{${x2 - x1}} = ${mRound}$$\n$$t = ${y1} - ${mRound} \\cdot ${x1} = ${tRound}$$\n$$y = ${mRound}x ${tRound >= 0 ? '+' : '-'} ${Math.abs(tRound)}$$`
     }
@@ -153,8 +227,8 @@ const aufgabenBanks = {
     return {
       typ: 'schnittpunkt',
       thema: '7. Schnittpunkt zweier Geraden',
-      frage: `Schnittpunkt: g₁: y = ${m1}x ${t1 >= 0 ? '+' : '-'} ${Math.abs(t1)} und g₂: y = ${m2}x ${t2 >= 0 ? '+' : '-'} ${Math.abs(t2)}. Gib x ein:`,
-      antwort: x,
+      frage: `Berechne die Koordinaten des Schnittpunktes der beiden Geraden g₁: y = ${m1}x ${t1 >= 0 ? '+' : '-'} ${Math.abs(t1)} und g₂: y = ${m2}x ${t2 >= 0 ? '+' : '-'} ${Math.abs(t2)}.`,
+      antwort: { x, y },
       lösungsweg: `Gleichsetzen: ${m1}x ${t1 >= 0 ? '+' : '-'} ${Math.abs(t1)} = ${m2}x ${t2 >= 0 ? '+' : '-'} ${Math.abs(t2)}\n$$x = ${x}, \\quad y = ${y}$$\nSchnittpunkt: (${x}|${y})`
     }
   }
@@ -173,11 +247,10 @@ interface Aufgabe {
 
 export default function GemischteAufgaben() {
   const [aufgaben, setAufgaben] = useState<Aufgabe[]>([])
-  const [antworten, setAntworten] = useState<{ [key: number]: { m?: string; t?: string; value?: string } }>({})
+  const [antworten, setAntworten] = useState<{ [key: number]: { m?: string; t?: string; x?: string; y?: string; value?: string; [key: number]: string } }>({})
   const [validiert, setValidiert] = useState<{ [key: number]: boolean }>({})
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
-
-  // MathJax laden
+  const [wertetabelleValidCount, setWertetabelleValidCount] = useState<{ [key: number]: number }>({})
   useEffect(() => {
     const script = document.createElement('script')
     script.src = 'https://polyfill.io/v3/polyfill.min.js?features=es6'
@@ -215,12 +288,21 @@ export default function GemischteAufgaben() {
     const aufgabe = aufgaben[index]
     if (!aufgabe) return false
     
-    if (aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen' || aufgabe.typ === 'graphZeichnen') {
+    if (aufgabe.typ === 'graphZeichnen') {
+      // Wertetabelle: mindestens 3 von 5 Werten korrekt
+      return wertetabelleValidCount[index] >= 3
+    } else if (aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen') {
       const m = parseFloat((inputData.m || '').replace(',', '.'))
       const t = parseFloat((inputData.t || '').replace(',', '.'))
       if (isNaN(m) || isNaN(t)) return false
       const expectedParts = (aufgabe.antwort as string).split(';').map(p => parseFloat(p.trim()))
       return Math.abs(m - expectedParts[0]) < 0.02 && Math.abs(t - expectedParts[1]) < 0.02
+    } else if (aufgabe.typ === 'schnittpunkt') {
+      const x = parseFloat((inputData.x || '').replace(',', '.'))
+      const y = parseFloat((inputData.y || '').replace(',', '.'))
+      if (isNaN(x) || isNaN(y)) return false
+      const expected = aufgabe.antwort as { x: number; y: number }
+      return Math.abs(x - expected.x) < 0.02 && Math.abs(y - expected.y) < 0.02
     } else if (aufgabe.typ === 'punktAufGerade') {
       return (inputData.value || '').toLowerCase() === aufgabe.antwort
     } else {
@@ -250,6 +332,16 @@ export default function GemischteAufgaben() {
       [index]: {
         ...antworten[index],
         value
+      }
+    })
+  }
+
+  function handleXYChange(index: number, field: 'x' | 'y', value: string) {
+    setAntworten({
+      ...antworten,
+      [index]: {
+        ...antworten[index],
+        [field]: value
       }
     })
   }
@@ -313,7 +405,7 @@ export default function GemischteAufgaben() {
                 )}
 
                 {/* M und T Eingabe mit Live-Anzeige */}
-                {(aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen' || aufgabe.typ === 'graphZeichnen') && (
+                {(aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen') && (
                   <div className={styles.mtSection}>
                     <div className={styles.mtInputs}>
                       <div className={styles.mtGroup}>
@@ -347,8 +439,51 @@ export default function GemischteAufgaben() {
                   </div>
                 )}
 
+                {/* Wertetabelle für graphZeichnen */}
+                {aufgabe.typ === 'graphZeichnen' && aufgabe.m !== undefined && aufgabe.t !== undefined && (
+                  <div className={styles.wertetabelleWrapper}>
+                    <p className={styles.wertetabelleHint}>Fülle die Wertetabelle aus. Die Zellen werden grün, wenn dein y-Wert korrekt ist.</p>
+                    <Wertetabelle
+                      m={aufgabe.m}
+                      t={aufgabe.t}
+                      onValuesChange={(validCount) => {
+                        setWertetabelleValidCount({ ...wertetabelleValidCount, [index]: validCount })
+                      }}
+                      value={antworten[index] || {}}
+                    />
+                  </div>
+                )}
+
+                {/* Schnittpunkt: X und Y Eingabe */}
+                {aufgabe.typ === 'schnittpunkt' && (
+                  <div className={styles.xySection}>
+                    <div className={styles.xyInputs}>
+                      <div className={styles.xyGroup}>
+                        <label>x =</label>
+                        <input
+                          type="text"
+                          placeholder="z.B. 2"
+                          value={antworten[index]?.x || ''}
+                          onChange={(e) => handleXYChange(index, 'x', e.target.value)}
+                          className={styles.xyInput}
+                        />
+                      </div>
+                      <div className={styles.xyGroup}>
+                        <label>y =</label>
+                        <input
+                          type="text"
+                          placeholder="z.B. -3"
+                          value={antworten[index]?.y || ''}
+                          onChange={(e) => handleXYChange(index, 'y', e.target.value)}
+                          className={styles.xyInput}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Standard Zahleneingabe */}
-                {aufgabe.typ !== 'funktionsgleichung' && aufgabe.typ !== 'ablesen' && aufgabe.typ !== 'graphZeichnen' && aufgabe.typ !== 'punktAufGerade' && (
+                {aufgabe.typ !== 'funktionsgleichung' && aufgabe.typ !== 'ablesen' && aufgabe.typ !== 'graphZeichnen' && aufgabe.typ !== 'punktAufGerade' && aufgabe.typ !== 'schnittpunkt' && (
                   <input
                     type="text"
                     placeholder="Ergebnis eingeben"
