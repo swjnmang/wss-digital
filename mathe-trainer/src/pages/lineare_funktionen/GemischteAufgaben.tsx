@@ -16,43 +16,45 @@ const MathDisplay = ({ latex }: { latex: string }) => {
   return <div ref={ref} className={styles.mathDisplay}>{latex}</div>
 }
 
-// Wertetabelle-Komponente für graphZeichnen
+// Wertetabelle-Komponente für graphZeichnen (leere Tabelle zum Ausfüllen)
 interface WertetabelleProps {
   m: number
   t: number
   value: any
-  onChange: (newValues: any, validCount: number) => void
+  onChange: (newValues: any, newValidierteZellen: any) => void
   validierteZellen: { [key: string]: boolean }
 }
 
 const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleProps) => {
-  const xValues = [-2, -1, 0, 1, 2]
+  const numRows = 4 // Schüler kann 4 Wertepaare eingeben
   const tolerance = 0.02
 
-  const handleValueChange = (xIndex: number, field: 'x' | 'y', inputValue: string) => {
+  const handleChange = (rowIndex: number, field: 'x' | 'y', inputValue: string) => {
     const newValues = { ...value }
-    if (!newValues[xIndex]) {
-      newValues[xIndex] = { x: '', y: '' }
+    if (!newValues[rowIndex]) {
+      newValues[rowIndex] = { x: '', y: '' }
     }
-    newValues[xIndex][field] = inputValue
+    newValues[rowIndex][field] = inputValue
 
     // Live-Validierung
-    const cellKey = `graph-${xIndex}`
+    const cellKey = `graph-${rowIndex}`
     const newValidierteZellen = { ...validierteZellen }
 
-    const x = parseFloat(newValues[xIndex].x.replace(',', '.'))
-    const y = parseFloat(newValues[xIndex].y.replace(',', '.'))
+    const x = parseFloat(newValues[rowIndex].x.replace(',', '.'))
+    const y = parseFloat(newValues[rowIndex].y.replace(',', '.'))
 
-    if (!isNaN(x) && !isNaN(y) && newValues[xIndex].x !== '' && newValues[xIndex].y !== '') {
+    // Beide Felder müssen gefüllt sein UND gültige Zahlen sein
+    if (!isNaN(x) && !isNaN(y) && newValues[rowIndex].x !== '' && newValues[rowIndex].y !== '') {
       const expectedY = Math.round((m * x + t) * 100) / 100
       newValidierteZellen[cellKey] = Math.abs(y - expectedY) <= tolerance
     } else {
       delete newValidierteZellen[cellKey]
     }
 
-    const validCount = Object.values(newValidierteZellen).filter(Boolean).length
     onChange(newValues, newValidierteZellen)
   }
+
+  const correctCount = Object.values(validierteZellen).filter(Boolean).length
 
   return (
     <div className={styles.wertetabelleContainer}>
@@ -60,30 +62,34 @@ const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleP
         <tbody>
           <tr>
             <th className={styles.tableHeader}>x</th>
-            {xValues.map((x, idx) => (
-              <td key={`x-header-${idx}`} className={styles.tableHeaderCell}>
-                {x}
-              </td>
-            ))}
-          </tr>
-          <tr>
             <th className={styles.tableHeader}>y</th>
-            {xValues.map((x, idx) => (
-              <td key={`y-${idx}`} className={styles.tableCell}>
+          </tr>
+          {Array.from({ length: numRows }).map((_, rowIndex) => (
+            <tr key={`row-${rowIndex}`}>
+              <td className={styles.tableCell}>
                 <input
                   type="text"
-                  placeholder="y"
-                  value={value?.[idx]?.y || ''}
-                  onChange={(e) => handleValueChange(idx, 'y', e.target.value)}
-                  className={`${styles.tableInput} ${validierteZellen[`graph-${idx}`] ? styles.inputCorrect : ''}`}
+                  placeholder="x eingeben"
+                  value={value?.[rowIndex]?.x || ''}
+                  onChange={(e) => handleChange(rowIndex, 'x', e.target.value)}
+                  className={`${styles.tableInput} ${validierteZellen[`graph-${rowIndex}`] ? styles.inputCorrect : ''}`}
                 />
               </td>
-            ))}
-          </tr>
+              <td className={styles.tableCell}>
+                <input
+                  type="text"
+                  placeholder="y eingeben"
+                  value={value?.[rowIndex]?.y || ''}
+                  onChange={(e) => handleChange(rowIndex, 'y', e.target.value)}
+                  className={`${styles.tableInput} ${validierteZellen[`graph-${rowIndex}`] ? styles.inputCorrect : ''}`}
+                />
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
       <p className={styles.hint}>
-        {Object.values(validierteZellen).filter(Boolean).length} / {xValues.length} korrekt
+        {correctCount} / {numRows} korrekte Wertepaare
       </p>
     </div>
   )
@@ -288,10 +294,10 @@ export default function GemischteAufgaben() {
     if (!aufgabe) return false
     
     if (aufgabe.typ === 'graphZeichnen') {
-      // Wertetabelle: mindestens 3 von 5 Werten korrekt
+      // Wertetabelle: mindestens 2 von 4 Wertepaaren korrekt
       const cellsForThisTask = validierteZellen[index] || {}
       const correctCount = Object.values(cellsForThisTask).filter(Boolean).length
-      return correctCount >= 3
+      return correctCount >= 2
     } else if (aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen') {
       const m = parseFloat((inputData.m || '').replace(',', '.'))
       const t = parseFloat((inputData.t || '').replace(',', '.'))
