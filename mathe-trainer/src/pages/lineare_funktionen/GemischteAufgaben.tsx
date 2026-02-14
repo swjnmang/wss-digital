@@ -262,15 +262,39 @@ const aufgabenBanks = {
       t: randInt(-3, 3)
     }));
 
-    // Mische die Funktionen für die Anzeige (damit nicht Graph 1 = Gleichung 1 ist)
-    const shuffled = [...functions].sort(() => Math.random() - 0.5)
-
     // Erstelle die Lösungszuordnung (welche Gleichung zu welchem Graphen)
     const antwort: { [key: number]: string } = {}
     functions.forEach((fn, idx) => {
       const eqStr = `y = ${fn.m}x ${fn.t >= 0 ? '+' : ''} ${fn.t}`
       antwort[idx] = eqStr
     })
+
+    // Generiere alle Gleichungen (echte + Distraktoren)
+    const allEquations: string[] = []
+    functions.forEach((fn) => {
+      const eqStr = `y = ${fn.m}x ${fn.t >= 0 ? '+' : ''} ${fn.t}`
+      allEquations.push(eqStr)
+    })
+
+    // Generiere 2 Distraktoren (falsche Gleichungen)
+    const distractors: string[] = []
+    while (distractors.length < 2) {
+      let m = 0;
+      while (m === 0) {
+        m = randInt(-3, 3);
+      }
+      const t = randInt(-3, 3)
+      const eqStr = `y = ${m}x ${t >= 0 ? '+' : ''} ${t}`
+      
+      // Stelle sicher, dass der Distraktor nicht bereits vorhanden ist
+      if (!allEquations.includes(eqStr) && !distractors.includes(eqStr)) {
+        distractors.push(eqStr)
+      }
+    }
+
+    // Kombiniere alle Gleichungen und shuffle sie
+    const allOptions = [...allEquations, ...distractors]
+    const shuffledEquations = allOptions.sort(() => Math.random() - 0.5)
 
     const frage = `Ordne die Funktionsgleichungen den Graphen (1, 2, 3) zu.`
     const lösungsweg = `Die Funktionsgleichungen entsprechen den Graphen:\n${functions
@@ -283,7 +307,7 @@ const aufgabenBanks = {
       frage,
       isGraph: true,
       functions,
-      shuffledEquations: shuffled,
+      shuffledEquations,
       antwort,
       lösungsweg
     }
@@ -370,7 +394,8 @@ export default function GemischteAufgaben() {
       const mappings = inputData as { [key: number]: string }
       const correctAnswer = aufgabe.antwort as { [key: number]: string }
       
-      for (let i = 0; i < 4; i++) {
+      // Überprüfe alle 3 Graphen
+      for (let i = 0; i < 3; i++) {
         if (!mappings[i] || mappings[i] !== correctAnswer[i]) {
           return false
         }
