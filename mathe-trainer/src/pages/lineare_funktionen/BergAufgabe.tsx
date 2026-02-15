@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
 interface Solution {
-  type: 'number' | 'text'
-  answer: string | number
+  type: 'number' | 'text' | 'wertetabelle'
+  answer?: string | number
   tolerance?: number
   labels?: string[] // für mehrteilige Antworten (z.B. x, y)
   answers?: (string | number)[] // für mehrteilige Antworten
@@ -72,6 +72,19 @@ export default function BergAufgabe() {
         tolerance: 50,
       },
       hint: 'Berechne zuerst die Nullstelle des grünen Lifts: 0 = -0,68x + 9,85 → x ≈ 14,49. Also B(14,49|0). Der Abstand der x-Koordinaten ist: |14,49 - (-2,5)| = 16,99 Längeneinheiten. In Metern: 16,99 · 1000 ≈ 16990 m',
+    },
+    {
+      id: 5,
+      title: 'Aufgabe 5',
+      question:
+        'Ergänze die abgebildete Wertetabelle, die zum grünen Lift mit y = -0,68x + 9,85 gehört. Gib die fehlenden Werte ein.',
+      solution: {
+        type: 'wertetabelle',
+        labels: ['y₁ (x=1)', 'x₂ (y=5)', 'y₃ (x=3)', 'x₄ (y=7)', 'y₅ (x=8)'],
+        answers: [9.17, 7.13, 7.81, 4.19, 4.29],
+        tolerance: 0.005,
+      },
+      hint: 'Verwende die Gleichung y = -0,68x + 9,85. Für fehlende y-Werte: setze x ein. Für fehlende x-Werte: löse nach x auf. z.B. y₁: y = -0,68·1 + 9,85 = 9,17. x₂: 5 = -0,68x + 9,85 → x = 7,13.',
     },
   ]
 
@@ -202,32 +215,90 @@ export default function BergAufgabe() {
             <h2 className="text-2xl font-bold text-blue-900 mb-3">{currentTaskData.title}</h2>
             <p className="text-lg text-gray-800 mb-6">{currentTaskData.question}</p>
 
+            {/* Wertetabelle Visualisierung */}
+            {currentTaskData.solution.type === 'wertetabelle' && (
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm font-semibold text-blue-900 mb-3">Wertetabelle zum grünen Lift: y = -0,68x + 9,85</p>
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-blue-200">
+                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">x</th>
+                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">1</th>
+                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">?</th>
+                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">3</th>
+                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">?</th>
+                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">8</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="border border-blue-300 px-3 py-2 font-bold bg-blue-100">y</td>
+                      <td className="border border-blue-300 px-3 py-2 text-center">?</td>
+                      <td className="border border-blue-300 px-3 py-2 text-center">5</td>
+                      <td className="border border-blue-300 px-3 py-2 text-center">?</td>
+                      <td className="border border-blue-300 px-3 py-2 text-center">7</td>
+                      <td className="border border-blue-300 px-3 py-2 text-center">?</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+
             {/* Input */}
             {currentTaskData.solution.answers && currentTaskData.solution.labels ? (
-              // Mehrteilige Eingabe (z.B. x und y)
-              <div className="mb-4 space-y-3">
-                {currentTaskData.solution.labels.map((label, index) => {
-                  const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
-                  return (
-                    <div key={index}>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">{label}:</label>
-                      <input
-                        type="text"
-                        value={currentInputs[label] || ''}
-                        onChange={(e) => handleMultiInputChange(label, e.target.value)}
-                        placeholder={`Gib den ${label} ein...`}
-                        className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
-                          feedbackState === 'correct'
-                            ? 'border-green-500 bg-green-50'
-                            : feedbackState === 'incorrect'
-                              ? 'border-red-500 bg-red-50'
-                              : 'border-gray-300 focus:border-blue-500'
-                        }`}
-                      />
-                    </div>
-                  )
-                })}
-              </div>
+              // Wertetabelle-Input (spezielle Darstellung)
+              currentTaskData.solution.type === 'wertetabelle' ? (
+                <div className="mb-4">
+                  <div className="grid grid-cols-5 gap-2">
+                    {currentTaskData.solution.labels.map((label, index) => {
+                      const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
+                      return (
+                        <div key={index}>
+                          <label className="block text-xs font-medium text-gray-700 mb-1 text-center">{label}</label>
+                          <input
+                            type="text"
+                            value={currentInputs[label] || ''}
+                            onChange={(e) => handleMultiInputChange(label, e.target.value)}
+                            placeholder="?"
+                            className={`w-full px-2 py-2 border-2 rounded text-center text-sm focus:outline-none transition ${
+                              feedbackState === 'correct'
+                                ? 'border-green-500 bg-green-50'
+                                : feedbackState === 'incorrect'
+                                  ? 'border-red-500 bg-red-50'
+                                  : 'border-gray-300 focus:border-blue-500'
+                            }`}
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : (
+                // Mehrteilige Eingabe (z.B. x und y für Schnittpunkt)
+                <div className="mb-4 space-y-3">
+                  {currentTaskData.solution.labels.map((label, index) => {
+                    const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
+                    return (
+                      <div key={index}>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{label}:</label>
+                        <input
+                          type="text"
+                          value={currentInputs[label] || ''}
+                          onChange={(e) => handleMultiInputChange(label, e.target.value)}
+                          placeholder={`Gib den ${label} ein...`}
+                          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
+                            feedbackState === 'correct'
+                              ? 'border-green-500 bg-green-50'
+                              : feedbackState === 'incorrect'
+                                ? 'border-red-500 bg-red-50'
+                                : 'border-gray-300 focus:border-blue-500'
+                          }`}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+              )
             ) : (
               // Einzelne Eingabe
               <div className="mb-4">
