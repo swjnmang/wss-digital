@@ -86,6 +86,17 @@ export default function BergAufgabe() {
       },
       hint: 'Verwende die Gleichung y = -0,68x + 9,85. Für fehlende y-Werte: setze x ein. Für fehlende x-Werte: löse nach x auf. z.B. y₁: y = -0,68·1 + 9,85 = 9,17. x₂: 5 = -0,68x + 9,85 → x = 7,13.',
     },
+    {
+      id: 6,
+      title: 'Aufgabe 6',
+      question:
+        'Von Punkt F zu G wurde eine gelbe Verstrebung eingebaut. Prüfe rechnerisch, ob die gelbe Verstrebung mit der Funktionsgleichung y = -20/19·x + 2,375 senkrecht zur roten Liftbahn angebracht wurde. Antworte mit "ja" oder "nein".',
+      solution: {
+        type: 'text',
+        answer: 'ja',
+      },
+      hint: 'Zwei Geraden sind senkrecht zueinander, wenn das Produkt ihrer Steigungen -1 ist. Roter Lift: m₁ = 0,95 = 19/20. Gelbe Verstrebung: m₂ = -20/19. Prüfe: (19/20) · (-20/19) = -1 ✓. Die Verstrebung ist senkrecht angebracht.',
+    },
   ]
 
   const currentTaskData = tasks[currentTask]
