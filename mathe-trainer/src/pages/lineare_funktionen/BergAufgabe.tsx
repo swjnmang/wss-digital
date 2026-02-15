@@ -31,10 +31,10 @@ export default function BergAufgabe() {
       solution: {
         type: 'number',
         labels: ['m', 't'],
-        answers: [0.95, 2.375],
-        tolerance: 0.01,
+        answers: [0.95, 2.38],
+        tolerance: 0.005,
       },
-      hint: 'Nutze die zwei Punkte A(-2,5|0) und C(2,3|4,56). Berechne zuerst die Steigung m = (y₂-y₁)/(x₂-x₁) = (4,56-0)/(2,3-(-2,5)) = 0,95. Dann setze einen Punkt ein, um t zu ermitteln: 0 = 0,95·(-2,5) + t → t = 2,375',
+      hint: 'Nutze die zwei Punkte A(-2,5|0) und C(2,3|4,56). Berechne zuerst die Steigung m = (y₂-y₁)/(x₂-x₁) = (4,56-0)/(2,3-(-2,5)) = 0,95. Dann setze einen Punkt ein, um t zu ermitteln: 0 = 0,95·(-2,5) + t → t ≈ 2,38 (auf 2 Nachkommastellen gerundet)',
     },
     {
       id: 2,
@@ -92,6 +92,11 @@ export default function BergAufgabe() {
     const solution = currentTaskData.solution
     let isCorrect = false
 
+    // Helper-Funktion: Runde auf 2 Dezimalstellen
+    const roundTo2Decimals = (num: number): number => {
+      return Math.round(num * 100) / 100
+    }
+
     // Mehrteilige Antwort (z.B. x und y für Schnittpunkt)
     if (solution.answers && solution.labels) {
       const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
@@ -109,10 +114,10 @@ export default function BergAufgabe() {
         const input = currentInputs[label]?.trim() || ''
         const normalizedInput = input.replace(',', '.')
         const numInput = parseFloat(normalizedInput)
-        const tolerance = solution.tolerance || 0.01
         const expectedAnswer = solution.answers[i] as number
 
-        if (isNaN(numInput) || Math.abs(numInput - expectedAnswer) > tolerance) {
+        // Vergleiche die auf 2 Dezimalstellen gerundeten Werte
+        if (isNaN(numInput) || roundTo2Decimals(numInput) !== roundTo2Decimals(expectedAnswer)) {
           isCorrect = false
           break
         }
@@ -129,8 +134,8 @@ export default function BergAufgabe() {
         const normalizedInput = input.replace(',', '.')
         const numInput = parseFloat(normalizedInput)
         if (!isNaN(numInput)) {
-          const tolerance = solution.tolerance || 0.01
-          isCorrect = Math.abs(numInput - (solution.answer as number)) <= tolerance
+          // Vergleiche die auf 2 Dezimalstellen gerundeten Werte
+          isCorrect = roundTo2Decimals(numInput) === roundTo2Decimals(solution.answer as number)
         }
       } else {
         const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.')
@@ -167,151 +172,158 @@ export default function BergAufgabe() {
         <p className="text-lg text-blue-800">Löse die Aufgaben rechnerisch mit Hilfe des Koordinatensystems</p>
       </header>
 
-      <div className="max-w-4xl mx-auto w-full bg-white rounded-lg shadow-lg p-6 mb-6">
-        {/* Einleitungstext */}
-        <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-          <p className="text-gray-800 leading-relaxed">
-            Du siehst hier die Silhouette eines Bergmassivs. Man kann die Berge über verschiedene Lifte, die hier durch
-            Geraden dargestellt sind, erreichen. In Punkt A und Punkt B befinden sich die Talstationen. Eine Längeneinheit
-            im Koordinatensystem entspricht 1000 Metern.
-          </p>
+      <div className="max-w-4xl mx-auto w-full">
+        {/* Hinweis zur Rundung */}
+        <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-600 rounded-lg">
+          <p className="text-yellow-900 font-semibold">💡 Wichtig: Runde deine Ergebnisse auf 2 Stellen nach dem Komma!</p>
         </div>
 
-        {/* Berg Bild */}
-        <div className="mb-6 p-4 bg-gray-100 rounded-lg">
-          <img
-            src="/images/berg.jpg"
-            alt="Bergmassiv mit Liften"
-            className="w-full h-auto rounded-lg shadow-md"
-          />
-        </div>
-
-        {/* Aktuelle Aufgabe */}
-        <div className="mb-6 p-6 bg-gray-50 rounded-lg border-l-4 border-blue-500">
-          <h2 className="text-2xl font-bold text-blue-900 mb-3">{currentTaskData.title}</h2>
-          <p className="text-lg text-gray-800 mb-6">{currentTaskData.question}</p>
-
-          {/* Input */}
-          {currentTaskData.solution.answers && currentTaskData.solution.labels ? (
-            // Mehrteilige Eingabe (z.B. x und y)
-            <div className="mb-4 space-y-3">
-              {currentTaskData.solution.labels.map((label, index) => {
-                const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
-                return (
-                  <div key={index}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{label}:</label>
-                    <input
-                      type="text"
-                      value={currentInputs[label] || ''}
-                      onChange={(e) => handleMultiInputChange(label, e.target.value)}
-                      placeholder={`Gib den ${label} ein...`}
-                      className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
-                        feedbackState === 'correct'
-                          ? 'border-green-500 bg-green-50'
-                          : feedbackState === 'incorrect'
-                            ? 'border-red-500 bg-red-50'
-                            : 'border-gray-300 focus:border-blue-500'
-                      }`}
-                    />
-                  </div>
-                )
-              })}
-            </div>
-          ) : (
-            // Einzelne Eingabe
-            <div className="mb-4">
-              <input
-                type="text"
-                value={(inputs[currentTask] as string) || ''}
-                onChange={(e) => handleInputChange(e.target.value)}
-                placeholder="Gib deine Antwort ein..."
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
-                  feedbackState === 'correct'
-                    ? 'border-green-500 bg-green-50'
-                    : feedbackState === 'incorrect'
-                      ? 'border-red-500 bg-red-50'
-                      : 'border-gray-300 focus:border-blue-500'
-                }`}
-              />
-            </div>
-          )}
-
-          {/* Feedback */}
-          {feedbackState === 'correct' && <div className="p-3 bg-green-100 text-green-800 rounded-lg mb-4 font-semibold">✓ Richtig!</div>}
-
-          {feedbackState === 'incorrect' && (
-            <div className="p-3 bg-red-100 text-red-800 rounded-lg mb-4 font-semibold">✗ Leider nicht richtig. Versuche es nochmal!</div>
-          )}
-
-          {/* Lösung anzeigen Button */}
-          {feedbackState === 'incorrect' && (
-            <button
-              onClick={() => setShowSolution({ ...showSolution, [currentTask]: !showSolution[currentTask] })}
-              className="mb-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-semibold transition"
-            >
-              {showSolution[currentTask] ? 'Lösung verbergen' : 'Lösung anzeigen'}
-            </button>
-          )}
-
-          {/* Musterlösung */}
-          {showSolution[currentTask] && feedbackState === 'incorrect' && (
-            <div className="p-4 bg-yellow-50 border border-yellow-300 rounded-lg mb-4">
-              <p className="font-semibold text-yellow-900 mb-2">Hinweis:</p>
-              <p className="text-yellow-800">{currentTaskData.hint}</p>
-            </div>
-          )}
-
-          {/* Button zum Überprüfen */}
-          <button
-            onClick={validateAnswer}
-            disabled={feedbackState === 'correct'}
-            className={`w-full px-4 py-3 rounded-lg font-semibold text-white transition ${
-              feedbackState === 'correct'
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 cursor-pointer'
-            }`}
-          >
-            {feedbackState === 'correct' ? 'Korrekt gelöst ✓' : 'Antwort überprüfen'}
-          </button>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={prevTask}
-            disabled={currentTask === 0}
-            className={`px-6 py-2 rounded-lg font-semibold transition ${
-              currentTask === 0
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white cursor-pointer'
-            }`}
-          >
-            ← Zurück
-          </button>
-
-          <div className="text-gray-700 font-semibold">
-            Aufgabe {currentTask + 1} von {tasks.length}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          {/* Einleitungstext */}
+          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+            <p className="text-gray-800 leading-relaxed">
+              Du siehst hier die Silhouette eines Bergmassivs. Man kann die Berge über verschiedene Lifte, die hier durch
+              Geraden dargestellt sind, erreichen. In Punkt A und Punkt B befinden sich die Talstationen. Eine Längeneinheit
+              im Koordinatensystem entspricht 1000 Metern.
+            </p>
           </div>
 
-          <button
-            onClick={nextTask}
-            disabled={currentTask === tasks.length - 1}
-            className={`px-6 py-2 rounded-lg font-semibold transition ${
-              currentTask === tasks.length - 1
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white cursor-pointer'
-            }`}
-          >
-            Weiter →
-          </button>
-        </div>
+          {/* Berg Bild */}
+          <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+            <img
+              src="/images/berg.jpg"
+              alt="Bergmassiv mit Liften"
+              className="w-full h-auto rounded-lg shadow-md"
+            />
+          </div>
 
-        {/* Fortschrittsanzeige */}
-        <div className="mt-6 w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${((currentTask + 1) / tasks.length) * 100}%` }}
-          ></div>
+          {/* Aktuelle Aufgabe */}
+          <div className="mb-6 p-6 bg-gray-50 rounded-lg border-l-4 border-blue-500">
+            <h2 className="text-2xl font-bold text-blue-900 mb-3">{currentTaskData.title}</h2>
+            <p className="text-lg text-gray-800 mb-6">{currentTaskData.question}</p>
+
+            {/* Input */}
+            {currentTaskData.solution.answers && currentTaskData.solution.labels ? (
+              // Mehrteilige Eingabe (z.B. x und y)
+              <div className="mb-4 space-y-3">
+                {currentTaskData.solution.labels.map((label, index) => {
+                  const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
+                  return (
+                    <div key={index}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{label}:</label>
+                      <input
+                        type="text"
+                        value={currentInputs[label] || ''}
+                        onChange={(e) => handleMultiInputChange(label, e.target.value)}
+                        placeholder={`Gib den ${label} ein...`}
+                        className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
+                          feedbackState === 'correct'
+                            ? 'border-green-500 bg-green-50'
+                            : feedbackState === 'incorrect'
+                              ? 'border-red-500 bg-red-50'
+                              : 'border-gray-300 focus:border-blue-500'
+                        }`}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              // Einzelne Eingabe
+              <div className="mb-4">
+                <input
+                  type="text"
+                  value={(inputs[currentTask] as string) || ''}
+                  onChange={(e) => handleInputChange(e.target.value)}
+                  placeholder="Gib deine Antwort ein..."
+                  className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
+                    feedbackState === 'correct'
+                      ? 'border-green-500 bg-green-50'
+                      : feedbackState === 'incorrect'
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-300 focus:border-blue-500'
+                  }`}
+                />
+              </div>
+            )}
+
+            {/* Feedback */}
+            {feedbackState === 'correct' && <div className="p-3 bg-green-100 text-green-800 rounded-lg mb-4 font-semibold">✓ Richtig!</div>}
+
+            {feedbackState === 'incorrect' && (
+              <div className="p-3 bg-red-100 text-red-800 rounded-lg mb-4 font-semibold">✗ Leider nicht richtig. Versuche es nochmal!</div>
+            )}
+
+            {/* Lösung anzeigen Button */}
+            {feedbackState === 'incorrect' && (
+              <button
+                onClick={() => setShowSolution({ ...showSolution, [currentTask]: !showSolution[currentTask] })}
+                className="mb-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-semibold transition"
+              >
+                {showSolution[currentTask] ? 'Lösung verbergen' : 'Lösung anzeigen'}
+              </button>
+            )}
+
+            {/* Musterlösung */}
+            {showSolution[currentTask] && feedbackState === 'incorrect' && (
+              <div className="p-4 bg-yellow-50 border border-yellow-300 rounded-lg mb-4">
+                <p className="font-semibold text-yellow-900 mb-2">Hinweis:</p>
+                <p className="text-yellow-800">{currentTaskData.hint}</p>
+              </div>
+            )}
+
+            {/* Button zum Überprüfen */}
+            <button
+              onClick={validateAnswer}
+              disabled={feedbackState === 'correct'}
+              className={`w-full px-4 py-3 rounded-lg font-semibold text-white transition ${
+                feedbackState === 'correct'
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-500 hover:bg-blue-600 cursor-pointer'
+              }`}
+            >
+              {feedbackState === 'correct' ? 'Korrekt gelöst ✓' : 'Antwort überprüfen'}
+            </button>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={prevTask}
+              disabled={currentTask === 0}
+              className={`px-6 py-2 rounded-lg font-semibold transition ${
+                currentTask === 0
+                  ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white cursor-pointer'
+              }`}
+            >
+              ← Zurück
+            </button>
+
+            <div className="text-gray-700 font-semibold">
+              Aufgabe {currentTask + 1} von {tasks.length}
+            </div>
+
+            <button
+              onClick={nextTask}
+              disabled={currentTask === tasks.length - 1}
+              className={`px-6 py-2 rounded-lg font-semibold transition ${
+                currentTask === tasks.length - 1
+                  ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white cursor-pointer'
+              }`}
+            >
+              Weiter →
+            </button>
+          </div>
+
+          {/* Fortschrittsanzeige */}
+          <div className="mt-6 w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${((currentTask + 1) / tasks.length) * 100}%` }}
+            ></div>
+          </div>
         </div>
       </div>
     </div>
