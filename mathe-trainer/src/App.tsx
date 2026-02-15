@@ -56,6 +56,7 @@ import GemischteAufgabenLF from './pages/lineare_funktionen/GemischteAufgaben'
 import AnwendungsaufgabenLF from './pages/lineare_funktionen/Anwendungsaufgaben'
 import FussballplatzAufgabe from './pages/lineare_funktionen/FussballplatzAufgabe'
 import TipiAufgabe from './pages/lineare_funktionen/TipiAufgabe'
+import BergAufgabe from './pages/lineare_funktionen/BergAufgabe'
 import Wertetabelle from './pages/lineare_funktionen/Wertetabelle'
 import ParallelSenkrecht from './pages/lineare_funktionen/ParallelSenkrecht'
 // Finanzmathe
@@ -217,6 +218,7 @@ export default function App() {
           <Route path="/lineare_funktionen/anwendungsaufgaben" element={<AnwendungsaufgabenLF />} />
           <Route path="/lineare_funktionen/anwendungsaufgaben/fussballplatz" element={<FussballplatzAufgabe />} />
           <Route path="/lineare_funktionen/anwendungsaufgaben/tipi" element={<TipiAufgabe />} />
+          <Route path="/lineare_funktionen/anwendungsaufgaben/berg" element={<BergAufgabe />} />
           <Route path="/lineare_funktionen/spiel_muenzen" element={<SpielMuenzen />} />
           <Route path="/lineare_funktionen/test" element={<TestLF />} />
           
