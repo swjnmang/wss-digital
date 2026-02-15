@@ -27,12 +27,14 @@ export default function BergAufgabe() {
       id: 1,
       title: 'Aufgabe 1',
       question:
-        'Berechne die Funktionsgleichung des roten Lifts durch die Punkte A (-2,5|0) und C (2,3|4,56).',
+        'Berechne die Funktionsgleichung des roten Lifts durch die Punkte A (-2,5|0) und C (2,3|4,56). Die Gleichung hat die Form y = m·x + t. Gib m und t ein.',
       solution: {
-        type: 'text',
-        answer: 'y = 0.95x + 2.375',
+        type: 'number',
+        labels: ['m', 't'],
+        answers: [0.95, 2.375],
+        tolerance: 0.01,
       },
-      hint: 'Nutze die zwei Punkte A(-2,5|0) und C(2,3|4,56). Berechne zuerst die Steigung m = (y₂-y₁)/(x₂-x₁). Dann setze einen Punkt ein, um t zu ermitteln. Die Antwort lautet: y = 0,95x + 2,375',
+      hint: 'Nutze die zwei Punkte A(-2,5|0) und C(2,3|4,56). Berechne zuerst die Steigung m = (y₂-y₁)/(x₂-x₁) = (4,56-0)/(2,3-(-2,5)) = 0,95. Dann setze einen Punkt ein, um t zu ermitteln: 0 = 0,95·(-2,5) + t → t = 2,375',
     },
     {
       id: 2,
@@ -63,7 +65,7 @@ export default function BergAufgabe() {
       id: 4,
       title: 'Aufgabe 4',
       question:
-        'Wie viele Meter sind die beiden Talstationen entlang der x-Achse voneinander entfernt? Punkt A ist bei (-2,5|0). Berechne zuerst die Nullstelle des grünen Lifts, um die Position von Punkt B zu finden. Berechne dann den Abstand in Metern (1 Längeneinheit = 1000 m).',
+        'Wie viele Meter sind die beiden Talstationen entlang der x-Achse voneinander entfernt? Gib das Ergebnis in Metern an.',
       solution: {
         type: 'number',
         answer: 16985,
