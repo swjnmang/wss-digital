@@ -91,7 +91,7 @@ export default function BergAufgabe() {
       id: 6,
       title: 'Aufgabe 6',
       question:
-        'Von Punkt F zu G wurde eine gelbe Verstrebung eingebaut. Prüfe rechnerisch, ob die gelbe Verstrebung mit der Funktionsgleichung y = -20/19·x + 2,375 senkrecht zur roten Liftbahn angebracht wurde. Antworte mit "ja" oder "nein".',
+        'Von Punkt F zu G wurde eine gelbe Verstrebung eingebaut. Prüfe rechnerisch, ob die gelbe Verstrebung mit der Funktionsgleichung y = [BRUCH]-20/19[/BRUCH]·x + 2,375 senkrecht zur roten Liftbahn angebracht wurde. Antworte mit "ja" oder "nein".',
       solution: {
         type: 'text',
         answer: 'ja',
@@ -236,6 +236,26 @@ export default function BergAufgabe() {
 
   const feedbackState = feedback[currentTask]
 
+  // Hilfsfunktion zum Rendern von Fragen mit Bruch-Formatierung
+  const renderQuestion = (question: string) => {
+    const parts = question.split(/(\[BRUCH\].*?\[\/BRUCH\])/g)
+    
+    return parts.map((part, index) => {
+      if (part.startsWith('[BRUCH]') && part.endsWith('[/BRUCH]')) {
+        const fractionText = part.replace('[BRUCH]', '').replace('[/BRUCH]', '')
+        const [numerator, denominator] = fractionText.split('/')
+        return (
+          <span key={index} className="inline-flex flex-col items-center mx-1">
+            <span className="text-lg font-semibold">{numerator}</span>
+            <span className="border-t-2 border-gray-800 w-8"></span>
+            <span className="text-lg font-semibold">{denominator}</span>
+          </span>
+        )
+      }
+      return part
+    })
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100 p-4">
       <header className="w-full py-8 px-4 md:px-12 flex flex-col items-center bg-white/80 shadow-sm rounded-lg mb-6">
@@ -271,7 +291,7 @@ export default function BergAufgabe() {
           {/* Aktuelle Aufgabe */}
           <div className="mb-6 p-6 bg-gray-50 rounded-lg border-l-4 border-blue-500">
             <h2 className="text-2xl font-bold text-blue-900 mb-3">{currentTaskData.title}</h2>
-            <p className="text-lg text-gray-800 mb-6">{currentTaskData.question}</p>
+            <p className="text-lg text-gray-800 mb-6">{renderQuestion(currentTaskData.question)}</p>
 
             {/* Wertetabelle Visualisierung */}
             {currentTaskData.solution.type === 'wertetabelle' && (
