@@ -66,6 +66,7 @@ export default function Schnittpunkt() {
         if (m1 === 0) m1 = 1.5
         t1 = randomInt(10, -10) / randomChoice([1, 2])
         m2 = generateParallel ? m1 : m1 + randomChoice([0.5, -0.5, 1, -1])
+        if (m2 === 0) m2 = 0.5
         t2 = generateParallel ? t1 : randomInt(10, -10) / randomChoice([1, 2])
         break
       case 'hard':
@@ -73,6 +74,7 @@ export default function Schnittpunkt() {
         if (m1 === 0) m1 = 1.25
         t1 = randomInt(1000, -1000) / 100
         m2 = generateParallel ? m1 : formatNumber(m1 + (randomInt(200, -200) / 100) + 0.1)
+        if (m2 === 0) m2 = 1.25
         t2 = generateParallel ? t1 : randomInt(1000, -1000) / 100
         break
       case 'easy':
@@ -82,7 +84,7 @@ export default function Schnittpunkt() {
         t1 = randomInt(10, -10)
         do {
           m2 = randomInt(5, -5)
-        } while (m1 === m2)
+        } while (m1 === m2 || m2 === 0)
         const x_intersect = randomInt(10, -10)
         t2 = (m1 - m2) * x_intersect + t1
         if (generateParallel) {
