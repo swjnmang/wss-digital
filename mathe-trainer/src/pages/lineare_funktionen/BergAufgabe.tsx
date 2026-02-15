@@ -20,6 +20,7 @@ export default function BergAufgabe() {
   const [currentTask, setCurrentTask] = useState(0)
   const [inputs, setInputs] = useState<Record<number, string | Record<string, string>>>({})
   const [feedback, setFeedback] = useState<Record<number, string>>({})
+  const [fieldFeedback, setFieldFeedback] = useState<Record<number, Record<string, 'correct' | 'incorrect' | ''>>>({})
   const [showSolution, setShowSolution] = useState<Record<number, boolean>>({})
 
   const tasks: Task[] = [
@@ -110,6 +111,47 @@ export default function BergAufgabe() {
     const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
     setInputs({ ...inputs, [currentTask]: { ...currentInputs, [key]: value } })
     setFeedback({ ...feedback, [currentTask]: '' })
+
+    // Live-Validierung für Wertetabellen-Felder
+    if (currentTaskData.solution.type === 'wertetabelle' && value.trim()) {
+      validateTableField(key, value)
+    } else if (!value.trim()) {
+      // Feedback zurücksetzen wenn Feld leer
+      setFieldFeedback({
+        ...fieldFeedback,
+        [currentTask]: { ...((fieldFeedback[currentTask] as Record<string, string>) || {}), [key]: '' },
+      })
+    }
+  }
+
+  const validateTableField = (key: string, value: string) => {
+    const solution = currentTaskData.solution
+    const roundTo2Decimals = (num: number): number => {
+      return Math.round(num * 100) / 100
+    }
+
+    if (!solution.labels || !solution.answers) return
+
+    const labelIndex = solution.labels.indexOf(key)
+    if (labelIndex === -1) return
+
+    const normalizedInput = value.replace(',', '.')
+    const numInput = parseFloat(normalizedInput)
+    const expectedAnswer = solution.answers[labelIndex] as number
+
+    let isCorrect = false
+    if (!isNaN(numInput)) {
+      if (solution.tolerance !== undefined) {
+        isCorrect = Math.abs(numInput - expectedAnswer) <= solution.tolerance
+      } else {
+        isCorrect = roundTo2Decimals(numInput) === roundTo2Decimals(expectedAnswer)
+      }
+    }
+
+    setFieldFeedback({
+      ...fieldFeedback,
+      [currentTask]: { ...((fieldFeedback[currentTask] as Record<string, string>) || {}), [key]: isCorrect ? 'correct' : 'incorrect' },
+    })
   }
 
   const validateAnswer = () => {
@@ -246,7 +288,13 @@ export default function BergAufgabe() {
                           value={((inputs[currentTask] as Record<string, string>) || {})['x₂ (y=5)'] || ''}
                           onChange={(e) => handleMultiInputChange('x₂ (y=5)', e.target.value)}
                           placeholder="?"
-                          className="w-full px-2 py-1 border border-blue-300 rounded text-center text-sm focus:outline-none"
+                          className={`w-full px-2 py-1 rounded text-center text-sm focus:outline-none transition ${
+                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₂ (y=5)'] === 'correct'
+                              ? 'border-2 border-green-500 bg-green-50'
+                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₂ (y=5)'] === 'incorrect'
+                                ? 'border-2 border-red-500 bg-red-50'
+                                : 'border border-blue-300'
+                          }`}
                         />
                       </th>
                       <th className="border border-blue-300 px-3 py-2 text-sm font-bold">3</th>
@@ -256,7 +304,13 @@ export default function BergAufgabe() {
                           value={((inputs[currentTask] as Record<string, string>) || {})['x₄ (y=7)'] || ''}
                           onChange={(e) => handleMultiInputChange('x₄ (y=7)', e.target.value)}
                           placeholder="?"
-                          className="w-full px-2 py-1 border border-blue-300 rounded text-center text-sm focus:outline-none"
+                          className={`w-full px-2 py-1 rounded text-center text-sm focus:outline-none transition ${
+                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₄ (y=7)'] === 'correct'
+                              ? 'border-2 border-green-500 bg-green-50'
+                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₄ (y=7)'] === 'incorrect'
+                                ? 'border-2 border-red-500 bg-red-50'
+                                : 'border border-blue-300'
+                          }`}
                         />
                       </th>
                       <th className="border border-blue-300 px-3 py-2 text-sm font-bold">8</th>
@@ -271,7 +325,13 @@ export default function BergAufgabe() {
                           value={((inputs[currentTask] as Record<string, string>) || {})['y₁ (x=1)'] || ''}
                           onChange={(e) => handleMultiInputChange('y₁ (x=1)', e.target.value)}
                           placeholder="?"
-                          className="w-full px-2 py-1 border border-blue-300 rounded text-center text-sm focus:outline-none"
+                          className={`w-full px-2 py-1 rounded text-center text-sm focus:outline-none transition ${
+                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₁ (x=1)'] === 'correct'
+                              ? 'border-2 border-green-500 bg-green-50'
+                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₁ (x=1)'] === 'incorrect'
+                                ? 'border-2 border-red-500 bg-red-50'
+                                : 'border border-blue-300'
+                          }`}
                         />
                       </td>
                       <td className="border border-blue-300 px-3 py-2 text-center">5</td>
@@ -281,7 +341,13 @@ export default function BergAufgabe() {
                           value={((inputs[currentTask] as Record<string, string>) || {})['y₃ (x=3)'] || ''}
                           onChange={(e) => handleMultiInputChange('y₃ (x=3)', e.target.value)}
                           placeholder="?"
-                          className="w-full px-2 py-1 border border-blue-300 rounded text-center text-sm focus:outline-none"
+                          className={`w-full px-2 py-1 rounded text-center text-sm focus:outline-none transition ${
+                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₃ (x=3)'] === 'correct'
+                              ? 'border-2 border-green-500 bg-green-50'
+                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₃ (x=3)'] === 'incorrect'
+                                ? 'border-2 border-red-500 bg-red-50'
+                                : 'border border-blue-300'
+                          }`}
                         />
                       </td>
                       <td className="border border-blue-300 px-3 py-2 text-center">7</td>
@@ -291,7 +357,13 @@ export default function BergAufgabe() {
                           value={((inputs[currentTask] as Record<string, string>) || {})['y₅ (x=8)'] || ''}
                           onChange={(e) => handleMultiInputChange('y₅ (x=8)', e.target.value)}
                           placeholder="?"
-                          className="w-full px-2 py-1 border border-blue-300 rounded text-center text-sm focus:outline-none"
+                          className={`w-full px-2 py-1 rounded text-center text-sm focus:outline-none transition ${
+                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₅ (x=8)'] === 'correct'
+                              ? 'border-2 border-green-500 bg-green-50'
+                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₅ (x=8)'] === 'incorrect'
+                                ? 'border-2 border-red-500 bg-red-50'
+                                : 'border border-blue-300'
+                          }`}
                         />
                       </td>
                     </tr>
