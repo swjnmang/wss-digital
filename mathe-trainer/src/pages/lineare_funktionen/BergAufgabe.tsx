@@ -286,28 +286,51 @@ export default function BergAufgabe() {
                 </div>
               ) : (
                 // Mehrteilige Eingabe (z.B. x und y für Schnittpunkt)
-                <div className="mb-4 space-y-3">
-                  {currentTaskData.solution.labels.map((label, index) => {
-                    const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
-                    return (
-                      <div key={index}>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{label}:</label>
-                        <input
-                          type="text"
-                          value={currentInputs[label] || ''}
-                          onChange={(e) => handleMultiInputChange(label, e.target.value)}
-                          placeholder={`Gib den ${label} ein...`}
-                          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
-                            feedbackState === 'correct'
-                              ? 'border-green-500 bg-green-50'
-                              : feedbackState === 'incorrect'
-                                ? 'border-red-500 bg-red-50'
-                                : 'border-gray-300 focus:border-blue-500'
-                          }`}
-                        />
+                <div>
+                  <div className="mb-4 space-y-3">
+                    {currentTaskData.solution.labels.map((label, index) => {
+                      const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
+                      return (
+                        <div key={index}>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">{label}:</label>
+                          <input
+                            type="text"
+                            value={currentInputs[label] || ''}
+                            onChange={(e) => handleMultiInputChange(label, e.target.value)}
+                            placeholder={`Gib den ${label} ein...`}
+                            className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
+                              feedbackState === 'correct'
+                                ? 'border-green-500 bg-green-50'
+                                : feedbackState === 'incorrect'
+                                  ? 'border-red-500 bg-red-50'
+                                  : 'border-gray-300 focus:border-blue-500'
+                            }`}
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* Live-Anzeige der Funktionsgleichung für Aufgabe 1 */}
+                  {currentTask === 0 && (
+                    <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-300">
+                      <p className="text-sm font-semibold text-blue-900 mb-2">Funktionsgleichung:</p>
+                      <div className="text-xl font-bold text-blue-800">
+                        y = {(() => {
+                          const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
+                          const m = currentInputs['m'] ? currentInputs['m'].replace(',', '.') : '?'
+                          const t = currentInputs['t'] ? currentInputs['t'].replace(',', '.') : '?'
+                          
+                          // Prüfe ob t positiv oder negativ ist für die Anzeige
+                          if (m === '?' || t === '?') {
+                            return `${m}x ${t !== '?' && parseFloat(t) >= 0 ? '+' : ''} ${t}`
+                          }
+                          const tNum = parseFloat(t)
+                          return `${m}x ${tNum >= 0 ? '+' : ''} ${t}`
+                        })()}
                       </div>
-                    )
-                  })}
+                    </div>
+                  )}
                 </div>
               )
             ) : (
