@@ -245,10 +245,10 @@ export default function BergAufgabe() {
         const fractionText = part.replace('[BRUCH]', '').replace('[/BRUCH]', '')
         const [numerator, denominator] = fractionText.split('/')
         return (
-          <span key={index} className="inline-flex flex-col items-center mx-1">
-            <span className="text-lg font-semibold">{numerator}</span>
-            <span className="border-t-2 border-gray-800 w-8"></span>
-            <span className="text-lg font-semibold">{denominator}</span>
+          <span key={index} className="inline-flex flex-col items-center mx-0.5 align-middle">
+            <span className="text-base font-semibold leading-none">{numerator}</span>
+            <span className="border-t-2 border-gray-800 w-6"></span>
+            <span className="text-base font-semibold leading-none">{denominator}</span>
           </span>
         )
       }
@@ -291,7 +291,7 @@ export default function BergAufgabe() {
           {/* Aktuelle Aufgabe */}
           <div className="mb-6 p-6 bg-gray-50 rounded-lg border-l-4 border-blue-500">
             <h2 className="text-2xl font-bold text-blue-900 mb-3">{currentTaskData.title}</h2>
-            <p className="text-lg text-gray-800 mb-6">{renderQuestion(currentTaskData.question)}</p>
+            <p className="text-lg text-gray-800 mb-6 whitespace-normal">{renderQuestion(currentTaskData.question)}</p>
 
             {/* Wertetabelle Visualisierung */}
             {currentTaskData.solution.type === 'wertetabelle' && (
