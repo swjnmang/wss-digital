@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 
 export default function Anwendungsaufgaben() {
   const aufgaben = [
-    { title: '1. Der Fußballplatz', desc: 'Löse Aufgaben rund um einen Pass auf einem Fußballfeld mit linearen Funktionen.', href: 'fussballplatz' },
-    { title: '2. Das Tipi', desc: 'Berechne die Maße eines Tipis anhand von zwei linearen Funktionsgleichungen.', href: 'tipi' },
-    { title: '3. Der Berg', desc: 'Berechne Funktionsgleichungen und Schnittpunkte von Bergliften anhand eines Bergmassivs.', href: 'berg' },
+    { title: '1. Der Fußballplatz', desc: 'Löse Aufgaben rund um einen Pass auf einem Fußballfeld mit linearen Funktionen.', href: 'fussballplatz', icon: '⚽' },
+    { title: '2. Das Tipi', desc: 'Berechne die Maße eines Tipis anhand von zwei linearen Funktionsgleichungen.', href: 'tipi', icon: '⛺' },
+    { title: '3. Der Berg', desc: 'Berechne Funktionsgleichungen und Schnittpunkte von Bergliften anhand eines Bergmassivs.', href: 'berg', icon: '⛰️' },
   ]
 
   return (
@@ -21,6 +21,7 @@ export default function Anwendungsaufgaben() {
             to={`/lineare_funktionen/anwendungsaufgaben/${a.href}`}
             className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col justify-center items-center p-6 hover:shadow-xl transition-shadow no-underline text-inherit text-center max-w-sm"
           >
+            <div className="text-5xl mb-4">{a.icon}</div>
             <h3 className="text-lg font-semibold mb-2 text-blue-900">{a.title}</h3>
             <p className="text-base text-gray-700">{a.desc}</p>
           </Link>
