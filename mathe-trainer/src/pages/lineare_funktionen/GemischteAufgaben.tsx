@@ -213,7 +213,7 @@ const aufgabenBanks = {
     return {
       typ: 'punktAufGerade',
       thema: '5. Punkt auf Gerade prüfen',
-      frage: `Liegt P(${x}|${testY}) auf y = ${m}x ${t >= 0 ? '+' : '-'} ${Math.abs(t)}?`,
+      frage: `Liegt der Punkt P(${x}|${testY}) auf y = ${m}x ${t >= 0 ? '+' : '-'} ${Math.abs(t)}? Prüfe durch Rechnung und kontrolliere anschließend dein Ergebnis.`,
       antwort,
       lösungsweg: `Einsetzen: $$y = ${m} \\cdot ${x} ${t >= 0 ? '+' : '-'} ${Math.abs(t)} = ${y}$$. Der Punkt ${antwort === 'ja' ? 'liegt' : 'liegt nicht'} auf der Geraden.`
     }
