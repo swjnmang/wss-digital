@@ -569,7 +569,6 @@ export default function GemischteAufgaben() {
                 {/* Wertetabelle für graphZeichnen */}
                 {aufgabe.typ === 'graphZeichnen' && aufgabe.m !== undefined && aufgabe.t !== undefined && (
                   <div className={styles.wertetabelleWrapper}>
-                    <p className={styles.wertetabelleHint}>Fülle die Wertetabelle aus. Die Zellen werden grün, wenn dein y-Wert korrekt ist.</p>
                     <Wertetabelle
                       m={aufgabe.m}
                       t={aufgabe.t}
