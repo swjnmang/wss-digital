@@ -158,8 +158,13 @@ export default function BergAufgabe() {
         const normalizedInput = input.replace(',', '.')
         const numInput = parseFloat(normalizedInput)
         if (!isNaN(numInput)) {
-          // Vergleiche die auf 2 Dezimalstellen gerundeten Werte
-          isCorrect = roundTo2Decimals(numInput) === roundTo2Decimals(solution.answer as number)
+          const expectedAnswer = solution.answer as number
+          // Wenn Toleranz definiert ist, verwende sie; sonst runde auf 2 Dezimalstellen
+          if (solution.tolerance !== undefined) {
+            isCorrect = Math.abs(numInput - expectedAnswer) <= solution.tolerance
+          } else {
+            isCorrect = roundTo2Decimals(numInput) === roundTo2Decimals(expectedAnswer)
+          }
         }
       } else {
         const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.')
@@ -235,20 +240,60 @@ export default function BergAufgabe() {
                     <tr className="bg-blue-200">
                       <th className="border border-blue-300 px-3 py-2 text-sm font-bold">x</th>
                       <th className="border border-blue-300 px-3 py-2 text-sm font-bold">1</th>
-                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">?</th>
+                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">
+                        <input
+                          type="text"
+                          value={((inputs[currentTask] as Record<string, string>) || {})['x₂ (y=5)'] || ''}
+                          onChange={(e) => handleMultiInputChange('x₂ (y=5)', e.target.value)}
+                          placeholder="?"
+                          className="w-full px-2 py-1 border border-blue-300 rounded text-center text-sm focus:outline-none"
+                        />
+                      </th>
                       <th className="border border-blue-300 px-3 py-2 text-sm font-bold">3</th>
-                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">?</th>
+                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">
+                        <input
+                          type="text"
+                          value={((inputs[currentTask] as Record<string, string>) || {})['x₄ (y=7)'] || ''}
+                          onChange={(e) => handleMultiInputChange('x₄ (y=7)', e.target.value)}
+                          placeholder="?"
+                          className="w-full px-2 py-1 border border-blue-300 rounded text-center text-sm focus:outline-none"
+                        />
+                      </th>
                       <th className="border border-blue-300 px-3 py-2 text-sm font-bold">8</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <td className="border border-blue-300 px-3 py-2 font-bold bg-blue-100">y</td>
-                      <td className="border border-blue-300 px-3 py-2 text-center">?</td>
+                      <td className="border border-blue-300 px-3 py-2 text-center">
+                        <input
+                          type="text"
+                          value={((inputs[currentTask] as Record<string, string>) || {})['y₁ (x=1)'] || ''}
+                          onChange={(e) => handleMultiInputChange('y₁ (x=1)', e.target.value)}
+                          placeholder="?"
+                          className="w-full px-2 py-1 border border-blue-300 rounded text-center text-sm focus:outline-none"
+                        />
+                      </td>
                       <td className="border border-blue-300 px-3 py-2 text-center">5</td>
-                      <td className="border border-blue-300 px-3 py-2 text-center">?</td>
+                      <td className="border border-blue-300 px-3 py-2 text-center">
+                        <input
+                          type="text"
+                          value={((inputs[currentTask] as Record<string, string>) || {})['y₃ (x=3)'] || ''}
+                          onChange={(e) => handleMultiInputChange('y₃ (x=3)', e.target.value)}
+                          placeholder="?"
+                          className="w-full px-2 py-1 border border-blue-300 rounded text-center text-sm focus:outline-none"
+                        />
+                      </td>
                       <td className="border border-blue-300 px-3 py-2 text-center">7</td>
-                      <td className="border border-blue-300 px-3 py-2 text-center">?</td>
+                      <td className="border border-blue-300 px-3 py-2 text-center">
+                        <input
+                          type="text"
+                          value={((inputs[currentTask] as Record<string, string>) || {})['y₅ (x=8)'] || ''}
+                          onChange={(e) => handleMultiInputChange('y₅ (x=8)', e.target.value)}
+                          placeholder="?"
+                          className="w-full px-2 py-1 border border-blue-300 rounded text-center text-sm focus:outline-none"
+                        />
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -257,35 +302,8 @@ export default function BergAufgabe() {
 
             {/* Input */}
             {currentTaskData.solution.answers && currentTaskData.solution.labels ? (
-              // Wertetabelle-Input (spezielle Darstellung)
-              currentTaskData.solution.type === 'wertetabelle' ? (
-                <div className="mb-4">
-                  <div className="grid grid-cols-5 gap-2">
-                    {currentTaskData.solution.labels.map((label, index) => {
-                      const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
-                      return (
-                        <div key={index}>
-                          <label className="block text-xs font-medium text-gray-700 mb-1 text-center">{label}</label>
-                          <input
-                            type="text"
-                            value={currentInputs[label] || ''}
-                            onChange={(e) => handleMultiInputChange(label, e.target.value)}
-                            placeholder="?"
-                            className={`w-full px-2 py-2 border-2 rounded text-center text-sm focus:outline-none transition ${
-                              feedbackState === 'correct'
-                                ? 'border-green-500 bg-green-50'
-                                : feedbackState === 'incorrect'
-                                  ? 'border-red-500 bg-red-50'
-                                  : 'border-gray-300 focus:border-blue-500'
-                            }`}
-                          />
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              ) : (
-                // Mehrteilige Eingabe (z.B. x und y für Schnittpunkt)
+              // Wertetabelle-Input ist bereits oben in der Tabelle integriert
+              currentTaskData.solution.type === 'wertetabelle' ? null : (
                 <div>
                   <div className="mb-4 space-y-3">
                     {currentTaskData.solution.labels.map((label, index) => {
