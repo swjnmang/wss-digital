@@ -3,15 +3,43 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Interaktive Mathe-Übungen zu verschiedenen Themen wie lineare Funktionen, Finanzmathematik und mehr." />
+    
+    <!-- Primary Meta Tags -->
+    <title>WSS-Digital Mathe-Trainer | Lineare Funktionen, Finanzmathe &amp; mehr</title>
+    <meta name="title" content="WSS-Digital Mathe-Trainer | Interaktive Mathematik-Übungen" />
+    <meta name="description" content="Interaktiver Mathe-Trainer für lineare Funktionen, quadratische Funktionen, Finanzmathe, Trigonometrie und mehr. Kostenlose Übungen mit sofortiges Feedback." />
+    <meta name="keywords" content="Mathe-Trainer, lineare Funktionen, quadratische Funktionen, Finanzmathe, Trigonometrie, Übungen, interaktiv lernen, Mathematik" />
+    <meta name="author" content="WSS-Digital" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ws-mathe-trainer.vercel.app/" />
+    <meta property="og:title" content="WSS-Digital Mathe-Trainer | Interaktive Mathematik-Übungen" />
+    <meta property="og:description" content="Kostenlos Mathematik üben mit interaktiven Aufgaben. Lineare Funktionen, Finanzmathe, Trigonometrie und mehr!" />
+    <meta property="og:site_name" content="WSS-Digital Mathe-Trainer" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:url" content="https://ws-mathe-trainer.vercel.app/" />
+    <meta property="twitter:title" content="WSS-Digital Mathe-Trainer" />
+    <meta property="twitter:description" content="Kostenlos Mathematik üben mit interaktiven Aufgaben" />
+    
+    <!-- Other Meta Tags -->
+    <meta name="language" content="de" />
+    <meta name="revisit-after" content="7 days" />
+    <link rel="canonical" href="https://ws-mathe-trainer.vercel.app/" />
+    <link rel="alternate" hreflang="de" href="https://ws-mathe-trainer.vercel.app/" />
+    
+    <!-- Favicon -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <title>Mathe-Übungen</title>
-    <!-- legacy global stylesheet (kept for compatibility) -->
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="/style.css">
-    <!-- Font Awesome für Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- MathJax für LaTeX Rendering (Zeichnen von Potenzen, Wurzeln etc.) -->
+    
+    <!-- MathJax -->
     <script>
       window.MathJax = {
         tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
@@ -19,7 +47,24 @@
       };
     </script>
     <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-    <!-- Vite will inject the module script -->
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "EducationalWebsite",
+      "name": "WSS-Digital Mathe-Trainer",
+      "url": "https://ws-mathe-trainer.vercel.app",
+      "description": "Interaktiver Mathe-Trainer für verschiedene mathematische Themen",
+      "potentialAction": {
+        "@type": "TradeAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://ws-mathe-trainer.vercel.app/lineare_funktionen"
+        }
+      }
+    }
+    </script>
   </head>
   <body>
     <!-- React root -->
@@ -28,3 +73,4 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+
