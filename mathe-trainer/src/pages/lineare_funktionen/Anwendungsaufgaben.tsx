@@ -6,6 +6,7 @@ export default function Anwendungsaufgaben() {
     { title: '1. Der Fußballplatz', desc: 'Löse Aufgaben rund um einen Pass auf einem Fußballfeld mit linearen Funktionen.', href: 'fussballplatz', icon: '⚽' },
     { title: '2. Das Tipi', desc: 'Berechne die Maße eines Tipis anhand von zwei linearen Funktionsgleichungen.', href: 'tipi', icon: '⛺' },
     { title: '3. Der Berg', desc: 'Berechne Funktionsgleichungen und Schnittpunkte von Bergliften anhand eines Bergmassivs.', href: 'berg', icon: '⛰️' },
+    { title: '4. Die Sonne', desc: 'Untersuche die Eigenschaften von Sonnenstrahlen mit Hilfe linearer Funktionen.', href: 'sonne', icon: '☀️' },
   ]
 
   return (
