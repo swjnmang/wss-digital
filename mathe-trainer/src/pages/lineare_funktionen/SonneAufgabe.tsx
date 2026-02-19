@@ -79,7 +79,7 @@ export default function SonneAufgabe() {
       id: 5,
       title: 'Aufgabe 5',
       question:
-        'Ein Mädchen leuchtet mit ihrer Taschenlampe in Richtung des rechten Sonnenstrahls. Der Strahl der Taschenlampe hat die Funktionsgleichung y = -0,66x + 3,82. Trifft der Strahl ihrer Taschenlampe in einem rechten Winkel auf den rechten Sonnenstrahl? Antworte mit "ja" oder "nein" und begründe kurz.',
+        'Ein Mädchen leuchtet mit ihrer Taschenlampe in Richtung des rechten Sonnenstrahls. Der Strahl der Taschenlampe hat die Funktionsgleichung y = -0,66x + 3,82. Trifft der Strahl ihrer Taschenlampe in einem rechten Winkel auf den rechten Sonnenstrahl? Antworte mit "ja" oder "nein".',
       solution: {
         type: 'text',
         answer: 'nein',
