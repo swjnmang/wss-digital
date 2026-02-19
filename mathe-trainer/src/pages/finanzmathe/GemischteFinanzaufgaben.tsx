@@ -1784,7 +1784,6 @@ const generators: Record<TaskType, () => Task> = {
   incomplete_tilgungsplan: createIncompleteTilgungsplanTask,
   ratendarlehen_plan: createRatendarlehenPlanTask,
   annuitaet_plan: createAnnuitaetPlanTask,
-  incomplete_tilgungsplan: createIncompleteTilgungsplanTask,
 };
 
 const randomTaskType = (): TaskType => randomChoice<TaskType>(taskTypes);
