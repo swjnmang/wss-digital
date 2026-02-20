@@ -1,6 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './Funktionsgleichung.module.css'
 
+declare global {
+  interface Window { 
+    MathJax: any
+    YT: any
+    onYouTubeIframeAPIReady: () => void
+  }
+}
+
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -29,6 +37,8 @@ export default function Funktionsgleichung(){
   const [tInput, setTInput] = useState('')
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
+  const [showVideoModal, setShowVideoModal] = useState(false)
+  const youtubePlayerRef = useRef<any>(null)
 
   // MathJax laden
   useEffect(() => {
@@ -42,6 +52,47 @@ export default function Funktionsgleichung(){
     mathjaxScript.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
     document.head.appendChild(mathjaxScript)
   }, [])
+
+  // Load YouTube IFrame API when video modal opens
+  useEffect(() => {
+    if (!showVideoModal) return
+
+    // Load YouTube API if not already loaded
+    if (!window.YT) {
+      const tag = document.createElement('script')
+      tag.src = 'https://www.youtube.com/iframe_api'
+      document.body.appendChild(tag)
+    }
+
+    // Initialize player when API is ready
+    const initializePlayer = () => {
+      if (window.YT && window.YT.Player && !youtubePlayerRef.current) {
+        youtubePlayerRef.current = new window.YT.Player('youtube-player-funktionsgleichung', {
+          height: '390',
+          width: '640',
+          videoId: 'r8vCu72ojYw',
+          playerVars: {
+            'start': 104  // Start at 1:44 (104 seconds)
+          }
+        })
+      }
+    }
+
+    // Check if API is ready, otherwise wait for onYouTubeIframeAPIReady
+    if (window.YT && window.YT.Player) {
+      initializePlayer()
+    } else {
+      window.onYouTubeIframeAPIReady = initializePlayer
+    }
+
+    return () => {
+      // Cleanup when modal closes
+      if (youtubePlayerRef.current && typeof youtubePlayerRef.current.destroy === 'function') {
+        youtubePlayerRef.current.destroy()
+        youtubePlayerRef.current = null
+      }
+    }
+  }, [showVideoModal])
 
   useEffect(() => {
     const m = (p2.y - p1.y) / (p2.x - p1.x)
@@ -111,6 +162,7 @@ export default function Funktionsgleichung(){
         <div className={styles.controls}>
           <button onClick={genTwoPoints} className={styles.btn}>Neue Aufgabe: 2 Punkte</button>
           <button onClick={genPointSlope} className={styles.btn}>Neue Aufgabe: Punkt + Steigung</button>
+          <button onClick={() => setShowVideoModal(true)} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: '500' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}>🎥 Erklärvideo</button>
         </div>
 
         <div className={styles.task}>
@@ -210,6 +262,21 @@ export default function Funktionsgleichung(){
           </div>
         )}
       </div>
+
+      {/* Video Modal */}
+      {showVideoModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', padding: '2rem', maxWidth: '800px', width: '90%', boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h3 style={{ margin: 0 }}>Erklärvideo: Funktionsgleichung aufstellen</h3>
+              <button onClick={() => setShowVideoModal(false)} style={{ backgroundColor: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>✕</button>
+            </div>
+            <div id="youtube-player-funktionsgleichung" style={{ marginBottom: '1rem' }}></div>
+            <p style={{ color: '#666', fontSize: '0.875rem', margin: 0 }}>Das Video startet bei 1:44.</p>
+            <button onClick={() => setShowVideoModal(false)} style={{ marginTop: '1.5rem', backgroundColor: '#3b82f6', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>Schließen</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
