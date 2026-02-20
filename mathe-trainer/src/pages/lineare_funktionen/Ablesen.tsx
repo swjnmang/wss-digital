@@ -2,7 +2,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import styles from './Ablesen.module.css'
 
 declare global {
-  interface Window { GGBApplet: any }
+  interface Window { 
+    GGBApplet: any
+    YT: any
+    onYouTubeIframeAPIReady: () => void
+  }
 }
 
 function randInt(min: number, max: number) {
@@ -16,10 +20,12 @@ export default function Ablesen() {
   const [tInput, setTInput] = useState('')
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
+  const [showVideoModal, setShowVideoModal] = useState(false)
   const [geoSize, setGeoSize] = useState<{width: number, height: number}>({width: 600, height: 600})
   const ggbRef = useRef<HTMLDivElement | null>(null)
   const ggbInstance = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const youtubePlayerRef = useRef<any>(null)
 
   // Berechne responsive Größe basierend auf verfügbarer Breite
   useEffect(() => {
@@ -43,6 +49,48 @@ export default function Ablesen() {
       ggbRef.current.style.height = `${geoSize.height}px`
     }
   }, [geoSize])
+
+  // Load YouTube IFrame API when video modal opens
+  useEffect(() => {
+    if (!showVideoModal) return
+
+    // Load YouTube API if not already loaded
+    if (!window.YT) {
+      const tag = document.createElement('script')
+      tag.src = 'https://www.youtube.com/iframe_api'
+      document.body.appendChild(tag)
+    }
+
+    // Initialize player when API is ready
+    const initializePlayer = () => {
+      if (window.YT && window.YT.Player && !youtubePlayerRef.current) {
+        youtubePlayerRef.current = new window.YT.Player('youtube-player', {
+          height: '390',
+          width: '640',
+          videoId: 'r8vCu72ojYw',
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        })
+      }
+    }
+
+    // Check if API is ready, otherwise wait for onYouTubeIframeAPIReady
+    if (window.YT && window.YT.Player) {
+      initializePlayer()
+    } else {
+      window.onYouTubeIframeAPIReady = initializePlayer
+    }
+
+    return () => {
+      // Cleanup when modal closes
+      if (youtubePlayerRef.current && typeof youtubePlayerRef.current.destroy === 'function') {
+        youtubePlayerRef.current.destroy()
+        youtubePlayerRef.current = null
+      }
+    }
+  }, [showVideoModal])
 
   // Load GeoGebra script once and initialize applet
   useEffect(() => {
@@ -292,6 +340,24 @@ export default function Ablesen() {
     else setFeedback('Nicht ganz. Probiere es noch einmal oder zeige die Lösung.')
   }
 
+  // YouTube Player event handlers
+  function onPlayerReady(event: any) {
+    // Video is ready, start playing
+    event.target.playVideo()
+  }
+
+  function onPlayerStateChange(event: any) {
+    // Check current time and pause at 1:44 (104 seconds)
+    const player = event.target
+    if (player && typeof player.getCurrentTime === 'function') {
+      const currentTime = player.getCurrentTime()
+      // If video reaches 1:44 (104 seconds), pause it
+      if (currentTime >= 104 && player.getPlayerState() === 1) {
+        player.pauseVideo()
+      }
+    }
+  }
+
   return (
     <div className={`prose ${styles.container}`}>
       <div className={styles.card}>
@@ -315,6 +381,7 @@ export default function Ablesen() {
         <div className={styles.actions}>
           <button onClick={check} className={styles.primary}>Prüfen</button>
           <button onClick={() => setShowSolution(true)} className={styles.secondary}>Lösung anzeigen</button>
+          <button onClick={() => setShowVideoModal(true)} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: '500' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}>🎥 Erklärvideo</button>
           <button onClick={() => generateNew()} className={styles.ghost}>Neue Aufgabe</button>
         </div>
 
@@ -328,6 +395,21 @@ export default function Ablesen() {
           </div>
         )}
       </div>
+
+      {/* Video Modal */}
+      {showVideoModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', padding: '2rem', maxWidth: '800px', width: '90%', boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h3 style={{ margin: 0 }}>Erklärvideo: Funktionsgleichung ablesen</h3>
+              <button onClick={() => setShowVideoModal(false)} style={{ backgroundColor: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>✕</button>
+            </div>
+            <div id="youtube-player" style={{ marginBottom: '1rem' }}></div>
+            <p style={{ color: '#666', fontSize: '0.875rem', margin: 0 }}>Das Video wird bei 1:44 automatisch pausiert.</p>
+            <button onClick={() => setShowVideoModal(false)} style={{ marginTop: '1.5rem', backgroundColor: '#3b82f6', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>Schließen</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
