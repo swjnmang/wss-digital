@@ -1,6 +1,13 @@
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import styles from './LFCommon.module.css'
+
+declare global {
+  interface Window { 
+    YT: any
+    onYouTubeIframeAPIReady: () => void
+  }
+}
 
 type Difficulty = 'easy' | 'medium' | 'hard'
 type CorrectAnswer = { x: number, y: number } | 'none'
@@ -31,6 +38,8 @@ export default function Schnittpunkt() {
   const [correctAnswer, setCorrectAnswer] = useState<CorrectAnswer>('none')
   const [geoGebraURL, setGeoGebraURL] = useState('')
   const [isFirstTask, setIsFirstTask] = useState(true)
+  const [showVideoModal, setShowVideoModal] = useState(false)
+  const youtubePlayerRef = useRef<any>(null)
 
   function handleDifficulty(level: Difficulty) {
     setDifficulty(level)
@@ -40,6 +49,44 @@ export default function Schnittpunkt() {
   function openGeoGebra() {
     if (geoGebraURL) window.open(geoGebraURL, '_blank')
   }
+
+  // Load YouTube IFrame API when video modal opens
+  useEffect(() => {
+    if (!showVideoModal) return
+
+    // Load YouTube API if not already loaded
+    if (!window.YT) {
+      const tag = document.createElement('script')
+      tag.src = 'https://www.youtube.com/iframe_api'
+      document.body.appendChild(tag)
+    }
+
+    // Initialize player when API is ready
+    const initializePlayer = () => {
+      if (window.YT && window.YT.Player && !youtubePlayerRef.current) {
+        youtubePlayerRef.current = new window.YT.Player('youtube-player-schnittpunkt', {
+          height: '390',
+          width: '640',
+          videoId: 'zbc5WmfLDiY'
+        })
+      }
+    }
+
+    // Check if API is ready, otherwise wait for onYouTubeIframeAPIReady
+    if (window.YT && window.YT.Player) {
+      initializePlayer()
+    } else {
+      window.onYouTubeIframeAPIReady = initializePlayer
+    }
+
+    return () => {
+      // Cleanup when modal closes
+      if (youtubePlayerRef.current && typeof youtubePlayerRef.current.destroy === 'function') {
+        youtubePlayerRef.current.destroy()
+        youtubePlayerRef.current = null
+      }
+    }
+  }, [showVideoModal])
 
   function generateNewTask(level: Difficulty = difficulty, forceNotParallel = false) {
     setFeedback('')
@@ -201,6 +248,7 @@ export default function Schnittpunkt() {
             <button className="generator-button bg-gradient-to-br from-sky-600 to-sky-700 text-white rounded-md px-5 py-2 shadow" onClick={() => generateNewTask(difficulty)}>Neue Aufgabe</button>
             <button className="generator-button bg-green-700 text-white rounded-md px-5 py-2" onClick={checkSolution}>Lösung prüfen</button>
             <button className="generator-button bg-gray-600 text-white rounded-md px-5 py-2" onClick={showAnswer} disabled={showAnswerBtnDisabled}>Lösung anzeigen</button>
+            <button className="generator-button text-white rounded-md px-5 py-2" style={{ backgroundColor: '#ef4444' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')} onClick={() => setShowVideoModal(true)}>🎥 Erklärvideo</button>
             <button className="generator-button bg-blue-700 text-white rounded-md px-5 py-2" onClick={openGeoGebra}>Zeichnerische Lösung</button>
           </div>
           {solutionVisible && (
@@ -208,6 +256,20 @@ export default function Schnittpunkt() {
           )}
         </div>
       </div>
+
+      {/* Video Modal */}
+      {showVideoModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', padding: '2rem', maxWidth: '800px', width: '90%', boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h3 style={{ margin: 0 }}>Erklärvideo: Schnittpunkt zweier Geraden</h3>
+              <button onClick={() => setShowVideoModal(false)} style={{ backgroundColor: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>✕</button>
+            </div>
+            <div id="youtube-player-schnittpunkt" style={{ marginBottom: '1rem' }}></div>
+            <button onClick={() => setShowVideoModal(false)} style={{ marginTop: '1.5rem', backgroundColor: '#3b82f6', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>Schließen</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
