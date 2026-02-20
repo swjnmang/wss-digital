@@ -55,6 +55,7 @@ export default function SteigungBerechnen() {
   const [p1, setP1] = useState({ x: 1, y: 3 })
   const [p2, setP2] = useState({ x: 4, y: 9 })
   const [correctSlope, setCorrectSlope] = useState<number>((9 - 3) / (4 - 1))
+  const [slopeSign, setSlopeSign] = useState<'positive' | 'negative' | ''>('')  // Neue State für Vorab-Auswahl
   const [input, setInput] = useState('')
   const [feedback, setFeedback] = useState<string>('')
   const [streak, setStreak] = useState(0)
@@ -83,6 +84,7 @@ export default function SteigungBerechnen() {
   function generateNewTask() {
     setFeedback('')
     setInput('')
+    setSlopeSign('')  // Reset der Vorab-Auswahl
     setShowSolution(false)
     let x1, x2
     do {
@@ -175,21 +177,42 @@ export default function SteigungBerechnen() {
   }
 
   function checkSolution() {
-    if (input.trim() === '') {
-      setFeedback('Bitte gib eine Lösung ein.')
+    // Überprüfe zuerst, ob das Vorzeichen ausgewählt wurde
+    if (slopeSign === '') {
+      setFeedback('Bitte wähle zuerst aus, ob die Steigung positiv oder negativ ist.')
       return
     }
+
+    if (input.trim() === '') {
+      setFeedback('Bitte gib die Steigung ein.')
+      return
+    }
+
     const user = parseFloat(input.replace(',', '.'))
     if (isNaN(user)) {
       setFeedback('Ungültige Zahl')
       return
     }
+
+    // Überprüfe, ob das Vorzeichen korrekt ist
+    const expectedSign = correctSlope >= 0 ? 'positive' : 'negative'
+    if (slopeSign !== expectedSign) {
+      setFeedback(
+        expectedSign === 'positive'
+          ? 'Das Vorzeichen ist falsch! Die Steigung ist positiv.'
+          : 'Das Vorzeichen ist falsch! Die Steigung ist negativ.'
+      )
+      setStreak(0)
+      return
+    }
+
+    // Überprüfe den Wert
     if (Math.abs(user - correctSlope) < 0.01) {
       setFeedback('Richtig! Super gemacht!')
       setStreak((s) => s + 1)
       setShowSolution(false)
     } else {
-      setFeedback('Leider nicht ganz richtig. Überprüfe deine Rechnung!')
+      setFeedback('Das Vorzeichen stimmt, aber der Wert ist nicht ganz richtig. Überprüfe deine Rechnung!')
       setStreak(0)
       setShowSolution(false)
     }
@@ -280,15 +303,48 @@ export default function SteigungBerechnen() {
               <p className={styles.taskDescription}>Berechne die Steigung m der Geraden, die durch die beiden Punkte verläuft. Runde auf zwei Nachkommastellen.</p>
             </div>
 
-            <div className={styles.inputContainer}>
-              <span>m =</span>
-              <input 
-                value={input} 
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} 
-                className={styles.input} 
-                placeholder="Deine Lösung" 
-              />
+            {/* Vorab: Steigungsvorzeichen auswählen */}
+            <div style={{ marginBottom: '20px', padding: '12px', backgroundColor: '#f0f4ff', borderRadius: '8px', borderLeft: '4px solid #3b82f6' }}>
+              <p style={{ marginTop: 0, marginBottom: '10px', fontWeight: '600', fontSize: '14px' }}>Schritt 1: Ist die Steigung positiv oder negativ?</p>
+              <div style={{ display: 'flex', gap: '15px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '15px' }}>
+                  <input
+                    type="radio"
+                    name="slope-sign"
+                    value="positive"
+                    checked={slopeSign === 'positive'}
+                    onChange={(e) => setSlopeSign(e.target.value as 'positive' | 'negative')}
+                  />
+                  📈 Positiv (steigt)
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '15px' }}>
+                  <input
+                    type="radio"
+                    name="slope-sign"
+                    value="negative"
+                    checked={slopeSign === 'negative'}
+                    onChange={(e) => setSlopeSign(e.target.value as 'positive' | 'negative')}
+                  />
+                  📉 Negativ (fällt)
+                </label>
+              </div>
             </div>
+
+            {/* Eingabefeld für m-Wert - nur wenn Vorzeichen ausgewählt */}
+            {slopeSign && (
+              <div>
+                <p style={{ marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Schritt 2: Gib den Wert ein</p>
+                <div className={styles.inputContainer}>
+                  <span>m =</span>
+                  <input 
+                    value={input} 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} 
+                    className={styles.input} 
+                    placeholder="Deine Lösung" 
+                  />
+                </div>
+              </div>
+            )}
 
             {feedback && <div className={`${styles.feedback} ${feedback.includes('Richtig') ? styles.success : styles.error}`}>{feedback}</div>}
 
@@ -296,6 +352,24 @@ export default function SteigungBerechnen() {
               <button onClick={generateNewTask} className={styles.btnPrimary}>Neue Aufgabe</button>
               <button onClick={checkSolution} className={styles.btnSuccess}>Lösung prüfen</button>
               <button onClick={onShowAnswer} className={styles.btnSecondary}>Lösung anzeigen</button>
+              <button 
+                onClick={() => window.open('https://youtu.be/IwNoiR-yfJ0?si=Hklidv10rx1W6YuJ', '_blank')}
+                style={{
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  padding: '10px 16px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}
+              >
+                🎥 Erklärvideo
+              </button>
             </div>
 
             {showSolution && (
