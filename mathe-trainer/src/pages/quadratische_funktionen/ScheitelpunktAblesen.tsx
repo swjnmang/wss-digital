@@ -18,6 +18,7 @@ const ScheitelpunktAblesen = () => {
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
   const [task, setTask] = useState<Task | null>(null);
   const [tasksCompleted, setTasksCompleted] = useState(0);
+  const [geoSize, setGeoSize] = useState<{ width: number; height: number }>({ width: 600, height: 500 });
   
   const [userXs, setUserXs] = useState<string>('');
   const [userYs, setUserYs] = useState<string>('');
@@ -26,11 +27,26 @@ const ScheitelpunktAblesen = () => {
   const [showSolution, setShowSolution] = useState<boolean>(false);
 
   const ggbApiRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const VIDEO_URL = "https://www.youtube.com/watch?v=VgsmYGAI-_8&list=PLI8kX0XEfSugainT6dHh9wGTGikzJ76d2&index=6";
 
   const formatNumber = (num: number) => Math.round(num * 100) / 100;
   const randomInt = (max: number, min: number = 0) => Math.floor(Math.random() * (max - min + 1)) + min;
   const randomChoice = (arr: number[]) => arr[Math.floor(Math.random() * arr.length)];
+
+  // Responsive sizing
+  useEffect(() => {
+    const calculateSize = () => {
+      if (!containerRef.current) return;
+      const parentWidth = containerRef.current.offsetWidth;
+      const size = Math.min(Math.max(parentWidth * 0.9, 300), 700);
+      setGeoSize({ width: size, height: size * 0.8 });
+    };
+
+    calculateSize();
+    window.addEventListener('resize', calculateSize);
+    return () => window.removeEventListener('resize', calculateSize);
+  }, []);
 
   const generateNewTask = (level: 'easy' | 'medium' | 'hard') => {
     setFeedback('');
@@ -39,7 +55,6 @@ const ScheitelpunktAblesen = () => {
     setShowSolution(false);
     setIsCorrect(false);
 
-    // Alternate between graph and equation type
     const taskType = tasksCompleted % 2 === 0 ? 'graph' : 'equation';
 
     let a: number, xs: number, ys: number;
@@ -69,7 +84,6 @@ const ScheitelpunktAblesen = () => {
 
     const xs_str = (xs >= 0) ? ` - ${xs}` : ` + ${Math.abs(xs)}`;
     const ys_str = (ys >= 0) ? ` + ${ys}` : ` - ${Math.abs(ys)}`;
-    const equation = `y = ${a}(x${xs_str})²${ys_str}`;
 
     const solutionSteps = `
       Der Scheitelpunkt wird aus der Scheitelform y = a(x - xs)² + ys abgelesen.
@@ -81,7 +95,6 @@ const ScheitelpunktAblesen = () => {
     const newTask = { a, xs, ys, type: taskType, solutionSteps };
     setTask(newTask);
 
-    // Initialize GeoGebra for graph type
     if (taskType === 'graph') {
       setTimeout(() => {
         initializeGeoGebra(a, xs, ys);
@@ -99,8 +112,8 @@ const ScheitelpunktAblesen = () => {
       
       const params: any = {
         appName: 'classic',
-        width: 500,
-        height: 400,
+        width: geoSize.width,
+        height: geoSize.height,
         showToolBar: false,
         showAlgebraInput: false,
         showMenuBar: false,
@@ -108,23 +121,21 @@ const ScheitelpunktAblesen = () => {
         useBrowserForJS: true,
         enableShiftDragZoom: true,
         showResetIcon: true,
+        showZoomButtons: true,
         appletOnLoad: (api: any) => {
           ggbApiRef.current = api;
           
           try {
             api.reset();
-            // Draw the parabola: y = a(x-xs)² + ys
             api.evalCommand(`f(x) = ${a}*(x - (${xs}))^2 + ${ys}`);
             api.setColor('f', 0, 0, 255);
             api.setLineThickness('f', 3);
             
-            // Mark the vertex
             api.evalCommand(`S = (${xs}, ${ys})`);
             api.setColor('S', 255, 0, 0);
             api.setPointSize('S', 8);
             api.setLabelVisible('S', true);
             
-            // Set appropriate view
             const margin = 3;
             api.setCoordSystem(xs - margin - 2, xs + margin + 2, ys - 3, ys + 8);
           } catch (e) {
@@ -185,119 +196,140 @@ const ScheitelpunktAblesen = () => {
     : '';
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Scheitelpunkt ablesen</h1>
-      
-      <div className="mb-6">
-        <div className="flex gap-2 mb-4">
-          <button 
-            onClick={() => setDifficulty('easy')}
-            className={`px-4 py-2 rounded ${difficulty === 'easy' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-          >
-            Leicht
-          </button>
-          <button 
-            onClick={() => setDifficulty('medium')}
-            className={`px-4 py-2 rounded ${difficulty === 'medium' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-          >
-            Mittel
-          </button>
-          <button 
-            onClick={() => setDifficulty('hard')}
-            className={`px-4 py-2 rounded ${difficulty === 'hard' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-          >
-            Schwer
-          </button>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <p className="text-lg mb-4 font-bold">
-            {task.type === 'graph' 
-              ? 'Lese den Scheitelpunkt aus dem Graphen ab:' 
-              : 'Lese den Scheitelpunkt aus der Gleichung ab:'}
-          </p>
-
-          {task.type === 'graph' ? (
-            <div id="ggb-scheitelpunkt" style={{ width: '100%', height: '400px', marginBottom: '20px' }}></div>
-          ) : (
-            <div className="text-2xl font-mono text-center bg-gray-50 p-4 rounded mb-6">
-              {equation}
-            </div>
-          )}
-
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <span className="text-xl">S (</span>
-            <input
-              type="text"
-              value={userXs}
-              onChange={(e) => setUserXs(e.target.value)}
-              placeholder="xs"
-              className="w-20 p-2 border rounded text-center"
-            />
-            <span className="text-xl">|</span>
-            <input
-              type="text"
-              value={userYs}
-              onChange={(e) => setUserYs(e.target.value)}
-              placeholder="ys"
-              className="w-20 p-2 border rounded text-center"
-            />
-            <span className="text-xl">)</span>
-          </div>
-
-          <div className="flex gap-4 justify-center">
-            <button 
-              onClick={checkSolution}
-              className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
-            >
-              Prüfen
-            </button>
-            <button 
-              onClick={() => generateNewTask(difficulty)}
-              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-            >
-              Neue Aufgabe
-            </button>
-          </div>
-
-          {feedback && (
-            <div className={`mt-4 text-center font-bold ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-              {feedback}
-            </div>
-          )}
-
-          {!isCorrect && feedback && (
-            <div className="mt-4 text-center">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
+      <div className="container mx-auto px-4" ref={containerRef}>
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-4xl font-bold mb-2 text-slate-800">Scheitelpunkt ablesen</h1>
+          <p className="text-slate-600 mb-6">Aufgabentyp: {task.type === 'graph' ? 'Graph ablesen' : 'Gleichung ablesen'}</p>
+          
+          <div className="mb-6">
+            <div className="flex gap-2 mb-6 flex-wrap">
               <button 
-                onClick={() => setShowSolution(true)}
-                className="text-blue-600 hover:underline"
+                onClick={() => setDifficulty('easy')}
+                className={`px-4 py-2 rounded-lg font-semibold transition-all ${difficulty === 'easy' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
               >
-                Lösung anzeigen
+                Leicht
+              </button>
+              <button 
+                onClick={() => setDifficulty('medium')}
+                className={`px-4 py-2 rounded-lg font-semibold transition-all ${difficulty === 'medium' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
+              >
+                Mittel
+              </button>
+              <button 
+                onClick={() => setDifficulty('hard')}
+                className={`px-4 py-2 rounded-lg font-semibold transition-all ${difficulty === 'hard' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
+              >
+                Schwer
               </button>
             </div>
-          )}
-        </div>
 
-        {showSolution && (
-          <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
-            <h3 className="font-bold text-lg mb-4">Lösungsweg:</h3>
-            <p className="whitespace-pre-wrap">{task.solutionSteps}</p>
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* GeoGebra oder Gleichung */}
+              <div className="lg:col-span-2">
+                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                  <p className="text-lg font-bold text-slate-700 mb-4">
+                    {task.type === 'graph' 
+                      ? 'Lese den Scheitelpunkt aus dem Graphen ab:' 
+                      : 'Lese den Scheitelpunkt aus der Gleichung ab:'}
+                  </p>
+
+                  {task.type === 'graph' ? (
+                    <div 
+                      id="ggb-scheitelpunkt"
+                      className="w-full bg-slate-50 rounded-lg border border-slate-200"
+                      style={{ minHeight: '500px' }}
+                    ></div>
+                  ) : (
+                    <div className="text-3xl font-mono text-center bg-slate-100 p-6 rounded-lg border-2 border-blue-400 text-blue-700 font-bold">
+                      {equation}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Input und Buttons */}
+              <div className="lg:col-span-1">
+                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 sticky top-6">
+                  <h3 className="text-lg font-bold text-slate-800 mb-4">Scheitelpunkt</h3>
+                  
+                  <div className="space-y-2 mb-6">
+                    <label className="block text-sm font-semibold text-slate-600">xs</label>
+                    <input
+                      type="text"
+                      value={userXs}
+                      onChange={(e) => setUserXs(e.target.value)}
+                      placeholder="x-Koordinate"
+                      className="w-full p-3 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center text-lg"
+                    />
+                  </div>
+
+                  <div className="space-y-2 mb-6">
+                    <label className="block text-sm font-semibold text-slate-600">ys</label>
+                    <input
+                      type="text"
+                      value={userYs}
+                      onChange={(e) => setUserYs(e.target.value)}
+                      placeholder="y-Koordinate"
+                      className="w-full p-3 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center text-lg"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <button 
+                      onClick={checkSolution}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-md"
+                    >
+                      Prüfen
+                    </button>
+                    <button 
+                      onClick={() => generateNewTask(difficulty)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-md"
+                    >
+                      Neue Aufgabe
+                    </button>
+                  </div>
+
+                  {feedback && (
+                    <div className={`mt-4 p-4 rounded-lg font-semibold text-center ${isCorrect ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}`}>
+                      {feedback}
+                    </div>
+                  )}
+
+                  {!isCorrect && feedback && (
+                    <button 
+                      onClick={() => setShowSolution(true)}
+                      className="w-full mt-3 text-blue-600 hover:text-blue-700 font-semibold hover:underline"
+                    >
+                      Lösung anzeigen
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {showSolution && (
+              <div className="mt-6 bg-blue-50 p-6 rounded-xl border-2 border-blue-300">
+                <h3 className="font-bold text-lg mb-3 text-blue-900">Lösungsweg:</h3>
+                <p className="whitespace-pre-wrap text-slate-700 leading-relaxed">{task.solutionSteps}</p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      <div className="mt-8">
-        <a 
-          href={VIDEO_URL} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-        >
-          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-          </svg>
-          Erklärvideo ansehen
-        </a>
+          <div className="mt-12 flex justify-center">
+            <a 
+              href={VIDEO_URL} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-md"
+            >
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+              </svg>
+              Erklärvideo ansehen
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
