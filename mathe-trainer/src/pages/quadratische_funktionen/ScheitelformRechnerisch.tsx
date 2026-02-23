@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { InlineMath } from 'react-katex';
+import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
 declare global {
@@ -136,24 +136,26 @@ const ScheitelformRechnerisch = () => {
 
         const xsTermForInput = formatNumber(-xs);
         const ysTermForInput = ys;
+        const diffValue = formatNumber(py - ys);
+        const squareValue = Math.pow(px - xs, 2);
 
         setSolutionSteps(
-            <div>
-                <p><strong>1. Scheitelpunkt S($x_s$|$y_s$) ablesen und einsetzen:</strong></p>
-                <p>Aus S({xs}|{ys}) folgt: $x_s = {xs}$ und $y_s = {ys}$.</p>
-                <p>Ansatz: $y = a(x - {xs})² + {ys}$</p>
-                <br />
+            <div className="space-y-2">
+                <p><strong>1. Scheitelpunkt <InlineMath>S(x_s|y_s)</InlineMath> ablesen und einsetzen:</strong></p>
+                <p>Aus <InlineMath>S({xs}|{ys})</InlineMath> folgt: <InlineMath>x_s = {xs}</InlineMath> und <InlineMath>y_s = {ys}</InlineMath>.</p>
+                <BlockMath>{`\text{Ansatz: } y = a(x - ${xs})^2 + ${ys}`}</BlockMath>
+                
                 <p><strong>2. Punkt P einsetzen, um a zu berechnen:</strong></p>
-                <p>Setze P({px}|{py}) für x und y ein.</p>
-                <p>${py} = a({px} - {xs})² + {ys} | -{ys}</p>
-                <p>${formatNumber(py - ys)} = a \cdot {Math.pow(px - xs, 2)} | : {Math.pow(px - xs, 2)}</p>
-                <p>a = {a}</p>
-                <br />
+                <p>Setze <InlineMath>P({px}|{py})</InlineMath> für x und y ein.</p>
+                <BlockMath>{`${py} = a(${px} - ${xs})^2 + ${ys} \quad | -${ys}`}</BlockMath>
+                <BlockMath>{`${diffValue} = a \cdot ${squareValue} \quad | : ${squareValue}`}</BlockMath>
+                <BlockMath>{`a = ${a}`}</BlockMath>
+                
                 <p><strong>3. Werte in die Lösungsmaske eintragen:</strong></p>
                 <ul className="list-disc pl-5">
-                    <li>Für 'a' gibst du {a} ein.</li>
-                    <li>In der Klammer (x...) wird das Vorzeichen von $x_s$ umgedreht: -({xs}) = {xsTermForInput}. Du gibst also <strong>{xsTermForInput > 0 ? '+' : ''}{xsTermForInput}</strong> ein.</li>
-                    <li>Der letzte Wert ist $y_s$ direkt: Du gibst also <strong>{ysTermForInput > 0 ? '+' : ''}{ysTermForInput}</strong> ein.</li>
+                    <li>Für 'a' gibst du <strong>{a}</strong> ein.</li>
+                    <li>In der Klammer (x...) wird das Vorzeichen von <InlineMath>x_s</InlineMath> umgedreht: <InlineMath>-({xs}) = {xsTermForInput}</InlineMath>. Du gibst also <strong>{xsTermForInput > 0 ? '+' : ''}{xsTermForInput}</strong> ein.</li>
+                    <li>Der letzte Wert ist <InlineMath>y_s</InlineMath> direkt: Du gibst also <strong>{ysTermForInput > 0 ? '+' : ''}{ysTermForInput}</strong> ein.</li>
                 </ul>
             </div>
         );
