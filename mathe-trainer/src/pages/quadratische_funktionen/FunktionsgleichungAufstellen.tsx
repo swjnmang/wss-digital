@@ -310,6 +310,19 @@ const FunktionsgleichungAufstellen = () => {
                         </div>
                     </div>
                     
+                    {(userA || userB || userC) && (
+                        <div className="mb-4 p-4 bg-green-100 rounded border-l-4 border-green-600">
+                            <p className="text-sm font-semibold text-gray-700 mb-2">Deine Funktionsgleichung:</p>
+                            <p className="font-mono text-xl text-green-800">
+                                f(x) = {formatQuadraticFunction(
+                                    userA ? parseFloat(userA.replace(',', '.')) : 0,
+                                    userB ? parseFloat(userB.replace(',', '.')) : 0,
+                                    userC ? parseFloat(userC.replace(',', '.')) : 0
+                                )}
+                            </p>
+                        </div>
+                    )}
+                    
                     <button 
                         onClick={checkAnswer}
                         className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 w-full sm:w-auto"
