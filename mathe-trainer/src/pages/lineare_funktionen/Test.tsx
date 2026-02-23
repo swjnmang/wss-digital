@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import styles from './LFCommon.module.css'
-import GeoGebraApplet from '../../components/GeoGebraApplet'
+import GeoGebraGraph from '../../components/GeoGebraGraph'
 
 type QuestionType = 'slope' | 'missing_coord' | 'equation_ps' | 'equation_2p' | 'zero' | 'intersection' | 'graph'
 type AnswerFormat = 'single_number' | 'point' | 'equation'
@@ -316,7 +316,7 @@ export default function Test() {
           {/* GeoGebra-Graph für graph-Fragen */}
           {q.type === 'graph' && q.data?.m !== undefined && q.data?.t !== undefined && (
             <div className="flex justify-center my-4">
-              <GeoGebraApplet m={q.data.m} t={q.data.t} width={400} height={300} />
+              <GeoGebraGraph m={q.data.m} t={q.data.t} width={400} height={300} />
             </div>
           )}
           {q.data.point && <div className="task-data text-lg font-bold text-sky-800 mt-2" dangerouslySetInnerHTML={{__html: q.data.point}} />}

@@ -50,23 +50,34 @@ export default function Normalparabel() {
     options3.push(`y = x²`);
     options3.sort(() => Math.random() - 0.5);
 
-    setTask({ a, correctAnswers, options3 });
+    const newTask = { a, correctAnswers, options3 };
+    setTask(newTask);
     setCurrentQuestion(1);
     setFeedback(null);
     setShowSolution(false);
+    
+    // Update GeoGebra immediately if API is ready
+    if (ggbApiRef.current) {
+      updateGeoGebra(ggbApiRef.current, a);
+    }
   };
 
   const updateGeoGebra = (api: any, a: number) => {
-    api.reset();
-    api.evalCommand(`f(x) = ${a}*x^2`);
-    api.evalCommand('n(x) = x^2');
-    api.setLineStyle('n', 1);
-    api.setColor('n', 150, 150, 150);
-    api.evalCommand('S=(0,0)');
-    api.setLabelVisible('S', true);
-    
-    // Adjust view
-    api.setCoordSystem(-5, 5, -5, 5);
+    if (!api) return;
+    try {
+      api.reset();
+      api.evalCommand(`f(x) = ${a}*x^2`);
+      api.evalCommand('n(x) = x^2');
+      api.setLineStyle('n', 1);
+      api.setColor('n', 150, 150, 150);
+      api.evalCommand('S=(0,0)');
+      api.setLabelVisible('S', true);
+      
+      // Adjust view
+      api.setCoordSystem(-5, 5, -5, 5);
+    } catch (e) {
+      console.error('GeoGebra update error:', e);
+    }
   };
 
   const handleAppletReady = (api: any) => {
