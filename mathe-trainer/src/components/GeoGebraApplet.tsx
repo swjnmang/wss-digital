@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 
 declare global {
   interface Window {
@@ -28,7 +28,7 @@ interface GeoGebraAppletProps {
 }
 
 export default function GeoGebraApplet({
-  id = `ggb-${Math.random().toString(36).substr(2, 9)}`,
+  id: providedId,
   filename,
   width = 800,
   height = 600,
@@ -42,6 +42,10 @@ export default function GeoGebraApplet({
 }: GeoGebraAppletProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const appletRef = useRef<any>(null);
+  
+  // Generate ID once and keep it stable
+  const id = useMemo(() => providedId || `ggb-${Math.random().toString(36).substr(2, 9)}`, [providedId]);
+  
   const [loading, setLoading] = useState(!filename || filename === '' ? true : false);
 
   // If filename is provided and not empty, use iframe-based approach
@@ -72,7 +76,15 @@ export default function GeoGebraApplet({
     }
 
     const initialize = () => {
-      if (!window.GGBApplet || !containerRef.current) return;
+      if (!window.GGBApplet) {
+        console.error('GeoGebra not loaded yet');
+        return;
+      }
+      
+      if (!containerRef.current) {
+        console.error('Container not found');
+        return;
+      }
 
       const params: any = {
         appName: 'classic',
@@ -134,20 +146,42 @@ export default function GeoGebraApplet({
       script.onload = () => {
         setTimeout(initialize, 100);
       };
+      script.onerror = () => {
+        console.error('Failed to load GeoGebra script');
+        setLoading(false);
+      };
       document.body.appendChild(script);
     } else {
       if (window.GGBApplet) {
         setTimeout(initialize, 100);
       } else {
         // Wait for GGBApplet to be available
+        let attempts = 0;
         const checkInterval = setInterval(() => {
           if (window.GGBApplet) {
             clearInterval(checkInterval);
             setTimeout(initialize, 100);
           }
+          attempts++;
+          if (attempts > 50) {
+            clearInterval(checkInterval);
+            console.error('GeoGebra took too long to load');
+            setLoading(false);
+          }
         }, 100);
       }
     }
+    
+    return () => {
+      // Cleanup: try to remove the applet when component unmounts
+      if (appletRef.current && typeof appletRef.current.remove === 'function') {
+        try {
+          appletRef.current.remove();
+        } catch (e) {
+          // Ignore cleanup errors
+        }
+      }
+    };
   }, [id, width, height, showToolBar, showAlgebraInput, showMenuBar, onAppletReady, commands, coordSystem]);
 
   return (
