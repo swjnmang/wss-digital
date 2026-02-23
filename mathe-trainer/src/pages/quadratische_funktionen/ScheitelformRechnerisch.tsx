@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { InlineMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
 
 declare global {
   interface Window {
@@ -222,10 +224,13 @@ const ScheitelformRechnerisch = () => {
                             <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 sticky top-6">
                                 <h3 className="text-lg font-bold text-slate-800 mb-4">Scheitelform</h3>
                                 
-                                <p className="text-sm text-slate-600 mb-4">
-                                    Bestimme: $y = a(x-x_s)²+y_s$<br/>
-                                    Gegeben: S{taskData && `(${taskData.S.x}|${taskData.S.y})`} und P{taskData && `(${taskData.P.x}|${taskData.P.y})`}
-                                </p>
+                                <div className="text-sm text-slate-600 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                                    <p className="mb-2"><strong>Bestimme:</strong></p>
+                                    <p className="mb-3"><InlineMath math={String.raw`y = a(x - x_s)^2 + y_s`} /></p>
+                                    <p className="text-xs">
+                                        <strong>Gegeben:</strong> S{taskData && `(${taskData.S.x}|${taskData.S.y})`} und P{taskData && `(${taskData.P.x}|${taskData.P.y})`}
+                                    </p>
+                                </div>
                                 
                                 <div className="space-y-3 mb-6">
                                     <div>
