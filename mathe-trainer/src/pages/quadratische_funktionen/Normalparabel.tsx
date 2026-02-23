@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import GeoGebraApplet from '../../components/GeoGebraApplet';
+
+declare global {
+  interface Window {
+    GGBApplet: any;
+  }
+}
 
 interface TaskState {
   a: number;
@@ -18,20 +23,50 @@ export default function Normalparabel() {
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState<{ text: string; type: 'correct' | 'incorrect' } | null>(null);
   const [showSolution, setShowSolution] = useState(false);
-  const [ggbApi, setGgbApi] = useState<any>(null);
-  
-  // To prevent infinite loops in useEffect
   const ggbApiRef = useRef<any>(null);
 
   useEffect(() => {
-    generateNewTask();
-  }, []);
+    // Load GeoGebra script once
+    const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
+    
+    const initApplet = () => {
+      if (!window.GGBApplet) return;
+      
+      const params: any = {
+        appName: 'classic',
+        width: 600,
+        height: 400,
+        showToolBar: false,
+        showAlgebraInput: false,
+        showMenuBar: false,
+        perspective: 'G',
+        useBrowserForJS: true,
+        enableShiftDragZoom: true,
+        showResetIcon: true,
+        appletOnLoad: (api: any) => {
+          ggbApiRef.current = api;
+          generateNewTask();
+        }
+      };
 
-  useEffect(() => {
-    if (task && ggbApiRef.current) {
-      updateGeoGebra(ggbApiRef.current, task.a);
+      try {
+        const applet = new window.GGBApplet(params, true);
+        applet.inject('ggb-normalparabel');
+      } catch (e) {
+        console.error('GeoGebra Error:', e);
+      }
+    };
+
+    if (!existing) {
+      const script = document.createElement('script');
+      script.src = 'https://www.geogebra.org/apps/deployggb.js';
+      script.async = true;
+      script.onload = () => setTimeout(initApplet, 100);
+      document.body.appendChild(script);
+    } else if (window.GGBApplet) {
+      setTimeout(initApplet, 100);
     }
-  }, [task]);
+  }, []);
 
   const generateNewTask = () => {
     const possibleA = [-4, -3, -2, -1.5, -0.5, 0.5, 1.5, 2, 3, 4];
@@ -44,7 +79,6 @@ export default function Normalparabel() {
       4: a > 0 ? 'niedrigster' : 'hoechster'
     };
 
-    // Options for question 3
     let options3 = [correctAnswers[3]];
     options3.push(`y = ${-a}x²`);
     options3.push(`y = x²`);
@@ -56,35 +90,20 @@ export default function Normalparabel() {
     setFeedback(null);
     setShowSolution(false);
     
-    // Update GeoGebra immediately if API is ready
+    // Update GeoGebra
     if (ggbApiRef.current) {
-      updateGeoGebra(ggbApiRef.current, a);
-    }
-  };
-
-  const updateGeoGebra = (api: any, a: number) => {
-    if (!api) return;
-    try {
-      api.reset();
-      api.evalCommand(`f(x) = ${a}*x^2`);
-      api.evalCommand('n(x) = x^2');
-      api.setLineStyle('n', 1);
-      api.setColor('n', 150, 150, 150);
-      api.evalCommand('S=(0,0)');
-      api.setLabelVisible('S', true);
-      
-      // Adjust view
-      api.setCoordSystem(-5, 5, -5, 5);
-    } catch (e) {
-      console.error('GeoGebra update error:', e);
-    }
-  };
-
-  const handleAppletReady = (api: any) => {
-    ggbApiRef.current = api;
-    setGgbApi(api);
-    if (task) {
-      updateGeoGebra(api, task.a);
+      try {
+        ggbApiRef.current.reset();
+        ggbApiRef.current.evalCommand(`f(x) = ${a}*x^2`);
+        ggbApiRef.current.evalCommand('n(x) = x^2');
+        ggbApiRef.current.setLineStyle('n', 1);
+        ggbApiRef.current.setColor('n', 150, 150, 150);
+        ggbApiRef.current.evalCommand('S=(0,0)');
+        ggbApiRef.current.setLabelVisible('S', true);
+        ggbApiRef.current.setCoordSystem(-5, 5, -5, 5);
+      } catch (e) {
+        console.error('GeoGebra update error:', e);
+      }
     }
   };
 
@@ -166,13 +185,7 @@ export default function Normalparabel() {
           <h1 className="text-2xl font-bold text-slate-800 mb-6 text-center">Eigenschaften von Parabeln</h1>
           
           <div className="mb-8 border rounded-lg overflow-hidden shadow-inner bg-white">
-            <GeoGebraApplet 
-              id="ggb-normalparabel"
-              width={600} 
-              height={400} 
-              showToolBar={false}
-              onAppletReady={handleAppletReady}
-            />
+            <div id="ggb-normalparabel" style={{ width: '100%', height: '400px' }}></div>
           </div>
 
           <div className="text-center mb-6 text-slate-600 text-sm">
