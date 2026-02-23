@@ -27,6 +27,10 @@ const ScheitelformRechnerisch = () => {
     const VIDEO_URL = "https://www.youtube.com/watch?v=xgiAK3rLCow&t";
 
     const formatNumber = (num: number) => Math.round(num * 100) / 100;
+    const formatNumberForMath = (num: number) => {
+        const formatted = formatNumber(num);
+        return formatted < 0 ? `(${formatted})` : String(formatted);
+    };
     const randomInt = (max: number, min: number = 0) => Math.floor(Math.random() * (max - min + 1)) + min;
     const randomChoice = (arr: number[]) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -138,17 +142,24 @@ const ScheitelformRechnerisch = () => {
         const ysTermForInput = ys;
         const diffValue = formatNumber(py - ys);
         const squareValue = Math.pow(px - xs, 2);
+        
+        const pxForMath = formatNumberForMath(px);
+        const xsForMath = formatNumberForMath(xs);
+        const ysForMath = formatNumberForMath(ys);
+        const pyForMath = formatNumberForMath(py);
+        const diffForMath = formatNumberForMath(diffValue);
+        const ysSubtractForMath = formatNumberForMath(-ys);
 
         setSolutionSteps(
             <div className="space-y-2">
                 <p><strong>1. Scheitelpunkt <InlineMath>S(x_s|y_s)</InlineMath> ablesen und einsetzen:</strong></p>
                 <p>Aus S({xs}|{ys}) folgt: <InlineMath>x_s = {xs}</InlineMath> und <InlineMath>y_s = {ys}</InlineMath>.</p>
-                <BlockMath>{`y = a(x - ${xs})^2 + ${ys}`}</BlockMath>
+                <BlockMath>{`y = a(x - ${xsForMath})^2 + ${ysForMath}`}</BlockMath>
                 
                 <p><strong>2. Punkt P einsetzen, um a zu berechnen:</strong></p>
                 <p>Setze P({px}|{py}) für x und y ein.</p>
-                <BlockMath>{`${py} = a(${px} - ${xs})^2 + ${ys} \\quad |\\, -${ys}`}</BlockMath>
-                <BlockMath>{`${diffValue} = a \\cdot ${squareValue} \\quad |\\, : ${squareValue}`}</BlockMath>
+                <BlockMath>{`${pyForMath} = a(${pxForMath} - ${xsForMath})^2 + ${ysForMath} \\quad |\\, ${ysSubtractForMath}`}</BlockMath>
+                <BlockMath>{`${diffForMath} = a \\cdot ${squareValue} \\quad |\\, : ${squareValue}`}</BlockMath>
                 <BlockMath>{`a = ${a}`}</BlockMath>
                 
                 <p><strong>3. Werte in die Lösungsmaske eintragen:</strong></p>
