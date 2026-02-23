@@ -1,7 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+
+declare global {
+  interface Window {
+    GGBApplet: any;
+  }
+}
 
 const Nullstellen = () => {
     // State
@@ -14,6 +20,10 @@ const Nullstellen = () => {
     const [showSolution, setShowSolution] = useState<boolean>(false);
     const [score, setScore] = useState<number>(0);
     const [attempted, setAttempted] = useState<boolean>(false);
+    const [geoSize, setGeoSize] = useState<{ width: number; height: number }>({ width: 600, height: 500 });
+
+    const ggbApiRef = useRef<any>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
     // Helpers
     const getRandomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -30,6 +40,82 @@ const Nullstellen = () => {
             return parseFloat(numStr) < 0 ? `(${numStr})` : numStr;
         }
         return numStr;
+    };
+
+    // Responsive sizing
+    useEffect(() => {
+        const calculateSize = () => {
+            if (!containerRef.current) return;
+            const parentWidth = containerRef.current.offsetWidth;
+            const size = Math.min(Math.max(parentWidth * 0.9, 300), 700);
+            setGeoSize({ width: size, height: size * 0.8 });
+        };
+
+        calculateSize();
+        window.addEventListener('resize', calculateSize);
+        return () => window.removeEventListener('resize', calculateSize);
+    }, []);
+
+    const initializeGeoGebra = (a: number, b: number, c: number) => {
+        const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
+        
+        const initApplet = () => {
+            if (!window.GGBApplet) return;
+            
+            const params: any = {
+                appName: 'classic',
+                width: geoSize.width,
+                height: geoSize.height,
+                showToolBar: false,
+                showAlgebraInput: false,
+                showMenuBar: false,
+                perspective: 'G',
+                useBrowserForJS: true,
+                enableShiftDragZoom: true,
+                showResetIcon: true,
+                showZoomButtons: true,
+                appletOnLoad: (api: any) => {
+                    ggbApiRef.current = api;
+                    
+                    try {
+                        api.reset();
+                        api.evalCommand(`f(x) = ${a}*x^2 + ${b}*x + ${c}`);
+                        api.setColor('f', 0, 0, 255);
+                        api.setLineThickness('f', 3);
+                        
+                        // Mark zeros
+                        roots.forEach((root, idx) => {
+                            const pointName = `Z${idx}`;
+                            api.evalCommand(`${pointName}=(${root}, 0)`);
+                            api.setColor(pointName, 255, 0, 0);
+                            api.setPointSize(pointName, 8);
+                            api.setLabelVisible(pointName, true);
+                        });
+                        
+                        api.setCoordSystem(-10, 10, -10, 10);
+                    } catch (e) {
+                        console.error('GeoGebra error:', e);
+                    }
+                }
+            };
+
+            try {
+                const applet = new window.GGBApplet(params, true);
+                applet.inject('ggb-nullstellen');
+            } catch (e) {
+                console.error('GeoGebra injection error:', e);
+            }
+        };
+
+        if (!existing) {
+            const script = document.createElement('script');
+            script.src = 'https://www.geogebra.org/apps/deployggb.js';
+            script.async = true;
+            script.onload = () => setTimeout(initApplet, 100);
+            document.body.appendChild(script);
+        } else if (window.GGBApplet) {
+            setTimeout(initApplet, 100);
+        }
     };
 
     const generateProblem = () => {
@@ -76,6 +162,10 @@ const Nullstellen = () => {
 
         setParams({ a, b, c });
         setRoots(realRoots);
+        
+        setTimeout(() => {
+            initializeGeoGebra(a, b, c);
+        }, 100);
     };
 
     useEffect(() => {
@@ -219,12 +309,8 @@ const Nullstellen = () => {
                     )}
                 </div>
 
-                <div className="mt-6 h-96 w-full bg-slate-100 rounded-lg border-2 border-slate-300 flex items-center justify-center">
-                    <div className="text-center text-slate-600">
-                        <p className="text-lg font-semibold">📊 GeoGebra Grafik</p>
-                        <p className="text-sm">Parabola: f(x) = {a}x² + {b}x + {c}</p>
-                        {roots.length > 0 && <p className="text-sm mt-2">Nullstellen: {roots.map(r => r.toFixed(2)).join(', ')}</p>}
-                    </div>
+                <div ref={containerRef} className="mt-6 w-full">
+                    <div id="ggb-nullstellen" className="w-full rounded-lg border-2 border-slate-300 overflow-hidden"></div>
                 </div>
             </div>
         );
