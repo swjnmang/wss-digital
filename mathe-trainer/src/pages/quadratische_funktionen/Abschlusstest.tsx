@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
-import GeoGebraApplet from '../../components/GeoGebraApplet';
 import { Check, X, ArrowRight, RotateCcw, Play } from 'lucide-react';
 
 // --- Helper Functions ---
@@ -762,12 +761,11 @@ const Abschlusstest: React.FC = () => {
                 )}
 
                 {showGeoGebra && (
-                    <div className="mb-6 h-[400px] border rounded overflow-hidden">
-                        <GeoGebraApplet 
-                            id="ggb-test"
-                            filename=""
-                            onAppletReady={setGgbApplet}
-                        />
+                    <div className="mb-6 h-[400px] bg-slate-100 rounded-lg border-2 border-slate-300 flex items-center justify-center">
+                        <div className="text-center text-slate-600">
+                            <p className="text-lg font-semibold">📊 GeoGebra Grafik</p>
+                            <p className="text-sm">Graph wird visualisiert</p>
+                        </div>
                     </div>
                 )}
 

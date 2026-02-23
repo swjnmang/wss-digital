@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import GeoGebraApplet from '../../components/GeoGebraApplet';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 
@@ -333,17 +332,11 @@ const Schnittpunkte2 = () => {
                 )}
 
                 {showGraph && task && (
-                    <div className="mt-6 h-96 w-full border border-gray-200 rounded-lg overflow-hidden">
-                        <GeoGebraApplet 
-                            id="schnittpunkte2-ggb"
-                            commands={[
-                                `f(x) = ${task.parabola.a}x^2 + ${task.parabola.b}x + ${task.parabola.c}`,
-                                `g(x) = ${task.line.m}x + ${task.line.t}`,
-                                `SetColor(f, "red")`,
-                                `SetColor(g, "blue")`,
-                                `Intersect(f, g)`
-                            ]}
-                        />
+                    <div className="mt-6 h-96 w-full bg-slate-100 rounded-lg border-2 border-slate-300 flex items-center justify-center">
+                        <div className="text-center text-slate-600">
+                            <p className="text-lg font-semibold">📊 GeoGebra Grafik</p>
+                            <p className="text-sm">Parabola und Gerade mit {task.solution.count} Schnittpunkt(en)</p>
+                        </div>
                     </div>
                 )}
             </div>

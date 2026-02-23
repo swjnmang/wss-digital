@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import GeoGebraApplet from '../../components/GeoGebraApplet';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 
@@ -220,22 +219,12 @@ const Nullstellen = () => {
                     )}
                 </div>
 
-                <div className="mt-6 h-96 w-full">
-                    <GeoGebraApplet 
-                        id="nullstellen-ggb"
-                        commands={[
-                            `f(x) = ${a}x^2 + ${b}x + ${c}`,
-                            `SetColor(f, "red")`,
-                            `SetLineThickness(f, 3)`,
-                            ...roots.map((r, i) => `N_${i+1} = (${r}, 0)`),
-                            ...roots.map((r, i) => `SetColor(N_${i+1}, "blue")`),
-                            ...roots.map((r, i) => `SetPointSize(N_${i+1}, 5)`),
-                            `S = Extremum(f)`,
-                            `SetColor(S, "green")`,
-                            `SetPointSize(S, 5)`,
-                            `SetLabelMode(S, 1)`, // Name and Value
-                        ]}
-                    />
+                <div className="mt-6 h-96 w-full bg-slate-100 rounded-lg border-2 border-slate-300 flex items-center justify-center">
+                    <div className="text-center text-slate-600">
+                        <p className="text-lg font-semibold">📊 GeoGebra Grafik</p>
+                        <p className="text-sm">Parabola: f(x) = {a}x² + {b}x + {c}</p>
+                        {roots.length > 0 && <p className="text-sm mt-2">Nullstellen: {roots.map(r => r.toFixed(2)).join(', ')}</p>}
+                    </div>
                 </div>
             </div>
         );

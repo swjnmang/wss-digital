@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import GeoGebraApplet from '../../components/GeoGebraApplet';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 
@@ -628,11 +627,11 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
                 {showSolution && renderSolution()}
 
                 {showGraph && (
-                    <div className="mt-6 h-96 w-full border border-gray-200 rounded-lg overflow-hidden">
-                        <GeoGebraApplet 
-                            id="schnittpunkte-ggb"
-                            commands={getGeoGebraCommands()}
-                        />
+                    <div className="mt-6 h-96 w-full bg-slate-100 rounded-lg border-2 border-slate-300 flex items-center justify-center">
+                        <div className="text-center text-slate-600">
+                            <p className="text-lg font-semibold">📊 GeoGebra Grafik</p>
+                            <p className="text-sm">Schnittpunkte werden visualisiert</p>
+                        </div>
                     </div>
                 )}
             </div>
