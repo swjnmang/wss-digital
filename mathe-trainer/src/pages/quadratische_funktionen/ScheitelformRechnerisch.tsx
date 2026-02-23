@@ -153,7 +153,7 @@ const ScheitelformRechnerisch = () => {
         setSolutionSteps(
             <div className="space-y-2">
                 <p><strong>1. Scheitelpunkt <InlineMath>S(x_s|y_s)</InlineMath> ablesen und einsetzen:</strong></p>
-                <p>Aus S({xs}|{ys}) folgt: <InlineMath>x_s = {xs}</InlineMath> und <InlineMath>y_s = {ys}</InlineMath>.</p>
+                <p>Aus S({xs}|{ys}) folgt: <InlineMath>x_s</InlineMath> = {xs} und <InlineMath>y_s</InlineMath> = {ys}.</p>
                 <BlockMath>{`y = a(x - ${xsForMath})^2 + ${ysForMath}`}</BlockMath>
                 
                 <p><strong>2. Punkt P einsetzen, um a zu berechnen:</strong></p>
