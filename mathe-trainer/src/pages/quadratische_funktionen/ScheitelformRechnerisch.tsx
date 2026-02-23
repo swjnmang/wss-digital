@@ -142,19 +142,19 @@ const ScheitelformRechnerisch = () => {
         setSolutionSteps(
             <div className="space-y-2">
                 <p><strong>1. Scheitelpunkt <InlineMath>S(x_s|y_s)</InlineMath> ablesen und einsetzen:</strong></p>
-                <p>Aus <InlineMath>S({xs}|{ys})</InlineMath> folgt: <InlineMath>x_s = {xs}</InlineMath> und <InlineMath>y_s = {ys}</InlineMath>.</p>
-                <BlockMath>{`\text{Ansatz: } y = a(x - ${xs})^2 + ${ys}`}</BlockMath>
+                <p>Aus S({xs}|{ys}) folgt: <InlineMath>x_s = {xs}</InlineMath> und <InlineMath>y_s = {ys}</InlineMath>.</p>
+                <BlockMath>{`y = a(x - ${xs})^2 + ${ys}`}</BlockMath>
                 
                 <p><strong>2. Punkt P einsetzen, um a zu berechnen:</strong></p>
-                <p>Setze <InlineMath>P({px}|{py})</InlineMath> für x und y ein.</p>
-                <BlockMath>{`${py} = a(${px} - ${xs})^2 + ${ys} \quad | -${ys}`}</BlockMath>
-                <BlockMath>{`${diffValue} = a \cdot ${squareValue} \quad | : ${squareValue}`}</BlockMath>
+                <p>Setze P({px}|{py}) für x und y ein.</p>
+                <BlockMath>{`${py} = a(${px} - ${xs})^2 + ${ys} \\quad |\\, -${ys}`}</BlockMath>
+                <BlockMath>{`${diffValue} = a \\cdot ${squareValue} \\quad |\\, : ${squareValue}`}</BlockMath>
                 <BlockMath>{`a = ${a}`}</BlockMath>
                 
                 <p><strong>3. Werte in die Lösungsmaske eintragen:</strong></p>
                 <ul className="list-disc pl-5">
                     <li>Für 'a' gibst du <strong>{a}</strong> ein.</li>
-                    <li>In der Klammer (x...) wird das Vorzeichen von <InlineMath>x_s</InlineMath> umgedreht: <InlineMath>-({xs}) = {xsTermForInput}</InlineMath>. Du gibst also <strong>{xsTermForInput > 0 ? '+' : ''}{xsTermForInput}</strong> ein.</li>
+                    <li>In der Klammer (x...) wird das Vorzeichen von <InlineMath>x_s</InlineMath> umgedreht: -({xs}) = {xsTermForInput}. Du gibst also <strong>{xsTermForInput > 0 ? '+' : ''}{xsTermForInput}</strong> ein.</li>
                     <li>Der letzte Wert ist <InlineMath>y_s</InlineMath> direkt: Du gibst also <strong>{ysTermForInput > 0 ? '+' : ''}{ysTermForInput}</strong> ein.</li>
                 </ul>
             </div>
