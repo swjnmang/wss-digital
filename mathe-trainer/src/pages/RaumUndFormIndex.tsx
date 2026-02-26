@@ -17,7 +17,7 @@ const sections: SectionData[] = [
       { icon: Cone, title: "Kegel", desc: "Coming Soon", href: "kegel" },
       { icon: Pyramid, title: "Pyramide", desc: "Coming Soon", href: "pyramide" },
       { icon: Cylinder, title: "Zylinder", desc: "Coming Soon", href: "zylinder" },
-      { icon: BookOpen, title: "Anwendungsaufgaben", desc: "Der Pool & Schwimmbad mit Schirm", href: "anwendungsaufgaben" }
+      { icon: BookOpen, title: "Anwendungsaufgaben", desc: "Übungsaufgaben aus dem Alltag", href: "anwendungsaufgaben" }
     ]
   }
 ];
