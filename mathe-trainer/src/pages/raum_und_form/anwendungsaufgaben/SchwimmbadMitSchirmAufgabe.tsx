@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
+import { BlockMath } from 'react-katex'
+import 'katex/dist/katex.min.css'
 
 interface Solution {
   type: 'number' | 'text'
   answer?: string | number
   tolerance?: number
-  unit?: string // z.B. 'm²', 'm', 'm³', '€'
-  unitOptions?: string[] // Optionen für Einheitsauswahl
+  unit?: string
+  unitOptions?: string[]
 }
 
 interface Task {
@@ -37,9 +39,9 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 1.8,
         unit: 'm',
         unitOptions: ['m', 'cm', 'mm'],
-        tolerance: 0.009, // 0,5% von 1,8
+        tolerance: 0.009,
       },
-      hint: '$$r_{innen} = 2\\text{ m} - 0{,}2\\text{ m} = 1{,}80\\text{ m}$$',
+      hint: 'r_{innen} = 2\\text{ m} - 0{,}2\\text{ m} = 1{,}80\\text{ m}',
     },
     {
       id: 2,
@@ -53,9 +55,9 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 28.18,
         unit: 'm²',
         unitOptions: ['m', 'm²', 'm³'],
-        tolerance: 0.1409, // 0,5% von 28,18
+        tolerance: 0.1409,
       },
-      hint: '$$A_{kreis} = 1{,}80^2 \\cdot \\pi = 10{,}18\\text{ m}^2$$\\n\\n$$A_{rechteck} = 5 \\cdot 3{,}60 = 18\\text{ m}^2$$\\n\\n$$A_{boden} = 28{,}18\\text{ m}^2$$',
+      hint: 'A_{kreis} = 1{,}80^2 \\cdot \\pi = 10{,}18\\text{ m}^2 \\quad A_{rechteck} = 5 \\cdot 3{,}60 = 18\\text{ m}^2 \\quad A_{boden} = 28{,}18\\text{ m}^2',
     },
     {
       id: 3,
@@ -69,9 +71,9 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 39.45,
         unit: 'm³',
         unitOptions: ['m³', 'Liter', 'cm³'],
-        tolerance: 0.19725, // 0,5% von 39,45
+        tolerance: 0.19725,
       },
-      hint: '$$V_{wasser} = 28{,}18 \\cdot 1{,}40 = 39{,}45\\text{ m}^3$$',
+      hint: 'V_{wasser} = 28{,}18 \\cdot 1{,}40 = 39{,}45\\text{ m}^3',
     },
     {
       id: 4,
@@ -85,9 +87,9 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 31.96,
         unit: 'm²',
         unitOptions: ['m', 'm²', 'm³'],
-        tolerance: 0.1598, // 0,5% von 31,96
+        tolerance: 0.1598,
       },
-      hint: '$$U_{innenwand} = 2 \\cdot 1{,}80 \\cdot \\pi + 2 \\cdot 5 = 21{,}31\\text{ m}$$\\n\\n$$A_{innenwand} = 21{,}31 \\cdot 1{,}50 = 31{,}96\\text{ m}^2$$',
+      hint: 'U_{innenwand} = 2 \\cdot 1{,}80 \\cdot \\pi + 2 \\cdot 5 = 21{,}31\\text{ m} \\quad A_{innenwand} = 21{,}31 \\cdot 1{,}50 = 31{,}96\\text{ m}^2',
     },
     {
       id: 5,
@@ -101,9 +103,9 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 9.48,
         unit: 'm²',
         unitOptions: ['m', 'm²', 'm³'],
-        tolerance: 0.0474, // 0,5% von 9,48
+        tolerance: 0.0474,
       },
-      hint: '$$h_s^2 = 0{,}5^2 + 1{,}5^2 = 1{,}58\\text{ m}$$\\n\\n$$M = 4 \\cdot \\frac{3 \\cdot 1{,}58}{2} = 9{,}48\\text{ m}^2$$',
+      hint: 'h_s^2 = 0{,}5^2 + 1{,}5^2 = 1{,}58\\text{ m} \\quad M = 4 \\cdot \\frac{3 \\cdot 1{,}58}{2} = 9{,}48\\text{ m}^2',
     },
     {
       id: 6,
@@ -117,9 +119,9 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 8.72,
         unit: 'm',
         unitOptions: ['m', 'cm', 'mm'],
-        tolerance: 0.0436, // 0,5% von 8,72
+        tolerance: 0.0436,
       },
-      hint: '$$s^2 = 1{,}5^2 + 1{,}58^2 \\Rightarrow s = 2{,}18\\text{ m}$$\\n\\n$$\\text{Gesamtlänge} = 4 \\cdot 2{,}18 = 8{,}72\\text{ m}$$',
+      hint: 's^2 = 1{,}5^2 + 1{,}58^2 \\Rightarrow s = 2{,}18\\text{ m} \\quad \\text{Gesamtlänge} = 4 \\cdot 2{,}18 = 8{,}72\\text{ m}',
     },
   ]
 
@@ -144,28 +146,17 @@ export default function SchwimmbadMitSchirmAufgabe() {
 
   const normalizeNumber = (input: string): number | null => {
     let normalized = input.trim()
-
-    // Entferne alle Leerzeichen
     normalized = normalized.replace(/\s/g, '')
-
-    // Finde die Position des letzten Punkts und Kommas
     const lastDotIndex = normalized.lastIndexOf('.')
     const lastCommaIndex = normalized.lastIndexOf(',')
 
-    // Bestimme anhand der Position, welches das Dezimaltrennzeichen ist
     if (lastCommaIndex > lastDotIndex) {
-      // Komma ist später -> Dezimaltrennzeichen
-      // Entferne alle Punkte (Tausendertrenner) und ersetze Komma durch Punkt
       normalized = normalized.replace(/\./g, '').replace(',', '.')
     } else if (lastDotIndex > lastCommaIndex && lastCommaIndex > -1) {
-      // Punkt ist später -> Dezimaltrennzeichen
-      // Entferne alle Kommas (Tausendertrenner)
       normalized = normalized.replace(/,/g, '')
     } else if (lastCommaIndex > -1 && lastDotIndex === -1) {
-      // Nur Komma vorhanden -> Dezimaltrennzeichen
       normalized = normalized.replace(',', '.')
     }
-    // Andernfalls: nur Punkt oder keine Trennzeichen vorhanden
 
     const num = parseFloat(normalized)
     return isNaN(num) ? null : num
@@ -185,7 +176,6 @@ export default function SchwimmbadMitSchirmAufgabe() {
     }
 
     let isCorrect = false
-    let errorMessage = ''
 
     if (solution.type === 'number') {
       const numInput = normalizeNumber(currentInput.value)
@@ -195,22 +185,15 @@ export default function SchwimmbadMitSchirmAufgabe() {
         return
       }
 
-      // Überprüfe ob die richtige Einheit ausgewählt wurde
       if (currentInput.unit !== solution.unit) {
-        errorMessage = `Falsche Einheit! Die richtige Einheit ist ${solution.unit}.`
-        setFeedback({ ...feedback, [currentTask]: { status: 'incorrect', message: errorMessage } })
+        setFeedback({ ...feedback, [currentTask]: { status: 'incorrect', message: `Falsche Einheit! Die richtige Einheit ist ${solution.unit}.` } })
         return
       }
 
-      // Toleranzbereich für ±2%
       const expectedAnswer = solution.answer as number
-      const tolerance = solution.tolerance || expectedAnswer * 0.02
+      const tolerance = solution.tolerance || expectedAnswer * 0.005
 
       isCorrect = Math.abs(numInput - expectedAnswer) <= tolerance
-    } else if (solution.type === 'text') {
-      const normalizedInput = currentInput.value.toLowerCase().replace(/\s+/g, '').replace(',', '.')
-      const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(',', '.')
-      isCorrect = normalizedInput === normalizedAnswer
     }
 
     if (isCorrect) {
@@ -243,17 +226,14 @@ export default function SchwimmbadMitSchirmAufgabe() {
       </header>
 
       <div className="max-w-4xl mx-auto w-full">
-        {/* Hinweis */}
         <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-600 rounded-lg">
           <p className="text-blue-900 font-semibold">💡 Tipp: Gib deine Antwort mit der richtigen Einheit ein! Wähle die Einheit aus der Liste.</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          {/* Aktuelle Aufgabe */}
           <div className="mb-6 p-6 bg-gray-50 rounded-lg border-l-4 border-blue-500">
             <h2 className="text-2xl font-bold text-blue-900 mb-3">{currentTaskData.title}</h2>
 
-            {/* Bild */}
             {currentTaskData.image && (
               <div className="mb-6 p-4 bg-gray-100 rounded-lg">
                 <img
@@ -266,7 +246,6 @@ export default function SchwimmbadMitSchirmAufgabe() {
 
             <p className="text-lg text-gray-800 mb-6 whitespace-pre-wrap leading-relaxed">{currentTaskData.question}</p>
 
-            {/* Input mit Einheits-Auswahl */}
             <div className="mb-4 grid grid-cols-3 gap-3">
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Wert:</label>
@@ -307,7 +286,6 @@ export default function SchwimmbadMitSchirmAufgabe() {
               </div>
             </div>
 
-            {/* Feedback */}
             {feedbackState === 'correct' && <div className="p-3 bg-green-100 text-green-800 rounded-lg mb-4 font-semibold">✓ Richtig!</div>}
 
             {feedbackState === 'incorrect' && (
@@ -316,7 +294,6 @@ export default function SchwimmbadMitSchirmAufgabe() {
               </div>
             )}
 
-            {/* Lösung anzeigen Button */}
             {feedbackState === 'incorrect' && (
               <button
                 onClick={() => setShowSolution({ ...showSolution, [currentTask]: !showSolution[currentTask] })}
@@ -326,15 +303,15 @@ export default function SchwimmbadMitSchirmAufgabe() {
               </button>
             )}
 
-            {/* Musterlösung */}
             {showSolution[currentTask] && feedbackState === 'incorrect' && (
               <div className="p-4 bg-yellow-50 border border-yellow-300 rounded-lg mb-4">
-                <p className="font-semibold text-yellow-900 mb-2">Hinweis:</p>
-                <p className="text-yellow-800 whitespace-pre-wrap">{currentTaskData.hint}</p>
+                <p className="font-semibold text-yellow-900 mb-3">Hinweis:</p>
+                <div className="text-yellow-800 flex justify-center">
+                  <BlockMath math={currentTaskData.hint} />
+                </div>
               </div>
             )}
 
-            {/* Button zum Überprüfen */}
             <button
               onClick={validateAnswer}
               disabled={feedbackState === 'correct'}
@@ -348,7 +325,6 @@ export default function SchwimmbadMitSchirmAufgabe() {
             </button>
           </div>
 
-          {/* Navigation */}
           <div className="flex justify-between items-center mt-8">
             <button
               onClick={prevTask}
@@ -379,7 +355,6 @@ export default function SchwimmbadMitSchirmAufgabe() {
             </button>
           </div>
 
-          {/* Progress Indicator */}
           <div className="mt-6 flex gap-2 justify-center">
             {tasks.map((_, index) => (
               <button
