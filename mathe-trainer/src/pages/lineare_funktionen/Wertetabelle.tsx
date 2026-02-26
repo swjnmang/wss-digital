@@ -281,6 +281,8 @@ export default function Wertetabelle() {
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
   const [showGraph, setShowGraph] = useState<{ [key: number]: boolean }>({})
   const [validierteZellen, setValidierteZellen] = useState<{ [key: string]: boolean }>({})
+  const [fehlerhafteZellen, setFehlerhafteZellen] = useState<{ [key: string]: boolean }>({})
+  const [punkte, setPunkte] = useState<number>(0)
   const [schwierigkeitsgrad, setSchwierigkeitsgrad] = useState<'einfach' | 'mittel' | 'schwer' | null>(null)
 
   // MathJax laden
@@ -378,6 +380,73 @@ export default function Wertetabelle() {
     setShowLösung({})
     setShowGraph({})
     setValidierteZellen({})
+    setFehlerhafteZellen({})
+  }
+
+  // Markiert fehlerhafte Zellen rot
+  function markFehlerhafteZellen(index: number, aufgabe: Aufgabe) {
+    const eingaben = antworten[index]
+    if (!eingaben) return
+    
+    const m = aufgabe.m
+    const t = aufgabe.t
+    const tolerance = 0.02
+    const fehler = { ...fehlerhafteZellen }
+    
+    if (aufgabe.typ === 'leereTabelleAusfüllen') {
+      // Typ 1: Beide x und y müssen korrekt sein
+      for (let i = 0; i < eingaben.length; i++) {
+        const x = parseFloat(eingaben[i].x.replace(',', '.'))
+        const y = parseFloat(eingaben[i].y.replace(',', '.'))
+        const cellKey = `${index}-${i}`
+        
+        if (isNaN(x) || isNaN(y)) {
+          fehler[cellKey] = true
+        } else {
+          const expectedY = Math.round((m * x + t) * 100) / 100
+          if (Math.abs(y - expectedY) > tolerance) {
+            fehler[cellKey] = true
+          } else {
+            delete fehler[cellKey]
+          }
+        }
+      }
+    } else {
+      // Typ 2: Basierend auf gebenXWert
+      for (let i = 0; i < eingaben.length; i++) {
+        const cellKey = `${index}-${i}`
+        
+        if (aufgabe.gebenXWert[i]) {
+          // X ist gegeben, y muss geprüft werden
+          const y = parseFloat(eingaben[i].y.replace(',', '.'))
+          if (isNaN(y)) {
+            fehler[cellKey] = true
+          } else {
+            const expectedY = aufgabe.yWerte[i]
+            if (Math.abs(y - expectedY) > tolerance) {
+              fehler[cellKey] = true
+            } else {
+              delete fehler[cellKey]
+            }
+          }
+        } else {
+          // Y ist gegeben, x muss geprüft werden
+          const x = parseFloat(eingaben[i].x.replace(',', '.'))
+          if (isNaN(x)) {
+            fehler[cellKey] = true
+          } else {
+            const expectedX = aufgabe.xWerte[i]
+            if (Math.abs(x - expectedX) > tolerance) {
+              fehler[cellKey] = true
+            } else {
+              delete fehler[cellKey]
+            }
+          }
+        }
+      }
+    }
+    
+    setFehlerhafteZellen(fehler)
   }
 
   function validateAnswer(index: number, aufgabe: Aufgabe): boolean {
@@ -387,6 +456,9 @@ export default function Wertetabelle() {
     const m = aufgabe.m
     const t = aufgabe.t
     const tolerance = 0.02
+    
+    // Markiere fehlerhafte Zellen
+    markFehlerhafteZellen(index, aufgabe)
 
     // Alle eingegebenen Wertepaare prüfen
     for (const eintrag of eingaben) {
@@ -402,6 +474,11 @@ export default function Wertetabelle() {
       }
     }
     
+    // Alle korrekt - Punkt hinzufügen!
+    if (!validiert[index]) {
+      setPunkte(punkte + 1)
+    }
+
     return true
   }
 
@@ -412,6 +489,9 @@ export default function Wertetabelle() {
     const m = aufgabe.m
     const t = aufgabe.t
     const tolerance = 0.02
+    
+    // Markiere fehlerhafte Zellen
+    markFehlerhafteZellen(index, aufgabe)
     
     // Prüfe alle Wertepaare basierend auf gebenXWert
     for (let i = 0; i < eingaben.length; i++) {
@@ -435,7 +515,12 @@ export default function Wertetabelle() {
         }
       }
     }
-    
+
+    // Alle korrekt - Punkt hinzufügen!
+    if (!validiert[index]) {
+      setPunkte(punkte + 1)
+    }
+
     return true
   }
 
@@ -575,8 +660,15 @@ export default function Wertetabelle() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Wertetabellen</h1>
-        <p className={styles.subtitle}>Erstelle oder vervollständige Wertetabellen für lineare Funktionen</p>
+        <div>
+          <h1 className={styles.title}>Wertetabellen</h1>
+          <p className={styles.subtitle}>Erstelle oder vervollständige Wertetabellen für lineare Funktionen</p>
+        </div>
+        <div className={styles.scoreBox}>
+          <div className={styles.score}>
+            ⭐ {punkte} <span className={styles.scoreLabel}>Punkte</span>
+          </div>
+        </div>
       </div>
 
       {/* Schwierigkeitsgrad Auswahl - Nur anzeigen wenn noch nicht ausgewählt */}
@@ -665,7 +757,7 @@ export default function Wertetabelle() {
                               placeholder="x"
                               value={antworten[index]?.[i]?.x || ''}
                               onChange={(e) => updateTableValue(index, i, 'x', e.target.value)}
-                              className={`${styles.tableInput} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
+                              className={`${styles.tableInput} ${fehlerhafteZellen[`${index}-${i}`] ? styles.inputError : ''} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
                             />
                           </td>
                         ))}
@@ -679,7 +771,7 @@ export default function Wertetabelle() {
                               placeholder="y"
                               value={antworten[index]?.[i]?.y || ''}
                               onChange={(e) => updateTableValue(index, i, 'y', e.target.value)}
-                              className={`${styles.tableInput} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
+                              className={`${styles.tableInput} ${fehlerhafteZellen[`${index}-${i}`] ? styles.inputError : ''} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
                             />
                           </td>
                         ))}
@@ -706,7 +798,7 @@ export default function Wertetabelle() {
                                 placeholder="?"
                                 value={antworten[index]?.[i]?.x || ''}
                                 onChange={(e) => updateTableValue(index, i, 'x', e.target.value)}
-                                className={`${styles.tableInput} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
+                                className={`${styles.tableInput} ${fehlerhafteZellen[`${index}-${i}`] ? styles.inputError : ''} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
                               />
                             )}
                           </td>
@@ -724,7 +816,7 @@ export default function Wertetabelle() {
                                 placeholder="?"
                                 value={antworten[index]?.[i]?.y || ''}
                                 onChange={(e) => updateTableValue(index, i, 'y', e.target.value)}
-                                className={`${styles.tableInput} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
+                                className={`${styles.tableInput} ${fehlerhafteZellen[`${index}-${i}`] ? styles.inputError : ''} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
                               />
                             )}
                           </td>

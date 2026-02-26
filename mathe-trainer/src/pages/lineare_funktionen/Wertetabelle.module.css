@@ -8,6 +8,10 @@
 
 .header {
   margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
 }
 
 .title {
@@ -21,6 +25,31 @@
   color: #6b7280;
   font-size: 1rem;
   margin: 0;
+}
+
+.scoreBox {
+  display: flex;
+  align-items: center;
+}
+
+.score {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.scoreLabel {
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.95;
 }
 
 .newButton {
@@ -227,6 +256,18 @@
 .inputCorrect:focus {
   border-color: #059669 !important;
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+.inputError {
+  border-color: #dc2626 !important;
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  font-weight: 500 !important;
+}
+
+.inputError:focus {
+  border-color: #b91c1c !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
 }
 
 .buttonGroup {
