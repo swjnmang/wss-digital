@@ -193,6 +193,7 @@ export default function Wertetabelle() {
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
   const [showGraph, setShowGraph] = useState<{ [key: number]: boolean }>({})
   const [validierteZellen, setValidierteZellen] = useState<{ [key: string]: boolean }>({})
+  const [funktionstyp, setFunktionstyp] = useState<'proportional' | 'linear'>('linear')
 
   // MathJax laden
   useEffect(() => {
@@ -208,15 +209,30 @@ export default function Wertetabelle() {
   }, [])
 
   // 10 vermischte Aufgaben generieren (unterschiedliche m/t Kombinationen)
-  function generiereAufgaben() {
+  function generiereAufgaben(typ: 'proportional' | 'linear' = funktionstyp) {
     const neue: Aufgabe[] = []
     
     // Generiere 10 verschiedene Aufgaben mit zufälligen m/t
     for (let i = 0; i < 10; i++) {
       // Zufällig zwischen Typ 1 und Typ 2 wählen
-      const typ = Math.random() > 0.5 ? 'leereTabelleAusfüllen' : 'teilweisgefülltVervollständigen'
-      const aufgabenGenerator = aufgabenBanks[typ as keyof typeof aufgabenBanks]
-      neue.push(aufgabenGenerator())
+      const aufgabenTyp = Math.random() > 0.5 ? 'leereTabelleAusfüllen' : 'teilweisgefülltVervollständigen'
+      let aufgabe = aufgabenBanks[aufgabenTyp as keyof typeof aufgabenBanks]()
+      
+      // Wenn proportional: setze t = 0 und berechne y-Werte neu
+      if (typ === 'proportional') {
+        aufgabe.t = 0
+        aufgabe.m = aufgabe.m === 0 ? 1 : aufgabe.m
+        aufgabe.funktionsgleichung = `y = ${aufgabe.m}x`
+        aufgabe.funktionsgleichungLatex = `$$y = ${aufgabe.m}x$$`
+        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}`
+        
+        // Wenn Typ 2: berechne y-Werte neu mit t = 0
+        if (aufgabenTyp === 'teilweisgefülltVervollständigen' && aufgabe.yWerte) {
+          aufgabe.yWerte = aufgabe.xWerte.map((x: number) => Math.round(aufgabe.m * x * 100) / 100)
+        }
+      }
+      
+      neue.push(aufgabe)
     }
     
     setAufgaben(neue)
@@ -228,8 +244,8 @@ export default function Wertetabelle() {
   }
 
   useEffect(() => {
-    generiereAufgaben()
-  }, [])
+    generiereAufgaben(funktionstyp)
+  }, [funktionstyp])
 
   function validateAnswer(index: number, aufgabe: Aufgabe): boolean {
     const eingaben = antworten[index]
@@ -430,9 +446,28 @@ export default function Wertetabelle() {
         <p className={styles.subtitle}>Erstelle oder vervollständige Wertetabellen für lineare Funktionen</p>
       </div>
 
-      <button onClick={generiereAufgaben} className={styles.newButton}>
+      <button onClick={() => generiereAufgaben(funktionstyp)} className={styles.newButton}>
         🔄 Neue Aufgaben
       </button>
+
+      {/* Funktionstyp Auswahl */}
+      <div className={styles.funktionsTypBox}>
+        <label className={styles.auswahlLabel}>Funktionstyp wählen:</label>
+        <div className={styles.buttonGroup}>
+          <button
+            onClick={() => setFunktionstyp('proportional')}
+            className={`${styles.typeButton} ${funktionstyp === 'proportional' ? styles.active : ''}`}
+          >
+            y = m·x
+          </button>
+          <button
+            onClick={() => setFunktionstyp('linear')}
+            className={`${styles.typeButton} ${funktionstyp === 'linear' ? styles.active : ''}`}
+          >
+            y = m·x + t
+          </button>
+        </div>
+      </div>
 
       <div className={styles.aufgabenContainer}>
         {aufgaben.map((aufgabe, index) => (
