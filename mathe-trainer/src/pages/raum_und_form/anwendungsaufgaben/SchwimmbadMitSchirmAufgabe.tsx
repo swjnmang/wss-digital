@@ -37,7 +37,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 1.8,
         unit: 'm',
         unitOptions: ['m', 'cm', 'mm'],
-        tolerance: 0.036, // 2% von 1,8
+        tolerance: 0.009, // 0,5% von 1,8
       },
       hint: 'Der Außenradius beträgt 2 m. Die Seitenwand ist 20 cm = 0,2 m dick. r_innen = 2 - 0,2 = 1,8 m.',
     },
@@ -53,7 +53,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 28.18,
         unit: 'm²',
         unitOptions: ['m', 'm²', 'm³'],
-        tolerance: 0.5636, // 2% von 28,18
+        tolerance: 0.1409, // 0,5% von 28,18
       },
       hint: 'Die Bodenfläche besteht aus dem inneren Kreis: A_kreis = π × 1,80² ≈ 10,18 m² plus der Fläche unter den Seitenwänden (bei komplexer Geometrie). Gesamtfläche ≈ 28,18 m².',
     },
@@ -69,7 +69,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 39.45,
         unit: 'm³',
         unitOptions: ['m³', 'Liter', 'cm³'],
-        tolerance: 0.789, // 2% von 39,45
+        tolerance: 0.19725, // 0,5% von 39,45
       },
       hint: 'Das Volumen ergibt sich aus: V = Bodenfläche × Füllhöhe = 28,18 × 1,40 ≈ 39,45 m³.',
     },
@@ -85,7 +85,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 31.96,
         unit: 'm²',
         unitOptions: ['m', 'm²', 'm³'],
-        tolerance: 0.6392, // 2% von 31,96
+        tolerance: 0.1598, // 0,5% von 31,96
       },
       hint: 'Die Innenwand ist ein Zylinder mit r = 1,80 m und h = 1,50 m. Mantelfläche: M = 2πrh = 2 × π × 1,80 × 1,50 ≈ 16,96 m²... (komplexe Berechnung). Gesamtfläche ≈ 31,96 m².',
     },
@@ -101,7 +101,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 9.48,
         unit: 'm²',
         unitOptions: ['m', 'm²', 'm³'],
-        tolerance: 0.1896, // 2% von 9,48
+        tolerance: 0.0474, // 0,5% von 9,48
       },
       hint: 'h_s² = 0,5² + 1,5² = 1,58 m. Die Mantelfläche der Pyramide: M = 4 × (3 × 1,58)/2 ≈ 9,48 m².',
     },
@@ -117,7 +117,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         answer: 8.72,
         unit: 'm',
         unitOptions: ['m', 'cm', 'mm'],
-        tolerance: 0.1744, // 2% von 8,72
+        tolerance: 0.0436, // 0,5% von 8,72
       },
       hint: 's² = 1,5² + 1,58² => s ≈ 2,18 m. Gesamtlänge = 4 × 2,18 ≈ 8,72 m.',
     },

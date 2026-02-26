@@ -37,7 +37,7 @@ export default function PoolAufgabe() {
         answer: 5.2,
         unit: 'm²',
         unitOptions: ['m', 'm²', 'm³'],
-        tolerance: 0.104, // 2% von 5,2
+        tolerance: 0.026, // 0,5% von 5,2
       },
       hint: 'Berechne zuerst die Fläche des Quadrats (3² = 9 m²), dann die Fläche des Pools mit r = 1,1 m (π × 1,1² ≈ 3,801 m²). Subtrahiere: 9 - 3,801 ≈ 5,2 m².',
     },
@@ -53,7 +53,7 @@ export default function PoolAufgabe() {
         answer: 5.53,
         unit: 'm²',
         unitOptions: ['m', 'm²', 'm³'],
-        tolerance: 0.1106, // 2% von 5,53
+        tolerance: 0.02765, // 0,5% von 5,53
       },
       hint: 'Die Außenfläche ist die Mantelfläche des Zylinders: M = 2πrh. Mit r = 1,1 m und h = 0,8 m: M = 2 × π × 1,1 × 0,8 ≈ 5,53 m².',
     },
@@ -69,7 +69,7 @@ export default function PoolAufgabe() {
         answer: 41.3,
         unit: '€',
         unitOptions: ['m', 'm²', '€'],
-        tolerance: 0.826, // 2% von 41,3
+        tolerance: 0.2065, // 0,5% von 41,3
       },
       hint: 'r_T = r_a + 0,35 = 1,1 + 0,35 = 1,45 m. Trittfläche = π/4 × (1,45² - 1,1²) × π ≈ 0,70 m². Kosten: 0,70 m² × 59 €/m² ≈ 41,3 €.',
     },
@@ -85,7 +85,7 @@ export default function PoolAufgabe() {
         answer: 2261.95,
         unit: 'Liter',
         unitOptions: ['m³', 'Liter', 'cm³'],
-        tolerance: 45.24, // 2% von 2261,95
+        tolerance: 11.31, // 0,5% von 2261,95
       },
       hint: 'Der innere Radius ist: r_innen = 1,1 - 0,1 = 1,0 m. Die Wasserhöhe ist: h_wasser = 0,8 × 0,9 = 0,72 m. Volumen: V = π × 1,0² × 0,72 ≈ 2,262 m³ = 2.262 Liter.',
     },
@@ -101,7 +101,7 @@ export default function PoolAufgabe() {
         answer: 1.49,
         unit: 'm',
         unitOptions: ['m', 'cm', 'mm'],
-        tolerance: 0.0298, // 2% von 1,49
+        tolerance: 0.00745, // 0,5% von 1,49
       },
       hint: 'Nach dem Strahlensatz: z/a = SE/SC => z = a × SE/SC = 3 × 110/222 ≈ 1,49 m.',
     },
@@ -117,7 +117,7 @@ export default function PoolAufgabe() {
         answer: 2.41,
         unit: 'm²',
         unitOptions: ['m', 'm²', 'm³'],
-        tolerance: 0.0482, // 2% von 2,41
+        tolerance: 0.01205, // 0,5% von 2,41
       },
       hint: 'Die Mantelfläche der Pyramide: M_Pyr = 4 × (z × h_z)/2 mit z = 1,49 m und h_z = 0,81 m. M_Pyr ≈ 2,41 m².',
     },
