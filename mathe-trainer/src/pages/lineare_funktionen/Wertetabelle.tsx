@@ -20,30 +20,94 @@ function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-// Generiert zufällige m und t Werte im Bereich -10 bis 10 mit Schrittweite 0.5
+// Generiert zufällige m und t Werte: m ∈ [-3, 3] mit Schrittweite 0.5, t ∈ [-5, 5] mit Schrittweite 0.5
 function generateRandomMT() {
-  const möglicheWerte = []
-  for (let v = -10; v <= 10; v += 0.5) {
-    möglicheWerte.push(Math.round(v * 10) / 10)
+  const mWerte = []
+  for (let v = -3; v <= 3; v += 0.5) {
+    mWerte.push(Math.round(v * 10) / 10)
   }
   
-  let m = möglicheWerte[randInt(0, möglicheWerte.length - 1)]
-  let t = möglicheWerte[randInt(0, möglicheWerte.length - 1)]
+  const tWerte = []
+  for (let v = -5; v <= 5; v += 0.5) {
+    tWerte.push(Math.round(v * 10) / 10)
+  }
+  
+  let m = mWerte[randInt(0, mWerte.length - 1)]
+  const t = tWerte[randInt(0, tWerte.length - 1)]
   
   // m darf nicht 0 sein
   while (m === 0) {
-    m = möglicheWerte[randInt(0, möglicheWerte.length - 1)]
+    m = mWerte[randInt(0, mWerte.length - 1)]
   }
   
   return { m, t }
 }
 
-// Formatiert die Funktionsgleichung korrekt
+// Konvertiere Dezimalzahl zu lesbarem Format: 0.5 → "1/2", 0.75 → "3/4", etc.
+function toFraction(num: number): string {
+  if (num === Math.round(num)) return Math.round(num).toString() // Ganze Zahl
+  
+  // Einfache Standardbrüche
+  const fractions: Record<string, string> = {
+    '0.5': '1/2',
+    '-0.5': '-1/2',
+    '0.25': '1/4',
+    '-0.25': '-1/4',
+    '0.75': '3/4',
+    '-0.75': '-3/4',
+    '0.33': '1/3',
+    '-0.33': '-1/3',
+    '0.67': '2/3',
+    '-0.67': '-2/3',
+    '0.2': '1/5',
+    '-0.2': '-1/5',
+    '0.4': '2/5',
+    '-0.4': '-2/5',
+    '0.6': '3/5',
+    '-0.6': '-3/5',
+    '0.8': '4/5',
+    '-0.8': '-4/5'
+  }
+  
+  const key = num.toFixed(2)
+  return fractions[key] || num.toString()
+}
+
+// Generiert m und t Werte mit Brüchen für schwere Aufgaben: m ∈ [-3, 3], t ∈ [-5, 5]
+function generateRandomMTMitBrüchen() {
+  // Zähler und Nenner für Brüche: m bleibt in [-3, 3]
+  const zählerM = [-3, -2, -1, 1, 2, 3]
+  const nenner = [1, 2, 3, 4]
+  
+  // Zähler für t: kann größer sein da t ∈ [-5, 5]
+  const zählerT = [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]
+  
+  // Generiere m mit Brüchen
+  let m = 0
+  while (m === 0) {
+    const z = zählerM[randInt(0, zählerM.length - 1)]
+    const n = nenner[randInt(0, nenner.length - 1)]
+    m = z / n
+  }
+  
+  // Generiere t mit Brüchen
+  const z_t = zählerT[randInt(0, zählerT.length - 1)]
+  const n_t = nenner[randInt(0, nenner.length - 1)]
+  const t = z_t / n_t
+  
+  return { m: Math.round(m * 100) / 100, t: Math.round(t * 100) / 100 }
+}
+
+// Formatiert die Funktionsgleichung mit Bruchdarstellung
 function formatEquation(m: number, t: number): string {
-  let equation = `y = ${m}x`
+  const mStr = toFraction(m)
+  const tStr = toFraction(t)
+  
+  let equation = `y = ${mStr}x`
   
   if (t !== 0) {
-    equation += t > 0 ? ` + ${t}` : ` - ${Math.abs(t)}`
+    const tDisplay = tStr.startsWith('-') ? tStr : tStr
+    equation += t > 0 ? ` + ${tDisplay}` : ` - ${tDisplay.replace('-', '')}`
   }
   
   return equation
@@ -51,13 +115,7 @@ function formatEquation(m: number, t: number): string {
 
 // LaTeX-Version für MathJax
 function formatEquationLatex(m: number, t: number): string {
-  let equation = `y = ${m}x`
-  
-  if (t !== 0) {
-    equation += t > 0 ? ` + ${t}` : ` - ${Math.abs(t)}`
-  }
-  
-  return `$$${equation}$$`
+  return `$$${formatEquation(m, t)}$$`
 }
 
 // Generiert 2 Rechenbeispiele für die Lösungsanzeige
@@ -193,7 +251,7 @@ export default function Wertetabelle() {
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
   const [showGraph, setShowGraph] = useState<{ [key: number]: boolean }>({})
   const [validierteZellen, setValidierteZellen] = useState<{ [key: string]: boolean }>({})
-  const [funktionstyp, setFunktionstyp] = useState<'proportional' | 'linear'>('linear')
+  const [schwierigkeitsgrad, setSchwierigkeitsgrad] = useState<'einfach' | 'mittel' | 'schwer' | null>(null)
 
   // MathJax laden
   useEffect(() => {
@@ -208,27 +266,53 @@ export default function Wertetabelle() {
     document.head.appendChild(mathjaxScript)
   }, [])
 
-  // 10 vermischte Aufgaben generieren (unterschiedliche m/t Kombinationen)
-  function generiereAufgaben(typ: 'proportional' | 'linear' = funktionstyp) {
+  // Aufgaben generieren basierend auf Schwierigkeitsgrad
+  function generiereAufgaben(grad: 'einfach' | 'mittel' | 'schwer') {
     const neue: Aufgabe[] = []
     
-    // Generiere 10 verschiedene Aufgaben mit zufälligen m/t
+    // Generiere 10 verschiedene Aufgaben
     for (let i = 0; i < 10; i++) {
       // Zufällig zwischen Typ 1 und Typ 2 wählen
       const aufgabenTyp = Math.random() > 0.5 ? 'leereTabelleAusfüllen' : 'teilweisgefülltVervollständigen'
       let aufgabe = aufgabenBanks[aufgabenTyp as keyof typeof aufgabenBanks]()
       
-      // Wenn proportional: setze t = 0 und berechne y-Werte neu
-      if (typ === 'proportional') {
+      // Gemeinsame Frage-Erweiterung
+      const graphHinweis = ' Zeichne den Graph anschließend in ein von dir selbst erstelltes Koordinatensystem.'
+      
+      // Passe Schwierigkeitsgrad an
+      if (grad === 'einfach') {
+        // Einfach: y = m*x (ohne t)
         aufgabe.t = 0
         aufgabe.m = aufgabe.m === 0 ? 1 : aufgabe.m
         aufgabe.funktionsgleichung = `y = ${aufgabe.m}x`
         aufgabe.funktionsgleichungLatex = `$$y = ${aufgabe.m}x$$`
-        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}`
+        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
         
-        // Wenn Typ 2: berechne y-Werte neu mit t = 0
+        // Wenn Typ 2: berechne y-Werte neu
         if (aufgabenTyp === 'teilweisgefülltVervollständigen' && aufgabe.yWerte) {
           aufgabe.yWerte = aufgabe.xWerte.map((x: number) => Math.round(aufgabe.m * x * 100) / 100)
+        }
+      } else if (grad === 'mittel') {
+        // Mittel: y = m*x + t mit ganzen Zahlen (schon Standard)
+        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
+      } else if (grad === 'schwer') {
+        // Schwer: y = m*x + t mit Brüchen
+        const { m: mBruch, t: tBruch } = generateRandomMTMitBrüchen()
+        aufgabe.m = mBruch
+        aufgabe.t = tBruch
+        
+        // Formatiere Funktionsgleichung mit Brüchen
+        const funktionsgleichungText = formatEquation(mBruch, tBruch)
+        aufgabe.funktionsgleichung = funktionsgleichungText
+        aufgabe.funktionsgleichungLatex = `$$${funktionsgleichungText}$$`
+        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${funktionsgleichungText}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
+        
+        // Berechne y-Werte neu mit Brüchen
+        if (aufgabenTyp === 'teilweisgefülltVervollständigen') {
+          aufgabe.yWerte = aufgabe.xWerte.map((x: number) => Math.round((mBruch * x + tBruch) * 100) / 100)
+        } else {
+          // Für leereTabelleAusfüllen: regeneriere mit neuen m/t
+          aufgabe.rechenbeispiele = generateRechenbeispiele(mBruch, tBruch)
         }
       }
       
@@ -242,10 +326,6 @@ export default function Wertetabelle() {
     setShowGraph({})
     setValidierteZellen({})
   }
-
-  useEffect(() => {
-    generiereAufgaben(funktionstyp)
-  }, [funktionstyp])
 
   function validateAnswer(index: number, aufgabe: Aufgabe): boolean {
     const eingaben = antworten[index]
@@ -446,30 +526,66 @@ export default function Wertetabelle() {
         <p className={styles.subtitle}>Erstelle oder vervollständige Wertetabellen für lineare Funktionen</p>
       </div>
 
-      <button onClick={() => generiereAufgaben(funktionstyp)} className={styles.newButton}>
-        🔄 Neue Aufgaben
-      </button>
-
-      {/* Funktionstyp Auswahl */}
-      <div className={styles.funktionsTypBox}>
-        <label className={styles.auswahlLabel}>Funktionstyp wählen:</label>
-        <div className={styles.buttonGroup}>
-          <button
-            onClick={() => setFunktionstyp('proportional')}
-            className={`${styles.typeButton} ${funktionstyp === 'proportional' ? styles.active : ''}`}
-          >
-            y = m·x
-          </button>
-          <button
-            onClick={() => setFunktionstyp('linear')}
-            className={`${styles.typeButton} ${funktionstyp === 'linear' ? styles.active : ''}`}
-          >
-            y = m·x + t
-          </button>
+      {/* Schwierigkeitsgrad Auswahl - Nur anzeigen wenn noch nicht ausgewählt */}
+      {schwierigkeitsgrad === null ? (
+        <div className={styles.difficultySelector}>
+          <h2 className={styles.difficultyTitle}>Schwierigkeitsgrad wählen:</h2>
+          <div className={styles.difficultyButtonGroup}>
+            <button
+              onClick={() => {
+                setSchwierigkeitsgrad('einfach')
+                // Nach kurzem Delay aufgaben generieren
+                setTimeout(() => {
+                  generiereAufgaben('einfach')
+                }, 100)
+              }}
+              className={`${styles.difficultyButton} ${styles.einfach}`}
+            >
+              <span className={styles.difficultyLabel}>Einfach</span>
+              <span className={styles.difficultyDescription}>y = m·x ohne Brüche</span>
+            </button>
+            <button
+              onClick={() => {
+                setSchwierigkeitsgrad('mittel')
+                setTimeout(() => {
+                  generiereAufgaben('mittel')
+                }, 100)
+              }}
+              className={`${styles.difficultyButton} ${styles.mittel}`}
+            >
+              <span className={styles.difficultyLabel}>Mittel</span>
+              <span className={styles.difficultyDescription}>y = m·x + t ganze Zahlen</span>
+            </button>
+            <button
+              onClick={() => {
+                setSchwierigkeitsgrad('schwer')
+                setTimeout(() => {
+                  generiereAufgaben('schwer')
+                }, 100)
+              }}
+              className={`${styles.difficultyButton} ${styles.schwer}`}
+            >
+              <span className={styles.difficultyLabel}>Schwer</span>
+              <span className={styles.difficultyDescription}>y = m·x + t mit Brüchen</span>
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Aufgaben anzeigen + "Schwierigkeitsgrad ändern" Button */}
+          <div className={styles.actionBar}>
+            <button onClick={() => generiereAufgaben(schwierigkeitsgrad)} className={styles.newButton}>
+              🔄 Neue Aufgaben
+            </button>
+            <button
+              onClick={() => setSchwierigkeitsgrad(null)}
+              className={styles.difficultyChangeButton}
+            >
+              📊 Schwierigkeitsgrad ändern
+            </button>
+          </div>
 
-      <div className={styles.aufgabenContainer}>
+          <div className={styles.aufgabenContainer}>
         {aufgaben.map((aufgabe, index) => (
           <div key={index} className={`${styles.aufgabeCard} ${validiert[index] ? styles.cardCorrect : ''}`}>
             <div className={styles.aufgabeHeader}>
@@ -680,6 +796,8 @@ export default function Wertetabelle() {
           </div>
         ))}
       </div>
+        </>
+      )}
     </div>
   )
 }

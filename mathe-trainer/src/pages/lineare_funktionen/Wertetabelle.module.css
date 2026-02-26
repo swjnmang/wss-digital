@@ -382,3 +382,124 @@
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-weight: 500;
 }
+/* Difficulty Selector Styles */
+.difficultySelector {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border: 2px solid #bfdbfe;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.difficultyTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 2rem 0;
+}
+
+.difficultyButtonGroup {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.difficultyButton {
+  flex: 1;
+  min-width: 180px;
+  max-width: 220px;
+  padding: 1.5rem;
+  border: 3px solid transparent;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.difficultyButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.difficultyButton.einfach {
+  background-color: #dcf4f1;
+  color: #0f766e;
+  border-color: #14b8a6;
+}
+
+.difficultyButton.einfach:hover {
+  background-color: #ccefe5;
+  border-color: #0d9488;
+}
+
+.difficultyButton.mittel {
+  background-color: #dbeafe;
+  color: #0c4a6e;
+  border-color: #0284c7;
+}
+
+.difficultyButton.mittel:hover {
+  background-color: #cbeafe;
+  border-color: #0369a1;
+}
+
+.difficultyButton.schwer {
+  background-color: #fecaca;
+  color: #7c2d12;
+  border-color: #dc2626;
+}
+
+.difficultyButton.schwer:hover {
+  background-color: #fca5a5;
+  border-color: #b91c1c;
+}
+
+.difficultyLabel {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.difficultyDescription {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* Action Bar for "Neue Aufgaben" and "Schwierigkeitsgrad ändern" buttons */
+.actionBar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.difficultyChangeButton {
+  padding: 0.75rem 1rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+  min-width: 200px;
+}
+
+.difficultyChangeButton:hover {
+  background-color: #e5e7eb;
+  border-color: #9ca3af;
+  color: #1f2937;
+}
