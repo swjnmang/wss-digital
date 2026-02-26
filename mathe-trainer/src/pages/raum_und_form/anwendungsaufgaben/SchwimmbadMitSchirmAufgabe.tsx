@@ -39,7 +39,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         unitOptions: ['m', 'cm', 'mm'],
         tolerance: 0.009, // 0,5% von 1,8
       },
-      hint: 'Der Außenradius beträgt 2 m. Die Seitenwand ist 20 cm = 0,2 m dick. r_innen = 2 - 0,2 = 1,8 m.',
+      hint: '$$r_{innen} = 2\\text{ m} - 0{,}2\\text{ m} = 1{,}80\\text{ m}$$',
     },
     {
       id: 2,
@@ -55,7 +55,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         unitOptions: ['m', 'm²', 'm³'],
         tolerance: 0.1409, // 0,5% von 28,18
       },
-      hint: 'Die Bodenfläche besteht aus dem inneren Kreis: A_kreis = π × 1,80² ≈ 10,18 m² plus der Fläche unter den Seitenwänden (bei komplexer Geometrie). Gesamtfläche ≈ 28,18 m².',
+      hint: '$$A_{kreis} = 1{,}80^2 \\cdot \\pi = 10{,}18\\text{ m}^2$$\\n\\n$$A_{rechteck} = 5 \\cdot 3{,}60 = 18\\text{ m}^2$$\\n\\n$$A_{boden} = 28{,}18\\text{ m}^2$$',
     },
     {
       id: 3,
@@ -71,7 +71,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         unitOptions: ['m³', 'Liter', 'cm³'],
         tolerance: 0.19725, // 0,5% von 39,45
       },
-      hint: 'Das Volumen ergibt sich aus: V = Bodenfläche × Füllhöhe = 28,18 × 1,40 ≈ 39,45 m³.',
+      hint: '$$V_{wasser} = 28{,}18 \\cdot 1{,}40 = 39{,}45\\text{ m}^3$$',
     },
     {
       id: 4,
@@ -87,7 +87,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         unitOptions: ['m', 'm²', 'm³'],
         tolerance: 0.1598, // 0,5% von 31,96
       },
-      hint: 'Die Innenwand ist ein Zylinder mit r = 1,80 m und h = 1,50 m. Mantelfläche: M = 2πrh = 2 × π × 1,80 × 1,50 ≈ 16,96 m²... (komplexe Berechnung). Gesamtfläche ≈ 31,96 m².',
+      hint: '$$U_{innenwand} = 2 \\cdot 1{,}80 \\cdot \\pi + 2 \\cdot 5 = 21{,}31\\text{ m}$$\\n\\n$$A_{innenwand} = 21{,}31 \\cdot 1{,}50 = 31{,}96\\text{ m}^2$$',
     },
     {
       id: 5,
@@ -103,7 +103,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         unitOptions: ['m', 'm²', 'm³'],
         tolerance: 0.0474, // 0,5% von 9,48
       },
-      hint: 'h_s² = 0,5² + 1,5² = 1,58 m. Die Mantelfläche der Pyramide: M = 4 × (3 × 1,58)/2 ≈ 9,48 m².',
+      hint: '$$h_s^2 = 0{,}5^2 + 1{,}5^2 = 1{,}58\\text{ m}$$\\n\\n$$M = 4 \\cdot \\frac{3 \\cdot 1{,}58}{2} = 9{,}48\\text{ m}^2$$',
     },
     {
       id: 6,
@@ -119,7 +119,7 @@ export default function SchwimmbadMitSchirmAufgabe() {
         unitOptions: ['m', 'cm', 'mm'],
         tolerance: 0.0436, // 0,5% von 8,72
       },
-      hint: 's² = 1,5² + 1,58² => s ≈ 2,18 m. Gesamtlänge = 4 × 2,18 ≈ 8,72 m.',
+      hint: '$$s^2 = 1{,}5^2 + 1{,}58^2 \\Rightarrow s = 2{,}18\\text{ m}$$\\n\\n$$\\text{Gesamtlänge} = 4 \\cdot 2{,}18 = 8{,}72\\text{ m}$$',
     },
   ]
 
