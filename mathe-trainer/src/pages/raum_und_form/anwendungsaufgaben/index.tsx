@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
-import { Waves } from "lucide-react";
+import { Waves, Umbrella } from "lucide-react";
 
 type Item = { title: string; desc: string; href: string; icon: LucideIcon };
 
@@ -10,6 +10,12 @@ const items: Item[] = [
     title: "Der Pool", 
     desc: "Zylinderförmiger Pool und Pavillon", 
     href: "pool" 
+  },
+  {
+    icon: Umbrella,
+    title: "Schwimmbad mit Schirm",
+    desc: "Schwimmbecken mit Sonnenschirm",
+    href: "schwimmbad-mit-schirm"
   }
 ];
 
