@@ -299,9 +299,15 @@ export default function Wertetabelle() {
   // Aufgaben generieren basierend auf Schwierigkeitsgrad
   function generiereAufgaben(grad: 'einfach' | 'mittel' | 'schwer') {
     const neue: Aufgabe[] = []
+    const usedCombinations = new Set<string>() // Tracke verwendete (m, t) Kombinationen
     
-    // Generiere 10 verschiedene Aufgaben
-    for (let i = 0; i < 10; i++) {
+    // Generiere 4 verschiedene Aufgaben mit unterschiedlichen Funktionsgleichungen
+    let attempts = 0
+    const maxAttempts = 100 // Verhindere infinite Loop
+    
+    while (neue.length < 4 && attempts < maxAttempts) {
+      attempts++
+      
       // Zufällig zwischen Typ 1 und Typ 2 wählen
       const aufgabenTyp = Math.random() > 0.5 ? 'leereTabelleAusfüllen' : 'teilweisgefülltVervollständigen'
       let aufgabe = aufgabenBanks[aufgabenTyp as keyof typeof aufgabenBanks]()
@@ -309,25 +315,38 @@ export default function Wertetabelle() {
       // Gemeinsame Frage-Erweiterung
       const graphHinweis = ' Zeichne den Graph anschließend in ein von dir selbst erstelltes Koordinatensystem.'
       
-      // Passe Schwierigkeitsgrad an
+      let m = aufgabe.m
+      let t = aufgabe.t
+      let kombinationKey = ''
+      
+      // Passe Schwierigkeitsgrad an und generiere m/t basierend darauf
       if (grad === 'einfach') {
         // Einfach: y = m*x (ohne t)
+        t = 0
+        m = m === 0 ? 1 : m
+        kombinationKey = `${m}|0` // m|t Format für Duplikatsprüfung
+        
         aufgabe.t = 0
-        aufgabe.m = aufgabe.m === 0 ? 1 : aufgabe.m
-        aufgabe.funktionsgleichung = `y = ${aufgabe.m}x`
-        aufgabe.funktionsgleichungLatex = `$$y = ${aufgabe.m}x$$`
+        aufgabe.m = m
+        aufgabe.funktionsgleichung = `y = ${m}x`
+        aufgabe.funktionsgleichungLatex = `$$y = ${m}x$$`
         aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
         
         // Wenn Typ 2: berechne y-Werte neu
         if (aufgabenTyp === 'teilweisgefülltVervollständigen' && aufgabe.yWerte) {
-          aufgabe.yWerte = aufgabe.xWerte.map((x: number) => Math.round(aufgabe.m * x * 100) / 100)
+          aufgabe.yWerte = aufgabe.xWerte.map((x: number) => Math.round(m * x * 100) / 100)
         }
       } else if (grad === 'mittel') {
-        // Mittel: y = m*x + t mit ganzen Zahlen (schon Standard)
+        // Mittel: y = m*x + t mit ganzen Zahlen
+        kombinationKey = `${aufgabe.m}|${aufgabe.t}`
         aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
       } else if (grad === 'schwer') {
         // Schwer: y = m*x + t mit Brüchen
         const { m: mBruch, t: tBruch } = generateRandomMTMitBrüchen()
+        m = mBruch
+        t = tBruch
+        kombinationKey = `${mBruch}|${tBruch}`
+        
         aufgabe.m = mBruch
         aufgabe.t = tBruch
         
@@ -346,7 +365,11 @@ export default function Wertetabelle() {
         }
       }
       
-      neue.push(aufgabe)
+      // Prüfe ob diese Kombination bereits verwendet wurde
+      if (!usedCombinations.has(kombinationKey)) {
+        usedCombinations.add(kombinationKey)
+        neue.push(aufgabe)
+      }
     }
     
     setAufgaben(neue)
