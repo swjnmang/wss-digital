@@ -21,7 +21,7 @@ interface Task {
 export default function PoolAufgabe() {
   const [currentTask, setCurrentTask] = useState(0)
   const [inputs, setInputs] = useState<Record<number, { value: string; unit: string }>>({})
-  const [feedback, setFeedback] = useState<Record<number, string>>({})
+  const [feedback, setFeedback] = useState<Record<number, { status: 'correct' | 'incorrect' | ''; message?: string }>>({})
   const [showSolution, setShowSolution] = useState<Record<number, boolean>>({})
 
   const tasks: Task[] = [
@@ -131,7 +131,7 @@ export default function PoolAufgabe() {
       ...inputs,
       [currentTask]: { ...currentInput, value },
     })
-    setFeedback({ ...feedback, [currentTask]: '' })
+    setFeedback({ ...feedback, [currentTask]: { status: '' } })
   }
 
   const handleUnitChange = (unit: string) => {
@@ -139,7 +139,7 @@ export default function PoolAufgabe() {
       ...inputs,
       [currentTask]: { ...currentInput, unit },
     })
-    setFeedback({ ...feedback, [currentTask]: '' })
+    setFeedback({ ...feedback, [currentTask]: { status: '' } })
   }
 
   const normalizeNumber = (input: string): number | null => {
@@ -175,31 +175,30 @@ export default function PoolAufgabe() {
     const solution = currentTaskData.solution
 
     if (!currentInput.value) {
-      setFeedback({ ...feedback, [currentTask]: 'Bitte gib eine Antwort ein.' })
+      setFeedback({ ...feedback, [currentTask]: { status: 'incorrect', message: 'Bitte gib eine Antwort ein.' } })
       return
     }
 
     if (!currentInput.unit) {
-      setFeedback({ ...feedback, [currentTask]: 'Bitte wähle eine Einheit aus.' })
+      setFeedback({ ...feedback, [currentTask]: { status: 'incorrect', message: 'Bitte wähle eine Einheit aus.' } })
       return
     }
 
     let isCorrect = false
+    let errorMessage = ''
 
     if (solution.type === 'number') {
       const numInput = normalizeNumber(currentInput.value)
 
       if (numInput === null) {
-        setFeedback({ ...feedback, [currentTask]: 'Bitte gib eine gültige Zahl ein.' })
+        setFeedback({ ...feedback, [currentTask]: { status: 'incorrect', message: 'Bitte gib eine gültige Zahl ein.' } })
         return
       }
 
       // Überprüfe ob die richtige Einheit ausgewählt wurde
       if (currentInput.unit !== solution.unit) {
-        setFeedback({
-          ...feedback,
-          [currentTask]: `Falsche Einheit! Die richtige Einheit ist ${solution.unit}.`,
-        })
+        errorMessage = `Falsche Einheit! Die richtige Einheit ist ${solution.unit}.`
+        setFeedback({ ...feedback, [currentTask]: { status: 'incorrect', message: errorMessage } })
         return
       }
 
@@ -214,7 +213,11 @@ export default function PoolAufgabe() {
       isCorrect = normalizedInput === normalizedAnswer
     }
 
-    setFeedback({ ...feedback, [currentTask]: isCorrect ? 'correct' : 'incorrect' })
+    if (isCorrect) {
+      setFeedback({ ...feedback, [currentTask]: { status: 'correct' } })
+    } else {
+      setFeedback({ ...feedback, [currentTask]: { status: 'incorrect', message: 'Leider nicht richtig. Versuche es nochmal!' } })
+    }
   }
 
   const nextTask = () => {
@@ -229,7 +232,8 @@ export default function PoolAufgabe() {
     }
   }
 
-  const feedbackState = feedback[currentTask]
+  const feedbackState = feedback[currentTask]?.status || ''
+  const feedbackMessage = feedback[currentTask]?.message
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-cyan-100 p-4">
@@ -307,7 +311,9 @@ export default function PoolAufgabe() {
             {feedbackState === 'correct' && <div className="p-3 bg-green-100 text-green-800 rounded-lg mb-4 font-semibold">✓ Richtig!</div>}
 
             {feedbackState === 'incorrect' && (
-              <div className="p-3 bg-red-100 text-red-800 rounded-lg mb-4 font-semibold">✗ Leider nicht richtig. Versuche es nochmal!</div>
+              <div className="p-3 bg-red-100 text-red-800 rounded-lg mb-4 font-semibold">
+                ✗ {feedbackMessage || 'Leider nicht richtig. Versuche es nochmal!'}
+              </div>
             )}
 
             {/* Lösung anzeigen Button */}
