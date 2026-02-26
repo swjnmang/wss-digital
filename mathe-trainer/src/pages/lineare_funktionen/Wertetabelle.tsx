@@ -43,7 +43,37 @@ function generateRandomMT() {
   return { m, t }
 }
 
-// Konvertiere Dezimalzahl zu lesbarem Format: 0.5 → "1/2", 0.75 → "3/4", etc.
+// Konvertiere Dezimalzahl zu LaTeX-Bruch: 0.5 → \frac{1}{2}, 0.75 → \frac{3}{4}, etc.
+function toFractionLatex(num: number): string {
+  if (num === Math.round(num)) return Math.round(num).toString() // Ganze Zahl
+  
+  // Mapping von Dezimalzahlen zu LaTeX-Brüchen
+  const fractions: Record<string, string> = {
+    '0.5': '\\frac{1}{2}',
+    '-0.5': '-\\frac{1}{2}',
+    '0.25': '\\frac{1}{4}',
+    '-0.25': '-\\frac{1}{4}',
+    '0.75': '\\frac{3}{4}',
+    '-0.75': '-\\frac{3}{4}',
+    '0.33': '\\frac{1}{3}',
+    '-0.33': '-\\frac{1}{3}',
+    '0.67': '\\frac{2}{3}',
+    '-0.67': '-\\frac{2}{3}',
+    '0.2': '\\frac{1}{5}',
+    '-0.2': '-\\frac{1}{5}',
+    '0.4': '\\frac{2}{5}',
+    '-0.4': '-\\frac{2}{5}',
+    '0.6': '\\frac{3}{5}',
+    '-0.6': '-\\frac{3}{5}',
+    '0.8': '\\frac{4}{5}',
+    '-0.8': '-\\frac{4}{5}'
+  }
+  
+  const key = num.toFixed(2)
+  return fractions[key] || num.toString()
+}
+
+// Konvertiere Dezimalzahl zu lesbarem Format: 0.5 → "1/2", 0.75 → "3/4", etc. (für nicht-LaTeX Anzeige)
 function toFraction(num: number): string {
   if (num === Math.round(num)) return Math.round(num).toString() // Ganze Zahl
   
@@ -98,10 +128,10 @@ function generateRandomMTMitBrüchen() {
   return { m: Math.round(m * 100) / 100, t: Math.round(t * 100) / 100 }
 }
 
-// Formatiert die Funktionsgleichung mit Bruchdarstellung
+// Formatiert die Funktionsgleichung mit LaTeX-Bruchdarstellung
 function formatEquation(m: number, t: number): string {
-  const mStr = toFraction(m)
-  const tStr = toFraction(t)
+  const mStr = toFractionLatex(m)
+  const tStr = toFractionLatex(t)
   
   let equation = `y = ${mStr}x`
   
