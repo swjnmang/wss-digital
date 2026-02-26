@@ -1,6 +1,6 @@
 ﻿import { Link } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
-import { Ruler, Triangle, Expand, Circle, Box, Cone, Pyramid, Cylinder } from "lucide-react";
+import { Ruler, Triangle, Expand, Circle, Box, Cone, Pyramid, Cylinder, BookOpen } from "lucide-react";
 
 type Item = { title: string; desc: string; href: string; icon: LucideIcon };
 type SectionData = { title: string; items: Item[] };
@@ -16,7 +16,8 @@ const sections: SectionData[] = [
       { icon: Box, title: "Prisma", desc: "Coming Soon", href: "prisma" },
       { icon: Cone, title: "Kegel", desc: "Coming Soon", href: "kegel" },
       { icon: Pyramid, title: "Pyramide", desc: "Coming Soon", href: "pyramide" },
-      { icon: Cylinder, title: "Zylinder", desc: "Coming Soon", href: "zylinder" }
+      { icon: Cylinder, title: "Zylinder", desc: "Coming Soon", href: "zylinder" },
+      { icon: BookOpen, title: "Anwendungsaufgaben", desc: "Coming Soon", href: "anwendungsaufgaben" }
     ]
   }
 ];
