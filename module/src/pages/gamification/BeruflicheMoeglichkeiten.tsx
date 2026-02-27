@@ -10,6 +10,7 @@ export default function BeruflicheMoeglichkeiten() {
         <Link to="/gamification" className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors">
           ← Zurück
         </Link>
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">Gamification</p>
         <h1 className="text-4xl font-bold mb-2 tracking-tight">💼 Berufliche Möglichkeiten entdecken</h1>
         <p className="text-lg text-slate-300">Karrierechancen im Bereich Gamification</p>
       </header>
