@@ -5,7 +5,7 @@ export default function Home() {
     {
       id: 'gamification',
       title: 'Gamification',
-      emoji: '�',
+      emoji: '🎮',
       description: 'Lerne spielerisch mit Punkten, Abzeichen und spannenden Herausforderungen.',
       enabled: true,
       path: '/gamification'
