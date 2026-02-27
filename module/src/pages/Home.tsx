@@ -15,39 +15,58 @@ export default function Home() {
       title: 'Gesundheit',
       emoji: '🏥',
       description: 'Verstehe wirtschaftliche Aspekte im Gesundheitswesen und Pflege.',
-      enabled: false
+      enabled: false,
+      path: '/gesundheit'
     },
     {
       id: 'fit4finance',
       title: 'Fit4Finance',
       emoji: '💰',
       description: 'Trainiere deine finanziellen Fähigkeiten und Finanzmanagement.',
-      enabled: false
+      enabled: false,
+      path: '/fit4finance'
     },
     {
       id: 'umweltoekonomie',
       title: 'Umweltökonomie',
       emoji: '🌍',
       description: 'Verstehe die Beziehung zwischen Wirtschaft und Umwelt.',
-      enabled: false
+      enabled: false,
+      path: '/umweltoekonomie'
     },
     {
       id: 'robotik',
       title: 'Robotik',
       emoji: '🤖',
       description: 'Grundlagen der Robotik und Automatisierung in der Industrie.',
-      enabled: false
+      enabled: false,
+      path: '/robotik'
     },
     {
       id: 'umwelttechnik',
       title: 'Umwelttechnik',
       emoji: '♻️',
       description: 'Technologien für nachhaltiges Wirtschaften und Ressourcenschonung.',
-      enabled: false
+      enabled: false,
+      path: '/umwelttechnik'
     },
     {
       id: 'ecommerce',
       title: 'E-Commerce',
+      emoji: '🛒',
+      description: 'Elektronischer Handel und digitale Geschäftsmodelle.',
+      enabled: false,
+      path: '/ecommerce'
+    },
+    {
+      id: 'tourismus',
+      title: 'Tourismus',
+      emoji: '✈️',
+      description: 'Wirtschaft und Management im Tourismussektor.',
+      enabled: false,
+      path: '/tourismus'
+    }
+  ]
       emoji: '🛒',
       description: 'Elektronischer Handel und digitale Geschäftsmodelle.',
       enabled: false
