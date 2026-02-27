@@ -67,18 +67,6 @@ export default function Home() {
       path: '/tourismus'
     }
   ]
-      emoji: '🛒',
-      description: 'Elektronischer Handel und digitale Geschäftsmodelle.',
-      enabled: false
-    },
-    {
-      id: 'tourismus',
-      title: 'Tourismus',
-      emoji: '✈️',
-      description: 'Wirtschaft und Management im Tourismussektor.',
-      enabled: false
-    }
-  ]
 
   return (
     <div className="min-h-screen flex flex-col">
