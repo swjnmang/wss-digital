@@ -5,7 +5,7 @@ export default function Home() {
     {
       id: 'gamification',
       title: 'Gamification',
-      emoji: '🎮',
+      emoji: '�',
       description: 'Lerne spielerisch mit Punkten, Abzeichen und spannenden Herausforderungen.',
       enabled: true,
       path: '/gamification'
@@ -13,7 +13,7 @@ export default function Home() {
     {
       id: 'gesundheit',
       title: 'Gesundheit',
-      emoji: '🏥',
+      emoji: '⚕️',
       description: 'Verstehe wirtschaftliche Aspekte im Gesundheitswesen und Pflege.',
       enabled: false,
       path: '/gesundheit'
@@ -21,7 +21,7 @@ export default function Home() {
     {
       id: 'fit4finance',
       title: 'Fit4Finance',
-      emoji: '💰',
+      emoji: '💳',
       description: 'Trainiere deine finanziellen Fähigkeiten und Finanzmanagement.',
       enabled: false,
       path: '/fit4finance'
@@ -29,7 +29,7 @@ export default function Home() {
     {
       id: 'umweltoekonomie',
       title: 'Umweltökonomie',
-      emoji: '🌍',
+      emoji: '🌱',
       description: 'Verstehe die Beziehung zwischen Wirtschaft und Umwelt.',
       enabled: false,
       path: '/umweltoekonomie'
@@ -37,7 +37,7 @@ export default function Home() {
     {
       id: 'robotik',
       title: 'Robotik',
-      emoji: '🤖',
+      emoji: '⚙️',
       description: 'Grundlagen der Robotik und Automatisierung in der Industrie.',
       enabled: false,
       path: '/robotik'
@@ -45,7 +45,7 @@ export default function Home() {
     {
       id: 'umwelttechnik',
       title: 'Umwelttechnik',
-      emoji: '♻️',
+      emoji: '🔋',
       description: 'Technologien für nachhaltiges Wirtschaften und Ressourcenschonung.',
       enabled: false,
       path: '/umwelttechnik'
@@ -53,7 +53,7 @@ export default function Home() {
     {
       id: 'ecommerce',
       title: 'E-Commerce',
-      emoji: '🛒',
+      emoji: '📦',
       description: 'Elektronischer Handel und digitale Geschäftsmodelle.',
       enabled: false,
       path: '/ecommerce'
@@ -61,7 +61,7 @@ export default function Home() {
     {
       id: 'tourismus',
       title: 'Tourismus',
-      emoji: '✈️',
+      emoji: '🗺️',
       description: 'Wirtschaft und Management im Tourismussektor.',
       enabled: false,
       path: '/tourismus'

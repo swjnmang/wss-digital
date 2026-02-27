@@ -10,7 +10,7 @@ export default function Fit4Finance() {
         <Link to="/" className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors">
           ← Zurück
         </Link>
-        <h1 className="text-4xl font-bold mb-2 tracking-tight">Fit4Finance</h1>
+        <h1 className="text-4xl font-bold mb-2 tracking-tight">💳 Fit4Finance</h1>
         <p className="text-lg text-slate-300">Deine finanziellen Fähigkeiten trainieren</p>
       </header>
 
@@ -58,7 +58,7 @@ export default function Fit4Finance() {
               <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="bg-slate-50 rounded-xl p-6 border border-slate-200">
-                    <div className="text-4xl mb-4">💰</div>
+                    <div className="text-4xl mb-4">�</div>
                     <h3 className="text-lg font-semibold text-slate-900 mb-2">Aufgabe {i}</h3>
                     <p className="text-slate-600 text-sm mb-4">Finanzielle Fähigkeiten trainieren...</p>
                     <div className="flex justify-between items-center">
