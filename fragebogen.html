@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragebogen zur Spielanalyse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        .form-section {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            margin-bottom: 2.5rem;
+            border: 1px solid #e2e8f0; /* slate-200 */
+        }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #334155; /* slate-700 */
+            margin-bottom: 0.75rem;
+        }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            border-radius: 0.5rem;
+            border: 1px solid #cbd5e1; /* slate-300 */
+            padding: 0.75rem 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #0d9488; /* teal-600 */
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
+            background-color: white;
+        }
+        .form-textarea {
+            min-height: 120px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .checkbox-label {
+            margin-left: 0.5rem;
+            color: #374151;
+        }
+        .radio-group label {
+            margin-right: 1.5rem;
+        }
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: help;
+        }
+        .tooltip-icon {
+            margin-left: 8px;
+            width: 20px;
+            height: 20px;
+            background-color: #64748b; /* slate-500 */
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            transition: background-color 0.2s;
+        }
+        .tooltip:hover .tooltip-icon {
+             background-color: #0d9488; /* teal-600 */
+        }
+        .tooltip-text {
+            visibility: hidden;
+            width: 280px;
+            background-color: #1e293b; /* slate-800 */
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 12px 16px;
+            position: absolute;
+            z-index: 10;
+            bottom: 150%;
+            left: 50%;
+            margin-left: -140px; /* Half of the width */
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            font-weight: 400;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateY(10px);
+        }
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+        .tooltip:hover .tooltip-text,
+        .tooltip:focus .tooltip-text,
+        .tooltip:focus-within .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                background-color: white;
+                font-size: 12pt;
+                -webkit-print-color-adjust: exact; /* Ensures colors and backgrounds are printed in Chrome/Safari */
+                color-adjust: exact;
+            }
+            header, footer, button {
+                display: none !important;
+            }
+            .form-section {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                padding: 1rem !important;
+                margin-bottom: 1rem !important;
+                break-inside: avoid; /* Prevents sections from splitting across pages */
+            }
+            .form-input, .form-textarea {
+                border: 1px solid #aaa !important;
+                background-color: #fff !important;
+            }
+            .max-w-4xl {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .tooltip, .tooltip-icon {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-10 p-6 rounded-lg bg-white shadow-sm">
+            <h1 class="text-3xl sm:text-4xl font-bold text-teal-600">Fragebogen zur Spielanalyse</h1>
+            <p class="text-lg text-slate-500 mt-2">Gesellschaftsspiele entschlüsseln</p>
+        </header>
+
+        <form id="gameAnalysisForm">
+            <!-- Allgemeine Informationen -->
+            <div class="form-section">
+                <h2 class="text-2xl font-semibold mb-6 border-b pb-4 text-slate-800">Allgemeine Informationen</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="gameName" class="form-label">Name des Spiels:</label>
+                        <input type="text" id="gameName" name="gameName" class="form-input" placeholder="z.B. Siedler von Catan">
+                    </div>
+                    <div>
+                        <label for="groupMembers" class="form-label">Namen der Gruppenmitglieder:</label>
+                        <input type="text" id="groupMembers" name="groupMembers" class="form-input" placeholder="Max, Erika, ...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teil A -->
+            <div class="form-section">
+                <h2 class="text-2xl font-semibold mb-6 border-b pb-4 text-slate-800">Teil A: Grundlegende Merkmale</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label for="spielidee" class="form-label">1. Spielidee & Ziel:</label>
+                        <textarea id="spielidee" name="spielidee" class="form-textarea" placeholder="Was ist die grundlegende Idee und das Ziel des Spiels?"></textarea>
+                    </div>
+                    <div>
+                        <label for="zielgruppe" class="form-label">2. Zielgruppe:</label>
+                        <textarea id="zielgruppe" name="zielgruppe" class="form-textarea" placeholder="Für wen ist dieses Spiel gedacht? Begründet eure Einschätzung."></textarea>
+                    </div>
+                    <div>
+                        <label class="form-label">3. Komplexität (1 = sehr einfach, 5 = sehr komplex):</label>
+                        <div class="flex items-center space-x-4 radio-group">
+                            <label><input type="radio" name="komplexitaet" value="1"> 1</label>
+                            <label><input type="radio" name="komplexitaet" value="2"> 2</label>
+                            <label><input type="radio" name="komplexitaet" value="3"> 3</label>
+                            <label><input type="radio" name="komplexitaet" value="4"> 4</label>
+                            <label><input type="radio" name="komplexitaet" value="5"> 5</label>
+                        </div>
+                         <textarea name="komplexitaet_begruendung" class="form-textarea mt-4" placeholder="Begründet eure Einschätzung kurz."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teil B -->
+            <div class="form-section">
+                <h2 class="text-2xl font-semibold mb-6 border-b pb-4 text-slate-800">Teil B: Spieltypische Elemente & Mechaniken</h2>
+                 <div class="space-y-6">
+                    <div>
+                        <label class="form-label">1. Elemente im Spiel (ankreuzen und Beispiel nennen):</label>
+                        <div class="space-y-4">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="punkte" name="elemente" value="Punkte" class="h-5 w-5 rounded text-teal-600 focus:ring-teal-500">
+                                <label for="punkte" class="checkbox-label font-medium">Punkte:</label>
+                            </div>
+                            <input type="text" name="punkte_beispiel" class="form-input ml-6" placeholder="Beispiel: Wofür erhält man Punkte?">
+
+                             <div class="checkbox-group mt-4">
+                                <input type="checkbox" id="belohnungen" name="elemente" value="Belohnungen" class="h-5 w-5 rounded text-teal-600 focus:ring-teal-500">
+                                <label for="belohnungen" class="checkbox-label font-medium">Belohnungen:</label>
+                            </div>
+                            <input type="text" name="belohnungen_beispiel" class="form-input ml-6" placeholder="Beispiel: Was bekommt man für eine gute Aktion?">
+
+                            <div class="checkbox-group mt-4">
+                                <input type="checkbox" id="missionen" name="elemente" value="Missionen" class="h-5 w-5 rounded text-teal-600 focus:ring-teal-500">
+                                <label for="missionen" class="checkbox-label font-medium">Missionen/Aufgaben:</label>
+                            </div>
+                            <input type="text" name="missionen_beispiel" class="form-input ml-6" placeholder="Beispiel: Gibt es konkrete Aufträge?">
+
+                            <div class="checkbox-group mt-4">
+                                <input type="checkbox" id="erfolge" name="elemente" value="Erfolge" class="h-5 w-5 rounded text-teal-600 focus:ring-teal-500">
+                                <label for="erfolge" class="checkbox-label font-medium">Erfolge/Abzeichen:</label>
+                            </div>
+                            <input type="text" name="erfolge_beispiel" class="form-input ml-6" placeholder="Beispiel: Gibt es besondere Titel oder Auszeichnungen?">
+
+                            <div class="checkbox-group mt-4">
+                                <input type="checkbox" id="ranglisten" name="elemente" value="Ranglisten" class="h-5 w-5 rounded text-teal-600 focus:ring-teal-500">
+                                <label for="ranglisten" class="checkbox-label font-medium">Ranglisten/Level:</label>
+                            </div>
+                            <input type="text" name="ranglisten_beispiel" class="form-input ml-6" placeholder="Beispiel: Gibt es eine sichtbare Rangfolge?">
+
+                            <div class="checkbox-group mt-4">
+                                <input type="checkbox" id="feedback" name="elemente" value="Feedback" class="h-5 w-5 rounded text-teal-600 focus:ring-teal-500">
+                                <label for="feedback" class="checkbox-label font-medium">Feedback:</label>
+                            </div>
+                            <input type="text" name="feedback_beispiel" class="form-input ml-6" placeholder="Beispiel: Woran erkennt man einen guten/schlechten Zug?">
+                        </div>
+                    </div>
+                     <div>
+                        <label class="form-label">2. Spielmechaniken (ankreuzen und erklären):</label>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="set-collection" name="mechaniken" value="Set-Collection" class="h-5 w-5 rounded mr-3 text-teal-600 focus:ring-teal-500">
+                                <div class="tooltip" tabindex="0">
+                                    <label for="set-collection" class="font-medium text-slate-700">Set-Collection</label>
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Das Sammeln von zusammengehörigen Sets (z.B. Karten einer Farbe, gleiche Zahlen, bestimmte Rohstoffe).</span>
+                                </div>
+                            </div>
+                            <textarea name="set_collection_erklaerung" class="form-textarea ml-6" placeholder="Erklärung: Wie funktioniert das Sammeln von Sets im Spiel?"></textarea>
+
+                            <div class="flex items-center mt-4">
+                                <input type="checkbox" id="tile-placement" name="mechaniken" value="Tile-Placement" class="h-5 w-5 rounded mr-3 text-teal-600 focus:ring-teal-500">
+                                <div class="tooltip" tabindex="0">
+                                    <label for="tile-placement" class="font-medium text-slate-700">Tile-Placement</label>
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Das Legen von Plättchen auf einem Spielbrett, um eine Landschaft zu gestalten, Gebiete zu beanspruchen oder Aktionen auszulösen.</span>
+                                </div>
+                            </div>
+                            <textarea name="tile_placement_erklaerung" class="form-textarea ml-6" placeholder="Erklärung: Wie funktioniert das Legen von Plättchen?"></textarea>
+
+                             <div class="flex items-center mt-4">
+                                <input type="checkbox" id="worker-placement" name="mechaniken" value="Worker-Placement" class="h-5 w-5 rounded mr-3 text-teal-600 focus:ring-teal-500">
+                                 <div class="tooltip" tabindex="0">
+                                    <label for="worker-placement" class="font-medium text-slate-700">Worker-Placement</label>
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Das Einsetzen von Spielfiguren ("Worker") auf Aktionsfelder, um eine bestimmte Aktion für sich zu beanspruchen. Oft ist ein Feld danach blockiert.</span>
+                                 </div>
+                            </div>
+                            <textarea name="worker_placement_erklaerung" class="form-textarea ml-6" placeholder="Erklärung: Wie funktioniert das Einsetzen von Figuren?"></textarea>
+
+                            <div class="flex items-center mt-4">
+                                <input type="checkbox" id="deckbuilding" name="mechaniken" value="Deckbuilding" class="h-5 w-5 rounded mr-3 text-teal-600 focus:ring-teal-500">
+                                <div class="tooltip" tabindex="0">
+                                    <label for="deckbuilding" class="font-medium text-slate-700">Deckbuilding</label>
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Spieler starten mit einem kleinen Kartendeck und kaufen im Laufe des Spiels stärkere Karten hinzu, um ihr Deck zu verbessern.</span>
+                                </div>
+                            </div>
+                            <textarea name="deckbuilding_erklaerung" class="form-textarea ml-6" placeholder="Erklärung: Wie wird das Kartendeck im Spiel verbessert?"></textarea>
+
+                             <div class="checkbox-group mt-4">
+                                <input type="checkbox" id="andere" name="mechaniken" value="Andere" class="h-5 w-5 rounded text-teal-600 focus:ring-teal-500">
+                                <label for="andere" class="checkbox-label font-medium">Andere wichtige Mechanik:</label>
+                            </div>
+                            <textarea name="andere_erklaerung" class="form-textarea ml-6" placeholder="z.B. Würfeln, Hand-Management, Bluffen. Erklärt die wichtigste andere Mechanik."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Teil C -->
+            <div class="form-section">
+                <h2 class="text-2xl font-semibold mb-6 border-b pb-4 text-slate-800">Teil C: Das Spielerlebnis & Persönliche Entwicklung</h2>
+                 <div class="space-y-6">
+                    <div>
+                        <label class="form-label">1. Emotionen im Spiel (nennt konkrete Beispiele):</label>
+                        <textarea name="emotionen_spannung" class="form-textarea mb-2" placeholder="Spannung:"></textarea>
+                        <textarea name="emotionen_glueck" class="form-textarea mb-2" placeholder="Glück/Freude:"></textarea>
+                        <textarea name="emotionen_frustration" class="form-textarea mb-2" placeholder="Frustration:"></textarea>
+                        <textarea name="emotionen_empathie" class="form-textarea" placeholder="Empathie:"></textarea>
+                    </div>
+                    <div>
+                         <label class="form-label">2. Geforderte Fähigkeiten (ordnet nach Wichtigkeit: 1 = am wichtigsten):</label>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="number" min="1" max="4" name="ranking_strategie" class="form-input w-20 mr-4 text-center">
+                                <label class="text-slate-700">Strategisches Denken (Langfristige Planung)</label>
+                            </div>
+                             <div class="flex items-center">
+                                <input type="number" min="1" max="4" name="ranking_problemloesung" class="form-input w-20 mr-4 text-center">
+                                <label class="text-slate-700">Problemlösung (Auf neue Situationen reagieren)</label>
+                            </div>
+                             <div class="flex items-center">
+                                <input type="number" min="1" max="4" name="ranking_kreativitaet" class="form-input w-20 mr-4 text-center">
+                                <label class="text-slate-700">Kreativität (Ungewöhnliche Lösungswege finden)</label>
+                            </div>
+                             <div class="flex items-center">
+                                <input type="number" min="1" max="4" name="ranking_resilienz" class="form-input w-20 mr-4 text-center">
+                                <div class="tooltip" tabindex="0">
+                                    <label class="text-slate-700">Resilienz</label>
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Die Fähigkeit, mit Pech, Rückschlägen oder Niederlagen umzugehen und trotzdem motiviert weiterzuspielen.</span>
+                                </div>
+                                <span class="ml-2 text-slate-600">(Mit Pech oder Rückschlägen umgehen)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teil D -->
+             <div class="form-section">
+                <h2 class="text-2xl font-semibold mb-6 border-b pb-4 text-slate-800">Teil D: Soziale Entwicklung</h2>
+                 <div class="space-y-6">
+                    <div>
+                        <label for="interaktion" class="form-label">1. Interaktion & Kommunikation:</label>
+                        <textarea id="interaktion" name="interaktion" class="form-textarea" placeholder="Wie interagieren die Spieler miteinander? Ist Kommunikation wichtig?"></textarea>
+                    </div>
+                    <div>
+                        <label for="teamarbeit" class="form-label">2. Teamarbeit & Inklusion:</label>
+                        <textarea id="teamarbeit" name="teamarbeit" class="form-textarea" placeholder="Fördert das Spiel Teamarbeit? Werden alle einbezogen?"></textarea>
+                    </div>
+                    <div>
+                        <label for="wertebildung" class="form-label">3. Wertebildung:</label>
+                        <textarea id="wertebildung" name="wertebildung" class="form-textarea" placeholder="Vermittelt das Spiel bestimmte Werte (z.B. Fairness, Kooperation)?"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                 <button type="button" onclick="window.print()" class="w-full sm:w-auto bg-teal-600 text-white font-bold py-4 px-10 rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-300 transition duration-300 transform hover:scale-105">
+                    Antworten drucken / Als PDF speichern
+                </button>
+                <button type="button" onclick="printEmptyForm()" class="w-full sm:w-auto bg-slate-200 text-slate-700 font-bold py-4 px-10 rounded-lg hover:bg-slate-300 focus:outline-none focus:ring-4 focus:ring-slate-300 transition duration-300 transform hover:scale-105">
+                    Leeren Fragebogen drucken
+                </button>
+            </div>
+        </form>
+
+        <footer class="text-center mt-16 text-slate-500 text-sm">
+            <p>&copy; 2025 - Erstellt für den Unterricht</p>
+        </footer>
+    </div>
+
+    <script>
+        function printEmptyForm() {
+            // Get the form element
+            const form = document.getElementById('gameAnalysisForm');
+            // Reset all form fields to their default values
+            form.reset();
+            // Allow a brief moment for the reset to render, then print
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        }
+    </script>
+</body>
+</html>
+

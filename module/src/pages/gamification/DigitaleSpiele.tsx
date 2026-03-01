@@ -1,11 +1,584 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import jsPDF from 'jspdf'
+
+interface QuizQuestion {
+  id: number
+  question: string
+  options: string[]
+  correctAnswer: number
+}
+
+const QUIZ_POOL: QuizQuestion[] = [
+  { id: 1, question: 'Was ist eine "Worker Placement" Mechanik?', options: ['Spieler platzieren Arbeiter um Ressourcen zu sichern', 'Spieler werden auf der Karte platziert', 'Die Anzahl der Spieler wird bestimmt', 'Arbeiter kämpfen gegeneinander'], correctAnswer: 0 },
+  { id: 2, question: 'Welche Mechanik beschreibt das Sammeln von Plättchen?', options: ['Tile Placement', 'Set Collection', 'Area Control', 'Resource Management'], correctAnswer: 1 },
+  { id: 3, question: 'Was ist "Area Control"?', options: ['Kontrolle über bestimmte Bereiche des Spielfeldes', 'Kontrolle über alle Spieler', 'Die Größe eines Spielbereichs', 'Bewegung auf dem Spielfeld'], correctAnswer: 0 },
+  { id: 4, question: 'Welches ist KEIN klassisches Spielelement?', options: ['Modulator', 'Würfel', 'Spielfigur', 'Spinner'], correctAnswer: 0 },
+  { id: 5, question: 'Was bedeutet "Asymmetrisches Spiel"?', options: ['Spieler haben unterschiedliche Fähigkeiten/Ziele', 'Das Spielfeld ist nicht symmetrisch', 'Spieler spielen nicht fair', 'Es gibt nur zwei Spieler'], correctAnswer: 0 },
+  { id: 6, question: 'Was ist "Push Your Luck"?', options: ['Spieler riskieren einen Gewinn für mehr Punkte', 'Glück beim Würfeln', 'Ein Glücksspiel', 'Schnell spielen'], correctAnswer: 0 },
+  { id: 7, question: 'Welche Mechanik erlaubt Spielern, aufbauende Strukturen zu errichten?', options: ['Building', 'Development', 'Construction', 'Alle Antworten sind korrekt'], correctAnswer: 3 },
+  { id: 8, question: 'Was ist ein "Rollenspielelement"?', options: ['Spieler schlüpfen in Charakterrollen', 'Würfelrolle im Spiel', 'Rollende Bewegung', 'Rollschuhfahren'], correctAnswer: 0 },
+  { id: 9, question: 'Was beschreibt "Deck Building"?', options: ['Spieler konstruieren ihr Kartendeck während des Spiels', 'Ein Kartenhaus bauen', 'Deck-Chips sammeln', 'Spielkarten austeilen'], correctAnswer: 0 },
+  { id: 10, question: 'Was ist "Tile Placement"?', options: ['Spieler legen Plättchen auf das Spielfeld', 'Fliesen als Spielfiguren', 'Zeitliche Platzierung', 'Spieler-Position'], correctAnswer: 0 },
+  { id: 11, question: 'Welche Mechanik beschreibt das Handeln zwischen Spielern?', options: ['Negotiation', 'Trading', 'Bidding', 'Alle sind korrekt'], correctAnswer: 3 },
+  { id: 12, question: 'Was ist ein "Thema" in einem Spiel?', options: ['Die Geschichte oder das Setting des Spiels', 'Das Designthema', 'Die Spielregel', 'Die Spielgruppe'], correctAnswer: 0 },
+  { id: 13, question: 'Was beschreibt "Modular Boards"?', options: ['Spielfelder die aus verschiedenen Modulen bestehen', 'Moderne Spieler', 'Modulare Regeln', 'Variable Spieleranzahl'], correctAnswer: 0 },
+  { id: 14, question: 'Was ist "Simultaneous Action Selection"?', options: ['Spieler wählen Aktionen gleichzeitig', 'Sequenzielle Aktionen', 'Schnelle Aktionswahl', 'Zufällige Aktionen'], correctAnswer: 0 },
+  { id: 15, question: 'Welche Mechanik belohnt Spieler für bestimmte Muster?', options: ['Pattern Recognition', 'Matching', 'Set Collection', 'B und C'], correctAnswer: 3 },
+  { id: 16, question: 'Was ist "Auction / Bidding"?', options: ['Spieler bieten um bestimmte Ressourcen', 'Versteigerung an echte Personen', 'Zufällige Verteilung', 'Spieler werden ausgewählt'], correctAnswer: 0 },
+  { id: 17, question: 'Was beschreibt "Resource Management"?', options: ['Spieler müssen begrenzte Ressourcen effektiv nutzen', 'Manager spielen', 'Ressourcen verteilen', 'Materialverwaltung'], correctAnswer: 0 },
+  { id: 18, question: 'Was ist ein "Tableau"?', options: ['Die persönliche Spielzone eines Spielers', 'Ein Kunstwerk', 'Ein Spieltisch', 'Ein Diagramm'], correctAnswer: 0 },
+  { id: 19, question: 'Welche Mechanik erfordert Spieler, strategisch zu planen?', options: ['Strategy', 'Planning', 'Strategisches Denken', 'Alle Antworten sind korrekt'], correctAnswer: 3 },
+  { id: 20, question: 'Was ist "Hidden Information"?', options: ['Spieler kennen nicht alle Informationen', 'Versteckte Karten', 'Geheime Strategien', 'Verdeckte Spielfiguren'], correctAnswer: 0 },
+  { id: 21, question: 'Was bedeutet "Cooperative Play"?', options: ['Spieler arbeiten zusammen gegen das Spiel', 'Alle spielen gegen einen', 'Gleichzeitiges Spielen', 'Teamspiel zwischen zwei Teams'], correctAnswer: 0 },
+  { id: 22, question: 'Was ist ein "Luckdependent" Spiel?', options: ['Das Glück hat großen Einfluss auf das Ergebnis', 'Zufälliges Spielende', 'Ein flüchtiges Spiel', 'Schnelle Spielweise'], correctAnswer: 0 },
+  { id: 23, question: 'Was beschreibt das Konzept "Eurogame" oder "Deutsch-Spiel"?', options: ['Strategische Spiele mit minimaler Interaktion', 'Spiele aus Deutschland', 'Europäische Spielweise', 'Komplexe Regelwerke'], correctAnswer: 0 },
+  { id: 24, question: 'Was ist "Meeple"?', options: ['Spielfigur in Spielform', 'Mensch-ähnliche Spielfigur', 'Me + Peeple', 'Alle sind korrekt'], correctAnswer: 3 },
+  { id: 25, question: 'Welche Mechanik erlaubt Spielern Karten zu ziehen und zu spielen?', options: ['Hand Management', 'Deck Management', 'Card Drafting', 'A und B'], correctAnswer: 3 },
+  { id: 26, question: 'Was ist "Player Elimination"?', options: ['Ein Spieler scheidet aus dem Spiel aus', 'Alle Spieler werden entfernt', 'Spieler wechseln die Seite', 'Spieler verlieren Punkte'], correctAnswer: 0 },
+  { id: 27, question: 'Was beschreibt "Movement Mechanics"?', options: ['Wie sich Spielfiguren auf dem Spielfeld bewegen', 'Physische Bewegung der Spieler', 'Schnelle Bewegungen', 'Sprünge und Rolls'], correctAnswer: 0 },
+  { id: 28, question: 'Was ist "Victory Points (VP)"?', options: ['Punkte um das Spiel zu gewinnen', 'Sieg-Punkte in jedem Spielzug', 'Punkte für schnelles Spielen', 'Extras für Spieler'], correctAnswer: 0 },
+  { id: 29, question: 'Was ist "Scripted Game Flow"?', options: ['Der Spielverlauf folgt einer vorgegebenen Reihenfolge', 'Spieler schreiben die Geschichte', 'Spontane Spielweise', 'Improvisation'], correctAnswer: 0 },
+  { id: 30, question: 'Welche mechanik überprüft das Wissen der Spieler?', options: ['Trivia', 'Knowledge', 'Quiz', 'A und B'], correctAnswer: 3 },
+  { id: 31, question: 'Was ist ein "Action Point Allowance"?', options: ['Spieler haben eine begrenzte Anzahl von Aktionen pro Runde', 'Punkte für Aktionen', 'Zufällige Aktionsanzahl', 'Unbegrenzte Aktionen'], correctAnswer: 0 },
+  { id: 32, question: 'Was beschreibt "Network Building"?', options: ['Spieler bauen Verbindungen/Netzwerke auf', 'Computernetzwerk', 'Soziales Netzwerk', 'Straßennetzwerk'], correctAnswer: 0 },
+  { id: 33, question: 'Was ist "Dexterity"?', options: ['Geschicklichkeitselemente im Spiel', 'Geschwindigkeit', 'Genauigkeit', 'Fingerfertigkeit'], correctAnswer: 0 },
+  { id: 34, question: 'Was bedeutet "Thematic Fidelity"?', options: ['Wie gut das Spiel zu seinem Thema passt', 'Die Treue des Themas', 'Authentisches Design', 'Historische Genauigkeit'], correctAnswer: 0 },
+  { id: 35, question: 'Welche Mechanik erlaubt Spielern, andere zu blockieren?', options: ['Area Control', 'Blocking', 'Territorial Control', 'Alle sind ähnlich'], correctAnswer: 1 },
+  { id: 36, question: 'Was ist "Engine Building"?', options: ['Spieler bauen allmählich Systeme auf', 'Motor im Spiel', 'Maschinenbau', 'Technische Mechanik'], correctAnswer: 0 },
+  { id: 37, question: 'Was ist "Drafting" beim Kartenspiel?', options: ['Spieler wählen nacheinander Karten aus', 'Entwerfen von Karten', 'Luftstrom', 'Spielanleitung'], correctAnswer: 0 },
+  { id: 38, question: 'Welche Mechanik belohnt Risiken einzugehen?', options: ['Risk-Reward', 'Glücksspiel', 'Abenteuer', 'Mutigkeit'], correctAnswer: 0 },
+  { id: 39, question: 'Was ist "Pattern Building"?', options: ['Spieler erstellen Muster aus Plättchen', 'Harken im Garten', 'Kacheln verlegen', 'Designs erstellen'], correctAnswer: 0 },
+  { id: 40, question: 'Welche Mechanik ermöglicht "Catch-up" Mechaniken?', options: ['Rubber Banding', 'Nachholmechaniken', 'Ausgleichspiele', 'Alle korrekt'], correctAnswer: 3 },
+  { id: 41, question: 'Was ist "Hand Limit"?', options: ['Maximum Anzahl Karten auf der Hand', 'Handgrenze', 'Kartenlimit pro Runde', 'Maximale Kartenzahl'], correctAnswer: 0 },
+  { id: 42, question: 'Welche Mechanik erfordert "Deduction"?', options: ['Spieler müssen Informationen kombinieren', 'Reduktion', 'Abzug von Punkten', 'Schlussfolgerungen'], correctAnswer: 0 },
+  { id: 43, question: 'Was ist "Programmed Movement"?', options: ['Spieler programmieren zukünftige Bewegungen', 'Bewegte Programme', 'Automatische Bewegung', 'Roboter-Bewegung'], correctAnswer: 0 },
+  { id: 44, question: 'Welche Mechanik erlaubt Spielern Bündnisse zu bilden?', options: ['Alliances', 'Coalition', 'Partnership', 'Alle korrekt'], correctAnswer: 3 },
+  { id: 45, question: 'Was ist "Roll and Move"?', options: ['Würfeln und Figur bewegen', 'Würfelnde Bewegung', 'Rollende Bewegung', 'Bewegungspunkte'], correctAnswer: 0 },
+  { id: 46, question: 'Welche Mechanik beschreibt "Territorial Control"?', options: ['Kontrolle über Gebiete auf der Karte', 'Territorium', 'Landkontrolle', 'Gebietskarte'], correctAnswer: 0 },
+  { id: 47, question: 'Was ist "Modular Board"?', options: ['Spielbrett aus verschiedenen Modulen', 'Modulares Spielfeld', 'Austauschbare Teile', 'Variable Spielfläche'], correctAnswer: 0 },
+  { id: 48, question: 'Welche Mechanik erfordert "Memory"?', options: ['Spieler müssen sich an verborgene Informationen erinnern', 'Memory-Spiel', 'Gedächtnis', 'Versteckte Objekte'], correctAnswer: 0 },
+  { id: 49, question: 'Was ist "Trading"?', options: ['Austausch von Ressourcen zwischen Spielern', 'Handel', 'Wirtschaft', 'Tausch'], correctAnswer: 0 },
+  { id: 50, question: 'Welche Mechanik beschreibt "Majority Control"?', options: ['Spieler mit dem höchsten Einfluss gewinnt', 'Mehrheit', 'Kontrolle', 'Übergewicht'], correctAnswer: 0 },
+  { id: 51, question: 'Was ist "Legacy Game"?', options: ['Spiel das sich über mehrere Partien verändert', 'Vermächtnis', 'Klassisches Spiel', 'Traditionelles Spiel'], correctAnswer: 0 },
+  { id: 52, question: 'Welche Mechanik erfordert "Communication" zwischen Spieler?', options: ['Kooperative Kommunikation', 'Sprechen', 'Diskussion', 'Interview'], correctAnswer: 0 },
+  { id: 53, question: 'Was ist "Set Collection"?', options: ['Spieler sammeln Sätze von Elementen', 'Sammlung von Sätzen', 'Set-Spiel', 'Sammlung'], correctAnswer: 0 },
+  { id: 54, question: 'Welche Mechanik ermöglicht "Bluffing"?', options: ['Hidden Information mit Täuschung', 'Pokerspielen', 'Lügen', 'Verheimlichung'], correctAnswer: 0 },
+  { id: 55, question: 'Was ist "Resource Conversion"?', options: ['Ressourcen werden in andere Forms umgewandelt', 'Ressourcenumwandlung', 'Ressourcenverteilung', 'Ressourcenaustausch'], correctAnswer: 0 },
+  { id: 56, question: 'Welche Mechanik ist in "Monopoly" zentral?', options: ['Roll and Move', 'Resource Management', 'Trading', 'A und B'], correctAnswer: 0 },
+  { id: 57, question: 'Was ist "Shared Pool"?', options: ['Gemeinsamer Ressourcen-Pool für alle Spieler', 'Gemeinsamer Teich', 'Geteilter Pool', 'Zentrale Ressourcen'], correctAnswer: 0 },
+  { id: 58, question: 'Welche Mechanik beschreibt "Positional Play"?', options: ['Die Position ist strategisch wichtig', 'Position', 'Platzierung', 'Standort'], correctAnswer: 0 },
+  { id: 59, question: 'Was ist "Abstract Game"?', options: ['Spiel ohne Thema, reines Strategie-Spiel', 'Abstrakte Kunst', 'Abstraktes Denken', 'Theoretisches Spiel'], correctAnswer: 0 },
+  { id: 60, question: 'Welche Mechanik kombiniert mehrere Spielelemente?', options: ['Hybrid Mechanics', 'Kombinierte Mechaniken', 'Gemischte Regeln', 'A und B'], correctAnswer: 3 },
+]
 
 export default function DigitaleSpiele() {
-  const [activeTab, setActiveTab] = useState('aufgaben')
+  const [expandedTasks, setExpandedTasks] = useState<Record<number, boolean>>({})
+  const [quizStarted, setQuizStarted] = useState(false)
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
+  const [answered, setAnswered] = useState(false)
+  const [score, setScore] = useState(0)
+  const [correctAnswers, setCorrectAnswers] = useState<number[]>([])
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([])
+  const [genreTable, setGenreTable] = useState<Record<string, { description: string; examples: string }>>({
+    action: { description: '', examples: '' },
+    shooter: { description: '', examples: '' },
+    adventure: { description: '', examples: '' },
+    beatEmUps: { description: '', examples: '' },
+    jumpRun: { description: '', examples: '' },
+    openWorld: { description: '', examples: '' },
+    rpg: { description: '', examples: '' },
+    simulation: { description: '', examples: '' },
+    strategy: { description: '', examples: '' },
+    sports: { description: '', examples: '' },
+    indie: { description: '', examples: '' },
+    serious: { description: '', examples: '' },
+  })
+
+  // Beurteilungsbogen State
+  const [beurteilungData, setBeurteilungData] = useState({
+    schuelerName: '',
+    klasse: '',
+    spielName: '',
+    format: '',
+    partA: [0, 0, 0, 0, 0],
+    partB: [0, 0, 0, 0, 0],
+    anmerkungen: '',
+  })
+
+  const toggleTask = (taskId: number) => {
+    setExpandedTasks(prev => ({ ...prev, [taskId]: !prev[taskId] }))
+  }
+
+  const startQuiz = () => {
+    const shuffled = [...QUIZ_POOL].sort(() => Math.random() - 0.5)
+    const selected = shuffled.slice(0, 15)
+    setQuizQuestions(selected)
+    setQuizStarted(true)
+    setCurrentQuestionIndex(0)
+    setSelectedAnswer(null)
+    setAnswered(false)
+    setScore(0)
+    setCorrectAnswers([])
+  }
+
+  const handleAnswerSelect = (answerIndex: number) => {
+    if (!answered) {
+      setSelectedAnswer(answerIndex)
+      setAnswered(true)
+      const isCorrect = answerIndex === quizQuestions[currentQuestionIndex].correctAnswer
+      if (isCorrect) {
+        setScore(score + 1)
+        setCorrectAnswers([...correctAnswers, quizQuestions[currentQuestionIndex].id])
+      }
+    }
+  }
+
+  const nextQuestion = () => {
+    if (currentQuestionIndex < quizQuestions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1)
+      setSelectedAnswer(null)
+      setAnswered(false)
+    } else {
+      const percentage = (score / quizQuestions.length) * 100
+      if (percentage >= 75) {
+        downloadQuizResult(true, score)
+      } else {
+        alert(`Nicht bestanden! Du hast ${score} von 15 Fragen richtig (${percentage.toFixed(1)}%). Du brauchst 75% (11-12 Fragen).`)
+        startQuiz()
+      }
+    }
+  }
+
+  const downloadQuizResult = (passed: boolean, finalScore: number) => {
+    const pdf = new jsPDF()
+    let yPosition = 15
+
+    pdf.setFontSize(18)
+    pdf.setFont('Helvetica', 'bold')
+    pdf.setTextColor(0, 0, 0)
+    pdf.text('Arbeitsauftrag 1: Fachbegriffe-Check', 15, yPosition)
+    yPosition += 12
+
+    pdf.setFontSize(14)
+    pdf.setFont('Helvetica', 'bold')
+    if (passed) {
+      pdf.setTextColor(34, 197, 94)
+      pdf.text('✓ BESTANDEN', 15, yPosition)
+    } else {
+      pdf.setTextColor(239, 68, 68)
+      pdf.text('✗ NICHT BESTANDEN', 15, yPosition)
+    }
+    pdf.setTextColor(0, 0, 0)
+    yPosition += 12
+
+    pdf.setFontSize(11)
+    pdf.setFont('Helvetica', 'normal')
+    pdf.text(`Datum: ${new Date().toLocaleDateString('de-DE')}`, 15, yPosition)
+    yPosition += 6
+    pdf.text(`Richtige Antworten: ${finalScore}/15`, 15, yPosition)
+    yPosition += 6
+    const percentage = (finalScore / 15) * 100
+    pdf.text(`Prozentsatz: ${percentage.toFixed(1)}%`, 15, yPosition)
+    yPosition += 6
+    pdf.text(`Erforderlich: 75% (11-12 Fragen)`, 15, yPosition)
+    yPosition += 12
+
+    pdf.setFontSize(10)
+    pdf.setFont('Helvetica', 'bold')
+    pdf.text('Beantwortete Fragen:', 15, yPosition)
+    yPosition += 8
+
+    pdf.setFont('Helvetica', 'normal')
+    pdf.setFontSize(9)
+    quizQuestions.forEach((q, idx) => {
+      const isCorrect = correctAnswers.includes(q.id)
+      if (isCorrect) {
+        pdf.setTextColor(34, 197, 94)
+        pdf.text(`✓ ${idx + 1}. ${q.question.substring(0, 50)}...`, 15, yPosition)
+      } else {
+        pdf.setTextColor(239, 68, 68)
+        pdf.text(`✗ ${idx + 1}. ${q.question.substring(0, 50)}...`, 15, yPosition)
+      }
+      pdf.setTextColor(0, 0, 0)
+      yPosition += 5
+
+      if (yPosition > 270) {
+        pdf.addPage()
+        yPosition = 15
+      }
+    })
+
+    yPosition += 5
+    pdf.setFontSize(8)
+    pdf.setFont('Helvetica', 'italic')
+    pdf.text('Diese Bestätigung wurde am ' + new Date().toLocaleString('de-DE') + ' automatisch generiert.', 15, yPosition)
+
+    pdf.save(`Fachbegriffe-Check-Ergebnis-${new Date().getTime()}.pdf`)
+  }
+
+  const handleGenreChange = (genre: string, field: 'description' | 'examples', value: string) => {
+    setGenreTable(prev => ({
+      ...prev,
+      [genre]: { ...prev[genre], [field]: value }
+    }))
+  }
+
+  const downloadGenreTable = () => {
+    const pdf = new jsPDF()
+    let yPosition = 15
+
+    pdf.setFontSize(16)
+    pdf.setFont('Helvetica', 'bold')
+    pdf.text('Mission: Genre-Detektiv', 15, yPosition)
+    yPosition += 12
+
+    pdf.setFontSize(11)
+    pdf.setFont('Helvetica', 'normal')
+    pdf.text('Ausgefüllt von: ____________________', 15, yPosition)
+    yPosition += 8
+    pdf.text('Datum: ____________________', 15, yPosition)
+    yPosition += 12
+
+    pdf.setFontSize(10)
+    const col1Width = 35
+    const col2Width = 60
+    const col3Width = 60
+
+    const genres = [
+      { key: 'action', label: 'Action' },
+      { key: 'shooter', label: 'Shooter' },
+      { key: 'adventure', label: 'Adventure' },
+      { key: 'beatEmUps', label: 'Beat \'em ups' },
+      { key: 'jumpRun', label: 'Jump \'n\' Run' },
+      { key: 'openWorld', label: 'Open World' },
+      { key: 'rpg', label: 'Rollenspiele/RPG' },
+      { key: 'simulation', label: 'Simulationen' },
+      { key: 'strategy', label: 'Aufbau- und Strategiespiele' },
+      { key: 'sports', label: 'Sportspiele' },
+      { key: 'indie', label: 'Indie-Games' },
+      { key: 'serious', label: 'Serious Games' },
+    ]
+
+    pdf.setFillColor(200, 200, 200)
+    pdf.setFont('Helvetica', 'bold')
+    pdf.rect(15, yPosition - 5, col1Width, 8, 'F')
+    pdf.rect(15 + col1Width, yPosition - 5, col2Width, 8, 'F')
+    pdf.rect(15 + col1Width + col2Width, yPosition - 5, col3Width, 8, 'F')
+
+    pdf.text('Genre', 17, yPosition)
+    pdf.text('Beschreibung', 15 + col1Width + 2, yPosition)
+    pdf.text('Beispiele', 15 + col1Width + col2Width + 2, yPosition)
+    yPosition += 10
+
+    pdf.setFont('Helvetica', 'normal')
+    pdf.setFontSize(9)
+
+    genres.forEach((genre) => {
+      const desc = genreTable[genre.key]?.description || ''
+      const ex = genreTable[genre.key]?.examples || ''
+
+      const descLines = pdf.splitTextToSize(desc, col2Width - 4)
+      const exLines = pdf.splitTextToSize(ex, col3Width - 4)
+      const rowHeight = Math.max(6, descLines.length * 4, exLines.length * 4) + 2
+
+      if (yPosition + rowHeight > 270) {
+        pdf.addPage()
+        yPosition = 15
+      }
+
+      pdf.rect(15, yPosition, col1Width, rowHeight)
+      pdf.text(genre.label, 17, yPosition + 3)
+
+      pdf.rect(15 + col1Width, yPosition, col2Width, rowHeight)
+      pdf.text(descLines, 15 + col1Width + 2, yPosition + 3)
+
+      pdf.rect(15 + col1Width + col2Width, yPosition, col3Width, rowHeight)
+      pdf.text(exLines, 15 + col1Width + col2Width + 2, yPosition + 3)
+
+      yPosition += rowHeight
+    })
+
+    pdf.save(`Genre-Detektiv-Tabelle.pdf`)
+  }
+
+  // Beurteilungsbogen Berechnungsfunktionen
+  const calculateBeurteilung = () => {
+    const sumA = beurteilungData.partA.reduce((a, b) => a + b, 0)
+    const sumB = beurteilungData.partB.reduce((a, b) => a + b, 0)
+    const total = sumA + sumB
+    
+    // Maximalwerte je nach Format
+    const isPodcast = beurteilungData.format === 'Podcast'
+    const maxB = isPodcast ? 8 : 10
+    const maxPoints = isPodcast ? 43 : 45
+    
+    const percentage = (total / maxPoints) * 100
+
+    // Note nach deutschem Notensystem
+    let note = 6
+    if (percentage >= 96) note = 1
+    else if (percentage >= 85) note = 2
+    else if (percentage >= 70) note = 3
+    else if (percentage >= 55) note = 4
+    else if (percentage >= 40) note = 5
+
+    return { sumA, sumB, total, maxB, maxPoints, percentage: percentage.toFixed(1), note }
+  }
+
+  const printBeurteilung = () => {
+    const element = document.getElementById('beurteilungsbogen-print')
+    if (!element) return
+
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Beurteilungsbogen: Spielerezension</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          html { height: 100%; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            padding: 40px;
+            background: white;
+            color: #000;
+            line-height: 1.4;
+          }
+          h4, h5 { margin: 12px 0 8px 0; page-break-inside: avoid; }
+          h4 { font-size: 1.1em; }
+          h5 { font-size: 0.95em; }
+          div { page-break-inside: avoid; }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0;
+            page-break-inside: avoid;
+          }
+          td, th {
+            border: 1px solid #999;
+            padding: 6px;
+            text-align: left;
+            font-size: 0.9em;
+          }
+          th { background-color: #ddd; font-weight: bold; }
+          tr.bg-blue-200 { background-color: #bfdbfe; }
+          tr.bg-blue-100 { background-color: #dbeafe; }
+          tr.bg-green-200 { background-color: #bbf7d0; }
+          tr.bg-green-100 { background-color: #dcfce7; }
+          tr.bg-slate-50 { background-color: #f8fafc; }
+          tr.bg-slate-100 { background-color: #f1f5f9; }
+          input { border: 1px solid #999; padding: 2px 4px; font-size: 0.9em; }
+          textarea { border: 1px solid #999; padding: 4px; font-size: 0.9em; }
+          .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 8px 0;
+          }
+          .border-2 { border: 2px solid #999; }
+          .rounded-lg { border-radius: 4px; }
+          .p-6 { padding: 12px; }
+          input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 4px;
+            margin: 2px 0;
+          }
+          .text-xs { font-size: 0.75em; }
+          .italic { font-style: italic; }
+          .text-slate-600 { color: #475569; }
+          ul { margin-left: 20px; }
+          @page {
+            size: A4;
+            margin: 20mm;
+          }
+          @media print {
+            body { padding: 0; }
+            * { page-break-inside: avoid; }
+          }
+        </style>
+      </head>
+      <body>
+        ${element.innerHTML}
+      </body>
+      </html>
+    `)
+    printWindow.document.close()
+    setTimeout(() => {
+      printWindow.print()
+    }, 250)
+  }
+
+  const downloadArbeitsauftrag4 = () => {
+    const pdf = new jsPDF()
+    let yPosition = 15
+    const pageHeight = pdf.internal.pageSize.getHeight()
+
+    // Header
+    pdf.setFontSize(16)
+    pdf.setFont('Helvetica', 'bold')
+    pdf.setTextColor(30, 41, 59)
+    pdf.text('🏆 Arbeitsauftrag 4: Spielerezension', 15, yPosition)
+    yPosition += 10
+    pdf.setFontSize(12)
+    pdf.text('Leistungsnachweis (1. PLN)', 15, yPosition)
+    yPosition += 8
+
+    pdf.setFontSize(11)
+    pdf.setFont('Helvetica', 'normal')
+    pdf.setTextColor(0, 0, 0)
+
+    const content = [
+      'Betreff: Deine Beförderung: Vom Praktikanten zum Spieletester!',
+      '',
+      'Herzlichen Glückwunsch! Du übernimmst deine erste eigene Spielerezension – die Königsdisziplin bei „Pixel-Probe"!',
+      '',
+      'MISSION: Teste, Analysiere und Bewerte ein digitales Spiel (max. USK 16).',
+      '',
+      'VARIANTEN:',
+      '• Video: 3-5 Minuten (Einzelarbeit)',
+      '• Podcast: 5-7 Minuten (Partner- oder Einzelarbeit)',
+      '',
+      'PFLICHT-INHALTE (a-f):',
+      'a) Steckbrief: Name, USK, Genre, Zielgruppe',
+      'b) Inhalt: Gameplay, Ziel, Story',
+      'c) Spielmechaniken: Besonderheiten, Fachbegriffe',
+      'd) Motivationssysteme: 2-3 Systeme erklären',
+      'e) Chancen & Risiken: Lernen/Erleben vs. Suchtgefahr',
+      'f) Bewertung mit Begründung: Stärken & Schwächen',
+      '',
+      'Drehbuch/Skript: tabellarisch, Stichpunkte',
+      'Abgabetermin: 28.01.2025',
+      'Abgabeort: bycs-Drive oder bycs-Messenger',
+    ]
+
+    content.forEach(line => {
+      if (yPosition > pageHeight - 20) {
+        pdf.addPage()
+        yPosition = 15
+      }
+      if (line.startsWith('•')) {
+        pdf.text(line, 20, yPosition)
+      } else if (line === '') {
+        yPosition += 2
+        return
+      } else {
+        pdf.text(line, 15, yPosition)
+      }
+      yPosition += 6
+    })
+
+    pdf.save(`Arbeitsauftrag-4-Spielerezension.pdf`)
+  }
+
+  const downloadCheckliste = () => {
+    const pdf = new jsPDF()
+    let yPosition = 15
+
+    pdf.setFontSize(14)
+    pdf.setFont('Helvetica', 'bold')
+    pdf.setTextColor(30, 41, 59)
+    pdf.text('✓ Checkliste Abgabe (1. PLN)', 15, yPosition)
+    yPosition += 12
+
+    pdf.setFontSize(10)
+    pdf.setFont('Helvetica', 'normal')
+    pdf.setTextColor(0, 0, 0)
+
+    const checklist = [
+      '☐ Pünktliche Abgabe! (Eine Minute zu spät = Note 6)',
+      '☐ Podcast: *.mp3 Format',
+      '☐ Video: *.mp4 oder *.mov Format',
+      '☐ Drehbuch/Skript: Tabellarische Form (Word/Excel)',
+      '☐ Upload in bycs-Drive Ordner oder per Messenger',
+      '☐ Dateinamen: NACHNAME.mp3 / NACHNAME.mp4 / NACHNAME.docx',
+      '☐ Zeitliche Vorgaben: Video 3-5 Min, Podcast 5-7 Min',
+      '☐ Alle 6 Bewertungskriterien (a-f) erfüllt',
+      '☐ Voraus testen, ob Upload funktioniert!',
+      '☐ Probleme? Rechtzeitig deine Lehrkraft fragen (nicht 15 Min vor Deadline!)',
+    ]
+
+    checklist.forEach(item => {
+      pdf.text(item, 15, yPosition)
+      yPosition += 8
+      if (yPosition > 260) {
+        pdf.addPage()
+        yPosition = 15
+      }
+    })
+
+    pdf.save(`Checkliste-Spielerezension.pdf`)
+  }
+
+  const downloadBeurteilungsbogen = () => {
+    const pdf = new jsPDF()
+    let yPosition = 15
+    const pageWidth = pdf.internal.pageSize.getWidth()
+
+    // Header
+    pdf.setFontSize(14)
+    pdf.setFont('Helvetica', 'bold')
+    pdf.setTextColor(30, 41, 59)
+    pdf.text('Beurteilungsbogen: Spielerezension (PLN)', 15, yPosition)
+    yPosition += 10
+
+    pdf.setFontSize(10)
+    pdf.setFont('Helvetica', 'normal')
+    pdf.setTextColor(0, 0, 0)
+
+    const criteria = [
+      { name: 'a) Steckbrief', points: '/ 2', desc: 'Name, USK, Genre, Zielgruppe vollständig und korrekt' },
+      { name: 'b) Gameplay & Story', points: '/ 2', desc: 'Detaillierte Beschreibung von Gameplay, Ziel und Story' },
+      { name: 'c) Spielmechaniken', points: '/ 3', desc: 'Fachgerechte Analyse mit korrekten Fachbegriffen' },
+      { name: 'd) Motivationssysteme', points: '/ 2', desc: '2-3 Systeme vollständig erklärt' },
+      { name: 'e) Chancen & Risiken', points: '/ 2', desc: 'Beide Seiten ausgewogen dargestellt' },
+      { name: 'f) Bewertung & Begründung', points: '/ 2', desc: 'Klare Bewertung mit nachvollziehbarer Begründung' },
+      { name: 'Format & Qualität', points: '/ 2', desc: 'Video/Podcast: Technik, Schnitt, Ton; Skript: Struktur' },
+      { name: 'Zeitvorgaben', points: '/ 2', desc: 'Video 3-5 Min, Podcast 5-7 Min eingehalten' },
+      { name: 'Pünktlichkeit', points: '/ 2', desc: 'Abgabe pünktlich am 28.01.2025' },
+    ]
+
+    pdf.setFillColor(100, 150, 200)
+    pdf.setTextColor(255, 255, 255)
+    pdf.text('Kriterium', 15, yPosition)
+    pdf.text('Punkte', pageWidth - 30, yPosition)
+    yPosition += 8
+
+    pdf.setTextColor(0, 0, 0)
+    criteria.forEach(c => {
+      if (yPosition > 250) {
+        pdf.addPage()
+        yPosition = 15
+      }
+      pdf.setFont('Helvetica', 'bold')
+      pdf.text(c.name, 15, yPosition)
+      pdf.text(c.points, pageWidth - 30, yPosition)
+      yPosition += 6
+      pdf.setFont('Helvetica', 'normal')
+      const descLines = pdf.splitTextToSize(c.desc, pageWidth - 35)
+      pdf.text(descLines, 18, yPosition)
+      yPosition += descLines.length * 4 + 3
+    })
+
+    yPosition += 5
+    pdf.setFont('Helvetica', 'bold')
+    pdf.text('Gesamtpunkte: ___ / 17 Punkte', 15, yPosition)
+    yPosition += 8
+    pdf.text('Note:', 15, yPosition)
+    pdf.text('_____', 40, yPosition)
+
+    pdf.save(`Beurteilungsbogen-Spielerezension.pdf`)
+  }
+
+  const currentQuestion = quizQuestions[currentQuestionIndex]
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-slate-50">
       <header className="bg-gradient-to-br from-slate-800 to-slate-700 text-white py-12 px-4 text-center shadow-md relative">
         <Link to="/gamification" className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors">
           ← Zurück
@@ -15,94 +588,874 @@ export default function DigitaleSpiele() {
         <p className="text-lg text-slate-300">Analysiere und evaluiere digitale Spiele</p>
       </header>
 
-      <main className="flex-1 w-full max-w-6xl mx-auto p-12">
-        <div className="bg-white rounded-2xl p-10 shadow-sm border border-slate-100">
-          
-          <div className="flex gap-4 mb-10 border-b border-slate-200">
+      <main className="flex-1 w-full max-w-6xl mx-auto p-6">
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-cyan-200 mb-8">
+          <div className="bg-gradient-to-r from-cyan-50 to-blue-50 p-6 rounded-xl border-l-4 border-cyan-500">
+            <h2 className="text-2xl font-bold text-cyan-900 mb-4">🎉 Herzlichen Glückwunsch!</h2>
+            <p className="text-slate-800 mb-4 leading-relaxed">
+              Deine Bewerbung an unserer Online-Zeitschrift „<strong>Pixel-Probe</strong>" war erfolgreich! 
+            </p>
+            <p className="text-slate-800 mb-4 leading-relaxed">
+              Als erfolgreiches Start-up im Bereich Spieletestung sind wir direkter Partner von Spieleentwicklern und Publishern im In- und Ausland. 
+              Wir testen und bewerten digitale Spiele sowie neue Apps und geben unseren Auftraggebern wertvolles Feedback.
+            </p>
+            <p className="text-slate-800 mb-4 leading-relaxed">
+              Du startest ab sofort als „<strong>Rookie-Gametester</strong>" und musst zunächst eine Reihe von Aufgaben absolvieren, 
+              bevor du ein echter „<strong>Master-Gametester</strong>" wirst.
+            </p>
+            <p className="text-slate-800 leading-relaxed">
+              Für deine <strong>3-4 Arbeitstage</strong> bekommst du folgende Aufträge, die du Schritt-für-Schritt durcharbeiten sollst. 
+              Eine genaue Aufgabenbeschreibung findest du unten.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          {/* Arbeitsauftrag 1 */}
+          <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
             <button
-              onClick={() => setActiveTab('aufgaben')}
-              className={`pb-4 px-2 font-semibold transition-colors ${
-                activeTab === 'aufgaben'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+              onClick={() => toggleTask(1)}
+              className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
             >
-              Aufgaben
+              <div className="text-left">
+                <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  📝 Arbeitsauftrag 1: Fachbegriffe-Check
+                </h3>
+                <p className="text-slate-600 text-sm mt-2">
+                  Test dein Wissen über Spielmechaniken und Fachbegriffe
+                </p>
+              </div>
+              <span className={`text-2xl transform transition-transform ${expandedTasks[1] ? 'rotate-45' : ''}`}>➕</span>
             </button>
-            <button
-              onClick={() => setActiveTab('texte')}
-              className={`pb-4 px-2 font-semibold transition-colors ${
-                activeTab === 'texte'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Texte
-            </button>
-            <button
-              onClick={() => setActiveTab('uebungen')}
-              className={`pb-4 px-2 font-semibold transition-colors ${
-                activeTab === 'uebungen'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Übungen
-            </button>
+            {expandedTasks[1] && (
+              <div className="px-6 pb-6 border-t border-slate-200">
+                <div className="bg-white p-6 rounded-lg space-y-4">
+                  <div className="text-slate-800 space-y-3">
+                    <p className="font-semibold">Hallo liebe/r Praktikant/in,</p>
+                    <p>
+                      willkommen im Team von <strong>"Pixel-Probe"</strong>! Du kennst dich bereits mit verschiedenen Spielmechaniken und typischen Spielelementen aus, da du dich intensiv mit Brettspielen beschäftigt hast.
+                    </p>
+                    <p>
+                      Für unsere Redaktion ist es wichtig, dass wir wie echte Profis klingen und die richtigen Fachbegriffe verwenden.
+                    </p>
+                    <p className="font-semibold mt-4">Dein Auftrag:</p>
+                    <ol className="list-decimal list-inside space-y-2 ml-2">
+                      <li>Beantworte 15 zufällige Fragen zu Spielmechaniken</li>
+                      <li>Du musst mindestens 75% (11-12 Fragen) richtig beantworten</li>
+                      <li>Nach erfolgreichem Test erhältst du eine PDF-Bestätigung</li>
+                      <li>Speichere die PDF und zeige sie deiner Lehrkraft</li>
+                    </ol>
+                  </div>
+
+                  {!quizStarted ? (
+                    <button
+                      onClick={startQuiz}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-lg mt-6"
+                    >
+                      🎯 Quiz starten
+                    </button>
+                  ) : (
+                    <div className="space-y-4 mt-6">
+                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <div className="flex justify-between items-center mb-4">
+                          <span className="font-bold text-slate-900">Frage {currentQuestionIndex + 1} von {quizQuestions.length}</span>
+                          <span className="font-bold text-blue-600">Score: {score}/{quizQuestions.length}</span>
+                        </div>
+                        <div className="w-full bg-slate-300 rounded-full h-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full transition-all"
+                            style={{ width: `${((currentQuestionIndex + 1) / quizQuestions.length) * 100}%` }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      {currentQuestion && (
+                        <div className="bg-white p-6 rounded-lg border-2 border-blue-300">
+                          <h4 className="font-bold text-lg text-slate-900 mb-6">{currentQuestion.question}</h4>
+                          <div className="space-y-3">
+                            {currentQuestion.options.map((option, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => handleAnswerSelect(idx)}
+                                disabled={answered}
+                                className={`w-full p-4 rounded-lg text-left font-medium transition-all ${
+                                  answered && idx === currentQuestion.correctAnswer
+                                    ? 'bg-green-100 border-2 border-green-500 text-green-900'
+                                    : answered && idx === selectedAnswer && idx !== currentQuestion.correctAnswer
+                                    ? 'bg-red-100 border-2 border-red-500 text-red-900'
+                                    : selectedAnswer === idx && !answered
+                                    ? 'bg-blue-100 border-2 border-blue-500 text-blue-900'
+                                    : 'bg-slate-100 border-2 border-slate-300 text-slate-900 hover:bg-slate-200'
+                                } ${answered ? 'cursor-default' : 'cursor-pointer'}`}
+                              >
+                                <span className="flex items-center gap-3">
+                                  <span className="font-bold">{String.fromCharCode(65 + idx)}.</span>
+                                  <span>{option}</span>
+                                  {answered && idx === currentQuestion.correctAnswer && <span className="ml-auto">✓</span>}
+                                  {answered && idx === selectedAnswer && idx !== currentQuestion.correctAnswer && <span className="ml-auto">✗</span>}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+
+                          {answered && (
+                            <div className={`mt-4 p-3 rounded-lg font-semibold text-sm ${
+                              selectedAnswer === currentQuestion.correctAnswer
+                                ? 'bg-green-100 text-green-900 border border-green-300'
+                                : 'bg-red-100 text-red-900 border border-red-300'
+                            }`}>
+                              {selectedAnswer === currentQuestion.correctAnswer 
+                                ? '✓ Richtig!' 
+                                : `✗ Falsch! Die korrekte Antwort ist: ${currentQuestion.options[currentQuestion.correctAnswer]}`
+                              }
+                            </div>
+                          )}
+
+                          {answered && (
+                            <button
+                              onClick={nextQuestion}
+                              className="w-full mt-4 bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                            >
+                              {currentQuestionIndex < quizQuestions.length - 1 ? 'Nächste Frage →' : 'Quiz beenden'}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
-          {activeTab === 'aufgaben' && (
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">Aufgaben</h2>
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-slate-50 rounded-xl p-6 border border-slate-200">
-                    <div className="text-4xl mb-4">🎮</div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Aufgabe {i}</h3>
-                    <p className="text-slate-600 text-sm mb-4">Analysiere ein digitales Spiel...</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-semibold text-blue-600">100 Punkte</span>
-                      <button className="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
-                        Öffnen
+          {/* Arbeitsauftrag 2 */}
+          <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+            <button
+              onClick={() => toggleTask(2)}
+              className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+            >
+              <div className="text-left">
+                <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  🔍 Arbeitsauftrag 2: Genre-Detektiv
+                </h3>
+                <p className="text-slate-600 text-sm mt-2">
+                  Fülle eine Tabelle mit den Characteristiken verschiedener Spielgenres aus
+                </p>
+              </div>
+              <span className={`text-2xl transform transition-transform ${expandedTasks[2] ? 'rotate-45' : ''}`}>➕</span>
+            </button>
+            {expandedTasks[2] && (
+              <div className="px-6 pb-6 border-t border-slate-200">
+                <div className="bg-white p-6 rounded-lg space-y-4">
+                  <div className="text-slate-800 space-y-3">
+                    <p className="font-semibold text-lg">Betreff: MISSION: Genre-Detektiv – Deine erste Spurensuche!</p>
+                    <p>
+                      Hallo angehender Spielexperte, willkommen zurück in der <strong>"Pixel-Probe"-Zentrale</strong>! Jetzt wird's Zeit für den nächsten Schritt.
+                    </p>
+                    <p>
+                      Bei "Pixel-Probe" leben wir davon, Spiele in- und auswendig zu kennen. Ein Profi erkennt alle Genres und kann sie auseinanderhalten.
+                    </p>
+                    <p className="font-semibold mt-4">Dein Arbeitsauftrag im Detail:</p>
+                    <ol className="list-decimal list-inside space-y-3 ml-2">
+                      <li>
+                        <strong>Recherche-Phase (ca. 45 Minuten):</strong> Nutze das Internet (Gaming-Websites, Wikis, YouTube-Videos) und dein Vorwissen, um die Tabelle auszufüllen. Konzentriere dich darauf, die Essenz jedes Genres zu erfassen und passende Beispiele zu finden. Wenn dir ein Laptop zur Verfügung steht, kannst du diese Tabelle digital erstellen.
+                      </li>
+                      <li>
+                        <strong>Konsolidierung (ca. 15 Minuten):</strong> Überprüfe deine Einträge. Sind sie klar und verständlich formuliert? Sind die Beispiele treffend?
+                      </li>
+                      <li>
+                        <strong>Abgabe:</strong> Schicke die ausgefüllte Tabelle an deine Teamleitung (E-Mail oder Abgabeort erfragen).
+                      </li>
+                    </ol>
+                    <p className="text-slate-700 italic mt-4">Zeig uns, dass du ein scharfes Auge für Spielarten hast! Viel Erfolg bei deiner Detektivarbeit! – Dein "Pixel-Probe"-Team</p>
+                  </div>
+
+                  <div className="mt-6 pt-6 border-t border-slate-200">
+                    <h4 className="font-bold text-slate-900 mb-4">📊 Genre-Analyse Tabelle</h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse text-sm">
+                        <thead>
+                          <tr className="bg-blue-100">
+                            <th className="border border-slate-300 p-2 text-left font-semibold text-slate-900">Genre</th>
+                            <th className="border border-slate-300 p-2 text-left font-semibold text-slate-900">Beschreibung</th>
+                            <th className="border border-slate-300 p-2 text-left font-semibold text-slate-900">Beispiele</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            { key: 'action', label: 'Action' },
+                            { key: 'shooter', label: 'Shooter' },
+                            { key: 'adventure', label: 'Adventure' },
+                            { key: 'beatEmUps', label: 'Beat \'em ups' },
+                            { key: 'jumpRun', label: 'Jump \'n\' Run' },
+                            { key: 'openWorld', label: 'Open World' },
+                            { key: 'rpg', label: 'Rollenspiele/RPG' },
+                            { key: 'simulation', label: 'Simulationen' },
+                            { key: 'strategy', label: 'Aufbau- und Strategiespiele' },
+                            { key: 'sports', label: 'Sportspiele' },
+                            { key: 'indie', label: 'Indie-Games' },
+                            { key: 'serious', label: 'Serious Games' },
+                          ].map((genre) => (
+                            <tr key={genre.key} className="hover:bg-slate-50">
+                              <td className="border border-slate-300 p-2 font-semibold text-slate-900">{genre.label}</td>
+                              <td className="border border-slate-300 p-2">
+                                <textarea
+                                  value={genreTable[genre.key].description}
+                                  onChange={(e) => handleGenreChange(genre.key, 'description', e.target.value)}
+                                  placeholder="Merkmale..."
+                                  className="w-full p-1 border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-xs"
+                                  rows={2}
+                                />
+                              </td>
+                              <td className="border border-slate-300 p-2">
+                                <textarea
+                                  value={genreTable[genre.key].examples}
+                                  onChange={(e) => handleGenreChange(genre.key, 'examples', e.target.value)}
+                                  placeholder="Spiele..."
+                                  className="w-full p-1 border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-xs"
+                                  rows={2}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <button
+                      onClick={downloadGenreTable}
+                      className="mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors inline-flex items-center gap-2"
+                    >
+                      📥 Tabelle als PDF herunterladen
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          {/* Arbeitsauftrag 3 */}
+          <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+            <button
+              onClick={() => toggleTask(3)}
+              className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+            >
+              <div className="text-left">
+                <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  🎮 Arbeitsauftrag 3: Ein Spiel zerlegen
+                </h3>
+                <p className="text-slate-600 text-sm mt-2">
+                  Analysiere ein digitales Spiel und erkläre, wie es funktioniert
+                </p>
+              </div>
+              <span className={`text-2xl transform transition-transform ${expandedTasks[3] ? 'rotate-45' : ''}`}>➕</span>
+            </button>
+            {expandedTasks[3] && (
+              <div className="px-6 pb-6 border-t border-slate-200">
+                <div className="bg-white p-6 rounded-lg space-y-4">
+                  <div className="text-slate-800 space-y-3">
+                    <p className="text-sm font-semibold text-slate-600">An: Praktikant/in (Analyse-Abteilung)</p>
+                    <p className="text-sm font-semibold text-slate-600">Von: Chefredaktion "Pixel-Probe"</p>
+                    <p className="font-semibold text-lg mb-4">Betreff: Super gemacht! Nächster Schritt: Wie funktioniert ein Spiel?</p>
+                    
+                    <p>
+                      Hallo liebe/r Praktikant/in,
+                    </p>
+                    <p>
+                      du hast die Genres super sortiert! Du weißt jetzt, welche Arten von Spielen es gibt. Jetzt wollen wir bei "Pixel-Probe" wissen: <strong>Warum macht ein Spiel Spaß? Was steckt in einem Spiel drin?</strong> Wir schauen uns jetzt die Bauteile eines Spiels genau an.
+                    </p>
+
+                    <p className="font-semibold mt-4 text-base">Dein Arbeitsauftrag: Ein Spiel zerlegen</p>
+                    <p>Wähle ein digitales Spiel, das du gut kennst. Deine Aufgabe ist es, dieses Spiel genau anzuschauen und einen kurzen Analyse-Übersicht zu erstellen (als Textdokument oder Präsentation).</p>
+
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 space-y-3">
+                      <p className="font-semibold text-blue-900">📋 Teil 1: Die Spielidee</p>
+                      <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
+                        <li><strong>Spielidee:</strong> Worum geht's in 1-2 Sätzen? (z.B. "Bei Minecraft in einer Block-Welt überleben und bauen.")</li>
+                        <li><strong>Genre:</strong> Welches Genre hat das Spiel?</li>
+                        <li><strong>Zielgruppe:</strong> Für wen ist das Spiel gemacht? (z.B. Alter, Gelegenheitsspieler, Profis?)</li>
+                        <li><strong>Spielziel:</strong> Was muss man tun, um zu gewinnen oder das Spiel zu beenden?</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200 space-y-3">
+                      <p className="font-semibold text-green-900">🎨 Teil 2: Das Spieldesign</p>
+                      <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
+                        <li><strong>Kern-Spielmechanik:</strong> Was macht man die ganze Zeit? (z.B. bei Super Mario: springen; bei Call of Duty: zielen und schießen)</li>
+                        <li><strong>Andere Mechaniken:</strong> Was macht man noch oft? (z.B. schleichen, craften, reden, rätseln?)</li>
+                        <li><strong>Grafik-Stil:</strong> Wie sieht das Spiel aus und welche Stimmung erzeugt das? (z.B. echt, wie ein Comic, Pixel-Look?)</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 space-y-3">
+                      <p className="font-semibold text-purple-900">⭐ Teil 3: Die Motivations-Tricks</p>
+                      <p className="text-sm">Warum spielt man weiter? Wähle die <strong>fünf wichtigsten Tricks</strong> aus dieser Liste aus und erkläre kurz, wie sie im Spiel funktionieren:</p>
+                      <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
+                        <li><strong>Punkte:</strong> Gibt es Highscores oder Erfahrungspunkte?</li>
+                        <li><strong>Belohnungen:</strong> Findet man neue Sachen? Kriegt man Spiel-Geld?</li>
+                        <li><strong>Abzeichen / Erfolge:</strong> Gibt es Trophäen?</li>
+                        <li><strong>Ranglisten:</strong> Wirst du mit anderen Spielern verglichen?</li>
+                        <li><strong>Levelsysteme:</strong> Wird dein Charakter besser? Lernst du Neues dazu?</li>
+                        <li><strong>Feedback:</strong> Woran merkst du, dass du was gut gemacht hast? (z.B. durch Geräusche, Vibration, Effekte?)</li>
+                        <li><strong>Missionen / Quests:</strong> Gibt es klare Aufgaben?</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 space-y-3">
+                      <p className="font-semibold text-yellow-900">📊 Teil 4: Dein Ergebnis</p>
+                      <p className="text-sm">Erstelle eine kurze, klare Analyse in der Form einer <strong>Präsentation oder eines Text-Dokuments</strong>. Nutze unbedingt <strong>Bilder/Screenshots und Stichpunkte</strong>. Auf der Analyse sollen <strong>keine vollständigen Sätze geschrieben stehen!</strong> Sei bereit, deine Ergebnisse in der nächsten Redaktionssitzung (im Plenum) in ca. <strong>5 Minuten vorzustellen</strong>.</p>
+                    </div>
+
+                    <p className="text-slate-700 italic mt-4 pt-4 border-t border-slate-300">Viel Erfolg bei der Analyse! – Dein "Pixel-Probe"-Team</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Arbeitsauftrag 4 */}
+          <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+            <button
+              onClick={() => toggleTask(4)}
+              className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+            >
+              <div className="text-left">
+                <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  🏆 Arbeitsauftrag 4: Spielerezension (Leistungsnachweis)
+                </h3>
+                <p className="text-slate-600 text-sm mt-2">
+                  Teste und bewerte ein Spiel wie ein professioneller Spieletester
+                </p>
+              </div>
+              <span className={`text-2xl transform transition-transform ${expandedTasks[4] ? 'rotate-45' : ''}`}>➕</span>
+            </button>
+            {expandedTasks[4] && (
+              <div className="px-6 pb-6 border-t border-slate-200">
+                <div className="bg-white p-6 rounded-lg space-y-4">
+                  <div className="text-slate-800 space-y-3">
+                    <p className="font-semibold text-lg mb-4">Betreff: Deine Beförderung: Vom Praktikanten zum Spieletester!</p>
+                    
+                    <p>
+                      Herzlichen Glückwunsch! Deine bisherige Arbeit hat uns im Redaktionsteam von <strong>"Pixel-Probe"</strong> schwer beeindruckt. Dein Gespür für Genres ist ausgezeichnet. Deshalb ist es an der Zeit für den nächsten, entscheidenden Schritt auf deiner Karriereleiter: <strong>Du übernimmst heute die Verantwortung für deine erste eigene Spielerezension!</strong>
+                    </p>
+                    
+                    <p>
+                      Das ist die Königsdisziplin in unserem Job. Unsere Leserinnen und Leser vertrauen auf unser Urteil. Sie wollen wissen, ob sich der Kauf eines Spiels lohnt, was sie erwartet und worauf sie achten müssen.
+                    </p>
+
+                    <p className="font-semibold text-base mt-4">Deine Mission: Teste, Analysiere und Bewerte!</p>
+                    <p>
+                      Deine Aufgabe ist es, dir ein digitales Spiel deiner Wahl auszusuchen (die Altersfreigabe darf maximal <strong>USK 16</strong> sein) und es einem ausführlichen Test zu unterziehen. Du schlüpfst dabei in die Rolle eines professionellen Redakteurs.
+                    </p>
+                    <p className="text-red-700 font-semibold">
+                      ⚠️ Da deine Rezension mit einer Note beurteilt wird, kläre im Vorfeld ab, bis wann deine Rezension eingereicht werden muss. Frage hierfür deine Lehrkraft!
+                    </p>
+                  </div>
+
+                  {/* Informationen */}
+                  <div className="bg-red-50 p-4 rounded-lg border border-red-200 space-y-2">
+                    <p className="font-semibold text-red-900">⚠️ Wichtig:</p>
+                    <p className="text-red-800 text-sm">Da deine Rezension mit einer Note beurteilt wird, kläre im Vorfeld ab, bis wann deine Rezension eingereicht werden muss. Frage hierfür deine Lehrkraft!</p>
+                  </div>
+
+                  {/* Vorbereitung */}
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 space-y-3">
+                    <p className="font-semibold text-blue-900">📝 Die Vorbereitung</p>
+                    <p className="text-sm">Wähle ein Spiel aus, das du gut kennst (max. USK 16) und bewerten möchtest.</p>
+                  </div>
+
+                  {/* Analyse & Gestaltung */}
+                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 space-y-3">
+                    <p className="font-semibold text-purple-900">🎬 Analyse & Gestaltung deiner Rezension</p>
+                    <p className="text-sm">Erstelle eine ausführliche Rezension in digitaler Form. Du kannst dich dabei zwischen Varianten entscheiden:</p>
+                    
+                    <div className="ml-2 space-y-2 text-sm">
+                      <p className="font-semibold text-purple-800">🎥 Video (Einzelarbeit) - 3-5 Minuten:</p>
+                      <ul className="list-disc list-inside ml-2 text-xs space-y-1 text-slate-700">
+                        <li>Kurzes Video über das Spiel (z.B. als \"Lets Play\")</li>
+                        <li>DEINE Stimme muss zu hören sein</li>
+                        <li>Videoschnitt und Voice-Overlay von dir</li>
+                        <li>Format: *.mp4 oder *.mov</li>
+                        <li>Software-Tipps: OBS, CapCut, iMovie</li>
+                      </ul>
+
+                      <p className="font-semibold text-purple-800 pt-2">🎙️ Podcast (Partner- oder Einzelarbeit) - 5-7 Minuten:</p>
+                      <ul className="list-disc list-inside ml-2 text-xs space-y-1 text-slate-700">
+                        <li>Podcast-Gespräch über das Spiel</li>
+                        <li>Optional mit einem Partner</li>
+                        <li>Selbstschnitt erforderlich</li>
+                        <li>Format: *.mp3</li>
+                        <li>Software-Tipps: Audacity, GarageBand, WaveEditor</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Pflicht-Inhalte */}
+                  <div className="space-y-3">
+                    <p className="font-semibold text-slate-900">✅ Pflicht-Inhalte (Video & Podcast)</p>
+                    
+                    <div className="ml-2 space-y-2 text-sm">
+                      <p className="font-semibold">📄 Drehbuch / Skript (tabellarisch, Stichpunkte)</p>
+                      
+                      <div className="bg-slate-100 p-3 rounded space-y-2">
+                        <p className="font-semibold text-slate-800">a) Steckbrief:</p>
+                        <ul className="list-disc list-inside ml-2 text-xs space-y-1">
+                          <li>Name des Spiels</li>
+                          <li>USK-Altersfreigabe</li>
+                          <li>Genre</li>
+                          <li>Zielgruppe</li>
+                        </ul>
+
+                        <p className="font-semibold text-slate-800 pt-2">b) Inhalt:</p>
+                        <ul className="list-disc list-inside ml-2 text-xs space-y-1">
+                          <li><strong>Gameplay:</strong> Wie spielt es sich? Steuerung? Spaß & Frustration?</li>
+                          <li><strong>Ziel:</strong> Was ist das Ziel? Wie wird es erreicht?</li>
+                          <li><strong>Story:</strong> Worum geht es? Ist sie spannend? (falls vorhanden)</li>
+                        </ul>
+
+                        <p className="font-semibold text-slate-800 pt-2">c) Spieltypische Elemente & Spielmechaniken:</p>
+                        <ul className="list-disc list-inside ml-2 text-xs space-y-1">
+                          <li>Welche besonderen Mechaniken gibt es? (Crafting, Skill-Trees, Level-Systeme)</li>
+                          <li>Was macht das Spiel einzigartig?</li>
+                          <li>Verwende korrekte Fachbegriffe!</li>
+                        </ul>
+
+                        <p className="font-semibold text-slate-800 pt-2">d) Motivationssysteme:</p>
+                        <ul className="list-disc list-inside ml-2 text-xs space-y-1">
+                          <li>Wähle 2-3 Systeme, die das Spiel nutzt</li>
+                          <li>Optionen: Punkte, Belohnungen, Abzeichen, Ranglisten, Level, Feedback, Quests</li>
+                        </ul>
+
+                        <p className="font-semibold text-slate-800 pt-2">e) Chancen & Risiken:</p>
+                        <ul className="list-disc list-inside ml-2 text-xs space-y-1">
+                          <li><strong>Chancen:</strong> Was kann man lernen/erleben? (Teamfähigkeit, Kreativität...)</li>
+                          <li><strong>Risiken:</strong> Suchtgefahr, In-Game-Käufe, Frustpotenzial, Gewalt?</li>
+                        </ul>
+
+                        <p className="font-semibold text-slate-800 pt-2">f) Bewertung mit Begründung:</p>
+                        <ul className="list-disc list-inside ml-2 text-xs space-y-1">
+                          <li>Klare Bewertung (z.B. 8/10, 4/5 Sterne, \"Sehr empfehlenswert\")</li>
+                          <li><strong>WICHTIG:</strong> Begründung! Warum? Stärken & Schwächen?</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Checkliste */}
+                  <div className="bg-red-50 p-4 rounded-lg border border-red-200 space-y-2">
+                    <p className="font-semibold text-red-900">✓ Checkliste Abgabe (1. PLN):</p>
+                    <ul className="list-disc list-inside ml-2 text-xs space-y-1 text-red-800">
+                      <li>Pünktliche Abgabe! (Eine Minute zu spät = Note 6)</li>
+                      <li>Podcast: *.mp3 Format</li>
+                      <li>Video: *.mp4 oder *.mov Format</li>
+                      <li>Drehbuch/Skript: Tabellarische Form (Word/Excel)</li>
+                      <li>Upload in bycs-Drive Ordner oder per Messenger</li>
+                      <li>Dateinamen: NACHNAME.mp3 / NACHNAME.mp4 / NACHNAME.docx</li>
+                      <li>Zeitliche Vorgaben: Video 3-5 Min, Podcast 5-7 Min</li>
+                      <li>Alle 6 Bewertungskriterien (a-f) erfüllt</li>
+                      <li>Voraus testen, ob Upload funktioniert!</li>
+                      <li>Probleme? Rechtzeitig deine Lehrkraft fragen (nicht 15 Min vor Deadline!)</li>
+                    </ul>
+                  </div>
+
+                  <p className="text-slate-700 italic pt-4 border-t border-slate-300">Viel Erfolg bei deiner Rezension! Wir freuen uns auf dein professionelles Urteil! – Dein \"Pixel-Probe\"-Team 🚀</p>
+
+                  {/* Beurteilungsbogen Container mit ID für Print */}
+                  <div id="beurteilungsbogen-print">
+                    <h4 className="text-xl font-bold text-slate-900 mb-6">📋 Beurteilungsbogen: Spielerezension</h4>
+
+                    {/* Schülerdaten */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                      <input
+                        type="text"
+                        placeholder="Name(n) der Schüler/in"
+                        value={beurteilungData.schuelerName}
+                        onChange={e => setBeurteilungData({...beurteilungData, schuelerName: e.target.value})}
+                        className="border-2 border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Klasse"
+                        value={beurteilungData.klasse}
+                        onChange={e => setBeurteilungData({...beurteilungData, klasse: e.target.value})}
+                        className="border-2 border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Getestetes Spiel"
+                        value={beurteilungData.spielName}
+                        onChange={e => setBeurteilungData({...beurteilungData, spielName: e.target.value})}
+                        className="border-2 border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500"
+                      />
+                      <select
+                        value={beurteilungData.format}
+                        onChange={e => setBeurteilungData({...beurteilungData, format: e.target.value})}
+                        className="border-2 border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500"
+                      >
+                        <option value="">Abgegebenes Format</option>
+                        <option value="Video">Video</option>
+                        <option value="Podcast">Podcast</option>
+                      </select>
+                    </div>
+
+                    {/* Teil A: Formalien & Inhalt */}
+                    <div className="mb-6">
+                      <h5 className="font-bold text-slate-900 mb-3 text-lg">Teil A: Formalien & Inhalt (max. 35 Punkte)</h5>
+                      <div className="overflow-x-auto border border-slate-300 rounded-lg">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="bg-blue-200">
+                              <th className="border border-slate-300 p-2 text-left">Kriterium</th>
+                              <th className="border border-slate-300 p-2 w-20">Max. Punkte</th>
+                              <th className="border border-slate-300 p-2 w-24">Punkte</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="border border-slate-300 p-2">1. Formale Kriterien & Vollständigkeit</td>
+                              <td className="border border-slate-300 p-2 text-center">5</td>
+                              <td className="border border-slate-300 p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="5"
+                                  value={beurteilungData.partA[0]}
+                                  onChange={e => {
+                                    const newA = [...beurteilungData.partA]
+                                    newA[0] = Math.min(5, Math.max(0, parseInt(e.target.value) || 0))
+                                    setBeurteilungData({...beurteilungData, partA: newA})
+                                  }}
+                                  className="w-full border border-slate-300 rounded p-1"
+                                />
+                              </td>
+                            </tr>
+                            <tr className="bg-slate-50">
+                              <td colSpan={3} className="border border-slate-300 p-2 text-xs text-slate-600 italic">
+                                Alle geforderten Abschnitte (a-f) sind vorhanden und klar erkennbar. Ein tabellarisches Drehbuch/Skript mit Stichpunkten liegt vor. Alle Dokumente oder Dateien wurden rechtzeitig und im geforderten Dateiformat (*.mp4 oder *.mp3) abgegeben.
+                              </td>
+                            </tr>
+                            <tr className="bg-slate-50">
+                              <td className="border border-slate-300 p-2">2. Inhaltliche Darstellung (Steckbrief, Gameplay & Story)</td>
+                              <td className="border border-slate-300 p-2 text-center">10</td>
+                              <td className="border border-slate-300 p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="10"
+                                  value={beurteilungData.partA[1]}
+                                  onChange={e => {
+                                    const newA = [...beurteilungData.partA]
+                                    newA[1] = Math.min(10, Math.max(0, parseInt(e.target.value) || 0))
+                                    setBeurteilungData({...beurteilungData, partA: newA})
+                                  }}
+                                  className="w-full border border-slate-300 rounded p-1"
+                                />
+                              </td>
+                            </tr>
+                            <tr className="bg-slate-50">
+                              <td colSpan={3} className="border border-slate-300 p-2 text-xs text-slate-600 italic">
+                                Der Steckbrief ist vollständig und korrekt (Name, USK, Genre, Zielgruppe). Gameplay wird mit konkreten Beispielen erläutert (Steuerung, Spielablauf, Spaß-/Frustfaktoren). Story bzw. Hauptziel des Spiels wird verständlich dargestellt.
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="border border-slate-300 p-2">3. Spielmechaniken & Motivationssysteme</td>
+                              <td className="border border-slate-300 p-2 text-center">5</td>
+                              <td className="border border-slate-300 p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="5"
+                                  value={beurteilungData.partA[2]}
+                                  onChange={e => {
+                                    const newA = [...beurteilungData.partA]
+                                    newA[2] = Math.min(5, Math.max(0, parseInt(e.target.value) || 0))
+                                    setBeurteilungData({...beurteilungData, partA: newA})
+                                  }}
+                                  className="w-full border border-slate-300 rounded p-1"
+                                />
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3} className="border border-slate-300 p-2 text-xs text-slate-600 italic bg-slate-50">
+                                Besondere Spielmechaniken (z.B. Crafting, Skill-Trees, Level-Systeme) werden mit korrekten Fachbegriffen benannt. Es wurden 2-3 zentrale Motivationssysteme identifiziert und deren Funktionsweise im Spiel kurz erklärt.
+                              </td>
+                            </tr>
+                            <tr className="bg-slate-50">
+                              <td className="border border-slate-300 p-2">4. Chancen & Risiken</td>
+                              <td className="border border-slate-300 p-2 text-center">5</td>
+                              <td className="border border-slate-300 p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="5"
+                                  value={beurteilungData.partA[3]}
+                                  onChange={e => {
+                                    const newA = [...beurteilungData.partA]
+                                    newA[3] = Math.min(5, Math.max(0, parseInt(e.target.value) || 0))
+                                    setBeurteilungData({...beurteilungData, partA: newA})
+                                  }}
+                                  className="w-full border border-slate-300 rounded p-1"
+                                />
+                              </td>
+                            </tr>
+                            <tr className="bg-slate-50">
+                              <td colSpan={3} className="border border-slate-300 p-2 text-xs text-slate-600 italic">
+                                Mindestens 2 Chancen (z.B. Lerneffekte, Kompetenzen) und 2 Risiken (z.B. Suchtgefahr, In-Game-Käufe) werden genannt und begründet. Die Auseinandersetzung ist differenziert und nicht nur oberflächlich.
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="border border-slate-300 p-2">5. Bewertung & Begründung</td>
+                              <td className="border border-slate-300 p-2 text-center">10</td>
+                              <td className="border border-slate-300 p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="10"
+                                  value={beurteilungData.partA[4]}
+                                  onChange={e => {
+                                    const newA = [...beurteilungData.partA]
+                                    newA[4] = Math.min(10, Math.max(0, parseInt(e.target.value) || 0))
+                                    setBeurteilungData({...beurteilungData, partA: newA})
+                                  }}
+                                  className="w-full border border-slate-300 rounded p-1"
+                                />
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3} className="border border-slate-300 p-2 text-xs text-slate-600 italic bg-slate-50">
+                                Eine klare Bewertung (z.B. X von 10 Punkten, Sterne-Bewertung) wird vergeben. Die Begründung benennt konkret Stärken und Schwächen des Spiels und leitet sich logisch aus der vorherigen Analyse ab.
+                              </td>
+                            </tr>
+                            <tr className="bg-blue-100 font-bold">
+                              <td className="border border-slate-300 p-2">Zwischensumme Teil A</td>
+                              <td className="border border-slate-300 p-2 text-center">35</td>
+                              <td className="border border-slate-300 p-2 text-center">{beurteilungData.partA.reduce((a, b) => a + b, 0)} / 35</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Teil B: Podcast/Video */}
+                    <div className="mb-6">
+                      <h5 className="font-bold text-slate-900 mb-3 text-lg">Teil B: Podcast / Video (max. {beurteilungData.format === 'Podcast' ? '8' : '10'} Punkte)</h5>
+                      <div className="overflow-x-auto border border-slate-300 rounded-lg">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="bg-green-200">
+                              <th className="border border-slate-300 p-2 text-left">Kriterium</th>
+                              <th className="border border-slate-300 p-2 w-20">Max. Punkte</th>
+                              <th className="border border-slate-300 p-2 w-24">Punkte</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="border border-slate-300 p-2">1. Audioqualität - Stimme</td>
+                              <td className="border border-slate-300 p-2 text-center">2</td>
+                              <td className="border border-slate-300 p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="2"
+                                  value={beurteilungData.partB[0]}
+                                  onChange={e => {
+                                    const newB = [...beurteilungData.partB]
+                                    newB[0] = Math.min(2, Math.max(0, parseInt(e.target.value) || 0))
+                                    setBeurteilungData({...beurteilungData, partB: newB})
+                                  }}
+                                  className="w-full border border-slate-300 rounded p-1"
+                                />
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3} className="border border-slate-300 p-2 text-xs text-slate-600 italic bg-slate-50">
+                                Die Stimme ist klar und deutlich verständlich. Lautstärke ist angemessen und konstant.
+                              </td>
+                            </tr>
+                            <tr className="bg-slate-50">
+                              <td className="border border-slate-300 p-2">2. Audioqualität - Hintergrund</td>
+                              <td className="border border-slate-300 p-2 text-center">2</td>
+                              <td className="border border-slate-300 p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="2"
+                                  value={beurteilungData.partB[1]}
+                                  onChange={e => {
+                                    const newB = [...beurteilungData.partB]
+                                    newB[1] = Math.min(2, Math.max(0, parseInt(e.target.value) || 0))
+                                    setBeurteilungData({...beurteilungData, partB: newB})
+                                  }}
+                                  className="w-full border border-slate-300 rounded p-1"
+                                />
+                              </td>
+                            </tr>
+                            <tr className="bg-slate-50">
+                              <td colSpan={3} className="border border-slate-300 p-2 text-xs text-slate-600 italic">
+                                Kein störendes Rauschen, Hall oder Hintergrundgeräusche. Aufnahme ist professionell und ohne technische Mängel.
+                              </td>
+                            </tr>
+                            {beurteilungData.format !== 'Podcast' && (
+                            <tr>
+                              <td className="border border-slate-300 p-2">3. Videoqualität</td>
+                              <td className="border border-slate-300 p-2 text-center">2</td>
+                              <td className="border border-slate-300 p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="2"
+                                  value={beurteilungData.partB[2]}
+                                  onChange={e => {
+                                    const newB = [...beurteilungData.partB]
+                                    newB[2] = Math.min(2, Math.max(0, parseInt(e.target.value) || 0))
+                                    setBeurteilungData({...beurteilungData, partB: newB})
+                                  }}
+                                  className="w-full border border-slate-300 rounded p-1"
+                                />
+                              </td>
+                            </tr>
+                            )}
+                            {beurteilungData.format !== 'Podcast' && (
+                            <tr>
+                              <td colSpan={3} className="border border-slate-300 p-2 text-xs text-slate-600 italic bg-slate-50">
+                                Bildqualität ist ausreichend scharf und gut belichtet. Bildausschnitt ist angemessen gewählt.
+                              </td>
+                            </tr>
+                            )}
+                            <tr className="bg-slate-50">
+                              <td className="border border-slate-300 p-2">4. Inhaltliche Umsetzung</td>
+                              <td className="border border-slate-300 p-2 text-center">2</td>
+                              <td className="border border-slate-300 p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="2"
+                                  value={beurteilungData.partB[3]}
+                                  onChange={e => {
+                                    const newB = [...beurteilungData.partB]
+                                    newB[3] = Math.min(2, Math.max(0, parseInt(e.target.value) || 0))
+                                    setBeurteilungData({...beurteilungData, partB: newB})
+                                  }}
+                                  className="w-full border border-slate-300 rounded p-1"
+                                />
+                              </td>
+                            </tr>
+                            <tr className="bg-slate-50">
+                              <td colSpan={3} className="border border-slate-300 p-2 text-xs text-slate-600 italic">
+                                Die wichtigsten Erkenntnisse werden zusammengefasst. Die Bewertung des Spiels wird klar kommuniziert.
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="border border-slate-300 p-2">5. Sprechweise & Engagement</td>
+                              <td className="border border-slate-300 p-2 text-center">2</td>
+                              <td className="border border-slate-300 p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="2"
+                                  value={beurteilungData.partB[4]}
+                                  onChange={e => {
+                                    const newB = [...beurteilungData.partB]
+                                    newB[4] = Math.min(2, Math.max(0, parseInt(e.target.value) || 0))
+                                    setBeurteilungData({...beurteilungData, partB: newB})
+                                  }}
+                                  className="w-full border border-slate-300 rounded p-1"
+                                />
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3} className="border border-slate-300 p-2 text-xs text-slate-600 italic bg-slate-50">
+                                Der Vortrag ist flüssig und lebendig. Die Sprechweise ist motiviert und ansprechend für Zuhörer/Zuschauer.
+                              </td>
+                            </tr>
+                            <tr className="bg-green-100 font-bold">
+                              <td className="border border-slate-300 p-2">Zwischensumme Teil B</td>
+                              <td className="border border-slate-300 p-2 text-center">{beurteilungData.format === 'Podcast' ? '8' : '10'}</td>
+                              <td className="border border-slate-300 p-2 text-center">{beurteilungData.partB.reduce((a, b) => a + b, 0)} / {beurteilungData.format === 'Podcast' ? '8' : '10'}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Anmerkungen */}
+                    <div className="mb-6">
+                      <label className="block font-bold text-slate-900 mb-2">Anmerkungen der Lehrkraft</label>
+                      <textarea
+                        placeholder="Anmerkungen..."
+                        value={beurteilungData.anmerkungen}
+                        onChange={e => setBeurteilungData({...beurteilungData, anmerkungen: e.target.value})}
+                        rows={4}
+                        className="w-full border-2 border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+
+                    {/* Gesamtergebnis */}
+                    {(() => {
+                      const calc = calculateBeurteilung()
+                      return (
+                        <div className="bg-gradient-to-r from-blue-50 to-slate-100 p-6 rounded-lg border-2 border-blue-300">
+                          <h5 className="font-bold text-slate-900 mb-4 text-lg">Gesamtergebnis</h5>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                              <p className="text-xs text-slate-600">Zwischensumme Teil A</p>
+                              <p className="text-xl font-bold text-slate-900">{calc.sumA} / 35</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-slate-600">Zwischensumme Teil B</p>
+                              <p className="text-xl font-bold text-slate-900">{calc.sumB} / {calc.maxB}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-slate-600">Gesamtpunktzahl</p>
+                              <p className="text-xl font-bold text-blue-600">{calc.total} / {calc.maxPoints}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-slate-600">Prozent</p>
+                              <p className="text-xl font-bold text-blue-600">{calc.percentage} %</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div>
+                              <p className="text-xs text-slate-600">Note</p>
+                              <p className={`text-3xl font-bold ${calc.note === 1 ? 'text-green-600' : calc.note <= 3 ? 'text-blue-600' : calc.note <= 5 ? 'text-yellow-600' : 'text-red-600'}`}>
+                                {calc.note}
+                              </p>
+                            </div>
+                            <button
+                              onClick={printBeurteilung}
+                              className="ml-auto bg-slate-700 hover:bg-slate-800 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center gap-2"
+                            >
+                              🖨️ Beurteilung Drucken
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })()}
+                  </div>
+
+                    {/* Download Buttons */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                      <button
+                        onClick={downloadArbeitsauftrag4}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      >
+                        📄 Arbeitsauftrag 4
+                      </button>
+                      <button
+                        onClick={downloadCheckliste}
+                        className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      >
+                        ✓ Checkliste
+                      </button>
+                      <button
+                        onClick={downloadBeurteilungsbogen}
+                        className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      >
+                        📊 PDF-Bogen
                       </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'texte' && (
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">Texte & Erklärungen</h2>
-              <div className="bg-slate-50 rounded-xl p-8 border border-slate-200">
-                <h3 className="text-xl font-semibold text-slate-900 mb-4">Analyse von digitalen Spielen</h3>
-                <p className="text-slate-700 mb-4 leading-relaxed">
-                  Digitale Spiele haben eigene Merkmale wie Grafik, Sounddesign, Interaktivität und Storytelling. Durch ihre Analyse können wir verstehen, wie sie Spieler motivieren und engagieren.
-                </p>
-                <p className="text-slate-700 leading-relaxed">
-                  Bei der Bewertung achten wir auf Spielmechaniken, Herausforderungsgrad, Lerninhalte und die Nutzererfahrung.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'uebungen' && (
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">Praktische Übungen</h2>
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6">
-                {[1, 2].map((i) => (
-                  <div key={i} className="bg-slate-50 rounded-xl p-6 border border-slate-200">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-3">Übung {i}</h3>
-                    <p className="text-slate-600 text-sm mb-4">Untersuche ein Spiel und evaluiere es...</p>
-                    <button className="w-full py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium text-sm">
-                      Übung starten
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+                </div>
+            )}
+          </div>
         </div>
       </main>
     </div>

@@ -4,31 +4,31 @@ export default function GamificationIndex() {
   const learningAreas = [
     {
       id: 'gesellschaftsspiele',
-      title: 'Gesellschaftsspiele entschlüsseln',
+      title: 'Lernbereich 1: Gesellschaftsspiele entschlüsseln',
       description: 'Lerne Mechaniken und Strukturen von Gesellschaftsspielen kennen und verstehen.',
       path: '/gamification/gesellschaftsspiele'
     },
     {
       id: 'digitale-spiele',
-      title: 'Digitale Spiele untersuchen & bewerten',
+      title: 'Lernbereich 2: Digitale Spiele untersuchen & bewerten',
       description: 'Analysiere und evaluiere digitale Spiele auf ihre Mechaniken und Wirkung.',
       path: '/gamification/digitale-spiele'
     },
     {
       id: 'lernspielen',
-      title: 'Mit Lernspielen motivieren und fördern',
+      title: 'Lernbereich 3: Mit Lernspielen motivieren und fördern',
       description: 'Entdecke, wie Lernspiele zur Motivation und Förderung eingesetzt werden.',
       path: '/gamification/lernspielen'
     },
     {
       id: 'gamification-nutzen',
-      title: 'Gamification identifizieren und nutzen',
+      title: 'Lernbereich 4: Gamification identifizieren und nutzen',
       description: 'Erkenne Gamification-Elemente und lerne, diese strategisch zu nutzen.',
       path: '/gamification/gamification-nutzen'
     },
     {
       id: 'berufliche-moeglichkeiten',
-      title: 'Berufliche Möglichkeiten entdecken',
+      title: 'Lernbereich 5: Berufliche Möglichkeiten entdecken',
       description: 'Erkunde Karrierechancen im Bereich Gamification und Game Design.',
       path: '/gamification/berufliche-moeglichkeiten'
     }

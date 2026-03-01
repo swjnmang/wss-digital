@@ -8,6 +8,7 @@ import GamificationNutzen from './pages/gamification/GamificationNutzen'
 import BeruflicheMoeglichkeiten from './pages/gamification/BeruflicheMoeglichkeiten'
 import Gesundheit from './pages/Gesundheit'
 import Fit4Finance from './pages/Fit4Finance'
+import ImpressumModal from './components/ImpressumModal'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/gesundheit" element={<Gesundheit />} />
         <Route path="/fit4finance" element={<Fit4Finance />} />
       </Routes>
+      <ImpressumModal />
     </Router>
   )
 }
