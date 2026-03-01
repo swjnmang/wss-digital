@@ -430,13 +430,13 @@ export default function NickYeeTest() {
 
     // Title
     pdf.setFontSize(20)
-    pdf.setFont(undefined, 'bold')
+    pdf.setFont('Helvetica', 'bold')
     pdf.text('Nick Yee Gamer Motivation Profile', pageWidth / 2, yPosition, { align: 'center' })
     yPosition += 8
 
     // Date
     pdf.setFontSize(10)
-    pdf.setFont(undefined, 'normal')
+    pdf.setFont('Helvetica', 'normal')
     pdf.setTextColor(100, 100, 100)
     pdf.text(`Datum: ${new Date().toLocaleDateString('de-DE')}`, pageWidth / 2, yPosition, { align: 'center' })
     pdf.setTextColor(0, 0, 0)
@@ -449,7 +449,7 @@ export default function NickYeeTest() {
 
     // Top 3 Motivations Header
     pdf.setFontSize(12)
-    pdf.setFont(undefined, 'bold')
+    pdf.setFont('Helvetica', 'bold')
     pdf.setTextColor(30, 80, 160)
     pdf.text('Deine Top 3 Motivationen:', 15, yPosition)
     pdf.setTextColor(0, 0, 0)
@@ -514,7 +514,7 @@ export default function NickYeeTest() {
     yPosition += 8
 
     pdf.setFontSize(10)
-    pdf.setFont(undefined, 'normal')
+    pdf.setFont('Helvetica', 'normal')
     
     // Get recommendations as array
     const recsArray = getRecommendations(scores)

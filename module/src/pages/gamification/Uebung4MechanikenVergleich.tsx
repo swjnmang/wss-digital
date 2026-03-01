@@ -89,8 +89,7 @@ export default function Uebung4MechanikenVergleich() {
   }
 
   const getUniqueMechanics = () => {
-    const data = getSelectedGamesData()
-      const all = getAllMechanics()
+    const all = getAllMechanics()
     const common = new Set(getCommonMechanics())
     return all.filter(m => !common.has(m))
   }

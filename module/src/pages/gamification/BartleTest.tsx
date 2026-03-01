@@ -202,13 +202,13 @@ export default function BartleTest() {
 
     // Title
     pdf.setFontSize(20)
-    pdf.setFont(undefined, 'bold')
+    pdf.setFont('Helvetica', 'bold')
     pdf.text('Bartle Player Type Test', pageWidth / 2, yPosition, { align: 'center' })
     yPosition += 8
 
     // Date
     pdf.setFontSize(10)
-    pdf.setFont(undefined, 'normal')
+    pdf.setFont('Helvetica', 'normal')
     pdf.setTextColor(100, 100, 100)
     pdf.text(`Datum: ${new Date().toLocaleDateString('de-DE')}`, pageWidth / 2, yPosition, { align: 'center' })
     pdf.setTextColor(0, 0, 0)
@@ -228,12 +228,12 @@ export default function BartleTest() {
     pdf.rect(15, yPosition, pageWidth - 30, 35, 'F')
     
     pdf.setFontSize(16)
-    pdf.setFont(undefined, 'bold')
+    pdf.setFont('Helvetica', 'bold')
     pdf.setTextColor(30, 80, 160)
     pdf.text(`Dein Spielertyp: ${primaryInfo.name}`, 20, yPosition + 8)
     
     pdf.setFontSize(11)
-    pdf.setFont(undefined, 'normal')
+    pdf.setFont('Helvetica', 'normal')
     pdf.setTextColor(0, 0, 0)
     const descLines = pdf.splitTextToSize(primaryInfo.description, pageWidth - 40)
     pdf.text(descLines, 20, yPosition + 16)
@@ -251,12 +251,12 @@ export default function BartleTest() {
 
     // Scores Table
     pdf.setFontSize(12)
-    pdf.setFont(undefined, 'bold')
+    pdf.setFont('Helvetica', 'bold')
     pdf.text('Spielertyp-Verteilung:', 15, yPosition)
     yPosition += 8
 
     pdf.setFontSize(11)
-    pdf.setFont(undefined, 'normal')
+    pdf.setFont('Helvetica', 'normal')
     
     const colorMap: Record<string, [number, number, number]> = {
       achiever: [251, 191, 36],
@@ -291,7 +291,7 @@ export default function BartleTest() {
     yPosition += 8
 
     pdf.setFontSize(10)
-    pdf.setFont(undefined, 'normal')
+    pdf.setFont('Helvetica', 'normal')
     
     const recsArray = getRecommendations(scores)
     recsArray.forEach((rec, idx) => {
