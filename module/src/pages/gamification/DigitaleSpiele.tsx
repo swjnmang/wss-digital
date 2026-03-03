@@ -1729,30 +1729,32 @@ export default function DigitaleSpiele() {
                 <h2 className="text-2xl font-bold text-slate-900 mb-2">1️⃣ Spielmechaniken Meister - Phase 1</h2>
                 <p className="text-slate-700 mb-6">Ziehe die Spielelemente per Drag & Drop in die richtige Kategorie!</p>
 
-                {/* Live Progress Counter */}
-                <div className="mb-6 p-4 bg-gradient-to-r from-blue-100 to-blue-50 rounded-lg border-2 border-blue-300">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold text-lg text-slate-900">
-                      📊 Live-Fortschritt
-                    </span>
-                    <span className="text-2xl font-bold text-blue-600">
-                      {exercise1Items.filter((i) => i.placedIn === i.correctCategory).length} / {exercise1Items.length}
-                    </span>
-                  </div>
-                  <div className="w-full bg-blue-200 rounded-full h-3 overflow-hidden">
-                    <div
-                      className="bg-gradient-to-r from-green-400 to-green-500 h-full transition-all duration-300"
-                      style={{
-                        width: `${(exercise1Items.filter((i) => i.placedIn === i.correctCategory).length / exercise1Items.length) * 100}%`,
-                      }}
-                    />
-                  </div>
-                  <p className="text-sm text-slate-600 mt-2">
-                    {exercise1Items.filter((i) => i.placedIn === i.correctCategory).length === exercise1Items.length
-                      ? '✅ Perfekt! Weiter zu Phase 2!'
-                      : `${exercise1Items.length - exercise1Items.filter((i) => i.placedIn === i.correctCategory).length} korrekte Zuordnungen verbleibend`}
-                  </p>
-                </div>
+                {/* Error Rate Counter */}
+                {(() => {
+                  const totalPlaced = exercise1Items.filter((i) => i.placedIn).length;
+                  const incorrectPlaced = exercise1Items.filter((i) => i.placedIn && i.placedIn !== i.correctCategory).length;
+                  const errorRateValue = totalPlaced > 0 ? (incorrectPlaced / totalPlaced) * 100 : 0;
+                  const errorRate = errorRateValue.toFixed(1);
+                  const errorColor = errorRateValue === 0 && totalPlaced > 0 ? '#10b981' : errorRateValue < 10 ? '#fbbf24' : '#ef4444';
+                  
+                  return (
+                    <div className="mb-6 p-4 bg-slate-100 rounded-lg border-2 border-slate-300">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-lg text-slate-900">
+                          ❌ Fehlerquote
+                        </span>
+                        <span className="text-3xl font-bold" style={{ color: errorColor }}>
+                          {errorRate}%
+                        </span>
+                      </div>
+                      {totalPlaced > 0 && (
+                        <p className="text-sm text-slate-600">
+                          {incorrectPlaced} von {totalPlaced} falsch zugeordnet
+                        </p>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* Categories with drop zones */}
                 <div className="grid gap-6 lg:grid-cols-3 mb-8">
