@@ -73,6 +73,7 @@ const QUIZ_POOL: QuizQuestion[] = [
 ]
 
 export default function DigitaleSpiele() {
+  const [activeTab, setActiveTab] = useState<'aufgaben' | 'kostenlose' | 'uebungen'>('aufgaben')
   const [expandedTasks, setExpandedTasks] = useState<Record<number, boolean>>({})
   const [quizStarted, setQuizStarted] = useState(false)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -105,6 +106,51 @@ export default function DigitaleSpiele() {
     partA: [0, 0, 0, 0, 0],
     partB: [0, 0, 0, 0, 0],
     anmerkungen: '',
+  })
+
+  // ===== EXERCISE STATES =====
+  const [exercise1Items, setExercise1Items] = useState([
+    { id: 1, element: 'Punkte (XP, Score)', correctCategory: 'Motivationssysteme', placedIn: null as string | null },
+    { id: 2, element: 'Achievements/Trophäen', correctCategory: 'Motivationssysteme', placedIn: null },
+    { id: 3, element: 'Loot/Belohnungskisten', correctCategory: 'Spielmechaniken', placedIn: null },
+    { id: 4, element: 'Jump & Walk Mechanik', correctCategory: 'Spielmechaniken', placedIn: null },
+    { id: 5, element: 'Leaderboards', correctCategory: 'Motivationssysteme', placedIn: null },
+    { id: 6, element: 'Sound-Feedback', correctCategory: 'Feedback-Systeme', placedIn: null },
+    { id: 7, element: 'Levelsystem', correctCategory: 'Motivationssysteme', placedIn: null },
+    { id: 8, element: 'Real-time Kontrolle', correctCategory: 'Spielmechaniken', placedIn: null },
+    { id: 9, element: 'Visuelle Effekte (Partikeln)', correctCategory: 'Feedback-Systeme', placedIn: null },
+    { id: 10, element: 'Haptic Feedback (Vibration)', correctCategory: 'Feedback-Systeme', placedIn: null },
+    { id: 11, element: 'Boss-Kämpfe', correctCategory: 'Spielmechaniken', placedIn: null },
+    { id: 12, element: 'In-Game Währung', correctCategory: 'Motivationssysteme', placedIn: null },
+    { id: 13, element: 'Musik/Soundtrack', correctCategory: 'Feedback-Systeme', placedIn: null },
+    { id: 14, element: 'Progression Bar', correctCategory: 'Motivationssysteme', placedIn: null },
+    { id: 15, element: 'Inventar-System', correctCategory: 'Spielmechaniken', placedIn: null },
+    { id: 16, element: 'Tutorial/Onboarding', correctCategory: 'Spielmechaniken', placedIn: null },
+  ])
+  const [exercise1SituationIndex, setExercise1SituationIndex] = useState(0)
+  const [exercise1SituationAnswers, setExercise1SituationAnswers] = useState<(string | null)[]>([])
+  const [exercise2Current, setExercise2Current] = useState(0)
+  const [exercise2Answers, setExercise2Answers] = useState<number[]>([])
+  const [exercise2ShowResult, setExercise2ShowResult] = useState(false)
+  const [exercise3Items, setExercise3Items] = useState([
+    { id: 1, text: 'Verbessert Strategisches Denken', category: 'chancen', answered: false },
+    { id: 2, text: 'Fördert Kreativität und Problemlösung', category: 'chancen', answered: false },
+    { id: 3, text: 'Risiko der Spielsucht', category: 'risiken', answered: false },
+    { id: 4, text: 'Schulung motorischer Fähigkeiten', category: 'chancen', answered: false },
+    { id: 5, text: 'Soziale Isolation möglich', category: 'risiken', answered: false },
+    { id: 6, text: 'Förderung von Teamfähigkeit (Multiplayer)', category: 'chancen', answered: false },
+    { id: 7, text: 'Finanzielle Gefahren durch In-Game-Käufe', category: 'risiken', answered: false },
+    { id: 8, text: 'Verbessert Hand-Auge-Koordination', category: 'chancen', answered: false },
+    { id: 9, text: 'Psychische Belastung durch Gewalt-Inhalte', category: 'risiken', answered: false },
+    { id: 10, text: 'Vermittlung von Lernstoff spielerisch', category: 'chancen', answered: false },
+  ])
+  const [exercise3Score, setExercise3Score] = useState(0)
+  const [exercise4Emotions, setExercise4Emotions] = useState({
+    spannung: 5,
+    frustration: 3,
+    glueck: 7,
+    empathie: 4,
+    stress: 2,
   })
 
   const toggleTask = (taskId: number) => {
@@ -575,6 +621,150 @@ export default function DigitaleSpiele() {
     pdf.save(`Beurteilungsbogen-Spielerezension.pdf`)
   }
 
+  // ===== EXERCISE HANDLERS & DATA =====
+  const handleExercise1Drop = (itemId: number, category: string) => {
+    setExercise1Items((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, placedIn: category } : item
+      )
+    )
+  }
+
+  const resetExercise1 = () => {
+    setExercise1Items((prev) => prev.map((item) => ({ ...item, placedIn: null })))
+  }
+
+  const handleExercise1DragStart = (e: React.DragEvent, itemId: number) => {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('itemId', itemId.toString())
+  }
+
+  const handleExercise1DragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleExercise1CategoryDrop = (e: React.DragEvent, category: string) => {
+    e.preventDefault()
+    const itemId = parseInt(e.dataTransfer.getData('itemId'))
+    handleExercise1Drop(itemId, category)
+  }
+
+  // ===== EXERCISE 1 PHASE 2: SITUATIONS =====
+  const exercise1Situations = [
+    { id: 1, situation: 'In Fortnite erhältst du nach jedem Sieg eine "Victory Royale" Benachrichtigung mit Special Sound und Musik.', correct: 'Motivationssysteme', game: 'Fortnite' },
+    { id: 2, situation: 'In Dark Souls musst du einen großen Gegner treffen und ausweichen, um ihn zu besiegen.', correct: 'Spielmechaniken', game: 'Dark Souls' },
+    { id: 3, situation: 'In Minecraft ertönt ein charakteristisches Geräusch, wenn du einen Block abbaust.', correct: 'Feedback-Systeme', game: 'Minecraft' },
+    { id: 4, situation: 'In Call of Duty sehen deine Kills in einem Killstreak Counter an der Seite des Bildschirms.', correct: 'Motivationssysteme', game: 'Call of Duty' },
+    { id: 5, situation: 'In The Legend of Zelda: Breath of the Wild musst du verschlossene Schätze mit Feuer oder Eis öffnen.', correct: 'Spielmechaniken', game: 'Zelda' },
+    { id: 6, situation: 'In Among Us sehen andere Spieler ein rotes X über dem Kopf eines verstorbenen Spielers.', correct: 'Feedback-Systeme', game: 'Among Us' },
+    { id: 7, situation: 'In Elden Ring bekommst du Runes für besiegte Feinde, die du sammeln und für Level-Ups verwenden kannst.', correct: 'Motivationssysteme', game: 'Elden Ring' },
+    { id: 8, situation: 'In Super Mario musst du durch Röhren reisen und Plattformen springen um zu neuen Bereichen zu gelangen.', correct: 'Spielmechaniken', game: 'Super Mario' },
+    { id: 9, situation: 'In League of Legends wird dein Gesundheits-Balken rot angezeigt wenn du wenig HP hast.', correct: 'Feedback-Systeme', game: 'League of Legends' },
+    { id: 10, situation: 'In Valorant kostet deine Ausrüstung Geld (Credits) und wird nicht zurück erstattet wenn du stirbst.', correct: 'Spielmechaniken', game: 'Valorant' },
+    { id: 11, situation: 'In Dota 2 hast du "Achievements", die du für bestimmte spielerische Leistungen freischaltest.', correct: 'Motivationssysteme', game: 'Dota 2' },
+    { id: 12, situation: 'In Minecraft erkennen dich Mobs (Monster) wenn du sie anschaust und werden rot gefärbt angezeigt.', correct: 'Feedback-Systeme', game: 'Minecraft' },
+    { id: 13, situation: 'In Baldur\'s Gate 3 musst du mit virtuellen Würfeln würfeln um Erfolgs-Chancen bei Aktionen zu berechnen.', correct: 'Spielmechaniken', game: 'Baldur\'s Gate 3' },
+    { id: 14, situation: 'In Stardew Valley erhältst du tägliche Gold-Belohnungen für das Verkaufen deiner angebauten Ernte.', correct: 'Motivationssysteme', game: 'Stardew Valley' },
+    { id: 15, situation: 'In Overwatch vibrieret dein Controller wenn du von gegnerischen Angriffen getroffen wirst.', correct: 'Feedback-Systeme', game: 'Overwatch' },
+  ]
+
+  const handleExercise1SituationAnswer = (answer: string) => {
+    const newAnswers = [...exercise1SituationAnswers, answer]
+    setExercise1SituationAnswers(newAnswers)
+    
+    if (exercise1SituationIndex < exercise1Situations.length - 1) {
+      setExercise1SituationIndex(exercise1SituationIndex + 1)
+    }
+  }
+
+  const getExercise1SituationScore = () => {
+    return exercise1SituationAnswers.filter((answer, idx) => {
+      return answer === exercise1Situations[idx]?.correct
+    }).length
+  }
+
+  const resetExercise1Phase2 = () => {
+    setExercise1SituationIndex(0)
+    setExercise1SituationAnswers([])
+  }
+
+  const exercise2Scenarios = [
+    {
+      name: 'Minecraft',
+      description: 'Ein kreatives Sandbox-Bauspiel mit Survival-Elementen',
+      questions: [
+        { text: 'Welche Altersgruppe spielt Minecraft hauptsächlich?', options: ['Kinder und Jugendliche (6-16 Jahre)', 'Nur Erwachsene (25+ Jahre)', 'Nur Hardcore-Gamer'], correct: 0 },
+        { text: 'Was reizt Spieler besonders an Minecraft?', options: ['Die kompetitive Rangliste', 'Kreativität und Freiheit beim Bauen', 'Intensive Action und Kämpfe'], correct: 1 },
+      ],
+    },
+    {
+      name: 'Call of Duty',
+      description: 'Ein schnelllebiger First-Person-Shooter mit Multiplayer-Fokus',
+      questions: [
+        { text: 'Wer sind die Hauptzielgruppe von CoD?', options: ['Gelegenheitsspieler ab 3 Jahren', 'Jugendliche und junge Erwachsene (14+)', 'Nur Frauen über 50'], correct: 1 },
+        { text: 'Was macht CoD attraktiv?', options: ['Entspanntes Bauen und Sammeln', 'Fast-paced Action, Wettbewerb, Teamplay', 'Emulieren von realistischen Bauarbeiten'], correct: 1 },
+      ],
+    },
+    {
+      name: 'Stardew Valley',
+      description: 'Ein entspanntes Farming-Simulation-Spiel',
+      questions: [
+        { text: 'Für wen ist Stardew Valley geeignet?', options: ['Kompetitive E-Sports-Profis', 'Spieler, die Entspannung und Aufbau suchen', 'Nur Kinder unter 8 Jahren'], correct: 1 },
+        { text: 'Was ist ein Reiz des Spiels?', options: ['Blutige Kämpfe und Konflikte', 'Stressige schnelle Reaktionen', 'Entspannung, Strategie, Beziehungsaufbau'], correct: 2 },
+      ],
+    },
+  ]
+
+  const handleExercise2Answer = (answerIndex: number) => {
+    const newAnswers = [...exercise2Answers, answerIndex]
+    setExercise2Answers(newAnswers)
+    if (newAnswers.length % 2 === 0) {
+      const currentScenario = Math.floor((newAnswers.length - 1) / 2)
+      if (currentScenario < exercise2Scenarios.length - 1) {
+        setExercise2Current(currentScenario + 1)
+      } else {
+        setExercise2ShowResult(true)
+      }
+    }
+  }
+
+  const resetExercise2 = () => {
+    setExercise2Current(0)
+    setExercise2Answers([])
+    setExercise2ShowResult(false)
+  }
+
+  const handleExercise3Drag = (itemId: number, toCategory: 'chancen' | 'risiken') => {
+    setExercise3Items((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, category: toCategory, answered: true } : item
+      )
+    )
+  }
+
+  const resetExercise3 = () => {
+    setExercise3Items((prev) => prev.map((item) => ({ ...item, answered: false })))
+    setExercise3Score(0)
+  }
+
+  const checkExercise3Score = () => {
+    const correctCount = exercise3Items.filter((item) => {
+      const isCorrect = (item.category === 'chancen' && [1, 2, 4, 6, 8, 10].includes(item.id)) ||
+        (item.category === 'risiken' && [3, 5, 7, 9].includes(item.id))
+      return item.answered && isCorrect
+    }).length
+    setExercise3Score(correctCount)
+  }
+
+  const handleExercise4Change = (emotion: keyof typeof exercise4Emotions, value: number) => {
+    setExercise4Emotions((prev) => ({ ...prev, [emotion]: value }))
+  }
+
+  const resetExercise4 = () => {
+    setExercise4Emotions({ spannung: 5, frustration: 3, glueck: 7, empathie: 4, stress: 2 })
+  }
+
   const currentQuestion = quizQuestions[currentQuestionIndex]
 
   return (
@@ -589,27 +779,50 @@ export default function DigitaleSpiele() {
       </header>
 
       <main className="flex-1 w-full max-w-6xl mx-auto p-6">
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-cyan-200 mb-8">
-          <div className="bg-gradient-to-r from-cyan-50 to-blue-50 p-6 rounded-xl border-l-4 border-cyan-500">
-            <h2 className="text-2xl font-bold text-cyan-900 mb-4">🎉 Herzlichen Glückwunsch!</h2>
-            <p className="text-slate-800 mb-4 leading-relaxed">
-              Deine Bewerbung an unserer Online-Zeitschrift „<strong>Pixel-Probe</strong>" war erfolgreich! 
-            </p>
-            <p className="text-slate-800 mb-4 leading-relaxed">
-              Als erfolgreiches Start-up im Bereich Spieletestung sind wir direkter Partner von Spieleentwicklern und Publishern im In- und Ausland. 
-              Wir testen und bewerten digitale Spiele sowie neue Apps und geben unseren Auftraggebern wertvolles Feedback.
-            </p>
-            <p className="text-slate-800 mb-4 leading-relaxed">
-              Du startest ab sofort als „<strong>Rookie-Gametester</strong>" und musst zunächst eine Reihe von Aufgaben absolvieren, 
-              bevor du ein echter „<strong>Master-Gametester</strong>" wirst.
-            </p>
-            <p className="text-slate-800 leading-relaxed">
-              Für deine <strong>3-4 Arbeitstage</strong> bekommst du folgende Aufträge, die du Schritt-für-Schritt durcharbeiten sollst. 
-              Eine genaue Aufgabenbeschreibung findest du unten.
-            </p>
-          </div>
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 mb-8">
+          <p className="text-slate-700 leading-relaxed">
+            Auf dieser Seite findest du 4 praxisorientierte Arbeitsaufträge zum Thema "Digitale Spiele analysieren und bewerten". 
+            Bearbeite die Aufgaben systematisch durch und nutze die zusätzliche Sektion "Übungen" um dein Wissen interaktiv zu vertiefen. 
+            Ein breites Angebot kostenloser Spiele zum Testen findest du unter "Kostenlose Spiele".
+          </p>
         </div>
 
+        {/* TAB NAVIGATION */}
+        <div className="flex gap-2 mb-8 border-b border-slate-300 overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('aufgaben')}
+            className={`px-6 py-3 font-bold whitespace-nowrap transition-colors ${
+              activeTab === 'aufgaben'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            📝 Aufgaben
+          </button>
+          <button
+            onClick={() => setActiveTab('kostenlose')}
+            className={`px-6 py-3 font-bold whitespace-nowrap transition-colors ${
+              activeTab === 'kostenlose'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            🎮 Kostenlose Spiele
+          </button>
+          <button
+            onClick={() => setActiveTab('uebungen')}
+            className={`px-6 py-3 font-bold whitespace-nowrap transition-colors ${
+              activeTab === 'uebungen'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            💪 Übungen
+          </button>
+        </div>
+
+        {/* ===== TAB CONTENT ===== */}
+        {activeTab === 'aufgaben' && (
         <div className="space-y-6">
           {/* Arbeitsauftrag 1 */}
           <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
@@ -631,7 +844,24 @@ export default function DigitaleSpiele() {
               <div className="px-6 pb-6 border-t border-slate-200">
                 <div className="bg-white p-6 rounded-lg space-y-4">
                   <div className="text-slate-800 space-y-3">
-                    <p className="font-semibold">Hallo liebe/r Praktikant/in,</p>
+                    <h3 className="text-xl font-bold text-slate-900 mb-4">🎉 Herzlichen Glückwunsch!</h3>
+                    <p className="leading-relaxed">
+                      Deine Bewerbung an unserer Online-Zeitschrift „<strong>Pixel-Probe</strong>" war erfolgreich! 
+                    </p>
+                    <p className="leading-relaxed">
+                      Als erfolgreiches Start-up im Bereich Spieletestung sind wir direkter Partner von Spieleentwicklern und Publishern im In- und Ausland. 
+                      Wir testen und bewerten digitale Spiele sowie neue Apps und geben unseren Auftraggebern wertvolles Feedback.
+                    </p>
+                    <p className="leading-relaxed">
+                      Du startest ab sofort als „<strong>Rookie-Gametester</strong>" und musst zunächst eine Reihe von Aufgaben absolvieren, 
+                      bevor du ein echter „<strong>Master-Gametester</strong>" wirst.
+                    </p>
+                    <p className="leading-relaxed mb-6">
+                      Für deine <strong>3-4 Arbeitstage</strong> bekommst du folgende Aufträge, die du Schritt-für-Schritt durcharbeiten sollst. 
+                      Eine genaue Aufgabenbeschreibung findest du unten.
+                    </p>
+
+                    <p className="font-semibold border-t border-slate-300 pt-4 mt-4">Hallo liebe/r Praktikant/in,</p>
                     <p>
                       willkommen im Team von <strong>"Pixel-Probe"</strong>! Du kennst dich bereits mit verschiedenen Spielmechaniken und typischen Spielelementen aus, da du dich intensiv mit Brettspielen beschäftigt hast.
                     </p>
@@ -1457,6 +1687,348 @@ export default function DigitaleSpiele() {
             )}
           </div>
         </div>
+        )}
+
+        {/* ===== KOSTENLOSE SPIELE TAB ===== */}
+        {activeTab === 'kostenlose' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+            <h2 className="text-3xl font-bold text-slate-900 mb-6">🎮 Kostenlose Spiele zum Testen</h2>
+            <p className="text-slate-700 mb-6 leading-relaxed">
+              Hier ist eine Liste kostenloseralready Spiele, die du analysieren kannst:
+            </p>
+            <div className="grid gap-4 md:grid-cols-2">
+              {[
+                { name: 'Minecraft Creative Mode', platform: 'PC, Mobile, Konsolen', genre: 'Sandbox', desc: 'Kreatives Bauen - perfekt für Analyse!' },
+                { name: 'League of Legends', platform: 'PC', genre: 'MOBA', desc: 'Online-Team-Spiel mit komplexer Mechanik' },
+                { name: 'Among Us', platform: 'Mobile, PC', genre: 'Social Deduction', desc: 'Teamfähigkeit und Vertrauen' },
+                { name: 'Fortnite', platform: 'PC, Mobile, Konsolen', genre: 'Battle Royale', desc: 'Analyse der Zielgruppe' },
+                { name: 'Dota 2', platform: 'PC', genre: 'MOBA', desc: 'Strategiespiel mit esports' },
+                { name: 'Valorant', platform: 'PC', genre: 'Tactical Shooter', desc: 'Fairplay und Balance' },
+              ].map((game, idx) => (
+                <div key={idx} className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                  <h3 className="font-bold text-lg mb-2">{game.name}</h3>
+                  <p className="text-sm text-slate-600 mb-2"><strong>Plattform:</strong> {game.platform}</p>
+                  <p className="text-sm text-slate-600 mb-2"><strong>Genre:</strong> {game.genre}</p>
+                  <p className="text-slate-700">{game.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        )}
+
+        {/* ===== ÜBUNGEN TAB ===== */}
+        {activeTab === 'uebungen' && (
+        <div className="space-y-8">
+          {/* Exercise 1: Spielmechaniken Meister */}
+          <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+            {/* PHASE 1: Begriffe Drag & Drop */}
+            {exercise1Items.filter((i) => i.placedIn === i.correctCategory).length < exercise1Items.length ? (
+              <>
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">1️⃣ Spielmechaniken Meister - Phase 1</h2>
+                <p className="text-slate-700 mb-6">Ziehe die Spielelemente per Drag & Drop in die richtige Kategorie!</p>
+
+                {/* Categories with drop zones */}
+                <div className="grid gap-6 lg:grid-cols-3 mb-8">
+                  {['Motivationssysteme', 'Spielmechaniken', 'Feedback-Systeme'].map((category) => (
+                    <div
+                      key={category}
+                      onDragOver={handleExercise1DragOver}
+                      onDrop={(e) => handleExercise1CategoryDrop(e, category)}
+                      className="bg-blue-50 rounded-lg p-6 border-4 border-dashed border-blue-300 min-h-80"
+                    >
+                      <h3 className="font-bold text-lg mb-6 pb-3 border-b-2 border-blue-300">{category}</h3>
+                      <div className="space-y-3">
+                        {exercise1Items
+                          .filter((item) => item.placedIn === category)
+                          .map((item) => {
+                            const isCorrect = item.correctCategory === category
+                            return (
+                              <div
+                                key={item.id}
+                                className={`p-3 rounded-lg border-2 font-semibold cursor-move transition-all ${
+                                  isCorrect
+                                    ? 'bg-green-100 border-green-500 text-green-900 hover:bg-green-200'
+                                    : 'bg-red-100 border-red-500 text-red-900 hover:bg-red-200'
+                                }`}
+                                draggable
+                                onDragStart={(e) => handleExercise1DragStart(e, item.id)}
+                              >
+                                {item.element} {isCorrect ? '✓' : '✗'}
+                              </div>
+                            )
+                          })}
+                        {exercise1Items.filter((item) => item.placedIn === category).length === 0 && (
+                          <p className="text-slate-400 italic text-center py-8">Ziehe Elemente hier rein...</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Available items to drag */}
+                <div className="bg-slate-50 rounded-lg p-6 border-2 border-slate-300">
+                  <h4 className="font-bold text-slate-900 mb-4">📦 Zu sortierende Elemente ({exercise1Items.filter((i) => !i.placedIn).length} verbleibend):</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {exercise1Items
+                      .filter((item) => !item.placedIn)
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          draggable
+                          onDragStart={(e) => handleExercise1DragStart(e, item.id)}
+                          className="bg-white p-3 rounded-lg border-2 border-slate-400 cursor-move hover:bg-blue-50 hover:border-blue-400 transition-all font-medium text-slate-900"
+                        >
+                          {item.element}
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Progress and buttons */}
+                <div className="mt-6 flex gap-4 justify-between items-center">
+                  <div className="font-bold text-lg">
+                    ✓ Richtig: {exercise1Items.filter((i) => i.placedIn === i.correctCategory).length}/{exercise1Items.length}
+                  </div>
+                  {exercise1Items.some((i) => i.placedIn) && (
+                    <button onClick={resetExercise1} className="px-4 py-2 bg-slate-300 hover:bg-slate-400 rounded-lg font-semibold transition-colors">
+                      Zurücksetzen
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                {/* PHASE 2: Situationen Kategorisieren */}
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">1️⃣ Spielmechaniken Meister - Phase 2</h2>
+                <p className="text-slate-700 mb-6">🎮 Erkenne die Kategorien in realen Spielsituationen!</p>
+
+                {exercise1SituationIndex < exercise1Situations.length ? (
+                  <>
+                    <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-lg border-2 border-purple-300 mb-6">
+                      <h3 className="font-bold text-slate-600 text-sm mb-2">Situation {exercise1SituationIndex + 1}/{exercise1Situations.length}</h3>
+                      <div className="w-full bg-slate-300 rounded-full h-2 mb-4">
+                        <div 
+                          className="bg-purple-600 h-2 rounded-full transition-all"
+                          style={{ width: `${((exercise1SituationIndex + 1) / exercise1Situations.length) * 100}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-slate-900 text-lg leading-relaxed mb-3">{exercise1Situations[exercise1SituationIndex].situation}</p>
+                      <p className="text-slate-600 text-sm italic">Aus: {exercise1Situations[exercise1SituationIndex].game}</p>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-3 mb-6">
+                      {['Motivationssysteme', 'Spielmechaniken', 'Feedback-Systeme'].map((category) => (
+                        <button
+                          key={category}
+                          onClick={() => handleExercise1SituationAnswer(category)}
+                          className={`p-6 rounded-lg font-bold text-lg transition-all border-2 ${
+                            exercise1SituationAnswers[exercise1SituationIndex] === category
+                              ? 'bg-blue-600 text-white border-blue-700'
+                              : 'bg-white text-slate-900 border-slate-300 hover:border-blue-400 hover:bg-blue-50'
+                          }`}
+                        >
+                          {category === 'Motivationssysteme' && '🎯'} {category === 'Spielmechaniken' && '⚙️'} {category === 'Feedback-Systeme' && '📢'}
+                          <br />
+                          <span className="text-sm">{category}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="bg-gradient-to-r from-green-100 to-emerald-100 p-8 rounded-lg border-2 border-green-500 text-center">
+                      <h3 className="text-3xl font-bold text-green-900 mb-4">🎉 Ausgezeichnet!</h3>
+                      <p className="text-xl text-green-800 mb-4">
+                        ✓ Richtig: {getExercise1SituationScore()}/{exercise1Situations.length}
+                      </p>
+                      <p className="text-lg text-green-700 mb-6">
+                        Du beherrschst die Spielmechaniken-Kategorien perfekt! 🏆
+                      </p>
+                      <button
+                        onClick={resetExercise1Phase2}
+                        className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
+                      >
+                        Nochmal versuchen
+                      </button>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Exercise 2 */}
+          <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">2️⃣ Zielgruppen-Detective</h2>
+            {!exercise2ShowResult ? (
+              exercise2Current < exercise2Scenarios.length ? (
+                <div className="space-y-6">
+                  <div className="bg-orange-50 p-6 rounded-lg border-2 border-orange-300">
+                    <h3 className="text-xl font-bold mb-2">
+                      Szenario {exercise2Current + 1}/{exercise2Scenarios.length}: {exercise2Scenarios[exercise2Current].name}
+                    </h3>
+                    <p className="text-slate-700">{exercise2Scenarios[exercise2Current].description}</p>
+                  </div>
+
+                  {exercise2Scenarios[exercise2Current].questions.map((q, qIdx) => {
+                    const globalIdx = exercise2Current * 2 + qIdx
+                    const answered = exercise2Answers.length > globalIdx
+                    return (
+                      <div key={qIdx} className="bg-slate-50 p-6 rounded-lg border border-slate-300">
+                        <h4 className="font-bold mb-4">{q.text}</h4>
+                        <div className="space-y-3">
+                          {q.options.map((opt, oIdx) => (
+                            <button
+                              key={oIdx}
+                              onClick={() => !answered && handleExercise2Answer(oIdx)}
+                              disabled={answered}
+                              className={`w-full p-4 text-left font-medium rounded-lg transition-all ${
+                                answered && oIdx === q.correct
+                                  ? 'bg-green-100 border-2 border-green-500'
+                                  : answered && oIdx === exercise2Answers[globalIdx]
+                                  ? 'bg-red-100 border-2 border-red-500'
+                                  : 'bg-white border-2 border-slate-300 hover:bg-slate-100'
+                              } ${answered ? 'cursor-default' : 'cursor-pointer'}`}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : null
+            ) : (
+              <div className="bg-green-100 p-8 rounded-lg border-2 border-green-500 text-center">
+                <h3 className="text-2xl font-bold text-green-900 mb-4">🎉 Fertig!</h3>
+                <button onClick={resetExercise2} className="px-6 py-3 bg-green-600 text-white rounded-lg">
+                  Nochmal
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Exercise 3 */}
+          <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">3️⃣ Chancen & Gefahren Sortierer</h2>
+            <p className="text-slate-700 mb-6">Sortiere die Aussagen!</p>
+
+            <div className="grid gap-6 lg:grid-cols-2 mb-6">
+              {['chancen', 'risiken'].map((cat) => (
+                <div key={cat} className={`p-6 rounded-lg border-2 min-h-80 ${
+                  cat === 'chancen' ? 'bg-green-50 border-green-400' : 'bg-red-50 border-red-400'
+                }`}>
+                  <h3 className={`font-bold text-lg mb-4 pb-3 border-b-2 ${
+                    cat === 'chancen' ? 'text-green-900 border-green-400' : 'text-red-900 border-red-400'
+                  }`}>
+                    {cat === 'chancen' ? '✅ Chancen' : '⚠️ Risiken'}
+                  </h3>
+                  <div className="space-y-3">
+                    {exercise3Items.filter((item) => item.category === cat).map((item) => (
+                      <div
+                        key={item.id}
+                        className={`p-3 rounded-lg text-sm cursor-pointer font-medium transition-all ${
+                          item.answered
+                            ? cat === 'chancen'
+                              ? 'bg-green-100 border-2 border-green-500'
+                              : 'bg-red-100 border-2 border-red-500'
+                            : 'bg-white border-2 border-slate-300'
+                        }`}
+                      >
+                        {item.text}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-slate-100 p-4 rounded-lg mb-6">
+              <h4 className="font-bold mb-3">Noch zu sortieren:</h4>
+              <div className="flex flex-wrap gap-2">
+                {exercise3Items.filter((item) => !item.answered).map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white p-3 rounded-lg border-2 border-slate-300 text-sm cursor-pointer hover:bg-blue-50"
+                    onClick={() => {
+                      handleExercise3Drag(item.id, item.category === 'chancen' ? 'risiken' : 'chancen')
+                    }}
+                  >
+                    {item.text}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button onClick={checkExercise3Score} className="px-6 py-3 bg-blue-600 text-white rounded-lg">
+                Score überprüfen
+              </button>
+              {exercise3Score > 0 && (
+                <>
+                  <div className="font-bold text-lg">Richtig: {exercise3Score}/10</div>
+                  <button onClick={resetExercise3} className="px-4 py-2 bg-slate-300 rounded-lg">
+                    Zurücksetzen
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Exercise 4 */}
+          <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">4️⃣ Spielerlebnis-Barometer</h2>
+            <p className="text-slate-700 mb-6">Beschreibe dein Spielerlebnis mit Schiebereglern (1-10):</p>
+
+            <div className="space-y-6">
+              {(Object.entries(exercise4Emotions) as Array<[keyof typeof exercise4Emotions, number]>).map(([emotion, value]) => (
+                <div key={emotion} className="space-y-3">
+                  <div className="flex justify-between">
+                    <label className="font-bold">{emotion === 'spannung' ? 'Spannung' : emotion === 'frustration' ? 'Frustration' : emotion === 'glueck' ? 'Glück' : emotion === 'empathie' ? 'Empathie' : 'Stress'}</label>
+                    <span className="text-2xl font-bold text-blue-600">{value}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={value}
+                    onChange={(e) => handleExercise4Change(emotion, parseInt(e.target.value))}
+                    className="w-full h-3 rounded-lg accent-blue-600"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 p-6 bg-purple-50 rounded-lg border-2 border-purple-300">
+              <h3 className="font-bold text-lg mb-4">📊 Dein Profil:</h3>
+              <div className="space-y-2 text-slate-700">
+                <p><strong>Spannung:</strong> {'█'.repeat(exercise4Emotions.spannung)}{'░'.repeat(10-exercise4Emotions.spannung)}</p>
+                <p><strong>Frustration:</strong> {'█'.repeat(exercise4Emotions.frustration)}{'░'.repeat(10-exercise4Emotions.frustration)}</p>
+                <p><strong>Glück:</strong> {'█'.repeat(exercise4Emotions.glueck)}{'░'.repeat(10-exercise4Emotions.glueck)}</p>
+              </div>
+              <div className="mt-4 p-4 bg-white rounded-lg border border-slate-300">
+                {exercise4Emotions.spannung + exercise4Emotions.glueck > 12 ? (
+                  <p className="text-green-800 font-semibold">✨ Intensives Spielerlebnis!</p>
+                ) : exercise4Emotions.frustration + exercise4Emotions.stress > 10 ? (
+                  <p className="text-orange-800 font-semibold">⚠️ Einige frustrierende Momente</p>
+                ) : (
+                  <p className="text-blue-800 font-semibold">😌 Ausgewogenes Erlebnis</p>
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={resetExercise4}
+              className="mt-6 w-full px-4 py-3 bg-slate-300 rounded-lg font-semibold"
+            >
+              Zurücksetzen
+            </button>
+          </div>
+        </div>
+        )}
       </main>
     </div>
   )
