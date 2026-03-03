@@ -129,6 +129,9 @@ export default function DigitaleSpiele() {
   ])
   const [exercise1SituationIndex, setExercise1SituationIndex] = useState(0)
   const [exercise1SituationAnswers, setExercise1SituationAnswers] = useState<(string | null)[]>([])
+  const [exercise1ShowPhaseDecision, setExercise1ShowPhaseDecision] = useState(false)
+  const [exercise1Phase2ShowFeedback, setExercise1Phase2ShowFeedback] = useState(false)
+  const [exercise1Phase2FeedbackIsCorrect, setExercise1Phase2FeedbackIsCorrect] = useState(false)
   const [exercise2Current, setExercise2Current] = useState(0)
   const [exercise2Answers, setExercise2Answers] = useState<number[]>([])
   const [exercise2ShowResult, setExercise2ShowResult] = useState(false)
@@ -623,8 +626,8 @@ export default function DigitaleSpiele() {
 
   // ===== EXERCISE HANDLERS & DATA =====
   const handleExercise1Drop = (itemId: number, category: string) => {
-    setExercise1Items((prev) =>
-      prev.map((item) =>
+    setExercise1Items((prev) => {
+      const updated = prev.map((item) =>
         item.id === itemId 
           ? { 
               ...item, 
@@ -632,8 +635,15 @@ export default function DigitaleSpiele() {
               hasError: item.hasError || category !== item.correctCategory
             } 
           : item
-      )
-    )
+      );
+      
+      // Check if all items are correctly placed
+      if (updated.filter((i) => i.placedIn === i.correctCategory).length === updated.length) {
+        setExercise1ShowPhaseDecision(true);
+      }
+      
+      return updated;
+    })
   }
 
   const resetExercise1 = () => {
@@ -676,8 +686,15 @@ export default function DigitaleSpiele() {
   ]
 
   const handleExercise1SituationAnswer = (answer: string) => {
+    const isCorrect = answer === exercise1Situations[exercise1SituationIndex]?.correct
     const newAnswers = [...exercise1SituationAnswers, answer]
     setExercise1SituationAnswers(newAnswers)
+    setExercise1Phase2FeedbackIsCorrect(isCorrect)
+    setExercise1Phase2ShowFeedback(true)
+  }
+
+  const handleExercise1Phase2ContinueAfterFeedback = () => {
+    setExercise1Phase2ShowFeedback(false)
     
     if (exercise1SituationIndex < exercise1Situations.length - 1) {
       setExercise1SituationIndex(exercise1SituationIndex + 1)
@@ -693,6 +710,17 @@ export default function DigitaleSpiele() {
   const resetExercise1Phase2 = () => {
     setExercise1SituationIndex(0)
     setExercise1SituationAnswers([])
+    setExercise1ShowPhaseDecision(false)
+    setExercise1Phase2ShowFeedback(false)
+  }
+
+  const resetExercise1ForRetry = () => {
+    setExercise1Items((prev) => prev.map((item) => ({ ...item, placedIn: null, hasError: false })))
+    setExercise1ShowPhaseDecision(false)
+  }
+
+  const startExercise1Phase2 = () => {
+    setExercise1ShowPhaseDecision(false)
   }
 
   const exercise2Scenarios = [
@@ -1734,8 +1762,6 @@ export default function DigitaleSpiele() {
               <>
                 <h2 className="text-2xl font-bold text-slate-900 mb-2">1️⃣ Spielmechaniken Meister - Phase 1</h2>
                 <p className="text-slate-700 mb-6">Ziehe die Spielelemente per Drag & Drop in die richtige Kategorie!</p>
-
-                {/* Error Rate Counter */}
                 {(() => {
                   const totalPlaced = exercise1Items.filter((i) => i.placedIn).length;
                   const totalErrors = exercise1Items.filter((i) => i.hasError).length;
@@ -1831,11 +1857,78 @@ export default function DigitaleSpiele() {
                   )}
                 </div>
               </>
+            ) : exercise1ShowPhaseDecision ? (
+              <>
+                {/* DECISION SCREEN: Phase 1 nochmal oder zu Phase 2 */}
+                <div className="bg-gradient-to-r from-blue-100 to-indigo-100 p-8 rounded-xl border-2 border-blue-500 text-center">
+                  <h2 className="text-3xl font-bold text-blue-900 mb-4">✅ Phase 1 Erfolgreich!</h2>
+                  <p className="text-lg text-blue-800 mb-6">
+                    Du hast alle 16 Begriffe korrekt zugeordnet. Sehr gut!
+                  </p>
+                  <p className="text-slate-700 mb-8">
+                    Was möchtest du als Nächstes tun?
+                  </p>
+                  
+                  <div className="grid gap-4 md:grid-cols-2 max-w-md mx-auto">
+                    <button
+                      onClick={resetExercise1ForRetry}
+                      className="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors text-lg"
+                    >
+                      🔄 Phase 1 nochmal üben
+                    </button>
+                    <button
+                      onClick={startExercise1Phase2}
+                      className="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors text-lg"
+                    >
+                      ▶️ Zu Phase 2
+                    </button>
+                  </div>
+                </div>
+              </>
             ) : (
               <>
                 {/* PHASE 2: Situationen Kategorisieren */}
                 <h2 className="text-2xl font-bold text-slate-900 mb-2">1️⃣ Spielmechaniken Meister - Phase 2</h2>
                 <p className="text-slate-700 mb-6">🎮 Erkenne die Kategorien in realen Spielsituationen!</p>
+
+                {/* Feedback Modal */}
+                {exercise1Phase2ShowFeedback && (
+                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className={`bg-white rounded-xl p-8 max-w-md w-full text-center shadow-xl border-4 ${
+                      exercise1Phase2FeedbackIsCorrect ? 'border-green-500 bg-gradient-to-b from-white to-green-50' : 'border-red-500 bg-gradient-to-b from-white to-red-50'
+                    }`}>
+                      {exercise1Phase2FeedbackIsCorrect ? (
+                        <>
+                          <div className="text-5xl mb-4">✅</div>
+                          <h3 className="text-2xl font-bold text-green-900 mb-2">Richtig!</h3>
+                          <p className="text-green-700 mb-6">
+                            Die Antwort ist korrekt. Weiter geht's!
+                          </p>
+                          <button
+                            onClick={handleExercise1Phase2ContinueAfterFeedback}
+                            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors w-full"
+                          >
+                            ▶️ Nächste Situation
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="text-5xl mb-4">❌</div>
+                          <h3 className="text-2xl font-bold text-red-900 mb-2">Falsch!</h3>
+                          <p className="text-red-700 mb-6">
+                            Das ist nicht die richtige Antwort. Versuch die nächste Situation!
+                          </p>
+                          <button
+                            onClick={handleExercise1Phase2ContinueAfterFeedback}
+                            className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition-colors w-full"
+                          >
+                            ▶️ Nächste Situation
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {exercise1SituationIndex < exercise1Situations.length ? (
                   <>
@@ -1856,7 +1949,10 @@ export default function DigitaleSpiele() {
                         <button
                           key={category}
                           onClick={() => handleExercise1SituationAnswer(category)}
+                          disabled={exercise1Phase2ShowFeedback}
                           className={`p-6 rounded-lg font-bold text-lg transition-all border-2 ${
+                            exercise1Phase2ShowFeedback ? 'opacity-50 cursor-not-allowed' : ''
+                          } ${
                             exercise1SituationAnswers[exercise1SituationIndex] === category
                               ? 'bg-blue-600 text-white border-blue-700'
                               : 'bg-white text-slate-900 border-slate-300 hover:border-blue-400 hover:bg-blue-50'
