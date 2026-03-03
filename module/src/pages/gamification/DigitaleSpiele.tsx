@@ -148,13 +148,6 @@ export default function DigitaleSpiele() {
     { id: 10, text: 'Vermittlung von Lernstoff spielerisch', category: 'chancen', answered: false },
   ])
   const [exercise3Score, setExercise3Score] = useState(0)
-  const [exercise4Emotions, setExercise4Emotions] = useState({
-    spannung: 5,
-    frustration: 3,
-    glueck: 7,
-    empathie: 4,
-    stress: 2,
-  })
 
   const toggleTask = (taskId: number) => {
     setExpandedTasks(prev => ({ ...prev, [taskId]: !prev[taskId] }))
@@ -791,13 +784,7 @@ export default function DigitaleSpiele() {
     setExercise3Score(correctCount)
   }
 
-  const handleExercise4Change = (emotion: keyof typeof exercise4Emotions, value: number) => {
-    setExercise4Emotions((prev) => ({ ...prev, [emotion]: value }))
-  }
 
-  const resetExercise4 = () => {
-    setExercise4Emotions({ spannung: 5, frustration: 3, glueck: 7, empathie: 4, stress: 2 })
-  }
 
   const currentQuestion = quizQuestions[currentQuestionIndex]
 
@@ -1756,12 +1743,12 @@ export default function DigitaleSpiele() {
         {activeTab === 'uebungen' && (
         <div className="space-y-8">
           {/* Exercise 1: Spielmechaniken Meister */}
-          <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             {/* PHASE 1: Begriffe Drag & Drop */}
             {exercise1Items.filter((i) => i.placedIn === i.correctCategory).length < exercise1Items.length ? (
               <>
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">1️⃣ Spielmechaniken Meister - Phase 1</h2>
-                <p className="text-slate-700 mb-6">Ziehe die Spielelemente per Drag & Drop in die richtige Kategorie!</p>
+                <h2 className="text-xl font-bold text-slate-900 mb-2">1️⃣ Spielmechaniken Meister - Phase 1</h2>
+                <p className="text-slate-700 mb-4 text-sm">Ziehe die Spielelemente per Drag & Drop in die richtige Kategorie!</p>
                 {(() => {
                   const totalPlaced = exercise1Items.filter((i) => i.placedIn).length;
                   const totalErrors = exercise1Items.filter((i) => i.hasError).length;
@@ -1770,17 +1757,17 @@ export default function DigitaleSpiele() {
                   const errorColor = errorRateValue === 0 && totalPlaced > 0 ? '#10b981' : errorRateValue < 10 ? '#fbbf24' : '#ef4444';
                   
                   return (
-                    <div className="mb-6 p-4 bg-slate-100 rounded-lg border-2 border-slate-300">
+                    <div className="mb-4 p-3 bg-slate-100 rounded-lg border-2 border-slate-300">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-lg text-slate-900">
+                        <span className="font-bold text-sm text-slate-900">
                           ❌ Fehlerquote
                         </span>
-                        <span className="text-3xl font-bold" style={{ color: errorColor }}>
+                        <span className="text-2xl font-bold" style={{ color: errorColor }}>
                           {errorRate}%
                         </span>
                       </div>
                       {totalPlaced > 0 && (
-                        <p className="text-sm text-slate-600">
+                        <p className="text-xs text-slate-600">
                           {totalErrors} von {totalPlaced} falsch zugeordnet
                         </p>
                       )}
@@ -1789,16 +1776,16 @@ export default function DigitaleSpiele() {
                 })()}
 
                 {/* Categories with drop zones */}
-                <div className="grid gap-6 lg:grid-cols-3 mb-8">
+                <div className="grid gap-4 lg:grid-cols-3 mb-6">
                   {['Motivationssysteme', 'Spielmechaniken', 'Feedback-Systeme'].map((category) => (
                     <div
                       key={category}
                       onDragOver={handleExercise1DragOver}
                       onDrop={(e) => handleExercise1CategoryDrop(e, category)}
-                      className="bg-blue-50 rounded-lg p-6 border-4 border-dashed border-blue-300 min-h-80"
+                      className="bg-blue-50 rounded-lg p-4 border-4 border-dashed border-blue-300 min-h-64"
                     >
-                      <h3 className="font-bold text-lg mb-6 pb-3 border-b-2 border-blue-300">{category}</h3>
-                      <div className="space-y-3">
+                      <h3 className="font-bold text-sm mb-4 pb-2 border-b-2 border-blue-300">{category}</h3>
+                      <div className="space-y-2">
                         {exercise1Items
                           .filter((item) => item.placedIn === category)
                           .map((item) => {
@@ -1806,7 +1793,7 @@ export default function DigitaleSpiele() {
                             return (
                               <div
                                 key={item.id}
-                                className={`p-3 rounded-lg border-2 font-semibold cursor-move transition-all ${
+                                className={`p-2 rounded-lg border-2 font-semibold text-sm cursor-move transition-all ${
                                   isCorrect
                                     ? 'bg-green-100 border-green-500 text-green-900 hover:bg-green-200'
                                     : 'bg-red-100 border-red-500 text-red-900 hover:bg-red-200'
@@ -1827,9 +1814,9 @@ export default function DigitaleSpiele() {
                 </div>
 
                 {/* Available items to drag */}
-                <div className="bg-slate-50 rounded-lg p-6 border-2 border-slate-300">
-                  <h4 className="font-bold text-slate-900 mb-4">📦 Zu sortierende Elemente ({exercise1Items.filter((i) => !i.placedIn).length} verbleibend):</h4>
-                  <div className="flex flex-wrap gap-2">
+                <div className="bg-slate-50 rounded-lg p-4 border-2 border-slate-300">
+                  <h4 className="font-bold text-sm text-slate-900 mb-3">📦 Zu sortierende Elemente ({exercise1Items.filter((i) => !i.placedIn).length} verbleibend):</h4>
+                  <div className="flex flex-wrap gap-1">
                     {exercise1Items
                       .filter((item) => !item.placedIn)
                       .map((item) => (
@@ -1837,7 +1824,7 @@ export default function DigitaleSpiele() {
                           key={item.id}
                           draggable
                           onDragStart={(e) => handleExercise1DragStart(e, item.id)}
-                          className="bg-white p-3 rounded-lg border-2 border-slate-400 cursor-move hover:bg-blue-50 hover:border-blue-400 transition-all font-medium text-slate-900"
+                          className="bg-white p-2 rounded-lg border-2 border-slate-400 cursor-move hover:bg-blue-50 hover:border-blue-400 transition-all font-medium text-sm text-slate-900"
                         >
                           {item.element}
                         </div>
@@ -1846,8 +1833,8 @@ export default function DigitaleSpiele() {
                 </div>
 
                 {/* Progress and buttons */}
-                <div className="mt-6 flex gap-4 justify-between items-center">
-                  <div className="font-bold text-lg">
+                <div className="mt-4 flex gap-4 justify-between items-center">
+                  <div className="font-bold text-sm">
                     ✓ Richtig: {exercise1Items.filter((i) => i.placedIn === i.correctCategory).length}/{exercise1Items.length}
                   </div>
                   {exercise1Items.some((i) => i.placedIn) && (
@@ -1860,25 +1847,25 @@ export default function DigitaleSpiele() {
             ) : exercise1ShowPhaseDecision ? (
               <>
                 {/* DECISION SCREEN: Phase 1 nochmal oder zu Phase 2 */}
-                <div className="bg-gradient-to-r from-blue-100 to-indigo-100 p-8 rounded-xl border-2 border-blue-500 text-center">
-                  <h2 className="text-3xl font-bold text-blue-900 mb-4">✅ Phase 1 Erfolgreich!</h2>
-                  <p className="text-lg text-blue-800 mb-6">
+                <div className="bg-gradient-to-r from-blue-100 to-indigo-100 p-6 rounded-xl border-2 border-blue-500 text-center">
+                  <h2 className="text-2xl font-bold text-blue-900 mb-3">✅ Phase 1 Erfolgreich!</h2>
+                  <p className="text-base text-blue-800 mb-4">
                     Du hast alle 16 Begriffe korrekt zugeordnet. Sehr gut!
                   </p>
-                  <p className="text-slate-700 mb-8">
+                  <p className="text-sm text-slate-700 mb-6">
                     Was möchtest du als Nächstes tun?
                   </p>
                   
-                  <div className="grid gap-4 md:grid-cols-2 max-w-md mx-auto">
+                  <div className="grid gap-3 md:grid-cols-2 max-w-md mx-auto">
                     <button
                       onClick={resetExercise1ForRetry}
-                      className="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors text-lg"
+                      className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors text-sm"
                     >
                       🔄 Phase 1 nochmal üben
                     </button>
                     <button
                       onClick={startExercise1Phase2}
-                      className="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors text-lg"
+                      className="px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors text-sm"
                     >
                       ▶️ Zu Phase 2
                     </button>
@@ -1888,39 +1875,39 @@ export default function DigitaleSpiele() {
             ) : (
               <>
                 {/* PHASE 2: Situationen Kategorisieren */}
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">1️⃣ Spielmechaniken Meister - Phase 2</h2>
-                <p className="text-slate-700 mb-6">🎮 Erkenne die Kategorien in realen Spielsituationen!</p>
+                <h2 className="text-xl font-bold text-slate-900 mb-2">1️⃣ Spielmechaniken Meister - Phase 2</h2>
+                <p className="text-slate-700 mb-4 text-sm">🎮 Erkenne die Kategorien in realen Spielsituationen!</p>
 
                 {/* Feedback Modal */}
                 {exercise1Phase2ShowFeedback && (
                   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className={`bg-white rounded-xl p-8 max-w-md w-full text-center shadow-xl border-4 ${
+                    <div className={`bg-white rounded-xl p-6 max-w-md w-full text-center shadow-xl border-4 ${
                       exercise1Phase2FeedbackIsCorrect ? 'border-green-500 bg-gradient-to-b from-white to-green-50' : 'border-red-500 bg-gradient-to-b from-white to-red-50'
                     }`}>
                       {exercise1Phase2FeedbackIsCorrect ? (
                         <>
-                          <div className="text-5xl mb-4">✅</div>
-                          <h3 className="text-2xl font-bold text-green-900 mb-2">Richtig!</h3>
-                          <p className="text-green-700 mb-6">
+                          <div className="text-4xl mb-3">✅</div>
+                          <h3 className="text-xl font-bold text-green-900 mb-2">Richtig!</h3>
+                          <p className="text-sm text-green-700 mb-4">
                             Die Antwort ist korrekt. Weiter geht's!
                           </p>
                           <button
                             onClick={handleExercise1Phase2ContinueAfterFeedback}
-                            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors w-full"
+                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors w-full text-sm"
                           >
                             ▶️ Nächste Situation
                           </button>
                         </>
                       ) : (
                         <>
-                          <div className="text-5xl mb-4">❌</div>
-                          <h3 className="text-2xl font-bold text-red-900 mb-2">Falsch!</h3>
-                          <p className="text-red-700 mb-6">
+                          <div className="text-4xl mb-3">❌</div>
+                          <h3 className="text-xl font-bold text-red-900 mb-2">Falsch!</h3>
+                          <p className="text-sm text-red-700 mb-4">
                             Das ist nicht die richtige Antwort. Versuch die nächste Situation!
                           </p>
                           <button
                             onClick={handleExercise1Phase2ContinueAfterFeedback}
-                            className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition-colors w-full"
+                            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition-colors w-full text-sm"
                           >
                             ▶️ Nächste Situation
                           </button>
@@ -1932,25 +1919,25 @@ export default function DigitaleSpiele() {
 
                 {exercise1SituationIndex < exercise1Situations.length ? (
                   <>
-                    <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-lg border-2 border-purple-300 mb-6">
-                      <h3 className="font-bold text-slate-600 text-sm mb-2">Situation {exercise1SituationIndex + 1}/{exercise1Situations.length}</h3>
-                      <div className="w-full bg-slate-300 rounded-full h-2 mb-4">
+                    <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg border-2 border-purple-300 mb-4">
+                      <h3 className="font-bold text-slate-600 text-xs mb-2">Situation {exercise1SituationIndex + 1}/{exercise1Situations.length}</h3>
+                      <div className="w-full bg-slate-300 rounded-full h-2 mb-3">
                         <div 
                           className="bg-purple-600 h-2 rounded-full transition-all"
                           style={{ width: `${((exercise1SituationIndex + 1) / exercise1Situations.length) * 100}%` }}
                         ></div>
                       </div>
-                      <p className="text-slate-900 text-lg leading-relaxed mb-3">{exercise1Situations[exercise1SituationIndex].situation}</p>
-                      <p className="text-slate-600 text-sm italic">Aus: {exercise1Situations[exercise1SituationIndex].game}</p>
+                      <p className="text-slate-900 text-sm leading-relaxed mb-2">{exercise1Situations[exercise1SituationIndex].situation}</p>
+                      <p className="text-slate-600 text-xs italic">Aus: {exercise1Situations[exercise1SituationIndex].game}</p>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-3 mb-6">
+                    <div className="grid gap-3 md:grid-cols-3 mb-4">
                       {['Motivationssysteme', 'Spielmechaniken', 'Feedback-Systeme'].map((category) => (
                         <button
                           key={category}
                           onClick={() => handleExercise1SituationAnswer(category)}
                           disabled={exercise1Phase2ShowFeedback}
-                          className={`p-6 rounded-lg font-bold text-lg transition-all border-2 ${
+                          className={`p-4 rounded-lg font-bold text-sm transition-all border-2 ${
                             exercise1Phase2ShowFeedback ? 'opacity-50 cursor-not-allowed' : ''
                           } ${
                             exercise1SituationAnswers[exercise1SituationIndex] === category
@@ -1967,17 +1954,17 @@ export default function DigitaleSpiele() {
                   </>
                 ) : (
                   <>
-                    <div className="bg-gradient-to-r from-green-100 to-emerald-100 p-8 rounded-lg border-2 border-green-500 text-center">
-                      <h3 className="text-3xl font-bold text-green-900 mb-4">🎉 Ausgezeichnet!</h3>
-                      <p className="text-xl text-green-800 mb-4">
+                    <div className="bg-gradient-to-r from-green-100 to-emerald-100 p-6 rounded-lg border-2 border-green-500 text-center">
+                      <h3 className="text-2xl font-bold text-green-900 mb-3">🎉 Ausgezeichnet!</h3>
+                      <p className="text-base text-green-800 mb-3">
                         ✓ Richtig: {getExercise1SituationScore()}/{exercise1Situations.length}
                       </p>
-                      <p className="text-lg text-green-700 mb-6">
+                      <p className="text-sm text-green-700 mb-4">
                         Du beherrschst die Spielmechaniken-Kategorien perfekt! 🏆
                       </p>
                       <button
                         onClick={resetExercise1Phase2}
-                        className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors text-sm"
                       >
                         Nochmal versuchen
                       </button>
@@ -1989,11 +1976,11 @@ export default function DigitaleSpiele() {
           </div>
 
           {/* Exercise 2 */}
-          <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">2️⃣ Zielgruppen-Detective</h2>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <h2 className="text-xl font-bold text-slate-900 mb-3">2️⃣ Zielgruppen-Detective</h2>
             {!exercise2ShowResult ? (
               exercise2Current < exercise2Scenarios.length ? (
-                <div className="space-y-6">
+              <div className="space-y-4">
                   <div className="bg-orange-50 p-6 rounded-lg border-2 border-orange-300">
                     <h3 className="text-xl font-bold mb-2">
                       Szenario {exercise2Current + 1}/{exercise2Scenarios.length}: {exercise2Scenarios[exercise2Current].name}
@@ -2005,15 +1992,15 @@ export default function DigitaleSpiele() {
                     const globalIdx = exercise2Current * 2 + qIdx
                     const answered = exercise2Answers.length > globalIdx
                     return (
-                      <div key={qIdx} className="bg-slate-50 p-6 rounded-lg border border-slate-300">
-                        <h4 className="font-bold mb-4">{q.text}</h4>
-                        <div className="space-y-3">
+                      <div key={qIdx} className="bg-slate-50 p-4 rounded-lg border border-slate-300">
+                        <h4 className="font-bold text-sm mb-3">{q.text}</h4>
+                        <div className="space-y-2">
                           {q.options.map((opt, oIdx) => (
                             <button
                               key={oIdx}
                               onClick={() => !answered && handleExercise2Answer(oIdx)}
                               disabled={answered}
-                              className={`w-full p-4 text-left font-medium rounded-lg transition-all ${
+                              className={`w-full p-3 text-left text-sm font-medium rounded-lg transition-all ${
                                 answered && oIdx === q.correct
                                   ? 'bg-green-100 border-2 border-green-500'
                                   : answered && oIdx === exercise2Answers[globalIdx]
@@ -2031,9 +2018,9 @@ export default function DigitaleSpiele() {
                 </div>
               ) : null
             ) : (
-              <div className="bg-green-100 p-8 rounded-lg border-2 border-green-500 text-center">
-                <h3 className="text-2xl font-bold text-green-900 mb-4">🎉 Fertig!</h3>
-                <button onClick={resetExercise2} className="px-6 py-3 bg-green-600 text-white rounded-lg">
+              <div className="bg-green-100 p-6 rounded-lg border-2 border-green-500 text-center">
+                <h3 className="text-xl font-bold text-green-900 mb-3">🎉 Fertig!</h3>
+                <button onClick={resetExercise2} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm">
                   Nochmal
                 </button>
               </div>
@@ -2041,25 +2028,25 @@ export default function DigitaleSpiele() {
           </div>
 
           {/* Exercise 3 */}
-          <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">3️⃣ Chancen & Gefahren Sortierer</h2>
-            <p className="text-slate-700 mb-6">Sortiere die Aussagen!</p>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <h2 className="text-xl font-bold text-slate-900 mb-3">3️⃣ Chancen & Gefahren Sortierer</h2>
+            <p className="text-sm text-slate-700 mb-4">Sortiere die Aussagen!</p>
 
-            <div className="grid gap-6 lg:grid-cols-2 mb-6">
+            <div className="grid gap-4 lg:grid-cols-2 mb-4">
               {['chancen', 'risiken'].map((cat) => (
-                <div key={cat} className={`p-6 rounded-lg border-2 min-h-80 ${
+                <div key={cat} className={`p-4 rounded-lg border-2 min-h-64 ${
                   cat === 'chancen' ? 'bg-green-50 border-green-400' : 'bg-red-50 border-red-400'
                 }`}>
-                  <h3 className={`font-bold text-lg mb-4 pb-3 border-b-2 ${
+                  <h3 className={`font-bold text-sm mb-3 pb-2 border-b-2 ${
                     cat === 'chancen' ? 'text-green-900 border-green-400' : 'text-red-900 border-red-400'
                   }`}>
                     {cat === 'chancen' ? '✅ Chancen' : '⚠️ Risiken'}
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {exercise3Items.filter((item) => item.category === cat).map((item) => (
                       <div
                         key={item.id}
-                        className={`p-3 rounded-lg text-sm cursor-pointer font-medium transition-all ${
+                        className={`p-2 rounded-lg text-xs cursor-pointer font-medium transition-all ${
                           item.answered
                             ? cat === 'chancen'
                               ? 'bg-green-100 border-2 border-green-500'
@@ -2075,13 +2062,13 @@ export default function DigitaleSpiele() {
               ))}
             </div>
 
-            <div className="bg-slate-100 p-4 rounded-lg mb-6">
-              <h4 className="font-bold mb-3">Noch zu sortieren:</h4>
-              <div className="flex flex-wrap gap-2">
+            <div className="bg-slate-100 p-3 rounded-lg mb-4">
+              <h4 className="font-bold text-sm mb-2">Noch zu sortieren:</h4>
+              <div className="flex flex-wrap gap-1">
                 {exercise3Items.filter((item) => !item.answered).map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white p-3 rounded-lg border-2 border-slate-300 text-sm cursor-pointer hover:bg-blue-50"
+                    className="bg-white p-2 rounded-lg border-2 border-slate-300 text-xs cursor-pointer hover:bg-blue-50"
                     onClick={() => {
                       handleExercise3Drag(item.id, item.category === 'chancen' ? 'risiken' : 'chancen')
                     }}
@@ -2092,14 +2079,14 @@ export default function DigitaleSpiele() {
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <button onClick={checkExercise3Score} className="px-6 py-3 bg-blue-600 text-white rounded-lg">
+            <div className="flex gap-3">
+              <button onClick={checkExercise3Score} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">
                 Score überprüfen
               </button>
               {exercise3Score > 0 && (
                 <>
-                  <div className="font-bold text-lg">Richtig: {exercise3Score}/10</div>
-                  <button onClick={resetExercise3} className="px-4 py-2 bg-slate-300 rounded-lg">
+                  <div className="font-bold text-sm">Richtig: {exercise3Score}/10</div>
+                  <button onClick={resetExercise3} className="px-3 py-1 bg-slate-300 rounded-lg text-sm">
                     Zurücksetzen
                   </button>
                 </>
@@ -2107,55 +2094,7 @@ export default function DigitaleSpiele() {
             </div>
           </div>
 
-          {/* Exercise 4 */}
-          <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">4️⃣ Spielerlebnis-Barometer</h2>
-            <p className="text-slate-700 mb-6">Beschreibe dein Spielerlebnis mit Schiebereglern (1-10):</p>
 
-            <div className="space-y-6">
-              {(Object.entries(exercise4Emotions) as Array<[keyof typeof exercise4Emotions, number]>).map(([emotion, value]) => (
-                <div key={emotion} className="space-y-3">
-                  <div className="flex justify-between">
-                    <label className="font-bold">{emotion === 'spannung' ? 'Spannung' : emotion === 'frustration' ? 'Frustration' : emotion === 'glueck' ? 'Glück' : emotion === 'empathie' ? 'Empathie' : 'Stress'}</label>
-                    <span className="text-2xl font-bold text-blue-600">{value}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={value}
-                    onChange={(e) => handleExercise4Change(emotion, parseInt(e.target.value))}
-                    className="w-full h-3 rounded-lg accent-blue-600"
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8 p-6 bg-purple-50 rounded-lg border-2 border-purple-300">
-              <h3 className="font-bold text-lg mb-4">📊 Dein Profil:</h3>
-              <div className="space-y-2 text-slate-700">
-                <p><strong>Spannung:</strong> {'█'.repeat(exercise4Emotions.spannung)}{'░'.repeat(10-exercise4Emotions.spannung)}</p>
-                <p><strong>Frustration:</strong> {'█'.repeat(exercise4Emotions.frustration)}{'░'.repeat(10-exercise4Emotions.frustration)}</p>
-                <p><strong>Glück:</strong> {'█'.repeat(exercise4Emotions.glueck)}{'░'.repeat(10-exercise4Emotions.glueck)}</p>
-              </div>
-              <div className="mt-4 p-4 bg-white rounded-lg border border-slate-300">
-                {exercise4Emotions.spannung + exercise4Emotions.glueck > 12 ? (
-                  <p className="text-green-800 font-semibold">✨ Intensives Spielerlebnis!</p>
-                ) : exercise4Emotions.frustration + exercise4Emotions.stress > 10 ? (
-                  <p className="text-orange-800 font-semibold">⚠️ Einige frustrierende Momente</p>
-                ) : (
-                  <p className="text-blue-800 font-semibold">😌 Ausgewogenes Erlebnis</p>
-                )}
-              </div>
-            </div>
-
-            <button
-              onClick={resetExercise4}
-              className="mt-6 w-full px-4 py-3 bg-slate-300 rounded-lg font-semibold"
-            >
-              Zurücksetzen
-            </button>
-          </div>
         </div>
         )}
       </main>
