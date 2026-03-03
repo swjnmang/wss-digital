@@ -110,22 +110,22 @@ export default function DigitaleSpiele() {
 
   // ===== EXERCISE STATES =====
   const [exercise1Items, setExercise1Items] = useState([
-    { id: 1, element: 'Punkte (XP, Score)', correctCategory: 'Motivationssysteme', placedIn: null as string | null },
-    { id: 2, element: 'Achievements/Trophäen', correctCategory: 'Motivationssysteme', placedIn: null },
-    { id: 3, element: 'Loot/Belohnungskisten', correctCategory: 'Spielmechaniken', placedIn: null },
-    { id: 4, element: 'Jump & Walk Mechanik', correctCategory: 'Spielmechaniken', placedIn: null },
-    { id: 5, element: 'Leaderboards', correctCategory: 'Motivationssysteme', placedIn: null },
-    { id: 6, element: 'Sound-Feedback', correctCategory: 'Feedback-Systeme', placedIn: null },
-    { id: 7, element: 'Levelsystem', correctCategory: 'Motivationssysteme', placedIn: null },
-    { id: 8, element: 'Real-time Kontrolle', correctCategory: 'Spielmechaniken', placedIn: null },
-    { id: 9, element: 'Visuelle Effekte (Partikeln)', correctCategory: 'Feedback-Systeme', placedIn: null },
-    { id: 10, element: 'Haptic Feedback (Vibration)', correctCategory: 'Feedback-Systeme', placedIn: null },
-    { id: 11, element: 'Boss-Kämpfe', correctCategory: 'Spielmechaniken', placedIn: null },
-    { id: 12, element: 'In-Game Währung', correctCategory: 'Motivationssysteme', placedIn: null },
-    { id: 13, element: 'Musik/Soundtrack', correctCategory: 'Feedback-Systeme', placedIn: null },
-    { id: 14, element: 'Progression Bar', correctCategory: 'Motivationssysteme', placedIn: null },
-    { id: 15, element: 'Inventar-System', correctCategory: 'Spielmechaniken', placedIn: null },
-    { id: 16, element: 'Tutorial/Onboarding', correctCategory: 'Spielmechaniken', placedIn: null },
+    { id: 1, element: 'Punkte (XP, Score)', correctCategory: 'Motivationssysteme', placedIn: null as string | null, hasError: false },
+    { id: 2, element: 'Achievements/Trophäen', correctCategory: 'Motivationssysteme', placedIn: null, hasError: false },
+    { id: 3, element: 'Loot/Belohnungskisten', correctCategory: 'Spielmechaniken', placedIn: null, hasError: false },
+    { id: 4, element: 'Jump & Walk Mechanik', correctCategory: 'Spielmechaniken', placedIn: null, hasError: false },
+    { id: 5, element: 'Leaderboards', correctCategory: 'Motivationssysteme', placedIn: null, hasError: false },
+    { id: 6, element: 'Sound-Feedback', correctCategory: 'Feedback-Systeme', placedIn: null, hasError: false },
+    { id: 7, element: 'Levelsystem', correctCategory: 'Motivationssysteme', placedIn: null, hasError: false },
+    { id: 8, element: 'Real-time Kontrolle', correctCategory: 'Spielmechaniken', placedIn: null, hasError: false },
+    { id: 9, element: 'Visuelle Effekte (Partikeln)', correctCategory: 'Feedback-Systeme', placedIn: null, hasError: false },
+    { id: 10, element: 'Haptic Feedback (Vibration)', correctCategory: 'Feedback-Systeme', placedIn: null, hasError: false },
+    { id: 11, element: 'Boss-Kämpfe', correctCategory: 'Spielmechaniken', placedIn: null, hasError: false },
+    { id: 12, element: 'In-Game Währung', correctCategory: 'Motivationssysteme', placedIn: null, hasError: false },
+    { id: 13, element: 'Musik/Soundtrack', correctCategory: 'Feedback-Systeme', placedIn: null, hasError: false },
+    { id: 14, element: 'Progression Bar', correctCategory: 'Motivationssysteme', placedIn: null, hasError: false },
+    { id: 15, element: 'Inventar-System', correctCategory: 'Spielmechaniken', placedIn: null, hasError: false },
+    { id: 16, element: 'Tutorial/Onboarding', correctCategory: 'Spielmechaniken', placedIn: null, hasError: false },
   ])
   const [exercise1SituationIndex, setExercise1SituationIndex] = useState(0)
   const [exercise1SituationAnswers, setExercise1SituationAnswers] = useState<(string | null)[]>([])
@@ -625,7 +625,13 @@ export default function DigitaleSpiele() {
   const handleExercise1Drop = (itemId: number, category: string) => {
     setExercise1Items((prev) =>
       prev.map((item) =>
-        item.id === itemId ? { ...item, placedIn: category } : item
+        item.id === itemId 
+          ? { 
+              ...item, 
+              placedIn: category,
+              hasError: item.hasError || category !== item.correctCategory
+            } 
+          : item
       )
     )
   }
@@ -1732,8 +1738,8 @@ export default function DigitaleSpiele() {
                 {/* Error Rate Counter */}
                 {(() => {
                   const totalPlaced = exercise1Items.filter((i) => i.placedIn).length;
-                  const incorrectPlaced = exercise1Items.filter((i) => i.placedIn && i.placedIn !== i.correctCategory).length;
-                  const errorRateValue = totalPlaced > 0 ? (incorrectPlaced / totalPlaced) * 100 : 0;
+                  const totalErrors = exercise1Items.filter((i) => i.hasError).length;
+                  const errorRateValue = totalPlaced > 0 ? (totalErrors / totalPlaced) * 100 : 0;
                   const errorRate = errorRateValue.toFixed(1);
                   const errorColor = errorRateValue === 0 && totalPlaced > 0 ? '#10b981' : errorRateValue < 10 ? '#fbbf24' : '#ef4444';
                   
@@ -1749,7 +1755,7 @@ export default function DigitaleSpiele() {
                       </div>
                       {totalPlaced > 0 && (
                         <p className="text-sm text-slate-600">
-                          {incorrectPlaced} von {totalPlaced} falsch zugeordnet
+                          {totalErrors} von {totalPlaced} falsch zugeordnet
                         </p>
                       )}
                     </div>
