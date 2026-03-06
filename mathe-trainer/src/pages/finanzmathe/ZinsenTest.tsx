@@ -12,21 +12,21 @@ const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max 
 const formatCurrency = (val: number) => val.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const formatNumber = (val: number, decimals: number = 2) => val.toLocaleString('de-DE', { maximumFractionDigits: decimals });
 
-// German 30/360 day count method helper
+// German 30/360 day count method helper (Deutsche kaufmännische Zinstage)
+// Formula: t = (m₂ - m₁) × 30 + (t₂ - t₁), with year adjustment
 const getDays30360 = (d1: Date, d2: Date) => {
   let d1Day = d1.getDate();
   let d1Month = d1.getMonth() + 1;
   let d2Day = d2.getDate();
   let d2Month = d2.getMonth() + 1;
+  let year1 = d1.getFullYear();
+  let year2 = d2.getFullYear();
 
-  // Check if last day of February
-  const isLastDayFeb1 = (d1Month === 2 && (d1Day === 28 || d1Day === 29));
-  const isLastDayFeb2 = (d2Month === 2 && (d2Day === 28 || d2Day === 29));
+  // German 30/360: Only convert day 31 to day 30
+  if (d1Day === 31) d1Day = 30;
+  if (d2Day === 31) d2Day = 30;
 
-  if (d1Day === 31 || isLastDayFeb1) d1Day = 30;
-  if (d2Day === 31 || isLastDayFeb2) d2Day = 30;
-
-  return (d2Month - d1Month) * 30 + (d2Day - d1Day);
+  return (year2 - year1) * 360 + (d2Month - d1Month) * 30 + (d2Day - d1Day);
 };
 
 export default function ZinsenTest() {
@@ -50,16 +50,18 @@ export default function ZinsenTest() {
     const newQuestions: Question[] = [];
     for (let i = 0; i < 10; i++) {
       const K = randomInt(10, 800) * 25;
-      const p = randomInt(5, 70) / 10.0;
+      // Round interest rate to max 1 decimal place for consistent calculation
+      const p = Math.round(randomInt(5, 70) / 10.0 * 10) / 10.0;
       const t = randomInt(3, 35) * 10;
-      const Z = (K * p * t) / 36000;
+      // Round Z to 2 decimal places for consistent calculation
+      const Z = Math.round((K * p * t) / 36000 * 100) / 100;
 
       const type = randomInt(1, 5);
       let q: Question = { id: i, text: '', answer: 0, unit: '', type: 'Z' };
 
       const K_fmt = formatCurrency(K);
       const Z_fmt = formatCurrency(Z);
-      const p_fmt = formatNumber(p);
+      const p_fmt = formatNumber(p, 1);
 
       switch (type) {
         case 1: // Z
@@ -68,21 +70,24 @@ export default function ZinsenTest() {
           q.unit = '€';
           q.type = 'Z';
           break;
-        case 2: // K
+        case 2: // K - recalculate from rounded Z to ensure consistency
+          const K_calculated = Math.round((Z * 36000) / (p * t) * 100) / 100;
           q.text = `Welches Kapital bringt ${Z_fmt} € Zinsen in ${t} Tagen bei einem Zinssatz von ${p_fmt} % p.a.?`;
-          q.answer = K;
+          q.answer = K_calculated;
           q.unit = '€';
           q.type = 'K';
           break;
-        case 3: // p
+        case 3: // p - recalculate from rounded Z to ensure consistency
+          const p_calculated = Math.round((Z * 36000) / (K * t) * 10) / 10.0;
           q.text = `Zu welchem Zinssatz wurde ein Kapital von ${K_fmt} € angelegt, wenn es in ${t} Tagen ${Z_fmt} € Zinsen brachte?`;
-          q.answer = p;
+          q.answer = p_calculated;
           q.unit = '% p.a.';
           q.type = 'p';
           break;
-        case 4: // t
+        case 4: // t - recalculate from rounded Z to ensure consistency
+          const t_calculated = Math.round((Z * 36000) / (K * p));
           q.text = `Wie viele Tage war ein Kapital von ${K_fmt} € zu ${p_fmt} % p.a. angelegt, um ${Z_fmt} € Zinsen zu erzielen?`;
-          q.answer = t;
+          q.answer = t_calculated;
           q.unit = 'Tage';
           q.type = 't';
           break;
@@ -100,8 +105,8 @@ export default function ZinsenTest() {
           
           const days = getDays30360(date1, date2);
           
-          // Recalculate Z with exact days
-          const Z_date = (K * p * days) / 36000;
+          // Recalculate Z with exact days and round to 2 decimal places
+          const Z_date = Math.round((K * p * days) / 36000 * 100) / 100;
           
           const d1Str = date1.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
           const d2Str = date2.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
@@ -216,7 +221,7 @@ export default function ZinsenTest() {
               <strong>Wichtige Hinweise:</strong>
               <ul className="list-disc list-inside mt-1 space-y-1">
                 <li>Runde Beträge auf 2 Nachkommastellen.</li>
-                <li>Runde Zinssätze auf 2 Nachkommastellen.</li>
+                <li>Runde Zinssätze auf 1 Nachkommastelle.</li>
                 <li>Runde Tage auf ganze Zahlen.</li>
               </ul>
             </div>
@@ -298,7 +303,7 @@ export default function ZinsenTest() {
                       </div>
                       {!isCorrect && (
                         <div className="text-gray-600">
-                          Richtige Lösung: <strong>{formatNumber(q.answer, q.type === 't' ? 0 : 2)} {q.unit}</strong>
+                          Richtige Lösung: <strong>{formatNumber(q.answer, q.type === 't' ? 0 : (q.type === 'p' ? 1 : 2))} {q.unit}</strong>
                         </div>
                       )}
                     </div>

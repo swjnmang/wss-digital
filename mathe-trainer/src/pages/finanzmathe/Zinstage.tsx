@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-// German 30/360 day count method helper
+// German 30/360 day count method helper (Deutsche kaufmännische Zinstage)
+// Formula: t = (m₂ - m₁) × 30 + (t₂ - t₁), with year adjustment
 const getDays30360 = (d1: Date, d2: Date) => {
   let d1Day = d1.getDate();
   let d1Month = d1.getMonth() + 1;
@@ -11,17 +12,9 @@ const getDays30360 = (d1: Date, d2: Date) => {
   let year1 = d1.getFullYear();
   let year2 = d2.getFullYear();
 
-  // Check if last day of February
-  // Helper to check if a date is the last day of Feb
-  const isLastDayFeb = (d: Date) => {
-    const m = d.getMonth();
-    const nextDay = new Date(d);
-    nextDay.setDate(d.getDate() + 1);
-    return nextDay.getMonth() !== m && m === 1; // Month 1 is Feb
-  };
-
-  if (d1Day === 31 || isLastDayFeb(d1)) d1Day = 30;
-  if (d2Day === 31 || isLastDayFeb(d2)) d2Day = 30;
+  // German 30/360: Only convert day 31 to day 30
+  if (d1Day === 31) d1Day = 30;
+  if (d2Day === 31) d2Day = 30;
 
   return (year2 - year1) * 360 + (d2Month - d1Month) * 30 + (d2Day - d1Day);
 };
@@ -119,6 +112,30 @@ export default function Zinstage() {
     setCResult(getDays30360(d1, d2));
   };
 
+  const getCalculationSteps = () => {
+    if (!pDate1 || !pDate2) return null;
+
+    const d1Day = pDate1.getDate();
+    const d1Month = pDate1.getMonth() + 1;
+    
+    const d2Day = pDate2.getDate();
+    const d2Month = pDate2.getMonth() + 1;
+
+    // Apply 30/360 conversion
+    let d1DayAdj = d1Day === 31 ? 30 : d1Day;
+    let d2DayAdj = d2Day === 31 ? 30 : d2Day;
+
+    const monthPart = (d2Month - d1Month) * 30;
+    const dayPart = d2DayAdj - d1DayAdj;
+
+    return {
+      d1Day, d1Month, d1DayAdj,
+      d2Day, d2Month, d2DayAdj,
+      monthPart, dayPart,
+      total: monthPart + dayPart
+    };
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-emerald-100">
       <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
@@ -179,8 +196,52 @@ export default function Zinstage() {
               )}
 
               {showSolution && (
-                <div className="w-full max-w-xl bg-blue-50 border border-blue-200 rounded p-4 text-blue-900 mb-2 text-base">
-                  <b>Lösung: {pSolution} Tage</b>
+                <div className="w-full max-w-xl bg-blue-50 border border-blue-200 rounded p-4 text-blue-900 mb-2">
+                  {(() => {
+                    const steps = getCalculationSteps();
+                    if (!steps) return null;
+                    
+                    return (
+                      <div className="space-y-3 text-sm">
+                        <div className="font-bold text-base mb-2">Lösung mit Rechenweg:</div>
+                        
+                        <div className="bg-white rounded p-2 border border-blue-200">
+                          <div className="font-semibold mb-1">📐 Formel (30/360 Methode):</div>
+                          <div className="text-xs font-mono bg-gray-100 p-1 rounded">
+                            t = (Monat₂ − Monat₁) × 30 + (Tag₂ − Tag₁)
+                          </div>
+                        </div>
+
+                        <div className="bg-white rounded p-2 border border-blue-200">
+                          <div className="font-semibold mb-1">📅 Datumswerte:</div>
+                          <div className="text-xs space-y-1">
+                            <div>Startdatum: {steps.d1Day}.{String(steps.d1Month).padStart(2, '0')}</div>
+                            <div>Enddatum: {steps.d2Day}.{String(steps.d2Month).padStart(2, '0')}</div>
+                            {(steps.d1Day === 31 || steps.d2Day === 31) && (
+                              <div className="text-blue-700 font-semibold">
+                                (Tag 31 wird zu Tag 30 umgewandelt)
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="bg-white rounded p-2 border border-blue-200">
+                          <div className="font-semibold mb-1">🧮 Berechnung:</div>
+                          <div className="text-xs space-y-1 font-mono">
+                            <div>Monate: ({steps.d2Month} − {steps.d1Month}) × 30 = {steps.monthPart}</div>
+                            <div>Tage: {steps.d2DayAdj} − {steps.d1DayAdj} = {steps.dayPart}</div>
+                            <div className="border-t border-gray-300 mt-1 pt-1 font-bold">
+                              Gesamt: {steps.monthPart} + ({steps.dayPart}) = <span className="text-blue-700">{steps.total} Tage</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-green-100 rounded p-2 border border-green-300 font-bold text-center">
+                          ✓ Lösung: {pSolution} Tage
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 

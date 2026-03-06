@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { InlineMath } from 'react-katex'
+import 'katex/dist/katex.min.css'
 import styles from './LFCommon.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
 
@@ -11,6 +13,7 @@ export default function Zeichnen(){
   const [showSolution, setShowSolution] = useState<boolean>(false)
   const [m, setM] = useState<number>(2)
   const [t, setT] = useState<number>(1)
+  const [equationLatex, setEquationLatex] = useState<string>('y = 2x + 1')
 
   useEffect(() => {
     generateNewTask(difficulty)
@@ -32,6 +35,42 @@ export default function Zeichnen(){
     const fraction = toFraction(roundedNum)
     if (fraction !== roundedNum) return fraction
     return roundedNum
+  }
+
+  function numberToLatex(num: number): string {
+    if (num === 0) return '0'
+    if (Math.abs(num) === 0.5) return (num > 0 ? '' : '-') + '\\frac{1}{2}'
+    if (Math.abs(num) === 0.25) return (num > 0 ? '' : '-') + '\\frac{1}{4}'
+    if (Math.abs(num) === 0.75) return (num > 0 ? '' : '-') + '\\frac{3}{4}'
+    if (Math.abs(num) === 1/3) return (num > 0 ? '' : '-') + '\\frac{1}{3}'
+    if (Math.abs(num) === 2/3) return (num > 0 ? '' : '-') + '\\frac{2}{3}'
+    if (Math.abs(num) === 2/5) return (num > 0 ? '' : '-') + '\\frac{2}{5}'
+    if (Math.abs(num) === 3/5) return (num > 0 ? '' : '-') + '\\frac{3}{5}'
+    if (Math.abs(num) === 1/5) return (num > 0 ? '' : '-') + '\\frac{1}{5}'
+    if (Math.abs(num) === 3/4) return (num > 0 ? '' : '-') + '\\frac{3}{4}'
+    if (Math.abs(num) === 4/5) return (num > 0 ? '' : '-') + '\\frac{4}{5}'
+    if (Math.abs(num) === 1/6) return (num > 0 ? '' : '-') + '\\frac{1}{6}'
+    if (Math.abs(num) === 5/6) return (num > 0 ? '' : '-') + '\\frac{5}{6}'
+    const rounded = Math.round(num * 100) / 100
+    return rounded.toString()
+  }
+
+  function generateEquationLatex(m: number, t: number): string {
+    let m_str = ''
+    let t_str = ''
+
+    if (m === 1) m_str = 'x'
+    else if (m === -1) m_str = '-x'
+    else if (!Number.isInteger(m) && Math.abs(m) > 0.1) {
+      const mLatex = numberToLatex(m)
+      m_str = `${mLatex}x`
+    } else m_str = `${numberToLatex(m)}x`
+
+    if (t === 0) t_str = ''
+    else if (t > 0) t_str = ` + ${numberToLatex(t)}`
+    else t_str = ` - ${numberToLatex(Math.abs(t))}`
+
+    return `y = ${m_str}${t_str}`
   }
 
   function generateNewTask(level: 'easy'|'medium'|'hard'){
@@ -83,6 +122,7 @@ export default function Zeichnen(){
 
     const eq = `y = ${m_str}${t_str}`
     setEquation(eq)
+    setEquationLatex(generateEquationLatex(m, t))
 
     setRangeHint('Ein guter Zeichenbereich für die x-Achse ist von -5 bis +5, die Länge der y-Achse musst du selbst festlegen, häufig reicht hier ebenfalls -5 bis +5.')
 
@@ -118,7 +158,9 @@ export default function Zeichnen(){
 
           <div id="task-output" className="bg-gray-100 border rounded-md p-6 mb-4 text-center">
             <div id="task-text">Zeichne den Graphen der folgenden Funktion in ein Koordinatensystem.</div>
-            <div id="task-equation" className="text-2xl font-bold text-sky-800 mt-2">{equation}</div>
+            <div id="task-equation" className="text-2xl font-bold text-sky-800 mt-2">
+              <InlineMath math={equationLatex} />
+            </div>
             <div id="drawing-range-hint" className="text-sm text-gray-600 mt-3">{rangeHint}</div>
           </div>
 
@@ -168,11 +210,11 @@ export default function Zeichnen(){
                 <h4 className="font-bold text-lg text-blue-600 mb-2">1. Wertetabelle erstellen</h4>
                 <p className="text-gray-700 mb-3">Erstelle eine Wertetabelle, indem du mehrere x-Werte in die Funktionsgleichung einsetzt und die entsprechenden y-Werte berechnest.</p>
                 <div className="bg-blue-50 border-l-4 border-blue-600 p-3 text-sm text-gray-700">
-                  <strong>Beispiel:</strong> Für y = 2x - 1<br/>
-                  x = -1 → y = 2(-1) - 1 = -3<br/>
-                  x = 0 → y = 2(0) - 1 = -1<br/>
-                  x = 1 → y = 2(1) - 1 = 1<br/>
-                  x = 2 → y = 2(2) - 1 = 3
+                  <strong>Beispiel:</strong> Für <InlineMath math="y = 2x - 1" /><br/>
+                  <InlineMath math="x = -1 \Rightarrow y = 2(-1) - 1 = -3" /><br/>
+                  <InlineMath math="x = 0 \Rightarrow y = 2(0) - 1 = -1" /><br/>
+                  <InlineMath math="x = 1 \Rightarrow y = 2(1) - 1 = 1" /><br/>
+                  <InlineMath math="x = 2 \Rightarrow y = 2(2) - 1 = 3" />
                 </div>
               </div>
 
@@ -180,23 +222,23 @@ export default function Zeichnen(){
                 <h4 className="font-bold text-lg text-blue-600 mb-2">2. Zwei wichtige Punkte berechnen</h4>
                 <p className="text-gray-700 mb-3">Du brauchst mindestens zwei Punkte, um eine Gerade zu zeichnen. Besonders einfach sind:</p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2">
-                  <li><strong>Y-Achsenabschnitt:</strong> Setze x = 0 ein. Der y-Wert ist direkt der konstante Term in der Gleichung.</li>
-                  <li><strong>X-Achsenabschnitt (Nullstelle):</strong> Setze y = 0 und löse nach x auf.</li>
+                  <li><strong>Y-Achsenabschnitt:</strong> Setze <InlineMath math="x = 0" /> ein. Der y-Wert ist direkt der konstante Term in der Gleichung.</li>
+                  <li><strong>X-Achsenabschnitt (Nullstelle):</strong> Setze <InlineMath math="y = 0" /> und löse nach <InlineMath math="x" /> auf.</li>
                 </ul>
                 <div className="bg-blue-50 border-l-4 border-blue-600 p-3 text-sm text-gray-700 mt-3">
-                  <strong>Beispiel:</strong> Für y = 2x - 1<br/>
-                  Y-Achsenabschnitt: x = 0 → y = -1, also Punkt (0 | -1)<br/>
-                  X-Achsenabschnitt: 0 = 2x - 1 → x = 0,5, also Punkt (0,5 | 0)
+                  <strong>Beispiel:</strong> Für <InlineMath math="y = 2x - 1" /><br/>
+                  Y-Achsenabschnitt: <InlineMath math="x = 0 \Rightarrow y = -1" />, also Punkt <InlineMath math="(0 \mid -1)" /><br/>
+                  X-Achsenabschnitt: <InlineMath math="0 = 2x - 1 \Rightarrow x = 0{,}5" />, also Punkt <InlineMath math="(0{,}5 \mid 0)" />
                 </div>
               </div>
 
               <div>
                 <h4 className="font-bold text-lg text-blue-600 mb-2">3. Steigung ablesen und nutzen</h4>
-                <p className="text-gray-700 mb-3">Die Steigung m zeigt dir, wie steil die Gerade ist. Wenn du einen Punkt hast, kannst du von dort aus die Steigung nutzen, um weitere Punkte zu finden:</p>
+                <p className="text-gray-700 mb-3">Die Steigung <InlineMath math="m" /> zeigt dir, wie steil die Gerade ist. Wenn du einen Punkt hast, kannst du von dort aus die Steigung nutzen, um weitere Punkte zu finden:</p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2">
                   <li>Positive Steigung: Gerade verläuft von links unten nach rechts oben</li>
                   <li>Negative Steigung: Gerade verläuft von links oben nach rechts unten</li>
-                  <li>Steigung m = 2 bedeutet: Wenn du 1 Einheit nach rechts gehst, gehst du 2 Einheiten nach oben</li>
+                  <li>Steigung <InlineMath math="m = 2" /> bedeutet: Wenn du 1 Einheit nach rechts gehst, gehst du 2 Einheiten nach oben</li>
                 </ul>
               </div>
 

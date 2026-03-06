@@ -1,0 +1,64 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'shared-links.js'
+      - 'fragebogen.html'
+      - 'README.md'
+      - 'public/**'
+      - '.github/workflows/deploy-to-pages.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout wss-digital repo
+        uses: actions/checkout@v4
+        with:
+          repository: swjnmang/wss-digital
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: wss-digital
+
+      - name: Checkout GitHub Pages repo
+        uses: actions/checkout@v4
+        with:
+          repository: swjnmang/swjnmang.github.io
+          token: ${{ secrets.DEPLOY_TOKEN }}
+          path: github-pages
+
+      - name: Sync files to GitHub Pages
+        run: |
+          # Copy the files to the wss-digital directory in GitHub Pages
+          mkdir -p github-pages/wss-digital
+          
+          # Copy main files
+          cp wss-digital/index.html github-pages/wss-digital/
+          cp wss-digital/shared-links.js github-pages/wss-digital/
+          cp wss-digital/fragebogen.html github-pages/wss-digital/ 2>/dev/null || true
+          cp wss-digital/README.md github-pages/wss-digital/ 2>/dev/null || true
+          
+          # Copy public folder if it exists
+          if [ -d "wss-digital/public" ]; then
+            cp -r wss-digital/public/* github-pages/wss-digital/public/ 2>/dev/null || mkdir -p github-pages/wss-digital/public && cp -r wss-digital/public/* github-pages/wss-digital/public/
+          fi
+
+      - name: Commit and push to GitHub Pages
+        working-directory: github-pages
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # Check if there are changes
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            git add wss-digital/
+            git commit -m "Update wss-digital from source repo - $(date '+%Y-%m-%d %H:%M:%S')"
+            git push
+            echo "✅ Successfully deployed to GitHub Pages"
+          fi
