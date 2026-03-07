@@ -2018,11 +2018,11 @@ export default function DigitaleSpiele() {
                 <h3 className="text-2xl font-bold text-purple-900 mb-4">🕹️ Kostenlose Klassiker (Steam & Launcher)</h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   {[
-                    { name: 'Dota 2', platform: 'PC (Steam)', genre: 'MOBA', desc: 'Strategie-Multiplayer. Komplexes Balances-System. Keine Pay-to-Win Mechanik.', url: 'https://www.dota2.com' },
-                    { name: 'Counter-Strike 2', platform: 'PC (Steam)', genre: 'Tactical Shooter', desc: 'Taktisches Team-Shooter-Spiel. Neu überarbeitet mit verbesserter Engine.', url: 'https://www.counter-strike.net' },
-                    { name: 'Team Fortress 2', platform: 'PC (Steam)', genre: 'Shooter', desc: 'Humor-Shooter mit 9 verschiedenen Charakterklassen. Seit 2007 kostenlos.', url: 'https://www.teamfortress.com' },
+                    { name: 'Dota 2', platform: 'PC (Steam)', genre: 'MOBA', desc: 'Strategie-Multiplayer. Komplexes Balances-System. Keine Pay-to-Win Mechanik.', url: 'https://store.steampowered.com/app/570/Dota_2/' },
+                    { name: 'Counter-Strike 2', platform: 'PC (Steam)', genre: 'Tactical Shooter', desc: 'Taktisches Team-Shooter-Spiel. Neu überarbeitet mit verbesserter Engine.', url: 'https://store.steampowered.com/app/730/CounterStrike_2/' },
+                    { name: 'Team Fortress 2', platform: 'PC (Steam)', genre: 'Shooter', desc: 'Humor-Shooter mit 9 verschiedenen Charakterklassen. Seit 2007 kostenlos.', url: 'https://store.steampowered.com/app/440/Team_Fortress_2/' },
                     { name: 'Warframe', platform: 'PC, Konsolen', genre: 'Action RPG', desc: 'Sci-Fi Action-RPG. Großartige Bewegungsmechaniken und Koop-Gameplay.', url: 'https://www.warframe.com' },
-                    { name: 'Lost Ark', platform: 'PC (Steam)', genre: 'MMORPG', desc: 'Isometrisches MMORPG mit großem Endgame-Content und regelmäßigen Updates.', url: 'https://www.lostarkgame.com' },
+                    { name: 'Lost Ark', platform: 'PC (Steam)', genre: 'MMORPG', desc: 'Isometrisches MMORPG mit großem Endgame-Content und regelmäßigen Updates.', url: 'https://www.playlostark.com' },
                     { name: 'Apex Legends', platform: 'PC, Konsolen, Mobile', genre: 'Battle Royale', desc: 'Team-basierter Battle Royale mit einzigartigen Charakter-Fähigkeiten.', url: 'https://www.ea.com/games/apex' },
                   ].map((game, idx) => (
                     <div key={idx} className="bg-purple-50 p-4 rounded-lg border-2 border-purple-200 hover:shadow-lg transition-shadow">
@@ -2047,7 +2047,7 @@ export default function DigitaleSpiele() {
                     { name: 'OpenTTD', platform: 'PC, Mac, Linux', genre: 'Tycoon/Strategie', desc: 'Open-Source Klon von Transport Tycoon. Umfangreiches Managementspiel völlig kostenlos.', url: 'https://www.openttd.org' },
                     { name: 'Battle for Wesnoth', platform: 'PC, Mac, Linux', genre: 'Strategiespiel', desc: 'Rundenbasiertes Fantasy-Strategiespiel. Open-Source, größer als viele kommerzielle Titel.', url: 'https://www.wesnoth.org' },
                     { name: 'SuperTuxKart', platform: 'PC, Mac, Linux, Android', genre: 'Rennspiel', desc: 'Open-Source Karting-Spiel mit Pixar-ähnlicher Grafik. Voller Inhalt ohne Monetarisierung.', url: 'https://supertuxkart.net' },
-                    { name: 'StepMania', platform: 'PC, Mac, Linux', genre: 'Rhythmus-Spiel', desc: 'Dance-Revolution-ähnliches Spiel. Open-Source mit aktiver Community.', url: 'https://www.stepmania.com' },
+                    { name: 'StepMania', platform: 'PC, Mac, Linux', genre: 'Rhythmus-Spiel', desc: 'Dance-Revolution-ähnliches Spiel. Open-Source mit aktiver Community.', url: 'https://stepmania.com' },
                     { name: 'Godot Engine', platform: 'PC, Mac, Linux', genre: 'Game Engine + Beispiele', desc: 'Free Game Engine mit kostenlosen Tutorialen und Beispielspielen zum Lernen.', url: 'https://godotengine.org' },
                   ].map((game, idx) => (
                     <div key={idx} className="bg-green-50 p-4 rounded-lg border-2 border-green-200 hover:shadow-lg transition-shadow">
@@ -2071,9 +2071,9 @@ export default function DigitaleSpiele() {
                     { name: 'Skribbl.io', platform: 'Browser', genre: 'Party/Zeichnen', desc: 'Pictionary-ähnliches Multiplayer-Spiel. Kostenlos, keine Registrierung nötig.', url: 'https://skribbl.io' },
                     { name: 'Gartic Phone', platform: 'Browser', genre: 'Party-Spiel', desc: 'Online Variante des "Stille-Post"-Spiels mit Zeichnungen. Großartig für Gruppen.', url: 'https://garticphone.com' },
                     { name: 'Sporcle', platform: 'Browser', genre: 'Quiz', desc: 'Tausende Quiz-Spiele zu Geographie, Geschichte, Popkultur etc.', url: 'https://www.sporcle.com' },
-                    { name: '2048', platform: 'Browser', genre: 'Puzzlespiel', desc: 'Minimalistisches Zahlen-Puzzle. Open-Source und sehr süchtig machend.', url: 'https://play2048.co' },
+                    { name: '2048', platform: 'Browser', genre: 'Puzzlespiel', desc: 'Minimalistisches Zahlen-Puzzle. Open-Source und sehr süchtig machend.', url: 'https://2048.org' },
                     { name: 'Wordle', platform: 'Browser', genre: 'Wort-Rätsel', desc: 'Tägliches Wort-Ratespiel. Kostenlos spielbar ohne Werbung.', url: 'https://www.nytimes.com/games/wordle' },
-                    { name: 'Onet Connect', platform: 'Browser', genre: 'Matching-Puzzle', desc: 'Tile-Matching Logik-Spiel. Endlose Spielbarkeit ohne Pay-to-Win.', url: 'https://onetconnect.xyz' },
+                    { name: 'Onet Connect', platform: 'Browser', genre: 'Matching-Puzzle', desc: 'Tile-Matching Logik-Spiel. Endlose Spielbarkeit ohne Pay-to-Win.', url: 'https://onetconnect.com' },
                   ].map((game, idx) => (
                     <div key={idx} className="bg-orange-50 p-4 rounded-lg border-2 border-orange-200 hover:shadow-lg transition-shadow">
                       <h4 className="font-bold text-lg text-orange-900 mb-2">{game.name}</h4>
