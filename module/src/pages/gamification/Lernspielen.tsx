@@ -3,6 +3,8 @@ import { useState } from 'react'
 
 export default function Lernspielen() {
   const [activeTab, setActiveTab] = useState('aufgaben')
+  const [expandedAufgabe1, setExpandedAufgabe1] = useState(true)
+  const [expandedAufgabe2, setExpandedAufgabe2] = useState(false)
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -56,16 +58,17 @@ export default function Lernspielen() {
               {/* AUFGABE 1: Grundlagen der Motivationspsychologie */}
               <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
                 <button
-                  onClick={() => {/* Toggle logic would go here if using state */}}
+                  onClick={() => setExpandedAufgabe1(!expandedAufgabe1)}
                   className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
                 >
                   <div className="text-left flex-1">
                     <h3 className="text-2xl font-bold text-slate-900">📋 Aufgabe 1: Grundlagen der Motivationspsychologie</h3>
                     <p className="text-slate-600 text-sm mt-2">Entdecke die Geheimisse menschlicher Motivation - Das Langeweile-Manifest</p>
                   </div>
-                  <span className="text-3xl ml-4">➕</span>
+                  <span className="text-3xl ml-4 transition-transform duration-300" style={{ transform: expandedAufgabe1 ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
                 </button>
                 
+                {expandedAufgabe1 && (
                 <div className="px-8 py-6 border-t border-slate-200 bg-white space-y-6">
                   {/* Narrative Introduction */}
                   <div className="bg-slate-50 border-l-4 border-slate-400 p-6 rounded-lg">
@@ -214,6 +217,203 @@ export default function Lernspielen() {
 
 
                 </div>
+                )}
+              </div>
+
+              {/* AUFGABE 2: Experimente Durchführen */}
+              <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedAufgabe2(!expandedAufgabe2)}
+                  className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="text-left flex-1">
+                    <h3 className="text-2xl font-bold text-slate-900">🧪 Aufgabe 2: Experimente Durchführen - Motivationstheorien</h3>
+                    <p className="text-slate-600 text-sm mt-2">Führt Experimente durch und testet die Motivationstheorien in der Praxis</p>
+                  </div>
+                  <span className="text-3xl ml-4 transition-transform duration-300" style={{ transform: expandedAufgabe2 ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                </button>
+
+                {expandedAufgabe2 && (
+                <div className="px-8 py-6 border-t border-slate-200 bg-white space-y-6">
+                  {/* Aufgabe 2 Introduction */}
+                  <div className="bg-slate-50 border-l-4 border-slate-400 p-6 rounded-lg">
+                    <h4 className="text-lg font-bold text-slate-900 mb-4">🔬 Theorie in die Praxis: Experiment durchführen</h4>
+                    <p className="text-slate-700 mb-4">
+                      Nachdem ihr die Motivationstheorien kennengelernt habt, ist es Zeit, diese <strong>selbst zu testen!</strong> Jede Gruppe wählt sich passende Experimente für ihr Thema aus, führt diese durch und dokumentiert die Ergebnisse.
+                    </p>
+                    <div className="bg-white p-4 rounded border border-slate-200">
+                      <p className="font-semibold text-slate-900 mb-2">📋 Wie es funktioniert:</p>
+                      <ol className="text-sm text-slate-700 space-y-1 list-decimal list-inside">
+                        <li>Wähle 1-2 Experimente aus, die zu deinem Thema passen</li>
+                        <li>Plane das Experiment (Material, Zeit, Teilnehmer)</li>
+                        <li>Führe es durch und beobachte/dokumentiere genau</li>
+                        <li>Präsentiere deine Erkenntnisse der Klasse</li>
+                        <li>Erkläre, wie diese Erkenntnisse Lernspiele besser machen</li>
+                      </ol>
+                    </div>
+                  </div>
+
+                  {/* Experiment Groups */}
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-bold text-slate-900">📚 Experimente nach Thema</h4>
+                    
+                    {/* Maslow Experiments */}
+                    <div className="bg-white border-2 border-slate-200 p-6 rounded-lg">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-3xl">🔺</span>
+                        <h5 className="text-xl font-bold text-slate-900">Bedürfnispyramide nach Maslow</h5>
+                      </div>
+                      <div className="space-y-3 text-slate-700">
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 1: Die "Insel-Challenge"</p>
+                          <p className="text-sm">Stellt euch vor, ihr strandet auf einer einsamen Insel. In welcher Reihenfolge würdet ihr eure Probleme lösen? Deckt sich das mit Maslows Pyramide? Fragt mehrere Personen und vergleicht die Antworten.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 2: Werbung analysieren</p>
+                          <p className="text-sm">Sucht euch ein bekanntes Produkt (z. B. ein teures Auto oder ein Parfüm). Welche Stufe der Pyramide versucht die Werbung anzusprechen? Analysiert mindestens 3 Werbungen.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 3: Kultur-Check</p>
+                          <p className="text-sm">Glaubt ihr, die Pyramide sieht in einer armen Region der Welt genauso aus wie in einer reichen Stadt? Recherchiert und diskutiert eure Hypothesen.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 4: Schul-Check</p>
+                          <p className="text-sm">Auf welcher Stufe befindet ihr euch meistens, wenn ihr im Klassenzimmer sitzt? Macht eine kurze Umfrage unter Mitschülern.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Classical Conditioning Experiments */}
+                    <div className="bg-white border-2 border-slate-200 p-6 rounded-lg">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-3xl">🔔</span>
+                        <h5 className="text-xl font-bold text-slate-900">Klassische Konditionierung</h5>
+                      </div>
+                      <div className="space-y-3 text-slate-700">
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 1: Das "Zitronen-Experiment"</p>
+                          <p className="text-sm">Stellt euch vor, ihr beißt in eine gelbe, saure Zitrone. Der Saft läuft in euren Mund. Was passiert gerade mit eurem Speichelfluss? Erklärt, warum allein der Gedanke daran eine Reaktion auslöst und testet das bei anderen.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 2: Konditionierung im Sport</p>
+                          <p className="text-sm">Warum tragen Profisportler oft "Glücksbringer" oder haben feste Rituale vor dem Spiel? Ist das eine Art Konditionierung? Interviewt Sportler und Trainer.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 3: Medien & Töne</p>
+                          <p className="text-sm">Warum greifen viele Menschen sofort zum Handy, wenn es "Pling" macht, selbst wenn sie gerade mitten im Gespräch sind? Beobachtet diesen Reflex bei euren Mitschülern.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 4: Gegen-Konditionierung</p>
+                          <p className="text-sm">Wie könnte man jemandem die Angst vor Spinnen "verlernen"? Entwerft einen praktischen Plan basierend auf klassischer Konditionierung.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Flow Theory Experiments */}
+                    <div className="bg-white border-2 border-slate-200 p-6 rounded-lg">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-3xl">🌊</span>
+                        <h5 className="text-xl font-bold text-slate-900">Die Flow-Theorie</h5>
+                      </div>
+                      <div className="space-y-3 text-slate-700">
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 1: Flow-Killer finden</p>
+                          <p className="text-sm">Was sind die größten Feinde des Flow-Zustands in eurem Zimmer oder im Unterricht? (z. B. Handy, Lärm, Unterbrechungen). Erstellt eine Top-5-Liste.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 2: Die Grafik-Aufgabe</p>
+                          <p className="text-sm">Zeichnet ein Diagramm mit den Achsen "Angst", "Langeweile" und "Flow". Wo landet man, wenn man ein Videospiel auf dem Level "Einfach" spielt, obwohl man Profi ist? Testet das mit verschiedenen Spielern.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 3: Flow in der Gruppe</p>
+                          <p className="text-sm">Kann eine ganze Band oder eine Fußballmannschaft gleichzeitig im Flow sein? Wie fühlt sich das an? Interviewt Musiker/innen oder Sportler/innen.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 4: Tipps für Lehrer</p>
+                          <p className="text-sm">Schreibt drei konkrete Tipps auf, wie ein Lehrer eine Aufgabe stellen muss, damit die Chance auf Flow steigt. Testet diese in echten Klassen-Situationen.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Intrinsic/Extrinsic Motivation Experiments */}
+                    <div className="bg-white border-2 border-slate-200 p-6 rounded-lg">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-3xl">⚡</span>
+                        <h5 className="text-xl font-bold text-slate-900">Intrinsische & Extrinsische Motivation</h5>
+                      </div>
+                      <div className="space-y-3 text-slate-700">
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 1: Das "Profi-Dilemma"</p>
+                          <p className="text-sm">Ein leidenschaftlicher Gamer wird dafür bezahlt, 10 Stunden am Tag ein bestimmtes Spiel zu spielen. Bleibt seine Motivation intrinsisch? Diskutiert und recherchiert Real-Life-Beispiele (z.B. Esports-Profis).</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 2: Noten-Debatte</p>
+                          <p className="text-sm">Wärt ihr noch motiviert zu lernen, wenn es ab morgen keine Noten mehr gäbe, sondern nur noch Feedback-Gespräche? Führt eine Klassendiskussion durch und dokumentiert die Ergebnisse.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 3: Die "Superkraft"</p>
+                          <p className="text-sm">Wenn ihr euch aussuchen könntet, für ein Schulfach plötzlich intrinsisch motiviert zu sein – welches wäre das und was würde sich in eurem Leben ändern? Umfrage bei mehreren Schülern.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 4: Motivation mischen</p>
+                          <p className="text-sm">Kann man eine Aufgabe extrinsisch starten (z. B. Hausaufgaben für Belohnung) und dann intrinsisch beenden? Testet den Wechsel im realen Schulalltag.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Reward System Experiments */}
+                    <div className="bg-white border-2 border-slate-200 p-6 rounded-lg">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-3xl">🎁</span>
+                        <h5 className="text-xl font-bold text-slate-900">Belohnungssysteme im Gehirn</h5>
+                      </div>
+                      <div className="space-y-3 text-slate-700">
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 1: Der "Social Media Check"</p>
+                          <p className="text-sm">Warum gibt es bei Instagram kein "Ende" beim Scrollen? Wie nutzt das Design unser Dopamin aus? Analysiert die Mechaniken und macht ein Poster darüber.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 2: Dopamin-Fasten</p>
+                          <p className="text-sm">Was würde passieren, wenn ihr 24 Stunden auf alle schnellen Belohnungen (Handy, Zucker, Gaming) verzichtet? Wie würde sich euer Gehirn nach 5 Stunden anfühlen? Dokumentiert das Experiment.</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 3: Erfolgstagebuch</p>
+                          <p className="text-sm">Warum fühlt es sich gut an, Aufgaben auf einer Liste abzuhaken? Erklärt den biologischen Grund dahinter und testet das mit der Klasse (Dopamin-Freisetzung durch kleine Siege).</p>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                          <p className="font-semibold mb-1">💡 Experiment 4: Gefährliche Belohnung</p>
+                          <p className="text-sm">Erklärt den Unterschied zwischen einer "gesunden" Belohnung (z. B. Stolz nach dem Sport) und einer "künstlichen" Belohnung (z. B. Glücksspiel). Fallstudien sammeln und analysieren.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Deliverables for Task 2 */}
+                  <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
+                    <h4 className="text-lg font-bold text-slate-900 mb-4">📊 Was muss abgegeben werden?</h4>
+                    <div className="space-y-3">
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <h5 className="font-bold text-slate-900 mb-2">📝 Experiment-Dokumentation</h5>
+                        <ul className="text-sm text-slate-700 space-y-1">
+                          <li>✓ Gewählte Experimente (1-2 pro Gruppe)</li>
+                          <li>✓ Hypothesis & Vorbereitungsplan</li>
+                          <li>✓ Durchführung (Foto/Video, wenn möglich)</li>
+                          <li>✓ Dokumentierte Beobachtungen & Ergebnisse</li>
+                          <li>✓ Verbindung zur Theorie erklären</li>
+                        </ul>
+                      </div>
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <h5 className="font-bold text-slate-900 mb-2">🎮 Gamification-Anwendung</h5>
+                        <ul className="text-sm text-slate-700 space-y-1">
+                          <li>✓ Wie könnte man diese Erkenntnisse in Lernspielen nutzen?</li>
+                          <li>✓ Konkrete Beispiele & Ideen für Game-Mechaniken</li>
+                          <li>✓ Wie helfen eure Erkenntnisse, bessere Lernerfahrungen zu schaffen?</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                )}
               </div>
             </div>
           )}
