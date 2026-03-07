@@ -182,7 +182,9 @@ const RelativeAbsoluteHaeufigkeit: React.FC = () => {
     if (currentTask.type === 'multiple-choice') {
       isCorrect = state.answer === currentTask.correctAnswer;
     } else if (currentTask.type === 'numeric') {
-      const numAnswer = parseFloat(String(state.answer));
+      // Normalize comma to point for parsing
+      const normalizedAnswer = String(state.answer).replace(',', '.');
+      const numAnswer = parseFloat(normalizedAnswer);
       const numCorrect = parseFloat(String(currentTask.correctAnswer));
       const tolerance = currentTask.tolerance || 0;
       isCorrect = Math.abs(numAnswer - numCorrect) <= tolerance;
