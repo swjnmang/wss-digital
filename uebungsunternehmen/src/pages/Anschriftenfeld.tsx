@@ -25,6 +25,7 @@ export default function Anschriftenfeld() {
   const [inputs, setInputs] = useState<string[]>(Array(6).fill(''));
   const [showFeedback, setShowFeedback] = useState(false);
   const [shuffledElements, setShuffledElements] = useState<string[]>([]);
+  const [showSolution, setShowSolution] = useState(false);
   
   // Exam State
   const [examState, setExamState] = useState<ExamState>({
@@ -50,6 +51,7 @@ export default function Anschriftenfeld() {
     setCurrentTask(randomTask);
     setInputs(Array(6).fill(''));
     setShowFeedback(false);
+    setShowSolution(false);
     
     // Shuffle address elements
     const nonEmptyElements = randomTask.solution.filter(el => el.trim() !== '');
@@ -62,6 +64,7 @@ export default function Anschriftenfeld() {
     newInputs[index] = value;
     setInputs(newInputs);
     setShowFeedback(false);
+    setShowSolution(false);
   };
 
   // --- Practice Mode Logic ---
@@ -418,13 +421,37 @@ export default function Anschriftenfeld() {
 
             {/* Hints (Practice only) */}
             {mode === 'practice' && showFeedback && !isCorrect && (
-              <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5 text-sm text-amber-900 space-y-2">
-                <h3 className="font-bold">Tipps zur Lösung:</h3>
-                <ul className="list-disc pl-5 space-y-1">
-                  {currentTask.hints.map((hint, i) => (
-                    <li key={i}>{hint}</li>
-                  ))}
-                </ul>
+              <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5 text-sm text-amber-900 space-y-4">
+                <div>
+                  <h3 className="font-bold mb-2">Tipps zur Lösung:</h3>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {currentTask.hints.map((hint, i) => (
+                      <li key={i}>{hint}</li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={() => setShowSolution(!showSolution)}
+                    className="flex-1 bg-amber-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-amber-700 transition-colors text-sm"
+                  >
+                    {showSolution ? 'Lösung verstecken' : 'Lösung anzeigen'}
+                  </button>
+                </div>
+
+                {showSolution && (
+                  <div className="mt-3 pt-3 border-t border-amber-200">
+                    <h4 className="font-bold mb-2">Richtige Lösung:</h4>
+                    <div className="bg-white rounded-lg p-3 space-y-1 font-mono text-xs">
+                      {currentTask.solution.map((line, i) => (
+                        <div key={i} className="text-slate-700">
+                          {line || '(leer)'}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
