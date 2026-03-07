@@ -5,6 +5,8 @@ import Kalkulation from './pages/Kalkulation';
 import Angebotsvergleich from './pages/Angebotsvergleich';
 import Geschaeftsbriefe from './pages/Geschaeftsbriefe';
 import Anschriftenfeld from './pages/Anschriftenfeld';
+import Einkaufsprozess from './pages/Einkaufsprozess';
+import Verkaufsprozess from './pages/Verkaufsprozess';
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         <Route path="/angebotsvergleich" element={<Angebotsvergleich />} />
         <Route path="/geschaeftsbriefe" element={<Geschaeftsbriefe />} />
         <Route path="/anschriftenfeld" element={<Anschriftenfeld />} />
+        <Route path="/einkaufsprozess" element={<Einkaufsprozess />} />
+        <Route path="/verkaufsprozess" element={<Verkaufsprozess />} />
       </Routes>
     </Router>
   );

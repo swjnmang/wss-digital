@@ -18,6 +18,26 @@ export default function Home() {
       <main className="flex-1 w-full max-w-6xl mx-auto p-12 flex items-center justify-center">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-8 w-full">
           
+          <Link to="/einkaufsprozess" className="bg-white rounded-2xl p-10 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100">
+            <div className="text-5xl mb-6 text-green-500">
+              🛍️
+            </div>
+            <h2 className="text-2xl font-semibold mb-3 text-slate-800">Einkaufsprozess</h2>
+            <p className="text-slate-500 leading-relaxed">
+              Lerne den kompletten Einkaufsprozess kennen: Von der Bedarfsprüfung bis zur Rechnungsprüfung.
+            </p>
+          </Link>
+
+          <Link to="/verkaufsprozess" className="bg-white rounded-2xl p-10 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100">
+            <div className="text-5xl mb-6 text-orange-500">
+              📦
+            </div>
+            <h2 className="text-2xl font-semibold mb-3 text-slate-800">Verkaufsprozess</h2>
+            <p className="text-slate-500 leading-relaxed">
+              Bediene das Warenwirtschaftssystem: Bearbeite Kundenanfragen und führe Aufträge durch.
+            </p>
+          </Link>
+          
           <Link to="/buchungssaetze" className="bg-white rounded-2xl p-10 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100">
             <div className="text-5xl mb-6 text-blue-500">
               📊
