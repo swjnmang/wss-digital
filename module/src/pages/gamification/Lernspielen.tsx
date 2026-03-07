@@ -336,7 +336,7 @@ export default function Lernspielen() {
                               <p className="font-semibold mb-2">Experiment 1: Der Handy-Reflex</p>
                               <div className="text-sm space-y-2">
                                 <p><strong>Vorbereitung:</strong> Stopuhr, Notizblock</p>
-                                <p><strong>Anleitung:</strong> Beobachtet eure Mitschüler eine Woche lang. Jedes Mal, wenn das Handy "pling" macht (Nachricht, Notification etc.), messt wie schnell die Person zum Handy greift. Zählt auch: Wie viele schaffen es, 5 Sekunden zu warten?</p>
+                                <p><strong>Anleitung:</strong> Beobachtet eure Mitschüler eine Woche lang. Jedes Mal, wenn das Handy "pling" macht (Nachricht, Notification etc.), messt, wie schnell die Person zum Handy greift. Zählt auch: Wie viele schaffen es, 5 Sekunden zu warten?</p>
                                 <p><strong>Dokumentation:</strong> Durchschnittliche Reaktionszeit? Wie viele Menschen greifen sofort zu? Macht es einen Unterschied, ob sie gerade essen oder schlafen wollen?</p>
                                 <p><strong>Erkenntnis:</strong> Klassische Konditionierung: Ton = Belohnung (neue Nachricht), darum automatisch reagieren.</p>
                               </div>
@@ -354,7 +354,7 @@ export default function Lernspielen() {
                               <p className="font-semibold mb-2">Experiment 3: Schulklingel & Konditionierung</p>
                               <div className="text-sm space-y-2">
                                 <p><strong>Vorbereitung:</strong> Beobachtungsblatt, Kamera (optional)</p>
-                                <p><strong>Anleitung:</strong> Hört auf die automatischen Reaktionen wenn die Schulklingel ertönt. Wer springt auf? Wer wird nervös? Wer seufzt? Seit wann kennen eure Mitschüler diesen Klingelton? Was würde passieren, wenn die Schule den Klingelton ändert?</p>
+                                <p><strong>Anleitung:</strong> Hört auf die automatischen Reaktionen, wenn die Schulklingel ertönt. Wer springt auf? Wer wird nervös? Wer seufzt? Seit wann kennen eure Mitschüler diesen Klingelton? Was würde passieren, wenn die Schule den Klingelton ändert?</p>
                                 <p><strong>Dokumentation:</strong> Dokumentiert die Reaktionen. Fragt: "Wie habt ihr euch beim Sound gefühlt?" Vergleicht ältere und jüngere Schüler.</p>
                                 <p><strong>Erkenntnis:</strong> Nach jahrelanger Schule ist der Klingelton ein konditionierter Reiz für "Ende der Stunde" oder "Stress".</p>
                               </div>
@@ -565,7 +565,7 @@ export default function Lernspielen() {
                           <p className="font-semibold text-slate-900 mb-2">🤔 Reflexionsfragen zum Nachdenken:</p>
                           <ul className="space-y-1 text-sm text-slate-700 list-disc list-inside">
                             <li>Warum können manche Menschen nicht aufhören, Spiele zu spielen oder Social Media zu nutzen?</li>
-                            <li>Ist die Design von Videospielen ethisch vertretbar, wenn sie auf Dopamin-Sucht abzielen?</li>
+                            <li>Ist das Design von Videospielen ethisch vertretbar, wenn sie auf Dopamin-Sucht abzielen?</li>
                             <li>Ist Dopamin immer "schlecht" oder gibt es auch "gutes" Dopamin (z.B. beim Sport)?</li>
                           </ul>
                         </div>
@@ -708,7 +708,7 @@ export default function Lernspielen() {
                 <ul className="space-y-2 text-sm text-slate-700">
                   <li>✓ Nutzt die Schulbibliothek für Psychologie-Fachliteratur</li>
                   <li>✓ Google Scholar (scholar.google.com) für kostenlose Forschungsartikel</li>
-                  <li>✓ YouTube: Suche nach "Motivation Psychology" oder deinem spezifischen Tema</li>
+                  <li>✓ YouTube: Suche nach "Motivation Psychology" oder deinem spezifischen Thema</li>
                   <li>✓ Respektiert Urheberrechte! Zitiert korrekt!</li>
                 </ul>
               </div>
