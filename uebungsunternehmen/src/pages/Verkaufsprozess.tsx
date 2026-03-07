@@ -877,10 +877,10 @@ export default function Verkaufsprozess() {
                           return (
                             <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded text-sm text-red-800">
                               <p className="font-semibold">❌ Berechnungsfehler!</p>
-                              {!subOk && <p>Summe: Sollte {expectedSubtotal.toFixed(2)}€ sein</p>}
-                              {!nettoOk && <p>Netto: Sollte {expectedNetto.toFixed(2)}€ sein</p>}
-                              {!vatOk && <p>MwSt.: Sollte {expectedVat.toFixed(2)}€ sein</p>}
-                              {!bruttoOk && <p>Brutto: Sollte {expectedBrutto.toFixed(2)}€ sein</p>}
+                              {!subOk && <p>❌ Summe-Berechnung ist falsch!</p>}
+                              {!nettoOk && <p>❌ Netto-Berechnung ist falsch!</p>}
+                              {!vatOk && <p>❌ MwSt.-Berechnung ist falsch!</p>}
+                              {!bruttoOk && <p>❌ Brutto-Berechnung ist falsch!</p>}
                             </div>
                           );
                         }
