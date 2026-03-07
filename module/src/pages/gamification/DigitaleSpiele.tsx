@@ -2043,7 +2043,7 @@ export default function DigitaleSpiele() {
                     {cat === 'chancen' ? '✅ Chancen' : '⚠️ Risiken'}
                   </h3>
                   <div className="space-y-2">
-                    {exercise3Items.filter((item) => item.category === cat).map((item) => (
+                    {exercise3Items.filter((item) => item.category === cat && item.answered).map((item) => (
                       <div
                         key={item.id}
                         className={`p-2 rounded-lg text-xs cursor-pointer font-medium transition-all ${
