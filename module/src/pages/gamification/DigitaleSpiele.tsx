@@ -2005,7 +2005,7 @@ export default function DigitaleSpiele() {
                       <p className="text-sm text-slate-600 mb-2"><strong>Plattform:</strong> {game.platform}</p>
                       <p className="text-sm text-slate-600 mb-2"><strong>Genre:</strong> {game.genre}</p>
                       <p className="text-slate-700 mb-3">{game.desc}</p>
-                      <a href={game.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-semibold transition-colors">
+                      <a href={game.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded text-xs font-medium transition-colors">
                         ➜ Öffnen
                       </a>
                     </div>
@@ -2030,7 +2030,7 @@ export default function DigitaleSpiele() {
                       <p className="text-sm text-slate-600 mb-2"><strong>Plattform:</strong> {game.platform}</p>
                       <p className="text-sm text-slate-600 mb-2"><strong>Genre:</strong> {game.genre}</p>
                       <p className="text-slate-700 mb-3">{game.desc}</p>
-                      <a href={game.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm font-semibold transition-colors">
+                      <a href={game.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-2 py-0.5 rounded text-xs font-medium transition-colors">
                         ➜ Öffnen
                       </a>
                     </div>
@@ -2055,7 +2055,7 @@ export default function DigitaleSpiele() {
                       <p className="text-sm text-slate-600 mb-2"><strong>Plattform:</strong> {game.platform}</p>
                       <p className="text-sm text-slate-600 mb-2"><strong>Genre:</strong> {game.genre}</p>
                       <p className="text-slate-700 mb-3">{game.desc}</p>
-                      <a href={game.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm font-semibold transition-colors">
+                      <a href={game.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 rounded text-xs font-medium transition-colors">
                         ➜ Öffnen
                       </a>
                     </div>
@@ -2080,7 +2080,7 @@ export default function DigitaleSpiele() {
                       <p className="text-sm text-slate-600 mb-2"><strong>Plattform:</strong> {game.platform}</p>
                       <p className="text-sm text-slate-600 mb-2"><strong>Genre:</strong> {game.genre}</p>
                       <p className="text-slate-700 mb-3">{game.desc}</p>
-                      <a href={game.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded text-sm font-semibold transition-colors">
+                      <a href={game.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-orange-600 hover:bg-orange-700 text-white px-2 py-0.5 rounded text-xs font-medium transition-colors">
                         ➜ Öffnen
                       </a>
                     </div>
