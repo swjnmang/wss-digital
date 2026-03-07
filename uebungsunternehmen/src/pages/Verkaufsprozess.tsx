@@ -36,6 +36,7 @@ interface Product {
   artNumber: string;
   specs: ProductSpecs;
   description: string;
+  weight: number;
 }
 
 interface CustomerRequirements {
@@ -59,9 +60,10 @@ interface Email {
 }
 
 interface ShippingOption {
+  id: string;
   name: string;
-  basePrice: number;
-  expressCharge: number;
+  fixCost: number;
+  costPerKg: number;
   deliveryDays: number;
 }
 
@@ -85,7 +87,8 @@ interface WorkflowState {
   vatAmount: number;
   totalBrutto: number;
   selectedShipping?: ShippingOption;
-  isExpress: boolean;
+  shippingCostInput: Record<string, number>;
+  shippingValidated: boolean;
   paymentReference: string;
   paymentVerified: boolean;
   goodsShipped: boolean;
@@ -108,10 +111,10 @@ const LIEFERBEDINGNISSE = {
 };
 
 const SHIPPING_OPTIONS: ShippingOption[] = [
-  { name: 'DAL Standard', basePrice: 6.40, expressCharge: 0.70, deliveryDays: 5 },
-  { name: 'Deltapost Express', basePrice: 10.00, expressCharge: 0.85, deliveryDays: 3 },
-  { name: 'POC post Budget', basePrice: 2.40, expressCharge: 0.70, deliveryDays: 7 },
-  { name: 'Postbox Premium', basePrice: 4.30, expressCharge: 0, deliveryDays: 2 },
+  { id: 'express-logistics', name: 'Express Logistics GmbH', fixCost: 8.50, costPerKg: 1.20, deliveryDays: 2 },
+  { id: 'swift-transport', name: 'SwiftTransport AG', fixCost: 5.00, costPerKg: 1.80, deliveryDays: 3 },
+  { id: 'eco-shipping', name: 'EcoShip Versand', fixCost: 2.50, costPerKg: 2.50, deliveryDays: 5 },
+  { id: 'premium-courier', name: 'PremiumCourier Plus', fixCost: 12.00, costPerKg: 0.90, deliveryDays: 1 },
 ];
 
 // ============================================================================
@@ -126,6 +129,7 @@ const PRODUCTS: Product[] = [
     price: 1895.50,
     stock: 12,
     artNumber: 'PS-ELX-001',
+    weight: 8.5,
     specs: { cpu: 'Intel Core i7-13700K', ram: '32GB DDR5', storage: '1TB NVMe SSD', gpu: 'NVIDIA RTX 4080 Super', warranty: '36 Monate', quality: 5, color: 'Grau' },
     description: 'High-Performance Desktop für professionelle Anwendungen'
   },
@@ -136,6 +140,7 @@ const PRODUCTS: Product[] = [
     price: 849.99,
     stock: 35,
     artNumber: 'WH-STD-008',
+    weight: 6.2,
     specs: { cpu: 'AMD Ryzen 5 5600G', ram: '16GB DDR4', storage: '512GB SSD', gpu: 'Integrated Vega', warranty: '24 Monate', quality: 4, color: 'Schwarz' },
     description: 'Zuverlässiger Office-PC für Standardaufgaben'
   },
@@ -146,6 +151,7 @@ const PRODUCTS: Product[] = [
     price: 2450.00,
     stock: 8,
     artNumber: 'UB-CM-M9',
+    weight: 10.1,
     specs: { cpu: 'Intel Core i9-13900KS', ram: '64GB DDR5', storage: '2TB NVMe SSD', gpu: 'NVIDIA RTX 4090', warranty: '48 Monate', quality: 5, color: 'Weiß' },
     description: 'Top-of-the-Line Workstation für Video & 3D-Rendering'
   },
@@ -156,6 +162,7 @@ const PRODUCTS: Product[] = [
     price: 499.99,
     stock: 50,
     artNumber: 'BB-SMP-S4',
+    weight: 5.0,
     specs: { cpu: 'Intel Pentium Gold G7400', ram: '8GB DDR4', storage: '256GB SSD', quality: 2, color: 'Schwarz' },
     description: 'Einstiegs-PC für Schulen und Kleine Büros'
   },
@@ -166,6 +173,7 @@ const PRODUCTS: Product[] = [
     price: 1899.00,
     stock: 15,
     artNumber: 'CVP-32-004K',
+    weight: 12.5,
     specs: { diagonal: '32"', resolution: '4K (3840x2160)', refreshRate: '60Hz', panelType: 'IPS', warranty: '36 Monate', quality: 5 },
     description: 'Professional 4K Monitor für Design & Video-Editing'
   },
@@ -176,6 +184,7 @@ const PRODUCTS: Product[] = [
     price: 599.99,
     stock: 42,
     artNumber: 'GE-27-144',
+    weight: 8.2,
     specs: { diagonal: '27"', resolution: 'QHD (2560x1440)', refreshRate: '144Hz', panelType: 'VA', warranty: '24 Monate', quality: 4 },
     description: 'Gaming Monitor mit hoher Bildwiederholrate'
   },
@@ -186,6 +195,7 @@ const PRODUCTS: Product[] = [
     price: 259.99,
     stock: 73,
     artNumber: 'OC-24-FHD',
+    weight: 6.0,
     specs: { diagonal: '24"', resolution: 'Full HD (1920x1080)', refreshRate: '60Hz', panelType: 'TN', warranty: '24 Monate', quality: 3 },
     description: 'Standard Office-Monitor für alltägliche Aufgaben'
   },
@@ -196,6 +206,7 @@ const PRODUCTS: Product[] = [
     price: 2299.99,
     stock: 6,
     artNumber: 'UWC-49-144',
+    weight: 18.0,
     specs: { diagonal: '49"', resolution: '5120x1440', refreshRate: '144Hz', panelType: 'VA', warranty: '36 Monate', quality: 5 },
     description: 'Ultra-Wide Curved Monitor für Profis'
   },
@@ -206,6 +217,7 @@ const PRODUCTS: Product[] = [
     price: 1199.99,
     stock: 28,
     artNumber: 'TMA-PRO-12',
+    weight: 0.6,
     specs: { screen: '12.9"', processor: 'Apple M2', storage: '512GB', warranty: '24 Monate', quality: 5 },
     description: 'Premium Tablet für kreative Profis'
   },
@@ -216,6 +228,7 @@ const PRODUCTS: Product[] = [
     price: 449.99,
     stock: 91,
     artNumber: 'MTE-10-ESS',
+    weight: 0.48,
     specs: { screen: '10.1"', processor: 'Qualcomm Snapdragon 870', storage: '128GB', warranty: '12 Monate', quality: 3 },
     description: 'Universal-Tablet für Schulen und Unterricht'
   },
@@ -226,6 +239,7 @@ const PRODUCTS: Product[] = [
     price: 299.99,
     stock: 64,
     artNumber: 'CVG-8-000',
+    weight: 0.35,
     specs: { screen: '8"', processor: 'MediaTek Helio G99', storage: '64GB', warranty: '12 Monate', quality: 2 },
     description: 'Portables Tablet für unterwegs'
   },
@@ -236,6 +250,7 @@ const PRODUCTS: Product[] = [
     price: 449.99,
     stock: 37,
     artNumber: 'SPE-STU-001',
+    weight: 0.25,
     specs: { driverSize: '50mm', frequency: '10Hz-40kHz', wireless: false, warranty: '24 Monate', quality: 5 },
     description: 'Studio-Kopfhörer für Audio-Profis'
   },
@@ -246,6 +261,7 @@ const PRODUCTS: Product[] = [
     price: 179.99,
     stock: 56,
     artNumber: 'CCP-GMG-007',
+    weight: 0.22,
     specs: { driverSize: '40mm', frequency: '20Hz-20kHz', wireless: true, warranty: '12 Monate', quality: 4 },
     description: 'Gaming Wireless Headset mit guter Qualität'
   },
@@ -256,6 +272,7 @@ const PRODUCTS: Product[] = [
     price: 79.99,
     stock: 128,
     artNumber: 'OCS-STD-002',
+    weight: 0.18,
     specs: { driverSize: '32mm', frequency: '20Hz-20kHz', wireless: false, warranty: '12 Monate', quality: 2 },
     description: 'Einfaches Multimedia-Headset'
   },
@@ -362,7 +379,8 @@ export default function Verkaufsprozess() {
     totalNetto: 0,
     vatAmount: 0,
     totalBrutto: 0,
-    isExpress: false,
+    shippingCostInput: {},
+    shippingValidated: false,
     paymentReference: '',
     paymentVerified: false,
     goodsShipped: false,
@@ -399,23 +417,6 @@ export default function Verkaufsprozess() {
       currentStep: 4,
       orderAccepted: true,
       orderDate: new Date().toLocaleDateString('de-DE'),
-    }));
-  };
-
-  const selectShipping = (option: ShippingOption) => {
-    const newShippingCost = workflow.isExpress ? option.basePrice * (1 + option.expressCharge / 100) : option.basePrice;
-    const newTotalNetto = workflow.subtotal - workflow.discountAmount + newShippingCost;
-    const newVatAmount = (newTotalNetto * LIEFERBEDINGNISSE.vatRate) / 100;
-    const newTotalBrutto = newTotalNetto + newVatAmount;
-
-    setWorkflow((prev) => ({
-      ...prev,
-      selectedShipping: option,
-      shippingCost: newShippingCost,
-      totalNetto: newTotalNetto,
-      vatAmount: newVatAmount,
-      totalBrutto: newTotalBrutto,
-      currentStep: 7,
     }));
   };
 
@@ -885,6 +886,7 @@ export default function Verkaufsprozess() {
                       <p><strong>Artikel:</strong> {workflow.selectedProduct.name}</p>
                       <p><strong>Art.-Nr.:</strong> {workflow.selectedProduct.artNumber}</p>
                       <p><strong>Menge:</strong> {workflow.quantity} Stück</p>
+                      <p><strong>Gesamtgewicht:</strong> <strong className="text-blue-600">{(workflow.quantity * workflow.selectedProduct.weight).toFixed(2)} kg</strong></p>
                       <p><strong>Versandadresse:</strong> {workflow.selectedEmail.from}, {workflow.selectedEmail.fromAddress}</p>
                       <p className="text-xs text-slate-600 mt-3 italic">Diesen Versandauftrag erhalten die Mitarbeiter des Lagers, damit sie die Ware zusammenpacken.</p>
                     </div>
@@ -899,59 +901,121 @@ export default function Verkaufsprozess() {
                     </div>
                   </div>
 
-                  {/* SHIPPING OPTIONS */}
+                  {/* SHIPPING CALCULATOR */}
                   <div className="border-2 border-orange-300 rounded-lg p-8 bg-orange-50">
-                    <h3 className="text-lg font-bold mb-6 text-slate-800">🚚 Versandunternehmen auswählen</h3>
+                    <h3 className="text-lg font-bold mb-6 text-slate-800">🚚 Versandkosten berechnen & Unternehmen auswählen</h3>
 
-                    {workflow.selectedShipping ? (
-                      <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-6">
-                        <p className="font-semibold text-green-800">✓ Ausgewählt: {workflow.selectedShipping.name}</p>
-                        <p className="text-sm text-green-700 mt-1">Versandkosten: € {workflow.shippingCost.toFixed(2)} | Lieferdauer: {workflow.selectedShipping.deliveryDays} Tage</p>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 gap-4 mb-6">
-                        {SHIPPING_OPTIONS.map((option) => {
-                          const cost = option.basePrice;
-                          const expressCost = option.basePrice * (1 + option.expressCharge / 100);
-                          return (
-                            <div key={option.name} className="border-2 border-slate-300 rounded-lg p-4 hover:border-orange-500 cursor-pointer transition-all">
-                              <div className="flex justify-between items-start mb-3">
-                                <div>
-                                  <p className="font-bold text-slate-900">{option.name}</p>
-                                  <p className="text-sm text-slate-600">Lieferdauer: {option.deliveryDays} Tage</p>
-                                </div>
-                                <div className="text-right">
-                                  <p className="font-bold text-slate-900">€ {cost.toFixed(2)}</p>
-                                  <p className="text-xs text-slate-600">Standard</p>
-                                </div>
-                              </div>
+                    <div className="mb-8 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                      <p className="font-semibold text-slate-800 mb-2">💡 Deine Aufgabe:</p>
+                      <p className="text-sm text-slate-700">1. Berechne die Versandkosten für jedes Unternehmen: <strong>Fixbetrag + (Gewicht × €/kg)</strong></p>
+                      <p className="text-sm text-slate-700">2. Trage deine berechneten Kosten in die Eingabefelder ein</p>
+                      <p className="text-sm text-slate-700">3. Wähle das günstigste Unternehmen</p>
+                      <p className="text-sm text-slate-700">4. Das System prüft deine Berechnung!</p>
+                    </div>
 
-                              <div className="flex gap-2">
-                                <button onClick={() => { setWorkflow((prev) => ({ ...prev, selectedShipping: option, isExpress: false })); selectShipping(option); }} className="flex-1 py-2 px-3 bg-blue-500 text-white font-semibold rounded text-sm hover:bg-blue-600 transition-colors">
-                                  Standard: € {cost.toFixed(2)}
-                                </button>
-                                {option.expressCharge > 0 && (
-                                  <button onClick={() => { setWorkflow((prev) => ({ ...prev, selectedShipping: option, isExpress: true })); selectShipping(option); }} className="flex-1 py-2 px-3 bg-red-500 text-white font-semibold rounded text-sm hover:bg-red-600 transition-colors">
-                                    Express: € {expressCost.toFixed(2)}
+                    <div className="mb-8 p-4 bg-amber-50 border border-amber-300 rounded text-sm">
+                      <p className="font-semibold text-amber-900 mb-2">📊 Bestellungsgewicht:</p>
+                      <p className="text-amber-900">
+                        <strong>{workflow.quantity}</strong> Stück × <strong>{workflow.selectedProduct.weight}</strong> kg = <strong className="text-lg text-orange-600">{(workflow.quantity * workflow.selectedProduct.weight).toFixed(2)} kg</strong>
+                      </p>
+                    </div>
+
+                    {!workflow.shippingValidated ? (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 gap-4">
+                          {SHIPPING_OPTIONS.map((option) => {
+                            const totalWeight = workflow.quantity * (workflow.selectedProduct?.weight || 0);
+                            const correctCost = option.fixCost + (totalWeight * option.costPerKg);
+                            const userInput = workflow.shippingCostInput[option.id] || 0;
+                            const isCorrect = Math.abs(userInput - correctCost) < 0.01;
+
+                            return (
+                              <div key={option.id} className="border-2 border-slate-300 rounded-lg p-5 bg-white hover:shadow-lg transition-all">
+                                <div className="flex justify-between items-start mb-4">
+                                  <div>
+                                    <p className="font-bold text-slate-900 text-lg">{option.name}</p>
+                                    <p className="text-sm text-slate-600">Lieferdauer: {option.deliveryDays} Tage</p>
+                                  </div>
+                                </div>
+
+                                <div className="bg-slate-50 p-3 rounded mb-4 text-xs text-slate-700 border border-slate-200">
+                                  <p className="font-semibold mb-2">Berechnung:</p>
+                                  <p>Fixbetrag: <strong>€ {option.fixCost.toFixed(2)}</strong></p>
+                                  <p>+ Gewicht: <strong>{totalWeight.toFixed(2)} kg × €{option.costPerKg.toFixed(2)}/kg</strong> = <strong>€ {(totalWeight * option.costPerKg).toFixed(2)}</strong></p>
+                                  <p className="border-t border-slate-300 mt-2 pt-2 font-bold text-slate-900">
+                                    Gesamt: € <span className="text-green-600">{correctCost.toFixed(2)}</span>
+                                  </p>
+                                </div>
+
+                                <div className="flex gap-3 items-end">
+                                  <div className="flex-1">
+                                    <label className="block text-xs font-bold text-slate-700 mb-1">Deine Berechnung (€):</label>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      value={userInput || ''}
+                                      onChange={(e) => {
+                                        const newValue = parseFloat(e.target.value) || 0;
+                                        setWorkflow((prev) => ({
+                                          ...prev,
+                                          shippingCostInput: { ...prev.shippingCostInput, [option.id]: newValue },
+                                        }));
+                                      }}
+                                      placeholder="z.B. 12,50"
+                                      className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
+                                    />
+                                  </div>
+                                  <div className={`text-center px-3 py-2 rounded font-semibold text-sm ${isCorrect ? 'bg-green-200 text-green-800' : userInput > 0 ? 'bg-red-200 text-red-800' : 'bg-slate-200 text-slate-600'}`}>
+                                    {isCorrect ? '✓ Korrekt!' : userInput > 0 ? '✗ Falsch' : '-'}
+                                  </div>
+                                </div>
+
+                                {isCorrect && (
+                                  <button
+                                    onClick={() => {
+                                      setWorkflow((prev) => ({
+                                        ...prev,
+                                        selectedShipping: option,
+                                        shippingCost: correctCost,
+                                        shippingValidated: true,
+                                        currentStep: 7,
+                                      }));
+                                    }}
+                                    className="w-full mt-3 py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
+                                  >
+                                    ✓ Dieses Unternehmen wählen
                                   </button>
                                 )}
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
+
+                        <div className="mt-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded text-sm text-slate-700">
+                          <p className="font-semibold mb-2">⚠️ Hinweis:</p>
+                          <p>Berechne alle Kosten korrekt und wähle dann das günstigste Unternehmen aus. Du kannst nur weitergehen, wenn deine Berechnung richtig ist!</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-green-50 border-2 border-green-500 rounded-lg p-8 text-center">
+                        <p className="text-2xl font-bold text-green-700 mb-3">✓ Versandunternehmen gewählt!</p>
+                        <p className="text-lg text-slate-700 mb-4">{workflow.selectedShipping?.name}</p>
+                        <p className="text-slate-600 mb-6">Versandkosten: <strong className="text-xl text-green-600">€ {workflow.shippingCost.toFixed(2)}</strong></p>
+                        <p className="text-sm text-slate-600 mb-6">Lieferdauer: {workflow.selectedShipping?.deliveryDays} Tage</p>
+                        <button
+                          onClick={generatePaymentReference}
+                          className="w-full py-3 px-6 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                          → Banking-Modul
+                        </button>
                       </div>
                     )}
                   </div>
 
-                  {workflow.selectedShipping && (
-                    <div className="flex gap-4">
-                      <button onClick={generatePaymentReference} className="flex-1 py-3 px-6 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">
-                        → Banking-Modul
-                      </button>
-                      <button onClick={() => setActiveTab('documents')} className="flex-1 py-3 px-6 bg-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-400 transition-colors">
-                        ← Zurück zu Dokumenten
-                      </button>
-                    </div>
+                  {!workflow.shippingValidated && (
+                    <button onClick={() => setActiveTab('documents')} className="w-full py-3 px-6 bg-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-400 transition-colors">
+                      ← Zurück zu Dokumenten
+                    </button>
                   )}
                 </div>
               ) : (
