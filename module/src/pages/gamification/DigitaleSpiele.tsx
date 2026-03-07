@@ -2094,6 +2094,95 @@ export default function DigitaleSpiele() {
             </div>
           </div>
 
+          {/* Arbeitsauftrag 5: Pixel-Probe Redaktion */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <h2 className="text-xl font-bold text-slate-900 mb-3">5️⃣ Arbeitsauftrag: Pixel-Probe Redaktion - "Chancen und Gefahren digitaler Spiele"</h2>
+            <p className="text-sm text-slate-700 mb-4">Ein Gruppenarbeitsauftrag - Kreative Erstellung eines Artikels für die Schülerzeitschrift</p>
+
+            <div className="space-y-4">
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
+                <h3 className="font-bold text-slate-900 mb-2">📰 Szenario: Ihr arbeitet als Redaktion der Schülerzeitschrift "Pixel-Probe"</h3>
+                <p className="text-slate-700 text-sm">
+                  Eure nächste Ausgabe hat das Thema "Digitale Spiele in der Schule und Freizeit". Die Redaktion braucht eure Expertise! 
+                  Erstellt einen ausgewogenen, informativen Artikel, der sowohl die Chancen als auch die Gefahren von digitalen Spielen beleuchtet.
+                </p>
+              </div>
+
+              <div className="bg-amber-50 border-l-4 border-amber-500 p-4">
+                <h3 className="font-bold text-slate-900 mb-3">🎯 Arbeitsauftrag für eure Gruppe:</h3>
+                <ol className="list-decimal list-inside space-y-2 text-sm text-slate-700">
+                  <li><strong>Recherche & Sammlung:</strong> Sammelt alle Chancen und Gefahren, die ihr bisher kennengelernt habt (nutzt die vorherigen Aufgaben!)</li>
+                  <li><strong>Gliederung:</strong> Strukturiert den Artikel in mindestens vier Abschnitte:
+                    <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
+                      <li>Einleitung: "Was sind digitale Spiele und warum spielen so viele Menschen?"</li>
+                      <li>Chancen: Positive Effekte (Pädagogische, soziale, kreative Vorteile)</li>
+                      <li>Gefahren: Kritische Aspekte (Suchtgefahr, finanzielle Risiken, Verlust von Bewegung)</li>
+                      <li>Fazit: "Wie man verantwortungsvoll mit digitalen Spielen umgeht"</li>
+                    </ul>
+                  </li>
+                  <li><strong>Kreative Gestaltung:</strong> Ergänzt den Text mit:
+                    <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
+                      <li>Einer Statistik oder Grafik (selbst erstellt oder recherchiert)</li>
+                      <li>Interviews mit fiktiven Charakteren (Game-Developer, Eltern, Suchtberaterin, begeisterter Spieler)</li>
+                      <li>Ein Fact-Box oder Tipps-Kasten mit praktischen Ratschlägen</li>
+                    </ul>
+                  </li>
+                  <li><strong>Länge:</strong> Der Artikel sollte 2-3 DIN-A4 Seiten umfassen (ca. 3000-5000 Zeichen)</li>
+                  <li><strong>Präsentation:</strong> Designet eine ansprechende Titelseite mit Headline und passendem Bild/Icon</li>
+                </ol>
+              </div>
+
+              <div className="bg-green-50 border-l-4 border-green-500 p-4">
+                <h3 className="font-bold text-slate-900 mb-2">📋 Checkliste für euren Artikel:</h3>
+                <ul className="space-y-2 text-sm text-slate-700">
+                  <li>☐ Mindestens 5 konkrete Chancen werden ausführlich erläutert</li>
+                  <li>☐ Mindestens 5 konkrete Gefahren werden ausführlich erläutert</li>
+                  <li>☐ Der Text ist sachlich, verständlich und angemessen für Schüler geschrieben</li>
+                  <li>☐ Der Artikel gibt konkrete Empfehlungen für einen verantwortungsvollen Umgang</li>
+                  <li>☐ Mindestens eine kreative Komponente (Grafik, Interview, Infografik) ist integriert</li>
+                  <li>☐ Alle Gruppenmitglieder haben mitgearbeitet (erkennbar durch unterschiedliche Abschnitte)</li>
+                  <li>☐ Rechtschreibung und Grammatik sind korrekt</li>
+                </ul>
+              </div>
+
+              <div className="bg-purple-50 border-l-4 border-purple-500 p-4">
+                <h3 className="font-bold text-slate-900 mb-3">📊 Zentrale Chancen und Gefahren - Übersicht:</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-bold text-green-700 mb-2">✅ CHANCEN:</h4>
+                    <ul className="text-xs text-slate-700 space-y-1">
+                      <li>• <strong>Kognitiv:</strong> Strategisches Denken, Problemlösung, Logik</li>
+                      <li>• <strong>Motorisch:</strong> Hand-Auge-Koordination, Geschicklichkeit</li>
+                      <li>• <strong>Sozial:</strong> Teamfähigkeit, Multiplayer-Zusammenarbeit</li>
+                      <li>• <strong>Kreativ:</strong> Kreativität, Innovation, künstlerischer Ausdruck</li>
+                      <li>• <strong>Pädagogisch:</strong> Spielerisches Lernen, Wissensvermittlung</li>
+                      <li>• <strong>Emotional:</strong> Stressabbau, Unterhaltung, Flow-Erlebnis</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-red-700 mb-2">⚠️ GEFAHREN:</h4>
+                    <ul className="text-xs text-slate-700 space-y-1">
+                      <li>• <strong>Sucht:</strong> Spielsucht, Abhängigkeit, Kontrollurverlust</li>
+                      <li>• <strong>Sozial:</strong> Soziale Isolation, Vernachlässigung von Freundschaften</li>
+                      <li>• <strong>Gesundheit:</strong> Schlafmangel, Bewegungsmangel, Übergewicht</li>
+                      <li>• <strong>Finanziell:</strong> In-Game-Käufe, Mikrotransaktionen, Schuldenmachen</li>
+                      <li>• <strong>Mental:</strong> Gewaltinhalte, psychische Belastung, Aggression</li>
+                      <li>• <strong>Entwicklung:</strong> Beeinträchtigung kognitiver Entwicklung, Konzentrationsprobleme</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-100 p-4 rounded-lg">
+                <h4 className="font-bold text-slate-900 mb-2">💡 Tipp für euer Projekt:</h4>
+                <p className="text-sm text-slate-700">
+                  Macht den Artikel persönlich und relevant! Bezieht euch auf Spiele, die eure Mitschüler spielen. 
+                  Verwendet eine ansprechende Sprache, die zum Lesen einlädt. Denkt daran, dass die Leser verschiedene Meinungen haben könnten - 
+                  der Artikel sollte sie zum Nachdenken bringen, nicht belehren!
+                </p>
+              </div>
+            </div>
+          </div>
 
         </div>
         )}
