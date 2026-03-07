@@ -24,6 +24,7 @@ export default function Anschriftenfeld() {
   const [currentTask, setCurrentTask] = useState<AddressExercise>(addressTasks[0]);
   const [inputs, setInputs] = useState<string[]>(Array(6).fill(''));
   const [showFeedback, setShowFeedback] = useState(false);
+  const [shuffledElements, setShuffledElements] = useState<string[]>([]);
   
   // Exam State
   const [examState, setExamState] = useState<ExamState>({
@@ -49,6 +50,11 @@ export default function Anschriftenfeld() {
     setCurrentTask(randomTask);
     setInputs(Array(6).fill(''));
     setShowFeedback(false);
+    
+    // Shuffle address elements
+    const nonEmptyElements = randomTask.solution.filter(el => el.trim() !== '');
+    const shuffled = [...nonEmptyElements].sort(() => Math.random() - 0.5);
+    setShuffledElements(shuffled);
   };
 
   const handleInputChange = (index: number, value: string) => {
@@ -96,6 +102,12 @@ export default function Anschriftenfeld() {
     }));
     
     setInputs(Array(6).fill(''));
+    
+    // Shuffle elements for first task
+    const nonEmptyElements = examTasks[0].solution.filter(el => el.trim() !== '');
+    const shuffled = [...nonEmptyElements].sort(() => Math.random() - 0.5);
+    setShuffledElements(shuffled);
+    
     setMode('exam');
   };
 
@@ -127,6 +139,12 @@ export default function Anschriftenfeld() {
         currentIndex: nextIndex
       }));
       setInputs(Array(6).fill(''));
+      
+      // Shuffle elements for next task
+      const nextTask = examState.tasks[nextIndex];
+      const nonEmptyElements = nextTask.solution.filter(el => el.trim() !== '');
+      const shuffled = [...nonEmptyElements].sort(() => Math.random() - 0.5);
+      setShuffledElements(shuffled);
     } else {
       setExamState(prev => ({
         ...prev,
@@ -302,9 +320,22 @@ export default function Anschriftenfeld() {
               <h2 className="text-xl font-bold mb-2">
                 {(mode === 'exam' ? examState.tasks[examState.currentIndex] : currentTask).title}
               </h2>
-              <p className="text-slate-600 leading-relaxed italic">
-                {(mode === 'exam' ? examState.tasks[examState.currentIndex] : currentTask).task}
+              <p className="text-slate-600 leading-relaxed italic mb-4">
+                Fülle das Anschriftenfeld für den nachfolgenden Addressaten korrekt aus.
               </p>
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                <p className="text-sm text-slate-700 font-medium mb-2">Verfügbare Adresselemente:</p>
+                <div className="flex flex-wrap gap-2">
+                  {shuffledElements.map((element, index) => (
+                    <span
+                      key={index}
+                      className="bg-white border border-slate-300 rounded-lg px-3 py-1 text-sm text-slate-700 shadow-sm"
+                    >
+                      {element}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Interactive Address Field */}
