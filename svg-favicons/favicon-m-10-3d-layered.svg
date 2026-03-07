@@ -1,0 +1,24 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="grad3d" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#667eea;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="100" height="100" fill="url(#grad3d)" rx="20"/>
+  
+  <!-- 3D Layered M -->
+  <!-- Shadow/back layer -->
+  <text x="52" y="75" font-size="70" font-weight="900" fill="black" text-anchor="middle" font-family="Arial, sans-serif" opacity="0.2">M</text>
+  
+  <!-- Middle layer -->
+  <text x="51" y="74" font-size="70" font-weight="900" fill="white" text-anchor="middle" font-family="Arial, sans-serif" opacity="0.6">M</text>
+  
+  <!-- Front layer -->
+  <text x="50" y="73" font-size="70" font-weight="900" fill="white" text-anchor="middle" font-family="Arial, sans-serif">M</text>
+  
+  <!-- Top highlight -->
+  <rect x="35" y="25" width="30" height="3" fill="white" opacity="0.4" rx="2"/>
+</svg>

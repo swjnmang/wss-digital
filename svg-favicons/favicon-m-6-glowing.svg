@@ -1,0 +1,21 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <rect width="100" height="100" fill="#00d4ff" rx="20"/>
+  
+  <!-- Glowing M -->
+  <text x="50" y="72" font-size="70" font-weight="900" fill="white" text-anchor="middle" font-family="Arial, sans-serif" filter="url(#glow)">M</text>
+  
+  <!-- Glow circles -->
+  <circle cx="35" cy="50" r="15" fill="white" opacity="0.08"/>
+  <circle cx="65" cy="50" r="15" fill="white" opacity="0.08"/>
+</svg>

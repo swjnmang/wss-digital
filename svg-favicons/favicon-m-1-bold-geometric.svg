@@ -1,0 +1,10 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100" height="100" fill="#667eea" rx="20"/>
+  
+  <!-- Bold Geometric M -->
+  <text x="50" y="75" font-size="70" font-weight="900" fill="white" text-anchor="middle" font-family="Arial, sans-serif" letter-spacing="-5">M</text>
+  
+  <!-- Accent accent line -->
+  <line x1="20" y1="35" x2="80" y2="35" stroke="white" stroke-width="2" opacity="0.6"/>
+</svg>

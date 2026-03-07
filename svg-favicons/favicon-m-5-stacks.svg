@@ -1,0 +1,20 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100" height="100" fill="#667eea" rx="20"/>
+  
+  <!-- Stacks/levels forming the M -->
+  <rect x="22" y="35" width="12" height="50" fill="white" rx="2"/>
+  <rect x="22" y="28" width="12" height="8" fill="#ffd700" rx="2"/>
+  
+  <polygon points="38,35 44,20 50,35" fill="white"/>
+  <rect x="38" y="35" width="12" height="50" fill="white" opacity="0.8" rx="2"/>
+  
+  <polygon points="54,35 60,20 66,35" fill="white"/>
+  <rect x="54" y="35" width="12" height="50" fill="white" opacity="0.8" rx="2"/>
+  
+  <rect x="66" y="35" width="12" height="50" fill="white" rx="2"/>
+  <rect x="66" y="28" width="12" height="8" fill="#ffd700" rx="2"/>
+  
+  <!-- Subtle M text for clarity -->
+  <text x="50" y="75" font-size="55" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial, sans-serif" opacity="0.2">M</text>
+</svg>

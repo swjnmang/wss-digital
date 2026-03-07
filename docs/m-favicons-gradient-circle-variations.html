@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Circle M-Favicon Variation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .favicon-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+        }
+        
+        .favicon-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        
+        .favicon-preview {
+            width: 100%;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .favicon-preview svg {
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        .favicon-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .color-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .color-codes {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            transition: transform 0.2s ease;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+        
+        .download-link {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        
+        .download-link:hover {
+            background: #764ba2;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #333;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+        
+        .original {
+            background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+            color: white;
+        }
+        
+        .new {
+            background: linear-gradient(135deg, #ff6f61 0%, #ff1b6d 100%);
+            color: white;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Gradient Circle M-Favicons</h1>
+            <p>6 verschiedene Farbkonzepte des gleichen Designs</p>
+        </div>
+        
+        <div class="gallery">
+            <!-- Original: Purple to Violet -->
+            <div class="favicon-card">
+                <div class="favicon-preview">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="100" height="100" fill="url(#grad1)" rx="20"/>
+                        <circle cx="50" cy="50" r="38" fill="white" opacity="0.15"/>
+                        <text x="50" y="72" font-size="65" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial, sans-serif">M</text>
+                    </svg>
+                </div>
+                <div class="favicon-title">Purple to Violet</div>
+                <div class="color-info">Das Original-Design</div>
+                <div class="color-codes">
+                    <div class="color-swatch" style="background: #667eea;" title="#667eea"></div>
+                    <div class="color-swatch" style="background: #764ba2;" title="#764ba2"></div>
+                </div>
+                <a href="svg-favicons/favicon-m-2-gradient-circle.svg" class="download-link">Download</a>
+                <span class="badge original">Original</span>
+            </div>
+            
+            <!-- Blue to Cyan -->
+            <div class="favicon-card">
+                <div class="favicon-preview">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="grad-blue-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#0099ff;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="100" height="100" fill="url(#grad-blue-cyan)" rx="20"/>
+                        <circle cx="50" cy="50" r="38" fill="white" opacity="0.15"/>
+                        <text x="50" y="72" font-size="65" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial, sans-serif">M</text>
+                    </svg>
+                </div>
+                <div class="favicon-title">Blue to Cyan</div>
+                <div class="color-info">Tech-freundlich und modern</div>
+                <div class="color-codes">
+                    <div class="color-swatch" style="background: #00d4ff;" title="#00d4ff"></div>
+                    <div class="color-swatch" style="background: #0099ff;" title="#0099ff"></div>
+                </div>
+                <a href="svg-favicons/favicon-m-gradient-circle-blue-cyan.svg" class="download-link">Download</a>
+                <span class="badge new">NEU</span>
+            </div>
+            
+            <!-- Orange to Pink -->
+            <div class="favicon-card">
+                <div class="favicon-preview">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="grad-orange-pink" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ff1b6d;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="100" height="100" fill="url(#grad-orange-pink)" rx="20"/>
+                        <circle cx="50" cy="50" r="38" fill="white" opacity="0.15"/>
+                        <text x="50" y="72" font-size="65" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial, sans-serif">M</text>
+                    </svg>
+                </div>
+                <div class="favicon-title">Orange to Pink</div>
+                <div class="color-info">Energisch und aufmerksamkeitsstark</div>
+                <div class="color-codes">
+                    <div class="color-swatch" style="background: #ff6b35;" title="#ff6b35"></div>
+                    <div class="color-swatch" style="background: #ff1b6d;" title="#ff1b6d"></div>
+                </div>
+                <a href="svg-favicons/favicon-m-gradient-circle-orange-pink.svg" class="download-link">Download</a>
+                <span class="badge new">NEU</span>
+            </div>
+            
+            <!-- Green to Turquoise -->
+            <div class="favicon-card">
+                <div class="favicon-preview">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="grad-green-turquoise" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#00d084;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#00b4a6;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="100" height="100" fill="url(#grad-green-turquoise)" rx="20"/>
+                        <circle cx="50" cy="50" r="38" fill="white" opacity="0.15"/>
+                        <text x="50" y="72" font-size="65" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial, sans-serif">M</text>
+                    </svg>
+                </div>
+                <div class="favicon-title">Green to Turquoise</div>
+                <div class="color-info">Frisch und wachstumsorientiert</div>
+                <div class="color-codes">
+                    <div class="color-swatch" style="background: #00d084;" title="#00d084"></div>
+                    <div class="color-swatch" style="background: #00b4a6;" title="#00b4a6"></div>
+                </div>
+                <a href="svg-favicons/favicon-m-gradient-circle-green-turquoise.svg" class="download-link">Download</a>
+                <span class="badge new">NEU</span>
+            </div>
+            
+            <!-- Red to Orange -->
+            <div class="favicon-card">
+                <div class="favicon-preview">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="grad-red-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#d32f2f;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ff6f00;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="100" height="100" fill="url(#grad-red-orange)" rx="20"/>
+                        <circle cx="50" cy="50" r="38" fill="white" opacity="0.15"/>
+                        <text x="50" y="72" font-size="65" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial, sans-serif">M</text>
+                    </svg>
+                </div>
+                <div class="favicon-title">Red to Orange</div>
+                <div class="color-info">Warm und motivierend</div>
+                <div class="color-codes">
+                    <div class="color-swatch" style="background: #d32f2f;" title="#d32f2f"></div>
+                    <div class="color-swatch" style="background: #ff6f00;" title="#ff6f00"></div>
+                </div>
+                <a href="svg-favicons/favicon-m-gradient-circle-red-orange.svg" class="download-link">Download</a>
+                <span class="badge new">NEU</span>
+            </div>
+            
+            <!-- Indigo to Deep Blue -->
+            <div class="favicon-card">
+                <div class="favicon-preview">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="grad-indigo-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4c3fa0;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#0066cc;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="100" height="100" fill="url(#grad-indigo-blue)" rx="20"/>
+                        <circle cx="50" cy="50" r="38" fill="white" opacity="0.15"/>
+                        <text x="50" y="72" font-size="65" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial, sans-serif">M</text>
+                    </svg>
+                </div>
+                <div class="favicon-title">Indigo to Deep Blue</div>
+                <div class="color-info">Professionell und vertrauenswürdig</div>
+                <div class="color-codes">
+                    <div class="color-swatch" style="background: #4c3fa0;" title="#4c3fa0"></div>
+                    <div class="color-swatch" style="background: #0066cc;" title="#0066cc"></div>
+                </div>
+                <a href="svg-favicons/favicon-m-gradient-circle-indigo-blue.svg" class="download-link">Download</a>
+                <span class="badge new">NEU</span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="margin-top: 40px;">✨ Wähle dein Lieblings-Farbkonzept!</p>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: #999;">Alle SVG-Dateien sind im Ordner <code>svg-favicons/</code></p>
+        </div>
+    </div>
+</body>
+</html>
