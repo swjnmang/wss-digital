@@ -68,15 +68,15 @@ export default function Lernspielen() {
                 
                 <div className="px-8 py-6 border-t border-slate-200 bg-white space-y-6">
                   {/* Narrative Introduction */}
-                  <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
-                    <h4 className="text-lg font-bold text-blue-900 mb-4">📖 Die Geschichte: Das Langeweile-Manifest</h4>
-                    <div className="bg-white p-4 rounded border border-blue-200 italic text-slate-700 space-y-3">
+                  <div className="bg-slate-50 border-l-4 border-slate-400 p-6 rounded-lg">
+                    <h4 className="text-lg font-bold text-slate-900 mb-4">📖 Die Geschichte: Das Langeweile-Manifest</h4>
+                    <div className="bg-white p-4 rounded border border-slate-200 italic text-slate-700 space-y-3">
                       <p>
                         <strong>Szenario:</strong> Du hast gerade eine frustrierende Nachhilfestunde beendet und hast von Schule die Nase voll. Du verfasst einen geheimen Aufruf, das "Langeweile-Manifest", der nur an die vertrauenswürdigsten und kreativsten Mitschüler/innen (die "<strong>A-Tutor-League</strong>") verschickt wird.
                       </p>
-                      <hr className="border-blue-200" />
-                      <div className="bg-yellow-50 p-3 rounded border border-yellow-200">
-                        <p className="font-semibold text-yellow-900 mb-2">💌 Original-Botschaft von Alex an das Team (Auszug):</p>
+                      <hr className="border-slate-200" />
+                      <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">💌 Original-Botschaft von Alex an das Team (Auszug):</p>
                         <blockquote className="text-sm leading-relaxed">
                           „Liebe Mitstreiter, wir können so nicht weitermachen. Die aktuellen Arbeitsblätter und PowerPoints sind digitale Schlaftabletten! Unsere Mitschüler/innen verlieren das Interesse, bevor sie überhaupt angefangen haben zu lernen.
                           <br /><br />
@@ -89,31 +89,31 @@ export default function Lernspielen() {
                   </div>
 
                   {/* Mission Brief */}
-                  <div className="bg-green-50 border-2 border-green-300 p-6 rounded-lg">
-                    <h4 className="text-lg font-bold text-green-900 mb-3">🎯 Euer Auftrag</h4>
+                  <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
+                    <h4 className="text-lg font-bold text-slate-900 mb-3">🎯 Euer Auftrag</h4>
                     <p className="text-slate-700 mb-4">
                       Um funktionierende Lernspiele zu entwickeln, müsst ihr zunächst verstehen, wie menschliche Motivation funktioniert. Die <strong>A-Tutor-League</strong> hat euch daher einen Gruppenauftrag gegeben:
                     </p>
-                    <div className="bg-white p-4 rounded border border-green-200">
+                    <div className="bg-white p-4 rounded border border-slate-200">
                       <ol className="space-y-2 text-slate-700">
                         <li className="flex gap-3">
-                          <span className="font-bold text-green-600">1.</span>
+                          <span className="font-bold text-slate-700">1.</span>
                           <span>Bildet <strong>5 Gruppen</strong> zu je 4-5 Personen</span>
                         </li>
                         <li className="flex gap-3">
-                          <span className="font-bold text-green-600">2.</span>
+                          <span className="font-bold text-slate-700">2.</span>
                           <span>Jede Gruppe wählt eines der 5 untenstehenden <strong>Motivations-Themen</strong></span>
                         </li>
                         <li className="flex gap-3">
-                          <span className="font-bold text-green-600">3.</span>
+                          <span className="font-bold text-slate-700">3.</span>
                           <span>Informiert euch gründlich über das Thema (nutzt die bereitgestellten Links & Texte)</span>
                         </li>
                         <li className="flex gap-3">
-                          <span className="font-bold text-green-600">4.</span>
+                          <span className="font-bold text-slate-700">4.</span>
                           <span>Erstellt eine <strong>10-15 Minuten</strong> Präsentation für die Klasse</span>
                         </li>
                         <li className="flex gap-3">
-                          <span className="font-bold text-green-600">5.</span>
+                          <span className="font-bold text-slate-700">5.</span>
                           <span>Erklärt, <strong>wie euer Konzept in Lernspielen angewendet werden kann</strong></span>
                         </li>
                       </ol>
@@ -155,18 +155,19 @@ export default function Lernspielen() {
                         },
                         {
                           group: 'Gruppe 5',
-                          title: 'Belohnungssysteme in Spielen',
+                          title: 'Belohnungssysteme im Gehirn',
                           emoji: '🎁',
-                          desc: 'Wie funktionieren Punkte, Achievements, Levelsysteme und Ranglisten psychologisch? Welche sind ethisch vertretbar?',
-                          color: 'rose',
+                          desc: 'In unserem Gehirn gibt es ein Zentrum, das uns steuert: das Belohnungssystem. Es ist dafür da, dass wir Dinge wiederholen, die gut für uns sind (wie Essen oder Lernen). Der wichtigste Botenstoff dabei ist Dopamin.',
+                          color: 'slate',
                         },
                       ].map((item, idx) => {
                         const colors = {
-                          blue: 'bg-blue-50 border-blue-200',
-                          purple: 'bg-purple-50 border-purple-200',
-                          cyan: 'bg-cyan-50 border-cyan-200',
-                          amber: 'bg-amber-50 border-amber-200',
-                          rose: 'bg-rose-50 border-rose-200',
+                          blue: 'bg-slate-50 border-slate-200',
+                          purple: 'bg-slate-50 border-slate-200',
+                          cyan: 'bg-slate-50 border-slate-200',
+                          amber: 'bg-slate-50 border-slate-200',
+                          rose: 'bg-slate-50 border-slate-200',
+                          slate: 'bg-slate-50 border-slate-200',
                         }
                         return (
                           <div key={idx} className={`${colors[item.color as keyof typeof colors]} p-4 rounded-lg border-2`}>
@@ -187,10 +188,10 @@ export default function Lernspielen() {
                   </div>
 
                   {/* Deliverables */}
-                  <div className="bg-orange-50 border-2 border-orange-300 p-6 rounded-lg">
-                    <h4 className="text-lg font-bold text-orange-900 mb-4">📊 Was muss präsentiert werden?</h4>
+                  <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
+                    <h4 className="text-lg font-bold text-slate-900 mb-4">📊 Was muss präsentiert werden?</h4>
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="bg-white p-4 rounded border border-orange-200">
+                      <div className="bg-white p-4 rounded border border-slate-200">
                         <h5 className="font-bold text-slate-900 mb-2">Teil 1: Theorie (5-7 Min)</h5>
                         <ul className="text-sm text-slate-700 space-y-1">
                           <li>✓ Grundkonzepte & Definitionen</li>
@@ -211,27 +212,7 @@ export default function Lernspielen() {
                     </div>
                   </div>
 
-                  {/* Resources & Tipps */}
-                  <div className="bg-slate-50 border border-slate-300 p-6 rounded-lg">
-                    <h4 className="text-lg font-bold text-slate-900 mb-4">📚 Hilfreiche Ressourcen</h4>
-                    <button className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors">
-                      → Zur Seite "Texte & Ressourcen"
-                    </button>
-                    <p className="text-sm text-slate-600 mt-3">
-                      Dort findest du Erklärvideos, Artikel, Studien und viele Praxis-Beispiele für jedes deiner 5 Themen.
-                    </p>
-                  </div>
 
-                  {/* Evaluation Criteria */}
-                  <div className="bg-teal-50 border-2 border-teal-300 p-6 rounded-lg">
-                    <h4 className="text-lg font-bold text-teal-900 mb-4">⭐ Bewertungskriterien (100 Punkte)</h4>
-                    <div className="space-y-2 text-sm text-slate-700">
-                      <p><strong>Inhaltliche Qualität (40 Pkt):</strong> Verstehen & korrekte Vermittlung der Theorie</p>
-                      <p><strong>Kreativität (25 Pkt):</strong> Innovative Anwendungsideen & Game-Design Gedanken</p>
-                      <p><strong>Präsentation (20 Pkt):</strong> Verständlichkeit, Engagement, Storytelling</p>
-                      <p><strong>Zusammenarbeit (15 Pkt):</strong> Alle Gruppenmitglieder sind aktiv beteiligt</p>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -242,12 +223,12 @@ export default function Lernspielen() {
               <h2 className="text-2xl font-bold text-slate-900 mb-6">📚 Lernmaterialien für jedes Thema</h2>
               
               {/* Maslow */}
-              <div className="bg-blue-50 border-2 border-blue-200 p-6 rounded-lg">
+              <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-3xl">🔺</span>
-                  <h3 className="text-2xl font-bold text-blue-900">Bedürfnispyramide nach Maslow</h3>
+                  <h3 className="text-2xl font-bold text-slate-900">Bedürfnispyramide nach Maslow</h3>
                 </div>
-                <div className="bg-white p-4 rounded border border-blue-200 space-y-3 text-slate-700">
+                <div className="bg-white p-4 rounded border border-slate-200 space-y-3 text-slate-700">
                   <p><strong>Kernidee:</strong> Menschen werden motiviert durch ein Hierarchie von Bedürfnissen - von physischen Grundbedürfnissen bis hin zu Selbstverwirklichung.</p>
                   <div className="space-y-2">
                     <p className="font-semibold">📖 Ressourcen:</p>
@@ -261,12 +242,12 @@ export default function Lernspielen() {
               </div>
 
               {/* Klassische Konditionierung */}
-              <div className="bg-purple-50 border-2 border-purple-200 p-6 rounded-lg">
+              <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-3xl">🔔</span>
-                  <h3 className="text-2xl font-bold text-purple-900">Klassische Konditionierung</h3>
+                  <h3 className="text-2xl font-bold text-slate-900">Klassische Konditionierung</h3>
                 </div>
-                <div className="bg-white p-4 rounded border border-purple-200 space-y-3 text-slate-700">
+                <div className="bg-white p-4 rounded border border-slate-200 space-y-3 text-slate-700">
                   <p><strong>Kernidee:</strong> Wenn man einen neutralen Reiz (z.B. einen Sound) wiederholt mit einem positiven Event (Belohnung) koppelt, beginnt man diese zu assoziieren.</p>
                   <div className="space-y-2">
                     <p className="font-semibold">📖 Ressourcen:</p>
@@ -280,12 +261,12 @@ export default function Lernspielen() {
               </div>
 
               {/* Flow-Theorie */}
-              <div className="bg-cyan-50 border-2 border-cyan-200 p-6 rounded-lg">
+              <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-3xl">🌊</span>
-                  <h3 className="text-2xl font-bold text-cyan-900">Flow-Theorie nach Csikszentmihalyi</h3>
+                  <h3 className="text-2xl font-bold text-slate-900">Flow-Theorie nach Csikszentmihalyi</h3>
                 </div>
-                <div className="bg-white p-4 rounded border border-cyan-200 space-y-3 text-slate-700">
+                <div className="bg-white p-4 rounded border border-slate-200 space-y-3 text-slate-700">
                   <p><strong>Kernidee:</strong> Flow ist der optimale Zustand von Konzentration und Problemlösung - wenn Herausforderung und Fähigkeit perfekt ausbalanciert sind.</p>
                   <div className="space-y-2">
                     <p className="font-semibold">📖 Ressourcen:</p>
@@ -299,12 +280,12 @@ export default function Lernspielen() {
               </div>
 
               {/* Intrinsische vs. Extrinsische Motivation */}
-              <div className="bg-amber-50 border-2 border-amber-200 p-6 rounded-lg">
+              <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-3xl">⚡</span>
-                  <h3 className="text-2xl font-bold text-amber-900">Intrinsische & Extrinsische Motivation</h3>
+                  <h3 className="text-2xl font-bold text-slate-900">Intrinsische & Extrinsische Motivation</h3>
                 </div>
-                <div className="bg-white p-4 rounded border border-amber-200 space-y-3 text-slate-700">
+                <div className="bg-white p-4 rounded border border-slate-200 space-y-3 text-slate-700">
                   <p><strong>Kernidee:</strong> Intrinsische Motivation (innere Antriebe) ist nachhaltiger als extrinsische (äußere Belohnungen wie Noten).</p>
                   <div className="space-y-2">
                     <p className="font-semibold">📖 Ressourcen:</p>
@@ -318,19 +299,19 @@ export default function Lernspielen() {
               </div>
 
               {/* Belohnungssysteme */}
-              <div className="bg-rose-50 border-2 border-rose-200 p-6 rounded-lg">
+              <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-3xl">🎁</span>
-                  <h3 className="text-2xl font-bold text-rose-900">Belohnungssysteme in Spielen</h3>
+                  <h3 className="text-2xl font-bold text-slate-900">Belohnungssysteme im Gehirn</h3>
                 </div>
-                <div className="bg-white p-4 rounded border border-rose-200 space-y-3 text-slate-700">
-                  <p><strong>Kernidee:</strong> Effektive Rewards sind zeitnah, Sinn-machend und bauen auf einer variablen Verstärkungsplan auf.</p>
+                <div className="bg-white p-4 rounded border border-slate-200 space-y-3 text-slate-700">
+                  <p><strong>Kernidee:</strong> In unserem Gehirn gibt es ein Zentrum, das uns steuert: das Belohnungssystem. Es ist dafür da, dass wir Dinge wiederholen, die gut für uns sind. Der wichtigste Botenstoff dabei ist Dopamin.</p>
                   <div className="space-y-2">
                     <p className="font-semibold">📖 Ressourcen:</p>
                     <ul className="space-y-1 text-sm">
-                      <li>🎥 <a href="https://youtu.be/xo8Z_0ZvXj8" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Video: Game Reward Systems - Skinner Box</a></li>
-                      <li>📄 Variable Ratio Schedules, Loot Boxes, Achievement Systems & deren psychologische Wirkung</li>
-                      <li>💡 Ethische Fragen: Ist Gamification manipulativ? Wann ist es verantwortbar?</li>
+                      <li>🎥 <a href="https://youtu.be/VrDiAg4ZdoM" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Video: Das Dopamin-System im Gehirn</a></li>
+                      <li>📄 Nucleus Accumbens, Dopamin-Rezeptoren und ihre Rolle bei Motivation & Lernen</li>
+                      <li>💡 Wie man Dopamin-Freisetzung in Lernspielen nutzt: Progression, Rewards und Feedback-Loops</li>
                     </ul>
                   </div>
                 </div>
