@@ -76,6 +76,7 @@ interface WorkflowState {
   orderDate?: string;
   invoiceNumber: number;
   invoiceDate: string;
+  unitPrice: number;
   discountPercent: number;
   discountAmount: number;
   subtotal: number;
@@ -88,6 +89,7 @@ interface WorkflowState {
   paymentReference: string;
   paymentVerified: boolean;
   goodsShipped: boolean;
+  offerFinalized: boolean;
 }
 
 const LIEFERBEDINGNISSE = {
@@ -352,6 +354,7 @@ export default function Verkaufsprozess() {
     orderAccepted: false,
     invoiceNumber: 18,
     invoiceDate: new Date().toLocaleDateString('de-DE'),
+    unitPrice: 0,
     discountPercent: 0,
     discountAmount: 0,
     subtotal: 0,
@@ -363,44 +366,11 @@ export default function Verkaufsprozess() {
     paymentReference: '',
     paymentVerified: false,
     goodsShipped: false,
+    offerFinalized: false,
   });
 
   const [activeTab, setActiveTab] = useState<'email' | 'warehouse' | 'documents' | 'shipping' | 'banking'>('email');
   const [selectedEmailForReading, setSelectedEmailForReading] = useState<Email | null>(null);
-
-  // Calculate discount based on subtotal
-  const calculateDiscount = (subtotal: number): number => {
-    for (const staffel of LIEFERBEDINGNISSE.rabattstaffeln.reverse()) {
-      if (subtotal >= staffel.ab) return staffel.prozent;
-    }
-    return 0;
-  };
-
-  // Calculate calculations
-  const calculateOffer = (quantity: number, product?: Product) => {
-    if (!product) return;
-
-    const subtotal = product.price * quantity;
-    const discountPercent = calculateDiscount(subtotal);
-    const discountAmount = (subtotal * discountPercent) / 100;
-    const afterDiscount = subtotal - discountAmount;
-    const shippingCost = workflow.isExpress && workflow.selectedShipping ? workflow.selectedShipping.basePrice * (1 + workflow.selectedShipping.expressCharge / 100) : workflow.shippingCost;
-    const totalNetto = afterDiscount + shippingCost;
-    const vatAmount = (totalNetto * LIEFERBEDINGNISSE.vatRate) / 100;
-    const totalBrutto = totalNetto + vatAmount;
-
-    setWorkflow((prev) => ({
-      ...prev,
-      quantity,
-      subtotal,
-      discountPercent,
-      discountAmount,
-      shippingCost,
-      totalNetto,
-      vatAmount,
-      totalBrutto,
-    }));
-  };
 
   const selectEmailForOffer = (email: Email) => {
     setWorkflow((prev) => ({
@@ -413,22 +383,14 @@ export default function Verkaufsprozess() {
   };
 
   const selectProduct = (product: Product) => {
-    const quantity = workflow.selectedEmail?.requirements.quantity?.exact || 0;
-    calculateOffer(quantity, product);
-
     setWorkflow((prev) => ({
       ...prev,
       selectedProduct: product,
+      unitPrice: product.price,
+      quantity: prev.selectedEmail?.requirements.quantity?.exact || 0,
       currentStep: 2,
     }));
     setActiveTab('documents');
-  };
-
-  const submitOffer = () => {
-    setWorkflow((prev) => ({
-      ...prev,
-      currentStep: 3,
-    }));
   };
 
   const acceptOrder = () => {
@@ -438,21 +400,6 @@ export default function Verkaufsprozess() {
       orderAccepted: true,
       orderDate: new Date().toLocaleDateString('de-DE'),
     }));
-  };
-
-  const generateInvoice = () => {
-    setWorkflow((prev) => ({
-      ...prev,
-      currentStep: 5,
-    }));
-  };
-
-  const proceedToShipping = () => {
-    setWorkflow((prev) => ({
-      ...prev,
-      currentStep: 6,
-    }));
-    setActiveTab('shipping');
   };
 
   const selectShipping = (option: ShippingOption) => {
@@ -663,116 +610,238 @@ export default function Verkaufsprozess() {
           {/* DOCUMENTS TAB */}
           {activeTab === 'documents' && (
             <div className="bg-white rounded-xl shadow-lg p-8 border border-slate-200">
-              <h2 className="text-2xl font-bold mb-6 text-slate-800">📄 Angebot & Rechnungen</h2>
+              <h2 className="text-2xl font-bold mb-6 text-slate-800">📄 Angebot erstellen & berechnen</h2>
 
               {workflow.selectedProduct && workflow.selectedEmail ? (
                 <div className="space-y-6">
-                  {/* OFFER PREVIEW */}
-                  <div className="border-2 border-slate-300 rounded-lg p-8 bg-slate-50">
-                    <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
+                  {/* OFFER FORM */}
+                  <div className="border-2 border-orange-300 rounded-lg p-8 bg-orange-50">
+                    <h3 className="text-lg font-bold mb-6 text-slate-800">📋 Angebotskalkulation</h3>
+
+                    {/* HEADER INFO */}
+                    <div className="mb-8 grid grid-cols-4 gap-4 text-sm bg-white p-4 rounded border border-slate-200">
                       <div>
-                        <p className="text-slate-600">Angebot-Nr.:</p>
-                        <p className="font-bold text-slate-900">{workflow.offerNumber}</p>
+                        <p className="text-slate-600 font-semibold">Angebot-Nr.:</p>
+                        <p className="text-lg font-bold text-slate-900">{workflow.offerNumber}</p>
                       </div>
                       <div>
-                        <p className="text-slate-600">Datum:</p>
-                        <p className="font-bold text-slate-900">{workflow.offerDate}</p>
+                        <p className="text-slate-600 font-semibold">Datum:</p>
+                        <p className="text-lg font-bold text-slate-900">{workflow.offerDate}</p>
                       </div>
                       <div>
-                        <p className="text-slate-600">Kunde:</p>
-                        <p className="font-bold text-slate-900">{workflow.selectedEmail.from}</p>
+                        <p className="text-slate-600 font-semibold">Kunde:</p>
+                        <p className="text-sm font-bold text-slate-900">{workflow.selectedEmail.from}</p>
                       </div>
                       <div>
-                        <p className="text-slate-600">Kundennummer:</p>
-                        <p className="font-bold text-slate-900">{workflow.selectedEmail.customerNumber}</p>
+                        <p className="text-slate-600 font-semibold">Kundennr.:</p>
+                        <p className="text-lg font-bold text-slate-900">{workflow.selectedEmail.customerNumber}</p>
                       </div>
                     </div>
 
-                    <table className="w-full text-sm border-collapse mb-6">
-                      <thead>
-                        <tr className="border-b-2 border-slate-800 bg-slate-200">
-                          <th className="text-left font-bold py-2">Artikel</th>
-                          <th className="text-center font-bold py-2">Menge</th>
-                          <th className="text-right font-bold py-2">Einheitspreis</th>
-                          <th className="text-right font-bold py-2">Summe</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="border-b border-slate-300">
-                          <td className="py-3">{workflow.selectedProduct.name}</td>
-                          <td className="text-center">{workflow.quantity}</td>
-                          <td className="text-right">€ {workflow.selectedProduct.price.toFixed(2)}</td>
-                          <td className="text-right font-semibold">€ {workflow.subtotal.toFixed(2)}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    {/* INPUT TABLE */}
+                    <div className="mb-6 bg-white rounded border border-slate-300 overflow-hidden">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="bg-slate-200 border-b-2 border-slate-800">
+                            <th className="text-left font-bold py-3 px-4">Artikel</th>
+                            <th className="text-center font-bold py-3 px-4">Art.-Nr.</th>
+                            <th className="text-center font-bold py-3 px-4 w-24">Menge</th>
+                            <th className="text-center font-bold py-3 px-4 w-32">Preis pro Stück</th>
+                            <th className="text-right font-bold py-3 px-4 w-32">Summe</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b border-slate-300 hover:bg-slate-50">
+                            <td className="py-4 px-4 font-semibold text-slate-900">{workflow.selectedProduct.name}</td>
+                            <td className="py-4 px-4 text-center text-slate-700">{workflow.selectedProduct.artNumber}</td>
+                            <td className="py-4 px-4">
+                              <input
+                                type="number"
+                                value={workflow.quantity}
+                                onChange={(e) => {
+                                  const newQty = parseInt(e.target.value) || 0;
+                                  setWorkflow((prev) => ({
+                                    ...prev,
+                                    quantity: newQty,
+                                    subtotal: newQty * prev.unitPrice,
+                                  }));
+                                }}
+                                className="w-full border-2 border-blue-400 rounded px-2 py-1 text-center font-semibold focus:outline-none focus:border-blue-600"
+                              />
+                            </td>
+                            <td className="py-4 px-4">
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={workflow.unitPrice}
+                                onChange={(e) => {
+                                  const newPrice = parseFloat(e.target.value) || 0;
+                                  setWorkflow((prev) => ({
+                                    ...prev,
+                                    unitPrice: newPrice,
+                                    subtotal: prev.quantity * newPrice,
+                                  }));
+                                }}
+                                className="w-full border-2 border-blue-400 rounded px-2 py-1 text-center font-semibold focus:outline-none focus:border-blue-600"
+                              />
+                            </td>
+                            <td className="py-4 px-4 text-right font-bold text-slate-900">€ {workflow.subtotal.toFixed(2)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
 
-                    <div className="space-y-2 text-sm mb-8 border-t border-b border-slate-300 py-4">
-                      <div className="flex justify-between">
-                        <span>Summe der Einzelposten:</span>
-                        <span className="font-semibold">€ {workflow.subtotal.toFixed(2)}</span>
-                      </div>
-                      {workflow.discountPercent > 0 && (
-                        <div className="flex justify-between text-green-600">
-                          <span>Rabatt ({workflow.discountPercent}%):</span>
-                          <span className="font-semibold">-€ {workflow.discountAmount.toFixed(2)}</span>
+                    {/* CALCULATION FIELDS */}
+                    <div className="mb-6 bg-white rounded border border-slate-300 p-6 space-y-4">
+                      <div className="grid grid-cols-2 gap-8">
+                        <div>
+                          <label className="block text-sm font-bold text-slate-700 mb-2">Summe Einzelposten:</label>
+                          <div className="bg-slate-100 border-2 border-slate-400 rounded px-3 py-2 text-right font-bold text-lg text-slate-900">
+                            € {workflow.subtotal.toFixed(2)}
+                          </div>
                         </div>
-                      )}
-                      <div className="flex justify-between font-bold">
-                        <span>Versandkosten:</span>
-                        <span>€ {workflow.shippingCost.toFixed(2)}</span>
+                        <div>
+                          <label className="block text-sm font-bold text-slate-700 mb-2">Rabatt in %:</label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            value={workflow.discountPercent}
+                            onChange={(e) => {
+                              const discPercent = parseFloat(e.target.value) || 0;
+                              const discAmount = (workflow.subtotal * discPercent) / 100;
+                              setWorkflow((prev) => ({
+                                ...prev,
+                                discountPercent: discPercent,
+                                discountAmount: discAmount,
+                              }));
+                            }}
+                            className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
+                          />
+                        </div>
                       </div>
-                      <div className="flex justify-between font-bold text-lg">
-                        <span>Gesamtpreis netto:</span>
-                        <span>€ {workflow.totalNetto.toFixed(2)}</span>
+
+                      <div className="grid grid-cols-2 gap-8">
+                        <div>
+                          <label className="block text-sm font-bold text-slate-700 mb-2">Rabatt € (auto):</label>
+                          <div className="bg-green-100 border-2 border-green-500 rounded px-3 py-2 text-right font-bold text-lg text-green-700">
+                            -€ {workflow.discountAmount.toFixed(2)}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold text-slate-700 mb-2">Versandkosten €:</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={workflow.shippingCost}
+                            onChange={(e) => {
+                              const newShipping = parseFloat(e.target.value) || 0;
+                              setWorkflow((prev) => ({
+                                ...prev,
+                                shippingCost: newShipping,
+                              }));
+                            }}
+                            className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
+                          />
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span>19% MwSt.:</span>
-                        <span>€ {workflow.vatAmount.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between font-bold text-lg text-orange-600">
-                        <span>Gesamtpreis brutto:</span>
-                        <span>€ {workflow.totalBrutto.toFixed(2)}</span>
+
+                      <div className="border-t-2 border-slate-300 pt-4">
+                        <div className="grid grid-cols-2 gap-8">
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">Gesamtpreis netto (auto):</label>
+                            <div
+                              className="bg-blue-100 border-2 border-blue-500 rounded px-3 py-2 text-right font-bold text-lg text-blue-700"
+                              onClick={() => {
+                                const newNetto = workflow.subtotal - workflow.discountAmount + workflow.shippingCost;
+                                setWorkflow((prev) => ({
+                                  ...prev,
+                                  totalNetto: newNetto,
+                                  vatAmount: (newNetto * LIEFERBEDINGNISSE.vatRate) / 100,
+                                  totalBrutto: newNetto + (newNetto * LIEFERBEDINGNISSE.vatRate) / 100,
+                                }));
+                              }}
+                            >
+                              € {(workflow.subtotal - workflow.discountAmount + workflow.shippingCost).toFixed(2)}
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">MwSt. 19% (auto):</label>
+                            <div
+                              className="bg-amber-100 border-2 border-amber-500 rounded px-3 py-2 text-right font-bold text-lg text-amber-700"
+                              onClick={() => {
+                                const newNetto = workflow.subtotal - workflow.discountAmount + workflow.shippingCost;
+                                const newVat = (newNetto * LIEFERBEDINGNISSE.vatRate) / 100;
+                                const newBrutto = newNetto + newVat;
+                                setWorkflow((prev) => ({
+                                  ...prev,
+                                  totalNetto: newNetto,
+                                  vatAmount: newVat,
+                                  totalBrutto: newBrutto,
+                                }));
+                              }}
+                            >
+                              €&nbsp;
+                              {((workflow.subtotal - workflow.discountAmount + workflow.shippingCost) * LIEFERBEDINGNISSE.vatRate / 100).toFixed(2)}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-6 p-6 bg-gradient-to-r from-orange-100 to-orange-50 border-2 border-orange-500 rounded">
+                          <label className="block text-sm font-bold text-slate-700 mb-2">Rechnungsbetrag brutto (auto):</label>
+                          <div className="text-right font-bold text-3xl text-orange-700">
+                            €&nbsp;
+                            {(workflow.subtotal - workflow.discountAmount + workflow.shippingCost + (workflow.subtotal - workflow.discountAmount + workflow.shippingCost) * LIEFERBEDINGNISSE.vatRate / 100).toFixed(2)}
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* PAYMENT TERMS */}
-                    <div className="text-xs text-slate-600 bg-amber-50 p-3 rounded mb-6 border border-amber-200">
-                      <p className="font-semibold mb-1">💳 Zahlungsbedingungen:</p>
-                      <p>• Zahlungsziel: {LIEFERBEDINGNISSE.zahlungsziel} Tage ab Rechnungsdatum</p>
-                      <p>• Skonto: {LIEFERBEDINGNISSE.skonto}% bei Zahlung innerhalb von {LIEFERBEDINGNISSE.skontoTage} Tagen</p>
+                    {/* HINT */}
+                    <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded text-sm text-slate-700">
+                      <p className="font-semibold mb-2">💡 Hinweis für Schüler:</p>
+                      <p>1. Geben Sie die Menge und den Preis pro Stück ein</p>
+                      <p>2. Berechnen Sie den Rabatt-Prozentsatz (basierend auf der Kundenanfrage)</p>
+                      <p>3. Tragen Sie die Versandkosten ein</p>
+                      <p>4. Das System berechnet automatisch netto, MwSt. und brutto</p>
                     </div>
 
                     {/* ACTION BUTTONS */}
                     <div className="flex gap-4">
-                      {!workflow.orderAccepted ? (
-                        <>
-                          <button onClick={submitOffer} className="flex-1 py-3 px-6 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors">
-                            ✓ Angebot absenden
-                          </button>
-                          <button onClick={() => setWorkflow((prev) => ({ ...prev, selectedProduct: undefined, currentStep: 1 }))} className="flex-1 py-3 px-6 bg-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-400 transition-colors">
-                            ← Zurück zum Lager
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button onClick={generateInvoice} className="flex-1 py-3 px-6 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors">
-                            📋 Rechnung generieren
-                          </button>
-                          <button onClick={proceedToShipping} className="flex-1 py-3 px-6 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-colors">
-                            🚚 Versand festlegen
-                          </button>
-                        </>
-                      )}
+                      <button
+                        onClick={() => {
+                          const newNetto = workflow.subtotal - workflow.discountAmount + workflow.shippingCost;
+                          const newVat = (newNetto * LIEFERBEDINGNISSE.vatRate) / 100;
+                          setWorkflow((prev) => ({
+                            ...prev,
+                            totalNetto: newNetto,
+                            vatAmount: newVat,
+                            totalBrutto: newNetto + newVat,
+                            offerFinalized: true,
+                            currentStep: 3,
+                          }));
+                        }}
+                        className="flex-1 py-3 px-6 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
+                      >
+                        ✓ Angebot fertigstellen & absenden
+                      </button>
+                      <button
+                        onClick={() => setWorkflow((prev) => ({ ...prev, selectedProduct: undefined, currentStep: 1 }))}
+                        className="flex-1 py-3 px-6 bg-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-400 transition-colors"
+                      >
+                        ← Zurück zum Lager
+                      </button>
                     </div>
                   </div>
 
                   {/* ORDER ACCEPTANCE */}
-                  {workflow.currentStep >= 3 && !workflow.orderAccepted && (
+                  {workflow.currentStep >= 3 && !workflow.orderAccepted && workflow.offerFinalized && (
                     <div className="border-2 border-blue-300 rounded-lg p-8 bg-blue-50">
                       <h3 className="text-xl font-bold text-slate-800 mb-4">🎯 Auftrag annehmen?</h3>
                       <p className="text-slate-700 mb-6">Der Kunde möchte diese Bestellung bestätigen. Klicken Sie „Auftrag annehmen", um die Auftragsbestätigung zu generieren.</p>
-                      <button onClick={acceptOrder} className="w-full py-3 px-6 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">
+                      <button
+                        onClick={acceptOrder}
+                        className="w-full py-3 px-6 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
+                      >
                         ✓ Auftrag annehmen und Auftragsbestätigung vorbereiten
                       </button>
                     </div>
