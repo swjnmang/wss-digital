@@ -267,28 +267,34 @@ export default function Lernspielen() {
                       <div className="space-y-4">
                         {/* Experiments */}
                         <div>
-                          <p className="font-semibold text-slate-900 mb-2">🧪 Echte Experimente:</p>
+                          <p className="font-semibold text-slate-900 mb-2">🧪 Wähle eines dieser 4 Experimente:</p>
                           <div className="space-y-2 text-slate-700">
                             <div className="bg-blue-50 p-3 rounded border border-blue-200">
-                              <p className="font-semibold mb-1">Experiment 1: "Bedürfnis-Ranking unter Druck"</p>
-                              <p className="text-sm"><strong>Hypothese:</strong> Unter Druck priorisieren Menschen zuerst Sicherheitsbedürfnisse über Selbstverwirklichung.</p>
-                              <p className="text-sm"><strong>Methode:</strong> Zeige 20 Schülern Listen von verschiedenen Bedürfnissen. Lass sie in 3 Szenarien sortieren: (1) Normal, (2) Stresstest (Lärm, Zeitdruck), (3) Sicherheitsbedrohung. Dokumentiere die Unterschiede.</p>
+                              <p className="font-semibold mb-1">Experiment 1: Die "Insel-Challenge"</p>
+                              <p className="text-sm">Stellt euch vor, ihr strandet auf einer einsamen Insel. In welcher Reihenfolge würdet ihr eure Probleme lösen? Deckt sich das mit Maslows Pyramide?</p>
                             </div>
                             <div className="bg-blue-50 p-3 rounded border border-blue-200">
-                              <p className="font-semibold mb-1">Experiment 2: "Hunger vs. Konzentration"</p>
-                              <p className="text-sm"><strong>Hypothese:</strong> Hungrige Schüler können sich weniger auf komplexe Aufgaben konzentrieren.</p>
-                              <p className="text-sm"><strong>Methode:</strong> Teile eine Gruppe: Hälfte bekommt Snack, Hälfte nicht. Beide lösen dieselbe Aufgabe. Messung: Fehlerquote, Bearbeitungszeit, Zufriedenheit.</p>
+                              <p className="font-semibold mb-1">Experiment 2: Werbung analysieren</p>
+                              <p className="text-sm">Schaut euch 3-4 Werbungen an (Auto, Schmuck, Krankenkasse, etc.). Welche Stufe von Maslow spricht jede Werbung an? Erstellt eine Übersicht.</p>
+                            </div>
+                            <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                              <p className="font-semibold mb-1">Experiment 3: Selbst-Check im Klassenzimmer</p>
+                              <p className="text-sm">Füllt selbst aus: Welche Bedürfnisse sind im Schulalltag erfüllt? Welche fehlen? Warum ist deine Motivation am höchsten, wenn bestimmte Bedürfnisse erfüllt sind?</p>
+                            </div>
+                            <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                              <p className="font-semibold mb-1">Experiment 4: Menschen interviewen</p>
+                              <p className="text-sm">Fragt 5 Menschen: "Was brauchst du zum Glücklichsein?" Sammelt die Antworten und ordnet sie in Maslows Pyramide ein. Gibt es Unterschiede zwischen Alter/Geschlecht/Kultur?</p>
                             </div>
                           </div>
                         </div>
 
                         {/* Reflection Questions */}
                         <div className="border-t pt-4">
-                          <p className="font-semibold text-slate-900 mb-2">🤔 Reflexionsfragen:</p>
+                          <p className="font-semibold text-slate-900 mb-2">🤔 Reflexionsfragen zum Nachdenken:</p>
                           <ul className="space-y-1 text-sm text-slate-700 list-disc list-inside">
-                            <li>Auf welcher Stufe der Pyramide bewegen wir uns im Klassenzimmer normalerweise?</li>
-                            <li>Warum versuchen Luxusmarken, auf den oberen Stufen anzusprechen?</li>
-                            <li>Ist Maslows Pyramide in allen Kulturen gleich gültig?</li>
+                            <li>Warum können Luxusmarken hohe Preise verlangen, obwohl sie dasselbe leisten wie günstige Alternativen?</li>
+                            <li>Kann ein Schüler gut lernen, wenn er hungrig ist oder Angst vor Tests hat?</li>
+                            <li>Funktioniert Maslows Pyramide überall in der Welt gleich oder gibt es kulturelle Unterschiede?</li>
                           </ul>
                         </div>
                       </div>
@@ -304,28 +310,34 @@ export default function Lernspielen() {
                       <div className="space-y-4">
                         {/* Experiments */}
                         <div>
-                          <p className="font-semibold text-slate-900 mb-2">🧪 Echte Experimente:</p>
+                          <p className="font-semibold text-slate-900 mb-2">🧪 Wähle eines dieser 4 Experimente:</p>
                           <div className="space-y-2 text-slate-700">
                             <div className="bg-purple-50 p-3 rounded border border-purple-200">
-                              <p className="font-semibold mb-1">Experiment 1: "Sound-Konditionierung"</p>
-                              <p className="text-sm"><strong>Hypothese:</strong> Nach mehreren Wiederholungen löst der Ton allein bereits Freude aus.</p>
-                              <p className="text-sm"><strong>Methode:</strong> Spiel einen Ton (z.B. Glocke) ab, gefolgt von etwas Positivem (Süßigkeit/Lob). 10x wiederholen. Dann: Spiel nur noch den Ton - misst die emotionale & körperliche Reaktion (Lächeln, Pupillenreaktion, etc.).</p>
+                              <p className="font-semibold mb-1">Experiment 1: Der Handy-Reflex</p>
+                              <p className="text-sm">Beobachtet eure Mitschüler eine Woche lang, wenn das Handy "pling" macht. Wie schnell greifen sie danach? Warum machen das so viele automatisch, ohne zu denken?</p>
                             </div>
                             <div className="bg-purple-50 p-3 rounded border border-purple-200">
-                              <p className="font-semibold mb-1">Experiment 2: "Reflex-Reaktionszeit"</p>
-                              <p className="text-sm"><strong>Hypothese:</strong> Konditionierte Handy-Nutzer reagieren schneller auf "Pling"-Töne als auf andere Reize.</p>
-                              <p className="text-sm"><strong>Methode:</strong> Messung der Reaktionszeit von 15 Schülern auf verschiedene Töne (Handy-Benachrichtigung, andere Sounds). Vergleiche mit ihrer durchschnittlichen Handy-Nutzung/Tag.</p>
+                              <p className="font-semibold mb-1">Experiment 2: Musik = Erinnerung</p>
+                              <p className="text-sm">Findet einen Song, der euch an etwas positives/negatives erinnert. Spielt ihn ab - welche Gefühle kommen zurück? Warum verbinden wir Musik mit bestimmten Momenten?</p>
+                            </div>
+                            <div className="bg-purple-50 p-3 rounded border border-purple-200">
+                              <p className="font-semibold mb-1">Experiment 3: Schulklingel & Konditionierung</p>
+                              <p className="text-sm">Die Schulklingel ertönt - was passiert? Alle springen auf oder werden nervös. Seit wann seid ihr so konditioniert? Was würde passieren, wenn die Schule den Klingelton ändern würde?</p>
+                            </div>
+                            <div className="bg-purple-50 p-3 rounded border border-purple-200">
+                              <p className="font-semibold mb-1">Experiment 4: Rituale von Athleten</p>
+                              <p className="text-sm">Recherchiert Ritualen von Profisportlern (z.B. Schuhe zuerst links anziehen, bestimmte Musik hören). Sind das Aberglaube oder klassische Konditionierung? Funktioniert das?</p>
                             </div>
                           </div>
                         </div>
 
                         {/* Reflection Questions */}
                         <div className="border-t pt-4">
-                          <p className="font-semibold text-slate-900 mb-2">🤔 Reflexionsfragen:</p>
+                          <p className="font-semibold text-slate-900 mb-2">🤔 Reflexionsfragen zum Nachdenken:</p>
                           <ul className="space-y-1 text-sm text-slate-700 list-disc list-inside">
-                            <li>Warum sind Glücksbringer von Sportlern eine Form der Konditionierung?</li>
-                            <li>Wie können wir negative Konditionierungen (z.B. Angst vor Tests) durch positive ersetzen?</li>
-                            <li>Nutzen Videospiele klassische Konditionierung mit ihren Sound-Designs?</li>
+                            <li>Sind Werbejingles (z.B. McDonald's, Coca-Cola) beispiele für klassische Konditionierung?</li>
+                            <li>Könnte man negative Konditionierungen (z.B. Angst vor Zahnarzt) bewusst abbauen?</li>
+                            <li>Warum funktioniert klassische Konditionierung - hat sie einen biologischen Grund?</li>
                           </ul>
                         </div>
                       </div>
@@ -341,28 +353,34 @@ export default function Lernspielen() {
                       <div className="space-y-4">
                         {/* Experiments */}
                         <div>
-                          <p className="font-semibold text-slate-900 mb-2">🧪 Echte Experimente:</p>
+                          <p className="font-semibold text-slate-900 mb-2">🧪 Wähle eines dieser 4 Experimente:</p>
                           <div className="space-y-2 text-slate-700">
                             <div className="bg-cyan-50 p-3 rounded border border-cyan-200">
-                              <p className="font-semibold mb-1">Experiment 1: "Challenge-Skill-Balance"</p>
-                              <p className="text-sm"><strong>Hypothese:</strong> Schüler sind am meisten fokussiert, wenn Challenge und Skill perfekt ausbalanciert sind - nicht zu einfach, nicht zu schwer.</p>
-                              <p className="text-sm"><strong>Methode:</strong> Schüler lösen Aufgaben mit 3 Schwierigkeitsgraden. Messung: Fokus-Zeit, Fehlerquote, Subjektive "Flow"-Bewertung (1-10). Finde den Balance-Punkt.</p>
+                              <p className="font-semibold mb-1">Experiment 1: Dein persönlicher Flow-Moment</p>
+                              <p className="text-sm">Denke an eine Aktivität, bei der du völlig "aufgehst" (Gaming, Sport, Musik, Lesen). Wann passiert das? Was ist anders als im normalen Unterricht? Was könnte Schule von diesem Moment lernen?</p>
                             </div>
                             <div className="bg-cyan-50 p-3 rounded border border-cyan-200">
-                              <p className="font-semibold mb-1">Experiment 2: "Zeitverzerrung im Flow"</p>
-                              <p className="text-sm"><strong>Hypothese:</strong> Im Flow-Zustand nehmen Menschen Zeit als schneller vergehend wahr (Minuten fühlen sich wie Sekunden an).</p>
-                              <p className="text-sm"><strong>Methode:</strong> Schüler arbeiten 15 Min an einer Aufgabe im Flow-Zustand. Dann: Schätzen, wie lange sie gearbeitet haben. Vergleich: Schätzung vs. Realität.</p>
+                              <p className="font-semibold mb-1">Experiment 2: Zu leicht = langweilig, zu schwer = stressig</p>
+                              <p className="text-sm">Löst eine Aufgabe, die zu einfach ist (z.B. für 3. Klasse). Dann: eine unmögliche Aufgabe. Wie fühlt sich das an? Jetzt eine Aufgabe, die genau passt - ist das anders?</p>
+                            </div>
+                            <div className="bg-cyan-50 p-3 rounded border border-cyan-200">
+                              <p className="font-semibold mb-1">Experiment 3: Flow-Killer finden</p>
+                              <p className="text-sm">Arbeitet 15 Minuten konzentriert. Dann: Lasst jemanden alle 2 Minuten unterbrechen. Wie fühlt sich das an? Was zerstört euren Flow am meisten: Lärm, Handy, andere Menschen?</p>
+                            </div>
+                            <div className="bg-cyan-50 p-3 rounded border border-cyan-200">
+                              <p className="font-semibold mb-1">Experiment 4: Videospiel-Schwierigkeitsstufen</p>
+                              <p className="text-sm">Spielt ein Spiel auf "Einfach", dann auf "Normal", dann auf "Unmöglich". Bei welchem Modus habt ihr die meiste Zeit Spaß? Warum verschiebt sich euer Spaß mit der Schwierigkeit?</p>
                             </div>
                           </div>
                         </div>
 
                         {/* Reflection Questions */}
                         <div className="border-t pt-4">
-                          <p className="font-semibold text-slate-900 mb-2">🤔 Reflexionsfragen:</p>
+                          <p className="font-semibold text-slate-900 mb-2">🤔 Reflexionsfragen zum Nachdenken:</p>
                           <ul className="space-y-1 text-sm text-slate-700 list-disc list-inside">
-                            <li>Was sind die größten Flow-Killer im Klassenzimmer?</li>
-                            <li>Wie kann ein Lehrer Aufgaben so gestalten, dass Flow wahrscheinlicher wird?</li>
-                            <li>Gibt es den Flow-Zustand auch in Gruppen oder nur im Einzelgehen?</li>
+                            <li>Warum verlieren viele Menschen das Interesse an einem Hobby, wenn es ihnen zu langweilig wird?</li>
+                            <li>Können mehrere Menschen gleichzeitig im Flow sein (z.B. eine Band, ein Sportteam)?</li>
+                            <li>Wie könnten Schulen ihre Unterrichtsstunden so gestalten, dass Flow wahrscheinlicher wird?</li>
                           </ul>
                         </div>
                       </div>
@@ -378,28 +396,34 @@ export default function Lernspielen() {
                       <div className="space-y-4">
                         {/* Experiments */}
                         <div>
-                          <p className="font-semibold text-slate-900 mb-2">🧪 Echte Experimente:</p>
+                          <p className="font-semibold text-slate-900 mb-2">🧪 Wähle eines dieser 4 Experimente:</p>
                           <div className="space-y-2 text-slate-700">
                             <div className="bg-amber-50 p-3 rounded border border-amber-200">
-                              <p className="font-semibold mb-1">Experiment 1: "Rewards-Paradox"</p>
-                              <p className="text-sm"><strong>Hypothese:</strong> Externe Belohnungen können intrinsische Motivation unterminieren (Overjustification-Effekt).</p>
-                              <p className="text-sm"><strong>Methode:</strong> Gruppe A: Aufgabe mit Belohnung versprochen. Gruppe B: Gleiche Aufgabe, keine Belohnung. Danach: Beide Gruppen können freiwillig weitermachen. Messung: Wie lange macht jede Gruppe freiwillig weiter?</p>
+                              <p className="font-semibold mb-1">Experiment 1: Mit und ohne Belohnung</p>
+                              <p className="text-sm">Aufgabe A: Ohne Belohnung, weil ihr interessiert seid. Aufgabe B: Mit Belohnung versprochen. Welche Aufgabe macht ihr lieber? Arbeitet ihr bei der Belohnung besser oder weniger gerne?</p>
                             </div>
                             <div className="bg-amber-50 p-3 rounded border border-amber-200">
-                              <p className="font-semibold mb-1">Experiment 2: "Autonomie & Intrinsik"</p>
-                              <p className="text-sm"><strong>Hypothese:</strong> Schüler mit Wahlmöglichkeit arbeiten intrinsisch motivierter, auch bei gleicher Aufgabe.</p>
-                              <p className="text-sm"><strong>Methode:</strong> Gruppe A: Aufgabe vorgegeben. Gruppe B: Aufgabe gewählt. Messung: Qualität der Arbeit, Engagement, Freude, Zeiteinsatz.</p>
+                              <p className="font-semibold mb-1">Experiment 2: Noten vs. Lust am Lernen</p>
+                              <p className="text-sm">Frage dich ehrlich: Lernst du wegen Noten oder weil du das Thema interessant findest? Gibt es Fächer, die du aus Interesse lernst? Fächer, wo es nur um Noten geht?</p>
+                            </div>
+                            <div className="bg-amber-50 p-3 rounded border border-amber-200">
+                              <p className="font-semibold mb-1">Experiment 3: Hobbys ohne Druck</p>
+                              <p className="text-sm">Denke an dein Lieblingshobby (Musik, Sport, Gaming). Niemand zwingt dich, das zu tun. Warum machst du es trotzdem? Was würde passieren, wenn dir jemand Punkte oder Noten dafür geben würde?</p>
+                            </div>
+                            <div className="bg-amber-50 p-3 rounded border border-amber-200">
+                              <p className="font-semibold mb-1">Experiment 4: Interessante Aufgabe vs. Belohnung</p>
+                              <p className="text-sm">Wärt ihr noch motiviert zu lernen, wenn es keine Noten gäbe, sondern nur Feedback-Gespräche? Was würde sich für euch ändern? Würdet ihr andere Fächer wählen?</p>
                             </div>
                           </div>
                         </div>
 
                         {/* Reflection Questions */}
                         <div className="border-t pt-4">
-                          <p className="font-semibold text-slate-900 mb-2">🤔 Reflexionsfragen:</p>
+                          <p className="font-semibold text-slate-900 mb-2">🤔 Reflexionsfragen zum Nachdenken:</p>
                           <ul className="space-y-1 text-sm text-slate-700 list-disc list-inside">
-                            <li>Warum kann eine Note die intrinsische Motivation zu lernen zerstören?</li>
-                            <li>Gibt es Unterschiede zwischen verschiedenen Arten von Belohnungen (materielle vs. soziale)?</li>
-                            <li>Wie können Lehrer Schüler von extrinsisch zu intrinsischer Motivation führen?</li>
+                            <li>Kann eine externe Belohnung die innere Motivation zerstören?</li>
+                            <li>Warum sind manche Menschen intrinsisch für Sport motiviert, aber nicht für Mathe?</li>
+                            <li>Wie könnten Schulen den Fokus mehr auf innere Motivation legen statt auf Noten?</li>
                           </ul>
                         </div>
                       </div>
@@ -415,28 +439,34 @@ export default function Lernspielen() {
                       <div className="space-y-4">
                         {/* Experiments */}
                         <div>
-                          <p className="font-semibold text-slate-900 mb-2">🧪 Echte Experimente:</p>
+                          <p className="font-semibold text-slate-900 mb-2">🧪 Wähle eines dieser 4 Experimente:</p>
                           <div className="space-y-2 text-slate-700">
                             <div className="bg-rose-50 p-3 rounded border border-rose-200">
-                              <p className="font-semibold mb-1">Experiment 1: "Variable Ratio Schedule"</p>
-                              <p className="text-sm"><strong>Hypothese:</strong> Unvorhersehbare Belohnungen sind süchtiger machend als regelmäßige (wie beim Glücksspiel).</p>
-                              <p className="text-sm"><strong>Methode:</strong> Schüler spielen ein einfaches Spiel mit 3 Bedingungen: (1) Jeder Sieg = Punkt, (2) Zufällige Belohnungen, (3) Keine Belohnungen. Messung: Wie lange spielen sie jeweils? (Immer freiwillig).</p>
+                              <p className="font-semibold mb-1">Experiment 1: Das Instagram-Scroll-Phänomen</p>
+                              <p className="text-sm">Schaut euch eure Social Media App an. Warum habt ihr das Gefühl, dass es "kein Ende" gibt? Analysiert: Wann habt ihr ein gutes Gefühl? Was könnte euer Gehirn da auslösen (Dopamin)?</p>
                             </div>
                             <div className="bg-rose-50 p-3 rounded border border-rose-200">
-                              <p className="font-semibold mb-1">Experiment 2: "Dopamin-Timing"</p>
-                              <p className="text-sm"><strong>Hypothese:</strong> Sofortige Belohnungen führen zu mehr Wiederholungen als verzögerte Belohnungen.</p>
-                              <p className="text-sm"><strong>Methode:</strong> Gruppe A: Aufgabe lösen → sofort Belohnung. Gruppe B: Aufgabe lösen → Belohnung nach 1 Woche. Messung: Wie viele Aufgaben absolviert jede Gruppe freiwillig?</p>
+                              <p className="font-semibold mb-1">Experiment 2: Sofortige vs. verzögerte Belohnung</p>
+                              <p className="text-sm">Kleiner Test: Würde du lieber heute eine kleine Süßigkeit bekommen oder nächste Woche eine große? Was ist für dein Gehirn verlockender? Warum?</p>
+                            </div>
+                            <div className="bg-rose-50 p-3 rounded border border-rose-200">
+                              <p className="font-semibold mb-1">Experiment 3: Liste abhaken = gutes Gefühl</p>
+                              <p className="text-sm">Macht eine To-Do-Liste und hakt Aufgaben ab. Beobachtet: Fühlt sich das gut an? Warum macht euch das Abhaken glücklich? Was passiert in eurem Gehirn dabei?</p>
+                            </div>
+                            <div className="bg-rose-50 p-3 rounded border border-rose-200">
+                              <p className="font-semibold mb-1">Experiment 4: Zufällige Belohnungen sind süchtiger</p>
+                              <p className="text-sm">Spieltag! Spiel A: Jeder richtige Treffer = Punkt. Spiel B: Zufallsbelohnungen (manchmal ja, manchmal nein). Welches Spiel sucht ihr euch nächstes Mal aus? Warum wirkt Zufall verlockender?</p>
                             </div>
                           </div>
                         </div>
 
                         {/* Reflection Questions */}
                         <div className="border-t pt-4">
-                          <p className="font-semibold text-slate-900 mb-2">🤔 Reflexionsfragen:</p>
+                          <p className="font-semibold text-slate-900 mb-2">🤔 Reflexionsfragen zum Nachdenken:</p>
                           <ul className="space-y-1 text-sm text-slate-700 list-disc list-inside">
-                            <li>Warum ist Social Media so süchtig machend? Welche Dopamin-Mechaniken nutzen sie?</li>
-                            <li>Ist es ethisch vertretbar, Game-Mechaniken zur Suchtförderung zu nutzen? Gibt es Grenzen?</li>
-                            <li>Wie unterscheidet sich eine "gute" Belohnung (Lernspiel) von einer "schädlichen" (Glücksspiel)?</li>
+                            <li>Warum können manche Menschen nicht aufhören, Spiele zu spielen oder Social Media zu nutzen?</li>
+                            <li>Ist die Design von Videospielen ethisch vertretbar, wenn sie auf Dopamin-Sucht abzielen?</li>
+                            <li>Ist Dopamin immer "schlecht" oder gibt es auch "gutes" Dopamin (z.B. beim Sport)?</li>
                           </ul>
                         </div>
                       </div>
