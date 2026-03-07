@@ -265,8 +265,8 @@ const EMAILS: Email[] = [
     from: 'Thomas Voss',
     fromAddress: 'thomas.voss@architekt-net.de',
     subject: '🔴 DRINGEND: 8 High-End Desktop-PCs für 3D-Rendering-Studio',
-    content: `Guten Tag Zusammen,\n\nwir sind ein Architekturbüro und benötigen DRINGEND neue Rendering-Workstationen.\n\nANFORDERUNGEN:\n• Stückzahl: Exakt 8 Stück\n• CPU: Mindestens Intel i9 oder AMD Ryzen 9\n• RAM: Minimum 64GB DDR5\n• GPU: NVIDIA RTX 4080 oder besser\n• Budget: MAX 17.000€ netto\n• Qualität: 5 Sterne erforderlich\n\nMit freundlichen Grüßen\nThomas Voss`,
-    requirements: { quantity: { exact: 8 }, maxBudget: 17000, quality: 5, specs: [{ key: 'cpu', values: ['Intel Core i9', 'AMD Ryzen 9'] }, { key: 'ram', minValue: 64 }, { key: 'gpu', values: ['RTX 4080', 'RTX 4090'] }], priority: ['qualität', 'leistung'] },
+    content: `Guten Tag Zusammen,\n\nwir sind ein Architekturbüro und benötigen DRINGEND neue Rendering-Workstationen.\n\nANFORDERUNGEN:\n• Stückzahl: Exakt 8 Stück\n• Wichtig: Leistungsstarke GPU (RTX 4080 oder besser) für 3D-Rendering\n• Wichtig: Mindestens 32GB RAM für große Dateien\n• Budget: MAX 17.000€ netto\n• Qualität: 5 Sterne erforderlich\n\nMit freundlichen Grüßen\nThomas Voss`,
+    requirements: { quantity: { exact: 8 }, maxBudget: 17000, quality: 5, specs: [{ key: 'gpu', values: ['RTX 4080', 'RTX 4090'] }, { key: 'ram', minValue: 32 }], priority: ['leistung', 'qualität'] },
     customerNumber: '2401',
     date: '06.03.2026',
     read: false,
@@ -276,8 +276,8 @@ const EMAILS: Email[] = [
     from: 'Petra Schmidt',
     fromAddress: 'bestellung@schulzentrum-berlin.de',
     subject: 'Schulausstattung: 25 Monitore für Computerräume',
-    content: `Liebe Damen und Herren,\n\ndas Schulzentrum Berlin erneuert seine Computerräume. Wir benötigen 25 Monitore.\n\nANFORDERUNGEN:\n• Anzahl: 25 Stück\n• Bildschirmgröße: 24" oder 27"\n• Panel: IPS oder VA (nicht TN!)\n• Budget pro Monitor: MAX 350€ netto\n• Gesamtbudget: MAX 8.750€ netto\n• Qualität: Minimum 3 Sterne\n\nMit freundlichen Grüßen\nPetra Schmidt`,
-    requirements: { quantity: { exact: 25 }, maxBudget: 8750, quality: 3, specs: [{ key: 'diagonal', values: ['24"', '27"'] }, { key: 'panelType', values: ['IPS', 'VA'] }], priority: ['preis', 'zuverlässigkeit'] },
+    content: `Liebe Damen und Herren,\n\ndas Schulzentrum Berlin erneuert seine Computerräume. Wir benötigen 25 Monitore.\n\nANFORDERUNGEN:\n• Anzahl: 25 Stück\n• Wichtig: 24" oder 27" Bildschirmgröße (Klassenzimmer-Standard)\n• Wichtig: Gutes Preis-Leistungs-Verhältnis (Budget max. 8.750€ gesamt)\n• Qualität: Minimum 3 Sterne\n\nMit freundlichen Grüßen\nPetra Schmidt`,
+    requirements: { quantity: { exact: 25 }, maxBudget: 8750, quality: 3, specs: [{ key: 'diagonal', values: ['24"', '27"'] }], priority: ['preis', 'verfügbarkeit'] },
     customerNumber: '2402',
     date: '05.03.2026',
     read: false,
@@ -491,30 +491,22 @@ export default function Verkaufsprozess() {
     }));
   };
 
-  const getMatchingProducts = (email?: Email): Product[] => {
-    if (!email) return PRODUCTS;
-
+  // Prüfe ob gewähltes Produkt wirklich passt
+  const isProductMatch = (product: Product, email?: Email): boolean => {
+    if (!email) return true;
     const reqs = email.requirements;
-    return PRODUCTS.filter((product) => {
-      if (product.stock <= 0) return false;
-      if (reqs.quality && product.specs.quality && product.specs.quality < reqs.quality) return false;
+    if (reqs.quality && product.specs.quality && product.specs.quality < reqs.quality) return false;
 
-      for (const spec of reqs.specs || []) {
-        if (spec.key === 'cpu' && !spec.values?.some((v) => product.specs.cpu?.includes(v))) return false;
-        if (spec.key === 'ram') {
-          const ramMatch = product.specs.ram?.match(/(\d+)/);
-          if (ramMatch && spec.minValue && parseInt(ramMatch[1]) < spec.minValue) return false;
-        }
-        if (spec.key === 'gpu' && !spec.values?.some((v) => product.specs.gpu?.includes(v))) return false;
-        if (spec.key === 'diagonal' && !spec.values?.some((v) => product.specs.diagonal?.includes(v))) return false;
-        if (spec.key === 'panelType' && !spec.values?.some((v) => product.specs.panelType?.includes(v))) return false;
+    for (const spec of reqs.specs || []) {
+      if (spec.key === 'gpu' && !spec.values?.some((v) => product.specs.gpu?.includes(v))) return false;
+      if (spec.key === 'ram') {
+        const ramMatch = product.specs.ram?.match(/(\d+)/);
+        if (ramMatch && spec.minValue && parseInt(ramMatch[1]) < spec.minValue) return false;
       }
-
-      return true;
-    });
+      if (spec.key === 'diagonal' && !spec.values?.some((v) => product.specs.diagonal?.includes(v))) return false;
+    }
+    return true;
   };
-
-  const matchingProducts = getMatchingProducts(workflow.selectedEmail);
 
   const StepBadge = ({ step, title, completed }: { step: number; title: string; completed: boolean }) => (
     <div className={`flex items-center gap-3 p-3 rounded-lg border-2 ${workflow.currentStep === step ? 'border-orange-500 bg-orange-50' : completed ? 'border-green-500 bg-green-50' : 'border-slate-200 bg-slate-50'}`}>
@@ -608,51 +600,54 @@ export default function Verkaufsprozess() {
                     <p className="text-sm text-slate-600 mt-1">Budget: € {workflow.selectedEmail.requirements.maxBudget?.toLocaleString('de-DE')} | Min. Qualität: {'⭐'.repeat(workflow.selectedEmail.requirements.quality || 3)}</p>
                   </div>
 
-                  {matchingProducts.length > 0 ? (
-                    <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded">
-                      <p className="font-semibold text-green-800">✓ {matchingProducts.length} passende Produkt(e) gefunden</p>
-                    </div>
-                  ) : (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
-                      <p className="font-semibold text-red-800">✗ Keine Produkte erfüllen alle Anforderungen!</p>
-                    </div>
-                  )}
+                  <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded">
+                    <p className="font-semibold text-amber-900">💡 Ihre Aufgabe: Wählen Sie SELBST den passenden Artikel!</p>
+                    <p className="text-sm text-amber-800 mt-2">Die Kundenanfrage weist auf 2 wichtige Anforderungen hin. Lesen Sie die Email sorgfältig und wählen Sie einen geeigneten Artikel aus dem Lager.</p>
+                  </div>
 
                   <div className="space-y-6">
                     {['Desktop-PCs', 'Monitore', 'Tablets', 'Kopfhörer'].map((category) => {
-                      const categoryProducts = matchingProducts.filter((p) => p.category === category);
+                      const categoryProducts = PRODUCTS.filter((p) => p.category === category && p.stock > 0);
                       if (categoryProducts.length === 0) return null;
 
                       return (
                         <div key={category}>
                           <h3 className="font-bold text-lg text-slate-800 mb-3 border-b pb-2">{category}</h3>
                           <div className="space-y-3">
-                            {categoryProducts.map((product) => (
-                              <div key={product.id} onClick={() => selectProduct(product)} className={`border-2 rounded-lg p-5 cursor-pointer transition-all hover:shadow-lg ${workflow.selectedProduct?.id === product.id ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-green-400 bg-white'}`}>
-                                <div className="flex justify-between items-start mb-2">
-                                  <div>
-                                    <p className="font-bold text-slate-900">{product.name}</p>
-                                    <p className="text-xs text-slate-500">Art.-Nr. {product.artNumber}</p>
+                            {categoryProducts.map((product) => {
+                              const isMatch = isProductMatch(product, workflow.selectedEmail);
+                              return (
+                                <div
+                                  key={product.id}
+                                  onClick={() => selectProduct(product)}
+                                  className={`border-2 rounded-lg p-5 cursor-pointer transition-all hover:shadow-lg ${workflow.selectedProduct?.id === product.id ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-green-400 bg-white'}`}
+                                >
+                                  <div className="flex justify-between items-start mb-2">
+                                    <div>
+                                      <p className="font-bold text-slate-900">{product.name}</p>
+                                      <p className="text-xs text-slate-500">Art.-Nr. {product.artNumber}</p>
+                                    </div>
+                                    <div className="text-right">
+                                      <p className="font-bold text-slate-900">€ {product.price.toFixed(2)}</p>
+                                      <p className="text-sm font-semibold text-green-600">Lager: {product.stock} Stk.</p>
+                                    </div>
                                   </div>
-                                  <div className="text-right">
-                                    <p className="font-bold text-slate-900">€ {product.price.toFixed(2)}</p>
-                                    <p className="text-sm font-semibold text-green-600">Lager: {product.stock} Stk.</p>
+
+                                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 mb-2">
+                                    {product.specs.cpu && <div>🖥️ {product.specs.cpu}</div>}
+                                    {product.specs.ram && <div>💾 {product.specs.ram}</div>}
+                                    {product.specs.diagonal && <div>📺 {product.specs.diagonal}</div>}
+                                    {product.specs.screen && <div>📱 {product.specs.screen}</div>}
+                                  </div>
+
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-xs font-semibold text-orange-600">{'⭐'.repeat(product.specs.quality || 3)}</span>
+                                    {workflow.selectedProduct?.id === product.id && <span className="text-xs font-bold text-green-600">✓ Ausgewählt</span>}
+                                    {!isMatch && workflow.selectedProduct?.id === product.id && <span className="text-xs font-bold text-red-600">⚠️ Passt nicht perfekt!</span>}
                                   </div>
                                 </div>
-
-                                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 mb-2">
-                                  {product.specs.cpu && <div>🖥️ {product.specs.cpu}</div>}
-                                  {product.specs.ram && <div>💾 {product.specs.ram}</div>}
-                                  {product.specs.diagonal && <div>📺 {product.specs.diagonal}</div>}
-                                  {product.specs.screen && <div>📱 {product.specs.screen}</div>}
-                                </div>
-
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs font-semibold text-orange-600">{'⭐'.repeat(product.specs.quality || 3)}</span>
-                                  {workflow.selectedProduct?.id === product.id && <span className="text-xs font-bold text-green-600">✓ Ausgewählt</span>}
-                                </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
                       );
