@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BarChart3, Dice3, Network, PieChart } from 'lucide-react';
+import { ArrowLeft, BarChart3, Dice3, Network, PieChart, Percent } from 'lucide-react';
 
 const DatenUndZufallIndex: React.FC = () => {
   const topics = [
@@ -21,6 +21,12 @@ const DatenUndZufallIndex: React.FC = () => {
       path: "/daten-und-zufall/baumdiagramme2",
       description: "Erstelle Baumdiagramme interaktiv und berechne Wahrscheinlichkeiten.",
       icon: <Network className="w-10 h-10 text-green-500" />
+    },
+    {
+      title: "Relative- und absolute Häufigkeit",
+      path: "/daten-und-zufall/relative-absolute-haeufigkeit",
+      description: "Lerne den Unterschied zwischen absoluter und relativer Häufigkeit mit praktischen Übungsaufgaben.",
+      icon: <Percent className="w-10 h-10 text-indigo-500" />
     },
     {
       title: "Wahrscheinlichkeiten berechnen",

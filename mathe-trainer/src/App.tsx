@@ -107,6 +107,7 @@ import StatistischeKennwerte from './pages/daten_und_zufall/StatistischeKennwert
 import Baumdiagramme2 from './pages/daten_und_zufall/Baumdiagramme2';
 import DiagrammeErstellen from './pages/daten_und_zufall/DiagrammeErstellen';
 import Wahrscheinlichkeiten from './pages/daten_und_zufall/Wahrscheinlichkeiten';
+import RelativeAbsoluteHaeufigkeit from './pages/daten_und_zufall/RelativeAbsoluteHaeufigkeit';
 // Raum und Form
 import RaumUndFormIndex from './pages/RaumUndFormIndex';
 import Flaechengeometrie from './pages/raum_und_form/Flaechengeometrie';
@@ -276,6 +277,7 @@ export default function App() {
           <Route path="/daten-und-zufall/statistische-kennwerte" element={<StatistischeKennwerte />} />
           <Route path="/daten-und-zufall/diagramme-erstellen" element={<DiagrammeErstellen />} />
           <Route path="/daten-und-zufall/baumdiagramme2" element={<Baumdiagramme2 />} />
+          <Route path="/daten-und-zufall/relative-absolute-haeufigkeit" element={<RelativeAbsoluteHaeufigkeit />} />
           <Route path="/daten-und-zufall/wahrscheinlichkeiten" element={<Wahrscheinlichkeiten />} />
 
           {/* Raum und Form */}
