@@ -136,7 +136,7 @@ export default function DigitaleSpiele() {
   const [exercise2Answers, setExercise2Answers] = useState<number[]>([])
   const [exercise2ShowResult, setExercise2ShowResult] = useState(false)
   const [exercise3Items, setExercise3Items] = useState<Array<{id: number; text: string; correctCategory: 'chancen' | 'risiken'; placedIn: 'chancen' | 'risiken' | null; hasError: boolean}>>([
-    { id: 1, text: 'Verbessert Strategisches Denken', correctCategory: 'chancen', placedIn: null, hasError: false },
+    { id: 1, text: 'Verbessert das strategische Denken', correctCategory: 'chancen', placedIn: null, hasError: false },
     { id: 2, text: 'Fördert Kreativität und Problemlösung', correctCategory: 'chancen', placedIn: null, hasError: false },
     { id: 3, text: 'Risiko der Spielsucht', correctCategory: 'risiken', placedIn: null, hasError: false },
     { id: 4, text: 'Schulung motorischer Fähigkeiten', correctCategory: 'chancen', placedIn: null, hasError: false },
@@ -2491,7 +2491,7 @@ export default function DigitaleSpiele() {
             >
               <div className="text-left flex-1">
                 <h3 className="text-xl font-bold text-slate-900">4️⃣ Spielsucht-Test: Bergen Gaming Addiction Scale</h3>
-                <p className="text-slate-600 text-sm mt-1">Erkannter wissenschaftlicher Test für problematisches Spielverhalten</p>
+                <p className="text-slate-600 text-sm mt-1">Anerkannter wissenschaftlicher Test für problematisches Spielverhalten</p>
               </div>
               <span className={`text-3xl transform transition-transform ml-4 ${expandedExercises[4] ? 'rotate-45' : ''}`}>➕</span>
             </button>
