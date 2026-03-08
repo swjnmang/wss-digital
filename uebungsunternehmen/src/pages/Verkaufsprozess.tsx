@@ -1417,6 +1417,14 @@ Audio-Studio`,
                     </div>
                   </div>
 
+                  {/* CUSTOMER RESPONSE */}
+                  {workflow.offerFinalized && !workflow.orderAccepted && (
+                    <div className="border-2 border-green-300 rounded-lg p-8 bg-green-50 mb-6">
+                      <h3 className="text-xl font-bold text-slate-800 mb-4">💌 Rückmeldung vom Kunden</h3>
+                      <p className="text-slate-700 text-lg">Der Kunde ist glücklich über Ihre schnelle und korrekte Bearbeitung der Anfragen und möchte das Angebot annehmen.</p>
+                    </div>
+                  )}
+
                   {/* ORDER ACCEPTANCE */}
                   {workflow.currentStep >= 3 && !workflow.orderAccepted && workflow.offerFinalized && (
                     <div className="border-2 border-blue-300 rounded-lg p-8 bg-blue-50">
