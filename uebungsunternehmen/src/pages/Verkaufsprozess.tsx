@@ -90,6 +90,7 @@ interface WorkflowState {
   selectedShipping?: ShippingOption;
   shippingCostInput: Record<string, number>;
   shippingValidated: boolean;
+  shippingOrderConfirmed: boolean;
   paymentReference: string;
   paymentVerified: boolean;
   goodsShipped: boolean;
@@ -397,6 +398,7 @@ export default function Verkaufsprozess() {
     totalBrutto: 0,
     shippingCostInput: {},
     shippingValidated: false,
+    shippingOrderConfirmed: false,
     paymentReference: '',
     paymentVerified: false,
     goodsShipped: false,
@@ -1648,6 +1650,7 @@ Audio-Studio`,
               {workflow.selectedProduct && workflow.selectedEmail ? (
                 <div className="space-y-6">
                   {/* SHIPPING ORDER */}
+                  {!workflow.shippingOrderConfirmed && (
                   <div className="border-2 border-slate-300 rounded-lg p-8 bg-slate-50">
                     <h3 className="text-lg font-bold mb-4 text-slate-800">📦 Versandauftrag für Lager</h3>
                     <div className="bg-white p-4 rounded border border-slate-200 text-sm space-y-2 mb-6">
@@ -1665,13 +1668,18 @@ Audio-Studio`,
                       <button className="flex-1 py-2 px-4 bg-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-400 transition-colors text-sm">
                         🖨️ Drucken
                       </button>
-                      <button className="flex-1 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors text-sm">
-                        ✓ Lager benachrichtigen
+                      <button
+                        onClick={() => setWorkflow((prev) => ({ ...prev, shippingOrderConfirmed: true }))}
+                        className="flex-1 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors text-sm"
+                      >
+                        ✓ Versandauftrag korrekt - Lager benachrichtigen
                       </button>
                     </div>
                   </div>
+                  )}
 
                   {/* SHIPPING CALCULATOR */}
+                  {workflow.shippingOrderConfirmed && (
                   <div className="border-2 border-orange-300 rounded-lg p-8 bg-orange-50">
                     <h3 className="text-lg font-bold mb-6 text-slate-800">🚚 Versandkosten berechnen & Unternehmen auswählen</h3>
 
@@ -1709,12 +1717,10 @@ Audio-Studio`,
                                 </div>
 
                                 <div className="bg-slate-50 p-3 rounded mb-4 text-xs text-slate-700 border border-slate-200">
-                                  <p className="font-semibold mb-2">Berechnung:</p>
+                                  <p className="font-semibold mb-2">Kosten-Struktur:</p>
                                   <p>Fixbetrag: <strong>€ {option.fixCost.toFixed(2)}</strong></p>
-                                  <p>+ Gewicht: <strong>{totalWeight.toFixed(2)} kg × €{option.costPerKg.toFixed(2)}/kg</strong> = <strong>€ {(totalWeight * option.costPerKg).toFixed(2)}</strong></p>
-                                  <p className="border-t border-slate-300 mt-2 pt-2 font-bold text-slate-900">
-                                    Gesamt: € <span className="text-green-600">{correctCost.toFixed(2)}</span>
-                                  </p>
+                                  <p>+ Gewicht: <strong>{totalWeight.toFixed(2)} kg × €{option.costPerKg.toFixed(2)}/kg</strong></p>
+                                  <p className="text-xs italic text-slate-500 mt-2">Berechne die Gesamtkosten und trage das Ergebnis oben ein!</p>
                                 </div>
 
                                 <div className="flex gap-3 items-end">
@@ -1781,6 +1787,7 @@ Audio-Studio`,
                       </div>
                     )}
                   </div>
+                  )}
 
                   {!workflow.shippingValidated && (
                     <button onClick={() => setActiveTab('documents')} className="w-full py-3 px-6 bg-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-400 transition-colors">
