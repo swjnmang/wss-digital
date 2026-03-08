@@ -1733,11 +1733,9 @@ Audio-Studio`,
                                   </div>
                                 </div>
 
-                                <div className="bg-slate-50 p-3 rounded mb-4 text-xs text-slate-700 border border-slate-200">
-                                  <p className="font-semibold mb-2">Kosten-Struktur:</p>
-                                  <p>Fixbetrag: <strong>€ {option.fixCost.toFixed(2)}</strong></p>
-                                  <p>+ Gewicht: <strong>{totalWeight.toFixed(2)} kg × €{option.costPerKg.toFixed(2)}/kg</strong></p>
-                                  <p className="text-xs italic text-slate-500 mt-2">Berechne die Gesamtkosten und trage das Ergebnis oben ein!</p>
+                                <div className="bg-slate-50 p-3 rounded mb-4 text-sm text-slate-700 border border-slate-200">
+                                  <p className="mb-2"><strong>Fixbetrag:</strong> {option.fixCost.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</p>
+                                  <p><strong>Kosten pro Kilogramm:</strong> {option.costPerKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</p>
                                 </div>
 
                                 <div className="flex gap-3 items-end">
