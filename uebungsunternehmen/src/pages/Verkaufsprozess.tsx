@@ -76,6 +76,7 @@ interface WorkflowState {
   offerDate: string;
   orderAccepted: boolean;
   orderDate?: string;
+  orderConfirmationDate: string;
   invoiceNumber: number;
   invoiceDate: string;
   unitPrice: number;
@@ -383,6 +384,7 @@ export default function Verkaufsprozess() {
     offerNumber: 18,
     offerDate: new Date().toLocaleDateString('de-DE'),
     orderAccepted: false,
+    orderConfirmationDate: '',
     invoiceNumber: 18,
     invoiceDate: new Date().toLocaleDateString('de-DE'),
     unitPrice: 0,
@@ -742,13 +744,18 @@ Audio-Studio`,
     setActiveTab('documents');
   };
 
-  const acceptOrder = () => {
+  const acceptOrder = (confirmationDate: string) => {
+    if (!confirmationDate) {
+      alert('Bitte wählen Sie ein Auftragsbestätigungsdatum aus!');
+      return;
+    }
     setWorkflow((prev) => ({
       ...prev,
       currentStep: 4,
       orderAccepted: true,
-      orderDate: new Date().toLocaleDateString('de-DE'),
+      orderDate: confirmationDate,
     }));
+    setActiveTab('shipping');
   };
 
   const generatePaymentReference = () => {
@@ -1462,24 +1469,24 @@ Audio-Studio`,
                     </div>
                   )}
 
-                  {/* ORDER ACCEPTANCE */}
+                  {/* NAVIGATION TO ORDER TAB */}
                   {workflow.currentStep >= 3 && !workflow.orderAccepted && workflow.offerFinalized && (
-                    <div className="border-2 border-blue-300 rounded-lg p-8 bg-blue-50">
-                      <h3 className="text-xl font-bold text-slate-800 mb-4">🎯 Auftrag annehmen?</h3>
-                      <p className="text-slate-700 mb-6">Der Kunde möchte diese Bestellung bestätigen. Das Angebot erfüllt alle Anforderungen und Berechnungen sind korrekt!</p>
+                    <div className="border-2 border-amber-300 rounded-lg p-8 bg-amber-50">
+                      <h3 className="text-xl font-bold text-slate-800 mb-4">📋 Nächster Schritt: Auftrag</h3>
+                      <p className="text-slate-700 mb-6">Der Kunde möchte diese Bestellung bestätigen. Bitte wechseln Sie zum Tab "Auftrag" und füllen Sie die Auftragsbestätigung aus.</p>
                       <button
-                        onClick={acceptOrder}
-                        className="w-full py-3 px-6 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
+                        onClick={() => setActiveTab('order')}
+                        className="w-full py-3 px-6 bg-amber-600 text-white font-bold rounded-lg hover:bg-amber-700 transition-colors"
                       >
-                        ✓ Auftrag annehmen und Auftragsbestätigung vorbereiten
+                        → Zum Auftrag-Tab wechseln
                       </button>
                     </div>
                   )}
 
-                  {/* ORDER CONFIRMATION */}
+                  {/* ORDER CONFIRMATION SUCCESS */}
                   {workflow.orderAccepted && workflow.currentStep >= 4 && (
                     <div className="border-2 border-green-300 rounded-lg p-8 bg-green-50">
-                      <h3 className="text-xl font-bold text-slate-800 mb-4">✓ Auftragsbestätigung</h3>
+                      <h3 className="text-xl font-bold text-slate-800 mb-4">✓ Auftragsbestätigung versendet</h3>
                       <div className="text-sm space-y-2 mb-4">
                         <p><strong>Auftragsnummer:</strong> {workflow.offerNumber}</p>
                         <p><strong>Auftragsbestätigung-Datum:</strong> {workflow.orderDate}</p>
@@ -1494,6 +1501,142 @@ Audio-Studio`,
                 </div>
               ) : (
                 <p className="text-slate-500">Wählen Sie eine Email und ein Produkt aus.</p>
+              )}
+            </div>
+          )}
+
+          {/* ORDER TAB */}
+          {activeTab === 'order' && (
+            <div className="bg-white rounded-xl shadow-lg p-8 border border-slate-200">
+              <h2 className="text-2xl font-bold mb-6 text-slate-800">📋 Auftragsbestätigung</h2>
+
+              {workflow.selectedProduct && workflow.selectedEmail && workflow.offerFinalized && !workflow.orderAccepted ? (
+                <div className="space-y-6">
+                  {/* CUSTOMER RESPONSE */}
+                  <div className="border-2 border-green-300 rounded-lg p-8 bg-green-50">
+                    <h3 className="text-xl font-bold text-slate-800 mb-4">💌 Rückmeldung vom Kunden</h3>
+                    <p className="text-slate-700 text-lg">Der Kunde ist glücklich über Ihre schnelle und korrekte Bearbeitung und möchte das Angebot annehmen!</p>
+                  </div>
+
+                  {/* ORDER CONFIRMATION FORM */}
+                  <div className="border-2 border-blue-400 rounded-lg p-8 bg-blue-50">
+                    <h3 className="text-xl font-bold text-slate-800 mb-6">✏️ Auftragsbestätigung ausfüllen</h3>
+                    
+                    {/* Auftrag Header */}
+                    <div className="bg-white border border-slate-300 rounded-lg p-6 mb-6">
+                      <div className="grid grid-cols-2 gap-8">
+                        <div>
+                          <p className="text-sm text-slate-600 font-semibold mb-2">Auftragsbestätigung</p>
+                          <p className="text-2xl font-bold text-slate-800 mb-4">Nr. {workflow.offerNumber}</p>
+                          
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">📅 Auftragsbestätigungsdatum:</label>
+                          <input
+                            type="date"
+                            value={workflow.orderConfirmationDate}
+                            onChange={(e) => setWorkflow((prev) => ({ ...prev, orderConfirmationDate: e.target.value }))}
+                            className="w-full border-2 border-blue-400 rounded px-4 py-2 text-slate-800 font-semibold focus:outline-none focus:border-blue-600 mb-4"
+                          />
+                          {workflow.orderConfirmationDate && (
+                            <p className="text-sm text-blue-600 font-semibold">Ausgewähltes Datum: {new Date(workflow.orderConfirmationDate + 'T00:00:00').toLocaleDateString('de-DE')}</p>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-sm text-slate-600 font-semibold mb-2">Kundendaten</p>
+                          <p className="text-slate-800 mb-2"><strong>{workflow.selectedEmail.from}</strong></p>
+                          <p className="text-slate-600 text-sm mb-2">{workflow.selectedEmail.fromAddress}</p>
+                          <p className="text-slate-600 text-sm">Kundennummer: {workflow.selectedEmail.customerNumber}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Order Details Table */}
+                    <div className="bg-white border border-slate-300 rounded-lg overflow-hidden mb-6">
+                      <div className="grid grid-cols-5 gap-4 bg-slate-100 border-b border-slate-300 p-4 font-semibold text-sm text-slate-700">
+                        <div className="col-span-1">Art.-Nr.</div>
+                        <div className="col-span-2">Artikel</div>
+                        <div className="col-span-1 text-right">Menge</div>
+                        <div className="col-span-1 text-right">Gesamtbetrag</div>
+                      </div>
+                      <div className="p-4">
+                        <div className="grid grid-cols-5 gap-4 items-center">
+                          <div className="text-sm text-slate-700">{workflow.selectedProduct.artNumber}</div>
+                          <div className="col-span-2 text-sm text-slate-700">{workflow.selectedProduct.name}</div>
+                          <div className="text-sm text-slate-700 text-right">{workflow.quantity} Stück</div>
+                          <div className="text-sm font-bold text-slate-800 text-right">{formatCurrency(workflow.subtotal)}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Price Summary */}
+                    <div className="bg-white border border-slate-300 rounded-lg p-6 mb-6">
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-slate-700">Summe der Einzelposten:</span>
+                          <span className="font-bold text-slate-800">{formatCurrency(workflow.subtotal)}</span>
+                        </div>
+                        {workflow.discountAmount > 0 && (
+                          <div className="flex justify-between text-amber-700">
+                            <span>Rabatt ({workflow.discountPercent.toFixed(1)}%):</span>
+                            <span className="font-bold">- {formatCurrency(workflow.discountAmount)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span className="text-slate-700">Versandkosten:</span>
+                          <span className="font-bold text-slate-800">{formatCurrency(workflow.shippingCost)}</span>
+                        </div>
+                        <div className="border-t border-slate-300 pt-3 flex justify-between">
+                          <span className="text-slate-700 font-semibold">Gesamtpreis netto:</span>
+                          <span className="font-bold text-blue-800">{formatCurrency(workflow.totalNetto)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-700">Umsatzsteuer (19%):</span>
+                          <span className="font-bold text-slate-800">{formatCurrency(workflow.vatAmount)}</span>
+                        </div>
+                        <div className="border-t border-slate-300 pt-3 flex justify-between text-lg">
+                          <span className="text-slate-800 font-bold">Rechnungsbetrag brutto:</span>
+                          <span className="font-bold text-orange-800 text-xl">{formatCurrency(workflow.totalBrutto)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <button
+                      onClick={() => acceptOrder(workflow.orderConfirmationDate)}
+                      disabled={!workflow.orderConfirmationDate}
+                      className={`w-full py-4 px-6 font-bold text-lg rounded-lg transition-colors ${
+                        workflow.orderConfirmationDate
+                          ? 'bg-green-600 text-white hover:bg-green-700'
+                          : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                      }`}
+                    >
+                      ✓ Auftragsbestätigung absenden
+                    </button>
+                    {!workflow.orderConfirmationDate && (
+                      <p className="text-sm text-red-600 text-center mt-2">⚠️ Bitte wählen Sie ein Auftragsbestätigungsdatum aus!</p>
+                    )}
+                  </div>
+                </div>
+              ) : workflow.orderAccepted ? (
+                <div className="border-2 border-green-300 rounded-lg p-8 bg-green-50">
+                  <h3 className="text-xl font-bold text-slate-800 mb-4">✓ Auftragsbestätigung versendet</h3>
+                  <div className="text-sm space-y-2 mb-4">
+                    <p><strong>Auftragsnummer:</strong> {workflow.offerNumber}</p>
+                    <p><strong>Auftragsbestätigungsdatum:</strong> {workflow.orderDate}</p>
+                    {workflow.selectedEmail && <p><strong>Kunde:</strong> {workflow.selectedEmail.from} (#{workflow.selectedEmail.customerNumber})</p>}
+                    {workflow.selectedProduct && <p><strong>Artikel:</strong> {workflow.selectedProduct.name}</p>}
+                    <p><strong>Menge:</strong> {workflow.quantity} Stück</p>
+                    <p><strong>Gesamtpreis brutto:</strong> {formatCurrency(workflow.totalBrutto)}</p>
+                  </div>
+                  <p className="text-xs text-slate-600 mb-6">Die Auftragsbestätigung wurde dem Kunden per Email gesendet.</p>
+                  <button
+                    onClick={() => setActiveTab('shipping')}
+                    className="w-full py-3 px-6 bg-slate-600 text-white font-bold rounded-lg hover:bg-slate-700 transition-colors"
+                  >
+                    → Weiter zum Versand
+                  </button>
+                </div>
+              ) : (
+                <p className="text-slate-500 text-center py-8">Wählen Sie zunächst eine Email und ein Produkt aus und erstellen Sie ein Angebot.</p>
               )}
             </div>
           )}
