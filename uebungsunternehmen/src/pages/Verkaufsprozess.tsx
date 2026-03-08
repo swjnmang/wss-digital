@@ -690,20 +690,29 @@ Audio-Studio`,
   }, []);
 
   const selectEmailForOffer = (email: Email) => {
+    setProductValidationError(null); // Reset any previous validation errors
     setWorkflow((prev) => ({
       ...prev,
       currentStep: 1,
       selectedEmail: email,
       quantity: email.requirements.quantity?.exact || 0,
+      selectedProduct: undefined, // Reset product selection
     }));
     setActiveTab('warehouse');
   };
 
   const selectProduct = (product: Product) => {
-    const errors = getProductMatchErrors(product, workflow.selectedEmail);
+    // Validiere das Produkt gegen die ausgewählte Email
+    const selectedEmail = workflow.selectedEmail;
+    if (!selectedEmail) {
+      setProductValidationError('Keine Anfrage ausgewählt');
+      return;
+    }
+
+    const errors = getProductMatchErrors(product, selectedEmail);
     
     if (errors.length > 0) {
-      // Produkt passt nicht
+      // Produkt passt nicht - zeige Fehler
       setProductValidationError(errors.join('\n'));
       return;
     }
@@ -714,7 +723,7 @@ Audio-Studio`,
       ...prev,
       selectedProduct: product,
       unitPrice: product.price,
-      quantity: prev.selectedEmail?.requirements.quantity?.exact || 0,
+      quantity: selectedEmail.requirements.quantity?.exact || 0,
       currentStep: 2,
     }));
     setActiveTab('documents');
