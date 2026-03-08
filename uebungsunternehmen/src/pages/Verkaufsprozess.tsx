@@ -991,11 +991,24 @@ Audio-Studio`,
                                       </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 mb-2">
-                                      {product.specs.cpu && <div>🖥️ {product.specs.cpu}</div>}
-                                      {product.specs.ram && <div>💾 {product.specs.ram}</div>}
-                                      {product.specs.diagonal && <div>📺 {product.specs.diagonal}</div>}
-                                      {product.specs.screen && <div>📱 {product.specs.screen}</div>}
+                                    <div className="grid grid-cols-1 gap-1 text-xs text-slate-600 mb-2 bg-slate-50 p-3 rounded border border-slate-100">
+                                      {product.specs.cpu && <div>🖥️ <strong>CPU:</strong> {product.specs.cpu}</div>}
+                                      {product.specs.processor && <div>🖥️ <strong>Prozessor:</strong> {product.specs.processor}</div>}
+                                      {product.specs.gpu && <div>🎮 <strong>GPU:</strong> {product.specs.gpu}</div>}
+                                      {product.specs.ram && <div>💾 <strong>RAM:</strong> {product.specs.ram}</div>}
+                                      {product.specs.storage && <div>💿 <strong>Speicher:</strong> {product.specs.storage}</div>}
+                                      {product.specs.battery && <div>🔋 <strong>Akku:</strong> {product.specs.battery}</div>}
+                                      {product.specs.diagonal && <div>📺 <strong>Größe:</strong> {product.specs.diagonal}</div>}
+                                      {product.specs.screen && <div>📱 <strong>Display:</strong> {product.specs.screen}</div>}
+                                      {product.specs.resolution && <div>📊 <strong>Auflösung:</strong> {product.specs.resolution}</div>}
+                                      {product.specs.refreshRate && <div>⚡ <strong>Bildwiederholrate:</strong> {product.specs.refreshRate}</div>}
+                                      {product.specs.panelType && <div>🎨 <strong>Panel-Typ:</strong> {product.specs.panelType}</div>}
+                                      {product.specs.driverSize && <div>🔊 <strong>Treibergreße:</strong> {product.specs.driverSize}</div>}
+                                      {product.specs.frequency && <div>📈 <strong>Frequenz:</strong> {product.specs.frequency}</div>}
+                                      {product.specs.impedance && <div>Ω <strong>Impedanz:</strong> {product.specs.impedance}</div>}
+                                      {product.specs.wireless !== undefined && <div>📡 <strong>Wireless:</strong> {product.specs.wireless ? 'Ja' : 'Nein'}</div>}
+                                      {product.specs.color && <div>🎨 <strong>Farbe:</strong> {product.specs.color}</div>}
+                                      {product.specs.warranty && <div>✓ <strong>Gewährleistung:</strong> {product.specs.warranty}</div>}
                                     </div>
 
                                     <div className="flex items-center justify-between gap-2">
