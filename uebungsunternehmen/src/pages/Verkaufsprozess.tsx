@@ -1207,9 +1207,6 @@ Audio-Studio`,
                                   }}
                                   className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
                                 />
-                                <p className="text-xs text-slate-500 mt-1">
-                                  💡 Automatischer Rabatt: <strong>{calculateAutomaticDiscount(workflow.subtotal)}%</strong>
-                                </p>
                               </div>
                             </td>
                           </tr>
