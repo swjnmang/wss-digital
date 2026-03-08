@@ -393,7 +393,7 @@ export default function Verkaufsprozess() {
   const [emails, setEmails] = useState<Email[]>(EMAILS);
   const [expandedCustomerRequest, setExpandedCustomerRequest] = useState<boolean>(false);
   const [expandedTerms, setExpandedTerms] = useState<boolean>(false);
-  const [productValidationError, setProductValidationError] = useState<string | null>(null);
+  const [productValidationError, setProductValidationError] = useState<{ productId: string } | null>(null);
 
   // Generate random customer emails with detailed, specific requests
   const generateEmails = () => {
@@ -705,15 +705,15 @@ Audio-Studio`,
     // Validiere das Produkt gegen die ausgewählte Email
     const selectedEmail = workflow.selectedEmail;
     if (!selectedEmail) {
-      setProductValidationError('Keine Anfrage ausgewählt');
+      setProductValidationError({ productId: product.id });
       return;
     }
 
     const errors = getProductMatchErrors(product, selectedEmail);
     
     if (errors.length > 0) {
-      // Produkt passt nicht - zeige Fehler
-      setProductValidationError(errors.join('\n'));
+      // Produkt passt nicht - speichere die productId
+      setProductValidationError({ productId: product.id });
       return;
     }
     
@@ -960,24 +960,6 @@ Audio-Studio`,
                     <p className="text-sm text-amber-800 mt-2">Die Kundenanfrage weist auf 2 wichtige Anforderungen hin. Lesen Sie die Email sorgfältig und wählen Sie einen geeigneten Artikel aus dem Lager.</p>
                   </div>
 
-                  {/* PRODUCT VALIDATION ERROR */}
-                  {productValidationError && (
-                    <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
-                      <p className="font-semibold text-red-800 mb-2">❌ Der Artikel passt nicht zur Anfrage, weil:</p>
-                      <div className="space-y-1 text-sm text-red-700">
-                        {productValidationError.split('\n').map((error, idx) => (
-                          <p key={idx}>• {error}</p>
-                        ))}
-                      </div>
-                      <button
-                        onClick={() => setProductValidationError(null)}
-                        className="mt-3 text-sm text-red-600 hover:text-red-800 font-semibold underline"
-                      >
-                        ✕ Schließen
-                      </button>
-                    </div>
-                  )}
-
                   <div className="space-y-6">
                     {['Desktop-PCs', 'Monitore', 'Tablets', 'Kopfhörer'].map((category) => {
                       const categoryProducts = PRODUCTS.filter((p) => p.category === category && p.stock > 0);
@@ -990,34 +972,53 @@ Audio-Studio`,
                             {categoryProducts.map((product) => {
                               const isMatch = isProductMatch(product, workflow.selectedEmail);
                               return (
-                                <div
-                                  key={product.id}
-                                  onClick={() => selectProduct(product)}
-                                  className={`border-2 rounded-lg p-5 cursor-pointer transition-all hover:shadow-lg ${workflow.selectedProduct?.id === product.id ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-green-400 bg-white'}`}
-                                >
-                                  <div className="flex justify-between items-start mb-2">
-                                    <div>
-                                      <p className="font-bold text-slate-900">{product.name}</p>
-                                      <p className="text-xs text-slate-500">Art.-Nr. {product.artNumber}</p>
+                                <div key={product.id}>
+                                  <div
+                                    onClick={() => selectProduct(product)}
+                                    className={`border-2 rounded-lg p-5 cursor-pointer transition-all hover:shadow-lg ${workflow.selectedProduct?.id === product.id ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-green-400 bg-white'}`}
+                                  >
+                                    <div className="flex justify-between items-start mb-2">
+                                      <div>
+                                        <p className="font-bold text-slate-900">{product.name}</p>
+                                        <p className="text-xs text-slate-500">Art.-Nr. {product.artNumber}</p>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="font-bold text-slate-900">€ {product.price.toFixed(2)}</p>
+                                        <p className="text-sm font-semibold text-green-600">Lager: {product.stock} Stk.</p>
+                                      </div>
                                     </div>
-                                    <div className="text-right">
-                                      <p className="font-bold text-slate-900">€ {product.price.toFixed(2)}</p>
-                                      <p className="text-sm font-semibold text-green-600">Lager: {product.stock} Stk.</p>
+
+                                    <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 mb-2">
+                                      {product.specs.cpu && <div>🖥️ {product.specs.cpu}</div>}
+                                      {product.specs.ram && <div>💾 {product.specs.ram}</div>}
+                                      {product.specs.diagonal && <div>📺 {product.specs.diagonal}</div>}
+                                      {product.specs.screen && <div>📱 {product.specs.screen}</div>}
+                                    </div>
+
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="text-xs font-semibold text-orange-600">{'⭐'.repeat(product.specs.quality || 3)}</span>
+                                      {workflow.selectedProduct?.id === product.id && <span className="text-xs font-bold text-green-600">✓ Ausgewählt</span>}
+                                      {!isMatch && workflow.selectedProduct?.id === product.id && <span className="text-xs font-bold text-red-600">⚠️ Passt nicht perfekt!</span>}
                                     </div>
                                   </div>
 
-                                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 mb-2">
-                                    {product.specs.cpu && <div>🖥️ {product.specs.cpu}</div>}
-                                    {product.specs.ram && <div>💾 {product.specs.ram}</div>}
-                                    {product.specs.diagonal && <div>📺 {product.specs.diagonal}</div>}
-                                    {product.specs.screen && <div>📱 {product.specs.screen}</div>}
-                                  </div>
-
-                                  <div className="flex items-center justify-between gap-2">
-                                    <span className="text-xs font-semibold text-orange-600">{'⭐'.repeat(product.specs.quality || 3)}</span>
-                                    {workflow.selectedProduct?.id === product.id && <span className="text-xs font-bold text-green-600">✓ Ausgewählt</span>}
-                                    {!isMatch && workflow.selectedProduct?.id === product.id && <span className="text-xs font-bold text-red-600">⚠️ Passt nicht perfekt!</span>}
-                                  </div>
+                                  {/* PRODUCT VALIDATION ERROR - shown directly under the article */}
+                                  {productValidationError?.productId === product.id && (
+                                    <div className="mt-2 p-3 bg-red-50 border-l-4 border-red-500 rounded flex items-start gap-3">
+                                      <div className="flex-1">
+                                        <p className="text-sm font-semibold text-red-800">❌ Der gewählte Artikel passt nicht zur Anfrage</p>
+                                      </div>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setProductValidationError(null);
+                                        }}
+                                        className="text-red-600 hover:text-red-800 font-bold text-lg leading-none"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
                               );
                             })}
