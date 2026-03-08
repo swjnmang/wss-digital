@@ -389,6 +389,55 @@ export default function Verkaufsprozess() {
 
   const [activeTab, setActiveTab] = useState<'email' | 'warehouse' | 'documents' | 'shipping' | 'banking'>('email');
   const [selectedEmailForReading, setSelectedEmailForReading] = useState<Email | null>(null);
+  const [emails, setEmails] = useState<Email[]>(EMAILS);
+
+  // Generate random customer emails
+  const generateEmails = () => {
+    const firstNames = ['Thomas', 'Petra', 'Marco', 'Lisa', 'Astrid', 'Stefan', 'Julia', 'Klaus'];
+    const lastNames = ['Voss', 'Schmidt', 'Weber', 'Meyer', 'Müller', 'Fischer', 'Wagner', 'Bauer'];
+    const companies = ['Architekt-Net GmbH', 'Schulzentrum Berlin', 'TechStudio München', 'Büro Leipzig', 'Design Hamburg', 'Grafik Köln'];
+    const newEmails: Email[] = [];
+
+    const quantities = [4, 6, 8, 10, 12, 15, 20, 25];
+    const budgets = [5000, 8750, 12000, 17000, 20000, 25000];
+    const qualities = [3, 4, 5];
+
+    for (let i = 1; i <= 5; i++) {
+      const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+      const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+      const company = companies[Math.floor(Math.random() * companies.length)];
+      const quantity = quantities[Math.floor(Math.random() * quantities.length)];
+      const budget = budgets[Math.floor(Math.random() * budgets.length)];
+      const quality = qualities[Math.floor(Math.random() * qualities.length)];
+      const category = ['Desktop-PCs', 'Monitore', 'Tablets', 'Kopfhörer'][Math.floor(Math.random() * 4)];
+
+      const demands = {
+        'Desktop-PCs': { spec1: 'GPU', spec2: 'RAM', sample: `Leistungsstarke GPU (RTX 4080+) und Mindestens ${16 + Math.random() * 32}GB RAM` },
+        'Monitore': { spec1: 'Größe', spec2: 'Auflösung', sample: `Bildschirmgröße ${Math.random() > 0.5 ? 24 : 27}" und gutes Preis-Leistungs-Verhältnis` },
+        'Tablets': { spec1: 'Display', spec2: 'Speicher', sample: `Display ${Math.random() > 0.5 ? 10 : 12}" und ${128 + Math.random() * 256}GB Speicher` },
+        'Kopfhörer': { spec1: 'Wireless', spec2: 'Batterie', sample: `Wireless-Technologie und lange Akkulaufzeit` },
+      }[category] || { spec1: 'Qualität', spec2: 'Features', sample: 'Hochwertige Qualität' };
+
+      const today = new Date();
+      const randomDays = Math.floor(Math.random() * 7);
+      const date = new Date(today.setDate(today.getDate() - randomDays));
+      const dateStr = date.toLocaleDateString('de-DE');
+
+      newEmails.push({
+        id: `gen-${i}`,
+        from: `${firstName} ${lastName}`,
+        fromAddress: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${company.split(' ')[0].toLowerCase()}.de`,
+        subject: `Anfrage: ${quantity}× ${category} erforderlich`,
+        content: `Guten Tag,\n\nwir benötigen ${quantity} ${category.toLowerCase()}.\n\nANFORDERUNGEN:\n• Stückzahl: ${quantity}\n• Wichtig: ${demands.spec1}\n• Wichtig: ${demands.spec2}\n• Budget: MAX €${budget}\n• Qualität: ${quality} Sterne\n\nMit freundlichen Grüßen\n${firstName} ${lastName}`,
+        requirements: { quantity: { exact: quantity }, maxBudget: budget, quality: quality, specs: [], priority: [] },
+        customerNumber: `${2400 + i}`,
+        date: dateStr,
+        read: false,
+      });
+    }
+
+    setEmails(newEmails);
+  };
 
   const selectEmailForOffer = (email: Email) => {
     setWorkflow((prev) => ({
@@ -500,39 +549,77 @@ export default function Verkaufsprozess() {
           {/* EMAIL TAB */}
           {activeTab === 'email' && (
             <div className="bg-white rounded-xl shadow-lg p-8 border border-slate-200">
-              <h2 className="text-2xl font-bold mb-6 text-slate-800">📧 Posteingang ({EMAILS.length})</h2>
-              <div className="space-y-4">
-                {EMAILS.map((email) => (
-                  <div key={email.id} className="border-2 border-slate-200 rounded-lg p-6 bg-slate-50 hover:shadow-lg transition-all">
-                    <div className="flex justify-between items-start gap-4 mb-3">
-                      <div className="flex-1 cursor-pointer" onClick={() => setSelectedEmailForReading(email)}>
-                        <h3 className="font-bold text-slate-900 hover:text-blue-600 transition-colors">{email.from}</h3>
-                        <p className="text-sm text-slate-500">{email.fromAddress}</p>
-                        <p className="font-semibold text-blue-600 mt-2 line-clamp-1">{email.subject}</p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <span className="text-sm text-slate-500">{email.date}</span>
-                        <p className="text-xs text-slate-500 mt-1">Kunde #{email.customerNumber}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mb-4 text-xs">
-                      <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full">{email.requirements.quantity?.exact} Stück</span>
-                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full">Budget: € {email.requirements.maxBudget?.toLocaleString('de-DE')}</span>
-                      <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full">Quality: {'⭐'.repeat(email.requirements.quality || 3)}</span>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button onClick={() => setSelectedEmailForReading(email)} className="flex-1 py-2 px-4 bg-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-300 transition-colors text-sm">
-                        Lesen
-                      </button>
-                      <button onClick={() => selectEmailForOffer(email)} className="flex-1 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors text-sm">
-                        Bearbeiten
-                      </button>
-                    </div>
-                  </div>
-                ))}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-slate-800">📧 Posteingang ({emails.length})</h2>
+                <button
+                  onClick={generateEmails}
+                  className="py-2 px-5 bg-slate-600 text-white font-semibold rounded-lg hover:bg-slate-700 transition-colors text-sm"
+                >
+                  ↻ Erneuern
+                </button>
               </div>
+
+              {emails.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-slate-500 text-lg mb-4">Keine Anfragen im Posteingang</p>
+                  <button
+                    onClick={generateEmails}
+                    className="py-3 px-6 bg-slate-600 text-white font-semibold rounded-lg hover:bg-slate-700 transition-colors"
+                  >
+                    ↻ Neue Anfragen laden
+                  </button>
+                </div>
+              ) : (
+                <div className="border border-slate-300 rounded-lg overflow-hidden">
+                  {/* Header Row */}
+                  <div className="grid grid-cols-12 gap-4 bg-slate-100 border-b border-slate-300 p-4 font-semibold text-sm text-slate-700">
+                    <div className="col-span-3">Von</div>
+                    <div className="col-span-5">Betreff</div>
+                    <div className="col-span-2">Stückzahl</div>
+                    <div className="col-span-2">Datum</div>
+                  </div>
+
+                  {/* Email Rows */}
+                  <div className="divide-y divide-slate-200">
+                    {emails.map((email) => (
+                      <div
+                        key={email.id}
+                        className="grid grid-cols-12 gap-4 p-4 hover:bg-slate-50 transition-colors text-sm border-b border-slate-200"
+                      >
+                        <div className="col-span-3">
+                          <p className="font-semibold text-slate-800 hover:text-blue-600 cursor-pointer" onClick={() => setSelectedEmailForReading(email)}>
+                            {email.from}
+                          </p>
+                          <p className="text-slate-500 text-xs">{email.fromAddress}</p>
+                        </div>
+                        <div className="col-span-5">
+                          <p
+                            className="text-slate-800 hover:text-blue-600 cursor-pointer line-clamp-1 font-medium"
+                            onClick={() => setSelectedEmailForReading(email)}
+                          >
+                            {email.subject}
+                          </p>
+                          <p className="text-xs text-slate-500">Kunde #{email.customerNumber}</p>
+                        </div>
+                        <div className="col-span-2">
+                          <p className="text-slate-800 font-semibold">{email.requirements.quantity?.exact} St.</p>
+                        </div>
+                        <div className="col-span-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-slate-600">{email.date}</span>
+                            <button
+                              onClick={() => selectEmailForOffer(email)}
+                              className="py-1 px-3 bg-slate-600 text-white text-xs font-semibold rounded hover:bg-slate-700 transition-colors"
+                            >
+                              Öffnen
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
