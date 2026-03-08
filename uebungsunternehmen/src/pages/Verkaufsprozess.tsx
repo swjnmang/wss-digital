@@ -374,6 +374,21 @@ const formatCurrency = (value: number): string => {
   }).format(value);
 };
 
+// Format number to German locale (e.g., 1234,56)
+const formatToGerman = (value: number, decimals: number = 2): string => {
+  return value.toLocaleString('de-DE', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+};
+
+// Parse German input (e.g., 1.234,56 or 1234,56) to number
+const parseGermanInput = (value: string): number => {
+  let cleaned = value.replace(/[^\d,-]/g, '');
+  cleaned = cleaned.replace(/\./g, '').replace(',', '.');
+  return parseFloat(cleaned) || 0;
+};
+
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
@@ -1218,129 +1233,131 @@ Audio-Studio`,
                           <tr className="border-b border-slate-300 hover:bg-slate-50">
                             <td className="text-right font-bold py-3 px-4 w-3/5">Summe der Einzelposten:</td>
                             <td className="py-3 px-4 w-2/5">
-                              <input
-                                type="number"
-                                step="0.01"
-                                value={workflow.subtotal}
-                                readOnly
-                                className="w-full border-2 border-slate-400 bg-slate-100 rounded px-3 py-2 text-right font-bold text-slate-900"
-                              />
-                              <p className="text-xs text-slate-600 mt-1 text-right">{formatCurrency(workflow.subtotal)}</p>
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  value={formatToGerman(workflow.subtotal, 2)}
+                                  readOnly
+                                  className="w-full border-2 border-slate-400 bg-slate-100 rounded px-3 py-2 pr-8 text-right font-bold text-slate-900"
+                                />
+                                <span className="absolute right-3 top-3 text-slate-700 font-semibold">€</span>
+                              </div>
                             </td>
                           </tr>
                           <tr className="border-b border-slate-300 hover:bg-slate-50">
-                            <td className="text-right font-bold py-3 px-4">Rabatt in %:</td>
-                            <td className="py-3 px-4">
-                              <div>
+                            <td className="text-right font-bold py-3 px-4 w-3/5">Rabatt in %:</td>
+                            <td className="py-3 px-4 w-2/5">
+                              <div className="relative">
                                 <input
-                                  type="number"
-                                  step="0.1"
-                                  value={workflow.discountPercent}
+                                  type="text"
+                                  value={formatToGerman(workflow.discountPercent, 1)}
                                   onChange={(e) => {
-                                    const discPercent = parseFloat(e.target.value) || 0;
-                                    setWorkflow((prev) => ({
-                                      ...prev,
-                                      discountPercent: discPercent,
-                                    }));
+                                    const numValue = parseGermanInput(e.target.value);
+                                    setWorkflow((prev) => ({ ...prev, discountPercent: Math.min(Math.max(numValue, 0), 100) }));
                                   }}
-                                  className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
+                                  className="w-full border-2 border-blue-400 rounded px-3 py-2 pr-8 text-right font-semibold focus:outline-none focus:border-blue-600"
                                 />
-                                <p className="text-xs text-slate-600 mt-1 text-right">{workflow.discountPercent.toFixed(1)}%</p>
+                                <span className="absolute right-3 top-3 text-slate-600 font-semibold">%</span>
                               </div>
                             </td>
                           </tr>
                           <tr className="border-b border-slate-300 hover:bg-slate-50">
                             <td className="text-right font-bold py-3 px-4">Rabatt in €:</td>
                             <td className="py-3 px-4">
-                              <input
-                                type="number"
-                                step="0.01"
-                                value={workflow.discountAmount}
-                                onChange={(e) => {
-                                  const discAmount = parseFloat(e.target.value) || 0;
-                                  setWorkflow((prev) => ({
-                                    ...prev,
-                                    discountAmount: discAmount,
-                                  }));
-                                }}
-                                className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
-                              />
-                              <p className="text-xs text-slate-600 mt-1 text-right">{formatCurrency(workflow.discountAmount)}</p>
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  value={formatToGerman(workflow.discountAmount, 2)}
+                                  onChange={(e) => {
+                                    const discAmount = parseGermanInput(e.target.value);
+                                    setWorkflow((prev) => ({
+                                      ...prev,
+                                      discountAmount: Math.max(discAmount, 0),
+                                    }));
+                                  }}
+                                  className="w-full border-2 border-blue-400 rounded px-3 py-2 pr-8 text-right font-semibold focus:outline-none focus:border-blue-600"
+                                />
+                                <span className="absolute right-3 top-3 text-slate-600 font-semibold">€</span>
+                              </div>
                             </td>
                           </tr>
                           <tr className="border-b border-slate-300 hover:bg-slate-50">
                             <td className="text-right font-bold py-3 px-4">Versandkosten (inkl. Verpackung):</td>
                             <td className="py-3 px-4">
-                              <input
-                                type="number"
-                                step="0.01"
-                                value={workflow.shippingCost}
-                                onChange={(e) => {
-                                  const newShipping = parseFloat(e.target.value) || 0;
-                                  setWorkflow((prev) => ({
-                                    ...prev,
-                                    shippingCost: newShipping,
-                                  }));
-                                }}
-                                className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
-                              />
-                              <p className="text-xs text-slate-600 mt-1 text-right">{formatCurrency(workflow.shippingCost)}</p>
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  value={formatToGerman(workflow.shippingCost, 2)}
+                                  onChange={(e) => {
+                                    const newShipping = parseGermanInput(e.target.value);
+                                    setWorkflow((prev) => ({
+                                      ...prev,
+                                      shippingCost: Math.max(newShipping, 0),
+                                    }));
+                                  }}
+                                  className="w-full border-2 border-blue-400 rounded px-3 py-2 pr-8 text-right font-semibold focus:outline-none focus:border-blue-600"
+                                />
+                                <span className="absolute right-3 top-3 text-slate-600 font-semibold">€</span>
+                              </div>
                             </td>
                           </tr>
                           <tr className="border-b-2 border-slate-800 bg-blue-50 hover:bg-blue-100">
                             <td className="text-right font-bold py-3 px-4 text-blue-900">Gesamtpreis netto:</td>
                             <td className="py-3 px-4">
-                              <input
-                                type="number"
-                                step="0.01"
-                                value={workflow.totalNetto}
-                                onChange={(e) => {
-                                  const newNetto = parseFloat(e.target.value) || 0;
-                                  setWorkflow((prev) => ({
-                                    ...prev,
-                                    totalNetto: newNetto,
-                                  }));
-                                }}
-                                className="w-full border-2 border-blue-500 bg-blue-100 rounded px-3 py-2 text-right font-bold text-blue-900 focus:outline-none focus:border-blue-700"
-                              />
-                              <p className="text-xs text-blue-600 mt-1 text-right font-semibold">{formatCurrency(workflow.totalNetto)}</p>
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  value={formatToGerman(workflow.totalNetto, 2)}
+                                  onChange={(e) => {
+                                    const newNetto = parseGermanInput(e.target.value);
+                                    setWorkflow((prev) => ({
+                                      ...prev,
+                                      totalNetto: Math.max(newNetto, 0),
+                                    }));
+                                  }}
+                                  className="w-full border-2 border-blue-500 bg-blue-100 rounded px-3 py-2 pr-8 text-right font-bold text-blue-900 focus:outline-none focus:border-blue-700"
+                                />
+                                <span className="absolute right-3 top-3 text-blue-900 font-semibold">€</span>
+                              </div>
                             </td>
                           </tr>
                           <tr className="border-b border-slate-300 hover:bg-slate-50">
                             <td className="text-right font-bold py-3 px-4">Umsatzsteuer (19%):</td>
                             <td className="py-3 px-4">
-                              <input
-                                type="number"
-                                step="0.01"
-                                value={workflow.vatAmount}
-                                onChange={(e) => {
-                                  const newVat = parseFloat(e.target.value) || 0;
-                                  setWorkflow((prev) => ({
-                                    ...prev,
-                                    vatAmount: newVat,
-                                  }));
-                                }}
-                                className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
-                              />
-                              <p className="text-xs text-slate-600 mt-1 text-right">{formatCurrency(workflow.vatAmount)}</p>
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  value={formatToGerman(workflow.vatAmount, 2)}
+                                  onChange={(e) => {
+                                    const newVat = parseGermanInput(e.target.value);
+                                    setWorkflow((prev) => ({
+                                      ...prev,
+                                      vatAmount: Math.max(newVat, 0),
+                                    }));
+                                  }}
+                                  className="w-full border-2 border-blue-400 rounded px-3 py-2 pr-8 text-right font-semibold focus:outline-none focus:border-blue-600"
+                                />
+                                <span className="absolute right-3 top-3 text-slate-600 font-semibold">€</span>
+                              </div>
                             </td>
                           </tr>
                           <tr className="bg-orange-50 hover:bg-orange-100">
                             <td className="text-right font-bold py-3 px-4 text-orange-900 text-lg">Rechnungsbetrag brutto:</td>
                             <td className="py-3 px-4">
-                              <input
-                                type="number"
-                                step="0.01"
-                                value={workflow.totalBrutto}
-                                onChange={(e) => {
-                                  setWorkflow((prev) => ({
-                                    ...prev,
-                                    totalBrutto: parseFloat(e.target.value) || 0,
-                                  }));
-                                }}
-                                className="w-full border-2 border-orange-500 bg-orange-100 rounded px-3 py-2 text-right font-bold text-orange-900 text-lg focus:outline-none focus:border-orange-700"
-                              />
-                              <p className="text-xs text-orange-600 mt-1 text-right font-semibold">{formatCurrency(workflow.totalBrutto)}</p>
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  value={formatToGerman(workflow.totalBrutto, 2)}
+                                  onChange={(e) => {
+                                    setWorkflow((prev) => ({
+                                      ...prev,
+                                      totalBrutto: Math.max(parseGermanInput(e.target.value), 0),
+                                    }));
+                                  }}
+                                  className="w-full border-2 border-orange-500 bg-orange-100 rounded px-3 py-2 pr-8 text-right font-bold text-orange-900 text-lg focus:outline-none focus:border-orange-700"
+                                />
+                                <span className="absolute right-3 top-3 text-orange-900 font-semibold">€</span>
+                              </div>
                             </td>
                           </tr>
                         </tbody>
