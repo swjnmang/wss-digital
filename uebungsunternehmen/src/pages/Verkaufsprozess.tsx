@@ -454,28 +454,28 @@ Kontaktperson`,
         category: 'Desktop-PCs',
         quantity: 6,
         budget: 12000,
-        quality: 4,
-        subject: '6 Desktop-PCs für Videoproduktion',
+        quality: 5,
+        subject: '6 High-End Desktop-PCs für Videoproduktion',
         requirements: {
           quantity: { exact: 6 },
           maxBudget: 12000,
-          quality: 4,
+          quality: 5,
           specs: [
-            { key: 'gpu', values: ['RTX 4070', 'RTX 4080'] },
+            { key: 'gpu', values: ['RTX 4080', 'RTX 4090'] },
             { key: 'ram', minValue: 32 },
           ],
           priority: ['Performance', 'Zuverlässigkeit'],
         },
         content: `Guten Tag,
 
-wir sind ein Videoproduktions-Studio und brauchen neue Arbeitsplätze für unser Team.
+wir sind ein Videoproduktions-Studio und brauchen neue Arbeitsplätze für unser Team mit Render-Farm-Fähigkeiten.
 
 ANFORDERUNGEN:
 • Stückzahl: 6 Stück
-• GPU: RTX 4070 oder höher (Video-Encoding)
+• GPU: RTX 4080 oder RTX 4090 (Video-Encoding und Rendering)
 • RAM: Mindestens 32 GB
 • Gesamtbudget: 12.000 € netto
-• Qualität: 4 Sterne
+• Qualität: 5 Sterne (Premium und zuverlässig)
 
 Mit freundlichen Grüßen
 Ihr Ansprechpartner`,
@@ -553,7 +553,7 @@ HR-Abteilung`,
           maxBudget: 8000,
           quality: 4,
           specs: [
-            { key: 'screen', values: ['10.2"'] },
+            { key: 'screen', values: ['10.1"'] },
             { key: 'storage', minValue: 128 },
           ],
           priority: ['Robustheit', 'Langlebigkeit'],
@@ -564,7 +564,7 @@ wir suchen 20 Tablets für den Einsatz im Unterricht. Die Geräte sollten robust
 
 ANFORDERUNGEN:
 • Stückzahl: 20 Stück
-• Display: 10 Zoll (tragbar für Schüler)
+• Display: 10,1 Zoll (tragbar für Schüler)
 • Speicher: Mindestens 128 GB
 • Gesamtbudget: 8.000 € netto
 • Qualität: 4 Sterne
@@ -645,18 +645,17 @@ Sprachenzentrum`,
           quality: 5,
           specs: [
             { key: 'wireless', values: ['ja'] },
-            { key: 'batteryLife', minValue: 30 },
           ],
-          priority: ['Komfort', 'Wireless'],
+          priority: ['Komfort', 'Wireless', 'Qualität'],
         },
         content: `Guten Tag,
 
-wir suchen hochwertige kabellose Kopfhörer für unser Team mit langer Akkulaufzeit.
+wir suchen hochwertige kabellose Kopfhörer mit Gaming-Features für unser Team.
 
 ANFORDERUNGEN:
 • Stückzahl: 10 Stück
 • Wireless: Ja (Bluetooth)
-• Akkulaufzeit: Mindestens 30 Stunden
+• Frequenzbereich: 20 Hz – 20 kHz
 • Gesamtbudget: 4.000 € netto
 • Qualität: 5 Sterne (Premium-Audio)
 
