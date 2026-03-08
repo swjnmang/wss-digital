@@ -764,6 +764,11 @@ Audio-Studio`,
     return 0;
   };
 
+  // Round to 2 decimal places
+  const round2 = (value: number): number => {
+    return Math.round(value * 100) / 100;
+  };
+
   const StepBadge = ({ step, title, completed }: { step: number; title: string; completed: boolean }) => (
     <div className={`flex items-center gap-3 p-3 rounded-lg border-2 ${workflow.currentStep === step ? 'border-orange-500 bg-orange-50' : completed ? 'border-green-500 bg-green-50' : 'border-slate-200 bg-slate-50'}`}>
       <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${completed ? 'bg-green-500 text-white' : workflow.currentStep === step ? 'bg-orange-500 text-white' : 'bg-slate-300 text-slate-700'}`}>
@@ -1062,7 +1067,6 @@ Audio-Studio`,
                                   setWorkflow((prev) => ({
                                     ...prev,
                                     quantity: newQty,
-                                    subtotal: newQty * prev.unitPrice,
                                   }));
                                 }}
                                 className="w-full border-2 border-blue-400 rounded px-2 py-2 text-center font-semibold focus:outline-none focus:border-blue-600"
@@ -1073,15 +1077,8 @@ Audio-Studio`,
                                 type="number"
                                 step="0.01"
                                 value={workflow.unitPrice}
-                                onChange={(e) => {
-                                  const newPrice = parseFloat(e.target.value) || 0;
-                                  setWorkflow((prev) => ({
-                                    ...prev,
-                                    unitPrice: newPrice,
-                                    subtotal: prev.quantity * newPrice,
-                                  }));
-                                }}
-                                className="w-full border-2 border-blue-400 rounded px-2 py-2 text-center font-semibold focus:outline-none focus:border-blue-600"
+                                readOnly
+                                className="w-full border-2 border-slate-400 bg-slate-100 rounded px-2 py-2 text-center font-semibold text-slate-900"
                               />
                             </td>
                             <td className="py-4 px-4">
@@ -1130,11 +1127,9 @@ Audio-Studio`,
                                   value={workflow.discountPercent}
                                   onChange={(e) => {
                                     const discPercent = parseFloat(e.target.value) || 0;
-                                    const discAmount = (workflow.subtotal * discPercent) / 100;
                                     setWorkflow((prev) => ({
                                       ...prev,
                                       discountPercent: discPercent,
-                                      discountAmount: discAmount,
                                     }));
                                   }}
                                   className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
@@ -1154,11 +1149,9 @@ Audio-Studio`,
                                 value={workflow.discountAmount}
                                 onChange={(e) => {
                                   const discAmount = parseFloat(e.target.value) || 0;
-                                  const discPercent = workflow.subtotal > 0 ? (discAmount / workflow.subtotal) * 100 : 0;
                                   setWorkflow((prev) => ({
                                     ...prev,
                                     discountAmount: discAmount,
-                                    discountPercent: discPercent,
                                   }));
                                 }}
                                 className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
@@ -1192,12 +1185,9 @@ Audio-Studio`,
                                 value={workflow.totalNetto}
                                 onChange={(e) => {
                                   const newNetto = parseFloat(e.target.value) || 0;
-                                  const newVat = (newNetto * LIEFERBEDINGNISSE.vatRate) / 100;
                                   setWorkflow((prev) => ({
                                     ...prev,
                                     totalNetto: newNetto,
-                                    vatAmount: newVat,
-                                    totalBrutto: newNetto + newVat,
                                   }));
                                 }}
                                 className="w-full border-2 border-blue-500 bg-blue-100 rounded px-3 py-2 text-right font-bold text-blue-900 focus:outline-none focus:border-blue-700"
@@ -1216,7 +1206,6 @@ Audio-Studio`,
                                   setWorkflow((prev) => ({
                                     ...prev,
                                     vatAmount: newVat,
-                                    totalBrutto: prev.totalNetto + newVat,
                                   }));
                                 }}
                                 className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
@@ -1270,10 +1259,10 @@ Audio-Studio`,
 
                       {/* Calculation Check */}
                       {(() => {
-                        const expectedSubtotal = workflow.quantity * workflow.unitPrice;
-                        const expectedNetto = expectedSubtotal - workflow.discountAmount + workflow.shippingCost;
-                        const expectedVat = (expectedNetto * LIEFERBEDINGNISSE.vatRate) / 100;
-                        const expectedBrutto = expectedNetto + expectedVat;
+                        const expectedSubtotal = round2(workflow.quantity * workflow.unitPrice);
+                        const expectedNetto = round2(expectedSubtotal - workflow.discountAmount + workflow.shippingCost);
+                        const expectedVat = round2((expectedNetto * LIEFERBEDINGNISSE.vatRate) / 100);
+                        const expectedBrutto = round2(expectedNetto + expectedVat);
                         
                         const subOk = Math.abs(workflow.subtotal - expectedSubtotal) < 0.01;
                         const nettoOk = Math.abs(workflow.totalNetto - expectedNetto) < 0.01;
@@ -1311,10 +1300,10 @@ Audio-Studio`,
                     {/* ACTION BUTTONS */}
                     <div className="flex gap-4">
                       {(() => {
-                        const expectedSubtotal = workflow.quantity * workflow.unitPrice;
-                        const expectedNetto = expectedSubtotal - workflow.discountAmount + workflow.shippingCost;
-                        const expectedVat = (expectedNetto * LIEFERBEDINGNISSE.vatRate) / 100;
-                        const expectedBrutto = expectedNetto + expectedVat;
+                        const expectedSubtotal = round2(workflow.quantity * workflow.unitPrice);
+                        const expectedNetto = round2(expectedSubtotal - workflow.discountAmount + workflow.shippingCost);
+                        const expectedVat = round2((expectedNetto * LIEFERBEDINGNISSE.vatRate) / 100);
+                        const expectedBrutto = round2(expectedNetto + expectedVat);
                         
                         const automaticDiscount = calculateAutomaticDiscount(workflow.subtotal);
                         const discountOk = workflow.discountPercent >= automaticDiscount;
