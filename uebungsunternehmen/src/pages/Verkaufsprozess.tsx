@@ -360,6 +360,19 @@ function EmailReaderModal({ email, onClose, onEdit }: { email: Email | null; onC
 }
 
 // ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+const formatCurrency = (value: number): string => {
+  return new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+};
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -376,7 +389,7 @@ export default function Verkaufsprozess() {
     discountPercent: 0,
     discountAmount: 0,
     subtotal: 0,
-    shippingCost: LIEFERBEDINGNISSE.versandkostenD,
+    shippingCost: 0,
     totalNetto: 0,
     vatAmount: 0,
     totalBrutto: 0,
@@ -1204,6 +1217,7 @@ Audio-Studio`,
                                 readOnly
                                 className="w-full border-2 border-slate-400 bg-slate-100 rounded px-3 py-2 text-right font-bold text-slate-900"
                               />
+                              <p className="text-xs text-slate-600 mt-1 text-right">{formatCurrency(workflow.subtotal)}</p>
                             </td>
                           </tr>
                           <tr className="border-b border-slate-300 hover:bg-slate-50">
@@ -1223,6 +1237,7 @@ Audio-Studio`,
                                   }}
                                   className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
                                 />
+                                <p className="text-xs text-slate-600 mt-1 text-right">{workflow.discountPercent.toFixed(1)}%</p>
                               </div>
                             </td>
                           </tr>
@@ -1242,6 +1257,7 @@ Audio-Studio`,
                                 }}
                                 className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
                               />
+                              <p className="text-xs text-slate-600 mt-1 text-right">{formatCurrency(workflow.discountAmount)}</p>
                             </td>
                           </tr>
                           <tr className="border-b border-slate-300 hover:bg-slate-50">
@@ -1260,6 +1276,7 @@ Audio-Studio`,
                                 }}
                                 className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
                               />
+                              <p className="text-xs text-slate-600 mt-1 text-right">{formatCurrency(workflow.shippingCost)}</p>
                             </td>
                           </tr>
                           <tr className="border-b-2 border-slate-800 bg-blue-50 hover:bg-blue-100">
@@ -1278,6 +1295,7 @@ Audio-Studio`,
                                 }}
                                 className="w-full border-2 border-blue-500 bg-blue-100 rounded px-3 py-2 text-right font-bold text-blue-900 focus:outline-none focus:border-blue-700"
                               />
+                              <p className="text-xs text-blue-600 mt-1 text-right font-semibold">{formatCurrency(workflow.totalNetto)}</p>
                             </td>
                           </tr>
                           <tr className="border-b border-slate-300 hover:bg-slate-50">
@@ -1296,6 +1314,7 @@ Audio-Studio`,
                                 }}
                                 className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
                               />
+                              <p className="text-xs text-slate-600 mt-1 text-right">{formatCurrency(workflow.vatAmount)}</p>
                             </td>
                           </tr>
                           <tr className="bg-orange-50 hover:bg-orange-100">
@@ -1313,6 +1332,7 @@ Audio-Studio`,
                                 }}
                                 className="w-full border-2 border-orange-500 bg-orange-100 rounded px-3 py-2 text-right font-bold text-orange-900 text-lg focus:outline-none focus:border-orange-700"
                               />
+                              <p className="text-xs text-orange-600 mt-1 text-right font-semibold">{formatCurrency(workflow.totalBrutto)}</p>
                             </td>
                           </tr>
                         </tbody>
