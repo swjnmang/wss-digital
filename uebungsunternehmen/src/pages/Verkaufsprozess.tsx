@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 // ============================================================================
@@ -682,6 +682,11 @@ Audio-Studio`,
 
     setEmails(newEmails);
   };
+
+  // Generate random emails on component mount
+  useEffect(() => {
+    generateEmails();
+  }, []);
 
   const selectEmailForOffer = (email: Email) => {
     setWorkflow((prev) => ({
