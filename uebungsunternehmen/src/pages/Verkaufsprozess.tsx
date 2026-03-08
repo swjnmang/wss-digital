@@ -392,32 +392,273 @@ export default function Verkaufsprozess() {
   const [selectedEmailForReading, setSelectedEmailForReading] = useState<Email | null>(null);
   const [emails, setEmails] = useState<Email[]>(EMAILS);
 
-  // Generate random customer emails
+  // Generate random customer emails with detailed, specific requests
   const generateEmails = () => {
     const firstNames = ['Thomas', 'Petra', 'Marco', 'Lisa', 'Astrid', 'Stefan', 'Julia', 'Klaus'];
     const lastNames = ['Voss', 'Schmidt', 'Weber', 'Meyer', 'Müller', 'Fischer', 'Wagner', 'Bauer'];
-    const companies = ['Architekt-Net GmbH', 'Schulzentrum Berlin', 'TechStudio München', 'Büro Leipzig', 'Design Hamburg', 'Grafik Köln'];
+    const companies = ['Architektur GmbH', 'Schulzentrum', 'Designstudio', 'IT-Agentur', 'Marketing AG', 'Grafik-Büro'];
     const newEmails: Email[] = [];
 
-    const quantities = [4, 6, 8, 10, 12, 15, 20, 25];
-    const budgets = [5000, 8750, 12000, 17000, 20000, 25000];
-    const qualities = [3, 4, 5];
+    // Konkrete Anfragen-Templates für jede Kategorie
+    const emailTemplates = [
+      // Desktop-PC Anfragen
+      {
+        category: 'Desktop-PCs',
+        quantity: 8,
+        budget: 17000,
+        quality: 5,
+        subject: '8 High-End Desktop-PCs für Rendering-Studio',
+        requirements: {
+          quantity: { exact: 8 },
+          maxBudget: 17000,
+          quality: 5,
+          specs: [
+            { key: 'gpu', values: ['RTX 4080', 'RTX 4090'] },
+            { key: 'ram', minValue: 32 },
+          ],
+          priority: ['Leistung', 'Qualität'],
+        },
+        content: `Guten Tag,
 
-    for (let i = 1; i <= 5; i++) {
+wir sind ein Architektur-Büro und benötigen neue Rendering-Workstationen für unser Team. Wir suchen hochwertige Desktop-PCs.
+
+ANFORDERUNGEN:
+• Stückzahl: 8 Stück
+• GPU: Mindestens NVIDIA RTX 4080 (für 3D-Rendering erforderlich)
+• RAM: Mindestens 32 GB (für große Dateien notwendig)
+• Gesamtbudget: 17.000 € netto
+• Qualität: 5 Sterne (Langzeitstabilität erforderlich)
+
+Liebe Grüße
+Kontaktperson`,
+      },
+      {
+        category: 'Desktop-PCs',
+        quantity: 6,
+        budget: 12000,
+        quality: 4,
+        subject: '6 Desktop-PCs für Videoproduktion',
+        requirements: {
+          quantity: { exact: 6 },
+          maxBudget: 12000,
+          quality: 4,
+          specs: [
+            { key: 'gpu', values: ['RTX 4070', 'RTX 4080'] },
+            { key: 'ram', minValue: 32 },
+          ],
+          priority: ['Performance', 'Zuverlässigkeit'],
+        },
+        content: `Guten Tag,
+
+wir sind ein Videoproduktions-Studio und brauchen neue Arbeitsplätze für unser Team.
+
+ANFORDERUNGEN:
+• Stückzahl: 6 Stück
+• GPU: RTX 4070 oder höher (Video-Encoding)
+• RAM: Mindestens 32 GB
+• Gesamtbudget: 12.000 € netto
+• Qualität: 4 Sterne
+
+Mit freundlichen Grüßen
+Ihr Ansprechpartner`,
+      },
+      // Monitor-Anfragen
+      {
+        category: 'Monitore',
+        quantity: 25,
+        budget: 8750,
+        quality: 3,
+        subject: '25 Monitore für Klassenzimmer',
+        requirements: {
+          quantity: { exact: 25 },
+          maxBudget: 8750,
+          quality: 3,
+          specs: [
+            { key: 'diagonal', values: ['24"', '27"'] },
+            { key: 'resolution', values: ['1920x1080'] },
+          ],
+          priority: ['Preis', 'Verfügbarkeit'],
+        },
+        content: `Guten Tag,
+
+das Schulzentrum erneuert seine Computerräume und benötigt 25 Monitore für den Unterricht.
+
+ANFORDERUNGEN:
+• Stückzahl: 25 Stück
+• Bildschirmgröße: 24 Zoll oder 27 Zoll
+• Auflösung: 1920 × 1080 Pixel (Full HD)
+• Gesamtbudget: 8.750 € netto
+• Qualität: 3 Sterne (Schulische Nutzung)
+
+Mit freundlichen Grüßen
+Schulzentrum`,
+      },
+      {
+        category: 'Monitore',
+        quantity: 12,
+        budget: 5500,
+        quality: 4,
+        subject: '12 Monitore für Büro-Arbeitsplätze',
+        requirements: {
+          quantity: { exact: 12 },
+          maxBudget: 5500,
+          quality: 4,
+          specs: [
+            { key: 'diagonal', values: ['27"'] },
+            { key: 'resolution', values: ['2560x1440'] },
+          ],
+          priority: ['Bildqualität', 'Ergonomie'],
+        },
+        content: `Guten Tag,
+
+wir erneuern die Arbeitsplätze in unserem Office und benötigen hochwertige Monitore mit guter Bildqualität.
+
+ANFORDERUNGEN:
+• Stückzahl: 12 Stück
+• Bildschirmgröße: 27 Zoll
+• Auflösung: 2560 × 1440 Pixel (QHD)
+• Gesamtbudget: 5.500 € netto
+• Qualität: 4 Sterne
+
+Mit freundlichen Grüßen
+HR-Abteilung`,
+      },
+      // Tablet-Anfragen
+      {
+        category: 'Tablets',
+        quantity: 20,
+        budget: 8000,
+        quality: 4,
+        subject: '20 Tablets für Unterricht',
+        requirements: {
+          quantity: { exact: 20 },
+          maxBudget: 8000,
+          quality: 4,
+          specs: [
+            { key: 'screen', values: ['10.2"'] },
+            { key: 'storage', minValue: 128 },
+          ],
+          priority: ['Robustheit', 'Langlebigkeit'],
+        },
+        content: `Guten Tag,
+
+wir suchen 20 Tablets für den Einsatz im Unterricht. Die Geräte sollten robust und zuverlässig sein.
+
+ANFORDERUNGEN:
+• Stückzahl: 20 Stück
+• Display: 10 Zoll (tragbar für Schüler)
+• Speicher: Mindestens 128 GB
+• Gesamtbudget: 8.000 € netto
+• Qualität: 4 Sterne
+
+Mit freundlichen Grüßen
+Schule`,
+      },
+      {
+        category: 'Tablets',
+        quantity: 15,
+        budget: 10000,
+        quality: 5,
+        subject: '15 Premium-Tablets für Design-Team',
+        requirements: {
+          quantity: { exact: 15 },
+          maxBudget: 10000,
+          quality: 5,
+          specs: [
+            { key: 'screen', values: ['12.9"'] },
+            { key: 'storage', minValue: 256 },
+          ],
+          priority: ['Bildqualität', 'Speicher'],
+        },
+        content: `Guten Tag,
+
+wir suchen hochwertige Tablets für unser Design- und Kreativ-Team.
+
+ANFORDERUNGEN:
+• Stückzahl: 15 Stück
+• Display: 12,9 Zoll (für Design-Arbeiten)
+• Speicher: Mindestens 256 GB
+• Gesamtbudget: 10.000 € netto
+• Qualität: 5 Sterne (Premium-Geräte)
+
+Mit freundlichen Grüßen
+Creative Agency`,
+      },
+      // Kopfhörer-Anfragen
+      {
+        category: 'Kopfhörer',
+        quantity: 30,
+        budget: 4500,
+        quality: 3,
+        subject: '30 Kopfhörer für Sprachlabor',
+        requirements: {
+          quantity: { exact: 30 },
+          maxBudget: 4500,
+          quality: 3,
+          specs: [
+            { key: 'wireless', values: ['kabelgebunden'] },
+            { key: 'frequency', values: ['20Hz-20kHz'] },
+          ],
+          priority: ['Haltbarkeit', 'Preis'],
+        },
+        content: `Guten Tag,
+
+wir brauchen robuste Kopfhörer für unser Sprachlabor an der Schule.
+
+ANFORDERUNGEN:
+• Stückzahl: 30 Stück
+• Bauart: Kabelgebunden (für Schulumgebung)
+• Frequenzbereich: 20 Hz – 20 kHz
+• Gesamtbudget: 4.500 € netto
+• Qualität: 3 Sterne (Schulisches Niveau)
+
+Mit freundlichen Grüßen
+Sprachenzentrum`,
+      },
+      {
+        category: 'Kopfhörer',
+        quantity: 10,
+        budget: 4000,
+        quality: 5,
+        subject: '10 Premium-Wireless-Kopfhörer für Team',
+        requirements: {
+          quantity: { exact: 10 },
+          maxBudget: 4000,
+          quality: 5,
+          specs: [
+            { key: 'wireless', values: ['ja'] },
+            { key: 'batteryLife', minValue: 30 },
+          ],
+          priority: ['Komfort', 'Wireless'],
+        },
+        content: `Guten Tag,
+
+wir suchen hochwertige kabellose Kopfhörer für unser Team mit langer Akkulaufzeit.
+
+ANFORDERUNGEN:
+• Stückzahl: 10 Stück
+• Wireless: Ja (Bluetooth)
+• Akkulaufzeit: Mindestens 30 Stunden
+• Gesamtbudget: 4.000 € netto
+• Qualität: 5 Sterne (Premium-Audio)
+
+Mit freundlichen Grüßen
+Audio-Studio`,
+      },
+    ];
+
+    // Wähle 5 zufällige Templates
+    const selectedTemplates = [];
+    for (let i = 0; i < 5; i++) {
+      const randomIdx = Math.floor(Math.random() * emailTemplates.length);
+      selectedTemplates.push(emailTemplates[randomIdx]);
+    }
+
+    // Erstelle Emails aus Templates
+    selectedTemplates.forEach((template, idx) => {
       const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
       const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
       const company = companies[Math.floor(Math.random() * companies.length)];
-      const quantity = quantities[Math.floor(Math.random() * quantities.length)];
-      const budget = budgets[Math.floor(Math.random() * budgets.length)];
-      const quality = qualities[Math.floor(Math.random() * qualities.length)];
-      const category = ['Desktop-PCs', 'Monitore', 'Tablets', 'Kopfhörer'][Math.floor(Math.random() * 4)];
-
-      const demands = {
-        'Desktop-PCs': { spec1: 'GPU', spec2: 'RAM', sample: `Leistungsstarke GPU (RTX 4080+) und Mindestens ${16 + Math.random() * 32}GB RAM` },
-        'Monitore': { spec1: 'Größe', spec2: 'Auflösung', sample: `Bildschirmgröße ${Math.random() > 0.5 ? 24 : 27}" und gutes Preis-Leistungs-Verhältnis` },
-        'Tablets': { spec1: 'Display', spec2: 'Speicher', sample: `Display ${Math.random() > 0.5 ? 10 : 12}" und ${128 + Math.random() * 256}GB Speicher` },
-        'Kopfhörer': { spec1: 'Wireless', spec2: 'Batterie', sample: `Wireless-Technologie und lange Akkulaufzeit` },
-      }[category] || { spec1: 'Qualität', spec2: 'Features', sample: 'Hochwertige Qualität' };
 
       const today = new Date();
       const randomDays = Math.floor(Math.random() * 7);
@@ -425,17 +666,17 @@ export default function Verkaufsprozess() {
       const dateStr = date.toLocaleDateString('de-DE');
 
       newEmails.push({
-        id: `gen-${i}`,
-        from: `${firstName} ${lastName}`,
+        id: `gen-${idx + 1}`,
+        from: firstName + ' ' + lastName,
         fromAddress: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${company.split(' ')[0].toLowerCase()}.de`,
-        subject: `Anfrage: ${quantity}× ${category} erforderlich`,
-        content: `Guten Tag,\n\nwir benötigen ${quantity} ${category.toLowerCase()}.\n\nANFORDERUNGEN:\n• Stückzahl: ${quantity}\n• Wichtig: ${demands.spec1}\n• Wichtig: ${demands.spec2}\n• Budget: MAX €${budget}\n• Qualität: ${quality} Sterne\n\nMit freundlichen Grüßen\n${firstName} ${lastName}`,
-        requirements: { quantity: { exact: quantity }, maxBudget: budget, quality: quality, specs: [], priority: [] },
-        customerNumber: `${2400 + i}`,
+        subject: template.subject,
+        content: template.content.replace('Kontaktperson', `${firstName} ${lastName}`).replace('Ihr Ansprechpartner', `${firstName} ${lastName}`),
+        requirements: template.requirements,
+        customerNumber: `${2400 + idx + 1}`,
         date: dateStr,
         read: false,
       });
-    }
+    });
 
     setEmails(newEmails);
   };
