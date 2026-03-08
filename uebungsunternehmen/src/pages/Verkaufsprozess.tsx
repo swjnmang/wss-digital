@@ -391,6 +391,7 @@ export default function Verkaufsprozess() {
   const [activeTab, setActiveTab] = useState<'email' | 'warehouse' | 'documents' | 'shipping' | 'banking'>('email');
   const [selectedEmailForReading, setSelectedEmailForReading] = useState<Email | null>(null);
   const [emails, setEmails] = useState<Email[]>(EMAILS);
+  const [expandedCustomerRequest, setExpandedCustomerRequest] = useState<boolean>(false);
 
   // Generate random customer emails with detailed, specific requests
   const generateEmails = () => {
@@ -853,9 +854,30 @@ Audio-Studio`,
 
               {workflow.selectedEmail ? (
                 <>
-                  <div className="mb-8 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-                    <p className="font-semibold text-slate-800">Kundenanfrage: {workflow.selectedEmail.requirements.quantity?.exact} Stück</p>
-                    <p className="text-sm text-slate-600 mt-1">Budget: € {workflow.selectedEmail.requirements.maxBudget?.toLocaleString('de-DE')} | Min. Qualität: {'⭐'.repeat(workflow.selectedEmail.requirements.quality || 3)}</p>
+                  <div className="mb-8 bg-blue-50 border-l-4 border-blue-500 rounded overflow-hidden">
+                    <button
+                      onClick={() => setExpandedCustomerRequest(!expandedCustomerRequest)}
+                      className="w-full p-4 flex items-center justify-between hover:bg-blue-100 transition-colors"
+                    >
+                      <div className="text-left">
+                        <p className="font-semibold text-slate-800">Kundenanfrage: {workflow.selectedEmail.requirements.quantity?.exact} Stück</p>
+                      </div>
+                      <span className={`text-2xl transition-transform ${expandedCustomerRequest ? 'rotate-180' : ''}`}>▼</span>
+                    </button>
+                    {expandedCustomerRequest && (
+                      <div className="p-4 border-t border-blue-200 bg-blue-50">
+                        <p className="text-sm text-slate-700 mb-3"><strong>Kundenname:</strong> {workflow.selectedEmail.from}</p>
+                        <p className="text-sm text-slate-700 mb-3"><strong>Email:</strong> {workflow.selectedEmail.fromAddress}</p>
+                        <p className="text-sm text-slate-700 mb-4"><strong>Datum:</strong> {workflow.selectedEmail.date}</p>
+                        <p className="text-sm text-slate-600 mb-3">
+                          Budget: € {workflow.selectedEmail.requirements.maxBudget?.toLocaleString('de-DE')} | Min. Qualität: {'⭐'.repeat(workflow.selectedEmail.requirements.quality || 3)}
+                        </p>
+                        <div className="mt-4 p-3 bg-white rounded border border-blue-200">
+                          <p className="text-xs font-semibold text-slate-600 mb-2">ORIGINALTEXT:</p>
+                          <p className="text-xs text-slate-700 whitespace-pre-wrap font-mono leading-relaxed max-h-48 overflow-y-auto">{workflow.selectedEmail.content}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded">
