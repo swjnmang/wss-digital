@@ -99,10 +99,10 @@ const LIEFERBEDINGNISSE = {
   versandkostenD: 20,
   versandkostenEU: 50,
   versandkostenfrei: 2500,
+  expresszuschlag: 30,
   rabattstaffeln: [
-    { ab: 5000, prozent: 3 },
     { ab: 10000, prozent: 5 },
-    { ab: 20000, prozent: 7 },
+    { ab: 50000, prozent: 10 },
   ],
   zahlungsziel: 30,
   skonto: 2.0,
@@ -392,6 +392,7 @@ export default function Verkaufsprozess() {
   const [selectedEmailForReading, setSelectedEmailForReading] = useState<Email | null>(null);
   const [emails, setEmails] = useState<Email[]>(EMAILS);
   const [expandedCustomerRequest, setExpandedCustomerRequest] = useState<boolean>(false);
+  const [expandedTerms, setExpandedTerms] = useState<boolean>(false);
 
   // Generate random customer emails with detailed, specific requests
   const generateEmails = () => {
@@ -748,6 +749,16 @@ Audio-Studio`,
     return true;
   };
 
+  // Calculate automatic discount based on subtotal
+  const calculateAutomaticDiscount = (subtotal: number): number => {
+    for (let i = LIEFERBEDINGNISSE.rabattstaffeln.length - 1; i >= 0; i--) {
+      if (subtotal >= LIEFERBEDINGNISSE.rabattstaffeln[i].ab) {
+        return LIEFERBEDINGNISSE.rabattstaffeln[i].prozent;
+      }
+    }
+    return 0;
+  };
+
   const StepBadge = ({ step, title, completed }: { step: number; title: string; completed: boolean }) => (
     <div className={`flex items-center gap-3 p-3 rounded-lg border-2 ${workflow.currentStep === step ? 'border-orange-500 bg-orange-50' : completed ? 'border-green-500 bg-green-50' : 'border-slate-200 bg-slate-50'}`}>
       <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${completed ? 'bg-green-500 text-white' : workflow.currentStep === step ? 'bg-orange-500 text-white' : 'bg-slate-300 text-slate-700'}`}>
@@ -945,6 +956,46 @@ Audio-Studio`,
             <div className="bg-white rounded-xl shadow-lg p-8 border border-slate-200">
               <h2 className="text-2xl font-bold mb-6 text-slate-800">📄 Angebot erstellen & berechnen</h2>
 
+              {/* EXPANDABLE TERMS AND CONDITIONS */}
+              <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-500 rounded overflow-hidden">
+                <button
+                  onClick={() => setExpandedTerms(!expandedTerms)}
+                  className="w-full p-4 flex items-center justify-between hover:bg-yellow-100 transition-colors"
+                >
+                  <div className="text-left">
+                    <p className="font-semibold text-slate-800">📋 Liefer- und Zahlungsbedingungen</p>
+                  </div>
+                  <span className={`text-2xl transition-transform ${expandedTerms ? 'rotate-180' : ''}`}>▼</span>
+                </button>
+                {expandedTerms && (
+                  <div className="p-6 border-t border-yellow-200 bg-white space-y-4">
+                    <div className="grid grid-cols-2 gap-6 text-sm">
+                      <div>
+                        <h4 className="font-bold text-slate-800 mb-3">💰 Rabattstaffeln:</h4>
+                        <p className="text-slate-700 mb-2">• <strong>5,00%</strong> ab € 10.000,00 Summe Einzelposten</p>
+                        <p className="text-slate-700">• <strong>10,00%</strong> ab € 50.000,00 Summe Einzelposten</p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 mb-3">🚚 Versandkosten:</h4>
+                        <p className="text-slate-700 mb-2">• Deutschland (D): € 20,00</p>
+                        <p className="text-slate-700 mb-2">• EU: € 50,00</p>
+                        <p className="text-slate-700 mb-2">• Versandkostenfrei ab: € 2.500,00</p>
+                        <p className="text-slate-700">• Expresszuschlag: € 30,00</p>
+                      </div>
+                    </div>
+                    <div className="border-t border-yellow-200 pt-4">
+                      <div className="grid grid-cols-2 gap-6 text-sm">
+                        <div>
+                          <h4 className="font-bold text-slate-800 mb-3">💳 Zahlungsbedingungen:</h4>
+                          <p className="text-slate-700 mb-2">• Zahlungsziel: <strong>30 Tage</strong></p>
+                          <p className="text-slate-700">• Skonto: <strong>2,00%</strong> bei Zahlung innerhalb von <strong>7 Tagen</strong></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {workflow.selectedProduct && workflow.selectedEmail ? (
                 <div className="space-y-6">
                   {/* OFFER FORM - TABULAR LAYOUT */}
@@ -1067,21 +1118,26 @@ Audio-Studio`,
                           <tr className="border-b border-slate-300 hover:bg-slate-50">
                             <td className="text-right font-bold py-3 px-4">Rabatt in %:</td>
                             <td className="py-3 px-4">
-                              <input
-                                type="number"
-                                step="0.1"
-                                value={workflow.discountPercent}
-                                onChange={(e) => {
-                                  const discPercent = parseFloat(e.target.value) || 0;
-                                  const discAmount = (workflow.subtotal * discPercent) / 100;
-                                  setWorkflow((prev) => ({
-                                    ...prev,
-                                    discountPercent: discPercent,
-                                    discountAmount: discAmount,
-                                  }));
-                                }}
-                                className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
-                              />
+                              <div>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  value={workflow.discountPercent}
+                                  onChange={(e) => {
+                                    const discPercent = parseFloat(e.target.value) || 0;
+                                    const discAmount = (workflow.subtotal * discPercent) / 100;
+                                    setWorkflow((prev) => ({
+                                      ...prev,
+                                      discountPercent: discPercent,
+                                      discountAmount: discAmount,
+                                    }));
+                                  }}
+                                  className="w-full border-2 border-blue-400 rounded px-3 py-2 text-right font-semibold focus:outline-none focus:border-blue-600"
+                                />
+                                <p className="text-xs text-slate-500 mt-1">
+                                  💡 Automatischer Rabatt: <strong>{calculateAutomaticDiscount(workflow.subtotal)}%</strong>
+                                </p>
+                              </div>
                             </td>
                           </tr>
                           <tr className="border-b border-slate-300 hover:bg-slate-50">
@@ -1193,6 +1249,20 @@ Audio-Studio`,
                         </div>
                       )}
 
+                      {/* Discount Check */}
+                      {(() => {
+                        const automaticDiscount = calculateAutomaticDiscount(workflow.subtotal);
+                        if (workflow.subtotal > 0 && workflow.discountPercent < automaticDiscount) {
+                          return (
+                            <div className="p-4 bg-amber-50 border-l-4 border-amber-500 rounded text-sm text-amber-800">
+                              <p className="font-semibold">⚠️ Rabatt zu niedrig!</p>
+                              <p>Basierend auf Ihrer Summe von € {workflow.subtotal.toFixed(2)} ist ein Rabatt von mindestens <strong>{automaticDiscount}%</strong> gültig.</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
+
                       {/* Calculation Check */}
                       {(() => {
                         const expectedSubtotal = workflow.quantity * workflow.unitPrice;
@@ -1241,12 +1311,16 @@ Audio-Studio`,
                         const expectedVat = (expectedNetto * LIEFERBEDINGNISSE.vatRate) / 100;
                         const expectedBrutto = expectedNetto + expectedVat;
                         
+                        const automaticDiscount = calculateAutomaticDiscount(workflow.subtotal);
+                        const discountOk = workflow.discountPercent >= automaticDiscount;
+                        
                         const allCorrect =
                           workflow.quantity === workflow.selectedEmail.requirements.quantity?.exact &&
                           Math.abs(workflow.subtotal - expectedSubtotal) < 0.01 &&
                           Math.abs(workflow.totalNetto - expectedNetto) < 0.01 &&
                           Math.abs(workflow.vatAmount - expectedVat) < 0.01 &&
-                          Math.abs(workflow.totalBrutto - expectedBrutto) < 0.01;
+                          Math.abs(workflow.totalBrutto - expectedBrutto) < 0.01 &&
+                          discountOk;
 
                         return (
                           <>
