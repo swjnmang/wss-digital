@@ -307,50 +307,51 @@ const EMAILS: Email[] = [
 // EMAIL READER MODAL
 // ============================================================================
 
-function EmailReaderModal({ email, onClose }: { email: Email | null; onClose: () => void }) {
+function EmailReaderModal({ email, onClose, onEdit }: { email: Email | null; onClose: () => void; onEdit: (email: Email) => void }) {
   if (!email) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         <div className="border-b border-slate-200 p-6 flex justify-between items-start">
           <div>
-            <p className="text-sm text-slate-500 mb-2">Von: {email.from}</p>
+            <p className="text-sm text-slate-500 mb-2">Von: {email.from} ({email.fromAddress})</p>
             <h2 className="text-2xl font-bold text-slate-800">{email.subject}</h2>
             <p className="text-sm text-slate-500 mt-2">{email.date} • Kunde #{email.customerNumber}</p>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl font-light">✕</button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 font-mono text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-50 font-mono text-sm text-slate-700 leading-relaxed whitespace-pre-wrap border-b border-slate-200">
           {email.content}
         </div>
 
-        <div className="border-t border-slate-200 bg-blue-50 p-6">
-          <h3 className="font-bold text-slate-800 mb-3">📋 Anforderungen-Zusammenfassung:</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-slate-600">Stückzahl:</p>
-              <p className="font-semibold text-slate-800">{email.requirements.quantity?.exact}</p>
-            </div>
-            <div>
-              <p className="text-slate-600">Max. Budget netto:</p>
-              <p className="font-semibold text-slate-800">€ {email.requirements.maxBudget?.toLocaleString('de-DE')}</p>
-            </div>
-            <div>
-              <p className="text-slate-600">Min. Qualität:</p>
-              <p className="font-semibold text-slate-800">{'⭐'.repeat(email.requirements.quality || 3)}</p>
-            </div>
-            <div>
-              <p className="text-slate-600">Prioritäten:</p>
-              <p className="font-semibold text-slate-800">{email.requirements.priority?.slice(0, 2).join(', ')}</p>
-            </div>
+        <div className="bg-slate-100 p-6 border-t border-slate-200">
+          <div className="mb-4">
+            <h3 className="font-bold text-slate-800 mb-3">📋 Anforderungen:</h3>
+            <ul className="text-sm text-slate-700 space-y-2 ml-4">
+              <li>• <strong>Stückzahl:</strong> {email.requirements.quantity?.exact} Stück</li>
+              <li>• <strong>Budget (netto):</strong> max. € {email.requirements.maxBudget?.toLocaleString('de-DE')}</li>
+              <li>• <strong>Qualität:</strong> {'⭐'.repeat(email.requirements.quality || 3)}</li>
+              {email.requirements.priority && email.requirements.priority.length > 0 && (
+                <li>• <strong>Prioritäten:</strong> {email.requirements.priority.join(', ')}</li>
+              )}
+            </ul>
           </div>
         </div>
 
         <div className="border-t border-slate-200 p-4 flex gap-3 justify-end">
-          <button onClick={onClose} className="px-6 py-2 bg-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-300 transition-colors">
+          <button onClick={onClose} className="px-6 py-2 bg-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-400 transition-colors">
             Schließen
+          </button>
+          <button
+            onClick={() => {
+              onEdit(email);
+              onClose();
+            }}
+            className="px-6 py-2 bg-slate-600 text-white font-semibold rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            → Anfrage bearbeiten
           </button>
         </div>
       </div>
@@ -573,9 +574,8 @@ export default function Verkaufsprozess() {
                 <div className="border border-slate-300 rounded-lg overflow-hidden">
                   {/* Header Row */}
                   <div className="grid grid-cols-12 gap-4 bg-slate-100 border-b border-slate-300 p-4 font-semibold text-sm text-slate-700">
-                    <div className="col-span-3">Von</div>
-                    <div className="col-span-5">Betreff</div>
-                    <div className="col-span-2">Stückzahl</div>
+                    <div className="col-span-4">Von</div>
+                    <div className="col-span-6">Betreff</div>
                     <div className="col-span-2">Datum</div>
                   </div>
 
@@ -584,36 +584,18 @@ export default function Verkaufsprozess() {
                     {emails.map((email) => (
                       <div
                         key={email.id}
-                        className="grid grid-cols-12 gap-4 p-4 hover:bg-slate-50 transition-colors text-sm border-b border-slate-200"
+                        onClick={() => setSelectedEmailForReading(email)}
+                        className="grid grid-cols-12 gap-4 p-4 hover:bg-blue-50 transition-colors text-sm cursor-pointer"
                       >
-                        <div className="col-span-3">
-                          <p className="font-semibold text-slate-800 hover:text-blue-600 cursor-pointer" onClick={() => setSelectedEmailForReading(email)}>
-                            {email.from}
-                          </p>
+                        <div className="col-span-4">
+                          <p className="font-semibold text-slate-800">{email.from}</p>
                           <p className="text-slate-500 text-xs">{email.fromAddress}</p>
                         </div>
-                        <div className="col-span-5">
-                          <p
-                            className="text-slate-800 hover:text-blue-600 cursor-pointer line-clamp-1 font-medium"
-                            onClick={() => setSelectedEmailForReading(email)}
-                          >
-                            {email.subject}
-                          </p>
-                          <p className="text-xs text-slate-500">Kunde #{email.customerNumber}</p>
+                        <div className="col-span-6">
+                          <p className="text-slate-800 line-clamp-1 font-medium">{email.subject}</p>
                         </div>
-                        <div className="col-span-2">
-                          <p className="text-slate-800 font-semibold">{email.requirements.quantity?.exact} St.</p>
-                        </div>
-                        <div className="col-span-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-slate-600">{email.date}</span>
-                            <button
-                              onClick={() => selectEmailForOffer(email)}
-                              className="py-1 px-3 bg-slate-600 text-white text-xs font-semibold rounded hover:bg-slate-700 transition-colors"
-                            >
-                              Öffnen
-                            </button>
-                          </div>
+                        <div className="col-span-2 text-right">
+                          <span className="text-slate-600">{email.date}</span>
                         </div>
                       </div>
                     ))}
@@ -1351,7 +1333,11 @@ export default function Verkaufsprozess() {
         </div>
       </main>
 
-      <EmailReaderModal email={selectedEmailForReading} onClose={() => setSelectedEmailForReading(null)} />
+      <EmailReaderModal 
+        email={selectedEmailForReading} 
+        onClose={() => setSelectedEmailForReading(null)}
+        onEdit={(email) => selectEmailForOffer(email)}
+      />
     </div>
   );
 }
