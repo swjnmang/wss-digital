@@ -393,6 +393,7 @@ export default function Verkaufsprozess() {
   const [emails, setEmails] = useState<Email[]>(EMAILS);
   const [expandedCustomerRequest, setExpandedCustomerRequest] = useState<boolean>(false);
   const [expandedTerms, setExpandedTerms] = useState<boolean>(false);
+  const [productValidationError, setProductValidationError] = useState<string | null>(null);
 
   // Generate random customer emails with detailed, specific requests
   const generateEmails = () => {
@@ -699,6 +700,16 @@ Audio-Studio`,
   };
 
   const selectProduct = (product: Product) => {
+    const errors = getProductMatchErrors(product, workflow.selectedEmail);
+    
+    if (errors.length > 0) {
+      // Produkt passt nicht
+      setProductValidationError(errors.join('\n'));
+      return;
+    }
+    
+    // Produkt passt - weiterleiten
+    setProductValidationError(null);
     setWorkflow((prev) => ({
       ...prev,
       selectedProduct: product,
@@ -737,21 +748,55 @@ Audio-Studio`,
     }));
   };
 
-  // Prüfe ob gewähltes Produkt wirklich passt
-  const isProductMatch = (product: Product, email?: Email): boolean => {
-    if (!email) return true;
+  // Prüfe ob gewähltes Produkt wirklich passt und liefere Fehlergründe
+  const getProductMatchErrors = (product: Product, email?: Email): string[] => {
+    const errors: string[] = [];
+    if (!email) return errors;
+    
     const reqs = email.requirements;
-    if (reqs.quality && product.specs.quality && product.specs.quality < reqs.quality) return false;
-
-    for (const spec of reqs.specs || []) {
-      if (spec.key === 'gpu' && !spec.values?.some((v) => product.specs.gpu?.includes(v))) return false;
-      if (spec.key === 'ram') {
-        const ramMatch = product.specs.ram?.match(/(\d+)/);
-        if (ramMatch && spec.minValue && parseInt(ramMatch[1]) < spec.minValue) return false;
-      }
-      if (spec.key === 'diagonal' && !spec.values?.some((v) => product.specs.diagonal?.includes(v))) return false;
+    
+    // Qualitätsprüfung
+    if (reqs.quality && product.specs.quality && product.specs.quality < reqs.quality) {
+      errors.push(`Qualität zu niedrig: Anforderung ${reqs.quality} Sterne, Produkt hat nur ${product.specs.quality} Sterne`);
     }
-    return true;
+
+    // Spezifikationsprüfung
+    for (const spec of reqs.specs || []) {
+      if (spec.key === 'gpu' && spec.values) {
+        if (!spec.values.some((v) => product.specs.gpu?.includes(v))) {
+          errors.push(`GPU passt nicht: Anforderung ${spec.values.join(' oder ')}, Produkt hat ${product.specs.gpu || 'keine GPU'}`);
+        }
+      }
+      if (spec.key === 'ram' && spec.minValue) {
+        const ramMatch = product.specs.ram?.match(/(\d+)/);
+        if (ramMatch && parseInt(ramMatch[1]) < spec.minValue) {
+          errors.push(`RAM zu niedrig: Anforderung mindestens ${spec.minValue} GB, Produkt hat nur ${ramMatch[1]} GB`);
+        }
+      }
+      if (spec.key === 'diagonal' && spec.values) {
+        if (!spec.values.some((v) => product.specs.diagonal?.includes(v))) {
+          errors.push(`Bildschirmgröße passt nicht: Anforderung ${spec.values.join(' oder ')}, Produkt hat ${product.specs.diagonal || 'unbekannt'}`);
+        }
+      }
+      if (spec.key === 'screen' && spec.values) {
+        if (!spec.values.some((v) => product.specs.screen?.includes(v))) {
+          errors.push(`Display passt nicht: Anforderung ${spec.values.join(' oder ')}, Produkt hat ${product.specs.screen || 'unbekannt'}`);
+        }
+      }
+      if (spec.key === 'storage' && spec.minValue) {
+        const storageMatch = product.specs.storage?.match(/(\d+)/);
+        if (storageMatch && parseInt(storageMatch[1]) < spec.minValue) {
+          errors.push(`Speicher zu niedrig: Anforderung mindestens ${spec.minValue} GB, Produkt hat nur ${storageMatch[1]} GB`);
+        }
+      }
+    }
+
+    return errors;
+  };
+
+  // Prüfe ob gewähltes Produkt wirklich passt (boolean version für bestehende Nutzung)
+  const isProductMatch = (product: Product, email?: Email): boolean => {
+    return getProductMatchErrors(product, email).length === 0;
   };
 
   // Calculate automatic discount based on subtotal
@@ -905,6 +950,24 @@ Audio-Studio`,
                     <p className="font-semibold text-amber-900">💡 Ihre Aufgabe: Wählen Sie SELBST den passenden Artikel!</p>
                     <p className="text-sm text-amber-800 mt-2">Die Kundenanfrage weist auf 2 wichtige Anforderungen hin. Lesen Sie die Email sorgfältig und wählen Sie einen geeigneten Artikel aus dem Lager.</p>
                   </div>
+
+                  {/* PRODUCT VALIDATION ERROR */}
+                  {productValidationError && (
+                    <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+                      <p className="font-semibold text-red-800 mb-2">❌ Der Artikel passt nicht zur Anfrage, weil:</p>
+                      <div className="space-y-1 text-sm text-red-700">
+                        {productValidationError.split('\n').map((error, idx) => (
+                          <p key={idx}>• {error}</p>
+                        ))}
+                      </div>
+                      <button
+                        onClick={() => setProductValidationError(null)}
+                        className="mt-3 text-sm text-red-600 hover:text-red-800 font-semibold underline"
+                      >
+                        ✕ Schließen
+                      </button>
+                    </div>
+                  )}
 
                   <div className="space-y-6">
                     {['Desktop-PCs', 'Monitore', 'Tablets', 'Kopfhörer'].map((category) => {
