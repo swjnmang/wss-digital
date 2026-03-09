@@ -96,6 +96,7 @@ interface WorkflowState {
   paymentVerified: boolean;
   goodsShipped: boolean;
   offerFinalized: boolean;
+  generatedShippingOptions?: ShippingOption[];
 }
 
 const LIEFERBEDINGNISSE = {
@@ -466,14 +467,15 @@ const parseGermanInput = (value: string): number => {
   return parseFloat(cleaned) || 0;
 };
 
-// Calculate cheapest shipping option based on weight
-const getCheapestShippingOption = (weight: number): ShippingOption | null => {
+// Calculate cheapest shipping option based on weight using generated options
+const getCheapestShippingOption = (weight: number, generatedOptions?: ShippingOption[]): ShippingOption | null => {
   if (weight <= 0) return null;
   
+  const options = generatedOptions || SHIPPING_OPTIONS;
   let cheapest: ShippingOption | null = null;
   let minCost = Infinity;
   
-  for (const option of SHIPPING_OPTIONS) {
+  for (const option of options) {
     const totalCost = option.fixCost + (weight * option.costPerKg);
     if (totalCost < minCost) {
       minCost = totalCost;
@@ -482,6 +484,15 @@ const getCheapestShippingOption = (weight: number): ShippingOption | null => {
   }
   
   return cheapest;
+};
+
+// Generate random shipping costs for each option
+const generateShippingCosts = (): ShippingOption[] => {
+  return SHIPPING_OPTIONS.map((option) => ({
+    ...option,
+    fixCost: parseFloat((Math.random() * 15 + 2).toFixed(2)), // 2.00 - 17.00 €
+    costPerKg: parseFloat((Math.random() * 2.5 + 0.5).toFixed(2)), // 0.50 - 3.00 € pro kg
+  }));
 };
 
 // ============================================================================
@@ -836,6 +847,11 @@ Audio-Studio`,
     });
 
     setEmails(newEmails);
+    // Generate new shipping costs for this batch of orders
+    setWorkflow((prev) => ({
+      ...prev,
+      generatedShippingOptions: generateShippingCosts(),
+    }));
   };
 
   // Generate random emails on component mount
@@ -1888,7 +1904,7 @@ Audio-Studio`,
                     {!workflow.shippingValidated ? (
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 gap-4">
-                          {SHIPPING_OPTIONS.map((option) => {
+                          {(workflow.generatedShippingOptions || SHIPPING_OPTIONS).map((option) => {
                             const totalWeight = workflow.quantity * (workflow.selectedProduct?.weight || 0);
                             const correctCost = option.fixCost + (totalWeight * option.costPerKg);
                             const userInput = workflow.shippingCostInput[option.id] || 0;
@@ -1935,7 +1951,7 @@ Audio-Studio`,
                                   <button
                                     onClick={() => {
                                       const totalWeight = workflow.quantity * (workflow.selectedProduct?.weight || 0);
-                                      const cheapest = getCheapestShippingOption(totalWeight);
+                                      const cheapest = getCheapestShippingOption(totalWeight, workflow.generatedShippingOptions);
                                       
                                       if (!cheapest || cheapest.id !== option.id) {
                                         setShippingValidationError(`❌ Das ist nicht das günstigste Unternehmen! Wähle: ${cheapest?.name} (€ ${(cheapest?.fixCost! + (totalWeight * cheapest?.costPerKg!)).toFixed(2)})`);
