@@ -466,6 +466,24 @@ const parseGermanInput = (value: string): number => {
   return parseFloat(cleaned) || 0;
 };
 
+// Calculate cheapest shipping option based on weight
+const getCheapestShippingOption = (weight: number): ShippingOption | null => {
+  if (weight <= 0) return null;
+  
+  let cheapest: ShippingOption | null = null;
+  let minCost = Infinity;
+  
+  for (const option of SHIPPING_OPTIONS) {
+    const totalCost = option.fixCost + (weight * option.costPerKg);
+    if (totalCost < minCost) {
+      minCost = totalCost;
+      cheapest = option;
+    }
+  }
+  
+  return cheapest;
+};
+
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
@@ -512,6 +530,24 @@ export default function Verkaufsprozess() {
   const [totalNettoInput, setTotalNettoInput] = useState<string>('');
   const [vatAmountInput, setVatAmountInput] = useState<string>('');
   const [totalBruttoInput, setTotalBruttoInput] = useState<string>('');
+  const [shippingValidationError, setShippingValidationError] = useState<string>('');
+
+  // Load state from localStorage on mount and save changes
+  useEffect(() => {
+    const savedWorkflow = localStorage.getItem('verkaufsprozess_workflow');
+    if (savedWorkflow) {
+      try {
+        setWorkflow(JSON.parse(savedWorkflow));
+      } catch (e) {
+        console.error('Fehler beim Laden des gespeicherten Workflows:', e);
+      }
+    }
+  }, []);
+
+  // Save workflow to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('verkaufsprozess_workflow', JSON.stringify(workflow));
+  }, [workflow]);
 
   // Generate random customer emails with detailed, specific requests
   const generateEmails = () => {
@@ -1836,6 +1872,12 @@ Audio-Studio`,
                       <p className="text-sm text-slate-700">4. Das System prüft deine Berechnung!</p>
                     </div>
 
+                    {shippingValidationError && (
+                      <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+                        <p className="font-semibold text-red-800">{shippingValidationError}</p>
+                      </div>
+                    )}
+
                     <div className="mb-8 p-4 bg-amber-50 border border-amber-300 rounded text-sm">
                       <p className="font-semibold text-amber-900 mb-2">📊 Bestellungsgewicht:</p>
                       <p className="text-amber-900">
@@ -1892,6 +1934,15 @@ Audio-Studio`,
                                 {isCorrect && (
                                   <button
                                     onClick={() => {
+                                      const totalWeight = workflow.quantity * (workflow.selectedProduct?.weight || 0);
+                                      const cheapest = getCheapestShippingOption(totalWeight);
+                                      
+                                      if (!cheapest || cheapest.id !== option.id) {
+                                        setShippingValidationError(`❌ Das ist nicht das günstigste Unternehmen! Wähle: ${cheapest?.name} (€ ${(cheapest?.fixCost! + (totalWeight * cheapest?.costPerKg!)).toFixed(2)})`);
+                                        return;
+                                      }
+                                      
+                                      setShippingValidationError('');
                                       setWorkflow((prev) => ({
                                         ...prev,
                                         selectedShipping: option,
