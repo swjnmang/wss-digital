@@ -2384,8 +2384,8 @@ Audio-Studio`,
                           <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded text-sm text-red-800 mb-6">
                             <p className="font-semibold">❌ Berechnungsfehler!</p>
                             {!dateOk && <p>❌ "Ihr Zeichen" (Datum) ist erforderlich!</p>}
-                            {!skontoOk && <p>❌ Skontobetrag ist falsch! Erwartet: € {expectedSkonto.toFixed(2)}</p>}
-                            {!amountOk && <p>❌ Überweisungsbetrag ist falsch! Erwartet: € {expectedAmountAfterSkonto.toFixed(2)}</p>}
+                            {!skontoOk && <p>❌ Skontobetrag ist falsch!</p>}
+                            {!amountOk && <p>❌ Überweisungsbetrag ist falsch!</p>}
                           </div>
                         );
                       }
