@@ -159,6 +159,17 @@ const PRODUCTS: Product[] = [
     description: 'Top-of-the-Line Workstation für Video & 3D-Rendering'
   },
   {
+    id: 'p3b',
+    name: 'ProStation Excellence X16',
+    category: 'Desktop-PCs',
+    price: 3200.00,
+    stock: 6,
+    artNumber: 'PS-EXC-X16',
+    weight: 11.0,
+    specs: { cpu: 'Intel Core i9-13900K', ram: '96GB DDR5', storage: '4TB NVMe SSD', gpu: 'NVIDIA RTX 4090', warranty: '48 Monate', quality: 5, color: 'Grau' },
+    description: 'Extreme Performance Workstation mit RTX 4090'
+  },
+  {
     id: 'p4',
     name: 'BudgetBox Simple S4',
     category: 'Desktop-PCs',
@@ -278,6 +289,17 @@ const PRODUCTS: Product[] = [
     weight: 0.18,
     specs: { driverSize: '32mm', frequency: '20Hz-20kHz', wireless: false, warranty: '12 Monate', quality: 2 },
     description: 'Einfaches Multimedia-Headset'
+  },
+  {
+    id: 'h4',
+    name: 'SchoolLine Educational',
+    category: 'Kopfhörer',
+    price: 89.99,
+    stock: 150,
+    artNumber: 'SLE-EDU-003',
+    weight: 0.20,
+    specs: { driverSize: '36mm', frequency: '20Hz-20kHz', wireless: false, warranty: '24 Monate', quality: 3 },
+    description: 'Robuste Kopfhörer für Bildungseinrichtungen'
   },
 ];
 
@@ -463,6 +485,7 @@ export default function Verkaufsprozess() {
   const [expandedCustomerRequest, setExpandedCustomerRequest] = useState<boolean>(false);
   const [expandedTerms, setExpandedTerms] = useState<boolean>(false);
   const [productValidationError, setProductValidationError] = useState<{ productId: string } | null>(null);
+  const [warehouseFilter, setWarehouseFilter] = useState<string>('Alle');
   
   // Separate input states for free typing in offer calculation fields
   const [discountPercentInput, setDiscountPercentInput] = useState<string>('');
@@ -1046,8 +1069,24 @@ Audio-Studio`,
                     <p className="text-sm text-amber-800 mt-2">Die Kundenanfrage weist auf 2 wichtige Anforderungen hin. Lesen Sie die Email sorgfältig und wählen Sie einen geeigneten Artikel aus dem Lager.</p>
                   </div>
 
+                  <div className="mb-6 flex flex-wrap gap-2">
+                    {['Alle', 'Desktop-PCs', 'Monitore', 'Tablets', 'Kopfhörer'].map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => setWarehouseFilter(category)}
+                        className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                          warehouseFilter === category
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+
                   <div className="space-y-6">
-                    {['Desktop-PCs', 'Monitore', 'Tablets', 'Kopfhörer'].map((category) => {
+                    {(warehouseFilter === 'Alle' ? ['Desktop-PCs', 'Monitore', 'Tablets', 'Kopfhörer'] : [warehouseFilter]).map((category) => {
                       const categoryProducts = PRODUCTS.filter((p) => p.category === category && p.stock > 0);
                       if (categoryProducts.length === 0) return null;
 
