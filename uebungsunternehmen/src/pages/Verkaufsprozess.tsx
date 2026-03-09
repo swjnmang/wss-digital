@@ -408,43 +408,61 @@ const formatDate = (date: Date | string): string => {
   return `${day}.${month}.${year}`;
 };
 
-// Parse German input (e.g., 1.234,56 or 1234,56 or 1.234 or 1234.56) to number
+// Parse German input (e.g., 1.234,56 or 1234,56 or 1.234 or 1234.56 or 599.99) to number
 const parseGermanInput = (value: string): number => {
-  // Entferne Leerzeichen und € Symbol
-  let cleaned = value.replace(/[^\d,.-]/g, '').trim();
+  // Entferne € Symbol und Leerzeichen
+  let cleaned = value.replace(/[^\d,.\-]/g, '').trim();
+  
+  if (!cleaned) return 0;
   
   // Finde Position des letzten Kommas und Punkts
   const lastCommaIdx = cleaned.lastIndexOf(',');
   const lastDotIdx = cleaned.lastIndexOf('.');
   
-  // Bestimme Dezimal-Trennzeichen
-  // Deutsch: 1.234,56 (letztes Komma ist Dezimal)
-  // International: 1,234.56 (letzter Punkt ist Dezimal)
-  if (lastCommaIdx > lastDotIdx) {
-    // Deutsches Format erkannt: 1.234,56 oder 1234,56
+  // Fall 1: Deutsches Format mit beiden Trennzeichen (1.234,56)
+  if (lastCommaIdx > lastDotIdx && lastDotIdx >= 0) {
+    // Komma kommt nach Punkt → German format
     return parseFloat(cleaned.replace(/\./g, '').replace(',', '.')) || 0;
-  } else if (lastDotIdx > lastCommaIdx) {
-    // Es gibt einen Punkt nach dem Komma - mit 1-2 Dezimalstellen ist es Dezimal-Trennzeichen
+  }
+  
+  // Fall 2: Internationales Format mit beiden Trennzeichen (1,234.56)
+  if (lastDotIdx > lastCommaIdx && lastCommaIdx >= 0) {
+    // Punkt kommt nach Komma
     const afterDot = cleaned.substring(lastDotIdx + 1);
     if (afterDot.length <= 2) {
-      // Dezimal-Trennzeichen
+      // Nur 1-2 Ziffern nach Punkt → Dezimaltrennzeichen
       return parseFloat(cleaned.replace(/,/g, '')) || 0;
     } else {
-      // Tausender-Trennzeichen, entferne es
+      // Zu viele Ziffern → Tausendertrennzeichen, Komma ist Dezimal
       return parseFloat(cleaned.replace(/\./g, '').replace(',', '.')) || 0;
     }
-  } else if (lastCommaIdx >= 0 && lastDotIdx < 0) {
-    // Nur Komma vorhanden - könnte Dezimal oder Tausender sein
+  }
+  
+  // Fall 3: Nur Komma vorhanden
+  if (lastCommaIdx >= 0 && lastDotIdx < 0) {
     const afterComma = cleaned.substring(lastCommaIdx + 1);
     if (afterComma.length <= 2) {
-      // Dezimal-Trennzeichen (Deutsch)
+      // Dezimaltrennzeichen (Deutsch: 599,99)
       return parseFloat(cleaned.replace(',', '.')) || 0;
     } else {
-      // Tausender-Trennzeichen
+      // Tausendertrennzeichen: 1.000 → 1000 (entferne Komma)
       return parseFloat(cleaned.replace(',', '')) || 0;
     }
   }
   
+  // Fall 4: Nur Punkt vorhanden
+  if (lastDotIdx >= 0 && lastCommaIdx < 0) {
+    const afterDot = cleaned.substring(lastDotIdx + 1);
+    if (afterDot.length <= 2) {
+      // Dezimaltrennzeichen (International: 599.99 oder 7199.88)
+      return parseFloat(cleaned) || 0;
+    } else {
+      // Tausendertrennzeichen: 1.000 → 1000 (entferne Punkt)
+      return parseFloat(cleaned.replace(/\./g, '')) || 0;
+    }
+  }
+  
+  // Fall 5: Keine Trennzeichen → Ganze Zahl
   return parseFloat(cleaned) || 0;
 };
 
@@ -1345,7 +1363,7 @@ Audio-Studio`,
                                   }}
                                   onBlur={() => setDiscountPercentInput('')}
                                   className="w-full border-2 border-blue-400 rounded px-3 py-2 pr-8 text-right font-semibold focus:outline-none focus:border-blue-600"
-                                  placeholder="z.B. 5 oder 5,5"
+                                  placeholder="z.B. 5,5 oder 5.5"
                                 />
                                 <span className="absolute right-3 top-3 text-slate-600 font-semibold">%</span>
                               </div>
@@ -1393,7 +1411,7 @@ Audio-Studio`,
                                   }}
                                   onBlur={() => setShippingCostInput('')}
                                   className="w-full border-2 border-blue-400 rounded px-3 py-2 pr-8 text-right font-semibold focus:outline-none focus:border-blue-600"
-                                  placeholder="z.B. 20 oder 20,50"
+                                  placeholder="z.B. 20,50 oder 20.50"
                                 />
                                 <span className="absolute right-3 top-3 text-slate-600 font-semibold">€</span>
                               </div>
@@ -1417,7 +1435,7 @@ Audio-Studio`,
                                   }}
                                   onBlur={() => setTotalNettoInput('')}
                                   className="w-full border-2 border-blue-500 bg-blue-100 rounded px-3 py-2 pr-8 text-right font-bold text-blue-900 focus:outline-none focus:border-blue-700"
-                                  placeholder="z.B. 15164 oder 15164,00"
+                                  placeholder="z.B. 15164,00 oder 15164.00"
                                 />
                                 <span className="absolute right-3 top-3 text-blue-900 font-semibold">€</span>
                               </div>
@@ -1441,7 +1459,7 @@ Audio-Studio`,
                                   }}
                                   onBlur={() => setVatAmountInput('')}
                                   className="w-full border-2 border-blue-400 rounded px-3 py-2 pr-8 text-right font-semibold focus:outline-none focus:border-blue-600"
-                                  placeholder="z.B. 2880 oder 2880,76"
+                                  placeholder="z.B. 2880,76 oder 2880.76"
                                 />
                                 <span className="absolute right-3 top-3 text-slate-600 font-semibold">€</span>
                               </div>
@@ -1464,7 +1482,7 @@ Audio-Studio`,
                                   }}
                                   onBlur={() => setTotalBruttoInput('')}
                                   className="w-full border-2 border-orange-500 bg-orange-100 rounded px-3 py-2 pr-8 text-right font-bold text-orange-900 text-lg focus:outline-none focus:border-orange-700"
-                                  placeholder="z.B. 18044 oder 18044,76"
+                                  placeholder="z.B. 18044,76 oder 18044.76"
                                 />
                                 <span className="absolute right-3 top-3 text-orange-900 font-semibold">€</span>
                               </div>
