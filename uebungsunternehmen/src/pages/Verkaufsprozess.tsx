@@ -664,36 +664,42 @@ const generateShippingCosts = (): ShippingOption[] => {
 // MAIN COMPONENT
 // ============================================================================
 
+// ============================================================================
+// INITIAL WORKFLOW STATE
+// ============================================================================
+
+const INITIAL_WORKFLOW_STATE: WorkflowState = {
+  currentStep: 0,
+  quantity: 0,
+  offerNumber: 18,
+  offerDate: formatDate(new Date()),
+  orderAccepted: false,
+  orderConfirmationDate: '',
+  invoiceNumber: 18,
+  invoiceDate: formatDate(new Date()),
+  invoiceSignatureDate: '',
+  unitPrice: 0,
+  discountPercent: 0,
+  discountAmount: 0,
+  subtotal: 0,
+  shippingCost: 0,
+  totalNetto: 0,
+  vatAmount: 0,
+  totalBrutto: 0,
+  skontoAmount: 0,
+  amountAfterSkonto: 0,
+  invoiceValidated: false,
+  shippingCostInput: {},
+  shippingValidated: false,
+  shippingOrderConfirmed: false,
+  paymentReference: '',
+  paymentVerified: false,
+  goodsShipped: false,
+  offerFinalized: false,
+};
+
 export default function Verkaufsprozess() {
-  const [workflow, setWorkflow] = useState<WorkflowState>({
-    currentStep: 0,
-    quantity: 0,
-    offerNumber: 18,
-    offerDate: formatDate(new Date()),
-    orderAccepted: false,
-    orderConfirmationDate: '',
-    invoiceNumber: 18,
-    invoiceDate: formatDate(new Date()),
-    invoiceSignatureDate: '',
-    unitPrice: 0,
-    discountPercent: 0,
-    discountAmount: 0,
-    subtotal: 0,
-    shippingCost: 0,
-    totalNetto: 0,
-    vatAmount: 0,
-    totalBrutto: 0,
-    skontoAmount: 0,
-    amountAfterSkonto: 0,
-    invoiceValidated: false,
-    shippingCostInput: {},
-    shippingValidated: false,
-    shippingOrderConfirmed: false,
-    paymentReference: '',
-    paymentVerified: false,
-    goodsShipped: false,
-    offerFinalized: false,
-  });
+  const [workflow, setWorkflow] = useState<WorkflowState>(INITIAL_WORKFLOW_STATE);
 
   const [activeTab, setActiveTab] = useState<'email' | 'warehouse' | 'documents' | 'order' | 'shipping' | 'invoice' | 'banking'>('email');
   const [selectedEmailForReading, setSelectedEmailForReading] = useState<Email | null>(null);
@@ -1035,13 +1041,27 @@ Audio-Studio`,
 
   const selectEmailForOffer = (email: Email) => {
     setProductValidationError(null); // Reset any previous validation errors
-    setWorkflow((prev) => ({
-      ...prev,
+    
+    // Reset complete workflow to initial state - remove old order from cache
+    setWorkflow({
+      ...INITIAL_WORKFLOW_STATE,
       currentStep: 1,
       selectedEmail: email,
-      quantity: email.requirements.quantity?.exact || 0,
-      selectedProduct: undefined, // Reset product selection
-    }));
+      offerNumber: email.customerNumber ? parseInt(email.customerNumber) : 18,
+      invoiceNumber: email.customerNumber ? parseInt(email.customerNumber) : 18,
+    });
+    
+    // Reset all input buffer states
+    setDiscountPercentInput('');
+    setDiscountAmountInput('');
+    setShippingCostInput('');
+    setTotalNettoInput('');
+    setVatAmountInput('');
+    setTotalBruttoInput('');
+    setInvoiceSignatureDateInput('');
+    setSkontoAmountInput('');
+    setAmountAfterSkontoInput('');
+    
     setActiveTab('warehouse');
   };
 
