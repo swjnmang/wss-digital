@@ -130,6 +130,7 @@ const SHIPPING_OPTIONS: ShippingOption[] = [
 // ============================================================================
 
 const PRODUCTS: Product[] = [
+  // ========== DESKTOP-PCs ==========
   {
     id: 'p1',
     name: 'ProStation Elite X12',
@@ -140,6 +141,17 @@ const PRODUCTS: Product[] = [
     weight: 8.5,
     specs: { cpu: 'Intel Core i7-13700K', ram: '32GB DDR5', storage: '1TB NVMe SSD', gpu: 'NVIDIA RTX 4080 Super', warranty: '36 Monate', quality: 5, color: 'Grau' },
     description: 'High-Performance Desktop für professionelle Anwendungen'
+  },
+  {
+    id: 'p1b',
+    name: 'ProStation Elite X8',
+    category: 'Desktop-PCs',
+    price: 1599.99,
+    stock: 18,
+    artNumber: 'PS-ELX-002',
+    weight: 8.2,
+    specs: { cpu: 'Intel Core i7-13700K', ram: '32GB DDR5', storage: '512GB NVMe SSD', gpu: 'NVIDIA RTX 4080', warranty: '36 Monate', quality: 5, color: 'Grau' },
+    description: 'High-Performance Desktop RTX 4080'
   },
   {
     id: 'p2',
@@ -175,6 +187,17 @@ const PRODUCTS: Product[] = [
     description: 'Extreme Performance Workstation mit RTX 4090'
   },
   {
+    id: 'p3c',
+    name: 'RenderPro RTX4090 Ultra',
+    category: 'Desktop-PCs',
+    price: 2899.99,
+    stock: 5,
+    artNumber: 'RP-RTX4090U',
+    weight: 10.8,
+    specs: { cpu: 'Intel Core i9-13900K', ram: '64GB DDR5', storage: '2TB NVMe SSD', gpu: 'NVIDIA RTX 4090', warranty: '48 Monate', quality: 5, color: 'Schwarz' },
+    description: 'Professionelle Rendering-Workstation RTX 4090'
+  },
+  {
     id: 'p4',
     name: 'BudgetBox Simple S4',
     category: 'Desktop-PCs',
@@ -185,6 +208,19 @@ const PRODUCTS: Product[] = [
     specs: { cpu: 'Intel Pentium Gold G7400', ram: '8GB DDR4', storage: '256GB SSD', quality: 2, color: 'Schwarz' },
     description: 'Einstiegs-PC für Schulen und Kleine Büros'
   },
+  {
+    id: 'p4b',
+    name: 'WorkPro Standard W6',
+    category: 'Desktop-PCs',
+    price: 699.99,
+    stock: 28,
+    artNumber: 'WP-STD-006',
+    weight: 5.8,
+    specs: { cpu: 'AMD Ryzen 5 5500', ram: '8GB DDR4', storage: '512GB SSD', quality: 3, color: 'Schwarz' },
+    description: 'Kostengünstiger Office-PC mit Ryzen 5'
+  },
+  
+  // ========== MONITORE ==========
   {
     id: 'm1',
     name: 'CinaryView Pro 32',
@@ -208,6 +244,17 @@ const PRODUCTS: Product[] = [
     description: 'Gaming Monitor mit hoher Bildwiederholrate'
   },
   {
+    id: 'm2b',
+    name: 'ProDisplay 27 QHD',
+    category: 'Monitore',
+    price: 449.99,
+    stock: 38,
+    artNumber: 'PD-27-QHD',
+    weight: 8.0,
+    specs: { diagonal: '27"', resolution: 'QHD (2560x1440)', refreshRate: '75Hz', panelType: 'IPS', warranty: '36 Monate', quality: 4 },
+    description: 'Professioneller 27" QHD Monitor mit IPS-Panel'
+  },
+  {
     id: 'm3',
     name: 'OfficeCore 24 FHD',
     category: 'Monitore',
@@ -217,6 +264,28 @@ const PRODUCTS: Product[] = [
     weight: 6.0,
     specs: { diagonal: '24"', resolution: 'Full HD (1920x1080)', refreshRate: '60Hz', panelType: 'TN', warranty: '24 Monate', quality: 3 },
     description: 'Standard Office-Monitor für alltägliche Aufgaben'
+  },
+  {
+    id: 'm3b',
+    name: 'EduDisplay 24 FHD',
+    category: 'Monitore',
+    price: 229.99,
+    stock: 95,
+    artNumber: 'ED-24-FHD',
+    weight: 5.9,
+    specs: { diagonal: '24"', resolution: 'Full HD (1920x1080)', refreshRate: '60Hz', panelType: 'TN', warranty: '24 Monate', quality: 3 },
+    description: 'Schulgeeigneter 24" FHD Monitor'
+  },
+  {
+    id: 'm3c',
+    name: 'BudgetView 27 FHD',
+    category: 'Monitore',
+    price: 299.99,
+    stock: 67,
+    artNumber: 'BV-27-FHD',
+    weight: 7.2,
+    specs: { diagonal: '27"', resolution: 'Full HD (1920x1080)', refreshRate: '60Hz', panelType: 'VA', warranty: '24 Monate', quality: 3 },
+    description: 'Budget-freundlicher 27" FHD Monitor'
   },
   {
     id: 'm4',
@@ -230,6 +299,19 @@ const PRODUCTS: Product[] = [
     description: 'Ultra-Wide Curved Monitor für Profis'
   },
   {
+    id: 'm5',
+    name: 'ProDisplay 27 Premium',
+    category: 'Monitore',
+    price: 749.99,
+    stock: 22,
+    artNumber: 'PD-27-PREM',
+    weight: 8.5,
+    specs: { diagonal: '27"', resolution: 'QHD (2560x1440)', refreshRate: '100Hz', panelType: 'IPS', warranty: '36 Monate', quality: 5 },
+    description: 'Premium 27" QHD Monitor mit 100Hz'
+  },
+  
+  // ========== TABLETS ==========
+  {
     id: 't1',
     name: 'TabMax Air Pro 12',
     category: 'Tablets',
@@ -239,6 +321,28 @@ const PRODUCTS: Product[] = [
     weight: 0.6,
     specs: { screen: '12.9"', processor: 'Apple M2', storage: '512GB', warranty: '24 Monate', quality: 5 },
     description: 'Premium Tablet für kreative Profis'
+  },
+  {
+    id: 't1b',
+    name: 'TabMax Air Plus 12.9',
+    category: 'Tablets',
+    price: 899.99,
+    stock: 22,
+    artNumber: 'TMA-PLUS-129',
+    weight: 0.58,
+    specs: { screen: '12.9"', processor: 'Apple M1', storage: '256GB', warranty: '24 Monate', quality: 5 },
+    description: 'Premium 12.9" Tablet mit M1 Chip'
+  },
+  {
+    id: 't1c',
+    name: 'ProTab Creative 12.9',
+    category: 'Tablets',
+    price: 799.99,
+    stock: 32,
+    artNumber: 'PT-CREA-129',
+    weight: 0.62,
+    specs: { screen: '12.9"', processor: 'Qualcomm Snapdragon 8 Gen 2', storage: '256GB', warranty: '24 Monate', quality: 4 },
+    description: 'Professionelles 12.9" Android-Tablet'
   },
   {
     id: 't2',
@@ -252,6 +356,28 @@ const PRODUCTS: Product[] = [
     description: 'Universal-Tablet für Schulen und Unterricht'
   },
   {
+    id: 't2b',
+    name: 'TabView Standard 10.1',
+    category: 'Tablets',
+    price: 379.99,
+    stock: 58,
+    artNumber: 'TV-STD-101',
+    weight: 0.46,
+    specs: { screen: '10.1"', processor: 'Qualcomm Snapdragon 680', storage: '128GB', warranty: '12 Monate', quality: 3 },
+    description: 'Schulgeeignetes 10.1" Standard-Tablet'
+  },
+  {
+    id: 't2c',
+    name: 'TradeTab Pro 10',
+    category: 'Tablets',
+    price: 549.99,
+    stock: 44,
+    artNumber: 'TT-PRO-10',
+    weight: 0.50,
+    specs: { screen: '10.1"', processor: 'Qualcomm Snapdragon 888', storage: '256GB', warranty: '24 Monate', quality: 4 },
+    description: 'Robustes Tablet mit großem Speicher für Unterricht'
+  },
+  {
     id: 't3',
     name: 'CompactView Go 8',
     category: 'Tablets',
@@ -262,6 +388,8 @@ const PRODUCTS: Product[] = [
     specs: { screen: '8"', processor: 'MediaTek Helio G99', storage: '64GB', warranty: '12 Monate', quality: 2 },
     description: 'Portables Tablet für unterwegs'
   },
+  
+  // ========== KOPFHÖRER ==========
   {
     id: 'h1',
     name: 'SoundPro Studio Elite',
@@ -274,6 +402,17 @@ const PRODUCTS: Product[] = [
     description: 'Studio-Kopfhörer für Audio-Profis'
   },
   {
+    id: 'h1b',
+    name: 'AudioMax Wireless Pro',
+    category: 'Kopfhörer',
+    price: 399.99,
+    stock: 29,
+    artNumber: 'AMP-WIR-PRO',
+    weight: 0.27,
+    specs: { driverSize: '45mm', frequency: '20Hz-20kHz', wireless: true, warranty: '24 Monate', quality: 5 },
+    description: 'Kabellose Premium-Kopfhörer mit Noise Canceling'
+  },
+  {
     id: 'h2',
     name: 'ClearComm Pro Gaming',
     category: 'Kopfhörer',
@@ -283,6 +422,17 @@ const PRODUCTS: Product[] = [
     weight: 0.22,
     specs: { driverSize: '40mm', frequency: '20Hz-20kHz', wireless: true, warranty: '12 Monate', quality: 4 },
     description: 'Gaming Wireless Headset mit guter Qualität'
+  },
+  {
+    id: 'h2b',
+    name: 'AudioPro Wireless Premium',
+    category: 'Kopfhörer',
+    price: 319.99,
+    stock: 41,
+    artNumber: 'AP-WIR-PREM',
+    weight: 0.25,
+    specs: { driverSize: '42mm', frequency: '20Hz-20kHz', wireless: true, warranty: '24 Monate', quality: 4 },
+    description: 'Hochwertige kabellose Kopfhörer für Profis'
   },
   {
     id: 'h3',
@@ -305,6 +455,17 @@ const PRODUCTS: Product[] = [
     weight: 0.20,
     specs: { driverSize: '36mm', frequency: '20Hz-20kHz', wireless: false, warranty: '24 Monate', quality: 3 },
     description: 'Robuste Kopfhörer für Bildungseinrichtungen'
+  },
+  {
+    id: 'h4b',
+    name: 'EduComm Robust School',
+    category: 'Kopfhörer',
+    price: 69.99,
+    stock: 200,
+    artNumber: 'ECR-SCHOOL',
+    weight: 0.19,
+    specs: { driverSize: '34mm', frequency: '20Hz-20kHz', wireless: false, warranty: '24 Monate', quality: 3 },
+    description: 'Robuste Schulkopfhörer - Massenbestand'
   },
 ];
 
