@@ -906,9 +906,23 @@ Audio-Studio`,
       ...prev,
       selectedProduct: product,
       unitPrice: product.price,
-      quantity: selectedEmail.requirements.quantity?.exact || 0,
+      quantity: 0, // Schüler muss selbst eingeben
+      subtotal: 0,
+      discountPercent: 0,
+      discountAmount: 0,
+      shippingCost: 0,
+      totalNetto: 0,
+      vatAmount: 0,
+      totalBrutto: 0,
       currentStep: 2,
     }));
+    // Reset input buffer states
+    setDiscountPercentInput('');
+    setDiscountAmountInput('');
+    setShippingCostInput('');
+    setTotalNettoInput('');
+    setVatAmountInput('');
+    setTotalBruttoInput('');
     setActiveTab('documents');
   };
 
