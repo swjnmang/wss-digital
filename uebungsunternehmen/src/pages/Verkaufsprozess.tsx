@@ -1557,6 +1557,14 @@ Audio-Studio`,
                       {/* Discount Check */}
                       {(() => {
                         const automaticDiscount = calculateAutomaticDiscount(workflow.subtotal);
+                        if (workflow.subtotal > 0 && workflow.discountPercent > automaticDiscount) {
+                          return (
+                            <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded text-sm text-red-800">
+                              <p className="font-semibold">❌ Rabatt nicht erlaubt!</p>
+                              <p>Basierend auf Ihrer Summe von € {workflow.subtotal.toFixed(2)} ist ein Rabatt von maximal <strong>{automaticDiscount}%</strong> erlaubt. Sie haben jedoch <strong>{workflow.discountPercent}%</strong> eingegeben!</p>
+                            </div>
+                          );
+                        }
                         if (workflow.subtotal > 0 && workflow.discountPercent < automaticDiscount) {
                           return (
                             <div className="p-4 bg-amber-50 border-l-4 border-amber-500 rounded text-sm text-amber-800">
@@ -1617,7 +1625,7 @@ Audio-Studio`,
                         const expectedBrutto = round2(expectedNetto + expectedVat);
                         
                         const automaticDiscount = calculateAutomaticDiscount(workflow.subtotal);
-                        const discountOk = workflow.discountPercent >= automaticDiscount;
+                        const discountOk = workflow.discountPercent <= automaticDiscount;
                         
                         const allCorrect =
                           workflow.quantity === workflow.selectedEmail.requirements.quantity?.exact &&
