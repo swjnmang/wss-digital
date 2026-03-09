@@ -80,6 +80,7 @@ interface WorkflowState {
   orderConfirmationDate: string;
   invoiceNumber: number;
   invoiceDate: string;
+  invoiceSignatureDate: string;
   unitPrice: number;
   discountPercent: number;
   discountAmount: number;
@@ -88,6 +89,9 @@ interface WorkflowState {
   totalNetto: number;
   vatAmount: number;
   totalBrutto: number;
+  skontoAmount: number;
+  amountAfterSkonto: number;
+  invoiceValidated: boolean;
   selectedShipping?: ShippingOption;
   shippingCostInput: Record<string, number>;
   shippingValidated: boolean;
@@ -509,6 +513,7 @@ export default function Verkaufsprozess() {
     orderConfirmationDate: '',
     invoiceNumber: 18,
     invoiceDate: formatDate(new Date()),
+    invoiceSignatureDate: '',
     unitPrice: 0,
     discountPercent: 0,
     discountAmount: 0,
@@ -517,6 +522,9 @@ export default function Verkaufsprozess() {
     totalNetto: 0,
     vatAmount: 0,
     totalBrutto: 0,
+    skontoAmount: 0,
+    amountAfterSkonto: 0,
+    invoiceValidated: false,
     shippingCostInput: {},
     shippingValidated: false,
     shippingOrderConfirmed: false,
@@ -526,7 +534,7 @@ export default function Verkaufsprozess() {
     offerFinalized: false,
   });
 
-  const [activeTab, setActiveTab] = useState<'email' | 'warehouse' | 'documents' | 'order' | 'shipping' | 'banking'>('email');
+  const [activeTab, setActiveTab] = useState<'email' | 'warehouse' | 'documents' | 'order' | 'shipping' | 'invoice' | 'banking'>('email');
   const [selectedEmailForReading, setSelectedEmailForReading] = useState<Email | null>(null);
   const [emails, setEmails] = useState<Email[]>(EMAILS);
   const [expandedCustomerRequest, setExpandedCustomerRequest] = useState<boolean>(false);
@@ -542,6 +550,11 @@ export default function Verkaufsprozess() {
   const [vatAmountInput, setVatAmountInput] = useState<string>('');
   const [totalBruttoInput, setTotalBruttoInput] = useState<string>('');
   const [shippingValidationError, setShippingValidationError] = useState<string>('');
+
+  // Separate input states for invoice fields
+  const [invoiceSignatureDateInput, setInvoiceSignatureDateInput] = useState<string>('');
+  const [skontoAmountInput, setSkontoAmountInput] = useState<string>('');
+  const [amountAfterSkontoInput, setAmountAfterSkontoInput] = useState<string>('');
 
   // Load state from localStorage on mount and save changes
   useEffect(() => {
@@ -913,21 +926,12 @@ Audio-Studio`,
     setActiveTab('shipping');
   };
 
-  const generatePaymentReference = () => {
-    const reference = `RG${workflow.invoiceNumber.toString().padStart(6, '0')}`;
-    setWorkflow((prev) => ({
-      ...prev,
-      paymentReference: reference,
-      currentStep: 8,
-    }));
-    setActiveTab('banking');
-  };
 
   const verifyPayment = () => {
     setWorkflow((prev) => ({
       ...prev,
       paymentVerified: true,
-      currentStep: 9,
+      currentStep: 8,
       goodsShipped: true,
     }));
   };
@@ -1036,6 +1040,9 @@ Audio-Studio`,
             </button>
             <button onClick={() => setActiveTab('shipping')} className={`py-3 px-4 rounded-lg font-semibold whitespace-nowrap transition-all ${activeTab === 'shipping' ? 'bg-blue-500 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
               🚚 Versand
+            </button>
+            <button onClick={() => setActiveTab('invoice')} className={`py-3 px-4 rounded-lg font-semibold whitespace-nowrap transition-all ${activeTab === 'invoice' ? 'bg-blue-500 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+              📄 Rechnung
             </button>
             <button onClick={() => setActiveTab('banking')} className={`py-3 px-4 rounded-lg font-semibold whitespace-nowrap transition-all ${activeTab === 'banking' ? 'bg-blue-500 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
               💰 Banking
@@ -1972,7 +1979,7 @@ Audio-Studio`,
                                         selectedShipping: option,
                                         shippingCost: correctCost,
                                         shippingValidated: true,
-                                        currentStep: 7,
+                                        currentStep: 5,
                                       }));
                                     }}
                                     className="w-full mt-3 py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
@@ -1997,10 +2004,10 @@ Audio-Studio`,
                         <p className="text-slate-600 mb-6">Versandkosten: <strong className="text-xl text-green-600">€ {workflow.shippingCost.toFixed(2)}</strong></p>
                         <p className="text-sm text-slate-600 mb-6">Lieferdauer: {workflow.selectedShipping?.deliveryDays} Tage</p>
                         <button
-                          onClick={generatePaymentReference}
+                          onClick={() => setActiveTab('invoice')}
                           className="w-full py-3 px-6 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
                         >
-                          → Banking-Modul
+                          → Rechnung erstellen
                         </button>
                       </div>
                     )}
@@ -2015,6 +2022,250 @@ Audio-Studio`,
                 </div>
               ) : (
                 <p className="text-slate-500">Wählen Sie zuerst eine Email und ein Produkt aus.</p>
+              )}
+            </div>
+          )}
+
+          {/* INVOICE TAB */}
+          {activeTab === 'invoice' && (
+            <div className="bg-white rounded-xl shadow-lg p-8 border border-slate-200">
+              <h2 className="text-2xl font-bold mb-6 text-slate-800">📄 Rechnung erstellen</h2>
+
+              {workflow.selectedProduct && workflow.selectedEmail && workflow.shippingValidated ? (
+                <div className="space-y-6">
+                  {/* INVOICE PREVIEW */}
+                  <div className="border-2 border-slate-300 rounded-lg p-8 bg-slate-50">
+                    <h3 className="text-lg font-bold mb-6 text-slate-800">📋 Rechnung für Kunden</h3>
+
+                    <div className="grid grid-cols-2 gap-8 mb-8">
+                      {/* LEFT SIDE - SENDER */}
+                      <div className="text-sm text-slate-700">
+                        <p className="font-bold text-slate-900 mb-2">DeltaBase Online GmbH</p>
+                        <p className="text-xs">Meindlstr. 8a</p>
+                        <p className="text-xs">81373 München</p>
+                      </div>
+
+                      {/* RIGHT SIDE - INVOICE INFO */}
+                      <div className="text-sm text-slate-700 text-right">
+                        <div className="grid grid-cols-2 gap-4 text-xs">
+                          <div className="text-left"><strong>Auftrags-Nr.:</strong></div>
+                          <div className="text-right">{workflow.offerNumber}</div>
+                          <div className="text-left"><strong>Rechnungs-Nr.:</strong></div>
+                          <div className="text-right">{workflow.invoiceNumber}</div>
+                          <div className="text-left"><strong>Kunden-Nr.:</strong></div>
+                          <div className="text-right">{workflow.selectedEmail.customerNumber}</div>
+                          <div className="text-left"><strong>Ihr Zeichen:</strong></div>
+                          <div className="text-right">
+                            <input
+                              type="date"
+                              value={invoiceSignatureDateInput}
+                              onChange={(e) => setInvoiceSignatureDateInput(e.target.value)}
+                              className="border-2 border-red-400 rounded px-2 py-1 text-right font-semibold text-sm"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-b-2 border-slate-300 mb-6"></div>
+
+                    {/* CUSTOMER INFO */}
+                    <div className="mb-6">
+                      <p className="font-bold text-slate-900 mb-2">{workflow.selectedEmail.from}</p>
+                      <p className="text-sm text-slate-700">{workflow.selectedEmail.fromAddress}</p>
+                    </div>
+
+                    {/* INVOICE TITLE */}
+                    <h4 className="text-xl font-bold text-slate-900 mb-6">Rechnung Nr. {workflow.invoiceNumber}</h4>
+
+                    {/* INVOICE TABLE */}
+                    <div className="mb-6">
+                      <table className="w-full text-sm mb-4">
+                        <thead>
+                          <tr className="border-b-2 border-slate-400">
+                            <th className="text-left py-2 px-2">Artikel</th>
+                            <th className="text-center py-2 px-2">Art.-Nr.</th>
+                            <th className="text-center py-2 px-2">Menge</th>
+                            <th className="text-right py-2 px-2">Preis</th>
+                            <th className="text-right py-2 px-2">Summe</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b border-slate-200">
+                            <td className="py-2 px-2">{workflow.selectedProduct.name}</td>
+                            <td className="text-center py-2 px-2 text-xs">{workflow.selectedProduct.artNumber}</td>
+                            <td className="text-center py-2 px-2">{workflow.quantity}</td>
+                            <td className="text-right py-2 px-2">€ {workflow.unitPrice.toFixed(2)}</td>
+                            <td className="text-right py-2 px-2 font-semibold">€ {workflow.subtotal.toFixed(2)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* CALCULATIONS */}
+                    <div className="space-y-2 text-sm mb-8">
+                      <div className="flex justify-between">
+                        <span>Summe der Einzelposten:</span>
+                        <span className="font-semibold">€ {workflow.subtotal.toFixed(2)}</span>
+                      </div>
+                      {workflow.discountAmount > 0 && (
+                        <div className="flex justify-between">
+                          <span>Rabatt ({workflow.discountPercent}%):</span>
+                          <span className="font-semibold">-€ {workflow.discountAmount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span>Versandkosten (inkl. Verpackung):</span>
+                        <span className="font-semibold">€ {workflow.shippingCost.toFixed(2)}</span>
+                      </div>
+                      <div className="border-t border-slate-300 pt-2 flex justify-between font-bold">
+                        <span>Gesamtpreis netto:</span>
+                        <span>€ {workflow.totalNetto.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>{LIEFERBEDINGNISSE.vatRate}% Umsatzsteuer:</span>
+                        <span className="font-semibold">€ {workflow.vatAmount.toFixed(2)}</span>
+                      </div>
+                      <div className="border-t-2 border-slate-400 pt-2 flex justify-between font-bold text-lg bg-orange-50 p-3 rounded">
+                        <span>Rechnungsbetrag brutto:</span>
+                        <span className="text-orange-600">€ {workflow.totalBrutto.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    {/* SKONTO SECTION */}
+                    <div className="bg-blue-50 border-2 border-blue-300 rounded p-4 mb-8">
+                      <p className="font-bold text-slate-900 mb-4">💙 Skonto-Bedingungen</p>
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between">
+                          <span>Skonto: {LIEFERBEDINGNISSE.skonto}% bei Zahlung innerhalb von {LIEFERBEDINGNISSE.skontoTage} Tagen</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span>Skontobetrag (€):</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={skontoAmountInput}
+                            onChange={(e) => setSkontoAmountInput(e.target.value)}
+                            placeholder="z.B. 119,88"
+                            className="border-2 border-red-400 rounded px-3 py-2 font-semibold text-right w-32"
+                          />
+                        </div>
+                        <div className="flex justify-between items-center font-bold">
+                          <span>Überweisungsbetrag unter Abzug von Skonto (€):</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={amountAfterSkontoInput}
+                            onChange={(e) => setAmountAfterSkontoInput(e.target.value)}
+                            placeholder="z.B. 5.948,82"
+                            className="border-2 border-red-400 rounded px-3 py-2 font-semibold text-right w-32"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* VALIDATION CHECKS */}
+                    {(() => {
+                      const expectedSkonto = round2(workflow.totalNetto * (LIEFERBEDINGNISSE.skonto / 100));
+                      const expectedAmountAfterSkonto = round2(workflow.totalNetto - expectedSkonto);
+                      const userSkonto = parseGermanInput(skontoAmountInput);
+                      const userAmountAfterSkonto = parseGermanInput(amountAfterSkontoInput);
+                      const userDate = invoiceSignatureDateInput;
+
+                      const skontoOk = Math.abs(userSkonto - expectedSkonto) < 0.01;
+                      const amountOk = Math.abs(userAmountAfterSkonto - expectedAmountAfterSkonto) < 0.01;
+                      const dateOk = userDate.length > 0;
+
+                      if (!skontoOk || !amountOk || !dateOk) {
+                        return (
+                          <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded text-sm text-red-800 mb-6">
+                            <p className="font-semibold">❌ Berechnungsfehler!</p>
+                            {!dateOk && <p>❌ "Ihr Zeichen" (Datum) ist erforderlich!</p>}
+                            {!skontoOk && <p>❌ Skontobetrag ist falsch! Erwartet: € {expectedSkonto.toFixed(2)}</p>}
+                            {!amountOk && <p>❌ Überweisungsbetrag ist falsch! Erwartet: € {expectedAmountAfterSkonto.toFixed(2)}</p>}
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="p-4 bg-green-50 border-l-4 border-green-500 rounded text-sm text-green-800 mb-6">
+                          <p className="font-semibold">✓ Alle Rechnungsangaben korrekt!</p>
+                        </div>
+                      );
+                    })()}
+
+                    {/* ACTION BUTTONS */}
+                    {(() => {
+                      const expectedSkonto = round2(workflow.totalNetto * (LIEFERBEDINGNISSE.skonto / 100));
+                      const expectedAmountAfterSkonto = round2(workflow.totalNetto - expectedSkonto);
+                      const userSkonto = parseGermanInput(skontoAmountInput);
+                      const userAmountAfterSkonto = parseGermanInput(amountAfterSkontoInput);
+                      const userDate = invoiceSignatureDateInput;
+
+                      const allCorrect = Math.abs(userSkonto - expectedSkonto) < 0.01 &&
+                        Math.abs(userAmountAfterSkonto - expectedAmountAfterSkonto) < 0.01 &&
+                        userDate.length > 0;
+
+                      return (
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => {
+                              const reference = `RG${workflow.invoiceNumber.toString().padStart(6, '0')}`;
+                              setWorkflow((prev) => ({
+                                ...prev,
+                                invoiceSignatureDate: invoiceSignatureDateInput,
+                                skontoAmount: userSkonto,
+                                amountAfterSkonto: userAmountAfterSkonto,
+                                invoiceValidated: true,
+                                paymentReference: reference,
+                                currentStep: 6,
+                              }));
+                              setActiveTab('banking');
+                            }}
+                            disabled={!allCorrect}
+                            className={`flex-1 py-3 px-6 font-bold rounded-lg transition-colors ${
+                              allCorrect
+                                ? 'bg-green-500 text-white hover:bg-green-600'
+                                : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                            }`}
+                          >
+                            ✓ Rechnung korrekt - Weiter zum Banking
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('shipping')}
+                            className="flex-1 py-3 px-6 bg-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-400 transition-colors"
+                          >
+                            ← Zurück zum Versand
+                          </button>
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  {/* SIGNATURE */}
+                  <div className="mb-6 p-6 bg-white border-t-4 border-slate-300 text-sm text-slate-700">
+                    <p className="mb-6">Freundlichen Grüßen</p>
+                    <div className="flex justify-between gap-12">
+                      <div>
+                        <div className="border-t border-slate-400 pt-2 text-center" style={{width: '150px'}}>
+                          <p className="text-xs font-semibold">DeltaBase Online GmbH</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* HINT */}
+                  <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded text-sm text-slate-700">
+                    <p className="font-semibold mb-2">💡 Deine Aufgabe:</p>
+                    <p>1. Gib ein Datum bei "Ihr Zeichen" ein (z.B. heute Datum)</p>
+                    <p>2. Berechne den Skontobetrag: Netto-Betrag × 2%</p>
+                    <p>3. Berechne den Überweisungsbetrag: Netto-Betrag - Skontobetrag</p>
+                    <p>4. Trage beide Werte in die entsprechenden Felder ein</p>
+                    <p>5. Wenn alles korrekt ist, kannst du weitermachen</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-slate-500">Bitte wählen Sie zuerst eine Email und ein Produkt aus und wählen Sie ein Versandunternehmen.</p>
               )}
             </div>
           )}
@@ -2112,8 +2363,8 @@ Audio-Studio`,
               <StepBadge step={2} title="Angebot erstellen" completed={workflow.currentStep > 2} />
               <StepBadge step={3} title="Angebot absenden" completed={workflow.currentStep > 3} />
               <StepBadge step={4} title="Auftrag annehmen" completed={workflow.currentStep > 4} />
-              <StepBadge step={5} title="Rechnung generieren" completed={workflow.currentStep > 5} />
-              <StepBadge step={6} title="Versand wählen" completed={workflow.currentStep > 6} />
+              <StepBadge step={5} title="Versand wählen" completed={workflow.currentStep > 5} />
+              <StepBadge step={6} title="Rechnung generieren" completed={workflow.currentStep > 6} />
               <StepBadge step={7} title="Zahlungsref" completed={workflow.currentStep > 7} />
               <StepBadge step={8} title="Zahlung prüfen" completed={workflow.currentStep > 8} />
               <StepBadge step={9} title="Abschließen" completed={workflow.currentStep > 9} />
