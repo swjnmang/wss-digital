@@ -716,7 +716,7 @@ export default function Verkaufsprozess() {
   const [totalNettoInput, setTotalNettoInput] = useState<string>('');
   const [vatAmountInput, setVatAmountInput] = useState<string>('');
   const [totalBruttoInput, setTotalBruttoInput] = useState<string>('');
-  const [shippingValidationError, setShippingValidationError] = useState<string>('');
+  const [wrongShippingId, setWrongShippingId] = useState<string | null>(null);
 
   // Separate input states for invoice fields
   const [invoiceSignatureDateInput, setInvoiceSignatureDateInput] = useState<string>('');
@@ -1061,6 +1061,7 @@ Audio-Studio`,
     setInvoiceSignatureDateInput('');
     setSkontoAmountInput('');
     setAmountAfterSkontoInput('');
+    setWrongShippingId(null);
     
     setActiveTab('warehouse');
   };
@@ -2098,12 +2099,6 @@ Audio-Studio`,
                       <p className="text-sm text-slate-700">4. Das System prüft deine Berechnung!</p>
                     </div>
 
-                    {shippingValidationError && (
-                      <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
-                        <p className="font-semibold text-red-800">{shippingValidationError}</p>
-                      </div>
-                    )}
-
                     <div className="mb-8 p-4 bg-amber-50 border border-amber-300 rounded text-sm">
                       <p className="font-semibold text-amber-900 mb-2">📊 Bestellungsgewicht:</p>
                       <p className="text-amber-900">
@@ -2158,29 +2153,42 @@ Audio-Studio`,
                                 </div>
 
                                 {isCorrect && (
-                                  <button
-                                    onClick={() => {
+                                  <>
+                                    <button
+                                      onClick={() => {
+                                        const totalWeight = workflow.quantity * (workflow.selectedProduct?.weight || 0);
+                                        const cheapest = getCheapestShippingOption(totalWeight, workflow.generatedShippingOptions);
+                                        
+                                        if (!cheapest || cheapest.id !== option.id) {
+                                          setWrongShippingId(option.id);
+                                          return;
+                                        }
+                                        
+                                        setWrongShippingId(null);
+                                        setWorkflow((prev) => ({
+                                          ...prev,
+                                          selectedShipping: option,
+                                          shippingCost: correctCost,
+                                          shippingValidated: true,
+                                          currentStep: 5,
+                                        }));
+                                      }}
+                                      className="w-full mt-3 py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
+                                    >
+                                      ✓ Dieses Unternehmen wählen
+                                    </button>
+                                    
+                                    {wrongShippingId === option.id && (() => {
                                       const totalWeight = workflow.quantity * (workflow.selectedProduct?.weight || 0);
                                       const cheapest = getCheapestShippingOption(totalWeight, workflow.generatedShippingOptions);
-                                      
-                                      if (!cheapest || cheapest.id !== option.id) {
-                                        setShippingValidationError(`❌ Das ist nicht das günstigste Unternehmen! Wähle: ${cheapest?.name} (€ ${(cheapest?.fixCost! + (totalWeight * cheapest?.costPerKg!)).toFixed(2)})`);
-                                        return;
-                                      }
-                                      
-                                      setShippingValidationError('');
-                                      setWorkflow((prev) => ({
-                                        ...prev,
-                                        selectedShipping: option,
-                                        shippingCost: correctCost,
-                                        shippingValidated: true,
-                                        currentStep: 5,
-                                      }));
-                                    }}
-                                    className="w-full mt-3 py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
-                                  >
-                                    ✓ Dieses Unternehmen wählen
-                                  </button>
+                                      return (
+                                        <div className="mt-3 p-3 bg-red-50 border-l-4 border-red-500 rounded text-sm text-red-800">
+                                          <p className="font-semibold">❌ Das ist nicht das günstigste Unternehmen!</p>
+                                          <p className="mt-1">Wähle stattdessen: <strong>{cheapest?.name}</strong> (€ {(cheapest?.fixCost! + (totalWeight * cheapest?.costPerKg!)).toFixed(2)})</p>
+                                        </div>
+                                      );
+                                    })()}
+                                  </>
                                 )}
                               </div>
                             );
