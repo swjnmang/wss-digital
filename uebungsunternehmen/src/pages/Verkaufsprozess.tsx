@@ -57,6 +57,7 @@ interface Email {
   customerNumber: string;
   date: string;
   read: boolean;
+  category: string;
 }
 
 interface ShippingOption {
@@ -291,6 +292,7 @@ const EMAILS: Email[] = [
     customerNumber: '2401',
     date: '06.03.2026',
     read: false,
+    category: 'Desktop-PCs',
   },
   {
     id: 'e2',
@@ -302,6 +304,7 @@ const EMAILS: Email[] = [
     customerNumber: '2402',
     date: '05.03.2026',
     read: false,
+    category: 'Monitore',
   },
 ];
 
@@ -734,6 +737,7 @@ Audio-Studio`,
         customerNumber: `${2400 + idx + 1}`,
         date: dateStr,
         read: false,
+        category: template.category,
       });
     });
 
@@ -955,8 +959,9 @@ Audio-Studio`,
                 <div className="border border-slate-300 rounded-lg overflow-hidden">
                   {/* Header Row */}
                   <div className="grid grid-cols-12 gap-4 bg-slate-100 border-b border-slate-300 p-4 font-semibold text-sm text-slate-700">
-                    <div className="col-span-4">Von</div>
-                    <div className="col-span-6">Betreff</div>
+                    <div className="col-span-3">Von</div>
+                    <div className="col-span-4">Betreff</div>
+                    <div className="col-span-2">Kategorie</div>
                     <div className="col-span-2">Datum</div>
                   </div>
 
@@ -968,12 +973,15 @@ Audio-Studio`,
                         onClick={() => setSelectedEmailForReading(email)}
                         className="grid grid-cols-12 gap-4 p-4 hover:bg-blue-50 transition-colors text-sm cursor-pointer"
                       >
-                        <div className="col-span-4">
+                        <div className="col-span-3">
                           <p className="font-semibold text-slate-800">{email.from}</p>
                           <p className="text-slate-500 text-xs">{email.fromAddress}</p>
                         </div>
-                        <div className="col-span-6">
+                        <div className="col-span-4">
                           <p className="text-slate-800 line-clamp-1 font-medium">{email.subject}</p>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">{email.category}</span>
                         </div>
                         <div className="col-span-2 text-right">
                           <span className="text-slate-600">{email.date}</span>
@@ -999,12 +1007,13 @@ Audio-Studio`,
                       className="w-full p-4 flex items-center justify-between hover:bg-blue-100 transition-colors"
                     >
                       <div className="text-left">
-                        <p className="font-semibold text-slate-800">Kundenanfrage: {workflow.selectedEmail.requirements.quantity?.exact} Stück</p>
+                        <p className="font-semibold text-slate-800">Kundenanfrage: {workflow.selectedEmail.requirements.quantity?.exact} Stück <span className="text-blue-600 font-bold">– {workflow.selectedEmail.category}</span></p>
                       </div>
                       <span className={`text-2xl transition-transform ${expandedCustomerRequest ? 'rotate-180' : ''}`}>▼</span>
                     </button>
                     {expandedCustomerRequest && (
                       <div className="p-4 border-t border-blue-200 bg-blue-50">
+                        <p className="text-sm text-slate-700 mb-3"><strong>Produktkategorie:</strong> <span className="text-blue-600 font-semibold">{workflow.selectedEmail.category}</span></p>
                         <p className="text-sm text-slate-700 mb-3"><strong>Kundenname:</strong> {workflow.selectedEmail.from}</p>
                         <p className="text-sm text-slate-700 mb-3"><strong>Email:</strong> {workflow.selectedEmail.fromAddress}</p>
                         <p className="text-sm text-slate-700 mb-4"><strong>Datum:</strong> {workflow.selectedEmail.date}</p>
