@@ -454,6 +454,14 @@ export default function Verkaufsprozess() {
   const [expandedCustomerRequest, setExpandedCustomerRequest] = useState<boolean>(false);
   const [expandedTerms, setExpandedTerms] = useState<boolean>(false);
   const [productValidationError, setProductValidationError] = useState<{ productId: string } | null>(null);
+  
+  // Separate input states for free typing in offer calculation fields
+  const [discountPercentInput, setDiscountPercentInput] = useState<string>('');
+  const [discountAmountInput, setDiscountAmountInput] = useState<string>('');
+  const [shippingCostInput, setShippingCostInput] = useState<string>('');
+  const [totalNettoInput, setTotalNettoInput] = useState<string>('');
+  const [vatAmountInput, setVatAmountInput] = useState<string>('');
+  const [totalBruttoInput, setTotalBruttoInput] = useState<string>('');
 
   // Generate random customer emails with detailed, specific requests
   const generateEmails = () => {
@@ -1284,11 +1292,14 @@ Audio-Studio`,
                               <div className="relative">
                                 <input
                                   type="text"
-                                  value={workflow.discountPercent.toString()}
+                                  value={discountPercentInput || workflow.discountPercent.toString()}
                                   onChange={(e) => {
-                                    const numValue = parseGermanInput(e.target.value);
+                                    const value = e.target.value;
+                                    setDiscountPercentInput(value);
+                                    const numValue = parseGermanInput(value);
                                     setWorkflow((prev) => ({ ...prev, discountPercent: Math.min(Math.max(numValue, 0), 100) }));
                                   }}
+                                  onBlur={() => setDiscountPercentInput('')}
                                   className="w-full border-2 border-blue-400 rounded px-3 py-2 pr-8 text-right font-semibold focus:outline-none focus:border-blue-600"
                                   placeholder="z.B. 5 oder 5,5"
                                 />
@@ -1302,14 +1313,17 @@ Audio-Studio`,
                               <div className="relative">
                                 <input
                                   type="text"
-                                  value={workflow.discountAmount.toString()}
+                                  value={discountAmountInput || workflow.discountAmount.toString()}
                                   onChange={(e) => {
-                                    const discAmount = parseGermanInput(e.target.value);
+                                    const value = e.target.value;
+                                    setDiscountAmountInput(value);
+                                    const discAmount = parseGermanInput(value);
                                     setWorkflow((prev) => ({
                                       ...prev,
                                       discountAmount: Math.max(discAmount, 0),
                                     }));
                                   }}
+                                  onBlur={() => setDiscountAmountInput('')}
                                   className="w-full border-2 border-blue-400 rounded px-3 py-2 pr-8 text-right font-semibold focus:outline-none focus:border-blue-600"
                                   placeholder="z.B. 758,50 oder 758.50"
                                 />
@@ -1323,14 +1337,17 @@ Audio-Studio`,
                               <div className="relative">
                                 <input
                                   type="text"
-                                  value={workflow.shippingCost.toString()}
+                                  value={shippingCostInput || workflow.shippingCost.toString()}
                                   onChange={(e) => {
-                                    const newShipping = parseGermanInput(e.target.value);
+                                    const value = e.target.value;
+                                    setShippingCostInput(value);
+                                    const newShipping = parseGermanInput(value);
                                     setWorkflow((prev) => ({
                                       ...prev,
                                       shippingCost: Math.max(newShipping, 0),
                                     }));
                                   }}
+                                  onBlur={() => setShippingCostInput('')}
                                   className="w-full border-2 border-blue-400 rounded px-3 py-2 pr-8 text-right font-semibold focus:outline-none focus:border-blue-600"
                                   placeholder="z.B. 20 oder 20,50"
                                 />
@@ -1344,14 +1361,17 @@ Audio-Studio`,
                               <div className="relative">
                                 <input
                                   type="text"
-                                  value={workflow.totalNetto.toString()}
+                                  value={totalNettoInput || workflow.totalNetto.toString()}
                                   onChange={(e) => {
-                                    const newNetto = parseGermanInput(e.target.value);
+                                    const value = e.target.value;
+                                    setTotalNettoInput(value);
+                                    const newNetto = parseGermanInput(value);
                                     setWorkflow((prev) => ({
                                       ...prev,
                                       totalNetto: Math.max(newNetto, 0),
                                     }));
                                   }}
+                                  onBlur={() => setTotalNettoInput('')}
                                   className="w-full border-2 border-blue-500 bg-blue-100 rounded px-3 py-2 pr-8 text-right font-bold text-blue-900 focus:outline-none focus:border-blue-700"
                                   placeholder="z.B. 15164 oder 15164,00"
                                 />
@@ -1365,14 +1385,17 @@ Audio-Studio`,
                               <div className="relative">
                                 <input
                                   type="text"
-                                  value={workflow.vatAmount.toString()}
+                                  value={vatAmountInput || workflow.vatAmount.toString()}
                                   onChange={(e) => {
-                                    const newVat = parseGermanInput(e.target.value);
+                                    const value = e.target.value;
+                                    setVatAmountInput(value);
+                                    const newVat = parseGermanInput(value);
                                     setWorkflow((prev) => ({
                                       ...prev,
                                       vatAmount: Math.max(newVat, 0),
                                     }));
                                   }}
+                                  onBlur={() => setVatAmountInput('')}
                                   className="w-full border-2 border-blue-400 rounded px-3 py-2 pr-8 text-right font-semibold focus:outline-none focus:border-blue-600"
                                   placeholder="z.B. 2880 oder 2880,76"
                                 />
@@ -1386,13 +1409,16 @@ Audio-Studio`,
                               <div className="relative">
                                 <input
                                   type="text"
-                                  value={workflow.totalBrutto.toString()}
+                                  value={totalBruttoInput || workflow.totalBrutto.toString()}
                                   onChange={(e) => {
+                                    const value = e.target.value;
+                                    setTotalBruttoInput(value);
                                     setWorkflow((prev) => ({
                                       ...prev,
-                                      totalBrutto: Math.max(parseGermanInput(e.target.value), 0),
+                                      totalBrutto: Math.max(parseGermanInput(value), 0),
                                     }));
                                   }}
+                                  onBlur={() => setTotalBruttoInput('')}
                                   className="w-full border-2 border-orange-500 bg-orange-100 rounded px-3 py-2 pr-8 text-right font-bold text-orange-900 text-lg focus:outline-none focus:border-orange-700"
                                   placeholder="z.B. 18044 oder 18044,76"
                                 />
