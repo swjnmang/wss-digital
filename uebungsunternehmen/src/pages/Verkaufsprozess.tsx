@@ -2243,9 +2243,9 @@ Audio-Studio`,
                     <div className="grid grid-cols-2 gap-8 mb-8">
                       {/* LEFT SIDE - SENDER */}
                       <div className="text-sm text-slate-700">
-                        <p className="font-bold text-slate-900 mb-2">DeltaBase Online GmbH</p>
-                        <p className="text-xs">Meindlstr. 8a</p>
-                        <p className="text-xs">81373 München</p>
+                        <p className="font-bold text-slate-900 mb-2">MM5 GmbH</p>
+                        <p className="text-xs">Plinganserstraße 5</p>
+                        <p className="text-xs">55555 Matenkik</p>
                       </div>
 
                       {/* RIGHT SIDE - INVOICE INFO */}
@@ -2337,7 +2337,7 @@ Audio-Studio`,
 
                     {/* SKONTO SECTION */}
                     <div className="bg-blue-50 border-2 border-blue-300 rounded p-4 mb-8">
-                      <p className="font-bold text-slate-900 mb-4">💙 Skonto-Bedingungen</p>
+                      <p className="font-bold text-slate-900 mb-4">Skonto-Bedingungen</p>
                       <div className="space-y-3 text-sm">
                         <div className="flex justify-between">
                           <span>Skonto: {LIEFERBEDINGNISSE.skonto}% bei Zahlung innerhalb von {LIEFERBEDINGNISSE.skontoTage} Tagen</span>
@@ -2369,8 +2369,8 @@ Audio-Studio`,
 
                     {/* VALIDATION CHECKS */}
                     {(() => {
-                      const expectedSkonto = round2(workflow.totalNetto * (LIEFERBEDINGNISSE.skonto / 100));
-                      const expectedAmountAfterSkonto = round2(workflow.totalNetto - expectedSkonto);
+                      const expectedSkonto = round2(workflow.totalBrutto * (LIEFERBEDINGNISSE.skonto / 100));
+                      const expectedAmountAfterSkonto = round2(workflow.totalBrutto - expectedSkonto);
                       const userSkonto = parseGermanInput(skontoAmountInput);
                       const userAmountAfterSkonto = parseGermanInput(amountAfterSkontoInput);
                       const userDate = invoiceSignatureDateInput;
@@ -2399,8 +2399,8 @@ Audio-Studio`,
 
                     {/* ACTION BUTTONS */}
                     {(() => {
-                      const expectedSkonto = round2(workflow.totalNetto * (LIEFERBEDINGNISSE.skonto / 100));
-                      const expectedAmountAfterSkonto = round2(workflow.totalNetto - expectedSkonto);
+                      const expectedSkonto = round2(workflow.totalBrutto * (LIEFERBEDINGNISSE.skonto / 100));
+                      const expectedAmountAfterSkonto = round2(workflow.totalBrutto - expectedSkonto);
                       const userSkonto = parseGermanInput(skontoAmountInput);
                       const userAmountAfterSkonto = parseGermanInput(amountAfterSkontoInput);
                       const userDate = invoiceSignatureDateInput;
@@ -2451,7 +2451,7 @@ Audio-Studio`,
                     <div className="flex justify-between gap-12">
                       <div>
                         <div className="border-t border-slate-400 pt-2 text-center" style={{width: '150px'}}>
-                          <p className="text-xs font-semibold">DeltaBase Online GmbH</p>
+                          <p className="text-xs font-semibold">MM5 GmbH</p>
                         </div>
                       </div>
                     </div>
@@ -2461,8 +2461,8 @@ Audio-Studio`,
                   <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded text-sm text-slate-700">
                     <p className="font-semibold mb-2">💡 Deine Aufgabe:</p>
                     <p>1. Gib ein Datum bei "Ihr Zeichen" ein (z.B. heute Datum)</p>
-                    <p>2. Berechne den Skontobetrag: Netto-Betrag × 2%</p>
-                    <p>3. Berechne den Überweisungsbetrag: Netto-Betrag - Skontobetrag</p>
+                    <p>2. Berechne den Skontobetrag: Brutto-Betrag × 2%</p>
+                    <p>3. Berechne den Überweisungsbetrag: Brutto-Betrag - Skontobetrag</p>
                     <p>4. Trage beide Werte in die entsprechenden Felder ein</p>
                     <p>5. Wenn alles korrekt ist, kannst du weitermachen</p>
                   </div>
