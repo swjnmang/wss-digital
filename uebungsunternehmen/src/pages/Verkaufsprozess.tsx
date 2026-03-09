@@ -377,6 +377,15 @@ const formatCurrency = (value: number): string => {
   }).format(value);
 };
 
+// Format date to DD.MM.YYYY format
+const formatDate = (date: Date | string): string => {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const year = dateObj.getFullYear();
+  return `${day}.${month}.${year}`;
+};
+
 // Parse German input (e.g., 1.234,56 or 1234,56 or 1.234 or 1234.56) to number
 const parseGermanInput = (value: string): number => {
   // Entferne Leerzeichen und € Symbol
@@ -426,11 +435,11 @@ export default function Verkaufsprozess() {
     currentStep: 0,
     quantity: 0,
     offerNumber: 18,
-    offerDate: new Date().toLocaleDateString('de-DE'),
+    offerDate: formatDate(new Date()),
     orderAccepted: false,
     orderConfirmationDate: '',
     invoiceNumber: 18,
-    invoiceDate: new Date().toLocaleDateString('de-DE'),
+    invoiceDate: formatDate(new Date()),
     unitPrice: 0,
     discountPercent: 0,
     discountAmount: 0,
@@ -733,7 +742,7 @@ Audio-Studio`,
       const today = new Date();
       const randomDays = Math.floor(Math.random() * 7);
       const date = new Date(today.setDate(today.getDate() - randomDays));
-      const dateStr = date.toLocaleDateString('de-DE');
+      const dateStr = formatDate(date);
 
       newEmails.push({
         id: `gen-${idx + 1}`,
@@ -967,10 +976,9 @@ Audio-Studio`,
                 <div className="border border-slate-300 rounded-lg overflow-hidden">
                   {/* Header Row */}
                   <div className="grid grid-cols-12 gap-4 bg-slate-100 border-b border-slate-300 p-4 font-semibold text-sm text-slate-700">
-                    <div className="col-span-3">Von</div>
-                    <div className="col-span-4">Betreff</div>
-                    <div className="col-span-2">Kategorie</div>
-                    <div className="col-span-2">Datum</div>
+                    <div className="col-span-4">Von</div>
+                    <div className="col-span-6">Betreff</div>
+                    <div className="col-span-2 text-right">Datum</div>
                   </div>
 
                   {/* Email Rows */}
@@ -981,15 +989,12 @@ Audio-Studio`,
                         onClick={() => setSelectedEmailForReading(email)}
                         className="grid grid-cols-12 gap-4 p-4 hover:bg-blue-50 transition-colors text-sm cursor-pointer"
                       >
-                        <div className="col-span-3">
+                        <div className="col-span-4">
                           <p className="font-semibold text-slate-800">{email.from}</p>
                           <p className="text-slate-500 text-xs">{email.fromAddress}</p>
                         </div>
-                        <div className="col-span-4">
+                        <div className="col-span-6">
                           <p className="text-slate-800 line-clamp-1 font-medium">{email.subject}</p>
-                        </div>
-                        <div className="col-span-2">
-                          <span className="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">{email.category}</span>
                         </div>
                         <div className="col-span-2 text-right">
                           <span className="text-slate-600">{email.date}</span>
@@ -1621,7 +1626,7 @@ Audio-Studio`,
                             className="w-full border-2 border-blue-400 rounded px-4 py-2 text-slate-800 font-semibold focus:outline-none focus:border-blue-600 mb-4"
                           />
                           {workflow.orderConfirmationDate && (
-                            <p className="text-sm text-blue-600 font-semibold">Ausgewähltes Datum: {new Date(workflow.orderConfirmationDate + 'T00:00:00').toLocaleDateString('de-DE')}</p>
+                            <p className="text-sm text-blue-600 font-semibold">Ausgewähltes Datum: {formatDate(new Date(workflow.orderConfirmationDate + 'T00:00:00'))}</p>
                           )}
                         </div>
                         <div>
@@ -1738,7 +1743,7 @@ Audio-Studio`,
                     <h3 className="text-lg font-bold mb-4 text-slate-800">📦 Versandauftrag für Lager</h3>
                     <div className="bg-white p-4 rounded border border-slate-200 text-sm space-y-2 mb-6">
                       <p><strong>Versandauftrag-Nummer:</strong> VA-{workflow.offerNumber}</p>
-                      <p><strong>Datum:</strong> {new Date().toLocaleDateString('de-DE')}</p>
+                      <p><strong>Datum:</strong> {formatDate(new Date())}</p>
                       <p><strong>Artikel:</strong> {workflow.selectedProduct.name}</p>
                       <p><strong>Art.-Nr.:</strong> {workflow.selectedProduct.artNumber}</p>
                       <p><strong>Menge:</strong> {workflow.quantity} Stück</p>
@@ -1912,7 +1917,7 @@ Audio-Studio`,
                         <div className="bg-white border-2 border-green-300 rounded-lg p-4">
                           <div className="flex justify-between items-start mb-3">
                             <div>
-                              <p className="font-bold text-slate-900">Zahlung vom {new Date().toLocaleDateString('de-DE')}</p>
+                              <p className="font-bold text-slate-900">Zahlung vom {formatDate(new Date())}</p>
                               <p className="text-sm text-slate-600">Absender: {workflow.selectedEmail.from}</p>
                             </div>
                             <div className="text-right">
@@ -1938,7 +1943,7 @@ Audio-Studio`,
                         <div className="space-y-2 text-sm text-slate-700">
                           <p><strong>Referenz:</strong> {workflow.paymentReference}</p>
                           <p><strong>Betrag:</strong> € {workflow.totalBrutto.toFixed(2)}</p>
-                          <p><strong>Bestätigt am:</strong> {new Date().toLocaleDateString('de-DE')}</p>
+                          <p><strong>Bestätigt am:</strong> {formatDate(new Date())}</p>
                         </div>
                         <div className="mt-6 p-4 bg-blue-50 rounded border border-blue-200">
                           <p className="text-sm text-blue-800">
