@@ -891,16 +891,16 @@ export default function Verkaufsprozess() {
     // Achievement box
     doc.setFillColor(220, 180, 120);
     doc.rect(30, 150, width - 60, 25, 'F');
-    doc.setFontSize(13);
+    doc.setFontSize(12);
     doc.setTextColor(100, 60, 20);
     doc.setFont('Helvetica', 'bold');
-    doc.text('✓ Verkaufsprozess erfolgreich abgeschlossen', width / 2, 168, { align: 'center' });
+    doc.text('✓ Verkaufsprozess erfolgreich abgeschlossen', width / 2, 162, { align: 'center' });
 
     // Footer
     doc.setFontSize(10);
     doc.setTextColor(120, 120, 120);
     doc.setFont('Helvetica', 'normal');
-    doc.text('Berufsschule - Übungsunternehmen Digital', 30, height - 15);
+    doc.text('Wirtschaftsschule Digitale - wss-digital.de', 30, height - 15);
     doc.text(`${date}`, width - 30, height - 15, { align: 'right' });
 
     // Save PDF
@@ -2796,7 +2796,6 @@ Audio-Studio`,
                         <thead className="bg-slate-200 border-b border-slate-400">
                           <tr>
                             <th className="px-4 py-3 text-left font-bold text-slate-700">Datum</th>
-                            <th className="px-4 py-3 text-left font-bold text-slate-700">Typ</th>
                             <th className="px-4 py-3 text-left font-bold text-slate-700">Beschreibung</th>
                             <th className="px-4 py-3 text-left font-bold text-slate-700">Referenz</th>
                             <th className="px-4 py-3 text-right font-bold text-slate-700">Betrag</th>
@@ -2820,17 +2819,6 @@ Audio-Studio`,
                                   }`}
                                 >
                                   <td className="px-4 py-3 text-slate-700 font-semibold">{tx.date}</td>
-                                  <td className="px-4 py-3">
-                                    <span
-                                      className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                        tx.type === 'S'
-                                          ? 'bg-green-200 text-green-900'
-                                          : 'bg-red-200 text-red-900'
-                                      }`}
-                                    >
-                                      {tx.type === 'S' ? 'Sammlung' : 'Haben'}
-                                    </span>
-                                  </td>
                                   <td className="px-4 py-3 text-slate-700">{tx.description}</td>
                                   <td className="px-4 py-3 font-mono font-bold text-slate-800">
                                     {tx.reference}
