@@ -2357,12 +2357,9 @@ Audio-Studio`,
                                     </button>
                                     
                                     {wrongShippingId === option.id && (() => {
-                                      const totalWeight = workflow.quantity * (workflow.selectedProduct?.weight || 0);
-                                      const cheapest = getCheapestShippingOption(totalWeight, workflow.generatedShippingOptions);
                                       return (
                                         <div className="mt-3 p-3 bg-red-50 border-l-4 border-red-500 rounded text-sm text-red-800">
                                           <p className="font-semibold">❌ Das ist nicht das günstigste Unternehmen!</p>
-                                          <p className="mt-1">Wähle stattdessen: <strong>{cheapest?.name}</strong> (€ {(cheapest?.fixCost! + (totalWeight * cheapest?.costPerKg!)).toFixed(2)})</p>
                                         </div>
                                       );
                                     })()}
