@@ -106,8 +106,8 @@ export default function Zeichnen(){
         // m constraint: -3 bis 3
         m = randomInt(3, -3)
         if (m === 0) m = 1
-        // t constraint: -4 bis 4
-        t = randomInt(4, -4)
+        // t = 0: nur Funktionen vom Typ y = m*x
+        t = 0
         break
     }
 
