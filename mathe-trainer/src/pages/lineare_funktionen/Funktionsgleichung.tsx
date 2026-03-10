@@ -161,8 +161,6 @@ export default function Funktionsgleichung(){
 
         <div className={styles.controls}>
           <button onClick={genTwoPoints} className={styles.btn}>Neue Aufgabe: 2 Punkte</button>
-          <button onClick={genPointSlope} className={styles.btn}>Neue Aufgabe: Punkt + Steigung</button>
-          <button onClick={() => setShowVideoModal(true)} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: '500' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}>🎥 Erklärvideo</button>
         </div>
 
         <div className={styles.task}>
@@ -191,6 +189,7 @@ export default function Funktionsgleichung(){
         <div className={styles.actions}>
           <button onClick={check} className={styles.primary}>Lösung prüfen</button>
           <button onClick={showSol} className={styles.secondary}>Lösung anzeigen</button>
+          <button onClick={() => setShowVideoModal(true)} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: '500' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}>🎥 Erklärvideo</button>
         </div>
 
         {showSolution && (
