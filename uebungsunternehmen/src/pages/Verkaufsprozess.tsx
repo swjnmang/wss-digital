@@ -68,6 +68,16 @@ interface ShippingOption {
   deliveryDays: number;
 }
 
+interface BankTransaction {
+  id: string;
+  date: string;
+  amount: number;
+  type: 'S' | 'H'; // S = Sammlung (Eingang), H = Haben (Ausgang)
+  reference: string;
+  description: string;
+  isCorrectPayment?: boolean;
+}
+
 interface WorkflowState {
   currentStep: number;
   selectedEmail?: Email;
@@ -660,6 +670,76 @@ const generateShippingCosts = (): ShippingOption[] => {
   }));
 };
 
+// Generate realistic bank transactions for the online banking view
+const generateBankTransactions = (invoiceNumber: number, correctAmount: number, correctReference: string): BankTransaction[] => {
+  const today = new Date();
+  const transactions: BankTransaction[] = [];
+  
+  // Add some random transactions from past days
+  for (let i = 0; i < 5; i++) {
+    const daysAgo = Math.floor(Math.random() * 20) + 3;
+    const date = new Date(today);
+    date.setDate(date.getDate() - daysAgo);
+    
+    const isIncoming = Math.random() > 0.3;
+    const amount = parseFloat((Math.random() * 5000 + 100).toFixed(2));
+    const references = [
+      'RG001234',
+      'RG005678',
+      'RG002890',
+      'IN001920',
+      'IN003456',
+      'PR001111',
+      'OR002222'
+    ];
+    
+    transactions.push({
+      id: `tx-old-${i}`,
+      date: date.toISOString().split('T')[0],
+      amount: amount,
+      type: isIncoming ? 'S' : 'H',
+      reference: references[Math.floor(Math.random() * references.length)],
+      description: isIncoming ? 'Bestellung eingegangen' : 'Rechnung bezahlt',
+    });
+  }
+  
+  // Add the CORRECT payment (today or tomorrow with correct reference)
+  const correctDate = new Date(today);
+  correctDate.setDate(correctDate.getDate() + (Math.random() > 0.5 ? 0 : 1));
+  
+  transactions.push({
+    id: `tx-correct-${invoiceNumber}`,
+    date: correctDate.toISOString().split('T')[0],
+    amount: correctAmount,
+    type: 'S',
+    reference: correctReference,
+    description: 'Kundenüberweisung',
+    isCorrectPayment: true,
+  });
+  
+  // Add some more random transactions
+  for (let i = 0; i < 3; i++) {
+    const daysAgo = Math.floor(Math.random() * 5) + 1;
+    const date = new Date(today);
+    date.setDate(date.getDate() + daysAgo);
+    
+    const isIncoming = Math.random() > 0.4;
+    const amount = parseFloat((Math.random() * 3000 + 50).toFixed(2));
+    
+    transactions.push({
+      id: `tx-future-${i}`,
+      date: date.toISOString().split('T')[0],
+      amount: amount,
+      type: isIncoming ? 'S' : 'H',
+      reference: `RG${Math.floor(Math.random() * 9000 + 1000)}`,
+      description: isIncoming ? 'Zahlung eingegangen' : 'Überweisung',
+    });
+  }
+  
+  // Sort by date descending
+  return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+};
+
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
@@ -708,6 +788,8 @@ export default function Verkaufsprozess() {
   const [expandedTerms, setExpandedTerms] = useState<boolean>(false);
   const [productValidationError, setProductValidationError] = useState<{ productId: string } | null>(null);
   const [warehouseFilter, setWarehouseFilter] = useState<string>('Alle');
+  const [bankingSearchQuery, setBankingSearchQuery] = useState<string>('');
+  const [bankTransactions, setBankTransactions] = useState<BankTransaction[]>([]);
   
   // Separate input states for free typing in offer calculation fields
   const [discountPercentInput, setDiscountPercentInput] = useState<string>('');
@@ -739,6 +821,18 @@ export default function Verkaufsprozess() {
   useEffect(() => {
     localStorage.setItem('verkaufsprozess_workflow', JSON.stringify(workflow));
   }, [workflow]);
+
+  // Initialize bank transactions when entering banking tab
+  useEffect(() => {
+    if (activeTab === 'banking' && bankTransactions.length === 0 && workflow.paymentReference) {
+      const transactions = generateBankTransactions(
+        workflow.invoiceNumber,
+        workflow.totalBrutto,
+        `RG${workflow.invoiceNumber}`
+      );
+      setBankTransactions(transactions);
+    }
+  }, [activeTab, workflow.paymentReference]);
 
   // Generate random customer emails with detailed, specific requests
   const generateEmails = () => {
@@ -2478,73 +2572,165 @@ Audio-Studio`,
             <div className="bg-white rounded-xl shadow-lg p-8 border border-slate-200">
               <h2 className="text-2xl font-bold mb-6 text-slate-800">💰 Online-Banking & Zahlungsverifizierung</h2>
 
-              {workflow.selectedProduct && workflow.selectedEmail ? (
+              {workflow.selectedProduct && workflow.selectedEmail && workflow.paymentReference ? (
                 <div className="space-y-6">
-                  {/* PAYMENT REFERENCE */}
-                  <div className="border-2 border-blue-300 rounded-lg p-8 bg-blue-50">
-                    <h3 className="text-lg font-bold mb-4 text-slate-800">📌 Zahlungsreferenz</h3>
-                    <div className="bg-white p-4 rounded border-2 border-blue-500 text-center mb-6">
-                      <p className="text-sm text-slate-600 mb-1">Rechnungsnummer (als Verwendungszweck):</p>
-                      <p className="text-3xl font-bold text-blue-600">{workflow.paymentReference}</p>
+                  {/* PAYMENT REFERENCE INFO */}
+                  <div className="border-2 border-blue-300 rounded-lg p-6 bg-blue-50">
+                    <h3 className="text-lg font-bold mb-3 text-slate-800">📌 Zahlungsreferenz</h3>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <p className="text-slate-600 font-semibold mb-1">Rechnungsnummer:</p>
+                        <p className="text-2xl font-bold text-blue-600">RG{workflow.invoiceNumber}</p>
+                      </div>
+                      <div>
+                        <p className="text-slate-600 font-semibold mb-1">Fällig:</p>
+                        <p className="text-xl font-bold text-slate-800">€ {workflow.totalBrutto.toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-slate-600 font-semibold mb-1">Kunde:</p>
+                        <p className="text-slate-800 font-semibold">{workflow.selectedEmail.from}</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-slate-700 mb-4">
-                      Der Kunde muss diesen Betrag überweisen:<br />
-                      <strong>€ {workflow.totalNetto.toFixed(2)}</strong> (netto) + <strong>€ {workflow.vatAmount.toFixed(2)}</strong> (MwSt.) = <strong>€ {workflow.totalBrutto.toFixed(2)}</strong> (brutto)
-                    </p>
-                    <p className="text-xs text-slate-600 italic">Verwendungszweck: {workflow.paymentReference}</p>
                   </div>
 
-                  {/* INCOMING PAYMENTS */}
-                  <div className="border-2 border-green-300 rounded-lg p-8 bg-green-50">
-                    <h3 className="text-lg font-bold mb-4 text-slate-800">💳 Eingegangene Zahlungen</h3>
-
-                    {!workflow.paymentVerified ? (
-                      <div className="space-y-4 mb-6">
-                        <div className="bg-white border-2 border-green-300 rounded-lg p-4">
-                          <div className="flex justify-between items-start mb-3">
-                            <div>
-                              <p className="font-bold text-slate-900">Zahlung vom {formatDate(new Date())}</p>
-                              <p className="text-sm text-slate-600">Absender: {workflow.selectedEmail.from}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-bold text-green-600 text-lg">€ {workflow.totalBrutto.toFixed(2)}</p>
-                              <p className="text-xs text-slate-600">Eingegangen</p>
-                            </div>
-                          </div>
-
-                          <div className="bg-slate-50 p-3 rounded text-sm mb-4 border-l-2 border-blue-500">
-                            <p className="text-slate-600"><strong>Referenz:</strong> {workflow.paymentReference}</p>
-                          </div>
-
-                          <div className="flex gap-2">
-                            <button onClick={verifyPayment} className="flex-1 py-2 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors text-sm">
-                              ✓ Zahlung bestätigen
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="bg-white border-2 border-green-500 rounded-lg p-6">
-                        <p className="text-lg font-bold text-green-600 mb-4">✓ Zahlung verifiziert!</p>
-                        <div className="space-y-2 text-sm text-slate-700">
-                          <p><strong>Referenz:</strong> {workflow.paymentReference}</p>
-                          <p><strong>Betrag:</strong> € {workflow.totalBrutto.toFixed(2)}</p>
-                          <p><strong>Bestätigt am:</strong> {formatDate(new Date())}</p>
-                        </div>
-                        <div className="mt-6 p-4 bg-blue-50 rounded border border-blue-200">
-                          <p className="text-sm text-blue-800">
-                            🎉 <strong>Prozess abgeschlossen!</strong>
-                          </p>
-                          <p className="text-xs text-blue-700 mt-1">
-                            Die Ware wurde versendet und die Zahlung ist eingegangen. Der gesamte Verkaufsprozess ist erfolgreich abgeschlossen.
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                  {/* SEARCH FUNCTIONALITY */}
+                  <div className="border-2 border-purple-300 rounded-lg p-6 bg-purple-50">
+                    <h3 className="text-lg font-bold mb-4 text-slate-800">🔍 Transaktionen durchsuchen</h3>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Suche nach Rechnungsnummer, z.B. RG2401..."
+                        value={bankingSearchQuery}
+                        onChange={(e) => setBankingSearchQuery(e.target.value)}
+                        className="flex-1 px-4 py-2 border-2 border-purple-400 rounded-lg focus:outline-none focus:border-purple-600"
+                      />
+                      <button
+                        onClick={() => setBankingSearchQuery('')}
+                        className="px-6 py-2 bg-purple-200 text-purple-900 font-semibold rounded-lg hover:bg-purple-300 transition-colors"
+                      >
+                        Zurücksetzen
+                      </button>
+                    </div>
                   </div>
+
+                  {/* ACCOUNT STATEMENT - TRANSACTIONS TABLE */}
+                  <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white">
+                    <div className="bg-slate-100 border-b border-slate-300 p-4">
+                      <h3 className="text-lg font-bold text-slate-800">📋 Kontoauszug</h3>
+                    </div>
+                    
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-slate-200 border-b border-slate-400">
+                          <tr>
+                            <th className="px-4 py-3 text-left font-bold text-slate-700">Datum</th>
+                            <th className="px-4 py-3 text-left font-bold text-slate-700">Typ</th>
+                            <th className="px-4 py-3 text-left font-bold text-slate-700">Beschreibung</th>
+                            <th className="px-4 py-3 text-left font-bold text-slate-700">Referenz</th>
+                            <th className="px-4 py-3 text-right font-bold text-slate-700">Betrag</th>
+                            <th className="px-4 py-3 text-center font-bold text-slate-700">Aktion</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {bankTransactions
+                            .filter((tx) =>
+                              bankingSearchQuery === '' || tx.reference.includes(bankingSearchQuery.toUpperCase())
+                            )
+                            .map((tx) => {
+                              const isCorrectPayment = tx.reference === `RG${workflow.invoiceNumber}`;
+                              const matches = bankingSearchQuery !== '' && tx.reference.includes(bankingSearchQuery.toUpperCase());
+                              
+                              return (
+                                <tr
+                                  key={tx.id}
+                                  className={`border-b border-slate-200 ${
+                                    isCorrectPayment && matches ? 'bg-green-100' : matches ? 'bg-yellow-50' : 'hover:bg-slate-50'
+                                  }`}
+                                >
+                                  <td className="px-4 py-3 text-slate-700 font-semibold">{tx.date}</td>
+                                  <td className="px-4 py-3">
+                                    <span
+                                      className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                        tx.type === 'S'
+                                          ? 'bg-green-200 text-green-900'
+                                          : 'bg-red-200 text-red-900'
+                                      }`}
+                                    >
+                                      {tx.type === 'S' ? 'Sammlung' : 'Haben'}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3 text-slate-700">{tx.description}</td>
+                                  <td className="px-4 py-3 font-mono font-bold text-slate-800">
+                                    {tx.reference}
+                                  </td>
+                                  <td className={`px-4 py-3 text-right font-bold ${tx.type === 'S' ? 'text-green-700' : 'text-red-700'}`}>
+                                    {tx.type === 'S' ? '+' : '-'}€ {tx.amount.toFixed(2)}
+                                  </td>
+                                  <td className="px-4 py-3 text-center">
+                                    {!workflow.paymentVerified && tx.type === 'S' && (
+                                      <button
+                                        onClick={() => {
+                                          if (isCorrectPayment) {
+                                            verifyPayment();
+                                          } else {
+                                            alert('⚠️ Das ist nicht die korrekte Zahlung! Suche nach der Rechnungsnummer RG' + workflow.invoiceNumber);
+                                          }
+                                        }}
+                                        className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
+                                          isCorrectPayment
+                                            ? 'bg-green-600 text-white hover:bg-green-700'
+                                            : 'bg-slate-300 text-slate-700 hover:bg-slate-400'
+                                        }`}
+                                      >
+                                        {isCorrectPayment ? '✓ Bestätigen' : 'Prüfen'}
+                                      </button>
+                                    )}
+                                    {workflow.paymentVerified && isCorrectPayment && (
+                                      <span className="text-green-700 font-bold text-xs">✓ Bestätigt</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* STATUS SECTION */}
+                  {workflow.paymentVerified ? (
+                    <div className="bg-white border-2 border-green-500 rounded-lg p-6">
+                      <p className="text-lg font-bold text-green-600 mb-4">✓ Zahlung verifiziert!</p>
+                      <div className="space-y-2 text-sm text-slate-700 mb-4">
+                        <p><strong>Rechnungsnummer:</strong> RG{workflow.invoiceNumber}</p>
+                        <p><strong>Betrag:</strong> € {workflow.totalBrutto.toFixed(2)}</p>
+                        <p><strong>Bestätigt am:</strong> {formatDate(new Date())}</p>
+                      </div>
+                      <div className="p-4 bg-blue-50 rounded border border-blue-200">
+                        <p className="text-sm text-blue-800">
+                          🎉 <strong>Prozess abgeschlossen!</strong>
+                        </p>
+                        <p className="text-xs text-blue-700 mt-1">
+                          Die Ware wurde versendet und die Zahlung ist eingegangen. Der gesamte Verkaufsprozess ist erfolgreich abgeschlossen.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6">
+                      <p className="text-sm text-blue-800 mb-2">
+                        <strong>💡 Aufgabe:</strong> Finde die korrekte Zahlung in der Liste und bestätige sie!
+                      </p>
+                      <p className="text-xs text-blue-700">
+                        Hinweis: Verwende die Rechnungsnummer RG{workflow.invoiceNumber} als Referenz zum Filtern. Achte auf den korrekten Betrag (€ {workflow.totalBrutto.toFixed(2)}).
+                      </p>
+                    </div>
+                  )}
 
                   {!workflow.paymentVerified && (
-                    <button onClick={() => setActiveTab('shipping')} className="w-full py-3 px-6 bg-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-400 transition-colors">
+                    <button
+                      onClick={() => setActiveTab('shipping')}
+                      className="w-full py-3 px-6 bg-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-400 transition-colors"
+                    >
                       ← Zurück zum Versand
                     </button>
                   )}
