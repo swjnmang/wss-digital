@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import jsPDF from 'jspdf';
 
 // ============================================================================
 // INTERFACES & TYPES
@@ -740,14 +741,6 @@ const generateBankTransactions = (invoiceNumber: number, correctAmount: number, 
   return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
 
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
-
-// ============================================================================
-// INITIAL WORKFLOW STATE
-// ============================================================================
-
 const INITIAL_WORKFLOW_STATE: WorkflowState = {
   currentStep: 0,
   quantity: 0,
@@ -791,6 +784,8 @@ export default function Verkaufsprozess() {
   const [bankingSearchQuery, setBankingSearchQuery] = useState<string>('');
   const [bankTransactions, setBankTransactions] = useState<BankTransaction[]>([]);
   const [invoiceDetailsExpanded, setInvoiceDetailsExpanded] = useState<boolean>(false);
+  const [studentName, setStudentName] = useState<string>('');
+  const [certificateGenerated, setCertificateGenerated] = useState<boolean>(false);
   
   // Separate input states for free typing in offer calculation fields
   const [discountPercentInput, setDiscountPercentInput] = useState<string>('');
@@ -833,7 +828,95 @@ export default function Verkaufsprozess() {
       );
       setBankTransactions(transactions);
     }
-  }, [activeTab, workflow.paymentReference]);
+  }, [activeTab, workflow.paymentReference, bankTransactions.length, workflow.invoiceNumber, workflow.totalBrutto]);
+
+  // Generate PDF certificate
+  const generateCertificatePDF = (name: string, customerName: string, invoiceNumber: number, date: string) => {
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'A4',
+    });
+
+    const width = doc.internal.pageSize.getWidth();
+    const height = doc.internal.pageSize.getHeight();
+
+    // Set background color
+    doc.setFillColor(240, 245, 250);
+    doc.rect(0, 0, width, height, 'F');
+
+    // Add border
+    doc.setDrawColor(200, 150, 80);
+    doc.setLineWidth(3);
+    doc.rect(10, 10, width - 20, height - 20);
+
+    // Decorative inner border
+    doc.setDrawColor(220, 180, 120);
+    doc.setLineWidth(1);
+    doc.rect(12, 12, width - 24, height - 24);
+
+    // Title
+    doc.setFontSize(36);
+    doc.setTextColor(100, 60, 20);
+    doc.setFont('Helvetica', 'bold');
+    doc.text('ZERTIFIKAT', width / 2, 40, { align: 'center' });
+
+    // Subtitle
+    doc.setFontSize(14);
+    doc.setTextColor(60, 60, 60);
+    doc.setFont('Helvetica', 'normal');
+    doc.text('Bestätigung der erfolgreichen Abschließung eines Verkaufsprozesses', width / 2, 52, { align: 'center' });
+
+    // Main text
+    doc.setFontSize(12);
+    doc.setTextColor(80, 80, 80);
+    doc.text('Hiermit bestätigt die Berufsschule die erfolgreiche Durchführung eines simulierten Verkaufsprozesses', width / 2, 70, { align: 'center' });
+    doc.text('von der Kundenanfrage bis zur Zahlungsverifizierung.', width / 2, 78, { align: 'center' });
+
+    // Student name
+    doc.setFontSize(14);
+    doc.setTextColor(100, 60, 20);
+    doc.setFont('Helvetica', 'bold');
+    doc.text(`Schüler/in: ${name}`, 30, 100);
+
+    // Details
+    doc.setFontSize(12);
+    doc.setTextColor(60, 60, 60);
+    doc.setFont('Helvetica', 'normal');
+    doc.text(`Betreutser Kunde: ${customerName}`, 30, 115);
+    doc.text(`Rechnungsnummer: RG${invoiceNumber}`, 30, 125);
+    doc.text(`Datum der Abschließung: ${date}`, 30, 135);
+
+    // Achievement box
+    doc.setFillColor(220, 180, 120);
+    doc.rect(30, 150, width - 60, 25, 'F');
+    doc.setFontSize(13);
+    doc.setTextColor(100, 60, 20);
+    doc.setFont('Helvetica', 'bold');
+    doc.text('✓ Verkaufsprozess erfolgreich abgeschlossen', width / 2, 168, { align: 'center' });
+
+    // Footer
+    doc.setFontSize(10);
+    doc.setTextColor(120, 120, 120);
+    doc.setFont('Helvetica', 'normal');
+    doc.text('Berufsschule - Übungsunternehmen Digital', 30, height - 15);
+    doc.text(`${date}`, width - 30, height - 15, { align: 'right' });
+
+    // Save PDF
+    doc.save(`Zertifikat_${name.replace(/\s+/g, '_')}_${invoiceNumber}.pdf`);
+  };
+
+  // Reset workflow after certificate generation
+  const resetWorkflowProcess = () => {
+    setWorkflow(INITIAL_WORKFLOW_STATE);
+    setStudentName('');
+    setCertificateGenerated(false);
+    setInvoiceDetailsExpanded(false);
+    setBankingSearchQuery('');
+    setBankTransactions([]);
+    setActiveTab('email');
+    localStorage.removeItem('verkaufsprozess_workflow');
+  };
 
   // Generate random customer emails with detailed, specific requests
   const generateEmails = () => {
@@ -2789,22 +2872,84 @@ Audio-Studio`,
 
                   {/* STATUS SECTION */}
                   {workflow.paymentVerified ? (
-                    <div className="bg-white border-2 border-green-500 rounded-lg p-6">
-                      <p className="text-lg font-bold text-green-600 mb-4">✓ Zahlung verifiziert!</p>
-                      <div className="space-y-2 text-sm text-slate-700 mb-4">
-                        <p><strong>Rechnungsnummer:</strong> RG{workflow.invoiceNumber}</p>
-                        <p><strong>Betrag:</strong> € {workflow.totalBrutto.toFixed(2)}</p>
-                        <p><strong>Bestätigt am:</strong> {formatDate(new Date())}</p>
+                    certificateGenerated ? (
+                      <div className="bg-white border-2 border-green-500 rounded-lg p-6 text-center">
+                        <p className="text-2xl font-bold text-green-600 mb-4">🎓 Zertifikat erstellt!</p>
+                        <div className="bg-green-50 border border-green-300 rounded p-4 mb-6">
+                          <p className="text-sm text-green-800 mb-2">
+                            Das Zertifikat für <strong>{studentName}</strong> wurde erfolgreich heruntergeladen.
+                          </p>
+                          <p className="text-xs text-green-700">
+                            Ihr Verkaufsprozess ist nun abgeschlossen und Sie werden zurück zum Posteingang geleitet.
+                          </p>
+                        </div>
+                        <button
+                          onClick={resetWorkflowProcess}
+                          className="w-full py-3 px-6 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors"
+                        >
+                          📧 Zurück zum Posteingang
+                        </button>
                       </div>
-                      <div className="p-4 bg-blue-50 rounded border border-blue-200">
-                        <p className="text-sm text-blue-800">
-                          🎉 <strong>Prozess abgeschlossen!</strong>
-                        </p>
-                        <p className="text-xs text-blue-700 mt-1">
-                          Die Ware wurde versendet und die Zahlung ist eingegangen. Der gesamte Verkaufsprozess ist erfolgreich abgeschlossen.
-                        </p>
+                    ) : (
+                      <div className="bg-white border-2 border-green-500 rounded-lg p-6">
+                        <p className="text-lg font-bold text-green-600 mb-4">✓ Zahlung verifiziert!</p>
+                        <div className="space-y-2 text-sm text-slate-700 mb-6">
+                          <p><strong>Rechnungsnummer:</strong> RG{workflow.invoiceNumber}</p>
+                          <p><strong>Betrag:</strong> € {workflow.totalBrutto.toFixed(2)}</p>
+                          <p><strong>Bestätigt am:</strong> {formatDate(new Date())}</p>
+                        </div>
+
+                        {/* CERTIFICATE FORM */}
+                        <div className="border-2 border-orange-300 rounded-lg p-6 bg-orange-50 mb-6">
+                          <h4 className="text-lg font-bold text-orange-900 mb-4">🎓 Zertifikat erstellen</h4>
+                          <p className="text-sm text-orange-800 mb-4">
+                            Der Verkaufsprozess ist vollständig abgeschlossen! Tragen Sie Ihren Namen ein und erstellen Sie ein Zertifikat.
+                          </p>
+                          <div className="mb-4">
+                            <label className="block text-sm font-semibold text-orange-900 mb-2">Ihr Name:</label>
+                            <input
+                              type="text"
+                              value={studentName}
+                              onChange={(e) => setStudentName(e.target.value)}
+                              placeholder="z.B. Max Mustermann"
+                              className="w-full px-4 py-2 border-2 border-orange-400 rounded-lg focus:outline-none focus:border-orange-600 font-semibold"
+                            />
+                          </div>
+                          <button
+                            onClick={() => {
+                              if (studentName.trim()) {
+                                generateCertificatePDF(
+                                  studentName,
+                                  workflow.selectedEmail!.from,
+                                  workflow.invoiceNumber,
+                                  formatDate(new Date())
+                                );
+                                setCertificateGenerated(true);
+                              } else {
+                                alert('Bitte tragen Sie Ihren Namen ein!');
+                              }
+                            }}
+                            disabled={!studentName.trim()}
+                            className={`w-full py-3 px-6 font-bold rounded-lg transition-colors ${
+                              studentName.trim()
+                                ? 'bg-orange-600 text-white hover:bg-orange-700'
+                                : 'bg-orange-300 text-orange-700 cursor-not-allowed'
+                            }`}
+                          >
+                            📄 Zertifikat als PDF herunterladen
+                          </button>
+                        </div>
+
+                        <div className="p-4 bg-green-50 rounded border border-green-200">
+                          <p className="text-sm text-green-800">
+                            🎉 <strong>Prozess abgeschlossen!</strong>
+                          </p>
+                          <p className="text-xs text-green-700 mt-1">
+                            Die Ware wurde versendet und die Zahlung ist eingegangen. Der gesamte Verkaufsprozess ist erfolgreich abgeschlossen.
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    )
                   ) : (
                     <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6">
                       <p className="text-sm text-blue-800 mb-2">
