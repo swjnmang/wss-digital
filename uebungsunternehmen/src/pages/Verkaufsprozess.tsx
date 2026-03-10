@@ -786,6 +786,7 @@ export default function Verkaufsprozess() {
   const [invoiceDetailsExpanded, setInvoiceDetailsExpanded] = useState<boolean>(false);
   const [studentName, setStudentName] = useState<string>('');
   const [certificateGenerated, setCertificateGenerated] = useState<boolean>(false);
+  const [inspectingTransaction, setInspectingTransaction] = useState<BankTransaction | null>(null);
   
   // Separate input states for free typing in offer calculation fields
   const [discountPercentInput, setDiscountPercentInput] = useState<string>('');
@@ -914,6 +915,7 @@ export default function Verkaufsprozess() {
     setInvoiceDetailsExpanded(false);
     setBankingSearchQuery('');
     setBankTransactions([]);
+    setInspectingTransaction(null);
     setActiveTab('email');
     localStorage.removeItem('verkaufsprozess_workflow');
   };
@@ -2839,20 +2841,10 @@ Audio-Studio`,
                                   <td className="px-4 py-3 text-center">
                                     {!workflow.paymentVerified && tx.type === 'S' && (
                                       <button
-                                        onClick={() => {
-                                          if (isCorrectPayment) {
-                                            verifyPayment();
-                                          } else {
-                                            alert('⚠️ Das ist nicht die korrekte Zahlung! Suche nach der Rechnungsnummer RG' + workflow.invoiceNumber);
-                                          }
-                                        }}
-                                        className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
-                                          isCorrectPayment
-                                            ? 'bg-green-600 text-white hover:bg-green-700'
-                                            : 'bg-slate-300 text-slate-700 hover:bg-slate-400'
-                                        }`}
+                                        onClick={() => setInspectingTransaction(tx)}
+                                        className="px-3 py-1 text-xs font-bold rounded transition-colors bg-blue-500 text-white hover:bg-blue-600"
                                       >
-                                        {isCorrectPayment ? '✓ Bestätigen' : 'Prüfen'}
+                                        Prüfen
                                       </button>
                                     )}
                                     {workflow.paymentVerified && isCorrectPayment && (
@@ -3017,6 +3009,63 @@ Audio-Studio`,
           </div>
         </div>
       </main>
+
+      {/* TRANSACTION VERIFICATION MODAL */}
+      {inspectingTransaction && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-slate-800 mb-4">💳 Zahlung überprüfen</h3>
+            
+            <div className="space-y-3 mb-6 bg-slate-50 p-4 rounded border border-slate-300">
+              <div>
+                <p className="text-sm text-slate-600 font-semibold">Datum:</p>
+                <p className="text-slate-800">{inspectingTransaction.date}</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-600 font-semibold">Beschreibung:</p>
+                <p className="text-slate-800">{inspectingTransaction.description}</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-600 font-semibold">Referenz:</p>
+                <p className="text-slate-800 font-mono font-bold">{inspectingTransaction.reference}</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-600 font-semibold">Betrag:</p>
+                <p className="text-lg font-bold text-green-600">+€ {inspectingTransaction.amount.toFixed(2)}</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-slate-700 mb-6">
+              Ist dies die Zahlung für Rechnungsnummer <strong>RG{workflow.invoiceNumber}</strong> im Betrag von <strong>€ {workflow.totalBrutto.toFixed(2)}</strong>?
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  const isCorrectPayment = inspectingTransaction.reference === `RG${workflow.invoiceNumber}` &&
+                                         Math.abs(inspectingTransaction.amount - workflow.totalBrutto) < 0.01;
+                  if (isCorrectPayment) {
+                    verifyPayment();
+                    setInspectingTransaction(null);
+                  } else {
+                    alert('⚠️ Das ist nicht die korrekte Zahlung! Prüfe die Rechnungsnummer und den Betrag nochmal.');
+                    setInspectingTransaction(null);
+                  }
+                }}
+                className="flex-1 py-2 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+              >
+                ✓ Bestätigen
+              </button>
+              <button
+                onClick={() => setInspectingTransaction(null)}
+                className="flex-1 py-2 px-4 bg-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-400 transition-colors"
+              >
+                ✗ Ablehnen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <EmailReaderModal 
         email={selectedEmailForReading} 
