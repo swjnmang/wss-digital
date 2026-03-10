@@ -2585,25 +2585,102 @@ Audio-Studio`,
                       <span className="text-lg">{invoiceDetailsExpanded ? '▼' : '▶'}</span>
                     </button>
                     
-                    {invoiceDetailsExpanded && (
-                      <div className="px-6 py-4 space-y-3 bg-white border-t border-orange-300">
-                        <div>
-                          <p className="text-slate-600 font-semibold text-sm mb-1">Rechnungsnummer:</p>
-                          <p className="text-2xl font-bold text-orange-600">RG{workflow.invoiceNumber}</p>
+                    {invoiceDetailsExpanded && workflow.selectedProduct && workflow.selectedEmail ? (
+                      <div className="px-6 py-6 space-y-4 bg-white border-t border-orange-300">
+                        {/* INVOICE CONTENT */}
+                        <div className="border border-slate-300 rounded p-6 bg-slate-50">
+                          <div className="grid grid-cols-2 gap-8 mb-6">
+                            {/* LEFT SIDE - SENDER */}
+                            <div className="text-sm text-slate-700">
+                              <p className="font-bold text-slate-900 mb-2">MM5 GmbH</p>
+                              <p className="text-xs">Plinganserstraße 5</p>
+                              <p className="text-xs">55555 Matenkik</p>
+                            </div>
+
+                            {/* RIGHT SIDE - INVOICE INFO */}
+                            <div className="text-sm text-slate-700 text-right">
+                              <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div className="text-left"><strong>Auftrags-Nr.:</strong></div>
+                                <div className="text-right">{workflow.offerNumber}</div>
+                                <div className="text-left"><strong>Rechnungs-Nr.:</strong></div>
+                                <div className="text-right font-bold text-orange-600">{workflow.invoiceNumber}</div>
+                                <div className="text-left"><strong>Kunden-Nr.:</strong></div>
+                                <div className="text-right">{workflow.selectedEmail.customerNumber}</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="border-b-2 border-slate-300 mb-4"></div>
+
+                          {/* CUSTOMER INFO */}
+                          <div className="mb-4">
+                            <p className="font-bold text-slate-900 mb-1">{workflow.selectedEmail.from}</p>
+                            <p className="text-xs text-slate-700">{workflow.selectedEmail.fromAddress}</p>
+                          </div>
+
+                          {/* INVOICE TITLE */}
+                          <h4 className="text-lg font-bold text-slate-900 mb-4">Rechnung Nr. {workflow.invoiceNumber}</h4>
+
+                          {/* INVOICE TABLE */}
+                          <div className="mb-4">
+                            <table className="w-full text-xs mb-3">
+                              <thead>
+                                <tr className="border-b-2 border-slate-400 bg-slate-100">
+                                  <th className="text-left py-2 px-2 font-bold">Artikel</th>
+                                  <th className="text-center py-2 px-2 font-bold">Art.-Nr.</th>
+                                  <th className="text-center py-2 px-2 font-bold">Menge</th>
+                                  <th className="text-right py-2 px-2 font-bold">Preis</th>
+                                  <th className="text-right py-2 px-2 font-bold">Summe</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr className="border-b border-slate-200">
+                                  <td className="py-2 px-2">{workflow.selectedProduct.name}</td>
+                                  <td className="text-center py-2 px-2 text-xs">{workflow.selectedProduct.artNumber}</td>
+                                  <td className="text-center py-2 px-2">{workflow.quantity}</td>
+                                  <td className="text-right py-2 px-2">€ {workflow.unitPrice.toFixed(2)}</td>
+                                  <td className="text-right py-2 px-2 font-semibold">€ {workflow.subtotal.toFixed(2)}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          {/* CALCULATIONS */}
+                          <div className="space-y-1 text-xs mb-4">
+                            <div className="flex justify-between px-2">
+                              <span>Summe der Einzelposten:</span>
+                              <span className="font-semibold">€ {workflow.subtotal.toFixed(2)}</span>
+                            </div>
+                            {workflow.discountAmount > 0 && (
+                              <div className="flex justify-between px-2">
+                                <span>Rabatt ({workflow.discountPercent}%):</span>
+                                <span className="font-semibold">-€ {workflow.discountAmount.toFixed(2)}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between px-2">
+                              <span>Versandkosten:</span>
+                              <span className="font-semibold">€ {workflow.shippingCost.toFixed(2)}</span>
+                            </div>
+                            <div className="border-t border-slate-300 pt-1 px-2 flex justify-between font-bold">
+                              <span>Gesamtpreis netto:</span>
+                              <span>€ {workflow.totalNetto.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between px-2">
+                              <span>19% Umsatzsteuer:</span>
+                              <span className="font-semibold">€ {workflow.vatAmount.toFixed(2)}</span>
+                            </div>
+                            <div className="border-t-2 border-slate-400 pt-1 px-2 flex justify-between font-bold text-sm bg-orange-50 p-2 rounded">
+                              <span>Rechnungsbetrag brutto:</span>
+                              <span className="text-orange-600">€ {workflow.totalBrutto.toFixed(2)}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-slate-600 font-semibold text-sm mb-1">Fällig:</p>
-                          <p className="text-lg font-bold text-slate-800">€ {workflow.totalBrutto.toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <p className="text-slate-600 font-semibold text-sm mb-1">Kunde:</p>
-                          <p className="text-slate-800 font-semibold">{workflow.selectedEmail.from}</p>
-                        </div>
-                        <div className="text-xs text-slate-600 italic pt-2 border-t border-orange-200">
-                          <p>Diese Rechnung wartet auf Zahlungsbestätigung. Finde die entsprechende Zahlung im Kontoauszug.</p>
+
+                        <div className="text-xs text-slate-600 italic border-t border-orange-200 pt-3">
+                          <p>Diese Rechnung wartet auf Zahlungsbestätigung. Suche die entsprechende Zahlung im Kontoauszug unten.</p>
                         </div>
                       </div>
-                    )}
+                    ) : null}
                   </div>
 
                   {/* SEARCH FUNCTIONALITY */}
