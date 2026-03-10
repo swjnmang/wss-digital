@@ -790,6 +790,7 @@ export default function Verkaufsprozess() {
   const [warehouseFilter, setWarehouseFilter] = useState<string>('Alle');
   const [bankingSearchQuery, setBankingSearchQuery] = useState<string>('');
   const [bankTransactions, setBankTransactions] = useState<BankTransaction[]>([]);
+  const [invoiceDetailsExpanded, setInvoiceDetailsExpanded] = useState<boolean>(false);
   
   // Separate input states for free typing in offer calculation fields
   const [discountPercentInput, setDiscountPercentInput] = useState<string>('');
@@ -2574,23 +2575,35 @@ Audio-Studio`,
 
               {workflow.selectedProduct && workflow.selectedEmail && workflow.paymentReference ? (
                 <div className="space-y-6">
-                  {/* PAYMENT REFERENCE INFO */}
-                  <div className="border-2 border-blue-300 rounded-lg p-6 bg-blue-50">
-                    <h3 className="text-lg font-bold mb-3 text-slate-800">📌 Zahlungsreferenz</h3>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div>
-                        <p className="text-slate-600 font-semibold mb-1">Rechnungsnummer:</p>
-                        <p className="text-2xl font-bold text-blue-600">RG{workflow.invoiceNumber}</p>
+                  {/* EXPANDABLE INVOICE DETAILS */}
+                  <div className="border-2 border-orange-300 rounded-lg overflow-hidden bg-orange-50">
+                    <button
+                      onClick={() => setInvoiceDetailsExpanded(!invoiceDetailsExpanded)}
+                      className="w-full px-6 py-4 bg-orange-200 hover:bg-orange-300 text-orange-900 font-bold flex items-center justify-between transition-colors"
+                    >
+                      <span>💰 Meine aktuelle Rechnung</span>
+                      <span className="text-lg">{invoiceDetailsExpanded ? '▼' : '▶'}</span>
+                    </button>
+                    
+                    {invoiceDetailsExpanded && (
+                      <div className="px-6 py-4 space-y-3 bg-white border-t border-orange-300">
+                        <div>
+                          <p className="text-slate-600 font-semibold text-sm mb-1">Rechnungsnummer:</p>
+                          <p className="text-2xl font-bold text-orange-600">RG{workflow.invoiceNumber}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-600 font-semibold text-sm mb-1">Fällig:</p>
+                          <p className="text-lg font-bold text-slate-800">€ {workflow.totalBrutto.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-600 font-semibold text-sm mb-1">Kunde:</p>
+                          <p className="text-slate-800 font-semibold">{workflow.selectedEmail.from}</p>
+                        </div>
+                        <div className="text-xs text-slate-600 italic pt-2 border-t border-orange-200">
+                          <p>Diese Rechnung wartet auf Zahlungsbestätigung. Finde die entsprechende Zahlung im Kontoauszug.</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-slate-600 font-semibold mb-1">Fällig:</p>
-                        <p className="text-xl font-bold text-slate-800">€ {workflow.totalBrutto.toFixed(2)}</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-600 font-semibold mb-1">Kunde:</p>
-                        <p className="text-slate-800 font-semibold">{workflow.selectedEmail.from}</p>
-                      </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* SEARCH FUNCTIONALITY */}
@@ -2721,7 +2734,7 @@ Audio-Studio`,
                         <strong>💡 Aufgabe:</strong> Finde die korrekte Zahlung in der Liste und bestätige sie!
                       </p>
                       <p className="text-xs text-blue-700">
-                        Hinweis: Verwende die Rechnungsnummer RG{workflow.invoiceNumber} als Referenz zum Filtern. Achte auf den korrekten Betrag (€ {workflow.totalBrutto.toFixed(2)}).
+                        <strong>Hinweis:</strong> Klicke auf "Meine aktuelle Rechnung" um die Rechnungsnummer zu sehen. Suche dann nach dieser Nummer im Kontoauszug. Achte auch auf den korrekten Betrag!
                       </p>
                     </div>
                   )}
