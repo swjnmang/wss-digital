@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import styles from './LFCommon.module.css'
 
 type Difficulty = 'easy' | 'medium' | 'hard'
-type TaskType = 'check_point' | 'find_y' | 'find_x'
+type TaskType = 'check_point' | 'check_point_calculation' | 'find_y' | 'find_x'
 
 function formatNumber(num: number): number {
   return Math.round(num * 100) / 100
@@ -69,7 +69,7 @@ export default function PunktGerade() {
 
     // Choose task type
     const taskTypeRand = Math.random()
-    let newTaskType: TaskType = taskTypeRand < 0.33 ? 'check_point' : taskTypeRand < 0.66 ? 'find_y' : 'find_x'
+    let newTaskType: TaskType = taskTypeRand < 0.25 ? 'check_point' : taskTypeRand < 0.5 ? 'check_point_calculation' : taskTypeRand < 0.75 ? 'find_y' : 'find_x'
     setTaskType(newTaskType)
 
     let p = { x: randomInt(10, -10), y: 0 }
@@ -92,6 +92,20 @@ export default function PunktGerade() {
       pointDisp = `${pointName}(${p.x}|${p.y})`
       const calcResult = formatNumber(m * p.x + t)
       sol = `<strong>Probe:</strong> Setze die Koordinaten von ${pointName}(${p.x}|${p.y}) ein.<br />${p.y} = ${m} * ${p.x} + ${t}<br />${p.y} = ${calcResult}<br /><strong>Ergebnis:</strong> Die Aussage ist <strong>${Math.abs(p.y - calcResult) < 0.01 ? 'wahr' : 'falsch'}</strong>.`
+      setInputPrefix('')
+    } else if (newTaskType === 'check_point_calculation') {
+      const isOnLine = Math.random() < 0.5
+      if (isOnLine) {
+        p.y = formatNumber(m * p.x + t)
+        answer = true
+      } else {
+        p.y = formatNumber(m * p.x + t + randomInt(5, 1) * (Math.random() < 0.5 ? 1 : -1))
+        answer = false
+      }
+      task = `Prüfe rechnerisch, ob der Punkt auf dem Funktionsgraph zu ${equation.replace('g: ', '')} liegt.`
+      pointDisp = `${pointName}(${p.x}|${p.y})`
+      const calcResult = formatNumber(m * p.x + t)
+      sol = `<strong>Rechnerische Probe:</strong> Setze x = ${p.x} in die Geradengleichung ein.<br />y = ${m} * ${p.x} + ${t}<br />y = ${calcResult}<br /><strong>Ergebnis:</strong> Die Gleichung ${p.y} = ${calcResult} ist <strong>${Math.abs(p.y - calcResult) < 0.01 ? 'wahr' : 'falsch'}</strong>, also liegt der Punkt ${Math.abs(p.y - calcResult) < 0.01 ? 'auf' : 'nicht auf'} der Geraden.`
       setInputPrefix('')
     } else if (newTaskType === 'find_y') {
       answer = formatNumber(m * p.x + t)
