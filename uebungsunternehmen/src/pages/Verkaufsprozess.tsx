@@ -2603,7 +2603,7 @@ Audio-Studio`,
                                 <div className="text-left"><strong>Auftrags-Nr.:</strong></div>
                                 <div className="text-right">{workflow.offerNumber}</div>
                                 <div className="text-left"><strong>Rechnungs-Nr.:</strong></div>
-                                <div className="text-right font-bold text-orange-600">{workflow.invoiceNumber}</div>
+                                <div className="text-right">{workflow.invoiceNumber}</div>
                                 <div className="text-left"><strong>Kunden-Nr.:</strong></div>
                                 <div className="text-right">{workflow.selectedEmail.customerNumber}</div>
                               </div>
