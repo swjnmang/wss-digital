@@ -41,15 +41,16 @@ function randomChoice<T>(arr: T[]): T {
 }
 
 export default function PunktGerade() {
-  const [difficulty, setDifficulty] = useState<Difficulty>('easy')
+  const [difficulty, setDifficulty] = useState<Difficulty | null>(null)
   const [tasks, setTasks] = useState<TaskData[]>([])
+  const [points, setPoints] = useState(0)
 
   function handleDifficulty(level: Difficulty) {
     setDifficulty(level)
     generateAllTasks(level)
   }
 
-  function generateAllTasks(level: Difficulty = difficulty) {
+  function generateAllTasks(level: Difficulty = difficulty || 'easy') {
     const newTasks: TaskData[] = [
       generateTask('check_point', level, '1'),
       generateTask('check_point_calculation', level, '2'),
@@ -223,101 +224,345 @@ export default function PunktGerade() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const themaLabels: Record<TaskType, string> = {
+    'check_point': 'Punktprobe - Ja/Nein',
+    'check_point_calculation': 'Rechnerische Prüfung',
+    'find_correct_point': 'Punkt aus 3 Optionen wählen'
+  }
+
   return (
-    <div className={`prose ${styles.container}`}>
-      <div className={styles.card}>
-        <h2 className={styles.title}>Punktprobe bei Geraden</h2>
-        <div className={styles.content}>
-          <div className="flex justify-center gap-3 mb-6">
-            <button className={`px-4 py-2 rounded-md border ${difficulty === 'easy' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`} onClick={() => handleDifficulty('easy')}>Leicht</button>
-            <button className={`px-4 py-2 rounded-md border ${difficulty === 'medium' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`} onClick={() => handleDifficulty('medium')}>Mittel</button>
-            <button className={`px-4 py-2 rounded-md border ${difficulty === 'hard' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`} onClick={() => handleDifficulty('hard')}>Schwer</button>
+    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px', backgroundColor: '#f9fafb', minHeight: '100vh' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <div>
+          <h1 style={{ fontSize: '32px', fontWeight: 'bold', margin: '0 0 8px 0', color: '#111' }}>Punktprobe bei Geraden</h1>
+          <p style={{ fontSize: '16px', color: '#666', margin: 0 }}>Prüfe rechnerisch, ob Punkte auf Geraden liegen</p>
+        </div>
+        <div style={{ backgroundColor: 'white', padding: '16px 24px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>⭐ {points} <span style={{ fontSize: '14px', color: '#666', marginLeft: '4px' }}>Punkte</span></div>
+        </div>
+      </div>
+
+      {/* Difficulty Selection - Only show when not selected */}
+      {difficulty === null ? (
+        <div style={{ marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px', color: '#111' }}>Schwierigkeitsgrad wählen:</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+            <button
+              onClick={() => {
+                setDifficulty('easy')
+                setTimeout(() => handleDifficulty('easy'), 100)
+              }}
+              style={{
+                padding: '16px',
+                backgroundColor: '#d1fae5',
+                border: '2px solid #10b981',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#047857',
+                transition: 'all 0.3s'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#a7f3d0')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#d1fae5')}
+            >
+              <div style={{ fontSize: '18px', marginBottom: '4px' }}>Leicht</div>
+              <div style={{ fontSize: '12px', color: '#059669' }}>y = m·x ohne Brüche</div>
+            </button>
+            <button
+              onClick={() => {
+                setDifficulty('medium')
+                setTimeout(() => handleDifficulty('medium'), 100)
+              }}
+              style={{
+                padding: '16px',
+                backgroundColor: '#fef3c7',
+                border: '2px solid #f59e0b',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#b45309',
+                transition: 'all 0.3s'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#fde68a')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fef3c7')}
+            >
+              <div style={{ fontSize: '18px', marginBottom: '4px' }}>Mittel</div>
+              <div style={{ fontSize: '12px', color: '#d97706' }}>y = m·x + t ganze Zahlen</div>
+            </button>
+            <button
+              onClick={() => {
+                setDifficulty('hard')
+                setTimeout(() => handleDifficulty('hard'), 100)
+              }}
+              style={{
+                padding: '16px',
+                backgroundColor: '#fee2e2',
+                border: '2px solid #ef4444',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#b91c1c',
+                transition: 'all 0.3s'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#fecaca')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fee2e2')}
+            >
+              <div style={{ fontSize: '18px', marginBottom: '4px' }}>Schwer</div>
+              <div style={{ fontSize: '12px', color: '#dc2626' }}>y = m·x + t mit Brüchen</div>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Action Bar */}
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', justifyContent: 'space-between' }}>
+            <button
+              onClick={() => generateAllTasks(difficulty)}
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2563eb')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#3b82f6')}
+            >
+              🔄 Neue Aufgaben
+            </button>
+            <button
+              onClick={() => setDifficulty(null)}
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#6b7280',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4b5563')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
+            >
+              📊 Schwierigkeitsgrad ändern
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {tasks.map((task) => (
-              <div key={task.id} className="bg-white border rounded-lg shadow-md p-4">
-                <div className="bg-gray-100 border rounded-md p-4 mb-4 text-center min-h-[80px]">
-                  <div className="text-sm font-semibold mb-2">{task.taskText}</div>
-                  <div className="equation-display text-lg font-bold text-sky-800 mb-2" dangerouslySetInnerHTML={{__html: task.equation}} />
-                  {task.points && task.points.length === 1 && (
-                    <div className="point-display text-lg font-bold text-sky-800">
-                      {task.points[0].name}({task.points[0].x}|{task.points[0].y})
+          {/* Tasks Container */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
+            {tasks.map((task, index) => (
+              <div
+                key={task.id}
+                style={{
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  overflow: 'hidden',
+                  border: task.feedbackClass === 'correct' ? '2px solid #10b981' : 'none'
+                }}
+              >
+                {/* Card Header */}
+                <div style={{ padding: '12px 16px', backgroundColor: '#f3f4f6', borderBottom: '1px solid #e5e7eb' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Aufgabe {index + 1}</span>
+                    <span style={{ fontSize: '12px', backgroundColor: '#dbeafe', color: '#0369a1', padding: '4px 8px', borderRadius: '4px' }}>
+                      {themaLabels[task.taskType]}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Card Content */}
+                <div style={{ padding: '16px' }}>
+                  <div style={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '6px', padding: '12px', marginBottom: '12px', textAlign: 'center', minHeight: '60px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ fontSize: '13px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>{task.taskText}</div>
+                    <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#0369a1', marginBottom: '8px' }} dangerouslySetInnerHTML={{__html: task.equation}} />
+                    {task.points && task.points.length === 1 && (
+                      <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#0369a1' }}>
+                        {task.points[0].name}({task.points[0].x}|{task.points[0].y})
+                      </div>
+                    )}
+                    {task.points && task.points.length === 3 && (
+                      <div>
+                        {task.points.map((p, idx) => (
+                          <div key={idx} style={{ fontSize: '14px', fontWeight: 'bold', color: '#0369a1' }}>
+                            {p.name}({p.x}|{p.y})
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Answer Buttons */}
+                  {(task.taskType === 'check_point' || task.taskType === 'check_point_calculation') && (
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                      <button
+                        onClick={() => checkSolution(task.id, true)}
+                        style={{
+                          flex: 1,
+                          padding: '10px',
+                          backgroundColor: '#10b981',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.3s'
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#059669')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#10b981')}
+                      >
+                        Ja
+                      </button>
+                      <button
+                        onClick={() => checkSolution(task.id, false)}
+                        style={{
+                          flex: 1,
+                          padding: '10px',
+                          backgroundColor: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.3s'
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}
+                      >
+                        Nein
+                      </button>
                     </div>
                   )}
-                  {task.points && task.points.length === 3 && (
-                    <div className="space-y-1">
+
+                  {task.taskType === 'find_correct_point' && task.points && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
                       {task.points.map((p, idx) => (
-                        <div key={idx} className="text-lg font-bold text-sky-800">
+                        <button
+                          key={idx}
+                          onClick={() => checkSolution(task.id, idx)}
+                          style={{
+                            padding: '10px',
+                            backgroundColor: task.selectedPoint === idx ? '#3b82f6' : '#e5e7eb',
+                            color: task.selectedPoint === idx ? 'white' : '#1f2937',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontSize: '13px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (task.selectedPoint !== idx) {
+                              e.currentTarget.style.backgroundColor = '#d1d5db'
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (task.selectedPoint !== idx) {
+                              e.currentTarget.style.backgroundColor = '#e5e7eb'
+                            }
+                          }}
+                        >
                           {p.name}({p.x}|{p.y})
-                        </div>
+                        </button>
                       ))}
                     </div>
                   )}
-                </div>
 
-                {/* Buttons for check_point */}
-                {task.taskType === 'check_point' && (
-                  <div className="flex justify-center gap-2 mb-2">
-                    <button className="generator-button bg-green-600 text-white rounded-md px-4 py-2 text-sm" onClick={() => checkSolution(task.id, true)}>Ja</button>
-                    <button className="generator-button bg-red-600 text-white rounded-md px-4 py-2 text-sm" onClick={() => checkSolution(task.id, false)}>Nein</button>
+                  {/* Feedback */}
+                  {task.feedback && (
+                    <div style={{
+                      padding: '10px',
+                      marginBottom: '12px',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      backgroundColor: task.feedbackClass === 'correct' ? '#d1fae5' : '#fee2e2',
+                      color: task.feedbackClass === 'correct' ? '#047857' : '#991b1b'
+                    }}>
+                      {task.feedback}
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <button
+                      onClick={() => generateNewTask(task.id)}
+                      style={{
+                        padding: '10px',
+                        backgroundColor: '#0ea5e9',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.3s'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#0284c7')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#0ea5e9')}
+                    >
+                      Neue Aufgabe
+                    </button>
+                    <button
+                      onClick={() => showAnswer(task.id)}
+                      style={{
+                        padding: '10px',
+                        backgroundColor: '#6b7280',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.3s'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4b5563')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
+                    >
+                      {task.solutionVisible ? 'Lösung ausblenden' : 'Lösung anzeigen'}
+                    </button>
+                    <button
+                      onClick={openVideo}
+                      style={{
+                        padding: '10px',
+                        backgroundColor: '#dc2626',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.3s'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#b91c1c')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
+                    >
+                      🎥 Erklärvideo
+                    </button>
                   </div>
-                )}
-
-                {/* Buttons for check_point_calculation */}
-                {task.taskType === 'check_point_calculation' && (
-                  <div className="flex justify-center gap-2 mb-2">
-                    <button className="generator-button bg-green-600 text-white rounded-md px-4 py-2 text-sm" onClick={() => checkSolution(task.id, true)}>Ja</button>
-                    <button className="generator-button bg-red-600 text-white rounded-md px-4 py-2 text-sm" onClick={() => checkSolution(task.id, false)}>Nein</button>
-                  </div>
-                )}
-
-                {/* Point selection for find_correct_point */}
-                {task.taskType === 'find_correct_point' && task.points && (
-                  <div className="space-y-2 mb-3">
-                    {task.points.map((p, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => checkSolution(task.id, idx)}
-                        className={`w-full py-2 px-3 rounded-md text-sm font-semibold transition ${
-                          task.selectedPoint === idx
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                        }`}
-                      >
-                        {p.name}({p.x}|{p.y})
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Feedback */}
-                <div className={`min-h-[20px] font-bold mb-2 text-sm ${task.feedbackClass === 'correct' ? 'text-green-700' : task.feedbackClass === 'incorrect' ? 'text-red-600' : ''}`}>
-                  {task.feedback}
-                </div>
-
-                {/* Buttons */}
-                <div className="flex flex-col gap-2">
-                  <button className="generator-button bg-gradient-to-br from-sky-600 to-sky-700 text-white rounded-md px-3 py-2 text-sm shadow" onClick={() => generateNewTask(task.id)}>
-                    Neue Aufgabe
-                  </button>
-                  <button className="generator-button bg-gray-600 text-white rounded-md px-3 py-2 text-sm" onClick={() => showAnswer(task.id)}>
-                    Lösung anzeigen
-                  </button>
-                  <button className="generator-button bg-red-700 text-white rounded-md px-3 py-2 text-sm" onClick={openVideo}>
-                    Erklärvideo
-                  </button>
                 </div>
 
                 {/* Solution */}
                 {task.solutionVisible && (
-                  <div className="bg-green-50 border border-green-200 text-green-800 rounded-md p-3 mt-3 text-left text-xs" dangerouslySetInnerHTML={{__html: task.solution}} />
+                  <div style={{ padding: '12px 16px', backgroundColor: '#f0fdf4', borderTop: '1px solid #e5e7eb', color: '#166534', fontSize: '12px', lineHeight: '1.6' }} dangerouslySetInnerHTML={{__html: task.solution}} />
                 )}
               </div>
             ))}
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   )
 }
