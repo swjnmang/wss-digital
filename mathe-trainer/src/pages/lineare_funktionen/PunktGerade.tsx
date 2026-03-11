@@ -255,20 +255,20 @@ export default function PunktGerade() {
               }}
               style={{
                 padding: '16px',
-                backgroundColor: '#d1fae5',
-                border: '2px solid #10b981',
+                backgroundColor: '#e5e7eb',
+                border: '2px solid #9ca3af',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontSize: '16px',
                 fontWeight: '600',
-                color: '#047857',
+                color: '#374151',
                 transition: 'all 0.3s'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#a7f3d0')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#d1fae5')}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#d1d5db')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#e5e7eb')}
             >
               <div style={{ fontSize: '18px', marginBottom: '4px' }}>Leicht</div>
-              <div style={{ fontSize: '12px', color: '#059669' }}>y = m·x ohne Brüche</div>
+              <div style={{ fontSize: '12px', color: '#6b7280' }}>y = m·x ohne Brüche</div>
             </button>
             <button
               onClick={() => {
@@ -277,20 +277,20 @@ export default function PunktGerade() {
               }}
               style={{
                 padding: '16px',
-                backgroundColor: '#fef3c7',
-                border: '2px solid #f59e0b',
+                backgroundColor: '#f3f4f6',
+                border: '2px solid #9ca3af',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontSize: '16px',
                 fontWeight: '600',
-                color: '#b45309',
+                color: '#374151',
                 transition: 'all 0.3s'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#fde68a')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fef3c7')}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e5e7eb')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
             >
               <div style={{ fontSize: '18px', marginBottom: '4px' }}>Mittel</div>
-              <div style={{ fontSize: '12px', color: '#d97706' }}>y = m·x + t ganze Zahlen</div>
+              <div style={{ fontSize: '12px', color: '#6b7280' }}>y = m·x + t ganze Zahlen</div>
             </button>
             <button
               onClick={() => {
@@ -299,32 +299,32 @@ export default function PunktGerade() {
               }}
               style={{
                 padding: '16px',
-                backgroundColor: '#fee2e2',
-                border: '2px solid #ef4444',
+                backgroundColor: '#f9fafb',
+                border: '2px solid #9ca3af',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontSize: '16px',
                 fontWeight: '600',
-                color: '#b91c1c',
+                color: '#374151',
                 transition: 'all 0.3s'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#fecaca')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fee2e2')}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9fafb')}
             >
               <div style={{ fontSize: '18px', marginBottom: '4px' }}>Schwer</div>
-              <div style={{ fontSize: '12px', color: '#dc2626' }}>y = m·x + t mit Brüchen</div>
+              <div style={{ fontSize: '12px', color: '#6b7280' }}>y = m·x + t mit Brüchen</div>
             </button>
           </div>
         </div>
       ) : (
         <>
           {/* Action Bar */}
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', justifyContent: 'flex-start', alignItems: 'center' }}>
             <button
               onClick={() => generateAllTasks(difficulty)}
               style={{
                 padding: '12px 24px',
-                backgroundColor: '#3b82f6',
+                backgroundColor: '#4b5563',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
@@ -333,16 +333,16 @@ export default function PunktGerade() {
                 cursor: 'pointer',
                 transition: 'background-color 0.3s'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2563eb')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#3b82f6')}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#374151')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#4b5563')}
             >
               🔄 Neue Aufgaben
             </button>
             <button
-              onClick={() => setDifficulty(null)}
+              onClick={openVideo}
               style={{
                 padding: '12px 24px',
-                backgroundColor: '#6b7280',
+                backgroundColor: '#7c3aed',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
@@ -351,11 +351,31 @@ export default function PunktGerade() {
                 cursor: 'pointer',
                 transition: 'background-color 0.3s'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4b5563')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6d28d9')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7c3aed')}
             >
-              📊 Schwierigkeitsgrad ändern
+              🎥 Erklärvideo
             </button>
+            <div style={{ marginLeft: 'auto' }}>
+              <button
+                onClick={() => setDifficulty(null)}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: '#9ca3af',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.3s'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#9ca3af')}
+              >
+                📊 Schwierigkeitsgrad ändern
+              </button>
+            </div>
           </div>
 
           {/* Tasks Container */}
@@ -368,7 +388,7 @@ export default function PunktGerade() {
                   borderRadius: '8px',
                   boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                   overflow: 'hidden',
-                  border: task.feedbackClass === 'correct' ? '2px solid #10b981' : 'none'
+                  border: task.feedbackClass === 'correct' ? '2px solid #6b7280' : 'none'
                 }}
               >
                 {/* Card Header */}
@@ -410,7 +430,7 @@ export default function PunktGerade() {
                         style={{
                           flex: 1,
                           padding: '10px',
-                          backgroundColor: '#10b981',
+                          backgroundColor: '#6b7280',
                           color: 'white',
                           border: 'none',
                           borderRadius: '6px',
@@ -419,8 +439,8 @@ export default function PunktGerade() {
                           cursor: 'pointer',
                           transition: 'background-color 0.3s'
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#059669')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#10b981')}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4b5563')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
                       >
                         Ja
                       </button>
@@ -429,7 +449,7 @@ export default function PunktGerade() {
                         style={{
                           flex: 1,
                           padding: '10px',
-                          backgroundColor: '#ef4444',
+                          backgroundColor: '#9ca3af',
                           color: 'white',
                           border: 'none',
                           borderRadius: '6px',
@@ -438,8 +458,8 @@ export default function PunktGerade() {
                           cursor: 'pointer',
                           transition: 'background-color 0.3s'
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#9ca3af')}
                       >
                         Nein
                       </button>
@@ -454,7 +474,7 @@ export default function PunktGerade() {
                           onClick={() => checkSolution(task.id, idx)}
                           style={{
                             padding: '10px',
-                            backgroundColor: task.selectedPoint === idx ? '#3b82f6' : '#e5e7eb',
+                            backgroundColor: task.selectedPoint === idx ? '#7c3aed' : '#d1d5db',
                             color: task.selectedPoint === idx ? 'white' : '#1f2937',
                             border: 'none',
                             borderRadius: '6px',
@@ -465,12 +485,12 @@ export default function PunktGerade() {
                           }}
                           onMouseEnter={(e) => {
                             if (task.selectedPoint !== idx) {
-                              e.currentTarget.style.backgroundColor = '#d1d5db'
+                              e.currentTarget.style.backgroundColor = '#b4b8bd'
                             }
                           }}
                           onMouseLeave={(e) => {
                             if (task.selectedPoint !== idx) {
-                              e.currentTarget.style.backgroundColor = '#e5e7eb'
+                              e.currentTarget.style.backgroundColor = '#d1d5db'
                             }
                           }}
                         >
@@ -488,8 +508,8 @@ export default function PunktGerade() {
                       borderRadius: '6px',
                       fontSize: '13px',
                       fontWeight: '600',
-                      backgroundColor: task.feedbackClass === 'correct' ? '#d1fae5' : '#fee2e2',
-                      color: task.feedbackClass === 'correct' ? '#047857' : '#991b1b'
+                      backgroundColor: task.feedbackClass === 'correct' ? '#e0f2fe' : '#fef2f2',
+                      color: task.feedbackClass === 'correct' ? '#0c4a6e' : '#7f1d1d'
                     }}>
                       {task.feedback}
                     </div>
@@ -498,28 +518,10 @@ export default function PunktGerade() {
                   {/* Action Buttons */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <button
-                      onClick={() => generateNewTask(task.id)}
-                      style={{
-                        padding: '10px',
-                        backgroundColor: '#0ea5e9',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.3s'
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#0284c7')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#0ea5e9')}
-                    >
-                      Neue Aufgabe
-                    </button>
-                    <button
                       onClick={() => showAnswer(task.id)}
                       style={{
                         padding: '10px',
-                        backgroundColor: '#6b7280',
+                        backgroundColor: '#9ca3af',
                         color: 'white',
                         border: 'none',
                         borderRadius: '6px',
@@ -528,35 +530,17 @@ export default function PunktGerade() {
                         cursor: 'pointer',
                         transition: 'background-color 0.3s'
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4b5563')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#9ca3af')}
                     >
                       {task.solutionVisible ? 'Lösung ausblenden' : 'Lösung anzeigen'}
-                    </button>
-                    <button
-                      onClick={openVideo}
-                      style={{
-                        padding: '10px',
-                        backgroundColor: '#dc2626',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.3s'
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#b91c1c')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
-                    >
-                      🎥 Erklärvideo
                     </button>
                   </div>
                 </div>
 
                 {/* Solution */}
                 {task.solutionVisible && (
-                  <div style={{ padding: '12px 16px', backgroundColor: '#f0fdf4', borderTop: '1px solid #e5e7eb', color: '#166534', fontSize: '12px', lineHeight: '1.6' }} dangerouslySetInnerHTML={{__html: task.solution}} />
+                  <div style={{ padding: '12px 16px', backgroundColor: '#f3f4f6', borderTop: '1px solid #e5e7eb', color: '#374151', fontSize: '12px', lineHeight: '1.6' }} dangerouslySetInnerHTML={{__html: task.solution}} />
                 )}
               </div>
             ))}
