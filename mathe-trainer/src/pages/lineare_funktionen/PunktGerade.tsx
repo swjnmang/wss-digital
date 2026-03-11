@@ -428,7 +428,7 @@ export default function PunktGerade() {
                   <div style={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '6px', padding: '12px', marginBottom: '12px', textAlign: 'center', minHeight: '60px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <div style={{ fontSize: '13px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>{task.taskText}</div>
                     <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#0369a1', marginBottom: '8px' }} dangerouslySetInnerHTML={{__html: task.equation}} />
-                    {task.points && task.points.length === 1 && (
+                    {task.points && task.points.length === 1 && task.taskType !== 'calculate_missing_coordinate' && (
                       <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#0369a1' }}>
                         {task.points[0].name}({task.points[0].x}|{task.points[0].y})
                       </div>
