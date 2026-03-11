@@ -76,7 +76,7 @@ export default function PunktGerade() {
       default:
         m = randomInt(5, -5)
         if (m === 0) m = 1
-        t = randomInt(10, -10)
+        t = 0
         break
     }
     m = formatNumber(m)
@@ -379,7 +379,7 @@ export default function PunktGerade() {
           </div>
 
           {/* Tasks Container */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', maxWidth: '100%' }}>
             {tasks.map((task, index) => (
               <div
                 key={task.id}
