@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import styles from './LFCommon.module.css'
 
 type Difficulty = 'easy' | 'medium' | 'hard'
-type TaskType = 'check_point' | 'check_point_calculation' | 'find_correct_point'
+type TaskType = 'check_point' | 'find_correct_point_among_three' | 'calculate_missing_coordinate'
 
 interface Point {
   name: string
@@ -19,6 +19,7 @@ interface TaskData {
   t: number
   points?: Point[]
   correctPointIndex?: number
+  missingCoordinate?: 'x' | 'y'
   taskText: string
   inputValue: string
   selectedPoint?: number
@@ -26,7 +27,7 @@ interface TaskData {
   feedbackClass: string
   solution: string
   solutionVisible: boolean
-  correctAnswer: number | boolean
+  correctAnswer: number | boolean | string
 }
 
 function formatNumber(num: number): number {
@@ -53,8 +54,8 @@ export default function PunktGerade() {
   function generateAllTasks(level: Difficulty = difficulty || 'easy') {
     const newTasks: TaskData[] = [
       generateTask('check_point', level, '1'),
-      generateTask('check_point_calculation', level, '2'),
-      generateTask('find_correct_point', level, '3'),
+      generateTask('find_correct_point_among_three', level, '2'),
+      generateTask('calculate_missing_coordinate', level, '3'),
     ]
     setTasks(newTasks)
   }
@@ -112,26 +113,11 @@ export default function PunktGerade() {
         p.y = formatNumber(m * p.x + t + randomInt(5, 1) * (Math.random() < 0.5 ? 1 : -1))
         taskData.correctAnswer = false
       }
-      taskData.taskText = 'Berechne, ob der nachfolgende Punkt auf der Geraden liegt.'
-      const calcResult = formatNumber(m * p.x + t)
-      taskData.solution = `<strong>Probe:</strong> Setze die Koordinaten von ${pointName}(${p.x}|${p.y}) ein.<br />${p.y} = ${m} * ${p.x} + ${t}<br />${p.y} = ${calcResult}<br /><strong>Ergebnis:</strong> Die Aussage ist <strong>${Math.abs(p.y - calcResult) < 0.01 ? 'wahr' : 'falsch'}</strong>.`
-      taskData.points = [{ name: pointName, x: p.x, y: p.y }]
-    } else if (taskType === 'check_point_calculation') {
-      const p = { x: randomInt(10, -10), y: 0 }
-      const pointName = String.fromCharCode(65 + randomInt(15))
-      const isOnLine = Math.random() < 0.5
-      if (isOnLine) {
-        p.y = formatNumber(m * p.x + t)
-        taskData.correctAnswer = true
-      } else {
-        p.y = formatNumber(m * p.x + t + randomInt(5, 1) * (Math.random() < 0.5 ? 1 : -1))
-        taskData.correctAnswer = false
-      }
       taskData.taskText = `Prüfe rechnerisch, ob der Punkt auf dem Funktionsgraph zu ${equation.replace('g: ', '')} liegt.`
       const calcResult = formatNumber(m * p.x + t)
       taskData.solution = `<strong>Rechnerische Probe:</strong> Setze x = ${p.x} in die Geradengleichung ein.<br />y = ${m} * ${p.x} + ${t}<br />y = ${calcResult}<br /><strong>Ergebnis:</strong> Die Gleichung ${p.y} = ${calcResult} ist <strong>${Math.abs(p.y - calcResult) < 0.01 ? 'wahr' : 'falsch'}</strong>, also liegt der Punkt ${Math.abs(p.y - calcResult) < 0.01 ? 'auf' : 'nicht auf'} der Geraden.`
       taskData.points = [{ name: pointName, x: p.x, y: p.y }]
-    } else if (taskType === 'find_correct_point') {
+    } else if (taskType === 'find_correct_point_among_three') {
       // Generate 3 points, one correct, two incorrect
       const correctX = randomInt(10, -10)
       const correctY = formatNumber(m * correctX + t)
@@ -164,22 +150,53 @@ export default function PunktGerade() {
       }
       solutionHTML += `<strong>Ergebnis:</strong> Der Punkt ${points[correctIdx].name} liegt auf der Geraden.`
       taskData.solution = solutionHTML
+    } else if (taskType === 'calculate_missing_coordinate') {
+      // Generate a point with either x or y missing
+      const missingCoordinate = Math.random() < 0.5 ? 'x' : 'y'
+      const pointName = 'A'
+      
+      let givenX: number, givenY: number
+      if (missingCoordinate === 'x') {
+        givenY = randomInt(10, -10)
+        givenX = formatNumber((givenY - t) / m)
+      } else {
+        givenX = randomInt(10, -10)
+        givenY = formatNumber(m * givenX + t)
+      }
+      
+      taskData.missingCoordinate = missingCoordinate
+      const correctAnswer = missingCoordinate === 'x' ? givenX : givenY
+      taskData.correctAnswer = correctAnswer.toString()
+      
+      const displayX = missingCoordinate === 'x' ? '?' : givenX
+      const displayY = missingCoordinate === 'y' ? '?' : givenY
+      
+      taskData.taskText = `Der Punkt ${pointName}(${displayX}|${displayY}) liegt auf der Geraden ${equation.replace('g: ', '')}. Berechne die fehlende Koordinate.`
+      taskData.points = [{ name: pointName, x: givenX, y: givenY }]
+      
+      if (missingCoordinate === 'x') {
+        taskData.solution = `<strong>Berechnung von x:</strong><br />Setze y = ${givenY} in die Geradengleichung ein:<br />${givenY} = ${m} * x + ${t}<br />${givenY} - ${t} = ${m} * x<br />x = (${givenY} - ${t}) / ${m}<br /><strong>x = ${givenX}</strong><br /><br />Der Punkt ist ${pointName}(${givenX}|${givenY})`
+      } else {
+        taskData.solution = `<strong>Berechnung von y:</strong><br />Setze x = ${givenX} in die Geradengleichung ein:<br />y = ${m} * ${givenX} + ${t}<br />y = ${formatNumber(m * givenX)} + ${t}<br /><strong>y = ${givenY}</strong><br /><br />Der Punkt ist ${pointName}(${givenX}|${givenY})`
+      }
     }
 
     return taskData
   }
 
-  function checkSolution(taskId: string, userAnswer?: number | boolean) {
+  function checkSolution(taskId: string, userAnswer?: number | boolean | string) {
     const task = tasks.find(t => t.id === taskId)
     if (!task) return
 
     let isCorrect = false
     if (task.taskType === 'check_point') {
       isCorrect = (userAnswer === task.correctAnswer)
-    } else if (task.taskType === 'check_point_calculation') {
+    } else if (task.taskType === 'find_correct_point_among_three') {
       isCorrect = (userAnswer === task.correctAnswer)
-    } else if (task.taskType === 'find_correct_point') {
-      isCorrect = (userAnswer === task.correctAnswer)
+    } else if (task.taskType === 'calculate_missing_coordinate') {
+      const userNum = parseFloat(userAnswer as string)
+      const correctNum = parseFloat(task.correctAnswer as string)
+      isCorrect = Math.abs(userNum - correctNum) < 0.01
     }
 
     const updatedTasks = tasks.map(t => {
@@ -188,12 +205,17 @@ export default function PunktGerade() {
           ...t,
           feedback: isCorrect ? 'Richtig! Sehr gut!' : 'Leider nicht richtig. Versuche es noch einmal!',
           feedbackClass: isCorrect ? 'correct' : 'incorrect',
-          selectedPoint: task.taskType === 'find_correct_point' ? (userAnswer as number) : undefined,
+          selectedPoint: task.taskType === 'find_correct_point_among_three' ? (userAnswer as number) : undefined,
+          inputValue: task.taskType === 'calculate_missing_coordinate' ? (userAnswer as string) : '',
         }
       }
       return t
     })
     setTasks(updatedTasks)
+
+    if (isCorrect) {
+      setPoints(points + 1)
+    }
   }
 
   function showAnswer(taskId: string) {
@@ -226,8 +248,8 @@ export default function PunktGerade() {
 
   const themaLabels: Record<TaskType, string> = {
     'check_point': 'Punktprobe - Ja/Nein',
-    'check_point_calculation': 'Rechnerische Prüfung',
-    'find_correct_point': 'Punkt aus 3 Optionen wählen'
+    'find_correct_point_among_three': 'Welcher Punkt liegt auf der Geraden?',
+    'calculate_missing_coordinate': 'Berechne die fehlende Koordinate'
   }
 
   return (
@@ -422,8 +444,8 @@ export default function PunktGerade() {
                     )}
                   </div>
 
-                  {/* Answer Buttons */}
-                  {(task.taskType === 'check_point' || task.taskType === 'check_point_calculation') && (
+                  {/* Answer Buttons for check_point */}
+                  {task.taskType === 'check_point' && (
                     <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
                       <button
                         onClick={() => checkSolution(task.id, true)}
@@ -466,7 +488,7 @@ export default function PunktGerade() {
                     </div>
                   )}
 
-                  {task.taskType === 'find_correct_point' && task.points && (
+                  {task.taskType === 'find_correct_point_among_three' && task.points && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
                       {task.points.map((p, idx) => (
                         <button
@@ -497,6 +519,52 @@ export default function PunktGerade() {
                           {p.name}({p.x}|{p.y})
                         </button>
                       ))}
+                    </div>
+                  )}
+
+                  {/* Input Field for calculate_missing_coordinate */}
+                  {task.taskType === 'calculate_missing_coordinate' && (
+                    <div style={{ marginBottom: '12px' }}>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <input
+                          type="number"
+                          step="0.01"
+                          placeholder="Dein Ergebnis..."
+                          value={task.inputValue}
+                          onChange={(e) => {
+                            const updatedTasks = tasks.map(t => 
+                              t.id === task.id ? { ...t, inputValue: e.target.value } : t
+                            )
+                            setTasks(updatedTasks)
+                          }}
+                          style={{
+                            flex: 1,
+                            padding: '10px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '6px',
+                            fontSize: '13px',
+                            fontFamily: 'inherit'
+                          }}
+                        />
+                        <button
+                          onClick={() => checkSolution(task.id, task.inputValue)}
+                          style={{
+                            padding: '10px 16px',
+                            backgroundColor: '#6b7280',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontSize: '13px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.3s'
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4b5563')}
+                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
+                        >
+                          Prüfen
+                        </button>
+                      </div>
                     </div>
                   )}
 
