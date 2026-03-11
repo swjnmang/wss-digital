@@ -216,6 +216,13 @@ export default function PunktGerade() {
     if (isCorrect) {
       setPoints(points + 1)
     }
+
+    // Check if all 3 tasks are now correct
+    if (updatedTasks.every(t => t.feedbackClass === 'correct')) {
+      setTimeout(() => {
+        generateAllTasks(difficulty)
+      }, 1500)
+    }
   }
 
   function showAnswer(taskId: string) {
