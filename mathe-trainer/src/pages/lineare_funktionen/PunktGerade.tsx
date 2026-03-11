@@ -591,26 +591,28 @@ export default function PunktGerade() {
                   )}
 
                   {/* Action Buttons */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <button
-                      onClick={() => showAnswer(task.id)}
-                      style={{
-                        padding: '10px',
-                        backgroundColor: '#9ca3af',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.3s'
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#9ca3af')}
-                    >
-                      {task.solutionVisible ? 'Lösung ausblenden' : 'Lösung anzeigen'}
-                    </button>
-                  </div>
+                  {task.feedbackClass === 'incorrect' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <button
+                        onClick={() => showAnswer(task.id)}
+                        style={{
+                          padding: '10px',
+                          backgroundColor: '#9ca3af',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.3s'
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#9ca3af')}
+                      >
+                        {task.solutionVisible ? 'Lösung ausblenden' : 'Lösung anzeigen'}
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Solution */}
