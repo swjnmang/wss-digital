@@ -1,10 +1,189 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 
+interface QuizQuestion {
+  id: number
+  theory: string
+  question: string
+  options: string[]
+  correctAnswer: number
+  explanation: string
+}
+
+const quizQuestions: QuizQuestion[] = [
+  {
+    id: 1,
+    theory: 'Maslow',
+    question: 'Nach Maslow gibt es eine Hierarchie der Bedürfnisse. Welche Bedürfnisse sind die Basis?',
+    options: ['Sicherheitsbedürfnisse', 'Physiologische Bedürfnisse', 'Selbstverwirklichung', 'Soziale Bedürfnisse'],
+    correctAnswer: 1,
+    explanation: 'Physische Bedürfnisse wie Hunger, Durst und Schlaf sind die Grundlage von Maslow\'s Pyramide.'
+  },
+  {
+    id: 2,
+    theory: 'Maslow',
+    question: 'Was versteht Maslow unter "Selbstverwirklichung"?',
+    options: ['Viel Geld verdienen', 'Das volle Potenzial ausschöpfen', 'Berühmtheit erlangen', 'Andere kontrollieren'],
+    correctAnswer: 1,
+    explanation: 'Selbstverwirklichung bedeutet, sein volles Potenzial zu entwickeln und kreativ zu sein.'
+  },
+  {
+    id: 3,
+    theory: 'Konditionierung',
+    question: 'Bei der klassischen Konditionierung ist der unkonditionierte Reiz:',
+    options: ['Der erlernte Reiz', 'Der natürlich wirksame Reiz', 'Eine neue Assoziation', 'Immer ein Klang'],
+    correctAnswer: 1,
+    explanation: 'Der unkonditionierte Reiz wirkt natürlicherweise, z.B. Futter für einen Hund.'
+  },
+  {
+    id: 4,
+    theory: 'Konditionierung',
+    question: 'Bei der operanten Konditionierung kommt es auf an:',
+    options: ['Ein vorhandener Reflex', 'Die Folgen des Verhaltens', 'Unbewusste Prozesse', 'Genetische Faktoren'],
+    correctAnswer: 1,
+    explanation: 'Operante Konditionierung basiert auf Verstärkung oder Bestrafung nach dem Verhalten.'
+  },
+  {
+    id: 5,
+    theory: 'Flow',
+    question: 'Wann entsteht der Flow-Zustand nach Csikszentmihalyi?',
+    options: ['Wenn die Aufgabe sehr einfach ist', 'Wenn Fähigkeiten und Herausforderungen im Gleichgewicht sind', 'Bei chaotischen Bedingungen', 'Wenn man entspannt ist'],
+    correctAnswer: 1,
+    explanation: 'Flow entsteht, wenn die Schwierigkeit der Aufgabe Fähigkeiten und Anforderungen des Menschen entspricht.'
+  },
+  {
+    id: 6,
+    theory: 'Flow',
+    question: 'Welcher Zustand tritt auf, wenn die Herausforderung größer ist als die Fähigkeiten?',
+    options: ['Flow', 'Apathie', 'Angst', 'Langeweile'],
+    correctAnswer: 2,
+    explanation: 'Wenn die Herausforderung zu groß ist, führt das zu Angst oder Frustration.'
+  },
+  {
+    id: 7,
+    theory: 'Intrinsisch/Extrinsisch',
+    question: 'Eine intrinsische Motivation ist...',
+    options: ['Motivation durch externe Belohnungen', 'Motivation aus innerem Antrieb', 'Immer stärker als extrinsisch', 'Basiert auf Angst'],
+    correctAnswer: 1,
+    explanation: 'Intrinsische Motivation kommt aus innerer Interesse und Freude an der Tätigkeit selbst.'
+  },
+  {
+    id: 8,
+    theory: 'Intrinsisch/Extrinsisch',
+    question: 'Welches ist ein Beispiel für extrinsische Motivation?',
+    options: ['Lernen, weil man ein Thema interessant findet', 'Eine gute Note für eine Prüfung erhalten', 'Hobbys nachgehen', 'Ein Buch lesen aus Leidenschaft'],
+    correctAnswer: 1,
+    explanation: 'Extrinsische Motivation bezieht sich auf externe Faktoren wie Noten, Geld oder Belohnungen.'
+  },
+  {
+    id: 9,
+    theory: 'Dopamin',
+    question: 'Dopamin ist ein Botenstoff, der besonders wichtig für...',
+    options: ['Muskelaufbau', 'Schlaf', 'Das Belohnungssystem und Motivation', 'Knochengesundheit'],
+    correctAnswer: 2,
+    explanation: 'Dopamin ist der Neurotransmitter des Belohnungssystems und fördert Motivation und Lernverhalten.'
+  },
+  {
+    id: 10,
+    theory: 'Dopamin',
+    question: 'Warum sind "Likes" auf Social Media so süchtig machend?',
+    options: ['Sie are immer verfügbar', 'Man weiß nie, wann der nächste kommt (intermittierende Verstärkung)', 'Sie sind sehr wertvoll', 'Man kann sie sparen'],
+    correctAnswer: 1,
+    explanation: 'Unvorhersehbare Belohnungen führen zu einer intensiveren Dopaminausschüttung als vorhersehbare.'
+  },
+  {
+    id: 11,
+    theory: 'Mixed',
+    question: 'Welche zwei Motivationsarten sollten idealerweise kombiniert werden?',
+    options: ['Nur intrinsisch', 'Nur extrinsisch', 'Intrinsisch UND extrinsisch', 'Weder noch - Motivationen konkurrieren'],
+    correctAnswer: 2,
+    explanation: 'Die beste Motivation entsteht durch die Kombination von innerer Freude und angemessener externer Struktur.'
+  },
+  {
+    id: 12,
+    theory: 'Mixed',
+    question: 'Nach welcher Theorie kann eine Schule ein "Lernspiel" nutzen, um alle Motivationsebenen anzusprechen?',
+    options: ['Nur Flow', 'Nur Dopamin', 'Alle Theorien zusammen (Maslow, Flow, Dopamin, etc.)', 'Nur Konditionierung'],
+    correctAnswer: 2,
+    explanation: 'Effektive Lernspielen kombinieren Elemente aus mehreren Motivationstheorien für maximalen Erfolg.'
+  },
+]
+
 export default function Lernspielen() {
   const [activeTab, setActiveTab] = useState('aufgaben')
-  const [expandedAufgabe1, setExpandedAufgabe1] = useState(true)
+  const [expandedAufgabe1, setExpandedAufgabe1] = useState(false)
   const [expandedAufgabe2, setExpandedAufgabe2] = useState(false)
+  const [expandedAufgabe3, setExpandedAufgabe3] = useState(false)
+  const [expandedPhase1, setExpandedPhase1] = useState(false)
+  const [expandedPhase2, setExpandedPhase2] = useState(false)
+  const [expandedPhase3, setExpandedPhase3] = useState(false)
+  const [expandedPhase4, setExpandedPhase4] = useState(false)
+  const [expandedInfotexte, setExpandedInfotexte] = useState<Record<number, boolean>>({
+    1: false,
+    2: false,
+    3: false,
+    4: false,
+    5: false,
+  })
+  
+  // Quiz state
+  const [quizStarted, setQuizStarted] = useState(false)
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
+  const [answered, setAnswered] = useState(false)
+  const [score, setScore] = useState(0)
+  const [answers, setAnswers] = useState<(number | null)[]>(new Array(quizQuestions.length).fill(null))
+
+
+  const handleAnswerClick = (optionIndex: number) => {
+    if (answered) return
+    
+    setSelectedAnswer(optionIndex)
+    setAnswered(true)
+    
+    const currentQuestion = quizQuestions[currentQuestionIndex]
+    const isCorrect = optionIndex === currentQuestion.correctAnswer
+    
+    if (isCorrect) {
+      setScore(score + 1)
+    }
+    
+    const newAnswers = [...answers]
+    newAnswers[currentQuestionIndex] = optionIndex
+    setAnswers(newAnswers)
+  }
+
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < quizQuestions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1)
+      setSelectedAnswer(null)
+      setAnswered(false)
+    }
+  }
+
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1)
+      setSelectedAnswer(answers[currentQuestionIndex - 1])
+      setAnswered(true)
+    }
+  }
+
+  const handleRestartQuiz = () => {
+    setQuizStarted(false)
+    setCurrentQuestionIndex(0)
+    setSelectedAnswer(null)
+    setAnswered(false)
+    setScore(0)
+    setAnswers(new Array(quizQuestions.length).fill(null))
+  }
+
+  const getProgressPercentage = () => {
+    return Math.round(((currentQuestionIndex + 1) / quizQuestions.length) * 100)
+  }
+
+  const currentQuestion = quizQuestions[currentQuestionIndex]
+  const isQuizComplete = currentQuestionIndex === quizQuestions.length - 1 && answered
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -32,14 +211,14 @@ export default function Lernspielen() {
               Aufgaben
             </button>
             <button
-              onClick={() => setActiveTab('texte')}
+              onClick={() => setActiveTab('infotexte')}
               className={`pb-4 px-2 font-semibold transition-colors ${
-                activeTab === 'texte'
+                activeTab === 'infotexte'
                   ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Texte
+              Infotexte
             </button>
             <button
               onClick={() => setActiveTab('uebungen')}
@@ -69,152 +248,185 @@ export default function Lernspielen() {
                 </button>
                 
                 {expandedAufgabe1 && (
-                <div className="px-8 py-6 border-t border-slate-200 bg-white space-y-6">
-                  {/* Narrative Introduction */}
-                  <div className="bg-slate-50 border-l-4 border-slate-400 p-6 rounded-lg">
-                    <h4 className="text-lg font-bold text-slate-900 mb-4">📖 Die Geschichte: Das Langeweile-Manifest</h4>
-                    <div className="bg-white p-4 rounded border border-slate-200 italic text-slate-700 space-y-3">
-                      <p>
-                        <strong>Szenario:</strong> Du hast gerade eine frustrierende Nachhilfestunde beendet und hast von Schule die Nase voll. Du verfasst einen geheimen Aufruf, das "Langeweile-Manifest", der nur an die vertrauenswürdigsten und kreativsten Mitschüler/innen (die "<strong>A-Tutor-League</strong>") verschickt wird.
-                      </p>
-                      <hr className="border-slate-200" />
-                      <div className="bg-slate-50 p-3 rounded border border-slate-200">
-                        <p className="font-semibold text-slate-900 mb-2">💌 Original-Botschaft von Alex an das Team (Auszug):</p>
-                        <blockquote className="text-sm leading-relaxed">
-                          „Liebe Mitstreiter, wir können so nicht weitermachen. Die aktuellen Arbeitsblätter und PowerPoints sind digitale Schlaftabletten! Unsere Mitschüler/innen verlieren das Interesse, bevor sie überhaupt angefangen haben zu lernen.
-                          <br /><br />
-                          Wenn wir das Fach retten wollen, müssen wir eine Revolution starten. Unser Ziel: Motivierenden Unterricht durch Gamification erschaffen. Wir sind die letzte Hoffnung.
-                          <br /><br />
-                          Wir starten die '<strong>A-Tutor-League</strong>' und unser erstes Projekt ist die Entwicklung von Lernspielen, die wirklich funktionieren. Wir müssen deshalb zunächst herausfinden, wie Motivation bei Menschen funktioniert."
+                <div className="px-8 py-6 border-t border-slate-200 bg-white space-y-8">
+                  
+                  {/* 1. The Story */}
+                  <section>
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-3xl">📖</span>
+                      <h4 className="text-xl font-bold text-slate-900">Die Geschichte: Das Langeweile-Manifest</h4>
+                    </div>
+                    <div className="space-y-4 text-slate-700">
+                      <div className="bg-white p-6 rounded-lg border border-slate-200">
+                        <p className="mb-3 leading-relaxed">
+                          <strong className="text-slate-900">Szenario:</strong> Du hast gerade eine frustrierende Nachhilfestunde beendet und hast von Schule die Nase voll. Du verfasst einen geheimen Aufruf, das <em>"Langeweile-Manifest"</em>, der nur an die vertrauenswürdigsten und kreativsten Mitschüler/innen (die <strong>"A-Tutor-League"</strong>) verschickt wird.
+                        </p>
+                      </div>
+                      
+                      <div className="bg-slate-50 border-l-4 border-slate-300 p-6 rounded-lg">
+                        <p className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                          <span>💌</span> Original-Botschaft von Alex an das Team
+                        </p>
+                        <blockquote className="italic text-slate-700 leading-relaxed space-y-3">
+                          <p>
+                            "Liebe Mitstreiter, wir können so nicht weitermachen. Die aktuellen Arbeitsblätter und PowerPoints sind digitale Schlaftabletten! Unsere Mitschüler/innen verlieren das Interesse, bevor sie überhaupt angefangen haben zu lernen.
+                          </p>
+                          <p>
+                            Wenn wir das Fach retten wollen, müssen wir eine Revolution starten. Unser Ziel: Motivierenden Unterricht durch Gamification erschaffen. Wir sind die letzte Hoffnung.
+                          </p>
+                          <p>
+                            Wir starten die <strong>'A-Tutor-League'</strong> und unser erstes Projekt ist die Entwicklung von Lernspielen, die wirklich funktionieren. Wir müssen deshalb zunächst herausfinden, wie Motivation bei Menschen funktioniert."
+                          </p>
                         </blockquote>
                       </div>
                     </div>
-                  </div>
+                  </section>
 
-                  {/* Mission Brief */}
-                  <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
-                    <h4 className="text-lg font-bold text-slate-900 mb-3">🎯 Euer Auftrag</h4>
-                    <p className="text-slate-700 mb-4">
+                  <hr className="border-slate-200" />
+
+                  {/* 2. The Mission */}
+                  <section>
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-3xl">🎯</span>
+                      <h4 className="text-xl font-bold text-slate-900">Euer Auftrag</h4>
+                    </div>
+                    <p className="text-slate-700 mb-6 leading-relaxed">
                       Um funktionierende Lernspiele zu entwickeln, müsst ihr zunächst verstehen, wie menschliche Motivation funktioniert. Die <strong>A-Tutor-League</strong> hat euch daher einen Gruppenauftrag gegeben:
                     </p>
-                    <div className="bg-white p-4 rounded border border-slate-200">
-                      <ol className="space-y-2 text-slate-700">
-                        <li className="flex gap-3">
-                          <span className="font-bold text-slate-700">1.</span>
-                          <span>Bildet <strong>5 Gruppen</strong> zu je 4-5 Personen</span>
-                        </li>
-                        <li className="flex gap-3">
-                          <span className="font-bold text-slate-700">2.</span>
-                          <span>Jede Gruppe wählt eines der 5 untenstehenden <strong>Motivations-Themen</strong></span>
-                        </li>
-                        <li className="flex gap-3">
-                          <span className="font-bold text-slate-700">3.</span>
-                          <span>Informiert euch gründlich über das Thema (nutzt die bereitgestellten Links & Texte)</span>
-                        </li>
-                        <li className="flex gap-3">
-                          <span className="font-bold text-slate-700">4.</span>
-                          <span>Erstellt eine <strong>10-15 Minuten</strong> Präsentation für die Klasse</span>
-                        </li>
-                        <li className="flex gap-3">
-                          <span className="font-bold text-slate-700">5.</span>
-                          <span>Erklärt, <strong>wie euer Konzept in Lernspielen angewendet werden kann</strong></span>
-                        </li>
+                    <div className="bg-slate-50 p-6 rounded-lg border border-slate-300">
+                      <ol className="space-y-4">
+                        {[
+                          'Bildet 5 Gruppen',
+                          'Jede Gruppe wählt eines der 5 untenstehenden Motivations-Themen',
+                          'Informiert euch gründlich über das Thema (nutzt die bereitgestellten Links & Texte)',
+                          'Erstellt eine 10-15 Minuten Präsentation für die Klasse',
+                          'Erklärt, wie euer Konzept in Lernspielen angewendet werden kann'
+                        ].map((task, idx) => (
+                          <li key={idx} className="flex gap-4 text-slate-700">
+                            <span className="font-bold text-slate-700 text-lg flex-shrink-0 w-7 h-7 flex items-center justify-center bg-slate-100 rounded-full">{idx + 1}</span>
+                            <span className="pt-1">{task}</span>
+                          </li>
+                        ))}
                       </ol>
                     </div>
-                  </div>
+                  </section>
 
-                  {/* Group Topics */}
-                  <div className="space-y-3">
-                    <h4 className="text-lg font-bold text-slate-900">👥 Die 5 Gruppen und ihre Themen</h4>
-                    <div className="grid gap-4">
+                  <hr className="border-slate-200" />
+
+                  {/* 3. Group Topics */}
+                  <section>
+                    <div className="flex items-center gap-3 mb-6">
+                      <span className="text-3xl">👥</span>
+                      <h4 className="text-xl font-bold text-slate-900">Die 5 Gruppen und ihre Themen</h4>
+                    </div>
+                    <div className="space-y-3">
                       {[
                         {
                           group: 'Gruppe 1',
                           title: 'Bedürfnispyramide nach Maslow',
                           emoji: '🔺',
                           desc: 'Wie beeinflussen Grundbedürfnisse, Sicherheit, Zugehörigkeit, Anerkennung und Selbstverwirklichung die Lernmotivation?',
-                          color: 'blue',
                         },
                         {
                           group: 'Gruppe 2',
                           title: 'Klassische Konditionierung',
                           emoji: '🔔',
                           desc: 'Wie können wir durch gezielte Reize-Reaktions-Muster (wie Pavlovs Hunde) Lernende motivieren?',
-                          color: 'purple',
                         },
                         {
                           group: 'Gruppe 3',
                           title: 'Flow-Theorie nach Csikszentmihalyi',
                           emoji: '🌊',
                           desc: 'Wie bringt man Lernende in einen Zustand vollständiger Hingabe, wo Zeit und Selbstzweifel vergessen sind?',
-                          color: 'cyan',
                         },
                         {
                           group: 'Gruppe 4',
                           title: 'Intrinsische & Extrinsische Motivation',
                           emoji: '⚡',
                           desc: 'Welche Motivation ist nachhaltiger? Punkte und Noten vs. innere Zufriedenheit und Interessenspflege?',
-                          color: 'amber',
                         },
                         {
                           group: 'Gruppe 5',
                           title: 'Belohnungssysteme im Gehirn',
                           emoji: '🎁',
                           desc: 'In unserem Gehirn gibt es ein Zentrum, das uns steuert: das Belohnungssystem. Es ist dafür da, dass wir Dinge wiederholen, die gut für uns sind (wie Essen oder Lernen). Der wichtigste Botenstoff dabei ist Dopamin.',
-                          color: 'slate',
                         },
-                      ].map((item, idx) => {
-                        const colors = {
-                          blue: 'bg-slate-50 border-slate-200',
-                          purple: 'bg-slate-50 border-slate-200',
-                          cyan: 'bg-slate-50 border-slate-200',
-                          amber: 'bg-slate-50 border-slate-200',
-                          rose: 'bg-slate-50 border-slate-200',
-                          slate: 'bg-slate-50 border-slate-200',
-                        }
-                        return (
-                          <div key={idx} className={`${colors[item.color as keyof typeof colors]} p-4 rounded-lg border-2`}>
-                            <div className="flex gap-3">
-                              <span className="text-3xl">{item.emoji}</span>
-                              <div className="flex-1">
-                                <div className="flex items-baseline gap-2 mb-1">
-                                  <span className="font-bold text-slate-700">{item.group}</span>
-                                  <span className="text-lg font-bold text-slate-900">{item.title}</span>
-                                </div>
-                                <p className="text-sm text-slate-700">{item.desc}</p>
+                      ].map((item, idx) => (
+                        <div key={idx} className="bg-slate-50 p-4 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors">
+                          <div className="flex gap-3">
+                            <span className="text-2xl flex-shrink-0">{item.emoji}</span>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-semibold text-slate-600 uppercase">{item.group}</span>
                               </div>
+                              <h5 className="font-semibold text-slate-900 text-base mb-1">{item.title}</h5>
+                              <p className="text-slate-700 text-xs leading-relaxed">{item.desc}</p>
                             </div>
                           </div>
-                        )
-                      })}
+                        </div>
+                      ))}
                     </div>
-                  </div>
+                  </section>
 
-                  {/* Deliverables */}
-                  <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
-                    <h4 className="text-lg font-bold text-slate-900 mb-4">📊 Was muss präsentiert werden?</h4>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="bg-white p-4 rounded border border-slate-200">
-                        <h5 className="font-bold text-slate-900 mb-2">Teil 1: Theorie (5-7 Min)</h5>
-                        <ul className="text-sm text-slate-700 space-y-1">
-                          <li>✓ Grundkonzepte & Definitionen</li>
-                          <li>✓ Historischer Kontext & Erfinder</li>
-                          <li>✓ Forschungsergebnisse & Belege</li>
-                          <li>✓ Praktische Beispiele aus Alltag</li>
+                  <hr className="border-slate-200" />
+
+                  {/* 4. Deliverables */}
+                  <section>
+                    <div className="flex items-center gap-3 mb-6">
+                      <span className="text-3xl">📊</span>
+                      <h4 className="text-xl font-bold text-slate-900">Was muss präsentiert werden?</h4>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg">
+                        <div className="flex items-center gap-2 mb-4">
+                          <span className="text-xl">🎓</span>
+                          <h5 className="font-semibold text-slate-900">Teil 1: Theorie (5-7 Min)</h5>
+                        </div>
+                        <ul className="text-slate-700 space-y-2 text-sm">
+                          <li className="flex gap-2">
+                            <span className="text-slate-600 font-bold">•</span>
+                            <span>Grundkonzepte & Definitionen</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-slate-600 font-bold">•</span>
+                            <span>Historischer Kontext & Erfinder</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-slate-600 font-bold">•</span>
+                            <span>Forschungsergebnisse & Belege</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-slate-600 font-bold">•</span>
+                            <span>Praktische Beispiele aus Alltag</span>
+                          </li>
                         </ul>
                       </div>
-                      <div className="bg-white p-4 rounded border border-orange-200">
-                        <h5 className="font-bold text-slate-900 mb-2">Teil 2: Anwendung (5-8 Min)</h5>
-                        <ul className="text-sm text-slate-700 space-y-1">
-                          <li>✓ Wie würde man dies in einem Lernspiel nutzen?</li>
-                          <li>✓ Wo genau könnte man es einbauen?</li>
-                          <li>✓ Prototype/Mockup oder Beispiel-Gameplay</li>
-                          <li>✓ Chancen & Risiken dieser Methode</li>
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg">
+                        <div className="flex items-center gap-2 mb-4">
+                          <span className="text-xl">🎮</span>
+                          <h5 className="font-semibold text-slate-900">Teil 2: Anwendung (5-8 Min)</h5>
+                        </div>
+                        <ul className="text-slate-700 space-y-2 text-sm">
+                          <li className="flex gap-2">
+                            <span className="text-slate-600 font-bold">•</span>
+                            <span>Wie würde man dies in einem Lernspiel nutzen?</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-slate-600 font-bold">•</span>
+                            <span>Wo genau könnte man es einbauen?</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-slate-600 font-bold">•</span>
+                            <span>Prototype/Mockup oder Beispiel-Gameplay</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-slate-600 font-bold">•</span>
+                            <span>Chancen & Risiken dieser Methode</span>
+                          </li>
                         </ul>
                       </div>
                     </div>
-                  </div>
-
+                  </section>
 
                 </div>
                 )}
@@ -600,117 +812,656 @@ export default function Lernspielen() {
                 </div>
                 )}
               </div>
+
+              {/* AUFGABE 3: Lernspiel entwickeln */}
+              <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedAufgabe3(!expandedAufgabe3)}
+                  className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="text-left flex-1">
+                    <h3 className="text-2xl font-bold text-slate-900">🎮 Aufgabe 3: Lernspiel entwickeln & durchführen</h3>
+                    <p className="text-slate-600 text-sm mt-2">Entwerft und testet euer eigenes Lernspiel - die A-Tutor-League wird aktiv!</p>
+                  </div>
+                  <span className="text-3xl ml-4 transition-transform duration-300" style={{ transform: expandedAufgabe3 ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                </button>
+
+                {expandedAufgabe3 && (
+                <div className="px-8 py-6 border-t border-slate-200 bg-white space-y-8">
+                  
+                  {/* Introduction */}
+                  <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                    <h4 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                      <span>🚀</span> Die A-Tutor-League wird praktisch!
+                    </h4>
+                    <p className="text-slate-700 mb-4">
+                      Ihr habt nun die theoretischen Grundlagen der Motivationspsychologie kennengelernt und Experimente durchgeführt. Jetzt ist es Zeit für die große Aktion: <strong>Ihr entwickelt ein eigenes Lernspiel!</strong>
+                    </p>
+                    <div className="bg-white p-4 rounded border border-slate-200 mt-4">
+                      <p className="font-semibold text-slate-900 mb-3">📋 Aufbau dieser Arbeitsaufgabe:</p>
+                      <ol className="text-sm text-slate-700 space-y-2 list-decimal list-inside">
+                        <li><strong>Planung:</strong> Was wollt ihr erreichen? Wer spielt? Was ist das Ziel?</li>
+                        <li><strong>Entwicklung:</strong> Erstellt das konkrete Spiel</li>
+                        <li><strong>Test & Optimierung:</strong> Testet mit anderen Schülern</li>
+                        <li><strong>Evaluation:</strong> Ihr erstellt einen Bewertungsbogen & messt Lernerfolg</li>
+                      </ol>
+                    </div>
+                  </div>
+
+                  {/* Phase 1: Planung */}
+                  <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => setExpandedPhase1(!expandedPhase1)}
+                      className="w-full p-6 hover:bg-slate-50 transition-colors flex items-center justify-between"
+                    >
+                      <div className="text-left flex-1">
+                        <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                          <span>📐</span> Phase 1: Planung - Das Konzept
+                        </h4>
+                      </div>
+                      <span className="text-2xl ml-4 transition-transform duration-300" style={{ transform: expandedPhase1 ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                    </button>
+
+                    {expandedPhase1 && (
+                    <div className="px-6 py-6 border-t border-slate-200 bg-slate-50 space-y-4">
+                      <p className="text-slate-700 mb-4">
+                        Bevor ihr anfangt zu programmieren oder zu basteln, müsst ihr genau planen. Beantwortet diese Fragen als Gruppe:
+                      </p>
+                    
+                    <div className="space-y-4">
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">👥 Zielgruppe</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li>Alter & Klassenstufe des Schülerkreises?</li>
+                          <li>Vorwissen: Was können die Spieler schon?</li>
+                          <li>Binnendifferenzierung: Gibt es verschiedene Schwierigkeitsstufen?</li>
+                          <li>Sprachbarrieren oder motorische Anforderungen?</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🎯 Zielsetzung</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li><strong>Lernziel:</strong> Was sollen die Spieler lernen/können?</li>
+                          <li><strong>Kompetenzen:</strong> Welche Fähigkeiten werden gefördert? (Wissen, Denken, Zusammenarbeit)</li>
+                          <li><strong>Verhaltensänderung:</strong> Soll das Spiel Motivation oder Einstellung ändern?</li>
+                          <li><strong>Spaßfaktor:</strong> Soll es einfach nur Spaß machen oder auch lehren?</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">📚 Fachgebiet & Themenbereich</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li>Welches Fach? (Mathe, Englisch, Biologie, Geschichte, etc.)</li>
+                          <li>Konkretes Thema? (z.B. „Englische Vokabeln", „Photosynthese", „Quadratische Gleichungen")</li>
+                          <li>Exaktes Curriculum-Niveau?</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🛠️ Materialien & Werkzeuge</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li>Was braucht ihr? (Papier, Karten, Würfel, Computer, etc.)</li>
+                          <li>Zeitbudget? (Wie lange dauert eine Runde?)</li>
+                          <li>Raumbu dget? (Kleiner Tisch, ganze Klassenzimmer, Outdoor?)</li>
+                          <li>Budget? (Kostet die Herstellung etwas?)</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🎮 Umsetzungsmöglichkeiten (Vorschläge & Inspirationen)</p>
+                        <p className="text-sm text-slate-700 mb-3">
+                          Hier sind einige Beispiele, wie euer Lernspiel aussehen könnte. Das sind aber nur <strong>Gedankenanstoße</strong> - ihr könnt natürlich auch ganz andere Formate wählen!
+                        </p>
+                        <ul className="text-sm text-slate-700 space-y-2 list-none">
+                          <li>💡 <strong>Analog:</strong> Brettspiel, Kartenspiel, Activity-ähnlich, Tabu, Schnitzeljagd, Tabletop-Rollenspiel, etc.</li>
+                          <li>💡 <strong>Digital:</strong> Quiz-App (Kahoot), HTML-Spiel, Online-Tool, Interactive Story, etc.</li>
+                          <li>💡 <strong>Hybrid:</strong> Mischung aus analog und digital</li>
+                          <li>💡 <strong>Virtuell:</strong> VR/AR-Elemente (falls verfügbar)</li>
+                          <li>💡 <strong>Eure Idee:</strong> Habt ihr eine ganz andere Idee? Noch besser! Z.B. Podcast+Quiz, Instagram-Story-Format, Video-Game-Stil, etc.</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🧠 Motivationstheorien im Spiel</p>
+                        <p className="text-sm text-slate-700 mb-3">
+                          <strong>Wichtig:</strong> Denkt dabei an eure 5 Motivationstheorien! Welche werdet ihr nutzen?
+                        </p>
+                        <ul className="text-sm text-slate-700 space-y-2 list-none">
+                          <li>🔺 <strong>Maslow:</strong> Erfüllt das Spiel bestimmte Bedürfnisse? (z.B. Zugehörigkeit durch Teamspiel, Anerkennung durch Punkte)</li>
+                          <li>🔔 <strong>Konditionierung:</strong> Welche Reize & Belohnungen verbinden die Spieler mit eurem Spiel?</li>
+                          <li>🌊 <strong>Flow:</strong> Passt die Schwierigkeit? Ist es weder zu leicht noch zu schwer?</li>
+                          <li>💜 <strong>Intrinsisch/Extrinsisch:</strong> Was motiviert mehr - der Inhalt selbst oder externe Belohnungen?</li>
+                          <li>🧬 <strong>Dopamin:</strong> Welche Momente erzeugen Glücksgefühle und wiederholen das Spielen?</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🎯 Gamification Elemente</p>
+                        <p className="text-sm text-slate-700 mb-3">
+                          Welche klassischen Gamification-Mechaniken werdet ihr einbauen?
+                        </p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li><strong>Punkte/Scoring:</strong> Wie verdienen Spieler Punkte?</li>
+                          <li><strong>Levels/Ränge:</strong> Gibt es verschiedene Schwierigkeitsstufen oder Progression?</li>
+                          <li><strong>Belohnungen:</strong> Was gewinnt der Spieler? (Badges, Medaillen, Titel, Privileg)</li>
+                          <li><strong>Leaderboards/Rankings:</strong> Vergleichen sich Spieler mit anderen?</li>
+                          <li><strong>Challenges/Missionen:</strong> Gibt es spezielle Aufgaben mit Boni?</li>
+                          <li><strong>Feedback:</strong> Wann weiß der Spieler, dass er richtig oder falsch war?</li>
+                          <li><strong>Story/Narrative:</strong> Hat das Spiel eine Geschichte oder nur reine Aufgaben?</li>
+                          <li><strong>Zusammenarbeit/Kompetition:</strong> Spielen alle gegeneinander oder zusammen?</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Checklist */}
+                    <div className="mt-6 bg-slate-50 p-4 rounded border border-slate-300">
+                      <p className="font-semibold text-slate-900 mb-3">✅ Planung Checklist:</p>
+                      <ul className="text-sm text-slate-700 space-y-1 list-none">
+                        <li>☐ Zielgruppe klargestellt</li>
+                        <li>☐ Lernziel definiert</li>
+                        <li>☐ Fach & Thema konkretisiert</li>
+                        <li>☐ Material- & Zeitbudget geplant</li>
+                        <li>☐ Type des Spiels entschieden</li>
+                        <li>☐ Motivationstheorien ausgewählt & geplant</li>
+                        <li>☐ Gamification Elemente definiert</li>
+                        <li>☐ Gruppenmitglieder & Rollen verteilt</li>
+                      </ul>
+                    </div>
+                    </div>
+                    )}
+                  </div>
+
+                  {/* Phase 2: Entwicklung & Prototype */}
+                  <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => setExpandedPhase2(!expandedPhase2)}
+                      className="w-full p-6 hover:bg-slate-50 transition-colors flex items-center justify-between"
+                    >
+                      <div className="text-left flex-1">
+                        <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                          <span>🔨</span> Phase 2: Entwicklung & Prototype
+                        </h4>
+                      </div>
+                      <span className="text-2xl ml-4 transition-transform duration-300" style={{ transform: expandedPhase2 ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                    </button>
+
+                    {expandedPhase2 && (
+                    <div className="px-6 py-6 border-t border-slate-200 bg-slate-50 space-y-4">
+                    <p className="text-slate-700 mb-4">
+                      Jetzt wird es konkret! Hier sind die Schritte, je nach Spieltyp:
+                    </p>
+
+                    <div className="space-y-4">
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">📀 Allgemein: Was muss klar sein?</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li><strong>Spielregeln:</strong> Schreibt sie auf! Klar & verständlich. Testet sie mit Unbeteiligten.</li>
+                          <li><strong>Spielablauf:</strong> Wie lange dauert eine Runde? Wann endet es?</li>
+                          <li><strong>Punkte/Gewinner:</strong> Wie gewinnt man? Was ist die Metrik?</li>
+                          <li><strong>Spieler-Erlebnis:</strong> Wo sind die motivierenden Momente? (Challenges, Belohnungen, FUN!)</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">📋 Für Kahoot/Quiz:</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li>Registriert euch auf Kahoot.com</li>
+                          <li>Schreibt 10-20 gute Fragen (je schwächer zu. Oder: Mix?)</li>
+                          <li>Multiple-Choice mit 4 Optionen</li>
+                          <li>Testet es in der Gruppe</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🎲 Für Brettspiel:</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li>Spielfeld designen (z.B. auf großem Papier)</li>
+                          <li>30-50 Aufgabenkarten beschreiben</li>
+                          <li>Würfel & Spielfiguren besorgen</li>
+                          <li>Spielregeln testen in Gruppe</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🎭 Für Activity/Tabu:</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li>100+ Begriffe schreiben (oder Bilder zeichnen)</li>
+                          <li>Karten schön beschriften</li>
+                          <li>Stoppen & Teamverwaltung: Wie zählt man?</li>
+                          <li>Testlauf mit echtem Team</li>
+                        </ul>
+                      </div>
+                    </div>
+                    </div>
+                    )}
+                  </div>
+
+                  {/* Phase 3: Test mit Schülern & Optimierung */}
+                  <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => setExpandedPhase3(!expandedPhase3)}
+                      className="w-full p-6 hover:bg-slate-50 transition-colors flex items-center justify-between"
+                    >
+                      <div className="text-left flex-1">
+                        <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                          <span>🧪</span> Phase 3: Test mit Schülern & Optimierung
+                        </h4>
+                      </div>
+                      <span className="text-2xl ml-4 transition-transform duration-300" style={{ transform: expandedPhase3 ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                    </button>
+
+                    {expandedPhase3 && (
+                    <div className="px-6 py-6 border-t border-slate-200 bg-slate-50 space-y-4">
+                    <p className="text-slate-700 mb-4">
+                      Ihr testertet das Spiel mit echten Spielern (andere Schüler, nicht eure Gruppe):
+                    </p>
+
+                    <div className="space-y-4">
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">📝 Versuchsaufbau</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li><strong>Versuchsgruppe:</strong> Schüler, die das Lernspiel spielen (min. 10 Personen, besser mehr)</li>
+                          <li><strong>Kontrollgruppe (optional):</strong> Schüler, die traditionell lernen (zum Vergleich)</li>
+                          <li><strong>Zeit:</strong> Ein oder mehrere Sessions durchführen</li>
+                          <li><strong>Beobachtung:</strong> Macht Notizen! Wo lachen Spieler? Wo verstehen sie nicht?</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">📋 Beobachtungskriterien (Vor & Nach)</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li><strong>Ausgangs-Zustand (Vor Spiel):</strong> Wie motiviert sind die Spieler? (1-10 Skala)</li>
+                          <li><strong>Während Spiel:</strong> Engagement, Spaß, Verständnis des Inhalts?</li>
+                          <li><strong>End-Zustand (Nach Spiel):</strong> Haben sie gelernt? Macht es noch Spaß? Möchten sie nochmal?</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🔄 Optimierung</p>
+                        <p className="text-sm text-slate-700 mb-2">Nach dem ersten Test: Was funktioniert NICHT?</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li>Sind Regeln zu komplex? → Vereinfachen!</li>
+                          <li>Ist es ZU einfach? → Schwierigkeit erhöhen</li>
+                          <li>Finden Spieler das Thema langweilig? → Motivations-Element verstärken (Gamification!)</li>
+                          <li>Technische Probleme bei Kahoot? → Check Internet & Geräte</li>
+                          <li>Zu laut/chaotisch? → Raumänderung oder Regeln anpassen</li>
+                        </ul>
+                      </div>
+                    </div>
+                    </div>
+                    )}
+                  </div>
+
+                  {/* Phase 4: Evaluation & Lernerfolg-Messung */}
+                  <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => setExpandedPhase4(!expandedPhase4)}
+                      className="w-full p-6 hover:bg-slate-50 transition-colors flex items-center justify-between"
+                    >
+                      <div className="text-left flex-1">
+                        <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                          <span>📊</span> Phase 4: Evaluation & Lernerfolg-Messung
+                        </h4>
+                      </div>
+                      <span className="text-2xl ml-4 transition-transform duration-300" style={{ transform: expandedPhase4 ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                    </button>
+
+                    {expandedPhase4 && (
+                    <div className="px-6 py-6 border-t border-slate-200 bg-slate-50 space-y-4">
+                    <p className="text-slate-700 mb-4">
+                      Jetzt wird es wissenschaftlich! Ihr müsst klar zeigen: Hat das Lernspiel funktioniert?
+                    </p>
+
+                    <div className="space-y-4">
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">📝 Evaluationsbogen (von euch erstellt!)</p>
+                        <p className="text-xs text-slate-600 mb-2">Ein Evaluationsbogen sollte folgende Bereiche checken:</p>
+                        <ul className="text-sm text-slate-700 space-y-2 list-none">
+                          <li><strong>✓ Spaßfaktor:</strong> "Hat dir das Spiel Spaß gemacht?" (1-5 oder ja/nein)</li>
+                          <li><strong>✓ Verständnis:</strong> Konkrete Fragen zum gelernten Inhalt</li>
+                          <li><strong>✓ Motivation:</strong> "Sind die bereit nochmal zu spielen?" / Vergleich zu normalem Unterricht</li>
+                          <li><strong>✓ Teamfähigkeit:</strong> "Warst du mit anderen zusammengearbeitet?" (falls relevant)</li>
+                          <li><strong>✓ Usability:</strong> "Waren die Regeln verständlich?" "Haben die Grafiken/Musik geholfen?"</li>
+                          <li><strong>✓ Verbesserungen:</strong> Offene Frage: Was hätte beliebt sein können?</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">📈 Wie messt ihr Lernerfolg? (Theorieteil)</p>
+                        <div className="text-sm text-slate-700 space-y-2">
+                          <p><strong>Methode 1: Pre-Post Test</strong></p>
+                          <p className="ml-4">- Test VOR dem Spiel (Pre-Test)</p>
+                          <p className="ml-4">- Spiel spielen</p>
+                          <p className="ml-4">- Test NACH dem Spiel (Post-Test)</p>
+                          <p className="ml-4">- Unterschied = Lernerfolg</p>
+                          
+                          <p className="mt-2"><strong>Methode 2: Beobachtung & Dokumentation</strong></p>
+                          <p className="ml-4">- Konnte der Spieler vorher Rechnungen lösen? Nein!</p>
+                          <p className="ml-4">- Nach dem Spiel? Ja! → Lernerfolg!</p>
+                          
+                          <p className="mt-2"><strong>Methode 3: Zufriedenheitsvergleich</strong></p>
+                          <p className="ml-4">- "Wie viel Spaß hat Lernspiel gemacht?" (1-10)</p>
+                          <p className="ml-4">- "Wie viel Spaß macht normaler Unterricht?" (1-10)</p>
+                          <p className="ml-4">- Unterschied zeigt Motivation-Boost</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🎯 Konkrete Maßnahmen (Pick 1-2):</p>
+                        <div className="text-sm text-slate-700 space-y-2">
+                          <p><strong>Option A: Mini-Leistungsnachweis</strong></p>
+                          <p className="ml-4">z.B. kleiner 5-Minuten-Test zu den Lerninhalten NACH dem Spiel</p>
+                          <p className="ml-4">→ "Konnten 80% der Spieler die Aufgaben lösen?"</p>
+                          
+                          <p className="mt-2"><strong>Option B: Zufriedenheitsumfrage</strong></p>
+                          <p className="ml-4">Fragebogen an die Spieler: Spaß? Lernerfolg? Engagement?</p>
+                          
+                          <p className="mt-2"><strong>Option C: Lehrer-Feedback (falls Lehrperson dabei war)</strong></p>
+                          <p className="ml-4">0-10 Rating: "Hat das Lernspiel einen Unterschied gemacht?"</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🔒 Wichtig - Datenschutz!</p>
+                        <p className="text-sm text-slate-700">
+                          ⚠️ Wenn ihr Feedback sammelt: KEINE persönlichen Daten! Keine Namen in Umfragen! Alles anonym halten. Wenn Lehrperson oder Eltern involved: Erlaubnis holen!
+                        </p>
+                      </div>
+                    </div>
+                    </div>
+                    )}
+                  </div>
+
+                  {/* Checklist */}
+                  <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                    <p className="font-bold text-slate-900 mb-4 text-lg">✅ Komplett-Checklist für Aufgabe 3</p>
+                    <div className="grid md:grid-cols-2 gap-6 text-sm text-slate-700">
+                      <div>
+                        <p className="font-semibold text-slate-900 mb-2">📋 Planung:</p>
+                        <ul className="space-y-1 list-none">
+                          <li>☐ Zielgruppe & Alter</li>
+                          <li>☐ Lernziel konkret</li>
+                          <li>☐ Fach & Thema</li>
+                          <li>☐ Material & Werkzeuge</li>
+                          <li>☐ Spieltyp gewählt</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900 mb-2">🎮 Entwicklung:</p>
+                        <ul className="space-y-1 list-none">
+                          <li>☐ Regeln aufgeschrieben</li>
+                          <li>☐ Prototype/Prototyp gemacht</li>
+                          <li>☐ Inhaltliche Korrektheit gecheckt</li>
+                          <li>☐ Mit Gruppe getestet</li>
+                          <li>☐ Bugs/Fehler behoben</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900 mb-2">🧪 Test & Iteration:</p>
+                        <ul className="space-y-1 list-none">
+                          <li>☐ Mit 10+ anderen Schülern getestet</li>
+                          <li>☐ Beobachtungen dokumentiert</li>
+                          <li>☐ Feedback gesammelt</li>
+                          <li>☐ Optimierungen gemacht</li>
+                          <li>☐ Version 2.0 erstellt</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900 mb-2">📊 Evaluation:</p>
+                        <ul className="space-y-1 list-none">
+                          <li>☐ Evaluationsbogen erstellt</li>
+                          <li>☐ Pre/Post Tests durchgeführt</li>
+                          <li>☐ Daten gesammelt & ausgewertet</li>
+                          <li>☐ Ergebnisse dokumentiert</li>
+                          <li>☐ Präsentation vorbereitet</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Final Note */}
+                  <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                    <p className="font-bold text-slate-900 mb-2 text-lg">🚀 Die große Mission der A-Tutor-League</p>
+                    <p className="text-slate-700">
+                      Mit dieser Aufgabe zeigt ihr nicht nur, dass ihr die Motivationspsychologie versteht, sondern auch, dass ihr sie PRAKTISCH umsetzen könnt! Das Ziel ist klar: Ein Lernspiel, das real funktioniert, echte Schüler motiviert und echte Lehrinhalte vermittelt. 
+                    </p>
+                    <p className="text-slate-700 mt-3">
+                      <strong>Das ist Gamification in echt!</strong> 🎮✨
+                    </p>
+                  </div>
+                </div>
+                )}
+              </div>
             </div>
           )}
 
-          {activeTab === 'texte' && (
-            <div className="space-y-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">📚 Lernmaterialien für jedes Thema</h2>
+          {activeTab === 'infotexte' && (
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">📚 Infotexte zu den 5 Motivationstheorien</h2>
               
               {/* Maslow */}
-              <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-3xl">🔺</span>
-                  <h3 className="text-2xl font-bold text-slate-900">Bedürfnispyramide nach Maslow</h3>
-                </div>
-                <div className="bg-white p-4 rounded border border-slate-200 space-y-3 text-slate-700">
-                  <p><strong>Kernidee:</strong> Menschen werden motiviert durch ein Hierarchie von Bedürfnissen - von physischen Grundbedürfnissen bis hin zu Selbstverwirklichung.</p>
-                  <div className="space-y-2">
-                    <p className="font-semibold">📖 Ressourcen:</p>
-                    <ul className="space-y-1 text-sm">
-                      <li>🎥 <a href="https://youtu.be/O-4XJlH5zQ4" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Video: Maslows Pyramid Explained (englisch)</a></li>
-                      <li>📄 Artikel: Physiologische, Sicherheits-, Soziale-, Anerkennungs- & Selbstverwirklichungsbedürfnisse</li>
-                      <li>💡 Wie könnte man Level-Up-Systeme mit Maslows Pyramide verbinden?</li>
-                    </ul>
+              <div className="border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setExpandedInfotexte({ ...expandedInfotexte, 1: !expandedInfotexte[1] })}
+                  className="w-full px-6 py-4 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3 text-left flex-1">
+                    <span className="text-2xl">🔺</span>
+                    <h3 className="font-bold text-slate-900">Bedürfnispyramide nach Maslow</h3>
                   </div>
-                </div>
+                  <span className="text-2xl ml-4 transition-transform duration-300" style={{ transform: expandedInfotexte[1] ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                </button>
+                {expandedInfotexte[1] && (
+                  <div className="px-6 py-4 bg-white border-t space-y-3 text-slate-700 text-sm leading-relaxed">
+                    <p><strong>Was ist das?</strong> Der Psychologe Abraham Maslow wollte verstehen, was Menschen antreibt. Er fand heraus, dass wir viele verschiedene Bedürfnisse haben. Diese ordnete er in einer Pyramide mit fünf Stufen an. Die Grundidee ist einfach: Man muss erst die unteren Stufen erfüllen, bevor man sich um die höheren Dinge kümmern kann.</p>
+                    
+                    <div>
+                      <p className="font-semibold mb-2">Die fünf Stufen im Detail:</p>
+                      <ol className="list-decimal list-inside space-y-2 ml-2">
+                        <li><strong>Grundbedürfnisse:</strong> Das ist das Fundament. Hierzu gehören Essen, Trinken, Schlafen und Atmen. Wenn ein Mensch hungrig ist oder keine Luft bekommt, ist ihm alles andere egal.</li>
+                        <li><strong>Sicherheit:</strong> Wenn wir satt sind, wollen wir uns sicher fühlen. Wir brauchen eine Wohnung, Schutz vor Gewalt, einen festen Job und Gesetze, auf die wir uns verlassen können.</li>
+                        <li><strong>Soziale Bedürfnisse:</strong> Der Mensch ist ein Gruppentier. Wir brauchen Freunde, Familie und das Gefühl, geliebt zu werden und dazuzugehören. Niemand ist gerne dauerhaft allein.</li>
+                        <li><strong>Anerkennung und Erfolg:</strong> Hier geht es um das Ego. Wir möchten, dass andere uns loben und respektieren. Wir wollen wichtig sein, Erfolg im Beruf haben und ein gesundes Selbstbewusstsein aufbauen.</li>
+                        <li><strong>Selbstverwirklichung:</strong> Das ist die Spitze. Hier geht es darum, seine eigenen Talente zu nutzen. Ein Maler will malen, ein Musiker will spielen. Man möchte die beste Version seiner selbst werden.</li>
+                      </ol>
+                    </div>
+                    
+                    <p><strong>Besonderheiten:</strong> Maslow sagt, dass die ersten vier Stufen „Defizitbedürfnisse" sind. Das bedeutet: Wenn sie fehlen, sind wir unglücklich. Wenn sie erfüllt sind, denken wir nicht mehr viel darüber nach. Die 5. Stufe ist ein „Wachstumsbedürfnis". Man kann nie „genug" Selbstverwirklichung haben.</p>
+                    
+                    <div className="bg-slate-50 p-3 rounded">
+                      <p className="font-semibold mb-2">Fragen für die Gruppe:</p>
+                      <ul className="space-y-1 ml-4 list-disc list-inside">
+                        <li>Warum kann ein Schüler, der in der Schule gemobbt wird (Stufe 2/3), sich oft schlecht auf den Lernstoff konzentrieren?</li>
+                        <li>Gibt es Menschen, die Stufe 5 erreichen, obwohl sie arm sind? Findet Beispiele.</li>
+                        <li>Erstellt eine eigene Pyramide für euren Alltag: Was ist für euch persönlich am wichtigsten?</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Klassische Konditionierung */}
-              <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-3xl">🔔</span>
-                  <h3 className="text-2xl font-bold text-slate-900">Klassische Konditionierung</h3>
-                </div>
-                <div className="bg-white p-4 rounded border border-slate-200 space-y-3 text-slate-700">
-                  <p><strong>Kernidee:</strong> Wenn man einen neutralen Reiz (z.B. einen Sound) wiederholt mit einem positiven Event (Belohnung) koppelt, beginnt man diese zu assoziieren.</p>
-                  <div className="space-y-2">
-                    <p className="font-semibold">📖 Ressourcen:</p>
-                    <ul className="space-y-1 text-sm">
-                      <li>🎥 <a href="https://youtu.be/rrKvFeW43K0" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Video: Pavlovs Dogs - Classic Conditioning Explained</a></li>
-                      <li>📄 Pavlov, Watson & moderne Anwendungen in Gamification</li>
-                      <li>💡 Sound-Design in Spielen: Warum das ding-Sound beim Achievement so motivierend wirkt</li>
-                    </ul>
+              <div className="border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setExpandedInfotexte({ ...expandedInfotexte, 2: !expandedInfotexte[2] })}
+                  className="w-full px-6 py-4 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3 text-left flex-1">
+                    <span className="text-2xl">🔔</span>
+                    <h3 className="font-bold text-slate-900">Klassische Konditionierung</h3>
                   </div>
-                </div>
+                  <span className="text-2xl ml-4 transition-transform duration-300" style={{ transform: expandedInfotexte[2] ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                </button>
+                {expandedInfotexte[2] && (
+                  <div className="px-6 py-4 bg-white border-t space-y-3 text-slate-700 text-sm leading-relaxed">
+                    <p><strong>Was ist das?</strong> Die klassische Konditionierung erklärt, wie wir lernen, zwei Dinge miteinander zu verknüpfen. Entdeckt wurde das vom Forscher Iwan Pawlow. Er arbeitete mit Hunden und bemerkte, dass sie schon Speichel produzierten, bevor das Futter überhaupt da war.</p>
+                    
+                    <div>
+                      <p className="font-semibold mb-2">Wie funktioniert der Prozess?</p>
+                      <ol className="list-decimal list-inside space-y-2 ml-2">
+                        <li><strong>Vor dem Lernen:</strong> Es gibt natürliche Reize. Wenn ein Hund Futter sieht, läuft ihm das Wasser im Mund zusammen. Das ist ein angeborener Reflex. Ein neutrales Geräusch, wie eine Glocke, löst erst einmal gar nichts aus.</li>
+                        <li><strong>Während des Lernens:</strong> Man lässt die Glocke läuten und gibt dem Hund direkt danach Futter. Das wiederholt man viele Male. Das Gehirn des Hundes lernt: „Glocke bedeutet Futter!".</li>
+                        <li><strong>Nach dem Lernen:</strong> Jetzt reicht das Geräusch der Glocke allein aus. Der Hund produziert Speichel, auch wenn gar kein Futter zu sehen ist. Er ist „konditioniert".</li>
+                      </ol>
+                    </div>
+                    
+                    <div>
+                      <p className="font-semibold mb-2">Wichtige Begriffe:</p>
+                      <ul className="space-y-1 ml-4 list-disc list-inside">
+                        <li><strong>Reiz-Reaktions-Kette:</strong> Ein Signal führt automatisch zu einem Verhalten.</li>
+                        <li><strong>Löschung:</strong> Wenn man die Glocke 100-mal läutet, ohne jemals wieder Futter zu geben, vergisst der Hund die Verbindung irgendwann.</li>
+                        <li><strong>Generalisierung:</strong> Wenn der Hund auch auf ein ähnliches Geräusch (z.B. eine Klingel) reagiert, nennt man das Generalisierung.</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-slate-50 p-3 rounded">
+                      <p className="font-semibold mb-2">Fragen für die Gruppe:</p>
+                      <ul className="space-y-1 ml-4 list-disc list-inside">
+                        <li>Ein Schüler hat einmal eine schlimme Erfahrung bei einer Mathearbeit gemacht. Jetzt hat er schon Angst, wenn er nur den Matheraum betritt. Erklärt das mit der Theorie von Pawlow.</li>
+                        <li>Wie nutzt die Werbung dieses Prinzip? (Tipp: Schöne Musik + ein neues Handy).</li>
+                        <li>Kann man Konditionierung im Alltag nutzen, um sich selbst bessere Gewohnheiten anzugewöhnen?</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Flow-Theorie */}
-              <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-3xl">🌊</span>
-                  <h3 className="text-2xl font-bold text-slate-900">Flow-Theorie nach Csikszentmihalyi</h3>
-                </div>
-                <div className="bg-white p-4 rounded border border-slate-200 space-y-3 text-slate-700">
-                  <p><strong>Kernidee:</strong> Flow ist der optimale Zustand von Konzentration und Problemlösung - wenn Herausforderung und Fähigkeit perfekt ausbalanciert sind.</p>
-                  <div className="space-y-2">
-                    <p className="font-semibold">📖 Ressourcen:</p>
-                    <ul className="space-y-1 text-sm">
-                      <li>🎥 <a href="https://youtu.be/fXIeFJCqsPs" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">TED Talk: Mihaly Csikszentmihalyi - Flow</a></li>
-                      <li>📄 Die 9 Flow-Merkmale: Challenge, Skill, Clear Goals, Feedback, Concentration...</li>
-                      <li>💡 Level-Design in Spielen: Wie man Progressive Difficulty für Flow nutzt</li>
-                    </ul>
+              {/* Flow */}
+              <div className="border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setExpandedInfotexte({ ...expandedInfotexte, 3: !expandedInfotexte[3] })}
+                  className="w-full px-6 py-4 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3 text-left flex-1">
+                    <span className="text-2xl">🌊</span>
+                    <h3 className="font-bold text-slate-900">Flow-Theorie nach Csikszentmihalyi</h3>
                   </div>
-                </div>
+                  <span className="text-2xl ml-4 transition-transform duration-300" style={{ transform: expandedInfotexte[3] ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                </button>
+                {expandedInfotexte[3] && (
+                  <div className="px-6 py-4 bg-white border-t space-y-3 text-slate-700 text-sm leading-relaxed">
+                    <p><strong>Was ist das?</strong> Der Forscher Mihály Csíkszentmihályi untersuchte Menschen, die in ihrer Arbeit völlig aufgehen. Er nannte diesen Zustand „Flow" (Englisch für Fließen). Im Flow vergisst man die Welt um sich herum, man spürt keinen Hunger und verliert das Zeitgefühl.</p>
+                    
+                    <div>
+                      <p className="font-semibold mb-2">Wann entsteht Flow? Flow passiert nicht einfach so. Es müssen bestimmte Bedingungen erfüllt sein:</p>
+                      <ol className="list-decimal list-inside space-y-2 ml-2">
+                        <li><strong>Das richtige Gleichgewicht:</strong> Die Aufgabe darf nicht zu schwer sein (sonst bekommt man Angst oder Stress). Sie darf aber auch nicht zu leicht sein (sonst wird einem langweilig). Die Anforderung muss genau zu deinen Fähigkeiten passen.</li>
+                        <li><strong>Klares Ziel:</strong> Du musst genau wissen, was zu tun ist.</li>
+                        <li><strong>Direktes Feedback:</strong> Du musst sofort merken, ob du Erfolg hast (z.B. beim Klettern hält der Griff, beim Videospiel steigt die Punktzahl).</li>
+                        <li><strong>Tiefe Konzentration:</strong> Man ist so fokussiert, dass man das eigene „Ich" und alle Sorgen vergisst.</li>
+                      </ol>
+                    </div>
+                    
+                    <p><strong>Warum ist Flow wichtig?</strong> Menschen im Flow sind extrem leistungsfähig und gleichzeitig sehr glücklich. Es ist eine der gesündesten Formen der Arbeit.</p>
+                    
+                    <div className="bg-slate-50 p-3 rounded">
+                      <p className="font-semibold mb-2">Fragen für die Gruppe:</p>
+                      <ul className="space-y-1 ml-4 list-disc list-inside">
+                        <li>Warum fühlen sich viele Schüler im Unterricht eher gelangweilt oder gestresst statt im „Flow"?</li>
+                        <li>Gamer erleben oft Flow. Welche Elemente in Videospielen sorgen dafür?</li>
+                        <li>Überlegt euch eine Aktivität (Sport, Musik, Hobby) und beschreibt genau, wie sich Flow dort anfühlt.</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Intrinsische vs. Extrinsische Motivation */}
-              <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-3xl">⚡</span>
-                  <h3 className="text-2xl font-bold text-slate-900">Intrinsische & Extrinsische Motivation</h3>
-                </div>
-                <div className="bg-white p-4 rounded border border-slate-200 space-y-3 text-slate-700">
-                  <p><strong>Kernidee:</strong> Intrinsische Motivation (innere Antriebe) ist nachhaltiger als extrinsische (äußere Belohnungen wie Noten).</p>
-                  <div className="space-y-2">
-                    <p className="font-semibold">📖 Ressourcen:</p>
-                    <ul className="space-y-1 text-sm">
-                      <li>🎥 <a href="https://youtu.be/u6XAPnuFjJc" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">TED Talk: Daniel Pink - The Puzzle of Motivation</a></li>
-                      <li>📄 Deci & Ryan Selbstbestimmungstheorie (SDT): Autonomy, Competence, Relatedness</li>
-                      <li>💡 Warum Punkte allein nicht motivieren - Die Rolle von inneren Werten</li>
-                    </ul>
+              {/* Intrinsische / Extrinsische Motivation */}
+              <div className="border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setExpandedInfotexte({ ...expandedInfotexte, 4: !expandedInfotexte[4] })}
+                  className="w-full px-6 py-4 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3 text-left flex-1">
+                    <span className="text-2xl">⚡</span>
+                    <h3 className="font-bold text-slate-900">Intrinsische & Extrinsische Motivation</h3>
                   </div>
-                </div>
+                  <span className="text-2xl ml-4 transition-transform duration-300" style={{ transform: expandedInfotexte[4] ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                </button>
+                {expandedInfotexte[4] && (
+                  <div className="px-6 py-4 bg-white border-t space-y-3 text-slate-700 text-sm leading-relaxed">
+                    <p><strong>Was ist das?</strong> Motivation ist der Grund, warum wir morgens aufstehen und Dinge tun. Die Psychologie unterscheidet zwei Quellen für diesen Antrieb:</p>
+                    
+                    <div>
+                      <p className="font-semibold mb-2">1. Intrinsische Motivation (von innen):</p>
+                      <p className="ml-4">Du tust etwas, weil die Sache selbst dir Spaß macht. Du liest ein Buch, weil die Geschichte spannend ist. Du spielst Fußball, weil du die Bewegung liebst.</p>
+                      <ul className="space-y-1 ml-4 mt-2 list-disc list-inside">
+                        <li><strong>Vorteil:</strong> Man hält länger durch, ist kreativer und glücklicher.</li>
+                        <li><strong>Bedingung:</strong> Man muss sich frei fühlen und merken, dass man etwas gut kann.</li>
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <p className="font-semibold mb-2">2. Extrinsische Motivation (von außen):</p>
+                      <p className="ml-4">Du tust etwas, um eine Belohnung zu bekommen oder eine Strafe zu vermeiden. Du lernst für eine gute Note. Du arbeitest für Geld. Du räumst dein Zimmer auf, damit deine Eltern nicht schimpfen.</p>
+                      <ul className="space-y-1 ml-4 mt-2 list-disc list-inside">
+                        <li><strong>Vorteil:</strong> Sie hilft uns, auch langweilige Aufgaben zu erledigen.</li>
+                        <li><strong>Nachteil:</strong> Wenn die Belohnung (z.B. das Geld) wegfällt, hört man sofort auf.</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-blue-50 p-3 rounded">
+                      <p className="font-semibold mb-2">Das Problem der Belohnung (Korrumpierungseffekt):</p>
+                      <p>Forscher haben herausgefunden: Wenn man jemandem Geld für eine Sache gibt, die er vorher freiwillig und gerne gemacht hat, verliert er oft den Spaß daran. Die äußere Belohnung „zerstört" die innere Freude.</p>
+                    </div>
+                    
+                    <div className="bg-slate-50 p-3 rounded">
+                      <p className="font-semibold mb-2">Fragen für die Gruppe:</p>
+                      <ul className="space-y-1 ml-4 list-disc list-inside">
+                        <li>Seid ihr für die Schule eher intrinsisch oder extrinsisch motiviert? Woran liegt das?</li>
+                        <li>Sollten Eltern ihre Kinder für gute Noten mit Geld belohnen? Diskutiert die Vor- und Nachteile.</li>
+                        <li>Wie kann ein Lehrer den Unterricht so gestalten, dass Schüler mehr Lust „von innen" bekommen?</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Belohnungssysteme */}
-              <div className="bg-slate-50 border-2 border-slate-300 p-6 rounded-lg">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-3xl">🎁</span>
-                  <h3 className="text-2xl font-bold text-slate-900">Belohnungssysteme im Gehirn</h3>
-                </div>
-                <div className="bg-white p-4 rounded border border-slate-200 space-y-3 text-slate-700">
-                  <p><strong>Kernidee:</strong> In unserem Gehirn gibt es ein Zentrum, das uns steuert: das Belohnungssystem. Es ist dafür da, dass wir Dinge wiederholen, die gut für uns sind. Der wichtigste Botenstoff dabei ist Dopamin.</p>
-                  <div className="space-y-2">
-                    <p className="font-semibold">📖 Ressourcen:</p>
-                    <ul className="space-y-1 text-sm">
-                      <li>🎥 <a href="https://youtu.be/VrDiAg4ZdoM" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Video: Das Dopamin-System im Gehirn</a></li>
-                      <li>📄 Nucleus Accumbens, Dopamin-Rezeptoren und ihre Rolle bei Motivation & Lernen</li>
-                      <li>💡 Wie man Dopamin-Freisetzung in Lernspielen nutzt: Progression, Rewards und Feedback-Loops</li>
-                    </ul>
+              {/* Dopamin / Belohnungssystem */}
+              <div className="border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setExpandedInfotexte({ ...expandedInfotexte, 5: !expandedInfotexte[5] })}
+                  className="w-full px-6 py-4 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3 text-left flex-1">
+                    <span className="text-2xl">🎁</span>
+                    <h3 className="font-bold text-slate-900">Belohnungssysteme im Gehirn</h3>
                   </div>
-                </div>
-              </div>
-
-              {/* General Tips */}
-              <div className="bg-slate-100 border-2 border-slate-300 p-6 rounded-lg">
-                <h4 className="text-lg font-bold text-slate-900 mb-3">💡 Recherche-Tipps</h4>
-                <ul className="space-y-2 text-sm text-slate-700">
-                  <li>✓ Nutzt die Schulbibliothek für Psychologie-Fachliteratur</li>
-                  <li>✓ Google Scholar (scholar.google.com) für kostenlose Forschungsartikel</li>
-                  <li>✓ YouTube: Suche nach "Motivation Psychology" oder deinem spezifischen Thema</li>
-                  <li>✓ Respektiert Urheberrechte! Zitiert korrekt!</li>
-                </ul>
+                  <span className="text-2xl ml-4 transition-transform duration-300" style={{ transform: expandedInfotexte[5] ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                </button>
+                {expandedInfotexte[5] && (
+                  <div className="px-6 py-4 bg-white border-t space-y-3 text-slate-700 text-sm leading-relaxed">
+                    <p><strong>Was ist das?</strong> In unserem Gehirn gibt es ein Zentrum, das uns steuert: das Belohnungssystem. Es ist dafür da, dass wir Dinge wiederholen, die gut für uns sind (wie Essen oder Lernen). Der wichtigste Botenstoff dabei ist Dopamin.</p>
+                    
+                    <div>
+                      <p className="font-semibold mb-2">Wie funktioniert es?</p>
+                      <p className="ml-4">Wenn wir ein Ziel erreichen oder eine positive Überraschung erleben, schüttet das Gehirn Dopamin aus. Das fühlt sich toll an – wie ein kleiner Glücksschub. Unser Gehirn merkt sich das und sagt: „Das war super, mach das nochmal!"</p>
+                    </div>
+                    
+                    <div>
+                      <p className="font-semibold mb-2">Die zwei Seiten des Systems:</p>
+                      <ol className="list-decimal list-inside space-y-2 ml-2">
+                        <li><strong>Die gute Seite:</strong> Es hilft uns, motiviert zu bleiben. Wenn wir eine schwierige Aufgabe lösen, fühlen wir uns stolz. Das ist der natürliche Lohn.</li>
+                        <li><strong>Die Gefahr:</strong> Das Gehirn kann ausgetrickst werden. Drogen, Zucker, aber auch soziale Medien (Likes auf Instagram, TikTok-Videos) schütten künstlich viel Dopamin aus. Das Gehirn will dann immer mehr davon. So entstehen Süchte.</li>
+                      </ol>
+                    </div>
+                    
+                    <div className="bg-orange-50 p-3 rounded">
+                      <p className="font-semibold mb-2">Wichtig zu wissen:</p>
+                      <p>Das Gehirn reagiert besonders stark auf unvorhersehbare Belohnungen. Wenn wir nicht wissen, ob wir im nächsten Moment ein „Like" bekommen oder im Spiel gewinnen, bleibt der Dopaminspiegel besonders hoch. Das nennt man „Intermittierende Verstärkung".</p>
+                    </div>
+                    
+                    <div className="bg-slate-50 p-3 rounded">
+                      <p className="font-semibold mb-2">Fragen für die Gruppe:</p>
+                      <ul className="space-y-1 ml-4 list-disc list-inside">
+                        <li>Warum ist es so schwer, das Handy wegzulegen, wenn man einmal angefangen hat zu scrollen? Erklärt es mit dem Belohnungssystem.</li>
+                        <li>Wie fühlt man sich, wenn man eine Belohnung fest erwartet hat, sie dann aber nicht bekommt? Was passiert dann mit der Motivation?</li>
+                        <li>Wie kann man sich selbst beim Lernen belohnen, ohne in eine Suchtfalle zu tappen?</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -718,22 +1469,177 @@ export default function Lernspielen() {
           {activeTab === 'uebungen' && (
             <div className="space-y-6">
               <h2 className="text-2xl font-bold text-slate-900 mb-6">Praktische Übungen</h2>
-              <p className="text-slate-700 mb-6">Hier kannst du dein Wissen über Motivationspsychologie in praktischen Szenarien testen und anwenden.</p>
               
-              <div className="grid gap-4">
-                {[
-                  { title: 'Szenario-Analyse', desc: 'Analysiere ein bestehendes Lernspiel und identifiziere welche Motivationskonzepte dort eingebaut sind.' },
-                  { title: 'Lernspiel-Prototyp', desc: 'Entwerfe einen Prototyp für ein Lernspiel basierend auf einer der 5 Motivationstheorien.' },
-                ].map((ex, idx) => (
-                  <div key={idx} className="bg-gradient-to-r from-slate-50 to-slate-100 border-2 border-slate-300 rounded-lg p-6">
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">{ex.title}</h3>
-                    <p className="text-slate-700 mb-4">{ex.desc}</p>
-                    <button className="py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-sm transition-colors">
-                      Übung starten
+              {!quizStarted ? (
+                <div className="space-y-6">
+                  <p className="text-slate-700 mb-6">Hier kannst du dein Wissen über Motivationspsychologie in praktischen Szenarien testen und anwenden.</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-8">
+                    <h3 className="text-2xl font-bold text-slate-900 mb-4">🧠 Quiz: Motivationstheorien</h3>
+                    <p className="text-slate-700 mb-6">Teste dein Wissen zu den 5 Motivationstheorien! Das Quiz hat 12 Fragen mit sofortigem Feedback nach jeder Antwort.</p>
+                    <div className="space-y-3 mb-8">
+                      <p className="text-sm text-slate-600">✓ Maslow - Bedürfnishierarchie</p>
+                      <p className="text-sm text-slate-600">✓ Klassische & Operante Konditionierung</p>
+                      <p className="text-sm text-slate-600">✓ Flow-Zustand nach Csikszentmihalyi</p>
+                      <p className="text-sm text-slate-600">✓ Intrinsische & Extrinsische Motivation</p>
+                      <p className="text-sm text-slate-600">✓ Dopamin & Belohnungssystem</p>
+                    </div>
+                    <button
+                      onClick={() => setQuizStarted(true)}
+                      className="py-3 px-6 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-bold text-lg transition-colors"
+                    >
+                      Quiz starten
                     </button>
                   </div>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="bg-white border-2 border-slate-200 rounded-lg p-8">
+                  {/* Progress Bar */}
+                  <div className="mb-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-semibold text-slate-700">Frage {currentQuestionIndex + 1} von {quizQuestions.length}</span>
+                      <span className="text-sm font-semibold text-slate-700">{getProgressPercentage()}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-3">
+                      <div
+                        className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                        style={{ width: `${getProgressPercentage()}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  {/* Quiz Complete Screen */}
+                  {isQuizComplete && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                      <div className="bg-white rounded-lg p-8 max-w-md">
+                        <h3 className="text-2xl font-bold text-center mb-4">🎉 Quiz abgeschlossen!</h3>
+                        <div className="text-center mb-6">
+                          <p className="text-5xl font-bold text-slate-800 mb-2">{score}/{quizQuestions.length}</p>
+                          <p className="text-lg text-slate-700">Punkte erreicht</p>
+                          <p className="text-sm text-slate-600 mt-2">
+                            {score === quizQuestions.length && 'Perfekt! Du beherrschst alle Theorien!'}
+                            {score >= 10 && score < quizQuestions.length && 'Sehr gut! Dein Wissen ist beeindruckend!'}
+                            {score >= 8 && score < 10 && 'Gut! Du hast ein solides Verständnis.'}
+                            {score >= 6 && score < 8 && 'Naja, noch Raum für Verbesserung. Lies die Infotexte nochmal durch!'}
+                            {score < 6 && 'Hast du die Infotexte gelesen? Versuch es nochmal!'}
+                          </p>
+                        </div>
+                        <button
+                          onClick={handleRestartQuiz}
+                          className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-colors"
+                        >
+                          Quiz erneut starten
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {!isQuizComplete && (
+                    <>
+                      {/* Theory Badge */}
+                      <div className="mb-6 inline-block">
+                        <span className="bg-slate-200 text-slate-700 px-4 py-2 rounded-full text-sm font-semibold">
+                          Theorie: {currentQuestion.theory}
+                        </span>
+                      </div>
+
+                      {/* Question */}
+                      <h3 className="text-xl font-bold text-slate-900 mb-8">{currentQuestion.question}</h3>
+
+                      {/* Answer Options */}
+                      <div className="space-y-4 mb-8">
+                        {currentQuestion.options.map((option, idx) => {
+                          const isSelected = selectedAnswer === idx
+                          const isCorrect = idx === currentQuestion.correctAnswer
+                          const showFeedback = answered
+
+                          let buttonClass = 'bg-white border-2 border-slate-300 hover:border-blue-400'
+
+                          if (showFeedback) {
+                            if (isCorrect) {
+                              buttonClass = 'bg-green-50 border-2 border-green-500'
+                            } else if (isSelected && !isCorrect) {
+                              buttonClass = 'bg-red-50 border-2 border-red-500'
+                            }
+                          } else if (isSelected) {
+                            buttonClass = 'bg-blue-50 border-2 border-blue-500'
+                          }
+
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => handleAnswerClick(idx)}
+                              disabled={answered}
+                              className={`w-full p-4 rounded-lg font-semibold text-left transition-colors ${buttonClass} ${
+                                answered ? 'cursor-default' : 'cursor-pointer'
+                              }`}
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-current flex items-center justify-center mt-0.5">
+                                  {showFeedback && isCorrect && <span className="text-green-600">✓</span>}
+                                  {showFeedback && isSelected && !isCorrect && <span className="text-red-600">✗</span>}
+                                  {!showFeedback && <span className="text-slate-400">{idx + 1}</span>}
+                                </div>
+                                <span>{option}</span>
+                              </div>
+                            </button>
+                          )
+                        })}
+                      </div>
+
+                      {/* Feedback */}
+                      {answered && (
+                        <div className={`p-4 rounded-lg mb-8 ${
+                          selectedAnswer === currentQuestion.correctAnswer
+                            ? 'bg-green-50 border-l-4 border-green-500 text-green-800'
+                            : 'bg-red-50 border-l-4 border-red-500 text-red-800'
+                        }`}>
+                          <p className="font-semibold mb-2">
+                            {selectedAnswer === currentQuestion.correctAnswer ? '✓ Korrekt!' : '✗ Leider falsch'}
+                          </p>
+                          <p className="text-sm">{currentQuestion.explanation}</p>
+                        </div>
+                      )}
+
+                      {/* Navigation Buttons */}
+                      <div className="flex gap-4">
+                        <button
+                          onClick={handlePreviousQuestion}
+                          disabled={currentQuestionIndex === 0}
+                          className={`py-3 px-6 rounded-lg font-semibold transition-colors ${
+                            currentQuestionIndex === 0
+                              ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                              : 'bg-slate-300 hover:bg-slate-400 text-slate-900'
+                          }`}
+                        >
+                          ← Vorherige
+                        </button>
+                        
+                        {!isQuizComplete ? (
+                          <button
+                            onClick={handleNextQuestion}
+                            disabled={!answered}
+                            className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors ${
+                              !answered
+                                ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                            }`}
+                          >
+                            Nächste →
+                          </button>
+                        ) : (
+                          <button
+                            onClick={handleRestartQuiz}
+                            className="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
+                          >
+                            Neu starten
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

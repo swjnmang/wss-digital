@@ -961,14 +961,6 @@ export default function DigitaleSpiele() {
       </header>
 
       <main className="flex-1 w-full max-w-6xl mx-auto p-6">
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 mb-8">
-          <p className="text-slate-700 leading-relaxed">
-            Auf dieser Seite findest du 4 praxisorientierte Arbeitsaufträge zum Thema "Digitale Spiele analysieren und bewerten". 
-            Bearbeite die Aufgaben systematisch durch und nutze die zusätzliche Sektion "Übungen" um dein Wissen interaktiv zu vertiefen. 
-            Ein breites Angebot kostenloser Spiele zum Testen findest du unter "Kostenlose Spiele".
-          </p>
-        </div>
-
         {/* TAB NAVIGATION */}
         <div className="flex gap-2 mb-8 border-b border-slate-300 overflow-x-auto">
           <button
