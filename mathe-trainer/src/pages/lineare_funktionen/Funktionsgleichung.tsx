@@ -28,6 +28,27 @@ function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+function validateInput(value: string, correctValue: number, tolerance: number): 'correct' | 'incorrect' | null {
+  if (value.trim() === '') return null
+  const parsed = parseFloat(value.replace(',', '.'))
+  if (isNaN(parsed)) return 'incorrect'
+  return Math.abs(parsed - correctValue) <= tolerance ? 'correct' : 'incorrect'
+}
+
+function formatEquationPreview(m: string, sign: string, t: string): string {
+  if (!m && !sign && !t) return 'y = ? \\cdot x + ?'
+  
+  const mVal = m || '?'
+  const signVal = sign || '?'
+  const tVal = t || '?'
+  
+  const mDisplay = m ? `${m}` : '?'
+  const signDisplay = sign ? ` ${sign} ` : ' ? '
+  const tDisplay = t ? `${t}` : '?'
+  
+  return `y = ${mDisplay} \\cdot x${signDisplay}${tDisplay}`
+}
+
 export default function Funktionsgleichung(){
   const [mode, setMode] = useState<'twoPoints'|'pointSlope'|'readGraph'>('twoPoints')
   const [p1, setP1] = useState({ x: 1, y: 2 })
@@ -184,29 +205,14 @@ export default function Funktionsgleichung(){
     
     if (sign !== '+' && sign !== '-') {
       setFeedback('Bitte + oder - eingeben.')
-      setSignCorrectness('incorrect')
       return
     }
 
-    // Check m - Toleranz je nach Mode
-    const tolerance = mode === 'readGraph' ? 0 : 0.02
-    const mOk = Math.abs(mi - mCorrect) <= tolerance
-    setMCorrectness(mOk ? 'correct' : 'incorrect')
-
-    // Check sign
-    const correctSign = tCorrect >= 0 ? '+' : '-'
-    const signOk = sign === correctSign
-    setSignCorrectness(signOk ? 'correct' : 'incorrect')
-
-    // Check t (absolute value) - Toleranz je nach Mode
-    const tOk = Math.abs(ti - Math.abs(tCorrect)) <= tolerance
-    setTCorrectness(tOk ? 'correct' : 'incorrect')
-
-    // All correct?
-    if (mOk && signOk && tOk) {
-      setFeedback('✓ Richtig!')
+    // Die Validierung hat bereits stattgefunden, daher prüften wir nur die Status
+    if (mCorrectness === 'correct' && signCorrectness === 'correct' && tCorrectness === 'correct') {
+      setFeedback('✓ Perfekt! Alle Werte sind korrekt!')
     } else {
-      setFeedback('✗ Leider nicht korrekt. Versuche es noch einmal oder zeige die Lösung.')
+      setFeedback('✗ Leider nicht vollständig korrekt. Überprüfe deine Eingaben.')
     }
   }
 
@@ -256,7 +262,8 @@ export default function Funktionsgleichung(){
             value={mInput}
             onChange={(e) => {
               setMInput(e.target.value)
-              setMCorrectness(null)
+              const tolerance = mode === 'readGraph' ? 0 : 0.02
+              setMCorrectness(validateInput(e.target.value, mCorrect, tolerance))
             }}
             className={`${styles.solutionInputBox} ${mCorrectness === 'correct' ? styles.correct : mCorrectness === 'incorrect' ? styles.incorrect : ''}`}
             placeholder="m"
@@ -266,8 +273,16 @@ export default function Funktionsgleichung(){
             type="text"
             value={signInput}
             onChange={(e) => {
-              setSignInput(e.target.value)
-              setSignCorrectness(null)
+              const val = e.target.value.trim().toUpperCase()
+              if (val === '' || val === '+' || val === '-') {
+                setSignInput(val)
+                if (val === '') {
+                  setSignCorrectness(null)
+                } else {
+                  const correctSign = tCorrect >= 0 ? '+' : '-'
+                  setSignCorrectness(val === correctSign ? 'correct' : 'incorrect')
+                }
+              }
             }}
             maxLength={1}
             className={`${styles.solutionInputBox} ${styles.signBox} ${signCorrectness === 'correct' ? styles.correct : signCorrectness === 'incorrect' ? styles.incorrect : ''}`}
@@ -278,11 +293,17 @@ export default function Funktionsgleichung(){
             value={tInput}
             onChange={(e) => {
               setTInput(e.target.value)
-              setTCorrectness(null)
+              const tolerance = mode === 'readGraph' ? 0 : 0.02
+              setTCorrectness(validateInput(e.target.value, Math.abs(tCorrect), tolerance))
             }}
             className={`${styles.solutionInputBox} ${tCorrectness === 'correct' ? styles.correct : tCorrectness === 'incorrect' ? styles.incorrect : ''}`}
             placeholder="t"
           />
+        </div>
+
+        {/* Live-Vorschau der Gleichung */}
+        <div className={styles.equationPreview}>
+          <MathDisplay latex={`$$${formatEquationPreview(mInput, signInput, tInput)}$$`} />
         </div>
 
         {feedback && (
