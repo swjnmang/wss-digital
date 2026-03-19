@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './Funktionsgleichung.module.css'
+import GeoGebraGraph from '../../components/GeoGebraGraph'
 
 declare global {
   interface Window { 
@@ -28,13 +29,17 @@ function randInt(min: number, max: number) {
 }
 
 export default function Funktionsgleichung(){
-  const [mode, setMode] = useState<'twoPoints'|'pointSlope'>('twoPoints')
+  const [mode, setMode] = useState<'twoPoints'|'pointSlope'|'readGraph'>('twoPoints')
   const [p1, setP1] = useState({ x: 1, y: 2 })
   const [p2, setP2] = useState({ x: 4, y: 5 })
   const [mCorrect, setMCorrect] = useState<number>( (p2.y - p1.y) / (p2.x - p1.x) )
   const [tCorrect, setTCorrect] = useState<number>( p1.y - mCorrect * p1.x )
   const [mInput, setMInput] = useState('')
+  const [signInput, setSignInput] = useState('')
   const [tInput, setTInput] = useState('')
+  const [mCorrectness, setMCorrectness] = useState<'correct' | 'incorrect' | null>(null)
+  const [signCorrectness, setSignCorrectness] = useState<'correct' | 'incorrect' | null>(null)
+  const [tCorrectness, setTCorrectness] = useState<'correct' | 'incorrect' | null>(null)
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
   const [showVideoModal, setShowVideoModal] = useState(false)
@@ -112,7 +117,11 @@ export default function Funktionsgleichung(){
     setP2({ x: x2, y: y2 })
     setMode('twoPoints')
     setMInput('')
+    setSignInput('')
     setTInput('')
+    setMCorrectness(null)
+    setSignCorrectness(null)
+    setTCorrectness(null)
     setFeedback('')
     setShowSolution(false)
   }
@@ -126,7 +135,38 @@ export default function Funktionsgleichung(){
     setP2({ x: x + 1, y: y + m })
     setMode('pointSlope')
     setMInput('')
+    setSignInput('')
     setTInput('')
+    setMCorrectness(null)
+    setSignCorrectness(null)
+    setTCorrectness(null)
+    setFeedback('')
+    setShowSolution(false)
+  }
+
+  function genReadGraph() {
+    // Generiere zufällige m und t für den Graph
+    let m: number, t: number
+    
+    // m: -3 bis 3
+    m = randInt(3, -3)
+    if (m === 0) m = 1
+    
+    // t: -4 bis 4
+    t = randInt(4, -4)
+    
+    setMCorrect(m)
+    setTCorrect(t)
+    setP1({ x: 0, y: t })
+    setP2({ x: 1, y: t + m })
+    
+    setMode('readGraph')
+    setMInput('')
+    setSignInput('')
+    setTInput('')
+    setMCorrectness(null)
+    setSignCorrectness(null)
+    setTCorrectness(null)
     setFeedback('')
     setShowSolution(false)
   }
@@ -135,17 +175,38 @@ export default function Funktionsgleichung(){
     setFeedback('')
     const mi = parseFloat(mInput.replace(',', '.'))
     const ti = parseFloat(tInput.replace(',', '.'))
-    if (isNaN(mi) || isNaN(ti)) {
-      setFeedback('Bitte zwei gültige Zahlen für m und t eingeben.')
+    const sign = signInput.trim()
+    
+    if (isNaN(mi) || isNaN(ti) || !sign) {
+      setFeedback('Bitte alle Werte eingeben.')
       return
     }
-    const ok = Math.abs(mi - mCorrect) < 0.02 && Math.abs(ti - tCorrect) < 0.02
-    if (ok) {
+    
+    if (sign !== '+' && sign !== '-') {
+      setFeedback('Bitte + oder - eingeben.')
+      setSignCorrectness('incorrect')
+      return
+    }
+
+    // Check m - Toleranz je nach Mode
+    const tolerance = mode === 'readGraph' ? 0 : 0.02
+    const mOk = Math.abs(mi - mCorrect) <= tolerance
+    setMCorrectness(mOk ? 'correct' : 'incorrect')
+
+    // Check sign
+    const correctSign = tCorrect >= 0 ? '+' : '-'
+    const signOk = sign === correctSign
+    setSignCorrectness(signOk ? 'correct' : 'incorrect')
+
+    // Check t (absolute value) - Toleranz je nach Mode
+    const tOk = Math.abs(ti - Math.abs(tCorrect)) <= tolerance
+    setTCorrectness(tOk ? 'correct' : 'incorrect')
+
+    // All correct?
+    if (mOk && signOk && tOk) {
       setFeedback('✓ Richtig!')
-      setShowSolution(false)
     } else {
       setFeedback('✗ Leider nicht korrekt. Versuche es noch einmal oder zeige die Lösung.')
-      setShowSolution(false)
     }
   }
 
@@ -161,23 +222,67 @@ export default function Funktionsgleichung(){
 
         <div className={styles.controls}>
           <button onClick={genTwoPoints} className={styles.btn}>Neue Aufgabe: 2 Punkte</button>
+          <button onClick={genReadGraph} className={styles.btn}>Neue Aufgabe: Graph ablesen</button>
         </div>
 
-        <div className={styles.task}>
+        {/* Task - nur Text, kein Kasten */}
+        <div className={styles.taskText}>
           {mode === 'twoPoints' ? (
-            <div>
-              <p>Gegeben sind die Punkte P₁({p1.x}|{p1.y}) und P₂({p2.x}|{p2.y}). Stelle die Gleichung y = mx + t auf.</p>
-            </div>
+            <p>Gegeben sind die Punkte P₁({p1.x}|{p1.y}) und P₂({p2.x}|{p2.y}). Stelle die Gleichung y = mx + t auf.</p>
+          ) : mode === 'pointSlope' ? (
+            <p>Gegeben ist der Punkt P({p1.x}|{p1.y}) und die Steigung m (oben). Stelle die Gleichung y = mx + t auf.</p>
           ) : (
-            <div>
-              <p>Gegeben ist der Punkt P({p1.x}|{p1.y}) und die Steigung m (oben). Stelle die Gleichung y = mx + t auf.</p>
-            </div>
+            <p>Betrachte den dargestellten Funktionsgraphen. Wähle dir zwei passende Punkte aus und berechne die Funktionsgleichung y = mx + t!</p>
           )}
         </div>
 
-        <div className={styles.inputRow}>
-          <label>m = <input value={mInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMInput(e.target.value)} className={styles.input} placeholder="Steigung" /></label>
-          <label>t = <input value={tInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTInput(e.target.value)} className={styles.input} placeholder="y-Achsenabschnitt" /></label>
+        {/* GeoGebra Graph für readGraph Mode */}
+        {mode === 'readGraph' && (
+          <div className={styles.graphContainer}>
+            <GeoGebraGraph 
+              m={mCorrect} 
+              t={tCorrect} 
+              width={600} 
+              height={450}
+            />
+          </div>
+        )}
+
+        {/* Solution Input - 3 Boxen */}
+        <div className={styles.solutionInputContainer}>
+          <div>Die Funktionsgleichung lautet: y = </div>
+          <input 
+            type="text"
+            value={mInput}
+            onChange={(e) => {
+              setMInput(e.target.value)
+              setMCorrectness(null)
+            }}
+            className={`${styles.solutionInputBox} ${mCorrectness === 'correct' ? styles.correct : mCorrectness === 'incorrect' ? styles.incorrect : ''}`}
+            placeholder="m"
+          />
+          <div>*x</div>
+          <input 
+            type="text"
+            value={signInput}
+            onChange={(e) => {
+              setSignInput(e.target.value)
+              setSignCorrectness(null)
+            }}
+            maxLength={1}
+            className={`${styles.solutionInputBox} ${styles.signBox} ${signCorrectness === 'correct' ? styles.correct : signCorrectness === 'incorrect' ? styles.incorrect : ''}`}
+            placeholder="±"
+          />
+          <input 
+            type="text"
+            value={tInput}
+            onChange={(e) => {
+              setTInput(e.target.value)
+              setTCorrectness(null)
+            }}
+            className={`${styles.solutionInputBox} ${tCorrectness === 'correct' ? styles.correct : tCorrectness === 'incorrect' ? styles.incorrect : ''}`}
+            placeholder="t"
+          />
         </div>
 
         {feedback && (
@@ -196,7 +301,26 @@ export default function Funktionsgleichung(){
           <div className={styles.solutionOutput}>
             <h3 className={styles.solutionTitle}>Lösungsweg</h3>
             <div className={styles.solutionStep}>
-              {mode === 'twoPoints' ? (
+              {mode === 'readGraph' ? (
+                <>
+                  {(() => {
+                    return (
+                      <>
+                        <MathDisplay latex={`$$\\textbf{Lösungsweg: Graph ablesen}$$`} />
+                        <MathDisplay latex={`$$\\textbf{Schritt 1: Zwei Punkte ablesen}$$`} />
+                        <MathDisplay latex={`$$P_1(0|${tCorrect}) \\quad \\textbf{(Y-Achsenabschnitt)}$$`} />
+                        <MathDisplay latex={`$$P_2(1|${tCorrect + mCorrect})$$`} />
+                        
+                        <MathDisplay latex={`$$\\textbf{Schritt 2: Steigung m berechnen}$$`} />
+                        <MathDisplay latex={`$$m = \\dfrac{${tCorrect + mCorrect} - (${tCorrect})}{1 - 0} = \\dfrac{${mCorrect}}{1} = ${mCorrect}$$`} />
+                        
+                        <MathDisplay latex={`$$\\textbf{Schritt 3: Y-Achsenabschnitt ablesen}$$`} />
+                        <MathDisplay latex={`$$t = ${tCorrect}$$`} />
+                      </>
+                    )
+                  })()}
+                </>
+              ) : mode === 'twoPoints' ? (
                 <>
                   {(() => {
                     const product = Math.round(mCorrect * p1.x * 100) / 100
