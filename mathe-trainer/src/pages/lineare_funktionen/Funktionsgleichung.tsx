@@ -64,6 +64,7 @@ export default function Funktionsgleichung(){
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
   const [showVideoModal, setShowVideoModal] = useState(false)
+  const [punkte, setPunkte] = useState(0)
   const youtubePlayerRef = useRef<any>(null)
 
   // MathJax laden
@@ -211,6 +212,11 @@ export default function Funktionsgleichung(){
     // Die Validierung hat bereits stattgefunden, daher prüften wir nur die Status
     if (mCorrectness === 'correct' && signCorrectness === 'correct' && tCorrectness === 'correct') {
       setFeedback('✓ Perfekt! Alle Werte sind korrekt!')
+      // Punkte vergeben nur wenn Lösung nicht angezeigt wurde
+      if (!showSolution) {
+        setPunkte(punkte + 3)
+        setFeedback('✓ Perfekt! +3 Punkte! 🎉')
+      }
     } else {
       setFeedback('✗ Leider nicht vollständig korrekt. Überprüfe deine Eingaben.')
     }
@@ -229,16 +235,20 @@ export default function Funktionsgleichung(){
         <div className={styles.controls}>
           <button onClick={genTwoPoints} className={styles.btn}>Neue Aufgabe: 2 Punkte</button>
           <button onClick={genReadGraph} className={styles.btn}>Neue Aufgabe: Graph ablesen</button>
+          <div className={styles.pointsCounter}>
+            <span className={styles.pointsIcon}>⭐</span>
+            <span className={styles.pointsText}>{punkte}</span>
+          </div>
         </div>
 
         {/* Task - nur Text, kein Kasten */}
         <div className={styles.taskText}>
           {mode === 'twoPoints' ? (
-            <p>Gegeben sind die Punkte P₁({p1.x}|{p1.y}) und P₂({p2.x}|{p2.y}). Stelle die Gleichung y = mx + t auf.</p>
+            <p>Gegeben sind die Punkte P₁({p1.x}|{p1.y}) und P₂({p2.x}|{p2.y}). Stelle die Gleichung y = mx + t auf.<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
           ) : mode === 'pointSlope' ? (
-            <p>Gegeben ist der Punkt P({p1.x}|{p1.y}) und die Steigung m (oben). Stelle die Gleichung y = mx + t auf.</p>
+            <p>Gegeben ist der Punkt P({p1.x}|{p1.y}) und die Steigung m (oben). Stelle die Gleichung y = mx + t auf.<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
           ) : (
-            <p>Betrachte den dargestellten Funktionsgraphen. Wähle dir zwei passende Punkte aus und berechne die Funktionsgleichung y = mx + t!</p>
+            <p>Betrachte den dargestellten Funktionsgraphen. Wähle dir zwei passende Punkte aus und berechne die Funktionsgleichung y = mx + t!<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
           )}
         </div>
 
