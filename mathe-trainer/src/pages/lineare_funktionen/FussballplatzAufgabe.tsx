@@ -63,7 +63,7 @@ export default function FussballplatzAufgabe() {
       solution: {
         type: 'number',
         labels: ['x-Wert', 'y-Wert'],
-        answers: [1.78, 2.93],
+        answers: [1.78, 1.67],
         tolerance: 0.1,
       },
       hint: 'Setze beide Funktionsgleichungen gleich: 0.6x + 0.6 = -0.3x + 2.2 und berechne dann y.',
