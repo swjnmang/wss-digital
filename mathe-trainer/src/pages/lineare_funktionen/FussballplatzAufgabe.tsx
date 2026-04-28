@@ -30,7 +30,7 @@ export default function FussballplatzAufgabe() {
         'Eine Fußballspielerin steht direkt auf Punkt A (−6|−3) und spielt den Ball mit einem geradlinigen Pass zu ihrer Mitspielerin, die in Punkt B (4|3) steht. Berechne die dazugehörige Funktionsgleichung in der Form y = mx + t',
       solution: {
         type: 'text',
-        answer: 'y = 0.6x + 0.6',
+        answer: 'y=0.6x+0.6',
       },
       hint: 'Nutze die zwei Punkte A(-6|-3) und B(4|3) um m und t zu berechnen.',
     },
