@@ -396,11 +396,11 @@ export default function ArdasKapitalanlagen() {
                 <BlockMath math="K_v = K_0 \cdot q^v - A \cdot \frac{q^v - 1}{q - 1}" />
                 <BlockMath math="K_v = 40.000 \cdot 1,014^5 - 4.314,42 \cdot \frac{1,014^5 - 1}{0,014}" />
                 <BlockMath math="K_v = 40.000 \cdot 1,0719 - 4.314,42 \cdot 5,1477" />
-                <BlockMath math="K_v = 42.876 - 22.211,38 \approx 20.664,62 \text{ €}" />
+                <BlockMath math="K_v = 42.876 - 22.211,38 \approx 20.694,87 \text{ €}" />
                 <p className="mt-3"><strong>Prüfung:</strong></p>
                 <p>Verfügbare Mittel: 21.000,00 €</p>
-                <p>Restschuld: ca. 20.665,00 €</p>
-                <p className="text-green-700 font-semibold">✅ Ja, das Vorhaben gelingt! Es bleibt ca. 335,00 € übrig.</p>
+                <p>Restschuld: ca. 20.694,87 €</p>
+                <p className="text-green-700 font-semibold">✅ Ja, das Vorhaben gelingt! Es bleibt ca. 305,13 € übrig.</p>
               </div>
             )}
           </div>
