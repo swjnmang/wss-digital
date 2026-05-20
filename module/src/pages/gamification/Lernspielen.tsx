@@ -116,6 +116,7 @@ export default function Lernspielen() {
   const [expandedAufgabe3, setExpandedAufgabe3] = useState(false)
   const [expandedPhase1, setExpandedPhase1] = useState(false)
   const [expandedPhase2, setExpandedPhase2] = useState(false)
+  const [expandedPhaseFeedback, setExpandedPhaseFeedback] = useState(false)
   const [expandedPhase3, setExpandedPhase3] = useState(false)
   const [expandedPhase4, setExpandedPhase4] = useState(false)
   const [expandedInfotexte, setExpandedInfotexte] = useState<Record<number, boolean>>({
@@ -1037,7 +1038,111 @@ export default function Lernspielen() {
                     )}
                   </div>
 
-                  {/* Phase 3: Test mit Schülern & Optimierung */}
+                  {/* Phase 3: Idee vorstellen & Feedback einholen */}
+                  <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => setExpandedPhaseFeedback(!expandedPhaseFeedback)}
+                      className="w-full p-6 hover:bg-slate-50 transition-colors flex items-center justify-between"
+                    >
+                      <div className="text-left flex-1">
+                        <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                          <span>💬</span> Phase 3: Idee vorstellen & Feedback einholen
+                        </h4>
+                      </div>
+                      <span className="text-3xl ml-4 transition-transform duration-300" style={{ transform: expandedPhaseFeedback ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
+                    </button>
+
+                    {expandedPhaseFeedback && (
+                    <div className="px-6 py-6 border-t border-slate-200 bg-slate-50 space-y-4">
+                    <p className="text-slate-700 mb-4">
+                      Bevor ihr mit dem echten Test mit anderen Schülern startet, präsentiert eure Spielidee der Klasse und holt Feedback ein! Dies hilft euch, Fehler zu finden und das Spiel zu verbessern.
+                    </p>
+
+                    <div className="space-y-4">
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🎤 Präsentation eurer Spielidee (5-10 Minuten)</p>
+                        <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                          <li><strong>Was ist euer Lernspiel?</strong> Kurze Beschreibung (Analog, Digital, Hybrid?)</li>
+                          <li><strong>Wer ist die Zielgruppe?</strong> (Alter, Klassenstufe, Vorwissen)</li>
+                          <li><strong>Was sollen die Spieler lernen?</strong> (Lernziel konkret)</li>
+                          <li><strong>Wie funktioniert das Spiel?</strong> Regeln & Spielablauf kurz erklären</li>
+                          <li><strong>Was macht es motivierend?</strong> Welche Motivationstheorien stecken dahinter? (Flow, Dopamin, Gamification-Elemente, etc.)</li>
+                          <li><strong>Warum glaubt ihr, dass es funktioniert?</strong> Begründung</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🤝 Feedback von der Klasse (10-15 Minuten)</p>
+                        <p className="text-sm text-slate-700 mb-3">
+                          Nach eurer Präsentation: Die anderen Schüler stellen Fragen & geben euch konstruktives Feedback. Nutzt diese Fragen als Leitfaden:
+                        </p>
+                        <ul className="text-sm text-slate-700 space-y-2 list-none">
+                          <li className="bg-blue-50 p-3 rounded">
+                            <strong>✓ Stärken:</strong> Was ist gut an der Spielidee? Was hat euch begeistert? Was funktioniert besonders gut?
+                          </li>
+                          <li className="bg-blue-50 p-3 rounded">
+                            <strong>✓ Schwächen & Risiken:</strong> Was könnte problematisch sein? Wo seht ihr potenzielle Fehler? Was ist unklar?
+                          </li>
+                          <li className="bg-blue-50 p-3 rounded">
+                            <strong>✓ Verbesserungen:</strong> Welche Ideen habt ihr zur Optimierung? Wie könnte man es besser machen?
+                          </li>
+                          <li className="bg-blue-50 p-3 rounded">
+                            <strong>✓ Fragen zum Verständnis:</strong> "Sind die Regeln klar?" "Wie lange dauert eine Runde?" "Macht es Spaß?"
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">📝 Notizen vom Feedback (WICHTIG!)</p>
+                        <p className="text-sm text-slate-700 mb-3">
+                          Einer aus eurer Gruppe schreibt die Rückmeldungen auf - gruppiert sie nach Kategorien:
+                        </p>
+                        <ul className="text-sm text-slate-700 space-y-2 list-none">
+                          <li className="bg-green-50 p-3 rounded">
+                            <strong>💚 Stärken (Was läuft gut):</strong><br/>
+                            <span className="text-slate-600 italic">z.B. "Spielidee ist innovativ", "Motivationstheorien sind gut umgesetzt", "Regeln sind verständlich"</span>
+                          </li>
+                          <li className="bg-yellow-50 p-3 rounded">
+                            <strong>⚠️ Schwächen (Kritikpunkte):</strong><br/>
+                            <span className="text-slate-600 italic">z.B. "Spielablauf ist zu kompliziert", "Lernziel ist nicht klar", "Zu lange Spielzeit"</span>
+                          </li>
+                          <li className="bg-red-50 p-3 rounded">
+                            <strong>🔧 Verbesserungsvorschläge:</strong><br/>
+                            <span className="text-slate-600 italic">z.B. "Regeln vereinfachen", "Mehr visuelle Elemente hinzufügen", "Zeit pro Runde reduzieren"</span>
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded border border-slate-200">
+                        <p className="font-semibold text-slate-900 mb-2">🛠️ Feedback-Tracking (Formular oder Liste)</p>
+                        <div className="text-sm text-slate-700 space-y-2">
+                          <p>Erstellt ein Feedback-Tracking, z.B. so:</p>
+                          <div className="bg-slate-50 p-3 rounded border border-slate-300 font-mono text-xs space-y-1">
+                            <p><strong>Feedback-Quelle</strong> | <strong>Kategorie</strong> | <strong>Feedback</strong> | <strong>Maßnahme geplant?</strong></p>
+                            <p>─────────────────────────────────────────────────────────────────</p>
+                            <p>Schüler A | Verbesserung | "Regeln kürzer erklären" | Ja, Version 2.0</p>
+                            <p>Schüler B | Stärke | "Gamification-Elemente cool!" | Behalten</p>
+                            <p>Schüler C | Schwäche | "Lernziel nicht 100% klar" | Ja, Text überarbeiten</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-amber-50 border border-amber-200 p-4 rounded">
+                        <p className="font-semibold text-amber-900 mb-2">💡 Tipps für diese Phase:</p>
+                        <ul className="text-sm text-amber-900 space-y-1 list-disc list-inside">
+                          <li>Nehmt jedes Feedback ernst - auch Kritik ist wertvoll!</li>
+                          <li>Notiert auch "Warum" hinter jedem Feedback (z.B. "Warum ist das zu kompliziert?")</li>
+                          <li>Nicht jedes Feedback muss umgesetzt werden - macht eine Gewichtung: "Wichtig" vs "Wäre schön zu haben"</li>
+                          <li>Überlegt: Welche Änderungen sind für Phase 4 (Test mit Schülern) notwendig?</li>
+                          <li>Dokumentiert eure Entscheidungen: "Dieses Feedback haben wir umgesetzt... / ...nicht umgesetzt, weil..."</li>
+                        </ul>
+                      </div>
+                    </div>
+                    </div>
+                    )}
+                  </div>
+
+                  {/* Phase 4: Test mit Schülern & Optimierung (vorher Phase 3) */}
                   <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
                     <button
                       onClick={() => setExpandedPhase3(!expandedPhase3)}
@@ -1045,7 +1150,7 @@ export default function Lernspielen() {
                     >
                       <div className="text-left flex-1">
                         <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                          <span>🧪</span> Phase 3: Test mit Schülern & Optimierung
+                          <span>🧪</span> Phase 4: Test mit Schülern & Optimierung
                         </h4>
                       </div>
                       <span className="text-2xl ml-4 transition-transform duration-300" style={{ transform: expandedPhase3 ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
@@ -1093,7 +1198,7 @@ export default function Lernspielen() {
                     )}
                   </div>
 
-                  {/* Phase 4: Evaluation & Lernerfolg-Messung */}
+                  {/* Phase 5: Evaluation & Lernerfolg-Messung (vorher Phase 4) */}
                   <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
                     <button
                       onClick={() => setExpandedPhase4(!expandedPhase4)}
@@ -1101,7 +1206,7 @@ export default function Lernspielen() {
                     >
                       <div className="text-left flex-1">
                         <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                          <span>📊</span> Phase 4: Evaluation & Lernerfolg-Messung
+                          <span>📊</span> Phase 5: Evaluation & Lernerfolg-Messung
                         </h4>
                       </div>
                       <span className="text-2xl ml-4 transition-transform duration-300" style={{ transform: expandedPhase4 ? 'rotate(45deg)' : 'rotate(0deg)' }}>➕</span>
@@ -1176,9 +1281,9 @@ export default function Lernspielen() {
                   {/* Checklist */}
                   <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
                     <p className="font-bold text-slate-900 mb-4 text-lg">✅ Komplett-Checklist für Aufgabe 3</p>
-                    <div className="grid md:grid-cols-2 gap-6 text-sm text-slate-700">
+                    <div className="grid md:grid-cols-3 gap-6 text-sm text-slate-700">
                       <div>
-                        <p className="font-semibold text-slate-900 mb-2">📋 Planung:</p>
+                        <p className="font-semibold text-slate-900 mb-2">📋 Phase 1 - Planung:</p>
                         <ul className="space-y-1 list-none">
                           <li>☐ Zielgruppe & Alter</li>
                           <li>☐ Lernziel konkret</li>
@@ -1188,7 +1293,7 @@ export default function Lernspielen() {
                         </ul>
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900 mb-2">🎮 Entwicklung:</p>
+                        <p className="font-semibold text-slate-900 mb-2">🎮 Phase 2 - Entwicklung:</p>
                         <ul className="space-y-1 list-none">
                           <li>☐ Regeln aufgeschrieben</li>
                           <li>☐ Prototype/Prototyp gemacht</li>
@@ -1198,7 +1303,17 @@ export default function Lernspielen() {
                         </ul>
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900 mb-2">🧪 Test & Iteration:</p>
+                        <p className="font-semibold text-slate-900 mb-2">💬 Phase 3 - Feedback:</p>
+                        <ul className="space-y-1 list-none">
+                          <li>☐ Präsentation vorbereitet</li>
+                          <li>☐ Im Plenum vorgestellt</li>
+                          <li>☐ Feedback eingeholt</li>
+                          <li>☐ Notizen gemacht</li>
+                          <li>☐ Verbesserungen geplant</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900 mb-2">🧪 Phase 4 - Test & Iteration:</p>
                         <ul className="space-y-1 list-none">
                           <li>☐ Mit 10+ anderen Schülern getestet</li>
                           <li>☐ Beobachtungen dokumentiert</li>
@@ -1208,7 +1323,7 @@ export default function Lernspielen() {
                         </ul>
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900 mb-2">📊 Evaluation:</p>
+                        <p className="font-semibold text-slate-900 mb-2">📊 Phase 5 - Evaluation:</p>
                         <ul className="space-y-1 list-none">
                           <li>☐ Evaluationsbogen erstellt</li>
                           <li>☐ Pre/Post Tests durchgeführt</li>
