@@ -1071,62 +1071,6 @@ export default function Lernspielen() {
                         </ul>
                       </div>
 
-                      <div className="bg-white p-4 rounded border border-slate-200">
-                        <p className="font-semibold text-slate-900 mb-2">🤝 Feedback von der Klasse (10-15 Minuten)</p>
-                        <p className="text-sm text-slate-700 mb-3">
-                          Nach eurer Präsentation: Die anderen Schüler stellen Fragen & geben euch konstruktives Feedback. Nutzt diese Fragen als Leitfaden:
-                        </p>
-                        <ul className="text-sm text-slate-700 space-y-2 list-none">
-                          <li className="bg-blue-50 p-3 rounded">
-                            <strong>✓ Stärken:</strong> Was ist gut an der Spielidee? Was hat euch begeistert? Was funktioniert besonders gut?
-                          </li>
-                          <li className="bg-blue-50 p-3 rounded">
-                            <strong>✓ Schwächen & Risiken:</strong> Was könnte problematisch sein? Wo seht ihr potenzielle Fehler? Was ist unklar?
-                          </li>
-                          <li className="bg-blue-50 p-3 rounded">
-                            <strong>✓ Verbesserungen:</strong> Welche Ideen habt ihr zur Optimierung? Wie könnte man es besser machen?
-                          </li>
-                          <li className="bg-blue-50 p-3 rounded">
-                            <strong>✓ Fragen zum Verständnis:</strong> "Sind die Regeln klar?" "Wie lange dauert eine Runde?" "Macht es Spaß?"
-                          </li>
-                        </ul>
-                      </div>
-
-                      <div className="bg-white p-4 rounded border border-slate-200">
-                        <p className="font-semibold text-slate-900 mb-2">📝 Notizen vom Feedback (WICHTIG!)</p>
-                        <p className="text-sm text-slate-700 mb-3">
-                          Einer aus eurer Gruppe schreibt die Rückmeldungen auf - gruppiert sie nach Kategorien:
-                        </p>
-                        <ul className="text-sm text-slate-700 space-y-2 list-none">
-                          <li className="bg-green-50 p-3 rounded">
-                            <strong>💚 Stärken (Was läuft gut):</strong><br/>
-                            <span className="text-slate-600 italic">z.B. "Spielidee ist innovativ", "Motivationstheorien sind gut umgesetzt", "Regeln sind verständlich"</span>
-                          </li>
-                          <li className="bg-yellow-50 p-3 rounded">
-                            <strong>⚠️ Schwächen (Kritikpunkte):</strong><br/>
-                            <span className="text-slate-600 italic">z.B. "Spielablauf ist zu kompliziert", "Lernziel ist nicht klar", "Zu lange Spielzeit"</span>
-                          </li>
-                          <li className="bg-red-50 p-3 rounded">
-                            <strong>🔧 Verbesserungsvorschläge:</strong><br/>
-                            <span className="text-slate-600 italic">z.B. "Regeln vereinfachen", "Mehr visuelle Elemente hinzufügen", "Zeit pro Runde reduzieren"</span>
-                          </li>
-                        </ul>
-                      </div>
-
-                      <div className="bg-white p-4 rounded border border-slate-200">
-                        <p className="font-semibold text-slate-900 mb-2">🛠️ Feedback-Tracking (Formular oder Liste)</p>
-                        <div className="text-sm text-slate-700 space-y-2">
-                          <p>Erstellt ein Feedback-Tracking, z.B. so:</p>
-                          <div className="bg-slate-50 p-3 rounded border border-slate-300 font-mono text-xs space-y-1">
-                            <p><strong>Feedback-Quelle</strong> | <strong>Kategorie</strong> | <strong>Feedback</strong> | <strong>Maßnahme geplant?</strong></p>
-                            <p>─────────────────────────────────────────────────────────────────</p>
-                            <p>Schüler A | Verbesserung | "Regeln kürzer erklären" | Ja, Version 2.0</p>
-                            <p>Schüler B | Stärke | "Gamification-Elemente cool!" | Behalten</p>
-                            <p>Schüler C | Schwäche | "Lernziel nicht 100% klar" | Ja, Text überarbeiten</p>
-                          </div>
-                        </div>
-                      </div>
-
                       <div className="bg-amber-50 border border-amber-200 p-4 rounded">
                         <p className="font-semibold text-amber-900 mb-2">💡 Tipps für diese Phase:</p>
                         <ul className="text-sm text-amber-900 space-y-1 list-disc list-inside">
