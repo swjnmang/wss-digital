@@ -33,7 +33,7 @@ export default function BergAufgabe() {
         type: 'number',
         labels: ['m', 't'],
         answers: [0.95, 2.38],
-        tolerance: 0.005,
+        tolerance: 0.02,
       },
       hint: 'Nutze die zwei Punkte A(-2,5|0) und C(2,3|4,56). Berechne zuerst die Steigung m = (y₂-y₁)/(x₂-x₁) = (4,56-0)/(2,3-(-2,5)) = 0,95. Dann setze einen Punkt ein, um t zu ermitteln: 0 = 0,95·(-2,5) + t → t ≈ 2,38 (auf 2 Nachkommastellen gerundet)',
     },
@@ -135,7 +135,7 @@ export default function BergAufgabe() {
     const labelIndex = solution.labels.indexOf(key)
     if (labelIndex === -1) return
 
-    const normalizedInput = value.replace(',', '.')
+    const normalizedInput = value.replace(/,/g, '.')
     const numInput = parseFloat(normalizedInput)
     const expectedAnswer = solution.answers[labelIndex] as number
 
@@ -178,7 +178,7 @@ export default function BergAufgabe() {
       for (let i = 0; i < solution.labels.length; i++) {
         const label = solution.labels[i]
         const input = currentInputs[label]?.trim() || ''
-        const normalizedInput = input.replace(',', '.')
+        const normalizedInput = input.replace(/,/g, '.')
         const numInput = parseFloat(normalizedInput)
         const expectedAnswer = solution.answers[i] as number
 
@@ -197,7 +197,7 @@ export default function BergAufgabe() {
       }
 
       if (solution.type === 'number') {
-        const normalizedInput = input.replace(',', '.')
+        const normalizedInput = input.replace(/,/g, '.')
         const numInput = parseFloat(normalizedInput)
         if (!isNaN(numInput)) {
           const expectedAnswer = solution.answer as number
@@ -209,8 +209,8 @@ export default function BergAufgabe() {
           }
         }
       } else {
-        const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.')
-        const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(',', '.')
+        const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(/,/g, '.')
+        const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(/,/g, '.')
         isCorrect = normalizedInput === normalizedAnswer
       }
     }

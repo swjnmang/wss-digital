@@ -33,7 +33,7 @@ export default function SonneAufgabe() {
         type: 'number',
         labels: ['m', 't'],
         answers: [0.55, 2.55],
-        tolerance: 0.01,
+        tolerance: 0.02,
       },
       hint: 'Verwende die Zwei-Punkte-Form: m = (3,32 - 2) / (1,39 - (-1)) = 1,32 / 2,39 ≈ 0,55. Setze Punkt G ein: 2 = 0,55 · (-1) + t → t ≈ 2,55',
     },
@@ -124,7 +124,7 @@ export default function SonneAufgabe() {
       for (let i = 0; i < solution.labels.length; i++) {
         const label = solution.labels[i]
         const input = currentInputs[label]?.trim() || ''
-        const normalizedInput = input.replace(',', '.')
+        const normalizedInput = input.replace(/,/g, '.')
         const numInput = parseFloat(normalizedInput)
         const expectedAnswer = solution.answers[i] as number
 
@@ -150,7 +150,7 @@ export default function SonneAufgabe() {
       }
 
       if (solution.type === 'number') {
-        const normalizedInput = input.replace(',', '.')
+        const normalizedInput = input.replace(/,/g, '.')
         const numInput = parseFloat(normalizedInput)
         if (!isNaN(numInput)) {
           const expectedAnswer = solution.answer as number
@@ -161,8 +161,8 @@ export default function SonneAufgabe() {
           }
         }
       } else {
-        const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.')
-        const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(',', '.')
+        const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(/,/g, '.')
+        const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(/,/g, '.')
         isCorrect = normalizedInput === normalizedAnswer
       }
     }

@@ -124,7 +124,7 @@ export default function FussballplatzAufgabe() {
       for (let i = 0; i < solution.labels.length; i++) {
         const label = solution.labels[i]
         const input = currentInputs[label]?.trim() || ''
-        const normalizedInput = input.replace(',', '.')
+        const normalizedInput = input.replace(/,/g, '.')
         const numInput = parseFloat(normalizedInput)
         const tolerance = solution.tolerance || 0.01
         const expectedAnswer = solution.answers[i] as number
@@ -143,15 +143,15 @@ export default function FussballplatzAufgabe() {
       }
 
       if (solution.type === 'number') {
-        const normalizedInput = input.replace(',', '.')
+        const normalizedInput = input.replace(/,/g, '.')
         const numInput = parseFloat(normalizedInput)
         if (!isNaN(numInput)) {
           const tolerance = solution.tolerance || 0.01
           isCorrect = Math.abs(numInput - (solution.answer as number)) <= tolerance
         }
       } else {
-        const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.')
-        const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(',', '.')
+        const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(/,/g, '.')
+        const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(/,/g, '.')
         isCorrect = normalizedInput === normalizedAnswer
       }
     }
