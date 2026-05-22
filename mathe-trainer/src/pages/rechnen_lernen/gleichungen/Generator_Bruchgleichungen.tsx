@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 /**
  * Vergleicht zwei Lösungen auf Äquivalenz
@@ -36,61 +36,61 @@ const AUFGABEN_KATEGORIEN: Kategorie[] = [
     name: 'Einfach',
     aufgaben: [
       // Typ: A = X/B => X = A*B
-      { id: 'e1', aufgabe: '2 = x/3', loesung: 6, rechenweg: ['2 = x/3', 'Multipliziere beide Seiten mit 3', '2 · 3 = (x/3) · 3', '6 = x', 'x = 6'] },
-      { id: 'e2', aufgabe: '5 = x/4', loesung: 20, rechenweg: ['5 = x/4', 'Multipliziere beide Seiten mit 4', '5 · 4 = (x/4) · 4', '20 = x', 'x = 20'] },
-      { id: 'e3', aufgabe: '3 = x/2', loesung: 6, rechenweg: ['3 = x/2', 'Multipliziere beide Seiten mit 2', '3 · 2 = (x/2) · 2', '6 = x', 'x = 6'] },
-      { id: 'e4', aufgabe: '4 = x/5', loesung: 20, rechenweg: ['4 = x/5', 'Multipliziere beide Seiten mit 5', '4 · 5 = (x/5) · 5', '20 = x', 'x = 20'] },
-      { id: 'e5', aufgabe: '7 = x/2', loesung: 14, rechenweg: ['7 = x/2', 'Multipliziere beide Seiten mit 2', '7 · 2 = (x/2) · 2', '14 = x', 'x = 14'] },
+      { id: 'e1', aufgabe: '$2 = \\frac{x}{3}$', loesung: 6, rechenweg: ['$2 = \\frac{x}{3}$', 'Multipliziere beide Seiten mit 3', '$2 \\cdot 3 = \\frac{x}{3} \\cdot 3$', '$6 = x$', '$x = 6$'] },
+      { id: 'e2', aufgabe: '$5 = \\frac{x}{4}$', loesung: 20, rechenweg: ['$5 = \\frac{x}{4}$', 'Multipliziere beide Seiten mit 4', '$5 \\cdot 4 = \\frac{x}{4} \\cdot 4$', '$20 = x$', '$x = 20$'] },
+      { id: 'e3', aufgabe: '$3 = \\frac{x}{2}$', loesung: 6, rechenweg: ['$3 = \\frac{x}{2}$', 'Multipliziere beide Seiten mit 2', '$3 \\cdot 2 = \\frac{x}{2} \\cdot 2$', '$6 = x$', '$x = 6$'] },
+      { id: 'e4', aufgabe: '$4 = \\frac{x}{5}$', loesung: 20, rechenweg: ['$4 = \\frac{x}{5}$', 'Multipliziere beide Seiten mit 5', '$4 \\cdot 5 = \\frac{x}{5} \\cdot 5$', '$20 = x$', '$x = 20$'] },
+      { id: 'e5', aufgabe: '$7 = \\frac{x}{2}$', loesung: 14, rechenweg: ['$7 = \\frac{x}{2}$', 'Multipliziere beide Seiten mit 2', '$7 \\cdot 2 = \\frac{x}{2} \\cdot 2$', '$14 = x$', '$x = 14$'] },
       // Typ: B = A/X => X = A/B
-      { id: 'e6', aufgabe: '3 = 12/x', loesung: 4, rechenweg: ['3 = 12/x', 'Multipliziere beide Seiten mit x', '3x = 12', 'Teile beide Seiten durch 3', 'x = 4'] },
-      { id: 'e7', aufgabe: '2 = 8/x', loesung: 4, rechenweg: ['2 = 8/x', 'Multipliziere beide Seiten mit x', '2x = 8', 'Teile beide Seiten durch 2', 'x = 4'] },
-      { id: 'e8', aufgabe: '5 = 25/x', loesung: 5, rechenweg: ['5 = 25/x', 'Multipliziere beide Seiten mit x', '5x = 25', 'Teile beide Seiten durch 5', 'x = 5'] },
-      { id: 'e9', aufgabe: '4 = 16/x', loesung: 4, rechenweg: ['4 = 16/x', 'Multipliziere beide Seiten mit x', '4x = 16', 'Teile beide Seiten durch 4', 'x = 4'] },
-      { id: 'e10', aufgabe: '6 = 18/x', loesung: 3, rechenweg: ['6 = 18/x', 'Multipliziere beide Seiten mit x', '6x = 18', 'Teile beide Seiten durch 6', 'x = 3'] },
+      { id: 'e6', aufgabe: '$3 = \\frac{12}{x}$', loesung: 4, rechenweg: ['$3 = \\frac{12}{x}$', 'Multipliziere beide Seiten mit x', '$3x = 12$', 'Teile beide Seiten durch 3', '$x = 4$'] },
+      { id: 'e7', aufgabe: '$2 = \\frac{8}{x}$', loesung: 4, rechenweg: ['$2 = \\frac{8}{x}$', 'Multipliziere beide Seiten mit x', '$2x = 8$', 'Teile beide Seiten durch 2', '$x = 4$'] },
+      { id: 'e8', aufgabe: '$5 = \\frac{25}{x}$', loesung: 5, rechenweg: ['$5 = \\frac{25}{x}$', 'Multipliziere beide Seiten mit x', '$5x = 25$', 'Teile beide Seiten durch 5', '$x = 5$'] },
+      { id: 'e9', aufgabe: '$4 = \\frac{16}{x}$', loesung: 4, rechenweg: ['$4 = \\frac{16}{x}$', 'Multipliziere beide Seiten mit x', '$4x = 16$', 'Teile beide Seiten durch 4', '$x = 4$'] },
+      { id: 'e10', aufgabe: '$6 = \\frac{18}{x}$', loesung: 3, rechenweg: ['$6 = \\frac{18}{x}$', 'Multipliziere beide Seiten mit x', '$6x = 18$', 'Teile beide Seiten durch 6', '$x = 3$'] },
     ],
   },
   {
     name: 'Mittel',
     aufgaben: [
       // Typ: A = X/B
-      { id: 'm1', aufgabe: '8 = x/3', loesung: 24, rechenweg: ['8 = x/3', 'Multipliziere beide Seiten mit 3', '8 · 3 = (x/3) · 3', '24 = x', 'x = 24'] },
-      { id: 'm2', aufgabe: '6 = x/4', loesung: 24, rechenweg: ['6 = x/4', 'Multipliziere beide Seiten mit 4', '6 · 4 = (x/4) · 4', '24 = x', 'x = 24'] },
-      { id: 'm3', aufgabe: '9 = x/5', loesung: 45, rechenweg: ['9 = x/5', 'Multipliziere beide Seiten mit 5', '9 · 5 = (x/5) · 5', '45 = x', 'x = 45'] },
-      { id: 'm4', aufgabe: '7 = x/6', loesung: 42, rechenweg: ['7 = x/6', 'Multipliziere beide Seiten mit 6', '7 · 6 = (x/6) · 6', '42 = x', 'x = 42'] },
-      { id: 'm5', aufgabe: '11 = x/3', loesung: 33, rechenweg: ['11 = x/3', 'Multipliziere beide Seiten mit 3', '11 · 3 = (x/3) · 3', '33 = x', 'x = 33'] },
-      { id: 'm6', aufgabe: '2.5 = x/4', loesung: 10, rechenweg: ['2.5 = x/4', 'Multipliziere beide Seiten mit 4', '2.5 · 4 = (x/4) · 4', '10 = x', 'x = 10'] },
-      { id: 'm7', aufgabe: '3.5 = x/2', loesung: 7, rechenweg: ['3.5 = x/2', 'Multipliziere beide Seiten mit 2', '3.5 · 2 = (x/2) · 2', '7 = x', 'x = 7'] },
-      { id: 'm8', aufgabe: '4.5 = x/2', loesung: 9, rechenweg: ['4.5 = x/2', 'Multipliziere beide Seiten mit 2', '4.5 · 2 = (x/2) · 2', '9 = x', 'x = 9'] },
+      { id: 'm1', aufgabe: '$8 = \\frac{x}{3}$', loesung: 24, rechenweg: ['$8 = \\frac{x}{3}$', 'Multipliziere beide Seiten mit 3', '$8 \\cdot 3 = \\frac{x}{3} \\cdot 3$', '$24 = x$', '$x = 24$'] },
+      { id: 'm2', aufgabe: '$6 = \\frac{x}{4}$', loesung: 24, rechenweg: ['$6 = \\frac{x}{4}$', 'Multipliziere beide Seiten mit 4', '$6 \\cdot 4 = \\frac{x}{4} \\cdot 4$', '$24 = x$', '$x = 24$'] },
+      { id: 'm3', aufgabe: '$9 = \\frac{x}{5}$', loesung: 45, rechenweg: ['$9 = \\frac{x}{5}$', 'Multipliziere beide Seiten mit 5', '$9 \\cdot 5 = \\frac{x}{5} \\cdot 5$', '$45 = x$', '$x = 45$'] },
+      { id: 'm4', aufgabe: '$7 = \\frac{x}{6}$', loesung: 42, rechenweg: ['$7 = \\frac{x}{6}$', 'Multipliziere beide Seiten mit 6', '$7 \\cdot 6 = \\frac{x}{6} \\cdot 6$', '$42 = x$', '$x = 42$'] },
+      { id: 'm5', aufgabe: '$11 = \\frac{x}{3}$', loesung: 33, rechenweg: ['$11 = \\frac{x}{3}$', 'Multipliziere beide Seiten mit 3', '$11 \\cdot 3 = \\frac{x}{3} \\cdot 3$', '$33 = x$', '$x = 33$'] },
+      { id: 'm6', aufgabe: '$2.5 = \\frac{x}{4}$', loesung: 10, rechenweg: ['$2.5 = \\frac{x}{4}$', 'Multipliziere beide Seiten mit 4', '$2.5 \\cdot 4 = \\frac{x}{4} \\cdot 4$', '$10 = x$', '$x = 10$'] },
+      { id: 'm7', aufgabe: '$3.5 = \\frac{x}{2}$', loesung: 7, rechenweg: ['$3.5 = \\frac{x}{2}$', 'Multipliziere beide Seiten mit 2', '$3.5 \\cdot 2 = \\frac{x}{2} \\cdot 2$', '$7 = x$', '$x = 7$'] },
+      { id: 'm8', aufgabe: '$4.5 = \\frac{x}{2}$', loesung: 9, rechenweg: ['$4.5 = \\frac{x}{2}$', 'Multipliziere beide Seiten mit 2', '$4.5 \\cdot 2 = \\frac{x}{2} \\cdot 2$', '$9 = x$', '$x = 9$'] },
       // Typ: B = A/X
-      { id: 'm9', aufgabe: '7 = 35/x', loesung: 5, rechenweg: ['7 = 35/x', 'Multipliziere beide Seiten mit x', '7x = 35', 'Teile beide Seiten durch 7', 'x = 5'] },
-      { id: 'm10', aufgabe: '8 = 32/x', loesung: 4, rechenweg: ['8 = 32/x', 'Multipliziere beide Seiten mit x', '8x = 32', 'Teile beide Seiten durch 8', 'x = 4'] },
-      { id: 'm11', aufgabe: '9 = 45/x', loesung: 5, rechenweg: ['9 = 45/x', 'Multipliziere beide Seiten mit x', '9x = 45', 'Teile beide Seiten durch 9', 'x = 5'] },
-      { id: 'm12', aufgabe: '10 = 50/x', loesung: 5, rechenweg: ['10 = 50/x', 'Multipliziere beide Seiten mit x', '10x = 50', 'Teile beide Seiten durch 10', 'x = 5'] },
-      { id: 'm13', aufgabe: '12 = 36/x', loesung: 3, rechenweg: ['12 = 36/x', 'Multipliziere beide Seiten mit x', '12x = 36', 'Teile beide Seiten durch 12', 'x = 3'] },
-      { id: 'm14', aufgabe: '6 = 24/x', loesung: 4, rechenweg: ['6 = 24/x', 'Multipliziere beide Seiten mit x', '6x = 24', 'Teile beide Seiten durch 6', 'x = 4'] },
-      { id: 'm15', aufgabe: '5 = 40/x', loesung: 8, rechenweg: ['5 = 40/x', 'Multipliziere beide Seiten mit x', '5x = 40', 'Teile beide Seiten durch 5', 'x = 8'] },
+      { id: 'm9', aufgabe: '$7 = \\frac{35}{x}$', loesung: 5, rechenweg: ['$7 = \\frac{35}{x}$', 'Multipliziere beide Seiten mit x', '$7x = 35$', 'Teile beide Seiten durch 7', '$x = 5$'] },
+      { id: 'm10', aufgabe: '$8 = \\frac{32}{x}$', loesung: 4, rechenweg: ['$8 = \\frac{32}{x}$', 'Multipliziere beide Seiten mit x', '$8x = 32$', 'Teile beide Seiten durch 8', '$x = 4$'] },
+      { id: 'm11', aufgabe: '$9 = \\frac{45}{x}$', loesung: 5, rechenweg: ['$9 = \\frac{45}{x}$', 'Multipliziere beide Seiten mit x', '$9x = 45$', 'Teile beide Seiten durch 9', '$x = 5$'] },
+      { id: 'm12', aufgabe: '$10 = \\frac{50}{x}$', loesung: 5, rechenweg: ['$10 = \\frac{50}{x}$', 'Multipliziere beide Seiten mit x', '$10x = 50$', 'Teile beide Seiten durch 10', '$x = 5$'] },
+      { id: 'm13', aufgabe: '$12 = \\frac{36}{x}$', loesung: 3, rechenweg: ['$12 = \\frac{36}{x}$', 'Multipliziere beide Seiten mit x', '$12x = 36$', 'Teile beide Seiten durch 12', '$x = 3$'] },
+      { id: 'm14', aufgabe: '$6 = \\frac{24}{x}$', loesung: 4, rechenweg: ['$6 = \\frac{24}{x}$', 'Multipliziere beide Seiten mit x', '$6x = 24$', 'Teile beide Seiten durch 6', '$x = 4$'] },
+      { id: 'm15', aufgabe: '$5 = \\frac{40}{x}$', loesung: 8, rechenweg: ['$5 = \\frac{40}{x}$', 'Multipliziere beide Seiten mit x', '$5x = 40$', 'Teile beide Seiten durch 5', '$x = 8$'] },
     ],
   },
   {
     name: 'Schwer',
     aufgaben: [
       // Typ: A = X/B mit größeren Zahlen
-      { id: 's1', aufgabe: '13 = x/4', loesung: 52, rechenweg: ['13 = x/4', 'Multipliziere beide Seiten mit 4', '13 · 4 = (x/4) · 4', '52 = x', 'x = 52'] },
-      { id: 's2', aufgabe: '15 = x/3', loesung: 45, rechenweg: ['15 = x/3', 'Multipliziere beide Seiten mit 3', '15 · 3 = (x/3) · 3', '45 = x', 'x = 45'] },
-      { id: 's3', aufgabe: '14 = x/2', loesung: 28, rechenweg: ['14 = x/2', 'Multipliziere beide Seiten mit 2', '14 · 2 = (x/2) · 2', '28 = x', 'x = 28'] },
-      { id: 's4', aufgabe: '19 = x/3', loesung: 57, rechenweg: ['19 = x/3', 'Multipliziere beide Seiten mit 3', '19 · 3 = (x/3) · 3', '57 = x', 'x = 57'] },
-      { id: 's5', aufgabe: '22 = x/2', loesung: 44, rechenweg: ['22 = x/2', 'Multipliziere beide Seiten mit 2', '22 · 2 = (x/2) · 2', '44 = x', 'x = 44'] },
-      { id: 's6', aufgabe: '6.5 = x/4', loesung: 26, rechenweg: ['6.5 = x/4', 'Multipliziere beide Seiten mit 4', '6.5 · 4 = (x/4) · 4', '26 = x', 'x = 26'] },
-      { id: 's7', aufgabe: '8.5 = x/2', loesung: 17, rechenweg: ['8.5 = x/2', 'Multipliziere beide Seiten mit 2', '8.5 · 2 = (x/2) · 2', '17 = x', 'x = 17'] },
-      { id: 's8', aufgabe: '12.5 = x/4', loesung: 50, rechenweg: ['12.5 = x/4', 'Multipliziere beide Seiten mit 4', '12.5 · 4 = (x/4) · 4', '50 = x', 'x = 50'] },
+      { id: 's1', aufgabe: '$13 = \\frac{x}{4}$', loesung: 52, rechenweg: ['$13 = \\frac{x}{4}$', 'Multipliziere beide Seiten mit 4', '$13 \\cdot 4 = \\frac{x}{4} \\cdot 4$', '$52 = x$', '$x = 52$'] },
+      { id: 's2', aufgabe: '$15 = \\frac{x}{3}$', loesung: 45, rechenweg: ['$15 = \\frac{x}{3}$', 'Multipliziere beide Seiten mit 3', '$15 \\cdot 3 = \\frac{x}{3} \\cdot 3$', '$45 = x$', '$x = 45$'] },
+      { id: 's3', aufgabe: '$14 = \\frac{x}{2}$', loesung: 28, rechenweg: ['$14 = \\frac{x}{2}$', 'Multipliziere beide Seiten mit 2', '$14 \\cdot 2 = \\frac{x}{2} \\cdot 2$', '$28 = x$', '$x = 28$'] },
+      { id: 's4', aufgabe: '$19 = \\frac{x}{3}$', loesung: 57, rechenweg: ['$19 = \\frac{x}{3}$', 'Multipliziere beide Seiten mit 3', '$19 \\cdot 3 = \\frac{x}{3} \\cdot 3$', '$57 = x$', '$x = 57$'] },
+      { id: 's5', aufgabe: '$22 = \\frac{x}{2}$', loesung: 44, rechenweg: ['$22 = \\frac{x}{2}$', 'Multipliziere beide Seiten mit 2', '$22 \\cdot 2 = \\frac{x}{2} \\cdot 2$', '$44 = x$', '$x = 44$'] },
+      { id: 's6', aufgabe: '$6.5 = \\frac{x}{4}$', loesung: 26, rechenweg: ['$6.5 = \\frac{x}{4}$', 'Multipliziere beide Seiten mit 4', '$6.5 \\cdot 4 = \\frac{x}{4} \\cdot 4$', '$26 = x$', '$x = 26$'] },
+      { id: 's7', aufgabe: '$8.5 = \\frac{x}{2}$', loesung: 17, rechenweg: ['$8.5 = \\frac{x}{2}$', 'Multipliziere beide Seiten mit 2', '$8.5 \\cdot 2 = \\frac{x}{2} \\cdot 2$', '$17 = x$', '$x = 17$'] },
+      { id: 's8', aufgabe: '$12.5 = \\frac{x}{4}$', loesung: 50, rechenweg: ['$12.5 = \\frac{x}{4}$', 'Multipliziere beide Seiten mit 4', '$12.5 \\cdot 4 = \\frac{x}{4} \\cdot 4$', '$50 = x$', '$x = 50$'] },
       // Typ: B = A/X mit größeren Zahlen
-      { id: 's9', aufgabe: '11 = 55/x', loesung: 5, rechenweg: ['11 = 55/x', 'Multipliziere beide Seiten mit x', '11x = 55', 'Teile beide Seiten durch 11', 'x = 5'] },
-      { id: 's10', aufgabe: '13 = 65/x', loesung: 5, rechenweg: ['13 = 65/x', 'Multipliziere beide Seiten mit x', '13x = 65', 'Teile beide Seiten durch 13', 'x = 5'] },
-      { id: 's11', aufgabe: '15 = 60/x', loesung: 4, rechenweg: ['15 = 60/x', 'Multipliziere beide Seiten mit x', '15x = 60', 'Teile beide Seiten durch 15', 'x = 4'] },
-      { id: 's12', aufgabe: '20 = 100/x', loesung: 5, rechenweg: ['20 = 100/x', 'Multipliziere beide Seiten mit x', '20x = 100', 'Teile beide Seiten durch 20', 'x = 5'] },
-      { id: 's13', aufgabe: '25 = 150/x', loesung: 6, rechenweg: ['25 = 150/x', 'Multipliziere beide Seiten mit x', '25x = 150', 'Teile beide Seiten durch 25', 'x = 6'] },
-      { id: 's14', aufgabe: '16 = 48/x', loesung: 3, rechenweg: ['16 = 48/x', 'Multipliziere beide Seiten mit x', '16x = 48', 'Teile beide Seiten durch 16', 'x = 3'] },
-      { id: 's15', aufgabe: '18 = 72/x', loesung: 4, rechenweg: ['18 = 72/x', 'Multipliziere beide Seiten mit x', '18x = 72', 'Teile beide Seiten durch 18', 'x = 4'] },
+      { id: 's9', aufgabe: '$11 = \\frac{55}{x}$', loesung: 5, rechenweg: ['$11 = \\frac{55}{x}$', 'Multipliziere beide Seiten mit x', '$11x = 55$', 'Teile beide Seiten durch 11', '$x = 5$'] },
+      { id: 's10', aufgabe: '$13 = \\frac{65}{x}$', loesung: 5, rechenweg: ['$13 = \\frac{65}{x}$', 'Multipliziere beide Seiten mit x', '$13x = 65$', 'Teile beide Seiten durch 13', '$x = 5$'] },
+      { id: 's11', aufgabe: '$15 = \\frac{60}{x}$', loesung: 4, rechenweg: ['$15 = \\frac{60}{x}$', 'Multipliziere beide Seiten mit x', '$15x = 60$', 'Teile beide Seiten durch 15', '$x = 4$'] },
+      { id: 's12', aufgabe: '$20 = \\frac{100}{x}$', loesung: 5, rechenweg: ['$20 = \\frac{100}{x}$', 'Multipliziere beide Seiten mit x', '$20x = 100$', 'Teile beide Seiten durch 20', '$x = 5$'] },
+      { id: 's13', aufgabe: '$25 = \\frac{150}{x}$', loesung: 6, rechenweg: ['$25 = \\frac{150}{x}$', 'Multipliziere beide Seiten mit x', '$25x = 150$', 'Teile beide Seiten durch 25', '$x = 6$'] },
+      { id: 's14', aufgabe: '$16 = \\frac{48}{x}$', loesung: 3, rechenweg: ['$16 = \\frac{48}{x}$', 'Multipliziere beide Seiten mit x', '$16x = 48$', 'Teile beide Seiten durch 16', '$x = 3$'] },
+      { id: 's15', aufgabe: '$18 = \\frac{72}{x}$', loesung: 4, rechenweg: ['$18 = \\frac{72}{x}$', 'Multipliziere beide Seiten mit x', '$18x = 72$', 'Teile beide Seiten durch 18', '$x = 4$'] },
     ],
   },
 ];
@@ -102,6 +102,15 @@ export default function Generator_Bruchgleichungen() {
 
   const currentKategorie = AUFGABEN_KATEGORIEN[selectedCategory];
   const currentAufgaben = currentKategorie.aufgaben;
+
+  // MathJax neu rendern, wenn sich die Aufgaben ändern
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).MathJax) {
+      (window as any).MathJax.typesetPromise?.().catch(() => {
+        // Fehler werden ignoriert
+      });
+    }
+  }, [selectedCategory, showSolutions]);
 
   const handleInputChange = (aufgabenId: string, value: string) => {
     const trimmedValue = value.trim();
@@ -170,7 +179,7 @@ export default function Generator_Bruchgleichungen() {
                   </span>
 
                   {/* Aufgabe */}
-                  <div className="text-sm font-mono bg-gray-50 px-2 py-1 rounded border border-gray-200 whitespace-nowrap">
+                  <div className="text-sm bg-gray-50 px-2 py-1 rounded border border-gray-200 whitespace-nowrap flex items-center justify-center">
                     {aufgabe.aufgabe}
                   </div>
 
