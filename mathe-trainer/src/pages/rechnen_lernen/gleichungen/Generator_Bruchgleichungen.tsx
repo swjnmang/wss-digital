@@ -3,10 +3,13 @@ import React, { useState, useEffect } from 'react';
 /**
  * Vergleicht zwei Lösungen auf Äquivalenz
  * Akzeptiert Rundungen auf 1-2 Dezimalstellen
+ * Akzeptiert Punkt und Komma als Dezimaltrennzeichen
  */
 function areEquivalentSolutions(input: string, expectedSolution: number): boolean {
   try {
-    const userSolution = parseFloat(input.trim());
+    // Akzeptiere Komma oder Punkt als Dezimaltrennzeichen
+    const normalizedInput = input.trim().replace(',', '.');
+    const userSolution = parseFloat(normalizedInput);
     if (isNaN(userSolution)) return false;
     
     // Runde beide Werte auf maximal 2 Dezimalstellen für Vergleich
