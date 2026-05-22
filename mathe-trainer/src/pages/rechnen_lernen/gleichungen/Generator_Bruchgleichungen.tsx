@@ -33,7 +33,7 @@ interface Kategorie {
 
 const AUFGABEN_KATEGORIEN: Kategorie[] = [
   {
-    name: 'Einfach',
+    name: 'Aufgaben 1-10',
     aufgaben: [
       // Typ: A = X/B => X = A*B
       { id: 'e1', aufgabe: '$2 = \\frac{x}{3}$', loesung: 6, rechenweg: ['$2 = \\frac{x}{3}$', 'Multipliziere beide Seiten mit 3', '$2 \\cdot 3 = \\frac{x}{3} \\cdot 3$', '$6 = x$', '$x = 6$'] },
@@ -50,7 +50,7 @@ const AUFGABEN_KATEGORIEN: Kategorie[] = [
     ],
   },
   {
-    name: 'Mittel',
+    name: 'Aufgaben 11-20',
     aufgaben: [
       // Typ: A = X/B
       { id: 'm1', aufgabe: '$8 = \\frac{x}{3}$', loesung: 24, rechenweg: ['$8 = \\frac{x}{3}$', 'Multipliziere beide Seiten mit 3', '$8 \\cdot 3 = \\frac{x}{3} \\cdot 3$', '$24 = x$', '$x = 24$'] },
@@ -72,7 +72,7 @@ const AUFGABEN_KATEGORIEN: Kategorie[] = [
     ],
   },
   {
-    name: 'Schwer',
+    name: 'Aufgaben 21-30',
     aufgaben: [
       // Typ: A = X/B mit größeren Zahlen
       { id: 's1', aufgabe: '$13 = \\frac{x}{4}$', loesung: 52, rechenweg: ['$13 = \\frac{x}{4}$', 'Multipliziere beide Seiten mit 4', '$13 \\cdot 4 = \\frac{x}{4} \\cdot 4$', '$52 = x$', '$x = 52$'] },
@@ -157,14 +157,14 @@ export default function Generator_Bruchgleichungen() {
                   : 'bg-white text-gray-700 border border-gray-300 hover:border-purple-300'
               }`}
             >
-              {kategorie.name} ({kategorie.aufgaben.length})
+              {kategorie.name}
             </button>
           ))}
         </div>
 
         {/* Aufgaben */}
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          <p className="text-sm font-semibold text-gray-700 mb-2 col-span-full">Löse die Bruchgleichung</p>
+          <p className="text-base font-semibold text-gray-700 mb-2 col-span-full">Löse die Bruchgleichung</p>
           {currentAufgaben.map((aufgabe, index) => {
             const answer = answers[aufgabe.id] || { value: '', isCorrect: null };
             const showSolution = showSolutions[aufgabe.id] || false;
@@ -172,19 +172,19 @@ export default function Generator_Bruchgleichungen() {
             return (
               <div key={aufgabe.id} className="space-y-0 col-span-1">
                 {/* Aufgabe in einer Zeile */}
-                <div className="bg-white rounded p-2 shadow border-l-2 border-purple-300 flex items-center gap-2">
+                <div className="bg-white rounded p-3 shadow border-l-2 border-purple-300 flex items-center gap-3">
                   {/* Nummer */}
-                  <span className="text-sm font-bold text-gray-600 whitespace-nowrap">
+                  <span className="text-base font-bold text-gray-600 whitespace-nowrap">
                     {index + 1})
                   </span>
 
                   {/* Aufgabe */}
-                  <div className="text-sm bg-gray-50 px-2 py-1 rounded border border-gray-200 whitespace-nowrap flex items-center justify-center">
+                  <div className="text-lg md:text-xl bg-gray-50 px-3 py-2 rounded border border-gray-200 whitespace-nowrap flex items-center justify-center">
                     {aufgabe.aufgabe}
                   </div>
 
                   {/* Gleichheitszeichen */}
-                  <span className="text-lg font-bold text-gray-500">=</span>
+                  <span className="text-2xl font-bold text-gray-500">=</span>
 
                   {/* Input */}
                   <input
@@ -192,7 +192,7 @@ export default function Generator_Bruchgleichungen() {
                     placeholder="..."
                     value={answer.value}
                     onChange={(e) => handleInputChange(aufgabe.id, e.target.value)}
-                    className={`flex-1 min-w-0 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
+                    className={`flex-1 min-w-0 px-3 py-2 rounded border-2 font-mono text-base transition-all ${
                       answer.isCorrect === null
                         ? 'border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-200'
                         : answer.isCorrect
@@ -214,7 +214,7 @@ export default function Generator_Bruchgleichungen() {
                   {/* Button */}
                   <button
                     onClick={() => toggleSolution(aufgabe.id)}
-                    className="text-sm px-2 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-all whitespace-nowrap font-semibold"
+                    className="text-base px-3 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-all whitespace-nowrap font-semibold"
                   >
                     {showSolution ? '✕' : '?'}
                   </button>
@@ -222,15 +222,15 @@ export default function Generator_Bruchgleichungen() {
 
                 {/* Rechenweg - ausklappbar unter der Aufgabe */}
                 {showSolution && (
-                  <div className="p-2 bg-purple-50 rounded border-l-2 border-purple-400 text-sm ml-8">
-                    <div className="space-y-0.5">
+                  <div className="p-3 bg-purple-50 rounded border-l-2 border-purple-400 text-base ml-8">
+                    <div className="space-y-1">
                       {aufgabe.rechenweg.map((schritt, i) => (
                         <p key={i} className="text-gray-700">
                           {i > 0 && '→ '} {schritt}
                         </p>
                       ))}
                     </div>
-                    <p className="font-semibold text-purple-900 mt-1">
+                    <p className="font-semibold text-purple-900 mt-2">
                       Lösung: <span className="font-mono bg-white px-1 rounded">x = {aufgabe.loesung}</span>
                     </p>
                   </div>
@@ -242,7 +242,7 @@ export default function Generator_Bruchgleichungen() {
 
         {/* Fortschritt */}
         <div className="mt-4 p-3 bg-white rounded shadow border border-gray-200">
-          <p className="text-sm font-semibold text-gray-800">
+          <p className="text-base font-semibold text-gray-800">
             Fortschritt: {Object.values(answers).filter((a) => a.isCorrect === true).length} /{' '}
             {currentAufgaben.length} korrekt
           </p>
