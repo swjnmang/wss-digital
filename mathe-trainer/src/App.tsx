@@ -27,6 +27,7 @@ import Handelskalkdif from './pages/rechnen_lernen/prozentrechnung/Handelskalkdi
 // Rechnen lernen: Gleichungen
 import GeneratorLineare from './pages/rechnen_lernen/gleichungen/Generator_lineare';
 import Quadratisch from './pages/rechnen_lernen/gleichungen/Quadratisch';
+import Bruchgleichungen from './pages/rechnen_lernen/gleichungen/Bruchgleichungen';
 import Abschlusstest from './pages/rechnen_lernen/gleichungen/Abschlusstest';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react';
@@ -209,6 +210,7 @@ export default function App() {
           <Route path="/rechnen_lernen/gleichungen" element={<Gleichungen />} />
           <Route path="/rechnen_lernen/gleichungen/generator_lineare" element={<GeneratorLineare />} />
           <Route path="/rechnen_lernen/gleichungen/quadratisch" element={<Quadratisch />} />
+          <Route path="/rechnen_lernen/gleichungen/bruchgleichungen" element={<Bruchgleichungen />} />
           <Route path="/rechnen_lernen/gleichungen/abschlusstest" element={<Abschlusstest />} />
           <Route path="/lineare_funktionen" element={<LineareIndex />} />
           <Route path="/lineare_funktionen/wertetabelle" element={<Wertetabelle />} />

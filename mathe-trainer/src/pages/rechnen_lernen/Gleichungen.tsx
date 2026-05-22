@@ -12,7 +12,12 @@ const aufgaben = [
     path: '/rechnen_lernen/gleichungen/quadratisch',
   },
   {
-    title: '3. Abschlusstest',
+    title: '3. Bruchgleichungen',
+    description: 'Löse Bruchgleichungen der Form A = X/B und B = A/X.',
+    path: '/rechnen_lernen/gleichungen/bruchgleichungen',
+  },
+  {
+    title: '4. Abschlusstest',
     description: 'Teste dein Wissen im Lösen von linearen und quadratischen Gleichungen.',
     path: '/rechnen_lernen/gleichungen/abschlusstest',
   },
