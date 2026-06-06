@@ -3,6 +3,11 @@ import { useState } from 'react'
 
 export default function GamificationNutzen() {
   const [activeTab, setActiveTab] = useState('aufgaben')
+  const [expandedTasks, setExpandedTasks] = useState<Record<number, boolean>>({})
+
+  const toggleTask = (taskId: number) => {
+    setExpandedTasks(prev => ({ ...prev, [taskId]: !prev[taskId] }))
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -50,22 +55,80 @@ export default function GamificationNutzen() {
           </div>
 
           {activeTab === 'aufgaben' && (
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">Aufgaben</h2>
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-slate-50 rounded-xl p-6 border border-slate-200">
-                    <div className="text-4xl mb-4">🔍</div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Aufgabe {i}</h3>
-                    <p className="text-slate-600 text-sm mb-4">Identifiziere Gamification-Elemente...</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-semibold text-blue-600">100 Punkte</span>
-                      <button className="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
-                        Öffnen
-                      </button>
+            <div className="space-y-6">
+              {/* Arbeitsauftrag 1 */}
+              <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                <button
+                  onClick={() => toggleTask(1)}
+                  className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                      🎮 Arbeitsauftrag 1: Gamification, Serious-Games, Simulationen & Lernspiele – Unterschiede kennenlernen
+                    </h3>
+                    <p className="text-slate-600 text-sm mt-2">
+                      Lerne die Unterschiede zwischen Gamification, Serious Games, Simulationen und Lernspielen kennen
+                    </p>
+                  </div>
+                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTasks[1] ? 'rotate-45' : ''}`}>➕</span>
+                </button>
+                {expandedTasks[1] && (
+                  <div className="px-6 pb-6 border-t border-slate-200">
+                    <div className="bg-white p-6 rounded-lg mt-4 text-slate-700 leading-relaxed">
+                      <p className="italic text-slate-500">Inhalt folgt …</p>
                     </div>
                   </div>
-                ))}
+                )}
+              </div>
+
+              {/* Arbeitsauftrag 2 */}
+              <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                <button
+                  onClick={() => toggleTask(2)}
+                  className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                      📱 Arbeitsauftrag 2: Eine App untersuchen und kritisch testen
+                    </h3>
+                    <p className="text-slate-600 text-sm mt-2">
+                      Analysiere und bewerte eine App auf Gamification-Elemente
+                    </p>
+                  </div>
+                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTasks[2] ? 'rotate-45' : ''}`}>➕</span>
+                </button>
+                {expandedTasks[2] && (
+                  <div className="px-6 pb-6 border-t border-slate-200">
+                    <div className="bg-white p-6 rounded-lg mt-4 text-slate-700 leading-relaxed">
+                      <p className="italic text-slate-500">Inhalt folgt …</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Arbeitsauftrag 3 */}
+              <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                <button
+                  onClick={() => toggleTask(3)}
+                  className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                      ⚖️ Arbeitsauftrag 3: Chancen & Risiken von Gamification
+                    </h3>
+                    <p className="text-slate-600 text-sm mt-2">
+                      Diskutiere und bewerte die Vor- und Nachteile von Gamification
+                    </p>
+                  </div>
+                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTasks[3] ? 'rotate-45' : ''}`}>➕</span>
+                </button>
+                {expandedTasks[3] && (
+                  <div className="px-6 pb-6 border-t border-slate-200">
+                    <div className="bg-white p-6 rounded-lg mt-4 text-slate-700 leading-relaxed">
+                      <p className="italic text-slate-500">Inhalt folgt …</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
