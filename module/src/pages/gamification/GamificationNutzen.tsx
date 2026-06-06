@@ -1,10 +1,110 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 
+type Category = 'Gamification' | 'Lernspiel' | 'Serious Game' | 'Simulation'
+
+interface AppItem {
+  name: string
+  description: string
+  correct: Category
+  explanation: string
+}
+
+const APP_ITEMS: AppItem[] = [
+  {
+    name: 'Duolingo',
+    description: 'Eine Sprachlern-App, bei der du täglich Lektionen absolvierst. Für richtige Antworten sammelst du Erfahrungspunkte (XP), hältst deinen täglichen Streak aufrecht und steigst in wöchentlichen Ranglisten gegen andere Nutzer auf. Das eigentliche Ziel ist das Erlernen einer Sprache.',
+    correct: 'Gamification',
+    explanation: 'Duolingo ist Gamification: Das Lernen einer Sprache (kein Spiel) wird durch Spielelemente (XP, Streaks, Ranglisten) motivierender gestaltet.'
+  },
+  {
+    name: 'ANTON App',
+    description: 'Eine Schul-App, bei der Schüler ihr Fach und ihre Jahrgangsstufe wählen und dann interaktive Lehrplan-Aufgaben lösen (z. B. Brüche, Satzglieder). Für jede richtige Antwort verdienen sie Münzen, die sie im integrierten Spiele-Shop einlösen können.',
+    correct: 'Lernspiel',
+    explanation: 'ANTON ist ein Lernspiel: Der Inhalt des Spiels besteht direkt aus Schulstoff. Man kommt nur weiter, wenn man Lernaufgaben löst.'
+  },
+  {
+    name: 'The Evolution of Trust',
+    description: 'Ein animiertes Browser-Spiel, in dem man mit verschiedenen Charakter-Typen interagiert und dabei die Spieltheorie und Psychologie des Vertrauens entdeckt. Es hat eine richtige Spielmechanik, aber kein klassisches Unterhaltungsziel.',
+    correct: 'Serious Game',
+    explanation: 'Ein Serious Game: Es ist ein vollwertiges Spiel, aber das eigentliche Ziel ist das Verständnis von Spieltheorie und gesellschaftlichem Vertrauen.'
+  },
+  {
+    name: 'GeoFS Flight Simulator',
+    description: 'Eine kostenlose Browser-Software, die ein Flugzeug-Cockpit mit echten Wetterdaten, echten Flughäfen und realistischer Physik nachbildet. Keine Story, kein Punktesystem – einfach fliegen wie in der Wirklichkeit.',
+    correct: 'Simulation',
+    explanation: 'Eine Simulation: Die Software bildet die Realität 1:1 nach. Keine erfundene Story, nur echte Physik und Daten.'
+  },
+  {
+    name: 'Habitica',
+    description: 'Eine To-Do-Listen-App, die dein echtes Leben in ein Rollenspiel verwandelt. Erledigst du eine Aufgabe auf deiner Liste, bekommt dein Charakter Erfahrungspunkte. Lässt du Aufgaben liegen, verliert dein Charakter Lebenspunkte.',
+    correct: 'Gamification',
+    explanation: 'Gamification: Die eigentliche Aufgabe (Produktivität, Aufgaben erledigen) ist kein Spiel. Spielelemente (RPG-Charakter, HP, XP) machen es motivierender.'
+  },
+  {
+    name: 'Kahoot!',
+    description: 'Eine Quiz-Plattform, die Lehrkräfte im Unterricht einsetzen. Die Schüler beantworten Fragen zu aktuellen Unterrichtsthemen auf Zeit. Der Schnellste mit der richtigen Antwort bekommt die meisten Punkte.',
+    correct: 'Lernspiel',
+    explanation: 'Ein Lernspiel: Der Inhalt sind konkrete Lehrplanthemen. Das Spiel funktioniert nur durch das Beantworten von Wissensfragen.'
+  },
+  {
+    name: 'This War of Mine',
+    description: 'Ein Videospiel, in dem du eine Gruppe Zivilisten durch einen Krieg führst. Du triffst schwere moralische Entscheidungen: Stehle ich Medikamente von einem alten Mann? Das Spiel basiert auf realen Kriegserfahrungen.',
+    correct: 'Serious Game',
+    explanation: 'Ein Serious Game: Es ist ein vollwertiges Videospiel, aber der Zweck ist, den Spieler die menschliche Seite des Krieges erleben zu lassen.'
+  },
+  {
+    name: 'Microsoft Flight Simulator (2024)',
+    description: 'Eine Software, die Flugzeuge und die gesamte Erde mit echten Satellitendaten und Live-Wetter in Echtzeit nachbildet. Piloten weltweit nutzen vergleichbare Systeme zur Ausbildung.',
+    correct: 'Simulation',
+    explanation: 'Eine Simulation: Maximale Realitätstreue, echte Daten, kein Spielziel – nur die exakte Nachbildung des Fliegens.'
+  },
+  {
+    name: 'Nike Run Club',
+    description: 'Eine Lauf-App, die deine Läufe aufzeichnet und dich mit Abzeichen belohnt, wenn du bestimmte Distanzen erreichst. Du kannst dich in Challenges mit Freunden messen und auf einer Rangliste aufsteigen.',
+    correct: 'Gamification',
+    explanation: 'Gamification: Das Laufen selbst ist kein Spiel. Badges, Challenges und Ranglisten werden hinzugefügt, um die Motivation zu steigern.'
+  },
+  {
+    name: 'Papers, Please',
+    description: 'Ein Videospiel, in dem du als Grenzbeamter eines fiktiven Landes Einreisedokumente prüfst. Du musst täglich Entscheidungen treffen: Lässt du eine Familie durch, die falsche Papiere hat? Dein Gehalt hängt von deiner Produktivität ab.',
+    correct: 'Serious Game',
+    explanation: 'Ein Serious Game: Es ist ein vollwertiges Spiel, das Bürokratie, Moral und politische Systeme erlebbar macht.'
+  },
+  {
+    name: 'SimCity (EA)',
+    description: 'Eine Software, in der du eine Stadt planst und verwaltest. Du musst Steuern festlegen, Infrastruktur bauen und auf Naturkatastrophen reagieren. Die Wirtschafts- und Verkehrsmodelle orientieren sich an echten stadtplanerischen Konzepten.',
+    correct: 'Simulation',
+    explanation: 'Eine Simulation: Stadtplanung und Wirtschaft werden realitätsnah modelliert, auch wenn es spielerische Elemente gibt.'
+  },
+  {
+    name: 'Quizlet',
+    description: 'Eine Lernplattform, auf der Schüler digitale Karteikarten zu Unterrichtsthemen erstellen oder nutzen. Im Lern-Modus "Match" musst du Begriffe und Definitionen so schnell wie möglich einander zuordnen.',
+    correct: 'Lernspiel',
+    explanation: 'Ein Lernspiel: Der gesamte Inhalt ist Schulstoff. Das Spielprinzip funktioniert nur durch das Anwenden von Lernmaterial.'
+  },
+]
+
+const CATEGORIES: Category[] = ['Gamification', 'Lernspiel', 'Serious Game', 'Simulation']
+
+const CATEGORY_COLORS: Record<Category, string> = {
+  'Gamification': 'bg-blue-500 hover:bg-blue-600 border-blue-500',
+  'Lernspiel': 'bg-green-500 hover:bg-green-600 border-green-500',
+  'Serious Game': 'bg-purple-500 hover:bg-purple-600 border-purple-500',
+  'Simulation': 'bg-amber-500 hover:bg-amber-600 border-amber-500',
+}
+
 export default function GamificationNutzen() {
   const [activeTab, setActiveTab] = useState('aufgaben')
   const [expandedTasks, setExpandedTasks] = useState<Record<number, boolean>>({})
   const [expandedTexts, setExpandedTexts] = useState<Record<number, boolean>>({})
+
+  // Übung 1 State
+  const [quiz1Index, setQuiz1Index] = useState(0)
+  const [quiz1Selected, setQuiz1Selected] = useState<Category | null>(null)
+  const [quiz1Score, setQuiz1Score] = useState(0)
+  const [quiz1Done, setQuiz1Done] = useState(false)
+  const [quiz1Expanded, setQuiz1Expanded] = useState(false)
 
   const toggleTask = (taskId: number) => {
     setExpandedTasks(prev => ({ ...prev, [taskId]: !prev[taskId] }))
@@ -12,6 +112,30 @@ export default function GamificationNutzen() {
 
   const toggleText = (textId: number) => {
     setExpandedTexts(prev => ({ ...prev, [textId]: !prev[textId] }))
+  }
+
+  const handleQuiz1Answer = (cat: Category) => {
+    if (quiz1Selected !== null) return
+    setQuiz1Selected(cat)
+    if (cat === APP_ITEMS[quiz1Index].correct) {
+      setQuiz1Score(s => s + 1)
+    }
+  }
+
+  const handleQuiz1Next = () => {
+    if (quiz1Index + 1 >= APP_ITEMS.length) {
+      setQuiz1Done(true)
+    } else {
+      setQuiz1Index(i => i + 1)
+      setQuiz1Selected(null)
+    }
+  }
+
+  const handleQuiz1Restart = () => {
+    setQuiz1Index(0)
+    setQuiz1Selected(null)
+    setQuiz1Score(0)
+    setQuiz1Done(false)
   }
 
   return (
@@ -435,19 +559,136 @@ export default function GamificationNutzen() {
           )}
 
           {activeTab === 'uebungen' && (
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">Praktische Übungen</h2>
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6">
-                {[1, 2].map((i) => (
-                  <div key={i} className="bg-slate-50 rounded-xl p-6 border border-slate-200">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-3">Übung {i}</h3>
-                    <p className="text-slate-600 text-sm mb-4">Entwerfe ein Gamification-System...</p>
-                    <button className="w-full py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium text-sm">
-                      Übung starten
-                    </button>
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold text-slate-900">Übungen</h2>
+
+              {/* Übung 1 */}
+              <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                <button
+                  onClick={() => setQuiz1Expanded(e => !e)}
+                  className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-slate-900">🗂️ 1. Gamification, Lernspiel, Serious Game oder Simulation?</h3>
+                    <p className="text-slate-600 text-sm mt-1">
+                      Lies die App-Beschreibung und ordne sie der richtigen Kategorie zu – {APP_ITEMS.length} Runden
+                    </p>
                   </div>
-                ))}
+                  <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${quiz1Expanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+
+                {quiz1Expanded && (
+                  <div className="px-6 pb-6 border-t border-slate-200">
+                    <div className="mt-4">
+
+                      {quiz1Done ? (
+                        /* ===== ERGEBNIS ===== */
+                        <div className="text-center py-10 space-y-4">
+                          <div className="text-6xl mb-2">{quiz1Score >= 10 ? '🏆' : quiz1Score >= 7 ? '👍' : '📚'}</div>
+                          <h3 className="text-2xl font-bold text-slate-900">
+                            Du hast {quiz1Score} von {APP_ITEMS.length} richtig!
+                          </h3>
+                          <p className="text-slate-600">
+                            {quiz1Score >= 10
+                              ? 'Hervorragend – du kennst die Unterschiede wie ein Profi!'
+                              : quiz1Score >= 7
+                              ? 'Gut gemacht! Wiederhole die Infotexte für die Kategorien, bei denen du unsicher warst.'
+                              : 'Schau dir noch einmal die Informationstexte an und versuche es erneut!'}
+                          </p>
+                          <button
+                            onClick={handleQuiz1Restart}
+                            className="mt-4 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
+                          >
+                            🔄 Nochmal versuchen
+                          </button>
+                        </div>
+                      ) : (
+                        /* ===== FRAGE ===== */
+                        <div className="space-y-5">
+                          {/* Fortschritt */}
+                          <div className="flex items-center justify-between text-sm text-slate-500 mb-1">
+                            <span>App {quiz1Index + 1} von {APP_ITEMS.length}</span>
+                            <span className="font-semibold text-slate-700">{quiz1Score} Punkte</span>
+                          </div>
+                          <div className="w-full bg-slate-200 rounded-full h-2">
+                            <div
+                              className="bg-blue-500 h-2 rounded-full transition-all"
+                              style={{ width: `${(quiz1Index / APP_ITEMS.length) * 100}%` }}
+                            />
+                          </div>
+
+                          {/* App-Karte */}
+                          <div className="bg-white border-2 border-slate-200 rounded-xl p-6">
+                            <h4 className="text-xl font-bold text-slate-900 mb-3">
+                              📱 {APP_ITEMS[quiz1Index].name}
+                            </h4>
+                            <p className="text-slate-700 leading-relaxed">
+                              {APP_ITEMS[quiz1Index].description}
+                            </p>
+                          </div>
+
+                          {/* Kategorie-Buttons */}
+                          <div className="grid grid-cols-2 gap-3">
+                            {CATEGORIES.map(cat => {
+                              const isSelected = quiz1Selected === cat
+                              const isCorrect = cat === APP_ITEMS[quiz1Index].correct
+                              const answered = quiz1Selected !== null
+
+                              let btnClass = 'w-full py-3 px-4 rounded-lg font-semibold text-white transition-all border-2 '
+                              if (!answered) {
+                                btnClass += CATEGORY_COLORS[cat]
+                              } else if (isCorrect) {
+                                btnClass += 'bg-green-500 border-green-500 scale-105 shadow-md'
+                              } else if (isSelected && !isCorrect) {
+                                btnClass += 'bg-red-400 border-red-400 opacity-75'
+                              } else {
+                                btnClass += 'bg-slate-300 border-slate-300 text-slate-600 opacity-50'
+                              }
+
+                              return (
+                                <button
+                                  key={cat}
+                                  onClick={() => handleQuiz1Answer(cat)}
+                                  disabled={answered}
+                                  className={btnClass}
+                                >
+                                  {answered && isCorrect && '✓ '}
+                                  {answered && isSelected && !isCorrect && '✗ '}
+                                  {cat}
+                                </button>
+                              )
+                            })}
+                          </div>
+
+                          {/* Feedback */}
+                          {quiz1Selected !== null && (
+                            <div className={`rounded-xl p-4 border-2 ${quiz1Selected === APP_ITEMS[quiz1Index].correct ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
+                              <p className="font-bold mb-1">
+                                {quiz1Selected === APP_ITEMS[quiz1Index].correct ? '✅ Richtig!' : `❌ Leider falsch – es ist: ${APP_ITEMS[quiz1Index].correct}`}
+                              </p>
+                              <p className="text-slate-700 text-sm leading-relaxed">
+                                {APP_ITEMS[quiz1Index].explanation}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Weiter-Button */}
+                          {quiz1Selected !== null && (
+                            <button
+                              onClick={handleQuiz1Next}
+                              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors"
+                            >
+                              {quiz1Index + 1 >= APP_ITEMS.length ? '🏁 Ergebnis anzeigen' : 'Weiter →'}
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                    </div>
+                  </div>
+                )}
               </div>
+
             </div>
           )}
         </div>
