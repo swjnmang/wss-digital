@@ -322,6 +322,19 @@ export default function GamificationNutzen() {
                           🔗 Zum Spiel: jkoelling.github.io/trust
                         </a>
                       </div>
+
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-3">🎬 Video: Was sind Serious Games?</h4>
+                        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                          <iframe
+                            className="absolute inset-0 w-full h-full rounded-lg"
+                            src="https://www.youtube.com/embed/M_pgMJ6DStU"
+                            title="Was sind Serious Games?"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
