@@ -4,9 +4,14 @@ import { useState } from 'react'
 export default function GamificationNutzen() {
   const [activeTab, setActiveTab] = useState('aufgaben')
   const [expandedTasks, setExpandedTasks] = useState<Record<number, boolean>>({})
+  const [expandedTexts, setExpandedTexts] = useState<Record<number, boolean>>({})
 
   const toggleTask = (taskId: number) => {
     setExpandedTasks(prev => ({ ...prev, [taskId]: !prev[taskId] }))
+  }
+
+  const toggleText = (textId: number) => {
+    setExpandedTexts(prev => ({ ...prev, [textId]: !prev[textId] }))
   }
 
   return (
@@ -218,142 +223,186 @@ export default function GamificationNutzen() {
             <div className="space-y-6">
               <h2 className="text-2xl font-semibold text-slate-900">Informationstexte</h2>
 
-              {/* Team 1 */}
-              <div className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
-                <div className="bg-blue-600 px-6 py-4">
-                  <h3 className="text-white font-bold text-lg">📄 Team 1: Die Gamification-Spezialisten</h3>
-                </div>
-                <div className="p-6 space-y-4 text-slate-700 leading-relaxed">
-                  <div>
-                    <h4 className="font-bold text-slate-900 mb-2">Was ist das überhaupt?</h4>
-                    <p>
-                      Stellt euch vor, ihr müsst eine total langweilige Aufgabe erledigen – zum Beispiel euer Zimmer aufräumen, Steuererklärungen ausfüllen oder Vokabeln büffeln. Eigentlich habt ihr null Bock darauf. Genau hier setzt <strong>Gamification</strong> (auf Deutsch: Spielifizierung) ein. Gamification bedeutet: Man nimmt spieltypische Elemente und baut sie in einen Alltagskontext ein, der eigentlich überhaupt nichts mit Spielen zu tun hat. Das Ziel dahinter ist es, die Motivation von Menschen zu steigern, Verhaltensweisen zu ändern oder langweilige Prozesse spannend zu machen.
-                    </p>
-                    <p className="mt-3">
-                      Wichtig ist: Bei Gamification spielt man kein eigenständiges, vollwertiges Videospiel. Man erledigt immer noch die reale Aufgabe, aber sie fühlt sich durch die eingebauten Mechanismen wie ein Spiel an.
-                    </p>
+              {/* Text 1 */}
+              <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                <button
+                  onClick={() => toggleText(1)}
+                  className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-slate-900">📄 Was ist eigentlich Gamification?</h3>
+                    <p className="text-slate-600 text-sm mt-1">Informationstext für Team 1: Die Gamification-Spezialisten</p>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 mb-2">Woran erkennt man Gamification? (Kernmerkmale)</h4>
-                    <ul className="space-y-2 ml-4 list-disc">
-                      <li><strong>Das PBL-System:</strong> Points (Punkte), Badges (virtuelle Abzeichen) und Leaderboards (Ranglisten). Wer eine Aufgabe erledigt, sammelt Punkte und steigt in Ligen auf.</li>
-                      <li><strong>Fortschrittsbalken:</strong> Ein visueller Balken zeigt an, dass ihr z. B. euer Profil zu „80 % vervollständigt" habt. Das triggert unser Gehirn, die 100 % vollmachen zu wollen.</li>
-                      <li><strong>Streaks (Serien):</strong> Ihr werdet belohnt, wenn ihr eine Aufgabe jeden Tag ohne Unterbrechung erledigt (z. B. der Flammen-Streak bei Snapchat oder tägliche Log-In-Boni).</li>
-                    </ul>
+                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTexts[1] ? 'rotate-45' : ''}`}>➕</span>
+                </button>
+                {expandedTexts[1] && (
+                  <div className="px-6 pb-6 border-t border-slate-200">
+                    <div className="bg-white p-6 rounded-lg mt-4 space-y-4 text-slate-700 leading-relaxed">
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-2">Was ist das überhaupt?</h4>
+                        <p>
+                          Stellt euch vor, ihr müsst eine total langweilige Aufgabe erledigen – zum Beispiel euer Zimmer aufräumen, Steuererklärungen ausfüllen oder Vokabeln büffeln. Eigentlich habt ihr null Bock darauf. Genau hier setzt <strong>Gamification</strong> (auf Deutsch: Spielifizierung) ein. Gamification bedeutet: Man nimmt spieltypische Elemente und baut sie in einen Alltagskontext ein, der eigentlich überhaupt nichts mit Spielen zu tun hat. Das Ziel dahinter ist es, die Motivation von Menschen zu steigern, Verhaltensweisen zu ändern oder langweilige Prozesse spannend zu machen.
+                        </p>
+                        <p className="mt-3">
+                          Wichtig ist: Bei Gamification spielt man kein eigenständiges, vollwertiges Videospiel. Man erledigt immer noch die reale Aufgabe, aber sie fühlt sich durch die eingebauten Mechanismen wie ein Spiel an.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-2">Woran erkennt man Gamification? (Kernmerkmale)</h4>
+                        <ul className="space-y-2 ml-4 list-disc">
+                          <li><strong>Das PBL-System:</strong> Points (Punkte), Badges (virtuelle Abzeichen) und Leaderboards (Ranglisten). Wer eine Aufgabe erledigt, sammelt Punkte und steigt in Ligen auf.</li>
+                          <li><strong>Fortschrittsbalken:</strong> Ein visueller Balken zeigt an, dass ihr z. B. euer Profil zu „80 % vervollständigt" habt. Das triggert unser Gehirn, die 100 % vollmachen zu wollen.</li>
+                          <li><strong>Streaks (Serien):</strong> Ihr werdet belohnt, wenn ihr eine Aufgabe jeden Tag ohne Unterbrechung erledigt (z. B. der Flammen-Streak bei Snapchat oder tägliche Log-In-Boni).</li>
+                        </ul>
+                      </div>
+                      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                        <h4 className="font-bold text-slate-800 mb-1">💡 Beispiel: Duolingo</h4>
+                        <p>
+                          Im Kern ist Duolingo nichts anderes als ein digitaler Karteikasten mit Grammatikübungen. Aber die App nutzt die volle Power der Gamification: tägliche Streaks, Erfahrungspunkte (XP), wöchentliche Ranglisten und glitzernde Abzeichen. Das eigentliche Ziel ist das Lernen einer Sprache – aber das System motiviert wie ein Onlinespiel.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h4 className="font-bold text-blue-900 mb-1">💡 Beispiel: Duolingo</h4>
-                    <p>
-                      Im Kern ist Duolingo nichts anderes als ein digitaler Karteikasten mit Grammatikübungen. Aber die App nutzt die volle Power der Gamification: tägliche Streaks, Erfahrungspunkte (XP), wöchentliche Ranglisten und glitzernde Abzeichen. Das eigentliche Ziel ist das Lernen einer Sprache – aber das System motiviert wie ein Onlinespiel.
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
 
-              {/* Team 2 */}
-              <div className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
-                <div className="bg-purple-600 px-6 py-4">
-                  <h3 className="text-white font-bold text-lg">📄 Team 2: Die Serious-Games-Analysten</h3>
-                </div>
-                <div className="p-6 space-y-4 text-slate-700 leading-relaxed">
-                  <div>
-                    <h4 className="font-bold text-slate-900 mb-2">Was ist das überhaupt?</h4>
-                    <p>
-                      <strong>Serious Games</strong> (auf Deutsch: Ernste Spiele) sehen optisch oft wie normale Videospiele aus – aber sie verfolgen ein höheres Ziel. Ein Serious Game ist ein eigenständiges, vollwertiges Videospiel, das jedoch entwickelt wurde, um ernste, reale und oft komplexe Themen spürbar und erlebbar zu machen. Es geht nicht ums bloße Auswendiglernen, sondern darum, durch schwierige Entscheidungen im Spiel ein tiefes Verständnis für gesellschaftliche Probleme, Geschichte, Politik oder Ethik zu entwickeln.
-                    </p>
+              {/* Text 2 */}
+              <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                <button
+                  onClick={() => toggleText(2)}
+                  className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-slate-900">📄 Was sind Serious-Games?</h3>
+                    <p className="text-slate-600 text-sm mt-1">Informationstext für Team 2: Die Serious-Games-Analysten</p>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 mb-2">Woran erkennt man Serious Games? (Kernmerkmale)</h4>
-                    <ul className="space-y-2 ml-4 list-disc">
-                      <li><strong>Echte Spielwelt und Story:</strong> Es gibt Charaktere, eine Handlung, eine Grafik und richtiges Gameplay (laufen, steuern, verwalten).</li>
-                      <li><strong>Ethische Dilemmata:</strong> Spieler werden gezwungen, schwierige Entscheidungen zu treffen, die oft keine perfekte Lösung haben und deren Konsequenzen man tragen muss.</li>
-                      <li><strong>Perspektivenwechsel:</strong> Man schlüpft in Rollen von Menschen, mit denen man im echten Leben selten tauschen möchte (z. B. Geflüchtete, historische Figuren oder Menschen in Krisengebieten).</li>
-                    </ul>
+                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTexts[2] ? 'rotate-45' : ''}`}>➕</span>
+                </button>
+                {expandedTexts[2] && (
+                  <div className="px-6 pb-6 border-t border-slate-200">
+                    <div className="bg-white p-6 rounded-lg mt-4 space-y-4 text-slate-700 leading-relaxed">
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-2">Was ist das überhaupt?</h4>
+                        <p>
+                          <strong>Serious Games</strong> (auf Deutsch: Ernste Spiele) sehen optisch oft wie normale Videospiele aus – aber sie verfolgen ein höheres Ziel. Ein Serious Game ist ein eigenständiges, vollwertiges Videospiel, das jedoch entwickelt wurde, um ernste, reale und oft komplexe Themen spürbar und erlebbar zu machen. Es geht nicht ums bloße Auswendiglernen, sondern darum, durch schwierige Entscheidungen im Spiel ein tiefes Verständnis für gesellschaftliche Probleme, Geschichte, Politik oder Ethik zu entwickeln.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-2">Woran erkennt man Serious Games? (Kernmerkmale)</h4>
+                        <ul className="space-y-2 ml-4 list-disc">
+                          <li><strong>Echte Spielwelt und Story:</strong> Es gibt Charaktere, eine Handlung, eine Grafik und richtiges Gameplay (laufen, steuern, verwalten).</li>
+                          <li><strong>Ethische Dilemmata:</strong> Spieler werden gezwungen, schwierige Entscheidungen zu treffen, die oft keine perfekte Lösung haben und deren Konsequenzen man tragen muss.</li>
+                          <li><strong>Perspektivenwechsel:</strong> Man schlüpft in Rollen von Menschen, mit denen man im echten Leben selten tauschen möchte (z. B. Geflüchtete, historische Figuren oder Menschen in Krisengebieten).</li>
+                        </ul>
+                      </div>
+                      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                        <h4 className="font-bold text-slate-800 mb-1">💡 Beispiel: The Evolution of Trust</h4>
+                        <p className="mb-3">
+                          In diesem animierten, interaktiven Spiel untersucht man die Psychologie und Spieltheorie. Ihr interagiert mit verschiedenen Charakter-Typen (z. B. treuen „Nachäffern" oder hinterlistigen „Betrügern") und schaut, was passiert, wenn man kooperiert oder hintergeht. Das Spiel zeigt auf geniale Weise, warum Vertrauen in unserer Gesellschaft so schwer aufzubauen, aber leicht zu zerstören ist.
+                        </p>
+                        <a
+                          href="https://jkoelling.github.io/trust/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:underline"
+                        >
+                          🔗 Zum Spiel: jkoelling.github.io/trust
+                        </a>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                    <h4 className="font-bold text-purple-900 mb-1">💡 Beispiel: The Evolution of Trust</h4>
-                    <p className="mb-2">
-                      In diesem animierten, interaktiven Spiel untersucht man die Psychologie und Spieltheorie. Ihr interagiert mit verschiedenen Charakter-Typen (z. B. treuen „Nachäffern" oder hinterlistigen „Betrügern") und schaut, was passiert, wenn man kooperiert oder hintergeht. Das Spiel zeigt auf geniale Weise, warum Vertrauen in unserer Gesellschaft so schwer aufzubauen, aber leicht zu zerstören ist.
-                    </p>
-                    <a
-                      href="https://jkoelling.github.io/trust/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-purple-700 font-semibold hover:underline"
-                    >
-                      🔗 Zum Spiel: jkoelling.github.io/trust
-                    </a>
-                  </div>
-                </div>
+                )}
               </div>
 
-              {/* Team 3 */}
-              <div className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
-                <div className="bg-green-600 px-6 py-4">
-                  <h3 className="text-white font-bold text-lg">📄 Team 3: Die Simulations-Experten</h3>
-                </div>
-                <div className="p-6 space-y-4 text-slate-700 leading-relaxed">
-                  <div>
-                    <h4 className="font-bold text-slate-900 mb-2">Was ist das überhaupt?</h4>
-                    <p>
-                      Eine <strong>Simulation</strong> ist das möglichst realitätsgetreue, exakte Nachbilden von komplexen Systemen, Prozessen oder Berufen in einer virtuellen Umgebung. Im Gegensatz zu normalen Videospielen gibt es hier oft keine künstliche Story und keine erfundenen Monster. Die Software verhält sich haargenau so, wie sich die echte Welt verhalten würde. Es geht darum, durch diese virtuelle Schnittstelle reale Abläufe fehlerfrei zu trainieren.
-                    </p>
+              {/* Text 3 */}
+              <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                <button
+                  onClick={() => toggleText(3)}
+                  className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-slate-900">📄 Was sind Simulationen?</h3>
+                    <p className="text-slate-600 text-sm mt-1">Informationstext für Team 3: Die Simulations-Experten</p>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 mb-2">Woran erkennt man Simulationen? (Kernmerkmale)</h4>
-                    <ul className="space-y-2 ml-4 list-disc">
-                      <li><strong>Exakte Realitätstreue:</strong> Physik, mathematische Marktregeln oder technische Knöpfe entsprechen 1:1 der Wirklichkeit.</li>
-                      <li><strong>Experimentieren mit Ursache und Wirkung:</strong> Wenn man in einer Wirtschaftssimulation die Preise zu hoch ansetzt, bricht der Umsatz exakt so ein, wie es auf einem echten Markt passieren würde.</li>
-                      <li><strong>Fehler ohne Risiko:</strong> Man kann ausprobieren, was passiert wenn etwas schiefgeht (z. B. Triebwerksausfall oder Börsencrash), ohne dass echter Schaden entsteht.</li>
-                    </ul>
+                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTexts[3] ? 'rotate-45' : ''}`}>➕</span>
+                </button>
+                {expandedTexts[3] && (
+                  <div className="px-6 pb-6 border-t border-slate-200">
+                    <div className="bg-white p-6 rounded-lg mt-4 space-y-4 text-slate-700 leading-relaxed">
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-2">Was ist das überhaupt?</h4>
+                        <p>
+                          Eine <strong>Simulation</strong> ist das möglichst realitätsgetreue, exakte Nachbilden von komplexen Systemen, Prozessen oder Berufen in einer virtuellen Umgebung. Im Gegensatz zu normalen Videospielen gibt es hier oft keine künstliche Story und keine erfundenen Monster. Die Software verhält sich haargenau so, wie sich die echte Welt verhalten würde. Es geht darum, durch diese virtuelle Schnittstelle reale Abläufe fehlerfrei zu trainieren.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-2">Woran erkennt man Simulationen? (Kernmerkmale)</h4>
+                        <ul className="space-y-2 ml-4 list-disc">
+                          <li><strong>Exakte Realitätstreue:</strong> Physik, mathematische Marktregeln oder technische Knöpfe entsprechen 1:1 der Wirklichkeit.</li>
+                          <li><strong>Experimentieren mit Ursache und Wirkung:</strong> Wenn man in einer Wirtschaftssimulation die Preise zu hoch ansetzt, bricht der Umsatz exakt so ein, wie es auf einem echten Markt passieren würde.</li>
+                          <li><strong>Fehler ohne Risiko:</strong> Man kann ausprobieren, was passiert wenn etwas schiefgeht (z. B. Triebwerksausfall oder Börsencrash), ohne dass echter Schaden entsteht.</li>
+                        </ul>
+                      </div>
+                      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                        <h4 className="font-bold text-slate-800 mb-1">💡 Beispiel: GeoFS Flight Simulator</h4>
+                        <p className="mb-3">
+                          Diese Software bildet das Cockpit von echten Flugzeugen detailgetreu nach. Sogar das Wetter, der Wind und die Flugplätze weltweit werden über Satellitendaten in Echtzeit simuliert. Piloten nutzen solche Systeme weltweit zur Ausbildung, weil sich das virtuelle Flugzeug physikalisch exakt so verhält wie eine echte Boeing oder ein Airbus.
+                        </p>
+                        <a
+                          href="https://www.geo-fs.com/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:underline"
+                        >
+                          🔗 Kostenlos spielbar: geo-fs.com
+                        </a>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <h4 className="font-bold text-green-900 mb-1">💡 Beispiel: GeoFS Flight Simulator</h4>
-                    <p className="mb-2">
-                      Diese Software bildet das Cockpit von echten Flugzeugen detailgetreu nach. Sogar das Wetter, der Wind und die Flugplätze weltweit werden über Satellitendaten in Echtzeit simuliert. Piloten nutzen solche Systeme weltweit zur Ausbildung, weil sich das virtuelle Flugzeug physikalisch exakt so verhält wie eine echte Boeing oder ein Airbus.
-                    </p>
-                    <a
-                      href="https://www.geo-fs.com/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-green-700 font-semibold hover:underline"
-                    >
-                      🔗 Kostenlos spielbar: geo-fs.com
-                    </a>
-                  </div>
-                </div>
+                )}
               </div>
 
-              {/* Team 4 */}
-              <div className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
-                <div className="bg-amber-500 px-6 py-4">
-                  <h3 className="text-white font-bold text-lg">📄 Team 4: Die Lernspiel-Prüfer</h3>
-                </div>
-                <div className="p-6 space-y-4 text-slate-700 leading-relaxed">
-                  <div>
-                    <h4 className="font-bold text-slate-900 mb-2">Was ist das überhaupt?</h4>
-                    <p>
-                      Ein <strong>Lernspiel</strong> (oft auch Educational Game genannt) ist ein Spiel, das von Pädagogen und Softwareentwicklern speziell für den Einsatz in der Schule oder beim Lernen zu Hause entwickelt wurde. Das primäre Ziel ist das Erreichen eines konkreten Lernziels aus dem Lehrplan (z. B. Einmaleins, Rechtschreibung oder Tastaturschreiben). Um das Üben schmackhafter zu machen, wird der Lernstoff in eine meist einfache, kindgerechte oder motivierende Rahmenhandlung verpackt.
-                    </p>
-                    <p className="mt-3 text-sm bg-amber-50 border border-amber-200 rounded p-3">
-                      <strong>Wichtig zur Abgrenzung:</strong> Bei der Gamification (Team 1) verändert man den Alltag. Beim Lernspiel spielt man ein echtes, kleines Spiel – aber der Inhalt besteht fast ausschließlich aus Schulstoff.
-                    </p>
+              {/* Text 4 */}
+              <div className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                <button
+                  onClick={() => toggleText(4)}
+                  className="w-full p-6 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                >
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-slate-900">📄 Was sind Lernspiele?</h3>
+                    <p className="text-slate-600 text-sm mt-1">Informationstext für Team 4: Die Lernspiel-Prüfer</p>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 mb-2">Woran erkennt man Lernspiele? (Kernmerkmale)</h4>
-                    <ul className="space-y-2 ml-4 list-disc">
-                      <li><strong>Direkter Lehrplanbezug:</strong> Die Aufgaben spiegeln genau das wider, was auch im Schulbuch steht (Matheaufgaben, Vokabeltests, Zuordnungen).</li>
-                      <li><strong>Fortschritt durch Wissen:</strong> Man kommt im Spiel nur weiter, wenn man eine Denk- oder Wissensaufgabe richtig gelöst hat (z. B. Türen öffnen sich nur durch die richtige Rechenaufgabe).</li>
-                      <li><strong>Belohnung durch Spielzeit:</strong> Nach einer erfolgreichen Lernphase darf man zur Belohnung oft ein kleines, spaßiges Minispiel spielen.</li>
-                    </ul>
+                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTexts[4] ? 'rotate-45' : ''}`}>➕</span>
+                </button>
+                {expandedTexts[4] && (
+                  <div className="px-6 pb-6 border-t border-slate-200">
+                    <div className="bg-white p-6 rounded-lg mt-4 space-y-4 text-slate-700 leading-relaxed">
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-2">Was ist das überhaupt?</h4>
+                        <p>
+                          Ein <strong>Lernspiel</strong> (oft auch Educational Game genannt) ist ein Spiel, das von Pädagogen und Softwareentwicklern speziell für den Einsatz in der Schule oder beim Lernen zu Hause entwickelt wurde. Das primäre Ziel ist das Erreichen eines konkreten Lernziels aus dem Lehrplan (z. B. Einmaleins, Rechtschreibung oder Tastaturschreiben). Um das Üben schmackhafter zu machen, wird der Lernstoff in eine meist einfache, kindgerechte oder motivierende Rahmenhandlung verpackt.
+                        </p>
+                        <p className="mt-3 text-sm bg-slate-100 border border-slate-200 rounded p-3">
+                          <strong>Wichtig zur Abgrenzung:</strong> Bei der Gamification (Team 1) verändert man den Alltag. Beim Lernspiel spielt man ein echtes, kleines Spiel – aber der Inhalt besteht fast ausschließlich aus Schulstoff.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-2">Woran erkennt man Lernspiele? (Kernmerkmale)</h4>
+                        <ul className="space-y-2 ml-4 list-disc">
+                          <li><strong>Direkter Lehrplanbezug:</strong> Die Aufgaben spiegeln genau das wider, was auch im Schulbuch steht (Matheaufgaben, Vokabeltests, Zuordnungen).</li>
+                          <li><strong>Fortschritt durch Wissen:</strong> Man kommt im Spiel nur weiter, wenn man eine Denk- oder Wissensaufgabe richtig gelöst hat (z. B. Türen öffnen sich nur durch die richtige Rechenaufgabe).</li>
+                          <li><strong>Belohnung durch Spielzeit:</strong> Nach einer erfolgreichen Lernphase darf man zur Belohnung oft ein kleines, spaßiges Minispiel spielen.</li>
+                        </ul>
+                      </div>
+                      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                        <h4 className="font-bold text-slate-800 mb-1">💡 Beispiel: ANTON App</h4>
+                        <p>
+                          Die an vielen bayerischen Schulen genutzte ANTON App lässt Schüler ihr Fach und ihre Jahrgangsstufe auswählen und interaktive Aufgaben lösen (z. B. Brüche zuordnen oder Satzglieder bestimmen). Für jede fehlerfreie Kachel verdienen sie virtuelle Münzen – mit denen sie im integrierten „Spiele-Shop" einfache Geschicklichkeitsspiele freischalten können. Das Spiel dient als direkte Belohnung für den messbaren Lernerfolg.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                    <h4 className="font-bold text-amber-900 mb-1">💡 Beispiel: ANTON App</h4>
-                    <p>
-                      Die an vielen bayerischen Schulen genutzte ANTON App lässt Schüler ihr Fach und ihre Jahrgangsstufe auswählen und interaktive Aufgaben lösen (z. B. Brüche zuordnen oder Satzglieder bestimmen). Für jede fehlerfreie Kachel verdienen sie virtuelle Münzen – mit denen sie im integrierten „Spiele-Shop" einfache Geschicklichkeitsspiele freischalten können. Das Spiel dient als direkte Belohnung für den messbaren Lernerfolg.
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
 
             </div>
