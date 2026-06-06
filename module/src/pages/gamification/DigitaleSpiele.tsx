@@ -1012,7 +1012,7 @@ export default function DigitaleSpiele() {
                   Test dein Wissen über Spielmechaniken und Fachbegriffe
                 </p>
               </div>
-              <span className={`text-2xl transform transition-transform ${expandedTasks[1] ? 'rotate-45' : ''}`}>➕</span>
+              <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTasks[1] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
             {expandedTasks[1] && (
               <div className="px-6 pb-6 border-t border-slate-200">
@@ -1146,7 +1146,7 @@ export default function DigitaleSpiele() {
                   Fülle eine Tabelle mit den Characteristiken verschiedener Spielgenres aus
                 </p>
               </div>
-              <span className={`text-2xl transform transition-transform ${expandedTasks[2] ? 'rotate-45' : ''}`}>➕</span>
+              <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTasks[2] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
             {expandedTasks[2] && (
               <div className="px-6 pb-6 border-t border-slate-200">
@@ -1250,7 +1250,7 @@ export default function DigitaleSpiele() {
                   Analysiere ein digitales Spiel und erkläre, wie es funktioniert
                 </p>
               </div>
-              <span className={`text-2xl transform transition-transform ${expandedTasks[3] ? 'rotate-45' : ''}`}>➕</span>
+              <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTasks[3] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
             {expandedTasks[3] && (
               <div className="px-6 pb-6 border-t border-slate-200">
@@ -1329,7 +1329,7 @@ export default function DigitaleSpiele() {
                   Teste und bewerte ein Spiel wie ein professioneller Spieletester
                 </p>
               </div>
-              <span className={`text-2xl transform transition-transform ${expandedTasks[4] ? 'rotate-45' : ''}`}>➕</span>
+              <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTasks[4] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
             {expandedTasks[4] && (
               <div className="px-6 pb-6 border-t border-slate-200">
@@ -1875,7 +1875,7 @@ export default function DigitaleSpiele() {
                   Ein Gruppenarbeitsauftrag - Kreative Erstellung eines Artikels für die Schülerzeitschrift
                 </p>
               </div>
-              <span className={`text-2xl transform transition-transform ${expandedTasks[5] ? 'rotate-45' : ''}`}>➕</span>
+              <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTasks[5] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
             {expandedTasks[5] && (
               <div className="px-6 pb-6 border-t border-slate-200">
@@ -2109,7 +2109,7 @@ export default function DigitaleSpiele() {
                 <h3 className="text-xl font-bold text-slate-900">1️⃣ Spielmechaniken Meister</h3>
                 <p className="text-slate-600 text-sm mt-1">Ziehe die Spielelemente per Drag & Drop in die richtige Kategorie!</p>
               </div>
-              <span className={`text-3xl transform transition-transform ml-4 ${expandedExercises[1] ? 'rotate-45' : ''}`}>➕</span>
+              <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedExercises[1] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
 
             {expandedExercises[1] && (
@@ -2322,7 +2322,7 @@ export default function DigitaleSpiele() {
                 <h3 className="text-xl font-bold text-slate-900">2️⃣ Zielgruppen-Detective</h3>
                 <p className="text-slate-600 text-sm mt-1">Identifiziere Spielgenres und ihre Charakteristiken!</p>
               </div>
-              <span className={`text-3xl transform transition-transform ml-4 ${expandedExercises[2] ? 'rotate-45' : ''}`}>➕</span>
+              <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedExercises[2] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
 
             {expandedExercises[2] && (
@@ -2388,7 +2388,7 @@ export default function DigitaleSpiele() {
                 <h3 className="text-xl font-bold text-slate-900">3️⃣ Chancen & Gefahren Sortierer</h3>
                 <p className="text-slate-600 text-sm mt-1">Ziehe die Aussagen per Drag & Drop in die richtige Kategorie!</p>
               </div>
-              <span className={`text-3xl transform transition-transform ml-4 ${expandedExercises[3] ? 'rotate-45' : ''}`}>➕</span>
+              <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedExercises[3] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
 
             {expandedExercises[3] && (
@@ -2485,7 +2485,7 @@ export default function DigitaleSpiele() {
                 <h3 className="text-xl font-bold text-slate-900">4️⃣ Spielsucht-Test: Bergen Gaming Addiction Scale</h3>
                 <p className="text-slate-600 text-sm mt-1">Anerkannter wissenschaftlicher Test für problematisches Spielverhalten</p>
               </div>
-              <span className={`text-3xl transform transition-transform ml-4 ${expandedExercises[4] ? 'rotate-45' : ''}`}>➕</span>
+              <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedExercises[4] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
 
             {expandedExercises[4] && (
@@ -2609,7 +2609,7 @@ export default function DigitaleSpiele() {
                 <h3 className="text-xl font-bold text-slate-900">5️⃣ Internet-Spielsucht-Test: IGAT</h3>
                 <p className="text-slate-600 text-sm mt-1">Umfassender psychometrischer Screening-Test für Gaming-Sucht</p>
               </div>
-              <span className={`text-3xl transform transition-transform ml-4 ${expandedExercises[5] ? 'rotate-45' : ''}`}>➕</span>
+              <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedExercises[5] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
 
             {expandedExercises[5] && (

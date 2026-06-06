@@ -75,7 +75,7 @@ export default function GamificationNutzen() {
                       Lerne die Unterschiede zwischen Gamification, Serious Games, Simulationen und Lernspielen kennen
                     </p>
                   </div>
-                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTasks[1] ? 'rotate-45' : ''}`}>➕</span>
+                  <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTasks[1] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {expandedTasks[1] && (
                   <div className="px-6 pb-6 border-t border-slate-200">
@@ -181,7 +181,7 @@ export default function GamificationNutzen() {
                       Analysiere und bewerte eine App auf Gamification-Elemente
                     </p>
                   </div>
-                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTasks[2] ? 'rotate-45' : ''}`}>➕</span>
+                  <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTasks[2] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {expandedTasks[2] && (
                   <div className="px-6 pb-6 border-t border-slate-200">
@@ -206,7 +206,7 @@ export default function GamificationNutzen() {
                       Diskutiere und bewerte die Vor- und Nachteile von Gamification
                     </p>
                   </div>
-                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTasks[3] ? 'rotate-45' : ''}`}>➕</span>
+                  <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTasks[3] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {expandedTasks[3] && (
                   <div className="px-6 pb-6 border-t border-slate-200">
@@ -233,7 +233,7 @@ export default function GamificationNutzen() {
                     <h3 className="text-xl font-bold text-slate-900">📄 Was ist eigentlich Gamification?</h3>
                     <p className="text-slate-600 text-sm mt-1">Informationstext für Team 1: Die Gamification-Spezialisten</p>
                   </div>
-                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTexts[1] ? 'rotate-45' : ''}`}>➕</span>
+                  <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTexts[1] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {expandedTexts[1] && (
                   <div className="px-6 pb-6 border-t border-slate-200">
@@ -261,6 +261,19 @@ export default function GamificationNutzen() {
                           Im Kern ist Duolingo nichts anderes als ein digitaler Karteikasten mit Grammatikübungen. Aber die App nutzt die volle Power der Gamification: tägliche Streaks, Erfahrungspunkte (XP), wöchentliche Ranglisten und glitzernde Abzeichen. Das eigentliche Ziel ist das Lernen einer Sprache – aber das System motiviert wie ein Onlinespiel.
                         </p>
                       </div>
+
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-3">🎬 Video: Was ist Gamification?</h4>
+                        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                          <iframe
+                            className="absolute inset-0 w-full h-full rounded-lg"
+                            src="https://www.youtube.com/embed/8Dw7HWZYP8M"
+                            title="Was ist Gamification?"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -276,7 +289,7 @@ export default function GamificationNutzen() {
                     <h3 className="text-xl font-bold text-slate-900">📄 Was sind Serious-Games?</h3>
                     <p className="text-slate-600 text-sm mt-1">Informationstext für Team 2: Die Serious-Games-Analysten</p>
                   </div>
-                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTexts[2] ? 'rotate-45' : ''}`}>➕</span>
+                  <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTexts[2] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {expandedTexts[2] && (
                   <div className="px-6 pb-6 border-t border-slate-200">
@@ -324,7 +337,7 @@ export default function GamificationNutzen() {
                     <h3 className="text-xl font-bold text-slate-900">📄 Was sind Simulationen?</h3>
                     <p className="text-slate-600 text-sm mt-1">Informationstext für Team 3: Die Simulations-Experten</p>
                   </div>
-                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTexts[3] ? 'rotate-45' : ''}`}>➕</span>
+                  <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTexts[3] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {expandedTexts[3] && (
                   <div className="px-6 pb-6 border-t border-slate-200">
@@ -372,7 +385,7 @@ export default function GamificationNutzen() {
                     <h3 className="text-xl font-bold text-slate-900">📄 Was sind Lernspiele?</h3>
                     <p className="text-slate-600 text-sm mt-1">Informationstext für Team 4: Die Lernspiel-Prüfer</p>
                   </div>
-                  <span className={`text-2xl transform transition-transform flex-shrink-0 ml-4 ${expandedTexts[4] ? 'rotate-45' : ''}`}>➕</span>
+                  <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transform transition-transform ${expandedTexts[4] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {expandedTexts[4] && (
                   <div className="px-6 pb-6 border-t border-slate-200">
