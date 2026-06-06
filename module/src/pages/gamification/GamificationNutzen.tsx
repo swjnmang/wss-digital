@@ -83,6 +83,79 @@ const APP_ITEMS: AppItem[] = [
     correct: 'Lernspiel',
     explanation: 'Ein Lernspiel: Der gesamte Inhalt ist Schulstoff. Das Spielprinzip funktioniert nur durch das Anwenden von Lernmaterial.'
   },
+  // --- Neue Einträge ---
+  {
+    name: 'Forest (App)',
+    description: 'Eine Produktivitäts-App, bei der ein virtueller Baum wächst, solange du das Smartphone nicht anfasst. Legt man das Handy weg, wächst der Baum; bricht man ab, stirbt er. Das Ziel ist konzentriertes Arbeiten – kein Spiel.',
+    correct: 'Gamification',
+    explanation: 'Gamification: Das eigentliche Ziel ist Produktivität (kein Spiel). Der wachsende Baum ist ein spieltypisches Element, das die Motivation steigert, das Handy wegzulegen.'
+  },
+  {
+    name: 'Payback-Punktesystem',
+    description: 'Ein reales Einkaufssystem: Durch Einkäufe sammelst du Punkte, steigst in Coupons auf und schaltest "X-fach-Punkte-Aktionen" frei. Du sammelst auf einer Karte, wie weit du von der nächsten Prämie entfernt bist.',
+    correct: 'Gamification',
+    explanation: 'Gamification: Das Einkaufen ist keine Spielaktivität. Punkte, Abzeichen und Belohnungen (typische Spielelemente) werden hinzugefügt, um Kundentreue zu erzeugen.'
+  },
+  {
+    name: 'LinkedIn-Profilstärke',
+    description: 'Beim Erstellen des Profils zeigt ein Kreis- oder Balkendiagramm an, zu wie viel Prozent das Profil vollständig ist – „Erreiche den Status Profi". Nutzer werden so animiert, weitere Daten einzutragen.',
+    correct: 'Gamification',
+    explanation: 'Gamification: Das Ausfüllen eines Profils ist keine Spielaktivität. Der Fortschrittsbalken und die Level-Bezeichnungen sind Spielelemente, die das Verhalten steuern sollen.'
+  },
+  {
+    name: 'Plague Inc.',
+    description: 'Ein Strategiespiel, in dem man einen Erreger so weiterentwickelt, dass er die gesamte Menschheit infiziert. Es wird von Gesundheitsbehörden wie der CDC gelobt, weil es realistisch zeigt, wie sich Pandemien ausbreiten und wie Impfkampagnen wirken.',
+    correct: 'Serious Game',
+    explanation: 'Serious Game: Es ist ein vollwertiges Strategiespiel mit echter Spielmechanik, das aber gezielt das Verständnis von Epidemiologie und Gesundheitspolitik fördern soll.'
+  },
+  {
+    name: 'Orwell (Videospiel)',
+    description: 'Du spielst als Ermittler eines staatlichen Überwachungsprogramms und durchleuchtest Internet-Aktivitäten, Chats und Profile von Bürgern, um Terrorismus aufzudecken. Das Spiel regt zur Diskussion über Datenschutz und Überwachungsstaaten an.',
+    correct: 'Serious Game',
+    explanation: 'Serious Game: Das Spiel hat eine vollwertige Mechanik, verfolgt aber das ernste Ziel, Datenschutz und staatliche Überwachung kritisch erfahrbar zu machen.'
+  },
+  {
+    name: 'Alba: A Wildlife Adventure',
+    description: 'Ein Spiel, in dem man als junges Mädchen eine Mittelmeerinsel erkundet, Tiere fotografiert und Müll einsammelt, um ein Naturschutzgebiet vor einem Hotelbau zu retten. Themen: Umweltschutz und zivilgesellschaftliches Engagement.',
+    correct: 'Serious Game',
+    explanation: 'Serious Game: Es ist ein vollwertiges Abenteuersspiel, dessen eigentlicher Zweck ist, Bewusstsein für Umweltschutz und Aktivismus zu schaffen.'
+  },
+  {
+    name: 'Planspiel Börse (Sparkassen)',
+    description: 'Eine Simulation des echten Aktienmarktes mit realen Live-Kursen. Schüler handeln mit virtuellem Startkapital unter echten Marktbedingungen, um den Wertpapierhandel ohne finanzielles Risiko zu erlernen.',
+    correct: 'Simulation',
+    explanation: 'Simulation: Echte Börsenkurse, echte Marktregeln – nur das Geld ist virtuell. Fehler haben keine realen Konsequenzen, aber die Mechanismen sind 1:1 realitätstreu.'
+  },
+  {
+    name: 'Euro Truck Simulator 2',
+    description: 'Eine detailgetreue Simulation des Berufsalltags eines LKW-Fahrers: Ruhezeiten einhalten, Spritverbrauch managen, Verkehrsregeln beachten und Fracht durch Europa transportieren. Kein Spielziel – nur realistischer Alltag.',
+    correct: 'Simulation',
+    explanation: 'Simulation: Alle Abläufe (Logistik, Fahrphysik, Verkehrsrecht) entsprechen der Realität. Es gibt keine erfundene Story, nur das Nachbilden eines echten Berufs.'
+  },
+  {
+    name: 'PC Building Simulator',
+    description: 'Eine Software, in der man lernt, wie Computerhardware exakt zusammengebaut wird. Kabel, Steckplätze und die Kompatibilität echter PC-Komponenten werden haargenau nachgebildet – wie in der Realität.',
+    correct: 'Simulation',
+    explanation: 'Simulation: Die Bauteilkompatibilität und Montage entsprechen 1:1 der Wirklichkeit. Die Software wird sogar in IT-Ausbildungen eingesetzt.'
+  },
+  {
+    name: 'Mathepiraten / Matheking',
+    description: 'Online-Plattformen für Grund- und Wirtschaftsschüler: Man löst Rechenaufgaben aus dem Lehrplan, um auf einer Schatzkarte voranzukommen oder Piratenschiffe freizuschalten. Ohne richtige Rechenergebnisse kein Fortschritt.',
+    correct: 'Lernspiel',
+    explanation: 'Lernspiel: Der Spielfortschritt ist direkt an das Lösen von Lehrplan-Rechenaufgaben gebunden. Das Spiel existiert nur, um Mathe-Übungen zu verpacken.'
+  },
+  {
+    name: 'Professor Layton (Reihe)',
+    description: 'Ein Abenteuer-Videospiel, dessen gesamter Fortschritt an das Lösen von logischen, mathematischen und rätselbasierten Denkaufgaben gekoppelt ist. Man kommt in der Geschichte nur weiter, wenn man die Aufgaben löst.',
+    correct: 'Lernspiel',
+    explanation: 'Lernspiel: Der Fortschritt im Spiel funktioniert ausschließlich durch das Lösen von Denk- und Wissensaufgaben – klassisches Lernspiel-Prinzip.'
+  },
+  {
+    name: 'Type Rush / Tipp-Trainer',
+    description: 'Ein Rennspiel, bei dem dein Auto umso schneller fährt, je schneller und fehlerfreier du Blindschreiben auf der Tastatur beherrschst. Das Ziel ist das Erlernen des Zehnfingersystems.',
+    correct: 'Lernspiel',
+    explanation: 'Lernspiel: Das Spielprinzip (Rennen gewinnen) funktioniert nur durch das korrekte Ausführen einer Lernaufgabe (Tastaturschreiben). Der Lernstoff ist der Spielinhalt.'
+  },
 ]
 
 const CATEGORIES: Category[] = ['Gamification', 'Lernspiel', 'Serious Game', 'Simulation']
