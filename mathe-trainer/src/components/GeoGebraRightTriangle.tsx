@@ -79,24 +79,29 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
 
     const setupTriangle = (api: any) => {
       try {
+        // Einfache Katheten-Längen (mit Pythagoras wird die Hypotenuse automatisch berechnet)
+        const cathetus1 = 3;  // Eine Kathete
+        const cathetus2 = 2;  // Andere Kathete
+        
         // Bestimme die Positionen basierend auf rightAngleAtPoint
+        // Der rechte Winkel ist immer bei dem Punkt, von dem die beiden Katheten ausgehen
         let pos: Record<string, [number, number]> = {};
 
         if (rightAngleAtPoint === pointA) {
-          // Rechter Winkel bei A (links unten)
+          // Rechter Winkel bei A - horizontale und vertikale Katheten
           pos[pointA] = [1, 1];
-          pos[pointB] = [5, 1];
-          pos[pointC] = [1, 4];
+          pos[pointB] = [1 + cathetus1, 1];      // Horizontal von A
+          pos[pointC] = [1, 1 + cathetus2];      // Vertikal von A
         } else if (rightAngleAtPoint === pointB) {
-          // Rechter Winkel bei B (rechts unten) - Standard
-          pos[pointA] = [1, 1];
-          pos[pointB] = [5, 1];
-          pos[pointC] = [5, 4];
+          // Rechter Winkel bei B
+          pos[pointB] = [3, 1];
+          pos[pointA] = [3 - cathetus1, 1];      // Horizontal von B
+          pos[pointC] = [3, 1 + cathetus2];      // Vertikal von B
         } else {
-          // Rechter Winkel bei C (rechts oben)
-          pos[pointA] = [1, 1];
-          pos[pointB] = [1, 4];
-          pos[pointC] = [5, 4];
+          // Rechter Winkel bei C
+          pos[pointC] = [3, 3];
+          pos[pointA] = [3 - cathetus1, 3];      // Horizontal von C
+          pos[pointB] = [3, 3 - cathetus2];      // Vertikal von C
         }
 
         // Erstelle die Punkte
@@ -104,19 +109,14 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         api.evalCommand(`${pointB} = (${pos[pointB][0]}, ${pos[pointB][1]})`);
         api.evalCommand(`${pointC} = (${pos[pointC][0]}, ${pos[pointC][1]})`);
 
-        // Zeichne die Dreiecksseiten mit korrekten Benennungen (a, b, c - NICHT seg_a!)
-        // Seite a: gegenüber von Punkt A (also zwischen B und C)
-        api.evalCommand(`a = Segment(${pointB}, ${pointC})`);
-        // Seite b: gegenüber von Punkt B (also zwischen A und C)
-        api.evalCommand(`b = Segment(${pointA}, ${pointC})`);
-        // Seite c: gegenüber von Punkt C (also zwischen A und B)
-        api.evalCommand(`c = Segment(${pointA}, ${pointB})`);
-
-        // Formatiere Segment-Linien
-        ['a', 'b', 'c'].forEach((seg: string) => {
-          api.setLineStyle(seg, 2);
-          api.setColor(seg, 0, 0, 0);
-        });
+        // Zeichne das Dreieck als Polygon mit Vieleck()
+        api.evalCommand(`triangle = Vieleck(${pointA}, ${pointB}, ${pointC})`);
+        
+        // Formatiere das Polygon
+        api.setLineStyle('triangle', 2);
+        api.setColor('triangle', 0, 0, 0);
+        api.setLineThickness('triangle', 2);
+        api.setLabelVisible('triangle', false);
 
         // Punkte formatieren - SEHR KLEIN
         [pointA, pointB, pointC].forEach((pt: string) => {
@@ -125,56 +125,63 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
           api.setColor(pt, 0, 0, 0);
         });
 
+        // Definiere die Seiten basierend auf den Punkt-Positionen
+        // Seite a: zwischen B und C
+        api.evalCommand(`a = Segment(${pointB}, ${pointC})`);
+        // Seite b: zwischen A und C
+        api.evalCommand(`b = Segment(${pointA}, ${pointC})`);
+        // Seite c: zwischen A und B
+        api.evalCommand(`c = Segment(${pointA}, ${pointB})`);
+
+        // Formatiere Segment-Linien
+        ['a', 'b', 'c'].forEach((seg: string) => {
+          api.setLineStyle(seg, 2);
+          api.setColor(seg, 0, 0, 0);
+          api.setLineThickness(seg, 2);
+        });
+
         // Beschrifte die Seiten mit benutzerdefinierten Namen
-        api.setCaption('a', sideA);   // Seite a gegenüber von A
+        // Nutze setCaption für dynamische Namen
+        api.setCaption('a', sideA);
         api.setLabelVisible('a', true);
         
-        api.setCaption('b', sideB);   // Seite b gegenüber von B
+        api.setCaption('b', sideB);
         api.setLabelVisible('b', true);
         
-        api.setCaption('c', sideC);   // Seite c gegenüber von C
+        api.setCaption('c', sideC);
         api.setLabelVisible('c', true);
 
-        // RECHTER WINKEL - Mit kleinem Quadrat-Symbol markieren
-        const squareSize = 0.25;
-        const allPoints = [pointA, pointB, pointC];
-        const x1 = pos[rightAngleAtPoint][0];
-        const y1 = pos[rightAngleAtPoint][1];
-        
-        try {
-          // Zeichne ein kleines Quadrat-Symbol für den rechten Winkel
-          api.evalCommand(`raH = Segment((${x1}, ${y1}), (${x1 + squareSize}, ${y1}))`);
-          api.evalCommand(`raV = Segment((${x1}, ${y1}), (${x1}, ${y1 + squareSize}))`);
-          api.evalCommand(`raDiag = Segment((${x1 + squareSize}, ${y1}), (${x1 + squareSize}, ${y1 + squareSize}))`);
-          
-          // Formatiere die Quadrat-Linien
-          ['raH', 'raV', 'raDiag'].forEach((seg: string) => {
-            try {
-              api.setLineThickness(seg, 2);
-              api.setColor(seg, 0, 0, 0);
-              api.setLabelVisible(seg, false);
-            } catch (e) {}
-          });
-        } catch (e) {
-          console.warn('Rechter Winkel Marker Fehler:', e);
-        }
-
-        // ALLE DREI WINKEL anzeigen mit Beschriftungen
+        // WINKEL DEFINIEREN UND BESCHRIFTEN
         const angleLetters = ['α', 'β', 'γ'];
+        const allPoints = [pointA, pointB, pointC];
+        let rightAngleIndex = 0;
+
+        // Bestimme welcher Winkel der rechte Winkel ist
+        if (rightAngleAtPoint === pointB) rightAngleIndex = 1;
+        if (rightAngleAtPoint === pointC) rightAngleIndex = 2;
+
+        // Erstelle alle drei Winkel
         allPoints.forEach((vertex: string, idx: number) => {
           try {
             const otherPts = allPoints.filter(p => p !== vertex);
             if (otherPts.length === 2) {
               api.evalCommand(`angle_${idx} = Angle(${otherPts[0]}, ${vertex}, ${otherPts[1]})`);
-              api.setCaption(`angle_${idx}`, angleLetters[idx]);
-              api.setLabelVisible(`angle_${idx}`, true);
-              api.setColor(`angle_${idx}`, 6, 182, 201);
-              api.setLineThickness(`angle_${idx}`, 2);
+              
+              // Bei dem rechten Winkel: Keine Beschriftung anzeigen
+              if (idx === rightAngleIndex) {
+                api.setLabelVisible(`angle_${idx}`, false);
+              } else {
+                // Bei den anderen Winkeln: Beschriftung (α, β, γ) anzeigen
+                api.setCaption(`angle_${idx}`, angleLetters[idx]);
+                api.setLabelVisible(`angle_${idx}`, true);
+                api.setColor(`angle_${idx}`, 6, 182, 201);
+                api.setLineThickness(`angle_${idx}`, 2);
+              }
             }
           } catch (e) {
             console.warn(`Fehler bei Winkel ${idx}:`, e);
           }
-        })
+        });
 
         // Zoom Einstellungen
         api.setCoordSystem(0, 6, 0, 5);
@@ -182,8 +189,8 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         // Stelle sicher, dass Grid und Axes ausgeblendet sind
         try {
           api.setGridVisible(false);
-          api.setAxisVisible(1, false);  // X-Achse
-          api.setAxisVisible(2, false);  // Y-Achse
+          api.setAxisVisible(1, false);
+          api.setAxisVisible(2, false);
         } catch (e) {
           // Fallback wenn diese Methoden nicht existieren
         }
