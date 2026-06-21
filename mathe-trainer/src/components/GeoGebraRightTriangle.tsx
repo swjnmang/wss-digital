@@ -132,40 +132,28 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         api.setCaption('c', sideC);   // Seite c gegenüber von C
         api.setLabelVisible('c', true);
 
-        // Rechter Winkel Marker - Zeichne kleines Quadrat mit vier Segmenten
+        // Rechter Winkel Marker - Zeichne kleines Quadrat mit Segmenten
         const otherPoints = [pointA, pointB, pointC].filter(p => p !== rightAngleAtPoint);
         if (otherPoints.length === 2) {
-          const rightPt = rightAngleAtPoint;
-          // Erstelle Hilfspunkte für das Quadrat
-          const sqSize = 0.3;
-          // Die Katheten ermitteln (welche Seiten die rechten Winkel bilden)
-          const catheti = otherPoints;
-          
           try {
-            // Zeichne vier kleine Segmente um ein Quadrat zu bilden
-            // Dieses erzeugt einen visuellen rechten Winkel Marker
-            api.evalCommand(`raHelper1 = (${rightPt}.x + ${sqSize}, ${rightPt}.y)`);
-            api.evalCommand(`raHelper2 = (${rightPt}.x + ${sqSize}, ${rightPt}.y + ${sqSize})`);
-            api.evalCommand(`raHelper3 = (${rightPt}.x, ${rightPt}.y + ${sqSize})`);
+            const sqSize = 0.25;
+            const ptName = rightAngleAtPoint;
             
-            // Zeichne die Quadrat-Segmente
-            api.evalCommand(`raSeg1 = Segment(${rightPt}, raHelper1)`);
-            api.evalCommand(`raSeg2 = Segment(raHelper1, raHelper2)`);
-            api.evalCommand(`raSeg3 = Segment(raHelper2, raHelper3)`);
+            // Zeichne die drei Seiten des Quadrats (von oben rechts nach unten links)
+            // Diese bilden einen visuellen rechten Winkel Marker
+            api.evalCommand(`raSeg1 = Segment(${ptName}, (${ptName}.x + ${sqSize}, ${ptName}.y))`);
+            api.evalCommand(`raSeg2 = Segment((${ptName}.x + ${sqSize}, ${ptName}.y), (${ptName}.x + ${sqSize}, ${ptName}.y + ${sqSize}))`);
+            api.evalCommand(`raSeg3 = Segment((${ptName}.x + ${sqSize}, ${ptName}.y + ${sqSize}), (${ptName}.x, ${ptName}.y + ${sqSize}))`);
             
             // Formatiere die Quadrat-Segmente
             ['raSeg1', 'raSeg2', 'raSeg3'].forEach((seg: string) => {
-              api.setLineThickness(seg, 1);
+              api.setLineThickness(seg, 1.2);
               api.setColor(seg, 0, 0, 0);
               api.setLabelVisible(seg, false);
             });
-            
-            // Verstecke die Hilfspunkte
-            ['raHelper1', 'raHelper2', 'raHelper3'].forEach((pt: string) => {
-              api.setVisible(pt, false);
-            });
           } catch (e) {
-            console.error('Error creating right angle marker:', e);
+            console.warn('Right angle marker could not be drawn:', e);
+            // Das ist kein kritischer Fehler - die Übung funktioniert auch ohne Marker
           }
         }
 
