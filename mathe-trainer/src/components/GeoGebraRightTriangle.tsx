@@ -132,15 +132,41 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         api.setCaption('c', sideC);   // Seite c gegenüber von C
         api.setLabelVisible('c', true);
 
-        // Rechter Winkel Marker - Zeichne kleines Quadrat
+        // Rechter Winkel Marker - Zeichne kleines Quadrat mit vier Segmenten
         const otherPoints = [pointA, pointB, pointC].filter(p => p !== rightAngleAtPoint);
         if (otherPoints.length === 2) {
           const rightPt = rightAngleAtPoint;
-          // Zeichne Quadrat für rechten Winkel
-          api.evalCommand(`rightAngleMarker = Polygon(${rightPt}, (${rightPt}.x + 0.3, ${rightPt}.y), (${rightPt}.x + 0.3, ${rightPt}.y + 0.3), (${rightPt}.x, ${rightPt}.y + 0.3))`);
-          api.setFillColor('rightAngleMarker', 255, 255, 255);
-          api.setLineThickness('rightAngleMarker', 1);
-          api.setColor('rightAngleMarker', 0, 0, 0);
+          // Erstelle Hilfspunkte für das Quadrat
+          const sqSize = 0.3;
+          // Die Katheten ermitteln (welche Seiten die rechten Winkel bilden)
+          const catheti = otherPoints;
+          
+          try {
+            // Zeichne vier kleine Segmente um ein Quadrat zu bilden
+            // Dieses erzeugt einen visuellen rechten Winkel Marker
+            api.evalCommand(`raHelper1 = (${rightPt}.x + ${sqSize}, ${rightPt}.y)`);
+            api.evalCommand(`raHelper2 = (${rightPt}.x + ${sqSize}, ${rightPt}.y + ${sqSize})`);
+            api.evalCommand(`raHelper3 = (${rightPt}.x, ${rightPt}.y + ${sqSize})`);
+            
+            // Zeichne die Quadrat-Segmente
+            api.evalCommand(`raSeg1 = Segment(${rightPt}, raHelper1)`);
+            api.evalCommand(`raSeg2 = Segment(raHelper1, raHelper2)`);
+            api.evalCommand(`raSeg3 = Segment(raHelper2, raHelper3)`);
+            
+            // Formatiere die Quadrat-Segmente
+            ['raSeg1', 'raSeg2', 'raSeg3'].forEach((seg: string) => {
+              api.setLineThickness(seg, 1);
+              api.setColor(seg, 0, 0, 0);
+              api.setLabelVisible(seg, false);
+            });
+            
+            // Verstecke die Hilfspunkte
+            ['raHelper1', 'raHelper2', 'raHelper3'].forEach((pt: string) => {
+              api.setVisible(pt, false);
+            });
+          } catch (e) {
+            console.error('Error creating right angle marker:', e);
+          }
         }
 
         // Markierter Winkel - INNENWINKEL des Dreiecks (NUR BESCHRIFTUNG, KEIN WINKELWERT)
