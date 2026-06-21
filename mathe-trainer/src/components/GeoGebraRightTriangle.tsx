@@ -10,12 +10,14 @@ interface GeoGebraRightTriangleProps {
   pointA: string;
   pointB: string;
   pointC: string;
-  sideA: string;
-  sideB: string;
-  sideC: string;
+  sideA: string;      // Seite gegenüber von A (zwischen B und C)
+  sideB: string;      // Seite gegenüber von B (zwischen A und C)
+  sideC: string;      // Seite gegenüber von C (zwischen A und B)
   markedAngle: 'alpha' | 'beta';
   width?: number;
   height?: number;
+  rightAngleAtPoint: string;  // Punkt wo der 90° Winkel ist
+  markedAngleAtPoint?: string; // Punkt wo der markierte Winkel ist
 }
 
 const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
@@ -28,6 +30,8 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
   markedAngle,
   width = 600,
   height = 500,
+  rightAngleAtPoint,
+  markedAngleAtPoint = pointA,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const appletRef = useRef<any>(null);
@@ -72,73 +76,83 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
 
     const setupTriangle = (api: any) => {
       try {
-        // Definiere die Punkte des rechtwinkligen Dreiecks
-        // pointB hat den rechten Winkel (90°)
-        api.evalCommand(`${pointA} = (1, 1)`);
-        api.evalCommand(`${pointB} = (5, 1)`);
-        api.evalCommand(`${pointC} = (5, 4)`);
+        // Bestimme die Positionen basierend auf rightAngleAtPoint
+        let pos: Record<string, [number, number]> = {};
 
-        // Zeichne die Dreiecksseiten
-        api.evalCommand(`seg_${pointA}${pointB} = Segment(${pointA}, ${pointB})`);
-        api.evalCommand(`seg_${pointB}${pointC} = Segment(${pointB}, ${pointC})`);
-        api.evalCommand(`seg_${pointC}${pointA} = Segment(${pointC}, ${pointA})`);
-
-        // Formatiere Segment-Linien (schwarz, Dicke 2)
-        api.setLineStyle(`seg_${pointA}${pointB}`, 2);
-        api.setLineStyle(`seg_${pointB}${pointC}`, 2);
-        api.setLineStyle(`seg_${pointC}${pointA}`, 2);
-        api.setColor(`seg_${pointA}${pointB}`, 0, 0, 0);
-        api.setColor(`seg_${pointB}${pointC}`, 0, 0, 0);
-        api.setColor(`seg_${pointC}${pointA}`, 0, 0, 0);
-
-        // Punkte formatieren
-        api.setLabelVisible(pointA, true);
-        api.setLabelVisible(pointB, true);
-        api.setLabelVisible(pointC, true);
-        api.setPointSize(pointA, 8);
-        api.setPointSize(pointB, 8);
-        api.setPointSize(pointC, 8);
-        api.setColor(pointA, 0, 0, 0);
-        api.setColor(pointB, 0, 0, 0);
-        api.setColor(pointC, 0, 0, 0);
-
-        // Beschrifte die Seiten mit Labels
-        // Setze Labels auf den Segmenten
-        api.setCaption(`seg_${pointA}${pointB}`, sideB);
-        api.setCaption(`seg_${pointB}${pointC}`, sideA);
-        api.setCaption(`seg_${pointC}${pointA}`, sideC);
-
-        // Label-Positionen visibel machen
-        api.setLabelVisible(`seg_${pointA}${pointB}`, true);
-        api.setLabelVisible(`seg_${pointB}${pointC}`, true);
-        api.setLabelVisible(`seg_${pointC}${pointA}`, true);
-
-        // Rechter Winkel Marker bei pointB (als kleine Polygon)
-        api.evalCommand(`rightAngle_marker = Polygon(${pointB}, (${pointB}.x - 0.25, ${pointB}.y), (${pointB}.x - 0.25, ${pointB}.y + 0.25), (${pointB}.x, ${pointB}.y + 0.25))`);
-        api.setFilling('rightAngle_marker', 0);
-        api.setLineThickness('rightAngle_marker', 1);
-        api.setColor('rightAngle_marker', 0, 0, 0);
-
-        // Winkel zeichnen und markieren
-        if (markedAngle === 'alpha') {
-          // Winkel α bei pointA
-          api.evalCommand(`angle_alpha = Angle(${pointB}, ${pointA}, ${pointC})`);
-          api.setCaption('angle_alpha', 'α');
-          api.setLabelVisible('angle_alpha', true);
-          api.setColor('angle_alpha', 6, 182, 201);
-          api.setLineStyle('angle_alpha', 2);
-          api.setLineThickness('angle_alpha', 2);
+        if (rightAngleAtPoint === pointA) {
+          // Rechter Winkel bei A (links unten)
+          pos[pointA] = [1, 1];
+          pos[pointB] = [5, 1];
+          pos[pointC] = [1, 4];
+        } else if (rightAngleAtPoint === pointB) {
+          // Rechter Winkel bei B (rechts unten) - Standard
+          pos[pointA] = [1, 1];
+          pos[pointB] = [5, 1];
+          pos[pointC] = [5, 4];
         } else {
-          // Winkel β bei pointC
-          api.evalCommand(`angle_beta = Angle(${pointA}, ${pointC}, ${pointB})`);
-          api.setCaption('angle_beta', 'β');
-          api.setLabelVisible('angle_beta', true);
-          api.setColor('angle_beta', 6, 182, 201);
-          api.setLineStyle('angle_beta', 2);
-          api.setLineThickness('angle_beta', 2);
+          // Rechter Winkel bei C (rechts oben)
+          pos[pointA] = [1, 1];
+          pos[pointB] = [1, 4];
+          pos[pointC] = [5, 4];
         }
 
-        // Zoom Einstellungen - Ausschnitt passend zum Dreieck
+        // Erstelle die Punkte
+        api.evalCommand(`${pointA} = (${pos[pointA][0]}, ${pos[pointA][1]})`);
+        api.evalCommand(`${pointB} = (${pos[pointB][0]}, ${pos[pointB][1]})`);
+        api.evalCommand(`${pointC} = (${pos[pointC][0]}, ${pos[pointC][1]})`);
+
+        // Zeichne die Dreiecksseiten mit korrekten Benennungen
+        // Seite a: gegenüber von Punkt A (also zwischen B und C)
+        api.evalCommand(`seg_a = Segment(${pointB}, ${pointC})`);
+        // Seite b: gegenüber von Punkt B (also zwischen A und C)
+        api.evalCommand(`seg_b = Segment(${pointA}, ${pointC})`);
+        // Seite c: gegenüber von Punkt C (also zwischen A und B)
+        api.evalCommand(`seg_c = Segment(${pointA}, ${pointB})`);
+
+        // Formatiere Segment-Linien
+        ['seg_a', 'seg_b', 'seg_c'].forEach((seg: string) => {
+          api.setLineStyle(seg, 2);
+          api.setColor(seg, 0, 0, 0);
+        });
+
+        // Punkte formatieren - SEHR KLEIN
+        [pointA, pointB, pointC].forEach((pt: string) => {
+          api.setLabelVisible(pt, true);
+          api.setPointSize(pt, 3);
+          api.setColor(pt, 0, 0, 0);
+        });
+
+        // Beschrifte die Seiten KORREKT
+        api.setCaption('seg_a', sideA);   // Seite a gegenüber von A
+        api.setLabelVisible('seg_a', true);
+        
+        api.setCaption('seg_b', sideB);   // Seite b gegenüber von B
+        api.setLabelVisible('seg_b', true);
+        
+        api.setCaption('seg_c', sideC);   // Seite c gegenüber von C
+        api.setLabelVisible('seg_c', true);
+
+        // Rechter Winkel Marker - Verwende GeoGebra's RightAngle Funktion
+        const otherPoints = [pointA, pointB, pointC].filter(p => p !== rightAngleAtPoint);
+        if (otherPoints.length === 2) {
+          api.evalCommand(`rightAngle = RightAngle(${otherPoints[0]}, ${rightAngleAtPoint}, ${otherPoints[1]})`);
+          api.setColor('rightAngle', 0, 0, 0);
+          api.setLineThickness('rightAngle', 1);
+        }
+
+        // Markierter Winkel - NUR BEZEICHNUNG, KEIN WINKELWERT
+        const anglePoints = [pointA, pointB, pointC].filter(p => p !== rightAngleAtPoint);
+        if (anglePoints.length === 2) {
+          api.evalCommand(`angle_marked = Angle(${anglePoints[0]}, ${markedAngleAtPoint}, ${rightAngleAtPoint})`);
+          // Setze CAPTION statt evalCommand für das Label (nur Buchstabe, kein Wert)
+          api.setCaption('angle_marked', markedAngle === 'alpha' ? 'α' : 'β');
+          api.setLabelVisible('angle_marked', true);
+          api.setColor('angle_marked', 6, 182, 201);
+          api.setLineStyle('angle_marked', 2);
+          api.setLineThickness('angle_marked', 2);
+        }
+
+        // Zoom Einstellungen
         api.setCoordSystem(0, 6, 0, 5);
 
       } catch (e) {
@@ -169,7 +183,7 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
     return () => {
       // Cleanup ist optional da GeoGebra intern managed wird
     };
-  }, [pointA, pointB, pointC, sideA, sideB, sideC, markedAngle, width, height]);
+  }, [pointA, pointB, pointC, sideA, sideB, sideC, markedAngle, width, height, rightAngleAtPoint, markedAngleAtPoint]);
 
   if (error) {
     return (

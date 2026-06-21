@@ -4,34 +4,33 @@ import GeoGebraRightTriangle from '../../components/GeoGebraRightTriangle';
 
 interface Task {
   id: number;
-  selectedAngle: 'alpha' | 'beta'; // Welcher Winkel (nicht 90°) wird hervorgehoben
-  trianglePoints: {
-    A: string; // z.B. "A"
-    B: string; // z.B. "B"
-    C: string; // z.B. "C"
-  };
-  triangleSides: {
-    opposite: string; // Gegenkathete (gegenüber vom Winkel)
-    adjacent: string; // Ankathete (neben dem Winkel)
-    hypotenuse: string; // Hypotenuse
-  };
-  angleLetter: string; // z.B. "α" oder "β"
+  pointA: string;
+  pointB: string;
+  pointC: string;
+  sideA: string;           // Seite gegenüber von A
+  sideB: string;           // Seite gegenüber von B
+  sideC: string;           // Seite gegenüber von C
+  rightAngleAtPoint: string; // Punkt wo der rechte Winkel ist
+  markedAngle: 'alpha' | 'beta';
+  markedAngleAtPoint: string; // Punkt wo der markierte Winkel ist
 }
 
 interface DragItem {
   label: string;
-  correct: 'hypotenuse' | 'opposite' | 'adjacent';
+  correctType: 'hypotenuse' | 'opposite' | 'adjacent';
+}
+
+interface Assignments {
+  hypotenuse: string | null;
+  opposite: string | null;
+  adjacent: string | null;
 }
 
 const RechtwinkligBeschriften: React.FC = () => {
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [taskCount, setTaskCount] = useState(0);
   const [correct, setCorrect] = useState(0);
-  const [assignments, setAssignments] = useState<{
-    hypotenuse: string | null;
-    opposite: string | null;
-    adjacent: string | null;
-  }>({
+  const [assignments, setAssignments] = useState<Assignments>({
     hypotenuse: null,
     opposite: null,
     adjacent: null,
@@ -41,31 +40,41 @@ const RechtwinkligBeschriften: React.FC = () => {
   const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Generiere eine neue Aufgabe
+  // Generiere eine neue Aufgabe mit variablen Dreiecks-Orientierungen
   const generateTask = () => {
-    const angles = ['alpha', 'beta'] as const;
-    const selectedAngle = angles[Math.floor(Math.random() * 2)];
-    
-    const pointNames = [
-      { A: 'A', B: 'B', C: 'C' },
-      { A: 'B', B: 'C', C: 'D' },
-      { A: 'P', B: 'Q', C: 'R' },
+    const points = [
+      ['A', 'B', 'C'],
+      ['P', 'Q', 'R'],
+      ['X', 'Y', 'Z'],
     ];
-    
-    const sideNames = [
-      { opposite: 'a', adjacent: 'b', hypotenuse: 'c' },
-      { opposite: 'x', adjacent: 'y', hypotenuse: 'z' },
+    const sides = [
+      ['a', 'b', 'c'],
+      ['x', 'y', 'z'],
     ];
 
-    const selectedPoints = pointNames[Math.floor(Math.random() * pointNames.length)];
-    const selectedSides = sideNames[Math.floor(Math.random() * sideNames.length)];
+    const selectedPoints = points[Math.floor(Math.random() * points.length)];
+    const selectedSides = sides[Math.floor(Math.random() * sides.length)];
+    
+    // Zufällig entscheiden, wo der rechte Winkel ist
+    const rightAngleOptions = [selectedPoints[0], selectedPoints[1], selectedPoints[2]];
+    const rightAngleAtPoint = rightAngleOptions[Math.floor(Math.random() * 3)];
+    
+    // Markierter Winkel: einer der beiden nicht-rechten Winkel
+    const otherPoints = selectedPoints.filter(p => p !== rightAngleAtPoint);
+    const markedAngleAtPoint = otherPoints[Math.floor(Math.random() * 2)];
+    const markedAngle = markedAngleAtPoint === selectedPoints[0] ? 'alpha' : 'beta';
 
     const task: Task = {
       id: Date.now(),
-      selectedAngle,
-      trianglePoints: selectedPoints,
-      triangleSides: selectedSides,
-      angleLetter: selectedAngle === 'alpha' ? 'α' : 'β',
+      pointA: selectedPoints[0],
+      pointB: selectedPoints[1],
+      pointC: selectedPoints[2],
+      sideA: selectedSides[0],  // Seite gegenüber von A
+      sideB: selectedSides[1],  // Seite gegenüber von B
+      sideC: selectedSides[2],  // Seite gegenüber von C
+      rightAngleAtPoint,
+      markedAngle,
+      markedAngleAtPoint,
     };
 
     setCurrentTask(task);
@@ -75,14 +84,34 @@ const RechtwinkligBeschriften: React.FC = () => {
     setFeedback(null);
   };
 
-  // Beim Laden: erste Aufgabe generieren
   useEffect(() => {
     if (!currentTask) {
       generateTask();
     }
   }, []);
 
-  // Drag-and-Drop Handler
+  // Bestimme die korrekten Zuordnungen basierend auf der Task
+  const getCorrectAssignments = (task: Task) => {
+    // Hypotenuse ist die Seite gegenüber vom rechten Winkel
+    const pointsArray = [task.pointA, task.pointB, task.pointC];
+    const sidesArray = [task.sideA, task.sideB, task.sideC];
+    const rightAngleIndex = pointsArray.indexOf(task.rightAngleAtPoint);
+    const hypotenuseSide = sidesArray[rightAngleIndex];
+
+    // Gegenkathete ist die Seite gegenüber vom markierten Winkel
+    const markedAngleIndex = pointsArray.indexOf(task.markedAngleAtPoint);
+    const oppositeSide = sidesArray[markedAngleIndex];
+
+    // Ankathete ist die dritte Seite
+    const adjacentSide = sidesArray.find(s => s !== hypotenuseSide && s !== oppositeSide)!;
+
+    return {
+      hypotenuse: hypotenuseSide,
+      opposite: oppositeSide,
+      adjacent: adjacentSide,
+    };
+  };
+
   const handleDragStart = (e: React.DragEvent, item: DragItem) => {
     setDraggedItem(item);
     e.dataTransfer.effectAllowed = 'move';
@@ -97,12 +126,11 @@ const RechtwinkligBeschriften: React.FC = () => {
     e.preventDefault();
     
     if (draggedItem) {
-      // Entferne das Item aus anderen Zielen
       setAssignments((prev) => {
         const newAssignments = { ...prev };
         Object.keys(newAssignments).forEach((key) => {
-          if (newAssignments[key as keyof typeof newAssignments] === draggedItem.label) {
-            newAssignments[key as keyof typeof newAssignments] = null;
+          if (newAssignments[key as keyof Assignments] === draggedItem.label) {
+            newAssignments[key as keyof Assignments] = null;
           }
         });
         newAssignments[target] = draggedItem.label;
@@ -119,12 +147,14 @@ const RechtwinkligBeschriften: React.FC = () => {
     }));
   };
 
-  // Überprüfe die Lösung
   const checkSolution = () => {
+    if (!currentTask) return;
+    const correct_assignments = getCorrectAssignments(currentTask);
+    
     const isCorrect =
-      assignments.hypotenuse === currentTask?.triangleSides.hypotenuse &&
-      assignments.opposite === currentTask?.triangleSides.opposite &&
-      assignments.adjacent === currentTask?.triangleSides.adjacent;
+      assignments.hypotenuse === correct_assignments.hypotenuse &&
+      assignments.opposite === correct_assignments.opposite &&
+      assignments.adjacent === correct_assignments.adjacent;
 
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     setShowFeedback(true);
@@ -138,11 +168,11 @@ const RechtwinkligBeschriften: React.FC = () => {
     return <div className="text-center py-8">Laden...</div>;
   }
 
-  const availableSides = [
-    currentTask.triangleSides.hypotenuse,
-    currentTask.triangleSides.opposite,
-    currentTask.triangleSides.adjacent,
-  ];
+  const correctAssignments = getCorrectAssignments(currentTask);
+  const availableSides = [currentTask.sideA, currentTask.sideB, currentTask.sideC];
+  const otherPoints = [currentTask.pointA, currentTask.pointB, currentTask.pointC].filter(
+    p => p !== currentTask.rightAngleAtPoint
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 p-8" ref={containerRef}>
@@ -164,19 +194,21 @@ const RechtwinkligBeschriften: React.FC = () => {
             <div className="flex flex-col items-center justify-center">
               <div className="bg-gray-50 rounded-lg w-full h-96 border-2 border-gray-200 flex items-center justify-center">
                 <GeoGebraRightTriangle
-                  pointA={currentTask.trianglePoints.A}
-                  pointB={currentTask.trianglePoints.B}
-                  pointC={currentTask.trianglePoints.C}
-                  sideA={currentTask.triangleSides.opposite}
-                  sideB={currentTask.triangleSides.adjacent}
-                  sideC={currentTask.triangleSides.hypotenuse}
-                  markedAngle={currentTask.selectedAngle}
+                  pointA={currentTask.pointA}
+                  pointB={currentTask.pointB}
+                  pointC={currentTask.pointC}
+                  sideA={currentTask.sideA}
+                  sideB={currentTask.sideB}
+                  sideC={currentTask.sideC}
+                  markedAngle={currentTask.markedAngle}
+                  rightAngleAtPoint={currentTask.rightAngleAtPoint}
+                  markedAngleAtPoint={currentTask.markedAngleAtPoint}
                   width={500}
                   height={350}
                 />
               </div>
               <p className="text-sm text-gray-600 mt-4 text-center">
-                Vom Winkel {currentTask.angleLetter} aus: Was ist Hypotenuse, Gegenkathete und Ankathete?
+                Vom Winkel {currentTask.markedAngle === 'alpha' ? 'α' : 'β'} aus: Was ist Hypotenuse, Gegenkathete und Ankathete?
               </p>
             </div>
 
@@ -213,7 +245,7 @@ const RechtwinkligBeschriften: React.FC = () => {
                 {/* Gegenkathete */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-20 bg-gray-50">
                   <p className="text-sm font-semibold text-gray-600 mb-2">
-                    Gegenkathete (gegenüber von {currentTask.angleLetter}):
+                    Gegenkathete (gegenüber von {currentTask.markedAngle === 'alpha' ? 'α' : 'β'}):
                   </p>
                   <div
                     onDragOver={handleDragOver}
@@ -239,7 +271,7 @@ const RechtwinkligBeschriften: React.FC = () => {
                 {/* Ankathete */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-20 bg-gray-50">
                   <p className="text-sm font-semibold text-gray-600 mb-2">
-                    Ankathete (neben {currentTask.angleLetter}):
+                    Ankathete (neben {currentTask.markedAngle === 'alpha' ? 'α' : 'β'}):
                   </p>
                   <div
                     onDragOver={handleDragOver}
@@ -274,7 +306,8 @@ const RechtwinkligBeschriften: React.FC = () => {
                       onDragStart={(e) =>
                         handleDragStart(e, {
                           label: side,
-                          correct: 'hypotenuse',
+                          correctType: side === correctAssignments.hypotenuse ? 'hypotenuse' : 
+                                       side === correctAssignments.opposite ? 'opposite' : 'adjacent',
                         })
                       }
                       className="bg-blue-100 border-2 border-blue-500 rounded-lg p-3 cursor-grab active:cursor-grabbing font-bold text-lg hover:bg-blue-200 transition"
