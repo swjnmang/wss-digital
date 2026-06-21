@@ -109,18 +109,8 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         api.evalCommand(`${pointB} = (${pos[pointB][0]}, ${pos[pointB][1]})`);
         api.evalCommand(`${pointC} = (${pos[pointC][0]}, ${pos[pointC][1]})`);
 
-        // Zeichne das Dreieck als Polygon mit Vieleck()
-        api.evalCommand(`triangle = Vieleck(${pointA}, ${pointB}, ${pointC})`);
-        
-        // Formatiere das Polygon
-        api.setLineStyle('triangle', 2);
-        api.setColor('triangle', 0, 0, 0);
-        api.setLineThickness('triangle', 2);
-        api.setLabelVisible('triangle', false);
-
         // Punkte formatieren - SEHR KLEIN
         [pointA, pointB, pointC].forEach((pt: string) => {
-          api.setLabelVisible(pt, true);
           api.setPointSize(pt, 3);
           api.setColor(pt, 0, 0, 0);
         });
