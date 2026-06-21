@@ -101,16 +101,16 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         api.evalCommand(`${pointB} = (${pos[pointB][0]}, ${pos[pointB][1]})`);
         api.evalCommand(`${pointC} = (${pos[pointC][0]}, ${pos[pointC][1]})`);
 
-        // Zeichne die Dreiecksseiten mit korrekten Benennungen
+        // Zeichne die Dreiecksseiten mit korrekten Benennungen (a, b, c - NICHT seg_a!)
         // Seite a: gegenüber von Punkt A (also zwischen B und C)
-        api.evalCommand(`seg_a = Segment(${pointB}, ${pointC})`);
+        api.evalCommand(`a = Segment(${pointB}, ${pointC})`);
         // Seite b: gegenüber von Punkt B (also zwischen A und C)
-        api.evalCommand(`seg_b = Segment(${pointA}, ${pointC})`);
+        api.evalCommand(`b = Segment(${pointA}, ${pointC})`);
         // Seite c: gegenüber von Punkt C (also zwischen A und B)
-        api.evalCommand(`seg_c = Segment(${pointA}, ${pointB})`);
+        api.evalCommand(`c = Segment(${pointA}, ${pointB})`);
 
         // Formatiere Segment-Linien
-        ['seg_a', 'seg_b', 'seg_c'].forEach((seg: string) => {
+        ['a', 'b', 'c'].forEach((seg: string) => {
           api.setLineStyle(seg, 2);
           api.setColor(seg, 0, 0, 0);
         });
@@ -122,29 +122,38 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
           api.setColor(pt, 0, 0, 0);
         });
 
-        // Beschrifte die Seiten KORREKT
-        api.setCaption('seg_a', sideA);   // Seite a gegenüber von A
-        api.setLabelVisible('seg_a', true);
+        // Beschrifte die Seiten mit benutzerdefinierten Namen
+        api.setCaption('a', sideA);   // Seite a gegenüber von A
+        api.setLabelVisible('a', true);
         
-        api.setCaption('seg_b', sideB);   // Seite b gegenüber von B
-        api.setLabelVisible('seg_b', true);
+        api.setCaption('b', sideB);   // Seite b gegenüber von B
+        api.setLabelVisible('b', true);
         
-        api.setCaption('seg_c', sideC);   // Seite c gegenüber von C
-        api.setLabelVisible('seg_c', true);
+        api.setCaption('c', sideC);   // Seite c gegenüber von C
+        api.setLabelVisible('c', true);
 
-        // Rechter Winkel Marker - Verwende GeoGebra's RightAngle Funktion
+        // Rechter Winkel Marker - Zeichne kleines Quadrat
         const otherPoints = [pointA, pointB, pointC].filter(p => p !== rightAngleAtPoint);
         if (otherPoints.length === 2) {
-          api.evalCommand(`rightAngle = RightAngle(${otherPoints[0]}, ${rightAngleAtPoint}, ${otherPoints[1]})`);
-          api.setColor('rightAngle', 0, 0, 0);
-          api.setLineThickness('rightAngle', 1);
+          const rightPt = rightAngleAtPoint;
+          // Zeichne Quadrat für rechten Winkel
+          api.evalCommand(`rightAngleMarker = Polygon(${rightPt}, (${rightPt}.x + 0.3, ${rightPt}.y), (${rightPt}.x + 0.3, ${rightPt}.y + 0.3), (${rightPt}.x, ${rightPt}.y + 0.3))`);
+          api.setFillColor('rightAngleMarker', 255, 255, 255);
+          api.setLineThickness('rightAngleMarker', 1);
+          api.setColor('rightAngleMarker', 0, 0, 0);
         }
 
-        // Markierter Winkel - NUR BEZEICHNUNG, KEIN WINKELWERT
-        const anglePoints = [pointA, pointB, pointC].filter(p => p !== rightAngleAtPoint);
-        if (anglePoints.length === 2) {
-          api.evalCommand(`angle_marked = Angle(${anglePoints[0]}, ${markedAngleAtPoint}, ${rightAngleAtPoint})`);
-          // Setze CAPTION statt evalCommand für das Label (nur Buchstabe, kein Wert)
+        // Markierter Winkel - INNENWINKEL des Dreiecks (NUR BESCHRIFTUNG, KEIN WINKELWERT)
+        const otherPointsForAngle = [pointA, pointB, pointC].filter(p => p !== markedAngleAtPoint);
+        if (otherPointsForAngle.length === 2) {
+          // Angle(P1, Vertex, P2) misst den Winkel am Vertex zwischen den zwei Strahlen
+          api.evalCommand(`angle_marked = Angle(${otherPointsForAngle[0]}, ${markedAngleAtPoint}, ${otherPointsForAngle[1]})`);
+          // Verstecke den automatischen Winkelwert, zeige nur die Beschriftung
+          try {
+            api.setLabelMode('angle_marked', 4);  // Mode 4 = Name only (versteckt Winkelwert)
+          } catch (e) {
+            // Fallback wenn setLabelMode nicht unterstützt wird
+          }
           api.setCaption('angle_marked', markedAngle === 'alpha' ? 'α' : 'β');
           api.setLabelVisible('angle_marked', true);
           api.setColor('angle_marked', 6, 182, 201);

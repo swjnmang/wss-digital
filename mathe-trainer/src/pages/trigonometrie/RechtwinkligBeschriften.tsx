@@ -271,7 +271,7 @@ const RechtwinkligBeschriften: React.FC = () => {
                 {/* Ankathete */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-20 bg-gray-50">
                   <p className="text-sm font-semibold text-gray-600 mb-2">
-                    Ankathete (neben {currentTask.markedAngle === 'alpha' ? 'α' : 'β'}):
+                    Ankathete (neben {currentTask.markedAngleAtPoint}):
                   </p>
                   <div
                     onDragOver={handleDragOver}
