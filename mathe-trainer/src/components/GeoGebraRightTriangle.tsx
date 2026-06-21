@@ -161,7 +161,13 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
               if (idx === rightAngleIndex) {
                 api.setLabelVisible(`angle_${idx}`, false);
               } else {
-                // Bei den anderen Winkeln: Beschriftung (α, β, γ) anzeigen
+                // Bei den anderen Winkeln: Verstecke die Gradzahl, zeige nur die Beschriftung
+                try {
+                  // Versuche den Label-Mode zu ändern (Name only)
+                  api.setLabelMode(`angle_${idx}`, 4);
+                } catch (e) {
+                  // Fallback: Setze Caption und hoffe auf das Beste
+                }
                 api.setCaption(`angle_${idx}`, angleLetters[idx]);
                 api.setLabelVisible(`angle_${idx}`, true);
                 api.setColor(`angle_${idx}`, 6, 182, 201);
