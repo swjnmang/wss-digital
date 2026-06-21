@@ -38,6 +38,7 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
   const elementIdRef = useRef<string>(`ggb-triangle-${Math.random().toString(36).substr(2, 9)}`);
   const [scriptLoaded, setScriptLoaded] = React.useState<boolean>(!!window.GGBApplet);
   const [error, setError] = React.useState<boolean>(false);
+  // Trigger Vercel rebuild
 
   useEffect(() => {
     const elementId = elementIdRef.current;
