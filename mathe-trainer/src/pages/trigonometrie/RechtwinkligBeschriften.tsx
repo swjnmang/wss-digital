@@ -162,7 +162,7 @@ const RechtwinkligBeschriften: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* GeoGebra Darstellung */}
             <div className="flex flex-col items-center justify-center">
-              <div className="bg-gray-50 rounded-lg p-4 w-full h-96 border-2 border-gray-200">
+              <div className="bg-gray-50 rounded-lg w-full h-96 border-2 border-gray-200 flex items-center justify-center">
                 <GeoGebraRightTriangle
                   pointA={currentTask.trianglePoints.A}
                   pointB={currentTask.trianglePoints.B}
@@ -171,8 +171,8 @@ const RechtwinkligBeschriften: React.FC = () => {
                   sideB={currentTask.triangleSides.adjacent}
                   sideC={currentTask.triangleSides.hypotenuse}
                   markedAngle={currentTask.selectedAngle}
-                  width={580}
-                  height={380}
+                  width={500}
+                  height={350}
                 />
               </div>
               <p className="text-sm text-gray-600 mt-4 text-center">
