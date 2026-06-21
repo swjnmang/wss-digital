@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import GeoGebraGraph from '../../components/GeoGebraGraph';
+import GeoGebraRightTriangle from '../../components/GeoGebraRightTriangle';
 
 interface Task {
   id: number;
@@ -162,58 +162,18 @@ const RechtwinkligBeschriften: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* GeoGebra Darstellung */}
             <div className="flex flex-col items-center justify-center">
-              <div className="bg-gray-50 rounded-lg p-4 w-full h-96 flex items-center justify-center border-2 border-gray-200">
-                <div className="text-center">
-                  <p className="text-sm text-gray-500 mb-4">
-                    Rechtwinkliges Dreieck mit Winkel {currentTask.angleLetter}
-                  </p>
-                  <svg viewBox="0 0 300 300" width="280" height="280" className="mx-auto">
-                    {/* Dreieck */}
-                    <polygon
-                      points="50,250 250,250 250,80"
-                      fill="none"
-                      stroke="#1f2937"
-                      strokeWidth="2"
-                    />
-
-                    {/* Rechter Winkel Marker */}
-                    <rect x="235" y="235" width="15" height="15" fill="none" stroke="#1f2937" strokeWidth="2" />
-
-                    {/* Punkte beschriften */}
-                    <text x="35" y="275" fontSize="18" fontWeight="bold" fill="#1f2937">
-                      {currentTask.trianglePoints.A}
-                    </text>
-                    <text x="250" y="275" fontSize="18" fontWeight="bold" fill="#1f2937">
-                      {currentTask.trianglePoints.B}
-                    </text>
-                    <text x="250" y="60" fontSize="18" fontWeight="bold" fill="#1f2937">
-                      {currentTask.trianglePoints.C}
-                    </text>
-
-                    {/* Seiten beschriften */}
-                    <text x="140" y="275" fontSize="16" fontWeight="bold" fill="#ea580c">
-                      {currentTask.triangleSides.adjacent}
-                    </text>
-                    <text x="260" y="165" fontSize="16" fontWeight="bold" fill="#ea580c">
-                      {currentTask.triangleSides.opposite}
-                    </text>
-                    <text x="135" y="155" fontSize="16" fontWeight="bold" fill="#ea580c">
-                      {currentTask.triangleSides.hypotenuse}
-                    </text>
-
-                    {/* Winkel markieren */}
-                    <path
-                      d="M 70 250 Q 90 235 95 220"
-                      fill="none"
-                      stroke="#0ea5e9"
-                      strokeWidth="2"
-                      strokeDasharray="5,5"
-                    />
-                    <text x="75" y="240" fontSize="16" fontWeight="bold" fill="#0ea5e9">
-                      {currentTask.angleLetter}
-                    </text>
-                  </svg>
-                </div>
+              <div className="bg-gray-50 rounded-lg p-4 w-full h-96 border-2 border-gray-200">
+                <GeoGebraRightTriangle
+                  pointA={currentTask.trianglePoints.A}
+                  pointB={currentTask.trianglePoints.B}
+                  pointC={currentTask.trianglePoints.C}
+                  sideA={currentTask.triangleSides.opposite}
+                  sideB={currentTask.triangleSides.adjacent}
+                  sideC={currentTask.triangleSides.hypotenuse}
+                  markedAngle={currentTask.selectedAngle}
+                  width={580}
+                  height={380}
+                />
               </div>
               <p className="text-sm text-gray-600 mt-4 text-center">
                 Vom Winkel {currentTask.angleLetter} aus: Was ist Hypotenuse, Gegenkathete und Ankathete?
