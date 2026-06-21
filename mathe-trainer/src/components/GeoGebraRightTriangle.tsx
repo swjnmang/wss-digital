@@ -132,28 +132,40 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         api.setCaption('c', sideC);   // Seite c gegenüber von C
         api.setLabelVisible('c', true);
 
-        // Rechter Winkel Marker - Zeichne kleines Quadrat mit Segmenten
+        // Rechter Winkel Marker - Zeichne drei Segmente für Quadrat-Marker
+        // Vereinfachter Ansatz - funktioniert mit allen GeoGebra-Versionen
         const otherPoints = [pointA, pointB, pointC].filter(p => p !== rightAngleAtPoint);
         if (otherPoints.length === 2) {
           try {
-            const sqSize = 0.25;
-            const ptName = rightAngleAtPoint;
+            const size = 0.2;
+            // Definiere Hilfspunkte basierend auf dem rechten-Winkel-Punkt
+            // Diese bilden ein kleines Quadrat
+            const rightPt = rightAngleAtPoint;
             
-            // Zeichne die drei Seiten des Quadrats (von oben rechts nach unten links)
-            // Diese bilden einen visuellen rechten Winkel Marker
-            api.evalCommand(`raSeg1 = Segment(${ptName}, (${ptName}.x + ${sqSize}, ${ptName}.y))`);
-            api.evalCommand(`raSeg2 = Segment((${ptName}.x + ${sqSize}, ${ptName}.y), (${ptName}.x + ${sqSize}, ${ptName}.y + ${sqSize}))`);
-            api.evalCommand(`raSeg3 = Segment((${ptName}.x + ${sqSize}, ${ptName}.y + ${sqSize}), (${ptName}.x, ${ptName}.y + ${sqSize}))`);
+            // Schreibe den Befehl so auf, dass GeoGebra es verstehen kann
+            // Verwende Punkt-Addition statt Koordinaten-Ausdrücke
+            api.evalCommand(`p1 = ${rightPt} + (${size},0)`);
+            api.evalCommand(`p2 = ${rightPt} + (${size},${size})`);
+            api.evalCommand(`p3 = ${rightPt} + (0,${size})`);
             
-            // Formatiere die Quadrat-Segmente
+            // Zeichne die Quadrat-Segmente
+            api.evalCommand(`raSeg1 = Segment(${rightPt}, p1)`);
+            api.evalCommand(`raSeg2 = Segment(p1, p2)`);
+            api.evalCommand(`raSeg3 = Segment(p2, p3)`);
+            
+            // Formatiere und verstecke Hilfspunkte
+            ['p1', 'p2', 'p3'].forEach((pt: string) => {
+              api.setVisible(pt, false);
+            });
+            
+            // Formatiere Segmente
             ['raSeg1', 'raSeg2', 'raSeg3'].forEach((seg: string) => {
-              api.setLineThickness(seg, 1.2);
+              api.setLineThickness(seg, 1);
               api.setColor(seg, 0, 0, 0);
               api.setLabelVisible(seg, false);
             });
           } catch (e) {
-            console.warn('Right angle marker could not be drawn:', e);
-            // Das ist kein kritischer Fehler - die Übung funktioniert auch ohne Marker
+            console.warn('Right angle marker could not be created:', e);
           }
         }
 
