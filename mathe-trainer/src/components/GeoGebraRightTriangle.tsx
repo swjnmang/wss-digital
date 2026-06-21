@@ -136,19 +136,23 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         api.setLabelVisible('c', true);
 
         // RECHTER WINKEL - Mit kleinem Quadrat-Symbol markieren
-        const squareSize = 0.3;
+        const squareSize = 0.25;
         const allPoints = [pointA, pointB, pointC];
-        const otherPoints = allPoints.filter(p => p !== rightAngleAtPoint);
         
-        // Bestimme die zwei Katheten des rechten Winkels
-        const point1 = otherPoints[0];
-        const point2 = otherPoints[1];
-        
-        // Zeichne ein kleines Quadrat-Symbol für den rechten Winkel
         try {
-          api.evalCommand(`raH = Segment((${rightAngleAtPoint}.x, ${rightAngleAtPoint}.y), (${rightAngleAtPoint}.x + ${squareSize}, ${rightAngleAtPoint}.y))`);
-          api.evalCommand(`raV = Segment((${rightAngleAtPoint}.x, ${rightAngleAtPoint}.y), (${rightAngleAtPoint}.x, ${rightAngleAtPoint}.y + ${squareSize}))`);
-          api.evalCommand(`raDiag = Segment((${rightAngleAtPoint}.x + ${squareSize}, ${rightAngleAtPoint}.y), (${rightAngleAtPoint}.x + ${squareSize}, ${rightAngleAtPoint}.y + ${squareSize}))`);
+          // Hilfspunkte für das Quadrat-Symbol erstellen
+          api.evalCommand(`raP1 = ${rightAngleAtPoint}`);
+          
+          // Offset-Punkte für das Quadrat basierend auf den Katheten-Richtungen
+          const otherPts = allPoints.filter(p => p !== rightAngleAtPoint);
+          api.evalCommand(`raP2 = ${rightAngleAtPoint} + (${squareSize}, 0)`);
+          api.evalCommand(`raP3 = ${rightAngleAtPoint} + (${squareSize}, ${squareSize})`);
+          api.evalCommand(`raP4 = ${rightAngleAtPoint} + (0, ${squareSize})`);
+          
+          // Zeichne die drei Seiten des kleinen Quadrats
+          api.evalCommand(`raH = Segment(raP1, raP2)`);
+          api.evalCommand(`raV = Segment(raP1, raP4)`);
+          api.evalCommand(`raDiag = Segment(raP2, raP3)`);
           
           // Formatiere die Quadrat-Linien
           ['raH', 'raV', 'raDiag'].forEach((seg: string) => {
@@ -156,6 +160,14 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
               api.setLineThickness(seg, 2);
               api.setColor(seg, 0, 0, 0);
               api.setLabelVisible(seg, false);
+            } catch (e) {}
+          });
+          
+          // Verstecke die Hilfspunkte
+          ['raP1', 'raP2', 'raP3', 'raP4'].forEach((pt: string) => {
+            try {
+              api.setLabelVisible(pt, false);
+              api.setPointSize(pt, 1);
             } catch (e) {}
           });
         } catch (e) {
@@ -167,12 +179,14 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         allPoints.forEach((vertex: string, idx: number) => {
           try {
             const otherPts = allPoints.filter(p => p !== vertex);
-            api.evalCommand(`angle_${idx} = Angle(${otherPts[0]}, ${vertex}, ${otherPts[1]})`);
-            api.setLabelMode(`angle_${idx}`, 4);  // Nur Label, kein Winkelwert
-            api.setCaption(`angle_${idx}`, angleLetters[idx]);
-            api.setLabelVisible(`angle_${idx}`, true);
-            api.setColor(`angle_${idx}`, 6, 182, 201);
-            api.setLineThickness(`angle_${idx}`, 2);
+            if (otherPts.length === 2) {
+              api.evalCommand(`angle_${idx} = Angle(${otherPts[0]}, ${vertex}, ${otherPts[1]})`);
+              api.setLabelMode(`angle_${idx}`, 4);  // Nur Label, kein Winkelwert
+              api.setCaption(`angle_${idx}`, angleLetters[idx]);
+              api.setLabelVisible(`angle_${idx}`, true);
+              api.setColor(`angle_${idx}`, 6, 182, 201);
+              api.setLineThickness(`angle_${idx}`, 2);
+            }
           } catch (e) {
             console.warn(`Fehler bei Winkel ${idx}:`, e);
           }
@@ -180,6 +194,15 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
 
         // Zoom Einstellungen
         api.setCoordSystem(0, 6, 0, 5);
+        
+        // Stelle sicher, dass Grid und Axes ausgeblendet sind
+        try {
+          api.setGridVisible(false);
+          api.setAxisVisible(1, false);  // X-Achse
+          api.setAxisVisible(2, false);  // Y-Achse
+        } catch (e) {
+          // Fallback wenn diese Methoden nicht existieren
+        }
 
       } catch (e) {
         console.error('Error setting up triangle:', e);
