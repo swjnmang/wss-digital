@@ -1,73 +1,44 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const TrigonometrieIndex: React.FC = () => {
-    const topics = [
-        {
-            title: 'Rechtwinklige Dreiecke 2',
-            path: '/trigonometrie/rechtwinklig2',
-            description: 'Erweiterte Übungen: Winkel aus Seiten berechnen und Seiten aus Winkel/Seite',
-            icon: '📐'
-        },
-        {
-            title: 'Sinussatz',
-            path: '/trigonometrie/sinussatz',
-            description: 'Seiten und Winkel mithilfe von gegenüberliegenden Paaren berechnen',
-            icon: '∿'
-        },
-        {
-            title: 'Kosinussatz',
-            path: '/trigonometrie/kosinussatz',
-            description: 'Mit zwei Seiten und dem eingeschlossenen Winkel fehlende Größen bestimmen',
-            icon: '📏'
-        },
-        {
-            title: 'Flächensatz',
-            path: '/trigonometrie/flaechensatz',
-            description: 'Flächeninhalt und fehlende Größen im allgemeinen Dreieck berechnen',
-            icon: 'areas'
-        },
-        {
-            title: 'Gemischte Anwendungen',
-            path: '/trigonometrie/gemischte-aufgaben',
-            description: '20 praxisnahe Aufgaben mit Skizzen, Hinweisen und Konzeptfilter',
-            icon: '🧭'
-        }
-    ];
+export default function TrigonometrieIndex() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 p-8">
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+        <h1 className="text-4xl font-bold text-orange-900 mb-8 text-center">Trigonometrie</h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Link to="/trigonometrie/rechtwinklig-beschriften" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
+            <h2 className="text-xl font-bold text-orange-800 mb-2">1. Rechtwinklige Dreiecke beschriften</h2>
+            <p className="text-gray-600">Hypotenuse, Gegenkathete und Ankathete korrekt zuordnen.</p>
+          </Link>
 
-    return (
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
-            <h1 className="text-4xl font-bold text-teal-800 text-center mb-12">
-                Trigonometrie
-            </h1>
+          <Link to="/trigonometrie/rechtwinklig2" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
+            <h2 className="text-xl font-bold text-orange-800 mb-2">2. Rechtwinklige Dreiecke 2</h2>
+            <p className="text-gray-600">Erweiterte Übungen: Winkel aus Seiten berechnen und Seiten aus Winkel/Seite.</p>
+          </Link>
 
-            <div className="grid md:grid-cols-2 gap-6">
-                {topics.map((topic) => (
-                    <Link 
-                        key={topic.path}
-                        to={topic.path}
-                        className="block bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 hover:border-teal-200 group"
-                    >
-                        <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                            {topic.icon === 'areas' ? (
-                                <svg className="w-10 h-10 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                </svg>
-                            ) : (
-                                <span role="img" aria-label="icon">{topic.icon}</span>
-                            )}
-                        </div>
-                        <h2 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-teal-600 transition-colors">
-                            {topic.title}
-                        </h2>
-                        <p className="text-gray-600">
-                            {topic.description}
-                        </p>
-                    </Link>
-                ))}
-            </div>
+          <Link to="/trigonometrie/sinussatz" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
+            <h2 className="text-xl font-bold text-orange-800 mb-2">3. Sinussatz</h2>
+            <p className="text-gray-600">Seiten und Winkel mithilfe von gegenüberliegenden Paaren berechnen.</p>
+          </Link>
+
+          <Link to="/trigonometrie/kosinussatz" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
+            <h2 className="text-xl font-bold text-orange-800 mb-2">4. Kosinussatz</h2>
+            <p className="text-gray-600">Mit zwei Seiten und dem eingeschlossenen Winkel fehlende Größen bestimmen.</p>
+          </Link>
+
+          <Link to="/trigonometrie/flaechensatz" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
+            <h2 className="text-xl font-bold text-orange-800 mb-2">5. Flächensatz</h2>
+            <p className="text-gray-600">Flächeninhalt und fehlende Größen im allgemeinen Dreieck berechnen.</p>
+          </Link>
+
+          <Link to="/trigonometrie/gemischte-aufgaben" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
+            <h2 className="text-xl font-bold text-orange-800 mb-2">6. Gemischte Anwendungen</h2>
+            <p className="text-gray-600">20 praxisnahe Aufgaben mit Skizzen, Hinweisen und Konzeptfilter.</p>
+          </Link>
         </div>
-    );
-};
-
-export default TrigonometrieIndex;
+      </div>
+    </div>
+  );
+}

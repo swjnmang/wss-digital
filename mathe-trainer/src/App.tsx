@@ -61,6 +61,7 @@ import BergAufgabe from './pages/lineare_funktionen/BergAufgabe'
 import SonneAufgabe from './pages/lineare_funktionen/SonneAufgabe'
 import Wertetabelle from './pages/lineare_funktionen/Wertetabelle'
 import ParallelSenkrecht from './pages/lineare_funktionen/ParallelSenkrecht'
+import ExerciseSheetGenerator from './pages/lineare_funktionen/ExerciseSheetGenerator'
 // Finanzmathe
 import FinanzmatheIndex from './pages/FinanzmatheIndex';
 import ZinsrechnungMenu from './pages/finanzmathe/ZinsrechnungMenu';
@@ -97,6 +98,7 @@ import SpielNullstellenQF from './pages/quadratische_funktionen/SpielNullstellen
 import AbschlusstestQF from './pages/quadratische_funktionen/Abschlusstest';
 // Trigonometrie
 import TrigonometrieIndex from './pages/TrigonometrieIndex';
+import RechtwinkligBeschriften from './pages/trigonometrie/RechtwinkligBeschriften';
 import Rechtwinklig2 from './pages/trigonometrie/Rechtwinklig2';
 import Sinussatz from './pages/trigonometrie/Sinussatz';
 import Kosinussatz from './pages/trigonometrie/Kosinussatz';
@@ -230,6 +232,7 @@ export default function App() {
           <Route path="/lineare_funktionen/anwendungsaufgaben/sonne" element={<SonneAufgabe />} />
           <Route path="/lineare_funktionen/spiel_muenzen" element={<SpielMuenzen />} />
           <Route path="/lineare_funktionen/test" element={<TestLF />} />
+          <Route path="/lineare_funktionen/ubungsblatt-generator" element={<ExerciseSheetGenerator />} />
           
           <Route path="/finanzmathe" element={<FinanzmatheIndex />} />
           <Route path="/finanzmathe/zinsrechnung" element={<ZinsrechnungMenu />} />
@@ -268,6 +271,7 @@ export default function App() {
           <Route path="/quadratische_funktionen/abschlusstest" element={<AbschlusstestQF />} />
           
           <Route path="/trigonometrie" element={<TrigonometrieIndex />} />
+          <Route path="/trigonometrie/rechtwinklig-beschriften" element={<RechtwinkligBeschriften />} />
           <Route path="/trigonometrie/rechtwinklig2" element={<Rechtwinklig2 />} />
           <Route path="/trigonometrie/sinussatz" element={<Sinussatz />} />
           <Route path="/trigonometrie/kosinussatz" element={<Kosinussatz />} />
