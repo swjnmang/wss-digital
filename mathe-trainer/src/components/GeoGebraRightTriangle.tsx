@@ -59,6 +59,8 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         enableShiftDragZoom: false,
         showAxes: false,
         showGrid: false,
+        showXAxis: false,
+        showYAxis: false,
         useBrowserForJS: true,
         appletOnLoad: (api: any) => {
           appletRef.current = api;
@@ -133,27 +135,48 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         api.setCaption('c', sideC);   // Seite c gegenüber von C
         api.setLabelVisible('c', true);
 
-        // Rechter Winkel ist implizit in der Dreiecks-Konstruktion gegeben
-        // (eine der beiden Katheten ist immer vertikal oder horizontal)
-        // Wir verzichten auf einen separaten Marker um GeoGebra-Kompatibilitätsprobleme zu vermeiden
-
-        // Markierter Winkel - INNENWINKEL des Dreiecks (NUR BESCHRIFTUNG, KEIN WINKELWERT)
-        const otherPointsForAngle = [pointA, pointB, pointC].filter(p => p !== markedAngleAtPoint);
-        if (otherPointsForAngle.length === 2) {
-          // Angle(P1, Vertex, P2) misst den Winkel am Vertex zwischen den zwei Strahlen
-          api.evalCommand(`angle_marked = Angle(${otherPointsForAngle[0]}, ${markedAngleAtPoint}, ${otherPointsForAngle[1]})`);
-          // Verstecke den automatischen Winkelwert, zeige nur die Beschriftung
-          try {
-            api.setLabelMode('angle_marked', 4);  // Mode 4 = Name only (versteckt Winkelwert)
-          } catch (e) {
-            // Fallback wenn setLabelMode nicht unterstützt wird
-          }
-          api.setCaption('angle_marked', markedAngle === 'alpha' ? 'α' : 'β');
-          api.setLabelVisible('angle_marked', true);
-          api.setColor('angle_marked', 6, 182, 201);
-          api.setLineStyle('angle_marked', 2);
-          api.setLineThickness('angle_marked', 2);
+        // RECHTER WINKEL - Mit kleinem Quadrat-Symbol markieren
+        const squareSize = 0.3;
+        const allPoints = [pointA, pointB, pointC];
+        const otherPoints = allPoints.filter(p => p !== rightAngleAtPoint);
+        
+        // Bestimme die zwei Katheten des rechten Winkels
+        const point1 = otherPoints[0];
+        const point2 = otherPoints[1];
+        
+        // Zeichne ein kleines Quadrat-Symbol für den rechten Winkel
+        try {
+          api.evalCommand(`raH = Segment((${rightAngleAtPoint}.x, ${rightAngleAtPoint}.y), (${rightAngleAtPoint}.x + ${squareSize}, ${rightAngleAtPoint}.y))`);
+          api.evalCommand(`raV = Segment((${rightAngleAtPoint}.x, ${rightAngleAtPoint}.y), (${rightAngleAtPoint}.x, ${rightAngleAtPoint}.y + ${squareSize}))`);
+          api.evalCommand(`raDiag = Segment((${rightAngleAtPoint}.x + ${squareSize}, ${rightAngleAtPoint}.y), (${rightAngleAtPoint}.x + ${squareSize}, ${rightAngleAtPoint}.y + ${squareSize}))`);
+          
+          // Formatiere die Quadrat-Linien
+          ['raH', 'raV', 'raDiag'].forEach((seg: string) => {
+            try {
+              api.setLineThickness(seg, 2);
+              api.setColor(seg, 0, 0, 0);
+              api.setLabelVisible(seg, false);
+            } catch (e) {}
+          });
+        } catch (e) {
+          console.warn('Rechter Winkel Marker Fehler:', e);
         }
+
+        // ALLE DREI WINKEL anzeigen mit Beschriftungen
+        const angleLetters = ['α', 'β', 'γ'];
+        allPoints.forEach((vertex: string, idx: number) => {
+          try {
+            const otherPts = allPoints.filter(p => p !== vertex);
+            api.evalCommand(`angle_${idx} = Angle(${otherPts[0]}, ${vertex}, ${otherPts[1]})`);
+            api.setLabelMode(`angle_${idx}`, 4);  // Nur Label, kein Winkelwert
+            api.setCaption(`angle_${idx}`, angleLetters[idx]);
+            api.setLabelVisible(`angle_${idx}`, true);
+            api.setColor(`angle_${idx}`, 6, 182, 201);
+            api.setLineThickness(`angle_${idx}`, 2);
+          } catch (e) {
+            console.warn(`Fehler bei Winkel ${idx}:`, e);
+          }
+        })
 
         // Zoom Einstellungen
         api.setCoordSystem(0, 6, 0, 5);
