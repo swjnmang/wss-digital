@@ -138,21 +138,14 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         // RECHTER WINKEL - Mit kleinem Quadrat-Symbol markieren
         const squareSize = 0.25;
         const allPoints = [pointA, pointB, pointC];
+        const x1 = pos[rightAngleAtPoint][0];
+        const y1 = pos[rightAngleAtPoint][1];
         
         try {
-          // Hilfspunkte für das Quadrat-Symbol erstellen
-          api.evalCommand(`raP1 = ${rightAngleAtPoint}`);
-          
-          // Offset-Punkte für das Quadrat basierend auf den Katheten-Richtungen
-          const otherPts = allPoints.filter(p => p !== rightAngleAtPoint);
-          api.evalCommand(`raP2 = ${rightAngleAtPoint} + (${squareSize}, 0)`);
-          api.evalCommand(`raP3 = ${rightAngleAtPoint} + (${squareSize}, ${squareSize})`);
-          api.evalCommand(`raP4 = ${rightAngleAtPoint} + (0, ${squareSize})`);
-          
-          // Zeichne die drei Seiten des kleinen Quadrats
-          api.evalCommand(`raH = Segment(raP1, raP2)`);
-          api.evalCommand(`raV = Segment(raP1, raP4)`);
-          api.evalCommand(`raDiag = Segment(raP2, raP3)`);
+          // Zeichne ein kleines Quadrat-Symbol für den rechten Winkel
+          api.evalCommand(`raH = Segment((${x1}, ${y1}), (${x1 + squareSize}, ${y1}))`);
+          api.evalCommand(`raV = Segment((${x1}, ${y1}), (${x1}, ${y1 + squareSize}))`);
+          api.evalCommand(`raDiag = Segment((${x1 + squareSize}, ${y1}), (${x1 + squareSize}, ${y1 + squareSize}))`);
           
           // Formatiere die Quadrat-Linien
           ['raH', 'raV', 'raDiag'].forEach((seg: string) => {
@@ -160,14 +153,6 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
               api.setLineThickness(seg, 2);
               api.setColor(seg, 0, 0, 0);
               api.setLabelVisible(seg, false);
-            } catch (e) {}
-          });
-          
-          // Verstecke die Hilfspunkte
-          ['raP1', 'raP2', 'raP3', 'raP4'].forEach((pt: string) => {
-            try {
-              api.setLabelVisible(pt, false);
-              api.setPointSize(pt, 1);
             } catch (e) {}
           });
         } catch (e) {
@@ -181,7 +166,6 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
             const otherPts = allPoints.filter(p => p !== vertex);
             if (otherPts.length === 2) {
               api.evalCommand(`angle_${idx} = Angle(${otherPts[0]}, ${vertex}, ${otherPts[1]})`);
-              api.setLabelMode(`angle_${idx}`, 4);  // Nur Label, kein Winkelwert
               api.setCaption(`angle_${idx}`, angleLetters[idx]);
               api.setLabelVisible(`angle_${idx}`, true);
               api.setColor(`angle_${idx}`, 6, 182, 201);
