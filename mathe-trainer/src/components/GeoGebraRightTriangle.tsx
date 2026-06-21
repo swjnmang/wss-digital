@@ -132,29 +132,25 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         api.setCaption('c', sideC);   // Seite c gegenüber von C
         api.setLabelVisible('c', true);
 
-        // Rechter Winkel Marker - Zeichne drei Segmente für Quadrat-Marker
-        // Vereinfachter Ansatz - funktioniert mit allen GeoGebra-Versionen
+        // Rechter Winkel Marker - Zeichne drei Segmente für rechten-Winkel-Quadrat
         const otherPoints = [pointA, pointB, pointC].filter(p => p !== rightAngleAtPoint);
         if (otherPoints.length === 2) {
           try {
             const size = 0.2;
-            // Definiere Hilfspunkte basierend auf dem rechten-Winkel-Punkt
-            // Diese bilden ein kleines Quadrat
-            const rightPt = rightAngleAtPoint;
+            const ptName = rightAngleAtPoint;
             
-            // Schreibe den Befehl so auf, dass GeoGebra es verstehen kann
-            // Verwende Punkt-Addition statt Koordinaten-Ausdrücke
-            api.evalCommand(`p1 = ${rightPt} + (${size},0)`);
-            api.evalCommand(`p2 = ${rightPt} + (${size},${size})`);
-            api.evalCommand(`p3 = ${rightPt} + (0,${size})`);
+            // Definiere Hilfspunkte für das Quadrat - verwende xCoord und yCoord Funktionen
+            api.evalCommand(`rawHelper1 = (xCoord(${ptName}) + ${size}, yCoord(${ptName}))`);
+            api.evalCommand(`rawHelper2 = (xCoord(${ptName}) + ${size}, yCoord(${ptName}) + ${size})`);
+            api.evalCommand(`rawHelper3 = (xCoord(${ptName}), yCoord(${ptName}) + ${size})`);
             
             // Zeichne die Quadrat-Segmente
-            api.evalCommand(`raSeg1 = Segment(${rightPt}, p1)`);
-            api.evalCommand(`raSeg2 = Segment(p1, p2)`);
-            api.evalCommand(`raSeg3 = Segment(p2, p3)`);
+            api.evalCommand(`raSeg1 = Segment(${ptName}, rawHelper1)`);
+            api.evalCommand(`raSeg2 = Segment(rawHelper1, rawHelper2)`);
+            api.evalCommand(`raSeg3 = Segment(rawHelper2, rawHelper3)`);
             
-            // Formatiere und verstecke Hilfspunkte
-            ['p1', 'p2', 'p3'].forEach((pt: string) => {
+            // Verstecke Hilfspunkte
+            ['rawHelper1', 'rawHelper2', 'rawHelper3'].forEach((pt: string) => {
               api.setVisible(pt, false);
             });
             
