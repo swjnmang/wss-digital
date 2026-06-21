@@ -157,21 +157,25 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
             if (otherPts.length === 2) {
               api.evalCommand(`angle_${idx} = Angle(${otherPts[0]}, ${vertex}, ${otherPts[1]})`);
               
-              // Bei dem rechten Winkel: Keine Beschriftung anzeigen
-              if (idx === rightAngleIndex) {
-                api.setLabelVisible(`angle_${idx}`, false);
-              } else {
-                // Bei den anderen Winkeln: Verstecke die Gradzahl, zeige nur die Beschriftung
+              // Verstecke die Angle-Label (Gradzahlen)
+              api.setLabelVisible(`angle_${idx}`, false);
+              
+              // Formatiere die Angle-Linien
+              api.setColor(`angle_${idx}`, 6, 182, 201);
+              api.setLineThickness(`angle_${idx}`, 2);
+              
+              // Bei den nicht-rechten Winkeln: Erstelle Text-Label mit Beschriftung
+              if (idx !== rightAngleIndex) {
                 try {
-                  // Versuche den Label-Mode zu ändern (Name only)
-                  api.setLabelMode(`angle_${idx}`, 4);
+                  // Erstelle ein Text-Label mit der Beschriftung
+                  api.evalCommand(`label_${idx} = Text("${angleLetters[idx]}", ${vertex})`);
+                  api.setTextSize(`label_${idx}`, 18);
+                  api.setColor(`label_${idx}`, 6, 182, 201);
                 } catch (e) {
-                  // Fallback: Setze Caption und hoffe auf das Beste
+                  // Fallback: Versuche setCaption
+                  api.setCaption(`angle_${idx}`, angleLetters[idx]);
+                  api.setLabelVisible(`angle_${idx}`, true);
                 }
-                api.setCaption(`angle_${idx}`, angleLetters[idx]);
-                api.setLabelVisible(`angle_${idx}`, true);
-                api.setColor(`angle_${idx}`, 6, 182, 201);
-                api.setLineThickness(`angle_${idx}`, 2);
               }
             }
           } catch (e) {
