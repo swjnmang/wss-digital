@@ -132,38 +132,9 @@ const GeoGebraRightTriangle: React.FC<GeoGebraRightTriangleProps> = ({
         api.setCaption('c', sideC);   // Seite c gegenüber von C
         api.setLabelVisible('c', true);
 
-        // Rechter Winkel Marker - Zeichne drei Segmente für rechten-Winkel-Quadrat
-        const otherPoints = [pointA, pointB, pointC].filter(p => p !== rightAngleAtPoint);
-        if (otherPoints.length === 2) {
-          try {
-            const size = 0.2;
-            const ptName = rightAngleAtPoint;
-            
-            // Definiere Hilfspunkte für das Quadrat - verwende xCoord und yCoord Funktionen
-            api.evalCommand(`rawHelper1 = (xCoord(${ptName}) + ${size}, yCoord(${ptName}))`);
-            api.evalCommand(`rawHelper2 = (xCoord(${ptName}) + ${size}, yCoord(${ptName}) + ${size})`);
-            api.evalCommand(`rawHelper3 = (xCoord(${ptName}), yCoord(${ptName}) + ${size})`);
-            
-            // Zeichne die Quadrat-Segmente
-            api.evalCommand(`raSeg1 = Segment(${ptName}, rawHelper1)`);
-            api.evalCommand(`raSeg2 = Segment(rawHelper1, rawHelper2)`);
-            api.evalCommand(`raSeg3 = Segment(rawHelper2, rawHelper3)`);
-            
-            // Verstecke Hilfspunkte
-            ['rawHelper1', 'rawHelper2', 'rawHelper3'].forEach((pt: string) => {
-              api.setVisible(pt, false);
-            });
-            
-            // Formatiere Segmente
-            ['raSeg1', 'raSeg2', 'raSeg3'].forEach((seg: string) => {
-              api.setLineThickness(seg, 1);
-              api.setColor(seg, 0, 0, 0);
-              api.setLabelVisible(seg, false);
-            });
-          } catch (e) {
-            console.warn('Right angle marker could not be created:', e);
-          }
-        }
+        // Rechter Winkel ist implizit in der Dreiecks-Konstruktion gegeben
+        // (eine der beiden Katheten ist immer vertikal oder horizontal)
+        // Wir verzichten auf einen separaten Marker um GeoGebra-Kompatibilitätsprobleme zu vermeiden
 
         // Markierter Winkel - INNENWINKEL des Dreiecks (NUR BESCHRIFTUNG, KEIN WINKELWERT)
         const otherPointsForAngle = [pointA, pointB, pointC].filter(p => p !== markedAngleAtPoint);
