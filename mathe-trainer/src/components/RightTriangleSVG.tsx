@@ -8,7 +8,7 @@ interface RightTriangleSVGProps {
   sideB: string;      // Seite gegenüber von B (zwischen A und C)
   sideC: string;      // Seite gegenüber von C (zwischen A und B)
   rightAngleAtPoint: string;  // Punkt wo der 90° Winkel ist
-  markedAngle?: 'alpha' | 'beta';
+  markedAngle?: 'alpha' | 'beta' | 'gamma';
   markedAngleAtPoint?: string; // Punkt wo der markierte Winkel ist
 }
 

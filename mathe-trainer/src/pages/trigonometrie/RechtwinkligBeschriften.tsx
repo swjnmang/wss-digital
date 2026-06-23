@@ -11,7 +11,7 @@ interface Task {
   sideB: string;           // Seite gegenüber von B
   sideC: string;           // Seite gegenüber von C
   rightAngleAtPoint: string; // Punkt wo der rechte Winkel ist
-  markedAngle: 'alpha' | 'beta';
+  markedAngle: 'alpha' | 'beta' | 'gamma';
   markedAngleAtPoint: string; // Punkt wo der markierte Winkel ist
 }
 
@@ -42,13 +42,7 @@ const RechtwinkligBeschriften: React.FC = () => {
 
   // Generiere eine neue Aufgabe mit variablen Dreiecks-Orientierungen
   const generateTask = () => {
-    const points = [
-      ['A', 'B', 'C'],
-      ['P', 'Q', 'R'],
-      ['X', 'Y', 'Z'],
-    ];
-
-    const selectedPoints = points[Math.floor(Math.random() * points.length)];
+    const selectedPoints = ['A', 'B', 'C'];
     // Seite gegenüber einem Punkt trägt immer dessen Kleinbuchstaben als Namen
     const selectedSides = selectedPoints.map((p) => p.toLowerCase());
 
@@ -59,7 +53,12 @@ const RechtwinkligBeschriften: React.FC = () => {
     // Markierter Winkel: einer der beiden nicht-rechten Winkel
     const otherPoints = selectedPoints.filter(p => p !== rightAngleAtPoint);
     const markedAngleAtPoint = otherPoints[Math.floor(Math.random() * 2)];
-    const markedAngle = markedAngleAtPoint === selectedPoints[0] ? 'alpha' : 'beta';
+    const angleNames: Record<string, 'alpha' | 'beta' | 'gamma'> = {
+      [selectedPoints[0]]: 'alpha',
+      [selectedPoints[1]]: 'beta',
+      [selectedPoints[2]]: 'gamma',
+    };
+    const markedAngle = angleNames[markedAngleAtPoint];
 
     const task: Task = {
       id: Date.now(),
@@ -165,6 +164,8 @@ const RechtwinkligBeschriften: React.FC = () => {
     return <div className="text-center py-8">Laden...</div>;
   }
 
+  const greekSymbol = { alpha: 'α', beta: 'β', gamma: 'γ' }[currentTask.markedAngle];
+
   const correctAssignments = getCorrectAssignments(currentTask);
   const availableSides = [currentTask.sideA, currentTask.sideB, currentTask.sideC];
   const otherPoints = [currentTask.pointA, currentTask.pointB, currentTask.pointC].filter(
@@ -203,7 +204,7 @@ const RechtwinkligBeschriften: React.FC = () => {
                 />
               </div>
               <p className="text-sm text-gray-600 mt-4 text-center">
-                Vom Winkel {currentTask.markedAngle === 'alpha' ? 'α' : 'β'} aus: Was ist Hypotenuse, Gegenkathete und Ankathete?
+                Vom Winkel {greekSymbol} aus: Was ist Hypotenuse, Gegenkathete und Ankathete?
               </p>
             </div>
 
@@ -240,7 +241,7 @@ const RechtwinkligBeschriften: React.FC = () => {
                 {/* Gegenkathete */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-20 bg-gray-50">
                   <p className="text-sm font-semibold text-gray-600 mb-2">
-                    Gegenkathete von {currentTask.markedAngle === 'alpha' ? 'α' : 'β'}
+                    Gegenkathete von {greekSymbol}
                   </p>
                   <div
                     onDragOver={handleDragOver}
@@ -266,7 +267,7 @@ const RechtwinkligBeschriften: React.FC = () => {
                 {/* Ankathete */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-20 bg-gray-50">
                   <p className="text-sm font-semibold text-gray-600 mb-2">
-                    Ankathete von {currentTask.markedAngle === 'alpha' ? 'α' : 'β'}
+                    Ankathete von {greekSymbol}
                   </p>
                   <div
                     onDragOver={handleDragOver}
