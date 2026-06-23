@@ -4,7 +4,6 @@ import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import GeoGebraApplet from '../../components/GeoGebraApplet';
 
-const RIGHT_TRIANGLE_SIDES_VIDEO_URL = 'https://youtu.be/HfiouXm2n3E?si=h55pTSdKcdpaimjd';
 const RIGHT_TRIANGLE_ANGLES_VIDEO_URL = 'https://youtu.be/EsW65RuykZ8?si=u77ouc4I3QxouVZJ';
 
 interface Task {
@@ -92,12 +91,11 @@ const pushStep = (steps: SolutionStep[], text: string, math?: string) => {
     steps.push({ text, math });
 };
 
-const Rechtwinklig2: React.FC = () => {
+const RechtwinkligWinkel: React.FC = () => {
     const [currentTask, setCurrentTask] = useState<Task | null>(null);
     const [userAnswers, setUserAnswers] = useState<{ [key: string]: string }>({});
     const [feedback, setFeedback] = useState<{ [key: string]: string }>({}); // key -> 'correct' | 'incorrect'
     const [showSolution, setShowSolution] = useState(false);
-    const [mode, setMode] = useState<'angles' | 'sides' | 'random'>('random');
 
     // Helpers
     const degToRad = (degrees: number) => degrees * (Math.PI / 180);
@@ -152,19 +150,8 @@ const Rechtwinklig2: React.FC = () => {
             };
         }
 
-        // 2. Select Task Type based on mode
-        let type: '2sides_angles' | '3sides_angles' | '2sides_1angle_side';
-        
-        if (mode === 'angles') {
-            type = Math.random() < 0.5 ? '2sides_angles' : '3sides_angles';
-        } else if (mode === 'sides') {
-            type = '2sides_1angle_side';
-        } else {
-            const r = Math.random();
-            if (r < 0.33) type = '2sides_angles';
-            else if (r < 0.66) type = '3sides_angles';
-            else type = '2sides_1angle_side';
-        }
+        // Diese Seite fragt ausschließlich Winkel ab
+        const type: '2sides_angles' | '3sides_angles' = Math.random() < 0.5 ? '2sides_angles' : '3sides_angles';
 
         let given: string[] = [];
         let toFind: string[] = [];
@@ -199,23 +186,10 @@ const Rechtwinklig2: React.FC = () => {
             // Find angles that are NOT 90
             toFind = ['alpha', 'beta', 'gamma'].filter(k => k !== rightAngleKey);
             description = `Gegeben sind zwei Seiten: ${formatGiven(given)}. Berechne die fehlenden Winkel.`;
-        } else if (type === '3sides_angles') {
+        } else {
             given = ['a', 'b', 'c', rightAngleKey];
             toFind = ['alpha', 'beta', 'gamma'].filter(k => k !== rightAngleKey);
             description = `Gegeben sind alle drei Seiten: ${formatGiven(given)}. Berechne die fehlenden Winkel.`;
-        } else {
-            const sides = ['a', 'b', 'c'];
-            const targetSideIndex = Math.floor(Math.random() * 3);
-            const targetSide = sides[targetSideIndex];
-            
-            const otherSides = sides.filter(s => s !== targetSide);
-            // Give one of the non-90 angles
-            const nonRightAngles = ['alpha', 'beta', 'gamma'].filter(k => k !== rightAngleKey);
-            const angleToGive = nonRightAngles[Math.floor(Math.random() * nonRightAngles.length)];
-            
-            given = [...otherSides, angleToGive, rightAngleKey];
-            toFind = [targetSide];
-            description = `Gegeben sind: ${formatGiven(given)}. Berechne die fehlende Seite ${targetSide}.`;
         }
 
         // Random orientation 0-3
@@ -236,7 +210,7 @@ const Rechtwinklig2: React.FC = () => {
 
     useEffect(() => {
         generateTask();
-    }, [mode]);
+    }, []);
 
     const checkAnswers = () => {
         if (!currentTask) return;
@@ -742,7 +716,7 @@ const Rechtwinklig2: React.FC = () => {
         return (
             <div className="w-full max-w-[600px] mx-auto">
                 <GeoGebraApplet 
-                    id="ggb-rechtwinklig2"
+                    id="ggb-rechtwinklig-winkel"
                     width={600}
                     height={450}
                     commands={commands}
@@ -767,43 +741,11 @@ const Rechtwinklig2: React.FC = () => {
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <div className="bg-white rounded-xl shadow-lg p-6">
                 <h1 className="text-3xl font-bold text-teal-800 text-center mb-6">
-                    Rechtwinklige Dreiecke 2
+                    Winkel berechnen mit Sinus, Kosinus und Tangens
                 </h1>
 
-                <div className="flex justify-center gap-4 mb-6">
-                    <button 
-                        onClick={() => setMode('angles')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${mode === 'angles' ? 'bg-teal-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                    >
-                        Winkel berechnen
-                    </button>
-                    <button 
-                        onClick={() => setMode('sides')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${mode === 'sides' ? 'bg-teal-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                    >
-                        Streckenlänge berechnen
-                    </button>
-                    <button 
-                        onClick={() => setMode('random')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${mode === 'random' ? 'bg-teal-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                    >
-                        Zufällige Aufgabe
-                    </button>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4 mb-6">
-                    <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 flex flex-col gap-2">
-                        <h2 className="text-lg font-semibold text-teal-900">Video: Seitenlängen bestimmen</h2>
-                        <a
-                            href={RIGHT_TRIANGLE_SIDES_VIDEO_URL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex justify-center items-center px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
-                        >
-                            Video ansehen
-                        </a>
-                    </div>
-                    <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex flex-col gap-2">
+                <div className="flex justify-center mb-6">
+                    <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex flex-col gap-2 items-center max-w-md">
                         <h2 className="text-lg font-semibold text-indigo-900">Video: Winkel bestimmen</h2>
                         <a
                             href={RIGHT_TRIANGLE_ANGLES_VIDEO_URL}
@@ -907,4 +849,4 @@ const Rechtwinklig2: React.FC = () => {
     );
 };
 
-export default Rechtwinklig2;
+export default RechtwinkligWinkel;

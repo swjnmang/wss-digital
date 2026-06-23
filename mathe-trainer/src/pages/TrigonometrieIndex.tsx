@@ -18,28 +18,33 @@ export default function TrigonometrieIndex() {
             <p className="text-gray-600">Verstehen, was die drei Winkelfunktionen als Seitenverhältnisse bedeuten.</p>
           </Link>
 
-          <Link to="/trigonometrie/rechtwinklig2" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">3. Rechtwinklige Dreiecke berechnen</h2>
-            <p className="text-gray-600">Erweiterte Übungen: Winkel aus Seiten berechnen und Seiten aus Winkel/Seite.</p>
+          <Link to="/trigonometrie/rechtwinklig-strecken" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
+            <h2 className="text-xl font-bold text-orange-800 mb-2">3. Streckenlänge mit Sinus, Kosinus und Tangens berechnen</h2>
+            <p className="text-gray-600">Fehlende Seiten im rechtwinkligen Dreieck mithilfe der Winkelfunktionen bestimmen.</p>
+          </Link>
+
+          <Link to="/trigonometrie/rechtwinklig-winkel" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
+            <h2 className="text-xl font-bold text-orange-800 mb-2">4. Winkel berechnen mit Sinus, Kosinus und Tangens</h2>
+            <p className="text-gray-600">Fehlende Winkel im rechtwinkligen Dreieck aus den Seitenlängen bestimmen.</p>
           </Link>
 
           <Link to="/trigonometrie/sinussatz" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">4. Sinussatz</h2>
+            <h2 className="text-xl font-bold text-orange-800 mb-2">5. Sinussatz</h2>
             <p className="text-gray-600">Seiten und Winkel mithilfe von gegenüberliegenden Paaren berechnen.</p>
           </Link>
 
           <Link to="/trigonometrie/kosinussatz" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">5. Kosinussatz</h2>
+            <h2 className="text-xl font-bold text-orange-800 mb-2">6. Kosinussatz</h2>
             <p className="text-gray-600">Mit zwei Seiten und dem eingeschlossenen Winkel fehlende Größen bestimmen.</p>
           </Link>
 
           <Link to="/trigonometrie/flaechensatz" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">6. Flächensatz</h2>
+            <h2 className="text-xl font-bold text-orange-800 mb-2">7. Flächensatz</h2>
             <p className="text-gray-600">Flächeninhalt und fehlende Größen im allgemeinen Dreieck berechnen.</p>
           </Link>
 
           <Link to="/trigonometrie/gemischte-aufgaben" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">7. Gemischte Anwendungen</h2>
+            <h2 className="text-xl font-bold text-orange-800 mb-2">8. Gemischte Anwendungen</h2>
             <p className="text-gray-600">20 praxisnahe Aufgaben mit Skizzen, Hinweisen und Konzeptfilter.</p>
           </Link>
         </div>

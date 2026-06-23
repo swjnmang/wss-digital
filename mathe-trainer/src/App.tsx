@@ -100,7 +100,8 @@ import AbschlusstestQF from './pages/quadratische_funktionen/Abschlusstest';
 import TrigonometrieIndex from './pages/TrigonometrieIndex';
 import RechtwinkligBeschriften from './pages/trigonometrie/RechtwinkligBeschriften';
 import SinusKosinusTangensErkennen from './pages/trigonometrie/SinusKosinusTangensErkennen';
-import Rechtwinklig2 from './pages/trigonometrie/Rechtwinklig2';
+import RechtwinkligStrecken from './pages/trigonometrie/RechtwinkligStrecken';
+import RechtwinkligWinkel from './pages/trigonometrie/RechtwinkligWinkel';
 import Sinussatz from './pages/trigonometrie/Sinussatz';
 import Kosinussatz from './pages/trigonometrie/Kosinussatz';
 import Flaechensatz from './pages/trigonometrie/Flaechensatz';
@@ -274,7 +275,8 @@ export default function App() {
           <Route path="/trigonometrie" element={<TrigonometrieIndex />} />
           <Route path="/trigonometrie/rechtwinklig-beschriften" element={<RechtwinkligBeschriften />} />
           <Route path="/trigonometrie/sinus-kosinus-tangens-erkennen" element={<SinusKosinusTangensErkennen />} />
-          <Route path="/trigonometrie/rechtwinklig2" element={<Rechtwinklig2 />} />
+          <Route path="/trigonometrie/rechtwinklig-strecken" element={<RechtwinkligStrecken />} />
+          <Route path="/trigonometrie/rechtwinklig-winkel" element={<RechtwinkligWinkel />} />
           <Route path="/trigonometrie/sinussatz" element={<Sinussatz />} />
           <Route path="/trigonometrie/kosinussatz" element={<Kosinussatz />} />
           <Route path="/trigonometrie/flaechensatz" element={<Flaechensatz />} />
