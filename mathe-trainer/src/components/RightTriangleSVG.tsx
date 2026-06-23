@@ -98,32 +98,43 @@ const RightTriangleSVG: React.FC<RightTriangleSVGProps> = ({
     const len1 = Math.sqrt(v1[0] * v1[0] + v1[1] * v1[1]);
     const len2 = Math.sqrt(v2[0] * v2[0] + v2[1] * v2[1]);
 
+    const unit1 = [v1[0] / len1, v1[1] / len1];
+    const unit2 = [v2[0] / len2, v2[1] / len2];
+
     const start = [
-      vertex[0] + (v1[0] / len1) * radius,
-      vertex[1] + (v1[1] / len1) * radius,
+      vertex[0] + unit1[0] * radius,
+      vertex[1] + unit1[1] * radius,
     ];
     const end = [
-      vertex[0] + (v2[0] / len2) * radius,
-      vertex[1] + (v2[1] / len2) * radius,
+      vertex[0] + unit2[0] * radius,
+      vertex[1] + unit2[1] * radius,
     ];
+
+    // Winkel-Differenz auf (-π, π] normalisieren, um atan2-Wraparound zu vermeiden
+    const angle1 = Math.atan2(v1[1], v1[0]);
+    const angle2 = Math.atan2(v2[1], v2[0]);
+    let delta = angle2 - angle1;
+    delta = ((delta + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+    const largeArc = Math.abs(delta) > Math.PI / 2 + 0.001 ? 1 : 0;
+    const sweep = delta > 0 ? 1 : 0;
+
+    // Winkelhalbierende über Vektorsumme der Einheitsvektoren (robust, kein Wraparound)
+    let bisector = [unit1[0] + unit2[0], unit1[1] + unit2[1]];
+    const bisectorLen = Math.sqrt(bisector[0] * bisector[0] + bisector[1] * bisector[1]);
+    bisector = bisectorLen > 0.0001 ? [bisector[0] / bisectorLen, bisector[1] / bisectorLen] : [unit1[0], unit1[1]];
 
     if (isRightAngle) {
       // Zeichne einen grauen Viertelkreis-Bogen mit Punkt für den rechten Winkel
-      const angle1 = Math.atan2(v1[1], v1[0]);
-      const angle2 = Math.atan2(v2[1], v2[0]);
-      const largeArc = Math.abs(angle2 - angle1) > Math.PI ? 1 : 0;
-
       const sectorPath = `
         M ${vertex[0]} ${vertex[1]}
         L ${start[0]} ${start[1]}
-        A ${radius} ${radius} 0 ${largeArc} 1 ${end[0]} ${end[1]}
+        A ${radius} ${radius} 0 ${largeArc} ${sweep} ${end[0]} ${end[1]}
         Z
       `;
 
-      const midAngle = (angle1 + angle2) / 2;
       const dotRadius = radius * 0.55;
-      const dotX = vertex[0] + Math.cos(midAngle) * dotRadius;
-      const dotY = vertex[1] + Math.sin(midAngle) * dotRadius;
+      const dotX = vertex[0] + bisector[0] * dotRadius;
+      const dotY = vertex[1] + bisector[1] * dotRadius;
 
       return (
         <g key={`angle-${label}`}>
@@ -133,21 +144,15 @@ const RightTriangleSVG: React.FC<RightTriangleSVGProps> = ({
       );
     } else {
       // Zeichne einen Bogen mit Label
-      const angle1 = Math.atan2(v1[1], v1[0]);
-      const angle2 = Math.atan2(v2[1], v2[0]);
-
-      const largeArc = Math.abs(angle2 - angle1) > Math.PI ? 1 : 0;
-
       const pathData = `
         M ${start[0]} ${start[1]}
-        A ${radius} ${radius} 0 ${largeArc} 1 ${end[0]} ${end[1]}
+        A ${radius} ${radius} 0 ${largeArc} ${sweep} ${end[0]} ${end[1]}
       `;
 
-      // Berechne Label-Position
-      const midAngle = (angle1 + angle2) / 2;
+      // Label-Position entlang der Winkelhalbierenden
       const labelRadius = radius + 15;
-      const labelX = vertex[0] + Math.cos(midAngle) * labelRadius;
-      const labelY = vertex[1] + Math.sin(midAngle) * labelRadius;
+      const labelX = vertex[0] + bisector[0] * labelRadius;
+      const labelY = vertex[1] + bisector[1] * labelRadius;
 
       const color = isMarked ? '#DC2626' : '#06B6C9';
 
@@ -175,6 +180,28 @@ const RightTriangleSVG: React.FC<RightTriangleSVGProps> = ({
   const isRightAngleAtB = rightAngleAtPoint === pointB;
   const isRightAngleAtC = rightAngleAtPoint === pointC;
 
+  // Punkt-Label immer vom Schwerpunkt weg nach außen versetzen
+  const centroid: [number, number] = [
+    (posA[0] + posB[0] + posC[0]) / 3,
+    (posA[1] + posB[1] + posC[1]) / 3,
+  ];
+
+  const pointLabelProps = (pos: [number, number]) => {
+    const dx = pos[0] - centroid[0];
+    const dy = pos[1] - centroid[1];
+    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+    const offset = 16;
+    const x = pos[0] + (dx / len) * offset;
+    const y = pos[1] + (dy / len) * offset;
+    const textAnchor = dx > 5 ? 'start' : dx < -5 ? 'end' : 'middle';
+    const dyAttr = dy > 5 ? '0.8em' : dy < -5 ? '0em' : '0.3em';
+    return { x, y, textAnchor, dyAttr };
+  };
+
+  const labelA = pointLabelProps(posA);
+  const labelB = pointLabelProps(posB);
+  const labelC = pointLabelProps(posC);
+
   return (
     <svg
       width="100%"
@@ -196,13 +223,13 @@ const RightTriangleSVG: React.FC<RightTriangleSVGProps> = ({
       <circle cx={posC[0]} cy={posC[1]} r="4" fill="black" />
 
       {/* Punkt-Labels */}
-      <text x={posA[0] - 15} y={posA[1] - 10} fontSize="14" fontWeight="bold">
+      <text x={labelA.x} y={labelA.y} dy={labelA.dyAttr} textAnchor={labelA.textAnchor} fontSize="14" fontWeight="bold">
         {pointA}
       </text>
-      <text x={posB[0] + 10} y={posB[1] - 10} fontSize="14" fontWeight="bold">
+      <text x={labelB.x} y={labelB.y} dy={labelB.dyAttr} textAnchor={labelB.textAnchor} fontSize="14" fontWeight="bold">
         {pointB}
       </text>
-      <text x={posC[0] - 15} y={posC[1] + 20} fontSize="14" fontWeight="bold">
+      <text x={labelC.x} y={labelC.y} dy={labelC.dyAttr} textAnchor={labelC.textAnchor} fontSize="14" fontWeight="bold">
         {pointC}
       </text>
 

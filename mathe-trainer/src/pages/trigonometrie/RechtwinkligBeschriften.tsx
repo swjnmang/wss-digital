@@ -215,7 +215,7 @@ const RechtwinkligBeschriften: React.FC = () => {
               <div className="space-y-4 mb-8">
                 {/* Hypotenuse */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-20 bg-gray-50">
-                  <p className="text-sm font-semibold text-gray-600 mb-2">Hypotenuse (längste Seite):</p>
+                  <p className="text-sm font-semibold text-gray-600 mb-2">Hypotenuse</p>
                   <div
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, 'hypotenuse')}
@@ -240,7 +240,7 @@ const RechtwinkligBeschriften: React.FC = () => {
                 {/* Gegenkathete */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-20 bg-gray-50">
                   <p className="text-sm font-semibold text-gray-600 mb-2">
-                    Gegenkathete (gegenüber von {currentTask.markedAngle === 'alpha' ? 'α' : 'β'}):
+                    Gegenkathete von {currentTask.markedAngle === 'alpha' ? 'α' : 'β'}
                   </p>
                   <div
                     onDragOver={handleDragOver}
@@ -266,7 +266,7 @@ const RechtwinkligBeschriften: React.FC = () => {
                 {/* Ankathete */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-20 bg-gray-50">
                   <p className="text-sm font-semibold text-gray-600 mb-2">
-                    Ankathete (neben {currentTask.markedAngleAtPoint}):
+                    Ankathete von {currentTask.markedAngle === 'alpha' ? 'α' : 'β'}
                   </p>
                   <div
                     onDragOver={handleDragOver}
