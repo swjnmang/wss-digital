@@ -4,6 +4,8 @@ import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import RightTriangleSVG from '../../components/RightTriangleSVG';
 
+const LERNVIDEO_URL = 'https://www.youtube.com/watch?v=0qxNk-ZcW-8';
+
 type SideRole = 'hypotenuse' | 'opposite' | 'adjacent';
 type TrigFunction = 'sin' | 'cos' | 'tan';
 
@@ -194,6 +196,17 @@ const SinusKosinusTangensErkennen: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="flex justify-center mb-6">
+            <a
+              href={LERNVIDEO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
+            >
+              ▶ Lernvideo
+            </a>
+          </div>
+
           <div className="mb-6 bg-blue-50 border border-blue-100 rounded-xl p-4">
             {question.type === 'functionToRatio' ? (
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-center">
