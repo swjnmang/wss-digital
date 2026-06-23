@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
-import GeoGebraApplet from '../../components/GeoGebraApplet';
+import RightTriangleTaskSVG, { AngleKey as TaskAngleKey, SideKey as TaskSideKey } from '../../components/RightTriangleTaskSVG';
 
 const RIGHT_TRIANGLE_SIDES_VIDEO_URL = 'https://youtu.be/HfiouXm2n3E?si=h55pTSdKcdpaimjd';
 
@@ -489,244 +489,18 @@ const RechtwinkligStrecken: React.FC = () => {
     const renderTriangle = () => {
         if (!currentTask) return null;
 
-        const { a, b, c, given, toFind, orientation } = currentTask;
-        
-        // GeoGebra Commands
-        const commands: string[] = [];
-        
-        // Setup View
-        commands.push('ShowAxes(false)');
-        commands.push('ShowGrid(false)');
+        const rightAnglePoint: 'A' | 'B' | 'C' =
+            currentTask.alpha === 90 ? 'A' : currentTask.beta === 90 ? 'B' : 'C';
 
-        // Determine which vertex is the right angle
-        let rightAngleVertex = 'C';
-        if (currentTask.alpha === 90) rightAngleVertex = 'A';
-        else if (currentTask.beta === 90) rightAngleVertex = 'B';
-
-        // Determine lengths for drawing
-        // We need width and height for the L-shape
-        // If C=90: legs are a and b.
-        // If A=90: legs are b and c.
-        // If B=90: legs are a and c.
-        
-        let width = 0;
-        let height = 0;
-        
-        // Mapping from visual points (Corner, Top, Right) to labels (A, B, C)
-        let labelCorner = '';
-        let labelTop = '';
-        let labelRight = '';
-
-        if (rightAngleVertex === 'C') {
-            // Legs are a and b.
-            // Let's randomly assign which is width/height to add more variety?
-            // Or stick to standard: b is usually vertical if A is top?
-            // Let's say: Corner=C. Top=A. Right=B.
-            // Then vertical leg is CA (length b). Horizontal leg is CB (length a).
-            labelCorner = 'C';
-            labelTop = 'A';
-            labelRight = 'B';
-            height = b;
-            width = a;
-        } else if (rightAngleVertex === 'A') {
-            // Legs are b and c.
-            // Corner=A. Top=B. Right=C.
-            // Vertical leg AB (length c). Horizontal leg AC (length b).
-            labelCorner = 'A';
-            labelTop = 'B';
-            labelRight = 'C';
-            height = c;
-            width = b;
-        } else { // B=90
-            // Legs are a and c.
-            // Corner=B. Top=C. Right=A.
-            // Vertical leg BC (length a). Horizontal leg BA (length c).
-            labelCorner = 'B';
-            labelTop = 'C';
-            labelRight = 'A';
-            height = a;
-            width = c;
-        }
-
-        // 1. Define Points based on orientation
-        // Standard (0): Corner=(0,0), Top=(0,h), Right=(w,0)
-        
-        let Cx = 0, Cy = 0; // Coordinates for Corner
-        let Tx = 0, Ty = 0; // Coordinates for Top
-        let Rx = 0, Ry = 0; // Coordinates for Right
-
-        switch (orientation) {
-            case 0: // Bottom-Left
-                Cx = 0; Cy = 0;
-                Tx = 0; Ty = height;
-                Rx = width; Ry = 0;
-                break;
-            case 1: // Bottom-Right
-                Cx = width; Cy = 0;
-                Tx = width; Ty = height;
-                Rx = 0; Ry = 0;
-                break;
-            case 2: // Top-Right
-                Cx = width; Cy = height;
-                Tx = width; Ty = 0;
-                Rx = 0; Ry = height;
-                break;
-            case 3: // Top-Left
-                Cx = 0; Cy = height;
-                Tx = 0; Ty = 0;
-                Rx = width; Ry = height;
-                break;
-        }
-
-        // Create points with correct labels
-        commands.push(`${labelCorner} = (${Cx}, ${Cy})`);
-        commands.push(`SetPointSize(${labelCorner}, 3)`);
-        commands.push(`SetColor(${labelCorner}, 0, 0, 0)`);
-        commands.push(`ShowLabel(${labelCorner}, true)`);
-        commands.push(`SetLabelMode(${labelCorner}, 0)`);
-
-        commands.push(`${labelTop} = (${Tx}, ${Ty})`);
-        commands.push(`SetPointSize(${labelTop}, 3)`);
-        commands.push(`SetColor(${labelTop}, 0, 0, 0)`);
-        commands.push(`ShowLabel(${labelTop}, true)`);
-        commands.push(`SetLabelMode(${labelTop}, 0)`);
-
-        commands.push(`${labelRight} = (${Rx}, ${Ry})`);
-        commands.push(`SetPointSize(${labelRight}, 3)`);
-        commands.push(`SetColor(${labelRight}, 0, 0, 0)`);
-        commands.push(`ShowLabel(${labelRight}, true)`);
-        commands.push(`SetLabelMode(${labelRight}, 0)`);
-        
-        // 2. Draw Segments explicitly
-        // We need to know which segment corresponds to a, b, c
-        // a is opposite A. b is opposite B. c is opposite C.
-        
-        // Helper to set color and label
-        const setStyle = (objName: string, key: string, val: number | string) => {
-            commands.push(`SetLineThickness(${objName}, 5)`);
-            
-            // Color
-            if (toFind.includes(key)) {
-                commands.push(`SetColor(${objName}, 255, 0, 0)`); // Red
-                commands.push(`SetCaption(${objName}, "?")`);
-                commands.push(`SetLabelMode(${objName}, 3)`); // Caption
-            } else {
-                commands.push(`SetColor(${objName}, 0, 0, 0)`); // Black
-                // Default label (name)
-                const displayName = key === 'alpha' ? 'α' : key === 'beta' ? 'β' : key === 'gamma' ? 'γ' : key;
-                commands.push(`SetCaption(${objName}, "${displayName}")`);
-                commands.push(`SetLabelMode(${objName}, 3)`);
-            }
-        };
-
-        // Draw segments between points
-        // Segment BC is 'a'
-        commands.push('seg_a = Segment(B, C)');
-        setStyle('seg_a', 'a', a);
-
-        // Segment AC is 'b'
-        commands.push('seg_b = Segment(A, C)');
-        setStyle('seg_b', 'b', b);
-
-        // Segment AB is 'c'
-        commands.push('seg_c = Segment(A, B)');
-        setStyle('seg_c', 'c', c);
-
-        // 3. Draw Polygon for fill (background)
-        commands.push('poly1 = Polygon(A, B, C)');
-        commands.push('SetColor(poly1, 240, 240, 240)');
-        commands.push('SetLineThickness(poly1, 0)'); // Hide polygon edges
-        commands.push('SetLayer(poly1, 0)'); // Move to back
-
-        // 4. Draw Angles
-        // Determine winding order: 
-        // Orientation 0 (BL) and 2 (TR) are Clockwise (CW) IF we define points in specific order?
-        // Actually, let's just use the standard Angle(Point, Vertex, Point) logic.
-        // But we need to know if it's reflex or not.
-        // The "Corner" angle is always 90.
-        // The other two depend on orientation.
-        
-        // Let's use the "isCCW" logic again, but we need to map it to our points.
-        // Orientation 0: Corner(BL) -> Right(BR) -> Top(TL) is CCW.
-        // Wait, Corner(0,0), Right(w,0), Top(0,h).
-        // Vector Corner->Right is (w,0). Corner->Top is (0,h). Cross product is positive (k). So CCW.
-        // Orientation 1: Corner(BR) -> Right(BL) -> Top(TR).
-        // Corner(w,0), Right(0,0), Top(w,h).
-        // Vector Corner->Right (-w,0). Corner->Top (0,h). Cross product (-w*h) negative. CW.
-        
-        // Let's simplify: Just draw Angle(P1, Vertex, P2) and if it's > 180, swap P1/P2?
-        // Or just use the orientation flag.
-        
-        // Orientation 0 (BL): CCW
-        // Orientation 1 (BR): CW
-        // Orientation 2 (TR): CCW
-        // Orientation 3 (TL): CW
-        
-        const isCCW = (orientation === 0 || orientation === 2);
-
-        // Helper to draw angle
-        const drawAngle = (name: string, vertex: string, p1: string, p2: string, val: number) => {
-            if (isCCW) {
-                commands.push(`${name} = Angle(${p2}, ${vertex}, ${p1})`);
-            } else {
-                commands.push(`${name} = Angle(${p1}, ${vertex}, ${p2})`);
-            }
-            
-            commands.push(`SetLineThickness(${name}, 3)`);
-            
-            // Style
-            if (toFind.includes(name.replace('_ang', ''))) {
-                commands.push(`SetColor(${name}, 255, 0, 0)`);
-                commands.push(`SetCaption(${name}, "?")`);
-                commands.push(`SetLabelMode(${name}, 3)`);
-            } else if (val === 90) {
-                // 90 degree angle - black, no label
-                commands.push(`SetColor(${name}, 0, 0, 0)`);
-                commands.push(`ShowLabel(${name}, false)`);
-            } else {
-                commands.push(`SetColor(${name}, 0, 0, 0)`);
-                const displayName = name === 'alpha_ang' ? 'α' : name === 'beta_ang' ? 'β' : 'γ';
-                commands.push(`SetCaption(${name}, "${displayName}")`);
-                commands.push(`SetLabelMode(${name}, 3)`);
-            }
-        };
-
-        // Alpha at A
-        // Neighbors of A are B and C
-        drawAngle('alpha_ang', 'A', 'B', 'C', currentTask.alpha);
-
-        // Beta at B
-        // Neighbors of B are A and C
-        drawAngle('beta_ang', 'B', 'C', 'A', currentTask.beta);
-
-        // Gamma at C
-        // Neighbors of C are A and B
-        drawAngle('gamma_ang', 'C', 'A', 'B', currentTask.gamma);
-
-        
-        // 5. View Settings
-        // Calculate center
-        // Bounding box is roughly (0,0) to (width, height) but shifted based on orientation.
-        // We can just use the max dimension.
-        const maxDim = Math.max(width, height);
-        const margin = maxDim * 0.2;
+        const highlightSides = currentTask.toFind.filter(isSideKey) as TaskSideKey[];
+        const highlightAngles = currentTask.toFind.filter(isAngleKey) as TaskAngleKey[];
 
         return (
-            <div className="w-full max-w-[600px] mx-auto">
-                <GeoGebraApplet 
-                    id="ggb-rechtwinklig-strecken"
-                    width={600}
-                    height={450}
-                    commands={commands}
-                    coordSystem={{
-                        xmin: -margin,
-                        xmax: width + margin,
-                        ymin: -margin,
-                        ymax: height + margin
-                    }}
-                    showToolBar={false}
-                    showAlgebraInput={false}
-                    showMenuBar={false}
+            <div className="w-full max-w-[500px] mx-auto h-[350px] bg-gray-50 rounded-lg border-2 border-gray-200 p-4">
+                <RightTriangleTaskSVG
+                    rightAngleAtPoint={rightAnglePoint}
+                    highlightSides={highlightSides}
+                    highlightAngles={highlightAngles}
                 />
             </div>
         );
