@@ -99,6 +99,7 @@ import AbschlusstestQF from './pages/quadratische_funktionen/Abschlusstest';
 // Trigonometrie
 import TrigonometrieIndex from './pages/TrigonometrieIndex';
 import RechtwinkligBeschriften from './pages/trigonometrie/RechtwinkligBeschriften';
+import SinusKosinusTangensErkennen from './pages/trigonometrie/SinusKosinusTangensErkennen';
 import Rechtwinklig2 from './pages/trigonometrie/Rechtwinklig2';
 import Sinussatz from './pages/trigonometrie/Sinussatz';
 import Kosinussatz from './pages/trigonometrie/Kosinussatz';
@@ -272,6 +273,7 @@ export default function App() {
           
           <Route path="/trigonometrie" element={<TrigonometrieIndex />} />
           <Route path="/trigonometrie/rechtwinklig-beschriften" element={<RechtwinkligBeschriften />} />
+          <Route path="/trigonometrie/sinus-kosinus-tangens-erkennen" element={<SinusKosinusTangensErkennen />} />
           <Route path="/trigonometrie/rechtwinklig2" element={<Rechtwinklig2 />} />
           <Route path="/trigonometrie/sinussatz" element={<Sinussatz />} />
           <Route path="/trigonometrie/kosinussatz" element={<Kosinussatz />} />
