@@ -25,6 +25,18 @@ const greekSymbols: Record<'alpha' | 'beta' | 'gamma', string> = {
   gamma: 'γ',
 };
 
+const trigFormula: Record<TrigFunction, string> = {
+  sin: '\\sin(\\alpha) = \\dfrac{\\text{Gegenkathete}}{\\text{Hypotenuse}}',
+  cos: '\\cos(\\alpha) = \\dfrac{\\text{Ankathete}}{\\text{Hypotenuse}}',
+  tan: '\\tan(\\alpha) = \\dfrac{\\text{Gegenkathete}}{\\text{Ankathete}}',
+};
+
+const trigExplanation: Record<TrigFunction, string> = {
+  sin: 'Der Sinus eines Winkels ist immer das Verhältnis aus Gegenkathete und Hypotenuse.',
+  cos: 'Der Kosinus eines Winkels ist immer das Verhältnis aus Ankathete und Hypotenuse.',
+  tan: 'Der Tangens eines Winkels ist immer das Verhältnis aus Gegenkathete und Ankathete.',
+};
+
 interface Triangle {
   rightAngleAtPoint: string;
   markedAngleAtPoint: string;
@@ -140,7 +152,6 @@ const SinusKosinusTangensErkennen: React.FC = () => {
   const [selected, setSelected] = useState<string | null>(null);
   const [taskCount, setTaskCount] = useState(0);
   const [correct, setCorrect] = useState(0);
-  const [showHelp, setShowHelp] = useState(false);
 
   const nextQuestion = () => {
     setQuestion(buildQuestion());
@@ -183,27 +194,20 @@ const SinusKosinusTangensErkennen: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="mb-6">
-            <button
-              onClick={() => setShowHelp(!showHelp)}
-              className="text-sm font-semibold text-blue-600 hover:text-blue-800"
-            >
-              {showHelp ? 'Merkhilfe verbergen' : 'Merkhilfe anzeigen'}
-            </button>
-            {showHelp && (
-              <div className="mt-4 bg-blue-50 border border-blue-100 rounded-xl p-4 grid sm:grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="font-semibold text-blue-900 mb-1">Sinus</p>
-                  <InlineMath math={'\\sin(\\alpha) = \\dfrac{\\text{Gegenkathete}}{\\text{Hypotenuse}}'} />
-                </div>
-                <div>
-                  <p className="font-semibold text-blue-900 mb-1">Kosinus</p>
-                  <InlineMath math={'\\cos(\\alpha) = \\dfrac{\\text{Ankathete}}{\\text{Hypotenuse}}'} />
-                </div>
-                <div>
-                  <p className="font-semibold text-blue-900 mb-1">Tangens</p>
-                  <InlineMath math={'\\tan(\\alpha) = \\dfrac{\\text{Gegenkathete}}{\\text{Ankathete}}'} />
-                </div>
+          <div className="mb-6 bg-blue-50 border border-blue-100 rounded-xl p-4">
+            {question.type === 'functionToRatio' ? (
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-center">
+                <InlineMath math={trigFormula[question.askedFunction!]} />
+                <p className="text-blue-900 text-sm sm:text-base">{trigExplanation[question.askedFunction!]}</p>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-3 gap-4 text-center">
+                {(['sin', 'cos', 'tan'] as TrigFunction[]).map((fn) => (
+                  <div key={fn}>
+                    <p className="font-semibold text-blue-900 mb-1">{trigFunctionLabel[fn]}</p>
+                    <InlineMath math={trigFormula[fn]} />
+                  </div>
+                ))}
               </div>
             )}
           </div>
