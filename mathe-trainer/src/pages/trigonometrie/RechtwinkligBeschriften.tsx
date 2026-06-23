@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import GeoGebraRightTriangle from '../../components/GeoGebraRightTriangle';
+import RightTriangleSVG from '../../components/RightTriangleSVG';
 
 interface Task {
   id: number;
@@ -193,17 +193,17 @@ const RechtwinkligBeschriften: React.FC = () => {
             {/* GeoGebra Darstellung */}
             <div className="flex flex-col items-center justify-center">
               <div className="bg-gray-50 rounded-lg w-full h-96 border-2 border-gray-200 flex items-center justify-center">
-                <GeoGebraRightTriangle
+                <RightTriangleSVG
                   pointA={currentTask.pointA}
                   pointB={currentTask.pointB}
                   pointC={currentTask.pointC}
                   sideA={currentTask.sideA}
                   sideB={currentTask.sideB}
                   sideC={currentTask.sideC}
-                  markedAngle={currentTask.markedAngle}
                   rightAngleAtPoint={currentTask.rightAngleAtPoint}
+                  markedAngle={currentTask.markedAngle}
                   markedAngleAtPoint={currentTask.markedAngleAtPoint}
-                  width={500}
+                  width={400}
                   height={350}
                 />
               </div>
