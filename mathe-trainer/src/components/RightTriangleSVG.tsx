@@ -10,9 +10,12 @@ interface RightTriangleSVGProps {
   rightAngleAtPoint: string;  // Punkt wo der 90° Winkel ist
   markedAngle?: 'alpha' | 'beta';
   markedAngleAtPoint?: string; // Punkt wo der markierte Winkel ist
-  width?: number;
-  height?: number;
 }
+
+// Virtuelles Koordinatensystem für die Geometrie-Berechnung.
+// Das SVG selbst skaliert über viewBox + width/height="100%" auf den verfügbaren Platz.
+const VIEW_WIDTH = 320;
+const VIEW_HEIGHT = 260;
 
 const RightTriangleSVG: React.FC<RightTriangleSVGProps> = ({
   pointA,
@@ -23,12 +26,13 @@ const RightTriangleSVG: React.FC<RightTriangleSVGProps> = ({
   sideC,
   rightAngleAtPoint,
   markedAngleAtPoint,
-  width = 400,
-  height = 400,
 }) => {
+  const width = VIEW_WIDTH;
+  const height = VIEW_HEIGHT;
+
   // Katheten-Längen (in SVG-Einheiten)
-  const cathetus1 = 120;
-  const cathetus2 = 80;
+  const cathetus1 = 200;
+  const cathetus2 = 140;
 
   // Bestimme die Positionen der Punkte
   let posA: [number, number];
@@ -36,7 +40,7 @@ const RightTriangleSVG: React.FC<RightTriangleSVGProps> = ({
   let posC: [number, number];
   let rightAnglePoint: [number, number];
 
-  const margin = 50;
+  const margin = 40;
 
   if (rightAngleAtPoint === pointA) {
     // Rechter Winkel bei A (oben links)
@@ -104,37 +108,27 @@ const RightTriangleSVG: React.FC<RightTriangleSVGProps> = ({
     ];
 
     if (isRightAngle) {
-      // Zeichne ein kleines Quadrat-Symbol für den rechten Winkel
-      const squareSize = 12;
-      const p1Normalized = [(v1[0] / len1) * squareSize, (v1[1] / len1) * squareSize];
-      const p2Normalized = [(v2[0] / len2) * squareSize, (v2[1] / len2) * squareSize];
+      // Zeichne einen grauen Viertelkreis-Bogen mit Punkt für den rechten Winkel
+      const angle1 = Math.atan2(v1[1], v1[0]);
+      const angle2 = Math.atan2(v2[1], v2[0]);
+      const largeArc = Math.abs(angle2 - angle1) > Math.PI ? 1 : 0;
+
+      const sectorPath = `
+        M ${vertex[0]} ${vertex[1]}
+        L ${start[0]} ${start[1]}
+        A ${radius} ${radius} 0 ${largeArc} 1 ${end[0]} ${end[1]}
+        Z
+      `;
+
+      const midAngle = (angle1 + angle2) / 2;
+      const dotRadius = radius * 0.55;
+      const dotX = vertex[0] + Math.cos(midAngle) * dotRadius;
+      const dotY = vertex[1] + Math.sin(midAngle) * dotRadius;
 
       return (
         <g key={`angle-${label}`}>
-          <line
-            x1={vertex[0]}
-            y1={vertex[1]}
-            x2={vertex[0] + p1Normalized[0]}
-            y2={vertex[1] + p1Normalized[1]}
-            stroke="black"
-            strokeWidth="1.5"
-          />
-          <line
-            x1={vertex[0] + p1Normalized[0]}
-            y1={vertex[1] + p1Normalized[1]}
-            x2={vertex[0] + p1Normalized[0] + p2Normalized[0]}
-            y2={vertex[1] + p1Normalized[1] + p2Normalized[1]}
-            stroke="black"
-            strokeWidth="1.5"
-          />
-          <line
-            x1={vertex[0]}
-            y1={vertex[1]}
-            x2={vertex[0] + p2Normalized[0]}
-            y2={vertex[1] + p2Normalized[1]}
-            stroke="black"
-            strokeWidth="1.5"
-          />
+          <path d={sectorPath} fill="#9CA3AF" fillOpacity="0.35" stroke="#6B7280" strokeWidth="1" />
+          <circle cx={dotX} cy={dotY} r="2.5" fill="#374151" />
         </g>
       );
     } else {
@@ -182,7 +176,12 @@ const RightTriangleSVG: React.FC<RightTriangleSVGProps> = ({
   const isRightAngleAtC = rightAngleAtPoint === pointC;
 
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+    <svg
+      width="100%"
+      height="100%"
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="xMidYMid meet"
+    >
       {/* Dreieck zeichnen */}
       <polygon
         points={`${posA[0]},${posA[1]} ${posB[0]},${posB[1]} ${posC[0]},${posC[1]}`}

@@ -47,14 +47,11 @@ const RechtwinkligBeschriften: React.FC = () => {
       ['P', 'Q', 'R'],
       ['X', 'Y', 'Z'],
     ];
-    const sides = [
-      ['a', 'b', 'c'],
-      ['x', 'y', 'z'],
-    ];
 
     const selectedPoints = points[Math.floor(Math.random() * points.length)];
-    const selectedSides = sides[Math.floor(Math.random() * sides.length)];
-    
+    // Seite gegenüber einem Punkt trägt immer dessen Kleinbuchstaben als Namen
+    const selectedSides = selectedPoints.map((p) => p.toLowerCase());
+
     // Zufällig entscheiden, wo der rechte Winkel ist
     const rightAngleOptions = [selectedPoints[0], selectedPoints[1], selectedPoints[2]];
     const rightAngleAtPoint = rightAngleOptions[Math.floor(Math.random() * 3)];
@@ -192,7 +189,7 @@ const RechtwinkligBeschriften: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* GeoGebra Darstellung */}
             <div className="flex flex-col items-center justify-center">
-              <div className="bg-gray-50 rounded-lg w-full h-96 border-2 border-gray-200 flex items-center justify-center">
+              <div className="bg-gray-50 rounded-lg w-full h-[450px] border-2 border-gray-200 p-4">
                 <RightTriangleSVG
                   pointA={currentTask.pointA}
                   pointB={currentTask.pointB}
@@ -203,8 +200,6 @@ const RechtwinkligBeschriften: React.FC = () => {
                   rightAngleAtPoint={currentTask.rightAngleAtPoint}
                   markedAngle={currentTask.markedAngle}
                   markedAngleAtPoint={currentTask.markedAngleAtPoint}
-                  width={400}
-                  height={350}
                 />
               </div>
               <p className="text-sm text-gray-600 mt-4 text-center">
