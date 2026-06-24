@@ -196,7 +196,7 @@ const SinusKosinusTangensErkennen: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="flex justify-center mb-6">
+          <div className="flex flex-wrap justify-center gap-4 mb-6">
             <a
               href={LERNVIDEO_URL}
               target="_blank"
@@ -204,6 +204,13 @@ const SinusKosinusTangensErkennen: React.FC = () => {
               className="inline-flex items-center gap-2 px-5 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
             >
               ▶ Lernvideo
+            </a>
+            <a
+              href="/downloads/sinus-kosinus-tangens-erkennen-uebungen.pdf"
+              download
+              className="inline-flex items-center gap-2 px-5 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition"
+            >
+              📄 Übungsblatt (PDF) herunterladen
             </a>
           </div>
 

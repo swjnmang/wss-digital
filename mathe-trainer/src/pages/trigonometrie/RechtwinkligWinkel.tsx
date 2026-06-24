@@ -533,6 +533,16 @@ const RechtwinkligWinkel: React.FC = () => {
                 </div>
 
                 <div className="flex justify-center mb-6">
+                    <a
+                        href="/downloads/winkel-berechnen-sinus-kosinus-tangens-uebungen.pdf"
+                        download
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-colors"
+                    >
+                        📄 Übungsblatt (PDF) herunterladen
+                    </a>
+                </div>
+
+                <div className="flex justify-center mb-6">
                     {renderTriangle()}
                 </div>
 

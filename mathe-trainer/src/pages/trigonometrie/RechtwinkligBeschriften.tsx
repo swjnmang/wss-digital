@@ -187,6 +187,16 @@ const RechtwinkligBeschriften: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="flex justify-center mb-6">
+            <a
+              href="/downloads/rechtwinklige-dreiecke-beschriften-uebungen.pdf"
+              download
+              className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition"
+            >
+              📄 Übungsblatt (PDF) herunterladen
+            </a>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* GeoGebra Darstellung */}
             <div className="flex flex-col items-center justify-center">
