@@ -36,6 +36,8 @@ PROBLEMS = [
     dict(right='B', marked='A', angle=42, given_role='adj', given_value=9.0, target_role='opp'),
     dict(right='C', marked='A', angle=28, given_role='adj', given_value=12.0, target_role='opp'),
     dict(right='A', marked='B', angle=55, given_role='opp', given_value=5.0, target_role='hyp'),
+    dict(right='B', marked='A', angle=33, given_role='opp', given_value=8.0, target_role='hyp'),
+    dict(right='A', marked='B', angle=48, given_role='opp', given_value=9.0, target_role='adj'),
 ]
 
 FN_FOR_ROLES = {
@@ -102,7 +104,7 @@ def header(c, title, subtitle=None):
 def footer(c, page_num):
     c.setFont('Helvetica', 8)
     c.setFillColorRGB(*GRAY)
-    c.drawCentredString(PAGE_W / 2, 10 * mm, f'WSS-Digital Mathe-Trainer  ·  Seite {page_num}')
+    c.drawCentredString(PAGE_W / 2, 10 * mm, f'wss-digital.de - Mathetrainer  ·  Seite {page_num}')
     c.setFillColorRGB(*BLACK)
 
 

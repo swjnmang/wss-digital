@@ -16,6 +16,8 @@ PROBLEMS = [
     ('C', 'B'),
     ('A', 'C'),
     ('B', 'A'),
+    ('C', 'A'),
+    ('B', 'C'),
 ]
 
 ANGLE_AT = {'A': 'alpha', 'B': 'beta', 'C': 'gamma'}
@@ -51,7 +53,7 @@ def header(c, title, subtitle=None):
 def footer(c, page_num):
     c.setFont('Helvetica', 8)
     c.setFillColorRGB(*GRAY)
-    c.drawCentredString(PAGE_W / 2, 10 * mm, f'WSS-Digital Mathe-Trainer  ·  Seite {page_num}')
+    c.drawCentredString(PAGE_W / 2, 10 * mm, f'wss-digital.de - Mathetrainer  ·  Seite {page_num}')
     c.setFillColorRGB(*BLACK)
 
 

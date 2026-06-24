@@ -43,6 +43,8 @@ PROBLEMS = [
     dict(right='B', marked='A', mode='cos', adj=6.0, hyp=11.0),
     dict(right='A', marked='B', mode='tan', opp=7.0, adj=10.0),
     dict(right='A', marked='C', mode='cos', adj=5.0, hyp=13.0),
+    dict(right='C', marked='B', mode='tan', opp=9.5, adj=6.0),
+    dict(right='B', marked='C', mode='cos', adj=7.0, hyp=15.0),
 ]
 
 
@@ -79,7 +81,7 @@ def header(c, title, subtitle=None):
 def footer(c, page_num):
     c.setFont('Helvetica', 8)
     c.setFillColorRGB(*GRAY)
-    c.drawCentredString(PAGE_W / 2, 10 * mm, f'WSS-Digital Mathe-Trainer  ·  Seite {page_num}')
+    c.drawCentredString(PAGE_W / 2, 10 * mm, f'wss-digital.de - Mathetrainer  ·  Seite {page_num}')
     c.setFillColorRGB(*BLACK)
 
 

@@ -40,6 +40,8 @@ PROBLEMS = [
     dict(right='B', marked='C', mode='ratio2func', ratio=('a', 'b')),
     dict(right='C', marked='A', mode='ratio2func', ratio=('b', 'a')),
     dict(right='A', marked='B', mode='ratio2func', ratio=('b', 'a')),
+    dict(right='B', marked='A', mode='func2ratio', fn='sin'),
+    dict(right='A', marked='C', mode='ratio2func', ratio=('c', 'b')),
 ]
 
 FN_NAME = {'sin': 'Sinus', 'cos': 'Kosinus', 'tan': 'Tangens'}
@@ -59,7 +61,7 @@ def header(c, title, subtitle=None):
 def footer(c, page_num):
     c.setFont('Helvetica', 8)
     c.setFillColorRGB(*GRAY)
-    c.drawCentredString(PAGE_W / 2, 10 * mm, f'WSS-Digital Mathe-Trainer  ·  Seite {page_num}')
+    c.drawCentredString(PAGE_W / 2, 10 * mm, f'wss-digital.de - Mathetrainer  ·  Seite {page_num}')
     c.setFillColorRGB(*BLACK)
 
 
