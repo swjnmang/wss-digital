@@ -38,6 +38,7 @@ const RechtwinkligBeschriften: React.FC = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
+  const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Generiere eine neue Aufgabe mit variablen Dreiecks-Orientierungen
@@ -108,32 +109,53 @@ const RechtwinkligBeschriften: React.FC = () => {
     };
   };
 
-  const handleDragStart = (e: React.DragEvent, item: DragItem) => {
-    setDraggedItem(item);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDrop = (e: React.DragEvent, target: 'hypotenuse' | 'opposite' | 'adjacent') => {
-    e.preventDefault();
-    
-    if (draggedItem) {
-      setAssignments((prev) => {
-        const newAssignments = { ...prev };
-        Object.keys(newAssignments).forEach((key) => {
-          if (newAssignments[key as keyof Assignments] === draggedItem.label) {
-            newAssignments[key as keyof Assignments] = null;
-          }
-        });
-        newAssignments[target] = draggedItem.label;
-        return newAssignments;
+  // Pointer-Events statt HTML5-Drag&Drop, damit es auch auf Touch-Geräten (iPad etc.) funktioniert
+  const assignTarget = (item: DragItem, target: 'hypotenuse' | 'opposite' | 'adjacent') => {
+    setAssignments((prev) => {
+      const newAssignments = { ...prev };
+      Object.keys(newAssignments).forEach((key) => {
+        if (newAssignments[key as keyof Assignments] === item.label) {
+          newAssignments[key as keyof Assignments] = null;
+        }
       });
+      newAssignments[target] = item.label;
+      return newAssignments;
+    });
+  };
+
+  const handlePointerDown = (e: React.PointerEvent, item: DragItem) => {
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setDraggedItem(item);
+    setDragPos({ x: e.clientX, y: e.clientY });
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!draggedItem) return;
+    e.preventDefault();
+    setDragPos({ x: e.clientX, y: e.clientY });
+  };
+
+  const finishDrag = (e: React.PointerEvent) => {
+    if (draggedItem) {
+      const dropEl = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+      const zoneEl = dropEl?.closest('[data-dropzone]') as HTMLElement | null;
+      if (zoneEl) {
+        const target = zoneEl.dataset.dropzone as 'hypotenuse' | 'opposite' | 'adjacent';
+        assignTarget(draggedItem, target);
+      }
     }
     setDraggedItem(null);
+    setDragPos(null);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    finishDrag(e);
+  };
+
+  const handlePointerCancel = (e: React.PointerEvent) => {
+    setDraggedItem(null);
+    setDragPos(null);
   };
 
   const handleRemoveAssignment = (target: 'hypotenuse' | 'opposite' | 'adjacent') => {
@@ -228,8 +250,7 @@ const RechtwinkligBeschriften: React.FC = () => {
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-20 bg-gray-50">
                   <p className="text-sm font-semibold text-gray-600 mb-2">Hypotenuse</p>
                   <div
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, 'hypotenuse')}
+                    data-dropzone="hypotenuse"
                     className="bg-white border border-gray-300 rounded p-3 min-h-12 flex items-center justify-between"
                   >
                     {assignments.hypotenuse ? (
@@ -254,8 +275,7 @@ const RechtwinkligBeschriften: React.FC = () => {
                     Gegenkathete von {greekSymbol}
                   </p>
                   <div
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, 'opposite')}
+                    data-dropzone="opposite"
                     className="bg-white border border-gray-300 rounded p-3 min-h-12 flex items-center justify-between"
                   >
                     {assignments.opposite ? (
@@ -280,8 +300,7 @@ const RechtwinkligBeschriften: React.FC = () => {
                     Ankathete von {greekSymbol}
                   </p>
                   <div
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, 'adjacent')}
+                    data-dropzone="adjacent"
                     className="bg-white border border-gray-300 rounded p-3 min-h-12 flex items-center justify-between"
                   >
                     {assignments.adjacent ? (
@@ -308,15 +327,20 @@ const RechtwinkligBeschriften: React.FC = () => {
                   {availableSides.map((side) => (
                     <div
                       key={side}
-                      draggable
-                      onDragStart={(e) =>
-                        handleDragStart(e, {
+                      onPointerDown={(e: React.PointerEvent<HTMLDivElement>) =>
+                        handlePointerDown(e, {
                           label: side,
-                          correctType: side === correctAssignments.hypotenuse ? 'hypotenuse' : 
+                          correctType: side === correctAssignments.hypotenuse ? 'hypotenuse' :
                                        side === correctAssignments.opposite ? 'opposite' : 'adjacent',
                         })
                       }
-                      className="bg-blue-100 border-2 border-blue-500 rounded-lg p-3 cursor-grab active:cursor-grabbing font-bold text-lg hover:bg-blue-200 transition"
+                      onPointerMove={handlePointerMove}
+                      onPointerUp={handlePointerUp}
+                      onPointerCancel={handlePointerCancel}
+                      style={{ touchAction: 'none' }}
+                      className={`bg-blue-100 border-2 border-blue-500 rounded-lg p-3 cursor-grab active:cursor-grabbing font-bold text-lg hover:bg-blue-200 transition select-none ${
+                        draggedItem?.label === side ? 'opacity-40' : ''
+                      }`}
                     >
                       {side}
                     </div>
@@ -355,6 +379,22 @@ const RechtwinkligBeschriften: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {draggedItem && dragPos && (
+        <div
+          style={{
+            position: 'fixed',
+            left: dragPos.x,
+            top: dragPos.y,
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none',
+            zIndex: 50,
+          }}
+          className="bg-blue-200 border-2 border-blue-600 rounded-lg p-3 font-bold text-lg shadow-lg"
+        >
+          {draggedItem.label}
+        </div>
+      )}
     </div>
   );
 };
