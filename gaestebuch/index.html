@@ -15,7 +15,7 @@
     </header>
 
     <main class="layout">
-      <section class="form-card">
+      <section class="form-card" id="formStep">
         <form id="entryForm">
           <label for="nameInput">Euer Name</label>
           <input id="nameInput" type="text" maxlength="60" placeholder="Vorname Nachname" required autocomplete="off">
@@ -24,16 +24,21 @@
           <textarea id="messageInput" maxlength="500" rows="4" placeholder="Schreibt uns ein paar schöne Worte..." required></textarea>
 
           <label for="photoInput">Foto (optional)</label>
-          <input id="photoInput" type="file" accept="image/*">
+          <div class="photo-buttons">
+            <label class="photo-btn" for="photoCapture">📷 Foto aufnehmen</label>
+            <input id="photoCapture" type="file" accept="image/*" capture="environment" class="visually-hidden">
+            <label class="photo-btn secondary" for="photoLibrary">🖼️ Aus Galerie wählen</label>
+            <input id="photoLibrary" type="file" accept="image/*" class="visually-hidden">
+          </div>
           <img id="photoPreview" class="photo-preview hidden" alt="Vorschau">
 
           <button type="submit" id="submitBtn">Eintragen</button>
           <p id="formError" class="error hidden"></p>
-          <p id="formSuccess" class="success hidden">Danke für euren Eintrag! 💛</p>
         </form>
       </section>
 
-      <section class="entries-card">
+      <section class="entries-card hidden" id="entriesStep">
+        <p class="success">Danke für euren Eintrag! 💛</p>
         <h2>Bisherige Einträge</h2>
         <div id="entriesList" class="entries-list">
           <p class="empty">Noch keine Einträge.</p>

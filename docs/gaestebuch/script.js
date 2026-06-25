@@ -38,8 +38,6 @@ async function initFirebase() {
     serverTimestampFn = serverTimestamp;
     firestoreFns = { addDoc, query, orderBy, getDocs };
     firestoreReady = true;
-
-    await renderEntries();
   } catch (err) {
     console.error("Firebase konnte nicht initialisiert werden:", err);
   }
@@ -146,35 +144,40 @@ async function submitEntry({ name, message, photoFile }) {
   await renderEntries();
 }
 
-const photoInput = document.getElementById("photoInput");
+const photoCapture = document.getElementById("photoCapture");
+const photoLibrary = document.getElementById("photoLibrary");
 const photoPreview = document.getElementById("photoPreview");
+let selectedPhotoFile = null;
 
-photoInput.addEventListener("change", () => {
-  const file = photoInput.files[0];
-  if (!file) {
-    photoPreview.classList.add("hidden");
-    return;
-  }
+function handlePhotoSelected(input) {
+  const file = input.files[0];
+  if (!file) return;
   if (file.size > MAX_IMAGE_BYTES) {
     alert("Das Bild ist zu groß (max. 8 MB). Bitte ein kleineres Foto wählen.");
-    photoInput.value = "";
-    photoPreview.classList.add("hidden");
+    input.value = "";
     return;
   }
+  selectedPhotoFile = file;
   photoPreview.src = URL.createObjectURL(file);
   photoPreview.classList.remove("hidden");
-});
+}
+
+photoCapture.addEventListener("change", () => handlePhotoSelected(photoCapture));
+photoLibrary.addEventListener("change", () => handlePhotoSelected(photoLibrary));
+
+async function showEntriesStep() {
+  document.getElementById("formStep").classList.add("hidden");
+  document.getElementById("entriesStep").classList.remove("hidden");
+  await renderEntries();
+}
 
 document.getElementById("entryForm").addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const errorEl = document.getElementById("formError");
-  const successEl = document.getElementById("formSuccess");
   errorEl.classList.add("hidden");
-  successEl.classList.add("hidden");
 
   const name = document.getElementById("nameInput").value.trim();
   const message = document.getElementById("messageInput").value.trim();
-  const photoFile = photoInput.files[0] || null;
   if (!name || !message) return;
 
   const submitBtn = document.getElementById("submitBtn");
@@ -182,10 +185,8 @@ document.getElementById("entryForm").addEventListener("submit", async (ev) => {
   submitBtn.textContent = "Wird gespeichert...";
 
   try {
-    await submitEntry({ name, message, photoFile });
-    document.getElementById("entryForm").reset();
-    photoPreview.classList.add("hidden");
-    successEl.classList.remove("hidden");
+    await submitEntry({ name, message, photoFile: selectedPhotoFile });
+    await showEntriesStep();
   } catch (err) {
     console.error(err);
     errorEl.textContent = "Eintragen fehlgeschlagen. Bitte erneut versuchen oder ein kleineres Foto wählen.";
@@ -197,4 +198,3 @@ document.getElementById("entryForm").addEventListener("submit", async (ev) => {
 });
 
 initFirebase();
-renderEntries();
