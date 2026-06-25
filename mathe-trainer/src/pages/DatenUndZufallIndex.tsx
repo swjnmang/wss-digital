@@ -47,21 +47,21 @@ export default function DatenUndZufallIndex() {
         </div>
       </header>
 
-      <main className="flex-1 w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12 flex items-center justify-center">
-        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-10 py-6 sm:py-8 flex items-center justify-center">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
           {topics.map((topic) => {
             const Icon = topic.icon;
             return (
               <Link
                 key={topic.path}
                 to={topic.path}
-                className="bg-white rounded-2xl p-6 sm:p-8 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100"
+                className="bg-white rounded-2xl p-4 sm:p-5 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100"
               >
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-blue-50 flex items-center justify-center text-[var(--accent)] mb-4 sm:mb-5">
-                  <Icon className="w-6 h-6" />
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-blue-50 flex items-center justify-center text-[var(--accent)] mb-3">
+                  <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-slate-800">{topic.title}</h3>
-                <p className="text-slate-500 leading-relaxed mb-4 sm:mb-5 text-sm sm:text-base">{topic.description}</p>
+                <h3 className="text-base sm:text-lg font-semibold mb-1.5 text-slate-800">{topic.title}</h3>
+                <p className="text-slate-500 leading-snug text-sm">{topic.description}</p>
                 <div className="mt-auto" aria-hidden="true" />
               </Link>
             );
