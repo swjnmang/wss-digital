@@ -1,0 +1,265 @@
+:root {
+  --green: #1f9d55;
+  --red: #d64545;
+  --blue: #2563eb;
+  --bg: #f5f6fa;
+  --card-bg: #ffffff;
+  --border: #d6d9e0;
+  --text: #1f2430;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+  font-size: 2rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: #5a6072;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-wrap {
+  overflow-x: auto;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.crossword {
+  display: inline-grid;
+  gap: 2px;
+}
+
+.cw-cell {
+  position: relative;
+  width: 32px;
+  height: 32px;
+}
+
+.cw-cell.blocked {
+  background: transparent;
+}
+
+.cw-cell input {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text);
+  padding: 0;
+}
+
+.cw-cell input:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+.cw-cell input.correct {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+
+.cw-cell input.incorrect {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+
+.cw-number {
+  position: absolute;
+  top: 1px;
+  left: 3px;
+  font-size: 0.55rem;
+  color: #888;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.cw-cell input.correct + .cw-number,
+.cw-cell input.incorrect + .cw-number {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: #5a6072;
+  margin: 0 0 10px;
+}
+
+.progress-bar {
+  height: 10px;
+  border-radius: 6px;
+  background: #e7e9f0;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--blue);
+  transition: width 0.2s ease;
+}
+
+.highscore-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: rank;
+}
+
+.highscore-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+
+.highscore-list li:last-child {
+  border-bottom: none;
+}
+
+.highscore-list li:not(.empty)::before {
+  counter-increment: rank;
+  content: counter(rank) ".";
+  font-weight: 700;
+  margin-right: 8px;
+  color: var(--blue);
+}
+
+.highscore-list li.empty {
+  color: #888;
+  font-style: italic;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.overlay-box {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+
+.overlay-box h2 {
+  margin-top: 0;
+}
+
+#nameForm {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+#nameInput {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+#nameForm button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--blue);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  margin-top: 14px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  color: #5a6072;
+}
+
+.error {
+  color: var(--red);
+  font-size: 0.85rem;
+}
+
+.error.hidden {
+  display: none;
+}

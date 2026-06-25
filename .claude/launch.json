@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "kreuzwortraetsel",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", "kreuzwortraetsel", "-p", "8123", "-c-1"],
+      "port": 8123
+    }
+  ]
+}

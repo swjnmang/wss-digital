@@ -9,6 +9,8 @@ Zentrale Landingpage der Wirtschaftsschule digital mit Links zu mehreren eigenst
 - `mathe-trainer/` – Vite/Tailwind-App mit interaktiven Matheaufgaben (deployt via Vercel, Root-Dir entsprechend wählen).
 - `planspiel/` – statisches Wirtschaftsplanspiel „Markt-Match 5“ (reine HTML/CSS/JS-Dateien, lokal oder über Pages lauffähig).
 - `docs/planspiel/` – Kopie der statischen Planspiel-Dateien für GitHub Pages (muss bei Änderungen mit gepflegt werden).
+- `kreuzwortraetsel/` – verstecktes Kreuzworträtsel mit Live-Feedback und Firebase-Highscore (kein Link von der Landingpage, nur per Direktlink erreichbar). Firebase-Zugangsdaten in `firebase-config.js` eintragen.
+- `docs/kreuzwortraetsel/` – Kopie für GitHub Pages (muss bei Änderungen mit gepflegt werden).
 - `digital-bildung/`, `module/` – Reserven für weitere Apps, die später ein eigenes Build-Setup erhalten.
 - `archive_original_site/` – Archiv der ursprünglichen statischen Seiten.
 - `scripts/` – Node-Skripte zum Kopieren oder Archivieren älterer Inhalte.

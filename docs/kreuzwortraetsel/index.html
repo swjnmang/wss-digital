@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Kreuzworträtsel | WSS digital</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <h1>Kreuzworträtsel</h1>
+      <p class="subtitle">Trage die Lösungsbuchstaben ein – richtige Felder werden grün, falsche rot.</p>
+    </header>
+
+    <main class="layout">
+      <section class="grid-wrap">
+        <div id="crossword" class="crossword" aria-label="Kreuzworträtsel-Gitter"></div>
+      </section>
+
+      <aside class="sidebar">
+        <div class="card" id="progressCard">
+          <h2>Fortschritt</h2>
+          <p id="progressText">0 / 0 Felder korrekt</p>
+          <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+        </div>
+
+        <div class="card" id="highscoreCard">
+          <h2>Highscore</h2>
+          <p class="hint">Wer das Rätsel als Erstes vollständig löst, steht oben.</p>
+          <ol id="highscoreList" class="highscore-list">
+            <li class="empty">Noch keine Einträge.</li>
+          </ol>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="winOverlay" class="overlay hidden">
+    <div class="overlay-box">
+      <h2>🎉 Geschafft!</h2>
+      <p>Du hast das Kreuzworträtsel vollständig richtig gelöst. Trag dich für den Highscore ein:</p>
+      <form id="nameForm">
+        <input id="nameInput" type="text" maxlength="30" placeholder="Dein Name" required autocomplete="off">
+        <button type="submit">Eintragen</button>
+      </form>
+      <p id="nameFormError" class="error hidden"></p>
+      <button id="closeOverlay" class="secondary-btn" type="button">Schließen</button>
+    </div>
+  </div>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
