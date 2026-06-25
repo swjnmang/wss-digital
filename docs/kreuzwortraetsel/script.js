@@ -89,8 +89,9 @@ for (let r = 0; r < ROWS; r++) {
 }
 
 const TOTAL_LETTERS = Object.keys(inputMap).length;
-const startTime = Date.now();
+let startTime = null;
 let elapsedMs = null;
+let timerInterval = null;
 
 function formatDuration(ms) {
   const totalSeconds = Math.round(ms / 1000);
@@ -99,7 +100,24 @@ function formatDuration(ms) {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
+function startTimer() {
+  if (startTime !== null) return;
+  startTime = Date.now();
+  const timerEl = document.getElementById("timerDisplay");
+  timerInterval = setInterval(() => {
+    timerEl.textContent = `⏱ ${formatDuration(Date.now() - startTime)}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval !== null) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
 function onCellInput(input, r, c) {
+  startTimer();
   const value = input.value.toUpperCase();
   input.value = value;
   const expected = cells[r][c].letter;
@@ -271,7 +289,9 @@ function showHighscoreStep() {
 
 function onPuzzleSolved() {
   if (elapsedMs === null) {
-    elapsedMs = Date.now() - startTime;
+    stopTimer();
+    elapsedMs = startTime !== null ? Date.now() - startTime : 0;
+    document.getElementById("timerDisplay").textContent = `⏱ ${formatDuration(elapsedMs)}`;
   }
   if (localStorage.getItem(SOLVED_FLAG_KEY)) {
     showHighscoreStep();

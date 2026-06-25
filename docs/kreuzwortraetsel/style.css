@@ -73,6 +73,18 @@ body {
   color: #5a6072;
 }
 
+.timer-display {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: #eef1fa;
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .layout {
   display: block;
 }
