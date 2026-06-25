@@ -70,19 +70,19 @@ export default function FinanzmatheIndex() {
         </div>
       </header>
 
-      <main className="flex-1 w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12 flex items-center justify-center">
-        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-10 py-6 sm:py-8 flex items-center justify-center">
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {subpages.map((s) => (
             <Link
               key={s.title}
               to={s.path}
-              className="bg-white rounded-2xl p-6 sm:p-8 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100"
+              className="bg-white rounded-2xl p-4 sm:p-5 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100"
             >
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-blue-50 flex items-center justify-center text-xl sm:text-2xl text-[var(--accent)] mb-4 sm:mb-5">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-50 flex items-center justify-center text-base sm:text-lg text-[var(--accent)] mb-2 sm:mb-3">
                 <i className={s.icon}></i>
               </div>
-              <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-slate-800">{s.title}</h3>
-              <p className="text-slate-500 leading-relaxed mb-4 sm:mb-5 text-sm sm:text-base">{s.description}</p>
+              <h3 className="text-base sm:text-lg font-semibold mb-1 text-slate-800">{s.title}</h3>
+              <p className="text-slate-500 leading-snug mb-2 text-xs sm:text-sm">{s.description}</p>
               <div className="mt-auto" aria-hidden="true" />
             </Link>
           ))}
