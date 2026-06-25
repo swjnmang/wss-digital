@@ -1,54 +1,67 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+
+const subpages = [
+  {
+    title: '1. Rechtwinklige Dreiecke beschriften',
+    description: 'Hypotenuse, Gegenkathete und Ankathete korrekt zuordnen.',
+    path: '/trigonometrie/rechtwinklig-beschriften',
+  },
+  {
+    title: '2. Sinus, Kosinus und Tangens erkennen',
+    description: 'Verstehen, was die drei Winkelfunktionen als Seitenverhältnisse bedeuten.',
+    path: '/trigonometrie/sinus-kosinus-tangens-erkennen',
+  },
+  {
+    title: '3. Streckenlänge mit Sinus, Kosinus und Tangens berechnen',
+    description: 'Fehlende Seiten im rechtwinkligen Dreieck mithilfe der Winkelfunktionen bestimmen.',
+    path: '/trigonometrie/rechtwinklig-strecken',
+  },
+  {
+    title: '4. Winkel berechnen mit Sinus, Kosinus und Tangens',
+    description: 'Fehlende Winkel im rechtwinkligen Dreieck aus den Seitenlängen bestimmen.',
+    path: '/trigonometrie/rechtwinklig-winkel',
+  },
+  {
+    title: '5. Sinussatz',
+    description: 'Seiten und Winkel mithilfe von gegenüberliegenden Paaren berechnen.',
+    path: '/trigonometrie/sinussatz',
+  },
+  {
+    title: '6. Kosinussatz',
+    description: 'Mit zwei Seiten und dem eingeschlossenen Winkel fehlende Größen bestimmen.',
+    path: '/trigonometrie/kosinussatz',
+  },
+  {
+    title: '7. Flächensatz',
+    description: 'Flächeninhalt und fehlende Größen im allgemeinen Dreieck berechnen.',
+    path: '/trigonometrie/flaechensatz',
+  },
+  {
+    title: '8. Gemischte Anwendungen',
+    description: '20 praxisnahe Aufgaben mit Skizzen, Hinweisen und Konzeptfilter.',
+    path: '/trigonometrie/gemischte-aufgaben',
+  },
+];
 
 export default function TrigonometrieIndex() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
-        <h1 className="text-4xl font-bold text-orange-900 mb-8 text-center">Trigonometrie</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Link to="/trigonometrie/rechtwinklig-beschriften" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">1. Rechtwinklige Dreiecke beschriften</h2>
-            <p className="text-gray-600">Hypotenuse, Gegenkathete und Ankathete korrekt zuordnen.</p>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-orange-50 to-amber-100">
+      <header className="w-full py-8 px-4 md:px-12 flex flex-col items-center bg-white/80 shadow-sm">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-orange-900">Trigonometrie</h1>
+        <p className="text-lg text-orange-800 mb-4">Wähle ein Thema aus, um zu den Übungen zu gelangen.</p>
+      </header>
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-8 grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+        {subpages.map((s) => (
+          <Link
+            key={s.title}
+            to={s.path}
+            className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col justify-center items-center p-8 min-h-64 hover:shadow-xl transition-shadow no-underline text-inherit text-center"
+          >
+            <h3 className="text-xl font-semibold mb-3 text-orange-900">{s.title}</h3>
+            <p className="text-gray-700">{s.description}</p>
           </Link>
-
-          <Link to="/trigonometrie/sinus-kosinus-tangens-erkennen" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">2. Sinus, Kosinus und Tangens erkennen</h2>
-            <p className="text-gray-600">Verstehen, was die drei Winkelfunktionen als Seitenverhältnisse bedeuten.</p>
-          </Link>
-
-          <Link to="/trigonometrie/rechtwinklig-strecken" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">3. Streckenlänge mit Sinus, Kosinus und Tangens berechnen</h2>
-            <p className="text-gray-600">Fehlende Seiten im rechtwinkligen Dreieck mithilfe der Winkelfunktionen bestimmen.</p>
-          </Link>
-
-          <Link to="/trigonometrie/rechtwinklig-winkel" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">4. Winkel berechnen mit Sinus, Kosinus und Tangens</h2>
-            <p className="text-gray-600">Fehlende Winkel im rechtwinkligen Dreieck aus den Seitenlängen bestimmen.</p>
-          </Link>
-
-          <Link to="/trigonometrie/sinussatz" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">5. Sinussatz</h2>
-            <p className="text-gray-600">Seiten und Winkel mithilfe von gegenüberliegenden Paaren berechnen.</p>
-          </Link>
-
-          <Link to="/trigonometrie/kosinussatz" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">6. Kosinussatz</h2>
-            <p className="text-gray-600">Mit zwei Seiten und dem eingeschlossenen Winkel fehlende Größen bestimmen.</p>
-          </Link>
-
-          <Link to="/trigonometrie/flaechensatz" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">7. Flächensatz</h2>
-            <p className="text-gray-600">Flächeninhalt und fehlende Größen im allgemeinen Dreieck berechnen.</p>
-          </Link>
-
-          <Link to="/trigonometrie/gemischte-aufgaben" className="block p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200">
-            <h2 className="text-xl font-bold text-orange-800 mb-2">8. Gemischte Anwendungen</h2>
-            <p className="text-gray-600">20 praxisnahe Aufgaben mit Skizzen, Hinweisen und Konzeptfilter.</p>
-          </Link>
-        </div>
-      </div>
+        ))}
+      </main>
     </div>
   );
 }
