@@ -89,6 +89,15 @@ for (let r = 0; r < ROWS; r++) {
 }
 
 const TOTAL_LETTERS = Object.keys(inputMap).length;
+const startTime = Date.now();
+let elapsedMs = null;
+
+function formatDuration(ms) {
+  const totalSeconds = Math.round(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
 
 function onCellInput(input, r, c) {
   const value = input.value.toUpperCase();
@@ -211,14 +220,16 @@ async function renderHighscore() {
   if (firestoreReady) {
     try {
       const { query, orderBy, limit, getDocs } = firestoreFns;
-      const q = query(collectionRef, orderBy("completedAt", "asc"), limit(20));
+      const q = query(collectionRef, orderBy("durationMs", "asc"), limit(20));
       const snapshot = await getDocs(q);
       entries = snapshot.docs.map((doc) => doc.data());
     } catch (err) {
       console.error("Highscore konnte nicht geladen werden:", err);
     }
   } else {
-    entries = JSON.parse(localStorage.getItem("kreuzwortraetsel_local_highscore") || "[]");
+    entries = JSON.parse(localStorage.getItem("kreuzwortraetsel_local_highscore") || "[]").sort(
+      (a, b) => a.durationMs - b.durationMs
+    );
   }
 
   listEl.innerHTML = "";
@@ -228,7 +239,7 @@ async function renderHighscore() {
   }
   for (const entry of entries) {
     const li = document.createElement("li");
-    li.innerHTML = `<span>${escapeHtml(entry.name)}</span>`;
+    li.innerHTML = `<span>${escapeHtml(entry.name)}</span><span class="highscore-time">${formatDuration(entry.durationMs)}</span>`;
     listEl.appendChild(li);
   }
 }
@@ -242,10 +253,10 @@ function escapeHtml(str) {
 async function submitHighscore(name) {
   if (firestoreReady) {
     const { addDoc } = firestoreFns;
-    await addDoc(collectionRef, { name, completedAt: serverTimestampFn() });
+    await addDoc(collectionRef, { name, durationMs: elapsedMs, completedAt: serverTimestampFn() });
   } else {
     const local = JSON.parse(localStorage.getItem("kreuzwortraetsel_local_highscore") || "[]");
-    local.push({ name, completedAt: Date.now() });
+    local.push({ name, durationMs: elapsedMs, completedAt: Date.now() });
     localStorage.setItem("kreuzwortraetsel_local_highscore", JSON.stringify(local));
   }
   await renderHighscore();
@@ -259,6 +270,9 @@ function showHighscoreStep() {
 }
 
 function onPuzzleSolved() {
+  if (elapsedMs === null) {
+    elapsedMs = Date.now() - startTime;
+  }
   if (localStorage.getItem(SOLVED_FLAG_KEY)) {
     showHighscoreStep();
     return;
@@ -266,6 +280,7 @@ function onPuzzleSolved() {
   document.getElementById("nameStep").classList.remove("hidden");
   document.getElementById("highscoreStep").classList.add("hidden");
   document.getElementById("winOverlay").classList.remove("hidden");
+  document.getElementById("solveTime").textContent = formatDuration(elapsedMs);
 }
 
 document.getElementById("nameForm").addEventListener("submit", async (ev) => {

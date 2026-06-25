@@ -191,6 +191,11 @@ body {
   border-bottom: none;
 }
 
+.highscore-time {
+  font-weight: 600;
+  color: var(--blue);
+}
+
 .highscore-list li:not(.empty)::before {
   counter-increment: rank;
   content: counter(rank) ".";
