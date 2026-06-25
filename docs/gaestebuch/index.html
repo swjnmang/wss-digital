@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Gästebuch</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <h1>Unser Gästebuch</h1>
+      <p class="subtitle">Hinterlasst uns ein paar Worte – und gerne auch ein Foto!</p>
+    </header>
+
+    <main class="layout">
+      <section class="form-card">
+        <form id="entryForm">
+          <label for="nameInput">Euer Name</label>
+          <input id="nameInput" type="text" maxlength="60" placeholder="Vorname Nachname" required autocomplete="off">
+
+          <label for="messageInput">Eure Nachricht</label>
+          <textarea id="messageInput" maxlength="500" rows="4" placeholder="Schreibt uns ein paar schöne Worte..." required></textarea>
+
+          <label for="photoInput">Foto (optional)</label>
+          <input id="photoInput" type="file" accept="image/*">
+          <img id="photoPreview" class="photo-preview hidden" alt="Vorschau">
+
+          <button type="submit" id="submitBtn">Eintragen</button>
+          <p id="formError" class="error hidden"></p>
+          <p id="formSuccess" class="success hidden">Danke für euren Eintrag! 💛</p>
+        </form>
+      </section>
+
+      <section class="entries-card">
+        <h2>Bisherige Einträge</h2>
+        <div id="entriesList" class="entries-list">
+          <p class="empty">Noch keine Einträge.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>

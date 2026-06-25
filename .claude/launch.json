@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["http-server", "kreuzwortraetsel", "-p", "8123", "-c-1"],
       "port": 8123
+    },
+    {
+      "name": "gaestebuch",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", "gaestebuch", "-p", "8124", "-c-1"],
+      "port": 8124
     }
   ]
 }

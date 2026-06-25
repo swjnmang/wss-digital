@@ -11,6 +11,8 @@ Zentrale Landingpage der Wirtschaftsschule digital mit Links zu mehreren eigenst
 - `docs/planspiel/` – Kopie der statischen Planspiel-Dateien für GitHub Pages (muss bei Änderungen mit gepflegt werden).
 - `kreuzwortraetsel/` – verstecktes Kreuzworträtsel mit Live-Feedback und Firebase-Highscore (kein Link von der Landingpage, nur per Direktlink erreichbar). Firebase-Zugangsdaten in `firebase-config.js` eintragen.
 - `docs/kreuzwortraetsel/` – Kopie für GitHub Pages (muss bei Änderungen mit gepflegt werden).
+- `gaestebuch/` – verstecktes digitales Gästebuch (Name, Text, optional Foto) mit Firebase-Speicherung, kein Link von der Landingpage, nur per Direktlink erreichbar. Fotos werden komprimiert als Base64 direkt im Firestore-Dokument gespeichert (kein Firebase Storage/Blaze-Tarif nötig).
+- `docs/gaestebuch/` – Kopie für GitHub Pages (muss bei Änderungen mit gepflegt werden).
 - `digital-bildung/`, `module/` – Reserven für weitere Apps, die später ein eigenes Build-Setup erhalten.
 - `archive_original_site/` – Archiv der ursprünglichen statischen Seiten.
 - `scripts/` – Node-Skripte zum Kopieren oder Archivieren älterer Inhalte.
