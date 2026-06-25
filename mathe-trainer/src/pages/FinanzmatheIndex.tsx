@@ -76,13 +76,13 @@ export default function FinanzmatheIndex() {
             <Link
               key={s.title}
               to={s.path}
-              className="bg-white rounded-2xl p-4 sm:p-5 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100"
+              className="bg-white rounded-2xl p-5 sm:p-6 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100"
             >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-50 flex items-center justify-center text-base sm:text-lg text-[var(--accent)] mb-2 sm:mb-3">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-blue-50 flex items-center justify-center text-lg sm:text-xl text-[var(--accent)] mb-3">
                 <i className={s.icon}></i>
               </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-1 text-slate-800">{s.title}</h3>
-              <p className="text-slate-500 leading-snug mb-2 text-xs sm:text-sm">{s.description}</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-1.5 text-slate-800">{s.title}</h3>
+              <p className="text-slate-500 leading-snug text-sm sm:text-base">{s.description}</p>
               <div className="mt-auto" aria-hidden="true" />
             </Link>
           ))}
