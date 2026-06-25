@@ -2,12 +2,12 @@
 // (Firebase Console -> Projekteinstellungen -> "Meine Apps" -> Web-App -> SDK-Konfiguration).
 // Firestore Database muss im Projekt aktiviert sein.
 export const firebaseConfig = {
-  apiKey: "DEIN_API_KEY",
-  authDomain: "DEIN_PROJEKT.firebaseapp.com",
-  projectId: "DEIN_PROJEKT_ID",
-  storageBucket: "DEIN_PROJEKT.appspot.com",
-  messagingSenderId: "DEINE_SENDER_ID",
-  appId: "DEINE_APP_ID",
+  apiKey: "AIzaSyC503SQThV2Jsxp7_rhTsbGlia0shMGyug",
+  authDomain: "kreuzwort-ll.firebaseapp.com",
+  projectId: "kreuzwort-ll",
+  storageBucket: "kreuzwort-ll.firebasestorage.app",
+  messagingSenderId: "202694711622",
+  appId: "1:202694711622:web:b9dc97111fe5b22ac7ed47",
 };
 
 // Name der Firestore-Collection, in der die Highscore-Einträge gespeichert werden.
