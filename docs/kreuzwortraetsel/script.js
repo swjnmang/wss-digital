@@ -54,8 +54,8 @@ for (const entry of ENTRIES) {
 
 // --- Grid rendern ------------------------------------------------------
 const gridEl = document.getElementById("crossword");
-gridEl.style.gridTemplateColumns = `repeat(${COLS}, 32px)`;
-gridEl.style.gridTemplateRows = `repeat(${ROWS}, 32px)`;
+gridEl.style.gridTemplateColumns = `repeat(${COLS}, var(--cell-size))`;
+gridEl.style.gridTemplateRows = `repeat(${ROWS}, var(--cell-size))`;
 
 const inputMap = {}; // "r,c" -> input element
 
@@ -153,9 +153,6 @@ function updateProgress() {
   for (const key in inputMap) {
     if (inputMap[key].classList.contains("correct")) correct++;
   }
-  document.getElementById("progressText").textContent = `${correct} / ${TOTAL_LETTERS} Felder korrekt`;
-  document.getElementById("progressFill").style.width = `${(correct / TOTAL_LETTERS) * 100}%`;
-
   if (correct === TOTAL_LETTERS) {
     onPuzzleSolved();
   }
@@ -202,7 +199,6 @@ async function initFirebase() {
     serverTimestampFn = serverTimestamp;
     firestoreFns = { addDoc, query, orderBy, limit, getDocs };
     firestoreReady = true;
-    await renderHighscore();
   } catch (err) {
     console.error("Firebase konnte nicht initialisiert werden:", err);
   }
@@ -255,8 +251,20 @@ async function submitHighscore(name) {
   await renderHighscore();
 }
 
+function showHighscoreStep() {
+  document.getElementById("nameStep").classList.add("hidden");
+  document.getElementById("highscoreStep").classList.remove("hidden");
+  document.getElementById("winOverlay").classList.remove("hidden");
+  renderHighscore();
+}
+
 function onPuzzleSolved() {
-  if (localStorage.getItem(SOLVED_FLAG_KEY)) return;
+  if (localStorage.getItem(SOLVED_FLAG_KEY)) {
+    showHighscoreStep();
+    return;
+  }
+  document.getElementById("nameStep").classList.remove("hidden");
+  document.getElementById("highscoreStep").classList.add("hidden");
   document.getElementById("winOverlay").classList.remove("hidden");
 }
 
@@ -271,7 +279,7 @@ document.getElementById("nameForm").addEventListener("submit", async (ev) => {
   try {
     await submitHighscore(name);
     localStorage.setItem(SOLVED_FLAG_KEY, "1");
-    document.getElementById("winOverlay").classList.add("hidden");
+    showHighscoreStep();
   } catch (err) {
     console.error(err);
     errorEl.textContent = "Eintragen fehlgeschlagen. Bitte erneut versuchen.";
@@ -284,5 +292,4 @@ document.getElementById("closeOverlay").addEventListener("click", () => {
 });
 
 initFirebase();
-renderHighscore();
 updateProgress();

@@ -6,10 +6,31 @@
   --card-bg: #ffffff;
   --border: #d6d9e0;
   --text: #1f2430;
+  --cell-size: 32px;
+}
+
+@media (max-width: 700px) {
+  :root {
+    --cell-size: 24px;
+  }
+}
+
+@media (max-width: 420px) {
+  :root {
+    --cell-size: 20px;
+  }
 }
 
 * {
   box-sizing: border-box;
+}
+
+.hidden {
+  display: none !important;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -25,6 +46,12 @@ body {
   padding: 24px 16px 64px;
 }
 
+@media (max-width: 600px) {
+  .page {
+    padding: 16px 8px 48px;
+  }
+}
+
 .page-header {
   text-align: center;
   margin-bottom: 24px;
@@ -35,30 +62,35 @@ body {
   font-size: 2rem;
 }
 
+@media (max-width: 600px) {
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+}
+
 .subtitle {
   margin: 0;
   color: #5a6072;
 }
 
 .layout {
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 24px;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
+  display: block;
 }
 
 .grid-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
+}
+
+@media (max-width: 600px) {
+  .grid-wrap {
+    padding: 12px;
+    border-radius: 8px;
+  }
 }
 
 .crossword {
@@ -68,8 +100,8 @@ body {
 
 .cw-cell {
   position: relative;
-  width: 32px;
-  height: 32px;
+  width: var(--cell-size);
+  height: var(--cell-size);
 }
 
 .cw-cell.blocked {
@@ -88,6 +120,18 @@ body {
   background: #fff;
   color: var(--text);
   padding: 0;
+}
+
+@media (max-width: 700px) {
+  .cw-cell input {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .cw-cell input {
+    font-size: 0.7rem;
+  }
 }
 
 .cw-cell input:focus {
@@ -122,43 +166,10 @@ body {
   color: rgba(255, 255, 255, 0.85);
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 18px;
-}
-
-.card h2 {
-  margin: 0 0 8px;
-  font-size: 1.1rem;
-}
-
 .hint {
   font-size: 0.85rem;
   color: #5a6072;
   margin: 0 0 10px;
-}
-
-.progress-bar {
-  height: 10px;
-  border-radius: 6px;
-  background: #e7e9f0;
-  overflow: hidden;
-  margin-top: 8px;
-}
-
-.progress-fill {
-  height: 100%;
-  width: 0%;
-  background: var(--blue);
-  transition: width 0.2s ease;
 }
 
 .highscore-list {
@@ -214,7 +225,16 @@ body {
   padding: 28px;
   max-width: 420px;
   width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
   text-align: center;
+}
+
+@media (max-width: 480px) {
+  .overlay-box {
+    padding: 20px;
+    border-radius: 10px;
+  }
 }
 
 .overlay-box h2 {
@@ -225,6 +245,12 @@ body {
   display: flex;
   gap: 8px;
   margin-top: 16px;
+}
+
+@media (max-width: 420px) {
+  #nameForm {
+    flex-direction: column;
+  }
 }
 
 #nameInput {
