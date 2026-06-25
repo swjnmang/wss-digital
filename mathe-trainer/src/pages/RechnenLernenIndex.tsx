@@ -41,23 +41,34 @@ const subpages = [
 
 export default function RechnenLernenIndex() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <header className="w-full py-8 px-4 md:px-12 flex flex-col items-center bg-white/80 shadow-sm">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-blue-900">Rechnen lernen</h1>
-        <p className="text-lg text-blue-800 mb-4">Wähle ein Thema aus, um zu den Übungen zu gelangen.</p>
+    <div className="min-h-screen bg-[var(--bg-color)] flex flex-col text-slate-900">
+      <header className="w-full text-white py-10 sm:py-14 text-center shadow-md relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-700" />
+        <div className="relative max-w-4xl mx-auto px-4 space-y-3">
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">Rechnen lernen</h1>
+          <p className="text-base sm:text-lg text-slate-200 max-w-2xl mx-auto">
+            Wähle ein Thema aus, um zu den Übungen zu gelangen.
+          </p>
+        </div>
       </header>
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-8 grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12 flex items-center justify-center">
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {subpages.map((s) => (
             <Link
               key={s.title}
               to={s.path}
-              className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col justify-center items-center p-8 min-h-64 hover:shadow-xl transition-shadow no-underline text-inherit text-center"
+              className="bg-white rounded-2xl p-6 sm:p-8 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100"
             >
-              <div className="card-icon text-4xl mb-3 text-blue-700"><i className={s.icon}></i></div>
-              <h3 className="text-xl font-semibold mb-3 text-blue-900">{s.title}</h3>
-              <p className="text-gray-700">{s.description}</p>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-blue-50 flex items-center justify-center text-xl sm:text-2xl text-[var(--accent)] mb-4 sm:mb-5">
+                <i className={s.icon}></i>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-slate-800">{s.title}</h3>
+              <p className="text-slate-500 leading-relaxed mb-4 sm:mb-5 text-sm sm:text-base">{s.description}</p>
+              <div className="mt-auto" aria-hidden="true" />
             </Link>
           ))}
+        </div>
       </main>
     </div>
   );
