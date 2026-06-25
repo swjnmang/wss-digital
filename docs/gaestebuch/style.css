@@ -13,11 +13,19 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .hidden {
@@ -25,6 +33,7 @@ body {
 }
 
 .page {
+  width: 100%;
   max-width: 900px;
   margin: 0 auto;
   padding: 24px 16px 64px;
@@ -60,6 +69,7 @@ body {
 
 .layout {
   display: block;
+  width: 100%;
   max-width: 540px;
   margin: 0 auto;
 }

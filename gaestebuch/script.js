@@ -145,7 +145,6 @@ async function submitEntry({ name, message, photoFile }) {
 }
 
 const photoCapture = document.getElementById("photoCapture");
-const photoLibrary = document.getElementById("photoLibrary");
 const photoPreview = document.getElementById("photoPreview");
 let selectedPhotoFile = null;
 
@@ -163,7 +162,6 @@ function handlePhotoSelected(input) {
 }
 
 photoCapture.addEventListener("change", () => handlePhotoSelected(photoCapture));
-photoLibrary.addEventListener("change", () => handlePhotoSelected(photoLibrary));
 
 async function showEntriesStep() {
   document.getElementById("formStep").classList.add("hidden");
