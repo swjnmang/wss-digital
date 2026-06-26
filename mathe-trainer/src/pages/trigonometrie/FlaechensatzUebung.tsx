@@ -146,13 +146,33 @@ const FlaechensatzUebung: React.FC = () => {
         addAngleLabel(points[1], points[0], points[2], 'β', unknownElement === 'unknown-angle-beta', 'beta');
         addAngleLabel(points[2], points[0], points[1], 'γ', unknownElement === 'unknown-angle-gamma', 'gamma');
 
-        // viewBox so berechnen, dass alle Punkte und Beschriftungen sichtbar sind
+        // viewBox so berechnen, dass alle Punkte und Beschriftungen sichtbar sind.
+        // Das Seitenverhältnis wird dabei begrenzt, damit das Dreieck bei extremen
+        // Winkeln weder riesig noch winzig dargestellt wird.
         const margin = 22;
-        const minX = Math.min(...boundsPoints.map(p => p.x)) - margin;
-        const maxX = Math.max(...boundsPoints.map(p => p.x)) + margin;
-        const minY = Math.min(...boundsPoints.map(p => p.y)) - margin;
-        const maxY = Math.max(...boundsPoints.map(p => p.y)) + margin;
-        const viewBoxAttr = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+        let minX = Math.min(...boundsPoints.map(p => p.x)) - margin;
+        let maxX = Math.max(...boundsPoints.map(p => p.x)) + margin;
+        let minY = Math.min(...boundsPoints.map(p => p.y)) - margin;
+        let maxY = Math.max(...boundsPoints.map(p => p.y)) + margin;
+
+        let boxWidth = maxX - minX;
+        let boxHeight = maxY - minY;
+        const maxAspect = 1.5;
+        if (boxWidth / boxHeight > maxAspect) {
+            const targetHeight = boxWidth / maxAspect;
+            const extra = (targetHeight - boxHeight) / 2;
+            minY -= extra;
+            maxY += extra;
+            boxHeight = targetHeight;
+        } else if (boxHeight / boxWidth > maxAspect) {
+            const targetWidth = boxHeight / maxAspect;
+            const extra = (targetWidth - boxWidth) / 2;
+            minX -= extra;
+            maxX += extra;
+            boxWidth = targetWidth;
+        }
+
+        const viewBoxAttr = `${minX} ${minY} ${boxWidth} ${boxHeight}`;
 
         return `<svg viewBox="${viewBoxAttr}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block" xmlns="http://www.w3.org/2000/svg">${svgContent}</svg>`;
     };
