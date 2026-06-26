@@ -274,12 +274,12 @@ const FlaechensatzEinstieg: React.FC = () => {
 
                     <section className="bg-teal-50 border border-teal-200 rounded-xl p-5 text-center space-y-2">
                         <p className="font-semibold text-teal-900">Merksatz: Der Flächensatz</p>
-                        <BlockMath math="A = \frac{1}{2} \cdot a \cdot b \cdot \sin(\gamma)" />
                         <p className="text-sm text-slate-600">
                             Je nachdem, welche zwei Seiten und welcher eingeschlossene Winkel gegeben sind, gibt es
-                            zwei gleichwertige Varianten:
+                            drei gleichwertige Varianten:
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4 text-sm">
+                            <BlockMath math="A = \frac{1}{2} \cdot a \cdot b \cdot \sin(\gamma)" />
                             <BlockMath math="A = \frac{1}{2} \cdot b \cdot c \cdot \sin(\alpha)" />
                             <BlockMath math="A = \frac{1}{2} \cdot a \cdot c \cdot \sin(\beta)" />
                         </div>
