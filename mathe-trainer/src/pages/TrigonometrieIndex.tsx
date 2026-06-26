@@ -44,10 +44,10 @@ const subpages = [
     path: '/trigonometrie/flaechensatz',
   },
   {
-    title: '8. Gemischte Anwendungen',
-    description: '20 praxisnahe Aufgaben mit Skizzen, Hinweisen und Konzeptfilter.',
+    title: '8. Anwendungsaufgaben',
+    description: 'Praxisnahe Aufgaben aus dem Alltag Schritt für Schritt lösen.',
     icon: 'fa-solid fa-shuffle',
-    path: '/trigonometrie/gemischte-aufgaben',
+    path: '/trigonometrie/anwendungsaufgaben',
   },
 ];
 

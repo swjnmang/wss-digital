@@ -107,7 +107,8 @@ import Kosinussatz from './pages/trigonometrie/Kosinussatz';
 import FlaechensatzMenu from './pages/trigonometrie/FlaechensatzMenu';
 import FlaechensatzEinstieg from './pages/trigonometrie/FlaechensatzEinstieg';
 import FlaechensatzUebung from './pages/trigonometrie/FlaechensatzUebung';
-import GemischteAufgaben from './pages/trigonometrie/GemischteAufgaben';
+import AnwendungsaufgabenMenu from './pages/trigonometrie/AnwendungsaufgabenMenu';
+import OlympiaparkMuenchen from './pages/trigonometrie/anwendungsaufgaben/OlympiaparkMuenchen';
 // Daten und Zufall
 import DatenUndZufallIndex from './pages/DatenUndZufallIndex';
 import StatistischeKennwerte from './pages/daten_und_zufall/StatistischeKennwerte';
@@ -284,7 +285,8 @@ export default function App() {
           <Route path="/trigonometrie/flaechensatz" element={<FlaechensatzMenu />} />
           <Route path="/trigonometrie/flaechensatz/einstieg" element={<FlaechensatzEinstieg />} />
           <Route path="/trigonometrie/flaechensatz/uebung" element={<FlaechensatzUebung />} />
-          <Route path="/trigonometrie/gemischte-aufgaben" element={<GemischteAufgaben />} />
+          <Route path="/trigonometrie/anwendungsaufgaben" element={<AnwendungsaufgabenMenu />} />
+          <Route path="/trigonometrie/anwendungsaufgaben/olympiapark-muenchen" element={<OlympiaparkMuenchen />} />
 
           {/* Daten und Zufall */}
           <Route path="/daten-und-zufall" element={<DatenUndZufallIndex />} />
