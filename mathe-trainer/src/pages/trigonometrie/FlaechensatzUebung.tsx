@@ -154,7 +154,7 @@ const FlaechensatzUebung: React.FC = () => {
         const maxY = Math.max(...boundsPoints.map(p => p.y)) + margin;
         const viewBoxAttr = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
 
-        return `<svg viewBox="${viewBoxAttr}" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">${svgContent}</svg>`;
+        return `<svg viewBox="${viewBoxAttr}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block" xmlns="http://www.w3.org/2000/svg">${svgContent}</svg>`;
     };
 
     const generateTask = () => {
@@ -353,7 +353,7 @@ const FlaechensatzUebung: React.FC = () => {
 
                             <div className="flex justify-center">
                                 <div
-                                    className="w-full max-w-md border border-gray-200 rounded-lg bg-white p-4"
+                                    className="w-full max-w-md h-64 sm:h-72 border border-gray-200 rounded-lg bg-white p-4"
                                     dangerouslySetInnerHTML={{ __html: task.sketchSVG }}
                                 />
                             </div>
