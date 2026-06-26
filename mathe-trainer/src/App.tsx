@@ -107,6 +107,7 @@ import Kosinussatz from './pages/trigonometrie/Kosinussatz';
 import FlaechensatzMenu from './pages/trigonometrie/FlaechensatzMenu';
 import FlaechensatzEinstieg from './pages/trigonometrie/FlaechensatzEinstieg';
 import FlaechensatzUebung from './pages/trigonometrie/FlaechensatzUebung';
+import SteigungswinkelProzentGrad from './pages/trigonometrie/SteigungswinkelProzentGrad';
 import AnwendungsaufgabenMenu from './pages/trigonometrie/AnwendungsaufgabenMenu';
 import OlympiaparkMuenchen from './pages/trigonometrie/anwendungsaufgaben/OlympiaparkMuenchen';
 // Daten und Zufall
@@ -280,6 +281,7 @@ export default function App() {
           <Route path="/trigonometrie/sinus-kosinus-tangens-erkennen" element={<SinusKosinusTangensErkennen />} />
           <Route path="/trigonometrie/rechtwinklig-strecken" element={<RechtwinkligStrecken />} />
           <Route path="/trigonometrie/rechtwinklig-winkel" element={<RechtwinkligWinkel />} />
+          <Route path="/trigonometrie/steigungswinkel-prozent-grad" element={<SteigungswinkelProzentGrad />} />
           <Route path="/trigonometrie/sinussatz" element={<Sinussatz />} />
           <Route path="/trigonometrie/kosinussatz" element={<Kosinussatz />} />
           <Route path="/trigonometrie/flaechensatz" element={<FlaechensatzMenu />} />
