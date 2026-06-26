@@ -69,7 +69,11 @@ const createTriangleSketch = (angles: any, formulaType: string) => {
     const midBC = { x: (points[1].x + points[2].x) / 2 + 15, y: (points[1].y + points[2].y) / 2 };
     const midAC = { x: (points[0].x + points[2].x) / 2 - 15, y: (points[0].y + points[2].y) / 2 };
 
-    let svgContent = `<svg width="100%" height="100%" viewBox="0 0 ${svgBaseWidth} ${svgBaseHeight}" xmlns="http://www.w3.org/2000/svg">`;
+    // Alle Punkte sammeln, damit die viewBox am Ende so berechnet werden kann,
+    // dass die Skizze bei jeder Winkelkombination vollständig sichtbar bleibt.
+    const boundsPoints = [pointA, pointB, pointC, midAB, midBC, midAC];
+
+    let svgContent = '';
     svgContent += `<polygon points="${points[0].x},${points[0].y} ${points[1].x},${points[1].y} ${points[2].x},${points[2].y}" style="fill:#ecfeff;stroke:#0f766e;stroke-width:1.5" />`;
 
     svgContent += `<text x="${points[0].x - 5}" y="${points[0].y + 10}" font-size="14" text-anchor="end" fill="#333">A</text>`;
@@ -102,6 +106,7 @@ const createTriangleSketch = (angles: any, formulaType: string) => {
         const midAng = (start + end) / 2;
         const lx = vertex.x + (radius + 15) * Math.cos(midAng);
         const ly = vertex.y + (radius + 15) * Math.sin(midAng);
+        boundsPoints.push({ x: lx, y: ly });
 
         const color = formulaType === formulaName ? '#0f766e' : 'black';
         svgContent += `<text x="${lx}" y="${ly}" font-size="14" text-anchor="middle" fill="${color}" font-weight="${formulaType === formulaName ? 'bold' : 'normal'}">${label}</text>`;
@@ -111,8 +116,15 @@ const createTriangleSketch = (angles: any, formulaType: string) => {
     addAngleLabel(points[1], points[0], points[2], 'β', 'beta');
     addAngleLabel(points[2], points[0], points[1], 'γ', 'gamma');
 
-    svgContent += `</svg>`;
-    return svgContent;
+    // viewBox so berechnen, dass alle Punkte und Beschriftungen sichtbar sind
+    const margin = 22;
+    const minX = Math.min(...boundsPoints.map(p => p.x)) - margin;
+    const maxX = Math.max(...boundsPoints.map(p => p.x)) + margin;
+    const minY = Math.min(...boundsPoints.map(p => p.y)) - margin;
+    const maxY = Math.max(...boundsPoints.map(p => p.y)) + margin;
+    const viewBoxAttr = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+
+    return `<svg viewBox="${viewBoxAttr}" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">${svgContent}</svg>`;
 };
 
 // Feste Beispiel-Skizze: a, b und der eingeschlossene Winkel γ sind bekannt

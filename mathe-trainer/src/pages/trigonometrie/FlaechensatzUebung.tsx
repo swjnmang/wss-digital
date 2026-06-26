@@ -86,8 +86,13 @@ const FlaechensatzUebung: React.FC = () => {
         const midBC = { x: (points[1].x + points[2].x) / 2 + 15, y: (points[1].y + points[2].y) / 2 };
         const midAC = { x: (points[0].x + points[2].x) / 2 - 15, y: (points[0].y + points[2].y) / 2 };
 
+        // Alle Punkte sammeln, die beim Zeichnen vorkommen, damit die viewBox am Ende
+        // so berechnet werden kann, dass nichts abgeschnitten wird (z. B. bei sehr
+        // spitzen oder stumpfen Winkeln, bei denen C weit außerhalb der Basisbreite liegt).
+        const boundsPoints = [pointA, pointB, pointC, midAB, midBC, midAC];
+
         // SVG Construction
-        let svgContent = `<svg width="100%" height="100%" viewBox="0 0 ${svgBaseWidth} ${svgBaseHeight}" xmlns="http://www.w3.org/2000/svg">`;
+        let svgContent = '';
 
         // Triangle
         svgContent += `<polygon points="${points[0].x},${points[0].y} ${points[1].x},${points[1].y} ${points[2].x},${points[2].y}" style="fill:none;stroke:black;stroke-width:1.5" />`;
@@ -106,6 +111,7 @@ const FlaechensatzUebung: React.FC = () => {
         const addAngleLabel = (vertex: any, p1: any, p2: any, label: string, isUnknown: boolean, formulaName: string) => {
             if (isUnknown) {
                 const pos = { x: vertex.x + (p1.x > vertex.x ? 20 : -20), y: vertex.y + (p1.y > vertex.y ? 20 : -5) };
+                boundsPoints.push(pos);
                 svgContent += `<text x="${pos.x}" y="${pos.y}" font-size="18" text-anchor="middle" fill="red">?</text>`;
             } else {
                 const radius = 20;
@@ -129,6 +135,7 @@ const FlaechensatzUebung: React.FC = () => {
                 const midAng = (start + end) / 2;
                 const lx = vertex.x + (radius + 15) * Math.cos(midAng);
                 const ly = vertex.y + (radius + 15) * Math.sin(midAng);
+                boundsPoints.push({ x: lx, y: ly });
 
                 const color = formulaType === formulaName ? 'blue' : 'black';
                 svgContent += `<text x="${lx}" y="${ly}" font-size="14" text-anchor="middle" fill="${color}">${label}</text>`;
@@ -139,8 +146,15 @@ const FlaechensatzUebung: React.FC = () => {
         addAngleLabel(points[1], points[0], points[2], 'β', unknownElement === 'unknown-angle-beta', 'beta');
         addAngleLabel(points[2], points[0], points[1], 'γ', unknownElement === 'unknown-angle-gamma', 'gamma');
 
-        svgContent += `</svg>`;
-        return svgContent;
+        // viewBox so berechnen, dass alle Punkte und Beschriftungen sichtbar sind
+        const margin = 22;
+        const minX = Math.min(...boundsPoints.map(p => p.x)) - margin;
+        const maxX = Math.max(...boundsPoints.map(p => p.x)) + margin;
+        const minY = Math.min(...boundsPoints.map(p => p.y)) - margin;
+        const maxY = Math.max(...boundsPoints.map(p => p.y)) + margin;
+        const viewBoxAttr = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+
+        return `<svg viewBox="${viewBoxAttr}" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">${svgContent}</svg>`;
     };
 
     const generateTask = () => {
