@@ -11,6 +11,8 @@ interface SolutionStep {
 
 interface SubTask {
     title: string;
+    image: string;
+    imageAlt: string;
     context: string;
     question: string;
     inputSuffix?: string;
@@ -19,9 +21,19 @@ interface SubTask {
     solutionSteps: SolutionStep[];
 }
 
+const SKETCH_1 = '/images/olympiapark-muenchen.png';
+const SKETCH_1_ALT =
+    'Skizze der Hängebrücken und Flying-Fox-Anlagen im Olympiapark München mit den Punkten S, H, Z, E, B, A, F sowie den gegebenen Längen und Winkeln';
+
+const SKETCH_2 = '/images/olympiapark-muenchen2.png';
+const SKETCH_2_ALT =
+    'Seitenansicht des Flying-Fox vom Olympiastadion S über Punkt A zum Ufer Z, mit dem Punkt W senkrecht unter A am Wasser';
+
 const tasks: SubTask[] = [
     {
         title: 'Aufgabe 1',
+        image: SKETCH_1,
+        imageAlt: SKETCH_1_ALT,
         context:
             'Im Münchner Olympiapark soll eine neue Touristenattraktion installiert werden. Der Olympiaberg B, das ' +
             'Olympiastadion S und die Schwimmhalle H werden mit Hängebrücken verbunden.\n\n' +
@@ -54,6 +66,8 @@ const tasks: SubTask[] = [
     },
     {
         title: 'Aufgabe 2',
+        image: SKETCH_1,
+        imageAlt: SKETCH_1_ALT,
         context: 'Aus statischen Gründen darf der Öffnungswinkel ε = ∢BSH zwischen den beiden Hängebrücken nicht größer als 60° sein.',
         question:
             'Prüfen Sie rechnerisch, ob diese Bedingung eingehalten wird. Berechnen Sie dazu den Winkel ε und ' +
@@ -83,6 +97,8 @@ const tasks: SubTask[] = [
     },
     {
         title: 'Aufgabe 3',
+        image: SKETCH_1,
+        imageAlt: SKETCH_1_ALT,
         context:
             'Um Unfällen im Landebereich vorzubeugen, muss das dreieckige Gebiet FEZ abgesperrt werden. Die ' +
             'Anlagenbetreiber messen die Strecken mit |FZ| = 80 m und |EZ| = 70 m ab.',
@@ -106,6 +122,77 @@ const tasks: SubTask[] = [
             {
                 heading: 'Schritt 4: Berechnen',
                 math: 'A_{\\triangle FEZ} \\approx 2.741{,}03 \\text{ m}^2'
+            }
+        ]
+    },
+    {
+        title: 'Aufgabe 4',
+        image: SKETCH_2,
+        imageAlt: SKETCH_2_ALT,
+        context:
+            'Zur Eröffnung der Anlage möchte der Weltmeister im Klippenspringen seinen eigenen Rekord im freien ' +
+            'Fall von 58,80 m überbieten.\n\n' +
+            'Er stoppt im Punkt A, klinkt sich aus und landet sicher im Punkt W.\n' +
+            'Sprungdetails: |AS| = 195,50 m, |SZ| = 600 m, |WZ| = 400 m.',
+        question:
+            'Überprüfen Sie rechnerisch, ob der Weltrekord gebrochen wurde. Berechnen Sie dazu die Falltiefe ' +
+            '|AW| in Metern.',
+        inputSuffix: 'm',
+        correctAnswer: 60.17,
+        solutionSteps: [
+            {
+                heading: 'Schritt 1: Strecke |AZ| bestimmen',
+                text: 'Da A auf der Strecke SZ liegt, gilt:',
+                math: '|\\overline{AZ}| = |\\overline{SZ}| - |\\overline{AS}| = 600 - 195{,}50 = 404{,}50 \\text{ m}'
+            },
+            {
+                heading: 'Schritt 2: Satz des Pythagoras aufstellen',
+                text: 'Im rechtwinkligen Dreieck AWZ (rechter Winkel bei W) ist |AZ| die Hypotenuse:',
+                math: '|\\overline{AW}| = \\sqrt{|\\overline{AZ}|^2 - |\\overline{WZ}|^2}'
+            },
+            {
+                heading: 'Schritt 3: Werte einsetzen',
+                math: '|\\overline{AW}| = \\sqrt{404{,}50^2 - 400^2}'
+            },
+            {
+                heading: 'Schritt 4: Berechnen und vergleichen',
+                math: '|\\overline{AW}| \\approx 60{,}17 \\text{ m} > 58{,}80 \\text{ m}'
+            },
+            {
+                heading: 'Ergebnis',
+                text: 'Da die Falltiefe von 60,17 m größer ist als der bisherige Rekord von 58,80 m, wird der Weltrekord gebrochen.'
+            }
+        ]
+    },
+    {
+        title: 'Aufgabe 5',
+        image: SKETCH_2,
+        imageAlt: SKETCH_2_ALT,
+        context:
+            'Damit die Geschwindigkeit für die Benutzer der Anlage nicht zu groß wird, darf das Gefälle des ' +
+            'Flying-Fox nicht größer als 16 % sein.',
+        question:
+            'Zeigen Sie rechnerisch, dass die Vorgabe eingehalten wird, wenn |AW| = 60,17 m und |WZ| = 400 m lang ' +
+            'sind. Berechnen Sie dazu das Gefälle in Prozent.',
+        inputSuffix: '%',
+        correctAnswer: 15.04,
+        solutionSteps: [
+            {
+                heading: 'Schritt 1: Formel für das Gefälle aufstellen',
+                text: 'Das Gefälle ist das Verhältnis von Höhenunterschied zu horizontaler Strecke:',
+                math: '\\text{Gefälle} = \\frac{|\\overline{AW}|}{|\\overline{WZ}|} \\cdot 100\\,\\%'
+            },
+            {
+                heading: 'Schritt 2: Werte einsetzen',
+                math: '\\text{Gefälle} = \\frac{60{,}17}{400} \\cdot 100\\,\\%'
+            },
+            {
+                heading: 'Schritt 3: Berechnen und vergleichen',
+                math: '\\text{Gefälle} \\approx 15{,}04\\,\\% \\le 16\\,\\%'
+            },
+            {
+                heading: 'Ergebnis',
+                text: 'Da das berechnete Gefälle von 15,04 % kleiner als 16 % ist, wird die Vorgabe eingehalten.'
             }
         ]
     }
@@ -156,8 +243,8 @@ const OlympiaparkMuenchen: React.FC = () => {
 
                     <div className="flex justify-center">
                         <img
-                            src="/images/olympiapark-muenchen.png"
-                            alt="Skizze der Hängebrücken und Flying-Fox-Anlagen im Olympiapark München mit den Punkten S, H, Z, E, B, A, F sowie den gegebenen Längen und Winkeln"
+                            src={task.image}
+                            alt={task.imageAlt}
                             className="w-full max-w-2xl border border-slate-200 rounded-lg"
                         />
                     </div>
