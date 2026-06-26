@@ -12,6 +12,7 @@ interface Task {
 const FLAECHENSATZ_VIDEO_URL = 'https://youtu.be/JFoLf3uT4DM?si=V1t-joWFciTN8ruX';
 
 const Flaechensatz: React.FC = () => {
+    const [section, setSection] = useState<'einstieg' | 'uebung'>('einstieg');
     const [task, setTask] = useState<Task | null>(null);
     const [showSolution, setShowSolution] = useState<boolean>(false);
     const [taskType, setTaskType] = useState<'area' | 'unknown'>('area');
@@ -280,92 +281,125 @@ const Flaechensatz: React.FC = () => {
     }, [taskType]);
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
-            <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="min-h-screen bg-[var(--bg-color)]">
+            <div className="container mx-auto px-4 py-8 max-w-4xl">
                 <h1 className="text-3xl font-bold text-teal-800 text-center mb-6">
                     Flächensatz im Dreieck
                 </h1>
 
-                <div className="bg-white border border-teal-100 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4 mb-6">
-                    <h2 className="text-lg font-semibold text-teal-900">Lernvideo zum Flächensatz</h2>
-                    <a
-                        href={FLAECHENSATZ_VIDEO_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    <button
+                        onClick={() => setSection('einstieg')}
+                        className={`rounded-2xl p-5 text-center shadow-sm border transition-all duration-300 ${
+                            section === 'einstieg'
+                                ? 'bg-teal-600 border-teal-600 text-white shadow-lg'
+                                : 'bg-white border-slate-100 text-slate-800 hover:-translate-y-1 hover:shadow-lg'
+                        }`}
                     >
-                        Video ansehen
-                    </a>
-                </div>
-
-                <div className="flex justify-center gap-4 mb-6">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input 
-                            type="radio" 
-                            checked={taskType === 'area'} 
-                            onChange={() => setTaskType('area')}
-                            className="w-4 h-4 text-teal-600"
-                        />
-                        <span>Flächeninhalt berechnen</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input 
-                            type="radio" 
-                            checked={taskType === 'unknown'} 
-                            onChange={() => setTaskType('unknown')}
-                            className="w-4 h-4 text-teal-600"
-                        />
-                        <span>Winkel oder Strecke berechnen</span>
-                    </label>
-                </div>
-
-                <div className="flex justify-center mb-6">
-                    <button 
-                        onClick={generateTask}
-                        className="px-6 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors"
+                        <span className="block text-lg font-semibold">Einstiegsaufgaben zum Flächensatz</span>
+                    </button>
+                    <button
+                        onClick={() => setSection('uebung')}
+                        className={`rounded-2xl p-5 text-center shadow-sm border transition-all duration-300 ${
+                            section === 'uebung'
+                                ? 'bg-teal-600 border-teal-600 text-white shadow-lg'
+                                : 'bg-white border-slate-100 text-slate-800 hover:-translate-y-1 hover:shadow-lg'
+                        }`}
                     >
-                        Neue Aufgabe
+                        <span className="block text-lg font-semibold">Übungsaufgaben zum Flächensatz</span>
                     </button>
                 </div>
 
-                {task && (
-                    <div className="space-y-6">
-                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-center">
-                            <p className="text-lg">{task.description}</p>
-                        </div>
+                {section === 'einstieg' && (
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 text-center text-slate-500">
+                        Die Einstiegsaufgaben folgen in Kürze.
+                    </div>
+                )}
 
-                        <div className="flex justify-center">
-                            <div 
-                                className="w-full max-w-md border border-gray-200 rounded-lg bg-white p-4"
-                                dangerouslySetInnerHTML={{ __html: task.sketchSVG }}
-                            />
-                        </div>
-
-                        <div className="flex justify-center">
-                            <button 
-                                onClick={() => setShowSolution(!showSolution)}
-                                className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                {section === 'uebung' && (
+                    <div className="bg-white rounded-xl shadow-lg p-6">
+                        <div className="bg-white border border-teal-100 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4 mb-6">
+                            <h2 className="text-lg font-semibold text-teal-900">Lernvideo zum Flächensatz</h2>
+                            <a
+                                href={FLAECHENSATZ_VIDEO_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
                             >
-                                {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
+                                Video ansehen
+                            </a>
+                        </div>
+
+                        <div className="flex justify-center gap-4 mb-6">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="radio"
+                                    checked={taskType === 'area'}
+                                    onChange={() => setTaskType('area')}
+                                    className="w-4 h-4 text-teal-600"
+                                />
+                                <span>Flächeninhalt berechnen</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="radio"
+                                    checked={taskType === 'unknown'}
+                                    onChange={() => setTaskType('unknown')}
+                                    className="w-4 h-4 text-teal-600"
+                                />
+                                <span>Winkel oder Strecke berechnen</span>
+                            </label>
+                        </div>
+
+                        <div className="flex justify-center mb-6">
+                            <button
+                                onClick={generateTask}
+                                className="px-6 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors"
+                            >
+                                Neue Aufgabe
                             </button>
                         </div>
 
-                        {showSolution && (
-                            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                                <h3 className="text-xl font-bold mb-4 text-gray-800">Lösung</h3>
-                                <div className="space-y-6">
-                                    {task.solutionSteps.map((step, index) => (
-                                        <div key={index}>
-                                            <h4 className="font-bold text-teal-700 mb-2">{step.heading}</h4>
-                                            <p className="mb-2">{step.text}</p>
-                                            {step.math && (
-                                                <div className="my-2">
-                                                    <BlockMath math={step.math} />
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
+                        {task && (
+                            <div className="space-y-6">
+                                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-center">
+                                    <p className="text-lg">{task.description}</p>
                                 </div>
+
+                                <div className="flex justify-center">
+                                    <div
+                                        className="w-full max-w-md border border-gray-200 rounded-lg bg-white p-4"
+                                        dangerouslySetInnerHTML={{ __html: task.sketchSVG }}
+                                    />
+                                </div>
+
+                                <div className="flex justify-center">
+                                    <button
+                                        onClick={() => setShowSolution(!showSolution)}
+                                        className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                                    >
+                                        {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
+                                    </button>
+                                </div>
+
+                                {showSolution && (
+                                    <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                                        <h3 className="text-xl font-bold mb-4 text-gray-800">Lösung</h3>
+                                        <div className="space-y-6">
+                                            {task.solutionSteps.map((step, index) => (
+                                                <div key={index}>
+                                                    <h4 className="font-bold text-teal-700 mb-2">{step.heading}</h4>
+                                                    <p className="mb-2">{step.text}</p>
+                                                    {step.math && (
+                                                        <div className="my-2">
+                                                            <BlockMath math={step.math} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
