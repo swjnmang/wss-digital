@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { InlineMath, BlockMath } from 'react-katex';
+import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
 interface Task {
@@ -11,8 +11,7 @@ interface Task {
 
 const FLAECHENSATZ_VIDEO_URL = 'https://youtu.be/JFoLf3uT4DM?si=V1t-joWFciTN8ruX';
 
-const Flaechensatz: React.FC = () => {
-    const [section, setSection] = useState<'einstieg' | 'uebung'>('einstieg');
+const FlaechensatzUebung: React.FC = () => {
     const [task, setTask] = useState<Task | null>(null);
     const [showSolution, setShowSolution] = useState<boolean>(false);
     const [taskType, setTaskType] = useState<'area' | 'unknown'>('area');
@@ -89,7 +88,7 @@ const Flaechensatz: React.FC = () => {
 
         // SVG Construction
         let svgContent = `<svg width="100%" height="100%" viewBox="0 0 ${svgBaseWidth} ${svgBaseHeight}" xmlns="http://www.w3.org/2000/svg">`;
-        
+
         // Triangle
         svgContent += `<polygon points="${points[0].x},${points[0].y} ${points[1].x},${points[1].y} ${points[2].x},${points[2].y}" style="fill:none;stroke:black;stroke-width:1.5" />`;
 
@@ -114,7 +113,7 @@ const Flaechensatz: React.FC = () => {
                 const vec2 = { x: p2.x - vertex.x, y: p2.y - vertex.y };
                 const ang1 = Math.atan2(vec1.y, vec1.x);
                 const ang2 = Math.atan2(vec2.y, vec2.x);
-                
+
                 let start = Math.min(ang1, ang2);
                 let end = Math.max(ang1, ang2);
                 if (end - start > Math.PI) [start, end] = [end, start + 2 * Math.PI];
@@ -126,11 +125,11 @@ const Flaechensatz: React.FC = () => {
                 const ey = vertex.y + radius * Math.sin(end);
 
                 svgContent += `<path d="M ${sx},${sy} A ${radius},${radius} 0 0 ${end > start ? 1 : 0} ${ex},${ey}" fill="none" stroke="black" stroke-width="1"/>`;
-                
+
                 const midAng = (start + end) / 2;
                 const lx = vertex.x + (radius + 15) * Math.cos(midAng);
                 const ly = vertex.y + (radius + 15) * Math.sin(midAng);
-                
+
                 const color = formulaType === formulaName ? 'blue' : 'black';
                 svgContent += `<text x="${lx}" y="${ly}" font-size="14" text-anchor="middle" fill="${color}">${label}</text>`;
             }
@@ -170,7 +169,7 @@ const Flaechensatz: React.FC = () => {
             { sides: ['b', 'c'], angle: 'alpha', formula: 'A = \\frac{1}{2} \\cdot b \\cdot c \\cdot \\sin(\\alpha)' },
             { sides: ['a', 'c'], angle: 'beta', formula: 'A = \\frac{1}{2} \\cdot a \\cdot c \\cdot \\sin(\\beta)' }
         ];
-        
+
         const chosen = formulaMapping[formulaVariation];
         const side1 = chosen.sides[0] as keyof typeof roundedSides;
         const side2 = chosen.sides[1] as keyof typeof roundedSides;
@@ -188,7 +187,7 @@ const Flaechensatz: React.FC = () => {
 
         if (taskType === 'area') {
             description = `Berechnen Sie den Flächeninhalt eines Dreiecks mit den Seitenlängen ${side1} = ${side1Value} cm und ${side2} = ${side2Value} cm sowie dem eingeschlossenen Winkel ${angle} = ${angleValue}°.`;
-            
+
             solutionSteps.push({
                 heading: "Schritt 1: Formel aufschreiben",
                 text: "Der Flächeninhalt eines Dreiecks kann mit der Formel berechnet werden, wenn zwei Seiten und der eingeschlossene Winkel bekannt sind:",
@@ -204,7 +203,7 @@ const Flaechensatz: React.FC = () => {
                 text: "Berechnen Sie den Flächeninhalt:",
                 math: `A \\approx ${roundedArea} \\text{ cm}^2`
             });
-            
+
             sketchSVG = createTriangleSketch(angles, roundedSides, angle, null);
         } else {
             const findSideOrAngle = Math.random() < 0.5 ? 'side' : 'angle';
@@ -213,7 +212,7 @@ const Flaechensatz: React.FC = () => {
                 const unknownSideIndex = Math.floor(Math.random() * 2);
                 const unknownSide = chosen.sides[unknownSideIndex] as keyof typeof roundedSides;
                 const knownSide = chosen.sides[1 - unknownSideIndex] as keyof typeof roundedSides;
-                
+
                 const unknownSideValue = roundedSides[unknownSide];
                 const knownSideValue = roundedSides[knownSide];
 
@@ -247,8 +246,6 @@ const Flaechensatz: React.FC = () => {
                 const sin_angle_clamped = Math.max(-1, Math.min(1, sin_angle_calc));
                 const angle_rad_arcsin = Math.asin(sin_angle_clamped);
                 const angle_deg_arcsin = radToDeg(angle_rad_arcsin);
-                const possibleAngle1 = round(angle_deg_arcsin, 1);
-                const possibleAngle2 = round(180 - angle_deg_arcsin, 1);
 
                 description = `Ein Dreieck hat den Flächeninhalt A = ${roundedArea} cm². Zwei Seiten, die den Winkel ${angle} einschließen, haben die Längen ${side1} = ${side1Value} cm und ${side2} = ${side2Value} cm. Berechnen Sie die Größe des Winkels ${angle}.`;
                 unknownElement = `unknown-angle-${angle}`;
@@ -281,132 +278,105 @@ const Flaechensatz: React.FC = () => {
     }, [taskType]);
 
     return (
-        <div className="min-h-screen bg-[var(--bg-color)]">
-            <div className="container mx-auto px-4 py-8 max-w-4xl">
-                <h1 className="text-3xl font-bold text-teal-800 text-center mb-6">
-                    Flächensatz im Dreieck
-                </h1>
+        <div className="min-h-screen bg-[var(--bg-color)] py-8">
+            <div className="container mx-auto px-4 max-w-4xl">
+                <Link to="/trigonometrie/flaechensatz" className="inline-flex items-center gap-2 text-teal-700 hover:text-teal-900 text-sm font-medium mb-4">
+                    <i className="fa-solid fa-arrow-left"></i> Zurück zur Übersicht
+                </Link>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                    <button
-                        onClick={() => setSection('einstieg')}
-                        className={`rounded-2xl p-5 text-center shadow-sm border transition-all duration-300 ${
-                            section === 'einstieg'
-                                ? 'bg-teal-600 border-teal-600 text-white shadow-lg'
-                                : 'bg-white border-slate-100 text-slate-800 hover:-translate-y-1 hover:shadow-lg'
-                        }`}
-                    >
-                        <span className="block text-lg font-semibold">Einstiegsaufgaben zum Flächensatz</span>
-                    </button>
-                    <button
-                        onClick={() => setSection('uebung')}
-                        className={`rounded-2xl p-5 text-center shadow-sm border transition-all duration-300 ${
-                            section === 'uebung'
-                                ? 'bg-teal-600 border-teal-600 text-white shadow-lg'
-                                : 'bg-white border-slate-100 text-slate-800 hover:-translate-y-1 hover:shadow-lg'
-                        }`}
-                    >
-                        <span className="block text-lg font-semibold">Übungsaufgaben zum Flächensatz</span>
-                    </button>
-                </div>
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                    <h1 className="text-3xl font-bold text-teal-800 text-center mb-6">
+                        Übungsaufgaben zum Flächensatz
+                    </h1>
 
-                {section === 'einstieg' && (
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 text-center text-slate-500">
-                        Die Einstiegsaufgaben folgen in Kürze.
+                    <div className="bg-white border border-teal-100 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4 mb-6">
+                        <h2 className="text-lg font-semibold text-teal-900">Lernvideo zum Flächensatz</h2>
+                        <a
+                            href={FLAECHENSATZ_VIDEO_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
+                        >
+                            Video ansehen
+                        </a>
                     </div>
-                )}
 
-                {section === 'uebung' && (
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                        <div className="bg-white border border-teal-100 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4 mb-6">
-                            <h2 className="text-lg font-semibold text-teal-900">Lernvideo zum Flächensatz</h2>
-                            <a
-                                href={FLAECHENSATZ_VIDEO_URL}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
-                            >
-                                Video ansehen
-                            </a>
-                        </div>
+                    <div className="flex justify-center gap-4 mb-6">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="radio"
+                                checked={taskType === 'area'}
+                                onChange={() => setTaskType('area')}
+                                className="w-4 h-4 text-teal-600"
+                            />
+                            <span>Flächeninhalt berechnen</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="radio"
+                                checked={taskType === 'unknown'}
+                                onChange={() => setTaskType('unknown')}
+                                className="w-4 h-4 text-teal-600"
+                            />
+                            <span>Winkel oder Strecke berechnen</span>
+                        </label>
+                    </div>
 
-                        <div className="flex justify-center gap-4 mb-6">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    checked={taskType === 'area'}
-                                    onChange={() => setTaskType('area')}
-                                    className="w-4 h-4 text-teal-600"
-                                />
-                                <span>Flächeninhalt berechnen</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    checked={taskType === 'unknown'}
-                                    onChange={() => setTaskType('unknown')}
-                                    className="w-4 h-4 text-teal-600"
-                                />
-                                <span>Winkel oder Strecke berechnen</span>
-                            </label>
-                        </div>
+                    <div className="flex justify-center mb-6">
+                        <button
+                            onClick={generateTask}
+                            className="px-6 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors"
+                        >
+                            Neue Aufgabe
+                        </button>
+                    </div>
 
-                        <div className="flex justify-center mb-6">
-                            <button
-                                onClick={generateTask}
-                                className="px-6 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors"
-                            >
-                                Neue Aufgabe
-                            </button>
-                        </div>
-
-                        {task && (
-                            <div className="space-y-6">
-                                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-center">
-                                    <p className="text-lg">{task.description}</p>
-                                </div>
-
-                                <div className="flex justify-center">
-                                    <div
-                                        className="w-full max-w-md border border-gray-200 rounded-lg bg-white p-4"
-                                        dangerouslySetInnerHTML={{ __html: task.sketchSVG }}
-                                    />
-                                </div>
-
-                                <div className="flex justify-center">
-                                    <button
-                                        onClick={() => setShowSolution(!showSolution)}
-                                        className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                                    >
-                                        {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
-                                    </button>
-                                </div>
-
-                                {showSolution && (
-                                    <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                                        <h3 className="text-xl font-bold mb-4 text-gray-800">Lösung</h3>
-                                        <div className="space-y-6">
-                                            {task.solutionSteps.map((step, index) => (
-                                                <div key={index}>
-                                                    <h4 className="font-bold text-teal-700 mb-2">{step.heading}</h4>
-                                                    <p className="mb-2">{step.text}</p>
-                                                    {step.math && (
-                                                        <div className="my-2">
-                                                            <BlockMath math={step.math} />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                    {task && (
+                        <div className="space-y-6">
+                            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-center">
+                                <p className="text-lg">{task.description}</p>
                             </div>
-                        )}
-                    </div>
-                )}
+
+                            <div className="flex justify-center">
+                                <div
+                                    className="w-full max-w-md border border-gray-200 rounded-lg bg-white p-4"
+                                    dangerouslySetInnerHTML={{ __html: task.sketchSVG }}
+                                />
+                            </div>
+
+                            <div className="flex justify-center">
+                                <button
+                                    onClick={() => setShowSolution(!showSolution)}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                                >
+                                    {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
+                                </button>
+                            </div>
+
+                            {showSolution && (
+                                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                                    <h3 className="text-xl font-bold mb-4 text-gray-800">Lösung</h3>
+                                    <div className="space-y-6">
+                                        {task.solutionSteps.map((step, index) => (
+                                            <div key={index}>
+                                                <h4 className="font-bold text-teal-700 mb-2">{step.heading}</h4>
+                                                <p className="mb-2">{step.text}</p>
+                                                {step.math && (
+                                                    <div className="my-2">
+                                                        <BlockMath math={step.math} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
 };
 
-export default Flaechensatz;
+export default FlaechensatzUebung;

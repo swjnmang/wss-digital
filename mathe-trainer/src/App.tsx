@@ -104,7 +104,9 @@ import RechtwinkligStrecken from './pages/trigonometrie/RechtwinkligStrecken';
 import RechtwinkligWinkel from './pages/trigonometrie/RechtwinkligWinkel';
 import Sinussatz from './pages/trigonometrie/Sinussatz';
 import Kosinussatz from './pages/trigonometrie/Kosinussatz';
-import Flaechensatz from './pages/trigonometrie/Flaechensatz';
+import FlaechensatzMenu from './pages/trigonometrie/FlaechensatzMenu';
+import FlaechensatzEinstieg from './pages/trigonometrie/FlaechensatzEinstieg';
+import FlaechensatzUebung from './pages/trigonometrie/FlaechensatzUebung';
 import GemischteAufgaben from './pages/trigonometrie/GemischteAufgaben';
 // Daten und Zufall
 import DatenUndZufallIndex from './pages/DatenUndZufallIndex';
@@ -279,7 +281,9 @@ export default function App() {
           <Route path="/trigonometrie/rechtwinklig-winkel" element={<RechtwinkligWinkel />} />
           <Route path="/trigonometrie/sinussatz" element={<Sinussatz />} />
           <Route path="/trigonometrie/kosinussatz" element={<Kosinussatz />} />
-          <Route path="/trigonometrie/flaechensatz" element={<Flaechensatz />} />
+          <Route path="/trigonometrie/flaechensatz" element={<FlaechensatzMenu />} />
+          <Route path="/trigonometrie/flaechensatz/einstieg" element={<FlaechensatzEinstieg />} />
+          <Route path="/trigonometrie/flaechensatz/uebung" element={<FlaechensatzUebung />} />
           <Route path="/trigonometrie/gemischte-aufgaben" element={<GemischteAufgaben />} />
 
           {/* Daten und Zufall */}
