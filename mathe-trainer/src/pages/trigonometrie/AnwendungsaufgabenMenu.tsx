@@ -7,6 +7,12 @@ const tasks = [
     icon: 'fa-solid fa-person-falling',
     path: '/trigonometrie/anwendungsaufgaben/olympiapark-muenchen',
   },
+  {
+    title: 'Stadionneubau',
+    description: 'Steigung, Dachneigung und Flutlicht rund um einen Stadionquerschnitt.',
+    icon: 'fa-solid fa-futbol',
+    path: '/trigonometrie/anwendungsaufgaben/stadion',
+  },
 ];
 
 export default function AnwendungsaufgabenMenu() {

@@ -110,6 +110,7 @@ import FlaechensatzUebung from './pages/trigonometrie/FlaechensatzUebung';
 import SteigungswinkelProzentGrad from './pages/trigonometrie/SteigungswinkelProzentGrad';
 import AnwendungsaufgabenMenu from './pages/trigonometrie/AnwendungsaufgabenMenu';
 import OlympiaparkMuenchen from './pages/trigonometrie/anwendungsaufgaben/OlympiaparkMuenchen';
+import Stadion from './pages/trigonometrie/anwendungsaufgaben/Stadion';
 // Daten und Zufall
 import DatenUndZufallIndex from './pages/DatenUndZufallIndex';
 import StatistischeKennwerte from './pages/daten_und_zufall/StatistischeKennwerte';
@@ -289,6 +290,7 @@ export default function App() {
           <Route path="/trigonometrie/flaechensatz/uebung" element={<FlaechensatzUebung />} />
           <Route path="/trigonometrie/anwendungsaufgaben" element={<AnwendungsaufgabenMenu />} />
           <Route path="/trigonometrie/anwendungsaufgaben/olympiapark-muenchen" element={<OlympiaparkMuenchen />} />
+          <Route path="/trigonometrie/anwendungsaufgaben/stadion" element={<Stadion />} />
 
           {/* Daten und Zufall */}
           <Route path="/daten-und-zufall" element={<DatenUndZufallIndex />} />
