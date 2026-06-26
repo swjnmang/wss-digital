@@ -215,7 +215,7 @@ const FlaechensatzEinstieg: React.FC = () => {
             setFeedback('incorrect');
             return;
         }
-        const tolerance = Math.max(0.1, practiceTask.correctArea * 0.02);
+        const tolerance = practiceTask.correctArea * 0.1;
         setFeedback(Math.abs(parsed - practiceTask.correctArea) <= tolerance ? 'correct' : 'incorrect');
     };
 
@@ -236,18 +236,6 @@ const FlaechensatzEinstieg: React.FC = () => {
                             eingeschlossenen Winkel.
                         </p>
                     </div>
-
-                    <section className="bg-white border border-teal-100 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4">
-                        <h2 className="text-lg font-semibold text-teal-900">Lernvideo zum Flächensatz</h2>
-                        <a
-                            href={FLAECHENSATZ_VIDEO_URL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
-                        >
-                            Video ansehen
-                        </a>
-                    </section>
 
                     <section className="space-y-4">
                         <h2 className="text-xl font-bold text-teal-700">Ein Dreieck mit zwei bekannten Seiten</h2>
@@ -287,6 +275,16 @@ const FlaechensatzEinstieg: React.FC = () => {
                             Wichtig: Der eingesetzte Winkel muss immer der <strong>von den beiden Seiten
                             eingeschlossene Winkel</strong> sein.
                         </p>
+                        <div className="flex justify-center pt-2">
+                            <a
+                                href={FLAECHENSATZ_VIDEO_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
+                            >
+                                Lernvideo zum Flächensatz ansehen
+                            </a>
+                        </div>
                     </section>
 
                     <section className="space-y-3">
@@ -347,7 +345,15 @@ const FlaechensatzEinstieg: React.FC = () => {
                                     />
                                 </div>
 
-                                <div className="flex flex-col items-center gap-3">
+                                <div
+                                    className={`flex flex-col items-center gap-3 rounded-xl border p-4 transition-colors duration-300 ${
+                                        feedback === 'correct'
+                                            ? 'bg-green-50 border-green-300'
+                                            : feedback === 'incorrect'
+                                            ? 'bg-red-50 border-red-300'
+                                            : 'bg-slate-50 border-slate-200'
+                                    }`}
+                                >
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="text"
