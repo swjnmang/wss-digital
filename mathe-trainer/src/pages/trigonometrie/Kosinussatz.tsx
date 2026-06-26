@@ -192,19 +192,19 @@ const Kosinussatz: React.FC = () => {
             const sideSteps: SolutionStep[] = [
                 {
                     text: 'Nutze den Kosinussatz für die gesuchte Seite.',
-                    math: `${targetSide}^2 = ${adj1}^2 + ${adj2}^2 - 2\cdot${adj1}\cdot${adj2}\cdot\cos(${angleSymbols[targetAngle]})`
+                    math: `${targetSide}^2 = ${adj1}^2 + ${adj2}^2 - 2\\cdot ${adj1}\\cdot ${adj2}\\cdot\\cos(${angleSymbols[targetAngle]})`
                 },
                 {
                     text: 'Setze die bekannten Seiten und den Winkel ein.',
-                    math: `${targetSide}^2 = ${formatNumber(triangle[adj1])}^2 + ${formatNumber(triangle[adj2])}^2 - 2\cdot${formatNumber(triangle[adj1])}\cdot${formatNumber(triangle[adj2])}\cdot\cos(${formatNumber(triangle[targetAngle], 1)}^{\\circ})`
+                    math: `${targetSide}^2 = ${formatNumber(triangle[adj1])}^2 + ${formatNumber(triangle[adj2])}^2 - 2\\cdot${formatNumber(triangle[adj1])}\\cdot${formatNumber(triangle[adj2])}\\cdot\\cos(${formatNumber(triangle[targetAngle], 1)}^{\\circ})`
                 },
                 {
                     text: 'Fasse den Term zusammen.',
-                    math: `${targetSide}^2 = ${round(underRoot, 3)} \Leftrightarrow ${targetSide} = \\sqrt{${round(underRoot, 3)}}`
+                    math: `${targetSide}^2 = ${round(underRoot, 3)} \\Leftrightarrow ${targetSide} = \\sqrt{${round(underRoot, 3)}}`
                 },
                 {
                     text: 'Ziehe die Wurzel, um die Seite zu erhalten.',
-                    math: `${targetSide} \approx ${formatNumber(Math.sqrt(Math.max(underRoot, 0)))}`
+                    math: `${targetSide} \\approx ${formatNumber(Math.sqrt(Math.max(underRoot, 0)))}`
                 }
             ];
 
@@ -238,7 +238,7 @@ const Kosinussatz: React.FC = () => {
         const angleSteps: SolutionStep[] = [
             {
                 text: 'Form des Kosinussatzes zur Winkelberechnung:',
-                math: `\\cos(${angleSymbols[targetAngle]}) = \\frac{${adj1}^2 + ${adj2}^2 - ${opposite}^2}{2\\cdot${adj1}\\cdot${adj2}}`
+                math: `\\cos(${angleSymbols[targetAngle]}) = \\frac{${adj1}^2 + ${adj2}^2 - ${opposite}^2}{2\\cdot ${adj1}\\cdot ${adj2}}`
             },
             {
                 text: 'Setze die bekannten Seiten ein.',
@@ -246,11 +246,11 @@ const Kosinussatz: React.FC = () => {
             },
             {
                 text: 'Berechne den Quotienten.',
-                math: `\\cos(${angleSymbols[targetAngle]}) = ${round(clamped, 4)} \Leftrightarrow ${angleSymbols[targetAngle]} = \\arccos(${round(clamped, 4)})`
+                math: `\\cos(${angleSymbols[targetAngle]}) = ${round(clamped, 4)} \\Leftrightarrow ${angleSymbols[targetAngle]} = \\arccos(${round(clamped, 4)})`
             },
             {
                 text: 'Bestimme den Winkel in Grad.',
-                math: `${angleSymbols[targetAngle]} \approx ${formatNumber(triangle[targetAngle], 1)}^{\\circ}`
+                math: `${angleSymbols[targetAngle]} \\approx ${formatNumber(triangle[targetAngle], 1)}^{\\circ}`
             }
         ];
 
