@@ -3,40 +3,87 @@ import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
-type TaskType = 'percent_to_angle' | 'angle_to_percent';
-
 interface SolutionStep {
     text: string;
     math?: string;
 }
 
-interface SlopeTask {
-    type: TaskType;
-    percent: number;
-    angle: number;
+interface SketchSpec {
     horizontal: number;
     vertical: number;
+    horizontalLabel: string;
+    verticalLabel: string;
+    hypotenuseLabel: string;
+    angleLabel: string;
+    highlight: 'horizontal' | 'vertical' | 'hypotenuse' | 'angle';
+}
+
+interface SlopeTask {
     prompt: string;
     steps: SolutionStep[];
     correctAnswer: number;
-    unit: '%' | '°';
+    unit: string;
+    resultLabel: string;
+    sketch: SketchSpec;
 }
 
 const degToRad = (deg: number) => deg * (Math.PI / 180);
 const radToDeg = (rad: number) => rad * (180 / Math.PI);
 const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+const randomInt = (min: number, max: number) => Math.floor(randomInRange(min, max + 1));
+const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 const round = (val: number, digits = 2) => parseFloat(val.toFixed(digits));
 const formatNumber = (val: number, digits = 2) => parseFloat(val.toFixed(digits)).toString();
 
-const SlopeSketch: React.FC<{ horizontal: number; vertical: number; highlight: 'angle' | 'percent' }> = ({
+interface Triangle {
+    horizontal: number;
+    vertical: number;
+    hypotenuse: number;
+    angle: number;
+    percent: number;
+}
+
+const triangleFromHorizontalPercent = (horizontal: number, percent: number): Triangle => {
+    const vertical = (horizontal * percent) / 100;
+    const angle = radToDeg(Math.atan(percent / 100));
+    const hypotenuse = Math.sqrt(horizontal ** 2 + vertical ** 2);
+    return { horizontal, vertical, hypotenuse, angle, percent };
+};
+
+const triangleFromHorizontalAngle = (horizontal: number, angle: number): Triangle => {
+    const vertical = horizontal * Math.tan(degToRad(angle));
+    const percent = (vertical / horizontal) * 100;
+    const hypotenuse = horizontal / Math.cos(degToRad(angle));
+    return { horizontal, vertical, hypotenuse, angle, percent };
+};
+
+const triangleFromPercentDistance = (percent: number, distance: number): Triangle => {
+    const angle = radToDeg(Math.atan(percent / 100));
+    const vertical = Math.sin(degToRad(angle)) * distance;
+    const horizontal = Math.cos(degToRad(angle)) * distance;
+    return { horizontal, vertical, hypotenuse: distance, angle, percent };
+};
+
+const triangleFromHorizontalVertical = (horizontal: number, vertical: number): Triangle => {
+    const angle = radToDeg(Math.atan(vertical / horizontal));
+    const percent = (vertical / horizontal) * 100;
+    const hypotenuse = Math.sqrt(horizontal ** 2 + vertical ** 2);
+    return { horizontal, vertical, hypotenuse, angle, percent };
+};
+
+const SlopeSketch: React.FC<SketchSpec> = ({
     horizontal,
     vertical,
+    horizontalLabel,
+    verticalLabel,
+    hypotenuseLabel,
+    angleLabel,
     highlight
 }) => {
-    const width = 400;
-    const height = 240;
-    const margin = 40;
-    const rightLabelSpace = 90;
+    const width = 420;
+    const height = 250;
+    const margin = 44;
+    const rightLabelSpace = 100;
     const maxRun = width - 2 * margin - rightLabelSpace;
     const scale = maxRun / horizontal;
     const runPx = horizontal * scale;
@@ -53,87 +100,89 @@ const SlopeSketch: React.FC<{ horizontal: number; vertical: number; highlight: '
     const Cx = Bx;
     const Cy = By - risePx;
 
-    return (
-        <svg width={400} height={240} viewBox="0 0 400 240" className="mx-auto">
-            <polygon
-                points={`${Ax},${Ay} ${Bx},${By} ${Cx},${Cy}`}
-                fill="#eef2ff"
-                stroke="#0f172a"
-                strokeWidth={2}
-            />
-            <line x1={Ax} y1={Ay} x2={Bx} y2={By} stroke="#1f2937" strokeWidth={3} />
-            <line x1={Bx} y1={By} x2={Cx} y2={Cy} stroke="#1f2937" strokeWidth={3} />
-            <line x1={Ax} y1={Ay} x2={Cx} y2={Cy} stroke="#dc2626" strokeWidth={3} />
+    const colorFor = (part: SketchSpec['highlight']) => (highlight === part ? '#dc2626' : '#1f2937');
 
-            <text x={(Ax + Bx) / 2} y={Ay + 22} textAnchor="middle" fontSize="13" fill="#1f2937">
-                horizontale Strecke
+    return (
+        <svg width={420} height={250} viewBox="0 0 420 250" className="mx-auto">
+            <polygon points={`${Ax},${Ay} ${Bx},${By} ${Cx},${Cy}`} fill="#eef2ff" stroke="#0f172a" strokeWidth={2} />
+            <line x1={Ax} y1={Ay} x2={Bx} y2={By} stroke={colorFor('horizontal')} strokeWidth={3} />
+            <line x1={Bx} y1={By} x2={Cx} y2={Cy} stroke={colorFor('vertical')} strokeWidth={3} />
+            <line x1={Ax} y1={Ay} x2={Cx} y2={Cy} stroke={colorFor('hypotenuse')} strokeWidth={3} />
+
+            <text x={(Ax + Bx) / 2} y={Ay + 22} textAnchor="middle" fontSize="13" fill={colorFor('horizontal')}>
+                {horizontalLabel}
             </text>
-            <text x={Bx + 12} y={(By + Cy) / 2} fontSize="13" fill="#1f2937">
-                Höhen-
+            <text x={Bx + 12} y={(By + Cy) / 2} fontSize="13" fill={colorFor('vertical')}>
+                {verticalLabel}
             </text>
-            <text x={Bx + 12} y={(By + Cy) / 2 + 16} fontSize="13" fill="#1f2937">
-                unterschied
+            <text x={(Ax + Cx) / 2 - 10} y={(Ay + Cy) / 2 - 5} fontSize="13" fill={colorFor('hypotenuse')} textAnchor="end">
+                {hypotenuseLabel}
             </text>
-            <text x={(Ax + Cx) / 2 - 10} y={(Ay + Cy) / 2 - 5} fontSize="13" fill="#dc2626" textAnchor="end">
-                Weg
-            </text>
-            <text
-                x={Ax + 28}
-                y={Ay - 10}
-                fontSize="14"
-                fontWeight="bold"
-                fill={highlight === 'angle' ? '#dc2626' : '#1f2937'}
-            >
-                α{highlight === 'angle' ? ' = ?' : ''}
+            <text x={Ax + 28} y={Ay - 10} fontSize="14" fontWeight="bold" fill={colorFor('angle')}>
+                {angleLabel}
             </text>
         </svg>
     );
 };
 
-const buildTask = (): SlopeTask => {
-    const type: TaskType = Math.random() < 0.5 ? 'percent_to_angle' : 'angle_to_percent';
-    const horizontal = round(randomInRange(50, 200), 0);
+const ALPINE_PASSES = [
+    { name: 'der Fernpass', percent: 8 },
+    { name: 'der Achenpass', percent: 12 },
+    { name: 'das Hahntennjoch', percent: 15 },
+    { name: 'der Monte Zoncolan', percent: 22 },
+    { name: 'das Stilfser Joch', percent: 24 },
+    { name: 'das Timmelsjoch', percent: 13 },
+    { name: 'der Sölkpass', percent: 23 },
+    { name: 'der Grimselpass', percent: 11 }
+];
 
-    if (type === 'percent_to_angle') {
-        const percent = round(randomInRange(3, 60), 1);
-        const angle = radToDeg(Math.atan(percent / 100));
-        const vertical = (percent / 100) * horizontal;
+const SLOPE_NOUNS = ['Ein Forstweg', 'Eine Skipiste', 'Eine Tiefgaragenrampe', 'Eine Bergstraße', 'Ein Wanderweg', 'Eine Schotterpiste'];
+const TRAVELERS = ['Ein Auto', 'Ein Fahrradfahrer', 'Ein Linienbus', 'Eine Wanderin', 'Ein Motorrad'];
+const MAP_SCALES = [10000, 25000, 50000];
 
-        const steps: SolutionStep[] = [
-            {
-                text: 'Die Steigung in Prozent ist das Verhältnis von Höhenunterschied zu horizontaler Strecke, multipliziert mit 100.',
-                math: `\\text{Steigung} = \\frac{\\text{Höhenunterschied}}{\\text{horizontale Strecke}} \\cdot 100\\%`
-            },
-            {
-                text: 'Dieses Verhältnis ist genau der Tangens des Steigungswinkels.',
-                math: `\\tan(\\alpha) = \\frac{\\text{Steigung in \\%}}{100} = \\frac{${formatNumber(percent, 1)}}{100} = ${formatNumber(percent / 100, 4)}`
-            },
-            {
-                text: 'Löse mit der Umkehrfunktion Tangens⁻¹ nach dem Winkel auf.',
-                math: `\\alpha = \\tan^{-1}(${formatNumber(percent / 100, 4)})`
-            },
-            {
-                text: 'Berechne und runde den Winkel.',
-                math: `\\alpha \\approx ${formatNumber(angle, 1)}^{\\circ}`
-            }
-        ];
+const buildPassTask = (): SlopeTask => {
+    const pass = pick(ALPINE_PASSES);
+    const horizontal = randomInt(80, 160);
+    const t = triangleFromHorizontalPercent(horizontal, pass.percent);
 
-        return {
-            type,
-            percent,
-            angle: round(angle, 1),
-            horizontal,
-            vertical: round(vertical, 1),
-            prompt: `Eine Straße hat eine Steigung von ${formatNumber(percent, 1)} %. Berechne den Steigungswinkel α in Grad.`,
-            steps,
-            correctAnswer: round(angle, 1),
-            unit: '°'
-        };
-    }
+    const steps: SolutionStep[] = [
+        {
+            text: 'Die Steigung in Prozent entspricht dem Tangens des Steigungswinkels.',
+            math: `\\tan(\\alpha) = \\frac{\\text{Steigung in \\%}}{100} = \\frac{${formatNumber(pass.percent, 1)}}{100} = ${formatNumber(pass.percent / 100, 4)}`
+        },
+        {
+            text: 'Löse mit der Umkehrfunktion Tangens⁻¹ nach dem Winkel auf.',
+            math: `\\alpha = \\tan^{-1}(${formatNumber(pass.percent / 100, 4)})`
+        },
+        {
+            text: 'Berechne und runde den Winkel.',
+            math: `\\alpha \\approx ${formatNumber(t.angle, 1)}^{\\circ}`
+        }
+    ];
 
-    const angle = round(randomInRange(1, 40), 1);
-    const percent = Math.tan(degToRad(angle)) * 100;
-    const vertical = Math.tan(degToRad(angle)) * horizontal;
+    return {
+        prompt: `In den Alpen haben viele Passstraßen starke Steigungen. ${pass.name.charAt(0).toUpperCase()}${pass.name.slice(1)} hat eine maximale Steigung von ${formatNumber(pass.percent, 1)} %. Berechne den Steigungswinkel α dieses Straßenabschnitts.`,
+        steps,
+        correctAnswer: round(t.angle, 1),
+        unit: '°',
+        resultLabel: 'α',
+        sketch: {
+            horizontal: t.horizontal,
+            vertical: t.vertical,
+            horizontalLabel: 'horizontale Strecke',
+            verticalLabel: `${formatNumber(t.vertical, 1)} m`,
+            hypotenuseLabel: 'Weg',
+            angleLabel: 'α = ?',
+            highlight: 'angle'
+        }
+    };
+};
+
+const buildAngleToPercentTask = (): SlopeTask => {
+    const noun = pick(SLOPE_NOUNS);
+    const horizontal = randomInt(60, 150);
+    const angle = round(randomInRange(2, 35), 1);
+    const t = triangleFromHorizontalAngle(horizontal, angle);
 
     const steps: SolutionStep[] = [
         {
@@ -142,30 +191,201 @@ const buildTask = (): SlopeTask => {
         },
         {
             text: 'Setze den gegebenen Winkel ein.',
-            math: `\\tan(${formatNumber(angle, 1)}^{\\circ}) = ${formatNumber(percent / 100, 4)}`
+            math: `\\tan(${formatNumber(angle, 1)}^{\\circ}) = ${formatNumber(t.percent / 100, 4)}`
         },
         {
             text: 'Die Steigung in Prozent ist dieses Verhältnis multipliziert mit 100.',
-            math: `\\text{Steigung} = \\tan(${formatNumber(angle, 1)}^{\\circ}) \\cdot 100\\%`
+            math: `\\text{Steigung} = \\tan(${formatNumber(angle, 1)}^{\\circ}) \\cdot 100\\,\\%`
         },
         {
             text: 'Berechne und runde das Ergebnis.',
-            math: `\\text{Steigung} \\approx ${formatNumber(percent, 1)}\\,\\%`
+            math: `\\text{Steigung} \\approx ${formatNumber(t.percent, 1)}\\,\\%`
         }
     ];
 
     return {
-        type,
-        percent: round(percent, 1),
-        angle,
-        horizontal,
-        vertical: round(vertical, 1),
-        prompt: `Eine Straße steigt unter einem Winkel von α = ${formatNumber(angle, 1)}°. Berechne die Steigung in Prozent.`,
+        prompt: `${noun} hat einen Steigungswinkel von α = ${formatNumber(angle, 1)}°. Berechne die Steigung in Prozent.`,
         steps,
-        correctAnswer: round(percent, 1),
-        unit: '%'
+        correctAnswer: round(t.percent, 1),
+        unit: '%',
+        resultLabel: 'Steigung',
+        sketch: {
+            horizontal: t.horizontal,
+            vertical: t.vertical,
+            horizontalLabel: 'horizontale Strecke',
+            verticalLabel: 'Höhenunterschied = ?',
+            hypotenuseLabel: 'Weg',
+            angleLabel: `α = ${formatNumber(angle, 1)}°`,
+            highlight: 'vertical'
+        }
     };
 };
+
+const buildDistanceTask = (): SlopeTask => {
+    const traveler = pick(TRAVELERS);
+    const percent = round(randomInRange(4, 25), 1);
+    const distance = randomInt(400, 3000);
+    const t = triangleFromPercentDistance(percent, distance);
+    const askHeight = Math.random() < 0.5;
+
+    if (askHeight) {
+        const steps: SolutionStep[] = [
+            {
+                text: 'Bestimme zunächst den Steigungswinkel aus der Steigung in Prozent.',
+                math: `\\alpha = \\tan^{-1}\\!\\left(\\frac{${formatNumber(percent, 1)}}{100}\\right) \\approx ${formatNumber(t.angle, 1)}^{\\circ}`
+            },
+            {
+                text: 'Der Höhenunterschied ist die Gegenkathete zur gefahrenen Strecke (Hypotenuse). Nutze den Sinus.',
+                math: `\\sin(\\alpha) = \\frac{\\text{Höhenunterschied}}{\\text{Fahrstrecke}}`
+            },
+            {
+                text: 'Löse nach dem Höhenunterschied auf und setze ein.',
+                math: `\\text{Höhenunterschied} = \\sin(${formatNumber(t.angle, 1)}^{\\circ}) \\cdot ${formatNumber(distance, 0)}\\,\\text{m}`
+            },
+            {
+                text: 'Berechne und runde das Ergebnis.',
+                math: `\\text{Höhenunterschied} \\approx ${formatNumber(t.vertical, 0)}\\,\\text{m}`
+            }
+        ];
+
+        return {
+            prompt: `${traveler} fährt auf einer Straße mit einem durchschnittlichen Gefälle von ${formatNumber(percent, 1)} % eine Fahrstrecke von ${formatNumber(distance, 0)} m. Welchen Höhenunterschied überwindet es dabei?`,
+            steps,
+            correctAnswer: round(t.vertical, 0),
+            unit: 'm',
+            resultLabel: 'Höhenunterschied',
+            sketch: {
+                horizontal: t.horizontal,
+                vertical: t.vertical,
+                horizontalLabel: 'horizontale Strecke',
+                verticalLabel: 'Höhenunterschied = ?',
+                hypotenuseLabel: `${formatNumber(distance, 0)} m`,
+                angleLabel: `α ≈ ${formatNumber(t.angle, 1)}°`,
+                highlight: 'vertical'
+            }
+        };
+    }
+
+    const steps: SolutionStep[] = [
+        {
+            text: 'Die Steigung in Prozent entspricht dem Tangens des Steigungswinkels.',
+            math: `\\tan(\\alpha) = \\frac{${formatNumber(percent, 1)}}{100} = ${formatNumber(percent / 100, 4)}`
+        },
+        {
+            text: 'Bestimme den Neigungswinkel mit der Umkehrfunktion Tangens⁻¹.',
+            math: `\\alpha = \\tan^{-1}(${formatNumber(percent / 100, 4)})`
+        },
+        {
+            text: 'Berechne und runde den Winkel.',
+            math: `\\alpha \\approx ${formatNumber(t.angle, 1)}^{\\circ}`
+        }
+    ];
+
+    return {
+        prompt: `${traveler} fährt auf einer Straße mit einem durchschnittlichen Gefälle von ${formatNumber(percent, 1)} % eine Fahrstrecke von ${formatNumber(distance, 0)} m. Bestimme den Neigungswinkel der Straße.`,
+        steps,
+        correctAnswer: round(t.angle, 1),
+        unit: '°',
+        resultLabel: 'α',
+        sketch: {
+            horizontal: t.horizontal,
+            vertical: t.vertical,
+            horizontalLabel: 'horizontale Strecke',
+            verticalLabel: `${formatNumber(t.vertical, 0)} m`,
+            hypotenuseLabel: `${formatNumber(distance, 0)} m`,
+            angleLabel: 'α = ?',
+            highlight: 'angle'
+        }
+    };
+};
+
+const buildMapScaleTask = (): SlopeTask => {
+    const scale = pick(MAP_SCALES);
+    const mapDistanceCm = round(randomInRange(2, 9), 1);
+    const heightDiff = randomInt(12, 150);
+    const horizontalCm = mapDistanceCm * scale;
+    const horizontalM = horizontalCm / 100;
+    const t = triangleFromHorizontalVertical(horizontalM, heightDiff);
+    const askPercent = Math.random() < 0.5;
+
+    if (askPercent) {
+        const steps: SolutionStep[] = [
+            {
+                text: 'Berechne zunächst die wahre horizontale Entfernung aus dem Kartenmaßstab.',
+                math: `\\text{Strecke} = ${formatNumber(mapDistanceCm, 1)}\\,\\text{cm} \\cdot ${scale} = ${formatNumber(horizontalCm, 0)}\\,\\text{cm} = ${formatNumber(horizontalM, 0)}\\,\\text{m}`
+            },
+            {
+                text: 'Die Steigung in Prozent ist der Höhenunterschied geteilt durch die horizontale Strecke, mal 100.',
+                math: `\\text{Gefälle} = \\frac{\\text{Höhendifferenz}}{\\text{horizontale Strecke}} \\cdot 100\\,\\%`
+            },
+            {
+                text: 'Setze die Werte ein.',
+                math: `\\text{Gefälle} = \\frac{${formatNumber(heightDiff, 0)}}{${formatNumber(horizontalM, 0)}} \\cdot 100\\,\\%`
+            },
+            {
+                text: 'Berechne und runde das Ergebnis.',
+                math: `\\text{Gefälle} \\approx ${formatNumber(t.percent, 1)}\\,\\%`
+            }
+        ];
+
+        return {
+            prompt: `Zwei Orte sind durch eine geradlinige Straße verbunden. Auf einer Karte mit dem Maßstab 1 : ${scale} sind sie ${formatNumber(mapDistanceCm, 1)} cm voneinander entfernt. Ihre Höhendifferenz beträgt ${formatNumber(heightDiff, 0)} m. Berechne das Gefälle der Straße.`,
+            steps,
+            correctAnswer: round(t.percent, 1),
+            unit: '%',
+            resultLabel: 'Gefälle',
+            sketch: {
+                horizontal: t.horizontal,
+                vertical: t.vertical,
+                horizontalLabel: `${formatNumber(horizontalM, 0)} m`,
+                verticalLabel: `${formatNumber(heightDiff, 0)} m`,
+                hypotenuseLabel: 'Straße = ?',
+                angleLabel: `α ≈ ${formatNumber(t.angle, 1)}°`,
+                highlight: 'hypotenuse'
+            }
+        };
+    }
+
+    const steps: SolutionStep[] = [
+        {
+            text: 'Berechne zunächst die wahre horizontale Entfernung aus dem Kartenmaßstab.',
+            math: `\\text{Strecke} = ${formatNumber(mapDistanceCm, 1)}\\,\\text{cm} \\cdot ${scale} = ${formatNumber(horizontalM, 0)}\\,\\text{m}`
+        },
+        {
+            text: 'Die Straßenlänge ist die Hypotenuse des Steigungsdreiecks. Nutze den Satz des Pythagoras.',
+            math: `\\text{Straßenlänge} = \\sqrt{\\text{horizontale Strecke}^2 + \\text{Höhendifferenz}^2}`
+        },
+        {
+            text: 'Setze die Werte ein.',
+            math: `\\text{Straßenlänge} = \\sqrt{${formatNumber(horizontalM, 0)}^2 + ${formatNumber(heightDiff, 0)}^2}`
+        },
+        {
+            text: 'Berechne und runde auf ganze Meter.',
+            math: `\\text{Straßenlänge} \\approx ${formatNumber(t.hypotenuse, 0)}\\,\\text{m}`
+        }
+    ];
+
+    return {
+        prompt: `Zwei Orte sind durch eine geradlinige Straße verbunden. Auf einer Karte mit dem Maßstab 1 : ${scale} sind sie ${formatNumber(mapDistanceCm, 1)} cm voneinander entfernt. Ihre Höhendifferenz beträgt ${formatNumber(heightDiff, 0)} m. Berechne die Straßenlänge (auf m gerundet).`,
+        steps,
+        correctAnswer: round(t.hypotenuse, 0),
+        unit: 'm',
+        resultLabel: 'Straßenlänge',
+        sketch: {
+            horizontal: t.horizontal,
+            vertical: t.vertical,
+            horizontalLabel: `${formatNumber(horizontalM, 0)} m`,
+            verticalLabel: `${formatNumber(heightDiff, 0)} m`,
+            hypotenuseLabel: 'Straße = ?',
+            angleLabel: `α ≈ ${formatNumber(t.angle, 1)}°`,
+            highlight: 'hypotenuse'
+        }
+    };
+};
+
+const TASK_BUILDERS: (() => SlopeTask)[] = [buildPassTask, buildAngleToPercentTask, buildDistanceTask, buildMapScaleTask];
+
+const buildTask = (): SlopeTask => pick(TASK_BUILDERS)();
 
 const SteigungswinkelProzentGrad: React.FC = () => {
     const [task, setTask] = useState<SlopeTask | null>(null);
@@ -184,8 +404,6 @@ const SteigungswinkelProzentGrad: React.FC = () => {
         generateTask();
     }, []);
 
-    const tolerance = task?.unit === '°' ? 0.5 : 1;
-
     const checkAnswer = () => {
         if (!task) return;
         const value = parseFloat(userAnswer.replace(',', '.'));
@@ -193,6 +411,8 @@ const SteigungswinkelProzentGrad: React.FC = () => {
             setFeedback('info');
             return;
         }
+        const tolerance =
+            task.unit === '°' ? 0.5 : task.unit === '%' ? 0.5 : Math.max(1, task.correctAnswer * 0.03);
         setFeedback(Math.abs(value - task.correctAnswer) <= tolerance ? 'correct' : 'incorrect');
     };
 
@@ -228,6 +448,11 @@ const SteigungswinkelProzentGrad: React.FC = () => {
                             <InlineMath math="\text{Steigung in \%} = \tan(\alpha) \cdot 100" />
                         </div>
                     </div>
+                    <p className="text-gray-700 text-sm">
+                        Ist statt der horizontalen Strecke die tatsächlich gefahrene Weglänge bekannt, hilft der Sinus weiter, denn der
+                        Höhenunterschied ist dann die Gegenkathete zur Hypotenuse. Bei Aufgaben mit einer Landkarte musst du zusätzlich
+                        zuerst den Kartenmaßstab in die wahre Streckenlänge umrechnen.
+                    </p>
                 </div>
 
                 <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
@@ -244,12 +469,8 @@ const SteigungswinkelProzentGrad: React.FC = () => {
                     {task && (
                         <div className="space-y-4">
                             <div className="bg-white border border-gray-200 rounded-lg p-4">
-                                <h3 className="font-semibold text-gray-800 mb-2">Skizze zur aktuellen Aufgabe</h3>
-                                <SlopeSketch
-                                    horizontal={task.horizontal}
-                                    vertical={task.vertical}
-                                    highlight={task.type === 'percent_to_angle' ? 'angle' : 'percent'}
-                                />
+                                <h3 className="font-semibold text-gray-800 mb-2">Steigungsdreieck zur aktuellen Aufgabe</h3>
+                                <SlopeSketch {...task.sketch} />
                             </div>
 
                             <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -317,8 +538,7 @@ const SteigungswinkelProzentGrad: React.FC = () => {
                                         ))}
                                     </ul>
                                     <div className="font-bold text-gray-900">
-                                        Ergebnis: {task.unit === '°' ? 'α' : 'Steigung'} ={' '}
-                                        {formatNumber(task.correctAnswer, 1)}
+                                        Ergebnis: {task.resultLabel} = {formatNumber(task.correctAnswer, task.unit === '°' || task.unit === '%' ? 1 : 0)}
                                         {task.unit}
                                     </div>
                                 </div>
