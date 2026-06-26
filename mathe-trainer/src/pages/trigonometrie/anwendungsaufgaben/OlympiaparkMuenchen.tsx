@@ -15,6 +15,7 @@ interface SubTask {
     imageAlt: string;
     context: string;
     question: string;
+    hint: string;
     inputSuffix?: string;
     correctAnswer: number;
     tolerancePercent?: number;
@@ -41,6 +42,8 @@ const tasks: SubTask[] = [
             'zum Ufer des Sees Z. Für Fortgeschrittene ist eine Anlage vom Dach des Olympiastadions S ebenfalls zum ' +
             'Ufer Z geplant.',
         question: 'Berechnen Sie die nötige Gesamtlänge der Seile für beide Flying-Fox-Anlagen.',
+        hint:
+            'Tipp: Nutze den Sinussatz im Dreieck BSZ, da dir zwei Winkel und eine Seite bekannt sind.',
         inputSuffix: 'm',
         correctAnswer: 1065.03,
         solutionSteps: [
@@ -72,6 +75,9 @@ const tasks: SubTask[] = [
         question:
             'Prüfen Sie rechnerisch, ob diese Bedingung eingehalten wird. Berechnen Sie dazu den Winkel ε und ' +
             'geben Sie ihn in Grad ein.',
+        hint:
+            'Tipp: Bestimme zunächst den Winkel ∢ZSH mit dem Kosinussatz im Dreieck ZSH und addiere ' +
+            'dann den bekannten Winkel α.',
         inputSuffix: '°',
         correctAnswer: 55.40,
         solutionSteps: [
@@ -103,6 +109,9 @@ const tasks: SubTask[] = [
             'Um Unfällen im Landebereich vorzubeugen, muss das dreieckige Gebiet FEZ abgesperrt werden. Die ' +
             'Anlagenbetreiber messen die Strecken mit |FZ| = 80 m und |EZ| = 70 m ab.',
         question: 'Berechnen Sie den Flächeninhalt dieses Gebietes.',
+        hint:
+            'Tipp: Berechne zuerst den fehlenden Winkel ∢FZE über die Winkelsumme und nutze dann die ' +
+            'Flächenformel mit Sinus.',
         inputSuffix: 'm²',
         correctAnswer: 2741.03,
         solutionSteps: [
@@ -137,6 +146,9 @@ const tasks: SubTask[] = [
         question:
             'Überprüfen Sie rechnerisch, ob der Weltrekord gebrochen wurde. Berechnen Sie dazu die Falltiefe ' +
             '|AW| in Metern.',
+        hint:
+            'Tipp: Berechne zunächst |AZ| als Differenz von |SZ| und |AS|, und wende dann den Satz ' +
+            'des Pythagoras im rechtwinkligen Dreieck AWZ an.',
         inputSuffix: 'm',
         correctAnswer: 60.17,
         solutionSteps: [
@@ -174,6 +186,9 @@ const tasks: SubTask[] = [
         question:
             'Zeigen Sie rechnerisch, dass die Vorgabe eingehalten wird, wenn |AW| = 60,17 m und |WZ| = 400 m lang ' +
             'sind. Berechnen Sie dazu das Gefälle in Prozent.',
+        hint:
+            'Tipp: Das Gefälle ist das Verhältnis von Höhenunterschied zu horizontaler Strecke, ' +
+            'multipliziert mit 100 %.',
         inputSuffix: '%',
         correctAnswer: 15.04,
         solutionSteps: [
@@ -203,11 +218,13 @@ const OlympiaparkMuenchen: React.FC = () => {
     const [answers, setAnswers] = useState<Record<number, string>>({});
     const [feedback, setFeedback] = useState<Record<number, 'correct' | 'incorrect' | null>>({});
     const [showSolution, setShowSolution] = useState<Record<number, boolean>>({});
+    const [wrongAttempt, setWrongAttempt] = useState<Record<number, boolean>>({});
 
     const task = tasks[currentTask];
     const currentAnswer = answers[currentTask] ?? '';
     const currentFeedback = feedback[currentTask] ?? null;
     const currentShowSolution = showSolution[currentTask] ?? false;
+    const currentWrongAttempt = wrongAttempt[currentTask] ?? false;
 
     const handleAnswerChange = (value: string) => {
         setAnswers({ ...answers, [currentTask]: value });
@@ -219,11 +236,15 @@ const OlympiaparkMuenchen: React.FC = () => {
         const parsed = parseFloat(normalized);
         if (isNaN(parsed)) {
             setFeedback({ ...feedback, [currentTask]: 'incorrect' });
+            setWrongAttempt({ ...wrongAttempt, [currentTask]: true });
             return;
         }
-        const tolerance = task.correctAnswer * ((task.tolerancePercent ?? 10) / 100);
+        const tolerance = task.correctAnswer * ((task.tolerancePercent ?? 5) / 100);
         const isCorrect = Math.abs(parsed - task.correctAnswer) <= tolerance;
         setFeedback({ ...feedback, [currentTask]: isCorrect ? 'correct' : 'incorrect' });
+        if (!isCorrect) {
+            setWrongAttempt({ ...wrongAttempt, [currentTask]: true });
+        }
     };
 
     const goTo = (index: number) => {
@@ -286,20 +307,29 @@ const OlympiaparkMuenchen: React.FC = () => {
                                 </p>
                             )}
                             {currentFeedback === 'incorrect' && (
-                                <p className="text-red-600 font-semibold flex items-center gap-2">
-                                    <i className="fa-solid fa-circle-xmark"></i> Noch nicht richtig. Versuch es
-                                    erneut oder schau dir die Lösung an.
-                                </p>
+                                <div className="text-center">
+                                    <p className="text-red-600 font-semibold flex items-center justify-center gap-2">
+                                        <i className="fa-solid fa-circle-xmark"></i> Noch nicht richtig.
+                                    </p>
+                                    <p className="text-slate-600 text-sm mt-1">{task.hint}</p>
+                                </div>
                             )}
                         </div>
 
                         <div className="flex justify-center">
-                            <button
-                                onClick={() => setShowSolution({ ...showSolution, [currentTask]: !currentShowSolution })}
-                                className="px-6 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
-                            >
-                                {currentShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
-                            </button>
+                            {currentWrongAttempt ? (
+                                <button
+                                    onClick={() => setShowSolution({ ...showSolution, [currentTask]: !currentShowSolution })}
+                                    className="px-6 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
+                                >
+                                    {currentShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
+                                </button>
+                            ) : (
+                                <p className="text-slate-400 text-sm italic">
+                                    Versuche es zuerst selbst. Nach einem falschen Versuch kannst du dir die
+                                    Musterlösung anzeigen lassen.
+                                </p>
+                            )}
                         </div>
 
                         {currentShowSolution && (

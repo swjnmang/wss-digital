@@ -15,6 +15,7 @@ interface SubTask {
     imageAlt: string;
     context: string;
     question: string;
+    hint: string;
     inputSuffix?: string;
     correctAnswer: number;
     tolerancePercent?: number;
@@ -23,7 +24,7 @@ interface SubTask {
 
 const SKETCH = '/images/stadion.png';
 const SKETCH_ALT =
-    'Querschnitt eines Stadions mit Spielfeld, Tribüne, Treppenaufgang AB, Außenwand AE, Stadiondach EF und den Punkten A, B, C, D, E, F, K, M';
+    'Querschnitt eines Stadions mit Spielfeld, Tribüne, Treppenaufgang CD, Außenwand AE, Stadiondach EF und den Punkten A, B, C, D, E, F, K, M';
 
 const intro =
     'Ein Bundesligaverein plant den Bau eines neuen Stadions. Dazu hat der Architekt einen ' +
@@ -38,8 +39,13 @@ const tasks: SubTask[] = [
         context:
             intro +
             '\n\nEine Sicherheitsvorschrift sieht vor, dass die Steigung des Treppenaufgangs ' +
-            '|AB| der Tribüne maximal 50 % betragen darf.',
-        question: 'Entscheiden Sie mit Hilfe einer Rechnung, ob die Sicherheitsvorschrift eingehalten wird.',
+            '|CD| der Tribüne maximal 50 % betragen darf.',
+        question:
+            'Entscheiden Sie mit Hilfe einer Rechnung, ob die Sicherheitsvorschrift eingehalten wird. ' +
+            'Berechne dafür den Steigungswinkel in Prozent.',
+        hint:
+            'Tipp: Die Steigung in Prozent berechnest du, indem du die Höhe der Treppe durch die ' +
+            'waagrechte Strecke teilst und mit 100 multiplizierst.',
         inputSuffix: '%',
         correctAnswer: 46.67,
         solutionSteps: [
@@ -64,6 +70,9 @@ const tasks: SubTask[] = [
         imageAlt: SKETCH_ALT,
         context: 'Der Erhebungswinkel des Stadiondaches beträgt ε = 9,50°.',
         question: 'Berechnen Sie die Länge des Stadiondachs |EF|.',
+        hint:
+            'Tipp: Nutze den Kosinus des Erhebungswinkels ε, der das Verhältnis von Ankathete ' +
+            '(|AB| + |BC|) zu Hypotenuse (|EF|) angibt.',
         inputSuffix: 'm',
         correctAnswer: 50.70,
         solutionSteps: [
@@ -88,6 +97,9 @@ const tasks: SubTask[] = [
         imageAlt: SKETCH_ALT,
         context: 'Die Strecke EF beträgt 50,70 Meter.',
         question: 'Berechnen Sie die Höhe der Außenwand |AE|.',
+        hint:
+            'Tipp: Bestimme zunächst die Innenwinkel des Dreiecks AEF und wende anschließend den ' +
+            'Sinussatz an.',
         inputSuffix: 'm',
         correctAnswer: 26.65,
         solutionSteps: [
@@ -116,6 +128,9 @@ const tasks: SubTask[] = [
         context:
             'Die Fläche ADE soll für Werbezwecke verwendet werden. Die Strecke AE ist 26,65 m lang.',
         question: 'Berechnen Sie die Größe dieser Werbefläche.',
+        hint:
+            'Tipp: Berechne zunächst |AD| mit dem Satz des Pythagoras und nutze dann die ' +
+            'Flächenformel mit Sinus.',
         inputSuffix: 'm²',
         correctAnswer: 266.44,
         solutionSteps: [
@@ -147,6 +162,9 @@ const tasks: SubTask[] = [
             'Die Entfernung des Flutlichtscheinwerfers beträgt zum linken Spielfeldrand ' +
             '|FK| = 36,45 m und zum rechten Rand |FM| = 106,12 m.',
         question: 'Berechnen Sie den dafür notwendigen Abstrahlwinkel γ.',
+        hint:
+            'Tipp: Da alle drei Seiten des Dreiecks FKM bekannt sind, hilft dir der Kosinussatz, ' +
+            'den Winkel γ zu berechnen.',
         inputSuffix: '°',
         correctAnswer: 54.52,
         solutionSteps: [
@@ -172,11 +190,13 @@ const Stadion: React.FC = () => {
     const [answers, setAnswers] = useState<Record<number, string>>({});
     const [feedback, setFeedback] = useState<Record<number, 'correct' | 'incorrect' | null>>({});
     const [showSolution, setShowSolution] = useState<Record<number, boolean>>({});
+    const [wrongAttempt, setWrongAttempt] = useState<Record<number, boolean>>({});
 
     const task = tasks[currentTask];
     const currentAnswer = answers[currentTask] ?? '';
     const currentFeedback = feedback[currentTask] ?? null;
     const currentShowSolution = showSolution[currentTask] ?? false;
+    const currentWrongAttempt = wrongAttempt[currentTask] ?? false;
 
     const handleAnswerChange = (value: string) => {
         setAnswers({ ...answers, [currentTask]: value });
@@ -188,11 +208,15 @@ const Stadion: React.FC = () => {
         const parsed = parseFloat(normalized);
         if (isNaN(parsed)) {
             setFeedback({ ...feedback, [currentTask]: 'incorrect' });
+            setWrongAttempt({ ...wrongAttempt, [currentTask]: true });
             return;
         }
-        const tolerance = task.correctAnswer * ((task.tolerancePercent ?? 10) / 100);
+        const tolerance = task.correctAnswer * ((task.tolerancePercent ?? 5) / 100);
         const isCorrect = Math.abs(parsed - task.correctAnswer) <= tolerance;
         setFeedback({ ...feedback, [currentTask]: isCorrect ? 'correct' : 'incorrect' });
+        if (!isCorrect) {
+            setWrongAttempt({ ...wrongAttempt, [currentTask]: true });
+        }
     };
 
     const goTo = (index: number) => {
@@ -255,20 +279,29 @@ const Stadion: React.FC = () => {
                                 </p>
                             )}
                             {currentFeedback === 'incorrect' && (
-                                <p className="text-red-600 font-semibold flex items-center gap-2">
-                                    <i className="fa-solid fa-circle-xmark"></i> Noch nicht richtig. Versuch es
-                                    erneut oder schau dir die Lösung an.
-                                </p>
+                                <div className="text-center">
+                                    <p className="text-red-600 font-semibold flex items-center justify-center gap-2">
+                                        <i className="fa-solid fa-circle-xmark"></i> Noch nicht richtig.
+                                    </p>
+                                    <p className="text-slate-600 text-sm mt-1">{task.hint}</p>
+                                </div>
                             )}
                         </div>
 
                         <div className="flex justify-center">
-                            <button
-                                onClick={() => setShowSolution({ ...showSolution, [currentTask]: !currentShowSolution })}
-                                className="px-6 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
-                            >
-                                {currentShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
-                            </button>
+                            {currentWrongAttempt ? (
+                                <button
+                                    onClick={() => setShowSolution({ ...showSolution, [currentTask]: !currentShowSolution })}
+                                    className="px-6 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
+                                >
+                                    {currentShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
+                                </button>
+                            ) : (
+                                <p className="text-slate-400 text-sm italic">
+                                    Versuche es zuerst selbst. Nach einem falschen Versuch kannst du dir die
+                                    Musterlösung anzeigen lassen.
+                                </p>
+                            )}
                         </div>
 
                         {currentShowSolution && (
