@@ -246,7 +246,7 @@ const Kosinussatz: React.FC = () => {
             },
             {
                 text: 'Berechne den Quotienten.',
-                math: `\\cos(${angleSymbols[targetAngle]}) = ${round(clamped, 4)} \\Leftrightarrow ${angleSymbols[targetAngle]} = \\arccos(${round(clamped, 4)})`
+                math: `\\cos(${angleSymbols[targetAngle]}) = ${round(clamped, 4)} \\Leftrightarrow ${angleSymbols[targetAngle]} = \\cos^{-1}(${round(clamped, 4)})`
             },
             {
                 text: 'Bestimme den Winkel in Grad.',

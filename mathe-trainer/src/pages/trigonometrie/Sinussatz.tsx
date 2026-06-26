@@ -319,8 +319,8 @@ const createFindAngleTask = (triangle: Triangle): SinusTask => {
             math: `\\sin(${angleSymbols[targetAngle]}) = \\frac{${formatNumber(triangle[targetSide])}}{${formatNumber(triangle[referenceSide])}} \\cdot \\sin(${formatNumber(triangle[referenceAngle], 1)}^\\circ)`
         },
         {
-            text: 'Arcussinus verwenden',
-            math: `${angleSymbols[targetAngle]} = \\arcsin(${formatNumber(clamped, 3)}) \\approx ${formatNumber(calculatedAngle, 1)}^\\circ`
+            text: 'Umkehrfunktion (Sinus⁻¹) verwenden',
+            math: `${angleSymbols[targetAngle]} = \\sin^{-1}(${formatNumber(clamped, 3)}) \\approx ${formatNumber(calculatedAngle, 1)}^\\circ`
         }
     ];
 

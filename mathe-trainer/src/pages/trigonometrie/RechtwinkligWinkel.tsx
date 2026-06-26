@@ -279,7 +279,7 @@ const RechtwinkligWinkel: React.FC = () => {
             pushStep(
                 steps,
                 'Forme nach dem Winkel um und runde.',
-                `${symbol} = \\arctan(${formatNumber(ratio, 3)}) \\approx ${formatNumber(task[angleKey])}^{\\circ}`
+                `${symbol} = \\tan^{-1}(${formatNumber(ratio, 3)}) \\approx ${formatNumber(task[angleKey])}^{\\circ}`
             );
             return { key: angleKey, title: `${symbol} berechnen`, steps };
         }
@@ -299,7 +299,7 @@ const RechtwinkligWinkel: React.FC = () => {
             pushStep(
                 steps,
                 'Bestimme den Winkel.',
-                `${symbol} = \\arcsin(${formatNumber(ratio, 3)}) \\approx ${formatNumber(task[angleKey])}^{\\circ}`
+                `${symbol} = \\sin^{-1}(${formatNumber(ratio, 3)}) \\approx ${formatNumber(task[angleKey])}^{\\circ}`
             );
             return { key: angleKey, title: `${symbol} berechnen`, steps };
         }
@@ -319,7 +319,7 @@ const RechtwinkligWinkel: React.FC = () => {
             pushStep(
                 steps,
                 'Bestimme den Winkel.',
-                `${symbol} = \\arccos(${formatNumber(ratio, 3)}) \\approx ${formatNumber(task[angleKey])}^{\\circ}`
+                `${symbol} = \\cos^{-1}(${formatNumber(ratio, 3)}) \\approx ${formatNumber(task[angleKey])}^{\\circ}`
             );
             return { key: angleKey, title: `${symbol} berechnen`, steps };
         }
