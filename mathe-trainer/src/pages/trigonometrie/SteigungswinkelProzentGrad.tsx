@@ -15,7 +15,8 @@ interface SketchSpec {
     verticalLabel: string;
     hypotenuseLabel: string;
     angleLabel: string;
-    highlight: 'horizontal' | 'vertical' | 'hypotenuse' | 'angle';
+    highlight: 'horizontal' | 'vertical' | 'hypotenuse' | 'angle' | 'none';
+    askedLabel?: string;
 }
 
 interface SlopeTask {
@@ -78,7 +79,8 @@ const SlopeSketch: React.FC<SketchSpec> = ({
     verticalLabel,
     hypotenuseLabel,
     angleLabel,
-    highlight
+    highlight,
+    askedLabel
 }) => {
     const width = 420;
     const height = 250;
@@ -121,6 +123,11 @@ const SlopeSketch: React.FC<SketchSpec> = ({
             <text x={Ax + 28} y={Ay - 10} fontSize="14" fontWeight="bold" fill={colorFor('angle')}>
                 {angleLabel}
             </text>
+            {askedLabel && (
+                <text x={width - 16} y={28} textAnchor="end" fontSize="14" fontWeight="bold" fill="#dc2626">
+                    {askedLabel}
+                </text>
+            )}
         </svg>
     );
 };
@@ -213,10 +220,11 @@ const buildAngleToPercentTask = (): SlopeTask => {
             horizontal: t.horizontal,
             vertical: t.vertical,
             horizontalLabel: 'horizontale Strecke',
-            verticalLabel: 'Höhenunterschied = ?',
+            verticalLabel: '',
             hypotenuseLabel: 'Weg',
             angleLabel: `α = ${formatNumber(angle, 1)}°`,
-            highlight: 'vertical'
+            highlight: 'none',
+            askedLabel: 'Steigung = ?'
         }
     };
 };
@@ -226,7 +234,7 @@ const buildDistanceTask = (): SlopeTask => {
     const percent = round(randomInRange(4, 25), 1);
     const distance = randomInt(400, 3000);
     const t = triangleFromPercentDistance(percent, distance);
-    const askHeight = Math.random() < 0.5;
+    const askHeight = Math.random() < 0.3;
 
     if (askHeight) {
         const steps: SolutionStep[] = [
@@ -306,7 +314,7 @@ const buildMapScaleTask = (): SlopeTask => {
     const horizontalCm = mapDistanceCm * scale;
     const horizontalM = horizontalCm / 100;
     const t = triangleFromHorizontalVertical(horizontalM, heightDiff);
-    const askPercent = Math.random() < 0.5;
+    const askPercent = Math.random() < 0.7;
 
     if (askPercent) {
         const steps: SolutionStep[] = [
@@ -339,9 +347,10 @@ const buildMapScaleTask = (): SlopeTask => {
                 vertical: t.vertical,
                 horizontalLabel: `${formatNumber(horizontalM, 0)} m`,
                 verticalLabel: `${formatNumber(heightDiff, 0)} m`,
-                hypotenuseLabel: 'Straße = ?',
+                hypotenuseLabel: 'Straße',
                 angleLabel: `α ≈ ${formatNumber(t.angle, 1)}°`,
-                highlight: 'hypotenuse'
+                highlight: 'none',
+                askedLabel: 'Gefälle = ?'
             }
         };
     }
@@ -383,7 +392,14 @@ const buildMapScaleTask = (): SlopeTask => {
     };
 };
 
-const TASK_BUILDERS: (() => SlopeTask)[] = [buildPassTask, buildAngleToPercentTask, buildDistanceTask, buildMapScaleTask];
+const TASK_BUILDERS: (() => SlopeTask)[] = [
+    buildPassTask,
+    buildPassTask,
+    buildAngleToPercentTask,
+    buildAngleToPercentTask,
+    buildDistanceTask,
+    buildMapScaleTask
+];
 
 const buildTask = (): SlopeTask => pick(TASK_BUILDERS)();
 
@@ -434,16 +450,18 @@ const SteigungswinkelProzentGrad: React.FC = () => {
                         Gegenkathete des Steigungswinkels α. Die Steigung in Prozent ist nichts anderes als dieses Seitenverhältnis,
                         multipliziert mit 100 – also genau der Tangens von α.
                     </p>
-                    <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 inline-block">
-                        <InlineMath math="\tan(\alpha) = \frac{\text{Höhenunterschied}}{\text{horizontale Strecke}} = \frac{\text{Steigung in \%}}{100}" />
+                    <div className="flex justify-center">
+                        <div className="bg-white border border-gray-200 rounded-lg px-3 py-2">
+                            <InlineMath math="\tan(\alpha) = \frac{\text{Höhenunterschied}}{\text{horizontale Strecke}} = \frac{\text{Steigung in \%}}{100}" />
+                        </div>
                     </div>
                     <p className="text-gray-700 text-sm">Daraus ergeben sich zwei Umrechnungen:</p>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                        <div className="bg-white border border-gray-200 rounded-lg px-3 py-2">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch">
+                        <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 flex flex-col items-center justify-center text-center">
                             <p className="text-xs text-gray-500 mb-1">Von Prozent zu Grad</p>
                             <InlineMath math="\alpha = \tan^{-1}\!\left(\frac{\text{Steigung in \%}}{100}\right)" />
                         </div>
-                        <div className="bg-white border border-gray-200 rounded-lg px-3 py-2">
+                        <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 flex flex-col items-center justify-center text-center">
                             <p className="text-xs text-gray-500 mb-1">Von Grad zu Prozent</p>
                             <InlineMath math="\text{Steigung in \%} = \tan(\alpha) \cdot 100" />
                         </div>
@@ -507,7 +525,7 @@ const SteigungswinkelProzentGrad: React.FC = () => {
                                 </p>
                             )}
 
-                            <div className="flex gap-4 flex-wrap">
+                            <div className="flex gap-4 flex-wrap justify-center items-center">
                                 <button
                                     onClick={checkAnswer}
                                     className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
