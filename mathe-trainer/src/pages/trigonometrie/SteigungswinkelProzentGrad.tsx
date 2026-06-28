@@ -314,80 +314,41 @@ const buildMapScaleTask = (): SlopeTask => {
     const horizontalCm = mapDistanceCm * scale;
     const horizontalM = horizontalCm / 100;
     const t = triangleFromHorizontalVertical(horizontalM, heightDiff);
-    const askPercent = Math.random() < 0.7;
-
-    if (askPercent) {
-        const steps: SolutionStep[] = [
-            {
-                text: 'Berechne zunächst die wahre horizontale Entfernung aus dem Kartenmaßstab.',
-                math: `\\text{Strecke} = ${formatNumber(mapDistanceCm, 1)}\\,\\text{cm} \\cdot ${scale} = ${formatNumber(horizontalCm, 0)}\\,\\text{cm} = ${formatNumber(horizontalM, 0)}\\,\\text{m}`
-            },
-            {
-                text: 'Die Steigung in Prozent ist der Höhenunterschied geteilt durch die horizontale Strecke, mal 100.',
-                math: `\\text{Gefälle} = \\frac{\\text{Höhendifferenz}}{\\text{horizontale Strecke}} \\cdot 100\\,\\%`
-            },
-            {
-                text: 'Setze die Werte ein.',
-                math: `\\text{Gefälle} = \\frac{${formatNumber(heightDiff, 0)}}{${formatNumber(horizontalM, 0)}} \\cdot 100\\,\\%`
-            },
-            {
-                text: 'Berechne und runde das Ergebnis.',
-                math: `\\text{Gefälle} \\approx ${formatNumber(t.percent, 1)}\\,\\%`
-            }
-        ];
-
-        return {
-            prompt: `Zwei Orte sind durch eine geradlinige Straße verbunden. Auf einer Karte mit dem Maßstab 1 : ${scale} sind sie ${formatNumber(mapDistanceCm, 1)} cm voneinander entfernt. Ihre Höhendifferenz beträgt ${formatNumber(heightDiff, 0)} m. Berechne das Gefälle der Straße.`,
-            steps,
-            correctAnswer: round(t.percent, 1),
-            unit: '%',
-            resultLabel: 'Gefälle',
-            sketch: {
-                horizontal: t.horizontal,
-                vertical: t.vertical,
-                horizontalLabel: `${formatNumber(horizontalM, 0)} m`,
-                verticalLabel: `${formatNumber(heightDiff, 0)} m`,
-                hypotenuseLabel: 'Straße',
-                angleLabel: `α ≈ ${formatNumber(t.angle, 1)}°`,
-                highlight: 'none',
-                askedLabel: 'Gefälle = ?'
-            }
-        };
-    }
 
     const steps: SolutionStep[] = [
         {
             text: 'Berechne zunächst die wahre horizontale Entfernung aus dem Kartenmaßstab.',
-            math: `\\text{Strecke} = ${formatNumber(mapDistanceCm, 1)}\\,\\text{cm} \\cdot ${scale} = ${formatNumber(horizontalM, 0)}\\,\\text{m}`
+            math: `\\text{Strecke} = ${formatNumber(mapDistanceCm, 1)}\\,\\text{cm} \\cdot ${scale} = ${formatNumber(horizontalCm, 0)}\\,\\text{cm} = ${formatNumber(horizontalM, 0)}\\,\\text{m}`
         },
         {
-            text: 'Die Straßenlänge ist die Hypotenuse des Steigungsdreiecks. Nutze den Satz des Pythagoras.',
-            math: `\\text{Straßenlänge} = \\sqrt{\\text{horizontale Strecke}^2 + \\text{Höhendifferenz}^2}`
+            text: 'Die Steigung in Prozent ist der Höhenunterschied geteilt durch die horizontale Strecke, mal 100.',
+            math: `\\text{Gefälle} = \\frac{\\text{Höhendifferenz}}{\\text{horizontale Strecke}} \\cdot 100\\,\\%`
         },
         {
             text: 'Setze die Werte ein.',
-            math: `\\text{Straßenlänge} = \\sqrt{${formatNumber(horizontalM, 0)}^2 + ${formatNumber(heightDiff, 0)}^2}`
+            math: `\\text{Gefälle} = \\frac{${formatNumber(heightDiff, 0)}}{${formatNumber(horizontalM, 0)}} \\cdot 100\\,\\%`
         },
         {
-            text: 'Berechne und runde auf ganze Meter.',
-            math: `\\text{Straßenlänge} \\approx ${formatNumber(t.hypotenuse, 0)}\\,\\text{m}`
+            text: 'Berechne und runde das Ergebnis.',
+            math: `\\text{Gefälle} \\approx ${formatNumber(t.percent, 1)}\\,\\%`
         }
     ];
 
     return {
-        prompt: `Zwei Orte sind durch eine geradlinige Straße verbunden. Auf einer Karte mit dem Maßstab 1 : ${scale} sind sie ${formatNumber(mapDistanceCm, 1)} cm voneinander entfernt. Ihre Höhendifferenz beträgt ${formatNumber(heightDiff, 0)} m. Berechne die Straßenlänge (auf m gerundet).`,
+        prompt: `Zwei Orte sind durch eine geradlinige Straße verbunden. Auf einer Karte mit dem Maßstab 1 : ${scale} sind sie ${formatNumber(mapDistanceCm, 1)} cm voneinander entfernt. Ihre Höhendifferenz beträgt ${formatNumber(heightDiff, 0)} m. Berechne das Gefälle der Straße.`,
         steps,
-        correctAnswer: round(t.hypotenuse, 0),
-        unit: 'm',
-        resultLabel: 'Straßenlänge',
+        correctAnswer: round(t.percent, 1),
+        unit: '%',
+        resultLabel: 'Gefälle',
         sketch: {
             horizontal: t.horizontal,
             vertical: t.vertical,
             horizontalLabel: `${formatNumber(horizontalM, 0)} m`,
             verticalLabel: `${formatNumber(heightDiff, 0)} m`,
-            hypotenuseLabel: 'Straße = ?',
+            hypotenuseLabel: 'Straße',
             angleLabel: `α ≈ ${formatNumber(t.angle, 1)}°`,
-            highlight: 'hypotenuse'
+            highlight: 'none',
+            askedLabel: 'Gefälle = ?'
         }
     };
 };
