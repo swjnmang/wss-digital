@@ -64,28 +64,89 @@ interface SketchPoints {
     C: { x: number; y: number };
 }
 
+const SKETCH_WIDTH = 360;
+const SKETCH_HEIGHT = 260;
+const SKETCH_MARGIN = 50;
+
 const buildSketchPoints = (triangle: Triangle): SketchPoints => {
-    const width = 320;
-    const height = 240;
-    const margin = 40;
-    const scale = (width - 2 * margin) / Math.max(triangle.a, triangle.b, triangle.c);
-    const c = Math.max(triangle.c * scale, 1);
-    const a = triangle.a * scale;
-    const b = triangle.b * scale;
-    const Ax = margin;
-    const Ay = height - margin;
-    const Bx = margin + c;
-    const By = height - margin;
-    const Px = (b * b + c * c - a * a) / (2 * c);
-    const Py = Math.sqrt(Math.max(b * b - Px * Px, 4));
-    const Cx = Ax + Px;
-    const Cy = Ay - Py;
+    // Lege A im Ursprung und B auf der x-Achse fest, C ergibt sich über den Winkel alpha.
+    const alphaRad = degToRad(triangle.alpha);
+    const rawA = { x: 0, y: 0 };
+    const rawB = { x: triangle.c, y: 0 };
+    const rawC = { x: triangle.b * Math.cos(alphaRad), y: triangle.b * Math.sin(alphaRad) };
+
+    const minX = Math.min(rawA.x, rawB.x, rawC.x);
+    const maxX = Math.max(rawA.x, rawB.x, rawC.x);
+    const minY = 0;
+    const maxY = Math.max(rawC.y, 0.0001);
+
+    const availableWidth = SKETCH_WIDTH - 2 * SKETCH_MARGIN;
+    const availableHeight = SKETCH_HEIGHT - 2 * SKETCH_MARGIN;
+    const scale = Math.min(availableWidth / (maxX - minX), availableHeight / (maxY - minY));
+
+    const toScreen = (p: { x: number; y: number }) => ({
+        x: SKETCH_MARGIN + (p.x - minX) * scale,
+        y: SKETCH_HEIGHT - SKETCH_MARGIN - (p.y - minY) * scale
+    });
 
     return {
-        A: { x: Ax, y: Ay },
-        B: { x: Bx, y: By },
-        C: { x: Cx, y: Cy }
+        A: toScreen(rawA),
+        B: toScreen(rawB),
+        C: toScreen(rawC)
     };
+};
+
+const GIVEN_COLOR = '#1f2937';
+const HIGHLIGHT_COLOR = '#dc2626';
+
+// Zeichnet einen kleinen Winkel-Bogen an einem Dreiecks-Knoten, Label sitzt auf der Winkelhalbierenden nach außen versetzt.
+const drawVertexAngleArc = (
+    vertex: { x: number; y: number },
+    p1: { x: number; y: number },
+    p2: { x: number; y: number },
+    radius: number,
+    label: string,
+    color: string,
+    key: string
+) => {
+    const v1 = [p1.x - vertex.x, p1.y - vertex.y];
+    const v2 = [p2.x - vertex.x, p2.y - vertex.y];
+    const len1 = Math.sqrt(v1[0] * v1[0] + v1[1] * v1[1]) || 1;
+    const len2 = Math.sqrt(v2[0] * v2[0] + v2[1] * v2[1]) || 1;
+    const unit1 = [v1[0] / len1, v1[1] / len1];
+    const unit2 = [v2[0] / len2, v2[1] / len2];
+
+    const start = [vertex.x + unit1[0] * radius, vertex.y + unit1[1] * radius];
+    const end = [vertex.x + unit2[0] * radius, vertex.y + unit2[1] * radius];
+
+    const angle1 = Math.atan2(v1[1], v1[0]);
+    const angle2 = Math.atan2(v2[1], v2[0]);
+    let delta = angle2 - angle1;
+    delta = ((delta + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+    const largeArc = Math.abs(delta) > Math.PI ? 1 : 0;
+    const sweep = delta > 0 ? 1 : 0;
+
+    let bisector = [unit1[0] + unit2[0], unit1[1] + unit2[1]];
+    const bisectorLen = Math.sqrt(bisector[0] * bisector[0] + bisector[1] * bisector[1]);
+    bisector = bisectorLen > 0.0001 ? [bisector[0] / bisectorLen, bisector[1] / bisectorLen] : [unit1[0], unit1[1]];
+
+    const labelRadius = radius + 14;
+    const labelX = vertex.x + bisector[0] * labelRadius;
+    const labelY = vertex.y + bisector[1] * labelRadius;
+
+    return (
+        <g key={`arc-${key}`}>
+            <path
+                d={`M ${start[0]} ${start[1]} A ${radius} ${radius} 0 ${largeArc} ${sweep} ${end[0]} ${end[1]}`}
+                fill="none"
+                stroke={color}
+                strokeWidth={1.2}
+            />
+            <text x={labelX} y={labelY} fontSize="13" fill={color} textAnchor="middle" dy="0.3em">
+                {label}
+            </text>
+        </g>
+    );
 };
 
 const TriangleSketch: React.FC<{
@@ -95,7 +156,7 @@ const TriangleSketch: React.FC<{
 }> = ({ triangle, highlight, givenKeys }) => {
     const points = buildSketchPoints(triangle);
     const givenSet = new Set(givenKeys);
-    const colorFor = (key: AngleKey | SideKey) => (highlight === key ? '#dc2626' : '#1f2937');
+    const colorFor = (key: AngleKey | SideKey) => (highlight === key ? HIGHLIGHT_COLOR : GIVEN_COLOR);
     const getSideLabel = (side: SideKey) => {
         if (highlight === side) return `${side} = ?`;
         if (givenSet.has(side)) return `${side} = ${formatValue(triangle[side], '')}`;
@@ -108,8 +169,43 @@ const TriangleSketch: React.FC<{
         return symbol;
     };
 
+    const centroid = {
+        x: (points.A.x + points.B.x + points.C.x) / 3,
+        y: (points.A.y + points.B.y + points.C.y) / 3
+    };
+
+    const pointLabelProps = (p: { x: number; y: number }) => {
+        const dx = p.x - centroid.x;
+        const dy = p.y - centroid.y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        const offset = 16;
+        return {
+            x: p.x + (dx / len) * offset,
+            y: p.y + (dy / len) * offset,
+            textAnchor: dx > 5 ? 'start' : dx < -5 ? 'end' : 'middle',
+            dy: dy > 5 ? '0.8em' : dy < -5 ? '0em' : '0.3em'
+        } as const;
+    };
+
+    const labelA = pointLabelProps(points.A);
+    const labelB = pointLabelProps(points.B);
+    const labelC = pointLabelProps(points.C);
+
+    const sideLabelPos = (p1: { x: number; y: number }, p2: { x: number; y: number }, offset = 16) => {
+        const mx = (p1.x + p2.x) / 2;
+        const my = (p1.y + p2.y) / 2;
+        const dx = mx - centroid.x;
+        const dy = my - centroid.y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        return { x: mx + (dx / len) * offset, y: my + (dy / len) * offset };
+    };
+
+    const sideLabelC = sideLabelPos(points.A, points.B);
+    const sideLabelB = sideLabelPos(points.A, points.C);
+    const sideLabelA = sideLabelPos(points.B, points.C);
+
     return (
-        <svg width={360} height={260} viewBox="0 0 360 260" className="mx-auto">
+        <svg width="100%" height="100%" viewBox={`0 0 ${SKETCH_WIDTH} ${SKETCH_HEIGHT}`} preserveAspectRatio="xMidYMid meet" className="mx-auto">
             <polygon
                 points={`${points.A.x},${points.A.y} ${points.B.x},${points.B.y} ${points.C.x},${points.C.y}`}
                 fill="#eef2ff"
@@ -120,29 +216,33 @@ const TriangleSketch: React.FC<{
             <line x1={points.A.x} y1={points.A.y} x2={points.C.x} y2={points.C.y} stroke={colorFor('b')} strokeWidth={3} />
             <line x1={points.B.x} y1={points.B.y} x2={points.C.x} y2={points.C.y} stroke={colorFor('a')} strokeWidth={3} />
 
-            <text x={points.A.x - 15} y={points.A.y + 15} fontWeight="bold">A</text>
-            <text x={points.B.x + 10} y={points.B.y + 15} fontWeight="bold">B</text>
-            <text x={points.C.x} y={points.C.y - 10} fontWeight="bold" textAnchor="middle">C</text>
+            <circle cx={points.A.x} cy={points.A.y} r={2.5} fill="#0f172a" />
+            <circle cx={points.B.x} cy={points.B.y} r={2.5} fill="#0f172a" />
+            <circle cx={points.C.x} cy={points.C.y} r={2.5} fill="#0f172a" />
 
-            <text x={(points.A.x + points.B.x) / 2} y={points.A.y + 25} textAnchor="middle" fill={colorFor('c')}>
+            <text x={labelA.x} y={labelA.y} dy={labelA.dy} textAnchor={labelA.textAnchor} fontSize="14" fontWeight="bold">
+                A
+            </text>
+            <text x={labelB.x} y={labelB.y} dy={labelB.dy} textAnchor={labelB.textAnchor} fontSize="14" fontWeight="bold">
+                B
+            </text>
+            <text x={labelC.x} y={labelC.y} dy={labelC.dy} textAnchor={labelC.textAnchor} fontSize="14" fontWeight="bold">
+                C
+            </text>
+
+            <text x={sideLabelC.x} y={sideLabelC.y} textAnchor="middle" fontSize="13" fill={colorFor('c')}>
                 {getSideLabel('c')}
             </text>
-            <text x={(points.A.x + points.C.x) / 2 - 10} y={(points.A.y + points.C.y) / 2} textAnchor="end" fill={colorFor('b')}>
+            <text x={sideLabelB.x} y={sideLabelB.y} textAnchor="middle" fontSize="13" fill={colorFor('b')}>
                 {getSideLabel('b')}
             </text>
-            <text x={(points.B.x + points.C.x) / 2 + 10} y={(points.B.y + points.C.y) / 2} fill={colorFor('a')}>
+            <text x={sideLabelA.x} y={sideLabelA.y} textAnchor="middle" fontSize="13" fill={colorFor('a')}>
                 {getSideLabel('a')}
             </text>
 
-            <text x={points.A.x + 5} y={points.A.y - 10} fill={colorFor('alpha')}>
-                {getAngleLabel('alpha')}
-            </text>
-            <text x={points.B.x - 80} y={points.B.y - 10} fill={colorFor('beta')}>
-                {getAngleLabel('beta')}
-            </text>
-            <text x={points.C.x} y={points.C.y - 20} textAnchor="middle" fill={colorFor('gamma')}>
-                {getAngleLabel('gamma')}
-            </text>
+            {drawVertexAngleArc(points.A, points.C, points.B, 20, getAngleLabel('alpha'), colorFor('alpha'), 'alpha')}
+            {drawVertexAngleArc(points.B, points.A, points.C, 20, getAngleLabel('beta'), colorFor('beta'), 'beta')}
+            {drawVertexAngleArc(points.C, points.B, points.A, 20, getAngleLabel('gamma'), colorFor('gamma'), 'gamma')}
         </svg>
     );
 };
@@ -321,8 +421,10 @@ const Kosinussatz: React.FC = () => {
                     {task && (
                         <div className="space-y-4">
                             <div className="bg-white border border-gray-200 rounded-lg p-4">
-                                <h3 className="font-semibold text-gray-800 mb-2">Skizze zum aktuellen Dreieck</h3>
-                                <TriangleSketch triangle={task.triangle} highlight={task.toFind} givenKeys={task.givenKeys} />
+                                <h3 className="font-semibold text-gray-800 mb-2 text-center">Skizze zum aktuellen Dreieck</h3>
+                                <div className="w-full max-w-[420px] mx-auto h-[300px]">
+                                    <TriangleSketch triangle={task.triangle} highlight={task.toFind} givenKeys={task.givenKeys} />
+                                </div>
                             </div>
 
                             <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
