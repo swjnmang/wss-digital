@@ -61,6 +61,12 @@ const subpages = [
     icon: 'fa-solid fa-shuffle',
     path: '/trigonometrie/anwendungsaufgaben',
   },
+  {
+    title: '11. Prüfungsmodus',
+    description: 'Zehn vermischte Aufgaben unter Prüfungsbedingungen lösen und eine Auswertung erhalten.',
+    icon: 'fa-solid fa-graduation-cap',
+    path: '/trigonometrie/pruefungsmodus',
+  },
 ];
 
 export default function TrigonometrieIndex() {
