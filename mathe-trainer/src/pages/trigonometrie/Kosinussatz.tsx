@@ -307,36 +307,16 @@ const Kosinussatz: React.FC = () => {
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
-                <div>
+                <div className="text-center">
                     <h1 className="text-3xl font-bold text-teal-800 mb-4">Kosinussatz im allgemeinen Dreieck</h1>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 max-w-2xl mx-auto">
                         Der Kosinussatz hilft dir, Seiten oder Winkel zu bestimmen, wenn keine Gegenüber-Paare bekannt sind. Er verknüpft
                         zwei Seiten, den eingeschlossenen Winkel und die gegenüberliegende Seite. So kannst du auch stumpfe Dreiecke sicher berechnen.
                     </p>
                 </div>
 
-                <div className="bg-white border border-indigo-100 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4">
-                    <h2 className="text-lg font-semibold text-indigo-900">Lernvideo zum Kosinussatz</h2>
-                    <a
-                        href={KOSINUSSATZ_VIDEO_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
-                    >
-                        Video ansehen
-                    </a>
-                </div>
-
                 <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-semibold text-gray-800">Training: Kosinussatz anwenden</h2>
-                        <button
-                            onClick={generateTask}
-                            className="px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700"
-                        >
-                            Neue Aufgabe
-                        </button>
-                    </div>
+                    <h2 className="text-xl font-semibold text-gray-800 text-center mb-4">Training: Kosinussatz anwenden</h2>
 
                     {task && (
                         <div className="space-y-4">
@@ -345,16 +325,16 @@ const Kosinussatz: React.FC = () => {
                                 <TriangleSketch triangle={task.triangle} highlight={task.toFind} givenKeys={task.givenKeys} />
                             </div>
 
-                            <div className="bg-white border border-gray-200 rounded-lg p-4">
+                            <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
                                 <p className="font-medium text-gray-800">{task.prompt}</p>
                                 <p className="text-sm text-gray-600 mt-2">
                                     <span className="font-semibold">Gegeben:</span> {givenSummary}
                                 </p>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row items-center gap-3">
-                                <label className="font-semibold text-gray-700 w-full sm:w-auto">Antwort:</label>
-                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                                <label className="font-semibold text-gray-700 w-full sm:w-auto text-center sm:text-left">Antwort:</label>
+                                <div className="flex items-center gap-2 w-full sm:w-auto justify-center">
                                     <input
                                         type="text"
                                         value={userAnswer}
@@ -367,22 +347,22 @@ const Kosinussatz: React.FC = () => {
                             </div>
 
                             {feedback === 'info' && (
-                                <p className="text-yellow-700 bg-yellow-100 border border-yellow-200 rounded-lg p-3 text-sm">
+                                <p className="text-yellow-700 bg-yellow-100 border border-yellow-200 rounded-lg p-3 text-sm text-center max-w-md mx-auto">
                                     Bitte gib eine Zahl ein.
                                 </p>
                             )}
                             {feedback === 'correct' && (
-                                <p className="text-green-700 bg-green-100 border border-green-200 rounded-lg p-3 text-sm">
+                                <p className="text-green-700 bg-green-100 border border-green-200 rounded-lg p-3 text-sm text-center max-w-md mx-auto">
                                     Perfekt! Deine Rechnung stimmt.
                                 </p>
                             )}
                             {feedback === 'incorrect' && (
-                                <p className="text-red-700 bg-red-100 border border-red-200 rounded-lg p-3 text-sm">
+                                <p className="text-red-700 bg-red-100 border border-red-200 rounded-lg p-3 text-sm text-center max-w-md mx-auto">
                                     Das passt noch nicht. Schau dir den Lösungsweg an.
                                 </p>
                             )}
 
-                            <div className="flex gap-4 flex-wrap">
+                            <div className="flex gap-4 flex-wrap justify-center items-center">
                                 <button
                                     onClick={checkAnswer}
                                     className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
@@ -395,6 +375,23 @@ const Kosinussatz: React.FC = () => {
                                 >
                                     {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
                                 </button>
+                                <button
+                                    onClick={generateTask}
+                                    className="px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700"
+                                >
+                                    Neue Aufgabe
+                                </button>
+                            </div>
+
+                            <div className="flex justify-center">
+                                <a
+                                    href={KOSINUSSATZ_VIDEO_URL}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
+                                >
+                                    Video ansehen
+                                </a>
                             </div>
 
                             {showSolution && (

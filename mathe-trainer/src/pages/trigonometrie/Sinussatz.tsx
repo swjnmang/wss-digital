@@ -396,20 +396,6 @@ const Sinussatz: React.FC = () => {
                     Paar bekannt ist, kannst du damit fehlende Winkel oder Seiten berechnen.
                 </p>
 
-                <div className="flex justify-center mb-6">
-                    <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 flex flex-col gap-2 items-center max-w-md">
-                        <h2 className="text-lg font-semibold text-teal-900">Lernvideo zum Sinussatz</h2>
-                        <a
-                            href={SINUSSATZ_VIDEO_URL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
-                        >
-                            Video ansehen
-                        </a>
-                    </div>
-                </div>
-
                 {task && (
                     <>
                         <div className="flex justify-center mb-6">
@@ -468,6 +454,17 @@ const Sinussatz: React.FC = () => {
                             <button onClick={generateTask} className="px-6 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors">
                                 Neue Aufgabe
                             </button>
+                        </div>
+
+                        <div className="flex justify-center mb-6">
+                            <a
+                                href={SINUSSATZ_VIDEO_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
+                            >
+                                Video ansehen
+                            </a>
                         </div>
 
                         {showSolution && (
