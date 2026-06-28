@@ -50,7 +50,13 @@ const subpages = [
     path: '/trigonometrie/flaechensatz',
   },
   {
-    title: '9. Anwendungsaufgaben',
+    title: '9. Sinusfunktion',
+    description: 'Die Sinusfunktion am Einheitskreis verstehen und ihren Funktionsgraphen erkunden.',
+    icon: 'fa-solid fa-wave-square',
+    path: '/trigonometrie/sinusfunktion',
+  },
+  {
+    title: '10. Anwendungsaufgaben',
     description: 'Praxisnahe Aufgaben aus dem Alltag Schritt für Schritt lösen.',
     icon: 'fa-solid fa-shuffle',
     path: '/trigonometrie/anwendungsaufgaben',
