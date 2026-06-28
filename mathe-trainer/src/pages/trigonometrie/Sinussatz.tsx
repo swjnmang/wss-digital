@@ -84,32 +84,34 @@ const buildTriangle = (): Triangle => {
     };
 };
 
+const SKETCH_WIDTH = 360;
+const SKETCH_HEIGHT = 260;
+const SKETCH_MARGIN = 50;
+
 const buildSketchPoints = (triangle: Triangle): SketchPoints => {
-    const width = 360;
-    const height = 260;
-    const margin = 30;
+    // Lege A im Ursprung und B auf der x-Achse fest, C ergibt sich über den Winkel alpha.
+    const alphaRad = degToRad(triangle.alpha);
+    const rawA = { x: 0, y: 0 };
+    const rawB = { x: triangle.c, y: 0 };
+    const rawC = { x: triangle.b * Math.cos(alphaRad), y: triangle.b * Math.sin(alphaRad) };
 
-    const scale = (width - 2 * margin) / triangle.c;
-    const base = triangle.c * scale;
-    const sideA = triangle.a * scale;
-    const sideB = triangle.b * scale;
+    const minX = Math.min(rawA.x, rawB.x, rawC.x);
+    const maxX = Math.max(rawA.x, rawB.x, rawC.x);
+    const maxY = Math.max(rawC.y, 0.0001);
 
-    const Ax = margin;
-    const Ay = height - margin;
-    const Bx = Ax + base;
-    const By = Ay;
+    const availableWidth = SKETCH_WIDTH - 2 * SKETCH_MARGIN;
+    const availableHeight = SKETCH_HEIGHT - 2 * SKETCH_MARGIN;
+    const scale = Math.min(availableWidth / (maxX - minX), availableHeight / maxY);
 
-    const px = (sideB * sideB - sideA * sideA + base * base) / (2 * base);
-    const heightSquared = Math.max(sideB * sideB - px * px, 36);
-    const py = Math.sqrt(heightSquared);
-
-    const Cx = Ax + px;
-    const Cy = Ay - py;
+    const toScreen = (p: { x: number; y: number }) => ({
+        x: SKETCH_MARGIN + (p.x - minX) * scale,
+        y: SKETCH_HEIGHT - SKETCH_MARGIN - p.y * scale
+    });
 
     return {
-        A: { x: Ax, y: Ay },
-        B: { x: Bx, y: By },
-        C: { x: Cx, y: Cy }
+        A: toScreen(rawA),
+        B: toScreen(rawB),
+        C: toScreen(rawC)
     };
 };
 
@@ -212,8 +214,27 @@ const TriangleSketch: React.FC<{
     const labelB = pointLabelProps(points.B);
     const labelC = pointLabelProps(points.C);
 
+    const sideLabelPos = (p1: { x: number; y: number }, p2: { x: number; y: number }, offset = 16) => {
+        const mx = (p1.x + p2.x) / 2;
+        const my = (p1.y + p2.y) / 2;
+        const dx = mx - centroid.x;
+        const dy = my - centroid.y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        return { x: mx + (dx / len) * offset, y: my + (dy / len) * offset };
+    };
+
+    const sideLabelC = sideLabelPos(points.A, points.B);
+    const sideLabelB = sideLabelPos(points.A, points.C);
+    const sideLabelA = sideLabelPos(points.B, points.C);
+
     return (
-        <svg width="100%" height="100%" viewBox="0 0 360 260" preserveAspectRatio="xMidYMid meet" className="mx-auto">
+        <svg
+            width="100%"
+            height="100%"
+            viewBox={`0 0 ${SKETCH_WIDTH} ${SKETCH_HEIGHT}`}
+            preserveAspectRatio="xMidYMid meet"
+            className="mx-auto"
+        >
             <polygon
                 points={`${points.A.x},${points.A.y} ${points.B.x},${points.B.y} ${points.C.x},${points.C.y}`}
                 fill="none"
@@ -235,13 +256,13 @@ const TriangleSketch: React.FC<{
                 C
             </text>
 
-            <text x={(points.A.x + points.B.x) / 2} y={points.A.y + 22} textAnchor="middle" fontSize="13" fill={colorFor('c')}>
+            <text x={sideLabelC.x} y={sideLabelC.y} textAnchor="middle" fontSize="13" fill={colorFor('c')}>
                 {sideLabel('c')}
             </text>
-            <text x={(points.A.x + points.C.x) / 2 - 12} y={(points.A.y + points.C.y) / 2} textAnchor="end" fontSize="13" fill={colorFor('b')}>
+            <text x={sideLabelB.x} y={sideLabelB.y} textAnchor="middle" fontSize="13" fill={colorFor('b')}>
                 {sideLabel('b')}
             </text>
-            <text x={(points.B.x + points.C.x) / 2 + 10} y={(points.B.y + points.C.y) / 2} fontSize="13" fill={colorFor('a')}>
+            <text x={sideLabelA.x} y={sideLabelA.y} textAnchor="middle" fontSize="13" fill={colorFor('a')}>
                 {sideLabel('a')}
             </text>
 
