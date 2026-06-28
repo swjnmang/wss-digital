@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import RightTriangleSVG from '../../components/RightTriangleSVG';
 
+const RECHTWINKLIG_BESCHRIFTEN_VIDEO_URL = 'https://www.youtube.com/watch?v=BKuTvKSng78';
+
 interface Task {
   id: number;
   pointA: string;
@@ -195,30 +197,20 @@ const RechtwinkligBeschriften: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 p-8" ref={containerRef}>
+    <div className="min-h-screen bg-[var(--bg-color)] p-8" ref={containerRef}>
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 flex justify-between items-center">
           <Link to="/trigonometrie" className="text-blue-600 hover:text-blue-800 font-semibold">
             ← Zurück zur Übersicht
           </Link>
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-orange-900">Rechtwinklige Dreiecke beschriften</h1>
+            <h1 className="text-3xl font-bold text-teal-800">Rechtwinklige Dreiecke beschriften</h1>
             <p className="text-gray-600 mt-2">Aufgabe {taskCount} | Richtig: {correct}/{Math.max(taskCount - 1, 0)}</p>
           </div>
           <div></div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="flex justify-center mb-6">
-            <a
-              href="/downloads/rechtwinklige-dreiecke-beschriften-uebungen.pdf"
-              download
-              className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition"
-            >
-              📄 Übungsblatt (PDF) herunterladen
-            </a>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* GeoGebra Darstellung */}
             <div className="flex flex-col items-center justify-center">
@@ -376,6 +368,24 @@ const RechtwinkligBeschriften: React.FC = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          <div className="flex justify-center flex-wrap gap-4 mt-8">
+            <a
+              href={RECHTWINKLIG_BESCHRIFTEN_VIDEO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
+            >
+              Video ansehen
+            </a>
+            <a
+              href="/downloads/rechtwinklige-dreiecke-beschriften-uebungen.pdf"
+              download
+              className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition"
+            >
+              📄 Übungsblatt (PDF) herunterladen
+            </a>
           </div>
         </div>
       </div>
