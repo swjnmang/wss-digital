@@ -519,30 +519,6 @@ const RechtwinkligWinkel: React.FC = () => {
                 </h1>
 
                 <div className="flex justify-center mb-6">
-                    <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex flex-col gap-2 items-center max-w-md">
-                        <h2 className="text-lg font-semibold text-indigo-900">Video: Winkel bestimmen</h2>
-                        <a
-                            href={RIGHT_TRIANGLE_ANGLES_VIDEO_URL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex justify-center items-center px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
-                        >
-                            Video ansehen
-                        </a>
-                    </div>
-                </div>
-
-                <div className="flex justify-center mb-6">
-                    <a
-                        href="/downloads/winkel-berechnen-sinus-kosinus-tangens-uebungen.pdf"
-                        download
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-colors"
-                    >
-                        📄 Übungsblatt (PDF) herunterladen
-                    </a>
-                </div>
-
-                <div className="flex justify-center mb-6">
                     {renderTriangle()}
                 </div>
 
@@ -591,12 +567,30 @@ const RechtwinkligWinkel: React.FC = () => {
                     >
                         {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
                     </button>
-                    <button 
+                    <button
                         onClick={generateTask}
                         className="px-6 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors"
                     >
                         Neue Aufgabe
                     </button>
+                </div>
+
+                <div className="flex justify-center flex-wrap gap-4 mb-6">
+                    <a
+                        href={RIGHT_TRIANGLE_ANGLES_VIDEO_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex justify-center items-center px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
+                    >
+                        Video ansehen
+                    </a>
+                    <a
+                        href="/downloads/winkel-berechnen-sinus-kosinus-tangens-uebungen.pdf"
+                        download
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-colors"
+                    >
+                        📄 Übungsblatt (PDF) herunterladen
+                    </a>
                 </div>
 
                 {showSolution && currentTask && (
