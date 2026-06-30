@@ -595,6 +595,17 @@ const Pruefungsmodus: React.FC = () => {
         setStage('exam');
     };
 
+    const sanitizeForPdf = (text: string) =>
+        text
+            .replace(/α/g, 'alpha')
+            .replace(/β/g, 'beta')
+            .replace(/γ/g, 'gamma')
+            .replace(/⁻¹/g, '^-1')
+            .replace(/·/g, '*')
+            .replace(/≈/g, 'ca.')
+            .replace(/½/g, '1/2')
+            .replace(/–/g, '-');
+
     const downloadPdf = () => {
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();
@@ -613,7 +624,7 @@ const Pruefungsmodus: React.FC = () => {
         const writeLines = (text: string, x: number, fontSize: number, lineHeight: number, options?: { bold?: boolean }) => {
             doc.setFontSize(fontSize);
             doc.setFont('helvetica', options?.bold ? 'bold' : 'normal');
-            const lines = doc.splitTextToSize(text, textWidth - (x - margin));
+            const lines = doc.splitTextToSize(sanitizeForPdf(text), textWidth - (x - margin));
             lines.forEach((line: string) => {
                 ensureSpace(lineHeight);
                 doc.text(line, x, y);
