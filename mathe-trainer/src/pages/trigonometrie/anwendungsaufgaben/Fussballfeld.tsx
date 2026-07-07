@@ -29,9 +29,9 @@ const SKETCH_ALT =
     'sowie den gegebenen Längen und Winkeln';
 
 const intro =
-    'Auf einem Fußballfeld werden verschiedene Spielsituationen mit Hilfe von Dreiecksberechnungen ' +
-    'ausgewertet. Die Positionen der Spieler und alle bekannten Längen und Winkel sind in der ' +
-    'folgenden Skizze dargestellt.';
+    'Auf einem Fußball-Kleinfeld werden verschiedene Spielsituationen mit Hilfe von Dreiecksberechnungen ' +
+    'ausgewertet. Da es sich um ein Kleinfeld handelt, ist das Tor nur 1 m breit. Die Positionen der ' +
+    'Spieler und alle bekannten Längen und Winkel sind in der folgenden Skizze dargestellt.';
 
 const tasks: SubTask[] = [
     {
@@ -296,7 +296,7 @@ const Fussballfeld: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-[var(--bg-color)] py-8">
-            <div className="container mx-auto px-4 max-w-4xl">
+            <div className="mx-auto px-4 max-w-4xl">
                 <Link to="/trigonometrie/anwendungsaufgaben" className="inline-flex items-center gap-2 text-teal-700 hover:text-teal-900 text-sm font-medium mb-4">
                     <i className="fa-solid fa-arrow-left"></i> Zurück zur Übersicht
                 </Link>
