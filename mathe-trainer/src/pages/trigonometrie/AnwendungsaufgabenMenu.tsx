@@ -13,6 +13,12 @@ const tasks = [
     icon: 'fa-solid fa-futbol',
     path: '/trigonometrie/anwendungsaufgaben/stadion',
   },
+  {
+    title: 'Das Fußballfeld',
+    description: 'Winkel, Flächen und Passwege zwischen Spielern auf dem Fußballfeld berechnen.',
+    icon: 'fa-solid fa-futbol',
+    path: '/trigonometrie/anwendungsaufgaben/fussballfeld',
+  },
 ];
 
 export default function AnwendungsaufgabenMenu() {
