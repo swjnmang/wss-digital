@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import { renderTextWithMath } from '../../../components/TextWithMath';
+import { UNIT_OPTIONS, isWithinTolerance } from '../../../utils/anwendungsaufgabenHelpers';
 
 interface SolutionStep {
     heading: string;
@@ -16,9 +18,8 @@ interface SubTask {
     context: string;
     question: string;
     hint: string;
-    inputSuffix?: string;
     correctAnswer: number;
-    tolerancePercent?: number;
+    correctUnit: string;
     solutionSteps: SolutionStep[];
 }
 
@@ -40,15 +41,14 @@ const tasks: SubTask[] = [
         context:
             intro +
             '\n\nIn der linken Ecke steht der Spieler in Punkt N. Die Punkte O und M liegen auf der ' +
-            'Torlinie, |OM| = 1 m. Für die Abstände zum Spieler gilt |ON| = 1,58 m ' +
-            'und |NM| = 2,12 m.',
+            'Torlinie, \\overline{OM} = 1 m. Für die Abstände zum Spieler gilt \\overline{ON} = 1,58 m ' +
+            'und \\overline{NM} = 2,12 m.',
         question:
             'Der Spieler in Punkt N schießt auf das Tor. Wie groß ist der Winkel α, den der Torhüter ' +
             'abdecken muss?',
         hint: 'Löse mit dem Kosinussatz.',
-        inputSuffix: '°',
         correctAnswer: 26.58,
-        tolerancePercent: 3,
+        correctUnit: '°',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Kosinussatz aufstellen',
@@ -71,14 +71,13 @@ const tasks: SubTask[] = [
         imageAlt: SKETCH_ALT,
         context:
             'Im Mittelfeld bilden die drei Abwehrspieler P, Q und R ein Dreieck. Es gilt ' +
-            '|QP| = 2,52 m und |QR| = 2,12 m. Der Winkel bei P beträgt 33,04°, ' +
+            '\\overline{QP} = 2,52 m und \\overline{QR} = 2,12 m. Der Winkel bei P beträgt 33,04°, ' +
             'der Winkel bei R beträgt 40,36°.',
         question:
             'Wie groß ist die Fläche, die die Abwehrspieler P, Q und R gemeinsam im Dreieck abdecken?',
         hint: 'Löse mit dem Flächensatz.',
-        inputSuffix: 'm²',
         correctAnswer: 2.56,
-        tolerancePercent: 3,
+        correctUnit: 'm²',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Winkel bei Q bestimmen',
@@ -104,13 +103,12 @@ const tasks: SubTask[] = [
         image: SKETCH,
         imageAlt: SKETCH_ALT,
         context:
-            'Betrachte weiterhin das Dreieck aus Spieler P, Q und R mit |QP| = 2,52 m, ' +
-            '|QR| = 2,12 m, dem Winkel bei P von 33,04° und dem Winkel bei R von 40,36°.',
+            'Betrachte weiterhin das Dreieck aus Spieler P, Q und R mit \\overline{QP} = 2,52 m, ' +
+            '\\overline{QR} = 2,12 m, dem Winkel bei P von 33,04° und dem Winkel bei R von 40,36°.',
         question: 'Wie weit stehen Spieler P und R voneinander entfernt?',
         hint: 'Berechne zunächst den fehlenden Winkel und löse dann mit dem Sinussatz.',
-        inputSuffix: 'm',
         correctAnswer: 3.73,
-        tolerancePercent: 3,
+        correctUnit: 'm',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Fehlenden Winkel bestimmen',
@@ -137,16 +135,15 @@ const tasks: SubTask[] = [
         imageAlt: SKETCH_ALT,
         context:
             'In der rechten Ecke des Spielfelds führt Spieler S einen Eckball aus. Das Dreieck TUS ist ' +
-            'bei U rechtwinklig, mit |TU| = 1,5 m und |TS| = 2,5 m.',
+            'bei U rechtwinklig, mit \\overline{TU} = 1,5 m und \\overline{TS} = 2,5 m.',
         question: 'In der rechten Ecke führt Spieler S einen Eckball aus. Wie groß ist der Winkel ε?',
         hint: 'Es ist ein rechtwinkliges Dreieck, bei dem Hypotenuse und Gegenkathete bekannt sind.',
-        inputSuffix: '°',
         correctAnswer: 36.87,
-        tolerancePercent: 3,
+        correctUnit: '°',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Sinus-Beziehung aufstellen',
-                text: 'Im rechtwinkligen Dreieck TUS (rechter Winkel bei U) ist |TU| die Gegenkathete und |TS| die Hypotenuse von ε:',
+                text: 'Im rechtwinkligen Dreieck TUS (rechter Winkel bei U) ist \\overline{TU} die Gegenkathete und \\overline{TS} die Hypotenuse von ε:',
                 math: '\\sin\\varepsilon = \\frac{|\\overline{TU}|}{|\\overline{TS}|}'
             },
             {
@@ -164,16 +161,44 @@ const tasks: SubTask[] = [
         image: SKETCH,
         imageAlt: SKETCH_ALT,
         context:
-            'Weiterhin gilt im Dreieck TUS: |TU| = 1,5 m, |TS| = 2,5 m und ε ≈ 36,87°.',
+            'Der Trainer möchte den Steigungswinkel ε von Spieler S aus nicht nur in Grad, sondern auch ' +
+            'als Steigung in Prozent kennen. Es gilt weiterhin \\overline{TU} = 1,5 m und \\overline{TS} = 2,5 m.',
+        question: 'Wie groß ist die Steigung des Winkels ε in Prozent?',
+        hint:
+            'Berechne zunächst die Ankathete \\overline{US} mit dem Kosinus und bilde dann das Verhältnis ' +
+            'von Gegenkathete zu Ankathete, multipliziert mit 100.',
+        correctAnswer: 75,
+        correctUnit: '%',
+        solutionSteps: [
+            {
+                heading: 'Schritt 1: Ankathete berechnen',
+                math: '|\\overline{US}| = |\\overline{TS}| \\cdot \\cos\\varepsilon = 2{,}5 \\cdot \\cos(36{,}87^\\circ) \\approx 2{,}00 \\text{ m}'
+            },
+            {
+                heading: 'Schritt 2: Steigung-Formel aufstellen',
+                text: 'Die Steigung in Prozent ist das Verhältnis von Gegenkathete zu Ankathete:',
+                math: '\\text{Steigung} = \\frac{|\\overline{TU}|}{|\\overline{US}|} \\cdot 100\\,\\%'
+            },
+            {
+                heading: 'Schritt 3: Werte einsetzen und berechnen',
+                math: '\\text{Steigung} = \\frac{1{,}5}{2{,}00} \\cdot 100\\,\\% = 75\\,\\%'
+            }
+        ]
+    },
+    {
+        title: 'Aufgabe 6',
+        image: SKETCH,
+        imageAlt: SKETCH_ALT,
+        context:
+            'Weiterhin gilt im Dreieck TUS: \\overline{TU} = 1,5 m, \\overline{TS} = 2,5 m und ε ≈ 36,87°.',
         question: 'Wie weit steht Spieler U von Spieler S entfernt?',
         hint: 'Du kennst Winkel, Hypotenuse und Gegenkathete.',
-        inputSuffix: 'm',
         correctAnswer: 2.00,
-        tolerancePercent: 3,
+        correctUnit: 'm',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Kosinus-Beziehung aufstellen',
-                text: '|US| ist die Ankathete von ε, |TS| die Hypotenuse:',
+                text: '\\overline{US} ist die Ankathete von ε, \\overline{TS} die Hypotenuse:',
                 math: '\\cos\\varepsilon = \\frac{|\\overline{US}|}{|\\overline{TS}|}'
             },
             {
@@ -187,20 +212,19 @@ const tasks: SubTask[] = [
         ]
     },
     {
-        title: 'Aufgabe 6',
+        title: 'Aufgabe 7',
         image: SKETCH,
         imageAlt: SKETCH_ALT,
         context:
             'Auf der gegenüberliegenden Spielfeldseite steht Spieler V genau in der Eckfahne und führt ' +
-            'einen Eckball zu Spieler W aus. Es gilt |ZW| = 0,97 m, der Winkel bei Z ' +
-            'ι = 58,53° sowie der Winkel θ = 57,31° zwischen der Seitenlinie und dem Passweg |VW| bei V.',
+            'einen Eckball zu Spieler W aus. Es gilt \\overline{ZW} = 0,97 m, der Winkel bei Z ' +
+            'ι = 58,53° sowie der Winkel θ = 57,31° zwischen der Seitenlinie und dem Passweg \\overline{VW} bei V.',
         question: 'Auf der Gegenseite führt Spieler V eine Ecke zu Spieler W aus. Wie lange ist der Passweg?',
         hint:
             'Berechne zunächst den Winkel bei Punkt V, indem du von 90° den Winkel θ = 57,31° abziehst. ' +
             'Löse dann mit dem Sinussatz!',
-        inputSuffix: 'm',
         correctAnswer: 1.53,
-        tolerancePercent: 3,
+        correctUnit: 'm',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Winkel bei V bestimmen',
@@ -226,6 +250,7 @@ const tasks: SubTask[] = [
 const Fussballfeld: React.FC = () => {
     const [currentTask, setCurrentTask] = useState(0);
     const [answers, setAnswers] = useState<Record<number, string>>({});
+    const [units, setUnits] = useState<Record<number, string>>({});
     const [feedback, setFeedback] = useState<Record<number, 'correct' | 'incorrect' | null>>({});
     const [showSolution, setShowSolution] = useState<Record<number, boolean>>({});
     const [wrongAttempt, setWrongAttempt] = useState<Record<number, boolean>>({});
@@ -233,6 +258,7 @@ const Fussballfeld: React.FC = () => {
 
     const task = tasks[currentTask];
     const currentAnswer = answers[currentTask] ?? '';
+    const currentUnit = units[currentTask] ?? '';
     const currentFeedback = feedback[currentTask] ?? null;
     const currentShowSolution = showSolution[currentTask] ?? false;
     const currentWrongAttempt = wrongAttempt[currentTask] ?? false;
@@ -243,16 +269,20 @@ const Fussballfeld: React.FC = () => {
         setFeedback({ ...feedback, [currentTask]: null });
     };
 
+    const handleUnitChange = (value: string) => {
+        setUnits({ ...units, [currentTask]: value });
+        setFeedback({ ...feedback, [currentTask]: null });
+    };
+
     const checkAnswer = () => {
         const normalized = currentAnswer.trim().replace(',', '.');
         const parsed = parseFloat(normalized);
-        if (isNaN(parsed)) {
+        if (isNaN(parsed) || !currentUnit) {
             setFeedback({ ...feedback, [currentTask]: 'incorrect' });
             setWrongAttempt({ ...wrongAttempt, [currentTask]: true });
             return;
         }
-        const tolerance = task.correctAnswer * ((task.tolerancePercent ?? 3) / 100);
-        const isCorrect = Math.abs(parsed - task.correctAnswer) <= tolerance;
+        const isCorrect = isWithinTolerance(parsed, task.correctAnswer) && currentUnit === task.correctUnit;
         setFeedback({ ...feedback, [currentTask]: isCorrect ? 'correct' : 'incorrect' });
         if (!isCorrect) {
             setWrongAttempt({ ...wrongAttempt, [currentTask]: true });
@@ -284,8 +314,8 @@ const Fussballfeld: React.FC = () => {
 
                     <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
                         <h2 className="font-bold text-teal-700">{task.title}</h2>
-                        <p className="whitespace-pre-wrap text-slate-700">{task.context}</p>
-                        <p className="font-semibold text-slate-900">{task.question}</p>
+                        <p className="whitespace-pre-wrap text-slate-700">{renderTextWithMath(task.context)}</p>
+                        <p className="font-semibold text-slate-900">{renderTextWithMath(task.question)}</p>
 
                         <div
                             className={`flex flex-col items-center gap-3 rounded-xl border p-4 transition-colors duration-300 ${
@@ -296,15 +326,29 @@ const Fussballfeld: React.FC = () => {
                                     : 'bg-slate-50 border-slate-200'
                             }`}
                         >
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center justify-center gap-2">
                                 <input
                                     type="text"
                                     inputMode="decimal"
                                     value={currentAnswer}
-                                    onChange={(e) => handleAnswerChange(e.target.value)}
-                                    placeholder={task.inputSuffix ? `Ergebnis in ${task.inputSuffix}` : 'Ergebnis'}
-                                    className="w-40 px-3 py-2 border border-slate-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleAnswerChange(e.target.value)}
+                                    placeholder="Ergebnis"
+                                    className="w-32 px-3 py-2 border border-slate-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-teal-500"
                                 />
+                                <select
+                                    value={currentUnit}
+                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleUnitChange(e.target.value)}
+                                    className="px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                >
+                                    <option value="" disabled>
+                                        Einheit
+                                    </option>
+                                    {UNIT_OPTIONS.map((unit) => (
+                                        <option key={unit} value={unit}>
+                                            {unit}
+                                        </option>
+                                    ))}
+                                </select>
                                 <button
                                     onClick={checkAnswer}
                                     className="px-5 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
@@ -354,7 +398,7 @@ const Fussballfeld: React.FC = () => {
                         {currentShowHint && (
                             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
                                 <i className="fa-solid fa-lightbulb text-amber-500 mt-1"></i>
-                                <p className="text-amber-800">{task.hint}</p>
+                                <p className="text-amber-800">{renderTextWithMath(task.hint)}</p>
                             </div>
                         )}
 
@@ -365,7 +409,7 @@ const Fussballfeld: React.FC = () => {
                                     {task.solutionSteps.map((step, i) => (
                                         <div key={i}>
                                             <h4 className="font-bold text-teal-700 mb-1">{step.heading}</h4>
-                                            {step.text && <p className="mb-1">{step.text}</p>}
+                                            {step.text && <p className="mb-1">{renderTextWithMath(step.text)}</p>}
                                             {step.math && (
                                                 <div className="my-2">
                                                     <BlockMath math={step.math} />

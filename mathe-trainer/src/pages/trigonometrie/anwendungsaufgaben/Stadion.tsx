@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import { renderTextWithMath } from '../../../components/TextWithMath';
+import { UNIT_OPTIONS, isWithinTolerance } from '../../../utils/anwendungsaufgabenHelpers';
 
 interface SolutionStep {
     heading: string;
-    text: string;
+    text?: string;
     math?: string;
 }
 
@@ -16,9 +18,8 @@ interface SubTask {
     context: string;
     question: string;
     hint: string;
-    inputSuffix?: string;
     correctAnswer: number;
-    tolerancePercent?: number;
+    correctUnit: string;
     solutionSteps: SolutionStep[];
 }
 
@@ -39,15 +40,15 @@ const tasks: SubTask[] = [
         context:
             intro +
             '\n\nEine Sicherheitsvorschrift sieht vor, dass die Steigung des Treppenaufgangs ' +
-            '|CD| der Tribüne maximal 50 % betragen darf.',
+            '\\overline{CD} der Tribüne maximal 50 % betragen darf.',
         question:
             'Entscheiden Sie mit Hilfe einer Rechnung, ob die Sicherheitsvorschrift eingehalten wird. ' +
             'Berechne dafür den Steigungswinkel in Prozent.',
         hint:
             'Tipp: Die Steigung in Prozent berechnest du, indem du die Höhe der Treppe durch die ' +
             'waagrechte Strecke teilst und mit 100 multiplizierst.',
-        inputSuffix: '%',
         correctAnswer: 46.67,
+        correctUnit: '%',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Steigung berechnen',
@@ -69,12 +70,12 @@ const tasks: SubTask[] = [
         image: SKETCH,
         imageAlt: SKETCH_ALT,
         context: 'Der Erhebungswinkel des Stadiondaches beträgt ε = 9,50°.',
-        question: 'Berechnen Sie die Länge des Stadiondachs |EF|.',
+        question: 'Berechnen Sie die Länge des Stadiondachs \\overline{EF}.',
         hint:
             'Tipp: Nutze den Kosinus des Erhebungswinkels ε, der das Verhältnis von Ankathete ' +
-            '(|AB| + |BC|) zu Hypotenuse (|EF|) angibt.',
-        inputSuffix: 'm',
+            '(|AB| + |BC|) zu Hypotenuse (\\overline{EF}) angibt.',
         correctAnswer: 50.70,
+        correctUnit: 'm',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Kosinus-Beziehung aufstellen',
@@ -95,13 +96,13 @@ const tasks: SubTask[] = [
         title: 'Aufgabe 3',
         image: SKETCH,
         imageAlt: SKETCH_ALT,
-        context: 'Die Strecke EF beträgt 50,70 Meter.',
-        question: 'Berechnen Sie die Höhe der Außenwand |AE|.',
+        context: 'Die Strecke \\overline{EF} beträgt 50,70 Meter.',
+        question: 'Berechnen Sie die Höhe der Außenwand \\overline{AE}.',
         hint:
             'Tipp: Bestimme zunächst die Innenwinkel des Dreiecks AEF und wende anschließend den ' +
             'Sinussatz an.',
-        inputSuffix: 'm',
         correctAnswer: 26.65,
+        correctUnit: 'm',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Winkel ∢AEF bestimmen',
@@ -126,13 +127,13 @@ const tasks: SubTask[] = [
         image: SKETCH,
         imageAlt: SKETCH_ALT,
         context:
-            'Die Fläche ADE soll für Werbezwecke verwendet werden. Die Strecke AE ist 26,65 m lang.',
+            'Die Fläche ADE soll für Werbezwecke verwendet werden. Die Strecke \\overline{AE} ist 26,65 m lang.',
         question: 'Berechnen Sie die Größe dieser Werbefläche.',
         hint:
             'Tipp: Berechne zunächst |AD| mit dem Satz des Pythagoras und nutze dann die ' +
             'Flächenformel mit Sinus.',
-        inputSuffix: 'm²',
         correctAnswer: 266.44,
+        correctUnit: 'm²',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Satz des Pythagoras für |AD|',
@@ -160,13 +161,13 @@ const tasks: SubTask[] = [
             'Am oberen Ende des Stadiondaches wird im Punkt F ein Flutlichtscheinwerfer ' +
             'angebracht, der die gesamte Spielfeldbreite ausleuchten soll.\n\n' +
             'Die Entfernung des Flutlichtscheinwerfers beträgt zum linken Spielfeldrand ' +
-            '|FK| = 36,45 m und zum rechten Rand |FM| = 106,12 m.',
+            '\\overline{FK} = 36,45 m und zum rechten Rand \\overline{FM} = 106,12 m.',
         question: 'Berechnen Sie den dafür notwendigen Abstrahlwinkel γ.',
         hint:
             'Tipp: Da alle drei Seiten des Dreiecks FKM bekannt sind, hilft dir der Kosinussatz, ' +
             'den Winkel γ zu berechnen.',
-        inputSuffix: '°',
         correctAnswer: 54.52,
+        correctUnit: '°',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Kosinussatz aufstellen',
@@ -188,31 +189,39 @@ const tasks: SubTask[] = [
 const Stadion: React.FC = () => {
     const [currentTask, setCurrentTask] = useState(0);
     const [answers, setAnswers] = useState<Record<number, string>>({});
+    const [units, setUnits] = useState<Record<number, string>>({});
     const [feedback, setFeedback] = useState<Record<number, 'correct' | 'incorrect' | null>>({});
     const [showSolution, setShowSolution] = useState<Record<number, boolean>>({});
     const [wrongAttempt, setWrongAttempt] = useState<Record<number, boolean>>({});
+    const [showHint, setShowHint] = useState<Record<number, boolean>>({});
 
     const task = tasks[currentTask];
     const currentAnswer = answers[currentTask] ?? '';
+    const currentUnit = units[currentTask] ?? '';
     const currentFeedback = feedback[currentTask] ?? null;
     const currentShowSolution = showSolution[currentTask] ?? false;
     const currentWrongAttempt = wrongAttempt[currentTask] ?? false;
+    const currentShowHint = showHint[currentTask] ?? false;
 
     const handleAnswerChange = (value: string) => {
         setAnswers({ ...answers, [currentTask]: value });
         setFeedback({ ...feedback, [currentTask]: null });
     };
 
+    const handleUnitChange = (value: string) => {
+        setUnits({ ...units, [currentTask]: value });
+        setFeedback({ ...feedback, [currentTask]: null });
+    };
+
     const checkAnswer = () => {
         const normalized = currentAnswer.trim().replace(',', '.');
         const parsed = parseFloat(normalized);
-        if (isNaN(parsed)) {
+        if (isNaN(parsed) || !currentUnit) {
             setFeedback({ ...feedback, [currentTask]: 'incorrect' });
             setWrongAttempt({ ...wrongAttempt, [currentTask]: true });
             return;
         }
-        const tolerance = task.correctAnswer * ((task.tolerancePercent ?? 5) / 100);
-        const isCorrect = Math.abs(parsed - task.correctAnswer) <= tolerance;
+        const isCorrect = isWithinTolerance(parsed, task.correctAnswer) && currentUnit === task.correctUnit;
         setFeedback({ ...feedback, [currentTask]: isCorrect ? 'correct' : 'incorrect' });
         if (!isCorrect) {
             setWrongAttempt({ ...wrongAttempt, [currentTask]: true });
@@ -244,8 +253,8 @@ const Stadion: React.FC = () => {
 
                     <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
                         <h2 className="font-bold text-teal-700">{task.title}</h2>
-                        <p className="whitespace-pre-wrap text-slate-700">{task.context}</p>
-                        <p className="font-semibold text-slate-900">{task.question}</p>
+                        <p className="whitespace-pre-wrap text-slate-700">{renderTextWithMath(task.context)}</p>
+                        <p className="font-semibold text-slate-900">{renderTextWithMath(task.question)}</p>
 
                         <div
                             className={`flex flex-col items-center gap-3 rounded-xl border p-4 transition-colors duration-300 ${
@@ -256,15 +265,29 @@ const Stadion: React.FC = () => {
                                     : 'bg-slate-50 border-slate-200'
                             }`}
                         >
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center justify-center gap-2">
                                 <input
                                     type="text"
                                     inputMode="decimal"
                                     value={currentAnswer}
-                                    onChange={(e) => handleAnswerChange(e.target.value)}
-                                    placeholder={task.inputSuffix ? `Ergebnis in ${task.inputSuffix}` : 'Ergebnis'}
-                                    className="w-40 px-3 py-2 border border-slate-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleAnswerChange(e.target.value)}
+                                    placeholder="Ergebnis"
+                                    className="w-32 px-3 py-2 border border-slate-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-teal-500"
                                 />
+                                <select
+                                    value={currentUnit}
+                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleUnitChange(e.target.value)}
+                                    className="px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                >
+                                    <option value="" disabled>
+                                        Einheit
+                                    </option>
+                                    {UNIT_OPTIONS.map((unit) => (
+                                        <option key={unit} value={unit}>
+                                            {unit}
+                                        </option>
+                                    ))}
+                                </select>
                                 <button
                                     onClick={checkAnswer}
                                     className="px-5 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
@@ -279,30 +302,44 @@ const Stadion: React.FC = () => {
                                 </p>
                             )}
                             {currentFeedback === 'incorrect' && (
-                                <div className="text-center">
-                                    <p className="text-red-600 font-semibold flex items-center justify-center gap-2">
-                                        <i className="fa-solid fa-circle-xmark"></i> Noch nicht richtig.
-                                    </p>
-                                    <p className="text-slate-600 text-sm mt-1">{task.hint}</p>
-                                </div>
+                                <p className="text-red-600 font-semibold flex items-center justify-center gap-2">
+                                    <i className="fa-solid fa-circle-xmark"></i> Noch nicht richtig.
+                                </p>
                             )}
                         </div>
 
-                        <div className="flex justify-center">
-                            {currentWrongAttempt ? (
+                        <div className="flex flex-wrap justify-center gap-3">
+                            <button
+                                onClick={() => setShowHint({ ...showHint, [currentTask]: !currentShowHint })}
+                                className="px-6 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors"
+                            >
+                                <i className="fa-solid fa-lightbulb mr-2"></i>
+                                {currentShowHint ? 'Tipp verbergen' : 'Tipp anzeigen'}
+                            </button>
+
+                            {currentWrongAttempt && (
                                 <button
                                     onClick={() => setShowSolution({ ...showSolution, [currentTask]: !currentShowSolution })}
                                     className="px-6 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
                                 >
                                     {currentShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
                                 </button>
-                            ) : (
-                                <p className="text-slate-400 text-sm italic">
-                                    Versuche es zuerst selbst. Nach einem falschen Versuch kannst du dir die
-                                    Musterlösung anzeigen lassen.
-                                </p>
                             )}
                         </div>
+
+                        {!currentWrongAttempt && (
+                            <p className="text-slate-400 text-sm italic text-center">
+                                Versuche es zuerst selbst. Nach einem falschen Versuch kannst du dir die
+                                Musterlösung anzeigen lassen.
+                            </p>
+                        )}
+
+                        {currentShowHint && (
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+                                <i className="fa-solid fa-lightbulb text-amber-500 mt-1"></i>
+                                <p className="text-amber-800">{renderTextWithMath(task.hint)}</p>
+                            </div>
+                        )}
 
                         {currentShowSolution && (
                             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
@@ -311,7 +348,7 @@ const Stadion: React.FC = () => {
                                     {task.solutionSteps.map((step, i) => (
                                         <div key={i}>
                                             <h4 className="font-bold text-teal-700 mb-1">{step.heading}</h4>
-                                            {step.text && <p className="mb-1">{step.text}</p>}
+                                            {step.text && <p className="mb-1">{renderTextWithMath(step.text)}</p>}
                                             {step.math && (
                                                 <div className="my-2">
                                                     <BlockMath math={step.math} />

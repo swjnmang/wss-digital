@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import { renderTextWithMath } from '../../../components/TextWithMath';
+import { UNIT_OPTIONS, isWithinTolerance } from '../../../utils/anwendungsaufgabenHelpers';
 
 interface SolutionStep {
     heading: string;
-    text: string;
+    text?: string;
     math?: string;
 }
 
@@ -16,9 +18,8 @@ interface SubTask {
     context: string;
     question: string;
     hint: string;
-    inputSuffix?: string;
     correctAnswer: number;
-    tolerancePercent?: number;
+    correctUnit: string;
     solutionSteps: SolutionStep[];
 }
 
@@ -44,8 +45,8 @@ const tasks: SubTask[] = [
         question: 'Berechnen Sie die nötige Gesamtlänge der Seile für beide Flying-Fox-Anlagen.',
         hint:
             'Tipp: Nutze den Sinussatz im Dreieck BSZ, da dir zwei Winkel und eine Seite bekannt sind.',
-        inputSuffix: 'm',
         correctAnswer: 1065.03,
+        correctUnit: 'm',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Sinussatz aufstellen',
@@ -78,8 +79,8 @@ const tasks: SubTask[] = [
         hint:
             'Tipp: Bestimme zunächst den Winkel ∢ZSH mit dem Kosinussatz im Dreieck ZSH und addiere ' +
             'dann den bekannten Winkel α.',
-        inputSuffix: '°',
         correctAnswer: 55.40,
+        correctUnit: '°',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Kosinussatz aufstellen',
@@ -107,13 +108,13 @@ const tasks: SubTask[] = [
         imageAlt: SKETCH_1_ALT,
         context:
             'Um Unfällen im Landebereich vorzubeugen, muss das dreieckige Gebiet FEZ abgesperrt werden. Die ' +
-            'Anlagenbetreiber messen die Strecken mit |FZ| = 80 m und |EZ| = 70 m ab.',
+            'Anlagenbetreiber messen die Strecken mit \\overline{FZ} = 80 m und \\overline{EZ} = 70 m ab.',
         question: 'Berechnen Sie den Flächeninhalt dieses Gebietes.',
         hint:
             'Tipp: Berechne zuerst den fehlenden Winkel ∢FZE über die Winkelsumme und nutze dann die ' +
             'Flächenformel mit Sinus.',
-        inputSuffix: 'm²',
         correctAnswer: 2741.03,
+        correctUnit: 'm²',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Winkel ∢FZE bestimmen',
@@ -142,15 +143,15 @@ const tasks: SubTask[] = [
             'Zur Eröffnung der Anlage möchte der Weltmeister im Klippenspringen seinen eigenen Rekord im freien ' +
             'Fall von 58,80 m überbieten.\n\n' +
             'Er stoppt im Punkt A, klinkt sich aus und landet sicher im Punkt W.\n' +
-            'Sprungdetails: |AS| = 195,50 m, |SZ| = 600 m, |WZ| = 400 m.',
+            'Sprungdetails: \\overline{AS} = 195,50 m, \\overline{SZ} = 600 m, \\overline{WZ} = 400 m.',
         question:
             'Überprüfen Sie rechnerisch, ob der Weltrekord gebrochen wurde. Berechnen Sie dazu die Falltiefe ' +
-            '|AW| in Metern.',
+            '\\overline{AW} in Metern.',
         hint:
             'Tipp: Berechne zunächst |AZ| als Differenz von |SZ| und |AS|, und wende dann den Satz ' +
             'des Pythagoras im rechtwinkligen Dreieck AWZ an.',
-        inputSuffix: 'm',
         correctAnswer: 60.17,
+        correctUnit: 'm',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Strecke |AZ| bestimmen',
@@ -184,13 +185,13 @@ const tasks: SubTask[] = [
             'Damit die Geschwindigkeit für die Benutzer der Anlage nicht zu groß wird, darf das Gefälle des ' +
             'Flying-Fox nicht größer als 16 % sein.',
         question:
-            'Zeigen Sie rechnerisch, dass die Vorgabe eingehalten wird, wenn |AW| = 60,17 m und |WZ| = 400 m lang ' +
-            'sind. Berechnen Sie dazu das Gefälle in Prozent.',
+            'Zeigen Sie rechnerisch, dass die Vorgabe eingehalten wird, wenn \\overline{AW} = 60,17 m und ' +
+            '\\overline{WZ} = 400 m lang sind. Berechnen Sie dazu das Gefälle in Prozent.',
         hint:
             'Tipp: Das Gefälle ist das Verhältnis von Höhenunterschied zu horizontaler Strecke, ' +
             'multipliziert mit 100 %.',
-        inputSuffix: '%',
         correctAnswer: 15.04,
+        correctUnit: '%',
         solutionSteps: [
             {
                 heading: 'Schritt 1: Formel für das Gefälle aufstellen',
@@ -216,31 +217,39 @@ const tasks: SubTask[] = [
 const OlympiaparkMuenchen: React.FC = () => {
     const [currentTask, setCurrentTask] = useState(0);
     const [answers, setAnswers] = useState<Record<number, string>>({});
+    const [units, setUnits] = useState<Record<number, string>>({});
     const [feedback, setFeedback] = useState<Record<number, 'correct' | 'incorrect' | null>>({});
     const [showSolution, setShowSolution] = useState<Record<number, boolean>>({});
     const [wrongAttempt, setWrongAttempt] = useState<Record<number, boolean>>({});
+    const [showHint, setShowHint] = useState<Record<number, boolean>>({});
 
     const task = tasks[currentTask];
     const currentAnswer = answers[currentTask] ?? '';
+    const currentUnit = units[currentTask] ?? '';
     const currentFeedback = feedback[currentTask] ?? null;
     const currentShowSolution = showSolution[currentTask] ?? false;
     const currentWrongAttempt = wrongAttempt[currentTask] ?? false;
+    const currentShowHint = showHint[currentTask] ?? false;
 
     const handleAnswerChange = (value: string) => {
         setAnswers({ ...answers, [currentTask]: value });
         setFeedback({ ...feedback, [currentTask]: null });
     };
 
+    const handleUnitChange = (value: string) => {
+        setUnits({ ...units, [currentTask]: value });
+        setFeedback({ ...feedback, [currentTask]: null });
+    };
+
     const checkAnswer = () => {
         const normalized = currentAnswer.trim().replace(',', '.');
         const parsed = parseFloat(normalized);
-        if (isNaN(parsed)) {
+        if (isNaN(parsed) || !currentUnit) {
             setFeedback({ ...feedback, [currentTask]: 'incorrect' });
             setWrongAttempt({ ...wrongAttempt, [currentTask]: true });
             return;
         }
-        const tolerance = task.correctAnswer * ((task.tolerancePercent ?? 5) / 100);
-        const isCorrect = Math.abs(parsed - task.correctAnswer) <= tolerance;
+        const isCorrect = isWithinTolerance(parsed, task.correctAnswer) && currentUnit === task.correctUnit;
         setFeedback({ ...feedback, [currentTask]: isCorrect ? 'correct' : 'incorrect' });
         if (!isCorrect) {
             setWrongAttempt({ ...wrongAttempt, [currentTask]: true });
@@ -272,8 +281,8 @@ const OlympiaparkMuenchen: React.FC = () => {
 
                     <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
                         <h2 className="font-bold text-teal-700">{task.title}</h2>
-                        <p className="whitespace-pre-wrap text-slate-700">{task.context}</p>
-                        <p className="font-semibold text-slate-900">{task.question}</p>
+                        <p className="whitespace-pre-wrap text-slate-700">{renderTextWithMath(task.context)}</p>
+                        <p className="font-semibold text-slate-900">{renderTextWithMath(task.question)}</p>
 
                         <div
                             className={`flex flex-col items-center gap-3 rounded-xl border p-4 transition-colors duration-300 ${
@@ -284,15 +293,29 @@ const OlympiaparkMuenchen: React.FC = () => {
                                     : 'bg-slate-50 border-slate-200'
                             }`}
                         >
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center justify-center gap-2">
                                 <input
                                     type="text"
                                     inputMode="decimal"
                                     value={currentAnswer}
-                                    onChange={(e) => handleAnswerChange(e.target.value)}
-                                    placeholder={task.inputSuffix ? `Ergebnis in ${task.inputSuffix}` : 'Ergebnis'}
-                                    className="w-40 px-3 py-2 border border-slate-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleAnswerChange(e.target.value)}
+                                    placeholder="Ergebnis"
+                                    className="w-32 px-3 py-2 border border-slate-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-teal-500"
                                 />
+                                <select
+                                    value={currentUnit}
+                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleUnitChange(e.target.value)}
+                                    className="px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                >
+                                    <option value="" disabled>
+                                        Einheit
+                                    </option>
+                                    {UNIT_OPTIONS.map((unit) => (
+                                        <option key={unit} value={unit}>
+                                            {unit}
+                                        </option>
+                                    ))}
+                                </select>
                                 <button
                                     onClick={checkAnswer}
                                     className="px-5 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
@@ -307,30 +330,44 @@ const OlympiaparkMuenchen: React.FC = () => {
                                 </p>
                             )}
                             {currentFeedback === 'incorrect' && (
-                                <div className="text-center">
-                                    <p className="text-red-600 font-semibold flex items-center justify-center gap-2">
-                                        <i className="fa-solid fa-circle-xmark"></i> Noch nicht richtig.
-                                    </p>
-                                    <p className="text-slate-600 text-sm mt-1">{task.hint}</p>
-                                </div>
+                                <p className="text-red-600 font-semibold flex items-center justify-center gap-2">
+                                    <i className="fa-solid fa-circle-xmark"></i> Noch nicht richtig.
+                                </p>
                             )}
                         </div>
 
-                        <div className="flex justify-center">
-                            {currentWrongAttempt ? (
+                        <div className="flex flex-wrap justify-center gap-3">
+                            <button
+                                onClick={() => setShowHint({ ...showHint, [currentTask]: !currentShowHint })}
+                                className="px-6 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors"
+                            >
+                                <i className="fa-solid fa-lightbulb mr-2"></i>
+                                {currentShowHint ? 'Tipp verbergen' : 'Tipp anzeigen'}
+                            </button>
+
+                            {currentWrongAttempt && (
                                 <button
                                     onClick={() => setShowSolution({ ...showSolution, [currentTask]: !currentShowSolution })}
                                     className="px-6 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
                                 >
                                     {currentShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
                                 </button>
-                            ) : (
-                                <p className="text-slate-400 text-sm italic">
-                                    Versuche es zuerst selbst. Nach einem falschen Versuch kannst du dir die
-                                    Musterlösung anzeigen lassen.
-                                </p>
                             )}
                         </div>
+
+                        {!currentWrongAttempt && (
+                            <p className="text-slate-400 text-sm italic text-center">
+                                Versuche es zuerst selbst. Nach einem falschen Versuch kannst du dir die
+                                Musterlösung anzeigen lassen.
+                            </p>
+                        )}
+
+                        {currentShowHint && (
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+                                <i className="fa-solid fa-lightbulb text-amber-500 mt-1"></i>
+                                <p className="text-amber-800">{renderTextWithMath(task.hint)}</p>
+                            </div>
+                        )}
 
                         {currentShowSolution && (
                             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
@@ -339,7 +376,7 @@ const OlympiaparkMuenchen: React.FC = () => {
                                     {task.solutionSteps.map((step, i) => (
                                         <div key={i}>
                                             <h4 className="font-bold text-teal-700 mb-1">{step.heading}</h4>
-                                            {step.text && <p className="mb-1">{step.text}</p>}
+                                            {step.text && <p className="mb-1">{renderTextWithMath(step.text)}</p>}
                                             {step.math && (
                                                 <div className="my-2">
                                                     <BlockMath math={step.math} />
