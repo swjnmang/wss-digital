@@ -19,6 +19,12 @@ const tasks = [
     icon: 'fa-solid fa-futbol',
     path: '/trigonometrie/anwendungsaufgaben/fussballfeld',
   },
+  {
+    title: 'Die Bergbahn',
+    description: 'Steigung, Seillängen und Pistenwinkel einer Seilbahn im Skigebiet berechnen.',
+    icon: 'fa-solid fa-mountain',
+    path: '/trigonometrie/anwendungsaufgaben/bergbahn',
+  },
 ];
 
 export default function AnwendungsaufgabenMenu() {

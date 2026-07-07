@@ -114,6 +114,7 @@ import AnwendungsaufgabenMenu from './pages/trigonometrie/AnwendungsaufgabenMenu
 import OlympiaparkMuenchen from './pages/trigonometrie/anwendungsaufgaben/OlympiaparkMuenchen';
 import Stadion from './pages/trigonometrie/anwendungsaufgaben/Stadion';
 import Fussballfeld from './pages/trigonometrie/anwendungsaufgaben/Fussballfeld';
+import Bergbahn from './pages/trigonometrie/anwendungsaufgaben/Bergbahn';
 // Daten und Zufall
 import DatenUndZufallIndex from './pages/DatenUndZufallIndex';
 import StatistischeKennwerte from './pages/daten_und_zufall/StatistischeKennwerte';
@@ -297,6 +298,7 @@ export default function App() {
           <Route path="/trigonometrie/anwendungsaufgaben/olympiapark-muenchen" element={<OlympiaparkMuenchen />} />
           <Route path="/trigonometrie/anwendungsaufgaben/stadion" element={<Stadion />} />
           <Route path="/trigonometrie/anwendungsaufgaben/fussballfeld" element={<Fussballfeld />} />
+          <Route path="/trigonometrie/anwendungsaufgaben/bergbahn" element={<Bergbahn />} />
 
           {/* Daten und Zufall */}
           <Route path="/daten-und-zufall" element={<DatenUndZufallIndex />} />
