@@ -125,6 +125,10 @@ import Baumdiagramme2 from './pages/daten_und_zufall/Baumdiagramme2';
 import DiagrammeErstellen from './pages/daten_und_zufall/DiagrammeErstellen';
 import Wahrscheinlichkeiten from './pages/daten_und_zufall/Wahrscheinlichkeiten';
 import RelativeAbsoluteHaeufigkeit from './pages/daten_und_zufall/RelativeAbsoluteHaeufigkeit';
+import DatenZufallAnwendungsaufgaben from './pages/daten_und_zufall/anwendungsaufgaben/index';
+import MensaUmfrage from './pages/daten_und_zufall/anwendungsaufgaben/MensaUmfrage';
+import Ticketkontrolle from './pages/daten_und_zufall/anwendungsaufgaben/Ticketkontrolle';
+import Elfmeterschiessen from './pages/daten_und_zufall/anwendungsaufgaben/Elfmeterschiessen';
 // Raum und Form
 import RaumUndFormIndex from './pages/RaumUndFormIndex';
 import Flaechengeometrie from './pages/raum_und_form/Flaechengeometrie';
@@ -313,6 +317,10 @@ export default function App() {
           <Route path="/daten-und-zufall/baumdiagramme2" element={<Baumdiagramme2 />} />
           <Route path="/daten-und-zufall/relative-absolute-haeufigkeit" element={<RelativeAbsoluteHaeufigkeit />} />
           <Route path="/daten-und-zufall/wahrscheinlichkeiten" element={<Wahrscheinlichkeiten />} />
+          <Route path="/daten-und-zufall/anwendungsaufgaben" element={<DatenZufallAnwendungsaufgaben />} />
+          <Route path="/daten-und-zufall/anwendungsaufgaben/mensa-umfrage" element={<MensaUmfrage />} />
+          <Route path="/daten-und-zufall/anwendungsaufgaben/ticketkontrolle" element={<Ticketkontrolle />} />
+          <Route path="/daten-und-zufall/anwendungsaufgaben/elfmeterschiessen" element={<Elfmeterschiessen />} />
 
           {/* Raum und Form */}
           <Route path="/raum-und-form" element={<RaumUndFormIndex />} />

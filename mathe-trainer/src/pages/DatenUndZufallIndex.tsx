@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BarChart3, Dice3, Network, PieChart, Percent } from 'lucide-react';
+import { BarChart3, Dice3, GraduationCap, Network, PieChart, Percent } from 'lucide-react';
 
 const topics = [
   {
@@ -31,6 +31,12 @@ const topics = [
     path: "/daten-und-zufall/wahrscheinlichkeiten",
     description: "20 Aufgaben zu ein- und mehrstufigen Zufallsexperimenten mit Musterlösungen.",
     icon: Dice3,
+  },
+  {
+    title: "Anwendungsaufgaben",
+    path: "/daten-und-zufall/anwendungsaufgaben",
+    description: "Prüfungsnahe Aufgaben mit Baumdiagrammen, Häufigkeiten und statistischen Kennwerten.",
+    icon: GraduationCap,
   },
 ];
 
