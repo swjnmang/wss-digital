@@ -68,7 +68,7 @@ export default function DasElektroauto() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/finanzmathe/anwendungsaufgaben')}
           className="mb-6 flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-100 rounded-lg shadow-sm transition-colors"
         >
           <i className="fa-solid fa-arrow-left"></i>

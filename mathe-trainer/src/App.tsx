@@ -169,10 +169,11 @@ export default function App() {
   const hideHeader = location.pathname === '/';
 
   const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
+    const segments = location.pathname.split('/').filter(Boolean);
+    if (segments.length <= 1) {
       navigate('/');
+    } else {
+      navigate('/' + segments.slice(0, -1).join('/'));
     }
   };
 
