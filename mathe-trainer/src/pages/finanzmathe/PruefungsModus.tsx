@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import 'katex/dist/katex.min.css';
 import { jsPDF } from 'jspdf';
 
@@ -29,6 +30,10 @@ interface PruefungsAufgabeSerialized {
   id: string;
   type: string;
   points: number;
+  // Question/Solution als statisches HTML gespeichert, damit sie beim Wiederherstellen
+  // exakt zu den gespeicherten correctValue-Werten passen (nicht neu zufällig generiert werden)
+  questionHtml: string;
+  solutionHtml: string;
   inputs: Array<{
     id: string;
     label: string;
@@ -133,6 +138,11 @@ const serializePruefung = (zustand: PruefungsZustand): PruefungsZustandSerialize
       id: a.id,
       type: a.type,
       points: a.points,
+      // Als statisches HTML sichern: verhindert, dass beim Wiederherstellen eine neu
+      // zufällig generierte Aufgabe angezeigt wird, die nicht mehr zu den unten
+      // gespeicherten correctValue-Werten passt.
+      questionHtml: renderToStaticMarkup(<>{a.question}</>),
+      solutionHtml: renderToStaticMarkup(<>{a.solution}</>),
       inputs: a.inputs,
       userAnswers: a.userAnswers,
       earnedPoints: a.earnedPoints,
@@ -145,37 +155,21 @@ const serializePruefung = (zustand: PruefungsZustand): PruefungsZustandSerialize
 };
 
 const deserializePruefung = (serialized: PruefungsZustandSerialized): PruefungsZustand => {
-  const generatoren: Record<string, () => any> = {
-    simple_interest: createSimpleInterestTask,
-    zinseszins: createZinseszinsTask,
-    kapitalmehrung: createKapitalmehrungTask,
-    kapitalminderung: createKapitalminderungTask,
-    renten_endwert: createRentenEndwertTask,
-    ratendarlehen_plan: createRatendarlehenPlanTask,
-    annuitaet_plan: createAnnuitaetPlanTask,
-  };
-
   return {
     name: serialized.name,
     klasse: serialized.klasse,
-    aufgaben: serialized.aufgaben.map(a => {
-      // Regeneriere die Aufgabe basierend auf ihrem Type, um question/solution zu erhalten
-      const generator = generatoren[a.type];
-      const task = generator ? generator() : { question: 'Fehler', solution: 'Fehler', inputs: [] };
-      
-      // WICHTIG: Benutze DIE GESPEICHERTEN inputs (mit correctValue etc), nicht die neu generierten!
-      // Das stellt sicher, dass wir die gleichen Werte zur Bewertung verwenden
-      return {
-        id: a.id,
-        type: a.type,
-        points: a.points,
-        question: task.question,
-        solution: task.solution,
-        inputs: a.inputs, // Use serialized inputs, not newly generated ones!
-        userAnswers: a.userAnswers,
-        earnedPoints: a.earnedPoints || 0, // Fallback für alte Prüfungen
-      };
-    }),
+    aufgaben: serialized.aufgaben.map(a => ({
+      id: a.id,
+      type: a.type,
+      points: a.points,
+      // Aus dem gespeicherten HTML wiederhergestellt, NICHT neu generiert – so bleiben
+      // Aufgabentext und die unten verwendeten correctValue-Werte garantiert konsistent.
+      question: <div dangerouslySetInnerHTML={{ __html: a.questionHtml }} />,
+      solution: <div dangerouslySetInnerHTML={{ __html: a.solutionHtml }} />,
+      inputs: a.inputs,
+      userAnswers: a.userAnswers,
+      earnedPoints: a.earnedPoints || 0, // Fallback für alte Prüfungen
+    })),
     aktuelleAufgabeIndex: serialized.aktuelleAufgabeIndex,
     gestartet: serialized.gestartet,
     beendet: serialized.beendet,

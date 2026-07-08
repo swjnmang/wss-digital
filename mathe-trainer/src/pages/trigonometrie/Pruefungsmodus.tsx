@@ -48,6 +48,8 @@ const randomInRange = (min: number, max: number) => Math.random() * (max - min) 
 const randomInt = (min: number, max: number) => Math.floor(randomInRange(min, max + 1));
 const round = (val: number, digits = 2) => parseFloat(val.toFixed(digits));
 const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+// Maximal 3% relative Toleranz beim Runden, mit kleiner Mindesttoleranz für sehr kleine Werte
+const relTolerance = (value: number, min = 0.01) => Math.max(Math.abs(value) * 0.03, min);
 
 let idCounter = 0;
 const nextId = () => {
@@ -243,7 +245,7 @@ const buildRightTriangleSideTask = (): ExamTask => {
         unit: 'cm',
         correctAnswer: (askOpposite ? opposite : adjacent).toFixed(2),
         isText: false,
-        tolerance: 0.1,
+        tolerance: relTolerance(askOpposite ? opposite : adjacent),
         solutionSteps,
         sketch: {
             kind: 'right',
@@ -271,7 +273,7 @@ const buildRightTriangleAngleTask = (): ExamTask => {
         unit: '°',
         correctAnswer: angle.toFixed(1),
         isText: false,
-        tolerance: 1,
+        tolerance: relTolerance(angle),
         solutionSteps: [
             `Gegeben: Ankathete b = ${adjacent} cm, Gegenkathete a = ${opposite} cm.`,
             'Verwende den Tangens: tan(α) = Gegenkathete / Ankathete.',
@@ -304,7 +306,7 @@ const buildSteigungTask = (): ExamTask => {
             unit: '%',
             correctAnswer: percent.toFixed(1),
             isText: false,
-            tolerance: 1,
+            tolerance: relTolerance(percent),
             solutionSteps: [
                 `Gegeben: Steigungswinkel α = ${angle}°.`,
                 'Die Steigung in Prozent ist 100 · tan(α).',
@@ -334,7 +336,7 @@ const buildSteigungTask = (): ExamTask => {
         unit: '°',
         correctAnswer: angle.toFixed(1),
         isText: false,
-        tolerance: 1,
+        tolerance: relTolerance(angle),
         solutionSteps: [
             `Gegeben: Steigung = ${percent} %.`,
             `tan(α) = Steigung / 100 = ${percent} / 100 = ${(percent / 100).toFixed(4)}`,
@@ -379,7 +381,7 @@ const buildSinussatzTask = (): ExamTask => {
             unit: 'cm',
             correctAnswer: round(b, 2).toFixed(2),
             isText: false,
-            tolerance: 0.15,
+            tolerance: relTolerance(b),
             solutionSteps: [
                 `Gegeben: a = ${a} cm, α = ${alpha}°, β = ${beta}°.`,
                 'Sinussatz: a / sin(α) = b / sin(β), also b = a · sin(β) / sin(α).',
@@ -405,7 +407,7 @@ const buildSinussatzTask = (): ExamTask => {
         unit: '°',
         correctAnswer: beta.toFixed(1),
         isText: false,
-        tolerance: 1,
+        tolerance: relTolerance(beta),
         solutionSteps: [
             `Gegeben: a = ${a} cm, b = ${round(b, 2)} cm, α = ${alpha}°.`,
             'Sinussatz: sin(β) / b = sin(α) / a, also sin(β) = b · sin(α) / a.',
@@ -441,7 +443,7 @@ const buildKosinussatzTask = (): ExamTask => {
             unit: 'cm',
             correctAnswer: round(a, 2).toFixed(2),
             isText: false,
-            tolerance: 0.15,
+            tolerance: relTolerance(a),
             solutionSteps: [
                 `Gegeben: b = ${b} cm, c = ${c} cm, α = ${alpha}°.`,
                 'Kosinussatz: a² = b² + c² − 2·b·c·cos(α).',
@@ -469,7 +471,7 @@ const buildKosinussatzTask = (): ExamTask => {
         unit: '°',
         correctAnswer: beta.toFixed(1),
         isText: false,
-        tolerance: 1,
+        tolerance: relTolerance(beta),
         solutionSteps: [
             `Gegeben: a = ${round(a, 2)} cm, b = ${b} cm, c = ${c} cm.`,
             'Kosinussatz: cos(β) = (a² + c² − b²) / (2·a·c).',
@@ -502,7 +504,7 @@ const buildFlaechensatzTask = (): ExamTask => {
         unit: 'cm²',
         correctAnswer: round(area, 2).toFixed(2),
         isText: false,
-        tolerance: 0.2,
+        tolerance: relTolerance(area),
         solutionSteps: [
             `Gegeben: a = ${a} cm, b = ${b} cm, γ = ${gamma}°.`,
             'Flächenformel: A = ½ · a · b · sin(γ).',
