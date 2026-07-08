@@ -182,14 +182,16 @@ export default function App() {
       <Analytics />
       {!hideHeader && (
         <header className="app-header">
-          <div className="app-shell flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <button onClick={handleBack} className="ghost-link text-sm sm:text-base">
-                ← Zurück
-              </button>
-              <div className="hidden sm:block w-px h-6 bg-slate-200" aria-hidden />
-              <span className="text-lg sm:text-xl font-bold text-slate-800">Mathe-Trainer</span>
-            </div>
+          <div className="app-shell relative flex items-center justify-between gap-3">
+            <button onClick={handleBack} className="ghost-link text-sm sm:text-base">
+              ← Zurück
+            </button>
+            <Link
+              to="/"
+              className="absolute left-1/2 -translate-x-1/2 text-lg sm:text-xl font-bold text-slate-800 hover:text-[var(--accent)] transition-colors"
+            >
+              Mathe-Trainer
+            </Link>
             <a
               href="https://swjnmang.github.io/wss-digital/"
               className="ghost-link text-xs sm:text-sm"
