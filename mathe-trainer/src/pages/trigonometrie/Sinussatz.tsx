@@ -5,12 +5,36 @@ import 'katex/dist/katex.min.css';
 
 const SINUSSATZ_VIDEO_URL = 'https://youtu.be/zA7vfHfNw1E?si=qS_mb1RnX2S2WWo-';
 
-const angleSymbols = { alpha: 'α', beta: 'β', gamma: 'γ' } as const;
 const angleKeys = ['alpha', 'beta', 'gamma'] as const;
 const sideKeys = ['a', 'b', 'c'] as const;
 
 export type AngleKey = (typeof angleKeys)[number];
 export type SideKey = (typeof sideKeys)[number];
+
+// Damit Schüler:innen nicht nur das Dreieck A, B, C kennenlernen, wird die
+// Beschriftung zufällig auch mal auf B, C, D (mit den Winkeln β, γ, δ) verschoben.
+// Die Geometrie und Logik bleiben identisch, nur die angezeigten Buchstaben ändern sich.
+type Scheme = 'ABC' | 'BCD';
+
+const SCHEMES: Record<
+    Scheme,
+    {
+        vertices: Record<'A' | 'B' | 'C', string>;
+        sides: Record<SideKey, string>;
+        angles: Record<AngleKey, string>;
+    }
+> = {
+    ABC: {
+        vertices: { A: 'A', B: 'B', C: 'C' },
+        sides: { a: 'a', b: 'b', c: 'c' },
+        angles: { alpha: 'α', beta: 'β', gamma: 'γ' }
+    },
+    BCD: {
+        vertices: { A: 'B', B: 'C', C: 'D' },
+        sides: { a: 'b', b: 'c', c: 'd' },
+        angles: { alpha: 'β', beta: 'γ', gamma: 'δ' }
+    }
+};
 
 type TaskType = 'find_side' | 'find_angle';
 
@@ -38,6 +62,7 @@ interface SinusTask {
     unit: string;
     givenKeys: (AngleKey | SideKey)[];
     answerLabel: string;
+    scheme: Scheme;
 }
 
 interface SketchPoints {
@@ -172,20 +197,24 @@ const TriangleSketch: React.FC<{
     triangle: Triangle;
     highlight?: AngleKey | SideKey;
     givenKeys: (AngleKey | SideKey)[];
-}> = ({ triangle, highlight, givenKeys }) => {
+    scheme: Scheme;
+}> = ({ triangle, highlight, givenKeys, scheme }) => {
     const points = buildSketchPoints(triangle);
     const givenSet = new Set(givenKeys);
+    const labels = SCHEMES[scheme];
 
     const colorFor = (key: AngleKey | SideKey) => (highlight === key ? HIGHLIGHT_COLOR : GIVEN_COLOR);
+    const isHighlighted = (key: AngleKey | SideKey) => highlight === key;
 
     const sideLabel = (side: SideKey) => {
-        if (highlight === side) return `${side} = ?`;
-        if (givenSet.has(side)) return `${side} = ${formatValue(triangle[side], 'cm')}`;
-        return side;
+        const letter = labels.sides[side];
+        if (highlight === side) return `${letter} = ?`;
+        if (givenSet.has(side)) return `${letter} = ${formatValue(triangle[side], 'cm')}`;
+        return letter;
     };
 
     const angleLabel = (angle: AngleKey) => {
-        const symbol = angleSymbols[angle];
+        const symbol = labels.angles[angle];
         if (highlight === angle) return `${symbol} = ?`;
         if (givenSet.has(angle)) return `${symbol} = ${formatValue(triangle[angle], '°', 1)}`;
         return symbol;
@@ -241,19 +270,31 @@ const TriangleSketch: React.FC<{
                 stroke="#0f172a"
                 strokeWidth={1.3}
             />
+            <line
+                x1={points.A.x} y1={points.A.y} x2={points.B.x} y2={points.B.y}
+                stroke={colorFor('c')} strokeWidth={isHighlighted('c') ? 3 : 1.3}
+            />
+            <line
+                x1={points.A.x} y1={points.A.y} x2={points.C.x} y2={points.C.y}
+                stroke={colorFor('b')} strokeWidth={isHighlighted('b') ? 3 : 1.3}
+            />
+            <line
+                x1={points.B.x} y1={points.B.y} x2={points.C.x} y2={points.C.y}
+                stroke={colorFor('a')} strokeWidth={isHighlighted('a') ? 3 : 1.3}
+            />
 
             <circle cx={points.A.x} cy={points.A.y} r={2.5} fill="#0f172a" />
             <circle cx={points.B.x} cy={points.B.y} r={2.5} fill="#0f172a" />
             <circle cx={points.C.x} cy={points.C.y} r={2.5} fill="#0f172a" />
 
             <text x={labelA.x} y={labelA.y} dy={labelA.dy} textAnchor={labelA.textAnchor as 'start' | 'middle' | 'end'} fontSize="14">
-                A
+                {labels.vertices.A}
             </text>
             <text x={labelB.x} y={labelB.y} dy={labelB.dy} textAnchor={labelB.textAnchor as 'start' | 'middle' | 'end'} fontSize="14">
-                B
+                {labels.vertices.B}
             </text>
             <text x={labelC.x} y={labelC.y} dy={labelC.dy} textAnchor={labelC.textAnchor as 'start' | 'middle' | 'end'} fontSize="14">
-                C
+                {labels.vertices.C}
             </text>
 
             <text x={sideLabelC.x} y={sideLabelC.y} textAnchor="middle" fontSize="13" fill={colorFor('c')}>
@@ -278,28 +319,33 @@ const pickDifferentAngle = (angleToAvoid: AngleKey): AngleKey => {
     return options[Math.floor(Math.random() * options.length)];
 };
 
-const createFindSideTask = (triangle: Triangle): SinusTask => {
+const createFindSideTask = (triangle: Triangle, scheme: Scheme): SinusTask => {
     const targetAngle = angleKeys[Math.floor(Math.random() * angleKeys.length)];
     const referenceAngle = pickDifferentAngle(targetAngle);
     const targetSide = angleToSideMap[targetAngle];
     const referenceSide = angleToSideMap[referenceAngle];
+    const labels = SCHEMES[scheme];
+    const targetSideLabel = labels.sides[targetSide];
+    const referenceSideLabel = labels.sides[referenceSide];
+    const targetAngleLabel = labels.angles[targetAngle];
+    const referenceAngleLabel = labels.angles[referenceAngle];
 
     const steps: SolutionStep[] = [
         {
             text: 'Sinussatz aufschreiben',
-            math: `\\frac{${targetSide}}{\\sin(${angleSymbols[targetAngle]})} = \\frac{${referenceSide}}{\\sin(${angleSymbols[referenceAngle]})}`
+            math: `\\frac{${targetSideLabel}}{\\sin(${targetAngleLabel})} = \\frac{${referenceSideLabel}}{\\sin(${referenceAngleLabel})}`
         },
         {
-            text: `${targetSide} isolieren (Äquivalenzumformung)`,
-            math: `${targetSide} = \\frac{\\sin(${angleSymbols[targetAngle]})}{\\sin(${angleSymbols[referenceAngle]})} \\cdot ${referenceSide}`
+            text: `${targetSideLabel} isolieren (Äquivalenzumformung)`,
+            math: `${targetSideLabel} = \\frac{\\sin(${targetAngleLabel})}{\\sin(${referenceAngleLabel})} \\cdot ${referenceSideLabel}`
         },
         {
             text: 'Werte einsetzen',
-            math: `${targetSide} = \\frac{\\sin(${formatNumber(triangle[targetAngle], 1)}^\\circ)}{\\sin(${formatNumber(triangle[referenceAngle], 1)}^\\circ)} \\cdot ${formatNumber(triangle[referenceSide])}`
+            math: `${targetSideLabel} = \\frac{\\sin(${formatNumber(triangle[targetAngle], 1)}^\\circ)}{\\sin(${formatNumber(triangle[referenceAngle], 1)}^\\circ)} \\cdot ${formatNumber(triangle[referenceSide])}`
         },
         {
             text: 'Berechnen und runden',
-            math: `${targetSide} \\approx ${formatNumber(triangle[targetSide])}\\,\\text{cm}`
+            math: `${targetSideLabel} \\approx ${formatNumber(triangle[targetSide])}\\,\\text{cm}`
         }
     ];
 
@@ -307,20 +353,26 @@ const createFindSideTask = (triangle: Triangle): SinusTask => {
         triangle,
         type: 'find_side',
         toFind: targetSide,
-        prompt: `Berechne die Seitenlänge ${targetSide}.`,
+        prompt: `Berechne die Seitenlänge ${targetSideLabel}.`,
         steps,
         correctAnswer: triangle[targetSide],
         unit: 'cm',
         givenKeys: [targetAngle, referenceAngle, referenceSide],
-        answerLabel: targetSide
+        answerLabel: targetSideLabel,
+        scheme
     };
 };
 
-const createFindAngleTask = (triangle: Triangle): SinusTask => {
+const createFindAngleTask = (triangle: Triangle, scheme: Scheme): SinusTask => {
     const targetAngle = angleKeys[Math.floor(Math.random() * angleKeys.length)];
     const referenceAngle = pickDifferentAngle(targetAngle);
     const targetSide = angleToSideMap[targetAngle];
     const referenceSide = angleToSideMap[referenceAngle];
+    const labels = SCHEMES[scheme];
+    const targetSideLabel = labels.sides[targetSide];
+    const referenceSideLabel = labels.sides[referenceSide];
+    const targetAngleLabel = labels.angles[targetAngle];
+    const referenceAngleLabel = labels.angles[referenceAngle];
 
     const ratio = (triangle[targetSide] / triangle[referenceSide]) * Math.sin(degToRad(triangle[referenceAngle]));
     const clamped = Math.min(1, Math.max(-1, ratio));
@@ -329,19 +381,19 @@ const createFindAngleTask = (triangle: Triangle): SinusTask => {
     const steps: SolutionStep[] = [
         {
             text: 'Sinussatz mit Winkeln formulieren',
-            math: `\\frac{\\sin(${angleSymbols[targetAngle]})}{${targetSide}} = \\frac{\\sin(${angleSymbols[referenceAngle]})}{${referenceSide}}`
+            math: `\\frac{\\sin(${targetAngleLabel})}{${targetSideLabel}} = \\frac{\\sin(${referenceAngleLabel})}{${referenceSideLabel}}`
         },
         {
-            text: `${angleSymbols[targetAngle]} isolieren`,
-            math: `\\sin(${angleSymbols[targetAngle]}) = \\frac{${targetSide}}{${referenceSide}} \\cdot \\sin(${angleSymbols[referenceAngle]})`
+            text: `${targetAngleLabel} isolieren`,
+            math: `\\sin(${targetAngleLabel}) = \\frac{${targetSideLabel}}{${referenceSideLabel}} \\cdot \\sin(${referenceAngleLabel})`
         },
         {
             text: 'Werte einsetzen',
-            math: `\\sin(${angleSymbols[targetAngle]}) = \\frac{${formatNumber(triangle[targetSide])}}{${formatNumber(triangle[referenceSide])}} \\cdot \\sin(${formatNumber(triangle[referenceAngle], 1)}^\\circ)`
+            math: `\\sin(${targetAngleLabel}) = \\frac{${formatNumber(triangle[targetSide])}}{${formatNumber(triangle[referenceSide])}} \\cdot \\sin(${formatNumber(triangle[referenceAngle], 1)}^\\circ)`
         },
         {
             text: 'Umkehrfunktion (Sinus⁻¹) verwenden',
-            math: `${angleSymbols[targetAngle]} = \\sin^{-1}(${formatNumber(clamped, 3)}) \\approx ${formatNumber(calculatedAngle, 1)}^\\circ`
+            math: `${targetAngleLabel} = \\sin^{-1}(${formatNumber(clamped, 3)}) \\approx ${formatNumber(calculatedAngle, 1)}^\\circ`
         }
     ];
 
@@ -349,12 +401,13 @@ const createFindAngleTask = (triangle: Triangle): SinusTask => {
         triangle,
         type: 'find_angle',
         toFind: targetAngle,
-        prompt: `Bestimme den Winkel ${angleSymbols[targetAngle]}.`,
+        prompt: `Bestimme den Winkel ${targetAngleLabel}.`,
         steps,
         correctAnswer: triangle[targetAngle],
         unit: '°',
         givenKeys: [targetSide, referenceAngle, referenceSide],
-        answerLabel: angleSymbols[targetAngle]
+        answerLabel: targetAngleLabel,
+        scheme
     };
 };
 
@@ -366,8 +419,9 @@ const Sinussatz: React.FC = () => {
 
     const generateTask = () => {
         const triangle = buildTriangle();
+        const scheme: Scheme = Math.random() < 0.5 ? 'ABC' : 'BCD';
         const generator = Math.random() < 0.5 ? createFindSideTask : createFindAngleTask;
-        setTask(generator(triangle));
+        setTask(generator(triangle, scheme));
         setUserAnswer('');
         setFeedback(null);
         setShowSolution(false);
@@ -399,12 +453,13 @@ const Sinussatz: React.FC = () => {
     const givenSummary = task
         ? Array.from(new Set(task.givenKeys))
               .map(key => {
+                  const labels = SCHEMES[task.scheme];
                   if (angleKeys.includes(key as AngleKey)) {
                       const angleKey = key as AngleKey;
-                      return `${angleSymbols[angleKey]} = ${formatValue(task.triangle[angleKey], '°', 1)}`;
+                      return `${labels.angles[angleKey]} = ${formatValue(task.triangle[angleKey], '°', 1)}`;
                   }
                   const sideKey = key as SideKey;
-                  return `${sideKey} = ${formatValue(task.triangle[sideKey], 'cm')}`;
+                  return `${labels.sides[sideKey]} = ${formatValue(task.triangle[sideKey], 'cm')}`;
               })
               .join(', ')
         : '';
@@ -422,7 +477,7 @@ const Sinussatz: React.FC = () => {
                     <>
                         <div className="flex justify-center mb-6">
                             <div className="w-full max-w-[500px] mx-auto h-[350px] bg-gray-50 rounded-lg border-2 border-gray-200 p-4">
-                                <TriangleSketch triangle={task.triangle} highlight={task.toFind} givenKeys={task.givenKeys} />
+                                <TriangleSketch triangle={task.triangle} highlight={task.toFind} givenKeys={task.givenKeys} scheme={task.scheme} />
                             </div>
                         </div>
 
