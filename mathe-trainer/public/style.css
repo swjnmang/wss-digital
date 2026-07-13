@@ -24,16 +24,6 @@ body {
     min-height: 100vh;
 }
 
-.container {
-    width: 100%;
-    max-width: 960px;
-    background-color: var(--card-background);
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-}
-
 h1, h2, h3 {
     color: var(--text-primary);
     text-align: center;
