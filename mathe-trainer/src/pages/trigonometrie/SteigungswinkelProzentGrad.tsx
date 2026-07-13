@@ -87,17 +87,17 @@ const SlopeSketch: React.FC<SketchSpec> = ({
     const margin = 44;
     const rightLabelSpace = 100;
     const maxRun = width - 2 * margin - rightLabelSpace;
-    const scale = maxRun / horizontal;
-    const runPx = horizontal * scale;
-    const riseRaw = vertical * scale;
     const riseCap = height - 2 * margin;
-    const riseScaleAdjust = riseRaw > riseCap ? riseCap / riseRaw : 1;
-    const runPxAdjusted = runPx * (riseRaw > riseCap ? riseScaleAdjust : 1);
-    const risePx = riseRaw * (riseRaw > riseCap ? riseScaleAdjust : 1);
+    // Steigungswinkel sind oft sehr flach (wenige Grad). Ohne eine Mindesthöhe
+    // würde das Dreieck dann nur als winziger Strich am unteren Bildrand erscheinen.
+    // Die Zeichnung ist bewusst nicht maßstabsgetreu, damit sie immer gut erkennbar ist.
+    const minRisePx = riseCap * 0.4;
+    const trueRisePx = (vertical / horizontal) * maxRun;
+    const risePx = Math.min(riseCap, Math.max(minRisePx, trueRisePx));
 
     const Ax = margin;
     const Ay = height - margin;
-    const Bx = margin + runPxAdjusted;
+    const Bx = margin + maxRun;
     const By = height - margin;
     const Cx = Bx;
     const Cy = By - risePx;
@@ -234,45 +234,6 @@ const buildDistanceTask = (): SlopeTask => {
     const percent = round(randomInRange(4, 25), 1);
     const distance = randomInt(400, 3000);
     const t = triangleFromPercentDistance(percent, distance);
-    const askHeight = Math.random() < 0.3;
-
-    if (askHeight) {
-        const steps: SolutionStep[] = [
-            {
-                text: 'Bestimme zunächst den Steigungswinkel aus der Steigung in Prozent.',
-                math: `\\alpha = \\tan^{-1}\\!\\left(\\frac{${formatNumber(percent, 1)}}{100}\\right) \\approx ${formatNumber(t.angle, 1)}^{\\circ}`
-            },
-            {
-                text: 'Der Höhenunterschied ist die Gegenkathete zur gefahrenen Strecke (Hypotenuse). Nutze den Sinus.',
-                math: `\\sin(\\alpha) = \\frac{\\text{Höhenunterschied}}{\\text{Fahrstrecke}}`
-            },
-            {
-                text: 'Löse nach dem Höhenunterschied auf und setze ein.',
-                math: `\\text{Höhenunterschied} = \\sin(${formatNumber(t.angle, 1)}^{\\circ}) \\cdot ${formatNumber(distance, 0)}\\,\\text{m}`
-            },
-            {
-                text: 'Berechne und runde das Ergebnis.',
-                math: `\\text{Höhenunterschied} \\approx ${formatNumber(t.vertical, 0)}\\,\\text{m}`
-            }
-        ];
-
-        return {
-            prompt: `${traveler} fährt auf einer Straße mit einem durchschnittlichen Gefälle von ${formatNumber(percent, 1)} % eine Fahrstrecke von ${formatNumber(distance, 0)} m. Welchen Höhenunterschied überwindet es dabei?`,
-            steps,
-            correctAnswer: round(t.vertical, 0),
-            unit: 'm',
-            resultLabel: 'Höhenunterschied',
-            sketch: {
-                horizontal: t.horizontal,
-                vertical: t.vertical,
-                horizontalLabel: 'horizontale Strecke',
-                verticalLabel: 'Höhenunterschied = ?',
-                hypotenuseLabel: `${formatNumber(distance, 0)} m`,
-                angleLabel: `α ≈ ${formatNumber(t.angle, 1)}°`,
-                highlight: 'vertical'
-            }
-        };
-    }
 
     const steps: SolutionStep[] = [
         {
