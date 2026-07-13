@@ -29,8 +29,8 @@ const FlaechensatzUebung: React.FC = () => {
         const factor = Math.pow(10, decimals);
         return Math.round(value * factor) / factor;
     };
-    // Maximal 3% relative Toleranz bei der Ergebniseingabe, mit kleiner Mindesttoleranz für sehr kleine Werte
-    const relTolerance = (value: number, min = 0.01) => Math.max(Math.abs(value) * 0.03, min);
+    // Maximal 1% relative Toleranz bei der Ergebniseingabe, mit kleiner Mindesttoleranz für sehr kleine Werte
+    const relTolerance = (value: number, min = 0.01) => Math.max(Math.abs(value) * 0.01, min);
 
     const generateTriangleAngles = () => {
         let alpha_deg, beta_deg, gamma_deg;

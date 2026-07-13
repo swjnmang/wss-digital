@@ -275,7 +275,8 @@ const Sinusfunktion: React.FC = () => {
             return;
         }
         const target = parseFloat(task.correctAnswer);
-        const tolerance = task.unit === '°' ? 1 : 0.03;
+        // Maximal 1% relative Toleranz, mit kleiner Mindesttoleranz für sehr kleine Werte
+        const tolerance = Math.max(Math.abs(target) * 0.01, 0.01);
         setFeedback(Math.abs(value - target) <= tolerance ? 'correct' : 'incorrect');
     };
 

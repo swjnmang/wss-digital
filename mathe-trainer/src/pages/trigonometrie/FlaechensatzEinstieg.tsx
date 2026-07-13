@@ -235,7 +235,8 @@ const FlaechensatzEinstieg: React.FC = () => {
             setFeedback('incorrect');
             return;
         }
-        const tolerance = practiceTask.correctArea * 0.1;
+        // Maximal 1% relative Toleranz, mit kleiner Mindesttoleranz für sehr kleine Werte
+        const tolerance = Math.max(Math.abs(practiceTask.correctArea) * 0.01, 0.01);
         setFeedback(Math.abs(parsed - practiceTask.correctArea) <= tolerance ? 'correct' : 'incorrect');
     };
 

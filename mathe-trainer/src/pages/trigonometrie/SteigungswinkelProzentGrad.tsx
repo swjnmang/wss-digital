@@ -388,8 +388,8 @@ const SteigungswinkelProzentGrad: React.FC = () => {
             setFeedback('info');
             return;
         }
-        const tolerance =
-            task.unit === '°' ? 0.5 : task.unit === '%' ? 0.5 : Math.max(1, task.correctAnswer * 0.03);
+        // Maximal 1% relative Toleranz, mit kleiner Mindesttoleranz für sehr kleine Werte
+        const tolerance = Math.max(Math.abs(task.correctAnswer) * 0.01, 0.01);
         setFeedback(Math.abs(value - task.correctAnswer) <= tolerance ? 'correct' : 'incorrect');
     };
 

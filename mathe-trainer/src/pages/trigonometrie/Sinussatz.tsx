@@ -377,7 +377,8 @@ const Sinussatz: React.FC = () => {
         generateTask();
     }, []);
 
-    const tolerance = task?.unit === '°' ? 1 : 0.2;
+    // Maximal 1% relative Toleranz, mit kleiner Mindesttoleranz für sehr kleine Werte
+    const tolerance = task ? Math.max(Math.abs(task.correctAnswer) * 0.01, 0.01) : 0.01;
 
     const checkAnswer = () => {
         if (!task) return;

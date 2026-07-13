@@ -48,8 +48,8 @@ const randomInRange = (min: number, max: number) => Math.random() * (max - min) 
 const randomInt = (min: number, max: number) => Math.floor(randomInRange(min, max + 1));
 const round = (val: number, digits = 2) => parseFloat(val.toFixed(digits));
 const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
-// Maximal 3% relative Toleranz beim Runden, mit kleiner Mindesttoleranz für sehr kleine Werte
-const relTolerance = (value: number, min = 0.01) => Math.max(Math.abs(value) * 0.03, min);
+// Maximal 1% relative Toleranz beim Runden, mit kleiner Mindesttoleranz für sehr kleine Werte
+const relTolerance = (value: number, min = 0.01) => Math.max(Math.abs(value) * 0.01, min);
 
 let idCounter = 0;
 const nextId = () => {

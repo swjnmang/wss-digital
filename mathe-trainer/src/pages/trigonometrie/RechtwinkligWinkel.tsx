@@ -223,9 +223,8 @@ const RechtwinkligWinkel: React.FC = () => {
             // @ts-ignore
             const correctVal = currentTask[key];
             
-            // Tolerance: Angles +/- 1 degree, Sides +/- 0.1 (since we rounded inputs)
-            // Actually, let's be a bit generous but not too much.
-            const tolerance = key.includes('alpha') || key.includes('beta') ? 1.0 : 0.2;
+            // Maximal 1% relative Toleranz, mit kleiner Mindesttoleranz für sehr kleine Werte
+            const tolerance = Math.max(Math.abs(correctVal) * 0.01, 0.01);
             
             if (Math.abs(val - correctVal) < tolerance) {
                 newFeedback[key] = 'correct';
