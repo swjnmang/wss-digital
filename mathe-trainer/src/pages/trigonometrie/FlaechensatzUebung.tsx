@@ -14,6 +14,37 @@ interface Task {
 
 const FLAECHENSATZ_VIDEO_URL = 'https://youtu.be/JFoLf3uT4DM?si=V1t-joWFciTN8ruX';
 
+// Damit Schüler:innen nicht nur das Dreieck a, b, c kennenlernen, wird die Beschriftung
+// zufällig auch auf b, c, d verschoben. Geometrie und Rechenweg bleiben identisch,
+// nur die angezeigten Buchstaben/Symbole ändern sich.
+type LetterScheme = 'ABC' | 'BCD';
+
+const LETTER_SCHEMES: Record<
+    LetterScheme,
+    {
+        vertices: { A: string; B: string; C: string };
+        sides: { a: string; b: string; c: string };
+        angleSymbols: { alpha: string; beta: string; gamma: string };
+        angleLatex: { alpha: string; beta: string; gamma: string };
+        angleWords: { alpha: string; beta: string; gamma: string };
+    }
+> = {
+    ABC: {
+        vertices: { A: 'A', B: 'B', C: 'C' },
+        sides: { a: 'a', b: 'b', c: 'c' },
+        angleSymbols: { alpha: 'α', beta: 'β', gamma: 'γ' },
+        angleLatex: { alpha: '\\alpha', beta: '\\beta', gamma: '\\gamma' },
+        angleWords: { alpha: 'alpha', beta: 'beta', gamma: 'gamma' }
+    },
+    BCD: {
+        vertices: { A: 'B', B: 'C', C: 'D' },
+        sides: { a: 'b', b: 'c', c: 'd' },
+        angleSymbols: { alpha: 'β', beta: 'γ', gamma: 'δ' },
+        angleLatex: { alpha: '\\beta', beta: '\\gamma', gamma: '\\delta' },
+        angleWords: { alpha: 'beta', beta: 'gamma', gamma: 'delta' }
+    }
+};
+
 const FlaechensatzUebung: React.FC = () => {
     const [task, setTask] = useState<Task | null>(null);
     const [showSolution, setShowSolution] = useState<boolean>(false);
@@ -54,7 +85,8 @@ const FlaechensatzUebung: React.FC = () => {
         return { a: sideA, b, c };
     };
 
-    const createTriangleSketch = (angles: any, sides: any, formulaType: string, unknownElement: string | null) => {
+    const createTriangleSketch = (angles: any, sides: any, formulaType: string, unknownElement: string | null, scheme: LetterScheme) => {
+        const L = LETTER_SCHEMES[scheme];
         const svgBaseWidth = 350;
         const svgBaseHeight = 250;
         const padding = 30;
@@ -78,9 +110,9 @@ const FlaechensatzUebung: React.FC = () => {
         const points = [pointA, pointB, pointC];
 
         // Labels
-        let labelA = 'a';
-        let labelB = 'b';
-        let labelC = 'c';
+        let labelA = L.sides.a;
+        let labelB = L.sides.b;
+        let labelC = L.sides.c;
 
         if (unknownElement && unknownElement.startsWith('unknown-side')) {
             const unknownSideLetter = unknownElement.slice('unknown-side-'.length);
@@ -105,9 +137,9 @@ const FlaechensatzUebung: React.FC = () => {
         svgContent += `<polygon points="${points[0].x},${points[0].y} ${points[1].x},${points[1].y} ${points[2].x},${points[2].y}" style="fill:none;stroke:black;stroke-width:1.5" />`;
 
         // Vertices
-        svgContent += `<text x="${points[0].x - 5}" y="${points[0].y + 10}" font-size="14" text-anchor="end" fill="#333">A</text>`;
-        svgContent += `<text x="${points[1].x + 5}" y="${points[1].y + 10}" font-size="14" text-anchor="start" fill="#333">B</text>`;
-        svgContent += `<text x="${points[2].x}" y="${points[2].y - 5}" font-size="14" text-anchor="middle" fill="#333">C</text>`;
+        svgContent += `<text x="${points[0].x - 5}" y="${points[0].y + 10}" font-size="14" text-anchor="end" fill="#333">${L.vertices.A}</text>`;
+        svgContent += `<text x="${points[1].x + 5}" y="${points[1].y + 10}" font-size="14" text-anchor="start" fill="#333">${L.vertices.B}</text>`;
+        svgContent += `<text x="${points[2].x}" y="${points[2].y - 5}" font-size="14" text-anchor="middle" fill="#333">${L.vertices.C}</text>`;
 
         // Sides
         svgContent += `<text x="${midBC.x}" y="${midBC.y}" font-size="16" text-anchor="start" fill="${labelA === '?' ? 'red' : 'black'}">${labelA}</text>`;
@@ -149,9 +181,9 @@ const FlaechensatzUebung: React.FC = () => {
             }
         };
 
-        addAngleLabel(points[0], points[2], points[1], 'α', unknownElement === 'unknown-angle-alpha', 'alpha');
-        addAngleLabel(points[1], points[0], points[2], 'β', unknownElement === 'unknown-angle-beta', 'beta');
-        addAngleLabel(points[2], points[0], points[1], 'γ', unknownElement === 'unknown-angle-gamma', 'gamma');
+        addAngleLabel(points[0], points[2], points[1], L.angleSymbols.alpha, unknownElement === 'unknown-angle-alpha', 'alpha');
+        addAngleLabel(points[1], points[0], points[2], L.angleSymbols.beta, unknownElement === 'unknown-angle-beta', 'beta');
+        addAngleLabel(points[2], points[0], points[1], L.angleSymbols.gamma, unknownElement === 'unknown-angle-gamma', 'gamma');
 
         // viewBox so berechnen, dass alle Punkte und Beschriftungen sichtbar sind.
         // Das Seitenverhältnis wird dabei begrenzt, damit das Dreieck bei extremen
@@ -189,6 +221,8 @@ const FlaechensatzUebung: React.FC = () => {
         const angles = generateTriangleAngles();
         const baseSideA = getRandom(5, 15);
         const sides = calculateSides(angles, baseSideA);
+        const scheme: LetterScheme = Math.random() < 0.5 ? 'ABC' : 'BCD';
+        const L = LETTER_SCHEMES[scheme];
 
         const roundedSides = {
             a: round(sides.a, 2),
@@ -203,20 +237,24 @@ const FlaechensatzUebung: React.FC = () => {
 
         const formulaVariation = Math.floor(Math.random() * 3);
         const formulaMapping = [
-            { sides: ['a', 'b'], angle: 'gamma', formula: 'A = \\frac{1}{2} \\cdot a \\cdot b \\cdot \\sin(\\gamma)' },
-            { sides: ['b', 'c'], angle: 'alpha', formula: 'A = \\frac{1}{2} \\cdot b \\cdot c \\cdot \\sin(\\alpha)' },
-            { sides: ['a', 'c'], angle: 'beta', formula: 'A = \\frac{1}{2} \\cdot a \\cdot c \\cdot \\sin(\\beta)' }
+            { sides: ['a', 'b'], angle: 'gamma' },
+            { sides: ['b', 'c'], angle: 'alpha' },
+            { sides: ['a', 'c'], angle: 'beta' }
         ];
 
         const chosen = formulaMapping[formulaVariation];
         const side1 = chosen.sides[0] as keyof typeof roundedSides;
         const side2 = chosen.sides[1] as keyof typeof roundedSides;
         const angle = chosen.angle as keyof typeof roundedAngles;
-        const formulaText = chosen.formula;
+        const formulaText = `A = \\frac{1}{2} \\cdot ${L.sides[side1]} \\cdot ${L.sides[side2]} \\cdot \\sin(${L.angleLatex[angle]})`;
 
         const side1Value = roundedSides[side1];
         const side2Value = roundedSides[side2];
         const angleValue = roundedAngles[angle];
+        const side1Label = L.sides[side1];
+        const side2Label = L.sides[side2];
+        const angleWord = L.angleWords[angle];
+        const angleLatex = L.angleLatex[angle];
 
         // Der Flächeninhalt wird konsequent aus genau den Werten berechnet, die dem
         // Schüler auch angezeigt werden (side1Value, side2Value, angleValue). So passt
@@ -233,7 +271,7 @@ const FlaechensatzUebung: React.FC = () => {
         let answerLabel = "";
 
         if (taskType === 'area') {
-            description = `Berechnen Sie den Flächeninhalt eines Dreiecks mit den Seitenlängen ${side1} = ${side1Value} cm und ${side2} = ${side2Value} cm sowie dem eingeschlossenen Winkel ${angle} = ${angleValue}°.`;
+            description = `Berechnen Sie den Flächeninhalt eines Dreiecks mit den Seitenlängen ${side1Label} = ${side1Value} cm und ${side2Label} = ${side2Value} cm sowie dem eingeschlossenen Winkel ${angleWord} = ${angleValue}°.`;
 
             solutionSteps.push({
                 heading: "Schritt 1: Formel aufschreiben",
@@ -251,7 +289,7 @@ const FlaechensatzUebung: React.FC = () => {
                 math: `A \\approx ${roundedArea} \\text{ cm}^2`
             });
 
-            sketchSVG = createTriangleSketch(angles, roundedSides, angle, null);
+            sketchSVG = createTriangleSketch(angles, roundedSides, angle, null, scheme);
             correctAnswer = roundedArea;
             unit = "cm²";
             answerLabel = "A";
@@ -264,11 +302,13 @@ const FlaechensatzUebung: React.FC = () => {
                 const knownSide = chosen.sides[1 - unknownSideIndex] as keyof typeof roundedSides;
 
                 const knownSideValue = roundedSides[knownSide];
+                const unknownSideLabel = L.sides[unknownSide];
+                const knownSideLabel = L.sides[knownSide];
                 // Aus den angezeigten (gerundeten) Werten für A, die bekannte Seite und den Winkel
                 // neu berechnen, damit das Ergebnis exakt zu den gezeigten Rechenschritten passt.
                 const unknownSideValue = round((2 * roundedArea) / (knownSideValue * Math.sin(degToRad(angleValue))), 2);
 
-                description = `Ein Dreieck hat den Flächeninhalt A = ${roundedArea} cm². Eine Seite hat die Länge ${knownSide} = ${knownSideValue} cm, und der eingeschlossene Winkel beträgt ${angle} = ${angleValue}°. Berechnen Sie die Länge der Seite ${unknownSide}.`;
+                description = `Ein Dreieck hat den Flächeninhalt A = ${roundedArea} cm². Eine Seite hat die Länge ${knownSideLabel} = ${knownSideValue} cm, und der eingeschlossene Winkel beträgt ${angleWord} = ${angleValue}°. Berechnen Sie die Länge der Seite ${unknownSideLabel}.`;
                 unknownElement = `unknown-side-${unknownSide}`;
 
                 solutionSteps.push({
@@ -278,31 +318,31 @@ const FlaechensatzUebung: React.FC = () => {
                 });
                 solutionSteps.push({
                     heading: "Schritt 2: Formel umstellen",
-                    text: `Um die unbekannte Seite ${unknownSide} zu finden, stellen wir die Formel um:`,
-                    math: `${unknownSide} = \\frac{2 \\cdot A}{${knownSide} \\cdot \\sin(${angle})}`
+                    text: `Um die unbekannte Seite ${unknownSideLabel} zu finden, stellen wir die Formel um:`,
+                    math: `${unknownSideLabel} = \\frac{2 \\cdot A}{${knownSideLabel} \\cdot \\sin(${angleLatex})}`
                 });
                 solutionSteps.push({
                     heading: "Schritt 3: Werte einsetzen",
                     text: "Setzen Sie die gegebenen Werte ein:",
-                    math: `${unknownSide} = \\frac{2 \\cdot ${roundedArea}}{${knownSideValue} \\cdot \\sin(${angleValue}^\\circ)}`
+                    math: `${unknownSideLabel} = \\frac{2 \\cdot ${roundedArea}}{${knownSideValue} \\cdot \\sin(${angleValue}^\\circ)}`
                 });
                 solutionSteps.push({
                     heading: "Schritt 4: Berechnen",
                     text: "Berechnen Sie die Länge der Seite:",
-                    math: `${unknownSide} \\approx ${unknownSideValue} \\text{ cm}`
+                    math: `${unknownSideLabel} \\approx ${unknownSideValue} \\text{ cm}`
                 });
 
-                sketchSVG = createTriangleSketch(angles, roundedSides, angle, unknownElement);
+                sketchSVG = createTriangleSketch(angles, roundedSides, angle, unknownElement, scheme);
                 correctAnswer = unknownSideValue;
                 unit = "cm";
-                answerLabel = unknownSide;
+                answerLabel = unknownSideLabel;
             } else {
                 const sin_angle_calc = (2 * roundedArea) / (side1Value * side2Value);
                 const sin_angle_clamped = Math.max(-1, Math.min(1, sin_angle_calc));
                 const angle_rad_arcsin = Math.asin(sin_angle_clamped);
                 const angle_deg_arcsin = round(radToDeg(angle_rad_arcsin), 1);
 
-                description = `Ein Dreieck hat den Flächeninhalt A = ${roundedArea} cm². Zwei Seiten, die den Winkel ${angle} einschließen, haben die Längen ${side1} = ${side1Value} cm und ${side2} = ${side2Value} cm. Berechnen Sie die Größe des Winkels ${angle}.`;
+                description = `Ein Dreieck hat den Flächeninhalt A = ${roundedArea} cm². Zwei Seiten, die den Winkel ${angleWord} einschließen, haben die Längen ${side1Label} = ${side1Value} cm und ${side2Label} = ${side2Value} cm. Berechnen Sie die Größe des Winkels ${angleWord}.`;
                 unknownElement = `unknown-angle-${angle}`;
 
                 solutionSteps.push({
@@ -312,19 +352,19 @@ const FlaechensatzUebung: React.FC = () => {
                 });
                 solutionSteps.push({
                     heading: "Schritt 2: Formel umstellen",
-                    text: `Um den Winkel ${angle} zu finden, stellen wir die Formel nach sin(${angle}) um:`,
-                    math: `\\sin(${angle}) = \\frac{2 \\cdot A}{${side1} \\cdot ${side2}}`
+                    text: `Um den Winkel ${angleWord} zu finden, stellen wir die Formel nach sin(${angleWord}) um:`,
+                    math: `\\sin(${angleLatex}) = \\frac{2 \\cdot A}{${side1Label} \\cdot ${side2Label}}`
                 });
                 solutionSteps.push({
                     heading: "Schritt 3: Werte einsetzen und berechnen",
                     text: `Wir berechnen den Sinuswert und dann den Winkel mit Arcussinus:`,
-                    math: `\\sin(${angle}) = \\frac{2 \\cdot ${roundedArea}}{${side1Value} \\cdot ${side2Value}} \\approx ${round(sin_angle_clamped, 3)} \\implies ${angle} \\approx ${angle_deg_arcsin}^\\circ`
+                    math: `\\sin(${angleLatex}) = \\frac{2 \\cdot ${roundedArea}}{${side1Value} \\cdot ${side2Value}} \\approx ${round(sin_angle_clamped, 3)} \\implies ${angleLatex} \\approx ${angle_deg_arcsin}^\\circ`
                 });
 
-                sketchSVG = createTriangleSketch(angles, roundedSides, angle, unknownElement);
+                sketchSVG = createTriangleSketch(angles, roundedSides, angle, unknownElement, scheme);
                 correctAnswer = angle_deg_arcsin;
                 unit = "°";
-                answerLabel = angle;
+                answerLabel = angleWord;
             }
         }
 

@@ -3,11 +3,40 @@ import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
-const angleSymbols = { alpha: 'α', beta: 'β', gamma: 'γ' } as const;
 const angleKeys = ['alpha', 'beta', 'gamma'] as const;
 const sideKeys = ['a', 'b', 'c'] as const;
 type AngleKey = typeof angleKeys[number];
 type SideKey = typeof sideKeys[number];
+
+// Damit Schüler:innen nicht nur das Dreieck a, b, c kennenlernen, wird die Beschriftung
+// zufällig auch auf b, c, d oder c, d, e verschoben. Geometrie und Rechenweg bleiben
+// identisch, nur die angezeigten Buchstaben/Symbole ändern sich.
+type LetterScheme = 'ABC' | 'BCD' | 'CDE';
+
+const LETTER_SCHEMES: Record<
+    LetterScheme,
+    {
+        vertices: { A: string; B: string; C: string };
+        sides: Record<SideKey, string>;
+        angles: Record<AngleKey, string>;
+    }
+> = {
+    ABC: {
+        vertices: { A: 'A', B: 'B', C: 'C' },
+        sides: { a: 'a', b: 'b', c: 'c' },
+        angles: { alpha: 'α', beta: 'β', gamma: 'γ' }
+    },
+    BCD: {
+        vertices: { A: 'B', B: 'C', C: 'D' },
+        sides: { a: 'b', b: 'c', c: 'd' },
+        angles: { alpha: 'β', beta: 'γ', gamma: 'δ' }
+    },
+    CDE: {
+        vertices: { A: 'C', B: 'D', C: 'E' },
+        sides: { a: 'c', b: 'd', c: 'e' },
+        angles: { alpha: 'γ', beta: 'δ', gamma: 'ε' }
+    }
+};
 
 const angleToSideMap: Record<AngleKey, SideKey> = {
     alpha: 'a',
@@ -49,6 +78,7 @@ interface CosTask {
     unit: '°' | '';
     givenKeys: (AngleKey | SideKey)[];
     answerLabel: string;
+    scheme: LetterScheme;
 }
 
 const degToRad = (deg: number) => deg * (Math.PI / 180);
@@ -153,17 +183,20 @@ const TriangleSketch: React.FC<{
     triangle: Triangle;
     highlight?: AngleKey | SideKey;
     givenKeys: (AngleKey | SideKey)[];
-}> = ({ triangle, highlight, givenKeys }) => {
+    scheme: LetterScheme;
+}> = ({ triangle, highlight, givenKeys, scheme }) => {
     const points = buildSketchPoints(triangle);
     const givenSet = new Set(givenKeys);
+    const labels = LETTER_SCHEMES[scheme];
     const colorFor = (key: AngleKey | SideKey) => (highlight === key ? HIGHLIGHT_COLOR : GIVEN_COLOR);
     const getSideLabel = (side: SideKey) => {
-        if (highlight === side) return `${side} = ?`;
-        if (givenSet.has(side)) return `${side} = ${formatValue(triangle[side], '')}`;
-        return side;
+        const letter = labels.sides[side];
+        if (highlight === side) return `${letter} = ?`;
+        if (givenSet.has(side)) return `${letter} = ${formatValue(triangle[side], '')}`;
+        return letter;
     };
     const getAngleLabel = (angle: AngleKey) => {
-        const symbol = angleSymbols[angle];
+        const symbol = labels.angles[angle];
         if (highlight === angle) return `${symbol} = ?`;
         if (givenSet.has(angle)) return `${symbol} = ${formatValue(triangle[angle], '°')}`;
         return symbol;
@@ -221,13 +254,13 @@ const TriangleSketch: React.FC<{
             <circle cx={points.C.x} cy={points.C.y} r={2.5} fill="#0f172a" />
 
             <text x={labelA.x} y={labelA.y} dy={labelA.dy} textAnchor={labelA.textAnchor} fontSize="14" fontWeight="bold">
-                A
+                {labels.vertices.A}
             </text>
             <text x={labelB.x} y={labelB.y} dy={labelB.dy} textAnchor={labelB.textAnchor} fontSize="14" fontWeight="bold">
-                B
+                {labels.vertices.B}
             </text>
             <text x={labelC.x} y={labelC.y} dy={labelC.dy} textAnchor={labelC.textAnchor} fontSize="14" fontWeight="bold">
-                C
+                {labels.vertices.C}
             </text>
 
             <text x={sideLabelC.x} y={sideLabelC.y} textAnchor="middle" fontSize="13" fill={colorFor('c')}>
@@ -278,6 +311,9 @@ const Kosinussatz: React.FC = () => {
     const generateTask = () => {
         const triangle = buildTriangle();
         const type: TaskType = Math.random() < 0.5 ? 'find_side' : 'find_angle';
+        const schemeOptions: LetterScheme[] = ['ABC', 'BCD', 'CDE'];
+        const scheme = schemeOptions[Math.floor(Math.random() * schemeOptions.length)];
+        const L = LETTER_SCHEMES[scheme];
 
         if (type === 'find_side') {
             const targetSide = sideKeys[Math.floor(Math.random() * sideKeys.length)];
@@ -288,23 +324,27 @@ const Kosinussatz: React.FC = () => {
                 Math.pow(triangle[adj1], 2) +
                 Math.pow(triangle[adj2], 2) -
                 2 * triangle[adj1] * triangle[adj2] * cosValue;
+            const targetSideLabel = L.sides[targetSide];
+            const adj1Label = L.sides[adj1];
+            const adj2Label = L.sides[adj2];
+            const targetAngleLabel = L.angles[targetAngle];
 
             const sideSteps: SolutionStep[] = [
                 {
                     text: 'Nutze den Kosinussatz für die gesuchte Seite.',
-                    math: `${targetSide}^2 = ${adj1}^2 + ${adj2}^2 - 2\\cdot ${adj1}\\cdot ${adj2}\\cdot\\cos(${angleSymbols[targetAngle]})`
+                    math: `${targetSideLabel}^2 = ${adj1Label}^2 + ${adj2Label}^2 - 2\\cdot ${adj1Label}\\cdot ${adj2Label}\\cdot\\cos(${targetAngleLabel})`
                 },
                 {
                     text: 'Setze die bekannten Seiten und den Winkel ein.',
-                    math: `${targetSide}^2 = ${formatNumber(triangle[adj1])}^2 + ${formatNumber(triangle[adj2])}^2 - 2\\cdot${formatNumber(triangle[adj1])}\\cdot${formatNumber(triangle[adj2])}\\cdot\\cos(${formatNumber(triangle[targetAngle], 1)}^{\\circ})`
+                    math: `${targetSideLabel}^2 = ${formatNumber(triangle[adj1])}^2 + ${formatNumber(triangle[adj2])}^2 - 2\\cdot${formatNumber(triangle[adj1])}\\cdot${formatNumber(triangle[adj2])}\\cdot\\cos(${formatNumber(triangle[targetAngle], 1)}^{\\circ})`
                 },
                 {
                     text: 'Fasse den Term zusammen.',
-                    math: `${targetSide}^2 = ${round(underRoot, 3)} \\Leftrightarrow ${targetSide} = \\sqrt{${round(underRoot, 3)}}`
+                    math: `${targetSideLabel}^2 = ${round(underRoot, 3)} \\Leftrightarrow ${targetSideLabel} = \\sqrt{${round(underRoot, 3)}}`
                 },
                 {
                     text: 'Ziehe die Wurzel, um die Seite zu erhalten.',
-                    math: `${targetSide} \\approx ${formatNumber(Math.sqrt(Math.max(underRoot, 0)))}`
+                    math: `${targetSideLabel} \\approx ${formatNumber(Math.sqrt(Math.max(underRoot, 0)))}`
                 }
             ];
 
@@ -312,12 +352,13 @@ const Kosinussatz: React.FC = () => {
                 triangle,
                 type,
                 toFind: targetSide,
-                prompt: `Berechne die Seitenlänge ${targetSide}.`,
+                prompt: `Berechne die Seitenlänge ${targetSideLabel}.`,
                 steps: sideSteps,
                 correctAnswer: triangle[targetSide],
                 unit: '',
                 givenKeys: [adj1, adj2, targetAngle],
-                answerLabel: targetSide
+                answerLabel: targetSideLabel,
+                scheme
             });
             setFeedback(null);
             setUserAnswer('');
@@ -334,23 +375,27 @@ const Kosinussatz: React.FC = () => {
         const ratio = numerator / denominator;
         const clamped = Math.min(1, Math.max(-1, ratio));
         const computedAngle = radToDeg(Math.acos(clamped));
+        const targetAngleLabel = L.angles[targetAngle];
+        const adj1Label = L.sides[adj1];
+        const adj2Label = L.sides[adj2];
+        const oppositeLabel = L.sides[opposite];
 
         const angleSteps: SolutionStep[] = [
             {
                 text: 'Form des Kosinussatzes zur Winkelberechnung:',
-                math: `\\cos(${angleSymbols[targetAngle]}) = \\frac{${adj1}^2 + ${adj2}^2 - ${opposite}^2}{2\\cdot ${adj1}\\cdot ${adj2}}`
+                math: `\\cos(${targetAngleLabel}) = \\frac{${adj1Label}^2 + ${adj2Label}^2 - ${oppositeLabel}^2}{2\\cdot ${adj1Label}\\cdot ${adj2Label}}`
             },
             {
                 text: 'Setze die bekannten Seiten ein.',
-                math: `\\cos(${angleSymbols[targetAngle]}) = \\frac{${formatNumber(triangle[adj1])}^2 + ${formatNumber(triangle[adj2])}^2 - ${formatNumber(triangle[opposite])}^2}{2\\cdot${formatNumber(triangle[adj1])}\\cdot${formatNumber(triangle[adj2])}}`
+                math: `\\cos(${targetAngleLabel}) = \\frac{${formatNumber(triangle[adj1])}^2 + ${formatNumber(triangle[adj2])}^2 - ${formatNumber(triangle[opposite])}^2}{2\\cdot${formatNumber(triangle[adj1])}\\cdot${formatNumber(triangle[adj2])}}`
             },
             {
                 text: 'Berechne den Quotienten.',
-                math: `\\cos(${angleSymbols[targetAngle]}) = ${round(clamped, 4)} \\Leftrightarrow ${angleSymbols[targetAngle]} = \\cos^{-1}(${round(clamped, 4)})`
+                math: `\\cos(${targetAngleLabel}) = ${round(clamped, 4)} \\Leftrightarrow ${targetAngleLabel} = \\cos^{-1}(${round(clamped, 4)})`
             },
             {
                 text: 'Bestimme den Winkel in Grad.',
-                math: `${angleSymbols[targetAngle]} \\approx ${formatNumber(triangle[targetAngle], 1)}^{\\circ}`
+                math: `${targetAngleLabel} \\approx ${formatNumber(triangle[targetAngle], 1)}^{\\circ}`
             }
         ];
 
@@ -358,12 +403,13 @@ const Kosinussatz: React.FC = () => {
             triangle,
             type,
             toFind: targetAngle,
-            prompt: `Berechne den Winkel ${angleSymbols[targetAngle]}.`,
+            prompt: `Berechne den Winkel ${targetAngleLabel}.`,
             steps: angleSteps,
             correctAnswer: triangle[targetAngle],
             unit: '°',
             givenKeys: [opposite, adj1, adj2],
-            answerLabel: angleSymbols[targetAngle]
+            answerLabel: targetAngleLabel,
+            scheme
         });
         setFeedback(null);
         setUserAnswer('');
@@ -394,12 +440,13 @@ const Kosinussatz: React.FC = () => {
     const givenSummary = task
         ? task.givenKeys
               .map(key => {
+                  const labels = LETTER_SCHEMES[task.scheme];
                   if (angleKeys.includes(key as AngleKey)) {
                       const angleKey = key as AngleKey;
-                      return `${angleSymbols[angleKey]} = ${formatValue(task.triangle[angleKey], '°')}`;
+                      return `${labels.angles[angleKey]} = ${formatValue(task.triangle[angleKey], '°')}`;
                   }
                   const sideKey = key as SideKey;
-                  return `${sideKey} = ${formatValue(task.triangle[sideKey], '')}`;
+                  return `${labels.sides[sideKey]} = ${formatValue(task.triangle[sideKey], '')}`;
               })
               .filter((value, index, arr) => arr.indexOf(value) === index)
               .join(', ')
@@ -424,7 +471,7 @@ const Kosinussatz: React.FC = () => {
                             <div className="bg-white border border-gray-200 rounded-lg p-4">
                                 <h3 className="font-semibold text-gray-800 mb-2 text-center">Skizze zum aktuellen Dreieck</h3>
                                 <div className="w-full max-w-[420px] mx-auto h-[300px]">
-                                    <TriangleSketch triangle={task.triangle} highlight={task.toFind} givenKeys={task.givenKeys} />
+                                    <TriangleSketch triangle={task.triangle} highlight={task.toFind} givenKeys={task.givenKeys} scheme={task.scheme} />
                                 </div>
                             </div>
 
