@@ -241,8 +241,7 @@ const FlaechensatzEinstieg: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--bg-color)] py-8">
-            <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
                 <Link to="/trigonometrie/flaechensatz" className="inline-flex items-center gap-2 text-teal-700 hover:text-teal-900 text-sm font-medium mb-4">
                     <i className="fa-solid fa-arrow-left"></i> Zurück zur Übersicht
                 </Link>
@@ -437,7 +436,6 @@ const FlaechensatzEinstieg: React.FC = () => {
                     </section>
                 </div>
             </div>
-        </div>
     );
 };
 

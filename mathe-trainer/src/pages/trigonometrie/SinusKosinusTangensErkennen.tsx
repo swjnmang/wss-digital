@@ -180,7 +180,7 @@ const SinusKosinusTangensErkennen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 p-8">
+    <div className="p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 flex justify-between items-center">
           <Link to="/trigonometrie" className="text-blue-600 hover:text-blue-800 font-semibold">

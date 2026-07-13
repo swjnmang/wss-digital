@@ -197,7 +197,7 @@ const RechtwinkligBeschriften: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] p-8" ref={containerRef}>
+    <div className="p-8" ref={containerRef}>
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 flex justify-between items-center">
           <Link to="/trigonometrie" className="text-blue-600 hover:text-blue-800 font-semibold">
