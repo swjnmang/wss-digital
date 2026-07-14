@@ -885,9 +885,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
                     <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-900 text-white font-semibold">
                         Aufgabe {index + 1}
                     </span>
-                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-100">
-                        {task.topic}
-                    </span>
                 </div>
                 <button onClick={onRegenerate} className="text-sm text-[var(--accent)] font-semibold hover:underline">
                     🔄 Aufgabe neu
@@ -895,8 +892,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             </div>
 
             {task.kind === 'numeric' && (
-                <div className="grid gap-5 md:grid-cols-[1.1fr,1fr]">
-                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 h-[220px]">
+                <div className="grid gap-5 md:grid-cols-[1.4fr,1fr]">
+                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 h-[340px] sm:h-[380px]">
                         <NumericSketch sketch={task.sketch} />
                     </div>
                     <div className="space-y-3">
@@ -938,8 +935,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             )}
 
             {task.kind === 'beschriften' && (
-                <div className="grid gap-5 md:grid-cols-[1.1fr,1fr]">
-                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 h-[220px]">
+                <div className="grid gap-5 md:grid-cols-[1.4fr,1fr]">
+                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 h-[340px] sm:h-[380px]">
                         <RightTriangleSVG
                             pointA={task.triangle.pointA}
                             pointB={task.triangle.pointB}
@@ -996,8 +993,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             )}
 
             {task.kind === 'erkennen' && (
-                <div className="grid gap-5 md:grid-cols-[1.1fr,1fr]">
-                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 h-[220px]">
+                <div className="grid gap-5 md:grid-cols-[1.4fr,1fr]">
+                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 h-[340px] sm:h-[380px]">
                         <RightTriangleSVG
                             pointA={task.triangle.pointA}
                             pointB={task.triangle.pointB}
