@@ -26,6 +26,9 @@ interface SlopeTask {
     unit: string;
     resultLabel: string;
     sketch: SketchSpec;
+    secondAnswer?: number;
+    secondUnit?: string;
+    secondResultLabel?: string;
 }
 
 const degToRad = (deg: number) => deg * (Math.PI / 180);
@@ -314,13 +317,59 @@ const buildMapScaleTask = (): SlopeTask => {
     };
 };
 
+const buildLengthsTask = (): SlopeTask => {
+    const noun = pick(SLOPE_NOUNS);
+    const horizontal = randomInt(20, 300);
+    const angle = round(randomInRange(2, 30), 1);
+    const raw = triangleFromHorizontalAngle(horizontal, angle);
+    const vertical = round(raw.vertical, 1);
+    const t = triangleFromHorizontalVertical(horizontal, vertical);
+
+    const steps: SolutionStep[] = [
+        {
+            text: 'Im rechtwinkligen Steigungsdreieck ist der Tangens des Steigungswinkels das Verhältnis von Höhenunterschied zu horizontaler Strecke.',
+            math: `\\tan(\\alpha) = \\frac{\\text{Höhenunterschied}}{\\text{horizontale Strecke}} = \\frac{${formatNumber(vertical, 1)}}{${formatNumber(horizontal, 0)}} = ${formatNumber(vertical / horizontal, 4)}`
+        },
+        {
+            text: 'Löse mit der Umkehrfunktion Tangens⁻¹ nach dem Winkel auf.',
+            math: `\\alpha = \\tan^{-1}(${formatNumber(vertical / horizontal, 4)}) \\approx ${formatNumber(t.angle, 1)}^{\\circ}`
+        },
+        {
+            text: 'Die Steigung in Prozent ist dasselbe Seitenverhältnis, multipliziert mit 100.',
+            math: `\\text{Steigung} = \\frac{${formatNumber(vertical, 1)}}{${formatNumber(horizontal, 0)}} \\cdot 100\\,\\% \\approx ${formatNumber(t.percent, 1)}\\,\\%`
+        }
+    ];
+
+    return {
+        prompt: `${noun} überwindet auf einer horizontalen Strecke von ${formatNumber(horizontal, 0)} m einen Höhenunterschied von ${formatNumber(vertical, 1)} m. Berechne den Steigungswinkel α sowohl in Grad als auch in Prozent.`,
+        steps,
+        correctAnswer: round(t.angle, 1),
+        unit: '°',
+        resultLabel: 'α',
+        secondAnswer: round(t.percent, 1),
+        secondUnit: '%',
+        secondResultLabel: 'Steigung',
+        sketch: {
+            horizontal: t.horizontal,
+            vertical: t.vertical,
+            horizontalLabel: `${formatNumber(horizontal, 0)} m`,
+            verticalLabel: `${formatNumber(vertical, 1)} m`,
+            hypotenuseLabel: 'Weg',
+            angleLabel: 'α = ?',
+            highlight: 'angle'
+        }
+    };
+};
+
 const TASK_BUILDERS: (() => SlopeTask)[] = [
     buildPassTask,
     buildPassTask,
     buildAngleToPercentTask,
     buildAngleToPercentTask,
     buildDistanceTask,
-    buildMapScaleTask
+    buildMapScaleTask,
+    buildLengthsTask,
+    buildLengthsTask
 ];
 
 const buildTask = (): SlopeTask => pick(TASK_BUILDERS)();
@@ -328,12 +377,14 @@ const buildTask = (): SlopeTask => pick(TASK_BUILDERS)();
 const SteigungswinkelProzentGrad: React.FC = () => {
     const [task, setTask] = useState<SlopeTask | null>(null);
     const [userAnswer, setUserAnswer] = useState('');
+    const [userAnswer2, setUserAnswer2] = useState('');
     const [feedback, setFeedback] = useState<'correct' | 'incorrect' | 'info' | null>(null);
     const [showSolution, setShowSolution] = useState(false);
 
     const generateTask = () => {
         setTask(buildTask());
         setUserAnswer('');
+        setUserAnswer2('');
         setFeedback(null);
         setShowSolution(false);
     };
@@ -351,7 +402,21 @@ const SteigungswinkelProzentGrad: React.FC = () => {
         }
         // Maximal 1% relative Toleranz, mit kleiner Mindesttoleranz für sehr kleine Werte
         const tolerance = Math.max(Math.abs(task.correctAnswer) * 0.01, 0.01);
-        setFeedback(Math.abs(value - task.correctAnswer) <= tolerance ? 'correct' : 'incorrect');
+        const firstCorrect = Math.abs(value - task.correctAnswer) <= tolerance;
+
+        if (task.secondAnswer === undefined) {
+            setFeedback(firstCorrect ? 'correct' : 'incorrect');
+            return;
+        }
+
+        const value2 = parseFloat(userAnswer2.replace(',', '.'));
+        if (isNaN(value2)) {
+            setFeedback('info');
+            return;
+        }
+        const tolerance2 = Math.max(Math.abs(task.secondAnswer) * 0.01, 0.01);
+        const secondCorrect = Math.abs(value2 - task.secondAnswer) <= tolerance2;
+        setFeedback(firstCorrect && secondCorrect ? 'correct' : 'incorrect');
     };
 
     return (
@@ -418,7 +483,9 @@ const SteigungswinkelProzentGrad: React.FC = () => {
                             </div>
 
                             <div className="flex flex-col sm:flex-row items-center gap-3">
-                                <label className="font-semibold text-gray-700 w-full sm:w-auto">Antwort:</label>
+                                <label className="font-semibold text-gray-700 w-full sm:w-auto">
+                                    {task.secondResultLabel ? `${task.resultLabel}:` : 'Antwort:'}
+                                </label>
                                 <div className="flex items-center gap-2 w-full sm:w-auto">
                                     <input
                                         type="text"
@@ -430,6 +497,22 @@ const SteigungswinkelProzentGrad: React.FC = () => {
                                     <span className="text-gray-600">{task.unit}</span>
                                 </div>
                             </div>
+
+                            {task.secondResultLabel && (
+                                <div className="flex flex-col sm:flex-row items-center gap-3">
+                                    <label className="font-semibold text-gray-700 w-full sm:w-auto">{task.secondResultLabel}:</label>
+                                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                                        <input
+                                            type="text"
+                                            value={userAnswer2}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserAnswer2(e.target.value)}
+                                            className="w-full sm:w-40 border border-gray-300 rounded-lg px-3 py-2 text-center"
+                                            placeholder="Deine Lösung"
+                                        />
+                                        <span className="text-gray-600">{task.secondUnit}</span>
+                                    </div>
+                                </div>
+                            )}
 
                             {feedback === 'info' && (
                                 <p className="text-yellow-700 bg-yellow-100 border border-yellow-200 rounded-lg p-3 text-sm">
@@ -480,6 +563,12 @@ const SteigungswinkelProzentGrad: React.FC = () => {
                                     <div className="font-bold text-gray-900">
                                         Ergebnis: {task.resultLabel} = {formatNumber(task.correctAnswer, task.unit === '°' || task.unit === '%' ? 1 : 0)}
                                         {task.unit}
+                                        {task.secondAnswer !== undefined && task.secondResultLabel && (
+                                            <>
+                                                {' '}| {task.secondResultLabel} = {formatNumber(task.secondAnswer, 1)}
+                                                {task.secondUnit}
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             )}
