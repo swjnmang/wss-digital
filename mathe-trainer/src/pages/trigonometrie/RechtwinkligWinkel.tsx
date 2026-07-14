@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import RightTriangleTaskSVG, { AngleKey as TaskAngleKey, SideKey as TaskSideKey } from '../../components/RightTriangleTaskSVG';
+import { useTaskTracking } from '../../hooks/useTaskTracking';
 
 const RIGHT_TRIANGLE_ANGLES_VIDEO_URL = 'https://youtu.be/EsW65RuykZ8?si=u77ouc4I3QxouVZJ';
 
@@ -96,6 +97,7 @@ const RechtwinkligWinkel: React.FC = () => {
     const [userAnswers, setUserAnswers] = useState<{ [key: string]: string }>({});
     const [feedback, setFeedback] = useState<{ [key: string]: string }>({}); // key -> 'correct' | 'incorrect'
     const [showSolution, setShowSolution] = useState(false);
+    const tracking = useTaskTracking('Winkel berechnen');
 
     // Helpers
     const degToRad = (degrees: number) => degrees * (Math.PI / 180);
@@ -103,6 +105,7 @@ const RechtwinkligWinkel: React.FC = () => {
     const round = (num: number) => Math.round(num * 100) / 100;
 
     const generateTask = () => {
+        tracking.onTaskStart();
         // 1. Generate a random right-angled triangle
         // Base values
         const angle1 = Math.random() * 70 + 10; // 10 to 80 degrees
@@ -235,9 +238,18 @@ const RechtwinkligWinkel: React.FC = () => {
         });
 
         setFeedback(newFeedback);
+        tracking.onCheck(allCorrect);
         if (allCorrect) {
             // maybe show confetti or something
         }
+    };
+
+    const toggleSolution = () => {
+        setShowSolution(prev => {
+            const next = !prev;
+            if (next) tracking.onHintShown();
+            return next;
+        });
     };
 
     interface SolutionEntry {
@@ -560,8 +572,8 @@ const RechtwinkligWinkel: React.FC = () => {
                     >
                         Prüfen
                     </button>
-                    <button 
-                        onClick={() => setShowSolution(!showSolution)}
+                    <button
+                        onClick={toggleSolution}
                         className="px-6 py-2 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition-colors"
                     >
                         {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}

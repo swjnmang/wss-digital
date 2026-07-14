@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import { useTaskTracking } from '../../hooks/useTaskTracking';
 
 interface Task {
     description: string;
@@ -51,6 +52,7 @@ const FlaechensatzUebung: React.FC = () => {
     const [taskType, setTaskType] = useState<'area' | 'unknown'>('area');
     const [userAnswer, setUserAnswer] = useState<string>('');
     const [feedback, setFeedback] = useState<'correct' | 'incorrect' | 'info' | null>(null);
+    const tracking = useTaskTracking('Flächensatz');
 
     // Helpers
     const getRandom = (min: number, max: number) => Math.random() * (max - min) + min;
@@ -217,6 +219,7 @@ const FlaechensatzUebung: React.FC = () => {
     };
 
     const generateTask = () => {
+        tracking.onTaskStart();
         setShowSolution(false);
         const angles = generateTriangleAngles();
         const baseSideA = getRandom(5, 15);
@@ -386,7 +389,17 @@ const FlaechensatzUebung: React.FC = () => {
             return;
         }
         const tolerance = relTolerance(task.correctAnswer);
-        setFeedback(Math.abs(value - task.correctAnswer) <= tolerance ? 'correct' : 'incorrect');
+        const isCorrect = Math.abs(value - task.correctAnswer) <= tolerance;
+        setFeedback(isCorrect ? 'correct' : 'incorrect');
+        tracking.onCheck(isCorrect);
+    };
+
+    const toggleSolution = () => {
+        setShowSolution(prev => {
+            const next = !prev;
+            if (next) tracking.onHintShown();
+            return next;
+        });
     };
 
     return (
@@ -486,7 +499,7 @@ const FlaechensatzUebung: React.FC = () => {
                                 Prüfen
                             </button>
                             <button
-                                onClick={() => setShowSolution(!showSolution)}
+                                onClick={toggleSolution}
                                 className="px-6 py-2 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition-colors"
                             >
                                 {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}

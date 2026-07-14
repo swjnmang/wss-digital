@@ -119,6 +119,9 @@ import OlympiaparkMuenchen from './pages/trigonometrie/anwendungsaufgaben/Olympi
 import Stadion from './pages/trigonometrie/anwendungsaufgaben/Stadion';
 import Fussballfeld from './pages/trigonometrie/anwendungsaufgaben/Fussballfeld';
 import Bergbahn from './pages/trigonometrie/anwendungsaufgaben/Bergbahn';
+import NachverfolgungBericht from './pages/trigonometrie/NachverfolgungBericht';
+import { startTrackingSession, stopTrackingSession } from './utils/tracking';
+import { useTrackingSession } from './hooks/useTaskTracking';
 // Daten und Zufall
 import DatenUndZufallIndex from './pages/DatenUndZufallIndex';
 import StatistischeKennwerte from './pages/daten_und_zufall/StatistischeKennwerte';
@@ -168,6 +171,8 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const hideHeader = location.pathname === '/';
+  const trackingActive = useTrackingSession();
+  const isTrigonometrieRoute = location.pathname.startsWith('/trigonometrie');
 
   const handleBack = () => {
     const segments = location.pathname.split('/').filter(Boolean);
@@ -176,6 +181,11 @@ export default function App() {
     } else {
       navigate('/' + segments.slice(0, -1).join('/'));
     }
+  };
+
+  const handleStopTracking = () => {
+    stopTrackingSession();
+    navigate('/trigonometrie/nachverfolgung-bericht');
   };
 
   return (
@@ -200,6 +210,28 @@ export default function App() {
               WSS-Digital
             </a>
           </div>
+          {isTrigonometrieRoute && (
+            <div className="app-shell flex justify-center mt-2">
+              {trackingActive ? (
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-red-600 font-semibold">🔴 Nachverfolgung läuft</span>
+                  <button
+                    onClick={handleStopTracking}
+                    className="px-3 py-1 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800"
+                  >
+                    Beenden &amp; Bericht ansehen
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={startTrackingSession}
+                  className="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 text-sm font-semibold hover:bg-slate-200 border border-slate-300"
+                >
+                  Nachverfolgung starten
+                </button>
+              )}
+            </div>
+          )}
         </header>
       )}
       <main>
@@ -314,6 +346,7 @@ export default function App() {
           <Route path="/trigonometrie/anwendungsaufgaben/stadion" element={<Stadion />} />
           <Route path="/trigonometrie/anwendungsaufgaben/fussballfeld" element={<Fussballfeld />} />
           <Route path="/trigonometrie/anwendungsaufgaben/bergbahn" element={<Bergbahn />} />
+          <Route path="/trigonometrie/nachverfolgung-bericht" element={<NachverfolgungBericht />} />
 
           {/* Daten und Zufall */}
           <Route path="/daten-und-zufall" element={<DatenUndZufallIndex />} />

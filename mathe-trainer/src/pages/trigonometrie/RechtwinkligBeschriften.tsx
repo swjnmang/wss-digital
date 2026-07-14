@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import RightTriangleSVG from '../../components/RightTriangleSVG';
+import { useTaskTracking } from '../../hooks/useTaskTracking';
 
 const RECHTWINKLIG_BESCHRIFTEN_VIDEO_URL = 'https://www.youtube.com/watch?v=BKuTvKSng78';
 
@@ -42,9 +43,11 @@ const RechtwinkligBeschriften: React.FC = () => {
   const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const tracking = useTaskTracking('Rechtwinklige Dreiecke beschriften');
 
   // Generiere eine neue Aufgabe mit variablen Dreiecks-Orientierungen
   const generateTask = () => {
+    tracking.onTaskStart();
     const selectedPoints = ['A', 'B', 'C'];
     // Seite gegenüber einem Punkt trägt immer dessen Kleinbuchstaben als Namen
     const selectedSides = selectedPoints.map((p) => p.toLowerCase());
@@ -178,6 +181,7 @@ const RechtwinkligBeschriften: React.FC = () => {
 
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     setShowFeedback(true);
+    tracking.onCheck(isCorrect);
 
     if (isCorrect) {
       setCorrect(correct + 1);

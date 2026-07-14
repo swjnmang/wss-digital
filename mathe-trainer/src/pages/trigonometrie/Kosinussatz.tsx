@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import { useTaskTracking } from '../../hooks/useTaskTracking';
 
 const angleKeys = ['alpha', 'beta', 'gamma'] as const;
 const sideKeys = ['a', 'b', 'c'] as const;
@@ -307,8 +308,10 @@ const Kosinussatz: React.FC = () => {
     const [userAnswer, setUserAnswer] = useState('');
     const [feedback, setFeedback] = useState<'correct' | 'incorrect' | 'info' | null>(null);
     const [showSolution, setShowSolution] = useState(false);
+    const tracking = useTaskTracking('Kosinussatz');
 
     const generateTask = () => {
+        tracking.onTaskStart();
         const triangle = buildTriangle();
         const type: TaskType = Math.random() < 0.5 ? 'find_side' : 'find_angle';
         const schemeOptions: LetterScheme[] = ['ABC', 'BCD', 'CDE'];
@@ -432,9 +435,19 @@ const Kosinussatz: React.FC = () => {
         }
         if (Math.abs(value - task.correctAnswer) <= tolerance) {
             setFeedback('correct');
+            tracking.onCheck(true);
         } else {
             setFeedback('incorrect');
+            tracking.onCheck(false);
         }
+    };
+
+    const toggleSolution = () => {
+        setShowSolution(prev => {
+            const next = !prev;
+            if (next) tracking.onHintShown();
+            return next;
+        });
     };
 
     const givenSummary = task
@@ -520,7 +533,7 @@ const Kosinussatz: React.FC = () => {
                                     Prüfen
                                 </button>
                                 <button
-                                    onClick={() => setShowSolution(prev => !prev)}
+                                    onClick={toggleSolution}
                                     className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600"
                                 >
                                     {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}

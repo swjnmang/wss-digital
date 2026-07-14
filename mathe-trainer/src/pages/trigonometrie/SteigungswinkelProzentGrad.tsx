@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import { useTaskTracking } from '../../hooks/useTaskTracking';
 
 interface SolutionStep {
     text: string;
@@ -380,8 +381,10 @@ const SteigungswinkelProzentGrad: React.FC = () => {
     const [userAnswer2, setUserAnswer2] = useState('');
     const [feedback, setFeedback] = useState<'correct' | 'incorrect' | 'info' | null>(null);
     const [showSolution, setShowSolution] = useState(false);
+    const tracking = useTaskTracking('Steigungswinkel');
 
     const generateTask = () => {
+        tracking.onTaskStart();
         setTask(buildTask());
         setUserAnswer('');
         setUserAnswer2('');
@@ -406,6 +409,7 @@ const SteigungswinkelProzentGrad: React.FC = () => {
 
         if (task.secondAnswer === undefined) {
             setFeedback(firstCorrect ? 'correct' : 'incorrect');
+            tracking.onCheck(firstCorrect);
             return;
         }
 
@@ -417,6 +421,15 @@ const SteigungswinkelProzentGrad: React.FC = () => {
         const tolerance2 = Math.max(Math.abs(task.secondAnswer) * 0.01, 0.01);
         const secondCorrect = Math.abs(value2 - task.secondAnswer) <= tolerance2;
         setFeedback(firstCorrect && secondCorrect ? 'correct' : 'incorrect');
+        tracking.onCheck(firstCorrect && secondCorrect);
+    };
+
+    const toggleSolution = () => {
+        setShowSolution(prev => {
+            const next = !prev;
+            if (next) tracking.onHintShown();
+            return next;
+        });
     };
 
     return (
@@ -538,7 +551,7 @@ const SteigungswinkelProzentGrad: React.FC = () => {
                                     Prüfen
                                 </button>
                                 <button
-                                    onClick={() => setShowSolution(prev => !prev)}
+                                    onClick={toggleSolution}
                                     className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600"
                                 >
                                     {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}

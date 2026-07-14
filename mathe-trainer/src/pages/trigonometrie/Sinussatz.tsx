@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import { useTaskTracking } from '../../hooks/useTaskTracking';
 
 const SINUSSATZ_VIDEO_URL = 'https://youtu.be/zA7vfHfNw1E?si=qS_mb1RnX2S2WWo-';
 
@@ -428,8 +429,10 @@ const Sinussatz: React.FC = () => {
     const [userAnswer, setUserAnswer] = useState('');
     const [feedback, setFeedback] = useState<'correct' | 'incorrect' | 'info' | null>(null);
     const [showSolution, setShowSolution] = useState(false);
+    const tracking = useTaskTracking('Sinussatz');
 
     const generateTask = () => {
+        tracking.onTaskStart();
         const triangle = buildTriangle();
         const scheme: Scheme = Math.random() < 0.5 ? 'ABC' : 'BCD';
         const generator = Math.random() < 0.5 ? createFindSideTask : createFindAngleTask;
@@ -457,9 +460,19 @@ const Sinussatz: React.FC = () => {
 
         if (Math.abs(value - task.correctAnswer) <= tolerance) {
             setFeedback('correct');
+            tracking.onCheck(true);
         } else {
             setFeedback('incorrect');
+            tracking.onCheck(false);
         }
+    };
+
+    const toggleSolution = () => {
+        setShowSolution(prev => {
+            const next = !prev;
+            if (next) tracking.onHintShown();
+            return next;
+        });
     };
 
     const givenSummary = task
@@ -535,7 +548,7 @@ const Sinussatz: React.FC = () => {
                                 Prüfen
                             </button>
                             <button
-                                onClick={() => setShowSolution(prev => !prev)}
+                                onClick={toggleSolution}
                                 className="px-6 py-2 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition-colors"
                             >
                                 {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}

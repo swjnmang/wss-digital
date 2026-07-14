@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import RightTriangleSVG from '../../components/RightTriangleSVG';
+import { useTaskTracking } from '../../hooks/useTaskTracking';
 
 const LERNVIDEO_URL = 'https://www.youtube.com/watch?v=0qxNk-ZcW-8';
 
@@ -154,8 +155,10 @@ const SinusKosinusTangensErkennen: React.FC = () => {
   const [selected, setSelected] = useState<string | null>(null);
   const [taskCount, setTaskCount] = useState(0);
   const [correct, setCorrect] = useState(0);
+  const tracking = useTaskTracking('Sinus, Kosinus, Tangens erkennen');
 
   const nextQuestion = () => {
+    tracking.onTaskStart();
     setQuestion(buildQuestion());
     setSelected(null);
     setTaskCount((c) => c + 1);
@@ -174,7 +177,9 @@ const SinusKosinusTangensErkennen: React.FC = () => {
   const handleSelect = (option: string) => {
     if (selected) return;
     setSelected(option);
-    if (option === question.correctOption) {
+    const isCorrect = option === question.correctOption;
+    tracking.onCheck(isCorrect);
+    if (isCorrect) {
       setCorrect((c) => c + 1);
     }
   };

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import RightTriangleSVG from '../../components/RightTriangleSVG';
+import { logTrackingEntry } from '../../utils/tracking';
 
 // ---------- Allgemeine Hilfsfunktionen ----------
 
@@ -709,6 +710,8 @@ interface CardState {
     feedback: string | null;
     feedbackType: 'correct' | 'incorrect' | null;
     showSolution: boolean;
+    attempts: number;
+    hintUsed: boolean;
 }
 
 const buildCard = (task: MixedTask): CardState => ({
@@ -718,8 +721,23 @@ const buildCard = (task: MixedTask): CardState => ({
     selectedOption: null,
     feedback: null,
     feedbackType: null,
-    showSolution: false
+    showSolution: false,
+    attempts: 0,
+    hintUsed: false
 });
+
+// Loggt eine Karte, die Versuche hatte, aber nie gelöst wurde (z. B. vor dem Neu-Generieren).
+const flushUnsolvedCard = (card: CardState) => {
+    if (card.attempts > 0 && card.feedbackType !== 'correct') {
+        logTrackingEntry({
+            topic: card.task.topic,
+            attempts: card.attempts,
+            firstTryCorrect: false,
+            solved: false,
+            hintUsed: card.hintUsed
+        });
+    }
+};
 
 const createCards = (): CardState[] => buildTaskSet().map(buildCard);
 
@@ -727,15 +745,40 @@ const parseAnswer = (value: string) => parseFloat(value.replace(',', '.'));
 
 const GemischteUebungsaufgaben: React.FC = () => {
     const [cards, setCards] = useState<CardState[]>(() => createCards());
+    const cardsRef = useRef(cards);
+
+    useEffect(() => {
+        cardsRef.current = cards;
+    }, [cards]);
+
+    // Karten, die beim Verlassen der Seite noch Versuche hatten, aber nie gelöst wurden, noch protokollieren.
+    useEffect(() => () => {
+        cardsRef.current.forEach(flushUnsolvedCard);
+    }, []);
 
     const updateCard = (taskId: number, updates: Partial<CardState>) => {
         setCards(prev => prev.map(card => (card.task.id === taskId ? { ...card, ...updates } : card)));
     };
 
-    const regenerateAll = () => setCards(createCards());
+    const regenerateAll = () => {
+        cards.forEach(flushUnsolvedCard);
+        setCards(createCards());
+    };
 
     const regenerateCard = (taskId: number) => {
-        setCards(prev => prev.map(card => (card.task.id === taskId ? buildCard(pick(TASK_BUILDERS)()) : card)));
+        const card = cards.find(c => c.task.id === taskId);
+        if (card) flushUnsolvedCard(card);
+        setCards(prev => prev.map(c => (c.task.id === taskId ? buildCard(pick(TASK_BUILDERS)()) : c)));
+    };
+
+    const toggleCardSolution = (taskId: number) => {
+        setCards(prev =>
+            prev.map(card => {
+                if (card.task.id !== taskId) return card;
+                const next = !card.showSolution;
+                return { ...card, showSolution: next, hintUsed: card.hintUsed || next };
+            })
+        );
     };
 
     const checkCard = (taskId: number) => {
@@ -751,12 +794,17 @@ const GemischteUebungsaufgaben: React.FC = () => {
             }
             const target = parseFloat(task.correctAnswer);
             const isCorrect = Math.abs(value - target) <= task.tolerance;
+            const attempts = card.attempts + 1;
             updateCard(taskId, {
                 feedback: isCorrect
                     ? 'Richtig!'
                     : `Nicht ganz. Richtige Lösung: ${task.correctAnswer} ${task.unit}`,
-                feedbackType: isCorrect ? 'correct' : 'incorrect'
+                feedbackType: isCorrect ? 'correct' : 'incorrect',
+                attempts
             });
+            if (isCorrect) {
+                logTrackingEntry({ topic: task.topic, attempts, firstTryCorrect: attempts === 1, solved: true, hintUsed: card.hintUsed });
+            }
             return;
         }
 
@@ -768,12 +816,17 @@ const GemischteUebungsaufgaben: React.FC = () => {
             }
             const isCorrect =
                 hypotenuse === task.correct.hypotenuse && opposite === task.correct.opposite && adjacent === task.correct.adjacent;
+            const attempts = card.attempts + 1;
             updateCard(taskId, {
                 feedback: isCorrect
                     ? 'Richtig!'
                     : `Nicht ganz. Richtig wäre: Hypotenuse = ${task.correct.hypotenuse}, Gegenkathete = ${task.correct.opposite}, Ankathete = ${task.correct.adjacent}.`,
-                feedbackType: isCorrect ? 'correct' : 'incorrect'
+                feedbackType: isCorrect ? 'correct' : 'incorrect',
+                attempts
             });
+            if (isCorrect) {
+                logTrackingEntry({ topic: task.topic, attempts, firstTryCorrect: attempts === 1, solved: true, hintUsed: card.hintUsed });
+            }
             return;
         }
 
@@ -783,10 +836,15 @@ const GemischteUebungsaufgaben: React.FC = () => {
             return;
         }
         const isCorrect = card.selectedOption === task.correctOption;
+        const attempts = card.attempts + 1;
         updateCard(taskId, {
             feedback: isCorrect ? 'Richtig!' : `Nicht ganz. Richtig wäre: ${task.correctOption.replace('/', ' / ')}`,
-            feedbackType: isCorrect ? 'correct' : 'incorrect'
+            feedbackType: isCorrect ? 'correct' : 'incorrect',
+            attempts
         });
+        if (isCorrect) {
+            logTrackingEntry({ topic: task.topic, attempts, firstTryCorrect: attempts === 1, solved: true, hintUsed: card.hintUsed });
+        }
     };
 
     const answeredCount = cards.filter(c => c.feedbackType !== null).length;
@@ -830,7 +888,7 @@ const GemischteUebungsaufgaben: React.FC = () => {
                                 updateCard(card.task.id, { assignments: { ...card.assignments, [target]: value } })
                             }
                             onSelectOption={(option) => updateCard(card.task.id, { selectedOption: option })}
-                            onToggleSolution={() => updateCard(card.task.id, { showSolution: !card.showSolution })}
+                            onToggleSolution={() => toggleCardSolution(card.task.id)}
                         />
                     ))}
                 </div>
