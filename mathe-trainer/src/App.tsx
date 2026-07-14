@@ -111,6 +111,7 @@ import FlaechensatzMenu from './pages/trigonometrie/FlaechensatzMenu';
 import FlaechensatzEinstieg from './pages/trigonometrie/FlaechensatzEinstieg';
 import FlaechensatzUebung from './pages/trigonometrie/FlaechensatzUebung';
 import Sinusfunktion from './pages/trigonometrie/Sinusfunktion';
+import GemischteUebungsaufgabenTrig from './pages/trigonometrie/GemischteUebungsaufgaben';
 import Pruefungsmodus from './pages/trigonometrie/Pruefungsmodus';
 import SteigungswinkelProzentGrad from './pages/trigonometrie/SteigungswinkelProzentGrad';
 import AnwendungsaufgabenMenu from './pages/trigonometrie/AnwendungsaufgabenMenu';
@@ -306,6 +307,7 @@ export default function App() {
           <Route path="/trigonometrie/flaechensatz/einstieg" element={<FlaechensatzEinstieg />} />
           <Route path="/trigonometrie/flaechensatz/uebung" element={<FlaechensatzUebung />} />
           <Route path="/trigonometrie/sinusfunktion" element={<Sinusfunktion />} />
+          <Route path="/trigonometrie/gemischte-uebungsaufgaben" element={<GemischteUebungsaufgabenTrig />} />
           <Route path="/trigonometrie/pruefungsmodus" element={<Pruefungsmodus />} />
           <Route path="/trigonometrie/anwendungsaufgaben" element={<AnwendungsaufgabenMenu />} />
           <Route path="/trigonometrie/anwendungsaufgaben/olympiapark-muenchen" element={<OlympiaparkMuenchen />} />

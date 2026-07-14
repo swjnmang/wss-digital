@@ -56,13 +56,19 @@ const subpages = [
     path: '/trigonometrie/sinusfunktion',
   },
   {
-    title: '10. Anwendungsaufgaben',
-    description: 'Praxisnahe Aufgaben aus dem Alltag Schritt für Schritt lösen.',
+    title: '10. Gemischte Übungsaufgaben',
+    description: 'Zufällig gemischte Aufgaben aus allen Themen (ohne Sinusfunktion) üben.',
     icon: 'fa-solid fa-shuffle',
+    path: '/trigonometrie/gemischte-uebungsaufgaben',
+  },
+  {
+    title: '11. Anwendungsaufgaben',
+    description: 'Praxisnahe Aufgaben aus dem Alltag Schritt für Schritt lösen.',
+    icon: 'fa-solid fa-list-check',
     path: '/trigonometrie/anwendungsaufgaben',
   },
   {
-    title: '11. Prüfungsmodus',
+    title: '12. Prüfungsmodus',
     description: 'Zehn vermischte Aufgaben unter Prüfungsbedingungen lösen und eine Auswertung erhalten.',
     icon: 'fa-solid fa-graduation-cap',
     path: '/trigonometrie/pruefungsmodus',
