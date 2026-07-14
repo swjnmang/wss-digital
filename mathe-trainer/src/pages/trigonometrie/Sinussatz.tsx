@@ -330,6 +330,14 @@ const createFindSideTask = (triangle: Triangle, scheme: Scheme): SinusTask => {
     const targetAngleLabel = labels.angles[targetAngle];
     const referenceAngleLabel = labels.angles[referenceAngle];
 
+    // Aus genau den angezeigten (gerundeten) Werten neu berechnen, statt die
+    // ursprüngliche, unabhängig gerundete Dreiecksseite zu übernehmen. So passt
+    // das Ergebnis immer exakt zu den gezeigten Rechenschritten.
+    const computedTargetSide = roundTo(
+        (Math.sin(degToRad(triangle[targetAngle])) / Math.sin(degToRad(triangle[referenceAngle]))) * triangle[referenceSide],
+        2
+    );
+
     const steps: SolutionStep[] = [
         {
             text: 'Sinussatz aufschreiben',
@@ -345,7 +353,7 @@ const createFindSideTask = (triangle: Triangle, scheme: Scheme): SinusTask => {
         },
         {
             text: 'Berechnen und runden',
-            math: `${targetSideLabel} \\approx ${formatNumber(triangle[targetSide])}\\,\\text{cm}`
+            math: `${targetSideLabel} \\approx ${formatNumber(computedTargetSide)}\\,\\text{cm}`
         }
     ];
 
@@ -355,7 +363,7 @@ const createFindSideTask = (triangle: Triangle, scheme: Scheme): SinusTask => {
         toFind: targetSide,
         prompt: `Berechne die Seitenlänge ${targetSideLabel}.`,
         steps,
-        correctAnswer: triangle[targetSide],
+        correctAnswer: computedTargetSide,
         unit: 'cm',
         givenKeys: [targetAngle, referenceAngle, referenceSide],
         answerLabel: targetSideLabel,
@@ -403,7 +411,11 @@ const createFindAngleTask = (triangle: Triangle, scheme: Scheme): SinusTask => {
         toFind: targetAngle,
         prompt: `Bestimme den Winkel ${targetAngleLabel}.`,
         steps,
-        correctAnswer: triangle[targetAngle],
+        // correctAnswer entspricht bewusst dem per Sinus⁻¹ berechneten (spitzen) Winkel,
+        // nicht dem ursprünglichen Dreieckswinkel: Ist dieser stumpf, liefert Sinus⁻¹
+        // rechnerisch immer die spitze Alternative - genau das steht auch in den
+        // gezeigten Lösungsschritten, daher muss das Ergebnis dazu passen.
+        correctAnswer: roundTo(calculatedAngle, 1),
         unit: '°',
         givenKeys: [targetSide, referenceAngle, referenceSide],
         answerLabel: targetAngleLabel,
