@@ -39,21 +39,19 @@ interface RightSketchSpec {
     kind: 'right';
     horizontal: number;
     vertical: number;
-    horizontalLabel: string;
-    verticalLabel: string;
-    hypotenuseLabel: string;
-    angleLabel: string;
+    horizontalName: string;
+    verticalName: string;
+    hypotenuseName: string;
+    angleName: string;
     highlight: RightHighlight;
     askedLabel?: string;
 }
 
 interface GeneralSketchSpec {
     kind: 'general';
-    a: number;
     b: number;
     c: number;
     alpha: number;
-    givenKeys: GeneralKey[];
     highlightKey: GeneralKey | 'none';
     askedLabel?: string;
 }
@@ -64,7 +62,10 @@ const GIVEN_COLOR = '#1f2937';
 const HIGHLIGHT_COLOR = '#dc2626';
 
 const NumericRightSketch: React.FC<{ spec: RightSketchSpec }> = ({ spec }) => {
-    const { horizontal, vertical, horizontalLabel, verticalLabel, hypotenuseLabel, angleLabel, highlight, askedLabel } = spec;
+    const { horizontal, vertical, horizontalName, verticalName, hypotenuseName, angleName, highlight, askedLabel } = spec;
+    // Zeigt im Aufgabentext bereits genannte Werte nicht erneut an. Nur der
+    // gesuchte Teil bekommt ein "= ?" und wird rot markiert.
+    const partLabel = (name: string, part: RightHighlight) => (name && highlight === part ? `${name} = ?` : name);
     const width = 320;
     const height = 220;
     const margin = 40;
@@ -144,16 +145,16 @@ const NumericRightSketch: React.FC<{ spec: RightSketchSpec }> = ({ spec }) => {
             <path d={alphaArcPath} fill="none" stroke={colorFor('angle')} strokeWidth={2} />
 
             <text x={(Ax + Bx) / 2} y={Ay + 18} textAnchor="middle" fontSize="12" fill={colorFor('horizontal')}>
-                {horizontalLabel}
+                {partLabel(horizontalName, 'horizontal')}
             </text>
             <text x={Bx + 8} y={(By + Cy) / 2} fontSize="12" fill={colorFor('vertical')}>
-                {verticalLabel}
+                {partLabel(verticalName, 'vertical')}
             </text>
             <text x={(Ax + Cx) / 2 - 8} y={(Ay + Cy) / 2 - 5} fontSize="12" fill={colorFor('hypotenuse')} textAnchor="end">
-                {hypotenuseLabel}
+                {partLabel(hypotenuseName, 'hypotenuse')}
             </text>
             <text x={Ax + 24} y={Ay - 8} fontSize="13" fontWeight="bold" fill={colorFor('angle')}>
-                {angleLabel}
+                {partLabel(angleName, 'angle')}
             </text>
             {askedLabel && (
                 <text x={width - 12} y={22} textAnchor="end" fontSize="13" fontWeight="bold" fill={HIGHLIGHT_COLOR}>
@@ -165,7 +166,7 @@ const NumericRightSketch: React.FC<{ spec: RightSketchSpec }> = ({ spec }) => {
 };
 
 const NumericGeneralSketch: React.FC<{ spec: GeneralSketchSpec }> = ({ spec }) => {
-    const { a, b, c, alpha, givenKeys, highlightKey, askedLabel } = spec;
+    const { b, c, alpha, highlightKey, askedLabel } = spec;
     const width = 320;
     const height = 220;
     const margin = 48;
@@ -189,18 +190,11 @@ const NumericGeneralSketch: React.FC<{ spec: GeneralSketchSpec }> = ({ spec }) =
     const B = toScreen(rawB);
     const C = toScreen(rawC);
 
-    const givenSet = new Set(givenKeys);
+    // Zeigt im Aufgabentext bereits genannte Werte nicht erneut an. Nur der
+    // gesuchte Teil bekommt ein "= ?" und wird rot markiert.
     const colorFor = (key: GeneralKey) => (highlightKey === key ? HIGHLIGHT_COLOR : GIVEN_COLOR);
-    const sideLabel = (key: 'a' | 'b' | 'c', value: number) => {
-        if (highlightKey === key) return `${key} = ?`;
-        if (givenSet.has(key)) return `${key} = ${round(value, 2)}`;
-        return key;
-    };
-    const angleLabel = (key: 'alpha' | 'beta' | 'gamma', symbol: string, value?: number) => {
-        if (highlightKey === key) return `${symbol} = ?`;
-        if (givenSet.has(key) && value !== undefined) return `${symbol} = ${round(value, 1)}°`;
-        return symbol;
-    };
+    const sideLabel = (key: 'a' | 'b' | 'c') => (highlightKey === key ? `${key} = ?` : key);
+    const angleLabel = (key: 'alpha' | 'beta' | 'gamma', symbol: string) => (highlightKey === key ? `${symbol} = ?` : symbol);
 
     const centroid = { x: (A.x + B.x + C.x) / 3, y: (A.y + B.y + C.y) / 3 };
     const sideLabelPos = (p1: { x: number; y: number }, p2: { x: number; y: number }, offset = 16) => {
@@ -211,10 +205,21 @@ const NumericGeneralSketch: React.FC<{ spec: GeneralSketchSpec }> = ({ spec }) =
         const len = Math.sqrt(dx * dx + dy * dy) || 1;
         return { x: mx + (dx / len) * offset, y: my + (dy / len) * offset };
     };
+    // Winkel-Labels werden vom Zentroid weg aus der jeweiligen Ecke herausgeschoben,
+    // damit α/β/γ immer am richtigen Eckpunkt stehen, unabhängig von der Dreiecksform.
+    const angleLabelPos = (vertex: { x: number; y: number }, offset = 18) => {
+        const dx = vertex.x - centroid.x;
+        const dy = vertex.y - centroid.y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        return { x: vertex.x + (dx / len) * offset, y: vertex.y + (dy / len) * offset };
+    };
 
     const labelC_ = sideLabelPos(A, B);
     const labelB_ = sideLabelPos(A, C);
     const labelA_ = sideLabelPos(B, C);
+    const angleA_ = angleLabelPos(A);
+    const angleB_ = angleLabelPos(B);
+    const angleC_ = angleLabelPos(C);
 
     return (
         <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet" className="mx-auto">
@@ -231,30 +236,30 @@ const NumericGeneralSketch: React.FC<{ spec: GeneralSketchSpec }> = ({ spec }) =
             <text x={C.x} y={C.y - 10} fontSize="12" fontWeight="bold" textAnchor="middle">C</text>
 
             <text x={labelC_.x} y={labelC_.y} textAnchor="middle" fontSize="12" fill={colorFor('c')}>
-                {sideLabel('c', c)}
+                {sideLabel('c')}
             </text>
             <text x={labelB_.x} y={labelB_.y} textAnchor="middle" fontSize="12" fill={colorFor('b')}>
-                {sideLabel('b', b)}
+                {sideLabel('b')}
             </text>
             <text x={labelA_.x} y={labelA_.y} textAnchor="middle" fontSize="12" fill={colorFor('a')}>
-                {sideLabel('a', a)}
+                {sideLabel('a')}
             </text>
 
-            <text x={A.x + 14} y={A.y - 10} fontSize="12" fontWeight="bold" fill={colorFor('alpha')}>
-                {angleLabel('alpha', 'α', alpha)}
+            <text x={angleA_.x} y={angleA_.y} textAnchor="middle" fontSize="12" fontWeight="bold" fill={colorFor('alpha')}>
+                {angleLabel('alpha', 'α')}
+            </text>
+            <text x={angleB_.x} y={angleB_.y} textAnchor="middle" fontSize="12" fontWeight="bold" fill={colorFor('beta')}>
+                {angleLabel('beta', 'β')}
+            </text>
+            <text x={angleC_.x} y={angleC_.y} textAnchor="middle" fontSize="12" fontWeight="bold" fill={colorFor('gamma')}>
+                {angleLabel('gamma', 'γ')}
             </text>
 
-            {(() => {
-                const cornerLabel =
-                    askedLabel ?? (highlightKey === 'beta' ? 'β = ?' : highlightKey === 'gamma' ? 'γ = ?' : undefined);
-                return (
-                    cornerLabel && (
-                        <text x={width - 12} y={22} textAnchor="end" fontSize="13" fontWeight="bold" fill={HIGHLIGHT_COLOR}>
-                            {cornerLabel}
-                        </text>
-                    )
-                );
-            })()}
+            {askedLabel && (
+                <text x={width - 12} y={22} textAnchor="end" fontSize="13" fontWeight="bold" fill={HIGHLIGHT_COLOR}>
+                    {askedLabel}
+                </text>
+            )}
         </svg>
     );
 };
@@ -455,10 +460,10 @@ const buildStreckenTask = (): NumericTask => {
             kind: 'right',
             horizontal: adjacent,
             vertical: opposite,
-            horizontalLabel: askOpposite ? `b ≈ ${adjacent.toFixed(2)} cm` : 'b = ?',
-            verticalLabel: askOpposite ? 'a = ?' : `a ≈ ${opposite.toFixed(2)} cm`,
-            hypotenuseLabel: `c = ${hyp} cm`,
-            angleLabel: `α = ${alpha}°`,
+            horizontalName: 'b',
+            verticalName: 'a',
+            hypotenuseName: 'c',
+            angleName: 'α',
             highlight: askOpposite ? 'vertical' : 'horizontal'
         }
     };
@@ -488,10 +493,10 @@ const buildWinkelTask = (): NumericTask => {
             kind: 'right',
             horizontal: adjacent,
             vertical: opposite,
-            horizontalLabel: `b = ${adjacent} cm`,
-            verticalLabel: `a = ${opposite} cm`,
-            hypotenuseLabel: 'c',
-            angleLabel: 'α = ?',
+            horizontalName: 'b',
+            verticalName: 'a',
+            hypotenuseName: 'c',
+            angleName: 'α',
             highlight: 'angle'
         }
     };
@@ -521,10 +526,10 @@ const buildSteigungTask = (): NumericTask => {
                 kind: 'right',
                 horizontal: 100,
                 vertical: percent,
-                horizontalLabel: 'horizontale Strecke',
-                verticalLabel: '',
-                hypotenuseLabel: 'Weg',
-                angleLabel: `α = ${angle}°`,
+                horizontalName: 'horizontale Strecke',
+                verticalName: '',
+                hypotenuseName: 'Weg',
+                angleName: 'α',
                 highlight: 'none',
                 askedLabel: 'Steigung = ?'
             }
@@ -550,10 +555,10 @@ const buildSteigungTask = (): NumericTask => {
             kind: 'right',
             horizontal: 100,
             vertical: percent,
-            horizontalLabel: 'horizontale Strecke',
-            verticalLabel: `Steigung ${percent} %`,
-            hypotenuseLabel: 'Weg',
-            angleLabel: 'α = ?',
+            horizontalName: 'horizontale Strecke',
+            verticalName: 'Steigung',
+            hypotenuseName: 'Weg',
+            angleName: 'α',
             highlight: 'angle'
         }
     };
@@ -594,11 +599,9 @@ const buildSinussatzTask = (): NumericTask => {
             ],
             sketch: {
                 kind: 'general',
-                a,
                 b: round(b, 2),
                 c: round(c, 2),
                 alpha,
-                givenKeys: ['a', 'alpha', 'beta'],
                 highlightKey: 'b'
             }
         };
@@ -620,11 +623,9 @@ const buildSinussatzTask = (): NumericTask => {
         ],
         sketch: {
             kind: 'general',
-            a,
             b: round(b, 2),
             c: round(c, 2),
             alpha,
-            givenKeys: ['a', 'b', 'alpha'],
             highlightKey: 'beta'
         }
     };
@@ -656,11 +657,9 @@ const buildKosinussatzTask = (): NumericTask => {
             ],
             sketch: {
                 kind: 'general',
-                a: round(a, 2),
                 b,
                 c,
                 alpha,
-                givenKeys: ['b', 'c', 'alpha'],
                 highlightKey: 'a'
             }
         };
@@ -684,11 +683,9 @@ const buildKosinussatzTask = (): NumericTask => {
         ],
         sketch: {
             kind: 'general',
-            a: round(a, 2),
             b,
             c,
             alpha,
-            givenKeys: ['a', 'b', 'c'],
             highlightKey: 'beta'
         }
     };
@@ -717,11 +714,9 @@ const buildFlaechensatzTask = (): NumericTask => {
         ],
         sketch: {
             kind: 'general',
-            a: round(Math.sqrt(Math.max(a * a + b * b - 2 * a * b * Math.cos(degToRad(gamma)), 0)), 2),
             b: a,
             c: b,
             alpha: gamma,
-            givenKeys: ['b', 'c', 'alpha'],
             highlightKey: 'none',
             askedLabel: 'Fläche = ?'
         }
