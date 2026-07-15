@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-// Zeichnet ein allgemeines Dreieck als eingebettetes GeoGebra-Applet (Pilot für die
-// gemischten Übungsaufgaben). GeoGebra übernimmt die Label-Platzierung selbst und
-// liefert damit sauberere Skizzen als die handgebaute SVG-Variante. Benötigt
-// Internetzugang (deployggb.js von geogebra.org); wenn das Script nicht lädt,
-// wird der übergebene fallback (SVG-Skizze) gerendert.
+// Zeichnet ein Dreieck als eingebettetes GeoGebra-Applet. GeoGebra übernimmt die
+// Label-Platzierung selbst und liefert damit sauberere Skizzen als handgebaute
+// SVGs. Schüler:innen können per Mausrad/Pinch und Zoom-Buttons rein- und
+// rauszoomen; die Konstruktion selbst ist fixiert.
+//
+// Benötigt Internetzugang (deployggb.js von geogebra.org). Lädt das Script
+// nicht, wird der übergebene fallback (z.B. die alte SVG-Skizze) gerendert.
+//
+// Verwendung und Details: siehe mathe-trainer/docs/geogebra-skizzen.md
 
 declare global {
     interface Window {
@@ -12,16 +16,34 @@ declare global {
     }
 }
 
-type TriangleKey = 'a' | 'b' | 'c' | 'alpha' | 'beta' | 'gamma';
+export interface GgbPoint {
+    x: number;
+    y: number;
+    // Angezeigter Punktname (z.B. "A"). Ohne label bleibt der Punkt unbeschriftet.
+    label?: string;
+}
+
+export interface GgbSide {
+    label?: string;
+    highlighted?: boolean;
+}
+
+export interface GgbAngle {
+    // Ohne label wird nur der Winkelbogen gezeichnet (bei 90° zeigt GeoGebra
+    // automatisch das Quadrat-Symbol für den rechten Winkel).
+    label?: string;
+    highlighted?: boolean;
+    // show: false unterdrückt den Winkel komplett (Standard: true).
+    show?: boolean;
+}
 
 export interface GeoGebraTriangleSketchProps {
-    // Geometrie: Punkt0 im Ursprung, Punkt1 bei (c, 0), Punkt2 über Winkel alpha und Seite b.
-    b: number;
-    c: number;
-    alphaDeg: number;
-    points: [string, string, string];
-    labels: Record<TriangleKey, string>;
-    highlightKey: TriangleKey | 'none';
+    points: [GgbPoint, GgbPoint, GgbPoint];
+    // Seiten in der Reihenfolge [P0P1, P1P2, P2P0].
+    sides: [GgbSide, GgbSide, GgbSide];
+    // Winkel an den Ecken [P0, P1, P2].
+    angles: [GgbAngle, GgbAngle, GgbAngle];
+    // Freier roter Hinweistext (z.B. "Fläche = ?"), platziert am Inkreismittelpunkt.
     askedLabel?: string;
     fallback: React.ReactNode;
 }
@@ -49,6 +71,7 @@ let ggbInstanceCounter = 0;
 
 const GIVEN_RGB: [number, number, number] = [31, 41, 55];
 const HIGHLIGHT_RGB: [number, number, number] = [220, 38, 38];
+const POINT_RGB: [number, number, number] = [15, 23, 42];
 
 const fmt = (value: number) => Number(value.toFixed(4)).toString();
 
@@ -65,108 +88,129 @@ interface GgbApi {
 }
 
 const drawTriangle = (api: GgbApi, props: GeoGebraTriangleSketchProps, width: number, height: number) => {
-    const { b, c, alphaDeg, points, labels, highlightKey, askedLabel } = props;
-    const [p0, p1, p2] = points;
-    const rad = (alphaDeg * Math.PI) / 180;
-    const bx = b * Math.cos(rad);
-    const by = b * Math.sin(rad);
+    const { points, sides, angles, askedLabel } = props;
 
     api.setAxesVisible(false, false);
     api.setGridVisible(false);
 
-    api.evalCommand(`${p0}=(0,0)`);
-    api.evalCommand(`${p1}=(${fmt(c)},0)`);
-    api.evalCommand(`${p2}=(${fmt(bx)},${fmt(by)})`);
+    // Interne Objektnamen V0..V2, damit Punktnamen wie "E" nicht mit
+    // GeoGebra-Konstanten oder untereinander kollidieren können.
+    points.forEach((p, i) => {
+        api.evalCommand(`V${i}=(${fmt(p.x)},${fmt(p.y)})`);
+    });
 
-    // Polygon liefert seine Kanten in der Reihenfolge P0P1 (Seite c), P1P2 (Seite a), P2P0 (Seite b).
-    let edgeC: string, edgeA: string, edgeB: string;
-    const returned = (api.evalCommandGetLabels(`tri=Polygon(${p0},${p1},${p2})`) ?? '')
+    // Polygon liefert seine Kanten in der Reihenfolge V0V1, V1V2, V2V0.
+    let edges: [string, string, string];
+    const returned = (api.evalCommandGetLabels('tri=Polygon(V0,V1,V2)') ?? '')
         .split(',')
         .map(s => s.trim())
         .filter(Boolean);
     if (returned.length >= 4) {
-        [, edgeC, edgeA, edgeB] = returned;
+        edges = [returned[1], returned[2], returned[3]];
     } else {
-        edgeC = 'segC';
-        edgeA = 'segA';
-        edgeB = 'segB';
-        api.evalCommand(`segC=Segment(${p0},${p1})`);
-        api.evalCommand(`segA=Segment(${p1},${p2})`);
-        api.evalCommand(`segB=Segment(${p2},${p0})`);
+        edges = ['seg01', 'seg12', 'seg20'];
+        api.evalCommand('seg01=Segment(V0,V1)');
+        api.evalCommand('seg12=Segment(V1,V2)');
+        api.evalCommand('seg20=Segment(V2,V0)');
     }
     api.evalCommand('SetColor(tri, 238, 242, 255)');
+    api.setFixed('tri', true, false);
 
-    api.evalCommand(`angA=Angle(${p1},${p0},${p2})`);
-    api.evalCommand(`angB=Angle(${p2},${p1},${p0})`);
-    api.evalCommand(`angC=Angle(${p0},${p2},${p1})`);
+    // Innenwinkel abhängig von der Umlaufrichtung des Dreiecks (GeoGebra misst
+    // gegen den Uhrzeigersinn).
+    const cross =
+        (points[1].x - points[0].x) * (points[2].y - points[0].y) -
+        (points[1].y - points[0].y) * (points[2].x - points[0].x);
+    const ccw = cross > 0;
+    const angleArgs: [number, number, number][] = ccw
+        ? [
+              [1, 0, 2],
+              [2, 1, 0],
+              [0, 2, 1]
+          ]
+        : [
+              [2, 0, 1],
+              [0, 1, 2],
+              [1, 2, 0]
+          ];
+    angles.forEach((angle, i) => {
+        if (angle.show === false) return;
+        const [from, vertex, to] = angleArgs[i];
+        api.evalCommand(`ang${i}=Angle(V${from},V${vertex},V${to})`);
+        const [r, g, b] = angle.highlighted ? HIGHLIGHT_RGB : GIVEN_RGB;
+        api.setColor(`ang${i}`, r, g, b);
+        if (angle.label) {
+            api.evalCommand(`SetCaption(ang${i}, "${angle.label}")`);
+            api.evalCommand(`SetLabelMode(ang${i}, 3)`);
+            api.evalCommand(`ShowLabel(ang${i}, true)`);
+        } else {
+            api.evalCommand(`ShowLabel(ang${i}, false)`);
+        }
+        api.setFixed(`ang${i}`, true, false);
+    });
 
-    const styleObject = (obj: string, key: TriangleKey, caption: string) => {
-        const highlighted = highlightKey === key;
-        api.evalCommand(`SetCaption(${obj}, "${highlighted ? `${caption} = ?` : caption}")`);
-        api.evalCommand(`SetLabelMode(${obj}, 3)`);
-        api.evalCommand(`ShowLabel(${obj}, true)`);
-        const [r, g, bl] = highlighted ? HIGHLIGHT_RGB : GIVEN_RGB;
-        api.setColor(obj, r, g, bl);
-        api.setLineThickness(obj, highlighted ? 6 : 4);
-        api.setFixed(obj, true, false);
-    };
-
-    styleObject(edgeA, 'a', labels.a);
-    styleObject(edgeB, 'b', labels.b);
-    styleObject(edgeC, 'c', labels.c);
-    styleObject('angA', 'alpha', labels.alpha);
-    styleObject('angB', 'beta', labels.beta);
-    styleObject('angC', 'gamma', labels.gamma);
+    sides.forEach((side, i) => {
+        const edge = edges[i];
+        const [r, g, b] = side.highlighted ? HIGHLIGHT_RGB : GIVEN_RGB;
+        api.setColor(edge, r, g, b);
+        api.setLineThickness(edge, side.highlighted ? 6 : 4);
+        if (side.label) {
+            api.evalCommand(`SetCaption(${edge}, "${side.label}")`);
+            api.evalCommand(`SetLabelMode(${edge}, 3)`);
+            api.evalCommand(`ShowLabel(${edge}, true)`);
+        } else {
+            api.evalCommand(`ShowLabel(${edge}, false)`);
+        }
+        api.setFixed(edge, true, false);
+    });
 
     // Punktnamen als eigene Textobjekte, vom Schwerpunkt weg nach außen versetzt.
     // Die automatischen Punktlabels (immer oben rechts) würden sonst mit den
     // innenliegenden Winkellabels kollidieren.
-    const coords: [number, number][] = [
-        [0, 0],
-        [c, 0],
-        [bx, by]
-    ];
-    const centroidX = (0 + c + bx) / 3;
-    const centroidY = by / 3;
-    const span = Math.max(Math.max(0, c, bx) - Math.min(0, c, bx), by, 0.0001);
+    const xs = points.map(p => p.x);
+    const ys = points.map(p => p.y);
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    const span = Math.max(maxX - minX, maxY - minY, 0.0001);
+    const centroidX = (points[0].x + points[1].x + points[2].x) / 3;
+    const centroidY = (points[0].y + points[1].y + points[2].y) / 3;
     const labelOffset = span * 0.09;
-    [p0, p1, p2].forEach((p, i) => {
-        api.setColor(p, 15, 23, 42);
-        api.evalCommand(`SetPointSize(${p}, 4)`);
-        api.evalCommand(`ShowLabel(${p}, false)`);
-        api.setFixed(p, true, false);
+    points.forEach((p, i) => {
+        api.setColor(`V${i}`, POINT_RGB[0], POINT_RGB[1], POINT_RGB[2]);
+        api.evalCommand(`SetPointSize(V${i}, 4)`);
+        api.evalCommand(`ShowLabel(V${i}, false)`);
+        api.setFixed(`V${i}`, true, false);
 
-        const [px, py] = coords[i];
-        const dx = px - centroidX;
-        const dy = py - centroidY;
+        if (!p.label) return;
+        const dx = p.x - centroidX;
+        const dy = p.y - centroidY;
         const len = Math.sqrt(dx * dx + dy * dy) || 1;
-        const lx = px + (dx / len) * labelOffset;
-        const ly = py + (dy / len) * labelOffset;
-        api.evalCommand(`ptLbl${i}=Text("${p}", (${fmt(lx)},${fmt(ly)}))`);
-        api.setColor(`ptLbl${i}`, 15, 23, 42);
+        const lx = p.x + (dx / len) * labelOffset;
+        const ly = p.y + (dy / len) * labelOffset;
+        api.evalCommand(`ptLbl${i}=Text("${p.label}", (${fmt(lx)},${fmt(ly)}))`);
+        api.setColor(`ptLbl${i}`, POINT_RGB[0], POINT_RGB[1], POINT_RGB[2]);
         api.setFixed(`ptLbl${i}`, true, false);
     });
-    api.setFixed('tri', true, false);
 
     if (askedLabel) {
         // Inkreismittelpunkt statt Schwerpunkt: liegt auch bei stumpfen Dreiecken
         // mittig im Inneren und schneidet keine Seite.
-        const sideA = Math.sqrt((c - bx) * (c - bx) + by * by);
-        const perimeter = sideA + b + c;
-        const inX = (sideA * 0 + b * c + c * bx) / perimeter;
-        const inY = (c * by) / perimeter;
-        const spanForText = Math.max(Math.max(0, c, bx) - Math.min(0, c, bx), by, 0.0001);
-        api.evalCommand(`txtAsk=Text("${askedLabel}", (${fmt(inX - spanForText * 0.12)},${fmt(inY)}))`);
+        const dist = (a: GgbPoint, b: GgbPoint) => Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+        const l0 = dist(points[1], points[2]);
+        const l1 = dist(points[2], points[0]);
+        const l2 = dist(points[0], points[1]);
+        const perimeter = l0 + l1 + l2 || 1;
+        const inX = (l0 * points[0].x + l1 * points[1].x + l2 * points[2].x) / perimeter;
+        const inY = (l0 * points[0].y + l1 * points[1].y + l2 * points[2].y) / perimeter;
+        api.evalCommand(`txtAsk=Text("${askedLabel}", (${fmt(inX - span * 0.12)},${fmt(inY)}))`);
         api.setColor('txtAsk', HIGHLIGHT_RGB[0], HIGHLIGHT_RGB[1], HIGHLIGHT_RGB[2]);
         api.setFixed('txtAsk', true, false);
     }
 
     // Sichtbereich mit Rand für die außenliegenden Labels; auf das Seitenverhältnis
     // des Applets gebracht, damit das Dreieck nicht verzerrt wird.
-    const minX = Math.min(0, c, bx);
-    const maxX = Math.max(0, c, bx);
-    const minY = 0;
-    const maxY = Math.max(by, 0.0001);
     const padX = (maxX - minX) * 0.3 || 1;
     const padY = (maxY - minY) * 0.3 || 1;
     let x0 = minX - padX;
@@ -206,7 +250,7 @@ const GeoGebraTriangleSketch: React.FC<GeoGebraTriangleSketchProps> = props => {
                 const applet = new window.GGBApplet(
                     {
                         appName: 'classic',
-                        // Nur die Grafik-Ansicht, ohne Algebra-Seitenpanel der Geometry-App.
+                        // Nur die Grafik-Ansicht, ohne Algebra-Seitenpanel.
                         perspective: 'G',
                         fontSize: 16,
                         width,
@@ -214,11 +258,12 @@ const GeoGebraTriangleSketch: React.FC<GeoGebraTriangleSketchProps> = props => {
                         showToolBar: false,
                         showAlgebraInput: false,
                         showMenuBar: false,
-                        showResetIcon: false,
-                        showZoomButtons: false,
+                        showResetIcon: true,
+                        // Schüler:innen dürfen zoomen und die Ansicht verschieben.
+                        showZoomButtons: true,
+                        enableShiftDragZoom: true,
                         showFullscreenButton: false,
                         enableRightClick: false,
-                        enableShiftDragZoom: false,
                         enableLabelDrags: false,
                         preventFocus: true,
                         borderColor: '#f8fafc',

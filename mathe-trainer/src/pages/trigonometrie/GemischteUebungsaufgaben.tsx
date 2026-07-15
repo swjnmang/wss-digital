@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import RightTriangleSVG from '../../components/RightTriangleSVG';
-import GeoGebraTriangleSketch from '../../components/GeoGebraTriangleSketch';
+import GeoGebraTriangleSketch, { GgbAngle } from '../../components/GeoGebraTriangleSketch';
 import { HelpUsage, logTrackingEntry } from '../../utils/tracking';
 
 // ---------- Allgemeine Hilfsfunktionen ----------
@@ -89,8 +89,6 @@ interface GeneralSketchSpec {
     askedLabel?: string;
     points?: [string, string, string];
     labels?: Partial<Record<GeneralKey, string>>;
-    // Pilot: Skizze als eingebettetes GeoGebra-Applet statt handgebautem SVG rendern.
-    renderer?: 'geogebra';
 }
 
 type SketchSpec = RightSketchSpec | GeneralSketchSpec;
@@ -303,23 +301,64 @@ const NumericGeneralSketch: React.FC<{ spec: GeneralSketchSpec }> = ({ spec }) =
     );
 };
 
+// Beschriftung mit "= ?" für die gesuchte Größe.
+const asked = (label: string | undefined, highlighted: boolean) =>
+    label && highlighted ? `${label} = ?` : label;
+
+// Alle Skizzen laufen über das GeoGebra-Applet; die alten SVG-Skizzen bleiben
+// als Fallback erhalten, falls das GeoGebra-Script nicht lädt (kein Internet).
 const NumericSketch: React.FC<{ sketch: SketchSpec }> = ({ sketch }) => {
-    if (sketch.kind === 'right') return <NumericRightSketch spec={sketch} />;
-    if (sketch.renderer === 'geogebra') {
+    if (sketch.kind === 'right') {
+        const { horizontal, vertical, horizontalName, verticalName, hypotenuseName, angleName, highlight } = sketch;
         return (
             <GeoGebraTriangleSketch
-                b={sketch.b}
-                c={sketch.c}
-                alphaDeg={sketch.alpha}
-                points={sketch.points ?? DEFAULT_POINTS}
-                labels={{ ...DEFAULT_GENERAL_LABELS, ...(sketch.labels ?? {}) }}
-                highlightKey={sketch.highlightKey}
+                points={[
+                    { x: 0, y: 0 },
+                    { x: horizontal, y: 0 },
+                    { x: horizontal, y: vertical }
+                ]}
+                sides={[
+                    { label: asked(horizontalName, highlight === 'horizontal'), highlighted: highlight === 'horizontal' },
+                    { label: asked(verticalName, highlight === 'vertical'), highlighted: highlight === 'vertical' },
+                    { label: asked(hypotenuseName, highlight === 'hypotenuse'), highlighted: highlight === 'hypotenuse' }
+                ]}
+                angles={[
+                    { label: asked(angleName, highlight === 'angle'), highlighted: highlight === 'angle' },
+                    // Rechter Winkel: nur das 90°-Symbol, ohne Beschriftung.
+                    {},
+                    { show: false }
+                ]}
                 askedLabel={sketch.askedLabel}
-                fallback={<NumericGeneralSketch spec={sketch} />}
+                fallback={<NumericRightSketch spec={sketch} />}
             />
         );
     }
-    return <NumericGeneralSketch spec={sketch} />;
+
+    const points = sketch.points ?? DEFAULT_POINTS;
+    const labels = { ...DEFAULT_GENERAL_LABELS, ...(sketch.labels ?? {}) };
+    const { highlightKey } = sketch;
+    const rad = degToRad(sketch.alpha);
+    return (
+        <GeoGebraTriangleSketch
+            points={[
+                { x: 0, y: 0, label: points[0] },
+                { x: sketch.c, y: 0, label: points[1] },
+                { x: sketch.b * Math.cos(rad), y: sketch.b * Math.sin(rad), label: points[2] }
+            ]}
+            sides={[
+                { label: asked(labels.c, highlightKey === 'c'), highlighted: highlightKey === 'c' },
+                { label: asked(labels.a, highlightKey === 'a'), highlighted: highlightKey === 'a' },
+                { label: asked(labels.b, highlightKey === 'b'), highlighted: highlightKey === 'b' }
+            ]}
+            angles={[
+                { label: asked(labels.alpha, highlightKey === 'alpha'), highlighted: highlightKey === 'alpha' },
+                { label: asked(labels.beta, highlightKey === 'beta'), highlighted: highlightKey === 'beta' },
+                { label: asked(labels.gamma, highlightKey === 'gamma'), highlighted: highlightKey === 'gamma' }
+            ]}
+            askedLabel={sketch.askedLabel}
+            fallback={<NumericGeneralSketch spec={sketch} />}
+        />
+    );
 };
 
 // ---------- Aufgaben-Typen ----------
@@ -358,6 +397,70 @@ interface LabelTriangle {
 }
 
 const ANGLE_ROLES: ('alpha' | 'beta' | 'gamma')[] = ['alpha', 'beta', 'gamma'];
+
+// GeoGebra-Skizze für die Zuordnungsaufgaben (Beschriften/Erkennen): rechtwinkliges
+// Dreieck mit variabler Lage des rechten Winkels, markierter Winkel rot. Fallback
+// ist die bisherige SVG-Komponente RightTriangleSVG.
+const LabelTriangleSketch: React.FC<{ triangle: LabelTriangle }> = ({ triangle: t }) => {
+    const K1 = 4;
+    const K2 = 2.8;
+    let coords: [number, number][];
+    if (t.rightAngleAtPoint === t.pointA) {
+        coords = [
+            [0, K2],
+            [K1, K2],
+            [0, 0]
+        ];
+    } else if (t.rightAngleAtPoint === t.pointB) {
+        coords = [
+            [0, 0],
+            [K1, 0],
+            [K1, K2]
+        ];
+    } else {
+        coords = [
+            [K1, 0],
+            [0, K2],
+            [0, 0]
+        ];
+    }
+    const names = [t.pointA, t.pointB, t.pointC];
+    const angleNames = [t.angleA, t.angleB, t.angleC];
+    return (
+        <GeoGebraTriangleSketch
+            points={[
+                { x: coords[0][0], y: coords[0][1], label: names[0] },
+                { x: coords[1][0], y: coords[1][1], label: names[1] },
+                { x: coords[2][0], y: coords[2][1], label: names[2] }
+            ]}
+            sides={[{ label: t.sideC }, { label: t.sideA }, { label: t.sideB }]}
+            angles={
+                names.map((name, i) =>
+                    name === t.rightAngleAtPoint
+                        ? // Rechter Winkel: nur das 90°-Symbol, ohne Beschriftung.
+                          {}
+                        : { label: angleNames[i], highlighted: name === t.markedAngleAtPoint }
+                ) as [GgbAngle, GgbAngle, GgbAngle]
+            }
+            fallback={
+                <RightTriangleSVG
+                    pointA={t.pointA}
+                    pointB={t.pointB}
+                    pointC={t.pointC}
+                    sideA={t.sideA}
+                    sideB={t.sideB}
+                    sideC={t.sideC}
+                    angleLabelA={t.angleA}
+                    angleLabelB={t.angleB}
+                    angleLabelC={t.angleC}
+                    rightAngleAtPoint={t.rightAngleAtPoint}
+                    markedAngle={t.markedAngle}
+                    markedAngleAtPoint={t.markedAngleAtPoint}
+                />
+            }
+        />
+    );
+};
 
 interface BeschriftenTask {
     id: number;
@@ -848,13 +951,15 @@ const buildFlaechensatzTask = (): NumericTask => {
         ],
         sketch: {
             kind: 'general',
-            renderer: 'geogebra',
             b: a,
             c: b,
             alpha: gamma,
             highlightKey: 'none',
             askedLabel: 'Fläche = ?',
-            points: scheme.points,
+            // Punktnamen passend zur Rollen-Umlegung: Der Scheitel des gegebenen
+            // Winkels (interne alpha-Position) trägt angleC und muss daher den
+            // dritten Punktnamen bekommen (zu Winkel γ gehört Punkt C usw.).
+            points: [scheme.points[2], scheme.points[0], scheme.points[1]],
             // Interne Rollen entsprechen hier nicht 1:1 den Aufgaben-Buchstaben
             // (die Skizze zeichnet den Winkel γ als "internes α" zwischen den
             // Seiten a/b) - daher werden die Anzeige-Buchstaben explizit umgelegt.
@@ -1195,20 +1300,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             {task.kind === 'beschriften' && (
                 <div className="grid gap-5 md:grid-cols-[1.4fr,1fr]">
                     <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 h-[340px] sm:h-[380px]">
-                        <RightTriangleSVG
-                            pointA={task.triangle.pointA}
-                            pointB={task.triangle.pointB}
-                            pointC={task.triangle.pointC}
-                            sideA={task.triangle.sideA}
-                            sideB={task.triangle.sideB}
-                            sideC={task.triangle.sideC}
-                            angleLabelA={task.triangle.angleA}
-                            angleLabelB={task.triangle.angleB}
-                            angleLabelC={task.triangle.angleC}
-                            rightAngleAtPoint={task.triangle.rightAngleAtPoint}
-                            markedAngle={task.triangle.markedAngle}
-                            markedAngleAtPoint={task.triangle.markedAngleAtPoint}
-                        />
+                        <LabelTriangleSketch triangle={task.triangle} />
                     </div>
                     <div className="space-y-3">
                         <p className="text-slate-800 leading-relaxed">
@@ -1256,20 +1348,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             {task.kind === 'erkennen' && (
                 <div className="grid gap-5 md:grid-cols-[1.4fr,1fr]">
                     <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 h-[340px] sm:h-[380px]">
-                        <RightTriangleSVG
-                            pointA={task.triangle.pointA}
-                            pointB={task.triangle.pointB}
-                            pointC={task.triangle.pointC}
-                            sideA={task.triangle.sideA}
-                            sideB={task.triangle.sideB}
-                            sideC={task.triangle.sideC}
-                            angleLabelA={task.triangle.angleA}
-                            angleLabelB={task.triangle.angleB}
-                            angleLabelC={task.triangle.angleC}
-                            rightAngleAtPoint={task.triangle.rightAngleAtPoint}
-                            markedAngle={task.triangle.markedAngle}
-                            markedAngleAtPoint={task.triangle.markedAngleAtPoint}
-                        />
+                        <LabelTriangleSketch triangle={task.triangle} />
                     </div>
                     <div className="space-y-3">
                         {task.type === 'functionToRatio' ? (
