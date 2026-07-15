@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import RightTriangleSVG from '../../components/RightTriangleSVG';
+import GeoGebraTriangleSketch from '../../components/GeoGebraTriangleSketch';
 import { HelpUsage, logTrackingEntry } from '../../utils/tracking';
 
 // ---------- Allgemeine Hilfsfunktionen ----------
@@ -88,6 +89,8 @@ interface GeneralSketchSpec {
     askedLabel?: string;
     points?: [string, string, string];
     labels?: Partial<Record<GeneralKey, string>>;
+    // Pilot: Skizze als eingebettetes GeoGebra-Applet statt handgebautem SVG rendern.
+    renderer?: 'geogebra';
 }
 
 type SketchSpec = RightSketchSpec | GeneralSketchSpec;
@@ -300,8 +303,24 @@ const NumericGeneralSketch: React.FC<{ spec: GeneralSketchSpec }> = ({ spec }) =
     );
 };
 
-const NumericSketch: React.FC<{ sketch: SketchSpec }> = ({ sketch }) =>
-    sketch.kind === 'right' ? <NumericRightSketch spec={sketch} /> : <NumericGeneralSketch spec={sketch} />;
+const NumericSketch: React.FC<{ sketch: SketchSpec }> = ({ sketch }) => {
+    if (sketch.kind === 'right') return <NumericRightSketch spec={sketch} />;
+    if (sketch.renderer === 'geogebra') {
+        return (
+            <GeoGebraTriangleSketch
+                b={sketch.b}
+                c={sketch.c}
+                alphaDeg={sketch.alpha}
+                points={sketch.points ?? DEFAULT_POINTS}
+                labels={{ ...DEFAULT_GENERAL_LABELS, ...(sketch.labels ?? {}) }}
+                highlightKey={sketch.highlightKey}
+                askedLabel={sketch.askedLabel}
+                fallback={<NumericGeneralSketch spec={sketch} />}
+            />
+        );
+    }
+    return <NumericGeneralSketch spec={sketch} />;
+};
 
 // ---------- Aufgaben-Typen ----------
 
@@ -829,6 +848,7 @@ const buildFlaechensatzTask = (): NumericTask => {
         ],
         sketch: {
             kind: 'general',
+            renderer: 'geogebra',
             b: a,
             c: b,
             alpha: gamma,
