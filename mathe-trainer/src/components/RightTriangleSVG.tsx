@@ -7,6 +7,9 @@ interface RightTriangleSVGProps {
   sideA: string;      // Seite gegenüber von A (zwischen B und C)
   sideB: string;      // Seite gegenüber von B (zwischen A und C)
   sideC: string;      // Seite gegenüber von C (zwischen A und B)
+  angleLabelA?: string;   // Beschriftung des Winkels bei A (Standard: α)
+  angleLabelB?: string;   // Beschriftung des Winkels bei B (Standard: β)
+  angleLabelC?: string;   // Beschriftung des Winkels bei C (Standard: γ)
   rightAngleAtPoint: string;  // Punkt wo der 90° Winkel ist
   markedAngle?: 'alpha' | 'beta' | 'gamma';
   markedAngleAtPoint?: string; // Punkt wo der markierte Winkel ist
@@ -24,6 +27,9 @@ const RightTriangleSVG: React.FC<RightTriangleSVGProps> = ({
   sideA,
   sideB,
   sideC,
+  angleLabelA = 'α',
+  angleLabelB = 'β',
+  angleLabelC = 'γ',
   rightAngleAtPoint,
   markedAngleAtPoint,
 }) => {
@@ -263,9 +269,9 @@ const RightTriangleSVG: React.FC<RightTriangleSVGProps> = ({
       </text>
 
       {/* Winkel-Bögen */}
-      {drawAngleArc(posA, posC, posB, arcRadius, 'α', isRightAngleAtA, markedAngleAtPoint === pointA)}
-      {drawAngleArc(posB, posA, posC, arcRadius, 'β', isRightAngleAtB, markedAngleAtPoint === pointB)}
-      {drawAngleArc(posC, posB, posA, arcRadius, 'γ', isRightAngleAtC, markedAngleAtPoint === pointC)}
+      {drawAngleArc(posA, posC, posB, arcRadius, angleLabelA, isRightAngleAtA, markedAngleAtPoint === pointA)}
+      {drawAngleArc(posB, posA, posC, arcRadius, angleLabelB, isRightAngleAtB, markedAngleAtPoint === pointB)}
+      {drawAngleArc(posC, posB, posA, arcRadius, angleLabelC, isRightAngleAtC, markedAngleAtPoint === pointC)}
     </svg>
   );
 };

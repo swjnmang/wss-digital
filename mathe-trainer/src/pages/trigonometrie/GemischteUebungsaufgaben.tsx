@@ -35,6 +35,38 @@ const nextId = () => {
 type RightHighlight = 'horizontal' | 'vertical' | 'hypotenuse' | 'angle' | 'none';
 type GeneralKey = 'a' | 'b' | 'c' | 'alpha' | 'beta' | 'gamma';
 
+// Beschriftungs-Sets für Dreiecke: Eckpunkte, gegenüberliegende Seiten und Winkel
+// gehören jeweils zusammen (Punkt i <-> Seite i <-> Winkel i), damit die Zuordnung
+// mathematisch korrekt bleibt, egal welches Set zufällig gezogen wird.
+interface LetterScheme {
+    points: [string, string, string];
+    sides: [string, string, string];
+    angles: [string, string, string];
+}
+
+const LETTER_SCHEMES: LetterScheme[] = [
+    { points: ['A', 'B', 'C'], sides: ['a', 'b', 'c'], angles: ['α', 'β', 'γ'] },
+    { points: ['P', 'Q', 'R'], sides: ['p', 'q', 'r'], angles: ['φ', 'ψ', 'χ'] },
+    { points: ['D', 'E', 'F'], sides: ['d', 'e', 'f'], angles: ['δ', 'ε', 'ζ'] },
+    { points: ['X', 'Y', 'Z'], sides: ['x', 'y', 'z'], angles: ['ξ', 'υ', 'ω'] }
+];
+
+const DEFAULT_POINTS: [string, string, string] = ['A', 'B', 'C'];
+const DEFAULT_GENERAL_LABELS: Record<GeneralKey, string> = { a: 'a', b: 'b', c: 'c', alpha: 'α', beta: 'β', gamma: 'γ' };
+
+const pickLetterScheme = (): LetterScheme => pick(LETTER_SCHEMES);
+
+// Direkte a/b/c<->α/β/γ-Zuordnung für Skizzen, deren interne Rollen exakt den
+// tatsächlichen Seiten/Winkeln der Aufgabe entsprechen (Sinussatz, Kosinussatz).
+const schemeToGeneralLabels = (scheme: LetterScheme): Record<GeneralKey, string> => ({
+    a: scheme.sides[0],
+    b: scheme.sides[1],
+    c: scheme.sides[2],
+    alpha: scheme.angles[0],
+    beta: scheme.angles[1],
+    gamma: scheme.angles[2]
+});
+
 interface RightSketchSpec {
     kind: 'right';
     horizontal: number;
@@ -54,6 +86,8 @@ interface GeneralSketchSpec {
     alpha: number;
     highlightKey: GeneralKey | 'none';
     askedLabel?: string;
+    points?: [string, string, string];
+    labels?: Partial<Record<GeneralKey, string>>;
 }
 
 type SketchSpec = RightSketchSpec | GeneralSketchSpec;
@@ -167,6 +201,8 @@ const NumericRightSketch: React.FC<{ spec: RightSketchSpec }> = ({ spec }) => {
 
 const NumericGeneralSketch: React.FC<{ spec: GeneralSketchSpec }> = ({ spec }) => {
     const { b, c, alpha, highlightKey, askedLabel } = spec;
+    const points = spec.points ?? DEFAULT_POINTS;
+    const labels = { ...DEFAULT_GENERAL_LABELS, ...(spec.labels ?? {}) };
     const width = 320;
     const height = 220;
     const margin = 48;
@@ -193,8 +229,8 @@ const NumericGeneralSketch: React.FC<{ spec: GeneralSketchSpec }> = ({ spec }) =
     // Zeigt im Aufgabentext bereits genannte Werte nicht erneut an. Nur der
     // gesuchte Teil bekommt ein "= ?" und wird rot markiert.
     const colorFor = (key: GeneralKey) => (highlightKey === key ? HIGHLIGHT_COLOR : GIVEN_COLOR);
-    const sideLabel = (key: 'a' | 'b' | 'c') => (highlightKey === key ? `${key} = ?` : key);
-    const angleLabel = (key: 'alpha' | 'beta' | 'gamma', symbol: string) => (highlightKey === key ? `${symbol} = ?` : symbol);
+    const sideLabel = (key: 'a' | 'b' | 'c') => (highlightKey === key ? `${labels[key]} = ?` : labels[key]);
+    const angleLabel = (key: 'alpha' | 'beta' | 'gamma') => (highlightKey === key ? `${labels[key]} = ?` : labels[key]);
 
     const centroid = { x: (A.x + B.x + C.x) / 3, y: (A.y + B.y + C.y) / 3 };
     const sideLabelPos = (p1: { x: number; y: number }, p2: { x: number; y: number }, offset = 16) => {
@@ -231,9 +267,9 @@ const NumericGeneralSketch: React.FC<{ spec: GeneralSketchSpec }> = ({ spec }) =
             <circle cx={A.x} cy={A.y} r={3} fill="#0f172a" />
             <circle cx={B.x} cy={B.y} r={3} fill="#0f172a" />
             <circle cx={C.x} cy={C.y} r={3} fill="#0f172a" />
-            <text x={A.x - 12} y={A.y + 16} fontSize="12" fontWeight="bold">A</text>
-            <text x={B.x + 8} y={B.y + 16} fontSize="12" fontWeight="bold">B</text>
-            <text x={C.x} y={C.y - 10} fontSize="12" fontWeight="bold" textAnchor="middle">C</text>
+            <text x={A.x - 12} y={A.y + 16} fontSize="12" fontWeight="bold">{points[0]}</text>
+            <text x={B.x + 8} y={B.y + 16} fontSize="12" fontWeight="bold">{points[1]}</text>
+            <text x={C.x} y={C.y - 10} fontSize="12" fontWeight="bold" textAnchor="middle">{points[2]}</text>
 
             <text x={labelC_.x} y={labelC_.y} textAnchor="middle" fontSize="12" fill={colorFor('c')}>
                 {sideLabel('c')}
@@ -246,13 +282,13 @@ const NumericGeneralSketch: React.FC<{ spec: GeneralSketchSpec }> = ({ spec }) =
             </text>
 
             <text x={angleA_.x} y={angleA_.y} textAnchor="middle" fontSize="12" fontWeight="bold" fill={colorFor('alpha')}>
-                {angleLabel('alpha', 'α')}
+                {angleLabel('alpha')}
             </text>
             <text x={angleB_.x} y={angleB_.y} textAnchor="middle" fontSize="12" fontWeight="bold" fill={colorFor('beta')}>
-                {angleLabel('beta', 'β')}
+                {angleLabel('beta')}
             </text>
             <text x={angleC_.x} y={angleC_.y} textAnchor="middle" fontSize="12" fontWeight="bold" fill={colorFor('gamma')}>
-                {angleLabel('gamma', 'γ')}
+                {angleLabel('gamma')}
             </text>
 
             {askedLabel && (
@@ -288,10 +324,16 @@ interface LabelTriangle {
     sideA: string;
     sideB: string;
     sideC: string;
+    angleA: string;
+    angleB: string;
+    angleC: string;
     rightAngleAtPoint: string;
     markedAngle: 'alpha' | 'beta' | 'gamma';
     markedAngleAtPoint: string;
+    markedAngleSymbol: string;
 }
+
+const ANGLE_ROLES: ('alpha' | 'beta' | 'gamma')[] = ['alpha', 'beta', 'gamma'];
 
 interface BeschriftenTask {
     id: number;
@@ -319,8 +361,6 @@ interface ErkennenTask {
 
 type MixedTask = NumericTask | BeschriftenTask | ErkennenTask;
 
-const greekSymbols: Record<'alpha' | 'beta' | 'gamma', string> = { alpha: 'α', beta: 'β', gamma: 'γ' };
-
 const trigFunctionLabel: Record<TrigFunction, string> = { sin: 'Sinus', cos: 'Kosinus', tan: 'Tangens' };
 const trigFormula: Record<TrigFunction, string> = {
     sin: '\\sin(\\alpha) = \\dfrac{\\text{Gegenkathete}}{\\text{Hypotenuse}}',
@@ -332,13 +372,15 @@ const trigFormula: Record<TrigFunction, string> = {
 
 // 1) Rechtwinklige Dreiecke beschriften
 const buildBeschriftenTask = (): BeschriftenTask => {
-    const points = ['A', 'B', 'C'];
-    const sides = ['a', 'b', 'c'];
+    const scheme = pickLetterScheme();
+    const points = scheme.points;
+    const sides = scheme.sides;
+    const angles = scheme.angles;
     const rightAngleAtPoint = pick(points);
     const otherPoints = points.filter(p => p !== rightAngleAtPoint);
     const markedAngleAtPoint = pick(otherPoints);
-    const angleNames: Record<string, 'alpha' | 'beta' | 'gamma'> = { A: 'alpha', B: 'beta', C: 'gamma' };
-    const markedAngle = angleNames[markedAngleAtPoint];
+    const markedAngle = ANGLE_ROLES[points.indexOf(markedAngleAtPoint)];
+    const markedAngleSymbol = angles[points.indexOf(markedAngleAtPoint)];
 
     const hypotenuse = sides[points.indexOf(rightAngleAtPoint)];
     const opposite = sides[points.indexOf(markedAngleAtPoint)];
@@ -348,7 +390,21 @@ const buildBeschriftenTask = (): BeschriftenTask => {
         id: nextId(),
         kind: 'beschriften',
         topic: 'Dreiecke beschriften',
-        triangle: { pointA: 'A', pointB: 'B', pointC: 'C', sideA: 'a', sideB: 'b', sideC: 'c', rightAngleAtPoint, markedAngle, markedAngleAtPoint },
+        triangle: {
+            pointA: points[0],
+            pointB: points[1],
+            pointC: points[2],
+            sideA: sides[0],
+            sideB: sides[1],
+            sideC: sides[2],
+            angleA: angles[0],
+            angleB: angles[1],
+            angleC: angles[2],
+            rightAngleAtPoint,
+            markedAngle,
+            markedAngleAtPoint,
+            markedAngleSymbol
+        },
         correct: { hypotenuse, opposite, adjacent },
         sideOptions: shuffleArray(sides)
     };
@@ -372,20 +428,36 @@ const ratioToFunction = (num: SideRole, den: SideRole): TrigFunction | null => {
 };
 
 const buildErkennenTask = (): ErkennenTask => {
-    const points = ['A', 'B', 'C'];
-    const sides = ['a', 'b', 'c'];
+    const scheme = pickLetterScheme();
+    const points = scheme.points;
+    const sides = scheme.sides;
+    const angles = scheme.angles;
     const rightAngleAtPoint = pick(points);
     const otherPoints = points.filter(p => p !== rightAngleAtPoint);
     const markedAngleAtPoint = pick(otherPoints);
-    const angleNames: Record<string, 'alpha' | 'beta' | 'gamma'> = { A: 'alpha', B: 'beta', C: 'gamma' };
-    const markedAngle = angleNames[markedAngleAtPoint];
+    const markedAngle = ANGLE_ROLES[points.indexOf(markedAngleAtPoint)];
+    const markedAngleSymbol = angles[points.indexOf(markedAngleAtPoint)];
 
     const hypotenuse = sides[points.indexOf(rightAngleAtPoint)];
     const opposite = sides[points.indexOf(markedAngleAtPoint)];
     const adjacent = sides.find(s => s !== hypotenuse && s !== opposite)!;
     const sideOf: Record<SideRole, string> = { hypotenuse, opposite, adjacent };
 
-    const triangle: LabelTriangle = { pointA: 'A', pointB: 'B', pointC: 'C', sideA: 'a', sideB: 'b', sideC: 'c', rightAngleAtPoint, markedAngle, markedAngleAtPoint };
+    const triangle: LabelTriangle = {
+        pointA: points[0],
+        pointB: points[1],
+        pointC: points[2],
+        sideA: sides[0],
+        sideB: sides[1],
+        sideC: sides[2],
+        angleA: angles[0],
+        angleB: angles[1],
+        angleC: angles[2],
+        rightAngleAtPoint,
+        markedAngle,
+        markedAngleAtPoint,
+        markedAngleSymbol
+    };
     const type: 'functionToRatio' | 'ratioToFunction' = Math.random() < 0.5 ? 'functionToRatio' : 'ratioToFunction';
 
     if (type === 'functionToRatio') {
@@ -425,6 +497,9 @@ const buildErkennenTask = (): ErkennenTask => {
 
 // 3) Rechtwinkliges Dreieck: fehlende Seite mit Sinus/Kosinus berechnen
 const buildStreckenTask = (): NumericTask => {
+    const scheme = pickLetterScheme();
+    const [sA, sB, sC] = scheme.sides;
+    const [angleA] = scheme.angles;
     const alpha = randomInt(20, 70);
     const hyp = round(randomInRange(5, 15), 2);
     const askOpposite = Math.random() < 0.5;
@@ -433,16 +508,16 @@ const buildStreckenTask = (): NumericTask => {
 
     const solutionSteps = askOpposite
         ? [
-              `Gegeben: Hypotenuse c = ${hyp} cm, Winkel α = ${alpha}°.`,
-              'Verwende den Sinus: sin(α) = Gegenkathete / Hypotenuse, also a = c · sin(α).',
-              `a = ${hyp} · sin(${alpha}°) = ${hyp} · ${Math.sin(degToRad(alpha)).toFixed(4)}`,
-              `a ≈ ${opposite.toFixed(2)} cm`
+              `Gegeben: Hypotenuse ${sC} = ${hyp} cm, Winkel ${angleA} = ${alpha}°.`,
+              `Verwende den Sinus: sin(${angleA}) = Gegenkathete / Hypotenuse, also ${sA} = ${sC} · sin(${angleA}).`,
+              `${sA} = ${hyp} · sin(${alpha}°) = ${hyp} · ${Math.sin(degToRad(alpha)).toFixed(4)}`,
+              `${sA} ≈ ${opposite.toFixed(2)} cm`
           ]
         : [
-              `Gegeben: Hypotenuse c = ${hyp} cm, Winkel α = ${alpha}°.`,
-              'Verwende den Kosinus: cos(α) = Ankathete / Hypotenuse, also b = c · cos(α).',
-              `b = ${hyp} · cos(${alpha}°) = ${hyp} · ${Math.cos(degToRad(alpha)).toFixed(4)}`,
-              `b ≈ ${adjacent.toFixed(2)} cm`
+              `Gegeben: Hypotenuse ${sC} = ${hyp} cm, Winkel ${angleA} = ${alpha}°.`,
+              `Verwende den Kosinus: cos(${angleA}) = Ankathete / Hypotenuse, also ${sB} = ${sC} · cos(${angleA}).`,
+              `${sB} = ${hyp} · cos(${alpha}°) = ${hyp} · ${Math.cos(degToRad(alpha)).toFixed(4)}`,
+              `${sB} ≈ ${adjacent.toFixed(2)} cm`
           ];
 
     return {
@@ -450,8 +525,8 @@ const buildStreckenTask = (): NumericTask => {
         kind: 'numeric',
         topic: 'Streckenlänge berechnen',
         prompt: askOpposite
-            ? `In einem rechtwinkligen Dreieck sind die Seite c = ${hyp} cm und der Winkel α = ${alpha}° gegeben. Berechne die Seite a.`
-            : `In einem rechtwinkligen Dreieck sind die Seite c = ${hyp} cm und der Winkel α = ${alpha}° gegeben. Berechne die Seite b.`,
+            ? `In einem rechtwinkligen Dreieck sind die Seite ${sC} = ${hyp} cm und der Winkel ${angleA} = ${alpha}° gegeben. Berechne die Seite ${sA}.`
+            : `In einem rechtwinkligen Dreieck sind die Seite ${sC} = ${hyp} cm und der Winkel ${angleA} = ${alpha}° gegeben. Berechne die Seite ${sB}.`,
         unit: 'cm',
         correctAnswer: (askOpposite ? opposite : adjacent).toFixed(2),
         tolerance: relTolerance(askOpposite ? opposite : adjacent),
@@ -460,10 +535,10 @@ const buildStreckenTask = (): NumericTask => {
             kind: 'right',
             horizontal: adjacent,
             vertical: opposite,
-            horizontalName: 'b',
-            verticalName: 'a',
-            hypotenuseName: 'c',
-            angleName: 'α',
+            horizontalName: sB,
+            verticalName: sA,
+            hypotenuseName: sC,
+            angleName: angleA,
             highlight: askOpposite ? 'vertical' : 'horizontal'
         }
     };
@@ -471,6 +546,9 @@ const buildStreckenTask = (): NumericTask => {
 
 // 4) Rechtwinkliges Dreieck: fehlenden Winkel berechnen
 const buildWinkelTask = (): NumericTask => {
+    const scheme = pickLetterScheme();
+    const [sA, sB, sC] = scheme.sides;
+    const [angleA] = scheme.angles;
     const adjacent = round(randomInRange(4, 12), 2);
     const opposite = round(randomInRange(4, 12), 2);
     const angle = radToDeg(Math.atan(opposite / adjacent));
@@ -479,24 +557,24 @@ const buildWinkelTask = (): NumericTask => {
         id: nextId(),
         kind: 'numeric',
         topic: 'Winkel berechnen',
-        prompt: `In einem rechtwinkligen Dreieck sind die Seite b = ${adjacent} cm und die Seite a = ${opposite} cm bekannt. Berechne den Winkel α.`,
+        prompt: `In einem rechtwinkligen Dreieck sind die Seite ${sB} = ${adjacent} cm und die Seite ${sA} = ${opposite} cm bekannt. Berechne den Winkel ${angleA}.`,
         unit: '°',
         correctAnswer: angle.toFixed(1),
         tolerance: relTolerance(angle),
         solutionSteps: [
-            `Gegeben: Ankathete b = ${adjacent} cm, Gegenkathete a = ${opposite} cm.`,
-            'Verwende den Tangens: tan(α) = Gegenkathete / Ankathete.',
-            `tan(α) = ${opposite} / ${adjacent} = ${(opposite / adjacent).toFixed(4)}`,
-            `α = tan⁻¹(${(opposite / adjacent).toFixed(4)}) ≈ ${angle.toFixed(1)}°`
+            `Gegeben: Ankathete ${sB} = ${adjacent} cm, Gegenkathete ${sA} = ${opposite} cm.`,
+            `Verwende den Tangens: tan(${angleA}) = Gegenkathete / Ankathete.`,
+            `tan(${angleA}) = ${opposite} / ${adjacent} = ${(opposite / adjacent).toFixed(4)}`,
+            `${angleA} = tan⁻¹(${(opposite / adjacent).toFixed(4)}) ≈ ${angle.toFixed(1)}°`
         ],
         sketch: {
             kind: 'right',
             horizontal: adjacent,
             vertical: opposite,
-            horizontalName: 'b',
-            verticalName: 'a',
-            hypotenuseName: 'c',
-            angleName: 'α',
+            horizontalName: sB,
+            verticalName: sA,
+            hypotenuseName: sC,
+            angleName: angleA,
             highlight: 'angle'
         }
     };
@@ -504,6 +582,7 @@ const buildWinkelTask = (): NumericTask => {
 
 // 5) Steigungswinkel: Grad <-> Prozent
 const buildSteigungTask = (): NumericTask => {
+    const [angleA] = pickLetterScheme().angles;
     const askPercent = Math.random() < 0.5;
     if (askPercent) {
         const angle = round(randomInRange(5, 35), 1);
@@ -512,13 +591,13 @@ const buildSteigungTask = (): NumericTask => {
             id: nextId(),
             kind: 'numeric',
             topic: 'Steigungswinkel',
-            prompt: `Eine Straße hat einen Steigungswinkel von α = ${angle}°. Berechne die Steigung in Prozent.`,
+            prompt: `Eine Straße hat einen Steigungswinkel von ${angleA} = ${angle}°. Berechne die Steigung in Prozent.`,
             unit: '%',
             correctAnswer: percent.toFixed(1),
             tolerance: relTolerance(percent),
             solutionSteps: [
-                `Gegeben: Steigungswinkel α = ${angle}°.`,
-                'Die Steigung in Prozent ist 100 · tan(α).',
+                `Gegeben: Steigungswinkel ${angleA} = ${angle}°.`,
+                `Die Steigung in Prozent ist 100 · tan(${angleA}).`,
                 `Steigung = 100 · tan(${angle}°) = 100 · ${Math.tan(degToRad(angle)).toFixed(4)}`,
                 `Steigung ≈ ${percent.toFixed(1)} %`
             ],
@@ -529,7 +608,7 @@ const buildSteigungTask = (): NumericTask => {
                 horizontalName: 'horizontale Strecke',
                 verticalName: '',
                 hypotenuseName: 'Weg',
-                angleName: 'α',
+                angleName: angleA,
                 highlight: 'none',
                 askedLabel: 'Steigung = ?'
             }
@@ -542,14 +621,14 @@ const buildSteigungTask = (): NumericTask => {
         id: nextId(),
         kind: 'numeric',
         topic: 'Steigungswinkel',
-        prompt: `Eine Straße hat eine Steigung von ${percent} %. Berechne den Steigungswinkel α.`,
+        prompt: `Eine Straße hat eine Steigung von ${percent} %. Berechne den Steigungswinkel ${angleA}.`,
         unit: '°',
         correctAnswer: angle.toFixed(1),
         tolerance: relTolerance(angle),
         solutionSteps: [
             `Gegeben: Steigung = ${percent} %.`,
-            `tan(α) = Steigung / 100 = ${percent} / 100 = ${(percent / 100).toFixed(4)}`,
-            `α = tan⁻¹(${(percent / 100).toFixed(4)}) ≈ ${angle.toFixed(1)}°`
+            `tan(${angleA}) = Steigung / 100 = ${percent} / 100 = ${(percent / 100).toFixed(4)}`,
+            `${angleA} = tan⁻¹(${(percent / 100).toFixed(4)}) ≈ ${angle.toFixed(1)}°`
         ],
         sketch: {
             kind: 'right',
@@ -558,7 +637,7 @@ const buildSteigungTask = (): NumericTask => {
             horizontalName: 'horizontale Strecke',
             verticalName: 'Steigung',
             hypotenuseName: 'Weg',
-            angleName: 'α',
+            angleName: angleA,
             highlight: 'angle'
         }
     };
@@ -566,6 +645,10 @@ const buildSteigungTask = (): NumericTask => {
 
 // 6) Sinussatz
 const buildSinussatzTask = (): NumericTask => {
+    const scheme = pickLetterScheme();
+    const [sA, sB] = scheme.sides;
+    const [angleA, angleB] = scheme.angles;
+    const generalLabels = schemeToGeneralLabels(scheme);
     let alpha = randomInRange(35, 110);
     let beta = randomInRange(25, 110);
     let gamma = 180 - alpha - beta;
@@ -587,22 +670,24 @@ const buildSinussatzTask = (): NumericTask => {
             id: nextId(),
             kind: 'numeric',
             topic: 'Sinussatz',
-            prompt: `In einem Dreieck sind a = ${a} cm, α = ${alpha}° und β = ${beta}° gegeben. Berechne die Seite b mit dem Sinussatz.`,
+            prompt: `In einem Dreieck sind ${sA} = ${a} cm, ${angleA} = ${alpha}° und ${angleB} = ${beta}° gegeben. Berechne die Seite ${sB} mit dem Sinussatz.`,
             unit: 'cm',
             correctAnswer: round(b, 2).toFixed(2),
             tolerance: relTolerance(b),
             solutionSteps: [
-                `Gegeben: a = ${a} cm, α = ${alpha}°, β = ${beta}°.`,
-                'Sinussatz: a / sin(α) = b / sin(β), also b = a · sin(β) / sin(α).',
-                `b = ${a} · sin(${beta}°) / sin(${alpha}°)`,
-                `b ≈ ${round(b, 2)} cm`
+                `Gegeben: ${sA} = ${a} cm, ${angleA} = ${alpha}°, ${angleB} = ${beta}°.`,
+                `Sinussatz: ${sA} / sin(${angleA}) = ${sB} / sin(${angleB}), also ${sB} = ${sA} · sin(${angleB}) / sin(${angleA}).`,
+                `${sB} = ${a} · sin(${beta}°) / sin(${alpha}°)`,
+                `${sB} ≈ ${round(b, 2)} cm`
             ],
             sketch: {
                 kind: 'general',
                 b: round(b, 2),
                 c: round(c, 2),
                 alpha,
-                highlightKey: 'b'
+                highlightKey: 'b',
+                points: scheme.points,
+                labels: generalLabels
             }
         };
     }
@@ -611,28 +696,34 @@ const buildSinussatzTask = (): NumericTask => {
         id: nextId(),
         kind: 'numeric',
         topic: 'Sinussatz',
-        prompt: `In einem Dreieck sind a = ${a} cm, b = ${round(b, 2)} cm und α = ${alpha}° gegeben. Berechne den Winkel β mit dem Sinussatz.`,
+        prompt: `In einem Dreieck sind ${sA} = ${a} cm, ${sB} = ${round(b, 2)} cm und ${angleA} = ${alpha}° gegeben. Berechne den Winkel ${angleB} mit dem Sinussatz.`,
         unit: '°',
         correctAnswer: beta.toFixed(1),
         tolerance: relTolerance(beta),
         solutionSteps: [
-            `Gegeben: a = ${a} cm, b = ${round(b, 2)} cm, α = ${alpha}°.`,
-            'Sinussatz: sin(β) / b = sin(α) / a, also sin(β) = b · sin(α) / a.',
-            `sin(β) = ${round(b, 2)} · sin(${alpha}°) / ${a}`,
-            `β = sin⁻¹(...) ≈ ${beta.toFixed(1)}°`
+            `Gegeben: ${sA} = ${a} cm, ${sB} = ${round(b, 2)} cm, ${angleA} = ${alpha}°.`,
+            `Sinussatz: sin(${angleB}) / ${sB} = sin(${angleA}) / ${sA}, also sin(${angleB}) = ${sB} · sin(${angleA}) / ${sA}.`,
+            `sin(${angleB}) = ${round(b, 2)} · sin(${alpha}°) / ${a}`,
+            `${angleB} = sin⁻¹(...) ≈ ${beta.toFixed(1)}°`
         ],
         sketch: {
             kind: 'general',
             b: round(b, 2),
             c: round(c, 2),
             alpha,
-            highlightKey: 'beta'
+            highlightKey: 'beta',
+            points: scheme.points,
+            labels: generalLabels
         }
     };
 };
 
 // 7) Kosinussatz
 const buildKosinussatzTask = (): NumericTask => {
+    const scheme = pickLetterScheme();
+    const [sA, sB, sC] = scheme.sides;
+    const [angleA, angleB] = scheme.angles;
+    const generalLabels = schemeToGeneralLabels(scheme);
     const b = round(randomInRange(5, 12), 2);
     const c = round(randomInRange(5, 12), 2);
     const alpha = round(randomInRange(35, 110), 1);
@@ -645,22 +736,24 @@ const buildKosinussatzTask = (): NumericTask => {
             id: nextId(),
             kind: 'numeric',
             topic: 'Kosinussatz',
-            prompt: `In einem Dreieck sind b = ${b} cm, c = ${c} cm und der eingeschlossene Winkel α = ${alpha}° gegeben. Berechne die Seite a mit dem Kosinussatz.`,
+            prompt: `In einem Dreieck sind ${sB} = ${b} cm, ${sC} = ${c} cm und der eingeschlossene Winkel ${angleA} = ${alpha}° gegeben. Berechne die Seite ${sA} mit dem Kosinussatz.`,
             unit: 'cm',
             correctAnswer: round(a, 2).toFixed(2),
             tolerance: relTolerance(a),
             solutionSteps: [
-                `Gegeben: b = ${b} cm, c = ${c} cm, α = ${alpha}°.`,
-                'Kosinussatz: a² = b² + c² − 2·b·c·cos(α).',
-                `a² = ${b}² + ${c}² − 2·${b}·${c}·cos(${alpha}°) = ${aSquared.toFixed(2)}`,
-                `a ≈ ${a.toFixed(2)} cm`
+                `Gegeben: ${sB} = ${b} cm, ${sC} = ${c} cm, ${angleA} = ${alpha}°.`,
+                `Kosinussatz: ${sA}² = ${sB}² + ${sC}² − 2·${sB}·${sC}·cos(${angleA}).`,
+                `${sA}² = ${b}² + ${c}² − 2·${b}·${c}·cos(${alpha}°) = ${aSquared.toFixed(2)}`,
+                `${sA} ≈ ${a.toFixed(2)} cm`
             ],
             sketch: {
                 kind: 'general',
                 b,
                 c,
                 alpha,
-                highlightKey: 'a'
+                highlightKey: 'a',
+                points: scheme.points,
+                labels: generalLabels
             }
         };
     }
@@ -671,28 +764,33 @@ const buildKosinussatzTask = (): NumericTask => {
         id: nextId(),
         kind: 'numeric',
         topic: 'Kosinussatz',
-        prompt: `In einem Dreieck sind a = ${round(a, 2)} cm, b = ${b} cm und c = ${c} cm gegeben. Berechne den Winkel β mit dem Kosinussatz.`,
+        prompt: `In einem Dreieck sind ${sA} = ${round(a, 2)} cm, ${sB} = ${b} cm und ${sC} = ${c} cm gegeben. Berechne den Winkel ${angleB} mit dem Kosinussatz.`,
         unit: '°',
         correctAnswer: beta.toFixed(1),
         tolerance: relTolerance(beta),
         solutionSteps: [
-            `Gegeben: a = ${round(a, 2)} cm, b = ${b} cm, c = ${c} cm.`,
-            'Kosinussatz: cos(β) = (a² + c² − b²) / (2·a·c).',
-            `cos(β) = (${round(a, 2)}² + ${c}² − ${b}²) / (2·${round(a, 2)}·${c})`,
-            `β = cos⁻¹(...) ≈ ${beta.toFixed(1)}°`
+            `Gegeben: ${sA} = ${round(a, 2)} cm, ${sB} = ${b} cm, ${sC} = ${c} cm.`,
+            `Kosinussatz: cos(${angleB}) = (${sA}² + ${sC}² − ${sB}²) / (2·${sA}·${sC}).`,
+            `cos(${angleB}) = (${round(a, 2)}² + ${c}² − ${b}²) / (2·${round(a, 2)}·${c})`,
+            `${angleB} = cos⁻¹(...) ≈ ${beta.toFixed(1)}°`
         ],
         sketch: {
             kind: 'general',
             b,
             c,
             alpha,
-            highlightKey: 'beta'
+            highlightKey: 'beta',
+            points: scheme.points,
+            labels: generalLabels
         }
     };
 };
 
 // 8) Flächensatz
 const buildFlaechensatzTask = (): NumericTask => {
+    const scheme = pickLetterScheme();
+    const [sA, sB, sC] = scheme.sides;
+    const [angleA, angleB, angleC] = scheme.angles;
     const a = round(randomInRange(4, 12), 2);
     const b = round(randomInRange(4, 12), 2);
     const gamma = round(randomInRange(20, 150), 1);
@@ -702,13 +800,13 @@ const buildFlaechensatzTask = (): NumericTask => {
         id: nextId(),
         kind: 'numeric',
         topic: 'Flächensatz',
-        prompt: `Ein Dreieck hat die Seiten a = ${a} cm und b = ${b} cm mit dem eingeschlossenen Winkel γ = ${gamma}°. Berechne den Flächeninhalt des Dreiecks.`,
+        prompt: `Ein Dreieck hat die Seiten ${sA} = ${a} cm und ${sB} = ${b} cm mit dem eingeschlossenen Winkel ${angleC} = ${gamma}°. Berechne den Flächeninhalt des Dreiecks.`,
         unit: 'cm²',
         correctAnswer: round(area, 2).toFixed(2),
         tolerance: relTolerance(area),
         solutionSteps: [
-            `Gegeben: a = ${a} cm, b = ${b} cm, γ = ${gamma}°.`,
-            'Flächenformel: A = ½ · a · b · sin(γ).',
+            `Gegeben: ${sA} = ${a} cm, ${sB} = ${b} cm, ${angleC} = ${gamma}°.`,
+            `Flächenformel: A = ½ · ${sA} · ${sB} · sin(${angleC}).`,
             `A = 0,5 · ${a} · ${b} · sin(${gamma}°)`,
             `A ≈ ${round(area, 2)} cm²`
         ],
@@ -718,7 +816,12 @@ const buildFlaechensatzTask = (): NumericTask => {
             c: b,
             alpha: gamma,
             highlightKey: 'none',
-            askedLabel: 'Fläche = ?'
+            askedLabel: 'Fläche = ?',
+            points: scheme.points,
+            // Interne Rollen entsprechen hier nicht 1:1 den Aufgaben-Buchstaben
+            // (die Skizze zeichnet den Winkel γ als "internes α" zwischen den
+            // Seiten a/b) - daher werden die Anzeige-Buchstaben explizit umgelegt.
+            labels: { a: sC, b: sA, c: sB, alpha: angleC, beta: angleA, gamma: angleB }
         }
     };
 };
@@ -1051,6 +1154,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                             sideA={task.triangle.sideA}
                             sideB={task.triangle.sideB}
                             sideC={task.triangle.sideC}
+                            angleLabelA={task.triangle.angleA}
+                            angleLabelB={task.triangle.angleB}
+                            angleLabelC={task.triangle.angleC}
                             rightAngleAtPoint={task.triangle.rightAngleAtPoint}
                             markedAngle={task.triangle.markedAngle}
                             markedAngleAtPoint={task.triangle.markedAngleAtPoint}
@@ -1058,7 +1164,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                     </div>
                     <div className="space-y-3">
                         <p className="text-slate-800 leading-relaxed">
-                            Vom Winkel {greekSymbols[task.triangle.markedAngle]} aus betrachtet: Ordne Hypotenuse, Gegenkathete und
+                            Vom Winkel {task.triangle.markedAngleSymbol} aus betrachtet: Ordne Hypotenuse, Gegenkathete und
                             Ankathete den richtigen Seiten zu.
                         </p>
                         {(['hypotenuse', 'opposite', 'adjacent'] as const).map(target => (
@@ -1067,8 +1173,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
                                     {target === 'hypotenuse'
                                         ? 'Hypotenuse'
                                         : target === 'opposite'
-                                        ? `Gegenkathete von ${greekSymbols[task.triangle.markedAngle]}`
-                                        : `Ankathete von ${greekSymbols[task.triangle.markedAngle]}`}
+                                        ? `Gegenkathete von ${task.triangle.markedAngleSymbol}`
+                                        : `Ankathete von ${task.triangle.markedAngleSymbol}`}
                                 </span>
                                 <select
                                     value={card.assignments[target] ?? '-'}
@@ -1109,6 +1215,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                             sideA={task.triangle.sideA}
                             sideB={task.triangle.sideB}
                             sideC={task.triangle.sideC}
+                            angleLabelA={task.triangle.angleA}
+                            angleLabelB={task.triangle.angleB}
+                            angleLabelC={task.triangle.angleC}
                             rightAngleAtPoint={task.triangle.rightAngleAtPoint}
                             markedAngle={task.triangle.markedAngle}
                             markedAngleAtPoint={task.triangle.markedAngleAtPoint}
@@ -1133,13 +1242,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
                             {task.type === 'functionToRatio' ? (
                                 <>
                                     Welcher Bruch entspricht {trigFunctionLabel[task.askedFunction!]}(
-                                    {greekSymbols[task.triangle.markedAngle]})?
+                                    {task.triangle.markedAngleSymbol})?
                                 </>
                             ) : (
                                 <>
                                     Welche Funktion beschreibt den Bruch{' '}
                                     <InlineMath math={`\\dfrac{${task.askedRatioLabel![0]}}{${task.askedRatioLabel![1]}}`} /> in Bezug
-                                    auf {greekSymbols[task.triangle.markedAngle]}?
+                                    auf {task.triangle.markedAngleSymbol}?
                                 </>
                             )}
                         </p>
