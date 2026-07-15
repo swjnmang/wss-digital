@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getTrackingLog, getTrackingStartedAt } from '../../utils/tracking';
+import { getEntryPoints, getTrackingLog, getTrackingScore, getTrackingStartedAt } from '../../utils/tracking';
+
+const formatPoints = (points: number) =>
+    (Number.isInteger(points) ? String(points) : points.toFixed(1)).replace('.', ',');
 
 const formatDateTime = (timestamp: number) =>
     new Date(timestamp).toLocaleString('de-DE', {
@@ -14,6 +17,7 @@ const formatDateTime = (timestamp: number) =>
 const NachverfolgungBericht: React.FC = () => {
     const log = getTrackingLog();
     const startedAt = getTrackingStartedAt();
+    const { points, maxPoints, percent } = getTrackingScore(log);
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -32,6 +36,14 @@ const NachverfolgungBericht: React.FC = () => {
                         Noch keine Aufgaben bearbeitet.
                     </p>
                 ) : (
+                    <>
+                    <div className="bg-teal-50 border border-teal-200 rounded-lg p-5 text-center space-y-1">
+                        <p className="text-sm font-semibold text-teal-800 uppercase tracking-wide">Gesamtpunktzahl</p>
+                        <p className="text-3xl font-bold text-teal-900">
+                            {formatPoints(points)} / {maxPoints} Punkte
+                        </p>
+                        <p className="text-sm text-teal-700">{percent.toFixed(0)} % erreicht</p>
+                    </div>
                     <div className="space-y-3">
                         {log.map((entry, index) => {
                             const statusIcon = entry.solved ? (entry.attempts === 1 ? '✅' : '⚠️') : '❌';
@@ -43,7 +55,7 @@ const NachverfolgungBericht: React.FC = () => {
                             return (
                                 <div
                                     key={`${entry.timestamp}-${index}`}
-                                    className="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3"
+                                    className="flex flex-wrap items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3"
                                 >
                                     <div className="flex items-center gap-3">
                                         <span className="text-lg">{statusIcon}</span>
@@ -54,15 +66,31 @@ const NachverfolgungBericht: React.FC = () => {
                                             <p className="text-sm text-gray-600">{statusText}</p>
                                         </div>
                                     </div>
-                                    {entry.hintUsed && (
-                                        <span className="text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full px-3 py-1">
-                                            💡 Tipp genutzt
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="text-xs font-semibold bg-slate-100 text-slate-700 rounded-full px-3 py-1">
+                                            +{formatPoints(getEntryPoints(entry))} Punkte
                                         </span>
-                                    )}
+                                        {entry.helpUsed === 'hint' && (
+                                            <span className="text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full px-3 py-1">
+                                                💡 Tipp genutzt
+                                            </span>
+                                        )}
+                                        {entry.helpUsed === 'solution' && (
+                                            <span className="text-xs font-semibold bg-orange-100 text-orange-800 rounded-full px-3 py-1">
+                                                📖 Musterlösung direkt angeschaut
+                                            </span>
+                                        )}
+                                        {entry.helpUsed === 'none' && entry.solved && (
+                                            <span className="text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full px-3 py-1">
+                                                🧠 Ohne Hilfe gelöst
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             );
                         })}
                     </div>
+                    </>
                 )}
 
                 <div className="flex justify-center">

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import RightTriangleSVG from '../../components/RightTriangleSVG';
-import { logTrackingEntry } from '../../utils/tracking';
+import { HelpUsage, logTrackingEntry } from '../../utils/tracking';
 
 // ---------- Allgemeine Hilfsfunktionen ----------
 
@@ -87,12 +87,61 @@ const NumericRightSketch: React.FC<{ spec: RightSketchSpec }> = ({ spec }) => {
 
     const colorFor = (part: RightHighlight) => (highlight === part ? HIGHLIGHT_COLOR : GIVEN_COLOR);
 
+    // Winkel-Bogen zwischen zwei Strahlen ab einem Scheitelpunkt (für Winkelmarkierung und rechten Winkel).
+    const computeArc = (
+        vertex: { x: number; y: number },
+        p1: { x: number; y: number },
+        p2: { x: number; y: number },
+        radius: number
+    ) => {
+        const v1 = { x: p1.x - vertex.x, y: p1.y - vertex.y };
+        const v2 = { x: p2.x - vertex.x, y: p2.y - vertex.y };
+        const len1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y) || 1;
+        const len2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y) || 1;
+        const u1 = { x: v1.x / len1, y: v1.y / len1 };
+        const u2 = { x: v2.x / len2, y: v2.y / len2 };
+        const start = { x: vertex.x + u1.x * radius, y: vertex.y + u1.y * radius };
+        const end = { x: vertex.x + u2.x * radius, y: vertex.y + u2.y * radius };
+
+        const angle1 = Math.atan2(v1.y, v1.x);
+        const angle2 = Math.atan2(v2.y, v2.x);
+        let delta = angle2 - angle1;
+        delta = ((delta + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+        const largeArc = Math.abs(delta) > Math.PI / 2 + 0.001 ? 1 : 0;
+        const sweep = delta > 0 ? 1 : 0;
+
+        let bisector = { x: u1.x + u2.x, y: u1.y + u2.y };
+        const bisectorLen = Math.sqrt(bisector.x * bisector.x + bisector.y * bisector.y);
+        bisector = bisectorLen > 0.0001 ? { x: bisector.x / bisectorLen, y: bisector.y / bisectorLen } : u1;
+
+        return { start, end, largeArc, sweep, bisector };
+    };
+
+    const A = { x: Ax, y: Ay };
+    const B = { x: Bx, y: By };
+    const C = { x: Cx, y: Cy };
+
+    // Rechter-Winkel-Markierung bei B (grauer Viertelkreis-Sektor mit Punkt).
+    const rightArc = computeArc(B, A, C, 18);
+    const rightSectorPath = `M ${B.x} ${B.y} L ${rightArc.start.x} ${rightArc.start.y} A 18 18 0 ${rightArc.largeArc} ${rightArc.sweep} ${rightArc.end.x} ${rightArc.end.y} Z`;
+    const rightDotRadius = 18 * 0.55;
+    const rightDotX = B.x + rightArc.bisector.x * rightDotRadius;
+    const rightDotY = B.y + rightArc.bisector.y * rightDotRadius;
+
+    // Winkelbogen für α bei A.
+    const alphaArc = computeArc(A, B, C, 24);
+    const alphaArcPath = `M ${alphaArc.start.x} ${alphaArc.start.y} A 24 24 0 ${alphaArc.largeArc} ${alphaArc.sweep} ${alphaArc.end.x} ${alphaArc.end.y}`;
+
     return (
         <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet" className="mx-auto">
             <polygon points={`${Ax},${Ay} ${Bx},${By} ${Cx},${Cy}`} fill="#eef2ff" stroke="#0f172a" strokeWidth={2} />
             <line x1={Ax} y1={Ay} x2={Bx} y2={By} stroke={colorFor('horizontal')} strokeWidth={3} />
             <line x1={Bx} y1={By} x2={Cx} y2={Cy} stroke={colorFor('vertical')} strokeWidth={3} />
             <line x1={Ax} y1={Ay} x2={Cx} y2={Cy} stroke={colorFor('hypotenuse')} strokeWidth={3} />
+
+            <path d={rightSectorPath} fill="#9CA3AF" fillOpacity="0.35" stroke="#6B7280" strokeWidth={1} />
+            <circle cx={rightDotX} cy={rightDotY} r={2.5} fill="#374151" />
+            <path d={alphaArcPath} fill="none" stroke={colorFor('angle')} strokeWidth={2} />
 
             <text x={(Ax + Bx) / 2} y={Ay + 18} textAnchor="middle" fontSize="12" fill={colorFor('horizontal')}>
                 {horizontalLabel}
@@ -396,8 +445,8 @@ const buildStreckenTask = (): NumericTask => {
         kind: 'numeric',
         topic: 'Streckenlänge berechnen',
         prompt: askOpposite
-            ? `In einem rechtwinkligen Dreieck ist die Hypotenuse c = ${hyp} cm und der Winkel α = ${alpha}°. Berechne die Gegenkathete a von α.`
-            : `In einem rechtwinkligen Dreieck ist die Hypotenuse c = ${hyp} cm und der Winkel α = ${alpha}°. Berechne die Ankathete b von α.`,
+            ? `In einem rechtwinkligen Dreieck sind die Seite c = ${hyp} cm und der Winkel α = ${alpha}° gegeben. Berechne die Seite a.`
+            : `In einem rechtwinkligen Dreieck sind die Seite c = ${hyp} cm und der Winkel α = ${alpha}° gegeben. Berechne die Seite b.`,
         unit: 'cm',
         correctAnswer: (askOpposite ? opposite : adjacent).toFixed(2),
         tolerance: relTolerance(askOpposite ? opposite : adjacent),
@@ -425,7 +474,7 @@ const buildWinkelTask = (): NumericTask => {
         id: nextId(),
         kind: 'numeric',
         topic: 'Winkel berechnen',
-        prompt: `In einem rechtwinkligen Dreieck sind die Ankathete b = ${adjacent} cm und die Gegenkathete a = ${opposite} cm eines Winkels α bekannt. Berechne α.`,
+        prompt: `In einem rechtwinkligen Dreieck sind die Seite b = ${adjacent} cm und die Seite a = ${opposite} cm bekannt. Berechne den Winkel α.`,
         unit: '°',
         correctAnswer: angle.toFixed(1),
         tolerance: relTolerance(angle),
@@ -711,7 +760,7 @@ interface CardState {
     feedbackType: 'correct' | 'incorrect' | null;
     showSolution: boolean;
     attempts: number;
-    hintUsed: boolean;
+    helpUsed: HelpUsage;
 }
 
 const buildCard = (task: MixedTask): CardState => ({
@@ -723,7 +772,7 @@ const buildCard = (task: MixedTask): CardState => ({
     feedbackType: null,
     showSolution: false,
     attempts: 0,
-    hintUsed: false
+    helpUsed: 'none'
 });
 
 // Loggt eine Karte, die Versuche hatte, aber nie gelöst wurde (z. B. vor dem Neu-Generieren).
@@ -734,7 +783,7 @@ const flushUnsolvedCard = (card: CardState) => {
             attempts: card.attempts,
             firstTryCorrect: false,
             solved: false,
-            hintUsed: card.hintUsed
+            helpUsed: card.helpUsed
         });
     }
 };
@@ -776,7 +825,12 @@ const GemischteUebungsaufgaben: React.FC = () => {
             prev.map(card => {
                 if (card.task.id !== taskId) return card;
                 const next = !card.showSolution;
-                return { ...card, showSolution: next, hintUsed: card.hintUsed || next };
+                if (!next) return { ...card, showSolution: next };
+                // Vor dem ersten Versuch angeschaut -> Musterlösung direkt übernommen.
+                // Erst nach einem falschen Versuch angeschaut -> als Tipp genutzt.
+                const helpUsed: HelpUsage =
+                    card.attempts === 0 ? 'solution' : card.helpUsed === 'none' ? 'hint' : card.helpUsed;
+                return { ...card, showSolution: next, helpUsed };
             })
         );
     };
@@ -803,7 +857,7 @@ const GemischteUebungsaufgaben: React.FC = () => {
                 attempts
             });
             if (isCorrect) {
-                logTrackingEntry({ topic: task.topic, attempts, firstTryCorrect: attempts === 1, solved: true, hintUsed: card.hintUsed });
+                logTrackingEntry({ topic: task.topic, attempts, firstTryCorrect: attempts === 1, solved: true, helpUsed: card.helpUsed });
             }
             return;
         }
@@ -825,7 +879,7 @@ const GemischteUebungsaufgaben: React.FC = () => {
                 attempts
             });
             if (isCorrect) {
-                logTrackingEntry({ topic: task.topic, attempts, firstTryCorrect: attempts === 1, solved: true, hintUsed: card.hintUsed });
+                logTrackingEntry({ topic: task.topic, attempts, firstTryCorrect: attempts === 1, solved: true, helpUsed: card.helpUsed });
             }
             return;
         }
@@ -843,7 +897,7 @@ const GemischteUebungsaufgaben: React.FC = () => {
             attempts
         });
         if (isCorrect) {
-            logTrackingEntry({ topic: task.topic, attempts, firstTryCorrect: attempts === 1, solved: true, hintUsed: card.hintUsed });
+            logTrackingEntry({ topic: task.topic, attempts, firstTryCorrect: attempts === 1, solved: true, helpUsed: card.helpUsed });
         }
     };
 
