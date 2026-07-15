@@ -48,7 +48,7 @@ const LETTER_SCHEMES: LetterScheme[] = [
     { points: ['A', 'B', 'C'], sides: ['a', 'b', 'c'], angles: ['α', 'β', 'γ'] },
     { points: ['P', 'Q', 'R'], sides: ['p', 'q', 'r'], angles: ['φ', 'ψ', 'χ'] },
     { points: ['D', 'E', 'F'], sides: ['d', 'e', 'f'], angles: ['δ', 'ε', 'ζ'] },
-    { points: ['X', 'Y', 'Z'], sides: ['x', 'y', 'z'], angles: ['ξ', 'υ', 'ω'] }
+    { points: ['B', 'C', 'D'], sides: ['b', 'c', 'd'], angles: ['β', 'γ', 'δ'] }
 ];
 
 const DEFAULT_POINTS: [string, string, string] = ['A', 'B', 'C'];
@@ -305,6 +305,11 @@ const NumericSketch: React.FC<{ sketch: SketchSpec }> = ({ sketch }) =>
 
 // ---------- Aufgaben-Typen ----------
 
+interface SolutionStep {
+    text: string;
+    math?: string;
+}
+
 interface NumericTask {
     id: number;
     kind: 'numeric';
@@ -314,7 +319,7 @@ interface NumericTask {
     correctAnswer: string;
     tolerance: number;
     sketch: SketchSpec;
-    solutionSteps: string[];
+    solutionSteps: SolutionStep[];
 }
 
 interface LabelTriangle {
@@ -506,18 +511,24 @@ const buildStreckenTask = (): NumericTask => {
     const opposite = hyp * Math.sin(degToRad(alpha));
     const adjacent = hyp * Math.cos(degToRad(alpha));
 
-    const solutionSteps = askOpposite
+    const solutionSteps: SolutionStep[] = askOpposite
         ? [
-              `Gegeben: Hypotenuse ${sC} = ${hyp} cm, Winkel ${angleA} = ${alpha}°.`,
-              `Verwende den Sinus: sin(${angleA}) = Gegenkathete / Hypotenuse, also ${sA} = ${sC} · sin(${angleA}).`,
-              `${sA} = ${hyp} · sin(${alpha}°) = ${hyp} · ${Math.sin(degToRad(alpha)).toFixed(4)}`,
-              `${sA} ≈ ${opposite.toFixed(2)} cm`
+              { text: 'Gegeben', math: `${sC} = ${hyp}\\,\\text{cm}, \\quad ${angleA} = ${alpha}^\\circ` },
+              {
+                  text: 'Sinus verwenden (Gegenkathete / Hypotenuse)',
+                  math: `\\sin(${angleA}) = \\dfrac{${sA}}{${sC}} \\;\\Rightarrow\\; ${sA} = ${sC} \\cdot \\sin(${angleA})`
+              },
+              { text: 'Werte einsetzen', math: `${sA} = ${hyp} \\cdot \\sin(${alpha}^\\circ) = ${hyp} \\cdot ${Math.sin(degToRad(alpha)).toFixed(4)}` },
+              { text: 'Ergebnis', math: `${sA} \\approx ${opposite.toFixed(2)}\\,\\text{cm}` }
           ]
         : [
-              `Gegeben: Hypotenuse ${sC} = ${hyp} cm, Winkel ${angleA} = ${alpha}°.`,
-              `Verwende den Kosinus: cos(${angleA}) = Ankathete / Hypotenuse, also ${sB} = ${sC} · cos(${angleA}).`,
-              `${sB} = ${hyp} · cos(${alpha}°) = ${hyp} · ${Math.cos(degToRad(alpha)).toFixed(4)}`,
-              `${sB} ≈ ${adjacent.toFixed(2)} cm`
+              { text: 'Gegeben', math: `${sC} = ${hyp}\\,\\text{cm}, \\quad ${angleA} = ${alpha}^\\circ` },
+              {
+                  text: 'Kosinus verwenden (Ankathete / Hypotenuse)',
+                  math: `\\cos(${angleA}) = \\dfrac{${sB}}{${sC}} \\;\\Rightarrow\\; ${sB} = ${sC} \\cdot \\cos(${angleA})`
+              },
+              { text: 'Werte einsetzen', math: `${sB} = ${hyp} \\cdot \\cos(${alpha}^\\circ) = ${hyp} \\cdot ${Math.cos(degToRad(alpha)).toFixed(4)}` },
+              { text: 'Ergebnis', math: `${sB} \\approx ${adjacent.toFixed(2)}\\,\\text{cm}` }
           ];
 
     return {
@@ -562,10 +573,10 @@ const buildWinkelTask = (): NumericTask => {
         correctAnswer: angle.toFixed(1),
         tolerance: relTolerance(angle),
         solutionSteps: [
-            `Gegeben: Ankathete ${sB} = ${adjacent} cm, Gegenkathete ${sA} = ${opposite} cm.`,
-            `Verwende den Tangens: tan(${angleA}) = Gegenkathete / Ankathete.`,
-            `tan(${angleA}) = ${opposite} / ${adjacent} = ${(opposite / adjacent).toFixed(4)}`,
-            `${angleA} = tan⁻¹(${(opposite / adjacent).toFixed(4)}) ≈ ${angle.toFixed(1)}°`
+            { text: 'Gegeben', math: `${sB} = ${adjacent}\\,\\text{cm} \\text{ (Ankathete)}, \\quad ${sA} = ${opposite}\\,\\text{cm} \\text{ (Gegenkathete)}` },
+            { text: 'Tangens verwenden', math: `\\tan(${angleA}) = \\dfrac{\\text{Gegenkathete}}{\\text{Ankathete}} = \\dfrac{${sA}}{${sB}}` },
+            { text: 'Werte einsetzen', math: `\\tan(${angleA}) = \\dfrac{${opposite}}{${adjacent}} = ${(opposite / adjacent).toFixed(4)}` },
+            { text: 'Umkehrfunktion verwenden', math: `${angleA} = \\tan^{-1}(${(opposite / adjacent).toFixed(4)}) \\approx ${angle.toFixed(1)}^\\circ` }
         ],
         sketch: {
             kind: 'right',
@@ -596,10 +607,10 @@ const buildSteigungTask = (): NumericTask => {
             correctAnswer: percent.toFixed(1),
             tolerance: relTolerance(percent),
             solutionSteps: [
-                `Gegeben: Steigungswinkel ${angleA} = ${angle}°.`,
-                `Die Steigung in Prozent ist 100 · tan(${angleA}).`,
-                `Steigung = 100 · tan(${angle}°) = 100 · ${Math.tan(degToRad(angle)).toFixed(4)}`,
-                `Steigung ≈ ${percent.toFixed(1)} %`
+                { text: 'Gegeben', math: `${angleA} = ${angle}^\\circ` },
+                { text: 'Formel für die Steigung', math: `\\text{Steigung} = 100 \\cdot \\tan(${angleA})` },
+                { text: 'Werte einsetzen', math: `\\text{Steigung} = 100 \\cdot \\tan(${angle}^\\circ) = 100 \\cdot ${Math.tan(degToRad(angle)).toFixed(4)}` },
+                { text: 'Ergebnis', math: `\\text{Steigung} \\approx ${percent.toFixed(1)}\\,\\%` }
             ],
             sketch: {
                 kind: 'right',
@@ -626,9 +637,9 @@ const buildSteigungTask = (): NumericTask => {
         correctAnswer: angle.toFixed(1),
         tolerance: relTolerance(angle),
         solutionSteps: [
-            `Gegeben: Steigung = ${percent} %.`,
-            `tan(${angleA}) = Steigung / 100 = ${percent} / 100 = ${(percent / 100).toFixed(4)}`,
-            `${angleA} = tan⁻¹(${(percent / 100).toFixed(4)}) ≈ ${angle.toFixed(1)}°`
+            { text: 'Gegeben', math: `\\text{Steigung} = ${percent}\\,\\%` },
+            { text: 'Formel umstellen', math: `\\tan(${angleA}) = \\dfrac{\\text{Steigung}}{100} = \\dfrac{${percent}}{100} = ${(percent / 100).toFixed(4)}` },
+            { text: 'Umkehrfunktion verwenden', math: `${angleA} = \\tan^{-1}(${(percent / 100).toFixed(4)}) \\approx ${angle.toFixed(1)}^\\circ` }
         ],
         sketch: {
             kind: 'right',
@@ -675,10 +686,11 @@ const buildSinussatzTask = (): NumericTask => {
             correctAnswer: round(b, 2).toFixed(2),
             tolerance: relTolerance(b),
             solutionSteps: [
-                `Gegeben: ${sA} = ${a} cm, ${angleA} = ${alpha}°, ${angleB} = ${beta}°.`,
-                `Sinussatz: ${sA} / sin(${angleA}) = ${sB} / sin(${angleB}), also ${sB} = ${sA} · sin(${angleB}) / sin(${angleA}).`,
-                `${sB} = ${a} · sin(${beta}°) / sin(${alpha}°)`,
-                `${sB} ≈ ${round(b, 2)} cm`
+                { text: 'Gegeben', math: `${sA} = ${a}\\,\\text{cm}, \\quad ${angleA} = ${alpha}^\\circ, \\quad ${angleB} = ${beta}^\\circ` },
+                { text: 'Sinussatz aufschreiben', math: `\\dfrac{${sA}}{\\sin(${angleA})} = \\dfrac{${sB}}{\\sin(${angleB})}` },
+                { text: `${sB} isolieren`, math: `${sB} = \\dfrac{\\sin(${angleB})}{\\sin(${angleA})} \\cdot ${sA}` },
+                { text: 'Werte einsetzen', math: `${sB} = \\dfrac{\\sin(${beta}^\\circ)}{\\sin(${alpha}^\\circ)} \\cdot ${a}` },
+                { text: 'Ergebnis', math: `${sB} \\approx ${round(b, 2)}\\,\\text{cm}` }
             ],
             sketch: {
                 kind: 'general',
@@ -692,6 +704,7 @@ const buildSinussatzTask = (): NumericTask => {
         };
     }
 
+    const sinBeta = Math.min(1, Math.max(-1, (round(b, 2) * Math.sin(degToRad(alpha))) / a));
     return {
         id: nextId(),
         kind: 'numeric',
@@ -701,10 +714,11 @@ const buildSinussatzTask = (): NumericTask => {
         correctAnswer: beta.toFixed(1),
         tolerance: relTolerance(beta),
         solutionSteps: [
-            `Gegeben: ${sA} = ${a} cm, ${sB} = ${round(b, 2)} cm, ${angleA} = ${alpha}°.`,
-            `Sinussatz: sin(${angleB}) / ${sB} = sin(${angleA}) / ${sA}, also sin(${angleB}) = ${sB} · sin(${angleA}) / ${sA}.`,
-            `sin(${angleB}) = ${round(b, 2)} · sin(${alpha}°) / ${a}`,
-            `${angleB} = sin⁻¹(...) ≈ ${beta.toFixed(1)}°`
+            { text: 'Gegeben', math: `${sA} = ${a}\\,\\text{cm}, \\quad ${sB} = ${round(b, 2)}\\,\\text{cm}, \\quad ${angleA} = ${alpha}^\\circ` },
+            { text: 'Sinussatz mit Winkeln formulieren', math: `\\dfrac{\\sin(${angleB})}{${sB}} = \\dfrac{\\sin(${angleA})}{${sA}}` },
+            { text: `${angleB} isolieren`, math: `\\sin(${angleB}) = \\dfrac{${sB}}{${sA}} \\cdot \\sin(${angleA})` },
+            { text: 'Werte einsetzen', math: `\\sin(${angleB}) = \\dfrac{${round(b, 2)}}{${a}} \\cdot \\sin(${alpha}^\\circ)` },
+            { text: 'Umkehrfunktion (Sinus⁻¹) verwenden', math: `${angleB} = \\sin^{-1}(${sinBeta.toFixed(3)}) \\approx ${beta.toFixed(1)}^\\circ` }
         ],
         sketch: {
             kind: 'general',
@@ -741,10 +755,10 @@ const buildKosinussatzTask = (): NumericTask => {
             correctAnswer: round(a, 2).toFixed(2),
             tolerance: relTolerance(a),
             solutionSteps: [
-                `Gegeben: ${sB} = ${b} cm, ${sC} = ${c} cm, ${angleA} = ${alpha}°.`,
-                `Kosinussatz: ${sA}² = ${sB}² + ${sC}² − 2·${sB}·${sC}·cos(${angleA}).`,
-                `${sA}² = ${b}² + ${c}² − 2·${b}·${c}·cos(${alpha}°) = ${aSquared.toFixed(2)}`,
-                `${sA} ≈ ${a.toFixed(2)} cm`
+                { text: 'Gegeben', math: `${sB} = ${b}\\,\\text{cm}, \\quad ${sC} = ${c}\\,\\text{cm}, \\quad ${angleA} = ${alpha}^\\circ` },
+                { text: 'Kosinussatz aufschreiben', math: `${sA}^2 = ${sB}^2 + ${sC}^2 - 2 \\cdot ${sB} \\cdot ${sC} \\cdot \\cos(${angleA})` },
+                { text: 'Werte einsetzen', math: `${sA}^2 = ${b}^2 + ${c}^2 - 2 \\cdot ${b} \\cdot ${c} \\cdot \\cos(${alpha}^\\circ) = ${aSquared.toFixed(2)}` },
+                { text: 'Wurzel ziehen', math: `${sA} = \\sqrt{${aSquared.toFixed(2)}} \\approx ${a.toFixed(2)}\\,\\text{cm}` }
             ],
             sketch: {
                 kind: 'general',
@@ -758,8 +772,8 @@ const buildKosinussatzTask = (): NumericTask => {
         };
     }
 
-    const cosBeta = (a * a + c * c - b * b) / (2 * a * c);
-    const beta = radToDeg(Math.acos(Math.min(1, Math.max(-1, cosBeta))));
+    const cosBeta = Math.min(1, Math.max(-1, (a * a + c * c - b * b) / (2 * a * c)));
+    const beta = radToDeg(Math.acos(cosBeta));
     return {
         id: nextId(),
         kind: 'numeric',
@@ -769,10 +783,13 @@ const buildKosinussatzTask = (): NumericTask => {
         correctAnswer: beta.toFixed(1),
         tolerance: relTolerance(beta),
         solutionSteps: [
-            `Gegeben: ${sA} = ${round(a, 2)} cm, ${sB} = ${b} cm, ${sC} = ${c} cm.`,
-            `Kosinussatz: cos(${angleB}) = (${sA}² + ${sC}² − ${sB}²) / (2·${sA}·${sC}).`,
-            `cos(${angleB}) = (${round(a, 2)}² + ${c}² − ${b}²) / (2·${round(a, 2)}·${c})`,
-            `${angleB} = cos⁻¹(...) ≈ ${beta.toFixed(1)}°`
+            { text: 'Gegeben', math: `${sA} = ${round(a, 2)}\\,\\text{cm}, \\quad ${sB} = ${b}\\,\\text{cm}, \\quad ${sC} = ${c}\\,\\text{cm}` },
+            { text: `Kosinussatz nach cos(${angleB}) umstellen`, math: `\\cos(${angleB}) = \\dfrac{${sA}^2 + ${sC}^2 - ${sB}^2}{2 \\cdot ${sA} \\cdot ${sC}}` },
+            {
+                text: 'Werte einsetzen',
+                math: `\\cos(${angleB}) = \\dfrac{${round(a, 2)}^2 + ${c}^2 - ${b}^2}{2 \\cdot ${round(a, 2)} \\cdot ${c}} = ${cosBeta.toFixed(4)}`
+            },
+            { text: 'Umkehrfunktion verwenden', math: `${angleB} = \\cos^{-1}(${cosBeta.toFixed(4)}) \\approx ${beta.toFixed(1)}^\\circ` }
         ],
         sketch: {
             kind: 'general',
@@ -805,10 +822,10 @@ const buildFlaechensatzTask = (): NumericTask => {
         correctAnswer: round(area, 2).toFixed(2),
         tolerance: relTolerance(area),
         solutionSteps: [
-            `Gegeben: ${sA} = ${a} cm, ${sB} = ${b} cm, ${angleC} = ${gamma}°.`,
-            `Flächenformel: A = ½ · ${sA} · ${sB} · sin(${angleC}).`,
-            `A = 0,5 · ${a} · ${b} · sin(${gamma}°)`,
-            `A ≈ ${round(area, 2)} cm²`
+            { text: 'Gegeben', math: `${sA} = ${a}\\,\\text{cm}, \\quad ${sB} = ${b}\\,\\text{cm}, \\quad ${angleC} = ${gamma}^\\circ` },
+            { text: 'Flächenformel aufschreiben', math: `A = \\dfrac{1}{2} \\cdot ${sA} \\cdot ${sB} \\cdot \\sin(${angleC})` },
+            { text: 'Werte einsetzen', math: `A = 0{,}5 \\cdot ${a} \\cdot ${b} \\cdot \\sin(${gamma}^\\circ)` },
+            { text: 'Ergebnis', math: `A \\approx ${round(area, 2)}\\,\\text{cm}^2` }
         ],
         sketch: {
             kind: 'general',
@@ -1134,11 +1151,22 @@ const TaskCard: React.FC<TaskCardProps> = ({
                             <div className={`rounded-lg border px-3 py-2 text-sm font-semibold ${feedbackClass}`}>{card.feedback}</div>
                         )}
                         {card.showSolution && (
-                            <ul className="text-sm text-slate-600 space-y-1 bg-slate-50 rounded-lg p-3 border border-slate-100">
-                                {task.solutionSteps.map((step, i) => (
-                                    <li key={i}>• {step}</li>
-                                ))}
-                            </ul>
+                            <div className="bg-slate-50 rounded-lg border border-slate-100 p-3">
+                                <div className="bg-white rounded-lg border border-slate-200 p-3">
+                                    <ol className="list-decimal pl-5 space-y-3 text-sm text-gray-700">
+                                        {task.solutionSteps.map((step, i) => (
+                                            <li key={i} className="space-y-1">
+                                                <p className="font-medium text-gray-800">{step.text}</p>
+                                                {step.math && (
+                                                    <div className="bg-gray-50 border border-gray-200 rounded px-2 py-1 inline-block">
+                                                        <InlineMath math={step.math} />
+                                                    </div>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ol>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>
