@@ -928,41 +928,91 @@ const buildFlaechensatzTask = (): NumericTask => {
     const scheme = pickLetterScheme();
     const [sA, sB, sC] = scheme.sides;
     const [angleA, angleB, angleC] = scheme.angles;
+
+    // Winkel konsistent über die Winkelsumme erzeugen und Seite b über den
+    // Sinussatz ableiten. So passen alle Angaben zusammen - wichtig für die
+    // zweistufige Variante, bei der α und β statt des eingeschlossenen
+    // Winkels γ gegeben sind.
+    let alphaRaw = randomInRange(25, 110);
+    let betaRaw = randomInRange(25, 110);
+    let gammaRaw = 180 - alphaRaw - betaRaw;
+    while (gammaRaw < 25 || gammaRaw > 130) {
+        alphaRaw = randomInRange(25, 110);
+        betaRaw = randomInRange(25, 110);
+        gammaRaw = 180 - alphaRaw - betaRaw;
+    }
+    const alpha = round(alphaRaw, 1);
+    const beta = round(betaRaw, 1);
+    const gamma = round(180 - alpha - beta, 1);
     const a = round(randomInRange(4, 12), 2);
-    const b = round(randomInRange(4, 12), 2);
-    const gamma = round(randomInRange(20, 150), 1);
+    const b = round((a * Math.sin(degToRad(beta))) / Math.sin(degToRad(alpha)), 2);
     const area = 0.5 * a * b * Math.sin(degToRad(gamma));
 
+    const includedAngleGiven = Math.random() < 0.5;
+
+    const sketch: SketchSpec = {
+        kind: 'general',
+        b: a,
+        c: b,
+        alpha: gamma,
+        // Bei der zweistufigen Variante wird der fehlende eingeschlossene
+        // Winkel (interne alpha-Position) rot mit "= ?" markiert.
+        highlightKey: includedAngleGiven ? 'none' : 'alpha',
+        askedLabel: 'Fläche = ?',
+        // Punktnamen passend zur Rollen-Umlegung: Der Scheitel des gegebenen
+        // Winkels (interne alpha-Position) trägt angleC und muss daher den
+        // dritten Punktnamen bekommen (zu Winkel γ gehört Punkt C usw.).
+        points: [scheme.points[2], scheme.points[0], scheme.points[1]],
+        // Interne Rollen entsprechen hier nicht 1:1 den Aufgaben-Buchstaben
+        // (die Skizze zeichnet den Winkel γ als "internes α" zwischen den
+        // Seiten a/b) - daher werden die Anzeige-Buchstaben explizit umgelegt.
+        labels: { a: sC, b: sA, c: sB, alpha: angleC, beta: angleA, gamma: angleB }
+    };
+
+    if (includedAngleGiven) {
+        return {
+            id: nextId(),
+            kind: 'numeric',
+            topic: 'Flächensatz',
+            prompt: `Ein Dreieck hat die Seiten ${sA} = ${a} cm und ${sB} = ${b} cm mit dem eingeschlossenen Winkel ${angleC} = ${gamma}°. Berechne den Flächeninhalt des Dreiecks.`,
+            unit: 'cm²',
+            correctAnswer: round(area, 2).toFixed(2),
+            tolerance: relTolerance(area),
+            solutionSteps: [
+                { text: 'Gegeben', math: `${sA} = ${a}\\,\\text{cm}, \\quad ${sB} = ${b}\\,\\text{cm}, \\quad ${angleC} = ${gamma}^\\circ` },
+                { text: 'Flächenformel aufschreiben', math: `A = \\dfrac{1}{2} \\cdot ${sA} \\cdot ${sB} \\cdot \\sin(${angleC})` },
+                { text: 'Werte einsetzen', math: `A = 0{,}5 \\cdot ${a} \\cdot ${b} \\cdot \\sin(${gamma}^\\circ)` },
+                { text: 'Ergebnis', math: `A \\approx ${round(area, 2)}\\,\\text{cm}^2` }
+            ],
+            sketch
+        };
+    }
+
+    // Zweistufige Variante: Die beiden NICHT eingeschlossenen Winkel sind
+    // gegeben - der eingeschlossene Winkel muss zuerst über die Winkelsumme
+    // berechnet werden.
     return {
         id: nextId(),
         kind: 'numeric',
         topic: 'Flächensatz',
-        prompt: `Ein Dreieck hat die Seiten ${sA} = ${a} cm und ${sB} = ${b} cm mit dem eingeschlossenen Winkel ${angleC} = ${gamma}°. Berechne den Flächeninhalt des Dreiecks.`,
+        prompt: `Ein Dreieck hat die Seiten ${sA} = ${a} cm und ${sB} = ${b} cm sowie die Winkel ${angleA} = ${alpha}° und ${angleB} = ${beta}°. Berechne den Flächeninhalt des Dreiecks.`,
         unit: 'cm²',
         correctAnswer: round(area, 2).toFixed(2),
         tolerance: relTolerance(area),
         solutionSteps: [
-            { text: 'Gegeben', math: `${sA} = ${a}\\,\\text{cm}, \\quad ${sB} = ${b}\\,\\text{cm}, \\quad ${angleC} = ${gamma}^\\circ` },
+            {
+                text: 'Gegeben',
+                math: `${sA} = ${a}\\,\\text{cm}, \\quad ${sB} = ${b}\\,\\text{cm}, \\quad ${angleA} = ${alpha}^\\circ, \\quad ${angleB} = ${beta}^\\circ`
+            },
+            {
+                text: `Fehlenden eingeschlossenen Winkel ${angleC} über die Winkelsumme berechnen`,
+                math: `${angleC} = 180^\\circ - ${angleA} - ${angleB} = 180^\\circ - ${alpha}^\\circ - ${beta}^\\circ = ${gamma}^\\circ`
+            },
             { text: 'Flächenformel aufschreiben', math: `A = \\dfrac{1}{2} \\cdot ${sA} \\cdot ${sB} \\cdot \\sin(${angleC})` },
             { text: 'Werte einsetzen', math: `A = 0{,}5 \\cdot ${a} \\cdot ${b} \\cdot \\sin(${gamma}^\\circ)` },
             { text: 'Ergebnis', math: `A \\approx ${round(area, 2)}\\,\\text{cm}^2` }
         ],
-        sketch: {
-            kind: 'general',
-            b: a,
-            c: b,
-            alpha: gamma,
-            highlightKey: 'none',
-            askedLabel: 'Fläche = ?',
-            // Punktnamen passend zur Rollen-Umlegung: Der Scheitel des gegebenen
-            // Winkels (interne alpha-Position) trägt angleC und muss daher den
-            // dritten Punktnamen bekommen (zu Winkel γ gehört Punkt C usw.).
-            points: [scheme.points[2], scheme.points[0], scheme.points[1]],
-            // Interne Rollen entsprechen hier nicht 1:1 den Aufgaben-Buchstaben
-            // (die Skizze zeichnet den Winkel γ als "internes α" zwischen den
-            // Seiten a/b) - daher werden die Anzeige-Buchstaben explizit umgelegt.
-            labels: { a: sC, b: sA, c: sB, alpha: angleC, beta: angleA, gamma: angleB }
-        }
+        sketch
     };
 };
 
