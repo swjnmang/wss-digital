@@ -16,7 +16,13 @@ Trigonometrie (`src/pages/trigonometrie/GemischteUebungsaufgaben.tsx`).
   injiziert. Alle UI-Elemente (Toolbar, Menü) sind ausgeblendet.
 - Das Dreieck wird im `appletOnLoad`-Callback per `evalCommand` konstruiert:
   Punkte, `Polygon` (Kantennamen kommen aus `evalCommandGetLabels` zurück),
-  `Angle`-Objekte, Captions über `SetCaption` + `SetLabelMode(obj, 3)`.
+  Captions über `SetCaption` + `SetLabelMode(obj, 3)`.
+- Winkel werden **manuell** als unsichtbarer `Circle` + `Arc`/`Sector`
+  gezeichnet (nicht über das native `Angle()`-Objekt), damit Radius und Stil
+  steuerbar sind: Bogengröße 50 px (statt GeoGebra-Standard 30, gekappt auf die
+  kürzere anliegende Seite), rechter Winkel als grauer Viertelkreis-Sektor mit
+  Punkt darin, Winkellabels als eigene Text-Objekte auf der Winkelhalbierenden
+  (bei spitzen Winkeln dynamisch weiter außen).
 - Alle Objekte sind fixiert (`setFixed`); Schüler:innen können aber **zoomen und
   die Ansicht verschieben** (`enableShiftDragZoom: true`, `showZoomButtons: true`)
   und über das Reset-Icon zur Ausgangsansicht zurückkehren.
@@ -29,8 +35,24 @@ Trigonometrie (`src/pages/trigonometrie/GemischteUebungsaufgaben.tsx`).
   die sichtbaren Namen werden als eigene `Text`-Objekte vom Schwerpunkt weg nach
   außen versetzt. Das verhindert Kollisionen mit den innenliegenden
   Winkellabels und Namenskonflikte mit GeoGebra-Konstanten (z. B. `e`).
-- **Rechter Winkel**: Ein Winkel ohne `label` zeigt nur den Bogen; bei exakt 90°
-  rendert GeoGebra automatisch das Quadrat-Symbol.
+- **Rechter Winkel**: `rightAngle: true` zeichnet den klassischen grauen
+  Viertelkreis-Sektor mit Punkt in der Mitte; ein Winkel ohne `label` zeigt nur
+  den Bogen.
+- **GeoGebra-Stolperfallen** (kosteten Debugging-Zeit, unbedingt beachten):
+  - `Arc(kreis, ...)` / `Sector(kreis, ...)` erwarten **Winkel-Parameter in
+    Radiant** (`Arc(c, t1, t2)`), nicht zwei Punkte. Varianten wie
+    `CircularArc`/`CircularSector`/`Arc(c, P, Q)` schlagen als evalCommand fehl.
+  - Arc-/Sector-Objekte akzeptieren `SetColor`/`ShowLabel`/`SetFixed`/
+    `SetLineThickness`/`SetFilling` **nicht als evalCommand-Textbefehl**
+    (liefert nur `false`) – dort müssen die direkten API-Methoden
+    (`api.setColor(...)`, `api.setLabelVisible(...)`, …) verwendet werden.
+    Bei Punkten/Segmenten/Texten funktionieren beide Wege.
+  - `name=(x,y)` mit **kleingeschriebenem** Namen erzeugt einen **Vektor**,
+    kein Punkt – `SetPointSize` wirft dann einen sichtbaren Fehlerdialog.
+    Punktnamen immer mit Großbuchstaben beginnen.
+  - `SetFontSize` existiert nicht als GeoGebra-Befehl (sichtbarer
+    Fehlerdialog); Schriftgröße nur global über den Applet-Parameter
+    `fontSize`.
 - **Gesuchte Größen**: `highlighted: true` färbt rot und zeichnet dicker. Das
   „= ?" hängt der Aufrufer selbst an den Label-Text an.
 - **Neu zeichnen**: Die Komponente zeichnet nur beim Mount. Neue Aufgabenwerte

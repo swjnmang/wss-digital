@@ -324,8 +324,7 @@ const NumericSketch: React.FC<{ sketch: SketchSpec }> = ({ sketch }) => {
                 ]}
                 angles={[
                     { label: asked(angleName, highlight === 'angle'), highlighted: highlight === 'angle' },
-                    // Rechter Winkel: nur das 90°-Symbol, ohne Beschriftung.
-                    {},
+                    { rightAngle: true },
                     { show: false }
                 ]}
                 askedLabel={sketch.askedLabel}
@@ -437,8 +436,7 @@ const LabelTriangleSketch: React.FC<{ triangle: LabelTriangle }> = ({ triangle: 
             angles={
                 names.map((name, i) =>
                     name === t.rightAngleAtPoint
-                        ? // Rechter Winkel: nur das 90°-Symbol, ohne Beschriftung.
-                          {}
+                        ? { rightAngle: true }
                         : { label: angleNames[i], highlighted: name === t.markedAngleAtPoint }
                 ) as [GgbAngle, GgbAngle, GgbAngle]
             }
