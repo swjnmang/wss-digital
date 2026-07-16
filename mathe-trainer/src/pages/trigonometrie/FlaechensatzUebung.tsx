@@ -274,26 +274,70 @@ const FlaechensatzUebung: React.FC = () => {
         let answerLabel = "";
 
         if (taskType === 'area') {
-            description = `Berechnen Sie den Flächeninhalt eines Dreiecks mit den Seitenlängen ${side1Label} = ${side1Value} cm und ${side2Label} = ${side2Value} cm sowie dem eingeschlossenen Winkel ${angleWord} = ${angleValue}°.`;
+            // Zwei Varianten: Entweder ist der eingeschlossene Winkel direkt gegeben,
+            // oder es sind die beiden ANDEREN Winkel gegeben und der eingeschlossene
+            // muss zuerst über die Winkelsumme (180°) berechnet werden.
+            const includedAngleGiven = Math.random() < 0.5;
 
-            solutionSteps.push({
-                heading: "Schritt 1: Formel aufschreiben",
-                text: "Der Flächeninhalt eines Dreiecks kann mit der Formel berechnet werden, wenn zwei Seiten und der eingeschlossene Winkel bekannt sind:",
-                math: formulaText
-            });
-            solutionSteps.push({
-                heading: "Schritt 2: Werte einsetzen",
-                text: "Setzen Sie die gegebenen Werte in die Formel ein:",
-                math: `A = \\frac{1}{2} \\cdot ${side1Value} \\cdot ${side2Value} \\cdot \\sin(${angleValue}^\\circ)`
-            });
-            solutionSteps.push({
-                heading: "Schritt 3: Berechnen",
-                text: "Berechnen Sie den Flächeninhalt:",
-                math: `A \\approx ${roundedArea} \\text{ cm}^2`
-            });
+            if (includedAngleGiven) {
+                description = `Berechnen Sie den Flächeninhalt eines Dreiecks mit den Seitenlängen ${side1Label} = ${side1Value} cm und ${side2Label} = ${side2Value} cm sowie dem eingeschlossenen Winkel ${angleWord} = ${angleValue}°.`;
 
-            sketchSVG = createTriangleSketch(angles, roundedSides, angle, null, scheme);
-            correctAnswer = roundedArea;
+                solutionSteps.push({
+                    heading: "Schritt 1: Formel aufschreiben",
+                    text: "Der Flächeninhalt eines Dreiecks kann mit der Formel berechnet werden, wenn zwei Seiten und der eingeschlossene Winkel bekannt sind:",
+                    math: formulaText
+                });
+                solutionSteps.push({
+                    heading: "Schritt 2: Werte einsetzen",
+                    text: "Setzen Sie die gegebenen Werte in die Formel ein:",
+                    math: `A = \\frac{1}{2} \\cdot ${side1Value} \\cdot ${side2Value} \\cdot \\sin(${angleValue}^\\circ)`
+                });
+                solutionSteps.push({
+                    heading: "Schritt 3: Berechnen",
+                    text: "Berechnen Sie den Flächeninhalt:",
+                    math: `A \\approx ${roundedArea} \\text{ cm}^2`
+                });
+
+                sketchSVG = createTriangleSketch(angles, roundedSides, angle, null, scheme);
+                correctAnswer = roundedArea;
+            } else {
+                // Die beiden nicht eingeschlossenen Winkel sind gegeben. Die Werte sind
+                // konsistent, weil alle Seiten/Winkel aus demselben Dreieck stammen.
+                const [other1, other2] = (['alpha', 'beta', 'gamma'] as const).filter(k => k !== angle);
+                const other1Value = roundedAngles[other1];
+                const other2Value = roundedAngles[other2];
+                // Aus den angezeigten (gerundeten) Winkeln neu berechnen, damit das
+                // Ergebnis exakt zum gezeigten Rechenweg passt.
+                const includedValue = round(180 - other1Value - other2Value, 1);
+                const areaTwoAngles = round(0.5 * side1Value * side2Value * Math.sin(degToRad(includedValue)), 2);
+
+                description = `Berechnen Sie den Flächeninhalt eines Dreiecks mit den Seitenlängen ${side1Label} = ${side1Value} cm und ${side2Label} = ${side2Value} cm sowie den Winkeln ${L.angleWords[other1]} = ${other1Value}° und ${L.angleWords[other2]} = ${other2Value}°.`;
+
+                solutionSteps.push({
+                    heading: "Schritt 1: Fehlenden eingeschlossenen Winkel berechnen",
+                    text: `Die Flächenformel benötigt den von ${side1Label} und ${side2Label} eingeschlossenen Winkel ${angleWord}. Dieser ist nicht gegeben, lässt sich aber über die Winkelsumme im Dreieck (180°) bestimmen:`,
+                    math: `${angleLatex} = 180^\\circ - ${L.angleLatex[other1]} - ${L.angleLatex[other2]} = 180^\\circ - ${other1Value}^\\circ - ${other2Value}^\\circ = ${includedValue}^\\circ`
+                });
+                solutionSteps.push({
+                    heading: "Schritt 2: Formel aufschreiben",
+                    text: "Jetzt sind zwei Seiten und der eingeschlossene Winkel bekannt:",
+                    math: formulaText
+                });
+                solutionSteps.push({
+                    heading: "Schritt 3: Werte einsetzen",
+                    text: "Setzen Sie die Werte in die Formel ein:",
+                    math: `A = \\frac{1}{2} \\cdot ${side1Value} \\cdot ${side2Value} \\cdot \\sin(${includedValue}^\\circ)`
+                });
+                solutionSteps.push({
+                    heading: "Schritt 4: Berechnen",
+                    text: "Berechnen Sie den Flächeninhalt:",
+                    math: `A \\approx ${areaTwoAngles} \\text{ cm}^2`
+                });
+
+                // Der fehlende eingeschlossene Winkel wird in der Skizze als rotes "?" markiert.
+                sketchSVG = createTriangleSketch(angles, roundedSides, angle, `unknown-angle-${angle}`, scheme);
+                correctAnswer = areaTwoAngles;
+            }
             unit = "cm²";
             answerLabel = "A";
         } else {
