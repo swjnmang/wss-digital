@@ -113,6 +113,48 @@ function fmtFaktor(m: Monom): string {
   return m.coeff < 0 ? `(${s})` : s;
 }
 
+// ============================================================================
+// Struktur-Baukasten für "Klammern auflösen": erlaubt, Terme und Klammern in
+// beliebiger Reihenfolge zu kombinieren (vorne/hinten/Mitte), statt immer
+// derselben Reihenfolge "Term + Klammer".
+// ============================================================================
+
+type Segment = { kind: 'term'; m: Monom } | { kind: 'klammer'; ms: Monom[]; sign: 1 | -1 };
+
+function term(m: Monom): Segment {
+  return { kind: 'term', m };
+}
+
+function klammer(ms: Monom[], sign: 1 | -1 = 1): Segment {
+  return { kind: 'klammer', ms, sign };
+}
+
+/** Hängt einen Term mit korrektem Verbindungszeichen an, z. B. " + 3y" oder " - 4y" */
+function anhaengen(m: Monom): string {
+  return m.coeff < 0 ? ` - ${formatMonomBody(m)}` : ` + ${formatMonomBody(m)}`;
+}
+
+function baueAusdruck(segments: Segment[]): { ausdruck: string; expanded: Monom[] } {
+  let ausdruck = '';
+  const expanded: Monom[] = [];
+  segments.forEach((seg, i) => {
+    if (seg.kind === 'term') {
+      expanded.push(seg.m);
+      ausdruck += i === 0 ? formatPoly([seg.m]) : anhaengen(seg.m);
+    } else {
+      const signierte = seg.sign === -1 ? seg.ms.map((m) => monom(-m.coeff, m.vars)) : seg.ms;
+      expanded.push(...signierte);
+      const klammerText = `(${formatPoly(seg.ms)})`;
+      if (i === 0) {
+        ausdruck += seg.sign === -1 ? `-${klammerText}` : klammerText;
+      } else {
+        ausdruck += (seg.sign === -1 ? ' - ' : ' + ') + klammerText;
+      }
+    }
+  });
+  return { ausdruck, expanded };
+}
+
 /**
  * Standard-Rechenweg fürs Zusammenfassen einer Monom-Liste:
  * gruppiert nach Variablenanteil, zeigt die Koeffizienten-Rechnung.
@@ -364,17 +406,35 @@ function genM4(): GeneratedTask {
 
 function genK1(): GeneratedTask {
   const [v1, v2] = randVars(2);
-  const outer = monom(randInt(2, 9), { [v1]: 1 });
   const inner: Monom[] = [
     monom(randInt(2, 9), { [v1]: 1 }),
     monom(Math.random() < 0.5 ? -randInt(1, 8) : randInt(1, 8), { [v2]: 1 }),
   ];
-  if (Math.random() < 0.4) {
+  if (Math.random() < 0.3) {
     inner.push(monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9)));
   }
-  const expanded = [outer, ...inner];
-  return eingabeTask(`${formatPoly([outer])} + (${formatPoly(inner)})`, expanded, [
-    'Plusklammer: Die Klammer kann einfach weggelassen werden, alle Vorzeichen bleiben.',
+  const outer1 = monom(Math.random() < 0.25 ? -randInt(2, 9) : randInt(2, 9), { [v1]: 1 });
+
+  const struktur = choice(['nach', 'vor', 'mitte'] as const);
+  let segments: Segment[];
+  let hinweis: string;
+  if (struktur === 'nach') {
+    segments = [term(outer1), klammer(inner, 1)];
+    hinweis = 'Plusklammer: Die Klammer kann einfach weggelassen werden, alle Vorzeichen bleiben.';
+  } else if (struktur === 'vor') {
+    segments = [klammer(inner, 1), term(outer1)];
+    hinweis =
+      'Die Klammer steht am Anfang – auch hier gilt: Plusklammer weglassen, Vorzeichen bleiben.';
+  } else {
+    const outer2 = monom(Math.random() < 0.5 ? -randInt(1, 7) : randInt(1, 7), { [v2]: 1 });
+    segments = [term(outer1), klammer(inner, 1), term(outer2)];
+    hinweis =
+      'Die Klammer steht in der Mitte – auch hier bleiben beim Weglassen alle Vorzeichen erhalten.';
+  }
+
+  const { ausdruck, expanded } = baueAusdruck(segments);
+  return eingabeTask(ausdruck, expanded, [
+    hinweis,
     `= ${formatPoly(expanded)}`,
     ...zusammenfassenWeg(expanded),
   ]);
@@ -382,16 +442,34 @@ function genK1(): GeneratedTask {
 
 function genK2(): GeneratedTask {
   const [v1, v2] = randVars(2);
-  const outer = monom(randInt(3, 12), { [v1]: 1 });
   const inner: Monom[] = [monom(randInt(1, 8), { [v1]: 1 })];
   if (Math.random() < 0.5) {
     inner.push(monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9)));
   } else {
     inner.push(monom(Math.random() < 0.5 ? -randInt(1, 8) : randInt(1, 8), { [v2]: 1 }));
   }
-  const expanded = [outer, ...inner.map((m) => monom(-m.coeff, m.vars))];
-  return eingabeTask(`${formatPoly([outer])} - (${formatPoly(inner)})`, expanded, [
-    'Minusklammer: Beim Weglassen der Klammer drehen sich ALLE Vorzeichen darin um.',
+  const outer1 = monom(randInt(3, 12), { [v1]: 1 });
+
+  const struktur = choice(['nach', 'vor', 'mitte'] as const);
+  let segments: Segment[];
+  let hinweis: string;
+  if (struktur === 'nach') {
+    segments = [term(outer1), klammer(inner, -1)];
+    hinweis = 'Minusklammer: Beim Weglassen der Klammer drehen sich ALLE Vorzeichen darin um.';
+  } else if (struktur === 'vor') {
+    segments = [klammer(inner, -1), term(outer1)];
+    hinweis =
+      'Die Minusklammer steht am Anfang: Auch hier drehen sich alle Vorzeichen in der Klammer um.';
+  } else {
+    const outer2 = monom(Math.random() < 0.5 ? -randInt(1, 7) : randInt(1, 7), { [v2]: 1 });
+    segments = [term(outer1), klammer(inner, -1), term(outer2)];
+    hinweis =
+      'Die Minusklammer steht in der Mitte: Auch hier drehen sich beim Weglassen alle Vorzeichen in der Klammer um.';
+  }
+
+  const { ausdruck, expanded } = baueAusdruck(segments);
+  return eingabeTask(ausdruck, expanded, [
+    hinweis,
     `= ${formatPoly(expanded)}`,
     ...zusammenfassenWeg(expanded),
   ]);
@@ -407,14 +485,23 @@ function genK3(): GeneratedTask {
     monom(randInt(1, 9), { [v1]: 1 }),
     monom(Math.random() < 0.5 ? -randInt(1, 6) : randInt(1, 6), { [v2]: 1 }),
   ];
-  const mitExtra = Math.random() < 0.4;
-  const extra = monom(randInt(2, 7), { [v2]: 1 });
-  const ausdruck =
-    `(${formatPoly(e1)}) - (${formatPoly(e2)})` + (mitExtra ? ` + ${formatMonomBody(extra)}` : '');
-  const expanded = [...e1, ...e2.map((m) => monom(-m.coeff, m.vars)), ...(mitExtra ? [extra] : [])];
+  const zeichen1: 1 | -1 = Math.random() < 0.5 ? 1 : -1;
+  const zeichen2Zufall: 1 | -1 = Math.random() < 0.5 ? 1 : -1;
+  // Mindestens eine Minusklammer, sonst wäre es nur Stufe-1-Stoff:
+  const zeichen2: 1 | -1 = zeichen1 === 1 && zeichen2Zufall === 1 ? -1 : zeichen2Zufall;
+
+  const extra = monom(Math.random() < 0.5 ? -randInt(2, 7) : randInt(2, 7), { [v2]: 1 });
+  const extraPos = choice(['keine', 'start', 'mitte', 'ende'] as const);
+
+  let segments: Segment[] = [klammer(e1, zeichen1), klammer(e2, zeichen2)];
+  if (extraPos === 'start') segments = [term(extra), ...segments];
+  else if (extraPos === 'mitte') segments = [segments[0], term(extra), segments[1]];
+  else if (extraPos === 'ende') segments = [...segments, term(extra)];
+
+  const { ausdruck, expanded } = baueAusdruck(segments);
   return eingabeTask(ausdruck, expanded, [
-    'Erste Klammer (Plus davor bzw. am Anfang): Vorzeichen bleiben.',
-    'Zweite Klammer (Minus davor): alle Vorzeichen drehen sich um.',
+    `Erste Klammer: ${zeichen1 === 1 ? 'Vorzeichen bleiben' : 'alle Vorzeichen drehen sich um'}.`,
+    `Zweite Klammer: ${zeichen2 === 1 ? 'Vorzeichen bleiben' : 'alle Vorzeichen drehen sich um'}.`,
     `= ${formatPoly(expanded)}`,
     ...zusammenfassenWeg(expanded),
   ]);
@@ -427,9 +514,15 @@ function genK4(): GeneratedTask {
   const c = randInt(1, 6);
   const d = randInt(1, 6);
   const e = randInt(1, 9);
-  if (Math.random() < 0.5) {
-    // a·v1 + (b·v2 - [c·v1 - d·v2] + e)
-    const ausdruck = `${cv(a, v1)} + (${cv(b, v2)} - [${cv(c, v1)} - ${cv(d, v2)}] + ${e})`;
+  const runde = choice(['plus', 'minus'] as const);
+  const outerPos = choice(['vor', 'nach'] as const);
+
+  if (runde === 'plus') {
+    // Runde Klammer bleibt (Pluszeichen davor bzw. dazwischen): b·v2 - [c·v1 - d·v2] + e
+    const rundeInhalt = `${cv(b, v2)} - [${cv(c, v1)} - ${cv(d, v2)}] + ${e}`;
+    const outerTerm = cv(a, v1);
+    const ausdruck =
+      outerPos === 'vor' ? `${outerTerm} + (${rundeInhalt})` : `(${rundeInhalt}) + ${outerTerm}`;
     const expanded = [
       monom(a, { [v1]: 1 }),
       monom(b, { [v2]: 1 }),
@@ -439,15 +532,20 @@ function genK4(): GeneratedTask {
     ];
     return eingabeTask(ausdruck, expanded, [
       `Innerste Klammer zuerst: -[${cv(c, v1)} - ${cv(d, v2)}] = -${cv(c, v1)} + ${cv(d, v2)}`,
-      `Runde Klammer (Plus davor): Vorzeichen bleiben.`,
+      `Runde Klammer hat ein Pluszeichen davor bzw. daneben: Vorzeichen bleiben.`,
       `= ${formatPoly(expanded)}`,
       ...zusammenfassenWeg(expanded),
     ]);
   }
-  // a·v1 - (b·v1 - [c·v1 + d])
-  const ausdruck = `${a + b + c}${v1} - (${cv(b, v1)} - [${cv(c, v1)} + ${d}])`;
+
+  // Runde Klammer wird mit Minus aufgelöst: b·v1 - [c·v1 + d]
+  const outerCoeff = a + b + c;
+  const rundeInhalt = `${cv(b, v1)} - [${cv(c, v1)} + ${d}]`;
+  const outerTerm = cv(outerCoeff, v1);
+  const ausdruck =
+    outerPos === 'vor' ? `${outerTerm} - (${rundeInhalt})` : `-(${rundeInhalt}) + ${outerTerm}`;
   const expanded = [
-    monom(a + b + c, { [v1]: 1 }),
+    monom(outerCoeff, { [v1]: 1 }),
     monom(-b, { [v1]: 1 }),
     monom(c, { [v1]: 1 }),
     monom(d),
