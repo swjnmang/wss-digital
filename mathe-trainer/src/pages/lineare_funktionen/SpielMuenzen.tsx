@@ -5,7 +5,7 @@ type Difficulty = 'normal' | 'medium' | 'hard'
 type Ramp = { m: number, b: number } | null
 type Obstacle = { x: number, y: number, width: number, height: number }
 type Bucket = { x: number, y: number, width: number }
-type Coin = { x: number, y: number, vy: number }
+type Coin = { x: number, y: number, vy: number, rampIdx?: number }
 
 const RAMP_COLORS = ['#16a34a', '#2563eb', '#ca8a04', '#c026d3']
 
@@ -134,29 +134,65 @@ export default function SpielMuenzen() {
     function gameTick() {
       setCoins(coins => {
         let newCoins = [...coins]
-        const activeRamps = ramps.filter(r => r !== null) as { m: number, b: number }[]
         for (let i = newCoins.length - 1; i >= 0; i--) {
-          const coin = newCoins[i]
-          const potentialNextY = coin.y - coin.vy
-          let collisionRamp: { m: number, b: number } | null = null
-          let collisionY = -Infinity
-          activeRamps.forEach(ramp => {
-            const rampYAtCoinX = ramp.m * coin.x + ramp.b
-            if (rampYAtCoinX <= coin.y && rampYAtCoinX >= potentialNextY) {
-              if (rampYAtCoinX > collisionY) {
-                collisionY = rampYAtCoinX
-                collisionRamp = ramp
+          const coin = { ...newCoins[i] }
+          const currentRamp = coin.rampIdx !== undefined ? ramps[coin.rampIdx] : null
+
+          if (currentRamp) {
+            // Münze rutscht auf ihrer Rampe bergab; Richtung ergibt sich aus der Steigung
+            const direction = currentRamp.m < 0 ? 1 : -1
+            const oldX = coin.x
+            const newX = oldX + direction * 0.1
+
+            // Prüfen, ob dieser Schritt den Schnittpunkt mit einer anderen aktiven Rampe
+            // kreuzt - dann wird die Münze dort exakt auf die andere Rampe übergeben
+            let handoff: { idx: number, x: number } | null = null
+            let handoffDist = Infinity
+            ramps.forEach((other, idx) => {
+              if (!other || idx === coin.rampIdx || other.m === currentRamp.m) return
+              const xCross = (other.b - currentRamp.b) / (currentRamp.m - other.m)
+              const between = direction > 0
+                ? (xCross > oldX && xCross <= newX)
+                : (xCross < oldX && xCross >= newX)
+              if (between) {
+                const dist = Math.abs(xCross - oldX)
+                if (dist < handoffDist) { handoffDist = dist; handoff = { idx, x: xCross } }
               }
+            })
+
+            if (handoff) {
+              const h = handoff as { idx: number, x: number }
+              coin.rampIdx = h.idx
+              coin.x = h.x
+              coin.y = ramps[h.idx]!.m * coin.x + ramps[h.idx]!.b
+            } else {
+              coin.x = newX
+              coin.y = currentRamp.m * coin.x + currentRamp.b
             }
-          })
-          if (collisionRamp !== null) {
-            coin.y = collisionY
-            const direction = (collisionRamp as { m: number, b: number }).m < 0 ? 1 : -1
-            coin.x += direction * 0.1
-            coin.y = (collisionRamp as { m: number, b: number }).m * coin.x + (collisionRamp as { m: number, b: number }).b
           } else {
-            coin.y = potentialNextY
+            // Freier Fall: prüfen, ob die Münze in diesem Schritt eine Rampe durchquert
+            coin.rampIdx = undefined
+            const potentialNextY = coin.y - coin.vy
+            let collisionIdx: number | null = null
+            let collisionY = -Infinity
+            ramps.forEach((ramp, idx) => {
+              if (!ramp) return
+              const rampYAtCoinX = ramp.m * coin.x + ramp.b
+              if (rampYAtCoinX <= coin.y && rampYAtCoinX >= potentialNextY) {
+                if (rampYAtCoinX > collisionY) {
+                  collisionY = rampYAtCoinX
+                  collisionIdx = idx
+                }
+              }
+            })
+            if (collisionIdx !== null) {
+              coin.rampIdx = collisionIdx
+              coin.y = collisionY
+            } else {
+              coin.y = potentialNextY
+            }
           }
+
           let collidedWithObstacle = false
           obstacles.forEach(ob => {
             if (coin.x > ob.x - ob.width / 2 && coin.x < ob.x + ob.width / 2 && coin.y < ob.y + ob.height / 2 && coin.y > ob.y - ob.height / 2) {
@@ -178,6 +214,7 @@ export default function SpielMuenzen() {
             continue
           }
           if (coin.y < -gridRangeY - 2) { newCoins.splice(i, 1); continue }
+          newCoins[i] = coin
         }
         return newCoins
       })
