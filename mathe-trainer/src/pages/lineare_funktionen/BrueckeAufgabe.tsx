@@ -17,10 +17,13 @@ interface Task {
 }
 
 // --- Koordinatensystem-Hilfsfunktionen für die Skizze ---
-const X_MIN = -8
-const X_MAX = 8
+// Wichtig: Die Pylon-Spitze wird bewusst NICHT eingezeichnet/beschriftet und liegt
+// abseits ganzzahliger Gitterpunkte, damit keine Aufgabe direkt aus der Zeichnung
+// abgelesen werden kann - alle Werte müssen rechnerisch ermittelt werden.
+const X_MIN = -10
+const X_MAX = 7
 const Y_MIN = -3
-const Y_MAX = 10.5
+const Y_MAX = 13.5
 const SVG_W = 900
 const SVG_H = 640
 const PAD_L = 50
@@ -40,10 +43,11 @@ for (let x = Math.ceil(X_MIN); x <= Math.floor(X_MAX); x++) X_TICKS.push(x)
 const Y_TICKS: number[] = []
 for (let y = Math.ceil(Y_MIN); y <= Math.floor(Y_MAX); y++) Y_TICKS.push(y)
 
+// Pylon-Spitze (nirgends beschriftet): (-1.7 | 9.45)
 const CABLES = [
-  { name: 'a', from: [-6, 0] as [number, number], to: [0, 9] as [number, number], color: '#dc2626', eq: 'y = 1,5x + 9', eqAt: [-4.3, 4.05] as [number, number] },
-  { name: 'b', from: [4, 0] as [number, number], to: [0, 9] as [number, number], color: '#2563eb', eq: 'y = -2,25x + 9', eqAt: [2.6, 3.4] as [number, number] },
-  { name: 'c', from: [6, 0] as [number, number], to: [0, 9] as [number, number], color: '#059669', eq: 'y = -1,5x + 9', eqAt: [4.6, 3.9] as [number, number] },
+  { name: 'a', from: [-8, 0] as [number, number], to: [-1.7, 9.45] as [number, number], color: '#dc2626' },
+  { name: 'b', from: [2.5, 0] as [number, number], to: [-1.7, 9.45] as [number, number], color: '#2563eb' },
+  { name: 'c', from: [4.6, 0] as [number, number], to: [-1.7, 9.45] as [number, number], color: '#059669' },
 ]
 
 function BrueckenSkizze() {
@@ -86,8 +90,8 @@ function BrueckenSkizze() {
         </text>
       ))}
 
-      {/* Pfeiler ins Wasser */}
-      {[-6, 6].map(ax => (
+      {/* Pfeiler ins Wasser (unbeschriftet) */}
+      {[-8, 2.5, 4.6].map(ax => (
         <polygon
           key={`pillar${ax}`}
           points={`${px(ax) - 8},${py(0)} ${px(ax) + 8},${py(0)} ${px(ax) + 4},${py(-1.8)} ${px(ax) - 4},${py(-1.8)}`}
@@ -107,59 +111,38 @@ function BrueckenSkizze() {
         strokeDasharray="14 10"
       />
 
-      {/* Pylon */}
-      <polygon points={`${px(-0.35)},${py(0.3)} ${px(0.35)},${py(0.3)} ${px(0.09)},${py(9)} ${px(-0.09)},${py(9)}`} fill="#334155" />
+      {/* Pylon (Spitze bewusst unbeschriftet) */}
+      <polygon
+        points={`${px(-1.7 - 0.35)},${py(0.3)} ${px(-1.7 + 0.35)},${py(0.3)} ${px(-1.7 + 0.09)},${py(9.45)} ${px(-1.7 - 0.09)},${py(9.45)}`}
+        fill="#334155"
+      />
 
-      {/* Kabel */}
+      {/* Kabel (ohne Gleichungsbeschriftung - muss berechnet werden) */}
       {CABLES.map(c => (
         <line key={c.name} x1={px(c.from[0])} y1={py(c.from[1])} x2={px(c.to[0])} y2={py(c.to[1])} stroke={c.color} strokeWidth={3.5} />
       ))}
-      {CABLES.map(c => (
-        <text
-          key={`eq${c.name}`}
-          x={px(c.eqAt[0])}
-          y={py(c.eqAt[1])}
-          fontSize={14}
-          fontWeight={700}
-          fill={c.color}
-          stroke="#ffffff"
-          strokeWidth={3}
-          paintOrder="stroke"
-        >
-          {c.eq}
-        </text>
-      ))}
 
-      {/* Inspektionsstrebe (gelb, y = -2/3 x + 5) */}
-      <line x1={px(-3)} y1={py(7)} x2={px(3)} y2={py(3)} stroke="#d97706" strokeWidth={3} strokeDasharray="8 6" />
-      <text x={px(-3.6)} y={py(7.6)} fontSize={13} fontWeight={700} fill="#d97706" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
+      {/* Inspektionsstrebe (gelb, y = -2/3 x + 5 - Gleichung steht nur im Aufgabentext) */}
+      <line x1={px(-6)} y1={py(9)} x2={px(0)} y2={py(5)} stroke="#d97706" strokeWidth={3} strokeDasharray="8 6" />
+      <text x={px(-6.6)} y={py(9.6)} fontSize={13} fontWeight={700} fill="#d97706" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
         Inspektionsstrebe
       </text>
 
       {/* Punkte */}
-      <circle cx={px(0)} cy={py(9)} r={5} fill="#1e3a8a" />
-      <text x={px(0.25)} y={py(9) - 10} fontSize={14} fontWeight={700} fill="#1e3a8a" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
-        T(0|9)
+      <circle cx={px(-8)} cy={py(0)} r={5} fill="#1e3a8a" />
+      <text x={px(-8)} y={py(0) + 22} fontSize={14} fontWeight={700} fill="#1e3a8a" textAnchor="middle" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
+        A(-8|0)
       </text>
 
-      <circle cx={px(-6)} cy={py(0)} r={5} fill="#1e3a8a" />
-      <text x={px(-6)} y={py(0) + 22} fontSize={14} fontWeight={700} fill="#1e3a8a" textAnchor="middle" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
-        A(-6|0)
+      {/* Warnleuchte W auf Kabel a - zweiter Punkt für Aufgabe 1 */}
+      <circle cx={px(-4)} cy={py(6)} r={6} fill="#f59e0b" stroke="#78350f" strokeWidth={1.5} />
+      <text x={px(-4)} y={py(6) - 14} fontSize={14} fontWeight={700} fill="#78350f" textAnchor="middle" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
+        W(-4|6)
       </text>
 
-      <circle cx={px(4)} cy={py(0)} r={5} fill="#1e3a8a" />
-      <text x={px(4)} y={py(0) + 22} fontSize={14} fontWeight={700} fill="#1e3a8a" textAnchor="middle" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
-        B(4|0)
-      </text>
-
-      <circle cx={px(6)} cy={py(0)} r={5} fill="#1e3a8a" />
-      <text x={px(6)} y={py(0) + 22} fontSize={14} fontWeight={700} fill="#1e3a8a" textAnchor="middle" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
-        C(6|0)
-      </text>
-
-      <circle cx={px(1)} cy={py(6)} r={5} fill="#be185d" />
-      <text x={px(1.25)} y={py(6) - 10} fontSize={14} fontWeight={700} fill="#be185d" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
-        R(1|6)
+      <circle cx={px(1)} cy={py(4)} r={5} fill="#be185d" />
+      <text x={px(1.25)} y={py(4) - 10} fontSize={14} fontWeight={700} fill="#be185d" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
+        R(1|4)
       </text>
     </svg>
   )
@@ -177,73 +160,73 @@ export default function BrueckeAufgabe() {
       id: 1,
       title: 'Aufgabe 1',
       question:
-        'Bestimme die Funktionsgleichung des roten Kabels a, das durch die Pylon-Spitze T (0|9) und den Ankerpunkt A (-6|0) auf der Fahrbahn verläuft. Die Gleichung hat die Form y = m·x + t. Gib m und t ein.',
+        'Am roten Kabel a ist eine Warnleuchte angebracht. Bestimme die Funktionsgleichung von Kabel a. Es verläuft durch den Ankerpunkt A (-8|0) auf der Fahrbahn und durch die Warnleuchte W (-4|6). Die Gleichung hat die Form y = m·x + t. Gib m und t ein.',
       solution: {
         type: 'number',
         labels: ['m', 't'],
-        answers: [1.5, 9],
+        answers: [1.5, 12],
         tolerance: 0.02,
       },
-      hint: 'Nutze die zwei Punkte A(-6|0) und T(0|9). Berechne die Steigung m = (9-0)/(0-(-6)) = 1,5. Da T auf der y-Achse liegt, ist t direkt ablesbar: t = 9.',
+      hint: 'Nutze die zwei Punkte A(-8|0) und W(-4|6). Berechne die Steigung m = (6-0)/(-4-(-8)) = 6/4 = 1,5. Setze Punkt A ein: 0 = 1,5 · (-8) + t → t = 12.',
     },
     {
       id: 2,
       title: 'Aufgabe 2',
       question:
-        'Ein Wartungsroboter befindet sich am Punkt R (1|6) auf einem der Stahlseile. Das blaue Kabel b verläuft durch die Pylon-Spitze T (0|9) und den Ankerpunkt B (4|0). Prüfe rechnerisch, ob sich der Roboter auf Kabel b befindet. Antworte mit "ja" oder "nein".',
+        'Das blaue Kabel b hat die Funktionsgleichung y = -2,25x + 5,625. Ein Wartungsroboter befindet sich am Punkt R (1|4) auf einem der Stahlseile. Prüfe rechnerisch, ob sich der Roboter auf Kabel b befindet. Antworte mit "ja" oder "nein".',
       solution: {
         type: 'text',
         answer: 'nein',
       },
-      hint: 'Berechne zuerst die Gleichung von Kabel b: m = (9-0)/(0-4) = -2,25, t = 9, also y = -2,25x + 9. Setze x = 1 ein: y = -2,25 · 1 + 9 = 6,75. Da 6,75 ≠ 6, liegt R nicht auf Kabel b. Antwort: nein.',
+      hint: 'Setze x = 1 in die Gleichung von Kabel b ein: y = -2,25 · 1 + 5,625 = 3,375. Da 3,375 ≠ 4, liegt R nicht auf Kabel b. Antwort: nein.',
     },
     {
       id: 3,
       title: 'Aufgabe 3',
       question:
-        'Das blaue Kabel b (y = -2,25x + 9) und das grüne Kabel c (y = -1,5x + 9) treffen sich beide oben an der Pylon-Spitze. Berechne rechnerisch die vollständigen Koordinaten dieses Treffpunkts (x- und y-Wert).',
+        'Das blaue Kabel b (y = -2,25x + 5,625) und das grüne Kabel c (y = -1,5x + 6,9) treffen sich beide oben am Pylon in einem gemeinsamen Punkt. Berechne rechnerisch die vollständigen Koordinaten dieses Treffpunkts (x- und y-Wert).',
       solution: {
         type: 'number',
         labels: ['x-Wert', 'y-Wert'],
-        answers: [0, 9],
+        answers: [-1.7, 9.45],
         tolerance: 0.1,
       },
-      hint: 'Setze beide Funktionsgleichungen gleich: -2,25x + 9 = -1,5x + 9. Das ergibt -0,75x = 0, also x = 0. Einsetzen liefert y = 9. Der Treffpunkt ist die Pylon-Spitze T(0|9).',
+      hint: 'Setze beide Funktionsgleichungen gleich: -2,25x + 5,625 = -1,5x + 6,9. Das ergibt -0,75x = 1,275, also x = -1,7. Einsetzen liefert y = -1,5 · (-1,7) + 6,9 = 9,45.',
     },
     {
       id: 4,
       title: 'Aufgabe 4',
       question:
-        'Die äußeren Ankerpunkte A (Kabel a) und C (Kabel c) liegen beide auf der Fahrbahn. Eine Längeneinheit entspricht 5 Metern. Wie weit sind die beiden Ankerpunkte entlang der Fahrbahn voneinander entfernt? Gib das Ergebnis in Metern an.',
+        'Das grüne Kabel c hat die Funktionsgleichung y = -1,5x + 6,9. Berechne die Nullstelle von Kabel c - also die Stelle, an der es auf der Fahrbahn verankert ist. Bestimme anschließend den Abstand dieses Ankerpunkts zum Ankerpunkt A (-8|0) von Kabel a. Eine Längeneinheit entspricht 5 Metern. Gib den Abstand in Metern an.',
       solution: {
         type: 'number',
-        answer: 60,
+        answer: 63,
         tolerance: 2,
       },
-      hint: 'A liegt bei x = -6 und C liegt bei x = 6 (jeweils Nullstellen der Kabelgleichungen). Der Abstand beträgt |6 - (-6)| = 12 Längeneinheiten. In Metern: 12 · 5 = 60 m.',
+      hint: 'Nullstelle von Kabel c: 0 = -1,5x + 6,9 → x = 4,6. Abstand zu A(-8|0): |4,6 - (-8)| = 12,6 Längeneinheiten. In Metern: 12,6 · 5 = 63 m.',
     },
     {
       id: 5,
       title: 'Aufgabe 5',
       question:
-        'Für Wartungsarbeiten wird eine gelbe Inspektionsstrebe mit der Funktionsgleichung y = [BRUCH]-2/3[/BRUCH]·x + 5 zwischen zwei Kabeln montiert. Prüfe rechnerisch, ob diese Strebe senkrecht zum roten Kabel a (y = 1,5x + 9) verläuft. Antworte mit "ja" oder "nein".',
+        'Für Wartungsarbeiten wird eine gelbe Inspektionsstrebe mit der Funktionsgleichung y = [BRUCH]-2/3[/BRUCH]·x + 5 zwischen zwei Kabeln montiert. Prüfe rechnerisch, ob diese Strebe senkrecht zum roten Kabel a aus Aufgabe 1 verläuft. Antworte mit "ja" oder "nein".',
       solution: {
         type: 'text',
         answer: 'ja',
       },
-      hint: 'Zwei Geraden sind senkrecht zueinander, wenn das Produkt ihrer Steigungen -1 ergibt. Kabel a: m₁ = 1,5 = 3/2. Strebe: m₂ = -2/3. Prüfe: (3/2) · (-2/3) = -1 ✓. Die Strebe ist senkrecht zu Kabel a montiert.',
+      hint: 'Zwei Geraden sind senkrecht zueinander, wenn das Produkt ihrer Steigungen -1 ergibt. Kabel a: m₁ = 1,5 = 3/2 (aus Aufgabe 1). Strebe: m₂ = -2/3. Prüfe: (3/2) · (-2/3) = -1 ✓. Die Strebe ist senkrecht zu Kabel a montiert.',
     },
     {
       id: 6,
       title: 'Aufgabe 6',
-      question: 'Ergänze die abgebildete Wertetabelle, die zum grünen Kabel c mit y = -1,5x + 9 gehört. Gib die fehlenden Werte ein.',
+      question: 'Ergänze die abgebildete Wertetabelle, die zum grünen Kabel c mit y = -1,5x + 6,9 gehört. Gib die fehlenden Werte ein.',
       solution: {
         type: 'wertetabelle',
-        labels: ['y₁ (x=1)', 'x₂ (y=6)', 'y₃ (x=3)', 'x₄ (y=3)', 'y₅ (x=5)'],
-        answers: [7.5, 2, 4.5, 4, 1.5],
+        labels: ['y₁ (x=0)', 'x₂ (y=5,4)', 'y₃ (x=2)', 'x₄ (y=0,9)', 'y₅ (x=5)'],
+        answers: [6.9, 1, 3.9, 4, -0.6],
         tolerance: 0.05,
       },
-      hint: 'Verwende die Gleichung y = -1,5x + 9. Für fehlende y-Werte setze x ein, für fehlende x-Werte löse nach x auf. z.B. y₁: y = -1,5·1 + 9 = 7,5. x₂: 6 = -1,5x + 9 → x = 2.',
+      hint: 'Verwende die Gleichung y = -1,5x + 6,9. Für fehlende y-Werte setze x ein, für fehlende x-Werte löse nach x auf. z.B. y₁: y = -1,5·0 + 6,9 = 6,9. x₂: 5,4 = -1,5x + 6,9 → x = 1.',
     },
   ]
 
@@ -396,9 +379,10 @@ export default function BrueckeAufgabe() {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <div className="mb-6 p-4 bg-blue-50 rounded-lg">
             <p className="text-gray-800 leading-relaxed">
-              Über einen Fluss führt eine Schrägseilbrücke. Von der Spitze des Pylons T aus spannen sich mehrere Stahlseile
-              (Kabel) schräg nach unten zur Fahrbahn und werden dort verankert. Die Fahrbahn entspricht der x-Achse. Löse die
-              folgenden Aufgaben zu den Kabeln der Brücke.
+              Über einen Fluss führt eine Schrägseilbrücke. Von der Spitze eines Pylons spannen sich mehrere Stahlseile
+              (Kabel) schräg nach unten zur Fahrbahn und werden dort verankert. Die genaue Position der Pylon-Spitze ist
+              nicht bekannt - alle Werte musst du selbst berechnen. Die Fahrbahn entspricht der x-Achse. Löse die folgenden
+              Aufgaben zu den Kabeln der Brücke.
             </p>
           </div>
 
@@ -412,38 +396,38 @@ export default function BrueckeAufgabe() {
 
             {currentTaskData.solution.type === 'wertetabelle' && (
               <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm font-semibold text-blue-900 mb-3">Wertetabelle zum grünen Kabel c: y = -1,5x + 9</p>
+                <p className="text-sm font-semibold text-blue-900 mb-3">Wertetabelle zum grünen Kabel c: y = -1,5x + 6,9</p>
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-blue-200">
                       <th className="border border-blue-300 px-3 py-2 text-sm font-bold">x</th>
-                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">1</th>
+                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">0</th>
                       <th className="border border-blue-300 px-3 py-2 text-sm font-bold">
                         <input
                           type="text"
-                          value={((inputs[currentTask] as Record<string, string>) || {})['x₂ (y=6)'] || ''}
-                          onChange={(e) => handleMultiInputChange('x₂ (y=6)', e.target.value)}
+                          value={((inputs[currentTask] as Record<string, string>) || {})['x₂ (y=5,4)'] || ''}
+                          onChange={(e) => handleMultiInputChange('x₂ (y=5,4)', e.target.value)}
                           placeholder="?"
                           className={`w-full px-2 py-1 rounded text-center text-sm focus:outline-none transition ${
-                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₂ (y=6)'] === 'correct'
+                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₂ (y=5,4)'] === 'correct'
                               ? 'border-2 border-green-500 bg-green-50'
-                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₂ (y=6)'] === 'incorrect'
+                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₂ (y=5,4)'] === 'incorrect'
                                 ? 'border-2 border-red-500 bg-red-50'
                                 : 'border border-blue-300'
                           }`}
                         />
                       </th>
-                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">3</th>
+                      <th className="border border-blue-300 px-3 py-2 text-sm font-bold">2</th>
                       <th className="border border-blue-300 px-3 py-2 text-sm font-bold">
                         <input
                           type="text"
-                          value={((inputs[currentTask] as Record<string, string>) || {})['x₄ (y=3)'] || ''}
-                          onChange={(e) => handleMultiInputChange('x₄ (y=3)', e.target.value)}
+                          value={((inputs[currentTask] as Record<string, string>) || {})['x₄ (y=0,9)'] || ''}
+                          onChange={(e) => handleMultiInputChange('x₄ (y=0,9)', e.target.value)}
                           placeholder="?"
                           className={`w-full px-2 py-1 rounded text-center text-sm focus:outline-none transition ${
-                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₄ (y=3)'] === 'correct'
+                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₄ (y=0,9)'] === 'correct'
                               ? 'border-2 border-green-500 bg-green-50'
-                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₄ (y=3)'] === 'incorrect'
+                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['x₄ (y=0,9)'] === 'incorrect'
                                 ? 'border-2 border-red-500 bg-red-50'
                                 : 'border border-blue-300'
                           }`}
@@ -458,35 +442,35 @@ export default function BrueckeAufgabe() {
                       <td className="border border-blue-300 px-3 py-2 text-center">
                         <input
                           type="text"
-                          value={((inputs[currentTask] as Record<string, string>) || {})['y₁ (x=1)'] || ''}
-                          onChange={(e) => handleMultiInputChange('y₁ (x=1)', e.target.value)}
+                          value={((inputs[currentTask] as Record<string, string>) || {})['y₁ (x=0)'] || ''}
+                          onChange={(e) => handleMultiInputChange('y₁ (x=0)', e.target.value)}
                           placeholder="?"
                           className={`w-full px-2 py-1 rounded text-center text-sm focus:outline-none transition ${
-                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₁ (x=1)'] === 'correct'
+                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₁ (x=0)'] === 'correct'
                               ? 'border-2 border-green-500 bg-green-50'
-                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₁ (x=1)'] === 'incorrect'
+                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₁ (x=0)'] === 'incorrect'
                                 ? 'border-2 border-red-500 bg-red-50'
                                 : 'border border-blue-300'
                           }`}
                         />
                       </td>
-                      <td className="border border-blue-300 px-3 py-2 text-center">6</td>
+                      <td className="border border-blue-300 px-3 py-2 text-center">5,4</td>
                       <td className="border border-blue-300 px-3 py-2 text-center">
                         <input
                           type="text"
-                          value={((inputs[currentTask] as Record<string, string>) || {})['y₃ (x=3)'] || ''}
-                          onChange={(e) => handleMultiInputChange('y₃ (x=3)', e.target.value)}
+                          value={((inputs[currentTask] as Record<string, string>) || {})['y₃ (x=2)'] || ''}
+                          onChange={(e) => handleMultiInputChange('y₃ (x=2)', e.target.value)}
                           placeholder="?"
                           className={`w-full px-2 py-1 rounded text-center text-sm focus:outline-none transition ${
-                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₃ (x=3)'] === 'correct'
+                            ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₃ (x=2)'] === 'correct'
                               ? 'border-2 border-green-500 bg-green-50'
-                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₃ (x=3)'] === 'incorrect'
+                              : ((fieldFeedback[currentTask] as Record<string, string>) || {})['y₃ (x=2)'] === 'incorrect'
                                 ? 'border-2 border-red-500 bg-red-50'
                                 : 'border border-blue-300'
                           }`}
                         />
                       </td>
-                      <td className="border border-blue-300 px-3 py-2 text-center">3</td>
+                      <td className="border border-blue-300 px-3 py-2 text-center">0,9</td>
                       <td className="border border-blue-300 px-3 py-2 text-center">
                         <input
                           type="text"
