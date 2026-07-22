@@ -77,6 +77,7 @@ import Annuitaetendarlehen from './pages/finanzmathe/Annuitaetendarlehen';
 import ZinsenTest from './pages/finanzmathe/ZinsenTest';
 import GemischteFinanzaufgaben from './pages/finanzmathe/GemischteFinanzaufgaben';
 import Anwendungsaufgaben from './pages/finanzmathe/Anwendungsaufgaben';
+import EscapeRoomZinseszins from './pages/finanzmathe/EscapeRoomZinseszins';
 import ArdasKapitalanlagen from './pages/finanzmathe/ArdasKapitalanlagen';
 import SportladenEröffnung from './pages/finanzmathe/SportladenEröffnung';
 import DieUnfallversicherung from './pages/finanzmathe/DieUnfallversicherung';
@@ -306,6 +307,7 @@ export default function App() {
           <Route path="/finanzmathe/annuitaetendarlehen" element={<Annuitaetendarlehen />} />
           <Route path="/finanzmathe/gemischte-aufgaben" element={<GemischteFinanzaufgaben />} />
           <Route path="/finanzmathe/anwendungsaufgaben" element={<Anwendungsaufgaben />} />
+          <Route path="/finanzmathe/anwendungsaufgaben/escape-room-zinseszins" element={<EscapeRoomZinseszins />} />
           <Route path="/finanzmathe/anwendungsaufgaben/ardas-kapitalanlagen" element={<ArdasKapitalanlagen />} />
           <Route path="/finanzmathe/anwendungsaufgaben/sportladen-eröffnung" element={<SportladenEröffnung />} />
           <Route path="/finanzmathe/anwendungsaufgaben/die-unfallversicherung" element={<DieUnfallversicherung />} />

@@ -59,6 +59,7 @@ const routes = [
   { path: '/finanzmathe/endwert', priority: 0.8, changefreq: 'monthly' },
   { path: '/finanzmathe/ratendarlehen', priority: 0.8, changefreq: 'monthly' },
   { path: '/finanzmathe/anwendungsaufgaben', priority: 0.8, changefreq: 'monthly' },
+  { path: '/finanzmathe/anwendungsaufgaben/escape-room-zinseszins', priority: 0.6, changefreq: 'monthly' },
 
   // Quadratische Funktionen
   { path: '/quadratische_funktionen', priority: 0.9, changefreq: 'monthly' },

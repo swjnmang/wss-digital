@@ -51,6 +51,10 @@ export default function Anwendungsaufgaben() {
               <h2 className="text-xl font-bold text-purple-800 mb-2"><i className="fa-solid fa-truck mr-2 text-purple-600"></i>8. Der Foodtruck</h2>
               <p className="text-gray-600">Zinssatz mit Zinseszins, nachschüssiges Ansparen, Annuität berechnen, Tilgungsplan und Restschuld mit Sondertilgung.</p>
             </Link>
+            <Link to="/finanzmathe/anwendungsaufgaben/escape-room-zinseszins" className="block p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200">
+              <h2 className="text-xl font-bold text-purple-800 mb-2"><i className="fa-solid fa-door-open mr-2 text-purple-600"></i>9. Digitaler Escape Room</h2>
+              <p className="text-gray-600">Interaktives Video: Löse unterwegs Lückentext-Rätsel rund um Zinsen und Zinseszinsen und knacke den Code.</p>
+            </Link>
           </div>
         </div>
       </div>

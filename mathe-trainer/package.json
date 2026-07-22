@@ -24,6 +24,7 @@
     "@vercel/analytics": "^1.6.1",
     "formula-parser": "^2.0.1",
     "formulajs": "^1.0.8",
+    "h5p-standalone": "^3.8.2",
     "html-to-image": "^1.11.13",
     "jspdf": "^3.0.4",
     "jspdf-autotable": "^5.0.2",
