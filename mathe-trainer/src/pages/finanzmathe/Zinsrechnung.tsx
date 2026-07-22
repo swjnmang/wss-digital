@@ -77,9 +77,21 @@ const getWordProblem = (type: TaskType, K: number, p: number, t: number, Z: numb
   return options[randomInt(0, options.length - 1)];
 };
 
+const UNIT_OPTIONS = ['€', '% p.a.', 'Tage'];
+
+const getCorrectUnit = (type: TaskType) => {
+  switch (type) {
+    case 'zinsen': return '€';
+    case 'kapital': return '€';
+    case 'zinssatz': return '% p.a.';
+    case 'laufzeit': return 'Tage';
+  }
+};
+
 export default function Zinsrechnung() {
   const [task, setTask] = useState<Task | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
+  const [userUnit, setUserUnit] = useState('');
   const [feedback, setFeedback] = useState<React.ReactNode | null>(null);
   const [feedbackType, setFeedbackType] = useState<'correct' | 'incorrect' | null>(null);
   const [solution, setSolution] = useState<React.ReactNode | null>(null);
@@ -97,7 +109,8 @@ export default function Zinsrechnung() {
     setFeedbackType(null);
     setSolution(null);
     setUserAnswer('');
-    
+    setUserUnit('');
+
     const types: TaskType[] = ['zinsen', 'kapital', 'zinssatz', 'laufzeit'];
     const type = types[randomInt(0, 3)];
     
@@ -136,39 +149,53 @@ export default function Zinsrechnung() {
 
   const checkAnswer = () => {
     if (!task) return;
-    
+
     const input = parseFloat(userAnswer.replace(',', '.'));
     if (isNaN(input)) {
       setFeedback('Bitte gib eine gültige Zahl ein.');
       setFeedbackType('incorrect');
       return;
     }
+    if (!userUnit) {
+      setFeedback('Bitte wähle auch die passende Einheit aus.');
+      setFeedbackType('incorrect');
+      return;
+    }
 
     let correctValue = 0;
-    let unit = '';
-    
     switch (task.type) {
-      case 'zinsen': correctValue = task.Z; unit = '€'; break;
-      case 'kapital': correctValue = task.K; unit = '€'; break;
-      case 'zinssatz': correctValue = task.p; unit = '% p.a.'; break;
-      case 'laufzeit': correctValue = task.t; unit = 'Tage'; break;
+      case 'zinsen': correctValue = task.Z; break;
+      case 'kapital': correctValue = task.K; break;
+      case 'zinssatz': correctValue = task.p; break;
+      case 'laufzeit': correctValue = task.t; break;
     }
+    const unit = getCorrectUnit(task.type);
 
     // Allow small tolerance for rounding differences
     const tolerance = 0.02;
     const diff = Math.abs(input - correctValue);
-    
+    const numberCorrect = diff <= tolerance;
+    const unitCorrect = userUnit === unit;
+
     setTotalCount(c => c + 1);
 
-    if (diff <= tolerance) {
+    if (numberCorrect && unitCorrect) {
       setFeedback('Richtig!');
       setFeedbackType('correct');
       setCorrectCount(c => c + 1);
       setStreak(s => s + 1);
     } else {
+      let hint: React.ReactNode;
+      if (numberCorrect && !unitCorrect) {
+        hint = <>Die Zahl stimmt, aber die Einheit ist falsch.</>;
+      } else if (!numberCorrect && unitCorrect) {
+        hint = <>Die Einheit stimmt, aber die Zahl ist falsch.</>;
+      } else {
+        hint = <>Zahl und Einheit sind falsch.</>;
+      }
       setFeedback(
         <div>
-          Leider falsch. Die richtige Lösung ist <b>{formatNumber(correctValue)} {unit}</b>.
+          {hint} Die richtige Lösung ist <b>{formatNumber(correctValue)} {unit}</b>.
         </div>
       );
       setFeedbackType('incorrect');
@@ -277,9 +304,16 @@ export default function Zinsrechnung() {
                   onKeyDown={handleKeyDown}
                   placeholder="Ergebnis"
                 />
-                <span className="text-xl font-bold text-gray-600">
-                  {task.type === 'zinsen' || task.type === 'kapital' ? '€' : task.type === 'zinssatz' ? '% p.a.' : 'Tage'}
-                </span>
+                <select
+                  className="border-2 border-slate-300 rounded-lg p-2 text-lg font-bold text-gray-700 bg-white focus:outline-blue-400"
+                  value={userUnit}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setUserUnit(e.target.value)}
+                >
+                  <option value="" disabled>Einheit</option>
+                  {UNIT_OPTIONS.map(u => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
               </div>
             </div>
           )}
