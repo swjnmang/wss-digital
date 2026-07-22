@@ -85,7 +85,7 @@ const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleP
                   placeholder="x"
                   value={value?.[idx]?.x || ''}
                   onChange={(e) => handleChange(idx, 'x', e.target.value)}
-                  className={`${styles.tableInput} ${validierteZellen[`graph-${idx}`] ? styles.inputCorrect : ''}`}
+                  className={`${styles.tableInput} ${validierteZellen[`graph-${idx}`] === true ? styles.inputCorrect : validierteZellen[`graph-${idx}`] === false ? styles.inputIncorrect : ''}`}
                 />
               </td>
             ))}
@@ -99,7 +99,7 @@ const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleP
                   placeholder="y"
                   value={value?.[idx]?.y || ''}
                   onChange={(e) => handleChange(idx, 'y', e.target.value)}
-                  className={`${styles.tableInput} ${validierteZellen[`graph-${idx}`] ? styles.inputCorrect : ''}`}
+                  className={`${styles.tableInput} ${validierteZellen[`graph-${idx}`] === true ? styles.inputCorrect : validierteZellen[`graph-${idx}`] === false ? styles.inputIncorrect : ''}`}
                 />
               </td>
             ))}
@@ -191,7 +191,7 @@ const aufgabenBanks = {
       thema: '4. Funktionsgleichung aufstellen',
       frage: `Wie lautet die Funktionsgleichung der Geraden, die durch die Punkte P₁(${x1}|${y1}), P₂(${x2}|${y2}) verläuft? Berechne!`,
       antwort: `${mRound};${tRound}`,
-      lösungsweg: `$$m = \\dfrac{${y2 - y1}}{${x2 - x1}} = ${mRound}$$\n$$t = ${y1} - ${mRound} \\cdot ${x1} = ${tRound}$$\n$$y = ${mRound}x ${tRound >= 0 ? '+' : '-'} ${Math.abs(tRound)}$$`
+      lösungsweg: `Schritt 1: Steigung m berechnen\n$$m = \\dfrac{${y2} - (${y1})}{${x2} - (${x1})} = \\dfrac{${y2 - y1}}{${x2 - x1}} = ${mRound}$$\nSchritt 2: m und einen Punkt, z.B. P₁(${x1}|${y1}), in die allgemeine Form y = mx + t einsetzen\n$$${y1} = ${mRound} \\cdot (${x1}) + t$$\nSchritt 3: Gleichung nach t auflösen\n$$t = ${y1} - ${mRound} \\cdot (${x1}) = ${tRound}$$\nLösung: Funktionsgleichung\n$$y = ${mRound}x ${tRound >= 0 ? '+' : '-'} ${Math.abs(tRound)}$$`
     }
   },
 
@@ -345,6 +345,7 @@ export default function GemischteAufgaben() {
   const [validiert, setValidiert] = useState<{ [key: number]: boolean }>({})
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
   const [validierteZellen, setValidierteZellen] = useState<{ [key: number | string]: { [key: string]: boolean } }>({})
+  const [fieldFeedback, setFieldFeedback] = useState<{ [key: number]: { [field: string]: 'correct' | 'incorrect' } }>({})
   useEffect(() => {
     const script = document.createElement('script')
     script.src = 'https://polyfill.io/v3/polyfill.min.js?features=es6'
@@ -378,6 +379,8 @@ export default function GemischteAufgaben() {
     setAntworten({})
     setValidiert({})
     setShowLösung({})
+    setValidierteZellen({})
+    setFieldFeedback({})
   }
 
   useEffect(() => {
@@ -435,6 +438,51 @@ export default function GemischteAufgaben() {
     setValidiert({ ...validiert, [index]: isCorrect })
   }
 
+  // Ermittelt den Erwartungswert eines einzelnen Feldes für die Live-Färbung
+  function getFieldExpectation(aufgabe: Aufgabe, field: string): number | null {
+    if (aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen') {
+      const parts = (aufgabe.antwort as string).split(';').map(p => parseFloat(p.trim()))
+      if (field === 'm') return parts[0]
+      if (field === 't') return parts[1]
+    } else if (aufgabe.typ === 'schnittpunkt') {
+      const expected = aufgabe.antwort as { x: number; y: number }
+      if (field === 'x') return expected.x
+      if (field === 'y') return expected.y
+    } else if (field === 'value' && typeof aufgabe.antwort === 'number') {
+      return aufgabe.antwort
+    }
+    return null
+  }
+
+  function isFieldCorrect(aufgabe: Aufgabe, field: string, rawValue: string): boolean {
+    const expected = getFieldExpectation(aufgabe, field)
+    if (expected === null) return false
+    const num = parseFloat(rawValue.replace(',', '.'))
+    if (isNaN(num)) return false
+    const toleranz = Math.max(Math.abs(expected) * 0.01, 0.02)
+    return Math.abs(num - expected) <= toleranz
+  }
+
+  // Aktualisiert die Live-Färbung (grün/rot) eines einzelnen Eingabefeldes
+  function updateFieldFeedback(index: number, field: string, value: string) {
+    const aufgabe = aufgaben[index]
+    if (!aufgabe) return
+    setFieldFeedback(prev => {
+      const current = { ...(prev[index] || {}) }
+      if (!value.trim()) {
+        delete current[field]
+      } else {
+        current[field] = isFieldCorrect(aufgabe, field, value) ? 'correct' : 'incorrect'
+      }
+      return { ...prev, [index]: current }
+    })
+  }
+
+  function fieldClass(index: number, field: string): string {
+    const state = fieldFeedback[index]?.[field]
+    return state === 'correct' ? styles.correct : state === 'incorrect' ? styles.incorrect : ''
+  }
+
   function handleMtChange(index: number, field: 'm' | 't', value: string) {
     setAntworten({
       ...antworten,
@@ -443,6 +491,7 @@ export default function GemischteAufgaben() {
         [field]: value
       }
     })
+    updateFieldFeedback(index, field, value)
   }
 
   function handleValueChange(index: number, value: string) {
@@ -453,6 +502,7 @@ export default function GemischteAufgaben() {
         value
       }
     })
+    updateFieldFeedback(index, 'value', value)
   }
 
   function handleXYChange(index: number, field: 'x' | 'y', value: string) {
@@ -463,6 +513,7 @@ export default function GemischteAufgaben() {
         [field]: value
       }
     })
+    updateFieldFeedback(index, field, value)
   }
 
   function handleYesNo(index: number, answer: 'ja' | 'nein') {
@@ -471,6 +522,12 @@ export default function GemischteAufgaben() {
       [index]: {
         value: answer
       }
+    })
+    const aufgabe = aufgaben[index]
+    const isCorrect = aufgabe?.typ === 'punktAufGerade' && answer === aufgabe.antwort
+    setFieldFeedback({
+      ...fieldFeedback,
+      [index]: { value: isCorrect ? 'correct' : 'incorrect' }
     })
   }
 
@@ -516,14 +573,14 @@ export default function GemischteAufgaben() {
                 {/* ja/nein Buttons */}
                 {aufgabe.typ === 'punktAufGerade' && (
                   <div className={styles.yesNoButtons}>
-                    <button 
-                      className={`${styles.yesNoBtn} ${antworten[index]?.value === 'ja' ? styles.selected : ''}`}
+                    <button
+                      className={`${styles.yesNoBtn} ${antworten[index]?.value === 'ja' ? styles.selected : ''} ${antworten[index]?.value === 'ja' ? fieldClass(index, 'value') : ''}`}
                       onClick={() => handleYesNo(index, 'ja')}
                     >
                       Ja
                     </button>
-                    <button 
-                      className={`${styles.yesNoBtn} ${antworten[index]?.value === 'nein' ? styles.selected : ''}`}
+                    <button
+                      className={`${styles.yesNoBtn} ${antworten[index]?.value === 'nein' ? styles.selected : ''} ${antworten[index]?.value === 'nein' ? fieldClass(index, 'value') : ''}`}
                       onClick={() => handleYesNo(index, 'nein')}
                     >
                       Nein
@@ -542,7 +599,7 @@ export default function GemischteAufgaben() {
                           placeholder="z.B. 2"
                           value={antworten[index]?.m || ''}
                           onChange={(e) => handleMtChange(index, 'm', e.target.value)}
-                          className={styles.mtInput}
+                          className={`${styles.mtInput} ${fieldClass(index, 'm')}`}
                         />
                       </div>
                       <div className={styles.mtGroup}>
@@ -552,7 +609,7 @@ export default function GemischteAufgaben() {
                           placeholder="z.B. -3"
                           value={antworten[index]?.t || ''}
                           onChange={(e) => handleMtChange(index, 't', e.target.value)}
-                          className={styles.mtInput}
+                          className={`${styles.mtInput} ${fieldClass(index, 't')}`}
                         />
                       </div>
                     </div>
@@ -593,7 +650,7 @@ export default function GemischteAufgaben() {
                           placeholder="z.B. 2"
                           value={antworten[index]?.x || ''}
                           onChange={(e) => handleXYChange(index, 'x', e.target.value)}
-                          className={styles.xyInput}
+                          className={`${styles.xyInput} ${fieldClass(index, 'x')}`}
                         />
                       </div>
                       <div className={styles.xyGroup}>
@@ -603,7 +660,7 @@ export default function GemischteAufgaben() {
                           placeholder="z.B. -3"
                           value={antworten[index]?.y || ''}
                           onChange={(e) => handleXYChange(index, 'y', e.target.value)}
-                          className={styles.xyInput}
+                          className={`${styles.xyInput} ${fieldClass(index, 'y')}`}
                         />
                       </div>
                     </div>
@@ -651,7 +708,7 @@ export default function GemischteAufgaben() {
                     placeholder="Ergebnis eingeben"
                     value={antworten[index]?.value || ''}
                     onChange={(e) => handleValueChange(index, e.target.value)}
-                    className={styles.standardInput}
+                    className={`${styles.standardInput} ${fieldClass(index, 'value')}`}
                     onKeyPress={(e) => e.key === 'Enter' && checkAnswer(index)}
                   />
                 )}
@@ -671,9 +728,14 @@ export default function GemischteAufgaben() {
               </div>
 
               {/* Feedback */}
-              {validiert[index] && (
+              {validiert[index] === true && (
                 <div className={styles.feedbackBox}>
                   ✓ Richtig!
+                </div>
+              )}
+              {validiert[index] === false && (
+                <div className={styles.feedbackBoxError}>
+                  ✗ Leider noch nicht richtig. Versuche es nochmal!
                 </div>
               )}
 
