@@ -7,6 +7,8 @@ export default function Anwendungsaufgaben() {
     { title: '2. Das Tipi', desc: 'Berechne die Maße eines Tipis anhand von zwei linearen Funktionsgleichungen.', href: 'tipi', icon: '⛺' },
     { title: '3. Der Berg', desc: 'Berechne Funktionsgleichungen und Schnittpunkte von Bergliften anhand eines Bergmassivs.', href: 'berg', icon: '⛰️' },
     { title: '4. Die Sonne', desc: 'Untersuche die Eigenschaften von Sonnenstrahlen mit Hilfe linearer Funktionen.', href: 'sonne', icon: '☀️' },
+    { title: '5. Die Schrägseilbrücke', desc: 'Berechne Funktionsgleichungen und Schnittpunkte der Tragseile einer Brücke.', href: 'bruecke', icon: '🌉' },
+    { title: '6. Der Flughafen', desc: 'Untersuche zwei sich kreuzende Start- und Landebahnen mit linearen Funktionen.', href: 'flughafen', icon: '✈️' },
   ]
 
   return (

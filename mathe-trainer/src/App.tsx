@@ -59,6 +59,8 @@ import FussballplatzAufgabe from './pages/lineare_funktionen/FussballplatzAufgab
 import TipiAufgabe from './pages/lineare_funktionen/TipiAufgabe'
 import BergAufgabe from './pages/lineare_funktionen/BergAufgabe'
 import SonneAufgabe from './pages/lineare_funktionen/SonneAufgabe'
+import BrueckeAufgabe from './pages/lineare_funktionen/BrueckeAufgabe'
+import FlughafenAufgabe from './pages/lineare_funktionen/FlughafenAufgabe'
 import Wertetabelle from './pages/lineare_funktionen/Wertetabelle'
 import ParallelSenkrecht from './pages/lineare_funktionen/ParallelSenkrecht'
 import ExerciseSheetGenerator from './pages/lineare_funktionen/ExerciseSheetGenerator'
@@ -287,6 +289,8 @@ export default function App() {
           <Route path="/lineare_funktionen/anwendungsaufgaben/tipi" element={<TipiAufgabe />} />
           <Route path="/lineare_funktionen/anwendungsaufgaben/berg" element={<BergAufgabe />} />
           <Route path="/lineare_funktionen/anwendungsaufgaben/sonne" element={<SonneAufgabe />} />
+          <Route path="/lineare_funktionen/anwendungsaufgaben/bruecke" element={<BrueckeAufgabe />} />
+          <Route path="/lineare_funktionen/anwendungsaufgaben/flughafen" element={<FlughafenAufgabe />} />
           <Route path="/lineare_funktionen/spiel_muenzen" element={<SpielMuenzen />} />
           <Route path="/lineare_funktionen/test" element={<TestLF />} />
           <Route path="/lineare_funktionen/ubungsblatt-generator" element={<ExerciseSheetGenerator />} />
