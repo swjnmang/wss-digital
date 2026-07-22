@@ -133,6 +133,9 @@ import DatenZufallAnwendungsaufgaben from './pages/daten_und_zufall/anwendungsau
 import MensaUmfrage from './pages/daten_und_zufall/anwendungsaufgaben/MensaUmfrage';
 import Ticketkontrolle from './pages/daten_und_zufall/anwendungsaufgaben/Ticketkontrolle';
 import Elfmeterschiessen from './pages/daten_und_zufall/anwendungsaufgaben/Elfmeterschiessen';
+import Sommerfest from './pages/daten_und_zufall/anwendungsaufgaben/Sommerfest';
+import Fahrradstation from './pages/daten_und_zufall/anwendungsaufgaben/Fahrradstation';
+import BioKiste from './pages/daten_und_zufall/anwendungsaufgaben/BioKiste';
 // Raum und Form
 import RaumUndFormIndex from './pages/RaumUndFormIndex';
 import Flaechengeometrie from './pages/raum_und_form/Flaechengeometrie';
@@ -359,6 +362,9 @@ export default function App() {
           <Route path="/daten-und-zufall/anwendungsaufgaben/mensa-umfrage" element={<MensaUmfrage />} />
           <Route path="/daten-und-zufall/anwendungsaufgaben/ticketkontrolle" element={<Ticketkontrolle />} />
           <Route path="/daten-und-zufall/anwendungsaufgaben/elfmeterschiessen" element={<Elfmeterschiessen />} />
+          <Route path="/daten-und-zufall/anwendungsaufgaben/sommerfest" element={<Sommerfest />} />
+          <Route path="/daten-und-zufall/anwendungsaufgaben/fahrradstation" element={<Fahrradstation />} />
+          <Route path="/daten-und-zufall/anwendungsaufgaben/bio-kiste" element={<BioKiste />} />
 
           {/* Raum und Form */}
           <Route path="/raum-und-form" element={<RaumUndFormIndex />} />

@@ -18,6 +18,24 @@ const tasks = [
         description: 'Relative Häufigkeit, Kennwerte der Zuschauerzahlen und dreistufiges Baumdiagramm mit konstanter Trefferquote.',
         icon: 'fa-solid fa-futbol',
         path: '/daten-und-zufall/anwendungsaufgaben/elfmeterschiessen'
+    },
+    {
+        title: '4. Das Sommerfest',
+        description: 'Kreuztabelle mit Kreisdiagramm, Tombola-Baumdiagramm ohne Zurücklegen sowie Kennwerte und Diagrammkritik.',
+        icon: 'fa-solid fa-ticket',
+        path: '/daten-und-zufall/anwendungsaufgaben/sommerfest'
+    },
+    {
+        title: '5. Die Fahrradstation',
+        description: 'Balkendiagramm, dreiästiges Baumdiagramm mit Zurücklegen, Kennwerte der Mietdauer und Kritik am Mittelwert.',
+        icon: 'fa-solid fa-bicycle',
+        path: '/daten-und-zufall/anwendungsaufgaben/fahrradstation'
+    },
+    {
+        title: '6. Die Bio-Kiste',
+        description: 'Kreisdiagramm, Baumdiagramm ohne Zurücklegen mit drei Sorten, Kennwerte des Gewichts und kritische Werbeaussage.',
+        icon: 'fa-solid fa-basket-shopping',
+        path: '/daten-und-zufall/anwendungsaufgaben/bio-kiste'
     }
 ];
 
