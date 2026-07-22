@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, RefreshCw, AlignLeft, Table2, Hash, BarChart3, PieChart as PieChartIcon, Lightbulb } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, RefreshCw, AlignLeft, Table2, Hash, BarChart3, PieChart as PieChartIcon, Lightbulb, LayoutGrid } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { generateTask, checkAnswer, GeneratedTask } from './haeufigkeit/generator';
 
@@ -11,6 +11,7 @@ const REPRESENTATION_LABEL: Record<GeneratedTask['representation'], { label: str
   table: { label: 'Tabelle', icon: <Table2 className="w-4 h-4" /> },
   tally: { label: 'Strichliste', icon: <Hash className="w-4 h-4" /> },
   chart: { label: 'Diagramm', icon: <BarChart3 className="w-4 h-4" /> },
+  crosstab: { label: 'Kreuztabelle', icon: <LayoutGrid className="w-4 h-4" /> },
 };
 
 const TallyBundle: React.FC<{ strokes: number }> = ({ strokes }) => {
@@ -73,6 +74,7 @@ const RelativeAbsoluteHaeufigkeit: React.FC = () => {
   const repInfo = REPRESENTATION_LABEL[task.representation];
   const revealedCategories = task.categories.filter((c) => c.revealed);
   const chartData = revealedCategories.map((c) => ({ name: c.name, value: c.count }));
+  const crosstab = task.crosstab;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
@@ -182,6 +184,57 @@ const RelativeAbsoluteHaeufigkeit: React.FC = () => {
                   </BarChart>
                 )}
               </ResponsiveContainer>
+            </div>
+          )}
+
+          {task.representation === 'crosstab' && crosstab && (
+            <div className="mb-6 overflow-x-auto">
+              <table className="w-full border-collapse text-sm sm:text-base">
+                <thead>
+                  <tr className="bg-indigo-50">
+                    <th className="text-left p-3 font-semibold text-slate-700 border-b-2 border-indigo-200">{crosstab.columnGroupLabel}</th>
+                    {crosstab.columnLabels.map((label, c) => (
+                      <th
+                        key={label}
+                        className={`text-right p-3 font-semibold text-slate-700 border-b-2 border-indigo-200 ${
+                          crosstab.highlightCols?.includes(c) ? 'bg-indigo-100' : ''
+                        }`}
+                      >
+                        {label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {crosstab.rowLabels.map((rowLabel, r) => (
+                    <tr key={rowLabel} className={`border-b border-slate-100 ${crosstab.highlightRow === r ? 'bg-indigo-50/60' : ''}`}>
+                      <td className="p-3 text-slate-700 font-medium">{rowLabel}</td>
+                      {crosstab.columnLabels.map((_, c) => {
+                        const isHidden = crosstab.hiddenCell?.row === r && crosstab.hiddenCell?.col === c;
+                        const isHighlighted = crosstab.highlightRow === r && crosstab.highlightCols?.includes(c);
+                        return (
+                          <td
+                            key={c}
+                            className={`p-3 text-right font-mono ${
+                              isHighlighted ? 'font-bold text-indigo-700 bg-indigo-100/70' : 'text-slate-900'
+                            }`}
+                          >
+                            {isHidden ? '?' : crosstab.matrix[r][c]}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                  <tr>
+                    <td className="p-3 font-bold text-slate-900">Gesamt</td>
+                    {crosstab.columnTotals.map((colTotal, c) => (
+                      <td key={c} className="p-3 text-right font-mono font-bold text-slate-900">
+                        {colTotal}
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
             </div>
           )}
 
