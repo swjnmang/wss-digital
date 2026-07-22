@@ -88,19 +88,19 @@ function FlughafenSkizze() {
         Rollweg
       </text>
 
-      {/* Startbahn 2, y = -2x + 7, durch S(-1|9) und U(4|-1) */}
+      {/* Startbahn 2 (Gleichung nur im Aufgabentext gegeben) */}
       <line x1={px(-1.75)} y1={py(10.5)} x2={px(4.75)} y2={py(-2.5)} stroke="#475569" strokeWidth={16} strokeLinecap="round" />
       <line x1={px(-1.75)} y1={py(10.5)} x2={px(4.75)} y2={py(-2.5)} stroke="#f8fafc" strokeWidth={2} strokeDasharray="10 8" />
 
-      {/* Startbahn 1, y = 0,5x + 2, durch P(-8|-2) und Q(6|5) */}
-      <line x1={px(-8.6)} y1={py(-2.3)} x2={px(6.6)} y2={py(5.3)} stroke="#334155" strokeWidth={16} strokeLinecap="round" />
-      <line x1={px(-8.6)} y1={py(-2.3)} x2={px(6.6)} y2={py(5.3)} stroke="#f8fafc" strokeWidth={2} strokeDasharray="10 8" />
+      {/* Startbahn 1, verläuft durch P und Q (siehe Aufgabe 1) */}
+      <line x1={px(-8.9)} y1={py(-2.45)} x2={px(6.1)} y2={py(5.05)} stroke="#334155" strokeWidth={16} strokeLinecap="round" />
+      <line x1={px(-8.9)} y1={py(-2.45)} x2={px(6.1)} y2={py(5.05)} stroke="#f8fafc" strokeWidth={2} strokeDasharray="10 8" />
 
-      <text x={px(-6.5)} y={py(-1.7)} fontSize={14} fontWeight={700} fill="#1e293b" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
-        Startbahn 1: y = 0,5x + 2
+      <text x={px(-3)} y={py(-0.8)} fontSize={12} fontWeight={700} fill="#1e293b" textAnchor="middle" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
+        Startbahn 1
       </text>
-      <text x={px(-1.4)} y={py(8.9)} fontSize={14} fontWeight={700} fill="#475569" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
-        Startbahn 2: y = -2x + 7
+      <text x={px(1.9)} y={py(6.6)} fontSize={12} fontWeight={700} fill="#475569" textAnchor="middle" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
+        Startbahn 2
       </text>
 
       {/* Tower */}
@@ -112,13 +112,12 @@ function FlughafenSkizze() {
         Tower
       </text>
 
-      {/* Punkte */}
+      {/* Punkte - nur P und Q sind beschriftet (werden für Aufgabe 1 benötigt).
+          Der Kreuzungspunkt der Bahnen wird bewusst NICHT markiert, da er die
+          Lösung von Aufgabe 3 ist und rechnerisch ermittelt werden muss. */}
       {[
-        { p: [-8, -2], label: 'P(-8|-2)', dy: 18 },
-        { p: [6, 5], label: 'Q(6|5)', dy: -12 },
-        { p: [-1, 9], label: 'S(-1|9)', dy: -12 },
-        { p: [4, -1], label: 'U(4|-1)', dy: 18 },
-        { p: [2, 3], label: 'K(2|3)', dy: -12 },
+        { p: [-8.4, -2.2], label: 'P(-8,4|-2,2)', dy: 18 },
+        { p: [5.6, 4.8], label: 'Q(5,6|4,8)', dy: -12 },
       ].map(({ p, label, dy }) => (
         <g key={label}>
           <circle cx={px(p[0])} cy={py(p[1])} r={5} fill="#1e3a8a" />
@@ -149,14 +148,14 @@ export default function FlughafenAufgabe() {
       id: 1,
       title: 'Aufgabe 1',
       question:
-        'Bestimme die Funktionsgleichung von Startbahn 1, die durch die Punkte P (-8|-2) und Q (6|5) verläuft. Die Gleichung hat die Form y = m·x + t. Gib m und t ein.',
+        'Bestimme die Funktionsgleichung von Startbahn 1, die durch die Punkte P (-8,4|-2,2) und Q (5,6|4,8) verläuft. Die Gleichung hat die Form y = m·x + t. Gib m und t ein.',
       solution: {
         type: 'number',
         labels: ['m', 't'],
         answers: [0.5, 2],
         tolerance: 0.02,
       },
-      hint: 'Nutze die zwei Punkte P(-8|-2) und Q(6|5). Berechne m = (5-(-2))/(6-(-8)) = 7/14 = 0,5. Setze einen Punkt ein, um t zu ermitteln: 5 = 0,5·6 + t → t = 2.',
+      hint: 'Nutze die zwei Punkte P(-8,4|-2,2) und Q(5,6|4,8). Berechne m = (4,8-(-2,2))/(5,6-(-8,4)) = 7/14 = 0,5. Setze einen Punkt ein, um t zu ermitteln: -2,2 = 0,5·(-8,4) + t → t = 2.',
     },
     {
       id: 2,
