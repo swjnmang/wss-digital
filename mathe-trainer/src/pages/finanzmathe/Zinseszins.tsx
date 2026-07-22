@@ -30,10 +30,22 @@ const explainerVideos: Record<TaskType, string> = {
   n: 'https://youtu.be/oUjYapq1AX8?si=lx02oGVSFGhtEVdA',
 };
 
+const UNIT_OPTIONS = ['€', '% p.a.', 'Jahre'];
+
+const getCorrectUnit = (type: TaskType) => {
+  switch (type) {
+    case 'k_end': return '€';
+    case 'k_start': return '€';
+    case 'p': return '% p.a.';
+    case 'n': return 'Jahre';
+  }
+};
+
 export default function Zinseszins() {
   const [taskType, setTaskType] = useState<TaskType | 'random'>('random');
   const [task, setTask] = useState<Task | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
+  const [userUnit, setUserUnit] = useState('');
   const [feedback, setFeedback] = useState<React.ReactNode | null>(null);
   const [feedbackType, setFeedbackType] = useState<'correct' | 'incorrect' | null>(null);
   const [solution, setSolution] = useState<React.ReactNode | null>(null);
@@ -51,7 +63,8 @@ export default function Zinseszins() {
     setFeedbackType(null);
     setSolution(null);
     setUserAnswer('');
-    
+    setUserUnit('');
+
     let type: TaskType;
     if (taskType === 'random') {
       const types: TaskType[] = ['k_end', 'k_start', 'p', 'n'];
@@ -149,38 +162,53 @@ export default function Zinseszins() {
 
   const checkAnswer = () => {
     if (!task) return;
-    
+
     const input = parseFloat(userAnswer.replace(',', '.'));
     if (isNaN(input)) {
       setFeedback('Bitte gib eine gültige Zahl ein.');
       setFeedbackType('incorrect');
       return;
     }
+    if (!userUnit) {
+      setFeedback('Bitte wähle auch die passende Einheit aus.');
+      setFeedbackType('incorrect');
+      return;
+    }
 
     let correctValue = 0;
-    let unit = '';
     let tolerance = 0.02; // Default tolerance
 
     switch (task.type) {
-      case 'k_end': correctValue = task.Kn; unit = '€'; break;
-      case 'k_start': correctValue = task.K0; unit = '€'; break;
-      case 'p': correctValue = task.p; unit = '% p.a.'; tolerance = 0.05; break;
-      case 'n': correctValue = task.n; unit = 'Jahre'; tolerance = 0.05; break;
+      case 'k_end': correctValue = task.Kn; break;
+      case 'k_start': correctValue = task.K0; break;
+      case 'p': correctValue = task.p; tolerance = 0.05; break;
+      case 'n': correctValue = task.n; tolerance = 0.05; break;
     }
+    const unit = getCorrectUnit(task.type);
 
     const diff = Math.abs(input - correctValue);
-    
+    const numberCorrect = diff <= tolerance;
+    const unitCorrect = userUnit === unit;
+
     setTotalCount(c => c + 1);
 
-    if (diff <= tolerance) {
+    if (numberCorrect && unitCorrect) {
       setFeedback('Richtig! Sehr gut gemacht!');
       setFeedbackType('correct');
       setCorrectCount(c => c + 1);
       setStreak(s => s + 1);
     } else {
+      let hint: React.ReactNode;
+      if (numberCorrect && !unitCorrect) {
+        hint = <>Die Zahl stimmt, aber die Einheit ist falsch.</>;
+      } else if (!numberCorrect && unitCorrect) {
+        hint = <>Die Einheit stimmt, aber die Zahl ist falsch.</>;
+      } else {
+        hint = <>Zahl und Einheit sind falsch.</>;
+      }
       setFeedback(
         <div>
-          Leider falsch. Die richtige Lösung ist <b>{formatNumber(correctValue, task.type === 'n' ? 0 : 2)} {unit}</b>.
+          {hint} Die richtige Lösung ist <b>{formatNumber(correctValue, task.type === 'n' ? 0 : 2)} {unit}</b>.
         </div>
       );
       setFeedbackType('incorrect');
@@ -296,9 +324,16 @@ export default function Zinseszins() {
                     onKeyDown={handleKeyDown}
                     placeholder={task.type === 'n' ? 'z.B. 5' : 'z.B. 1234,56'}
                   />
-                  <span className="text-lg sm:text-xl font-bold text-gray-600 whitespace-nowrap">
-                    {task.type === 'k_end' || task.type === 'k_start' ? '€' : task.type === 'p' ? '% p.a.' : 'Jahre'}
-                  </span>
+                  <select
+                    className="border-2 border-slate-300 rounded-lg p-2 text-lg font-bold text-gray-700 bg-white focus:outline-blue-400"
+                    value={userUnit}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setUserUnit(e.target.value)}
+                  >
+                    <option value="" disabled>Einheit</option>
+                    {UNIT_OPTIONS.map(u => (
+                      <option key={u} value={u}>{u}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
