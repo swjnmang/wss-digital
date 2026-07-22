@@ -23,6 +23,13 @@ const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max 
 const formatCurrency = (val: number) => val.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const formatNumber = (val: number, decimals: number = 2) => val.toLocaleString('de-DE', { maximumFractionDigits: decimals });
 
+const explainerVideos: Record<TaskType, string> = {
+  k_end: 'https://youtu.be/4A8DaY8-Mgw?si=L4IT09_79obIao_W',
+  k_start: 'https://youtu.be/vs0o8S9ksjg?list=PLI8kX0XEfSujoc5mrNv30D7mptBkAN3E8&t=130',
+  p: 'https://youtu.be/BeJd9e5Qv-E?si=XokDQ8yfwluJy1IW',
+  n: 'https://youtu.be/oUjYapq1AX8?si=lx02oGVSFGhtEVdA',
+};
+
 export default function Zinseszins() {
   const [taskType, setTaskType] = useState<TaskType | 'random'>('random');
   const [task, setTask] = useState<Task | null>(null);
@@ -301,6 +308,11 @@ export default function Zinseszins() {
             <button onClick={checkAnswer} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full sm:w-auto">Überprüfen</button>
             <button onClick={showSolution} className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full sm:w-auto">Lösung zeigen</button>
             <button onClick={generateNewTask} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full sm:w-auto">Nächste Aufgabe</button>
+            {task && (
+              <a href={explainerVideos[task.type]} target="_blank" rel="noopener noreferrer" className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full sm:w-auto flex items-center justify-center">
+                Erklärvideo
+              </a>
+            )}
           </div>
 
           {feedback && (
