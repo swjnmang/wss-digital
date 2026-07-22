@@ -193,13 +193,8 @@ const RelativeAbsoluteHaeufigkeit: React.FC = () => {
                 <thead>
                   <tr className="bg-indigo-50">
                     <th className="text-left p-3 font-semibold text-slate-700 border-b-2 border-indigo-200">{crosstab.columnGroupLabel}</th>
-                    {crosstab.columnLabels.map((label, c) => (
-                      <th
-                        key={label}
-                        className={`text-right p-3 font-semibold text-slate-700 border-b-2 border-indigo-200 ${
-                          crosstab.highlightCols?.includes(c) ? 'bg-indigo-100' : ''
-                        }`}
-                      >
+                    {crosstab.columnLabels.map((label) => (
+                      <th key={label} className="text-right p-3 font-semibold text-slate-700 border-b-2 border-indigo-200">
                         {label}
                       </th>
                     ))}
@@ -207,18 +202,12 @@ const RelativeAbsoluteHaeufigkeit: React.FC = () => {
                 </thead>
                 <tbody>
                   {crosstab.rowLabels.map((rowLabel, r) => (
-                    <tr key={rowLabel} className={`border-b border-slate-100 ${crosstab.highlightRow === r ? 'bg-indigo-50/60' : ''}`}>
+                    <tr key={rowLabel} className="border-b border-slate-100">
                       <td className="p-3 text-slate-700 font-medium">{rowLabel}</td>
                       {crosstab.columnLabels.map((_, c) => {
                         const isHidden = crosstab.hiddenCell?.row === r && crosstab.hiddenCell?.col === c;
-                        const isHighlighted = crosstab.highlightRow === r && crosstab.highlightCols?.includes(c);
                         return (
-                          <td
-                            key={c}
-                            className={`p-3 text-right font-mono ${
-                              isHighlighted ? 'font-bold text-indigo-700 bg-indigo-100/70' : 'text-slate-900'
-                            }`}
-                          >
+                          <td key={c} className="p-3 text-right font-mono text-slate-900">
                             {isHidden ? '?' : crosstab.matrix[r][c]}
                           </td>
                         );
