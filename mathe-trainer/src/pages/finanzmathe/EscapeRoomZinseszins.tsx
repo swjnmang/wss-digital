@@ -1,6 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import H5PPlayer from '../../components/H5PPlayer'
+
+const EMBED_URL = 'https://nachhilfe-wirtschaftsschule.de/wordpress/wp-admin/admin-ajax.php?action=h5p_embed&id=2'
 
 export default function EscapeRoomZinseszins() {
   const navigate = useNavigate()
@@ -25,7 +26,16 @@ export default function EscapeRoomZinseszins() {
             Hinweis: Der Escape Room wird nur auf großen Displays korrekt dargestellt (z.B. Windows-PC).
           </p>
 
-          <H5PPlayer contentPath="/h5p-content/escaperoom-zinseszins" />
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <iframe
+              src={EMBED_URL}
+              width="100%"
+              height={700}
+              style={{ border: '1px solid #e5e7eb', borderRadius: 8, backgroundColor: 'white' }}
+              allowFullScreen
+              title="Escaperoom (Zinsen und Zinseszinsen)"
+            />
+          </div>
         </div>
       </div>
     </div>
