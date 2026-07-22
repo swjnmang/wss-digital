@@ -1,411 +1,275 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, RefreshCw, AlignLeft, Table2, Hash, BarChart3, PieChart as PieChartIcon, Lightbulb } from 'lucide-react';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { generateTask, checkAnswer, GeneratedTask } from './haeufigkeit/generator';
 
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  type: 'multiple-choice' | 'numeric' | 'fraction';
-  scenario: string;
-  question: string;
-  options?: string[];
-  correctAnswer: string | number;
-  tolerance?: number;
-  solution: string;
-  explanation: string;
-}
+const COLORS = ['#6366f1', '#f43f5e', '#10b981', '#f59e0b', '#0ea5e9', '#a855f7'];
 
-interface TaskState {
-  answer: string | number;
-  status: 'blank' | 'correct' | 'incorrect' | 'invalid';
-  showSolution: boolean;
-  attempts: number;
-}
+const REPRESENTATION_LABEL: Record<GeneratedTask['representation'], { label: string; icon: React.ReactNode }> = {
+  text: { label: 'Sachtext', icon: <AlignLeft className="w-4 h-4" /> },
+  table: { label: 'Tabelle', icon: <Table2 className="w-4 h-4" /> },
+  tally: { label: 'Strichliste', icon: <Hash className="w-4 h-4" /> },
+  chart: { label: 'Diagramm', icon: <BarChart3 className="w-4 h-4" /> },
+};
 
-const tasks: Task[] = [
-  {
-    id: 'hauf-01',
-    title: 'Umfrage zur Lieblingsfarbe',
-    description: 'Absolute und relative Häufigkeit verstehen',
-    type: 'multiple-choice',
-    scenario: 'In einer Klasse mit 20 Schülern wurden diese nach ihrer Lieblingsfarbe befragt. 8 Schüler antworteten "Blau".',
-    question: 'Wie viel Prozent der Schüler bevorzugen Blau?',
-    options: ['20%', '32%', '40%', '50%'],
-    correctAnswer: '40%',
-    solution: 'Relative Häufigkeit = Absolute Häufigkeit / Gesamtmenge = 8 / 20 = 0,4 = 40%',
-    explanation: 'Die absolute Häufigkeit ist 8 (konkrete Anzahl). Die relative Häufigkeit ist der Anteil: 8/20 = 2/5 = 40%.'
-  },
-  {
-    id: 'hauf-02',
-    title: 'Würfelwürfe',
-    description: 'Häufigkeiten bei Zufallsexperimenten',
-    type: 'numeric',
-    scenario: 'Ein Würfel wird 60-mal geworfen. Dabei wird die "6" insgesamt 12-mal geworfen.',
-    question: 'Wie groß ist die relative Häufigkeit der "6"? Antworte als Dezimalzahl.',
-    correctAnswer: 0.2,
-    tolerance: 0.01,
-    solution: 'Relative Häufigkeit = 12 / 60 = 1/5 = 0,2',
-    explanation: 'Die absolute Häufigkeit der 6 ist 12. Die relative Häufigkeit ist 12 von 60 Würfen, also 12/60 = 0,2.'
-  },
-  {
-    id: 'hauf-03',
-    title: 'Absatzquote berechnen',
-    description: 'Von 150 hergestellten Produkten sind 3 fehlerhaft',
-    type: 'numeric',
-    scenario: 'In einer Fabrik wurden 150 Produkte hergestellt. Davon waren 3 Produkte fehlerhaft.',
-    question: 'Wie groß ist die relative Häufigkeit der fehlerhaften Produkte? (als Dezimalzahl, 4 Stellen)',
-    correctAnswer: 0.02,
-    tolerance: 0.001,
-    solution: 'Relative Häufigkeit = 3 / 150 = 1/50 = 0,02 = 2%',
-    explanation: '3 fehlerhafte Produkte von 150 insgesamt: 3/150 = 0,02 = 2%. Dies ist eine sehr gute Qualitätsquote!'
-  },
-  {
-    id: 'hauf-04',
-    title: 'Umschlag mit Kugeln',
-    description: 'Relative Häufigkeit und Gesamtanzahl',
-    type: 'numeric',
-    scenario: 'In einem Beutel sind insgesamt 25 Kugeln. 40% davon sind rot.',
-    question: 'Wie viele rote Kugeln sind im Beutel? (absolute Häufigkeit)',
-    correctAnswer: 10,
-    tolerance: 0,
-    solution: 'Absolute Häufigkeit = Relative Häufigkeit × Gesamtmenge = 0,4 × 25 = 10',
-    explanation: 'Wenn 40% von 25 Kugeln rot sind: 0,4 × 25 = 10 rote Kugeln.'
-  },
-  {
-    id: 'hauf-05',
-    title: 'Befragung schulischer Aktivitäten',
-    description: 'Klassendiskussion mit relativen Häufigkeiten',
-    type: 'multiple-choice',
-    scenario: 'In einer Klasse mit 32 Schülern spielen 16 Schüler in der Schulband.',
-    question: 'Welche relative Häufigkeit haben die Schüler in der Schulband?',
-    options: ['1/4', '1/3', '1/2', '2/3'],
-    correctAnswer: '1/2',
-    solution: 'Relative Häufigkeit = 16 / 32 = 1/2 = 50%',
-    explanation: 'Die Hälfte der Klasse spielt in der Schulband (50% oder 1/2).'
-  },
-  {
-    id: 'hauf-06',
-    title: 'Münzwurf Experiment',
-    description: 'Häufigkeitsverhältnisse erkennen',
-    type: 'numeric',
-    scenario: 'Eine Münze wird 80-mal geworfen. 32-mal zeigt sie "Zahl".',
-    question: 'Wie groß ist die relative Häufigkeit von "Zahl"? (als Dezimalzahl)',
-    correctAnswer: 0.4,
-    tolerance: 0.01,
-    solution: 'Relative Häufigkeit = 32 / 80 = 2/5 = 0,4 = 40%',
-    explanation: 'Bei 32 "Zahl" von 80 Würfen: 32/80 = 0,4. Dies weicht leicht von der theoretischen Wahrscheinlichkeit von 50% ab.'
-  },
-  {
-    id: 'hauf-07',
-    title: 'Rückwärts rechnen: Von relativ zu absolut',
-    description: 'Absolute Häufigkeit aus relativer Häufigkeit berechnen',
-    type: 'numeric',
-    scenario: 'Bei einer Befragung von 200 Personen gaben 35% an, Sport zu treiben.',
-    question: 'Wie viele Personen treiben Sport? (absolute Häufigkeit)',
-    correctAnswer: 70,
-    tolerance: 0,
-    solution: 'Absolute Häufigkeit = Relative Häufigkeit × Gesamtmenge = 0,35 × 200 = 70',
-    explanation: '35% von 200 = 0,35 × 200 = 70 Personen treiben Sport.'
-  },
-  {
-    id: 'hauf-08',
-    title: 'Vergleich von Häufigkeiten',
-    description: 'Relative Häufigkeiten richtig interpretieren',
-    type: 'multiple-choice',
-    scenario: 'Klasse A hat 25 Schüler, davon fahren 10 mit dem Bus. Klasse B hat 20 Schüler, davon fahren 9 mit dem Bus.',
-    question: 'In welcher Klasse ist der Busfahrer-Anteil höher?',
-    options: ['In Klasse A (40%)', 'In Klasse B (45%)', 'In beiden Klassen gleich', 'Es kann nicht bestimmt werden'],
-    correctAnswer: 'In Klasse B (45%)',
-    solution: 'Klasse A: 10/25 = 0,4 = 40%, Klasse B: 9/20 = 0,45 = 45%. Klasse B hat einen höheren Anteil!',
-    explanation: 'Obwohl Klasse A mehr absolute Busfahrer hat (10 vs 9), ist der relative Anteil in Klasse B höher (45% vs 40%).'
-  },
-  {
-    id: 'hauf-09',
-    title: 'Meinungsumfrage mit Dezimalzahlen',
-    description: 'Relative Häufigkeit in Dezimalform',
-    type: 'numeric',
-    scenario: 'Von 250 befragten Personen befürworten 87 eine Maßnahme.',
-    question: 'Wie groß ist die relative Häufigkeit der Befürworter? (4 Dezimalstellen)',
-    correctAnswer: 0.348,
-    tolerance: 0.01,
-    solution: 'Relative Häufigkeit = 87 / 250 = 0,348 = 34,8%',
-    explanation: '87 von 250 Personen = 87/250 = 0,348 ≈ 35% der Befragten befürworten die Maßnahme.'
-  },
-  {
-    id: 'hauf-10',
-    title: 'Quiz-Auswertung',
-    description: 'Häufigkeiten bei Mehrfachnennung',
-    type: 'numeric',
-    scenario: 'Bei einem Quiz mit 5 Fragen bekamen 60 Schüler folgende Noten: 12 bekamen eine "1", 18 bekamen eine "2", die restlichen bekamen eine "3" oder schlechter.',
-    question: 'Wie viel Prozent der Schüler bekamen eine "1" oder "2"? (als ganze Zahl mit %)',
-    correctAnswer: 50,
-    tolerance: 1,
-    solution: 'Schüler mit "1" oder "2": 12 + 18 = 30. Relative Häufigkeit = 30/60 = 0,5 = 50%',
-    explanation: 'Von 60 Schülern hatten 30 die Note "1" oder "2". Das entspricht 50%.'
+const TallyBundle: React.FC<{ strokes: number }> = ({ strokes }) => {
+  const spacing = 7;
+  const lines: React.ReactNode[] = [];
+  for (let i = 0; i < Math.min(strokes, 4); i++) {
+    lines.push(
+      <line key={i} x1={4 + i * spacing} y1={2} x2={4 + i * spacing} y2={26} stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" />
+    );
   }
-];
+  if (strokes === 5) {
+    lines.push(
+      <line key="diag" x1={0} y1={28} x2={4 + 3 * spacing + 3} y2={0} stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" />
+    );
+  }
+  const width = 4 + 3 * spacing + 8;
+  return (
+    <svg width={width} height={30} viewBox={`0 0 ${width} 30`} className="text-indigo-600 flex-shrink-0">
+      {lines}
+    </svg>
+  );
+};
+
+const TallyMarks: React.FC<{ count: number }> = ({ count }) => {
+  const fullBundles = Math.floor(count / 5);
+  const remainder = count % 5;
+  const bundles = [...Array(fullBundles).fill(5), ...(remainder > 0 ? [remainder] : [])];
+  if (count === 0) return <span className="text-slate-400 text-sm">–</span>;
+  return (
+    <div className="flex flex-wrap items-end gap-2">
+      {bundles.map((s, idx) => (
+        <span key={idx} className="inline-flex">
+          <TallyBundle strokes={s} />
+        </span>
+      ))}
+    </div>
+  );
+};
 
 const RelativeAbsoluteHaeufigkeit: React.FC = () => {
-  const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
-  const [taskStates, setTaskStates] = useState<Record<string, TaskState>>(() => {
-    const states: Record<string, TaskState> = {};
-    tasks.forEach(task => {
-      states[task.id] = {
-        answer: '',
-        status: 'blank',
-        showSolution: false,
-        attempts: 0
-      };
-    });
-    return states;
-  });
+  const [task, setTask] = useState<GeneratedTask>(() => generateTask());
+  const [answer, setAnswer] = useState('');
+  const [status, setStatus] = useState<'blank' | 'correct' | 'incorrect'>('blank');
+  const [showSolution, setShowSolution] = useState(false);
+  const [stats, setStats] = useState({ attempted: 0, correct: 0 });
 
-  const currentTask = tasks[currentTaskIndex];
-  const currentState = taskStates[currentTask.id];
-
-  const handleAnswerChange = (value: string | number) => {
-    setTaskStates(prev => ({
-      ...prev,
-      [currentTask.id]: {
-        ...prev[currentTask.id],
-        answer: value,
-        status: 'blank'
-      }
-    }));
+  const newTask = () => {
+    setTask(generateTask());
+    setAnswer('');
+    setStatus('blank');
+    setShowSolution(false);
   };
 
-  const checkAnswer = () => {
-    const state = taskStates[currentTask.id];
-    let isCorrect = false;
-
-    if (currentTask.type === 'multiple-choice') {
-      isCorrect = state.answer === currentTask.correctAnswer;
-    } else if (currentTask.type === 'numeric') {
-      // Normalize comma to point for parsing
-      const normalizedAnswer = String(state.answer).replace(',', '.');
-      const numAnswer = parseFloat(normalizedAnswer);
-      const numCorrect = parseFloat(String(currentTask.correctAnswer));
-      const tolerance = currentTask.tolerance || 0;
-      isCorrect = Math.abs(numAnswer - numCorrect) <= tolerance;
-    } else if (currentTask.type === 'fraction') {
-      isCorrect = state.answer === currentTask.correctAnswer;
-    }
-
-    setTaskStates(prev => ({
-      ...prev,
-      [currentTask.id]: {
-        ...prev[currentTask.id],
-        status: isCorrect ? 'correct' : 'incorrect',
-        attempts: prev[currentTask.id].attempts + 1
-      }
-    }));
+  const handleCheck = () => {
+    const isCorrect = checkAnswer(task, answer);
+    setStatus(isCorrect ? 'correct' : 'incorrect');
+    setStats((prev) => ({ attempted: prev.attempted + 1, correct: prev.correct + (isCorrect ? 1 : 0) }));
   };
 
-  const toggleSolution = () => {
-    setTaskStates(prev => ({
-      ...prev,
-      [currentTask.id]: {
-        ...prev[currentTask.id],
-        showSolution: !prev[currentTask.id].showSolution
-      }
-    }));
-  };
-
-  const goToNextTask = () => {
-    if (currentTaskIndex < tasks.length - 1) {
-      setCurrentTaskIndex(currentTaskIndex + 1);
-    }
-  };
-
-  const goToPreviousTask = () => {
-    if (currentTaskIndex > 0) {
-      setCurrentTaskIndex(currentTaskIndex - 1);
-    }
-  };
-
-  const correctCount = Object.values(taskStates).filter(state => state.status === 'correct').length;
-  const progress = ((correctCount + 1) / tasks.length) * 100;
+  const repInfo = REPRESENTATION_LABEL[task.representation];
+  const revealedCategories = task.categories.filter((c) => c.revealed);
+  const chartData = revealedCategories.map((c) => ({ name: c.name, value: c.count }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
       <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/daten-und-zufall" className="text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-2">
             <ArrowLeft className="w-5 h-5" />
             Zurück
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">Relative- und absolute Häufigkeit</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Absolute und relative Häufigkeit</h1>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        {/* Progress Bar */}
-        <div className="mb-6">
-          <div className="flex justify-between mb-2">
-            <span className="text-sm font-semibold text-slate-600">Aufgabe {currentTaskIndex + 1} von {tasks.length}</span>
-            <span className="text-sm font-semibold text-slate-600">{correctCount} korrekt</span>
-          </div>
-          <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
+      <main className="max-w-3xl mx-auto px-4 py-8">
+        {/* Session-Statistik */}
+        <div className="flex justify-between items-center mb-6 text-sm font-semibold text-slate-600">
+          <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-100">
+            {repInfo.icon}
+            {repInfo.label}-Aufgabe
+          </span>
+          <span>
+            {stats.correct} von {stats.attempted} richtig
+          </span>
         </div>
 
-        {/* Task Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">{currentTask.title}</h2>
-            <p className="text-sm text-slate-500">{currentTask.description}</p>
+        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6">
+          {/* Aufgabentext */}
+          <div className="mb-6 space-y-2">
+            {task.intro.map((line, idx) => (
+              <p key={idx} className="text-slate-700 leading-relaxed">
+                {line}
+              </p>
+            ))}
           </div>
 
-          {/* Scenario */}
-          <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-slate-900 mb-2">Aufgabenszenario:</h3>
-            <p className="text-slate-700">{currentTask.scenario}</p>
-          </div>
-
-          {/* Question */}
-          <div className="mb-6">
-            <h3 className="font-semibold text-slate-900 mb-3">Frage:</h3>
-            <p className="text-lg text-slate-700 mb-4">{currentTask.question}</p>
-
-            {/* Answer Input */}
-            <div className="space-y-3">
-              {currentTask.type === 'multiple-choice' && (
-                <div className="grid grid-cols-1 gap-2">
-                  {currentTask.options?.map((option) => (
-                    <label key={option} className="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-indigo-50 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name={currentTask.id}
-                        value={option}
-                        checked={String(currentState.answer) === option}
-                        onChange={(e) => handleAnswerChange(e.target.value)}
-                        className="w-4 h-4 text-indigo-600"
-                      />
-                      <span className="ml-3 text-slate-700">{option}</span>
-                    </label>
+          {/* Darstellung der Daten */}
+          {task.representation === 'table' && (
+            <div className="mb-6 overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-indigo-50">
+                    <th className="text-left p-3 rounded-l-lg font-semibold text-slate-700 border-b-2 border-indigo-200">Kategorie</th>
+                    <th className="text-right p-3 rounded-r-lg font-semibold text-slate-700 border-b-2 border-indigo-200">Anzahl</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {task.categories.map((c) => (
+                    <tr key={c.name} className="border-b border-slate-100">
+                      <td className="p-3 text-slate-700">
+                        <span className="mr-2">{c.icon}</span>
+                        {c.name}
+                      </td>
+                      <td className="p-3 text-right font-mono font-semibold text-slate-900">{c.count}</td>
+                    </tr>
                   ))}
-                </div>
-              )}
-
-              {(currentTask.type === 'numeric' || currentTask.type === 'fraction') && (
-                <input
-                  type="text"
-                  value={currentState.answer}
-                  onChange={(e) => handleAnswerChange(e.target.value)}
-                  placeholder="Antwort eingeben..."
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              )}
+                  <tr>
+                    <td className="p-3 font-bold text-slate-900">Gesamt</td>
+                    <td className="p-3 text-right font-mono font-bold text-slate-900">{task.total}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
+          )}
+
+          {task.representation === 'tally' && (
+            <div className="mb-6 space-y-4 bg-slate-50 rounded-lg p-4 border border-slate-200">
+              {task.categories.map((c) => (
+                <div key={c.name} className="flex items-center gap-4">
+                  <span className="w-36 flex-shrink-0 text-slate-700 font-medium">
+                    <span className="mr-1.5">{c.icon}</span>
+                    {c.name}
+                  </span>
+                  <TallyMarks count={c.count} />
+                </div>
+              ))}
+              <div className="pt-2 border-t border-slate-200 text-sm text-slate-500">Gesamt: {task.total}</div>
+            </div>
+          )}
+
+          {task.representation === 'chart' && (
+            <div className="mb-6 h-72 bg-slate-50 rounded-lg border border-slate-200 p-2">
+              <div className="flex items-center gap-2 text-xs text-slate-400 px-2 pt-1">
+                {task.chartKind === 'pie' ? <PieChartIcon className="w-3.5 h-3.5" /> : <BarChart3 className="w-3.5 h-3.5" />}
+                {task.chartKind === 'pie' ? 'Kreisdiagramm' : 'Balkendiagramm'}
+              </div>
+              <ResponsiveContainer width="100%" height="100%">
+                {task.chartKind === 'pie' ? (
+                  <PieChart>
+                    <Pie data={chartData} cx="50%" cy="50%" outerRadius={85} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                      {chartData.map((_, idx) => (
+                        <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                ) : (
+                  <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Bar dataKey="value">
+                      {chartData.map((_, idx) => (
+                        <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                )}
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Frage */}
+          <div className="mb-6">
+            <p className="text-lg font-semibold text-slate-900 mb-4">{task.questionText}</p>
+            <input
+              type="text"
+              value={answer}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setAnswer(e.target.value);
+                setStatus('blank');
+              }}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === 'Enter' && answer && status === 'blank') handleCheck();
+              }}
+              placeholder={task.answerFormat === 'percentOrDecimal' ? 'z.B. 25% oder 0,25' : 'Antwort eingeben...'}
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg"
+            />
           </div>
 
           {/* Feedback */}
-          {currentState.status !== 'blank' && (
-            <div className={`flex items-start gap-3 p-4 rounded-lg mb-6 ${
-              currentState.status === 'correct' 
-                ? 'bg-green-50 border border-green-200' 
-                : 'bg-red-50 border border-red-200'
-            }`}>
-              {currentState.status === 'correct' ? (
+          {status !== 'blank' && (
+            <div
+              className={`flex items-start gap-3 p-4 rounded-lg mb-6 ${
+                status === 'correct' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+              }`}
+            >
+              {status === 'correct' ? (
                 <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
               ) : (
                 <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
               )}
               <div>
-                <p className={`font-semibold ${currentState.status === 'correct' ? 'text-green-800' : 'text-red-800'}`}>
-                  {currentState.status === 'correct' ? '✓ Korrekt!' : '✗ Nicht ganz korrekt'}
+                <p className={`font-semibold ${status === 'correct' ? 'text-green-800' : 'text-red-800'}`}>
+                  {status === 'correct' ? 'Richtig!' : 'Noch nicht ganz richtig'}
                 </p>
-                <p className={`text-sm mt-1 ${currentState.status === 'correct' ? 'text-green-700' : 'text-red-700'}`}>
-                  {currentState.status === 'correct' ? 'Ausgezeichnet!' : `Versuche: ${currentState.attempts}`}
-                </p>
+                {status === 'correct' && (
+                  <div className="mt-2 space-y-1">
+                    {task.solutionSteps.map((step, idx) => (
+                      <p key={idx} className="text-sm text-green-700">
+                        {step}
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
 
-          {/* Solution */}
-          {currentState.status === 'correct' && (
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
-              <h4 className="font-semibold text-slate-900 mb-2">Erklärung:</h4>
-              <p className="text-slate-700 mb-2">{currentTask.solution}</p>
-              <p className="text-slate-600 text-sm">{currentTask.explanation}</p>
-            </div>
-          )}
-
-          {/* Show Solution Button */}
-          {currentState.status !== 'correct' && (
+          {/* Lösung anzeigen */}
+          {status !== 'correct' && (
             <button
-              onClick={toggleSolution}
-              className="w-full mb-4 px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors"
+              onClick={() => setShowSolution(!showSolution)}
+              className="w-full mb-4 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition-colors inline-flex items-center justify-center gap-2"
             >
-              {currentState.showSolution ? 'Lösung verstecken' : 'Lösung anzeigen'}
+              <Lightbulb className="w-4 h-4" />
+              {showSolution ? 'Lösung verstecken' : 'Lösung anzeigen'}
             </button>
           )}
 
-          {currentState.showSolution && currentState.status !== 'correct' && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-              <h4 className="font-semibold text-amber-900 mb-2">Lösung:</h4>
-              <p className="text-amber-800 mb-2">{currentTask.solution}</p>
-              <p className="text-amber-700 text-sm">{currentTask.explanation}</p>
+          {showSolution && status !== 'correct' && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 space-y-1">
+              {task.solutionSteps.map((step, idx) => (
+                <p key={idx} className="text-amber-800 text-sm">
+                  {step}
+                </p>
+              ))}
             </div>
           )}
 
-          {/* Check Button */}
-          {currentState.status === 'blank' && (
-            <button
-              onClick={checkAnswer}
-              disabled={!currentState.answer}
-              className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold rounded-lg transition-colors"
-            >
-              Antwort prüfen
-            </button>
-          )}
-        </div>
-
-        {/* Navigation */}
-        <div className="flex gap-4 justify-between">
-          <button
-            onClick={goToPreviousTask}
-            disabled={currentTaskIndex === 0}
-            className="px-6 py-2 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 disabled:text-slate-400 text-slate-700 font-semibold rounded-lg transition-colors"
-          >
-            ← Zurück
-          </button>
-
-          <button
-            onClick={goToNextTask}
-            disabled={currentTaskIndex === tasks.length - 1}
-            className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:text-slate-400 text-white font-semibold rounded-lg transition-colors"
-          >
-            Weiter →
-          </button>
-        </div>
-
-        {/* Task Overview */}
-        <div className="mt-8 bg-slate-50 rounded-lg p-6">
-          <h3 className="font-semibold text-slate-900 mb-4">Aufgabenübersicht ({correctCount}/{tasks.length} korrekt)</h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-            {tasks.map((task, index) => (
+          <div className="flex flex-col sm:flex-row gap-3">
+            {status === 'blank' && (
               <button
-                key={task.id}
-                onClick={() => setCurrentTaskIndex(index)}
-                className={`p-3 rounded-lg font-semibold transition-colors ${
-                  taskStates[task.id].status === 'correct'
-                    ? 'bg-green-500 text-white'
-                    : taskStates[task.id].status === 'incorrect'
-                    ? 'bg-red-500 text-white'
-                    : index === currentTaskIndex
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-indigo-400'
-                }`}
+                onClick={handleCheck}
+                disabled={!answer}
+                className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold rounded-lg transition-colors"
               >
-                {index + 1}
+                Antwort prüfen
               </button>
-            ))}
+            )}
+            <button
+              onClick={newTask}
+              className="flex-1 px-6 py-3 border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold rounded-lg transition-colors inline-flex items-center justify-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Neue Aufgabe
+            </button>
           </div>
         </div>
       </main>
