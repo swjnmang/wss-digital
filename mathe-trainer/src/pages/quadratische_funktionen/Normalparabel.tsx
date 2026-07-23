@@ -100,7 +100,18 @@ export default function Normalparabel() {
         ggbApiRef.current.setColor('n', 150, 150, 150);
         ggbApiRef.current.evalCommand('S=(0,0)');
         ggbApiRef.current.setLabelVisible('S', true);
-        ggbApiRef.current.setCoordSystem(-5, 5, -5, 5);
+        // Kartesisches Koordinatensystem erzwingen: y-Bereich anhand des tatsächlichen
+        // Breiten-/Höhenverhältnisses der Zeichenfläche berechnen, damit 1 Einheit auf
+        // beiden Achsen gleich viele Pixel entspricht (die GeoGebra-API bietet keine
+        // eingebaute 1:1-Sperre für setCoordSystem).
+        const api = ggbApiRef.current;
+        const container = document.getElementById('ggb-normalparabel');
+        const xHalf = 5;
+        let yHalf = xHalf;
+        if (container && container.clientWidth > 0 && container.clientHeight > 0) {
+          yHalf = xHalf * (container.clientHeight / container.clientWidth);
+        }
+        api.setCoordSystem(-xHalf, xHalf, -yHalf, yHalf);
       } catch (e) {
         console.error('GeoGebra update error:', e);
       }
