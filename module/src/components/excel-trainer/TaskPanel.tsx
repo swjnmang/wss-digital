@@ -32,27 +32,18 @@ export function TaskPanel({ task, results, onCheck, recording, onFinishRecording
           </span>
           <h2 className="text-base font-bold text-slate-800">{task.title}</h2>
         </div>
-        <div className="flex items-center gap-2">
-          {recording && <RecordingControls recording onStart={() => {}} onFinish={onFinishRecording} />}
-          <button
-            onClick={onCheck}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg px-5 py-1.5 text-sm transition-colors"
-          >
-            Prüfen
-          </button>
-        </div>
+        {recording && <RecordingControls recording onStart={() => {}} onFinish={onFinishRecording} />}
       </div>
 
-      <div className="flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-3 py-1.5">
+      <div className="flex flex-wrap items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-3 py-1.5">
         <button
           onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
           disabled={stepIndex === 0}
-          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-bold text-lg px-1 shrink-0"
-          aria-label="Vorheriger Arbeitsauftrag"
+          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-semibold text-sm px-2 py-1 rounded-md hover:bg-blue-100 disabled:hover:bg-transparent shrink-0 whitespace-nowrap"
         >
-          ←
+          ← Zurück zur letzten Aufgabe
         </button>
-        <p className="text-sm text-slate-800 flex-1">
+        <p className="text-sm text-slate-800 flex-1 min-w-[200px]">
           <span className="text-xs font-semibold uppercase tracking-wide text-blue-500 mr-2">
             {stepIndex + 1}/{steps.length}
           </span>
@@ -61,10 +52,15 @@ export function TaskPanel({ task, results, onCheck, recording, onFinishRecording
         <button
           onClick={() => setStepIndex((i) => Math.min(steps.length - 1, i + 1))}
           disabled={stepIndex === steps.length - 1}
-          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-bold text-lg px-1 shrink-0"
-          aria-label="Nächster Arbeitsauftrag"
+          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-semibold text-sm px-2 py-1 rounded-md hover:bg-blue-100 disabled:hover:bg-transparent shrink-0 whitespace-nowrap"
         >
-          →
+          Zur nächsten Teilaufgabe →
+        </button>
+        <button
+          onClick={onCheck}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg px-5 py-1.5 text-sm transition-colors shrink-0"
+        >
+          Prüfen
         </button>
       </div>
 
