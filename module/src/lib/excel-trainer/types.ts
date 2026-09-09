@@ -1,4 +1,4 @@
-export type CellAlign = 'left' | 'center' | 'right';
+export type CellAlign = 'left' | 'center';
 
 export interface ExcelCellSeed {
   cell: string;
