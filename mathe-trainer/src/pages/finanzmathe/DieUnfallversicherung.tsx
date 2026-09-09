@@ -48,7 +48,7 @@ export default function DieUnfallversicherung() {
 
     const tolerances: Record<string, [number, number]> = {
       '1.1': [2.5, 2.7],
-      '1.2': [195, 200],
+      '1.2': [192, 195],
       '1.3': [5.8, 6.1],
       '1.5': [14000, 14500],
     }
@@ -193,8 +193,8 @@ export default function DieUnfallversicherung() {
                 <p className="text-gray-700 mb-3">Nach R auflösen:</p>
                 <BlockMath formula="R = \frac{K_n - K_0 \cdot q^n}{\frac{q^n - 1}{q - 1}}" />
                 <p className="text-gray-700 mb-3">Berechnung:</p>
-                <BlockMath formula="K_0 \cdot q^n = 12.500 \cdot 1,0125^{12} \approx 14.447,13 \text{ €}" />
-                <BlockMath formula="R = \frac{17.000 - 14.447,13}{\frac{1,0125^{12} - 1}{0,0125}} \approx \frac{2.552,87}{12,887} \approx \mathbf{198,51 \text{ €}}" />
+                <BlockMath formula="K_0 \cdot q^n = 12.500 \cdot 1,0125^{12} \approx 14.509,43 \text{ €}" />
+                <BlockMath formula="R = \frac{17.000 - 14.509,43}{\frac{1,0125^{12} - 1}{0,0125}} \approx \frac{2.490,57}{12,860} \approx \mathbf{193,66 \text{ €}}" />
               </div>
             )}
           </div>
@@ -251,7 +251,7 @@ export default function DieUnfallversicherung() {
                 <p className="text-gray-700 mb-3">Vereinfachen:</p>
                 <BlockMath formula="17.000 \cdot 1,015^n = 3.045 \cdot \frac{1,015^n - 1}{0,015}" />
                 <p className="text-gray-700 mb-2">
-                  <InlineMath formula="1,015^n \approx 1,1008 \Rightarrow n \approx 5,98" />
+                  <InlineMath formula="1,015^n \approx 1,0914 \Rightarrow n \approx 5,87" />
                 </p>
                 <p className="text-gray-700 text-sm font-semibold text-green-700">
                   ✅ Auf volle Jahre gerundet: <InlineMath formula="n = \mathbf{6 \text{ Jahre}}" />

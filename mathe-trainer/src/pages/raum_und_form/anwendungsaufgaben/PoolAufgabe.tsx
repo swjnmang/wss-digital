@@ -71,7 +71,7 @@ export default function PoolAufgabe() {
         unitOptions: ['m', 'm²', '€'],
         tolerance: 0.2065, // 0,5% von 41,3
       },
-      hint: 'r_T = r_a + 0,35 = 1,1 + 0,35 = 1,45 m. Trittfläche = π/4 × (1,45² - 1,1²) × π ≈ 0,70 m². Kosten: 0,70 m² × 59 €/m² ≈ 41,3 €.',
+      hint: 'r_T = r_a + 0,35 = 1,1 + 0,35 = 1,45 m. Trittfläche = π/4 × (1,45² - 1,1²) ≈ 0,70 m². Kosten: 0,70 m² × 59 €/m² ≈ 41,3 €.',
     },
     {
       id: 4,

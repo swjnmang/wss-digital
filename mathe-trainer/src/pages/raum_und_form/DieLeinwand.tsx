@@ -99,16 +99,17 @@ const exercises: Exercise[] = [
     hint: "Du kannst hier den Kosinussatz oder Pythagoras nutzen, je nach dem Winkel in der Skizze!",
     solution: [
       "Das Parallelogramm kann über die Skizze analysiert werden.",
-      "Die Diagonale OP kann mit dem Kosinussatz oder Pythagoras berechnet werden.",
+      "Wie in Aufgabe 4 zu erkennen, liegt bei R ein rechter Winkel (∠ORP = 90°),",
+      "da dort die Höhe h = PR senkrecht auf der Basis OR steht.",
       "",
-      "Mit OR = PR = 2 m und dem Winkel aus der Skizze:",
-      "OP² = OR² + PR² - 2 × OR × PR × cos(∠ORP)",
+      "Damit lässt sich OP mit dem Satz des Pythagoras berechnen:",
+      "OP² = OR² + PR²",
       "",
-      "Falls es sich um einen 45°-Winkel handelt:",
-      "OP² = 2² + 2² - 2 × 2 × 2 × cos(45°)",
-      "OP² = 4 + 4 - 8 × 0,707",
-      "OP² ≈ 8 - 5,66",
-      "OP² ≈ 2,34",
+      "Mit OR = PR = 2 m:",
+      "OP² = 2² + 2²",
+      "OP² = 4 + 4",
+      "OP² = 8",
+      "OP = √8",
       "OP ≈ 2,83 m"
     ]
   },
@@ -173,7 +174,7 @@ const exercises: Exercise[] = [
   {
     id: 9,
     question: "Berechne, wieviel Prozent der blauen Leinwand bemalt wurden. Die Leinwand hat eine Fläche von 40 m².",
-    expectedAnswer: 33.41,
+    expectedAnswer: 54,
     tolerance: 2,
     unit: "%",
     hint: "Addiere alle bemalten Flächen und teile durch die Gesamtfläche, dann × 100!",
@@ -187,12 +188,12 @@ const exercises: Exercise[] = [
       "- Dreieck: 3 m²",
       "- Weitere Formen je nach Skizze",
       "",
-      "Gesamte bemalte Fläche: ca. 13,36 m²",
+      "Gesamte bemalte Fläche: 6 + 9,62 + 2,98 + 3 = 21,6 m²",
       "",
       "Prozentsatz berechnen:",
       "Prozent = (bemalte Fläche / Gesamtfläche) × 100",
-      "Prozent = (13,36 / 40) × 100",
-      "Prozent ≈ 33,4 %"
+      "Prozent = (21,6 / 40) × 100",
+      "Prozent = 54 %"
     ]
   }
 ];

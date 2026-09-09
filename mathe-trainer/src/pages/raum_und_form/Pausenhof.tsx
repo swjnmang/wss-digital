@@ -14,10 +14,10 @@ const questions: Question[] = [
     id: 1,
     question: "Die komplette Fläche des rechteckigen Pausenhofs muss zunächst mit Pflastersteinen ausgelegt werden. Ein Pflasterstein hat die Größe von 200 cm². Beim Auslegen der Fläche muss ein Verschnitt von 10 % addiert einkalkuliert werden. Wie viele Steine werden benötigt?",
     answers: [
-      { text: "30 015 Steine", correct: false },
-      { text: "33 017 Steine", correct: true },
-      { text: "27 014 Steine", correct: false },
-      { text: "36 018 Steine", correct: false }
+      { text: "30 000 Steine", correct: false },
+      { text: "33 000 Steine", correct: true },
+      { text: "27 000 Steine", correct: false },
+      { text: "36 000 Steine", correct: false }
     ],
     solution: [
       "1. Fläche des Pausenhofs berechnen:",
@@ -27,10 +27,10 @@ const questions: Question[] = [
       "   600 m² = 600 × 10.000 cm² = 6.000.000 cm²",
       "",
       "3. Anzahl Steine ohne Verschnitt:",
-      "   6.000.000 cm² ÷ 200 cm²/Stein = 30.015 Steine",
+      "   6.000.000 cm² ÷ 200 cm²/Stein = 30.000 Steine",
       "",
       "4. Mit 10% Verschnitt:",
-      "   30.015 × 1,1 = 33.016,5 ≈ 33.017 Steine"
+      "   30.000 × 1,1 = 33.000 Steine"
     ]
   },
   {

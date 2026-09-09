@@ -386,6 +386,13 @@ const createFindAngleTask = (triangle: Triangle, scheme: Scheme): SinusTask => {
     const ratio = (triangle[targetSide] / triangle[referenceSide]) * Math.sin(degToRad(triangle[referenceAngle]));
     const clamped = Math.min(1, Math.max(-1, ratio));
     const calculatedAngle = radToDeg(Math.asin(clamped));
+    // Der tatsächliche Winkel des Dreiecks ist bereits durch die Konstruktion bekannt.
+    // Math.asin() liefert immer nur den spitzen Wert zwischen -90° und 90°. Ist der
+    // gesuchte Winkel in Wirklichkeit stumpf (>90°), liefert Sinus⁻¹ rechnerisch nur
+    // dessen spitzes Ergänzungswinkel-Gegenstück (180° - trueAngle). Dieser Ambiguous
+    // Case muss im Lösungsweg sichtbar aufgelöst werden.
+    const trueAngle = triangle[targetAngle];
+    const isObtuse = trueAngle > 90;
 
     const steps: SolutionStep[] = [
         {
@@ -400,10 +407,15 @@ const createFindAngleTask = (triangle: Triangle, scheme: Scheme): SinusTask => {
             text: 'Werte einsetzen',
             math: `\\sin(${targetAngleLabel}) = \\frac{${formatNumber(triangle[targetSide])}}{${formatNumber(triangle[referenceSide])}} \\cdot \\sin(${formatNumber(triangle[referenceAngle], 1)}^\\circ)`
         },
-        {
-            text: 'Umkehrfunktion (Sinus⁻¹) verwenden',
-            math: `${targetAngleLabel} = \\sin^{-1}(${formatNumber(clamped, 3)}) \\approx ${formatNumber(calculatedAngle, 1)}^\\circ`
-        }
+        isObtuse
+            ? {
+                text: `Umkehrfunktion (Sinus⁻¹) verwenden – ${targetAngleLabel} könnte stumpf sein, daher Ergänzungswinkel prüfen`,
+                math: `${targetAngleLabel} = 180^\\circ - \\sin^{-1}(${formatNumber(clamped, 3)}) \\approx 180^\\circ - ${formatNumber(calculatedAngle, 1)}^\\circ = ${formatNumber(trueAngle, 1)}^\\circ`
+            }
+            : {
+                text: 'Umkehrfunktion (Sinus⁻¹) verwenden',
+                math: `${targetAngleLabel} = \\sin^{-1}(${formatNumber(clamped, 3)}) \\approx ${formatNumber(trueAngle, 1)}^\\circ`
+            }
     ];
 
     return {
@@ -412,11 +424,7 @@ const createFindAngleTask = (triangle: Triangle, scheme: Scheme): SinusTask => {
         toFind: targetAngle,
         prompt: `Bestimme den Winkel ${targetAngleLabel}.`,
         steps,
-        // correctAnswer entspricht bewusst dem per Sinus⁻¹ berechneten (spitzen) Winkel,
-        // nicht dem ursprünglichen Dreieckswinkel: Ist dieser stumpf, liefert Sinus⁻¹
-        // rechnerisch immer die spitze Alternative - genau das steht auch in den
-        // gezeigten Lösungsschritten, daher muss das Ergebnis dazu passen.
-        correctAnswer: roundTo(calculatedAngle, 1),
+        correctAnswer: roundTo(trueAngle, 1),
         unit: '°',
         givenKeys: [targetSide, referenceAngle, referenceSide],
         answerLabel: targetAngleLabel,

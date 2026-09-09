@@ -825,6 +825,13 @@ const buildSinussatzTask = (): NumericTask => {
     }
 
     const sinBeta = Math.min(1, Math.max(-1, (round(b, 2) * Math.sin(degToRad(alpha))) / a));
+    // beta ist der tatsächliche Winkel des generierten Dreiecks und bereits bekannt.
+    // Math.asin() liefert aber immer nur den spitzen Wert zwischen -90° und 90°: Ist
+    // beta in Wirklichkeit stumpf (>90°), liefert Sinus⁻¹ rechnerisch nur dessen
+    // spitzes Ergänzungswinkel-Gegenstück (180° - beta). Dieser Ambiguous Case wird im
+    // Lösungsweg unten aufgelöst.
+    const arcsinBeta = radToDeg(Math.asin(sinBeta));
+    const isObtuseBeta = beta > 90;
     return {
         id: nextId(),
         kind: 'numeric',
@@ -838,7 +845,9 @@ const buildSinussatzTask = (): NumericTask => {
             { text: 'Sinussatz mit Winkeln formulieren', math: `\\dfrac{\\sin(${angleB})}{${sB}} = \\dfrac{\\sin(${angleA})}{${sA}}` },
             { text: `${angleB} isolieren`, math: `\\sin(${angleB}) = \\dfrac{${sB}}{${sA}} \\cdot \\sin(${angleA})` },
             { text: 'Werte einsetzen', math: `\\sin(${angleB}) = \\dfrac{${round(b, 2)}}{${a}} \\cdot \\sin(${alpha}^\\circ)` },
-            { text: 'Umkehrfunktion (Sinus⁻¹) verwenden', math: `${angleB} = \\sin^{-1}(${sinBeta.toFixed(3)}) \\approx ${beta.toFixed(1)}^\\circ` }
+            isObtuseBeta
+                ? { text: `Umkehrfunktion (Sinus⁻¹) verwenden – ${angleB} könnte stumpf sein, daher Ergänzungswinkel prüfen`, math: `${angleB} = 180^\\circ - \\sin^{-1}(${sinBeta.toFixed(3)}) \\approx 180^\\circ - ${arcsinBeta.toFixed(1)}^\\circ = ${beta.toFixed(1)}^\\circ` }
+                : { text: 'Umkehrfunktion (Sinus⁻¹) verwenden', math: `${angleB} = \\sin^{-1}(${sinBeta.toFixed(3)}) \\approx ${beta.toFixed(1)}^\\circ` }
         ],
         sketch: {
             kind: 'general',

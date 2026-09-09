@@ -97,6 +97,12 @@ const FunktionsgleichungAufstellen = () => {
         
         const y2 = calculateY(a, b, c, x2);
 
+        // Signierte Darstellung eines additiven Terms, z. B. "+ 3" oder "- 4" (statt "+ -4")
+        const signedTerm = (value: number) => (value >= 0 ? `+ ${formatNumber(value)}` : `- ${formatNumber(Math.abs(value))}`);
+        // Darstellung von "x - h" bzw. "x + |h|", je nach Vorzeichen von h
+        const xMinusH = h >= 0 ? `x - ${formatNumber(h)}` : `x + ${formatNumber(Math.abs(h))}`;
+        const numMinusH = h >= 0 ? `${x2} - ${formatNumber(h)}` : `${x2} + ${formatNumber(Math.abs(h))}`;
+
         setCurrentSolution({ a, b, c });
         setTaskData({
             type: 'vertex',
@@ -107,22 +113,22 @@ const FunktionsgleichungAufstellen = () => {
         setSolutionText(
             <div>
                 <p>Wir stellen die Funktion zunächst in Scheitelpunktform auf:</p>
-                <p className="font-mono">f(x) = a(x - {h})² + {k}</p>
-                
+                <p className="font-mono">f(x) = a({xMinusH})² {signedTerm(k)}</p>
+
                 <p className="mt-2">Mit dem Punkt P({x2}|{formatNumber(y2)}) können wir a bestimmen:</p>
-                <p className="font-mono">{formatNumber(y2)} = a({x2} - {h})² + {k}</p>
-                <p className="font-mono">{formatNumber(y2)} - {k} = a · {Math.pow(x2 - h, 2)}</p>
+                <p className="font-mono">{formatNumber(y2)} = a({numMinusH})² {signedTerm(k)}</p>
+                <p className="font-mono">{formatNumber(y2)} {signedTerm(-k)} = a · {Math.pow(x2 - h, 2)}</p>
                 <p className="font-mono">{formatNumber(y2 - k)} = a · {Math.pow(x2 - h, 2)}</p>
                 <p className="font-mono">a = {formatNumber(y2 - k)} / {Math.pow(x2 - h, 2)} = {formatNumber(a)}</p>
-                
+
                 <p className="mt-2">Damit haben wir die Scheitelpunktform:</p>
-                <p className="font-mono">f(x) = {formatNumber(a)}(x - {h})² + {k}</p>
-                
+                <p className="font-mono">f(x) = {formatNumber(a)}({xMinusH})² {signedTerm(k)}</p>
+
                 <p className="mt-2">Umformen in die Normalform:</p>
-                <p className="font-mono">f(x) = {formatNumber(a)}(x² - {2*h}x + {h*h}) + {k}</p>
-                <p className="font-mono">f(x) = {formatNumber(a)}x² - {formatNumber(2*a*h)}x + {formatNumber(a*h*h)} + {k}</p>
-                <p className="font-mono">f(x) = {formatNumber(a)}x² - {formatNumber(2*a*h)}x + {formatNumber(a*h*h + k)}</p>
-                
+                <p className="font-mono">f(x) = {formatNumber(a)}(x² {signedTerm(-2 * h)}x + {formatNumber(h * h)}) {signedTerm(k)}</p>
+                <p className="font-mono">f(x) = {formatNumber(a)}x² {signedTerm(b)}x {signedTerm(a * h * h)} {signedTerm(k)}</p>
+                <p className="font-mono">f(x) = {formatNumber(a)}x² {signedTerm(b)}x {signedTerm(c)}</p>
+
                 <p className="mt-4 font-bold">Die Koeffizienten der Normalform sind:</p>
                 <p>a = {formatNumber(a)}</p>
                 <p>b = {formatNumber(b)}</p>

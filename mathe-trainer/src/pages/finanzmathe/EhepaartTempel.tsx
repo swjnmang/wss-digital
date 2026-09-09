@@ -222,7 +222,7 @@ export default function EhepaartTempel() {
                   <InlineMath formula="p = (q - 1) \cdot 100\% = (1,01199 - 1) \cdot 100\% = \mathbf{1,20\%}" />
                 </p>
                 <p className="text-gray-700 text-sm font-semibold">
-                  Die Kapitalanlage von Nadine mit p = 1,20% hat den höheren Zinssatz (Klaus hat 2,40%, aber das ist Klaus' Satz - Nadine hat tatsächlich den höheren Kontostand bei gleicher Berechnung).
+                  Die Kapitalanlage von Anna mit p = 1,20% hat den höheren Zinssatz (Thomas hat 2,40%, aber das ist Thomas' Satz - Anna hat tatsächlich den höheren Kontostand bei gleicher Berechnung).
                 </p>
               </div>
             )}

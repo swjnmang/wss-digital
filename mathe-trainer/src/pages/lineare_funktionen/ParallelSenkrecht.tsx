@@ -23,32 +23,35 @@ function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+// m1 = 0 ausschließen: Die Senkrechte zu einer waagrechten Geraden hat keine
+// darstellbare Steigung (x = const) und lässt sich nicht als y = mx + t schreiben.
+function randIntNonZero(min: number, max: number): number {
+  let v = randInt(min, max)
+  while (v === 0) v = randInt(min, max)
+  return v
+}
+
 // ===== Aufgabengenerator =====
 const aufgabenBanks = {
   // Typ 1: Zwei Funktionsgleichungen - Parallel oder Senkrecht?
   gleichungenPrüfen: () => {
-    const m1 = randInt(-5, 5)
+    const m1 = randIntNonZero(-5, 5)
     const t1 = randInt(-10, 10)
-    
+
     let m2: number
     let t2 = randInt(-10, 10)
     let beziehung: 'parallel' | 'senkrecht' | 'keine'
-    
+
     const typ = Math.random()
-    
+
     if (typ < 0.4) {
       // Parallel: gleiche Steigung
       m2 = m1
       beziehung = 'parallel'
     } else if (typ < 0.8) {
       // Senkrecht: m1 · m2 = -1
-      if (m1 === 0) {
-        m2 = 1
-        beziehung = 'senkrecht'
-      } else {
-        m2 = -1 / m1
-        beziehung = 'senkrecht'
-      }
+      m2 = -1 / m1
+      beziehung = 'senkrecht'
     } else {
       // Keine Beziehung
       m2 = randInt(-5, 5)
@@ -79,19 +82,19 @@ const aufgabenBanks = {
 
   // Typ 2: Gerade durch Punkt parallel/senkrecht zu gegebener Gerade
   geradeDurchPunkt: () => {
-    const m1 = randInt(-5, 5)
+    const m1 = randIntNonZero(-5, 5)
     const t1 = randInt(-10, 10)
     const x = randInt(-5, 5)
     const y = randInt(-10, 10)
-    
+
     const aufgabentyp = Math.random() < 0.5 ? 'parallel' : 'senkrecht'
-    
+
     let m2: number
-    
+
     if (aufgabentyp === 'parallel') {
       m2 = m1
     } else {
-      m2 = m1 === 0 ? 1 : -1 / m1
+      m2 = -1 / m1
     }
     
     const t2 = y - m2 * x
@@ -137,15 +140,15 @@ const aufgabenBanks = {
 
   // Typ 3: Mehrere Geraden - Kategorisieren
   mehrereGeraden: () => {
-    const m1 = randInt(-4, 4)
+    const m1 = randIntNonZero(-4, 4)
     const t1 = randInt(-8, 8)
-    
+
     // Gerade 2: parallel zu 1
     const m2 = m1
     const t2 = randInt(-8, 8)
-    
+
     // Gerade 3: senkrecht zu 1
-    const m3 = m1 === 0 ? 1 : -1 / m1
+    const m3 = -1 / m1
     const t3 = randInt(-8, 8)
     
     // Gerade 4: keine Beziehung
@@ -387,7 +390,8 @@ export default function ParallelSenkrecht() {
                       )}
                       {aufgabe.beziehung === 'senkrecht' && (
                         <p style={{ color: '#10b981' }}>
-                          ✓ m₁ · m₂ = {aufgabe.m1} · {aufgabe.m2} = -1 → die Geraden sind <strong>senkrecht</strong>
+                          ✓ m₁ · m₂ = {aufgabe.m1} · (−1/{aufgabe.m1}) = -1 → die Geraden sind <strong>senkrecht</strong>
+                          {' '}(gerundet: m₂ ≈ {aufgabe.m2})
                         </p>
                       )}
                       {aufgabe.beziehung === 'keine' && (
@@ -402,7 +406,7 @@ export default function ParallelSenkrecht() {
                       {aufgabe.aufgabentyp === 'parallel' ? (
                         <MathDisplay latex={`$$m_2 = m_1 = ${aufgabe.m1}$$`} />
                       ) : (
-                        <MathDisplay latex={`$$m_1 \\cdot m_2 = -1 \\Rightarrow m_2 = -\\frac{1}{${aufgabe.m1}} = ${aufgabe.m2}$$`} />
+                        <MathDisplay latex={`$$m_1 \\cdot m_2 = -1 \\Rightarrow m_2 = -\\frac{1}{${aufgabe.m1}} \\approx ${aufgabe.m2}$$`} />
                       )}
                       
                       <p style={{ marginTop: '1rem' }}><strong>Schritt 2: Punkt P({aufgabe.punkt.x}|{aufgabe.punkt.y}) einsetzen</strong></p>
@@ -424,7 +428,7 @@ export default function ParallelSenkrecht() {
                           {g.beziehung === 'parallel'
                             ? 'parallel (m₁ = m)'
                             : g.beziehung === 'senkrecht'
-                            ? `senkrecht (m₁ · m = -1)`
+                            ? `senkrecht (m₁ · m = ${aufgabe.m1} · (−1/${aufgabe.m1}) = -1)`
                             : 'keine Beziehung'}
                         </p>
                       ))}

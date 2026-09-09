@@ -263,11 +263,11 @@ export default function FamilieKessler() {
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="font-bold text-blue-900 mb-3">Lösung:</h3>
                 <p className="text-gray-700 mb-3">
-                  Kapitalminderung mit nachschüssiger Rente:
+                  Kapitalminderung mit vorschüssiger Rente:
                 </p>
-                <BlockMath formula="10.000 = 30.000 \cdot 1,0225^4 - r \cdot \frac{1,0225^4 - 1}{1,0225 - 1}" />
+                <BlockMath formula="10.000 = 30.000 \cdot 1,0225^4 - r \cdot 1,0225 \cdot \frac{1,0225^4 - 1}{1,0225 - 1}" />
                 <p className="text-gray-700 mb-3">Umformen nach r:</p>
-                <BlockMath formula="r = \frac{30.000 \cdot 1,0225^4 - 10.000}{1,0225 - 1} \cdot \frac{1}{1,0225^4 - 1}" />
+                <BlockMath formula="r = \frac{30.000 \cdot 1,0225^4 - 10.000}{1,0225 \cdot \frac{1,0225^4 - 1}{1,0225 - 1}}" />
                 <p className="text-gray-700 mb-2">
                   <InlineMath formula="r = \mathbf{5.388,15 \text{ €}}" />
                 </p>

@@ -151,8 +151,8 @@ export default function SarahKapitalanlagen() {
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
                 <strong>Lösung (Zinseszinsformel):</strong><br/>
                 K_n = K₀ · q^n<br/>
-                K_n = 4.000,00 € · 1,012⁴,8<br/>
-                (von 15.03.2016 bis 31.12.2020 ≈ 4,8 Jahre)<br/>
+                K_n = 4.000,00 € · 1,012⁵<br/>
+                (Zinsgutschriften jeweils zum 31.12. der Jahre 2016–2020 = 5 volle Zinsperioden)<br/>
                 K_n ≈ 4.245,84 €
               </div>
             )}
@@ -221,7 +221,7 @@ export default function SarahKapitalanlagen() {
                   type="text"
                   value={answers['1.3'].input}
                   onChange={(e) => updateAnswer('1.3', 'input', e.target.value)}
-                  placeholder="z.B. 19,50"
+                  placeholder="z.B. 19"
                   className="border border-gray-300 rounded px-3 py-2 w-32"
                 />
                 <span className="text-gray-600">Jahre</span>
@@ -229,7 +229,7 @@ export default function SarahKapitalanlagen() {
             </div>
             <div className="flex gap-3 flex-wrap mb-4">
               <button
-                onClick={() => checkAnswer('1.3', 19.50, 0.5)}
+                onClick={() => checkAnswer('1.3', 19, 0.5)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -249,7 +249,8 @@ export default function SarahKapitalanlagen() {
                 3.500,00 = 2.500,00 · 1,018^n<br/>
                 1,4 = 1,018^n<br/>
                 n · lg(1,018) = lg(1,4)<br/>
-                n = lg(1,4) / lg(1,018) ≈ 19,50 Jahre
+                n = lg(1,4) / lg(1,018) ≈ 18,86 Jahre<br/>
+                Da Zinsen nur einmal jährlich gutgeschrieben werden, hat Sarah den Betrag erst nach dem nächsten vollen Zinsjahr zur Verfügung: n = 19 Jahre.
               </div>
             )}
           </div>
@@ -322,15 +323,15 @@ export default function SarahKapitalanlagen() {
                     <td className="px-2 py-2 border font-semibold">1</td>
                     <td className="px-2 py-2 text-right border">80.000,00 €</td>
                     <td className="px-2 py-2 text-right border">2.000,00 €</td>
-                    <td className="px-2 py-2 text-right border">16.909,60 €</td>
-                    <td className="px-2 py-2 text-right border font-semibold">18.909,60 €</td>
+                    <td className="px-2 py-2 text-right border">15.219,75 €</td>
+                    <td className="px-2 py-2 text-right border font-semibold">17.219,75 €</td>
                   </tr>
                   <tr className="bg-blue-50">
                     <td className="px-2 py-2 border font-semibold">2</td>
-                    <td className="px-2 py-2 text-right border">63.090,40 €</td>
-                    <td className="px-2 py-2 text-right border">1.577,26 €</td>
-                    <td className="px-2 py-2 text-right border">17.332,34 €</td>
-                    <td className="px-2 py-2 text-right border font-semibold">18.909,60 €</td>
+                    <td className="px-2 py-2 text-right border">64.780,25 €</td>
+                    <td className="px-2 py-2 text-right border">1.619,51 €</td>
+                    <td className="px-2 py-2 text-right border">15.600,24 €</td>
+                    <td className="px-2 py-2 text-right border font-semibold">17.219,75 €</td>
                   </tr>
                 </tbody>
               </table>
@@ -349,14 +350,14 @@ export default function SarahKapitalanlagen() {
                 <strong>Erklärung der Annuität:</strong><br/>
                 A = K₀ · (q^n · (q - 1)) / (q^n - 1)<br/>
                 A = 80.000,00 € · (1,025⁵ · 0,025) / (1,025⁵ - 1)<br/>
-                A = 80.000,00 € · 0,2364 ≈ 18.909,60 €<br/><br/>
+                A = 80.000,00 € · 0,2152 ≈ 17.219,75 €<br/><br/>
                 <strong>Jahr 1:</strong><br/>
                 Zinsen = 80.000,00 € · 0,025 = 2.000,00 €<br/>
-                Tilgung = 18.909,60 € - 2.000,00 € = 16.909,60 €<br/>
-                Restschuld = 80.000,00 € - 16.909,60 € = 63.090,40 €<br/><br/>
+                Tilgung = 17.219,75 € - 2.000,00 € = 15.219,75 €<br/>
+                Restschuld = 80.000,00 € - 15.219,75 € = 64.780,25 €<br/><br/>
                 <strong>Jahr 2:</strong><br/>
-                Zinsen = 63.090,40 € · 0,025 = 1.577,26 €<br/>
-                Tilgung = 18.909,60 € - 1.577,26 € = 17.332,34 €
+                Zinsen = 64.780,25 € · 0,025 = 1.619,51 €<br/>
+                Tilgung = 17.219,75 € - 1.619,51 € = 15.600,24 €
               </div>
             )}
           </div>
@@ -401,9 +402,9 @@ export default function SarahKapitalanlagen() {
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700">
                 <strong>Lösung (Restschuld-Formel für Annuitätendarlehen):</strong><br/>
                 K_v = K₀ · q^v - A · (q^v - 1) / (q - 1)<br/>
-                K_v = 80.000,00 · 1,025⁵ - 18.909,60 · (1,025⁵ - 1) / 0,025<br/>
-                K_v = 80.000,00 · 1,1314 - 18.909,60 · 5,2563<br/>
-                K_v = 90.510,98 - 99.510,98<br/>
+                K_v = 80.000,00 · 1,025⁵ - 17.219,75 · (1,025⁵ - 1) / 0,025<br/>
+                K_v = 80.000,00 · 1,1314 - 17.219,75 · 5,2563<br/>
+                K_v = 90.512,66 - 90.512,66<br/>
                 K_v ≈ 0,00 € (vollständig getilgt)
               </div>
             )}

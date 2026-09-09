@@ -47,7 +47,7 @@ const tasks: SubTask[] = [
             'Der Spieler in Punkt N schießt auf das Tor. Wie groß ist der Winkel α, den der Torhüter ' +
             'abdecken muss?',
         hint: 'Löse mit dem Kosinussatz.',
-        correctAnswer: 26.58,
+        correctAnswer: 26.59,
         correctUnit: '°',
         solutionSteps: [
             {

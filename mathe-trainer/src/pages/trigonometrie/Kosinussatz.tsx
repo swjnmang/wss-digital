@@ -332,6 +332,12 @@ const Kosinussatz: React.FC = () => {
             const adj2Label = L.sides[adj2];
             const targetAngleLabel = L.angles[targetAngle];
 
+            // Die gesuchte Seite wird EINMAL aus underRoot berechnet und genauso gerundet
+            // wie die übrigen Dreiecksseiten (triangle.a/b/c). Dieser eine Wert wird sowohl
+            // im Lösungsweg-Text als auch als correctAnswer verwendet, damit gezeigtes
+            // Zwischenergebnis und Endergebnis nicht durch unabhängiges Runden auseinanderlaufen.
+            const computedTargetSide = round(Math.sqrt(Math.max(underRoot, 0)));
+
             const sideSteps: SolutionStep[] = [
                 {
                     text: 'Nutze den Kosinussatz für die gesuchte Seite.',
@@ -347,7 +353,7 @@ const Kosinussatz: React.FC = () => {
                 },
                 {
                     text: 'Ziehe die Wurzel, um die Seite zu erhalten.',
-                    math: `${targetSideLabel} \\approx ${formatNumber(Math.sqrt(Math.max(underRoot, 0)))}`
+                    math: `${targetSideLabel} \\approx ${formatNumber(computedTargetSide)}`
                 }
             ];
 
@@ -357,7 +363,7 @@ const Kosinussatz: React.FC = () => {
                 toFind: targetSide,
                 prompt: `Berechne die Seitenlänge ${targetSideLabel}.`,
                 steps: sideSteps,
-                correctAnswer: triangle[targetSide],
+                correctAnswer: computedTargetSide,
                 unit: '',
                 givenKeys: [adj1, adj2, targetAngle],
                 answerLabel: targetSideLabel,

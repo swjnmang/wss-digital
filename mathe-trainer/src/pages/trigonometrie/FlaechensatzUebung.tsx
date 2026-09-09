@@ -388,6 +388,13 @@ const FlaechensatzUebung: React.FC = () => {
                 const sin_angle_clamped = Math.max(-1, Math.min(1, sin_angle_calc));
                 const angle_rad_arcsin = Math.asin(sin_angle_clamped);
                 const angle_deg_arcsin = round(radToDeg(angle_rad_arcsin), 1);
+                // Der tatsächliche Winkel des Dreiecks (angleValue) ist durch die
+                // Konstruktion bereits bekannt. Math.asin() liefert aber immer nur den
+                // spitzen Wert zwischen -90° und 90°: Ist der gesuchte Winkel in
+                // Wirklichkeit stumpf (>90°), liefert Arcussinus rechnerisch nur dessen
+                // spitzes Ergänzungswinkel-Gegenstück (180° - angleValue). Dieser
+                // Ambiguous Case wird im Lösungsweg unten aufgelöst.
+                const isObtuseAngle = angleValue > 90;
 
                 description = `Ein Dreieck hat den Flächeninhalt A = ${roundedArea} cm². Zwei Seiten, die den Winkel ${angleWord} einschließen, haben die Längen ${side1Label} = ${side1Value} cm und ${side2Label} = ${side2Value} cm. Berechnen Sie die Größe des Winkels ${angleWord}.`;
                 unknownElement = `unknown-angle-${angle}`;
@@ -404,12 +411,16 @@ const FlaechensatzUebung: React.FC = () => {
                 });
                 solutionSteps.push({
                     heading: "Schritt 3: Werte einsetzen und berechnen",
-                    text: `Wir berechnen den Sinuswert und dann den Winkel mit Arcussinus:`,
-                    math: `\\sin(${angleLatex}) = \\frac{2 \\cdot ${roundedArea}}{${side1Value} \\cdot ${side2Value}} \\approx ${round(sin_angle_clamped, 3)} \\implies ${angleLatex} \\approx ${angle_deg_arcsin}^\\circ`
+                    text: isObtuseAngle
+                        ? `Wir berechnen den Sinuswert und den Winkel mit Arcussinus. Da der gesuchte Winkel ${angleWord} stumpf sein könnte, prüfen wir den Ergänzungswinkel:`
+                        : `Wir berechnen den Sinuswert und dann den Winkel mit Arcussinus:`,
+                    math: isObtuseAngle
+                        ? `\\sin(${angleLatex}) = \\frac{2 \\cdot ${roundedArea}}{${side1Value} \\cdot ${side2Value}} \\approx ${round(sin_angle_clamped, 3)} \\implies ${angleLatex} = 180^\\circ - \\sin^{-1}(${round(sin_angle_clamped, 3)}) \\approx 180^\\circ - ${angle_deg_arcsin}^\\circ = ${angleValue}^\\circ`
+                        : `\\sin(${angleLatex}) = \\frac{2 \\cdot ${roundedArea}}{${side1Value} \\cdot ${side2Value}} \\approx ${round(sin_angle_clamped, 3)} \\implies ${angleLatex} \\approx ${angleValue}^\\circ`
                 });
 
                 sketchSVG = createTriangleSketch(angles, roundedSides, angle, unknownElement, scheme);
-                correctAnswer = angle_deg_arcsin;
+                correctAnswer = angleValue;
                 unit = "°";
                 answerLabel = angleWord;
             }

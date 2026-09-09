@@ -171,11 +171,11 @@ export default function Funktionsgleichung(){
     let m: number, t: number
     
     // m: -3 bis 3
-    m = randInt(3, -3)
+    m = randInt(-3, 3)
     if (m === 0) m = 1
-    
+
     // t: -4 bis 4
-    t = randInt(4, -4)
+    t = randInt(-4, 4)
     
     setMCorrect(m)
     setTCorrect(t)

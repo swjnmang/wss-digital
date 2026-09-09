@@ -400,6 +400,14 @@ const buildSinussatzTask = (): ExamTask => {
         };
     }
 
+    const sinBeta = Math.min(1, Math.max(-1, (round(b, 2) * Math.sin(degToRad(alpha))) / a));
+    // beta ist der tatsächliche Winkel des generierten Dreiecks und bereits bekannt.
+    // Math.asin() liefert aber immer nur den spitzen Wert zwischen -90° und 90°: Ist
+    // beta in Wirklichkeit stumpf (>90°), liefert Sinus⁻¹ rechnerisch nur dessen
+    // spitzes Ergänzungswinkel-Gegenstück (180° - beta). Dieser Ambiguous Case wird im
+    // Lösungsweg unten aufgelöst, damit die Musterlösung mathematisch korrekt bleibt.
+    const arcsinBeta = radToDeg(Math.asin(sinBeta));
+    const isObtuseBeta = beta > 90;
     return {
         id: nextId(),
         topic: 'Sinussatz',
@@ -411,8 +419,10 @@ const buildSinussatzTask = (): ExamTask => {
         solutionSteps: [
             `Gegeben: a = ${a} cm, b = ${round(b, 2)} cm, α = ${alpha}°.`,
             'Sinussatz: sin(β) / b = sin(α) / a, also sin(β) = b · sin(α) / a.',
-            `sin(β) = ${round(b, 2)} · sin(${alpha}°) / ${a}`,
-            `β = sin⁻¹(...) ≈ ${beta.toFixed(1)}°`
+            `sin(β) = ${round(b, 2)} · sin(${alpha}°) / ${a} ≈ ${sinBeta.toFixed(3)}`,
+            isObtuseBeta
+                ? `Da β stumpf sein könnte, prüfen wir den Ergänzungswinkel: β = 180° − sin⁻¹(${sinBeta.toFixed(3)}) ≈ 180° − ${arcsinBeta.toFixed(1)}° = ${beta.toFixed(1)}°`
+                : `β = sin⁻¹(${sinBeta.toFixed(3)}) ≈ ${beta.toFixed(1)}°`
         ],
         sketch: {
             kind: 'general',

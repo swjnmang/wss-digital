@@ -58,10 +58,10 @@ const questions: Question[] = [
     id: 3,
     question: "Von Punkt F wird ein Pass zur Eckfahne in Punkt B gespielt. Welche Strecke (in Metern) legt der Ball zurück?",
     answers: [
-      { text: "115,34 m", correct: false },
-      { text: "135,60 m", correct: false },
-      { text: "128,06 m", correct: true },
-      { text: "142,80 m", correct: false }
+      { text: "65,34 m", correct: false },
+      { text: "78,60 m", correct: false },
+      { text: "72,11 m", correct: true },
+      { text: "84,20 m", correct: false }
     ],
     solution: [
       "1. Koordinaten ablesen (Beispiel):",
@@ -75,7 +75,7 @@ const questions: Question[] = [
       "   d = 7,21 LE",
       "",
       "3. Umrechnung in Meter:",
-      "   Alternativ: d ≈ 12,806 LE × 10 = 128,06 m"
+      "   d ≈ 7,21 LE × 10 = 72,11 m"
     ]
   },
   {

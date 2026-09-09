@@ -127,7 +127,7 @@ export default function SportladenEröffnung() {
                   type="text"
                   value={answers['1'].input}
                   onChange={(e) => updateAnswer('1', 'input', e.target.value)}
-                  placeholder="z.B. 37.309,77"
+                  placeholder="z.B. 34.232,27"
                   className="border border-gray-300 rounded px-3 py-2 w-40 text-center"
                 />
                 <span className="text-gray-600">€</span>
@@ -135,7 +135,7 @@ export default function SportladenEröffnung() {
             </div>
             <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
-                onClick={() => checkAnswer('1', 37309.77, 100)}
+                onClick={() => checkAnswer('1', 34232.27, 100)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -151,10 +151,11 @@ export default function SportladenEröffnung() {
             {answers['1'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 text-center">
                 <strong>Lösung (Vorschüssige Rente mit Anfangskapital):</strong>
-                <BlockMath math="K_n = K_0 \cdot q^n + R \cdot q \cdot \frac{q^n - 1}{q - 1}" />
-                <p>Mit <InlineMath math="q = 1,021" />, <InlineMath math="K_0 = 7.500 \text{ €}" />, <InlineMath math="R = 2.500 \text{ €}" />, <InlineMath math="n = 10" /> Jahre:</p>
-                <BlockMath math="K_{10} = 7.500 \cdot 1,021^{10} + 2.500 \cdot 1,021 \cdot \frac{1,021^{10} - 1}{0,021}" />
-                <BlockMath math="K_{10} \approx 37.309,77 \text{ €}" />
+                <p className="text-xs text-gray-600 mt-1">Laut Kontoauszug erfolgt die erste Zusatzeinzahlung von 2.500 € erst am 01.01.2011, also ein Jahr nach der Anfangseinzahlung. Bis zum 31.12.2019 (n = 10 Jahre nach K₀) fließen damit nur 9 Rentenzahlungen (2011–2019).</p>
+                <BlockMath math="K_n = K_0 \cdot q^n + R \cdot q \cdot \frac{q^{n-1} - 1}{q - 1}" />
+                <p>Mit <InlineMath math="q = 1,021" />, <InlineMath math="K_0 = 7.500 \text{ €}" />, <InlineMath math="R = 2.500 \text{ €}" />, <InlineMath math="n = 10" /> Jahre (9 Rentenzahlungen):</p>
+                <BlockMath math="K_{10} = 7.500 \cdot 1,021^{10} + 2.500 \cdot 1,021 \cdot \frac{1,021^{9} - 1}{0,021}" />
+                <BlockMath math="K_{10} \approx 9.232,49 \text{ €} + 24.999,79 \text{ €} \approx 34.232,27 \text{ €}" />
               </div>
             )}
           </div>
@@ -163,7 +164,7 @@ export default function SportladenEröffnung() {
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Aufgabe 2</h2>
             <p className="text-gray-700 mb-4 text-center">
-              Nachdem sie den Laden nun eröffnet hat, erhält sie von ihrer Großmutter ein Sparbuch als Erbschaft. Das Guthaben beträgt 40.000,00 €. Sie möchte dieses Guthaben auf ihr bestehendes Sparkonto (mit aktuell 37.309,77 € bei Verzinsung) übertragen. Nach genau 3 Jahren soll das Gesamtkapital 78.000,00 € betragen.
+              Nachdem sie den Laden nun eröffnet hat, erhält sie von ihrer Großmutter ein Sparbuch als Erbschaft. Das Guthaben beträgt 40.000,00 €. Sie möchte dieses Guthaben auf ihr bestehendes Sparkonto (mit aktuell 34.232,27 € bei Verzinsung) übertragen. Nach genau 3 Jahren soll das Gesamtkapital 78.000,00 € betragen.
               <br/><br/>
               <strong>Berechnen Sie den erforderlichen Zinssatz für diese Vermögensanlage.</strong>
             </p>
@@ -174,7 +175,7 @@ export default function SportladenEröffnung() {
                   type="text"
                   value={answers['2'].input}
                   onChange={(e) => updateAnswer('2', 'input', e.target.value)}
-                  placeholder="z.B. 1,50"
+                  placeholder="z.B. 1,66"
                   className="border border-gray-300 rounded px-3 py-2 w-32 text-center"
                 />
                 <span className="text-gray-600">%</span>
@@ -182,7 +183,7 @@ export default function SportladenEröffnung() {
             </div>
             <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
-                onClick={() => checkAnswer('2', 1.50, 0.1)}
+                onClick={() => checkAnswer('2', 1.66, 0.1)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
               >
                 Prüfen
@@ -199,10 +200,10 @@ export default function SportladenEröffnung() {
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 text-center">
                 <strong>Lösung:</strong>
                 <BlockMath math="K_n = K_0 \cdot q^n" />
-                <BlockMath math="78.000 = 77.309,77 \cdot q^3" />
-                <BlockMath math="q^3 = \frac{78.000}{77.309,77} \approx 1,00893" />
-                <BlockMath math="q = \sqrt[3]{1,00893} \approx 1,0150" />
-                <BlockMath math="p = (q - 1) \cdot 100 = 1,50\%" />
+                <BlockMath math="78.000 = 74.232,27 \cdot q^3" />
+                <BlockMath math="q^3 = \frac{78.000}{74.232,27} \approx 1,05076" />
+                <BlockMath math="q = \sqrt[3]{1,05076} \approx 1,0166" />
+                <BlockMath math="p = (q - 1) \cdot 100 = 1,66\%" />
               </div>
             )}
           </div>

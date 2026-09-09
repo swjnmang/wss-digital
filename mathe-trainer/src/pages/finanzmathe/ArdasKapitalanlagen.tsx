@@ -247,9 +247,9 @@ export default function ArdasKapitalanlagen() {
             {answers['3'].showSolution && (
               <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-gray-700 text-center">
                 <strong>Lösung (Vorschüssige Kapitalminderung):</strong>
-                <BlockMath math="K_0 = R \cdot q \cdot \frac{q^n - 1}{q - 1}" />
-                <BlockMath math="20.000 = 4.500 \cdot 1,0164 \cdot \frac{1,0164^n - 1}{0,0164}" />
-                <p>Nach Umformen und Lösen: <InlineMath math="n \approx 4" /> Jahre (exakt: <InlineMath math="n \approx 4,51" /> Jahre)</p>
+                <BlockMath math="K_0 \cdot q^n = R \cdot q \cdot \frac{q^n - 1}{q - 1}" />
+                <BlockMath math="20.000 \cdot 1,0164^n = 4.500 \cdot 1,0164 \cdot \frac{1,0164^n - 1}{0,0164}" />
+                <p>Nach Umformen und Lösen: <InlineMath math="n \approx 4" /> Jahre (exakt: <InlineMath math="n \approx 4,575" /> Jahre)</p>
               </div>
             )}
           </div>
