@@ -255,19 +255,16 @@
 
         .overview-box {
             width: 100%;
-            display: flex;
-            align-items: stretch;
-            gap: 1rem;
-        }
-
-        .overview-content {
-            flex: 1;
-            min-width: 0;
+            position: relative;
             background-color: var(--card-bg);
             border-radius: 16px;
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            padding: 2.5rem;
+            overflow: hidden;
+        }
+
+        .overview-content {
+            padding: 2.5rem 4.5rem;
             position: relative;
             min-height: 240px;
         }
@@ -300,24 +297,34 @@
         }
 
         .overview-btn {
-            background: var(--primary);
-            color: white;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 56px;
+            background: transparent;
             border: none;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
+            color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 1.25rem;
-            transition: background 0.2s ease;
-            flex-shrink: 0;
-            align-self: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            transition: background 0.2s ease, color 0.2s ease;
+            z-index: 2;
         }
 
         .overview-btn:hover {
-            background: var(--primary-dark);
+            background: #eff6ff;
+            color: var(--primary-dark);
+        }
+
+        .overview-btn--prev {
+            left: 0;
+        }
+
+        .overview-btn--next {
+            right: 0;
         }
 
         .overview-dots {
@@ -518,8 +525,8 @@
             .subtitle { font-size: 1rem; }
             main { padding: 2rem 1rem; }
             .overview-section h2 { font-size: 1.4rem; }
-            .overview-content { padding: 1.5rem 1.25rem; min-height: 0; }
-            .overview-btn { width: 36px; height: 36px; font-size: 1rem; }
+            .overview-content { padding: 1.5rem 2.75rem; min-height: 0; }
+            .overview-btn { width: 40px; font-size: 1.15rem; }
             .cookie-actions { flex-direction: column; }
             .cookie-button { width: 100%; }
             footer { flex-direction: column; }
@@ -653,7 +660,7 @@
     <section class="overview-section">
         <h2>Alle Bausteine im Überblick</h2>
         <div class="overview-box">
-            <button class="overview-btn" id="overviewPrev" aria-label="Vorheriger Baustein">❮</button>
+            <button class="overview-btn overview-btn--prev" id="overviewPrev" aria-label="Vorheriger Baustein">❮</button>
             <div class="overview-content">
                 <article class="overview-panel is-active">
                     <h3>Mathe-Trainer</h3>
@@ -684,7 +691,7 @@
                     <p>Grundlagenwissen und praktische Werkzeuge für digitale Medienkompetenz im Unterricht. Von sicherem Umgang mit digitalen Endgeräten über Datenschutz bis zu nützlichen Tools für den Schulalltag – kompakt aufbereitet für Lehrkräfte und Schülerinnen und Schüler der Wirtschaftsschule.</p>
                 </article>
             </div>
-            <button class="overview-btn" id="overviewNext" aria-label="Nächster Baustein">❯</button>
+            <button class="overview-btn overview-btn--next" id="overviewNext" aria-label="Nächster Baustein">❯</button>
         </div>
         <div class="overview-dots" id="overviewDots"></div>
     </section>
