@@ -242,7 +242,7 @@ export default function PoolAufgabe() {
         <p className="text-lg text-blue-800">Berechne verschiedene Größen rund um einen zylinderförmigen Garten-Pool</p>
       </header>
 
-      <div className="max-w-4xl mx-auto w-full">
+      <div className="max-w-6xl mx-auto w-full">
         {/* Hinweis */}
         <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-600 rounded-lg">
           <p className="text-blue-900 font-semibold">💡 Tipp: Gib deine Antwort mit der richtigen Einheit ein! Wähle die Einheit aus der Liste.</p>

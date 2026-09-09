@@ -191,7 +191,7 @@ export default function Normalparabel() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="mx-auto px-4 py-8 max-w-6xl">
         <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
           <h1 className="text-2xl font-bold text-slate-800 mb-6 text-center">Eigenschaften von Parabeln</h1>
           

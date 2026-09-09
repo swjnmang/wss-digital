@@ -256,7 +256,7 @@ export default function Handelskalkvw() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
       <div className="flex-1 flex flex-col items-center px-3 py-10">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-4xl p-6 sm:p-10">
+        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-6xl p-6 sm:p-10">
           <h1 className="text-3xl font-bold text-blue-900 mb-2">Handelskalkulation (Verkaufspreise)</h1>
           <p className="text-slate-600 mb-6">Führe die vollständige Vorwärtskalkulation durch: vom Listeneinkaufspreis bis zum Bruttoverkaufspreis.</p>
 

@@ -204,7 +204,7 @@ const Schnittpunkte2 = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-3xl">
+        <div className="mx-auto px-4 py-8 max-w-6xl">
             <div className="bg-white rounded-xl shadow-lg p-6">
                 <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">
                     Aufgabengenerator: Schnittpunkt Gerade & Parabel

@@ -184,7 +184,7 @@ export default function FussballplatzAufgabe() {
         <p className="text-lg text-blue-800">Löse die Aufgaben rechnerisch mit Hilfe des Koordinatensystems</p>
       </header>
 
-      <div className="max-w-4xl mx-auto w-full bg-white rounded-lg shadow-lg p-6 mb-6">
+      <div className="max-w-6xl mx-auto w-full bg-white rounded-lg shadow-lg p-6 mb-6">
         {/* Einleitungstext */}
         <div className="mb-6 p-4 bg-blue-50 rounded-lg">
           <p className="text-gray-800 leading-relaxed">

@@ -256,7 +256,7 @@ export default function Gemischt() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
       <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-4xl min-h-[560px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
+        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-6xl min-h-[560px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
           {/* Local style tweaks for fraction exponent vertical alignment */}
           <style>{`
             .fraction sup {font-size:0.65em; top:-0.2em; position:relative; line-height:1;}

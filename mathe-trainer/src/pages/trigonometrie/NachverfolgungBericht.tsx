@@ -20,7 +20,7 @@ const NachverfolgungBericht: React.FC = () => {
     const { points, maxPoints, percent } = getTrackingScore(log);
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-3xl">
+        <div className="mx-auto px-4 py-8 max-w-6xl">
             <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
                 <div className="text-center space-y-2">
                     <h1 className="text-3xl font-bold text-teal-800">Deine Nachverfolgung – Trigonometrie</h1>

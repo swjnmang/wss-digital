@@ -215,7 +215,7 @@ export default function Haus() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-6 flex items-center gap-4">
+        <div className="max-w-6xl mx-auto px-6 py-6 flex items-center gap-4">
           <Link to="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben" className="text-slate-600 hover:text-slate-900">
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -226,7 +226,7 @@ export default function Haus() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-10 space-y-8">
+      <main className="max-w-6xl mx-auto px-6 py-10 space-y-8">
         
         {/* Text über dem Bild */}
         <div className="rounded-lg border border-slate-200 bg-blue-50 p-4">

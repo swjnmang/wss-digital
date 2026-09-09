@@ -299,7 +299,7 @@ const ExamScreen: React.FC<ExamScreenProps> = ({ zustand, onUpdateAnswer, onNavi
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header mit Fortschrittsbalken */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
@@ -661,7 +661,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Ergebniskarte */}
         <div className="bg-white rounded-lg shadow-2xl p-8 mb-8">
           <div className="text-center mb-8">

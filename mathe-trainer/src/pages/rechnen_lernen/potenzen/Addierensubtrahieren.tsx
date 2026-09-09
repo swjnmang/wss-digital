@@ -113,7 +113,7 @@ export default function Addierensubtrahieren() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
       <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-3xl md:max-w-4xl min-h-[520px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
+        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-3xl md:max-w-6xl min-h-[520px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
           <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Potenzen addieren & subtrahieren</h1>
 
           <div className="w-full max-w-2xl bg-slate-100 border border-slate-200 rounded-lg p-4 mb-4 text-center">

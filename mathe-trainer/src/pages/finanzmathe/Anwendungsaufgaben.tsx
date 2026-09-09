@@ -6,7 +6,7 @@ export default function Anwendungsaufgaben() {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <button
           onClick={() => navigate('/finanzmathe')}
           className="mb-6 flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-100 rounded-lg shadow-sm transition-colors"

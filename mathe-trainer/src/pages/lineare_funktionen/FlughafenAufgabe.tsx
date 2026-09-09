@@ -341,7 +341,7 @@ export default function FlughafenAufgabe() {
         <p className="text-lg text-sky-800">Löse die Aufgaben rechnerisch mit Hilfe des Koordinatensystems</p>
       </header>
 
-      <div className="max-w-4xl mx-auto w-full">
+      <div className="max-w-6xl mx-auto w-full">
         <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-600 rounded-lg">
           <p className="text-yellow-900 font-semibold">💡 Wichtig: Runde deine Ergebnisse auf 2 Stellen nach dem Komma!</p>
         </div>

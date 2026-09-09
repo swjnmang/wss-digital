@@ -30,7 +30,7 @@ export default function Gleichungen() {
             <h1 className="text-3xl md:text-4xl font-bold mb-2 text-blue-900">Gleichungen lösen</h1>
             <p className="text-lg text-blue-800">Wähle eine Aufgabe aus der folgenden Liste aus.</p>
           </header>
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-8 grid gap-8 grid-cols-1 sm:grid-cols-2">
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-8 grid gap-8 grid-cols-1 sm:grid-cols-2">
             {aufgaben.map((a) => (
               <Link
                 key={a.title}

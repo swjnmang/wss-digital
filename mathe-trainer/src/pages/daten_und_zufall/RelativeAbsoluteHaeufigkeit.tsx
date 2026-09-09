@@ -79,7 +79,7 @@ const RelativeAbsoluteHaeufigkeit: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
       <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/daten-und-zufall" className="text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-2">
             <ArrowLeft className="w-5 h-5" />
             Zurück
@@ -88,7 +88,7 @@ const RelativeAbsoluteHaeufigkeit: React.FC = () => {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Session-Statistik */}
         <div className="flex justify-between items-center mb-6 text-sm font-semibold text-slate-600">
           <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-100">

@@ -144,7 +144,7 @@ export default function Pausenhof() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-6 flex items-center gap-4">
+        <div className="max-w-6xl mx-auto px-6 py-6 flex items-center gap-4">
           <Link to="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben" className="text-slate-600 hover:text-slate-900">
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -155,7 +155,7 @@ export default function Pausenhof() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-10 space-y-8">
+      <main className="max-w-6xl mx-auto px-6 py-10 space-y-8">
         
         {/* Bild */}
         <div className="rounded-lg border border-slate-200 bg-white p-6">

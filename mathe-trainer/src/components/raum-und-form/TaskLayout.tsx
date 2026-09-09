@@ -29,7 +29,7 @@ export default function TaskLayout({
   return (
     <div className="min-h-screen bg-[var(--bg-color)] text-slate-900">
       <header className="w-full bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-4">
           <nav className="flex flex-wrap items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
             {breadcrumbs.map((crumb, idx) => (
               <span key={idx} className="flex items-center gap-1">
@@ -74,7 +74,7 @@ export default function TaskLayout({
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">{children}</main>
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">{children}</main>
     </div>
   );
 }

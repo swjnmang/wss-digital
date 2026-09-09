@@ -281,7 +281,7 @@ export default function Zinseszins() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
       <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-4 sm:px-4 md:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-4xl min-h-[400px] flex flex-col items-center p-4 sm:p-8 md:p-12">
+        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-6xl min-h-[400px] flex flex-col items-center p-4 sm:p-8 md:p-12">
           <h1 className="text-2xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Zinseszins-Rechner</h1>
           
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6 w-full max-w-2xl text-center">

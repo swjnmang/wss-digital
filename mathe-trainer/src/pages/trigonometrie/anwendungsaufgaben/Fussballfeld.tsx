@@ -296,7 +296,7 @@ const Fussballfeld: React.FC = () => {
 
     return (
         <div className="py-8">
-            <div className="mx-auto px-4 max-w-4xl">
+            <div className="mx-auto px-4 max-w-6xl">
                 <Link to="/trigonometrie/anwendungsaufgaben" className="inline-flex items-center gap-2 text-teal-700 hover:text-teal-900 text-sm font-medium mb-4">
                     <i className="fa-solid fa-arrow-left"></i> Zurück zur Übersicht
                 </Link>

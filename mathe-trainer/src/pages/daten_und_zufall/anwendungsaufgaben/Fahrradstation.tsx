@@ -114,7 +114,7 @@ export default function Fahrradstation() {
 
     return (
         <div className="min-h-screen bg-[var(--bg-color)] py-8">
-            <div className="mx-auto px-4 max-w-4xl">
+            <div className="mx-auto px-4 max-w-6xl">
                 <Link to="/daten-und-zufall/anwendungsaufgaben" className="inline-flex items-center gap-2 text-blue-700 hover:text-blue-900 text-sm font-medium mb-4">
                     <i className="fa-solid fa-arrow-left"></i> Zurück zur Übersicht
                 </Link>

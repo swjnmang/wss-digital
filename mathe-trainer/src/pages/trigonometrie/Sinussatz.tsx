@@ -498,7 +498,7 @@ const Sinussatz: React.FC = () => {
         : '';
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="mx-auto px-4 py-8 max-w-6xl">
             <div className="bg-white rounded-xl shadow-lg p-6">
                 <h1 className="text-3xl font-bold text-teal-800 text-center mb-4">Sinussatz im allgemeinen Dreieck</h1>
                 <p className="text-gray-700 text-center max-w-2xl mx-auto mb-6">

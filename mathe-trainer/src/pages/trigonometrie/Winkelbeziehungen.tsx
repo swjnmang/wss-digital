@@ -189,7 +189,7 @@ const WinkelDiagramm: React.FC<{ theta: number; highlightA: number; highlightB: 
     const colorOf = (id: number) => (id === highlightA ? '#2563eb' : id === highlightB ? '#dc2626' : '#94a3b8');
 
     return (
-        <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="mx-auto">
+        <svg viewBox={`0 0 ${width} ${height}`} className="mx-auto w-full h-auto" style={{ maxWidth: width }}>
             {/* Parallele Geraden */}
             <line x1={20} y1={p1.y} x2={400} y2={p1.y} stroke="#0f172a" strokeWidth={1.5} />
             <line x1={20} y1={p2.y} x2={400} y2={p2.y} stroke="#0f172a" strokeWidth={1.5} />
@@ -273,7 +273,7 @@ const Winkelbeziehungen: React.FC = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="mx-auto px-4 py-8 max-w-6xl">
             <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
                 <div className="text-center">
                     <h1 className="text-3xl font-bold text-teal-800 mb-4">Winkelbeziehungen</h1>
