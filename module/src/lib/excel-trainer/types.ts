@@ -69,6 +69,17 @@ export interface ConditionalFormatExistsCheck extends BaseCheck {
   type: 'conditionalFormatExists';
 }
 
+export interface NumberFormatContainsCheck extends BaseCheck {
+  type: 'numberFormatContains';
+  cell: string;
+  expectedSubstring: string;
+}
+
+export interface SheetNameCheck extends BaseCheck {
+  type: 'sheetName';
+  expectedName: string;
+}
+
 export type ExcelCheck =
   | FormulaCheck
   | FormulaRangeCheck
@@ -77,7 +88,9 @@ export type ExcelCheck =
   | BorderCheck
   | SortedByColumnCheck
   | FilterActiveCheck
-  | ConditionalFormatExistsCheck;
+  | ConditionalFormatExistsCheck
+  | NumberFormatContainsCheck
+  | SheetNameCheck;
 
 export interface ExcelTask {
   id: string;

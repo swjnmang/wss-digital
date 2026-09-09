@@ -141,6 +141,25 @@ function runCheck(sheet: ReturnType<FWorkbook['getActiveSheet']>, check: ExcelCh
       };
     }
 
+    case 'numberFormatContains': {
+      const format = sheet.getRange(check.cell).getNumberFormat();
+      const success = format.toLowerCase().includes(check.expectedSubstring.toLowerCase());
+      return {
+        label: check.label,
+        success,
+        message: success ? check.feedback.correct ?? '✅ Korrekt!' : check.feedback.wrong ?? '❌ Nicht korrekt.',
+      };
+    }
+
+    case 'sheetName': {
+      const success = sheet.getSheetName().trim().toLowerCase() === check.expectedName.trim().toLowerCase();
+      return {
+        label: check.label,
+        success,
+        message: success ? check.feedback.correct ?? '✅ Korrekt!' : check.feedback.wrong ?? '❌ Nicht korrekt.',
+      };
+    }
+
     default: {
       const _exhaustive: never = check;
       return _exhaustive;
