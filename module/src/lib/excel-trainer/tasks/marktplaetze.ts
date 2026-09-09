@@ -79,7 +79,7 @@ export const marktplaetzeTask: ExcelTask = {
     '6. Berechnen Sie die Summe des maximal erzielbaren Gesamtumsatzes.',
     '7. Filtern Sie die Ergebnisse so, dass nur Artikel angezeigt werden, die angeboten werden sollen.',
   ],
-  hint: 'VKP neu = VKP alt × (1 + $C$3). VKP brutto = VKP neu × (1 + $H$3). Umsatz = VKP neu × absetzbare Menge. Entscheidung: =WENN(G5>2000;"anbieten";"entfernen").',
+  hint: 'VKP neu = VKP alt × (1 + $C$3). VKP brutto = VKP neu × (1 + $H$3). Umsatz = VKP neu × absetzbare Menge. Entscheidung: =WENN(G5>2000,"anbieten","entfernen") – in dieser Tabellenkalkulation werden die Argumente einer Formel mit Komma statt Semikolon getrennt.',
   seed,
   columnWidths: { A: 60, B: 200, C: 100, D: 100, E: 100, F: 130, G: 110, H: 110, I: 130 },
   checks: [

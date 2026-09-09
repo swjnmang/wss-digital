@@ -14,6 +14,7 @@ import '@univerjs/preset-sheets-sort/lib/index.css';
 import '@univerjs/preset-sheets-conditional-formatting/lib/index.css';
 
 import type { FUniver } from '@univerjs/core/facade';
+import { registerGermanFormulaAliases } from '../../lib/excel-trainer/german-formulas';
 import { applyTaskToWorkbook } from '../../lib/excel-trainer/apply-task';
 import { gradeTask } from '../../lib/excel-trainer/grading';
 import type { ExcelTask, ValidationResult } from '../../lib/excel-trainer/types';
@@ -72,6 +73,7 @@ export const UniverSheet = forwardRef<UniverSheetHandle, UniverSheetProps>(({ ta
 
     const workbook = api.createWorkbook({ id: task.id, name: task.title });
     workbookRef.current = workbook;
+    registerGermanFormulaAliases(api);
     applyTaskToWorkbook(workbook, task);
   }, [task]);
 

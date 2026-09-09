@@ -64,6 +64,11 @@ export function TaskPanel({ task, results, onCheck }: TaskPanelProps) {
         </button>
       </div>
 
+      <p className="text-xs text-slate-400">
+        ℹ️ In dieser Tabellenkalkulation werden Argumente innerhalb einer Formel mit Komma <code>,</code> statt
+        Semikolon <code>;</code> getrennt (z. B. <code>=WENN(A1&gt;5,"ja","nein")</code>).
+      </p>
+
       {task.hint && (
         <details className="text-sm text-slate-500 bg-slate-50 rounded-lg p-3">
           <summary className="cursor-pointer font-semibold text-slate-600">💡 Hinweis</summary>
