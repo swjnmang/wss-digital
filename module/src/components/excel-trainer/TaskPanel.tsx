@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import type { ExcelTask, ValidationResult } from '../../lib/excel-trainer/types';
+import { RecordingControls } from './RecordingControls';
 
 interface TaskPanelProps {
   task: ExcelTask;
   results: ValidationResult[] | null;
   onCheck: () => void;
+  recording: boolean;
+  onFinishRecording: (studentName: string) => void;
 }
 
 const difficultyLabel: Record<ExcelTask['difficulty'], string> = {
@@ -13,7 +16,7 @@ const difficultyLabel: Record<ExcelTask['difficulty'], string> = {
   schwer: 'Schwer',
 };
 
-export function TaskPanel({ task, results, onCheck }: TaskPanelProps) {
+export function TaskPanel({ task, results, onCheck, recording, onFinishRecording }: TaskPanelProps) {
   const allCorrect = results !== null && results.every((r) => r.success);
 
   const [context, ...steps] = task.instruction;
@@ -21,71 +24,72 @@ export function TaskPanel({ task, results, onCheck }: TaskPanelProps) {
   const currentStep = steps[stepIndex] ?? context;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 flex flex-col gap-3">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-600 bg-blue-50 rounded-full px-2 py-1">
+    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3 flex flex-col gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-600 bg-blue-50 rounded-full px-2 py-0.5">
             {difficultyLabel[task.difficulty]}
           </span>
-          <h2 className="text-lg font-bold text-slate-800">{task.title}</h2>
+          <h2 className="text-base font-bold text-slate-800">{task.title}</h2>
         </div>
-        <button
-          onClick={onCheck}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg px-6 py-2 transition-colors"
-        >
-          Prüfen
-        </button>
+        <div className="flex items-center gap-2">
+          {recording && <RecordingControls recording onStart={() => {}} onFinish={onFinishRecording} />}
+          <button
+            onClick={onCheck}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg px-5 py-1.5 text-sm transition-colors"
+          >
+            Prüfen
+          </button>
+        </div>
       </div>
 
-      {context && <p className="text-sm text-slate-500">{context}</p>}
-
-      <div className="flex items-center gap-3 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">
+      <div className="flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-3 py-1.5">
         <button
           onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
           disabled={stepIndex === 0}
-          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-bold text-lg px-1"
+          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-bold text-lg px-1 shrink-0"
           aria-label="Vorheriger Arbeitsauftrag"
         >
           ←
         </button>
-        <div className="flex-1">
-          <span className="text-xs font-semibold uppercase tracking-wide text-blue-500">
-            Arbeitsauftrag {stepIndex + 1} von {steps.length}
+        <p className="text-sm text-slate-800 flex-1">
+          <span className="text-xs font-semibold uppercase tracking-wide text-blue-500 mr-2">
+            {stepIndex + 1}/{steps.length}
           </span>
-          <p className="text-sm text-slate-800 font-medium">{currentStep}</p>
-        </div>
+          {currentStep}
+        </p>
         <button
           onClick={() => setStepIndex((i) => Math.min(steps.length - 1, i + 1))}
           disabled={stepIndex === steps.length - 1}
-          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-bold text-lg px-1"
+          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-bold text-lg px-1 shrink-0"
           aria-label="Nächster Arbeitsauftrag"
         >
           →
         </button>
       </div>
 
-      <p className="text-xs text-slate-400">
-        ℹ️ In dieser Tabellenkalkulation werden Argumente innerhalb einer Formel mit Komma <code>,</code> statt
-        Semikolon <code>;</code> getrennt (z. B. <code>=WENN(A1&gt;5,"ja","nein")</code>).
-      </p>
-
-      {task.hint && (
-        <details className="text-sm text-slate-500 bg-slate-50 rounded-lg p-3">
-          <summary className="cursor-pointer font-semibold text-slate-600">💡 Hinweis</summary>
-          <p className="mt-2">{task.hint}</p>
-        </details>
-      )}
+      <details className="text-sm text-slate-500 bg-slate-50 rounded-lg px-3 py-1.5">
+        <summary className="cursor-pointer font-semibold text-slate-600 text-sm">💡 Kontext &amp; Hinweis</summary>
+        <div className="mt-2 space-y-2">
+          {context && <p>{context}</p>}
+          {task.hint && <p>{task.hint}</p>}
+          <p className="text-xs text-slate-400">
+            ℹ️ Argumente innerhalb einer Formel werden mit Komma <code>,</code> statt Semikolon <code>;</code>{' '}
+            getrennt (z. B. <code>=WENN(A1&gt;5,"ja","nein")</code>).
+          </p>
+        </div>
+      </details>
 
       {results && (
-        <div className="space-y-2 border-t border-slate-100 pt-3">
+        <div className="space-y-1.5 border-t border-slate-100 pt-2">
           <p className={`text-sm font-semibold ${allCorrect ? 'text-green-600' : 'text-amber-600'}`}>
             {allCorrect ? '🎉 Alles richtig!' : 'Es sind noch nicht alle Punkte korrekt.'}
           </p>
-          <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+          <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-1.5">
             {results.map((r, i) => (
               <li
                 key={i}
-                className={`text-sm rounded-lg px-3 py-2 ${
+                className={`text-sm rounded-lg px-3 py-1.5 ${
                   r.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
                 }`}
               >

@@ -34,9 +34,10 @@ export function RecordingControls({ recording, onStart, onFinish }: RecordingCon
       ) : (
         <button
           onClick={handleFinishClick}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg font-medium text-xs transition-colors whitespace-nowrap"
         >
-          ⏹ Aufzeichnung beenden
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+          Aufzeichnung beenden
         </button>
       )}
 
