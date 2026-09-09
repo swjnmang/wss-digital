@@ -9,14 +9,15 @@ declare global {
 interface GeoGebraSineUnitCircleProps {
     width?: number;
     height?: number;
+    mode?: 'sin' | 'cos';
 }
 
 const ASPECT_RATIO = 760 / 230;
 
-const GeoGebraSineUnitCircle: React.FC<GeoGebraSineUnitCircleProps> = ({ width = 760, height = 230 }) => {
+const GeoGebraSineUnitCircle: React.FC<GeoGebraSineUnitCircleProps> = ({ width = 760, height = 230, mode = 'sin' }) => {
     const wrapperRef = useRef<HTMLDivElement | null>(null);
     const appletRef = useRef<any>(null);
-    const elementIdRef = useRef<string>(`ggb-sine-${Math.random().toString(36).substr(2, 9)}`);
+    const elementIdRef = useRef<string>(`ggb-${mode}-${Math.random().toString(36).substr(2, 9)}`);
     const [scriptLoaded, setScriptLoaded] = useState<boolean>(!!window.GGBApplet);
     const [error, setError] = useState<boolean>(false);
     const [isAnimating, setIsAnimating] = useState(false);
@@ -42,12 +43,22 @@ const GeoGebraSineUnitCircle: React.FC<GeoGebraSineUnitCircleProps> = ({ width =
                 api.evalCommand('winkel=Angle(X1,O,P)');
 
                 api.evalCommand('segOP=Segment(O,P)');
-                api.evalCommand('segSin=Segment(P,(x(P),0))');
+                // Für sin: senkrechte Strecke zur x-Achse (y-Koordinate von P).
+                // Für cos: waagrechte Strecke zur y-Achse (x-Koordinate von P).
+                api.evalCommand(mode === 'sin' ? 'segSin=Segment(P,(x(P),0))' : 'segSin=Segment(P,(0,y(P)))');
 
-                // Sinuskurve rechts vom Kreis, Offset entlang der x-Achse
+                // Sinus-/Kosinuskurve rechts vom Kreis, Offset entlang der x-Achse
                 api.evalCommand('offset=2.6');
-                api.evalCommand('kurve=Function(sin(x-offset),offset,offset+2*pi)');
-                api.evalCommand('Q=(offset+alpha*pi/180,sin(alpha*pi/180))');
+                api.evalCommand(
+                    mode === 'sin'
+                        ? 'kurve=Function(sin(x-offset),offset,offset+2*pi)'
+                        : 'kurve=Function(cos(x-offset),offset,offset+2*pi)'
+                );
+                api.evalCommand(
+                    mode === 'sin'
+                        ? 'Q=(offset+alpha*pi/180,sin(alpha*pi/180))'
+                        : 'Q=(offset+alpha*pi/180,cos(alpha*pi/180))'
+                );
                 api.evalCommand('segLink=Segment(P,Q)');
                 api.evalCommand('segDown=Segment(Q,(x(Q),0))');
 

@@ -51,6 +51,7 @@ import Zeichnen from './pages/lineare_funktionen/Zeichnen'
 import Nullstellen from './pages/lineare_funktionen/Nullstellen'
 import PunktGerade from './pages/lineare_funktionen/PunktGerade'
 import Schnittpunkt from './pages/lineare_funktionen/Schnittpunkt'
+import Gleichungssysteme from './pages/lineare_funktionen/Gleichungssysteme'
 import SpielMuenzen from './pages/lineare_funktionen/SpielMuenzen'
 import TestLF from './pages/lineare_funktionen/Test'
 import GemischteAufgabenLF from './pages/lineare_funktionen/GemischteAufgaben'
@@ -114,6 +115,8 @@ import FlaechensatzMenu from './pages/trigonometrie/FlaechensatzMenu';
 import FlaechensatzEinstieg from './pages/trigonometrie/FlaechensatzEinstieg';
 import FlaechensatzUebung from './pages/trigonometrie/FlaechensatzUebung';
 import Sinusfunktion from './pages/trigonometrie/Sinusfunktion';
+import Kosinusfunktion from './pages/trigonometrie/Kosinusfunktion';
+import Winkelbeziehungen from './pages/trigonometrie/Winkelbeziehungen';
 import GemischteUebungsaufgabenTrig from './pages/trigonometrie/GemischteUebungsaufgaben';
 import Pruefungsmodus from './pages/trigonometrie/Pruefungsmodus';
 import SteigungswinkelProzentGrad from './pages/trigonometrie/SteigungswinkelProzentGrad';
@@ -303,6 +306,7 @@ export default function App() {
           <Route path="/lineare_funktionen/parallel_senkrecht" element={<ParallelSenkrecht />} />
           <Route path="/lineare_funktionen/nullstellen" element={<Nullstellen />} />
           <Route path="/lineare_funktionen/schnittpunkt" element={<Schnittpunkt />} />
+          <Route path="/lineare_funktionen/gleichungssysteme" element={<Gleichungssysteme />} />
           <Route path="/lineare_funktionen/gemischte-aufgaben" element={<GemischteAufgabenLF />} />
           <Route path="/lineare_funktionen/anwendungsaufgaben" element={<AnwendungsaufgabenLF />} />
           <Route path="/lineare_funktionen/anwendungsaufgaben/fussballplatz" element={<FussballplatzAufgabe />} />
@@ -367,6 +371,8 @@ export default function App() {
           <Route path="/trigonometrie/flaechensatz/einstieg" element={<FlaechensatzEinstieg />} />
           <Route path="/trigonometrie/flaechensatz/uebung" element={<FlaechensatzUebung />} />
           <Route path="/trigonometrie/sinusfunktion" element={<Sinusfunktion />} />
+          <Route path="/trigonometrie/kosinusfunktion" element={<Kosinusfunktion />} />
+          <Route path="/trigonometrie/winkelbeziehungen" element={<Winkelbeziehungen />} />
           <Route path="/trigonometrie/gemischte-uebungsaufgaben" element={<GemischteUebungsaufgabenTrig />} />
           <Route path="/trigonometrie/pruefungsmodus" element={<Pruefungsmodus />} />
           <Route path="/trigonometrie/anwendungsaufgaben" element={<AnwendungsaufgabenMenu />} />
