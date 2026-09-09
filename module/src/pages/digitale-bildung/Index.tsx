@@ -19,12 +19,12 @@ const tools: Tool[] = [
     path: '/digitale-bildung/excel-trainer',
   },
   {
-    id: 'geschaeftsbrief',
-    title: 'Geschäftsbrief',
+    id: 'word',
+    title: 'Word',
     emoji: '✉️',
     description: 'Geschäftsbriefe nach DIN-Norm formatieren und aufbauen.',
     enabled: false,
-    path: '/digitale-bildung/geschaeftsbrief',
+    path: '/digitale-bildung/word',
   },
   {
     id: 'powerpoint',

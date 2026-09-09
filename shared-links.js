@@ -5,7 +5,7 @@
       newTab: false,
     },
     'digitale-bildung': {
-      url: '#',
+      url: 'https://module-taupe.vercel.app/digitale-bildung',
       newTab: false,
     },
     'wirtschaftsplanspiel': {
