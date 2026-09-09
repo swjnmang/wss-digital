@@ -65,6 +65,14 @@ export default function Home() {
       description: 'Wirtschaft und Management im Tourismussektor.',
       enabled: false,
       path: '/tourismus'
+    },
+    {
+      id: 'digitale-bildung',
+      title: 'Digitale Bildung',
+      emoji: '💻',
+      description: 'Excel, Geschäftsbrief und weitere digitale Werkzeuge für den Büroalltag.',
+      enabled: true,
+      path: '/digitale-bildung'
     }
   ]
 

@@ -18,6 +18,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "mathe-trainer", "--", "--port", "5173"],
       "port": 5173
+    },
+    {
+      "name": "module",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "module", "--", "--port", "5174"],
+      "port": 5174
     }
   ]
 }

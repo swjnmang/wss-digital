@@ -8,6 +8,8 @@ import GamificationNutzen from './pages/gamification/GamificationNutzen'
 import BeruflicheMoeglichkeiten from './pages/gamification/BeruflicheMoeglichkeiten'
 import Gesundheit from './pages/Gesundheit'
 import Fit4Finance from './pages/Fit4Finance'
+import DigitaleBildungIndex from './pages/digitale-bildung/Index'
+import ExcelTrainer from './pages/digitale-bildung/ExcelTrainer'
 import ImpressumModal from './components/ImpressumModal'
 
 function App() {
@@ -23,6 +25,8 @@ function App() {
         <Route path="/gamification/berufliche-moeglichkeiten" element={<BeruflicheMoeglichkeiten />} />
         <Route path="/gesundheit" element={<Gesundheit />} />
         <Route path="/fit4finance" element={<Fit4Finance />} />
+        <Route path="/digitale-bildung" element={<DigitaleBildungIndex />} />
+        <Route path="/digitale-bildung/excel-trainer" element={<ExcelTrainer />} />
       </Routes>
       <ImpressumModal />
     </Router>
