@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { ExcelTask, ValidationResult } from '../../lib/excel-trainer/types';
 
 interface TaskPanelProps {
@@ -14,6 +15,10 @@ const difficultyLabel: Record<ExcelTask['difficulty'], string> = {
 
 export function TaskPanel({ task, results, onCheck }: TaskPanelProps) {
   const allCorrect = results !== null && results.every((r) => r.success);
+
+  const [context, ...steps] = task.instruction;
+  const [stepIndex, setStepIndex] = useState(0);
+  const currentStep = steps[stepIndex] ?? context;
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 flex flex-col gap-3">
@@ -32,10 +37,31 @@ export function TaskPanel({ task, results, onCheck }: TaskPanelProps) {
         </button>
       </div>
 
-      <div className="text-sm text-slate-600 leading-relaxed columns-1 md:columns-2 xl:columns-3 gap-6 [&>p]:mb-2 [&>p]:break-inside-avoid">
-        {task.instruction.map((line, i) => (
-          <p key={i}>{line}</p>
-        ))}
+      {context && <p className="text-sm text-slate-500">{context}</p>}
+
+      <div className="flex items-center gap-3 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">
+        <button
+          onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
+          disabled={stepIndex === 0}
+          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-bold text-lg px-1"
+          aria-label="Vorheriger Arbeitsauftrag"
+        >
+          ←
+        </button>
+        <div className="flex-1">
+          <span className="text-xs font-semibold uppercase tracking-wide text-blue-500">
+            Arbeitsauftrag {stepIndex + 1} von {steps.length}
+          </span>
+          <p className="text-sm text-slate-800 font-medium">{currentStep}</p>
+        </div>
+        <button
+          onClick={() => setStepIndex((i) => Math.min(steps.length - 1, i + 1))}
+          disabled={stepIndex === steps.length - 1}
+          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-bold text-lg px-1"
+          aria-label="Nächster Arbeitsauftrag"
+        >
+          →
+        </button>
       </div>
 
       {task.hint && (

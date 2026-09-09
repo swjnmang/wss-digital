@@ -79,7 +79,7 @@ export default function ExcelTrainer() {
           <RecordingControls recording={recording} onStart={handleStartRecording} onFinish={handleFinishRecording} />
         </div>
 
-        <TaskPanel task={task} results={results} onCheck={handleCheck} />
+        <TaskPanel key={task.id} task={task} results={results} onCheck={handleCheck} />
 
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <UniverSheet ref={sheetRef} task={task} />
