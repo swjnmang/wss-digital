@@ -65,21 +65,23 @@ export default function ExcelTrainer() {
           📱 Der Excel-Trainer ist für Tablet oder Computer gemacht. Auf dem Smartphone lässt sich die Tabelle nur eingeschränkt bedienen.
         </div>
 
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          {recording ? (
-            <div className="flex-1 bg-slate-100 border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              Aufzeichnung läuft – deine Bearbeitungszeit und Ergebnisse werden festgehalten.
-            </div>
-          ) : (
-            <div className="flex-1 text-sm text-slate-500 bg-white border border-slate-200 rounded-lg px-4 py-2">
-              Du arbeitest ohne Aufzeichnung.
-            </div>
-          )}
-          <RecordingControls recording={recording} onStart={handleStartRecording} onFinish={handleFinishRecording} />
-        </div>
+        <div className="sticky top-0 z-20 bg-slate-50 pb-3 flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            {recording ? (
+              <div className="flex-1 bg-slate-100 border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                Aufzeichnung läuft – deine Bearbeitungszeit und Ergebnisse werden festgehalten.
+              </div>
+            ) : (
+              <div className="flex-1 text-sm text-slate-500 bg-white border border-slate-200 rounded-lg px-4 py-2">
+                Du arbeitest ohne Aufzeichnung.
+              </div>
+            )}
+            <RecordingControls recording={recording} onStart={handleStartRecording} onFinish={handleFinishRecording} />
+          </div>
 
-        <TaskPanel key={task.id} task={task} results={results} onCheck={handleCheck} />
+          <TaskPanel key={task.id} task={task} results={results} onCheck={handleCheck} />
+        </div>
 
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <UniverSheet ref={sheetRef} task={task} />
