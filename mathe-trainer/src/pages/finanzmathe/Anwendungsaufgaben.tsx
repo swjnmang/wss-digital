@@ -55,6 +55,10 @@ export default function Anwendungsaufgaben() {
               <h2 className="text-xl font-bold text-purple-800 mb-2"><i className="fa-solid fa-door-open mr-2 text-purple-600"></i>9. Digitaler Escape Room</h2>
               <p className="text-gray-600">Interaktives Video: Löse unterwegs Lückentext-Rätsel rund um Zinsen und Zinseszinsen und knacke den Code.</p>
             </Link>
+            <Link to="/finanzmathe/anwendungsaufgaben/sarah-kapitalanlagen" className="block p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200">
+              <h2 className="text-xl font-bold text-purple-800 mb-2"><i className="fa-solid fa-piggy-bank mr-2 text-purple-600"></i>10. Sarahs Finanzplanung</h2>
+              <p className="text-gray-600">Zinseszins, Zinssatz- und Laufzeitberechnung, Annuitätendarlehen mit Tilgungsplan und Restschuldberechnung.</p>
+            </Link>
           </div>
         </div>
       </div>
