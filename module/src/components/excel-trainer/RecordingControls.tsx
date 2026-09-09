@@ -18,8 +18,8 @@ export function RecordingControls({ recording, onStart, onFinish }: RecordingCon
     const trimmed = name.trim();
     if (!trimmed) return;
     setShowNamePrompt(false);
-    onFinish(trimmed);
     setName('');
+    onFinish(trimmed);
   };
 
   return (

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom'
 import Home from './pages/Home'
 import Gamification from './pages/gamification/Index'
 import Gesellschaftsspiele from './pages/gamification/Gesellschaftsspiele'
@@ -9,7 +9,9 @@ import BeruflicheMoeglichkeiten from './pages/gamification/BeruflicheMoeglichkei
 import Gesundheit from './pages/Gesundheit'
 import Fit4Finance from './pages/Fit4Finance'
 import DigitaleBildungIndex from './pages/digitale-bildung/Index'
+import ExcelTaskSelect from './pages/digitale-bildung/ExcelTaskSelect'
 import ExcelTrainer from './pages/digitale-bildung/ExcelTrainer'
+import { ExcelSessionProvider } from './lib/excel-trainer/ExcelSessionContext'
 import ImpressumModal from './components/ImpressumModal'
 
 function App() {
@@ -26,7 +28,17 @@ function App() {
         <Route path="/gesundheit" element={<Gesundheit />} />
         <Route path="/fit4finance" element={<Fit4Finance />} />
         <Route path="/digitale-bildung" element={<DigitaleBildungIndex />} />
-        <Route path="/digitale-bildung/excel-trainer" element={<ExcelTrainer />} />
+        <Route
+          path="/digitale-bildung/excel-trainer"
+          element={
+            <ExcelSessionProvider>
+              <Outlet />
+            </ExcelSessionProvider>
+          }
+        >
+          <Route index element={<ExcelTaskSelect />} />
+          <Route path=":taskId" element={<ExcelTrainer />} />
+        </Route>
       </Routes>
       <ImpressumModal />
     </Router>
