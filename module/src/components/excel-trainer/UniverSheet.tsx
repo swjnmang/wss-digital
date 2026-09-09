@@ -82,7 +82,7 @@ export const UniverSheet = forwardRef<UniverSheetHandle, UniverSheetProps>(({ ta
     },
   }));
 
-  return <div ref={containerRef} style={{ width: '100%', height: '600px' }} />;
+  return <div ref={containerRef} style={{ width: '100%', height: 'calc(100vh - 260px)', minHeight: '480px' }} />;
 });
 
 UniverSheet.displayName = 'UniverSheet';

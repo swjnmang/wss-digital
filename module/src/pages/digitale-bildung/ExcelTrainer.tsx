@@ -35,17 +35,17 @@ export default function ExcelTrainer() {
         <h1 className="text-2xl font-bold text-center">📊 Excel-Trainer</h1>
       </header>
 
-      <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 flex flex-col gap-4">
+      <main className="flex-1 w-full px-2 sm:px-3 py-3 flex flex-col gap-3">
         <div className="sm:hidden bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3">
           📱 Der Excel-Trainer ist für Tablet oder Computer gemacht. Auf dem Smartphone lässt sich die Tabelle nur eingeschränkt bedienen.
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-slate-600">
+        <div className="flex items-center justify-between gap-4">
+          <div className="text-sm text-slate-600 whitespace-nowrap">
             Aufgabe <span className="font-bold">{taskIndex + 1}</span> von{' '}
             <span className="font-bold">{TASKS.length}</span>
           </div>
-          <div className="w-48 bg-slate-200 rounded-full h-2">
+          <div className="flex-1 max-w-xs bg-slate-200 rounded-full h-2">
             <div
               className="bg-green-500 h-2 rounded-full transition-all"
               style={{ width: `${((taskIndex + 1) / TASKS.length) * 100}%` }}
@@ -53,13 +53,10 @@ export default function ExcelTrainer() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1">
-          <div className="lg:col-span-1">
-            <TaskPanel task={task} results={results} onCheck={handleCheck} />
-          </div>
-          <div className="lg:col-span-3 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <UniverSheet ref={sheetRef} task={task} />
-          </div>
+        <TaskPanel task={task} results={results} onCheck={handleCheck} />
+
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <UniverSheet ref={sheetRef} task={task} />
         </div>
 
         <div className="flex items-center justify-between">
