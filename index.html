@@ -234,115 +234,78 @@
             font-weight: 400;
         }
 
-        /* --- Features Slider --- */
-        .features-section {
+        /* --- Angebots-Überblick (durchblätterbare Textbox) --- */
+        .overview-section {
             width: 100%;
-            max-width: 1200px;
+            max-width: 900px;
             margin: 3rem auto 0;
-            padding: 3rem 1.5rem;
+            padding: 0 1.5rem 3rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2rem;
+            gap: 1.5rem;
         }
 
-        .features-section h2 {
+        .overview-section h2 {
             font-size: 1.875rem;
             font-weight: 700;
             color: var(--text-main);
-            margin-bottom: 1rem;
+            text-align: center;
         }
 
-        .slider-container {
+        .overview-box {
             width: 100%;
-            position: relative;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: stretch;
             gap: 1rem;
         }
 
-        .slider-wrapper {
-            width: 100%;
-            max-width: 800px;
-            overflow: hidden;
-            border-radius: 12px;
-        }
-
-        .slider {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-        }
-
-        .slider-item {
-            min-width: 100%;
+        .overview-content {
+            flex: 1;
+            min-width: 0;
             background-color: var(--card-bg);
-            padding: 3rem 2.5rem;
             border-radius: 16px;
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 1.5rem;
+            padding: 2.5rem;
             position: relative;
-            overflow: hidden;
+            min-height: 240px;
         }
 
-        .slider-item-icon {
-            background-color: #eff6ff;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            transition: background-color 0.3s ease;
+        .overview-panel {
+            display: none;
         }
 
-        /* Farbbalken oben für Konsistenz mit nav-card */
-        .slider-item::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--primary);
-            z-index: 4;
+        .overview-panel.is-active {
+            display: block;
+            animation: overviewFadeIn 0.3s ease;
         }
 
-        .slider-item-title {
+        @keyframes overviewFadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .overview-panel h3 {
             font-size: 1.35rem;
             font-weight: 600;
             color: var(--text-main);
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.75rem;
         }
 
-        .slider-item-text {
-            font-size: 0.95rem;
+        .overview-panel p {
+            font-size: 1rem;
             color: var(--text-light);
-            line-height: 1.6;
-            max-width: 650px;
+            line-height: 1.7;
         }
 
-        .slider-controls {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-
-        .slider-btn {
+        .overview-btn {
             background: var(--primary);
             color: white;
             border: none;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -350,20 +313,21 @@
             font-size: 1.25rem;
             transition: background 0.2s ease;
             flex-shrink: 0;
+            align-self: center;
         }
 
-        .slider-btn:hover {
+        .overview-btn:hover {
             background: var(--primary-dark);
         }
 
-        .slider-dots {
+        .overview-dots {
             display: flex;
             gap: 0.5rem;
             justify-content: center;
-            margin-top: 1rem;
+            flex-wrap: wrap;
         }
 
-        .slider-dot {
+        .overview-dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
@@ -374,7 +338,7 @@
             padding: 0;
         }
 
-        .slider-dot.active {
+        .overview-dot.active {
             background: var(--primary);
         }
 
@@ -553,6 +517,9 @@
             h1 { font-size: 1.8rem; }
             .subtitle { font-size: 1rem; }
             main { padding: 2rem 1rem; }
+            .overview-section h2 { font-size: 1.4rem; }
+            .overview-content { padding: 1.5rem 1.25rem; min-height: 0; }
+            .overview-btn { width: 36px; height: 36px; font-size: 1rem; }
             .cookie-actions { flex-direction: column; }
             .cookie-button { width: 100%; }
             footer { flex-direction: column; }
@@ -682,32 +649,44 @@
         </div>
     </main>
 
-    <!-- Features Slider Section -->
-    <section class="features-section">
-        <div class="slider-container">
-            <button class="slider-btn" id="prevBtn" aria-label="Vorheriger Beitrag">❮</button>
-            <div class="slider-wrapper">
-                <div class="slider" id="slider">
-                    <div class="slider-item">
-                        <div class="slider-item-icon">📚</div>
-                        <div class="slider-item-title">Mathe-Trainer</div>
-                        <div class="slider-item-text">Interaktive Übungsumgebung für alle wichtigen Themen der Wirtschaftsschule. Von den Grundlagen (Rechnen lernen, Brüche, Potenzen) über Lineare und Quadratische Funktionen bis hin zur Finanzmathematik (Zins- und Rentenrechnung) und Trigonometrie. Mit detaillierten Schritt-für-Schritt-Lösungen, Zufallsgeneratoren für Aufgaben und gezielter Prüfungsvorbereitung.</div>
-                    </div>
-                    <div class="slider-item">
-                        <div class="slider-item-icon">📊</div>
-                        <div class="slider-item-title">Markt-Match 5 Wirtschaftsplanspiel</div>
-                        <div class="slider-item-text">Ein realistisches Unternehmensplanspiel speziell für den Einstieg. Schlüpfe in die Rolle der Geschäftsführung und triff strategische Entscheidungen über Preisgestaltung, Produktionsmengen, Marketingbudget und Forschungsinvestitionen. Tritt gegen andere Gruppen an und lerne spielerisch wirtschaftliche Zusammenhänge wie Fixkosten, Gewinn und Marktdynamik kennen.</div>
-                    </div>
-                    <div class="slider-item">
-                        <div class="slider-item-icon">🏢</div>
-                        <div class="slider-item-title">Übungsunternehmen</div>
-                        <div class="slider-item-text">Bereichsübergreifendes, praxisnahes Lernen in einem virtuellen Unternehmen. Trainiere wichtige kaufmännische Kompetenzen: vom professionellen Angebotsvergleich und Kalkulationen über das Erstellen rechtssicherer Geschäftsbriefe bis hin zur korrekten Adressierung und dem Buchen von Geschäftsvorfällen. Die ideale Vorbereitung auf die Arbeit in modernen Büroumgebungen.</div>
-                    </div>
-                </div>
+    <!-- Angebots-Überblick -->
+    <section class="overview-section">
+        <h2>Alle Bausteine im Überblick</h2>
+        <div class="overview-box">
+            <button class="overview-btn" id="overviewPrev" aria-label="Vorheriger Baustein">❮</button>
+            <div class="overview-content">
+                <article class="overview-panel is-active">
+                    <h3>Mathe-Trainer</h3>
+                    <p>Interaktive Übungsumgebung für alle wichtigen Themen der Wirtschaftsschule: von Grundlagen wie Bruchrechnung und Potenzen über lineare und quadratische Funktionen bis zur Finanzmathematik (Zins- und Rentenrechnung) und Trigonometrie. Mit Schritt-für-Schritt-Lösungen, Zufallsgeneratoren für neue Übungsaufgaben und gezielter Vorbereitung auf Schulaufgaben und Abschlussprüfungen.</p>
+                </article>
+                <article class="overview-panel">
+                    <h3>Wirtschaftsplanspiel – Markt-Match 5</h3>
+                    <p>Markt-Match 5 ist ein kostenfreies Unternehmensplanspiel für den Wirtschaftsunterricht. Schülerinnen und Schüler übernehmen die Geschäftsführung eines virtuellen Unternehmens und treffen Entscheidungen zu Preisgestaltung, Produktionsmenge, Marketingbudget und Forschung. Im Wettbewerb gegen andere Gruppen werden wirtschaftliche Zusammenhänge wie Fixkosten, Gewinn und Marktdynamik spielerisch erfahrbar.</p>
+                </article>
+                <article class="overview-panel">
+                    <h3>Übungsunternehmen</h3>
+                    <p>Bereichsübergreifendes, praxisnahes Lernen in einem virtuellen Übungsunternehmen. Trainiert werden zentrale kaufmännische Kompetenzen: Angebotsvergleiche und Kalkulationen erstellen, rechtssichere Geschäftsbriefe verfassen, Anschriften korrekt formatieren und Geschäftsvorfälle buchen – eine praxisnahe Vorbereitung auf die Ausbildung in modernen Büro- und Verwaltungsberufen.</p>
+                </article>
+                <article class="overview-panel">
+                    <h3>Module</h3>
+                    <p>Laufend wachsende Sammlung eigenständiger Lernmodule zu wechselnden Themen – von Gamification-Ansätzen im Unterricht bis zu neuen, praxisnahen Übungsformaten. Ideal, um Abwechslung in den Wirtschaftsschulunterricht zu bringen und aktuelle didaktische Trends direkt im Klassenzimmer auszuprobieren.</p>
+                </article>
+                <article class="overview-panel">
+                    <h3>Kennenlernspiele</h3>
+                    <p>Umfangreiche Sammlung an Kennenlernspielen, erlebnispädagogischen Übungen, Warm-ups und druckfertigen Arbeitsblättern für den Schuljahresbeginn. Ideal für die 9. und 10. Klasse, um am ersten Schultag Klassengemeinschaft, Vertrauen und Kommunikation zu fördern – inklusive Reflexionsleitfäden und Vorlagen für Steckbriefe und Partnerinterviews.</p>
+                </article>
+                <article class="overview-panel">
+                    <h3>My Rallye</h3>
+                    <p>Mit My Rallye lassen sich eigene Rallyes und Schnitzeljagden für Schulhaus und Schulgelände erstellen – zum Beispiel für den Kennenlerntag, Wandertage oder Projektwochen. Stationen, Aufgaben und Rätsel individuell zusammenstellen und die Klasse aktiv das Schulgelände erkunden lassen.</p>
+                </article>
+                <article class="overview-panel">
+                    <h3>Digitale Bildung</h3>
+                    <p>Grundlagenwissen und praktische Werkzeuge für digitale Medienkompetenz im Unterricht. Von sicherem Umgang mit digitalen Endgeräten über Datenschutz bis zu nützlichen Tools für den Schulalltag – kompakt aufbereitet für Lehrkräfte und Schülerinnen und Schüler der Wirtschaftsschule.</p>
+                </article>
             </div>
-            <button class="slider-btn" id="nextBtn" aria-label="Nächster Beitrag">❯</button>
+            <button class="overview-btn" id="overviewNext" aria-label="Nächster Baustein">❯</button>
         </div>
-        <div class="slider-dots" id="dots"></div>
+        <div class="overview-dots" id="overviewDots"></div>
     </section>
 
     <div class="impressum-panel" id="impressumPanel" role="dialog" aria-modal="true" aria-labelledby="impressumTitle" aria-hidden="true">
@@ -818,53 +797,41 @@
             }
         })();
 
-        // Slider functionality
+        // Angebots-Überblick: durchblätterbare Textbox (kein Auto-Advance,
+        // damit man die Absätze in Ruhe lesen kann; alle Texte stehen
+        // unabhängig von der Anzeige vollständig im HTML, u. a. für Google).
         (function() {
-            const slider = document.getElementById('slider');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const dotsContainer = document.getElementById('dots');
-            const items = document.querySelectorAll('.slider-item');
+            const panels = document.querySelectorAll('.overview-panel');
+            const prevBtn = document.getElementById('overviewPrev');
+            const nextBtn = document.getElementById('overviewNext');
+            const dotsContainer = document.getElementById('overviewDots');
+            if (!panels.length || !prevBtn || !nextBtn || !dotsContainer) { return; }
+
             let currentIndex = 0;
 
-            // Create dots
-            items.forEach((_, index) => {
+            panels.forEach((_, index) => {
                 const dot = document.createElement('button');
-                dot.classList.add('slider-dot');
+                dot.classList.add('overview-dot');
+                dot.setAttribute('aria-label', `Baustein ${index + 1} von ${panels.length}`);
                 if (index === 0) dot.classList.add('active');
-                dot.addEventListener('click', () => goToSlide(index));
+                dot.addEventListener('click', () => goTo(index));
                 dotsContainer.appendChild(dot);
             });
 
-            const dots = document.querySelectorAll('.slider-dot');
+            const dots = dotsContainer.querySelectorAll('.overview-dot');
 
-            function updateSlider() {
-                const offset = -currentIndex * 100;
-                slider.style.transform = `translateX(${offset}%)`;
-                dots.forEach(dot => dot.classList.remove('active'));
-                dots[currentIndex].classList.add('active');
+            function update() {
+                panels.forEach((panel, index) => panel.classList.toggle('is-active', index === currentIndex));
+                dots.forEach((dot, index) => dot.classList.toggle('active', index === currentIndex));
             }
 
-            function goToSlide(index) {
-                currentIndex = (index + items.length) % items.length;
-                updateSlider();
+            function goTo(index) {
+                currentIndex = (index + panels.length) % panels.length;
+                update();
             }
 
-            function nextSlide() {
-                currentIndex = (currentIndex + 1) % items.length;
-                updateSlider();
-            }
-
-            function prevSlide() {
-                currentIndex = (currentIndex - 1 + items.length) % items.length;
-                updateSlider();
-            }
-
-            nextBtn.addEventListener('click', nextSlide);
-            prevBtn.addEventListener('click', prevSlide);
-
-            // Auto-advance slides every 8 seconds
-            setInterval(nextSlide, 8000);
+            nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
+            prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
         })();
     </script>
 </body>
