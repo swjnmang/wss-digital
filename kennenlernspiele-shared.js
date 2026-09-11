@@ -79,27 +79,38 @@
 
     // Bettet YouTube-Videos erst dann ein, wenn die zugehörige Spielkarte
     // tatsächlich aufgeklappt wird (spart Ladezeit und lädt keine
-    // Drittanbieter-Inhalte, bevor sie wirklich gebraucht werden).
+    // Drittanbieter-Inhalte, bevor sie wirklich gebraucht werden). Wird die
+    // Karte wieder eingeklappt, wird der iframe komplett entfernt, damit ein
+    // laufendes Video sofort stoppt statt im Hintergrund weiterzulaufen.
+    const fallbackLinkHtml = (videoId) =>
+        `<a class="video-fallback-link" href="https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener noreferrer">▶ Video auf YouTube ansehen</a>`;
+
     document.querySelectorAll('details.item-card').forEach((details) => {
         details.addEventListener('toggle', () => {
-            if (!details.open) { return; }
             const wrapper = details.querySelector('.video-embed-wrapper[data-yt-id]');
-            if (!wrapper || wrapper.dataset.loaded === 'true') { return; }
-
+            if (!wrapper) { return; }
             const videoId = wrapper.getAttribute('data-yt-id');
-            const videoTitle = wrapper.getAttribute('data-yt-title') || 'YouTube-Video';
 
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}`;
-            iframe.title = videoTitle;
-            iframe.loading = 'lazy';
-            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-            iframe.allowFullscreen = true;
+            if (details.open) {
+                if (wrapper.dataset.loaded === 'true') { return; }
+                const videoTitle = wrapper.getAttribute('data-yt-title') || 'YouTube-Video';
 
-            wrapper.innerHTML = '';
-            wrapper.appendChild(iframe);
-            wrapper.dataset.loaded = 'true';
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}`;
+                iframe.title = videoTitle;
+                iframe.loading = 'lazy';
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+                iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+                iframe.allowFullscreen = true;
+
+                wrapper.innerHTML = '';
+                wrapper.appendChild(iframe);
+                wrapper.dataset.loaded = 'true';
+            } else {
+                if (wrapper.dataset.loaded !== 'true') { return; }
+                wrapper.innerHTML = fallbackLinkHtml(videoId);
+                wrapper.dataset.loaded = 'false';
+            }
         });
     });
 })();
