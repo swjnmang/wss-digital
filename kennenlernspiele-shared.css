@@ -349,6 +349,56 @@ details.item-card[open] .chevron {
     gap: 0.35rem;
 }
 
+/* --- Video-Einbettung (YouTube, lädt erst beim Aufklappen) --- */
+.video-embed-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 */
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    margin-top: 0.25rem;
+}
+
+.video-embed-wrapper iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.video-fallback-link {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-align: center;
+    padding: 1rem;
+    transition: background 0.2s ease;
+}
+
+.video-fallback-link:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.video-credit {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--text-light);
+}
+
+.video-credit a {
+    color: var(--text-light);
+}
+
 /* --- Bingo-Raster --- */
 .bingo-grid {
     display: grid;
@@ -642,6 +692,7 @@ footer {
     header .back-link,
     .print-button,
     .worksheet-actions,
+    .video-block,
     footer,
     .cookie-banner,
     .impressum-panel {

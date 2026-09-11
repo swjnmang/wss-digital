@@ -76,4 +76,30 @@
         items.forEach((el, index) => { el.open = previousOpenStates[index]; });
         previousOpenStates = null;
     });
+
+    // Bettet YouTube-Videos erst dann ein, wenn die zugehörige Spielkarte
+    // tatsächlich aufgeklappt wird (spart Ladezeit und lädt keine
+    // Drittanbieter-Inhalte, bevor sie wirklich gebraucht werden).
+    document.querySelectorAll('details.item-card').forEach((details) => {
+        details.addEventListener('toggle', () => {
+            if (!details.open) { return; }
+            const wrapper = details.querySelector('.video-embed-wrapper[data-yt-id]');
+            if (!wrapper || wrapper.dataset.loaded === 'true') { return; }
+
+            const videoId = wrapper.getAttribute('data-yt-id');
+            const videoTitle = wrapper.getAttribute('data-yt-title') || 'YouTube-Video';
+
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}`;
+            iframe.title = videoTitle;
+            iframe.loading = 'lazy';
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+            iframe.allowFullscreen = true;
+
+            wrapper.innerHTML = '';
+            wrapper.appendChild(iframe);
+            wrapper.dataset.loaded = 'true';
+        });
+    });
 })();
