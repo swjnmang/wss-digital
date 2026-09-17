@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './SteigungBerechnen.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -120,8 +121,8 @@ export default function SteigungBerechnen() {
       setGraphFeedback('Bitte gib beide Koordinaten für Punkt 1 ein.')
       return
     }
-    const x = parseFloat(point1Input.x.replace(',', '.'))
-    const y = parseFloat(point1Input.y.replace(',', '.'))
+    const x = parseFlexibleNumber(point1Input.x)
+    const y = parseFlexibleNumber(point1Input.y)
     
     if (isNaN(x) || isNaN(y)) {
       setGraphFeedback('Ungültige Koordinaten für Punkt 1.')
@@ -147,8 +148,8 @@ export default function SteigungBerechnen() {
       setGraphFeedback('Bitte gib beide Koordinaten für Punkt 2 ein.')
       return
     }
-    const x = parseFloat(point2Input.x.replace(',', '.'))
-    const y = parseFloat(point2Input.y.replace(',', '.'))
+    const x = parseFlexibleNumber(point2Input.x)
+    const y = parseFlexibleNumber(point2Input.y)
     
     if (isNaN(x) || isNaN(y)) {
       setGraphFeedback('Ungültige Koordinaten für Punkt 2.')

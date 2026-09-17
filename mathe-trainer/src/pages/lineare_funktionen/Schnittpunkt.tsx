@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import styles from './LFCommon.module.css'
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 
 declare global {
   interface Window { 
@@ -189,8 +190,8 @@ export default function Schnittpunkt() {
       if (correctAnswer === 'none') {
         isCorrect = false
       } else {
-        const xUser = parseFloat(xInput.replace(',', '.'))
-        const yUser = parseFloat(yInput.replace(',', '.'))
+        const xUser = parseFlexibleNumber(xInput)
+        const yUser = parseFlexibleNumber(yInput)
         isCorrect = (Math.abs(xUser - correctAnswer.x) < 0.01 && Math.abs(yUser - correctAnswer.y) < 0.01)
       }
     }

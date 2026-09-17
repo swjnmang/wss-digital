@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import styles from './Nullstellen.module.css'
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 
 declare global {
   interface Window { 
@@ -78,7 +79,7 @@ export default function Nullstellen() {
 
   function check() {
     setFeedback('')
-    const xi = parseFloat(xInput.replace(',', '.'))
+    const xi = parseFlexibleNumber(xInput)
     if (isNaN(xi)) {
       setFeedback('Bitte eine gültige Zahl eingeben.')
       return

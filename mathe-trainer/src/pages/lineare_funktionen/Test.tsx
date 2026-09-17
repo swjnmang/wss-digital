@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import styles from './LFCommon.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 
 type QuestionType = 'slope' | 'missing_coord' | 'equation_ps' | 'equation_2p' | 'zero' | 'intersection' | 'graph'
 type AnswerFormat = 'single_number' | 'point' | 'equation'
@@ -19,20 +20,6 @@ const TOTAL_QUESTIONS = 15
 function formatNumber(num: number) { return Math.round(num * 100) / 100 }
 function randomInt(max: number, min = 0) { return Math.floor(Math.random() * (max - min + 1)) + min }
 function randomChoice<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)] }
-
-// Parst Schülereingaben tolerant: erlaubt Leerzeichen ("- 3"), verschachtelte
-// Vorzeichen ("+(-1)", "-(-1)") und Komma als Dezimaltrennzeichen.
-function parseFlexibleNumber(raw: unknown): number {
-  if (raw === undefined || raw === null) return NaN
-  let s = String(raw).trim()
-  if (s === '') return NaN
-  s = s.replace(/,/g, '.').replace(/\s+/g, '').replace(/[()]/g, '')
-  const match = s.match(/^([+-]*)(\d+(?:\.\d+)?)$/)
-  if (!match) return Number(s)
-  const minusCount = (match[1].match(/-/g) || []).length
-  const sign = minusCount % 2 === 0 ? 1 : -1
-  return sign * parseFloat(match[2])
-}
 
 function createSlopeQuestion(): Question {
   let x1, y1, x2, y2

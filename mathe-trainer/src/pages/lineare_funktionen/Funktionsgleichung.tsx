@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './Funktionsgleichung.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 
 declare global {
   interface Window { 
@@ -30,7 +31,7 @@ function randInt(min: number, max: number) {
 
 function validateInput(value: string, correctValue: number, tolerance: number): 'correct' | 'incorrect' | null {
   if (value.trim() === '') return null
-  const parsed = parseFloat(value.replace(',', '.'))
+  const parsed = parseFlexibleNumber(value)
   if (isNaN(parsed)) return 'incorrect'
   return Math.abs(parsed - correctValue) <= tolerance ? 'correct' : 'incorrect'
 }
@@ -195,15 +196,15 @@ export default function Funktionsgleichung(){
 
   function check() {
     setFeedback('')
-    const mi = parseFloat(mInput.replace(',', '.'))
-    const ti = parseFloat(tInput.replace(',', '.'))
+    const mi = parseFlexibleNumber(mInput)
+    const ti = parseFlexibleNumber(tInput)
     const sign = signInput.trim()
-    
+
     if (isNaN(mi) || isNaN(ti) || !sign) {
       setFeedback('Bitte alle Werte eingeben.')
       return
     }
-    
+
     if (sign !== '+' && sign !== '-') {
       setFeedback('Bitte + oder - eingeben.')
       return

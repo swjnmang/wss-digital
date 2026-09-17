@@ -196,6 +196,7 @@ export default function Ablesen() {
         const s = document.createElement('style')
         s.id = 'ggb-hide-left-panel-style'
         s.textContent = `#ggb-container .algebraView, #ggb-container .ggbAlgebraView, #ggb-container .ggbSidebar, #ggb-container [class*="Algebra"], #ggb-container [aria-label*="Algebra"], #ggb-container .sidebar { display: none !important; }
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
         #ggb-container [role="complementary"] { display: none !important; }`
         document.head.appendChild(s)
       }
@@ -332,8 +333,8 @@ export default function Ablesen() {
 
   function check() {
     setFeedback('')
-    const mi = parseFloat(mInput.replace(',', '.'))
-    const ti = parseFloat(tInput.replace(',', '.'))
+    const mi = parseFlexibleNumber(mInput)
+    const ti = parseFlexibleNumber(tInput)
     if (isNaN(mi) || isNaN(ti)) { setFeedback('Bitte gültige Zahlen für m und t eingeben.'); return }
     const ok = Math.abs(mi - m) < 0.03 && Math.abs(ti - t) < 0.03
     if (ok) setFeedback('Richtig — gut abgelesen!')

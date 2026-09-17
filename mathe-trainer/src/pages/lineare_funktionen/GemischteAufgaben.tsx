@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './GemischteAufgaben.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import GeoGebraMultiGraph from '../../components/GeoGebraMultiGraph'
 
 // MathJax-Komponente
@@ -457,7 +458,7 @@ export default function GemischteAufgaben() {
   function isFieldCorrect(aufgabe: Aufgabe, field: string, rawValue: string): boolean {
     const expected = getFieldExpectation(aufgabe, field)
     if (expected === null) return false
-    const num = parseFloat(rawValue.replace(',', '.'))
+    const num = parseFlexibleNumber(rawValue)
     if (isNaN(num)) return false
     const toleranz = Math.max(Math.abs(expected) * 0.01, 0.02)
     return Math.abs(num - expected) <= toleranz

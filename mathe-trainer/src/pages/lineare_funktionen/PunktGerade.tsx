@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import styles from './LFCommon.module.css'
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 
 type Difficulty = 'easy' | 'medium' | 'hard'
 type TaskType = 'check_point' | 'find_correct_point_among_three' | 'calculate_missing_coordinate'
@@ -194,8 +195,8 @@ export default function PunktGerade() {
     } else if (task.taskType === 'find_correct_point_among_three') {
       isCorrect = (userAnswer === task.correctAnswer)
     } else if (task.taskType === 'calculate_missing_coordinate') {
-      const userNum = parseFloat(userAnswer as string)
-      const correctNum = parseFloat(task.correctAnswer as string)
+      const userNum = parseFlexibleNumber(userAnswer as string)
+      const correctNum = parseFlexibleNumber(task.correctAnswer as string)
       isCorrect = Math.abs(userNum - correctNum) < 0.01
     }
 

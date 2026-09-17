@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './Wertetabelle.module.css'
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
 
 // MathJax-Komponente

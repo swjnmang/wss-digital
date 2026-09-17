@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import styles from './LFCommon.module.css'
 
 type Difficulty = 'normal' | 'medium' | 'hard'

@@ -1,3 +1,4 @@
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import React, { useState } from 'react'
 
 interface Solution {

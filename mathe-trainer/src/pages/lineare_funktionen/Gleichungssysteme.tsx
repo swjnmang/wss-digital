@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { Link } from 'react-router-dom';
 
 type Method = 'einsetzen' | 'gleichsetzen' | 'addieren';
@@ -365,8 +366,8 @@ const Gleichungssysteme: React.FC = () => {
 
     const checkAnswer = () => {
         if (!task) return;
-        const xVal = parseFloat(xInput.replace(',', '.'));
-        const yVal = parseFloat(yInput.replace(',', '.'));
+        const xVal = parseFlexibleNumber(xInput);
+        const yVal = parseFlexibleNumber(yInput);
         if (isNaN(xVal) || isNaN(yVal)) {
             setFeedback('info');
             return;
