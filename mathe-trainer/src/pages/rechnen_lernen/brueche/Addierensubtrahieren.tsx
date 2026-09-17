@@ -76,8 +76,8 @@ export default function Addierensubtrahieren() {
   function handleCheck() {
     if (!task) return;
     setSolution(null);
-    const num = parseInt(inputNum, 10);
-    const den = parseInt(inputDen, 10);
+    const num = parseInt(inputNum.replace(/[−–—‐]/g, '-'), 10);
+    const den = parseInt(inputDen.replace(/[−–—‐]/g, '-'), 10);
     if (isNaN(num) || isNaN(den) || den === 0) {
       setFeedback('Bitte gib gültige ganze Zahlen ein (Nenner ≠ 0).');
       setFeedbackType('incorrect');

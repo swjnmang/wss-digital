@@ -206,7 +206,7 @@ const Nullstellen = () => {
     const checkAnswer = () => {
         if (!params) return;
         
-        const count = parseInt(userCount);
+        const count = parseInt(userCount.replace(/[−–—‐]/g, '-'));
         const correctCount = roots.length;
         
         if (count !== correctCount) {

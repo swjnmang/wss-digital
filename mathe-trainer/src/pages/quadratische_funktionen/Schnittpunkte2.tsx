@@ -141,7 +141,7 @@ const Schnittpunkte2 = () => {
                 setFeedback({ type: 'info', message: 'Bitte gib eine Anzahl ein.' });
                 return;
             }
-            isCorrect = (parseInt(userCount) === task.solution.count);
+            isCorrect = (parseInt(userCount.replace(/[−–—‐]/g, '-')) === task.solution.count);
         } else {
             const p1x = parseFloat(userP1.x.replace(',', '.').replace(/[−–—‐]/g, '-'));
             const p1y = parseFloat(userP1.y.replace(',', '.').replace(/[−–—‐]/g, '-'));

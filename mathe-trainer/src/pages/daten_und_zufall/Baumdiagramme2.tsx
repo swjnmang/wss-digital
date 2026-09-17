@@ -123,8 +123,8 @@ const Baumdiagramme2: React.FC = () => {
       }
 
       const [correctNum, correctDen] = correctFraction.split('/').map(Number);
-      const userNum = parseInt(input.num, 10);
-      const userDen = parseInt(input.den, 10);
+      const userNum = parseInt(input.num.replace(/[−–—‐]/g, '-'), 10);
+      const userDen = parseInt(input.den.replace(/[−–—‐]/g, '-'), 10);
 
       if (!isNaN(userNum) && !isNaN(userDen) && userDen !== 0 && Math.abs(userNum / userDen - correctNum / correctDen) < 0.0001) {
         newValidationResults[id] = true;
