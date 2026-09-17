@@ -59,7 +59,7 @@ export interface GeometryTaskPageProps {
 
 const parseAnswer = (value: string) => {
   if (!value) return NaN;
-  return parseFloat(value.replace(',', '.'));
+  return parseFloat(value.replace(',', '.').replace(/[−–—‐]/g, '-'));
 };
 
 const formatNumber = (value: number, decimals = 2) =>

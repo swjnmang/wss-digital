@@ -182,9 +182,9 @@ export default function BergAufgabe() {
         const normalizedInput = input.replace(/,/g, '.')
         const numInput = parseFloat(normalizedInput)
         const expectedAnswer = solution.answers[i] as number
+        const fieldTolerance = solution.tolerance !== undefined ? solution.tolerance : 0.01
 
-        // Vergleiche die auf 2 Dezimalstellen gerundeten Werte
-        if (isNaN(numInput) || roundTo2Decimals(numInput) !== roundTo2Decimals(expectedAnswer)) {
+        if (isNaN(numInput) || Math.abs(numInput - expectedAnswer) > fieldTolerance) {
           isCorrect = false
           break
         }
@@ -429,8 +429,8 @@ export default function BergAufgabe() {
                       <div className="text-xl font-bold text-blue-800">
                         y = {(() => {
                           const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
-                          const m = currentInputs['m'] ? currentInputs['m'].replace(',', '.') : '?'
-                          const t = currentInputs['t'] ? currentInputs['t'].replace(',', '.') : '?'
+                          const m = currentInputs['m'] ? currentInputs['m'].replace(',', '.').replace(/[−–—‐]/g, '-') : '?'
+                          const t = currentInputs['t'] ? currentInputs['t'].replace(',', '.').replace(/[−–—‐]/g, '-') : '?'
                           
                           // Prüfe ob t positiv oder negativ ist für die Anzeige
                           if (m === '?' || t === '?') {

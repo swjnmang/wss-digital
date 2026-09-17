@@ -100,8 +100,8 @@ const Scheitelpunkt = () => {
             return;
         }
 
-        const xVal = parseFloat(userX.replace(',', '.'));
-        const yVal = parseFloat(userY.replace(',', '.'));
+        const xVal = parseFloat(userX.replace(',', '.').replace(/[−–—‐]/g, '-'));
+        const yVal = parseFloat(userY.replace(',', '.').replace(/[−–—‐]/g, '-'));
 
         if (isNaN(xVal) || isNaN(yVal)) {
             setFeedback({ text: "Die Koordinaten müssen Zahlen sein.", type: 'error' });

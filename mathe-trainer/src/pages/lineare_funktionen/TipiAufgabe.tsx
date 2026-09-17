@@ -119,15 +119,15 @@ export default function TipiAufgabe() {
 
         // Für Text-Antworten (Funktionsgleichungen)
         if (typeof solution.answers[i] === 'string') {
-          const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.')
-          const normalizedAnswer = (solution.answers[i] as string).toLowerCase().replace(/\s+/g, '').replace(',', '.')
+          const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.').replace(/[−–—‐]/g, '-')
+          const normalizedAnswer = (solution.answers[i] as string).toLowerCase().replace(/\s+/g, '').replace(',', '.').replace(/[−–—‐]/g, '-')
           if (normalizedInput !== normalizedAnswer) {
             isCorrect = false
             break
           }
         } else {
           // Für Zahlen-Antworten
-          const normalizedInput = input.replace(',', '.')
+          const normalizedInput = input.replace(',', '.').replace(/[−–—‐]/g, '-')
           const numInput = parseFloat(normalizedInput)
           const tolerance = solution.tolerance || 0.01
           const expectedAnswer = solution.answers[i] as number
@@ -147,15 +147,15 @@ export default function TipiAufgabe() {
       }
 
       if (solution.type === 'number') {
-        const normalizedInput = input.replace(',', '.')
+        const normalizedInput = input.replace(',', '.').replace(/[−–—‐]/g, '-')
         const numInput = parseFloat(normalizedInput)
         if (!isNaN(numInput)) {
           const tolerance = solution.tolerance || 0.01
           isCorrect = Math.abs(numInput - (solution.answer as number)) <= tolerance
         }
       } else {
-        const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.')
-        const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(',', '.')
+        const normalizedInput = input.toLowerCase().replace(/\s+/g, '').replace(',', '.').replace(/[−–—‐]/g, '-')
+        const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(',', '.').replace(/[−–—‐]/g, '-')
         isCorrect = normalizedInput === normalizedAnswer
       }
     }

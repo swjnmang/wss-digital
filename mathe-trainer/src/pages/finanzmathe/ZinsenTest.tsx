@@ -145,7 +145,7 @@ export default function ZinsenTest() {
   const evaluate = () => {
     let correct = 0;
     questions.forEach((q, idx) => {
-      const userVal = parseFloat(userAnswers[idx].replace(',', '.'));
+      const userVal = parseFloat(userAnswers[idx].replace(',', '.').replace(/[−–—‐]/g, '-'));
       if (!isNaN(userVal)) {
         let tolerance = 0.05;
         if (q.type === 't') tolerance = 0.5; // Days should be integer, but allow small float error
@@ -278,7 +278,7 @@ export default function ZinsenTest() {
 
             <div className="space-y-4 mb-8">
               {questions.map((q, idx) => {
-                const userVal = parseFloat(userAnswers[idx].replace(',', '.'));
+                const userVal = parseFloat(userAnswers[idx].replace(',', '.').replace(/[−–—‐]/g, '-'));
                 let isCorrect = false;
                 if (!isNaN(userVal)) {
                   let tolerance = 0.05;

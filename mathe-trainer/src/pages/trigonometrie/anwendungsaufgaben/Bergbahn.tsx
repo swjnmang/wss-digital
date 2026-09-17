@@ -239,7 +239,7 @@ const Bergbahn: React.FC = () => {
         const raw = currentAnswer.trim();
         // Eingaben wie "454.727,5" (deutscher Tausenderpunkt) korrekt behandeln
         const normalized = raw.includes(',')
-            ? raw.replace(/\./g, '').replace(',', '.')
+            ? raw.replace(/\./g, '').replace(',', '.').replace(/[−–—‐]/g, '-')
             : raw;
         const value = parseFloat(normalized);
         if (isNaN(value) || !currentUnit) {

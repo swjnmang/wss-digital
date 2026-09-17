@@ -45,7 +45,7 @@ export default function SportladenEröffnung() {
   }
 
   const parseInput = (value: string) => {
-    return parseFloat(value.replace(',', '.'))
+    return parseFloat(value.replace(',', '.').replace(/[−–—‐]/g, '-'))
   }
 
   const checkAnswer = (part: string, correctValue: number, tolerance: number = 50) => {

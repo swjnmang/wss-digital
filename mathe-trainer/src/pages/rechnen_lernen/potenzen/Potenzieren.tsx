@@ -68,19 +68,19 @@ export default function Potenzieren() {
     if (!aufgabe) return;
     let korrekt = false;
     if (aufgabe.resultExp === 0) {
-      const val = parseInt(answerOne, 10);
+      const val = parseInt(answerOne.replace(/[−–—‐]/g, '-'), 10);
       if (!isNaN(val) && val === 1) korrekt = true;
     } else {
       // Variable / numerische Basis unterscheiden
       if (aufgabe.isVariable) {
         const validVars = ['x','y','z'];
         if (!validVars.includes(baseInput.trim())) { setFeedback('❌ Ungültige Variable (x, y oder z).'); return; }
-        const exp = parseInt(expInput, 10);
+        const exp = parseInt(expInput.replace(/[−–—‐]/g, '-'), 10);
         if (isNaN(exp)) { setFeedback('❌ Bitte Exponent eingeben.'); return; }
         if (baseInput.trim() === aufgabe.base && exp === aufgabe.resultExp) korrekt = true;
       } else {
-        const baseNum = parseInt(baseInput, 10);
-        const exp = parseInt(expInput, 10);
+        const baseNum = parseInt(baseInput.replace(/[−–—‐]/g, '-'), 10);
+        const exp = parseInt(expInput.replace(/[−–—‐]/g, '-'), 10);
         if (isNaN(baseNum) || isNaN(exp)) { setFeedback('❌ Basis und Exponent als Zahl eingeben.'); return; }
         if (baseNum === aufgabe.base && exp === aufgabe.resultExp) korrekt = true;
       }

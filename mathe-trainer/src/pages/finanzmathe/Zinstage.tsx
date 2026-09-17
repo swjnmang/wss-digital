@@ -76,7 +76,7 @@ export default function Zinstage() {
   };
 
   const checkAnswer = () => {
-    const input = parseInt(userAnswer);
+    const input = parseInt(userAnswer.replace(/[−–—‐]/g, '-'));
     if (isNaN(input)) {
       setFeedback('Bitte gib eine ganze Zahl ein.');
       setFeedbackType('incorrect');

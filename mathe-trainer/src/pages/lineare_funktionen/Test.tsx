@@ -328,14 +328,14 @@ export default function Test() {
     let ans: any = {}
     const state = inputState[current] || {}
     if (q.answerFormat === 'single_number') {
-      ans.val = (state.singleVal || '').replace(',', '.')
+      ans.val = (state.singleVal || '').replace(',', '.').replace(/[−–—‐]/g, '-')
     } else if (q.answerFormat === 'point') {
-      ans.x = (state.xVal || '').replace(',', '.')
-      ans.y = (state.yVal || '').replace(',', '.')
+      ans.x = (state.xVal || '').replace(',', '.').replace(/[−–—‐]/g, '-')
+      ans.y = (state.yVal || '').replace(',', '.').replace(/[−–—‐]/g, '-')
       ans.isNone = !!state.isNone
     } else if (q.answerFormat === 'equation') {
-      ans.m = (state.mVal || '').replace(',', '.')
-      ans.t = (state.tVal || '').replace(',', '.')
+      ans.m = (state.mVal || '').replace(',', '.').replace(/[−–—‐]/g, '-')
+      ans.t = (state.tVal || '').replace(',', '.').replace(/[−–—‐]/g, '-')
     }
     handleAnswer(ans)
     nextQuestion()

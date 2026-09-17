@@ -214,7 +214,7 @@ const Stadion: React.FC = () => {
     };
 
     const checkAnswer = () => {
-        const normalized = currentAnswer.trim().replace(',', '.');
+        const normalized = currentAnswer.trim().replace(',', '.').replace(/[−–—‐]/g, '-');
         const parsed = parseFloat(normalized);
         if (isNaN(parsed) || !currentUnit) {
             setFeedback({ ...feedback, [currentTask]: 'incorrect' });

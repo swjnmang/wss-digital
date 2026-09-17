@@ -38,7 +38,7 @@ export default function DieUnfallversicherung() {
   })
 
   const parseInput = (value: string): number | null => {
-    const parsed = parseFloat(value.replace(',', '.').trim())
+    const parsed = parseFloat(value.replace(',', '.').replace(/[−–—‐]/g, '-').trim())
     return isNaN(parsed) ? null : parsed
   }
 

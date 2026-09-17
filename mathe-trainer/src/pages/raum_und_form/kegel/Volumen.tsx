@@ -22,7 +22,7 @@ export default function KegelVolumen() {
   }, [task]);
 
   const handleCheck = () => {
-    const val = parseFloat(input.replace(",", "."));
+    const val = parseFloat(input.replace(",", ".").replace(/[−–—‐]/g, '-'));
     if (Number.isNaN(val)) {
       setFeedback("Bitte einen Wert eingeben.");
       return;

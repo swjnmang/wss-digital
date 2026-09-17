@@ -321,9 +321,9 @@ const FunktionsgleichungAufstellen = () => {
                             <p className="text-sm font-semibold text-gray-700 mb-2">Deine Funktionsgleichung:</p>
                             <p className="font-mono text-xl text-green-800">
                                 f(x) = {formatQuadraticFunction(
-                                    userA ? parseFloat(userA.replace(',', '.')) : 0,
-                                    userB ? parseFloat(userB.replace(',', '.')) : 0,
-                                    userC ? parseFloat(userC.replace(',', '.')) : 0
+                                    userA ? parseFloat(userA.replace(',', '.').replace(/[−–—‐]/g, '-')) : 0,
+                                    userB ? parseFloat(userB.replace(',', '.').replace(/[−–—‐]/g, '-')) : 0,
+                                    userC ? parseFloat(userC.replace(',', '.').replace(/[−–—‐]/g, '-')) : 0
                                 )}
                             </p>
                         </div>

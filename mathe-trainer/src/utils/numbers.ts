@@ -5,6 +5,7 @@
 export function parseLocalizedNumber(str: string): number {
   if (str == null) return NaN;
   const cleaned = str.trim()
+    .replace(/[−–—‐]/g, '-') // normalisiere Minus-Varianten (Bindestrich, En-Dash, Em-Dash von Apple-Geräten)
     .replace(/\s+/g, '') // Leerzeichen
     .replace(/\.(?=\d{3}(?:\D|$))/g, '') // entferne Punkte vor 3er-Gruppen (rudimentärer Tausendertrenner)
     .replace(/,/g, '.'); // ersetze Komma durch Punkt

@@ -66,7 +66,7 @@ export default function Gemischt() {
 
   function check() {
     if (!task) return;
-    const ni = parseInt(n, 10), di = parseInt(d, 10);
+    const ni = parseInt(n.replace(/[−–—‐]/g, '-'), 10), di = parseInt(d.replace(/[−–—‐]/g, '-'), 10);
     if (isNaN(ni) || isNaN(di) || di === 0) { setFb('Bitte gib gültige ganze Zahlen ein (Nenner ≠ 0).'); setFbType('incorrect'); return; }
     setTot(t => t + 1);
     const rres = result(task);

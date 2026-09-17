@@ -174,8 +174,8 @@ const ScheitelpunktAblesen = () => {
       return;
     }
 
-    const xsVal = parseFloat(userXs.replace(',', '.'));
-    const ysVal = parseFloat(userYs.replace(',', '.'));
+    const xsVal = parseFloat(userXs.replace(',', '.').replace(/[−–—‐]/g, '-'));
+    const ysVal = parseFloat(userYs.replace(',', '.').replace(/[−–—‐]/g, '-'));
 
     const isXsCorrect = Math.abs(xsVal - task.xs) < 0.01;
     const isYsCorrect = Math.abs(ysVal - task.ys) < 0.01;

@@ -10,7 +10,8 @@ import React, { useState } from 'react';
  */
 function normalizeExpressionWithPowers(expr: string): Map<string, number> {
   // Normalisiere: entferne Leerzeichen, wandle ³ zu ^3 um, etc.
-  expr = expr.replace(/\s+/g, '').toLowerCase();
+  // Normalisiere zuerst alle Minus-Varianten (Bindestrich, En-Dash, Em-Dash von Apple-Geräten)
+  expr = expr.replace(/[−–—‐]/g, '-').replace(/\s+/g, '').toLowerCase();
   
   // Wandle Unicode-Exponenten in ^n um
   expr = expr.replace(/⁰/g, '^0').replace(/¹/g, '^1').replace(/²/g, '^2')

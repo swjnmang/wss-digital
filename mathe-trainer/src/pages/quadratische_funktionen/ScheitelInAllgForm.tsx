@@ -47,9 +47,9 @@ const ScheitelInAllgForm = () => {
     const pruefeLoesung = () => {
         if (!korrekteWerte) return;
 
-        const a_user = parseFloat(userA);
-        const b_user = parseFloat(userB);
-        const c_user = parseFloat(userC);
+        const a_user = parseFloat(userA.replace(/[−–—‐]/g, '-').replace(',', '.'));
+        const b_user = parseFloat(userB.replace(/[−–—‐]/g, '-').replace(',', '.'));
+        const c_user = parseFloat(userC.replace(/[−–—‐]/g, '-').replace(',', '.'));
 
         if (a_user === korrekteWerte.a && b_user === korrekteWerte.b && c_user === korrekteWerte.c) {
             setFeedback({ text: "Super, alles richtig! ✅", type: 'success' });

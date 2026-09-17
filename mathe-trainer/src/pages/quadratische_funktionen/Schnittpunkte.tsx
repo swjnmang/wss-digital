@@ -295,8 +295,8 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
         }
 
         const parsedUserPoints = userPoints.map(p => ({
-            x: parseFloat(p.x.replace(',', '.')),
-            y: parseFloat(p.y.replace(',', '.'))
+            x: parseFloat(p.x.replace(',', '.').replace(/[−–—‐]/g, '-')),
+            y: parseFloat(p.y.replace(',', '.').replace(/[−–—‐]/g, '-'))
         }));
 
         // Check for valid numbers

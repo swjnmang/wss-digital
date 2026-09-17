@@ -156,14 +156,14 @@ export default function PoolAufgabe() {
     if (lastCommaIndex > lastDotIndex) {
       // Komma ist später -> Dezimaltrennzeichen
       // Entferne alle Punkte (Tausendertrenner) und ersetze Komma durch Punkt
-      normalized = normalized.replace(/\./g, '').replace(',', '.')
+      normalized = normalized.replace(/\./g, '').replace(',', '.').replace(/[−–—‐]/g, '-')
     } else if (lastDotIndex > lastCommaIndex && lastCommaIndex > -1) {
       // Punkt ist später -> Dezimaltrennzeichen
       // Entferne alle Kommas (Tausendertrenner)
       normalized = normalized.replace(/,/g, '')
     } else if (lastCommaIndex > -1 && lastDotIndex === -1) {
       // Nur Komma vorhanden -> Dezimaltrennzeichen
-      normalized = normalized.replace(',', '.')
+      normalized = normalized.replace(',', '.').replace(/[−–—‐]/g, '-')
     }
     // Andernfalls: nur Punkt oder keine Trennzeichen vorhanden
 
@@ -208,8 +208,8 @@ export default function PoolAufgabe() {
 
       isCorrect = Math.abs(numInput - expectedAnswer) <= tolerance
     } else if (solution.type === 'text') {
-      const normalizedInput = currentInput.value.toLowerCase().replace(/\s+/g, '').replace(',', '.')
-      const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(',', '.')
+      const normalizedInput = currentInput.value.toLowerCase().replace(/\s+/g, '').replace(',', '.').replace(/[−–—‐]/g, '-')
+      const normalizedAnswer = (solution.answer as string).toLowerCase().replace(/\s+/g, '').replace(',', '.').replace(/[−–—‐]/g, '-')
       isCorrect = normalizedInput === normalizedAnswer
     }
 

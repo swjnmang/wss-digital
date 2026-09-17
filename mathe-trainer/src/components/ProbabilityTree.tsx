@@ -25,7 +25,7 @@ interface ProbabilityTreeProps {
 
 // Akzeptiert Brüche ("2/15"), Dezimalzahlen ("0,13") und Prozentangaben ("13,3" oder "13,3%")
 const parseProb = (s: string): number => {
-    const t = s.trim().replace(',', '.');
+    const t = s.trim().replace(',', '.').replace(/[−–—‐]/g, '-');
     if (!t) return NaN;
     if (t.includes('/')) {
         const parts = t.split('/');

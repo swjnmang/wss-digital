@@ -270,7 +270,7 @@ const parseGermanNumber = (str: string): number => {
     // Entferne alle Punkte (das sind Tausender-Trennzeichen)
     cleaned = cleaned.replace(/\./g, '');
     // Ersetze Komma durch Punkt
-    cleaned = cleaned.replace(',', '.');
+    cleaned = cleaned.replace(',', '.').replace(/[−–—‐]/g, '-');
   } else {
     // Kein Komma: Entferne auch alle Punkte (die sind Tausender-Trennzeichen)
     cleaned = cleaned.replace(/\./g, '');

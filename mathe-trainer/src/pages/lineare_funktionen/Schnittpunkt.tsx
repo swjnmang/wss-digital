@@ -37,6 +37,7 @@ export default function Schnittpunkt() {
   const [solution, setSolution] = useState('')
   const [solutionVisible, setSolutionVisible] = useState(false)
   const [correctAnswer, setCorrectAnswer] = useState<CorrectAnswer>('none')
+  const [lineParams, setLineParams] = useState({ m1: 1, t1: 0, m2: 1, t2: 0 })
   const [geoGebraURL, setGeoGebraURL] = useState('')
   const [isFirstTask, setIsFirstTask] = useState(true)
   const [showVideoModal, setShowVideoModal] = useState(false)
@@ -173,6 +174,7 @@ export default function Schnittpunkt() {
       sol = `<strong>1. Gleichungen gleichsetzen:</strong><br />g₁ = g₂<br />${m1}x + ${t1} = ${m2}x + ${t2}<br /><br /><strong>2. Nach x auflösen:</strong><br />${formatNumber(m1 - m2)}x = ${formatNumber(t2 - t1)}<br />x = ${answer.x}<br /><br /><strong>3. x in g₁ (oder g₂) einsetzen, um y zu finden:</strong><br />y = ${m1} * ${answer.x} + ${t1}<br />y = ${answer.y}<br /><br /><strong>Schnittpunkt: S(${answer.x}|${answer.y})</strong>`
     }
     setCorrectAnswer(answer)
+    setLineParams({ m1, t1, m2, t2 })
     setSolution(sol)
     setGeoGebraURL(`https://www.geogebra.org/graphing?command=${encodeURIComponent(combined_commands)}`)
   }
@@ -192,7 +194,15 @@ export default function Schnittpunkt() {
       } else {
         const xUser = parseFlexibleNumber(xInput)
         const yUser = parseFlexibleNumber(yInput)
-        isCorrect = (Math.abs(xUser - correctAnswer.x) < 0.01 && Math.abs(yUser - correctAnswer.y) < 0.01)
+        const { m1, t1, m2, t2 } = lineParams
+        const xCorrect = Math.abs(xUser - correctAnswer.x) < 0.01
+        // y kann korrekt sein, egal ob mit g1, g2 oder dem gerundeten Referenzwert berechnet -
+        // je nachdem, welche Gleichung der Schüler nutzt, führt der gerundete x-Wert zu leicht
+        // unterschiedlichen (aber beide korrekten) y-Werten.
+        const yViaReference = Math.abs(yUser - correctAnswer.y) < 0.02
+        const yViaG1 = Math.abs(yUser - (m1 * xUser + t1)) < 0.02
+        const yViaG2 = Math.abs(yUser - (m2 * xUser + t2)) < 0.02
+        isCorrect = xCorrect && (yViaReference || yViaG1 || yViaG2)
       }
     }
     if (isCorrect) {

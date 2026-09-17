@@ -32,8 +32,8 @@ export default function Trapez() {
   const perimeter = task.baseA + task.baseC + 2 * task.leg;
 
   const handleCheck = () => {
-    const areaVal = parseFloat(areaInput.replace(",", "."));
-    const perVal = parseFloat(perimeterInput.replace(",", "."));
+    const areaVal = parseFloat(areaInput.replace(",", ".").replace(/[−–—‐]/g, '-'));
+    const perVal = parseFloat(perimeterInput.replace(",", ".").replace(/[−–—‐]/g, '-'));
     if (Number.isNaN(areaVal) || Number.isNaN(perVal)) {
       setFeedback("Bitte beide Werte eingeben.");
       return;

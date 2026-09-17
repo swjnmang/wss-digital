@@ -189,9 +189,9 @@ const Scheitelform = () => {
             return;
         }
 
-        const aVal = parseFloat(userA.replace(',', '.'));
-        const xsVal = parseFloat(userXs.replace(',', '.'));
-        const ysVal = parseFloat(userYs.replace(',', '.'));
+        const aVal = parseFloat(userA.replace(',', '.').replace(/[−–—‐]/g, '-'));
+        const xsVal = parseFloat(userXs.replace(',', '.').replace(/[−–—‐]/g, '-'));
+        const ysVal = parseFloat(userYs.replace(',', '.').replace(/[−–—‐]/g, '-'));
 
         const correctXsForInput = formatNumber(-correctXs);
         const correctYsForInput = correctYs;

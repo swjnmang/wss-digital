@@ -229,7 +229,7 @@ const FlaechensatzEinstieg: React.FC = () => {
 
     const checkAnswer = () => {
         if (!practiceTask) return;
-        const normalized = userAnswer.trim().replace(',', '.');
+        const normalized = userAnswer.trim().replace(',', '.').replace(/[−–—‐]/g, '-');
         const parsed = parseFloat(normalized);
         if (isNaN(parsed)) {
             setFeedback('incorrect');

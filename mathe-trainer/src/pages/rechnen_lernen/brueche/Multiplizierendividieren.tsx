@@ -44,7 +44,7 @@ const parseMonomial = (input: string): Monomial => {
   } else if (coeffStr === '-') {
     coeff = -1;
   } else {
-    coeff = parseInt(coeffStr, 10);
+    coeff = parseInt(coeffStr.replace(/[−–—‐]/g, '-'), 10);
   }
   
   const vars = varsStr.split('').sort().join('');

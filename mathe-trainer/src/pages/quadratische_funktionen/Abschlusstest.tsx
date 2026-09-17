@@ -399,8 +399,8 @@ const Abschlusstest: React.FC = () => {
 
             if (ua) {
                 if (q.answerFormat === 'vertex') {
-                    const u_xs = parseFloat(ua.xs.replace(',', '.'));
-                    const u_ys = parseFloat(ua.ys.replace(',', '.'));
+                    const u_xs = parseFloat(ua.xs.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                    const u_ys = parseFloat(ua.ys.replace(',', '.').replace(/[−–—‐]/g, '-'));
                     if (!isNaN(u_xs) && !isNaN(u_ys)) {
                         isCorrect = Math.abs(u_xs - ca.xs) < 0.1 && Math.abs(u_ys - ca.ys) < 0.1;
                     }
@@ -408,8 +408,8 @@ const Abschlusstest: React.FC = () => {
                     if (ua.isNone) {
                         isCorrect = ca.isNone === true;
                     } else {
-                        const u_n1 = parseFloat(ua.n1.replace(',', '.'));
-                        const u_n2 = parseFloat(ua.n2.replace(',', '.'));
+                        const u_n1 = parseFloat(ua.n1.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                        const u_n2 = parseFloat(ua.n2.replace(',', '.').replace(/[−–—‐]/g, '-'));
                         if (!isNaN(u_n1) && !isNaN(u_n2)) {
                             // Check both orders
                             const match1 = Math.abs(u_n1 - ca.n1) < 0.1 && Math.abs(u_n2 - ca.n2) < 0.1;
@@ -418,16 +418,16 @@ const Abschlusstest: React.FC = () => {
                         }
                     }
                 } else if (q.answerFormat === 'general_form') {
-                    const u_a = parseFloat(ua.a.replace(',', '.'));
-                    const u_b = parseFloat(ua.b.replace(',', '.'));
-                    const u_c = parseFloat(ua.c.replace(',', '.'));
+                    const u_a = parseFloat(ua.a.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                    const u_b = parseFloat(ua.b.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                    const u_c = parseFloat(ua.c.replace(',', '.').replace(/[−–—‐]/g, '-'));
                     if (!isNaN(u_a) && !isNaN(u_b) && !isNaN(u_c)) {
                         isCorrect = Math.abs(u_a - ca.a) < 0.1 && Math.abs(u_b - ca.b) < 0.1 && Math.abs(u_c - ca.c) < 0.1;
                     }
                 } else if (q.answerFormat === 'vertex_form') {
-                    const u_a = parseFloat(ua.a.replace(',', '.'));
-                    const u_xs = parseFloat(ua.xs.replace(',', '.'));
-                    const u_ys = parseFloat(ua.ys.replace(',', '.'));
+                    const u_a = parseFloat(ua.a.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                    const u_xs = parseFloat(ua.xs.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                    const u_ys = parseFloat(ua.ys.replace(',', '.').replace(/[−–—‐]/g, '-'));
                     if (!isNaN(u_a) && !isNaN(u_xs) && !isNaN(u_ys)) {
                         isCorrect = Math.abs(u_a - ca.a) < 0.1 && Math.abs(u_xs - ca.xs) < 0.1 && Math.abs(u_ys - ca.ys) < 0.1;
                     }
@@ -676,14 +676,14 @@ const Abschlusstest: React.FC = () => {
                         let correct = false;
                         if (ua) {
                              if (q.answerFormat === 'vertex') {
-                                const u_xs = parseFloat(ua.xs.replace(',', '.'));
-                                const u_ys = parseFloat(ua.ys.replace(',', '.'));
+                                const u_xs = parseFloat(ua.xs.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                                const u_ys = parseFloat(ua.ys.replace(',', '.').replace(/[−–—‐]/g, '-'));
                                 if (!isNaN(u_xs) && !isNaN(u_ys)) correct = Math.abs(u_xs - ca.xs) < 0.1 && Math.abs(u_ys - ca.ys) < 0.1;
                             } else if (q.answerFormat === 'nullstellen') {
                                 if (ua.isNone) correct = ca.isNone === true;
                                 else {
-                                    const u_n1 = parseFloat(ua.n1.replace(',', '.'));
-                                    const u_n2 = parseFloat(ua.n2.replace(',', '.'));
+                                    const u_n1 = parseFloat(ua.n1.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                                    const u_n2 = parseFloat(ua.n2.replace(',', '.').replace(/[−–—‐]/g, '-'));
                                     if (!isNaN(u_n1) && !isNaN(u_n2)) {
                                         const match1 = Math.abs(u_n1 - ca.n1) < 0.1 && Math.abs(u_n2 - ca.n2) < 0.1;
                                         const match2 = Math.abs(u_n1 - ca.n2) < 0.1 && Math.abs(u_n2 - ca.n1) < 0.1;
@@ -691,14 +691,14 @@ const Abschlusstest: React.FC = () => {
                                     }
                                 }
                             } else if (q.answerFormat === 'general_form') {
-                                const u_a = parseFloat(ua.a.replace(',', '.'));
-                                const u_b = parseFloat(ua.b.replace(',', '.'));
-                                const u_c = parseFloat(ua.c.replace(',', '.'));
+                                const u_a = parseFloat(ua.a.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                                const u_b = parseFloat(ua.b.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                                const u_c = parseFloat(ua.c.replace(',', '.').replace(/[−–—‐]/g, '-'));
                                 if (!isNaN(u_a) && !isNaN(u_b) && !isNaN(u_c)) correct = Math.abs(u_a - ca.a) < 0.1 && Math.abs(u_b - ca.b) < 0.1 && Math.abs(u_c - ca.c) < 0.1;
                             } else if (q.answerFormat === 'vertex_form') {
-                                const u_a = parseFloat(ua.a.replace(',', '.'));
-                                const u_xs = parseFloat(ua.xs.replace(',', '.'));
-                                const u_ys = parseFloat(ua.ys.replace(',', '.'));
+                                const u_a = parseFloat(ua.a.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                                const u_xs = parseFloat(ua.xs.replace(',', '.').replace(/[−–—‐]/g, '-'));
+                                const u_ys = parseFloat(ua.ys.replace(',', '.').replace(/[−–—‐]/g, '-'));
                                 if (!isNaN(u_a) && !isNaN(u_xs) && !isNaN(u_ys)) correct = Math.abs(u_a - ca.a) < 0.1 && Math.abs(u_xs - ca.xs) < 0.1 && Math.abs(u_ys - ca.ys) < 0.1;
                             } else if (q.answerFormat === 'mc_properties') {
                                 correct = ua.stretch === ca.stretch && ua.opening === ca.opening;

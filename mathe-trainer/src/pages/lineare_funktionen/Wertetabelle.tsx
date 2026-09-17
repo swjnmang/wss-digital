@@ -397,8 +397,8 @@ export default function Wertetabelle() {
     if (aufgabe.typ === 'leereTabelleAusfüllen') {
       // Typ 1: Beide x und y müssen korrekt sein
       for (let i = 0; i < eingaben.length; i++) {
-        const x = parseFloat(eingaben[i].x.replace(',', '.'))
-        const y = parseFloat(eingaben[i].y.replace(',', '.'))
+        const x = parseFloat(eingaben[i].x.replace(',', '.').replace(/[−–—‐]/g, '-'))
+        const y = parseFloat(eingaben[i].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
         const cellKey = `${index}-${i}`
         
         if (isNaN(x) || isNaN(y)) {
@@ -419,7 +419,7 @@ export default function Wertetabelle() {
         
         if (aufgabe.gebenXWert[i]) {
           // X ist gegeben, y muss geprüft werden
-          const y = parseFloat(eingaben[i].y.replace(',', '.'))
+          const y = parseFloat(eingaben[i].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
           if (isNaN(y)) {
             fehler[cellKey] = true
           } else {
@@ -432,7 +432,7 @@ export default function Wertetabelle() {
           }
         } else {
           // Y ist gegeben, x muss geprüft werden
-          const x = parseFloat(eingaben[i].x.replace(',', '.'))
+          const x = parseFloat(eingaben[i].x.replace(',', '.').replace(/[−–—‐]/g, '-'))
           if (isNaN(x)) {
             fehler[cellKey] = true
           } else {
@@ -463,8 +463,8 @@ export default function Wertetabelle() {
 
     // Alle eingegebenen Wertepaare prüfen
     for (const eintrag of eingaben) {
-      const x = parseFloat(eintrag.x.replace(',', '.'))
-      const y = parseFloat(eintrag.y.replace(',', '.'))
+      const x = parseFloat(eintrag.x.replace(',', '.').replace(/[−–—‐]/g, '-'))
+      const y = parseFloat(eintrag.y.replace(',', '.').replace(/[−–—‐]/g, '-'))
       
       if (isNaN(x) || isNaN(y)) return false
       
@@ -498,7 +498,7 @@ export default function Wertetabelle() {
     for (let i = 0; i < eingaben.length; i++) {
       if (aufgabe.gebenXWert[i]) {
         // X ist gegeben, y muss geprüft werden
-        const y = parseFloat(eingaben[i].y.replace(',', '.'))
+        const y = parseFloat(eingaben[i].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
         if (isNaN(y)) return false
         
         const expectedY = aufgabe.yWerte[i]
@@ -507,7 +507,7 @@ export default function Wertetabelle() {
         }
       } else {
         // Y ist gegeben, x muss geprüft werden
-        const x = parseFloat(eingaben[i].x.replace(',', '.'))
+        const x = parseFloat(eingaben[i].x.replace(',', '.').replace(/[−–—‐]/g, '-'))
         if (isNaN(x)) return false
         
         const expectedX = aufgabe.xWerte[i]
@@ -536,13 +536,13 @@ export default function Wertetabelle() {
     if (aufgabe.typ === 'teilweisgefülltVervollständigen') {
       if (aufgabe.gebenXWert[rowIndex]) {
         // X ist gegeben, y muss geprüft werden
-        const y = parseFloat(eingaben[rowIndex].y.replace(',', '.'))
+        const y = parseFloat(eingaben[rowIndex].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
         if (isNaN(y)) return false
         const expectedY = aufgabe.yWerte[rowIndex]
         return Math.abs(y - expectedY) <= tolerance
       } else {
         // Y ist gegeben, x muss geprüft werden
-        const x = parseFloat(eingaben[rowIndex].x.replace(',', '.'))
+        const x = parseFloat(eingaben[rowIndex].x.replace(',', '.').replace(/[−–—‐]/g, '-'))
         if (isNaN(x)) return false
         const expectedX = aufgabe.xWerte[rowIndex]
         return Math.abs(x - expectedX) <= tolerance
@@ -581,8 +581,8 @@ export default function Wertetabelle() {
       
       if (xFilled && yFilled) {
         // Validiere die Zelle
-        const x = parseFloat(currentAnswers[rowIndex].x.replace(',', '.'))
-        const y = parseFloat(currentAnswers[rowIndex].y.replace(',', '.'))
+        const x = parseFloat(currentAnswers[rowIndex].x.replace(',', '.').replace(/[−–—‐]/g, '-'))
+        const y = parseFloat(currentAnswers[rowIndex].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
         
         if (!isNaN(x) && !isNaN(y)) {
           const m = aufgabe.m
@@ -624,14 +624,14 @@ export default function Wertetabelle() {
         
         if (aufgabe.gebenXWert[rowIndex]) {
           // X gegeben, y eingegeben
-          const y = parseFloat(currentAnswers[rowIndex].y.replace(',', '.'))
+          const y = parseFloat(currentAnswers[rowIndex].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
           if (!isNaN(y)) {
             const expectedY = aufgabe.yWerte[rowIndex]
             isValid = Math.abs(y - expectedY) <= tolerance
           }
         } else {
           // Y gegeben, x eingegeben
-          const x = parseFloat(currentAnswers[rowIndex].x.replace(',', '.'))
+          const x = parseFloat(currentAnswers[rowIndex].x.replace(',', '.').replace(/[−–—‐]/g, '-'))
           if (!isNaN(x)) {
             const expectedX = aufgabe.xWerte[rowIndex]
             isValid = Math.abs(x - expectedX) <= tolerance

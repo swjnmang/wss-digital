@@ -225,7 +225,7 @@ export default function DieLeinwand() {
       return;
     }
 
-    const userValue = parseFloat(currentAnswer!);
+    const userValue = parseFloat(currentAnswer!.replace(/[−–—‐]/g, '-').replace(',', '.'));
     if (isNaN(userValue)) {
       setFeedback("Ungültige Eingabe! Bitte gib eine Zahl ein.");
       return;
@@ -267,7 +267,7 @@ export default function DieLeinwand() {
   };
 
   const completedCount = answers.filter(
-    (ans, idx) => ans !== null && ans !== "" && Math.abs(parseFloat(ans) - exercises[idx].expectedAnswer) <= exercises[idx].tolerance
+    (ans, idx) => ans !== null && ans !== "" && Math.abs(parseFloat(ans.replace(/[−–—‐]/g, '-').replace(',', '.')) - exercises[idx].expectedAnswer) <= exercises[idx].tolerance
   ).length;
 
   return (

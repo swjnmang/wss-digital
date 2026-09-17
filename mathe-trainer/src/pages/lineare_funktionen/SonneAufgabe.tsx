@@ -281,8 +281,8 @@ export default function SonneAufgabe() {
                       <div className="text-xl font-bold text-blue-800">
                         y = {(() => {
                           const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
-                          const m = currentInputs['m'] ? currentInputs['m'].replace(',', '.') : '?'
-                          const t = currentInputs['t'] ? currentInputs['t'].replace(',', '.') : '?'
+                          const m = currentInputs['m'] ? currentInputs['m'].replace(',', '.').replace(/[−–—‐]/g, '-') : '?'
+                          const t = currentInputs['t'] ? currentInputs['t'].replace(',', '.').replace(/[−–—‐]/g, '-') : '?'
                           
                           // Prüfe ob t positiv oder negativ ist für die Anzeige
                           if (m === '?' || t === '?') {

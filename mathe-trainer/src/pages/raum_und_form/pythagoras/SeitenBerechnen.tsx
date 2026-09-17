@@ -22,7 +22,7 @@ const round2 = (val: number) => Math.round(val * 100) / 100;
 const parseNumberInput = (raw: string) => {
   let s = raw.trim().replace(/\s/g, '');
   if (s.includes(',')) {
-    s = s.replace(/\./g, '').replace(',', '.');
+    s = s.replace(/\./g, '').replace(',', '.').replace(/[−–—‐]/g, '-');
   }
   return parseFloat(s);
 };

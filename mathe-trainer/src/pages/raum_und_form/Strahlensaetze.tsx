@@ -399,7 +399,7 @@ export default function Strahlensaetze() {
   const [showSolution, setShowSolution] = useState(false);
 
   const handleCheck = () => {
-    const val = parseFloat(input.replace(",", "."));
+    const val = parseFloat(input.replace(",", ".").replace(/[−–—‐]/g, '-'));
     if (Number.isNaN(val)) {
       setFeedback("Bitte gib eine gültige Zahl ein.");
       return;
