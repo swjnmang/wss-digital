@@ -182,9 +182,9 @@ export default function BergAufgabe() {
         const normalizedInput = input.replace(/,/g, '.')
         const numInput = parseFloat(normalizedInput)
         const expectedAnswer = solution.answers[i] as number
+        const fieldTolerance = solution.tolerance !== undefined ? solution.tolerance : 0.01
 
-        // Vergleiche die auf 2 Dezimalstellen gerundeten Werte
-        if (isNaN(numInput) || roundTo2Decimals(numInput) !== roundTo2Decimals(expectedAnswer)) {
+        if (isNaN(numInput) || Math.abs(numInput - expectedAnswer) > fieldTolerance) {
           isCorrect = false
           break
         }

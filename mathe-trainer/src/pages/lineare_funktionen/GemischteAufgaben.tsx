@@ -252,7 +252,7 @@ const aufgabenBanks = {
       typ: 'schnittpunkt',
       thema: '7. Schnittpunkt zweier Geraden',
       frage: `Berechne die Koordinaten des Schnittpunktes der beiden Geraden g₁: y = ${m1}x ${t1 >= 0 ? '+' : '-'} ${Math.abs(t1)} und g₂: y = ${m2}x ${t2 >= 0 ? '+' : '-'} ${Math.abs(t2)}.`,
-      antwort: { x, y },
+      antwort: { x, y, m1, t1, m2, t2 },
       lösungsweg: `Gleichsetzen: ${m1}x ${t1 >= 0 ? '+' : '-'} ${Math.abs(t1)} = ${m2}x ${t2 >= 0 ? '+' : '-'} ${Math.abs(t2)}\n$$x = ${x}, \\quad y = ${y}$$\nSchnittpunkt: (${x}|${y})`
     }
   },
@@ -409,10 +409,17 @@ export default function GemischteAufgaben() {
       const x = parseFloat((inputData.x || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
       const y = parseFloat((inputData.y || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
       if (isNaN(x) || isNaN(y)) return false
-      const expected = aufgabe.antwort as { x: number; y: number }
+      const expected = aufgabe.antwort as { x: number; y: number; m1: number; t1: number; m2: number; t2: number }
       const toleranzX = Math.max(Math.abs(expected.x) * 0.01, 0.02)
       const toleranzY = Math.max(Math.abs(expected.y) * 0.01, 0.02)
-      return Math.abs(x - expected.x) <= toleranzX && Math.abs(y - expected.y) <= toleranzY
+      if (Math.abs(x - expected.x) > toleranzX) return false
+      // y kann korrekt sein, egal ob mit g1, g2 oder dem gespeicherten Referenzwert berechnet -
+      // je nachdem, welche Gleichung genutzt wird, führt der gerundete x-Wert zu leicht
+      // unterschiedlichen (aber beide korrekten) y-Werten.
+      const yViaReference = Math.abs(y - expected.y) <= toleranzY
+      const yViaG1 = Math.abs(y - (expected.m1 * x + expected.t1)) <= toleranzY
+      const yViaG2 = Math.abs(y - (expected.m2 * x + expected.t2)) <= toleranzY
+      return yViaReference || yViaG1 || yViaG2
     } else if (aufgabe.typ === 'graphZuordnen') {
       // Alle 4 Zuordnungen müssen stimmen
       const mappings = inputData as { [key: number]: string }
