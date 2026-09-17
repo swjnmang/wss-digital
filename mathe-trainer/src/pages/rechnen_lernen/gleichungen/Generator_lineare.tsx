@@ -9,8 +9,9 @@ import React, { useState } from 'react';
  */
 function solveLinearEquation(equation: string): number | null {
   try {
-    // Entferne Leerzeichen und wandle in Kleinbuchstaben um
-    let eq = equation.replace(/\s+/g, '').toLowerCase();
+    // Normalisiere alle Minus-Varianten (Bindestrich, En-Dash, Em-Dash, mathematisches Minus)
+    // und entferne Leerzeichen, wandle in Kleinbuchstaben um
+    let eq = equation.replace(/[−–—‐]/g, '-').replace(/\s+/g, '').toLowerCase();
 
     // Split bei "="
     const [left, right] = eq.split('=');
