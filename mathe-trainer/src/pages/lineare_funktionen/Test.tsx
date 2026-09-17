@@ -20,6 +20,20 @@ function formatNumber(num: number) { return Math.round(num * 100) / 100 }
 function randomInt(max: number, min = 0) { return Math.floor(Math.random() * (max - min + 1)) + min }
 function randomChoice<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)] }
 
+// Parst Schülereingaben tolerant: erlaubt Leerzeichen ("- 3"), verschachtelte
+// Vorzeichen ("+(-1)", "-(-1)") und Komma als Dezimaltrennzeichen.
+function parseFlexibleNumber(raw: unknown): number {
+  if (raw === undefined || raw === null) return NaN
+  let s = String(raw).trim()
+  if (s === '') return NaN
+  s = s.replace(/,/g, '.').replace(/\s+/g, '').replace(/[()]/g, '')
+  const match = s.match(/^([+-]*)(\d+(?:\.\d+)?)$/)
+  if (!match) return Number(s)
+  const minusCount = (match[1].match(/-/g) || []).length
+  const sign = minusCount % 2 === 0 ? 1 : -1
+  return sign * parseFloat(match[2])
+}
+
 function createSlopeQuestion(): Question {
   let x1, y1, x2, y2
   do { x1 = randomInt(10, -10); x2 = randomInt(10, -10) } while (x1 === x2)
@@ -200,13 +214,13 @@ export default function Test() {
   function isCorrect(q: Question, user: any) {
     if (!user) return false
     if (q.answerFormat === 'single_number') {
-      return Math.abs(Number(user.val) - Number(q.answer.val)) < 0.01
+      return Math.abs(parseFlexibleNumber(user.val) - Number(q.answer.val)) < 0.01
     } else if (q.answerFormat === 'point') {
       if (user.isNone) return q.answer === 'none'
       if (q.answer === 'none') return false
-      return Math.abs(Number(user.x) - Number(q.answer.x)) < 0.01 && Math.abs(Number(user.y) - Number(q.answer.y)) < 0.01
+      return Math.abs(parseFlexibleNumber(user.x) - Number(q.answer.x)) < 0.01 && Math.abs(parseFlexibleNumber(user.y) - Number(q.answer.y)) < 0.01
     } else if (q.answerFormat === 'equation') {
-      return Math.abs(Number(user.m) - Number(q.answer.m)) < 0.01 && Math.abs(Number(user.t) - Number(q.answer.t)) < 0.01
+      return Math.abs(parseFlexibleNumber(user.m) - Number(q.answer.m)) < 0.01 && Math.abs(parseFlexibleNumber(user.t) - Number(q.answer.t)) < 0.01
     }
     return false
   }
