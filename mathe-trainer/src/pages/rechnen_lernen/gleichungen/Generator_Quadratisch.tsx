@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import RechenwegDisplay from '../../../components/RechenwegDisplay';
 
 interface Aufgabe {
   id: string;
@@ -379,13 +380,7 @@ const Generator_Quadratisch: React.FC = () => {
                 {/* Rechenweg - ausklappbar unter der Aufgabe */}
                 {showSolution && (
                   <div className="p-2 bg-blue-50 rounded border-l-2 border-blue-400 text-sm ml-8">
-                    <div className="space-y-0.5">
-                      {aufgabe.rechenweg.map((schritt, i) => (
-                        <p key={i} className="text-gray-700">
-                          {i > 0 && '→ '} {schritt}
-                        </p>
-                      ))}
-                    </div>
+                    <RechenwegDisplay steps={aufgabe.rechenweg} />
                     <p className="font-semibold text-blue-900 mt-1">
                       Lösungen: <span className="font-mono bg-white px-1 rounded">{aufgabe.loesungen[0]} und {aufgabe.loesungen[1]}</span>
                     </p>

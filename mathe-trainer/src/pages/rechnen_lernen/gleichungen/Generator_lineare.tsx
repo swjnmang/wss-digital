@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import RechenwegDisplay from '../../../components/RechenwegDisplay';
 
 // ============================================================================
 // INTELLIGENTE VALIDIERUNGSFUNKTION FÜR GLEICHUNGEN
@@ -391,13 +392,7 @@ const LineareGleichungen: React.FC = () => {
                 {/* Rechenweg - ausklappbar unter der Aufgabe */}
                 {showSolution && (
                   <div className="p-2 bg-orange-50 rounded border-l-2 border-orange-400 text-sm ml-8">
-                    <div className="space-y-0.5">
-                      {aufgabe.rechenweg.map((schritt, i) => (
-                        <p key={i} className="text-gray-700">
-                          {i > 0 && '→ '} {schritt}
-                        </p>
-                      ))}
-                    </div>
+                    <RechenwegDisplay steps={aufgabe.rechenweg} />
                     <p className="font-semibold text-orange-900 mt-1">
                       Lösung: <span className="font-mono bg-white px-1 rounded">x = {aufgabe.loesung}</span>
                     </p>

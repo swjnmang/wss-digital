@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import RechenwegDisplay from '../../../components/RechenwegDisplay';
 
 /**
  * Vergleicht zwei Lösungen auf Äquivalenz
@@ -245,13 +246,7 @@ export default function Generator_Bruchgleichungen() {
                 {/* Rechenweg - ausklappbar unter der Aufgabe */}
                 {showSolution && (
                   <div className="p-3 bg-purple-50 rounded border-l-2 border-purple-400 text-base ml-8">
-                    <div className="space-y-1">
-                      {aufgabe.rechenweg.map((schritt, i) => (
-                        <p key={i} className="text-gray-700">
-                          {i > 0 && '→ '} {schritt}
-                        </p>
-                      ))}
-                    </div>
+                    <RechenwegDisplay steps={aufgabe.rechenweg} isLatex />
                     <p className="font-semibold text-purple-900 mt-2">
                       Lösung: <span className="font-mono bg-white px-1 rounded">x = {Math.round(aufgabe.loesung * 100) / 100}</span>
                     </p>
