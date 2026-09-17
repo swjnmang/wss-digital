@@ -267,7 +267,7 @@ const Kosinusfunktion: React.FC = () => {
             return;
         }
 
-        const value = parseFloat(userAnswer.replace(',', '.'));
+        const value = parseFloat(userAnswer.replace(',', '.').replace(/[−–—‐]/g, '-'));
         if (isNaN(value)) {
             setFeedback('info');
             return;

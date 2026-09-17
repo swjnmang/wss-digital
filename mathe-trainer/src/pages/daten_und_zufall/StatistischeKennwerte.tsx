@@ -100,11 +100,11 @@ const StatistischeKennwerte: React.FC = () => {
     const newFeedback: { [key: string]: boolean } = {};
 
     // Mean (allow small error margin)
-    const userMean = parseFloat(userInputs.mean.replace(',', '.'));
+    const userMean = parseFloat(userInputs.mean.replace(',', '.').replace(/[−–—‐]/g, '-'));
     newFeedback.mean = !isNaN(userMean) && Math.abs(userMean - data.mean) < 0.1;
 
     // Median
-    const userMedian = parseFloat(userInputs.median.replace(',', '.'));
+    const userMedian = parseFloat(userInputs.median.replace(',', '.').replace(/[−–—‐]/g, '-'));
     newFeedback.median = !isNaN(userMedian) && userMedian === data.median;
 
     // Mode (comma separated if multiple)
@@ -115,15 +115,15 @@ const StatistischeKennwerte: React.FC = () => {
     newFeedback.mode = modeCorrect;
 
     // Range
-    const userRange = parseFloat(userInputs.range.replace(',', '.'));
+    const userRange = parseFloat(userInputs.range.replace(',', '.').replace(/[−–—‐]/g, '-'));
     newFeedback.range = !isNaN(userRange) && userRange === data.range;
 
     // Min
-    const userMin = parseFloat(userInputs.min.replace(',', '.'));
+    const userMin = parseFloat(userInputs.min.replace(',', '.').replace(/[−–—‐]/g, '-'));
     newFeedback.min = !isNaN(userMin) && userMin === data.min;
 
     // Max
-    const userMax = parseFloat(userInputs.max.replace(',', '.'));
+    const userMax = parseFloat(userInputs.max.replace(',', '.').replace(/[−–—‐]/g, '-'));
     newFeedback.max = !isNaN(userMax) && userMax === data.max;
 
     setFeedback(newFeedback);

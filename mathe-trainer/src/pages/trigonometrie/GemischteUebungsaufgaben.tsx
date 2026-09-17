@@ -1087,7 +1087,7 @@ const flushUnsolvedCard = (card: CardState) => {
 
 const createCards = (): CardState[] => buildTaskSet().map(buildCard);
 
-const parseAnswer = (value: string) => parseFloat(value.replace(',', '.'));
+const parseAnswer = (value: string) => parseFloat(value.replace(',', '.').replace(/[−–—‐]/g, '-'));
 
 const GemischteUebungsaufgaben: React.FC = () => {
     const [cards, setCards] = useState<CardState[]>(() => createCards());

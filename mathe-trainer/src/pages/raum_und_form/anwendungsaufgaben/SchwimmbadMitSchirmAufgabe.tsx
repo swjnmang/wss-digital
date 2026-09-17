@@ -151,11 +151,11 @@ export default function SchwimmbadMitSchirmAufgabe() {
     const lastCommaIndex = normalized.lastIndexOf(',')
 
     if (lastCommaIndex > lastDotIndex) {
-      normalized = normalized.replace(/\./g, '').replace(',', '.')
+      normalized = normalized.replace(/\./g, '').replace(',', '.').replace(/[−–—‐]/g, '-')
     } else if (lastDotIndex > lastCommaIndex && lastCommaIndex > -1) {
       normalized = normalized.replace(/,/g, '')
     } else if (lastCommaIndex > -1 && lastDotIndex === -1) {
-      normalized = normalized.replace(',', '.')
+      normalized = normalized.replace(',', '.').replace(/[−–—‐]/g, '-')
     }
 
     const num = parseFloat(normalized)

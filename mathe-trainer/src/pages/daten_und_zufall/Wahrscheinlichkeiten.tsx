@@ -502,7 +502,7 @@ const parseProbabilityInput = (rawValue: string): number | null => {
         value = value.slice(0, -1).trim();
     }
 
-    value = value.replace(',', '.');
+    value = value.replace(',', '.').replace(/[−–—‐]/g, '-');
 
     let numericValue: number | null = null;
 

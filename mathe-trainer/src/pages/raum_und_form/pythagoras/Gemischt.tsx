@@ -95,7 +95,7 @@ export default function Gemischt() {
   };
 
   const handleCheck = () => {
-    const val = parseFloat(input.replace(",", "."));
+    const val = parseFloat(input.replace(",", ".").replace(/[−–—‐]/g, '-'));
     if (Number.isNaN(val)) {
       setFeedback({ correct: false, text: "Bitte gib eine gültige Zahl ein." });
       return;

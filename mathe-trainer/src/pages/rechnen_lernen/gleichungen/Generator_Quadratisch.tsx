@@ -177,7 +177,7 @@ const AUFGABEN_KATEGORIEN = [
 
 const areEquivalentSolutions = (userInput: string, solutions: [number, number]): boolean => {
   // Komma zu Punkt konvertieren (deutsche Dezimalschreibweise)
-  const normalized = userInput.toLowerCase().trim().replace(',', '.');
+  const normalized = userInput.toLowerCase().trim().replace(',', '.').replace(/[−–—‐]/g, '-');
   const [sol1, sol2] = solutions;
   
   const checkMatch = (val: number) => {
@@ -201,7 +201,7 @@ const validateDualSolution = (value1: string, value2: string, solutions: [number
   
   const checkMatch = (userInput: string, targetValue: number) => {
     // Komma zu Punkt konvertieren (deutsche Dezimalschreibweise)
-    const normalized = userInput.toLowerCase().trim().replace(',', '.');
+    const normalized = userInput.toLowerCase().trim().replace(',', '.').replace(/[−–—‐]/g, '-');
     const absVal = Math.abs(targetValue);
     if (absVal < 0.0001) return normalized === '0';
     const rounded = Math.round(targetValue * 100) / 100;

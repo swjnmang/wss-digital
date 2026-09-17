@@ -41,8 +41,8 @@ const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleP
     const cellKey = `graph-${rowIndex}`
     const newValidierteZellen = { ...validierteZellen }
 
-    const x = parseFloat(newValues[rowIndex].x.replace(',', '.'))
-    const y = parseFloat(newValues[rowIndex].y.replace(',', '.'))
+    const x = parseFloat(newValues[rowIndex].x.replace(',', '.').replace(/[−–—‐]/g, '-'))
+    const y = parseFloat(newValues[rowIndex].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
 
     // Beide Felder müssen gefüllt sein UND gültige Zahlen sein
     if (!isNaN(x) && !isNaN(y) && newValues[rowIndex].x !== '' && newValues[rowIndex].y !== '') {
@@ -54,8 +54,8 @@ const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleP
       let isDuplicate = false
       for (let i = 0; i < numRows; i++) {
         if (i !== rowIndex && newValues[i]?.x && newValues[i]?.y) {
-          const otherX = parseFloat(newValues[i].x.replace(',', '.'))
-          const otherY = parseFloat(newValues[i].y.replace(',', '.'))
+          const otherX = parseFloat(newValues[i].x.replace(',', '.').replace(/[−–—‐]/g, '-'))
+          const otherY = parseFloat(newValues[i].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
           if (!isNaN(otherX) && !isNaN(otherY) && otherX === x && otherY === y) {
             isDuplicate = true
             break
@@ -398,16 +398,16 @@ export default function GemischteAufgaben() {
       const correctCount = Object.values(cellsForThisTask).filter(Boolean).length
       return correctCount >= 2
     } else if (aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen') {
-      const m = parseFloat((inputData.m || '').replace(',', '.'))
-      const t = parseFloat((inputData.t || '').replace(',', '.'))
+      const m = parseFloat((inputData.m || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
+      const t = parseFloat((inputData.t || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
       if (isNaN(m) || isNaN(t)) return false
       const expectedParts = (aufgabe.antwort as string).split(';').map(p => parseFloat(p.trim()))
       const toleranzM = Math.max(Math.abs(expectedParts[0]) * 0.01, 0.02)
       const toleranzT = Math.max(Math.abs(expectedParts[1]) * 0.01, 0.02)
       return Math.abs(m - expectedParts[0]) <= toleranzM && Math.abs(t - expectedParts[1]) <= toleranzT
     } else if (aufgabe.typ === 'schnittpunkt') {
-      const x = parseFloat((inputData.x || '').replace(',', '.'))
-      const y = parseFloat((inputData.y || '').replace(',', '.'))
+      const x = parseFloat((inputData.x || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
+      const y = parseFloat((inputData.y || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
       if (isNaN(x) || isNaN(y)) return false
       const expected = aufgabe.antwort as { x: number; y: number }
       const toleranzX = Math.max(Math.abs(expected.x) * 0.01, 0.02)
@@ -428,7 +428,7 @@ export default function GemischteAufgaben() {
     } else if (aufgabe.typ === 'punktAufGerade') {
       return (inputData.value || '').toLowerCase() === aufgabe.antwort
     } else {
-      const num = parseFloat((inputData.value || '').replace(',', '.'))
+      const num = parseFloat((inputData.value || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
       const toleranz = Math.max(Math.abs(aufgabe.antwort) * 0.01, 0.02)
       return Math.abs(num - aufgabe.antwort) <= toleranz
     }

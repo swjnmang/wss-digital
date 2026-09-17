@@ -582,7 +582,7 @@ const Pruefungsmodus: React.FC = () => {
         if (task.isText) {
             return given.toLowerCase() === task.correctAnswer.toLowerCase();
         }
-        const value = parseFloat(given.replace(',', '.'));
+        const value = parseFloat(given.replace(',', '.').replace(/[−–—‐]/g, '-'));
         if (isNaN(value)) return false;
         const target = parseFloat(task.correctAnswer);
         return Math.abs(value - target) <= task.tolerance;

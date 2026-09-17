@@ -50,7 +50,7 @@ const treeEdges: TreeEdge[] = [
 
 const parseInput = (value: string) => {
     const raw = value.trim();
-    const normalized = raw.includes(',') ? raw.replace(/\./g, '').replace(',', '.') : raw;
+    const normalized = raw.includes(',') ? raw.replace(/\./g, '').replace(',', '.').replace(/[−–—‐]/g, '-') : raw;
     return parseFloat(normalized);
 };
 

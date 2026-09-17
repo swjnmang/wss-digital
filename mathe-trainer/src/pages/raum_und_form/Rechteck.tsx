@@ -30,8 +30,8 @@ export default function Rechteck() {
   const perimeter = 2 * (task.width + task.height);
 
   const handleCheck = () => {
-    const areaVal = parseFloat(areaInput.replace(",", "."));
-    const perVal = parseFloat(perimeterInput.replace(",", "."));
+    const areaVal = parseFloat(areaInput.replace(",", ".").replace(/[−–—‐]/g, '-'));
+    const perVal = parseFloat(perimeterInput.replace(",", ".").replace(/[−–—‐]/g, '-'));
     if (Number.isNaN(areaVal) || Number.isNaN(perVal)) {
       setFeedback("Bitte beide Werte eingeben.");
       return;

@@ -163,7 +163,7 @@ export default function Zinseszins() {
   const checkAnswer = () => {
     if (!task) return;
 
-    const input = parseFloat(userAnswer.replace(',', '.'));
+    const input = parseFloat(userAnswer.replace(',', '.').replace(/[−–—‐]/g, '-'));
     if (isNaN(input)) {
       setFeedback('Bitte gib eine gültige Zahl ein.');
       setFeedbackType('incorrect');

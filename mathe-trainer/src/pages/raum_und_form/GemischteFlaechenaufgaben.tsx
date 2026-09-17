@@ -485,7 +485,7 @@ function lengthUnitChoices(shape: Shape) {
 }
 
 function parseNumber(value: string) {
-  return parseFloat(value.replace(",", "."));
+  return parseFloat(value.replace(",", ".").replace(/[−–—‐]/g, '-'));
 }
 
 function withinTolerance(given: number, target?: number) {

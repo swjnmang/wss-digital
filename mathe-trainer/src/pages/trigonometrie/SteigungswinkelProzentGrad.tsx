@@ -398,7 +398,7 @@ const SteigungswinkelProzentGrad: React.FC = () => {
 
     const checkAnswer = () => {
         if (!task) return;
-        const value = parseFloat(userAnswer.replace(',', '.'));
+        const value = parseFloat(userAnswer.replace(',', '.').replace(/[−–—‐]/g, '-'));
         if (isNaN(value)) {
             setFeedback('info');
             return;
@@ -413,7 +413,7 @@ const SteigungswinkelProzentGrad: React.FC = () => {
             return;
         }
 
-        const value2 = parseFloat(userAnswer2.replace(',', '.'));
+        const value2 = parseFloat(userAnswer2.replace(',', '.').replace(/[−–—‐]/g, '-'));
         if (isNaN(value2)) {
             setFeedback('info');
             return;

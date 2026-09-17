@@ -226,7 +226,7 @@ const Nullstellen = () => {
         }
 
         if (correctCount === 1) {
-            const uX1 = parseFloat(userX1.replace(',', '.'));
+            const uX1 = parseFloat(userX1.replace(',', '.').replace(/[−–—‐]/g, '-'));
             if (isNaN(uX1)) {
                 setFeedback({ type: 'info', message: 'Bitte gib eine gültige Zahl ein.' });
                 return;
@@ -243,8 +243,8 @@ const Nullstellen = () => {
         }
 
         if (correctCount === 2) {
-            const uX1 = parseFloat(userX1.replace(',', '.'));
-            const uX2 = parseFloat(userX2.replace(',', '.'));
+            const uX1 = parseFloat(userX1.replace(',', '.').replace(/[−–—‐]/g, '-'));
+            const uX2 = parseFloat(userX2.replace(',', '.').replace(/[−–—‐]/g, '-'));
             
             if (isNaN(uX1) || isNaN(uX2)) {
                 setFeedback({ type: 'info', message: 'Bitte gib gültige Zahlen ein.' });

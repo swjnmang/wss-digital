@@ -23,7 +23,7 @@ const parseNumberInput = (raw: string) => {
   // Accept thousand separators (dot, space, apostrophe) and comma as decimal
   let s = raw.trim().replace(/\s|'/g, '');
   if (s.includes(',')) {
-    s = s.replace(/\./g, '').replace(',', '.');
+    s = s.replace(/\./g, '').replace(',', '.').replace(/[−–—‐]/g, '-');
   } else {
     s = s.replace(/,/g, '');
   }

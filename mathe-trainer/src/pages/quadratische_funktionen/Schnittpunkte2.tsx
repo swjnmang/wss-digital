@@ -143,10 +143,10 @@ const Schnittpunkte2 = () => {
             }
             isCorrect = (parseInt(userCount) === task.solution.count);
         } else {
-            const p1x = parseFloat(userP1.x.replace(',', '.'));
-            const p1y = parseFloat(userP1.y.replace(',', '.'));
-            const p2x = parseFloat(userP2.x.replace(',', '.'));
-            const p2y = parseFloat(userP2.y.replace(',', '.'));
+            const p1x = parseFloat(userP1.x.replace(',', '.').replace(/[−–—‐]/g, '-'));
+            const p1y = parseFloat(userP1.y.replace(',', '.').replace(/[−–—‐]/g, '-'));
+            const p2x = parseFloat(userP2.x.replace(',', '.').replace(/[−–—‐]/g, '-'));
+            const p2y = parseFloat(userP2.y.replace(',', '.').replace(/[−–—‐]/g, '-'));
 
             const userPoints: Point[] = [];
             if (!isNaN(p1x) && !isNaN(p1y)) userPoints.push({ x: p1x, y: p1y });

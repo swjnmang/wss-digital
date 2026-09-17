@@ -189,7 +189,7 @@ export default function SteigungBerechnen() {
       return
     }
 
-    const user = parseFloat(input.replace(',', '.'))
+    const user = parseFloat(input.replace(',', '.').replace(/[−–—‐]/g, '-'))
     if (isNaN(user)) {
       setFeedback('Ungültige Zahl')
       return
@@ -228,7 +228,7 @@ export default function SteigungBerechnen() {
       setGraphFeedback('Bitte gib die Steigung ein.')
       return
     }
-    const user = parseFloat(graphInput.replace(',', '.'))
+    const user = parseFloat(graphInput.replace(',', '.').replace(/[−–—‐]/g, '-'))
     if (isNaN(user)) {
       setGraphFeedback('Ungültige Zahl')
       return

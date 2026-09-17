@@ -434,7 +434,7 @@ const Kosinussatz: React.FC = () => {
 
     const checkAnswer = () => {
         if (!task) return;
-        const value = parseFloat(userAnswer.replace(',', '.'));
+        const value = parseFloat(userAnswer.replace(',', '.').replace(/[−–—‐]/g, '-'));
         if (isNaN(value)) {
             setFeedback('info');
             return;

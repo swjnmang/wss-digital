@@ -51,8 +51,8 @@ export default function FamilieKessler() {
   ])
 
   const parseInput = (value: string): number | null => {
-    let cleaned = value.trim()
-    
+    let cleaned = value.trim().replace(/[−–—‐]/g, '-')
+
     // Finde das letzte Punkt oder Komma
     const lastCommaIdx = cleaned.lastIndexOf(',')
     const lastDotIdx = cleaned.lastIndexOf('.')

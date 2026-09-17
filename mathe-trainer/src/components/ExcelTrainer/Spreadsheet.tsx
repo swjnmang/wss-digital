@@ -61,7 +61,7 @@ export const Spreadsheet: React.FC<SpreadsheetProps> = ({ task }) => {
           for (let c = Math.min(c1, c2); c <= Math.max(c1, c2); c++) {
             const cellLetter = String.fromCharCode(65 + c);
             const cellKey = `${cellLetter}${r}`;
-            const val = parseFloat(cells[cellKey]?.value || '0');
+            const val = parseFloat((cells[cellKey]?.value || '0').replace(/[−–—‐]/g, '-').replace(',', '.'));
             if (!isNaN(val)) sum += val;
           }
         }
@@ -79,7 +79,7 @@ export const Spreadsheet: React.FC<SpreadsheetProps> = ({ task }) => {
           for (let c = Math.min(c1, c2); c <= Math.max(c1, c2); c++) {
             const cellLetter = String.fromCharCode(65 + c);
             const cellKey = `${cellLetter}${r}`;
-            const val = parseFloat(cells[cellKey]?.value || '0');
+            const val = parseFloat((cells[cellKey]?.value || '0').replace(/[−–—‐]/g, '-').replace(',', '.'));
             if (!isNaN(val)) values.push(val);
           }
         }
@@ -97,7 +97,7 @@ export const Spreadsheet: React.FC<SpreadsheetProps> = ({ task }) => {
           for (let c = Math.min(c1, c2); c <= Math.max(c1, c2); c++) {
             const cellLetter = String.fromCharCode(65 + c);
             const cellKey = `${cellLetter}${r}`;
-            const val = parseFloat(cells[cellKey]?.value || '0');
+            const val = parseFloat((cells[cellKey]?.value || '0').replace(/[−–—‐]/g, '-').replace(',', '.'));
             if (!isNaN(val)) values.push(val);
           }
         }
@@ -115,7 +115,7 @@ export const Spreadsheet: React.FC<SpreadsheetProps> = ({ task }) => {
           for (let c = Math.min(c1, c2); c <= Math.max(c1, c2); c++) {
             const cellLetter = String.fromCharCode(65 + c);
             const cellKey = `${cellLetter}${r}`;
-            const val = parseFloat(cells[cellKey]?.value || '0');
+            const val = parseFloat((cells[cellKey]?.value || '0').replace(/[−–—‐]/g, '-').replace(',', '.'));
             if (!isNaN(val)) values.push(val);
           }
         }

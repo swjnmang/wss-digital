@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 function areEquivalentSolutions(input: string, expectedSolution: number): boolean {
   try {
     // Akzeptiere Komma oder Punkt als Dezimaltrennzeichen
-    const normalizedInput = input.trim().replace(',', '.');
+    const normalizedInput = input.trim().replace(',', '.').replace(/[−–—‐]/g, '-');
     const userSolution = parseFloat(normalizedInput);
     if (isNaN(userSolution)) return false;
     

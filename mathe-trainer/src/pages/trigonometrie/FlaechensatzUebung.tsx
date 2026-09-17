@@ -437,7 +437,7 @@ const FlaechensatzUebung: React.FC = () => {
 
     const checkAnswer = () => {
         if (!task) return;
-        const cleaned = userAnswer.replace(',', '.');
+        const cleaned = userAnswer.replace(',', '.').replace(/[−–—‐]/g, '-');
         const value = parseFloat(cleaned);
         if (Number.isNaN(value)) {
             setFeedback('info');

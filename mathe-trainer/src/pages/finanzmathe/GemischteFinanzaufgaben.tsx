@@ -1898,7 +1898,7 @@ export default function GemischteFinanzaufgaben() {
     // Alle Punkte davor sind Tausender-Trennzeichen
     if (cleaned.includes(',')) {
       cleaned = cleaned.replace(/\./g, ''); // Entferne Punkte (Tausender-Trennzeichen)
-      cleaned = cleaned.replace(',', '.'); // Ersetze Komma durch Punkt
+      cleaned = cleaned.replace(',', '.').replace(/[−–—‐]/g, '-'); // Ersetze Komma durch Punkt
     }
     
     return parseFloat(cleaned);

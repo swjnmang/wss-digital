@@ -220,7 +220,7 @@ const RechtwinkligStrecken: React.FC = () => {
         let allCorrect = true;
 
         currentTask.toFind.forEach(key => {
-            const val = parseFloat(userAnswers[key]?.replace(',', '.') || '0');
+            const val = parseFloat(userAnswers[key]?.replace(',', '.').replace(/[−–—‐]/g, '-') || '0');
             // @ts-ignore
             const correctVal = currentTask[key];
             
