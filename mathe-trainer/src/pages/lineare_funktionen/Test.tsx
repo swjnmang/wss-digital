@@ -25,10 +25,14 @@ function createSlopeQuestion(): Question {
   let x1, y1, x2, y2
   do { x1 = randomInt(10, -10); x2 = randomInt(10, -10) } while (x1 === x2)
   y1 = randomInt(10, -10); y2 = randomInt(10, -10)
+  const slope = formatNumber((y2 - y1) / (x2 - x1))
+  if (!isFinite(slope)) {
+    return createSlopeQuestion()
+  }
   return {
     type: 'slope',
     text: `Berechne die Steigung m der Geraden durch P₁(${x1}|${y1}) und P₂(${x2}|${y2}).`,
-    answer: { m: formatNumber((y2 - y1) / (x2 - x1)) },
+    answer: { m: slope },
     answerFormat: 'single_number',
     inputPrefix: 'm ='
   }
@@ -69,6 +73,9 @@ function createEquationFromTwoPointsQuestion(): Question {
   let x2
   do { x2 = randomInt(5, -5) } while (x1 === x2)
   const y2 = formatNumber(m * x2 + t)
+  if (!isFinite(y1) || !isFinite(y2)) {
+    return createEquationFromTwoPointsQuestion()
+  }
   return {
     type: 'equation_2p',
     text: `Bestimme die Geradengleichung (y=mx+t), die durch die Punkte P₁(${x1}|${y1}) und P₂(${x2}|${y2}) verläuft.`,
@@ -104,7 +111,12 @@ function createIntersectionQuestion(): Question {
     const x_intersect = randomInt(8, -8)
     t2 = (m1 - m2) * x_intersect + t1
     const y_intersect = m1 * x_intersect + t1
-    answer = { x: formatNumber(x_intersect), y: formatNumber(y_intersect) }
+    const x_formatted = formatNumber(x_intersect)
+    const y_formatted = formatNumber(y_intersect)
+    if (!isFinite(x_formatted) || !isFinite(y_formatted)) {
+      return createIntersectionQuestion()
+    }
+    answer = { x: x_formatted, y: y_formatted }
   }
   return {
     type: 'intersection',
@@ -152,27 +164,33 @@ export default function Test() {
   }, [questions])
 
   // Initialisiere Input-States beim Fragenwechsel
-  const q = questions[current]
   useEffect(() => {
-    if (!q) return;
-    if (!inputState[current]) {
-      if (q.answerFormat === 'single_number') {
-        setInputState(s => ({ ...s, [current]: { singleVal: '' } }))
-      } else if (q.answerFormat === 'point') {
-        setInputState(s => ({ ...s, [current]: { xVal: '', yVal: '', isNone: false } }))
-      } else if (q.answerFormat === 'equation') {
-        setInputState(s => ({ ...s, [current]: { mVal: '', tVal: '' } }))
-      }
+    if (questions.length === 0 || !questions[current]) return
+    if (inputState[current]) return
+    const q = questions[current]
+    if (q.answerFormat === 'single_number') {
+      setInputState(s => ({ ...s, [current]: { singleVal: '' } }))
+    } else if (q.answerFormat === 'point') {
+      setInputState(s => ({ ...s, [current]: { xVal: '', yVal: '', isNone: false } }))
+    } else if (q.answerFormat === 'equation') {
+      setInputState(s => ({ ...s, [current]: { mVal: '', tVal: '' } }))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current, q?.answerFormat])
+  }, [current])
 
   function startTest() {
-    setQuestions(Array.from({ length: TOTAL_QUESTIONS }, () => randomChoice(questionTypes)()))
-    setUserAnswers([])
-    setCurrent(0)
-    setShowResult(false)
-    // setStarted wird durch useEffect gesetzt
+    try {
+      const newQuestions = Array.from({ length: TOTAL_QUESTIONS }, () => randomChoice(questionTypes)())
+      setQuestions(newQuestions)
+      setUserAnswers([])
+      setCurrent(0)
+      setShowResult(false)
+      setInputState({})
+      // setStarted wird durch useEffect gesetzt
+    } catch (e) {
+      console.error('Error starting test:', e)
+      alert('Ein Fehler ist beim Starten des Tests aufgetreten. Bitte versuchen Sie es erneut.')
+    }
   }
 
   function handleAnswer(ans: any) {
@@ -200,14 +218,27 @@ export default function Test() {
   // Scoring
   function isCorrect(q: Question, user: any) {
     if (!user) return false
-    if (q.answerFormat === 'single_number') {
-      return Math.abs(parseFlexibleNumber(user.val) - Number(q.answer.val)) < 0.01
-    } else if (q.answerFormat === 'point') {
-      if (user.isNone) return q.answer === 'none'
-      if (q.answer === 'none') return false
-      return Math.abs(parseFlexibleNumber(user.x) - Number(q.answer.x)) < 0.01 && Math.abs(parseFlexibleNumber(user.y) - Number(q.answer.y)) < 0.01
-    } else if (q.answerFormat === 'equation') {
-      return Math.abs(parseFlexibleNumber(user.m) - Number(q.answer.m)) < 0.01 && Math.abs(parseFlexibleNumber(user.t) - Number(q.answer.t)) < 0.01
+    try {
+      if (q.answerFormat === 'single_number') {
+        const parsed = parseFlexibleNumber(user.val)
+        if (isNaN(parsed)) return false
+        return Math.abs(parsed - Number(q.answer.val)) < 0.01
+      } else if (q.answerFormat === 'point') {
+        if (user.isNone) return q.answer === 'none'
+        if (q.answer === 'none') return false
+        const x = parseFlexibleNumber(user.x)
+        const y = parseFlexibleNumber(user.y)
+        if (isNaN(x) || isNaN(y)) return false
+        return Math.abs(x - Number(q.answer.x)) < 0.01 && Math.abs(y - Number(q.answer.y)) < 0.01
+      } else if (q.answerFormat === 'equation') {
+        const m = parseFlexibleNumber(user.m)
+        const t = parseFlexibleNumber(user.t)
+        if (isNaN(m) || isNaN(t)) return false
+        return Math.abs(m - Number(q.answer.m)) < 0.01 && Math.abs(t - Number(q.answer.t)) < 0.01
+      }
+    } catch (e) {
+      console.error('Error in isCorrect:', e)
+      return false
     }
     return false
   }
@@ -221,6 +252,9 @@ export default function Test() {
     if (score >= 6) return '5 (mangelhaft)'
     return '6 (ungenügend)'
   }
+
+  // Schutz: Check current Index
+  const q = questions.length > 0 && current >= 0 && current < questions.length ? questions[current] : null
 
   // Render
   if (!started) {
@@ -270,7 +304,7 @@ export default function Test() {
   }
 
   // Schutz: erst rendern, wenn q existiert
-  if (!q) {
+  if (!q || questions.length === 0) {
     return (
       <div className={`prose ${styles.container}`}>
         <div className={styles.card}>
