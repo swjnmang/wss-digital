@@ -185,9 +185,9 @@ const Scheitelform = () => {
 
         setSolutionSteps(
             <div>
-                <p><strong>1. Scheitelpunkt S($x_s$|$y_s$) ablesen:</strong></p>
+                <p><strong>1. Scheitelpunkt S(<InlineMath math="x_s" />|<InlineMath math="y_s" />) ablesen:</strong></p>
                 <p>Der Scheitelpunkt liegt bei S({newCorrectXs}|{newCorrectYs}).</p>
-                <p>Daraus folgt: $x_s = {newCorrectXs}$ und $y_s = {newCorrectYs}$.</p>
+                <p>Daraus folgt: <InlineMath math={`x_s = ${newCorrectXs}`} /> und <InlineMath math={`y_s = ${newCorrectYs}`} />.</p>
                 <br />
                 <p><strong>2. Formfaktor a bestimmen:</strong></p>
                 <p>Der Formfaktor war mit <strong>a = {newCorrectA}</strong> gegeben.</p>
@@ -195,8 +195,8 @@ const Scheitelform = () => {
                 <p><strong>3. Werte in die Lösungsmaske eintragen:</strong></p>
                 <ul className="list-disc pl-5">
                     <li>Der Wert für <strong>a</strong> ist {newCorrectA}.</li>
-                    <li>In der Klammer (x ... ) wird das Vorzeichen von $x_s$ umgedreht: -({newCorrectXs}) = {xsTermForInput}. Du wählst also das Vorzeichen <strong>{xsTermForInput >= 0 ? '+' : '−'}</strong> und trägst die Zahl <strong>{Math.abs(xsTermForInput)}</strong> ein.</li>
-                    <li>Nach der Klammer steht $y_s$ direkt: Du wählst das Vorzeichen <strong>{ysTermForInput >= 0 ? '+' : '−'}</strong> und trägst die Zahl <strong>{Math.abs(ysTermForInput)}</strong> ein.</li>
+                    <li>In der Klammer (x ... ) wird das Vorzeichen von <InlineMath math="x_s" /> umgedreht: -({newCorrectXs}) = {xsTermForInput}. Du wählst also das Vorzeichen <strong>{xsTermForInput >= 0 ? '+' : '−'}</strong> und trägst die Zahl <strong>{Math.abs(xsTermForInput)}</strong> ein.</li>
+                    <li>Nach der Klammer steht <InlineMath math="y_s" /> direkt: Du wählst das Vorzeichen <strong>{ysTermForInput >= 0 ? '+' : '−'}</strong> und trägst die Zahl <strong>{Math.abs(ysTermForInput)}</strong> ein.</li>
                 </ul>
                 <br />
                 <p><strong>Finale Gleichung:</strong></p>
