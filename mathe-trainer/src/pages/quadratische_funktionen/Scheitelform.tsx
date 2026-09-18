@@ -293,7 +293,7 @@ const Scheitelform = () => {
 
                                     <p className="text-sm text-slate-600 mb-4 text-center">
                                         Ergänze: <InlineMath math={String.raw`y = a(x - x_s)^2 + y_s`} /><br/>
-                                        Der Formfaktor a = ?
+                                        Der Formfaktor ist <strong>a = {correctA}</strong>.
                                     </p>
 
                                     <div className="flex flex-nowrap items-center justify-center gap-0.5 mb-6 bg-slate-50 py-2 px-1.5 rounded-lg border border-slate-200 font-mono text-sm overflow-x-auto">
