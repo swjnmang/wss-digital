@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import styles from './Ablesen.module.css'
+import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 
 declare global {
   interface Window { 
@@ -21,6 +22,8 @@ export default function Ablesen() {
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
   const [showVideoModal, setShowVideoModal] = useState(false)
+  const [showSuccessToast, setShowSuccessToast] = useState(false)
+  const toastShownRef = useRef(false)
   const [geoSize, setGeoSize] = useState<{width: number, height: number}>({width: 600, height: 600})
   const ggbRef = useRef<HTMLDivElement | null>(null)
   const ggbInstance = useRef<any>(null)
@@ -196,7 +199,6 @@ export default function Ablesen() {
         const s = document.createElement('style')
         s.id = 'ggb-hide-left-panel-style'
         s.textContent = `#ggb-container .algebraView, #ggb-container .ggbAlgebraView, #ggb-container .ggbSidebar, #ggb-container [class*="Algebra"], #ggb-container [aria-label*="Algebra"], #ggb-container .sidebar { display: none !important; }
-import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
         #ggb-container [role="complementary"] { display: none !important; }`
         document.head.appendChild(s)
       }
@@ -316,6 +318,7 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
     const slope = slopeCandidates[Math.floor(Math.random() * slopeCandidates.length)]
     const intercept = randInt(-4, 4)
     setM(slope); setT(intercept); setMInput(''); setTInput(''); setFeedback(''); setShowSolution(false)
+    setShowSuccessToast(false); toastShownRef.current = false
     if (!api) return
     const correctM = Math.round(slope * 100) / 100
     const correctT = Math.round(intercept * 100) / 100
@@ -330,6 +333,35 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
       try { if (typeof api.setCoordSystem === 'function') api.setCoordSystem(-7, 7, -7, 7) } catch(e) {}
     } catch (e) { /* ignore */ }
   }
+
+  function isMCorrect(value: string): boolean {
+    const v = parseFlexibleNumber(value)
+    return !isNaN(v) && Math.abs(v - m) < 0.03
+  }
+
+  function isTCorrect(value: string): boolean {
+    const v = parseFlexibleNumber(value)
+    return !isNaN(v) && Math.abs(v - t) < 0.03
+  }
+
+  // Live-Prüfung: sobald m UND t korrekt eingegeben wurden, kurzes Erfolgsfenster zeigen
+  useEffect(() => {
+    const bothCorrect = isMCorrect(mInput) && isTCorrect(tInput)
+    if (bothCorrect && !toastShownRef.current) {
+      toastShownRef.current = true
+      setShowSuccessToast(true)
+    } else if (!bothCorrect) {
+      toastShownRef.current = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mInput, tInput, m, t])
+
+  // Erfolgsfenster nach ein paar Sekunden automatisch ausblenden
+  useEffect(() => {
+    if (!showSuccessToast) return
+    const timer = setTimeout(() => setShowSuccessToast(false), 4000)
+    return () => clearTimeout(timer)
+  }, [showSuccessToast])
 
   function check() {
     setFeedback('')
@@ -370,8 +402,8 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
         </div>
 
         <div className={styles.inputRow}>
-          <label className={styles.label}>m = <input value={mInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMInput(e.target.value)} className={styles.input} placeholder="z.B. 1.5" /></label>
-          <label className={styles.label}>t = <input value={tInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTInput(e.target.value)} className={styles.input} placeholder="z.B. 2" /></label>
+          <label className={styles.label}>m = <input value={mInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMInput(e.target.value)} className={`${styles.input} ${isMCorrect(mInput) ? styles.inputCorrect : ''}`} placeholder="z.B. 1.5" /></label>
+          <label className={styles.label}>t = <input value={tInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTInput(e.target.value)} className={`${styles.input} ${isTCorrect(tInput) ? styles.inputCorrect : ''}`} placeholder="z.B. 2" /></label>
           {mInput && tInput && (
             <div className={styles.equation}>
               y = {mInput}x {parseFloat(tInput) >= 0 ? '+' : ''} {tInput}
@@ -409,6 +441,14 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
             <p style={{ color: '#666', fontSize: '0.875rem', margin: 0 }}>Das Video wird bei 1:44 automatisch pausiert.</p>
             <button onClick={() => setShowVideoModal(false)} style={{ marginTop: '1.5rem', backgroundColor: '#3b82f6', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>Schließen</button>
           </div>
+        </div>
+      )}
+
+      {/* Erfolgsfenster bei vollständig korrekter Eingabe */}
+      {showSuccessToast && (
+        <div className={styles.successToast}>
+          <span>Die Funktionsgleichung lautet also y = {m}x {t >= 0 ? '+ ' + t : '- ' + Math.abs(t)} - richtig gelöst :-)</span>
+          <button onClick={() => setShowSuccessToast(false)} className={styles.successToastClose} aria-label="Schließen">✕</button>
         </div>
       )}
     </div>
