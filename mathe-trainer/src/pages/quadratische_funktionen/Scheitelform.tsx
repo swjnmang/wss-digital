@@ -11,12 +11,12 @@ declare global {
 // Kleiner Umschalter, mit dem der Schüler selbst zwischen + und − wählt,
 // statt ein Vorzeichen im Kopf umdrehen und als Zahl eintippen zu müssen.
 const SignToggle = ({ value, onChange }: { value: '+' | '-' | null; onChange: (v: '+' | '-') => void }) => (
-    <div className="inline-flex rounded-md overflow-hidden border-2 border-slate-300">
+    <div className="inline-flex shrink-0 rounded-md overflow-hidden border-2 border-slate-300">
         <button
             type="button"
             onClick={() => onChange('+')}
             aria-label="Plus"
-            className={`w-9 h-11 flex items-center justify-center text-lg font-bold transition-colors ${value === '+' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
+            className={`w-5 h-8 flex items-center justify-center text-xs font-bold transition-colors ${value === '+' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
         >
             +
         </button>
@@ -24,7 +24,7 @@ const SignToggle = ({ value, onChange }: { value: '+' | '-' | null; onChange: (v
             type="button"
             onClick={() => onChange('-')}
             aria-label="Minus"
-            className={`w-9 h-11 flex items-center justify-center text-lg font-bold transition-colors border-l-2 border-slate-300 ${value === '-' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
+            className={`w-5 h-8 flex items-center justify-center text-xs font-bold transition-colors border-l-2 border-slate-300 ${value === '-' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
         >
             −
         </button>
@@ -273,12 +273,12 @@ const Scheitelform = () => {
                             </button>
                         </div>
 
-                        <div className="grid lg:grid-cols-3 gap-6">
+                        <div className="flex flex-col gap-6">
                             {/* GeoGebra */}
-                            <div className="lg:col-span-2">
+                            <div>
                                 <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200">
                                     <p className="text-lg font-bold text-slate-700 mb-4">Graph der Parabel:</p>
-                                    <div 
+                                    <div
                                         id="ggb-scheitelform"
                                         className="w-full bg-slate-50 rounded-lg border border-slate-200"
                                         style={{ minHeight: '500px' }}
@@ -287,26 +287,26 @@ const Scheitelform = () => {
                             </div>
 
                             {/* Input und Buttons */}
-                            <div className="lg:col-span-1">
-                                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 sticky top-6">
-                                    <h3 className="text-lg font-bold text-slate-800 mb-4">Scheitelform</h3>
-                                    
-                                    <p className="text-sm text-slate-600 mb-4">
+                            <div>
+                                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md border border-slate-200 max-w-xl mx-auto">
+                                    <h3 className="text-lg font-bold text-slate-800 mb-4 text-center">Scheitelform</h3>
+
+                                    <p className="text-sm text-slate-600 mb-4 text-center">
                                         Ergänze: <InlineMath math={String.raw`y = a(x - x_s)^2 + y_s`} /><br/>
                                         Der Formfaktor a = ?
                                     </p>
 
-                                    <div className="flex flex-wrap items-center justify-center gap-1.5 mb-6 bg-slate-50 p-4 rounded-lg border border-slate-200 font-mono text-lg">
-                                        <span>y =</span>
+                                    <div className="flex flex-nowrap items-center justify-center gap-0.5 mb-6 bg-slate-50 py-2 px-1.5 rounded-lg border border-slate-200 font-mono text-sm overflow-x-auto">
+                                        <span className="whitespace-nowrap shrink-0">y =</span>
                                         <input
                                             type="text"
                                             value={userA}
                                             onChange={(e) => setUserA(e.target.value)}
                                             placeholder="a"
                                             aria-label="Formfaktor a"
-                                            className="w-14 h-11 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
+                                            className="w-8 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
                                         />
-                                        <span>(x</span>
+                                        <span className="whitespace-nowrap shrink-0">(x</span>
                                         <SignToggle value={xsSign} onChange={setXsSign} />
                                         <input
                                             type="text"
@@ -314,9 +314,9 @@ const Scheitelform = () => {
                                             onChange={(e) => setUserXsAbs(e.target.value)}
                                             placeholder="xs"
                                             aria-label="Zahl im Klammerterm"
-                                            className="w-14 h-11 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
+                                            className="w-8 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
                                         />
-                                        <span>)²</span>
+                                        <span className="whitespace-nowrap shrink-0">)²</span>
                                         <SignToggle value={ysSign} onChange={setYsSign} />
                                         <input
                                             type="text"
@@ -324,18 +324,18 @@ const Scheitelform = () => {
                                             onChange={(e) => setUserYsAbs(e.target.value)}
                                             placeholder="ys"
                                             aria-label="Zahl ys"
-                                            className="w-14 h-11 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
+                                            className="w-8 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
                                         />
                                     </div>
 
-                                    <div className="flex flex-col gap-3">
-                                        <button 
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                        <button
                                             onClick={checkSolution}
                                             className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-md"
                                         >
                                             Lösung prüfen
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={() => generateNewTask(difficulty)}
                                             className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-md"
                                         >
@@ -350,7 +350,7 @@ const Scheitelform = () => {
                                     )}
 
                                     {!isCorrect && feedback && (
-                                        <button 
+                                        <button
                                             onClick={() => setShowSolution(true)}
                                             className="w-full mt-3 text-blue-600 hover:text-blue-700 font-semibold hover:underline"
                                         >
