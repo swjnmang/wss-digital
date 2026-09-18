@@ -91,6 +91,7 @@ import DerFoodtruck from './pages/finanzmathe/DerFoodtruck';
 import PruefungsModus from './pages/finanzmathe/PruefungsModus';
 // Quadratische Funktionen
 import QuadratischeFunktionenMenu from './pages/quadratische_funktionen/QuadratischeFunktionenMenu';
+import WertetabelleQF from './pages/quadratische_funktionen/Wertetabelle';
 import Normalparabel from './pages/quadratische_funktionen/Normalparabel';
 import ScheitelpunktAblesen from './pages/quadratische_funktionen/ScheitelpunktAblesen';
 import Scheitelpunkt from './pages/quadratische_funktionen/Scheitelpunkt';
@@ -345,6 +346,7 @@ export default function App() {
           <Route path="/finanzmathe/pruefungsmodus" element={<PruefungsModus />} />
 
           <Route path="/quadratische_funktionen" element={<QuadratischeFunktionenMenu />} />
+          <Route path="/quadratische_funktionen/wertetabelle" element={<WertetabelleQF />} />
           <Route path="/quadratische_funktionen/normalparabel" element={<Normalparabel />} />
           <Route path="/quadratische_funktionen/scheitelpunkt_ablesen" element={<ScheitelpunktAblesen />} />
           <Route path="/quadratische_funktionen/scheitelpunkt" element={<Scheitelpunkt />} />
