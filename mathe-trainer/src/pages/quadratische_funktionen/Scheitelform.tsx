@@ -8,6 +8,29 @@ declare global {
   }
 }
 
+// Kleiner Umschalter, mit dem der Schüler selbst zwischen + und − wählt,
+// statt ein Vorzeichen im Kopf umdrehen und als Zahl eintippen zu müssen.
+const SignToggle = ({ value, onChange }: { value: '+' | '-' | null; onChange: (v: '+' | '-') => void }) => (
+    <div className="inline-flex rounded-md overflow-hidden border-2 border-slate-300">
+        <button
+            type="button"
+            onClick={() => onChange('+')}
+            aria-label="Plus"
+            className={`w-9 h-11 flex items-center justify-center text-lg font-bold transition-colors ${value === '+' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
+        >
+            +
+        </button>
+        <button
+            type="button"
+            onClick={() => onChange('-')}
+            aria-label="Minus"
+            className={`w-9 h-11 flex items-center justify-center text-lg font-bold transition-colors border-l-2 border-slate-300 ${value === '-' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
+        >
+            −
+        </button>
+    </div>
+);
+
 const Scheitelform = () => {
     const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
     const [correctA, setCorrectA] = useState<number>(0);
@@ -17,8 +40,10 @@ const Scheitelform = () => {
     const [geoSize, setGeoSize] = useState<{ width: number; height: number }>({ width: 600, height: 500 });
     
     const [userA, setUserA] = useState<string>('');
-    const [userXs, setUserXs] = useState<string>('');
-    const [userYs, setUserYs] = useState<string>('');
+    const [xsSign, setXsSign] = useState<'+' | '-' | null>(null);
+    const [userXsAbs, setUserXsAbs] = useState<string>('');
+    const [ysSign, setYsSign] = useState<'+' | '-' | null>(null);
+    const [userYsAbs, setUserYsAbs] = useState<string>('');
     const [feedback, setFeedback] = useState<string>('');
     const [isCorrect, setIsCorrect] = useState<boolean>(false);
     const [showSolution, setShowSolution] = useState<boolean>(false);
@@ -107,8 +132,10 @@ const Scheitelform = () => {
         // Reset UI
         setFeedback('');
         setUserA('');
-        setUserXs('');
-        setUserYs('');
+        setXsSign(null);
+        setUserXsAbs('');
+        setYsSign(null);
+        setUserYsAbs('');
         setShowSolution(false);
         setIsCorrect(false);
 
@@ -168,8 +195,8 @@ const Scheitelform = () => {
                 <p><strong>3. Werte in die Lösungsmaske eintragen:</strong></p>
                 <ul className="list-disc pl-5">
                     <li>Der Wert für <strong>a</strong> ist {newCorrectA}.</li>
-                    <li>In der Klammer (x...) wird das Vorzeichen von $x_s$ umgedreht: -({newCorrectXs}) = {xsTermForInput}. Du gibst also <strong>{xsTermForInput > 0 ? '+' : ''}{xsTermForInput}</strong> ein.</li>
-                    <li>Der letzte Wert ist $y_s$ direkt: Du gibst also <strong>{ysTermForInput > 0 ? '+' : ''}{ysTermForInput}</strong> ein.</li>
+                    <li>In der Klammer (x ... ) wird das Vorzeichen von $x_s$ umgedreht: -({newCorrectXs}) = {xsTermForInput}. Du wählst also das Vorzeichen <strong>{xsTermForInput >= 0 ? '+' : '−'}</strong> und trägst die Zahl <strong>{Math.abs(xsTermForInput)}</strong> ein.</li>
+                    <li>Nach der Klammer steht $y_s$ direkt: Du wählst das Vorzeichen <strong>{ysTermForInput >= 0 ? '+' : '−'}</strong> und trägst die Zahl <strong>{Math.abs(ysTermForInput)}</strong> ein.</li>
                 </ul>
                 <br />
                 <p><strong>Finale Gleichung:</strong></p>
@@ -183,22 +210,30 @@ const Scheitelform = () => {
     }, [difficulty]);
 
     const checkSolution = () => {
-        if (userA === '' || userXs === '' || userYs === '') {
-            setFeedback('Bitte fülle alle drei Felder aus.');
+        if (userA === '' || xsSign === null || userXsAbs === '' || ysSign === null || userYsAbs === '') {
+            setFeedback('Bitte fülle alle Felder aus und wähle die Vorzeichen.');
             setIsCorrect(false);
             return;
         }
 
         const aVal = parseFloat(userA.replace(',', '.').replace(/[−–—‐]/g, '-'));
-        const xsVal = parseFloat(userXs.replace(',', '.').replace(/[−–—‐]/g, '-'));
-        const ysVal = parseFloat(userYs.replace(',', '.').replace(/[−–—‐]/g, '-'));
+        const xsAbsVal = parseFloat(userXsAbs.replace(',', '.').replace(/[−–—‐]/g, '-'));
+        const ysAbsVal = parseFloat(userYsAbs.replace(',', '.').replace(/[−–—‐]/g, '-'));
 
-        const correctXsForInput = formatNumber(-correctXs);
-        const correctYsForInput = correctYs;
+        // In der Klammer (x ± xsAbs) steht das UMGEKEHRTE Vorzeichen von xs:
+        // ist xs positiv, steht dort "-"; ist xs negativ, steht dort "+".
+        const expectedXsAbs = Math.abs(correctXs);
+        const expectedXsSign: '+' | '-' = correctXs > 0 ? '-' : '+';
+        const isXsSignCorrect = correctXs === 0 ? true : xsSign === expectedXsSign;
+        const isXsCorrect = isXsSignCorrect && Math.abs(xsAbsVal - expectedXsAbs) < 0.01;
+
+        // Nach der Klammer steht ys direkt mit seinem eigenen Vorzeichen.
+        const expectedYsAbs = Math.abs(correctYs);
+        const expectedYsSign: '+' | '-' = correctYs < 0 ? '-' : '+';
+        const isYsSignCorrect = correctYs === 0 ? true : ysSign === expectedYsSign;
+        const isYsCorrect = isYsSignCorrect && Math.abs(ysAbsVal - expectedYsAbs) < 0.01;
 
         const isACorrect = Math.abs(aVal - correctA) < 0.01;
-        const isXsCorrect = Math.abs(xsVal - correctXsForInput) < 0.01;
-        const isYsCorrect = Math.abs(ysVal - correctYsForInput) < 0.01;
 
         if (isACorrect && isXsCorrect && isYsCorrect) {
             setFeedback('Richtig! Ausgezeichnet!');
@@ -256,44 +291,41 @@ const Scheitelform = () => {
                                 <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 sticky top-6">
                                     <h3 className="text-lg font-bold text-slate-800 mb-4">Scheitelform</h3>
                                     
-                                    <p className="text-sm text-slate-600 mb-6">
+                                    <p className="text-sm text-slate-600 mb-4">
                                         Ergänze: <InlineMath math={String.raw`y = a(x - x_s)^2 + y_s`} /><br/>
-                                        Der Formfaktor ist <strong>a = {correctA}</strong>.
+                                        Der Formfaktor a = ?
                                     </p>
 
-                                    <div className="space-y-3 mb-6">
-                                        <div>
-                                            <label className="block text-sm font-semibold text-slate-600 mb-1">a</label>
-                                            <input
-                                                type="text"
-                                                value={userA}
-                                                onChange={(e) => setUserA(e.target.value)}
-                                                placeholder="z.B. 1 oder -2"
-                                                className="w-full p-3 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-semibold text-slate-600 mb-1">xs (Vorzeichen umgekehrt!)</label>
-                                            <input
-                                                type="text"
-                                                value={userXs}
-                                                onChange={(e) => setUserXs(e.target.value)}
-                                                placeholder="z.B. +2 oder -3"
-                                                className="w-full p-3 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-semibold text-slate-600 mb-1">ys</label>
-                                            <input
-                                                type="text"
-                                                value={userYs}
-                                                onChange={(e) => setUserYs(e.target.value)}
-                                                placeholder="z.B. +1 oder -4"
-                                                className="w-full p-3 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
-                                            />
-                                        </div>
+                                    <div className="flex flex-wrap items-center justify-center gap-1.5 mb-6 bg-slate-50 p-4 rounded-lg border border-slate-200 font-mono text-lg">
+                                        <span>y =</span>
+                                        <input
+                                            type="text"
+                                            value={userA}
+                                            onChange={(e) => setUserA(e.target.value)}
+                                            placeholder="a"
+                                            aria-label="Formfaktor a"
+                                            className="w-14 h-11 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
+                                        />
+                                        <span>(x</span>
+                                        <SignToggle value={xsSign} onChange={setXsSign} />
+                                        <input
+                                            type="text"
+                                            value={userXsAbs}
+                                            onChange={(e) => setUserXsAbs(e.target.value)}
+                                            placeholder="xs"
+                                            aria-label="Zahl im Klammerterm"
+                                            className="w-14 h-11 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
+                                        />
+                                        <span>)²</span>
+                                        <SignToggle value={ysSign} onChange={setYsSign} />
+                                        <input
+                                            type="text"
+                                            value={userYsAbs}
+                                            onChange={(e) => setUserYsAbs(e.target.value)}
+                                            placeholder="ys"
+                                            aria-label="Zahl ys"
+                                            className="w-14 h-11 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
+                                        />
                                     </div>
 
                                     <div className="flex flex-col gap-3">
