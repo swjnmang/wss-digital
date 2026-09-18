@@ -3,6 +3,7 @@ import styles from './GemischteAufgaben.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import GeoGebraMultiGraph from '../../components/GeoGebraMultiGraph'
+import { roundHalfAwayFromZero } from '../../utils/numbers'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -46,7 +47,7 @@ const Wertetabelle = ({ m, t, value, onChange, validierteZellen }: WertetabelleP
 
     // Beide Felder müssen gefüllt sein UND gültige Zahlen sein
     if (!isNaN(x) && !isNaN(y) && newValues[rowIndex].x !== '' && newValues[rowIndex].y !== '') {
-      const expectedY = Math.round((m * x + t) * 100) / 100
+      const expectedY = roundHalfAwayFromZero(m * x + t)
       // Toleranz: 1% des erwarteten Wertes oder 0.02, je größer
       const maxError = Math.max(Math.abs(expectedY) * 0.01, 0.02)
       
@@ -164,7 +165,7 @@ const aufgabenBanks = {
     const y1 = randInt(-5, 5)
     const y2 = randInt(-5, 5)
     const m = (y2 - y1) / (x2 - x1)
-    const mRound = Math.round(m * 100) / 100
+    const mRound = roundHalfAwayFromZero(m)
     return {
       typ: 'steigungBerechnen',
       thema: '3. Steigung berechnen',
@@ -184,9 +185,10 @@ const aufgabenBanks = {
     const y1 = randInt(-5, 5)
     const y2 = randInt(-5, 5)
     const m = (y2 - y1) / (x2 - x1)
-    const t = y1 - m * x1
-    const mRound = Math.round(m * 100) / 100
-    const tRound = Math.round(t * 100) / 100
+    const mRound = roundHalfAwayFromZero(m)
+    // t wird aus dem GERUNDETEN m berechnet, damit der gezeigte Lösungsweg
+    // (Schritt 2/3, die mit mRound rechnen) auch tatsächlich zu tRound führt.
+    const tRound = roundHalfAwayFromZero(y1 - mRound * x1)
     return {
       typ: 'funktionsgleichung',
       thema: '4. Funktionsgleichung aufstellen',
@@ -202,7 +204,7 @@ const aufgabenBanks = {
     const m = slopes[randInt(0, slopes.length - 1)]
     const t = randInt(-4, 4)
     const x = randInt(-3, 3)
-    const y = Math.round((m * x + t) * 100) / 100
+    const y = roundHalfAwayFromZero(m * x + t)
     const variantIdx = randInt(0, 2)
     let testY = y
     if (variantIdx === 1) {
@@ -226,7 +228,7 @@ const aufgabenBanks = {
     let m = slopes[randInt(0, slopes.length - 1)]
     let t = randInt(-4, 4)
     if (m === 0 || t === 0) return aufgabenBanks.nullstellen()
-    const nullstelle = Math.round((-t / m) * 100) / 100
+    const nullstelle = roundHalfAwayFromZero(-t / m)
     return {
       typ: 'nullstellen',
       thema: '6. Nullstellen berechnen',
@@ -246,8 +248,8 @@ const aufgabenBanks = {
     } while (m1 === m2)
     const t1 = randInt(-3, 3)
     const t2 = randInt(-3, 3)
-    const x = Math.round(((t2 - t1) / (m1 - m2)) * 100) / 100
-    const y = Math.round((m1 * x + t1) * 100) / 100
+    const x = roundHalfAwayFromZero((t2 - t1) / (m1 - m2))
+    const y = roundHalfAwayFromZero(m1 * x + t1)
     return {
       typ: 'schnittpunkt',
       thema: '7. Schnittpunkt zweier Geraden',
