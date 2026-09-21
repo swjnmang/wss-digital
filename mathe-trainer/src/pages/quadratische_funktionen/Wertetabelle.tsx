@@ -24,15 +24,22 @@ function randInt(min: number, max: number) {
 // Anzahl der Wertepaare pro Wertetabelle (mindestens 8, Schrittweite 0,5)
 const ANZAHL_WERTEPAARE = 8
 
-// Generiert x-Werte mit Schrittweite 0,5 aus dem gesamten Bereich [-5, 5],
-// damit sich der Graph anschließend vernünftig zeichnen lässt (z.B. bei
-// y = a·x² auch die linke Parabelhälfte und der Scheitelpunkt sichtbar sind).
+// Generiert x-Werte mit Schrittweite 0,5, verteilt über ein 5 Einheiten
+// breites Fenster um `zentrum`, damit sich der Graph anschließend vernünftig
+// zeichnen lässt. Bei y = a·x² bzw. y = a·x² + c liegt der Scheitelpunkt immer
+// bei x = 0 (Standardwert von `zentrum`), sodass z.B. auch die linke
+// Parabelhälfte sichtbar ist. Bei "schwer" (y = a·x² + b·x + c) ist der
+// Scheitelpunkt bei x_s = -b/(2a) meist verschoben – dort wird `zentrum`
+// entsprechend auf x_s gesetzt, damit der Scheitelpunkt im Blickfeld bleibt.
 // Dazu wird das Raster in `anzahl` etwa gleich große Abschnitte geteilt und aus
 // jedem Abschnitt ein zufälliger Wert gewählt – der gesamte Bereich ist so
 // abgedeckt, ohne dass zwingend jeder einzelne Rasterwert vorkommen muss.
-function generateXWerte(anzahl: number = ANZAHL_WERTEPAARE): number[] {
+function generateXWerte(anzahl: number = ANZAHL_WERTEPAARE, zentrum: number = 0): number[] {
+  const zentrumGerundet = Math.round(zentrum * 2) / 2
+  const halbspanne = 2.5
+
   const raster: number[] = []
-  for (let v = -5; v <= 5; v += 0.5) {
+  for (let v = zentrumGerundet - halbspanne; v <= zentrumGerundet + halbspanne; v += 0.5) {
     raster.push(Math.round(v * 10) / 10)
   }
 
@@ -385,6 +392,12 @@ export default function Wertetabelle() {
         aufgabe.a = aBruch
         aufgabe.b = bBruch
         aufgabe.c = cBruch
+
+        // Bei "schwer" ist der Scheitelpunkt x_s = -b/(2a) meist nicht mehr 0,
+        // daher die x-Werte neu um den tatsächlichen Scheitelpunkt zentrieren,
+        // statt sie (wie bei einfach/mittel passend) um x = 0 zu verteilen.
+        const scheitelpunktXs = -bBruch / (2 * aBruch)
+        aufgabe.xWerte = generateXWerte(ANZAHL_WERTEPAARE, scheitelpunktXs)
 
         const funktionsgleichungText = formatEquation(aBruch, bBruch, cBruch)
         aufgabe.funktionsgleichung = funktionsgleichungText
