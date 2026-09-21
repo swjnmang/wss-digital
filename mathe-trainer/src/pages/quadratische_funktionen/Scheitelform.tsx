@@ -290,11 +290,11 @@ const Scheitelform = () => {
                         <div className="flex flex-col gap-6">
                             {/* GeoGebra */}
                             <div>
-                                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 max-w-3xl mx-auto">
                                     <p className="text-lg font-bold text-slate-700 mb-4">Graph der Parabel:</p>
                                     <div
                                         id="ggb-scheitelform"
-                                        className="w-full bg-slate-50 rounded-lg border border-slate-200"
+                                        className="w-full bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-center"
                                         style={{ minHeight: '500px' }}
                                     ></div>
                                 </div>
