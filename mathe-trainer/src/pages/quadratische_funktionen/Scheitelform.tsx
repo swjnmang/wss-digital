@@ -55,6 +55,20 @@ const Scheitelform = () => {
     const randomInt = (max: number, min: number = 0) => Math.floor(Math.random() * (max - min + 1)) + min;
     const randomChoice = (arr: number[]) => arr[Math.floor(Math.random() * arr.length)];
 
+    // Baut aus den bisherigen Eingaben live die LaTeX-Gleichung auf, damit
+    // der Schüler direkt sieht, wie sich seine Eingabe in der Formel niederschlägt.
+    const buildLivePreviewLatex = (): string => {
+        const cleanNumber = (raw: string) => raw.trim().replace(',', '.').replace(/[−–—‐]/g, '-');
+
+        const aPart = userA.trim() !== '' ? cleanNumber(userA) : 'a';
+        const xsAbsPart = userXsAbs.trim() !== '' ? cleanNumber(userXsAbs) : 'x_s';
+        const ysAbsPart = userYsAbs.trim() !== '' ? cleanNumber(userYsAbs) : 'y_s';
+        const xsSignLatex = xsSign ?? '\\pm';
+        const ysSignLatex = ysSign ?? '\\pm';
+
+        return `y = ${aPart}\\left(x ${xsSignLatex} ${xsAbsPart}\\right)^2 ${ysSignLatex} ${ysAbsPart}`;
+    };
+
     // Responsive sizing
     useEffect(() => {
         const calculateSize = () => {
@@ -296,7 +310,7 @@ const Scheitelform = () => {
                                         Der Formfaktor ist <strong>a = {correctA}</strong>.
                                     </p>
 
-                                    <div className="flex flex-nowrap items-center justify-center gap-0.5 mb-6 bg-slate-50 py-2 px-1.5 rounded-lg border border-slate-200 font-mono text-sm overflow-x-auto">
+                                    <div className="flex flex-nowrap items-center justify-center gap-1 mb-4 bg-slate-50 py-2 px-1.5 rounded-lg border border-slate-200 font-mono text-sm overflow-x-auto">
                                         <span className="whitespace-nowrap shrink-0">y =</span>
                                         <input
                                             type="text"
@@ -304,7 +318,7 @@ const Scheitelform = () => {
                                             onChange={(e) => setUserA(e.target.value)}
                                             placeholder="a"
                                             aria-label="Formfaktor a"
-                                            className="w-8 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
+                                            className="w-16 h-10 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
                                         />
                                         <span className="whitespace-nowrap shrink-0">(x</span>
                                         <SignToggle value={xsSign} onChange={setXsSign} />
@@ -314,7 +328,7 @@ const Scheitelform = () => {
                                             onChange={(e) => setUserXsAbs(e.target.value)}
                                             placeholder="xs"
                                             aria-label="Zahl im Klammerterm"
-                                            className="w-8 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
+                                            className="w-16 h-10 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
                                         />
                                         <span className="whitespace-nowrap shrink-0">)²</span>
                                         <SignToggle value={ysSign} onChange={setYsSign} />
@@ -324,8 +338,13 @@ const Scheitelform = () => {
                                             onChange={(e) => setUserYsAbs(e.target.value)}
                                             placeholder="ys"
                                             aria-label="Zahl ys"
-                                            className="w-8 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
+                                            className="w-16 h-10 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
                                         />
+                                    </div>
+
+                                    <div className="mb-6 bg-blue-50 py-3 px-3 rounded-lg border border-blue-200 text-center overflow-x-auto">
+                                        <p className="text-xs font-semibold text-blue-700 mb-1">Deine Gleichung:</p>
+                                        <InlineMath math={buildLivePreviewLatex()} />
                                     </div>
 
                                     <div className="flex flex-col sm:flex-row gap-3">
