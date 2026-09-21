@@ -292,11 +292,16 @@ const Scheitelform = () => {
                             <div>
                                 <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 max-w-3xl mx-auto">
                                     <p className="text-lg font-bold text-slate-700 mb-4">Graph der Parabel:</p>
-                                    <div
-                                        id="ggb-scheitelform"
-                                        className="w-full bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-center"
-                                        style={{ minHeight: '500px' }}
-                                    ></div>
+                                    {/* GeoGebra setzt beim Einfügen oft eine eigene, feste Breite auf das
+                                        Zielelement selbst – daher zentriert der Flex-Wrapper von außen,
+                                        statt sich darauf zu verlassen, dass das Zielelement mittig bleibt. */}
+                                    <div className="w-full flex justify-center">
+                                        <div
+                                            id="ggb-scheitelform"
+                                            className="w-full bg-slate-50 rounded-lg border border-slate-200"
+                                            style={{ minHeight: '500px' }}
+                                        ></div>
+                                    </div>
                                 </div>
                             </div>
 
