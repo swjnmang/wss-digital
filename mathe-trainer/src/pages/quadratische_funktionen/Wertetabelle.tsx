@@ -21,6 +21,26 @@ function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+// Anzahl der Wertepaare pro Wertetabelle (mindestens 8, Schrittweite 0,5)
+const ANZAHL_WERTEPAARE = 8
+
+// Generiert eine zusammenhängende Folge von x-Werten mit Schrittweite 0,5,
+// die vollständig im Bereich [-5, 5] liegt, damit sie sich sinnvoll in ein
+// Koordinatensystem einzeichnen lässt.
+function generateXWerte(anzahl: number = ANZAHL_WERTEPAARE): number[] {
+  const spanne = (anzahl - 1) * 0.5
+  const minStart = -5
+  const maxStart = 5 - spanne
+  const schritte = Math.round((maxStart - minStart) / 0.5)
+  const start = minStart + randInt(0, schritte) * 0.5
+
+  const xWerte: number[] = []
+  for (let i = 0; i < anzahl; i++) {
+    xWerte.push(Math.round((start + i * 0.5) * 10) / 10)
+  }
+  return xWerte
+}
+
 // Generiert zufällige a, b, c Werte: a ∈ [-3, 3] \ {0} mit Schrittweite 0.5,
 // b, c ∈ [-5, 5] mit Schrittweite 0.5
 function generateRandomABC() {
@@ -198,13 +218,13 @@ const aufgabenBanks = {
     return {
       typ: 'leereTabelleAusfüllen',
       thema: '1. Wertetabelle aus Funktionsgleichung',
-      frage: `Gegeben ist die Funktionsgleichung ${formatEquation(a, b, c)}. Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.`,
+      frage: `Gegeben ist die Funktionsgleichung ${formatEquation(a, b, c)}. Erstelle eine Wertetabelle mit mindestens ${ANZAHL_WERTEPAARE} Wertepaaren. Wähle dazu x-Werte zwischen -5 und 5 mit einer Schrittweite von 0,5.`,
       a,
       b,
       c,
       funktionsgleichung: formatEquation(a, b, c),
       funktionsgleichungLatex: formatEquationLatex(a, b, c),
-      numZeilen: 4,
+      numZeilen: ANZAHL_WERTEPAARE,
       lösungsweg: `Setze verschiedene x-Werte in die Funktionsgleichung ein und berechne die entsprechenden y-Werte.`,
       rechenbeispiele
     }
@@ -217,18 +237,8 @@ const aufgabenBanks = {
     const { a, b, c } = generateRandomABC()
     const rechenbeispiele = generateRechenbeispiele(a, b, c)
 
-    const xWerte: number[] = []
-    const yWerte: number[] = []
-
-    const verwendeteX = new Set<number>()
-    while (xWerte.length < 5) {
-      const x = randInt(-5, 5)
-      if (!verwendeteX.has(x)) {
-        verwendeteX.add(x)
-        xWerte.push(x)
-        yWerte.push(berechneY(a, b, c, x))
-      }
-    }
+    const xWerte = generateXWerte()
+    const yWerte = xWerte.map(x => berechneY(a, b, c, x))
 
     return {
       typ: 'teilweisgefülltVervollständigen',
@@ -314,7 +324,7 @@ export default function Wertetabelle() {
         aufgabe.c = 0
         aufgabe.funktionsgleichung = formatEquation(a, 0, 0)
         aufgabe.funktionsgleichungLatex = formatEquationLatex(a, 0, 0)
-        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
+        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? `Erstelle eine Wertetabelle mit mindestens ${ANZAHL_WERTEPAARE} Wertepaaren. Wähle dazu x-Werte zwischen -5 und 5 mit einer Schrittweite von 0,5.` : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
 
         if (aufgabenTyp === 'teilweisgefülltVervollständigen') {
           aufgabe.yWerte = aufgabe.xWerte.map((x: number) => berechneY(a, 0, 0, x))
@@ -329,7 +339,7 @@ export default function Wertetabelle() {
         aufgabe.b = 0
         aufgabe.funktionsgleichung = formatEquation(a, 0, c)
         aufgabe.funktionsgleichungLatex = formatEquationLatex(a, 0, c)
-        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
+        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? `Erstelle eine Wertetabelle mit mindestens ${ANZAHL_WERTEPAARE} Wertepaaren. Wähle dazu x-Werte zwischen -5 und 5 mit einer Schrittweite von 0,5.` : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
 
         if (aufgabenTyp === 'teilweisgefülltVervollständigen') {
           aufgabe.yWerte = aufgabe.xWerte.map((x: number) => berechneY(a, 0, c, x))
@@ -351,7 +361,7 @@ export default function Wertetabelle() {
         const funktionsgleichungText = formatEquation(aBruch, bBruch, cBruch)
         aufgabe.funktionsgleichung = funktionsgleichungText
         aufgabe.funktionsgleichungLatex = formatEquationLatex(aBruch, bBruch, cBruch)
-        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${funktionsgleichungText}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
+        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${funktionsgleichungText}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? `Erstelle eine Wertetabelle mit mindestens ${ANZAHL_WERTEPAARE} Wertepaaren. Wähle dazu x-Werte zwischen -5 und 5 mit einer Schrittweite von 0,5.` : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
 
         if (aufgabenTyp === 'teilweisgefülltVervollständigen') {
           aufgabe.yWerte = aufgabe.xWerte.map((x: number) => berechneY(aBruch, bBruch, cBruch, x))
