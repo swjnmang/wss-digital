@@ -213,29 +213,30 @@ function eingabeTask(
 
 function genV1(): GeneratedTask {
   const v = choice(VARS);
-  const n = randInt(3, 4);
-  const coeffs = Array.from({ length: n }, () => randInt(1, 6));
-  const monoms = coeffs.map((c) => monom(c, { [v]: 1 }));
+  const n = randInt(2, 5);
+  const coeffs = Array.from({ length: n }, () => randInt(1, 9));
+  const monoms = shuffle(coeffs.map((c) => monom(c, { [v]: 1 })));
   const sum = coeffs.reduce((a, b) => a + b, 0);
   return eingabeTask(formatPoly(monoms), monoms, [
     `Alle Terme sind gleichartig – sie enthalten dieselbe Variable ${v}.`,
-    `Beachte: ${v} = 1${v}. Addiere die Koeffizienten: ${coeffs.join(' + ')} = ${sum}`,
+    `Beachte: ${v} = 1${v}. Addiere die Koeffizienten: ${koeffKette(coeffs)} = ${sum}`,
     `Ergebnis: ${formatPoly(simplifyPoly(monoms))}`,
   ]);
 }
 
 function genV2(): GeneratedTask {
   const v = choice(VARS);
-  const n = randInt(3, 4);
+  const n = randInt(3, 5);
   const dezimal = Math.random() < 0.4;
   const coeffs: number[] = [];
   for (let i = 0; i < n; i++) {
-    let c = dezimal ? randInt(3, 24) / 2 : randInt(2, 15);
-    if (i > 0 && Math.random() < 0.55) c = -c;
+    let c = dezimal ? randInt(3, 24) / 2 : randInt(2, 18);
+    if (Math.random() < 0.5) c = -c;
     coeffs.push(c);
   }
-  if (!coeffs.some((c) => c < 0)) coeffs[n - 1] = -coeffs[n - 1];
-  const monoms = coeffs.map((c) => monom(c, { [v]: 1 }));
+  if (!coeffs.some((c) => c < 0)) coeffs[randInt(0, n - 1)] = -coeffs[randInt(0, n - 1)];
+  if (!coeffs.some((c) => c > 0)) coeffs[randInt(0, n - 1)] = Math.abs(coeffs[randInt(0, n - 1)]);
+  const monoms = shuffle(coeffs.map((c) => monom(c, { [v]: 1 })));
   return eingabeTask(formatPoly(monoms), monoms, [
     `Alle Terme enthalten ${v} – rechne die Koeffizienten mit Vorzeichen zusammen:`,
     ...zusammenfassenWeg(monoms),
@@ -243,14 +244,19 @@ function genV2(): GeneratedTask {
 }
 
 function genV3(): GeneratedTask {
-  const nVars = Math.random() < 0.3 ? 3 : 2;
+  const nVars = choice([2, 2, 3]);
   const vs = randVars(nVars);
   const monoms: Monom[] = [];
   for (const v of vs) {
-    const c1 = randInt(2, 12);
-    let c2 = Math.random() < 0.6 ? -randInt(1, 9) : randInt(1, 9);
-    if (c1 + c2 === 0) c2 += 1;
-    monoms.push(monom(c1, { [v]: 1 }), monom(c2, { [v]: 1 }));
+    const anzahl = choice([2, 2, 3]);
+    const teilCoeffs: number[] = [];
+    for (let i = 0; i < anzahl; i++) {
+      const c = Math.random() < 0.55 ? -randInt(1, 12) : randInt(1, 12);
+      teilCoeffs.push(c);
+    }
+    const summe = teilCoeffs.reduce((a, b) => a + b, 0);
+    if (summe === 0) teilCoeffs[0] += 1;
+    teilCoeffs.forEach((c) => monoms.push(monom(c, { [v]: 1 })));
   }
   const order = shuffle(monoms);
   return eingabeTask(formatPoly(order), order, [
@@ -260,23 +266,33 @@ function genV3(): GeneratedTask {
 }
 
 function genV4(): GeneratedTask {
-  const [v1, v2] = randVars(2);
+  const nVars = choice([2, 2, 3]);
+  const [v1, v2, v3] = randVars(nVars);
   const monoms: Monom[] = [];
+
   const a1 = randInt(2, 9);
   let a2 = Math.random() < 0.6 ? -randInt(1, 7) : randInt(1, 7);
   if (a1 + a2 === 0) a2 += 1;
   monoms.push(monom(a1, { [v1]: 1 }), monom(a2, { [v1]: 1 }));
+
   monoms.push(monom(randInt(2, 9), { [v2]: 1 }));
   if (Math.random() < 0.5) {
     monoms.push(monom(Math.random() < 0.5 ? -randInt(1, 6) : randInt(1, 6), { [v2]: 1 }));
   }
-  monoms.push(monom(randInt(1, 12)), monom(-randInt(1, 9)));
+  if (v3 && Math.random() < 0.5) {
+    monoms.push(monom(Math.random() < 0.5 ? -randInt(1, 8) : randInt(1, 8), { [v3]: 1 }));
+  }
+
+  const nZahlen = randInt(2, 3);
+  for (let i = 0; i < nZahlen; i++) {
+    monoms.push(monom(Math.random() < 0.5 ? -randInt(1, 12) : randInt(1, 12)));
+  }
   if (Math.random() < 0.35) {
     monoms.push(monom(randInt(2, 5), { [v1]: 1, [v2]: 1 }));
   }
   const order = shuffle(monoms);
   return eingabeTask(formatPoly(order), order, [
-    `Achtung: ${v1}, ${v2}, ${v1}${v2} und Zahlen sind NICHT gleichartig – nur gleiche Sorten zusammenfassen!`,
+    `Achtung: verschiedene Variablen, Variablenpaare und Zahlen sind NICHT gleichartig – nur gleiche Sorten zusammenfassen!`,
     ...zusammenfassenWeg(order),
   ]);
 }
@@ -288,8 +304,8 @@ function genV4(): GeneratedTask {
 function genM1(): GeneratedTask {
   const v = choice(VARS);
   if (Math.random() < 0.5) {
-    const a = randInt(2, 12);
-    const k = randInt(2, 9);
+    const a = randInt(2, 15);
+    const k = randInt(2, 12);
     const zuerst = Math.random() < 0.5;
     const ausdruck = zuerst ? `${a}${v} · ${k}` : `${k} · ${a}${v}`;
     return eingabeTask(ausdruck, [monom(a * k, { [v]: 1 })], [
@@ -299,8 +315,8 @@ function genM1(): GeneratedTask {
       `Ergebnis: ${a * k}${v}`,
     ]);
   }
-  const d = randInt(2, 9);
-  const r = randInt(2, 12);
+  const d = randInt(2, 11);
+  const r = randInt(2, 14);
   return eingabeTask(`${d * r}${v} : ${d}`, [monom(r, { [v]: 1 })], [
     'Dividiere den Koeffizienten durch die Zahl:',
     `${d * r} : ${d} = ${r}`,
@@ -311,9 +327,9 @@ function genM1(): GeneratedTask {
 
 function genM2(): GeneratedTask {
   const [v, w] = randVars(2);
-  const a = randInt(2, 12);
-  const b = randInt(2, 9);
-  const variante = randInt(1, 3);
+  const a = randInt(2, 14);
+  const b = randInt(2, 11);
+  const variante = randInt(1, 4);
   let ausdruck: string;
   let coeffZeile: string;
   let gesamt: number;
@@ -322,12 +338,19 @@ function genM2(): GeneratedTask {
     coeffZeile = `${a} · ${b} = ${a * b}`;
     gesamt = a * b;
   } else if (variante === 2) {
-    const k = randInt(2, 5);
-    ausdruck = `${k} · ${a}${v} · ${b}${w}`;
+    ausdruck = `${b}${w} · ${a}${v}`;
+    coeffZeile = `${b} · ${a} = ${a * b}`;
+    gesamt = a * b;
+  } else if (variante === 3) {
+    const k = randInt(2, 6);
+    const reihenfolge = choice(['kav', 'akv', 'avk'] as const);
+    if (reihenfolge === 'kav') ausdruck = `${k} · ${a}${v} · ${b}${w}`;
+    else if (reihenfolge === 'akv') ausdruck = `${a}${v} · ${k} · ${b}${w}`;
+    else ausdruck = `${a}${v} · ${b}${w} · ${k}`;
     coeffZeile = `${k} · ${a} · ${b} = ${k * a * b}`;
     gesamt = k * a * b;
   } else {
-    ausdruck = `${a}${v} · ${w}`;
+    ausdruck = Math.random() < 0.5 ? `${a}${v} · ${w}` : `${w} · ${a}${v}`;
     coeffZeile = `${a} · 1 = ${a}`;
     gesamt = a;
   }
@@ -342,7 +365,7 @@ function genM2(): GeneratedTask {
 
 function genM3(): GeneratedTask {
   const [v, w] = randVars(2);
-  const variante = randInt(1, 3);
+  const variante = randInt(1, 4);
   if (variante === 1) {
     return eingabeTask(`${v} · ${v}`, [monom(1, { [v]: 2 })], [
       'Gleiche Variablen multipliziert ergeben eine Potenz:',
@@ -350,31 +373,56 @@ function genM3(): GeneratedTask {
       `Ergebnis: ${v}²`,
     ]);
   }
-  const a = randInt(2, 8);
-  const b = randInt(2, 6);
+  const a = randInt(2, 9);
+  const b = randInt(2, 7);
   if (variante === 2) {
-    return eingabeTask(`${a}${v} · ${b}${v}`, [monom(a * b, { [v]: 2 })], [
-      `Zahlen multiplizieren: ${a} · ${b} = ${a * b}`,
+    const nurZweiterHatKoeffizient = Math.random() < 0.5;
+    const ausdruck = nurZweiterHatKoeffizient ? `${v} · ${a}${v}` : `${a}${v} · ${b}${v}`;
+    const koeffZeile = nurZweiterHatKoeffizient
+      ? `1 · ${a} = ${a}`
+      : `${a} · ${b} = ${a * b}`;
+    const gesamt = nurZweiterHatKoeffizient ? a : a * b;
+    return eingabeTask(ausdruck, [monom(gesamt, { [v]: 2 })], [
+      `Zahlen multiplizieren: ${koeffZeile}`,
       `Gleiche Variablen ergeben eine Potenz: ${v} · ${v} = ${v}²`,
-      `Ergebnis: ${a * b}${v}²`,
+      `Ergebnis: ${gesamt}${v}²`,
     ]);
   }
-  return eingabeTask(`${a}${v} · ${b}${v} · ${w}`, [monom(a * b, { [v]: 2, [w]: 1 })], [
-    `Zahlen multiplizieren: ${a} · ${b} = ${a * b}`,
-    `Variablen multiplizieren: ${v} · ${v} · ${w} = ${v}²${w}`,
-    `Ergebnis: ${formatPoly(simplifyPoly([monom(a * b, { [v]: 2, [w]: 1 })]))}`,
+  if (variante === 3) {
+    const reihenfolge = choice(['vvw', 'vwv', 'wvv'] as const);
+    const ausdruck =
+      reihenfolge === 'vvw'
+        ? `${a}${v} · ${b}${v} · ${w}`
+        : reihenfolge === 'vwv'
+        ? `${a}${v} · ${w} · ${b}${v}`
+        : `${w} · ${a}${v} · ${b}${v}`;
+    return eingabeTask(ausdruck, [monom(a * b, { [v]: 2, [w]: 1 })], [
+      `Zahlen multiplizieren: ${a} · ${b} = ${a * b}`,
+      `Variablen multiplizieren: ${v} · ${v} · ${w} = ${v}²${w}`,
+      `Ergebnis: ${formatPoly(simplifyPoly([monom(a * b, { [v]: 2, [w]: 1 })]))}`,
+    ]);
+  }
+  const c = randInt(2, 6);
+  return eingabeTask(`${a}${v} · ${b}${w} · ${c}${w}`, [monom(a * b * c, { [v]: 1, [w]: 2 })], [
+    `Zahlen multiplizieren: ${a} · ${b} · ${c} = ${a * b * c}`,
+    `Gleiche Variablen ergeben eine Potenz: ${w} · ${w} = ${w}²`,
+    `Ergebnis: ${formatPoly(simplifyPoly([monom(a * b * c, { [v]: 1, [w]: 2 })]))}`,
   ]);
 }
 
 function genM4(): GeneratedTask {
   const [v, w] = randVars(2);
-  const variante = randInt(1, 3);
+  const variante = randInt(1, 4);
   if (variante === 1) {
     const d = choice([2, 3, 4, 6]);
     const a = d * randInt(1, 4);
     const b = randInt(2, 8);
     const ergebnis = (a * b) / d;
-    return eingabeTask(`${a}${v} · ${b}${w} : ${d}`, [monom(ergebnis, { [v]: 1, [w]: 1 })], [
+    const reihenfolge = Math.random() < 0.5;
+    const ausdruck = reihenfolge
+      ? `${a}${v} · ${b}${w} : ${d}`
+      : `${b}${w} · ${a}${v} : ${d}`;
+    return eingabeTask(ausdruck, [monom(ergebnis, { [v]: 1, [w]: 1 })], [
       `Erst multiplizieren: ${a} · ${b} = ${a * b}`,
       `Dann dividieren: ${a * b} : ${d} = ${formatNumber(ergebnis)}`,
       `Variablen: ${v} · ${w} = ${v}${w}`,
@@ -382,21 +430,32 @@ function genM4(): GeneratedTask {
     ]);
   }
   if (variante === 2) {
-    const d = randInt(2, 9);
-    const r = randInt(2, 9);
+    const d = randInt(2, 11);
+    const r = randInt(2, 11);
     return eingabeTask(`${d * r}${v} : (-${d})`, [monom(-r, { [v]: 1 })], [
       'Beachte das Vorzeichen: positiv durch negativ ergibt negativ.',
       `${d * r} : (-${d}) = -${r}`,
       `Ergebnis: -${r}${v}`,
     ]);
   }
-  const a = randInt(2, 9);
-  const b = randInt(2, 7);
-  return eingabeTask(`${a}${v} · (-${b}${w})`, [monom(-a * b, { [v]: 1, [w]: 1 })], [
-    'Beachte das Vorzeichen: plus mal minus ergibt minus.',
-    `${a} · (-${b}) = -${a * b}`,
-    `Variablen: ${v} · ${w} = ${v}${w}`,
-    `Ergebnis: -${a * b}${v}${w}`,
+  if (variante === 3) {
+    const a = randInt(2, 11);
+    const b = randInt(2, 9);
+    const zuerst = Math.random() < 0.5;
+    const ausdruck = zuerst ? `${a}${v} · (-${b}${w})` : `(-${b}${w}) · ${a}${v}`;
+    return eingabeTask(ausdruck, [monom(-a * b, { [v]: 1, [w]: 1 })], [
+      'Beachte das Vorzeichen: plus mal minus ergibt minus.',
+      `${a} · (-${b}) = -${a * b}`,
+      `Variablen: ${v} · ${w} = ${v}${w}`,
+      `Ergebnis: -${a * b}${v}${w}`,
+    ]);
+  }
+  const d = randInt(2, 9);
+  const r = randInt(2, 9);
+  return eingabeTask(`(-${d * r}${v}) : (-${d})`, [monom(r, { [v]: 1 })], [
+    'Beachte das Vorzeichen: negativ durch negativ ergibt positiv.',
+    `-${d * r} : (-${d}) = ${r}`,
+    `Ergebnis: ${r}${v}`,
   ]);
 }
 
@@ -407,15 +466,15 @@ function genM4(): GeneratedTask {
 function genK1(): GeneratedTask {
   const [v1, v2] = randVars(2);
   const inner: Monom[] = [
-    monom(randInt(2, 9), { [v1]: 1 }),
-    monom(Math.random() < 0.5 ? -randInt(1, 8) : randInt(1, 8), { [v2]: 1 }),
+    monom(randInt(2, 11), { [v1]: 1 }),
+    monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9), { [v2]: 1 }),
   ];
-  if (Math.random() < 0.3) {
+  if (Math.random() < 0.4) {
     inner.push(monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9)));
   }
   const outer1 = monom(Math.random() < 0.25 ? -randInt(2, 9) : randInt(2, 9), { [v1]: 1 });
 
-  const struktur = choice(['nach', 'vor', 'mitte'] as const);
+  const struktur = choice(['nach', 'vor', 'mitte', 'mitte'] as const);
   let segments: Segment[];
   let hinweis: string;
   if (struktur === 'nach') {
@@ -426,7 +485,10 @@ function genK1(): GeneratedTask {
     hinweis =
       'Die Klammer steht am Anfang – auch hier gilt: Plusklammer weglassen, Vorzeichen bleiben.';
   } else {
-    const outer2 = monom(Math.random() < 0.5 ? -randInt(1, 7) : randInt(1, 7), { [v2]: 1 });
+    const outer2 =
+      Math.random() < 0.7
+        ? monom(Math.random() < 0.5 ? -randInt(1, 7) : randInt(1, 7), { [v2]: 1 })
+        : monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9));
     segments = [term(outer1), klammer(inner, 1), term(outer2)];
     hinweis =
       'Die Klammer steht in der Mitte – auch hier bleiben beim Weglassen alle Vorzeichen erhalten.';
@@ -442,15 +504,18 @@ function genK1(): GeneratedTask {
 
 function genK2(): GeneratedTask {
   const [v1, v2] = randVars(2);
-  const inner: Monom[] = [monom(randInt(1, 8), { [v1]: 1 })];
-  if (Math.random() < 0.5) {
+  const inner: Monom[] = [monom(randInt(1, 10), { [v1]: 1 })];
+  if (Math.random() < 0.4) {
     inner.push(monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9)));
   } else {
-    inner.push(monom(Math.random() < 0.5 ? -randInt(1, 8) : randInt(1, 8), { [v2]: 1 }));
+    inner.push(monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9), { [v2]: 1 }));
   }
-  const outer1 = monom(randInt(3, 12), { [v1]: 1 });
+  if (Math.random() < 0.3) {
+    inner.push(monom(Math.random() < 0.5 ? -randInt(1, 8) : randInt(1, 8)));
+  }
+  const outer1 = monom(randInt(3, 13), { [v1]: 1 });
 
-  const struktur = choice(['nach', 'vor', 'mitte'] as const);
+  const struktur = choice(['nach', 'vor', 'mitte', 'mitte'] as const);
   let segments: Segment[];
   let hinweis: string;
   if (struktur === 'nach') {
@@ -461,7 +526,10 @@ function genK2(): GeneratedTask {
     hinweis =
       'Die Minusklammer steht am Anfang: Auch hier drehen sich alle Vorzeichen in der Klammer um.';
   } else {
-    const outer2 = monom(Math.random() < 0.5 ? -randInt(1, 7) : randInt(1, 7), { [v2]: 1 });
+    const outer2 =
+      Math.random() < 0.7
+        ? monom(Math.random() < 0.5 ? -randInt(1, 7) : randInt(1, 7), { [v2]: 1 })
+        : monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9));
     segments = [term(outer1), klammer(inner, -1), term(outer2)];
     hinweis =
       'Die Minusklammer steht in der Mitte: Auch hier drehen sich beim Weglassen alle Vorzeichen in der Klammer um.';
@@ -564,63 +632,71 @@ function genK4(): GeneratedTask {
 // ============================================================================
 
 function genD1(): GeneratedTask {
-  const v = choice(VARS);
+  const [v, w] = randVars(2);
   const variante = randInt(1, 3);
-  const a = randInt(2, 9);
-  const bNeg = Math.random() < 0.4;
-  const b = bNeg ? -randInt(1, 9) : randInt(1, 9);
-  const inner = [monom(a, { [v]: 1 }), monom(b)];
-  const k = randInt(2, 9);
+  const a = randInt(2, 11);
+  const zweiterTermIstVar = Math.random() < 0.3;
+  const b = Math.random() < 0.4 ? -randInt(1, 9) : randInt(1, 9);
+  const inner = shuffle([monom(a, { [v]: 1 }), zweiterTermIstVar ? monom(b, { [w]: 1 }) : monom(b)]);
+
   if (variante === 3) {
+    const k = randInt(2, 9);
     const expanded = inner;
-    const ausdruck = `(${formatPoly(scalePoly(inner, k))}) : ${k}`;
+    const scaled = scalePoly(inner, k);
+    const ausdruck = `(${formatPoly(scaled)}) : ${k}`;
     return eingabeTask(ausdruck, expanded, [
       `Teile JEDEN Term in der Klammer durch ${k}:`,
-      `${k * a}${v} : ${k} = ${a}${v}`,
-      `${formatNumber(Math.abs(k * b))} : ${k} = ${formatNumber(Math.abs(b))}`,
+      ...inner.map((m, i) => `${formatSignedMonom(scaled[i])} : ${k} = ${formatSignedMonom(m)}`),
       `Ergebnis: ${formatPoly(simplifyPoly(expanded))}`,
     ]);
   }
+
+  const k = randInt(2, 11) * (Math.random() < 0.15 ? -1 : 1);
+  const kText = k < 0 ? `(${k})` : `${k}`;
   const expanded = scalePoly(inner, k);
-  const ausdruck =
-    variante === 1 ? `${k} · (${formatPoly(inner)})` : `(${formatPoly(inner)}) · ${k}`;
+  const klammerText = `(${formatPoly(inner)})`;
+  const ausdruck = variante === 1 ? `${kText} · ${klammerText}` : `${klammerText} · ${kText}`;
   return eingabeTask(ausdruck, expanded, [
     `Distributivgesetz: Multipliziere ${k} mit JEDEM Term in der Klammer:`,
-    `${k} · ${a}${v} = ${k * a}${v}`,
-    `${k} · ${fmtFaktor(monom(b))} = ${formatSignedMonom(monom(k * b))}`,
+    ...inner.map((m, i) => `${k} · ${fmtFaktor(m)} = ${formatSignedMonom(expanded[i])}`),
     `Ergebnis: ${formatPoly(simplifyPoly(expanded))}`,
   ]);
 }
 
 function genD2(): GeneratedTask {
   const [v, w] = randVars(2);
-  const a = randInt(2, 8);
-  const b = randInt(1, 9);
-  const variante = randInt(1, 3);
-  if (variante === 1) {
-    const expanded = [monom(a, { [v]: 2 }), monom(b, { [v]: 1 })];
-    return eingabeTask(`${v} · (${a}${v} + ${b})`, expanded, [
-      `Multipliziere ${v} mit jedem Term in der Klammer:`,
-      `${v} · ${a}${v} = ${a}${v}² (gleiche Variablen ergeben eine Potenz!)`,
-      `${v} · ${b} = ${b}${v}`,
-      `Ergebnis: ${formatPoly(simplifyPoly(expanded))}`,
-    ]);
+  const outerNeg = Math.random() < 0.3;
+  const outerText = outerNeg ? `-${v}` : v;
+
+  // Klammer-Inhalt zusammenstellen: immer ein v-Term (dadurch entsteht die Potenz),
+  // dazu je nach Zufall eine Zahl, eine andere Variable oder beides – Vorzeichen
+  // und Reihenfolge sind unabhängig zufällig.
+  const inner: Monom[] = [monom(Math.random() < 0.35 ? -randInt(2, 9) : randInt(2, 9), { [v]: 1 })];
+  const zusatz = choice(['zahl', 'andereVar', 'beides'] as const);
+  if (zusatz === 'zahl' || zusatz === 'beides') {
+    inner.push(monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9)));
   }
-  if (variante === 2) {
-    const expanded = [monom(a, { [v]: 1, [w]: 1 }), monom(-b, { [v]: 1 })];
-    return eingabeTask(`${v} · (${a}${w} - ${b})`, expanded, [
-      `Multipliziere ${v} mit jedem Term in der Klammer:`,
-      `${v} · ${a}${w} = ${a}${v}${w}`,
-      `${v} · (-${b}) = -${b}${v}`,
-      `Ergebnis: ${formatPoly(simplifyPoly(expanded))}`,
-    ]);
+  if (zusatz === 'andereVar' || zusatz === 'beides') {
+    inner.push(monom(Math.random() < 0.5 ? -randInt(1, 8) : randInt(1, 8), { [w]: 1 }));
   }
-  const k = randInt(2, 6);
-  const expanded = [monom(-k * a, { [v]: 1 }), monom(k * b)];
-  return eingabeTask(`-${k} · (${a}${v} - ${b})`, expanded, [
-    `Multipliziere -${k} mit jedem Term – beachte die Vorzeichen:`,
-    `-${k} · ${a}${v} = -${k * a}${v}`,
-    `-${k} · (-${b}) = +${k * b} (minus mal minus ergibt plus!)`,
+  const terme = shuffle(inner);
+
+  const klammerText = `(${formatPoly(terme)})`;
+  const klammerVorne = Math.random() < 0.5;
+  const outerInline = klammerVorne && outerNeg ? `(-${v})` : outerText;
+  const ausdruck = klammerVorne ? `${klammerText} · ${outerInline}` : `${outerText} · ${klammerText}`;
+
+  const expanded = terme.map((m) =>
+    monom((outerNeg ? -1 : 1) * m.coeff, { ...m.vars, [v]: (m.vars[v] ?? 0) + 1 })
+  );
+  const produkte = terme.map(
+    (m, i) => `${outerText} · ${fmtFaktor(m)} = ${formatSignedMonom(expanded[i])}`
+  );
+
+  return eingabeTask(ausdruck, expanded, [
+    `Multipliziere ${outerText} mit jedem Term in der Klammer${outerNeg ? ' (Vorzeichen beachten)' : ''}:`,
+    ...produkte,
+    `Gleiche Variablen ergeben eine Potenz: ${v} · ${v} = ${v}²`,
     `Ergebnis: ${formatPoly(simplifyPoly(expanded))}`,
   ]);
 }
@@ -628,26 +704,33 @@ function genD2(): GeneratedTask {
 function genD3(): GeneratedTask {
   const g = choice([2, 3, 4, 5, 6, 7]);
   const [v, w] = randVars(2);
-  const a = randInt(2, 6);
-  let b = randInt(1, 9);
+  const anzahl = choice([2, 2, 3] as const);
+
+  // Koeffizienten so würfeln, dass ihr ggT wirklich 1 ist – sonst wäre g nicht
+  // der GRÖSSTE gemeinsame Teiler.
+  let coeffs: number[] = [];
   let guard = 0;
-  while (ggT(a, b) > 1 && guard < 20) {
-    b = randInt(1, 9);
+  do {
+    coeffs = [randInt(2, 6)];
+    for (let i = 1; i < anzahl; i++) coeffs.push(randInt(1, 9));
     guard++;
-  }
-  const minus = Math.random() < 0.4;
-  const zweiteVariable = Math.random() < 0.4;
-  const inner: Monom[] = [
-    monom(a, { [v]: 1 }),
-    zweiteVariable ? monom(minus ? -b : b, { [w]: 1 }) : monom(minus ? -b : b),
-  ];
+  } while (coeffs.reduce((acc, c) => ggT(acc, c), 0) > 1 && guard < 30);
+  coeffs = coeffs.map((c) => (Math.random() < 0.35 ? -c : c));
+  coeffs[0] = Math.abs(coeffs[0]); // v-Term bleibt positiv, damit die Aufgabe klar startet
+
+  const typen: ('v' | 'w' | 'zahl')[] = anzahl === 2 ? ['v', choice(['w', 'zahl'])] : ['v', 'w', 'zahl'];
+  const inner = shuffle(
+    typen.map((typ, i) =>
+      typ === 'v' ? monom(coeffs[i], { [v]: 1 }) : typ === 'w' ? monom(coeffs[i], { [w]: 1 }) : monom(coeffs[i])
+    )
+  );
+
   const expanded = scalePoly(inner, g);
   const loesung = `${g} · (${formatPoly(inner)})`;
   return eingabeTask(formatPoly(expanded), expanded, [
-    `Suche den größten gemeinsamen Teiler der Koeffizienten ${g * a} und ${g * b}: ggT = ${g}`,
+    `Suche den größten gemeinsamen Teiler aller Koeffizienten: ggT = ${g}`,
     `Teile jeden Term durch ${g}:`,
-    `${g * a}${v} : ${g} = ${a}${v}`,
-    `${formatSignedMonom(expanded[1])} : ${g} = ${formatSignedMonom(inner[1])}`,
+    ...inner.map((m, i) => `${formatSignedMonom(expanded[i])} : ${g} = ${formatSignedMonom(m)}`),
     `Ergebnis: ${loesung}`,
   ], {
     frage: 'Klammere den größten gemeinsamen Faktor aus:',
@@ -658,23 +741,32 @@ function genD3(): GeneratedTask {
 
 function genD4(): GeneratedTask {
   const v = choice(VARS);
-  const variante = randInt(1, 2);
+  const variante = randInt(1, 3);
   let p1: Poly;
   let p2: Poly;
   let ausdruck: string;
   if (variante === 1) {
-    const a = Math.random() < 0.4 ? -randInt(1, 6) : randInt(1, 6);
-    const b = Math.random() < 0.4 ? -randInt(1, 6) : randInt(1, 6);
+    const a = Math.random() < 0.4 ? -randInt(1, 7) : randInt(1, 7);
+    const b = Math.random() < 0.4 ? -randInt(1, 7) : randInt(1, 7);
     p1 = [monom(1, { [v]: 1 }), monom(a)];
     p2 = [monom(1, { [v]: 1 }), monom(b)];
     ausdruck = `(${formatPoly(p1)}) · (${formatPoly(p2)})`;
-  } else {
+  } else if (variante === 2) {
     const a = randInt(2, 4);
     const b = Math.random() < 0.4 ? -randInt(1, 5) : randInt(1, 5);
     const c = randInt(2, 3);
     const d = Math.random() < 0.4 ? -randInt(1, 5) : randInt(1, 5);
     p1 = [monom(a, { [v]: 1 }), monom(b)];
     p2 = [monom(c, { [v]: 1 }), monom(d)];
+    ausdruck = `(${formatPoly(p1)}) · (${formatPoly(p2)})`;
+  } else {
+    // Eine Klammer mit Koeffizient 1, die andere mit größerem Koeffizienten
+    const a = randInt(2, 5);
+    const b = Math.random() < 0.4 ? -randInt(1, 6) : randInt(1, 6);
+    const c = Math.random() < 0.4 ? -randInt(1, 6) : randInt(1, 6);
+    const zuerst = Math.random() < 0.5;
+    p1 = zuerst ? [monom(a, { [v]: 1 }), monom(b)] : [monom(1, { [v]: 1 }), monom(c)];
+    p2 = zuerst ? [monom(1, { [v]: 1 }), monom(c)] : [monom(a, { [v]: 1 }), monom(b)];
     ausdruck = `(${formatPoly(p1)}) · (${formatPoly(p2)})`;
   }
   const produkte: string[] = [];
