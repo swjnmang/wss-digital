@@ -210,22 +210,26 @@ function generateRechenbeispiele(a: number, b: number, c: number): Array<{ x: nu
 
 // ===== Aufgabengenerator =====
 const aufgabenBanks = {
-  // Typ 1: Völlig leere Wertetabelle ausfüllen
+  // Typ 1: Wertetabelle zu vorgegebenen x-Werten berechnen
   leereTabelleAusfüllen: () => {
     const { a, b, c } = generateRandomABC()
     const rechenbeispiele = generateRechenbeispiele(a, b, c)
 
+    const xWerte = generateXWerte()
+    const yWerte = xWerte.map(x => berechneY(a, b, c, x))
+
     return {
       typ: 'leereTabelleAusfüllen',
       thema: '1. Wertetabelle aus Funktionsgleichung',
-      frage: `Gegeben ist die Funktionsgleichung ${formatEquation(a, b, c)}. Erstelle eine Wertetabelle mit mindestens ${ANZAHL_WERTEPAARE} Wertepaaren. Wähle dazu x-Werte zwischen -5 und 5 mit einer Schrittweite von 0,5.`,
+      frage: `Gegeben ist die Funktionsgleichung ${formatEquation(a, b, c)}. Berechne für die vorgegebenen x-Werte die zugehörigen y-Werte.`,
       a,
       b,
       c,
       funktionsgleichung: formatEquation(a, b, c),
       funktionsgleichungLatex: formatEquationLatex(a, b, c),
-      numZeilen: ANZAHL_WERTEPAARE,
-      lösungsweg: `Setze verschiedene x-Werte in die Funktionsgleichung ein und berechne die entsprechenden y-Werte.`,
+      xWerte,
+      yWerte,
+      lösungsweg: `Setze die vorgegebenen x-Werte in die Funktionsgleichung ein und berechne die entsprechenden y-Werte.`,
       rechenbeispiele
     }
   },
@@ -271,7 +275,7 @@ interface Aufgabe {
 
 export default function Wertetabelle() {
   const [aufgaben, setAufgaben] = useState<Aufgabe[]>([])
-  const [antworten, setAntworten] = useState<{ [key: number]: Array<{ x: string; y: string }> }>({})
+  const [antworten, setAntworten] = useState<{ [key: number]: Array<{ y: string }> }>({})
   const [validiert, setValidiert] = useState<{ [key: number]: boolean }>({})
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
   const [showGraph, setShowGraph] = useState<{ [key: number]: boolean }>({})
@@ -324,11 +328,10 @@ export default function Wertetabelle() {
         aufgabe.c = 0
         aufgabe.funktionsgleichung = formatEquation(a, 0, 0)
         aufgabe.funktionsgleichungLatex = formatEquationLatex(a, 0, 0)
-        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? `Erstelle eine Wertetabelle mit mindestens ${ANZAHL_WERTEPAARE} Wertepaaren. Wähle dazu x-Werte zwischen -5 und 5 mit einer Schrittweite von 0,5.` : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
+        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Berechne für die vorgegebenen x-Werte die zugehörigen y-Werte.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
+        aufgabe.yWerte = aufgabe.xWerte.map((x: number) => berechneY(a, 0, 0, x))
 
-        if (aufgabenTyp === 'teilweisgefülltVervollständigen') {
-          aufgabe.yWerte = aufgabe.xWerte.map((x: number) => berechneY(a, 0, 0, x))
-        } else {
+        if (aufgabenTyp === 'leereTabelleAusfüllen') {
           aufgabe.rechenbeispiele = generateRechenbeispiele(a, 0, 0)
         }
       } else if (grad === 'mittel') {
@@ -339,11 +342,10 @@ export default function Wertetabelle() {
         aufgabe.b = 0
         aufgabe.funktionsgleichung = formatEquation(a, 0, c)
         aufgabe.funktionsgleichungLatex = formatEquationLatex(a, 0, c)
-        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? `Erstelle eine Wertetabelle mit mindestens ${ANZAHL_WERTEPAARE} Wertepaaren. Wähle dazu x-Werte zwischen -5 und 5 mit einer Schrittweite von 0,5.` : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
+        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Berechne für die vorgegebenen x-Werte die zugehörigen y-Werte.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
+        aufgabe.yWerte = aufgabe.xWerte.map((x: number) => berechneY(a, 0, c, x))
 
-        if (aufgabenTyp === 'teilweisgefülltVervollständigen') {
-          aufgabe.yWerte = aufgabe.xWerte.map((x: number) => berechneY(a, 0, c, x))
-        } else {
+        if (aufgabenTyp === 'leereTabelleAusfüllen') {
           aufgabe.rechenbeispiele = generateRechenbeispiele(a, 0, c)
         }
       } else if (grad === 'schwer') {
@@ -361,11 +363,10 @@ export default function Wertetabelle() {
         const funktionsgleichungText = formatEquation(aBruch, bBruch, cBruch)
         aufgabe.funktionsgleichung = funktionsgleichungText
         aufgabe.funktionsgleichungLatex = formatEquationLatex(aBruch, bBruch, cBruch)
-        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${funktionsgleichungText}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? `Erstelle eine Wertetabelle mit mindestens ${ANZAHL_WERTEPAARE} Wertepaaren. Wähle dazu x-Werte zwischen -5 und 5 mit einer Schrittweite von 0,5.` : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
+        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${funktionsgleichungText}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Berechne für die vorgegebenen x-Werte die zugehörigen y-Werte.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
+        aufgabe.yWerte = aufgabe.xWerte.map((x: number) => berechneY(aBruch, bBruch, cBruch, x))
 
-        if (aufgabenTyp === 'teilweisgefülltVervollständigen') {
-          aufgabe.yWerte = aufgabe.xWerte.map((x: number) => berechneY(aBruch, bBruch, cBruch, x))
-        } else {
+        if (aufgabenTyp === 'leereTabelleAusfüllen') {
           aufgabe.rechenbeispiele = generateRechenbeispiele(aBruch, bBruch, cBruch)
         }
       }
@@ -385,46 +386,25 @@ export default function Wertetabelle() {
     setFehlerhafteZellen({})
   }
 
-  // Markiert fehlerhafte Zellen rot
+  // Markiert fehlerhafte Zellen rot (x ist stets vorgegeben, nur y wird geprüft)
   function markFehlerhafteZellen(index: number, aufgabe: Aufgabe) {
     const eingaben = antworten[index]
     if (!eingaben) return
 
-    const { a, b, c } = aufgabe
     const tolerance = 0.02
     const fehler = { ...fehlerhafteZellen }
 
-    if (aufgabe.typ === 'leereTabelleAusfüllen') {
-      for (let i = 0; i < eingaben.length; i++) {
-        const x = parseFloat(eingaben[i].x.replace(',', '.').replace(/[−–—‐]/g, '-'))
-        const y = parseFloat(eingaben[i].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
-        const cellKey = `${index}-${i}`
-
-        if (isNaN(x) || isNaN(y)) {
+    for (let i = 0; i < aufgabe.xWerte.length; i++) {
+      const cellKey = `${index}-${i}`
+      const y = parseFloat((eingaben[i]?.y || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
+      if (isNaN(y)) {
+        fehler[cellKey] = true
+      } else {
+        const expectedY = aufgabe.yWerte[i]
+        if (Math.abs(y - expectedY) > tolerance) {
           fehler[cellKey] = true
         } else {
-          const expectedY = berechneY(a, b, c, x)
-          if (Math.abs(y - expectedY) > tolerance) {
-            fehler[cellKey] = true
-          } else {
-            delete fehler[cellKey]
-          }
-        }
-      }
-    } else {
-      // Typ 2: x ist immer gegeben, nur y wird geprüft
-      for (let i = 0; i < eingaben.length; i++) {
-        const cellKey = `${index}-${i}`
-        const y = parseFloat(eingaben[i].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
-        if (isNaN(y)) {
-          fehler[cellKey] = true
-        } else {
-          const expectedY = aufgabe.yWerte[i]
-          if (Math.abs(y - expectedY) > tolerance) {
-            fehler[cellKey] = true
-          } else {
-            delete fehler[cellKey]
-          }
+          delete fehler[cellKey]
         }
       }
     }
@@ -432,35 +412,7 @@ export default function Wertetabelle() {
     setFehlerhafteZellen(fehler)
   }
 
-  function validateAnswer(index: number, aufgabe: Aufgabe): boolean {
-    const eingaben = antworten[index]
-    if (!eingaben || eingaben.length === 0) return false
-
-    const { a, b, c } = aufgabe
-    const tolerance = 0.02
-
-    markFehlerhafteZellen(index, aufgabe)
-
-    for (const eintrag of eingaben) {
-      const x = parseFloat(eintrag.x.replace(',', '.').replace(/[−–—‐]/g, '-'))
-      const y = parseFloat(eintrag.y.replace(',', '.').replace(/[−–—‐]/g, '-'))
-
-      if (isNaN(x) || isNaN(y)) return false
-
-      const expectedY = berechneY(a, b, c, x)
-      if (Math.abs(y - expectedY) > tolerance) {
-        return false
-      }
-    }
-
-    if (!validiert[index]) {
-      setPunkte(punkte + 1)
-    }
-
-    return true
-  }
-
-  function validateType2(index: number, aufgabe: Aufgabe): boolean {
+  function validateWertetabelle(index: number, aufgabe: Aufgabe): boolean {
     const eingaben = antworten[index]
     if (!eingaben) return false
 
@@ -489,73 +441,41 @@ export default function Wertetabelle() {
 
   function checkAnswer(index: number) {
     const aufgabe = aufgaben[index]
-    const isCorrect = aufgabe.typ === 'leereTabelleAusfüllen'
-      ? validateAnswer(index, aufgabe)
-      : validateType2(index, aufgabe)
+    const isCorrect = validateWertetabelle(index, aufgabe)
     setValidiert({ ...validiert, [index]: isCorrect })
   }
 
-  function updateTableValue(aufgabeIndex: number, rowIndex: number, field: 'x' | 'y', value: string) {
+  function updateTableValue(aufgabeIndex: number, rowIndex: number, value: string) {
     const currentAnswers = antworten[aufgabeIndex] || []
 
     while (currentAnswers.length <= rowIndex) {
-      currentAnswers.push({ x: '', y: '' })
+      currentAnswers.push({ y: '' })
     }
 
-    currentAnswers[rowIndex][field] = value
+    currentAnswers[rowIndex].y = value
 
     const aufgabe = aufgaben[aufgabeIndex]
     const cellKey = `${aufgabeIndex}-${rowIndex}`
 
-    if (aufgabe?.typ === 'leereTabelleAusfüllen') {
-      const xFilled = currentAnswers[rowIndex].x.trim() !== ''
-      const yFilled = currentAnswers[rowIndex].y.trim() !== ''
+    const yFilled = currentAnswers[rowIndex].y.trim() !== ''
 
-      if (xFilled && yFilled) {
-        const x = parseFloat(currentAnswers[rowIndex].x.replace(',', '.').replace(/[−–—‐]/g, '-'))
-        const y = parseFloat(currentAnswers[rowIndex].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
-
-        if (!isNaN(x) && !isNaN(y)) {
-          const { a, b, c } = aufgabe
-          const tolerance = 0.02
-          const expectedY = berechneY(a, b, c, x)
-          const isValid = Math.abs(y - expectedY) <= tolerance
-
-          setValidierteZellen({
-            ...validierteZellen,
-            [cellKey]: isValid
-          })
-        } else {
-          const newValidierteZellen = { ...validierteZellen }
-          delete newValidierteZellen[cellKey]
-          setValidierteZellen(newValidierteZellen)
-        }
-      } else {
-        const newValidierteZellen = { ...validierteZellen }
-        delete newValidierteZellen[cellKey]
-        setValidierteZellen(newValidierteZellen)
+    if (yFilled && aufgabe) {
+      const tolerance = 0.02
+      const y = parseFloat(currentAnswers[rowIndex].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
+      let isValid = false
+      if (!isNaN(y)) {
+        const expectedY = aufgabe.yWerte[rowIndex]
+        isValid = Math.abs(y - expectedY) <= tolerance
       }
-    } else if (aufgabe?.typ === 'teilweisgefülltVervollständigen') {
-      const yFilled = currentAnswers[rowIndex].y.trim() !== ''
 
-      if (yFilled) {
-        const tolerance = 0.02
-        const y = parseFloat(currentAnswers[rowIndex].y.replace(',', '.').replace(/[−–—‐]/g, '-'))
-        let isValid = false
-        if (!isNaN(y)) {
-          const expectedY = aufgabe.yWerte[rowIndex]
-          isValid = Math.abs(y - expectedY) <= tolerance
-        }
-
-        setValidierteZellen({
-          ...validierteZellen,
-          [cellKey]: isValid
-        })
-      } else {
-        const newValidierteZellen = { ...validierteZellen }
-        delete newValidierteZellen[cellKey]
-        setValidierteZellen(newValidierteZellen)
-      }
+      setValidierteZellen({
+        ...validierteZellen,
+        [cellKey]: isValid
+      })
+    } else {
+      const newValidierteZellen = { ...validierteZellen }
+      delete newValidierteZellen[cellKey]
+      setValidierteZellen(newValidierteZellen)
     }
 
     setAntworten({
@@ -571,7 +491,7 @@ export default function Wertetabelle() {
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Wertetabellen</h1>
-          <p className={styles.subtitle}>Erstelle oder vervollständige Wertetabellen für quadratische Funktionen</p>
+          <p className={styles.subtitle}>Berechne die y-Werte zu vorgegebenen x-Werten für quadratische Funktionen</p>
         </div>
         <div className={styles.scoreBox}>
           <div className={styles.score}>
@@ -649,75 +569,35 @@ export default function Wertetabelle() {
 
                   <MathDisplay latex={aufgabe.funktionsgleichungLatex} />
 
-                  {/* Typ 1: Leere Wertetabelle */}
-                  {aufgabe.typ === 'leereTabelleAusfüllen' && (
-                    <div className={styles.tableSection}>
-                      <table className={styles.wertetabelle}>
-                        <tbody>
-                          <tr>
-                            <th>x</th>
-                            {Array.from({ length: aufgabe.numZeilen }).map((_, i) => (
-                              <td key={`x-${i}`}>
-                                <input
-                                  type="text"
-                                  placeholder="x"
-                                  value={antworten[index]?.[i]?.x || ''}
-                                  onChange={(e) => updateTableValue(index, i, 'x', e.target.value)}
-                                  className={`${styles.tableInput} ${fehlerhafteZellen[`${index}-${i}`] ? styles.inputError : ''} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
-                                />
-                              </td>
-                            ))}
-                          </tr>
-                          <tr className={styles.yRow}>
-                            <th>y</th>
-                            {Array.from({ length: aufgabe.numZeilen }).map((_, i) => (
-                              <td key={`y-${i}`}>
-                                <input
-                                  type="text"
-                                  placeholder="y"
-                                  value={antworten[index]?.[i]?.y || ''}
-                                  onChange={(e) => updateTableValue(index, i, 'y', e.target.value)}
-                                  className={`${styles.tableInput} ${fehlerhafteZellen[`${index}-${i}`] ? styles.inputError : ''} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
-                                />
-                              </td>
-                            ))}
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-
-                  {/* Typ 2: Teilweise gefüllte Wertetabelle (x immer gegeben) */}
-                  {aufgabe.typ === 'teilweisgefülltVervollständigen' && (
-                    <div className={styles.tableSection}>
-                      <table className={styles.wertetabelle}>
-                        <tbody>
-                          <tr>
-                            <th>x</th>
-                            {aufgabe.xWerte.map((x: number, i: number) => (
-                              <td key={`x-${i}`}>
-                                <span className={styles.givenValue}>{x}</span>
-                              </td>
-                            ))}
-                          </tr>
-                          <tr className={styles.yRow}>
-                            <th>y</th>
-                            {aufgabe.yWerte.map((y: number, i: number) => (
-                              <td key={`y-${i}`}>
-                                <input
-                                  type="text"
-                                  placeholder="?"
-                                  value={antworten[index]?.[i]?.y || ''}
-                                  onChange={(e) => updateTableValue(index, i, 'y', e.target.value)}
-                                  className={`${styles.tableInput} ${fehlerhafteZellen[`${index}-${i}`] ? styles.inputError : ''} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
-                                />
-                              </td>
-                            ))}
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+                  {/* x-Werte sind stets vorgegeben, nur die y-Werte werden eingetragen */}
+                  <div className={styles.tableSection}>
+                    <table className={styles.wertetabelle}>
+                      <tbody>
+                        <tr>
+                          <th>x</th>
+                          {aufgabe.xWerte.map((x: number, i: number) => (
+                            <td key={`x-${i}`}>
+                              <span className={styles.givenValue}>{x}</span>
+                            </td>
+                          ))}
+                        </tr>
+                        <tr className={styles.yRow}>
+                          <th>y</th>
+                          {aufgabe.yWerte.map((y: number, i: number) => (
+                            <td key={`y-${i}`}>
+                              <input
+                                type="text"
+                                placeholder="?"
+                                value={antworten[index]?.[i]?.y || ''}
+                                onChange={(e) => updateTableValue(index, i, e.target.value)}
+                                className={`${styles.tableInput} ${fehlerhafteZellen[`${index}-${i}`] ? styles.inputError : ''} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
+                              />
+                            </td>
+                          ))}
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
 
                   {/* Buttons */}
                   <div className={styles.buttonGroup}>
@@ -766,7 +646,7 @@ export default function Wertetabelle() {
                         </div>
                       )}
 
-                      {aufgabe.typ === 'teilweisgefülltVervollständigen' && (
+                      {aufgabe.xWerte && aufgabe.yWerte && (
                         <div className={styles.lösungTabelle}>
                           <table className={styles.wertetabelle}>
                             <tbody>
