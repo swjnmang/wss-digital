@@ -24,7 +24,7 @@ function randInt(min: number, max: number) {
 // Anzahl der Wertepaare pro Wertetabelle (mindestens 8, Schrittweite 0,5)
 const ANZAHL_WERTEPAARE = 8
 
-// Generiert x-Werte mit Schrittweite 0,5, verteilt über ein 5 Einheiten
+// Generiert x-Werte mit Schrittweite 0,5, verteilt über ein 10 Einheiten
 // breites Fenster um `zentrum`, damit sich der Graph anschließend vernünftig
 // zeichnen lässt. Bei y = a·x² bzw. y = a·x² + c liegt der Scheitelpunkt immer
 // bei x = 0 (Standardwert von `zentrum`), sodass z.B. auch die linke
@@ -36,7 +36,7 @@ const ANZAHL_WERTEPAARE = 8
 // abgedeckt, ohne dass zwingend jeder einzelne Rasterwert vorkommen muss.
 function generateXWerte(anzahl: number = ANZAHL_WERTEPAARE, zentrum: number = 0): number[] {
   const zentrumGerundet = Math.round(zentrum * 2) / 2
-  const halbspanne = 2.5
+  const halbspanne = 5
 
   const raster: number[] = []
   for (let v = zentrumGerundet - halbspanne; v <= zentrumGerundet + halbspanne; v += 0.5) {
