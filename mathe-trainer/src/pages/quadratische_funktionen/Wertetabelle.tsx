@@ -24,19 +24,24 @@ function randInt(min: number, max: number) {
 // Anzahl der Wertepaare pro Wertetabelle (mindestens 8, Schrittweite 0,5)
 const ANZAHL_WERTEPAARE = 8
 
-// Generiert eine zusammenhängende Folge von x-Werten mit Schrittweite 0,5,
-// die vollständig im Bereich [-5, 5] liegt, damit sie sich sinnvoll in ein
-// Koordinatensystem einzeichnen lässt.
+// Generiert x-Werte mit Schrittweite 0,5 aus dem gesamten Bereich [-5, 5],
+// damit sich der Graph anschließend vernünftig zeichnen lässt (z.B. bei
+// y = a·x² auch die linke Parabelhälfte und der Scheitelpunkt sichtbar sind).
+// Dazu wird das Raster in `anzahl` etwa gleich große Abschnitte geteilt und aus
+// jedem Abschnitt ein zufälliger Wert gewählt – der gesamte Bereich ist so
+// abgedeckt, ohne dass zwingend jeder einzelne Rasterwert vorkommen muss.
 function generateXWerte(anzahl: number = ANZAHL_WERTEPAARE): number[] {
-  const spanne = (anzahl - 1) * 0.5
-  const minStart = -5
-  const maxStart = 5 - spanne
-  const schritte = Math.round((maxStart - minStart) / 0.5)
-  const start = minStart + randInt(0, schritte) * 0.5
+  const raster: number[] = []
+  for (let v = -5; v <= 5; v += 0.5) {
+    raster.push(Math.round(v * 10) / 10)
+  }
 
   const xWerte: number[] = []
   for (let i = 0; i < anzahl; i++) {
-    xWerte.push(Math.round((start + i * 0.5) * 10) / 10)
+    const abschnittStart = Math.floor((i * raster.length) / anzahl)
+    const abschnittEnde = Math.floor(((i + 1) * raster.length) / anzahl) - 1
+    const index = randInt(abschnittStart, abschnittEnde)
+    xWerte.push(raster[index])
   }
   return xWerte
 }
