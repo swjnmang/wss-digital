@@ -86,11 +86,19 @@ function toFractionLatex(num: number): string {
     '-0.8': '-\\frac{4}{5}'
   }
 
+  // key ist bereits auf 2 Nachkommastellen gerundet; das ist auch der korrekte
+  // Fallback für Zahlen außerhalb der Bruch-Tabelle (z.B. 4/3), statt der vollen,
+  // nicht abbrechenden Dezimalzahl (num.toString()).
   const key = num.toFixed(2)
-  return fractions[key] || num.toString()
+  return fractions[key] || key
 }
 
 // Generiert a, b, c mit Brüchen für schwere Aufgaben: a ∈ [-3, 3], b, c ∈ [-5, 5]
+// Die Werte bleiben als exakte Brüche (z.B. 2/3) erhalten und werden NICHT auf
+// 2 Nachkommastellen gerundet, da sonst die angezeigte Bruchdarstellung
+// (z.B. \frac{2}{3}) und die für die y-Werte verwendete Zahl auseinanderlaufen
+// würden – das hätte bei größeren x-Werten schnell zu Rundungsfehlern über der
+// Toleranz geführt, obwohl der Schüler korrekt mit dem Bruch gerechnet hat.
 function generateRandomABCMitBrüchen() {
   const zählerA = [-3, -2, -1, 1, 2, 3]
   const nenner = [1, 2, 3, 4]
@@ -111,27 +119,30 @@ function generateRandomABCMitBrüchen() {
   const n_c = nenner[randInt(0, nenner.length - 1)]
   const c = z_c / n_c
 
-  return {
-    a: roundHalfAwayFromZero(a),
-    b: roundHalfAwayFromZero(b),
-    c: roundHalfAwayFromZero(c)
-  }
+  return { a, b, c }
 }
 
-// Formatiert die Funktionsgleichung als Klartext (mit Unicode x²)
+// Formatiert die Funktionsgleichung als Klartext (mit Unicode x²).
+// a, b, c werden nur für die ANZEIGE auf 2 Nachkommastellen gerundet (z.B. bei
+// Brüchen wie 2/3 = 0.6666...); für die y-Wert-Berechnung wird weiterhin der
+// exakte Wert verwendet.
 function formatEquation(a: number, b: number, c: number): string {
-  const aStr = a === 1 ? 'x²' : a === -1 ? '-x²' : `${a}x²`
+  const aDisp = roundHalfAwayFromZero(a)
+  const bDisp = roundHalfAwayFromZero(b)
+  const cDisp = roundHalfAwayFromZero(c)
+
+  const aStr = aDisp === 1 ? 'x²' : aDisp === -1 ? '-x²' : `${aDisp}x²`
 
   let bPart = ''
-  if (b !== 0) {
-    if (b === 1) bPart = ' + x'
-    else if (b === -1) bPart = ' - x'
-    else bPart = b > 0 ? ` + ${b}x` : ` - ${Math.abs(b)}x`
+  if (bDisp !== 0) {
+    if (bDisp === 1) bPart = ' + x'
+    else if (bDisp === -1) bPart = ' - x'
+    else bPart = bDisp > 0 ? ` + ${bDisp}x` : ` - ${Math.abs(bDisp)}x`
   }
 
   let cPart = ''
-  if (c !== 0) {
-    cPart = c > 0 ? ` + ${c}` : ` - ${Math.abs(c)}`
+  if (cDisp !== 0) {
+    cPart = cDisp > 0 ? ` + ${cDisp}` : ` - ${Math.abs(cDisp)}`
   }
 
   return `y = ${aStr}${bPart}${cPart}`
@@ -175,6 +186,12 @@ function generateRechenbeispiele(a: number, b: number, c: number): Array<{ x: nu
     xWerte.add(x)
   }
 
+  // a, b, c werden für die Textdarstellung gerundet (z.B. Brüche wie 2/3), die
+  // y-Berechnung selbst nutzt weiterhin die exakten Werte.
+  const aDisp = roundHalfAwayFromZero(a)
+  const bDisp = roundHalfAwayFromZero(b)
+  const cDisp = roundHalfAwayFromZero(c)
+
   xWerte.forEach(x => {
     const y = berechneY(a, b, c, x)
 
@@ -182,22 +199,22 @@ function generateRechenbeispiele(a: number, b: number, c: number): Array<{ x: nu
 
     // a * x² Teil
     let axText = ''
-    if (a === 1) axText = `${xDisplay}²`
-    else if (a === -1) axText = `-${xDisplay}²`
-    else axText = `${a} · ${xDisplay}²`
+    if (aDisp === 1) axText = `${xDisplay}²`
+    else if (aDisp === -1) axText = `-${xDisplay}²`
+    else axText = `${aDisp} · ${xDisplay}²`
 
     // b * x Teil mit Vorzeichen
     let bxText = ''
-    if (b !== 0) {
-      if (b === 1) bxText = ' + ' + xDisplay
-      else if (b === -1) bxText = ' - ' + xDisplay
-      else bxText = b > 0 ? ` + ${b} · ${xDisplay}` : ` - ${Math.abs(b)} · ${xDisplay}`
+    if (bDisp !== 0) {
+      if (bDisp === 1) bxText = ' + ' + xDisplay
+      else if (bDisp === -1) bxText = ' - ' + xDisplay
+      else bxText = bDisp > 0 ? ` + ${bDisp} · ${xDisplay}` : ` - ${Math.abs(bDisp)} · ${xDisplay}`
     }
 
     // c Teil mit Vorzeichen
     let cText = ''
-    if (c !== 0) {
-      cText = c > 0 ? ` + ${c}` : ` - ${Math.abs(c)}`
+    if (cDisp !== 0) {
+      cText = cDisp > 0 ? ` + ${cDisp}` : ` - ${Math.abs(cDisp)}`
     }
 
     const berechnung = `y = ${axText}${bxText}${cText} = ${y}`
@@ -333,6 +350,8 @@ export default function Wertetabelle() {
 
         if (aufgabenTyp === 'leereTabelleAusfüllen') {
           aufgabe.rechenbeispiele = generateRechenbeispiele(a, 0, 0)
+        } else {
+          aufgabe.lösungsweg = `Setze die gegebenen x-Werte in die Funktionsgleichung ${formatEquationLatex(a, 0, 0)} ein und berechne die zugehörigen y-Werte.`
         }
       } else if (grad === 'mittel') {
         // Mittel: y = a·x² + c (vertikale Verschiebung, kein linearer Term)
@@ -347,6 +366,8 @@ export default function Wertetabelle() {
 
         if (aufgabenTyp === 'leereTabelleAusfüllen') {
           aufgabe.rechenbeispiele = generateRechenbeispiele(a, 0, c)
+        } else {
+          aufgabe.lösungsweg = `Setze die gegebenen x-Werte in die Funktionsgleichung ${formatEquationLatex(a, 0, c)} ein und berechne die zugehörigen y-Werte.`
         }
       } else if (grad === 'schwer') {
         // Schwer: y = a·x² + b·x + c mit Brüchen
@@ -368,6 +389,8 @@ export default function Wertetabelle() {
 
         if (aufgabenTyp === 'leereTabelleAusfüllen') {
           aufgabe.rechenbeispiele = generateRechenbeispiele(aBruch, bBruch, cBruch)
+        } else {
+          aufgabe.lösungsweg = `Setze die gegebenen x-Werte in die Funktionsgleichung ${formatEquationLatex(aBruch, bBruch, cBruch)} ein und berechne die zugehörigen y-Werte.`
         }
       }
 
