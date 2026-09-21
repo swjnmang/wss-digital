@@ -3,6 +3,7 @@ import { checkAnswer, hasFactorOutsideBrackets } from './terme/termAlgebra';
 import { KATEGORIEN, GeneratedTask } from './terme/termAufgaben';
 
 const AUFGABEN_PRO_SET = 8;
+const AUTO_WEITER_VERZOEGERUNG_MS = 2500;
 
 function generiereSet(katIndex: number, stufeIndex: number): GeneratedTask[] {
   const gen = KATEGORIEN[katIndex].stufen[stufeIndex].generate;
@@ -94,14 +95,25 @@ const TermeZusammenfassen: React.FC = () => {
     // altem, bereits vollständig beantwortetem Set laufen und den Dialog fälschlich erneut zeigen.
   }, [tasks, answers, choiceAnswers]);
 
-  const zurNaechstenStufe = () => {
+  const zurNaechstenStufe = useCallback(() => {
     setZeigeAbschlussDialog(false);
     setStufeIndex((i) => i + 1);
-  };
+  }, []);
 
   const stufeWiederholen = () => {
     neueAufgaben(katIndex, stufeIndex);
   };
+
+  const alleRichtig = tasks.length > 0 && richtigCount === tasks.length;
+
+  // Bei perfektem Ergebnis automatisch zur nächsten Stufe wechseln, statt
+  // auf den manuellen Klick zu warten. Wird der Dialog vorher geschlossen
+  // oder die Stufe wiederholt, räumt die Cleanup-Funktion den Timer auf.
+  useEffect(() => {
+    if (!zeigeAbschlussDialog || !alleRichtig || !hatNaechsteStufe) return;
+    const timeout = setTimeout(zurNaechstenStufe, AUTO_WEITER_VERZOEGERUNG_MS);
+    return () => clearTimeout(timeout);
+  }, [zeigeAbschlussDialog, alleRichtig, hatNaechsteStufe, zurNaechstenStufe]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50 p-3">
@@ -352,6 +364,23 @@ const TermeZusammenfassen: React.FC = () => {
                 Aufgaben in „{stufe.name}&quot; richtig gelöst.
               </p>
               <p className="text-3xl font-bold text-orange-600 mb-4">{prozent}%</p>
+              {alleRichtig && hatNaechsteStufe && (
+                <div className="mb-4">
+                  <p className="text-sm text-green-700 font-semibold text-center mb-2">
+                    Alle Aufgaben richtig! Weiter geht&apos;s automatisch …
+                  </p>
+                  <div className="w-full bg-orange-100 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      key={stufeIndex}
+                      className="bg-orange-500 h-1.5 rounded-full"
+                      style={{
+                        animation: `wss-auto-weiter ${AUTO_WEITER_VERZOEGERUNG_MS}ms linear forwards`,
+                      }}
+                    ></div>
+                  </div>
+                  <style>{`@keyframes wss-auto-weiter { from { width: 0% } to { width: 100% } }`}</style>
+                </div>
+              )}
               <div className="flex flex-col gap-2">
                 {hatNaechsteStufe ? (
                   <button
