@@ -23,7 +23,7 @@ const bausteine: Bausteinstein[] = [
     title: 'Infoblock',
     emoji: 'ℹ️',
     description: 'Ihr Zeichen, unser Zeichen, Ansprechpartner und Datum richtig aufbauen.',
-    enabled: false,
+    enabled: true,
     path: '/digitale-bildung/word/geschaeftsbrief/infoblock',
   },
   {

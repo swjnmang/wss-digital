@@ -17,6 +17,9 @@ import GeschaeftsbriefIndex from './pages/digitale-bildung/word/GeschaeftsbriefI
 import AnschriftenfeldTaskSelect from './pages/digitale-bildung/word/AnschriftenfeldTaskSelect'
 import AnschriftenfeldTrainer from './pages/digitale-bildung/word/AnschriftenfeldTrainer'
 import { ANSCHRIFTENFELD_TASKS } from './lib/geschaeftsbrief/anschriftenfeld-tasks'
+import InfoblockTaskSelect from './pages/digitale-bildung/word/InfoblockTaskSelect'
+import InfoblockTrainer from './pages/digitale-bildung/word/InfoblockTrainer'
+import { INFOBLOCK_TASKS } from './lib/geschaeftsbrief/infoblock-tasks'
 import ImpressumModal from './components/ImpressumModal'
 
 function App() {
@@ -63,6 +66,17 @@ function App() {
           path="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/:taskId"
           element={<AnschriftenfeldTrainer />}
         />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/infoblock"
+          element={
+            <Navigate to={`/digitale-bildung/word/geschaeftsbrief/infoblock/${INFOBLOCK_TASKS[0].id}`} replace />
+          }
+        />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/infoblock/uebersicht"
+          element={<InfoblockTaskSelect />}
+        />
+        <Route path="/digitale-bildung/word/geschaeftsbrief/infoblock/:taskId" element={<InfoblockTrainer />} />
       </Routes>
       <ImpressumModal />
     </Router>
