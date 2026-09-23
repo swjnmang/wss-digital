@@ -20,6 +20,15 @@ import { ANSCHRIFTENFELD_TASKS } from './lib/geschaeftsbrief/anschriftenfeld-tas
 import InfoblockTaskSelect from './pages/digitale-bildung/word/InfoblockTaskSelect'
 import InfoblockTrainer from './pages/digitale-bildung/word/InfoblockTrainer'
 import { INFOBLOCK_TASKS } from './lib/geschaeftsbrief/infoblock-tasks'
+import GrussformelTaskSelect from './pages/digitale-bildung/word/GrussformelTaskSelect'
+import GrussformelTrainer from './pages/digitale-bildung/word/GrussformelTrainer'
+import { GRUSSFORMEL_TASKS } from './lib/geschaeftsbrief/grussformel-tasks'
+import AufzaehlungTaskSelect from './pages/digitale-bildung/word/AufzaehlungTaskSelect'
+import AufzaehlungTrainer from './pages/digitale-bildung/word/AufzaehlungTrainer'
+import { AUFZAEHLUNG_TASKS } from './lib/geschaeftsbrief/aufzaehlung-tasks'
+import VollstaendigerBriefTaskSelect from './pages/digitale-bildung/word/VollstaendigerBriefTaskSelect'
+import VollstaendigerBriefTrainer from './pages/digitale-bildung/word/VollstaendigerBriefTrainer'
+import { VOLLSTAENDIGER_BRIEF_TASKS } from './lib/geschaeftsbrief/vollstaendiger-brief-tasks'
 import ImpressumModal from './components/ImpressumModal'
 
 function App() {
@@ -77,6 +86,45 @@ function App() {
           element={<InfoblockTaskSelect />}
         />
         <Route path="/digitale-bildung/word/geschaeftsbrief/infoblock/:taskId" element={<InfoblockTrainer />} />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/grussformel"
+          element={
+            <Navigate to={`/digitale-bildung/word/geschaeftsbrief/grussformel/${GRUSSFORMEL_TASKS[0].id}`} replace />
+          }
+        />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/grussformel/uebersicht"
+          element={<GrussformelTaskSelect />}
+        />
+        <Route path="/digitale-bildung/word/geschaeftsbrief/grussformel/:taskId" element={<GrussformelTrainer />} />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/aufzaehlung"
+          element={
+            <Navigate to={`/digitale-bildung/word/geschaeftsbrief/aufzaehlung/${AUFZAEHLUNG_TASKS[0].id}`} replace />
+          }
+        />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/aufzaehlung/uebersicht"
+          element={<AufzaehlungTaskSelect />}
+        />
+        <Route path="/digitale-bildung/word/geschaeftsbrief/aufzaehlung/:taskId" element={<AufzaehlungTrainer />} />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief"
+          element={
+            <Navigate
+              to={`/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief/${VOLLSTAENDIGER_BRIEF_TASKS[0].id}`}
+              replace
+            />
+          }
+        />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief/uebersicht"
+          element={<VollstaendigerBriefTaskSelect />}
+        />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief/:taskId"
+          element={<VollstaendigerBriefTrainer />}
+        />
       </Routes>
       <ImpressumModal />
     </Router>
