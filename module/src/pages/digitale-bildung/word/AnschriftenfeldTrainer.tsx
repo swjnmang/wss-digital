@@ -13,6 +13,7 @@ export default function AnschriftenfeldTrainer() {
   const navigate = useNavigate();
   const task = taskId ? getAnschriftenfeldTaskById(taskId) : undefined;
   const [selections, setSelections] = useState<Record<string, string>>({});
+  const [checked, setChecked] = useState(false);
   const [loadedTaskId, setLoadedTaskId] = useState(taskId);
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function AnschriftenfeldTrainer() {
   if (taskId !== loadedTaskId) {
     setLoadedTaskId(taskId);
     setSelections({});
+    setChecked(false);
   }
 
   if (!task) return null;
@@ -33,13 +35,15 @@ export default function AnschriftenfeldTrainer() {
 
   const choose = (lineId: string, optionId: string) => {
     setSelections((prev) => ({ ...prev, [lineId]: optionId }));
+    setChecked(false);
   };
 
+  const allAnswered = task.lines.every((line) => selections[line.id]);
   const correctCount = task.lines.filter((line) => {
     const chosen = selections[line.id];
     return chosen && line.options.find((o) => o.id === chosen)?.correct;
   }).length;
-  const allCorrect = correctCount === task.lines.length;
+  const allCorrect = checked && correctCount === task.lines.length;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -92,7 +96,15 @@ export default function AnschriftenfeldTrainer() {
                     }
                   >
                     {chosenOption ? (
-                      <span className={isCorrect ? 'text-green-700 font-medium' : 'text-red-600 font-medium'}>
+                      <span
+                        className={
+                          checked
+                            ? isCorrect
+                              ? 'text-green-700 font-medium'
+                              : 'text-red-600 font-medium'
+                            : 'text-slate-800 font-medium'
+                        }
+                      >
                         {chosenOption.text}
                       </span>
                     ) : (
@@ -103,8 +115,24 @@ export default function AnschriftenfeldTrainer() {
               })}
             </div>
             <div className="mt-3 text-sm font-semibold text-slate-600">
-              {correctCount} / {task.lines.length} Zeilen korrekt
+              {checked ? `${correctCount} / ${task.lines.length} Zeilen korrekt` : 'Noch nicht geprüft'}
             </div>
+            <button
+              onClick={() => setChecked(true)}
+              disabled={!allAnswered}
+              className={`mt-3 w-full px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
+                allAnswered
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              Prüfen
+            </button>
+            {!allAnswered && (
+              <p className="mt-2 text-xs text-slate-400 text-center">
+                Wähle für jede Zeile eine Option, bevor du prüfst.
+              </p>
+            )}
           </div>
 
           {/* Auswahl je Zeile */}
@@ -120,25 +148,28 @@ export default function AnschriftenfeldTrainer() {
                   <div className="flex flex-wrap gap-2">
                     {line.options.map((option) => {
                       const selected = chosenId === option.id;
+                      const showResult = checked && selected;
                       return (
                         <button
                           key={option.id}
                           onClick={() => choose(line.id, option.id)}
                           className={`px-3 py-2 rounded-lg text-sm font-medium border-2 transition-all ${
-                            selected
+                            showResult
                               ? option.correct
                                 ? 'bg-green-100 text-green-800 border-green-400'
                                 : 'bg-red-100 text-red-800 border-red-400'
-                              : 'bg-slate-50 text-slate-700 border-transparent hover:border-slate-200'
+                              : selected
+                                ? 'bg-blue-100 text-blue-800 border-blue-400'
+                                : 'bg-slate-50 text-slate-700 border-transparent hover:border-slate-200'
                           }`}
                         >
-                          {selected && (option.correct ? '✅ ' : '❌ ')}
+                          {showResult && (option.correct ? '✅ ' : '❌ ')}
                           {option.text}
                         </button>
                       );
                     })}
                   </div>
-                  {chosenOption && (
+                  {checked && chosenOption && (
                     <p
                       className={`mt-3 text-sm rounded-lg px-3 py-2 ${
                         isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
@@ -171,6 +202,14 @@ export default function AnschriftenfeldTrainer() {
                 Zur Aufgabenübersicht
               </Link>
             )}
+          </div>
+        )}
+        {checked && !allCorrect && (
+          <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 text-center">
+            <p className="text-amber-800 font-semibold">
+              Noch nicht ganz richtig ({correctCount} / {task.lines.length}). Korrigiere die rot markierten Zeilen und
+              klicke erneut auf „Prüfen“.
+            </p>
           </div>
         )}
       </main>
