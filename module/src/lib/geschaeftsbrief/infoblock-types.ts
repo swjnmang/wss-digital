@@ -5,9 +5,11 @@ export type {
   ChoiceLine as InfoblockChoiceLine,
   ZeichenLine as InfoblockZeichenLine,
   FreitextLine as InfoblockFreitextLine,
+  NameLine as InfoblockNameLine,
+  EmailLine as InfoblockEmailLine,
   Line as InfoblockLine,
 } from './line-types';
-export { BLEIBT_FREI, zeichenPattern } from './line-types';
+export { BLEIBT_FREI, zeichenPattern, isValidName, deriveInitials, deriveEmail } from './line-types';
 
 export interface InfoblockTask {
   id: string;

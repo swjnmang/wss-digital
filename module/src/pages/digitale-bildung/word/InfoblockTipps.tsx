@@ -44,26 +44,31 @@ function InfoblockTippsModal({ onClose }: { onClose: () => void }) {
               </p>
             </div>
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:col-span-2">
-              <p className="text-sm font-semibold text-slate-800 mb-1">Unser Zeichen</p>
+              <p className="text-sm font-semibold text-slate-800 mb-1">Name → Unser Zeichen &amp; E-Mail</p>
               <p className="text-xs text-slate-600 mb-2">
-                Kürzel des Vorgesetzten und deines eigenen Namens: jeweils der erste Buchstabe des Vor- und
-                Nachnamens, klein geschrieben, getrennt durch einen Bindestrich. Der Auftraggeber (z.&nbsp;B. der
-                Vorgesetzte) wird zuerst genannt.
+                Trage zuerst deinen eigenen Vor- und Nachnamen ein. Daraus ergibt sich dein Kürzel bei „Unser
+                Zeichen“ (erster Buchstabe von Vor- und Nachname, klein geschrieben) sowie deine eigene
+                E-Mail-Adresse nach dem Muster „vorname.nachname@domain“ – <strong>nicht</strong> die des
+                Vorgesetzten. Bei „Unser Zeichen“ wird zuerst das Kürzel des Vorgesetzten genannt (Auftraggeber),
+                dann mit Bindestrich getrennt dein eigenes Kürzel.
               </p>
               <div className="border border-dashed border-slate-300 rounded-lg p-3 bg-white font-mono text-sm text-slate-800">
-                Beispiel: Alfred Maier (Vorgesetzter) beauftragt Hans Schuster → <strong>am-hs</strong>
+                Beispiel: Alfred Maier (Vorgesetzter) beauftragt Hans Schuster
+                <br />
+                Unser Zeichen → <strong>am-hs</strong> · E-Mail → <strong>hans.schuster@firma.de</strong>
               </div>
               <p className="text-xs text-slate-500 mt-2">
                 Akademische Titel wie „Dr.“ oder „Prof.“ zählen dabei nicht mit.
               </p>
             </div>
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:col-span-2">
-              <p className="text-sm font-semibold text-slate-800 mb-1">Name, Telefon, Fax, E-Mail, Datum</p>
+              <p className="text-sm font-semibold text-slate-800 mb-1">Telefon, Fax, Datum</p>
               <p className="text-xs text-slate-600">
-                Name des Verfassers/der Verfasserin sowie die vorgegebenen Kontaktdaten werden unverändert
-                übernommen. Enthält eine E-Mail-Vorlage einen Platzhalter wie „vorname.nachname“, setzt du dort die
-                echten Vor- und Nachnamen der Kontaktperson ein. Wird eine Angabe (z.&nbsp;B. Fax) gar nicht
-                genannt, bleibt das Feld leer. Das Datum ist immer das heutige Tagesdatum.
+                Beim Telefon trägst du nur die Durchwahlnummer selbst ein (z.&nbsp;B. „142“), ohne das Wort
+                „Durchwahl“ davor – die Beschriftung „Telefon:“ steht ja schon davor. Ist stattdessen eine
+                vollständige Telefonnummer angegeben, wird genau diese übernommen. Beim Fax gilt dasselbe. Wird eine
+                Angabe (z.&nbsp;B. Fax) gar nicht genannt, bleibt das Feld leer. Das Datum ist immer das heutige
+                Tagesdatum.
               </p>
             </div>
           </div>

@@ -55,22 +55,23 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
-        type: 'freitext',
+        type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Dein Name',
-        hint: 'Hier trägst du deinen eigenen Namen als Verfasser/-in ein (nicht bewertet, da uns dein Name nicht bekannt ist).',
+        placeholder: 'Vorname Nachname',
+        explanation:
+          'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
         type: 'choice',
         id: 'telefon',
         caption: 'Telefon',
         options: [
-          { id: 'a', text: '142', correct: false },
-          { id: 'b', text: 'Fax 142', correct: false },
-          { id: 'c', text: 'Durchwahl 142', correct: true },
+          { id: 'a', text: 'Durchwahl 142', correct: false },
+          { id: 'b', text: 'Tel. 142', correct: false },
+          { id: 'c', text: '142', correct: true },
         ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
         type: 'choice',
@@ -84,16 +85,13 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
-        type: 'choice',
+        type: 'email',
         id: 'email',
         caption: 'E-Mail',
-        options: [
-          { id: 'a', text: 'vorname.nachname@jordanmoebel.de', correct: false },
-          { id: 'b', text: 'Werner.Volk@jordanmoebel.de', correct: false },
-          { id: 'c', text: 'werner.volk@jordanmoebel.de', correct: true },
-        ],
+        domain: 'jordanmoebel.de',
+        placeholder: 'vorname.nachname@jordanmoebel.de',
         explanation:
-          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier müssen die tatsächlichen Vor- und Nachnamen des Vorgesetzten (klein geschrieben) eingesetzt werden.',
+          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den des Vorgesetzten.',
       },
       {
         type: 'freitext',
@@ -157,22 +155,23 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
-        type: 'freitext',
+        type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Dein Name',
-        hint: 'Hier trägst du deinen eigenen Namen als Verfasser/-in ein (nicht bewertet, da uns dein Name nicht bekannt ist).',
+        placeholder: 'Vorname Nachname',
+        explanation:
+          'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
         type: 'choice',
         id: 'telefon',
         caption: 'Telefon',
         options: [
-          { id: 'a', text: '15', correct: false },
-          { id: 'b', text: 'Fax 15', correct: false },
-          { id: 'c', text: 'Durchwahl 15', correct: true },
+          { id: 'a', text: 'Durchwahl 15', correct: false },
+          { id: 'b', text: 'Tel. 15', correct: false },
+          { id: 'c', text: '15', correct: true },
         ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
         type: 'choice',
@@ -186,16 +185,13 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
-        type: 'choice',
+        type: 'email',
         id: 'email',
         caption: 'E-Mail',
-        options: [
-          { id: 'a', text: 'Sabine.Roth@sportwelt-fischer.de', correct: false },
-          { id: 'b', text: 'vorname.nachname@sportwelt-fischer.de', correct: false },
-          { id: 'c', text: 'sabine.roth@sportwelt-fischer.de', correct: true },
-        ],
+        domain: 'sportwelt-fischer.de',
+        placeholder: 'vorname.nachname@sportwelt-fischer.de',
         explanation:
-          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier müssen die tatsächlichen Vor- und Nachnamen der Vorgesetzten (klein geschrieben) eingesetzt werden.',
+          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den der Vorgesetzten.',
       },
       {
         type: 'freitext',
@@ -260,22 +256,23 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Es gab noch kein eigenes vorheriges Schreiben in dieser Sache, daher bleibt „Unsere Nachricht vom“ leer.',
       },
       {
-        type: 'freitext',
+        type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Dein Name',
-        hint: 'Hier trägst du deinen eigenen Namen als Verfasser/-in ein (nicht bewertet, da uns dein Name nicht bekannt ist).',
+        placeholder: 'Vorname Nachname',
+        explanation:
+          'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
         type: 'choice',
         id: 'telefon',
         caption: 'Telefon',
         options: [
-          { id: 'a', text: '77', correct: false },
-          { id: 'b', text: 'Fax 77', correct: false },
-          { id: 'c', text: 'Durchwahl 77', correct: true },
+          { id: 'a', text: 'Durchwahl 77', correct: false },
+          { id: 'b', text: 'Tel. 77', correct: false },
+          { id: 'c', text: '77', correct: true },
         ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
         type: 'choice',
@@ -289,16 +286,13 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
-        type: 'choice',
+        type: 'email',
         id: 'email',
         caption: 'E-Mail',
-        options: [
-          { id: 'a', text: 'vorname.nachname@berg-buerotechnik.de', correct: false },
-          { id: 'b', text: 'Thomas.Berg@berg-buerotechnik.de', correct: false },
-          { id: 'c', text: 'thomas.berg@berg-buerotechnik.de', correct: true },
-        ],
+        domain: 'berg-buerotechnik.de',
+        placeholder: 'vorname.nachname@berg-buerotechnik.de',
         explanation:
-          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier müssen die tatsächlichen Vor- und Nachnamen des Vorgesetzten (klein geschrieben) eingesetzt werden.',
+          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den des Vorgesetzten.',
       },
       {
         type: 'freitext',
@@ -364,22 +358,23 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Hier steht das Datum des eigenen vorherigen Schreibens, an das ihr erinnert – also der 12.01.2025.',
       },
       {
-        type: 'freitext',
+        type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Dein Name',
-        hint: 'Hier trägst du deinen eigenen Namen als Verfasser/-in ein (nicht bewertet, da uns dein Name nicht bekannt ist).',
+        placeholder: 'Vorname Nachname',
+        explanation:
+          'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
         type: 'choice',
         id: 'telefon',
         caption: 'Telefon',
         options: [
-          { id: 'a', text: '33', correct: false },
-          { id: 'b', text: 'Fax 33', correct: false },
-          { id: 'c', text: 'Durchwahl 33', correct: true },
+          { id: 'a', text: 'Durchwahl 33', correct: false },
+          { id: 'b', text: 'Tel. 33', correct: false },
+          { id: 'c', text: '33', correct: true },
         ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
         type: 'choice',
@@ -393,16 +388,13 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
-        type: 'choice',
+        type: 'email',
         id: 'email',
         caption: 'E-Mail',
-        options: [
-          { id: 'a', text: 'vorname.nachname@gartenwelt-lang.de', correct: false },
-          { id: 'b', text: 'Petra.Lang@gartenwelt-lang.de', correct: false },
-          { id: 'c', text: 'petra.lang@gartenwelt-lang.de', correct: true },
-        ],
+        domain: 'gartenwelt-lang.de',
+        placeholder: 'vorname.nachname@gartenwelt-lang.de',
         explanation:
-          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier müssen die tatsächlichen Vor- und Nachnamen der Vorgesetzten (klein geschrieben) eingesetzt werden.',
+          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den der Vorgesetzten.',
       },
       {
         type: 'freitext',
@@ -466,22 +458,23 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
-        type: 'freitext',
+        type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Dein Name',
-        hint: 'Hier trägst du deinen eigenen Namen als Verfasser/-in ein (nicht bewertet, da uns dein Name nicht bekannt ist).',
+        placeholder: 'Vorname Nachname',
+        explanation:
+          'Trage hier deinen eigenen Vor- und Nachnamen ein (ohne Titel) – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
         type: 'choice',
         id: 'telefon',
         caption: 'Telefon',
         options: [
-          { id: 'a', text: '55', correct: false },
-          { id: 'b', text: 'Fax 55', correct: false },
-          { id: 'c', text: 'Durchwahl 55', correct: true },
+          { id: 'a', text: 'Durchwahl 55', correct: false },
+          { id: 'b', text: 'Tel. 55', correct: false },
+          { id: 'c', text: '55', correct: true },
         ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
         type: 'choice',
@@ -495,16 +488,13 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
-        type: 'choice',
+        type: 'email',
         id: 'email',
         caption: 'E-Mail',
-        options: [
-          { id: 'a', text: 'Dr.Michael.Ostermann@it-neumann.de', correct: false },
-          { id: 'b', text: 'vorname.nachname@it-neumann.de', correct: false },
-          { id: 'c', text: 'michael.ostermann@it-neumann.de', correct: true },
-        ],
+        domain: 'it-neumann.de',
+        placeholder: 'vorname.nachname@it-neumann.de',
         explanation:
-          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – eingesetzt werden die tatsächlichen Vor- und Nachnamen (klein geschrieben), der Titel „Dr.“ gehört nicht in die E-Mail-Adresse.',
+          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, ohne Titel) ein, nicht den des Vorgesetzten.',
       },
       {
         type: 'freitext',
@@ -568,22 +558,23 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
-        type: 'freitext',
+        type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Dein Name',
-        hint: 'Hier trägst du deinen eigenen Namen als Verfasser/-in ein (nicht bewertet, da uns dein Name nicht bekannt ist).',
+        placeholder: 'Vorname Nachname',
+        explanation:
+          'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
         type: 'choice',
         id: 'telefon',
         caption: 'Telefon',
         options: [
-          { id: 'a', text: '21', correct: false },
-          { id: 'b', text: 'Fax 21', correct: false },
-          { id: 'c', text: 'Durchwahl 21', correct: true },
+          { id: 'a', text: 'Durchwahl 21', correct: false },
+          { id: 'b', text: 'Tel. 21', correct: false },
+          { id: 'c', text: '21', correct: true },
         ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
         type: 'choice',
@@ -598,16 +589,13 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Wird im Arbeitsauftrag kein Faxanschluss genannt, gibt es auch keine Angabe zum Eintragen – das Feld bleibt leer.',
       },
       {
-        type: 'choice',
+        type: 'email',
         id: 'email',
         caption: 'E-Mail',
-        options: [
-          { id: 'a', text: 'vorname.nachname@verlag-krause.de', correct: false },
-          { id: 'b', text: 'Anna.Krause@verlag-krause.de', correct: false },
-          { id: 'c', text: 'anna.krause@verlag-krause.de', correct: true },
-        ],
+        domain: 'verlag-krause.de',
+        placeholder: 'vorname.nachname@verlag-krause.de',
         explanation:
-          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier müssen die tatsächlichen Vor- und Nachnamen der Vorgesetzten (klein geschrieben) eingesetzt werden.',
+          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den der Vorgesetzten.',
       },
       {
         type: 'freitext',
@@ -672,22 +660,23 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Hier steht das Datum des eigenen vorherigen Schreibens, auf das zusätzlich Bezug genommen wird – also der 05.02.2025.',
       },
       {
-        type: 'freitext',
+        type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Dein Name',
-        hint: 'Hier trägst du deinen eigenen Namen als Verfasser/-in ein (nicht bewertet, da uns dein Name nicht bekannt ist).',
+        placeholder: 'Vorname Nachname',
+        explanation:
+          'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
         type: 'choice',
         id: 'telefon',
         caption: 'Telefon',
         options: [
-          { id: 'a', text: '88', correct: false },
-          { id: 'b', text: 'Fax 88', correct: false },
-          { id: 'c', text: 'Durchwahl 88', correct: true },
+          { id: 'a', text: 'Durchwahl 88', correct: false },
+          { id: 'b', text: 'Tel. 88', correct: false },
+          { id: 'c', text: '88', correct: true },
         ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
         type: 'choice',
@@ -701,16 +690,13 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
-        type: 'choice',
+        type: 'email',
         id: 'email',
         caption: 'E-Mail',
-        options: [
-          { id: 'a', text: 'vorname.nachname@hartmann-spedition.de', correct: false },
-          { id: 'b', text: 'Frank.Hartmann@hartmann-spedition.de', correct: false },
-          { id: 'c', text: 'frank.hartmann@hartmann-spedition.de', correct: true },
-        ],
+        domain: 'hartmann-spedition.de',
+        placeholder: 'vorname.nachname@hartmann-spedition.de',
         explanation:
-          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier müssen die tatsächlichen Vor- und Nachnamen des Vorgesetzten (klein geschrieben) eingesetzt werden.',
+          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den des Vorgesetzten.',
       },
       {
         type: 'freitext',
@@ -774,11 +760,12 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
-        type: 'freitext',
+        type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Dein Name',
-        hint: 'Hier trägst du deinen eigenen Namen als Verfasser/-in ein (nicht bewertet, da uns dein Name nicht bekannt ist).',
+        placeholder: 'Vorname Nachname',
+        explanation:
+          'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
         type: 'choice',
@@ -804,16 +791,13 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
-        type: 'choice',
+        type: 'email',
         id: 'email',
         caption: 'E-Mail',
-        options: [
-          { id: 'a', text: 'vorname.nachname@modehaus-adler.de', correct: false },
-          { id: 'b', text: 'Claudia.Adler@modehaus-adler.de', correct: false },
-          { id: 'c', text: 'claudia.adler@modehaus-adler.de', correct: true },
-        ],
+        domain: 'modehaus-adler.de',
+        placeholder: 'vorname.nachname@modehaus-adler.de',
         explanation:
-          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier müssen die tatsächlichen Vor- und Nachnamen der Vorgesetzten (klein geschrieben) eingesetzt werden.',
+          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den der Vorgesetzten.',
       },
       {
         type: 'freitext',
@@ -878,22 +862,23 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Ein eigenes vorheriges Schreiben in dieser Sache wird nicht erwähnt, daher bleibt „Unsere Nachricht vom“ leer.',
       },
       {
-        type: 'freitext',
+        type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Dein Name',
-        hint: 'Hier trägst du deinen eigenen Namen als Verfasser/-in ein (nicht bewertet, da uns dein Name nicht bekannt ist).',
+        placeholder: 'Vorname Nachname',
+        explanation:
+          'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
         type: 'choice',
         id: 'telefon',
         caption: 'Telefon',
         options: [
-          { id: 'a', text: '61', correct: false },
-          { id: 'b', text: 'Fax 61', correct: false },
-          { id: 'c', text: 'Durchwahl 61', correct: true },
+          { id: 'a', text: 'Durchwahl 61', correct: false },
+          { id: 'b', text: 'Tel. 61', correct: false },
+          { id: 'c', text: '61', correct: true },
         ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
         type: 'choice',
@@ -907,16 +892,13 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
-        type: 'choice',
+        type: 'email',
         id: 'email',
         caption: 'E-Mail',
-        options: [
-          { id: 'a', text: 'vorname.nachname@glaserei-huber.de', correct: false },
-          { id: 'b', text: 'Stefan.Huber@glaserei-huber.de', correct: false },
-          { id: 'c', text: 'stefan.huber@glaserei-huber.de', correct: true },
-        ],
+        domain: 'glaserei-huber.de',
+        placeholder: 'vorname.nachname@glaserei-huber.de',
         explanation:
-          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier müssen die tatsächlichen Vor- und Nachnamen des Vorgesetzten (klein geschrieben) eingesetzt werden.',
+          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den des Vorgesetzten.',
       },
       {
         type: 'freitext',
@@ -980,11 +962,12 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
-        type: 'freitext',
+        type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Dein Name',
-        hint: 'Hier trägst du deinen eigenen Namen als Verfasser/-in ein (nicht bewertet, da uns dein Name nicht bekannt ist).',
+        placeholder: 'Vorname Nachname',
+        explanation:
+          'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
         type: 'choice',
@@ -1011,16 +994,13 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Wird im Arbeitsauftrag kein Faxanschluss genannt, gibt es auch keine Angabe zum Eintragen – das Feld bleibt leer.',
       },
       {
-        type: 'choice',
+        type: 'email',
         id: 'email',
         caption: 'E-Mail',
-        options: [
-          { id: 'a', text: 'vorname.nachname@reisebuero-sonnenschein.de', correct: false },
-          { id: 'b', text: 'Melanie.Vogt@reisebuero-sonnenschein.de', correct: false },
-          { id: 'c', text: 'melanie.vogt@reisebuero-sonnenschein.de', correct: true },
-        ],
+        domain: 'reisebuero-sonnenschein.de',
+        placeholder: 'vorname.nachname@reisebuero-sonnenschein.de',
         explanation:
-          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier müssen die tatsächlichen Vor- und Nachnamen der Vorgesetzten (klein geschrieben) eingesetzt werden.',
+          '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den der Vorgesetzten.',
       },
       {
         type: 'freitext',

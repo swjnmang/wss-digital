@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { INFOBLOCK_TASKS, getInfoblockTaskById } from '../../../lib/geschaeftsbrief/infoblock-tasks';
-import { zeichenPattern } from '../../../lib/geschaeftsbrief/infoblock-types';
+import { isValidName, deriveInitials, deriveEmail } from '../../../lib/geschaeftsbrief/infoblock-types';
 import { InfoblockTippsButton } from './InfoblockTipps';
 
 const difficultyLabel: Record<string, string> = {
@@ -41,7 +41,7 @@ export default function InfoblockTrainer() {
     setChecked(false);
   };
 
-  const changeZeichen = (lineId: string, text: string) => {
+  const changeGraded = (lineId: string, text: string) => {
     setValues((prev) => ({ ...prev, [lineId]: text }));
     setChecked(false);
   };
@@ -50,13 +50,28 @@ export default function InfoblockTrainer() {
     setValues((prev) => ({ ...prev, [lineId]: text }));
   };
 
+  const nameValue = values['name'] ?? '';
+
+  // "Unser Zeichen" and "E-Mail" are derived from "Name", so ask for the name first.
+  const editOrder = [...task.lines].sort((a, b) => (a.id === 'name' ? -1 : b.id === 'name' ? 1 : 0));
+
   const isLineCorrect = (line: (typeof task.lines)[number]): boolean => {
     const value = values[line.id] ?? '';
     if (line.type === 'choice') {
       return line.options.find((o) => o.id === value)?.correct ?? false;
     }
+    if (line.type === 'name') {
+      return isValidName(value);
+    }
     if (line.type === 'zeichen') {
-      return zeichenPattern(line.bossInitials).test(value.trim());
+      const studentInitials = deriveInitials(nameValue);
+      if (!studentInitials) return false;
+      return value.trim() === `${line.bossInitials}-${studentInitials}`;
+    }
+    if (line.type === 'email') {
+      const expected = deriveEmail(nameValue, line.domain);
+      if (!expected) return false;
+      return value.trim() === expected;
     }
     return true;
   };
@@ -174,7 +189,7 @@ export default function InfoblockTrainer() {
 
           {/* Eingabe je Feld */}
           <div className="flex flex-col gap-4">
-            {task.lines.map((line) => {
+            {editOrder.map((line) => {
               if (line.type === 'choice') {
                 const chosenId = values[line.id];
                 const correct = isLineCorrect(line);
@@ -218,7 +233,7 @@ export default function InfoblockTrainer() {
                 );
               }
 
-              if (line.type === 'zeichen') {
+              if (line.type === 'zeichen' || line.type === 'name' || line.type === 'email') {
                 const value = values[line.id] ?? '';
                 const correct = isLineCorrect(line);
                 const showResult = checked && value.trim() !== '';
@@ -228,7 +243,7 @@ export default function InfoblockTrainer() {
                     <input
                       type="text"
                       value={value}
-                      onChange={(e) => changeZeichen(line.id, e.target.value)}
+                      onChange={(e) => changeGraded(line.id, e.target.value)}
                       placeholder={line.placeholder}
                       className={`w-full max-w-xs px-3 py-2 rounded-lg text-sm font-mono border-2 transition-all outline-none ${
                         showResult
