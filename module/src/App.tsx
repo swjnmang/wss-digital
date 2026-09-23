@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom'
 import Home from './pages/Home'
 import Gamification from './pages/gamification/Index'
 import Gesellschaftsspiele from './pages/gamification/Gesellschaftsspiele'
@@ -16,6 +16,7 @@ import WordIndex from './pages/digitale-bildung/word/WordIndex'
 import GeschaeftsbriefIndex from './pages/digitale-bildung/word/GeschaeftsbriefIndex'
 import AnschriftenfeldTaskSelect from './pages/digitale-bildung/word/AnschriftenfeldTaskSelect'
 import AnschriftenfeldTrainer from './pages/digitale-bildung/word/AnschriftenfeldTrainer'
+import { ANSCHRIFTENFELD_TASKS } from './lib/geschaeftsbrief/anschriftenfeld-tasks'
 import ImpressumModal from './components/ImpressumModal'
 
 function App() {
@@ -45,7 +46,19 @@ function App() {
         </Route>
         <Route path="/digitale-bildung/word" element={<WordIndex />} />
         <Route path="/digitale-bildung/word/geschaeftsbrief" element={<GeschaeftsbriefIndex />} />
-        <Route path="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld" element={<AnschriftenfeldTaskSelect />} />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld"
+          element={
+            <Navigate
+              to={`/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/${ANSCHRIFTENFELD_TASKS[0].id}`}
+              replace
+            />
+          }
+        />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/uebersicht"
+          element={<AnschriftenfeldTaskSelect />}
+        />
         <Route
           path="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/:taskId"
           element={<AnschriftenfeldTrainer />}

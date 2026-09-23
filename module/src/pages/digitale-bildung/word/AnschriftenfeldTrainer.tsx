@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ANSCHRIFTENFELD_TASKS, getAnschriftenfeldTaskById } from '../../../lib/geschaeftsbrief/anschriftenfeld-tasks';
+import { AnschriftenfeldTippsButton } from './AnschriftenfeldTipps';
 
 const difficultyLabel: Record<string, string> = {
   einfach: 'Einfach',
@@ -18,7 +19,7 @@ export default function AnschriftenfeldTrainer() {
 
   useEffect(() => {
     if (!task) {
-      navigate('/digitale-bildung/word/geschaeftsbrief/anschriftenfeld', { replace: true });
+      navigate('/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/uebersicht', { replace: true });
     }
   }, [task, navigate]);
 
@@ -50,11 +51,12 @@ export default function AnschriftenfeldTrainer() {
       <header className="bg-gradient-to-br from-slate-800 to-slate-700 text-white py-6 px-4 relative">
         <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
           <Link
-            to="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld"
+            to="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/uebersicht"
             className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors"
           >
             ← Aufgabenübersicht
           </Link>
+          <AnschriftenfeldTippsButton className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/20 text-white transition-colors" />
           <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-200 bg-white/10 rounded-full px-2 py-1 mb-2">
             {difficultyLabel[task.difficulty] ?? task.difficulty}
           </span>
@@ -196,7 +198,7 @@ export default function AnschriftenfeldTrainer() {
               </button>
             ) : (
               <Link
-                to="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld"
+                to="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/uebersicht"
                 className="inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
               >
                 Zur Aufgabenübersicht

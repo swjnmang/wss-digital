@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ANSCHRIFTENFELD_TASKS } from '../../../lib/geschaeftsbrief/anschriftenfeld-tasks';
+import { AnschriftenfeldTippsButton } from './AnschriftenfeldTipps';
 
 const difficultyLabel: Record<string, string> = {
   einfach: 'Einfach',
@@ -23,6 +24,7 @@ export default function AnschriftenfeldTaskSelect() {
         >
           ← Geschäftsbrief
         </Link>
+        <AnschriftenfeldTippsButton className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/20 text-white transition-colors" />
         <h1 className="text-2xl font-bold">📬 Anschriftenfeld</h1>
         <p className="text-slate-300 text-sm mt-1">Wähle eine Übung aus.</p>
       </header>
