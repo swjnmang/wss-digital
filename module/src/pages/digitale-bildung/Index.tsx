@@ -23,7 +23,7 @@ const tools: Tool[] = [
     title: 'Word',
     emoji: '✉️',
     description: 'Geschäftsbriefe nach DIN-Norm formatieren und aufbauen.',
-    enabled: false,
+    enabled: true,
     path: '/digitale-bildung/word',
   },
   {

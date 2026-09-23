@@ -12,6 +12,10 @@ import DigitaleBildungIndex from './pages/digitale-bildung/Index'
 import ExcelTaskSelect from './pages/digitale-bildung/ExcelTaskSelect'
 import ExcelTrainer from './pages/digitale-bildung/ExcelTrainer'
 import { ExcelSessionProvider } from './lib/excel-trainer/ExcelSessionContext'
+import WordIndex from './pages/digitale-bildung/word/WordIndex'
+import GeschaeftsbriefIndex from './pages/digitale-bildung/word/GeschaeftsbriefIndex'
+import AnschriftenfeldTaskSelect from './pages/digitale-bildung/word/AnschriftenfeldTaskSelect'
+import AnschriftenfeldTrainer from './pages/digitale-bildung/word/AnschriftenfeldTrainer'
 import ImpressumModal from './components/ImpressumModal'
 
 function App() {
@@ -39,6 +43,13 @@ function App() {
           <Route index element={<ExcelTaskSelect />} />
           <Route path=":taskId" element={<ExcelTrainer />} />
         </Route>
+        <Route path="/digitale-bildung/word" element={<WordIndex />} />
+        <Route path="/digitale-bildung/word/geschaeftsbrief" element={<GeschaeftsbriefIndex />} />
+        <Route path="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld" element={<AnschriftenfeldTaskSelect />} />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/:taskId"
+          element={<AnschriftenfeldTrainer />}
+        />
       </Routes>
       <ImpressumModal />
     </Router>
