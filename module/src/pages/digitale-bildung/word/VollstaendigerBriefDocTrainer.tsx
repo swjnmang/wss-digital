@@ -75,11 +75,6 @@ export default function VollstaendigerBriefDocTrainer() {
           ))}
         </details>
 
-        <div className="bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-lg px-4 py-2">
-          Dies ist ein echter, frei editierbarer Texteditor (wie Word). Die grau/fett dargestellten Beschriftungen
-          (z. B. „Betreff:“) sind eine Vorlage – bitte nicht löschen. Trage deine Antworten direkt dahinter ein.
-        </div>
-
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <UniverDoc ref={docRef} task={task} />
         </div>
