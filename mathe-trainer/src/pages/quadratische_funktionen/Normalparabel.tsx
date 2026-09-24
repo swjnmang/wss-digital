@@ -69,7 +69,11 @@ export default function Normalparabel() {
   }, []);
 
   const generateNewTask = () => {
-    const possibleA = [-4, -3, -2, -1.5, -0.5, 0.5, 1.5, 2, 3, 4];
+    // a = ±1 ausgeschlossen, da sonst weder "gestreckt" noch "gestaucht" zutrifft
+    const possibleA = [
+      -5, -4, -3.5, -3, -2.5, -2, -1.5, -1.25, -0.75, -0.5, -0.25,
+      0.25, 0.5, 0.75, 1.25, 1.5, 2, 2.5, 3, 3.5, 4, 5
+    ];
     const a = possibleA[Math.floor(Math.random() * possibleA.length)];
 
     const correctAnswers = {
