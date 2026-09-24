@@ -284,28 +284,32 @@ const Nullstellen = () => {
                 <p className="mb-2">Die allgemeine Mitternachtsformel lautet:</p>
                 <BlockMath math="x_{1,2} = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}" />
                 
-                <p className="mb-2 mt-4">Einsetzen der Koeffizienten ($a={smartFormat(a)}, b={smartFormat(b)}, c={smartFormat(c)}$):</p>
+                <p className="mb-2 mt-4">
+                    Einsetzen der Koeffizienten (<InlineMath math={`a=${smartFormat(a)}, b=${smartFormat(b)}, c=${smartFormat(c)}`} />):
+                </p>
                 <BlockMath math={`x_{1,2} = \\frac{-${bStr} \\pm \\sqrt{(${bStr})^2 - 4 \\cdot ${aStr} \\cdot ${cStr}}}{2 \\cdot ${aStr}}`} />
                 
-                <p className="mb-2 mt-4">Berechnung der Diskriminante $D$ (Term unter der Wurzel):</p>
+                <p className="mb-2 mt-4">
+                    Berechnung der Diskriminante <InlineMath math="D" /> (Term unter der Wurzel):
+                </p>
                 <BlockMath math={`D = (${bStr})^2 - 4 \\cdot ${aStr} \\cdot ${cStr} = ${smartFormat(b*b)} - (${smartFormat(4*a*c)}) = ${smartFormat(D)}`} />
                 
                 <div className="mt-4">
                     {D > 0.0001 && (
                         <>
-                            <p>Da $D &gt; 0$, gibt es zwei verschiedene reelle Nullstellen:</p>
+                            <p>Da <InlineMath math="D > 0" />, gibt es zwei verschiedene reelle Nullstellen:</p>
                             <BlockMath math={`x_1 = \\frac{${negB} - \\sqrt{${smartFormat(D)}}}{${twoA}} = \\frac{${smartFormat(-b - Math.sqrt(D))}}{${twoA}} = \\mathbf{${smartFormat(roots[0])}}`} />
                             <BlockMath math={`x_2 = \\frac{${negB} + \\sqrt{${smartFormat(D)}}}{${twoA}} = \\frac{${smartFormat(-b + Math.sqrt(D))}}{${twoA}} = \\mathbf{${smartFormat(roots[1])}}`} />
                         </>
                     )}
                     {Math.abs(D) <= 0.0001 && (
                         <>
-                            <p>Da $D = 0$, gibt es genau eine reelle Nullstelle (doppelte Nullstelle):</p>
+                            <p>Da <InlineMath math="D = 0" />, gibt es genau eine reelle Nullstelle (doppelte Nullstelle):</p>
                             <BlockMath math={`x_0 = \\frac{${negB}}{${twoA}} = \\mathbf{${smartFormat(roots[0])}}`} />
                         </>
                     )}
                     {D < -0.0001 && (
-                        <p>Da $D &lt; 0$, ist der Wert unter der Wurzel negativ. Es gibt <strong>keine reellen Nullstellen</strong>.</p>
+                        <p>Da <InlineMath math="D < 0" />, ist der Wert unter der Wurzel negativ. Es gibt <strong>keine reellen Nullstellen</strong>.</p>
                     )}
                 </div>
 
@@ -343,7 +347,7 @@ const Nullstellen = () => {
                 <div className="bg-white p-6 rounded-lg border border-gray-200 mb-6">
                     <div className="mb-4">
                         <label className="block text-gray-700 font-medium mb-2">
-                            Wie viele reelle Nullstellen erwartest du?
+                            Wie viele unterschiedliche Nullstellen konntest du berechnen?
                         </label>
                         <select 
                             value={userCount}
