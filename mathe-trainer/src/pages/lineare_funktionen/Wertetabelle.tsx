@@ -9,6 +9,33 @@ declare global {
 }
 
 const PLOT_MIN_POINTS = 2
+const PLOT_WIDTH = 460
+const PLOT_HEIGHT = 300
+
+// Erzwingt ein kartesisches Koordinatensystem: 1 Einheit auf der x-Achse
+// entspricht optisch genauso vielen Pixeln wie 1 Einheit auf der y-Achse.
+// Dazu wird die knappere der beiden benötigten Spannen (x oder y) auf das
+// Seitenverhältnis von Breite/Höhe der Zeichenfläche aufgeweitet.
+function computeCartesianView(xMin: number, xMax: number, yMin: number, yMax: number, width: number, height: number) {
+  const xCenter = (xMin + xMax) / 2
+  const yCenter = (yMin + yMax) / 2
+  let rangeX = Math.max(xMax - xMin, 0.0001)
+  let rangeY = Math.max(yMax - yMin, 0.0001)
+
+  const neededRangeXForY = rangeY * (width / height)
+  if (rangeX < neededRangeXForY) {
+    rangeX = neededRangeXForY
+  } else {
+    rangeY = rangeX * (height / width)
+  }
+
+  return {
+    viewXMin: xCenter - rangeX / 2,
+    viewXMax: xCenter + rangeX / 2,
+    viewYMin: yCenter - rangeY / 2,
+    viewYMax: yCenter + rangeY / 2,
+  }
+}
 
 function injectPlotApplet(containerId: string, width: number, height: number, onLoad: (api: any) => void) {
   const params: any = {
@@ -379,10 +406,9 @@ export default function Wertetabelle() {
     const yMax = Math.max(...ys)
     const xPad = Math.max((xMax - xMin) * 0.25, 1)
     const yPad = Math.max((yMax - yMin) * 0.25, 1)
-    const viewXMin = xMin - xPad
-    const viewXMax = xMax + xPad
-    const viewYMin = yMin - yPad
-    const viewYMax = yMax + yPad
+    const { viewXMin, viewXMax, viewYMin, viewYMax } = computeCartesianView(
+      xMin - xPad, xMax + xPad, yMin - yPad, yMax + yPad, PLOT_WIDTH, PLOT_HEIGHT
+    )
     const rangeX = viewXMax - viewXMin
     const rangeY = viewYMax - viewYMin
 
@@ -472,7 +498,7 @@ export default function Wertetabelle() {
         if (attempts < 50) setTimeout(tryInject, 100)
         return
       }
-      injectPlotApplet(containerId, 460, 300, (api: any) => {
+      injectPlotApplet(containerId, PLOT_WIDTH, PLOT_HEIGHT, (api: any) => {
         plotApiRefs.current[index] = api
         setupPlot(index, aufgabe, api)
       })
@@ -1178,7 +1204,7 @@ export default function Wertetabelle() {
                   <p className={styles.plotHint}>
                     Klicke im Koordinatensystem auf mindestens {PLOT_MIN_POINTS} deiner Wertepaare. Richtige Punkte werden grün markiert; sobald genug Punkte gesetzt sind, zeichnet die App automatisch die passende Gerade ein.
                   </p>
-                  <div id={`ggb-plot-${index}`} style={{ width: '460px', height: '300px', margin: '0 auto' }}></div>
+                  <div id={`ggb-plot-${index}`} style={{ width: `${PLOT_WIDTH}px`, height: `${PLOT_HEIGHT}px`, margin: '0 auto' }}></div>
                   <div className={styles.plotControls}>
                     <span className={styles.plotBadge}>
                       {plotAchievedCount[index] || 0} / {PLOT_MIN_POINTS} Punkte gesetzt
