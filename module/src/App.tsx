@@ -26,6 +26,7 @@ import { GRUSSFORMEL_TASKS } from './lib/geschaeftsbrief/grussformel-tasks'
 import AufzaehlungTaskSelect from './pages/digitale-bildung/word/AufzaehlungTaskSelect'
 import AufzaehlungTrainer from './pages/digitale-bildung/word/AufzaehlungTrainer'
 import { AUFZAEHLUNG_TASKS } from './lib/geschaeftsbrief/aufzaehlung-tasks'
+import VollstaendigerBriefFormatSelect from './pages/digitale-bildung/word/VollstaendigerBriefFormatSelect'
 import VollstaendigerBriefTaskSelect from './pages/digitale-bildung/word/VollstaendigerBriefTaskSelect'
 import VollstaendigerBriefTrainer from './pages/digitale-bildung/word/VollstaendigerBriefTrainer'
 import { VOLLSTAENDIGER_BRIEF_TASKS } from './lib/geschaeftsbrief/vollstaendiger-brief-tasks'
@@ -111,6 +112,10 @@ function App() {
           element={<AufzaehlungTaskSelect />}
         />
         <Route path="/digitale-bildung/word/geschaeftsbrief/aufzaehlung/:taskId" element={<AufzaehlungTrainer />} />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-waehlen"
+          element={<VollstaendigerBriefFormatSelect />}
+        />
         <Route
           path="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief"
           element={

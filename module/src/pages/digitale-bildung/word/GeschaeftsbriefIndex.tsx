@@ -46,17 +46,10 @@ const bausteine: Bausteinstein[] = [
     id: 'vollstaendiger-brief',
     title: 'Vollständiger Geschäftsbrief',
     emoji: '📄',
-    description: 'Alle Bausteine zusammen in einem kompletten Geschäftsbrief üben.',
+    description:
+      'Alle Bausteine zusammen in einem kompletten Geschäftsbrief üben – wahlweise mit beschrifteten Eingabefeldern oder in einem freien Word-Editor.',
     enabled: true,
-    path: '/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief',
-  },
-  {
-    id: 'vollstaendiger-brief-doc',
-    title: 'Vollständiger Geschäftsbrief (Word-Editor)',
-    emoji: '📝',
-    description: 'Dieselbe Übung in einem echten, frei editierbaren Texteditor direkt im Browser – ohne Datei-Upload.',
-    enabled: true,
-    path: '/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc',
+    path: '/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-waehlen',
   },
 ];
 
