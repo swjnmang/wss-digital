@@ -335,9 +335,10 @@ export default function Wertetabelle() {
         aufgabe.funktionsgleichungLatex = `$$y = ${m}x$$`
         aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
         
-        // Wenn Typ 2: berechne y-Werte neu
+        // Wenn Typ 2: berechne y-Werte neu und erzwinge "nur x-Werte gegeben" (y wird gesucht)
         if (aufgabenTyp === 'teilweisgefülltVervollständigen' && aufgabe.yWerte) {
           aufgabe.yWerte = aufgabe.xWerte.map((x: number) => Math.round(m * x * 100) / 100)
+          aufgabe.gebenXWert = aufgabe.xWerte.map(() => true)
         }
       } else if (grad === 'mittel') {
         // Mittel: y = m*x + t mit ganzen Zahlen
