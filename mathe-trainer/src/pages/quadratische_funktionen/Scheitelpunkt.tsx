@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
 
 interface FunctionData {
     x_s: number;
@@ -56,6 +58,7 @@ const Scheitelpunkt = () => {
             if (a === -1 && (h !== 0)) funcString = funcString.replace("-1(x", "-(x");
             if (a === 1 && h === 0) funcString = funcString.replace("1x²", "x²");
             if (a === -1 && h === 0) funcString = funcString.replace("-1x²", "-x²");
+            funcString = funcString.replace(/²/g, '^2');
             hint = `Bei der Scheitelpunktform f(x) = a(x-d)² + e ist der Scheitelpunkt S(d|e). Achte auf das Vorzeichen bei d!`;
             data = { x_s, y_s, hint, level, a, h, k };
         } else if (level === 2) {
@@ -73,6 +76,7 @@ const Scheitelpunkt = () => {
             if (a === -1) funcString = funcString.replace("-1x²", "-x²");
             if (funcString.endsWith(" + 0")) funcString = funcString.slice(0, -4);
             if (funcString.endsWith(" - 0")) funcString = funcString.slice(0, -4);
+            funcString = funcString.replace(/²/g, '^2');
             hint = `Für f(x) = ax² + bx + c ist die x-Koordinate des Scheitelpunkts x_s = -b / (2a). Setze x_s in f(x) ein, um y_s zu erhalten.`;
             data = { x_s, y_s, hint, level, a, b, c };
         } else {
@@ -92,6 +96,7 @@ const Scheitelpunkt = () => {
             if (a === -1) funcString = funcString.replace("-1x²", "-x²");
             if (funcString.endsWith(" + 0")) funcString = funcString.slice(0, -4);
             if (funcString.endsWith(" - 0")) funcString = funcString.slice(0, -4);
+            funcString = funcString.replace(/²/g, '^2');
             hint = `Nutze x_s = -b / (2a) und y_s = f(x_s). Manchmal ist auch die quadratische Ergänzung hilfreich, um die Scheitelpunktform zu finden.`;
             data = { x_s, y_s, hint, level, a, b, c };
         }
@@ -152,15 +157,28 @@ const Scheitelpunkt = () => {
         }
     };
 
+    const wrapNeg = (n: number) => (n < 0 ? `(${n})` : `${n}`);
+
     const renderSolutionSteps = (data: FunctionData) => {
         if (data.level === 1) {
             const { a, h, k, x_s, y_s } = data;
             return (
-                <div className="space-y-2">
-                    <p>In der <strong>Scheitelpunktform</strong> f(x) = a(x − d)² + e kann der Scheitelpunkt S(d|e) direkt abgelesen werden.</p>
-                    <p>Vergleich mit f(x) = {equation.replace('f(x) = ', '')}: a = {a}, d = {h}, e = {k}</p>
-                    <p><em>Achtung:</em> In der Klammer steht „x − d". Das Vorzeichen von d ist also immer entgegengesetzt zum Vorzeichen in der Klammer.</p>
-                    <p className="font-bold text-blue-900">Scheitelpunkt: S({x_s} | {y_s})</p>
+                <div className="space-y-3">
+                    <p>
+                        In der <strong>Scheitelpunktform</strong>{' '}
+                        <InlineMath math="f(x) = a(x - d)^2 + e" /> kann der Scheitelpunkt{' '}
+                        <InlineMath math="S(d \mid e)" /> direkt abgelesen werden.
+                    </p>
+                    <p>
+                        Vergleich mit <InlineMath math={equation} />:{' '}
+                        <InlineMath math={`a = ${a}, \\; d = ${h}, \\; e = ${k}`} />
+                    </p>
+                    <p>
+                        <em>Achtung:</em> In der Klammer steht <InlineMath math="(x - d)" />. Das Vorzeichen von d ist also immer entgegengesetzt zum Vorzeichen in der Klammer.
+                    </p>
+                    <p className="font-bold text-blue-900 text-lg">
+                        Scheitelpunkt: <InlineMath math={`S(${x_s} \\mid ${y_s})`} />
+                    </p>
                 </div>
             );
         }
@@ -170,18 +188,23 @@ const Scheitelpunkt = () => {
         const term2 = Math.round(b * x_s * 100) / 100;
 
         return (
-            <div className="space-y-3">
-                <p>In der <strong>allgemeinen Form</strong> f(x) = ax² + bx + c gilt: a = {a}, b = {b}, c = {c}</p>
+            <div className="space-y-4">
+                <p>
+                    In der <strong>allgemeinen Form</strong> <InlineMath math="f(x) = ax^2 + bx + c" /> gilt:{' '}
+                    <InlineMath math={`a = ${a}, \\; b = ${b}, \\; c = ${c}`} />
+                </p>
                 <div>
-                    <p className="font-semibold">Schritt 1: x-Koordinate berechnen</p>
-                    <p>x_s = −b / (2a) = −({b}) / (2 · {a}) = {x_s}</p>
+                    <p className="font-semibold mb-1">Schritt 1: x-Koordinate berechnen</p>
+                    <BlockMath math={`x_S = -\\frac{b}{2a} = -\\frac{${wrapNeg(b)}}{2 \\cdot ${wrapNeg(a)}} = ${x_s}`} />
                 </div>
                 <div>
-                    <p className="font-semibold">Schritt 2: x_s in f(x) einsetzen, um y_s zu erhalten</p>
-                    <p>y_s = f(x_s) = {a} · ({x_s})² {formatNum(b)} · ({x_s}) {formatNum(c)}</p>
-                    <p>y_s = {term1} {formatNum(term2)} {formatNum(c)} = {y_s}</p>
+                    <p className="font-semibold mb-1">Schritt 2: x<sub>S</sub> in f(x) einsetzen, um y<sub>S</sub> zu erhalten</p>
+                    <BlockMath math={`y_S = f(x_S) = ${wrapNeg(a)} \\cdot (${wrapNeg(x_s)})^2 ${formatNum(b)} \\cdot (${wrapNeg(x_s)}) ${formatNum(c)}`} />
+                    <BlockMath math={`y_S = ${term1} ${formatNum(term2)} ${formatNum(c)} = ${y_s}`} />
                 </div>
-                <p className="font-bold text-blue-900">Scheitelpunkt: S({x_s} | {y_s})</p>
+                <p className="font-bold text-blue-900 text-lg">
+                    Scheitelpunkt: <InlineMath math={`S(${x_s} \\mid ${y_s})`} />
+                </p>
             </div>
         );
     };
@@ -237,8 +260,8 @@ const Scheitelpunkt = () => {
 
                 <div className="bg-white p-6 rounded-lg shadow-md mb-6 text-center">
                     <p className="text-lg mb-4">{taskPrompt}</p>
-                    <div className="text-3xl font-serif text-center bg-gray-50 p-6 rounded mb-8">
-                        {equation}
+                    <div className="text-3xl text-center bg-gray-50 p-6 rounded mb-8">
+                        <InlineMath math={equation} />
                     </div>
 
                     <div className="flex items-center justify-center gap-4 mb-8">
