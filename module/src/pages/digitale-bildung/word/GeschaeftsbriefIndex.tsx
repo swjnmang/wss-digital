@@ -50,6 +50,14 @@ const bausteine: Bausteinstein[] = [
     enabled: true,
     path: '/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief',
   },
+  {
+    id: 'vollstaendiger-brief-doc',
+    title: 'Vollständiger Geschäftsbrief (Word-Editor)',
+    emoji: '📝',
+    description: 'Dieselbe Übung in einem echten, frei editierbaren Texteditor direkt im Browser – ohne Datei-Upload.',
+    enabled: true,
+    path: '/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc',
+  },
 ];
 
 export default function GeschaeftsbriefIndex() {

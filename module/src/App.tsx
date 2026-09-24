@@ -29,6 +29,9 @@ import { AUFZAEHLUNG_TASKS } from './lib/geschaeftsbrief/aufzaehlung-tasks'
 import VollstaendigerBriefTaskSelect from './pages/digitale-bildung/word/VollstaendigerBriefTaskSelect'
 import VollstaendigerBriefTrainer from './pages/digitale-bildung/word/VollstaendigerBriefTrainer'
 import { VOLLSTAENDIGER_BRIEF_TASKS } from './lib/geschaeftsbrief/vollstaendiger-brief-tasks'
+import VollstaendigerBriefDocTaskSelect from './pages/digitale-bildung/word/VollstaendigerBriefDocTaskSelect'
+import VollstaendigerBriefDocTrainer from './pages/digitale-bildung/word/VollstaendigerBriefDocTrainer'
+import { WORD_DOKUMENT_TASKS } from './lib/geschaeftsbrief/word-dokument-tasks'
 import ImpressumModal from './components/ImpressumModal'
 
 function App() {
@@ -124,6 +127,23 @@ function App() {
         <Route
           path="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief/:taskId"
           element={<VollstaendigerBriefTrainer />}
+        />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc"
+          element={
+            <Navigate
+              to={`/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc/${WORD_DOKUMENT_TASKS[0].id}`}
+              replace
+            />
+          }
+        />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc/uebersicht"
+          element={<VollstaendigerBriefDocTaskSelect />}
+        />
+        <Route
+          path="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc/:taskId"
+          element={<VollstaendigerBriefDocTrainer />}
         />
       </Routes>
       <ImpressumModal />
