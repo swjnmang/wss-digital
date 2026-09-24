@@ -127,11 +127,7 @@ export default function Normalparabel() {
       setScore(s => s + 1);
       setTimeout(() => {
         setFeedback(null);
-        if (currentQuestion < 4) {
-          setCurrentQuestion(c => c + 1);
-        } else {
-          setFeedback({ text: 'Sehr gut! Alle Fragen richtig beantwortet.', type: 'correct' });
-        }
+        setCurrentQuestion(c => c + 1);
       }, 1000);
     } else {
       setFeedback({ text: 'Leider falsch. Versuche es erneut!', type: 'incorrect' });
@@ -185,7 +181,17 @@ export default function Normalparabel() {
           </div>
         );
       default:
-        return <div className="text-green-600 font-bold text-xl">Alle Fragen beantwortet!</div>;
+        return (
+          <div className="question-block">
+            <p className="text-green-600 font-bold text-xl mb-4">Sehr gut! Alle Fragen richtig beantwortet.</p>
+            <button
+              onClick={generateNewTask}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors"
+            >
+              Weiter zur nächsten Aufgabe
+            </button>
+          </div>
+        );
     }
   };
 
