@@ -6,7 +6,7 @@ import '@univerjs/preset-docs-core/lib/index.css';
 
 import type { FUniver } from '@univerjs/core/facade';
 import type { FDocument } from '@univerjs/docs/facade';
-import { applyTaskToDocument } from '../../lib/geschaeftsbrief/word-dokument-doc';
+import { applyTaskToDocument, buildInitialDocumentData } from '../../lib/geschaeftsbrief/word-dokument-doc';
 import { gradeWordDokument } from '../../lib/geschaeftsbrief/word-dokument-grading';
 import type { WordDokumentTask } from '../../lib/geschaeftsbrief/word-dokument-tasks';
 import type { ValidationResult } from '../../lib/excel-trainer/types';
@@ -54,7 +54,7 @@ export const UniverDoc = forwardRef<UniverDocHandle, UniverDocProps>(({ task }, 
       api.disposeUnit(documentRef.current.getId());
     }
 
-    const fDocument = api.createDocument({ id: task.id, title: task.title });
+    const fDocument = api.createDocument(buildInitialDocumentData(task));
     documentRef.current = fDocument;
     applyTaskToDocument(fDocument, task);
   }, [task]);
