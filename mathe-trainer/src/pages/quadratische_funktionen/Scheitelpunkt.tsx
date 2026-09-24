@@ -133,30 +133,48 @@ const Scheitelpunkt = () => {
         }
     };
 
+    const parseInput = (value: string) => parseFloat(value.replace(',', '.').replace(/[−–—‐]/g, '-'));
+
+    const getInputValidationClass = (value: string, target: number | undefined) => {
+        if (value === '' || target === undefined) return 'border-gray-300';
+        const parsed = parseInput(value);
+        if (isNaN(parsed)) return 'border-gray-300';
+        return Math.abs(parsed - target) < 0.01
+            ? 'border-green-500 bg-green-50 text-green-800'
+            : 'border-red-500 bg-red-50 text-red-800';
+    };
+
+    const xInputClass = getInputValidationClass(userX, currentFunctionData?.x_s);
+    const yInputClass = getInputValidationClass(userY, currentFunctionData?.y_s);
+
+    const taskPrompt = difficulty === 1
+        ? 'Lies den Scheitelpunkt aus der Scheitelform ab. Eine Berechnung ist nicht notwendig'
+        : 'Bestimme den Scheitelpunkt der Funktion:';
+
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col items-center text-center mb-6 gap-3">
                 <h1 className="text-3xl font-bold">Scheitelpunkt-Trainer</h1>
                 <div className="bg-white px-4 py-2 rounded shadow text-blue-600 font-bold">
                     Streak: {streak} 🔥
                 </div>
             </div>
-            
+
             <div className="mb-6">
-                <div className="flex gap-2 mb-4">
-                    <button 
+                <div className="flex gap-2 mb-4 justify-center flex-wrap">
+                    <button
                         onClick={() => setDifficulty(1)}
                         className={`px-4 py-2 rounded ${difficulty === 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
                     >
                         Level 1 (Scheitelpunktform)
                     </button>
-                    <button 
+                    <button
                         onClick={() => setDifficulty(2)}
                         className={`px-4 py-2 rounded ${difficulty === 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
                     >
                         Level 2 (Allgemeine Form)
                     </button>
-                    <button 
+                    <button
                         onClick={() => setDifficulty(3)}
                         className={`px-4 py-2 rounded ${difficulty === 3 ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
                     >
@@ -164,8 +182,8 @@ const Scheitelpunkt = () => {
                     </button>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                    <p className="text-lg mb-4">Bestimme den Scheitelpunkt der Funktion:</p>
+                <div className="bg-white p-6 rounded-lg shadow-md mb-6 text-center">
+                    <p className="text-lg mb-4">{taskPrompt}</p>
                     <div className="text-3xl font-serif text-center bg-gray-50 p-6 rounded mb-8">
                         {equation}
                     </div>
@@ -177,7 +195,7 @@ const Scheitelpunkt = () => {
                             value={userX}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUserX(event.target.value)}
                             placeholder="x"
-                            className="w-24 p-3 border rounded text-center text-xl"
+                            className={`w-24 p-3 border-2 rounded text-center text-xl transition-colors ${xInputClass}`}
                             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => event.key === 'Enter' && checkAnswer()}
                         />
                         <span className="text-2xl">|</span>
@@ -186,26 +204,26 @@ const Scheitelpunkt = () => {
                             value={userY}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUserY(event.target.value)}
                             placeholder="y"
-                            className="w-24 p-3 border rounded text-center text-xl"
+                            className={`w-24 p-3 border-2 rounded text-center text-xl transition-colors ${yInputClass}`}
                             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => event.key === 'Enter' && checkAnswer()}
                         />
                         <span className="text-2xl">)</span>
                     </div>
 
                     <div className="flex gap-4 justify-center flex-wrap">
-                        <button 
+                        <button
                             onClick={checkAnswer}
                             className="bg-green-600 text-white px-8 py-3 rounded hover:bg-green-700 font-bold text-lg"
                         >
                             Prüfen
                         </button>
-                        <button 
+                        <button
                             onClick={() => generateFunction(difficulty)}
                             className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
                         >
                             Neue Aufgabe
                         </button>
-                        <button 
+                        <button
                             onClick={showHint}
                             className="bg-yellow-500 text-white px-6 py-3 rounded hover:bg-yellow-600"
                         >
