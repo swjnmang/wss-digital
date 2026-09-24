@@ -15,7 +15,16 @@ interface TaskState {
     4: string;
   };
   options3: string[];
+  colorName: string;
 }
+
+const PARABOLA_COLORS = [
+  { name: 'blaue', rgb: [25, 85, 220] },
+  { name: 'rote', rgb: [220, 38, 38] },
+  { name: 'grüne', rgb: [22, 163, 74] },
+  { name: 'orangene', rgb: [234, 88, 12] },
+  { name: 'violette', rgb: [147, 51, 234] },
+];
 
 export default function Normalparabel() {
   const [task, setTask] = useState<TaskState | null>(null);
@@ -75,6 +84,7 @@ export default function Normalparabel() {
       0.25, 0.5, 0.75, 1.25, 1.5, 2, 2.5, 3, 3.5, 4, 5
     ];
     const a = possibleA[Math.floor(Math.random() * possibleA.length)];
+    const color = PARABOLA_COLORS[Math.floor(Math.random() * PARABOLA_COLORS.length)];
 
     const correctAnswers = {
       1: Math.abs(a) > 1 ? 'gestreckt' : 'gestaucht',
@@ -88,7 +98,7 @@ export default function Normalparabel() {
     options3.push(`y = x²`);
     options3.sort(() => Math.random() - 0.5);
 
-    const newTask = { a, correctAnswers, options3 };
+    const newTask = { a, correctAnswers, options3, colorName: color.name };
     setTask(newTask);
     setCurrentQuestion(1);
     setFeedback(null);
@@ -99,6 +109,7 @@ export default function Normalparabel() {
       try {
         ggbApiRef.current.reset();
         ggbApiRef.current.evalCommand(`f(x) = ${a}*x^2`);
+        ggbApiRef.current.setColor('f', color.rgb[0], color.rgb[1], color.rgb[2]);
         ggbApiRef.current.evalCommand('n(x) = x^2');
         ggbApiRef.current.setLineStyle('n', 1);
         ggbApiRef.current.setColor('n', 150, 150, 150);
@@ -146,7 +157,7 @@ export default function Normalparabel() {
       case 1:
         return (
           <div className="question-block">
-            <p className="font-bold mb-4">1. Ist die Parabel gestreckt oder gestaucht?</p>
+            <p className="font-bold mb-4">1. Ist die {task.colorName} Parabel im Vergleich zur grauen Normalparabel gestreckt oder gestaucht?</p>
             <div className="flex gap-4 justify-center">
               <button onClick={() => checkAnswer(1, 'gestreckt')} className="btn-option">Gestreckt (|a| &gt; 1)</button>
               <button onClick={() => checkAnswer(1, 'gestaucht')} className="btn-option">Gestaucht (|a| &lt; 1)</button>
