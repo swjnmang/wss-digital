@@ -154,11 +154,11 @@ export default function Normalparabel() {
 
   const [appletsLoaded, setAppletsLoaded] = useState({ main: false, match: false, guess: false, sandbox: false });
 
-  // Größen der Graphen: deutlich kleiner als zuvor und an die Bildschirmbreite angepasst
-  const sandboxSize = getResponsiveSize(380, 250);
-  const mainSize = getResponsiveSize(340, 220);
-  const matchSize = getResponsiveSize(380, 250);
-  const guessSize = getResponsiveSize(380, 250);
+  // Größen der Graphen: groß und gut lesbar, nur an die Bildschirmbreite gedeckelt
+  const sandboxSize = getResponsiveSize(500, 320);
+  const mainSize = getResponsiveSize(560, 370);
+  const matchSize = getResponsiveSize(500, 320);
+  const guessSize = getResponsiveSize(500, 320);
 
   useEffect(() => {
     const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
@@ -470,9 +470,9 @@ export default function Normalparabel() {
           </div>
 
           {mainTask && (
-            <div className="space-y-1.5">
-              <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
-                <p className="font-semibold text-sm mb-1.5">1. Ist die {mainTask.colorName} Parabel im Vergleich zur grauen Normalparabel gestreckt oder gestaucht?</p>
+            <div className="divide-y divide-slate-200 border-t border-b border-slate-200">
+              <div className="py-1.5">
+                <p className="font-semibold text-sm mb-1">1. Ist die {mainTask.colorName} Parabel im Vergleich zur grauen Normalparabel gestreckt oder gestaucht?</p>
                 <div className="flex gap-2 justify-center flex-wrap">
                   <button onClick={() => checkMainAnswer(1, 'gestreckt')} className="btn-option" disabled={mainAnswered[1]}>Gestreckt (|a| &gt; 1)</button>
                   <button onClick={() => checkMainAnswer(1, 'gestaucht')} className="btn-option" disabled={mainAnswered[1]}>Gestaucht (|a| &lt; 1)</button>
@@ -480,8 +480,8 @@ export default function Normalparabel() {
                 {mainFeedback[1] && <p className={`text-center font-bold text-sm mt-1 ${mainFeedback[1]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[1]!.text}</p>}
               </div>
 
-              <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
-                <p className="font-semibold text-sm mb-1.5">2. Ist die Parabel nach oben oder unten geöffnet?</p>
+              <div className="py-1.5">
+                <p className="font-semibold text-sm mb-1">2. Ist die Parabel nach oben oder unten geöffnet?</p>
                 <div className="flex gap-2 justify-center flex-wrap">
                   <button onClick={() => checkMainAnswer(2, 'oben')} className="btn-option" disabled={mainAnswered[2]}>Nach oben (a &gt; 0)</button>
                   <button onClick={() => checkMainAnswer(2, 'unten')} className="btn-option" disabled={mainAnswered[2]}>Nach unten (a &lt; 0)</button>
@@ -489,8 +489,8 @@ export default function Normalparabel() {
                 {mainFeedback[2] && <p className={`text-center font-bold text-sm mt-1 ${mainFeedback[2]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[2]!.text}</p>}
               </div>
 
-              <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
-                <p className="font-semibold text-sm mb-1.5">3. Wie lautet die Funktionsgleichung?</p>
+              <div className="py-1.5">
+                <p className="font-semibold text-sm mb-1">3. Wie lautet die Funktionsgleichung?</p>
                 <div className="flex gap-2 justify-center flex-wrap">
                   {mainTask.options3.map((opt, idx) => (
                     <button key={idx} onClick={() => checkMainAnswer(3, opt)} className="btn-option" disabled={mainAnswered[3]}>{opt}</button>
@@ -499,16 +499,20 @@ export default function Normalparabel() {
                 {mainFeedback[3] && <p className={`text-center font-bold text-sm mt-1 ${mainFeedback[3]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[3]!.text}</p>}
               </div>
 
-              <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
-                <p className="font-semibold text-sm mb-1.5">4. Ist der Scheitelpunkt der höchste oder niedrigste Punkt?</p>
+              <div className="py-1.5">
+                <p className="font-semibold text-sm mb-1">4. Ist der Scheitelpunkt der höchste oder niedrigste Punkt?</p>
                 <div className="flex gap-2 justify-center flex-wrap">
                   <button onClick={() => checkMainAnswer(4, 'niedrigster')} className="btn-option" disabled={mainAnswered[4]}>Niedrigster (Tiefpunkt)</button>
                   <button onClick={() => checkMainAnswer(4, 'hoechster')} className="btn-option" disabled={mainAnswered[4]}>Höchster (Hochpunkt)</button>
                 </div>
                 {mainFeedback[4] && <p className={`text-center font-bold text-sm mt-1 ${mainFeedback[4]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[4]!.text}</p>}
               </div>
+            </div>
+          )}
 
-              <div className="text-center pt-1">
+          {mainTask && (
+            <>
+              <div className="text-center pt-2">
                 <button
                   onClick={() => setMainShowSolution(true)}
                   className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm"
@@ -539,7 +543,7 @@ export default function Normalparabel() {
                   </ul>
                 </div>
               )}
-            </div>
+            </>
           )}
         </div>
 
@@ -678,10 +682,10 @@ export default function Normalparabel() {
         .btn-option {
           background-color: white;
           border: 1px solid #cbd5e1;
-          padding: 0.4rem 0.85rem;
-          border-radius: 0.5rem;
+          padding: 0.3rem 0.7rem;
+          border-radius: 0.375rem;
           font-weight: 500;
-          font-size: 0.875rem;
+          font-size: 0.8125rem;
           color: #334155;
           transition: all 0.2s;
         }
