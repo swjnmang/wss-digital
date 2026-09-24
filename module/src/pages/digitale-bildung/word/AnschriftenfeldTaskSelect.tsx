@@ -50,7 +50,7 @@ export default function AnschriftenfeldTaskSelect() {
                 {difficultyLabel[task.difficulty] ?? task.difficulty}
               </span>
               <h3 className="text-base font-bold text-slate-800 mb-1">{task.title}</h3>
-              <p className="text-sm text-slate-500 line-clamp-2">{task.scenario}</p>
+              <p className="text-sm text-slate-500 line-clamp-2">{task.arbeitsauftrag}</p>
             </button>
           ))}
         </div>

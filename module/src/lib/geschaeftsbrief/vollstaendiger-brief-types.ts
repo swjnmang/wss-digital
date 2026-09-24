@@ -1,4 +1,8 @@
-import type { Line } from './line-types';
+import type { InfoblockLine } from './infoblock-types';
+import type { AnschriftLine } from './types';
+import type { TextLine } from './line-types';
+
+export type { InfoblockLine, AnschriftLine, TextLine };
 
 export interface VollstaendigerBriefTask {
   id: string;
@@ -6,14 +10,17 @@ export interface VollstaendigerBriefTask {
   difficulty: 'einfach' | 'mittel' | 'schwer';
   arbeitsauftrag: string;
   senderLine: string;
-  anschriftenfeld: Line[];
-  infoblock: Line[];
-  betreff: Line[];
-  anrede: Line[];
-  grussformel: Line[];
+  anschriftenfeld: AnschriftLine[];
+  infoblock: InfoblockLine[];
+  betreff: TextLine[];
+  anrede: TextLine[];
+  /** Reference letter body (plain paragraphs, no lists/tables) the student must type themselves. */
+  brieftextReferenz: string[];
+  grussformel: TextLine[];
 }
 
-export function allLines(task: VollstaendigerBriefTask): Line[] {
+/** All typed single-line fields that get graded together (excludes the free-text Brieftext). */
+export function allLineFields(task: VollstaendigerBriefTask): (AnschriftLine | InfoblockLine | TextLine)[] {
   return [
     ...task.anschriftenfeld,
     ...task.infoblock,
@@ -21,4 +28,16 @@ export function allLines(task: VollstaendigerBriefTask): Line[] {
     ...task.anrede,
     ...task.grussformel,
   ];
+}
+
+/** Normalizes whitespace for a lenient comparison of the typed Brieftext against the reference. */
+export function normalizeBrieftext(value: string): string {
+  return value
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([.,;:!?])/g, '$1');
+}
+
+export function brieftextMatches(value: string, reference: string[]): boolean {
+  return normalizeBrieftext(value) === normalizeBrieftext(reference.join(' '));
 }
