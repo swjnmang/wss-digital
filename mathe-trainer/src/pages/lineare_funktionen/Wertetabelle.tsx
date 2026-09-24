@@ -1,7 +1,37 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './Wertetabelle.module.css'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
-import GeoGebraGraph from '../../components/GeoGebraGraph'
+
+declare global {
+  interface Window {
+    GGBApplet: any
+  }
+}
+
+const PLOT_MIN_POINTS = 2
+
+function injectPlotApplet(containerId: string, width: number, height: number, onLoad: (api: any) => void) {
+  const params: any = {
+    appName: 'classic',
+    width,
+    height,
+    showToolBar: false,
+    showAlgebraInput: false,
+    showMenuBar: false,
+    perspective: 'G',
+    useBrowserForJS: true,
+    enableShiftDragZoom: true,
+    showResetIcon: true,
+    showZoomButtons: true,
+    appletOnLoad: onLoad,
+  }
+  try {
+    const applet = new window.GGBApplet(params, true)
+    applet.inject(containerId)
+  } catch (e) {
+    console.error(`GeoGebra Error (${containerId}):`, e)
+  }
+}
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -280,11 +310,19 @@ export default function Wertetabelle() {
   const [antworten, setAntworten] = useState<{ [key: number]: Array<{ x: string; y: string }> }>({})
   const [validiert, setValidiert] = useState<{ [key: number]: boolean }>({})
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
-  const [showGraph, setShowGraph] = useState<{ [key: number]: boolean }>({})
   const [validierteZellen, setValidierteZellen] = useState<{ [key: string]: boolean }>({})
   const [fehlerhafteZellen, setFehlerhafteZellen] = useState<{ [key: string]: boolean }>({})
   const [punkte, setPunkte] = useState<number>(0)
   const [schwierigkeitsgrad, setSchwierigkeitsgrad] = useState<'einfach' | 'mittel' | 'schwer' | null>(null)
+
+  // --- Interaktives Einzeichnen der Punkte/Geraden (pro Aufgabe) ---
+  const plotApiRefs = useRef<{ [index: number]: any }>({})
+  const plotAchievedRefs = useRef<{ [index: number]: Set<string> }>({})
+  const plotDoneRefs = useRef<{ [index: number]: boolean }>({})
+  const [plotAchievedCount, setPlotAchievedCount] = useState<{ [index: number]: number }>({})
+  const [plotDone, setPlotDone] = useState<{ [index: number]: boolean }>({})
+  const [plotFeedback, setPlotFeedback] = useState<{ [index: number]: string | null }>({})
+  const [plotScored, setPlotScored] = useState<{ [index: number]: boolean }>({})
 
   // MathJax laden
   useEffect(() => {
@@ -298,6 +336,202 @@ export default function Wertetabelle() {
     mathjaxScript.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
     document.head.appendChild(mathjaxScript)
   }, [])
+
+  // GeoGebra-Skript einmalig laden
+  useEffect(() => {
+    const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]')
+    if (!existing) {
+      const script = document.createElement('script')
+      script.src = 'https://www.geogebra.org/apps/deployggb.js'
+      script.async = true
+      document.body.appendChild(script)
+    }
+  }, [])
+
+  // Ermittelt die bekannten (korrekten) Wertepaare einer Aufgabe, sobald sie
+  // richtig gelöst ist. Bei Typ 1 sind das die selbst gewählten x-Werte der
+  // SuS (deren y-Werte gerade als korrekt geprüft wurden), bei Typ 2 die vom
+  // Aufgabengenerator vorgegebenen xWerte/yWerte-Paare.
+  function getTargetPoints(aufgabe: Aufgabe, eingaben: Array<{ x: string; y: string }> | undefined): { x: number; y: number }[] {
+    if (aufgabe.typ === 'leereTabelleAusfüllen') {
+      if (!eingaben) return []
+      return eingaben
+        .map(e => ({
+          x: parseFloat(e.x.replace(',', '.').replace(/[−–—‐]/g, '-')),
+          y: parseFloat(e.y.replace(',', '.').replace(/[−–—‐]/g, '-'))
+        }))
+        .filter(p => !isNaN(p.x) && !isNaN(p.y))
+    }
+    return aufgabe.xWerte.map((x: number, i: number) => ({ x, y: aufgabe.yWerte[i] }))
+  }
+
+  // Richtet die Zeichenfläche für eine Aufgabe ein: Punkt-Werkzeug aktivieren,
+  // Koordinatensystem passend zu den Zielpunkten wählen und auf Klicks reagieren.
+  function setupPlot(index: number, aufgabe: Aufgabe, api: any) {
+    const targets = getTargetPoints(aufgabe, antworten[index])
+    if (targets.length < PLOT_MIN_POINTS) return
+
+    const xs = targets.map(p => p.x).concat(0)
+    const ys = targets.map(p => p.y).concat(0)
+    const xMin = Math.min(...xs)
+    const xMax = Math.max(...xs)
+    const yMin = Math.min(...ys)
+    const yMax = Math.max(...ys)
+    const xPad = Math.max((xMax - xMin) * 0.25, 1)
+    const yPad = Math.max((yMax - yMin) * 0.25, 1)
+    const viewXMin = xMin - xPad
+    const viewXMax = xMax + xPad
+    const viewYMin = yMin - yPad
+    const viewYMax = yMax + yPad
+    const rangeX = viewXMax - viewXMin
+    const rangeY = viewYMax - viewYMin
+
+    plotAchievedRefs.current[index] = new Set()
+    plotDoneRefs.current[index] = false
+    setPlotAchievedCount(prev => ({ ...prev, [index]: 0 }))
+    setPlotDone(prev => ({ ...prev, [index]: false }))
+    setPlotFeedback(prev => ({ ...prev, [index]: null }))
+
+    try {
+      api.reset()
+      api.setCoordSystem(viewXMin, viewXMax, viewYMin, viewYMax)
+      api.setMode(1) // Punkt-Werkzeug: Klicks erzeugen einen Punkt
+
+      api.registerAddListener((objName: string) => {
+        if (plotDoneRefs.current[index]) return
+
+        let rawX = 0
+        let rawY = 0
+        try {
+          rawX = api.getXcoord(objName)
+          rawY = api.getYcoord(objName)
+        } catch (e) {
+          return
+        }
+
+        let nearest: { x: number; y: number } | null = null
+        let nearestDist = Infinity
+        for (const t of targets) {
+          const dx = (rawX - t.x) / rangeX
+          const dy = (rawY - t.y) / rangeY
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < nearestDist) {
+            nearestDist = dist
+            nearest = t
+          }
+        }
+
+        const captureRadius = 0.06
+        const achieved = plotAchievedRefs.current[index] || new Set<string>()
+
+        if (nearest && nearestDist <= captureRadius) {
+          const key = `${nearest.x}|${nearest.y}`
+          if (achieved.has(key)) {
+            try { api.deleteObject(objName) } catch (e) { /* ignore */ }
+            return
+          }
+          try {
+            api.setCoords(objName, nearest.x, nearest.y)
+            api.setColor(objName, 22, 163, 74)
+          } catch (e) { /* ignore */ }
+
+          achieved.add(key)
+          plotAchievedRefs.current[index] = achieved
+          setPlotAchievedCount(prev => ({ ...prev, [index]: achieved.size }))
+          setPlotFeedback(prev => ({ ...prev, [index]: null }))
+
+          if (achieved.size >= PLOT_MIN_POINTS) {
+            plotDoneRefs.current[index] = true
+            setPlotDone(prev => ({ ...prev, [index]: true }))
+            try {
+              api.evalCommand(`g(x) = ${aufgabe.m}*x + ${aufgabe.t}`)
+              api.setColor('g', 37, 99, 235)
+              api.setMode(0)
+            } catch (e) { /* ignore */ }
+          }
+        } else {
+          try { api.setColor(objName, 220, 38, 38) } catch (e) { /* ignore */ }
+          setPlotFeedback(prev => ({ ...prev, [index]: 'Dieser Punkt passt zu keinem Wertepaar deiner Tabelle. Versuch es noch einmal!' }))
+          setTimeout(() => {
+            try { api.deleteObject(objName) } catch (e) { /* ignore */ }
+          }, 900)
+        }
+      })
+    } catch (e) {
+      console.error('GeoGebra Plot-Setup-Error:', e)
+    }
+  }
+
+  // Injiziert (bzw. richtet erneut ein) die Zeichenfläche für eine Aufgabe
+  function initPlotForIndex(index: number, aufgabe: Aufgabe) {
+    const containerId = `ggb-plot-${index}`
+    let attempts = 0
+    const tryInject = () => {
+      attempts++
+      if (!window.GGBApplet || !document.getElementById(containerId)) {
+        if (attempts < 50) setTimeout(tryInject, 100)
+        return
+      }
+      injectPlotApplet(containerId, 460, 300, (api: any) => {
+        plotApiRefs.current[index] = api
+        setupPlot(index, aufgabe, api)
+      })
+    }
+    tryInject()
+  }
+
+  // Sobald eine Aufgabe als richtig validiert wird, Zeichenfläche einrichten
+  useEffect(() => {
+    aufgaben.forEach((aufgabe, index) => {
+      if (validiert[index] && !plotApiRefs.current[index]) {
+        initPlotForIndex(index, aufgabe)
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validiert, aufgaben])
+
+  function resetPlot(index: number) {
+    const aufgabe = aufgaben[index]
+    const api = plotApiRefs.current[index]
+    if (!api || !aufgabe) return
+    setupPlot(index, aufgabe, api)
+  }
+
+  // Entfernt die Zeichenfläche und ihren Zustand für eine Aufgabe (z.B. wenn
+  // die Tabelle erneut bearbeitet wird und damit nicht mehr als geprüft gilt)
+  function clearPlotForIndex(index: number) {
+    delete plotApiRefs.current[index]
+    delete plotAchievedRefs.current[index]
+    delete plotDoneRefs.current[index]
+    setPlotAchievedCount(prev => {
+      const next = { ...prev }
+      delete next[index]
+      return next
+    })
+    setPlotDone(prev => {
+      const next = { ...prev }
+      delete next[index]
+      return next
+    })
+    setPlotFeedback(prev => {
+      const next = { ...prev }
+      delete next[index]
+      return next
+    })
+  }
+
+  // Vergibt einen Zusatzpunkt, sobald in einer Aufgabe die Gerade fertig
+  // eingezeichnet wurde (einmalig pro Aufgabe/Runde)
+  useEffect(() => {
+    Object.keys(plotDone).forEach(key => {
+      const index = Number(key)
+      if (plotDone[index] && !plotScored[index]) {
+        setPunkte(p => p + 1)
+        setPlotScored(prev => ({ ...prev, [index]: true }))
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plotDone])
 
   // Aufgaben generieren basierend auf Schwierigkeitsgrad
   function generiereAufgaben(grad: 'einfach' | 'mittel' | 'schwer') {
@@ -316,7 +550,7 @@ export default function Wertetabelle() {
       let aufgabe = aufgabenBanks[aufgabenTyp as keyof typeof aufgabenBanks]()
       
       // Gemeinsame Frage-Erweiterung
-      const graphHinweis = ' Zeichne den Graph anschließend in ein von dir selbst erstelltes Koordinatensystem.'
+      const graphHinweis = ' Sobald die Wertetabelle richtig ist, zeichne mindestens zwei deiner Wertepaare als Punkte in das erscheinende Koordinatensystem ein - die passende Gerade wird dann automatisch ergänzt.'
       
       let m = aufgabe.m
       let t = aufgabe.t
@@ -380,9 +614,17 @@ export default function Wertetabelle() {
     setAntworten({})
     setValidiert({})
     setShowLösung({})
-    setShowGraph({})
     setValidierteZellen({})
     setFehlerhafteZellen({})
+
+    // Zeichenflächen der vorherigen Runde vollständig zurücksetzen
+    plotApiRefs.current = {}
+    plotAchievedRefs.current = {}
+    plotDoneRefs.current = {}
+    setPlotAchievedCount({})
+    setPlotDone({})
+    setPlotFeedback({})
+    setPlotScored({})
   }
 
   // Markiert fehlerhafte Zellen rot
@@ -655,7 +897,10 @@ export default function Wertetabelle() {
       ...antworten,
       [aufgabeIndex]: currentAnswers
     })
-    
+
+    if (validiert[aufgabeIndex]) {
+      clearPlotForIndex(aufgabeIndex)
+    }
     setValidiert({ ...validiert, [aufgabeIndex]: false })
   }
 
@@ -834,17 +1079,11 @@ export default function Wertetabelle() {
                 <button onClick={() => checkAnswer(index)} className={styles.checkBtn}>
                   Prüfen
                 </button>
-                <button 
-                  onClick={() => setShowLösung({ ...showLösung, [index]: !showLösung[index] })} 
+                <button
+                  onClick={() => setShowLösung({ ...showLösung, [index]: !showLösung[index] })}
                   className={styles.solutionBtn}
                 >
                   {showLösung[index] ? 'Lösung ausblenden' : 'Lösung anzeigen'}
-                </button>
-                <button 
-                  onClick={() => setShowGraph({ ...showGraph, [index]: !showGraph[index] })} 
-                  className={styles.graphBtn}
-                >
-                  {showGraph[index] ? 'Graph ausblenden' : 'Graph anzeigen'}
                 </button>
               </div>
 
@@ -932,11 +1171,30 @@ export default function Wertetabelle() {
                 </div>
               )}
 
-              {/* Graph */}
-              {showGraph[index] && (
+              {/* Punkte einzeichnen: erscheint automatisch, sobald die Wertetabelle richtig ist */}
+              {validiert[index] && (
                 <div className={styles.graphBox}>
-                  <h4>Funktionsgraph:</h4>
-                  <GeoGebraGraph m={aufgabe.m} t={aufgabe.t} width={600} height={400} />
+                  <h4>Punkte einzeichnen:</h4>
+                  <p className={styles.plotHint}>
+                    Klicke im Koordinatensystem auf mindestens {PLOT_MIN_POINTS} deiner Wertepaare. Richtige Punkte werden grün markiert; sobald genug Punkte gesetzt sind, zeichnet die App automatisch die passende Gerade ein.
+                  </p>
+                  <div id={`ggb-plot-${index}`} style={{ width: '460px', height: '300px', margin: '0 auto' }}></div>
+                  <div className={styles.plotControls}>
+                    <span className={styles.plotBadge}>
+                      {plotAchievedCount[index] || 0} / {PLOT_MIN_POINTS} Punkte gesetzt
+                    </span>
+                    <button onClick={() => resetPlot(index)} className={styles.solutionBtn}>
+                      Punkte zurücksetzen
+                    </button>
+                  </div>
+                  {plotFeedback[index] && (
+                    <p className={styles.plotFeedbackError}>{plotFeedback[index]}</p>
+                  )}
+                  {plotDone[index] && (
+                    <p className={styles.plotSuccess}>
+                      Super! Die Gerade {aufgabe.funktionsgleichung} wurde eingezeichnet.
+                    </p>
+                  )}
                 </div>
               )}
             </div>

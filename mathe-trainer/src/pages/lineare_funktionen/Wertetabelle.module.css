@@ -378,6 +378,47 @@
   justify-content: center;
 }
 
+.plotHint {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0 0 0.75rem 0;
+  text-align: center;
+}
+
+.plotControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.plotBadge {
+  background-color: #ede9fe;
+  color: #5b21b6;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.plotFeedbackError {
+  color: #dc2626;
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  margin: 0.75rem 0 0 0;
+}
+
+.plotSuccess {
+  color: #15803d;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0.75rem 0 0 0;
+}
+
 .rechenbeispiele {
   margin-top: 1rem;
   padding-top: 1rem;
