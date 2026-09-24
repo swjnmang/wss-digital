@@ -30,6 +30,16 @@ export interface FreitextLine {
   hint: string;
 }
 
+export interface TextLine {
+  type: 'text';
+  id: string;
+  caption: string;
+  /** Expected value, trimmed exact match. Empty string means the field should be left blank. */
+  expected: string;
+  placeholder?: string;
+  explanation: string;
+}
+
 export interface NameLine {
   type: 'name';
   id: string;
@@ -48,7 +58,7 @@ export interface EmailLine {
   explanation: string;
 }
 
-export type Line = ChoiceLine | ZeichenLine | FreitextLine | NameLine | EmailLine;
+export type Line = ChoiceLine | ZeichenLine | FreitextLine | NameLine | EmailLine | TextLine;
 
 export const BLEIBT_FREI = '(bleibt frei)';
 

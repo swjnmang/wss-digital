@@ -7,9 +7,10 @@ export type {
   FreitextLine as InfoblockFreitextLine,
   NameLine as InfoblockNameLine,
   EmailLine as InfoblockEmailLine,
+  TextLine as InfoblockTextLine,
   Line as InfoblockLine,
 } from './line-types';
-export { BLEIBT_FREI, zeichenPattern, isValidName, deriveInitials, deriveEmail } from './line-types';
+export { zeichenPattern, isValidName, deriveInitials, deriveEmail } from './line-types';
 
 export interface InfoblockTask {
   id: string;

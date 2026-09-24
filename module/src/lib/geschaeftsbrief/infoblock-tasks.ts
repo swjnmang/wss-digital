@@ -1,5 +1,4 @@
 import type { InfoblockTask } from './infoblock-types';
-import { BLEIBT_FREI } from './infoblock-types';
 
 export const INFOBLOCK_TASKS: InfoblockTask[] = [
   {
@@ -12,27 +11,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
     empfaengerLines: ['Merkur & Söhne GmbH', 'Frau Elke Schnell', 'Postfach 1 16 09', '83425 Bad Reichenhall'],
     lines: [
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihr-zeichen',
         caption: 'Ihr Zeichen',
-        options: [
-          { id: 'a', text: '11.03.2025', correct: false },
-          { id: 'b', text: 'es-eb', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           '„Ihr Zeichen“ wird nur ausgefüllt, wenn im Auftrag auf ein Schreiben des Geschäftspartners Bezug genommen wird. Hier gibt es keinen solchen Bezug, das Feld bleibt leer.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihre-nachricht-vom',
         caption: 'Ihre Nachricht vom',
-        options: [
-          { id: 'a', text: '04.03.2025', correct: false },
-          { id: 'b', text: 'wv-vn', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
+        expected: '',
+        explanation:
+          'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
       },
       {
         type: 'zeichen',
@@ -44,15 +36,12 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Das Kürzel „wv“ stammt von Werner Volk (Vorgesetzter, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „wv-ab“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'unsere-nachricht-vom',
         caption: 'Unsere Nachricht vom',
-        options: [
-          { id: 'a', text: 'das heutige Datum', correct: false },
-          { id: 'b', text: '10.03.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
+        expected: '',
+        explanation:
+          'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
         type: 'name',
@@ -63,26 +52,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'telefon',
         caption: 'Telefon',
-        options: [
-          { id: 'a', text: 'Durchwahl 142', correct: false },
-          { id: 'b', text: 'Tel. 142', correct: false },
-          { id: 'c', text: '142', correct: true },
-        ],
-        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
+        expected: '142',
+        explanation:
+          'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'fax',
         caption: 'Fax',
-        options: [
-          { id: 'a', text: 'Fax 100', correct: false },
-          { id: 'b', text: 'Durchwahl 100', correct: false },
-          { id: 'c', text: '100', correct: true },
-        ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        expected: '100',
+        explanation:
+          'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
         type: 'email',
@@ -112,27 +95,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
     empfaengerLines: ['Turnverein Blau-Weiß e. V.', 'Herrn Klaus Peters', 'Vereinsheim 3', '91052 Erlangen'],
     lines: [
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihr-zeichen',
         caption: 'Ihr Zeichen',
-        options: [
-          { id: 'a', text: 'kp-tv', correct: false },
-          { id: 'b', text: '02.04.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           '„Ihr Zeichen“ wird nur ausgefüllt, wenn im Auftrag auf ein Schreiben des Geschäftspartners Bezug genommen wird. Hier gibt es keinen solchen Bezug, das Feld bleibt leer.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihre-nachricht-vom',
         caption: 'Ihre Nachricht vom',
-        options: [
-          { id: 'a', text: '28.03.2025', correct: false },
-          { id: 'b', text: 'sr-vn', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
+        expected: '',
+        explanation:
+          'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
       },
       {
         type: 'zeichen',
@@ -144,15 +120,12 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Das Kürzel „sr“ stammt von Sabine Roth (Vorgesetzte, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „sr-ab“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'unsere-nachricht-vom',
         caption: 'Unsere Nachricht vom',
-        options: [
-          { id: 'a', text: 'das heutige Datum', correct: false },
-          { id: 'b', text: '30.03.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
+        expected: '',
+        explanation:
+          'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
         type: 'name',
@@ -163,26 +136,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'telefon',
         caption: 'Telefon',
-        options: [
-          { id: 'a', text: 'Durchwahl 15', correct: false },
-          { id: 'b', text: 'Tel. 15', correct: false },
-          { id: 'c', text: '15', correct: true },
-        ],
-        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
+        expected: '15',
+        explanation:
+          'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'fax',
         caption: 'Fax',
-        options: [
-          { id: 'a', text: 'Fax 20', correct: false },
-          { id: 'b', text: 'Durchwahl 20', correct: false },
-          { id: 'c', text: '20', correct: true },
-        ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        expected: '20',
+        explanation:
+          'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
         type: 'email',
@@ -212,27 +179,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
     empfaengerLines: ['Rauch Maschinenbau GmbH', 'Herrn Michael Rauch', 'Talstraße 9', '45141 Essen'],
     lines: [
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihr-zeichen',
         caption: 'Ihr Zeichen',
-        options: [
-          { id: 'a', text: BLEIBT_FREI, correct: false },
-          { id: 'b', text: 'tb-mb', correct: false },
-          { id: 'c', text: 'rm-ab', correct: true },
-        ],
+        expected: 'rm-ab',
         explanation:
           '„Ihr Zeichen“ wird aus dem Schreiben des Geschäftspartners übernommen, auf das dieser Brief antwortet – hier also unverändert „rm-ab“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihre-nachricht-vom',
         caption: 'Ihre Nachricht vom',
-        options: [
-          { id: 'a', text: BLEIBT_FREI, correct: false },
-          { id: 'b', text: 'heutiges Datum', correct: false },
-          { id: 'c', text: '03.02.2025', correct: true },
-        ],
-        explanation: 'Hier steht das Datum des Schreibens des Geschäftspartners, auf das dieser Brief antwortet.',
+        expected: '03.02.2025',
+        explanation:
+          'Hier steht das Datum des Schreibens des Geschäftspartners, auf das dieser Brief antwortet.',
       },
       {
         type: 'zeichen',
@@ -244,14 +204,10 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Das Kürzel „tb“ stammt von Thomas Berg (Vorgesetzter, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „tb-ab“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'unsere-nachricht-vom',
         caption: 'Unsere Nachricht vom',
-        options: [
-          { id: 'a', text: '03.02.2025', correct: false },
-          { id: 'b', text: 'das heutige Datum', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           'Es gab noch kein eigenes vorheriges Schreiben in dieser Sache, daher bleibt „Unsere Nachricht vom“ leer.',
       },
@@ -264,26 +220,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'telefon',
         caption: 'Telefon',
-        options: [
-          { id: 'a', text: 'Durchwahl 77', correct: false },
-          { id: 'b', text: 'Tel. 77', correct: false },
-          { id: 'c', text: '77', correct: true },
-        ],
-        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
+        expected: '77',
+        explanation:
+          'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'fax',
         caption: 'Fax',
-        options: [
-          { id: 'a', text: 'Fax 78', correct: false },
-          { id: 'b', text: 'Durchwahl 78', correct: false },
-          { id: 'c', text: '78', correct: true },
-        ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        expected: '78',
+        explanation:
+          'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
         type: 'email',
@@ -313,26 +263,18 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
     empfaengerLines: ['GrünTraum Gartenbau', 'Frau Nina Vogt', 'Wiesenweg 8', '51103 Köln'],
     lines: [
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihr-zeichen',
         caption: 'Ihr Zeichen',
-        options: [
-          { id: 'a', text: 'pl-vn', correct: false },
-          { id: 'b', text: '12.01.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           'Es liegt kein Schreiben der Kundin vor, auf das Bezug genommen werden könnte – „Ihr Zeichen“ bleibt leer.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihre-nachricht-vom',
         caption: 'Ihre Nachricht vom',
-        options: [
-          { id: 'a', text: '12.01.2025', correct: false },
-          { id: 'b', text: 'das heutige Datum', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           'Auch „Ihre Nachricht vom“ bleibt leer, da kein Schreiben der Kundin vorliegt, auf das Bezug genommen wird.',
       },
@@ -346,14 +288,10 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Das Kürzel „pl“ stammt von Petra Lang (Vorgesetzte, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „pl-ab“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'unsere-nachricht-vom',
         caption: 'Unsere Nachricht vom',
-        options: [
-          { id: 'a', text: BLEIBT_FREI, correct: false },
-          { id: 'b', text: 'das heutige Datum', correct: false },
-          { id: 'c', text: '12.01.2025', correct: true },
-        ],
+        expected: '12.01.2025',
         explanation:
           'Hier steht das Datum des eigenen vorherigen Schreibens, an das ihr erinnert – also der 12.01.2025.',
       },
@@ -366,26 +304,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'telefon',
         caption: 'Telefon',
-        options: [
-          { id: 'a', text: 'Durchwahl 33', correct: false },
-          { id: 'b', text: 'Tel. 33', correct: false },
-          { id: 'c', text: '33', correct: true },
-        ],
-        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
+        expected: '33',
+        explanation:
+          'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'fax',
         caption: 'Fax',
-        options: [
-          { id: 'a', text: 'Fax 34', correct: false },
-          { id: 'b', text: 'Durchwahl 34', correct: false },
-          { id: 'c', text: '34', correct: true },
-        ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        expected: '34',
+        explanation:
+          'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
         type: 'email',
@@ -415,27 +347,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
     empfaengerLines: ['Papier & Stift OHG', 'Herrn Jonas Weller', 'Hauptstraße 21', '76133 Karlsruhe'],
     lines: [
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihr-zeichen',
         caption: 'Ihr Zeichen',
-        options: [
-          { id: 'a', text: 'jw-mo', correct: false },
-          { id: 'b', text: '15.04.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           '„Ihr Zeichen“ wird nur ausgefüllt, wenn im Auftrag auf ein Schreiben des Geschäftspartners Bezug genommen wird. Hier gibt es keinen solchen Bezug, das Feld bleibt leer.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihre-nachricht-vom',
         caption: 'Ihre Nachricht vom',
-        options: [
-          { id: 'a', text: '12.04.2025', correct: false },
-          { id: 'b', text: 'mo-vn', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
+        expected: '',
+        explanation:
+          'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
       },
       {
         type: 'zeichen',
@@ -447,15 +372,12 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Akademische Titel wie „Dr.“ zählen nicht zum Kürzel – entscheidend sind nur Vor- und Nachname: „Michael Ostermann“ ergibt „mo“. Danach folgt ein Bindestrich und deine eigenen Initialen, z. B. „mo-ab“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'unsere-nachricht-vom',
         caption: 'Unsere Nachricht vom',
-        options: [
-          { id: 'a', text: 'das heutige Datum', correct: false },
-          { id: 'b', text: '10.04.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
+        expected: '',
+        explanation:
+          'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
         type: 'name',
@@ -466,26 +388,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Trage hier deinen eigenen Vor- und Nachnamen ein (ohne Titel) – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'telefon',
         caption: 'Telefon',
-        options: [
-          { id: 'a', text: 'Durchwahl 55', correct: false },
-          { id: 'b', text: 'Tel. 55', correct: false },
-          { id: 'c', text: '55', correct: true },
-        ],
-        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
+        expected: '55',
+        explanation:
+          'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'fax',
         caption: 'Fax',
-        options: [
-          { id: 'a', text: 'Fax 56', correct: false },
-          { id: 'b', text: 'Durchwahl 56', correct: false },
-          { id: 'c', text: '56', correct: true },
-        ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        expected: '56',
+        explanation:
+          'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
         type: 'email',
@@ -515,27 +431,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
     empfaengerLines: ['Buchhandlung Seitenzahl', 'Herrn Paul Nickel', 'Marktgasse 14', '04109 Leipzig'],
     lines: [
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihr-zeichen',
         caption: 'Ihr Zeichen',
-        options: [
-          { id: 'a', text: 'pn-ak', correct: false },
-          { id: 'b', text: '01.05.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           '„Ihr Zeichen“ wird nur ausgefüllt, wenn im Auftrag auf ein Schreiben des Geschäftspartners Bezug genommen wird. Hier gibt es keinen solchen Bezug, das Feld bleibt leer.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihre-nachricht-vom',
         caption: 'Ihre Nachricht vom',
-        options: [
-          { id: 'a', text: '28.04.2025', correct: false },
-          { id: 'b', text: 'ak-vn', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
+        expected: '',
+        explanation:
+          'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
       },
       {
         type: 'zeichen',
@@ -547,15 +456,12 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Das Kürzel „ak“ stammt von Anna Krause (Vorgesetzte, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „ak-ab“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'unsere-nachricht-vom',
         caption: 'Unsere Nachricht vom',
-        options: [
-          { id: 'a', text: 'das heutige Datum', correct: false },
-          { id: 'b', text: '30.04.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
+        expected: '',
+        explanation:
+          'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
         type: 'name',
@@ -566,25 +472,18 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'telefon',
         caption: 'Telefon',
-        options: [
-          { id: 'a', text: 'Durchwahl 21', correct: false },
-          { id: 'b', text: 'Tel. 21', correct: false },
-          { id: 'c', text: '21', correct: true },
-        ],
-        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
+        expected: '21',
+        explanation:
+          'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'fax',
         caption: 'Fax',
-        options: [
-          { id: 'a', text: 'Durchwahl 21', correct: false },
-          { id: 'b', text: 'nicht vorhanden', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           'Wird im Arbeitsauftrag kein Faxanschluss genannt, gibt es auch keine Angabe zum Eintragen – das Feld bleibt leer.',
       },
@@ -616,27 +515,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
     empfaengerLines: ['Wagner Logistik AG', 'Frau Katrin Wolter', 'Hafenstraße 40', '27568 Bremerhaven'],
     lines: [
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihr-zeichen',
         caption: 'Ihr Zeichen',
-        options: [
-          { id: 'a', text: BLEIBT_FREI, correct: false },
-          { id: 'b', text: 'fh-kw', correct: false },
-          { id: 'c', text: 'fw-mk', correct: true },
-        ],
+        expected: 'fw-mk',
         explanation:
           '„Ihr Zeichen“ wird aus dem Schreiben des Geschäftspartners übernommen, auf das dieser Brief antwortet – hier also unverändert „fw-mk“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihre-nachricht-vom',
         caption: 'Ihre Nachricht vom',
-        options: [
-          { id: 'a', text: '05.02.2025', correct: false },
-          { id: 'b', text: 'das heutige Datum', correct: false },
-          { id: 'c', text: '18.02.2025', correct: true },
-        ],
-        explanation: 'Hier steht das Datum des Schreibens des Geschäftspartners, auf das dieser Brief antwortet.',
+        expected: '18.02.2025',
+        explanation:
+          'Hier steht das Datum des Schreibens des Geschäftspartners, auf das dieser Brief antwortet.',
       },
       {
         type: 'zeichen',
@@ -648,14 +540,10 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Das Kürzel „fh“ stammt von Frank Hartmann (Vorgesetzter, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „fh-ab“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'unsere-nachricht-vom',
         caption: 'Unsere Nachricht vom',
-        options: [
-          { id: 'a', text: '18.02.2025', correct: false },
-          { id: 'b', text: BLEIBT_FREI, correct: false },
-          { id: 'c', text: '05.02.2025', correct: true },
-        ],
+        expected: '05.02.2025',
         explanation:
           'Hier steht das Datum des eigenen vorherigen Schreibens, auf das zusätzlich Bezug genommen wird – also der 05.02.2025.',
       },
@@ -668,26 +556,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'telefon',
         caption: 'Telefon',
-        options: [
-          { id: 'a', text: 'Durchwahl 88', correct: false },
-          { id: 'b', text: 'Tel. 88', correct: false },
-          { id: 'c', text: '88', correct: true },
-        ],
-        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
+        expected: '88',
+        explanation:
+          'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'fax',
         caption: 'Fax',
-        options: [
-          { id: 'a', text: 'Fax 89', correct: false },
-          { id: 'b', text: 'Durchwahl 89', correct: false },
-          { id: 'c', text: '89', correct: true },
-        ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        expected: '89',
+        explanation:
+          'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
         type: 'email',
@@ -717,27 +599,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
     empfaengerLines: ['Trachtenwelt Bergmann', 'Herrn Sepp Bergmann', 'Postfach 45 21', '83022 Rosenheim'],
     lines: [
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihr-zeichen',
         caption: 'Ihr Zeichen',
-        options: [
-          { id: 'a', text: 'sb-ca', correct: false },
-          { id: 'b', text: '20.08.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           '„Ihr Zeichen“ wird nur ausgefüllt, wenn im Auftrag auf ein Schreiben des Geschäftspartners Bezug genommen wird. Hier gibt es keinen solchen Bezug, das Feld bleibt leer.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihre-nachricht-vom',
         caption: 'Ihre Nachricht vom',
-        options: [
-          { id: 'a', text: '18.08.2025', correct: false },
-          { id: 'b', text: 'ca-vn', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
+        expected: '',
+        explanation:
+          'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
       },
       {
         type: 'zeichen',
@@ -749,15 +624,12 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Das Kürzel „ca“ stammt von Claudia Adler (Vorgesetzte, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „ca-ab“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'unsere-nachricht-vom',
         caption: 'Unsere Nachricht vom',
-        options: [
-          { id: 'a', text: 'das heutige Datum', correct: false },
-          { id: 'b', text: '19.08.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
+        expected: '',
+        explanation:
+          'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
         type: 'name',
@@ -768,27 +640,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'telefon',
         caption: 'Telefon',
-        options: [
-          { id: 'a', text: 'Durchwahl 0821 551234', correct: false },
-          { id: 'b', text: 'Tel. 0821 551234', correct: false },
-          { id: 'c', text: '0821 551234', correct: true },
-        ],
+        expected: '0821 551234',
         explanation:
           'Ist keine Durchwahl, sondern eine vollständige Telefonnummer angegeben, wird genau diese Nummer unverändert übernommen – ohne erfundenes „Durchwahl“ davor.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'fax',
         caption: 'Fax',
-        options: [
-          { id: 'a', text: 'Fax 0821 551200', correct: false },
-          { id: 'b', text: 'Durchwahl 0821 551200', correct: false },
-          { id: 'c', text: '0821 551200', correct: true },
-        ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        expected: '0821 551200',
+        explanation:
+          'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
         type: 'email',
@@ -818,27 +683,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
     empfaengerLines: ['Fensterbau Schreiner OHG', 'Frau Dr. Laura Meyer', 'Postfach 7 30', '93042 Regensburg'],
     lines: [
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihr-zeichen',
         caption: 'Ihr Zeichen',
-        options: [
-          { id: 'a', text: BLEIBT_FREI, correct: false },
-          { id: 'b', text: 'sh-lm', correct: false },
-          { id: 'c', text: 'fs-lm', correct: true },
-        ],
+        expected: 'fs-lm',
         explanation:
           '„Ihr Zeichen“ wird aus dem Schreiben des Geschäftspartners übernommen, auf das dieser Brief antwortet – hier also unverändert „fs-lm“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihre-nachricht-vom',
         caption: 'Ihre Nachricht vom',
-        options: [
-          { id: 'a', text: 'das heutige Datum', correct: false },
-          { id: 'b', text: BLEIBT_FREI, correct: false },
-          { id: 'c', text: '22.06.2025', correct: true },
-        ],
-        explanation: 'Hier steht das Datum des Schreibens des Geschäftspartners, auf das dieser Brief antwortet.',
+        expected: '22.06.2025',
+        explanation:
+          'Hier steht das Datum des Schreibens des Geschäftspartners, auf das dieser Brief antwortet.',
       },
       {
         type: 'zeichen',
@@ -850,14 +708,10 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Das Kürzel „sh“ stammt von Stefan Huber (Vorgesetzter, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „sh-ab“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'unsere-nachricht-vom',
         caption: 'Unsere Nachricht vom',
-        options: [
-          { id: 'a', text: '22.06.2025', correct: false },
-          { id: 'b', text: 'das heutige Datum', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           'Ein eigenes vorheriges Schreiben in dieser Sache wird nicht erwähnt, daher bleibt „Unsere Nachricht vom“ leer.',
       },
@@ -870,26 +724,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'telefon',
         caption: 'Telefon',
-        options: [
-          { id: 'a', text: 'Durchwahl 61', correct: false },
-          { id: 'b', text: 'Tel. 61', correct: false },
-          { id: 'c', text: '61', correct: true },
-        ],
-        explanation: 'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
+        expected: '61',
+        explanation:
+          'Beim Telefon wird nur die Durchwahlnummer selbst eingetragen, ohne das Wort „Durchwahl“ davor.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'fax',
         caption: 'Fax',
-        options: [
-          { id: 'a', text: 'Fax 62', correct: false },
-          { id: 'b', text: 'Durchwahl 62', correct: false },
-          { id: 'c', text: '62', correct: true },
-        ],
-        explanation: 'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
+        expected: '62',
+        explanation:
+          'Vorgegebene Kontaktdaten werden unverändert aus dem Arbeitsauftrag übernommen.',
       },
       {
         type: 'email',
@@ -919,27 +767,20 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
     empfaengerLines: ['Herrn Alfons Bauer', 'Seeweg 12', '82340 Feldafing'],
     lines: [
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihr-zeichen',
         caption: 'Ihr Zeichen',
-        options: [
-          { id: 'a', text: 'ab-mv', correct: false },
-          { id: 'b', text: '02.09.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           '„Ihr Zeichen“ wird nur ausgefüllt, wenn im Auftrag auf ein Schreiben des Geschäftspartners Bezug genommen wird. Hier gibt es keinen solchen Bezug, das Feld bleibt leer.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'ihre-nachricht-vom',
         caption: 'Ihre Nachricht vom',
-        options: [
-          { id: 'a', text: '30.08.2025', correct: false },
-          { id: 'b', text: 'mv-vn', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
+        expected: '',
+        explanation:
+          'Ohne Bezug auf ein Schreiben des Geschäftspartners bleibt auch „Ihre Nachricht vom“ leer.',
       },
       {
         type: 'zeichen',
@@ -951,15 +792,12 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Das Kürzel „mv“ stammt von Melanie Vogt (Vorgesetzte, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „mv-ab“.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'unsere-nachricht-vom',
         caption: 'Unsere Nachricht vom',
-        options: [
-          { id: 'a', text: 'das heutige Datum', correct: false },
-          { id: 'b', text: '01.09.2025', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
-        explanation: 'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
+        expected: '',
+        explanation:
+          'Ohne ein eigenes vorheriges Schreiben, auf das Bezug genommen wird, bleibt dieses Feld leer.',
       },
       {
         type: 'name',
@@ -970,26 +808,18 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'telefon',
         caption: 'Telefon',
-        options: [
-          { id: 'a', text: 'Durchwahl 08151 4477', correct: false },
-          { id: 'b', text: 'Tel. 08151 4477', correct: false },
-          { id: 'c', text: '08151 4477', correct: true },
-        ],
+        expected: '08151 4477',
         explanation:
           'Ist keine Durchwahl, sondern eine vollständige Telefonnummer angegeben, wird genau diese Nummer unverändert übernommen – ohne erfundenes „Durchwahl“ davor.',
       },
       {
-        type: 'choice',
+        type: 'text',
         id: 'fax',
         caption: 'Fax',
-        options: [
-          { id: 'a', text: 'nicht vorhanden', correct: false },
-          { id: 'b', text: '08151 4477', correct: false },
-          { id: 'c', text: BLEIBT_FREI, correct: true },
-        ],
+        expected: '',
         explanation:
           'Wird im Arbeitsauftrag kein Faxanschluss genannt, gibt es auch keine Angabe zum Eintragen – das Feld bleibt leer.',
       },
