@@ -1,7 +1,62 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+
+declare global {
+    interface Window {
+        GGBApplet: any;
+    }
+}
+
+const PLOT_WIDTH = 500;
+const PLOT_HEIGHT = 350;
+
+// Erzwingt ein kartesisches Koordinatensystem: 1 Einheit auf der x-Achse
+// entspricht optisch genauso vielen Pixeln wie 1 Einheit auf der y-Achse.
+function computeCartesianView(xMin: number, xMax: number, yMin: number, yMax: number, width: number, height: number) {
+    const xCenter = (xMin + xMax) / 2;
+    const yCenter = (yMin + yMax) / 2;
+    let rangeX = Math.max(xMax - xMin, 0.0001);
+    let rangeY = Math.max(yMax - yMin, 0.0001);
+
+    const neededRangeXForY = rangeY * (width / height);
+    if (rangeX < neededRangeXForY) {
+        rangeX = neededRangeXForY;
+    } else {
+        rangeY = rangeX * (height / width);
+    }
+
+    return {
+        viewXMin: xCenter - rangeX / 2,
+        viewXMax: xCenter + rangeX / 2,
+        viewYMin: yCenter - rangeY / 2,
+        viewYMax: yCenter + rangeY / 2,
+    };
+}
+
+function injectApplet(containerId: string, width: number, height: number, onLoad: (api: any) => void) {
+    const params: any = {
+        appName: 'classic',
+        width,
+        height,
+        showToolBar: false,
+        showAlgebraInput: false,
+        showMenuBar: false,
+        perspective: 'G',
+        useBrowserForJS: true,
+        enableShiftDragZoom: true,
+        showResetIcon: true,
+        showZoomButtons: true,
+        appletOnLoad: onLoad,
+    };
+    try {
+        const applet = new window.GGBApplet(params, true);
+        applet.inject(containerId);
+    } catch (e) {
+        console.error(`GeoGebra Error (${containerId}):`, e);
+    }
+}
 
 type TaskType = 'line-parabola' | 'parabola-parabola';
 type Difficulty = 'leicht' | 'mittel' | 'schwer';
@@ -48,6 +103,8 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
     const [showSolution, setShowSolution] = useState<boolean>(false);
     const [showGraph, setShowGraph] = useState<boolean>(false);
 
+    const ggbApiRef = useRef<any>(null);
+
     // Helpers
     const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
     
@@ -59,6 +116,24 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
     const roundTo = (value: number, decimals: number) => {
         const factor = Math.pow(10, decimals);
         return Math.round(value * factor) / factor;
+    };
+
+    // Prüft für jedes eingegebene Wertepaar live (ohne "Prüfen"-Klick), ob es zu
+    // einem der noch nicht zugeordneten erwarteten Schnittpunkte passt.
+    // null = noch nicht vollständig ausgefüllt, true = korrekt, false = falsch.
+    const computePointStatuses = (points: {x: string, y: string}[], expected: Point[]): (boolean | null)[] => {
+        const tolerance = 0.1;
+        const remaining = [...expected];
+        return points.map(p => {
+            if (!p.x.trim() || !p.y.trim()) return null;
+            const x = parseFloat(p.x.replace(',', '.').replace(/[−–—‐]/g, '-'));
+            const y = parseFloat(p.y.replace(',', '.').replace(/[−–—‐]/g, '-'));
+            if (isNaN(x) || isNaN(y)) return false;
+            const matchIndex = remaining.findIndex(e => Math.abs(x - e.x) <= tolerance && Math.abs(y - e.y) <= tolerance);
+            if (matchIndex === -1) return false;
+            remaining.splice(matchIndex, 1);
+            return true;
+        });
     };
 
     const formatCoefficient = (value: number) => {
@@ -130,6 +205,7 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
             }
 
             if (a === 0) a = 1;
+            if (m === 0) m = 1;
 
             const discriminant = Math.pow(b - m, 2) - 4 * a * (c - t);
 
@@ -240,9 +316,10 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
         setFeedback(null);
         setShowSolution(false);
         setShowGraph(false);
+        ggbApiRef.current = null;
         setSelectedCount(null);
         setUserPoints([]);
-        
+
         if (taskType === 'line-parabola') {
             setParams(generateLineParabolaTask(difficulty));
         } else {
@@ -458,32 +535,111 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
         }
     };
 
-    const getGeoGebraCommands = () => {
-        if (!params) return [];
-        const cmds = [];
-        if (params.type === 'line-parabola') {
-            const { a, b, c, m, t } = params;
-            cmds.push(`f(x) = ${a}x^2 + ${b}x + ${c}`);
-            cmds.push(`g(x) = ${m}x + ${t}`);
-            cmds.push(`SetColor(f, "red")`);
-            cmds.push(`SetColor(g, "blue")`);
+    // Berechnet einen kartesischen Anzeigebereich, der beide Funktionen und
+    // alle Schnittpunkte gut sichtbar zeigt (inkl. der Scheitelpunkte der
+    // beteiligten Parabel(n), damit deren Form erkennbar bleibt).
+    const computeGraphView = (p: TaskParams) => {
+        const xs: number[] = [0];
+        const ys: number[] = [0];
+        p.points.forEach(pt => { xs.push(pt.x); ys.push(pt.y); });
+
+        if (p.type === 'line-parabola') {
+            const a = p.a!, b = p.b!, c = p.c!;
+            const vx = -b / (2 * a);
+            xs.push(vx);
+            ys.push(a * vx * vx + b * vx + c);
         } else {
-            const { a1, b1, c1, a2, b2, c2 } = params;
-            cmds.push(`f(x) = ${a1}x^2 + ${b1}x + ${c1}`);
-            cmds.push(`g(x) = ${a2}x^2 + ${b2}x + ${c2}`);
-            cmds.push(`SetColor(f, "red")`);
-            cmds.push(`SetColor(g, "blue")`);
+            const a1 = p.a1!, b1 = p.b1!, c1 = p.c1!;
+            const a2 = p.a2!, b2 = p.b2!, c2 = p.c2!;
+            const vx1 = -b1 / (2 * a1);
+            xs.push(vx1);
+            ys.push(a1 * vx1 * vx1 + b1 * vx1 + c1);
+            const vx2 = -b2 / (2 * a2);
+            xs.push(vx2);
+            ys.push(a2 * vx2 * vx2 + b2 * vx2 + c2);
         }
-        // Berechne Schnittpunkte und speichere sie in einer Liste
-        cmds.push(`L1 = {Intersect(f, g)}`);
-        // Markiere die Schnittpunkte
-        cmds.push(`SetColor(L1, "orange")`);
-        cmds.push(`SetPointSize(L1, 6)`);
-        cmds.push(`ShowLabel(L1, true)`);
-        // Zeige Name und Wert (Koordinaten)
-        cmds.push(`SetLabelMode(L1, 1)`); 
-        return cmds;
+
+        const xMin = Math.min(...xs), xMax = Math.max(...xs);
+        const yMin = Math.min(...ys), yMax = Math.max(...ys);
+        const xPad = Math.max((xMax - xMin) * 0.3, 2);
+        const yPad = Math.max((yMax - yMin) * 0.3, 2);
+
+        return computeCartesianView(xMin - xPad, xMax + xPad, yMin - yPad, yMax + yPad, PLOT_WIDTH, PLOT_HEIGHT);
     };
+
+    // Zeichnet beide Funktionen sowie die (bereits in JS berechneten) Schnittpunkte
+    const setupSchnittpunkteGraph = (api: any, p: TaskParams) => {
+        try {
+            api.reset();
+
+            if (p.type === 'line-parabola') {
+                api.evalCommand(`f(x) = ${p.a}*x^2 + ${p.b}*x + ${p.c}`);
+                api.evalCommand(`g(x) = ${p.m}*x + ${p.t}`);
+            } else {
+                api.evalCommand(`f(x) = ${p.a1}*x^2 + ${p.b1}*x + ${p.c1}`);
+                api.evalCommand(`g(x) = ${p.a2}*x^2 + ${p.b2}*x + ${p.c2}`);
+            }
+            api.setColor('f', 220, 38, 38);
+            api.setLineThickness('f', 3);
+            api.setColor('g', 37, 99, 235);
+            api.setLineThickness('g', 3);
+
+            p.points.forEach((pt, i) => {
+                const name = `S${i + 1}`;
+                api.evalCommand(`${name}=(${pt.x},${pt.y})`);
+                api.setColor(name, 234, 88, 12);
+                api.setPointSize(name, 6);
+                api.setLabelVisible(name, true);
+            });
+
+            const view = computeGraphView(p);
+            api.setCoordSystem(view.viewXMin, view.viewXMax, view.viewYMin, view.viewYMax);
+        } catch (e) {
+            console.error('GeoGebra Schnittpunkte-Error:', e);
+        }
+    };
+
+    // GeoGebra-Skript einmalig laden, damit es beim ersten Klick auf
+    // "Graph anzeigen" bereits bereitsteht.
+    useEffect(() => {
+        const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
+        if (!existing) {
+            const script = document.createElement('script');
+            script.src = 'https://www.geogebra.org/apps/deployggb.js';
+            script.async = true;
+            document.body.appendChild(script);
+        }
+    }, []);
+
+    // Applet injizieren, sobald der Graph eingeblendet wird; bei bereits
+    // geladenem Applet (z.B. nach "Neue Aufgabe") stattdessen nur aktualisieren.
+    useEffect(() => {
+        if (!showGraph || !params) return;
+
+        if (ggbApiRef.current) {
+            setupSchnittpunkteGraph(ggbApiRef.current, params);
+            return;
+        }
+
+        let attempts = 0;
+        let cancelled = false;
+        const tryInject = () => {
+            if (cancelled) return;
+            attempts++;
+            if (!window.GGBApplet || !document.getElementById('ggb-schnittpunkte')) {
+                if (attempts < 50) setTimeout(tryInject, 100);
+                return;
+            }
+            injectApplet('ggb-schnittpunkte', PLOT_WIDTH, PLOT_HEIGHT, (api: any) => {
+                ggbApiRef.current = api;
+                setupSchnittpunkteGraph(api, params);
+            });
+        };
+        tryInject();
+
+        return () => { cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showGraph, params]);
 
     return (
         <div className="mx-auto px-4 py-8 max-w-6xl">
@@ -540,9 +696,9 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
                     </div>
                 )}
 
-                <div className="mb-6">
+                <div className="mb-6 text-center">
                     <p className="block text-gray-700 font-medium mb-3">Wie viele Schnittpunkte gibt es?</p>
-                    <div className="flex gap-3 mb-4">
+                    <div className="flex gap-3 mb-4 justify-center">
                         {[0, 1, 2].map(count => (
                             <button
                                 key={count}
@@ -560,29 +716,37 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
 
                     {selectedCount !== null && selectedCount > 0 && (
                         <div className="space-y-4">
-                            <p className="text-gray-700 font-medium">Gib die Koordinaten ein:</p>
-                            {userPoints.map((point, index) => (
-                                <div key={index} className="flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                                    <span className="font-bold text-gray-600">S{index + 1}:</span>
-                                    <span className="text-gray-600">(</span>
-                                    <input
-                                        type="text"
-                                        value={point.x}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePointChange(index, 'x', e.target.value)}
-                                        placeholder="x"
-                                        className="w-20 p-2 border border-gray-300 rounded text-center focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                                    />
-                                    <span className="text-gray-600">|</span>
-                                    <input
-                                        type="text"
-                                        value={point.y}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePointChange(index, 'y', e.target.value)}
-                                        placeholder="y"
-                                        className="w-20 p-2 border border-gray-300 rounded text-center focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                                    />
-                                    <span className="text-gray-600">)</span>
-                                </div>
-                            ))}
+                            <p className="text-gray-700 font-medium text-center">Gib die Koordinaten ein:</p>
+                            {userPoints.map((point, index) => {
+                                const status = params ? computePointStatuses(userPoints, params.points)[index] : null;
+                                const fieldClass = (base: string) => {
+                                    if (status === true) return `${base} border-green-500 bg-green-50 text-green-800`;
+                                    if (status === false) return `${base} border-red-500 bg-red-50 text-red-800`;
+                                    return `${base} border-gray-300`;
+                                };
+                                return (
+                                    <div key={index} className="flex items-center justify-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                        <span className="font-bold text-gray-600">S{index + 1}:</span>
+                                        <span className="text-gray-600">(</span>
+                                        <input
+                                            type="text"
+                                            value={point.x}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePointChange(index, 'x', e.target.value)}
+                                            placeholder="x"
+                                            className={fieldClass("w-20 p-2 border rounded text-center focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors")}
+                                        />
+                                        <span className="text-gray-600">|</span>
+                                        <input
+                                            type="text"
+                                            value={point.y}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePointChange(index, 'y', e.target.value)}
+                                            placeholder="y"
+                                            className={fieldClass("w-20 p-2 border rounded text-center focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors")}
+                                        />
+                                        <span className="text-gray-600">)</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
@@ -606,8 +770,11 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
                     >
                         {showSolution ? "Lösung verbergen" : "Lösung anzeigen"}
                     </button>
-                    <button 
-                        onClick={() => setShowGraph(!showGraph)}
+                    <button
+                        onClick={() => {
+                            if (showGraph) ggbApiRef.current = null;
+                            setShowGraph(!showGraph);
+                        }}
                         className="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
                     >
                         {showGraph ? "Graph verbergen" : "Graph anzeigen"}
@@ -627,11 +794,8 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
                 {showSolution && renderSolution()}
 
                 {showGraph && (
-                    <div className="mt-6 h-96 w-full bg-slate-100 rounded-lg border-2 border-slate-300 flex items-center justify-center">
-                        <div className="text-center text-slate-600">
-                            <p className="text-lg font-semibold">📊 GeoGebra Grafik</p>
-                            <p className="text-sm">Schnittpunkte werden visualisiert</p>
-                        </div>
+                    <div className="mt-6 p-4 bg-slate-50 rounded-lg border-2 border-slate-300 flex justify-center">
+                        <div id="ggb-schnittpunkte" style={{ width: `${PLOT_WIDTH}px`, height: `${PLOT_HEIGHT}px` }}></div>
                     </div>
                 )}
             </div>
