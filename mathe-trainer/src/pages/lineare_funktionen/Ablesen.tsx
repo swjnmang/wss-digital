@@ -104,7 +104,7 @@ export default function Ablesen() {
         // match the original static page: use classic app and Graphics-only perspective
         appName: 'classic', width: geoSize.width, height: geoSize.height,
         showToolBar: false, showAlgebraInput: false, showMenuBar: false,
-        showZoomButtons: true,
+        showZoomButtons: true, showResetIcon: true,
         perspective: 'G', useBrowserForJS: true,
         appletOnLoad: (api: any) => {
           ggbInstance.current = api

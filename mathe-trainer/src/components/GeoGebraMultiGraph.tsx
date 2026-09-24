@@ -38,7 +38,7 @@ const GeoGebraMultiGraph: React.FC<GeoGebraMultiGraphProps> = ({
         showToolBar: false,
         showAlgebraInput: false,
         showMenuBar: false,
-        showResetIcon: false,
+        showResetIcon: true,
         showFullscreenButton: false,
         showZoomButtons: true,
         useBrowserForJS: true,

@@ -40,7 +40,7 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
         showToolBar: false,
         showAlgebraInput: false,
         showMenuBar: false,
-        showResetIcon: false,
+        showResetIcon: true,
         showFullscreenButton: false,
         showZoomButtons: true, // Zoom + / - Buttons anzeigen
         useBrowserForJS: true,
