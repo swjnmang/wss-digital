@@ -86,10 +86,10 @@ function setSquareView(api: any, containerId: string, xHalf = 5) {
   api.setCoordSystem(-xHalf, xHalf, -yHalf, yHalf);
 }
 
-function injectApplet(containerId: string, height: number, onLoad: (api: any) => void) {
+function injectApplet(containerId: string, width: number, height: number, onLoad: (api: any) => void) {
   const params: any = {
     appName: 'classic',
-    width: 600,
+    width,
     height,
     showToolBar: false,
     showAlgebraInput: false,
@@ -106,6 +106,16 @@ function injectApplet(containerId: string, height: number, onLoad: (api: any) =>
   } catch (e) {
     console.error(`GeoGebra Error (${containerId}):`, e);
   }
+}
+
+// Berechnet eine an die Bildschirmbreite angepasste, aber begrenzte Applet-Größe,
+// damit der Graph zentriert und deutlich kleiner als zuvor dargestellt wird.
+function getResponsiveSize(desiredWidth: number, desiredHeight: number) {
+  const pagePadding = 64; // seitliche Innenabstände von Seite + Karte
+  const maxAvailable = typeof window !== 'undefined' ? window.innerWidth - pagePadding : desiredWidth;
+  const width = Math.max(260, Math.min(desiredWidth, maxAvailable));
+  const height = Math.round(width * (desiredHeight / desiredWidth));
+  return { width, height };
 }
 
 export default function Normalparabel() {
@@ -144,31 +154,37 @@ export default function Normalparabel() {
 
   const [appletsLoaded, setAppletsLoaded] = useState({ main: false, match: false, guess: false, sandbox: false });
 
+  // Größen der Graphen: deutlich kleiner als zuvor und an die Bildschirmbreite angepasst
+  const sandboxSize = getResponsiveSize(380, 250);
+  const mainSize = getResponsiveSize(340, 220);
+  const matchSize = getResponsiveSize(380, 250);
+  const guessSize = getResponsiveSize(380, 250);
+
   useEffect(() => {
     const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
 
     const initAll = () => {
       if (!window.GGBApplet) return;
 
-      injectApplet('ggb-sandbox', 350, (api: any) => {
+      injectApplet('ggb-sandbox', sandboxSize.width, sandboxSize.height, (api: any) => {
         sandboxApiRef.current = api;
         initSandbox(api);
         setAppletsLoaded(l => ({ ...l, sandbox: true }));
       });
 
-      injectApplet('ggb-normalparabel', 400, (api: any) => {
+      injectApplet('ggb-normalparabel', mainSize.width, mainSize.height, (api: any) => {
         ggbApiRef.current = api;
         generateMainTask(api);
         setAppletsLoaded(l => ({ ...l, main: true }));
       });
 
-      injectApplet('ggb-zuordnung', 350, (api: any) => {
+      injectApplet('ggb-zuordnung', matchSize.width, matchSize.height, (api: any) => {
         matchApiRef.current = api;
         generateMatchTask(api);
         setAppletsLoaded(l => ({ ...l, match: true }));
       });
 
-      injectApplet('ggb-schaetz', 350, (api: any) => {
+      injectApplet('ggb-schaetz', guessSize.width, guessSize.height, (api: any) => {
         guessApiRef.current = api;
         generateGuessTask(api);
         setAppletsLoaded(l => ({ ...l, guess: true }));
@@ -419,83 +435,83 @@ export default function Normalparabel() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-6xl w-full">
-        <h1 className="text-2xl font-bold text-slate-800 mb-6 text-center">Eigenschaften von Parabeln</h1>
+      <div className="mx-auto px-4 py-5 max-w-3xl w-full">
+        <h1 className="text-xl font-bold text-slate-800 mb-4 text-center">Eigenschaften von Parabeln</h1>
 
         {/* Schieberegler-Sandbox */}
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 mb-8">
-          <h2 className="text-lg font-bold text-slate-800 mb-2">Entdecke den Einfluss von a</h2>
-          <p className="text-sm text-slate-600 mb-4">
+        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+          <h2 className="text-base font-bold text-slate-800 mb-1">Entdecke den Einfluss von a</h2>
+          <p className="text-xs text-slate-600 mb-3">
             Ziehe den Punkt auf dem Schieberegler im Graphen und beobachte, wie sich die blaue Parabel im Vergleich zur grauen Normalparabel verändert.
           </p>
-          <div className="mb-4 border rounded-lg overflow-hidden shadow-inner bg-white">
-            <div id="ggb-sandbox" style={{ width: '100%', height: '350px' }}></div>
+          <div className="mb-3 border rounded-lg overflow-hidden shadow-inner bg-white flex justify-center">
+            <div id="ggb-sandbox" style={{ width: sandboxSize.width, height: sandboxSize.height }}></div>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded font-bold text-sm">
               f(x) = {Math.round(sandboxA * 100) / 100}x²
             </div>
-            <button onClick={resetSandbox} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">
+            <button onClick={resetSandbox} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm">
               Regler zurücksetzen
             </button>
           </div>
         </div>
 
         {/* Aufgabe 1: Eigenschaften ablesen */}
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 mb-8">
-          <h2 className="text-lg font-bold text-slate-800 mb-4">Aufgabe 1: Eigenschaften ablesen</h2>
+        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+          <h2 className="text-base font-bold text-slate-800 mb-2">Aufgabe 1: Eigenschaften ablesen</h2>
 
-          <div className="mb-4 border rounded-lg overflow-hidden shadow-inner bg-white">
-            <div id="ggb-normalparabel" style={{ width: '100%', height: '400px' }}></div>
+          <div className="mb-2 border rounded-lg overflow-hidden shadow-inner bg-white flex justify-center">
+            <div id="ggb-normalparabel" style={{ width: mainSize.width, height: mainSize.height }}></div>
           </div>
 
-          <div className="text-center mb-6 text-slate-600 text-sm">
+          <div className="text-center mb-2 text-slate-600 text-xs">
             Die graue Parabel ist die Normalparabel f(x) = x².
           </div>
 
           {mainTask && (
-            <div className="space-y-4">
-              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                <p className="font-bold mb-3">1. Ist die {mainTask.colorName} Parabel im Vergleich zur grauen Normalparabel gestreckt oder gestaucht?</p>
-                <div className="flex gap-4 justify-center flex-wrap">
+            <div className="space-y-1.5">
+              <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                <p className="font-semibold text-sm mb-1.5">1. Ist die {mainTask.colorName} Parabel im Vergleich zur grauen Normalparabel gestreckt oder gestaucht?</p>
+                <div className="flex gap-2 justify-center flex-wrap">
                   <button onClick={() => checkMainAnswer(1, 'gestreckt')} className="btn-option" disabled={mainAnswered[1]}>Gestreckt (|a| &gt; 1)</button>
                   <button onClick={() => checkMainAnswer(1, 'gestaucht')} className="btn-option" disabled={mainAnswered[1]}>Gestaucht (|a| &lt; 1)</button>
                 </div>
-                {mainFeedback[1] && <p className={`text-center font-bold mt-3 ${mainFeedback[1]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[1]!.text}</p>}
+                {mainFeedback[1] && <p className={`text-center font-bold text-sm mt-1 ${mainFeedback[1]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[1]!.text}</p>}
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                <p className="font-bold mb-3">2. Ist die Parabel nach oben oder unten geöffnet?</p>
-                <div className="flex gap-4 justify-center flex-wrap">
+              <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                <p className="font-semibold text-sm mb-1.5">2. Ist die Parabel nach oben oder unten geöffnet?</p>
+                <div className="flex gap-2 justify-center flex-wrap">
                   <button onClick={() => checkMainAnswer(2, 'oben')} className="btn-option" disabled={mainAnswered[2]}>Nach oben (a &gt; 0)</button>
                   <button onClick={() => checkMainAnswer(2, 'unten')} className="btn-option" disabled={mainAnswered[2]}>Nach unten (a &lt; 0)</button>
                 </div>
-                {mainFeedback[2] && <p className={`text-center font-bold mt-3 ${mainFeedback[2]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[2]!.text}</p>}
+                {mainFeedback[2] && <p className={`text-center font-bold text-sm mt-1 ${mainFeedback[2]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[2]!.text}</p>}
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                <p className="font-bold mb-3">3. Wie lautet die Funktionsgleichung?</p>
-                <div className="flex gap-4 justify-center flex-wrap">
+              <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                <p className="font-semibold text-sm mb-1.5">3. Wie lautet die Funktionsgleichung?</p>
+                <div className="flex gap-2 justify-center flex-wrap">
                   {mainTask.options3.map((opt, idx) => (
                     <button key={idx} onClick={() => checkMainAnswer(3, opt)} className="btn-option" disabled={mainAnswered[3]}>{opt}</button>
                   ))}
                 </div>
-                {mainFeedback[3] && <p className={`text-center font-bold mt-3 ${mainFeedback[3]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[3]!.text}</p>}
+                {mainFeedback[3] && <p className={`text-center font-bold text-sm mt-1 ${mainFeedback[3]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[3]!.text}</p>}
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                <p className="font-bold mb-3">4. Ist der Scheitelpunkt der höchste oder niedrigste Punkt?</p>
-                <div className="flex gap-4 justify-center flex-wrap">
+              <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                <p className="font-semibold text-sm mb-1.5">4. Ist der Scheitelpunkt der höchste oder niedrigste Punkt?</p>
+                <div className="flex gap-2 justify-center flex-wrap">
                   <button onClick={() => checkMainAnswer(4, 'niedrigster')} className="btn-option" disabled={mainAnswered[4]}>Niedrigster (Tiefpunkt)</button>
                   <button onClick={() => checkMainAnswer(4, 'hoechster')} className="btn-option" disabled={mainAnswered[4]}>Höchster (Hochpunkt)</button>
                 </div>
-                {mainFeedback[4] && <p className={`text-center font-bold mt-3 ${mainFeedback[4]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[4]!.text}</p>}
+                {mainFeedback[4] && <p className={`text-center font-bold text-sm mt-1 ${mainFeedback[4]!.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{mainFeedback[4]!.text}</p>}
               </div>
 
-              <div className="text-center">
+              <div className="text-center pt-1">
                 <button
                   onClick={() => setMainShowSolution(true)}
-                  className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded shadow transition-colors"
+                  className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm"
                   disabled={mainShowSolution}
                 >
                   Lösung anzeigen
@@ -503,10 +519,10 @@ export default function Normalparabel() {
               </div>
 
               {mainShowSolution && (
-                <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-6 text-green-900">
-                  <h3 className="font-bold text-lg mb-4">Lösung:</h3>
+                <div className="mt-2 bg-green-50 border border-green-200 rounded-lg p-3 text-green-900 text-sm">
+                  <h3 className="font-bold mb-2">Lösung:</h3>
                   <p>Der Formfaktor ist <strong>a = {mainTask.a}</strong>.</p>
-                  <ul className="list-disc list-inside space-y-2 mt-2">
+                  <ul className="list-disc list-inside space-y-1 mt-1.5">
                     <li>
                       <strong>Frage 1 (Form):</strong> Der Betrag von a ist |{mainTask.a}| = {Math.abs(mainTask.a)}.
                       Da |a| {Math.abs(mainTask.a) > 1 ? '>' : '<'} 1, ist die Parabel <strong>{mainTask.correctAnswers[1]}</strong>.
@@ -528,30 +544,30 @@ export default function Normalparabel() {
         </div>
 
         {/* Aufgabe 2: Zuordnungsaufgabe */}
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 mb-8">
-          <h2 className="text-lg font-bold text-slate-800 mb-4">Aufgabe 2: Parabeln zuordnen</h2>
-          <p className="text-sm text-slate-600 mb-4 text-center">Ordne jeder farbigen Parabel die passende Funktionsgleichung zu.</p>
+        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+          <h2 className="text-base font-bold text-slate-800 mb-2">Aufgabe 2: Parabeln zuordnen</h2>
+          <p className="text-xs text-slate-600 mb-3 text-center">Ordne jeder farbigen Parabel die passende Funktionsgleichung zu.</p>
 
-          <div className="mb-4 border rounded-lg overflow-hidden shadow-inner bg-white">
-            <div id="ggb-zuordnung" style={{ width: '100%', height: '350px' }}></div>
+          <div className="mb-3 border rounded-lg overflow-hidden shadow-inner bg-white flex justify-center">
+            <div id="ggb-zuordnung" style={{ width: matchSize.width, height: matchSize.height }}></div>
           </div>
 
           {matchTask && (
-            <div className="space-y-3">
+            <div className="space-y-2 text-sm">
               {matchTask.items.map((item, idx) => {
                 const isCorrect = matchChecked && matchSelections[idx] === item.equation;
                 const isWrong = matchChecked && matchSelections[idx] && matchSelections[idx] !== item.equation;
                 return (
-                  <div key={idx} className="flex items-center gap-3 justify-center flex-wrap">
+                  <div key={idx} className="flex items-center gap-2 justify-center flex-wrap">
                     <span
-                      className="inline-block w-4 h-4 rounded-full border border-slate-300"
+                      className="inline-block w-3.5 h-3.5 rounded-full border border-slate-300"
                       style={{ backgroundColor: `rgb(${item.color.rgb.join(',')})` }}
                     ></span>
                     <span className="font-medium">{item.color.name.charAt(0).toUpperCase() + item.color.name.slice(1)} Parabel:</span>
                     <select
                       value={matchSelections[idx] || ''}
                       onChange={(e) => setMatchSelections(s => ({ ...s, [idx]: e.target.value }))}
-                      className="border border-slate-300 rounded px-2 py-1"
+                      className="border border-slate-300 rounded px-2 py-1 text-sm"
                     >
                       <option value="" disabled>Bitte wählen…</option>
                       {matchTask.shuffledEquations.map((eq, i2) => (
@@ -563,8 +579,8 @@ export default function Normalparabel() {
                   </div>
                 );
               })}
-              <div className="text-center pt-2">
-                <button onClick={checkMatchTask} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">
+              <div className="text-center pt-1">
+                <button onClick={checkMatchTask} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm">
                   Auswerten
                 </button>
               </div>
@@ -573,17 +589,17 @@ export default function Normalparabel() {
         </div>
 
         {/* Aufgabe 3: Schätz-Modus */}
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 mb-8">
-          <h2 className="text-lg font-bold text-slate-800 mb-4">Aufgabe 3: Schätze den Wert von a</h2>
-          <p className="text-sm text-slate-600 mb-4 text-center">Schätze anhand des Graphen, welchen Wert der Formfaktor a hat (Toleranz: ±0,25).</p>
+        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+          <h2 className="text-base font-bold text-slate-800 mb-2">Aufgabe 3: Schätze den Wert von a</h2>
+          <p className="text-xs text-slate-600 mb-3 text-center">Schätze anhand des Graphen, welchen Wert der Formfaktor a hat (Toleranz: ±0,25).</p>
 
-          <div className="mb-4 border rounded-lg overflow-hidden shadow-inner bg-white">
-            <div id="ggb-schaetz" style={{ width: '100%', height: '350px' }}></div>
+          <div className="mb-3 border rounded-lg overflow-hidden shadow-inner bg-white flex justify-center">
+            <div id="ggb-schaetz" style={{ width: guessSize.width, height: guessSize.height }}></div>
           </div>
 
           {guessTask && (
-            <div className="text-center">
-              <div className="flex justify-center items-center gap-3 flex-wrap mb-3">
+            <div className="text-center text-sm">
+              <div className="flex justify-center items-center gap-2 flex-wrap mb-2">
                 <span className="font-medium">a =</span>
                 <input
                   type="text"
@@ -591,25 +607,25 @@ export default function Normalparabel() {
                   value={guessInput}
                   onChange={(e) => setGuessInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') checkGuess(); }}
-                  className="border border-slate-300 rounded px-3 py-2 w-28 text-center"
+                  className="border border-slate-300 rounded px-2 py-1 w-24 text-center text-sm"
                   placeholder="z. B. 2"
                 />
-                <button onClick={checkGuess} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">
+                <button onClick={checkGuess} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm">
                   Prüfen
                 </button>
               </div>
               {guessFeedback && (
-                <p className={`font-bold mb-3 ${guessFeedback.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{guessFeedback.text}</p>
+                <p className={`font-bold mb-2 ${guessFeedback.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{guessFeedback.text}</p>
               )}
               <button
                 onClick={() => setGuessShowSolution(true)}
-                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded shadow transition-colors"
+                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm"
                 disabled={guessShowSolution}
               >
                 Lösung anzeigen
               </button>
               {guessShowSolution && (
-                <p className="mt-3 text-green-900 bg-green-50 border border-green-200 rounded-lg p-3 inline-block">
+                <p className="mt-2 text-green-900 bg-green-50 border border-green-200 rounded-lg p-2 inline-block">
                   Der tatsächliche Wert ist <strong>a = {guessTask.a}</strong>.
                 </p>
               )}
@@ -618,16 +634,16 @@ export default function Normalparabel() {
         </div>
 
         {/* Aufgabe 4: Umkehraufgabe */}
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 mb-8">
-          <h2 className="text-lg font-bold text-slate-800 mb-4">Aufgabe 4: Finde die passende Gleichung</h2>
+        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+          <h2 className="text-base font-bold text-slate-800 mb-2">Aufgabe 4: Finde die passende Gleichung</h2>
 
           {reverseTask && (
-            <div className="text-center">
-              <p className="mb-4">
+            <div className="text-center text-sm">
+              <p className="mb-3">
                 Gesucht ist die Gleichung einer Parabel, die im Vergleich zur Normalparabel{' '}
                 <strong>{reverseTask.form}</strong> ist und nach <strong>{reverseTask.direction}</strong> geöffnet ist.
               </p>
-              <div className="flex gap-4 justify-center flex-wrap mb-3">
+              <div className="flex gap-2 justify-center flex-wrap mb-2">
                 {reverseTask.options.map((v, idx) => (
                   <button key={idx} onClick={() => checkReverse(v)} className="btn-option">{`y = ${v}x²`}</button>
                 ))}
@@ -640,21 +656,21 @@ export default function Normalparabel() {
         </div>
 
         {/* Steuerung */}
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
-          <div className="flex flex-wrap justify-center gap-4 items-center">
+        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200">
+          <div className="flex flex-wrap justify-center gap-3 items-center">
             <button
               onClick={generateNewRound}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors disabled:opacity-50"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors disabled:opacity-50 text-sm"
               disabled={!allReady}
             >
               Neue Aufgaben
             </button>
-            <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">
+            <div className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded font-bold text-sm">
               Punkte: {score}
             </div>
           </div>
           {!allReady && (
-            <p className="text-center text-sm text-slate-500 mt-3">Übungen werden geladen…</p>
+            <p className="text-center text-xs text-slate-500 mt-2">Übungen werden geladen…</p>
           )}
         </div>
       </div>
@@ -662,9 +678,10 @@ export default function Normalparabel() {
         .btn-option {
           background-color: white;
           border: 1px solid #cbd5e1;
-          padding: 0.75rem 1.5rem;
+          padding: 0.4rem 0.85rem;
           border-radius: 0.5rem;
           font-weight: 500;
+          font-size: 0.875rem;
           color: #334155;
           transition: all 0.2s;
         }
