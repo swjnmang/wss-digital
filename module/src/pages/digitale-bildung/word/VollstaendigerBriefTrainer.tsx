@@ -115,12 +115,18 @@ export default function VollstaendigerBriefTrainer() {
     );
   };
 
-  const renderSection = (title: string, sectionLines: SimpleLine[]) => (
-    <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-5">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">{title}</p>
-      <div className="flex flex-col gap-3">{sectionLines.map(renderRow)}</div>
-    </div>
-  );
+  const renderSection = (title: string, sectionLines: SimpleLine[], options?: { bare?: boolean }) => {
+    const content = (
+      <>
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">{title}</p>
+        <div className="flex flex-col gap-3">{sectionLines.map(renderRow)}</div>
+      </>
+    );
+    if (options?.bare) {
+      return <div>{content}</div>;
+    }
+    return <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-5">{content}</div>;
+  };
 
   const brieftextShowResult = checked && brieftext.trim() !== '';
   const brieftextOk = isBrieftextCorrect();
@@ -142,7 +148,7 @@ export default function VollstaendigerBriefTrainer() {
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-4xl mx-auto p-6 flex flex-col gap-6">
+      <main className="flex-1 w-full max-w-5xl mx-auto p-6 flex flex-col gap-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-2">📝 Arbeitsauftrag</p>
           {task.arbeitsauftrag.split('\n\n').map((absatz, i) => (
@@ -153,60 +159,71 @@ export default function VollstaendigerBriefTrainer() {
         </div>
 
         <div className="flex flex-col gap-5">
-          {renderSection('1. Anschriftenfeld', task.anschriftenfeld as SimpleLine[])}
-          {renderSection('2. Infoblock', task.infoblock as SimpleLine[])}
-          {renderSection('3. Betreff', task.betreff as SimpleLine[])}
-          {renderSection('4. Anrede', task.anrede as SimpleLine[])}
-
-          {/* Brieftext: Referenztext anzeigen (nicht kopierbar), Student tippt selbst ab */}
-          <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">5. Brieftext</p>
-            <p className="text-xs text-slate-500 mb-2">
-              Lies den vorgegebenen Brieftext und tippe ihn vollständig und wortgenau in das Textfeld darunter ab. Der
-              Text lässt sich nicht kopieren – du musst ihn selbst schreiben.
-            </p>
-            <div
-              className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 mb-3 text-sm text-slate-700 leading-relaxed flex flex-col gap-3"
-              style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-              onCopy={preventCopy}
-              onCut={preventCopy}
-              onContextMenu={preventCopy}
-            >
-              {task.brieftextReferenz.map((absatz, i) => (
-                <p key={i}>{absatz}</p>
-              ))}
+          {/* Der eigentliche Brief: eine durchgehende Briefseite, von oben nach unten wie ein Word-Dokument. */}
+          <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-6 md:p-8 flex flex-col gap-8">
+            {/* Briefkopf: Anschriftenfeld oben links, Infoblock oben rechts (DIN 5008) */}
+            <div className="flex flex-col md:flex-row md:justify-between gap-6">
+              <div className="w-full md:w-[360px]">
+                {renderSection('1. Anschriftenfeld', task.anschriftenfeld as SimpleLine[], { bare: true })}
+              </div>
+              <div className="w-full md:w-[420px]">
+                {renderSection('2. Infoblock', task.infoblock as SimpleLine[], { bare: true })}
+              </div>
             </div>
-            <textarea
-              value={brieftext}
-              onChange={(e) => {
-                setBrieftext(e.target.value);
-                setChecked(false);
-              }}
-              onPaste={preventCopy}
-              rows={8}
-              placeholder="Tippe hier den Brieftext ab …"
-              className={`w-full px-3 py-2 rounded-lg text-sm border-2 transition-all outline-none leading-relaxed ${
-                brieftextShowResult
-                  ? brieftextOk
-                    ? 'bg-green-50 border-green-400 text-green-800'
-                    : 'bg-red-50 border-red-400 text-red-800'
-                  : 'bg-white border-slate-200 text-slate-800 focus:border-blue-400'
-              }`}
-            />
-            {brieftextShowResult && (
-              <p
-                className={`mt-2 text-xs rounded-lg px-3 py-2 ${
-                  brieftextOk ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-                }`}
-              >
-                {brieftextOk
-                  ? 'Der Brieftext stimmt (kleine Abweichungen bei Leerzeichen werden toleriert).'
-                  : 'Der abgetippte Text weicht noch vom vorgegebenen Brieftext ab. Vergleiche jedes Wort und jedes Satzzeichen genau.'}
-              </p>
-            )}
-          </div>
 
-          {renderSection('6. Grußformel & Unterschrift', task.grussformel as SimpleLine[])}
+            {renderSection('3. Betreff', task.betreff as SimpleLine[], { bare: true })}
+            {renderSection('4. Anrede', task.anrede as SimpleLine[], { bare: true })}
+
+            {/* Brieftext: Referenztext anzeigen (nicht kopierbar), Student tippt selbst ab */}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">5. Brieftext</p>
+              <p className="text-xs text-slate-500 mb-2">
+                Lies den vorgegebenen Brieftext und tippe ihn vollständig und wortgenau in das Textfeld darunter ab.
+                Der Text lässt sich nicht kopieren – du musst ihn selbst schreiben.
+              </p>
+              <div
+                className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 mb-3 text-sm text-slate-700 leading-relaxed flex flex-col gap-3"
+                style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+                onCopy={preventCopy}
+                onCut={preventCopy}
+                onContextMenu={preventCopy}
+              >
+                {task.brieftextReferenz.map((absatz, i) => (
+                  <p key={i}>{absatz}</p>
+                ))}
+              </div>
+              <textarea
+                value={brieftext}
+                onChange={(e) => {
+                  setBrieftext(e.target.value);
+                  setChecked(false);
+                }}
+                onPaste={preventCopy}
+                rows={8}
+                placeholder="Tippe hier den Brieftext ab …"
+                className={`w-full px-3 py-2 rounded-lg text-sm border-2 transition-all outline-none leading-relaxed ${
+                  brieftextShowResult
+                    ? brieftextOk
+                      ? 'bg-green-50 border-green-400 text-green-800'
+                      : 'bg-red-50 border-red-400 text-red-800'
+                    : 'bg-white border-slate-200 text-slate-800 focus:border-blue-400'
+                }`}
+              />
+              {brieftextShowResult && (
+                <p
+                  className={`mt-2 text-xs rounded-lg px-3 py-2 ${
+                    brieftextOk ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                  }`}
+                >
+                  {brieftextOk
+                    ? 'Der Brieftext stimmt (kleine Abweichungen bei Leerzeichen werden toleriert).'
+                    : 'Der abgetippte Text weicht noch vom vorgegebenen Brieftext ab. Vergleiche jedes Wort und jedes Satzzeichen genau.'}
+                </p>
+              )}
+            </div>
+
+            {renderSection('6. Grußformel & Unterschrift', task.grussformel as SimpleLine[], { bare: true })}
+          </div>
 
           <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-5">
             <div className="text-sm font-semibold text-slate-600 mb-3">
