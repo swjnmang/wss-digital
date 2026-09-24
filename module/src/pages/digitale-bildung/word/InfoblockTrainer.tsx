@@ -141,7 +141,7 @@ export default function InfoblockTrainer() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-gradient-to-br from-slate-800 to-slate-700 text-white py-6 px-4 relative">
-        <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
+        <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
           <Link
             to="/digitale-bildung/word/geschaeftsbrief/infoblock/uebersicht"
             className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors"
@@ -156,7 +156,7 @@ export default function InfoblockTrainer() {
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-4xl mx-auto p-6 flex flex-col gap-6">
+      <main className="flex-1 w-full max-w-6xl mx-auto p-6 flex flex-col gap-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-2">📝 Arbeitsauftrag</p>
           {task.arbeitsauftrag.split('\n\n').map((absatz, i) => (
@@ -166,54 +166,61 @@ export default function InfoblockTrainer() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-          {/* Anschriftenfeld (Kontext) */}
-          <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-4 md:sticky md:top-6">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Anschriftenfeld</p>
-            <div className="border border-dashed border-slate-300 rounded-lg p-3 bg-slate-50 font-mono">
-              <div className="text-[10px] text-slate-500 mb-1">{task.senderLine}</div>
-              <div className="border-t border-slate-300 my-1" />
-              {task.empfaengerLines.map((line) => (
-                <div key={line} className="text-sm text-slate-800">
-                  {line}
+        {/* Briefseite: Anschriftenfeld und Infoblock nebeneinander, wie auf einem echten Briefbogen */}
+        <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-6 md:p-10">
+          <div className="flex flex-col md:flex-row md:items-start gap-8 md:gap-16">
+            {/* Anschriftenfeld (Kontext) */}
+            <div className="w-full md:w-[360px] shrink-0 md:sticky md:top-6">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Anschriftenfeld</p>
+              <div className="border border-dashed border-slate-300 rounded-lg p-3 bg-slate-50 font-mono">
+                <div className="text-[10px] text-slate-500 mb-1">{task.senderLine}</div>
+                <div className="border-t border-slate-300 my-1" />
+                {task.empfaengerLines.map((line) => (
+                  <div key={line} className="text-sm text-slate-800">
+                    {line}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Infoblock: direkt ausfüllbar */}
+            <div className="w-full md:w-[380px] shrink-0">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">Infoblock</p>
+              <div className="flex flex-col gap-3">
+                {task.lines.map((line, i) => (
+                  <div key={line.id}>
+                    {renderRow(line)}
+                    {(i === 3 || i === 7) && <div className="h-1" />}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 pt-4 border-t border-slate-200">
+                <div className="text-sm font-semibold text-slate-600 mb-3">
+                  {checked ? `${correctCount} / ${gradableLines.length} Felder korrekt` : 'Noch nicht geprüft'}
                 </div>
-              ))}
+                <button
+                  onClick={() => setChecked(true)}
+                  disabled={!allAnswered}
+                  className={`w-full px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
+                    allAnswered
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  }`}
+                >
+                  Prüfen
+                </button>
+                {!allAnswered && (
+                  <p className="mt-2 text-xs text-slate-400 text-center">
+                    Fülle alle Felder aus, die eine Angabe benötigen, bevor du prüfst.
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Infoblock: direkt ausfüllbar */}
-          <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">Infoblock</p>
-            <div className="flex flex-col gap-3">
-              {task.lines.map((line, i) => (
-                <div key={line.id}>
-                  {renderRow(line)}
-                  {(i === 3 || i === 7) && <div className="h-1" />}
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 pt-4 border-t border-slate-200">
-              <div className="text-sm font-semibold text-slate-600 mb-3">
-                {checked ? `${correctCount} / ${gradableLines.length} Felder korrekt` : 'Noch nicht geprüft'}
-              </div>
-              <button
-                onClick={() => setChecked(true)}
-                disabled={!allAnswered}
-                className={`w-full px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-                  allAnswered
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                }`}
-              >
-                Prüfen
-              </button>
-              {!allAnswered && (
-                <p className="mt-2 text-xs text-slate-400 text-center">
-                  Fülle alle Felder aus, die eine Angabe benötigen, bevor du prüfst.
-                </p>
-              )}
-            </div>
+          <div className="hidden md:block mt-10 pt-6 border-t border-dashed border-slate-200 text-xs text-slate-300 text-center">
+            (Brieftext folgt hier im weiteren Verlauf des Geschäftsbriefs …)
           </div>
         </div>
 
