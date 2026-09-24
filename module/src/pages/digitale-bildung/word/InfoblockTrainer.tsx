@@ -82,22 +82,27 @@ export default function InfoblockTrainer() {
       const value = values[line.id] ?? '';
       return (
         <div key={line.id}>
-          <div className="flex items-center gap-2 mb-1">
-            <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-              {line.caption}
-            </label>
-            <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400 bg-slate-100 rounded-full px-1.5 py-0.5">
-              nicht bewertet
-            </span>
+          <div className="grid grid-cols-[130px_1fr] gap-x-3 items-center">
+            <div className="flex items-center gap-1.5">
+              <label className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 leading-tight">
+                {line.caption}
+              </label>
+              <span className="text-[8px] font-semibold uppercase tracking-wide text-slate-400 bg-slate-100 rounded-full px-1 py-0.5 whitespace-nowrap">
+                nicht bewertet
+              </span>
+            </div>
+            <input
+              type="text"
+              value={value}
+              onChange={(e) => changeFreitext(line.id, e.target.value)}
+              placeholder={line.placeholder}
+              className="w-full px-3 py-2 rounded-lg text-sm font-mono border-2 border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-400 outline-none"
+            />
           </div>
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => changeFreitext(line.id, e.target.value)}
-            placeholder={line.placeholder}
-            className="w-full px-3 py-2 rounded-lg text-sm font-mono border-2 border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-400 outline-none"
-          />
-          <p className="mt-1 text-xs text-slate-500">{line.hint}</p>
+          <div className="grid grid-cols-[130px_1fr] gap-x-3">
+            <div />
+            <p className="mt-1 text-xs text-slate-500">{line.hint}</p>
+          </div>
         </div>
       );
     }
@@ -109,30 +114,35 @@ export default function InfoblockTrainer() {
     const placeholder = 'placeholder' in line ? line.placeholder : undefined;
     return (
       <div key={line.id}>
-        <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-1 block">
-          {line.caption}
-        </label>
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => changeGraded(line.id, e.target.value)}
-          placeholder={placeholder}
-          className={`w-full px-3 py-2 rounded-lg text-sm font-mono border-2 transition-all outline-none ${
-            showResult
-              ? correct
-                ? 'bg-green-50 border-green-400 text-green-800'
-                : 'bg-red-50 border-red-400 text-red-800'
-              : 'bg-white border-slate-200 text-slate-800 focus:border-blue-400'
-          }`}
-        />
-        {showResult && (
-          <p
-            className={`mt-1 text-xs rounded-lg px-3 py-2 ${
-              correct ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+        <div className="grid grid-cols-[130px_1fr] gap-x-3 items-center">
+          <label className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 leading-tight">
+            {line.caption}
+          </label>
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => changeGraded(line.id, e.target.value)}
+            placeholder={placeholder}
+            className={`w-full px-3 py-2 rounded-lg text-sm font-mono border-2 transition-all outline-none ${
+              showResult
+                ? correct
+                  ? 'bg-green-50 border-green-400 text-green-800'
+                  : 'bg-red-50 border-red-400 text-red-800'
+                : 'bg-white border-slate-200 text-slate-800 focus:border-blue-400'
             }`}
-          >
-            {line.explanation}
-          </p>
+          />
+        </div>
+        {showResult && (
+          <div className="grid grid-cols-[130px_1fr] gap-x-3">
+            <div />
+            <p
+              className={`mt-1 text-xs rounded-lg px-3 py-2 ${
+                correct ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+              }`}
+            >
+              {line.explanation}
+            </p>
+          </div>
         )}
       </div>
     );
@@ -184,7 +194,7 @@ export default function InfoblockTrainer() {
             </div>
 
             {/* Infoblock: direkt ausfüllbar */}
-            <div className="w-full md:w-[380px] shrink-0">
+            <div className="w-full md:w-[460px] shrink-0">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">Infoblock</p>
               <div className="flex flex-col gap-3">
                 {task.lines.map((line, i) => (
