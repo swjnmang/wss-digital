@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { INFOBLOCK_TASKS, getInfoblockTaskById } from '../../../lib/geschaeftsbrief/infoblock-tasks';
-import { isValidName, deriveInitials, deriveEmail } from '../../../lib/geschaeftsbrief/infoblock-types';
+import { isValidName, deriveInitials, deriveEmail, isTodayGerman } from '../../../lib/geschaeftsbrief/infoblock-types';
 import { InfoblockTippsButton } from './InfoblockTipps';
 
 const difficultyLabel: Record<string, string> = {
@@ -34,16 +34,12 @@ export default function InfoblockTrainer() {
 
   const taskIndex = INFOBLOCK_TASKS.findIndex((t) => t.id === task.id);
   const nextTask = INFOBLOCK_TASKS[taskIndex + 1];
-  const gradableLines = task.lines.filter((line) => line.type !== 'freitext');
+  const gradableLines = task.lines;
   const nameValue = values['name'] ?? '';
 
   const changeGraded = (lineId: string, text: string) => {
     setValues((prev) => ({ ...prev, [lineId]: text }));
     setChecked(false);
-  };
-
-  const changeFreitext = (lineId: string, text: string) => {
-    setValues((prev) => ({ ...prev, [lineId]: text }));
   };
 
   const isLineCorrect = (line: (typeof task.lines)[number]): boolean => {
@@ -64,11 +60,13 @@ export default function InfoblockTrainer() {
       if (!expected) return false;
       return value.trim() === expected;
     }
+    if (line.type === 'date') {
+      return isTodayGerman(value);
+    }
     return true;
   };
 
   const isRequired = (line: (typeof task.lines)[number]): boolean => {
-    if (line.type === 'freitext') return false;
     if (line.type === 'text') return line.expected.trim() !== '';
     return true;
   };
@@ -78,35 +76,6 @@ export default function InfoblockTrainer() {
   const allCorrect = checked && correctCount === gradableLines.length;
 
   const renderRow = (line: (typeof task.lines)[number]) => {
-    if (line.type === 'freitext') {
-      const value = values[line.id] ?? '';
-      return (
-        <div key={line.id}>
-          <div className="grid grid-cols-[130px_1fr] gap-x-3 items-center">
-            <div className="flex items-center gap-1.5">
-              <label className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 leading-tight">
-                {line.caption}
-              </label>
-              <span className="text-[8px] font-semibold uppercase tracking-wide text-slate-400 bg-slate-100 rounded-full px-1 py-0.5 whitespace-nowrap">
-                nicht bewertet
-              </span>
-            </div>
-            <input
-              type="text"
-              value={value}
-              onChange={(e) => changeFreitext(line.id, e.target.value)}
-              placeholder={line.placeholder}
-              className="w-full px-3 py-2 rounded-lg text-sm font-mono border-2 border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-400 outline-none"
-            />
-          </div>
-          <div className="grid grid-cols-[130px_1fr] gap-x-3">
-            <div />
-            <p className="mt-1 text-xs text-slate-500">{line.hint}</p>
-          </div>
-        </div>
-      );
-    }
-
     const value = values[line.id] ?? '';
     const correct = isLineCorrect(line);
     // Show a result even for an intentionally empty "text" field (expected === '').

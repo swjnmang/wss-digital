@@ -18,7 +18,7 @@ export interface ZeichenLine {
   caption: string;
   /** Lowercase initials of the Vorgesetzter/-r, e.g. "wv" for Werner Volk. */
   bossInitials: string;
-  placeholder: string;
+  placeholder?: string;
   explanation: string;
 }
 
@@ -44,7 +44,7 @@ export interface NameLine {
   type: 'name';
   id: string;
   caption: string;
-  placeholder: string;
+  placeholder?: string;
   explanation: string;
 }
 
@@ -54,11 +54,19 @@ export interface EmailLine {
   caption: string;
   /** Domain part after the @, e.g. "jordanmoebel.de". */
   domain: string;
-  placeholder: string;
+  placeholder?: string;
   explanation: string;
 }
 
-export type Line = ChoiceLine | ZeichenLine | FreitextLine | NameLine | EmailLine | TextLine;
+export interface DateLine {
+  type: 'date';
+  id: string;
+  caption: string;
+  placeholder?: string;
+  explanation: string;
+}
+
+export type Line = ChoiceLine | ZeichenLine | FreitextLine | NameLine | EmailLine | TextLine | DateLine;
 
 export const BLEIBT_FREI = '(bleibt frei)';
 
@@ -91,4 +99,17 @@ export function deriveEmail(name: string, domain: string): string | null {
   if (!tokens) return null;
   const [first, last] = tokens;
   return `${first.toLowerCase()}.${last.toLowerCase()}@${domain}`;
+}
+
+/** Checks whether a "TT.MM.JJJJ" (or "T.M.JJJJ") string matches today's date. */
+export function isTodayGerman(value: string): boolean {
+  const match = value.trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if (!match) return false;
+  const [, day, month, year] = match;
+  const today = new Date();
+  return (
+    Number(day) === today.getDate() &&
+    Number(month) === today.getMonth() + 1 &&
+    Number(year) === today.getFullYear()
+  );
 }

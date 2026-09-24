@@ -31,7 +31,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'unser-zeichen',
         caption: 'Unser Zeichen',
         bossInitials: 'wv',
-        placeholder: 'z. B. wv-ab',
         explanation:
           'Das Kürzel „wv“ stammt von Werner Volk (Vorgesetzter, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „wv-ab“.',
       },
@@ -47,7 +46,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Vorname Nachname',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
@@ -72,16 +70,15 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'email',
         caption: 'E-Mail',
         domain: 'jordanmoebel.de',
-        placeholder: 'vorname.nachname@jordanmoebel.de',
         explanation:
           '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den des Vorgesetzten.',
       },
       {
-        type: 'freitext',
+        type: 'date',
         id: 'datum',
         caption: 'Datum',
         placeholder: 'TT.MM.JJJJ',
-        hint: 'Hier trägst du das heutige Datum ein (nicht bewertet).',
+        explanation: 'Hier trägst du das heutige Tagesdatum ein, im Format TT.MM.JJJJ.',
       },
     ],
   },
@@ -115,7 +112,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'unser-zeichen',
         caption: 'Unser Zeichen',
         bossInitials: 'sr',
-        placeholder: 'z. B. sr-ab',
         explanation:
           'Das Kürzel „sr“ stammt von Sabine Roth (Vorgesetzte, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „sr-ab“.',
       },
@@ -131,7 +127,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Vorname Nachname',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
@@ -156,16 +151,15 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'email',
         caption: 'E-Mail',
         domain: 'sportwelt-fischer.de',
-        placeholder: 'vorname.nachname@sportwelt-fischer.de',
         explanation:
           '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den der Vorgesetzten.',
       },
       {
-        type: 'freitext',
+        type: 'date',
         id: 'datum',
         caption: 'Datum',
         placeholder: 'TT.MM.JJJJ',
-        hint: 'Hier trägst du das heutige Datum ein (nicht bewertet).',
+        explanation: 'Hier trägst du das heutige Tagesdatum ein, im Format TT.MM.JJJJ.',
       },
     ],
   },
@@ -199,7 +193,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'unser-zeichen',
         caption: 'Unser Zeichen',
         bossInitials: 'tb',
-        placeholder: 'z. B. tb-ab',
         explanation:
           'Das Kürzel „tb“ stammt von Thomas Berg (Vorgesetzter, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „tb-ab“.',
       },
@@ -215,7 +208,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Vorname Nachname',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
@@ -240,16 +232,15 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'email',
         caption: 'E-Mail',
         domain: 'berg-buerotechnik.de',
-        placeholder: 'vorname.nachname@berg-buerotechnik.de',
         explanation:
           '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den des Vorgesetzten.',
       },
       {
-        type: 'freitext',
+        type: 'date',
         id: 'datum',
         caption: 'Datum',
         placeholder: 'TT.MM.JJJJ',
-        hint: 'Hier trägst du das heutige Datum ein (nicht bewertet).',
+        explanation: 'Hier trägst du das heutige Tagesdatum ein, im Format TT.MM.JJJJ.',
       },
     ],
   },
@@ -283,7 +274,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'unser-zeichen',
         caption: 'Unser Zeichen',
         bossInitials: 'pl',
-        placeholder: 'z. B. pl-ab',
         explanation:
           'Das Kürzel „pl“ stammt von Petra Lang (Vorgesetzte, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „pl-ab“.',
       },
@@ -299,7 +289,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Vorname Nachname',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
@@ -324,16 +313,15 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'email',
         caption: 'E-Mail',
         domain: 'gartenwelt-lang.de',
-        placeholder: 'vorname.nachname@gartenwelt-lang.de',
         explanation:
           '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den der Vorgesetzten.',
       },
       {
-        type: 'freitext',
+        type: 'date',
         id: 'datum',
         caption: 'Datum',
         placeholder: 'TT.MM.JJJJ',
-        hint: 'Hier trägst du das heutige Datum ein (nicht bewertet).',
+        explanation: 'Hier trägst du das heutige Tagesdatum ein, im Format TT.MM.JJJJ.',
       },
     ],
   },
@@ -367,7 +355,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'unser-zeichen',
         caption: 'Unser Zeichen',
         bossInitials: 'mo',
-        placeholder: 'z. B. mo-ab',
         explanation:
           'Akademische Titel wie „Dr.“ zählen nicht zum Kürzel – entscheidend sind nur Vor- und Nachname: „Michael Ostermann“ ergibt „mo“. Danach folgt ein Bindestrich und deine eigenen Initialen, z. B. „mo-ab“.',
       },
@@ -383,7 +370,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Vorname Nachname',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein (ohne Titel) – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
@@ -408,16 +394,15 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'email',
         caption: 'E-Mail',
         domain: 'it-neumann.de',
-        placeholder: 'vorname.nachname@it-neumann.de',
         explanation:
           '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, ohne Titel) ein, nicht den des Vorgesetzten.',
       },
       {
-        type: 'freitext',
+        type: 'date',
         id: 'datum',
         caption: 'Datum',
         placeholder: 'TT.MM.JJJJ',
-        hint: 'Hier trägst du das heutige Datum ein (nicht bewertet).',
+        explanation: 'Hier trägst du das heutige Tagesdatum ein, im Format TT.MM.JJJJ.',
       },
     ],
   },
@@ -451,7 +436,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'unser-zeichen',
         caption: 'Unser Zeichen',
         bossInitials: 'ak',
-        placeholder: 'z. B. ak-ab',
         explanation:
           'Das Kürzel „ak“ stammt von Anna Krause (Vorgesetzte, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „ak-ab“.',
       },
@@ -467,7 +451,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Vorname Nachname',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
@@ -492,16 +475,15 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'email',
         caption: 'E-Mail',
         domain: 'verlag-krause.de',
-        placeholder: 'vorname.nachname@verlag-krause.de',
         explanation:
           '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den der Vorgesetzten.',
       },
       {
-        type: 'freitext',
+        type: 'date',
         id: 'datum',
         caption: 'Datum',
         placeholder: 'TT.MM.JJJJ',
-        hint: 'Hier trägst du das heutige Datum ein (nicht bewertet).',
+        explanation: 'Hier trägst du das heutige Tagesdatum ein, im Format TT.MM.JJJJ.',
       },
     ],
   },
@@ -535,7 +517,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'unser-zeichen',
         caption: 'Unser Zeichen',
         bossInitials: 'fh',
-        placeholder: 'z. B. fh-ab',
         explanation:
           'Das Kürzel „fh“ stammt von Frank Hartmann (Vorgesetzter, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „fh-ab“.',
       },
@@ -551,7 +532,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Vorname Nachname',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
@@ -576,16 +556,15 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'email',
         caption: 'E-Mail',
         domain: 'hartmann-spedition.de',
-        placeholder: 'vorname.nachname@hartmann-spedition.de',
         explanation:
           '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den des Vorgesetzten.',
       },
       {
-        type: 'freitext',
+        type: 'date',
         id: 'datum',
         caption: 'Datum',
         placeholder: 'TT.MM.JJJJ',
-        hint: 'Hier trägst du das heutige Datum ein (nicht bewertet).',
+        explanation: 'Hier trägst du das heutige Tagesdatum ein, im Format TT.MM.JJJJ.',
       },
     ],
   },
@@ -619,7 +598,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'unser-zeichen',
         caption: 'Unser Zeichen',
         bossInitials: 'ca',
-        placeholder: 'z. B. ca-ab',
         explanation:
           'Das Kürzel „ca“ stammt von Claudia Adler (Vorgesetzte, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „ca-ab“.',
       },
@@ -635,7 +613,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Vorname Nachname',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
@@ -660,16 +637,15 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'email',
         caption: 'E-Mail',
         domain: 'modehaus-adler.de',
-        placeholder: 'vorname.nachname@modehaus-adler.de',
         explanation:
           '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den der Vorgesetzten.',
       },
       {
-        type: 'freitext',
+        type: 'date',
         id: 'datum',
         caption: 'Datum',
         placeholder: 'TT.MM.JJJJ',
-        hint: 'Hier trägst du das heutige Datum ein (nicht bewertet).',
+        explanation: 'Hier trägst du das heutige Tagesdatum ein, im Format TT.MM.JJJJ.',
       },
     ],
   },
@@ -703,7 +679,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'unser-zeichen',
         caption: 'Unser Zeichen',
         bossInitials: 'sh',
-        placeholder: 'z. B. sh-ab',
         explanation:
           'Das Kürzel „sh“ stammt von Stefan Huber (Vorgesetzter, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „sh-ab“.',
       },
@@ -719,7 +694,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Vorname Nachname',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
@@ -744,16 +718,15 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'email',
         caption: 'E-Mail',
         domain: 'glaserei-huber.de',
-        placeholder: 'vorname.nachname@glaserei-huber.de',
         explanation:
           '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den des Vorgesetzten.',
       },
       {
-        type: 'freitext',
+        type: 'date',
         id: 'datum',
         caption: 'Datum',
         placeholder: 'TT.MM.JJJJ',
-        hint: 'Hier trägst du das heutige Datum ein (nicht bewertet).',
+        explanation: 'Hier trägst du das heutige Tagesdatum ein, im Format TT.MM.JJJJ.',
       },
     ],
   },
@@ -787,7 +760,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'unser-zeichen',
         caption: 'Unser Zeichen',
         bossInitials: 'mv',
-        placeholder: 'z. B. mv-ab',
         explanation:
           'Das Kürzel „mv“ stammt von Melanie Vogt (Vorgesetzte, wird zuerst genannt). Danach folgt ein Bindestrich und deine eigenen Initialen (2 Kleinbuchstaben) – z. B. „mv-ab“.',
       },
@@ -803,7 +775,6 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         type: 'name',
         id: 'name',
         caption: 'Name',
-        placeholder: 'Vorname Nachname',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
       },
@@ -828,16 +799,15 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
         id: 'email',
         caption: 'E-Mail',
         domain: 'reisebuero-sonnenschein.de',
-        placeholder: 'vorname.nachname@reisebuero-sonnenschein.de',
         explanation:
           '„vorname.nachname“ ist nur ein Platzhalter im Muster der Firma – hier setzt du deinen EIGENEN Vor- und Nachnamen (klein geschrieben, durch einen Punkt getrennt) ein, nicht den der Vorgesetzten.',
       },
       {
-        type: 'freitext',
+        type: 'date',
         id: 'datum',
         caption: 'Datum',
         placeholder: 'TT.MM.JJJJ',
-        hint: 'Hier trägst du das heutige Datum ein (nicht bewertet).',
+        explanation: 'Hier trägst du das heutige Tagesdatum ein, im Format TT.MM.JJJJ.',
       },
     ],
   },
