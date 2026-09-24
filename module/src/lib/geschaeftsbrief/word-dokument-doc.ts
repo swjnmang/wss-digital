@@ -29,20 +29,23 @@ import type { WordDokumentTask } from './word-dokument-tasks';
 /**
  * One line ("paragraph") of the DIN-5008 letter document.
  *
- * The same plan drives both seeding (`applyTaskToDocument`/`buildInitialDocumentData`)
- * and grading (`word-dokument-grading.ts`), so the labels the student sees are exactly
- * the labels grading looks for. See the architecture note in
- * `word-dokument-grading.ts` for why this is text-position based rather than
- * relying on Univer's per-range document protection.
+ * The same plan drives seeding (`applyTaskToDocument`/`buildInitialDocumentData`).
+ * Unlike the earlier label-anchored design, the document body no longer prints any
+ * instructional headings, markers or per-field captions for the Anschriftenfeld,
+ * Betreff, Anrede, Brieftext or Grußformel sections — the student must recognize
+ * from DIN-5008 rules alone which line is which. Only the Infoblock keeps its
+ * genuine, permanent template labels ("Ihr Zeichen:", "Telefon:", "Datum:", …).
+ * Because of this, `word-dokument-grading.ts` no longer anchors on label text for
+ * those sections; it reads paragraphs back in document order and maps them
+ * positionally to this plan's field lists instead. See the architecture note in
+ * `word-dokument-grading.ts` for details and trade-offs.
  *
  * The Anschriftenfeld and Infoblock fields (`section: 'anschriftenfeld' | 'infoblock'`)
  * are seeded inside the DIN-5008 header table built by `buildInitialDocumentData`,
  * not as flat top-level paragraphs — see that function for how this plan's field
- * entries are placed into the table's cells. Grading does not care about physical
- * position and simply searches the whole document body for each field's label.
+ * entries are placed into the table's cells.
  */
 export type LetterLine =
-  | { kind: 'static'; text: string; style: 'heading' }
   | { kind: 'blank' }
   | {
       kind: 'field';
@@ -52,13 +55,7 @@ export type LetterLine =
       explanation: string;
       section: 'anschriftenfeld' | 'infoblock' | 'betreff' | 'anrede' | 'grussformel';
     }
-  | { kind: 'field-date'; fieldId: 'datum'; label: string; explanation: string; section: 'infoblock' }
-  | { kind: 'brieftext-marker'; boundary: 'start' | 'end'; text: string }
-  | { kind: 'brieftext-placeholder' };
-
-export const BRIEFTEXT_START_MARKER = 'Brieftext (bitte hier eintippen):';
-export const BRIEFTEXT_END_MARKER = 'Grußformel & Unterschrift:';
-export const BRIEFTEXT_PLACEHOLDER = '[Hier den vorgegebenen Brieftext vollständig abtippen …]';
+  | { kind: 'field-date'; fieldId: 'datum'; label: string; explanation: string; section: 'infoblock' };
 
 /**
  * Builds the ordered list of lines that make up the editable DIN-5008 letter for a task.
@@ -66,11 +63,16 @@ export const BRIEFTEXT_PLACEHOLDER = '[Hier den vorgegebenen Brieftext vollstän
  * The Anschriftenfeld and Infoblock fields are listed here (for grading) but are
  * seeded into the header table's cells rather than as flat paragraphs — see
  * `buildInitialDocumentData`.
+ *
+ * There are deliberately no heading, marker or per-field caption lines here for
+ * Anschriftenfeld/Betreff/Anrede/Brieftext/Grußformel: the student must recognize
+ * from DIN-5008 rules which structural element belongs on each blank line. Only
+ * `blank` spacer lines mark the vertical rhythm between sections.
  */
 export function buildLetterPlan(task: WordDokumentTask): LetterLine[] {
   const lines: LetterLine[] = [];
 
-  // 1. Anschriftenfeld (editable, seeded into the table's address-field cell)
+  // 1. Anschriftenfeld (editable, seeded into the table's address-field cell as blank lines)
   for (const line of task.anschriftenfeld) {
     lines.push({
       kind: 'field',
@@ -105,8 +107,7 @@ export function buildLetterPlan(task: WordDokumentTask): LetterLine[] {
     section: 'infoblock',
   });
 
-  // 3. Betreff
-  lines.push({ kind: 'static', text: '3. Betreff', style: 'heading' });
+  // 3. Betreff (directly follows the header table's fixed vertical gap, no heading/label)
   for (const line of task.betreff) {
     lines.push({
       kind: 'field',
@@ -120,7 +121,6 @@ export function buildLetterPlan(task: WordDokumentTask): LetterLine[] {
   lines.push({ kind: 'blank' });
 
   // 4. Anrede
-  lines.push({ kind: 'static', text: '4. Anrede', style: 'heading' });
   for (const line of task.anrede) {
     lines.push({
       kind: 'field',
@@ -133,14 +133,12 @@ export function buildLetterPlan(task: WordDokumentTask): LetterLine[] {
   }
   lines.push({ kind: 'blank' });
 
-  // 5. Brieftext (freier, mehrzeiliger Fließtext zwischen zwei Markern)
-  lines.push({ kind: 'static', text: '5. Brieftext', style: 'heading' });
-  lines.push({ kind: 'brieftext-marker', boundary: 'start', text: BRIEFTEXT_START_MARKER });
-  lines.push({ kind: 'brieftext-placeholder' });
+  // 5. Brieftext (freier, mehrzeiliger Fließtext; der Referenztext wird außerhalb
+  // des Dokuments nicht-kopierbar angezeigt, siehe VollstaendigerBriefDocTrainer)
+  lines.push({ kind: 'blank' });
   lines.push({ kind: 'blank' });
 
-  // 6. Grußformel & Unterschrift (der End-Marker ist zugleich die Überschrift dieses Abschnitts)
-  lines.push({ kind: 'brieftext-marker', boundary: 'end', text: BRIEFTEXT_END_MARKER });
+  // 6. Grußformel & Unterschrift
   for (const line of task.grussformel) {
     lines.push({
       kind: 'field',
@@ -187,9 +185,12 @@ const MARGIN_HEADER_TWIPS = 709;
 const MARGIN_FOOTER_TWIPS = 283;
 
 const TABLE_WIDTH_TWIPS = 9639;
-const COL1_ANSCHRIFT_TWIPS = 4461; // ≈ 7.87 cm
-const COL2_GAP_TWIPS = 1985; // ≈ 3.50 cm
-const COL3_INFOBLOCK_TWIPS = 3193; // ≈ 5.63 cm
+const COL1_ANSCHRIFT_TWIPS = 4461; // ≈ 7.87 cm (unchanged — already has ample room)
+// The middle "gap" column only ever holds whitespace, while the Infoblock column
+// must fit a typed value after every label. Narrowed from ≈3.50 cm and the freed
+// width given to the Infoblock column so students have more room to type.
+const COL2_GAP_TWIPS = 992; // ≈ 1.75 cm
+const COL3_INFOBLOCK_TWIPS = 4186; // ≈ 7.38 cm (was ≈ 5.63 cm)
 const ROW2_HEIGHT_TWIPS = 1774; // ≈ 3.13 cm, exact
 
 /** `spacingRule: EXACT` line height matching the template's `lineRule="exact" line="240"` (12pt). */
@@ -218,7 +219,11 @@ interface CellParagraphSpec {
   labelLength?: number;
 }
 
-/** Builds the (text, style-split) specs for one Infoblock/Anschriftenfeld field line. */
+/**
+ * Builds the (text, style-split) specs for one Infoblock field line. Infoblock
+ * labels are the genuine, permanent parts of a DIN-5008 template, so they are
+ * printed (bold+gray) with the field's editable value appended after them.
+ */
 function fieldSpec(label: string, fs?: number): CellParagraphSpec {
   const labelWithColon = `${label}:`;
   return { text: fieldParagraphSeedText(label), fs, labelLength: labelWithColon.length };
@@ -360,11 +365,14 @@ function buildAddressInfoTable(
   const row1Col3 = buildTableCell(builder, infoblockSpecs, { exactLineSpacing: true, rowSpan: 2 });
   builder.raw(DataStreamTreeTokenType.TABLE_ROW_END);
 
-  // Row 2 (the Anschriftenfeld window students type the recipient's address into)
+  // Row 2 (the Anschriftenfeld window students type the recipient's address into).
+  // Visually blank on purpose — a real Anschriftenfeld has no per-line captions;
+  // the student must know from DIN-5008 rules how many lines to use and in what
+  // order. One empty paragraph per expected line keeps the field's height stable.
   builder.raw(DataStreamTreeTokenType.TABLE_ROW_START);
   const row2Col1 = buildTableCell(
     builder,
-    anschriftenfeldFields.map((line) => fieldSpec(line.label)),
+    anschriftenfeldFields.map(() => ({ text: '', fs: 8 })),
   );
   const row2Col2 = buildTableCell(builder, [{ text: '' }]);
   const row2Col3 = buildTableCell(builder, [{ text: '' }], { rowSpan: 0 }); // covered by row1Col3's rowSpan
@@ -460,12 +468,12 @@ export function buildInitialDocumentData(task: WordDokumentTask): Partial<IDocum
  * Writes the DIN-5008 letter structure into a Univer document that was created
  * from `buildInitialDocumentData` (so the header table already exists).
  *
- * There is no supported way (in this client-only Univer Docs build) to make
- * only part of a paragraph truly read-only — see the note in
- * `word-dokument-grading.ts`. Instead, static/template text is visually
- * distinguished (gray, italic, or bold heading) and editable field labels
- * are bold, while the actual value the student types stays plain, freely
- * editable text on the same line.
+ * Below the table, only the Infoblock keeps genuine printed labels (handled
+ * inside the table by `buildAddressInfoTable`). Betreff, Anrede and Grußformel
+ * are seeded as plain blank paragraphs with no caption — the student must
+ * recognize from DIN-5008 rules which blank line is which. There is no
+ * supported way (in this client-only Univer Docs build) to make only part of a
+ * paragraph truly read-only — see the note in `word-dokument-grading.ts`.
  */
 export function applyTaskToDocument(fDocument: FDocument, task: WordDokumentTask) {
   const plan = buildLetterPlan(task);
@@ -500,28 +508,9 @@ export function applyTaskToDocument(fDocument: FDocument, task: WordDokumentTask
       continue;
     }
 
-    if (line.kind === 'static') {
-      const paragraph = writeLine(line.text);
-      paragraph.getTextRange().setTextStyle({ bl: BooleanNumber.TRUE, fs: 11 });
-      continue;
-    }
-
     if (line.kind === 'field') {
-      const paragraph = writeLine(fieldParagraphSeedText(line.label));
-      const labelRange = paragraph.findText(line.label);
-      labelRange?.setTextStyle({ bl: BooleanNumber.TRUE, cl: GRAY });
-      continue;
-    }
-
-    if (line.kind === 'brieftext-marker') {
-      const paragraph = writeLine(line.text);
-      paragraph.getTextRange().setTextStyle({ bl: BooleanNumber.TRUE, fs: 11 });
-      continue;
-    }
-
-    if (line.kind === 'brieftext-placeholder') {
-      const paragraph = writeLine(BRIEFTEXT_PLACEHOLDER);
-      paragraph.getTextRange().setTextStyle({ it: BooleanNumber.TRUE, cl: GRAY });
+      // Betreff/Anrede/Grußformel: no printed label, just a blank editable line.
+      writeLine('');
       continue;
     }
   }

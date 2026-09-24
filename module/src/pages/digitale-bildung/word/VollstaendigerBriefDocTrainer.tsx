@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import type { ClipboardEvent, MouseEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { UniverDoc, type UniverDocHandle } from '../../../components/word-trainer/UniverDoc';
 import {
@@ -12,6 +13,10 @@ const difficultyLabel: Record<string, string> = {
   mittel: 'Mittel',
   schwer: 'Schwer',
 };
+
+function preventCopy(e: ClipboardEvent | MouseEvent) {
+  e.preventDefault();
+}
 
 export default function VollstaendigerBriefDocTrainer() {
   const { taskId } = useParams<{ taskId: string }>();
@@ -74,6 +79,25 @@ export default function VollstaendigerBriefDocTrainer() {
             </p>
           ))}
         </details>
+
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Brieftext (Referenz)</p>
+          <p className="text-xs text-slate-500 mb-2">
+            Lies den vorgegebenen Brieftext und tippe ihn vollständig und wortgenau in das Dokument unten ab. Der Text
+            lässt sich nicht kopieren – du musst ihn selbst schreiben.
+          </p>
+          <div
+            className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 text-sm text-slate-700 leading-relaxed flex flex-col gap-3"
+            style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+            onCopy={preventCopy}
+            onCut={preventCopy}
+            onContextMenu={preventCopy}
+          >
+            {task.brieftextReferenz.map((absatz, i) => (
+              <p key={i}>{absatz}</p>
+            ))}
+          </div>
+        </div>
 
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <UniverDoc ref={docRef} task={task} />
