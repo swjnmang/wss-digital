@@ -432,20 +432,22 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
                     
                     <div className="mb-4">
                         <p className="font-bold">2. Umformen zur Normalform (<InlineMath math="ax^2 + bx + c = 0" />):</p>
+                        <BlockMath math={`${m}x ${formatConstant(t)} = ${a}x^2 ${formatCoefficient(b)}x ${formatConstant(c)} \\quad \\Big| ${formatCoefficient(-m)}x ${formatConstant(-t)}`} />
                         <BlockMath math={`${a}x^2 ${formatCoefficient(B)}x ${formatConstant(C)} = 0`} />
                     </div>
 
                     <div className="mb-4">
-                        <p className="font-bold">3. Diskriminante berechnen:</p>
-                        <BlockMath math={`D = (${roundTo(B, 2)})^2 - 4 \\cdot ${a} \\cdot (${roundTo(C, 2)}) = ${roundTo(D, 2)}`} />
+                        <p className="font-bold">3. Parameter a, b und c bestimmen:</p>
+                        <BlockMath math={`a = ${a}, \\quad b = ${roundTo(B, 2)}, \\quad c = ${roundTo(C, 2)}`} />
                     </div>
 
                     {D >= 0 && (
                         <div className="mb-4">
-                            <p className="font-bold">4. x-Werte berechnen (Mitternachtsformel):</p>
-                            <BlockMath math={`x_{1,2} = \\frac{-(${roundTo(B, 2)}) \\pm \\sqrt{${roundTo(D, 2)}}}{2 \\cdot ${a}}`} />
+                            <p className="font-bold">4. Einsetzen in die Mitternachtsformel:</p>
+                            <BlockMath math={"x_{1,2} = \\dfrac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}"} />
+                            <BlockMath math={`x_{1,2} = \\dfrac{-(${roundTo(B, 2)}) \\pm \\sqrt{(${roundTo(B, 2)})^2 - 4 \\cdot ${a} \\cdot (${roundTo(C, 2)})}}{2 \\cdot ${a}}`} />
                             <p>
-                                Ergebnisse: <InlineMath math={`x_1 = ${roundTo(params.points[0].x, 3)}`} />
+                                Ergebnisse (Taschenrechner): <InlineMath math={`x_1 = ${roundTo(params.points[0].x, 3)}`} />
                                 {params.points.length > 1 && <>, <InlineMath math={`x_2 = ${roundTo(params.points[1].x, 3)}`} /></>}
                             </p>
                         </div>
@@ -492,20 +494,22 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
                     
                     <div className="mb-4">
                         <p className="font-bold">2. Umformen zur Normalform:</p>
+                        <BlockMath math={`${a1}x^2 ${formatCoefficient(b1)}x ${formatConstant(c1)} = ${a2}x^2 ${formatCoefficient(b2)}x ${formatConstant(c2)} \\quad \\Big| ${formatCoefficient(-a2)}x^2 ${formatCoefficient(-b2)}x ${formatConstant(-c2)}`} />
                         <BlockMath math={`${roundTo(A, 2)}x^2 ${formatCoefficient(B)}x ${formatConstant(C)} = 0`} />
                     </div>
 
                     <div className="mb-4">
-                        <p className="font-bold">3. Diskriminante berechnen:</p>
-                        <BlockMath math={`D = (${roundTo(B, 2)})^2 - 4 \\cdot ${roundTo(A, 2)} \\cdot (${roundTo(C, 2)}) = ${roundTo(D, 2)}`} />
+                        <p className="font-bold">3. Parameter a, b und c bestimmen:</p>
+                        <BlockMath math={`a = ${roundTo(A, 2)}, \\quad b = ${roundTo(B, 2)}, \\quad c = ${roundTo(C, 2)}`} />
                     </div>
 
                     {D >= 0 && (
                         <div className="mb-4">
-                            <p className="font-bold">4. x-Werte berechnen:</p>
-                            <BlockMath math={`x_{1,2} = \\frac{-(${roundTo(B, 2)}) \\pm \\sqrt{${roundTo(D, 2)}}}{2 \\cdot ${roundTo(A, 2)}}`} />
+                            <p className="font-bold">4. Einsetzen in die Mitternachtsformel:</p>
+                            <BlockMath math={"x_{1,2} = \\dfrac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}"} />
+                            <BlockMath math={`x_{1,2} = \\dfrac{-(${roundTo(B, 2)}) \\pm \\sqrt{(${roundTo(B, 2)})^2 - 4 \\cdot ${roundTo(A, 2)} \\cdot (${roundTo(C, 2)})}}{2 \\cdot ${roundTo(A, 2)}}`} />
                             <p>
-                                Ergebnisse: <InlineMath math={`x_1 = ${roundTo(params.points[0].x, 3)}`} />
+                                Ergebnisse (Taschenrechner): <InlineMath math={`x_1 = ${roundTo(params.points[0].x, 3)}`} />
                                 {params.points.length > 1 && <>, <InlineMath math={`x_2 = ${roundTo(params.points[1].x, 3)}`} /></>}
                             </p>
                         </div>
