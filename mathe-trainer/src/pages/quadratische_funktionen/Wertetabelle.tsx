@@ -114,12 +114,12 @@ function generateXWerte(anzahl: number = ANZAHL_WERTEPAARE, zentrum: number = 0)
   return xWerte
 }
 
-// Generiert zufällige a, b, c Werte: a ∈ [-3, 3] \ {0} mit Schrittweite 0.5,
+// Generiert zufällige a, b, c Werte: a ∈ [-3, 3] \ {0} mit Schrittweite 0.25,
 // b, c ∈ [-5, 5] mit Schrittweite 0.5
 function generateRandomABC() {
   const aWerte: number[] = []
-  for (let v = -3; v <= 3; v += 0.5) {
-    if (v !== 0) aWerte.push(Math.round(v * 10) / 10)
+  for (let v = -3; v <= 3; v += 0.25) {
+    if (v !== 0) aWerte.push(Math.round(v * 100) / 100)
   }
 
   const bcWerte: number[] = []
