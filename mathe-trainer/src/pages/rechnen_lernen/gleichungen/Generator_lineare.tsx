@@ -353,7 +353,7 @@ const LineareGleichungen: React.FC = () => {
                   </div>
 
                   {/* Gleichheitszeichen */}
-                  <span className="text-lg font-bold text-gray-500">=</span>
+                  <span className="text-lg font-bold text-gray-500 whitespace-nowrap">x =</span>
 
                   {/* Input */}
                   <input
