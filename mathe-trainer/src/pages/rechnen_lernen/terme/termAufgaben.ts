@@ -213,8 +213,8 @@ function eingabeTask(
 
 function genV1(): GeneratedTask {
   const v = choice(VARS);
-  const n = randInt(3, 4);
-  const coeffs = Array.from({ length: n }, () => randInt(1, 6));
+  const n = randInt(2, 6);
+  const coeffs = Array.from({ length: n }, () => randInt(1, 9));
   const monoms = coeffs.map((c) => monom(c, { [v]: 1 }));
   const sum = coeffs.reduce((a, b) => a + b, 0);
   return eingabeTask(formatPoly(monoms), monoms, [
@@ -226,7 +226,7 @@ function genV1(): GeneratedTask {
 
 function genV2(): GeneratedTask {
   const v = choice(VARS);
-  const n = randInt(3, 4);
+  const n = randInt(2, 6);
   const dezimal = Math.random() < 0.4;
   const coeffs: number[] = [];
   for (let i = 0; i < n; i++) {
@@ -247,10 +247,13 @@ function genV3(): GeneratedTask {
   const vs = randVars(nVars);
   const monoms: Monom[] = [];
   for (const v of vs) {
-    const c1 = randInt(2, 12);
-    let c2 = Math.random() < 0.6 ? -randInt(1, 9) : randInt(1, 9);
-    if (c1 + c2 === 0) c2 += 1;
-    monoms.push(monom(c1, { [v]: 1 }), monom(c2, { [v]: 1 }));
+    const count = randInt(1, 3);
+    const coeffs = [randInt(2, 12)];
+    for (let i = 1; i < count; i++) {
+      coeffs.push(Math.random() < 0.6 ? -randInt(1, 9) : randInt(1, 9));
+    }
+    if (coeffs.reduce((a, b) => a + b, 0) === 0) coeffs[coeffs.length - 1] += 1;
+    for (const c of coeffs) monoms.push(monom(c, { [v]: 1 }));
   }
   const order = shuffle(monoms);
   return eingabeTask(formatPoly(order), order, [
@@ -270,7 +273,10 @@ function genV4(): GeneratedTask {
   if (Math.random() < 0.5) {
     monoms.push(monom(Math.random() < 0.5 ? -randInt(1, 6) : randInt(1, 6), { [v2]: 1 }));
   }
-  monoms.push(monom(randInt(1, 12)), monom(-randInt(1, 9)));
+  const zahlCount = randInt(1, 3);
+  for (let i = 0; i < zahlCount; i++) {
+    monoms.push(monom(Math.random() < 0.5 ? -randInt(1, 12) : randInt(1, 12)));
+  }
   if (Math.random() < 0.35) {
     monoms.push(monom(randInt(2, 5), { [v1]: 1, [v2]: 1 }));
   }
@@ -287,7 +293,8 @@ function genV4(): GeneratedTask {
 
 function genM1(): GeneratedTask {
   const v = choice(VARS);
-  if (Math.random() < 0.5) {
+  const variante = randInt(1, 3);
+  if (variante === 1) {
     const a = randInt(2, 12);
     const k = randInt(2, 9);
     const zuerst = Math.random() < 0.5;
@@ -299,13 +306,23 @@ function genM1(): GeneratedTask {
       `Ergebnis: ${a * k}${v}`,
     ]);
   }
-  const d = randInt(2, 9);
-  const r = randInt(2, 12);
-  return eingabeTask(`${d * r}${v} : ${d}`, [monom(r, { [v]: 1 })], [
-    'Dividiere den Koeffizienten durch die Zahl:',
-    `${d * r} : ${d} = ${r}`,
+  if (variante === 2) {
+    const d = randInt(2, 9);
+    const r = randInt(2, 12);
+    return eingabeTask(`${d * r}${v} : ${d}`, [monom(r, { [v]: 1 })], [
+      'Dividiere den Koeffizienten durch die Zahl:',
+      `${d * r} : ${d} = ${r}`,
+      `Die Variable ${v} bleibt erhalten.`,
+      `Ergebnis: ${r}${v}`,
+    ]);
+  }
+  const k1 = randInt(2, 6);
+  const k2 = randInt(2, 6);
+  return eingabeTask(`${k1} · ${k2} · ${v}`, [monom(k1 * k2, { [v]: 1 })], [
+    'Multipliziere zuerst die beiden Zahlen miteinander:',
+    `${k1} · ${k2} = ${k1 * k2}`,
     `Die Variable ${v} bleibt erhalten.`,
-    `Ergebnis: ${r}${v}`,
+    `Ergebnis: ${k1 * k2}${v}`,
   ]);
 }
 
@@ -410,7 +427,7 @@ function genK1(): GeneratedTask {
     monom(randInt(2, 9), { [v1]: 1 }),
     monom(Math.random() < 0.5 ? -randInt(1, 8) : randInt(1, 8), { [v2]: 1 }),
   ];
-  if (Math.random() < 0.3) {
+  if (Math.random() < 0.5) {
     inner.push(monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9)));
   }
   const outer1 = monom(Math.random() < 0.25 ? -randInt(2, 9) : randInt(2, 9), { [v1]: 1 });
@@ -447,6 +464,14 @@ function genK2(): GeneratedTask {
     inner.push(monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9)));
   } else {
     inner.push(monom(Math.random() < 0.5 ? -randInt(1, 8) : randInt(1, 8), { [v2]: 1 }));
+  }
+  if (Math.random() < 0.4) {
+    const hatSchon = inner.some((m) => Object.keys(m.vars).length === 0);
+    inner.push(
+      hatSchon
+        ? monom(Math.random() < 0.5 ? -randInt(1, 8) : randInt(1, 8), { [v2]: 1 })
+        : monom(Math.random() < 0.5 ? -randInt(1, 9) : randInt(1, 9))
+    );
   }
   const outer1 = monom(randInt(3, 12), { [v1]: 1 });
 
@@ -565,7 +590,7 @@ function genK4(): GeneratedTask {
 
 function genD1(): GeneratedTask {
   const v = choice(VARS);
-  const variante = randInt(1, 3);
+  const variante = randInt(1, 4);
   const a = randInt(2, 9);
   const bNeg = Math.random() < 0.4;
   const b = bNeg ? -randInt(1, 9) : randInt(1, 9);
@@ -578,6 +603,16 @@ function genD1(): GeneratedTask {
       `Teile JEDEN Term in der Klammer durch ${k}:`,
       `${k * a}${v} : ${k} = ${a}${v}`,
       `${formatNumber(Math.abs(k * b))} : ${k} = ${formatNumber(Math.abs(b))}`,
+      `Ergebnis: ${formatPoly(simplifyPoly(expanded))}`,
+    ]);
+  }
+  if (variante === 4) {
+    const expanded = scalePoly(inner, -k);
+    const ausdruck = `-${k} · (${formatPoly(inner)})`;
+    return eingabeTask(ausdruck, expanded, [
+      `Distributivgesetz: Multipliziere -${k} mit JEDEM Term in der Klammer – Vorzeichen beachten:`,
+      `-${k} · ${a}${v} = ${formatSignedMonom(monom(-k * a, { [v]: 1 }))}`,
+      `-${k} · ${fmtFaktor(monom(b))} = ${formatSignedMonom(monom(-k * b))}`,
       `Ergebnis: ${formatPoly(simplifyPoly(expanded))}`,
     ]);
   }
