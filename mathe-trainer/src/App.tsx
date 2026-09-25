@@ -94,6 +94,7 @@ import PruefungsModus from './pages/finanzmathe/PruefungsModus';
 import QuadratischeFunktionenMenu from './pages/quadratische_funktionen/QuadratischeFunktionenMenu';
 import WertetabelleQF from './pages/quadratische_funktionen/Wertetabelle';
 import Normalparabel from './pages/quadratische_funktionen/Normalparabel';
+import VerschiebungNormalparabel from './pages/quadratische_funktionen/VerschiebungNormalparabel';
 import ScheitelpunktAblesen from './pages/quadratische_funktionen/ScheitelpunktAblesen';
 import Scheitelpunkt from './pages/quadratische_funktionen/Scheitelpunkt';
 import Scheitelform from './pages/quadratische_funktionen/Scheitelform';
@@ -350,6 +351,7 @@ export default function App() {
           <Route path="/quadratische_funktionen" element={<QuadratischeFunktionenMenu />} />
           <Route path="/quadratische_funktionen/wertetabelle" element={<WertetabelleQF />} />
           <Route path="/quadratische_funktionen/normalparabel" element={<Normalparabel />} />
+          <Route path="/quadratische_funktionen/verschiebung_normalparabel" element={<VerschiebungNormalparabel />} />
           <Route path="/quadratische_funktionen/scheitelpunkt_ablesen" element={<ScheitelpunktAblesen />} />
           <Route path="/quadratische_funktionen/scheitelpunkt" element={<Scheitelpunkt />} />
           <Route path="/quadratische_funktionen/scheitelform" element={<Scheitelform />} />
