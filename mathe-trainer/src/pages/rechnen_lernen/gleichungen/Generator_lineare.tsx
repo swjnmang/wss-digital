@@ -72,9 +72,15 @@ function solveLinearEquation(equation: string): number | null {
  */
 function areEquivalentSolutions(input: string, expectedSolution: number): boolean {
   try {
-    const userSolution = parseFloat(input.trim());
+    // Deutsches Komma als Dezimaltrennzeichen zulassen (z.B. "-5,14")
+    const normalized = input.trim().replace(',', '.');
+    const userSolution = parseFloat(normalized);
     if (isNaN(userSolution)) return false;
-    return Math.abs(userSolution - expectedSolution) < 0.0001;
+    // Toleranz von 0,01 statt 0,0001: viele Lösungen sind krumme Brüche
+    // (z.B. -36/7 ≈ -5,142857...), im Rechenweg auf 2 Nachkommastellen
+    // gerundet dargestellt (≈ -5,14) - genau dieser gerundete Wert muss
+    // als richtig gelten.
+    return Math.abs(userSolution - expectedSolution) < 0.01;
   } catch {
     return false;
   }
@@ -310,7 +316,7 @@ const LineareGleichungen: React.FC = () => {
         <div className="mb-4">
           <h1 className="text-2xl font-bold text-orange-900 mb-1">Lineare Gleichungen lösen</h1>
           <p className="text-xs text-gray-600">
-            Löse die Gleichung und gib nur die Lösung für x ein (z.B.: 5, -2, 1.5)
+            Löse die Gleichung und gib nur die Lösung für x ein (z.B.: 5, -2, 1,5 oder 1.5)
           </p>
         </div>
 
@@ -332,66 +338,68 @@ const LineareGleichungen: React.FC = () => {
         </div>
 
         {/* Aufgaben */}
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
           <p className="text-sm font-semibold text-gray-700 mb-2 col-span-full">Löse die Gleichung</p>
           {currentAufgaben.map((aufgabe, index) => {
             const answer = answers[aufgabe.id] || { value: '', isCorrect: null };
             const showSolution = showSolutions[aufgabe.id] || false;
 
             return (
-              <div key={aufgabe.id} className="space-y-0 col-span-1">
-                {/* Aufgabe in einer Zeile */}
-                <div className="bg-white rounded p-2 shadow border-l-2 border-orange-300 flex items-center gap-2">
-                  {/* Nummer */}
-                  <span className="text-sm font-bold text-gray-600 whitespace-nowrap">
-                    {index + 1})
-                  </span>
-
-                  {/* Aufgabe */}
-                  <div className="text-sm font-mono bg-gray-50 px-2 py-1 rounded border border-gray-200 whitespace-nowrap">
-                    {aufgabe.aufgabe}
+              <div key={aufgabe.id} className="space-y-1 col-span-1">
+                <div className="bg-white rounded shadow border-l-2 border-orange-300 overflow-hidden">
+                  {/* Zeile 1: Aufgabe */}
+                  <div className="p-2.5 flex items-start gap-2">
+                    <span className="text-sm font-bold text-gray-600 whitespace-nowrap pt-1.5">
+                      {index + 1})
+                    </span>
+                    <div className="flex-1 text-sm sm:text-base font-mono bg-gray-50 px-2 py-1.5 rounded border border-gray-200 break-words">
+                      {aufgabe.aufgabe}
+                    </div>
                   </div>
 
-                  {/* Gleichheitszeichen */}
-                  <span className="text-lg font-bold text-gray-500">=</span>
+                  {/* Zeile 2: Lösungszeile */}
+                  <div className="px-2.5 pb-2.5 pt-1 border-t border-gray-100 flex items-center gap-2">
+                    <span className="text-base font-bold text-gray-500 whitespace-nowrap pl-6">
+                      x =
+                    </span>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="..."
+                      value={answer.value}
+                      onChange={(e) => handleInputChange(aufgabe.id, e.target.value)}
+                      className={`flex-1 min-w-0 px-3 py-2.5 rounded border-2 font-mono text-base transition-all ${
+                        answer.isCorrect === null
+                          ? 'border-gray-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-200'
+                          : answer.isCorrect
+                          ? 'border-green-500 bg-green-50 focus:ring-1 focus:ring-green-200'
+                          : 'border-red-500 bg-red-50 focus:ring-1 focus:ring-red-200'
+                      }`}
+                    />
 
-                  {/* Input */}
-                  <input
-                    type="text"
-                    placeholder="..."
-                    value={answer.value}
-                    onChange={(e) => handleInputChange(aufgabe.id, e.target.value)}
-                    className={`flex-1 min-w-0 px-2 py-1 rounded border-2 font-mono text-sm transition-all ${
-                      answer.isCorrect === null
-                        ? 'border-gray-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-200'
-                        : answer.isCorrect
-                        ? 'border-green-500 bg-green-50 focus:ring-1 focus:ring-green-200'
-                        : 'border-red-500 bg-red-50 focus:ring-1 focus:ring-red-200'
-                    }`}
-                  />
+                    {/* Status Indicator */}
+                    <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                      {answer.isCorrect === true && (
+                        <span className="text-green-600 font-bold text-base">✓</span>
+                      )}
+                      {answer.isCorrect === false && (
+                        <span className="text-red-600 font-bold text-base">✗</span>
+                      )}
+                    </div>
 
-                  {/* Status Indicator */}
-                  <div className="w-5 h-5 flex items-center justify-center">
-                    {answer.isCorrect === true && (
-                      <span className="text-green-600 font-bold text-sm">✓</span>
-                    )}
-                    {answer.isCorrect === false && (
-                      <span className="text-red-600 font-bold text-sm">✗</span>
-                    )}
+                    {/* Button */}
+                    <button
+                      onClick={() => toggleSolution(aufgabe.id)}
+                      className="text-sm px-3 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-all whitespace-nowrap font-semibold flex-shrink-0"
+                    >
+                      {showSolution ? '✕' : '?'}
+                    </button>
                   </div>
-
-                  {/* Button */}
-                  <button
-                    onClick={() => toggleSolution(aufgabe.id)}
-                    className="text-sm px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-all whitespace-nowrap font-semibold"
-                  >
-                    {showSolution ? '✕' : '?'}
-                  </button>
                 </div>
 
                 {/* Rechenweg - ausklappbar unter der Aufgabe */}
                 {showSolution && (
-                  <div className="p-2 bg-orange-50 rounded border-l-2 border-orange-400 text-sm ml-8">
+                  <div className="p-2 bg-orange-50 rounded border-l-2 border-orange-400 text-sm">
                     <RechenwegDisplay steps={aufgabe.rechenweg} />
                     <p className="font-semibold text-orange-900 mt-1">
                       Lösung: <span className="font-mono bg-white px-1 rounded">x = {aufgabe.loesung}</span>
