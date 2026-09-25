@@ -97,7 +97,7 @@ function injectApplet(containerId: string, width: number, height: number, onLoad
     perspective: 'G',
     useBrowserForJS: true,
     enableShiftDragZoom: true,
-    showResetIcon: true,
+    showResetIcon: false,
     showZoomButtons: true,
     appletOnLoad: onLoad,
   };
