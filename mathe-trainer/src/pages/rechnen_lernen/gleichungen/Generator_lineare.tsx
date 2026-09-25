@@ -1,75 +1,519 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import RechenwegDisplay from '../../../components/RechenwegDisplay';
 
 // ============================================================================
-// INTELLIGENTE VALIDIERUNGSFUNKTION FÜR GLEICHUNGEN
+// ALGEBRA-KERN: Terme, Klammern und eine generische Gleichungs-Engine.
+// Aus zufällig zusammengesetzten Termen (Segmente/Klammern) wird sowohl die
+// Anzeige als auch ein IMMER korrekter, echter Rechenweg berechnet - nicht
+// von Hand getippt, sondern aus der tatsächlichen Rechnung abgeleitet.
 // ============================================================================
 
-/**
- * Löst eine lineare Gleichung ax + b = cx + d auf und gibt die Lösung zurück
- */
-function solveLinearEquation(equation: string): number | null {
-  try {
-    // Normalisiere alle Minus-Varianten (Bindestrich, En-Dash, Em-Dash, mathematisches Minus)
-    // und entferne Leerzeichen, wandle in Kleinbuchstaben um
-    let eq = equation.replace(/[−–—‐]/g, '-').replace(/\s+/g, '').toLowerCase();
+interface Term {
+  coeff: number;
+  isX: boolean;
+}
 
-    // Split bei "="
-    const [left, right] = eq.split('=');
-    if (!left || !right) return null;
+type Piece =
+  | { kind: 'term'; coeff: number; isX: boolean }
+  | { kind: 'bracket'; factor: number; inner: Term[] };
 
-    // Parse beide Seiten: ax + b
-    const parseExpression = (expr: string) => {
-      let coefficient = 0;
-      let constant = 0;
+function term(coeff: number, isX = false): Piece {
+  return { kind: 'term', coeff, isX };
+}
 
-      // Entferne führendes + oder -
-      expr = expr.replace(/^[+]/, '');
+function xterm(coeff: number): Piece {
+  return { kind: 'term', coeff, isX: true };
+}
 
-      // Regex für Terme: ±Zahl*x oder ±Zahl
-      const terms = expr.match(/[+-]?[^+-]+/g) || [];
+function bracket(factor: number, inner: Term[]): Piece {
+  return { kind: 'bracket', factor, inner };
+}
 
-      for (const term of terms) {
-        const trimmed = term.trim();
-        if (!trimmed) continue;
+function round4(n: number): number {
+  return Math.round(n * 10000) / 10000;
+}
 
-        if (trimmed.includes('x')) {
-          // x-Term: 3x, -2x, x, etc.
-          const match = trimmed.match(/([+-]?\d*\.?\d*)\*?x/);
-          if (match) {
-            let coeff = match[1];
-            if (coeff === '' || coeff === '+') coeff = '1';
-            if (coeff === '-') coeff = '-1';
-            coefficient += parseFloat(coeff);
-          }
-        } else {
-          // Konstante
-          constant += parseFloat(trimmed);
-        }
-      }
+function fmtNum(n: number): string {
+  const r = round4(n);
+  const v = Object.is(r, -0) ? 0 : r;
+  return String(v).replace('.', ',');
+}
 
-      return { coefficient, constant };
-    };
+function absTermStr(t: Term): string {
+  const c = Math.abs(t.coeff);
+  if (t.isX) return Math.abs(c - 1) < 1e-9 ? 'x' : `${fmtNum(c)}x`;
+  return fmtNum(c);
+}
 
-    const leftParsed = parseExpression(left);
-    const rightParsed = parseExpression(right);
+/** Reiht Terme mit ihren eigenen Vorzeichen aneinander, ohne zusammenzufassen. */
+function joinTerms(terms: Term[]): string {
+  if (terms.length === 0) return '0';
+  let out = '';
+  terms.forEach((t, i) => {
+    const neg = t.coeff < 0;
+    if (i === 0) out = (neg ? '-' : '') + absTermStr(t);
+    else out += (neg ? ' - ' : ' + ') + absTermStr(t);
+  });
+  return out;
+}
 
-    // Gleichung umformen: ax + b = cx + d => (a - c)x = d - b
-    const a = leftParsed.coefficient - rightParsed.coefficient;
-    const b = rightParsed.constant - leftParsed.constant;
+function pieceTerms(p: Piece): Term[] {
+  if (p.kind === 'term') return [{ coeff: p.coeff, isX: p.isX }];
+  return p.inner.map((t) => ({ coeff: round4(t.coeff * p.factor), isX: t.isX }));
+}
 
-    if (Math.abs(a) < 0.0001) return null; // Keine eindeutige Lösung
+function pieceSign(p: Piece): 1 | -1 {
+  return (p.kind === 'term' ? p.coeff : p.factor) < 0 ? -1 : 1;
+}
 
-    const solution = b / a;
-    return Math.round(solution * 10000) / 10000; // Runde auf 4 Dezimalstellen
-  } catch {
-    return null;
+function pieceAbsDisplay(p: Piece): string {
+  if (p.kind === 'term') return absTermStr({ coeff: Math.abs(p.coeff), isX: p.isX });
+  const af = Math.abs(p.factor);
+  const inner = joinTerms(p.inner);
+  return (Math.abs(af - 1) < 1e-9 ? '' : `${fmtNum(af)} · `) + `(${inner})`;
+}
+
+function buildSide(pieces: Piece[]): { display: string; terms: Term[] } {
+  let display = '';
+  const terms: Term[] = [];
+  pieces.forEach((p, i) => {
+    const sign = pieceSign(p);
+    const abs = pieceAbsDisplay(p);
+    if (i === 0) display = (sign === -1 ? '-' : '') + abs;
+    else display += (sign === -1 ? ' - ' : ' + ') + abs;
+    terms.push(...pieceTerms(p));
+  });
+  return { display, terms };
+}
+
+function sumX(terms: Term[]): number {
+  return round4(terms.filter((t) => t.isX).reduce((s, t) => s + t.coeff, 0));
+}
+function sumC(terms: Term[]): number {
+  return round4(terms.filter((t) => !t.isX).reduce((s, t) => s + t.coeff, 0));
+}
+function evalAt(terms: Term[], xVal: number): number {
+  return round4(terms.reduce((s, t) => s + t.coeff * (t.isX ? xVal : 1), 0));
+}
+
+/** Kombinierte Darstellung einer Seite aus x-Koeffizient und Konstante. */
+function sideStr(x: number, c: number): string {
+  const list: Term[] = [];
+  if (Math.abs(x) > 1e-9) list.push({ coeff: x, isX: true });
+  if (Math.abs(c) > 1e-9 || list.length === 0) list.push({ coeff: c, isX: false });
+  return joinTerms(list);
+}
+
+/** Löst eine "freie" Konstante so, dass die Gleichung bei x = xVal exakt aufgeht. */
+function solveConstant(fixedLeft: Piece[], fixedRight: Piece[], xVal: number, side: 'left' | 'right'): number {
+  const leftVal = evalAt(buildSide(fixedLeft).terms, xVal);
+  const rightVal = evalAt(buildSide(fixedRight).terms, xVal);
+  return side === 'right' ? round4(leftVal - rightVal) : round4(rightVal - leftVal);
+}
+
+interface GleichungResult {
+  aufgabe: string;
+  loesung: number;
+  rechenweg: string[];
+}
+
+/** Baut Aufgabentext + einen vollständig korrekten, aus der Rechnung abgeleiteten Rechenweg. */
+function buildEquation(leftPieces: Piece[], rightPieces: Piece[]): GleichungResult {
+  const left = buildSide(leftPieces);
+  const right = buildSide(rightPieces);
+  const original = `${left.display} = ${right.display}`;
+  const steps: string[] = [original];
+
+  const hasBrackets = leftPieces.some((p) => p.kind === 'bracket') || rightPieces.some((p) => p.kind === 'bracket');
+  if (hasBrackets) {
+    steps.push(`${joinTerms(left.terms)} = ${joinTerms(right.terms)}   | Ausmultiplizieren`);
+  }
+
+  const leftX = sumX(left.terms);
+  const leftC = sumC(left.terms);
+  const rightX = sumX(right.terms);
+  const rightC = sumC(right.terms);
+
+  const needsCombine =
+    left.terms.filter((t) => t.isX).length > 1 ||
+    left.terms.filter((t) => !t.isX).length > 1 ||
+    right.terms.filter((t) => t.isX).length > 1 ||
+    right.terms.filter((t) => !t.isX).length > 1;
+  if (needsCombine) {
+    steps.push(`${sideStr(leftX, leftC)} = ${sideStr(rightX, rightC)}   | Zusammenfassen`);
+  }
+
+  const finalCoeff = round4(leftX - rightX);
+  const finalConst = round4(rightC - leftC);
+  const moveNeeded = Math.abs(rightX) > 1e-9 || Math.abs(leftC) > 1e-9;
+
+  if (moveNeeded) {
+    const annoParts: string[] = [];
+    if (Math.abs(rightX) > 1e-9) annoParts.push(`${rightX > 0 ? '-' : '+'}${fmtNum(Math.abs(rightX))}x`);
+    if (Math.abs(leftC) > 1e-9) annoParts.push(`${leftC > 0 ? '-' : '+'}${fmtNum(Math.abs(leftC))}`);
+
+    let moveLeft = sideStr(leftX, 0);
+    if (Math.abs(rightX) > 1e-9) moveLeft += ` ${rightX > 0 ? '-' : '+'} ${fmtNum(Math.abs(rightX))}x`;
+    let moveRight = Math.abs(rightC) > 1e-9 ? fmtNum(rightC) : '0';
+    if (Math.abs(leftC) > 1e-9) moveRight += ` ${leftC > 0 ? '-' : '+'} ${fmtNum(Math.abs(leftC))}`;
+
+    steps.push(`${moveLeft} = ${moveRight}   | ${annoParts.join(' ')}`);
+    steps.push(`${sideStr(finalCoeff, 0)} = ${fmtNum(finalConst)}`);
+  }
+
+  const solutionExact = finalConst / finalCoeff;
+  const rounded2 = Math.round(solutionExact * 100) / 100;
+  // "≈" nur zeigen, wenn beim Runden auf 2 Nachkommastellen tatsächlich
+  // Genauigkeit verloren geht (z.B. 13/12 = 1,0833...) - ein exakter Wert
+  // wie 2,75 ist keine Näherung und bekommt daher ein "=".
+  const needsApprox = Math.abs(solutionExact - rounded2) > 1e-9;
+
+  if (Math.abs(finalCoeff - 1) < 1e-9) {
+    if (!moveNeeded) steps.push(`x = ${fmtNum(finalConst)}`);
+    // sonst steht "x = ..." bereits als letzte Zeile aus dem Umstell-Schritt da
+  } else if (Math.abs(finalCoeff + 1) < 1e-9) {
+    steps.push(`x = ${fmtNum(-finalConst)}   | · (-1)`);
+  } else {
+    const divisor = finalCoeff < 0 ? `(${fmtNum(finalCoeff)})` : fmtNum(finalCoeff);
+    steps.push(`x ${needsApprox ? '≈' : '='} ${fmtNum(rounded2)}   | : ${divisor}`);
+  }
+
+  const loesung = round4(solutionExact);
+  return { aufgabe: original, loesung, rechenweg: steps };
+}
+
+// ============================================================================
+// ZUFALLS-HELFER
+// ============================================================================
+
+function randInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function choice<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/** Zufallszahl ungleich 0 aus [min, max] (verschiebt 0 auf 1). */
+function nonZero(min: number, max: number): number {
+  const v = randInt(min, max);
+  return v === 0 ? 1 : v;
+}
+
+// ============================================================================
+// STUFE "EINFACH": Ein-Schritt-Gleichungen, mehrere Strukturen
+// ============================================================================
+
+function genEinfach(): GleichungResult {
+  const variant = randInt(1, 8);
+  const xVal = randInt(-15, 20);
+
+  switch (variant) {
+    case 1: {
+      const b = randInt(1, 20);
+      const c = xVal + b;
+      return { aufgabe: `x + ${b} = ${c}`, loesung: xVal, rechenweg: [`x + ${b} = ${c}`, `x = ${c} - ${b}   | - ${b}`, `x = ${xVal}`] };
+    }
+    case 2: {
+      const b = randInt(1, 20);
+      const c = xVal - b;
+      return { aufgabe: `x - ${b} = ${c}`, loesung: xVal, rechenweg: [`x - ${b} = ${c}`, `x = ${c} + ${b}   | + ${b}`, `x = ${xVal}`] };
+    }
+    case 3: {
+      const b = randInt(1, 20);
+      const c = xVal + b;
+      return { aufgabe: `${b} + x = ${c}`, loesung: xVal, rechenweg: [`${b} + x = ${c}`, `x = ${c} - ${b}   | - ${b}`, `x = ${xVal}`] };
+    }
+    case 4: {
+      const b = randInt(1, 20);
+      const c = b - xVal;
+      return {
+        aufgabe: `${b} - x = ${c}`,
+        loesung: xVal,
+        rechenweg: [`${b} - x = ${c}`, `-x = ${c} - ${b}   | - ${b}`, `-x = ${c - b}`, `x = ${xVal}   | · (-1)`],
+      };
+    }
+    case 5: {
+      const a = randInt(2, 12);
+      const c = a * xVal;
+      return { aufgabe: `${a}x = ${c}`, loesung: xVal, rechenweg: [`${a}x = ${c}`, `x = ${c} : ${a}`, `x = ${xVal}   | : ${a}`] };
+    }
+    case 6: {
+      const a = randInt(2, 9);
+      const c = randInt(-10, 15);
+      const x = a * c;
+      return { aufgabe: `x : ${a} = ${c}`, loesung: x, rechenweg: [`x : ${a} = ${c}`, `x = ${c} · ${a}`, `x = ${x}   | · ${a}`] };
+    }
+    case 7: {
+      const b = randInt(1, 20);
+      const c = xVal + b;
+      return { aufgabe: `${c} = x + ${b}`, loesung: xVal, rechenweg: [`${c} = x + ${b}`, `${c} - ${b} = x   | - ${b}`, `x = ${xVal}`] };
+    }
+    default: {
+      const a = randInt(2, 12);
+      const c = a * xVal;
+      return { aufgabe: `${c} = ${a}x`, loesung: xVal, rechenweg: [`${c} = ${a}x`, `${c} : ${a} = x`, `x = ${xVal}   | : ${a}`] };
+    }
   }
 }
 
-/**
- * Vergleicht zwei Lösungen auf Äquivalenz
- */
+// ============================================================================
+// STUFE "MITTEL": Zwei-Schritt-Gleichungen, x auf beiden Seiten, eine Klammer
+// (Ergebnis wird bewusst auf einen "schönen" Zielwert zurückgerechnet)
+// ============================================================================
+
+function genMittelPieces(): { left: Piece[]; right: Piece[] } {
+  const variant = randInt(1, 9);
+  const xVal = randInt(-10, 12);
+
+  switch (variant) {
+    case 1: {
+      const a = randInt(2, 9);
+      const b = randInt(1, 20);
+      const fixedLeft: Piece[] = [xterm(a), term(b)];
+      const c = solveConstant(fixedLeft, [], xVal, 'right');
+      return { left: fixedLeft, right: [term(c)] };
+    }
+    case 2: {
+      const a = randInt(2, 9);
+      const b = randInt(1, 20);
+      const fixedLeft: Piece[] = [xterm(a), term(-b)];
+      const c = solveConstant(fixedLeft, [], xVal, 'right');
+      return { left: fixedLeft, right: [term(c)] };
+    }
+    case 3: {
+      const a = randInt(2, 9);
+      const b = randInt(1, 20);
+      const fixedRight: Piece[] = [xterm(a), term(b)];
+      const c = solveConstant([], fixedRight, xVal, 'left');
+      return { left: [term(c)], right: fixedRight };
+    }
+    case 4: {
+      const a = randInt(2, 9);
+      let d = randInt(2, 9);
+      while (d === a) d = randInt(2, 9);
+      const b = randInt(1, 20);
+      const fixedLeft: Piece[] = [xterm(a), term(b)];
+      const e = solveConstant(fixedLeft, [xterm(d)], xVal, 'right');
+      return { left: fixedLeft, right: [xterm(d), term(e)] };
+    }
+    case 5: {
+      const a = randInt(2, 9);
+      let d = randInt(2, 9);
+      while (d === a) d = randInt(2, 9);
+      const b = randInt(1, 20);
+      const fixedLeft: Piece[] = [xterm(a), term(-b)];
+      const e = solveConstant(fixedLeft, [xterm(d)], xVal, 'right');
+      return { left: fixedLeft, right: [xterm(d), term(e)] };
+    }
+    case 6: {
+      const a = randInt(5, 30);
+      const b = randInt(2, 9);
+      const fixedLeft: Piece[] = [term(a), xterm(-b)];
+      const c = solveConstant(fixedLeft, [], xVal, 'right');
+      return { left: fixedLeft, right: [term(c)] };
+    }
+    case 7: {
+      const a = randInt(2, 9);
+      const b = nonZero(-10, 10);
+      const fixedLeft: Piece[] = [bracket(a, [{ coeff: 1, isX: true }, { coeff: b, isX: false }])];
+      const c = solveConstant(fixedLeft, [], xVal, 'right');
+      return { left: fixedLeft, right: [term(c)] };
+    }
+    case 8: {
+      const a = randInt(2, 9);
+      const d = randInt(2, 9);
+      const b = nonZero(-8, 8);
+      const fixedLeft: Piece[] = [bracket(a, [{ coeff: 1, isX: true }, { coeff: b, isX: false }])];
+      const e = solveConstant(fixedLeft, [xterm(d)], xVal, 'right');
+      return { left: fixedLeft, right: [xterm(d), term(e)] };
+    }
+    default: {
+      const a = randInt(3, 9);
+      let b = randInt(2, 8);
+      while (b === a) b = randInt(2, 8);
+      const c0 = nonZero(-8, 8);
+      const fixedLeft: Piece[] = [xterm(a), bracket(-b, [{ coeff: 1, isX: true }, { coeff: -c0, isX: false }])];
+      const d = solveConstant(fixedLeft, [], xVal, 'right');
+      return { left: fixedLeft, right: [term(d)] };
+    }
+  }
+}
+
+function genMittel(): GleichungResult {
+  for (let attempt = 0; attempt < 25; attempt++) {
+    const { left, right } = genMittelPieces();
+    const lt = buildSide(left).terms;
+    const rt = buildSide(right).terms;
+    if (Math.abs(sumX(lt) - sumX(rt)) < 1e-6) continue;
+    return buildEquation(left, right);
+  }
+  return buildEquation([xterm(2), term(4)], [term(10)]);
+}
+
+// ============================================================================
+// STUFE "SCHWER": Klammern auf beiden Seiten, mehrere Klammern, Dezimalzahlen
+// (Zahlen frei zufällig - Ergebnis darf krumm/gerundet sein, wie im Original)
+// ============================================================================
+
+function genSchwerPieces(): { left: Piece[]; right: Piece[] } {
+  const variant = randInt(1, 8);
+
+  switch (variant) {
+    case 1: {
+      const a = randInt(2, 9);
+      const b = randInt(1, 9);
+      const c = randInt(2, 9);
+      const d = randInt(1, 9);
+      return {
+        left: [bracket(a, [{ coeff: 1, isX: true }, { coeff: b, isX: false }])],
+        right: [bracket(c, [{ coeff: 1, isX: true }, { coeff: -d, isX: false }])],
+      };
+    }
+    case 2: {
+      const outerFactor = randInt(2, 9);
+      const innerXCoeff = randInt(2, 6);
+      const innerConst = randInt(1, 9);
+      const rightXCoeff = randInt(2, 9);
+      const rightConst = randInt(1, 30);
+      return {
+        left: [bracket(outerFactor, [{ coeff: innerXCoeff, isX: true }, { coeff: innerConst, isX: false }])],
+        right: [xterm(rightXCoeff), term(rightConst)],
+      };
+    }
+    case 3: {
+      const a = randInt(2, 9);
+      const b = randInt(1, 9);
+      const c = randInt(2, 9);
+      const d = randInt(1, 9);
+      const e = randInt(1, 40);
+      return {
+        left: [
+          bracket(a, [{ coeff: 1, isX: true }, { coeff: -b, isX: false }]),
+          bracket(c, [{ coeff: 1, isX: true }, { coeff: d, isX: false }]),
+        ],
+        right: [term(e)],
+      };
+    }
+    case 4: {
+      const a = randInt(2, 9);
+      const b = randInt(1, 9);
+      const c = randInt(2, 9);
+      const d = randInt(1, 9);
+      const e = randInt(1, 40);
+      return {
+        left: [
+          bracket(a, [{ coeff: 1, isX: true }, { coeff: -b, isX: false }]),
+          bracket(-c, [{ coeff: 1, isX: true }, { coeff: d, isX: false }]),
+        ],
+        right: [term(e)],
+      };
+    }
+    case 5: {
+      const leadConst = randInt(5, 30);
+      const innerX = randInt(2, 9);
+      const innerC = randInt(1, 9);
+      const rightXCoeff = randInt(2, 9);
+      const rightConst = randInt(1, 20);
+      return {
+        left: [term(leadConst), bracket(-1, [{ coeff: innerX, isX: true }, { coeff: -innerC, isX: false }])],
+        right: [xterm(rightXCoeff), term(rightConst)],
+      };
+    }
+    case 6: {
+      const c1 = round4(randInt(1, 9) + choice([0, 0.5]));
+      const x1 = round4(randInt(2, 9) + choice([0, 0.5]));
+      const x2 = round4(randInt(2, 9) + choice([0, 0.5]));
+      const c2 = round4(randInt(1, 9) + choice([0, 0.5]));
+      return { left: [term(c1), xterm(-x1)], right: [term(c2), xterm(-x2)] };
+    }
+    case 7: {
+      const outerXCoeff = randInt(2, 9);
+      const bracketFactor = randInt(2, 8);
+      const innerXCoeff = randInt(1, 6);
+      const innerConst = randInt(1, 9);
+      const rhsConst = randInt(1, 40);
+      return {
+        left: [xterm(outerXCoeff), bracket(-bracketFactor, [{ coeff: innerXCoeff, isX: true }, { coeff: -innerConst, isX: false }])],
+        right: [term(rhsConst)],
+      };
+    }
+    default: {
+      const a1 = randInt(2, 9);
+      const b1 = randInt(1, 9);
+      const c1 = randInt(2, 9);
+      const d1 = randInt(1, 9);
+      const f1 = randInt(1, 15);
+      const g1 = randInt(1, 50);
+      return {
+        left: [
+          bracket(a1, [{ coeff: 1, isX: true }, { coeff: b1, isX: false }]),
+          bracket(-c1, [{ coeff: 1, isX: true }, { coeff: -d1, isX: false }]),
+          term(f1),
+        ],
+        right: [term(g1)],
+      };
+    }
+  }
+}
+
+function genSchwer(): GleichungResult {
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const { left, right } = genSchwerPieces();
+    const lt = buildSide(left).terms;
+    const rt = buildSide(right).terms;
+    if (Math.abs(sumX(lt) - sumX(rt)) < 1e-6) continue;
+    return buildEquation(left, right);
+  }
+  return buildEquation([xterm(3), term(5)], [xterm(1), term(17)]);
+}
+
+// ============================================================================
+// KATEGORIEN UND AUFGABEN-SET-ERZEUGUNG
+// ============================================================================
+
+interface Aufgabe {
+  id: string;
+  aufgabe: string;
+  loesung: number;
+  rechenweg: string[];
+}
+
+const KATEGORIE_NAMEN = ['Einfach', 'Mittel', 'Schwer'] as const;
+
+const GENERATORS: Record<(typeof KATEGORIE_NAMEN)[number], () => GleichungResult> = {
+  Einfach: genEinfach,
+  Mittel: genMittel,
+  Schwer: genSchwer,
+};
+
+const AUFGABEN_PRO_SET = 16;
+
+let idCounter = 0;
+function nextId(): string {
+  idCounter += 1;
+  return `gen_${idCounter}`;
+}
+
+function generiereSet(kategorieName: (typeof KATEGORIE_NAMEN)[number]): Aufgabe[] {
+  const gen = GENERATORS[kategorieName];
+  const list: Aufgabe[] = [];
+  const seen = new Set<string>();
+  let guard = 0;
+  while (list.length < AUFGABEN_PRO_SET && guard < 500) {
+    guard++;
+    const raw = gen();
+    if (seen.has(raw.aufgabe)) continue;
+    seen.add(raw.aufgabe);
+    list.push({ id: nextId(), ...raw });
+  }
+  return list;
+}
+
+// ============================================================================
+// EINGABEPRÜFUNG
+// ============================================================================
+
 function areEquivalentSolutions(input: string, expectedSolution: number): boolean {
   try {
     // Deutsches Komma als Dezimaltrennzeichen zulassen (z.B. "-5,14")
@@ -87,210 +531,31 @@ function areEquivalentSolutions(input: string, expectedSolution: number): boolea
 }
 
 // ============================================================================
-// AUFGABEN UND KATEGORIEN
+// KOMPONENTE
 // ============================================================================
-
-interface Aufgabe {
-  id: string;
-  aufgabe: string;
-  loesung: number;
-  rechenweg: string[];
-}
-
-interface Kategorie {
-  name: string;
-  aufgaben: Aufgabe[];
-}
-
-const AUFGABEN_KATEGORIEN: Kategorie[] = [
-  {
-    name: 'Einfach',
-    aufgaben: [
-      // Aus Screenshots - Einfache Aufgaben
-      { id: 'e1', aufgabe: 'x + 7 = 12', loesung: 5, rechenweg: ['x + 7 = 12', 'x = 5  | - 7'] },
-      { id: 'e2', aufgabe: 'x + 8 = 4', loesung: -4, rechenweg: ['x + 8 = 4', 'x = -4  | - 8'] },
-      { id: 'e3', aufgabe: '4 + x = 14', loesung: 10, rechenweg: ['4 + x = 14', 'x = 10  | - 4'] },
-      { id: 'e4', aufgabe: 'x - 4 = 7', loesung: 11, rechenweg: ['x - 4 = 7', 'x = 11  | + 4'] },
-      { id: 'e5', aufgabe: 'x - 5 = 1', loesung: 6, rechenweg: ['x - 5 = 1', 'x = 6  | + 5'] },
-      { id: 'e6', aufgabe: '17 + x = 1', loesung: -16, rechenweg: ['17 + x = 1', 'x = -16  | - 17'] },
-      { id: 'e7', aufgabe: '3 - x = 2', loesung: 1, rechenweg: ['3 - x = 2', '-x = -1  | - 3', '-x = -1', 'x = 1  | · (-1)'] },
-      { id: 'e8', aufgabe: '5 - x = 10', loesung: -5, rechenweg: ['5 - x = 10', '-x = 5  | - 5', '-x = 5', 'x = -5  | · (-1)'] },
-      { id: 'e9', aufgabe: 'x + 5 = 12', loesung: 7, rechenweg: ['x + 5 = 12', 'x = 7  | - 5'] },
-      { id: 'e10', aufgabe: 'x + 3 = 11', loesung: 8, rechenweg: ['x + 3 = 11', 'x = 8  | - 3'] },
-      { id: 'e11', aufgabe: '2x = 14', loesung: 7, rechenweg: ['2x = 14', 'x = 7  | : 2'] },
-      { id: 'e12', aufgabe: '3x = 9', loesung: 3, rechenweg: ['3x = 9', 'x = 3  | : 3'] },
-      { id: 'e13', aufgabe: '4x = 20', loesung: 5, rechenweg: ['4x = 20', 'x = 5  | : 4'] },
-      { id: 'e14', aufgabe: '5x = 15', loesung: 3, rechenweg: ['5x = 15', 'x = 3  | : 5'] },
-      { id: 'e15', aufgabe: '6x = 24', loesung: 4, rechenweg: ['6x = 24', 'x = 4  | : 6'] },
-      { id: 'e16', aufgabe: '7x = 21', loesung: 3, rechenweg: ['7x = 21', 'x = 3  | : 7'] },
-      { id: 'e17', aufgabe: 'x : 2 = 4', loesung: 8, rechenweg: ['x : 2 = 4', 'x = 8  | · 2'] },
-      { id: 'e18', aufgabe: 'x : 3 = 4', loesung: 12, rechenweg: ['x : 3 = 4', 'x = 12  | · 3'] },
-      { id: 'e19', aufgabe: 'x : 5 = 2', loesung: 10, rechenweg: ['x : 5 = 2', 'x = 10  | · 5'] },
-      { id: 'e20', aufgabe: 'x : 6 = 6', loesung: 36, rechenweg: ['x : 6 = 6', 'x = 36  | · 6'] },
-      { id: 'e21', aufgabe: 'x + 2 = 5', loesung: 3, rechenweg: ['x + 2 = 5', 'x = 3  | - 2'] },
-      { id: 'e22', aufgabe: 'x - 9 = 2', loesung: 11, rechenweg: ['x - 9 = 2', 'x = 11  | + 9'] },
-      { id: 'e23', aufgabe: '8x = 32', loesung: 4, rechenweg: ['8x = 32', 'x = 4  | : 8'] },
-      { id: 'e24', aufgabe: '9x = 18', loesung: 2, rechenweg: ['9x = 18', 'x = 2  | : 9'] },
-      { id: 'e25', aufgabe: 'x - 1 = 6', loesung: 7, rechenweg: ['x - 1 = 6', 'x = 7  | + 1'] },
-      { id: 'e26', aufgabe: 'x + 10 = 20', loesung: 10, rechenweg: ['x + 10 = 20', 'x = 10  | - 10'] },
-      { id: 'e27', aufgabe: '2x = 10', loesung: 5, rechenweg: ['2x = 10', 'x = 5  | : 2'] },
-      { id: 'e28', aufgabe: '3x = 15', loesung: 5, rechenweg: ['3x = 15', 'x = 5  | : 3'] },
-      { id: 'e29', aufgabe: '5x = 25', loesung: 5, rechenweg: ['5x = 25', 'x = 5  | : 5'] },
-      { id: 'e30', aufgabe: '6x = 12', loesung: 2, rechenweg: ['6x = 12', 'x = 2  | : 6'] },
-      { id: 'e31', aufgabe: 'x + 1 = 2', loesung: 1, rechenweg: ['x + 1 = 2', 'x = 1  | - 1'] },
-      { id: 'e32', aufgabe: 'x - 3 = 5', loesung: 8, rechenweg: ['x - 3 = 5', 'x = 8  | + 3'] },
-      { id: 'e33', aufgabe: 'x + 6 = 10', loesung: 4, rechenweg: ['x + 6 = 10', 'x = 4  | - 6'] },
-      { id: 'e34', aufgabe: '4x = 12', loesung: 3, rechenweg: ['4x = 12', 'x = 3  | : 4'] },
-      { id: 'e35', aufgabe: 'x + 15 = 20', loesung: 5, rechenweg: ['x + 15 = 20', 'x = 5  | - 15'] },
-      { id: 'e36', aufgabe: 'x - 10 = -5', loesung: 5, rechenweg: ['x - 10 = -5', 'x = 5  | + 10'] },
-      { id: 'e37', aufgabe: '10x = 50', loesung: 5, rechenweg: ['10x = 50', 'x = 5  | : 10'] },
-      { id: 'e38', aufgabe: 'x : 4 = 3', loesung: 12, rechenweg: ['x : 4 = 3', 'x = 12  | · 4'] },
-      { id: 'e39', aufgabe: 'x + 9 = 15', loesung: 6, rechenweg: ['x + 9 = 15', 'x = 6  | - 9'] },
-      { id: 'e40', aufgabe: '7x = 14', loesung: 2, rechenweg: ['7x = 14', 'x = 2  | : 7'] },
-      { id: 'e41', aufgabe: 'x - 2 = 8', loesung: 10, rechenweg: ['x - 2 = 8', 'x = 10  | + 2'] },
-      { id: 'e42', aufgabe: '12x = 24', loesung: 2, rechenweg: ['12x = 24', 'x = 2  | : 12'] },
-      { id: 'e43', aufgabe: 'x + 11 = 20', loesung: 9, rechenweg: ['x + 11 = 20', 'x = 9  | - 11'] },
-      { id: 'e44', aufgabe: 'x - 7 = 1', loesung: 8, rechenweg: ['x - 7 = 1', 'x = 8  | + 7'] },
-      { id: 'e45', aufgabe: '9x = 27', loesung: 3, rechenweg: ['9x = 27', 'x = 3  | : 9'] },
-      { id: 'e46', aufgabe: 'x : 7 = 2', loesung: 14, rechenweg: ['x : 7 = 2', 'x = 14  | · 7'] },
-      { id: 'e47', aufgabe: 'x + 4 = 8', loesung: 4, rechenweg: ['x + 4 = 8', 'x = 4  | - 4'] },
-      { id: 'e48', aufgabe: 'x - 6 = 4', loesung: 10, rechenweg: ['x - 6 = 4', 'x = 10  | + 6'] },
-      { id: 'e49', aufgabe: '11x = 22', loesung: 2, rechenweg: ['11x = 22', 'x = 2  | : 11'] },
-      { id: 'e50', aufgabe: 'x : 8 = 1', loesung: 8, rechenweg: ['x : 8 = 1', 'x = 1 · 8', 'x = 8'] },
-      { id: 'e51', aufgabe: 'x + 12 = 25', loesung: 13, rechenweg: ['x + 12 = 25', 'x = 25 - 12', 'x = 13'] },
-      { id: 'e52', aufgabe: 'x - 8 = 3', loesung: 11, rechenweg: ['x - 8 = 3', 'x = 3 + 8', 'x = 11'] },
-    ],
-  },
-  {
-    name: 'Mittel',
-    aufgaben: [
-      // Mittelere Aufgaben - zwei Terme mit x
-      { id: 'm1', aufgabe: '2x + 3 = x + 8', loesung: 5, rechenweg: ['2x + 3 = x + 8', '2x - x = 8 - 3   | -x -3', 'x = 5'] },
-      { id: 'm2', aufgabe: '3x - 4 = 2x + 1', loesung: 5, rechenweg: ['3x - 4 = 2x + 1', '3x - 2x = 1 + 4   | -2x +4', 'x = 5'] },
-      { id: 'm3', aufgabe: '5x - 7 = 2x + 8', loesung: 5, rechenweg: ['5x - 7 = 2x + 8', '5x - 2x = 8 + 7   | -2x +7', '3x = 15', '3x = 15', 'x = 5  | : 3'] },
-      { id: 'm4', aufgabe: '8 - 3x = -1', loesung: 3, rechenweg: ['8 - 3x = -1', '-3x = -1 - 8   | -8', '-3x = -9', '-3x = -9', 'x = 3  | : (-3)'] },
-      { id: 'm5', aufgabe: '1 - 2x = 5', loesung: -2, rechenweg: ['1 - 2x = 5', '-2x = 5 - 1   | -1', '-2x = 4', '-2x = 4', 'x = -2  | : (-2)'] },
-      { id: 'm6', aufgabe: '6x - 14 = 10', loesung: 4, rechenweg: ['6x - 14 = 10', '6x = 10 + 14   | +14', '6x = 24', '6x = 24', 'x = 4  | : 6'] },
-      { id: 'm7', aufgabe: '8z - 9 = 31', loesung: 5, rechenweg: ['8z - 9 = 31', '8z = 31 + 9   | +9', '8z = 40', '8z = 40', 'z = 5  | : 8'] },
-      { id: 'm8', aufgabe: '3x + 2 = 11', loesung: 3, rechenweg: ['3x + 2 = 11', '3x = 11 - 2   | -2', '3x = 9', '3x = 9', 'x = 3  | : 3'] },
-      { id: 'm9', aufgabe: '2x + 5 = 15', loesung: 5, rechenweg: ['2x + 5 = 15', '2x = 15 - 5   | -5', '2x = 10', '2x = 10', 'x = 5  | : 2'] },
-      { id: 'm10', aufgabe: '7x + 3 = 31', loesung: 4, rechenweg: ['7x + 3 = 31', '7x = 31 - 3   | -3', '7x = 28', '7x = 28', 'x = 4  | : 7'] },
-      { id: 'm11', aufgabe: '4x - 2 = 14', loesung: 4, rechenweg: ['4x - 2 = 14', '4x = 14 + 2   | +2', '4x = 16', '4x = 16', 'x = 4  | : 4'] },
-      { id: 'm12', aufgabe: '3x + 8 = 17', loesung: 3, rechenweg: ['3x + 8 = 17', '3x = 17 - 8   | -8', '3x = 9', '3x = 9', 'x = 3  | : 3'] },
-      { id: 'm13', aufgabe: '5x + 33 = 9x - 7', loesung: 10, rechenweg: ['5x + 33 = 9x - 7', '5x - 9x = -7 - 33   | -9x -33', '-4x = -40', '-4x = -40', 'x = 10  | : (-4)'] },
-      { id: 'm14', aufgabe: '2x + 3 = x + 8', loesung: 5, rechenweg: ['2x + 3 = x + 8', '2x - x = 8 - 3   | -x -3', 'x = 5'] },
-      { id: 'm15', aufgabe: '4x + 1 = 2x + 17', loesung: 8, rechenweg: ['4x + 1 = 2x + 17', '4x - 2x = 17 - 1   | -2x -1', '2x = 16', '2x = 16', 'x = 8  | : 2'] },
-      { id: 'm16', aufgabe: '15x + 4 = 5x - 86', loesung: -9, rechenweg: ['15x + 4 = 5x - 86', '15x - 5x = -86 - 4   | -5x -4', '10x = -90', '10x = -90', 'x = -9  | : 10'] },
-      { id: 'm17', aufgabe: '4x + 5 = 14 - 7x', loesung: 9/11, rechenweg: ['4x + 5 = 14 - 7x', '4x + 7x = 14 - 5   | +7x -5', '11x = 9', '11x = 9', 'x = 9/11 ≈ 0.82  | : 11'] },
-      { id: 'm18', aufgabe: '3x - 7 = 11', loesung: 6, rechenweg: ['3x - 7 = 11', '3x = 11 + 7   | +7', '3x = 18', '3x = 18', 'x = 6  | : 3'] },
-      { id: 'm19', aufgabe: '5 - 2x = x + 2', loesung: 1, rechenweg: ['5 - 2x = x + 2', '-2x - x = 2 - 5   | -x -5', '-3x = -3', '-3x = -3', 'x = 1  | : (-3)'] },
-      { id: 'm20', aufgabe: '14 - 5x = 3x - 2', loesung: 2, rechenweg: ['14 - 5x = 3x - 2', '-5x - 3x = -2 - 14   | -3x -14', '-8x = -16', '-8x = -16', 'x = 2  | : (-8)'] },
-      { id: 'm21', aufgabe: '2x + 10 = 22x - 12', loesung: 1.1, rechenweg: ['2x + 10 = 22x - 12', '2x - 22x = -12 - 10   | -22x -10', '-20x = -22', '-20x = -22', 'x = 1.1  | : (-20)'] },
-      { id: 'm22', aufgabe: '3x + 2 = x + 6', loesung: 2, rechenweg: ['3x + 2 = x + 6', '3x - x = 6 - 2   | -x -2', '2x = 4', '2x = 4', 'x = 2  | : 2'] },
-      { id: 'm23', aufgabe: 'x + 8 = 3x + 2', loesung: 3, rechenweg: ['x + 8 = 3x + 2', 'x - 3x = 2 - 8   | -3x -8', '-2x = -6', '-2x = -6', 'x = 3  | : (-2)'] },
-      { id: 'm24', aufgabe: '2x - 5 = x + 3', loesung: 8, rechenweg: ['2x - 5 = x + 3', '2x - x = 3 + 5   | -x +5', 'x = 8'] },
-      { id: 'm25', aufgabe: '4(x + 5) = 9x + 5', loesung: 3, rechenweg: ['4(x + 5) = 9x + 5', '4x + 20 = 9x + 5   | Ausmultiplizieren', '4x - 9x = 5 - 20', '-5x = -15  | -9x -20', '-5x = -15', 'x = 3  | : (-5)'] },
-      { id: 'm26', aufgabe: '3(x + 1) = 15', loesung: 4, rechenweg: ['3(x + 1) = 15', '3x + 3 = 15   | Ausmultiplizieren', '3x = 15 - 3', '3x = 12  | -3', '3x = 12', 'x = 4  | : 3'] },
-      { id: 'm27', aufgabe: '2(3x - 1) = 4(x - 1) + 6', loesung: 2, rechenweg: ['2(3x - 1) = 4(x - 1) + 6', '6x - 2 = 4x - 4 + 6   | Ausmultiplizieren', '6x - 2 = 4x + 2', '6x - 4x = 2 + 2   | -4x +2', '2x = 4', 'x = 2  | : 2'] },
-      { id: 'm28', aufgabe: '7x + 3 = x + 8', loesung: 0.833, rechenweg: ['7x + 3 = x + 8', '7x - x = 8 - 3   | -x -3', '6x = 5', '6x = 5', 'x = 5/6 ≈ 0.83  | : 6'] },
-      { id: 'm29', aufgabe: 'x - 9 = 2', loesung: 11, rechenweg: ['x - 9 = 2', 'x = 2 + 9   | +9', 'x = 11'] },
-      { id: 'm30', aufgabe: '6x + 5 = 3x + 14', loesung: 3, rechenweg: ['6x + 5 = 3x + 14', '6x - 3x = 14 - 5   | -3x -5', '3x = 9', '3x = 9', 'x = 3  | : 3'] },
-      { id: 'm31', aufgabe: '2(x - 4) = 3(x - 2)', loesung: -2, rechenweg: ['2(x - 4) = 3(x - 2)', '2x - 8 = 3x - 6   | Ausmultiplizieren', '2x - 3x = -6 + 8', '-x = 2  | -3x +8', '-x = 2', 'x = -2  | · (-1)'] },
-      { id: 'm32', aufgabe: '5x - 2(x - 3) = 21', loesung: 5, rechenweg: ['5x - 2(x - 3) = 21', '5x - 2x + 6 = 21   | Ausmultiplizieren', '3x + 6 = 21', '3x = 21 - 6', '3x = 15  | -6', '3x = 15', 'x = 5  | : 3'] },
-      { id: 'm33', aufgabe: '3(2x + 1) = 4(x - 5)', loesung: -11.5, rechenweg: ['3(2x + 1) = 4(x - 5)', '6x + 3 = 4x - 20   | Ausmultiplizieren', '6x - 4x = -20 - 3', '2x = -23  | -4x -3', '2x = -23', 'x = -11.5  | : 2'] },
-      { id: 'm34', aufgabe: '6(x + 1) - 4(x - 2) = 22', loesung: 4, rechenweg: ['6(x + 1) - 4(x - 2) = 22', '6x + 6 - 4x + 8 = 22   | Ausmultiplizieren', '2x + 14 = 22', '2x = 22 - 14', '2x = 8  | -14', '2x = 8', 'x = 4  | : 2'] },
-      { id: 'm35', aufgabe: '3(2x - 4) = 18', loesung: 5, rechenweg: ['3(2x - 4) = 18', '6x - 12 = 18   | Ausmultiplizieren', '6x = 18 + 12', '6x = 30  | +12', '6x = 30', 'x = 5  | : 6'] },
-      { id: 'm36', aufgabe: '4(x - 3) = 3(x - 2) + 2', loesung: 8, rechenweg: ['4(x - 3) = 3(x - 2) + 2', '4x - 12 = 3x - 6 + 2   | Ausmultiplizieren', '4x - 12 = 3x - 4', '4x - 3x = -4 + 12', 'x = 8  | -3x +12'] },
-      { id: 'm37', aufgabe: '5(x - 2) + 3(x + 1) = 37', loesung: 5.5, rechenweg: ['5(x - 2) + 3(x + 1) = 37', '5x - 10 + 3x + 3 = 37   | Ausmultiplizieren', '8x - 7 = 37', '8x = 37 + 7', '8x = 44  | +7', '8x = 44', 'x = 5.5  | : 8'] },
-      { id: 'm38', aufgabe: '2(3x + 4) - 3(x - 1) = 32', loesung: 7, rechenweg: ['2(3x + 4) - 3(x - 1) = 32', '6x + 8 - 3x + 3 = 32   | Ausmultiplizieren', '3x + 11 = 32', '3x = 32 - 11', '3x = 21  | -11', '3x = 21', 'x = 7  | : 3'] },
-      { id: 'm39', aufgabe: '4(2x - 3) = 2(3x + 5)', loesung: 11, rechenweg: ['4(2x - 3) = 2(3x + 5)', '8x - 12 = 6x + 10   | Ausmultiplizieren', '8x - 6x = 10 + 12', '2x = 22  | -6x +12', '2x = 22', 'x = 11  | : 2'] },
-      { id: 'm40', aufgabe: '3(x + 4) + 2(x - 1) = 38', loesung: 5.6, rechenweg: ['3(x + 4) + 2(x - 1) = 38', '3x + 12 + 2x - 2 = 38   | Ausmultiplizieren', '5x + 10 = 38', '5x = 38 - 10', '5x = 28  | -10', '5x = 28', 'x = 5.6  | : 5'] },
-      { id: 'm41', aufgabe: '17 - 4x = 1 - 12x', loesung: -2, rechenweg: ['17 - 4x = 1 - 12x', '-4x + 12x = 1 - 17   | +12x -17', '8x = -16', '8x = -16', 'x = -2  | : 8'] },
-      { id: 'm42', aufgabe: '10 - 7x = 1 + 2x', loesung: 1, rechenweg: ['10 - 7x = 1 + 2x', '-7x - 2x = 1 - 10   | -2x -10', '-9x = -9', '-9x = -9', 'x = 1  | : (-9)'] },
-      { id: 'm43', aufgabe: '3x - 8 = 136 - 6x', loesung: 16, rechenweg: ['3x - 8 = 136 - 6x', '3x + 6x = 136 + 8   | +6x +8', '9x = 144', '9x = 144', 'x = 16  | : 9'] },
-      { id: 'm44', aufgabe: '3x + 10 = -15 - 2x', loesung: -5, rechenweg: ['3x + 10 = -15 - 2x', '3x + 2x = -15 - 10   | +2x -10', '5x = -25', '5x = -25', 'x = -5  | : 5'] },
-      { id: 'm45', aufgabe: '2x + 3 = -x + 9', loesung: 2, rechenweg: ['2x + 3 = -x + 9', '2x + x = 9 - 3   | +x -3', '3x = 6', '3x = 6', 'x = 2  | : 3'] },
-      { id: 'm46', aufgabe: '5 - x = x + 2', loesung: 1.5, rechenweg: ['5 - x = x + 2', '-x - x = 2 - 5   | -x -5', '-2x = -3', '-2x = -3', 'x = 1.5  | : (-2)'] },
-      { id: 'm47', aufgabe: '24 + 3x = 10 - 4x', loesung: -2, rechenweg: ['24 + 3x = 10 - 4x', '3x + 4x = 10 - 24   | +4x -24', '7x = -14', '7x = -14', 'x = -2  | : 7'] },
-      { id: 'm48', aufgabe: '4(x + 2) - 3(x - 1) = 2x + 5', loesung: 6, rechenweg: ['4(x + 2) - 3(x - 1) = 2x + 5', '4x + 8 - 3x + 3 = 2x + 5   | Ausmultiplizieren', 'x + 11 = 2x + 5', 'x - 2x = 5 - 11   | -2x -11', '-x = -6', 'x = 6  | · (-1)'] },
-      { id: 'm49', aufgabe: '2x + 8 = x + 15', loesung: 7, rechenweg: ['2x + 8 = x + 15', '2x - x = 15 - 8   | -x -8', 'x = 7'] },
-      { id: 'm50', aufgabe: '4x - 3 = 2x + 1', loesung: 2, rechenweg: ['4x - 3 = 2x + 1', '4x - 2x = 1 + 3   | -2x +3', '2x = 4', '2x = 4', 'x = 2  | : 2'] },
-      { id: 'm51', aufgabe: '3(x - 2) = 9', loesung: 5, rechenweg: ['3(x - 2) = 9', '3x - 6 = 9   | Ausmultiplizieren', '3x = 9 + 6', '3x = 15  | +6', '3x = 15', 'x = 5  | : 3'] },
-      { id: 'm52', aufgabe: '8x - 12 = 4x + 8', loesung: 5, rechenweg: ['8x - 12 = 4x + 8', '8x - 4x = 8 + 12   | -4x +12', '4x = 20', '4x = 20', 'x = 5  | : 4'] },
-    ],
-  },
-  {
-    name: 'Schwer',
-    aufgaben: [
-      // Schwere Aufgaben - Klammerung, Brüche, mehrere Terme
-      { id: 's1', aufgabe: '2(3x - 4) = 5(x - 4)', loesung: -12, rechenweg: ['2(3x - 4) = 5(x - 4)', '6x - 8 = 5x - 20   | Ausmultiplizieren', '6x - 5x = -20 + 8', 'x = -12  | -5x +8'] },
-      { id: 's2', aufgabe: '2(x - 4) = 3(x - 2)', loesung: -2, rechenweg: ['2(x - 4) = 3(x - 2)', '2x - 8 = 3x - 6   | Ausmultiplizieren', '-x = 2', 'x = -2  | · (-1)'] },
-      { id: 's3', aufgabe: '7(x - 4) = 5(2x - 6) - 13', loesung: 5, rechenweg: ['7(x - 4) = 5(2x - 6) - 13', '7x - 28 = 10x - 30 - 13   | Ausmultiplizieren', '7x - 28 = 10x - 43', '-3x = -15', 'x = 5  | : (-3)'] },
-      { id: 's4', aufgabe: '3(x - 4) + 1 = 7(x - 1)', loesung: -1, rechenweg: ['3(x - 4) + 1 = 7(x - 1)', '3x - 12 + 1 = 7x - 7   | Ausmultiplizieren', '3x - 11 = 7x - 7', '-4x = 4', 'x = -1  | : (-4)'] },
-      { id: 's5', aufgabe: '9(3 + 2x) = 45', loesung: 1, rechenweg: ['9(3 + 2x) = 45', '27 + 18x = 45   | Ausmultiplizieren', '18x = 18', 'x = 1  | : 18'] },
-      { id: 's6', aufgabe: '4(x + 5) = 9x + 5', loesung: 3, rechenweg: ['4(x + 5) = 9x + 5', '4x + 20 = 9x + 5   | Ausmultiplizieren', '-5x = -15', 'x = 3  | : (-5)'] },
-      { id: 's7', aufgabe: '4(3x + 1) = 5x + 18', loesung: 2, rechenweg: ['4(3x + 1) = 5x + 18', '12x + 4 = 5x + 18   | Ausmultiplizieren', '7x = 14', 'x = 2  | : 7'] },
-      { id: 's8', aufgabe: '3(7x + 5) = 4x + 49', loesung: 2, rechenweg: ['3(7x + 5) = 4x + 49', '21x + 15 = 4x + 49   | Ausmultiplizieren', '17x = 34', 'x = 2  | : 17'] },
-      { id: 's9', aufgabe: '3(2x - 4) = 3(x - 2)', loesung: 2, rechenweg: ['3(2x - 4) = 3(x - 2)', '6x - 12 = 3x - 6   | Ausmultiplizieren', '3x = 6', 'x = 2  | : 3'] },
-      { id: 's10', aufgabe: '4(2x - 1) - 3(5x + 8) = 8', loesung: -36/7, rechenweg: ['4(2x - 1) - 3(5x + 8) = 8', '8x - 4 - 15x - 24 = 8   | Ausmultiplizieren', '-7x - 28 = 8', '-7x = 36', 'x = -36/7 ≈ -5.14  | : (-7)'] },
-      { id: 's11', aufgabe: '2(x - 4) - (x + 1) = 5', loesung: 14, rechenweg: ['2(x - 4) - (x + 1) = 5', '2x - 8 - x - 1 = 5   | Ausmultiplizieren', 'x - 9 = 5', 'x = 14  | +9'] },
-      { id: 's12', aufgabe: '5 - [7x - (5x - 30)] + 125 = 0', loesung: 50, rechenweg: ['5 - [7x - (5x - 30)] + 125 = 0  | Innere Klammer', '5 - [2x + 30] + 125 = 0 ', '5 - 2x - 30 + 125 = 0  | Äußere Klammer', '100 - 2x = 0', 'x = 50  | +2x -100'] },
-      { id: 's13', aufgabe: '17 - 4x = 1 - 12x', loesung: -2, rechenweg: ['17 - 4x = 1 - 12x', '8x = -16   | +4x -1', 'x = -2  | : 8'] },
-      { id: 's14', aufgabe: '10 - 7x = 1 + 2x', loesung: 1, rechenweg: ['10 - 7x = 1 + 2x', '-9x = -9   | -2x -10', 'x = 1  | : (-9)'] },
-      { id: 's15', aufgabe: '3x - 8 = 136 - 6x', loesung: 16, rechenweg: ['3x - 8 = 136 - 6x', '9x = 144   | +6x +8', 'x = 16  | : 9'] },
-      { id: 's16', aufgabe: '3x + 10 = -15 - 2x', loesung: -5, rechenweg: ['3x + 10 = -15 - 2x', '5x = -25   | +2x -10', 'x = -5  | : 5'] },
-      { id: 's17', aufgabe: '5x - 2(x - 3) = 21', loesung: 5, rechenweg: ['5x - 2(x - 3) = 21', '5x - 2x + 6 = 21   | Ausmultiplizieren', '3x = 15', 'x = 5  | : 3'] },
-      { id: 's18', aufgabe: '3(2x + 1) = 4(x - 5)', loesung: -11.5, rechenweg: ['3(2x + 1) = 4(x - 5)', '6x + 3 = 4x - 20   | Ausmultiplizieren', '2x = -23', 'x = -11.5  | : 2'] },
-      { id: 's19', aufgabe: 'x - 1/2 = 3/4', loesung: 1.25, rechenweg: ['x - 1/2 = 3/4', 'x = 3/4 + 1/2   | +1/2', 'x = 3/4 + 2/4', 'x = 5/4 = 1.25  | Gemeinsamer Nenner'] },
-      { id: 's20', aufgabe: 'x + 3/8 = 5/6', loesung: 11/24, rechenweg: ['x + 3/8 = 5/6', 'x = 5/6 - 3/8   | -3/8', 'x = 20/24 - 9/24', 'x = 11/24 ≈ 0.458  | Gemeinsamer Nenner'] },
-      { id: 's21', aufgabe: '2/3 - x = 1/8', loesung: 13/24, rechenweg: ['2/3 - x = 1/8', '-x = 1/8 - 2/3   | -2/3', '-x = 3/24 - 16/24', '-x = -13/24  | Gemeinsamer Nenner', 'x = 13/24  | · (-1)'] },
-      { id: 's22', aufgabe: '1 1/4 - x = 3 2/3', loesung: -2.417, rechenweg: ['1 1/4 - x = 3 2/3', '5/4 - x = 11/3   | Umwandlung Brüche', '-x = 11/3 - 5/4', '-x = 44/12 - 15/12  | -5/4', '-x = 29/12  | Gemeinsamer Nenner', 'x ≈ -2.417  | · (-1)'] },
-      { id: 's23', aufgabe: 'x - 3 = 1 - 12x', loesung: 4/13, rechenweg: ['x - 3 = 1 - 12x', '13x = 4   | +12x +3', 'x = 4/13 ≈ 0.308  | : 13'] },
-      { id: 's24', aufgabe: '4x + 3 = 14 - 7x', loesung: 1, rechenweg: ['4x + 3 = 14 - 7x', '11x = 11   | +7x -3', 'x = 1  | : 11'] },
-      { id: 's25', aufgabe: '4x + 3 = 3(x + 1)', loesung: 0, rechenweg: ['4x + 3 = 3(x + 1)', '4x + 3 = 3x + 3   | Ausmultiplizieren', 'x = 0  | -3x -3'] },
-      { id: 's26', aufgabe: '3(2x - 4) - (x - 8) = 0', loesung: 4/5, rechenweg: ['3(2x - 4) - (x - 8) = 0', '6x - 12 - x + 8 = 0   | Ausmultiplizieren', '5x - 4 = 0', 'x = 4/5  | +4'] },
-      { id: 's27', aufgabe: '2(x - 1) = 3(x - 1)', loesung: 1, rechenweg: ['2(x - 1) = 3(x - 1)', '2x - 2 = 3x - 3   | Ausmultiplizieren', '-x = -1', 'x = 1  | · (-1)'] },
-      { id: 's28', aufgabe: '2(4x - 3) - (x + 5) = 3(x - 1) + 4', loesung: 3, rechenweg: ['2(4x - 3) - (x + 5) = 3(x - 1) + 4', '8x - 6 - x - 5 = 3x - 3 + 4   | Ausmultiplizieren', '7x - 11 = 3x + 1', '7x - 3x = 1 + 11   | -3x +11', '4x = 12', 'x = 3  | : 4'] },
-      { id: 's29', aufgabe: '4(x + 3) + 3(x + 1) = 36', loesung: 3, rechenweg: ['4(x + 3) + 3(x + 1) = 36', '4x + 12 + 3x + 3 = 36   | Ausmultiplizieren', '7x + 15 = 36', '7x = 21', 'x = 3  | : 7'] },
-      { id: 's30', aufgabe: '3(3x - 2) = 2(x + 1)', loesung: 8/7, rechenweg: ['3(3x - 2) = 2(x + 1)', '9x - 6 = 2x + 2   | Ausmultiplizieren', '7x = 8', 'x = 8/7 ≈ 1.143  | : 7'] },
-      { id: 's31', aufgabe: '100 - 5(20x - 20.5) + 2.5 = 5(5x - 9)', loesung: 2, rechenweg: ['100 - 5(20x - 20.5) + 2.5 = 5(5x - 9)', '100 - 100x + 102.5 + 2.5 = 25x - 45   | Ausmultiplizieren', '205 - 100x = 25x - 45', '-125x = -250', 'x = 2  | : (-125)'] },
-      { id: 's32', aufgabe: '2.3 - 4.5x = 6.7 - 8x', loesung: 44 / 35, rechenweg: ['2.3 - 4.5x = 6.7 - 8x', '3.5x = 4.4   | +4.5x -2.3', 'x ≈ 1.257  | : 3.5'] },
-      { id: 's33', aufgabe: '2,5x - 3,4(2 - 3x) = x : 2 - 12,9', loesung: -0.5, rechenweg: ['2,5x - 3,4(2 - 3x) = x:2 - 12,9', '2,5x - 6,8 + 10,2x = 0,5x - 12,9   | Ausmultiplizieren', '12,7x - 6,8 = 0,5x - 12,9', '12,2x = -6,1', 'x = -0.5  | : 12,2'] },
-      { id: 's34', aufgabe: '5.1 - (8x - 15) = 36x - (55 - (7x + 23) + 2x)', loesung: 52.1 / 49, rechenweg: ['5.1 - (8x - 15) = 36x - (55 - (7x + 23) + 2x)', '5.1 - 8x + 15 = 36x - (55 - 7x - 23 + 2x)   | Klammern auflösen', '20.1 - 8x = 36x - (32 - 5x)   | Zusammenfassen', '20.1 - 8x = 36x - 32 + 5x', '20.1 - 8x = 41x - 32   | Zusammenfassen', '-8x - 41x = -32 - 20.1   | -41x -20.1', '-49x = -52.1', 'x ≈ 1.06  | : (-49)'] },
-      { id: 's35', aufgabe: '3(x - 2) - 2(x + 1) = 3 2/3', loesung: 35/3, rechenweg: ['3(x - 2) - 2(x + 1) = 3 2/3', '3x - 6 - 2x - 2 = 11/3   | Ausmultiplizieren', 'x - 8 = 11/3', 'x = 11/3 + 8', 'x = 35/3 ≈ 11.67  | +8'] },
-      { id: 's36', aufgabe: '2(x - 4) = 3(x - 2)', loesung: -2, rechenweg: ['2(x - 4) = 3(x - 2)', '2x - 8 = 3x - 6  | Ausmultiplizieren', '2x - 3x = -6 + 8', '-x = 2  | -3x +8', 'x = -2  | · (-1)'] },
-      { id: 's37', aufgabe: '5(x - 2) + 3(x + 1) = 37', loesung: 5.5, rechenweg: ['5(x - 2) + 3(x + 1) = 37', '5x - 10 + 3x + 3 = 37   | Ausmultiplizieren', '8x - 7 = 37', '8x = 44', 'x = 5.5  | : 8'] },
-      { id: 's38', aufgabe: '2(3x + 4) - 3(x - 1) = 32', loesung: 7, rechenweg: ['2(3x + 4) - 3(x - 1) = 32', '6x + 8 - 3x + 3 = 32   | Ausmultiplizieren', '3x + 11 = 32', '3x = 21', 'x = 7  | : 3'] },
-      { id: 's39', aufgabe: '4(2x - 3) = 2(3x + 5)', loesung: 11, rechenweg: ['4(2x - 3) = 2(3x + 5)', '8x - 12 = 6x + 10   | Ausmultiplizieren', '2x = 22', 'x = 11  | : 2'] },
-      { id: 's40', aufgabe: '3(x + 4) + 2(x - 1) = 38', loesung: 5.6, rechenweg: ['3(x + 4) + 2(x - 1) = 38', '3x + 12 + 2x - 2 = 38   | Ausmultiplizieren', '5x + 10 = 38', '5x = 28', 'x = 5.6  | : 5'] },
-      { id: 's41', aufgabe: '17 - 4x = 1 - 12x', loesung: -2, rechenweg: ['17 - 4x = 1 - 12x', '8x = -16   | +4x -1', 'x = -2  | : 8'] },
-      { id: 's42', aufgabe: '3(x - 8) = 136 - 6x', loesung: 160/9, rechenweg: ['3(x - 8) = 136 - 6x', '3x - 24 = 136 - 6x  | Ausmultiplizieren', '3x + 6x = 136 + 24', '9x = 160  | +6x +24', 'x = 160/9 ≈ 17.78  | : 9'] },
-      { id: 's43', aufgabe: '3(x + 10) = -15 - 2x', loesung: -9, rechenweg: ['3(x + 10) = -15 - 2x', '3x + 30 = -15 - 2x  | Ausmultiplizieren', '3x + 2x = -15 - 30', '5x = -45  | +2x -30', 'x = -9  | : 5'] },
-      { id: 's44', aufgabe: '2(2 + 5x) = 3(4 + 7x)', loesung: -8/11, rechenweg: ['2(2 + 5x) = 3(4 + 7x)', '4 + 10x = 12 + 21x  | Ausmultiplizieren', '10x - 21x = 12 - 4', '-11x = 8  | -21x -4', 'x = -8/11 ≈ -0.727  | : (-11)'] },
-      { id: 's45', aufgabe: '5(4 - 2x) = x + 2', loesung: 18 / 11, rechenweg: ['5(4 - 2x) = x + 2', '20 - 10x = x + 2   | Ausmultiplizieren', '-11x = -18', 'x ≈ 1.636  | : (-11)'] },
-      { id: 's46', aufgabe: '24 + 3x = 10 - 4x', loesung: -2, rechenweg: ['24 + 3x = 10 - 4x', '7x = -14   | +4x -24', 'x = -2  | : 7'] },
-      { id: 's47', aufgabe: '4(x - 3) - (x + 1) = 0', loesung: 13/3, rechenweg: ['4(x - 3) - (x + 1) = 0', '4x - 12 - x - 1 = 0   | Ausmultiplizieren', '3x - 13 = 0', 'x = 13/3 ≈ 4.33  | +13'] },
-      { id: 's48', aufgabe: '3(2x - 4) + 1 = 7(x - 1)', loesung: -4, rechenweg: ['3(2x - 4) + 1 = 7(x - 1)', '6x - 12 + 1 = 7x - 7   | Ausmultiplizieren', '6x - 11 = 7x - 7', '-x = 4', 'x = -4  | · (-1)'] },
-      { id: 's49', aufgabe: '8x - 12 = 4x + 8', loesung: 5, rechenweg: ['8x - 12 = 4x + 8', '4x = 20   | -4x +12', 'x = 5  | : 4'] },
-      { id: 's50', aufgabe: '5(x - 1) - 3(x - 2) = 8', loesung: 3.5, rechenweg: ['5(x - 1) - 3(x - 2) = 8', '5x - 5 - 3x + 6 = 8   | Ausmultiplizieren', '2x + 1 = 8', '2x = 7', 'x = 3.5  | : 2'] },
-      { id: 's51', aufgabe: '4(3x + 5) = 9x + 5', loesung: -5, rechenweg: ['4(3x + 5) = 9x + 5', '12x + 20 = 9x + 5   | Ausmultiplizieren', '3x = -15', 'x = -5  | : 3'] },
-      { id: 's52', aufgabe: '2(x - 4) + 3(x + 1) = 2x + 1', loesung: 2, rechenweg: ['2(x - 4) + 3(x + 1) = 2x + 1', '2x - 8 + 3x + 3 = 2x + 1   | Ausmultiplizieren', '5x - 5 = 2x + 1', '3x = 6', 'x = 2  | : 3'] },
-    ],
-  },
-];
 
 const LineareGleichungen: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState(0);
+  const [aufgaben, setAufgaben] = useState<Aufgabe[]>(() => generiereSet(KATEGORIE_NAMEN[0]));
   const [answers, setAnswers] = useState<Record<string, { value: string; isCorrect: boolean | null }>>({});
   const [showSolutions, setShowSolutions] = useState<Record<string, boolean>>({});
 
-  const currentKategorie = AUFGABEN_KATEGORIEN[selectedCategory];
-  const currentAufgaben = currentKategorie.aufgaben;
+  const neueAufgaben = useCallback((katName: (typeof KATEGORIE_NAMEN)[number]) => {
+    setAufgaben(generiereSet(katName));
+    setAnswers({});
+    setShowSolutions({});
+  }, []);
+
+  useEffect(() => {
+    neueAufgaben(KATEGORIE_NAMEN[selectedCategory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory]);
+
+  const currentAufgaben = aufgaben;
 
   const handleInputChange = (aufgabenId: string, value: string) => {
     const trimmedValue = value.trim();
 
-    // Finde die zugehörige Aufgabe
     const aufgabe = currentAufgaben.find((a) => a.id === aufgabenId);
     if (!aufgabe) return;
 
@@ -316,15 +581,16 @@ const LineareGleichungen: React.FC = () => {
         <div className="mb-4">
           <h1 className="text-2xl font-bold text-orange-900 mb-1">Lineare Gleichungen lösen</h1>
           <p className="text-xs text-gray-600">
-            Löse die Gleichung und gib nur die Lösung für x ein (z.B.: 5, -2, 1,5 oder 1.5)
+            Löse die Gleichung und gib nur die Lösung für x ein (z.B.: 5, -2, 1,5 oder 1.5). Jede
+            Aufgabe wird neu für dich erzeugt.
           </p>
         </div>
 
         {/* Kategorie Tabs */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {AUFGABEN_KATEGORIEN.map((kategorie, index) => (
+          {KATEGORIE_NAMEN.map((name, index) => (
             <button
-              key={index}
+              key={name}
               onClick={() => setSelectedCategory(index)}
               className={`px-3 py-1 text-sm rounded font-semibold transition-all ${
                 selectedCategory === index
@@ -332,14 +598,22 @@ const LineareGleichungen: React.FC = () => {
                   : 'bg-white text-gray-700 border border-gray-300 hover:border-orange-300'
               }`}
             >
-              {kategorie.name} ({kategorie.aufgaben.length})
+              {name} ({AUFGABEN_PRO_SET})
             </button>
           ))}
         </div>
 
         {/* Aufgaben */}
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-          <p className="text-sm font-semibold text-gray-700 mb-2 col-span-full">Löse die Gleichung</p>
+          <div className="col-span-full flex items-center justify-between gap-2 mb-2">
+            <p className="text-sm font-semibold text-gray-700">Löse die Gleichung</p>
+            <button
+              onClick={() => neueAufgaben(KATEGORIE_NAMEN[selectedCategory])}
+              className="px-3 py-1 text-sm bg-orange-500 text-white rounded font-semibold hover:bg-orange-600 transition-all shadow"
+            >
+              Neue Aufgaben
+            </button>
+          </div>
           {currentAufgaben.map((aufgabe, index) => {
             const answer = answers[aufgabe.id] || { value: '', isCorrect: null };
             const showSolution = showSolutions[aufgabe.id] || false;
@@ -402,7 +676,7 @@ const LineareGleichungen: React.FC = () => {
                   <div className="p-2 bg-orange-50 rounded border-l-2 border-orange-400 text-sm">
                     <RechenwegDisplay steps={aufgabe.rechenweg} />
                     <p className="font-semibold text-orange-900 mt-1">
-                      Lösung: <span className="font-mono bg-white px-1 rounded">x = {aufgabe.loesung}</span>
+                      Lösung: <span className="font-mono bg-white px-1 rounded">x = {fmtNum(aufgabe.loesung)}</span>
                     </p>
                   </div>
                 )}
