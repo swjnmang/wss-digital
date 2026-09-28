@@ -104,6 +104,31 @@ function generateRound(prevContextId?: string): Round {
   return { context, k, targets }
 }
 
+// Erzwingt ein kartesisches Koordinatensystem: 1 Einheit auf der x-Achse
+// entspricht optisch genauso vielen Pixeln wie 1 Einheit auf der y-Achse.
+// Dazu wird die knappere der beiden benötigten Spannen (x oder y) auf das
+// Seitenverhältnis von Breite/Höhe der Zeichenfläche aufgeweitet.
+function computeCartesianView(xMin: number, xMax: number, yMin: number, yMax: number, width: number, height: number) {
+  const xCenter = (xMin + xMax) / 2
+  const yCenter = (yMin + yMax) / 2
+  let rangeX = Math.max(xMax - xMin, 0.0001)
+  let rangeY = Math.max(yMax - yMin, 0.0001)
+
+  const neededRangeXForY = rangeY * (width / height)
+  if (rangeX < neededRangeXForY) {
+    rangeX = neededRangeXForY
+  } else {
+    rangeY = rangeX * (height / width)
+  }
+
+  return {
+    viewXMin: xCenter - rangeX / 2,
+    viewXMax: xCenter + rangeX / 2,
+    viewYMin: yCenter - rangeY / 2,
+    viewYMax: yCenter + rangeY / 2,
+  }
+}
+
 function injectApplet(containerId: string, width: number, height: number, onLoad: (api: any) => void) {
   const params: any = {
     appName: 'classic',
@@ -114,7 +139,7 @@ function injectApplet(containerId: string, width: number, height: number, onLoad
     showMenuBar: false,
     perspective: 'G',
     useBrowserForJS: true,
-    enableShiftDragZoom: false,
+    enableShiftDragZoom: true,
     showResetIcon: true,
     showZoomButtons: true,
     appletOnLoad: onLoad,
@@ -190,22 +215,27 @@ export default function Proportional() {
   const setupPlot = (api: any) => {
     const ctx = roundRef.current.context
     const targets = roundRef.current.targets
-    const xMax = Math.max(...ctx.xValues) * 1.25
-    const yMax = Math.max(...targets.map((t) => t.y)) * 1.25
+    const xMax = Math.max(...ctx.xValues) * 1.15
+    const yMax = Math.max(...targets.map((t) => t.y)) * 1.15
+    const { viewXMin, viewXMax, viewYMin, viewYMax } = computeCartesianView(
+      -xMax * 0.08, xMax, -yMax * 0.08, yMax, 600, 400
+    )
+    const rangeX = viewXMax - viewXMin
+    const rangeY = viewYMax - viewYMin
 
     try {
       api.reset()
-      api.setCoordSystem(-xMax * 0.08, xMax, -yMax * 0.08, yMax)
+      api.setCoordSystem(viewXMin, viewXMax, viewYMin, viewYMax)
       api.setMode(1) // Punkt-Werkzeug: Klicks erzeugen einen Punkt
       api.registerAddListener((objName: string) => {
-        handlePointAdded(api, objName, xMax, yMax)
+        handlePointAdded(api, objName, rangeX, rangeY)
       })
     } catch (e) {
       console.error('GeoGebra Setup-Error:', e)
     }
   }
 
-  const handlePointAdded = (api: any, objName: string, xMax: number, yMax: number) => {
+  const handlePointAdded = (api: any, objName: string, rangeX: number, rangeY: number) => {
     if (plotDoneRef.current) return
 
     let rawX = 0
@@ -221,8 +251,8 @@ export default function Proportional() {
     let nearest: { x: number; y: number } | null = null
     let nearestDist = Infinity
     for (const t of targets) {
-      const dx = (rawX - t.x) / xMax
-      const dy = (rawY - t.y) / yMax
+      const dx = (rawX - t.x) / rangeX
+      const dy = (rawY - t.y) / rangeY
       const dist = Math.sqrt(dx * dx + dy * dy)
       if (dist < nearestDist) {
         nearestDist = dist
@@ -380,7 +410,7 @@ export default function Proportional() {
           <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 mb-8">
             <h2 className="text-lg font-bold text-slate-800 mb-2">Punkte einzeichnen</h2>
             <p className="text-sm text-slate-600 mb-4">
-              Klicke im Koordinatensystem auf die Punkte aus deiner Wertetabelle. Richtige Punkte werden grün markiert; sobald alle Punkte gesetzt sind, zeichnet die App automatisch die passende Gerade ein.
+              Klicke im Koordinatensystem auf die Punkte aus deiner Wertetabelle. Richtige Punkte werden grün markiert; sobald alle Punkte gesetzt sind, zeichnet die App automatisch die passende Gerade ein. Mit dem Mausrad, zwei Fingern (Touch) oder den +/− Knöpfen kannst du hinein- und herauszoomen, um genauer zu klicken.
             </p>
 
             <div className="mb-4 border rounded-lg overflow-hidden shadow-inner bg-white">
