@@ -8,9 +8,14 @@ declare global {
   }
 }
 
-const PLOT_MIN_POINTS = 2
-const PLOT_WIDTH = 460
-const PLOT_HEIGHT = 300
+// 3 Punkte, damit die SuS die Gerade nicht schon nach dem ersten "Treffer"
+// automatisch bestätigt bekommen, sondern wirklich mehrfach die Zuordnung
+// Wertepaar → Koordinatenpunkt üben.
+const PLOT_MIN_POINTS = 3
+// Größere Zeichenfläche = mehr Pixel pro Einheit = leichter präzise zu
+// treffen, gerade mit dem Finger auf einem Tablet statt mit der Maus.
+const PLOT_WIDTH = 500
+const PLOT_HEIGHT = 330
 
 // Erzwingt ein kartesisches Koordinatensystem: 1 Einheit auf der x-Achse
 // entspricht optisch genauso vielen Pixeln wie 1 Einheit auf der y-Achse.
@@ -423,6 +428,11 @@ export default function Wertetabelle() {
       api.setCoordSystem(viewXMin, viewXMax, viewYMin, viewYMax)
       api.setMode(1) // Punkt-Werkzeug: Klicks erzeugen einen Punkt
 
+      // Sichtbares Gitter als Zielhilfe beim Antippen - rein optisch, daher
+      // eigenes try/catch, damit ein evtl. Fehler hier nicht den Rest des
+      // Setups (Punkt-Werkzeug, Klick-Listener) blockiert.
+      try { api.setGridVisible(true) } catch (e) { /* ignore */ }
+
       api.registerAddListener((objName: string) => {
         if (plotDoneRefs.current[index]) return
 
@@ -434,6 +444,10 @@ export default function Wertetabelle() {
         } catch (e) {
           return
         }
+
+        // Größere Punktmarker: leichter zu sehen, was man mit dem Finger
+        // tatsächlich gesetzt hat (v.a. auf Tablets).
+        try { api.setPointSize(objName, 7) } catch (e) { /* ignore */ }
 
         let nearest: { x: number; y: number } | null = null
         let nearestDist = Infinity
@@ -447,7 +461,9 @@ export default function Wertetabelle() {
           }
         }
 
-        const captureRadius = 0.06
+        // Großzügigere Trefferzone als zuvor (0.06), da Fingertipps auf
+        // Tablets deutlich ungenauer sind als Mausklicks.
+        const captureRadius = 0.1
         const achieved = plotAchievedRefs.current[index] || new Set<string>()
 
         if (nearest && nearestDist <= captureRadius) {
@@ -576,7 +592,7 @@ export default function Wertetabelle() {
       let aufgabe = aufgabenBanks[aufgabenTyp as keyof typeof aufgabenBanks]()
       
       // Gemeinsame Frage-Erweiterung
-      const graphHinweis = ' Sobald die Wertetabelle richtig ist, zeichne mindestens zwei deiner Wertepaare als Punkte in das erscheinende Koordinatensystem ein - die passende Gerade wird dann automatisch ergänzt.'
+      const graphHinweis = ` Sobald die Wertetabelle richtig ist, zeichne mindestens ${PLOT_MIN_POINTS} deiner Wertepaare als Punkte in das erscheinende Koordinatensystem ein - die passende Gerade wird dann automatisch ergänzt.`
       
       let m = aufgabe.m
       let t = aufgabe.t
