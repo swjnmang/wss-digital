@@ -387,8 +387,8 @@ export default function Proportional() {
               Klicke im Koordinatensystem auf die Punkte aus deiner Wertetabelle. Richtige Punkte werden grün markiert; sobald alle Punkte gesetzt sind, zeichnet die App automatisch die passende Gerade ein. Mit dem Mausrad, zwei Fingern (Touch) oder den +/− Knöpfen kannst du hinein- und herauszoomen, um genauer zu klicken.
             </p>
 
-            <div className="mb-4 border rounded-lg overflow-hidden shadow-inner bg-white">
-              <div id="ggb-proportional-plot" style={{ width: '100%', height: '400px' }}></div>
+            <div className="mb-4 flex justify-center border rounded-lg overflow-hidden shadow-inner bg-white">
+              <div id="ggb-proportional-plot" style={{ width: '600px', height: '400px' }}></div>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-4">
