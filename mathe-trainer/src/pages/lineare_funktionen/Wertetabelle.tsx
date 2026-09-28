@@ -594,11 +594,15 @@ export default function Wertetabelle() {
         aufgabe.funktionsgleichung = `y = ${m}x`
         aufgabe.funktionsgleichungLatex = `$$y = ${m}x$$`
         aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
-        
+
+        // Rechenbeispiele und Lösungsweg müssen zum neuen (t=0) Gleichung passen
+        aufgabe.rechenbeispiele = generateRechenbeispiele(m, 0)
+
         // Wenn Typ 2: berechne y-Werte neu und erzwinge "nur x-Werte gegeben" (y wird gesucht)
         if (aufgabenTyp === 'teilweisgefülltVervollständigen' && aufgabe.yWerte) {
           aufgabe.yWerte = aufgabe.xWerte.map((x: number) => Math.round(m * x * 100) / 100)
           aufgabe.gebenXWert = aufgabe.xWerte.map(() => true)
+          aufgabe.lösungsweg = `Nutze die Funktionsgleichung ${formatEquationLatex(m, 0)} und berechne den fehlenden Wert (x oder y) aus dem gegebenen Wert.`
         }
       } else if (grad === 'mittel') {
         // Mittel: y = m*x + t mit ganzen Zahlen
@@ -620,12 +624,13 @@ export default function Wertetabelle() {
         aufgabe.funktionsgleichungLatex = `$$${funktionsgleichungText}$$`
         aufgabe.frage = `Gegeben ist die Funktionsgleichung ${funktionsgleichungText}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
         
+        // Rechenbeispiele müssen zu den neuen Bruch-Werten passen
+        aufgabe.rechenbeispiele = generateRechenbeispiele(mBruch, tBruch)
+
         // Berechne y-Werte neu mit Brüchen
         if (aufgabenTyp === 'teilweisgefülltVervollständigen') {
           aufgabe.yWerte = aufgabe.xWerte.map((x: number) => Math.round((mBruch * x + tBruch) * 100) / 100)
-        } else {
-          // Für leereTabelleAusfüllen: regeneriere mit neuen m/t
-          aufgabe.rechenbeispiele = generateRechenbeispiele(mBruch, tBruch)
+          aufgabe.lösungsweg = `Nutze die Funktionsgleichung ${formatEquationLatex(mBruch, tBruch)} und berechne den fehlenden Wert (x oder y) aus dem gegebenen Wert.`
         }
       }
       
