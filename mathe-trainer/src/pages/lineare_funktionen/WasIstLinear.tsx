@@ -1,5 +1,5 @@
 import type React from 'react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 interface Fn {
@@ -155,6 +155,18 @@ export default function WasIstLinear() {
       setScored(true)
     }
   }
+  // Sind alle vier Zuordnungen richtig, kommt nach kurzer Pause automatisch eine neue Aufgabe.
+  useEffect(() => {
+    if (!checked || !allCorrect) return
+    const timer = setTimeout(() => {
+      setRound(newRound(withT))
+      setAnswers({})
+      setChecked(false)
+      setScored(false)
+    }, 2500)
+    return () => clearTimeout(timer)
+  }, [checked, allCorrect, withT])
+
   const switchLevel = (v: boolean) => {
     setWithT(v)
     setRound(newRound(v))
@@ -303,7 +315,7 @@ export default function WasIstLinear() {
           {checked && (
             <p className={`text-center font-bold mt-4 ${allCorrect ? 'text-green-600' : 'text-red-600'}`}>
               {allCorrect
-                ? 'Super! Alles richtig zugeordnet.'
+                ? 'Super! Alles richtig zugeordnet. Gleich kommen vier neue Aufgaben …'
                 : `${results.filter(Boolean).length} von ${cards.length} richtig. Die rot markierten Karten passen noch nicht – probiere es nochmal!`}
             </p>
           )}
