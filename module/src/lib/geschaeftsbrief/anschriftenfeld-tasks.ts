@@ -1,8 +1,9 @@
 import type { AnschriftenfeldTask } from './types';
+import { generateAnschriftenfeldTasks } from './anschriftenfeld-generator';
 
 const SENDER = 'Markus Mustermann, Musterstraße 1, 11111 Musterstadt';
 
-export const ANSCHRIFTENFELD_TASKS: AnschriftenfeldTask[] = [
+const HANDMADE_TASKS: AnschriftenfeldTask[] = [
   {
     id: 'privatperson-einfach',
     title: 'Privatperson ohne Titel',
@@ -964,6 +965,8 @@ export const ANSCHRIFTENFELD_TASKS: AnschriftenfeldTask[] = [
     ],
   },
 ];
+
+export const ANSCHRIFTENFELD_TASKS: AnschriftenfeldTask[] = [...HANDMADE_TASKS, ...generateAnschriftenfeldTasks()];
 
 export function getAnschriftenfeldTaskById(id: string) {
   return ANSCHRIFTENFELD_TASKS.find((task) => task.id === id);

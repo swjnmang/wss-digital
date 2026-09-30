@@ -1,18 +1,18 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ANSCHRIFTENFELD_TASKS } from '../../../lib/geschaeftsbrief/anschriftenfeld-tasks';
 import { AnschriftenfeldTippsButton } from './AnschriftenfeldTipps';
 
-const difficultyLabel: Record<string, string> = {
-  einfach: 'Einfach',
-  mittel: 'Mittel',
-  schwer: 'Schwer',
-};
+const levels = [
+  { key: '', label: 'Alle Stufen', title: 'Zufällige Übung', text: 'Eine beliebige Aufgabe – jedes Mal eine andere.' },
+  { key: 'einfach', label: 'Einfach', title: 'Zufällige Übung', text: 'Privatpersonen, Unternehmen und Behörden.' },
+  { key: 'mittel', label: 'Mittel', title: 'Zufällige Übung', text: 'Titel, Berufsbezeichnungen, Postfach und erste Auslandsanschriften.' },
+  { key: 'schwer', label: 'Schwer', title: 'Zufällige Übung', text: 'Vermerke, Ansprechpartner mit Titel und knifflige Auslandsanschriften.' },
+];
 
 export default function AnschriftenfeldTaskSelect() {
   const navigate = useNavigate();
 
-  const goToTask = (taskId: string) => {
-    navigate(`/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/${taskId}`);
+  const goToRandom = (stufe: string) => {
+    navigate(`/digitale-bildung/word/geschaeftsbrief/anschriftenfeld${stufe ? `?stufe=${stufe}` : ''}`);
   };
 
   return (
@@ -26,7 +26,7 @@ export default function AnschriftenfeldTaskSelect() {
         </Link>
         <AnschriftenfeldTippsButton className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/20 text-white transition-colors" />
         <h1 className="text-2xl font-bold">📬 Anschriftenfeld</h1>
-        <p className="text-slate-300 text-sm mt-1">Wähle eine Übung aus.</p>
+        <p className="text-slate-300 text-sm mt-1">Wähle eine Schwierigkeitsstufe – die Aufgabe wird zufällig ausgewählt.</p>
       </header>
 
       <main className="flex-1 w-full max-w-3xl mx-auto p-6 flex flex-col gap-6">
@@ -40,17 +40,17 @@ export default function AnschriftenfeldTaskSelect() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {ANSCHRIFTENFELD_TASKS.map((task) => (
+          {levels.map((level) => (
             <button
-              key={task.id}
-              onClick={() => goToTask(task.id)}
+              key={level.key}
+              onClick={() => goToRandom(level.key)}
               className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 text-left hover:-translate-y-0.5 hover:shadow-md transition-all"
             >
               <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-600 bg-blue-50 rounded-full px-2 py-1 mb-2">
-                {difficultyLabel[task.difficulty] ?? task.difficulty}
+                {level.label}
               </span>
-              <h3 className="text-base font-bold text-slate-800 mb-1">{task.title}</h3>
-              <p className="text-sm text-slate-500 line-clamp-2">{task.arbeitsauftrag}</p>
+              <h3 className="text-base font-bold text-slate-800 mb-1">🔀 {level.title}</h3>
+              <p className="text-sm text-slate-500">{level.text}</p>
             </button>
           ))}
         </div>

@@ -19,7 +19,7 @@ import WordIndex from './pages/digitale-bildung/word/WordIndex'
 import GeschaeftsbriefIndex from './pages/digitale-bildung/word/GeschaeftsbriefIndex'
 import AnschriftenfeldTaskSelect from './pages/digitale-bildung/word/AnschriftenfeldTaskSelect'
 import AnschriftenfeldTrainer from './pages/digitale-bildung/word/AnschriftenfeldTrainer'
-import { ANSCHRIFTENFELD_TASKS } from './lib/geschaeftsbrief/anschriftenfeld-tasks'
+import AnschriftenfeldRandom from './pages/digitale-bildung/word/AnschriftenfeldRandom'
 import InfoblockTaskSelect from './pages/digitale-bildung/word/InfoblockTaskSelect'
 import InfoblockTrainer from './pages/digitale-bildung/word/InfoblockTrainer'
 import { INFOBLOCK_TASKS } from './lib/geschaeftsbrief/infoblock-tasks'
@@ -70,12 +70,7 @@ function App() {
         <Route path="/digitale-bildung/word/geschaeftsbrief" element={<GeschaeftsbriefIndex />} />
         <Route
           path="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld"
-          element={
-            <Navigate
-              to={`/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/${ANSCHRIFTENFELD_TASKS[0].id}`}
-              replace
-            />
-          }
+          element={<AnschriftenfeldRandom />}
         />
         <Route
           path="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/uebersicht"

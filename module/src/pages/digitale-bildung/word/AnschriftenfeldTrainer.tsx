@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ANSCHRIFTENFELD_TASKS, getAnschriftenfeldTaskById } from '../../../lib/geschaeftsbrief/anschriftenfeld-tasks';
+import { getAnschriftenfeldTaskById } from '../../../lib/geschaeftsbrief/anschriftenfeld-tasks';
+import { markAnschriftenfeldSeen, pickRandomAnschriftenfeldTask } from '../../../lib/geschaeftsbrief/anschriftenfeld-random';
 import type { AnschriftLine } from '../../../lib/geschaeftsbrief/types';
 import { AnschriftenfeldTippsButton } from './AnschriftenfeldTipps';
 
@@ -19,6 +20,10 @@ export default function AnschriftenfeldTrainer() {
   const [loadedTaskId, setLoadedTaskId] = useState(taskId);
 
   useEffect(() => {
+    if (task) markAnschriftenfeldSeen(task.id);
+  }, [task]);
+
+  useEffect(() => {
     if (!task) {
       navigate('/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/uebersicht', { replace: true });
     }
@@ -32,8 +37,10 @@ export default function AnschriftenfeldTrainer() {
 
   if (!task) return null;
 
-  const taskIndex = ANSCHRIFTENFELD_TASKS.findIndex((t) => t.id === task.id);
-  const nextTask = ANSCHRIFTENFELD_TASKS[taskIndex + 1];
+  const goToRandomTask = () => {
+    const next = pickRandomAnschriftenfeldTask({ excludeId: task.id });
+    navigate(`/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/${next.id}`);
+  };
 
   const change = (lineId: string, text: string) => {
     setValues((prev) => ({ ...prev, [lineId]: text }));
@@ -135,6 +142,12 @@ export default function AnschriftenfeldTrainer() {
                 >
                   Prüfen
                 </button>
+                <button
+                  onClick={goToRandomTask}
+                  className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors whitespace-nowrap"
+                >
+                  🔀 Andere Aufgabe
+                </button>
                 <AnschriftenfeldTippsButton className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors whitespace-nowrap" />
               </div>
               {!allAnswered && (
@@ -149,21 +162,12 @@ export default function AnschriftenfeldTrainer() {
         {allCorrect && (
           <div className="bg-green-50 border-2 border-green-400 rounded-xl p-5 text-center">
             <p className="text-green-800 font-semibold mb-3">🎉 Super! Das Anschriftenfeld ist korrekt aufgebaut.</p>
-            {nextTask ? (
-              <button
-                onClick={() => navigate(`/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/${nextTask.id}`)}
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Nächste Aufgabe →
-              </button>
-            ) : (
-              <Link
-                to="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/uebersicht"
-                className="inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Zur Aufgabenübersicht
-              </Link>
-            )}
+            <button
+              onClick={goToRandomTask}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
+            >
+              Nächste Aufgabe →
+            </button>
           </div>
         )}
         {checked && !allCorrect && (
