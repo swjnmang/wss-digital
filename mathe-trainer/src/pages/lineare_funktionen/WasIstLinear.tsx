@@ -5,24 +5,24 @@ import { Link } from 'react-router-dom'
 interface Fn {
   id: string
   m: number
-  b: number
+  t: number
   text: string
 }
 
 const FUNCTIONS: Fn[] = [
-  { id: '2x', m: 2, b: 0, text: 'Jeder y-Wert ist doppelt so hoch wie der dazugehörige x-Wert.' },
-  { id: '3x', m: 3, b: 0, text: 'Jeder y-Wert ist dreimal so hoch wie der dazugehörige x-Wert.' },
-  { id: '0.5x', m: 0.5, b: 0, text: 'Jeder y-Wert ist halb so hoch wie der dazugehörige x-Wert.' },
-  { id: '-x', m: -1, b: 0, text: 'Jeder y-Wert ist das Gegenteil des dazugehörigen x-Werts.' },
-  { id: '-2x', m: -2, b: 0, text: 'Jeder y-Wert ist doppelt so hoch wie der x-Wert, hat aber das umgekehrte Vorzeichen.' },
-  { id: 'x', m: 1, b: 0, text: 'Jeder y-Wert ist genauso groß wie der dazugehörige x-Wert.' },
-  { id: '4x', m: 4, b: 0, text: 'Jeder y-Wert ist viermal so hoch wie der dazugehörige x-Wert.' },
-  { id: '-0.5x', m: -0.5, b: 0, text: 'Jeder y-Wert ist halb so groß wie der x-Wert, hat aber das umgekehrte Vorzeichen.' },
-  { id: 'x+3', m: 1, b: 3, text: 'Jeder y-Wert ist um 3 größer als der dazugehörige x-Wert.' },
-  { id: 'x-2', m: 1, b: -2, text: 'Jeder y-Wert ist um 2 kleiner als der dazugehörige x-Wert.' },
-  { id: '2x+1', m: 2, b: 1, text: 'Jeder y-Wert ist doppelt so hoch wie der x-Wert, zusätzlich kommt 1 dazu.' },
-  { id: '-x+2', m: -1, b: 2, text: 'Jeder y-Wert ergibt sich, wenn man den x-Wert von 2 abzieht.' },
-  { id: 'x+1', m: 1, b: 1, text: 'Jeder y-Wert ist um 1 größer als der dazugehörige x-Wert.' },
+  { id: '2x', m: 2, t: 0, text: 'Jeder y-Wert ist doppelt so hoch wie der dazugehörige x-Wert.' },
+  { id: '3x', m: 3, t: 0, text: 'Jeder y-Wert ist dreimal so hoch wie der dazugehörige x-Wert.' },
+  { id: '0.5x', m: 0.5, t: 0, text: 'Jeder y-Wert ist halb so hoch wie der dazugehörige x-Wert.' },
+  { id: '-x', m: -1, t: 0, text: 'Jeder y-Wert ist das Gegenteil des dazugehörigen x-Werts.' },
+  { id: '-2x', m: -2, t: 0, text: 'Jeder y-Wert ist doppelt so hoch wie der x-Wert, hat aber das umgekehrte Vorzeichen.' },
+  { id: 'x', m: 1, t: 0, text: 'Jeder y-Wert ist genauso groß wie der dazugehörige x-Wert.' },
+  { id: '4x', m: 4, t: 0, text: 'Jeder y-Wert ist viermal so hoch wie der dazugehörige x-Wert.' },
+  { id: '-0.5x', m: -0.5, t: 0, text: 'Jeder y-Wert ist halb so groß wie der x-Wert, hat aber das umgekehrte Vorzeichen.' },
+  { id: 'x+3', m: 1, t: 3, text: 'Jeder y-Wert ist um 3 größer als der dazugehörige x-Wert.' },
+  { id: 'x-2', m: 1, t: -2, text: 'Jeder y-Wert ist um 2 kleiner als der dazugehörige x-Wert.' },
+  { id: '2x+1', m: 2, t: 1, text: 'Jeder y-Wert ist doppelt so hoch wie der x-Wert, zusätzlich kommt 1 dazu.' },
+  { id: '-x+2', m: -1, t: 2, text: 'Jeder y-Wert ergibt sich, wenn man den x-Wert von 2 abzieht.' },
+  { id: 'x+1', m: 1, t: 1, text: 'Jeder y-Wert ist um 1 größer als der dazugehörige x-Wert.' },
 ]
 
 const XS = [-4, -2, 0, 2, 4]
@@ -33,12 +33,12 @@ function equation(f: Fn): string {
   let s = 'y = '
   const mPart = f.m === 1 ? 'x' : f.m === -1 ? '−x' : `${fmt(f.m)}x`
   s += mPart
-  if (f.b > 0) s += ` + ${fmt(f.b)}`
-  if (f.b < 0) s += ` − ${fmt(-f.b)}`
+  if (f.t > 0) s += ` + ${fmt(f.t)}`
+  if (f.t < 0) s += ` − ${fmt(-f.t)}`
   return s
 }
 
-const yOf = (f: Fn, x: number) => f.m * x + f.b
+const yOf = (f: Fn, x: number) => f.m * x + f.t
 
 function ValueTable({ f, highlight }: { f: Fn; highlight?: number }) {
   return (
@@ -119,8 +119,8 @@ interface Card {
   fnIdx: number // Index der richtigen Funktion (= richtiger Text)
 }
 
-function newRound(withB: boolean) {
-  const pool = FUNCTIONS.filter((f) => withB || f.b === 0)
+function newRound(withT: boolean) {
+  const pool = FUNCTIONS.filter((f) => withT || f.t === 0)
   const fns = shuffle(pool).slice(0, 4)
   const cards: Card[] = []
   ;(['table', 'graph', 'equation'] as const).forEach((kind) => {
@@ -132,7 +132,7 @@ function newRound(withB: boolean) {
 export default function WasIstLinear() {
   const [demoX, setDemoX] = useState(2)
   const [round, setRound] = useState(() => newRound(false))
-  const [withB, setWithB] = useState(false)
+  const [withT, setWithT] = useState(false)
   const [answers, setAnswers] = useState<Record<number, string>>({})
   const [checked, setChecked] = useState(false)
   const [score, setScore] = useState(0)
@@ -156,14 +156,14 @@ export default function WasIstLinear() {
     }
   }
   const switchLevel = (v: boolean) => {
-    setWithB(v)
+    setWithT(v)
     setRound(newRound(v))
     setAnswers({})
     setChecked(false)
     setScored(false)
   }
   const next = () => {
-    setRound(newRound(withB))
+    setRound(newRound(withT))
     setAnswers({})
     setChecked(false)
     setScored(false)
@@ -221,7 +221,7 @@ export default function WasIstLinear() {
             <p>
               Eine <strong>Funktion</strong> ordnet jedem x-Wert genau einen y-Wert zu. Text, Wertetabelle, Funktionsgleichung und Funktionsgraph
               beschreiben dieselbe Funktion – sie gehören zusammen. Hier ist der Graph eine <strong>Gerade durch den Ursprung</strong>, die Gleichung hat die Form
-              <strong> y = m · x</strong>. Das ist eine (proportionale) <strong>lineare Funktion</strong>. In Stufe 2 der Übung kommen Geraden hinzu, die nicht durch den Ursprung gehen (y = m · x + b).
+              <strong> y = m · x</strong>. Das ist eine (proportionale) <strong>lineare Funktion</strong>. In Stufe 2 der Übung kommen Geraden hinzu, die nicht durch den Ursprung gehen (y = m · x + t, mit dem y-Achsenabschnitt t).
             </p>
           </div>
         </div>
@@ -230,11 +230,11 @@ export default function WasIstLinear() {
         <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
           <h2 className="text-lg font-bold text-slate-800 mb-2">Übung: Was gehört zusammen?</h2>
           <div className="flex flex-wrap justify-center gap-2 mb-4">
-            <button onClick={() => switchLevel(false)} className={`px-4 py-1 rounded font-bold border ${!withB ? 'bg-blue-600 text-white border-blue-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'}`}>
+            <button onClick={() => switchLevel(false)} className={`px-4 py-1 rounded font-bold border ${!withT ? 'bg-blue-600 text-white border-blue-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'}`}>
               Stufe 1: Ursprungsgeraden (y = m · x)
             </button>
-            <button onClick={() => switchLevel(true)} className={`px-4 py-1 rounded font-bold border ${withB ? 'bg-blue-600 text-white border-blue-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'}`}>
-              Stufe 2: auch y = m · x + b
+            <button onClick={() => switchLevel(true)} className={`px-4 py-1 rounded font-bold border ${withT ? 'bg-blue-600 text-white border-blue-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'}`}>
+              Stufe 2: auch y = m · x + t
             </button>
           </div>
           <p className="text-slate-700 mb-4">Unten stehen vier Texte (A–D). Ordne jeder Wertetabelle, jedem Graphen und jeder Gleichung den passenden Text zu.</p>
