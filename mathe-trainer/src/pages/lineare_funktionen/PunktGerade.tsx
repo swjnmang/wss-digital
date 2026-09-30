@@ -63,7 +63,7 @@ export default function PunktGerade() {
     const keys = key === undefined ? Object.keys(tracked.current) : [String(key)]
     keys.forEach(k => {
       const e = tracked.current[k as unknown as string]
-      if (e && !e.logged && e.attempts > 0) {
+      if (e && !e.logged) {
         logTrackingEntry({ topic: e.topic, area: trackingArea.current, attempts: e.attempts, firstTryCorrect: e.firstTryCorrect, solved: false, helpUsed: e.helpUsed })
       }
       delete tracked.current[k as unknown as string]
@@ -79,6 +79,11 @@ export default function PunktGerade() {
       e.logged = true
       logTrackingEntry({ topic: e.topic, area: trackingArea.current, attempts: e.attempts, firstTryCorrect: e.firstTryCorrect, solved: true, helpUsed: e.helpUsed })
     }
+  }
+
+  // Jede angezeigte Aufgabe registrieren, damit sie auch ohne Versuch als "nicht bearbeitet" geloggt wird.
+  const trackRegister = (key: string, topic: string) => {
+    tracked.current[key] = { topic, attempts: 0, firstTryCorrect: false, helpUsed: 'none', logged: false }
   }
 
   // Vor dem ersten Versuch angeschaut -> 'solution', danach -> 'hint'
@@ -103,6 +108,7 @@ export default function PunktGerade() {
       generateTask('find_correct_point_among_three', level, '2'),
       generateTask('calculate_missing_coordinate', level, '3'),
     ]
+    newTasks.forEach(t => trackRegister(t.id, trackingTopics[t.taskType]))
     setTasks(newTasks)
   }
 
@@ -290,6 +296,7 @@ export default function PunktGerade() {
     if (!task) return
     trackFlush(taskId)
     const newTask = generateTask(task.taskType, difficulty, taskId)
+    trackRegister(taskId, trackingTopics[task.taskType])
     const updatedTasks = tasks.map(t => (t.id === taskId ? newTask : t))
     setTasks(updatedTasks)
   }

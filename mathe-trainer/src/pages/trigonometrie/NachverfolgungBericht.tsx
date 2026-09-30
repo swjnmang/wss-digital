@@ -57,8 +57,11 @@ const NachverfolgungBericht: React.FC<{ area?: TrackingArea }> = ({ area = 'trig
                     </div>
                     <div className="space-y-3">
                         {log.map((entry, index) => {
-                            const statusIcon = entry.solved ? (entry.attempts === 1 ? '✅' : '⚠️') : '❌';
-                            const statusText = entry.solved
+                            const untouched = entry.attempts === 0;
+                            const statusIcon = untouched ? '⏸️' : entry.solved ? (entry.attempts === 1 ? '✅' : '⚠️') : '❌';
+                            const statusText = untouched
+                                ? 'nicht bearbeitet'
+                                : entry.solved
                                 ? entry.attempts === 1
                                     ? 'sofort richtig'
                                     : `richtig nach ${entry.attempts} Versuchen`

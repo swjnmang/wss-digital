@@ -368,14 +368,23 @@ export default function GemischteAufgaben() {
 
   function flushTracking() {
     Object.values(trackingRef.current).forEach(t => {
-      if (t.attempts > 0 && !t.solved) {
-        logTrackingEntry({ topic: t.topic, attempts: t.attempts, firstTryCorrect: false, solved: false, helpUsed: t.helpUsed })
+      if (!t.solved) {
+        logTrackingEntry({ topic: t.topic, attempts: t.attempts, firstTryCorrect: t.firstTryCorrect, solved: false, helpUsed: t.helpUsed })
       }
     })
     trackingRef.current = {}
   }
 
   useEffect(() => () => flushTracking(), [])
+
+  // Jede angezeigte Aufgabe registrieren, damit sie auch ohne Versuch als "nicht bearbeitet" geloggt wird.
+  function registerTracking(list: Aufgabe[]) {
+    const reg: typeof trackingRef.current = {}
+    list.forEach((a, i) => {
+      reg[i] = { topic: (a.thema ?? 'Gemischte Aufgaben').replace(/^\d+\.\s*/, ''), attempts: 0, firstTryCorrect: false, solved: false, helpUsed: 'none' }
+    })
+    trackingRef.current = reg
+  }
 
   // 10 vermischte Aufgaben generieren
   function generiereAufgaben() {
@@ -395,6 +404,7 @@ export default function GemischteAufgaben() {
       neue.push(aufgabenBanks[thema]())
     }
     
+    registerTracking(neue)
     setAufgaben(neue)
     setAntworten({})
     setValidiert({})

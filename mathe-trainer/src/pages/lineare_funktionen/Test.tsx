@@ -349,16 +349,11 @@ export default function Test() {
       ans.t = (state.tVal || '').replace(',', '.').replace(/[−–—‐]/g, '-')
     }
     handleAnswer(ans)
-    // Nachverfolgung: Der Test gibt kein Feedback und keine Hilfe -> pro Frage ein Eintrag
-    // (ein Versuch), geloggt erst beim Abschluss des Tests.
-    if (current === TOTAL_QUESTIONS - 1) {
-      const all = [...userAnswers]
-      all[current] = ans
-      questions.forEach((qu, i) => {
-        const ok = isCorrect(qu, all[i])
-        logTrackingEntry({ topic: TRACKING_TOPICS[qu.type], attempts: 1, firstTryCorrect: ok, solved: ok, helpUsed: 'none' })
-      })
-    }
+    // Nachverfolgung: Der Test gibt kein Feedback und keine Hilfe -> pro Frage sofort ein Eintrag
+    // (ein Versuch); bei Abbruch zählen so die bereits beantworteten Fragen.
+    const cq = questions[current]
+    const ok = isCorrect(cq, ans)
+    logTrackingEntry({ topic: TRACKING_TOPICS[cq.type], attempts: 1, firstTryCorrect: ok, solved: ok, helpUsed: 'none' })
     nextQuestion()
   }
 

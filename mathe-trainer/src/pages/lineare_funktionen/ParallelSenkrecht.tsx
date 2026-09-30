@@ -211,7 +211,7 @@ export default function ParallelSenkrecht() {
     const keys = key === undefined ? Object.keys(tracked.current) : [String(key)]
     keys.forEach(k => {
       const e = tracked.current[k as unknown as number]
-      if (e && !e.logged && e.attempts > 0) {
+      if (e && !e.logged) {
         logTrackingEntry({ topic: e.topic, area: trackingArea.current, attempts: e.attempts, firstTryCorrect: e.firstTryCorrect, solved: false, helpUsed: e.helpUsed })
       }
       delete tracked.current[k as unknown as number]
@@ -229,6 +229,11 @@ export default function ParallelSenkrecht() {
     }
   }
 
+  // Jede angezeigte Aufgabe registrieren, damit sie auch ohne Versuch als "nicht bearbeitet" geloggt wird.
+  const trackRegister = (key: number, topic: string) => {
+    tracked.current[key] = { topic, attempts: 0, firstTryCorrect: false, helpUsed: 'none', logged: false }
+  }
+
   // Vor dem ersten Versuch angeschaut -> 'solution', danach -> 'hint'
   const trackHint = (key: number, topic: string) => {
     const e = (tracked.current[key] ??= { topic, attempts: 0, firstTryCorrect: false, helpUsed: 'none', logged: false })
@@ -237,7 +242,12 @@ export default function ParallelSenkrecht() {
     else if (e.helpUsed === 'none') e.helpUsed = 'hint'
   }
 
-  useEffect(() => () => trackFlush(), [])
+  // Beim Mounten die ersten Aufgaben registrieren; Cleanup liest nur Refs (keine veralteten Closures).
+  useEffect(() => {
+    aufgaben.forEach((a, i) => trackRegister(i, trackingTopics[a.typ]))
+    return () => trackFlush()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const prüfeAntwort = (index: number) => {
     const aufgabe = aufgaben[index]
@@ -273,6 +283,7 @@ export default function ParallelSenkrecht() {
       aufgabenBanks.geradeDurchPunkt(),
       aufgabenBanks.mehrereGeraden()
     ]
+    newAufgaben.forEach((a, i) => trackRegister(i, trackingTopics[a.typ]))
     setAufgaben(newAufgaben)
     setAntworten(newAufgaben.map(() => ''))
     setValidiert(newAufgaben.map(() => false))

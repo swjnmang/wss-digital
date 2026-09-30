@@ -16,11 +16,15 @@ export const useTaskTracking = (topic: string) => {
     const firstTryCorrect = useRef(false);
     const helpUsed = useRef<HelpUsage>('none');
     const solved = useRef(false);
+    // Aufgabe ist angezeigt, aber noch nicht abgeschlossen -> zählt auch ohne Versuch
+    // als "nicht bearbeitet". Die erste Aufgabe ist mit dem Öffnen der Seite sichtbar.
+    const shown = useRef(true);
+    const firstStart = useRef(true);
     // Bereich beim Mounten festhalten: beim Verlassen der Seite ist die URL schon eine andere.
     const area = useRef(getAreaFromPath(window.location.pathname) ?? undefined);
 
     const flush = () => {
-        if (attempts.current > 0) {
+        if (attempts.current > 0 || shown.current) {
             logTrackingEntry({
                 topic,
                 area: area.current,
@@ -30,6 +34,7 @@ export const useTaskTracking = (topic: string) => {
                 helpUsed: helpUsed.current
             });
         }
+        shown.current = false;
         attempts.current = 0;
         firstTryCorrect.current = false;
         helpUsed.current = 'none';
@@ -37,7 +42,15 @@ export const useTaskTracking = (topic: string) => {
     };
 
     const onTaskStart = () => {
+        // Der erste Aufruf beim Öffnen der Seite erzeugt die bereits gezählte erste Aufgabe.
+        if (firstStart.current && attempts.current === 0) {
+            firstStart.current = false;
+            shown.current = true;
+            return;
+        }
+        firstStart.current = false;
         flush();
+        shown.current = true;
     };
 
     const onCheck = (isCorrect: boolean) => {
