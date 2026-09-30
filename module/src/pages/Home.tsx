@@ -38,9 +38,10 @@ export default function Home() {
       id: 'robotik',
       title: 'Robotik',
       emoji: '⚙️',
-      description: 'Grundlagen der Robotik und Automatisierung in der Industrie.',
-      enabled: false,
-      path: '/robotik'
+      description: 'Robotik Klasse 10: Grundlagen der Robotik und Automatisierung.',
+      enabled: true,
+      path: 'https://rover.herrzim.de/',
+      external: true
     },
     {
       id: 'umwelttechnik',
@@ -94,7 +95,23 @@ export default function Home() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 w-full">
           
           {modules.map((module) => (
-            module.enabled ? (
+            module.enabled && module.external ? (
+              <a
+                key={module.id}
+                href={module.path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white rounded-xl p-6 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100"
+              >
+                <div className="text-4xl mb-4 text-blue-500">
+                  {module.emoji}
+                </div>
+                <h2 className="text-lg font-semibold mb-2 text-slate-800">{module.title}</h2>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  {module.description}
+                </p>
+              </a>
+            ) : module.enabled ? (
               <Link
                 key={module.id}
                 to={module.path}
