@@ -1,7 +1,15 @@
 import { Link } from 'react-router-dom'
 
 export default function Home() {
-  const modules = [
+  const modules: {
+    id: string
+    title: string
+    emoji: string
+    description: string
+    enabled: boolean
+    path: string
+    external?: boolean
+  }[] = [
     {
       id: 'gamification',
       title: 'Gamification',
