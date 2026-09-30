@@ -18,6 +18,14 @@ const topics: WordTopic[] = [
     enabled: true,
     path: '/digitale-bildung/word/geschaeftsbrief',
   },
+  {
+    id: 'layout',
+    title: 'Layouten mit Word',
+    emoji: '🎨',
+    description: 'Text gestalten: Schriftart und -größe, Farben, Ausrichtung, Überschriften, Listen und Tabellen.',
+    enabled: true,
+    path: '/digitale-bildung/word/layout',
+  },
 ];
 
 export default function WordIndex() {
