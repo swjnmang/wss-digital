@@ -53,37 +53,30 @@ export default function AnschriftenfeldTrainer() {
     const small = line.zone === 'zusatz';
     return (
       <div key={line.id}>
-        <div className="grid grid-cols-[140px_1fr] gap-x-3 items-center">
-          <label className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 leading-tight">
-            {line.caption}
-          </label>
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => change(line.id, e.target.value)}
-            placeholder={line.placeholder}
-            className={`w-full px-3 py-2 rounded-lg font-mono border-2 transition-all outline-none ${
-              small ? 'text-xs' : 'text-sm'
-            } ${
-              showResult
-                ? correct
-                  ? 'bg-green-50 border-green-400 text-green-800'
-                  : 'bg-red-50 border-red-400 text-red-800'
-                : 'bg-white border-slate-200 text-slate-800 focus:border-blue-400'
-            }`}
-          />
-        </div>
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => change(line.id, e.target.value)}
+          placeholder={line.placeholder}
+          aria-label="Zeile des Anschriftenfelds"
+          className={`w-full px-3 py-2 rounded-lg font-mono border-2 transition-all outline-none ${
+            small ? 'text-xs' : 'text-sm'
+          } ${
+            showResult
+              ? correct
+                ? 'bg-green-50 border-green-400 text-green-800'
+                : 'bg-red-50 border-red-400 text-red-800'
+              : 'bg-white border-slate-200 text-slate-800 focus:border-blue-400'
+          }`}
+        />
         {showResult && (
-          <div className="grid grid-cols-[140px_1fr] gap-x-3">
-            <div />
-            <p
-              className={`mt-1 text-xs rounded-lg px-3 py-2 ${
-                correct ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-              }`}
-            >
-              {line.explanation}
-            </p>
-          </div>
+          <p
+            className={`mt-1 text-xs rounded-lg px-3 py-2 ${
+              correct ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+            }`}
+          >
+            {line.explanation}
+          </p>
         )}
       </div>
     );
