@@ -578,7 +578,6 @@ export default function Wertetabelle() {
       if (plotDone[index] && !plotScored[index]) {
         setPunkte(p => p + 1)
         setPlotScored(prev => ({ ...prev, [index]: true }))
-        trackings[index]?.onCheck(true) // Aufgabe = Tabelle + Punkte einzeichnen
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -857,8 +856,8 @@ export default function Wertetabelle() {
     const isCorrect = aufgabe.typ === 'leereTabelleAusfüllen' 
       ? validateAnswer(index, aufgabe)
       : validateType2(index, aufgabe)
-    // Nur falsche Tabellen-Versuche zählen hier; gelöst ist die Aufgabe erst nach dem Einzeichnen
-    if (!isCorrect && antworten[index]?.length) trackings[index]?.onCheck(false)
+    // Bewertet wird die Wertetabelle; das anschließende Einzeichnen ist freiwillige Zusatzübung
+    if (antworten[index]?.length) trackings[index]?.onCheck(isCorrect)
     setValidiert({ ...validiert, [index]: isCorrect })
   }
 

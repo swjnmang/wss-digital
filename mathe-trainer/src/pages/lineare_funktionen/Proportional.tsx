@@ -291,8 +291,8 @@ export default function Proportional() {
     })
     setTableChecked(results)
     const allCorrect = results.every(Boolean)
-    // Aufgabe = Tabelle + Punkte einzeichnen: erst der Abschluss des Plots zählt als gelöst
-    if (!allCorrect) tracking.onCheck(false)
+    // Bewertet wird die Wertetabelle; das anschließende Einzeichnen ist freiwillige Zusatzübung
+    tracking.onCheck(allCorrect)
     setTableSolved(allCorrect)
     if (allCorrect && !tableScored) {
       setScore((s) => s + 1)
@@ -318,7 +318,6 @@ export default function Proportional() {
     if (plotDone && !plotScored) {
       setScore((s) => s + 1)
       setPlotScored(true)
-      tracking.onCheck(true)
     }
   }, [plotDone, plotScored])
 

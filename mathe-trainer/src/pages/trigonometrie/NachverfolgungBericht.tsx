@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getEntryPoints, getTrackingLog, getTrackingScore, getTrackingStartedAt, TRACKING_AREAS, TrackingArea } from '../../utils/tracking';
+import { getEntryPoints, getTrackingLog, getTrackingScore, getTrackingStartedAt, stopTrackingSession, TRACKING_AREAS, TrackingArea } from '../../utils/tracking';
 
 const formatPoints = (points: number) =>
     (Number.isInteger(points) ? String(points) : points.toFixed(1)).replace('.', ',');
@@ -17,7 +17,16 @@ const formatDateTime = (timestamp: number) =>
 const NachverfolgungBericht: React.FC<{ area?: TrackingArea }> = ({ area = 'trigonometrie' }) => {
     const areaInfo = TRACKING_AREAS.find((a) => a.area === area)!;
     // Alte Einträge ohne Bereich stammen aus der Trigonometrie.
-    const log = getTrackingLog().filter((e) => (e.area ?? 'trigonometrie') === area);
+    const readLog = () => getTrackingLog().filter((e) => (e.area ?? 'trigonometrie') === area);
+    const [log, setLog] = useState(readLog);
+
+    // Beim Öffnen des Berichts wird die Sitzung beendet. Die Effekt-Aufräumfunktionen der
+    // verlassenen Übungsseite laufen davor und haben offene Aufgaben bereits geloggt.
+    useEffect(() => {
+        stopTrackingSession();
+        setLog(readLog());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const startedAt = getTrackingStartedAt();
     const { points, maxPoints, percent } = getTrackingScore(log);
 

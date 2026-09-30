@@ -131,7 +131,7 @@ import Stadion from './pages/trigonometrie/anwendungsaufgaben/Stadion';
 import Fussballfeld from './pages/trigonometrie/anwendungsaufgaben/Fussballfeld';
 import Bergbahn from './pages/trigonometrie/anwendungsaufgaben/Bergbahn';
 import NachverfolgungBericht from './pages/trigonometrie/NachverfolgungBericht';
-import { getAreaFromPath, startTrackingSession, stopTrackingSession } from './utils/tracking';
+import { getAreaFromPath, startTrackingSession } from './utils/tracking';
 import { useTrackingSession } from './hooks/useTaskTracking';
 // Daten und Zufall
 import DatenUndZufallIndex from './pages/DatenUndZufallIndex';
@@ -217,7 +217,7 @@ export default function App() {
   };
 
   const handleStopTracking = () => {
-    stopTrackingSession();
+    // Die Sitzung wird erst im Bericht beendet: Beim Verlassen der Seite werden noch offene Aufgaben geloggt.
     navigate(`/${trackingArea}/nachverfolgung-bericht`);
   };
 
