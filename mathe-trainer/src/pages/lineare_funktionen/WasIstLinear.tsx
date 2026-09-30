@@ -15,6 +15,9 @@ const FUNCTIONS: Fn[] = [
   { id: '0.5x', m: 0.5, b: 0, text: 'Jeder y-Wert ist halb so hoch wie der dazugehörige x-Wert.' },
   { id: '-x', m: -1, b: 0, text: 'Jeder y-Wert ist das Gegenteil des dazugehörigen x-Werts.' },
   { id: '-2x', m: -2, b: 0, text: 'Jeder y-Wert ist doppelt so hoch wie der x-Wert, hat aber das umgekehrte Vorzeichen.' },
+  { id: 'x', m: 1, b: 0, text: 'Jeder y-Wert ist genauso groß wie der dazugehörige x-Wert.' },
+  { id: '4x', m: 4, b: 0, text: 'Jeder y-Wert ist viermal so hoch wie der dazugehörige x-Wert.' },
+  { id: '-0.5x', m: -0.5, b: 0, text: 'Jeder y-Wert ist halb so groß wie der x-Wert, hat aber das umgekehrte Vorzeichen.' },
   { id: 'x+3', m: 1, b: 3, text: 'Jeder y-Wert ist um 3 größer als der dazugehörige x-Wert.' },
   { id: 'x-2', m: 1, b: -2, text: 'Jeder y-Wert ist um 2 kleiner als der dazugehörige x-Wert.' },
   { id: '2x+1', m: 2, b: 1, text: 'Jeder y-Wert ist doppelt so hoch wie der x-Wert, zusätzlich kommt 1 dazu.' },
@@ -116,8 +119,9 @@ interface Card {
   fnIdx: number // Index der richtigen Funktion (= richtiger Text)
 }
 
-function newRound() {
-  const fns = shuffle(FUNCTIONS).slice(0, 4)
+function newRound(withB: boolean) {
+  const pool = FUNCTIONS.filter((f) => withB || f.b === 0)
+  const fns = shuffle(pool).slice(0, 4)
   const cards: Card[] = []
   ;(['table', 'graph', 'equation'] as const).forEach((kind) => {
     shuffle([0, 1, 2, 3]).forEach((fnIdx) => cards.push({ kind, fnIdx }))
@@ -127,7 +131,8 @@ function newRound() {
 
 export default function WasIstLinear() {
   const [demoX, setDemoX] = useState(2)
-  const [round, setRound] = useState(newRound)
+  const [round, setRound] = useState(() => newRound(false))
+  const [withB, setWithB] = useState(false)
   const [answers, setAnswers] = useState<Record<number, string>>({})
   const [checked, setChecked] = useState(false)
   const [score, setScore] = useState(0)
@@ -150,8 +155,15 @@ export default function WasIstLinear() {
       setScored(true)
     }
   }
+  const switchLevel = (v: boolean) => {
+    setWithB(v)
+    setRound(newRound(v))
+    setAnswers({})
+    setChecked(false)
+    setScored(false)
+  }
   const next = () => {
-    setRound(newRound())
+    setRound(newRound(withB))
     setAnswers({})
     setChecked(false)
     setScored(false)
@@ -208,8 +220,8 @@ export default function WasIstLinear() {
             <p className="font-semibold text-blue-900 mb-1">Merke</p>
             <p>
               Eine <strong>Funktion</strong> ordnet jedem x-Wert genau einen y-Wert zu. Text, Wertetabelle, Funktionsgleichung und Funktionsgraph
-              beschreiben dieselbe Funktion – sie gehören zusammen. Ist der Graph eine <strong>Gerade</strong> und hat die Gleichung die Form
-              <strong> y = m · x + b</strong>, nennt man sie eine <strong>lineare Funktion</strong>.
+              beschreiben dieselbe Funktion – sie gehören zusammen. Hier ist der Graph eine <strong>Gerade durch den Ursprung</strong>, die Gleichung hat die Form
+              <strong> y = m · x</strong>. Das ist eine (proportionale) <strong>lineare Funktion</strong>. In Stufe 2 der Übung kommen Geraden hinzu, die nicht durch den Ursprung gehen (y = m · x + b).
             </p>
           </div>
         </div>
@@ -217,6 +229,14 @@ export default function WasIstLinear() {
         {/* Übung */}
         <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
           <h2 className="text-lg font-bold text-slate-800 mb-2">Übung: Was gehört zusammen?</h2>
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
+            <button onClick={() => switchLevel(false)} className={`px-4 py-1 rounded font-bold border ${!withB ? 'bg-blue-600 text-white border-blue-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'}`}>
+              Stufe 1: Ursprungsgeraden (y = m · x)
+            </button>
+            <button onClick={() => switchLevel(true)} className={`px-4 py-1 rounded font-bold border ${withB ? 'bg-blue-600 text-white border-blue-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'}`}>
+              Stufe 2: auch y = m · x + b
+            </button>
+          </div>
           <p className="text-slate-700 mb-4">Unten stehen vier Texte (A–D). Ordne jeder Wertetabelle, jedem Graphen und jeder Gleichung den passenden Text zu.</p>
 
           <div className="grid sm:grid-cols-2 gap-3 mb-6">
