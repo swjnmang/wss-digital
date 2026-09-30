@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import styles from './Funktionsgleichung.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
 
 declare global {
   interface Window { 
@@ -51,6 +52,7 @@ function formatEquationPreview(m: string, sign: string, t: string): string {
 }
 
 export default function Funktionsgleichung(){
+  const tracking = useTaskTracking('Funktionsgleichung aufstellen')
   const [mode, setMode] = useState<'twoPoints'|'pointSlope'|'readGraph'>('twoPoints')
   const [p1, setP1] = useState({ x: 1, y: 2 })
   const [p2, setP2] = useState({ x: 4, y: 5 })
@@ -129,6 +131,7 @@ export default function Funktionsgleichung(){
   }, [p1, p2])
 
   function genTwoPoints() {
+    tracking.onTaskStart()
     let x1, x2
     do {
       x1 = randInt(-5, 5)
@@ -150,6 +153,7 @@ export default function Funktionsgleichung(){
   }
 
   function genPointSlope() {
+    tracking.onTaskStart()
     const x = randInt(-5, 5)
     const y = randInt(-5, 5)
     const m = randInt(-3, 3) || 1
@@ -168,6 +172,7 @@ export default function Funktionsgleichung(){
   }
 
   function genReadGraph() {
+    tracking.onTaskStart()
     // Generiere zufällige m und t für den Graph
     let m: number, t: number
     
@@ -211,7 +216,9 @@ export default function Funktionsgleichung(){
     }
 
     // Die Validierung hat bereits stattgefunden, daher prüften wir nur die Status
-    if (mCorrectness === 'correct' && signCorrectness === 'correct' && tCorrectness === 'correct') {
+    const allCorrect = mCorrectness === 'correct' && signCorrectness === 'correct' && tCorrectness === 'correct'
+    tracking.onCheck(allCorrect)
+    if (allCorrect) {
       setFeedback('✓ Perfekt! Alle Werte sind korrekt!')
       // Punkte vergeben nur wenn Lösung nicht angezeigt wurde
       if (!showSolution) {
@@ -225,6 +232,7 @@ export default function Funktionsgleichung(){
 
   function showSol() {
     setShowSolution(true)
+    tracking.onHintShown()
   }
 
   return (

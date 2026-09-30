@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import styles from './Ablesen.module.css'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
 
 declare global {
   interface Window { 
@@ -15,6 +16,7 @@ function randInt(min: number, max: number) {
 }
 
 export default function Ablesen() {
+  const tracking = useTaskTracking('Funktionsgleichung ablesen')
   const [m, setM] = useState<number>(1)
   const [t, setT] = useState<number>(0)
   const [mInput, setMInput] = useState('')
@@ -313,6 +315,7 @@ export default function Ablesen() {
 
 
   function generateNew(instance?: any) {
+    tracking.onTaskStart()
     const api = instance || ggbInstance.current
     const slopeCandidates = [-2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2]
     const slope = slopeCandidates[Math.floor(Math.random() * slopeCandidates.length)]
@@ -350,6 +353,7 @@ export default function Ablesen() {
     if (bothCorrect && !toastShownRef.current) {
       toastShownRef.current = true
       setShowSuccessToast(true)
+      tracking.onCheck(true) // Live-Prüfung gilt als Lösung (auch ohne Klick auf Prüfen)
     } else if (!bothCorrect) {
       toastShownRef.current = false
     }
@@ -369,6 +373,7 @@ export default function Ablesen() {
     const ti = parseFlexibleNumber(tInput)
     if (isNaN(mi) || isNaN(ti)) { setFeedback('Bitte gültige Zahlen für m und t eingeben.'); return }
     const ok = Math.abs(mi - m) < 0.03 && Math.abs(ti - t) < 0.03
+    tracking.onCheck(ok)
     if (ok) setFeedback('Richtig — gut abgelesen!')
     else setFeedback('Nicht ganz. Probiere es noch einmal oder zeige die Lösung.')
   }
@@ -413,7 +418,7 @@ export default function Ablesen() {
 
         <div className={styles.actions}>
           <button onClick={check} className={styles.primary}>Prüfen</button>
-          <button onClick={() => setShowSolution(true)} className={styles.secondary}>Lösung anzeigen</button>
+          <button onClick={() => { setShowSolution(true); tracking.onHintShown() }} className={styles.secondary}>Lösung anzeigen</button>
           <button onClick={() => setShowVideoModal(true)} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: '500' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}>🎥 Erklärvideo</button>
           <button onClick={() => generateNew()} className={styles.ghost}>Neue Aufgabe</button>
         </div>

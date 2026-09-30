@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import styles from './LFCommon.module.css'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { getAreaFromPath, HelpUsage, logTrackingEntry } from '../../utils/tracking'
 
 type Difficulty = 'easy' | 'medium' | 'hard'
 type TaskType = 'check_point' | 'find_correct_point_among_three' | 'calculate_missing_coordinate'
@@ -42,10 +43,53 @@ function randomChoice<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
+const trackingTopics: Record<TaskType, string> = {
+  check_point: 'Punktprobe (Ja/Nein)',
+  find_correct_point_among_three: 'Punkt auf Gerade finden',
+  calculate_missing_coordinate: 'Fehlende Koordinate berechnen'
+}
+
 export default function PunktGerade() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null)
   const [tasks, setTasks] = useState<TaskData[]>([])
   const [points, setPoints] = useState(0)
+
+  // Mehrere Aufgaben gleichzeitig offen -> eigene Versuchs-/Hilfe-Buchführung pro Aufgabe,
+  // Eintrag direkt über logTrackingEntry (ein Eintrag = eine Aufgabe).
+  const tracked = useRef<Record<string, { topic: string; attempts: number; firstTryCorrect: boolean; helpUsed: HelpUsage; logged: boolean }>>({})
+  const trackingArea = useRef(getAreaFromPath(window.location.pathname) ?? undefined)
+
+  const trackFlush = (key?: string) => {
+    const keys = key === undefined ? Object.keys(tracked.current) : [String(key)]
+    keys.forEach(k => {
+      const e = tracked.current[k as unknown as string]
+      if (e && !e.logged && e.attempts > 0) {
+        logTrackingEntry({ topic: e.topic, area: trackingArea.current, attempts: e.attempts, firstTryCorrect: e.firstTryCorrect, solved: false, helpUsed: e.helpUsed })
+      }
+      delete tracked.current[k as unknown as string]
+    })
+  }
+
+  const trackCheck = (key: string, topic: string, isCorrect: boolean) => {
+    const e = (tracked.current[key] ??= { topic, attempts: 0, firstTryCorrect: false, helpUsed: 'none', logged: false })
+    if (e.logged) return
+    e.attempts += 1
+    if (e.attempts === 1) e.firstTryCorrect = isCorrect
+    if (isCorrect) {
+      e.logged = true
+      logTrackingEntry({ topic: e.topic, area: trackingArea.current, attempts: e.attempts, firstTryCorrect: e.firstTryCorrect, solved: true, helpUsed: e.helpUsed })
+    }
+  }
+
+  // Vor dem ersten Versuch angeschaut -> 'solution', danach -> 'hint'
+  const trackHint = (key: string, topic: string) => {
+    const e = (tracked.current[key] ??= { topic, attempts: 0, firstTryCorrect: false, helpUsed: 'none', logged: false })
+    if (e.logged) return
+    if (e.attempts === 0) e.helpUsed = 'solution'
+    else if (e.helpUsed === 'none') e.helpUsed = 'hint'
+  }
+
+  useEffect(() => () => trackFlush(), [])
 
   function handleDifficulty(level: Difficulty) {
     setDifficulty(level)
@@ -53,6 +97,7 @@ export default function PunktGerade() {
   }
 
   function generateAllTasks(level: Difficulty = difficulty || 'easy') {
+    trackFlush()
     const newTasks: TaskData[] = [
       generateTask('check_point', level, '1'),
       generateTask('find_correct_point_among_three', level, '2'),
@@ -200,6 +245,8 @@ export default function PunktGerade() {
       isCorrect = Math.abs(userNum - correctNum) < 0.01
     }
 
+    trackCheck(taskId, trackingTopics[task.taskType], isCorrect)
+
     const updatedTasks = tasks.map(t => {
       if (t.id === taskId) {
         return {
@@ -227,6 +274,8 @@ export default function PunktGerade() {
   }
 
   function showAnswer(taskId: string) {
+    const task = tasks.find(t => t.id === taskId)
+    if (task) trackHint(taskId, trackingTopics[task.taskType])
     const updatedTasks = tasks.map(t => {
       if (t.id === taskId) {
         return { ...t, solutionVisible: true }
@@ -239,6 +288,7 @@ export default function PunktGerade() {
   function generateNewTask(taskId: string) {
     const task = tasks.find(t => t.id === taskId)
     if (!task) return
+    trackFlush(taskId)
     const newTask = generateTask(task.taskType, difficulty, taskId)
     const updatedTasks = tasks.map(t => (t.id === taskId ? newTask : t))
     setTasks(updatedTasks)

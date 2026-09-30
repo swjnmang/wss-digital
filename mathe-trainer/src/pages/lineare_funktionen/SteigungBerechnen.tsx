@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import styles from './SteigungBerechnen.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -52,6 +53,9 @@ function FractionDisplay({ numerator, denominator }: { numerator: number; denomi
 }
 
 export default function SteigungBerechnen() {
+  // Text- und Graphaufgabe haben je eine eigene Aufgabe -> je ein Tracker
+  const textTracking = useTaskTracking('Steigung aus zwei Punkten')
+  const graphTracking = useTaskTracking('Steigung aus Graph')
   const [taskType, setTaskType] = useState<'text' | 'graph'>('text')
   const [p1, setP1] = useState({ x: 1, y: 3 })
   const [p2, setP2] = useState({ x: 4, y: 9 })
@@ -83,6 +87,7 @@ export default function SteigungBerechnen() {
   }, [p1, p2])
 
   function generateNewTask() {
+    textTracking.onTaskStart()
     setFeedback('')
     setInput('')
     setSlopeSign('')  // Reset der Vorab-Auswahl
@@ -99,6 +104,7 @@ export default function SteigungBerechnen() {
   }
 
   function generateNewGraphTask() {
+    graphTracking.onTaskStart()
     setGraphFeedback('')
     setGraphInput('')
     setGraphShowSolution(false)
@@ -198,6 +204,7 @@ export default function SteigungBerechnen() {
     // Überprüfe, ob das Vorzeichen korrekt ist
     const expectedSign = correctSlope >= 0 ? 'positive' : 'negative'
     if (slopeSign !== expectedSign) {
+      textTracking.onCheck(false)
       setFeedback(
         expectedSign === 'positive'
           ? 'Das Vorzeichen ist falsch! Die Steigung ist positiv.'
@@ -209,10 +216,12 @@ export default function SteigungBerechnen() {
 
     // Überprüfe den Wert
     if (Math.abs(user - correctSlope) < 0.01) {
+      textTracking.onCheck(true)
       setFeedback('Richtig! Super gemacht!')
       setStreak((s) => s + 1)
       setShowSolution(false)
     } else {
+      textTracking.onCheck(false)
       setFeedback('Das Vorzeichen stimmt, aber der Wert ist nicht ganz richtig. Überprüfe deine Rechnung!')
       setStreak(0)
       setShowSolution(false)
@@ -234,10 +243,12 @@ export default function SteigungBerechnen() {
       return
     }
     if (Math.abs(user - graphCorrectSlope) < 0.01) {
+      graphTracking.onCheck(true)
       setGraphFeedback('Richtig! Super gemacht!')
       setStreak((s) => s + 1)
       setGraphShowSolution(false)
     } else {
+      graphTracking.onCheck(false)
       setGraphFeedback('Leider nicht ganz richtig. Überprüfe deine Rechnung!')
       setStreak(0)
       setGraphShowSolution(false)
@@ -247,11 +258,14 @@ export default function SteigungBerechnen() {
   function onShowAnswer() {
     setShowSolution(true)
     setStreak(0)
+    textTracking.onHintShown()
   }
 
   function onShowGraphAnswer() {
     setGraphShowSolution(true)
     setStreak(0)
+    // Lösungsweg wird nur sichtbar, wenn beide Punkte gewählt sind
+    if (selectedPoints.length === 2) graphTracking.onHintShown()
   }
 
   const deltaY = selectedPoints.length === 2 ? selectedPoints[1].y - selectedPoints[0].y : 0

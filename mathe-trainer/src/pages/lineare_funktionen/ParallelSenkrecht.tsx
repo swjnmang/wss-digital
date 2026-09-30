@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import styles from './ParallelSenkrecht.module.css'
+import { getAreaFromPath, HelpUsage, logTrackingEntry } from '../../utils/tracking'
 
 // ===== MathDisplay Komponente =====
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -181,6 +182,12 @@ const aufgabenBanks = {
 }
 
 // ===== Hauptkomponente =====
+const trackingTopics: Record<string, string> = {
+  gleichungenPrüfen: 'Parallel oder senkrecht prüfen',
+  geradeDurchPunkt: 'Parallele/senkrechte Gerade durch Punkt',
+  mehrereGeraden: 'Geradenpaare zuordnen'
+}
+
 export default function ParallelSenkrecht() {
   const [aufgaben, setAufgaben] = useState(
     Array.from({ length: 3 }, (_, i) =>
@@ -195,10 +202,47 @@ export default function ParallelSenkrecht() {
   const [antworten, setAntworten] = useState(aufgaben.map(() => ''))
   const [validiert, setValidiert] = useState(aufgaben.map(() => false))
   const [showLösung, setShowLösung] = useState(aufgaben.map(() => false))
+  // Mehrere Aufgaben gleichzeitig offen -> eigene Versuchs-/Hilfe-Buchführung pro Aufgabe,
+  // Eintrag direkt über logTrackingEntry (ein Eintrag = eine Aufgabe).
+  const tracked = useRef<Record<number, { topic: string; attempts: number; firstTryCorrect: boolean; helpUsed: HelpUsage; logged: boolean }>>({})
+  const trackingArea = useRef(getAreaFromPath(window.location.pathname) ?? undefined)
+
+  const trackFlush = (key?: number) => {
+    const keys = key === undefined ? Object.keys(tracked.current) : [String(key)]
+    keys.forEach(k => {
+      const e = tracked.current[k as unknown as number]
+      if (e && !e.logged && e.attempts > 0) {
+        logTrackingEntry({ topic: e.topic, area: trackingArea.current, attempts: e.attempts, firstTryCorrect: e.firstTryCorrect, solved: false, helpUsed: e.helpUsed })
+      }
+      delete tracked.current[k as unknown as number]
+    })
+  }
+
+  const trackCheck = (key: number, topic: string, isCorrect: boolean) => {
+    const e = (tracked.current[key] ??= { topic, attempts: 0, firstTryCorrect: false, helpUsed: 'none', logged: false })
+    if (e.logged) return
+    e.attempts += 1
+    if (e.attempts === 1) e.firstTryCorrect = isCorrect
+    if (isCorrect) {
+      e.logged = true
+      logTrackingEntry({ topic: e.topic, area: trackingArea.current, attempts: e.attempts, firstTryCorrect: e.firstTryCorrect, solved: true, helpUsed: e.helpUsed })
+    }
+  }
+
+  // Vor dem ersten Versuch angeschaut -> 'solution', danach -> 'hint'
+  const trackHint = (key: number, topic: string) => {
+    const e = (tracked.current[key] ??= { topic, attempts: 0, firstTryCorrect: false, helpUsed: 'none', logged: false })
+    if (e.logged) return
+    if (e.attempts === 0) e.helpUsed = 'solution'
+    else if (e.helpUsed === 'none') e.helpUsed = 'hint'
+  }
+
+  useEffect(() => () => trackFlush(), [])
 
   const prüfeAntwort = (index: number) => {
     const aufgabe = aufgaben[index]
     const antwort = antworten[index].trim()
+    if (antwort === '') return // leere Eingabe ist keine echte Prüfung
 
     let isCorrect = false
 
@@ -213,6 +257,8 @@ export default function ParallelSenkrecht() {
       isCorrect = parts.length === 3 && parts.every((p, i) => p === expected[i])
     }
 
+    trackCheck(index, trackingTopics[aufgabe.typ], isCorrect)
+
     setValidiert(prev => {
       const newVal = [...prev]
       newVal[index] = isCorrect
@@ -221,6 +267,7 @@ export default function ParallelSenkrecht() {
   }
 
   const neueAufgaben = () => {
+    trackFlush()
     const newAufgaben = [
       aufgabenBanks.gleichungenPrüfen(),
       aufgabenBanks.geradeDurchPunkt(),
@@ -355,13 +402,14 @@ export default function ParallelSenkrecht() {
                 </button>
                 <button
                   className={styles.lösungButton}
-                  onClick={() =>
+                  onClick={() => {
+                    if (!showLösung[index]) trackHint(index, trackingTopics[aufgabe.typ])
                     setShowLösung(prev => {
                       const newSL = [...prev]
                       newSL[index] = !newSL[index]
                       return newSL
                     })
-                  }
+                  }}
                 >
                   Lösung {showLösung[index] ? 'verbergen' : 'anzeigen'}
                 </button>

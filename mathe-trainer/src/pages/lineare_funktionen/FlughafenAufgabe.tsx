@@ -1,5 +1,6 @@
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import React, { useState } from 'react'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
 
 interface Solution {
   type: 'number' | 'text' | 'wertetabelle'
@@ -143,6 +144,8 @@ export default function FlughafenAufgabe() {
   const [feedback, setFeedback] = useState<Record<number, string>>({})
   const [fieldFeedback, setFieldFeedback] = useState<Record<number, Record<string, 'correct' | 'incorrect' | ''>>>({})
   const [showSolution, setShowSolution] = useState<Record<number, boolean>>({})
+  // Nachverfolgung: jede Teilaufgabe ist ein Eintrag (Wechsel der Teilaufgabe schließt den Eintrag ab)
+  const tracking = useTaskTracking('Anwendung: Flughafen')
 
   const tasks: Task[] = [
     {
@@ -323,15 +326,22 @@ export default function FlughafenAufgabe() {
       }
     }
 
+    tracking.onCheck(isCorrect)
     setFeedback({ ...feedback, [currentTask]: isCorrect ? 'correct' : 'incorrect' })
   }
 
   const nextTask = () => {
-    if (currentTask < tasks.length - 1) setCurrentTask(currentTask + 1)
+    if (currentTask < tasks.length - 1) {
+      tracking.onTaskStart()
+      setCurrentTask(currentTask + 1)
+    }
   }
 
   const prevTask = () => {
-    if (currentTask > 0) setCurrentTask(currentTask - 1)
+    if (currentTask > 0) {
+      tracking.onTaskStart()
+      setCurrentTask(currentTask - 1)
+    }
   }
 
   const feedbackState = feedback[currentTask]
@@ -514,7 +524,10 @@ export default function FlughafenAufgabe() {
 
             {feedbackState === 'incorrect' && (
               <button
-                onClick={() => setShowSolution({ ...showSolution, [currentTask]: !showSolution[currentTask] })}
+                onClick={() => {
+                  if (!showSolution[currentTask]) tracking.onHintShown()
+                  setShowSolution({ ...showSolution, [currentTask]: !showSolution[currentTask] })
+                }}
                 className="mb-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-semibold transition"
               >
                 {showSolution[currentTask] ? 'Lösung verbergen' : 'Lösung anzeigen'}

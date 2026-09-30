@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import styles from './LFCommon.module.css'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
 
 declare global {
   interface Window { 
@@ -24,6 +25,7 @@ function randomChoice<T>(arr: T[]): T {
 }
 
 export default function Schnittpunkt() {
+  const tracking = useTaskTracking('Schnittpunkt berechnen')
   const [difficulty, setDifficulty] = useState<Difficulty>('easy')
   const [g1, setG1] = useState('g₁: y = x + 1')
   const [g2, setG2] = useState('g₂: y = -x + 2')
@@ -91,6 +93,7 @@ export default function Schnittpunkt() {
   }, [showVideoModal])
 
   function generateNewTask(level: Difficulty = difficulty, forceNotParallel = false) {
+    tracking.onTaskStart()
     setFeedback('')
     setFeedbackClass('')
     setXInput('')
@@ -205,6 +208,7 @@ export default function Schnittpunkt() {
         isCorrect = xCorrect && (yViaReference || yViaG1 || yViaG2)
       }
     }
+    tracking.onCheck(isCorrect)
     if (isCorrect) {
       setFeedback('Richtig! Sehr gut!')
       setFeedbackClass('correct')
@@ -219,6 +223,7 @@ export default function Schnittpunkt() {
   function showAnswer() {
     setSolutionVisible(true)
     setShowAnswerBtnDisabled(true)
+    tracking.onHintShown()
   }
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import React, { useState } from 'react'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
 
 interface Solution {
   type: 'number' | 'text'
@@ -22,6 +23,8 @@ export default function TipiAufgabe() {
   const [inputs, setInputs] = useState<Record<number, string | Record<string, string>>>({})
   const [feedback, setFeedback] = useState<Record<number, string>>({})
   const [showSolution, setShowSolution] = useState<Record<number, boolean>>({})
+  // Nachverfolgung: jede Teilaufgabe ist ein Eintrag (Wechsel der Teilaufgabe schließt den Eintrag ab)
+  const tracking = useTaskTracking('Anwendung: Tipi')
 
   const tasks: Task[] = [
     {
@@ -160,6 +163,7 @@ export default function TipiAufgabe() {
       }
     }
 
+    tracking.onCheck(isCorrect)
     if (isCorrect) {
       setFeedback({ ...feedback, [currentTask]: 'correct' })
     } else {
@@ -169,12 +173,14 @@ export default function TipiAufgabe() {
 
   const nextTask = () => {
     if (currentTask < tasks.length - 1) {
+      tracking.onTaskStart()
       setCurrentTask(currentTask + 1)
     }
   }
 
   const prevTask = () => {
     if (currentTask > 0) {
+      tracking.onTaskStart()
       setCurrentTask(currentTask - 1)
     }
   }
@@ -337,7 +343,10 @@ export default function TipiAufgabe() {
           {/* Lösung anzeigen Button */}
           {feedbackState === 'incorrect' && (
             <button
-              onClick={() => setShowSolution({ ...showSolution, [currentTask]: !showSolution[currentTask] })}
+              onClick={() => {
+                if (!showSolution[currentTask]) tracking.onHintShown()
+                setShowSolution({ ...showSolution, [currentTask]: !showSolution[currentTask] })
+              }}
               className="mb-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-semibold transition"
             >
               {showSolution[currentTask] ? 'Lösung verbergen' : 'Lösung anzeigen'}

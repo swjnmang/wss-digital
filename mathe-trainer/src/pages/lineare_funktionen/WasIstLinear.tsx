@@ -1,6 +1,7 @@
 import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
 
 interface Fn {
   id: string
@@ -136,6 +137,7 @@ function newRound(withT: boolean) {
 }
 
 export default function WasIstLinear() {
+  const tracking = useTaskTracking('Was ist eine lineare Funktion?')
   const [demoX, setDemoX] = useState(2)
   const [round, setRound] = useState(() => newRound(false))
   const [withT, setWithT] = useState(false)
@@ -156,6 +158,7 @@ export default function WasIstLinear() {
 
   const check = () => {
     setChecked(true)
+    tracking.onCheck(allCorrect)
     if (allCorrect && !scored) {
       setScore((s) => s + 1)
       setScored(true)
@@ -165,6 +168,7 @@ export default function WasIstLinear() {
   useEffect(() => {
     if (!checked || !allCorrect) return
     const timer = setTimeout(() => {
+      tracking.onTaskStart()
       setRound(newRound(withT))
       setAnswers({})
       setChecked(false)
@@ -174,6 +178,7 @@ export default function WasIstLinear() {
   }, [checked, allCorrect, withT])
 
   const switchLevel = (v: boolean) => {
+    tracking.onTaskStart()
     setWithT(v)
     setRound(newRound(v))
     setAnswers({})
@@ -181,6 +186,7 @@ export default function WasIstLinear() {
     setScored(false)
   }
   const next = () => {
+    tracking.onTaskStart()
     setRound(newRound(withT))
     setAnswers({})
     setChecked(false)

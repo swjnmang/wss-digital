@@ -4,6 +4,7 @@ import GeoGebraGraph from '../../components/GeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import GeoGebraMultiGraph from '../../components/GeoGebraMultiGraph'
 import { roundHalfAwayFromZero } from '../../utils/numbers'
+import { HelpUsage, logTrackingEntry } from '../../utils/tracking'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -361,8 +362,24 @@ export default function GemischteAufgaben() {
     document.head.appendChild(mathjaxScript)
   }, [])
 
+  // Nachverfolgung: pro Aufgabenkarte (Index) Versuche / Hilfe; Eintrag beim Lösen,
+  // beim Neu-Generieren oder Verlassen der Seite (falls Versuche, aber nie gelöst).
+  const trackingRef = useRef<{ [key: number]: { topic: string; attempts: number; firstTryCorrect: boolean; solved: boolean; helpUsed: HelpUsage } }>({})
+
+  function flushTracking() {
+    Object.values(trackingRef.current).forEach(t => {
+      if (t.attempts > 0 && !t.solved) {
+        logTrackingEntry({ topic: t.topic, attempts: t.attempts, firstTryCorrect: false, solved: false, helpUsed: t.helpUsed })
+      }
+    })
+    trackingRef.current = {}
+  }
+
+  useEffect(() => () => flushTracking(), [])
+
   // 10 vermischte Aufgaben generieren
   function generiereAufgaben() {
+    flushTracking()
     const neue: Aufgabe[] = []
     const themen = Object.keys(aufgabenBanks) as (keyof typeof aufgabenBanks)[]
     
@@ -446,6 +463,22 @@ export default function GemischteAufgaben() {
   function checkAnswer(index: number) {
     const isCorrect = validateAnswer(index, antworten[index] || {})
     setValidiert({ ...validiert, [index]: isCorrect })
+
+    const t = (trackingRef.current[index] ??= {
+      topic: (aufgaben[index]?.thema ?? 'Gemischte Aufgaben').replace(/^\d+\.\s*/, ''),
+      attempts: 0,
+      firstTryCorrect: false,
+      solved: false,
+      helpUsed: 'none'
+    })
+    if (!t.solved) {
+      t.attempts += 1
+      if (t.attempts === 1) t.firstTryCorrect = isCorrect
+      if (isCorrect) {
+        t.solved = true
+        logTrackingEntry({ topic: t.topic, attempts: t.attempts, firstTryCorrect: t.firstTryCorrect, solved: true, helpUsed: t.helpUsed })
+      }
+    }
   }
 
   // Ermittelt den Erwartungswert eines einzelnen Feldes für die Live-Färbung
@@ -730,7 +763,19 @@ export default function GemischteAufgaben() {
                   Prüfen
                 </button>
                 <button 
-                  onClick={() => setShowLösung({ ...showLösung, [index]: !showLösung[index] })} 
+                  onClick={() => {
+                    if (!showLösung[index]) {
+                      const t = (trackingRef.current[index] ??= {
+                        topic: aufgabe.thema.replace(/^\d+\.\s*/, ''),
+                        attempts: 0,
+                        firstTryCorrect: false,
+                        solved: false,
+                        helpUsed: 'none'
+                      })
+                      if (!t.solved) t.helpUsed = t.attempts === 0 ? 'solution' : t.helpUsed === 'none' ? 'hint' : t.helpUsed
+                    }
+                    setShowLösung({ ...showLösung, [index]: !showLösung[index] })
+                  }}
                   className={styles.solutionBtn}
                 >
                   {showLösung[index] ? 'Lösung ausblenden' : 'Lösung anzeigen'}

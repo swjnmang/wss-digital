@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './Wertetabelle.module.css'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
 
 declare global {
   interface Window {
@@ -338,6 +339,13 @@ interface Aufgabe {
 }
 
 export default function Wertetabelle() {
+  // Pro Runde gibt es 4 parallele Aufgaben -> je ein Tracking-Hook (feste Anzahl, Hook-Regeln bleiben erfüllt)
+  const trackings = [
+    useTaskTracking('Wertetabelle'),
+    useTaskTracking('Wertetabelle'),
+    useTaskTracking('Wertetabelle'),
+    useTaskTracking('Wertetabelle')
+  ]
   const [aufgaben, setAufgaben] = useState<Aufgabe[]>([])
   const [antworten, setAntworten] = useState<{ [key: number]: Array<{ x: string; y: string }> }>({})
   const [validiert, setValidiert] = useState<{ [key: number]: boolean }>({})
@@ -570,6 +578,7 @@ export default function Wertetabelle() {
       if (plotDone[index] && !plotScored[index]) {
         setPunkte(p => p + 1)
         setPlotScored(prev => ({ ...prev, [index]: true }))
+        trackings[index]?.onCheck(true) // Aufgabe = Tabelle + Punkte einzeichnen
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -577,6 +586,7 @@ export default function Wertetabelle() {
 
   // Aufgaben generieren basierend auf Schwierigkeitsgrad
   function generiereAufgaben(grad: 'einfach' | 'mittel' | 'schwer') {
+    trackings.forEach(t => t.onTaskStart())
     const neue: Aufgabe[] = []
     const usedCombinations = new Set<string>() // Tracke verwendete (m, t) Kombinationen
     
@@ -847,6 +857,8 @@ export default function Wertetabelle() {
     const isCorrect = aufgabe.typ === 'leereTabelleAusfüllen' 
       ? validateAnswer(index, aufgabe)
       : validateType2(index, aufgabe)
+    // Nur falsche Tabellen-Versuche zählen hier; gelöst ist die Aufgabe erst nach dem Einzeichnen
+    if (!isCorrect && antworten[index]?.length) trackings[index]?.onCheck(false)
     setValidiert({ ...validiert, [index]: isCorrect })
   }
 
@@ -1127,7 +1139,10 @@ export default function Wertetabelle() {
                   Prüfen
                 </button>
                 <button
-                  onClick={() => setShowLösung({ ...showLösung, [index]: !showLösung[index] })}
+                  onClick={() => {
+                    if (!showLösung[index]) trackings[index]?.onHintShown()
+                    setShowLösung({ ...showLösung, [index]: !showLösung[index] })
+                  }}
                   className={styles.solutionBtn}
                 >
                   {showLösung[index] ? 'Lösung ausblenden' : 'Lösung anzeigen'}

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import styles from './Nullstellen.module.css'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
 
 declare global {
   interface Window { 
@@ -15,6 +16,7 @@ function randInt(min: number, max: number) {
 }
 
 export default function Nullstellen() {
+  const tracking = useTaskTracking('Nullstellen berechnen')
   const [m, setM] = useState<number>(1)
   const [t, setT] = useState<number>(0)
   const [xInput, setXInput] = useState('')
@@ -67,6 +69,7 @@ export default function Nullstellen() {
   }, [showVideoModal])
 
   function gen() {
+    tracking.onTaskStart()
     let slope = 0
     while (slope === 0) slope = randInt(-4, 4)
     const intercept = randInt(-6, 6)
@@ -86,8 +89,10 @@ export default function Nullstellen() {
     }
     const xTrue = -t / m
     if (Math.abs(xi - xTrue) < 0.02) {
+      tracking.onCheck(true)
       setFeedback('Richtig!')
     } else {
+      tracking.onCheck(false)
       setFeedback('Falsch. Versuche es noch einmal oder zeige die Lösung.')
     }
   }
@@ -104,7 +109,7 @@ export default function Nullstellen() {
 
         <div className={styles.actions}>
           <button onClick={check} className={styles.primary}>Prüfen</button>
-          <button onClick={() => setShowSolution(true)} className={styles.secondary}>Lösung anzeigen</button>
+          <button onClick={() => { setShowSolution(true); tracking.onHintShown() }} className={styles.secondary}>Lösung anzeigen</button>
           <button onClick={() => setShowVideoModal(true)} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: '500' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}>🎥 Erklärvideo</button>
           <button onClick={gen} className={styles.ghost}>Neue Aufgabe</button>
         </div>

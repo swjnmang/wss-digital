@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
 
 declare global {
   interface Window {
@@ -128,6 +129,7 @@ function injectApplet(containerId: string, width: number, height: number, onLoad
 }
 
 export default function Proportional() {
+  const tracking = useTaskTracking('Proportionale Zusammenhänge')
   const [score, setScore] = useState(0)
   const [round, setRound] = useState<Round>(() => generateRound())
   const [yInputs, setYInputs] = useState<string[]>(() => round.targets.map(() => ''))
@@ -289,6 +291,8 @@ export default function Proportional() {
     })
     setTableChecked(results)
     const allCorrect = results.every(Boolean)
+    // Aufgabe = Tabelle + Punkte einzeichnen: erst der Abschluss des Plots zählt als gelöst
+    if (!allCorrect) tracking.onCheck(false)
     setTableSolved(allCorrect)
     if (allCorrect && !tableScored) {
       setScore((s) => s + 1)
@@ -297,6 +301,7 @@ export default function Proportional() {
   }
 
   const newTask = () => {
+    tracking.onTaskStart()
     const nextRound = generateRound(round.context.id)
     setRound(nextRound)
     setYInputs(nextRound.targets.map(() => ''))
@@ -313,6 +318,7 @@ export default function Proportional() {
     if (plotDone && !plotScored) {
       setScore((s) => s + 1)
       setPlotScored(true)
+      tracking.onCheck(true)
     }
   }, [plotDone, plotScored])
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import styles from './LFCommon.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { logTrackingEntry } from '../../utils/tracking'
 
 type QuestionType = 'slope' | 'missing_coord' | 'equation_ps' | 'equation_2p' | 'zero' | 'intersection' | 'graph'
 type AnswerFormat = 'single_number' | 'point' | 'equation'
@@ -136,6 +137,16 @@ function createGraphQuestion(): Question {
     answer: { m, t },
     answerFormat: 'equation'
   }
+}
+
+const TRACKING_TOPICS: Record<QuestionType, string> = {
+  slope: 'Test: Steigung berechnen',
+  missing_coord: 'Test: Fehlende Koordinate',
+  equation_ps: 'Test: Gleichung aus Punkt und Steigung',
+  equation_2p: 'Test: Gleichung aus zwei Punkten',
+  zero: 'Test: Nullstelle',
+  intersection: 'Test: Schnittpunkt',
+  graph: 'Test: Gleichung aus Graph'
 }
 
 const questionTypes = [
@@ -338,6 +349,16 @@ export default function Test() {
       ans.t = (state.tVal || '').replace(',', '.').replace(/[−–—‐]/g, '-')
     }
     handleAnswer(ans)
+    // Nachverfolgung: Der Test gibt kein Feedback und keine Hilfe -> pro Frage ein Eintrag
+    // (ein Versuch), geloggt erst beim Abschluss des Tests.
+    if (current === TOTAL_QUESTIONS - 1) {
+      const all = [...userAnswers]
+      all[current] = ans
+      questions.forEach((qu, i) => {
+        const ok = isCorrect(qu, all[i])
+        logTrackingEntry({ topic: TRACKING_TOPICS[qu.type], attempts: 1, firstTryCorrect: ok, solved: ok, helpUsed: 'none' })
+      })
+    }
     nextQuestion()
   }
 

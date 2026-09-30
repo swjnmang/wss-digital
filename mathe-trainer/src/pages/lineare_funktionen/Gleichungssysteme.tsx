@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { Link } from 'react-router-dom';
 
 type Method = 'einsetzen' | 'gleichsetzen' | 'addieren';
@@ -346,8 +347,15 @@ const Gleichungssysteme: React.FC = () => {
     const [yInput, setYInput] = useState('');
     const [feedback, setFeedback] = useState<'correct' | 'incorrect' | 'info' | null>(null);
     const [showSolution, setShowSolution] = useState(false);
+    // Ein Tracker pro Verfahren, damit der Eintrag das Thema des Verfahrens trägt.
+    const trackers: Record<Method, ReturnType<typeof useTaskTracking>> = {
+        einsetzen: useTaskTracking('Einsetzungsverfahren'),
+        gleichsetzen: useTaskTracking('Gleichsetzungsverfahren'),
+        addieren: useTaskTracking('Additionsverfahren')
+    };
 
     const generateTask = (m: Method) => {
+        Object.values(trackers).forEach(t => t.onTaskStart());
         setTask(buildTask(m));
         setXInput('');
         setYInput('');
@@ -372,7 +380,9 @@ const Gleichungssysteme: React.FC = () => {
             setFeedback('info');
             return;
         }
-        setFeedback(xVal === task.x && yVal === task.y ? 'correct' : 'incorrect');
+        const isCorrect = xVal === task.x && yVal === task.y;
+        trackers[task.method].onCheck(isCorrect);
+        setFeedback(isCorrect ? 'correct' : 'incorrect');
     };
 
     return (
@@ -477,7 +487,10 @@ const Gleichungssysteme: React.FC = () => {
                                     Prüfen
                                 </button>
                                 <button
-                                    onClick={() => setShowSolution(prev => !prev)}
+                                    onClick={() => {
+                                        if (!showSolution && task) trackers[task.method].onHintShown();
+                                        setShowSolution(prev => !prev);
+                                    }}
                                     className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600"
                                 >
                                     {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
