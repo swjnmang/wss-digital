@@ -7,6 +7,7 @@ interface Tool {
   description: string;
   enabled: boolean;
   path: string;
+  external?: boolean;
 }
 
 const tools: Tool[] = [
@@ -34,6 +35,15 @@ const tools: Tool[] = [
     enabled: false,
     path: '/digitale-bildung/powerpoint',
   },
+  {
+    id: 'ki',
+    title: 'Mit einer KI umgehen',
+    emoji: '🤖',
+    description: 'Den sinnvollen und verantwortungsvollen Umgang mit KI-Assistenten lernen.',
+    enabled: true,
+    path: 'https://haemmo.herrzim.de/',
+    external: true,
+  },
 ];
 
 export default function DigitaleBildungIndex() {
@@ -50,9 +60,21 @@ export default function DigitaleBildungIndex() {
       </header>
 
       <main className="flex-1 w-full max-w-5xl mx-auto p-8 flex items-center justify-center">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
           {tools.map((tool) =>
-            tool.enabled ? (
+            tool.enabled && tool.external ? (
+              <a
+                key={tool.id}
+                href={tool.path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white rounded-xl p-6 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100"
+              >
+                <div className="text-4xl mb-4 text-blue-500">{tool.emoji}</div>
+                <h2 className="text-lg font-semibold mb-2 text-slate-800">{tool.title}</h2>
+                <p className="text-sm text-slate-500 leading-relaxed">{tool.description}</p>
+              </a>
+            ) : tool.enabled ? (
               <Link
                 key={tool.id}
                 to={tool.path}
