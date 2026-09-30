@@ -40,8 +40,7 @@ export default function Home() {
       emoji: '⚙️',
       description: 'Robotik Klasse 10: Grundlagen der Robotik und Automatisierung.',
       enabled: true,
-      path: 'https://rover.herrzim.de/',
-      external: true
+      path: '/robotik'
     },
     {
       id: 'umwelttechnik',
