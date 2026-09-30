@@ -62,8 +62,8 @@ function ValueTable({ f, highlight }: { f: Fn; highlight?: number }) {
 }
 
 function Graph({ f, highlight, size = 240 }: { f: Fn; highlight?: number; size?: number }) {
-  const R = 6 // Achsenbereich -R..R
-  const pad = 14
+  const R = 5 // Achsenbereich -R..R, Schrittweite 1
+  const pad = 20
   const inner = size - 2 * pad
   const sx = (x: number) => pad + ((x + R) / (2 * R)) * inner
   const sy = (y: number) => pad + ((R - y) / (2 * R)) * inner
@@ -85,12 +85,18 @@ function Graph({ f, highlight, size = 240 }: { f: Fn; highlight?: number; size?:
       ))}
       <line x1={pad} y1={sy(0)} x2={pad + inner} y2={sy(0)} stroke="#475569" strokeWidth={1.2} />
       <line x1={sx(0)} y1={pad} x2={sx(0)} y2={pad + inner} stroke="#475569" strokeWidth={1.2} />
-      {[-4, -2, 2, 4].map((t) => (
-        <g key={t} fontSize={9} fill="#64748b">
-          <text x={sx(t)} y={sy(0) + 11} textAnchor="middle">{fmt(t)}</text>
+      <polygon points={`${pad + inner + 4},${sy(0)} ${pad + inner - 3},${sy(0) - 3} ${pad + inner - 3},${sy(0) + 3}`} fill="#475569" />
+      <polygon points={`${sx(0)},${pad - 4} ${sx(0) - 3},${pad + 3} ${sx(0) + 3},${pad + 3}`} fill="#475569" />
+      {ticks.filter((t) => t !== 0).map((t) => (
+        <g key={t} fontSize={size < 250 ? 8 : 10} fill="#64748b">
+          <line x1={sx(t)} y1={sy(0) - 2} x2={sx(t)} y2={sy(0) + 2} stroke="#475569" />
+          <line x1={sx(0) - 2} y1={sy(t)} x2={sx(0) + 2} y2={sy(t)} stroke="#475569" />
+          <text x={sx(t)} y={sy(0) + (size < 250 ? 10 : 12)} textAnchor="middle">{fmt(t)}</text>
           <text x={sx(0) - 4} y={sy(t) + 3} textAnchor="end">{fmt(t)}</text>
         </g>
       ))}
+      <text x={pad + inner + 2} y={sy(0) - 6} fontSize={size < 250 ? 11 : 13} fontStyle="italic" fontWeight={700} fill="#0f172a" textAnchor="end">x</text>
+      <text x={sx(0) + 7} y={pad + 3} fontSize={size < 250 ? 11 : 13} fontStyle="italic" fontWeight={700} fill="#0f172a">y</text>
       <g clipPath={`url(#${clip})`}>
         <line x1={sx(-R)} y1={sy(yOf(f, -R))} x2={sx(R)} y2={sy(yOf(f, R))} stroke="#2563eb" strokeWidth={2.2} />
       </g>
