@@ -1,4 +1,4 @@
-// Anonymer Nachverfolgungsmodus für den Trigonometrie-Bereich.
+// Anonymer Nachverfolgungsmodus (Trigonometrie und Lineare Funktionen).
 // Alle Daten bleiben ausschließlich im Browser (localStorage) - kein Backend,
 // kein Name, keine Klasse. Wird verwendet, wenn Schüler:innen den Modus im
 // Header aktivieren, um am Ende eine Übersicht ihrer Übungssitzung zu erhalten.
@@ -15,7 +15,19 @@ export interface TrackingEntry {
     solved: boolean;
     helpUsed: HelpUsage;
     timestamp: number;
+    // Themenbereich, in dem die Aufgabe bearbeitet wurde (aus der URL abgeleitet).
+    area?: TrackingArea;
 }
+
+export type TrackingArea = 'trigonometrie' | 'lineare_funktionen';
+
+export const TRACKING_AREAS: { area: TrackingArea; path: string; title: string }[] = [
+    { area: 'trigonometrie', path: '/trigonometrie', title: 'Trigonometrie' },
+    { area: 'lineare_funktionen', path: '/lineare_funktionen', title: 'Lineare Funktionen' }
+];
+
+export const getAreaFromPath = (pathname: string): TrackingArea | null =>
+    TRACKING_AREAS.find((a) => pathname.startsWith(a.path))?.area ?? null;
 
 const ACTIVE_KEY = 'trig_tracking_active';
 const LOG_KEY = 'trig_tracking_log';
@@ -58,7 +70,7 @@ export const stopTrackingSession = (): void => {
 export const logTrackingEntry = (entry: Omit<TrackingEntry, 'timestamp'>): void => {
     if (!isTrackingActive()) return;
     const log = getTrackingLog();
-    log.push({ ...entry, timestamp: Date.now() });
+    log.push({ ...entry, area: entry.area ?? getAreaFromPath(window.location.pathname) ?? undefined, timestamp: Date.now() });
     localStorage.setItem(LOG_KEY, JSON.stringify(log));
 };
 

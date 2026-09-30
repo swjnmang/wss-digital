@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getEntryPoints, getTrackingLog, getTrackingScore, getTrackingStartedAt } from '../../utils/tracking';
+import { getEntryPoints, getTrackingLog, getTrackingScore, getTrackingStartedAt, TRACKING_AREAS, TrackingArea } from '../../utils/tracking';
 
 const formatPoints = (points: number) =>
     (Number.isInteger(points) ? String(points) : points.toFixed(1)).replace('.', ',');
@@ -14,8 +14,10 @@ const formatDateTime = (timestamp: number) =>
         minute: '2-digit'
     });
 
-const NachverfolgungBericht: React.FC = () => {
-    const log = getTrackingLog();
+const NachverfolgungBericht: React.FC<{ area?: TrackingArea }> = ({ area = 'trigonometrie' }) => {
+    const areaInfo = TRACKING_AREAS.find((a) => a.area === area)!;
+    // Alte Einträge ohne Bereich stammen aus der Trigonometrie.
+    const log = getTrackingLog().filter((e) => (e.area ?? 'trigonometrie') === area);
     const startedAt = getTrackingStartedAt();
     const { points, maxPoints, percent } = getTrackingScore(log);
 
@@ -23,7 +25,7 @@ const NachverfolgungBericht: React.FC = () => {
         <div className="mx-auto px-4 py-8 max-w-6xl">
             <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
                 <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-bold text-teal-800">Deine Nachverfolgung – Trigonometrie</h1>
+                    <h1 className="text-3xl font-bold text-teal-800">Deine Nachverfolgung – {areaInfo.title}</h1>
                     {startedAt && <p className="text-sm text-gray-500">Sitzung gestartet am {formatDateTime(startedAt)}</p>}
                     <p className="text-sm text-gray-600 max-w-xl mx-auto">
                         Diese Daten bleiben ausschließlich in deinem Browser gespeichert. Es werden keine Namen oder Klassen
@@ -94,7 +96,7 @@ const NachverfolgungBericht: React.FC = () => {
                 )}
 
                 <div className="flex justify-center">
-                    <Link to="/trigonometrie" className="text-[var(--accent)] hover:underline text-sm sm:text-base">
+                    <Link to={areaInfo.path} className="text-[var(--accent)] hover:underline text-sm sm:text-base">
                         <i className="fa-solid fa-arrow-left mr-2"></i>
                         Zurück zur Übersicht
                     </Link>

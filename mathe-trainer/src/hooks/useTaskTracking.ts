@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+    getAreaFromPath,
     HelpUsage,
     isTrackingActive,
     logTrackingEntry,
@@ -15,11 +16,14 @@ export const useTaskTracking = (topic: string) => {
     const firstTryCorrect = useRef(false);
     const helpUsed = useRef<HelpUsage>('none');
     const solved = useRef(false);
+    // Bereich beim Mounten festhalten: beim Verlassen der Seite ist die URL schon eine andere.
+    const area = useRef(getAreaFromPath(window.location.pathname) ?? undefined);
 
     const flush = () => {
         if (attempts.current > 0) {
             logTrackingEntry({
                 topic,
+                area: area.current,
                 attempts: attempts.current,
                 firstTryCorrect: firstTryCorrect.current,
                 solved: solved.current,

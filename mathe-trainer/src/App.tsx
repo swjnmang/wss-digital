@@ -131,7 +131,7 @@ import Stadion from './pages/trigonometrie/anwendungsaufgaben/Stadion';
 import Fussballfeld from './pages/trigonometrie/anwendungsaufgaben/Fussballfeld';
 import Bergbahn from './pages/trigonometrie/anwendungsaufgaben/Bergbahn';
 import NachverfolgungBericht from './pages/trigonometrie/NachverfolgungBericht';
-import { startTrackingSession, stopTrackingSession } from './utils/tracking';
+import { getAreaFromPath, startTrackingSession, stopTrackingSession } from './utils/tracking';
 import { useTrackingSession } from './hooks/useTaskTracking';
 // Daten und Zufall
 import DatenUndZufallIndex from './pages/DatenUndZufallIndex';
@@ -205,7 +205,7 @@ export default function App() {
   const location = useLocation();
   const hideHeader = location.pathname === '/';
   const trackingActive = useTrackingSession();
-  const isTrigonometrieRoute = location.pathname.startsWith('/trigonometrie');
+  const trackingArea = getAreaFromPath(location.pathname);
 
   const handleBack = () => {
     const segments = location.pathname.split('/').filter(Boolean);
@@ -218,7 +218,7 @@ export default function App() {
 
   const handleStopTracking = () => {
     stopTrackingSession();
-    navigate('/trigonometrie/nachverfolgung-bericht');
+    navigate(`/${trackingArea}/nachverfolgung-bericht`);
   };
 
   return (
@@ -243,7 +243,7 @@ export default function App() {
               WSS-Digital
             </a>
           </div>
-          {isTrigonometrieRoute && (
+          {trackingArea && (
             <div className="app-shell flex justify-center mt-2">
               {trackingActive ? (
                 <div className="flex items-center gap-2 text-sm">
@@ -390,7 +390,8 @@ export default function App() {
           <Route path="/trigonometrie/anwendungsaufgaben/stadion" element={<Stadion />} />
           <Route path="/trigonometrie/anwendungsaufgaben/fussballfeld" element={<Fussballfeld />} />
           <Route path="/trigonometrie/anwendungsaufgaben/bergbahn" element={<Bergbahn />} />
-          <Route path="/trigonometrie/nachverfolgung-bericht" element={<NachverfolgungBericht />} />
+          <Route path="/trigonometrie/nachverfolgung-bericht" element={<NachverfolgungBericht area="trigonometrie" />} />
+          <Route path="/lineare_funktionen/nachverfolgung-bericht" element={<NachverfolgungBericht area="lineare_funktionen" />} />
 
           {/* Daten und Zufall */}
           <Route path="/daten-und-zufall" element={<DatenUndZufallIndex />} />
