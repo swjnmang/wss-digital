@@ -2,21 +2,22 @@ import { Link } from 'react-router-dom'
 
 const items = [
   { title: '1. Proportionale Zusammenhänge (Einstieg)', desc: 'Fülle Wertetabellen zu Alltagsbeispielen aus und zeichne die passende Ursprungsgerade - der ideale Einstieg vor den linearen Funktionen.', href: 'proportionale_zusammenhaenge', icon: 'fa-solid fa-compass' },
-  { title: '2. Wertetabelle erstellen und vervollständigen', desc: 'Erstelle Wertetabellen für lineare Funktionen und löse fehlende Werte.', href: 'wertetabelle', icon: 'fa-solid fa-table' },
-  { title: '3. Graph zeichnen', desc: 'Übe das Zeichnen von linearen Funktionen im Koordinatensystem.', href: 'zeichnen', icon: 'fa-solid fa-pencil' },
-  { title: '4. Funktionsgleichung ablesen', desc: 'Lese die Funktionsgleichung direkt aus einem Graphen ab.', href: 'ablesen', icon: 'fa-solid fa-eye' },
-  { title: '5. Steigung berechnen', desc: 'Lerne, die Steigung einer Geraden aus zwei Punkten zu ermitteln.', href: 'steigung_berechnen', icon: 'fa-solid fa-chart-line' },
-  { title: '6. Funktionsgleichung aufstellen', desc: 'Stelle die Gleichung einer Geraden aus gegebenen Informationen auf.', href: 'funktionsgleichung', icon: 'fa-solid fa-pen-ruler' },
-  { title: '7. Punkt auf Gerade prüfen', desc: 'Überprüfe rechnerisch, ob ein Punkt auf einer Geraden liegt.', href: 'punkt_gerade', icon: 'fa-solid fa-magnifying-glass-chart' },
-  { title: '8. Parallele und senkrechte Geraden', desc: 'Erkenne parallele und senkrechte Geraden anhand ihrer Steigung.', href: 'parallel_senkrecht', icon: 'fa-solid fa-lines-leaning' },
-  { title: '9. Nullstellen berechnen', desc: 'Finde den Schnittpunkt einer Geraden mit der x-Achse.', href: 'nullstellen', icon: 'fa-solid fa-arrows-down-to-line' },
-  { title: '10. Schnittpunkt zweier Geraden', desc: 'Berechne den gemeinsamen Schnittpunkt von zwei Geraden.', href: 'schnittpunkt', icon: 'fa-solid fa-arrows-turn-to-dots' },
-  { title: '11. Lineare Gleichungssysteme', desc: 'Löse Gleichungssysteme mit dem Einsetzungs-, Gleichsetzungs- und Additionsverfahren.', href: 'gleichungssysteme', icon: 'fa-solid fa-equals' },
-  { title: '12. Gemischte Übungsaufgaben', desc: 'Gemischte Aufgaben zu allen Themen der linearen Funktionen.', href: 'gemischte-aufgaben', icon: 'fa-solid fa-shuffle' },
-  { title: '13. Spiel: Münzen sammeln', desc: 'Eine spielerische Anwendung zum Thema lineare Funktionen.', href: 'spiel_muenzen', icon: 'fa-solid fa-gamepad' },
-  { title: '14. Anwendungsaufgaben', desc: 'Realistische Aufgaben mit linearen Funktionen aus dem Alltag.', href: 'anwendungsaufgaben', icon: 'fa-solid fa-lightbulb' },
-  { title: '15. Abschlusstest', desc: 'Teste dein Wissen über lineare Funktionen.', href: 'test', icon: 'fa-solid fa-graduation-cap' },
-  { title: '16. Übungsblatt-Generator', desc: 'Stelle dir ein personalisiertes Übungsblatt zusammen und lade es als PDF herunter.', href: 'ubungsblatt-generator', icon: 'fa-solid fa-file-pdf' }
+  { title: '2. Was ist eine lineare Funktion?', desc: 'Verstehe, wie Wertetabelle, Graph und Gleichung zusammengehören, und ordne sie einander zu.', href: 'was_ist_linear', icon: 'fa-solid fa-lightbulb' },
+  { title: '3. Wertetabelle erstellen und vervollständigen', desc: 'Erstelle Wertetabellen für lineare Funktionen und löse fehlende Werte.', href: 'wertetabelle', icon: 'fa-solid fa-table' },
+  { title: '4. Graph zeichnen', desc: 'Übe das Zeichnen von linearen Funktionen im Koordinatensystem.', href: 'zeichnen', icon: 'fa-solid fa-pencil' },
+  { title: '5. Funktionsgleichung ablesen', desc: 'Lese die Funktionsgleichung direkt aus einem Graphen ab.', href: 'ablesen', icon: 'fa-solid fa-eye' },
+  { title: '6. Steigung berechnen', desc: 'Lerne, die Steigung einer Geraden aus zwei Punkten zu ermitteln.', href: 'steigung_berechnen', icon: 'fa-solid fa-chart-line' },
+  { title: '7. Funktionsgleichung aufstellen', desc: 'Stelle die Gleichung einer Geraden aus gegebenen Informationen auf.', href: 'funktionsgleichung', icon: 'fa-solid fa-pen-ruler' },
+  { title: '8. Punkt auf Gerade prüfen', desc: 'Überprüfe rechnerisch, ob ein Punkt auf einer Geraden liegt.', href: 'punkt_gerade', icon: 'fa-solid fa-magnifying-glass-chart' },
+  { title: '9. Parallele und senkrechte Geraden', desc: 'Erkenne parallele und senkrechte Geraden anhand ihrer Steigung.', href: 'parallel_senkrecht', icon: 'fa-solid fa-lines-leaning' },
+  { title: '10. Nullstellen berechnen', desc: 'Finde den Schnittpunkt einer Geraden mit der x-Achse.', href: 'nullstellen', icon: 'fa-solid fa-arrows-down-to-line' },
+  { title: '11. Schnittpunkt zweier Geraden', desc: 'Berechne den gemeinsamen Schnittpunkt von zwei Geraden.', href: 'schnittpunkt', icon: 'fa-solid fa-arrows-turn-to-dots' },
+  { title: '12. Lineare Gleichungssysteme', desc: 'Löse Gleichungssysteme mit dem Einsetzungs-, Gleichsetzungs- und Additionsverfahren.', href: 'gleichungssysteme', icon: 'fa-solid fa-equals' },
+  { title: '13. Gemischte Übungsaufgaben', desc: 'Gemischte Aufgaben zu allen Themen der linearen Funktionen.', href: 'gemischte-aufgaben', icon: 'fa-solid fa-shuffle' },
+  { title: '14. Spiel: Münzen sammeln', desc: 'Eine spielerische Anwendung zum Thema lineare Funktionen.', href: 'spiel_muenzen', icon: 'fa-solid fa-gamepad' },
+  { title: '15. Anwendungsaufgaben', desc: 'Realistische Aufgaben mit linearen Funktionen aus dem Alltag.', href: 'anwendungsaufgaben', icon: 'fa-solid fa-lightbulb' },
+  { title: '16. Abschlusstest', desc: 'Teste dein Wissen über lineare Funktionen.', href: 'test', icon: 'fa-solid fa-graduation-cap' },
+  { title: '17. Übungsblatt-Generator', desc: 'Stelle dir ein personalisiertes Übungsblatt zusammen und lade es als PDF herunter.', href: 'ubungsblatt-generator', icon: 'fa-solid fa-file-pdf' }
 ]
 
 export default function LineareIndex() {
