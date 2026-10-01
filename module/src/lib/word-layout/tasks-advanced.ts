@@ -257,10 +257,10 @@ const daemmung: LayoutTask = {
     },
     {
       title: 'Fließtext: Schrift',
-      target: 'Die drei Textabsätze („Ein schlecht gedämmtes …“, „Der Wärmedurchgangskoeffizient ist …“, „Der U-Wert von einem …“) und die drei U-Werte darunter',
+      target: 'Die drei Textabsätze – „Ein schlecht gedämmtes …“, „Der Wärmedurchgangskoeffizient ist …“ und „Der U-Wert von einem …“',
       instruction: 'Schriftart Arial\nSchriftgröße 10',
       checks: [
-        check('Arial, 10 pt', `Jeden Absatz markieren, dann ${H.font('Arial')}, ${H.size(10)}`, (d) => [...byText(...D_BODY, ...D_LIST)(d), ...D_SECOND(d)], (p) => fontOf(p) === 'Arial' && sizeOf(p) === 10),
+        check('Arial, 10 pt', `Jeden Absatz markieren, dann ${H.font('Arial')}, ${H.size(10)}`, (d) => [...byText(...D_BODY)(d), ...D_SECOND(d)], (p) => fontOf(p) === 'Arial' && sizeOf(p) === 10),
       ],
     },
     {
@@ -292,9 +292,10 @@ const daemmung: LayoutTask = {
     {
       title: 'Aufzählung',
       target: 'Die drei U-Werte – „25 cm Betonwand …“, „24 cm Mauerziegel …“, „20 cm Massivholz …“',
-      instruction: `Aufzählung mit Punkten\nEinzug links 0 cm, hängender Einzug 0,75 cm (${px(0.75)})`,
+      instruction: `Schriftart Arial, Schriftgröße 10\nAufzählung mit Punkten\nEinzug links 0 cm, hängender Einzug 0,75 cm (${px(0.75)})`,
       tools: ['absatz'],
       checks: [
+        check('Arial, 10 pt', `${H.selectLines}, dann ${H.font('Arial')}, ${H.size(10)}`, D_LIST, (p) => fontOf(p) === 'Arial' && sizeOf(p) === 10),
         check('Aufzählung mit Punkten', `${H.selectLines}, dann ${H.bullets}`, D_LIST, (p) => isBulletList(p)),
         check('Hängender Einzug 0,75 cm, links 0', `${H.paragraph} → Links 0, „Hängender Einzug“ ${px(0.75)}`, D_LIST, (p) => near(p.hanging, cmToPx(0.75), 2) && near(p.indentStart ?? 0, 0)),
       ],
