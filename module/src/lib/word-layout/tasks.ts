@@ -12,22 +12,10 @@ import {
   isUnderlined,
   sizeOf,
   type LayoutDocument,
-  type LayoutParagraph,
 } from './grading';
-import type { LayoutCheck, LayoutTask } from './types';
-
-/** Prüfung für einen oder mehrere Absätze (Anfang des Textes identifiziert sie); alle müssen passen. */
-function check(label: string, hint: string, prefixes: string | string[], test: (p: LayoutParagraph, d: LayoutDocument) => boolean): LayoutCheck {
-  const list = Array.isArray(prefixes) ? prefixes : [prefixes];
-  return {
-    label,
-    hint,
-    test: (d) => list.every((prefix) => { const p = d.find(prefix); return !!p && test(p, d); }),
-  };
-}
-
-const isNumberedList = (p: LayoutParagraph) => p.isList && p.listType !== 'BULLET_LIST' && !/CHECK|TASK/i.test(p.listType);
-const isBulletList = (p: LayoutParagraph) => p.isList && p.listType === 'BULLET_LIST';
+import type { LayoutTask } from './types';
+import { check, isBulletList, isNumberedList } from './checks';
+import { ADVANCED_TASKS } from './tasks-advanced';
 
 // ---------- Aufgabe 1: Einladung ----------
 
@@ -322,7 +310,7 @@ const bibliothek: LayoutTask = {
   ],
 };
 
-export const LAYOUT_TASKS: LayoutTask[] = [einladung, formatvorlagen, flyer, tabelle, bibliothek];
+export const LAYOUT_TASKS: LayoutTask[] = [einladung, formatvorlagen, flyer, tabelle, bibliothek, ...ADVANCED_TASKS];
 
 export function getLayoutTask(id: string): LayoutTask | undefined {
   return LAYOUT_TASKS.find((t) => t.id === id);

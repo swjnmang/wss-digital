@@ -17,6 +17,7 @@
     "@univerjs/preset-sheets-filter": "^1.0.1",
     "@univerjs/preset-sheets-sort": "^1.0.1",
     "@univerjs/presets": "^1.0.1",
+    "docx": "^9.8.1",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.0",
     "react": "^19.2.0",

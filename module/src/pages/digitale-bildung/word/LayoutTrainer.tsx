@@ -2,6 +2,58 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { UniverLayoutDoc, type UniverLayoutDocHandle } from '../../../components/word-trainer/UniverLayoutDoc';
 import { LAYOUT_TASKS, getLayoutTask, runLayoutChecks } from '../../../lib/word-layout/tasks';
+import { readLayoutDocument } from '../../../lib/word-layout/grading';
+import type { StudentInfo } from '../../../lib/word-layout/export-pdf';
+
+const STUDENT_KEY = 'wss-word-layout:student';
+
+function loadStudent(): StudentInfo {
+  try {
+    const raw = localStorage.getItem(STUDENT_KEY);
+    if (raw) return { name: '', klasse: '', ...JSON.parse(raw) };
+  } catch {
+    // ohne gespeicherte Angaben weiter
+  }
+  return { name: '', klasse: '' };
+}
+
+function download(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/** Dateiname nach Unterrichtsvorgabe: nachname_aufgabe.docx */
+function fileBase(student: StudentInfo, taskId: string) {
+  const last = student.name.trim().split(/\s+/).pop() ?? '';
+  const clean = (t: string) => t.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/ß/g, 'ss').replace(/[^A-Za-z0-9-]+/g, '_').replace(/^_|_$/g, '');
+  return [clean(last).toLowerCase() || 'dokument', taskId].join('_');
+}
+
+/** Mehrzeilige Vorgaben als Spiegelstriche; eine Einleitung mit Doppelpunkt bleibt davor stehen. */
+function Instruction({ text }: { text: string }) {
+  const lines = text.split('\n');
+  const hasIntro = lines.length === 1 || lines[0].trim().endsWith(':');
+  const first = hasIntro ? lines[0] : null;
+  const rest = hasIntro ? lines.slice(1) : lines;
+  return (
+    <>
+      {first && <p>{first}</p>}
+      {rest.length > 0 && (
+        <ul className="list-disc ml-5 mt-1 space-y-0.5">
+          {rest.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}
 
 const difficultyLabel: Record<string, string> = {
   einfach: 'Einfach',
@@ -18,6 +70,18 @@ export default function LayoutTrainer() {
   const [results, setResults] = useState<StepResult | null>(null);
   const [loadedTaskId, setLoadedTaskId] = useState(taskId);
   const docRef = useRef<UniverLayoutDocHandle>(null);
+  const [restored, setRestored] = useState(false);
+  const [student, setStudent] = useState<StudentInfo>(loadStudent);
+  const [exporting, setExporting] = useState<'docx' | 'pdf' | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STUDENT_KEY, JSON.stringify(student));
+    } catch {
+      // nicht schlimm
+    }
+  }, [student]);
 
   useEffect(() => {
     if (!task) navigate('/digitale-bildung/word/layout', { replace: true });
@@ -32,6 +96,37 @@ export default function LayoutTrainer() {
 
   const taskIndex = LAYOUT_TASKS.findIndex((t) => t.id === task.id);
   const nextTask = LAYOUT_TASKS[taskIndex + 1];
+
+  const handleReset = () => {
+    if (!window.confirm('Alle Änderungen an diesem Dokument verwerfen und neu beginnen?')) return;
+    docRef.current?.reset();
+    setResults(null);
+    setRestored(false);
+  };
+
+  const handleExport = async (kind: 'docx' | 'pdf') => {
+    const data = docRef.current?.save();
+    if (!data) return;
+    setExporting(kind);
+    setExportError(null);
+    try {
+      const base = fileBase(student, task.id);
+      if (kind === 'docx') {
+        const { exportDocx } = await import('../../../lib/word-layout/export-docx');
+        download(await exportDocx(data), `${base}.docx`);
+      } else {
+        const fresh = runLayoutChecks(task, readLayoutDocument(data));
+        setResults(fresh);
+        const { exportPdf } = await import('../../../lib/word-layout/export-pdf');
+        download(await exportPdf(data, task, fresh, student), `${base}.pdf`);
+      }
+    } catch (err) {
+      console.error(err);
+      setExportError('Das Speichern hat leider nicht geklappt. Bitte versuche es noch einmal.');
+    } finally {
+      setExporting(null);
+    }
+  };
 
   const handleCheck = () => {
     const doc = docRef.current?.read();
@@ -80,7 +175,7 @@ export default function LayoutTrainer() {
                   </span>
                   <div className="text-sm text-slate-700">
                     <p className="font-semibold text-slate-800">{step.title}</p>
-                    <p>{step.instruction}</p>
+                    <Instruction text={step.instruction} />
                   </div>
                 </li>
               );
@@ -89,7 +184,17 @@ export default function LayoutTrainer() {
         </div>
 
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <UniverLayoutDoc ref={docRef} task={task} />
+          <div className="flex items-center justify-between gap-3 px-4 py-2 border-b border-slate-200 bg-slate-50 text-xs text-slate-600">
+            <span>
+              {restored
+                ? '💾 Dein letzter Stand wurde wiederhergestellt. Änderungen werden automatisch im Browser gesichert.'
+                : '💾 Änderungen werden automatisch im Browser gesichert.'}
+            </span>
+            <button onClick={handleReset} className="shrink-0 px-3 py-1 rounded-md border border-slate-300 bg-white hover:bg-slate-100 font-semibold">
+              ↺ Neu beginnen
+            </button>
+          </div>
+          <UniverLayoutDoc ref={docRef} task={task} onRestored={setRestored} />
         </div>
 
         <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-4">
@@ -153,6 +258,53 @@ export default function LayoutTrainer() {
             </p>
           </div>
         )}
+
+        <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-4">
+          <p className="text-sm font-semibold text-slate-700 mb-1">📄 Arbeitsnachweis speichern</p>
+          <p className="text-xs text-slate-500 mb-3">
+            Die Word-Datei enthält dein gestaltetes Dokument (zum Weiterbearbeiten in Word). Das PDF enthält zusätzlich ein Deckblatt mit
+            deinem Namen und dem Prüfergebnis – das gibst du deiner Lehrkraft ab.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+            <label className="text-xs font-semibold text-slate-600">
+              Vor- und Nachname
+              <input
+                value={student.name}
+                onChange={(e) => setStudent({ ...student, name: e.target.value })}
+                placeholder="z. B. Lena Huber"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-normal"
+              />
+            </label>
+            <label className="text-xs font-semibold text-slate-600">
+              Klasse
+              <input
+                value={student.klasse}
+                onChange={(e) => setStudent({ ...student, klasse: e.target.value })}
+                placeholder="z. B. 10b"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-normal"
+              />
+            </label>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              onClick={() => handleExport('docx')}
+              disabled={exporting !== null}
+              className="px-4 py-2.5 rounded-lg font-semibold text-sm bg-slate-700 hover:bg-slate-800 disabled:opacity-60 text-white"
+            >
+              {exporting === 'docx' ? 'Wird erstellt …' : '⬇ Als Word-Datei (.docx)'}
+            </button>
+            <button
+              onClick={() => handleExport('pdf')}
+              disabled={exporting !== null || !student.name.trim()}
+              title={!student.name.trim() ? 'Bitte zuerst deinen Namen eintragen' : undefined}
+              className="px-4 py-2.5 rounded-lg font-semibold text-sm bg-red-700 hover:bg-red-800 disabled:opacity-60 text-white"
+            >
+              {exporting === 'pdf' ? 'PDF wird erstellt …' : '⬇ Als PDF mit Prüfergebnis'}
+            </button>
+          </div>
+          {!student.name.trim() && <p className="text-xs text-slate-500 mt-2">Für das PDF bitte zuerst deinen Namen eintragen.</p>}
+          {exportError && <p className="text-xs text-red-700 mt-2">{exportError}</p>}
+        </div>
       </main>
     </div>
   );

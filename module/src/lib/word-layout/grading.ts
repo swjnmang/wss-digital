@@ -1,10 +1,14 @@
 import type { IDocumentData, ITextStyle } from '@univerjs/core';
-import { BooleanNumber, DataStreamTreeTokenType, HorizontalAlign, NamedStyleType } from '@univerjs/core';
+import { BaselineOffset, BooleanNumber, ColumnSeparatorType, DataStreamTreeTokenType, HorizontalAlign, NamedStyleType, SpacingRule } from '@univerjs/core';
 import type { FDocument } from '@univerjs/docs/facade';
 
 /** Gelesener Absatz des Schüler-Dokuments (Text + wirksame Formatierung). */
 export interface LayoutParagraph {
   text: string;
+  /** Position des ersten Textzeichens im dataStream. */
+  start: number;
+  /** Position der Absatzmarke im dataStream. */
+  end: number;
   namedStyle: number;
   align: number;
   isList: boolean;
@@ -12,17 +16,44 @@ export interface LayoutParagraph {
   /** Zeichenformat pro Zeichen (Text ohne Absatzmarke). */
   charStyles: ITextStyle[];
   inTable: boolean;
+  /** Index des Abschnitts (nur Hauptdokument, Tabellenzellen zählen zum umgebenden Abschnitt). */
+  section: number;
+  /** Absatzeinstellungen in px bzw. als Mehrfaches; undefined = nicht gesetzt. */
+  lineSpacing?: number;
+  spacingRule: number;
+  spaceAbove?: number;
+  spaceBelow?: number;
+  indentStart?: number;
+  indentFirstLine?: number;
+  hanging?: number;
+}
+
+export interface LayoutSection {
+  columns: number;
+  /** Spaltenabstand in px. */
+  gap: number;
+  separator: boolean;
+  /** Seitenränder in px (Abschnitt oder – falls nicht gesetzt – Dokument). */
+  margins: { top: number; bottom: number; left: number; right: number };
 }
 
 export interface LayoutDocument {
   paragraphs: LayoutParagraph[];
-  tables: { rows: number; cols: number }[];
+  tables: { rows: number; cols: number; cells: (LayoutParagraph | undefined)[][] }[];
+  sections: LayoutSection[];
+  headerText: string;
+  footerText: string;
   defaults: ITextStyle;
+  /** Kompletter Text inkl. Steuerzeichen (z. B. \v = Spaltenumbruch). */
+  stream: string;
   /** Findet den Absatz, dessen Text mit `prefix` beginnt (mit "=" am Anfang: exakt gleich). */
   find: (prefix: string) => LayoutParagraph | undefined;
 }
 
 const T = DataStreamTreeTokenType;
+
+const num = (v: { v: number } | number | undefined) => (v == null ? undefined : typeof v === 'number' ? v : v.v);
+const cleanText = (stream: string) => [...stream].map((c) => (c.charCodeAt(0) < 32 ? ' ' : c)).join('').replace(/\s+/g, ' ').trim();
 
 export function readLayoutDocument(data: IDocumentData): LayoutDocument {
   const body = data.body;
@@ -31,6 +62,29 @@ export function readLayoutDocument(data: IDocumentData): LayoutDocument {
   const runs = body?.textRuns ?? [];
   const defaults: ITextStyle = data.documentStyle?.textStyle ?? {};
   const tables = body?.tables ?? [];
+  const docStyle = data.documentStyle ?? {};
+  const inAnyTable = (i: number) => tables.some((t) => i >= t.startIndex && i < t.endIndex);
+
+  // Abschnittsumbrüche in Tabellenzellen gehören nicht zur Seitengliederung
+  const mainBreaks = (body?.sectionBreaks ?? []).filter((s) => !inAnyTable(s.startIndex));
+  const sections: LayoutSection[] = mainBreaks.map((s) => {
+    const cols = s.columnProperties ?? [];
+    return {
+      columns: Math.max(1, cols.length),
+      gap: cols.length > 1 ? cols[0].paddingEnd : 0,
+      separator: s.columnSeparatorType === ColumnSeparatorType.BETWEEN_EACH_COLUMN,
+      margins: {
+        top: s.marginTop ?? docStyle.marginTop ?? 0,
+        bottom: s.marginBottom ?? docStyle.marginBottom ?? 0,
+        left: s.marginLeft ?? docStyle.marginLeft ?? 0,
+        right: s.marginRight ?? docStyle.marginRight ?? 0,
+      },
+    };
+  });
+  const sectionOf = (index: number) => {
+    const i = mainBreaks.findIndex((s) => s.startIndex >= index);
+    return i === -1 ? Math.max(0, mainBreaks.length - 1) : i;
+  };
 
   const paragraphs: LayoutParagraph[] = [];
   let prevEnd = -1;
@@ -38,7 +92,7 @@ export function readLayoutDocument(data: IDocumentData): LayoutDocument {
     const start = prevEnd + 1;
     const end = p.startIndex;
     prevEnd = end;
-    // Steuerzeichen (Tabellen-/Zellgrenzen) gehören nicht zum Text
+    // Steuerzeichen (Tabellen-/Zellgrenzen, Abschnitts- und Spaltenumbrüche) gehören nicht zum Text
     let textStart = start;
     while (textStart < end && stream.charCodeAt(textStart) < 32) textStart += 1;
     const text = stream.slice(textStart, end);
@@ -47,29 +101,62 @@ export function readLayoutDocument(data: IDocumentData): LayoutDocument {
       const run = runs.find((r) => r.st <= i && i < r.ed);
       charStyles.push({ ...defaults, ...(run?.ts ?? {}) });
     }
-    const inTable = tables.some((t) => textStart >= t.startIndex && textStart < t.endIndex);
+    const ps = p.paragraphStyle ?? {};
     paragraphs.push({
       text,
-      namedStyle: p.paragraphStyle?.namedStyleType ?? NamedStyleType.NORMAL_TEXT,
-      align: p.paragraphStyle?.horizontalAlign ?? HorizontalAlign.UNSPECIFIED,
+      start: textStart,
+      end,
+      namedStyle: ps.namedStyleType ?? NamedStyleType.NORMAL_TEXT,
+      align: ps.horizontalAlign ?? HorizontalAlign.UNSPECIFIED,
       isList: !!p.bullet,
       listType: p.bullet?.listType ?? '',
       charStyles,
-      inTable,
+      inTable: inAnyTable(textStart),
+      section: sectionOf(end),
+      lineSpacing: ps.lineSpacing,
+      spacingRule: ps.spacingRule ?? SpacingRule.AUTO,
+      spaceAbove: num(ps.spaceAbove),
+      spaceBelow: num(ps.spaceBelow),
+      indentStart: num(ps.indentStart),
+      indentFirstLine: num(ps.indentFirstLine),
+      hanging: num(ps.hanging),
     });
   }
 
+  const byEnd = new Map(paragraphs.map((p) => [p.end, p]));
   const tableInfos = tables.map((t) => {
-    const part = stream.slice(t.startIndex, t.endIndex);
-    const rows = [...part].filter((c) => c === T.TABLE_ROW_START).length;
-    const cells = [...part].filter((c) => c === T.TABLE_CELL_START).length;
-    return { rows, cols: rows > 0 ? Math.round(cells / rows) : 0 };
+    // Zellen über die Steuerzeichen zuordnen: jeweils der erste Absatz einer Zelle
+    const cells: (LayoutParagraph | undefined)[][] = [];
+    let row = -1;
+    let col = -1;
+    let cellHasParagraph = false;
+    for (let i = t.startIndex; i < t.endIndex; i++) {
+      const c = stream[i];
+      if (c === T.TABLE_ROW_START) {
+        row += 1;
+        col = -1;
+        cells[row] = [];
+      } else if (c === T.TABLE_CELL_START) {
+        col += 1;
+        cellHasParagraph = false;
+      } else if (c === T.PARAGRAPH && row >= 0 && col >= 0 && !cellHasParagraph) {
+        cells[row][col] = byEnd.get(i);
+        cellHasParagraph = true;
+      }
+    }
+    const rows = cells.length;
+    const cols = rows > 0 ? Math.round(cells.reduce((n, r) => n + r.length, 0) / rows) : 0;
+    return { rows, cols, cells };
   });
 
   return {
     paragraphs,
     tables: tableInfos,
+    sections,
+    headerText: Object.values(data.headers ?? {}).map((h) => cleanText(h.body?.dataStream ?? '')).join(' ').trim(),
+    footerText: Object.values(data.footers ?? {}).map((f) => cleanText(f.body?.dataStream ?? '')).join(' ').trim(),
     defaults,
+    stream,
     // "=Text" verlangt einen exakten Treffer (z. B. für Tabellenzellen), sonst zählt der Textanfang
     find: (prefix) =>
       prefix.startsWith('=')
@@ -87,7 +174,11 @@ export function readFromFDocument(fDocument: FDocument): LayoutDocument {
 /** Wert einer Zeicheneigenschaft, sofern er im ganzen Absatz einheitlich ist. */
 function uniform<K extends keyof ITextStyle>(p: LayoutParagraph | undefined, key: K): ITextStyle[K] | undefined | 'mixed' {
   if (!p) return undefined;
-  const vals = p.charStyles.filter((_, i) => p.text[i]?.trim()).map((s) => JSON.stringify(s[key] ?? null));
+  // Hoch-/tiefgestellte Zeichen (Fußnotenzeichen, m²) zählen bei Schriftart und -größe nicht mit
+  const ignoreScript = key === 'ff' || key === 'fs';
+  const vals = p.charStyles
+    .filter((s, i) => p.text[i]?.trim() && !(ignoreScript && s.va != null && s.va !== BaselineOffset.NORMAL))
+    .map((s) => JSON.stringify(s[key] ?? null));
   if (vals.length === 0) return undefined;
   return vals.every((v) => v === vals[0]) ? (JSON.parse(vals[0]) ?? undefined) : 'mixed';
 }
@@ -148,3 +239,37 @@ export function colorFamily(hex?: string): ColorFamily {
   return 'other';
 }
 export const colorIs = (p: LayoutParagraph | undefined, fam: ColorFamily) => colorFamily(rgbOf(p)) === fam;
+
+// ---------- Absatz, Seite, Abschnitte ----------
+
+/** Vergleich von px-Werten mit kleiner Toleranz (Eingaben werden teils gerundet). */
+export const near = (value: number | undefined, target: number, tolerance = 1.5) => value != null && Math.abs(value - target) <= tolerance;
+
+/** Zeilenabstand als Mehrfaches (z. B. 1,5 Zeilen). */
+export const lineSpacingIs = (p: LayoutParagraph | undefined, multiple: number) =>
+  !!p && p.spacingRule === SpacingRule.AUTO && p.lineSpacing != null && Math.abs(p.lineSpacing - multiple) < 0.01;
+
+/** Zeichenformat an einer Stelle: `offset` Zeichen nach dem Beginn von `needle` im Absatz. */
+export function styleAt(p: LayoutParagraph | undefined, needle: string, offset = 0): ITextStyle | undefined {
+  if (!p) return undefined;
+  const i = p.text.indexOf(needle);
+  return i === -1 ? undefined : p.charStyles[i + offset];
+}
+
+export const isSuperscript = (ts?: ITextStyle) => ts?.va === BaselineOffset.SUPERSCRIPT;
+
+/** Steht direkt vor `phrase` (Leerzeichen ignoriert) ein manueller Spaltenumbruch? */
+export function columnBreakBefore(doc: LayoutDocument, phrase: string): boolean {
+  const i = doc.stream.indexOf(phrase);
+  if (i <= 0) return false;
+  let j = i - 1;
+  while (j >= 0 && doc.stream[j] === ' ') j -= 1;
+  return doc.stream[j] === T.COLUMN_BREAK;
+}
+
+/** Datum im Format TT.MM.JJ bzw. TT.MM.JJJJ. */
+export const containsDate = (text: string) => /\b\d{1,2}\.\d{1,2}\.(\d{4}|\d{2})\b/.test(text);
+
+/** Mindestens Vorname, Nachname und Klasse (drei Wörter neben dem Datum). */
+export const containsNameAndClass = (text: string) =>
+  text.replace(/\b\d{1,2}\.\d{1,2}\.(\d{4}|\d{2})\b/g, ' ').split(/[\s,;|·/-]+/).filter((w) => /[\p{L}\d]/u.test(w)).length >= 3;

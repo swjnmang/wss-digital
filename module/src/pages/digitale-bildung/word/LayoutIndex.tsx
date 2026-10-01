@@ -9,6 +9,18 @@ const difficultyLabel: Record<string, string> = {
 
 export default function LayoutIndex() {
   const navigate = useNavigate();
+  const groups = [
+    {
+      title: 'Grundlagen',
+      text: 'Schritt für Schritt: Zeichen-, Absatz- und Seitenformatierung kennenlernen.',
+      tasks: LAYOUT_TASKS.filter((t) => t.kind !== 'projekt'),
+    },
+    {
+      title: 'Projektaufgaben wie im Unterricht',
+      text: 'Umfangreiche Arbeitsaufträge mit knappen Vorgaben – Kopf-/Fußzeile, Seitenränder, Spalten, Einzüge, Tabelle und Fußnote.',
+      tasks: LAYOUT_TASKS.filter((t) => t.kind === 'projekt'),
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -28,26 +40,40 @@ export default function LayoutIndex() {
           <p className="font-semibold mb-1">📖 Kurz erklärt</p>
           <p>
             Der Text ist jeweils schon vorgegeben. Deine Aufgabe ist es, ihn direkt im Word-Editor zu gestalten:
-            Schriftart und -größe, Farben, Ausrichtung, Überschriften, Listen und Tabellen. Mit „Prüfen“ siehst du,
-            welche Arbeitsaufträge schon erfüllt sind.
+            Schriftart und -größe, Farben, Ausrichtung, Überschriften, Listen, Tabellen, Absatzabstände, Seitenränder und
+            Spalten. Mit „Prüfen“ siehst du, welche Arbeitsaufträge schon erfüllt sind. Am Ende speicherst du dein Ergebnis
+            als Word-Datei oder als PDF-Arbeitsnachweis für deine Lehrkraft. Dein Zwischenstand bleibt im Browser erhalten.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {LAYOUT_TASKS.map((task, index) => (
-            <button
-              key={task.id}
-              onClick={() => navigate(`/digitale-bildung/word/layout/${task.id}`)}
-              className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 text-left hover:-translate-y-0.5 hover:shadow-md transition-all"
-            >
-              <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-600 bg-blue-50 rounded-full px-2 py-1 mb-2">
-                {index + 1} · {difficultyLabel[task.difficulty] ?? task.difficulty}
-              </span>
-              <h3 className="text-base font-bold text-slate-800 mb-1">{task.title}</h3>
-              <p className="text-sm text-slate-500">{task.intro}</p>
-            </button>
-          ))}
-        </div>
+        {groups.map((group) => (
+          <section key={group.title} className="flex flex-col gap-3">
+            <div>
+              <h2 className="text-lg font-bold text-slate-800">{group.title}</h2>
+              <p className="text-sm text-slate-500">{group.text}</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {group.tasks.map((task) => (
+                <button
+                  key={task.id}
+                  onClick={() => navigate(`/digitale-bildung/word/layout/${task.id}`)}
+                  className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 text-left flex flex-col items-start justify-start hover:-translate-y-0.5 hover:shadow-md transition-all"
+                >
+                  <span
+                    className={`inline-block text-xs font-semibold uppercase tracking-wide rounded-full px-2 py-1 mb-2 ${
+                      task.kind === 'projekt' ? 'text-red-700 bg-red-50' : 'text-blue-600 bg-blue-50'
+                    }`}
+                  >
+                    {LAYOUT_TASKS.indexOf(task) + 1} · {difficultyLabel[task.difficulty] ?? task.difficulty}
+                  </span>
+                  <h3 className="text-base font-bold text-slate-800 mb-1">{task.title}</h3>
+                  <p className="text-sm text-slate-500">{task.intro}</p>
+                  <p className="text-xs text-slate-400 mt-2">{task.steps.reduce((n, st) => n + st.checks.length, 0)} Vorgaben</p>
+                </button>
+              ))}
+            </div>
+          </section>
+        ))}
       </main>
     </div>
   );
