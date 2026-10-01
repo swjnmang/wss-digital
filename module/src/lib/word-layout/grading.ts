@@ -52,6 +52,14 @@ export interface LayoutDocument {
 
 const T = DataStreamTreeTokenType;
 
+/** Vergleichstext: Groß-/Kleinschreibung und Mehrfach-Leerzeichen spielen keine Rolle. */
+const normText = (t: string) => t.replace(/[\u00a0\s]+/g, ' ').trim().toLowerCase();
+/** Exakter Zelltext, tolerant gegenüber Leerzeichen und abschließendem Punkt (z. B. „15 Min“ = „15 Min.“). */
+const sameText = (a: string, b: string) => {
+  const k = (t: string) => normText(t).replace(/\s+/g, '').replace(/\.+$/, '');
+  return k(a) === k(b);
+};
+
 const num = (v: { v: number } | number | undefined) => (v == null ? undefined : typeof v === 'number' ? v : v.v);
 const cleanText = (stream: string) => [...stream].map((c) => (c.charCodeAt(0) < 32 ? ' ' : c)).join('').replace(/\s+/g, ' ').trim();
 
@@ -160,8 +168,8 @@ export function readLayoutDocument(data: IDocumentData): LayoutDocument {
     // "=Text" verlangt einen exakten Treffer (z. B. für Tabellenzellen), sonst zählt der Textanfang
     find: (prefix) =>
       prefix.startsWith('=')
-        ? paragraphs.find((p) => p.text.trim() === prefix.slice(1).trim())
-        : paragraphs.find((p) => p.text.trim().startsWith(prefix.trim())),
+        ? paragraphs.find((p) => sameText(p.text, prefix.slice(1)))
+        : paragraphs.find((p) => normText(p.text).startsWith(normText(prefix))),
   };
 }
 
@@ -213,12 +221,33 @@ export function hexToRgb(hex: string): [number, number, number] | null {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
-export type ColorFamily = 'red' | 'blue' | 'green' | 'orange' | 'yellow' | 'gray' | 'black' | 'other';
+export type ColorFamily = 'red' | 'blue' | 'green' | 'orange' | 'yellow' | 'gray' | 'black' | 'purple' | 'teal' | 'pink' | 'other';
 
-/** Ordnet eine Farbe grob einer Farbfamilie zu, damit jede passende Palettenfarbe akzeptiert wird. */
+// Farbpalette des Univer-Editors: Spalten von links nach rechts, Zeilen von hell nach dunkel
+const PALETTE_COLUMNS: [ColorFamily, string[]][] = [
+  ['gray', ['#CDD0D8', '#979DAC', '#414657']],
+  ['blue', ['#E1EFFE', '#A4CAFE', '#3F83F8', '#1A56DB', '#233876']],
+  ['red', ['#FDE8E8', '#F8B4B4', '#F05252', '#C81E1E', '#771D1D']],
+  ['orange', ['#FEECDC', '#FDBA8C', '#FF5A1F', '#B43403', '#8A2C0D']],
+  ['yellow', ['#FFF4B9', '#FAC815', '#D49D0F', '#9A6D15', '#634312']],
+  ['green', ['#DEF7EC', '#84E1BC', '#0DA471', '#046C4E', '#014737']],
+  ['teal', ['#D5F5F6', '#7EDCE2', '#0694A2', '#036672', '#014451']],
+  ['purple', ['#EDEBFE', '#CABFFD', '#9061F9', '#6C2BD9', '#4A1D96']],
+  ['pink', ['#FCE8F3', '#F8B4D9', '#E74694', '#BF125D', '#751A3D']],
+  ['black', ['#000000']],
+];
+const PALETTE = new Map(PALETTE_COLUMNS.flatMap(([fam, colors]) => colors.map((c) => [c, fam] as const)));
+
+/**
+ * Ordnet eine Farbe einer Farbfamilie zu, damit jeder Farbton der passenden Palettenspalte akzeptiert wird.
+ * Palettenfarben werden über ihre Spalte erkannt, andere Farben (z. B. aus Word) über den Farbton.
+ */
 export function colorFamily(hex?: string): ColorFamily {
   const c = hex ? hexToRgb(hex) : null;
   if (!c) return 'black';
+  const key = '#' + c.map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+  const known = PALETTE.get(key);
+  if (known) return known;
   const [r, g, b] = c.map((v) => v / 255);
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);
@@ -226,17 +255,27 @@ export function colorFamily(hex?: string): ColorFamily {
   const d = max - min;
   if (l < 0.1) return 'black';
   const sat = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
-  if (sat < 0.2) return l > 0.9 ? 'other' : 'gray';
+  if (sat < 0.2) return l > 0.93 ? 'other' : 'gray';
   let h: number;
   if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
   else if (max === g) h = ((b - r) / d + 2) * 60;
   else h = ((r - g) / d + 4) * 60;
-  if (h < 15 || h >= 340) return 'red';
-  if (h < 45) return 'orange';
+  if (h < 12 || h >= 345) return 'red';
+  if (h < 38) return 'orange';
   if (h < 70) return 'yellow';
-  if (h < 175) return 'green';
-  if (h >= 200 && h < 260) return 'blue';
-  return 'other';
+  if (h < 170) return 'green';
+  if (h < 200) return 'teal';
+  if (h < 250) return 'blue';
+  if (h < 290) return 'purple';
+  return 'pink';
+}
+
+/** Dunkle Farbe (z. B. „dunkelrot“): eine der beiden untersten Palettenzeilen bzw. geringe Helligkeit. */
+export function isDarkColor(hex?: string): boolean {
+  const c = hex ? hexToRgb(hex) : null;
+  if (!c) return false;
+  const l = (Math.max(...c) + Math.min(...c)) / 2 / 255;
+  return l < 0.42;
 }
 export const colorIs = (p: LayoutParagraph | undefined, fam: ColorFamily) => colorFamily(rgbOf(p)) === fam;
 

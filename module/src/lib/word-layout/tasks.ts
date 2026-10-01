@@ -14,7 +14,7 @@ import {
   type LayoutDocument,
 } from './grading';
 import type { LayoutTask } from './types';
-import { check, isBulletList, isNumberedList } from './checks';
+import { check, H, isBulletList, isNumberedList, PALETTE_COLUMN } from './checks';
 import { ADVANCED_TASKS } from './tasks-advanced';
 
 // ---------- Aufgabe 1: Einladung ----------
@@ -24,7 +24,8 @@ const einladung: LayoutTask = {
   title: 'Einladung zum Sommerfest',
   difficulty: 'einfach',
   intro: 'Schriftgröße, Farbe, Ausrichtung und Aufzählung – die Grundlagen der Textformatierung.',
-  auftrag: 'Die Schülervertretung hat eine Einladung zum Sommerfest geschrieben. Der Text steht bereits im Dokument, er sieht aber noch unfertig aus. Gestalte die Einladung nach den Arbeitsaufträgen. Markiere dazu jeweils den Absatz (Dreifachklick) und nutze die Werkzeuge der Start-Leiste. Mehrere Zeilen markierst du, indem du mit gedrückter Maustaste von vor der ersten bis hinter die letzte Zeile ziehst.',
+  auftrag:
+    'Die Schülervertretung hat eine Einladung zum Sommerfest geschrieben. Der Text steht schon im Dokument, sieht aber noch unfertig aus. Gestalte ihn Auftrag für Auftrag. Markiere immer zuerst den Text und wähle dann das Werkzeug.',
   paragraphs: [
     { text: 'Einladung zum Sommerfest' },
     { text: 'Samstag, 12. Juli 2026, ab 15 Uhr · Schulhof der WSS' },
@@ -37,46 +38,56 @@ const einladung: LayoutTask = {
   ],
   steps: [
     {
-      title: 'Überschrift',
-      instruction: 'Die Überschrift „Einladung zum Sommerfest“ soll zentriert, fett, in Schriftgröße 24 und in blauer Schriftfarbe erscheinen.',
+      title: 'Überschrift: Größe und Fettdruck',
+      target: '1. Zeile – „Einladung zum Sommerfest“',
+      instruction: 'Schriftgröße 24\nFett',
       checks: [
-        check('Überschrift zentriert', 'Start → Ausrichtung (Symbol mit Linien) → Zentriert', 'Einladung zum', (p) => isCentered(p)),
-        check('Überschrift fett', 'Start → „B“', 'Einladung zum', (p) => isBold(p)),
-        check('Schriftgröße 24', 'Start → Schriftgröße', 'Einladung zum', (p) => sizeOf(p) === 24),
-        check('Schriftfarbe blau', 'Start → Schriftfarbe („A“ mit Farbbalken) → Blau', 'Einladung zum', (p) => colorIs(p, 'blue')),
+        check('Schriftgröße 24', `${H.selectLine}, dann ${H.size(24)}`, 'Einladung zum', (p) => sizeOf(p) === 24),
+        check('Fett', `${H.selectLine}, dann ${H.bold}`, 'Einladung zum', (p) => isBold(p)),
+      ],
+    },
+    {
+      title: 'Überschrift: Ausrichtung und Farbe',
+      target: '1. Zeile – „Einladung zum Sommerfest“',
+      instruction: 'Zentriert\nSchriftfarbe Blau (Farbpalette: 2. Spalte, beliebiger Farbton)',
+      checks: [
+        check('Zentriert', H.align('Zentriert'), 'Einladung zum', (p) => isCentered(p)),
+        check('Schriftfarbe Blau', `${H.selectLine}, dann ${H.color('Blau', PALETTE_COLUMN.blau)}`, 'Einladung zum', (p) => colorIs(p, 'blue')),
       ],
     },
     {
       title: 'Datumszeile',
-      instruction: 'Die Zeile mit Datum und Ort soll rechtsbündig und kursiv sein.',
+      target: '2. Zeile – „Samstag, 12. Juli 2026, ab 15 Uhr …“',
+      instruction: 'Rechtsbündig\nKursiv',
       checks: [
-        check('Datumszeile rechtsbündig', 'Start → Ausrichtung → Rechtsbündig', 'Samstag, 12. Juli', (p) => isRight(p)),
-        check('Datumszeile kursiv', 'Start → „I“', 'Samstag, 12. Juli', (p) => isItalic(p)),
+        check('Rechtsbündig', H.align('Rechtsbündig'), 'Samstag, 12. Juli', (p) => isRight(p)),
+        check('Kursiv', `${H.selectLine}, dann ${H.italic}`, 'Samstag, 12. Juli', (p) => isItalic(p)),
       ],
     },
     {
       title: 'Fließtext',
-      instruction: 'Beide Absätze des Fließtexts („Liebe Schülerinnen …“ und „Für das leibliche Wohl …“) erhalten die Schriftart Verdana, Schriftgröße 10 und Blocksatz.',
+      target: '3. und 4. Absatz – „Liebe Schülerinnen …“ bis „… Klassenkasse zugute.“',
+      instruction: 'Schriftart Verdana\nSchriftgröße 10\nBlocksatz',
       checks: [
-        check('Schriftart Verdana', 'Start → Schriftart-Liste', ['Liebe Schülerinnen', 'Für das leibliche'], (p) => fontOf(p) === 'Verdana'),
-        check('Schriftgröße 10', 'Start → Schriftgröße', ['Liebe Schülerinnen', 'Für das leibliche'], (p) => sizeOf(p) === 10),
-        check('Blocksatz', 'Start → Ausrichtung → Blocksatz', ['Liebe Schülerinnen', 'Für das leibliche'], (p) => isJustified(p)),
+        check('Schriftart Verdana', `${H.selectLines}, dann ${H.font('Verdana')}`, ['Liebe Schülerinnen', 'Für das leibliche'], (p) => fontOf(p) === 'Verdana'),
+        check('Schriftgröße 10', `${H.selectLines}, dann ${H.size(10)}`, ['Liebe Schülerinnen', 'Für das leibliche'], (p) => sizeOf(p) === 10),
+        check('Blocksatz', H.align('Blocksatz'), ['Liebe Schülerinnen', 'Für das leibliche'], (p) => isJustified(p)),
       ],
     },
     {
       title: 'Aufzählung',
-      instruction: 'Die drei Stichpunkte (Kuchenbuffet, Spiele, Live-Musik) sollen als Aufzählung mit Aufzählungszeichen dargestellt werden. Markiere alle drei Zeilen gemeinsam (mit gedrückter Maustaste ziehen).',
-      checks: [
-        check('Aufzählungszeichen aktiv', 'Start → Liste mit Punkten (Aufzählung)', ['Kuchenbuffet', 'Spiele und', 'Live-Musik'], (p) => isBulletList(p)),
-      ],
+      target: '5. bis 7. Zeile – „Kuchenbuffet …“, „Spiele und Wettbewerbe …“, „Live-Musik …“',
+      instruction: 'Alle drei Zeilen als Aufzählung mit Punkten',
+      checks: [check('Aufzählung mit Punkten', `${H.selectLines}, dann ${H.bullets}`, ['Kuchenbuffet', 'Spiele und', 'Live-Musik'], (p) => isBulletList(p))],
     },
     {
-      title: 'Hervorhebung',
-      instruction: 'Der letzte Satz („Anmeldung bis …“) soll auffallen: rote Schriftfarbe, fett und gelb hinterlegt (Texthervorhebung).',
+      title: 'Hinweis hervorheben',
+      target: 'Letzte Zeile – „Anmeldung bis zum 1. Juli im Sekretariat!“',
+      instruction: 'Fett\nSchriftfarbe Rot (Farbpalette: 3. Spalte)\nGelb hinterlegt (Texthintergrundfarbe, 5. Spalte)',
       checks: [
-        check('Schriftfarbe rot', 'Start → Schriftfarbe → Rot', 'Anmeldung bis', (p) => colorIs(p, 'red')),
-        check('Letzter Satz fett', 'Start → „B“', 'Anmeldung bis', (p) => isBold(p)),
-        check('Gelb hinterlegt', 'Start → Texthervorhebung (Farbeimer) → Gelb', 'Anmeldung bis', (p) => colorFamily(highlightOf(p)) === 'yellow'),
+        check('Fett', `${H.selectLine}, dann ${H.bold}`, 'Anmeldung bis', (p) => isBold(p)),
+        check('Schriftfarbe Rot', H.color('Rot', PALETTE_COLUMN.rot), 'Anmeldung bis', (p) => colorIs(p, 'red')),
+        check('Gelb hinterlegt', H.highlight('Gelb', PALETTE_COLUMN.gelb), 'Anmeldung bis', (p) => colorFamily(highlightOf(p)) === 'yellow'),
       ],
     },
   ],
@@ -89,7 +100,8 @@ const formatvorlagen: LayoutTask = {
   title: 'Formatvorlagen: Praktikumsleitfaden',
   difficulty: 'einfach',
   intro: 'Titel, Überschriften und Nummerierung mit Formatvorlagen statt von Hand gestalten.',
-  auftrag: 'Du gestaltest einen Leitfaden für Praktikantinnen und Praktikanten. In Word nutzt man für Titel und Überschriften Formatvorlagen – so sieht das Dokument einheitlich aus und hat eine klare Gliederung. Die Formatvorlagen findest du links neben der Schriftgröße (dort steht „Normal“).',
+  auftrag:
+    'Du gestaltest einen Leitfaden für Praktikantinnen und Praktikanten. In Word nutzt man für Titel und Überschriften Formatvorlagen – so sieht das Dokument einheitlich aus und hat eine klare Gliederung. Die Formatvorlagen findest du in der Start-Leiste im Feld „Normal“.',
   paragraphs: [
     { text: 'Praktikum in der Verbraucherzentrale' },
     { text: 'Ein Leitfaden für Schülerinnen und Schüler' },
@@ -107,35 +119,46 @@ const formatvorlagen: LayoutTask = {
   ],
   steps: [
     {
-      title: 'Titel und Untertitel',
-      instruction: 'Weise der ersten Zeile die Formatvorlage „Titel“ und der zweiten Zeile die Formatvorlage „Untertitel“ zu. Beide Zeilen sollen zentriert sein.',
+      title: 'Titel',
+      target: '1. Zeile – „Praktikum in der Verbraucherzentrale“',
+      instruction: 'Formatvorlage „Titel“\nZentriert',
       checks: [
-        check('Formatvorlage „Titel“', 'Start → Formatvorlage („Normal“) → Titel', 'Praktikum in der', (p) => p.namedStyle === NamedStyleType.TITLE),
-        check('Formatvorlage „Untertitel“', 'Start → Formatvorlage → Untertitel', 'Ein Leitfaden', (p) => p.namedStyle === NamedStyleType.SUBTITLE),
-        check('Titel und Untertitel zentriert', 'Start → Ausrichtung → Zentriert', ['Praktikum in der', 'Ein Leitfaden'], (p) => isCentered(p)),
+        check('Formatvorlage „Titel“', `Cursor in die Zeile setzen, dann ${H.style('Titel')}`, 'Praktikum in der', (p) => p.namedStyle === NamedStyleType.TITLE),
+        check('Zentriert', H.align('Zentriert'), 'Praktikum in der', (p) => isCentered(p)),
       ],
     },
     {
-      title: 'Überschriften',
-      instruction: 'Die Zeilen „Vor dem Praktikum“ und „Während des Praktikums“ sind Hauptüberschriften (Formatvorlage „Überschrift 1“). „Bewerbung“ und „Vorbereitung“ sind Unterpunkte (Formatvorlage „Überschrift 2“).',
+      title: 'Untertitel',
+      target: '2. Zeile – „Ein Leitfaden für Schülerinnen und Schüler“',
+      instruction: 'Formatvorlage „Untertitel“\nZentriert',
       checks: [
-        check('Hauptüberschriften = Überschrift 1', 'Start → Formatvorlage → Überschrift 1', ['Vor dem Praktikum', 'Während des Praktikums'], (p) => p.namedStyle === NamedStyleType.HEADING_1),
-        check('Unterpunkte = Überschrift 2', 'Start → Formatvorlage → Überschrift 2', ['Bewerbung', 'Vorbereitung'], (p) => p.namedStyle === NamedStyleType.HEADING_2),
+        check('Formatvorlage „Untertitel“', H.style('Untertitel'), 'Ein Leitfaden', (p) => p.namedStyle === NamedStyleType.SUBTITLE),
+        check('Zentriert', H.align('Zentriert'), 'Ein Leitfaden', (p) => isCentered(p)),
       ],
     },
     {
-      title: 'Nummerierung',
-      instruction: 'Die drei Schritte am Ende („Pünktlich ankommen“, „Aufgaben notieren“, „Fragen stellen“) sollen als nummerierte Liste (1., 2., 3.) erscheinen.',
-      checks: [
-        check('Nummerierte Liste', 'Start → Liste mit Zahlen (Nummerierung)', ['Pünktlich ankommen', 'Aufgaben notieren', 'Fragen stellen'], (p) => isNumberedList(p)),
-      ],
+      title: 'Hauptüberschriften',
+      target: '„Vor dem Praktikum“ (3. Zeile) und „Während des Praktikums“ (9. Zeile)',
+      instruction: 'Beide Zeilen: Formatvorlage „Überschrift 1“',
+      checks: [check('Formatvorlage „Überschrift 1“', H.style('Überschrift 1'), ['=Vor dem Praktikum', '=Während des Praktikums'], (p) => p.namedStyle === NamedStyleType.HEADING_1)],
+    },
+    {
+      title: 'Unterüberschriften',
+      target: '„Bewerbung“ (5. Zeile) und „Vorbereitung“ (7. Zeile)',
+      instruction: 'Beide Zeilen: Formatvorlage „Überschrift 2“',
+      checks: [check('Formatvorlage „Überschrift 2“', H.style('Überschrift 2'), ['=Bewerbung', '=Vorbereitung'], (p) => p.namedStyle === NamedStyleType.HEADING_2)],
+    },
+    {
+      title: 'Nummerierte Liste',
+      target: 'Die letzten drei Zeilen – „Pünktlich ankommen“, „Aufgaben notieren“, „Fragen stellen“',
+      instruction: 'Als nummerierte Liste 1., 2., 3.',
+      checks: [check('Nummerierte Liste', `${H.selectLines}, dann ${H.numbers}`, ['Pünktlich ankommen', 'Aufgaben notieren', 'Fragen stellen'], (p) => isNumberedList(p))],
     },
     {
       title: 'Fließtext',
-      instruction: 'Die drei normalen Textabsätze („Ein Praktikum …“, „Schreibe eine …“, „Kläre vorab …“) sollen im Blocksatz stehen, die Schriftgröße bleibt 11.',
-      checks: [
-        check('Fließtext im Blocksatz', 'Start → Ausrichtung → Blocksatz', ['Ein Praktikum gibt', 'Schreibe eine kurze', 'Kläre vorab'], (p) => isJustified(p)),
-      ],
+      target: 'Die drei Textabsätze – „Ein Praktikum gibt …“, „Schreibe eine kurze …“, „Kläre vorab …“',
+      instruction: 'Blocksatz (Schriftgröße bleibt 11)',
+      checks: [check('Blocksatz', `Jeden Absatz markieren, dann ${H.align('Blocksatz')}`, ['Ein Praktikum gibt', 'Schreibe eine kurze', 'Kläre vorab'], (p) => isJustified(p))],
     },
   ],
 };
@@ -147,7 +170,7 @@ const flyer: LayoutTask = {
   title: 'Flyer: Fahrradwerkstatt',
   difficulty: 'mittel',
   intro: 'Schriftarten, Farben, Hervorhebungen und Aufzählung kombinieren.',
-  auftrag: 'Die Technik-AG betreibt eine Fahrradwerkstatt und braucht einen Flyer. Der Text steht schon im Dokument. Gestalte daraus einen ansprechenden Flyer. Mehrere Zeilen markierst du, indem du mit gedrückter Maustaste von vor der ersten bis hinter die letzte Zeile ziehst.',
+  auftrag: 'Die Technik-AG betreibt eine Fahrradwerkstatt und braucht einen Flyer. Der Text steht schon im Dokument. Gestalte daraus einen ansprechenden Flyer.',
   paragraphs: [
     { text: 'Die Schul-Fahrradwerkstatt' },
     { text: 'Reparieren statt wegwerfen!' },
@@ -162,46 +185,65 @@ const flyer: LayoutTask = {
   ],
   steps: [
     {
-      title: 'Titel',
-      instruction: 'Der Titel soll in Times New Roman, Schriftgröße 28, fett, zentriert und in oranger Schriftfarbe erscheinen.',
+      title: 'Titel: Schrift',
+      target: '1. Zeile – „Die Schul-Fahrradwerkstatt“',
+      instruction: 'Schriftart Times New Roman\nSchriftgröße 28\nFett',
       checks: [
-        check('Schriftart Times New Roman', 'Start → Schriftart-Liste', 'Die Schul-Fahrrad', (p) => fontOf(p) === 'Times New Roman'),
-        check('Schriftgröße 28', 'Start → Schriftgröße', 'Die Schul-Fahrrad', (p) => sizeOf(p) === 28),
-        check('Fett und zentriert', 'Start → „B“ und Ausrichtung → Zentriert', 'Die Schul-Fahrrad', (p) => isBold(p) && isCentered(p)),
-        check('Schriftfarbe orange', 'Start → Schriftfarbe → Orange', 'Die Schul-Fahrrad', (p) => colorIs(p, 'orange')),
+        check('Times New Roman', `${H.selectLine}, dann ${H.font('Times New Roman')}`, 'Die Schul-Fahrrad', (p) => fontOf(p) === 'Times New Roman'),
+        check('Schriftgröße 28', H.size(28), 'Die Schul-Fahrrad', (p) => sizeOf(p) === 28),
+        check('Fett', H.bold, 'Die Schul-Fahrrad', (p) => isBold(p)),
+      ],
+    },
+    {
+      title: 'Titel: Ausrichtung und Farbe',
+      target: '1. Zeile – „Die Schul-Fahrradwerkstatt“',
+      instruction: 'Zentriert\nSchriftfarbe Orange (Farbpalette: 4. Spalte)',
+      checks: [
+        check('Zentriert', H.align('Zentriert'), 'Die Schul-Fahrrad', (p) => isCentered(p)),
+        check('Schriftfarbe Orange', H.color('Orange', PALETTE_COLUMN.orange), 'Die Schul-Fahrrad', (p) => colorIs(p, 'orange')),
       ],
     },
     {
       title: 'Slogan',
-      instruction: 'Der Slogan „Reparieren statt wegwerfen!“ wird zentriert, kursiv und in grauer Schrift gesetzt.',
+      target: '2. Zeile – „Reparieren statt wegwerfen!“',
+      instruction: 'Zentriert\nKursiv\nSchriftfarbe Grau (Farbpalette: 1. Spalte, ein Grauton)',
       checks: [
-        check('Slogan zentriert und kursiv', 'Start → Ausrichtung → Zentriert, „I“', 'Reparieren statt', (p) => isCentered(p) && isItalic(p)),
-        check('Schriftfarbe grau', 'Start → Schriftfarbe → Grau', 'Reparieren statt', (p) => colorIs(p, 'gray')),
+        check('Zentriert', H.align('Zentriert'), 'Reparieren statt', (p) => isCentered(p)),
+        check('Kursiv', H.italic, 'Reparieren statt', (p) => isItalic(p)),
+        check('Schriftfarbe Grau', H.color('Grau', PALETTE_COLUMN.grau), 'Reparieren statt', (p) => colorIs(p, 'gray')),
       ],
     },
     {
-      title: 'Unterüberschriften',
-      instruction: 'Die Zeilen „Unser Angebot“ und „Öffnungszeiten“ sind Unterüberschriften: Verdana, Schriftgröße 14, fett und unterstrichen.',
+      title: 'Zwischenüberschriften',
+      target: '„Unser Angebot“ (4. Zeile) und „Öffnungszeiten“ (6. Zeile)',
+      instruction: 'Schriftart Verdana, Schriftgröße 14\nFett und unterstrichen',
       checks: [
-        check('Schriftart Verdana, 14 pt', 'Start → Schriftart und Schriftgröße', ['Unser Angebot', 'Öffnungszeiten'], (p) => fontOf(p) === 'Verdana' && sizeOf(p) === 14),
-        check('Fett und unterstrichen', 'Start → „B“ und „U“', ['Unser Angebot', 'Öffnungszeiten'], (p) => isBold(p) && isUnderlined(p)),
+        check('Verdana, 14 pt', `${H.font('Verdana')}, ${H.size(14)}`, ['=Unser Angebot', '=Öffnungszeiten'], (p) => fontOf(p) === 'Verdana' && sizeOf(p) === 14),
+        check('Fett und unterstrichen', `${H.bold} und ${H.underline}`, ['=Unser Angebot', '=Öffnungszeiten'], (p) => isBold(p) && isUnderlined(p)),
       ],
     },
     {
       title: 'Fließtext',
-      instruction: 'Die beiden Textabsätze („Ein Fahrrad …“ und „Wir prüfen …“) stehen in Verdana, Schriftgröße 10 und im Blocksatz.',
+      target: '3. und 5. Zeile – Absätze „Ein Fahrrad ist …“ und „Wir prüfen Bremsen …“',
+      instruction: 'Schriftart Verdana, Schriftgröße 10\nBlocksatz',
       checks: [
-        check('Verdana, 10 pt', 'Start → Schriftart und Schriftgröße', ['Ein Fahrrad ist', 'Wir prüfen Bremsen'], (p) => fontOf(p) === 'Verdana' && sizeOf(p) === 10),
-        check('Blocksatz', 'Start → Ausrichtung → Blocksatz', ['Ein Fahrrad ist', 'Wir prüfen Bremsen'], (p) => isJustified(p)),
+        check('Verdana, 10 pt', `${H.font('Verdana')}, ${H.size(10)}`, ['Ein Fahrrad ist', 'Wir prüfen Bremsen'], (p) => fontOf(p) === 'Verdana' && sizeOf(p) === 10),
+        check('Blocksatz', H.align('Blocksatz'), ['Ein Fahrrad ist', 'Wir prüfen Bremsen'], (p) => isJustified(p)),
       ],
     },
     {
-      title: 'Öffnungszeiten und Kontakt',
-      instruction: 'Die drei Öffnungszeiten werden eine Aufzählung. Der letzte Satz („Fragen? …“) wird zentriert, fett und gelb hinterlegt.',
+      title: 'Öffnungszeiten als Aufzählung',
+      target: '7. bis 9. Zeile – Dienstag, Mittwoch, Donnerstag',
+      instruction: 'Alle drei Zeilen als Aufzählung mit Punkten',
+      checks: [check('Aufzählung mit Punkten', `${H.selectLines}, dann ${H.bullets}`, ['Dienstag:', 'Mittwoch:', 'Donnerstag:'], (p) => isBulletList(p))],
+    },
+    {
+      title: 'Kontaktzeile',
+      target: 'Letzte Zeile – „Fragen? Sprich uns einfach an!“',
+      instruction: 'Zentriert und fett\nGelb hinterlegt (Texthintergrundfarbe, 5. Spalte)',
       checks: [
-        check('Öffnungszeiten als Aufzählung', 'Start → Liste mit Punkten', ['Dienstag:', 'Mittwoch:', 'Donnerstag:'], (p) => isBulletList(p)),
-        check('Kontaktzeile zentriert und fett', 'Start → Zentriert, „B“', 'Fragen? Sprich', (p) => isCentered(p) && isBold(p)),
-        check('Kontaktzeile gelb hinterlegt', 'Start → Texthervorhebung → Gelb', 'Fragen? Sprich', (p) => colorFamily(highlightOf(p)) === 'yellow'),
+        check('Zentriert und fett', `${H.align('Zentriert')}; ${H.bold}`, 'Fragen? Sprich', (p) => isCentered(p) && isBold(p)),
+        check('Gelb hinterlegt', H.highlight('Gelb', PALETTE_COLUMN.gelb), 'Fragen? Sprich', (p) => colorFamily(highlightOf(p)) === 'yellow'),
       ],
     },
   ],
@@ -214,7 +256,7 @@ const tabelle: LayoutTask = {
   title: 'Tabelle: Preisliste',
   difficulty: 'mittel',
   intro: 'Eine Tabelle einfügen, befüllen und formatieren.',
-  auftrag: 'Für die Fahrradwerkstatt soll eine Preisliste als Tabelle entstehen. Füge unter dem Text eine Tabelle mit 3 Spalten und 4 Zeilen ein (Einfügen → Tabelle) und trage folgende Werte ein:\n\nLeistung | Dauer | Preis\nSchlauch wechseln | 15 Min. | 5,00 €\nBremsen einstellen | 20 Min. | 8,00 €\nLicht prüfen | 10 Min. | kostenlos',
+  auftrag: 'Für die Fahrradwerkstatt soll eine Preisliste als Tabelle entstehen. Die Überschrift steht schon im Dokument, die Tabelle fügst du selbst ein.',
   paragraphs: [
     { text: 'Preisliste der Fahrradwerkstatt' },
     { text: 'Alle Preise gelten für Schülerinnen und Schüler der WSS.' },
@@ -223,27 +265,41 @@ const tabelle: LayoutTask = {
   steps: [
     {
       title: 'Überschrift',
-      instruction: 'Die erste Zeile erhält die Formatvorlage „Überschrift 1“ und wird zentriert.',
+      target: '1. Zeile – „Preisliste der Fahrradwerkstatt“',
+      instruction: 'Formatvorlage „Überschrift 1“\nZentriert',
       checks: [
-        check('Formatvorlage „Überschrift 1“', 'Start → Formatvorlage → Überschrift 1', 'Preisliste der', (p) => p.namedStyle === NamedStyleType.HEADING_1),
-        check('Überschrift zentriert', 'Start → Ausrichtung → Zentriert', 'Preisliste der', (p) => isCentered(p)),
+        check('Formatvorlage „Überschrift 1“', H.style('Überschrift 1'), 'Preisliste der', (p) => p.namedStyle === NamedStyleType.HEADING_1),
+        check('Zentriert', H.align('Zentriert'), 'Preisliste der', (p) => isCentered(p)),
       ],
     },
     {
       title: 'Tabelle einfügen',
-      instruction: 'Füge eine Tabelle mit 3 Spalten und 4 Zeilen ein und trage alle Werte ein.',
+      target: 'Leere 3. Zeile – unter „Alle Preise gelten …“',
+      instruction: 'Tabelle mit 3 Spalten und 4 Zeilen einfügen',
       checks: [
-        { label: 'Tabelle mit 3 Spalten und 4 Zeilen', hint: 'Einfügen → Tabelle → Raster auswählen', test: (d) => d.tables.some((t) => t.cols === 3 && t.rows === 4) },
-        check('Kopfzeile ausgefüllt', 'Text in die Zellen der ersten Zeile tippen', ['=Leistung', '=Dauer', '=Preis'], () => true),
-        check('Zeilen ausgefüllt', 'Text in die Zellen tippen', ['=Schlauch wechseln', '=Bremsen einstellen', '=Licht prüfen', '=15 Min.', '=20 Min.', '=10 Min.', '=5,00 €', '=8,00 €', '=kostenlos'], () => true),
+        {
+          label: 'Tabelle mit 3 Spalten und 4 Zeilen',
+          hint: 'Cursor in die leere Zeile setzen → Einfügen → Tabelle (Raster-Symbol) → Tabelle einfügen → Zeilenanzahl 4, Spaltenanzahl 3 → OK',
+          test: (d) => d.tables.some((t) => t.cols === 3 && t.rows === 4),
+        },
       ],
     },
     {
-      title: 'Formatierung',
-      instruction: 'Die Kopfzeile (Leistung, Dauer, Preis) wird fett. Die Werte der Spalte „Preis“ (5,00 €, 8,00 €, kostenlos) werden rechtsbündig ausgerichtet.',
+      title: 'Tabelle ausfüllen',
+      target: 'In die neue Tabelle, Zeile für Zeile',
+      instruction: 'Zuerst in die erste Zelle (oben links) klicken bzw. tippen\nZeile 1: Leistung | Dauer | Preis\nZeile 2: Schlauch wechseln | 15 Min. | 5,00 €\nZeile 3: Bremsen einstellen | 20 Min. | 8,00 €\nZeile 4: Licht prüfen | 10 Min. | kostenlos',
       checks: [
-        check('Kopfzeile fett', 'Zellen der ersten Zeile markieren → „B“', ['=Leistung', '=Dauer', '=Preis'], (p) => isBold(p)),
-        check('Preise rechtsbündig', 'Zellen der Preisspalte markieren → Ausrichtung → Rechtsbündig', ['=5,00 €', '=8,00 €', '=kostenlos'], (p) => isRight(p)),
+        check('Zeile 1 ausgefüllt', 'In die erste Zelle klicken und tippen; mit Tab springst du zur nächsten Zelle (Tablet: in die Zelle tippen)', ['=Leistung', '=Dauer', '=Preis'], () => true),
+        check('Zeilen 2–4 ausgefüllt', 'Schreibweise genau wie vorgegeben', ['=Schlauch wechseln', '=Bremsen einstellen', '=Licht prüfen', '=15 Min.', '=20 Min.', '=10 Min.', '=5,00 €', '=8,00 €', '=kostenlos'], () => true),
+      ],
+    },
+    {
+      title: 'Tabelle formatieren',
+      target: 'Kopfzeile (Leistung, Dauer, Preis) und Spalte „Preis“',
+      instruction: 'Kopfzeile fett\nAlle drei Preise (5,00 €, 8,00 €, kostenlos) rechtsbündig',
+      checks: [
+        check('Kopfzeile fett', `Die drei Zellen der ersten Zeile markieren, dann ${H.bold}`, ['=Leistung', '=Dauer', '=Preis'], (p) => isBold(p)),
+        check('Preise rechtsbündig', `Die drei Preiszellen markieren, dann ${H.align('Rechtsbündig')}`, ['=5,00 €', '=8,00 €', '=kostenlos'], (p) => isRight(p)),
       ],
     },
   ],
@@ -256,7 +312,7 @@ const bibliothek: LayoutTask = {
   title: 'Abschluss: Flyer Stadtbibliothek',
   difficulty: 'schwer',
   intro: 'Alles zusammen: Formatvorlagen, Schrift, Ausrichtung, Liste und Hervorhebung.',
-  auftrag: 'Die Stadtbibliothek braucht einen Flyer für ihre neue Kinder- und Jugendabteilung. Gestalte den vorgegebenen Text selbstständig nach den Vorgaben. Die Aufträge sind bewusst knapp formuliert – überlege, welche Werkzeuge du brauchst.',
+  auftrag: 'Die Stadtbibliothek braucht einen Flyer für ihre neue Kinder- und Jugendabteilung. Gestalte den vorgegebenen Text selbstständig. Die Aufträge sind knapp – überlege, welche Werkzeuge du brauchst.',
   paragraphs: [
     { text: 'Lesen macht schlau' },
     { text: 'Die neue Kinder- und Jugendabteilung' },
@@ -272,39 +328,64 @@ const bibliothek: LayoutTask = {
   ],
   steps: [
     {
-      title: 'Kopfbereich',
-      instruction: 'Titel „Lesen macht schlau“: Comic Sans MS, Schriftgröße 26, fett, zentriert, grüne Schriftfarbe. Die Zeile darunter ist der Untertitel (Formatvorlage „Untertitel“), kursiv und zentriert.',
+      title: 'Titel',
+      target: '1. Zeile – „Lesen macht schlau“',
+      instruction: 'Comic Sans MS, 26 pt\nFett, zentriert\nSchriftfarbe Grün (Farbpalette: 6. Spalte)',
       checks: [
-        check('Titel: Comic Sans MS, 26 pt', 'Start → Schriftart und Schriftgröße', 'Lesen macht schlau', (p) => fontOf(p) === 'Comic Sans MS' && sizeOf(p) === 26),
-        check('Titel: fett, zentriert, grün', 'Start → „B“, Zentriert, Schriftfarbe → Grün', 'Lesen macht schlau', (p) => isBold(p) && isCentered(p) && colorIs(p, 'green')),
-        check('Untertitel: Formatvorlage', 'Start → Formatvorlage → Untertitel', 'Die neue Kinder', (p) => p.namedStyle === NamedStyleType.SUBTITLE),
-        check('Untertitel: kursiv und zentriert', 'Start → „I“ und Zentriert', 'Die neue Kinder', (p) => isItalic(p) && isCentered(p)),
+        check('Comic Sans MS, 26 pt', `${H.font('Comic Sans MS')}, ${H.size(26)}`, 'Lesen macht schlau', (p) => fontOf(p) === 'Comic Sans MS' && sizeOf(p) === 26),
+        check('Fett und zentriert', `${H.bold}; ${H.align('Zentriert')}`, 'Lesen macht schlau', (p) => isBold(p) && isCentered(p)),
+        check('Schriftfarbe Grün', H.color('Grün', PALETTE_COLUMN.gruen), 'Lesen macht schlau', (p) => colorIs(p, 'green')),
       ],
     },
     {
-      title: 'Überschriften',
-      instruction: '„Neu im Angebot“ und „Unsere Aktionen“ erhalten die Formatvorlage „Überschrift 2“ und eine blaue Schriftfarbe.',
+      title: 'Untertitel',
+      target: '2. Zeile – „Die neue Kinder- und Jugendabteilung“',
+      instruction: 'Formatvorlage „Untertitel“\nKursiv und zentriert',
       checks: [
-        check('Formatvorlage „Überschrift 2“', 'Start → Formatvorlage → Überschrift 2', ['Neu im Angebot', 'Unsere Aktionen'], (p) => p.namedStyle === NamedStyleType.HEADING_2),
-        check('Schriftfarbe blau', 'Start → Schriftfarbe → Blau', ['Neu im Angebot', 'Unsere Aktionen'], (p) => colorIs(p, 'blue')),
+        check('Formatvorlage „Untertitel“', H.style('Untertitel'), 'Die neue Kinder', (p) => p.namedStyle === NamedStyleType.SUBTITLE),
+        check('Kursiv und zentriert', `${H.italic}; ${H.align('Zentriert')}`, 'Die neue Kinder', (p) => isItalic(p) && isCentered(p)),
       ],
     },
     {
-      title: 'Fließtext und Liste',
-      instruction: 'Die beiden Textabsätze („Ab sofort …“ und „Jeden Monat …“): Times New Roman, Schriftgröße 12, Blocksatz. Die drei Aktionen (Lesung, Workshop, Spieleabend) werden eine Aufzählung.',
+      title: 'Zwischenüberschriften',
+      target: '„Neu im Angebot“ (3. Zeile) und „Unsere Aktionen“ (5. Zeile)',
+      instruction: 'Formatvorlage „Überschrift 2“\nSchriftfarbe Blau (Farbpalette: 2. Spalte)',
       checks: [
-        check('Times New Roman, 12 pt', 'Start → Schriftart und Schriftgröße', ['Ab sofort finden', 'Jeden Monat gibt'], (p) => fontOf(p) === 'Times New Roman' && sizeOf(p) === 12),
-        check('Blocksatz', 'Start → Ausrichtung → Blocksatz', ['Ab sofort finden', 'Jeden Monat gibt'], (p) => isJustified(p)),
-        check('Aufzählung der Aktionen', 'Start → Liste mit Punkten', ['Lesung für', 'Comic-Workshop', 'Spieleabend für'], (p) => isBulletList(p)),
+        check('Formatvorlage „Überschrift 2“', H.style('Überschrift 2'), ['=Neu im Angebot', '=Unsere Aktionen'], (p) => p.namedStyle === NamedStyleType.HEADING_2),
+        check('Schriftfarbe Blau', H.color('Blau', PALETTE_COLUMN.blau), ['=Neu im Angebot', '=Unsere Aktionen'], (p) => colorIs(p, 'blue')),
       ],
     },
     {
-      title: 'Tipp und Fußzeile',
-      instruction: 'Der Tipp-Absatz wird zentriert, fett und gelb hinterlegt. Die letzte Zeile (Adresse) wird rechtsbündig, Schriftgröße 9 und in grauer Schrift gesetzt.',
+      title: 'Fließtext',
+      target: '4. und 6. Zeile – Absätze „Ab sofort finden …“ und „Jeden Monat gibt …“',
+      instruction: 'Times New Roman, 12 pt\nBlocksatz',
       checks: [
-        check('Tipp zentriert, fett, gelb hinterlegt', 'Start → Zentriert, „B“, Texthervorhebung → Gelb', 'Tipp: Mit dem', (p) => isCentered(p) && isBold(p) && colorFamily(highlightOf(p)) === 'yellow'),
-        check('Adresse rechtsbündig, 9 pt', 'Start → Rechtsbündig, Schriftgröße 9', 'Stadtbibliothek ·', (p) => isRight(p) && sizeOf(p) === 9),
-        check('Adresse grau', 'Start → Schriftfarbe → Grau', 'Stadtbibliothek ·', (p) => colorIs(p, 'gray')),
+        check('Times New Roman, 12 pt', `${H.font('Times New Roman')}, ${H.size(12)}`, ['Ab sofort finden', 'Jeden Monat gibt'], (p) => fontOf(p) === 'Times New Roman' && sizeOf(p) === 12),
+        check('Blocksatz', H.align('Blocksatz'), ['Ab sofort finden', 'Jeden Monat gibt'], (p) => isJustified(p)),
+      ],
+    },
+    {
+      title: 'Aktionen als Aufzählung',
+      target: '7. bis 9. Zeile – Lesung, Comic-Workshop, Spieleabend',
+      instruction: 'Aufzählung mit Punkten',
+      checks: [check('Aufzählung mit Punkten', `${H.selectLines}, dann ${H.bullets}`, ['Lesung für', 'Comic-Workshop', 'Spieleabend für'], (p) => isBulletList(p))],
+    },
+    {
+      title: 'Tipp hervorheben',
+      target: '10. Zeile – „Tipp: Mit dem Bibliotheksausweis …“',
+      instruction: 'Zentriert und fett\nGelb hinterlegt (Texthintergrundfarbe, 5. Spalte)',
+      checks: [
+        check('Zentriert und fett', `${H.align('Zentriert')}; ${H.bold}`, 'Tipp: Mit dem', (p) => isCentered(p) && isBold(p)),
+        check('Gelb hinterlegt', H.highlight('Gelb', PALETTE_COLUMN.gelb), 'Tipp: Mit dem', (p) => colorFamily(highlightOf(p)) === 'yellow'),
+      ],
+    },
+    {
+      title: 'Adresszeile',
+      target: 'Letzte Zeile – „Stadtbibliothek · Musterstraße 1 …“',
+      instruction: 'Rechtsbündig\nSchriftgröße 9\nSchriftfarbe Grau (Farbpalette: 1. Spalte)',
+      checks: [
+        check('Rechtsbündig, 9 pt', `${H.align('Rechtsbündig')}; ${H.size(9)}`, 'Stadtbibliothek ·', (p) => isRight(p) && sizeOf(p) === 9),
+        check('Schriftfarbe Grau', H.color('Grau', PALETTE_COLUMN.grau), 'Stadtbibliothek ·', (p) => colorIs(p, 'gray')),
       ],
     },
   ],

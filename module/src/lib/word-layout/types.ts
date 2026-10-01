@@ -38,10 +38,16 @@ export interface LayoutCheck {
   test: (doc: LayoutDocument) => boolean;
 }
 
+/** Werkzeuge, die die Oberfläche zusätzlich als Knopf anbietet (am Tablet gibt es keinen Rechtsklick). */
+export type LayoutTool = 'absatz' | 'abschnitt' | 'seite' | 'kopfzeile' | 'fusszeile';
+
 export interface LayoutStep {
   title: string;
-  /** Mehrere Zeilen werden als Spiegelstriche angezeigt. */
+  /** Wo genau? z. B. „1. Zeile: „Einladung zum Sommerfest““ */
+  target?: string;
+  /** Was ist zu tun? Mehrere Zeilen werden als Spiegelstriche angezeigt. */
   instruction: string;
+  tools?: LayoutTool[];
   checks: LayoutCheck[];
 }
 

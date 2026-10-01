@@ -1,5 +1,5 @@
 import { NamedStyleType } from '@univerjs/core';
-import { byText, cells, check, docCheck, isBulletList, isNumberedList, longParagraph, sectionOf } from './checks';
+import { byText, cells, check, docCheck, H, isBulletList, isNumberedList, longParagraph, PALETTE_COLUMN, sectionOf } from './checks';
 import {
   colorFamily,
   colorIs,
@@ -10,12 +10,14 @@ import {
   highlightOf,
   isBold,
   isCentered,
+  isDarkColor,
   isItalic,
   isJustified,
   isSuperscript,
   isUnderlined,
   lineSpacingIs,
   near,
+  rgbOf,
   sizeOf,
   styleAt,
   type LayoutDocument,
@@ -30,9 +32,7 @@ import type { LayoutCheck, LayoutMargins, LayoutTask } from './types';
 const px = (cm: number) => `${(Math.round(cmToPx(cm) * 10) / 10).toLocaleString('de-DE')} px`;
 const ptPx = (pt: number) => Math.round((pt * 4) / 3);
 
-const HINT_MARGINS = 'Rechtsklick ins Dokument → Abschnittseinstellungen → Oben/Unten/Links/Rechts (px). 1 cm ≈ 37,8 px';
-const HINT_PARAGRAPH = 'Absatz markieren → Rechtsklick → Absatzeinstellungen';
-const HINT_SECTION = 'Rechtsklick in den Abschnitt → Abschnittseinstellungen';
+const HINT_MARGINS = `${H.page}. Haben einzelne Abschnitte eigene Ränder, dort unter „▥ Abschnitt & Spalten“ angleichen. 1 cm ≈ 37,8 px`;
 
 function marginChecks(target: LayoutMargins): LayoutCheck[] {
   const ok = (d: LayoutDocument, side: keyof LayoutMargins) =>
@@ -46,7 +46,7 @@ function marginChecks(target: LayoutMargins): LayoutCheck[] {
 /** Text der Kopf- bzw. Fußzeile ohne eventuellen Fußnotentext. */
 function nameLineChecks(where: 'header' | 'footer', strip?: RegExp): LayoutCheck[] {
   const label = where === 'header' ? 'Kopfzeile' : 'Fußzeile';
-  const hint = `Start → Symbol „Kopf- und Fußzeile“ (oder Doppelklick in den ${where === 'header' ? 'oberen' : 'unteren'} Seitenrand) → Text eintippen`;
+  const hint = where === 'header' ? H.header : H.footer;
   const text = (d: LayoutDocument) => {
     const raw = where === 'header' ? d.headerText : d.footerText;
     return strip ? raw.replace(strip, ' ') : raw;
@@ -98,56 +98,85 @@ const merkblatt: LayoutTask = {
   ],
   steps: [
     {
-      title: 'Seite einrichten',
-      instruction: `Seitenränder: oben und unten 2 cm (${px(2)}), links 2,5 cm (${px(2.5)}), rechts 2 cm (${px(2)}).`,
+      title: 'Seitenränder einstellen',
+      target: 'Ganzes Dokument',
+      instruction: `Oben und unten 2 cm (${px(2)})\nLinks 2,5 cm (${px(2.5)})\nRechts 2 cm (${px(2)})`,
+      tools: ['seite'],
       checks: marginChecks({ top: 2, bottom: 2, left: 2.5, right: 2 }),
     },
     {
-      title: 'Kopfzeile',
-      instruction: 'Trage in die Kopfzeile deinen Vor- und Nachnamen, deine Klasse und das heutige Datum (TT.MM.JJ) ein.',
+      title: 'Kopfzeile ausfüllen',
+      target: 'Kopfzeile (oberer Seitenrand)',
+      instruction: 'Knopf „Kopfzeile bearbeiten“ drücken – der Cursor steht dann in der Kopfzeile\nVor- und Nachname, Klasse, heutiges Datum im Format TT.MM.JJ eintragen – z. B. Lena Huber 10b 01.10.26\nZum Schluss „↩ Zurück zum Text“ drücken',
+      tools: ['kopfzeile'],
       checks: nameLineChecks('header'),
     },
     {
       title: 'Titel',
-      instruction: 'Erste Zeile: Formatvorlage „Titel“, zentriert.\nZweite Zeile: Formatvorlage „Untertitel“, zentriert und kursiv.',
+      target: '1. Zeile – „Fit fürs Vorstellungsgespräch“',
+      instruction: 'Formatvorlage „Titel“\nZentriert',
       checks: [
-        check('Titel: Formatvorlage und zentriert', 'Start → Formatvorlage („Normal“) → Titel, dann Zentriert', 'Fit fürs Vorstellungs', (p) => p.namedStyle === NamedStyleType.TITLE && isCentered(p)),
-        check('Untertitel: Formatvorlage, zentriert, kursiv', 'Start → Formatvorlage → Untertitel, Zentriert, „I“', 'Merkblatt der Berufs', (p) => p.namedStyle === NamedStyleType.SUBTITLE && isCentered(p) && isItalic(p)),
+        check('Formatvorlage „Titel“', H.style('Titel'), 'Fit fürs Vorstellungs', (p) => p.namedStyle === NamedStyleType.TITLE),
+        check('Zentriert', H.align('Zentriert'), 'Fit fürs Vorstellungs', (p) => isCentered(p)),
+      ],
+    },
+    {
+      title: 'Untertitel',
+      target: '2. Zeile – „Merkblatt der Berufsberatung …“',
+      instruction: 'Formatvorlage „Untertitel“\nZentriert und kursiv',
+      checks: [
+        check('Formatvorlage „Untertitel“', H.style('Untertitel'), 'Merkblatt der Berufs', (p) => p.namedStyle === NamedStyleType.SUBTITLE),
+        check('Zentriert und kursiv', `${H.align('Zentriert')}; ${H.italic}`, 'Merkblatt der Berufs', (p) => isCentered(p) && isItalic(p)),
       ],
     },
     {
       title: 'Zwischenüberschriften',
-      instruction: `„Vor dem Gespräch“ und „Im Gespräch“: Formatvorlage „Überschrift 2“, Abstand vor 12 pt (${ptPx(12)} px) und nach 6 pt (${ptPx(6)} px).`,
+      target: '„Vor dem Gespräch“ (3. Zeile) und „Im Gespräch“ (5. Zeile)',
+      instruction: `Formatvorlage „Überschrift 2“\nAbstand vor 12 pt (${ptPx(12)} px)\nAbstand nach 6 pt (${ptPx(6)} px)`,
+      tools: ['absatz'],
       checks: [
-        check('Formatvorlage „Überschrift 2“', 'Start → Formatvorlage → Überschrift 2', ['=Vor dem Gespräch', '=Im Gespräch'], (p) => p.namedStyle === NamedStyleType.HEADING_2),
-        check(`Abstand vor ${ptPx(12)} px, nach ${ptPx(6)} px`, `${HINT_PARAGRAPH} → Abstand Vor/Nach`, ['=Vor dem Gespräch', '=Im Gespräch'], (p) => near(p.spaceAbove, ptPx(12)) && near(p.spaceBelow, ptPx(6))),
+        check('Formatvorlage „Überschrift 2“', H.style('Überschrift 2'), ['=Vor dem Gespräch', '=Im Gespräch'], (p) => p.namedStyle === NamedStyleType.HEADING_2),
+        check(`Abstand vor ${ptPx(12)} px`, `${H.paragraph} → Abstand „Vor“`, ['=Vor dem Gespräch', '=Im Gespräch'], (p) => near(p.spaceAbove, ptPx(12))),
+        check(`Abstand nach ${ptPx(6)} px`, `${H.paragraph} → Abstand „Nach“`, ['=Vor dem Gespräch', '=Im Gespräch'], (p) => near(p.spaceBelow, ptPx(6))),
       ],
     },
     {
-      title: 'Fließtext',
-      instruction: `Die beiden Textabsätze („Ein Vorstellungsgespräch …“ und „Achte auf …“):\nBlocksatz\nZeilenabstand 1,5 Zeilen (Mehrfacher Abstand 1,5)\nEinzug der ersten Zeile 0,5 cm (${px(0.5)})`,
+      title: 'Fließtext: Blocksatz und Zeilenabstand',
+      target: '4. und 6. Zeile – Absätze „Ein Vorstellungsgespräch …“ und „Achte auf eine …“',
+      instruction: 'Blocksatz\nZeilenabstand 1,5 (Mehrfacher Abstand 1,5)',
+      tools: ['absatz'],
       checks: [
-        check('Blocksatz', 'Start → Ausrichtung → Blocksatz', ['Ein Vorstellungsgespräch', 'Achte auf eine'], (p) => isJustified(p)),
-        check('Zeilenabstand 1,5', `${HINT_PARAGRAPH} → Zeilenabstand „Mehrfacher Abstand“ 1,5`, ['Ein Vorstellungsgespräch', 'Achte auf eine'], (p) => lineSpacingIs(p, 1.5)),
-        check('Einzug erste Zeile 0,5 cm', `${HINT_PARAGRAPH} → Einzug „Erste Zeile“ ${px(0.5)}`, ['Ein Vorstellungsgespräch', 'Achte auf eine'], (p) => near(p.indentFirstLine, cmToPx(0.5), 2)),
+        check('Blocksatz', H.align('Blocksatz'), ['Ein Vorstellungsgespräch', 'Achte auf eine'], (p) => isJustified(p)),
+        check('Zeilenabstand 1,5', `${H.paragraph} → Zeilenabstand „Mehrfacher Abstand“ → 1.5`, ['Ein Vorstellungsgespräch', 'Achte auf eine'], (p) => lineSpacingIs(p, 1.5)),
       ],
+    },
+    {
+      title: 'Fließtext: Einzug erste Zeile',
+      target: '4. und 6. Zeile – Absätze „Ein Vorstellungsgespräch …“ und „Achte auf eine …“',
+      instruction: `Einzug der ersten Zeile 0,5 cm (${px(0.5)})`,
+      tools: ['absatz'],
+      checks: [check('Einzug erste Zeile 0,5 cm', `${H.paragraph} → Einzug „Erste Zeile“ ${px(0.5)}`, ['Ein Vorstellungsgespräch', 'Achte auf eine'], (p) => near(p.indentFirstLine, cmToPx(0.5), 2))],
     },
     {
       title: 'Fragenliste',
-      instruction: `„Diese Fragen solltest du …“ wird fett.\nDie drei Fragen werden eine nummerierte Liste mit hängendem Einzug 0,75 cm (${px(0.75)}).`,
+      target: '7. Zeile „Diese Fragen solltest du …“ und die drei Fragen darunter (8.–10. Zeile)',
+      instruction: `7. Zeile: fett\nDie drei Fragen: nummerierte Liste\nDie drei Fragen: hängender Einzug 0,75 cm (${px(0.75)})`,
+      tools: ['absatz'],
       checks: [
-        check('Einleitungssatz fett', 'Start → „B“', 'Diese Fragen solltest', (p) => isBold(p)),
-        check('Nummerierte Liste', 'Start → Liste mit Zahlen', ['Warum möchtest', 'Was weißt du', 'Wo liegen deine'], (p) => isNumberedList(p)),
-        check('Hängender Einzug 0,75 cm', `${HINT_PARAGRAPH} → Hängender Einzug ${px(0.75)}`, ['Warum möchtest', 'Was weißt du', 'Wo liegen deine'], (p) => near(p.hanging, cmToPx(0.75), 2)),
+        check('Einleitungssatz fett', `${H.selectLine}, dann ${H.bold}`, 'Diese Fragen solltest', (p) => isBold(p)),
+        check('Nummerierte Liste', `${H.selectLines}, dann ${H.numbers}`, ['Warum möchtest', 'Was weißt du', 'Wo liegen deine'], (p) => isNumberedList(p)),
+        check('Hängender Einzug 0,75 cm', `${H.paragraph} → „Hängender Einzug“ ${px(0.75)}`, ['Warum möchtest', 'Was weißt du', 'Wo liegen deine'], (p) => near(p.hanging, cmToPx(0.75), 2)),
       ],
     },
     {
-      title: 'Tipp',
-      instruction: `Der Tipp am Ende: zentriert, fett, gelb hinterlegt und mit einem Abstand vor von 18 pt (${ptPx(18)} px).`,
+      title: 'Tipp hervorheben',
+      target: 'Letzte Zeile – „Tipp: Plane für die Anfahrt …“',
+      instruction: `Zentriert und fett\nGelb hinterlegt (Texthintergrundfarbe, 5. Spalte)\nAbstand vor 18 pt (${ptPx(18)} px)`,
+      tools: ['absatz'],
       checks: [
-        check('Zentriert und fett', 'Start → Zentriert, „B“', 'Tipp: Plane', (p) => isCentered(p) && isBold(p)),
-        check('Gelb hinterlegt', 'Start → Texthervorhebung → Gelb', 'Tipp: Plane', (p) => colorFamily(highlightOf(p)) === 'yellow'),
-        check(`Abstand vor ${ptPx(18)} px`, `${HINT_PARAGRAPH} → Abstand Vor`, 'Tipp: Plane', (p) => near(p.spaceAbove, ptPx(18))),
+        check('Zentriert und fett', `${H.align('Zentriert')}; ${H.bold}`, 'Tipp: Plane', (p) => isCentered(p) && isBold(p)),
+        check('Gelb hinterlegt', H.highlight('Gelb', PALETTE_COLUMN.gelb), 'Tipp: Plane', (p) => colorFamily(highlightOf(p)) === 'yellow'),
+        check(`Abstand vor ${ptPx(18)} px`, `${H.paragraph} → Abstand „Vor“`, 'Tipp: Plane', (p) => near(p.spaceAbove, ptPx(18))),
       ],
     },
   ],
@@ -167,8 +196,8 @@ const daemmung: LayoutTask = {
   kind: 'projekt',
   intro: 'Wie im Unterricht: Seitenränder, Spalten mit Trennlinie, Spaltenumbruch, hängender Einzug, Tabelle und Fußnote nach Vorgaben.',
   auftrag:
-    'Sie absolvieren ein Praktikum bei der Verbraucherzentrale im Bereich Energieberatung. Sie sollen einen Informationsflyer zum Thema „Durch richtiges Dämmen Heizkosten reduzieren“ anpassen. Der Text ist bereits vorhanden – Sie passen lediglich das Layout nach den folgenden Angaben an.\n\nDer Editor rechnet in Pixeln: 1 cm ≈ 37,8 px, 1 pt ≈ 1,33 px. Bei „Prüfen“ siehst du, welche Vorgaben schon stimmen; Tipps erscheinen erst bei Fehlern.',
-  margins: { top: 2.5, bottom: 2, left: 2.5, right: 2.5 },
+    'Sie absolvieren ein Praktikum bei der Verbraucherzentrale im Bereich Energieberatung. Sie sollen einen Informationsflyer zum Thema „Durch richtiges Dämmen Heizkosten reduzieren“ anpassen. Der Text ist bereits vorhanden – Sie passen lediglich das Layout nach den folgenden Angaben an.\n\nDer Editor rechnet in Pixeln: 1 cm ≈ 37,8 px, 1 pt ≈ 1,33 px.',
+  margins: { top: 2.5, bottom: 2.5, left: 2.5, right: 2.5 },
   baseFont: { family: 'Verdana', size: 11 },
   paragraphs: [
     { text: 'Durch richtiges Dämmen Heizkosten reduzieren' },
@@ -203,80 +232,133 @@ const daemmung: LayoutTask = {
   ],
   steps: [
     {
-      title: '1 · Kopfzeile',
-      instruction: 'Nachname, Vorname und Klasse oben in die Kopfzeile eintragen, dazu das Datum im Format TT.MM.JJ.',
+      title: 'Kopfzeile',
+      target: 'Kopfzeile (oberer Seitenrand)',
+      instruction: 'Knopf „Kopfzeile bearbeiten“ drücken – der Cursor steht dann in der Kopfzeile\nNachname, Vorname, Klasse und Datum (TT.MM.JJ) eintragen – z. B. Huber, Lena 10b 01.10.26\nZum Schluss „↩ Zurück zum Text“ drücken',
+      tools: ['kopfzeile'],
       checks: nameLineChecks('header'),
     },
     {
-      title: '2 · Seitenränder',
-      instruction: `Links und rechts 2 cm (${px(2)}), oben 2,5 cm (${px(2.5)}), unten 2 cm (${px(2)}).`,
+      title: 'Seitenränder',
+      target: 'Ganzes Dokument – bitte vor den Abschnittsumbrüchen (Auftrag 9) erledigen',
+      instruction: `Links und rechts 2 cm (${px(2)})\nOben 2,5 cm (${px(2.5)})\nUnten 2 cm (${px(2)})`,
+      tools: ['seite'],
       checks: marginChecks({ top: 2.5, bottom: 2, left: 2, right: 2 }),
     },
     {
-      title: '3 · Fließtext',
-      instruction:
-        'Gilt für alle Absätze mit Fließtext und die Aufzählung (nicht für Titel, Unterüberschriften und Tabelle):\nSchriftart Arial, Schriftgröße 10 pt\nBlocksatz (nur die drei Textabsätze)\nZeilenabstand 1,5 Zeilen (nur die drei Textabsätze)',
+      title: 'Titel',
+      target: '1. Zeile – „Durch richtiges Dämmen Heizkosten reduzieren“',
+      instruction: 'Times New Roman, 18 pt\nFett, zentriert\nSchriftfarbe Orange (4. Spalte, statt WordArt in Gold)',
       checks: [
-        check('Arial, 10 pt', 'Text markieren → Start → Schriftart und Schriftgröße', (d) => [...byText(...D_BODY, ...D_LIST)(d), ...D_SECOND(d)], (p) => fontOf(p) === 'Arial' && sizeOf(p) === 10),
-        check('Blocksatz', 'Start → Ausrichtung → Blocksatz', (d) => [...byText(...D_BODY)(d), ...D_SECOND(d)], (p) => isJustified(p)),
-        check('Zeilenabstand 1,5', `${HINT_PARAGRAPH} → Zeilenabstand „Mehrfacher Abstand“ 1,5`, (d) => [...byText(...D_BODY)(d), ...D_SECOND(d)], (p) => lineSpacingIs(p, 1.5)),
+        check('Times New Roman, 18 pt', `${H.font('Times New Roman')}, ${H.size(18)}`, 'Durch richtiges Dämmen', (p) => fontOf(p) === 'Times New Roman' && sizeOf(p) === 18),
+        check('Fett und zentriert', `${H.bold}; ${H.align('Zentriert')}`, 'Durch richtiges Dämmen', (p) => isBold(p) && isCentered(p)),
+        check('Schriftfarbe Orange', H.color('Orange', PALETTE_COLUMN.orange), 'Durch richtiges Dämmen', (p) => colorIs(p, 'orange')),
       ],
     },
     {
-      title: '4 · Titel',
-      instruction: '„Durch richtiges Dämmen Heizkosten reduzieren“: Times New Roman, 18 pt, fett, zentriert, orange Schriftfarbe (statt WordArt in Gold).',
+      title: 'Fließtext: Schrift',
+      target: 'Die drei Textabsätze („Ein schlecht gedämmtes …“, „Der Wärmedurchgangskoeffizient ist …“, „Der U-Wert von einem …“) und die drei U-Werte darunter',
+      instruction: 'Schriftart Arial\nSchriftgröße 10',
       checks: [
-        check('Times New Roman, 18 pt', 'Start → Schriftart und Schriftgröße', 'Durch richtiges Dämmen', (p) => fontOf(p) === 'Times New Roman' && sizeOf(p) === 18),
-        check('Fett, zentriert, orange', 'Start → „B“, Zentriert, Schriftfarbe → Orange', 'Durch richtiges Dämmen', (p) => isBold(p) && isCentered(p) && colorIs(p, 'orange')),
+        check('Arial, 10 pt', `Jeden Absatz markieren, dann ${H.font('Arial')}, ${H.size(10)}`, (d) => [...byText(...D_BODY, ...D_LIST)(d), ...D_SECOND(d)], (p) => fontOf(p) === 'Arial' && sizeOf(p) === 10),
       ],
     },
     {
-      title: '5 · Unterüberschriften',
-      instruction: `„Der Wärmedurchgangskoeffizient“, „U-Werte für Außenbauteile“ und „Vergleich der Heizkosten …“:\nTimes New Roman, 11 pt, fett\nunterstrichen\nAbstand nach 6 pt (${ptPx(6)} px)`,
+      title: 'Fließtext: Absatz',
+      target: 'Nur die drei Textabsätze („Ein schlecht gedämmtes …“, „Der Wärmedurchgangskoeffizient ist …“, „Der U-Wert von einem …“)',
+      instruction: 'Blocksatz\nZeilenabstand 1,5 (Mehrfacher Abstand 1,5)',
+      tools: ['absatz'],
       checks: [
-        check('Times New Roman, 11 pt, fett', 'Start → Schriftart, Schriftgröße, „B“', D_HEADINGS, (p) => fontOf(p) === 'Times New Roman' && sizeOf(p) === 11 && isBold(p)),
-        check('Unterstrichen', 'Start → „U“', D_HEADINGS, (p) => isUnderlined(p)),
-        check(`Abstand nach ${ptPx(6)} px`, `${HINT_PARAGRAPH} → Abstand Nach`, D_HEADINGS, (p) => near(p.spaceBelow, ptPx(6))),
+        check('Blocksatz', H.align('Blocksatz'), (d) => [...byText(...D_BODY)(d), ...D_SECOND(d)], (p) => isJustified(p)),
+        check('Zeilenabstand 1,5', `${H.paragraph} → Zeilenabstand „Mehrfacher Abstand“ → 1.5`, (d) => [...byText(...D_BODY)(d), ...D_SECOND(d)], (p) => lineSpacingIs(p, 1.5)),
       ],
     },
     {
-      title: '6 · Zweiter Absatz in zwei Spalten',
-      instruction:
-        'Nur der Absatz „Der Wärmedurchgangskoeffizient ist …“ steht in zwei gleich breiten Spalten:\nVor und nach dem Absatz je einen Abschnittsumbruch (Fortlaufend) einfügen (Einfügen → Umbrüche)\nFür diesen Abschnitt 2 Spalten mit Trennlinie einstellen (Rechtsklick → Abschnittseinstellungen, oben den richtigen Abschnitt wählen)\nManueller Spaltenumbruch vor „Die jeweilige Bauteildicke …“',
+      title: 'Unterüberschriften: Schrift',
+      target: '„Der Wärmedurchgangskoeffizient“ (3. Zeile), „U-Werte für Außenbauteile“, „Vergleich der Heizkosten …“ (über der Tabelle)',
+      instruction: 'Times New Roman, 11 pt\nFett und unterstrichen',
       checks: [
-        check('Absatz zweispaltig', `Abschnittsumbrüche setzen, dann ${HINT_SECTION} → Spaltenanzahl 2`, D_SECOND, (p, d) => sectionOf(d, p)?.columns === 2),
-        check('Trennlinie zwischen den Spalten', `${HINT_SECTION} → Trennlinie „Zwischen Spalten“`, D_SECOND, (p, d) => !!sectionOf(d, p)?.separator),
-        check('Übriger Text bleibt einspaltig', 'Nur der Abschnitt mit dem zweiten Absatz bekommt 2 Spalten – prüfe die Abschnittsumbrüche', (d) => [...byText('Ein schlecht gedämmtes', 'Der U-Wert von einem')(d)], (p, d) => sectionOf(d, p)?.columns === 1 && sectionOf(d, D_SECOND(d)[0])?.columns === 2),
-        docCheck('Spaltenumbruch vor „Die jeweilige Bauteildicke“', 'Cursor vor „Die jeweilige …“ setzen → Einfügen → Umbrüche → Spaltenumbruch', (d) => columnBreakBefore(d, 'Die jeweilige Bauteildicke')),
+        check('Times New Roman, 11 pt', `${H.font('Times New Roman')}, ${H.size(11)}`, D_HEADINGS, (p) => fontOf(p) === 'Times New Roman' && sizeOf(p) === 11),
+        check('Fett und unterstrichen', `${H.bold} und ${H.underline}`, D_HEADINGS, (p) => isBold(p) && isUnderlined(p)),
       ],
     },
     {
-      title: '7 · Aufzählung',
-      instruction: `Die drei U-Werte werden eine Aufzählung (Aufzählungszeichen •) mit Einzug links 0 cm und hängendem Einzug 0,75 cm (${px(0.75)}).`,
+      title: 'Unterüberschriften: Abstand',
+      target: 'Dieselben drei Unterüberschriften',
+      instruction: `Abstand nach 6 pt (${ptPx(6)} px)`,
+      tools: ['absatz'],
+      checks: [check(`Abstand nach ${ptPx(6)} px`, `${H.paragraph} → Abstand „Nach“`, D_HEADINGS, (p) => near(p.spaceBelow, ptPx(6)))],
+    },
+    {
+      title: 'Aufzählung',
+      target: 'Die drei U-Werte – „25 cm Betonwand …“, „24 cm Mauerziegel …“, „20 cm Massivholz …“',
+      instruction: `Aufzählung mit Punkten\nEinzug links 0 cm, hängender Einzug 0,75 cm (${px(0.75)})`,
+      tools: ['absatz'],
       checks: [
-        check('Aufzählungszeichen', 'Start → Liste mit Punkten', D_LIST, (p) => isBulletList(p)),
-        check('Hängender Einzug 0,75 cm, links 0 cm', `${HINT_PARAGRAPH} → Links 0, Hängender Einzug ${px(0.75)}`, D_LIST, (p) => near(p.hanging, cmToPx(0.75), 2) && near(p.indentStart ?? 0, 0)),
+        check('Aufzählung mit Punkten', `${H.selectLines}, dann ${H.bullets}`, D_LIST, (p) => isBulletList(p)),
+        check('Hängender Einzug 0,75 cm, links 0', `${H.paragraph} → Links 0, „Hängender Einzug“ ${px(0.75)}`, D_LIST, (p) => near(p.hanging, cmToPx(0.75), 2) && near(p.indentStart ?? 0, 0)),
       ],
     },
     {
-      title: '8 · Tabelle',
-      instruction:
-        'Text in der Tabelle: Arial, 10 pt\nErste Zeile fett und grau hinterlegt (Texthervorhebung)\n„vor Sanierung“ und „nach Sanierung“ unterstreichen\nZeile 3 und 5, Spalten 2–4: zentriert\nIn „W/(m2K)“ (Zeile 3 und 5) die 2 hochstellen (m²)',
+      title: 'Zweiter Absatz: eigener Abschnitt',
+      target: 'Absatz „Der Wärmedurchgangskoeffizient ist eine der …“ (unter der gleichnamigen Unterüberschrift)',
+      instruction: 'Cursor an den Anfang dieses Absatzes → Abschnittsumbruch (Fortlaufend)\nCursor an den Anfang von „U-Werte für Außenbauteile“ → Abschnittsumbruch (Fortlaufend)',
       checks: [
-        check('Tabellentext Arial, 10 pt', 'Tabelle markieren → Schriftart und Schriftgröße', cells(() => true), (p) => fontOf(p) === 'Arial' && sizeOf(p) === 10),
-        check('Erste Zeile fett und grau hinterlegt', 'Zellen der ersten Zeile markieren → „B“, Texthervorhebung → Grau', cells((r) => r === 0), (p) => isBold(p) && colorFamily(highlightOf(p)) === 'gray'),
-        check('„vor/nach Sanierung“ unterstrichen', 'Nur die beiden Wörter markieren → „U“', cells((r, c) => (r === 1 || r === 3) && c === 0), (p) => rangeUnderlined(p, 'vor Sanierung') || rangeUnderlined(p, 'nach Sanierung')),
-        check('Werte zentriert', 'Zellen markieren → Ausrichtung → Zentriert', cells((r, c) => (r === 2 || r === 4) && c > 0), (p) => isCentered(p)),
-        check('m² hochgestellt', '„2“ in W/(m2K) markieren → Hochgestellt (X²)', cells((r, c) => (r === 2 || r === 4) && c === 1), (p) => superscriptAfter(p, 'W/(m')),
+        check(
+          'Absatz steht in einem eigenen Abschnitt',
+          H.insertBreak('Abschnittsumbruch (Fortlaufend)'),
+          D_SECOND,
+          (p, d) => {
+            const before = d.paragraphs.find((x) => x.text.startsWith('Ein schlecht gedämmtes'));
+            const after = d.paragraphs.find((x) => x.text.startsWith('Der U-Wert von einem'));
+            return !!before && !!after && before.section !== p.section && after.section !== p.section;
+          },
+        ),
       ],
     },
     {
-      title: '9 · Fußnote',
-      instruction:
-        'Word setzt Fußnoten automatisch – hier baust du sie selbst:\nHinter „Wärmedurchgangskoeffizient“ im zweiten Absatz eine hochgestellte 1 eintippen\nLetzte Zeile („1 wird häufig …“): Schriftgröße 8, die 1 am Anfang hochstellen',
+      title: 'Zweiter Absatz: zwei Spalten',
+      target: 'Der neue Abschnitt mit „Der Wärmedurchgangskoeffizient ist …“',
+      instruction: 'Spaltenanzahl 2\nTrennlinie „Zwischen Spalten“\nDer übrige Text bleibt einspaltig',
+      tools: ['abschnitt'],
       checks: [
-        check('Hochgestellte 1 im zweiten Absatz', 'Cursor hinter „…koeffizient“ → 1 tippen, markieren → Hochgestellt (X²)', D_SECOND, (p) => p.text.startsWith('Der Wärmedurchgangskoeffizient1') && superscriptAfter(p, 'Der Wärmedurchgangskoeffizient')),
-        check('Fußnotentext 8 pt, 1 hochgestellt', 'Zeile markieren → Schriftgröße 8; dann nur die 1 → Hochgestellt', (d) => [d.paragraphs.find((p) => /wird häufig auch als U-Wert/.test(p.text))], (p) => sizeOf(p) === 8 && isSuperscript(p.charStyles[0])),
+        check('Zwei Spalten', `Cursor in den Absatz, dann ${H.section} → Spaltenanzahl 2`, D_SECOND, (p, d) => sectionOf(d, p)?.columns === 2),
+        check('Trennlinie zwischen den Spalten', `${H.section} → Trennlinie „Zwischen Spalten“`, D_SECOND, (p, d) => !!sectionOf(d, p)?.separator),
+        check('Übriger Text einspaltig', 'Nur der Abschnitt mit dem zweiten Absatz bekommt 2 Spalten – im Abschnitts-Panel oben den richtigen Abschnitt wählen', byText('Ein schlecht gedämmtes', 'Der U-Wert von einem'), (p, d) => sectionOf(d, p)?.columns === 1 && sectionOf(d, D_SECOND(d)[0])?.columns === 2),
+      ],
+    },
+    {
+      title: 'Spaltenumbruch',
+      target: 'Im zweiten Absatz direkt vor „Die jeweilige Bauteildicke …“',
+      instruction: 'Manueller Spaltenumbruch, damit der Text ab „Die jeweilige …“ in der rechten Spalte beginnt',
+      checks: [docCheck('Spaltenumbruch vor „Die jeweilige Bauteildicke“', H.insertBreak('Spaltenumbruch'), (d) => columnBreakBefore(d, 'Die jeweilige Bauteildicke'))],
+    },
+    {
+      title: 'Tabelle: Schrift',
+      target: 'Gesamte Tabelle unter „Vergleich der Heizkosten …“',
+      instruction: 'Arial, 10 pt\nErste Tabellenzeile (U-Wert, Heizölbedarf, Heizkosten …): fett und grau hinterlegt (Texthintergrundfarbe, 1. Spalte)',
+      checks: [
+        check('Tabellentext Arial, 10 pt', `Von der ersten bis zur letzten Zelle ziehen, dann ${H.font('Arial')}, ${H.size(10)}`, cells(() => true), (p) => fontOf(p) === 'Arial' && sizeOf(p) === 10),
+        check('Erste Zeile fett und grau hinterlegt', `${H.bold}; ${H.highlight('Grau', PALETTE_COLUMN.grau)}`, cells((r) => r === 0), (p) => isBold(p) && colorFamily(highlightOf(p)) === 'gray'),
+      ],
+    },
+    {
+      title: 'Tabelle: Werte',
+      target: 'Tabellenzeilen 2 bis 5',
+      instruction: 'In „Dachboden vor Sanierung …“ und „Dachboden nach Sanierung …“ nur die Wörter „vor Sanierung“ bzw. „nach Sanierung“ unterstreichen\nDie Werte in Zeile 3 und 5 (Spalten 2–4) zentrieren\nIn „W/(m2K)“ (Zeile 3 und 5) die 2 hochstellen → W/(m²K)',
+      checks: [
+        check('„vor/nach Sanierung“ unterstrichen', `Nur die beiden Wörter markieren, dann ${H.underline}`, cells((r, c) => (r === 1 || r === 3) && c === 0), (p) => rangeUnderlined(p, 'vor Sanierung') || rangeUnderlined(p, 'nach Sanierung')),
+        check('Werte zentriert', `Wertezellen markieren, dann ${H.align('Zentriert')}`, cells((r, c) => (r === 2 || r === 4) && c > 0), (p) => isCentered(p)),
+        check('m² hochgestellt', H.superscript, cells((r, c) => (r === 2 || r === 4) && c === 1), (p) => superscriptAfter(p, 'W/(m')),
+      ],
+    },
+    {
+      title: 'Fußnote',
+      target: 'Zweiter Absatz hinter „Wärmedurchgangskoeffizient“ und letzte Zeile „1 wird häufig …“',
+      instruction: 'Direkt hinter „Der Wärmedurchgangskoeffizient“ (Absatzanfang) eine 1 eintippen und hochstellen\nLetzte Zeile: Schriftgröße 8, die 1 am Anfang hochstellen',
+      checks: [
+        check('Hochgestellte 1 im zweiten Absatz', `Cursor hinter „…koeffizient“, 1 tippen; ${H.superscript}`, D_SECOND, (p) => p.text.startsWith('Der Wärmedurchgangskoeffizient1') && superscriptAfter(p, 'Der Wärmedurchgangskoeffizient')),
+        check('Fußnotentext 8 pt, 1 hochgestellt', `${H.selectLine}, ${H.size(8)}; dann ${H.superscript}`, (d) => [d.paragraphs.find((p) => /wird häufig auch als U-Wert/.test(p.text))], (p) => sizeOf(p) === 8 && isSuperscript(p.charStyles[0])),
       ],
     },
   ],
@@ -327,74 +409,111 @@ const sparkasse: LayoutTask = {
   ],
   steps: [
     {
-      title: '1 · Fußzeile',
-      instruction: 'Name, Klasse und Datum (TT.MM.JJ) in die Fußzeile eintragen.',
+      title: 'Fußzeile',
+      target: 'Fußzeile (unterer Seitenrand)',
+      instruction: 'Knopf „Fußzeile bearbeiten“ drücken – der Cursor steht dann in der Fußzeile\nName, Klasse und Datum (TT.MM.JJ) eintragen – z. B. Lena Huber 10b 01.10.26\nZum Schluss „↩ Zurück zum Text“ drücken',
+      tools: ['fusszeile'],
       checks: nameLineChecks('footer', FOOTNOTE_TEXT),
     },
     {
-      title: '2 · Seitenränder',
-      instruction: `Alle Seitenränder 1 cm (${px(1)}).`,
+      title: 'Seitenränder',
+      target: 'Ganzes Dokument – bitte vor den Abschnittsumbrüchen (Auftrag 8) erledigen',
+      instruction: `Alle vier Seitenränder 1 cm (${px(1)})`,
+      tools: ['seite'],
       checks: marginChecks({ top: 1, bottom: 1, left: 1, right: 1 }),
     },
     {
-      title: '3 · Fließtext und Tabelle',
-      instruction: 'Alle Absätze außer den Überschriften sowie der Tabellentext: Arial, 11 pt.',
+      title: 'Fließtext: Schrift',
+      target: 'Alle Absätze außer den Überschriften: 2. Zeile „Ihr erstes eigenes Konto …“, die fünf Vorteile, Absatz „Mit der App …“, letzte Zeile „Ihre Sparkasse berät …“',
+      instruction: 'Schriftart Arial\nSchriftgröße 11',
+      checks: [
+        check('Arial, 11 pt', `Absätze markieren, dann ${H.font('Arial')}, ${H.size(11)}`, (d) => [...byText('Ihr erstes eigenes', ...S_LIST, 'Ihre Sparkasse berät')(d), ...S_MOBILE(d)], (p) => fontOf(p) === 'Arial' && sizeOf(p) === 11),
+      ],
+    },
+    {
+      title: 'Tabelle: Schrift',
+      target: 'Gesamte Tabelle unter „Preisvergleich“',
+      instruction: 'Schriftart Arial\nSchriftgröße 11',
+      checks: [check('Tabellentext Arial, 11 pt', `Von der ersten bis zur letzten Zelle ziehen, dann ${H.font('Arial')}, ${H.size(11)}`, cells(() => true), (p) => fontOf(p) === 'Arial' && sizeOf(p) === 11)],
+    },
+    {
+      title: 'Hauptüberschrift',
+      target: '1. Zeile – „PrivatKonto Young“',
+      instruction: 'Verdana, 26 pt\nFett, zentriert\nSchriftfarbe Rot (3. Spalte, statt WordArt)',
+      checks: [
+        check('Verdana, 26 pt', `${H.font('Verdana')}, ${H.size(26)}`, '=PrivatKonto Young', (p) => fontOf(p) === 'Verdana' && sizeOf(p) === 26),
+        check('Fett und zentriert', `${H.bold}; ${H.align('Zentriert')}`, '=PrivatKonto Young', (p) => isBold(p) && isCentered(p)),
+        check('Schriftfarbe Rot', H.color('Rot', PALETTE_COLUMN.rot), '=PrivatKonto Young', (p) => colorIs(p, 'red')),
+      ],
+    },
+    {
+      title: 'Unterüberschriften',
+      target: '„Ihre Vorteile im Überblick“, „Mobiles Bezahlen“, „Preisvergleich“',
+      instruction: 'Arial, 12 pt\nFett',
+      checks: [check('Arial, 12 pt, fett', `${H.font('Arial')}, ${H.size(12)}, ${H.bold}`, S_HEADINGS, (p) => fontOf(p) === 'Arial' && sizeOf(p) === 12 && isBold(p))],
+    },
+    {
+      title: 'Vorteile als Aufzählung',
+      target: 'Die fünf Zeilen unter „Ihre Vorteile im Überblick“ (von „Kostenlose Kontoführung …“ bis „Persönliche Beratung …“)',
+      instruction: `Aufzählung mit Punkten\nEinzug links 0 cm, hängender Einzug 0,75 cm (${px(0.75)})`,
+      tools: ['absatz'],
+      checks: [
+        check('Aufzählung mit Punkten', `${H.selectLines}, dann ${H.bullets}`, S_LIST, (p) => isBulletList(p)),
+        check('Hängender Einzug 0,75 cm, links 0', `${H.paragraph} → Links 0, „Hängender Einzug“ ${px(0.75)}`, S_LIST, (p) => near(p.hanging, cmToPx(0.75), 2) && near(p.indentStart ?? 0, 0)),
+      ],
+    },
+    {
+      title: 'Mobiles Bezahlen: eigener Abschnitt',
+      target: 'Absatz „Mit der App „Mobiles Bezahlen“ …“',
+      instruction: 'Cursor an den Anfang dieses Absatzes → Abschnittsumbruch (Fortlaufend)\nCursor an den Anfang von „Preisvergleich“ → Abschnittsumbruch (Fortlaufend)',
       checks: [
         check(
-          'Fließtext Arial, 11 pt',
-          'Text markieren → Start → Schriftart und Schriftgröße',
-          (d) => [...byText('Ihr erstes eigenes', ...S_LIST, 'Ihre Sparkasse berät')(d), ...S_MOBILE(d)],
-          (p) => fontOf(p) === 'Arial' && sizeOf(p) === 11,
+          'Absatz steht in einem eigenen Abschnitt',
+          H.insertBreak('Abschnittsumbruch (Fortlaufend)'),
+          S_MOBILE,
+          (p, d) => {
+            const before = d.paragraphs.find((x) => x.text.startsWith('Ihr erstes eigenes'));
+            const after = d.paragraphs.find((x) => x.text.startsWith('Ihre Sparkasse berät'));
+            return !!before && !!after && before.section !== p.section && after.section !== p.section;
+          },
         ),
-        check('Tabellentext Arial, 11 pt', 'Tabelle markieren → Schriftart und Schriftgröße', cells(() => true), (p) => fontOf(p) === 'Arial' && sizeOf(p) === 11),
       ],
     },
     {
-      title: '4 · Hauptüberschrift',
-      instruction: '„PrivatKonto Young“: Verdana, 26 pt, fett, rote Schriftfarbe, zentriert (statt WordArt).',
+      title: 'Mobiles Bezahlen: zwei Spalten',
+      target: 'Der neue Abschnitt mit „Mit der App …“',
+      instruction: `Spaltenanzahl 2\nTrennlinie „Zwischen Spalten“\nSpaltenabstand 1 cm (${px(1)})\nDer übrige Text bleibt einspaltig`,
+      tools: ['abschnitt'],
       checks: [
-        check('Verdana, 26 pt', 'Start → Schriftart und Schriftgröße', '=PrivatKonto Young', (p) => fontOf(p) === 'Verdana' && sizeOf(p) === 26),
-        check('Fett, rot, zentriert', 'Start → „B“, Schriftfarbe → Rot, Zentriert', '=PrivatKonto Young', (p) => isBold(p) && colorIs(p, 'red') && isCentered(p)),
+        check('Zwei Spalten', `Cursor in den Absatz, dann ${H.section} → Spaltenanzahl 2`, S_MOBILE, (p, d) => sectionOf(d, p)?.columns === 2),
+        check('Trennlinie und Abstand 1 cm', `${H.section} → Trennlinie „Zwischen Spalten“, Spaltenabstand ${px(1)}`, S_MOBILE, (p, d) => !!sectionOf(d, p)?.separator && near(sectionOf(d, p)?.gap, cmToPx(1))),
+        check('Übriger Text einspaltig', 'Nur der Abschnitt „Mobiles Bezahlen“ bekommt 2 Spalten – im Abschnitts-Panel oben den richtigen Abschnitt wählen', byText('Ihr erstes eigenes', 'Ihre Sparkasse berät'), (p, d) => sectionOf(d, p)?.columns === 1 && sectionOf(d, S_MOBILE(d)[0])?.columns === 2),
       ],
     },
     {
-      title: '5 · Unterüberschriften',
-      instruction: '„Ihre Vorteile im Überblick“, „Mobiles Bezahlen“, „Preisvergleich“: Arial, fett, 12 pt.',
-      checks: [check('Arial, 12 pt, fett', 'Start → Schriftart, Schriftgröße, „B“', S_HEADINGS, (p) => fontOf(p) === 'Arial' && sizeOf(p) === 12 && isBold(p))],
+      title: 'Spaltenumbruch',
+      target: 'Im Absatz „Mit der App …“ direkt vor dem Satz „Zusätzlich können Sie …“',
+      instruction: 'Manueller Spaltenumbruch, damit „Zusätzlich …“ oben in der rechten Spalte beginnt',
+      checks: [docCheck('Spaltenumbruch vor „Zusätzlich“', H.insertBreak('Spaltenumbruch'), (d) => columnBreakBefore(d, 'Zusätzlich können Sie'))],
     },
     {
-      title: '6 · Vorteile als Aufzählung',
-      instruction: `Die fünf Vorteile: Aufzählung mit Punkt, Einzug links 0 cm, hängender Einzug 0,75 cm (${px(0.75)}).`,
+      title: 'Tabelle formatieren',
+      target: 'Tabelle unter „Preisvergleich“',
+      instruction: 'Spaltenüberschriften (Zeile 1: Konto Young, Konto Klassik, Konto Premium): fett und zentriert\nZeile 1 und Spalte 1 (Kontoführung monatlich … Überweisung beleglos): dunkelrote Schrift (3. Spalte, eine der beiden untersten Farben)\nAlle Werte (Zeile 2–6, Spalte 2–4): zentriert',
       checks: [
-        check('Aufzählungszeichen', 'Start → Liste mit Punkten', S_LIST, (p) => isBulletList(p)),
-        check('Hängender Einzug 0,75 cm, links 0 cm', `${HINT_PARAGRAPH} → Links 0, Hängender Einzug ${px(0.75)}`, S_LIST, (p) => near(p.hanging, cmToPx(0.75), 2) && near(p.indentStart ?? 0, 0)),
+        check('Spaltenüberschriften fett, zentriert', `${H.bold}; ${H.align('Zentriert')}`, cells((r, c) => r === 0 && c > 0), (p) => isBold(p) && isCentered(p)),
+        check('Überschriften dunkelrot', H.color('Dunkelrot', PALETTE_COLUMN.rot), cells((r, c) => r === 0 || c === 0), (p) => colorIs(p, 'red') && isDarkColor(rgbOf(p))),
+        check('Werte zentriert', `Wertezellen markieren, dann ${H.align('Zentriert')}`, cells((r, c) => r > 0 && c > 0), (p) => isCentered(p)),
       ],
     },
     {
-      title: '7 · Mobiles Bezahlen in zwei Spalten',
-      instruction: `Absatz nach „Mobiles Bezahlen“:\nzwei Spalten (vorher und nachher Abschnittsumbruch „Fortlaufend“ einfügen)\nTrennlinie zwischen den Spalten\nSpaltenabstand 1 cm (${px(1)})\nSpaltenumbruch vor „Zusätzlich …“`,
+      title: 'Fußnote',
+      target: 'Tabelle Zeile 2, Spalte 4 („0,00 EUR“ beim Konto Premium) und die Fußzeile',
+      instruction: 'Direkt hinter „0,00 EUR“ eine 1 eintippen und hochstellen\nIn der Fußzeile zusätzlich: „1 mtl. Mindestgeldeingang 5.000 EUR, sonst 12,90 EUR“',
+      tools: ['fusszeile'],
       checks: [
-        check('Absatz zweispaltig', `Abschnittsumbrüche setzen, dann ${HINT_SECTION} → Spaltenanzahl 2`, S_MOBILE, (p, d) => sectionOf(d, p)?.columns === 2),
-        check('Trennlinie und Abstand 1 cm', `${HINT_SECTION} → Trennlinie „Zwischen Spalten“, Spaltenabstand ${px(1)}`, S_MOBILE, (p, d) => !!sectionOf(d, p)?.separator && near(sectionOf(d, p)?.gap, cmToPx(1))),
-        check('Übriger Text bleibt einspaltig', 'Nur der Abschnitt „Mobiles Bezahlen“ bekommt 2 Spalten – prüfe die Abschnittsumbrüche', byText('Ihr erstes eigenes', 'Ihre Sparkasse berät'), (p, d) => sectionOf(d, p)?.columns === 1 && sectionOf(d, S_MOBILE(d)[0])?.columns === 2),
-        docCheck('Spaltenumbruch vor „Zusätzlich“', 'Cursor vor „Zusätzlich“ setzen → Einfügen → Umbrüche → Spaltenumbruch', (d) => columnBreakBefore(d, 'Zusätzlich können Sie')),
-      ],
-    },
-    {
-      title: '8 · Tabelle',
-      instruction: 'Spaltenüberschriften (Zeile 1): fett und zentriert\nSpalten- und Zeilenüberschriften (Zeile 1 und Spalte 1): dunkelrote Schriftfarbe\nAlle Werte (Zeile 2–6, Spalte 2–4): zentriert',
-      checks: [
-        check('Spaltenüberschriften fett, zentriert', 'Zellen der ersten Zeile markieren → „B“, Zentriert', cells((r, c) => r === 0 && c > 0), (p) => isBold(p) && isCentered(p)),
-        check('Überschriften dunkelrot', 'Zellen markieren → Schriftfarbe → Dunkelrot', cells((r, c) => r === 0 || c === 0), (p) => colorIs(p, 'red')),
-        check('Werte zentriert', 'Wertezellen markieren → Zentriert', cells((r, c) => r > 0 && c > 0), (p) => isCentered(p)),
-      ],
-    },
-    {
-      title: '9 · Fußnote',
-      instruction: 'Hinter „0,00 EUR“ bei der Kontoführung des Premium-Kontos (Zeile 2, Spalte 4) eine hochgestellte 1 einfügen.\nIn die Fußzeile zusätzlich: „1 mtl. Mindestgeldeingang 5.000 EUR, sonst 12,90 EUR“.',
-      checks: [
-        check('Hochgestellte 1 hinter 0,00 EUR', 'In die Zelle klicken, 1 tippen, markieren → Hochgestellt (X²)', cells((r, c) => r === 1 && c === 3), (p) => p.text.trim() === '0,00 EUR1' && superscriptAfter(p, '0,00 EUR')),
-        docCheck('Fußnotentext in der Fußzeile', 'Fußzeile öffnen → Text eintippen', (d) => /Mindestgeldeingang\s*5\.000\s*EUR/i.test(d.footerText)),
+        check('Hochgestellte 1 hinter 0,00 EUR', `In die Zelle hinter „EUR“ tippen, 1 eingeben; ${H.superscript}`, cells((r, c) => r === 1 && c === 3), (p) => p.text.trim() === '0,00 EUR1' && superscriptAfter(p, '0,00 EUR')),
+        docCheck('Fußnotentext in der Fußzeile', H.footer, (d) => /Mindestgeldeingang\s*5\.000\s*EUR/i.test(d.footerText)),
       ],
     },
   ],

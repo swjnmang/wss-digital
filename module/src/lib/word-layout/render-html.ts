@@ -79,7 +79,7 @@ function renderParagraph(p: ExportParagraph, ctx: Ctx, runs = p.runs, continuati
   applyTextStyle(node, { ...ctx.defaults, ...(runs[0]?.style ?? {}) }, s);
 
   if (p.bullet && !continuation) {
-    const isBullet = p.bullet.listType === 'BULLET_LIST';
+    const isBullet = p.bullet.listType.startsWith('BULLET_LIST');
     let marker = '•';
     if (!isBullet) {
       const key = `${p.bullet.listId}:${p.bullet.level}`;

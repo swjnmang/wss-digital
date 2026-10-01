@@ -112,7 +112,7 @@ function paragraph(p: ExportParagraph): Paragraph {
         }
       : undefined,
     numbering: p.bullet
-      ? { reference: p.bullet.listType === 'BULLET_LIST' ? 'bullets' : 'numbers', level: Math.min(p.bullet.level, 2), instance: hashInstance(p.bullet.listId) }
+      ? { reference: p.bullet.listType.startsWith('BULLET_LIST') ? 'bullets' : 'numbers', level: Math.min(p.bullet.level, 2), instance: hashInstance(p.bullet.listId) }
       : undefined,
   });
 }
