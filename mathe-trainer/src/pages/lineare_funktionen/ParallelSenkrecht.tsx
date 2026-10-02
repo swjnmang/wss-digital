@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import styles from './ParallelSenkrecht.module.css'
 import { getAreaFromPath, HelpUsage, logTrackingEntry } from '../../utils/tracking'
+import { useFlushOnLeave } from '../../hooks/useTaskTracking'
 
 // ===== MathDisplay Komponente =====
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -242,12 +243,12 @@ export default function ParallelSenkrecht() {
     else if (e.helpUsed === 'none') e.helpUsed = 'hint'
   }
 
-  // Beim Mounten die ersten Aufgaben registrieren; Cleanup liest nur Refs (keine veralteten Closures).
+  // Beim Mounten die ersten Aufgaben registrieren.
   useEffect(() => {
     aufgaben.forEach((a, i) => trackRegister(i, trackingTopics[a.typ]))
-    return () => trackFlush()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  useFlushOnLeave(() => trackFlush())
 
   const prüfeAntwort = (index: number) => {
     const aufgabe = aufgaben[index]

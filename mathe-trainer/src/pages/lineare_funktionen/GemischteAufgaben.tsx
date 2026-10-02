@@ -5,6 +5,7 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import GeoGebraMultiGraph from '../../components/GeoGebraMultiGraph'
 import { roundHalfAwayFromZero } from '../../utils/numbers'
 import { HelpUsage, logTrackingEntry } from '../../utils/tracking'
+import { useFlushOnLeave } from '../../hooks/useTaskTracking'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -375,7 +376,7 @@ export default function GemischteAufgaben() {
     trackingRef.current = {}
   }
 
-  useEffect(() => () => flushTracking(), [])
+  useFlushOnLeave(flushTracking)
 
   // Jede angezeigte Aufgabe registrieren, damit sie auch ohne Versuch als "nicht bearbeitet" geloggt wird.
   function registerTracking(list: Aufgabe[]) {

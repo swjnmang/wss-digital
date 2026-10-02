@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import styles from './LFCommon.module.css'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { getAreaFromPath, HelpUsage, logTrackingEntry } from '../../utils/tracking'
+import { useFlushOnLeave } from '../../hooks/useTaskTracking'
 
 type Difficulty = 'easy' | 'medium' | 'hard'
 type TaskType = 'check_point' | 'find_correct_point_among_three' | 'calculate_missing_coordinate'
@@ -94,7 +95,7 @@ export default function PunktGerade() {
     else if (e.helpUsed === 'none') e.helpUsed = 'hint'
   }
 
-  useEffect(() => () => trackFlush(), [])
+  useFlushOnLeave(() => trackFlush())
 
   function handleDifficulty(level: Difficulty) {
     setDifficulty(level)

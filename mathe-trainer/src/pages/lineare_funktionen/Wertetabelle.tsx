@@ -341,10 +341,10 @@ interface Aufgabe {
 export default function Wertetabelle() {
   // Pro Runde gibt es 4 parallele Aufgaben -> je ein Tracking-Hook (feste Anzahl, Hook-Regeln bleiben erfüllt)
   const trackings = [
-    useTaskTracking('Wertetabelle'),
-    useTaskTracking('Wertetabelle'),
-    useTaskTracking('Wertetabelle'),
-    useTaskTracking('Wertetabelle')
+    useTaskTracking('Wertetabelle', { shownOnMount: false }),
+    useTaskTracking('Wertetabelle', { shownOnMount: false }),
+    useTaskTracking('Wertetabelle', { shownOnMount: false }),
+    useTaskTracking('Wertetabelle', { shownOnMount: false })
   ]
   const [aufgaben, setAufgaben] = useState<Aufgabe[]>([])
   const [antworten, setAntworten] = useState<{ [key: number]: Array<{ x: string; y: string }> }>({})
@@ -585,7 +585,8 @@ export default function Wertetabelle() {
 
   // Aufgaben generieren basierend auf Schwierigkeitsgrad
   function generiereAufgaben(grad: 'einfach' | 'mittel' | 'schwer') {
-    trackings.forEach(t => t.onTaskStart())
+    const gradLabel = grad === 'einfach' ? 'Einfach' : grad === 'mittel' ? 'Mittel' : 'Schwer'
+    trackings.forEach(t => t.onTaskStart(`Wertetabelle (${gradLabel})`))
     const neue: Aufgabe[] = []
     const usedCombinations = new Set<string>() // Tracke verwendete (m, t) Kombinationen
     
@@ -870,6 +871,7 @@ export default function Wertetabelle() {
     }
     
     currentAnswers[rowIndex][field] = value
+    if (value.trim() !== '') trackings[aufgabeIndex]?.onInput()
     
     // Validiere diese Zelle
     const aufgabe = aufgaben[aufgabeIndex]

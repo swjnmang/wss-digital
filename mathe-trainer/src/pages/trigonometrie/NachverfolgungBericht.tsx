@@ -26,7 +26,7 @@ const formatDateTime = (timestamp: number) =>
     });
 
 const getStatusText = (entry: TrackingEntry) => {
-    if (entry.attempts === 0) return 'nicht bearbeitet';
+    if (entry.attempts === 0) return entry.started ? 'begonnen, aber nicht geprüft' : 'nicht bearbeitet';
     if (entry.solved) return entry.attempts === 1 ? 'sofort richtig' : `richtig nach ${entry.attempts} Versuchen`;
     return `nicht gelöst (${entry.attempts} Versuch${entry.attempts === 1 ? '' : 'e'})`;
 };
@@ -182,7 +182,7 @@ const NachverfolgungBericht: React.FC<{ area?: TrackingArea }> = ({ area = 'trig
                     <div className="space-y-3">
                         {log.map((entry, index) => {
                             const untouched = entry.attempts === 0;
-                            const statusIcon = untouched ? '⏸️' : entry.solved ? (entry.attempts === 1 ? '✅' : '⚠️') : '❌';
+                            const statusIcon = untouched ? (entry.started ? '✏️' : '⏸️') : entry.solved ? (entry.attempts === 1 ? '✅' : '⚠️') : '❌';
                             const statusText = getStatusText(entry);
                             return (
                                 <div

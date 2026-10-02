@@ -4,6 +4,9 @@ import { InlineMath } from 'react-katex'
 import 'katex/dist/katex.min.css'
 import styles from './LFCommon.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
+import { useTaskTracking } from '../../hooks/useTaskTracking'
+
+const LEVEL_LABELS = { easy: 'Leicht', medium: 'Mittel', hard: 'Schwer' } as const
 
 export default function Zeichnen(){
   const [difficulty, setDifficulty] = useState<'easy'|'medium'|'hard'>('easy')
@@ -15,6 +18,9 @@ export default function Zeichnen(){
   const [t, setT] = useState<number>(1)
   const [equationLatex, setEquationLatex] = useState<string>('y = 2x + 1')
   const lastEasyM = useRef<number | null>(null)
+  // Keine automatische Prüfung möglich (gezeichnet wird im Heft) -> Selbsteinschätzung nach der Lösungskontrolle.
+  const tracking = useTaskTracking('Graph zeichnen')
+  const [selfCheck, setSelfCheck] = useState<'correct' | 'wrong' | null>(null)
 
   useEffect(() => {
     generateNewTask(difficulty)
@@ -114,6 +120,8 @@ export default function Zeichnen(){
     setM(m)
     setT(t)
     setShowSolution(false)
+    setSelfCheck(null)
+    tracking.onTaskStart(`Graph zeichnen (${LEVEL_LABELS[level]})`)
   }
 
   function openGeoGebra(){
@@ -205,7 +213,7 @@ export default function Zeichnen(){
 
           <div className="flex justify-center gap-4 flex-wrap">
             <button className="generator-button bg-gradient-to-br from-sky-600 to-sky-700 text-white rounded-md px-5 py-3 shadow" onClick={() => generateNewTask(difficulty)}>Neue Aufgabe</button>
-            <button className="generator-button bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-md px-5 py-3 shadow" onClick={() => setShowTipps(true)}>Tipps</button>
+            <button className="generator-button bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-md px-5 py-3 shadow" onClick={() => { tracking.onHintShown(); setShowTipps(true) }}>Tipps</button>
             <button className="generator-button bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-md px-5 py-3 shadow" onClick={openGeoGebra}>Lösungskontrolle anzeigen</button>
           </div>
 
@@ -226,6 +234,28 @@ export default function Zeichnen(){
                 width={700} 
                 height={500}
               />
+              <div className="mt-4 text-center">
+                {selfCheck === 'correct' ? (
+                  <p className="text-green-700 font-semibold">Super, dein Graph stimmt! Weiter mit „Neue Aufgabe“.</p>
+                ) : (
+                  <>
+                    <p className="text-gray-700 mb-2">Vergleiche mit deiner Zeichnung: Stimmt dein Graph?</p>
+                    <div className="flex justify-center gap-3 flex-wrap">
+                      <button
+                        className="bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-2"
+                        onClick={() => { tracking.onCheck(true); setSelfCheck('correct') }}
+                      >✓ Mein Graph stimmt</button>
+                      <button
+                        className="bg-rose-600 hover:bg-rose-700 text-white rounded-md px-4 py-2"
+                        onClick={() => { tracking.onCheck(false); setSelfCheck('wrong') }}
+                      >✗ Mein Graph stimmt nicht</button>
+                    </div>
+                    {selfCheck === 'wrong' && (
+                      <p className="text-rose-700 mt-2">Schau dir die Tipps an, korrigiere deine Zeichnung und vergleiche noch einmal.</p>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           )}
         </div>

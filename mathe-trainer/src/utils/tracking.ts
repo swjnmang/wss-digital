@@ -14,6 +14,8 @@ export interface TrackingEntry {
     firstTryCorrect: boolean;
     solved: boolean;
     helpUsed: HelpUsage;
+    // Eingaben gemacht, aber nie geprüft (nur sinnvoll bei attempts: 0).
+    started?: boolean;
     timestamp: number;
     // Themenbereich, in dem die Aufgabe bearbeitet wurde (aus der URL abgeleitet).
     area?: TrackingArea;
