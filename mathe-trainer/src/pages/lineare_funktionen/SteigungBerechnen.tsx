@@ -307,6 +307,8 @@ export default function SteigungBerechnen() {
   const coordCls = 'w-20 text-center border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:border-blue-500'
   const panel = 'text-left bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
 
+  const openVideo = () => window.open('https://youtu.be/IwNoiR-yfJ0?si=Hklidv10rx1W6YuJ', '_blank')
+
   const feedbackEl = (text: string) =>
     text ? (
       <p className={`text-center font-bold mt-3 ${text.includes('Richtig') ? 'text-green-600' : 'text-red-600'}`}>{text}</p>
@@ -409,14 +411,7 @@ export default function SteigungBerechnen() {
               <button onClick={checkSolution} className={btnPrimary}>Lösung prüfen</button>
               <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
               <button onClick={onShowAnswer} className={btnSecondary}>Lösung anzeigen</button>
-              <a
-                href="https://youtu.be/IwNoiR-yfJ0?si=Hklidv10rx1W6YuJ"
-                target="_blank"
-                rel="noreferrer"
-                className={`${btnSecondary} no-underline`}
-              >
-                Erklärvideo
-              </a>
+              <button onClick={openVideo} className={btnSecondary}>Erklärvideo</button>
             </div>
 
             {showSolution && solutionEl(p1, p2, p2.y - p1.y, p2.x - p1.x, (p2.y - p1.y) / (p2.x - p1.x))}
@@ -487,6 +482,7 @@ export default function SteigungBerechnen() {
               <button onClick={checkGraphSolution} className={btnPrimary}>Lösung prüfen</button>
               <button onClick={generateNewGraphTask} className={btnSecondary}>Neue Aufgabe</button>
               <button onClick={onShowGraphAnswer} className={btnSecondary}>Lösung anzeigen</button>
+              <button onClick={openVideo} className={btnSecondary}>Erklärvideo</button>
             </div>
 
             {graphShowSolution && selectedPoints.length === 2 &&
