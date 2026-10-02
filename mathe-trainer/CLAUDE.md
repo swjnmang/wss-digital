@@ -18,3 +18,8 @@ Der Modus wird nicht automatisch erkannt: Jede Seite muss ihn selbst einbinden.
 - Angezeigte, aber nie geprüfte Aufgaben erscheinen im Bericht als „nicht bearbeitet“ (`attempts: 0`).
   Der Hook erledigt das selbst; bei direktem `logTrackingEntry` muss jede angezeigte Aufgabe beim Generieren
   registriert und beim Flush (neue Aufgabe / Seite verlassen) mitgeloggt werden.
+
+## Git-Workflow
+
+Fertige Änderungen immer direkt in `main` committen und pushen (ausdrücklicher Wunsch des Repo-Inhabers),
+nicht nur auf einen Feature-Branch. Vorher `main` aktualisieren und mergen, keine Force-Pushes.
