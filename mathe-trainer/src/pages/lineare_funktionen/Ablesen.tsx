@@ -1,459 +1,344 @@
 import React, { useEffect, useRef, useState } from 'react'
-import styles from './Ablesen.module.css'
+import { useNavigate } from 'react-router-dom'
+import GeoGebraGraph from '../../components/GeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 
 declare global {
-  interface Window { 
-    GGBApplet: any
+  interface Window {
     YT: any
     onYouTubeIframeAPIReady: () => void
   }
 }
 
+const TOTAL_TASKS = 5
+const VIDEO_ID = 'r8vCu72ojYw'
+
+const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
+const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
+const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
+
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-export default function Ablesen() {
+// Steigung und y-Achsenabschnitt (beide ungleich 0, damit jede Gleichung die Form y = mx ± t hat)
+const SLOPES = [-3, -2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2, 3]
+function newLine() {
+  let t = 0
+  while (t === 0) t = randInt(-4, 4)
+  return { m: SLOPES[Math.floor(Math.random() * SLOPES.length)], t }
+}
+
+const fmt = (n: number) => String(n).replace('.', ',').replace('-', '−')
+
+function equationText(m: number, t: number) {
+  const mPart = m === 1 ? '' : m === -1 ? '−' : fmt(m)
+  return `y = ${mPart}x ${t < 0 ? '−' : '+'} ${fmt(Math.abs(t))}`
+}
+
+// ---------- Auswertung der beiden Felder ----------
+
+type Status = 'idle' | 'right' | 'wrong'
+const isSign = (c: string) => /[+\-−–—‐]/.test(c)
+
+function mStatus(raw: string, m: number): Status {
+  const s = raw.trim()
+  if (s === '' || (s.length === 1 && (isSign(s) || s === ',' || s === '.'))) return 'idle'
+  const v = parseFlexibleNumber(s)
+  if (Number.isNaN(v)) return 'wrong'
+  return Math.abs(v - m) < 0.03 ? 'right' : 'wrong'
+}
+
+/** Das zweite Feld enthält Vorzeichen und Wert von t, z. B. "+3" oder "−2": Das Vorzeichen muss der Schüler selbst setzen. */
+function tStatus(raw: string, t: number): { status: Status; hint: string } {
+  const s = raw.trim()
+  if (s === '' || (s.length === 1 && (isSign(s) || s === ',' || s === '.'))) return { status: 'idle', hint: '' }
+  const match = s.replace(/\s+/g, '').match(/^([+\-−–—‐])(\d+(?:[.,]\d+)?)$/)
+  if (!match) {
+    return /^\d/.test(s)
+      ? { status: 'wrong', hint: 'Setze ein Vorzeichen (+ oder −) davor.' }
+      : { status: 'wrong', hint: '' }
+  }
+  const value = (/[\-−–—‐]/.test(match[1]) ? -1 : 1) * parseFloat(match[2].replace(',', '.'))
+  return Math.abs(value - t) < 0.03 ? { status: 'right', hint: '' } : { status: 'wrong', hint: '' }
+}
+
+const fieldCls = (status: Status) =>
+  `w-20 text-center border-2 rounded px-2 py-2 focus:outline-none ${
+    status === 'right' ? 'border-green-500 bg-green-50' : status === 'wrong' ? 'border-red-500 bg-red-50' : 'border-slate-300'
+  }`
+
+// ---------- Graph in passender Größe ----------
+
+function ResponsiveGraph({ m, t }: { m: number; t: number }) {
+  const boxRef = useRef<HTMLDivElement>(null)
+  const [size, setSize] = useState(400)
+  useEffect(() => {
+    const el = boxRef.current
+    if (!el) return
+    // Größe in 40-px-Schritten, damit der Graph nicht bei jedem Pixel neu lädt
+    const update = () => setSize(Math.max(240, Math.min(480, Math.floor((el.clientWidth - 24) / 40) * 40)))
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  return (
+    <div ref={boxRef} className="flex justify-center mb-4 w-full overflow-hidden">
+      <div key={size}>
+        <GeoGebraGraph m={m} t={t} width={size} height={size} />
+      </div>
+    </div>
+  )
+}
+
+// ---------- Eine Aufgabe ----------
+
+interface CardProps {
+  number: number
+  onSolvedChange: (solved: boolean) => void
+  onResult: (correct: boolean) => void
+  onVideo: () => void
+}
+
+function TaskCard({ number, onSolvedChange, onResult, onVideo }: CardProps) {
   const tracking = useTaskTracking('Funktionsgleichung ablesen')
-  const [m, setM] = useState<number>(1)
-  const [t, setT] = useState<number>(0)
+  const [{ m, t }, setLine] = useState(newLine)
   const [mInput, setMInput] = useState('')
   const [tInput, setTInput] = useState('')
-  const [feedback, setFeedback] = useState('')
+  const [solved, setSolved] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
-  const [showVideoModal, setShowVideoModal] = useState(false)
-  const [showSuccessToast, setShowSuccessToast] = useState(false)
-  const toastShownRef = useRef(false)
-  const [geoSize, setGeoSize] = useState<{width: number, height: number}>({width: 600, height: 600})
-  const ggbRef = useRef<HTMLDivElement | null>(null)
-  const ggbInstance = useRef<any>(null)
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const youtubePlayerRef = useRef<any>(null)
 
-  // Berechne responsive Größe basierend auf verfügbarer Breite
+  const ms = mStatus(mInput, m)
+  const { status: ts, hint } = tStatus(tInput, t)
+  const bothRight = ms === 'right' && ts === 'right'
+  const anyWrong = ms === 'wrong' || ts === 'wrong'
+
   useEffect(() => {
-    const calculateSize = () => {
-      if (!containerRef.current) return
-      const parentWidth = containerRef.current.offsetWidth
-      // Responsive Größe: 90% der verfügbaren Breite, max 800px
-      const size = Math.min(Math.max(parentWidth * 0.9, 300), 800)
-      setGeoSize({ width: size, height: size })
+    if (solved) return
+    if (bothRight) {
+      setSolved(true)
+      tracking.onCheck(true)
+      onResult(true)
+      onSolvedChange(true)
+      setShowSolution(false)
+      return
     }
-
-    calculateSize()
-    window.addEventListener('resize', calculateSize)
-    return () => window.removeEventListener('resize', calculateSize)
-  }, [])
-
-  // Update GeoGebraSize im DOM element styles
-  useEffect(() => {
-    if (ggbRef.current) {
-      ggbRef.current.style.width = `${geoSize.width}px`
-      ggbRef.current.style.height = `${geoSize.height}px`
+    if (anyWrong) {
+      // Ein falscher Versuch zählt erst, wenn die Eingabe kurz stehen bleibt
+      const timer = setTimeout(() => {
+        tracking.onCheck(false)
+        onResult(false)
+      }, 900)
+      return () => clearTimeout(timer)
     }
-  }, [geoSize])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mInput, tInput, solved])
 
-  // Load YouTube IFrame API when video modal opens
+  function newTask() {
+    tracking.onTaskStart()
+    onSolvedChange(false)
+    setSolved(false)
+    setShowSolution(false)
+    setMInput('')
+    setTInput('')
+    setLine(newLine())
+  }
+
+  // Live mitgerenderte Gleichung aus den Eingaben des Schülers
+  const tShown = tInput.trim().replace(/\s+/g, '').replace(/^([+\-−–—‐])/, (c) => (/[+]/.test(c) ? '+ ' : '− '))
+  const preview = (
+    <>
+      y = <span className={mInput.trim() ? '' : 'text-slate-400'}>{mInput.trim() ? mInput.trim().replace(/[\-–—‐]/g, '−') : 'm'}</span>x{' '}
+      <span className={tInput.trim() ? '' : 'text-slate-400'}>{tInput.trim() ? tShown : '± t'}</span>
+    </>
+  )
+
+  return (
+    <div className={panel}>
+      <h2 className="text-lg font-bold text-slate-800 mb-2">Aufgabe {number}: Funktionsgleichung ablesen</h2>
+      <p className="text-slate-700 mb-4">
+        Lies Steigung m und y-Achsenabschnitt t aus dem Graphen ab und trage sie in die Gleichung ein.
+      </p>
+
+      <ResponsiveGraph m={m} t={t} />
+
+      <p className="text-sm text-slate-600 mb-3">Gegeben: y = m · x + t</p>
+
+      <div className="flex flex-wrap items-center justify-center gap-2 text-xl font-semibold text-slate-800">
+        <span>y =</span>
+        <input
+          aria-label="Wert für m"
+          value={mInput}
+          readOnly={solved}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMInput(e.target.value)}
+          className={fieldCls(ms)}
+          inputMode="decimal"
+        />
+        <span>x</span>
+        <input
+          aria-label="Vorzeichen und Wert für t"
+          value={tInput}
+          readOnly={solved}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTInput(e.target.value)}
+          className={fieldCls(ts)}
+          inputMode="decimal"
+        />
+      </div>
+
+      <p className="mt-4 text-xl text-slate-800 min-h-8">{preview}</p>
+
+      {solved && <p className="text-center font-bold mt-2 text-green-600">Richtig! Die Funktionsgleichung lautet {equationText(m, t)}.</p>}
+      {!solved && hint && <p className="text-center font-bold mt-2 text-red-600">{hint}</p>}
+      {!solved && !hint && anyWrong && <p className="text-center font-bold mt-2 text-red-600">Noch nicht richtig.</p>}
+
+      <div className="flex flex-wrap justify-center gap-3 mt-6">
+        <button onClick={newTask} className={btnSecondary}>Neue Aufgabe</button>
+        <button
+          onClick={() => {
+            setShowSolution(true)
+            tracking.onHintShown()
+          }}
+          className={btnSecondary}
+        >
+          Lösung anzeigen
+        </button>
+        <button onClick={onVideo} className={btnSecondary}>Erklärvideo</button>
+      </div>
+
+      {showSolution && (
+        <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-slate-800">
+          <h3 className="text-base font-bold mb-2">Lösung</h3>
+          <p>Steigung m = {fmt(m)}</p>
+          <p>y-Achsenabschnitt t = {fmt(t)}</p>
+          <p className="font-bold mt-1">{equationText(m, t)}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ---------- Seite ----------
+
+export default function Ablesen() {
+  const navigate = useNavigate()
+  const [round, setRound] = useState(0)
+  const [solved, setSolved] = useState<Record<number, boolean>>({})
+  const [streak, setStreak] = useState(0)
+  const [finished, setFinished] = useState(false)
+  const [showVideo, setShowVideo] = useState(false)
+  const playerRef = useRef<any>(null)
+  const completionRef = useRef<HTMLDivElement>(null)
+
+  const solvedCount = Object.values(solved).filter(Boolean).length
+  const allSolved = solvedCount === TOTAL_TASKS
+
   useEffect(() => {
-    if (!showVideoModal) return
+    if (allSolved) completionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [allSolved])
 
-    // Load YouTube API if not already loaded
+  // YouTube-Player im Erklärvideo-Fenster (pausiert bei 1:44)
+  useEffect(() => {
+    if (!showVideo) return
     if (!window.YT) {
       const tag = document.createElement('script')
       tag.src = 'https://www.youtube.com/iframe_api'
       document.body.appendChild(tag)
     }
-
-    // Initialize player when API is ready
-    const initializePlayer = () => {
-      if (window.YT && window.YT.Player && !youtubePlayerRef.current) {
-        youtubePlayerRef.current = new window.YT.Player('youtube-player', {
+    const init = () => {
+      if (window.YT && window.YT.Player && !playerRef.current) {
+        playerRef.current = new window.YT.Player('youtube-player', {
           height: '390',
           width: '640',
-          videoId: 'r8vCu72ojYw',
+          videoId: VIDEO_ID,
           events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-          }
-        })
-      }
-    }
-
-    // Check if API is ready, otherwise wait for onYouTubeIframeAPIReady
-    if (window.YT && window.YT.Player) {
-      initializePlayer()
-    } else {
-      window.onYouTubeIframeAPIReady = initializePlayer
-    }
-
-    return () => {
-      // Cleanup when modal closes
-      if (youtubePlayerRef.current && typeof youtubePlayerRef.current.destroy === 'function') {
-        youtubePlayerRef.current.destroy()
-        youtubePlayerRef.current = null
-      }
-    }
-  }, [showVideoModal])
-
-  // Load GeoGebra script once and initialize applet
-  useEffect(() => {
-    const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]')
-    function initApplet() {
-      if (!window.GGBApplet || !ggbRef.current) return
-      const params: any = {
-        // match the original static page: use classic app and Graphics-only perspective
-        appName: 'classic', width: geoSize.width, height: geoSize.height,
-        showToolBar: false, showAlgebraInput: false, showMenuBar: false,
-        showZoomButtons: true, showResetIcon: true,
-        perspective: 'G', useBrowserForJS: true,
-        appletOnLoad: (api: any) => {
-          ggbInstance.current = api
-          // Best-effort: tell the applet to hide algebra & switch to graph view.
-          try { if (typeof api.setAlgebraVisible === 'function') api.setAlgebraVisible(false) } catch(e) {}
-          try { if (typeof api.setActiveView === 'function') api.setActiveView('G') } catch(e) {}
-
-          // Some versions of GeoGebra re-create UI after load. Call the safe API several times
-          // and schedule a couple of retries. If the API is missing, we'll fall back to DOM cleanup.
-          for (let i = 0; i < 3; i++) {
-            const delay = i * 300
-            setTimeout(() => {
-              try { if (typeof api.setAlgebraVisible === 'function') api.setAlgebraVisible(false) } catch(e) {}
-              // NOTE: avoid calling evalCommand('ShowView[...]') because some GeoGebra builds
-              // show a modal dialog for unknown commands (we saw "Unbekannter Befehl : ShowView").
-              // We rely on the safe setAlgebraVisible API above and a DOM fallback below.
-            }, delay)
-          }
-
-          // Install a MutationObserver fallback to hide any left-side panel that appears later.
-          installLeftPanelHider()
-          installModalHider()
-
-          // Extra defensive calls for different GeoGebra API variants
-          try { if (typeof api.setAlgebraVisible === 'function') api.setAlgebraVisible(false) } catch (e) {}
-          try { if (typeof api.setShowAlgebra === 'function') api.setShowAlgebra(false) } catch (e) {}
-          try { if (typeof api.setShowAlgebraView === 'function') api.setShowAlgebraView(false) } catch (e) {}
-
-          // small delayed attempt: call variants again and inspect DOM to find any remaining panels
-          setTimeout(() => {
-            try { if (typeof api.setAlgebraVisible === 'function') api.setAlgebraVisible(false) } catch (e) {}
-            try { if (typeof api.setShowAlgebra === 'function') api.setShowAlgebra(false) } catch (e) {}
-            try { if (typeof api.setShowAlgebraView === 'function') api.setShowAlgebraView(false) } catch (e) {}
-
-            // Debug: enumerate potential left-panel elements and log details to console so we can tune selectors
-            try {
-              const container = document.getElementById('ggb-container')
-              if (container) {
-                const parentRect = container.getBoundingClientRect()
-                const candidates: Element[] = []
-                Array.from(container.querySelectorAll('*')).forEach(el => {
-                  if (!(el instanceof HTMLElement)) return
-                  const r = el.getBoundingClientRect()
-                  if (r.width >= 6 && r.width < parentRect.width * 0.6 && Math.abs(r.left - parentRect.left) < 20 && r.height > 30) {
-                    candidates.push(el)
-                  }
-                })
-                if (candidates.length) {
-                  console.group('GeoGebra: left-panel candidates')
-                  candidates.forEach((el, idx) => {
-                    console.log(idx, { tag: el.tagName, class: el.className, aria: (el as HTMLElement).getAttribute('aria-label'), outer: (el as HTMLElement).outerHTML.slice(0,400) })
-                    // try hiding aggressively
-                    try { (el as HTMLElement).style.display = 'none'; (el as HTMLElement).dataset.ggHidden = '1' } catch (e) {}
-                  })
-                  console.groupEnd()
-                } else {
-                  console.debug('GeoGebra: no left-panel-like candidates found in #ggb-container')
-                }
+            onReady: (e: any) => e.target.playVideo(),
+            onStateChange: (e: any) => {
+              const player = e.target
+              if (player && typeof player.getCurrentTime === 'function' && player.getCurrentTime() >= 104 && player.getPlayerState() === 1) {
+                player.pauseVideo()
               }
-            } catch (e) { /* ignore */ }
-          }, 450)
-
-          generateNew(api)
-        }
-      }
-      const applet = new window.GGBApplet(params, true)
-      // inject into the original static element id so GeoGebra picks up intended options
-      applet.inject('ggb-element')
-    }
-
-    if (!existing) {
-      const s = document.createElement('script')
-      s.src = 'https://www.geogebra.org/apps/deployggb.js'
-      s.async = true
-      s.onload = () => initApplet()
-      document.body.appendChild(s)
-    } else {
-      initApplet()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // --- Helper: hide left-side GeoGebra panel by observing DOM changes ---
-  function installLeftPanelHider() {
-    const container = document.getElementById('ggb-container')
-    if (!container) return
-
-    // Inject a small, targeted CSS fallback to hide common GeoGebra algebra/sidebar selectors.
-    // This is scoped to #ggb-container and uses !important to beat inline styles from the applet.
-    try {
-      if (!document.getElementById('ggb-hide-left-panel-style')) {
-        const s = document.createElement('style')
-        s.id = 'ggb-hide-left-panel-style'
-        s.textContent = `#ggb-container .algebraView, #ggb-container .ggbAlgebraView, #ggb-container .ggbSidebar, #ggb-container [class*="Algebra"], #ggb-container [aria-label*="Algebra"], #ggb-container .sidebar { display: none !important; }
-        #ggb-container [role="complementary"] { display: none !important; }`
-        document.head.appendChild(s)
-      }
-    } catch (e) { /* ignore */ }
-
-    const hideIfLeftPanel = (el: Element) => {
-      if (!(el instanceof HTMLElement)) return false
-      // Already hidden by us?
-      if (el.dataset && el.dataset.ggHidden === '1') return false
-      const rect = el.getBoundingClientRect()
-      const parentRect = container.getBoundingClientRect()
-      // Heuristic: element anchored to left of container and occupies a vertical band
-      // Accept narrow collapsed panels too (width >= 8px) since some GeoGebra builds may show a thin strip.
-      if (rect.width >= 8 && rect.width < parentRect.width * 0.5 && Math.abs(rect.left - parentRect.left) < 12 && rect.height > 40) {
-        // Also check textual hints (labels or inner text GeoGebra often shows)
-        const txt = (el.textContent || '').trim()
-        if (txt.length > 0 && (txt.includes('f(x)') || txt.includes('GeoGebra') || txt.includes('P1') || txt.includes('y-Achse') || txt.includes('Algebra'))) {
-          el.style.display = 'none'
-          el.dataset.ggHidden = '1'
-          console.debug('Hid left panel by text heuristic', el)
-          return true
-        }
-        // If no text, still hide panels that look like an algebra sidebar (likely ARIA role or many inputs)
-        const inputs = el.querySelectorAll('input, button, label')
-        if (inputs.length >= 2) {
-          el.style.display = 'none'
-          el.dataset.ggHidden = '1'
-          console.debug('Hid left panel by input-count heuristic', el)
-          return true
-        }
-        // Also hide if element has aria-label mentioning algebra
-        const aria = el.getAttribute('aria-label') || ''
-        if (aria.toLowerCase().includes('algebra')) {
-          el.style.display = 'none'
-          el.dataset.ggHidden = '1'
-          console.debug('Hid left panel by aria-label', el)
-          return true
-        }
-      }
-      return false
-    }
-
-    // Initial pass: scan existing children
-    Array.from(container.querySelectorAll('*')).forEach(n => hideIfLeftPanel(n))
-    // Also try explicit selectors in case the panel uses known classes/attributes
-    try {
-      const explicit = container.querySelectorAll('.algebraView, .ggbAlgebraView, .ggbSidebar, [aria-label*="Algebra"], [class*="Algebra"], [role="complementary"]')
-      explicit.forEach((el) => { (el as HTMLElement).style.display = 'none'; (el as HTMLElement).dataset.ggHidden = '1'; console.debug('Hid left panel by explicit selector', el) })
-    } catch (e) { /* ignore */ }
-
-    const observer = new MutationObserver(muts => {
-      for (const m of muts) {
-        m.addedNodes.forEach(n => {
-          try {
-            hideIfLeftPanel(n as Element)
-            // also check descendants
-            if (n instanceof Element) Array.from(n.querySelectorAll('*')).forEach(d => hideIfLeftPanel(d))
-          } catch (e) { /* ignore */ }
+            },
+          },
         })
       }
-    })
-
-    observer.observe(container, { childList: true, subtree: true })
-
-    // cleanup on unmount
-    const to = setTimeout(() => { observer.disconnect() }, 30_000)
-    // store on ref so we can clear if component unmounts quickly
-    ;(ggbRef.current as any).__ggb_panel_observer = { observer, timeoutId: to }
-  }
-
-  // --- Helper: hide GeoGebra error modal dialogs that some builds show for unsupported commands ---
-  function installModalHider() {
-    const body = document.body
-    if (!body) return
-
-    const hideModalNode = (n: Node) => {
-      try {
-        if (!(n instanceof Element)) return false
-        const text = (n.textContent || '')
-        if (!text) return false
-        const lowered = text.toLowerCase()
-        if (lowered.includes('unbekannter befehl') || lowered.includes('fehler') || lowered.includes('unknown command')) {
-          // prefer hiding the dialog container (role=dialog) if present
-          const dialog = (n as Element).closest('[role="dialog"], .modal, .Dialog, .ggb-dialog')
-          const target = dialog || (n as Element)
-          ;(target as HTMLElement).style.display = 'none'
-          console.debug('GeoGebra modal hidden by installModalHider', { textSnippet: text.slice(0, 80), target })
-          return true
-        }
-      } catch (e) { /* ignore */ }
-      return false
     }
-
-    // initial sweep
-    Array.from(body.querySelectorAll('*')).forEach(el => hideModalNode(el))
-
-    const obs = new MutationObserver(muts => {
-      for (const m of muts) {
-        m.addedNodes.forEach(n => {
-          try {
-            if (hideModalNode(n)) return
-            if (n instanceof Element) Array.from(n.querySelectorAll('*')).forEach(el => hideModalNode(el))
-          } catch (e) { /* ignore */ }
-        })
-      }
-    })
-
-    obs.observe(body, { childList: true, subtree: true })
-    const to = setTimeout(() => obs.disconnect(), 30_000)
-    ;(ggbRef.current as any).__ggb_modal_observer = { observer: obs, timeoutId: to }
-  }
-
-
-  function generateNew(instance?: any) {
-    tracking.onTaskStart()
-    const api = instance || ggbInstance.current
-    const slopeCandidates = [-2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2]
-    const slope = slopeCandidates[Math.floor(Math.random() * slopeCandidates.length)]
-    const intercept = randInt(-4, 4)
-    setM(slope); setT(intercept); setMInput(''); setTInput(''); setFeedback(''); setShowSolution(false)
-    setShowSuccessToast(false); toastShownRef.current = false
-    if (!api) return
-    const correctM = Math.round(slope * 100) / 100
-    const correctT = Math.round(intercept * 100) / 100
-    try {
-      api.reset()
-      api.evalCommand(`f(x) = ${correctM}*x + ${correctT}`)
-      api.evalCommand(`P1=(0, ${correctT})`)
-      api.evalCommand(`P2=(1, ${correctM + correctT})`)
-      try { api.setVisible('P1', false); api.setVisible('P2', false) } catch(e) {}
-      try { if (typeof api.setAxesVisible === 'function') api.setAxesVisible(true, true) } catch(e) {}
-      try { if (typeof api.setGridVisible === 'function') api.setGridVisible(true) } catch(e) {}
-      try { if (typeof api.setCoordSystem === 'function') api.setCoordSystem(-7, 7, -7, 7) } catch(e) {}
-    } catch (e) { /* ignore */ }
-  }
-
-  function isMCorrect(value: string): boolean {
-    const v = parseFlexibleNumber(value)
-    return !isNaN(v) && Math.abs(v - m) < 0.03
-  }
-
-  function isTCorrect(value: string): boolean {
-    const v = parseFlexibleNumber(value)
-    return !isNaN(v) && Math.abs(v - t) < 0.03
-  }
-
-  // Live-Prüfung: sobald m UND t korrekt eingegeben wurden, kurzes Erfolgsfenster zeigen
-  useEffect(() => {
-    const bothCorrect = isMCorrect(mInput) && isTCorrect(tInput)
-    if (bothCorrect && !toastShownRef.current) {
-      toastShownRef.current = true
-      setShowSuccessToast(true)
-      tracking.onCheck(true) // Live-Prüfung gilt als Lösung (auch ohne Klick auf Prüfen)
-    } else if (!bothCorrect) {
-      toastShownRef.current = false
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mInput, tInput, m, t])
-
-  // Erfolgsfenster nach ein paar Sekunden automatisch ausblenden
-  useEffect(() => {
-    if (!showSuccessToast) return
-    const timer = setTimeout(() => setShowSuccessToast(false), 4000)
-    return () => clearTimeout(timer)
-  }, [showSuccessToast])
-
-  function check() {
-    setFeedback('')
-    const mi = parseFlexibleNumber(mInput)
-    const ti = parseFlexibleNumber(tInput)
-    if (isNaN(mi) || isNaN(ti)) { setFeedback('Bitte gültige Zahlen für m und t eingeben.'); return }
-    const ok = Math.abs(mi - m) < 0.03 && Math.abs(ti - t) < 0.03
-    tracking.onCheck(ok)
-    if (ok) setFeedback('Richtig — gut abgelesen!')
-    else setFeedback('Nicht ganz. Probiere es noch einmal oder zeige die Lösung.')
-  }
-
-  // YouTube Player event handlers
-  function onPlayerReady(event: any) {
-    // Video is ready, start playing
-    event.target.playVideo()
-  }
-
-  function onPlayerStateChange(event: any) {
-    // Check current time and pause at 1:44 (104 seconds)
-    const player = event.target
-    if (player && typeof player.getCurrentTime === 'function') {
-      const currentTime = player.getCurrentTime()
-      // If video reaches 1:44 (104 seconds), pause it
-      if (currentTime >= 104 && player.getPlayerState() === 1) {
-        player.pauseVideo()
+    if (window.YT && window.YT.Player) init()
+    else window.onYouTubeIframeAPIReady = init
+    return () => {
+      if (playerRef.current && typeof playerRef.current.destroy === 'function') {
+        playerRef.current.destroy()
+        playerRef.current = null
       }
     }
+  }, [showVideo])
+
+  const startNewRound = () => {
+    setRound((r) => r + 1)
+    setSolved({})
+    setFinished(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
-    <div className={`prose ${styles.container}`}>
-      <div className={styles.card}>
-        <h2>Funktionsgleichung ablesen</h2>
-        <p>Ableseaufgabe: Lies Steigung m und y-Achsenabschnitt t aus dem Graphen ab.</p>
-
-        <div id="ggb-container" className={styles.svgWrap} ref={containerRef}>
-          <div id="ggb-element" ref={ggbRef} className={styles.geoGebraContainer} style={{ width: geoSize.width, height: geoSize.height, border: '1px solid #ccc', borderRadius: 8, background: 'white' }} />
+    <div className="min-h-screen flex flex-col bg-slate-50">
+      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Funktionsgleichung ablesen</h1>
+          <p className="text-center text-slate-600">Lies m und t aus dem Graphen ab und setze sie in die Gleichung ein.</p>
         </div>
 
-        <div className={styles.inputRow}>
-          <label className={styles.label}>m = <input value={mInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMInput(e.target.value)} className={`${styles.input} ${isMCorrect(mInput) ? styles.inputCorrect : ''}`} placeholder="z.B. 1.5" /></label>
-          <label className={styles.label}>t = <input value={tInput} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTInput(e.target.value)} className={`${styles.input} ${isTCorrect(tInput) ? styles.inputCorrect : ''}`} placeholder="z.B. 2" /></label>
-          {mInput && tInput && (
-            <div className={styles.equation}>
-              y = {mInput}x {parseFloat(tInput) >= 0 ? '+' : ''} {tInput}
-            </div>
-          )}
+        {Array.from({ length: TOTAL_TASKS }, (_, i) => (
+          <TaskCard
+            key={`${round}-${i}`}
+            number={i + 1}
+            onSolvedChange={(value) => setSolved((s) => ({ ...s, [i]: value }))}
+            onResult={(correct) => setStreak((s) => (correct ? s + 1 : 0))}
+            onVideo={() => setShowVideo(true)}
+          />
+        ))}
+
+        <div className="flex justify-center gap-3 flex-wrap">
+          <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">Gelöst: {solvedCount} / {TOTAL_TASKS}</div>
+          <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">Richtig in Folge: {streak}</div>
         </div>
 
-        <div className={styles.actions}>
-          <button onClick={check} className={styles.primary}>Prüfen</button>
-          <button onClick={() => { setShowSolution(true); tracking.onHintShown() }} className={styles.secondary}>Lösung anzeigen</button>
-          <button onClick={() => setShowVideoModal(true)} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: '500' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}>🎥 Erklärvideo</button>
-          <button onClick={() => generateNew()} className={styles.ghost}>Neue Aufgabe</button>
-        </div>
-
-        {feedback && <div className={styles.feedback}>{feedback}</div>}
-
-        {showSolution && (
-          <div className={styles.solution}>
-            <p>Steigung m = {m}</p>
-            <p>y-Achsenabschnitt t = {t}</p>
-            <p>Gleichung: y = {m}x {t >= 0 ? '+ ' + t : '- ' + Math.abs(t)}</p>
+        {allSolved && (
+          <div ref={completionRef} className="bg-green-50 border-2 border-green-400 rounded-xl p-6 text-center">
+            {finished ? (
+              <>
+                <p className="text-green-800 font-semibold mb-4">Alles klar – bis zum nächsten Mal!</p>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <button onClick={startNewRound} className={btnPrimary}>Doch noch neue Aufgaben</button>
+                  <button onClick={() => navigate('/lineare_funktionen')} className={btnSecondary}>Zur Übersicht</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-green-800 text-lg font-semibold mb-1">Super, toll gemacht!</p>
+                <p className="text-green-800 mb-4">Du hast alle {TOTAL_TASKS} Aufgaben richtig gelöst.</p>
+                <p className="text-slate-700 mb-4">Möchtest du neue Aufgaben üben oder hörst du hier auf?</p>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <button onClick={startNewRound} className={btnPrimary}>Neue Aufgaben</button>
+                  <button onClick={() => setFinished(true)} className={btnSecondary}>Fertig für heute</button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
 
-      {/* Video Modal */}
-      {showVideoModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', padding: '2rem', maxWidth: '800px', width: '90%', boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h3 style={{ margin: 0 }}>Erklärvideo: Funktionsgleichung ablesen</h3>
-              <button onClick={() => setShowVideoModal(false)} style={{ backgroundColor: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>✕</button>
+      {showVideo && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowVideo(false)}>
+          <div className="bg-white rounded-xl p-6 w-full max-w-3xl shadow-xl" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-slate-800">Erklärvideo: Funktionsgleichung ablesen</h3>
+              <button onClick={() => setShowVideo(false)} className="text-slate-500 hover:text-slate-800 text-xl" aria-label="Schließen">✕</button>
             </div>
-            <div id="youtube-player" style={{ marginBottom: '1rem' }}></div>
-            <p style={{ color: '#666', fontSize: '0.875rem', margin: 0 }}>Das Video wird bei 1:44 automatisch pausiert.</p>
-            <button onClick={() => setShowVideoModal(false)} style={{ marginTop: '1.5rem', backgroundColor: '#3b82f6', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>Schließen</button>
+            <div className="overflow-x-auto"><div id="youtube-player" /></div>
+            <p className="text-sm text-slate-500 mt-3">Das Video wird bei 1:44 automatisch pausiert.</p>
           </div>
-        </div>
-      )}
-
-      {/* Erfolgsfenster bei vollständig korrekter Eingabe */}
-      {showSuccessToast && (
-        <div className={styles.successToast}>
-          <span>Die Funktionsgleichung lautet also y = {m}x {t >= 0 ? '+ ' + t : '- ' + Math.abs(t)} - richtig gelöst :-)</span>
-          <button onClick={() => setShowSuccessToast(false)} className={styles.successToastClose} aria-label="Schließen">✕</button>
         </div>
       )}
     </div>
