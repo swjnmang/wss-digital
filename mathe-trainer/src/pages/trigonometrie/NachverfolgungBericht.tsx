@@ -254,7 +254,7 @@ const NachverfolgungBericht: React.FC<{ area?: TrackingArea }> = ({ area = 'trig
                                 <input
                                     type="text"
                                     value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
                                     className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
                                     placeholder="Vor- und Nachname"
                                     // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -267,7 +267,7 @@ const NachverfolgungBericht: React.FC<{ area?: TrackingArea }> = ({ area = 'trig
                                 <input
                                     type="text"
                                     value={klasse}
-                                    onChange={(e) => setKlasse(e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setKlasse(e.target.value)}
                                     className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
                                     placeholder="z. B. 10a"
                                     required
