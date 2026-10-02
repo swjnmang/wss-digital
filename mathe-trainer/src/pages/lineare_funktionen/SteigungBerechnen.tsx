@@ -4,9 +4,8 @@ import GeoGebraGraph from '../../components/GeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 
-const TEXT_TASKS = 3
-const GRAPH_TASKS = 3
-const TOTAL_TASKS = TEXT_TASKS + GRAPH_TASKS
+// Sechs Aufgaben im Wechsel: Punkte, Graph, Punkte, Graph, Punkte, Graph
+const TOTAL_TASKS = 6
 
 const VIDEO_URL = 'https://youtu.be/IwNoiR-yfJ0?si=Hklidv10rx1W6YuJ'
 
@@ -439,7 +438,7 @@ export default function SteigungBerechnen() {
     // Die Karten bleiben nach einem Neustart per key getrennt (frischer Zustand, eigenes Tracking)
     return (
       <React.Fragment key={`${round}-${i}`}>
-        {i < TEXT_TASKS ? <TextTaskCard {...props} /> : <GraphTaskCard {...props} />}
+        {i % 2 === 0 ? <TextTaskCard {...props} /> : <GraphTaskCard {...props} />}
       </React.Fragment>
     )
   })
