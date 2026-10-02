@@ -305,7 +305,7 @@ export default function SteigungBerechnen() {
   const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
   const inputCls = 'w-40 text-center border border-slate-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500'
   const coordCls = 'w-20 text-center border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:border-blue-500'
-  const panel = 'text-left bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
+  const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
 
   const openVideo = () => window.open('https://youtu.be/IwNoiR-yfJ0?si=Hklidv10rx1W6YuJ', '_blank')
 
@@ -369,7 +369,7 @@ export default function SteigungBerechnen() {
 
             <fieldset className="mb-4">
               <legend className="text-sm font-semibold text-slate-700 mb-2">Schritt 1: Ist die Steigung positiv oder negativ?</legend>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap justify-center gap-3">
                 {([['positive', 'Positiv (steigt)'], ['negative', 'Negativ (fällt)']] as const).map(([value, label]) => (
                   <label
                     key={value}
@@ -393,7 +393,7 @@ export default function SteigungBerechnen() {
             {slopeSign && (
               <div className="mb-2">
                 <p className="text-sm font-semibold text-slate-700 mb-2">Schritt 2: Gib den Wert ein</p>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center gap-2">
                   <span className="font-semibold text-slate-800">m =</span>
                   <input
                     value={input}
@@ -435,7 +435,7 @@ export default function SteigungBerechnen() {
                 <p className="text-sm font-semibold text-slate-700 mb-2">
                   Punkt {selectedPoints.length + 1}: (x | y)
                 </p>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center justify-center gap-2">
                   {selectedPoints.length === 0 ? (
                     <>
                       <input type="number" step="0.1" value={point1Input.x} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPoint1Input({ ...point1Input, x: e.target.value })} className={coordCls} placeholder="x" />
