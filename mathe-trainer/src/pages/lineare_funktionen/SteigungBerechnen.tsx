@@ -28,7 +28,8 @@ function randomInt(max: number, min = 0) {
 }
 
 // Erlaubte Steigungswerte für Graph-Aufgaben
-const allowedSlopes = [-3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3] as const
+// (m = 0 kommt bewusst nicht vor)
+const allowedSlopes = [-3, -2.5, -2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2, 2.5, 3] as const
 
 function getRandomSlope() {
   return allowedSlopes[Math.floor(Math.random() * allowedSlopes.length)]
@@ -159,12 +160,17 @@ interface CardProps {
 }
 
 function newTextPoints() {
-  let x1, x2
+  // x-Werte verschieden (keine senkrechte Gerade) und y-Werte verschieden (Steigung nie 0)
+  let x1, x2, y1, y2
   do {
     x1 = randomInt(10, -10)
     x2 = randomInt(10, -10)
   } while (x1 === x2)
-  return { p1: { x: x1, y: randomInt(10, -10) }, p2: { x: x2, y: randomInt(10, -10) } }
+  do {
+    y1 = randomInt(10, -10)
+    y2 = randomInt(10, -10)
+  } while (y1 === y2)
+  return { p1: { x: x1, y: y1 }, p2: { x: x2, y: y2 } }
 }
 
 // ---------- Textaufgabe: Steigung aus zwei Punkten ----------
