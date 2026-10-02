@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { InlineMath } from 'react-katex'
 import 'katex/dist/katex.min.css'
 import styles from './LFCommon.module.css'
@@ -14,6 +14,7 @@ export default function Zeichnen(){
   const [m, setM] = useState<number>(2)
   const [t, setT] = useState<number>(1)
   const [equationLatex, setEquationLatex] = useState<string>('y = 2x + 1')
+  const lastEasyM = useRef<number | null>(null)
 
   useEffect(() => {
     generateNewTask(difficulty)
@@ -85,9 +86,11 @@ export default function Zeichnen(){
         break
       case 'easy':
       default:
-        // m constraint: -3 bis 3
-        m = randomInt(3, -3)
-        if (m === 0) m = 1
+        // m von -3 bis 3 in 0,5er-Schritten (ohne 0), nicht zweimal hintereinander gleich
+        do {
+          m = randomInt(6, -6) / 2
+        } while (m === 0 || m === lastEasyM.current)
+        lastEasyM.current = m
         // t = 0: nur Funktionen vom Typ y = m*x
         t = 0
         break
