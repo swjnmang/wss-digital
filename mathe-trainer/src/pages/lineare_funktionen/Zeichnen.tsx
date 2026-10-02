@@ -28,7 +28,9 @@ function getDenominator(value: number): number {
   return 1
 }
 
-function valueToLatex(value: number): string {
+// decimal: Dezimalzahl mit Komma (z. B. 0,5) statt Bruch – wird im Schwierigkeitsgrad "Leicht" verwendet
+function valueToLatex(value: number, decimal = false): string {
+  if (decimal) return String(Math.round(value * 100) / 100).replace('.', '{,}')
   const d = getDenominator(value)
   const n = Math.round(value * d)
   if (d === 1) return String(n)
@@ -36,41 +38,41 @@ function valueToLatex(value: number): string {
 }
 
 // Negative Zahlen beim Einsetzen in Klammern schreiben.
-function withParens(value: number): string {
-  return value < 0 ? `(${valueToLatex(value)})` : valueToLatex(value)
+function withParens(value: number, decimal = false): string {
+  return value < 0 ? `(${valueToLatex(value, decimal)})` : valueToLatex(value, decimal)
 }
 
-function generateEquationLatex(m: number, t: number): string {
+function generateEquationLatex(m: number, t: number, decimal = false): string {
   let mStr: string
   if (m === 1) mStr = 'x'
   else if (m === -1) mStr = '-x'
-  else mStr = `${valueToLatex(m)}x`
+  else mStr = `${valueToLatex(m, decimal)}x`
 
   let tStr = ''
-  if (t > 0) tStr = ` + ${valueToLatex(t)}`
-  else if (t < 0) tStr = ` - ${valueToLatex(Math.abs(t))}`
+  if (t > 0) tStr = ` + ${valueToLatex(t, decimal)}`
+  else if (t < 0) tStr = ` - ${valueToLatex(Math.abs(t), decimal)}`
 
   return `y = ${mStr}${tStr}`
 }
 
-function buildTipps(m: number, t: number) {
+function buildTipps(m: number, t: number, decimal = false) {
   const denominator = getDenominator(m)
   const xValues = denominator === 1 ? [-2, -1, 0, 1, 2] : [-denominator, 0, denominator]
-  const tTerm = t === 0 ? '' : t > 0 ? ` + ${valueToLatex(t)}` : ` - ${valueToLatex(Math.abs(t))}`
+  const tTerm = t === 0 ? '' : t > 0 ? ` + ${valueToLatex(t, decimal)}` : ` - ${valueToLatex(Math.abs(t), decimal)}`
 
   const rows = xValues.map((x) => {
     const product = m * x
     const y = product + t
-    const mTerm = m === 1 ? withParens(x) : `${valueToLatex(m)} \\cdot ${withParens(x)}`
+    const mTerm = m === 1 ? withParens(x, decimal) : `${valueToLatex(m, decimal)} \\cdot ${withParens(x, decimal)}`
     let calculation = `y = ${mTerm}${tTerm}`
-    if (t !== 0) calculation += ` = ${valueToLatex(product)}${tTerm}`
-    calculation += ` = ${valueToLatex(y)}`
+    if (t !== 0) calculation += ` = ${valueToLatex(product, decimal)}${tTerm}`
+    calculation += ` = ${valueToLatex(y, decimal)}`
     return {
       x,
-      xLatex: valueToLatex(x),
+      xLatex: valueToLatex(x, decimal),
       calculation,
-      yLatex: valueToLatex(y),
-      point: `(${valueToLatex(x)} \\mid ${valueToLatex(y)})`,
+      yLatex: valueToLatex(y, decimal),
+      point: `(${valueToLatex(x, decimal)} \\mid ${valueToLatex(y, decimal)})`,
     }
   })
 
@@ -82,7 +84,7 @@ function buildTipps(m: number, t: number) {
     `um den nächsten Punkt auf der Geraden zu erreichen. Die Gerade verläuft deshalb von ` +
     `${m > 0 ? 'links unten nach rechts oben' : 'links oben nach rechts unten'}.`
 
-  return { denominator, rows, mLatex: valueToLatex(m), slopeText }
+  return { denominator, rows, mLatex: valueToLatex(m, decimal), slopeText }
 }
 
 // ---------- Aufgaben erzeugen ----------
@@ -163,8 +165,9 @@ function DrawCard({ number, task, level, onNewTask, onSolvedChange }: CardProps)
   const [showSolution, setShowSolution] = useState(false)
   const [selfCheck, setSelfCheck] = useState<'correct' | 'wrong' | null>(null)
   const { m, t } = task
-  const equationLatex = generateEquationLatex(m, t)
-  const tipps = buildTipps(m, t)
+  const decimal = level === 'easy'
+  const equationLatex = generateEquationLatex(m, t, decimal)
+  const tipps = buildTipps(m, t, decimal)
 
   return (
     <div className={panel}>
@@ -251,9 +254,10 @@ function DrawCard({ number, task, level, onNewTask, onSolvedChange }: CardProps)
                 </p>
                 {tipps.denominator > 1 && (
                   <p className="text-gray-700 mb-3">
-                    <strong>Tipp:</strong> Vor dem <InlineMath math="x" /> steht ein Bruch mit dem Nenner {tipps.denominator}. Wähle deshalb
-                    x-Werte, die durch {tipps.denominator} teilbar sind – dann kürzt sich der Bruch weg und das Rechnen wird
-                    leichter.
+                    <strong>Tipp:</strong>{' '}
+                    {decimal
+                      ? <>Vor dem <InlineMath math="x" /> steht eine Zahl mit Nachkommastelle. Wähle deshalb gerade x-Werte (z. B. −2, 0, 2) – dann kommen beim Rechnen glatte Zahlen heraus.</>
+                      : <>Vor dem <InlineMath math="x" /> steht ein Bruch mit dem Nenner {tipps.denominator}. Wähle deshalb x-Werte, die durch {tipps.denominator} teilbar sind – dann kürzt sich der Bruch weg und das Rechnen wird leichter.</>}
                   </p>
                 )}
                 <div className="overflow-x-auto">
