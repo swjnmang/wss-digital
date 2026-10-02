@@ -1,279 +1,242 @@
-import { Link } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { InlineMath } from 'react-katex'
 import 'katex/dist/katex.min.css'
-import styles from './LFCommon.module.css'
-import GeoGebraGraph from '../../components/GeoGebraGraph'
+import ResponsiveGeoGebraGraph from '../../components/ResponsiveGeoGebraGraph'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 
-const LEVEL_LABELS = { easy: 'Leicht', medium: 'Mittel', hard: 'Schwer' } as const
+const TOTAL_TASKS = 5
 
-export default function Zeichnen(){
-  const [difficulty, setDifficulty] = useState<'easy'|'medium'|'hard'>('easy')
-  const [equation, setEquation] = useState<string>('y = 2x + 1')
-  const [rangeHint, setRangeHint] = useState<string>('')
-  const [showTipps, setShowTipps] = useState<boolean>(false)
-  const [showSolution, setShowSolution] = useState<boolean>(false)
-  const [m, setM] = useState<number>(2)
-  const [t, setT] = useState<number>(1)
-  const [equationLatex, setEquationLatex] = useState<string>('y = 2x + 1')
-  const lastEasyM = useRef<number | null>(null)
+type Level = 'easy' | 'medium' | 'hard'
+const LEVELS: { id: Level; label: string }[] = [
+  { id: 'easy', label: 'Leicht' },
+  { id: 'medium', label: 'Mittel' },
+  { id: 'hard', label: 'Schwer' },
+]
+
+const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
+const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
+const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
+
+// ---------- Zahlen und Formeln ----------
+
+// Kleinster Nenner, mit dem sich die Zahl als Bruch darstellen lässt.
+function getDenominator(value: number): number {
+  for (let d = 1; d <= 60; d++) {
+    if (Math.abs(value * d - Math.round(value * d)) < 1e-9) return d
+  }
+  return 1
+}
+
+function valueToLatex(value: number): string {
+  const d = getDenominator(value)
+  const n = Math.round(value * d)
+  if (d === 1) return String(n)
+  return `${n < 0 ? '-' : ''}\\frac{${Math.abs(n)}}{${d}}`
+}
+
+// Negative Zahlen beim Einsetzen in Klammern schreiben.
+function withParens(value: number): string {
+  return value < 0 ? `(${valueToLatex(value)})` : valueToLatex(value)
+}
+
+function generateEquationLatex(m: number, t: number): string {
+  let mStr: string
+  if (m === 1) mStr = 'x'
+  else if (m === -1) mStr = '-x'
+  else mStr = `${valueToLatex(m)}x`
+
+  let tStr = ''
+  if (t > 0) tStr = ` + ${valueToLatex(t)}`
+  else if (t < 0) tStr = ` - ${valueToLatex(Math.abs(t))}`
+
+  return `y = ${mStr}${tStr}`
+}
+
+function buildTipps(m: number, t: number) {
+  const denominator = getDenominator(m)
+  const xValues = denominator === 1 ? [-2, -1, 0, 1, 2] : [-denominator, 0, denominator]
+  const tTerm = t === 0 ? '' : t > 0 ? ` + ${valueToLatex(t)}` : ` - ${valueToLatex(Math.abs(t))}`
+
+  const rows = xValues.map((x) => {
+    const product = m * x
+    const y = product + t
+    const mTerm = m === 1 ? withParens(x) : `${valueToLatex(m)} \\cdot ${withParens(x)}`
+    let calculation = `y = ${mTerm}${tTerm}`
+    if (t !== 0) calculation += ` = ${valueToLatex(product)}${tTerm}`
+    calculation += ` = ${valueToLatex(y)}`
+    return {
+      x,
+      xLatex: valueToLatex(x),
+      calculation,
+      yLatex: valueToLatex(y),
+      point: `(${valueToLatex(x)} \\mid ${valueToLatex(y)})`,
+    }
+  })
+
+  const rise = Math.round(Math.abs(m) * denominator)
+  const direction = m > 0 ? 'nach oben' : 'nach unten'
+  const right = denominator === 1 ? '1 Einheit' : `${denominator} Einheiten`
+  const slopeText =
+    `Gehst du von einem deiner Punkte ${right} nach rechts, musst du ${rise} ${rise === 1 ? 'Einheit' : 'Einheiten'} ${direction} gehen, ` +
+    `um den nächsten Punkt auf der Geraden zu erreichen. Die Gerade verläuft deshalb von ` +
+    `${m > 0 ? 'links unten nach rechts oben' : 'links oben nach rechts unten'}.`
+
+  return { denominator, rows, mLatex: valueToLatex(m), slopeText }
+}
+
+// ---------- Aufgaben erzeugen ----------
+
+interface DrawTask {
+  id: number
+  m: number
+  t: number
+}
+
+const randomInt = (max: number, min = 0) => Math.floor(Math.random() * (max - min + 1)) + min
+const randomChoice = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)]
+
+function rawTask(level: Level): { m: number; t: number } {
+  let m: number
+  let t: number
+  switch (level) {
+    case 'medium':
+      m = randomChoice<number>([randomInt(2, -2), 0.5, -0.5, 1.5, -1.5, 2.5, -2.5])
+      if (m === 0) m = 1.5
+      m = Math.max(-3, Math.min(3, m))
+      t = randomChoice<number>([randomInt(4, -4), randomInt(8, -8) / 2])
+      t = Math.max(-4, Math.min(4, t))
+      break
+    case 'hard': {
+      const numerators = [-9, -8, -7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      const denominators = [3, 4, 5]
+      m = randomChoice(numerators) / randomChoice(denominators)
+      m = Math.max(-3, Math.min(3, m))
+      if (Math.abs(m) < 0.1) m = 2 / 3
+      t = randomChoice(numerators.slice(4, -4)) / randomChoice(denominators)
+      t = Math.round(t * 4) / 4
+      t = Math.max(-4, Math.min(4, t))
+      break
+    }
+    case 'easy':
+    default:
+      // m von -3 bis 3 in 0,5er-Schritten (ohne 0); t = 0: nur Funktionen vom Typ y = m*x
+      do {
+        m = randomInt(6, -6) / 2
+      } while (m === 0)
+      t = 0
+      break
+  }
+  return { m, t }
+}
+
+let nextId = 1
+/** Neue Aufgabe, deren Steigung sich von den anderen Aufgaben auf der Seite unterscheidet. */
+function makeTask(level: Level, others: DrawTask[]): DrawTask {
+  let candidate = rawTask(level)
+  for (let i = 0; i < 60 && others.some((o) => Math.abs(o.m - candidate.m) < 1e-9); i++) {
+    candidate = rawTask(level)
+  }
+  return { id: nextId++, ...candidate }
+}
+
+function makeTasks(level: Level): DrawTask[] {
+  const tasks: DrawTask[] = []
+  for (let i = 0; i < TOTAL_TASKS; i++) tasks.push(makeTask(level, tasks))
+  return tasks
+}
+
+// ---------- Eine Aufgabe ----------
+
+interface CardProps {
+  number: number
+  task: DrawTask
+  level: Level
+  onNewTask: () => void
+  onSolvedChange: (solved: boolean) => void
+}
+
+function DrawCard({ number, task, level, onNewTask, onSolvedChange }: CardProps) {
   // Keine automatische Prüfung möglich (gezeichnet wird im Heft) -> Selbsteinschätzung nach der Lösungskontrolle.
-  const tracking = useTaskTracking('Graph zeichnen')
+  const tracking = useTaskTracking(`Graph zeichnen (${LEVELS.find((l) => l.id === level)?.label})`)
+  const [showTipps, setShowTipps] = useState(false)
+  const [showSolution, setShowSolution] = useState(false)
   const [selfCheck, setSelfCheck] = useState<'correct' | 'wrong' | null>(null)
-
-  useEffect(() => {
-    generateNewTask(difficulty)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [difficulty])
-
-  function toFraction(decimal: number): string | number {
-    if (decimal === 0) return '0'
-    if (Math.abs(decimal) === 0.5) return (decimal > 0 ? '' : '-') + '1/2'
-    if (Math.abs(decimal) === 0.25) return (decimal > 0 ? '' : '-') + '1/4'
-    if (Math.abs(decimal) === 0.75) return (decimal > 0 ? '' : '-') + '3/4'
-    if (Math.abs(decimal) === 1/3) return (decimal > 0 ? '' : '-') + '1/3'
-    if (Math.abs(decimal) === 2/3) return (decimal > 0 ? '' : '-') + '2/3'
-    return decimal
-  }
-
-  function formatNumber(num: number): string | number {
-    const roundedNum = Math.round(num * 100) / 100
-    const fraction = toFraction(roundedNum)
-    if (fraction !== roundedNum) return fraction
-    return roundedNum
-  }
-
-  function generateEquationLatex(m: number, t: number): string {
-    let m_str = ''
-    let t_str = ''
-
-    if (m === 1) m_str = 'x'
-    else if (m === -1) m_str = '-x'
-    else if (!Number.isInteger(m) && Math.abs(m) > 0.1) {
-      const mLatex = valueToLatex(m)
-      m_str = `${mLatex}x`
-    } else m_str = `${valueToLatex(m)}x`
-
-    if (t === 0) t_str = ''
-    else if (t > 0) t_str = ` + ${valueToLatex(t)}`
-    else t_str = ` - ${valueToLatex(Math.abs(t))}`
-
-    return `y = ${m_str}${t_str}`
-  }
-
-  function generateNewTask(level: 'easy'|'medium'|'hard'){
-    let m: number, t: number
-    let m_str: string, t_str: string
-
-    const randomInt = (max: number, min = 0) => Math.floor(Math.random() * (max - min + 1)) + min
-    const randomChoice = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)]
-
-    switch (level) {
-      case 'medium':
-        m = randomChoice<number | any>([randomInt(2, -2), 0.5, -0.5, 1.5, -1.5, 2.5, -2.5])
-        if (m === 0) m = 1.5
-        // m constraint: -3 bis 3
-        m = Math.max(-3, Math.min(3, m))
-        // t constraint: -4 bis 4
-        t = randomChoice<number>([randomInt(4, -4), randomInt(8, -8) / 2])
-        t = Math.max(-4, Math.min(4, t))
-        break
-      case 'hard':
-        const numerators = [-9,-8,-7,-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8,9]
-        const denominators = [3,4,5]
-        m = randomChoice(numerators) / randomChoice(denominators)
-        m = Math.max(-3, Math.min(3, m))
-        if (Math.abs(m) < 0.1) m = 2/3
-        t = randomChoice(numerators.slice(4,-4)) / randomChoice(denominators)
-        t = Math.round(t * 4) / 4
-        // t constraint: -4 bis 4
-        t = Math.max(-4, Math.min(4, t))
-        break
-      case 'easy':
-      default:
-        // m von -3 bis 3 in 0,5er-Schritten (ohne 0), nicht zweimal hintereinander gleich
-        do {
-          m = randomInt(6, -6) / 2
-        } while (m === 0 || m === lastEasyM.current)
-        lastEasyM.current = m
-        // t = 0: nur Funktionen vom Typ y = m*x
-        t = 0
-        break
-    }
-
-    if (m === 1) m_str = 'x'
-    else if (m === -1) m_str = '-x'
-    else if (level === 'hard') m_str = `(${formatNumber(m)})x`
-    else m_str = `${formatNumber(m)}x`
-
-    if (t === 0) t_str = ''
-    else if (t > 0) t_str = ` + ${formatNumber(t)}`
-    else t_str = ` - ${formatNumber(Math.abs(t))}`
-
-    const eq = `y = ${m_str}${t_str}`
-    setEquation(eq)
-    setEquationLatex(generateEquationLatex(m, t))
-
-    setRangeHint('Ein guter Zeichenbereich für die x-Achse ist von -5 bis +5, die Länge der y-Achse musst du selbst festlegen, häufig reicht hier ebenfalls -5 bis +5.')
-
-    setM(m)
-    setT(t)
-    setShowSolution(false)
-    setSelfCheck(null)
-    tracking.onTaskStart(`Graph zeichnen (${LEVEL_LABELS[level]})`)
-  }
-
-  function openGeoGebra(){
-    setShowSolution(true)
-  }
-
-  // Kleinster Nenner, mit dem sich die Zahl als Bruch darstellen lässt.
-  function getDenominator(value: number): number {
-    for (let d = 1; d <= 60; d++) {
-      if (Math.abs(value * d - Math.round(value * d)) < 1e-9) return d
-    }
-    return 1
-  }
-
-  function valueToLatex(value: number): string {
-    const d = getDenominator(value)
-    const n = Math.round(value * d)
-    if (d === 1) return String(n)
-    return `${n < 0 ? '-' : ''}\\frac{${Math.abs(n)}}{${d}}`
-  }
-
-  // Negative Zahlen beim Einsetzen in Klammern schreiben.
-  function withParens(value: number): string {
-    return value < 0 ? `(${valueToLatex(value)})` : valueToLatex(value)
-  }
-
-  function buildTipps(m: number, t: number) {
-    const denominator = getDenominator(m)
-    const xValues = denominator === 1 ? [-2, -1, 0, 1, 2] : [-denominator, 0, denominator]
-    const tTerm = t === 0 ? '' : t > 0 ? ` + ${valueToLatex(t)}` : ` - ${valueToLatex(Math.abs(t))}`
-
-    const rows = xValues.map((x) => {
-      const product = m * x
-      const y = product + t
-      const mTerm = m === 1 ? withParens(x) : `${valueToLatex(m)} \\cdot ${withParens(x)}`
-      let calculation = `y = ${mTerm}${tTerm}`
-      if (t !== 0) calculation += ` = ${valueToLatex(product)}${tTerm}`
-      calculation += ` = ${valueToLatex(y)}`
-      return {
-        x,
-        xLatex: valueToLatex(x),
-        calculation,
-        yLatex: valueToLatex(y),
-        point: `(${valueToLatex(x)} \\mid ${valueToLatex(y)})`
-      }
-    })
-
-    const rise = Math.round(Math.abs(m) * denominator)
-    const direction = m > 0 ? 'nach oben' : 'nach unten'
-    const right = denominator === 1 ? '1 Einheit' : `${denominator} Einheiten`
-    const slopeText =
-      `Gehst du von einem deiner Punkte ${right} nach rechts, musst du ${rise} ${rise === 1 ? 'Einheit' : 'Einheiten'} ${direction} gehen, ` +
-      `um den nächsten Punkt auf der Geraden zu erreichen. Die Gerade verläuft deshalb von ` +
-      `${m > 0 ? 'links unten nach rechts oben' : 'links oben nach rechts unten'}.`
-
-    return { denominator, rows, mLatex: valueToLatex(m), slopeText }
-  }
-
+  const { m, t } = task
+  const equationLatex = generateEquationLatex(m, t)
   const tipps = buildTipps(m, t)
 
   return (
-    <div className={`prose ${styles.container}`}>
-      <div className={styles.card}>
-        <h2 className={styles.title}>Lineare Funktionen zeichnen</h2>
+    <div className={panel}>
+      <h2 className="text-lg font-bold text-slate-800 mb-2">Aufgabe {number}</h2>
+      <p className="text-slate-700">Zeichne den Graphen der folgenden Funktion in ein Koordinatensystem.</p>
+      <div className="text-2xl font-bold text-slate-800 my-4">
+        <InlineMath math={equationLatex} />
+      </div>
 
-        <div className={styles.content}>
-          <div id="difficulty-selector" className="flex justify-center gap-3 mb-4">
-            <button
-              className={`px-4 py-2 rounded-md border ${difficulty === 'easy' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
-              onClick={() => setDifficulty('easy')}
-            >Leicht</button>
-            <button
-              className={`px-4 py-2 rounded-md border ${difficulty === 'medium' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
-              onClick={() => setDifficulty('medium')}
-            >Mittel</button>
-            <button
-              className={`px-4 py-2 rounded-md border ${difficulty === 'hard' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
-              onClick={() => setDifficulty('hard')}
-            >Schwer</button>
+      <div className="flex flex-wrap justify-center gap-3">
+        <button onClick={onNewTask} className={btnSecondary}>Neue Aufgabe</button>
+        <button
+          onClick={() => {
+            tracking.onHintShown()
+            setShowTipps(true)
+          }}
+          className={btnSecondary}
+        >
+          Tipps
+        </button>
+        <button onClick={() => setShowSolution(true)} className={btnPrimary}>Lösungskontrolle anzeigen</button>
+      </div>
+
+      {showSolution && (
+        <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-base font-bold text-slate-800">Lösungsgraph</h3>
+            <button onClick={() => setShowSolution(false)} className="text-slate-500 hover:text-slate-800 text-xl" aria-label="Schließen">✕</button>
           </div>
-
-          <div id="task-output" className="bg-gray-100 border rounded-md p-6 mb-4 text-center">
-            <div id="task-text">Zeichne den Graphen der folgenden Funktion in ein Koordinatensystem.</div>
-            <div id="task-equation" className="text-2xl font-bold text-sky-800 mt-2">
-              <InlineMath math={equationLatex} />
-            </div>
-            <div id="drawing-range-hint" className="text-sm text-gray-600 mt-3">{rangeHint}</div>
-          </div>
-
-          <div className="flex justify-center gap-4 flex-wrap">
-            <button className="generator-button bg-gradient-to-br from-sky-600 to-sky-700 text-white rounded-md px-5 py-3 shadow" onClick={() => generateNewTask(difficulty)}>Neue Aufgabe</button>
-            <button className="generator-button bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-md px-5 py-3 shadow" onClick={() => { tracking.onHintShown(); setShowTipps(true) }}>Tipps</button>
-            <button className="generator-button bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-md px-5 py-3 shadow" onClick={openGeoGebra}>Lösungskontrolle anzeigen</button>
-          </div>
-
-          {showSolution && (
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-blue-600">Lösungsgraph</h3>
+          <ResponsiveGeoGebraGraph m={m} t={t} />
+          {selfCheck === 'correct' ? (
+            <p className="font-bold text-green-600">Super, dein Graph stimmt!</p>
+          ) : (
+            <>
+              <p className="text-slate-700 mb-3">Vergleiche mit deiner Zeichnung: Stimmt dein Graph?</p>
+              <div className="flex justify-center gap-3 flex-wrap">
                 <button
-                  onClick={() => setShowSolution(false)}
-                  className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                  className={btnPrimary}
+                  onClick={() => {
+                    tracking.onCheck(true)
+                    setSelfCheck('correct')
+                    onSolvedChange(true)
+                  }}
                 >
-                  ✕
+                  Mein Graph stimmt
+                </button>
+                <button
+                  className={btnSecondary}
+                  onClick={() => {
+                    tracking.onCheck(false)
+                    setSelfCheck('wrong')
+                  }}
+                >
+                  Mein Graph stimmt nicht
                 </button>
               </div>
-              <GeoGebraGraph 
-                m={m} 
-                t={t} 
-                width={700} 
-                height={500}
-              />
-              <div className="mt-4 text-center">
-                {selfCheck === 'correct' ? (
-                  <p className="text-green-700 font-semibold">Super, dein Graph stimmt! Weiter mit „Neue Aufgabe“.</p>
-                ) : (
-                  <>
-                    <p className="text-gray-700 mb-2">Vergleiche mit deiner Zeichnung: Stimmt dein Graph?</p>
-                    <div className="flex justify-center gap-3 flex-wrap">
-                      <button
-                        className="bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-2"
-                        onClick={() => { tracking.onCheck(true); setSelfCheck('correct') }}
-                      >✓ Mein Graph stimmt</button>
-                      <button
-                        className="bg-rose-600 hover:bg-rose-700 text-white rounded-md px-4 py-2"
-                        onClick={() => { tracking.onCheck(false); setSelfCheck('wrong') }}
-                      >✗ Mein Graph stimmt nicht</button>
-                    </div>
-                    {selfCheck === 'wrong' && (
-                      <p className="text-rose-700 mt-2">Schau dir die Tipps an, korrigiere deine Zeichnung und vergleiche noch einmal.</p>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
+              {selfCheck === 'wrong' && (
+                <p className="text-red-600 font-semibold mt-3">Schau dir die Tipps an, korrigiere deine Zeichnung und vergleiche noch einmal.</p>
+              )}
+            </>
           )}
         </div>
-      </div>
+      )}
 
       {showTipps && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
               <h3 className="text-2xl font-bold text-blue-600">Tipps zum Zeichnen von Funktionsgraphen</h3>
-              <button
-                onClick={() => setShowTipps(false)}
-                className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
-              >
-                ✕
-              </button>
+              <button onClick={() => setShowTipps(false)} className="text-gray-500 hover:text-gray-700 text-2xl leading-none">✕</button>
             </div>
-            
+
             <div className="p-6 space-y-6 text-left">
               <p className="text-gray-700">
                 Diese Tipps passen zu deiner aktuellen Aufgabe: <InlineMath math={equationLatex} />
@@ -354,16 +317,109 @@ export default function Zeichnen(){
             </div>
 
             <div className="bg-gray-100 border-t border-gray-200 p-4 flex justify-end">
-              <button
-                onClick={() => setShowTipps(false)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
-              >
+              <button onClick={() => setShowTipps(false)} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors">
                 Schließen
               </button>
             </div>
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+// ---------- Seite ----------
+
+export default function Zeichnen() {
+  const navigate = useNavigate()
+  const [level, setLevel] = useState<Level>('easy')
+  const [tasks, setTasks] = useState<DrawTask[]>(() => makeTasks('easy'))
+  const [solved, setSolved] = useState<Record<number, boolean>>({})
+  const [finished, setFinished] = useState(false)
+  const completionRef = useRef<HTMLDivElement>(null)
+
+  const solvedCount = tasks.filter((t) => solved[t.id]).length
+  const allSolved = solvedCount === TOTAL_TASKS
+
+  const startRound = (nextLevel: Level) => {
+    setLevel(nextLevel)
+    setTasks(makeTasks(nextLevel))
+    setSolved({})
+    setFinished(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const replaceTask = (index: number) =>
+    setTasks((current) => current.map((task, i) => (i === index ? makeTask(level, current.filter((_, j) => j !== index)) : task)))
+
+  // Scrollt zur Abschlussmeldung, sobald alle Aufgaben erledigt sind
+  useEffect(() => {
+    if (allSolved) completionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [allSolved])
+
+  return (
+    <div className="min-h-screen flex flex-col bg-slate-50">
+      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Lineare Funktionen zeichnen</h1>
+          <p className="text-center text-slate-600">
+            Zeichne die Graphen in dein Heft. Ein guter Zeichenbereich für die x-Achse ist von −5 bis +5; die Länge der y-Achse legst du selbst fest, häufig reicht ebenfalls −5 bis +5.
+          </p>
+        </div>
+
+        <div className="flex justify-center gap-2">
+          {LEVELS.map(({ id, label }) => (
+            <button
+              key={id}
+              onClick={() => startRound(id)}
+              className={`px-4 py-1.5 rounded font-semibold border transition-colors ${
+                level === id ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {tasks.map((task, i) => (
+          <DrawCard
+            key={task.id}
+            number={i + 1}
+            task={task}
+            level={level}
+            onNewTask={() => replaceTask(i)}
+            onSolvedChange={(value) => setSolved((s) => ({ ...s, [task.id]: value }))}
+          />
+        ))}
+
+        <div className="flex justify-center">
+          <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">Geschafft: {solvedCount} / {TOTAL_TASKS}</div>
+        </div>
+
+        {allSolved && (
+          <div ref={completionRef} className="bg-green-50 border-2 border-green-400 rounded-xl p-6 text-center">
+            {finished ? (
+              <>
+                <p className="text-green-800 font-semibold mb-4">Alles klar – bis zum nächsten Mal!</p>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <button onClick={() => startRound(level)} className={btnPrimary}>Doch noch neue Aufgaben</button>
+                  <button onClick={() => navigate('/lineare_funktionen')} className={btnSecondary}>Zur Übersicht</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-green-800 text-lg font-semibold mb-1">Super, toll gemacht!</p>
+                <p className="text-green-800 mb-4">Alle {TOTAL_TASKS} Graphen stimmen.</p>
+                <p className="text-slate-700 mb-4">Möchtest du neue Aufgaben üben oder hörst du hier auf?</p>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <button onClick={() => startRound(level)} className={btnPrimary}>Neue Aufgaben</button>
+                  <button onClick={() => setFinished(true)} className={btnSecondary}>Fertig für heute</button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

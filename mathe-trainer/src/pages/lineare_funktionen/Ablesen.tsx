@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import GeoGebraGraph from '../../components/GeoGebraGraph'
+import ResponsiveGraph from '../../components/ResponsiveGeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 
@@ -68,30 +68,6 @@ const fieldCls = (status: Status) =>
   `w-20 text-center border-2 rounded px-2 py-2 focus:outline-none ${
     status === 'right' ? 'border-green-500 bg-green-50' : status === 'wrong' ? 'border-red-500 bg-red-50' : 'border-slate-300'
   }`
-
-// ---------- Graph in passender Größe ----------
-
-function ResponsiveGraph({ m, t }: { m: number; t: number }) {
-  const boxRef = useRef<HTMLDivElement>(null)
-  const [size, setSize] = useState(400)
-  useEffect(() => {
-    const el = boxRef.current
-    if (!el) return
-    // Größe in 40-px-Schritten, damit der Graph nicht bei jedem Pixel neu lädt
-    const update = () => setSize(Math.max(240, Math.min(480, Math.floor((el.clientWidth - 24) / 40) * 40)))
-    update()
-    const ro = new ResizeObserver(update)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-  return (
-    <div ref={boxRef} className="flex justify-center mb-4 w-full overflow-hidden">
-      <div key={size}>
-        <GeoGebraGraph m={m} t={t} width={size} height={size} />
-      </div>
-    </div>
-  )
-}
 
 // ---------- Eine Aufgabe ----------
 
@@ -183,9 +159,26 @@ function TaskCard({ number, onSolvedChange, onResult, onVideo }: CardProps) {
           readOnly={solved}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTInput(e.target.value)}
           className={fieldCls(ts)}
-          inputMode="decimal"
+          inputMode="text"
         />
       </div>
+      {/* Auf Handys fehlt auf der Zahlentastatur das Plus: Tasten setzen das Vorzeichen (der Schüler entscheidet selbst, welches) */}
+      {!solved && (
+        <div className="flex justify-center items-center gap-2 mt-2 text-sm text-slate-600">
+          <span>Vorzeichen für t:</span>
+          {(['+', '−'] as const).map((sign) => (
+            <button
+              key={sign}
+              type="button"
+              onClick={() => setTInput((v) => sign + v.trim().replace(/^[+\-−–—‐]\s*/, ''))}
+              className="w-9 h-9 rounded border border-slate-300 bg-white hover:bg-slate-100 text-lg font-semibold text-slate-700"
+              aria-label={sign === '+' ? 'Plus einsetzen' : 'Minus einsetzen'}
+            >
+              {sign}
+            </button>
+          ))}
+        </div>
+      )}
 
       <p className="mt-4 text-xl text-slate-800 min-h-8">{preview}</p>
 
