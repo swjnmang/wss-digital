@@ -15,7 +15,7 @@ const MathDisplay = ({ latex }: { latex: string }) => {
     }
   }, [latex])
   
-  return <div ref={ref} className={styles.mathDisplay}>{latex}</div>
+  return <div ref={ref} className="text-center text-base my-1 leading-relaxed overflow-x-auto">{latex}</div>
 }
 
 function randomInt(max: number, min = 0) {
@@ -77,6 +77,22 @@ export default function SteigungBerechnen() {
   const [instruction, setInstruction] = useState('Gib die Koordinaten von zwei Punkten ein, die auf der Geraden liegen.')
   const [point1Input, setPoint1Input] = useState({ x: '', y: '' })
   const [point2Input, setPoint2Input] = useState({ x: '', y: '' })
+
+  // Graph-Größe folgt der verfügbaren Breite (in 40-px-Schritten, damit der Graph nicht bei jedem Pixel neu lädt)
+  const graphBoxRef = useRef<HTMLDivElement>(null)
+  const [graphSize, setGraphSize] = useState(400)
+  useEffect(() => {
+    const el = graphBoxRef.current
+    if (!el) return
+    const update = () => {
+      const w = el.clientWidth - 24
+      setGraphSize(Math.max(240, Math.min(480, Math.floor(w / 40) * 40)))
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [taskType])
 
   const graphCorrectSlope = selectedPoints.length === 2 
     ? (selectedPoints[1].y - selectedPoints[0].y) / (selectedPoints[1].x - selectedPoints[0].x)
@@ -285,239 +301,202 @@ export default function SteigungBerechnen() {
     document.body.appendChild(script2)
   }, [])
 
-  return (
-    <div className={`prose ${styles.container}`}>
-      <div className={styles.card}>
-        <div className={styles.streak}>🔥 {streak}</div>
-        <h2>Steigung aus zwei Punkten berechnen</h2>
+  const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
+  const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
+  const inputCls = 'w-40 text-center border border-slate-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500'
+  const coordCls = 'w-20 text-center border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:border-blue-500'
+  const panel = 'text-left bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
 
-        {/* Task Type Toggle */}
-        <div className={styles.typeToggle}>
-          <button 
-            className={`${styles.toggleButton} ${taskType === 'text' ? styles.active : ''}`}
-            onClick={() => setTaskType('text')}
-          >
-            Textaufgabe
-          </button>
-          <button 
-            className={`${styles.toggleButton} ${taskType === 'graph' ? styles.active : ''}`}
-            onClick={() => {
-              setTaskType('graph')
-              generateNewGraphTask()
-            }}
-          >
-            Graphaufgabe
-          </button>
+  const feedbackEl = (text: string) =>
+    text ? (
+      <p className={`text-center font-bold mt-3 ${text.includes('Richtig') ? 'text-green-600' : 'text-red-600'}`}>{text}</p>
+    ) : null
+
+  const solutionEl = (
+    pa: { x: number; y: number },
+    pb: { x: number; y: number },
+    dy: number,
+    dx: number,
+    slope: number,
+  ) => (
+    <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50">
+      <h3 className="text-base font-bold text-slate-800 text-center mb-2">Lösungsweg</h3>
+      <MathDisplay latex={`$$P_1(${pa.x}|${pa.y}) \\quad P_2(${pb.x}|${pb.y})$$`} />
+      <MathDisplay latex={`$$m = \\dfrac{y_2 - y_1}{x_2 - x_1} = \\dfrac{${pb.y} - (${pa.y})}{${pb.x} - (${pa.x})} = \\dfrac{${dy}}{${dx}} = ${Math.round(slope * 100) / 100}$$`} />
+      <div className="font-bold text-slate-800 mt-2">
+        <MathDisplay latex={`$$m = ${Math.round(slope * 100) / 100}$$`} />
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="min-h-screen flex flex-col bg-slate-50">
+      <div className="mx-auto px-4 py-8 max-w-3xl w-full">
+        <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Steigung berechnen</h1>
+        <p className="text-center text-slate-600 mb-6">Berechne die Steigung m einer Geraden aus zwei Punkten.</p>
+
+        <div className="flex justify-center gap-2 mb-6">
+          {([['text', 'Textaufgabe'], ['graph', 'Graphaufgabe']] as const).map(([type, label]) => (
+            <button
+              key={type}
+              onClick={() => {
+                setTaskType(type)
+                if (type === 'graph') generateNewGraphTask()
+              }}
+              className={`px-4 py-1.5 rounded font-semibold border transition-colors ${
+                taskType === type
+                  ? 'bg-blue-600 border-blue-700 text-white'
+                  : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
-        {/* Text Task */}
+        {/* Textaufgabe */}
         {taskType === 'text' && (
-          <div>
-            <div className={styles.taskBox}>
-              <div className={styles.taskPoints}>P1({p1.x}|{p1.y}) und P2({p2.x}|{p2.y})</div>
-              <p className={styles.taskDescription}>Berechne die Steigung m der Geraden, die durch die beiden Punkte verläuft. Runde auf zwei Nachkommastellen.</p>
-            </div>
+          <div className={panel}>
+            <h2 className="text-lg font-bold text-slate-800 mb-2">Steigung aus zwei Punkten</h2>
+            <p className="text-slate-700 mb-1">
+              Berechne die Steigung m der Geraden durch die beiden Punkte. Runde auf zwei Nachkommastellen.
+            </p>
+            <p className="text-center text-lg font-semibold text-slate-800 my-4">
+              P<sub>1</sub>({p1.x}|{p1.y}) und P<sub>2</sub>({p2.x}|{p2.y})
+            </p>
 
-            {/* Vorab: Steigungsvorzeichen auswählen */}
-            <div style={{ marginBottom: '20px', padding: '12px', backgroundColor: '#f0f4ff', borderRadius: '8px', borderLeft: '4px solid #3b82f6' }}>
-              <p style={{ marginTop: 0, marginBottom: '10px', fontWeight: '600', fontSize: '14px' }}>Schritt 1: Ist die Steigung positiv oder negativ?</p>
-              <div style={{ display: 'flex', gap: '15px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '15px' }}>
-                  <input
-                    type="radio"
-                    name="slope-sign"
-                    value="positive"
-                    checked={slopeSign === 'positive'}
-                    onChange={(e) => setSlopeSign(e.target.value as 'positive' | 'negative')}
-                  />
-                  📈 Positiv (steigt)
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '15px' }}>
-                  <input
-                    type="radio"
-                    name="slope-sign"
-                    value="negative"
-                    checked={slopeSign === 'negative'}
-                    onChange={(e) => setSlopeSign(e.target.value as 'positive' | 'negative')}
-                  />
-                  📉 Negativ (fällt)
-                </label>
+            <fieldset className="mb-4">
+              <legend className="text-sm font-semibold text-slate-700 mb-2">Schritt 1: Ist die Steigung positiv oder negativ?</legend>
+              <div className="flex flex-wrap gap-3">
+                {([['positive', 'Positiv (steigt)'], ['negative', 'Negativ (fällt)']] as const).map(([value, label]) => (
+                  <label
+                    key={value}
+                    className={`flex items-center gap-2 cursor-pointer rounded border px-3 py-2 text-sm ${
+                      slopeSign === value ? 'border-blue-500 bg-blue-50 text-blue-900' : 'border-slate-300 bg-white text-slate-700'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="slope-sign"
+                      value={value}
+                      checked={slopeSign === value}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSlopeSign(e.target.value as 'positive' | 'negative')}
+                    />
+                    {label}
+                  </label>
+                ))}
               </div>
-            </div>
+            </fieldset>
 
-            {/* Eingabefeld für m-Wert - nur wenn Vorzeichen ausgewählt */}
             {slopeSign && (
-              <div>
-                <p style={{ marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Schritt 2: Gib den Wert ein</p>
-                <div className={styles.inputContainer}>
-                  <span>m =</span>
-                  <input 
-                    value={input} 
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} 
-                    className={styles.input} 
-                    placeholder="Deine Lösung" 
+              <div className="mb-2">
+                <p className="text-sm font-semibold text-slate-700 mb-2">Schritt 2: Gib den Wert ein</p>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-slate-800">m =</span>
+                  <input
+                    value={input}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+                    className={inputCls}
+                    placeholder="Deine Lösung"
                   />
                 </div>
               </div>
             )}
 
-            {feedback && <div className={`${styles.feedback} ${feedback.includes('Richtig') ? styles.success : styles.error}`}>{feedback}</div>}
+            {feedbackEl(feedback)}
 
-            <div className={styles.actions}>
-              <button onClick={generateNewTask} className={styles.btnPrimary}>Neue Aufgabe</button>
-              <button onClick={checkSolution} className={styles.btnSuccess}>Lösung prüfen</button>
-              <button onClick={onShowAnswer} className={styles.btnSecondary}>Lösung anzeigen</button>
-              <button 
-                onClick={() => window.open('https://youtu.be/IwNoiR-yfJ0?si=Hklidv10rx1W6YuJ', '_blank')}
-                style={{
-                  backgroundColor: '#ef4444',
-                  color: 'white',
-                  padding: '10px 16px',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}
+            <div className="flex flex-wrap justify-center gap-3 mt-6">
+              <button onClick={checkSolution} className={btnPrimary}>Lösung prüfen</button>
+              <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
+              <button onClick={onShowAnswer} className={btnSecondary}>Lösung anzeigen</button>
+              <a
+                href="https://youtu.be/IwNoiR-yfJ0?si=Hklidv10rx1W6YuJ"
+                target="_blank"
+                rel="noreferrer"
+                className={`${btnSecondary} no-underline`}
               >
-                🎥 Erklärvideo
-              </button>
+                Erklärvideo
+              </a>
             </div>
 
-            {showSolution && (
-              <div className={styles.solutionOutput}>
-                <h3 className={styles.solutionTitle}>Lösungsweg</h3>
-                <div className={styles.solutionStep}>
-                  <MathDisplay latex={`$$P_1(${p1.x}|${p1.y}) \\quad P_2(${p2.x}|${p2.y})$$`} />
-                  <MathDisplay latex={`$$m = \\dfrac{y_2 - y_1}{x_2 - x_1} = \\dfrac{${p2.y} - (${p1.y})}{${p2.x} - (${p1.x})} = \\dfrac{${p2.y - p1.y}}{${p2.x - p1.x}} = ${Math.round(((p2.y - p1.y) / (p2.x - p1.x)) * 100) / 100}$$`} />
-                </div>
-                <div className={styles.answerBox}>
-                  <MathDisplay latex={`$$m = ${Math.round(((p2.y - p1.y) / (p2.x - p1.x)) * 100) / 100}$$`} />
-                </div>
-              </div>
-            )}
+            {showSolution && solutionEl(p1, p2, p2.y - p1.y, p2.x - p1.x, (p2.y - p1.y) / (p2.x - p1.x))}
           </div>
         )}
 
-        {/* Graph Task */}
+        {/* Graphaufgabe */}
         {taskType === 'graph' && (
-          <div>
-            <div className={styles.taskBox}>
-              <p className={styles.taskDescription}>{instruction}</p>
+          <div className={panel}>
+            <h2 className="text-lg font-bold text-slate-800 mb-2">Steigung aus dem Graphen</h2>
+            <p className="text-slate-700 mb-4">{instruction}</p>
+
+            <div ref={graphBoxRef} className="flex justify-center mb-4 w-full overflow-hidden">
+              <div key={graphSize}>
+                <GeoGebraGraph m={graphM} t={graphT} width={graphSize} height={graphSize} />
+              </div>
             </div>
 
-            <div className={styles.graphContainer}>
-              <GeoGebraGraph m={graphM} t={graphT} width={600} height={600} />
-            </div>
-
-            {/* Point Input Section */}
             {selectionMode && selectedPoints.length < 2 && (
-              <div className={styles.pointInputSection}>
-                {selectedPoints.length === 0 && (
-                  <div className={styles.pointInputBox}>
-                    <p className={styles.pointInputLabel}>Punkt 1: (x | y)</p>
-                    <div className={styles.pointInputRow}>
-                      <input 
-                        type="number" 
-                        step="0.1"
-                        value={point1Input.x} 
-                        onChange={(e) => setPoint1Input({...point1Input, x: e.target.value})} 
-                        className={styles.coordInput} 
-                        placeholder="x" 
-                      />
-                      <span>|</span>
-                      <input 
-                        type="number" 
-                        step="0.1"
-                        value={point1Input.y} 
-                        onChange={(e) => setPoint1Input({...point1Input, y: e.target.value})} 
-                        className={styles.coordInput} 
-                        placeholder="y" 
-                      />
-                      <button onClick={addGraphPoint1} className={styles.addPointBtn}>Punkt 1 annehmen</button>
-                    </div>
-                  </div>
-                )}
-
-                {selectedPoints.length === 1 && (
-                  <div className={styles.pointInputBox}>
-                    <p className={styles.pointInputLabel}>Punkt 2: (x | y)</p>
-                    <div className={styles.pointInputRow}>
-                      <input 
-                        type="number" 
-                        step="0.1"
-                        value={point2Input.x} 
-                        onChange={(e) => setPoint2Input({...point2Input, x: e.target.value})} 
-                        className={styles.coordInput} 
-                        placeholder="x" 
-                      />
-                      <span>|</span>
-                      <input 
-                        type="number" 
-                        step="0.1"
-                        value={point2Input.y} 
-                        onChange={(e) => setPoint2Input({...point2Input, y: e.target.value})} 
-                        className={styles.coordInput} 
-                        placeholder="y" 
-                      />
-                      <button onClick={addGraphPoint2} className={styles.addPointBtn}>Punkt 2 annehmen</button>
-                    </div>
-                  </div>
-                )}
+              <div className="border border-slate-200 rounded-lg p-4 mb-4 bg-slate-50">
+                <p className="text-sm font-semibold text-slate-700 mb-2">
+                  Punkt {selectedPoints.length + 1}: (x | y)
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {selectedPoints.length === 0 ? (
+                    <>
+                      <input type="number" step="0.1" value={point1Input.x} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPoint1Input({ ...point1Input, x: e.target.value })} className={coordCls} placeholder="x" />
+                      <span className="text-slate-500">|</span>
+                      <input type="number" step="0.1" value={point1Input.y} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPoint1Input({ ...point1Input, y: e.target.value })} className={coordCls} placeholder="y" />
+                      <button onClick={addGraphPoint1} className={btnPrimary}>Punkt 1 annehmen</button>
+                    </>
+                  ) : (
+                    <>
+                      <input type="number" step="0.1" value={point2Input.x} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPoint2Input({ ...point2Input, x: e.target.value })} className={coordCls} placeholder="x" />
+                      <span className="text-slate-500">|</span>
+                      <input type="number" step="0.1" value={point2Input.y} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPoint2Input({ ...point2Input, y: e.target.value })} className={coordCls} placeholder="y" />
+                      <button onClick={addGraphPoint2} className={btnPrimary}>Punkt 2 annehmen</button>
+                    </>
+                  )}
+                </div>
               </div>
             )}
 
             {selectedPoints.length > 0 && (
-              <div className={styles.pointsDisplay}>
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-4 text-sm font-semibold text-slate-700">
                 {selectedPoints.map((point, idx) => (
                   <span key={idx}>Punkt {idx + 1}: ({point.x}|{point.y})</span>
                 ))}
-                <button 
-                  onClick={() => generateNewGraphTask()} 
-                  className={styles.resetPointsBtn}
-                >
+                <button onClick={() => generateNewGraphTask()} className="text-blue-600 hover:underline font-semibold">
                   Punkte neu eingeben
                 </button>
               </div>
             )}
 
-
-
-            <div className={styles.inputContainer}>
-              <span>m =</span>
-              <input 
-                value={graphInput} 
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGraphInput(e.target.value)} 
-                className={styles.input} 
-                placeholder="Deine Lösung" 
+            <div className="flex items-center justify-center gap-2">
+              <span className="font-semibold text-slate-800">m =</span>
+              <input
+                value={graphInput}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGraphInput(e.target.value)}
+                className={inputCls}
+                placeholder="Deine Lösung"
               />
             </div>
 
-            {graphFeedback && <div className={`${styles.feedback} ${graphFeedback.includes('Richtig') ? styles.success : styles.error}`}>{graphFeedback}</div>}
+            {feedbackEl(graphFeedback)}
 
-            <div className={styles.actions}>
-              <button onClick={generateNewGraphTask} className={styles.btnPrimary}>Neue Aufgabe</button>
-              <button onClick={checkGraphSolution} className={styles.btnSuccess}>Lösung prüfen</button>
-              <button onClick={onShowGraphAnswer} className={styles.btnSecondary}>Lösung anzeigen</button>
+            <div className="flex flex-wrap justify-center gap-3 mt-6">
+              <button onClick={checkGraphSolution} className={btnPrimary}>Lösung prüfen</button>
+              <button onClick={generateNewGraphTask} className={btnSecondary}>Neue Aufgabe</button>
+              <button onClick={onShowGraphAnswer} className={btnSecondary}>Lösung anzeigen</button>
             </div>
 
-            {graphShowSolution && selectedPoints.length === 2 && (
-              <div className={styles.solutionOutput}>
-                <h3 className={styles.solutionTitle}>Lösungsweg</h3>
-                <div className={styles.solutionStep}>
-                  <MathDisplay latex={`$$P_1(${selectedPoints[0].x}|${selectedPoints[0].y}) \\quad P_2(${selectedPoints[1].x}|${selectedPoints[1].y})$$`} />
-                  <MathDisplay latex={`$$m = \\dfrac{y_2 - y_1}{x_2 - x_1} = \\dfrac{${selectedPoints[1].y} - (${selectedPoints[0].y})}{${selectedPoints[1].x} - (${selectedPoints[0].x})} = \\dfrac{${deltaY}}{${deltaX}} = ${Math.round(graphCorrectSlope * 100) / 100}$$`} />
-                </div>
-                <div className={styles.answerBox}>
-                  <MathDisplay latex={`$$m = ${Math.round(graphCorrectSlope * 100) / 100}$$`} />
-                </div>
-              </div>
-            )}
+            {graphShowSolution && selectedPoints.length === 2 &&
+              solutionEl(selectedPoints[0], selectedPoints[1], deltaY, deltaX, graphCorrectSlope)}
           </div>
         )}
+
+        <div className="mt-4 flex justify-center">
+          <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">Richtig in Folge: {streak}</div>
+        </div>
       </div>
     </div>
   )
