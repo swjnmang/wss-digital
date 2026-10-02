@@ -41,6 +41,90 @@ const inputCls = 'w-40 text-center border border-slate-300 rounded px-3 py-2 foc
 const coordCls = 'w-20 text-center border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:border-blue-500'
 const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
 
+const parseAnswer = (raw: string) => parseFloat(raw.replace(',', '.').replace(/[−–—‐]/g, '-'))
+
+type AnswerStatus = 'idle' | 'right' | 'wrong'
+
+/**
+ * Live-Auswertung der Eingabe: richtig -> sofort grün (ohne Klick auf "Prüfen"), falsch -> sofort rot.
+ * Für Tracking und "Richtig in Folge" zählt ein falscher Versuch erst, wenn die Eingabe kurz stehen bleibt,
+ * nicht bei jedem Tastendruck.
+ */
+function useLiveAnswer(
+  correct: number | null,
+  handlers: { onCorrect: () => void; onWrong: () => void },
+) {
+  const [input, setInput] = useState('')
+  const [solved, setSolved] = useState(false)
+  const parsed = parseAnswer(input)
+  const trimmed = input.trim()
+  const incomplete = trimmed === '' || trimmed === '-' || trimmed === '−' || trimmed === ',' || trimmed === '.'
+  const status: AnswerStatus =
+    correct === null || incomplete || Number.isNaN(parsed)
+      ? 'idle'
+      : Math.abs(parsed - correct) < 0.01
+        ? 'right'
+        : 'wrong'
+
+  useEffect(() => {
+    if (solved) return
+    if (status === 'right') {
+      setSolved(true)
+      handlers.onCorrect()
+      return
+    }
+    if (status === 'wrong') {
+      const timer = setTimeout(handlers.onWrong, 900)
+      return () => clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [input, correct, solved])
+
+  const reset = () => {
+    setInput('')
+    setSolved(false)
+  }
+
+  const hint =
+    status === 'wrong' && correct !== null && correct !== 0 && Math.sign(parsed) !== 0 && Math.sign(parsed) !== Math.sign(correct)
+      ? 'Das Vorzeichen stimmt nicht.'
+      : 'Noch nicht richtig.'
+
+  return { input, setInput, status, solved, reset, hint }
+}
+
+function AnswerField({
+  live,
+  disabled,
+  placeholder = 'Deine Lösung',
+}: {
+  live: ReturnType<typeof useLiveAnswer>
+  disabled?: boolean
+  placeholder?: string
+}) {
+  const { input, setInput, status, solved, hint } = live
+  const border =
+    status === 'right' ? 'border-green-500 bg-green-50' : status === 'wrong' ? 'border-red-500 bg-red-50' : 'border-slate-300'
+  return (
+    <div>
+      <div className="flex items-center justify-center gap-2">
+        <span className="font-semibold text-slate-800">m =</span>
+        <input
+          value={input}
+          disabled={disabled}
+          readOnly={solved}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+          className={`w-40 text-center border-2 rounded px-3 py-2 focus:outline-none disabled:bg-slate-100 ${border}`}
+          placeholder={placeholder}
+          inputMode="decimal"
+        />
+      </div>
+      {status === 'right' && <p className="text-center font-bold mt-3 text-green-600">Richtig! Super gemacht!</p>}
+      {status === 'wrong' && <p className="text-center font-bold mt-3 text-red-600">{hint}</p>}
+    </div>
+  )
+}
+
 const feedbackEl = (text: string) =>
   text ? (
     <p className={`text-center font-bold mt-3 ${text.includes('Richtig') ? 'text-green-600' : 'text-red-600'}`}>{text}</p>
@@ -89,61 +173,28 @@ function newTextPoints() {
 function TextTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) {
   const tracking = useTaskTracking('Steigung aus zwei Punkten')
   const [{ p1, p2 }, setPoints] = useState(newTextPoints)
-  const [slopeSign, setSlopeSign] = useState<'positive' | 'negative' | ''>('')
-  const [input, setInput] = useState('')
-  const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
   const correctSlope = (p2.y - p1.y) / (p2.x - p1.x)
+
+  const live = useLiveAnswer(correctSlope, {
+    onCorrect: () => {
+      tracking.onCheck(true)
+      onResult(true)
+      onSolvedChange(true)
+      setShowSolution(false)
+    },
+    onWrong: () => {
+      tracking.onCheck(false)
+      onResult(false)
+    },
+  })
 
   function generateNewTask() {
     tracking.onTaskStart()
     onSolvedChange(false)
-    setFeedback('')
-    setInput('')
-    setSlopeSign('')
+    live.reset()
     setShowSolution(false)
     setPoints(newTextPoints())
-  }
-
-  function checkSolution() {
-    if (slopeSign === '') {
-      setFeedback('Bitte wähle zuerst aus, ob die Steigung positiv oder negativ ist.')
-      return
-    }
-    if (input.trim() === '') {
-      setFeedback('Bitte gib die Steigung ein.')
-      return
-    }
-    const user = parseFloat(input.replace(',', '.').replace(/[−–—‐]/g, '-'))
-    if (isNaN(user)) {
-      setFeedback('Ungültige Zahl')
-      return
-    }
-
-    const expectedSign = correctSlope >= 0 ? 'positive' : 'negative'
-    if (slopeSign !== expectedSign) {
-      tracking.onCheck(false)
-      setFeedback(
-        expectedSign === 'positive'
-          ? 'Das Vorzeichen ist falsch! Die Steigung ist positiv.'
-          : 'Das Vorzeichen ist falsch! Die Steigung ist negativ.',
-      )
-      onResult(false)
-      return
-    }
-
-    if (Math.abs(user - correctSlope) < 0.01) {
-      tracking.onCheck(true)
-      setFeedback('Richtig! Super gemacht!')
-      setShowSolution(false)
-      onResult(true)
-      onSolvedChange(true)
-    } else {
-      tracking.onCheck(false)
-      setFeedback('Das Vorzeichen stimmt, aber der Wert ist nicht ganz richtig. Überprüfe deine Rechnung!')
-      setShowSolution(false)
-      onResult(false)
-    }
   }
 
   function onShowAnswer() {
@@ -162,48 +213,9 @@ function TextTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) {
         P<sub>1</sub>({p1.x}|{p1.y}) und P<sub>2</sub>({p2.x}|{p2.y})
       </p>
 
-      <fieldset className="mb-4">
-        <legend className="text-sm font-semibold text-slate-700 mb-2 mx-auto">Schritt 1: Ist die Steigung positiv oder negativ?</legend>
-        <div className="flex flex-wrap justify-center gap-3">
-          {([['positive', 'Positiv (steigt)'], ['negative', 'Negativ (fällt)']] as const).map(([value, label]) => (
-            <label
-              key={value}
-              className={`flex items-center gap-2 cursor-pointer rounded border px-3 py-2 text-sm ${
-                slopeSign === value ? 'border-blue-500 bg-blue-50 text-blue-900' : 'border-slate-300 bg-white text-slate-700'
-              }`}
-            >
-              <input
-                type="radio"
-                name={`slope-sign-${number}`}
-                value={value}
-                checked={slopeSign === value}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSlopeSign(e.target.value as 'positive' | 'negative')}
-              />
-              {label}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      {slopeSign && (
-        <div className="mb-2">
-          <p className="text-sm font-semibold text-slate-700 mb-2">Schritt 2: Gib den Wert ein</p>
-          <div className="flex items-center justify-center gap-2">
-            <span className="font-semibold text-slate-800">m =</span>
-            <input
-              value={input}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
-              className={inputCls}
-              placeholder="Deine Lösung"
-            />
-          </div>
-        </div>
-      )}
-
-      {feedbackEl(feedback)}
+      <AnswerField live={live} />
 
       <div className="flex flex-wrap justify-center gap-3 mt-6">
-        <button onClick={checkSolution} className={btnPrimary}>Lösung prüfen</button>
         <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
         <button onClick={onShowAnswer} className={btnSecondary}>Lösung anzeigen</button>
         <button onClick={() => window.open(VIDEO_URL, '_blank')} className={btnSecondary}>Erklärvideo</button>
@@ -225,7 +237,6 @@ function newGraphLine() {
 function GraphTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) {
   const tracking = useTaskTracking('Steigung aus Graph')
   const [{ m: graphM, t: graphT }, setLine] = useState(newGraphLine)
-  const [input, setInput] = useState('')
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
   const [selectedPoints, setSelectedPoints] = useState<Array<{ x: number; y: number }>>([])
@@ -257,11 +268,24 @@ function GraphTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) 
   const deltaY = selectedPoints.length === 2 ? selectedPoints[1].y - selectedPoints[0].y : 0
   const deltaX = selectedPoints.length === 2 ? selectedPoints[1].x - selectedPoints[0].x : 0
 
+  const live = useLiveAnswer(selectedPoints.length === 2 ? correctSlope : null, {
+    onCorrect: () => {
+      tracking.onCheck(true)
+      onResult(true)
+      onSolvedChange(true)
+      setShowSolution(false)
+    },
+    onWrong: () => {
+      tracking.onCheck(false)
+      onResult(false)
+    },
+  })
+
   function generateNewTask() {
     tracking.onTaskStart()
     onSolvedChange(false)
     setFeedback('')
-    setInput('')
+    live.reset()
     setShowSolution(false)
     setSelectedPoints([])
     setSelectionMode(true)
@@ -303,34 +327,6 @@ function GraphTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) 
       setInstruction('Berechne jetzt die Steigung!')
     }
     setFeedback('')
-  }
-
-  function checkSolution() {
-    if (selectedPoints.length !== 2) {
-      setFeedback('Bitte wähle zuerst zwei Punkte im Graphen aus.')
-      return
-    }
-    if (input.trim() === '') {
-      setFeedback('Bitte gib die Steigung ein.')
-      return
-    }
-    const user = parseFloat(input.replace(',', '.').replace(/[−–—‐]/g, '-'))
-    if (isNaN(user)) {
-      setFeedback('Ungültige Zahl')
-      return
-    }
-    if (Math.abs(user - correctSlope) < 0.01) {
-      tracking.onCheck(true)
-      setFeedback('Richtig! Super gemacht!')
-      setShowSolution(false)
-      onResult(true)
-      onSolvedChange(true)
-    } else {
-      tracking.onCheck(false)
-      setFeedback('Leider nicht ganz richtig. Überprüfe deine Rechnung!')
-      setShowSolution(false)
-      onResult(false)
-    }
   }
 
   function onShowAnswer() {
@@ -379,20 +375,11 @@ function GraphTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) 
         </div>
       )}
 
-      <div className="flex items-center justify-center gap-2">
-        <span className="font-semibold text-slate-800">m =</span>
-        <input
-          value={input}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
-          className={inputCls}
-          placeholder="Deine Lösung"
-        />
-      </div>
+      <AnswerField live={live} disabled={selectedPoints.length !== 2} placeholder={selectedPoints.length === 2 ? 'Deine Lösung' : 'Erst zwei Punkte'} />
 
       {feedbackEl(feedback)}
 
       <div className="flex flex-wrap justify-center gap-3 mt-6">
-        <button onClick={checkSolution} className={btnPrimary}>Lösung prüfen</button>
         <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
         <button onClick={onShowAnswer} className={btnSecondary}>Lösung anzeigen</button>
         <button onClick={() => window.open(VIDEO_URL, '_blank')} className={btnSecondary}>Erklärvideo</button>
