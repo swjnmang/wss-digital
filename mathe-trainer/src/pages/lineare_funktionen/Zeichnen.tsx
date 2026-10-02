@@ -37,24 +37,6 @@ export default function Zeichnen(){
     return roundedNum
   }
 
-  function numberToLatex(num: number): string {
-    if (num === 0) return '0'
-    if (Math.abs(num) === 0.5) return (num > 0 ? '' : '-') + '\\frac{1}{2}'
-    if (Math.abs(num) === 0.25) return (num > 0 ? '' : '-') + '\\frac{1}{4}'
-    if (Math.abs(num) === 0.75) return (num > 0 ? '' : '-') + '\\frac{3}{4}'
-    if (Math.abs(num) === 1/3) return (num > 0 ? '' : '-') + '\\frac{1}{3}'
-    if (Math.abs(num) === 2/3) return (num > 0 ? '' : '-') + '\\frac{2}{3}'
-    if (Math.abs(num) === 2/5) return (num > 0 ? '' : '-') + '\\frac{2}{5}'
-    if (Math.abs(num) === 3/5) return (num > 0 ? '' : '-') + '\\frac{3}{5}'
-    if (Math.abs(num) === 1/5) return (num > 0 ? '' : '-') + '\\frac{1}{5}'
-    if (Math.abs(num) === 3/4) return (num > 0 ? '' : '-') + '\\frac{3}{4}'
-    if (Math.abs(num) === 4/5) return (num > 0 ? '' : '-') + '\\frac{4}{5}'
-    if (Math.abs(num) === 1/6) return (num > 0 ? '' : '-') + '\\frac{1}{6}'
-    if (Math.abs(num) === 5/6) return (num > 0 ? '' : '-') + '\\frac{5}{6}'
-    const rounded = Math.round(num * 100) / 100
-    return rounded.toString()
-  }
-
   function generateEquationLatex(m: number, t: number): string {
     let m_str = ''
     let t_str = ''
@@ -62,13 +44,13 @@ export default function Zeichnen(){
     if (m === 1) m_str = 'x'
     else if (m === -1) m_str = '-x'
     else if (!Number.isInteger(m) && Math.abs(m) > 0.1) {
-      const mLatex = numberToLatex(m)
+      const mLatex = valueToLatex(m)
       m_str = `${mLatex}x`
-    } else m_str = `${numberToLatex(m)}x`
+    } else m_str = `${valueToLatex(m)}x`
 
     if (t === 0) t_str = ''
-    else if (t > 0) t_str = ` + ${numberToLatex(t)}`
-    else t_str = ` - ${numberToLatex(Math.abs(t))}`
+    else if (t > 0) t_str = ` + ${valueToLatex(t)}`
+    else t_str = ` - ${valueToLatex(Math.abs(t))}`
 
     return `y = ${m_str}${t_str}`
   }
@@ -134,6 +116,60 @@ export default function Zeichnen(){
   function openGeoGebra(){
     setShowSolution(true)
   }
+
+  // Kleinster Nenner, mit dem sich die Zahl als Bruch darstellen lässt.
+  function getDenominator(value: number): number {
+    for (let d = 1; d <= 60; d++) {
+      if (Math.abs(value * d - Math.round(value * d)) < 1e-9) return d
+    }
+    return 1
+  }
+
+  function valueToLatex(value: number): string {
+    const d = getDenominator(value)
+    const n = Math.round(value * d)
+    if (d === 1) return String(n)
+    return `${n < 0 ? '-' : ''}\\frac{${Math.abs(n)}}{${d}}`
+  }
+
+  // Negative Zahlen beim Einsetzen in Klammern schreiben.
+  function withParens(value: number): string {
+    return value < 0 ? `(${valueToLatex(value)})` : valueToLatex(value)
+  }
+
+  function buildTipps(m: number, t: number) {
+    const denominator = getDenominator(m)
+    const xValues = denominator === 1 ? [-2, -1, 0, 1, 2] : [-denominator, 0, denominator]
+    const tTerm = t === 0 ? '' : t > 0 ? ` + ${valueToLatex(t)}` : ` - ${valueToLatex(Math.abs(t))}`
+
+    const rows = xValues.map((x) => {
+      const product = m * x
+      const y = product + t
+      const mTerm = m === 1 ? withParens(x) : `${valueToLatex(m)} \\cdot ${withParens(x)}`
+      let calculation = `y = ${mTerm}${tTerm}`
+      if (t !== 0) calculation += ` = ${valueToLatex(product)}${tTerm}`
+      calculation += ` = ${valueToLatex(y)}`
+      return {
+        x,
+        xLatex: valueToLatex(x),
+        calculation,
+        yLatex: valueToLatex(y),
+        point: `(${valueToLatex(x)} \\mid ${valueToLatex(y)})`
+      }
+    })
+
+    const rise = Math.round(Math.abs(m) * denominator)
+    const direction = m > 0 ? 'nach oben' : 'nach unten'
+    const right = denominator === 1 ? '1 Einheit' : `${denominator} Einheiten`
+    const slopeText =
+      `Gehst du von einem deiner Punkte ${right} nach rechts, musst du ${rise} ${rise === 1 ? 'Einheit' : 'Einheiten'} ${direction} gehen, ` +
+      `um den nächsten Punkt auf der Geraden zu erreichen. Die Gerade verläuft deshalb von ` +
+      `${m > 0 ? 'links unten nach rechts oben' : 'links oben nach rechts unten'}.`
+
+    return { denominator, rows, mLatex: valueToLatex(m), slopeText }
+  }
+
+  const tipps = buildTipps(m, t)
 
   return (
     <div className={`prose ${styles.container}`}>
@@ -205,56 +241,82 @@ export default function Zeichnen(){
               </button>
             </div>
             
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 text-left">
+              <p className="text-gray-700">
+                Diese Tipps passen zu deiner aktuellen Aufgabe: <InlineMath math={equationLatex} />
+              </p>
+
               <div>
                 <h4 className="font-bold text-lg text-blue-600 mb-2">1. Wertetabelle erstellen</h4>
-                <p className="text-gray-700 mb-3">Erstelle eine Wertetabelle, indem du mehrere x-Werte in die Funktionsgleichung einsetzt und die entsprechenden y-Werte berechnest.</p>
-                <div className="bg-blue-50 border-l-4 border-blue-600 p-3 text-sm text-gray-700">
-                  <strong>Beispiel:</strong> Für <InlineMath math="y = 2x - 1" /><br/>
-                  <InlineMath math="x = -1 \Rightarrow y = 2(-1) - 1 = -3" /><br/>
-                  <InlineMath math="x = 0 \Rightarrow y = 2(0) - 1 = -1" /><br/>
-                  <InlineMath math="x = 1 \Rightarrow y = 2(1) - 1 = 1" /><br/>
-                  <InlineMath math="x = 2 \Rightarrow y = 2(2) - 1 = 3" />
+                <p className="text-gray-700 mb-3">
+                  Wähle einige x-Werte aus und schreibe sie in die erste Spalte. Setze dann jeden x-Wert für{' '}
+                  <InlineMath math="x" /> in die Funktionsgleichung ein und rechne aus. Das Ergebnis ist der passende
+                  y-Wert. Jede Zeile der Tabelle ergibt einen Punkt <InlineMath math="(x \mid y)" />.
+                </p>
+                {tipps.denominator > 1 && (
+                  <p className="text-gray-700 mb-3">
+                    <strong>Tipp:</strong> Vor dem <InlineMath math="x" /> steht ein Bruch mit dem Nenner {tipps.denominator}. Wähle deshalb
+                    x-Werte, die durch {tipps.denominator} teilbar sind – dann kürzt sich der Bruch weg und das Rechnen wird
+                    leichter.
+                  </p>
+                )}
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-sm text-gray-800 not-prose">
+                    <thead>
+                      <tr className="bg-blue-100">
+                        <th className="border border-blue-300 px-3 py-2 text-center">x</th>
+                        <th className="border border-blue-300 px-3 py-2 text-left">x einsetzen und ausrechnen</th>
+                        <th className="border border-blue-300 px-3 py-2 text-center">y</th>
+                        <th className="border border-blue-300 px-3 py-2 text-center">Punkt</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tipps.rows.map((row) => (
+                        <tr key={row.x} className="odd:bg-white even:bg-blue-50">
+                          <td className="border border-blue-200 px-3 py-2 text-center"><InlineMath math={row.xLatex} /></td>
+                          <td className="border border-blue-200 px-3 py-2"><InlineMath math={row.calculation} /></td>
+                          <td className="border border-blue-200 px-3 py-2 text-center font-semibold"><InlineMath math={row.yLatex} /></td>
+                          <td className="border border-blue-200 px-3 py-2 text-center"><InlineMath math={row.point} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
+                <p className="text-sm text-gray-600 mt-2">
+                  Achte beim Einsetzen von negativen Zahlen auf die Klammern und auf die Vorzeichenregeln: Minus mal Minus ergibt Plus.
+                </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">2. Zwei wichtige Punkte berechnen</h4>
-                <p className="text-gray-700 mb-3">Du brauchst mindestens zwei Punkte, um eine Gerade zu zeichnen. Besonders einfach sind:</p>
-                <ul className="list-disc list-inside text-gray-700 space-y-2">
-                  <li><strong>Y-Achsenabschnitt:</strong> Setze <InlineMath math="x = 0" /> ein. Der y-Wert ist direkt der konstante Term in der Gleichung.</li>
-                  <li><strong>X-Achsenabschnitt (Nullstelle):</strong> Setze <InlineMath math="y = 0" /> und löse nach <InlineMath math="x" /> auf.</li>
-                </ul>
-                <div className="bg-blue-50 border-l-4 border-blue-600 p-3 text-sm text-gray-700 mt-3">
-                  <strong>Beispiel:</strong> Für <InlineMath math="y = 2x - 1" /><br/>
-                  Y-Achsenabschnitt: <InlineMath math="x = 0 \Rightarrow y = -1" />, also Punkt <InlineMath math="(0 \mid -1)" /><br/>
-                  X-Achsenabschnitt: <InlineMath math="0 = 2x - 1 \Rightarrow x = 0{,}5" />, also Punkt <InlineMath math="(0{,}5 \mid 0)" />
-                </div>
+                <h4 className="font-bold text-lg text-blue-600 mb-2">2. Punkte ins Koordinatensystem eintragen</h4>
+                <p className="text-gray-700 mb-3">
+                  Trage die Punkte aus der letzten Spalte genau ins Koordinatensystem ein. Gehe beim x-Wert nach rechts
+                  (positiv) oder links (negativ) und beim y-Wert nach oben (positiv) oder unten (negativ). Markiere jeden
+                  Punkt als kleines Kreuz.
+                </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">3. Steigung ablesen und nutzen</h4>
-                <p className="text-gray-700 mb-3">Die Steigung <InlineMath math="m" /> zeigt dir, wie steil die Gerade ist. Wenn du einen Punkt hast, kannst du von dort aus die Steigung nutzen, um weitere Punkte zu finden:</p>
-                <ul className="list-disc list-inside text-gray-700 space-y-2">
-                  <li>Positive Steigung: Gerade verläuft von links unten nach rechts oben</li>
-                  <li>Negative Steigung: Gerade verläuft von links oben nach rechts unten</li>
-                  <li>Steigung <InlineMath math="m = 2" /> bedeutet: Wenn du 1 Einheit nach rechts gehst, gehst du 2 Einheiten nach oben</li>
-                </ul>
+                <h4 className="font-bold text-lg text-blue-600 mb-2">3. Kontrolle mit der Steigung</h4>
+                <p className="text-gray-700 mb-3">
+                  Die Zahl vor dem <InlineMath math="x" /> ist die Steigung <InlineMath math={`m = ${tipps.mLatex}`} />. {tipps.slopeText}
+                </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">4. Punkte ins Koordinatensystem eintragen</h4>
-                <p className="text-gray-700 mb-3">Trage die berechneten Punkte genau ins Koordinatensystem ein. Markiere sie deutlich als kleine Kreuze oder Punkte.</p>
-              </div>
-
-              <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">5. Gerade zeichnen</h4>
-                <p className="text-gray-700 mb-3">Verbinde die Punkte mit einem Lineal zu einer geraden Linie. Verlängere die Linie über die markierten Punkte hinaus, um zu zeigen, dass sie sich unendlich fortsetzt.</p>
+                <h4 className="font-bold text-lg text-blue-600 mb-2">4. Gerade zeichnen</h4>
+                <p className="text-gray-700 mb-3">
+                  Verbinde die Punkte mit einem Lineal zu einer geraden Linie. Verlängere die Linie über die markierten Punkte
+                  hinaus bis zum Rand des Koordinatensystems.
+                </p>
               </div>
 
               <div className="bg-green-50 border-l-4 border-green-600 p-4">
                 <h4 className="font-bold text-green-700 mb-2">💡 Profi-Tipp:</h4>
-                <p className="text-gray-700">Verwende mindestens 3-4 Punkte, um sicherzugehen, dass deine Gerade korrekt ist. Wenn alle Punkte auf einer Linie liegen, hast du alles richtig gemacht!</p>
+                <p className="text-gray-700">
+                  Für eine Gerade reichen eigentlich zwei Punkte. Mit einem dritten Punkt kannst du aber prüfen, ob du dich
+                  verrechnet hast: Liegen alle Punkte auf einer Linie, hast du richtig gerechnet!
+                </p>
               </div>
             </div>
 
