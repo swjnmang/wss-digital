@@ -92,8 +92,8 @@
         .grid-container {
             display: grid;
             /* Automatische Spalten: Mindestens 260px breit, sonst aufteilen */
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
             width: 100%;
         }
 
@@ -101,7 +101,7 @@
         .nav-card {
             background-color: var(--card-bg);
             border-radius: 16px;
-            padding: 2.5rem 1.5rem;
+            padding: 1.75rem 1.25rem;
             text-align: center;
             text-decoration: none;
             color: var(--text-main);
@@ -184,13 +184,13 @@
         /* --- Icons --- */
         .icon-wrapper {
             background-color: #eff6ff;
-            width: 80px;
-            height: 80px;
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             transition: background-color 0.3s ease;
         }
 
@@ -199,8 +199,8 @@
         }
 
         .nav-card svg {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             stroke: var(--primary);
             stroke-width: 2;
             fill: none;
@@ -215,14 +215,14 @@
 
         /* --- Texte in der Karte --- */
         .nav-card h2 {
-            font-size: 1.35rem;
+            font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
             color: var(--text-main);
         }
 
         .nav-card p {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--text-light);
             line-height: 1.5;
         }
@@ -570,32 +570,20 @@
             </a>
 
             <!-- Karte 2 -->
-            <a href="https://marktmatch5.vercel.app/" class="nav-card" data-link-id="wirtschaftsplanspiel">
+            <a href="https://module-taupe.vercel.app/digitale-bildung" class="nav-card" data-link-id="digitale-bildung">
                 <div class="icon-wrapper">
-                    <!-- Chart/Strategy Icon -->
+                    <!-- Laptop Icon -->
                     <svg viewBox="0 0 24 24">
-                        <path d="M3 3v18h18"></path>
-                        <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
                     </svg>
                 </div>
-                <h2>Wirtschaftsplanspiel</h2>
-                <p>Markt-Match 5 - kostenfreies Unternehmensplanspiel für Schulklassen oder andere Gruppen</p>
+                <h2>Digitale Bildung</h2>
+                <p>Grundlagen, Medienkompetenz und digitale Werkzeuge für den Unterricht.</p>
             </a>
 
             <!-- Karte 3 -->
-            <a href="https://wss-digital-uebungsunternehmen.vercel.app/" class="nav-card" data-link-id="uebungsunternehmen">
-                <div class="icon-wrapper">
-                    <!-- Briefcase Icon -->
-                    <svg viewBox="0 0 24 24">
-                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                    </svg>
-                </div>
-                <h2>Übungsunternehmen</h2>
-                <p>Praxisnahe Arbeit in verschiedenen Abteilungen eines virtuellen Unternehmens.</p>
-            </a>
-
-            <!-- Karte 4 -->
             <a href="https://module-taupe.vercel.app/" class="nav-card" data-link-id="module">
                 <div class="icon-wrapper">
                     <!-- Modules Icon -->
@@ -610,19 +598,30 @@
                 <p>Neue Module und themenspezifische Lerneinheiten wie Gamification und vieles mehr.</p>
             </a>
 
-            <!-- Karte 5 -->
-            <a href="kennenlernspiele.html" class="nav-card" data-link-id="kennenlernspiele">
+            <!-- Karte 4 -->
+            <a href="https://wss-digital-uebungsunternehmen.vercel.app/" class="nav-card" data-link-id="uebungsunternehmen">
                 <div class="icon-wrapper">
-                    <!-- Users/Team Icon -->
+                    <!-- Briefcase Icon -->
                     <svg viewBox="0 0 24 24">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                     </svg>
                 </div>
-                <h2>Kennenlernspiele</h2>
-                <p>Spiele, Methoden und Vorlagen für den Schuljahresbeginn und Teambuilding in der Klasse.</p>
+                <h2>Übungsunternehmen</h2>
+                <p>Praxisnahe Arbeit in verschiedenen Abteilungen eines virtuellen Unternehmens.</p>
+            </a>
+
+            <!-- Karte 5 -->
+            <a href="https://marktmatch5.vercel.app/" class="nav-card" data-link-id="wirtschaftsplanspiel">
+                <div class="icon-wrapper">
+                    <!-- Chart/Strategy Icon -->
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 3v18h18"></path>
+                        <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+                    </svg>
+                </div>
+                <h2>Wirtschaftsplanspiel</h2>
+                <p>Markt-Match 5 - kostenfreies Unternehmensplanspiel für Schulklassen oder andere Gruppen</p>
             </a>
 
             <!-- Karte 6 -->
@@ -640,17 +639,18 @@
             </a>
 
             <!-- Karte 7 -->
-            <a href="https://module-taupe.vercel.app/digitale-bildung" class="nav-card" data-link-id="digitale-bildung">
+            <a href="kennenlernspiele.html" class="nav-card" data-link-id="kennenlernspiele">
                 <div class="icon-wrapper">
-                    <!-- Laptop Icon -->
+                    <!-- Users/Team Icon -->
                     <svg viewBox="0 0 24 24">
-                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                        <line x1="8" y1="21" x2="16" y2="21"></line>
-                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
                 </div>
-                <h2>Digitale Bildung</h2>
-                <p>Grundlagen, Medienkompetenz und digitale Werkzeuge für den Unterricht.</p>
+                <h2>Kennenlernspiele</h2>
+                <p>Spiele, Methoden und Vorlagen für den Schuljahresbeginn und Teambuilding in der Klasse.</p>
             </a>
 
         </div>
