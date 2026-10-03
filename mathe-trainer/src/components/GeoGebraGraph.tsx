@@ -88,7 +88,9 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
         showToolBar: false,
         showAlgebraInput: false,
         showMenuBar: false,
-        showResetIcon: true,
+        // Das eingebaute GeoGebra-Reset-Symbol setzt auf einen leeren Ausgangszustand zurück (Gerade weg);
+        // stattdessen gibt es unten einen eigenen Button, der die Gerade neu zeichnet.
+        showResetIcon: false,
         showFullscreenButton: false,
         showZoomButtons: true, // Zoom + / - Buttons anzeigen
         useBrowserForJS: true,
@@ -204,6 +206,7 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
           ⏳ Graph wird geladen...
         </div>
       ) : (
+        <div style={{ position: 'relative' }}>
         <div 
           id={elementIdRef.current}
           style={{
@@ -213,6 +216,31 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
             borderRadius: '4px'
           }}
         />
+          <button
+            type="button"
+            title="Graph neu laden"
+            aria-label="Graph neu laden"
+            onClick={() => {
+              if (appletRef.current) updateGraph(appletRef.current, latest.current.m, latest.current.t)
+            }}
+            style={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              width: 34,
+              height: 34,
+              borderRadius: 6,
+              border: '1px solid #cbd5e1',
+              background: 'rgba(255,255,255,0.92)',
+              color: '#475569',
+              fontSize: 20,
+              lineHeight: 1,
+              cursor: 'pointer',
+            }}
+          >
+            ⟳
+          </button>
+        </div>
       )}
     </div>
   );
