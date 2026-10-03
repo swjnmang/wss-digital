@@ -13,6 +13,34 @@ interface GeoGebraGraphProps {
   height?: number;
 }
 
+const GGB_SRC = 'https://www.geogebra.org/apps/deployggb.js';
+let ggbLoader: Promise<void> | null = null;
+
+/** Lädt deployggb.js genau einmal; alle Aufrufer bekommen dasselbe Promise (auch während das Skript noch lädt). */
+function loadGeoGebra(): Promise<void> {
+  if (window.GGBApplet) return Promise.resolve();
+  if (ggbLoader) return ggbLoader;
+  ggbLoader = new Promise<void>((resolve, reject) => {
+    const done = () => (window.GGBApplet ? resolve() : reject(new Error('GGBApplet fehlt')));
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${GGB_SRC}"]`);
+    if (existing) {
+      existing.addEventListener('load', done);
+      existing.addEventListener('error', () => reject(new Error('GeoGebra-Skript nicht geladen')));
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = GGB_SRC;
+    s.async = true;
+    s.onload = done;
+    s.onerror = () => reject(new Error('GeoGebra-Skript nicht geladen'));
+    document.body.appendChild(s);
+  }).catch((e) => {
+    ggbLoader = null; // beim nächsten Versuch neu laden
+    throw e;
+  });
+  return ggbLoader;
+}
+
 const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({ 
   m, 
   t, 
@@ -24,13 +52,33 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
   const elementIdRef = useRef<string>(`ggb-elem-${Math.random().toString(36).substr(2, 9)}`);
   const [scriptLoaded, setScriptLoaded] = React.useState<boolean>(!!window.GGBApplet);
   const [error, setError] = React.useState<boolean>(false);
+  const latest = useRef({ m, t });
+  latest.current = { m, t };
 
-  // Initialisiere GeoGebra einmalig
+  // Skript laden (einmal für die ganze Seite, alle Graphen warten auf dasselbe Laden)
   useEffect(() => {
-    const elementId = elementIdRef.current;
-    
-    const initApplet = () => {
-      if (!window.GGBApplet || appletRef.current) return;
+    let cancelled = false
+    loadGeoGebra()
+      .then(() => { if (!cancelled) setScriptLoaded(true) })
+      .catch(() => { if (!cancelled) setError(true) })
+    return () => { cancelled = true }
+  }, [])
+
+  // Applet einfügen, sobald das Skript da ist und das Ziel-Element gerendert wurde
+  useEffect(() => {
+    if (!scriptLoaded || appletRef.current) return
+    const elementId = elementIdRef.current
+    let cancelled = false
+    let retryTimer: ReturnType<typeof setTimeout> | undefined
+
+    const inject = (attempt: number) => {
+      if (cancelled || appletRef.current) return
+      const el = document.getElementById(elementId)
+      if (!el || !window.GGBApplet) {
+        retryTimer = setTimeout(() => inject(attempt), 100)
+        return
+      }
+      el.innerHTML = ''
 
       const params = {
         appName: 'classic', // WICHTIG: Muss 'classic' sein, nicht 'graphing'!
@@ -45,42 +93,37 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
         showZoomButtons: true, // Zoom + / - Buttons anzeigen
         useBrowserForJS: true,
         appletOnLoad: (api: any) => {
-          appletRef.current = api;
+          if (cancelled) return
+          appletRef.current = api
           // Setze die initiale Gleichung
-          updateGraph(api, m, t);
+          updateGraph(api, latest.current.m, latest.current.t)
         }
-      };
+      }
 
       try {
-        const applet = new window.GGBApplet(params, true);
-        applet.inject(elementId);
+        const applet = new window.GGBApplet(params, true)
+        applet.inject(elementId)
       } catch (e) {
-        console.error('GeoGebra Error beim Injizieren:', e);
-        setError(true);
+        console.error('GeoGebra Error beim Injizieren:', e)
+        setError(true)
+        return
       }
-    };
 
-    // Lade deployggb.js script wenn es noch nicht existiert
-    const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
-    
-    if (!existing) {
-      const s = document.createElement('script');
-      s.src = 'https://www.geogebra.org/apps/deployggb.js';
-      s.async = true;
-      s.onload = () => {
-        setScriptLoaded(true);
-        setTimeout(() => initApplet(), 150);
-      };
-      s.onerror = () => {
-        console.error('Fehler beim Laden von GeoGebra Script');
-        setError(true);
-      };
-      document.body.appendChild(s);
-    } else {
-      setScriptLoaded(true);
-      setTimeout(() => initApplet(), 50);
+      // Wenn das Applet nicht meldet, dass es geladen ist: einmal neu versuchen, danach Fehlermeldung
+      retryTimer = setTimeout(() => {
+        if (cancelled || appletRef.current) return
+        if (attempt < 2) inject(attempt + 1)
+        else setError(true)
+      }, 8000)
     }
-  }, [width, height]);
+
+    inject(1)
+    return () => {
+      cancelled = true
+      if (retryTimer) clearTimeout(retryTimer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scriptLoaded, width, height])
 
   // Update Graph wenn m oder t sich ändert
   useEffect(() => {
