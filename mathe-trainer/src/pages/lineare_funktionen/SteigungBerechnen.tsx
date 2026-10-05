@@ -508,19 +508,19 @@ export default function SteigungBerechnen() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
-                className="rounded-xl border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 p-5 transition-colors"
+                className="rounded-xl bg-green-600 hover:bg-green-700 text-white p-5 shadow-sm transition-colors"
               >
-                <p className="text-lg font-bold text-slate-800 mb-1">Einfach</p>
-                <p className="text-xl font-serif italic text-blue-700 mb-2">y = m · x</p>
-                <p className="text-sm text-slate-600">Nur Ursprungsgeraden: Alle Geraden gehen durch den Punkt O(0|0).</p>
+                <p className="text-lg font-bold mb-1 text-white">Einfach</p>
+                <p className="text-xl font-serif italic mb-2 text-white">y = m · x</p>
+                <p className="text-sm text-white/90">Nur Ursprungsgeraden: Alle Geraden gehen durch den Punkt O(0|0).</p>
               </button>
               <button
                 onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-xl border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 p-5 transition-colors"
+                className="rounded-xl bg-red-600 hover:bg-red-700 text-white p-5 shadow-sm transition-colors"
               >
-                <p className="text-lg font-bold text-slate-800 mb-1">Fortgeschritten</p>
-                <p className="text-xl font-serif italic text-blue-700 mb-2">y = m · x + t</p>
-                <p className="text-sm text-slate-600">Beliebige Geraden, die die y-Achse an einer anderen Stelle schneiden.</p>
+                <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
+                <p className="text-xl font-serif italic mb-2 text-white">y = m · x + t</p>
+                <p className="text-sm text-white/90">Beliebige Geraden, die die y-Achse an einer anderen Stelle schneiden.</p>
               </button>
             </div>
           </div>
