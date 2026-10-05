@@ -39,6 +39,7 @@ const routes = [
   { path: '/lineare_funktionen/zeichnen', priority: 0.8, changefreq: 'monthly' },
   { path: '/lineare_funktionen/ablesen', priority: 0.8, changefreq: 'monthly' },
   { path: '/lineare_funktionen/steigung_berechnen', priority: 0.8, changefreq: 'monthly' },
+  { path: '/lineare_funktionen/y_achsenabschnitt', priority: 0.8, changefreq: 'monthly' },
   { path: '/lineare_funktionen/funktionsgleichung', priority: 0.8, changefreq: 'monthly' },
   { path: '/lineare_funktionen/punkt_gerade', priority: 0.8, changefreq: 'monthly' },
   { path: '/lineare_funktionen/parallel_senkrecht', priority: 0.8, changefreq: 'monthly' },

@@ -45,6 +45,7 @@ import Impressum from './pages/Impressum'
 import CookieBanner from './components/CookieBanner'
 // lineare funktionen pages
 import SteigungBerechnen from './pages/lineare_funktionen/SteigungBerechnen'
+import YAchsenabschnitt from './pages/lineare_funktionen/YAchsenabschnitt'
 import Funktionsgleichung from './pages/lineare_funktionen/Funktionsgleichung'
 import Ablesen from './pages/lineare_funktionen/Ablesen'
 import Zeichnen from './pages/lineare_funktionen/Zeichnen'
@@ -308,6 +309,7 @@ export default function App() {
           <Route path="/lineare_funktionen/zeichnen" element={<Zeichnen />} />
           <Route path="/lineare_funktionen/ablesen" element={<Ablesen />} />
           <Route path="/lineare_funktionen/steigung_berechnen" element={<SteigungBerechnen />} />
+          <Route path="/lineare_funktionen/y_achsenabschnitt" element={<YAchsenabschnitt />} />
           <Route path="/lineare_funktionen/funktionsgleichung" element={<Funktionsgleichung />} />
           <Route path="/lineare_funktionen/punkt_gerade" element={<PunktGerade />} />
           <Route path="/lineare_funktionen/parallel_senkrecht" element={<ParallelSenkrecht />} />
