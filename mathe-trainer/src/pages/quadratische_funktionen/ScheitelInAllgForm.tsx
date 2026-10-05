@@ -43,7 +43,15 @@ const erzeugeAufgabe = (): Aufgabe => {
     };
 };
 
-const erzeugeAufgaben = () => Array.from({ length: ANZAHL_AUFGABEN }, erzeugeAufgabe);
+// Die 5 Aufgaben eines Durchgangs sind immer paarweise verschieden.
+const erzeugeAufgaben = () => {
+    const aufgaben = new Map<string, Aufgabe>();
+    while (aufgaben.size < ANZAHL_AUFGABEN) {
+        const t = erzeugeAufgabe();
+        aufgaben.set(t.equation, t);
+    }
+    return Array.from(aufgaben.values());
+};
 const leereEingaben = (): Eingabe[] =>
     Array.from({ length: ANZAHL_AUFGABEN }, () => ({ a: '', b: '', c: '' }));
 
