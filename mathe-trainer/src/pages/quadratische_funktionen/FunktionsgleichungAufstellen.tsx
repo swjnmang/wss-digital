@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { BlockMath, InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
@@ -17,8 +18,8 @@ const ANZAHL_AUFGABEN = 5;
 // Reihenfolge der Aufgabentypen auf einer Seite
 const TYPEN: Aufgabe['typ'][] = ['scheitel', 'punkte', 'scheitel', 'punkte', 'scheitel'];
 const LOB = ['Super, alles richtig!', 'Sehr gut gemacht!', 'Top, perfekt gerechnet!', 'Stark, das stimmt alles!', 'Klasse Arbeit!'];
-// Lernvideo wird nachgereicht: hier die YouTube-ID eintragen, dann erscheint es eingebettet.
-const LERNVIDEO_ID = '';
+const LERNVIDEO_ID = 'hg9QipwqXxI';
+const GLEICHUNGSSYSTEME_PFAD = '/lineare_funktionen/gleichungssysteme';
 
 const BEISPIEL_SCHEITEL: ScheitelAufgabe = { typ: 'scheitel', a: 1, b: -4, c: 3, h: 2, k: -1, px: 4, py: 3 };
 const BEISPIEL_PUNKTE: PunkteAufgabe = { typ: 'punkte', a: -1, b: 2, c: 4, x1: 1, y1: 5, x2: 3, y2: 1 };
@@ -353,7 +354,7 @@ const FunktionsgleichungAufstellen = () => {
                         <p className="text-gray-700 mb-3">
                             Ist <InlineMath math="a" /> bekannt (z. B. „verschobene Normalparabel“ bedeutet <InlineMath math="a = 1" />), setzt du{' '}
                             <InlineMath math="a" /> in <InlineMath math="y = ax^2 + bx + c" /> ein. Dann setzt du nacheinander beide Punkte ein und erhältst
-                            zwei Gleichungen (I und II). Ziehst du II von I ab, fällt <InlineMath math="c" /> weg und du kannst <InlineMath math="b" /> berechnen.
+                            zwei Gleichungen (I und II). Ziehst du II von I ab (Additionsverfahren), fällt <InlineMath math="c" /> weg und du kannst <InlineMath math="b" /> berechnen.
                             Mit <InlineMath math="b" /> bekommst du aus Gleichung I dann <InlineMath math="c" />.
                         </p>
                         <p className="text-gray-700 mb-3">
@@ -368,7 +369,7 @@ const FunktionsgleichungAufstellen = () => {
                 <section className="mb-10">
                     <h2 className="text-xl font-semibold text-gray-800 mb-3">Lernvideo</h2>
                     {LERNVIDEO_ID ? (
-                        <div className="max-w-3xl">
+                        <div className="max-w-3xl mx-auto">
                             <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
                                 <iframe
                                     className="absolute inset-0 w-full h-full rounded-lg"
@@ -395,6 +396,17 @@ const FunktionsgleichungAufstellen = () => {
                 </section>
 
                 {/* Aufgaben */}
+                <div className="bg-amber-50 border-l-4 border-amber-500 rounded-md p-4 mb-8 text-gray-800">
+                    <p className="font-semibold mb-1">⚠️ Voraussetzung: Additionsverfahren</p>
+                    <p>
+                        Für Fall 2 musst du ein lineares Gleichungssystem mit dem <strong>Additionsverfahren</strong> lösen können (zwei Gleichungen
+                        voneinander abziehen, sodass eine Variable wegfällt). Wenn du das noch nicht sicher beherrschst, übe es zuerst noch einmal:{' '}
+                        <Link to={GLEICHUNGSSYSTEME_PFAD} className="font-semibold text-blue-700 underline hover:text-blue-900">
+                            Lineare Gleichungssysteme üben
+                        </Link>
+                    </p>
+                </div>
+
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">Deine Aufgaben</h2>
                 <p className="text-gray-600 mb-6">
                     Bestimme jeweils die Funktionsgleichung in allgemeiner Form <InlineMath math="y = ax^2 + bx + c" />. Rechne zuerst im Heft und trage
