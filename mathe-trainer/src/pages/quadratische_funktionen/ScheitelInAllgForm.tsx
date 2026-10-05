@@ -14,6 +14,7 @@ type Feld = keyof Eingabe;
 type Status = 'leer' | 'richtig' | 'vorzeichen' | 'falsch';
 
 const ANZAHL_AUFGABEN = 5;
+const ANZAHL_SCHRITTE = 5;
 
 const generiereZufallszahl = (min: number, max: number) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
@@ -54,17 +55,6 @@ const bewerte = (eingabe: string, korrekt: number): Status => {
     return 'falsch';
 };
 
-const tippText = (feld: Feld): string => {
-    switch (feld) {
-        case 'a':
-            return 'a ist der Faktor, der direkt vor der Klammer steht. Er bleibt beim Ausmultiplizieren der Potenz der Faktor vor x².';
-        case 'b':
-            return 'Löse zuerst die Klammer auf: (x − xₛ)² = x² − 2·xₛ·x + xₛ². Multipliziere dann alles mit a. Es gilt b = a · (−2 · xₛ).';
-        case 'c':
-            return 'Es gilt c = a · xₛ² + yₛ. Quadriere xₛ, multipliziere mit a und addiere dann yₛ (Vorzeichen beachten!).';
-    }
-};
-
 const farbKlasse = (status: Status) =>
     status === 'richtig'
         ? 'border-green-500 bg-green-50 text-green-800 focus:ring-green-500 focus:border-green-500'
@@ -72,7 +62,7 @@ const farbKlasse = (status: Status) =>
           ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
           : 'border-red-500 bg-red-50 text-red-800 focus:ring-red-500 focus:border-red-500';
 
-const Loesungsweg = ({ t }: { t: Aufgabe }) => {
+const Loesungsweg = ({ t, anzahl }: { t: Aufgabe; anzahl: number }) => {
     const { a, xs, ys, b, c } = t;
     const k = klammerTerm(xs);
     const ysT = ys === 0 ? '' : ` ${sgn(ys)}`;
@@ -101,10 +91,10 @@ const Loesungsweg = ({ t }: { t: Aufgabe }) => {
 
     return (
         <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-bold text-gray-800 mb-3">Musterlösung</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-3">Tipp: Lösungsweg</h3>
             <table className="w-full border-collapse text-gray-700">
                 <tbody>
-                    {zeilen.map((z, i) => (
+                    {zeilen.slice(0, anzahl).map((z, i) => (
                         <tr key={i} className="border border-gray-300">
                             <td className="bg-gray-200 p-2 align-top border-r border-gray-300">
                                 {i + 1}. Schritt: {z.text}
@@ -114,9 +104,11 @@ const Loesungsweg = ({ t }: { t: Aufgabe }) => {
                     ))}
                 </tbody>
             </table>
-            <p className="mt-3 font-bold text-center bg-blue-100 rounded-md p-2">
-                Ergebnis: a = {a}, b = {b}, c = {c}
-            </p>
+            {anzahl >= zeilen.length && (
+                <p className="mt-3 font-bold text-center bg-blue-100 rounded-md p-2">
+                    Ergebnis: a = {a}, b = {b}, c = {c}
+                </p>
+            )}
         </div>
     );
 };
@@ -124,14 +116,12 @@ const Loesungsweg = ({ t }: { t: Aufgabe }) => {
 const ScheitelInAllgForm = () => {
     const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
     const [eingaben, setEingaben] = useState<Eingabe[]>(leereEingaben());
-    const [zeigeTipp, setZeigeTipp] = useState<Record<string, boolean>>({});
-    const [zeigeLoesung, setZeigeLoesung] = useState<boolean[]>(Array(ANZAHL_AUFGABEN).fill(false));
+    const [tippSchritte, setTippSchritte] = useState<number[]>(Array(ANZAHL_AUFGABEN).fill(0));
 
     const neueAufgaben = () => {
         setAufgaben(erzeugeAufgaben());
         setEingaben(leereEingaben());
-        setZeigeTipp({});
-        setZeigeLoesung(Array(ANZAHL_AUFGABEN).fill(false));
+        setTippSchritte(Array(ANZAHL_AUFGABEN).fill(0));
     };
 
     useEffect(() => {
@@ -142,8 +132,8 @@ const ScheitelInAllgForm = () => {
         setEingaben((prev) => prev.map((e, idx) => (idx === i ? { ...e, [feld]: wert } : e)));
     };
 
-    const toggleLoesung = (i: number) => {
-        setZeigeLoesung((prev) => prev.map((v, idx) => (idx === i ? !v : v)));
+    const naechsterTipp = (i: number) => {
+        setTippSchritte((prev) => prev.map((v, idx) => (idx === i ? Math.min(v + 1, ANZAHL_SCHRITTE) : v)));
     };
 
     return (
@@ -154,9 +144,8 @@ const ScheitelInAllgForm = () => {
                     Forme jede der folgenden quadratischen Funktionen von der Scheitelform{' '}
                     <span className="font-mono">f(x) = a(x − xₛ)² + yₛ</span> in die allgemeine Form{' '}
                     <span className="font-mono">f(x) = ax² + bx + c</span> um. Rechne zuerst im Heft und trage dann
-                    die Werte für a, b und c ein. Richtige Werte werden sofort grün, falsche rot. Bei einem
-                    falschen Wert kannst du dir einen Tipp anzeigen lassen. Die Musterlösung zeigt dir den
-                    Rechenweg Schritt für Schritt.
+                    die Werte für a, b und c ein. Richtige Werte werden sofort grün, falsche rot. Wenn du nicht weiterkommst, zeigt
+                    dir „Tipp anzeigen“ den Lösungsweg Schritt für Schritt.
                 </p>
 
                 <div className="space-y-6">
@@ -170,9 +159,7 @@ const ScheitelInAllgForm = () => {
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
                                 {(['a', 'b', 'c'] as const).map((feld) => {
                                     const status = bewerte(eingaben[i]?.[feld] ?? '', t[feld]);
-                                    const tippKey = `${i}-${feld}`;
-                                    const istFalsch = status === 'falsch' || status === 'vorzeichen';
-                                    return (
+                                                    return (
                                         <div key={feld}>
                                             <div className="flex items-center space-x-2">
                                                 <label htmlFor={`${feld}-${i}`} className="text-lg font-medium text-gray-600">
@@ -193,34 +180,21 @@ const ScheitelInAllgForm = () => {
                                                     Fast! Nur das Vorzeichen ist falsch.
                                                 </p>
                                             )}
-                                            {istFalsch && (
-                                                <button
-                                                    onClick={() => setZeigeTipp((prev) => ({ ...prev, [tippKey]: !prev[tippKey] }))}
-                                                    className="mt-1 text-sm text-blue-700 underline hover:text-blue-900"
-                                                >
-                                                    {zeigeTipp[tippKey] ? 'Tipp verbergen' : 'Tipp anzeigen'}
-                                                </button>
-                                            )}
-                                            {istFalsch && zeigeTipp[tippKey] && (
-                                                <p className="mt-1 text-sm text-gray-700 bg-yellow-50 border border-yellow-300 rounded p-2">
-                                                    💡 {tippText(feld)}
-                                                </p>
-                                            )}
                                         </div>
                                     );
                                 })}
                             </div>
 
-                            <div className="flex flex-wrap gap-3 mt-3">
+                            {tippSchritte[i] < ANZAHL_SCHRITTE && (
                                 <button
-                                    onClick={() => toggleLoesung(i)}
-                                    className="bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+                                    onClick={() => naechsterTipp(i)}
+                                    className="mt-3 bg-yellow-100 text-yellow-900 font-bold py-2 px-5 rounded-lg hover:bg-yellow-200 transition-colors duration-200"
                                 >
-                                    {zeigeLoesung[i] ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
+                                    {tippSchritte[i] === 0 ? 'Tipp anzeigen' : 'Nächsten Tipp anzeigen'}
                                 </button>
-                            </div>
+                            )}
 
-                            {zeigeLoesung[i] && <Loesungsweg t={t} />}
+                            {tippSchritte[i] > 0 && <Loesungsweg t={t} anzahl={tippSchritte[i]} />}
                         </div>
                     ))}
                 </div>
