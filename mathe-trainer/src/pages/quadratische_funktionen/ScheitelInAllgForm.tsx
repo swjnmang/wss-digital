@@ -91,7 +91,7 @@ const Loesungsweg = ({ t, anzahl }: { t: Aufgabe; anzahl: number }) => {
 
     return (
         <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-bold text-gray-800 mb-3">Tipp: Lösungsweg</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-3">{anzahl >= zeilen.length ? 'Lösungsweg' : 'Tipp: Lösungsweg'}</h3>
             <table className="w-full border-collapse text-gray-700">
                 <tbody>
                     {zeilen.slice(0, anzahl).map((z, i) => (
@@ -130,6 +130,10 @@ const ScheitelInAllgForm = () => {
 
     const setEingabe = (i: number, feld: Feld, wert: string) => {
         setEingaben((prev) => prev.map((e, idx) => (idx === i ? { ...e, [feld]: wert } : e)));
+    };
+
+    const zeigeVollstaendigeLoesung = (i: number) => {
+        setTippSchritte((prev) => prev.map((v, idx) => (idx === i ? ANZAHL_SCHRITTE : v)));
     };
 
     const naechsterTipp = (i: number) => {
@@ -186,12 +190,20 @@ const ScheitelInAllgForm = () => {
                             </div>
 
                             {tippSchritte[i] < ANZAHL_SCHRITTE && (
-                                <button
-                                    onClick={() => naechsterTipp(i)}
-                                    className="mt-3 bg-yellow-100 text-yellow-900 font-bold py-2 px-5 rounded-lg hover:bg-yellow-200 transition-colors duration-200"
-                                >
-                                    {tippSchritte[i] === 0 ? 'Tipp anzeigen' : 'Nächsten Tipp anzeigen'}
-                                </button>
+                                <div className="flex flex-wrap gap-3 mt-3">
+                                    <button
+                                        onClick={() => naechsterTipp(i)}
+                                        className="bg-yellow-100 text-yellow-900 font-bold py-2 px-5 rounded-lg hover:bg-yellow-200 transition-colors duration-200"
+                                    >
+                                        {tippSchritte[i] === 0 ? 'Tipp anzeigen' : 'Nächsten Tipp anzeigen'}
+                                    </button>
+                                    <button
+                                        onClick={() => zeigeVollstaendigeLoesung(i)}
+                                        className="bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+                                    >
+                                        Vollständige Lösung anzeigen
+                                    </button>
+                                </div>
                             )}
 
                             {tippSchritte[i] > 0 && <Loesungsweg t={t} anzahl={tippSchritte[i]} />}
