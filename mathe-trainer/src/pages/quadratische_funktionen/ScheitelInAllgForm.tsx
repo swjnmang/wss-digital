@@ -17,6 +17,8 @@ const ANZAHL_AUFGABEN = 5;
 const ANZAHL_SCHRITTE = 5;
 const LOB = ['Super, alles richtig!', 'Sehr gut gemacht!', 'Top, perfekt gerechnet!', 'Stark, das stimmt alles!', 'Klasse Arbeit!'];
 const LERNVIDEO_URL = 'https://www.youtube.com/watch?v=xLohr5cup-M';
+const LERNVIDEO_EMBED_URL = 'https://www.youtube-nocookie.com/embed/xLohr5cup-M';
+const BEISPIEL: Aufgabe = { a: 2, xs: 3, ys: 1, b: -12, c: 19, equation: 'f(x) = 2(x - 3)² + 1' };
 
 const generiereZufallszahl = (min: number, max: number) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
@@ -72,7 +74,7 @@ const farbKlasse = (status: Status) =>
           ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
           : 'border-red-500 bg-red-50 text-red-800 focus:ring-red-500 focus:border-red-500';
 
-const Loesungsweg = ({ t, anzahl }: { t: Aufgabe; anzahl: number }) => {
+const Loesungsweg = ({ t, anzahl, titel }: { t: Aufgabe; anzahl: number; titel?: string }) => {
     const { a, xs, ys, b, c } = t;
     const k = klammerTerm(xs);
     const ysT = ys === 0 ? '' : ` ${sgn(ys)}`;
@@ -101,8 +103,8 @@ const Loesungsweg = ({ t, anzahl }: { t: Aufgabe; anzahl: number }) => {
 
     return (
         <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-bold text-gray-800 mb-3">{anzahl >= zeilen.length ? 'Lösungsweg' : 'Tipp: Lösungsweg'}</h3>
-            <table className="w-full border-collapse text-gray-700">
+            <h3 className="text-lg font-bold text-gray-800 mb-3">{titel ?? (anzahl >= zeilen.length ? 'Lösungsweg' : 'Tipp: Lösungsweg')}</h3>
+            <div className="overflow-x-auto"><table className="w-full border-collapse text-gray-700">
                 <tbody>
                     {zeilen.slice(0, anzahl).map((z, i) => (
                         <tr key={i} className="border border-gray-300">
@@ -113,7 +115,7 @@ const Loesungsweg = ({ t, anzahl }: { t: Aufgabe; anzahl: number }) => {
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </table></div>
             {anzahl >= zeilen.length && (
                 <p className="mt-3 font-bold text-center bg-blue-100 rounded-md p-2">
                     Ergebnis: a = {a}, b = {b}, c = {c}
@@ -152,17 +154,52 @@ const ScheitelInAllgForm = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="bg-white p-8 rounded-xl shadow-lg max-w-3xl w-full mx-auto">
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">Von der Scheitelform zur allgemeinen Form</h1>
+            <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-7xl w-full mx-auto text-left">
+                <h1 className="text-3xl font-bold text-gray-800 mb-6">Von der Scheitelform zur allgemeinen Form</h1>
+
+                <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-800 mb-3">So funktioniert's</h2>
+                        <p className="text-gray-700 mb-3">
+                            Die Scheitelform <span className="font-mono">f(x) = a(x − xₛ)² + yₛ</span> willst du in die
+                            allgemeine Form <span className="font-mono">f(x) = ax² + bx + c</span> umwandeln. Dafür löst
+                            du die Klammer mit der Potenz auf, fasst zusammen und multiplizierst am Ende den Faktor a aus.
+                        </p>
+                        <p className="text-gray-700 mb-3">
+                            <strong>Beispiel:</strong> <span className="font-mono">f(x) = 2(x − 3)² + 1</span>
+                        </p>
+                        <Loesungsweg t={BEISPIEL} anzahl={ANZAHL_SCHRITTE} titel="Beispiel: Lösungsweg" />
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-800 mb-3">Lernvideo</h2>
+                        <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
+                            <iframe
+                                className="absolute inset-0 w-full h-full rounded-lg"
+                                src={LERNVIDEO_EMBED_URL}
+                                title="Lernvideo: Von der Scheitelform zur allgemeinen Form"
+                                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                            />
+                        </div>
+                        <a
+                            href={LERNVIDEO_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block mt-2 text-sm text-blue-700 underline hover:text-blue-900"
+                        >
+                            Video auf YouTube öffnen
+                        </a>
+                    </div>
+                </section>
+
+                <h2 className="text-xl font-semibold text-gray-800 mb-2">Deine Aufgaben</h2>
                 <p className="text-gray-600 mb-6">
-                    Forme jede der folgenden quadratischen Funktionen von der Scheitelform{' '}
-                    <span className="font-mono">f(x) = a(x − xₛ)² + yₛ</span> in die allgemeine Form{' '}
-                    <span className="font-mono">f(x) = ax² + bx + c</span> um. Rechne zuerst im Heft und trage dann
-                    die Werte für a, b und c ein. Richtige Werte werden sofort grün, falsche rot. Wenn du nicht weiterkommst, zeigt
-                    dir „Tipp anzeigen“ den Lösungsweg Schritt für Schritt.
+                    Forme jede Funktion in die allgemeine Form um. Rechne zuerst im Heft und trage dann die Werte für a, b
+                    und c ein. Richtige Werte werden sofort grün, falsche rot. Wenn du nicht weiterkommst, zeigt dir
+                    „Tipp anzeigen“ den Lösungsweg Schritt für Schritt.
                 </p>
 
-                <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                     {aufgaben.map((t, i) => (
                         <div key={i} className="border border-gray-200 rounded-lg p-4">
                             <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-md mb-4">
@@ -176,7 +213,7 @@ const ScheitelInAllgForm = () => {
                                                     return (
                                         <div key={feld}>
                                             <div className="flex items-center space-x-2">
-                                                <label htmlFor={`${feld}-${i}`} className="text-lg font-medium text-gray-600">
+                                                <label htmlFor={`${feld}-${i}`} className="text-lg font-medium text-gray-600 whitespace-nowrap">
                                                     {feld} =
                                                 </label>
                                                 <input
@@ -225,14 +262,6 @@ const ScheitelInAllgForm = () => {
                                         </button>
                                     </>
                                 )}
-                                <a
-                                    href={LERNVIDEO_URL}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="bg-red-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-red-700 transition-colors duration-200"
-                                >
-                                    ▶ Lernvideo ansehen
-                                </a>
                             </div>
 
                             {tippSchritte[i] > 0 && <Loesungsweg t={t} anzahl={tippSchritte[i]} />}
