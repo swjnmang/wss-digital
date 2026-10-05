@@ -35,6 +35,11 @@ function getRandomSlope() {
   return allowedSlopes[Math.floor(Math.random() * allowedSlopes.length)]
 }
 
+// Einfach: nur Ursprungsgeraden y = m·x, Fortgeschritten: Geraden y = m·x + t
+type Level = 'einfach' | 'fortgeschritten'
+
+const LEVEL_LABEL: Record<Level, string> = { einfach: 'Einfach', fortgeschritten: 'Fortgeschritten' }
+
 const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
 const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
 const inputCls = 'w-40 text-center border border-slate-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500'
@@ -157,9 +162,29 @@ interface CardProps {
   /** Meldet jedes Prüfergebnis für die Serie "Richtig in Folge". */
   onResult: (correct: boolean) => void
   onHelp: () => void
+  level: Level
 }
 
-function newTextPoints() {
+// Steigungen für Ursprungsgeraden (Stufe Einfach)
+const originSlopes = [-4, -3, -2.5, -2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2, 2.5, 3, 4] as const
+
+function newOriginPoints() {
+  // Beide Punkte liegen auf y = m·x, mit ganzzahligen Koordinaten; manchmal ist einer davon O(0|0)
+  const m = originSlopes[Math.floor(Math.random() * originSlopes.length)]
+  const xs = Array.from({ length: 21 }, (_, i) => i - 10).filter((x) => Number.isInteger(m * x) && Math.abs(m * x) <= 12)
+  const withOrigin = Math.random() < 0.3
+  let x1: number, x2: number
+  do {
+    x1 = withOrigin ? 0 : xs[Math.floor(Math.random() * xs.length)]
+    x2 = xs[Math.floor(Math.random() * xs.length)]
+  } while (x1 === x2 || (!withOrigin && (x1 === 0 || x2 === 0)))
+  const p1 = { x: x1, y: m * x1 }
+  const p2 = { x: x2, y: m * x2 }
+  return Math.random() < 0.5 ? { p1, p2 } : { p1: p2, p2: p1 }
+}
+
+function newTextPoints(level: Level) {
+  if (level === 'einfach') return newOriginPoints()
   // x-Werte verschieden (keine senkrechte Gerade) und y-Werte verschieden (Steigung nie 0)
   let x1, x2, y1, y2
   do {
@@ -175,9 +200,9 @@ function newTextPoints() {
 
 // ---------- Textaufgabe: Steigung aus zwei Punkten ----------
 
-function TextTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) {
-  const tracking = useTaskTracking('Steigung aus zwei Punkten')
-  const [{ p1, p2 }, setPoints] = useState(newTextPoints)
+function TextTaskCard({ number, onSolvedChange, onResult, onHelp, level }: CardProps) {
+  const tracking = useTaskTracking(`Steigung aus zwei Punkten (${LEVEL_LABEL[level]})`)
+  const [{ p1, p2 }, setPoints] = useState(() => newTextPoints(level))
   const [showSolution, setShowSolution] = useState(false)
   const correctSlope = (p2.y - p1.y) / (p2.x - p1.x)
 
@@ -199,7 +224,7 @@ function TextTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) {
     onSolvedChange(false)
     live.reset()
     setShowSolution(false)
-    setPoints(newTextPoints())
+    setPoints(newTextPoints(level))
   }
 
   function onShowAnswer() {
@@ -212,7 +237,9 @@ function TextTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) {
     <div className={panel}>
       <h2 className="text-lg font-bold text-slate-800 mb-2">Aufgabe {number}: Steigung aus zwei Punkten</h2>
       <p className="text-slate-700 mb-1">
-        Berechne die Steigung m der Geraden durch die beiden Punkte. Runde auf zwei Nachkommastellen.
+        {level === 'einfach'
+          ? 'Die Ursprungsgerade y = m · x geht durch die beiden Punkte. Berechne ihre Steigung m.'
+          : 'Berechne die Steigung m der Geraden durch die beiden Punkte. Runde auf zwei Nachkommastellen.'}
       </p>
       <p className="text-center text-lg font-semibold text-slate-800 my-4">
         P<sub>1</sub>({p1.x}|{p1.y}) und P<sub>2</sub>({p2.x}|{p2.y})
@@ -235,13 +262,17 @@ function TextTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) {
 
 const GRAPH_HINT = 'Gib die Koordinaten von zwei Punkten ein, die auf der Geraden liegen.'
 
-function newGraphLine() {
-  return { m: getRandomSlope(), t: randomInt(4, -4) }
+function newGraphLine(level: Level) {
+  if (level === 'einfach') return { m: getRandomSlope(), t: 0 }
+  // Fortgeschritten: Gerade schneidet die y-Achse nicht im Ursprung
+  let t = 0
+  while (t === 0) t = randomInt(4, -4)
+  return { m: getRandomSlope(), t }
 }
 
-function GraphTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) {
-  const tracking = useTaskTracking('Steigung aus Graph')
-  const [{ m: graphM, t: graphT }, setLine] = useState(newGraphLine)
+function GraphTaskCard({ number, onSolvedChange, onResult, onHelp, level }: CardProps) {
+  const tracking = useTaskTracking(`Steigung aus Graph (${LEVEL_LABEL[level]})`)
+  const [{ m: graphM, t: graphT }, setLine] = useState(() => newGraphLine(level))
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
   const [selectedPoints, setSelectedPoints] = useState<Array<{ x: number; y: number }>>([])
@@ -297,7 +328,7 @@ function GraphTaskCard({ number, onSolvedChange, onResult, onHelp }: CardProps) 
     setInstruction(GRAPH_HINT)
     setPoint1Input({ x: '', y: '' })
     setPoint2Input({ x: '', y: '' })
-    setLine(newGraphLine())
+    setLine(newGraphLine(level))
   }
 
   function addPoint(index: 1 | 2) {
@@ -427,6 +458,8 @@ export default function SteigungBerechnen() {
     if (allSolved) completionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [allSolved])
 
+  const [level, setLevel] = useState<Level | null>(null)
+
   const startNewRound = () => {
     setRound((r) => r + 1)
     setSolved({})
@@ -434,27 +467,80 @@ export default function SteigungBerechnen() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const cards = Array.from({ length: TOTAL_TASKS }, (_, i) => {
-    const props: CardProps = {
-      number: i + 1,
-      onSolvedChange: (value) => setSolved((s) => ({ ...s, [i]: value })),
-      onResult: (correct) => setStreak((s) => (correct ? s + 1 : 0)),
-      onHelp: () => setStreak(0),
-    }
-    // Die Karten bleiben nach einem Neustart per key getrennt (frischer Zustand, eigenes Tracking)
+  const chooseLevel = (next: Level | null) => {
+    setLevel(next)
+    startNewRound()
+    setStreak(0)
+  }
+
+  const cards = level
+    ? Array.from({ length: TOTAL_TASKS }, (_, i) => {
+        const props: CardProps = {
+          number: i + 1,
+          onSolvedChange: (value) => setSolved((s) => ({ ...s, [i]: value })),
+          onResult: (correct) => setStreak((s) => (correct ? s + 1 : 0)),
+          onHelp: () => setStreak(0),
+          level,
+        }
+        // Die Karten bleiben nach einem Neustart per key getrennt (frischer Zustand, eigenes Tracking)
+        return (
+          <React.Fragment key={`${level}-${round}-${i}`}>
+            {i % 2 === 0 ? <TextTaskCard {...props} /> : <GraphTaskCard {...props} />}
+          </React.Fragment>
+        )
+      })
+    : null
+
+  const header = (
+    <div>
+      <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Steigung berechnen</h1>
+      <p className="text-center text-slate-600">Berechne die Steigung m einer Geraden aus zwei Punkten.</p>
+    </div>
+  )
+
+  if (!level) {
     return (
-      <React.Fragment key={`${round}-${i}`}>
-        {i % 2 === 0 ? <TextTaskCard {...props} /> : <GraphTaskCard {...props} />}
-      </React.Fragment>
+      <div className="min-h-screen flex flex-col bg-slate-50">
+        <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+          {header}
+          <div className={panel}>
+            <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                onClick={() => chooseLevel('einfach')}
+                className="rounded-xl border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 p-5 transition-colors"
+              >
+                <p className="text-lg font-bold text-slate-800 mb-1">Einfach</p>
+                <p className="text-xl font-serif italic text-blue-700 mb-2">y = m · x</p>
+                <p className="text-sm text-slate-600">Nur Ursprungsgeraden: Alle Geraden gehen durch den Punkt O(0|0).</p>
+              </button>
+              <button
+                onClick={() => chooseLevel('fortgeschritten')}
+                className="rounded-xl border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 p-5 transition-colors"
+              >
+                <p className="text-lg font-bold text-slate-800 mb-1">Fortgeschritten</p>
+                <p className="text-xl font-serif italic text-blue-700 mb-2">y = m · x + t</p>
+                <p className="text-sm text-slate-600">Beliebige Geraden, die die y-Achse an einer anderen Stelle schneiden.</p>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     )
-  })
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
       <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Steigung berechnen</h1>
-          <p className="text-center text-slate-600">Berechne die Steigung m einer Geraden aus zwei Punkten.</p>
+        {header}
+
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
+            Schwierigkeitsgrad: {LEVEL_LABEL[level]} ({level === 'einfach' ? 'y = m · x' : 'y = m · x + t'})
+          </span>
+          <button onClick={() => chooseLevel(null)} className="text-blue-600 hover:underline text-sm font-semibold">
+            Schwierigkeitsgrad wechseln
+          </button>
         </div>
 
         {cards}
