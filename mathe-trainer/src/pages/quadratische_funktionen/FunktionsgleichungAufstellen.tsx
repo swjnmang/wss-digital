@@ -5,8 +5,9 @@ import 'katex/dist/katex.min.css';
 
 // Typ 1: Scheitelpunkt S(h|k) und ein weiterer Punkt P gegeben
 type ScheitelAufgabe = { typ: 'scheitel'; a: number; b: number; c: number; h: number; k: number; px: number; py: number };
-// Typ 2: Formfaktor a und zwei Punkte P, Q gegeben
-type PunkteAufgabe = { typ: 'punkte'; a: number; b: number; c: number; x1: number; y1: number; x2: number; y2: number };
+// Typ 2: einer der Werte a, b oder c und zwei Punkte P, Q gegeben
+type Bekannt = 'a' | 'b' | 'c';
+type PunkteAufgabe = { typ: 'punkte'; bekannt: Bekannt; a: number; b: number; c: number; x1: number; y1: number; x2: number; y2: number };
 type Aufgabe = ScheitelAufgabe | PunkteAufgabe;
 
 type Eingabe = { a: string; b: string; c: string };
@@ -16,13 +17,14 @@ type Schritt = { text: string; formeln: string[] };
 
 const ANZAHL_AUFGABEN = 5;
 // Reihenfolge der Aufgabentypen auf einer Seite
-const TYPEN: Aufgabe['typ'][] = ['scheitel', 'punkte', 'scheitel', 'punkte', 'scheitel'];
+// (bei 'punkte' kommt jede Variante – a, b oder c bekannt – einmal vor)
+const TYPEN: Aufgabe['typ'][] = ['scheitel', 'punkte', 'scheitel', 'punkte', 'punkte'];
 const LOB = ['Super, alles richtig!', 'Sehr gut gemacht!', 'Top, perfekt gerechnet!', 'Stark, das stimmt alles!', 'Klasse Arbeit!'];
 const LERNVIDEO_ID = 'hg9QipwqXxI';
 const GLEICHUNGSSYSTEME_PFAD = '/lineare_funktionen/gleichungssysteme';
 
 const BEISPIEL_SCHEITEL: ScheitelAufgabe = { typ: 'scheitel', a: 1, b: -4, c: 3, h: 2, k: -1, px: 4, py: 3 };
-const BEISPIEL_PUNKTE: PunkteAufgabe = { typ: 'punkte', a: -1, b: 2, c: 4, x1: 1, y1: 5, x2: 3, y2: 1 };
+const BEISPIEL_PUNKTE: PunkteAufgabe = { typ: 'punkte', bekannt: 'a', a: -1, b: 2, c: 4, x1: 1, y1: 5, x2: 3, y2: 1 };
 
 const zufall = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const auswahl = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
@@ -55,26 +57,41 @@ const erzeugeScheitelAufgabe = (): ScheitelAufgabe => {
     return { typ: 'scheitel', a, b: -2 * a * h, c: a * h * h + k, h, k, px, py };
 };
 
-const erzeugePunkteAufgabe = (): PunkteAufgabe => {
+const erzeugePunkteAufgabe = (bekannt: Bekannt): PunkteAufgabe => {
     const a = auswahl([1, -1, 2, -2]);
-    const b = zufall(-6, 6);
-    const c = zufall(-6, 6);
-    const x1 = auswahl([-3, -2, -1, 1, 2, 3]);
-    let x2 = x1;
-    while (x2 === x1) x2 = auswahl([-3, -2, -1, 1, 2, 3]);
+    // Der bekannte Wert ist nie 0, sonst wäre die Angabe nichtssagend
+    const b = bekannt === 'b' ? auswahl([-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]) : zufall(-6, 6);
+    const c = bekannt === 'c' ? auswahl([-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]) : zufall(-6, 6);
+    const xWerte = [-3, -2, -1, 1, 2, 3];
+    const x1 = auswahl(xWerte);
+    // Bei bekanntem b muss x2 ≠ -x1 sein, sonst fällt beim Abziehen auch a weg
+    const x2 = auswahl(xWerte.filter(x => x !== x1 && (bekannt !== 'b' || x !== -x1)));
     const f = (x: number) => a * x * x + b * x + c;
-    return { typ: 'punkte', a, b, c, x1, y1: f(x1), x2, y2: f(x2) };
+    return { typ: 'punkte', bekannt, a, b, c, x1, y1: f(x1), x2, y2: f(x2) };
 };
 
 const schluessel = (t: Aufgabe) =>
-    t.typ === 'scheitel' ? `s${t.h},${t.k},${t.px},${t.a}` : `p${t.a},${t.x1},${t.y1},${t.x2},${t.y2}`;
+    t.typ === 'scheitel' ? `s${t.h},${t.k},${t.px},${t.a}` : `p${t.bekannt},${t.a},${t.x1},${t.y1},${t.x2},${t.y2}`;
+
+const mischen = <T,>(arr: T[]) => {
+    const kopie = [...arr];
+    for (let i = kopie.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [kopie[i], kopie[j]] = [kopie[j], kopie[i]];
+    }
+    return kopie;
+};
 
 const erzeugeAufgaben = (): Aufgabe[] => {
     const gesehen = new Set<string>();
+    const bekanntReihenfolge = mischen<Bekannt>(['a', 'b', 'c']);
+    let punkteNr = 0;
     return TYPEN.map(typ => {
+        const bekannt = bekanntReihenfolge[punkteNr % 3];
+        if (typ === 'punkte') punkteNr++;
         let t: Aufgabe;
         do {
-            t = typ === 'scheitel' ? erzeugeScheitelAufgabe() : erzeugePunkteAufgabe();
+            t = typ === 'scheitel' ? erzeugeScheitelAufgabe() : erzeugePunkteAufgabe(bekannt);
         } while (gesehen.has(schluessel(t)));
         gesehen.add(schluessel(t));
         return t;
@@ -138,7 +155,7 @@ const schritteScheitel = (t: ScheitelAufgabe): Schritt[] => {
     ];
 };
 
-const schrittePunkte = (t: PunkteAufgabe): Schritt[] => {
+const schritteABekannt = (t: PunkteAufgabe): Schritt[] => {
     const { a, b, c, x1, y1, x2, y2 } = t;
     const r1 = y1 - a * x1 * x1;
     const r2 = y2 - a * x2 * x2;
@@ -177,7 +194,110 @@ const schrittePunkte = (t: PunkteAufgabe): Schritt[] => {
     ];
 };
 
-const schritte = (t: Aufgabe) => (t.typ === 'scheitel' ? schritteScheitel(t) : schrittePunkte(t));
+const schritteBBekannt = (t: PunkteAufgabe): Schritt[] => {
+    const { a, b, c, x1, y1, x2, y2 } = t;
+    const r1 = y1 - b * x1;
+    const r2 = y2 - b * x2;
+    const gleichung = (nr: string, x: number, y: number, r: number) => [
+        `\\text{${nr}:}\\quad {${num(y)}} = a \\cdot ${kl(x)}^2 + ${kl(b)} \\cdot ${kl(x)} + c`,
+        `\\text{${nr}:}\\quad {${num(y)}} = ${vorfaktor(x * x)}a${summand(b * x)} + c${minusRechnen(b * x)}`,
+        `\\text{${nr}:}\\quad {${num(r)}} = ${vorfaktor(x * x)}a + c`,
+    ];
+    const diff = x1 * x1 - x2 * x2;
+    return [
+        {
+            text: `Den bekannten Wert b = ${b} in die allgemeine Form einsetzen:`,
+            formeln: [`y = ax^2${summand(b, 'x')} + c`],
+        },
+        { text: `Punkt P(${x1}|${y1}) einsetzen → Gleichung I:`, formeln: gleichung('I', x1, y1, r1) },
+        { text: `Punkt Q(${x2}|${y2}) einsetzen → Gleichung II:`, formeln: gleichung('II', x2, y2, r2) },
+        {
+            text: 'Gleichung II von Gleichung I abziehen (I − II). Dadurch fällt c weg und du kannst a berechnen:',
+            formeln: [
+                `${num(r1)} - ${kl(r2)} = ${vorfaktor(x1 * x1)}a - ${vorfaktor(x2 * x2)}a`,
+                `${num(r1 - r2)} = ${vorfaktor(diff)}a${diff === 1 ? '' : ` \\quad |\\, : ${kl(diff)}`}`,
+                `a = ${num(a)}`,
+            ],
+        },
+        {
+            text: 'a in Gleichung I einsetzen und c berechnen:',
+            formeln: [
+                `${num(r1)} = ${num(x1 * x1)} \\cdot ${kl(a)} + c`,
+                `${num(r1)} = ${num(x1 * x1 * a)} + c${minusRechnen(x1 * x1 * a)}`,
+                `c = ${num(c)}`,
+            ],
+        },
+        { text: 'a, b und c in die allgemeine Form einsetzen:', formeln: [allgForm(a, b, c)] },
+    ];
+};
+
+const ggT = (m: number, n: number): number => (n === 0 ? Math.abs(m) : ggT(n, m % n));
+
+const schritteCBekannt = (t: PunkteAufgabe): Schritt[] => {
+    const { a, b, c, x1, y1, x2, y2 } = t;
+    const r1 = y1 - c;
+    const r2 = y2 - c;
+    // Faktoren, damit vor b in beiden Gleichungen dieselbe Zahl (kgV von |x1| und |x2|) steht
+    const kgV = Math.abs(x1 * x2) / ggT(x1, x2);
+    const f1 = kgV / x1;
+    const f2 = kgV / x2;
+    const gleichung = (nr: string, x: number, y: number, r: number) => [
+        `\\text{${nr}:}\\quad {${num(y)}} = a \\cdot ${kl(x)}^2 + b \\cdot ${kl(x)}${summand(c)}`,
+        `\\text{${nr}:}\\quad {${num(y)}} = ${vorfaktor(x * x)}a${summand(x, 'b')}${summand(c)}${minusRechnen(c)}`,
+        `\\text{${nr}:}\\quad {${num(r)}} = ${vorfaktor(x * x)}a${summand(x, 'b')}`,
+    ];
+    const multipliziert = (nr: string, f: number, x: number, r: number) =>
+        f === 1 ? [] : [`\\text{${nr}} \\cdot ${kl(f)}:\\quad {${num(r * f)}} = ${vorfaktor(x * x * f)}a${summand(kgV, 'b')}`];
+    const faktorText = [f1 !== 1 ? `Gleichung I mit ${f1}` : '', f2 !== 1 ? `Gleichung II mit ${f2}` : ''].filter(Boolean).join(' und ');
+    const koeffA = x1 * x1 * f1 - x2 * x2 * f2;
+    const rest = r1 - x1 * x1 * a;
+    return [
+        {
+            text: `Den bekannten Wert c = ${c} in die allgemeine Form einsetzen:`,
+            formeln: [`y = ax^2 + bx${summand(c)}`],
+        },
+        { text: `Punkt P(${x1}|${y1}) einsetzen → Gleichung I:`, formeln: gleichung('I', x1, y1, r1) },
+        { text: `Punkt Q(${x2}|${y2}) einsetzen → Gleichung II:`, formeln: gleichung('II', x2, y2, r2) },
+        {
+            text:
+                (faktorText
+                    ? `Damit b wegfällt, muss vor b in beiden Gleichungen dieselbe Zahl stehen. Multipliziere dazu ${faktorText}. `
+                    : 'Vor b steht in beiden Gleichungen schon dieselbe Zahl. ') +
+                'Ziehe dann Gleichung II von Gleichung I ab (I − II) und berechne a:',
+            formeln: [
+                ...multipliziert('I', f1, x1, r1),
+                ...multipliziert('II', f2, x2, r2),
+                `\\text{I} - \\text{II}:\\quad {${num(r1 * f1 - r2 * f2)}} = ${vorfaktor(koeffA)}a${koeffA === 1 ? '' : ` \\quad |\\, : ${kl(koeffA)}`}`,
+                `a = ${num(a)}`,
+            ],
+        },
+        {
+            text: 'a in Gleichung I einsetzen und b berechnen:',
+            formeln: [
+                `${num(r1)} = ${num(x1 * x1)} \\cdot ${kl(a)}${summand(x1, 'b')}`,
+                `${num(r1)} = ${num(x1 * x1 * a)}${summand(x1, 'b')}${minusRechnen(x1 * x1 * a)}`,
+                `${num(rest)} = ${vorfaktor(x1)}b${x1 === 1 ? '' : ` \\quad |\\, : ${kl(x1)}`}`,
+                `b = ${num(b)}`,
+            ],
+        },
+        { text: 'a, b und c in die allgemeine Form einsetzen:', formeln: [allgForm(a, b, c)] },
+    ];
+};
+
+// Gleiche aufeinanderfolgende Zeilen (z. B. wenn ein Summand 0 ist) nur einmal zeigen
+const ohneDoppelte = (liste: Schritt[]) =>
+    liste.map(s => ({ ...s, formeln: s.formeln.filter((f, i, arr) => i === 0 || f !== arr[i - 1]) }));
+
+const schritte = (t: Aufgabe) =>
+    ohneDoppelte(
+        t.typ === 'scheitel'
+            ? schritteScheitel(t)
+            : t.bekannt === 'a'
+              ? schritteABekannt(t)
+              : t.bekannt === 'b'
+                ? schritteBBekannt(t)
+                : schritteCBekannt(t)
+    );
 
 const gegebenePunkte = (t: Aufgabe) =>
     t.typ === 'scheitel'
@@ -293,8 +413,14 @@ const AufgabenText = ({ t }: { t: Aufgabe }) =>
         </span>
     ) : (
         <span>
-            Die Parabel hat den Formfaktor <strong>a = {t.a}</strong> und verläuft durch die Punkte <strong>P({t.x1}|{t.y1})</strong> und{' '}
-            <strong>Q({t.x2}|{t.y2})</strong>.
+            {t.bekannt === 'a' ? (
+                <>Die Parabel hat den Formfaktor <strong>a = {t.a}</strong></>
+            ) : (
+                <>
+                    Für die Parabel <InlineMath math="y = ax^2 + bx + c" /> gilt <strong>{t.bekannt} = {t[t.bekannt]}</strong>. Sie
+                </>
+            )}{' '}
+            {t.bekannt === 'a' ? 'und verläuft' : 'verläuft'} durch die Punkte <strong>P({t.x1}|{t.y1})</strong> und <strong>Q({t.x2}|{t.y2})</strong>.
         </span>
     );
 
@@ -350,13 +476,21 @@ const FunktionsgleichungAufstellen = () => {
                     </div>
 
                     <div className="border border-gray-200 rounded-xl p-5">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-2">Fall 2: Formfaktor a und zwei Punkte</h2>
+                        <h2 className="text-xl font-semibold text-gray-800 mb-2">Fall 2: Ein Wert (a, b oder c) und zwei Punkte</h2>
                         <p className="text-gray-700 mb-3">
-                            Ist <InlineMath math="a" /> bekannt (z. B. „verschobene Normalparabel“ bedeutet <InlineMath math="a = 1" />), setzt du{' '}
-                            <InlineMath math="a" /> in <InlineMath math="y = ax^2 + bx + c" /> ein. Dann setzt du nacheinander beide Punkte ein und erhältst
-                            zwei Gleichungen (I und II). Ziehst du II von I ab (Additionsverfahren), fällt <InlineMath math="c" /> weg und du kannst <InlineMath math="b" /> berechnen.
-                            Mit <InlineMath math="b" /> bekommst du aus Gleichung I dann <InlineMath math="c" />.
+                            Ist einer der drei Werte bekannt (z. B. „verschobene Normalparabel“ bedeutet <InlineMath math="a = 1" />), setzt du ihn in{' '}
+                            <InlineMath math="y = ax^2 + bx + c" /> ein. Dann setzt du nacheinander beide Punkte ein und erhältst zwei Gleichungen (I und II)
+                            mit den zwei noch fehlenden Werten. Dieses Gleichungssystem löst du mit dem <strong>Additionsverfahren</strong>: Ziehst du II von I
+                            ab, fällt eine Unbekannte weg und du kannst die andere berechnen. Diese setzt du in Gleichung I ein und erhältst den letzten Wert.
                         </p>
+                        <ul className="list-disc pl-5 text-gray-700 mb-3 space-y-1">
+                            <li><strong><InlineMath math="a" /> bekannt:</strong> Beim Abziehen fällt <InlineMath math="c" /> weg → zuerst <InlineMath math="b" />, dann <InlineMath math="c" />.</li>
+                            <li><strong><InlineMath math="b" /> bekannt:</strong> Beim Abziehen fällt <InlineMath math="c" /> weg → zuerst <InlineMath math="a" />, dann <InlineMath math="c" />.</li>
+                            <li>
+                                <strong><InlineMath math="c" /> bekannt:</strong> Vorher eine oder beide Gleichungen so multiplizieren, dass vor <InlineMath math="b" />{' '}
+                                dieselbe Zahl steht. Dann fällt beim Abziehen <InlineMath math="b" /> weg → zuerst <InlineMath math="a" />, dann <InlineMath math="b" />.
+                            </li>
+                        </ul>
                         <p className="text-gray-700 mb-3">
                             <strong>Beispiel:</strong> <strong>a = −1</strong>, Punkte <strong>P(1|5)</strong> und <strong>Q(3|1)</strong>
                         </p>
@@ -399,8 +533,8 @@ const FunktionsgleichungAufstellen = () => {
                 <div className="bg-amber-50 border-l-4 border-amber-500 rounded-md p-4 mb-8 text-gray-800">
                     <p className="font-semibold mb-1">⚠️ Voraussetzung: Additionsverfahren</p>
                     <p>
-                        Für Fall 2 musst du ein lineares Gleichungssystem mit dem <strong>Additionsverfahren</strong> lösen können (zwei Gleichungen
-                        voneinander abziehen, sodass eine Variable wegfällt). Wenn du das noch nicht sicher beherrschst, übe es zuerst noch einmal:{' '}
+                        Für Fall 2 musst du ein lineares Gleichungssystem mit dem <strong>Additionsverfahren</strong> lösen können (Gleichungen
+                        gegebenenfalls multiplizieren und dann voneinander abziehen, sodass eine Unbekannte wegfällt). Wenn du das noch nicht sicher beherrschst, übe es zuerst noch einmal:{' '}
                         <Link to={GLEICHUNGSSYSTEME_PFAD} className="font-semibold text-blue-700 underline hover:text-blue-900">
                             Lineare Gleichungssysteme üben
                         </Link>
