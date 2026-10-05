@@ -8,7 +8,7 @@ import { useTaskTracking } from '../../hooks/useTaskTracking';
 // Sechs Aufgaben auf einer Seite
 const TOTAL_TASKS = 6;
 
-const VIDEO_URL = 'https://youtu.be/yIaIp8YaZp4';
+const VIDEO_EMBED_URL = 'https://www.youtube-nocookie.com/embed/yIaIp8YaZp4';
 
 // Formel mit KaTeX (ohne Nachladen aus dem Netz)
 const MathDisplay = ({ latex }: { latex: string }) => (
@@ -259,6 +259,66 @@ function CoordinateGraph({
   );
 }
 
+// ---------- Erklärung mit Beispiel und Video ----------
+
+const EXAMPLE: Task = { id: 0, m: 2, t: -4, swapped: false };
+
+function Intro({ onHide }: { onHide?: () => void }) {
+  return (
+    <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <h2 className="text-lg font-bold text-slate-800">So berechnest du eine Nullstelle</h2>
+        {onHide && (
+          <button
+            onClick={onHide}
+            className="text-blue-600 hover:underline text-sm font-semibold shrink-0"
+          >
+            Ausblenden
+          </button>
+        )}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        <div className="text-slate-700">
+          <p className="mb-3">
+            Die <strong>Nullstelle</strong> ist die Stelle, an der die Gerade die{' '}
+            <strong>x-Achse schneidet</strong>. Jeder Punkt auf der x-Achse hat den y-Wert 0 –
+            deshalb setzt man <strong>y = 0</strong> und löst die Gleichung nach x auf.
+          </p>
+          <p className="font-semibold text-slate-800 mb-1">Beispiel: y = 2x − 4</p>
+          <div className="border border-slate-200 rounded-lg px-3 py-2 bg-slate-50">
+            <p className="text-sm text-slate-600">1. y = 0 setzen:</p>
+            <MathDisplay latex={`0 = 2x - 4 \\quad | + 4`} />
+            <p className="text-sm text-slate-600">2. Nach x auflösen:</p>
+            <MathDisplay latex={`4 = 2x \\quad | : 2`} />
+            <MathDisplay latex={`x = 2`} />
+            <p className="text-sm text-slate-600">3. Nullstelle angeben:</p>
+            <div className="font-bold">
+              <MathDisplay latex={`N(2\\,|\\,0)`} />
+            </div>
+          </div>
+        </div>
+        <div>
+          <CoordinateGraph task={EXAMPLE} guess={null} showZero />
+          <p className="text-sm text-slate-600 text-center mt-2">
+            Die Gerade y = 2x − 4 schneidet die x-Achse bei x = 2.
+          </p>
+        </div>
+      </div>
+      <h3 className="text-base font-bold text-slate-800 mt-6 mb-2 text-center">Erklärvideo</h3>
+      <div className="relative w-full max-w-xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200 bg-black">
+        <iframe
+          className="absolute inset-0 w-full h-full"
+          src={VIDEO_EMBED_URL}
+          title="Erklärvideo: Nullstellen berechnen"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    </div>
+  );
+}
+
 // ---------- Aufgabenkarte ----------
 
 type AnswerStatus = 'idle' | 'right' | 'wrong';
@@ -371,9 +431,6 @@ function TaskCard({ number, task, level, onNewTask, onSolvedChange, onResult, on
         <button onClick={onNewTask} className={btnSecondary}>
           Neue Aufgabe
         </button>
-        <button onClick={() => window.open(VIDEO_URL, '_blank')} className={btnSecondary}>
-          Erklärvideo
-        </button>
       </div>
 
       {showGraph && (
@@ -454,6 +511,8 @@ export default function Nullstellen() {
     setTasks((ts) => ts.map((t, j) => (j === i ? newTask(level, ts) : t)));
   };
 
+  const [showIntro, setShowIntro] = useState(true);
+
   const header = (
     <div>
       <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Nullstellen berechnen</h1>
@@ -463,11 +522,25 @@ export default function Nullstellen() {
     </div>
   );
 
+  const intro = showIntro ? (
+    <Intro onHide={() => setShowIntro(false)} />
+  ) : (
+    <div className="text-center">
+      <button
+        onClick={() => setShowIntro(true)}
+        className="text-blue-600 hover:underline text-sm font-semibold"
+      >
+        Erklärung und Erklärvideo einblenden
+      </button>
+    </div>
+  );
+
   if (!level) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50">
         <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
           {header}
+          {intro}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">
               Wähle deinen Schwierigkeitsgrad
@@ -504,6 +577,7 @@ export default function Nullstellen() {
     <div className="min-h-screen flex flex-col bg-slate-50">
       <div className="mx-auto px-4 py-8 max-w-5xl w-full flex flex-col gap-6">
         {header}
+        {intro}
 
         <div className="flex flex-wrap items-center justify-center gap-3">
           <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
