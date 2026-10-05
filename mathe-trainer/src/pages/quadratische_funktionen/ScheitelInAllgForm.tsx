@@ -15,6 +15,7 @@ type Status = 'leer' | 'richtig' | 'vorzeichen' | 'falsch';
 
 const ANZAHL_AUFGABEN = 5;
 const ANZAHL_SCHRITTE = 5;
+const LOB = ['Super, alles richtig!', 'Sehr gut gemacht!', 'Top, perfekt gerechnet!', 'Stark, das stimmt alles!', 'Klasse Arbeit!'];
 const LERNVIDEO_URL = 'https://www.youtube.com/watch?v=xLohr5cup-M';
 
 const generiereZufallszahl = (min: number, max: number) =>
@@ -189,6 +190,15 @@ const ScheitelInAllgForm = () => {
                                     );
                                 })}
                             </div>
+
+                            {(['a', 'b', 'c'] as const).every((f) => bewerte(eingaben[i]?.[f] ?? '', t[f]) === 'richtig') && (
+                                <div className="mt-3 p-3 bg-green-100 border border-green-400 rounded-md text-green-900 font-semibold">
+                                    🎉 {LOB[i % LOB.length]}{' '}
+                                    {i < aufgaben.length - 1
+                                        ? `Weiter geht's mit Aufgabe ${i + 2}!`
+                                        : 'Du hast alle Aufgaben geschafft – klicke unten auf „5 neue Aufgaben“, um weiterzuüben.'}
+                                </div>
+                            )}
 
                             <div className="flex flex-wrap gap-3 mt-3">
                                 {tippSchritte[i] < ANZAHL_SCHRITTE && (
