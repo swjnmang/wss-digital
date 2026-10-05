@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ParabelGraph from '../../components/ParabelGraph';
 
 type Typ = 'graph' | 'gleichung';
 
@@ -16,7 +17,6 @@ type Status = 'leer' | 'richtig' | 'vorzeichen' | 'falsch';
 const ANZAHL_AUFGABEN = 5;
 const TYPEN: Typ[] = ['graph', 'gleichung', 'graph', 'gleichung', 'graph'];
 const STRECKFAKTOREN = [1, -1, 2, -2, 0.5, -0.5];
-const BEREICH = 6; // Koordinatensystem von -6 bis 6
 const VIDEO_URL = 'https://www.youtube.com/watch?v=VgsmYGAI-_8&list=PLI8kX0XEfSugainT6dHh9wGTGikzJ76d2&index=6';
 
 const zufall = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -62,62 +62,6 @@ const farbKlasse = (status: Status) =>
         : status === 'leer'
           ? 'border-gray-300 focus:border-blue-500'
           : 'border-red-500 bg-red-50 text-red-800';
-
-const Graph = ({ a, xs, ys }: Aufgabe) => {
-    const groesse = 200;
-    const skala = groesse / (2 * BEREICH);
-    const px = (x: number) => (x + BEREICH) * skala;
-    const py = (y: number) => (BEREICH - y) * skala;
-    const raster = Array.from({ length: 2 * BEREICH + 1 }, (_, i) => i - BEREICH);
-
-    const punkte: string[] = [];
-    for (let x = -BEREICH; x <= BEREICH; x += 0.05) {
-        const y = a * (x - xs) ** 2 + ys;
-        if (Math.abs(y) <= BEREICH + 1) punkte.push(`${px(x).toFixed(1)},${py(y).toFixed(1)}`);
-    }
-
-    return (
-        <svg
-            viewBox={`0 0 ${groesse} ${groesse}`}
-            className="w-full max-w-[180px] bg-white rounded-md border border-gray-200"
-            role="img"
-            aria-label="Graph einer quadratischen Funktion"
-        >
-            <defs>
-                <clipPath id="zeichenflaeche">
-                    <rect x="0" y="0" width={groesse} height={groesse} />
-                </clipPath>
-            </defs>
-            {raster.map((k) => (
-                <g key={k}>
-                    <line x1={px(k)} y1={0} x2={px(k)} y2={groesse} stroke="#e5e7eb" strokeWidth="1" />
-                    <line x1={0} y1={py(k)} x2={groesse} y2={py(k)} stroke="#e5e7eb" strokeWidth="1" />
-                </g>
-            ))}
-            <line x1={0} y1={py(0)} x2={groesse} y2={py(0)} stroke="#6b7280" strokeWidth="1.2" />
-            <line x1={px(0)} y1={0} x2={px(0)} y2={groesse} stroke="#6b7280" strokeWidth="1.2" />
-            {raster
-                .filter((k) => k !== 0 && k % 2 === 0 && Math.abs(k) < BEREICH)
-                .map((k) => (
-                    <g key={`l${k}`} fontSize="7" fill="#6b7280">
-                        <text x={px(k)} y={py(0) + 8} textAnchor="middle">
-                            {k}
-                        </text>
-                        <text x={px(0) - 3} y={py(k) + 2.5} textAnchor="end">
-                            {k}
-                        </text>
-                    </g>
-                ))}
-            <polyline
-                points={punkte.join(' ')}
-                fill="none"
-                stroke="#2563eb"
-                strokeWidth="2"
-                clipPath="url(#zeichenflaeche)"
-            />
-        </svg>
-    );
-};
 
 const Loesung = ({ t }: { t: Aufgabe }) => (
     <div className="mt-3 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md p-3 space-y-1">
@@ -172,7 +116,7 @@ const ScheitelpunktAblesen = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-left">
+            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-left [&_p]:text-left">
                 <div className="flex items-start justify-between gap-4 mb-2">
                     <h1 className="text-2xl font-bold text-gray-800">Scheitelpunkt ablesen</h1>
                     <span
@@ -203,7 +147,7 @@ const ScheitelpunktAblesen = () => {
                                     <div className="sm:w-1/2">
                                         <p className="text-sm font-semibold text-gray-500 mb-2">Aufgabe {i + 1}</p>
                                         {t.typ === 'graph' ? (
-                                            <Graph {...t} />
+                                            <ParabelGraph a={t.a} xs={t.xs} ys={t.ys} />
                                         ) : (
                                             <p className="text-xl font-mono text-blue-900 bg-blue-50 border-l-4 border-blue-500 rounded-md px-3 py-2 inline-block">
                                                 {gleichung(t)}
