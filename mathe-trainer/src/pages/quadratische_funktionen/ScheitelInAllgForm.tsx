@@ -10,7 +10,8 @@ type Aufgabe = {
 };
 
 type Eingabe = { a: string; b: string; c: string };
-type Feedback = 'richtig' | 'falsch' | null;
+type Feld = keyof Eingabe;
+type Status = 'leer' | 'richtig' | 'vorzeichen' | 'falsch';
 
 const ANZAHL_AUFGABEN = 5;
 
@@ -44,6 +45,32 @@ const leereEingaben = (): Eingabe[] =>
     Array.from({ length: ANZAHL_AUFGABEN }, () => ({ a: '', b: '', c: '' }));
 
 const parseZahl = (s: string) => parseFloat(s.replace(/[−–—‐]/g, '-').replace(',', '.'));
+
+const bewerte = (eingabe: string, korrekt: number): Status => {
+    const wert = parseZahl(eingabe);
+    if (Number.isNaN(wert)) return 'leer';
+    if (wert === korrekt) return 'richtig';
+    if (korrekt !== 0 && wert === -korrekt) return 'vorzeichen';
+    return 'falsch';
+};
+
+const tippText = (feld: Feld): string => {
+    switch (feld) {
+        case 'a':
+            return 'a ist der Faktor, der direkt vor der Klammer steht. Er bleibt beim Ausmultiplizieren der Potenz der Faktor vor x².';
+        case 'b':
+            return 'Löse zuerst die Klammer auf: (x − xₛ)² = x² − 2·xₛ·x + xₛ². Multipliziere dann alles mit a. Es gilt b = a · (−2 · xₛ).';
+        case 'c':
+            return 'Es gilt c = a · xₛ² + yₛ. Quadriere xₛ, multipliziere mit a und addiere dann yₛ (Vorzeichen beachten!).';
+    }
+};
+
+const farbKlasse = (status: Status) =>
+    status === 'richtig'
+        ? 'border-green-500 bg-green-50 text-green-800 focus:ring-green-500 focus:border-green-500'
+        : status === 'leer'
+          ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+          : 'border-red-500 bg-red-50 text-red-800 focus:ring-red-500 focus:border-red-500';
 
 const Loesungsweg = ({ t }: { t: Aufgabe }) => {
     const { a, xs, ys, b, c } = t;
@@ -97,13 +124,13 @@ const Loesungsweg = ({ t }: { t: Aufgabe }) => {
 const ScheitelInAllgForm = () => {
     const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
     const [eingaben, setEingaben] = useState<Eingabe[]>(leereEingaben());
-    const [feedback, setFeedback] = useState<Feedback[]>(Array(ANZAHL_AUFGABEN).fill(null));
+    const [zeigeTipp, setZeigeTipp] = useState<Record<string, boolean>>({});
     const [zeigeLoesung, setZeigeLoesung] = useState<boolean[]>(Array(ANZAHL_AUFGABEN).fill(false));
 
     const neueAufgaben = () => {
         setAufgaben(erzeugeAufgaben());
         setEingaben(leereEingaben());
-        setFeedback(Array(ANZAHL_AUFGABEN).fill(null));
+        setZeigeTipp({});
         setZeigeLoesung(Array(ANZAHL_AUFGABEN).fill(false));
     };
 
@@ -111,16 +138,8 @@ const ScheitelInAllgForm = () => {
         neueAufgaben();
     }, []);
 
-    const setEingabe = (i: number, feld: keyof Eingabe, wert: string) => {
+    const setEingabe = (i: number, feld: Feld, wert: string) => {
         setEingaben((prev) => prev.map((e, idx) => (idx === i ? { ...e, [feld]: wert } : e)));
-    };
-
-    const pruefe = (i: number) => {
-        const t = aufgaben[i];
-        const e = eingaben[i];
-        const ok =
-            parseZahl(e.a) === t.a && parseZahl(e.b) === t.b && parseZahl(e.c) === t.c;
-        setFeedback((prev) => prev.map((f, idx) => (idx === i ? (ok ? 'richtig' : 'falsch') : f)));
     };
 
     const toggleLoesung = (i: number) => {
@@ -135,8 +154,9 @@ const ScheitelInAllgForm = () => {
                     Forme jede der folgenden quadratischen Funktionen von der Scheitelform{' '}
                     <span className="font-mono">f(x) = a(x − xₛ)² + yₛ</span> in die allgemeine Form{' '}
                     <span className="font-mono">f(x) = ax² + bx + c</span> um. Rechne zuerst im Heft und trage dann
-                    die Werte für a, b und c ein. Mit „Prüfen“ kontrollierst du dein Ergebnis, die Musterlösung
-                    zeigt dir den Rechenweg Schritt für Schritt.
+                    die Werte für a, b und c ein. Richtige Werte werden sofort grün, falsche rot. Bei einem
+                    falschen Wert kannst du dir einen Tipp anzeigen lassen. Die Musterlösung zeigt dir den
+                    Rechenweg Schritt für Schritt.
                 </p>
 
                 <div className="space-y-6">
@@ -147,42 +167,51 @@ const ScheitelInAllgForm = () => {
                                 <span className="text-xl font-mono tracking-wider text-blue-900">{t.equation}</span>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                                {(['a', 'b', 'c'] as const).map((feld) => (
-                                    <div key={feld} className="flex items-center space-x-2">
-                                        <label htmlFor={`${feld}-${i}`} className="text-lg font-medium text-gray-600">
-                                            {feld} =
-                                        </label>
-                                        <input
-                                            type="number"
-                                            id={`${feld}-${i}`}
-                                            value={eingaben[i]?.[feld] ?? ''}
-                                            onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                                                setEingabe(i, feld, ev.target.value)
-                                            }
-                                            className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                        />
-                                    </div>
-                                ))}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
+                                {(['a', 'b', 'c'] as const).map((feld) => {
+                                    const status = bewerte(eingaben[i]?.[feld] ?? '', t[feld]);
+                                    const tippKey = `${i}-${feld}`;
+                                    const istFalsch = status === 'falsch' || status === 'vorzeichen';
+                                    return (
+                                        <div key={feld}>
+                                            <div className="flex items-center space-x-2">
+                                                <label htmlFor={`${feld}-${i}`} className="text-lg font-medium text-gray-600">
+                                                    {feld} =
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    id={`${feld}-${i}`}
+                                                    value={eingaben[i]?.[feld] ?? ''}
+                                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                                                        setEingabe(i, feld, ev.target.value)
+                                                    }
+                                                    className={`block w-full p-2 border-2 rounded-md shadow-sm ${farbKlasse(status)}`}
+                                                />
+                                            </div>
+                                            {status === 'vorzeichen' && (
+                                                <p className="mt-1 text-sm text-red-600 font-semibold">
+                                                    Fast! Nur das Vorzeichen ist falsch.
+                                                </p>
+                                            )}
+                                            {istFalsch && (
+                                                <button
+                                                    onClick={() => setZeigeTipp((prev) => ({ ...prev, [tippKey]: !prev[tippKey] }))}
+                                                    className="mt-1 text-sm text-blue-700 underline hover:text-blue-900"
+                                                >
+                                                    {zeigeTipp[tippKey] ? 'Tipp verbergen' : 'Tipp anzeigen'}
+                                                </button>
+                                            )}
+                                            {istFalsch && zeigeTipp[tippKey] && (
+                                                <p className="mt-1 text-sm text-gray-700 bg-yellow-50 border border-yellow-300 rounded p-2">
+                                                    💡 {tippText(feld)}
+                                                </p>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
 
-                            {feedback[i] && (
-                                <div
-                                    className={`mb-3 font-semibold ${feedback[i] === 'richtig' ? 'text-green-600' : 'text-red-600'}`}
-                                >
-                                    {feedback[i] === 'richtig'
-                                        ? 'Super, alles richtig! ✅'
-                                        : 'Leider nicht ganz richtig. Versuche es erneut! ❌'}
-                                </div>
-                            )}
-
-                            <div className="flex flex-wrap gap-3">
-                                <button
-                                    onClick={() => pruefe(i)}
-                                    className="bg-blue-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                                >
-                                    Prüfen
-                                </button>
+                            <div className="flex flex-wrap gap-3 mt-3">
                                 <button
                                     onClick={() => toggleLoesung(i)}
                                     className="bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg hover:bg-gray-300 transition-colors duration-200"
