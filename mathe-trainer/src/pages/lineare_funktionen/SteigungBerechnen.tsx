@@ -7,7 +7,7 @@ import { useTaskTracking } from '../../hooks/useTaskTracking'
 // Sechs Aufgaben im Wechsel: Punkte, Graph, Punkte, Graph, Punkte, Graph
 const TOTAL_TASKS = 6
 
-const VIDEO_URL = 'https://youtu.be/IwNoiR-yfJ0?si=Hklidv10rx1W6YuJ'
+const VIDEO_ID = 'IwNoiR-yfJ0'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -250,7 +250,6 @@ function TextTaskCard({ number, onSolvedChange, onResult, onHelp, level }: CardP
       <div className="flex flex-wrap justify-center gap-3 mt-6">
         <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
         <button onClick={onShowAnswer} className={btnSecondary}>Lösung anzeigen</button>
-        <button onClick={() => window.open(VIDEO_URL, '_blank')} className={btnSecondary}>Erklärvideo</button>
       </div>
 
       {showSolution && solutionEl(p1, p2, p2.y - p1.y, p2.x - p1.x, correctSlope)}
@@ -418,11 +417,125 @@ function GraphTaskCard({ number, onSolvedChange, onResult, onHelp, level }: Card
       <div className="flex flex-wrap justify-center gap-3 mt-6">
         <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
         <button onClick={onShowAnswer} className={btnSecondary}>Lösung anzeigen</button>
-        <button onClick={() => window.open(VIDEO_URL, '_blank')} className={btnSecondary}>Erklärvideo</button>
       </div>
 
       {showSolution && selectedPoints.length === 2 &&
         solutionEl(selectedPoints[0], selectedPoints[1], deltaY, deltaX, correctSlope)}
+    </div>
+  )
+}
+
+// ---------- Erklärung mit Beispiel (Graph + Rechnung) und Erklärvideo ----------
+
+// Beispiel: Gerade y = 2x − 1 durch P1(1|1) und P2(3|5)
+const EX = { p1: { x: 1, y: 1 }, p2: { x: 3, y: 5 } }
+const SX = 40 // Pixel pro Einheit
+const X_MIN = -1, X_MAX = 6, Y_MIN = -2, Y_MAX = 7
+const toPx = (x: number, y: number) => ({ px: (x - X_MIN) * SX, py: (Y_MAX - y) * SX })
+
+function ExampleGraph() {
+  const w = (X_MAX - X_MIN) * SX
+  const h = (Y_MAX - Y_MIN) * SX
+  const o = toPx(0, 0)
+  const a = toPx(EX.p1.x, EX.p1.y)
+  const b = toPx(EX.p2.x, EX.p2.y)
+  const c = toPx(EX.p2.x, EX.p1.y) // Ecke des Steigungsdreiecks
+  const lineStart = toPx(-0.5, -2)
+  const lineEnd = toPx(4, 7)
+  const xs = Array.from({ length: X_MAX - X_MIN + 1 }, (_, i) => X_MIN + i)
+  const ys = Array.from({ length: Y_MAX - Y_MIN + 1 }, (_, i) => Y_MIN + i)
+  return (
+    <svg viewBox={`-10 -10 ${w + 20} ${h + 20}`} className="w-full max-w-xs mx-auto" role="img" aria-label="Gerade y = 2x − 1 mit Steigungsdreieck zwischen P1(1|1) und P2(3|5)">
+      {xs.map((x) => (
+        <line key={`gx${x}`} x1={toPx(x, 0).px} y1={0} x2={toPx(x, 0).px} y2={h} stroke="#e2e8f0" strokeWidth={1} />
+      ))}
+      {ys.map((y) => (
+        <line key={`gy${y}`} x1={0} y1={toPx(0, y).py} x2={w} y2={toPx(0, y).py} stroke="#e2e8f0" strokeWidth={1} />
+      ))}
+      {/* Achsen */}
+      <line x1={0} y1={o.py} x2={w} y2={o.py} stroke="#334155" strokeWidth={1.5} />
+      <line x1={o.px} y1={h} x2={o.px} y2={0} stroke="#334155" strokeWidth={1.5} />
+      <text x={w - 4} y={o.py - 6} fontSize={13} textAnchor="end" fill="#334155">x</text>
+      <text x={o.px + 6} y={12} fontSize={13} fill="#334155">y</text>
+      {xs.filter((x) => x !== 0).map((x) => (
+        <text key={`lx${x}`} x={toPx(x, 0).px} y={o.py + 14} fontSize={10} textAnchor="middle" fill="#64748b">{x}</text>
+      ))}
+      {ys.filter((y) => y !== 0).map((y) => (
+        <text key={`ly${y}`} x={o.px - 5} y={toPx(0, y).py + 3} fontSize={10} textAnchor="end" fill="#64748b">{y}</text>
+      ))}
+      {/* Gerade */}
+      <line x1={lineStart.px} y1={lineStart.py} x2={lineEnd.px} y2={lineEnd.py} stroke="#2563eb" strokeWidth={2.5} />
+      {/* Steigungsdreieck */}
+      <line x1={a.px} y1={a.py} x2={c.px} y2={c.py} stroke="#16a34a" strokeWidth={2.5} />
+      <line x1={c.px} y1={c.py} x2={b.px} y2={b.py} stroke="#dc2626" strokeWidth={2.5} />
+      <text x={(a.px + c.px) / 2} y={a.py + 16} fontSize={13} fontWeight="bold" textAnchor="middle" fill="#16a34a">Δx = 2</text>
+      <text x={c.px + 6} y={(c.py + b.py) / 2 + 4} fontSize={13} fontWeight="bold" fill="#dc2626">Δy = 4</text>
+      {/* Punkte */}
+      <circle cx={a.px} cy={a.py} r={4.5} fill="#1e293b" />
+      <circle cx={b.px} cy={b.py} r={4.5} fill="#1e293b" />
+      <text x={a.px + 6} y={a.py - 8} fontSize={12} fontWeight="bold" fill="#1e293b">P₁(1|1)</text>
+      <text x={b.px - 8} y={b.py - 4} fontSize={12} fontWeight="bold" textAnchor="end" fill="#1e293b">P₂(3|5)</text>
+    </svg>
+  )
+}
+
+// Bruch in HTML (unabhängig davon, ob MathJax schon geladen ist)
+function Frac({ num, den }: { num: React.ReactNode; den: React.ReactNode }) {
+  return (
+    <span className="inline-flex flex-col items-center align-middle mx-1">
+      <span className="px-1 leading-tight">{num}</span>
+      <span className="px-1 leading-tight border-t-2 border-slate-700">{den}</span>
+    </span>
+  )
+}
+
+function Erklaerung() {
+  return (
+    <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200">
+      <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">So berechnest du die Steigung</h2>
+      <p className="text-slate-700 mb-3">
+        Die Steigung m gibt an, wie stark eine Gerade steigt oder fällt: Um wie viel ändert sich y, wenn x um 1 größer wird?
+        Du brauchst dafür <strong>zwei Punkte</strong> auf der Geraden. Zeichnest du zwischen ihnen ein{' '}
+        <strong>Steigungsdreieck</strong>, kannst du die Änderung in x-Richtung (<span className="text-green-700 font-semibold">Δx</span>)
+        und in y-Richtung (<span className="text-red-700 font-semibold">Δy</span>) ablesen.
+      </p>
+      <p className="text-center text-lg font-serif my-3">
+        <i>m</i> =
+        <Frac num={<span className="text-red-700">Δ<i>y</i></span>} den={<span className="text-green-700">Δ<i>x</i></span>} />=
+        <Frac num={<><i>y</i><sub>2</sub> − <i>y</i><sub>1</sub></>} den={<><i>x</i><sub>2</sub> − <i>x</i><sub>1</sub></>} />
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center mt-3">
+        <ExampleGraph />
+        <div>
+          <p className="font-semibold text-slate-800 mb-1">Beispiel</p>
+          <p className="text-slate-700 mb-2">
+            Die Gerade geht durch P<sub>1</sub>(1|1) und P<sub>2</sub>(3|5).
+          </p>
+          <p className="text-center text-lg font-serif my-2">
+            <i>m</i> =
+            <Frac num="5 − 1" den="3 − 1" />=
+            <Frac num={<span className="text-red-700">4</span>} den={<span className="text-green-700">2</span>} />= <strong>2</strong>
+          </p>
+          <p className="text-slate-700 mt-2">
+            Gehst du 2 Einheiten nach rechts, geht es 4 Einheiten nach oben. Pro Einheit nach rechts steigt die Gerade also um 2.
+          </p>
+        </div>
+      </div>
+      <ul className="list-disc pl-5 mt-3 text-slate-700 space-y-1 text-sm">
+        <li>m &gt; 0: Die Gerade steigt. m &lt; 0: Die Gerade fällt.</li>
+        <li>Achte auf Vorzeichen: Bei negativen Koordinaten Klammern setzen, z. B. 3 − (−2) = 5.</li>
+        <li>Die Reihenfolge der Punkte ist egal, solange oben und unten derselbe Punkt zuerst steht.</li>
+      </ul>
+      <h3 className="text-base font-bold text-slate-800 mt-5 mb-2 text-center">Erklärvideo</h3>
+      <div className="max-w-2xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200">
+        <iframe
+          className="w-full h-full"
+          src={`https://www.youtube.com/embed/${VIDEO_ID}`}
+          title="Erklärvideo: Steigung berechnen"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
     </div>
   )
 }
@@ -498,11 +611,14 @@ export default function SteigungBerechnen() {
     </div>
   )
 
+  const explanation = <Erklaerung />
+
   if (!level) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50">
         <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
           {header}
+          {explanation}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -533,6 +649,7 @@ export default function SteigungBerechnen() {
     <div className="min-h-screen flex flex-col bg-slate-50">
       <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
         {header}
+        {explanation}
 
         <div className="flex flex-wrap items-center justify-center gap-3">
           <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
