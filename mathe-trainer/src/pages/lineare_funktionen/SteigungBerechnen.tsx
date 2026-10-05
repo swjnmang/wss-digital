@@ -618,7 +618,6 @@ export default function SteigungBerechnen() {
       <div className="min-h-screen flex flex-col bg-slate-50">
         <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
           {header}
-          {explanation}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
