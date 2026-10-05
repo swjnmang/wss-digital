@@ -15,6 +15,7 @@ type Status = 'leer' | 'richtig' | 'vorzeichen' | 'falsch';
 
 const ANZAHL_AUFGABEN = 5;
 const ANZAHL_SCHRITTE = 5;
+const LERNVIDEO_URL = 'https://www.youtube.com/watch?v=xLohr5cup-M';
 
 const generiereZufallszahl = (min: number, max: number) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
@@ -189,22 +190,32 @@ const ScheitelInAllgForm = () => {
                                 })}
                             </div>
 
-                            {tippSchritte[i] < ANZAHL_SCHRITTE && (
-                                <div className="flex flex-wrap gap-3 mt-3">
-                                    <button
-                                        onClick={() => naechsterTipp(i)}
-                                        className="bg-yellow-100 text-yellow-900 font-bold py-2 px-5 rounded-lg hover:bg-yellow-200 transition-colors duration-200"
-                                    >
-                                        {tippSchritte[i] === 0 ? 'Tipp anzeigen' : 'Nächsten Tipp anzeigen'}
-                                    </button>
-                                    <button
-                                        onClick={() => zeigeVollstaendigeLoesung(i)}
-                                        className="bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg hover:bg-gray-300 transition-colors duration-200"
-                                    >
-                                        Vollständige Lösung anzeigen
-                                    </button>
-                                </div>
-                            )}
+                            <div className="flex flex-wrap gap-3 mt-3">
+                                {tippSchritte[i] < ANZAHL_SCHRITTE && (
+                                    <>
+                                        <button
+                                            onClick={() => naechsterTipp(i)}
+                                            className="bg-yellow-100 text-yellow-900 font-bold py-2 px-5 rounded-lg hover:bg-yellow-200 transition-colors duration-200"
+                                        >
+                                            {tippSchritte[i] === 0 ? 'Tipp anzeigen' : 'Nächsten Tipp anzeigen'}
+                                        </button>
+                                        <button
+                                            onClick={() => zeigeVollstaendigeLoesung(i)}
+                                            className="bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+                                        >
+                                            Vollständige Lösung anzeigen
+                                        </button>
+                                    </>
+                                )}
+                                <a
+                                    href={LERNVIDEO_URL}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="bg-red-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-red-700 transition-colors duration-200"
+                                >
+                                    ▶ Lernvideo ansehen
+                                </a>
+                            </div>
 
                             {tippSchritte[i] > 0 && <Loesungsweg t={t} anzahl={tippSchritte[i]} />}
                         </div>
