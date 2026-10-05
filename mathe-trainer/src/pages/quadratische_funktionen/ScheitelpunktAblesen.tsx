@@ -1,338 +1,280 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
-declare global {
-  interface Window {
-    GGBApplet: any;
-  }
-}
+type Typ = 'graph' | 'gleichung';
 
-interface Task {
-  a: number;
-  xs: number;
-  ys: number;
-  type: 'graph' | 'equation';
-  solutionSteps: string;
-}
+type Aufgabe = {
+    typ: Typ;
+    a: number;
+    xs: number;
+    ys: number;
+};
+
+type Eingabe = { xs: string; ys: string };
+type Feld = keyof Eingabe;
+type Status = 'leer' | 'richtig' | 'vorzeichen' | 'falsch';
+
+const ANZAHL_AUFGABEN = 5;
+const TYPEN: Typ[] = ['graph', 'gleichung', 'graph', 'gleichung', 'graph'];
+const STRECKFAKTOREN = [1, -1, 2, -2, 0.5, -0.5];
+const BEREICH = 6; // Koordinatensystem von -6 bis 6
+const VIDEO_URL = 'https://www.youtube.com/watch?v=VgsmYGAI-_8&list=PLI8kX0XEfSugainT6dHh9wGTGikzJ76d2&index=6';
+
+const zufall = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+const zahl = (n: number) => String(n).replace('.', ',').replace('-', '−');
+
+const erzeugeAufgaben = (): Aufgabe[] => {
+    const schonDa = new Set<string>();
+    return TYPEN.map((typ) => {
+        let a: number, xs: number, ys: number, key: string;
+        do {
+            a = STRECKFAKTOREN[zufall(0, STRECKFAKTOREN.length - 1)];
+            xs = zufall(-4, 4);
+            ys = zufall(-4, 4);
+            key = `${xs}|${ys}`;
+        } while (schonDa.has(key));
+        schonDa.add(key);
+        return { typ, a, xs, ys };
+    });
+};
+
+const leereEingaben = (): Eingabe[] => Array.from({ length: ANZAHL_AUFGABEN }, () => ({ xs: '', ys: '' }));
+
+const gleichung = ({ a, xs, ys }: Aufgabe) => {
+    const faktor = a === 1 ? '' : a === -1 ? '−' : zahl(a);
+    const quadrat = xs === 0 ? 'x²' : `(x ${xs > 0 ? '−' : '+'} ${Math.abs(xs)})²`;
+    const rest = ys === 0 ? '' : ` ${ys > 0 ? '+' : '−'} ${Math.abs(ys)}`;
+    return `f(x) = ${faktor}${quadrat}${rest}`;
+};
+
+const parseZahl = (s: string) => parseFloat(s.replace(/[−–—‐]/g, '-').replace(',', '.'));
+
+const bewerte = (eingabe: string, korrekt: number): Status => {
+    const wert = parseZahl(eingabe);
+    if (Number.isNaN(wert)) return 'leer';
+    if (wert === korrekt) return 'richtig';
+    if (korrekt !== 0 && wert === -korrekt) return 'vorzeichen';
+    return 'falsch';
+};
+
+const farbKlasse = (status: Status) =>
+    status === 'richtig'
+        ? 'border-green-500 bg-green-50 text-green-800'
+        : status === 'leer'
+          ? 'border-gray-300 focus:border-blue-500'
+          : 'border-red-500 bg-red-50 text-red-800';
+
+const Graph = ({ a, xs, ys }: Aufgabe) => {
+    const groesse = 200;
+    const skala = groesse / (2 * BEREICH);
+    const px = (x: number) => (x + BEREICH) * skala;
+    const py = (y: number) => (BEREICH - y) * skala;
+    const raster = Array.from({ length: 2 * BEREICH + 1 }, (_, i) => i - BEREICH);
+
+    const punkte: string[] = [];
+    for (let x = -BEREICH; x <= BEREICH; x += 0.05) {
+        const y = a * (x - xs) ** 2 + ys;
+        if (Math.abs(y) <= BEREICH + 1) punkte.push(`${px(x).toFixed(1)},${py(y).toFixed(1)}`);
+    }
+
+    return (
+        <svg
+            viewBox={`0 0 ${groesse} ${groesse}`}
+            className="w-full max-w-[180px] bg-white rounded-md border border-gray-200"
+            role="img"
+            aria-label="Graph einer quadratischen Funktion"
+        >
+            <defs>
+                <clipPath id="zeichenflaeche">
+                    <rect x="0" y="0" width={groesse} height={groesse} />
+                </clipPath>
+            </defs>
+            {raster.map((k) => (
+                <g key={k}>
+                    <line x1={px(k)} y1={0} x2={px(k)} y2={groesse} stroke="#e5e7eb" strokeWidth="1" />
+                    <line x1={0} y1={py(k)} x2={groesse} y2={py(k)} stroke="#e5e7eb" strokeWidth="1" />
+                </g>
+            ))}
+            <line x1={0} y1={py(0)} x2={groesse} y2={py(0)} stroke="#6b7280" strokeWidth="1.2" />
+            <line x1={px(0)} y1={0} x2={px(0)} y2={groesse} stroke="#6b7280" strokeWidth="1.2" />
+            {raster
+                .filter((k) => k !== 0 && k % 2 === 0 && Math.abs(k) < BEREICH)
+                .map((k) => (
+                    <g key={`l${k}`} fontSize="7" fill="#6b7280">
+                        <text x={px(k)} y={py(0) + 8} textAnchor="middle">
+                            {k}
+                        </text>
+                        <text x={px(0) - 3} y={py(k) + 2.5} textAnchor="end">
+                            {k}
+                        </text>
+                    </g>
+                ))}
+            <polyline
+                points={punkte.join(' ')}
+                fill="none"
+                stroke="#2563eb"
+                strokeWidth="2"
+                clipPath="url(#zeichenflaeche)"
+            />
+        </svg>
+    );
+};
+
+const Loesung = ({ t }: { t: Aufgabe }) => (
+    <div className="mt-3 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md p-3 space-y-1">
+        {t.typ === 'gleichung' ? (
+            <>
+                <p>
+                    Vergleiche mit der Scheitelform <span className="font-mono">f(x) = a(x − xₛ)² + yₛ</span>.
+                </p>
+                <p>
+                    In der Klammer steht das <b>umgekehrte</b> Vorzeichen: xₛ = {zahl(t.xs)}
+                </p>
+                <p>Die Zahl hinter der Klammer wird direkt übernommen: yₛ = {zahl(t.ys)}</p>
+            </>
+        ) : (
+            <p>
+                Der Scheitelpunkt ist der {t.a > 0 ? 'tiefste' : 'höchste'} Punkt der Parabel. Lies seine Koordinaten
+                an den Achsen ab.
+            </p>
+        )}
+        <p className="font-bold">
+            S({zahl(t.xs)} | {zahl(t.ys)})
+        </p>
+    </div>
+);
 
 const ScheitelpunktAblesen = () => {
-  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
-  const [task, setTask] = useState<Task | null>(null);
-  const [tasksCompleted, setTasksCompleted] = useState(0);
-  const [geoSize, setGeoSize] = useState<{ width: number; height: number }>({ width: 600, height: 500 });
-  
-  const [userXs, setUserXs] = useState<string>('');
-  const [userYs, setUserYs] = useState<string>('');
-  const [feedback, setFeedback] = useState<string>('');
-  const [isCorrect, setIsCorrect] = useState<boolean>(false);
-  const [showSolution, setShowSolution] = useState<boolean>(false);
+    const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
+    const [eingaben, setEingaben] = useState<Eingabe[]>(leereEingaben());
+    const [loesungen, setLoesungen] = useState<boolean[]>(Array(ANZAHL_AUFGABEN).fill(false));
 
-  const ggbApiRef = useRef<any>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const VIDEO_URL = "https://www.youtube.com/watch?v=VgsmYGAI-_8&list=PLI8kX0XEfSugainT6dHh9wGTGikzJ76d2&index=6";
-
-  const formatNumber = (num: number) => Math.round(num * 100) / 100;
-  const randomInt = (max: number, min: number = 0) => Math.floor(Math.random() * (max - min + 1)) + min;
-  const randomChoice = (arr: number[]) => arr[Math.floor(Math.random() * arr.length)];
-
-  // Responsive sizing
-  useEffect(() => {
-    const calculateSize = () => {
-      if (!containerRef.current) return;
-      const parentWidth = containerRef.current.offsetWidth;
-      const size = Math.min(Math.max(parentWidth * 0.9, 300), 700);
-      setGeoSize({ width: size, height: size * 0.8 });
+    const neueAufgaben = () => {
+        setAufgaben(erzeugeAufgaben());
+        setEingaben(leereEingaben());
+        setLoesungen(Array(ANZAHL_AUFGABEN).fill(false));
     };
 
-    calculateSize();
-    window.addEventListener('resize', calculateSize);
-    return () => window.removeEventListener('resize', calculateSize);
-  }, []);
+    useEffect(() => {
+        neueAufgaben();
+    }, []);
 
-  const generateNewTask = (level: 'easy' | 'medium' | 'hard') => {
-    setFeedback('');
-    setUserXs('');
-    setUserYs('');
-    setShowSolution(false);
-    setIsCorrect(false);
-
-    const taskType = tasksCompleted % 2 === 0 ? 'graph' : 'equation';
-
-    let a: number, xs: number, ys: number;
-
-    switch (level) {
-      case 'easy':
-        a = randomChoice([1, -1, 2, -2]);
-        xs = randomInt(5, -5);
-        ys = randomInt(5, -5);
-        break;
-      case 'medium':
-        a = randomChoice([-2, -1.5, -0.5, 0.5, 1.5, 2]);
-        xs = randomInt(8, -8) / 2;
-        ys = randomInt(8, -8) / 2;
-        break;
-      case 'hard':
-        a = randomChoice([-0.75, -0.25, 0.25, 0.75, randomInt(3, -3)]);
-        xs = randomInt(16, -16) / 4;
-        ys = randomInt(16, -16) / 4;
-        break;
-    }
-
-    if (a === 0) a = 1;
-    a = formatNumber(a);
-    xs = formatNumber(xs);
-    ys = formatNumber(ys);
-
-    const xs_str = (xs >= 0) ? ` - ${xs}` : ` + ${Math.abs(xs)}`;
-    const ys_str = (ys >= 0) ? ` + ${ys}` : ` - ${Math.abs(ys)}`;
-
-    const solutionSteps = `
-      Der Scheitelpunkt wird aus der Scheitelform y = a(x - xs)² + ys abgelesen.
-      Das Vorzeichen in der Klammer wird umgekehrt: xs = ${xs}
-      Der Wert nach dem ² wird direkt abgelesen: ys = ${ys}
-      Also ist der Scheitelpunkt S(${xs}|${ys})
-    `;
-
-    const newTask = { a, xs, ys, type: taskType, solutionSteps };
-    setTask(newTask);
-
-    if (taskType === 'graph') {
-      setTimeout(() => {
-        initializeGeoGebra(a, xs, ys);
-      }, 100);
-    }
-
-    setTasksCompleted(t => t + 1);
-  };
-
-  const initializeGeoGebra = (a: number, xs: number, ys: number) => {
-    const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
-    
-    const initApplet = () => {
-      if (!window.GGBApplet) return;
-      
-      const params: any = {
-        appName: 'classic',
-        width: geoSize.width,
-        height: geoSize.height,
-        showToolBar: false,
-        showAlgebraInput: false,
-        showMenuBar: false,
-        perspective: 'G',
-        useBrowserForJS: true,
-        enableShiftDragZoom: true,
-        showResetIcon: true,
-        showZoomButtons: true,
-        appletOnLoad: (api: any) => {
-          ggbApiRef.current = api;
-          
-          try {
-            api.reset();
-            api.evalCommand(`f(x) = ${a}*(x - (${xs}))^2 + ${ys}`);
-            api.setColor('f', 0, 0, 255);
-            api.setLineThickness('f', 3);
-            
-            api.evalCommand(`S = (${xs}, ${ys})`);
-            api.setColor('S', 255, 0, 0);
-            api.setPointSize('S', 8);
-            api.setLabelVisible('S', true);
-            
-            const margin = 3;
-            api.setCoordSystem(xs - margin - 2, xs + margin + 2, ys - 3, ys + 8);
-          } catch (e) {
-            console.error('GeoGebra error:', e);
-          }
-        }
-      };
-
-      try {
-        const applet = new window.GGBApplet(params, true);
-        applet.inject('ggb-scheitelpunkt');
-      } catch (e) {
-        console.error('GeoGebra injection error:', e);
-      }
+    const setEingabe = (i: number, feld: Feld, wert: string) => {
+        setEingaben((prev) => prev.map((e, idx) => (idx === i ? { ...e, [feld]: wert } : e)));
     };
 
-    if (!existing) {
-      const script = document.createElement('script');
-      script.src = 'https://www.geogebra.org/apps/deployggb.js';
-      script.async = true;
-      script.onload = () => setTimeout(initApplet, 100);
-      document.body.appendChild(script);
-    } else if (window.GGBApplet) {
-      setTimeout(initApplet, 100);
-    }
-  };
+    const zeigeLoesung = (i: number) => {
+        setLoesungen((prev) => prev.map((v, idx) => (idx === i ? !v : v)));
+    };
 
-  useEffect(() => {
-    generateNewTask(difficulty);
-  }, [difficulty]);
+    const anzahlRichtig = aufgaben.filter(
+        (t, i) => bewerte(eingaben[i]?.xs ?? '', t.xs) === 'richtig' && bewerte(eingaben[i]?.ys ?? '', t.ys) === 'richtig'
+    ).length;
 
-  const checkSolution = () => {
-    if (!task || userXs === '' || userYs === '') {
-      setFeedback('Bitte fülle beide Felder (xs und ys) aus.');
-      setIsCorrect(false);
-      return;
-    }
-
-    const xsVal = parseFloat(userXs.replace(',', '.').replace(/[−–—‐]/g, '-'));
-    const ysVal = parseFloat(userYs.replace(',', '.').replace(/[−–—‐]/g, '-'));
-
-    const isXsCorrect = Math.abs(xsVal - task.xs) < 0.01;
-    const isYsCorrect = Math.abs(ysVal - task.ys) < 0.01;
-
-    if (isXsCorrect && isYsCorrect) {
-      setFeedback('Richtig! Ausgezeichnet!');
-      setIsCorrect(true);
-    } else {
-      setFeedback('Leider nicht ganz richtig. Überprüfe die Koordinaten des Scheitelpunkts!');
-      setIsCorrect(false);
-    }
-  };
-
-  if (!task) return <div>Lädt...</div>;
-
-  const equation = task.type === 'equation' 
-    ? `y = ${task.a}(x ${task.xs >= 0 ? '-' : '+'} ${Math.abs(task.xs)})² ${task.ys >= 0 ? '+' : '-'} ${Math.abs(task.ys)}`
-    : '';
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
-      <div className="container mx-auto px-4" ref={containerRef}>
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold mb-2 text-slate-800">Scheitelpunkt ablesen</h1>
-          <p className="text-slate-600 mb-6">Aufgabentyp: {task.type === 'graph' ? 'Graph ablesen' : 'Gleichung ablesen'}</p>
-          
-          <div className="mb-6">
-            <div className="flex gap-2 mb-6 flex-wrap">
-              <button 
-                onClick={() => setDifficulty('easy')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-all ${difficulty === 'easy' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
-              >
-                Leicht
-              </button>
-              <button 
-                onClick={() => setDifficulty('medium')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-all ${difficulty === 'medium' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
-              >
-                Mittel
-              </button>
-              <button 
-                onClick={() => setDifficulty('hard')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-all ${difficulty === 'hard' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
-              >
-                Schwer
-              </button>
-            </div>
-
-            <div className="grid lg:grid-cols-3 gap-6">
-              {/* GeoGebra oder Gleichung */}
-              <div className="lg:col-span-2">
-                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200">
-                  <p className="text-lg font-bold text-slate-700 mb-4">
-                    {task.type === 'graph' 
-                      ? 'Lese den Scheitelpunkt aus dem Graphen ab:' 
-                      : 'Lese den Scheitelpunkt aus der Gleichung ab:'}
-                  </p>
-
-                  {task.type === 'graph' ? (
-                    <div 
-                      id="ggb-scheitelpunkt"
-                      className="w-full bg-slate-50 rounded-lg border border-slate-200"
-                      style={{ minHeight: '500px' }}
-                    ></div>
-                  ) : (
-                    <div className="text-3xl font-mono text-center bg-slate-100 p-6 rounded-lg border-2 border-blue-400 text-blue-700 font-bold">
-                      {equation}
-                    </div>
-                  )}
+    return (
+        <div className="container mx-auto px-4 py-8">
+            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-left">
+                <div className="flex items-start justify-between gap-4 mb-2">
+                    <h1 className="text-2xl font-bold text-gray-800">Scheitelpunkt ablesen</h1>
+                    <span
+                        className={`shrink-0 text-sm font-semibold px-3 py-1 rounded-full ${
+                            anzahlRichtig === ANZAHL_AUFGABEN ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                        }`}
+                    >
+                        {anzahlRichtig} / {ANZAHL_AUFGABEN} richtig
+                    </span>
                 </div>
-              </div>
+                <p className="text-gray-600 mb-6">
+                    Lies den Scheitelpunkt S(xₛ | yₛ) aus dem Graphen bzw. aus der Scheitelform{' '}
+                    <span className="font-mono">f(x) = a(x − xₛ)² + yₛ</span> ab. Richtige Werte werden sofort grün,
+                    falsche rot.
+                </p>
 
-              {/* Input und Buttons */}
-              <div className="lg:col-span-1">
-                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 sticky top-6">
-                  <h3 className="text-lg font-bold text-slate-800 mb-4">Scheitelpunkt</h3>
-                  
-                  <div className="space-y-2 mb-6">
-                    <label className="block text-sm font-semibold text-slate-600">xs</label>
-                    <input
-                      type="text"
-                      value={userXs}
-                      onChange={(e) => setUserXs(e.target.value)}
-                      placeholder="x-Koordinate"
-                      className="w-full p-3 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center text-lg"
-                    />
-                  </div>
+                <div className="space-y-4">
+                    {aufgaben.map((t, i) => {
+                        const statusX = bewerte(eingaben[i]?.xs ?? '', t.xs);
+                        const statusY = bewerte(eingaben[i]?.ys ?? '', t.ys);
+                        const fertig = statusX === 'richtig' && statusY === 'richtig';
+                        return (
+                            <div
+                                key={i}
+                                className={`border rounded-lg p-4 ${fertig ? 'border-green-300 bg-green-50/40' : 'border-gray-200'}`}
+                            >
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                                    <div className="sm:w-1/2">
+                                        <p className="text-sm font-semibold text-gray-500 mb-2">Aufgabe {i + 1}</p>
+                                        {t.typ === 'graph' ? (
+                                            <Graph {...t} />
+                                        ) : (
+                                            <p className="text-xl font-mono text-blue-900 bg-blue-50 border-l-4 border-blue-500 rounded-md px-3 py-2 inline-block">
+                                                {gleichung(t)}
+                                            </p>
+                                        )}
+                                    </div>
 
-                  <div className="space-y-2 mb-6">
-                    <label className="block text-sm font-semibold text-slate-600">ys</label>
-                    <input
-                      type="text"
-                      value={userYs}
-                      onChange={(e) => setUserYs(e.target.value)}
-                      placeholder="y-Koordinate"
-                      className="w-full p-3 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center text-lg"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-3">
-                    <button 
-                      onClick={checkSolution}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-md"
-                    >
-                      Prüfen
-                    </button>
-                    <button 
-                      onClick={() => generateNewTask(difficulty)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-md"
-                    >
-                      Neue Aufgabe
-                    </button>
-                  </div>
-
-                  {feedback && (
-                    <div className={`mt-4 p-4 rounded-lg font-semibold text-center ${isCorrect ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}`}>
-                      {feedback}
-                    </div>
-                  )}
-
-                  {!isCorrect && feedback && (
-                    <button 
-                      onClick={() => setShowSolution(true)}
-                      className="w-full mt-3 text-blue-600 hover:text-blue-700 font-semibold hover:underline"
-                    >
-                      Lösung anzeigen
-                    </button>
-                  )}
+                                    <div className="sm:w-1/2">
+                                        <div className="flex items-center gap-1 text-xl font-mono text-gray-700">
+                                            <span>S(</span>
+                                            {(['xs', 'ys'] as const).map((feld, k) => {
+                                                const status = feld === 'xs' ? statusX : statusY;
+                                                return (
+                                                    <span key={feld} className="flex items-center">
+                                                        {k === 1 && <span className="px-1">|</span>}
+                                                        <input
+                                                            type="text"
+                                                            inputMode="decimal"
+                                                            aria-label={feld === 'xs' ? 'x-Koordinate' : 'y-Koordinate'}
+                                                            placeholder={feld === 'xs' ? 'xₛ' : 'yₛ'}
+                                                            value={eingaben[i]?.[feld] ?? ''}
+                                                            onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                                                                setEingabe(i, feld, ev.target.value)
+                                                            }
+                                                            className={`w-16 p-1.5 text-center border-2 rounded-md outline-none ${farbKlasse(status)}`}
+                                                        />
+                                                    </span>
+                                                );
+                                            })}
+                                            <span>)</span>
+                                        </div>
+                                        {(statusX === 'vorzeichen' || statusY === 'vorzeichen') && (
+                                            <p className="mt-1 text-sm text-red-600 font-semibold">
+                                                Fast! Achte auf das Vorzeichen.
+                                            </p>
+                                        )}
+                                        {!fertig && (
+                                            <button
+                                                onClick={() => zeigeLoesung(i)}
+                                                className="mt-2 text-sm text-blue-600 hover:underline"
+                                            >
+                                                {loesungen[i] ? 'Lösung ausblenden' : 'Lösung anzeigen'}
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                                {loesungen[i] && !fertig && <Loesung t={t} />}
+                            </div>
+                        );
+                    })}
                 </div>
-              </div>
+
+                <div className="flex flex-wrap justify-center items-center gap-4 mt-8">
+                    <button
+                        onClick={neueAufgaben}
+                        className="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                    >
+                        5 neue Aufgaben
+                    </button>
+                    <a
+                        href={VIDEO_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-red-600 hover:underline font-semibold"
+                    >
+                        ▶ Erklärvideo ansehen
+                    </a>
+                </div>
             </div>
-
-            {showSolution && (
-              <div className="mt-6 bg-blue-50 p-6 rounded-xl border-2 border-blue-300">
-                <h3 className="font-bold text-lg mb-3 text-blue-900">Lösungsweg:</h3>
-                <p className="whitespace-pre-wrap text-slate-700 leading-relaxed">{task.solutionSteps}</p>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-12 flex justify-center">
-            <a 
-              href={VIDEO_URL} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-md"
-            >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-              </svg>
-              Erklärvideo ansehen
-            </a>
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default ScheitelpunktAblesen;
