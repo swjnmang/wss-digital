@@ -152,6 +152,10 @@ function SolutionSteps({ task }: { task: Task }) {
         <p className="font-serif text-lg">
           y<sub>S</sub> = {fmt(t1)} {t2 < 0 ? '−' : '+'} {fmt(Math.abs(t2))} {c < 0 ? '−' : '+'} {fmt(Math.abs(c))} = <strong>{fmt(ys)}</strong>
         </p>
+        <p className="mt-2">oder mit der Formel y<sub>S</sub> = c − b² / (4 · a):</p>
+        <p className="font-serif text-lg">
+          y<sub>S</sub> = {fmt(c)} − {fmtP(b)}² / (4 · {fmtP(a)}) = {fmt(c)} − {fmt(b * b)} / {fmtP(4 * a)} = {fmt(c)} {b * b / (4 * a) < 0 ? '+' : '−'} {fmt(Math.abs(b * b / (4 * a)))} = <strong>{fmt(ys)}</strong>
+        </p>
       </div>
       <p className="font-bold text-slate-800 text-center text-lg">
         S({fmt(xs)} | {fmt(ys)})
@@ -222,7 +226,7 @@ function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps
     message = (
       <p className={`text-center font-bold mt-3 ${yStatus === 'wrong' ? 'text-red-600' : 'text-green-600'}`}>
         {yStatus === 'wrong' ? 'x stimmt, aber y ist noch nicht richtig. Setze x' : 'Gut, x stimmt! Jetzt noch y: Setze x'}
-        <sub>S</sub> in f(x) ein.
+        <sub>S</sub> in f(x) ein oder nutze y<sub>S</sub> = c − b² / (4a).
       </p>
     )
   } else if (xStatus === 'wrong') {
@@ -344,8 +348,23 @@ function Erklaerung() {
         <li>
           <span className="text-red-700 font-semibold">y-Koordinate</span>: x<sub>S</sub> in die Funktionsgleichung einsetzen:{' '}
           <span className="font-serif">y<sub>S</sub> = f(x<sub>S</sub>)</span>
+          <span className="block mt-1">
+            <strong>Oder</strong> du nutzt direkt die passende Formel für y<sub>S</sub>:
+          </span>
+          <span className="block text-center text-lg font-serif my-2">
+            <i>y</i><sub>S</sub> = <i>c</i> − <Frac num={<><i>b</i>²</>} den={<>4 · <i>a</i></>} />
+          </span>
         </li>
       </ol>
+      <div className="border-2 border-green-500 bg-green-50 rounded-xl px-4 py-3 mb-3 text-center">
+        <p className="font-semibold text-slate-800 mb-1">Scheitelpunktkoordinaten auf einen Blick</p>
+        <p className="text-lg font-serif">
+          S(<i>x</i><sub>S</sub> | <i>y</i><sub>S</sub>) = S(
+          <span className="text-green-700">−<Frac num={<i>b</i>} den={<>2 · <i>a</i></>} /></span>|
+          <span className="text-red-700 ml-1"><i>c</i> − <Frac num={<><i>b</i>²</>} den={<>4 · <i>a</i></>} /></span>)
+        </p>
+        <p className="text-sm text-slate-600 mt-1">Beide Wege für y<sub>S</sub> führen zum selben Ergebnis – nimm den, der dir leichter fällt.</p>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center mt-3">
         <ExampleGraph />
         <div className="text-left">
@@ -359,6 +378,10 @@ function Erklaerung() {
           <p className="text-slate-700 font-serif mt-2">
             <span className="text-red-700 font-semibold">y<sub>S</sub></span> = f(2) = 2² − 4 · 2 + 1 = 4 − 8 + 1 ={' '}
             <strong className="text-red-700">−3</strong>
+          </p>
+          <p className="text-slate-700 font-serif mt-2">
+            oder mit Formel: <span className="text-red-700 font-semibold">y<sub>S</sub></span> = 1 −
+            <Frac num="(−4)²" den="4 · 1" />= 1 − <Frac num="16" den="4" />= 1 − 4 = <strong className="text-red-700">−3</strong>
           </p>
           <p className="text-slate-800 font-bold mt-3">Der Scheitelpunkt ist S(2 | −3).</p>
         </div>
