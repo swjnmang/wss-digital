@@ -38,22 +38,22 @@ const menuItems = [
     icon: 'fa-solid fa-pencil',
   },
   {
-    title: '7. Scheitelpunkt berechnen',
-    description: 'Berechne den Scheitelpunkt aus der Normal- oder allgemeinen Form.',
+    title: '7. Umwandlung in Allg. Form',
+    description: 'Wandle die Scheitelpunktform in die allgemeine Form um.',
+    path: '/quadratische_funktionen/scheitel_in_allg_form',
+    icon: 'fa-solid fa-left-right',
+  },
+  {
+    title: '8. Scheitelpunkt berechnen',
+    description: 'Berechne den Scheitelpunkt aus der allgemeinen Form.',
     path: '/quadratische_funktionen/scheitelpunkt',
     icon: 'fa-solid fa-calculator',
   },
   {
-    title: '8. Umwandlung in Scheitelform',
+    title: '9. Umwandlung in Scheitelform',
     description: 'Forme die allgemeine Form in die Scheitelpunktform um.',
     path: '/quadratische_funktionen/scheitelform_rechnerisch',
     icon: 'fa-solid fa-right-left',
-  },
-  {
-    title: '9. Umwandlung in Allg. Form',
-    description: 'Wandle die Scheitelpunktform in die allgemeine Form um.',
-    path: '/quadratische_funktionen/scheitel_in_allg_form',
-    icon: 'fa-solid fa-left-right',
   },
   {
     title: '10. Funktionsgleichung aufstellen',
