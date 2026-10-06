@@ -44,6 +44,8 @@ export interface NameLine {
   type: 'name';
   id: string;
   caption: string;
+  /** Name des/der Vorgesetzten – darf nicht als eigener Name eingetragen werden. */
+  bossName?: string;
   placeholder?: string;
   explanation: string;
 }
@@ -83,6 +85,25 @@ function nameTokens(name: string): [string, string] | null {
 
 export function isValidName(name: string): boolean {
   return nameTokens(name) !== null;
+}
+
+/** Vor- und Nachname ohne Titel, klein geschrieben – zum Vergleichen zweier Namen. */
+function nameKey(name: string): string | null {
+  const tokens = nameTokens(name.replace(/\b(Dr|Prof)\.\s*/g, ''));
+  return tokens ? tokens.join(' ').toLowerCase() : null;
+}
+
+const PLATZHALTER_NAMEN = ['vorname nachname', 'max mustermann', 'erika mustermann', 'markus mustermann'];
+
+export type NameProblem = 'unvollstaendig' | 'vorgesetzter' | 'platzhalter';
+
+/** Prüft, ob ein eigener Vor- und Nachname eingetragen wurde (nicht der des Vorgesetzten, kein Platzhalter). */
+export function nameProblem(name: string, bossName?: string): NameProblem | null {
+  const key = nameKey(name);
+  if (!key) return 'unvollstaendig';
+  if (bossName && key === nameKey(bossName)) return 'vorgesetzter';
+  if (PLATZHALTER_NAMEN.includes(key)) return 'platzhalter';
+  return null;
 }
 
 /** Derives the "vorname.nachname" style initials for "Unser Zeichen", e.g. "Hans Schuster" -> "hs". */

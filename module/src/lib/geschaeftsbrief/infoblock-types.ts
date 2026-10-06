@@ -9,7 +9,7 @@ export type {
   TextLine as InfoblockTextLine,
   DateLine as InfoblockDateLine,
 } from './line-types';
-export { zeichenPattern, isValidName, deriveInitials, deriveEmail, isTodayGerman } from './line-types';
+export { zeichenPattern, isValidName, nameProblem, deriveInitials, deriveEmail, isTodayGerman } from './line-types';
 
 export type InfoblockLine = ChoiceLine | ZeichenLine | NameLine | EmailLine | TextLine | DateLine;
 

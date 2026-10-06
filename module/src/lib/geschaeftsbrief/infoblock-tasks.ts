@@ -45,6 +45,7 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
       {
         type: 'name',
         id: 'name',
+        bossName: 'Werner Volk',
         caption: 'Name',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
@@ -126,6 +127,7 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
       {
         type: 'name',
         id: 'name',
+        bossName: 'Sabine Roth',
         caption: 'Name',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
@@ -207,6 +209,7 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
       {
         type: 'name',
         id: 'name',
+        bossName: 'Thomas Berg',
         caption: 'Name',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
@@ -288,6 +291,7 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
       {
         type: 'name',
         id: 'name',
+        bossName: 'Petra Lang',
         caption: 'Name',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
@@ -369,6 +373,7 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
       {
         type: 'name',
         id: 'name',
+        bossName: 'Dr. Michael Ostermann',
         caption: 'Name',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein (ohne Titel) – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
@@ -450,6 +455,7 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
       {
         type: 'name',
         id: 'name',
+        bossName: 'Anna Krause',
         caption: 'Name',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
@@ -531,6 +537,7 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
       {
         type: 'name',
         id: 'name',
+        bossName: 'Frank Hartmann',
         caption: 'Name',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
@@ -612,6 +619,7 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
       {
         type: 'name',
         id: 'name',
+        bossName: 'Claudia Adler',
         caption: 'Name',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
@@ -693,6 +701,7 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
       {
         type: 'name',
         id: 'name',
+        bossName: 'Stefan Huber',
         caption: 'Name',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',
@@ -774,6 +783,7 @@ export const INFOBLOCK_TASKS: InfoblockTask[] = [
       {
         type: 'name',
         id: 'name',
+        bossName: 'Melanie Vogt',
         caption: 'Name',
         explanation:
           'Trage hier deinen eigenen Vor- und Nachnamen ein – daraus leiten sich dein Kürzel bei „Unser Zeichen“ und deine E-Mail-Adresse weiter unten ab.',

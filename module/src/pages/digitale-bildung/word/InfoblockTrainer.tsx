@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { INFOBLOCK_TASKS, getInfoblockTaskById } from '../../../lib/geschaeftsbrief/infoblock-tasks';
-import { isValidName, deriveInitials, deriveEmail, isTodayGerman } from '../../../lib/geschaeftsbrief/infoblock-types';
+import { nameProblem, deriveInitials, deriveEmail, isTodayGerman } from '../../../lib/geschaeftsbrief/infoblock-types';
 import { InfoblockTippsButton } from './InfoblockTipps';
 
 const difficultyLabel: Record<string, string> = {
@@ -17,6 +17,7 @@ export default function InfoblockTrainer() {
   const [values, setValues] = useState<Record<string, string>>({});
   const [checked, setChecked] = useState(false);
   const [loadedTaskId, setLoadedTaskId] = useState(taskId);
+  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!task) {
@@ -28,6 +29,7 @@ export default function InfoblockTrainer() {
     setLoadedTaskId(taskId);
     setValues({});
     setChecked(false);
+    setRevealed({});
   }
 
   if (!task) return null;
@@ -36,6 +38,10 @@ export default function InfoblockTrainer() {
   const nextTask = INFOBLOCK_TASKS[taskIndex + 1];
   const gradableLines = task.lines;
   const nameValue = values['name'] ?? '';
+  const nameLine = task.lines.find((line) => line.type === 'name');
+  const bossName = nameLine?.type === 'name' ? nameLine.bossName : undefined;
+  const currentNameProblem = nameProblem(nameValue, bossName);
+  const ownName = currentNameProblem === null;
 
   const changeGraded = (lineId: string, text: string) => {
     setValues((prev) => ({ ...prev, [lineId]: text }));
@@ -48,14 +54,17 @@ export default function InfoblockTrainer() {
       return value.trim() === line.expected.trim();
     }
     if (line.type === 'name') {
-      return isValidName(value);
+      return currentNameProblem === null;
     }
     if (line.type === 'zeichen') {
+      // Kürzel und E-Mail leiten sich vom eigenen Namen ab – mit dem Namen des Chefs sind sie nicht korrekt.
+      if (!ownName) return false;
       const studentInitials = deriveInitials(nameValue);
       if (!studentInitials) return false;
       return value.trim() === `${line.bossInitials}-${studentInitials}`;
     }
     if (line.type === 'email') {
+      if (!ownName) return false;
       const expected = deriveEmail(nameValue, line.domain);
       if (!expected) return false;
       return value.trim() === expected;
@@ -74,6 +83,43 @@ export default function InfoblockTrainer() {
   const allAnswered = task.lines.filter(isRequired).every((line) => (values[line.id] ?? '').trim() !== '');
   const correctCount = gradableLines.filter((line) => isLineCorrect(line)).length;
   const allCorrect = checked && correctCount === gradableLines.length;
+
+  const explanationOf = (line: (typeof task.lines)[number]): string => {
+    if (line.type === 'name' && currentNameProblem === 'vorgesetzter') {
+      return `${bossName} ist der Name deiner bzw. deines Vorgesetzten. Hier trägst du deinen EIGENEN Vor- und Nachnamen ein – du schreibst den Brief.`;
+    }
+    if (line.type === 'name' && currentNameProblem === 'platzhalter') {
+      return 'Das ist nur ein Platzhalter. Trage hier deinen EIGENEN Vor- und Nachnamen ein.';
+    }
+    if ((line.type === 'zeichen' || line.type === 'email') && checked && !ownName) {
+      return `${line.explanation} Korrigiere zuerst das Feld „Name“: Dort muss dein eigener Vor- und Nachname stehen.`;
+    }
+    return line.explanation;
+  };
+
+  const solutionOf = (line: (typeof task.lines)[number]): string => {
+    const today = new Date();
+    switch (line.type) {
+      case 'text':
+        return line.expected.trim() === '' ? '(Feld bleibt leer)' : line.expected;
+      case 'name':
+        return 'Dein eigener Vor- und Nachname, z. B. „Lisa Müller“' + (bossName ? ` – nicht ${bossName}` : '');
+      case 'zeichen': {
+        const initials = ownName ? deriveInitials(nameValue) : null;
+        return initials
+          ? `${line.bossInitials}-${initials}`
+          : `${line.bossInitials}-xy (xy = deine eigenen Initialen in Kleinbuchstaben)`;
+      }
+      case 'email': {
+        const email = ownName ? deriveEmail(nameValue, line.domain) : null;
+        return email ?? `vorname.nachname@${line.domain} mit deinem eigenen Namen in Kleinbuchstaben`;
+      }
+      case 'date':
+        return `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
+      case 'choice':
+        return line.options.find((option) => option.correct)?.text ?? '';
+    }
+  };
 
   const renderRow = (line: (typeof task.lines)[number]) => {
     const value = values[line.id] ?? '';
@@ -109,7 +155,27 @@ export default function InfoblockTrainer() {
                 correct ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
               }`}
             >
-              {line.explanation}
+              {explanationOf(line)}
+            </p>
+          </div>
+        )}
+        {showResult && !correct && !revealed[line.id] && (
+          <div className="grid grid-cols-[130px_1fr] gap-x-3">
+            <div />
+            <button
+              type="button"
+              onClick={() => setRevealed((prev) => ({ ...prev, [line.id]: true }))}
+              className="mt-1 justify-self-start text-xs font-semibold text-blue-700 hover:text-blue-900 underline"
+            >
+              💡 Lösung für dieses Feld anzeigen
+            </button>
+          </div>
+        )}
+        {revealed[line.id] && (
+          <div className="grid grid-cols-[130px_1fr] gap-x-3">
+            <div />
+            <p className="mt-1 text-xs rounded-lg px-3 py-2 bg-blue-50 text-blue-900">
+              Lösung: <span className="font-mono font-semibold">{solutionOf(line)}</span>
             </p>
           </div>
         )}
@@ -227,7 +293,8 @@ export default function InfoblockTrainer() {
           <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 text-center">
             <p className="text-amber-800 font-semibold">
               Noch nicht ganz richtig ({correctCount} / {gradableLines.length}). Korrigiere die rot markierten Felder
-              und klicke erneut auf „Prüfen“.
+              und klicke erneut auf „Prüfen“. Wenn du nicht weiterkommst, kannst du dir die Lösung einzelner Felder
+              anzeigen lassen.
             </p>
           </div>
         )}
