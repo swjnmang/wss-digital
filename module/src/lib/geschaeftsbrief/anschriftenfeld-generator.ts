@@ -61,15 +61,36 @@ const BRANCHEN = [
   'Sanitär', 'Spedition', 'Fahrradhaus', 'Reisebüro', 'Buchhandlung', 'Getränkehandel', 'Fliesenleger',
 ];
 const RECHTSFORMEN = ['GmbH', 'GmbH', 'KG', 'OHG', 'AG', 'GmbH & Co. KG'];
-const BERUFE: readonly (readonly [string, string])[] = [
-  ['Rechtsanwalt', 'Rechtsanwältin'], ['Steuerberater', 'Steuerberaterin'], ['Architekt', 'Architektin'],
-  ['Notar', 'Notarin'], ['Bürgermeister', 'Bürgermeisterin'], ['Direktor', 'Direktorin'], ['Apotheker', 'Apothekerin'],
+/** [männlich, weiblich, Anliegen, für das man sich an diese Person wendet] */
+const BERUFE: readonly (readonly [string, string, string])[] = [
+  ['Rechtsanwalt', 'Rechtsanwältin', 'einem Streit mit einem Lieferanten'],
+  ['Steuerberater', 'Steuerberaterin', 'der Umsatzsteuererklärung des Betriebs'],
+  ['Architekt', 'Architektin', 'dem geplanten Umbau der Werkstatt'],
+  ['Notar', 'Notarin', 'dem Kauf eines Grundstücks für eine neue Lagerhalle'],
+  ['Bürgermeister', 'Bürgermeisterin', 'einem Firmenjubiläum, das auf dem Marktplatz gefeiert werden soll'],
+  ['Direktor', 'Direktorin', 'einer geplanten Kooperation zur Ausbildung von Praktikanten'],
+  ['Apotheker', 'Apothekerin', 'der Ausstattung der betrieblichen Erste-Hilfe-Kästen'],
 ];
+/** Ämter mit Zuständigkeit (wie auf der Internetseite) und einem konkreten Anliegen des Betriebs. */
+const AEMTER: Record<string, readonly [string, string]> = {
+  Bürgeramt: ['Personalausweise, Reisepässe, Meldebescheinigungen', 'für den Firmeninhaber eine Meldebescheinigung anfordern'],
+  Ordnungsamt: ['Veranstaltungen und Verkaufsstände im öffentlichen Raum', 'einen Verkaufsstand beim Stadtfest anmelden'],
+  Bauamt: ['Bauanträge, Baugenehmigungen, Bebauungspläne', 'den Antrag für eine neue Lagerhalle einreichen'],
+  Gewerbeamt: ['An-, Um- und Abmeldung von Gewerbebetrieben', 'eine zweite Betriebsstätte anmelden'],
+  Standesamt: ['Geburten, Eheschließungen, Sterbefälle, Urkunden', 'eine Heiratsurkunde für die Personalakte anfordern'],
+  Umweltamt: ['Baumschutz, Gewässerschutz, Abfallrecht', 'eine Genehmigung zum Fällen einer alten Eiche auf dem Firmengelände beantragen'],
+  Zulassungsstelle: ['An-, Um- und Abmeldung von Kraftfahrzeugen', 'zwei neue Lieferwagen anmelden'],
+  Jugendamt: ['Kinder- und Jugendhilfe, Kindertagesbetreuung', 'sich über Zuschüsse für eine betriebliche Kinderbetreuung informieren'],
+  Gesundheitsamt: ['Infektionsschutz, Hygienebelehrungen, Trinkwasser', 'einen Termin für die Hygienebelehrung neuer Küchenkräfte vereinbaren'],
+  Einwohnermeldeamt: ['An- und Ummeldung des Wohnsitzes, Meldebescheinigungen', 'eine Meldebescheinigung für einen neuen Mitarbeiter anfordern'],
+};
 const BEHOERDEN: readonly (readonly [string, readonly string[]])[] = [
   ['Stadtverwaltung', ['Bürgeramt', 'Ordnungsamt', 'Bauamt', 'Gewerbeamt', 'Standesamt', 'Umweltamt']],
   ['Kreisverwaltung', ['Zulassungsstelle', 'Jugendamt', 'Gesundheitsamt', 'Bauamt']],
   ['Gemeindeverwaltung', ['Einwohnermeldeamt', 'Bauamt', 'Ordnungsamt']],
 ];
+const ABTEILUNGEN = ['Vertrieb', 'Einkauf', 'Kundenservice', 'Auftragsabwicklung', 'Projektleitung', 'Technischer Support'];
+const WOCHENTAGE = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
 
 /* ---------- Bausteine ---------- */
 
@@ -90,22 +111,127 @@ function person(withTitle: boolean): Person {
   };
 }
 
+/** Eine weitere Person als Ablenker, die nicht mit dem Empfänger verwechselt werden darf. */
+function anderePerson(p: Person): Person {
+  let q = person(rand() < 0.3);
+  while (q.first === p.first || q.last === p.last) q = person(rand() < 0.3);
+  return q;
+}
+
 const anredeOf = (p: Person) => (p.female ? 'Frau' : 'Herrn');
 const nameOf = (p: Person) => [p.title, p.first, p.last].filter(Boolean).join(' ');
-const boss = () => pick(['Dein Chef', 'Deine Chefin']);
+/** Bewusst im Nominativ („Herr“), damit die Anrede „Herrn“ selbst gebildet werden muss. */
+const kurzname = (p: Person) => [p.female ? 'Frau' : 'Herr', p.title, p.last].filter(Boolean).join(' ');
+
+/** Pronomen für eine Person, damit das Geschlecht nur aus dem Zusammenhang hervorgeht. */
+function pr(p: Person) {
+  return p.female
+    ? { er: 'sie', Er: 'Sie', ihn: 'sie', ihm: 'ihr', sein: 'ihr', seine: 'ihre', Seine: 'Ihre', seines: 'ihres', seiner: 'ihrer' }
+    : { er: 'er', Er: 'Er', ihn: 'ihn', ihm: 'ihm', sein: 'sein', seine: 'seine', Seine: 'Seine', seines: 'seines', seiner: 'seiner' };
+}
+
+interface Chef {
+  Nom: string;
+  nom: string;
+  er: string;
+  Er: string;
+  ihm: string;
+}
+
+function chef(): Chef {
+  return rand() < 0.5
+    ? { Nom: 'Dein Chef', nom: 'dein Chef', er: 'er', Er: 'Er', ihm: 'ihm' }
+    : { Nom: 'Deine Chefin', nom: 'deine Chefin', er: 'sie', Er: 'Sie', ihm: 'ihr' };
+}
 
 function hausnummer(): string {
   const n = randInt(1, 120);
   return rand() < 0.18 ? `${n} ${pick(['a', 'b', 'c'])}` : String(n);
 }
 
-function deutscheAdresse() {
-  const [ort, plz] = pick(CITIES);
-  return { strasse: `${pick(STREETS)} ${hausnummer()}`, plz, ort };
+interface Adresse {
+  strasseName: string;
+  nr: string;
+  strasse: string;
+  plz: string;
+  ort: string;
 }
 
-function firmenname(): string {
-  return `${pick(BRANCHEN)} ${pick(LAST)} ${pick(RECHTSFORMEN)}`;
+function deutscheAdresse(): Adresse {
+  const [ort, plz] = pick(CITIES);
+  const strasseName = pick(STREETS);
+  const nr = hausnummer();
+  return { strasseName, nr, strasse: `${strasseName} ${nr}`, plz, ort };
+}
+
+/** Andere Adresse in einem anderen Ort (z. B. alte Wohnung, Zweigstelle). */
+function andereAdresse(a: Adresse): Adresse {
+  let b = deutscheAdresse();
+  while (b.ort === a.ort) b = deutscheAdresse();
+  return b;
+}
+
+/** Andere Postleitzahl im selben Ort: Großstädte haben viele Postleitzahlen. */
+function nachbarPlz(plz: string): string {
+  return String(Number(plz) + randInt(2, 9)).padStart(5, '0');
+}
+
+/** Andere Adresse im selben Ort (z. B. Lager, Lieferadresse, Hausanschrift neben dem Postfach). */
+function nachbarAdresse(a: Adresse): Adresse {
+  let strasseName = pick(STREETS);
+  while (strasseName === a.strasseName) strasseName = pick(STREETS);
+  const nr = hausnummer();
+  return { strasseName, nr, strasse: `${strasseName} ${nr}`, plz: nachbarPlz(a.plz), ort: a.ort };
+}
+
+/** „in der Lindenstraße“, „im Birkenweg“, „am Marktplatz“ */
+function lage(strasseName: string): string {
+  if (/platz$/.test(strasseName)) return `am ${strasseName}`;
+  if (/weg$/.test(strasseName)) return `im ${strasseName}`;
+  return `in der ${strasseName}`;
+}
+
+/** Adresse als Fließtext in wechselnder, nicht sortierter Reihenfolge. */
+function adresseImText(a: Adresse): string {
+  return pick([
+    `${lage(a.strasseName)} ${a.nr} in ${a.ort} (Postleitzahl ${a.plz})`,
+    `in ${a.ort}, und zwar ${lage(a.strasseName)}, Hausnummer ${a.nr} – die Postleitzahl ist die ${a.plz}`,
+    `in ${a.plz} ${a.ort}, genauer gesagt ${lage(a.strasseName)} ${a.nr}`,
+    `${lage(a.strasseName)}, Hausnummer ${a.nr}, in ${a.ort}; die Postleitzahl lautet ${a.plz}`,
+  ]);
+}
+
+const telefon = () => `0${randInt(201, 999)} ${randInt(10000, 999999)}`;
+
+function slug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ü/g, 'ue')
+    .replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+interface Firma {
+  voll: string;
+  branche: string;
+  inhaber: string;
+  domain: string;
+}
+
+function firma(): Firma {
+  const branche = pick(BRANCHEN);
+  const inhaber = pick(LAST);
+  return { voll: `${branche} ${inhaber} ${pick(RECHTSFORMEN)}`, branche, inhaber, domain: `${slug(`${branche}-${inhaber}`)}.de` };
+}
+
+const mailOf = (p: Person, domain: string) => `${slug(p.first)}.${slug(p.last)}@${domain}`;
+
+/** Zwei Einträge in zufälliger Reihenfolge, damit die richtige Zeile nicht immer an derselben Stelle steht. */
+function gemischt<T>(a: T, b: T): [T, T] {
+  return rand() < 0.5 ? [a, b] : [b, a];
 }
 
 /** Postfachnummer von rechts in Zweiergruppen gliedern: 12345 -> "1 23 45". */
@@ -147,6 +273,8 @@ const EXPL = {
   beruf: 'Berufs- bzw. Amtsbezeichnungen stehen in derselben Zeile hinter der Anrede.',
   postfach:
     'Postfachnummern werden von rechts nach links in Zweiergruppen gegliedert. Bleibt eine einzelne Ziffer übrig, steht sie allein ganz vorne.',
+  postfachPlz:
+    'Für ein Postfach gilt eine eigene Postleitzahl, die sich von der Postleitzahl der Hausanschrift unterscheiden kann. Im Anschriftenfeld steht die Postleitzahl des Postfachs.',
   grossOrt: 'Der Bestimmungsort wird bei Auslandssendungen in GROSSBUCHSTABEN geschrieben.',
   grossLand: 'Das Bestimmungsland wird bei Auslandssendungen ebenfalls in GROSSBUCHSTABEN geschrieben.',
   vermerkReihenfolge:
@@ -177,20 +305,54 @@ const nextId = (kind: string) => `${kind}-${++zaehler}`;
 
 function privatperson(withTitle: boolean): AnschriftenfeldTask {
   const p = person(withTitle);
+  const g = pr(p);
   const a = deutscheAdresse();
+  const alt = andereAdresse(a);
+  const c = chef();
   const anlass = pick([
-    'einen Brief mit den versprochenen Unterlagen',
-    'eine Einladung zum Sommerfest',
+    'die versprochenen Unterlagen',
+    'eine Einladung zu unserem Sommerfest',
     'ein Dankeschreiben für die gute Zusammenarbeit',
-    'die Antwort auf eine private Anfrage',
-    'ein persönliches Glückwunschschreiben',
-    'die Rückmeldung zu einem Gebrauchtwagenkauf',
+    'die Antwort auf die Anfrage von letzter Woche',
+    'ein Glückwunschschreiben zum Geburtstag',
+    'die Unterlagen zum Gebrauchtwagenkauf',
   ]);
+  const variante = randInt(0, 2);
+  let arbeitsauftrag: string;
+
+  if (variante === 0) {
+    arbeitsauftrag =
+      `Auf deinem Schreibtisch liegt eine Telefonnotiz, die ${c.nom} für dich hinterlassen hat:\n\n` +
+      `„${pick(WOCHENTAGE)}, ${randInt(8, 16)}:${pick(['05', '15', '30', '45'])} Uhr – Anruf von ${kurzname(p)} (Vorname: ${p.first}), Tel. ${telefon()}.\n` +
+      `${g.Er} wartet noch auf ${anlass} – bitte per Post schicken! Achtung: ${g.Er} ist umgezogen. ` +
+      `Die alte Adresse ${lage(alt.strasseName)} ${alt.nr}, ${alt.plz} ${alt.ort} gilt nicht mehr. ` +
+      `Neu wohnt ${g.er} ${adresseImText(a)}.“\n\n` +
+      'Erstelle das vollständige Anschriftenfeld für den Brief.';
+  } else if (variante === 1) {
+    arbeitsauftrag =
+      `${c.Nom} leitet dir eine E-Mail weiter und schreibt dazu: „Bitte schick ${g.ihm} ${anlass} per Post – an die Privatadresse, nicht ins Büro!“\n\n` +
+      '„Guten Tag,\n' +
+      `vielen Dank für das nette Gespräch. Tagsüber erreichen Sie mich im Büro ${lage(alt.strasseName)} ${alt.nr} in ${alt.ort}. ` +
+      `Briefe schicken Sie aber bitte zu mir nach Hause: Ich wohne ${adresseImText(a)}.\n\n` +
+      `Viele Grüße\n${nameOf(p)}\nTel. ${telefon()}“\n\n` +
+      'Erstelle das vollständige Anschriftenfeld.';
+  } else {
+    const partner = anderePerson(p);
+    partner.female = !p.female;
+    partner.first = pick(partner.female ? FEMALE : MALE);
+    partner.title = undefined;
+    arbeitsauftrag =
+      `${c.Nom} erzählt dir: „Heute Morgen war ${kurzname(p)} bei uns – mit Vornamen heißt ${g.er} übrigens ${p.first}. ` +
+      `Bitte schick ${g.ihm} ${anlass}. ${g.Er} wohnt ${adresseImText(a)}. ` +
+      `${p.female ? 'Ihr Mann' : 'Seine Frau'}, ${partner.first} ${p.last}, war auch dabei, aber der Brief ist nur für ${g.ihn} persönlich.“\n\n` +
+      'Erstelle aus diesen Angaben das vollständige Anschriftenfeld.';
+  }
+
   return {
     id: nextId('privat'),
     title: withTitle ? 'Privatperson mit Titel' : 'Privatperson ohne Titel',
     difficulty: withTitle ? 'mittel' : 'einfach',
-    arbeitsauftrag: `${boss()} bittet dich, ${anlass} zu adressieren. Empfänger ist ${anredeOf(p)} ${nameOf(p)}, ${a.strasse}, ${a.plz} ${a.ort}. Erstelle das vollständige Anschriftenfeld.`,
+    arbeitsauftrag,
     senderLine: SENDER,
     lines: [
       ...personLines(p, 6),
@@ -202,14 +364,40 @@ function privatperson(withTitle: boolean): AnschriftenfeldTask {
 
 function berufsbezeichnung(): AnschriftenfeldTask {
   const p = person(rand() < 0.5);
-  const [m, f] = pick(BERUFE);
+  const g = pr(p);
+  const [m, f, thema] = pick(BERUFE);
   const beruf = p.female ? f : m;
+  const beiThema = `bei ${thema}`.replace(/^bei dem /, 'beim ');
   const a = deutscheAdresse();
+  const alt = andereAdresse(a);
+  const c = chef();
+  let arbeitsauftrag: string;
+
+  if (rand() < 0.5) {
+    const [buero1, buero2] = gemischt(
+      `Büro ${a.ort}: ${a.strasse} · ${a.plz} ${a.ort}`,
+      `Büro ${alt.ort}: ${alt.strasse} · ${alt.plz} ${alt.ort}`,
+    );
+    arbeitsauftrag =
+      `${c.Nom} braucht Unterstützung ${beiThema} und legt dir eine Visitenkarte auf den Tisch: ` +
+      `„Schreib bitte an ${g.ihn} persönlich – aber an das Büro in ${a.ort}, das in ${alt.ort} ist nur ${pick(WOCHENTAGE).toLowerCase()}s besetzt. ` +
+      'Die Berufsbezeichnung soll mit in die Anschrift.“\n\n' +
+      `${nameOf(p)}\n${beruf}\n${buero1}\n${buero2}\nTel. ${telefon()} · ${mailOf(p, `buero-${slug(p.last)}.de`)}\n\n` +
+      'Erstelle das vollständige Anschriftenfeld.';
+  } else {
+    const q = anderePerson(p);
+    arbeitsauftrag =
+      `${c.Nom} braucht Unterstützung ${beiThema}. Ein Geschäftspartner hat ${c.ihm} dafür ${p.female ? 'eine' : 'einen'} ${beruf} empfohlen: ${nameOf(p)}. ` +
+      `Laut Internetseite befindet sich das Büro ${adresseImText(a)}. ` +
+      `Am Telefon hat ${q.female ? 'die Sekretärin' : 'der Sekretär'}, ${kurzname(q)}, bestätigt, dass ${kurzname(p)} die Angelegenheit selbst übernimmt.\n\n` +
+      'Erstelle das vollständige Anschriftenfeld für den Brief an die zuständige Person. Die Berufsbezeichnung gehört mit in die Anschrift.';
+  }
+
   return {
     id: nextId('beruf'),
     title: 'Berufsbezeichnung in der Anschrift',
     difficulty: 'mittel',
-    arbeitsauftrag: `${boss()} benötigt fachlichen Rat und schreibt deshalb ${anredeOf(p)} ${beruf} ${nameOf(p)} an, ${p.female ? 'deren' : 'dessen'} Büro sich in der ${a.strasse} in ${a.plz} ${a.ort} befindet. Erstelle die vollständige Anschrift. Die Berufsbezeichnung gehört mit in die Anschrift.`,
+    arbeitsauftrag,
     senderLine: SENDER,
     lines: [
       line('anrede', 'Zeile 6 – Anrede Berufsbezeichnung', `${anredeOf(p)} ${beruf}`, EXPL.beruf),
@@ -221,24 +409,41 @@ function berufsbezeichnung(): AnschriftenfeldTask {
 }
 
 function firmaOhneAnsprechpartner(): AnschriftenfeldTask {
-  const firma = firmenname();
+  const fa = firma();
   const a = deutscheAdresse();
-  const anlass = pick([
-    'eine Anfrage',
-    'ein allgemeines Angebot',
-    'eine Reklamation',
-    'eine Bestellung',
-    'eine Bewerbung auf eine ausgeschriebene Stelle',
-  ]);
-  const chef = boss();
+  const lager = nachbarAdresse(a);
+  const gf = person(rand() < 0.3);
+  const c = chef();
+  const anlass = pick(['die Anfrage', 'das Angebot', 'die Reklamation', 'die Bestellung', 'die Bewerbung']);
+  let arbeitsauftrag: string;
+
+  if (rand() < 0.5) {
+    const [zeile1, zeile2] = gemischt(
+      `Postanschrift: ${a.strasse}, ${a.plz} ${a.ort}`,
+      `Lager und Warenannahme: ${lager.strasse}, ${lager.plz} ${lager.ort}`,
+    );
+    arbeitsauftrag =
+      `${c.Nom} möchte ${anlass} per Brief verschicken: „Wir kennen dort niemanden persönlich – schick es einfach an die Firma.“ ` +
+      'Die Angaben hast du aus dem Impressum der Internetseite kopiert:\n\n' +
+      `Impressum\n${fa.voll}\nGeschäftsführung: ${nameOf(gf)}\n${zeile1}\n${zeile2}\n` +
+      `Telefon: ${telefon()} · E-Mail: info@${fa.domain}\nRegistergericht: Amtsgericht ${a.ort}, HRB ${randInt(1000, 99999)}\n\n` +
+      'Erstelle das Anschriftenfeld.';
+  } else {
+    arbeitsauftrag =
+      `${c.Nom} erzählt dir: „In der Zeitung war eine Anzeige der ${fa.branche} ${fa.inhaber}. ` +
+      `Im Handelsregister ist das Unternehmen als ${fa.voll} eingetragen. Die sitzen ${adresseImText(a)}. ` +
+      `Als Inhaber wird ${kurzname(gf)} genannt, aber ${gf.female ? 'die' : 'den'} kenne ich nicht – ${anlass} soll ganz allgemein an das Unternehmen gehen.“\n\n` +
+      'Erstelle das Anschriftenfeld.';
+  }
+
   return {
     id: nextId('firma'),
     title: 'Unternehmen ohne Ansprechpartner',
     difficulty: 'einfach',
-    arbeitsauftrag: `${chef} möchte ${anlass} an das Unternehmen ${firma} schicken. Die Adresse lautet ${a.strasse}, ${a.plz} ${a.ort}. Einen persönlichen Ansprechpartner kennt ${chef === 'Dein Chef' ? 'er' : 'sie'} nicht. Erstelle das Anschriftenfeld.`,
+    arbeitsauftrag,
     senderLine: SENDER,
     lines: [
-      line('firma', 'Zeile 6 – Firma', firma, EXPL.firmaOhne),
+      line('firma', 'Zeile 6 – Firma', fa.voll, EXPL.firmaOhne),
       line('strasse', 'Zeile 7 – Straße Hausnummer', a.strasse, strasseExplanation(a.strasse)),
       line('ort', 'Zeile 8 – PLZ Ort', `${a.plz} ${a.ort}`, EXPL.ort),
     ],
@@ -246,18 +451,45 @@ function firmaOhneAnsprechpartner(): AnschriftenfeldTask {
 }
 
 function firmaMitAnsprechpartner(withTitle: boolean): AnschriftenfeldTask {
-  const firma = firmenname();
+  const fa = firma();
   const p = person(withTitle);
+  const g = pr(p);
+  const q = anderePerson(p);
   const a = deutscheAdresse();
-  const chef = boss();
+  const lieferung = nachbarAdresse(a);
+  const c = chef();
+  let arbeitsauftrag: string;
+
+  if (rand() < 0.5) {
+    const [zeile1, zeile2] = gemischt(
+      `Postanschrift: ${a.strasse}, ${a.plz} ${a.ort}`,
+      `Lieferadresse (nur Warenanlieferung): ${lieferung.strasse}, ${lieferung.plz} ${lieferung.ort}`,
+    );
+    arbeitsauftrag =
+      `${c.Nom} zeigt dir eine E-Mail, die heute eingegangen ist: „Antworte bitte per Brief – und zwar direkt an ${p.female ? 'die Verfasserin' : 'den Verfasser'} der Mail.“\n\n` +
+      '„Guten Tag,\n' +
+      `wie telefonisch besprochen, übernehme ich ab sofort die Bearbeitung Ihres Auftrags. ` +
+      `${q.female ? 'Meine Kollegin' : 'Mein Kollege'} ${nameOf(q)}, mit ${q.female ? 'der' : 'dem'} Sie bisher Kontakt hatten, ist in eine andere Abteilung gewechselt.\n\n` +
+      `Mit freundlichen Grüßen\n${nameOf(p)}\n${pick(ABTEILUNGEN)}\n\n` +
+      `${fa.voll}\n${zeile1}\n${zeile2}\nTel. ${telefon()} · ${mailOf(p, fa.domain)}“\n\n` +
+      'Erstelle das vollständige Anschriftenfeld.';
+  } else {
+    arbeitsauftrag =
+      `${c.Nom} kommt aus einem Telefonat und erzählt: „Ich hatte gerade die ${fa.voll} am Apparat. ` +
+      `Zuerst war ${kurzname(q)} aus der Zentrale dran, aber zuständig für unseren Auftrag ist ${kurzname(p)} – mit Vornamen ${p.first}. ` +
+      `Schreib bitte direkt an ${g.ihn}. Die Firma sitzt ${adresseImText(a)}. ` +
+      `Nicht verwechseln: ${lage(lieferung.strasseName)} ${lieferung.nr} (${lieferung.plz}) ist nur das Lager.“\n\n` +
+      'Erstelle das vollständige Anschriftenfeld.';
+  }
+
   return {
     id: nextId('firma-person'),
     title: withTitle ? 'Unternehmen mit Ansprechpartner und Titel' : 'Unternehmen mit Ansprechpartner',
     difficulty: withTitle ? 'schwer' : 'mittel',
-    arbeitsauftrag: `${chef} hat mit dem Unternehmen ${firma} (${a.strasse}, ${a.plz} ${a.ort}) telefoniert und dabei direkt mit ${anredeOf(p)} ${nameOf(p)} gesprochen, und ${p.female ? 'sie' : 'er'} wird die Angelegenheit bearbeiten. Der Brief soll gezielt an diese Person gehen. Erstelle das vollständige Anschriftenfeld.`,
+    arbeitsauftrag,
     senderLine: SENDER,
     lines: [
-      line('firma', 'Zeile 6 – Firma', firma, EXPL.firmaMit),
+      line('firma', 'Zeile 6 – Firma', fa.voll, EXPL.firmaMit),
       line('name', 'Zeile 7 – Anrede Titel Vorname Nachname', `${anredeOf(p)} ${nameOf(p)}`, EXPL.firmaPerson),
       line('strasse', 'Zeile 8 – Straße Hausnummer', a.strasse, strasseExplanation(a.strasse)),
       line('ort', 'Zeile 9 – PLZ Ort', `${a.plz} ${a.ort}`, EXPL.ort),
@@ -267,20 +499,44 @@ function firmaMitAnsprechpartner(withTitle: boolean): AnschriftenfeldTask {
 
 function postfach(): AnschriftenfeldTask {
   const p = person(rand() < 0.5);
+  const g = pr(p);
   const [ort, plz] = pick(CITIES);
+  const haus = nachbarAdresse({ strasseName: '', nr: '', strasse: '', plz, ort });
   const stellen = randInt(4, 6);
   const nummer = String(randInt(10 ** (stellen - 1), 10 ** stellen - 1));
   const ungerade = stellen % 2 === 1;
+  const c = chef();
+  let arbeitsauftrag: string;
+
+  if (rand() < 0.5) {
+    const [zeile1, zeile2] = gemischt(
+      `Hausanschrift: ${haus.strasse}, ${haus.plz} ${ort}`,
+      `Postanschrift: Postfach ${nummer}, ${plz} ${ort}`,
+    );
+    arbeitsauftrag =
+      `${c.Nom} muss vertrauliche Unterlagen an ${p.female ? 'eine Gutachterin' : 'einen Gutachter'} schicken: „Die Post wird dort ausschließlich über das Postfach angenommen.“ ` +
+      `Im Briefkopf ${g.seines} letzten Schreibens steht:\n\n` +
+      `${nameOf(p)}\nSachverständigenbüro\n${zeile1}\n${zeile2}\nTel. ${telefon()}\n\n` +
+      'Erstelle die vollständige Anschrift.';
+  } else {
+    arbeitsauftrag =
+      `${c.Nom} erzählt dir: „Ich habe ein Schreiben von ${nameOf(p)} bekommen und muss vertrauliche Unterlagen zurückschicken. ` +
+      `${g.Er} nimmt Post nur über ${g.sein} Postfach an, die Nummer ist die ${nummer}. ` +
+      `Die Hausanschrift ${lage(haus.strasseName)} ${haus.nr} hat die Postleitzahl ${haus.plz}, für das Postfach gilt aber die ${plz}. ` +
+      `Beides liegt natürlich in ${ort}.“\n\n` +
+      'Erstelle die vollständige Anschrift.';
+  }
+
   return {
     id: nextId('postfach'),
     title: ungerade ? 'Postfach mit ungerader Ziffernzahl' : 'Postfach',
     difficulty: ungerade ? 'schwer' : 'mittel',
-    arbeitsauftrag: `${boss()} schickt vertrauliche Unterlagen an ${anredeOf(p)} ${nameOf(p)}. Die Post wird dort ausschließlich über ein Postfach entgegengenommen: Postfach ${nummer}, ${plz} ${ort}. Erstelle die vollständige Anschrift.`,
+    arbeitsauftrag,
     senderLine: SENDER,
     lines: [
       ...personLines(p, 6),
       line('postfach', 'Zeile 8 – Postfach', `Postfach ${postfachGegliedert(nummer)}`, EXPL.postfach),
-      line('ort', 'Zeile 9 – PLZ Ort', `${plz} ${ort}`, EXPL.ort),
+      line('ort', 'Zeile 9 – PLZ Ort', `${plz} ${ort}`, `${EXPL.ort} ${EXPL.postfachPlz}`),
     ],
   };
 }
@@ -288,7 +544,11 @@ function postfach(): AnschriftenfeldTask {
 function vermerke(): AnschriftenfeldTask {
   const variante = pick(['privat', 'einschreiben-privat', 'einschreiben-rueckschein'] as const);
   const p = person(rand() < 0.4);
+  const g = pr(p);
   const a = deutscheAdresse();
+  const firmaAlt = andereAdresse(a);
+  const c = chef();
+  const bekannt = `${p.female ? 'einer langjährigen Bekannten' : 'einem langjährigen Bekannten'}, ${nameOf(p)},`;
   const zusatz: AnschriftLine[] = [];
   let anlass: string;
   let titel: string;
@@ -297,7 +557,7 @@ function vermerke(): AnschriftenfeldTask {
   if (variante === 'privat') {
     titel = 'Vermerk „Privat“';
     difficulty = 'mittel';
-    anlass = `${boss()} schreibt ${anredeOf(p)} ${nameOf(p)} einen persönlichen Brief zu einem sensiblen familiären Thema. Niemand anderes im Haushalt soll den Brief öffnen, bevor ${p.female ? 'die Empfängerin' : 'der Empfänger'} ihn selbst gelesen hat.`;
+    anlass = `${c.Nom} schreibt ${bekannt} einen persönlichen Brief zu einem sensiblen familiären Thema. Niemand anderes im Haushalt soll den Brief öffnen, bevor ${kurzname(p)} ihn selbst gelesen hat.`;
     zusatz.push(
       line('vermerk', 'Zusatz- und Vermerkzone – Zeile direkt über der Anschrift', 'Privat',
         'Der Vermerk „Privat“ weist zusätzlich auf das Briefgeheimnis hin: In Deutschland darf niemand einen an eine andere Person adressierten Brief öffnen.',
@@ -306,7 +566,7 @@ function vermerke(): AnschriftenfeldTask {
   } else if (variante === 'einschreiben-privat') {
     titel = 'Einschreiben und „Privat“ kombiniert';
     difficulty = 'schwer';
-    anlass = `${boss()} möchte ${anredeOf(p)} ${nameOf(p)} ein wichtiges persönliches Dokument zukommen lassen. Der Empfang soll nachweisbar sein, gleichzeitig soll aber niemand außer ${p.female ? 'der Empfängerin' : 'dem Empfänger'} selbst den Umschlag öffnen. Ergänze beide Vermerke in der richtigen Reihenfolge.`;
+    anlass = `${c.Nom} möchte ${bekannt} ein wichtiges persönliches Dokument zukommen lassen. Der Empfang soll nachweisbar sein, gleichzeitig soll aber niemand außer ${g.ihm} selbst den Umschlag öffnen.`;
     zusatz.push(
       line('vermerk1', 'Zusatz- und Vermerkzone – obere Zeile', 'Einschreiben', EXPL.vermerkReihenfolge, 'zusatz'),
       line('vermerk2', 'Zusatz- und Vermerkzone – untere Zeile (direkt über der Anschrift)', 'Privat', EXPL.vermerkReihenfolge, 'zusatz'),
@@ -314,7 +574,7 @@ function vermerke(): AnschriftenfeldTask {
   } else {
     titel = 'Einschreiben mit Rückschein';
     difficulty = 'schwer';
-    anlass = `${boss()} verschickt wichtige Unterlagen an ${anredeOf(p)} ${nameOf(p)}. Weil der Empfang zweifelsfrei nachgewiesen werden muss, soll der Brief als Einschreiben mit Rückschein verschickt werden. Ergänze zuerst die passenden postalischen Vermerke.`;
+    anlass = `${c.Nom} verschickt wichtige Unterlagen an ${p.female ? 'eine Vertragspartnerin' : 'einen Vertragspartner'}, ${nameOf(p)}. Der Empfang muss zweifelsfrei nachgewiesen werden – und zwar mit ${g.seiner} eigenen Unterschrift auf einer Karte, die an uns zurückgeschickt wird.`;
     zusatz.push(
       line('vermerk1', 'Zusatz- und Vermerkzone – obere Zeile', 'Einschreiben', EXPL.vermerkReihenfolge, 'zusatz'),
       line('vermerk2', 'Zusatz- und Vermerkzone – untere Zeile (direkt über der Anschrift)', 'mit Rückschein', EXPL.vermerkReihenfolge, 'zusatz'),
@@ -325,7 +585,10 @@ function vermerke(): AnschriftenfeldTask {
     id: nextId('vermerk'),
     title: titel,
     difficulty,
-    arbeitsauftrag: `${anlass} Die Anschrift lautet: ${a.strasse}, ${a.plz} ${a.ort}.`,
+    arbeitsauftrag:
+      `${anlass} ${g.Er} arbeitet ${lage(firmaAlt.strasseName)} ${firmaAlt.nr} in ${firmaAlt.ort}, der Brief soll aber an die Privatadresse gehen: ` +
+      `${g.Er} wohnt ${adresseImText(a)}.\n\n` +
+      'Erstelle das vollständige Anschriftenfeld und ergänze die passenden postalischen Vermerke.',
     senderLine: SENDER,
     lines: [
       ...zusatz,
@@ -341,18 +604,29 @@ function behoerde(): AnschriftenfeldTask {
   const abteilung = pick(stellen);
   const [ort, plz] = pick(CITIES);
   const strasse = `${pick(['Rathausplatz', 'Marktplatz', 'Am Markt', 'Schlossstraße', 'Hauptstraße'])} ${randInt(1, 30)}`;
+  const besucher = `${pick(['Bürgerzentrum, Kirchgasse', 'Verwaltungsgebäude, Bahnhofstraße', 'Servicecenter, Lindenallee'])} ${randInt(2, 40)}`;
   const name = `${art} ${ort}`;
+  const c = chef();
+  const liste = [...stellen]
+    .sort(() => rand() - 0.5)
+    .map((amt) => `• ${amt}: ${AEMTER[amt][0]}`)
+    .join('\n');
+  const [zeile1, zeile2] = gemischt(`Besucheradresse: ${besucher}`, `Postanschrift für Schreiben: ${strasse}, ${plz} ${ort}`);
   return {
     id: nextId('behoerde'),
     title: 'Behörde mit Fachabteilung',
     difficulty: 'einfach',
-    arbeitsauftrag: `${boss()} schickt Unterlagen an die ${name}, ${strasse}, ${plz} ${ort}. Zuständig ist dort die Stelle „${abteilung}“. Ein persönlicher Ansprechpartner ist nicht bekannt. Erstelle die Anschrift so, dass sowohl die Behörde als auch die zuständige Stelle erkennbar sind.`,
+    arbeitsauftrag:
+      `${c.Nom} möchte ${AEMTER[abteilung][1]} und bittet dich, das Schreiben an die richtige Stelle zu adressieren. ` +
+      `Einen persönlichen Ansprechpartner kennt ${c.er} nicht. Auf der Internetseite der ${name} findest du:\n\n` +
+      `${liste}\n\n${zeile1}\n${zeile2}\nÖffnungszeiten: Mo–Fr 8:00–12:00 Uhr\n\n` +
+      'Finde heraus, welche Stelle zuständig ist, und erstelle die Anschrift so, dass Behörde und zuständige Stelle erkennbar sind.',
     senderLine: SENDER,
     lines: [
       line('firma', 'Zeile 6 – Behörde', name,
         'Bei Behörden steht der Name der Institution wie eine Firmenbezeichnung in der ersten Zeile der Anschrift.'),
       line('abteilung', 'Zeile 7 – Abteilung', abteilung,
-        'Ist eine bestimmte Abteilung zuständig, aber kein persönlicher Ansprechpartner bekannt, wird die Abteilung in einer eigenen Zeile unter dem Namen der Institution genannt.'),
+        `Ist eine bestimmte Abteilung zuständig, aber kein persönlicher Ansprechpartner bekannt, wird die Abteilung in einer eigenen Zeile unter dem Namen der Institution genannt. Zuständig ist hier die Stelle „${abteilung}“ (${AEMTER[abteilung][0]}).`),
       line('strasse', 'Zeile 8 – Straße Hausnummer', strasse, EXPL.strasse),
       line('ort', 'Zeile 9 – PLZ Ort', `${plz} ${ort}`, EXPL.ort),
     ],
@@ -365,19 +639,28 @@ interface Land {
   key: string;
   landOriginal: string;
   landGross: string;
+  vorwahl: string;
+  domain: string;
   difficulty: AnschriftenfeldTask['difficulty'];
   strasseErklaerung: string;
-  adresse: () => { strasse: string; ortZeile: string; ortOriginal: string };
+  adresse: () => { strasse: string; ortZeile: string; ortOriginal: string; ort: string; plz: string };
 }
 
 const BUCHSTABEN = 'ABCDEFGHJKLMNPRSTVWXZ';
 const zufallsBuchstaben = (n: number) => Array.from({ length: n }, () => BUCHSTABEN[randInt(0, BUCHSTABEN.length - 1)]).join('');
+
+/** Ort und PLZ in der im Land üblichen Reihenfolge (PLZ vor dem Ort). */
+function ortAngaben(plz: string, ort: string) {
+  return { ortZeile: `${plz} ${ort.toUpperCase()}`, ortOriginal: `${plz} ${ort}`, ort, plz };
+}
 
 const LAENDER: readonly Land[] = [
   {
     key: 'oesterreich',
     landOriginal: 'Österreich',
     landGross: 'ÖSTERREICH',
+    vorwahl: '+43',
+    domain: 'at',
     difficulty: 'mittel',
     strasseErklaerung:
       'Die Struktur der Adresse richtet sich nach dem Bestimmungsland. Österreich behält die deutsche Reihenfolge Straße vor Hausnummer bei.',
@@ -385,8 +668,7 @@ const LAENDER: readonly Land[] = [
       const [plz, ort] = pick([['1010', 'Wien'], ['5020', 'Salzburg'], ['6020', 'Innsbruck'], ['8010', 'Graz'], ['4020', 'Linz']]);
       return {
         strasse: `${pick(['Mariahilfer Straße', 'Kärntner Straße', 'Landstraße', 'Bahnhofstraße', 'Schlossgasse', 'Ringstraße'])} ${randInt(1, 90)}`,
-        ortZeile: `${plz} ${ort.toUpperCase()}`,
-        ortOriginal: `${plz} ${ort}`,
+        ...ortAngaben(plz, ort),
       };
     },
   },
@@ -394,6 +676,8 @@ const LAENDER: readonly Land[] = [
     key: 'schweiz',
     landOriginal: 'Schweiz',
     landGross: 'SCHWEIZ',
+    vorwahl: '+41',
+    domain: 'ch',
     difficulty: 'mittel',
     strasseErklaerung:
       'Die Struktur der Adresse richtet sich nach dem Bestimmungsland. In der Schweiz steht die Hausnummer wie in Deutschland hinter der Straße.',
@@ -401,8 +685,7 @@ const LAENDER: readonly Land[] = [
       const [plz, ort] = pick([['8001', 'Zürich'], ['3011', 'Bern'], ['4001', 'Basel'], ['6003', 'Luzern'], ['9000', 'St. Gallen']]);
       return {
         strasse: `${pick(['Bahnhofstrasse', 'Seestrasse', 'Hauptstrasse', 'Dorfstrasse', 'Kirchgasse'])} ${randInt(1, 70)}`,
-        ortZeile: `${plz} ${ort.toUpperCase()}`,
-        ortOriginal: `${plz} ${ort}`,
+        ...ortAngaben(plz, ort),
       };
     },
   },
@@ -410,15 +693,15 @@ const LAENDER: readonly Land[] = [
     key: 'niederlande',
     landOriginal: 'Niederlande',
     landGross: 'NIEDERLANDE',
+    vorwahl: '+31',
+    domain: 'nl',
     difficulty: 'mittel',
     strasseErklaerung: 'Die Niederlande behalten wie Deutschland die Reihenfolge Straße vor Hausnummer bei.',
     adresse: () => {
       const [plz, ort] = pick([['1012', 'Amsterdam'], ['3011', 'Rotterdam'], ['3511', 'Utrecht'], ['2511', 'Den Haag'], ['5611', 'Eindhoven']]);
-      const vollePlz = `${plz} ${zufallsBuchstaben(2)}`;
       return {
         strasse: `${pick(['Kalverstraat', 'Herengracht', 'Oudegracht', 'Stationsweg', 'Keizersgracht'])} ${randInt(1, 120)}`,
-        ortZeile: `${vollePlz} ${ort.toUpperCase()}`,
-        ortOriginal: `${vollePlz} ${ort}`,
+        ...ortAngaben(`${plz} ${zufallsBuchstaben(2)}`, ort),
       };
     },
   },
@@ -426,6 +709,8 @@ const LAENDER: readonly Land[] = [
     key: 'frankreich',
     landOriginal: 'Frankreich',
     landGross: 'FRANKREICH',
+    vorwahl: '+33',
+    domain: 'fr',
     difficulty: 'schwer',
     strasseErklaerung:
       'Die Struktur der Adresse richtet sich nach dem Bestimmungsland. In Frankreich steht die Hausnummer vor der Straße.',
@@ -433,8 +718,7 @@ const LAENDER: readonly Land[] = [
       const [plz, ort] = pick([['75001', 'Paris'], ['69001', 'Lyon'], ['13001', 'Marseille'], ['67000', 'Strasbourg'], ['57000', 'Metz'], ['59000', 'Lille'], ['31000', 'Toulouse']]);
       return {
         strasse: `${randInt(1, 99)}, ${pick(['Rue de la Paix', 'Rue Victor Hugo', 'Rue Pasteur', 'Boulevard Voltaire', 'Rue de la République', 'Avenue Jean Jaurès', 'Rue St. Antoine'])}`,
-        ortZeile: `${plz} ${ort.toUpperCase()}`,
-        ortOriginal: `${plz} ${ort}`,
+        ...ortAngaben(plz, ort),
       };
     },
   },
@@ -442,6 +726,8 @@ const LAENDER: readonly Land[] = [
     key: 'grossbritannien',
     landOriginal: 'United Kingdom',
     landGross: 'GROSSBRITANNIEN',
+    vorwahl: '+44',
+    domain: 'co.uk',
     difficulty: 'schwer',
     strasseErklaerung:
       'In Großbritannien steht die Hausnummer wie in Frankreich vor dem Straßennamen, nicht dahinter wie in Deutschland.',
@@ -451,6 +737,8 @@ const LAENDER: readonly Land[] = [
         strasse: `${randInt(1, 99)} ${pick(['Baker Street', 'High Street', 'Station Road', 'Church Lane', 'Victoria Road', 'Queen Street'])}`,
         ortZeile: `${ort.toUpperCase()} ${plz}`,
         ortOriginal: `${ort} ${plz}`,
+        ort,
+        plz,
       };
     },
   },
@@ -458,6 +746,8 @@ const LAENDER: readonly Land[] = [
     key: 'italien',
     landOriginal: 'Italien',
     landGross: 'ITALIEN',
+    vorwahl: '+39',
+    domain: 'it',
     difficulty: 'mittel',
     strasseErklaerung:
       'Die Struktur der Adresse richtet sich nach dem Bestimmungsland. In Italien steht die Hausnummer wie in Deutschland hinter dem Straßennamen.',
@@ -465,8 +755,7 @@ const LAENDER: readonly Land[] = [
       const [plz, ort] = pick([['00184', 'Roma'], ['20121', 'Milano'], ['10121', 'Torino'], ['50122', 'Firenze'], ['40121', 'Bologna']]);
       return {
         strasse: `${pick(['Via Roma', 'Via Garibaldi', 'Corso Italia', 'Via Dante', 'Via Mazzini'])} ${randInt(1, 90)}`,
-        ortZeile: `${plz} ${ort.toUpperCase()}`,
-        ortOriginal: `${plz} ${ort}`,
+        ...ortAngaben(plz, ort),
       };
     },
   },
@@ -474,6 +763,8 @@ const LAENDER: readonly Land[] = [
     key: 'spanien',
     landOriginal: 'Spanien',
     landGross: 'SPANIEN',
+    vorwahl: '+34',
+    domain: 'es',
     difficulty: 'mittel',
     strasseErklaerung:
       'Die Struktur der Adresse richtet sich nach dem Bestimmungsland. In Spanien steht die Hausnummer wie in Deutschland hinter dem Straßennamen.',
@@ -481,8 +772,7 @@ const LAENDER: readonly Land[] = [
       const [plz, ort] = pick([['28013', 'Madrid'], ['08002', 'Barcelona'], ['46001', 'Valencia'], ['41001', 'Sevilla'], ['29015', 'Málaga']]);
       return {
         strasse: `${pick(['Calle Mayor', 'Calle de Alcalá', 'Avenida de la Constitución', 'Calle Real'])} ${randInt(1, 80)}`,
-        ortZeile: `${plz} ${ort.toUpperCase()}`,
-        ortOriginal: `${plz} ${ort}`,
+        ...ortAngaben(plz, ort),
       };
     },
   },
@@ -490,30 +780,50 @@ const LAENDER: readonly Land[] = [
 
 function ausland(land: Land, alsFirma: boolean): AnschriftenfeldTask {
   const a = land.adresse();
-  const originalAdresse = `${a.strasse}, ${a.ortOriginal}, ${land.landOriginal}`;
   const landLine = line('land', 'Bestimmungsland', land.landGross, EXPL.grossLand);
   const ortLine = line('ort', 'PLZ Bestimmungsort', a.ortZeile, EXPL.grossOrt);
   const strasseLine = line('strasse', 'Straße Hausnummer', a.strasse, land.strasseErklaerung);
-  const quelle = pick(['Auf der Visitenkarte', 'In der E-Mail-Signatur', 'Auf dem Briefkopf des letzten Schreibens']);
+  const tel = `${land.vorwahl} ${randInt(10, 99)} ${randInt(100000, 9999999)}`;
+  const landName = land.landOriginal === 'United Kingdom' ? 'Großbritannien' : land.landOriginal;
+  const c = chef();
 
   if (alsFirma) {
-    const firma = firmenname();
+    const fa = firma();
+    const gf = person(rand() < 0.3);
     return {
       id: nextId(`ausland-${land.key}`),
-      title: `Auslandsanschrift: ${land.landOriginal === 'United Kingdom' ? 'Großbritannien' : land.landOriginal} (Unternehmen)`,
+      title: `Auslandsanschrift: ${landName} (Unternehmen)`,
       difficulty: land.difficulty,
-      arbeitsauftrag: `${boss()} möchte dem Unternehmen ${firma} ein Angebot zusenden. Im letzten Schreiben des Unternehmens steht die Adresse „${originalAdresse}“. Ein persönlicher Ansprechpartner ist nicht bekannt. Übertrage die Auslandsanschrift korrekt in das Anschriftenfeld.`,
+      arbeitsauftrag:
+        `${c.Nom} möchte einem Unternehmen ein Angebot zusenden. Einen persönlichen Ansprechpartner kennt ${c.er} nicht. ` +
+        'In der Fußzeile des letzten Schreibens dieses Unternehmens steht:\n\n' +
+        `${fa.voll} · Geschäftsführung: ${nameOf(gf)} · ${a.strasse} · ${a.ortOriginal} · ${land.landOriginal} · Tel. ${tel} · www.${slug(`${fa.branche}-${fa.inhaber}`)}.${land.domain}\n\n` +
+        'Übertrage die Auslandsanschrift korrekt in das Anschriftenfeld.',
       senderLine: SENDER,
-      lines: [line('firma', 'Zeile 6 – Firma', firma, EXPL.firmaOhne), strasseLine, ortLine, landLine],
+      lines: [line('firma', 'Zeile 6 – Firma', fa.voll, EXPL.firmaOhne), strasseLine, ortLine, landLine],
     };
   }
 
   const p = person(false);
+  const g = pr(p);
+  const kundennummer = `K-${randInt(10000, 99999)}`;
+  const arbeitsauftrag =
+    rand() < 0.5
+      ? `${c.Nom} möchte ${p.female ? 'einer Kundin' : 'einem Kunden'} eine Broschüre schicken. Im Kundenverwaltungsprogramm findest du diesen Datensatz:\n\n` +
+        `Kundennummer: ${kundennummer}\nNachname: ${p.last}\nOrt: ${a.ort}\nAnrede: ${p.female ? 'Frau' : 'Herr'}\nLand: ${land.landOriginal}\n` +
+        `Straße/Hausnummer: ${a.strasse}\nVorname: ${p.first}\nPostleitzahl: ${a.plz}\nTelefon: ${tel}\n\n` +
+        'Übertrage diese Auslandsanschrift korrekt in das Anschriftenfeld.'
+      : `${c.Nom} hat auf einer Messe ${p.female ? 'eine Geschäftsfrau' : 'einen Geschäftsmann'} aus ${landName === 'Schweiz' ? 'der Schweiz' : landName === 'Niederlande' ? 'den Niederlanden' : landName} kennengelernt und möchte ${g.ihm} eine Broschüre an die Privatadresse schicken. ` +
+        `${g.Er} hat ${c.ihm} ${g.seine} Adresse auf einen Zettel geschrieben:\n\n` +
+        `„${p.first} ${p.last} – ${a.strasse}, ${a.ortOriginal}, ${land.landOriginal}. Handy: ${tel}“\n\n` +
+        `Auf ${g.seiner} Visitenkarte steht dagegen die Adresse ${g.seiner} Firma – die ist hier nicht gemeint. ` +
+        'Übertrage die Auslandsanschrift korrekt in das Anschriftenfeld.';
+
   return {
     id: nextId(`ausland-${land.key}`),
-    title: `Auslandsanschrift: ${land.landOriginal === 'United Kingdom' ? 'Großbritannien' : land.landOriginal}`,
+    title: `Auslandsanschrift: ${landName}`,
     difficulty: land.difficulty,
-    arbeitsauftrag: `${boss()} hat ${anredeOf(p)} ${nameOf(p)} kennengelernt und möchte eine Broschüre zusenden. ${quelle} steht die Adresse „${originalAdresse}“. Übertrage diese Auslandsanschrift korrekt in das Anschriftenfeld.`,
+    arbeitsauftrag,
     senderLine: SENDER,
     lines: [...personLines(p, 6), strasseLine, ortLine, landLine],
   };
