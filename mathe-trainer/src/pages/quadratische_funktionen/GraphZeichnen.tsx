@@ -1,215 +1,391 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
-declare global {
-  interface Window {
-    GGBApplet: any;
-  }
-}
+type Aufgabe = {
+    a: number;
+    b: number;
+    c: number;
+    xs: number;
+    ys: number;
+    xWerte: number[];
+    equation: string;
+};
+
+type Status = 'leer' | 'richtig' | 'vorzeichen' | 'falsch';
+
+const ANZAHL_AUFGABEN = 4;
+const LOB = ['Super, alles richtig!', 'Sehr gut gemacht!', 'Top, perfekt gerechnet!', 'Stark, das stimmt alles!', 'Klasse Arbeit!'];
+const LERNVIDEO_URL = 'https://www.youtube.com/watch?v=F93pr2hAqsA';
+const LERNVIDEO_EMBED_URL = 'https://www.youtube-nocookie.com/embed/F93pr2hAqsA';
+
+const generiereZufallszahl = (min: number, max: number) =>
+    Math.floor(Math.random() * (max - min + 1)) + min;
+
+const runde = (n: number) => Math.round(n * 100) / 100;
+
+/** Zahl mit deutschem Komma und echtem Minuszeichen */
+const zahl = (n: number) => {
+    const r = runde(n);
+    return (r < 0 ? '−' : '') + String(Math.abs(r)).replace('.', ',');
+};
+
+/** Zahl mit Rechenzeichen davor, z. B. "+ 3" oder "− 0,5" */
+const sgn = (n: number) => (n < 0 ? `− ${zahl(-n)}` : `+ ${zahl(n)}`);
+
+/** Negative Zahlen beim Einsetzen in Klammern */
+const klammer = (n: number) => (n < 0 ? `(${zahl(n)})` : zahl(n));
+
+/** Koeffizient vor x bzw. x² (1 und −1 werden weggelassen) */
+const koeff = (n: number) => (n === 1 ? '' : n === -1 ? '−' : zahl(n));
+
+const termText = (a: number, b: number, c: number) => {
+    let s = `${koeff(a)}x²`;
+    if (b !== 0) s += ` ${b < 0 ? '−' : '+'} ${koeff(Math.abs(b))}x`;
+    if (c !== 0) s += ` ${sgn(c)}`;
+    return s;
+};
+
+const funktionswert = (t: { a: number; b: number; c: number }, x: number) => runde(t.a * x * x + t.b * x + t.c);
+
+const baueAufgabe = (a: number, xs: number, ys: number, breite: number): Aufgabe => {
+    const b = -2 * a * xs;
+    const c = a * xs * xs + ys;
+    const xWerte = Array.from({ length: 2 * breite + 1 }, (_, i) => xs - breite + i);
+    return { a, b, c, xs, ys, xWerte, equation: `f(x) = ${termText(a, b, c)}` };
+};
+
+const BEISPIEL = baueAufgabe(1, 1, -4, 3);
+
+const erzeugeAufgabe = (): Aufgabe => {
+    const a = [-2, -1, -0.5, 0.5, 1, 2][generiereZufallszahl(0, 5)];
+    const xs = generiereZufallszahl(-2, 2);
+    const ys = generiereZufallszahl(-4, 4);
+    // Bei steilen Parabeln reichen 5 Werte, sonst 7 – so bleiben die y-Werte überschaubar.
+    return baueAufgabe(a, xs, ys, Math.abs(a) >= 2 ? 2 : 3);
+};
+
+// Die Aufgaben eines Durchgangs sind immer paarweise verschieden.
+const erzeugeAufgaben = () => {
+    const aufgaben = new Map<string, Aufgabe>();
+    while (aufgaben.size < ANZAHL_AUFGABEN) {
+        const t = erzeugeAufgabe();
+        aufgaben.set(t.equation, t);
+    }
+    return Array.from(aufgaben.values());
+};
+
+const leereEingaben = (aufgaben: Aufgabe[]) => aufgaben.map((t) => t.xWerte.map(() => ''));
+
+const parseZahl = (s: string) => {
+    const t = s.trim().replace(/[−–—‐]/g, '-').replace(',', '.');
+    return t === '' || t === '-' ? NaN : Number(t);
+};
+
+const bewerte = (eingabe: string, korrekt: number): Status => {
+    const wert = parseZahl(eingabe);
+    if (Number.isNaN(wert)) return 'leer';
+    if (Math.abs(wert - korrekt) < 1e-9) return 'richtig';
+    if (korrekt !== 0 && Math.abs(wert + korrekt) < 1e-9) return 'vorzeichen';
+    return 'falsch';
+};
+
+const farbKlasse = (status: Status) =>
+    status === 'richtig'
+        ? 'border-green-500 bg-green-50 text-green-800 focus:ring-green-500 focus:border-green-500'
+        : status === 'leer'
+          ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+          : 'border-red-500 bg-red-50 text-red-800 focus:ring-red-500 focus:border-red-500';
+
+/** Rechnung für einen x-Wert, z. B. f(−1) = 2·(−1)² − 4·(−1) + 1 = 2 + 4 + 1 = 7 */
+const einsetzen = (t: Aufgabe, x: number) => {
+    const { a, b, c } = t;
+    let links = `${a === 1 ? '' : a === -1 ? '−' : `${zahl(a)}·`}${klammer(x)}²`;
+    if (b !== 0) links += ` ${b < 0 ? '−' : '+'} ${Math.abs(b) === 1 ? '' : `${zahl(Math.abs(b))}·`}${klammer(x)}`;
+    if (c !== 0) links += ` ${sgn(c)}`;
+    const summanden = [a * x * x, ...(b !== 0 ? [b * x] : []), ...(c !== 0 ? [c] : [])];
+    const mitte = summanden.map((v, i) => (i === 0 ? zahl(v) : sgn(v))).join(' ');
+    const ergebnis = zahl(funktionswert(t, x));
+    return `f(${zahl(x)}) = ${links} = ${summanden.length > 1 ? `${mitte} = ` : ''}${ergebnis}`;
+};
+
+const Graph = ({ t }: { t: Aufgabe }) => {
+    const punkte = t.xWerte.map((x) => ({ x, y: funktionswert(t, x) }));
+    const xMin = Math.min(t.xWerte[0], 0) - 1;
+    const xMax = Math.max(t.xWerte[t.xWerte.length - 1], 0) + 1;
+    const yMin = Math.floor(Math.min(...punkte.map((p) => p.y), 0)) - 1;
+    const yMax = Math.ceil(Math.max(...punkte.map((p) => p.y), 0)) + 1;
+    const yStep = yMax - yMin <= 14 ? 1 : yMax - yMin <= 28 ? 2 : 5;
+
+    const W = 420;
+    const H = 360;
+    const R = 24;
+    const sx = (x: number) => R + ((x - xMin) / (xMax - xMin)) * (W - 2 * R);
+    const sy = (y: number) => H - R - ((y - yMin) / (yMax - yMin)) * (H - 2 * R);
+
+    const xTicks = Array.from({ length: xMax - xMin + 1 }, (_, i) => xMin + i);
+    const yTicks: number[] = [];
+    for (let y = Math.ceil(yMin / yStep) * yStep; y <= yMax; y += yStep) yTicks.push(y);
+
+    // Kurve nur im Bereich der Wertetabelle (plus etwas Rand) zeichnen
+    const kurve: string[] = [];
+    for (let x = t.xWerte[0] - 0.3; x <= t.xWerte[t.xWerte.length - 1] + 0.3; x += 0.05) {
+        const y = t.a * x * x + t.b * x + t.c;
+        if (y >= yMin && y <= yMax) kurve.push(`${sx(x).toFixed(1)},${sy(y).toFixed(1)}`);
+    }
+
+    return (
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-md mx-auto bg-white border border-gray-200 rounded-lg" role="img" aria-label={`Graph von ${t.equation}`}>
+            {xTicks.map((x) => (
+                <line key={`gx${x}`} x1={sx(x)} x2={sx(x)} y1={sy(yMin)} y2={sy(yMax)} stroke="#e5e7eb" />
+            ))}
+            {yTicks.map((y) => (
+                <line key={`gy${y}`} x1={sx(xMin)} x2={sx(xMax)} y1={sy(y)} y2={sy(y)} stroke="#e5e7eb" />
+            ))}
+            <line x1={sx(xMin)} x2={sx(xMax)} y1={sy(0)} y2={sy(0)} stroke="#374151" strokeWidth={1.5} />
+            <line x1={sx(0)} x2={sx(0)} y1={sy(yMin)} y2={sy(yMax)} stroke="#374151" strokeWidth={1.5} />
+            <text x={sx(xMax) - 4} y={sy(0) - 6} fontSize={13} textAnchor="end" fill="#374151">x</text>
+            <text x={sx(0) + 6} y={sy(yMax) + 12} fontSize={13} fill="#374151">y</text>
+            {xTicks.filter((x) => x !== 0 && x !== xMin && x !== xMax).map((x) => (
+                <text key={`lx${x}`} x={sx(x)} y={sy(0) + 14} fontSize={10} textAnchor="middle" fill="#6b7280">{zahl(x)}</text>
+            ))}
+            {yTicks.filter((y) => y !== 0 && y !== yMin && y !== yMax).map((y) => (
+                <text key={`ly${y}`} x={sx(0) - 5} y={sy(y) + 3} fontSize={10} textAnchor="end" fill="#6b7280">{zahl(y)}</text>
+            ))}
+            <polyline points={kurve.join(' ')} fill="none" stroke="#2563eb" strokeWidth={2.5} />
+            {punkte.map((p) => (
+                <circle key={p.x} cx={sx(p.x)} cy={sy(p.y)} r={4} fill="#dc2626" />
+            ))}
+        </svg>
+    );
+};
+
+const Wertetabelle = ({ t }: { t: Aufgabe }) => (
+    <div className="overflow-x-auto">
+        <table className="border-collapse text-gray-800 mx-auto">
+            <tbody>
+                <tr>
+                    <th className="border border-gray-300 bg-gray-200 px-3 py-1">x</th>
+                    {t.xWerte.map((x) => (
+                        <td key={x} className="border border-gray-300 px-3 py-1 text-center font-mono">{zahl(x)}</td>
+                    ))}
+                </tr>
+                <tr>
+                    <th className="border border-gray-300 bg-gray-200 px-3 py-1">f(x)</th>
+                    {t.xWerte.map((x) => (
+                        <td key={x} className="border border-gray-300 px-3 py-1 text-center font-mono">{zahl(funktionswert(t, x))}</td>
+                    ))}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+);
+
+const Loesungsweg = ({ t, anzahl, titel }: { t: Aufgabe; anzahl: number; titel?: string }) => {
+    const vollstaendig = anzahl >= t.xWerte.length;
+    return (
+        <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-800 mb-3">{titel ?? (vollstaendig ? 'Lösungsweg' : 'Tipp: Lösungsweg')}</h3>
+            <div className="overflow-x-auto"><table className="w-full border-collapse text-gray-700">
+                <tbody>
+                    {t.xWerte.slice(0, anzahl).map((x, i) => (
+                        <tr key={x} className="border border-gray-300">
+                            <td className="bg-gray-200 p-2 align-top border-r border-gray-300 whitespace-nowrap">
+                                {i + 1}. Wert: x = {zahl(x)} einsetzen
+                            </td>
+                            <td className="p-2 font-mono whitespace-nowrap">{einsetzen(t, x)}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table></div>
+            {vollstaendig && (
+                <>
+                    <p className="mt-4 mb-2 font-semibold text-gray-800">Fertige Wertetabelle:</p>
+                    <Wertetabelle t={t} />
+                    <p className="mt-4 mb-2 font-semibold text-gray-800">
+                        Punkte eintragen und zu einer glatten Kurve verbinden:
+                    </p>
+                    <Graph t={t} />
+                    <p className="mt-3 font-bold text-center bg-blue-100 rounded-md p-2">
+                        Scheitelpunkt S({zahl(t.xs)} | {zahl(t.ys)}) – die Parabel ist nach {t.a > 0 ? 'oben' : 'unten'} geöffnet.
+                    </p>
+                </>
+            )}
+        </div>
+    );
+};
 
 const GraphZeichnen = () => {
-    const [equation, setEquation] = useState<string>('');
-    const [params, setParams] = useState<{a: number, b: number, c: number} | null>(null);
-    const [showSolution, setShowSolution] = useState<boolean>(false);
-    const [tableData, setTableData] = useState<{x: number, y: number}[]>([]);
-    const [geoSize, setGeoSize] = useState<{ width: number; height: number }>({ width: 600, height: 500 });
-    
-    const ggbApiRef = useRef<any>(null);
-    const containerRef = useRef<HTMLDivElement | null>(null);
+    const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
+    const [eingaben, setEingaben] = useState<string[][]>([]);
+    const [tippSchritte, setTippSchritte] = useState<number[]>(Array(ANZAHL_AUFGABEN).fill(0));
 
-    const VIDEO_URL = "https://www.youtube.com/watch?v=jUJ9rB0XVy4";
-
-    const formatNumber = (num: number) => Math.round(num * 100) / 100;
-    const randomInt = (max: number, min: number = 0) => Math.floor(Math.random() * (max - min + 1)) + min;
-    const randomHalfInt = (max: number, min: number) => randomInt(max * 2, min * 2) / 2;
-
-    // Responsive sizing
-    useEffect(() => {
-        const calculateSize = () => {
-            if (!containerRef.current) return;
-            const parentWidth = containerRef.current.offsetWidth;
-            const size = Math.min(Math.max(parentWidth * 0.9, 300), 700);
-            setGeoSize({ width: size, height: size * 0.8 });
-        };
-
-        calculateSize();
-        window.addEventListener('resize', calculateSize);
-        return () => window.removeEventListener('resize', calculateSize);
-    }, []);
-
-    const generateNewTask = () => {
-        setShowSolution(false);
-        setTableData([]);
-
-        let a = randomHalfInt(3, -3);
-        while (Math.abs(a) < 0.2) {
-            a = randomHalfInt(3, -3);
-        }
-        
-        const b = randomHalfInt(3, -3);
-        const c = randomHalfInt(3, -3);
-
-        setParams({ a, b, c });
-
-        const a_str = (a === 1) ? "x²" : (a === -1) ? "-x²" : `${a}x²`;
-        const b_str = (b === 1) ? " + x" : (b === -1) ? " - x" : (b > 0) ? ` + ${b}x` : (b < 0) ? ` - ${Math.abs(b)}x` : "";
-        const c_str = (c > 0) ? ` + ${c}` : (c < 0) ? ` - ${Math.abs(c)}` : "";
-        
-        setEquation(`y = ${a_str}${b_str}${c_str}`);
-    };
-
-    const initializeGeoGebra = (a: number, b: number, c: number) => {
-        const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]');
-        
-        const initApplet = () => {
-            if (!window.GGBApplet) return;
-            
-            const params: any = {
-                appName: 'classic',
-                width: geoSize.width,
-                height: geoSize.height,
-                showToolBar: false,
-                showAlgebraInput: false,
-                showMenuBar: false,
-                perspective: 'G',
-                useBrowserForJS: true,
-                enableShiftDragZoom: true,
-                showResetIcon: true,
-                showZoomButtons: true,
-                appletOnLoad: (api: any) => {
-                    ggbApiRef.current = api;
-                    
-                    try {
-                        api.reset();
-                        const ggbEquation = `f(x) = ${a}*x^2 + ${b}*x + ${c}`;
-                        api.evalCommand(ggbEquation);
-                        api.setColor('f', 0, 0, 255);
-                        api.setLineThickness('f', 3);
-                    } catch (e) {
-                        console.error('GeoGebra error:', e);
-                    }
-                }
-            };
-
-            try {
-                const applet = new window.GGBApplet(params, true);
-                applet.inject('ggb-graph-zeichnen');
-            } catch (e) {
-                console.error('GeoGebra injection error:', e);
-            }
-        };
-
-        if (!existing) {
-            const script = document.createElement('script');
-            script.src = 'https://www.geogebra.org/apps/deployggb.js';
-            script.async = true;
-            script.onload = () => setTimeout(initApplet, 100);
-            document.body.appendChild(script);
-        } else if (window.GGBApplet) {
-            setTimeout(initApplet, 100);
-        }
+    const neueAufgaben = () => {
+        const neu = erzeugeAufgaben();
+        setAufgaben(neu);
+        setEingaben(leereEingaben(neu));
+        setTippSchritte(Array(ANZAHL_AUFGABEN).fill(0));
     };
 
     useEffect(() => {
-        generateNewTask();
+        neueAufgaben();
     }, []);
 
-    const showSolutionHandler = () => {
-        if (!params) return;
-        
-        setShowSolution(true);
-        
-        setTimeout(() => {
-            initializeGeoGebra(params.a, params.b, params.c);
-        }, 100);
+    const setEingabe = (i: number, j: number, wert: string) => {
+        setEingaben((prev) => prev.map((e, idx) => (idx === i ? e.map((v, k) => (k === j ? wert : v)) : e)));
+    };
 
-        const newTableData = [];
-        for (let x = -5; x <= 5; x += 0.5) {
-            const y = params.a * x * x + params.b * x + params.c;
-            newTableData.push({ x, y: formatNumber(y) });
-        }
-        setTableData(newTableData);
+    const zeigeVollstaendigeLoesung = (i: number) => {
+        setTippSchritte((prev) => prev.map((v, idx) => (idx === i ? aufgaben[i].xWerte.length : v)));
+    };
+
+    const naechsterTipp = (i: number) => {
+        setTippSchritte((prev) => prev.map((v, idx) => (idx === i ? Math.min(v + 1, aufgaben[i].xWerte.length) : v)));
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
-            <div className="container mx-auto px-4" ref={containerRef}>
-                <div className="max-w-6xl mx-auto">
-                    <h1 className="text-4xl font-bold mb-2 text-slate-800">Parabeln zeichnen (Allgemeine Form)</h1>
-                    <p className="text-slate-600 mb-6">Erstelle eine Wertetabelle und zeichne den Graph</p>
-                    
-                    <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 mb-6">
-                        <div className="mb-6">
-                            <p className="text-lg mb-4 text-slate-700">
-                                Zeichne den Graphen der folgenden Funktion in ein Koordinatensystem auf einem Blatt Papier. 
-                                Erstelle dazu eine Wertetabelle für den x-Bereich von -5 bis 5 mit einer Schrittweite von 0,5.
-                            </p>
-                            <div className="text-3xl font-mono text-center bg-blue-50 p-6 rounded-lg border-2 border-blue-400 text-blue-700 font-bold">
-                                {equation}
-                            </div>
-                        </div>
+        <div className="container mx-auto px-4 py-8">
+            <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-left">
+                <h1 className="text-3xl font-bold text-gray-800 mb-6">Graph einer Parabel zeichnen</h1>
 
-                        <div className="flex gap-4 justify-center flex-wrap mb-8">
-                            <button 
-                                onClick={generateNewTask}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-md"
-                            >
-                                Neue Aufgabe
-                            </button>
-                            <button 
-                                onClick={showSolutionHandler}
-                                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-md"
-                            >
-                                Lösung (Graph & Tabelle) anzeigen
-                            </button>
-                            <a 
-                                href={VIDEO_URL} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-colors shadow-md"
-                            >
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-                                </svg>
-                                Erklärvideo
-                            </a>
-                        </div>
-
-                        {showSolution && (
-                            <div className="grid lg:grid-cols-3 gap-6 animate-fade-in">
-                                <div className="lg:col-span-2">
-                                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                        <p className="text-lg font-bold text-slate-700 mb-4">Graph der Funktion:</p>
-                                        <div 
-                                            id="ggb-graph-zeichnen"
-                                            className="w-full bg-white rounded-lg border border-slate-200"
-                                            style={{ minHeight: '500px' }}
-                                        ></div>
-                                    </div>
-                                </div>
-                                <div className="lg:col-span-1">
-                                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 max-h-[500px] overflow-y-auto">
-                                        <p className="text-lg font-bold text-slate-700 mb-4">Wertetabelle:</p>
-                                        <table className="w-full text-center border-collapse text-sm">
-                                            <thead className="bg-blue-100 sticky top-0">
-                                                <tr>
-                                                    <th className="p-2 border border-slate-300 font-semibold">x</th>
-                                                    <th className="p-2 border border-slate-300 font-semibold">y</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {tableData.map((row, index) => (
-                                                    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-100'}>
-                                                        <td className="p-2 border border-slate-300">{row.x}</td>
-                                                        <td className="p-2 border border-slate-300">{row.y}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                <section className="flex flex-col gap-8 mb-10">
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-800 mb-3">So funktioniert&apos;s</h2>
+                        <p className="text-gray-700 mb-3">
+                            Um den Graphen einer quadratischen Funktion <span className="font-mono">f(x) = ax² + bx + c</span> zu
+                            zeichnen, legst du eine Wertetabelle an:
+                        </p>
+                        <ol className="list-decimal pl-6 text-gray-700 mb-3 space-y-1">
+                            <li>Wähle mehrere x-Werte (am besten rund um den Scheitelpunkt).</li>
+                            <li>
+                                Setze jeden x-Wert in die Funktion ein und berechne y. Negative Zahlen setzt du in Klammern –
+                                denn <span className="font-mono">(−2)² = 4</span>. Rechne zuerst die Potenz, dann Punkt vor Strich.
+                            </li>
+                            <li>Trage die Punkte (x | y) in ein Koordinatensystem ein.</li>
+                            <li>Verbinde die Punkte mit einer glatten, gebogenen Kurve – nicht mit dem Lineal!</li>
+                        </ol>
+                        <p className="text-gray-700 mb-3">
+                            <strong>Beispiel:</strong> <span className="font-mono">{BEISPIEL.equation}</span>
+                        </p>
+                        <Loesungsweg t={BEISPIEL} anzahl={BEISPIEL.xWerte.length} titel="Beispiel: Lösungsweg" />
                     </div>
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-800 mb-3">Lernvideo</h2>
+                        <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
+                            <iframe
+                                className="absolute inset-0 w-full h-full rounded-lg"
+                                src={LERNVIDEO_EMBED_URL}
+                                title="Lernvideo: Graph einer Parabel zeichnen"
+                                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                            />
+                        </div>
+                        <a
+                            href={LERNVIDEO_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block mt-2 text-sm text-blue-700 underline hover:text-blue-900"
+                        >
+                            Video auf YouTube öffnen
+                        </a>
+                    </div>
+                </section>
+
+                <h2 className="text-xl font-semibold text-gray-800 mb-2">Deine Aufgaben</h2>
+                <p className="text-gray-600 mb-6">
+                    Vervollständige für jede Funktion die Wertetabelle. Rechne im Heft und trage die y-Werte ein (Dezimalzahlen
+                    mit Komma, z. B. 2,5). Richtige Werte werden sofort grün, falsche rot. Zeichne anschließend den Graphen in
+                    dein Heft. Mit „Vollständige Lösung anzeigen“ kannst du deinen Graphen vergleichen.
+                </p>
+
+                <div className="flex flex-col gap-6">
+                    {aufgaben.map((t, i) => {
+                        const status = t.xWerte.map((x, j) => bewerte(eingaben[i]?.[j] ?? '', funktionswert(t, x)));
+                        const alleRichtig = status.every((s) => s === 'richtig');
+                        return (
+                            <div key={i} className="border border-gray-200 rounded-lg p-4">
+                                <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-md mb-4">
+                                    <span className="font-semibold text-gray-700 mr-2">Aufgabe {i + 1}:</span>
+                                    <span className="text-xl font-mono tracking-wider text-blue-900">{t.equation}</span>
+                                </div>
+
+                                <div className="overflow-x-auto">
+                                    <table className="border-collapse text-gray-800">
+                                        <tbody>
+                                            <tr>
+                                                <th className="border border-gray-300 bg-gray-200 px-3 py-2">x</th>
+                                                {t.xWerte.map((x) => (
+                                                    <td key={x} className="border border-gray-300 px-2 py-2 text-center font-mono">{zahl(x)}</td>
+                                                ))}
+                                            </tr>
+                                            <tr>
+                                                <th className="border border-gray-300 bg-gray-200 px-3 py-2">f(x)</th>
+                                                {t.xWerte.map((x, j) => (
+                                                    <td key={x} className="border border-gray-300 p-1">
+                                                        <input
+                                                            type="text"
+                                                            inputMode="decimal"
+                                                            aria-label={`f(${zahl(x)})`}
+                                                            value={eingaben[i]?.[j] ?? ''}
+                                                            onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                                                                setEingabe(i, j, ev.target.value)
+                                                            }
+                                                            className={`block w-16 p-1 text-center border-2 rounded-md shadow-sm ${farbKlasse(status[j])}`}
+                                                        />
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {status.includes('vorzeichen') && (
+                                    <p className="mt-2 text-sm text-red-600 font-semibold">
+                                        Fast! Bei mindestens einem Wert ist nur das Vorzeichen falsch. Denk an die Klammern bei
+                                        negativen x-Werten.
+                                    </p>
+                                )}
+
+                                {alleRichtig && (
+                                    <div className="mt-3 p-3 bg-green-100 border border-green-400 rounded-md text-green-900 font-semibold">
+                                        🎉 {LOB[i % LOB.length]} Zeichne jetzt die Punkte in dein Koordinatensystem und verbinde
+                                        sie zu einer Parabel.{' '}
+                                        {i < aufgaben.length - 1
+                                            ? `Danach geht's weiter mit Aufgabe ${i + 2}!`
+                                            : `Danach hast du alle Aufgaben geschafft – klicke unten auf „${ANZAHL_AUFGABEN} neue Aufgaben“, um weiterzuüben.`}
+                                    </div>
+                                )}
+
+                                <div className="flex flex-wrap gap-3 mt-3">
+                                    {tippSchritte[i] < t.xWerte.length && (
+                                        <>
+                                            <button
+                                                onClick={() => naechsterTipp(i)}
+                                                className="bg-yellow-100 text-yellow-900 font-bold py-2 px-5 rounded-lg hover:bg-yellow-200 transition-colors duration-200"
+                                            >
+                                                {tippSchritte[i] === 0 ? 'Tipp anzeigen' : 'Nächsten Tipp anzeigen'}
+                                            </button>
+                                            <button
+                                                onClick={() => zeigeVollstaendigeLoesung(i)}
+                                                className="bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+                                            >
+                                                Vollständige Lösung anzeigen
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+
+                                {tippSchritte[i] > 0 && <Loesungsweg t={t} anzahl={tippSchritte[i]} />}
+                            </div>
+                        );
+                    })}
+                </div>
+
+                <div className="flex justify-center mt-8">
+                    <button
+                        onClick={neueAufgaben}
+                        className="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                    >
+                        {ANZAHL_AUFGABEN} neue Aufgaben
+                    </button>
                 </div>
             </div>
         </div>
