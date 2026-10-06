@@ -68,6 +68,7 @@ import Proportional from './pages/lineare_funktionen/Proportional'
 import WasIstLinear from './pages/lineare_funktionen/WasIstLinear'
 import ParallelSenkrecht from './pages/lineare_funktionen/ParallelSenkrecht'
 import ExerciseSheetGenerator from './pages/lineare_funktionen/ExerciseSheetGenerator'
+import WerWirdMillionaer from './pages/lineare_funktionen/WerWirdMillionaer'
 // Finanzmathe
 import FinanzmatheIndex from './pages/FinanzmatheIndex';
 import ZinsrechnungMenu from './pages/finanzmathe/ZinsrechnungMenu';
@@ -327,6 +328,7 @@ export default function App() {
           <Route path="/lineare_funktionen/spiel_muenzen" element={<SpielMuenzen />} />
           <Route path="/lineare_funktionen/test" element={<TestLF />} />
           <Route path="/lineare_funktionen/ubungsblatt-generator" element={<ExerciseSheetGenerator />} />
+          <Route path="/lineare_funktionen/wer_wird_millionaer" element={<WerWirdMillionaer />} />
           
           <Route path="/finanzmathe" element={<FinanzmatheIndex />} />
           <Route path="/finanzmathe/zinsrechnung" element={<ZinsrechnungMenu />} />

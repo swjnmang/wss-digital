@@ -51,6 +51,7 @@ const routes = [
   { path: '/lineare_funktionen/anwendungsaufgaben/tipi', priority: 0.8, changefreq: 'monthly' },
   { path: '/lineare_funktionen/anwendungsaufgaben/berg', priority: 0.8, changefreq: 'monthly' },
   { path: '/lineare_funktionen/test', priority: 0.7, changefreq: 'monthly' },
+  { path: '/lineare_funktionen/wer_wird_millionaer', priority: 0.6, changefreq: 'monthly' },
 
   // Finanzmathe
   { path: '/finanzmathe', priority: 0.9, changefreq: 'monthly' },
