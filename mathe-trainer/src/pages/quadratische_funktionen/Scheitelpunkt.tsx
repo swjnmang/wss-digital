@@ -195,11 +195,17 @@ function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps
   const [solved, setSolved] = useState(false)
   const [praise, setPraise] = useState(PRAISE[0])
   const [showSolution, setShowSolution] = useState(false)
+  // Lösung erst nach einem eigenen, falschen Versuch (bleibt danach für die Aufgabe freigeschaltet)
+  const [triedWrong, setTriedWrong] = useState(false)
 
   const xStatus = getStatus(xIn, task.xs)
   const yStatus = getStatus(yIn, task.ys)
   const bothRight = xStatus === 'right' && yStatus === 'right'
   const anyWrong = xStatus === 'wrong' || yStatus === 'wrong'
+
+  useEffect(() => {
+    if (anyWrong) setTriedWrong(true)
+  }, [anyWrong])
 
   useEffect(() => {
     if (solved) return
@@ -225,10 +231,12 @@ function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps
     setYIn('')
     setSolved(false)
     setShowSolution(false)
+    setTriedWrong(false)
     onSolvedChange(false)
   }
 
   function onShowSolution() {
+    if (!triedWrong) return
     setShowSolution(true)
     onHelp()
   }
@@ -276,8 +284,18 @@ function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps
 
       <div className="flex flex-wrap justify-center gap-3 mt-6">
         <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
-        <button onClick={onShowSolution} className={btnSecondary}>Lösung anzeigen</button>
+        <button
+          onClick={onShowSolution}
+          disabled={!triedWrong}
+          title={triedWrong ? undefined : 'Versuche die Aufgabe zuerst selbst.'}
+          className={`${btnSecondary} disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white`}
+        >
+          Lösung anzeigen
+        </button>
       </div>
+      {!triedWrong && !solved && (
+        <p className="mt-2 text-sm text-slate-500">Die Lösung kannst du dir anzeigen lassen, sobald du die Aufgabe selbst versucht hast.</p>
+      )}
 
       {showSolution && <SolutionSteps task={task} />}
     </div>

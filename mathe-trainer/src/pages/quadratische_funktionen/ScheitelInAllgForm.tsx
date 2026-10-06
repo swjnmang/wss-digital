@@ -194,11 +194,14 @@ const ScheitelInAllgForm = () => {
     const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
     const [eingaben, setEingaben] = useState<Eingabe[]>(leereEingaben());
     const [tippSchritte, setTippSchritte] = useState<number[]>(Array(ANZAHL_AUFGABEN).fill(0));
+    // Musterlösung erst nach einem eigenen, falschen Versuch (bleibt danach für die Aufgabe freigeschaltet)
+    const [freigeschaltet, setFreigeschaltet] = useState<boolean[]>(Array(ANZAHL_AUFGABEN).fill(false));
 
     const neueAufgaben = (l: Level) => {
         setAufgaben(erzeugeAufgaben(l));
         setEingaben(leereEingaben());
         setTippSchritte(Array(ANZAHL_AUFGABEN).fill(0));
+        setFreigeschaltet(Array(ANZAHL_AUFGABEN).fill(false));
     };
 
     const waehleLevel = (l: Level | null) => {
@@ -209,14 +212,21 @@ const ScheitelInAllgForm = () => {
 
     const setEingabe = (i: number, feld: Feld, wert: string) => {
         setEingaben((prev) => prev.map((e, idx) => (idx === i ? { ...e, [feld]: wert } : e)));
+        const status = aufgaben[i] ? bewerte(wert, aufgaben[i][feld]) : 'leer';
+        if (status === 'falsch' || status === 'vorzeichen') {
+            setFreigeschaltet((prev) => prev.map((v, idx) => (idx === i ? true : v)));
+        }
     };
 
     const zeigeVollstaendigeLoesung = (i: number) => {
+        if (!freigeschaltet[i]) return;
         setTippSchritte((prev) => prev.map((v, idx) => (idx === i ? ANZAHL_SCHRITTE : v)));
     };
 
     const naechsterTipp = (i: number) => {
-        setTippSchritte((prev) => prev.map((v, idx) => (idx === i ? Math.min(v + 1, ANZAHL_SCHRITTE) : v)));
+        // Der letzte Schritt enthält das Ergebnis und zählt deshalb zur Musterlösung
+        const max = freigeschaltet[i] ? ANZAHL_SCHRITTE : ANZAHL_SCHRITTE - 1;
+        setTippSchritte((prev) => prev.map((v, idx) => (idx === i ? Math.min(v + 1, max) : v)));
     };
 
     const ueberschrift = <h1 className="text-3xl font-bold text-gray-800 mb-6">Von der Scheitelform zur allgemeinen Form</h1>;
@@ -368,21 +378,32 @@ const ScheitelInAllgForm = () => {
                             <div className="flex flex-wrap gap-3 mt-3">
                                 {tippSchritte[i] < ANZAHL_SCHRITTE && (
                                     <>
-                                        <button
-                                            onClick={() => naechsterTipp(i)}
-                                            className="bg-yellow-100 text-yellow-900 font-bold py-2 px-5 rounded-lg hover:bg-yellow-200 transition-colors duration-200"
-                                        >
-                                            {tippSchritte[i] === 0 ? 'Tipp anzeigen' : 'Nächsten Tipp anzeigen'}
-                                        </button>
+                                        {(freigeschaltet[i] || tippSchritte[i] < ANZAHL_SCHRITTE - 1) && (
+                                            <button
+                                                onClick={() => naechsterTipp(i)}
+                                                className="bg-yellow-100 text-yellow-900 font-bold py-2 px-5 rounded-lg hover:bg-yellow-200 transition-colors duration-200"
+                                            >
+                                                {tippSchritte[i] === 0 ? 'Tipp anzeigen' : 'Nächsten Tipp anzeigen'}
+                                            </button>
+                                        )}
                                         <button
                                             onClick={() => zeigeVollstaendigeLoesung(i)}
-                                            className="bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+                                            disabled={!freigeschaltet[i]}
+                                            title={freigeschaltet[i] ? undefined : 'Versuche die Aufgabe zuerst selbst.'}
+                                            className="bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg hover:bg-gray-300 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-200"
                                         >
                                             Vollständige Lösung anzeigen
                                         </button>
                                     </>
                                 )}
                             </div>
+                            {!freigeschaltet[i] &&
+                                tippSchritte[i] < ANZAHL_SCHRITTE &&
+                                !(['a', 'b', 'c'] as const).every((f) => bewerte(eingaben[i]?.[f] ?? '', t[f]) === 'richtig') && (
+                                <p className="mt-2 text-sm text-gray-500">
+                                    Die Musterlösung kannst du dir anzeigen lassen, sobald du die Aufgabe selbst versucht hast.
+                                </p>
+                            )}
 
                             {tippSchritte[i] > 0 && <Loesungsweg t={t} anzahl={tippSchritte[i]} />}
                         </div>
