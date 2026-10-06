@@ -108,6 +108,7 @@ import FunktionsgleichungAufstellen from './pages/quadratische_funktionen/Funkti
 import NullstellenQF from './pages/quadratische_funktionen/Nullstellen';
 import SchnittpunkteQF from './pages/quadratische_funktionen/Schnittpunkte';
 import Schnittpunkte2QF from './pages/quadratische_funktionen/Schnittpunkte2';
+import SchnittpunkteGeradeQF from './pages/quadratische_funktionen/SchnittpunkteGerade';
 import SpielNullstellenQF from './pages/quadratische_funktionen/SpielNullstellen';
 import AbschlusstestQF from './pages/quadratische_funktionen/Abschlusstest';
 // Trigonometrie
@@ -366,8 +367,8 @@ export default function App() {
           <Route path="/quadratische_funktionen/scheitel_in_allg_form" element={<ScheitelInAllgForm />} />
           <Route path="/quadratische_funktionen/funktionsgleichung_aufstellen" element={<FunktionsgleichungAufstellen />} />
           <Route path="/quadratische_funktionen/nullstellen" element={<NullstellenQF />} />
-          <Route path="/quadratische_funktionen/schnittpunkte" element={<SchnittpunkteQF />} />
-          <Route path="/quadratische_funktionen/schnittpunkte_gerade" element={<SchnittpunkteQF initialTaskType="line-parabola" />} />
+          <Route path="/quadratische_funktionen/schnittpunkte" element={<SchnittpunkteGeradeQF />} />
+          <Route path="/quadratische_funktionen/schnittpunkte_gerade" element={<SchnittpunkteGeradeQF />} />
           <Route path="/quadratische_funktionen/schnittpunkte_parabel" element={<SchnittpunkteQF initialTaskType="parabola-parabola" />} />
           <Route path="/quadratische_funktionen/schnittpunkte2" element={<Schnittpunkte2QF />} />
           <Route path="/quadratische_funktionen/spiel_nullstellen" element={<SpielNullstellenQF />} />

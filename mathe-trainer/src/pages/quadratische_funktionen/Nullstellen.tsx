@@ -1,8 +1,45 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import katex from 'katex'
-import 'katex/dist/katex.min.css'
-import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import {
+  BLUE,
+  GREEN,
+  HALVES,
+  MitternachtsSteps,
+  PRAISE,
+  type AnswerStatus,
+  type Q,
+  RED,
+  StepTable,
+  Steps,
+  Tex,
+  Video,
+  add,
+  btnPrimary,
+  btnSecondary,
+  coeff,
+  discriminant,
+  eqQ,
+  isIncomplete,
+  isInt,
+  mul,
+  neg,
+  panel,
+  parseAnswer,
+  pick,
+  polyTex,
+  q,
+  randomInt,
+  shuffle,
+  solveQuadratic,
+  sqrtQ,
+  sqrtTex,
+  statusBorder,
+  tn,
+  tq,
+  tqp,
+  val,
+  vertexTex,
+} from './quadratischShared'
 
 // Sechs Aufgaben gleichzeitig auf der Seite
 const TOTAL_TASKS = 6
@@ -17,114 +54,6 @@ type Count = 0 | 1 | 2
 
 const LEVEL_LABEL: Record<Level, string> = { einfach: 'Einfach', fortgeschritten: 'Fortgeschritten' }
 
-const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
-const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
-const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
-
-const PRAISE = [
-  'Richtig! Super gemacht!',
-  'Klasse, das stimmt!',
-  'Perfekt gelöst!',
-  'Sehr gut, weiter so!',
-  'Stark! Genau richtig!',
-  'Prima, du hast es drauf!',
-]
-
-const GREEN = '#15803d'
-const RED = '#b91c1c'
-
-function randomInt(max: number, min = 0) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
-function pick<T>(list: readonly T[]): T {
-  return list[Math.floor(Math.random() * list.length)]
-}
-
-function shuffle<T>(list: T[]): T[] {
-  const a = [...list]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
-
-const round2 = (n: number) => Math.round(n * 100) / 100
-
-// ---------- Brüche (exakt rechnen, damit Lösungswege sauber aussehen) ----------
-
-interface Q {
-  n: number
-  d: number
-}
-
-const gcd = (a: number, b: number): number => (b === 0 ? Math.abs(a) : gcd(b, a % b))
-
-function q(n: number, d = 1): Q {
-  if (d < 0) {
-    n = -n
-    d = -d
-  }
-  const g = gcd(n, d) || 1
-  return { n: n / g, d: d / g }
-}
-
-const add = (x: Q, y: Q) => q(x.n * y.d + y.n * x.d, x.d * y.d)
-const mul = (x: Q, y: Q) => q(x.n * y.n, x.d * y.d)
-const neg = (x: Q) => q(-x.n, x.d)
-const val = (x: Q) => x.n / x.d
-const isInt = (x: Q) => x.d === 1
-
-/** Wurzel eines Bruchs, falls sie wieder ein Bruch ist (sonst null) */
-function sqrtQ(x: Q): Q | null {
-  if (x.n < 0) return null
-  const rn = Math.round(Math.sqrt(x.n))
-  const rd = Math.round(Math.sqrt(x.d))
-  return rn * rn === x.n && rd * rd === x.d ? q(rn, rd) : null
-}
-
-// ---------- LaTeX-Hilfen ----------
-
-// Dezimalzahl mit deutschem Komma ({,} verhindert den Abstand nach dem Komma)
-const tn = (n: number) => {
-  const r = round2(n)
-  return (r < 0 ? '-' : '') + String(Math.abs(r)).replace('.', '{,}')
-}
-
-/** Bruch als LaTeX, z. B. "-\frac{3}{2}" oder "4" */
-const tq = (x: Q) => (isInt(x) ? String(x.n) : `${x.n < 0 ? '-' : ''}\\frac{${Math.abs(x.n)}}{${x.d}}`)
-/** Bruch in Klammern, wenn negativ (für Einsetzen) */
-const tqp = (x: Q) => (x.n < 0 ? `\\left(${tq(x)}\\right)` : tq(x))
-/** Bruch mit Rechenzeichen davor, z. B. "+ 3" oder "- \frac{1}{2}" */
-const sgq = (x: Q) => (x.n < 0 ? `- ${tq(neg(x))}` : `+ ${tq(x)}`)
-
-/** Koeffizient vor x bzw. x² (1 und −1 werden weggelassen) */
-const coeff = (x: Q) => (x.n === x.d ? '' : x.n === -x.d ? '-' : tq(x))
-
-function generalTex(a: Q, b: Q, c: Q) {
-  let s = `${coeff(a)}x^2`
-  if (b.n !== 0) s += ` ${b.n < 0 ? '-' : '+'} ${coeff(q(Math.abs(b.n), b.d))}x`
-  if (c.n !== 0) s += ` ${sgq(c)}`
-  return `y = ${s}`
-}
-
-const bracketTex = (xs: number) => `(x ${xs < 0 ? '+' : '-'} ${Math.abs(xs)})^2`
-
-function vertexTex(a: Q, xs: number, ys: Q) {
-  return `y = ${coeff(a)}${bracketTex(xs)}${ys.n !== 0 ? ` ${sgq(ys)}` : ''}`
-}
-
-/** KaTeX-Formel; display = abgesetzt (bei Platzmangel horizontal scrollbar) */
-function Tex({ tex, display = false, className = '' }: { tex: string; display?: boolean; className?: string }) {
-  const html = useMemo(() => katex.renderToString(tex, { throwOnError: false, displayMode: display }), [tex, display])
-  return display ? (
-    <div className={`overflow-x-auto overflow-y-hidden ${className}`} dangerouslySetInnerHTML={{ __html: html }} />
-  ) : (
-    <span className={className} dangerouslySetInnerHTML={{ __html: html }} />
-  )
-}
-
 // ---------- Aufgaben erzeugen ----------
 
 interface Task {
@@ -135,7 +64,7 @@ interface Task {
   /** nur bei Scheitelform */
   xs: number
   ys: Q
-  /** Nullstellen, aufsteigend sortiert */
+  /** Nullstellen in der Reihenfolge des Lösungswegs (x₁, x₂) */
   roots: number[]
   tex: string
 }
@@ -150,18 +79,10 @@ function fromRoots(a: Q, x1: Q, x2: Q) {
   return { b: neg(mul(a, add(x1, x2))), c: mul(a, mul(x1, x2)) }
 }
 
-function rootsOf(a: Q, b: Q, c: Q): number[] {
-  const D = val(b) * val(b) - 4 * val(a) * val(c)
-  if (D < -1e-9) return []
-  if (Math.abs(D) < 1e-9) return [-val(b) / (2 * val(a))]
-  const r = [(-val(b) - Math.sqrt(D)) / (2 * val(a)), (-val(b) + Math.sqrt(D)) / (2 * val(a))]
-  return r.sort((u, v) => u - v)
-}
-
 const small = (x: Q, max: number) => Math.abs(val(x)) <= max && x.d <= 12
 
 function generalTask(a: Q, b: Q, c: Q): Task {
-  return { form: 'allgemein', a, b, c, xs: 0, ys: q(0), roots: rootsOf(a, b, c), tex: generalTex(a, b, c) }
+  return { form: 'allgemein', a, b, c, xs: 0, ys: q(0), roots: solveQuadratic(a, b, c), tex: `y = ${polyTex(a, b, c)}` }
 }
 
 function newEasyTask(count: Count): Task {
@@ -189,7 +110,6 @@ function newEasyTask(count: Count): Task {
 }
 
 const FRAC_A = [q(1, 2), q(-1, 2), q(1, 4), q(-1, 4), q(1, 3), q(-1, 3), q(3, 2), q(-3, 2), q(2, 3), q(-2, 3), q(2), q(-2), q(1), q(-1)]
-const HALVES = Array.from({ length: 25 }, (_, i) => q(i - 12, 2)) // −6 … 6 in Halbschritten
 
 function newFractionTask(count: Count): Task {
   for (;;) {
@@ -199,12 +119,12 @@ function newFractionTask(count: Count): Task {
       // Nullstellen sind keine "glatten" Zahlen: Ergebnis runden
       b = pick(HALVES)
       c = pick(HALVES)
-      const D = add(mul(b, b), neg(mul(q(4), mul(a, c))))
+      const D = discriminant(a, b, c)
       if (D.n <= 0 || sqrtQ(D)) continue
     } else if (count === 2) {
       const x1 = pick(HALVES)
       const x2 = pick(HALVES)
-      if (x1.n * x2.d === x2.n * x1.d) continue
+      if (eqQ(x1, x2)) continue
       ;({ b, c } = fromRoots(a, x1, x2))
     } else if (count === 1) {
       const x0 = pick(HALVES)
@@ -242,7 +162,10 @@ function newVertexTask(count: Count): Task {
     }
     const b = neg(mul(q(2 * xs), a))
     const c = add(mul(a, q(xs * xs)), ys)
-    return { form: 'scheitel', a, b, c, xs, ys, roots: rootsOf(a, b, c), tex: vertexTex(a, xs, ys) }
+    // Reihenfolge wie im Lösungsweg: x₁ = x_S + √r, x₂ = x_S − √r
+    const r = val(ys) === 0 ? 0 : -val(ys) / val(a)
+    const roots = r < 0 ? [] : r === 0 ? [xs] : [xs + Math.sqrt(r), xs - Math.sqrt(r)]
+    return { form: 'scheitel', a, b, c, xs, ys, roots, tex: `y = ${vertexTex(a, xs, ys)}` }
   }
 }
 
@@ -272,24 +195,6 @@ function pageTasks(level: Level): { spec: Spec; task: Task }[] {
 
 // ---------- Live-Auswertung einer Eingabe ----------
 
-/** Zahl oder Bruch ("-3/2") */
-function parseAnswer(raw: string) {
-  const s = raw.trim()
-  if (s.includes('/')) {
-    const [num, den] = s.split('/')
-    const v = parseFlexibleNumber(num) / parseFlexibleNumber(den)
-    return Number.isFinite(v) ? v : NaN
-  }
-  return parseFlexibleNumber(s)
-}
-
-type AnswerStatus = 'idle' | 'right' | 'wrong'
-
-const isIncomplete = (s: string) => {
-  const t = s.trim()
-  return t === '' || /^[-−–—‐+,./]$/.test(t) || /\/$/.test(t)
-}
-
 /** Index der passenden Nullstelle oder −1 */
 function matchRoot(input: string, roots: number[]): number {
   const v = parseAnswer(input)
@@ -310,8 +215,6 @@ function RootInput({
   onChange: (v: string) => void
   readOnly: boolean
 }) {
-  const border =
-    status === 'right' ? 'border-green-500 bg-green-50 text-green-800' : status === 'wrong' ? 'border-red-500 bg-red-50 text-red-800' : 'border-slate-300'
   return (
     <label className="flex items-center gap-2 text-xl text-slate-800">
       <Tex tex={`${label} =`} />
@@ -319,7 +222,7 @@ function RootInput({
         value={value}
         readOnly={readOnly}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-        className={`w-24 text-center border-2 rounded px-2 py-2 text-lg focus:outline-none transition-colors ${border}`}
+        className={`w-24 text-center border-2 rounded px-2 py-2 text-lg focus:outline-none transition-colors ${statusBorder(status)}`}
         inputMode="decimal"
         aria-label={`Nullstelle ${label}`}
       />
@@ -329,63 +232,6 @@ function RootInput({
 
 // ---------- Lösungsweg ----------
 
-/** Wurzel als LaTeX: exakt, wenn möglich, sonst gerundet */
-const sqrtTex = (x: Q) => {
-  const r = sqrtQ(x)
-  return r ? tq(r) : `\\sqrt{${tq(x)}}`
-}
-
-const rootTex = (n: number) => tn(n)
-
-function GeneralSolution({ task }: { task: Task }) {
-  const { a, b, c, roots } = task
-  const b2 = mul(b, b)
-  const ac4 = mul(q(4), mul(a, c))
-  const D = add(b2, neg(ac4))
-  const twoA = mul(q(2), a)
-  const r = sqrtQ(D)
-  return (
-    <>
-      <p>
-        Ablesen: <Tex tex={`a = ${tq(a)},\\quad b = ${tq(b)},\\quad c = ${tq(c)}`} />
-      </p>
-      <div>
-        <p className="font-semibold text-slate-800">Schritt 1: Diskriminante berechnen</p>
-        <Tex display tex={`D = b^2 - 4ac = ${tqp(b)}^2 - 4 \\cdot ${tqp(a)} \\cdot ${tqp(c)} = ${tq(b2)} ${sgq(neg(ac4))} = \\mathbf{${tq(D)}}`} />
-        <p>
-          {D.n > 0 && <>Da <Tex tex="D > 0" /> ist, gibt es <strong>zwei Nullstellen</strong>.</>}
-          {D.n === 0 && <>Da <Tex tex="D = 0" /> ist, gibt es <strong>genau eine Nullstelle</strong>.</>}
-          {D.n < 0 && <>Da <Tex tex="D < 0" /> ist, gibt es <strong>keine Nullstelle</strong>: Aus einer negativen Zahl kann man keine Wurzel ziehen.</>}
-        </p>
-      </div>
-      {D.n >= 0 && (
-        <div>
-          <p className="font-semibold text-slate-800">Schritt 2: In die Mitternachtsformel einsetzen</p>
-          {D.n === 0 ? (
-            <Tex display tex={`x = \\frac{-b}{2a} = \\frac{${tq(neg(b))}}{2 \\cdot ${tqp(a)}} = \\frac{${tq(neg(b))}}{${tq(twoA)}} = \\mathbf{${rootTex(roots[0])}}`} />
-          ) : (
-            <>
-              <Tex display tex={`x_{1,2} = \\frac{-b \\pm \\sqrt{D}}{2a} = \\frac{${tq(neg(b))} \\pm \\sqrt{${tq(D)}}}{2 \\cdot ${tqp(a)}} = \\frac{${tq(neg(b))} \\pm ${sqrtTex(D)}}{${tq(twoA)}}`} />
-              {(['-', '+'] as const).map((op, i) => {
-                const x = (val(neg(b)) + (op === '-' ? -1 : 1) * Math.sqrt(val(D))) / val(twoA)
-                const num = r ? add(neg(b), op === '-' ? neg(r) : r) : null
-                return (
-                  <div key={op}>
-                  <Tex
-                    display
-                    tex={`x_${i + 1} = \\frac{${tq(neg(b))} ${op} ${sqrtTex(D)}}{${tq(twoA)}} ${num ? `= \\frac{${tq(num)}}{${tq(twoA)}} = \\mathbf{${rootTex(x)}}` : `\\approx \\mathbf{${rootTex(x)}}`}`}
-                  />
-                  </div>
-                )
-              })}
-            </>
-          )}
-        </div>
-      )}
-    </>
-  )
-}
-
 function VertexSolution({ task }: { task: Task }) {
   const { a, xs, ys, roots } = task
   const rhs = neg(ys)
@@ -393,28 +239,24 @@ function VertexSolution({ task }: { task: Task }) {
   const k = sqrtQ(r)
   const xm = `x ${xs < 0 ? '+' : '-'} ${Math.abs(xs)}`
   const isOne = a.n === a.d
-  // Umformung Zeile für Zeile, die Rechenoperation steht jeweils rechts neben der Zeile, auf die sie angewendet wird
-  const op = (s: string) => ` \\qquad \\left| \\; ${s}\\right.`
-  const divide = isOne ? '' : op(`: ${tqp(a)}`)
-  const root = r.n > 0 ? op('\\sqrt{\\phantom{x}}') : ''
-  const lines: string[] = [`0 = ${task.tex.slice(4)}`]
+  // Umformung Zeile für Zeile, die Rechenoperation steht rechts neben der Zeile, auf die sie angewendet wird
+  const divide = isOne ? undefined : `: ${tqp(a)}`
+  const root = r.n > 0 ? '\\sqrt{\\phantom{x}}' : undefined
+  const lines: { tex: string; op?: string }[] = [{ tex: `0 = ${vertexTex(a, xs, ys)}` }]
   if (ys.n !== 0) {
-    lines[0] += op(`${ys.n < 0 ? '+' : '-'} ${tq(ys.n < 0 ? rhs : ys)}`)
-    lines.push(`${coeff(a)}(${xm})^2 = ${tq(rhs)}${isOne ? root : divide}`)
+    lines[0].op = `${ys.n < 0 ? '+' : '-'} ${tq(ys.n < 0 ? rhs : ys)}`
+    lines.push({ tex: `${coeff(a)}(${xm})^2 = ${tq(rhs)}`, op: isOne ? root : divide })
   } else {
-    lines[0] += divide
+    lines[0].op = divide
   }
-  if (!isOne) lines.push(`(${xm})^2 = ${tq(r)}${root}`)
+  if (!isOne) lines.push({ tex: `(${xm})^2 = ${tq(r)}`, op: root })
+  if (r.n > 0) lines.push({ tex: `${xm} = \\pm ${sqrtTex(r)}` })
   return (
     <>
       <p>
         Setze <Tex tex="y = 0" /> und löse nach x auf:
       </p>
-      {lines.map((line) => (
-        <div key={line}>
-          <Tex display tex={line} />
-        </div>
-      ))}
+      <Steps lines={lines} />
       {r.n < 0 && (
         <p>
           Ein Quadrat kann nie negativ sein. Die Gleichung hat keine Lösung, es gibt <strong>keine Nullstelle</strong>.
@@ -429,32 +271,37 @@ function VertexSolution({ task }: { task: Task }) {
         </>
       )}
       {r.n > 0 && (
-        <>
-          <Tex display tex={`${xm} = \\pm ${sqrtTex(r)}`} />
-          <Tex
-            display
-            tex={`x_1 = ${xs} - ${sqrtTex(r)} ${k ? '=' : '\\approx'} \\mathbf{${rootTex(roots[0])}} \\qquad x_2 = ${xs} + ${sqrtTex(r)} ${k ? '=' : '\\approx'} \\mathbf{${rootTex(roots[1])}}`}
-          />
-        </>
+        <Tex
+          display
+          tex={`x_1 = ${xs} + ${sqrtTex(r)} ${k ? '=' : '\\approx'} \\mathbf{${tn(roots[0])}} \\qquad x_2 = ${xs} - ${sqrtTex(r)} ${k ? '=' : '\\approx'} \\mathbf{${tn(roots[1])}}`}
+        />
       )}
     </>
   )
 }
 
-function rootsText(roots: number[]) {
-  if (roots.length === 0) return 'Es gibt keine Nullstelle.'
-  const eq = (n: number) => (Math.abs(n - round2(n)) < 1e-9 ? '=' : '\\approx')
-  if (roots.length === 1) return `x ${eq(roots[0])} ${tn(roots[0])}`
-  return `x_1 ${eq(roots[0])} ${tn(roots[0])},\\quad x_2 ${eq(roots[1])} ${tn(roots[1])}`
+/** Nullstellen als Punkte, z. B. "N_1(3 | 0) \quad N_2(−1 | 0)" */
+function pointsText(roots: number[]) {
+  if (roots.length === 1) return `N(${tn(roots[0])} \\mid 0)`
+  return roots.map((r, i) => `N_${i + 1}(${tn(r)} \\mid 0)`).join('\\quad ')
 }
 
 function SolutionSteps({ task }: { task: Task }) {
   return (
     <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-left text-slate-700 space-y-3">
       <h3 className="text-base font-bold text-slate-800 text-center">Lösungsweg</h3>
-      {task.form === 'scheitel' ? <VertexSolution task={task} /> : <GeneralSolution task={task} />}
+      {task.form === 'scheitel' ? (
+        <VertexSolution task={task} />
+      ) : (
+        <>
+          <p>
+            Setze <Tex tex="y = 0" />: <Tex tex={`${polyTex(task.a, task.b, task.c)} = 0`} />
+          </p>
+          <MitternachtsSteps a={task.a} b={task.b} c={task.c} noun="Nullstelle" />
+        </>
+      )}
       <div className="font-bold text-slate-800 text-center text-lg">
-        {task.roots.length === 0 ? <p>Keine Nullstelle</p> : <Tex display tex={rootsText(task.roots)} />}
+        {task.roots.length === 0 ? <p>Keine Nullstelle</p> : <Tex display tex={pointsText(task.roots)} />}
       </div>
     </div>
   )
@@ -548,7 +395,7 @@ function TaskCard({ number, level, spec, initialTask, onSolvedChange, onResult, 
   if (solved) {
     message = (
       <p className="text-center font-bold mt-4 text-green-600">
-        {praise} {roots.length === 0 ? 'Die Parabel schneidet die x-Achse nicht.' : <Tex tex={rootsText(roots)} />}
+        {praise} {roots.length === 0 ? 'Die Parabel schneidet die x-Achse nicht.' : <Tex tex={pointsText(roots)} />}
       </p>
     )
   } else if (count !== null && !countRight) {
@@ -610,7 +457,7 @@ function TaskCard({ number, level, spec, initialTask, onSolvedChange, onResult, 
 
 // ---------- Erklärung mit Beispiel (Graph + Rechnung) und Erklärvideo ----------
 
-// Beispiel: y = x² − 2x − 3  →  Nullstellen −1 und 3
+// Beispiel: y = x² − 2x − 3  →  Nullstellen 3 und −1
 const SX = 30 // Pixel pro Einheit
 const X_MIN = -3, X_MAX = 5, Y_MIN = -5, Y_MAX = 5
 const toPx = (x: number, y: number) => ({ px: (x - X_MIN) * SX, py: (Y_MAX - y) * SX })
@@ -620,8 +467,8 @@ function ExampleGraph() {
   const w = (X_MAX - X_MIN) * SX
   const h = (Y_MAX - Y_MIN) * SX
   const o = toPx(0, 0)
-  const n1 = toPx(-1, 0)
-  const n2 = toPx(3, 0)
+  const n1 = toPx(3, 0)
+  const n2 = toPx(-1, 0)
   const xs = Array.from({ length: X_MAX - X_MIN + 1 }, (_, i) => X_MIN + i)
   const ys = Array.from({ length: Y_MAX - Y_MIN + 1 }, (_, i) => Y_MIN + i)
   const pts: string[] = []
@@ -630,7 +477,7 @@ function ExampleGraph() {
     pts.push(`${p.px.toFixed(1)},${p.py.toFixed(1)}`)
   }
   return (
-    <svg viewBox={`-10 -10 ${w + 20} ${h + 20}`} className="w-full max-w-xs mx-auto" role="img" aria-label="Parabel y = x² − 2x − 3 mit den Nullstellen −1 und 3">
+    <svg viewBox={`-10 -10 ${w + 20} ${h + 20}`} className="w-full max-w-xs mx-auto" role="img" aria-label="Parabel y = x² − 2x − 3 mit den Nullstellen 3 und −1">
       {xs.map((x) => (
         <line key={`gx${x}`} x1={toPx(x, 0).px} y1={0} x2={toPx(x, 0).px} y2={h} stroke="#e2e8f0" strokeWidth={1} />
       ))}
@@ -648,10 +495,10 @@ function ExampleGraph() {
         <text key={`ly${y}`} x={o.px - 5} y={toPx(0, y).py + 3} fontSize={10} textAnchor="end" fill="#64748b">{y}</text>
       ))}
       <polyline points={pts.join(' ')} fill="none" stroke="#2563eb" strokeWidth={2.5} />
-      <circle cx={n1.px} cy={n1.py} r={5} fill="#dc2626" />
-      <circle cx={n2.px} cy={n2.py} r={5} fill="#dc2626" />
-      <text x={n1.px - 6} y={n1.py - 8} fontSize={12} fontWeight="bold" textAnchor="end" fill="#dc2626">N₁(−1|0)</text>
-      <text x={n2.px + 6} y={n2.py - 8} fontSize={12} fontWeight="bold" fill="#dc2626">N₂(3|0)</text>
+      <circle cx={n1.px} cy={n1.py} r={5} fill={RED} />
+      <circle cx={n2.px} cy={n2.py} r={5} fill={BLUE} />
+      <text x={n1.px + 6} y={n1.py - 8} fontSize={12} fontWeight="bold" fill={RED}>N₁(3|0)</text>
+      <text x={n2.px - 6} y={n2.py - 8} fontSize={12} fontWeight="bold" textAnchor="end" fill={BLUE}>N₂(−1|0)</text>
     </svg>
   )
 }
@@ -661,33 +508,77 @@ function Erklaerung({ level }: { level: Level }) {
     <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200 text-left">
       <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">So berechnest du die Nullstellen</h2>
       <p className="text-slate-700 mb-3">
-        <strong>Nullstellen</strong> sind die x-Werte, an denen die Parabel die x-Achse schneidet oder berührt. Dort ist{' '}
-        <Tex tex="y = 0" />. Du setzt also die Funktionsgleichung gleich null und löst nach x auf. Bei der{' '}
-        <strong>allgemeinen Form</strong> <Tex tex="y = ax^2 + bx + c" /> hilft dir die <strong>Mitternachtsformel</strong>:
+        Um die <strong>Nullstellen</strong>, also die Schnittpunkte einer Funktion mit der x-Achse, zu berechnen, gehst du wie folgt vor:
       </p>
-      <div className="border-2 border-green-500 bg-green-50 rounded-xl px-4 py-3 mb-3 text-center">
-        <Tex display className="text-lg" tex={`x_{1,2} = \\frac{-b \\pm \\sqrt{\\textcolor{${RED}}{b^2 - 4ac}}}{2a}`} />
-        <p className="text-sm text-slate-600 mt-1">
-          Der Term unter der Wurzel heißt <span className="font-semibold" style={{ color: RED }}>Diskriminante D</span>. Er verrät dir, wie viele Nullstellen es gibt:
-        </p>
-      </div>
-      <ul className="list-disc pl-5 text-slate-700 space-y-1 mb-3">
-        <li><Tex tex="D > 0" />: zwei Nullstellen <Tex tex="x_1" /> und <Tex tex="x_2" /></li>
-        <li><Tex tex="D = 0" />: genau eine Nullstelle (die Parabel berührt die x-Achse im Scheitelpunkt)</li>
-        <li><Tex tex="D < 0" />: keine Nullstelle (aus einer negativen Zahl kann man keine Wurzel ziehen)</li>
-      </ul>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center mt-3">
+      <StepTable
+        rows={[
+          {
+            step: (
+              <>
+                <strong>1.</strong> Setze die Funktionsgleichung <Tex tex="y = 0" />.
+                <span className="block text-sm text-slate-600">(Das ist die Voraussetzung für die folgenden Schritte.)</span>
+              </>
+            ),
+            example: <Tex display tex="x^2 - 2x - 3 = 0" />,
+          },
+          {
+            step: (
+              <>
+                <strong>2.</strong> Notiere dir die Koeffizienten a, b und c der Funktionsgleichung. <strong>Achtung:</strong> Vorzeichen mitnehmen!
+              </>
+            ),
+            example: <Tex display tex="a = 1, \quad b = -2, \quad c = -3" />,
+          },
+          {
+            step: (
+              <>
+                <strong>3.</strong> Löse die Gleichung mit der <strong>Mitternachtsformel</strong> (Formelsammlung: Lösungsformel). Setze negative
+                Zahlen in Klammern.
+                <span className="block text-sm text-slate-600 mt-2">
+                  Das Zeichen ± (gesprochen: plus-minus) bedeutet, dass du den Wert der Wurzel einmal addierst und einmal subtrahierst.
+                  Dieses Zeichen gibt es auf dem Taschenrechner nicht – du musst also zwei Rechnungen durchführen (siehe Schritt 4).
+                </span>
+                <span className="block text-sm text-slate-600 mt-2">
+                  Der Wert unter der Wurzel heißt <strong>Diskriminante D</strong>. Ist <Tex tex="D < 0" />, gibt es keine Nullstelle; ist{' '}
+                  <Tex tex="D = 0" />, gibt es genau eine.
+                </span>
+              </>
+            ),
+            example: (
+              <>
+                <Tex display tex="x_{1,2} = \frac{-b \pm \sqrt{b^2 - 4 \cdot a \cdot c}}{2 \cdot a}" />
+                <Tex display tex="x_{1,2} = \frac{-(-2) \pm \sqrt{(-2)^2 - 4 \cdot 1 \cdot (-3)}}{2 \cdot 1}" />
+              </>
+            ),
+          },
+          {
+            step: (
+              <>
+                <strong>4.</strong> Du erhältst zwei Werte für x – je nachdem, ob du den Wert der Wurzel <strong>addierst</strong> oder{' '}
+                <strong>subtrahierst</strong>.
+              </>
+            ),
+            example: (
+              <>
+                <Tex display tex={`x_1 = \\frac{2 + \\sqrt{16}}{2} = \\frac{2 + 4}{2} = \\textcolor{${RED}}{3}`} />
+                <p className="text-center">und</p>
+                <Tex display tex={`x_2 = \\frac{2 - \\sqrt{16}}{2} = \\frac{2 - 4}{2} = \\textcolor{${BLUE}}{-1}`} />
+              </>
+            ),
+          },
+          {
+            step: (
+              <>
+                <strong>5.</strong> Gib die vollständigen Koordinaten an.
+              </>
+            ),
+            example: <Tex display tex={`N_1(\\textcolor{${RED}}{3} \\mid 0) \\;\\text{ und }\\; N_2(\\textcolor{${BLUE}}{-1} \\mid 0)`} />,
+          },
+        ]}
+      />
+      <div className="mt-4">
         <ExampleGraph />
-        <div className="text-slate-700">
-          <p className="font-semibold text-slate-800 mb-1">Beispiel</p>
-          <Tex display tex="y = x^2 - 2x - 3" />
-          <p className="mb-2">
-            <Tex tex="a = 1,\quad b = -2,\quad c = -3" />
-          </p>
-          <Tex display tex={`\\textcolor{${RED}}{D} = (-2)^2 - 4 \\cdot 1 \\cdot (-3) = 4 + 12 = \\textcolor{${RED}}{16}`} />
-          <Tex display tex="x_{1,2} = \frac{2 \pm \sqrt{16}}{2 \cdot 1} = \frac{2 \pm 4}{2}" />
-          <Tex display tex={`x_1 = \\frac{2 - 4}{2} = \\textcolor{${GREEN}}{\\mathbf{-1}} \\qquad x_2 = \\frac{2 + 4}{2} = \\textcolor{${GREEN}}{\\mathbf{3}}`} />
-        </div>
+        <p className="text-sm text-slate-600 text-center mt-1">Die Parabel schneidet die x-Achse genau bei den berechneten Nullstellen.</p>
       </div>
 
       {level === 'fortgeschritten' && (
@@ -699,7 +590,7 @@ function Erklaerung({ level }: { level: Level }) {
           </p>
           <Tex display tex="y = \tfrac{1}{2}x^2 - x - \tfrac{3}{2} \qquad a = \tfrac{1}{2},\; b = -1,\; c = -\tfrac{3}{2}" />
           <Tex display tex="D = (-1)^2 - 4 \cdot \tfrac{1}{2} \cdot \left(-\tfrac{3}{2}\right) = 1 + 3 = 4" />
-          <Tex display tex={`x_{1,2} = \\frac{1 \\pm \\sqrt{4}}{2 \\cdot \\frac{1}{2}} = \\frac{1 \\pm 2}{1} \\quad\\Rightarrow\\quad x_1 = \\textcolor{${GREEN}}{\\mathbf{-1}},\\; x_2 = \\textcolor{${GREEN}}{\\mathbf{3}}`} />
+          <Tex display tex={`x_{1,2} = \\frac{1 \\pm \\sqrt{4}}{2 \\cdot \\frac{1}{2}} = \\frac{1 \\pm 2}{1} \\quad\\Rightarrow\\quad x_1 = \\textcolor{${GREEN}}{\\mathbf{3}},\\; x_2 = \\textcolor{${GREEN}}{\\mathbf{-1}}`} />
           <p className="text-sm text-slate-600 mt-1">
             Tipp: Du kannst die Gleichung <Tex tex="0 = \tfrac{1}{2}x^2 - x - \tfrac{3}{2}" /> auch zuerst mit dem Hauptnenner (hier 2)
             multiplizieren: <Tex tex="0 = x^2 - 2x - 3" />. Die Nullstellen bleiben gleich.
@@ -710,10 +601,15 @@ function Erklaerung({ level }: { level: Level }) {
             Ist die Funktion in der Scheitelform <Tex tex="y = a(x - x_S)^2 + y_S" /> gegeben, brauchst du keine Mitternachtsformel.
             Setze <Tex tex="y = 0" />, bringe <Tex tex="y_S" /> auf die andere Seite, teile durch a und ziehe die Wurzel:
           </p>
-          <Tex display tex="0 = 2(x - 1)^2 - 8 \qquad | +8" />
-          <Tex display tex="8 = 2(x - 1)^2 \qquad | : 2" />
-          <Tex display tex="(x - 1)^2 = 4 \qquad | \sqrt{\phantom{x}}" />
-          <Tex display tex={`x - 1 = \\pm 2 \\quad\\Rightarrow\\quad x_1 = 1 - 2 = \\textcolor{${GREEN}}{\\mathbf{-1}},\\; x_2 = 1 + 2 = \\textcolor{${GREEN}}{\\mathbf{3}}`} />
+          <Steps
+            lines={[
+              { tex: '0 = 2(x - 1)^2 - 8', op: '+8' },
+              { tex: '8 = 2(x - 1)^2', op: ': 2' },
+              { tex: '(x - 1)^2 = 4', op: '\\sqrt{\\phantom{x}}' },
+              { tex: 'x - 1 = \\pm 2' },
+            ]}
+          />
+          <Tex display tex={`x_1 = 1 + 2 = \\textcolor{${GREEN}}{\\mathbf{3}},\\quad x_2 = 1 - 2 = \\textcolor{${GREEN}}{\\mathbf{-1}}`} />
           <p className="text-sm text-slate-600 mt-1">
             Steht rechts eine negative Zahl, gibt es keine Nullstelle (ein Quadrat ist nie negativ). Steht rechts 0, gibt es genau eine
             Nullstelle: <Tex tex="x = x_S" />. Ist die Wurzel keine glatte Zahl, rundest du auf zwei Nachkommastellen.
@@ -730,16 +626,7 @@ function Erklaerung({ level }: { level: Level }) {
         </li>
         <li>Die Reihenfolge von <Tex tex="x_1" /> und <Tex tex="x_2" /> ist egal.</li>
       </ul>
-      <h3 className="text-base font-bold text-slate-800 mt-5 mb-2 text-center">Erklärvideo</h3>
-      <div className="max-w-2xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200">
-        <iframe
-          className="w-full h-full"
-          src={`https://www.youtube.com/embed/${VIDEO_ID}`}
-          title="Erklärvideo: Nullstellen berechnen"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
+      <Video id={VIDEO_ID} title="Erklärvideo: Nullstellen berechnen" />
     </div>
   )
 }
