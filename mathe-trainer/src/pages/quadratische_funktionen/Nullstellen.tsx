@@ -16,7 +16,6 @@ import {
   add,
   btnPrimary,
   btnSecondary,
-  coeff,
   discriminant,
   eqQ,
   isIncomplete,
@@ -32,13 +31,11 @@ import {
   shuffle,
   solveQuadratic,
   sqrtQ,
-  sqrtTex,
   statusBorder,
   tn,
-  tq,
-  tqp,
   val,
   vertexTex,
+  vertexToGeneralLines,
 } from './quadratischShared'
 
 // Sechs Aufgaben gleichzeitig auf der Seite
@@ -162,10 +159,7 @@ function newVertexTask(count: Count): Task {
     }
     const b = neg(mul(q(2 * xs), a))
     const c = add(mul(a, q(xs * xs)), ys)
-    // Reihenfolge wie im Lösungsweg: x₁ = x_S + √r, x₂ = x_S − √r
-    const r = val(ys) === 0 ? 0 : -val(ys) / val(a)
-    const roots = r < 0 ? [] : r === 0 ? [xs] : [xs + Math.sqrt(r), xs - Math.sqrt(r)]
-    return { form: 'scheitel', a, b, c, xs, ys, roots, tex: `y = ${vertexTex(a, xs, ys)}` }
+    return { form: 'scheitel', a, b, c, xs, ys, roots: solveQuadratic(a, b, c), tex: `y = ${vertexTex(a, xs, ys)}` }
   }
 }
 
@@ -232,54 +226,6 @@ function RootInput({
 
 // ---------- Lösungsweg ----------
 
-function VertexSolution({ task }: { task: Task }) {
-  const { a, xs, ys, roots } = task
-  const rhs = neg(ys)
-  const r = mul(rhs, q(a.d, a.n)) // −y_S : a
-  const k = sqrtQ(r)
-  const xm = `x ${xs < 0 ? '+' : '-'} ${Math.abs(xs)}`
-  const isOne = a.n === a.d
-  // Umformung Zeile für Zeile, die Rechenoperation steht rechts neben der Zeile, auf die sie angewendet wird
-  const divide = isOne ? undefined : `: ${tqp(a)}`
-  const root = r.n > 0 ? '\\sqrt{\\phantom{x}}' : undefined
-  const lines: { tex: string; op?: string }[] = [{ tex: `0 = ${vertexTex(a, xs, ys)}` }]
-  if (ys.n !== 0) {
-    lines[0].op = `${ys.n < 0 ? '+' : '-'} ${tq(ys.n < 0 ? rhs : ys)}`
-    lines.push({ tex: `${coeff(a)}(${xm})^2 = ${tq(rhs)}`, op: isOne ? root : divide })
-  } else {
-    lines[0].op = divide
-  }
-  if (!isOne) lines.push({ tex: `(${xm})^2 = ${tq(r)}`, op: root })
-  if (r.n > 0) lines.push({ tex: `${xm} = \\pm ${sqrtTex(r)}` })
-  return (
-    <>
-      <p>
-        Setze <Tex tex="y = 0" /> und löse nach x auf:
-      </p>
-      <Steps lines={lines} />
-      {r.n < 0 && (
-        <p>
-          Ein Quadrat kann nie negativ sein. Die Gleichung hat keine Lösung, es gibt <strong>keine Nullstelle</strong>.
-        </p>
-      )}
-      {r.n === 0 && (
-        <>
-          <Tex display tex={`${xm} = 0 \\quad \\Rightarrow \\quad x = \\mathbf{${xs}}`} />
-          <p>
-            Es gibt <strong>genau eine Nullstelle</strong> – sie ist gleichzeitig der Scheitelpunkt.
-          </p>
-        </>
-      )}
-      {r.n > 0 && (
-        <Tex
-          display
-          tex={`x_1 = ${xs} + ${sqrtTex(r)} ${k ? '=' : '\\approx'} \\mathbf{${tn(roots[0])}} \\qquad x_2 = ${xs} - ${sqrtTex(r)} ${k ? '=' : '\\approx'} \\mathbf{${tn(roots[1])}}`}
-        />
-      )}
-    </>
-  )
-}
-
 /** Nullstellen als Punkte, z. B. "N_1(3 | 0) \quad N_2(−1 | 0)" */
 function pointsText(roots: number[]) {
   if (roots.length === 1) return `N(${tn(roots[0])} \\mid 0)`
@@ -290,16 +236,20 @@ function SolutionSteps({ task }: { task: Task }) {
   return (
     <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-left text-slate-700 space-y-3">
       <h3 className="text-base font-bold text-slate-800 text-center">Lösungsweg</h3>
-      {task.form === 'scheitel' ? (
-        <VertexSolution task={task} />
-      ) : (
-        <>
-          <p>
-            Setze <Tex tex="y = 0" />: <Tex tex={`${polyTex(task.a, task.b, task.c)} = 0`} />
-          </p>
-          <MitternachtsSteps a={task.a} b={task.b} c={task.c} noun="Nullstelle" />
-        </>
+      {task.form === 'scheitel' && (
+        <div>
+          <p className="font-semibold text-slate-800">Schritt 1: Scheitelform in die allgemeine Form umformen</p>
+          <Steps lines={vertexToGeneralLines(task.a, task.xs, task.ys).map((tex) => ({ tex }))} />
+        </div>
       )}
+      <div>
+        <p className="font-semibold text-slate-800">{task.form === 'scheitel' ? 'Schritt 2: ' : ''}Setze y = 0</p>
+        <Tex display tex={`${polyTex(task.a, task.b, task.c)} = 0`} />
+      </div>
+      <div>
+        <p className="font-semibold text-slate-800">{task.form === 'scheitel' ? 'Schritt 3: ' : ''}Mitternachtsformel</p>
+        <MitternachtsSteps a={task.a} b={task.b} c={task.c} noun="Nullstelle" />
+      </div>
       <div className="font-bold text-slate-800 text-center text-lg">
         {task.roots.length === 0 ? <p>Keine Nullstelle</p> : <Tex display tex={pointsText(task.roots)} />}
       </div>
@@ -386,7 +336,7 @@ function TaskCard({ number, level, spec, initialTask, onSolvedChange, onResult, 
 
   const countHint =
     task.form === 'scheitel' ? (
-      <>Tipp: Setze y = 0 und stelle nach <Tex tex="(x - x_S)^2" /> um. Ist die rechte Seite negativ, null oder positiv?</>
+      <>Tipp: Forme die Scheitelform zuerst in die allgemeine Form um und berechne dann die Diskriminante <Tex tex="D = b^2 - 4ac" />.</>
     ) : (
       <>Tipp: Berechne zuerst die Diskriminante <Tex tex="D = b^2 - 4ac" />.</>
     )
@@ -598,21 +548,23 @@ function Erklaerung({ level }: { level: Level }) {
 
           <h3 className="text-base font-bold text-slate-800 mt-5 mb-2">Scheitelform</h3>
           <p className="text-slate-700 mb-2">
-            Ist die Funktion in der Scheitelform <Tex tex="y = a(x - x_S)^2 + y_S" /> gegeben, brauchst du keine Mitternachtsformel.
-            Setze <Tex tex="y = 0" />, bringe <Tex tex="y_S" /> auf die andere Seite, teile durch a und ziehe die Wurzel:
+            Ist die Funktion in der Scheitelform <Tex tex="y = a(x - x_S)^2 + y_S" /> gegeben, formst du sie <strong>zuerst in die allgemeine
+            Form</strong> <Tex tex="y = ax^2 + bx + c" /> um. Dazu löst du die Klammer mit der binomischen Formel auf und multiplizierst den
+            Faktor a aus. Anschließend rechnest du wie oben mit der Mitternachtsformel weiter.
           </p>
           <Steps
             lines={[
-              { tex: '0 = 2(x - 1)^2 - 8', op: '+8' },
-              { tex: '8 = 2(x - 1)^2', op: ': 2' },
-              { tex: '(x - 1)^2 = 4', op: '\\sqrt{\\phantom{x}}' },
-              { tex: 'x - 1 = \\pm 2' },
+              { tex: 'y = 2(x - 1)^2 - 8' },
+              { tex: 'y = 2\\left(x^2 - 2x + 1\\right) - 8' },
+              { tex: 'y = 2x^2 - 4x + 2 - 8' },
+              { tex: 'y = 2x^2 - 4x - 6' },
             ]}
           />
-          <Tex display tex={`x_1 = 1 + 2 = \\textcolor{${GREEN}}{\\mathbf{3}},\\quad x_2 = 1 - 2 = \\textcolor{${GREEN}}{\\mathbf{-1}}`} />
+          <Tex display tex="a = 2,\quad b = -4,\quad c = -6 \qquad D = (-4)^2 - 4 \cdot 2 \cdot (-6) = 16 + 48 = 64" />
+          <Tex display tex={`x_{1,2} = \\frac{4 \\pm \\sqrt{64}}{2 \\cdot 2} = \\frac{4 \\pm 8}{4} \\quad\\Rightarrow\\quad x_1 = \\textcolor{${GREEN}}{\\mathbf{3}},\\; x_2 = \\textcolor{${GREEN}}{\\mathbf{-1}}`} />
           <p className="text-sm text-slate-600 mt-1">
-            Steht rechts eine negative Zahl, gibt es keine Nullstelle (ein Quadrat ist nie negativ). Steht rechts 0, gibt es genau eine
-            Nullstelle: <Tex tex="x = x_S" />. Ist die Wurzel keine glatte Zahl, rundest du auf zwei Nachkommastellen.
+            Binomische Formeln: <Tex tex="(x - d)^2 = x^2 - 2dx + d^2" /> und <Tex tex="(x + d)^2 = x^2 + 2dx + d^2" />. Ist die Wurzel keine
+            glatte Zahl, rundest du auf zwei Nachkommastellen.
           </p>
         </>
       )}
@@ -675,7 +627,7 @@ export default function Nullstellen() {
   if (!level) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50">
-        <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+        <div className="mx-auto px-4 py-8 max-w-6xl w-full flex flex-col gap-6">
           {header}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
@@ -706,7 +658,7 @@ export default function Nullstellen() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+      <div className="mx-auto px-4 py-8 max-w-6xl w-full flex flex-col gap-6">
         {header}
         <Erklaerung level={level} />
 

@@ -119,6 +119,22 @@ export function vertexTex(a: Q, xs: number, ys: Q) {
   return `${coeff(a)}${bracketTex(xs)}${ys.n !== 0 ? ` ${sgq(ys)}` : ''}`
 }
 
+/**
+ * Umformung der Scheitelform in die allgemeine Form, Zeile für Zeile:
+ * a(x − x_S)² + y_S = a(x² − 2x_S·x + x_S²) + y_S = ax² + bx + a·x_S² + y_S = ax² + bx + c
+ */
+export function vertexToGeneralLines(a: Q, xs: number, ys: Q): string[] {
+  const b = mul(q(-2 * xs), a)
+  const k = mul(a, q(xs * xs))
+  const lines = [
+    `y = ${vertexTex(a, xs, ys)}`,
+    `y = ${coeff(a)}\\left(x^2 ${xs > 0 ? '-' : '+'} ${2 * Math.abs(xs)}x + ${xs * xs}\\right)${ys.n !== 0 ? ` ${sgq(ys)}` : ''}`,
+  ]
+  if (ys.n !== 0) lines.push(`y = ${polyTex(a, b, k)} ${sgq(ys)}`)
+  lines.push(`y = ${polyTex(a, b, add(k, ys))}`)
+  return lines
+}
+
 /** KaTeX-Formel; display = abgesetzt (bei Platzmangel horizontal scrollbar) */
 export function Tex({ tex, display = false, className = '' }: { tex: string; display?: boolean; className?: string }) {
   const html = useMemo(() => katex.renderToString(tex, { throwOnError: false, displayMode: display }), [tex, display])

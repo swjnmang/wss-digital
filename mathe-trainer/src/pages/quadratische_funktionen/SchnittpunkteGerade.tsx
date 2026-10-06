@@ -40,6 +40,7 @@ import {
   tq,
   val,
   vertexTex,
+  vertexToGeneralLines,
 } from './quadratischShared'
 
 // Sechs Aufgaben gleichzeitig auf der Seite
@@ -295,11 +296,8 @@ function SolutionSteps({ task }: { task: Task }) {
       <h3 className="text-base font-bold text-slate-800 text-center">Lösungsweg</h3>
       {task.form === 'scheitel' && (
         <div>
-          <p className="font-semibold text-slate-800">Vorab: Scheitelform ausmultiplizieren</p>
-          <Tex
-            display
-            tex={`y = ${vertexTex(a, xs, ys)} = ${coeff(a)}\\left(x^2 ${xs > 0 ? '-' : '+'} ${2 * Math.abs(xs)}x + ${xs * xs}\\right)${ys.n !== 0 ? ` ${sgq(ys)}` : ''} = ${poly}`}
-          />
+          <p className="font-semibold text-slate-800">Vorab: Scheitelform in die allgemeine Form umformen</p>
+          <Steps lines={vertexToGeneralLines(a, xs, ys).map((tex) => ({ tex }))} />
         </div>
       )}
       <div>
@@ -698,7 +696,7 @@ export default function SchnittpunkteGerade() {
   if (!level) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50">
-        <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+        <div className="mx-auto px-4 py-8 max-w-6xl w-full flex flex-col gap-6">
           {header}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
@@ -730,7 +728,7 @@ export default function SchnittpunkteGerade() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+      <div className="mx-auto px-4 py-8 max-w-6xl w-full flex flex-col gap-6">
         {header}
         <Erklaerung level={level} />
 
