@@ -28,10 +28,22 @@ export default function AnschriftenfeldTrainer() {
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   const [lob, setLob] = useState(LOB[0]);
   const [loadedTaskId, setLoadedTaskId] = useState(taskId);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (task) markAnschriftenfeldSeen(task.id);
   }, [task]);
+
+  // Neue Aufgabe: Seite kurz „neu laden“ – nach oben springen, kurz Ladehinweis, dann einblenden.
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [taskId]);
+
+  useEffect(() => {
+    if (!refreshing) return;
+    const timer = window.setTimeout(() => setRefreshing(false), 400);
+    return () => window.clearTimeout(timer);
+  }, [refreshing]);
 
   useEffect(() => {
     if (!task) {
@@ -44,6 +56,7 @@ export default function AnschriftenfeldTrainer() {
     setValues({});
     setChecked(false);
     setRevealed({});
+    setRefreshing(true);
   }
 
   if (!task) return null;
@@ -137,7 +150,13 @@ export default function AnschriftenfeldTrainer() {
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-4xl mx-auto p-6 flex flex-col gap-6">
+      {refreshing ? (
+        <main className="flex-1 w-full max-w-4xl mx-auto p-6 flex flex-col items-center justify-center gap-3 text-slate-500">
+          <div className="w-8 h-8 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin" />
+          <p className="text-sm font-medium">Neue Aufgabe wird geladen …</p>
+        </main>
+      ) : (
+      <main key={task.id} className="aufgabe-einblenden flex-1 w-full max-w-4xl mx-auto p-6 flex flex-col gap-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-2">📝 Arbeitsauftrag</p>
           {task.arbeitsauftrag.split('\n\n').map((absatz, i) => (
@@ -215,6 +234,7 @@ export default function AnschriftenfeldTrainer() {
           </div>
         )}
       </main>
+      )}
     </div>
   );
 }
