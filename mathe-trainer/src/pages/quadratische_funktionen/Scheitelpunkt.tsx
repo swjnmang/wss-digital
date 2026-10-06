@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import katex from 'katex'
+import 'katex/dist/katex.min.css'
 
 // Sieben Aufgaben gleichzeitig auf der Seite
 const TOTAL_TASKS = 7
@@ -35,21 +37,37 @@ function pick<T>(list: readonly T[]): T {
 
 const round2 = (n: number) => Math.round(n * 100) / 100
 
-// Zahl mit deutschem Dezimalkomma und echtem Minuszeichen
-const fmt = (n: number) => {
+// Zahl als LaTeX mit deutschem Dezimalkomma ({,} verhindert den Abstand nach dem Komma)
+const tn = (n: number) => {
   const r = round2(n)
-  return (r < 0 ? '−' : '') + String(Math.abs(r)).replace('.', ',')
+  return (r < 0 ? '-' : '') + String(Math.abs(r)).replace('.', '{,}')
 }
 
 // Zahl in Klammern, wenn negativ (für Einsetzen)
-const fmtP = (n: number) => (n < 0 ? `(${fmt(n)})` : fmt(n))
+const tp = (n: number) => (n < 0 ? `(${tn(n)})` : tn(n))
 
-/** f(x) = ax² + bx + c als Text, z. B. "f(x) = −2x² + 4x − 1" */
-function formatGeneral(a: number, b: number, c: number) {
-  let s = a === 1 ? 'x²' : a === -1 ? '−x²' : `${fmt(a)}x²`
-  if (b !== 0) s += ` ${b < 0 ? '−' : '+'} ${Math.abs(b) === 1 ? '' : fmt(Math.abs(b))}x`
-  if (c !== 0) s += ` ${c < 0 ? '−' : '+'} ${fmt(Math.abs(c))}`
+// Zahl mit Rechenzeichen davor, z. B. "+ 3" oder "- 2{,}5"
+const sg = (n: number) => (round2(n) < 0 ? `- ${tn(-n)}` : `+ ${tn(n)}`)
+
+/** f(x) = ax² + bx + c als LaTeX, z. B. "f(x) = -2x^2 + 4x - 1" */
+function generalTex(a: number, b: number, c: number) {
+  let s = a === 1 ? 'x^2' : a === -1 ? '-x^2' : `${tn(a)}x^2`
+  if (b !== 0) s += ` ${b < 0 ? '-' : '+'} ${Math.abs(b) === 1 ? '' : tn(Math.abs(b))}x`
+  if (c !== 0) s += ` ${sg(c)}`
   return `f(x) = ${s}`
+}
+
+const GREEN = '#15803d'
+const RED = '#b91c1c'
+
+/** KaTeX-Formel; display = abgesetzt (bei Platzmangel horizontal scrollbar) */
+function Tex({ tex, display = false, className = '' }: { tex: string; display?: boolean; className?: string }) {
+  const html = useMemo(() => katex.renderToString(tex, { throwOnError: false, displayMode: display }), [tex, display])
+  return display ? (
+    <div className={`overflow-x-auto overflow-y-hidden ${className}`} dangerouslySetInnerHTML={{ __html: html }} />
+  ) : (
+    <span className={className} dangerouslySetInnerHTML={{ __html: html }} />
+  )
 }
 
 interface Task {
@@ -132,34 +150,30 @@ function SolutionSteps({ task }: { task: Task }) {
   const { a, b, c, xs, ys } = task
   const t1 = round2(a * xs * xs)
   const t2 = round2(b * xs)
+  const q = b * b / (4 * a)
   return (
     <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-left text-slate-700 space-y-3">
       <h3 className="text-base font-bold text-slate-800 text-center">Lösungsweg</h3>
       <p>
-        Ablesen: a = {fmt(a)}, b = {fmt(b)}, c = {fmt(c)}
+        Ablesen: <Tex tex={`a = ${tn(a)},\\quad b = ${tn(b)},\\quad c = ${tn(c)}`} />
       </p>
       <div>
         <p className="font-semibold text-slate-800">Schritt 1: x-Koordinate berechnen</p>
-        <p className="font-serif text-lg">
-          x<sub>S</sub> = −b / (2 · a) = −{fmtP(b)} / (2 · {fmtP(a)}) = {fmt(-b)} / {fmt(2 * a)} = <strong>{fmt(xs)}</strong>
-        </p>
+        <Tex display tex={`x_S = -\\frac{b}{2 \\cdot a} = -\\frac{${tn(b)}}{2 \\cdot ${tp(a)}} = \\frac{${tn(-b)}}{${tn(2 * a)}} = \\mathbf{${tn(xs)}}`} />
       </div>
       <div>
-        <p className="font-semibold text-slate-800">Schritt 2: x<sub>S</sub> in f(x) einsetzen</p>
-        <p className="font-serif text-lg">
-          y<sub>S</sub> = f({fmt(xs)}) = {fmt(a)} · {fmtP(xs)}² {b < 0 ? '−' : '+'} {fmt(Math.abs(b))} · {fmtP(xs)} {c < 0 ? '−' : '+'} {fmt(Math.abs(c))}
+        <p className="font-semibold text-slate-800">
+          Schritt 2: <Tex tex="x_S" /> in <Tex tex="f(x)" /> einsetzen
         </p>
-        <p className="font-serif text-lg">
-          y<sub>S</sub> = {fmt(t1)} {t2 < 0 ? '−' : '+'} {fmt(Math.abs(t2))} {c < 0 ? '−' : '+'} {fmt(Math.abs(c))} = <strong>{fmt(ys)}</strong>
+        <Tex display tex={`\\begin{aligned} y_S &= f(${tn(xs)}) = ${tn(a)} \\cdot ${tp(xs)}^2 ${b < 0 ? '-' : '+'} ${tn(Math.abs(b))} \\cdot ${tp(xs)} ${sg(c)} \\\\ &= ${tn(t1)} ${sg(t2)} ${sg(c)} = \\mathbf{${tn(ys)}} \\end{aligned}`} />
+        <p className="mt-2">
+          oder mit der Formel <Tex tex="y_S = c - \frac{b^2}{4 \cdot a}" />:
         </p>
-        <p className="mt-2">oder mit der Formel y<sub>S</sub> = c − b² / (4 · a):</p>
-        <p className="font-serif text-lg">
-          y<sub>S</sub> = {fmt(c)} − {fmtP(b)}² / (4 · {fmtP(a)}) = {fmt(c)} − {fmt(b * b)} / {fmtP(4 * a)} = {fmt(c)} {b * b / (4 * a) < 0 ? '+' : '−'} {fmt(Math.abs(b * b / (4 * a)))} = <strong>{fmt(ys)}</strong>
-        </p>
+        <Tex display tex={`y_S = ${tn(c)} - \\frac{${tp(b)}^2}{4 \\cdot ${tp(a)}} = ${tn(c)} - \\frac{${tn(b * b)}}{${tn(4 * a)}} = ${tn(c)} ${sg(-q)} = \\mathbf{${tn(ys)}}`} />
       </div>
-      <p className="font-bold text-slate-800 text-center text-lg">
-        S({fmt(xs)} | {fmt(ys)})
-      </p>
+      <div className="font-bold text-slate-800 text-center text-lg">
+        <Tex display tex={`S\\left({${tn(xs)}} \\;\\middle|\\; {${tn(ys)}}\\right)`} />
+      </div>
     </div>
   )
 }
@@ -225,14 +239,14 @@ function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps
   } else if (xStatus === 'right' && yStatus !== 'right') {
     message = (
       <p className={`text-center font-bold mt-3 ${yStatus === 'wrong' ? 'text-red-600' : 'text-green-600'}`}>
-        {yStatus === 'wrong' ? 'x stimmt, aber y ist noch nicht richtig. Setze x' : 'Gut, x stimmt! Jetzt noch y: Setze x'}
-        <sub>S</sub> in f(x) ein oder nutze y<sub>S</sub> = c − b² / (4a).
+        {yStatus === 'wrong' ? 'x stimmt, aber y ist noch nicht richtig. Setze ' : 'Gut, x stimmt! Jetzt noch y: Setze '}
+        <Tex tex="x_S" /> in <Tex tex="f(x)" /> ein oder nutze <Tex tex="y_S = c - \frac{b^2}{4a}" />.
       </p>
     )
   } else if (xStatus === 'wrong') {
     message = (
       <p className="text-center font-bold mt-3 text-red-600">
-        x ist noch nicht richtig. Tipp: x<sub>S</sub> = −b / (2a)
+        x ist noch nicht richtig. Tipp: <Tex tex="x_S = -\frac{b}{2a}" />
       </p>
     )
   } else if (yStatus === 'wrong') {
@@ -246,14 +260,16 @@ function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps
         Berechne den Scheitelpunkt S der Parabel.
         {level === 'fortgeschritten' && ' Runde, falls nötig, auf zwei Nachkommastellen.'}
       </p>
-      <p className="text-center text-2xl font-serif text-slate-800 my-4">{formatGeneral(task.a, task.b, task.c)}</p>
+      <div className="text-center text-2xl text-slate-800 my-4">
+        <Tex tex={generalTex(task.a, task.b, task.c)} />
+      </div>
 
       <div className="flex items-center justify-center gap-2 text-2xl text-slate-800">
-        <span className="font-serif">S(</span>
+        <Tex tex="S\Big(" />
         <CoordInput value={xIn} status={xStatus} onChange={setXIn} placeholder="x" readOnly={solved} />
-        <span>|</span>
+        <Tex tex="\Big|" />
         <CoordInput value={yIn} status={yStatus} onChange={setYIn} placeholder="y" readOnly={solved} />
-        <span className="font-serif">)</span>
+        <Tex tex="\Big)" />
       </div>
 
       {message}
@@ -320,76 +336,66 @@ function ExampleGraph() {
   )
 }
 
-// Bruch in HTML
-function Frac({ num, den }: { num: React.ReactNode; den: React.ReactNode }) {
-  return (
-    <span className="inline-flex flex-col items-center align-middle mx-1">
-      <span className="px-1 leading-tight">{num}</span>
-      <span className="px-1 leading-tight border-t-2 border-slate-700">{den}</span>
-    </span>
-  )
-}
-
 function Erklaerung() {
   return (
     <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200">
       <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">So berechnest du den Scheitelpunkt</h2>
       <p className="text-slate-700 mb-3">
         Der <strong>Scheitelpunkt S</strong> ist der höchste oder tiefste Punkt einer Parabel. Ist die Funktion in der{' '}
-        <strong>allgemeinen Form</strong> f(x) = ax² + bx + c gegeben, berechnest du ihn in zwei Schritten:
+        <strong>allgemeinen Form</strong> <Tex tex="f(x) = ax^2 + bx + c" /> gegeben, berechnest du ihn in zwei Schritten:
       </p>
       <ol className="list-decimal pl-5 text-slate-700 space-y-2 mb-3 text-left">
         <li>
           <span className="text-green-700 font-semibold">x-Koordinate</span> mit der Formel berechnen:
-          <span className="block text-center text-lg font-serif my-2">
-            <i>x</i><sub>S</sub> = <Frac num={<>−<i>b</i></>} den={<>2 · <i>a</i></>} />
-          </span>
+          <Tex display tex={`\\textcolor{${GREEN}}{x_S} = -\\frac{b}{2 \\cdot a}`} />
         </li>
         <li>
-          <span className="text-red-700 font-semibold">y-Koordinate</span>: x<sub>S</sub> in die Funktionsgleichung einsetzen:{' '}
-          <span className="font-serif">y<sub>S</sub> = f(x<sub>S</sub>)</span>
+          <span className="text-red-700 font-semibold">y-Koordinate</span>: <Tex tex="x_S" /> in die Funktionsgleichung einsetzen:{' '}
+          <Tex tex="y_S = f(x_S)" />
           <span className="block mt-1">
-            <strong>Oder</strong> du nutzt direkt die passende Formel für y<sub>S</sub>:
+            <strong>Oder</strong> du nutzt direkt die passende Formel für <Tex tex="y_S" />:
           </span>
-          <span className="block text-center text-lg font-serif my-2">
-            <i>y</i><sub>S</sub> = <i>c</i> − <Frac num={<><i>b</i>²</>} den={<>4 · <i>a</i></>} />
-          </span>
+          <Tex display tex={`\\textcolor{${RED}}{y_S} = c - \\frac{b^2}{4 \\cdot a}`} />
         </li>
       </ol>
       <div className="border-2 border-green-500 bg-green-50 rounded-xl px-4 py-3 mb-3 text-center">
         <p className="font-semibold text-slate-800 mb-1">Scheitelpunktkoordinaten auf einen Blick</p>
-        <p className="text-lg font-serif">
-          S(<i>x</i><sub>S</sub> | <i>y</i><sub>S</sub>) = S(
-          <span className="text-green-700">−<Frac num={<i>b</i>} den={<>2 · <i>a</i></>} /></span>|
-          <span className="text-red-700 ml-1"><i>c</i> − <Frac num={<><i>b</i>²</>} den={<>4 · <i>a</i></>} /></span>)
+        <Tex
+          display
+          className="text-lg"
+          tex={`S(x_S \\mid y_S) = S\\left(\\textcolor{${GREEN}}{-\\frac{b}{2 \\cdot a}} \\;\\middle|\\; \\textcolor{${RED}}{c - \\frac{b^2}{4 \\cdot a}}\\right)`}
+        />
+        <p className="text-sm text-slate-600 mt-1">
+          Beide Wege für <Tex tex="y_S" /> führen zum selben Ergebnis – nimm den, der dir leichter fällt.
         </p>
-        <p className="text-sm text-slate-600 mt-1">Beide Wege für y<sub>S</sub> führen zum selben Ergebnis – nimm den, der dir leichter fällt.</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center mt-3">
         <ExampleGraph />
-        <div className="text-left">
+        <div className="text-left text-slate-700">
           <p className="font-semibold text-slate-800 mb-1">Beispiel</p>
-          <p className="text-slate-700 mb-2 font-serif text-lg">f(x) = x² − 4x + 1</p>
-          <p className="text-slate-700 mb-2">a = 1, b = −4, c = 1</p>
-          <p className="text-slate-700 font-serif">
-            <span className="text-green-700 font-semibold">x<sub>S</sub></span> =
-            <Frac num="−(−4)" den="2 · 1" />= <Frac num="4" den="2" />= <strong className="text-green-700">2</strong>
+          <Tex display tex="f(x) = x^2 - 4x + 1" />
+          <p className="mb-2">
+            <Tex tex="a = 1,\quad b = -4,\quad c = 1" />
           </p>
-          <p className="text-slate-700 font-serif mt-2">
-            <span className="text-red-700 font-semibold">y<sub>S</sub></span> = f(2) = 2² − 4 · 2 + 1 = 4 − 8 + 1 ={' '}
-            <strong className="text-red-700">−3</strong>
+          <Tex display tex={`\\textcolor{${GREEN}}{x_S} = -\\frac{-4}{2 \\cdot 1} = \\frac{4}{2} = \\textcolor{${GREEN}}{\\mathbf{2}}`} />
+          <Tex display tex={`\\begin{aligned} \\textcolor{${RED}}{y_S} &= f(2) = 2^2 - 4 \\cdot 2 + 1 \\\\ &= 4 - 8 + 1 = \\textcolor{${RED}}{\\mathbf{-3}} \\end{aligned}`} />
+          <p className="text-sm">oder mit der Formel:</p>
+          <Tex display tex={`\\begin{aligned} \\textcolor{${RED}}{y_S} &= 1 - \\frac{(-4)^2}{4 \\cdot 1} = 1 - \\frac{16}{4} \\\\ &= 1 - 4 = \\textcolor{${RED}}{\\mathbf{-3}} \\end{aligned}`} />
+          <p className="text-slate-800 font-bold mt-3">
+            Der Scheitelpunkt ist <Tex tex="S(2 \mid -3)" />.
           </p>
-          <p className="text-slate-700 font-serif mt-2">
-            oder mit Formel: <span className="text-red-700 font-semibold">y<sub>S</sub></span> = 1 −
-            <Frac num="(−4)²" den="4 · 1" />= 1 − <Frac num="16" den="4" />= 1 − 4 = <strong className="text-red-700">−3</strong>
-          </p>
-          <p className="text-slate-800 font-bold mt-3">Der Scheitelpunkt ist S(2 | −3).</p>
         </div>
       </div>
       <ul className="list-disc pl-5 mt-3 text-slate-700 space-y-1 text-sm text-left">
-        <li>a &gt; 0: Die Parabel ist nach oben geöffnet, S ist der tiefste Punkt. a &lt; 0: nach unten geöffnet, S ist der höchste Punkt.</li>
-        <li>Achte auf Vorzeichen: Ist b negativ, wird −b positiv, z. B. −(−4) = 4.</li>
-        <li>Beim Einsetzen negative Zahlen in Klammern setzen: (−3)² = 9, aber −3² = −9.</li>
+        <li>
+          <Tex tex="a > 0" />: Die Parabel ist nach oben geöffnet, S ist der tiefste Punkt. <Tex tex="a < 0" />: nach unten geöffnet, S ist der höchste Punkt.
+        </li>
+        <li>
+          Achte auf Vorzeichen: Ist b negativ, wird <Tex tex="-b" /> positiv, z. B. <Tex tex="-(-4) = 4" />.
+        </li>
+        <li>
+          Beim Einsetzen negative Zahlen in Klammern setzen: <Tex tex="(-3)^2 = 9" />, aber <Tex tex="-3^2 = -9" />.
+        </li>
       </ul>
       <h3 className="text-base font-bold text-slate-800 mt-5 mb-2 text-center">Erklärvideo</h3>
       <div className="max-w-2xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200">
@@ -439,7 +445,7 @@ export default function Scheitelpunkt() {
   const header = (
     <div>
       <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Scheitelpunkt berechnen</h1>
-      <p className="text-center text-slate-600">Berechne den Scheitelpunkt einer Parabel aus der allgemeinen Form f(x) = ax² + bx + c.</p>
+      <p className="text-center text-slate-600">Berechne den Scheitelpunkt einer Parabel aus der allgemeinen Form <Tex tex="f(x) = ax^2 + bx + c" />.</p>
     </div>
   )
 
@@ -456,7 +462,7 @@ export default function Scheitelpunkt() {
                 className="rounded-xl bg-green-600 hover:bg-green-700 text-white p-5 shadow-sm transition-colors"
               >
                 <p className="text-lg font-bold mb-1 text-white">Einfach</p>
-                <p className="text-xl font-serif italic mb-2 text-white">f(x) = ±x² + bx + c</p>
+                <Tex display className="text-xl mb-2 text-white" tex="f(x) = \pm x^2 + bx + c" />
                 <p className="text-sm text-white/90">Ohne Streckfaktor (a = 1 oder a = −1), der Scheitelpunkt hat ganzzahlige Koordinaten.</p>
               </button>
               <button
@@ -464,7 +470,7 @@ export default function Scheitelpunkt() {
                 className="rounded-xl bg-red-600 hover:bg-red-700 text-white p-5 shadow-sm transition-colors"
               >
                 <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
-                <p className="text-xl font-serif italic mb-2 text-white">f(x) = ax² + bx + c</p>
+                <Tex display className="text-xl mb-2 text-white" tex="f(x) = ax^2 + bx + c" />
                 <p className="text-sm text-white/90">Mit Streckfaktor a, der Scheitelpunkt kann auch Kommazahlen enthalten.</p>
               </button>
             </div>
