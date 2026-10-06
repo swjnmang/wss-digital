@@ -11,12 +11,22 @@ const difficultyLabel: Record<string, string> = {
   schwer: 'Schwer',
 };
 
+const LOB = [
+  '🎉 Super gemacht! Dein Anschriftenfeld ist komplett richtig.',
+  '🌟 Hervorragend! Du hast alle Angaben richtig herausgesucht und korrekt angeordnet.',
+  '👏 Klasse! Jede Zeile sitzt – so kann der Brief verschickt werden.',
+  '🏆 Perfekt gelöst! Du hast dich von den Zusatzinfos nicht ablenken lassen.',
+  '💪 Stark! Das Anschriftenfeld entspricht genau der DIN 5008.',
+];
+
 export default function AnschriftenfeldTrainer() {
   const { taskId } = useParams<{ taskId: string }>();
   const navigate = useNavigate();
   const task = taskId ? getAnschriftenfeldTaskById(taskId) : undefined;
   const [values, setValues] = useState<Record<string, string>>({});
   const [checked, setChecked] = useState(false);
+  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+  const [lob, setLob] = useState(LOB[0]);
   const [loadedTaskId, setLoadedTaskId] = useState(taskId);
 
   useEffect(() => {
@@ -33,6 +43,7 @@ export default function AnschriftenfeldTrainer() {
     setLoadedTaskId(taskId);
     setValues({});
     setChecked(false);
+    setRevealed({});
   }
 
   if (!task) return null;
@@ -52,6 +63,12 @@ export default function AnschriftenfeldTrainer() {
   const allAnswered = task.lines.every((line) => (values[line.id] ?? '').trim() !== '');
   const correctCount = task.lines.filter(isLineCorrect).length;
   const allCorrect = checked && correctCount === task.lines.length;
+  const usedSolution = task.lines.some((line) => revealed[line.id]);
+
+  const check = () => {
+    setLob(LOB[Math.floor(Math.random() * LOB.length)]);
+    setChecked(true);
+  };
 
   const renderRow = (line: AnschriftLine) => {
     const value = values[line.id] ?? '';
@@ -83,6 +100,20 @@ export default function AnschriftenfeldTrainer() {
             }`}
           >
             {line.explanation}
+          </p>
+        )}
+        {showResult && !correct && !revealed[line.id] && (
+          <button
+            type="button"
+            onClick={() => setRevealed((prev) => ({ ...prev, [line.id]: true }))}
+            className="mt-1 text-xs font-semibold text-blue-700 hover:text-blue-900 underline"
+          >
+            💡 Lösung für diese Zeile anzeigen
+          </button>
+        )}
+        {revealed[line.id] && (
+          <p className="mt-1 text-xs rounded-lg px-3 py-2 bg-blue-50 text-blue-900">
+            Lösung: <span className="font-mono font-semibold">{line.expected}</span>
           </p>
         )}
       </div>
@@ -132,7 +163,7 @@ export default function AnschriftenfeldTrainer() {
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setChecked(true)}
+                  onClick={check}
                   disabled={!allAnswered}
                   className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
                     allAnswered
@@ -161,7 +192,11 @@ export default function AnschriftenfeldTrainer() {
 
         {allCorrect && (
           <div className="bg-green-50 border-2 border-green-400 rounded-xl p-5 text-center">
-            <p className="text-green-800 font-semibold mb-3">🎉 Super! Das Anschriftenfeld ist korrekt aufgebaut.</p>
+            <p className="text-green-800 font-semibold mb-3">
+              {usedSolution
+                ? '✅ Geschafft! Jetzt ist alles richtig. Versuch die nächste Aufgabe ganz ohne Lösungshilfe!'
+                : lob}
+            </p>
             <button
               onClick={goToRandomTask}
               className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
@@ -174,7 +209,8 @@ export default function AnschriftenfeldTrainer() {
           <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 text-center">
             <p className="text-amber-800 font-semibold">
               Noch nicht ganz richtig ({correctCount} / {task.lines.length}). Korrigiere die rot markierten Zeilen und
-              klicke erneut auf „Prüfen“.
+              klicke erneut auf „Prüfen“. Wenn du nicht weiterkommst, kannst du dir die Lösung einzelner Zeilen anzeigen
+              lassen.
             </p>
           </div>
         )}

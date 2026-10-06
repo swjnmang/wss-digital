@@ -542,7 +542,7 @@ function postfach(): AnschriftenfeldTask {
 }
 
 function vermerke(): AnschriftenfeldTask {
-  const variante = pick(['privat', 'einschreiben-privat', 'einschreiben-rueckschein'] as const);
+  const variante = pick(['privat', 'einschreiben-privat', 'einschreiben'] as const);
   const p = person(rand() < 0.4);
   const g = pr(p);
   const a = deutscheAdresse();
@@ -572,12 +572,13 @@ function vermerke(): AnschriftenfeldTask {
       line('vermerk2', 'Zusatz- und Vermerkzone – untere Zeile (direkt über der Anschrift)', 'Privat', EXPL.vermerkReihenfolge, 'zusatz'),
     );
   } else {
-    titel = 'Einschreiben mit Rückschein';
-    difficulty = 'schwer';
-    anlass = `${c.Nom} verschickt wichtige Unterlagen an ${p.female ? 'eine Vertragspartnerin' : 'einen Vertragspartner'}, ${nameOf(p)}. Der Empfang muss zweifelsfrei nachgewiesen werden – und zwar mit ${g.seiner} eigenen Unterschrift auf einer Karte, die an uns zurückgeschickt wird.`;
+    titel = 'Vermerk „Einschreiben“';
+    difficulty = 'mittel';
+    anlass = `${c.Nom} verschickt wichtige Unterlagen an ${p.female ? 'eine Vertragspartnerin' : 'einen Vertragspartner'}, ${nameOf(p)}. Die Post soll die Übergabe gegen Unterschrift bestätigen, damit später nachgewiesen werden kann, dass der Brief angekommen ist.`;
     zusatz.push(
-      line('vermerk1', 'Zusatz- und Vermerkzone – obere Zeile', 'Einschreiben', EXPL.vermerkReihenfolge, 'zusatz'),
-      line('vermerk2', 'Zusatz- und Vermerkzone – untere Zeile (direkt über der Anschrift)', 'mit Rückschein', EXPL.vermerkReihenfolge, 'zusatz'),
+      line('vermerk', 'Zusatz- und Vermerkzone – Zeile direkt über der Anschrift', 'Einschreiben',
+        'Mit dem Vermerk „Einschreiben“ wird der Brief nur gegen Unterschrift übergeben, der Empfang ist damit nachweisbar. Der Vermerk steht direkt über der Anschrift.',
+        'zusatz'),
     );
   }
 

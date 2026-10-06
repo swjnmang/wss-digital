@@ -215,7 +215,7 @@ const HANDMADE_TASKS: AnschriftenfeldTask[] = [
     title: 'Zusatz- und Vermerkzone',
     difficulty: 'schwer',
     arbeitsauftrag:
-      'Dein Chef händigt dir wichtige private Dokumente aus, die an Herrn Dr. Stephan Breitner, Birkenweg 11, 54344 Kenn gehen sollen. Weil der Empfang zweifelsfrei nachgewiesen werden muss, soll der Brief als Einschreiben mit Rückschein verschickt werden. Ergänze zuerst die passenden postalischen Vermerke, bevor du die eigentliche Anschrift ausfüllst.',
+      'Dein Chef händigt dir wichtige private Dokumente aus, die an Herrn Dr. Stephan Breitner, Birkenweg 11, 54344 Kenn gehen sollen. Weil der Empfang zweifelsfrei nachgewiesen werden muss, soll der Brief als Einschreiben verschickt werden. Außerdem soll niemand außer Herrn Breitner selbst den Umschlag öffnen. Ergänze zuerst die passenden postalischen Vermerke, bevor du die eigentliche Anschrift ausfüllst.',
     senderLine: SENDER,
     lines: [
       {
@@ -225,13 +225,13 @@ const HANDMADE_TASKS: AnschriftenfeldTask[] = [
         expected: 'Einschreiben',
         zone: 'zusatz',
         explanation:
-          'Mehrere postalische Vermerke werden untereinander aufgeführt. „Einschreiben“ steht hier über „mit Rückschein“.',
+          'Mehrere postalische Vermerke werden untereinander aufgeführt. „Einschreiben“ steht hier über „Privat“.',
       },
       {
         type: 'text',
         id: 'vermerk2',
         caption: 'Zusatz- und Vermerkzone – untere Zeile (direkt über der Anschrift)',
-        expected: 'mit Rückschein',
+        expected: 'Privat',
         zone: 'zusatz',
         explanation:
           'Auch bei mehreren Vermerken beginnt man auf der untersten Zeile der Zusatz- und Vermerkzone, also direkt über der eigentlichen Anschrift.',
