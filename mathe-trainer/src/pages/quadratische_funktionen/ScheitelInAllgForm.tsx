@@ -154,10 +154,10 @@ const ScheitelInAllgForm = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-7xl w-full mx-auto text-left">
+            <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-left">
                 <h1 className="text-3xl font-bold text-gray-800 mb-6">Von der Scheitelform zur allgemeinen Form</h1>
 
-                <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                <section className="flex flex-col gap-8 mb-10">
                     <div>
                         <h2 className="text-xl font-semibold text-gray-800 mb-3">So funktioniert's</h2>
                         <p className="text-gray-700 mb-3">
@@ -199,7 +199,7 @@ const ScheitelInAllgForm = () => {
                     „Tipp anzeigen“ den Lösungsweg Schritt für Schritt.
                 </p>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                <div className="flex flex-col gap-6">
                     {aufgaben.map((t, i) => (
                         <div key={i} className="border border-gray-200 rounded-lg p-4">
                             <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-md mb-4">
