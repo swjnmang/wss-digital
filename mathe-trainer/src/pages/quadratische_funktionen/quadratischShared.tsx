@@ -293,3 +293,33 @@ export function Video({ id, title }: { id: string; title: string }) {
     </>
   )
 }
+
+// ---------- Scheitelform-Eingabe ----------
+
+export type Vorzeichen = '+' | '-' | null
+
+// Kleiner Umschalter, mit dem der Schüler selbst zwischen + und − wählt,
+// statt ein Vorzeichen im Kopf umdrehen und als Zahl eintippen zu müssen.
+export const SignToggle = ({ value, onChange }: { value: Vorzeichen; onChange: (v: '+' | '-') => void }) => (
+    <div className="inline-flex shrink-0 rounded-md overflow-hidden border-2 border-slate-300">
+        <button
+            type="button"
+            onClick={() => onChange('+')}
+            aria-label="Plus"
+            className={`w-5 h-8 flex items-center justify-center text-xs font-bold transition-colors ${value === '+' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
+        >
+            +
+        </button>
+        <button
+            type="button"
+            onClick={() => onChange('-')}
+            aria-label="Minus"
+            className={`w-5 h-8 flex items-center justify-center text-xs font-bold transition-colors border-l-2 border-slate-300 ${value === '-' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
+        >
+            −
+        </button>
+    </div>
+);
+
+export const eingabeKlasse =
+    'w-14 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-md focus:border-blue-500 focus:outline-none text-center';

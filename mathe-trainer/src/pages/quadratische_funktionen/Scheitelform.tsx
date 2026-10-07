@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import ParabelGraph from '../../components/ParabelGraph';
-
-type Vorzeichen = '+' | '-' | null;
+import MarioSpiel from './MarioSpiel';
+import { SignToggle, eingabeKlasse, type Vorzeichen } from './quadratischShared';
 
 type Aufgabe = { a: number; xs: number; ys: number };
 
@@ -77,32 +77,6 @@ const pruefe = (t: Aufgabe, e: Eingabe): Ergebnis => {
     return { richtig: false, text: `Noch nicht ganz. Überprüfe: ${fehler}` };
 };
 
-// Kleiner Umschalter, mit dem der Schüler selbst zwischen + und − wählt,
-// statt ein Vorzeichen im Kopf umdrehen und als Zahl eintippen zu müssen.
-const SignToggle = ({ value, onChange }: { value: Vorzeichen; onChange: (v: '+' | '-') => void }) => (
-    <div className="inline-flex shrink-0 rounded-md overflow-hidden border-2 border-slate-300">
-        <button
-            type="button"
-            onClick={() => onChange('+')}
-            aria-label="Plus"
-            className={`w-5 h-8 flex items-center justify-center text-xs font-bold transition-colors ${value === '+' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
-        >
-            +
-        </button>
-        <button
-            type="button"
-            onClick={() => onChange('-')}
-            aria-label="Minus"
-            className={`w-5 h-8 flex items-center justify-center text-xs font-bold transition-colors border-l-2 border-slate-300 ${value === '-' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
-        >
-            −
-        </button>
-    </div>
-);
-
-const eingabeKlasse =
-    'w-14 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-md focus:border-blue-500 focus:outline-none text-center';
-
 const Loesungsweg = ({ t }: { t: Aufgabe }) => (
     <div className="mt-3 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md p-3 space-y-1">
         <p>
@@ -124,6 +98,7 @@ const Scheitelform = () => {
     const [eingaben, setEingaben] = useState<Eingabe[]>([]);
     const [ergebnisse, setErgebnisse] = useState<Ergebnis[]>([]);
     const [loesungen, setLoesungen] = useState<boolean[]>([]);
+    const [spielGeloest, setSpielGeloest] = useState(false);
 
     const neueAufgaben = () => {
         setAufgaben(erzeugeAufgaben());
@@ -149,7 +124,7 @@ const Scheitelform = () => {
         setLoesungen((prev) => prev.map((v, idx) => (idx === i ? !v : v)));
     };
 
-    const anzahlRichtig = ergebnisse.filter((r) => r?.richtig).length;
+    const anzahlRichtig = ergebnisse.filter((r) => r?.richtig).length + (spielGeloest ? 1 : 0);
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -158,10 +133,10 @@ const Scheitelform = () => {
                     <h1 className="text-2xl font-bold text-gray-800">Scheitelform aus dem Graphen</h1>
                     <span
                         className={`shrink-0 text-sm font-semibold px-3 py-1 rounded-full ${
-                            anzahlRichtig === ANZAHL_AUFGABEN ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                            anzahlRichtig === ANZAHL_AUFGABEN + 1 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
                         }`}
                     >
-                        {anzahlRichtig} / {ANZAHL_AUFGABEN} richtig
+                        {anzahlRichtig} / {ANZAHL_AUFGABEN + 1} richtig
                     </span>
                 </div>
                 <p className="text-gray-600 mb-5">
@@ -293,6 +268,7 @@ const Scheitelform = () => {
                             </div>
                         );
                     })}
+                    <MarioSpiel onGeloest={() => setSpielGeloest(true)} />
                 </div>
 
                 <div className="flex justify-center mt-8">
