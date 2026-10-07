@@ -29,7 +29,7 @@ import GeneratorLineare from './pages/rechnen_lernen/gleichungen/Generator_linea
 import Quadratisch from './pages/rechnen_lernen/gleichungen/Quadratisch';
 import Bruchgleichungen from './pages/rechnen_lernen/gleichungen/Bruchgleichungen';
 import Abschlusstest from './pages/rechnen_lernen/gleichungen/Abschlusstest';
-import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
+import { Routes, Route, Link, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react';
 import Home from './pages/Home'
 import LineareIndex from './pages/LineareIndex'
@@ -119,9 +119,7 @@ import RechtwinkligStrecken from './pages/trigonometrie/RechtwinkligStrecken';
 import RechtwinkligWinkel from './pages/trigonometrie/RechtwinkligWinkel';
 import Sinussatz from './pages/trigonometrie/Sinussatz';
 import Kosinussatz from './pages/trigonometrie/Kosinussatz';
-import FlaechensatzMenu from './pages/trigonometrie/FlaechensatzMenu';
-import FlaechensatzEinstieg from './pages/trigonometrie/FlaechensatzEinstieg';
-import FlaechensatzUebung from './pages/trigonometrie/FlaechensatzUebung';
+import Flaechensatz from './pages/trigonometrie/Flaechensatz';
 import Sinusfunktion from './pages/trigonometrie/Sinusfunktion';
 import Kosinusfunktion from './pages/trigonometrie/Kosinusfunktion';
 import Winkelbeziehungen from './pages/trigonometrie/Winkelbeziehungen';
@@ -337,9 +335,9 @@ export default function App() {
           <Route path="/trigonometrie/steigungswinkel-prozent-grad" element={<SteigungswinkelProzentGrad />} />
           <Route path="/trigonometrie/sinussatz" element={<Sinussatz />} />
           <Route path="/trigonometrie/kosinussatz" element={<Kosinussatz />} />
-          <Route path="/trigonometrie/flaechensatz" element={<FlaechensatzMenu />} />
-          <Route path="/trigonometrie/flaechensatz/einstieg" element={<FlaechensatzEinstieg />} />
-          <Route path="/trigonometrie/flaechensatz/uebung" element={<FlaechensatzUebung />} />
+          <Route path="/trigonometrie/flaechensatz" element={<Flaechensatz />} />
+          <Route path="/trigonometrie/flaechensatz/einstieg" element={<Navigate to="/trigonometrie/flaechensatz" replace />} />
+          <Route path="/trigonometrie/flaechensatz/uebung" element={<Navigate to="/trigonometrie/flaechensatz" replace />} />
           <Route path="/trigonometrie/sinusfunktion" element={<Sinusfunktion />} />
           <Route path="/trigonometrie/kosinusfunktion" element={<Kosinusfunktion />} />
           <Route path="/trigonometrie/winkelbeziehungen" element={<Winkelbeziehungen />} />

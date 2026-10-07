@@ -1,603 +1,341 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { InlineMath } from 'react-katex';
+import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
-import { useTaskTracking } from '../../hooks/useTaskTracking';
+import Practice from './engine/Practice';
+import Rich from '../raum_und_form/engine/Rich';
+import TriangleFigure, { COLOR_ASKED, COLOR_GIVEN, type Mark } from './engine/TriangleFigure';
+import type { Level, Task, TopicConfig } from './engine/types';
+import { cap, deg, fmt, pick, randFloat, randInt, sinD, tanD, tex, texDeg } from './engine/util';
 
-interface SolutionStep {
-    text: string;
-    math?: string;
-}
-
-interface SketchSpec {
-    horizontal: number;
-    vertical: number;
-    horizontalLabel: string;
-    verticalLabel: string;
-    hypotenuseLabel: string;
-    angleLabel: string;
-    highlight: 'horizontal' | 'vertical' | 'hypotenuse' | 'angle' | 'none';
-    askedLabel?: string;
-}
-
-interface SlopeTask {
-    prompt: string;
-    steps: SolutionStep[];
-    correctAnswer: number;
-    unit: string;
-    resultLabel: string;
-    sketch: SketchSpec;
-    secondAnswer?: number;
-    secondUnit?: string;
-    secondResultLabel?: string;
-}
-
-const degToRad = (deg: number) => deg * (Math.PI / 180);
-const radToDeg = (rad: number) => rad * (180 / Math.PI);
-const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-const randomInt = (min: number, max: number) => Math.floor(randomInRange(min, max + 1));
-const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
-const round = (val: number, digits = 2) => parseFloat(val.toFixed(digits));
-const formatNumber = (val: number, digits = 2) => parseFloat(val.toFixed(digits)).toString();
-
-interface Triangle {
-    horizontal: number;
-    vertical: number;
-    hypotenuse: number;
-    angle: number;
-    percent: number;
-}
-
-const triangleFromHorizontalPercent = (horizontal: number, percent: number): Triangle => {
-    const vertical = (horizontal * percent) / 100;
-    const angle = radToDeg(Math.atan(percent / 100));
-    const hypotenuse = Math.sqrt(horizontal ** 2 + vertical ** 2);
-    return { horizontal, vertical, hypotenuse, angle, percent };
-};
-
-const triangleFromHorizontalAngle = (horizontal: number, angle: number): Triangle => {
-    const vertical = horizontal * Math.tan(degToRad(angle));
-    const percent = (vertical / horizontal) * 100;
-    const hypotenuse = horizontal / Math.cos(degToRad(angle));
-    return { horizontal, vertical, hypotenuse, angle, percent };
-};
-
-const triangleFromPercentDistance = (percent: number, distance: number): Triangle => {
-    const angle = radToDeg(Math.atan(percent / 100));
-    const vertical = Math.sin(degToRad(angle)) * distance;
-    const horizontal = Math.cos(degToRad(angle)) * distance;
-    return { horizontal, vertical, hypotenuse: distance, angle, percent };
-};
-
-const triangleFromHorizontalVertical = (horizontal: number, vertical: number): Triangle => {
-    const angle = radToDeg(Math.atan(vertical / horizontal));
-    const percent = (vertical / horizontal) * 100;
-    const hypotenuse = Math.sqrt(horizontal ** 2 + vertical ** 2);
-    return { horizontal, vertical, hypotenuse, angle, percent };
-};
-
-const SlopeSketch: React.FC<SketchSpec> = ({
-    horizontal,
-    vertical,
-    horizontalLabel,
-    verticalLabel,
-    hypotenuseLabel,
-    angleLabel,
-    highlight,
-    askedLabel
-}) => {
-    const width = 420;
-    const height = 250;
-    const margin = 44;
-    const rightLabelSpace = 100;
-    const maxRun = width - 2 * margin - rightLabelSpace;
-    const riseCap = height - 2 * margin;
-    // Steigungswinkel sind oft sehr flach (wenige Grad). Ohne eine Mindesthöhe
-    // würde das Dreieck dann nur als winziger Strich am unteren Bildrand erscheinen.
-    // Die Zeichnung ist bewusst nicht maßstabsgetreu, damit sie immer gut erkennbar ist.
-    const minRisePx = riseCap * 0.4;
-    const trueRisePx = (vertical / horizontal) * maxRun;
-    const risePx = Math.min(riseCap, Math.max(minRisePx, trueRisePx));
-
-    const Ax = margin;
-    const Ay = height - margin;
-    const Bx = margin + maxRun;
-    const By = height - margin;
-    const Cx = Bx;
-    const Cy = By - risePx;
-
-    const colorFor = (part: SketchSpec['highlight']) => (highlight === part ? '#dc2626' : '#1f2937');
-
-    return (
-        <svg width={420} height={250} viewBox="0 0 420 250" className="mx-auto">
-            <polygon points={`${Ax},${Ay} ${Bx},${By} ${Cx},${Cy}`} fill="#eef2ff" stroke="#0f172a" strokeWidth={2} />
-            <line x1={Ax} y1={Ay} x2={Bx} y2={By} stroke={colorFor('horizontal')} strokeWidth={3} />
-            <line x1={Bx} y1={By} x2={Cx} y2={Cy} stroke={colorFor('vertical')} strokeWidth={3} />
-            <line x1={Ax} y1={Ay} x2={Cx} y2={Cy} stroke={colorFor('hypotenuse')} strokeWidth={3} />
-
-            <text x={(Ax + Bx) / 2} y={Ay + 22} textAnchor="middle" fontSize="13" fill={colorFor('horizontal')}>
-                {horizontalLabel}
-            </text>
-            <text x={Bx + 12} y={(By + Cy) / 2} fontSize="13" fill={colorFor('vertical')}>
-                {verticalLabel}
-            </text>
-            <text x={(Ax + Cx) / 2 - 10} y={(Ay + Cy) / 2 - 5} fontSize="13" fill={colorFor('hypotenuse')} textAnchor="end">
-                {hypotenuseLabel}
-            </text>
-            <text x={Ax + 28} y={Ay - 10} fontSize="14" fontWeight="bold" fill={colorFor('angle')}>
-                {angleLabel}
-            </text>
-            {askedLabel && (
-                <text x={width - 16} y={28} textAnchor="end" fontSize="14" fontWeight="bold" fill="#dc2626">
-                    {askedLabel}
-                </text>
-            )}
-        </svg>
-    );
-};
-
-const ALPINE_PASSES = [
-    { name: 'der Fernpass', percent: 8 },
-    { name: 'der Achenpass', percent: 12 },
-    { name: 'das Hahntennjoch', percent: 15 },
-    { name: 'der Monte Zoncolan', percent: 22 },
-    { name: 'das Stilfser Joch', percent: 24 },
-    { name: 'das Timmelsjoch', percent: 13 },
-    { name: 'der Sölkpass', percent: 23 },
-    { name: 'der Grimselpass', percent: 11 }
+const ROADS = [
+  'eine Bergstraße',
+  'eine Passstraße',
+  'eine Tiefgaragenrampe',
+  'ein Forstweg',
+  'eine Skipiste',
+  'ein Wanderweg',
+  'eine Rollstuhlrampe',
+  'eine Zahnradbahn',
+];
+const PASSES = [
+  { name: 'Der Fernpass', percent: 8 },
+  { name: 'Der Achenpass', percent: 12 },
+  { name: 'Das Hahntennjoch', percent: 15 },
+  { name: 'Der Monte Zoncolan', percent: 22 },
+  { name: 'Das Stilfser Joch', percent: 24 },
+  { name: 'Das Timmelsjoch', percent: 13 },
+  { name: 'Der Sölkpass', percent: 23 },
+  { name: 'Der Grimselpass', percent: 11 },
 ];
 
-const SLOPE_NOUNS = ['Ein Forstweg', 'Eine Skipiste', 'Eine Tiefgaragenrampe', 'Eine Bergstraße', 'Ein Wanderweg', 'Eine Schotterpiste'];
-const TRAVELERS = ['Ein Auto', 'Ein Fahrradfahrer', 'Ein Linienbus', 'Eine Wanderin', 'Ein Motorrad'];
-const MAP_SCALES = [10000, 25000, 50000];
+/** Steigungsdreieck; flache Steigungen werden überhöht gezeichnet, damit man sie erkennt. */
+function SlopeFigure({
+  ratio,
+  base,
+  rise,
+  path,
+  angle,
+}: {
+  ratio: number;
+  base: Mark | null;
+  rise: Mark | null;
+  path: Mark | null;
+  angle: Mark | null;
+}) {
+  const h = Math.min(0.75, Math.max(0.28, ratio));
+  return (
+    <TriangleFigure
+      pts={[
+        { x: 0, y: 0 },
+        { x: 1, y: 0 },
+        { x: 1, y: h },
+      ]}
+      names={['', '', '']}
+      sides={[rise, path, base]}
+      angles={[angle, null, null]}
+      right={1}
+    />
+  );
+}
 
-const buildPassTask = (): SlopeTask => {
-    const pass = pick(ALPINE_PASSES);
-    const horizontal = randomInt(80, 160);
-    const t = triangleFromHorizontalPercent(horizontal, pass.percent);
+const g = (text: string): Mark => ({ text, color: COLOR_GIVEN });
+const q = (text: string): Mark => ({ text, color: COLOR_ASKED, bold: true });
 
-    const steps: SolutionStep[] = [
-        {
-            text: 'Die Steigung in Prozent entspricht dem Tangens des Steigungswinkels.',
-            math: `\\tan(\\alpha) = \\frac{\\text{Steigung in \\%}}{100} = \\frac{${formatNumber(pass.percent, 1)}}{100} = ${formatNumber(pass.percent / 100, 4)}`
-        },
-        {
-            text: 'Löse mit der Umkehrfunktion Tangens⁻¹ nach dem Winkel auf.',
-            math: `\\alpha = \\tan^{-1}(${formatNumber(pass.percent / 100, 4)})`
-        },
-        {
-            text: 'Berechne und runde den Winkel.',
-            math: `\\alpha \\approx ${formatNumber(t.angle, 1)}^{\\circ}`
-        }
-    ];
+const pTex = (p: number) => `${tex(p, 1)}\\,\\%`;
 
+function generate(level: Level, slot: number): Task {
+  if (level === 'einfach') {
+    if (slot % 2 === 0) {
+      // Prozent -> Grad
+      const pass = slot === 0 || slot === 4 ? pick(PASSES) : null;
+      const p = pass ? pass.percent : randInt(3, 40);
+      const a = deg(Math.atan(p / 100));
+      return {
+        key: `pg-${p}`,
+        text: pass
+          ? `${pass.name} hat eine maximale Steigung von ${p} %. Berechne den Steigungswinkel $\\alpha$.`
+          : `${cap(
+              pick(ROADS)
+            )} hat eine Steigung von ${p} %. Berechne den Steigungswinkel $\\alpha$.`,
+        figure: (
+          <SlopeFigure
+            ratio={p / 100}
+            base={g('100 m')}
+            rise={g(`${p} m`)}
+            path={null}
+            angle={q('α = ?')}
+          />
+        ),
+        fields: [{ kind: 'num', label: '$\\alpha$', value: a, unit: '°', tol: 0.15 }],
+        tips: [
+          `${p} % Steigung bedeutet: auf 100 m waagrechter Strecke geht es ${p} m nach oben.`,
+          `Höhe (Gegenkathete) und waagrechte Strecke (Ankathete) → Tangens: $\\tan(\\alpha) = \\dfrac{${p}}{100}$.`,
+          `Mit $\\tan^{-1}$ erhältst du den Winkel.`,
+        ],
+        solution: [
+          `$\\tan(\\alpha) = \\dfrac{${p}}{100} = ${tex(p / 100, 2)}$`,
+          `$\\alpha = \\tan^{-1}(${tex(p / 100, 2)}) \\approx ${texDeg(a)}$`,
+        ],
+      };
+    }
+    // Grad -> Prozent
+    const a = randInt(2, 25);
+    const p = tanD(a) * 100;
     return {
-        prompt: `In den Alpen haben viele Passstraßen starke Steigungen. ${pass.name.charAt(0).toUpperCase()}${pass.name.slice(1)} hat eine maximale Steigung von ${formatNumber(pass.percent, 1)} %. Berechne den Steigungswinkel α dieses Straßenabschnitts.`,
-        steps,
-        correctAnswer: round(t.angle, 1),
-        unit: '°',
-        resultLabel: 'α',
-        sketch: {
-            horizontal: t.horizontal,
-            vertical: t.vertical,
-            horizontalLabel: 'horizontale Strecke',
-            verticalLabel: `${formatNumber(t.vertical, 1)} m`,
-            hypotenuseLabel: 'Weg',
-            angleLabel: 'α = ?',
-            highlight: 'angle'
-        }
+      key: `gp-${a}`,
+      text: `${cap(
+        pick(ROADS)
+      )} hat einen Steigungswinkel von $\\alpha = ${a}^\\circ$. Gib die Steigung in Prozent an.`,
+      figure: (
+        <SlopeFigure
+          ratio={p / 100}
+          base={g('100 m')}
+          rise={q('? m')}
+          path={null}
+          angle={g(`α = ${a}°`)}
+        />
+      ),
+      fields: [{ kind: 'num', label: 'Steigung', value: p, unit: '%', tol: 0.15 }],
+      tips: [
+        `Die Steigung in Prozent gibt an, wie viele Meter es auf 100 m waagrechter Strecke nach oben geht.`,
+        `$\\tan(\\alpha) = \\dfrac{\\text{Höhe}}{\\text{waagrechte Strecke}}$ – also ist die Steigung $\\tan(${a}^\\circ) \\cdot 100\\,\\%$.`,
+      ],
+      solution: [
+        `$\\tan(${a}^\\circ) \\approx ${tex(tanD(a), 4)}$`,
+        `Steigung $= ${tex(tanD(a), 4)} \\cdot 100\\,\\% \\approx ${pTex(p)}$`,
+      ],
     };
-};
+  }
 
-const buildAngleToPercentTask = (): SlopeTask => {
-    const noun = pick(SLOPE_NOUNS);
-    const horizontal = randomInt(60, 150);
-    const angle = round(randomInRange(2, 35), 1);
-    const t = triangleFromHorizontalAngle(horizontal, angle);
-
-    const steps: SolutionStep[] = [
-        {
-            text: 'Im rechtwinkligen Dreieck beschreibt der Tangens des Steigungswinkels das Verhältnis von Höhenunterschied zu horizontaler Strecke.',
-            math: `\\tan(\\alpha) = \\frac{\\text{Höhenunterschied}}{\\text{horizontale Strecke}}`
-        },
-        {
-            text: 'Setze den gegebenen Winkel ein.',
-            math: `\\tan(${formatNumber(angle, 1)}^{\\circ}) = ${formatNumber(t.percent / 100, 4)}`
-        },
-        {
-            text: 'Die Steigung in Prozent ist dieses Verhältnis multipliziert mit 100.',
-            math: `\\text{Steigung} = \\tan(${formatNumber(angle, 1)}^{\\circ}) \\cdot 100\\,\\%`
-        },
-        {
-            text: 'Berechne und runde das Ergebnis.',
-            math: `\\text{Steigung} \\approx ${formatNumber(t.percent, 1)}\\,\\%`
-        }
-    ];
-
+  if (level === 'mittel') {
+    // Höhenunterschied und waagrechte Strecke -> Prozent und Grad
+    const d = slot % 2 === 0 ? randInt(20, 400) : randInt(500, 3000);
+    const h = Math.round(d * randFloat(0.03, 0.35, 2));
+    const p = (h / d) * 100;
+    const a = deg(Math.atan(h / d));
+    const road = pick(ROADS);
     return {
-        prompt: `${noun} hat einen Steigungswinkel von α = ${formatNumber(angle, 1)}°. Berechne die Steigung in Prozent.`,
-        steps,
-        correctAnswer: round(t.percent, 1),
-        unit: '%',
-        resultLabel: 'Steigung',
-        sketch: {
-            horizontal: t.horizontal,
-            vertical: t.vertical,
-            horizontalLabel: 'horizontale Strecke',
-            verticalLabel: '',
-            hypotenuseLabel: 'Weg',
-            angleLabel: `α = ${formatNumber(angle, 1)}°`,
-            highlight: 'none',
-            askedLabel: 'Steigung = ?'
-        }
+      key: `m-${d}-${h}`,
+      text: `${cap(road)} überwindet auf einer **waagrechten** Strecke von ${fmt(
+        d
+      )} m einen Höhenunterschied von ${h} m. Berechne die Steigung in Prozent und den Steigungswinkel $\\alpha$.`,
+      figure: (
+        <SlopeFigure
+          ratio={h / d}
+          base={g(`${fmt(d)} m`)}
+          rise={g(`${h} m`)}
+          path={null}
+          angle={q('α = ?')}
+        />
+      ),
+      fields: [
+        { kind: 'num', label: 'Steigung', value: p, unit: '%', tol: 0.15 },
+        { kind: 'num', label: '$\\alpha$', value: a, unit: '°', tol: 0.15 },
+      ],
+      tips: [
+        `Steigung in Prozent: $\\dfrac{\\text{Höhenunterschied}}{\\text{waagrechte Strecke}} \\cdot 100\\,\\%$.`,
+        `Derselbe Quotient ist $\\tan(\\alpha)$. Nutze $\\tan^{-1}$ für den Winkel.`,
+        `Achtung: Steigung in Prozent und Winkel in Grad sind **nicht** dasselbe – 100 % entsprechen 45°.`,
+      ],
+      solution: [
+        `Steigung $= \\dfrac{${h}\\,\\text{m}}{${d}\\,\\text{m}} \\cdot 100\\,\\% \\approx ${pTex(
+          p
+        )}$`,
+        `$\\tan(\\alpha) = \\dfrac{${h}}{${d}} \\approx ${tex(
+          h / d,
+          4
+        )}$ $\\Rightarrow$ $\\alpha = \\tan^{-1}(${tex(h / d, 4)}) \\approx ${texDeg(a)}$`,
+      ],
     };
-};
+  }
 
-const buildDistanceTask = (): SlopeTask => {
-    const traveler = pick(TRAVELERS);
-    const percent = round(randomInRange(4, 25), 1);
-    const distance = randomInt(400, 3000);
-    const t = triangleFromPercentDistance(percent, distance);
-
-    const steps: SolutionStep[] = [
-        {
-            text: 'Die Steigung in Prozent entspricht dem Tangens des Steigungswinkels.',
-            math: `\\tan(\\alpha) = \\frac{${formatNumber(percent, 1)}}{100} = ${formatNumber(percent / 100, 4)}`
-        },
-        {
-            text: 'Bestimme den Neigungswinkel mit der Umkehrfunktion Tangens⁻¹.',
-            math: `\\alpha = \\tan^{-1}(${formatNumber(percent / 100, 4)})`
-        },
-        {
-            text: 'Berechne und runde den Winkel.',
-            math: `\\alpha \\approx ${formatNumber(t.angle, 1)}^{\\circ}`
-        }
-    ];
-
+  // schwer: Anwendungen mit der Weglänge (Hypotenuse) bzw. einer Karte
+  const kind = slot % 3;
+  if (kind === 0) {
+    const p = randFloat(4, 25, 1);
+    const s = randInt(4, 30) * 100;
+    const a = deg(Math.atan(p / 100));
+    const h = s * sinD(a);
+    const who = pick([
+      'Ein Radfahrer',
+      'Eine Wanderin',
+      'Ein Linienbus',
+      'Eine Läuferin',
+      'Ein Auto',
+    ]);
     return {
-        prompt: `${traveler} fährt auf einer Straße mit einem durchschnittlichen Gefälle von ${formatNumber(percent, 1)} % eine Fahrstrecke von ${formatNumber(distance, 0)} m. Bestimme den Neigungswinkel der Straße.`,
-        steps,
-        correctAnswer: round(t.angle, 1),
-        unit: '°',
-        resultLabel: 'α',
-        sketch: {
-            horizontal: t.horizontal,
-            vertical: t.vertical,
-            horizontalLabel: 'horizontale Strecke',
-            verticalLabel: `${formatNumber(t.vertical, 0)} m`,
-            hypotenuseLabel: `${formatNumber(distance, 0)} m`,
-            angleLabel: 'α = ?',
-            highlight: 'angle'
-        }
+      key: `s0-${p}-${s}`,
+      text: `${who} legt auf einer Straße mit ${fmt(p, 1)} % Steigung eine Strecke von ${fmt(
+        s
+      )} m zurück (gemessen **entlang der Straße**). Berechne den Steigungswinkel und den Höhenunterschied.`,
+      figure: (
+        <SlopeFigure
+          ratio={p / 100}
+          base={null}
+          rise={q('h = ?')}
+          path={g(`${fmt(s)} m`)}
+          angle={q('α = ?')}
+        />
+      ),
+      fields: [
+        { kind: 'num', label: '$\\alpha$', value: a, unit: '°', tol: 0.15 },
+        { kind: 'num', label: '$h$', value: h, unit: 'm', tol: Math.max(h * 0.01, 0.5) },
+      ],
+      tips: [
+        `Berechne zuerst den Winkel: $\\tan(\\alpha) = \\dfrac{${tex(p, 1)}}{100}$.`,
+        `Die ${fmt(
+          s
+        )} m entlang der Straße sind die **Hypotenuse**, gesucht ist die Gegenkathete $h$ → Sinus.`,
+        `$h = ${fmt(s)}\\,\\text{m} \\cdot \\sin(\\alpha)$`,
+      ],
+      solution: [
+        `$\\alpha = \\tan^{-1}\\left(\\dfrac{${tex(p, 1)}}{100}\\right) \\approx ${texDeg(a, 2)}$`,
+        `$h = ${s}\\,\\text{m} \\cdot \\sin(${texDeg(a, 2)}) \\approx ${tex(h, 1)}\\,\\text{m}$`,
+      ],
     };
-};
-
-const buildMapScaleTask = (): SlopeTask => {
-    const scale = pick(MAP_SCALES);
-    const mapDistanceCm = round(randomInRange(2, 9), 1);
-    const heightDiff = randomInt(12, 150);
-    const horizontalCm = mapDistanceCm * scale;
-    const horizontalM = horizontalCm / 100;
-    const t = triangleFromHorizontalVertical(horizontalM, heightDiff);
-
-    const steps: SolutionStep[] = [
-        {
-            text: 'Berechne zunächst die wahre horizontale Entfernung aus dem Kartenmaßstab.',
-            math: `\\text{Strecke} = ${formatNumber(mapDistanceCm, 1)}\\,\\text{cm} \\cdot ${scale} = ${formatNumber(horizontalCm, 0)}\\,\\text{cm} = ${formatNumber(horizontalM, 0)}\\,\\text{m}`
-        },
-        {
-            text: 'Die Steigung in Prozent ist der Höhenunterschied geteilt durch die horizontale Strecke, mal 100.',
-            math: `\\text{Gefälle} = \\frac{\\text{Höhendifferenz}}{\\text{horizontale Strecke}} \\cdot 100\\,\\%`
-        },
-        {
-            text: 'Setze die Werte ein.',
-            math: `\\text{Gefälle} = \\frac{${formatNumber(heightDiff, 0)}}{${formatNumber(horizontalM, 0)}} \\cdot 100\\,\\%`
-        },
-        {
-            text: 'Berechne und runde das Ergebnis.',
-            math: `\\text{Gefälle} \\approx ${formatNumber(t.percent, 1)}\\,\\%`
-        }
-    ];
-
+  }
+  if (kind === 1) {
+    const scale = pick([10000, 25000, 50000]);
+    const cm = randFloat(2, 9, 1);
+    const d = (cm * scale) / 100;
+    const h = randInt(15, 160);
+    const p = (h / d) * 100;
+    const a = deg(Math.atan(h / d));
     return {
-        prompt: `Zwei Orte sind durch eine geradlinige Straße verbunden. Auf einer Karte mit dem Maßstab 1 : ${scale} sind sie ${formatNumber(mapDistanceCm, 1)} cm voneinander entfernt. Ihre Höhendifferenz beträgt ${formatNumber(heightDiff, 0)} m. Berechne das Gefälle der Straße.`,
-        steps,
-        correctAnswer: round(t.percent, 1),
-        unit: '%',
-        resultLabel: 'Gefälle',
-        sketch: {
-            horizontal: t.horizontal,
-            vertical: t.vertical,
-            horizontalLabel: `${formatNumber(horizontalM, 0)} m`,
-            verticalLabel: `${formatNumber(heightDiff, 0)} m`,
-            hypotenuseLabel: 'Straße',
-            angleLabel: `α ≈ ${formatNumber(t.angle, 1)}°`,
-            highlight: 'none',
-            askedLabel: 'Gefälle = ?'
-        }
+      key: `s1-${scale}-${cm}-${h}`,
+      text: `Auf einer Wanderkarte im Maßstab 1 : ${fmt(scale)} sind zwei Orte ${fmt(
+        cm,
+        1
+      )} cm voneinander entfernt. Der Höhenunterschied beträgt ${h} m. Berechne das durchschnittliche Gefälle in Prozent und den Neigungswinkel.`,
+      figure: (
+        <SlopeFigure
+          ratio={h / d}
+          base={q('? m')}
+          rise={g(`${h} m`)}
+          path={null}
+          angle={q('α = ?')}
+        />
+      ),
+      fields: [
+        { kind: 'num', label: 'Gefälle', value: p, unit: '%', tol: 0.15 },
+        { kind: 'num', label: '$\\alpha$', value: a, unit: '°', tol: 0.15 },
+      ],
+      tips: [
+        `Die Karte zeigt die waagrechte Entfernung: ${fmt(cm, 1)} cm · ${fmt(scale)} = ${fmt(
+          cm * scale
+        )} cm = ${fmt(d)} m.`,
+        `Gefälle $= \\dfrac{\\text{Höhenunterschied}}{\\text{waagrechte Strecke}} \\cdot 100\\,\\%$ – rechne beide in Metern.`,
+        `Für den Winkel: $\\alpha = \\tan^{-1}\\left(\\dfrac{${h}}{${tex(d, 0)}}\\right)$.`,
+      ],
+      solution: [
+        `Waagrechte Strecke: $${tex(cm, 1)}\\,\\text{cm} \\cdot ${scale} = ${tex(
+          d,
+          0
+        )}\\,\\text{m}$`,
+        `Gefälle $= \\dfrac{${h}}{${tex(d, 0)}} \\cdot 100\\,\\% \\approx ${pTex(p)}$`,
+        `$\\alpha = \\tan^{-1}(${tex(h / d, 4)}) \\approx ${texDeg(a)}$`,
+      ],
     };
+  }
+  // Rampe: Höhe und Steigung gegeben -> Länge der Rampe
+  const p = pick([6, 8, 10, 12, 15]);
+  const h = randFloat(0.4, 2.5, 2);
+  const a = deg(Math.atan(p / 100));
+  const s = h / sinD(a);
+  return {
+    key: `s2-${p}-${h}`,
+    text: `Eine Rampe soll eine Höhe von ${fmt(
+      h
+    )} m überwinden und darf höchstens ${p} % Steigung haben. Wie lang muss die Rampe (die schräge Fläche) mindestens sein? Berechne auch den Steigungswinkel.`,
+    figure: (
+      <SlopeFigure
+        ratio={p / 100}
+        base={null}
+        rise={g(`${fmt(h)} m`)}
+        path={q('s = ?')}
+        angle={q('α = ?')}
+      />
+    ),
+    fields: [
+      { kind: 'num', label: '$\\alpha$', value: a, unit: '°', tol: 0.15 },
+      { kind: 'num', label: '$s$', value: s, unit: 'm', tol: Math.max(s * 0.01, 0.02) },
+    ],
+    tips: [
+      `Winkel: $\\alpha = \\tan^{-1}\\left(\\dfrac{${p}}{100}\\right)$.`,
+      `Die Höhe ist die Gegenkathete, die Rampe die Hypotenuse → Sinus: $\\sin(\\alpha) = \\dfrac{h}{s}$.`,
+      `Umgestellt: $s = \\dfrac{h}{\\sin(\\alpha)}$.`,
+    ],
+    solution: [
+      `$\\alpha = \\tan^{-1}(${tex(p / 100, 2)}) \\approx ${texDeg(a, 2)}$`,
+      `$s = \\dfrac{${tex(h)}\\,\\text{m}}{\\sin(${texDeg(a, 2)})} \\approx ${tex(s)}\\,\\text{m}$`,
+    ],
+  };
+}
+
+const explanation = (
+  <>
+    <p>
+      <Rich text="Die **Steigung in Prozent** gibt an, wie viele Meter es auf 100 m **waagrechter** Strecke nach oben geht. Der **Steigungswinkel** $\alpha$ ist der Winkel zwischen Straße und Waagrechter. Beide hängen über den Tangens zusammen:" />
+    </p>
+    <BlockMath math="\tan(\alpha) = \frac{\text{Höhenunterschied}}{\text{waagrechte Strecke}} = \frac{p}{100}" />
+    <ul className="list-disc pl-5 space-y-1">
+      <li>
+        <Rich text="Prozent → Grad: $\alpha = \tan^{-1}\left(\dfrac{p}{100}\right)$" />
+      </li>
+      <li>
+        <Rich text="Grad → Prozent: $p = \tan(\alpha) \cdot 100\,\%$" />
+      </li>
+    </ul>
+    <div className="border-l-4 border-blue-400 bg-blue-50 rounded p-3">
+      <p className="font-semibold text-slate-800 mb-1">Beispiel</p>
+      <Rich text="12 % Steigung: $\tan(\alpha) = 0{,}12$ $\Rightarrow$ $\alpha = \tan^{-1}(0{,}12) \approx 6{,}8^\circ$. Achtung: 100 % Steigung sind 45°, nicht 90°!" />
+    </div>
+  </>
+);
+
+export const cfg: TopicConfig = {
+  title: 'Steigungswinkel in Prozent und Grad',
+  subtitle: 'Rechne Steigungsangaben zwischen Prozent und Winkelmaß um.',
+  trackingTopic: 'Steigungswinkel',
+  explanation,
+  roundingNote: 'Runde auf eine Nachkommastelle.',
+  levels: [
+    {
+      id: 'einfach',
+      description: 'Prozent in Grad umrechnen und umgekehrt.',
+      example: '$12\\,\\% \\approx 6{,}8^\\circ$',
+    },
+    {
+      id: 'mittel',
+      description: 'Aus Höhenunterschied und waagrechter Strecke Steigung und Winkel bestimmen.',
+    },
+    {
+      id: 'schwer',
+      description: 'Anwendungen: Weg entlang der Straße, Wanderkarte mit Maßstab, Rampen.',
+    },
+  ],
+  generate,
 };
 
-const buildLengthsTask = (): SlopeTask => {
-    const noun = pick(SLOPE_NOUNS);
-    const horizontal = randomInt(20, 300);
-    const angle = round(randomInRange(2, 30), 1);
-    const raw = triangleFromHorizontalAngle(horizontal, angle);
-    const vertical = round(raw.vertical, 1);
-    const t = triangleFromHorizontalVertical(horizontal, vertical);
-
-    const steps: SolutionStep[] = [
-        {
-            text: 'Im rechtwinkligen Steigungsdreieck ist der Tangens des Steigungswinkels das Verhältnis von Höhenunterschied zu horizontaler Strecke.',
-            math: `\\tan(\\alpha) = \\frac{\\text{Höhenunterschied}}{\\text{horizontale Strecke}} = \\frac{${formatNumber(vertical, 1)}}{${formatNumber(horizontal, 0)}} = ${formatNumber(vertical / horizontal, 4)}`
-        },
-        {
-            text: 'Löse mit der Umkehrfunktion Tangens⁻¹ nach dem Winkel auf.',
-            math: `\\alpha = \\tan^{-1}(${formatNumber(vertical / horizontal, 4)}) \\approx ${formatNumber(t.angle, 1)}^{\\circ}`
-        },
-        {
-            text: 'Die Steigung in Prozent ist dasselbe Seitenverhältnis, multipliziert mit 100.',
-            math: `\\text{Steigung} = \\frac{${formatNumber(vertical, 1)}}{${formatNumber(horizontal, 0)}} \\cdot 100\\,\\% \\approx ${formatNumber(t.percent, 1)}\\,\\%`
-        }
-    ];
-
-    return {
-        prompt: `${noun} überwindet auf einer horizontalen Strecke von ${formatNumber(horizontal, 0)} m einen Höhenunterschied von ${formatNumber(vertical, 1)} m. Berechne den Steigungswinkel α sowohl in Grad als auch in Prozent.`,
-        steps,
-        correctAnswer: round(t.angle, 1),
-        unit: '°',
-        resultLabel: 'α',
-        secondAnswer: round(t.percent, 1),
-        secondUnit: '%',
-        secondResultLabel: 'Steigung',
-        sketch: {
-            horizontal: t.horizontal,
-            vertical: t.vertical,
-            horizontalLabel: `${formatNumber(horizontal, 0)} m`,
-            verticalLabel: `${formatNumber(vertical, 1)} m`,
-            hypotenuseLabel: 'Weg',
-            angleLabel: 'α = ?',
-            highlight: 'angle'
-        }
-    };
-};
-
-const TASK_BUILDERS: (() => SlopeTask)[] = [
-    buildPassTask,
-    buildPassTask,
-    buildAngleToPercentTask,
-    buildAngleToPercentTask,
-    buildDistanceTask,
-    buildMapScaleTask,
-    buildLengthsTask,
-    buildLengthsTask
-];
-
-const buildTask = (): SlopeTask => pick(TASK_BUILDERS)();
-
-const SteigungswinkelProzentGrad: React.FC = () => {
-    const [task, setTask] = useState<SlopeTask | null>(null);
-    const [userAnswer, setUserAnswer] = useState('');
-    const [userAnswer2, setUserAnswer2] = useState('');
-    const [feedback, setFeedback] = useState<'correct' | 'incorrect' | 'info' | null>(null);
-    const [showSolution, setShowSolution] = useState(false);
-    const tracking = useTaskTracking('Steigungswinkel');
-
-    const generateTask = () => {
-        tracking.onTaskStart();
-        setTask(buildTask());
-        setUserAnswer('');
-        setUserAnswer2('');
-        setFeedback(null);
-        setShowSolution(false);
-    };
-
-    useEffect(() => {
-        generateTask();
-    }, []);
-
-    const checkAnswer = () => {
-        if (!task) return;
-        const value = parseFloat(userAnswer.replace(',', '.').replace(/[−–—‐]/g, '-'));
-        if (isNaN(value)) {
-            setFeedback('info');
-            return;
-        }
-        // Maximal 1% relative Toleranz, mit kleiner Mindesttoleranz für sehr kleine Werte
-        const tolerance = Math.max(Math.abs(task.correctAnswer) * 0.01, 0.01);
-        const firstCorrect = Math.abs(value - task.correctAnswer) <= tolerance;
-
-        if (task.secondAnswer === undefined) {
-            setFeedback(firstCorrect ? 'correct' : 'incorrect');
-            tracking.onCheck(firstCorrect);
-            return;
-        }
-
-        const value2 = parseFloat(userAnswer2.replace(',', '.').replace(/[−–—‐]/g, '-'));
-        if (isNaN(value2)) {
-            setFeedback('info');
-            return;
-        }
-        const tolerance2 = Math.max(Math.abs(task.secondAnswer) * 0.01, 0.01);
-        const secondCorrect = Math.abs(value2 - task.secondAnswer) <= tolerance2;
-        setFeedback(firstCorrect && secondCorrect ? 'correct' : 'incorrect');
-        tracking.onCheck(firstCorrect && secondCorrect);
-    };
-
-    const toggleSolution = () => {
-        setShowSolution(prev => {
-            const next = !prev;
-            if (next) tracking.onHintShown();
-            return next;
-        });
-    };
-
-    return (
-        <div className="mx-auto px-4 py-8 max-w-6xl">
-            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
-                <div>
-                    <h1 className="text-3xl font-bold text-teal-800 mb-4">Steigungswinkel in Prozent und Grad</h1>
-                    <p className="text-gray-700">
-                        Straßen- oder Dachneigungen werden oft in Prozent angegeben, mathematisch beschreibt man sie aber über den
-                        Steigungswinkel in Grad. Beide Größen sind über den Tangens im rechtwinkligen Dreieck miteinander verknüpft.
-                    </p>
-                </div>
-
-                <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-5 space-y-3">
-                    <h2 className="text-lg font-semibold text-indigo-900">So funktioniert die Umrechnung</h2>
-                    <p className="text-gray-700 text-sm">
-                        Stell dir ein rechtwinkliges Dreieck vor: Die horizontale Strecke ist die Ankathete, der Höhenunterschied die
-                        Gegenkathete des Steigungswinkels α. Die Steigung in Prozent ist nichts anderes als dieses Seitenverhältnis,
-                        multipliziert mit 100 – also genau der Tangens von α.
-                    </p>
-                    <div className="flex justify-center">
-                        <div className="bg-white border border-gray-200 rounded-lg px-3 py-2">
-                            <InlineMath math="\tan(\alpha) = \frac{\text{Höhenunterschied}}{\text{horizontale Strecke}} = \frac{\text{Steigung in \%}}{100}" />
-                        </div>
-                    </div>
-                    <p className="text-gray-700 text-sm">Daraus ergeben sich zwei Umrechnungen:</p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch">
-                        <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 flex flex-col items-center justify-center text-center">
-                            <p className="text-xs text-gray-500 mb-1">Von Prozent zu Grad</p>
-                            <InlineMath math="\alpha = \tan^{-1}\!\left(\frac{\text{Steigung in \%}}{100}\right)" />
-                        </div>
-                        <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 flex flex-col items-center justify-center text-center">
-                            <p className="text-xs text-gray-500 mb-1">Von Grad zu Prozent</p>
-                            <InlineMath math="\text{Steigung in \%} = \tan(\alpha) \cdot 100" />
-                        </div>
-                    </div>
-                    <p className="text-gray-700 text-sm">
-                        Ist statt der horizontalen Strecke die tatsächlich gefahrene Weglänge bekannt, hilft der Sinus weiter, denn der
-                        Höhenunterschied ist dann die Gegenkathete zur Hypotenuse. Bei Aufgaben mit einer Landkarte musst du zusätzlich
-                        zuerst den Kartenmaßstab in die wahre Streckenlänge umrechnen.
-                    </p>
-                </div>
-
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-semibold text-gray-800">Training: Steigung umrechnen</h2>
-                        <button
-                            onClick={generateTask}
-                            className="px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700"
-                        >
-                            Neue Aufgabe
-                        </button>
-                    </div>
-
-                    {task && (
-                        <div className="space-y-4">
-                            <div className="bg-white border border-gray-200 rounded-lg p-4">
-                                <h3 className="font-semibold text-gray-800 mb-2">Steigungsdreieck zur aktuellen Aufgabe</h3>
-                                <SlopeSketch {...task.sketch} />
-                            </div>
-
-                            <div className="bg-white border border-gray-200 rounded-lg p-4">
-                                <p className="font-medium text-gray-800">{task.prompt}</p>
-                            </div>
-
-                            <div className="flex flex-col sm:flex-row items-center gap-3">
-                                <label className="font-semibold text-gray-700 w-full sm:w-auto">
-                                    {task.secondResultLabel ? `${task.resultLabel}:` : 'Antwort:'}
-                                </label>
-                                <div className="flex items-center gap-2 w-full sm:w-auto">
-                                    <input
-                                        type="text"
-                                        value={userAnswer}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserAnswer(e.target.value)}
-                                        className="w-full sm:w-40 border border-gray-300 rounded-lg px-3 py-2 text-center"
-                                        placeholder="Deine Lösung"
-                                    />
-                                    <span className="text-gray-600">{task.unit}</span>
-                                </div>
-                            </div>
-
-                            {task.secondResultLabel && (
-                                <div className="flex flex-col sm:flex-row items-center gap-3">
-                                    <label className="font-semibold text-gray-700 w-full sm:w-auto">{task.secondResultLabel}:</label>
-                                    <div className="flex items-center gap-2 w-full sm:w-auto">
-                                        <input
-                                            type="text"
-                                            value={userAnswer2}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserAnswer2(e.target.value)}
-                                            className="w-full sm:w-40 border border-gray-300 rounded-lg px-3 py-2 text-center"
-                                            placeholder="Deine Lösung"
-                                        />
-                                        <span className="text-gray-600">{task.secondUnit}</span>
-                                    </div>
-                                </div>
-                            )}
-
-                            {feedback === 'info' && (
-                                <p className="text-yellow-700 bg-yellow-100 border border-yellow-200 rounded-lg p-3 text-sm">
-                                    Bitte gib eine Zahl ein.
-                                </p>
-                            )}
-                            {feedback === 'correct' && (
-                                <p className="text-green-700 bg-green-100 border border-green-200 rounded-lg p-3 text-sm">
-                                    Perfekt! Deine Rechnung stimmt.
-                                </p>
-                            )}
-                            {feedback === 'incorrect' && (
-                                <p className="text-red-700 bg-red-100 border border-red-200 rounded-lg p-3 text-sm">
-                                    Das passt noch nicht. Schau dir den Lösungsweg an.
-                                </p>
-                            )}
-
-                            <div className="flex gap-4 flex-wrap justify-center items-center">
-                                <button
-                                    onClick={checkAnswer}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
-                                >
-                                    Prüfen
-                                </button>
-                                <button
-                                    onClick={toggleSolution}
-                                    className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600"
-                                >
-                                    {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
-                                </button>
-                            </div>
-
-                            {showSolution && (
-                                <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
-                                    <h3 className="font-semibold text-gray-800">Lösungsweg</h3>
-                                    <ul className="list-decimal pl-5 text-gray-700 space-y-2 text-sm">
-                                        {task.steps.map((step, index) => (
-                                            <li key={`slope-step-${index}`} className="space-y-1">
-                                                <p className="font-medium text-gray-800">{step.text}</p>
-                                                {step.math && (
-                                                    <div className="bg-gray-50 border border-gray-200 rounded px-2 py-1 inline-block">
-                                                        <InlineMath math={step.math} />
-                                                    </div>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    <div className="font-bold text-gray-900">
-                                        Ergebnis: {task.resultLabel} = {formatNumber(task.correctAnswer, task.unit === '°' || task.unit === '%' ? 1 : 0)}
-                                        {task.unit}
-                                        {task.secondAnswer !== undefined && task.secondResultLabel && (
-                                            <>
-                                                {' '}| {task.secondResultLabel} = {formatNumber(task.secondAnswer, 1)}
-                                                {task.secondUnit}
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex justify-center">
-                    <Link to="/trigonometrie" className="text-[var(--accent)] hover:underline text-sm sm:text-base">
-                        <i className="fa-solid fa-arrow-left mr-2"></i>
-                        Zurück zur Übersicht
-                    </Link>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default SteigungswinkelProzentGrad;
+export default function SteigungswinkelProzentGrad() {
+  return <Practice cfg={cfg} />;
+}

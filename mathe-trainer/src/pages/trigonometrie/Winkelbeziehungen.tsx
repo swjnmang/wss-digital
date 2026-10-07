@@ -1,414 +1,355 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-
-interface SolutionStep {
-    text: string;
-}
+import Practice from './engine/Practice';
+import Rich from '../raum_und_form/engine/Rich';
+import type { Level, Task, TopicConfig } from './engine/types';
+import { chance, pick, randInt } from './engine/util';
 
 type RelType = 'Scheitelwinkel' | 'Nebenwinkel' | 'Stufenwinkel' | 'Wechselwinkel';
 
 const RELATION_LABEL: Record<RelType, string> = {
-    Scheitelwinkel: 'Scheitelwinkel',
-    Nebenwinkel: 'Nebenwinkel (Nachbarwinkel)',
-    Stufenwinkel: 'Stufenwinkel',
-    Wechselwinkel: 'Wechselwinkel'
+  Scheitelwinkel: 'Scheitelwinkel',
+  Nebenwinkel: 'Nebenwinkel',
+  Stufenwinkel: 'Stufenwinkel',
+  Wechselwinkel: 'Wechselwinkel',
 };
 
-const RELATION_EXPLANATION: Record<RelType, string> = {
-    Scheitelwinkel: 'Scheitelwinkel entstehen an derselben Kreuzung gegenüberliegend. Sie sind immer gleich groß.',
-    Nebenwinkel:
-        'Nebenwinkel (auch Nachbarwinkel genannt) liegen an derselben Kreuzung nebeneinander auf einer Geraden. Sie ergänzen sich immer zu 180°.',
-    Stufenwinkel:
-        'Stufenwinkel liegen an unterschiedlichen Kreuzungen an der gleichen Position (z. B. beide oben links). Bei parallelen Geraden sind sie immer gleich groß.',
-    Wechselwinkel:
-        'Wechselwinkel liegen an unterschiedlichen Kreuzungen auf verschiedenen Seiten der Schrägen, zwischen bzw. außerhalb der Parallelen. Bei parallelen Geraden sind sie immer gleich groß.'
+const RELATION_RULE: Record<RelType, string> = {
+  Scheitelwinkel:
+    'Scheitelwinkel liegen sich an derselben Kreuzung gegenüber und sind **gleich groß**.',
+  Nebenwinkel:
+    'Nebenwinkel liegen an derselben Kreuzung nebeneinander und ergänzen sich zu **180°**.',
+  Stufenwinkel:
+    'Stufenwinkel liegen an den beiden Kreuzungen an der gleichen Position. An Parallelen sind sie **gleich groß**.',
+  Wechselwinkel:
+    'Wechselwinkel liegen an verschiedenen Kreuzungen auf verschiedenen Seiten der Schrägen, beide zwischen oder beide außerhalb der Parallelen („Z-Form“). An Parallelen sind sie **gleich groß**.',
 };
 
-// Positionen der acht Winkel um die beiden Kreuzungspunkte: 1-4 an g1 (oben), 5-8 an g2 (unten)
+// Winkel 1–4 an der oberen Kreuzung (g₁), 5–8 an der unteren (g₂)
 type Pos = 'TL' | 'TR' | 'BR' | 'BL';
-const POSITION: Record<number, Pos> = { 1: 'TL', 2: 'TR', 3: 'BR', 4: 'BL', 5: 'TL', 6: 'TR', 7: 'BR', 8: 'BL' };
+const POSITION: Record<number, Pos> = {
+  1: 'TL',
+  2: 'TR',
+  3: 'BR',
+  4: 'BL',
+  5: 'TL',
+  6: 'TR',
+  7: 'BR',
+  8: 'BL',
+};
 
-interface RelationPair {
-    a: number;
-    b: number;
-    type: RelType;
-}
-
-const RELATIONS: RelationPair[] = [
-    // Scheitelwinkel (an derselben Kreuzung, gegenüberliegend)
-    { a: 1, b: 3, type: 'Scheitelwinkel' },
-    { a: 2, b: 4, type: 'Scheitelwinkel' },
-    { a: 5, b: 7, type: 'Scheitelwinkel' },
-    { a: 6, b: 8, type: 'Scheitelwinkel' },
-    // Nebenwinkel (an derselben Kreuzung, nebeneinander)
-    { a: 1, b: 2, type: 'Nebenwinkel' },
-    { a: 2, b: 3, type: 'Nebenwinkel' },
-    { a: 3, b: 4, type: 'Nebenwinkel' },
-    { a: 4, b: 1, type: 'Nebenwinkel' },
-    { a: 5, b: 6, type: 'Nebenwinkel' },
-    { a: 6, b: 7, type: 'Nebenwinkel' },
-    { a: 7, b: 8, type: 'Nebenwinkel' },
-    { a: 8, b: 5, type: 'Nebenwinkel' },
-    // Stufenwinkel (gleiche Position an beiden Kreuzungen)
-    { a: 1, b: 5, type: 'Stufenwinkel' },
-    { a: 2, b: 6, type: 'Stufenwinkel' },
-    { a: 3, b: 7, type: 'Stufenwinkel' },
-    { a: 4, b: 8, type: 'Stufenwinkel' },
-    // Wechselwinkel (verschiedene Kreuzungen, verschiedene Seiten der Schrägen)
-    { a: 3, b: 5, type: 'Wechselwinkel' },
-    { a: 4, b: 6, type: 'Wechselwinkel' },
-    { a: 1, b: 7, type: 'Wechselwinkel' },
-    { a: 2, b: 8, type: 'Wechselwinkel' }
+const RELATIONS: { a: number; b: number; type: RelType }[] = [
+  { a: 1, b: 3, type: 'Scheitelwinkel' },
+  { a: 2, b: 4, type: 'Scheitelwinkel' },
+  { a: 5, b: 7, type: 'Scheitelwinkel' },
+  { a: 6, b: 8, type: 'Scheitelwinkel' },
+  { a: 1, b: 2, type: 'Nebenwinkel' },
+  { a: 2, b: 3, type: 'Nebenwinkel' },
+  { a: 3, b: 4, type: 'Nebenwinkel' },
+  { a: 4, b: 1, type: 'Nebenwinkel' },
+  { a: 5, b: 6, type: 'Nebenwinkel' },
+  { a: 6, b: 7, type: 'Nebenwinkel' },
+  { a: 7, b: 8, type: 'Nebenwinkel' },
+  { a: 8, b: 5, type: 'Nebenwinkel' },
+  { a: 1, b: 5, type: 'Stufenwinkel' },
+  { a: 2, b: 6, type: 'Stufenwinkel' },
+  { a: 3, b: 7, type: 'Stufenwinkel' },
+  { a: 4, b: 8, type: 'Stufenwinkel' },
+  { a: 3, b: 5, type: 'Wechselwinkel' },
+  { a: 4, b: 6, type: 'Wechselwinkel' },
+  { a: 1, b: 7, type: 'Wechselwinkel' },
+  { a: 2, b: 8, type: 'Wechselwinkel' },
 ];
 
-const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
-const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
-const randomTheta = () => randomInt(35, 75);
+const relationOf = (x: number, y: number) =>
+  RELATIONS.find((r) => (r.a === x && r.b === y) || (r.a === y && r.b === x));
 
-// Winkel 'TL'/'BR' entsprechen θ, 'TR'/'BL' entsprechen 180°-θ (siehe Skizzen-Geometrie unten)
-const valueOf = (id: number, theta: number): number => {
-    const pos = POSITION[id];
-    return pos === 'TL' || pos === 'BR' ? theta : 180 - theta;
-};
+// 'TL'/'BR' sind θ, 'TR'/'BL' sind 180° − θ
+const valueOf = (id: number, theta: number) =>
+  POSITION[id] === 'TL' || POSITION[id] === 'BR' ? theta : 180 - theta;
 
-type TaskMode = 'calc' | 'classify';
+const step = (from: number, to: number, theta: number, type: RelType) =>
+  type === 'Nebenwinkel'
+    ? `∠${to} und ∠${from} sind Nebenwinkel: ∠${to} = 180° − ${valueOf(from, theta)}° = ${valueOf(
+        to,
+        theta
+      )}°`
+    : `∠${to} und ∠${from} sind ${RELATION_LABEL[type]}: ∠${to} = ∠${from} = ${valueOf(
+        to,
+        theta
+      )}°`;
 
-interface Task {
-    mode: TaskMode;
-    theta: number;
-    highlightA: number;
-    highlightB: number;
-    prompt: string;
-    steps: SolutionStep[];
-    correctAnswer: string;
-    options?: string[];
+// ---------- Skizze ----------
+
+const rad = (d: number) => (d * Math.PI) / 180;
+
+const wedgeSpan = (pos: Pos, theta: number): [number, number] =>
+  pos === 'TL'
+    ? [180, 180 + theta]
+    : pos === 'TR'
+    ? [180 + theta, 360]
+    : pos === 'BR'
+    ? [0, theta]
+    : [theta, 180];
+
+function AngleSketch({
+  theta,
+  single,
+  mirror,
+  blue,
+  red,
+}: {
+  theta: number;
+  single: boolean;
+  mirror: boolean;
+  blue: number[];
+  red: number[];
+}) {
+  const W = 420;
+  const H = single ? 190 : 300;
+  const mx = (x: number) => (mirror ? W - x : x);
+  const p1 = { x: 190, y: single ? 95 : 90 };
+  const t = rad(theta);
+  const s = 130 / Math.sin(t);
+  const p2 = { x: p1.x + s * Math.cos(t), y: p1.y + s * Math.sin(t) };
+  const ext = single ? 85 : 60;
+  const start = { x: p1.x - ext * Math.cos(t), y: p1.y - ext * Math.sin(t) };
+  const end = single
+    ? { x: p1.x + ext * Math.cos(t), y: p1.y + ext * Math.sin(t) }
+    : { x: p2.x + 60 * Math.cos(t), y: p2.y + 60 * Math.sin(t) };
+  const ids = single ? [1, 2, 3, 4] : [1, 2, 3, 4, 5, 6, 7, 8];
+  const color = (id: number) =>
+    blue.includes(id) ? '#2563eb' : red.includes(id) ? '#dc2626' : '#94a3b8';
+  const hl = (id: number) => blue.includes(id) || red.includes(id);
+
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      className="w-full max-w-[420px] mx-auto"
+      role="img"
+      aria-label="Skizze der Winkel"
+    >
+      {[p1, ...(single ? [] : [p2])].map((p, i) => (
+        <g key={i}>
+          <line x1={mx(20)} y1={p.y} x2={mx(400)} y2={p.y} stroke="#0f172a" strokeWidth={1.5} />
+          {!single && (
+            <polygon
+              points={`${mx(388)},${p.y - 5} ${mx(398)},${p.y} ${mx(388)},${p.y + 5}`}
+              fill="#0f172a"
+            />
+          )}
+          <text
+            x={mx(405)}
+            y={p.y + 5}
+            fontSize={14}
+            fontWeight="bold"
+            textAnchor={mirror ? 'end' : 'start'}
+          >
+            {single ? 'g' : i === 0 ? 'g₁' : 'g₂'}
+          </text>
+        </g>
+      ))}
+      <line
+        x1={mx(start.x)}
+        y1={start.y}
+        x2={mx(end.x)}
+        y2={end.y}
+        stroke="#0f172a"
+        strokeWidth={1.5}
+      />
+      <text
+        x={mx(end.x + 8)}
+        y={end.y + 10}
+        fontSize={14}
+        fontWeight="bold"
+        textAnchor={mirror ? 'end' : 'start'}
+      >
+        {single ? 'h' : 't'}
+      </text>
+      {ids.map((id) => {
+        const v = id <= 4 ? p1 : p2;
+        const [a0, a1] = wedgeSpan(POSITION[id], theta);
+        const r = hl(id) ? 30 : 22;
+        const sx = v.x + r * Math.cos(rad(a0));
+        const sy = v.y + r * Math.sin(rad(a0));
+        const ex = v.x + r * Math.cos(rad(a1));
+        const ey = v.y + r * Math.sin(rad(a1));
+        const mid = rad((a0 + a1) / 2);
+        const lr = r + 15;
+        return (
+          <g key={id}>
+            <path
+              d={`M ${mx(v.x)} ${v.y} L ${mx(sx)} ${sy} A ${r} ${r} 0 0 ${mirror ? 0 : 1} ${mx(
+                ex
+              )} ${ey} Z`}
+              fill={color(id)}
+              fillOpacity={hl(id) ? 0.2 : 0}
+              stroke="none"
+            />
+            <path
+              d={`M ${mx(sx)} ${sy} A ${r} ${r} 0 0 ${mirror ? 0 : 1} ${mx(ex)} ${ey}`}
+              fill="none"
+              stroke={color(id)}
+              strokeWidth={hl(id) ? 2.5 : 1.3}
+            />
+            <text
+              x={mx(v.x + lr * Math.cos(mid))}
+              y={v.y + lr * Math.sin(mid)}
+              fontSize={hl(id) ? 15 : 12}
+              fontWeight={hl(id) ? 'bold' : 'normal'}
+              fill={color(id)}
+              textAnchor="middle"
+              dominantBaseline="middle"
+            >
+              {id}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
 }
 
-const buildCalcTask = (): Task => {
-    const theta = randomTheta();
-    const rel = pick(RELATIONS);
-    const swap = Math.random() < 0.5;
-    const givenId = swap ? rel.b : rel.a;
-    const targetId = swap ? rel.a : rel.b;
-    const givenValue = valueOf(givenId, theta);
-    const targetValue = valueOf(targetId, theta);
+// ---------- Aufgaben ----------
 
-    const steps: SolutionStep[] = [
-        { text: `∠${givenId} und ∠${targetId} sind ${RELATION_LABEL[rel.type]}.` },
-        { text: RELATION_EXPLANATION[rel.type] },
-        {
-            text:
-                rel.type === 'Nebenwinkel'
-                    ? `∠${targetId} = 180° − ∠${givenId} = 180° − ${givenValue}° = ${targetValue}°`
-                    : `∠${targetId} = ∠${givenId} = ${targetValue}°`
-        }
-    ];
+function generate(level: Level, slot: number): Task {
+  const theta = randInt(32, 78);
+  const mirror = chance();
+  const single = level === 'einfach';
+  const calc = slot % 2 === 0;
 
+  if (level === 'schwer') {
+    // Zwei Winkel ohne direkte Beziehung zum gegebenen Winkel -> über einen Zwischenwinkel
+    const g = randInt(1, 8);
+    const far = [1, 2, 3, 4, 5, 6, 7, 8].filter((x) => x !== g && !relationOf(g, x));
+    const targets = [pick(far)];
+    targets.push(pick(far.filter((x) => x !== targets[0])));
+    targets.sort((a, b) => a - b);
+    const chain = (t: number) => {
+      const mid = [1, 2, 3, 4, 5, 6, 7, 8].find((x) => relationOf(g, x) && relationOf(x, t))!;
+      return [
+        step(g, mid, theta, relationOf(g, mid)!.type),
+        step(mid, t, theta, relationOf(mid, t)!.type),
+      ];
+    };
     return {
-        mode: 'calc',
-        theta,
-        highlightA: givenId,
-        highlightB: targetId,
-        prompt: `An den parallelen Geraden g₁ und g₂ gilt: ∠${givenId} und ∠${targetId} sind ${RELATION_LABEL[rel.type]}. Es gilt ∠${givenId} = ${givenValue}°. Berechne ∠${targetId}.`,
-        steps,
-        correctAnswer: targetValue.toString()
+      key: `s-${g}-${targets.join('')}-${theta}`,
+      text: `Die Geraden g₁ und g₂ sind parallel. Es gilt ∠${g} = ${valueOf(
+        g,
+        theta
+      )}°. Berechne ∠${targets[0]} und ∠${targets[1]}.`,
+      figure: <AngleSketch theta={theta} single={false} mirror={mirror} blue={[g]} red={targets} />,
+      fields: targets.map((t) => ({
+        kind: 'num' as const,
+        label: `∠${t}`,
+        value: valueOf(t, theta),
+        unit: '°',
+        tol: 0.01,
+      })),
+      tips: [
+        `Die gesuchten Winkel hängen nicht direkt mit ∠${g} zusammen. Gehe in zwei Schritten über einen Zwischenwinkel.`,
+        `Bestimme zuerst die Winkel an derselben Kreuzung wie ∠${g} (Scheitel- und Nebenwinkel). Übertrage sie dann mit Stufen- oder Wechselwinkeln auf die andere Kreuzung.`,
+        `An jeder Kreuzung gibt es nur zwei verschiedene Werte: ${valueOf(g, theta)}° und ${
+          180 - valueOf(g, theta)
+        }°.`,
+      ],
+      solution: targets.flatMap((t) => [`**∠${t}:**`, ...chain(t)]),
     };
-};
+  }
 
-const buildClassifyTask = (): Task => {
-    const theta = randomTheta();
-    const rel = pick(RELATIONS);
-    const [idA, idB] = Math.random() < 0.5 ? [rel.a, rel.b] : [rel.b, rel.a];
-    const options = ['Scheitelwinkel', 'Nebenwinkel (Nachbarwinkel)', 'Stufenwinkel', 'Wechselwinkel'];
+  const pool = single ? RELATIONS.filter((r) => r.a <= 4 && r.b <= 4) : RELATIONS;
+  const rel =
+    level === 'mittel'
+      ? pool.filter((r) =>
+          slot % 4 < 2 ? r.type === 'Stufenwinkel' || r.type === 'Wechselwinkel' : true
+        )
+      : pool;
+  const r = pick(rel);
+  const [x, y] = chance() ? [r.a, r.b] : [r.b, r.a];
+  const intro = single
+    ? 'Zwei Geraden g und h schneiden sich.'
+    : 'Die Geraden g₁ und g₂ sind parallel und werden von t geschnitten.';
 
-    const steps: SolutionStep[] = [{ text: RELATION_EXPLANATION[rel.type] }];
-
+  if (calc) {
     return {
-        mode: 'classify',
-        theta,
-        highlightA: idA,
-        highlightB: idB,
-        prompt: `Welche Beziehung besteht zwischen ∠${idA} und ∠${idB}?`,
-        steps,
-        correctAnswer: RELATION_LABEL[rel.type],
-        options
+      key: `c-${x}-${y}-${theta}`,
+      text: `${intro} Es gilt ∠${x} = ${valueOf(x, theta)}°. Berechne ∠${y}.`,
+      figure: <AngleSketch theta={theta} single={single} mirror={mirror} blue={[x]} red={[y]} />,
+      fields: [{ kind: 'num', label: `∠${y}`, value: valueOf(y, theta), unit: '°', tol: 0.01 }],
+      tips: [
+        `Wie liegen ∠${x} und ∠${y} zueinander? Gleiche Kreuzung oder verschiedene? Gegenüber, nebeneinander oder an der gleichen Position?`,
+        `∠${x} und ∠${y} sind ${RELATION_LABEL[r.type]}. ${RELATION_RULE[r.type]}`,
+      ],
+      solution: [RELATION_RULE[r.type], step(x, y, theta, r.type)],
     };
+  }
+
+  const options: RelType[] = single
+    ? ['Scheitelwinkel', 'Nebenwinkel']
+    : ['Scheitelwinkel', 'Nebenwinkel', 'Stufenwinkel', 'Wechselwinkel'];
+  return {
+    key: `k-${Math.min(x, y)}-${Math.max(x, y)}-${theta}`,
+    text: `${intro} Welche Beziehung besteht zwischen ∠${x} und ∠${y}?`,
+    figure: <AngleSketch theta={theta} single={single} mirror={mirror} blue={[x]} red={[y]} />,
+    fields: [
+      {
+        kind: 'choice',
+        options: options.map((o) => RELATION_LABEL[o]),
+        correct: options.indexOf(r.type),
+      },
+    ],
+    tips: [
+      single
+        ? `Liegen die beiden Winkel einander gegenüber oder direkt nebeneinander?`
+        : `Liegen beide Winkel an derselben Kreuzung? Dann sind es Scheitel- oder Nebenwinkel, sonst Stufen- oder Wechselwinkel.`,
+      single
+        ? `Nebenwinkel haben einen gemeinsamen Schenkel und ergeben zusammen 180°.`
+        : `Stufenwinkel: gleiche Position (F-Form). Wechselwinkel: über Kreuz auf verschiedenen Seiten der Schrägen (Z-Form).`,
+    ],
+    solution: [`∠${x} und ∠${y} sind **${RELATION_LABEL[r.type]}**.`, RELATION_RULE[r.type]],
+  };
+}
+
+const explanation = (
+  <>
+    <p>
+      <Rich text="Schneiden sich zwei Geraden, entstehen vier Winkel. Schneidet eine Gerade $t$ zwei **parallele** Geraden, entstehen acht Winkel – aber nur zwei verschiedene Größen!" />
+    </p>
+    <ul className="list-disc pl-5 space-y-1">
+      <li>
+        <Rich text="**Scheitelwinkel:** liegen sich an derselben Kreuzung gegenüber – sie sind **gleich groß**." />
+      </li>
+      <li>
+        <Rich text="**Nebenwinkel:** liegen nebeneinander an derselben Kreuzung – zusammen **180°**." />
+      </li>
+      <li>
+        <Rich text="**Stufenwinkel (F-Form):** gleiche Position an beiden Kreuzungen – an Parallelen **gleich groß**." />
+      </li>
+      <li>
+        <Rich text="**Wechselwinkel (Z-Form):** über Kreuz auf verschiedenen Seiten der Schrägen – an Parallelen **gleich groß**." />
+      </li>
+    </ul>
+    <div className="border-l-4 border-blue-400 bg-blue-50 rounded p-3">
+      <p className="font-semibold text-slate-800 mb-1">Beispiel</p>
+      <Rich text="Ist ∠1 = 60°, dann ist sein Scheitelwinkel ∠3 = 60°, sein Nebenwinkel ∠2 = 180° − 60° = 120° und sein Stufenwinkel ∠5 = 60°." />
+    </div>
+  </>
+);
+
+export const cfg: TopicConfig = {
+  title: 'Winkelbeziehungen',
+  subtitle: 'Scheitel-, Neben-, Stufen- und Wechselwinkel erkennen und berechnen.',
+  trackingTopic: 'Winkelbeziehungen',
+  explanation,
+  levels: [
+    { id: 'einfach', description: 'Zwei sich schneidende Geraden: Scheitel- und Nebenwinkel.' },
+    { id: 'mittel', description: 'Parallele Geraden mit Schräge: alle vier Winkelbeziehungen.' },
+    {
+      id: 'schwer',
+      description: 'Winkel über einen Zwischenschritt berechnen – zwei Winkel pro Aufgabe.',
+    },
+  ],
+  generate,
 };
 
-const buildTask = (): Task => (Math.random() < 0.5 ? buildCalcTask() : buildClassifyTask());
-
-// --- Geometrie der Skizze ---
-const degToRad = (deg: number) => (deg * Math.PI) / 180;
-
-const wedgeSpan = (pos: Pos, theta: number): [number, number] => {
-    switch (pos) {
-        case 'TL':
-            return [180, 180 + theta];
-        case 'TR':
-            return [180 + theta, 360];
-        case 'BR':
-            return [0, theta];
-        case 'BL':
-            return [theta, 180];
-    }
-};
-
-const arcPath = (cx: number, cy: number, r: number, startDeg: number, endDeg: number) => {
-    const sx = cx + r * Math.cos(degToRad(startDeg));
-    const sy = cy + r * Math.sin(degToRad(startDeg));
-    const ex = cx + r * Math.cos(degToRad(endDeg));
-    const ey = cy + r * Math.sin(degToRad(endDeg));
-    return `M ${sx} ${sy} A ${r} ${r} 0 0 1 ${ex} ${ey}`;
-};
-
-const labelPos = (cx: number, cy: number, r: number, startDeg: number, endDeg: number) => {
-    const mid = (startDeg + endDeg) / 2;
-    return { x: cx + r * Math.cos(degToRad(mid)), y: cy + r * Math.sin(degToRad(mid)) };
-};
-
-const WinkelDiagramm: React.FC<{ theta: number; highlightA: number; highlightB: number }> = ({ theta, highlightA, highlightB }) => {
-    const width = 420;
-    const height = 300;
-    const p1 = { x: 150, y: 90 };
-    const thetaRad = degToRad(theta);
-    const s = 130 / Math.sin(thetaRad);
-    const p2 = { x: p1.x + s * Math.cos(thetaRad), y: p1.y + s * Math.sin(thetaRad) };
-
-    const tExtStart = { x: p1.x - 60 * Math.cos(thetaRad), y: p1.y - 60 * Math.sin(thetaRad) };
-    const tExtEnd = { x: p2.x + 60 * Math.cos(thetaRad), y: p2.y + 60 * Math.sin(thetaRad) };
-
-    const vertexOf = (id: number) => (id <= 4 ? p1 : p2);
-
-    const wedges = [1, 2, 3, 4, 5, 6, 7, 8].map(id => {
-        const [start, end] = wedgeSpan(POSITION[id], theta);
-        const v = vertexOf(id);
-        return { id, start, end, v };
-    });
-
-    const isHighlighted = (id: number) => id === highlightA || id === highlightB;
-    const colorOf = (id: number) => (id === highlightA ? '#2563eb' : id === highlightB ? '#dc2626' : '#94a3b8');
-
-    return (
-        <svg viewBox={`0 0 ${width} ${height}`} className="mx-auto w-full h-auto" style={{ maxWidth: width }}>
-            {/* Parallele Geraden */}
-            <line x1={20} y1={p1.y} x2={400} y2={p1.y} stroke="#0f172a" strokeWidth={1.5} />
-            <line x1={20} y1={p2.y} x2={400} y2={p2.y} stroke="#0f172a" strokeWidth={1.5} />
-            {/* Parallelitätsmarkierungen */}
-            <polygon points={`392,${p1.y - 5} 400,${p1.y} 392,${p1.y + 5}`} fill="#0f172a" />
-            <polygon points={`392,${p2.y - 5} 400,${p2.y} 392,${p2.y + 5}`} fill="#0f172a" />
-            <text x={404} y={p1.y + 4} fontSize="14" fontWeight="bold">g₁</text>
-            <text x={404} y={p2.y + 4} fontSize="14" fontWeight="bold">g₂</text>
-            {/* Schräge (Transversale) */}
-            <line x1={tExtStart.x} y1={tExtStart.y} x2={tExtEnd.x} y2={tExtEnd.y} stroke="#0f172a" strokeWidth={1.5} />
-            <text x={tExtEnd.x + 6} y={tExtEnd.y + 10} fontSize="14" fontWeight="bold">t</text>
-
-            <circle cx={p1.x} cy={p1.y} r={2.5} fill="#0f172a" />
-            <circle cx={p2.x} cy={p2.y} r={2.5} fill="#0f172a" />
-
-            {wedges.map(w => {
-                const highlighted = isHighlighted(w.id);
-                const radius = highlighted ? 30 : 22;
-                const lp = labelPos(w.v.x, w.v.y, radius + 16, w.start, w.end);
-                return (
-                    <g key={`wedge-${w.id}`}>
-                        <path
-                            d={arcPath(w.v.x, w.v.y, radius, w.start, w.end)}
-                            fill="none"
-                            stroke={colorOf(w.id)}
-                            strokeWidth={highlighted ? 3 : 1.5}
-                        />
-                        <text
-                            x={lp.x}
-                            y={lp.y}
-                            fontSize={highlighted ? 15 : 12}
-                            fontWeight={highlighted ? 'bold' : 'normal'}
-                            fill={colorOf(w.id)}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                        >
-                            {w.id}
-                        </text>
-                    </g>
-                );
-            })}
-        </svg>
-    );
-};
-
-const Winkelbeziehungen: React.FC = () => {
-    const [task, setTask] = useState<Task | null>(null);
-    const [userAnswer, setUserAnswer] = useState('');
-    const [feedback, setFeedback] = useState<'correct' | 'incorrect' | 'info' | null>(null);
-    const [showSolution, setShowSolution] = useState(false);
-
-    const generateTask = () => {
-        setTask(buildTask());
-        setUserAnswer('');
-        setFeedback(null);
-        setShowSolution(false);
-    };
-
-    useEffect(() => {
-        generateTask();
-    }, []);
-
-    const checkAnswer = (choice?: string) => {
-        if (!task) return;
-        if (task.mode === 'classify') {
-            const answer = choice ?? userAnswer;
-            if (!answer) {
-                setFeedback('info');
-                return;
-            }
-            setFeedback(answer === task.correctAnswer ? 'correct' : 'incorrect');
-            return;
-        }
-
-        const value = parseFloat(userAnswer.replace(',', '.').replace(/[−–—‐]/g, '-'));
-        if (isNaN(value)) {
-            setFeedback('info');
-            return;
-        }
-        setFeedback(value === parseFloat(task.correctAnswer) ? 'correct' : 'incorrect');
-    };
-
-    return (
-        <div className="mx-auto px-4 py-8 max-w-6xl">
-            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
-                <div className="text-center">
-                    <h1 className="text-3xl font-bold text-teal-800 mb-4">Winkelbeziehungen</h1>
-                    <p className="text-gray-700 max-w-2xl mx-auto">
-                        Schneidet eine Gerade (Schräge t) zwei parallele Geraden g₁ und g₂, entstehen acht Winkel.
-                        Zwischen diesen Winkeln gibt es feste Beziehungen: Scheitelwinkel und Nebenwinkel an
-                        derselben Kreuzung sowie Stufenwinkel und Wechselwinkel zwischen den beiden Kreuzungen.
-                    </p>
-                </div>
-
-                <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-5 space-y-2">
-                    <h2 className="text-lg font-semibold text-indigo-900 text-center">Die vier Winkelbeziehungen</h2>
-                    <ul className="text-gray-700 text-sm space-y-1.5 max-w-2xl mx-auto list-disc pl-5">
-                        <li><strong>Scheitelwinkel</strong> – gegenüberliegend an derselben Kreuzung, gleich groß.</li>
-                        <li><strong>Nebenwinkel (Nachbarwinkel)</strong> – nebeneinander an derselben Kreuzung, Summe 180°.</li>
-                        <li><strong>Stufenwinkel</strong> – gleiche Position an beiden Kreuzungen, bei parallelen Geraden gleich groß.</li>
-                        <li><strong>Wechselwinkel</strong> – verschiedene Seiten der Schrägen zwischen den Kreuzungen, bei parallelen Geraden gleich groß.</li>
-                    </ul>
-                </div>
-
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                        <h2 className="text-xl font-semibold text-gray-800">Training</h2>
-                        <button
-                            onClick={generateTask}
-                            className="px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700"
-                        >
-                            Neue Aufgabe
-                        </button>
-                    </div>
-
-                    {task && (
-                        <div className="space-y-4">
-                            <div className="bg-white border border-gray-200 rounded-lg p-4">
-                                <WinkelDiagramm theta={task.theta} highlightA={task.highlightA} highlightB={task.highlightB} />
-                            </div>
-
-                            <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-                                <p className="font-medium text-gray-800">{task.prompt}</p>
-                            </div>
-
-                            {task.mode === 'calc' ? (
-                                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                                    <label className="font-semibold text-gray-700 w-full sm:w-auto text-center sm:text-left">
-                                        Antwort:
-                                    </label>
-                                    <div className="flex items-center gap-2 w-full sm:w-auto justify-center">
-                                        <input
-                                            type="text"
-                                            value={userAnswer}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserAnswer(e.target.value)}
-                                            className="w-full sm:w-40 border border-gray-300 rounded-lg px-3 py-2 text-center"
-                                            placeholder="Deine Lösung"
-                                        />
-                                        <span className="text-gray-600">°</span>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg mx-auto">
-                                    {task.options?.map(opt => (
-                                        <button
-                                            key={opt}
-                                            onClick={() => {
-                                                setUserAnswer(opt);
-                                                checkAnswer(opt);
-                                            }}
-                                            className={`px-4 py-2 rounded-lg border font-medium transition-colors ${
-                                                userAnswer === opt
-                                                    ? 'bg-blue-600 text-white border-blue-600'
-                                                    : 'bg-white text-gray-800 border-gray-300 hover:border-blue-400'
-                                            }`}
-                                        >
-                                            {opt}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-
-                            {feedback === 'info' && (
-                                <p className="text-yellow-700 bg-yellow-100 border border-yellow-200 rounded-lg p-3 text-sm text-center max-w-md mx-auto">
-                                    {task.mode === 'calc' ? 'Bitte gib eine Zahl ein.' : 'Bitte wähle eine Antwort aus.'}
-                                </p>
-                            )}
-                            {feedback === 'correct' && (
-                                <p className="text-green-700 bg-green-100 border border-green-200 rounded-lg p-3 text-sm text-center max-w-md mx-auto">
-                                    Perfekt! Deine Antwort stimmt.
-                                </p>
-                            )}
-                            {feedback === 'incorrect' && (
-                                <p className="text-red-700 bg-red-100 border border-red-200 rounded-lg p-3 text-sm text-center max-w-md mx-auto">
-                                    Das passt noch nicht. Schau dir den Lösungsweg an.
-                                </p>
-                            )}
-
-                            <div className="flex gap-4 flex-wrap justify-center items-center">
-                                {task.mode === 'calc' && (
-                                    <button
-                                        onClick={() => checkAnswer()}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
-                                    >
-                                        Prüfen
-                                    </button>
-                                )}
-                                <button
-                                    onClick={() => setShowSolution(prev => !prev)}
-                                    className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600"
-                                >
-                                    {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
-                                </button>
-                            </div>
-
-                            {showSolution && (
-                                <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
-                                    <h3 className="font-semibold text-gray-800">Lösungsweg</h3>
-                                    <ul className="list-decimal pl-5 text-gray-700 space-y-2 text-sm">
-                                        {task.steps.map((step, index) => (
-                                            <li key={`winkel-step-${index}`}>{step.text}</li>
-                                        ))}
-                                    </ul>
-                                    <div className="font-bold text-gray-900">Ergebnis: {task.correctAnswer}{task.mode === 'calc' ? '°' : ''}</div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex justify-center">
-                    <Link to="/trigonometrie" className="text-[var(--accent)] hover:underline text-sm sm:text-base">
-                        <i className="fa-solid fa-arrow-left mr-2"></i>
-                        Zurück zur Übersicht
-                    </Link>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default Winkelbeziehungen;
+export default function Winkelbeziehungen() {
+  return <Practice cfg={cfg} />;
+}
