@@ -30,7 +30,9 @@ const TYPEN: Record<Modus, Aufgabe['typ'][]> = {
     gemischt: ['scheitel', 'punkte', 'scheitel', 'punkte', 'punkte'],
 };
 const LOB = ['Super, alles richtig!', 'Sehr gut gemacht!', 'Top, perfekt gerechnet!', 'Stark, das stimmt alles!', 'Klasse Arbeit!'];
-const LERNVIDEO_ID = 'hg9QipwqXxI';
+// Lernvideos je Fall (Fall 3 = gemischt hat kein eigenes Video)
+const LERNVIDEO_FALL1 = 'xgiAK3rLCow';
+const LERNVIDEO_FALL2 = 'hg9QipwqXxI';
 const GLEICHUNGSSYSTEME_PFAD = '/lineare_funktionen/gleichungssysteme';
 
 const BEISPIEL_SCHEITEL: ScheitelAufgabe = { typ: 'scheitel', a: 1, b: -4, c: 3, h: 2, k: -1, px: 4, py: 3 };
@@ -490,22 +492,22 @@ const ErklaerungFall2 = () => (
     </div>
 );
 
-const Lernvideo = () => (
+const Lernvideo = ({ id, fall }: { id: string; fall: string }) => (
     <section className="mb-10">
-        <h2 className="text-xl font-semibold text-gray-800 mb-3">Lernvideo</h2>
-        {LERNVIDEO_ID ? (
+        <h2 className="text-xl font-semibold text-gray-800 mb-3">Lernvideo zu {fall}</h2>
+        {id ? (
             <div className="max-w-3xl mx-auto">
                 <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
                     <iframe
                         className="absolute inset-0 w-full h-full rounded-lg"
-                        src={`https://www.youtube-nocookie.com/embed/${LERNVIDEO_ID}`}
-                        title="Lernvideo: Funktionsgleichung aufstellen"
+                        src={`https://www.youtube-nocookie.com/embed/${id}`}
+                        title={`Lernvideo: Funktionsgleichung aufstellen – ${fall}`}
                         allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                     />
                 </div>
                 <a
-                    href={`https://www.youtube.com/watch?v=${LERNVIDEO_ID}`}
+                    href={`https://www.youtube.com/watch?v=${id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block mt-2 text-sm text-blue-700 underline hover:text-blue-900"
@@ -606,7 +608,8 @@ const FunktionsgleichungAufstellen = () => {
                     )}
                 </section>
 
-                <Lernvideo />
+                {modus === 'scheitel' && <Lernvideo id={LERNVIDEO_FALL1} fall="Fall 1" />}
+                {modus === 'punkte' && <Lernvideo id={LERNVIDEO_FALL2} fall="Fall 2" />}
 
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">Deine Aufgaben</h2>
                 <p className="text-gray-600 mb-6">
