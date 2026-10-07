@@ -33,7 +33,7 @@ const LOB = ['Super, alles richtig!', 'Sehr gut gemacht!', 'Top, perfekt gerechn
 // Lernvideos je Fall (Fall 3 = gemischt hat kein eigenes Video)
 const LERNVIDEO_FALL1 = 'xgiAK3rLCow';
 const LERNVIDEO_FALL2 = 'hg9QipwqXxI';
-const GLEICHUNGSSYSTEME_PFAD = '/lineare_funktionen/gleichungssysteme';
+const GLEICHUNGSSYSTEME_PFAD = '/lineare_funktionen/gleichungssysteme?verfahren=addieren';
 
 const BEISPIEL_SCHEITEL: ScheitelAufgabe = { typ: 'scheitel', a: 1, b: -4, c: 3, h: 2, k: -1, px: 4, py: 3 };
 const BEISPIEL_PUNKTE: PunkteAufgabe = { typ: 'punkte', bekannt: 'a', a: -1, b: 2, c: 4, x1: 1, y1: 5, x2: 3, y2: 1 };
