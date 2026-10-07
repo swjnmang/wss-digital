@@ -375,9 +375,17 @@ type AnswerStatus = 'idle' | 'right' | 'wrong'
 
 const isIncomplete = (raw: string) => ['', '-', '−', ',', '.'].includes(raw.trim())
 
+/** Status eines einzelnen Koordinatenfelds: grün, sobald der Wert stimmt, sonst rot. */
+function fieldStatus(raw: string, correct: number | undefined): AnswerStatus {
+  const v = parseFlexibleNumber(raw)
+  if (isIncomplete(raw) || Number.isNaN(v)) return 'idle'
+  return correct !== undefined && Math.abs(v - correct) < 0.01 ? 'right' : 'wrong'
+}
+
 /**
- * Richtig -> sofort grün (ohne Klick auf "Prüfen"), falsch -> sofort rot.
- * Für Tracking und "Richtig in Folge" zählt ein falscher Versuch erst, wenn die Eingabe kurz stehen bleibt.
+ * Jedes Feld färbt sich beim Tippen sofort grün (richtig) oder rot (falsch).
+ * Für Tracking, "Richtig in Folge" und das Freischalten der Musterlösung zählt ein falscher Versuch erst,
+ * wenn die Eingabe kurz stehen bleibt, nicht bei jedem Tastendruck.
  */
 function useLiveIntersection(
   task: Task,
@@ -387,14 +395,15 @@ function useLiveIntersection(
   const [yIn, setYIn] = useState('')
   const [none, setNone] = useState(false)
   const [solved, setSolved] = useState(false)
+  const [hadWrong, setHadWrong] = useState(false)
 
-  const x = parseFlexibleNumber(xIn)
-  const y = parseFlexibleNumber(yIn)
-  const xRight = task.s !== null && Math.abs(x - task.s.x) < 0.01
+  const xStatus = fieldStatus(xIn, task.s?.x)
+  const yStatus = fieldStatus(yIn, task.s?.y)
   let status: AnswerStatus
   if (none) status = task.s === null ? 'right' : 'wrong'
-  else if (isIncomplete(xIn) || isIncomplete(yIn) || Number.isNaN(x) || Number.isNaN(y)) status = 'idle'
-  else status = xRight && task.s !== null && Math.abs(y - task.s.y) < 0.01 ? 'right' : 'wrong'
+  else if (xStatus === 'right' && yStatus === 'right') status = 'right'
+  else if (xStatus === 'wrong' || yStatus === 'wrong') status = 'wrong'
+  else status = 'idle'
 
   useEffect(() => {
     if (solved) return
@@ -404,7 +413,10 @@ function useLiveIntersection(
       return
     }
     if (status === 'wrong') {
-      const timer = setTimeout(handlers.onWrong, 900)
+      const timer = setTimeout(() => {
+        setHadWrong(true)
+        handlers.onWrong()
+      }, 900)
       return () => clearTimeout(timer)
     }
   }, [xIn, yIn, none, task, solved])
@@ -414,22 +426,26 @@ function useLiveIntersection(
     setYIn('')
     setNone(false)
     setSolved(false)
+    setHadWrong(false)
   }
 
   const hint = none
     ? 'Die Geraden haben doch einen Schnittpunkt.'
-    : xRight
+    : xStatus === 'right' && yStatus === 'wrong'
       ? 'x stimmt, aber y noch nicht.'
-      : 'Noch nicht richtig.'
+      : xStatus === 'wrong' && yStatus === 'right'
+        ? 'y stimmt, aber x noch nicht.'
+        : 'Noch nicht richtig.'
 
-  return { xIn, setXIn, yIn, setYIn, none, setNone, status, solved, reset, hint }
+  return { xIn, setXIn, yIn, setYIn, none, setNone, xStatus, yStatus, status, solved, hadWrong, reset, hint }
 }
 
+const statusBorder = (s: AnswerStatus) =>
+  s === 'right' ? 'border-green-500 bg-green-50' : s === 'wrong' ? 'border-red-500 bg-red-50' : 'border-slate-300'
+
 function AnswerField({ live, allowNone }: { live: ReturnType<typeof useLiveIntersection>; allowNone: boolean }) {
-  const { xIn, setXIn, yIn, setYIn, none, setNone, status, solved, hint } = live
-  const border =
-    status === 'right' ? 'border-green-500 bg-green-50' : status === 'wrong' ? 'border-red-500 bg-red-50' : 'border-slate-300'
-  const inputCls = `w-24 text-center border-2 rounded px-2 py-2 focus:outline-none disabled:bg-slate-100 disabled:border-slate-200 ${border}`
+  const { xIn, setXIn, yIn, setYIn, none, setNone, xStatus, yStatus, status, solved, hint } = live
+  const inputCls = 'w-24 text-center border-2 rounded px-2 py-2 focus:outline-none disabled:bg-slate-100 disabled:border-slate-200'
   return (
     <div>
       <div className="flex items-center justify-center gap-1 text-lg font-semibold text-slate-800">
@@ -439,7 +455,7 @@ function AnswerField({ live, allowNone }: { live: ReturnType<typeof useLiveInter
           disabled={none}
           readOnly={solved}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setXIn(e.target.value)}
-          className={inputCls}
+          className={`${inputCls} ${none ? '' : statusBorder(xStatus)}`}
           placeholder="x"
           aria-label="x-Koordinate des Schnittpunkts"
         />
@@ -449,14 +465,18 @@ function AnswerField({ live, allowNone }: { live: ReturnType<typeof useLiveInter
           disabled={none}
           readOnly={solved}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setYIn(e.target.value)}
-          className={inputCls}
+          className={`${inputCls} ${none ? '' : statusBorder(yStatus)}`}
           placeholder="y"
           aria-label="y-Koordinate des Schnittpunkts"
         />
         <span>)</span>
       </div>
       {allowNone && (
-        <label className="flex items-center justify-center gap-2 mt-3 text-slate-700 cursor-pointer">
+        <label
+          className={`inline-flex items-center justify-center gap-2 mt-3 px-3 py-1.5 rounded border-2 cursor-pointer text-slate-700 ${
+            none ? statusBorder(status) : 'border-transparent'
+          }`}
+        >
           <input
             type="checkbox"
             checked={none}
@@ -469,6 +489,94 @@ function AnswerField({ live, allowNone }: { live: ReturnType<typeof useLiveInter
       )}
       {status === 'right' && <p className="text-center font-bold mt-3 text-green-600">Richtig! Super gemacht!</p>}
       {status === 'wrong' && <p className="text-center font-bold mt-3 text-red-600">{hint}</p>}
+    </div>
+  )
+}
+
+// ---------- Tipps (schrittweise) ----------
+
+const hasFraction = (task: Task) => task.m1.d !== 1 || task.m2.d !== 1 || task.t1.d !== 1 || task.t2.d !== 1
+
+function tipsFor(task: Task): React.ReactNode[] {
+  const { m1, t1, m2, t2 } = task
+  const tips: React.ReactNode[] = [
+    <>
+      Setze die beiden Funktionsterme gleich:
+      <EquationRows rows={[{ lhs: <Lin m={m1} t={t1} />, rhs: <Lin m={m2} t={t2} /> }]} />
+    </>,
+  ]
+  const fractionNote = hasFraction(task) && (
+    <p className="text-sm mt-1">
+      Brüche mit gleichem Nenner kannst du direkt verrechnen, sonst bringst du sie zuerst auf einen gemeinsamen Nenner.
+    </p>
+  )
+
+  if (eq(m1, m2)) {
+    tips.push(
+      <>
+        Bringe die x-Terme auf eine Seite. Rechne dazu <span className="font-serif whitespace-nowrap"><OpX m={m2} /></span>.
+        Was passiert dabei mit x?
+      </>,
+      <>
+        Vergleiche die Steigungen der beiden Geraden: m₁ = <span className="font-serif"><Num v={m1} /></span> und
+        m₂ = <span className="font-serif"><Num v={m2} /></span>.
+      </>,
+      <>
+        Fällt x weg und bleibt eine <strong>falsche Aussage</strong> übrig (z. B. 1 = −3), sind die Geraden parallel.
+        Dann gibt es keinen Schnittpunkt – setze den Haken.
+      </>,
+    )
+    return tips
+  }
+
+  const d = sub(m1, m2)
+  tips.push(
+    <>
+      Bringe die x-Terme auf eine Seite. Rechne dazu <span className="font-serif whitespace-nowrap"><OpX m={m2} /></span>:
+      <EquationRows rows={[{ lhs: <Lin m={d} t={t1} />, rhs: <Num v={t2} /> }]} />
+      {fractionNote}
+    </>,
+  )
+  const dOp = d.d === 1 ? <>: <Paren v={d} /></> : <>· <Paren v={div(q(1), d)} /></>
+  tips.push(
+    t1.n !== 0 ? (
+      <>
+        Bringe die Zahl auf die andere Seite (<span className="font-serif whitespace-nowrap"><OpConst t={t1} /></span>):
+        <EquationRows rows={[{ lhs: <XTerm m={d} />, rhs: <Num v={sub(t2, t1)} /> }]} />
+        {!isOne(d) && <>Rechne dann <span className="font-serif whitespace-nowrap">| {dOp}</span>, damit x allein steht.</>}
+      </>
+    ) : isOne(d) ? (
+      <>Jetzt steht x schon allein – du hast den x-Wert des Schnittpunkts.</>
+    ) : (
+      <>
+        Damit x allein steht, rechne <span className="font-serif whitespace-nowrap">| {dOp}</span>.
+      </>
+    ),
+  )
+  tips.push(
+    <>
+      Setze dein Ergebnis für x in g₁ ein:{' '}
+      <span className="font-serif whitespace-nowrap">
+        <i>y</i> = <Lin m={m1} t={t1} />
+      </span>
+      . Den Schnittpunkt schreibst du dann als S(x | y).
+    </>,
+  )
+  return tips
+}
+
+function TipBox({ tips, shown }: { tips: React.ReactNode[]; shown: number }) {
+  if (shown === 0) return null
+  return (
+    <div className="mt-4 border-l-4 border-amber-400 bg-amber-50 rounded p-3 text-left text-slate-700">
+      <ol className="space-y-2">
+        {tips.slice(0, shown).map((tip, i) => (
+          <li key={i}>
+            <span className="font-semibold text-slate-800">Tipp {i + 1}: </span>
+            {tip}
+          </li>
+        ))}
+      </ol>
     </div>
   )
 }
@@ -491,6 +599,8 @@ function TaskCard({ number, onSolvedChange, onResult, onHelp, level, initialPara
   const tracking = useTaskTracking(`Schnittpunkt berechnen (${LEVEL_LABEL[level]})`)
   const [task, setTask] = useState(() => newTask(level, initialParallel))
   const [showSolution, setShowSolution] = useState(false)
+  const [tipsShown, setTipsShown] = useState(0)
+  const tips = tipsFor(task)
 
   const live = useLiveIntersection(task, {
     onCorrect: () => {
@@ -514,7 +624,14 @@ function TaskCard({ number, onSolvedChange, onResult, onHelp, level, initialPara
     onSolvedChange(false)
     live.reset()
     setShowSolution(false)
+    setTipsShown(0)
     setTask(newTask(level, level === 'fortgeschritten' && Math.random() < 0.25))
+  }
+
+  function onShowTip() {
+    setTipsShown((n) => Math.min(n + 1, tips.length))
+    onHelp()
+    tracking.onHintShown()
   }
 
   function onShowAnswer() {
@@ -522,6 +639,9 @@ function TaskCard({ number, onSolvedChange, onResult, onHelp, level, initialPara
     onHelp()
     tracking.onHintShown()
   }
+
+  const solutionLocked = !live.hadWrong
+  const tipsLeft = tipsShown < tips.length
 
   return (
     <div className={panel}>
@@ -538,10 +658,29 @@ function TaskCard({ number, onSolvedChange, onResult, onHelp, level, initialPara
 
       <AnswerField live={live} allowNone={level === 'fortgeschritten'} />
 
+      <TipBox tips={tips} shown={tipsShown} />
+
       <div className="flex flex-wrap justify-center gap-3 mt-6">
         <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
-        <button onClick={onShowAnswer} className={btnSecondary}>Lösung anzeigen</button>
+        <button
+          onClick={onShowTip}
+          disabled={!tipsLeft || live.solved}
+          className={`${btnSecondary} disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white`}
+        >
+          {tipsShown === 0 ? 'Tipp' : tipsLeft ? 'Nächster Tipp' : 'Keine weiteren Tipps'} ({tipsShown}/{tips.length})
+        </button>
+        <button
+          onClick={onShowAnswer}
+          disabled={solutionLocked}
+          title={solutionLocked ? 'Die Lösung kannst du anzeigen, nachdem du einmal eine Antwort eingegeben hast.' : undefined}
+          className={`${btnSecondary} disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white`}
+        >
+          Lösung anzeigen
+        </button>
       </div>
+      {solutionLocked && !live.solved && (
+        <p className="text-xs text-slate-500 mt-2">Die Lösung kannst du erst nach einem falschen Versuch anzeigen.</p>
+      )}
 
       {showSolution && <SolutionWay task={task} />}
     </div>
