@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
+import { type Q, q, add, mul, neg, val, isInt, tq, tqp, sgq, polyTex, parseAnswer, isIncomplete } from './quadratischShared'
 
 // Sieben Aufgaben gleichzeitig auf der Seite
 const TOTAL_TASKS = 7
@@ -9,7 +10,7 @@ const TOTAL_TASKS = 7
 const VIDEO_ID = 'Im1FRd6_o-w'
 
 // Einfach: a = 1 oder a = −1, ganzzahliger Scheitelpunkt
-// Fortgeschritten: andere Streckfaktoren, Scheitelpunkt auch mit Kommazahlen
+// Fortgeschritten: Brüche in der Funktionsgleichung (Streckfaktor, b und/oder c), Scheitelpunkt oft als Bruch
 type Level = 'einfach' | 'fortgeschritten'
 
 const LEVEL_LABEL: Record<Level, string> = { einfach: 'Einfach', fortgeschritten: 'Fortgeschritten' }
@@ -43,20 +44,6 @@ const tn = (n: number) => {
   return (r < 0 ? '-' : '') + String(Math.abs(r)).replace('.', '{,}')
 }
 
-// Zahl in Klammern, wenn negativ (für Einsetzen)
-const tp = (n: number) => (n < 0 ? `(${tn(n)})` : tn(n))
-
-// Zahl mit Rechenzeichen davor, z. B. "+ 3" oder "- 2{,}5"
-const sg = (n: number) => (round2(n) < 0 ? `- ${tn(-n)}` : `+ ${tn(n)}`)
-
-/** f(x) = ax² + bx + c als LaTeX, z. B. "f(x) = -2x^2 + 4x - 1" */
-function generalTex(a: number, b: number, c: number) {
-  let s = a === 1 ? 'x^2' : a === -1 ? '-x^2' : `${tn(a)}x^2`
-  if (b !== 0) s += ` ${b < 0 ? '-' : '+'} ${Math.abs(b) === 1 ? '' : tn(Math.abs(b))}x`
-  if (c !== 0) s += ` ${sg(c)}`
-  return `f(x) = ${s}`
-}
-
 const GREEN = '#15803d'
 const RED = '#b91c1c'
 
@@ -71,49 +58,62 @@ function Tex({ tex, display = false, className = '' }: { tex: string; display?: 
 }
 
 interface Task {
-  a: number
-  b: number
-  c: number
-  xs: number
-  ys: number
+  a: Q
+  b: Q
+  c: Q
+  xs: Q
+  ys: Q
 }
 
+const taskFrom = (a: Q, xs: Q, c: Q): Task => {
+  const b = mul(q(-2), mul(a, xs))
+  return { a, b, c, xs, ys: add(mul(b, xs), add(mul(a, mul(xs, xs)), c)) }
+}
+
+// Fortgeschritten: Streckfaktoren (meist Brüche) und mögliche Werte für x_S und c
+const A_FORTGESCHRITTEN = [[1, 2], [-1, 2], [1, 3], [-1, 3], [2, 3], [-2, 3], [1, 4], [-1, 4], [3, 4], [-3, 4], [3, 2], [-3, 2], [2, 1], [-2, 1]] as const
+const XS_FORTGESCHRITTEN = Array.from({ length: 17 }, (_, i) => q(i - 8, 2)).filter((x) => x.n !== 0)
+const C_FORTGESCHRITTEN = [
+  ...Array.from({ length: 13 }, (_, i) => q(i - 6)),
+  ...[-5, -3, -1, 1, 3, 5].map((n) => q(n, 2)),
+  ...[-3, -1, 1, 3].map((n) => q(n, 4)),
+  ...[-2, -1, 1, 2].map((n) => q(n, 3)),
+].filter((c) => c.n !== 0)
+
 function newTask(level: Level): Task {
-  let a: number, xs: number
   if (level === 'einfach') {
-    a = pick([1, -1])
+    let xs: number
     do xs = randomInt(5, -5)
     while (xs === 0)
-  } else {
-    a = pick([2, -2, 3, -3, 0.5, -0.5, 1, -1])
-    // x_s so wählen, dass b = −2a·x_s ganzzahlig ist (bei a = ±1, ±2, ±3 auch halbe x-Werte)
-    const candidates = Array.from({ length: 17 }, (_, i) => (i - 8) / 2).filter(
-      (x) => x !== 0 && Number.isInteger(-2 * a * x) && Math.abs(-2 * a * x) <= 18,
-    )
-    // bei a = ±1 bevorzugt halbe x-Werte, sonst wäre die Aufgabe wie in "Einfach"
-    const halves = candidates.filter((x) => !Number.isInteger(x))
-    xs = Math.abs(a) === 1 && halves.length ? pick(halves) : pick(candidates)
+    let c: number
+    do c = randomInt(9, -9)
+    while (c === 0)
+    return taskFrom(q(pick([1, -1])), q(xs), q(c))
   }
-  const b = -2 * a * xs
-  let c: number
-  do c = randomInt(9, -9)
-  while (c === 0)
-  const ys = round2(a * xs * xs + b * xs + c)
-  return { a, b, c, xs, ys }
+  for (;;) {
+    const [an, ad] = pick(A_FORTGESCHRITTEN)
+    const t = taskFrom(q(an, ad), pick(XS_FORTGESCHRITTEN), pick(C_FORTGESCHRITTEN))
+    // Mindestens ein Bruch in der Gleichung, überschaubare Nenner und Beträge
+    const mitBruch = !isInt(t.a) || !isInt(t.b) || !isInt(t.c)
+    if (mitBruch && t.b.n !== 0 && t.b.d <= 4 && Math.abs(val(t.b)) <= 12 && t.ys.d <= 6 && Math.abs(val(t.ys)) <= 12) return t
+  }
 }
+
+/** Bruch als gerundete Dezimalzahl in LaTeX, z. B. "2{,}33" */
+const dezimalWert = (x: Q) => tn(val(x))
+/** "= 2{,}5" bzw. "\\approx 2{,}33" */
+const dezimal = (x: Q) => `${Math.abs(val(x) - round2(val(x))) < 1e-9 ? '=' : '\\approx'} ${dezimalWert(x)}`
 
 // ---------- Live-Auswertung einer Eingabe ----------
 
-const parseAnswer = (raw: string) => parseFloat(raw.replace(',', '.').replace(/[−–—‐]/g, '-'))
-
 type AnswerStatus = 'idle' | 'right' | 'wrong'
 
-function getStatus(input: string, correct: number): AnswerStatus {
-  const trimmed = input.trim()
-  if (trimmed === '' || trimmed === '-' || trimmed === '−' || trimmed === ',' || trimmed === '.') return 'idle'
+// Brüche (z. B. 7/3) werden exakt verglichen, Dezimalzahlen müssen auf zwei Nachkommastellen stimmen.
+function getStatus(input: string, correct: Q): AnswerStatus {
+  if (isIncomplete(input)) return 'idle'
   const parsed = parseAnswer(input)
   if (Number.isNaN(parsed)) return 'idle'
-  return Math.abs(parsed - correct) < 0.01 ? 'right' : 'wrong'
+  return Math.abs(parsed - val(correct)) < 0.0051 ? 'right' : 'wrong'
 }
 
 function CoordInput({
@@ -148,31 +148,34 @@ function CoordInput({
 
 function SolutionSteps({ task }: { task: Task }) {
   const { a, b, c, xs, ys } = task
-  const t1 = round2(a * xs * xs)
-  const t2 = round2(b * xs)
-  const q = b * b / (4 * a)
+  const t1 = mul(a, mul(xs, xs))
+  const t2 = mul(b, xs)
+  const bb = mul(b, b)
+  const vierA = mul(q(4), a)
+  const quot = q(bb.n * vierA.d, bb.d * vierA.n)
+  const naeherung = isInt(ys) ? '' : ` ${dezimal(ys)}`
   return (
     <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-left text-slate-700 space-y-3">
       <h3 className="text-base font-bold text-slate-800 text-center">Lösungsweg</h3>
       <p>
-        Ablesen: <Tex tex={`a = ${tn(a)},\\quad b = ${tn(b)},\\quad c = ${tn(c)}`} />
+        Ablesen: <Tex tex={`a = ${tq(a)},\\quad b = ${tq(b)},\\quad c = ${tq(c)}`} />
       </p>
       <div>
         <p className="font-semibold text-slate-800">Schritt 1: x-Koordinate berechnen</p>
-        <Tex display tex={`x_S = -\\frac{b}{2 \\cdot a} = -\\frac{${tn(b)}}{2 \\cdot ${tp(a)}} = \\frac{${tn(-b)}}{${tn(2 * a)}} = \\mathbf{${tn(xs)}}`} />
+        <Tex display tex={`x_S = -\\frac{b}{2 \\cdot a} = -\\frac{${tq(b)}}{2 \\cdot ${tqp(a)}} = \\frac{${tq(neg(b))}}{${tq(mul(q(2), a))}} = \\mathbf{${tq(xs)}}`} />
       </div>
       <div>
         <p className="font-semibold text-slate-800">
           Schritt 2: <Tex tex="x_S" /> in <Tex tex="f(x)" /> einsetzen
         </p>
-        <Tex display tex={`\\begin{aligned} y_S &= f(${tn(xs)}) = ${tn(a)} \\cdot ${tp(xs)}^2 ${b < 0 ? '-' : '+'} ${tn(Math.abs(b))} \\cdot ${tp(xs)} ${sg(c)} \\\\ &= ${tn(t1)} ${sg(t2)} ${sg(c)} = \\mathbf{${tn(ys)}} \\end{aligned}`} />
+        <Tex display tex={`\\begin{aligned} y_S &= f\\left(${tq(xs)}\\right) = ${tq(a)} \\cdot ${tqp(xs)}^2 ${b.n < 0 ? '-' : '+'} ${tq(q(Math.abs(b.n), b.d))} \\cdot ${tqp(xs)} ${sgq(c)} \\\\ &= ${tq(t1)} ${sgq(t2)} ${sgq(c)} = \\mathbf{${tq(ys)}}${naeherung} \\end{aligned}`} />
         <p className="mt-2">
           oder mit der Formel <Tex tex="y_S = c - \frac{b^2}{4 \cdot a}" />:
         </p>
-        <Tex display tex={`y_S = ${tn(c)} - \\frac{${tp(b)}^2}{4 \\cdot ${tp(a)}} = ${tn(c)} - \\frac{${tn(b * b)}}{${tn(4 * a)}} = ${tn(c)} ${sg(-q)} = \\mathbf{${tn(ys)}}`} />
+        <Tex display tex={`\\begin{aligned} y_S &= ${tq(c)} - \\frac{${tqp(b)}^2}{4 \\cdot ${tqp(a)}} = ${tq(c)} - \\frac{${tq(bb)}}{${tq(vierA)}} \\\\ &= ${tq(c)} ${sgq(neg(quot))} = \\mathbf{${tq(ys)}}${naeherung} \\end{aligned}`} />
       </div>
       <div className="font-bold text-slate-800 text-center text-lg">
-        <Tex display tex={`S\\left({${tn(xs)}} \\;\\middle|\\; {${tn(ys)}}\\right)`} />
+        <Tex display tex={`S\\left({${tq(xs)}} \\;\\middle|\\; {${tq(ys)}}\\right)${isInt(xs) && isInt(ys) ? '' : ` \\approx S\\left({${dezimalWert(xs)}} \\;\\middle|\\; {${dezimalWert(ys)}}\\right)`}`} />
       </div>
     </div>
   )
@@ -266,10 +269,10 @@ function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps
       <h2 className="text-lg font-bold text-slate-800 mb-2">Aufgabe {number}</h2>
       <p className="text-slate-700 mb-1">
         Berechne den Scheitelpunkt S der Parabel.
-        {level === 'fortgeschritten' && ' Runde, falls nötig, auf zwei Nachkommastellen.'}
+        {level === 'fortgeschritten' && ' Gib Brüche mit Schrägstrich ein (z. B. 7/3) oder als Dezimalzahl, auf zwei Nachkommastellen gerundet.'}
       </p>
       <div className="text-center text-2xl text-slate-800 my-4">
-        <Tex tex={generalTex(task.a, task.b, task.c)} />
+        <Tex tex={`f(x) = ${polyTex(task.a, task.b, task.c)}`} />
       </div>
 
       <div className="flex items-center justify-center gap-2 text-2xl text-slate-800">
@@ -488,8 +491,8 @@ export default function Scheitelpunkt() {
                 className="rounded-xl bg-red-600 hover:bg-red-700 text-white p-5 shadow-sm transition-colors"
               >
                 <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
-                <Tex display className="text-xl mb-2 text-white" tex="f(x) = ax^2 + bx + c" />
-                <p className="text-sm text-white/90">Mit Streckfaktor a, der Scheitelpunkt kann auch Kommazahlen enthalten.</p>
+                <Tex display className="text-xl mb-2 text-white" tex="f(x) = \frac{1}{2}x^2 - 3x + \frac{5}{2}" />
+                <p className="text-sm text-white/90">Mit Brüchen in der Funktionsgleichung – rechne mit Bruchrechnung.</p>
               </button>
             </div>
           </div>
