@@ -138,6 +138,7 @@ const schritteScheitel = (t: ScheitelAufgabe): Schritt[] => {
     const d2 = (px - h) ** 2;
     const aTerm = d2 === 1 ? 'a' : `${d2}a`;
     const aMal = a === 1 ? '' : a === -1 ? '-' : `${num(a)} \\cdot `;
+    const faktor = `(x ${h > 0 ? '-' : '+'} ${num(Math.abs(h))})`;
     return [
         {
             text: `Scheitelpunkt S(${h}|${k}) in die Scheitelform einsetzen:`,
@@ -157,11 +158,20 @@ const schritteScheitel = (t: ScheitelAufgabe): Schritt[] => {
             formeln: [scheitelForm(a, h, k)],
         },
         {
-            text: 'Klammer mit der binomischen Formel auflösen:',
+            text: 'Quadrat als Produkt zweier Klammern schreiben und ausmultiplizieren (jeder Summand der ersten Klammer mal jeder Summand der zweiten Klammer):',
+            formeln: [
+                `${klammer(h)} = ${faktor} \\cdot ${faktor}`,
+                `= x \\cdot x + x \\cdot ${kl(-h)} + ${kl(-h)} \\cdot x + ${kl(-h)} \\cdot ${kl(-h)}`,
+                `= x^2${summand(-h, 'x')}${summand(-h, 'x')}${summand(h * h)}`,
+                `= x^2${summand(-2 * h, 'x')}${summand(h * h)}`,
+            ],
+        },
+        {
+            text: 'Das Ergebnis in die Scheitelform einsetzen (Klammer bleibt stehen):',
             formeln: [`y = ${aMal}(x^2${summand(-2 * h, 'x')}${summand(h * h)})${summand(k)}`],
         },
         {
-            text: 'Ausmultiplizieren und zusammenfassen – fertig ist die allgemeine Form:',
+            text: 'Klammer mit a ausmultiplizieren und zusammenfassen – fertig ist die allgemeine Form:',
             formeln: [`y = ${vorfaktor(a)}x^2${summand(b, 'x')}${summand(a * h * h)}${summand(k)}`, allgForm(a, b, c)],
         },
     ];
