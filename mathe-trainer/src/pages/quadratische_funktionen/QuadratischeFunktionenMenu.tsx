@@ -62,22 +62,22 @@ const menuItems = [
     icon: 'fa-solid fa-arrows-down-to-line',
   },
   {
-    title: '11. Funktionsgleichung aufstellen',
-    description: 'Stelle eine Funktionsgleichung aus Punkten oder Eigenschaften auf.',
-    path: '/quadratische_funktionen/funktionsgleichung_aufstellen',
-    icon: 'fa-solid fa-pen-ruler',
-  },
-  {
-    title: '12. Schnittpunkte (Parabel-Gerade)',
+    title: '11. Schnittpunkte (Parabel-Gerade)',
     description: 'Berechne die Schnittpunkte zwischen einer Parabel und einer Geraden.',
     path: '/quadratische_funktionen/schnittpunkte_gerade',
     icon: 'fa-solid fa-arrows-turn-to-dots',
   },
   {
-    title: '13. Schnittpunkte (Parabel-Parabel)',
+    title: '12. Schnittpunkte (Parabel-Parabel)',
     description: 'Berechne die Schnittpunkte zwischen zwei Parabeln.',
     path: '/quadratische_funktionen/schnittpunkte_parabel',
     icon: 'fa-solid fa-code-compare',
+  },
+  {
+    title: '13. Funktionsgleichung aufstellen',
+    description: 'Stelle eine Funktionsgleichung aus Punkten oder Eigenschaften auf.',
+    path: '/quadratische_funktionen/funktionsgleichung_aufstellen',
+    icon: 'fa-solid fa-pen-ruler',
   },
   {
     title: '14. Spiel: Nullstellen finden',
