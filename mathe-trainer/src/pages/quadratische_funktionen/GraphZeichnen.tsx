@@ -44,10 +44,16 @@ const klammer = (n: number) => (n < 0 ? `(${zahl(n)})` : zahl(n));
 /** Koeffizient vor x bzw. x² (1 und −1 werden weggelassen) */
 const koeff = (n: number) => (n === 1 ? '' : n === -1 ? '−' : zahl(n));
 
-const termText = (a: number, b: number, c: number) => {
-    let s = `${koeff(a)}x²`;
-    if (b !== 0) s += ` ${b < 0 ? '−' : '+'} ${koeff(Math.abs(b))}x`;
-    if (c !== 0) s += ` ${sgn(c)}`;
+/** Klammer mit x und Verschiebung, z. B. "(x − 2)" bzw. "(−1 + 3)" beim Einsetzen */
+const xKlammer = (x: string, xs: number) => `(${x} ${xs > 0 ? '−' : '+'} ${zahl(Math.abs(xs))})`;
+
+/**
+ * Gleichung so, dass man die Verschiebung direkt sieht:
+ * ax² (nicht verschoben), ax² + c (y-Achse), a(x − d)² (x-Achse), a(x − d)² + e (beide)
+ */
+const termText = (a: number, xs: number, ys: number) => {
+    let s = `${koeff(a)}${xs === 0 ? 'x' : xKlammer('x', xs)}²`;
+    if (ys !== 0) s += ` ${sgn(ys)}`;
     return s;
 };
 
@@ -57,7 +63,7 @@ const baueAufgabe = (a: number, xs: number, ys: number, breite: number): Aufgabe
     const b = -2 * a * xs;
     const c = a * xs * xs + ys;
     const xWerte = Array.from({ length: 2 * breite + 1 }, (_, i) => xs - breite + i);
-    return { a, b, c, xs, ys, xWerte, equation: `f(x) = ${termText(a, b, c)}` };
+    return { a, b, c, xs, ys, xWerte, equation: `f(x) = ${termText(a, xs, ys)}` };
 };
 
 const BEISPIEL: Record<Level, Aufgabe> = {
@@ -121,16 +127,18 @@ const farbKlasse = (status: Status) =>
           ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
           : 'border-red-500 bg-red-50 text-red-800 focus:ring-red-500 focus:border-red-500';
 
-/** Rechnung für einen x-Wert, z. B. f(−1) = 2·(−1)² − 4·(−1) + 1 = 2 + 4 + 1 = 7 */
+/** Rechnung für einen x-Wert, z. B. f(−1) = 2·(−1 − 1)² − 4 = 2·(−2)² − 4 = 8 − 4 = 4 */
 const einsetzen = (t: Aufgabe, x: number) => {
-    const { a, b, c } = t;
-    let links = `${a === 1 ? '' : a === -1 ? '−' : `${zahl(a)}·`}${klammer(x)}²`;
-    if (b !== 0) links += ` ${b < 0 ? '−' : '+'} ${Math.abs(b) === 1 ? '' : `${zahl(Math.abs(b))}·`}${klammer(x)}`;
-    if (c !== 0) links += ` ${sgn(c)}`;
-    const summanden = [a * x * x, ...(b !== 0 ? [b * x] : []), ...(c !== 0 ? [c] : [])];
-    const mitte = summanden.map((v, i) => (i === 0 ? zahl(v) : sgn(v))).join(' ');
-    const ergebnis = zahl(funktionswert(t, x));
-    return `f(${zahl(x)}) = ${links} = ${summanden.length > 1 ? `${mitte} = ` : ''}${ergebnis}`;
+    const { a, xs, ys } = t;
+    const vor = a === 1 ? '' : a === -1 ? '−' : `${zahl(a)}·`;
+    const rest = ys !== 0 ? ` ${sgn(ys)}` : '';
+    const schritte = [`${vor}${xs === 0 ? klammer(x) : xKlammer(zahl(x), xs)}²${rest}`];
+    // Bei verschobener Parabel zuerst die Klammer ausrechnen
+    if (xs !== 0) schritte.push(`${vor}${klammer(x - xs)}²${rest}`);
+    const summanden = [a * (x - xs) ** 2, ...(ys !== 0 ? [ys] : [])];
+    if (summanden.length > 1) schritte.push(summanden.map((v, i) => (i === 0 ? zahl(v) : sgn(v))).join(' '));
+    schritte.push(zahl(funktionswert(t, x)));
+    return `f(${zahl(x)}) = ${schritte.join(' = ')}`;
 };
 
 const Graph = ({ t }: { t: Aufgabe }) => {
@@ -276,7 +284,7 @@ const GraphZeichnen = () => {
         const stufen: { l: Level; farbe: string; beispiel: string; text: string }[] = [
             { l: 'einfach', farbe: 'bg-green-600 hover:bg-green-700', beispiel: 'f(x) = 2x²', text: 'Nicht verschobene Parabeln – nur der Formfaktor a ändert sich.' },
             { l: 'mittel', farbe: 'bg-yellow-500 hover:bg-yellow-600', beispiel: 'f(x) = x² − 3', text: 'Parabeln, die entlang der y-Achse oder entlang der x-Achse verschoben sind.' },
-            { l: 'fortgeschritten', farbe: 'bg-red-600 hover:bg-red-700', beispiel: 'f(x) = x² − 2x − 3', text: 'Parabeln, die entlang der x-Achse und der y-Achse verschoben sind.' },
+            { l: 'fortgeschritten', farbe: 'bg-red-600 hover:bg-red-700', beispiel: 'f(x) = (x − 1)² − 4', text: 'Parabeln, die entlang der x-Achse und der y-Achse verschoben sind.' },
         ];
         return (
             <div className="container mx-auto px-4 py-8">
@@ -317,14 +325,15 @@ const GraphZeichnen = () => {
                     <div>
                         <h2 className="text-xl font-semibold text-gray-800 mb-3">So funktioniert&apos;s</h2>
                         <p className="text-gray-700 mb-3">
-                            Um den Graphen einer quadratischen Funktion <span className="font-mono">f(x) = ax² + bx + c</span> zu
-                            zeichnen, legst du eine Wertetabelle an:
+                            Um den Graphen einer quadratischen Funktion wie{' '}
+                            <span className="font-mono">f(x) = a(x − d)² + e</span> zu zeichnen, legst du eine Wertetabelle
+                            an:
                         </p>
                         <ol className="list-decimal pl-6 text-gray-700 mb-3 space-y-1">
                             <li>Wähle mehrere x-Werte (am besten rund um den Scheitelpunkt).</li>
                             <li>
                                 Setze jeden x-Wert in die Funktion ein und berechne y. Negative Zahlen setzt du in Klammern –
-                                denn <span className="font-mono">(−2)² = 4</span>. Rechne zuerst die Potenz, dann Punkt vor Strich.
+                                denn <span className="font-mono">(−2)² = 4</span>. Rechne zuerst die Klammer, dann die Potenz, dann Punkt vor Strich.
                             </li>
                             <li>Trage die Punkte (x | y) in ein Koordinatensystem ein.</li>
                             <li>Verbinde die Punkte mit einer glatten, gebogenen Kurve – nicht mit dem Lineal!</li>
