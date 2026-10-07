@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ParabelGraph from '../../components/ParabelGraph';
 
-type Typ = 'graph' | 'gleichung';
-
 type Aufgabe = {
-    typ: Typ;
     a: number;
     xs: number;
     ys: number;
@@ -15,7 +12,6 @@ type Feld = keyof Eingabe;
 type Status = 'leer' | 'richtig' | 'vorzeichen' | 'falsch';
 
 const ANZAHL_AUFGABEN = 5;
-const TYPEN: Typ[] = ['graph', 'gleichung', 'graph', 'gleichung', 'graph'];
 const STRECKFAKTOREN = [1, -1, 2, -2, 0.5, -0.5];
 const VIDEO_URL = 'https://www.youtube.com/watch?v=VgsmYGAI-_8&list=PLI8kX0XEfSugainT6dHh9wGTGikzJ76d2&index=6';
 
@@ -24,7 +20,7 @@ const zahl = (n: number) => String(n).replace('.', ',').replace('-', '−');
 
 const erzeugeAufgaben = (): Aufgabe[] => {
     const schonDa = new Set<string>();
-    return TYPEN.map((typ) => {
+    return Array.from({ length: ANZAHL_AUFGABEN }, () => {
         let a: number, xs: number, ys: number, key: string;
         do {
             a = STRECKFAKTOREN[zufall(0, STRECKFAKTOREN.length - 1)];
@@ -33,18 +29,11 @@ const erzeugeAufgaben = (): Aufgabe[] => {
             key = `${xs}|${ys}`;
         } while (schonDa.has(key));
         schonDa.add(key);
-        return { typ, a, xs, ys };
+        return { a, xs, ys };
     });
 };
 
 const leereEingaben = (): Eingabe[] => Array.from({ length: ANZAHL_AUFGABEN }, () => ({ xs: '', ys: '' }));
-
-const gleichung = ({ a, xs, ys }: Aufgabe) => {
-    const faktor = a === 1 ? '' : a === -1 ? '−' : zahl(a);
-    const quadrat = xs === 0 ? 'x²' : `(x ${xs > 0 ? '−' : '+'} ${Math.abs(xs)})²`;
-    const rest = ys === 0 ? '' : ` ${ys > 0 ? '+' : '−'} ${Math.abs(ys)}`;
-    return `f(x) = ${faktor}${quadrat}${rest}`;
-};
 
 const parseZahl = (s: string) => parseFloat(s.replace(/[−–—‐]/g, '-').replace(',', '.'));
 
@@ -65,22 +54,10 @@ const farbKlasse = (status: Status) =>
 
 const Loesung = ({ t }: { t: Aufgabe }) => (
     <div className="mt-3 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md p-3 space-y-1">
-        {t.typ === 'gleichung' ? (
-            <>
-                <p>
-                    Vergleiche mit der Scheitelform <span className="font-mono">f(x) = a(x − xₛ)² + yₛ</span>.
-                </p>
-                <p>
-                    In der Klammer steht das <b>umgekehrte</b> Vorzeichen: xₛ = {zahl(t.xs)}
-                </p>
-                <p>Die Zahl hinter der Klammer wird direkt übernommen: yₛ = {zahl(t.ys)}</p>
-            </>
-        ) : (
-            <p>
-                Der Scheitelpunkt ist der {t.a > 0 ? 'tiefste' : 'höchste'} Punkt der Parabel. Lies seine Koordinaten
-                an den Achsen ab.
-            </p>
-        )}
+        <p>
+            Der Scheitelpunkt ist der {t.a > 0 ? 'tiefste' : 'höchste'} Punkt der Parabel. Lies seine Koordinaten an
+            den Achsen ab: zuerst den x-Wert, dann den y-Wert.
+        </p>
         <p className="font-bold">
             S({zahl(t.xs)} | {zahl(t.ys)})
         </p>
@@ -128,9 +105,8 @@ const ScheitelpunktAblesen = () => {
                     </span>
                 </div>
                 <p className="text-gray-600 mb-6">
-                    Lies den Scheitelpunkt S(xₛ | yₛ) aus dem Graphen bzw. aus der Scheitelform{' '}
-                    <span className="font-mono">f(x) = a(x − xₛ)² + yₛ</span> ab. Richtige Werte werden sofort grün,
-                    falsche rot.
+                    Lies den Scheitelpunkt S(xₛ | yₛ) aus dem Graphen ab. Ein Kästchen entspricht einer Einheit.
+                    Richtige Werte werden sofort grün, falsche rot.
                 </p>
 
                 <div className="space-y-4">
@@ -143,19 +119,13 @@ const ScheitelpunktAblesen = () => {
                                 key={i}
                                 className={`border rounded-lg p-4 ${fertig ? 'border-green-300 bg-green-50/40' : 'border-gray-200'}`}
                             >
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                                    <div className="sm:w-1/2">
+                                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                                    <div className="w-full md:w-auto md:flex-1">
                                         <p className="text-sm font-semibold text-gray-500 mb-2">Aufgabe {i + 1}</p>
-                                        {t.typ === 'graph' ? (
-                                            <ParabelGraph a={t.a} xs={t.xs} ys={t.ys} />
-                                        ) : (
-                                            <p className="text-xl font-mono text-blue-900 bg-blue-50 border-l-4 border-blue-500 rounded-md px-3 py-2 inline-block">
-                                                {gleichung(t)}
-                                            </p>
-                                        )}
+                                        <ParabelGraph a={t.a} xs={t.xs} ys={t.ys} groesse={460} />
                                     </div>
 
-                                    <div className="sm:w-1/2">
+                                    <div className="md:w-56 shrink-0">
                                         <div className="flex items-center gap-1 text-xl font-mono text-gray-700">
                                             <span>S(</span>
                                             {(['xs', 'ys'] as const).map((feld, k) => {

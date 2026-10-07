@@ -85,6 +85,8 @@ const ParabelGraph = ({ a, xs, ys, zeigeScheitel = false, bereich = 6, groesse =
                             }
                             api.setGridVisible(true);
                             api.setCoordSystem(-bereich, bereich, -bereich, bereich);
+                            // Achsen in Einerschritten beschriften, damit sich jede Koordinate ablesen lässt.
+                            api.setAxisSteps(1, 1, 1);
                         },
                     },
                     true
@@ -105,7 +107,7 @@ const ParabelGraph = ({ a, xs, ys, zeigeScheitel = false, bereich = 6, groesse =
         <div
             ref={halterRef}
             className="w-full rounded-md border border-gray-200 overflow-hidden bg-white"
-            style={{ maxWidth: groesse, minHeight: Math.min(groesse, 200) }}
+            style={{ maxWidth: groesse, aspectRatio: '1 / 1' }}
         />
     );
 };
