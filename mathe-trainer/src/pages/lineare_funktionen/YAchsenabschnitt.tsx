@@ -5,6 +5,9 @@ import { useTaskTracking } from '../../hooks/useTaskTracking'
 // Sechs Aufgaben, jede mit einem eigenen Aufgabentyp
 const TOTAL_TASKS = 6
 
+// Erklärvideo zum y-Achsenabschnitt (YouTube)
+const VIDEO_ID = 'IgUrqycTKPQ'
+
 function randomInt(max: number, min = 0) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
@@ -215,6 +218,7 @@ function Erklaerung() {
         </p>
       </div>
 
+      <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
       {/* Interaktive Darstellung */}
       <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-3 sm:p-4">
         <p className="font-semibold text-slate-800 text-center mb-3">Probiere es aus: Verändere t und beobachte die Gerade.</p>
@@ -292,10 +296,13 @@ function Erklaerung() {
           <b>Warum?</b> Auf der y-Achse ist x = 0. Setzt du x = 0 ein, erhältst du y = m · 0 + t = t.
         </p>
       </div>
+      </div>
 
       {/* Beispiel */}
       <div className="space-y-3">
         <h3 className="font-bold text-slate-800">Beispiel: <Eq>y = 2x − 3</Eq></h3>
+        <div className="grid gap-4 lg:grid-cols-2 lg:items-center">
+        <div className="space-y-3">
         <p>
           Vergleiche die Wertetabellen von <Eq>y = 2x</Eq> und <Eq>y = 2x − 3</Eq>:
         </p>
@@ -329,15 +336,6 @@ function Erklaerung() {
           Jeder y-Wert ist um <b>3 kleiner</b>. Die Gerade <Eq>y = 2x − 3</Eq> ist also die um 3 Einheiten nach{' '}
           <b>unten</b> verschobene Ursprungsgerade <Eq>y = 2x</Eq>. Beide Geraden sind parallel.
         </p>
-        <Koordinatensystem
-          lines={[
-            { m: 2, t: 0, color: GREY, dashed: true },
-            { m: 2, t: -3, color: BLUE },
-          ]}
-          arrows={[-1, 1, 2].map((x) => ({ x, y1: 2 * x, y2: 2 * x - 3, color: RED }))}
-          points={[{ x: 0, y: -3, color: RED, label: 'S(0|−3)' }]}
-          className="w-full max-w-[340px]"
-        />
         <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
           <p className="font-semibold text-slate-800 mb-1">Ergebnis:</p>
           <ul className="list-disc pl-5 space-y-1">
@@ -345,6 +343,17 @@ function Erklaerung() {
             <li>y-Achsenabschnitt: t = −3 (das Minuszeichen gehört zu t!)</li>
             <li>Schnittpunkt mit der y-Achse: S<sub>y</sub>(0|−3)</li>
           </ul>
+        </div>
+        </div>
+        <Koordinatensystem
+          lines={[
+            { m: 2, t: 0, color: GREY, dashed: true },
+            { m: 2, t: -3, color: BLUE },
+          ]}
+          arrows={[-1, 1, 2].map((x) => ({ x, y1: 2 * x, y2: 2 * x - 3, color: RED }))}
+          points={[{ x: 0, y: -3, color: RED, label: 'S(0|−3)' }]}
+          className="w-full max-w-[400px]"
+        />
         </div>
       </div>
 
@@ -366,6 +375,20 @@ function Erklaerung() {
           <b>Tipp zum Zeichnen:</b> Beginne beim Punkt S(0|t) auf der y-Achse und zeichne von dort aus das
           Steigungsdreieck mit m.
         </p>
+      </div>
+
+      {/* Erklärvideo */}
+      <div className="space-y-2">
+        <h3 className="font-bold text-slate-800 text-center">Erklärvideo</h3>
+        <div className="max-w-3xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200">
+          <iframe
+            className="w-full h-full"
+            src={`https://www.youtube.com/embed/${VIDEO_ID}`}
+            title="Erklärvideo: y-Achsenabschnitt"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
       </div>
     </div>
   )
@@ -982,7 +1005,7 @@ export default function YAchsenabschnitt() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+      <div className="mx-auto px-4 py-8 max-w-6xl w-full flex flex-col gap-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">y-Achsenabschnitt</h1>
           <p className="text-center text-slate-600">
@@ -996,7 +1019,7 @@ export default function YAchsenabschnitt() {
           Übungsaufgaben
         </h2>
 
-        {cards}
+        <div className="grid gap-6 lg:grid-cols-2 lg:items-start">{cards}</div>
 
         <div className="flex justify-center gap-3 flex-wrap">
           <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">
