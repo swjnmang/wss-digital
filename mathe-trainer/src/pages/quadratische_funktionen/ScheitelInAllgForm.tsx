@@ -102,16 +102,57 @@ const erzeugeAufgaben = (level: Level) => {
 };
 const leereEingaben = (): Eingabe[] => Array.from({ length: ANZAHL_AUFGABEN }, () => ({ a: '', b: '', c: '' }));
 
-// Erlaubt ganze Zahlen, Dezimalzahlen (Komma oder Punkt) und Brüche wie 3/4 oder -1/2
+const normalisiere = (s: string) => s.trim().replace(/[−–—‐]/g, '-').replace(/,/g, '.').replace(/\s+/g, '');
+const BRUCH_MUSTER = /^([+-]?)\(?([+-]?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)\)?$/;
+const ZAHL_MUSTER = /^[+-]?\d*\.?\d+$/;
+
+// Erlaubt ganze Zahlen, Dezimalzahlen (Komma oder Punkt) und Brüche wie 3/4 oder -1/2, jeweils mit + oder − davor
 const parseZahl = (s: string): number => {
-    const t = s.trim().replace(/[−–—‐]/g, '-').replace(/,/g, '.').replace(/\s+/g, '');
-    const m = t.match(/^(-?)\(?(-?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)\)?$/);
+    const t = normalisiere(s);
+    const m = t.match(BRUCH_MUSTER);
     if (m) {
         const nenner = parseFloat(m[3]);
         if (nenner === 0) return NaN;
-        return (m[1] ? -1 : 1) * (parseFloat(m[2]) / nenner);
+        return (m[1] === '-' ? -1 : 1) * (parseFloat(m[2]) / nenner);
     }
-    return /^-?\d*\.?\d+$/.test(t) ? parseFloat(t) : NaN;
+    return ZAHL_MUSTER.test(t) ? parseFloat(t) : NaN;
+};
+
+type VorschauZahl = { negativ: boolean; betrag: string; eins: boolean; null: boolean };
+
+// Eingabe für die Live-Vorschau: Vorzeichen und Betrag (als LaTeX) getrennt, null bei unvollständiger Eingabe
+const eingabeTex = (s: string): VorschauZahl | null => {
+    const wert = parseZahl(s);
+    if (Number.isNaN(wert)) return null;
+    const t = normalisiere(s);
+    const m = t.match(BRUCH_MUSTER);
+    const komma = (z: string) => z.replace(/^[+-]/, '').replace('.', '{,}');
+    const betrag = m ? `\\frac{${komma(m[2])}}{${komma(m[3])}}` : komma(t);
+    return { negativ: wert < 0, betrag, eins: Math.abs(wert) === 1 && !m, null: wert === 0 };
+};
+
+const LUECKE = '\\boxed{\\phantom{0}}';
+
+// Baut f(x) = ax² + bx + c aus den Eingaben auf; leere Felder erscheinen als Kästchen
+const vorschauTex = (e: Eingabe) => {
+    const a = eingabeTex(e.a);
+    const b = eingabeTex(e.b);
+    const c = eingabeTex(e.c);
+    let erster = true;
+    const glied = (z: VorschauZahl | null, variable: string) => {
+        if (!z) {
+            const r = `${erster ? '' : ' + '}${LUECKE}${variable ? `\\,${variable}` : ''}`;
+            erster = false;
+            return r;
+        }
+        if (z.null) return '';
+        const zahl = variable && z.eins ? '' : z.betrag;
+        const r = erster ? `${z.negativ ? '-' : ''}${zahl}${variable}` : ` ${z.negativ ? '-' : '+'} ${zahl}${variable}`;
+        erster = false;
+        return r;
+    };
+    const rechts = glied(a, 'x^2') + glied(b, 'x') + glied(c, '');
+    return `f(x) = ${erster ? '0' : rechts}`;
 };
 
 const bewerte = (eingabe: string, korrekt: Bruch): Status => {
@@ -320,8 +361,8 @@ const ScheitelInAllgForm = () => {
 
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">Deine Aufgaben</h2>
                 <p className="text-gray-600 mb-6">
-                    Forme jede Funktion in die allgemeine Form um. Rechne zuerst im Heft und trage dann die Werte für a, b
-                    und c ein. Richtige Werte werden sofort grün, falsche rot. Wenn du nicht weiterkommst, zeigt dir
+                    Forme jede Funktion in die allgemeine Form um. Rechne zuerst im Heft und trage dann a, b und c mit dem
+                    richtigen Vorzeichen in die allgemeine Form ein – darunter baut sich deine Funktionsgleichung live auf. Richtige Werte werden sofort grün, falsche rot. Wenn du nicht weiterkommst, zeigt dir
                     „Tipp anzeigen“ den Lösungsweg Schritt für Schritt.
                     {level === 'fortgeschritten' && ' Brüche gibst du mit Schrägstrich ein, z. B. 3/4 oder -1/2.'}
                 </p>
@@ -334,40 +375,45 @@ const ScheitelInAllgForm = () => {
                                 <Tex tex={t.equation} className="text-xl text-blue-900" />
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
-                                {(['a', 'b', 'c'] as const).map((feld) => {
-                                    const status = bewerte(eingaben[i]?.[feld] ?? '', t[feld]);
-                                    return (
-                                        <div key={feld}>
-                                            <div className="flex items-center space-x-2">
-                                                <label htmlFor={`${feld}-${i}`} className="text-lg font-medium text-gray-600 whitespace-nowrap">
-                                                    {feld} =
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    inputMode={level === 'einfach' ? 'numeric' : 'text'}
-                                                    autoComplete="off"
-                                                    id={`${feld}-${i}`}
-                                                    value={eingaben[i]?.[feld] ?? ''}
-                                                    placeholder={level === 'fortgeschritten' ? 'z. B. 3/4' : ''}
-                                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                                                        setEingabe(i, feld, ev.target.value)
-                                                    }
-                                                    className={`block w-full p-2 border-2 rounded-md shadow-sm ${farbKlasse(status)}`}
-                                                />
-                                            </div>
-                                            {status === 'vorzeichen' && (
-                                                <p className="mt-1 text-sm text-red-600 font-semibold">
-                                                    Fast! Nur das Vorzeichen ist falsch.
-                                                </p>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+                            <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-3 mb-2 text-xl">
+                                <Tex tex="f(x) =" />
+                                {(['a', 'b', 'c'] as const).map((feld) => (
+                                    <span key={feld} className="inline-flex items-center gap-1">
+                                        <input
+                                            type="text"
+                                            inputMode="text"
+                                            autoComplete="off"
+                                            id={`${feld}-${i}`}
+                                            aria-label={feld}
+                                            value={eingaben[i]?.[feld] ?? ''}
+                                            placeholder={feld}
+                                            onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEingabe(i, feld, ev.target.value)}
+                                            className={`w-20 sm:w-24 p-2 text-center text-lg border-2 rounded-md shadow-sm placeholder:italic placeholder:text-gray-400 ${farbKlasse(
+                                                bewerte(eingaben[i]?.[feld] ?? '', t[feld]),
+                                            )}`}
+                                        />
+                                        {feld === 'a' && <Tex tex="x^2" />}
+                                        {feld === 'b' && <Tex tex="x" />}
+                                    </span>
+                                ))}
+                            </div>
+                            <p className="text-center text-sm text-gray-500 mb-2">
+                                Gib a, b und c mit Vorzeichen ein, z. B. {level === 'einfach' ? '+4 oder -3' : '+4, -3 oder -1/2'}.
+                            </p>
+                            {(['a', 'b', 'c'] as const)
+                                .filter((feld) => bewerte(eingaben[i]?.[feld] ?? '', t[feld]) === 'vorzeichen')
+                                .map((feld) => (
+                                    <p key={feld} className="text-center text-sm text-red-600 font-semibold">
+                                        Fast! Bei {feld} ist nur das Vorzeichen falsch.
+                                    </p>
+                                ))}
+                            <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-md text-center">
+                                <div className="text-sm text-gray-500 mb-1">Deine Funktionsgleichung:</div>
+                                <Tex display tex={vorschauTex(eingaben[i] ?? { a: '', b: '', c: '' })} className="text-lg" />
                             </div>
 
                             {(['a', 'b', 'c'] as const).every((f) => bewerte(eingaben[i]?.[f] ?? '', t[f]) === 'richtig') && (
-                                <div className="mt-3 p-3 bg-green-100 border border-green-400 rounded-md text-green-900 font-semibold">
+                                <div className="mt-3 p-3 bg-green-100 border border-green-400 rounded-md text-green-900 font-semibold text-center">
                                     🎉 {LOB[i % LOB.length]}{' '}
                                     {i < aufgaben.length - 1
                                         ? `Weiter geht's mit Aufgabe ${i + 2}!`
@@ -375,7 +421,7 @@ const ScheitelInAllgForm = () => {
                                 </div>
                             )}
 
-                            <div className="flex flex-wrap gap-3 mt-3">
+                            <div className="flex flex-wrap justify-center gap-3 mt-3">
                                 {tippSchritte[i] < ANZAHL_SCHRITTE && (
                                     <>
                                         {(freigeschaltet[i] || tippSchritte[i] < ANZAHL_SCHRITTE - 1) && (
@@ -400,7 +446,7 @@ const ScheitelInAllgForm = () => {
                             {!freigeschaltet[i] &&
                                 tippSchritte[i] < ANZAHL_SCHRITTE &&
                                 !(['a', 'b', 'c'] as const).every((f) => bewerte(eingaben[i]?.[f] ?? '', t[f]) === 'richtig') && (
-                                <p className="mt-2 text-sm text-gray-500">
+                                <p className="mt-2 text-sm text-gray-500 text-center">
                                     Die Musterlösung kannst du dir anzeigen lassen, sobald du die Aufgabe selbst versucht hast.
                                 </p>
                             )}
