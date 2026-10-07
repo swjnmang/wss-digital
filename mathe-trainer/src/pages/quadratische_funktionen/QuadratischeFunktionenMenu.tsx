@@ -26,8 +26,8 @@ const menuItems = [
     icon: 'fa-solid fa-map-pin',
   },
   {
-    title: '5. Scheitelform',
-    description: 'Verstehe den Aufbau und die Vorteile der Scheitelpunktform.',
+    title: '5. Scheitelform ablesen',
+    description: 'Lies die Scheitelform einer Parabel direkt aus dem Graphen ab.',
     path: '/quadratische_funktionen/scheitelform',
     icon: 'fa-solid fa-square-root-variable',
   },

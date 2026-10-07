@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 type Aufgabe = {
     a: number;
@@ -9,6 +9,13 @@ type Aufgabe = {
     xWerte: number[];
     equation: string;
 };
+
+// Einfach: y = ax² (nur der Formfaktor ändert sich)
+// Mittel: entweder entlang der y-Achse (y = ax² + c) oder entlang der x-Achse verschoben (y = a(x − d)²)
+// Fortgeschritten: entlang beider Achsen verschoben
+type Level = 'einfach' | 'mittel' | 'fortgeschritten';
+
+const LEVEL_LABEL: Record<Level, string> = { einfach: 'Einfach', mittel: 'Mittel', fortgeschritten: 'Fortgeschritten' };
 
 type Status = 'leer' | 'richtig' | 'vorzeichen' | 'falsch';
 
@@ -53,21 +60,40 @@ const baueAufgabe = (a: number, xs: number, ys: number, breite: number): Aufgabe
     return { a, b, c, xs, ys, xWerte, equation: `f(x) = ${termText(a, b, c)}` };
 };
 
-const BEISPIEL = baueAufgabe(1, 1, -4, 3);
+const BEISPIEL: Record<Level, Aufgabe> = {
+    einfach: baueAufgabe(2, 0, 0, 2),
+    mittel: baueAufgabe(1, 0, -3, 3),
+    fortgeschritten: baueAufgabe(1, 1, -4, 3),
+};
 
-const erzeugeAufgabe = (): Aufgabe => {
-    const a = [-2, -1, -0.5, 0.5, 1, 2][generiereZufallszahl(0, 5)];
-    const xs = generiereZufallszahl(-2, 2);
-    const ys = generiereZufallszahl(-4, 4);
+const FORMFAKTOREN = [-2, -1, -0.5, 0.5, 1, 2];
+const ohneNull = (min: number, max: number) => {
+    const n = generiereZufallszahl(min, max - 1);
+    return n >= 0 ? n + 1 : n;
+};
+
+const erzeugeAufgabe = (level: Level, verschiebung: 'x' | 'y'): Aufgabe => {
+    const a = FORMFAKTOREN[generiereZufallszahl(0, FORMFAKTOREN.length - 1)];
+    let xs = 0;
+    let ys = 0;
+    if (level === 'mittel') {
+        if (verschiebung === 'x') xs = ohneNull(-2, 2);
+        else ys = ohneNull(-4, 4);
+    } else if (level === 'fortgeschritten') {
+        xs = ohneNull(-2, 2);
+        ys = ohneNull(-4, 4);
+    }
     // Bei steilen Parabeln reichen 5 Werte, sonst 7 – so bleiben die y-Werte überschaubar.
     return baueAufgabe(a, xs, ys, Math.abs(a) >= 2 ? 2 : 3);
 };
 
 // Die Aufgaben eines Durchgangs sind immer paarweise verschieden.
-const erzeugeAufgaben = () => {
+// Bei „Mittel“ kommen beide Verschiebungsarten gleich oft vor (in zufälliger Reihenfolge).
+const erzeugeAufgaben = (level: Level) => {
+    const arten = (['x', 'y', 'x', 'y'] as const).slice(0, ANZAHL_AUFGABEN).sort(() => Math.random() - 0.5);
     const aufgaben = new Map<string, Aufgabe>();
     while (aufgaben.size < ANZAHL_AUFGABEN) {
-        const t = erzeugeAufgabe();
+        const t = erzeugeAufgabe(level, arten[aufgaben.size % arten.length]);
         aufgaben.set(t.equation, t);
     }
     return Array.from(aufgaben.values());
@@ -214,20 +240,23 @@ const Loesungsweg = ({ t, anzahl, titel }: { t: Aufgabe; anzahl: number; titel?:
 };
 
 const GraphZeichnen = () => {
+    const [level, setLevel] = useState<Level | null>(null);
     const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
     const [eingaben, setEingaben] = useState<string[][]>([]);
     const [tippSchritte, setTippSchritte] = useState<number[]>(Array(ANZAHL_AUFGABEN).fill(0));
 
-    const neueAufgaben = () => {
-        const neu = erzeugeAufgaben();
+    const neueAufgaben = (l: Level) => {
+        const neu = erzeugeAufgaben(l);
         setAufgaben(neu);
         setEingaben(leereEingaben(neu));
         setTippSchritte(Array(ANZAHL_AUFGABEN).fill(0));
     };
 
-    useEffect(() => {
-        neueAufgaben();
-    }, []);
+    const waehleLevel = (l: Level | null) => {
+        setLevel(l);
+        if (l) neueAufgaben(l);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const setEingabe = (i: number, j: number, wert: string) => {
         setEingaben((prev) => prev.map((e, idx) => (idx === i ? e.map((v, k) => (k === j ? wert : v)) : e)));
@@ -241,10 +270,48 @@ const GraphZeichnen = () => {
         setTippSchritte((prev) => prev.map((v, idx) => (idx === i ? Math.min(v + 1, aufgaben[i].xWerte.length) : v)));
     };
 
+    const ueberschrift = <h1 className="text-3xl font-bold text-gray-800 mb-6">Graph einer Parabel zeichnen</h1>;
+
+    if (!level) {
+        const stufen: { l: Level; farbe: string; beispiel: string; text: string }[] = [
+            { l: 'einfach', farbe: 'bg-green-600 hover:bg-green-700', beispiel: 'f(x) = 2x²', text: 'Nicht verschobene Parabeln – nur der Formfaktor a ändert sich.' },
+            { l: 'mittel', farbe: 'bg-yellow-500 hover:bg-yellow-600', beispiel: 'f(x) = x² − 3', text: 'Parabeln, die entlang der y-Achse oder entlang der x-Achse verschoben sind.' },
+            { l: 'fortgeschritten', farbe: 'bg-red-600 hover:bg-red-700', beispiel: 'f(x) = x² − 2x − 3', text: 'Parabeln, die entlang der x-Achse und der y-Achse verschoben sind.' },
+        ];
+        return (
+            <div className="container mx-auto px-4 py-8">
+                <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-center">
+                    {ueberschrift}
+                    <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {stufen.map(({ l, farbe, beispiel, text }) => (
+                            <button key={l} onClick={() => waehleLevel(l)} className={`rounded-xl text-white p-5 shadow-sm transition-colors ${farbe}`}>
+                                <p className="text-lg font-bold mb-1 text-white">{LEVEL_LABEL[l]}</p>
+                                <p className="text-lg font-mono mb-2 text-white whitespace-nowrap">{beispiel}</p>
+                                <p className="text-sm text-white/90">{text}</p>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const beispiel = BEISPIEL[level];
+
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-left">
-                <h1 className="text-3xl font-bold text-gray-800 mb-6">Graph einer Parabel zeichnen</h1>
+                {ueberschrift}
+
+                <div className="flex flex-wrap items-center gap-3 mb-6">
+                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
+                        Schwierigkeitsgrad: {LEVEL_LABEL[level]}
+                    </span>
+                    <button onClick={() => waehleLevel(null)} className="text-blue-600 hover:underline text-sm font-semibold">
+                        Schwierigkeitsgrad wechseln
+                    </button>
+                </div>
 
                 <section className="flex flex-col gap-8 mb-10">
                     <div>
@@ -263,9 +330,9 @@ const GraphZeichnen = () => {
                             <li>Verbinde die Punkte mit einer glatten, gebogenen Kurve – nicht mit dem Lineal!</li>
                         </ol>
                         <p className="text-gray-700 mb-3">
-                            <strong>Beispiel:</strong> <span className="font-mono">{BEISPIEL.equation}</span>
+                            <strong>Beispiel:</strong> <span className="font-mono">{beispiel.equation}</span>
                         </p>
-                        <Loesungsweg t={BEISPIEL} anzahl={BEISPIEL.xWerte.length} titel="Beispiel: Lösungsweg" />
+                        <Loesungsweg t={beispiel} anzahl={beispiel.xWerte.length} titel="Beispiel: Lösungsweg" />
                     </div>
                     <div>
                         <h2 className="text-xl font-semibold text-gray-800 mb-3">Lernvideo</h2>
@@ -381,7 +448,7 @@ const GraphZeichnen = () => {
 
                 <div className="flex justify-center mt-8">
                     <button
-                        onClick={neueAufgaben}
+                        onClick={() => neueAufgaben(level)}
                         className="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-200"
                     >
                         {ANZAHL_AUFGABEN} neue Aufgaben
