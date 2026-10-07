@@ -20,6 +20,14 @@ const MathDisplay = ({ latex }: { latex: string }) => (
   />
 );
 
+const InlineMath = ({ latex }: { latex: string }) => (
+  <span
+    dangerouslySetInnerHTML={{
+      __html: katex.renderToString(latex, { throwOnError: false }),
+    }}
+  />
+);
+
 function randomInt(max: number, min = 0) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -49,6 +57,7 @@ const btnPrimary =
   'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors';
 const btnSecondary =
   'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors';
+const btnDisabled = 'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white';
 const panel = 'bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200';
 
 const round2 = (v: number) => Math.round(v * 100) / 100;
@@ -117,7 +126,7 @@ function equationText({ m, t }: Pick<Task, 'm' | 't'>) {
   return `y = ${mxText(m)} ${t < 0 ? '−' : '+'} ${fmt(Math.abs(t))}`;
 }
 
-/** Rechte Seite mit eingesetztem x, z. B. "2 \cdot (-3) + 1" */
+/** Rechte Seite mit eingesetztem x, z. B. "2 \\cdot (-3) + 1" */
 function substitutedTex({ m, t }: Pick<Task, 'm' | 't'>, x: number) {
   const mx = `${tex(m)} \\cdot ${texP(x)}`;
   if (t === 0) return mx;
@@ -424,6 +433,107 @@ function Solution({ task }: { task: Task }) {
   );
 }
 
+// ---------- Tipps (schrittweise) ----------
+
+function tipsFor(task: Task): React.ReactNode[] {
+  const eq = <InlineMath latex={`y = ${rhsTex(task)}`} />;
+  const p = task.points[0];
+
+  if (task.type === 'check') {
+    return [
+      <>
+        Setze die x-Koordinate von {p.name} in die Gleichung {eq} ein: x = {fmt(p.x)}.
+      </>,
+      <>
+        Rechne aus: <InlineMath latex={`y = ${substitutedTex(task, p.x)} = \\;?`} />
+      </>,
+      <>
+        Vergleiche dein Ergebnis mit der y-Koordinate von {p.name}: y = {fmt(p.y)}. Sind beide
+        gleich, liegt {p.name} auf g – sonst nicht.
+      </>,
+    ];
+  }
+
+  if (task.type === 'choose') {
+    return [
+      <>Mache für jeden der drei Punkte die Punktprobe: Setze seine x-Koordinate in {eq} ein.</>,
+      <>
+        Rechne für jeden Punkt den y-Wert aus:
+        {task.points.map((pt) => (
+          <span key={pt.name} className="block mt-1">
+            {pt.name}: <InlineMath latex={`y = ${substitutedTex(task, pt.x)} = \\;?`} />
+          </span>
+        ))}
+      </>,
+      <>
+        Vergleiche jedes Ergebnis mit der y-Koordinate des Punkts. Nur bei einem Punkt stimmen beide
+        überein – dieser Punkt liegt auf g.
+      </>,
+    ];
+  }
+
+  if (task.missing === 'y') {
+    return [
+      <>
+        Die x-Koordinate ist bekannt: x = {fmt(p.x)}. Setze sie in {eq} ein.
+      </>,
+      <>
+        Rechne aus: <InlineMath latex={`y = ${substitutedTex(task, p.x)} = \\;?`} />
+      </>,
+      <>
+        Zuerst multiplizieren:{' '}
+        <InlineMath latex={`${tex(task.m)} \\cdot ${texP(p.x)} = ${tex(task.m * p.x)}`} />
+        {task.t !== 0 && (
+          <>, dann {task.t < 0 ? `${fmt(Math.abs(task.t))} abziehen` : `${fmt(task.t)} addieren`}</>
+        )}
+        .
+      </>,
+    ];
+  }
+
+  const tips: React.ReactNode[] = [
+    <>
+      Die y-Koordinate ist bekannt: y = {fmt(p.y)}. Setze sie für y ein:{' '}
+      <InlineMath latex={`${tex(p.y)} = ${rhsTex(task)}`} />
+    </>,
+  ];
+  if (task.t !== 0) {
+    tips.push(
+      <>
+        Bringe {fmt(Math.abs(task.t))} auf die linke Seite: Rechne auf beiden Seiten{' '}
+        {task.t < 0 ? `+ ${fmt(Math.abs(task.t))}` : `− ${fmt(task.t)}`}. Du erhältst{' '}
+        <InlineMath
+          latex={`${tex(p.y - task.t)} = ${task.m === 1 ? '' : task.m === -1 ? '-' : tex(task.m)}x`}
+        />
+        .
+      </>
+    );
+  }
+  tips.push(
+    <>
+      Teile beide Seiten durch {fmt(task.m)}:{' '}
+      <InlineMath latex={`x = ${tex(p.y - task.t)} : ${texP(task.m)} = \\;?`} />
+    </>
+  );
+  return tips;
+}
+
+function TipBox({ tips, shown }: { tips: React.ReactNode[]; shown: number }) {
+  if (shown === 0) return null;
+  return (
+    <div className="mt-4 border-l-4 border-amber-400 bg-amber-50 rounded p-3 text-left text-slate-700">
+      <ol className="space-y-2">
+        {tips.slice(0, shown).map((tip, i) => (
+          <li key={i}>
+            <span className="font-semibold text-slate-800">Tipp {i + 1}: </span>
+            {tip}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 // ---------- Aufgabenkarte ----------
 
 type AnswerStatus = 'idle' | 'right' | 'wrong';
@@ -448,6 +558,10 @@ function TaskCard({ number, task, level, onNewTask, onSolvedChange, onResult, on
   const [choice, setChoice] = useState<number | boolean | null>(null);
   const [solved, setSolved] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
+  // Musterlösung erst nach einem falschen Versuch
+  const [hadWrong, setHadWrong] = useState(false);
+  const [tipsShown, setTipsShown] = useState(0);
+  const tips = tipsFor(task);
 
   const p = task.points[0];
   const target = task.missing === 'x' ? p.x : p.y;
@@ -486,6 +600,8 @@ function TaskCard({ number, task, level, onNewTask, onSolvedChange, onResult, on
     if (correct) {
       setSolved(true);
       onSolvedChange(true);
+    } else {
+      setHadWrong(true);
     }
   }
 
@@ -501,6 +617,7 @@ function TaskCard({ number, task, level, onNewTask, onSolvedChange, onResult, on
     }
     if (inputStatus === 'wrong') {
       const timer = setTimeout(() => {
+        setHadWrong(true);
         tracking.onCheck(false);
         onResult(false);
       }, 900);
@@ -509,11 +626,20 @@ function TaskCard({ number, task, level, onNewTask, onSolvedChange, onResult, on
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input, solved]);
 
+  function onShowTip() {
+    setTipsShown((n) => Math.min(n + 1, tips.length));
+    onHelp();
+    tracking.onHintShown();
+  }
+
   function onShowAnswer() {
     setShowSolution(true);
     onHelp();
     tracking.onHintShown();
   }
+
+  const solutionLocked = !hadWrong;
+  const tipsLeft = tipsShown < tips.length;
 
   const choiceBtn = (selected: boolean) => {
     const base = 'font-semibold py-2 px-5 rounded border-2 transition-colors';
@@ -612,14 +738,38 @@ function TaskCard({ number, task, level, onNewTask, onSolvedChange, onResult, on
         <p className="font-bold mt-3 text-red-600">Noch nicht richtig. Rechne noch einmal nach.</p>
       )}
 
+      <TipBox tips={tips} shown={tipsShown} />
+
       <div className="flex flex-wrap justify-center gap-2 mt-5">
-        <button onClick={onShowAnswer} className={btnSecondary}>
+        <button
+          onClick={onShowTip}
+          disabled={!tipsLeft || solved}
+          className={`${btnSecondary} ${btnDisabled}`}
+        >
+          {tipsShown === 0 ? 'Tipp' : tipsLeft ? 'Nächster Tipp' : 'Keine weiteren Tipps'} (
+          {tipsShown}/{tips.length})
+        </button>
+        <button
+          onClick={onShowAnswer}
+          disabled={solutionLocked}
+          title={
+            solutionLocked
+              ? 'Die Lösung kannst du anzeigen, nachdem du einmal eine falsche Antwort gegeben hast.'
+              : undefined
+          }
+          className={`${btnSecondary} ${btnDisabled}`}
+        >
           Lösung anzeigen
         </button>
         <button onClick={onNewTask} className={btnSecondary}>
           Neue Aufgabe
         </button>
       </div>
+      {solutionLocked && !solved && (
+        <p className="text-xs text-slate-500 mt-2">
+          Die Lösung kannst du erst nach einem falschen Versuch anzeigen.
+        </p>
+      )}
 
       {showSolution && (
         <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50">
