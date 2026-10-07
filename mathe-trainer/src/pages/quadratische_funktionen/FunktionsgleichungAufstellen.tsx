@@ -16,9 +16,19 @@ type Status = 'leer' | 'richtig' | 'vorzeichen' | 'falsch';
 type Schritt = { text: string; formeln: string[] };
 
 const ANZAHL_AUFGABEN = 5;
-// Reihenfolge der Aufgabentypen auf einer Seite
-// (bei 'punkte' kommt jede Variante – a, b oder c bekannt – einmal vor)
-const TYPEN: Aufgabe['typ'][] = ['scheitel', 'punkte', 'scheitel', 'punkte', 'punkte'];
+type Modus = 'scheitel' | 'punkte' | 'gemischt';
+const MODI: { id: Modus; titel: string; beschreibung: string }[] = [
+    { id: 'scheitel', titel: 'Fall 1', beschreibung: 'Scheitelpunkt und ein weiterer Punkt' },
+    { id: 'punkte', titel: 'Fall 2', beschreibung: 'Ein Wert (a, b oder c) und zwei Punkte' },
+    { id: 'gemischt', titel: 'Fall 3', beschreibung: 'Gemischte Übungsaufgaben' },
+];
+// Reihenfolge der Aufgabentypen auf einer Seite je Modus
+// (bei 'punkte' kommt jede Variante – a, b oder c bekannt – mindestens einmal vor)
+const TYPEN: Record<Modus, Aufgabe['typ'][]> = {
+    scheitel: ['scheitel', 'scheitel', 'scheitel', 'scheitel', 'scheitel'],
+    punkte: ['punkte', 'punkte', 'punkte', 'punkte', 'punkte'],
+    gemischt: ['scheitel', 'punkte', 'scheitel', 'punkte', 'punkte'],
+};
 const LOB = ['Super, alles richtig!', 'Sehr gut gemacht!', 'Top, perfekt gerechnet!', 'Stark, das stimmt alles!', 'Klasse Arbeit!'];
 const LERNVIDEO_ID = 'hg9QipwqXxI';
 const GLEICHUNGSSYSTEME_PFAD = '/lineare_funktionen/gleichungssysteme';
@@ -82,11 +92,11 @@ const mischen = <T,>(arr: T[]) => {
     return kopie;
 };
 
-const erzeugeAufgaben = (): Aufgabe[] => {
+const erzeugeAufgaben = (modus: Modus): Aufgabe[] => {
     const gesehen = new Set<string>();
     const bekanntReihenfolge = mischen<Bekannt>(['a', 'b', 'c']);
     let punkteNr = 0;
-    return TYPEN.map(typ => {
+    return TYPEN[modus].map(typ => {
         const bekannt = bekanntReihenfolge[punkteNr % 3];
         if (typ === 'punkte') punkteNr++;
         let t: Aufgabe;
@@ -424,21 +434,115 @@ const AufgabenText = ({ t }: { t: Aufgabe }) =>
         </span>
     );
 
+// ---------- Erklärungen ----------
+const Voraussetzung = () => (
+    <div className="bg-amber-50 border-l-4 border-amber-500 rounded-md p-4 text-gray-800">
+        <p className="font-semibold mb-1">⚠️ Voraussetzung: Additionsverfahren</p>
+        <p>
+            Für Fall 2 musst du ein lineares Gleichungssystem mit dem <strong>Additionsverfahren</strong> lösen können (Gleichungen
+            gegebenenfalls multiplizieren und dann voneinander abziehen, sodass eine Unbekannte wegfällt). Wenn du das noch nicht sicher beherrschst, übe es zuerst noch einmal:{' '}
+            <Link to={GLEICHUNGSSYSTEME_PFAD} className="font-semibold text-blue-700 underline hover:text-blue-900">
+                Lineare Gleichungssysteme üben
+            </Link>
+        </p>
+    </div>
+);
+
+const ErklaerungFall1 = () => (
+    <div className="border border-gray-200 rounded-xl p-5">
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">Fall 1: Scheitelpunkt und ein weiterer Punkt</h2>
+        <p className="text-gray-700 mb-3">
+            Kennst du den Scheitelpunkt, startest du mit der <strong>Scheitelform</strong>{' '}
+            <InlineMath math="y = a \cdot (x - x_s)^2 + y_s" />. Setze den Scheitelpunkt ein. Dann fehlt nur noch <InlineMath math="a" />:
+            Dafür setzt du den zweiten Punkt für <InlineMath math="x" /> und <InlineMath math="y" /> ein und löst nach <InlineMath math="a" /> auf.
+            Zum Schluss wandelst du die Scheitelform in die allgemeine Form um.
+        </p>
+        <p className="text-gray-700 mb-3">
+            <strong>Beispiel:</strong> Scheitelpunkt <strong>S(2|−1)</strong>, Punkt <strong>P(4|3)</strong>
+        </p>
+        <ParabelGraph a={BEISPIEL_SCHEITEL.a} b={BEISPIEL_SCHEITEL.b} c={BEISPIEL_SCHEITEL.c} punkte={gegebenePunkte(BEISPIEL_SCHEITEL)} />
+        <Loesungsweg t={BEISPIEL_SCHEITEL} anzahl={schritte(BEISPIEL_SCHEITEL).length} titel="Beispiel: Lösungsweg" />
+    </div>
+);
+
+const ErklaerungFall2 = () => (
+    <div className="border border-gray-200 rounded-xl p-5">
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">Fall 2: Ein Wert (a, b oder c) und zwei Punkte</h2>
+        <p className="text-gray-700 mb-3">
+            Ist einer der drei Werte bekannt (z. B. „verschobene Normalparabel“ bedeutet <InlineMath math="a = 1" />), setzt du ihn in{' '}
+            <InlineMath math="y = ax^2 + bx + c" /> ein. Dann setzt du nacheinander beide Punkte ein und erhältst zwei Gleichungen (I und II)
+            mit den zwei noch fehlenden Werten. Dieses Gleichungssystem löst du mit dem <strong>Additionsverfahren</strong>: Ziehst du II von I
+            ab, fällt eine Unbekannte weg und du kannst die andere berechnen. Diese setzt du in Gleichung I ein und erhältst den letzten Wert.
+        </p>
+        <ul className="list-disc pl-5 text-gray-700 mb-3 space-y-1">
+            <li><strong><InlineMath math="a" /> bekannt:</strong> Beim Abziehen fällt <InlineMath math="c" /> weg → zuerst <InlineMath math="b" />, dann <InlineMath math="c" />.</li>
+            <li><strong><InlineMath math="b" /> bekannt:</strong> Beim Abziehen fällt <InlineMath math="c" /> weg → zuerst <InlineMath math="a" />, dann <InlineMath math="c" />.</li>
+            <li>
+                <strong><InlineMath math="c" /> bekannt:</strong> Vorher eine oder beide Gleichungen so multiplizieren, dass vor <InlineMath math="b" />{' '}
+                dieselbe Zahl steht. Dann fällt beim Abziehen <InlineMath math="b" /> weg → zuerst <InlineMath math="a" />, dann <InlineMath math="b" />.
+            </li>
+        </ul>
+        <p className="text-gray-700 mb-3">
+            <strong>Beispiel:</strong> <strong>a = −1</strong>, Punkte <strong>P(1|5)</strong> und <strong>Q(3|1)</strong>
+        </p>
+        <ParabelGraph a={BEISPIEL_PUNKTE.a} b={BEISPIEL_PUNKTE.b} c={BEISPIEL_PUNKTE.c} punkte={gegebenePunkte(BEISPIEL_PUNKTE)} />
+        <Loesungsweg t={BEISPIEL_PUNKTE} anzahl={schritte(BEISPIEL_PUNKTE).length} titel="Beispiel: Lösungsweg" />
+    </div>
+);
+
+const Lernvideo = () => (
+    <section className="mb-10">
+        <h2 className="text-xl font-semibold text-gray-800 mb-3">Lernvideo</h2>
+        {LERNVIDEO_ID ? (
+            <div className="max-w-3xl mx-auto">
+                <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
+                    <iframe
+                        className="absolute inset-0 w-full h-full rounded-lg"
+                        src={`https://www.youtube-nocookie.com/embed/${LERNVIDEO_ID}`}
+                        title="Lernvideo: Funktionsgleichung aufstellen"
+                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    />
+                </div>
+                <a
+                    href={`https://www.youtube.com/watch?v=${LERNVIDEO_ID}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-2 text-sm text-blue-700 underline hover:text-blue-900"
+                >
+                    Video auf YouTube öffnen
+                </a>
+            </div>
+        ) : (
+            <p className="text-gray-500 italic bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 max-w-3xl">
+                Das Lernvideo zu diesem Thema folgt in Kürze.
+            </p>
+        )}
+    </section>
+);
+
 // ---------- Seite ----------
 const FunktionsgleichungAufstellen = () => {
+    const [modus, setModus] = useState<Modus>('scheitel');
     const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
     const [eingaben, setEingaben] = useState<Eingabe[]>(leereEingaben());
     const [tippSchritte, setTippSchritte] = useState<number[]>(Array(ANZAHL_AUFGABEN).fill(0));
 
-    const neueAufgaben = () => {
-        setAufgaben(erzeugeAufgaben());
+    const neueAufgaben = (m: Modus = modus) => {
+        setAufgaben(erzeugeAufgaben(m));
         setEingaben(leereEingaben());
         setTippSchritte(Array(ANZAHL_AUFGABEN).fill(0));
     };
 
     useEffect(() => {
-        neueAufgaben();
+        neueAufgaben('scheitel');
     }, []);
+
+    const wechsleModus = (m: Modus) => {
+        if (m === modus) return;
+        setModus(m);
+        neueAufgaben(m);
+    };
 
     const setEingabe = (i: number, feld: Feld, wert: string) => {
         setEingaben(prev => prev.map((e, idx) => (idx === i ? { ...e, [feld]: wert } : e)));
@@ -452,94 +556,57 @@ const FunktionsgleichungAufstellen = () => {
         <div className="container mx-auto px-4 py-8">
             <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-7xl w-full mx-auto text-left">
                 <h1 className="text-3xl font-bold text-gray-800 mb-3">Funktionsgleichung aufstellen</h1>
-                <p className="text-gray-700 mb-8">
+                <p className="text-gray-700 mb-6">
                     Gesucht ist die Funktionsgleichung einer Parabel in allgemeiner Form <InlineMath math="y = ax^2 + bx + c" />. Du musst also
                     die drei Werte <InlineMath math="a" />, <InlineMath math="b" /> und <InlineMath math="c" /> herausfinden. Je nachdem, was über die Parabel
-                    bekannt ist, gehst du unterschiedlich vor:
+                    bekannt ist, gehst du unterschiedlich vor. Wähle einen Fall aus:
                 </p>
 
-                {/* Erklärung */}
-                <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    <div className="border border-gray-200 rounded-xl p-5">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-2">Fall 1: Scheitelpunkt und ein weiterer Punkt</h2>
-                        <p className="text-gray-700 mb-3">
-                            Kennst du den Scheitelpunkt, startest du mit der <strong>Scheitelform</strong>{' '}
-                            <InlineMath math="y = a \cdot (x - x_s)^2 + y_s" />. Setze den Scheitelpunkt ein. Dann fehlt nur noch <InlineMath math="a" />:
-                            Dafür setzt du den zweiten Punkt für <InlineMath math="x" /> und <InlineMath math="y" /> ein und löst nach <InlineMath math="a" /> auf.
-                            Zum Schluss wandelst du die Scheitelform in die allgemeine Form um.
-                        </p>
-                        <p className="text-gray-700 mb-3">
-                            <strong>Beispiel:</strong> Scheitelpunkt <strong>S(2|−1)</strong>, Punkt <strong>P(4|3)</strong>
-                        </p>
-                        <ParabelGraph a={BEISPIEL_SCHEITEL.a} b={BEISPIEL_SCHEITEL.b} c={BEISPIEL_SCHEITEL.c} punkte={gegebenePunkte(BEISPIEL_SCHEITEL)} />
-                        <Loesungsweg t={BEISPIEL_SCHEITEL} anzahl={schritte(BEISPIEL_SCHEITEL).length} titel="Beispiel: Lösungsweg" />
-                    </div>
-
-                    <div className="border border-gray-200 rounded-xl p-5">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-2">Fall 2: Ein Wert (a, b oder c) und zwei Punkte</h2>
-                        <p className="text-gray-700 mb-3">
-                            Ist einer der drei Werte bekannt (z. B. „verschobene Normalparabel“ bedeutet <InlineMath math="a = 1" />), setzt du ihn in{' '}
-                            <InlineMath math="y = ax^2 + bx + c" /> ein. Dann setzt du nacheinander beide Punkte ein und erhältst zwei Gleichungen (I und II)
-                            mit den zwei noch fehlenden Werten. Dieses Gleichungssystem löst du mit dem <strong>Additionsverfahren</strong>: Ziehst du II von I
-                            ab, fällt eine Unbekannte weg und du kannst die andere berechnen. Diese setzt du in Gleichung I ein und erhältst den letzten Wert.
-                        </p>
-                        <ul className="list-disc pl-5 text-gray-700 mb-3 space-y-1">
-                            <li><strong><InlineMath math="a" /> bekannt:</strong> Beim Abziehen fällt <InlineMath math="c" /> weg → zuerst <InlineMath math="b" />, dann <InlineMath math="c" />.</li>
-                            <li><strong><InlineMath math="b" /> bekannt:</strong> Beim Abziehen fällt <InlineMath math="c" /> weg → zuerst <InlineMath math="a" />, dann <InlineMath math="c" />.</li>
-                            <li>
-                                <strong><InlineMath math="c" /> bekannt:</strong> Vorher eine oder beide Gleichungen so multiplizieren, dass vor <InlineMath math="b" />{' '}
-                                dieselbe Zahl steht. Dann fällt beim Abziehen <InlineMath math="b" /> weg → zuerst <InlineMath math="a" />, dann <InlineMath math="b" />.
-                            </li>
-                        </ul>
-                        <p className="text-gray-700 mb-3">
-                            <strong>Beispiel:</strong> <strong>a = −1</strong>, Punkte <strong>P(1|5)</strong> und <strong>Q(3|1)</strong>
-                        </p>
-                        <ParabelGraph a={BEISPIEL_PUNKTE.a} b={BEISPIEL_PUNKTE.b} c={BEISPIEL_PUNKTE.c} punkte={gegebenePunkte(BEISPIEL_PUNKTE)} />
-                        <Loesungsweg t={BEISPIEL_PUNKTE} anzahl={schritte(BEISPIEL_PUNKTE).length} titel="Beispiel: Lösungsweg" />
-                    </div>
-                </section>
-
-                {/* Lernvideo */}
-                <section className="mb-10">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-3">Lernvideo</h2>
-                    {LERNVIDEO_ID ? (
-                        <div className="max-w-3xl mx-auto">
-                            <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
-                                <iframe
-                                    className="absolute inset-0 w-full h-full rounded-lg"
-                                    src={`https://www.youtube-nocookie.com/embed/${LERNVIDEO_ID}`}
-                                    title="Lernvideo: Funktionsgleichung aufstellen"
-                                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                />
-                            </div>
-                            <a
-                                href={`https://www.youtube.com/watch?v=${LERNVIDEO_ID}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-block mt-2 text-sm text-blue-700 underline hover:text-blue-900"
+                {/* Auswahl */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8" role="tablist">
+                    {MODI.map(m => {
+                        const aktiv = m.id === modus;
+                        return (
+                            <button
+                                key={m.id}
+                                role="tab"
+                                aria-selected={aktiv}
+                                onClick={() => wechsleModus(m.id)}
+                                className={`rounded-xl border-2 px-4 py-3 text-left transition-colors duration-200 ${
+                                    aktiv
+                                        ? 'border-blue-600 bg-blue-600 text-white shadow-md'
+                                        : 'border-gray-200 bg-white text-gray-800 hover:border-blue-400 hover:bg-blue-50'
+                                }`}
                             >
-                                Video auf YouTube öffnen
-                            </a>
-                        </div>
-                    ) : (
-                        <p className="text-gray-500 italic bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 max-w-3xl">
-                            Das Lernvideo zu diesem Thema folgt in Kürze.
-                        </p>
+                                <span className="block text-lg font-bold">{m.titel}</span>
+                                <span className={`block text-sm ${aktiv ? 'text-blue-100' : 'text-gray-600'}`}>{m.beschreibung}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Erklärung */}
+                <section className="space-y-6 mb-8">
+                    {modus === 'scheitel' && <ErklaerungFall1 />}
+                    {modus === 'punkte' && (
+                        <>
+                            <Voraussetzung />
+                            <ErklaerungFall2 />
+                        </>
+                    )}
+                    {modus === 'gemischt' && (
+                        <>
+                            <Voraussetzung />
+                            <p className="text-gray-700">
+                                Hier kommen beide Fälle gemischt vor. Überlege bei jeder Aufgabe zuerst, welcher Fall vorliegt: Ist der{' '}
+                                <strong>Scheitelpunkt</strong> gegeben, gehst du wie in <strong>Fall 1</strong> vor. Sind <strong>ein Wert und zwei Punkte</strong>{' '}
+                                gegeben, gehst du wie in <strong>Fall 2</strong> vor. Die ausführlichen Erklärungen findest du über die Buttons „Fall 1“ und „Fall 2“.
+                            </p>
+                        </>
                     )}
                 </section>
 
-                {/* Aufgaben */}
-                <div className="bg-amber-50 border-l-4 border-amber-500 rounded-md p-4 mb-8 text-gray-800">
-                    <p className="font-semibold mb-1">⚠️ Voraussetzung: Additionsverfahren</p>
-                    <p>
-                        Für Fall 2 musst du ein lineares Gleichungssystem mit dem <strong>Additionsverfahren</strong> lösen können (Gleichungen
-                        gegebenenfalls multiplizieren und dann voneinander abziehen, sodass eine Unbekannte wegfällt). Wenn du das noch nicht sicher beherrschst, übe es zuerst noch einmal:{' '}
-                        <Link to={GLEICHUNGSSYSTEME_PFAD} className="font-semibold text-blue-700 underline hover:text-blue-900">
-                            Lineare Gleichungssysteme üben
-                        </Link>
-                    </p>
-                </div>
+                <Lernvideo />
 
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">Deine Aufgaben</h2>
                 <p className="text-gray-600 mb-6">
@@ -548,7 +615,7 @@ const FunktionsgleichungAufstellen = () => {
                     Lösungsweg Schritt für Schritt.
                 </p>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                <div className="flex flex-col gap-6">
                     {aufgaben.map((t, i) => {
                         const anzahlSchritte = schritte(t).length;
                         const alleRichtig = (['a', 'b', 'c'] as const).every(f => bewerte(eingaben[i]?.[f] ?? '', t[f]) === 'richtig');
@@ -628,7 +695,7 @@ const FunktionsgleichungAufstellen = () => {
 
                 <div className="flex justify-center mt-8">
                     <button
-                        onClick={neueAufgaben}
+                        onClick={() => neueAufgaben()}
                         className="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-200"
                     >
                         5 neue Aufgaben

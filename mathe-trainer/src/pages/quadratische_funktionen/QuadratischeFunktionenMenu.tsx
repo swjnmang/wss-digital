@@ -56,16 +56,16 @@ const menuItems = [
     icon: 'fa-solid fa-right-left',
   },
   {
-    title: '10. Funktionsgleichung aufstellen',
-    description: 'Stelle eine Funktionsgleichung aus Punkten oder Eigenschaften auf.',
-    path: '/quadratische_funktionen/funktionsgleichung_aufstellen',
-    icon: 'fa-solid fa-pen-ruler',
-  },
-  {
-    title: '11. Nullstellen berechnen',
+    title: '10. Nullstellen berechnen',
     description: 'Finde die Schnittpunkte einer Parabel mit der x-Achse.',
     path: '/quadratische_funktionen/nullstellen',
     icon: 'fa-solid fa-arrows-down-to-line',
+  },
+  {
+    title: '11. Funktionsgleichung aufstellen',
+    description: 'Stelle eine Funktionsgleichung aus Punkten oder Eigenschaften auf.',
+    path: '/quadratische_funktionen/funktionsgleichung_aufstellen',
+    icon: 'fa-solid fa-pen-ruler',
   },
   {
     title: '12. Schnittpunkte (Parabel-Gerade)',
