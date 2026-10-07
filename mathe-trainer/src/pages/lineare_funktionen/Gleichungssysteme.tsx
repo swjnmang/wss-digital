@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 type Method = 'einsetzen' | 'gleichsetzen' | 'addieren';
 
@@ -340,8 +340,13 @@ const METHOD_LABEL: Record<Method, string> = {
     addieren: 'Additionsverfahren'
 };
 
+// Startverfahren über die URL wählbar, z. B. ?verfahren=addieren
+const isMethod = (v: string | null): v is Method => v === 'einsetzen' || v === 'gleichsetzen' || v === 'addieren';
+
 const Gleichungssysteme: React.FC = () => {
-    const [method, setMethod] = useState<Method>('einsetzen');
+    const [searchParams] = useSearchParams();
+    const startMethod: Method = isMethod(searchParams.get('verfahren')) ? (searchParams.get('verfahren') as Method) : 'einsetzen';
+    const [method, setMethod] = useState<Method>(startMethod);
     const [task, setTask] = useState<Task | null>(null);
     const [xInput, setXInput] = useState('');
     const [yInput, setYInput] = useState('');
@@ -364,7 +369,7 @@ const Gleichungssysteme: React.FC = () => {
     };
 
     useEffect(() => {
-        generateTask('einsetzen');
+        generateTask(startMethod);
     }, []);
 
     const chooseMethod = (m: Method) => {
