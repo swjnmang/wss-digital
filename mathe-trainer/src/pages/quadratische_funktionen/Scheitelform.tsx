@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import ParabelGraph from '../../components/ParabelGraph';
 
 type Vorzeichen = '+' | '-' | null;
+
+type Level = 'einfach' | 'fortgeschritten';
 
 type Aufgabe = { a: number; xs: number; ys: number };
 
@@ -19,21 +21,41 @@ type Ergebnis = { richtig: boolean; text: string } | null;
 
 const ANZAHL_AUFGABEN = 5;
 const STRECKFAKTOREN = [1, -1, 2, -2, 0.5, -0.5];
+// Fortgeschritten: a muss abgelesen werden – nur Werte, die auf dem 1er-Gitter gut ablesbar sind
+const STRECKFAKTOREN_ABLESEN = [1, -1, 2, -2, 3, -3, 0.5, -0.5];
 const BEISPIEL: Aufgabe = { a: 2, xs: -3, ys: 1 };
+const BEISPIEL_A: Aufgabe = { a: -2, xs: 1, ys: 3 };
+const BEISPIEL_A_HALB: Aufgabe = { a: 0.5, xs: -2, ys: -3 };
+const BEREICH = 6;
+const GRAPH_GROESSE = 360;
 
 const zufall = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const zahl = (n: number) => String(n).replace('.', ',');
-const parseZahl = (s: string) => parseFloat(s.trim().replace(',', '.').replace(/[−–—‐]/g, '-'));
+const parseZahl = (s: string) =>
+    parseFloat(
+        s
+            .trim()
+            .replace(',', '.')
+            .replace(/[−–—‐]/g, '-')
+    );
 
-const erzeugeAufgaben = (): Aufgabe[] => {
+/** Schritte zum Ablesen von a: bei |a| < 1 zwei Einheiten nach rechts, sonst eine */
+const ableseSchritt = (a: number) => {
+    const dx = Math.abs(a) < 1 ? 2 : 1;
+    return { dx, dy: a * dx * dx };
+};
+
+const erzeugeAufgaben = (level: Level): Aufgabe[] => {
     const schonDa = new Set<string>();
+    const faktoren = level === 'einfach' ? STRECKFAKTOREN : STRECKFAKTOREN_ABLESEN;
     return Array.from({ length: ANZAHL_AUFGABEN }, () => {
         let a: number, xs: number, ys: number;
         do {
-            a = STRECKFAKTOREN[zufall(0, STRECKFAKTOREN.length - 1)];
+            a = faktoren[zufall(0, faktoren.length - 1)];
             xs = zufall(-4, 4);
             ys = zufall(-4, 4);
-        } while (schonDa.has(`${xs}|${ys}`));
+            // Der Ablesepunkt neben dem Scheitel muss im sichtbaren Bereich liegen.
+        } while (schonDa.has(`${xs}|${ys}`) || Math.abs(ys + ableseSchritt(a).dy) > BEREICH - 1);
         schonDa.add(`${xs}|${ys}`);
         return { a, xs, ys };
     });
@@ -51,7 +73,11 @@ const scheitelformLatex = ({ a, xs, ys }: Aufgabe) => {
 
 /** Live-Vorschau aus den bisherigen Eingaben */
 const vorschauLatex = (e: Eingabe) => {
-    const sauber = (raw: string) => raw.trim().replace(',', '{,}').replace(/[−–—‐]/g, '-');
+    const sauber = (raw: string) =>
+        raw
+            .trim()
+            .replace(',', '{,}')
+            .replace(/[−–—‐]/g, '-');
     const a = e.a.trim() !== '' ? sauber(e.a) : 'a';
     const xs = e.xsAbs.trim() !== '' ? sauber(e.xsAbs) : 'x_s';
     const ys = e.ysAbs.trim() !== '' ? sauber(e.ysAbs) : 'y_s';
@@ -85,7 +111,9 @@ const SignToggle = ({ value, onChange }: { value: Vorzeichen; onChange: (v: '+' 
             type="button"
             onClick={() => onChange('+')}
             aria-label="Plus"
-            className={`w-5 h-8 flex items-center justify-center text-xs font-bold transition-colors ${value === '+' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
+            className={`w-5 h-8 flex items-center justify-center text-xs font-bold transition-colors ${
+                value === '+' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'
+            }`}
         >
             +
         </button>
@@ -93,7 +121,9 @@ const SignToggle = ({ value, onChange }: { value: Vorzeichen; onChange: (v: '+' 
             type="button"
             onClick={() => onChange('-')}
             aria-label="Minus"
-            className={`w-5 h-8 flex items-center justify-center text-xs font-bold transition-colors border-l-2 border-slate-300 ${value === '-' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
+            className={`w-5 h-8 flex items-center justify-center text-xs font-bold transition-colors border-l-2 border-slate-300 ${
+                value === '-' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'
+            }`}
         >
             −
         </button>
@@ -103,12 +133,39 @@ const SignToggle = ({ value, onChange }: { value: Vorzeichen; onChange: (v: '+' 
 const eingabeKlasse =
     'w-14 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-md focus:border-blue-500 focus:outline-none text-center';
 
-const Loesungsweg = ({ t }: { t: Aufgabe }) => (
+/** Text, wie man a aus dem Graphen abliest, z. B. „1 nach rechts, 2 nach unten → a = −2“ */
+const FormfaktorAblesen = ({ a }: { a: number }) => {
+    const { dx, dy } = ableseSchritt(a);
+    const richtung = dy > 0 ? 'oben' : 'unten';
+    if (dx === 1) {
+        return (
+            <>
+                Vom Scheitelpunkt 1 Kästchen nach rechts, dann {zahl(Math.abs(dy))} nach {richtung} bis zum Graphen,
+                also <b>a = {zahl(a)}</b>.
+            </>
+        );
+    }
+    return (
+        <>
+            Vom Scheitelpunkt 2 Kästchen nach rechts, dann {zahl(Math.abs(dy))} nach {richtung} bis zum Graphen. Die
+            Normalparabel ginge hier 4 nach oben, also{' '}
+            <InlineMath math={`a = ${dy < 0 ? '-' : ''}\\frac{${Math.abs(dy)}}{4} = ${zahl(a).replace(',', '{,}')}`} />.
+        </>
+    );
+};
+
+const Loesungsweg = ({ t, level }: { t: Aufgabe; level: Level }) => (
     <div className="mt-3 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md p-3 space-y-1">
         <p>
             1. Scheitelpunkt ablesen: S({zahl(t.xs)} | {zahl(t.ys)})
         </p>
-        <p>2. Formfaktor ist gegeben: a = {zahl(t.a)}</p>
+        {level === 'einfach' ? (
+            <p>2. Formfaktor ist gegeben: a = {zahl(t.a)}</p>
+        ) : (
+            <p>
+                2. Formfaktor ablesen: <FormfaktorAblesen a={t.a} />
+            </p>
+        )}
         <p>
             3. Einsetzen in <InlineMath math="y = a(x - x_s)^2 + y_s" /> (in der Klammer dreht sich das Vorzeichen von{' '}
             <InlineMath math="x_s" /> um):
@@ -116,25 +173,95 @@ const Loesungsweg = ({ t }: { t: Aufgabe }) => (
         <p className="font-bold">
             <InlineMath math={scheitelformLatex(t)} />
         </p>
+        {level === 'fortgeschritten' && (
+            <div className="pt-2 max-w-[300px]">
+                <ParabelGraph {...t} zeigeScheitel zeigeFormfaktor bereich={BEREICH} groesse={300} schrittweite={1} />
+            </div>
+        )}
+    </div>
+);
+
+type GraphProps = { bereich: number; groesse: number; schrittweite: number };
+
+const BeispielFortgeschritten = ({ graphProps }: { graphProps: GraphProps }) => (
+    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 space-y-4">
+        <p className="font-bold text-blue-900">So liest du den Formfaktor a ab</p>
+        <p className="text-sm text-gray-700">
+            Bei der Normalparabel <InlineMath math="y = x^2" /> geht man vom Scheitelpunkt <b>1 Kästchen nach rechts</b>{' '}
+            und <b>1 Kästchen nach oben</b>, um wieder auf dem Graphen zu landen. Der Formfaktor a gibt an, wie weit man
+            bei der gestreckten oder gestauchten Parabel nach oben (a &gt; 0) bzw. nach unten (a &lt; 0) gehen muss.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+            <div className="sm:w-[300px] shrink-0">
+                <ParabelGraph {...BEISPIEL_A} zeigeScheitel zeigeFormfaktor {...graphProps} groesse={300} />
+            </div>
+            <ol className="text-sm text-gray-700 space-y-2 list-decimal pl-5">
+                <li>
+                    Scheitelpunkt ablesen:{' '}
+                    <b>
+                        S({BEISPIEL_A.xs} | {BEISPIEL_A.ys})
+                    </b>
+                    , also <InlineMath math={`x_s = ${BEISPIEL_A.xs}`} /> und{' '}
+                    <InlineMath math={`y_s = ${BEISPIEL_A.ys}`} />.
+                </li>
+                <li>
+                    Formfaktor ablesen: Vom Scheitelpunkt 1 Kästchen nach rechts, dann bis zum Graphen zählen: 2
+                    Kästchen nach <b>unten</b>. Die Parabel ist nach unten geöffnet, also <InlineMath math="a = -2" />.
+                </li>
+                <li>
+                    Einsetzen: <InlineMath math={scheitelformLatex(BEISPIEL_A)} />
+                </li>
+            </ol>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+            <div className="sm:w-[300px] shrink-0">
+                <ParabelGraph {...BEISPIEL_A_HALB} zeigeScheitel zeigeFormfaktor {...graphProps} groesse={300} />
+            </div>
+            <div className="text-sm text-gray-700 space-y-2">
+                <p>
+                    <b>Tipp bei flachen Parabeln:</b> Landet man nach 1 Kästchen nach rechts nicht auf einem
+                    Gitterpunkt, geht man <b>2 Kästchen nach rechts</b>. Die Normalparabel würde dort <b>4 Kästchen</b>{' '}
+                    nach oben gehen (
+                    <InlineMath math="2^2 = 4" />
+                    ).
+                </p>
+                <p>
+                    Hier: 2 nach rechts, 2 nach oben, also <InlineMath math="a = \frac{2}{4} = 0{,}5" />.
+                </p>
+                <p>
+                    Ergebnis: <InlineMath math={scheitelformLatex(BEISPIEL_A_HALB)} />
+                </p>
+            </div>
+        </div>
+
+        <p className="text-xs text-blue-900">
+            Merke: <b>a = Anzahl Kästchen nach oben/unten</b> (bei 1 nach rechts). Nach unten heißt: a ist negativ. In
+            der Klammer steht das umgekehrte Vorzeichen von <InlineMath math="x_s" />.
+        </p>
     </div>
 );
 
 const Scheitelform = () => {
+    const [level, setLevel] = useState<Level | null>(null);
     const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
     const [eingaben, setEingaben] = useState<Eingabe[]>([]);
     const [ergebnisse, setErgebnisse] = useState<Ergebnis[]>([]);
     const [loesungen, setLoesungen] = useState<boolean[]>([]);
 
-    const neueAufgaben = () => {
-        setAufgaben(erzeugeAufgaben());
+    const neueAufgaben = (l: Level) => {
+        setAufgaben(erzeugeAufgaben(l));
         setEingaben(Array.from({ length: ANZAHL_AUFGABEN }, leereEingabe));
         setErgebnisse(Array(ANZAHL_AUFGABEN).fill(null));
         setLoesungen(Array(ANZAHL_AUFGABEN).fill(false));
     };
 
-    useEffect(() => {
-        neueAufgaben();
-    }, []);
+    const waehleLevel = (l: Level | null) => {
+        setLevel(l);
+        if (l) neueAufgaben(l);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const setEingabe = (i: number, teil: Partial<Eingabe>) => {
         setEingaben((prev) => prev.map((e, idx) => (idx === i ? { ...e, ...teil } : e)));
@@ -150,58 +277,122 @@ const Scheitelform = () => {
     };
 
     const anzahlRichtig = ergebnisse.filter((r) => r?.richtig).length;
+    const ueberschrift = <h1 className="text-2xl font-bold text-gray-800">Scheitelform aus dem Graphen</h1>;
+
+    if (!level) {
+        return (
+            <div className="container mx-auto px-4 py-8">
+                <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-center">
+                    <div className="mb-6">{ueberschrift}</div>
+                    <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <button
+                            onClick={() => waehleLevel('einfach')}
+                            className="rounded-xl bg-green-600 hover:bg-green-700 text-white p-5 shadow-sm transition-colors"
+                        >
+                            <p className="text-lg font-bold mb-1 text-white">Einfach</p>
+                            <p className="text-sm text-white/90">
+                                Der Formfaktor a ist gegeben. Du liest nur den Scheitelpunkt ab.
+                            </p>
+                        </button>
+                        <button
+                            onClick={() => waehleLevel('fortgeschritten')}
+                            className="rounded-xl bg-red-600 hover:bg-red-700 text-white p-5 shadow-sm transition-colors"
+                        >
+                            <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
+                            <p className="text-sm text-white/90">
+                                Kein Formfaktor gegeben: Du liest a, xₛ und yₛ aus dem Graphen ab.
+                            </p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const graphProps = { bereich: BEREICH, groesse: GRAPH_GROESSE, schrittweite: 1 };
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-left [&_p]:text-left">
+            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-4xl w-full mx-auto text-left [&_p]:text-left">
                 <div className="flex items-start justify-between gap-4 mb-2">
-                    <h1 className="text-2xl font-bold text-gray-800">Scheitelform aus dem Graphen</h1>
+                    {ueberschrift}
                     <span
                         className={`shrink-0 text-sm font-semibold px-3 py-1 rounded-full ${
-                            anzahlRichtig === ANZAHL_AUFGABEN ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                            anzahlRichtig === ANZAHL_AUFGABEN
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-gray-100 text-gray-600'
                         }`}
                     >
                         {anzahlRichtig} / {ANZAHL_AUFGABEN} richtig
                     </span>
                 </div>
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
+                        Schwierigkeitsgrad: {level === 'einfach' ? 'Einfach' : 'Fortgeschritten'}
+                    </span>
+                    <button
+                        onClick={() => waehleLevel(null)}
+                        className="text-blue-600 hover:underline text-sm font-semibold"
+                    >
+                        Schwierigkeitsgrad wechseln
+                    </button>
+                </div>
                 <p className="text-gray-600 mb-5">
-                    Lies den Scheitelpunkt aus dem Graphen ab und stelle mit dem gegebenen Formfaktor a die Scheitelform{' '}
-                    <InlineMath math="y = a(x - x_s)^2 + y_s" /> auf.
+                    {level === 'einfach' ? (
+                        <>
+                            Lies den Scheitelpunkt aus dem Graphen ab und stelle mit dem gegebenen Formfaktor a die
+                            Scheitelform <InlineMath math="y = a(x - x_s)^2 + y_s" /> auf.
+                        </>
+                    ) : (
+                        <>
+                            Lies den Scheitelpunkt <b>und</b> den Formfaktor a aus dem Graphen ab und stelle die
+                            Scheitelform <InlineMath math="y = a(x - x_s)^2 + y_s" /> auf.
+                        </>
+                    )}
                 </p>
 
                 {/* Beispiel */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                    <p className="font-bold text-blue-900 mb-3">Beispiel</p>
-                    <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
-                        <div className="sm:w-[240px] shrink-0">
-                            <ParabelGraph {...BEISPIEL} zeigeScheitel />
-                            <p className="text-sm text-gray-600 mt-1">
-                                gegeben: <b>a = {BEISPIEL.a}</b>
+                {level === 'einfach' ? (
+                    <>
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <p className="font-bold text-blue-900 mb-3">Beispiel</p>
+                            <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+                                <div className="sm:w-[300px] shrink-0">
+                                    <ParabelGraph {...BEISPIEL} zeigeScheitel {...graphProps} groesse={300} />
+                                    <p className="text-sm text-gray-600 mt-1">
+                                        gegeben: <b>a = {BEISPIEL.a}</b>
+                                    </p>
+                                </div>
+                                <ol className="text-sm text-gray-700 space-y-2 list-decimal pl-5">
+                                    <li>
+                                        Scheitelpunkt (tiefster bzw. höchster Punkt) ablesen:{' '}
+                                        <b>
+                                            S({BEISPIEL.xs} | {BEISPIEL.ys})
+                                        </b>
+                                        , also <InlineMath math={`x_s = ${BEISPIEL.xs}`} /> und{' '}
+                                        <InlineMath math={`y_s = ${BEISPIEL.ys}`} />.
+                                    </li>
+                                    <li>
+                                        Werte einsetzen:{' '}
+                                        <InlineMath math={`y = 2\\,(x - (${BEISPIEL.xs}))^2 + ${BEISPIEL.ys}`} />
+                                    </li>
+                                    <li>
+                                        Vorzeichen in der Klammer zusammenfassen – aus <InlineMath math="-(-3)" /> wird{' '}
+                                        <InlineMath math="+3" />: <InlineMath math={scheitelformLatex(BEISPIEL)} />
+                                    </li>
+                                </ol>
+                            </div>
+                            <p className="text-xs text-blue-900 mt-3">
+                                Merke: In der Klammer steht <b>das umgekehrte Vorzeichen</b> von{' '}
+                                <InlineMath math="x_s" />, hinter der Klammer steht <InlineMath math="y_s" /> mit seinem
+                                eigenen Vorzeichen.
                             </p>
                         </div>
-                        <ol className="text-sm text-gray-700 space-y-2 list-decimal pl-5">
-                            <li>
-                                Scheitelpunkt (tiefster bzw. höchster Punkt) ablesen:{' '}
-                                <b>
-                                    S({BEISPIEL.xs} | {BEISPIEL.ys})
-                                </b>
-                                , also <InlineMath math={`x_s = ${BEISPIEL.xs}`} /> und{' '}
-                                <InlineMath math={`y_s = ${BEISPIEL.ys}`} />.
-                            </li>
-                            <li>
-                                Werte einsetzen: <InlineMath math={`y = 2\\,(x - (${BEISPIEL.xs}))^2 + ${BEISPIEL.ys}`} />
-                            </li>
-                            <li>
-                                Vorzeichen in der Klammer zusammenfassen – aus <InlineMath math="-(-3)" /> wird{' '}
-                                <InlineMath math="+3" />: <InlineMath math={scheitelformLatex(BEISPIEL)} />
-                            </li>
-                        </ol>
-                    </div>
-                    <p className="text-xs text-blue-900 mt-3">
-                        Merke: In der Klammer steht <b>das umgekehrte Vorzeichen</b> von <InlineMath math="x_s" />, hinter
-                        der Klammer steht <InlineMath math="y_s" /> mit seinem eigenen Vorzeichen.
-                    </p>
-                </div>
+                    </>
+                ) : (
+                    <BeispielFortgeschritten graphProps={graphProps} />
+                )}
 
                 {/* Aufgaben */}
                 <div className="space-y-4">
@@ -212,17 +403,25 @@ const Scheitelform = () => {
                         return (
                             <div
                                 key={i}
-                                className={`border rounded-lg p-4 ${r?.richtig ? 'border-green-300 bg-green-50/40' : 'border-gray-200'}`}
+                                className={`border rounded-lg p-4 ${
+                                    r?.richtig ? 'border-green-300 bg-green-50/40' : 'border-gray-200'
+                                }`}
                             >
                                 <div className="flex flex-col sm:flex-row gap-4">
-                                    <div className="sm:w-[240px] shrink-0">
+                                    <div className="sm:w-[360px] shrink-0">
                                         <p className="text-sm font-semibold text-gray-500 mb-2">Aufgabe {i + 1}</p>
-                                        <ParabelGraph a={t.a} xs={t.xs} ys={t.ys} />
+                                        <ParabelGraph a={t.a} xs={t.xs} ys={t.ys} {...graphProps} />
                                     </div>
 
                                     <div className="flex-1 min-w-0 sm:pt-7">
                                         <p className="text-sm text-gray-600 mb-2">
-                                            Formfaktor: <b>a = {zahl(t.a)}</b>
+                                            {level === 'einfach' ? (
+                                                <>
+                                                    Formfaktor: <b>a = {zahl(t.a)}</b>
+                                                </>
+                                            ) : (
+                                                <>Formfaktor a: aus dem Graphen ablesen</>
+                                            )}
                                         </p>
                                         <div className="flex flex-nowrap items-center gap-1 bg-slate-50 py-2 px-1.5 rounded-lg border border-slate-200 font-mono text-sm overflow-x-auto">
                                             <span className="whitespace-nowrap shrink-0">y =</span>
@@ -230,29 +429,41 @@ const Scheitelform = () => {
                                                 type="text"
                                                 inputMode="decimal"
                                                 value={e.a}
-                                                onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEingabe(i, { a: ev.target.value })}
+                                                onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                                                    setEingabe(i, { a: ev.target.value })
+                                                }
                                                 placeholder="a"
                                                 aria-label="Formfaktor a"
                                                 className={eingabeKlasse}
                                             />
                                             <span className="whitespace-nowrap shrink-0">(x</span>
-                                            <SignToggle value={e.xsSign} onChange={(v) => setEingabe(i, { xsSign: v })} />
+                                            <SignToggle
+                                                value={e.xsSign}
+                                                onChange={(v) => setEingabe(i, { xsSign: v })}
+                                            />
                                             <input
                                                 type="text"
                                                 inputMode="decimal"
                                                 value={e.xsAbs}
-                                                onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEingabe(i, { xsAbs: ev.target.value })}
+                                                onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                                                    setEingabe(i, { xsAbs: ev.target.value })
+                                                }
                                                 placeholder="xs"
                                                 aria-label="Zahl im Klammerterm"
                                                 className={eingabeKlasse}
                                             />
                                             <span className="whitespace-nowrap shrink-0">)²</span>
-                                            <SignToggle value={e.ysSign} onChange={(v) => setEingabe(i, { ysSign: v })} />
+                                            <SignToggle
+                                                value={e.ysSign}
+                                                onChange={(v) => setEingabe(i, { ysSign: v })}
+                                            />
                                             <input
                                                 type="text"
                                                 inputMode="decimal"
                                                 value={e.ysAbs}
-                                                onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEingabe(i, { ysAbs: ev.target.value })}
+                                                onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                                                    setEingabe(i, { ysAbs: ev.target.value })
+                                                }
                                                 placeholder="ys"
                                                 aria-label="Zahl ys"
                                                 className={eingabeKlasse}
@@ -260,7 +471,9 @@ const Scheitelform = () => {
                                         </div>
 
                                         <div className="mt-2 text-sm text-blue-900 overflow-x-auto">
-                                            <span className="text-xs font-semibold text-blue-700 mr-2">Deine Gleichung:</span>
+                                            <span className="text-xs font-semibold text-blue-700 mr-2">
+                                                Deine Gleichung:
+                                            </span>
                                             <InlineMath math={vorschauLatex(e)} />
                                         </div>
 
@@ -273,7 +486,9 @@ const Scheitelform = () => {
                                             </button>
                                             {r && (
                                                 <span
-                                                    className={`text-sm font-semibold ${r.richtig ? 'text-green-700' : 'text-red-600'}`}
+                                                    className={`text-sm font-semibold ${
+                                                        r.richtig ? 'text-green-700' : 'text-red-600'
+                                                    }`}
                                                 >
                                                     {r.text}
                                                 </span>
@@ -289,7 +504,7 @@ const Scheitelform = () => {
                                         </div>
                                     </div>
                                 </div>
-                                {loesungen[i] && !r?.richtig && <Loesungsweg t={t} />}
+                                {loesungen[i] && !r?.richtig && <Loesungsweg t={t} level={level} />}
                             </div>
                         );
                     })}
@@ -297,7 +512,7 @@ const Scheitelform = () => {
 
                 <div className="flex justify-center mt-8">
                     <button
-                        onClick={neueAufgaben}
+                        onClick={() => neueAufgaben(level)}
                         className="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-200"
                     >
                         5 neue Aufgaben
