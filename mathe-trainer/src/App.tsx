@@ -152,53 +152,8 @@ import Fahrradstation from './pages/daten_und_zufall/anwendungsaufgaben/Fahrrads
 import BioKiste from './pages/daten_und_zufall/anwendungsaufgaben/BioKiste';
 // Raum und Form
 import RaumUndFormIndex from './pages/RaumUndFormIndex';
-import Flaechengeometrie from './pages/raum_und_form/Flaechengeometrie';
-import SatzDesPythagoras from './pages/raum_und_form/SatzDesPythagoras';
-import Strahlensaetze from './pages/raum_und_form/Strahlensaetze';
-import KugelIndex from './pages/raum_und_form/kugel/KugelIndex';
-import KugelOberflaeche from './pages/raum_und_form/kugel/Oberflaeche';
-import KugelVolumen from './pages/raum_und_form/kugel/Volumen';
-import KugelGemischt from './pages/raum_und_form/kugel/Gemischt';
-import KugelAnwendungsaufgaben from './pages/raum_und_form/kugel/Anwendungsaufgaben';
-import KegelIndex from './pages/raum_und_form/kegel/KegelIndex';
-import KegelOberflaeche from './pages/raum_und_form/kegel/Oberflaeche';
-import KegelVolumen from './pages/raum_und_form/kegel/Volumen';
-import KegelGemischt from './pages/raum_und_form/kegel/Gemischt';
-import KegelAnwendungsaufgaben from './pages/raum_und_form/kegel/Anwendungsaufgaben';
-import PyramideIndex from './pages/raum_und_form/pyramide/PyramideIndex';
-import PyramideOberflaeche from './pages/raum_und_form/pyramide/Oberflaeche';
-import PyramideVolumen from './pages/raum_und_form/pyramide/Volumen';
-import PyramideGemischt from './pages/raum_und_form/pyramide/Gemischt';
-import ZylinderIndex from './pages/raum_und_form/zylinder/ZylinderIndex';
-import ZylinderOberflaeche from './pages/raum_und_form/zylinder/Oberflaeche';
-import ZylinderVolumen from './pages/raum_und_form/zylinder/Volumen';
-import ZylinderGemischt from './pages/raum_und_form/zylinder/Gemischt';
-import PrismaIndex from './pages/raum_und_form/prisma/PrismaIndex';
-import PrismaOberflaeche from './pages/raum_und_form/prisma/Oberflaeche';
-import PrismaVolumen from './pages/raum_und_form/prisma/Volumen';
-import PrismaGemischt from './pages/raum_und_form/prisma/Gemischt';
-import PrismaAnwendungsaufgaben from './pages/raum_und_form/prisma/Anwendungsaufgaben';
-import Dreiecke from './pages/raum_und_form/Dreiecke';
-import Trapez from './pages/raum_und_form/Trapez';
-import Rechteck from './pages/raum_und_form/Rechteck';
-import Parallelogramm from './pages/raum_und_form/Parallelogramm';
-import Raute from './pages/raum_und_form/Raute';
-import Kreis from './pages/raum_und_form/Kreis';
-import GemischteFlaechenaufgaben from './pages/raum_und_form/GemischteFlaechenaufgaben';
-import AnwendungsUebungsaufgaben from './pages/raum_und_form/AnwendungsUebungsaufgaben';
-import Pausenhof from './pages/raum_und_form/Pausenhof';
-import Fussballplatz from './pages/raum_und_form/Fussballplatz';
-import Haus from './pages/raum_und_form/Haus';
-import DieLeinwand from './pages/raum_und_form/DieLeinwand';
-// Pythagoras
-import KathetenHypotenuse from './pages/raum_und_form/pythagoras/KathetenHypotenuse';
-import SeitenBerechnen from './pages/raum_und_form/pythagoras/SeitenBerechnen';
-import AnwendungsaufgabenPythagoras from './pages/raum_und_form/pythagoras/Anwendungsaufgaben';
-import GemischtPythagoras from './pages/raum_und_form/pythagoras/Gemischt';
-// Anwendungsaufgaben Raum und Form
-import AnwendungsaufgabenRaumIndex from './pages/raum_und_form/anwendungsaufgaben/index';
-import PoolAufgabe from './pages/raum_und_form/anwendungsaufgaben/PoolAufgabe';
-import SchwimmbadMitSchirmAufgabe from './pages/raum_und_form/anwendungsaufgaben/SchwimmbadMitSchirmAufgabe';
+import RaumTopicIndex from './pages/raum_und_form/TopicIndex';
+import RaumPracticeRoute from './pages/raum_und_form/PracticeRoute';
 // Excel Trainer
 import { ExcelTrainer } from './pages/ExcelTrainer';
 // ... other imports will be added as files are created
@@ -415,51 +370,8 @@ export default function App() {
 
           {/* Raum und Form */}
           <Route path="/raum-und-form" element={<RaumUndFormIndex />} />
-          <Route path="/raum-und-form/flaechengeometrie" element={<Flaechengeometrie />} />
-          <Route path="/raum-und-form/satz-des-pythagoras" element={<SatzDesPythagoras />} />
-          <Route path="/raum-und-form/satz-des-pythagoras/katheten-hypotenuse" element={<KathetenHypotenuse />} />
-          <Route path="/raum-und-form/satz-des-pythagoras/berechnen" element={<SeitenBerechnen />} />
-          <Route path="/raum-und-form/satz-des-pythagoras/anwendung" element={<AnwendungsaufgabenPythagoras />} />
-          <Route path="/raum-und-form/satz-des-pythagoras/gemischt" element={<GemischtPythagoras />} />
-          <Route path="/raum-und-form/strahlensaetze" element={<Strahlensaetze />} />
-          <Route path="/raum-und-form/kugel" element={<KugelIndex />} />
-          <Route path="/raum-und-form/kugel/oberflaeche" element={<KugelOberflaeche />} />
-          <Route path="/raum-und-form/kugel/volumen" element={<KugelVolumen />} />
-          <Route path="/raum-und-form/kugel/gemischt" element={<KugelGemischt />} />
-          <Route path="/raum-und-form/kugel/anwendungsaufgaben" element={<KugelAnwendungsaufgaben />} />
-          <Route path="/raum-und-form/kegel" element={<KegelIndex />} />
-          <Route path="/raum-und-form/kegel/oberflaeche" element={<KegelOberflaeche />} />
-          <Route path="/raum-und-form/kegel/volumen" element={<KegelVolumen />} />
-          <Route path="/raum-und-form/kegel/gemischt" element={<KegelGemischt />} />
-          <Route path="/raum-und-form/kegel/anwendungsaufgaben" element={<KegelAnwendungsaufgaben />} />
-          <Route path="/raum-und-form/pyramide" element={<PyramideIndex />} />
-          <Route path="/raum-und-form/pyramide/oberflaeche" element={<PyramideOberflaeche />} />
-          <Route path="/raum-und-form/pyramide/volumen" element={<PyramideVolumen />} />
-          <Route path="/raum-und-form/pyramide/gemischt" element={<PyramideGemischt />} />
-          <Route path="/raum-und-form/zylinder" element={<ZylinderIndex />} />
-          <Route path="/raum-und-form/zylinder/oberflaeche" element={<ZylinderOberflaeche />} />
-          <Route path="/raum-und-form/zylinder/volumen" element={<ZylinderVolumen />} />
-          <Route path="/raum-und-form/zylinder/gemischt" element={<ZylinderGemischt />} />
-          <Route path="/raum-und-form/prisma" element={<PrismaIndex />} />
-          <Route path="/raum-und-form/prisma/oberflaeche" element={<PrismaOberflaeche />} />
-          <Route path="/raum-und-form/prisma/volumen" element={<PrismaVolumen />} />
-          <Route path="/raum-und-form/prisma/gemischt" element={<PrismaGemischt />} />
-          <Route path="/raum-und-form/prisma/anwendungsaufgaben" element={<PrismaAnwendungsaufgaben />} />
-          <Route path="/raum-und-form/flaechengeometrie/dreiecke" element={<Dreiecke />} />
-          <Route path="/raum-und-form/flaechengeometrie/trapez" element={<Trapez />} />
-          <Route path="/raum-und-form/flaechengeometrie/rechteck" element={<Rechteck />} />
-          <Route path="/raum-und-form/flaechengeometrie/parallelogramm" element={<Parallelogramm />} />
-          <Route path="/raum-und-form/flaechengeometrie/raute" element={<Raute />} />
-          <Route path="/raum-und-form/flaechengeometrie/kreis" element={<Kreis />} />
-          <Route path="/raum-und-form/flaechengeometrie/gemischte-aufgaben" element={<GemischteFlaechenaufgaben />} />
-          <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben" element={<AnwendungsUebungsaufgaben />} />
-          <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/pausenhof" element={<Pausenhof />} />
-          <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/fussballplatz" element={<Fussballplatz />} />
-          <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/haus" element={<Haus />} />
-          <Route path="/raum-und-form/flaechengeometrie/anwendungs-uebungsaufgaben/die-leinwand" element={<DieLeinwand />} />
-          <Route path="/raum-und-form/anwendungsaufgaben" element={<AnwendungsaufgabenRaumIndex />} />
-          <Route path="/raum-und-form/anwendungsaufgaben/pool" element={<PoolAufgabe />} />
-          <Route path="/raum-und-form/anwendungsaufgaben/schwimmbad-mit-schirm" element={<SchwimmbadMitSchirmAufgabe />} />
+          <Route path="/raum-und-form/:topic" element={<RaumTopicIndex />} />
+          <Route path="/raum-und-form/:topic/:page" element={<RaumPracticeRoute />} />
 
           {/* Excel Trainer */}
           <Route path="/excel-trainer" element={<ExcelTrainer />} />

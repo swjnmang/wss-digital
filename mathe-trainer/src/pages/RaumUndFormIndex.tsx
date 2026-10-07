@@ -1,47 +1,33 @@
-import { Link } from "react-router-dom";
-import { Ruler, Triangle, Expand, Circle, Box, Cone, Pyramid, Cylinder, BookOpen } from "lucide-react";
-
-const items = [
-  { icon: Ruler, title: "Flächengeometrie", desc: "Dreiecke, Vierecke und Kreis berechnen", href: "flaechengeometrie" },
-  { icon: Triangle, title: "Satz des Pythagoras", desc: "Katheten und Hypotenuse verstehen", href: "satz-des-pythagoras" },
-  { icon: Expand, title: "Strahlensätze", desc: "Streckenverhältnisse berechnen", href: "strahlensaetze" },
-  { icon: Circle, title: "Kugel", desc: "Oberfläche und Volumen berechnen", href: "kugel" },
-  { icon: Box, title: "Prisma", desc: "Oberfläche und Volumen berechnen", href: "prisma" },
-  { icon: Cone, title: "Kegel", desc: "Oberfläche und Volumen berechnen", href: "kegel" },
-  { icon: Pyramid, title: "Pyramide", desc: "Oberfläche und Volumen berechnen", href: "pyramide" },
-  { icon: Cylinder, title: "Zylinder", desc: "Oberfläche und Volumen berechnen", href: "zylinder" },
-  { icon: BookOpen, title: "Anwendungsaufgaben", desc: "Übungsaufgaben aus dem Alltag", href: "anwendungsaufgaben" },
-];
+import { Link } from 'react-router-dom';
+import { TOPICS } from './raum_und_form/registry';
+import { TOPIC_ICONS } from './raum_und_form/icons';
 
 export default function RaumUndFormIndex() {
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] flex flex-col text-slate-900">
-      <header className="w-full text-white py-10 sm:py-14 text-center shadow-md relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-700" />
-        <div className="relative max-w-4xl mx-auto px-4 space-y-3">
-          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">Raum &amp; Form</h1>
-          <p className="text-base sm:text-lg text-slate-200 max-w-2xl mx-auto">
-            Wähle ein Thema aus, um zu den Übungen zu gelangen.
-          </p>
+    <div className="min-h-screen bg-[var(--bg-color)] text-left text-slate-900">
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-[1600px] px-3 py-4 sm:px-4">
+          <h1 className="text-left text-2xl font-bold tracking-tight sm:text-3xl">Raum &amp; Form</h1>
+          <p className="text-left text-slate-500">Wähle ein Thema. Jede Übungsseite beginnt mit einem Beispiel – danach rechnest du selbst.</p>
         </div>
-      </header>
-
-      <main className="flex-1 w-full px-4 sm:px-6 lg:px-10 py-6 sm:py-8 flex flex-col items-center">
-        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
-          {items.map((item) => {
-            const Icon = item.icon;
+      </div>
+      <main className="mx-auto max-w-[1600px] px-3 py-4 sm:px-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {TOPICS.map((t) => {
+            const Icon = TOPIC_ICONS[t.icon];
             return (
               <Link
-                key={item.href}
-                to={`/raum-und-form/${item.href}`}
-                className="bg-white rounded-2xl p-4 sm:p-5 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100"
+                key={t.slug}
+                to={`/raum-und-form/${t.slug}`}
+                className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-blue-300 hover:shadow-md"
               >
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-blue-50 flex items-center justify-center text-[var(--accent)] mb-3">
-                  <Icon className="w-5 h-5" />
-                </div>
-                <h3 className="text-base sm:text-lg font-semibold mb-1.5 text-slate-800">{item.title}</h3>
-                <p className="text-slate-500 leading-snug text-sm">{item.desc}</p>
-                <div className="mt-auto" aria-hidden="true" />
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[var(--accent)]">
+                  {Icon && <Icon className="h-5 w-5" />}
+                </span>
+                <span>
+                  <span className="block font-semibold text-slate-800">{t.title}</span>
+                  <span className="block text-sm leading-snug text-slate-500">{t.description}</span>
+                </span>
               </Link>
             );
           })}
