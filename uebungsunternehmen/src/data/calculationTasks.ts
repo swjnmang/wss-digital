@@ -230,44 +230,7 @@ export const generateTask = (schema: CalculationSchema, direction: CalculationDi
     percentages.gewinn_p = d_gewinn_p; // Update the percentage in the object
   }
 
-  let description = '';
-  if (schema === 'Bezugskalkulation') {
-    if (direction === 'Vorwärts') {
-      description = `Ein Unternehmen kauft Waren mit einem Listenpreis von ${lep.toFixed(2)}€. ` +
-        `Der Lieferant gewährt ${percentages.l_rabatt_p}% Rabatt. ` +
-        `Bei Zahlung innerhalb von 10 Tagen werden zusätzlich ${percentages.l_skonto_p}% Skonto gewährt. ` +
-        `Die Bezugskosten betragen ${bezugskosten.toFixed(2)}€. ` +
-        `Berechnen Sie den Bezugspreis.`;
-    } else {
-      description = `Rückwärtskalkulation (Bezug): Der Bezugspreis beträgt ${bp.toFixed(2)}€. ` +
-        `Die Bezugskosten lagen bei ${bezugskosten.toFixed(2)}€. ` +
-        `Der Lieferant gewährte ${percentages.l_skonto_p}% Skonto und ${percentages.l_rabatt_p}% Rabatt. ` +
-        `Ermitteln Sie den Listeneinkaufspreis.`;
-    }
-  } else {
-    if (direction === 'Vorwärts') {
-      description = `Berechnen Sie die Handelskalkulation (Vorwärts) für folgende Eckdaten: ` +
-        `Listeneinkaufspreis: ${lep.toFixed(2)}€, ` +
-        `Liefererrabatt: ${percentages.l_rabatt_p}%, Liefererskonto: ${percentages.l_skonto_p}%, ` +
-        `Bezugskosten: ${bezugskosten.toFixed(2)}€, ` +
-        `Handlungskostenzuschlag: ${percentages.hkz_p}%, Gewinnzuschlag: ${percentages.gewinn_p}%, ` +
-        `Kundenskonto: ${percentages.k_skonto_p}%, Kundenrabatt: ${percentages.k_rabatt_p}%, ` +
-        `Umsatzsteuer: ${percentages.ust_p}%.`;
-    } else if (direction === 'Rückwärts') {
-      description = `Berechnen Sie die Handelskalkulation (Rückwärts) ausgehend vom Bruttoverkaufspreis: ${values.brutto.toFixed(2)}€. ` +
-        `Gegeben sind: Umsatzsteuer: ${percentages.ust_p}%, Kundenrabatt: ${percentages.k_rabatt_p}%, ` +
-        `Kundenskonto: ${percentages.k_skonto_p}%, Gewinnzuschlag: ${percentages.gewinn_p}%, ` +
-        `Handlungskostenzuschlag: ${percentages.hkz_p}%, Bezugskosten: ${bezugskosten.toFixed(2)}€, ` +
-        `Liefererskonto: ${percentages.l_skonto_p}%, Liefererrabatt: ${percentages.l_rabatt_p}%. ` +
-        `Ermitteln Sie den Listeneinkaufspreis.`;
-    } else {
-      description = `Differenzkalkulation: Gegeben sind der Listeneinkaufspreis (${values.lep.toFixed(2)}€) und der Bruttoverkaufspreis (${values.brutto.toFixed(2)}€). ` +
-        `Ermitteln Sie den Gewinn in Euro und Prozent. ` +
-        `Kalkulationsdaten: Liefererrabatt ${percentages.l_rabatt_p}%, Liefererskonto ${percentages.l_skonto_p}%, ` +
-        `Bezugskosten ${bezugskosten.toFixed(2)}€, Handlungskostenzuschlag ${percentages.hkz_p}%, ` +
-        `Kundenskonto ${percentages.k_skonto_p}%, Kundenrabatt ${percentages.k_rabatt_p}%, Umsatzsteuer ${percentages.ust_p}%.`;
-    }
-  }
+  const description = buildDescription(schema, direction, values, percentages);
 
   return {
     id: Date.now().toString(),
@@ -279,82 +242,277 @@ export const generateTask = (schema: CalculationSchema, direction: CalculationDi
   };
 };
 
+// ---------------------------------------------------------------------------
+// Formatierung (deutsche Schreibweise)
+// ---------------------------------------------------------------------------
+
+export const formatEuro = (n: number) =>
+  n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00A0€';
+
+export const formatPercent = (n: number) =>
+  n.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + '\u00A0%';
+
+const formatNumber = (n: number) => n.toLocaleString('de-DE', { maximumFractionDigits: 2 });
+
+// ---------------------------------------------------------------------------
+// Aufgabentexte
+// ---------------------------------------------------------------------------
+
+interface Scenario {
+  anlass: string;
+  firma: string; // weiblich (GmbH, KG, OHG, AG) → "die ..."
+  ort: string;
+  produkt: string; // Akkusativ mit unbestimmtem Artikel
+  produktNom: string; // Nominativ mit bestimmtem Artikel
+  produktAkk: string; // Akkusativ mit bestimmtem Artikel
+  lieferer: string; // weiblich (GmbH, AG) → "die ..."
+  liefererOrt: string;
+}
+
+const SCENARIOS: Scenario[] = [
+  {
+    anlass: 'Der Frühling steht vor der Tür, und mit den ersten Sonnenstrahlen beginnt die Fahrradsaison.',
+    firma: 'Radsport Weber KG', ort: 'Passau',
+    produkt: 'ein Trekkingrad des Modells Alpencross', produktNom: 'das Trekkingrad', produktAkk: 'das Trekkingrad',
+    lieferer: 'VeloTec GmbH', liefererOrt: 'Stuttgart',
+  },
+  {
+    anlass: 'Immer mehr Kundinnen und Kunden möchten ihren Cappuccino zu Hause genauso genießen wie im Lieblingscafé.',
+    firma: 'Bohne & Co. GmbH', ort: 'Bamberg',
+    produkt: 'eine Siebträger-Espressomaschine', produktNom: 'die Espressomaschine', produktAkk: 'die Espressomaschine',
+    lieferer: 'Caffè Macchina AG', liefererOrt: 'Mailand',
+  },
+  {
+    anlass: 'Seit viele Menschen regelmäßig im Homeoffice arbeiten, sind rückenschonende Sitzmöbel gefragt wie nie.',
+    firma: 'Büroprofi Schneider GmbH', ort: 'Regensburg',
+    produkt: 'einen ergonomischen Bürostuhl', produktNom: 'der Bürostuhl', produktAkk: 'den Bürostuhl',
+    lieferer: 'SitzWerk AG', liefererOrt: 'Nürnberg',
+  },
+  {
+    anlass: 'Kurz vor dem großen E-Sport-Turnier in der Stadthalle rechnet man mit einem Ansturm von Gamerinnen und Gamern.',
+    firma: 'PixelPlanet GmbH', ort: 'Augsburg',
+    produkt: 'einen 34-Zoll-Gaming-Monitor', produktNom: 'der Monitor', produktAkk: 'den Monitor',
+    lieferer: 'VisionTech AG', liefererOrt: 'Düsseldorf',
+  },
+  {
+    anlass: 'Die ersten warmen Tage locken die Hobbygärtnerinnen und Hobbygärtner wieder ins Freie.',
+    firma: 'Grünwerk Huber OHG', ort: 'Landshut',
+    produkt: 'einen leisen Akku-Rasenmäher', produktNom: 'der Rasenmäher', produktAkk: 'den Rasenmäher',
+    lieferer: 'GartenMaxx GmbH', liefererOrt: 'Ulm',
+  },
+  {
+    anlass: 'Die Sommerferien rücken näher, und Campingausrüstung ist so stark nachgefragt wie lange nicht mehr.',
+    firma: 'Gipfelglück Sport GmbH', ort: 'Garmisch-Partenkirchen',
+    produkt: 'ein wetterfestes Vier-Personen-Zelt', produktNom: 'das Zelt', produktAkk: 'das Zelt',
+    lieferer: 'Nordwand Outdoor AG', liefererOrt: 'Innsbruck',
+  },
+  {
+    anlass: 'Eine beliebte Kochshow im Fernsehen hat einen regelrechten Hype um Küchenmaschinen ausgelöst.',
+    firma: 'Küchenzauber Maier KG', ort: 'Würzburg',
+    produkt: 'eine Küchenmaschine mit Kochfunktion', produktNom: 'die Küchenmaschine', produktAkk: 'die Küchenmaschine',
+    lieferer: 'ChefLine GmbH', liefererOrt: 'Wuppertal',
+  },
+  {
+    anlass: 'Nach einem ausverkauften Open-Air-Konzert in der Region wollen viele Jugendliche selbst Gitarre spielen lernen.',
+    firma: 'Klangraum Musikhaus GmbH', ort: 'Ingolstadt',
+    produkt: 'eine elektroakustische Westerngitarre', produktNom: 'die Gitarre', produktAkk: 'die Gitarre',
+    lieferer: 'SoundCraft Instruments AG', liefererOrt: 'Hamburg',
+  },
+];
+
+const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+const bezugskostenSatz = (bezugskosten: number) => pick([
+  `Für Fracht und Verpackung stellt die Spedition ${formatEuro(bezugskosten)} in Rechnung.`,
+  `Für Transport und Transportversicherung fallen Bezugskosten in Höhe von ${formatEuro(bezugskosten)} an.`,
+  `Die Anlieferung per Spedition schlägt mit ${formatEuro(bezugskosten)} Bezugskosten zu Buche.`,
+]);
+
+const buildDescription = (
+  schema: CalculationSchema,
+  direction: CalculationDirection,
+  v: Record<string, number>,
+  p: Record<string, number>,
+): string => {
+  const s = pick(SCENARIOS);
+  const tage = pick([10, 14]);
+  const bk = bezugskostenSatz(v.bezugskosten);
+  const einkaufMit = (subjekt: string) =>
+    `${subjekt} gewährt ${formatPercent(p.l_rabatt_p)} Liefererrabatt ` +
+    `und bei Zahlung innerhalb von ${tage} Tagen zusätzlich ${formatPercent(p.l_skonto_p)} Skonto.`;
+  const einkauf = einkaufMit(`Die ${s.lieferer} aus ${s.liefererOrt}`);
+
+  if (schema === 'Bezugskalkulation') {
+    if (direction === 'Vorwärts') {
+      return `${s.anlass} Die ${s.firma} aus ${s.ort} bestellt deshalb bei der ${s.lieferer} aus ${s.liefererOrt} ${s.produkt}. ` +
+        `Laut Preisliste kostet der Artikel ${formatEuro(v.lep)} netto. ${einkaufMit('Der Lieferer')} ${bk} ` +
+        `Berechnen Sie den Bezugspreis, mit dem das Unternehmen kalkulieren muss.`;
+    }
+    return `${s.anlass} Die ${s.firma} aus ${s.ort} möchte deshalb ${s.produkt} ins Sortiment aufnehmen. ` +
+      `Die Einkaufsleitung hat ein klares Limit gesetzt: Der Bezugspreis darf ${formatEuro(v.bp)} nicht überschreiten. ` +
+      `${einkauf} ${bk} ` +
+      `Ermitteln Sie, wie hoch der Listeneinkaufspreis höchstens sein darf.`;
+  }
+
+  const verkauf =
+    `Den Kundinnen und Kunden werden ${formatPercent(p.k_rabatt_p)} Rabatt und ${formatPercent(p.k_skonto_p)} Skonto gewährt; ` +
+    `die Umsatzsteuer beträgt ${formatPercent(p.ust_p)}.`;
+
+  if (direction === 'Vorwärts') {
+    return `${s.anlass} Die ${s.firma} aus ${s.ort} nimmt deshalb ${s.produkt} neu ins Sortiment auf. ` +
+      `Die ${s.lieferer} aus ${s.liefererOrt} bietet den Artikel zum Listeneinkaufspreis von ${formatEuro(v.lep)} an, ` +
+      `gewährt ${formatPercent(p.l_rabatt_p)} Rabatt und bei Zahlung innerhalb von ${tage} Tagen ${formatPercent(p.l_skonto_p)} Skonto. ` +
+      `${bk} Das Rechnungswesen kalkuliert mit einem Handlungskostenzuschlag von ${formatPercent(p.hkz_p)} ` +
+      `und einem Gewinnzuschlag von ${formatPercent(p.gewinn_p)}. ${verkauf} ` +
+      `Berechnen Sie, zu welchem Bruttoverkaufspreis ${s.produktNom} angeboten werden muss.`;
+  }
+
+  if (direction === 'Rückwärts') {
+    return `${s.anlass} Die ${s.firma} aus ${s.ort} möchte deshalb ${s.produkt} anbieten. ` +
+      `Ein großer Online-Händler verkauft ${s.produktAkk} bereits für ${formatEuro(v.brutto)} brutto. ` +
+      `Teurer darf das eigene Angebot auf keinen Fall sein. ` +
+      `Kalkuliert wird mit ${formatPercent(p.ust_p)} Umsatzsteuer, ${formatPercent(p.k_rabatt_p)} Kundenrabatt, ` +
+      `${formatPercent(p.k_skonto_p)} Kundenskonto, ${formatPercent(p.gewinn_p)} Gewinnzuschlag und ` +
+      `${formatPercent(p.hkz_p)} Handlungskostenzuschlag. ${bk} ${einkauf} ` +
+      `Wie hoch darf der Listeneinkaufspreis höchstens sein, damit das Angebot konkurrenzfähig bleibt?`;
+  }
+
+  return `${s.anlass} Die ${s.firma} aus ${s.ort} möchte deshalb ${s.produkt} verkaufen. ` +
+    `Den Preis kann sie allerdings nicht frei festlegen: Der Hersteller empfiehlt einen Bruttoverkaufspreis von ` +
+    `${formatEuro(v.brutto)}, und daran hält sich die gesamte Konkurrenz. ` +
+    `Laut Preisliste der ${s.lieferer} aus ${s.liefererOrt} kostet der Artikel ${formatEuro(v.lep)}. ` +
+    `Sie gewährt ${formatPercent(p.l_rabatt_p)} Rabatt sowie bei Zahlung innerhalb von ${tage} Tagen ` +
+    `${formatPercent(p.l_skonto_p)} Skonto. ${bk} Der Handlungskostenzuschlag beträgt ${formatPercent(p.hkz_p)}. ${verkauf} ` +
+    `Lohnt sich das Geschäft? Ermitteln Sie den Gewinn in Euro und in Prozent der Selbstkosten ` +
+    `(Prozentsatz auf zwei Nachkommastellen runden).`;
+};
+
+// ---------------------------------------------------------------------------
+// Eingaben auswerten
+// ---------------------------------------------------------------------------
+
+/** Liest Zahlen in deutscher Schreibweise (1.234,56) und toleriert auch 1234.56. */
+export const parseGermanNumber = (input: string): number => {
+  const str = input.trim().replace(/\s|€|%/g, '');
+  if (str === '') return NaN;
+  if (str.includes(',')) return parseFloat(str.replace(/\./g, '').replace(',', '.'));
+  // Nur Punkte: als Tausendertrennzeichen werten, wenn das Muster passt (1.234 / 12.345.678)
+  if (/^-?\d{1,3}(\.\d{3})+$/.test(str)) return parseFloat(str.replace(/\./g, ''));
+  return parseFloat(str);
+};
+
+const TOLERANCE = 0.05;
+
+/** Liefert den richtigen Wert für ein Eingabefeld (Betrag oder Gewinn in %). */
+export const getCorrectValue = (task: CalcTask, key: string): number =>
+  key === 'gewinn_p' ? task.percentages.gewinn_p : task.values[key];
+
+export const isInputCorrect = (task: CalcTask, key: string, input: string | undefined): boolean => {
+  if (!input) return false;
+  const val = parseGermanNumber(input);
+  return !isNaN(val) && Math.abs(val - getCorrectValue(task, key)) <= TOLERANCE;
+};
+
+/** Felder, deren Wert in der Aufgabe vorgegeben ist und nicht berechnet werden muss. */
+export const isGivenField = (task: CalcTask, key: string): boolean => {
+  if (key === 'bezugskosten') return true;
+  switch (task.direction) {
+    case 'Vorwärts': return key === 'lep';
+    case 'Rückwärts': return key === (task.schema === 'Bezugskalkulation' ? 'bp' : 'brutto');
+    case 'Differenz': return key === 'lep' || key === 'brutto';
+  }
+};
+
+/** Zeilen des Kalkulationsschemas, die zur Aufgabe gehören. */
+export const getRowsForSchema = (schema: CalculationSchema): CalculationRow[] => {
+  if (schema === 'Handelskalkulation') return SCHEMA_ROWS;
+  const bpIndex = SCHEMA_ROWS.findIndex(r => r.key === 'bp');
+  return SCHEMA_ROWS.slice(0, bpIndex + 1);
+};
+
+/** Alle Felder, die der Schüler selbst ausfüllen muss. */
+export const getEditableKeys = (task: CalcTask): string[] => {
+  const keys = getRowsForSchema(task.schema).map(r => r.key).filter(k => !isGivenField(task, k));
+  if (task.direction === 'Differenz') keys.push('gewinn_p');
+  return keys;
+};
+
+// ---------------------------------------------------------------------------
+// Lösungswege
+// ---------------------------------------------------------------------------
+
 export const getCalculationExplanation = (
-  key: string, 
-  direction: CalculationDirection, 
+  key: string,
+  direction: CalculationDirection,
   task: CalcTask
 ): string => {
   const p = task.percentages;
   const v = task.values;
-  const f = (n: number) => n.toFixed(2).replace('.', ',') + '€';
-  const fp = (n: number) => n.toString().replace('.', ',') + '%';
+  const f = formatEuro;
+  const n = formatNumber;
+
+  // Einkaufsseite vorwärts (Vorwärts- und Differenzkalkulation)
+  const einkaufVorwaerts = (): string => {
+    switch (key) {
+      case 'l_rabatt': return `Listeneinkaufspreis (${f(v.lep)}) × ${n(p.l_rabatt_p)} ÷ 100`;
+      case 'zep': return `Listeneinkaufspreis (${f(v.lep)}) – Liefererrabatt (${f(v.l_rabatt)})`;
+      case 'l_skonto': return `Zieleinkaufspreis (${f(v.zep)}) × ${n(p.l_skonto_p)} ÷ 100`;
+      case 'bep': return `Zieleinkaufspreis (${f(v.zep)}) – Liefererskonto (${f(v.l_skonto)})`;
+      case 'bezugskosten': return `Gegebener Wert`;
+      case 'bp': return `Bareinkaufspreis (${f(v.bep)}) + Bezugskosten (${f(v.bezugskosten)})`;
+      case 'hkz': return `Bezugspreis (${f(v.bp)}) × ${n(p.hkz_p)} ÷ 100`;
+      case 'sk': return `Bezugspreis (${f(v.bp)}) + Handlungskostenzuschlag (${f(v.hkz)})`;
+      default: return '';
+    }
+  };
+
+  // Verkaufsseite rückwärts (Rückwärts- und Differenzkalkulation)
+  const verkaufRueckwaerts = (): string => {
+    switch (key) {
+      case 'ust': return `Bruttoverkaufspreis (${f(v.brutto)}) ÷ ${n(100 + p.ust_p)} × ${n(p.ust_p)}  (Brutto = ${n(100 + p.ust_p)} %)`;
+      case 'nvp': return `Bruttoverkaufspreis (${f(v.brutto)}) – Umsatzsteuer (${f(v.ust)})`;
+      case 'k_rabatt': return `Nettoverkaufspreis (${f(v.nvp)}) × ${n(p.k_rabatt_p)} ÷ 100`;
+      case 'zvp': return `Nettoverkaufspreis (${f(v.nvp)}) – Kundenrabatt (${f(v.k_rabatt)})`;
+      case 'k_skonto': return `Zielverkaufspreis (${f(v.zvp)}) × ${n(p.k_skonto_p)} ÷ 100`;
+      case 'bvp': return `Zielverkaufspreis (${f(v.zvp)}) – Kundenskonto (${f(v.k_skonto)})`;
+      default: return '';
+    }
+  };
 
   if (direction === 'Vorwärts') {
     switch (key) {
-      case 'l_rabatt': return `Listeneinkaufspreis (${f(v.lep)}) × ${fp(p.l_rabatt_p)} ÷ 100`;
-      case 'zep': return `Listeneinkaufspreis (${f(v.lep)}) – Liefererrabatt (${f(v.l_rabatt)})`;
-      case 'l_skonto': return `Zieleinkaufspreis (${f(v.zep)}) × ${fp(p.l_skonto_p)} ÷ 100`;
-      case 'bep': return `Zieleinkaufspreis (${f(v.zep)}) – Liefererskonto (${f(v.l_skonto)})`;
-      case 'bezugskosten': return `Gegebener Wert`;
-      case 'bp': return `Bareinkaufspreis (${f(v.bep)}) + Bezugskosten (${f(v.bezugskosten)})`;
-      case 'hkz': return `Bezugspreis (${f(v.bp)}) × ${fp(p.hkz_p)} ÷ 100`;
-      case 'sk': return `Bezugspreis (${f(v.bp)}) + Handlungskostenzuschlag (${f(v.hkz)})`;
-      case 'gewinn': return `Selbstkosten (${f(v.sk)}) × ${fp(p.gewinn_p)} ÷ 100`;
+      case 'gewinn': return `Selbstkosten (${f(v.sk)}) × ${n(p.gewinn_p)} ÷ 100`;
       case 'bvp': return `Selbstkosten (${f(v.sk)}) + Gewinn (${f(v.gewinn)})`;
-      case 'zvp': return `Barverkaufspreis (${f(v.bvp)}) ÷ (100 - ${fp(p.k_skonto_p)}) × 100`;
-      case 'k_skonto': return `Zielverkaufspreis (${f(v.zvp)}) – Barverkaufspreis (${f(v.bvp)})`;
-      case 'nvp': return `Zielverkaufspreis (${f(v.zvp)}) ÷ (100 - ${fp(p.k_rabatt_p)}) × 100`;
-      case 'k_rabatt': return `Nettoverkaufspreis (${f(v.nvp)}) – Zielverkaufspreis (${f(v.zvp)})`;
-      case 'ust': return `Nettoverkaufspreis (${f(v.nvp)}) × ${fp(p.ust_p)} ÷ 100`;
+      case 'k_skonto': return `Barverkaufspreis (${f(v.bvp)}) ÷ ${n(100 - p.k_skonto_p)} × ${n(p.k_skonto_p)}  (im Hundert: Barverkaufspreis = ${n(100 - p.k_skonto_p)} %)`;
+      case 'zvp': return `Barverkaufspreis (${f(v.bvp)}) + Kundenskonto (${f(v.k_skonto)})`;
+      case 'k_rabatt': return `Zielverkaufspreis (${f(v.zvp)}) ÷ ${n(100 - p.k_rabatt_p)} × ${n(p.k_rabatt_p)}  (im Hundert: Zielverkaufspreis = ${n(100 - p.k_rabatt_p)} %)`;
+      case 'nvp': return `Zielverkaufspreis (${f(v.zvp)}) + Kundenrabatt (${f(v.k_rabatt)})`;
+      case 'ust': return `Nettoverkaufspreis (${f(v.nvp)}) × ${n(p.ust_p)} ÷ 100`;
       case 'brutto': return `Nettoverkaufspreis (${f(v.nvp)}) + Umsatzsteuer (${f(v.ust)})`;
-      default: return '';
+      default: return einkaufVorwaerts();
     }
-  } else if (direction === 'Rückwärts') {
+  }
+
+  if (direction === 'Rückwärts') {
     switch (key) {
-      case 'ust': return `Bruttoverkaufspreis (${f(v.brutto)}) ÷ (100 + ${fp(p.ust_p)}) × ${fp(p.ust_p)}`;
-      case 'nvp': return `Bruttoverkaufspreis (${f(v.brutto)}) – Umsatzsteuer (${f(v.ust)})`;
-      case 'k_rabatt': return `Nettoverkaufspreis (${f(v.nvp)}) × ${fp(p.k_rabatt_p)} ÷ 100`;
-      case 'zvp': return `Nettoverkaufspreis (${f(v.nvp)}) – Kundenrabatt (${f(v.k_rabatt)})`;
-      case 'k_skonto': return `Zielverkaufspreis (${f(v.zvp)}) × ${fp(p.k_skonto_p)} ÷ 100`;
-      case 'bvp': return `Zielverkaufspreis (${f(v.zvp)}) – Kundenskonto (${f(v.k_skonto)})`;
-      case 'gewinn': return `Barverkaufspreis (${f(v.bvp)}) ÷ (100 + ${fp(p.gewinn_p)}) × ${fp(p.gewinn_p)}`;
+      case 'gewinn': return `Barverkaufspreis (${f(v.bvp)}) ÷ ${n(100 + p.gewinn_p)} × ${n(p.gewinn_p)}  (auf Hundert: Barverkaufspreis = ${n(100 + p.gewinn_p)} %)`;
       case 'sk': return `Barverkaufspreis (${f(v.bvp)}) – Gewinn (${f(v.gewinn)})`;
-      case 'hkz': return `Selbstkosten (${f(v.sk)}) ÷ (100 + ${fp(p.hkz_p)}) × ${fp(p.hkz_p)}`;
+      case 'hkz': return `Selbstkosten (${f(v.sk)}) ÷ ${n(100 + p.hkz_p)} × ${n(p.hkz_p)}  (auf Hundert: Selbstkosten = ${n(100 + p.hkz_p)} %)`;
       case 'bp': return `Selbstkosten (${f(v.sk)}) – Handlungskostenzuschlag (${f(v.hkz)})`;
       case 'bezugskosten': return `Gegebener Wert`;
       case 'bep': return `Bezugspreis (${f(v.bp)}) – Bezugskosten (${f(v.bezugskosten)})`;
-      case 'l_skonto': return `Bareinkaufspreis (${f(v.bep)}) ÷ (100 - ${fp(p.l_skonto_p)}) × ${fp(p.l_skonto_p)}`;
+      case 'l_skonto': return `Bareinkaufspreis (${f(v.bep)}) ÷ ${n(100 - p.l_skonto_p)} × ${n(p.l_skonto_p)}  (im Hundert: Bareinkaufspreis = ${n(100 - p.l_skonto_p)} %)`;
       case 'zep': return `Bareinkaufspreis (${f(v.bep)}) + Liefererskonto (${f(v.l_skonto)})`;
-      case 'l_rabatt': return `Zieleinkaufspreis (${f(v.zep)}) ÷ (100 - ${fp(p.l_rabatt_p)}) × ${fp(p.l_rabatt_p)}`;
+      case 'l_rabatt': return `Zieleinkaufspreis (${f(v.zep)}) ÷ ${n(100 - p.l_rabatt_p)} × ${n(p.l_rabatt_p)}  (im Hundert: Zieleinkaufspreis = ${n(100 - p.l_rabatt_p)} %)`;
       case 'lep': return `Zieleinkaufspreis (${f(v.zep)}) + Liefererrabatt (${f(v.l_rabatt)})`;
-      default: return '';
-    }
-  } else if (direction === 'Differenz') {
-    // Differenzkalkulation
-    switch (key) {
-      // Forward part (LEP -> SK)
-      case 'l_rabatt': return `Listeneinkaufspreis (${f(v.lep)}) × ${fp(p.l_rabatt_p)} ÷ 100`;
-      case 'zep': return `Listeneinkaufspreis (${f(v.lep)}) – Liefererrabatt (${f(v.l_rabatt)})`;
-      case 'l_skonto': return `Zieleinkaufspreis (${f(v.zep)}) × ${fp(p.l_skonto_p)} ÷ 100`;
-      case 'bep': return `Zieleinkaufspreis (${f(v.zep)}) – Liefererskonto (${f(v.l_skonto)})`;
-      case 'bezugskosten': return `Gegebener Wert`;
-      case 'bp': return `Bareinkaufspreis (${f(v.bep)}) + Bezugskosten (${f(v.bezugskosten)})`;
-      case 'hkz': return `Bezugspreis (${f(v.bp)}) × ${fp(p.hkz_p)} ÷ 100`;
-      case 'sk': return `Bezugspreis (${f(v.bp)}) + Handlungskostenzuschlag (${f(v.hkz)})`;
-      
-      // Backward part (Brutto -> BVP)
-      case 'ust': return `Bruttoverkaufspreis (${f(v.brutto)}) ÷ (100 + ${fp(p.ust_p)}) × ${fp(p.ust_p)}`;
-      case 'nvp': return `Bruttoverkaufspreis (${f(v.brutto)}) – Umsatzsteuer (${f(v.ust)})`;
-      case 'k_rabatt': return `Nettoverkaufspreis (${f(v.nvp)}) × ${fp(p.k_rabatt_p)} ÷ 100`;
-      case 'zvp': return `Nettoverkaufspreis (${f(v.nvp)}) – Kundenrabatt (${f(v.k_rabatt)})`;
-      case 'k_skonto': return `Zielverkaufspreis (${f(v.zvp)}) × ${fp(p.k_skonto_p)} ÷ 100`;
-      case 'bvp': return `Zielverkaufspreis (${f(v.zvp)}) – Kundenskonto (${f(v.k_skonto)})`;
-      
-      // The difference
-      case 'gewinn': return `Barverkaufspreis (${f(v.bvp)}) – Selbstkosten (${f(v.sk)})`;
-      
-      default: return '';
+      default: return verkaufRueckwaerts();
     }
   }
-  return '';
+
+  // Differenzkalkulation
+  switch (key) {
+    case 'gewinn': return `Barverkaufspreis (${f(v.bvp)}) – Selbstkosten (${f(v.sk)})`;
+    case 'gewinn_p': return `Gewinn (${f(v.gewinn)}) ÷ Selbstkosten (${f(v.sk)}) × 100`;
+    default: return einkaufVorwaerts() || verkaufRueckwaerts();
+  }
 };

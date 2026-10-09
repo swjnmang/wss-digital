@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
-import { generateTask, type CalcTask, SCHEMA_ROWS, type CalculationSchema, type CalculationDirection, getCalculationExplanation } from '../data/calculationTasks';
+import {
+  generateTask, type CalcTask, type CalculationSchema, type CalculationDirection, getCalculationExplanation,
+  formatPercent, getEditableKeys, getRowsForSchema, isGivenField, isInputCorrect
+} from '../data/calculationTasks';
 
 type Mode = 'practice' | 'exam-intro' | 'exam' | 'exam-result';
 
@@ -28,7 +31,8 @@ export default function Kalkulation() {
   // Practice State
   const [task, setTask] = useState<CalcTask | null>(null);
   const [userInputs, setUserInputs] = useState<Record<string, string>>({});
-  const [feedback, setFeedback] = useState<Record<string, boolean>>({}); // true = correct, false = wrong
+  const [feedback, setFeedback] = useState<Record<string, boolean>>({}); // Prüfungsmodus: true = richtig, false = falsch
+  const [touched, setTouched] = useState<Record<string, boolean>>({}); // Übungsmodus: Feld wurde verlassen / bestätigt
   const [expandedExplanations, setExpandedExplanations] = useState<Record<string, boolean>>({});
   const [showSolution, setShowSolution] = useState(false);
   const [schema, setSchema] = useState<CalculationSchema>('Bezugskalkulation');
@@ -78,6 +82,7 @@ export default function Kalkulation() {
 
     setUserInputs(initialInputs);
     setFeedback({});
+    setTouched({});
     setExpandedExplanations({});
     setShowSolution(false);
   };
@@ -123,43 +128,11 @@ export default function Kalkulation() {
 
   const handleExamCheck = () => {
     if (!task) return;
-    
+
     const newFeedback: Record<string, boolean> = {};
-    
-    SCHEMA_ROWS.forEach(row => {
-      // Skip rows not in current schema
-      if (task.schema === 'Bezugskalkulation' && row.key === 'hkz') return; 
-      
-      const userValStr = userInputs[row.key];
-      if (!userValStr) return;
-
-      const normalizedStr = userValStr.replace(/\./g, '').replace(',', '.');
-      const userVal = parseFloat(normalizedStr);
-      const correctVal = task.values[row.key];
-      
-      if (Math.abs(userVal - correctVal) <= 0.05) {
-        newFeedback[row.key] = true;
-      } else {
-        newFeedback[row.key] = false;
-      }
+    getEditableKeys(task).forEach(key => {
+      if (userInputs[key]) newFeedback[key] = isInputCorrect(task, key, userInputs[key]);
     });
-
-    // Add check for gewinn_p if Differenz
-    if (task.direction === 'Differenz') {
-      const userValStr = userInputs['gewinn_p'];
-      if (userValStr) {
-        const normalizedStr = userValStr.replace(/\./g, '').replace(',', '.');
-        const userVal = parseFloat(normalizedStr);
-        const correctVal = task.percentages['gewinn_p'];
-        
-        if (Math.abs(userVal - correctVal) <= 0.05) {
-          newFeedback['gewinn_p'] = true;
-        } else {
-          newFeedback['gewinn_p'] = false;
-        }
-      }
-    }
-
     setFeedback(newFeedback);
   };
 
@@ -167,66 +140,10 @@ export default function Kalkulation() {
     if (!task) return;
 
     // Calculate Score based on current inputs
-    let correct = 0;
-    let total = 0;
-    let errors = 0;
-
-    const relevantRows = SCHEMA_ROWS.filter(row => {
-      if (task.schema === 'Bezugskalkulation') {
-        const index = SCHEMA_ROWS.findIndex(r => r.key === 'bp');
-        const rowIndex = SCHEMA_ROWS.findIndex(r => r.key === row.key);
-        return rowIndex <= index;
-      }
-      return true;
-    });
-
-    relevantRows.forEach(row => {
-      const isReadOnly = 
-        row.key === 'bezugskosten' ||
-        (task.direction === 'Vorwärts' && row.key === 'lep') ||
-        (task.direction === 'Rückwärts' && (
-          (task.schema === 'Bezugskalkulation' && row.key === 'bp') ||
-          (task.schema === 'Handelskalkulation' && row.key === 'brutto')
-        ));
-      
-      if (isReadOnly) return;
-
-      total++;
-      const userValStr = userInputs[row.key];
-      if (!userValStr) {
-        errors++;
-        return;
-      }
-
-      const normalizedStr = userValStr.replace(/\./g, '').replace(',', '.');
-      const userVal = parseFloat(normalizedStr);
-      const correctVal = task.values[row.key];
-
-      if (Math.abs(userVal - correctVal) <= 0.05) {
-        correct++;
-      } else {
-        errors++;
-      }
-    });
-
-    // Add check for gewinn_p if Differenz
-    if (task.direction === 'Differenz') {
-      total++;
-      const userValStr = userInputs['gewinn_p'];
-      if (!userValStr) {
-        errors++;
-      } else {
-        const normalizedStr = userValStr.replace(/\./g, '').replace(',', '.');
-        const userVal = parseFloat(normalizedStr);
-        const correctVal = task.percentages['gewinn_p'];
-
-        if (Math.abs(userVal - correctVal) <= 0.05) {
-          correct++;
-        } else {
-          errors++;
-        }
-      }
-    }
+    const editableKeys = getEditableKeys(task);
+    const total = editableKeys.length;
+    const correct = editableKeys.filter(key => isInputCorrect(task, key, userInputs[key])).length;
+    const errors = total - correct;
 
     const result: ExamResult = {
       taskId: task.id,
@@ -380,16 +297,8 @@ export default function Kalkulation() {
     y = 40;
     tasks.forEach((t, i) => {
       // Estimate height needed for this solution
-      const rows = SCHEMA_ROWS.filter(row => {
-        if (t.schema === 'Bezugskalkulation') {
-          // Include up to 'bp'
-          const index = SCHEMA_ROWS.findIndex(r => r.key === 'bp');
-          const thisIndex = SCHEMA_ROWS.findIndex(r => r.key === row.key);
-          return thisIndex <= index;
-        }
-        return true;
-      });
-      
+      const rows = getRowsForSchema(t.schema);
+
       const heightNeeded = rows.length * 6 + 20;
       
       if (y + heightNeeded > 280) {
@@ -414,8 +323,7 @@ export default function Kalkulation() {
         
         // Percentage?
         if (row.percentageKey) {
-          const pVal = t.percentages[row.percentageKey];
-          doc.text(`${pVal} %`, 100, y, { align: 'right' });
+          doc.text(formatPercent(t.percentages[row.percentageKey]), 100, y, { align: 'right' });
         }
         
         doc.text(`${val.toFixed(2).replace('.', ',')} €`, 160, y, { align: 'right' });
@@ -424,7 +332,7 @@ export default function Kalkulation() {
       
       // Add Gewinn % for Differenz
       if (t.direction === 'Differenz') {
-         doc.text(`Gewinnzuschlag: ${t.percentages.gewinn_p.toFixed(2).replace('.', ',')} %`, 28, y);
+         doc.text(`Gewinnzuschlag: ${formatPercent(t.percentages.gewinn_p)}`, 28, y);
          y += 6;
       }
 
@@ -436,20 +344,51 @@ export default function Kalkulation() {
 
   const handleInputChange = (key: string, value: string) => {
     setUserInputs(prev => ({ ...prev, [key]: value }));
+
+    // Während der Eingabe nicht rot färben – erst beim Verlassen des Feldes
+    if (touched[key]) {
+      setTouched(prev => ({ ...prev, [key]: false }));
+    }
+
     // Clear feedback for this field when edited
     if (feedback[key] !== undefined) {
       const newFeedback = { ...feedback };
       delete newFeedback[key];
       setFeedback(newFeedback);
-      
-      // Also hide explanation
-      if (expandedExplanations[key]) {
-        const newExpl = { ...expandedExplanations };
-        delete newExpl[key];
-        setExpandedExplanations(newExpl);
-      }
+    }
+
+    // Also hide explanation
+    if (expandedExplanations[key]) {
+      const newExpl = { ...expandedExplanations };
+      delete newExpl[key];
+      setExpandedExplanations(newExpl);
     }
   };
+
+  const markTouched = (key: string) => {
+    if (mode === 'practice' && !touched[key]) {
+      setTouched(prev => ({ ...prev, [key]: true }));
+    }
+  };
+
+  /**
+   * true = richtig (grün), false = falsch (rot), undefined = neutral.
+   * Übungsmodus: Richtige Eingaben werden sofort grün, falsche rot, sobald das Feld verlassen wird.
+   * Prüfungsmodus: Färbung erst nach "Eingaben prüfen".
+   */
+  const getFieldStatus = (key: string): boolean | undefined => {
+    if (!task || showSolution) return undefined;
+    if (mode === 'exam') return feedback[key];
+    const input = userInputs[key];
+    if (!input || !input.trim()) return undefined;
+    if (isInputCorrect(task, key, input)) return true;
+    return touched[key] ? false : undefined;
+  };
+
+  const statusClasses = (status: boolean | undefined) =>
+    status === true ? 'border-green-500 bg-green-50 text-green-700 font-semibold' :
+    status === false ? 'border-red-500 bg-red-50 text-red-700 font-semibold' :
+    'bg-white border-slate-300 text-slate-800';
 
   const getVideoUrl = (s: CalculationSchema, d: CalculationDirection) => {
     if (s === 'Bezugskalkulation') {
@@ -465,61 +404,15 @@ export default function Kalkulation() {
 
   const checkSolution = () => {
     if (!task) return;
-    
-    const newFeedback: Record<string, boolean> = {};
-    
-    SCHEMA_ROWS.forEach(row => {
-      // Skip rows not in current schema
-      if (task.schema === 'Bezugskalkulation' && row.key === 'hkz') return; // Stop after BP
-      // Actually we need to filter the rows properly in the render loop too.
-      
-      const userValStr = userInputs[row.key];
-      if (!userValStr) return;
 
-      // Handle German number format (1.234,56)
-      // Remove thousands separator (.) and replace decimal separator (,) with (.)
-      const normalizedStr = userValStr.replace(/\./g, '').replace(',', '.');
-      const userVal = parseFloat(normalizedStr);
-      const correctVal = task.values[row.key];
-      
-      // Allow 0.05 tolerance
-      if (Math.abs(userVal - correctVal) <= 0.05) {
-        newFeedback[row.key] = true;
-      } else {
-        newFeedback[row.key] = false;
-      }
-    });
-
-    // Add check for gewinn_p if Differenz
-    if (task.direction === 'Differenz') {
-      const userValStr = userInputs['gewinn_p'];
-      if (userValStr) {
-        const normalizedStr = userValStr.replace(/\./g, '').replace(',', '.');
-        const userVal = parseFloat(normalizedStr);
-        const correctVal = task.percentages['gewinn_p'];
-        
-        if (Math.abs(userVal - correctVal) <= 0.05) {
-          newFeedback['gewinn_p'] = true;
-        } else {
-          newFeedback['gewinn_p'] = false;
-        }
-      }
-    }
-
-    setFeedback(newFeedback);
+    // Alle Felder als bestätigt markieren, damit auch falsche Eingaben rot werden
+    const allTouched: Record<string, boolean> = {};
+    getEditableKeys(task).forEach(key => { allTouched[key] = true; });
+    setTouched(allTouched);
   };
 
   // Filter rows based on schema
-  const visibleRows = SCHEMA_ROWS.filter(row => {
-    if (!task) return false;
-    if (task.schema === 'Bezugskalkulation') {
-      // Show up to 'bp'
-      const index = SCHEMA_ROWS.findIndex(r => r.key === 'bp');
-      const rowIndex = SCHEMA_ROWS.findIndex(r => r.key === row.key);
-      return rowIndex <= index;
-    }
-    return true;
-  });
+  const visibleRows = task ? getRowsForSchema(task.schema) : [];
 
   if (!task && mode === 'practice') return <div>Laden...</div>;
 
@@ -707,14 +600,9 @@ export default function Kalkulation() {
               </div>
 
               {visibleRows.map((row, idx) => {
-                const isReadOnly = 
-                  row.key === 'bezugskosten' ||
-                  (task.direction === 'Vorwärts' && row.key === 'lep') ||
-                  (task.direction === 'Rückwärts' && (
-                    (task.schema === 'Bezugskalkulation' && row.key === 'bp') ||
-                    (task.schema === 'Handelskalkulation' && row.key === 'brutto')
-                  )) ||
-                  (task.direction === 'Differenz' && (row.key === 'lep' || row.key === 'brutto'));
+                const isReadOnly = isGivenField(task, row.key);
+                const status = isReadOnly ? undefined : getFieldStatus(row.key);
+                const profitStatus = getFieldStatus('gewinn_p');
                 
                 // Determine percentage label
                 let label = row.label;
@@ -724,7 +612,7 @@ export default function Kalkulation() {
                   if (isDifferenceProfit) {
                     label = `${row.operator} ${row.label}`;
                   } else {
-                    label = `${row.operator} ${row.label} (${task.percentages[row.percentageKey]}%)`;
+                    label = `${row.operator} ${row.label} (${formatPercent(task.percentages[row.percentageKey])})`;
                   }
                 } else if (row.operator) {
                   label = `${row.operator} ${row.label}`;
@@ -740,11 +628,10 @@ export default function Kalkulation() {
                             type="text"
                             value={showSolution ? task.percentages['gewinn_p'].toString().replace('.', ',') : (userInputs['gewinn_p'] || '')}
                             onChange={(e) => handleInputChange('gewinn_p', e.target.value)}
+                            onBlur={() => markTouched('gewinn_p')}
+                            onKeyDown={(e) => { if (e.key === 'Enter') markTouched('gewinn_p'); }}
                             disabled={showSolution}
-                            className={`w-12 md:w-16 p-0.5 md:p-1 border rounded text-right font-mono text-xs md:text-base inline-block ${
-                              feedback['gewinn_p'] === true ? 'border-green-500 bg-green-50' : 
-                              feedback['gewinn_p'] === false ? 'border-red-500 bg-red-50' : 'bg-white border-slate-300'
-                            }`}
+                            className={`w-12 md:w-16 p-0.5 md:p-1 border rounded text-right font-mono text-xs md:text-base inline-block outline-none focus:ring-2 focus:ring-blue-500 ${statusClasses(profitStatus)}`}
                             placeholder="0"
                           /> %
                         </span>
@@ -755,20 +642,19 @@ export default function Kalkulation() {
                         type="text" 
                         value={showSolution ? task.values[row.key].toFixed(2).replace('.', ',') : (userInputs[row.key] || '')}
                         onChange={(e) => handleInputChange(row.key, e.target.value)}
+                        onBlur={() => markTouched(row.key)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') markTouched(row.key); }}
                         disabled={isReadOnly || showSolution}
-                        className={`w-full p-0.5 md:p-1.5 border rounded text-right font-mono text-xs md:text-base ${
-                          isReadOnly ? 'bg-slate-100 text-slate-500' : 'bg-white focus:ring-2 focus:ring-blue-500 outline-none border-slate-300'
-                        } ${
-                          feedback[row.key] === true ? 'border-green-500 bg-green-50' : 
-                          feedback[row.key] === false ? 'border-red-500 bg-red-50' : ''
+                        className={`w-full p-0.5 md:p-1.5 border rounded text-right font-mono text-xs md:text-base outline-none ${
+                          isReadOnly ? 'bg-slate-100 text-slate-500 border-slate-300' : `focus:ring-2 focus:ring-blue-500 ${statusClasses(status)}`
                         }`}
                         placeholder="0,00"
                       />
                     </div>
                     <div className="p-0.5 md:p-2 flex flex-col items-center justify-center relative">
                       <div className="flex items-center gap-0.5 md:gap-2 text-base md:text-xl">
-                        {feedback[row.key] === true && <span className="text-green-500">✓</span>}
-                        {feedback[row.key] === false && (
+                        {status === true && <span className="text-green-500">✓</span>}
+                        {(status === false || (isDifferenceProfit && profitStatus === false)) && (
                           <>
                             <span className="text-red-500">✗</span>
                             {mode === 'practice' && (
@@ -783,10 +669,13 @@ export default function Kalkulation() {
                           </>
                         )}
                       </div>
-                      {mode === 'practice' && expandedExplanations[row.key] && feedback[row.key] === false && (
+                      {mode === 'practice' && expandedExplanations[row.key] && (status === false || (isDifferenceProfit && profitStatus === false)) && (
                         <div className="absolute right-full top-0 mr-2 z-20 w-40 md:w-64 text-[10px] md:text-xs text-slate-600 bg-white p-2 rounded-lg border border-blue-200 shadow-xl">
                           <div className="font-bold text-blue-800 mb-1">Lösungsweg:</div>
-                          {getCalculationExplanation(row.key, task.direction, task)}
+                          {status === false && <div>{getCalculationExplanation(row.key, task.direction, task)}</div>}
+                          {isDifferenceProfit && profitStatus === false && (
+                            <div className={status === false ? 'mt-1' : ''}>Gewinn in %: {getCalculationExplanation('gewinn_p', task.direction, task)}</div>
+                          )}
                           <div className="absolute right-[-6px] top-3 w-3 h-3 bg-white border-t border-r border-blue-200 rotate-45"></div>
                         </div>
                       )}
