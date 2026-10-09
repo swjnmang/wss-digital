@@ -585,3 +585,10 @@
   border-color: #9ca3af;
   color: #1f2937;
 }
+.heftSchritte {
+  margin: 0 0 0.75rem 0;
+  padding-left: 1.25rem;
+  color: #374151;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
