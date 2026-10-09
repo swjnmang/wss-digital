@@ -5,7 +5,7 @@ const items = [
   { title: '2. Was ist eine lineare Funktion?', desc: 'Verstehe, wie Wertetabelle, Graph und Gleichung zusammengehören, und ordne sie einander zu.', href: 'was_ist_linear', icon: 'fa-solid fa-lightbulb' },
   { title: '3. Wertetabelle erstellen und vervollständigen', desc: 'Erstelle Wertetabellen für lineare Funktionen und löse fehlende Werte.', href: 'wertetabelle', icon: 'fa-solid fa-table' },
   { title: '4. Graph zeichnen', desc: 'Übe das Zeichnen von linearen Funktionen im Koordinatensystem.', href: 'zeichnen', icon: 'fa-solid fa-pencil' },
-  { title: '5. Steigung berechnen', desc: 'Lerne, die Steigung einer Geraden aus zwei Punkten zu ermitteln.', href: 'steigung_berechnen', icon: 'fa-solid fa-chart-line' },
+  { title: '5. Die Steigung m', desc: 'Lies die Steigung einer Geraden mit dem Steigungsdreieck ab oder berechne sie aus zwei Punkten.', href: 'steigung', icon: 'fa-solid fa-chart-line' },
   { title: '6. y-Achsenabschnitt', desc: 'Lerne Funktionen der Form y = m·x + t kennen: Der y-Achsenabschnitt t verschiebt die Gerade entlang der y-Achse.', href: 'y_achsenabschnitt', icon: 'fa-solid fa-arrows-up-down' },
   { title: '7. Funktionsgleichung ablesen', desc: 'Lese die Funktionsgleichung direkt aus einem Graphen ab.', href: 'ablesen', icon: 'fa-solid fa-eye' },
   { title: '8. Funktionsgleichung aufstellen', desc: 'Stelle die Gleichung einer Geraden aus gegebenen Informationen auf.', href: 'funktionsgleichung', icon: 'fa-solid fa-pen-ruler' },
