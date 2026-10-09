@@ -606,7 +606,7 @@ export default function SteigungBerechnen() {
 
   const header = (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Steigung berechnen</h1>
+      <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Die Steigung m berechnen</h1>
       <p className="text-center text-slate-600">Berechne die Steigung m einer Geraden aus zwei Punkten.</p>
     </div>
   )
@@ -675,7 +675,7 @@ export default function SteigungBerechnen() {
                 <p className="text-green-800 font-semibold mb-4">Alles klar – bis zum nächsten Mal!</p>
                 <div className="flex flex-wrap justify-center gap-3">
                   <button onClick={startNewRound} className={btnPrimary}>Doch noch neue Aufgaben</button>
-                  <button onClick={() => navigate('/lineare_funktionen')} className={btnSecondary}>Zur Übersicht</button>
+                  <button onClick={() => navigate('/lineare_funktionen/steigung')} className={btnSecondary}>Zur Übersicht</button>
                 </div>
               </>
             ) : (

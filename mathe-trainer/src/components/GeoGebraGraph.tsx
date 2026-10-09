@@ -11,6 +11,12 @@ interface GeoGebraGraphProps {
   t: number;
   width?: number;
   height?: number;
+  /** Gitternetz anzeigen (zum Ablesen) */
+  grid?: boolean;
+  /** Sichtbarer Bereich [xMin, xMax, yMin, yMax] */
+  view?: [number, number, number, number];
+  /** Steigungsdreieck ab x = x1 mit waagrechter Kathete dx (Δx grün, Δy rot) */
+  triangle?: { x1: number; dx: number } | null;
 }
 
 const GGB_SRC = 'https://www.geogebra.org/apps/deployggb.js';
@@ -45,15 +51,18 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
   m, 
   t, 
   width = 600, 
-  height = 500
+  height = 500,
+  grid = false,
+  view,
+  triangle = null,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const appletRef = useRef<any>(null);
   const elementIdRef = useRef<string>(`ggb-elem-${Math.random().toString(36).substr(2, 9)}`);
   const [scriptLoaded, setScriptLoaded] = React.useState<boolean>(!!window.GGBApplet);
   const [error, setError] = React.useState<boolean>(false);
-  const latest = useRef({ m, t });
-  latest.current = { m, t };
+  const latest = useRef({ m, t, grid, view, triangle });
+  latest.current = { m, t, grid, view, triangle };
 
   // Skript laden (einmal für die ganze Seite, alle Graphen warten auf dasselbe Laden)
   useEffect(() => {
@@ -98,7 +107,7 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
           if (cancelled) return
           appletRef.current = api
           // Setze die initiale Gleichung
-          updateGraph(api, latest.current.m, latest.current.t)
+          updateGraph(api)
         }
       }
 
@@ -128,16 +137,49 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
   }, [scriptLoaded, width, height])
 
   // Update Graph wenn m oder t sich ändert
+  const viewKey = view ? view.join(',') : '';
+  const triangleKey = triangle ? `${triangle.x1},${triangle.dx}` : '';
   useEffect(() => {
     if (appletRef.current && appletRef.current.evalCommand) {
-      updateGraph(appletRef.current, m, t);
+      updateGraph(appletRef.current);
     }
-  }, [m, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [m, t, grid, viewKey, triangleKey]);
 
-  const updateGraph = (api: any, m: number, t: number) => {
+  const updateGraph = (api: any) => {
+    const { m, t, grid, view, triangle } = latest.current;
     try {
       api.reset();
       api.evalCommand(`f(x) = ${m}*x + ${t}`);
+      if (grid) api.setGridVisible(true);
+      if (view) api.setCoordSystem(view[0], view[1], view[2], view[3]);
+      if (triangle) {
+        const { x1, dx } = triangle;
+        const x2 = x1 + dx;
+        const y1 = m * x1 + t;
+        const y2 = m * x2 + t;
+        const dy = Math.round((y2 - y1) * 1000) / 1000;
+        const fmt = (n: number) => String(n).replace('.', ',');
+        api.evalCommand(`A = (${x1}, ${y1})`);
+        api.evalCommand(`B = (${x2}, ${y2})`);
+        api.evalCommand(`C = (${x2}, ${y1})`);
+        api.evalCommand('dX = Segment(A, C)');
+        api.evalCommand('dY = Segment(C, B)');
+        api.setColor('dX', 22, 163, 74);
+        api.setColor('dY', 220, 38, 38);
+        api.setLineThickness('dX', 7);
+        api.setLineThickness('dY', 7);
+        ['A', 'B'].forEach((p) => { api.setColor(p, 30, 41, 59); api.setPointSize(p, 5); api.setFixed(p, true, false); });
+        api.setVisible('C', false);
+        api.setLabelVisible('dX', false);
+        api.setLabelVisible('dY', false);
+        // Beschriftungen Δx (unter/über der waagrechten Kathete) und Δy (neben der senkrechten Kathete)
+        const below = dy > 0 ? -0.6 : 0.35;
+        api.evalCommand(`tX = Text("Δx = ${fmt(dx)}", (${x1 + dx / 2 - 0.8}, ${y1 + below}))`);
+        api.evalCommand(`tY = Text("Δy = ${fmt(dy)}", (${x2 + 0.2}, ${(y1 + y2) / 2}))`);
+        api.setColor('tX', 22, 163, 74);
+        api.setColor('tY', 220, 38, 38);
+      }
     } catch (e) {
       console.error('Fehler beim Update der Gleichung:', e);
     }
@@ -221,7 +263,7 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
             title="Graph neu laden"
             aria-label="Graph neu laden"
             onClick={() => {
-              if (appletRef.current) updateGraph(appletRef.current, latest.current.m, latest.current.t)
+              if (appletRef.current) updateGraph(appletRef.current)
             }}
             style={{
               position: 'absolute',
