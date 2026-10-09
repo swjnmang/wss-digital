@@ -9,14 +9,14 @@ declare global {
   }
 }
 
-// 3 Punkte, damit die SuS die Gerade nicht schon nach dem ersten "Treffer"
-// automatisch bestätigt bekommen, sondern wirklich mehrfach die Zuordnung
-// Wertepaar → Koordinatenpunkt üben.
-const PLOT_MIN_POINTS = 3
-// Größere Zeichenfläche = mehr Pixel pro Einheit = leichter präzise zu
-// treffen, gerade mit dem Finger auf einem Tablet statt mit der Maus.
-const PLOT_WIDTH = 500
-const PLOT_HEIGHT = 330
+// "Gut zeichenbarer" Bereich für das Koordinatensystem im Heft:
+// beide Achsen von -6 bis 6 (1 Einheit = 1 cm passt bequem auf eine Heftseite).
+const ZEICHEN_X_MIN = -6
+const ZEICHEN_X_MAX = 6
+const ZEICHEN_Y_MAX = 6
+
+const GRAPH_WIDTH = 500
+const GRAPH_HEIGHT = 330
 
 // Erzwingt ein kartesisches Koordinatensystem: 1 Einheit auf der x-Achse
 // entspricht optisch genauso vielen Pixeln wie 1 Einheit auf der y-Achse.
@@ -43,7 +43,7 @@ function computeCartesianView(xMin: number, xMax: number, yMin: number, yMax: nu
   }
 }
 
-function injectPlotApplet(containerId: string, width: number, height: number, onLoad: (api: any) => void) {
+function injectGraphApplet(containerId: string, width: number, height: number, onLoad: (api: any) => void) {
   const params: any = {
     appName: 'classic',
     width,
@@ -53,6 +53,7 @@ function injectPlotApplet(containerId: string, width: number, height: number, on
     showMenuBar: false,
     perspective: 'G',
     useBrowserForJS: true,
+    enableRightClick: false,
     enableShiftDragZoom: true,
     showResetIcon: true,
     showZoomButtons: true,
@@ -212,19 +213,45 @@ function formatEquationLatex(m: number, t: number): string {
   return `$$${formatEquation(m, t)}$$`
 }
 
+// Ganzzahlige x-Werte im Heft-Zeichenbereich, deren y-Werte ebenfalls gut
+// zeichenbar sind: |y| <= ZEICHEN_Y_MAX und y ein Vielfaches von 0,5
+// (lässt sich auf Karopapier mit 1 Einheit = 2 Kästchen exakt eintragen).
+function gutZeichenbareXWerte(m: number, t: number): number[] {
+  const werte: number[] = []
+  for (let x = ZEICHEN_X_MIN; x <= ZEICHEN_X_MAX; x++) {
+    const y = m * x + t
+    const istHalbzahlig = Math.abs(y * 2 - Math.round(y * 2)) < 1e-9
+    if (Math.abs(y) <= ZEICHEN_Y_MAX + 1e-9 && istHalbzahlig) werte.push(x)
+  }
+  return werte
+}
+
+// Wählt bis zu `anzahl` möglichst gleichmäßig verteilte Werte aus einer sortierten Liste
+function verteilteAuswahl(werte: number[], anzahl: number): number[] {
+  if (werte.length <= anzahl) return [...werte]
+  const auswahl: number[] = []
+  for (let i = 0; i < anzahl; i++) {
+    auswahl.push(werte[Math.round((i * (werte.length - 1)) / (anzahl - 1))])
+  }
+  return auswahl
+}
+
+function berechneY(m: number, t: number, x: number) {
+  return Math.round((m * x + t) * 100) / 100
+}
+
 // Generiert 2 Rechenbeispiele für die Lösungsanzeige
-function generateRechenbeispiele(m: number, t: number): Array<{ x: number; y: number; berechnung: string }> {
+function generateRechenbeispiele(m: number, t: number, xPool: number[]): Array<{ x: number; y: number; berechnung: string }> {
   const beispiele: Array<{ x: number; y: number; berechnung: string }> = []
   
-  // Wähle 2 verschiedene zufällige x-Werte
+  // Wähle 2 verschiedene zufällige x-Werte aus dem gut zeichenbaren Bereich
   const xWerte = new Set<number>()
-  while (xWerte.size < 2) {
-    const x = randInt(-3, 3)
-    xWerte.add(x)
+  while (xWerte.size < Math.min(2, xPool.length)) {
+    xWerte.add(xPool[randInt(0, xPool.length - 1)])
   }
   
   xWerte.forEach(x => {
-    const y = Math.round((m * x + t) * 100) / 100
+    const y = berechneY(m, t, x)
     
     // Formatiere x-Wert mit Klammern wenn negativ
     let xDisplay = ''
@@ -265,64 +292,52 @@ function generateRechenbeispiele(m: number, t: number): Array<{ x: number; y: nu
 }
 
 // ===== Aufgabengenerator =====
+// xPool: gut zeichenbare x-Werte (siehe gutZeichenbareXWerte), mindestens 5 Stück
 const aufgabenBanks = {
   // Typ 1: Völlig leere Wertetabelle ausfüllen
-  leereTabelleAusfüllen: () => {
-    const { m, t } = generateRandomMT()
-    const rechenbeispiele = generateRechenbeispiele(m, t)
-    
+  leereTabelleAusfüllen: (m: number, t: number, xPool: number[], funktionsgleichung: string) => {
+    const xVon = xPool[0]
+    const xBis = xPool[xPool.length - 1]
+    // Sind nicht alle ganzen Zahlen im Bereich gut zeichenbar (Brüche), konkrete Vorschläge nennen
+    const lückenlos = xPool.length === xBis - xVon + 1
+    const vorschläge = verteilteAuswahl(xPool, 4)
+    const xTipp = lückenlos
+      ? `Wähle x-Werte zwischen ${xVon} und ${xBis}, damit du den Graphen gut zeichnen kannst.`
+      : `Wähle x-Werte, bei denen sich "schöne" y-Werte ergeben, z. B. x = ${vorschläge.join('; ')}.`
+
     return {
       typ: 'leereTabelleAusfüllen',
       thema: '1. Wertetabelle aus Funktionsgleichung',
-      frage: `Gegeben ist die Funktionsgleichung ${formatEquation(m, t)}. Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.`,
-      m,
-      t,
-      funktionsgleichung: formatEquation(m, t),
-      funktionsgleichungLatex: formatEquationLatex(m, t),
+      frage: `Gegeben ist die Funktionsgleichung ${funktionsgleichung}. Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren. ${xTipp}`,
       numZeilen: 4,
+      // Beispiel-Wertetabelle für die Lösung
+      xWerte: vorschläge,
+      yWerte: vorschläge.map(x => berechneY(m, t, x)),
       lösungsweg: `Setze verschiedene x-Werte in die Funktionsgleichung ein und berechne die entsprechenden y-Werte.`,
-      rechenbeispiele
     }
   },
 
   // Typ 2: Teilweise gefüllte Wertetabelle vervollständigen
-  teilweisgefülltVervollständigen: () => {
-    const { m, t } = generateRandomMT()
-    const rechenbeispiele = generateRechenbeispiele(m, t)
-    
-    // Generiere 5 Wertepaare mit zufälligen x-Werten
+  teilweisgefülltVervollständigen: (m: number, t: number, xPool: number[], funktionsgleichung: string, nurYGesucht: boolean) => {
+    // 5 verschiedene zufällige x-Werte aus dem gut zeichenbaren Bereich, aufsteigend sortiert
+    const pool = [...xPool]
     const xWerte: number[] = []
-    const yWerte: number[] = []
-    const gebenXWert: boolean[] = [] // true = x gegeben, y versteckt; false = y gegeben, x versteckt
-    
-    // Generiere 5 verschiedene zufällige x-Werte
-    const verwendeteX = new Set<number>()
     while (xWerte.length < 5) {
-      const x = randInt(-5, 5)
-      if (!verwendeteX.has(x)) {
-        verwendeteX.add(x)
-        xWerte.push(x)
-        const y = Math.round((m * x + t) * 100) / 100
-        yWerte.push(y)
-        
-        // Zufällig entscheiden: x oder y geben
-        gebenXWert.push(Math.random() > 0.5)
-      }
+      xWerte.push(pool.splice(randInt(0, pool.length - 1), 1)[0])
     }
-    
+    xWerte.sort((a, b) => a - b)
+    const yWerte = xWerte.map(x => berechneY(m, t, x))
+    // true = x gegeben, y versteckt; false = y gegeben, x versteckt
+    const gebenXWert = xWerte.map(() => nurYGesucht || Math.random() > 0.5)
+
     return {
       typ: 'teilweisgefülltVervollständigen',
       thema: '2. Wertetabelle vervollständigen',
-      frage: `Vervollständige die Wertetabelle für die Funktionsgleichung ${formatEquation(m, t)}.`,
-      m,
-      t,
-      funktionsgleichung: formatEquation(m, t),
-      funktionsgleichungLatex: formatEquationLatex(m, t),
+      frage: `Vervollständige die Wertetabelle für die Funktionsgleichung ${funktionsgleichung}.`,
       xWerte,
       yWerte,
-      gebenXWert, // true = x gegeben, y versteckt; false = y gegeben, x versteckt
+      gebenXWert,
       lösungsweg: `Nutze die Funktionsgleichung ${formatEquationLatex(m, t)} und berechne den fehlenden Wert (x oder y) aus dem gegebenen Wert.`,
-      rechenbeispiele
     }
   }
 }
@@ -355,14 +370,8 @@ export default function Wertetabelle() {
   const [punkte, setPunkte] = useState<number>(0)
   const [schwierigkeitsgrad, setSchwierigkeitsgrad] = useState<'einfach' | 'mittel' | 'schwer' | null>(null)
 
-  // --- Interaktives Einzeichnen der Punkte/Geraden (pro Aufgabe) ---
-  const plotApiRefs = useRef<{ [index: number]: any }>({})
-  const plotAchievedRefs = useRef<{ [index: number]: Set<string> }>({})
-  const plotDoneRefs = useRef<{ [index: number]: boolean }>({})
-  const [plotAchievedCount, setPlotAchievedCount] = useState<{ [index: number]: number }>({})
-  const [plotDone, setPlotDone] = useState<{ [index: number]: boolean }>({})
-  const [plotFeedback, setPlotFeedback] = useState<{ [index: number]: string | null }>({})
-  const [plotScored, setPlotScored] = useState<{ [index: number]: boolean }>({})
+  // GeoGebra-Applets der Lösungsgraphen (pro Aufgabe), damit jeder Graph nur einmal injiziert wird
+  const lösungGraphRefs = useRef<{ [index: number]: boolean }>({})
 
   // MathJax laden
   useEffect(() => {
@@ -388,200 +397,62 @@ export default function Wertetabelle() {
     }
   }, [])
 
-  // Ermittelt die bekannten (korrekten) Wertepaare einer Aufgabe, sobald sie
-  // richtig gelöst ist. Bei Typ 1 sind das die selbst gewählten x-Werte der
-  // SuS (deren y-Werte gerade als korrekt geprüft wurden), bei Typ 2 die vom
-  // Aufgabengenerator vorgegebenen xWerte/yWerte-Paare.
-  function getTargetPoints(aufgabe: Aufgabe, eingaben: Array<{ x: string; y: string }> | undefined): { x: number; y: number }[] {
-    if (aufgabe.typ === 'leereTabelleAusfüllen') {
-      if (!eingaben) return []
-      return eingaben
-        .map(e => ({
-          x: parseFloat(e.x.replace(',', '.').replace(/[−–—‐]/g, '-')),
-          y: parseFloat(e.y.replace(',', '.').replace(/[−–—‐]/g, '-'))
-        }))
-        .filter(p => !isNaN(p.x) && !isNaN(p.y))
-    }
-    return aufgabe.xWerte.map((x: number, i: number) => ({ x, y: aufgabe.yWerte[i] }))
-  }
-
-  // Richtet die Zeichenfläche für eine Aufgabe ein: Punkt-Werkzeug aktivieren,
-  // Koordinatensystem passend zu den Zielpunkten wählen und auf Klicks reagieren.
-  function setupPlot(index: number, aufgabe: Aufgabe, api: any) {
-    const targets = getTargetPoints(aufgabe, antworten[index])
-    if (targets.length < PLOT_MIN_POINTS) return
-
-    const xs = targets.map(p => p.x).concat(0)
-    const ys = targets.map(p => p.y).concat(0)
-    const xMin = Math.min(...xs)
-    const xMax = Math.max(...xs)
-    const yMin = Math.min(...ys)
-    const yMax = Math.max(...ys)
-    const xPad = Math.max((xMax - xMin) * 0.25, 1)
-    const yPad = Math.max((yMax - yMin) * 0.25, 1)
+  // Zeichnet in der Lösung den Funktionsgraphen samt Punkten der Wertetabelle
+  function setupLösungGraph(aufgabe: Aufgabe, api: any, width: number) {
+    const punkte = aufgabe.xWerte.map((x: number, i: number) => ({ x, y: aufgabe.yWerte[i] }))
+    const xs = punkte.map((p: { x: number }) => p.x).concat(0)
+    const ys = punkte.map((p: { y: number }) => p.y).concat(0)
     const { viewXMin, viewXMax, viewYMin, viewYMax } = computeCartesianView(
-      xMin - xPad, xMax + xPad, yMin - yPad, yMax + yPad, PLOT_WIDTH, PLOT_HEIGHT
+      Math.min(...xs) - 1, Math.max(...xs) + 1, Math.min(...ys) - 1, Math.max(...ys) + 1, width, GRAPH_HEIGHT
     )
-    const rangeX = viewXMax - viewXMin
-    const rangeY = viewYMax - viewYMin
-
-    plotAchievedRefs.current[index] = new Set()
-    plotDoneRefs.current[index] = false
-    setPlotAchievedCount(prev => ({ ...prev, [index]: 0 }))
-    setPlotDone(prev => ({ ...prev, [index]: false }))
-    setPlotFeedback(prev => ({ ...prev, [index]: null }))
-
     try {
-      api.reset()
       api.setCoordSystem(viewXMin, viewXMax, viewYMin, viewYMax)
-      api.setMode(1) // Punkt-Werkzeug: Klicks erzeugen einen Punkt
-
-      // Sichtbares Gitter als Zielhilfe beim Antippen - rein optisch, daher
-      // eigenes try/catch, damit ein evtl. Fehler hier nicht den Rest des
-      // Setups (Punkt-Werkzeug, Klick-Listener) blockiert.
       try { api.setGridVisible(true) } catch (e) { /* ignore */ }
-
-      api.registerAddListener((objName: string) => {
-        if (plotDoneRefs.current[index]) return
-
-        let rawX = 0
-        let rawY = 0
-        try {
-          rawX = api.getXcoord(objName)
-          rawY = api.getYcoord(objName)
-        } catch (e) {
-          return
-        }
-
-        // Größere Punktmarker: leichter zu sehen, was man mit dem Finger
-        // tatsächlich gesetzt hat (v.a. auf Tablets).
-        try { api.setPointSize(objName, 7) } catch (e) { /* ignore */ }
-
-        let nearest: { x: number; y: number } | null = null
-        let nearestDist = Infinity
-        for (const t of targets) {
-          const dx = (rawX - t.x) / rangeX
-          const dy = (rawY - t.y) / rangeY
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < nearestDist) {
-            nearestDist = dist
-            nearest = t
-          }
-        }
-
-        // Großzügigere Trefferzone als zuvor (0.06), da Fingertipps auf
-        // Tablets deutlich ungenauer sind als Mausklicks.
-        const captureRadius = 0.1
-        const achieved = plotAchievedRefs.current[index] || new Set<string>()
-
-        if (nearest && nearestDist <= captureRadius) {
-          const key = `${nearest.x}|${nearest.y}`
-          if (achieved.has(key)) {
-            try { api.deleteObject(objName) } catch (e) { /* ignore */ }
-            return
-          }
-          try {
-            api.setCoords(objName, nearest.x, nearest.y)
-            api.setColor(objName, 22, 163, 74)
-          } catch (e) { /* ignore */ }
-
-          achieved.add(key)
-          plotAchievedRefs.current[index] = achieved
-          setPlotAchievedCount(prev => ({ ...prev, [index]: achieved.size }))
-          setPlotFeedback(prev => ({ ...prev, [index]: null }))
-
-          if (achieved.size >= PLOT_MIN_POINTS) {
-            plotDoneRefs.current[index] = true
-            setPlotDone(prev => ({ ...prev, [index]: true }))
-            try {
-              api.evalCommand(`g(x) = ${aufgabe.m}*x + ${aufgabe.t}`)
-              api.setColor('g', 37, 99, 235)
-              api.setMode(0)
-            } catch (e) { /* ignore */ }
-          }
-        } else {
-          try { api.setColor(objName, 220, 38, 38) } catch (e) { /* ignore */ }
-          setPlotFeedback(prev => ({ ...prev, [index]: 'Dieser Punkt passt zu keinem Wertepaar deiner Tabelle. Versuch es noch einmal!' }))
-          setTimeout(() => {
-            try { api.deleteObject(objName) } catch (e) { /* ignore */ }
-          }, 900)
-        }
+      api.evalCommand(`f(x) = ${aufgabe.m}*x + ${aufgabe.t}`)
+      api.setColor('f', 37, 99, 235)
+      api.setLineThickness('f', 6)
+      api.setFixed('f', true, false)
+      punkte.forEach((p: { x: number; y: number }, i: number) => {
+        const name = `P_{${i + 1}}`
+        api.evalCommand(`${name} = (${p.x}, ${p.y})`)
+        api.setColor(name, 220, 38, 38)
+        api.setPointSize(name, 5)
+        api.setFixed(name, true, false)
       })
     } catch (e) {
-      console.error('GeoGebra Plot-Setup-Error:', e)
+      console.error('GeoGebra Lösungsgraph-Error:', e)
     }
   }
 
-  // Injiziert (bzw. richtet erneut ein) die Zeichenfläche für eine Aufgabe
-  function initPlotForIndex(index: number, aufgabe: Aufgabe) {
-    const containerId = `ggb-plot-${index}`
-    let attempts = 0
-    const tryInject = () => {
-      attempts++
-      if (!window.GGBApplet || !document.getElementById(containerId)) {
-        if (attempts < 50) setTimeout(tryInject, 100)
-        return
-      }
-      injectPlotApplet(containerId, PLOT_WIDTH, PLOT_HEIGHT, (api: any) => {
-        plotApiRefs.current[index] = api
-        setupPlot(index, aufgabe, api)
-      })
-    }
-    tryInject()
-  }
-
-  // Sobald eine Aufgabe als richtig validiert wird, Zeichenfläche einrichten
+  // Lösungsgraphen injizieren, sobald die Lösung eingeblendet wird
   useEffect(() => {
     aufgaben.forEach((aufgabe, index) => {
-      if (validiert[index] && !plotApiRefs.current[index]) {
-        initPlotForIndex(index, aufgabe)
+      if (!showLösung[index]) {
+        // Beim Ausblenden wird der Container entfernt -> beim nächsten Einblenden neu injizieren
+        delete lösungGraphRefs.current[index]
+        return
       }
+      if (lösungGraphRefs.current[index]) return
+      lösungGraphRefs.current[index] = true
+
+      const containerId = `ggb-loesung-${index}`
+      let attempts = 0
+      const tryInject = () => {
+        attempts++
+        const container = document.getElementById(containerId)
+        if (!window.GGBApplet || !container) {
+          if (attempts < 50) setTimeout(tryInject, 100)
+          return
+        }
+        // Auf schmalen Bildschirmen (Tablet hochkant, Handy) nicht breiter als der verfügbare Platz
+        const width = Math.min(GRAPH_WIDTH, container.parentElement?.clientWidth || GRAPH_WIDTH)
+        container.style.width = `${width}px`
+        injectGraphApplet(containerId, width, GRAPH_HEIGHT, (api: any) => setupLösungGraph(aufgabe, api, width))
+      }
+      tryInject()
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [validiert, aufgaben])
-
-  function resetPlot(index: number) {
-    const aufgabe = aufgaben[index]
-    const api = plotApiRefs.current[index]
-    if (!api || !aufgabe) return
-    setupPlot(index, aufgabe, api)
-  }
-
-  // Entfernt die Zeichenfläche und ihren Zustand für eine Aufgabe (z.B. wenn
-  // die Tabelle erneut bearbeitet wird und damit nicht mehr als geprüft gilt)
-  function clearPlotForIndex(index: number) {
-    delete plotApiRefs.current[index]
-    delete plotAchievedRefs.current[index]
-    delete plotDoneRefs.current[index]
-    setPlotAchievedCount(prev => {
-      const next = { ...prev }
-      delete next[index]
-      return next
-    })
-    setPlotDone(prev => {
-      const next = { ...prev }
-      delete next[index]
-      return next
-    })
-    setPlotFeedback(prev => {
-      const next = { ...prev }
-      delete next[index]
-      return next
-    })
-  }
-
-  // Vergibt einen Zusatzpunkt, sobald in einer Aufgabe die Gerade fertig
-  // eingezeichnet wurde (einmalig pro Aufgabe/Runde)
-  useEffect(() => {
-    Object.keys(plotDone).forEach(key => {
-      const index = Number(key)
-      if (plotDone[index] && !plotScored[index]) {
-        setPunkte(p => p + 1)
-        setPlotScored(prev => ({ ...prev, [index]: true }))
-      }
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plotDone])
+  }, [showLösung, aufgaben])
 
   // Aufgaben generieren basierend auf Schwierigkeitsgrad
   function generiereAufgaben(grad: 'einfach' | 'mittel' | 'schwer') {
@@ -592,79 +463,53 @@ export default function Wertetabelle() {
     
     // Generiere 4 verschiedene Aufgaben mit unterschiedlichen Funktionsgleichungen
     let attempts = 0
-    const maxAttempts = 100 // Verhindere infinite Loop
+    const maxAttempts = 1000 // Verhindere infinite Loop
     
     while (neue.length < 4 && attempts < maxAttempts) {
       attempts++
       
-      // Zufällig zwischen Typ 1 und Typ 2 wählen
-      const aufgabenTyp = Math.random() > 0.5 ? 'leereTabelleAusfüllen' : 'teilweisgefülltVervollständigen'
-      let aufgabe = aufgabenBanks[aufgabenTyp as keyof typeof aufgabenBanks]()
-      
-      // Gemeinsame Frage-Erweiterung
-      const graphHinweis = ` Sobald die Wertetabelle richtig ist, zeichne mindestens ${PLOT_MIN_POINTS} deiner Wertepaare als Punkte in das erscheinende Koordinatensystem ein - die passende Gerade wird dann automatisch ergänzt.`
-      
-      let m = aufgabe.m
-      let t = aufgabe.t
-      let kombinationKey = ''
-      
       // Passe Schwierigkeitsgrad an und generiere m/t basierend darauf
+      let m: number
+      let t: number
+      let funktionsgleichung: string
       if (grad === 'einfach') {
         // Einfach: y = m*x (ohne t)
+        m = generateRandomMT().m
         t = 0
-        m = m === 0 ? 1 : m
-        kombinationKey = `${m}|0` // m|t Format für Duplikatsprüfung
-        
-        aufgabe.t = 0
-        aufgabe.m = m
-        aufgabe.funktionsgleichung = `y = ${m}x`
-        aufgabe.funktionsgleichungLatex = `$$y = ${m}x$$`
-        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
-
-        // Rechenbeispiele und Lösungsweg müssen zum neuen (t=0) Gleichung passen
-        aufgabe.rechenbeispiele = generateRechenbeispiele(m, 0)
-
-        // Wenn Typ 2: berechne y-Werte neu und erzwinge "nur x-Werte gegeben" (y wird gesucht)
-        if (aufgabenTyp === 'teilweisgefülltVervollständigen' && aufgabe.yWerte) {
-          aufgabe.yWerte = aufgabe.xWerte.map((x: number) => Math.round(m * x * 100) / 100)
-          aufgabe.gebenXWert = aufgabe.xWerte.map(() => true)
-          aufgabe.lösungsweg = `Nutze die Funktionsgleichung ${formatEquationLatex(m, 0)} und berechne den fehlenden Wert (x oder y) aus dem gegebenen Wert.`
-        }
+        funktionsgleichung = `y = ${m}x`
       } else if (grad === 'mittel') {
         // Mittel: y = m*x + t mit ganzen Zahlen
-        kombinationKey = `${aufgabe.m}|${aufgabe.t}`
-        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${aufgabe.funktionsgleichung}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
-      } else if (grad === 'schwer') {
+        ;({ m, t } = generateRandomMT())
+        funktionsgleichung = formatEquation(m, t)
+      } else {
         // Schwer: y = m*x + t mit Brüchen
-        const { m: mBruch, t: tBruch } = generateRandomMTMitBrüchen()
-        m = mBruch
-        t = tBruch
-        kombinationKey = `${mBruch}|${tBruch}`
-        
-        aufgabe.m = mBruch
-        aufgabe.t = tBruch
-        
-        // Formatiere Funktionsgleichung mit Brüchen
-        const funktionsgleichungText = formatEquation(mBruch, tBruch)
-        aufgabe.funktionsgleichung = funktionsgleichungText
-        aufgabe.funktionsgleichungLatex = `$$${funktionsgleichungText}$$`
-        aufgabe.frage = `Gegeben ist die Funktionsgleichung ${funktionsgleichungText}. ${aufgabenTyp === 'leereTabelleAusfüllen' ? 'Erstelle eine Wertetabelle mit mindestens 4 Wertepaaren.' : 'Vervollständige die Wertetabelle.'}${graphHinweis}`
-        
-        // Rechenbeispiele müssen zu den neuen Bruch-Werten passen
-        aufgabe.rechenbeispiele = generateRechenbeispiele(mBruch, tBruch)
+        ;({ m, t } = generateRandomMTMitBrüchen())
+        funktionsgleichung = formatEquation(m, t)
+      }
 
-        // Berechne y-Werte neu mit Brüchen
-        if (aufgabenTyp === 'teilweisgefülltVervollständigen') {
-          aufgabe.yWerte = aufgabe.xWerte.map((x: number) => Math.round((mBruch * x + tBruch) * 100) / 100)
-          aufgabe.lösungsweg = `Nutze die Funktionsgleichung ${formatEquationLatex(mBruch, tBruch)} und berechne den fehlenden Wert (x oder y) aus dem gegebenen Wert.`
-        }
-      }
-      
       // Prüfe ob diese Kombination bereits verwendet wurde
-      if (!usedCombinations.has(kombinationKey)) {
-        usedCombinations.add(kombinationKey)
-        neue.push(aufgabe)
-      }
+      const kombinationKey = `${m}|${t}`
+      if (usedCombinations.has(kombinationKey)) continue
+
+      // Nur Funktionen, für die es genug gut zeichenbare Wertepaare gibt
+      const xPool = gutZeichenbareXWerte(m, t)
+      if (xPool.length < 5) continue
+      usedCombinations.add(kombinationKey)
+
+      // Zufällig zwischen Typ 1 und Typ 2 wählen
+      const teil = Math.random() > 0.5
+        ? aufgabenBanks.leereTabelleAusfüllen(m, t, xPool, funktionsgleichung)
+        : aufgabenBanks.teilweisgefülltVervollständigen(m, t, xPool, funktionsgleichung, grad === 'einfach')
+
+      neue.push({
+        ...teil,
+        frage: `${teil.frage} Sobald deine Wertetabelle richtig ist, zeichnest du den Graphen in dein Heft.`,
+        m,
+        t,
+        funktionsgleichung,
+        funktionsgleichungLatex: `$$${funktionsgleichung}$$`,
+        rechenbeispiele: generateRechenbeispiele(m, t, xPool)
+      })
     }
     
     setAufgaben(neue)
@@ -673,15 +518,7 @@ export default function Wertetabelle() {
     setShowLösung({})
     setValidierteZellen({})
     setFehlerhafteZellen({})
-
-    // Zeichenflächen der vorherigen Runde vollständig zurücksetzen
-    plotApiRefs.current = {}
-    plotAchievedRefs.current = {}
-    plotDoneRefs.current = {}
-    setPlotAchievedCount({})
-    setPlotDone({})
-    setPlotFeedback({})
-    setPlotScored({})
+    lösungGraphRefs.current = {}
   }
 
   // Markiert fehlerhafte Zellen rot
@@ -857,7 +694,6 @@ export default function Wertetabelle() {
     const isCorrect = aufgabe.typ === 'leereTabelleAusfüllen' 
       ? validateAnswer(index, aufgabe)
       : validateType2(index, aufgabe)
-    // Bewertet wird die Wertetabelle; das anschließende Einzeichnen ist freiwillige Zusatzübung
     if (antworten[index]?.length) trackings[index]?.onCheck(isCorrect)
     setValidiert({ ...validiert, [index]: isCorrect })
   }
@@ -958,9 +794,6 @@ export default function Wertetabelle() {
       [aufgabeIndex]: currentAnswers
     })
 
-    if (validiert[aufgabeIndex]) {
-      clearPlotForIndex(aufgabeIndex)
-    }
     setValidiert({ ...validiert, [aufgabeIndex]: false })
   }
 
@@ -1157,6 +990,19 @@ export default function Wertetabelle() {
                 </div>
               )}
 
+              {/* Aufforderung: Graph ins Heft zeichnen */}
+              {validiert[index] && (
+                <div className={styles.graphBox}>
+                  <h4>✏️ Zeichne jetzt den Graphen in dein Heft:</h4>
+                  <ol className={styles.heftSchritte}>
+                    <li>Zeichne ein Koordinatensystem: x-Achse und y-Achse jeweils von {ZEICHEN_X_MIN} bis {ZEICHEN_X_MAX} (1 Einheit = 1 cm = 2 Kästchen).</li>
+                    <li>Trage die Wertepaare aus deiner Tabelle als Punkte ein.</li>
+                    <li>Verbinde die Punkte mit dem Lineal zu einer Geraden und beschrifte sie mit {aufgabe.funktionsgleichung}.</li>
+                  </ol>
+                  <p className={styles.plotHint}>Zur Kontrolle kannst du dir unter „Lösung anzeigen" den Graphen ansehen.</p>
+                </div>
+              )}
+
               {/* Lösung */}
               {showLösung[index] && (
                 <div className={styles.lösungBox}>
@@ -1209,55 +1055,38 @@ export default function Wertetabelle() {
                     </div>
                   )}
                   
-                  {aufgabe.typ === 'teilweisgefülltVervollständigen' && (
-                    <div className={styles.lösungTabelle}>
-                      <table className={styles.wertetabelle}>
-                        <tbody>
-                          <tr>
-                            <th>x</th>
-                            {aufgabe.xWerte.map((x: number, i: number) => (
-                              <td key={`sol-x-${i}`} className={!aufgabe.gebenXWert[i] ? styles.sollution : styles.xCell}>{x}</td>
-                            ))}
-                          </tr>
-                          <tr className={styles.yRow}>
-                            <th>y</th>
-                            {aufgabe.yWerte.map((y: number, i: number) => (
-                              <td key={`sol-y-${i}`} className={aufgabe.gebenXWert[i] ? styles.sollution : ''}>
-                                {y}
-                              </td>
-                            ))}
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Punkte einzeichnen: erscheint automatisch, sobald die Wertetabelle richtig ist */}
-              {validiert[index] && (
-                <div className={styles.graphBox}>
-                  <h4>Punkte einzeichnen:</h4>
-                  <p className={styles.plotHint}>
-                    Klicke im Koordinatensystem auf mindestens {PLOT_MIN_POINTS} deiner Wertepaare. Richtige Punkte werden grün markiert; sobald genug Punkte gesetzt sind, zeichnet die App automatisch die passende Gerade ein.
-                  </p>
-                  <div id={`ggb-plot-${index}`} style={{ width: `${PLOT_WIDTH}px`, height: `${PLOT_HEIGHT}px`, margin: '0 auto' }}></div>
-                  <div className={styles.plotControls}>
-                    <span className={styles.plotBadge}>
-                      {plotAchievedCount[index] || 0} / {PLOT_MIN_POINTS} Punkte gesetzt
-                    </span>
-                    <button onClick={() => resetPlot(index)} className={styles.solutionBtn}>
-                      Punkte zurücksetzen
-                    </button>
+                  <div className={styles.lösungTabelle}>
+                    {aufgabe.typ === 'leereTabelleAusfüllen' && (
+                      <p className={styles.plotHint}>Beispiel-Wertetabelle (du kannst natürlich auch andere x-Werte wählen):</p>
+                    )}
+                    <table className={styles.wertetabelle}>
+                      <tbody>
+                        <tr>
+                          <th>x</th>
+                          {aufgabe.xWerte.map((x: number, i: number) => (
+                            <td key={`sol-x-${i}`} className={aufgabe.gebenXWert && !aufgabe.gebenXWert[i] ? styles.sollution : styles.xCell}>{x}</td>
+                          ))}
+                        </tr>
+                        <tr className={styles.yRow}>
+                          <th>y</th>
+                          {aufgabe.yWerte.map((y: number, i: number) => (
+                            <td key={`sol-y-${i}`} className={!aufgabe.gebenXWert || aufgabe.gebenXWert[i] ? styles.sollution : ''}>
+                              {y}
+                            </td>
+                          ))}
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                  {plotFeedback[index] && (
-                    <p className={styles.plotFeedbackError}>{plotFeedback[index]}</p>
-                  )}
-                  {plotDone[index] && (
-                    <p className={styles.plotSuccess}>
-                      Super! Die Gerade {aufgabe.funktionsgleichung} wurde eingezeichnet.
+
+                  {/* Funktionsgraph zur Kontrolle der Zeichnung im Heft */}
+                  <div className={styles.graphBox}>
+                    <h4>Graph der Funktion {aufgabe.funktionsgleichung}:</h4>
+                    <p className={styles.plotHint}>
+                      Die roten Punkte sind die Wertepaare aus der Tabelle. Vergleiche mit deiner Zeichnung im Heft.
                     </p>
-                  )}
+                    <div id={`ggb-loesung-${index}`} style={{ width: `${GRAPH_WIDTH}px`, maxWidth: '100%', height: `${GRAPH_HEIGHT}px`, margin: '0 auto' }}></div>
+                  </div>
                 </div>
               )}
             </div>
