@@ -23,6 +23,10 @@
   .bk-header-row { gap: 8px; padding: 8px 12px; }
 }
 
+/* Hinweisband: neue Version verfügbar (src/hooks/useAppUpdate.ts) */
+.bk-update { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 8px 16px; background: var(--highlight); color: var(--on-highlight); border-bottom: 2px solid var(--edge); font: 700 15px/1.2 var(--font-body); }
+.bk-update i { margin-right: 6px; }
+
 /* ── Seiten ─────────────────────────────────────────────────────────────── */
 .bk-page { max-width: 1440px; margin: 0 auto; padding: 20px 16px 0; }
 @media (min-width: 900px) { .bk-page { padding: 24px 32px 0; } }
