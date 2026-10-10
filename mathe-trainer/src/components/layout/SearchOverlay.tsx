@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { allExercises } from '../../data/areas'
+import AreaIcon from './AreaIcon'
 
 const norm = (s: string) =>
   s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ß/g, 'ss')
@@ -83,7 +84,7 @@ export default function SearchOverlay({ open, onClose }: Props) {
               onMouseEnter={() => setActive(i)}
               onClick={() => go(r.path)}
             >
-              <span className="bk-glyph bk-glyph-sm" style={{ ['--area' as string]: `var(--area-${r.area.id})` }}>{r.area.glyph}</span>
+              <span className="bk-glyph bk-glyph-sm" style={{ ['--area' as string]: `var(--area-${r.area.id})` }}><AreaIcon id={r.area.id} height={20} /></span>
               <span className="bk-search-text">
                 <strong>{r.title}</strong>
                 <small>{r.area.title} · {r.section}</small>

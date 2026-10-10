@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { areaById, exerciseCount, type AreaId } from '../data/areas'
+import AreaIcon from '../components/layout/AreaIcon'
 
 // Bereichsseite im Baukasten-Design: Kopf in der Bereichsfarbe, Übungen als Nummern-Kacheln,
 // gruppiert in Abschnitte (z. B. Grundlagen / Anwenden / Testen). Reihenfolge wie bisher.
@@ -19,7 +20,7 @@ export default function AreaPage({ id }: { id: AreaId }) {
           <p>{area.short}</p>
           <p className="bk-area-meta">{count} {area.unit} · empfohlene Reihenfolge · jede frei wählbar</p>
         </div>
-        <span className="bk-area-glyph" aria-hidden="true">{area.glyph}</span>
+        <span className="bk-area-glyph" aria-hidden="true"><AreaIcon id={area.id} height={72} /></span>
       </section>
 
       {area.sections.map((section) => (
