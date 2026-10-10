@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import TaskShell from '../../components/layout/TaskShell'
 
 type Method = 'einsetzen' | 'gleichsetzen' | 'addieren';
 
@@ -375,11 +376,10 @@ const Gleichungssysteme: React.FC = () => {
     };
 
     return (
-        <div className="mx-auto px-4 py-8 max-w-6xl">
-            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
-                <div className="text-center">
-                    <h1 className="text-3xl font-bold text-teal-800 mb-4">Lineare Gleichungssysteme</h1>
-                    <p className="text-gray-700 max-w-2xl mx-auto">
+        <TaskShell title="Lineare Gleichungssysteme" width="narrow">
+            <div className="bk-panel space-y-6">
+                <div>
+                    <p className="text-ink text-left" style={{ maxWidth: '68ch' }}>
                         Übe die drei rechnerischen Lösungsverfahren für lineare Gleichungssysteme mit zwei
                         Unbekannten – Einsetzungs-, Gleichsetzungs- und Additionsverfahren. Die Aufgaben wechseln
                         zufällig zwischen einer leichteren Variante (Gleichung(en) bereits nach einer Variablen
@@ -392,28 +392,24 @@ const Gleichungssysteme: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="flex flex-wrap gap-2 justify-center">
+                <div className="bk-seg">
                     {(Object.keys(METHOD_LABEL) as Method[]).map(m => (
                         <button
                             key={m}
                             onClick={() => chooseMethod(m)}
-                            className={`px-4 py-2 rounded-lg font-medium border transition-colors ${
-                                method === m
-                                    ? 'bg-teal-600 text-white border-teal-600'
-                                    : 'bg-white text-gray-800 border-gray-300 hover:border-teal-400'
-                            }`}
+                            className={`bk-seg-btn ${method === m ? 'bk-seg-btn-on' : ''}`}
                         >
                             {METHOD_LABEL[m]}
                         </button>
                     ))}
                 </div>
 
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                <div className="bg-sunken rounded-2xl p-5">
                     <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                        <h2 className="text-xl font-semibold text-gray-800">{task ? METHOD_LABEL[task.method] : ''}</h2>
+                        <h2 className="text-xl font-extrabold text-ink">{task ? METHOD_LABEL[task.method] : ''}</h2>
                         <button
                             onClick={() => generateTask(method)}
-                            className="px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700"
+                            className="bk-btn"
                         >
                             Neue Aufgabe
                         </button>
@@ -421,77 +417,77 @@ const Gleichungssysteme: React.FC = () => {
 
                     {task && (
                         <div className="space-y-4">
-                            <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-1 font-mono text-gray-800 text-sm sm:text-base">
+                            <div className="bg-white border-2 border-edge rounded-xl p-4 space-y-1 font-display font-bold text-ink text-lg sm:text-xl">
                                 {task.systemLines.map((line, idx) => (
                                     <p key={`sys-${idx}`}>{line}</p>
                                 ))}
                             </div>
 
-                            <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-                                <p className="font-medium text-gray-800">{task.question}</p>
+                            <div className="bk-taskbox">
+                                <p className="font-medium text-ink">{task.question}</p>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                 <div className="flex items-center gap-2">
-                                    <label className="font-semibold text-gray-700">{task.xLabel} =</label>
+                                    <label className="font-display font-bold text-2xl text-ink">{task.xLabel} =</label>
                                     <input
                                         type="text"
                                         value={xInput}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setXInput(e.target.value)}
-                                        className="w-24 border border-gray-300 rounded-lg px-3 py-2 text-center"
+                                        className="bk-input w-28 text-center"
                                     />
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <label className="font-semibold text-gray-700">{task.yLabel} =</label>
+                                    <label className="font-display font-bold text-2xl text-ink">{task.yLabel} =</label>
                                     <input
                                         type="text"
                                         value={yInput}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setYInput(e.target.value)}
-                                        className="w-24 border border-gray-300 rounded-lg px-3 py-2 text-center"
+                                        className="bk-input w-28 text-center"
                                     />
                                 </div>
                             </div>
 
                             {feedback === 'info' && (
-                                <p className="text-yellow-700 bg-yellow-100 border border-yellow-200 rounded-lg p-3 text-sm text-center max-w-md mx-auto">
+                                <p className="bk-feedback bk-feedback-info">
                                     Bitte gib für beide Größen eine Zahl ein.
                                 </p>
                             )}
                             {feedback === 'correct' && (
-                                <p className="text-green-700 bg-green-100 border border-green-200 rounded-lg p-3 text-sm text-center max-w-md mx-auto">
+                                <p className="bk-feedback bk-feedback-ok">
                                     Perfekt! Deine Lösung stimmt.
                                 </p>
                             )}
                             {feedback === 'incorrect' && (
-                                <p className="text-red-700 bg-red-100 border border-red-200 rounded-lg p-3 text-sm text-center max-w-md mx-auto">
+                                <p className="bk-feedback bk-feedback-no">
                                     Das passt noch nicht. Schau dir den Lösungsweg an.
                                 </p>
                             )}
 
-                            <div className="flex gap-4 flex-wrap justify-center items-center">
+                            <div className="bk-actions">
                                 <button
                                     onClick={checkAnswer}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+                                    className="bk-btn bk-btn-primary"
                                 >
                                     Prüfen
                                 </button>
                                 <button
                                     onClick={() => setShowSolution(prev => !prev)}
-                                    className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600"
+                                    className="bk-btn"
                                 >
                                     {showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
                                 </button>
                             </div>
 
                             {showSolution && (
-                                <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
-                                    <h3 className="font-semibold text-gray-800">Lösungsweg</h3>
-                                    <ul className="list-decimal pl-5 text-gray-700 space-y-2 text-sm">
+                                <div className="bk-solution space-y-3">
+                                    <h3 className="bk-solution-title">Lösungsweg</h3>
+                                    <ul className="list-decimal pl-5 text-ink space-y-2">
                                         {task.steps.map((step, index) => (
                                             <li key={`lgs-step-${index}`}>{step.text}</li>
                                         ))}
                                     </ul>
-                                    <div className="font-bold text-gray-900">
+                                    <div className="bk-answer">
                                         Ergebnis: {task.xLabel} = {task.x}, {task.yLabel} = {task.y}
                                     </div>
                                 </div>
@@ -500,14 +496,14 @@ const Gleichungssysteme: React.FC = () => {
                     )}
                 </div>
 
-                <div className="flex justify-center">
-                    <Link to="/lineare_funktionen" className="text-[var(--accent)] hover:underline text-sm sm:text-base">
-                        <i className="fa-solid fa-arrow-left mr-2"></i>
+                <div>
+                    <Link to="/lineare_funktionen" className="bk-btn bk-btn-ghost">
+                        <i className="fa-solid fa-arrow-left" aria-hidden="true"></i>
                         Zurück zur Übersicht
                     </Link>
                 </div>
             </div>
-        </div>
+        </TaskShell>
     );
 };
 

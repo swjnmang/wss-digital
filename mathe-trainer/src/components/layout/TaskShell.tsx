@@ -21,7 +21,7 @@ export default function TaskShell({ title, subtitle, actions, children, width = 
   const style = { ['--area' as string]: area ? `var(--area-${area.id})` : 'var(--surface)' } as CSSProperties
 
   return (
-    <div className="bk-page">
+    <div className={`bk-page bk-task bk-w-${width}`}>
       <header className="bk-task-head" style={style}>
         <div className="bk-task-titles">
           {area && (
@@ -38,7 +38,7 @@ export default function TaskShell({ title, subtitle, actions, children, width = 
         </div>
         {actions && <div className="bk-task-actions">{actions}</div>}
       </header>
-      <div className={`bk-task-body bk-w-${width}`}>{children}</div>
+      <div className="bk-task-body">{children}</div>
     </div>
   )
 }

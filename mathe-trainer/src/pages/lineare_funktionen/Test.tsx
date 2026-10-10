@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import styles from './LFCommon.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
+import TaskShell from '../../components/layout/TaskShell'
 
 type QuestionType = 'slope' | 'missing_coord' | 'equation_ps' | 'equation_2p' | 'zero' | 'intersection' | 'graph'
 type AnswerFormat = 'single_number' | 'point' | 'equation'
@@ -224,26 +224,26 @@ export default function Test() {
   // Render
   if (!started) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-sky-100 py-8 px-2">
-        <div className="w-full max-w-2xl bg-white/90 rounded-2xl shadow-md border border-slate-200 p-8 flex flex-col items-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-blue-900">Digitale Prüfung: Lineare Funktionen</h2>
-          <p className="mb-1 text-blue-800">Dieser Test besteht aus 15 zufälligen Aufgaben zu allen wichtigen Themen der linearen Funktionen.</p>
-          <p className="mb-2 text-gray-700"><b>Wichtiger Hinweis:</b> Halte bitte Stift und Papier bereit, um alle Berechnungen schriftlich festzuhalten.</p>
+      <TaskShell title="Abschlusstest" width="narrow">
+        <div className="bk-panel flex flex-col items-start">
+          <h2 className="text-2xl md:text-3xl font-extrabold mb-2 text-ink text-left">Digitale Prüfung: Lineare Funktionen</h2>
+          <p className="mb-1 text-ink text-left">Dieser Test besteht aus 15 zufälligen Aufgaben zu allen wichtigen Themen der linearen Funktionen.</p>
+          <p className="mb-2 text-muted text-left"><b>Wichtiger Hinweis:</b> Halte bitte Stift und Papier bereit, um alle Berechnungen schriftlich festzuhalten.</p>
           <div className="mt-4">
-            <label className="text-gray-700"><input type="checkbox" checked={confirmed} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmed(e.target.checked)} className="mr-2" /> Ich habe die Information gelesen.</label>
+            <label className="flex items-center gap-3 min-h-[44px] text-ink font-semibold"><input type="checkbox" checked={confirmed} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmed(e.target.checked)} className="w-6 h-6 accent-black" /> Ich habe die Information gelesen.</label>
           </div>
-          <button className="generator-button mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors disabled:opacity-50" onClick={startTest} disabled={!confirmed}>Test starten</button>
+          <button className="bk-btn bk-btn-primary" onClick={startTest} disabled={!confirmed}>Test starten</button>
         </div>
-      </div>
+</TaskShell>
     )
   }
 
   if (showResult) {
     const correctCount = questions.filter((q, i) => isCorrect(q, userAnswers[i])).length
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-sky-100 py-8 px-2">
-        <div className="w-full max-w-2xl bg-white/90 rounded-2xl shadow-md border border-slate-200 p-8 flex flex-col items-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-blue-900">Dein Ergebnis</h2>
+      <TaskShell title="Abschlusstest" width="narrow">
+        <div className="bk-panel flex flex-col items-start">
+          <h2 className="text-2xl md:text-3xl font-extrabold mb-2 text-ink text-left">Dein Ergebnis</h2>
           <div className="score text-3xl font-bold my-2">{correctCount} / {TOTAL_QUESTIONS}</div>
           <div className="grade text-xl mb-2">Note: {getGrade(correctCount)}</div>
           <div className="feedback mb-4">{correctCount >= 12 ? 'Sehr gut! Du beherrschst die linearen Funktionen.' : correctCount >= 8 ? 'Du hast die Grundlagen verstanden, aber übe noch etwas.' : 'Bitte wiederhole die Themen noch einmal.'}</div>
@@ -253,29 +253,29 @@ export default function Test() {
             {questions.map((q, i) => (
               <div key={i} className="result-item border-b pb-3 mb-3">
                 <div className="result-question font-bold">{q.text}</div>
-                <div className={isCorrect(q, userAnswers[i]) ? 'user-answer correct' : 'user-answer incorrect'}>
+                <div className={isCorrect(q, userAnswers[i]) ? 'user-answer correct text-green-600 font-semibold' : 'user-answer incorrect text-red-600 font-semibold'}>
                   Deine Antwort: {q.answerFormat === 'single_number' ? userAnswers[i]?.val : q.answerFormat === 'point' ? (userAnswers[i]?.isNone ? 'Kein Schnittpunkt' : `S(${userAnswers[i]?.x}|${userAnswers[i]?.y})`) : q.answerFormat === 'equation' ? `y = ${userAnswers[i]?.m}x + ${userAnswers[i]?.t}` : ''}
                 </div>
                 {!isCorrect(q, userAnswers[i]) && (
-                  <div className="correct-answer">Richtig: {q.answerFormat === 'single_number' ? q.answer.val : q.answerFormat === 'point' ? (q.answer === 'none' ? 'Kein Schnittpunkt' : `S(${q.answer.x}|${q.answer.y})`) : q.answerFormat === 'equation' ? `y = ${q.answer.m}x + ${q.answer.t}` : ''}</div>
+                  <div className="correct-answer text-muted">Richtig: {q.answerFormat === 'single_number' ? q.answer.val : q.answerFormat === 'point' ? (q.answer === 'none' ? 'Kein Schnittpunkt' : `S(${q.answer.x}|${q.answer.y})`) : q.answerFormat === 'equation' ? `y = ${q.answer.m}x + ${q.answer.t}` : ''}</div>
                 )}
               </div>
             ))}
           </div>
-          <button className="generator-button mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors" onClick={restart}>Neuen Test starten</button>
+          <button className="bk-btn bk-btn-primary" onClick={restart}>Neuen Test starten</button>
         </div>
-      </div>
+</TaskShell>
     )
   }
 
   // Schutz: erst rendern, wenn q existiert
   if (!q) {
     return (
-      <div className={`prose ${styles.container}`}>
-        <div className={styles.card}>
+      <TaskShell title="Abschlusstest" width="narrow">
+        <div className="bk-panel">
           <div>Lade Aufgaben ...</div>
         </div>
-      </div>
+</TaskShell>
     )
   }
 
@@ -307,11 +307,11 @@ export default function Test() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-sky-100 py-8 px-2">
-      <div className="w-full max-w-2xl bg-white/90 rounded-2xl shadow-md border border-slate-200 p-8 flex flex-col items-center">
-        <h2 className="text-2xl md:text-3xl font-bold mb-2 text-blue-900">Aufgabe {current + 1}</h2>
-        <div className="w-full bg-gray-200 rounded mb-4"><div className="bg-blue-600 h-2 rounded" style={{ width: `${((current + 1) / TOTAL_QUESTIONS) * 100}%` }} /></div>
-        <div className="bg-gray-100 border rounded-md p-6 mb-4 text-center min-h-[80px] w-full">
+    <TaskShell title="Abschlusstest" width="narrow">
+      <div className="bk-panel flex flex-col items-start">
+        <h2 className="text-2xl md:text-3xl font-extrabold mb-2 text-ink text-left">Aufgabe {current + 1}</h2>
+        <div className="w-full bg-white border-2 border-edge rounded-full mb-4 h-3 overflow-hidden"><div className="bg-primary h-full" style={{ width: `${((current + 1) / TOTAL_QUESTIONS) * 100}%` }} /></div>
+        <div className="bk-taskbox mb-4 min-h-[80px] w-full">
           <div>{q.text}</div>
           {/* GeoGebra-Graph für graph-Fragen */}
           {q.type === 'graph' && q.data?.m !== undefined && q.data?.t !== undefined && (
@@ -319,42 +319,42 @@ export default function Test() {
               <GeoGebraGraph m={q.data.m} t={q.data.t} width={400} height={300} />
             </div>
           )}
-          {q.data.point && <div className="task-data text-lg font-bold text-sky-800 mt-2" dangerouslySetInnerHTML={{__html: q.data.point}} />}
-          {q.data.g1 && <div className="task-data text-lg font-bold text-sky-800 mt-2" dangerouslySetInnerHTML={{__html: q.data.g1}} />}
-          {q.data.g2 && <div className="task-data text-lg font-bold text-sky-800 mt-2" dangerouslySetInnerHTML={{__html: q.data.g2}} />}
+          {q.data.point && <div className="task-data text-xl font-bold text-ink mt-2" dangerouslySetInnerHTML={{__html: q.data.point}} />}
+          {q.data.g1 && <div className="task-data text-xl font-bold text-ink mt-2" dangerouslySetInnerHTML={{__html: q.data.g1}} />}
+          {q.data.g2 && <div className="task-data text-xl font-bold text-ink mt-2" dangerouslySetInnerHTML={{__html: q.data.g2}} />}
         </div>
         {/* Input masks */}
         {q.answerFormat === 'single_number' && (
-          <div className="flex justify-center items-center gap-2 mb-4">
+          <div className="flex items-center gap-3 mb-4 text-2xl font-display font-bold">
             <span>{q.inputPrefix}</span>
-            <input type="text" className="border rounded px-3 py-2 text-lg w-24 text-center" value={inputState[current]?.singleVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('singleVal', e.target.value)} placeholder="Ergebnis" />
+            <input type="text" className="bk-input  text-center" value={inputState[current]?.singleVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('singleVal', e.target.value)} placeholder="Ergebnis" />
           </div>
         )}
         {q.answerFormat === 'point' && (
-          <div className="flex flex-col items-center mb-4">
-            <div className="flex items-center gap-2 text-xl font-mono mb-2">
+          <div className="flex flex-col items-start mb-4">
+            <div className="flex items-center gap-2 text-2xl font-display font-bold mb-3">
               <span>S(</span>
-              <input type="text" className="border rounded px-3 py-2 text-lg w-20 text-center" value={inputState[current]?.xVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('xVal', e.target.value)} placeholder="x" disabled={inputState[current]?.isNone} />
+              <input type="text" className="bk-input  text-center" value={inputState[current]?.xVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('xVal', e.target.value)} placeholder="x" disabled={inputState[current]?.isNone} />
               <span>|</span>
-              <input type="text" className="border rounded px-3 py-2 text-lg w-20 text-center" value={inputState[current]?.yVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('yVal', e.target.value)} placeholder="y" disabled={inputState[current]?.isNone} />
+              <input type="text" className="bk-input  text-center" value={inputState[current]?.yVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('yVal', e.target.value)} placeholder="y" disabled={inputState[current]?.isNone} />
               <span>)</span>
             </div>
-            <div className="flex items-center gap-2 mt-1">
-              <input type="checkbox" id="no-intersection-checkbox" checked={!!inputState[current]?.isNone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('isNone', e.target.checked)} />
+            <div className="flex items-center gap-3 mt-1 min-h-[44px]">
+              <input type="checkbox" className="w-6 h-6 accent-black" id="no-intersection-checkbox" checked={!!inputState[current]?.isNone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('isNone', e.target.checked)} />
               <label htmlFor="no-intersection-checkbox">Kein Schnittpunkt</label>
             </div>
           </div>
         )}
         {q.answerFormat === 'equation' && (
-          <div className="flex justify-center items-center gap-2 mb-4">
+          <div className="flex items-center gap-3 mb-4 text-2xl font-display font-bold">
             <span>y =</span>
-            <input type="text" className="border rounded px-3 py-2 text-lg w-16 text-center" value={inputState[current]?.mVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('mVal', e.target.value)} placeholder="m" />
+            <input type="text" className="bk-input  text-center" value={inputState[current]?.mVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('mVal', e.target.value)} placeholder="m" />
             <span>x +</span>
-            <input type="text" className="border rounded px-3 py-2 text-lg w-16 text-center" value={inputState[current]?.tVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('tVal', e.target.value)} placeholder="t" />
+            <input type="text" className="bk-input  text-center" value={inputState[current]?.tVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('tVal', e.target.value)} placeholder="t" />
           </div>
         )}
-        <button className="generator-button mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors" onClick={handleNext}>Nächste Frage</button>
+        <button className="bk-btn bk-btn-primary" onClick={handleNext}>Nächste Frage</button>
       </div>
-    </div>
+    </TaskShell>
   )
 }

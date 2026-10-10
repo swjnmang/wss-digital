@@ -4,6 +4,7 @@ import { InlineMath } from 'react-katex'
 import 'katex/dist/katex.min.css'
 import styles from './LFCommon.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
+import TaskShell from '../../components/layout/TaskShell'
 
 export default function Zeichnen(){
   const [difficulty, setDifficulty] = useState<'easy'|'medium'|'hard'>('easy')
@@ -136,49 +137,49 @@ export default function Zeichnen(){
   }
 
   return (
-    <div className={`prose ${styles.container}`}>
+    <TaskShell title="Lineare Funktionen zeichnen" width="wide">
       <div className={styles.card}>
-        <h2 className={styles.title}>Lineare Funktionen zeichnen</h2>
 
         <div className={styles.content}>
-          <div id="difficulty-selector" className="flex justify-center gap-3 mb-4">
+          <div id="difficulty-selector" className="bk-seg mb-4">
             <button
-              className={`px-4 py-2 rounded-md border ${difficulty === 'easy' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
+              className={`bk-seg-btn ${difficulty === 'easy' ? 'bk-seg-btn-on' : ''}`}
               onClick={() => setDifficulty('easy')}
             >Leicht</button>
             <button
-              className={`px-4 py-2 rounded-md border ${difficulty === 'medium' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
+              className={`bk-seg-btn ${difficulty === 'medium' ? 'bk-seg-btn-on' : ''}`}
               onClick={() => setDifficulty('medium')}
             >Mittel</button>
             <button
-              className={`px-4 py-2 rounded-md border ${difficulty === 'hard' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
+              className={`bk-seg-btn ${difficulty === 'hard' ? 'bk-seg-btn-on' : ''}`}
               onClick={() => setDifficulty('hard')}
             >Schwer</button>
           </div>
 
-          <div id="task-output" className="bg-gray-100 border rounded-md p-6 mb-4 text-center">
+          <div id="task-output" className="bk-taskbox mb-4">
             <div id="task-text">Zeichne den Graphen der folgenden Funktion in ein Koordinatensystem.</div>
-            <div id="task-equation" className="text-2xl font-bold text-sky-800 mt-2">
+            <div id="task-equation" className="text-3xl font-bold text-ink mt-2">
               <InlineMath math={equationLatex} />
             </div>
             <div id="drawing-range-hint" className="text-sm text-gray-600 mt-3">{rangeHint}</div>
           </div>
 
-          <div className="flex justify-center gap-4 flex-wrap">
-            <button className="generator-button bg-gradient-to-br from-sky-600 to-sky-700 text-white rounded-md px-5 py-3 shadow" onClick={() => generateNewTask(difficulty)}>Neue Aufgabe</button>
-            <button className="generator-button bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-md px-5 py-3 shadow" onClick={() => setShowTipps(true)}>Tipps</button>
-            <button className="generator-button bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-md px-5 py-3 shadow" onClick={openGeoGebra}>Lösungskontrolle anzeigen</button>
+          <div className="bk-actions">
+            <button className="bk-btn" onClick={() => generateNewTask(difficulty)}>Neue Aufgabe</button>
+            <button className="bk-btn" onClick={() => setShowTipps(true)}>Tipps</button>
+            <button className="bk-btn bk-btn-primary" onClick={openGeoGebra}>Lösungskontrolle anzeigen</button>
           </div>
 
           {showSolution && (
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="bk-solution">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-blue-600">Lösungsgraph</h3>
+                <h3 className="bk-solution-title" style={{ margin: 0 }}>Lösungsgraph</h3>
                 <button
                   onClick={() => setShowSolution(false)}
-                  className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                  className="bk-icon-btn"
+                  aria-label="Lösungsgraph schließen"
                 >
-                  ✕
+                  <i className="fa-solid fa-xmark" aria-hidden="true" />
                 </button>
               </div>
               <GeoGebraGraph 
@@ -193,23 +194,24 @@ export default function Zeichnen(){
       </div>
 
       {showTipps && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-              <h3 className="text-2xl font-bold text-blue-600">Tipps zum Zeichnen von Funktionsgraphen</h3>
+        <div className="bk-modal-backdrop">
+          <div className="bk-modal" style={{ padding: 0, maxWidth: 720 }}>
+            <div className="sticky top-0 bg-white border-b-2 border-edge p-5 flex items-center justify-between gap-4">
+              <h3 className="text-2xl font-extrabold text-ink text-left">Tipps zum Zeichnen von Funktionsgraphen</h3>
               <button
                 onClick={() => setShowTipps(false)}
-                className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+                className="bk-icon-btn"
+                aria-label="Tipps schließen"
               >
-                ✕
+                <i className="fa-solid fa-xmark" aria-hidden="true" />
               </button>
             </div>
             
             <div className="p-6 space-y-6">
               <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">1. Wertetabelle erstellen</h4>
+                <h4 className="font-extrabold text-lg text-ink mb-2 text-left">1. Wertetabelle erstellen</h4>
                 <p className="text-gray-700 mb-3">Erstelle eine Wertetabelle, indem du mehrere x-Werte in die Funktionsgleichung einsetzt und die entsprechenden y-Werte berechnest.</p>
-                <div className="bg-blue-50 border-l-4 border-blue-600 p-3 text-sm text-gray-700">
+                <div className="bk-taskbox text-sm">
                   <strong>Beispiel:</strong> Für <InlineMath math="y = 2x - 1" /><br/>
                   <InlineMath math="x = -1 \Rightarrow y = 2(-1) - 1 = -3" /><br/>
                   <InlineMath math="x = 0 \Rightarrow y = 2(0) - 1 = -1" /><br/>
@@ -219,13 +221,13 @@ export default function Zeichnen(){
               </div>
 
               <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">2. Zwei wichtige Punkte berechnen</h4>
+                <h4 className="font-extrabold text-lg text-ink mb-2 text-left">2. Zwei wichtige Punkte berechnen</h4>
                 <p className="text-gray-700 mb-3">Du brauchst mindestens zwei Punkte, um eine Gerade zu zeichnen. Besonders einfach sind:</p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2">
                   <li><strong>Y-Achsenabschnitt:</strong> Setze <InlineMath math="x = 0" /> ein. Der y-Wert ist direkt der konstante Term in der Gleichung.</li>
                   <li><strong>X-Achsenabschnitt (Nullstelle):</strong> Setze <InlineMath math="y = 0" /> und löse nach <InlineMath math="x" /> auf.</li>
                 </ul>
-                <div className="bg-blue-50 border-l-4 border-blue-600 p-3 text-sm text-gray-700 mt-3">
+                <div className="bk-taskbox text-sm mt-3">
                   <strong>Beispiel:</strong> Für <InlineMath math="y = 2x - 1" /><br/>
                   Y-Achsenabschnitt: <InlineMath math="x = 0 \Rightarrow y = -1" />, also Punkt <InlineMath math="(0 \mid -1)" /><br/>
                   X-Achsenabschnitt: <InlineMath math="0 = 2x - 1 \Rightarrow x = 0{,}5" />, also Punkt <InlineMath math="(0{,}5 \mid 0)" />
@@ -233,7 +235,7 @@ export default function Zeichnen(){
               </div>
 
               <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">3. Steigung ablesen und nutzen</h4>
+                <h4 className="font-extrabold text-lg text-ink mb-2 text-left">3. Steigung ablesen und nutzen</h4>
                 <p className="text-gray-700 mb-3">Die Steigung <InlineMath math="m" /> zeigt dir, wie steil die Gerade ist. Wenn du einen Punkt hast, kannst du von dort aus die Steigung nutzen, um weitere Punkte zu finden:</p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2">
                   <li>Positive Steigung: Gerade verläuft von links unten nach rechts oben</li>
@@ -243,25 +245,25 @@ export default function Zeichnen(){
               </div>
 
               <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">4. Punkte ins Koordinatensystem eintragen</h4>
+                <h4 className="font-extrabold text-lg text-ink mb-2 text-left">4. Punkte ins Koordinatensystem eintragen</h4>
                 <p className="text-gray-700 mb-3">Trage die berechneten Punkte genau ins Koordinatensystem ein. Markiere sie deutlich als kleine Kreuze oder Punkte.</p>
               </div>
 
               <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">5. Gerade zeichnen</h4>
+                <h4 className="font-extrabold text-lg text-ink mb-2 text-left">5. Gerade zeichnen</h4>
                 <p className="text-gray-700 mb-3">Verbinde die Punkte mit einem Lineal zu einer geraden Linie. Verlängere die Linie über die markierten Punkte hinaus, um zu zeigen, dass sie sich unendlich fortsetzt.</p>
               </div>
 
-              <div className="bg-green-50 border-l-4 border-green-600 p-4">
-                <h4 className="font-bold text-green-700 mb-2">💡 Profi-Tipp:</h4>
+              <div className="bk-feedback bk-feedback-info" style={{ display: 'block' }}>
+                <h4 className="font-extrabold text-ink mb-2 text-left"><i className="fa-solid fa-lightbulb" aria-hidden="true" /> Profi-Tipp:</h4>
                 <p className="text-gray-700">Verwende mindestens 3-4 Punkte, um sicherzugehen, dass deine Gerade korrekt ist. Wenn alle Punkte auf einer Linie liegen, hast du alles richtig gemacht!</p>
               </div>
             </div>
 
-            <div className="bg-gray-100 border-t border-gray-200 p-4 flex justify-end">
+            <div className="bg-sunken border-t-2 border-edge p-4 flex justify-end">
               <button
                 onClick={() => setShowTipps(false)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
+                className="bk-btn bk-btn-primary"
               >
                 Schließen
               </button>
@@ -269,6 +271,6 @@ export default function Zeichnen(){
           </div>
         </div>
       )}
-    </div>
+    </TaskShell>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import styles from './LFCommon.module.css'
+import TaskShell from '../../components/layout/TaskShell'
 
 type Difficulty = 'normal' | 'medium' | 'hard'
 type Ramp = { m: number, b: number } | null
@@ -260,46 +261,44 @@ export default function SpielMuenzen() {
 
   // Difficulty button helpers
   function difficultyBtnClass(level: Difficulty) {
-    return `difficulty-btn px-4 py-2 rounded font-bold text-sm ${difficulty === level ? 'bg-blue-700 text-white' : 'bg-neutral-300 text-neutral-800'}`
+    return `bk-seg-btn ${difficulty === level ? 'bk-seg-btn-on' : ''}`
   }
 
   // Number of ramps by difficulty
   const numRamps = difficulty === 'hard' ? 4 : difficulty === 'medium' ? 3 : 2
 
   return (
-    <div className={`prose ${styles.container}`}> 
+    <TaskShell title="Münzen-Sammler" subtitle="Baue Rampen, um die Münzen um die Hindernisse in den Eimer zu leiten!" width="wide">
       <div className={styles.card}>
-        <h2 className={styles.title}>Münzen-Sammler</h2>
         <div className={styles.content}>
-          <p className="text-neutral-500 mb-2">Baue Rampen, um die Münzen um die Hindernisse in den Eimer zu leiten!</p>
-          <div className="flex flex-col sm:flex-row justify-between items-center bg-neutral-100 p-3 rounded-lg mb-4 text-xl gap-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-center bk-taskbox mb-4 text-xl gap-4">
             <div>
-              <span className="font-bold text-neutral-600">Punkte:</span>
-              <span className="font-bold text-amber-500 ml-2">{score}</span>
+              <span className="font-bold text-muted">Punkte:</span>
+              <span className="bk-streak ml-2">{score}</span>
             </div>
-            <div className="flex gap-2">
+            <div className="bk-seg">
               <button className={difficultyBtnClass('normal')} onClick={() => setDifficulty('normal')}>Normal</button>
               <button className={difficultyBtnClass('medium')} onClick={() => setDifficulty('medium')}>Mittel</button>
               <button className={difficultyBtnClass('hard')} onClick={() => setDifficulty('hard')}>Schwer</button>
             </div>
           </div>
           <div ref={containerRef} className="relative w-full" style={{ paddingBottom: '75%' }}>
-            <canvas ref={canvasRef} width={canvasDims.width} height={canvasDims.height} className="absolute top-0 left-0 w-full h-full rounded-lg" />
+            <canvas ref={canvasRef} width={canvasDims.width} height={canvasDims.height} className="absolute top-0 left-0 w-full h-full rounded-2xl border-2 border-edge" />
           </div>
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-neutral-100 rounded-lg">
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             {Array.from({ length: numRamps }).map((_, i) => (
-              <div key={i} className="ramp-control p-3 rounded-lg border-2" style={{ borderColor: RAMP_COLORS[i] }}>
+              <div key={i} className="ramp-control p-4 rounded-2xl border-2 bg-white" style={{ borderColor: RAMP_COLORS[i] }}>
                 <h3 className="font-bold text-lg mb-2" style={{ color: RAMP_COLORS[i] }}>Rampe {i + 1}</h3>
                 <div className="flex items-center gap-2 justify-center mb-3">
-                  <span className="input-label">y=</span>
-                  <input type="number" className="input-field" step="0.1" value={inputVals[i].m} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleRampInput(i, 'm', e.target.value)} />
-                  <span className="input-label">x+</span>
-                  <input type="number" className="input-field" step="0.5" value={inputVals[i].b} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleRampInput(i, 'b', e.target.value)} />
+                  <span className="input-label font-display font-bold text-xl">y =</span>
+                  <input type="number" className="input-field bk-input w-24 text-center" step="0.1" value={inputVals[i].m} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleRampInput(i, 'm', e.target.value)} />
+                  <span className="input-label font-display font-bold text-xl">x +</span>
+                  <input type="number" className="input-field bk-input w-24 text-center" step="0.5" value={inputVals[i].b} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleRampInput(i, 'b', e.target.value)} />
                 </div>
                 <div className="flex gap-2 justify-center">
-                  <button className="build-button bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded text-md w-full" onClick={() => buildRamp(i)}>{ramps[i] ? 'Ändern' : 'Bauen'}</button>
+                  <button className="build-button bk-btn bk-btn-primary w-full" onClick={() => buildRamp(i)}>{ramps[i] ? 'Ändern' : 'Bauen'}</button>
                   {ramps[i] && (
-                    <button className="clear-button bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 px-4 rounded text-md w-full" onClick={() => clearRamp(i)}>Löschen</button>
+                    <button className="clear-button bk-btn w-full" onClick={() => clearRamp(i)}>Löschen</button>
                   )}
                 </div>
               </div>
@@ -307,6 +306,6 @@ export default function SpielMuenzen() {
           </div>
         </div>
       </div>
-    </div>
+    </TaskShell>
   )
 }

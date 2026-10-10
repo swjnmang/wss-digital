@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './Wertetabelle.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
+import TaskShell from '../../components/layout/TaskShell'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -287,9 +288,6 @@ export default function Wertetabelle() {
 
   // MathJax laden
   useEffect(() => {
-    const script = document.createElement('script')
-    script.src = 'https://polyfill.io/v3/polyfill.min.js?features=es6'
-    document.head.appendChild(script)
 
     const mathjaxScript = document.createElement('script')
     mathjaxScript.id = 'MathJax-script'
@@ -658,18 +656,12 @@ export default function Wertetabelle() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Wertetabellen</h1>
-          <p className={styles.subtitle}>Erstelle oder vervollständige Wertetabellen für lineare Funktionen</p>
-        </div>
-        <div className={styles.scoreBox}>
-          <div className={styles.score}>
-            ⭐ {punkte} <span className={styles.scoreLabel}>Punkte</span>
-          </div>
-        </div>
-      </div>
+    <TaskShell
+      title="Wertetabellen"
+      subtitle="Erstelle oder vervollständige Wertetabellen für lineare Funktionen"
+      width="full"
+      actions={<div className={styles.score}><i className="fa-solid fa-star" aria-hidden="true" /> {punkte} <span className={styles.scoreLabel}>Punkte</span></div>}
+    >
 
       {/* Schwierigkeitsgrad Auswahl - Nur anzeigen wenn noch nicht ausgewählt */}
       {schwierigkeitsgrad === null ? (
@@ -943,6 +935,6 @@ export default function Wertetabelle() {
       </div>
         </>
       )}
-    </div>
+    </TaskShell>
   )
 }

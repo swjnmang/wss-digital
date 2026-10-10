@@ -102,10 +102,10 @@ a.bk-tile:active, button.bk-tile:active { transform: translateY(2px); box-shadow
 .bk-num { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; height: 32px; padding: 0 10px; border-radius: 999px; background: var(--highlight); color: var(--on-highlight); border: 2px solid var(--edge); font: 800 16px/1 var(--font-display); flex: none; }
 .bk-task-sub { margin: 6px 0 0; text-align: left; color: inherit; font-size: 15px; }
 .bk-task-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.bk-task-body { margin: 20px auto 0; }
-.bk-w-narrow { max-width: 920px; }
-.bk-w-wide { max-width: 1280px; }
-.bk-w-full { max-width: none; }
+.bk-task-body { margin: 20px 0 0; }
+.bk-task.bk-w-narrow { max-width: calc(920px + 64px); }
+.bk-task.bk-w-wide { max-width: calc(1280px + 64px); }
+.bk-task.bk-w-full { max-width: 1440px; }
 
 /* ── Overlays: Suche, Video ─────────────────────────────────────────────── */
 .bk-overlay { position: fixed; inset: 0; z-index: 60; background: rgba(18, 18, 18, .55); display: flex; align-items: flex-start; justify-content: center; padding: max(16px, env(safe-area-inset-top)) 16px 16px; overflow-y: auto; }

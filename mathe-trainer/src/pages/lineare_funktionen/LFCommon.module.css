@@ -1,5 +1,6 @@
-.container { max-width:900px; margin:0 auto; padding:1rem; }
-.card { background:white; border-radius:10px; padding:1rem; box-shadow:0 6px 18px rgba(0,0,0,0.06); border:1px solid #eee }
-.back { display:inline-block; margin-bottom:0.5rem; color:#0366d6 }
-.title { font-size:1.5rem; margin-bottom:0.5rem }
-.content { color:#333 }
+/* Baukasten-Design – gemeinsame Klassen der Lineare-Funktionen-Seiten */
+.container { max-width: 1280px; margin: 0 auto; }
+.card { composes: bk-panel from global; text-align: left; }
+.back { display: inline-block; margin-bottom: 0.5rem; color: var(--primary-ink); }
+.title { font: 800 24px/1.2 var(--font-display); margin: 0 0 12px; text-align: left; color: var(--ink); }
+.content { color: var(--ink); }

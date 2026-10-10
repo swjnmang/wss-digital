@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import TaskShell from '../../components/layout/TaskShell'
 
 interface Solution {
   type: 'number' | 'text' | 'wertetabelle'
@@ -208,19 +209,15 @@ export default function SonneAufgabe() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-yellow-50 to-orange-100 p-4">
-      <header className="w-full py-8 px-4 md:px-12 flex flex-col items-center bg-white/80 shadow-sm rounded-lg mb-6">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-orange-900">☀️ Die Sonne</h1>
-        <p className="text-lg text-orange-800">Untersuche die Eigenschaften von Sonnenstrahlen mit Hilfe linearer Funktionen</p>
-      </header>
+    <TaskShell title="Die Sonne" subtitle="Untersuche die Eigenschaften von Sonnenstrahlen mit Hilfe linearer Funktionen" width="wide">
 
-      <div className="max-w-6xl mx-auto w-full">
+      <div className="w-full">
         {/* Hinweis zur Rundung */}
-        <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-600 rounded-lg">
-          <p className="text-yellow-900 font-semibold">💡 Wichtig: Runde deine Ergebnisse auf 2 Stellen nach dem Komma!</p>
+        <div className="mb-6 bk-feedback bk-feedback-info">
+          <p className="font-semibold"><i className="fa-solid fa-lightbulb" aria-hidden="true" /> Wichtig: Runde deine Ergebnisse auf 2 Stellen nach dem Komma!</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div className="bk-panel mb-6">
           {/* Einleitungstext */}
           <div className="mb-6 p-4 bg-yellow-50 rounded-lg">
             <p className="text-gray-800 leading-relaxed">
@@ -231,17 +228,17 @@ export default function SonneAufgabe() {
           </div>
 
           {/* Sonne Bild */}
-          <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+          <div className="mb-6 bk-graph">
             <img
               src="/images/sonne.jpg"
               alt="Sonnenstrahlen mit linearen Funktionen"
-              className="w-full h-auto rounded-lg shadow-md"
+              className="w-full h-auto rounded-xl"
             />
           </div>
 
           {/* Aktuelle Aufgabe */}
-          <div className="mb-6 p-6 bg-gray-50 rounded-lg border-l-4 border-orange-500">
-            <h2 className="text-2xl font-bold text-orange-900 mb-3">{currentTaskData.title}</h2>
+          <div className="mb-6 p-5 bg-sunken rounded-2xl">
+            <h2 className="text-2xl font-extrabold text-ink mb-3 text-left">{currentTaskData.title}</h2>
             <p className="text-lg text-gray-800 mb-6 whitespace-normal">{renderQuestion(currentTaskData.question)}</p>
 
             {/* Input */}
@@ -255,18 +252,18 @@ export default function SonneAufgabe() {
                         const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
                         return (
                           <div key={index}>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">{label}:</label>
+                            <label className="block text-sm font-bold text-ink mb-1">{label}:</label>
                             <input
                               type="text"
                               value={currentInputs[label] || ''}
                               onChange={(e) => handleMultiInputChange(label, e.target.value)}
                               placeholder={`${label} eingeben...`}
-                              className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
+                              className={`w-full bk-input ${
                                 feedbackState === 'correct'
                                   ? 'border-green-500 bg-green-50'
                                   : feedbackState === 'incorrect'
                                     ? 'border-red-500 bg-red-50'
-                                    : 'border-gray-300 focus:border-blue-500'
+                                    : 'border-edge'
                               }`}
                             />
                           </div>
@@ -300,18 +297,18 @@ export default function SonneAufgabe() {
                       const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
                       return (
                         <div key={index}>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">{label}:</label>
+                          <label className="block text-sm font-bold text-ink mb-1">{label}:</label>
                           <input
                             type="text"
                             value={currentInputs[label] || ''}
                             onChange={(e) => handleMultiInputChange(label, e.target.value)}
                             placeholder={`Gib den ${label} ein...`}
-                            className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
+                            className={`w-full bk-input ${
                               feedbackState === 'correct'
                                 ? 'border-green-500 bg-green-50'
                                 : feedbackState === 'incorrect'
                                   ? 'border-red-500 bg-red-50'
-                                  : 'border-gray-300 focus:border-blue-500'
+                                  : 'border-edge'
                             }`}
                           />
                         </div>
@@ -328,29 +325,29 @@ export default function SonneAufgabe() {
                   value={(inputs[currentTask] as string) || ''}
                   onChange={(e) => handleInputChange(e.target.value)}
                   placeholder="Gib deine Antwort ein..."
-                  className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition ${
+                  className={`w-full bk-input ${
                     feedbackState === 'correct'
                       ? 'border-green-500 bg-green-50'
                       : feedbackState === 'incorrect'
                         ? 'border-red-500 bg-red-50'
-                        : 'border-gray-300 focus:border-blue-500'
+                        : 'border-edge'
                   }`}
                 />
               </div>
             )}
 
             {/* Feedback */}
-            {feedbackState === 'correct' && <div className="p-3 bg-green-100 text-green-800 rounded-lg mb-4 font-semibold">✓ Richtig!</div>}
+            {feedbackState === 'correct' && <div className="bk-feedback bk-feedback-ok mb-4">✓ Richtig!</div>}
 
             {feedbackState === 'incorrect' && (
-              <div className="p-3 bg-red-100 text-red-800 rounded-lg mb-4 font-semibold">✗ Leider nicht richtig. Versuche es nochmal!</div>
+              <div className="bk-feedback bk-feedback-no mb-4">✗ Leider nicht richtig. Versuche es nochmal!</div>
             )}
 
             {/* Lösung anzeigen Button */}
             {feedbackState === 'incorrect' && (
               <button
                 onClick={() => setShowSolution({ ...showSolution, [currentTask]: !showSolution[currentTask] })}
-                className="mb-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-semibold transition"
+                className="mb-4 bk-btn"
               >
                 {showSolution[currentTask] ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
@@ -358,9 +355,9 @@ export default function SonneAufgabe() {
 
             {/* Musterlösung */}
             {showSolution[currentTask] && feedbackState === 'incorrect' && (
-              <div className="p-4 bg-yellow-50 border border-yellow-300 rounded-lg mb-4">
-                <p className="font-semibold text-yellow-900 mb-2">Hinweis:</p>
-                <p className="text-yellow-800">{currentTaskData.hint}</p>
+              <div className="bk-solution mb-4">
+                <p className="bk-solution-title">Hinweis:</p>
+                <p className="text-ink">{currentTaskData.hint}</p>
               </div>
             )}
 
@@ -368,11 +365,7 @@ export default function SonneAufgabe() {
             <button
               onClick={validateAnswer}
               disabled={feedbackState === 'correct'}
-              className={`w-full px-4 py-3 rounded-lg font-semibold text-white transition ${
-                feedbackState === 'correct'
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-500 hover:bg-blue-600 cursor-pointer'
-              }`}
+              className="bk-btn bk-btn-primary w-full"
             >
               {feedbackState === 'correct' ? 'Korrekt gelöst ✓' : 'Antwort überprüfen'}
             </button>
@@ -383,11 +376,7 @@ export default function SonneAufgabe() {
             <button
               onClick={prevTask}
               disabled={currentTask === 0}
-              className={`px-6 py-2 rounded-lg font-semibold transition ${
-                currentTask === 0
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-500 text-white hover:bg-blue-600 cursor-pointer'
-              }`}
+              className="bk-btn"
             >
               ← Zurück
             </button>
@@ -399,11 +388,7 @@ export default function SonneAufgabe() {
             <button
               onClick={nextTask}
               disabled={currentTask === tasks.length - 1}
-              className={`px-6 py-2 rounded-lg font-semibold transition ${
-                currentTask === tasks.length - 1
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-500 text-white hover:bg-blue-600 cursor-pointer'
-              }`}
+              className="bk-btn"
             >
               Weiter →
             </button>
@@ -416,13 +401,13 @@ export default function SonneAufgabe() {
                 key={index}
                 onClick={() => setCurrentTask(index)}
                 className={`w-3 h-3 rounded-full transition ${
-                  index === currentTask ? 'bg-blue-600 w-8' : 'bg-gray-300 hover:bg-gray-400'
+                  index === currentTask ? 'bg-primary w-8' : 'bg-gray-300 hover:bg-gray-400'
                 }`}
               />
             ))}
           </div>
         </div>
       </div>
-    </div>
+    </TaskShell>
   )
 }

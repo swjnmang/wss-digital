@@ -1,364 +1,59 @@
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1rem;
-  text-align: center;
-}
-.card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.25rem;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.08);
-  border: 1px solid #e6e6e6;
-  position: relative;
-}
+/* Baukasten-Design – Klassennamen unverändert, nur Darstellung neu */
+.container { max-width: 920px; margin: 0 auto; }
+.card { composes: bk-panel from global; text-align: left; }
 
 /* Bruchdarstellung */
-.fraction {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  margin: 0 4px;
-  font-size: 1.1em;
-}
+.fraction { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; margin: 0 4px; font-size: 1.1em; }
+.numerator { display: block; line-height: 1; }
+.fractionLine { display: block; width: 30px; height: 2px; background: currentColor; }
+.denominator { display: block; line-height: 1; }
 
-.numerator {
-  display: block;
-  line-height: 1;
-}
+.typeToggle { composes: bk-seg from global; margin-bottom: 20px; }
+.toggleButton { composes: bk-seg-btn from global; }
+.toggleButton.active, .toggleButton.active:hover { background: var(--primary); color: var(--on-primary); }
 
-.fractionLine {
-  display: block;
-  width: 30px;
-  height: 2px;
-  background: currentColor;
-}
+.taskBox { composes: bk-taskbox from global; margin-bottom: 20px; }
+.taskPoints { font: 800 24px/1.3 var(--font-display); color: var(--ink); font-variant-numeric: tabular-nums; }
+.taskDescription { margin: 8px 0 0; font-size: 16px; line-height: 1.5; color: var(--ink-muted); text-align: left; }
 
-.denominator {
-  display: block;
-  line-height: 1;
-}
+.signBox { margin-bottom: 20px; }
+.stepLabel { margin: 0 0 10px; font: 700 15px/1.3 var(--font-body); color: var(--ink); text-align: left; }
+.signChoices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; max-width: 520px; }
 
-.typeToggle {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-}
+.inputContainer { display: flex; align-items: center; gap: 12px; margin: 0 0 20px; font: 700 22px/1 var(--font-display); }
+.input { composes: bk-input from global; width: 180px; }
 
-.toggleButton {
-  padding: 0.75rem 1.5rem;
-  border: 2px solid #d1d5db;
-  background: white;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #666;
-}
+.feedback { composes: bk-feedback from global; margin: 0 0 16px; }
+.feedback.success { background: var(--correct-soft); border-color: var(--correct); color: var(--correct); }
+.feedback.error { background: var(--wrong-soft); border-color: var(--wrong); color: var(--wrong); }
 
-.toggleButton:hover {
-  border-color: #3b82f6;
-  color: #3b82f6;
-}
+.actions { composes: bk-actions from global; margin: 8px 0 4px; }
+.btnPrimary { composes: bk-btn from global; }
+.btnSuccess { composes: bk-btn bk-btn-primary from global; }
+.btnSecondary { composes: bk-btn from global; }
 
-.toggleButton.active {
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
-}
+.solutionOutput { composes: bk-solution from global; }
+.solutionOutput p { margin: 0 0 8px; text-align: left; color: var(--ink); }
+.calculationBox { background: var(--surface-sunken); border-radius: 12px; padding: 12px 14px; margin: 10px 0; }
+.calculationBox p { margin: 4px 0; text-align: left; color: var(--ink); }
 
-.taskBox {
-  background: #f0f9ff;
-  border-left: 4px solid #3b82f6;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
+.graphContainer { composes: bk-graph from global; display: flex; justify-content: center; margin: 0 auto 20px; width: fit-content; }
 
-.taskPoints {
-  font-family: 'Courier New', monospace;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #0c4a6e;
-}
+.pointsDisplay { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 0 0 16px; font: 700 16px/1.3 var(--font-body); }
+.pointsDisplay span { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--correct-soft); color: var(--correct); }
+.resetPointsBtn { composes: bk-btn bk-btn-sm from global; }
 
-.taskDescription {
-  margin: 0.5rem 0 0 0;
-  font-size: 0.95rem;
-  color: #476569;
-}
+.streak { composes: bk-streak from global; }
 
-.inputContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  margin: 1.5rem 0;
-  font-weight: 600;
-  font-size: 1.1rem;
-}
+.pointInputSection { margin: 0 0 16px; }
+.pointInputBox { background: var(--surface-sunken); border-radius: 16px; padding: 14px 16px; }
+.pointInputLabel { margin: 0 0 10px; font: 700 15px/1.3 var(--font-body); color: var(--ink); text-align: left; }
+.pointInputRow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font: 700 22px/1 var(--font-display); }
+.coordInput { composes: bk-input from global; width: 100px; }
+.addPointBtn { composes: bk-btn from global; }
 
-.input {
-  border: 2px solid #d1d5db;
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  width: 120px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-}
-
-.input:focus {
-  outline: none;
-  border-color: #3b82f6;
-}
-
-.feedback {
-  padding: 0.75rem;
-  margin: 1rem 0;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.feedback.success {
-  background: #dcfce7;
-  color: #16a34a;
-  border-left: 4px solid #16a34a;
-}
-
-.feedback.error {
-  background: #fee2e2;
-  color: #dc2626;
-  border-left: 4px solid #dc2626;
-}
-
-.actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-  margin: 1.5rem 0;
-  flex-wrap: wrap;
-}
-
-.btnPrimary,
-.btnSuccess,
-.btnSecondary {
-  padding: 0.75rem 1.25rem;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.95rem;
-}
-
-.btnPrimary {
-  background: #06b6d4;
-  color: white;
-}
-
-.btnPrimary:hover {
-  background: #0891b2;
-}
-
-.btnSuccess {
-  background: #16a34a;
-  color: white;
-}
-
-.btnSuccess:hover {
-  background: #15803d;
-}
-
-.btnSecondary {
-  background: #64748b;
-  color: white;
-}
-
-.btnSecondary:hover {
-  background: #475569;
-}
-
-.solutionOutput {
-  background: #e9f5e9;
-  border-radius: 8px;
-  padding: 0.75rem;
-  margin-top: 1rem;
-  text-align: center;
-  border-left: 4px solid #16a34a;
-  line-height: 1.4;
-  color: #1b5e20;
-}
-
-.solutionOutput p {
-  margin: 0.5rem 0;
-}
-
-.calculationBox {
-  background: #f3f4f6;
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 1rem 0;
-  border-left: 4px solid #3b82f6;
-  line-height: 1.8;
-}
-
-.calculationBox p {
-  margin: 0.5rem 0;
-  font-weight: 500;
-}
-
-.graphContainer {
-  display: flex;
-  justify-content: center;
-  margin: 2rem 0;
-}
-
-.pointsDisplay {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-  margin: 1rem 0;
-  font-weight: 600;
-  background: #f3f4f6;
-  padding: 0.75rem;
-  border-radius: 6px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.resetPointsBtn {
-  padding: 0.5rem 0.75rem;
-  background: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s;
-}
-
-.resetPointsBtn:hover {
-  background: #dc2626;
-}
-
-.streak {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  font-size: 1.5rem;
-}
-
-/* Point Input */
-.pointInputSection {
-  margin: 1.5rem 0;
-  padding: 1rem;
-  background: #fef3c7;
-  border-radius: 8px;
-  border-left: 4px solid #f59e0b;
-}
-
-.pointInputBox {
-  background: white;
-  padding: 1rem;
-  border-radius: 6px;
-  margin-bottom: 0.5rem;
-}
-
-.pointInputLabel {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #333;
-}
-
-.pointInputRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.coordInput {
-  width: 80px;
-  padding: 0.5rem;
-  border: 2px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  text-align: center;
-}
-
-.coordInput:focus {
-  outline: none;
-  border-color: #f59e0b;
-}
-
-.addPointBtn {
-  padding: 0.5rem 1rem;
-  background: #f59e0b;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.addPointBtn:hover {
-  background: #d97706;
-}
-
-/* MathJax Display */
-.mathDisplay {
-  font-size: 1.1rem;
-  margin: 1rem 0;
-  padding: 0.5rem;
-  line-height: 1.8;
-}
-
-/* Solution Steps */
-.solutionTitle {
-  text-align: center;
-  color: #10b981;
-  font-size: 1.3rem;
-  margin-bottom: 0.75rem;
-  border-bottom: 3px solid #10b981;
-  padding-bottom: 0.5rem;
-}
-
-.solutionStep {
-  background: transparent;
-  padding: 0.5rem 0;
-  margin: 0.5rem 0;
-  border-radius: 0;
-  border-left: none;
-}
-
-.stepTitle {
-  margin: 0 0 0.25rem 0;
-  color: #0c4a6e;
-  font-weight: 600;
-  display: none;
-}
-
-.mathDisplay {
-  font-size: 0.95rem;
-  margin: 0.25rem 0;
-  line-height: 1.5;
-  text-align: center;
-}
-
-.answerBox {
-  background: #dcfce7;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  border: 3px solid #16a34a;
-  margin-top: 0.75rem;
-  text-align: center;
-  font-weight: bold;
-}
+.mathDisplay { margin: 6px 0; font-size: 1.1rem; overflow-x: auto; }
+.solutionTitle { composes: bk-solution-title from global; }
+.solutionStep { background: var(--surface-sunken); border-radius: 12px; padding: 10px 14px; margin: 8px 0; }
+.stepTitle { margin: 0 0 6px; font: 700 15px/1.3 var(--font-body); text-align: left; }
+.answerBox { composes: bk-answer from global; }

@@ -1,15 +1,20 @@
-.container { padding: 1rem }
-.back { display:inline-block; margin-bottom:0.5rem; color:#0366d6 }
-.card { background:white; padding:1rem; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.06) }
-.svgWrap { display:flex; justify-content:center; margin-bottom:0.75rem; width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; }
-.geoGebraContainer { width: 100%; aspect-ratio: 1 / 1; border: 1px solid #ccc; border-radius: 8px; background: white; }
-.inputRow { display:flex; gap:0.75rem; align-items:center; margin-bottom:0.75rem; justify-content:center; flex-wrap: wrap; }
-.label { font-weight:600 }
-.input { border:1px solid #d1d5db; padding:0.4rem 0.5rem; border-radius:6px; width:100px }
-.equation { font-size:1.1rem; font-weight:600; color:#0366d6; padding:0.5rem 1rem; background:#eff6ff; border-radius:6px; border-left:4px solid #0366d6; }
-.actions { display:flex; gap:0.5rem; justify-content:center }
-.primary { background:#10b981; color:white; padding:0.5rem 0.75rem; border-radius:6px; border:none }
-.secondary { background:#64748b; color:white; padding:0.5rem 0.75rem; border-radius:6px; border:none }
-.ghost { background:transparent; border:1px solid #cbd5e1; padding:0.4rem 0.6rem; border-radius:6px }
-.feedback { margin-top:0.75rem; font-weight:600; text-align:center }
-.solution { margin-top:0.75rem; background:#f1f5f9; padding:0.75rem; border-radius:6px }
+/* Baukasten-Design – Klassennamen unverändert, nur Darstellung neu */
+.container { max-width: 920px; margin: 0 auto; }
+.back { display: inline-block; margin-bottom: 0.5rem; color: var(--primary-ink); }
+.card { composes: bk-panel from global; text-align: left; }
+.card > p { margin: 0 0 16px; font-size: 18px; line-height: 1.55; color: var(--ink); text-align: left; }
+.svgWrap { display: flex; justify-content: center; margin-bottom: 20px; overflow-x: auto; }
+.geoGebraContainer { width: 100%; aspect-ratio: 1 / 1; border: 2px solid var(--edge); border-radius: 16px; background: var(--surface); overflow: hidden; }
+.inputRow { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 18px; }
+.label { display: inline-flex; align-items: center; gap: 10px; font: 700 22px/1 var(--font-display); }
+.input { composes: bk-input from global; width: 140px; }
+.equation { font: 800 22px/1.2 var(--font-display); color: var(--primary-ink); padding: 8px 14px; border-radius: 12px; background: var(--surface-sunken); }
+.actions { composes: bk-actions from global; }
+.primary { composes: bk-btn bk-btn-primary from global; }
+.secondary { composes: bk-btn from global; }
+.ghost { composes: bk-btn from global; }
+.feedback { composes: bk-feedback bk-feedback-info from global; margin-top: 16px; }
+.feedback.ok { background: var(--correct-soft); border-color: var(--correct); color: var(--correct); }
+.feedback.no { background: var(--wrong-soft); border-color: var(--wrong); color: var(--wrong); }
+.solution { composes: bk-solution from global; }
+.solution p { margin: 4px 0; font: 600 17px/1.5 var(--font-display); color: var(--ink); text-align: left; }

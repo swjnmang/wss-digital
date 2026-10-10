@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import styles from './ParallelSenkrecht.module.css'
+import TaskShell from '../../components/layout/TaskShell'
 
 // ===== MathDisplay Komponente =====
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -233,13 +234,7 @@ export default function ParallelSenkrecht() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Parallele und senkrechte Geraden</h1>
-        <p className={styles.subtitle}>
-          Untersuche die Beziehungen zwischen Geraden rechnerisch (Multiple Choice)
-        </p>
-      </div>
+    <TaskShell title="Parallele und senkrechte Geraden" subtitle="Untersuche die Beziehungen zwischen Geraden rechnerisch (Multiple Choice)" width="full">
 
       <button className={styles.newButton} onClick={neueAufgaben}>
         Neue Aufgaben generieren
@@ -386,16 +381,16 @@ export default function ParallelSenkrecht() {
                       
                       <p style={{ marginTop: '1rem' }}><strong>Ergebnis:</strong></p>
                       {aufgabe.beziehung === 'parallel' && (
-                        <p style={{ color: '#10b981' }}>✓ m₁ = m₂ → die Geraden sind <strong>parallel</strong></p>
+                        <p style={{ color: 'var(--correct)' }}>✓ m₁ = m₂ → die Geraden sind <strong>parallel</strong></p>
                       )}
                       {aufgabe.beziehung === 'senkrecht' && (
-                        <p style={{ color: '#10b981' }}>
+                        <p style={{ color: 'var(--correct)' }}>
                           ✓ m₁ · m₂ = {aufgabe.m1} · (−1/{aufgabe.m1}) = -1 → die Geraden sind <strong>senkrecht</strong>
                           {' '}(gerundet: m₂ ≈ {aufgabe.m2})
                         </p>
                       )}
                       {aufgabe.beziehung === 'keine' && (
-                        <p style={{ color: '#10b981' }}>Die Geraden haben <strong>keine spezielle Beziehung</strong></p>
+                        <p style={{ color: 'var(--correct)' }}>Die Geraden haben <strong>keine spezielle Beziehung</strong></p>
                       )}
                     </div>
                   )}
@@ -413,7 +408,7 @@ export default function ParallelSenkrecht() {
                       <MathDisplay latex={`$$${aufgabe.punkt.y} = ${aufgabe.m2} \\cdot ${aufgabe.punkt.x} + t$$`} />
                       <MathDisplay latex={`$$t = ${aufgabe.t2}$$`} />
                       
-                      <p style={{ marginTop: '1rem', color: '#10b981', fontWeight: 'bold' }}>
+                      <p style={{ marginTop: '1rem', color: 'var(--correct)', fontWeight: 'bold' }}>
                         Lösung: y = {aufgabe.m2}x {aufgabe.t2 >= 0 ? '+' : '−'} {Math.abs(aufgabe.t2)}
                       </p>
                     </div>
@@ -440,6 +435,6 @@ export default function ParallelSenkrecht() {
           </div>
         ))}
       </div>
-    </div>
+    </TaskShell>
   )
 }

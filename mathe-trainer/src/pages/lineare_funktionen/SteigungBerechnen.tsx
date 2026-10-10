@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './SteigungBerechnen.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
+import VideoButton from '../../components/VideoButton'
+import TaskShell from '../../components/layout/TaskShell'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -258,10 +260,6 @@ export default function SteigungBerechnen() {
 
   useEffect(() => {
     // MathJax Script laden
-    const script = document.createElement('script')
-    script.src = 'https://polyfill.io/v3/polyfill.min.js?features=es6'
-    script.async = true
-    document.body.appendChild(script)
 
     const script2 = document.createElement('script')
     script2.id = 'MathJax-script'
@@ -271,10 +269,8 @@ export default function SteigungBerechnen() {
   }, [])
 
   return (
-    <div className={`prose ${styles.container}`}>
+    <TaskShell title="Steigung aus zwei Punkten berechnen" width="narrow" actions={<div className={styles.streak} aria-label={`${streak} richtig in Folge`}><i className="fa-solid fa-fire" aria-hidden="true" /> {streak}</div>}>
       <div className={styles.card}>
-        <div className={styles.streak}>🔥 {streak}</div>
-        <h2>Steigung aus zwei Punkten berechnen</h2>
 
         {/* Task Type Toggle */}
         <div className={styles.typeToggle}>
@@ -304,10 +300,10 @@ export default function SteigungBerechnen() {
             </div>
 
             {/* Vorab: Steigungsvorzeichen auswählen */}
-            <div style={{ marginBottom: '20px', padding: '12px', backgroundColor: '#f0f4ff', borderRadius: '8px', borderLeft: '4px solid #3b82f6' }}>
-              <p style={{ marginTop: 0, marginBottom: '10px', fontWeight: '600', fontSize: '14px' }}>Schritt 1: Ist die Steigung positiv oder negativ?</p>
-              <div style={{ display: 'flex', gap: '15px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '15px' }}>
+            <div className={styles.signBox}>
+              <p className={styles.stepLabel}>Schritt 1: Ist die Steigung positiv oder negativ?</p>
+              <div className={styles.signChoices}>
+                <label className="bk-choice">
                   <input
                     type="radio"
                     name="slope-sign"
@@ -315,9 +311,9 @@ export default function SteigungBerechnen() {
                     checked={slopeSign === 'positive'}
                     onChange={(e) => setSlopeSign(e.target.value as 'positive' | 'negative')}
                   />
-                  📈 Positiv (steigt)
+                  <i className="fa-solid fa-arrow-trend-up" aria-hidden="true" /> Positiv (steigt)
                 </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '15px' }}>
+                <label className="bk-choice">
                   <input
                     type="radio"
                     name="slope-sign"
@@ -325,7 +321,7 @@ export default function SteigungBerechnen() {
                     checked={slopeSign === 'negative'}
                     onChange={(e) => setSlopeSign(e.target.value as 'positive' | 'negative')}
                   />
-                  📉 Negativ (fällt)
+                  <i className="fa-solid fa-arrow-trend-down" aria-hidden="true" /> Negativ (fällt)
                 </label>
               </div>
             </div>
@@ -333,7 +329,7 @@ export default function SteigungBerechnen() {
             {/* Eingabefeld für m-Wert - nur wenn Vorzeichen ausgewählt */}
             {slopeSign && (
               <div>
-                <p style={{ marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Schritt 2: Gib den Wert ein</p>
+                <p className={styles.stepLabel}>Schritt 2: Gib den Wert ein</p>
                 <div className={styles.inputContainer}>
                   <span>m =</span>
                   <input 
@@ -352,24 +348,7 @@ export default function SteigungBerechnen() {
               <button onClick={generateNewTask} className={styles.btnPrimary}>Neue Aufgabe</button>
               <button onClick={checkSolution} className={styles.btnSuccess}>Lösung prüfen</button>
               <button onClick={onShowAnswer} className={styles.btnSecondary}>Lösung anzeigen</button>
-              <button 
-                onClick={() => window.open('https://youtu.be/IwNoiR-yfJ0?si=Hklidv10rx1W6YuJ', '_blank')}
-                style={{
-                  backgroundColor: '#ef4444',
-                  color: 'white',
-                  padding: '10px 16px',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}
-              >
-                🎥 Erklärvideo
-              </button>
+              <VideoButton url="https://youtu.be/IwNoiR-yfJ0?si=Hklidv10rx1W6YuJ" />
             </div>
 
             {showSolution && (
@@ -504,6 +483,6 @@ export default function SteigungBerechnen() {
           </div>
         )}
       </div>
-    </div>
+    </TaskShell>
   )
 }
