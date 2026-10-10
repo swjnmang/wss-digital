@@ -29,10 +29,14 @@ import GeneratorLineare from './pages/rechnen_lernen/gleichungen/Generator_linea
 import Quadratisch from './pages/rechnen_lernen/gleichungen/Quadratisch';
 import Bruchgleichungen from './pages/rechnen_lernen/gleichungen/Bruchgleichungen';
 import Abschlusstest from './pages/rechnen_lernen/gleichungen/Abschlusstest';
-import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react';
 import Home from './pages/Home'
-import LineareIndex from './pages/LineareIndex'
+import AreaPage from './pages/AreaPage'
+import AppHeader from './components/layout/AppHeader'
+import SearchOverlay from './components/layout/SearchOverlay'
+import MathKeypad from './components/MathKeypad'
 import QuadratischeIndex from './pages/QuadratischeIndex'
 import RechnenLernenIndex from './pages/RechnenLernenIndex'
 import Terme from './pages/rechnen_lernen/Terme'
@@ -127,7 +131,6 @@ import Stadion from './pages/trigonometrie/anwendungsaufgaben/Stadion';
 import Fussballfeld from './pages/trigonometrie/anwendungsaufgaben/Fussballfeld';
 import Bergbahn from './pages/trigonometrie/anwendungsaufgaben/Bergbahn';
 import NachverfolgungBericht from './pages/trigonometrie/NachverfolgungBericht';
-import { startTrackingSession, stopTrackingSession } from './utils/tracking';
 import { useTrackingSession } from './hooks/useTaskTracking';
 // Daten und Zufall
 import DatenUndZufallIndex from './pages/DatenUndZufallIndex';
@@ -197,72 +200,26 @@ import { ExcelTrainer } from './pages/ExcelTrainer';
 // ... other imports will be added as files are created
 
 export default function App() {
-  const navigate = useNavigate();
   const location = useLocation();
-  const hideHeader = location.pathname === '/';
   const trackingActive = useTrackingSession();
-  const isTrigonometrieRoute = location.pathname.startsWith('/trigonometrie');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const openSearch = useCallback(() => setSearchOpen(true), []);
+  const closeSearch = useCallback(() => setSearchOpen(false), []);
 
-  const handleBack = () => {
-    const segments = location.pathname.split('/').filter(Boolean);
-    if (segments.length <= 1) {
-      navigate('/');
-    } else {
-      navigate('/' + segments.slice(0, -1).join('/'));
-    }
-  };
+  useEffect(() => {
+    window.addEventListener('bk:search', openSearch);
+    return () => window.removeEventListener('bk:search', openSearch);
+  }, [openSearch]);
 
-  const handleStopTracking = () => {
-    stopTrackingSession();
-    navigate('/trigonometrie/nachverfolgung-bericht');
-  };
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <div className="app-root">
       <Analytics />
-      {!hideHeader && (
-        <header className="app-header">
-          <div className="app-shell relative flex items-center justify-between gap-3">
-            <button onClick={handleBack} className="ghost-link text-sm sm:text-base">
-              ← Zurück
-            </button>
-            <Link
-              to="/"
-              className="absolute left-1/2 -translate-x-1/2 text-lg sm:text-xl font-bold text-slate-800 hover:text-[var(--accent)] transition-colors"
-            >
-              Mathe-Trainer
-            </Link>
-            <a
-              href="https://swjnmang.github.io/wss-digital/"
-              className="ghost-link text-xs sm:text-sm"
-            >
-              WSS-Digital
-            </a>
-          </div>
-          {isTrigonometrieRoute && (
-            <div className="app-shell flex justify-center mt-2">
-              {trackingActive ? (
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-red-600 font-semibold">🔴 Nachverfolgung läuft</span>
-                  <button
-                    onClick={handleStopTracking}
-                    className="px-3 py-1 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800"
-                  >
-                    Beenden &amp; Bericht ansehen
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={startTrackingSession}
-                  className="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 text-sm font-semibold hover:bg-slate-200 border border-slate-300"
-                >
-                  Nachverfolgung starten
-                </button>
-              )}
-            </div>
-          )}
-        </header>
-      )}
+      <AppHeader onSearch={openSearch} trackingActive={trackingActive} />
+      <SearchOverlay open={searchOpen} onClose={closeSearch} />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -297,7 +254,7 @@ export default function App() {
           <Route path="/rechnen_lernen/gleichungen/quadratisch" element={<Quadratisch />} />
           <Route path="/rechnen_lernen/gleichungen/bruchgleichungen" element={<Bruchgleichungen />} />
           <Route path="/rechnen_lernen/gleichungen/abschlusstest" element={<Abschlusstest />} />
-          <Route path="/lineare_funktionen" element={<LineareIndex />} />
+          <Route path="/lineare_funktionen" element={<AreaPage id="linear" />} />
           <Route path="/lineare_funktionen/wertetabelle" element={<Wertetabelle />} />
           <Route path="/lineare_funktionen/zeichnen" element={<Zeichnen />} />
           <Route path="/lineare_funktionen/ablesen" element={<Ablesen />} />
@@ -456,6 +413,7 @@ export default function App() {
         </Routes>
       </main>
       <CookieBanner />
+      <MathKeypad />
     </div>
   )
 }
