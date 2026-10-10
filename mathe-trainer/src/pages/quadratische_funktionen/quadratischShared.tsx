@@ -5,14 +5,15 @@ import React, { useMemo } from 'react'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { VideoEmbed } from '../../components/VideoButton'
 
 export const GREEN = '#15803d'
 export const RED = '#b91c1c'
 export const BLUE = '#1d4ed8'
 
-export const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
-export const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
-export const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
+export const btnPrimary = 'bk-btn bk-btn-primary'
+export const btnSecondary = 'bk-btn'
+export const panel = 'bk-panel text-center'
 
 export const PRAISE = [
   'Richtig! Super gemacht!',
@@ -280,16 +281,8 @@ export function MitternachtsSteps({ a, b, c, noun }: { a: Q; b: Q; c: Q; noun: '
 export function Video({ id, title }: { id: string; title: string }) {
   return (
     <>
-      <h3 className="text-base font-bold text-slate-800 mt-5 mb-2 text-center">Erklärvideo</h3>
-      <div className="max-w-2xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200">
-        <iframe
-          className="w-full h-full"
-          src={`https://www.youtube.com/embed/${id}`}
-          title={title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
+      <h3 className="text-lg font-extrabold text-ink mt-5 mb-2 text-center">Erklärvideo</h3>
+      <VideoEmbed src={`https://www.youtube.com/embed/${id}`} title={title} />
     </>
   )
 }

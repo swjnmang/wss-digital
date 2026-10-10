@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import { Check, X, ArrowRight, RotateCcw, Play } from 'lucide-react';
+import TaskShell from '../../components/layout/TaskShell'
 
 // --- Helper Functions ---
 const randomInt = (max: number, min: number = 0) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -625,19 +626,20 @@ const Abschlusstest: React.FC = () => {
 
     if (step === 'start') {
         return (
-            <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg text-center">
-                <h1 className="text-3xl font-bold mb-6 text-blue-600">Abschlusstest: Quadratische Funktionen</h1>
+            <TaskShell title="Abschlusstest: Quadratische Funktionen" width="wide">
+            <div className="text-center">
                 <p className="mb-6 text-gray-700 text-lg">
                     Beweise dein Können! Der Test besteht aus 10 zufälligen Aufgaben zu allen Themenbereichen.
                     Du benötigst Stift und Papier für Nebenrechnungen.
                 </p>
                 <button 
                     onClick={startTest}
-                    className="bg-blue-600 text-white px-8 py-3 rounded-lg text-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 mx-auto"
+                    className="bk-btn bk-btn-primary text-xl flex items-center justify-center gap-2 mx-auto"
                 >
                     <Play size={24} /> Test starten
                 </button>
             </div>
+            </TaskShell>
         );
     }
 
@@ -655,7 +657,7 @@ const Abschlusstest: React.FC = () => {
                     <p className="text-gray-600">{feedback}</p>
                     <button 
                         onClick={() => setStep('start')}
-                        className="mt-6 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 flex items-center gap-2 mx-auto"
+                        className="bk-btn bk-btn-primary mt-6 flex items-center gap-2 mx-auto"
                     >
                         <RotateCcw size={20} /> Test wiederholen
                     </button>
@@ -742,7 +744,7 @@ const Abschlusstest: React.FC = () => {
                 ></div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="bk-panel p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold text-gray-800">Frage {currentQuestionIndex + 1} von {TOTAL_QUESTIONS}</h2>
                     <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">{currentQ.points} Punkte</span>
@@ -776,7 +778,7 @@ const Abschlusstest: React.FC = () => {
                 <div className="mt-8 flex justify-end">
                     <button 
                         onClick={handleNextQuestion}
-                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 flex items-center gap-2"
+                        className="bk-btn bk-btn-primary flex items-center gap-2"
                     >
                         {currentQuestionIndex < TOTAL_QUESTIONS - 1 ? 'Nächste Frage' : 'Test beenden'} <ArrowRight size={20} />
                     </button>

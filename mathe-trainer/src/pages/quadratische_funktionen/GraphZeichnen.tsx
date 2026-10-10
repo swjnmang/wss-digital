@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import TaskShell from '../../components/layout/TaskShell'
+import { VideoEmbed } from '../../components/VideoButton'
 
 type Aufgabe = {
     a: number;
@@ -278,7 +280,6 @@ const GraphZeichnen = () => {
         setTippSchritte((prev) => prev.map((v, idx) => (idx === i ? Math.min(v + 1, aufgaben[i].xWerte.length) : v)));
     };
 
-    const ueberschrift = <h1 className="text-3xl font-bold text-gray-800 mb-6">Graph einer Parabel zeichnen</h1>;
 
     if (!level) {
         const stufen: { l: Level; farbe: string; beispiel: string; text: string }[] = [
@@ -287,9 +288,9 @@ const GraphZeichnen = () => {
             { l: 'fortgeschritten', farbe: 'bg-red-600 hover:bg-red-700', beispiel: 'f(x) = (x − 1)² − 4', text: 'Parabeln, die entlang der x-Achse und der y-Achse verschoben sind.' },
         ];
         return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-center">
-                    {ueberschrift}
+            <TaskShell title="Graph einer Parabel zeichnen" width="wide">
+            <div className="container">
+                <div className="bk-panel max-w-3xl w-full mx-auto text-center">
                     <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {stufen.map(({ l, farbe, beispiel, text }) => (
@@ -302,15 +303,16 @@ const GraphZeichnen = () => {
                     </div>
                 </div>
             </div>
+            </TaskShell>
         );
     }
 
     const beispiel = BEISPIEL[level];
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-left">
-                {ueberschrift}
+        <TaskShell title="Graph einer Parabel zeichnen" width="wide">
+        <div className="container">
+            <div className="bk-panel max-w-3xl w-full mx-auto text-left">
 
                 <div className="flex flex-wrap items-center gap-3 mb-6">
                     <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
@@ -345,15 +347,7 @@ const GraphZeichnen = () => {
                     </div>
                     <div>
                         <h2 className="text-xl font-semibold text-gray-800 mb-3">Lernvideo</h2>
-                        <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
-                            <iframe
-                                className="absolute inset-0 w-full h-full rounded-lg"
-                                src={LERNVIDEO_EMBED_URL}
-                                title="Lernvideo: Graph einer Parabel zeichnen"
-                                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                            />
-                        </div>
+                        <VideoEmbed src={LERNVIDEO_EMBED_URL} title="Lernvideo: Graph einer Parabel zeichnen" />
                         <a
                             href={LERNVIDEO_URL}
                             target="_blank"
@@ -458,13 +452,14 @@ const GraphZeichnen = () => {
                 <div className="flex justify-center mt-8">
                     <button
                         onClick={() => neueAufgaben(level)}
-                        className="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                        className="bk-btn"
                     >
                         {ANZAHL_AUFGABEN} neue Aufgaben
                     </button>
                 </div>
             </div>
         </div>
+        </TaskShell>
     );
 };
 

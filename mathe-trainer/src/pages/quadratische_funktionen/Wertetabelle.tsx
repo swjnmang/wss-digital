@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './Wertetabelle.module.css'
 import { roundHalfAwayFromZero } from '../../utils/numbers'
+import TaskShell from '../../components/layout/TaskShell'
 
 declare global {
   interface Window {
@@ -386,9 +387,6 @@ export default function Wertetabelle() {
 
   // MathJax laden
   useEffect(() => {
-    const script = document.createElement('script')
-    script.src = 'https://polyfill.io/v3/polyfill.min.js?features=es6'
-    document.head.appendChild(script)
 
     const mathjaxScript = document.createElement('script')
     mathjaxScript.id = 'MathJax-script'
@@ -805,18 +803,12 @@ export default function Wertetabelle() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Wertetabellen</h1>
-          <p className={styles.subtitle}>Berechne die y-Werte zu vorgegebenen x-Werten für quadratische Funktionen</p>
-        </div>
-        <div className={styles.scoreBox}>
-          <div className={styles.score}>
-            ⭐ {punkte} <span className={styles.scoreLabel}>Punkte</span>
-          </div>
-        </div>
-      </div>
+    <TaskShell
+      title="Wertetabellen"
+      subtitle="Berechne die y-Werte zu vorgegebenen x-Werten für quadratische Funktionen"
+      width="full"
+      actions={<div className={styles.score}><i className="fa-solid fa-star" aria-hidden="true" /> {punkte} <span className={styles.scoreLabel}>Punkte</span></div>}
+    >
 
       {schwierigkeitsgrad === null ? (
         <div className={styles.difficultySelector}>
@@ -1013,6 +1005,6 @@ export default function Wertetabelle() {
           </div>
         </>
       )}
-    </div>
+    </TaskShell>
   )
 }

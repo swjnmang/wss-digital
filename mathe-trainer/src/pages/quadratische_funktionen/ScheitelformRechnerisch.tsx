@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import TaskShell from '../../components/layout/TaskShell'
+import VideoButton from '../../components/VideoButton'
 
 declare global {
   interface Window {
@@ -239,11 +241,11 @@ const ScheitelformRechnerisch = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
+        <TaskShell title="Umwandlung in die Scheitelform" width="wide">
+        <div className="">
             <div className="container mx-auto px-4" ref={containerRef}>
                 <div className="max-w-4xl mx-auto">
                     <div className="flex flex-wrap justify-between items-center gap-3 mb-2">
-                        <h1 className="text-3xl md:text-4xl font-bold text-slate-800">Umwandlung in die Scheitelform</h1>
                         <div className="bg-white px-4 py-2 rounded-lg shadow text-orange-500 font-bold border border-orange-200">
                             Streak: {streak} 🔥
                         </div>
@@ -333,20 +335,14 @@ const ScheitelformRechnerisch = () => {
 
                         <div className="flex flex-col sm:flex-row gap-3 pt-2">
                             <button onClick={checkSolution}
-                                className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-md">
+                                className="bk-btn bk-btn-primary flex-1">
                                 Lösung prüfen
                             </button>
                             <button onClick={generateNewTask}
-                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-md">
+                                className="bk-btn bk-btn-primary flex-1">
                                 Neue Aufgabe
                             </button>
-                            <a href={VIDEO_URL} target="_blank" rel="noopener noreferrer"
-                                className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors shadow-md">
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-                                </svg>
-                                Video
-                            </a>
+                            <VideoButton url={VIDEO_URL} label="Video" className="bk-btn flex-1" />
                         </div>
 
                         {feedback && (
@@ -382,6 +378,7 @@ const ScheitelformRechnerisch = () => {
                 </div>
             </div>
         </div>
+        </TaskShell>
     );
 };
 

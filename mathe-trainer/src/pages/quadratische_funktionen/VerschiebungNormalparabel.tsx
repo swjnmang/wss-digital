@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import TaskShell from '../../components/layout/TaskShell'
 
 declare global {
   interface Window {
@@ -716,9 +717,9 @@ export default function VerschiebungNormalparabel() {
   const allReady = appletsLoaded.shiftX && appletsLoaded.shiftY && appletsLoaded.combined && appletsLoaded.match;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-5 max-w-3xl w-full">
-        <h1 className="text-xl font-bold text-slate-800 mb-1 text-center">Verschiebung der Normalparabel</h1>
+    <TaskShell title="Verschiebung der Normalparabel" width="wide">
+    <div className="flex flex-col">
+      <div className="mx-auto max-w-3xl w-full">
         <p className="text-center text-sm text-slate-600 mb-4">
           Wir betrachten Parabeln der Form <InlineMath math="y = (x + d)^2 + c" />.
         </p>
@@ -743,7 +744,7 @@ export default function VerschiebungNormalparabel() {
         </div>
 
         {/* Sandbox */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+        <div className="bk-panel p-4 border border-slate-200 mb-5">
           <div className="flex items-start justify-between gap-2 mb-1">
             <h2 className="text-base font-bold text-slate-800">Entdecke den Einfluss von d und c</h2>
             <ExplainToggle open={sandboxExplainOpen} onToggle={() => setSandboxExplainOpen(o => !o)} />
@@ -768,14 +769,14 @@ export default function VerschiebungNormalparabel() {
               f(x) = (x {signStr(sandboxD)} {Math.abs(Math.round(sandboxD * 100) / 100)})² {signStr(sandboxC)}{' '}
               {Math.abs(Math.round(sandboxC * 100) / 100)}
             </div>
-            <button onClick={resetSandbox} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm">
+            <button onClick={resetSandbox} className="bk-btn">
               Regler zurücksetzen
             </button>
           </div>
         </div>
 
         {/* Aufgabe 1: Verschiebung in x-Richtung */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+        <div className="bk-panel p-4 border border-slate-200 mb-5">
           <div className="flex items-start justify-between gap-2 mb-2">
             <h2 className="text-base font-bold text-slate-800">Aufgabe 1: Verschiebung entlang der x-Achse</h2>
             <ExplainToggle open={shiftXExplainOpen} onToggle={() => setShiftXExplainOpen(o => !o)} />
@@ -845,7 +846,7 @@ export default function VerschiebungNormalparabel() {
               <div className="text-center pt-2">
                 <button
                   onClick={() => setShiftXShowSolution(true)}
-                  className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm"
+                  className="bk-btn"
                   disabled={shiftXShowSolution}
                 >
                   Lösung anzeigen
@@ -866,7 +867,7 @@ export default function VerschiebungNormalparabel() {
         </div>
 
         {/* Aufgabe 2: Verschiebung in y-Richtung */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+        <div className="bk-panel p-4 border border-slate-200 mb-5">
           <div className="flex items-start justify-between gap-2 mb-2">
             <h2 className="text-base font-bold text-slate-800">Aufgabe 2: Verschiebung entlang der y-Achse</h2>
             <ExplainToggle open={shiftYExplainOpen} onToggle={() => setShiftYExplainOpen(o => !o)} />
@@ -936,7 +937,7 @@ export default function VerschiebungNormalparabel() {
               <div className="text-center pt-2">
                 <button
                   onClick={() => setShiftYShowSolution(true)}
-                  className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm"
+                  className="bk-btn"
                   disabled={shiftYShowSolution}
                 >
                   Lösung anzeigen
@@ -957,7 +958,7 @@ export default function VerschiebungNormalparabel() {
         </div>
 
         {/* Aufgabe 3: Kombinierte Verschiebung */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+        <div className="bk-panel p-4 border border-slate-200 mb-5">
           <div className="flex items-start justify-between gap-2 mb-2">
             <h2 className="text-base font-bold text-slate-800">Aufgabe 3: Kombinierte Verschiebung</h2>
             <ExplainToggle open={combinedExplainOpen} onToggle={() => setCombinedExplainOpen(o => !o)} />
@@ -1056,7 +1057,7 @@ export default function VerschiebungNormalparabel() {
               <div className="text-center pt-3">
                 <button
                   onClick={() => setCombinedShowSolution(true)}
-                  className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm"
+                  className="bk-btn"
                   disabled={combinedShowSolution}
                 >
                   Lösung anzeigen
@@ -1079,7 +1080,7 @@ export default function VerschiebungNormalparabel() {
         </div>
 
         {/* Aufgabe 4: Zuordnungsaufgabe */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+        <div className="bk-panel p-4 border border-slate-200 mb-5">
           <div className="flex items-start justify-between gap-2 mb-2">
             <h2 className="text-base font-bold text-slate-800">Aufgabe 4: Parabeln zuordnen</h2>
             <ExplainToggle open={matchExplainOpen} onToggle={() => setMatchExplainOpen(o => !o)} />
@@ -1124,7 +1125,7 @@ export default function VerschiebungNormalparabel() {
                 );
               })}
               <div className="text-center pt-1">
-                <button onClick={checkMatchTask} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm">
+                <button onClick={checkMatchTask} className="bk-btn bk-btn-primary">
                   Auswerten
                 </button>
               </div>
@@ -1133,7 +1134,7 @@ export default function VerschiebungNormalparabel() {
         </div>
 
         {/* Aufgabe 5: Umkehraufgabe */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+        <div className="bk-panel p-4 border border-slate-200 mb-5">
           <div className="flex items-start justify-between gap-2 mb-2">
             <h2 className="text-base font-bold text-slate-800">Aufgabe 5: Finde die passende Gleichung</h2>
             <ExplainToggle open={reverseExplainOpen} onToggle={() => setReverseExplainOpen(o => !o)} />
@@ -1163,11 +1164,11 @@ export default function VerschiebungNormalparabel() {
         </div>
 
         {/* Steuerung */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200">
+        <div className="bk-panel p-4 border border-slate-200">
           <div className="flex flex-wrap justify-center gap-3 items-center">
             <button
               onClick={generateNewRound}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors disabled:opacity-50 text-sm"
+              className="bk-btn bk-btn-primary disabled:opacity-50"
               disabled={!allReady}
             >
               Neue Aufgaben
@@ -1203,5 +1204,6 @@ export default function VerschiebungNormalparabel() {
         }
       `}</style>
     </div>
+    </TaskShell>
   );
 }

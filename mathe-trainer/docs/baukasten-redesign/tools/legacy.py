@@ -48,7 +48,11 @@ def frame(p: Page, width='wide', title=None, h1=True, all_returns=False, subtitl
         title = m.group(1).strip()
     anchor = m.start() if m else None
     blocks = []
-    if all_returns:
+    if isinstance(all_returns, str):
+        # alle return-Blöcke, die den Marker enthalten (z. B. '{ueberschrift}')
+        for r in re.finditer(re.escape(all_returns), s):
+            blocks.append(r.start())
+    elif all_returns:
         # alle return-Blöcke der Default-Komponente, deren erstes Element ein min-h-screen-Rahmen ist
         for r in re.finditer(r'\n([ \t]*)return \(\s*\n[ \t]*<div className="[^"]*min-h-screen[^"]*">', s):
             blocks.append(r.end() - 1)
@@ -94,6 +98,9 @@ BTN_DROP = re.compile(r'^(bg-\S+|hover:\S+|text-white|font-\S+|py-\S+|px-\S+|p-\
 def _btn_classes(cls):
     toks = cls.split()
     if 'text-white' not in toks:
+        return None
+    # Schwierigkeits-/Auswahlkacheln (farbig, großer Innenabstand, mehrzeiliger Inhalt) bleiben farbig
+    if any(re.match(r'^(p-[3-9]|border-edge|shadow-hard|text-left)$', t) for t in toks):
         return None
     bgs = [t for t in toks if re.match(r'^bg-[a-z]+-\d00$', t)]
     if not bgs or not any(t.startswith('hover:bg-') for t in toks):

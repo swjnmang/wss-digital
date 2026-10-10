@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import TaskShell from '../../components/layout/TaskShell'
 
 interface Bucket {
     x: number;
@@ -291,9 +292,9 @@ const SpielNullstellen = () => {
     }, [gameState]);
 
     return (
-        <div className="mx-auto px-4 py-8 max-w-6xl">
-            <div className="bg-white rounded-xl shadow-lg p-6 text-center">
-                <h1 className="text-3xl font-bold text-slate-700 mb-2">Nullstellen-Fänger</h1>
+        <TaskShell title="Nullstellen-Fänger" width="wide">
+        <div className="">
+            <div className="bk-panel p-6 text-center">
                 <p className="text-slate-500 mb-4">Berechne zuerst die Nullstellen schriftlich! Platziere dann die Eimer an den richtigen Positionen.</p>
 
                 <div className="flex justify-between items-center bg-slate-100 p-3 rounded-lg mb-4 text-lg">
@@ -328,7 +329,7 @@ const SpielNullstellen = () => {
                             <p className="mb-6 text-lg">Platziere 2 Eimer mit der Maus und klicke.</p>
                             <button 
                                 onClick={startGame}
-                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl shadow-md transition-transform transform hover:scale-105"
+                                className="bk-btn bk-btn-primary text-xl"
                             >
                                 Spiel starten
                             </button>
@@ -337,6 +338,7 @@ const SpielNullstellen = () => {
                 </div>
             </div>
         </div>
+        </TaskShell>
     );
 };
 

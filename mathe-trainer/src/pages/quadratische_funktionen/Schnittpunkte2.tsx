@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+import TaskShell from '../../components/layout/TaskShell'
 
 interface Point {
     x: number;
@@ -204,11 +205,9 @@ const Schnittpunkte2 = () => {
     };
 
     return (
-        <div className="mx-auto px-4 py-8 max-w-6xl">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-                <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">
-                    Aufgabengenerator: Schnittpunkt Gerade & Parabel
-                </h1>
+        <TaskShell title="Aufgabengenerator: Schnittpunkt Gerade & Parabel" width="wide">
+        <div className="">
+            <div className="bk-panel p-6">
 
                 {task && (
                     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6 text-center">
@@ -284,25 +283,25 @@ const Schnittpunkte2 = () => {
                 <div className="flex flex-wrap gap-4 justify-center mb-6">
                     <button 
                         onClick={generateNewTask}
-                        className="px-6 py-3 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-md"
+                        className="bk-btn"
                     >
                         Neue Aufgabe
                     </button>
                     <button 
                         onClick={checkSolution}
-                        className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors shadow-md"
+                        className="bk-btn bk-btn-primary"
                     >
                         Lösung prüfen
                     </button>
                     <button 
                         onClick={() => setShowSolution(!showSolution)}
-                        className="px-6 py-3 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors shadow-md"
+                        className="bk-btn"
                     >
                         {showSolution ? "Lösung verbergen" : "Lösung anzeigen"}
                     </button>
                     <button 
                         onClick={() => setShowGraph(!showGraph)}
-                        className="px-6 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors shadow-md"
+                        className="bk-btn bk-btn-primary"
                     >
                         {showGraph ? "Graph verbergen" : "In GeoGebra zeichnen"}
                     </button>
@@ -341,6 +340,7 @@ const Schnittpunkte2 = () => {
                 )}
             </div>
         </div>
+        </TaskShell>
     );
 };
 
