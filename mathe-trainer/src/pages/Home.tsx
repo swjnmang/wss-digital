@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { AREAS, exerciseCount } from '../data/areas'
+import AreaIcon from '../components/layout/AreaIcon'
 
 export default function Home() {
   return (
@@ -31,7 +32,7 @@ export default function Home() {
           const count = exerciseCount(a)
           return (
             <Link key={a.id} to={a.path} className="bk-tile bk-tile-area" style={{ ['--area' as string]: `var(--area-${a.id})` } as CSSProperties}>
-              <span className="bk-tile-glyph">{a.glyph}</span>
+              <span className="bk-tile-glyph"><AreaIcon id={a.id} height={52} /></span>
               <span className="bk-chip">{count} {a.unit}</span>
               <h3>{a.title}</h3>
             </Link>

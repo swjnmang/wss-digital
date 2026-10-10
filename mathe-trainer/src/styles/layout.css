@@ -44,7 +44,7 @@ a.bk-tile:active, button.bk-tile:active { transform: translateY(2px); box-shadow
 .bk-tile-icon { font-size: 26px; }
 .bk-tile-area { background: var(--area); color: var(--on-area); }
 .bk-tile-area .bk-chip { position: absolute; right: 12px; top: 12px; }
-.bk-tile-glyph { font: 800 40px/1 var(--font-display); letter-spacing: -.04em; }
+.bk-tile-glyph { display: inline-flex; color: var(--ink); }
 .bk-tile-accent { background: var(--highlight); color: var(--on-highlight); }
 .bk-tile-ink { background: var(--primary); color: var(--on-primary); cursor: default; }
 .bk-tile-links { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
@@ -74,7 +74,8 @@ a.bk-tile:active, button.bk-tile:active { transform: translateY(2px); box-shadow
 .bk-area-hero h1 { margin: 0 0 6px; font: 800 clamp(28px, 4vw, 40px)/1.05 var(--font-display); letter-spacing: -.03em; text-align: left; color: inherit; }
 .bk-area-hero p { margin: 0; text-align: left; color: inherit; font-size: 16px; }
 .bk-area-hero .bk-area-meta { margin-top: 8px; font: 700 14px/1.3 var(--font-body); }
-.bk-area-glyph { font: 800 clamp(44px, 7vw, 72px)/1 var(--font-display); letter-spacing: -.04em; flex: none; }
+.bk-area-glyph { display: inline-flex; flex: none; color: var(--ink); }
+@media (max-width: 640px) { .bk-area-glyph svg { height: 52px; width: 78px; } }
 .bk-area-section { margin-top: 24px; }
 .bk-section-title { margin: 0 0 12px; font: 800 22px/1.2 var(--font-display); text-align: left; color: var(--ink); }
 .bk-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -98,7 +99,7 @@ a.bk-tile:active, button.bk-tile:active { transform: translateY(2px); box-shadow
 .bk-task-area { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; font: 700 14px/1 var(--font-body); color: inherit; text-decoration: none; }
 .bk-task-area:hover { text-decoration: underline; }
 .bk-task-crumb { margin: 0 8px; font: 700 14px/1 var(--font-body); }
-.bk-task-glyph { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 26px; padding: 0 6px; border-radius: 8px; background: var(--surface); border: 2px solid var(--edge); font: 800 13px/1 var(--font-display); }
+.bk-task-glyph { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 26px; padding: 0 5px; border-radius: 8px; color: var(--ink); background: var(--surface); border: 2px solid var(--edge); font: 800 13px/1 var(--font-display); }
 .bk-task-head h1 { margin: 4px 0 0; display: flex; align-items: center; gap: 10px; font: 800 clamp(22px, 3vw, 30px)/1.1 var(--font-display); letter-spacing: -.02em; color: inherit; text-align: left; }
 .bk-num { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; height: 32px; padding: 0 10px; border-radius: 999px; background: var(--highlight); color: var(--on-highlight); border: 2px solid var(--edge); font: 800 16px/1 var(--font-display); flex: none; }
 .bk-task-sub { margin: 6px 0 0; text-align: left; color: inherit; font-size: 15px; }

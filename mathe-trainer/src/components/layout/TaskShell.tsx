@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { allExercises, areaForPath } from '../../data/areas'
+import AreaIcon from './AreaIcon'
 
 // Rahmen für Übungsseiten: Kopfzeile in der Bereichsfarbe, darunter der Inhalt der Übung.
 // Die Übung selbst (Aufgaben, Prüflogik) bleibt unverändert im children-Bereich.
@@ -28,7 +29,7 @@ export default function TaskShell({ title, subtitle, actions, children, width = 
         <div className="bk-task-titles">
           {area && (
             <Link to={area.path} className="bk-task-area">
-              <span className="bk-task-glyph" aria-hidden="true">{area.glyph}</span>
+              <span className="bk-task-glyph" aria-hidden="true"><AreaIcon id={area.id} height={18} /></span>
               {area.title}
             </Link>
           )}
