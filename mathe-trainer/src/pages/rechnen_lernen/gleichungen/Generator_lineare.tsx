@@ -124,10 +124,16 @@ function buildEquation(leftPieces: Piece[], rightPieces: Piece[]): GleichungResu
   const right = buildSide(rightPieces);
   const original = `${left.display} = ${right.display}`;
   const steps: string[] = [original];
+  // Die Äquivalenzumformung steht hinter der Zeile, auf die sie angewendet wird
+  // (also eine Zeile ÜBER dem Ergebnis der Umformung).
+  const umformung = (op: string) => {
+    steps[steps.length - 1] += `   | ${op}`;
+  };
 
   const hasBrackets = leftPieces.some((p) => p.kind === 'bracket') || rightPieces.some((p) => p.kind === 'bracket');
   if (hasBrackets) {
-    steps.push(`${joinTerms(left.terms)} = ${joinTerms(right.terms)}   | Ausmultiplizieren`);
+    umformung('Ausmultiplizieren');
+    steps.push(`${joinTerms(left.terms)} = ${joinTerms(right.terms)}`);
   }
 
   const leftX = sumX(left.terms);
@@ -141,7 +147,8 @@ function buildEquation(leftPieces: Piece[], rightPieces: Piece[]): GleichungResu
     right.terms.filter((t) => t.isX).length > 1 ||
     right.terms.filter((t) => !t.isX).length > 1;
   if (needsCombine) {
-    steps.push(`${sideStr(leftX, leftC)} = ${sideStr(rightX, rightC)}   | Zusammenfassen`);
+    umformung('Zusammenfassen');
+    steps.push(`${sideStr(leftX, leftC)} = ${sideStr(rightX, rightC)}`);
   }
 
   const finalCoeff = round4(leftX - rightX);
@@ -158,7 +165,8 @@ function buildEquation(leftPieces: Piece[], rightPieces: Piece[]): GleichungResu
     let moveRight = Math.abs(rightC) > 1e-9 ? fmtNum(rightC) : '0';
     if (Math.abs(leftC) > 1e-9) moveRight += ` ${leftC > 0 ? '-' : '+'} ${fmtNum(Math.abs(leftC))}`;
 
-    steps.push(`${moveLeft} = ${moveRight}   | ${annoParts.join(' ')}`);
+    umformung(annoParts.join(' '));
+    steps.push(`${moveLeft} = ${moveRight}`);
     steps.push(`${sideStr(finalCoeff, 0)} = ${fmtNum(finalConst)}`);
   }
 
@@ -173,10 +181,12 @@ function buildEquation(leftPieces: Piece[], rightPieces: Piece[]): GleichungResu
     if (!moveNeeded) steps.push(`x = ${fmtNum(finalConst)}`);
     // sonst steht "x = ..." bereits als letzte Zeile aus dem Umstell-Schritt da
   } else if (Math.abs(finalCoeff + 1) < 1e-9) {
-    steps.push(`x = ${fmtNum(-finalConst)}   | · (-1)`);
+    umformung('· (-1)');
+    steps.push(`x = ${fmtNum(-finalConst)}`);
   } else {
     const divisor = finalCoeff < 0 ? `(${fmtNum(finalCoeff)})` : fmtNum(finalCoeff);
-    steps.push(`x ${needsApprox ? '≈' : '='} ${fmtNum(rounded2)}   | : ${divisor}`);
+    umformung(`: ${divisor}`);
+    steps.push(`x ${needsApprox ? '≈' : '='} ${fmtNum(rounded2)}`);
   }
 
   const loesung = round4(solutionExact);
