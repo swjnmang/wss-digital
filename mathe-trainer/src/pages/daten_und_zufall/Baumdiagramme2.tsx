@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import TaskShell from '../../components/layout/TaskShell'
+import VideoButton from '../../components/VideoButton'
 
 interface TaskData {
   description: string;
@@ -275,11 +277,9 @@ const Baumdiagramme2: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800">Interaktives Baumdiagramm-Training</h2>
-        </div>
+    <TaskShell title="Interaktives Baumdiagramm-Training" width="wide">
+    <div className="space-y-6">
+      <div className="bk-panel !p-0 overflow-hidden">
         <div className="p-6 space-y-6">
           <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
             <h3 className="font-semibold mb-2">Deine Aufgabe:</h3>
@@ -288,7 +288,7 @@ const Baumdiagramme2: React.FC = () => {
             <div className="flex flex-wrap gap-4">
               <button 
                 onClick={checkSolution}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="bk-btn bk-btn-primary"
               >
                 Lösung prüfen
               </button>
@@ -299,14 +299,7 @@ const Baumdiagramme2: React.FC = () => {
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Neue Aufgabe
               </button>
-              <a
-                href="https://youtu.be/PcKEXYJ4C-U?si=CwwSuTa6C-e6PktL"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center"
-              >
-                Erklärvideo anschauen
-              </a>
+              <VideoButton url="https://youtu.be/PcKEXYJ4C-U?si=CwwSuTa6C-e6PktL" label="Erklärvideo anschauen" className="bk-btn" />
             </div>
 
             {feedback.message && (
@@ -327,6 +320,7 @@ const Baumdiagramme2: React.FC = () => {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 };
 

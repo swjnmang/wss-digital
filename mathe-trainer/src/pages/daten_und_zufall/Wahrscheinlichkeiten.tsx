@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import TaskShell from '../../components/layout/TaskShell'
 
 type ExperimentType = 'coin-four' | 'dice-double' | 'mini-wheel' | 'urn-double' | 'card-single';
 
@@ -636,7 +637,7 @@ const SpinnerShowcase: React.FC = () => {
                     <button
                         onClick={spinWheel}
                         disabled={isSpinning}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-60"
+                        className="bk-btn bk-btn-primary disabled:opacity-60"
                     >
                         {isSpinning ? '... dreht' : 'Glücksrad drehen'}
                     </button>
@@ -721,7 +722,7 @@ const DiceFrequencyLab: React.FC = () => {
                         Letztes Ergebnis: <span className="font-semibold text-slate-900">{diceValues[0]} + {diceValues[1]} = {currentSum}</span>
                     </p>
                     <div className="flex flex-wrap gap-3">
-                        <button onClick={() => rollDice(1)} className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
+                        <button onClick={() => rollDice(1)} className="bk-btn bk-btn-primary">
                             1× würfeln
                         </button>
                         <button onClick={() => rollDice(10)} className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg font-semibold hover:bg-indigo-200">
@@ -806,7 +807,7 @@ const UrnVisualLab: React.FC = () => {
                 </div>
                 <div className="space-y-3">
                     <div className="flex flex-wrap gap-3">
-                        <button onClick={drawBall} className="px-4 py-2 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700">
+                        <button onClick={drawBall} className="bk-btn bk-btn-primary">
                             Kugel ziehen
                         </button>
                         <button onClick={resetUrn} className="px-4 py-2 border border-slate-300 rounded-lg font-semibold text-slate-700 hover:bg-slate-50">
@@ -1011,7 +1012,7 @@ const Wahrscheinlichkeiten: React.FC = () => {
                         <div className="flex flex-wrap items-center gap-3">
                             <button
                                 onClick={() => handleExperimentRun(task.id, task.experiment!.type)}
-                                className="px-4 py-2 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700"
+                                className="bk-btn"
                             >
                                 {task.experiment.buttonLabel}
                             </button>
@@ -1033,11 +1034,11 @@ const Wahrscheinlichkeiten: React.FC = () => {
                         placeholder="z. B. 3/8 oder 0,375"
                         className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300"
                     />
-                    <button onClick={() => checkAnswer(task)} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700">
+                    <button onClick={() => checkAnswer(task)} className="bk-btn bk-btn-primary">
                         Prüfen
                     </button>
                     {state.hadWrongAttempt && (
-                        <button onClick={() => toggleSolution(task.id)} className="px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600">
+                        <button onClick={() => toggleSolution(task.id)} className="bk-btn">
                             {state.showSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
                         </button>
                     )}
@@ -1056,10 +1057,10 @@ const Wahrscheinlichkeiten: React.FC = () => {
     };
 
     return (
-        <div className="mx-auto px-4 py-8 max-w-6xl">
-            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
+        <TaskShell title="Wahrscheinlichkeiten berechnen" width="wide">
+        <div className="">
+            <div className="space-y-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-blue-900 mb-3">Wahrscheinlichkeiten berechnen</h1>
                     <p className="text-gray-700">
                         Dich erwarten jetzt 37 Aufgaben zu ein- und mehrstufigen Zufallsexperimenten. Ein interaktives Glücksrad, ein
                         Würfel-Labor und eine Urnen-Simulation sowie fünf zusätzliche Mini-Experimente (Münzen, Würfel, Mini-Rad, Urne,
@@ -1119,6 +1120,7 @@ const Wahrscheinlichkeiten: React.FC = () => {
                 </div>
             </div>
         </div>
+        </TaskShell>
     );
 };
 

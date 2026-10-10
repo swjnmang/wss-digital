@@ -16,7 +16,7 @@ from family import videos as family_videos
 DROP_OUTER = re.compile(
     r'^(min-h-screen|min-h-\[[^\]]+\]|bg-[\w\[\]\(\)\-\./#]+|from-\S+|via-\S+|to-\S+|p[xytblr]?-\S+|sm:p[xytblr]?-\S+|md:p[xytblr]?-\S+|'
     r'lg:p[xytblr]?-\S+|xl:p[xytblr]?-\S+|mx-auto|max-w-\S+|sm:max-w-\S+|md:max-w-\S+|lg:max-w-\S+|w-full|flex-1|'
-    r'justify-center|text-slate-900|text-gray-900|shadow\S*|rounded\S*|border|border-\S+|overflow-hidden)$'
+    r'container|justify-center|text-slate-900|text-gray-900|shadow\S*|rounded\S*|border|border-\S+|overflow-hidden)$'
 )
 
 
