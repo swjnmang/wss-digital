@@ -3,9 +3,21 @@ import react from '@vitejs/plugin-react'
 import express from 'express'
 import * as XLSX from 'xlsx'
 
+// Build-Kennung für den Update-Check (src/hooks/useAppUpdate.ts): Commit auf Vercel, sonst Zeitstempel
+const BUILD_ID = process.env.VERCEL_GIT_COMMIT_SHA || String(Date.now())
+
 export default defineConfig({
+  define: { __BUILD_ID__: JSON.stringify(BUILD_ID) },
   plugins: [
     react(),
+    {
+      // version.json im Build-Ordner: offene Tabs vergleichen sie mit ihrer eigenen Kennung
+      name: 'version-json',
+      apply: 'build',
+      generateBundle() {
+        this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ build: BUILD_ID }) })
+      },
+    },
     {
       name: 'excel-api',
       configureServer(server) {

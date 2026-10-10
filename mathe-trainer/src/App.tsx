@@ -135,6 +135,7 @@ import Fussballfeld from './pages/trigonometrie/anwendungsaufgaben/Fussballfeld'
 import Bergbahn from './pages/trigonometrie/anwendungsaufgaben/Bergbahn';
 import NachverfolgungBericht from './pages/trigonometrie/NachverfolgungBericht';
 import { useTrackingSession } from './hooks/useTaskTracking';
+import { useAppUpdate } from './hooks/useAppUpdate';
 // Daten und Zufall
 import StatistischeKennwerte from './pages/daten_und_zufall/StatistischeKennwerte';
 import Baumdiagramme2 from './pages/daten_und_zufall/Baumdiagramme2';
@@ -158,6 +159,7 @@ import { ExcelTrainer } from './pages/ExcelTrainer';
 export default function App() {
   const location = useLocation();
   const trackingActive = useTrackingSession();
+  const update = useAppUpdate();
   const [searchOpen, setSearchOpen] = useState(false);
   const openSearch = useCallback(() => setSearchOpen(true), []);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
@@ -176,6 +178,12 @@ export default function App() {
       <Analytics />
       <AppHeader onSearch={openSearch} trackingActive={trackingActive} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
+      {update.available && (
+        <div className="bk-update" role="status">
+          <span><i className="fa-solid fa-arrows-rotate" aria-hidden="true" /> Neue Version verfügbar</span>
+          <button type="button" className="bk-btn bk-btn-sm" onClick={update.reload}>Aktualisieren</button>
+        </div>
+      )}
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
