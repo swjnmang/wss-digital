@@ -22,8 +22,8 @@
 .primary { composes: bk-btn bk-btn-primary from global; }
 .secondary { composes: bk-btn from global; }
 .feedback { composes: bk-feedback from global; margin-bottom: 12px; }
-.feedback.success { background: var(--correct-soft); border-color: var(--correct); color: var(--correct); }
-.feedback.error { background: var(--wrong-soft); border-color: var(--wrong); color: var(--wrong); }
+.feedback.success { background: var(--correct-soft); border-color: var(--correct); color: var(--correct-ink); }
+.feedback.error { background: var(--wrong-soft); border-color: var(--wrong); color: var(--wrong-ink); }
 .solutionOutput { composes: bk-solution from global; }
 .solutionTitle { composes: bk-solution-title from global; }
 .solutionStep { background: var(--surface-sunken); border-radius: 12px; padding: 10px 14px; margin: 8px 0; overflow-x: auto; }

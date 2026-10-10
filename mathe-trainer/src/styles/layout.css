@@ -13,7 +13,7 @@
 .bk-header-link { font: 600 14px/1 var(--font-body); color: var(--ink-muted); text-decoration: none; padding: 8px 4px; }
 .bk-header-link:hover { color: var(--ink); }
 .bk-tracking { max-width: 1440px; margin: 0 auto; padding: 0 16px 10px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
-.bk-tracking-live { display: inline-flex; align-items: center; gap: 8px; font: 700 15px/1 var(--font-body); color: var(--wrong); }
+.bk-tracking-live { display: inline-flex; align-items: center; gap: 8px; font: 700 15px/1 var(--font-body); color: var(--wrong-ink); }
 .bk-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--wrong); animation: bkPulse 1.4s ease-in-out infinite; }
 @keyframes bkPulse { 50% { opacity: .35; } }
 @media (max-width: 640px) {

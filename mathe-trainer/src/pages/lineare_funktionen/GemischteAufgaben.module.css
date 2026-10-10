@@ -47,5 +47,5 @@
 .tableInput { composes: bk-input from global; width: 72px; min-height: 44px; text-align: center; font-size: 17px; }
 
 .lösungBox { composes: bk-solution from global; }
-.lösungBox h4 { margin: 0 0 8px; font: 800 17px/1.2 var(--font-display); color: var(--correct); text-align: left; }
+.lösungBox h4 { margin: 0 0 8px; font: 800 17px/1.2 var(--font-display); color: var(--correct-ink); text-align: left; }
 .lösungsDetails p { margin: 4px 0; text-align: left; color: var(--ink); }

@@ -38,7 +38,7 @@
 .pr { margin: 0; }
 
 .lösungBox { composes: bk-solution from global; }
-.lösungBox h4 { margin: 0 0 8px; font: 800 17px/1.2 var(--font-display); color: var(--correct); text-align: left; }
+.lösungBox h4 { margin: 0 0 8px; font: 800 17px/1.2 var(--font-display); color: var(--correct-ink); text-align: left; }
 .lösungsDetails p { margin: 4px 0; text-align: left; color: var(--ink); }
 
 .prüfenButton { composes: bk-btn bk-btn-primary from global; }

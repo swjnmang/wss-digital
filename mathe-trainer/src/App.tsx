@@ -136,6 +136,7 @@ import Bergbahn from './pages/trigonometrie/anwendungsaufgaben/Bergbahn';
 import NachverfolgungBericht from './pages/trigonometrie/NachverfolgungBericht';
 import { useTrackingSession } from './hooks/useTaskTracking';
 import { useAppUpdate } from './hooks/useAppUpdate';
+import { useAutoCheck } from './hooks/useAutoCheck';
 // Daten und Zufall
 import StatistischeKennwerte from './pages/daten_und_zufall/StatistischeKennwerte';
 import Baumdiagramme2 from './pages/daten_und_zufall/Baumdiagramme2';
@@ -160,6 +161,7 @@ export default function App() {
   const location = useLocation();
   const trackingActive = useTrackingSession();
   const update = useAppUpdate();
+  useAutoCheck(location.pathname);
   const [searchOpen, setSearchOpen] = useState(false);
   const openSearch = useCallback(() => setSearchOpen(true), []);
   const closeSearch = useCallback(() => setSearchOpen(false), []);

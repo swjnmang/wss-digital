@@ -2,7 +2,7 @@
 
 // Baukasten-Design: Die Tailwind-Farbfamilien werden auf die Baukasten-Palette abgebildet,
 // damit alle bestehenden Seiten ohne Eingriff in die Aufgabenlogik die neue Farbwelt bekommen.
-// grün = "richtig" (Petrol), rot = "noch nicht" (Orange), grau/slate = warme Neutraltöne.
+// grün = "richtig" (Pastell-Mint), rot = "falsch" (Rot), grau/slate = warme Neutraltöne.
 const neutral = {
   50: '#faf9f6', 100: '#f3f2ee', 200: '#e3e0d8', 300: '#cfcbc1', 400: '#a29e94',
   500: '#85817a', 600: '#5a5750', 700: '#45423c', 800: '#2b2926', 900: '#191919', 950: '#0e0e0e',
@@ -12,12 +12,12 @@ const blue = {
   500: '#2f74e6', 600: '#1a56db', 700: '#1745b0', 800: '#163a8a', 900: '#142f6b', 950: '#0f2150',
 }
 const correct = {
-  50: '#ecf7fa', 100: '#dff0f6', 200: '#b4dfeb', 300: '#7cc6dc', 400: '#3ea7c4',
-  500: '#128aa8', 600: '#0b6a8f', 700: '#0a5876', 800: '#0a475f', 900: '#0a3a4d', 950: '#06262f',
+  50: '#effaf3', 100: '#dcf5e3', 200: '#b9ebc8', 300: '#8ddba5', 400: '#5cc47f',
+  500: '#2f9e5b', 600: '#24834a', 700: '#1e6b3d', 800: '#1a5532', 900: '#154529', 950: '#0b2a18',
 }
 const wrong = {
-  50: '#fef4ee', 100: '#fde6da', 200: '#f9c9b0', 300: '#f4a47f', 400: '#ec7a4c',
-  500: '#d95a24', 600: '#b03a0a', 700: '#923009', 800: '#74280b', 900: '#5e220c', 950: '#3a1405',
+  50: '#fef2f2', 100: '#fde2e2', 200: '#fbc5c5', 300: '#f59b9b', 400: '#ec6c6c',
+  500: '#d64545', 600: '#b93232', 700: '#a32d2d', 800: '#842626', 900: '#6b2020', 950: '#401010',
 }
 const yellow = {
   50: '#fffbea', 100: '#fff4cc', 200: '#ffe999', 300: '#ffdc66', 400: '#ffcf33',

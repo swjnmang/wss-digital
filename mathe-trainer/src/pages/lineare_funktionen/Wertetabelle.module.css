@@ -47,15 +47,15 @@
 .wertetabelle tr:first-child th, .wertetabelle tr:first-child td { border-top: 0; }
 .graphBtn { composes: bk-btn from global; }
 .graphBox { composes: bk-graph from global; margin-top: 14px; display: flex; justify-content: center; }
-.sollution { color: var(--correct); font-weight: 800; }
+.sollution { color: var(--correct-ink); font-weight: 800; }
 .rechenbeispiele { composes: bk-solution from global; }
 .beispiel { margin: 8px 0; padding: 10px 12px; border-radius: 12px; background: var(--surface-sunken); }
 .beispielText, .beispielErklaerung { margin: 0 0 4px; text-align: left; color: var(--ink); }
 .berechnung { margin: 0; font: 700 17px/1.4 var(--font-display); text-align: left; color: var(--ink); }
-.xWertRot { color: var(--wrong); font-weight: 800; }
+.xWertRot { color: var(--wrong-ink); font-weight: 800; }
 
 .lösungBox { composes: bk-solution from global; }
-.lösungBox h4 { margin: 0 0 8px; font: 800 17px/1.2 var(--font-display); color: var(--correct); text-align: left; }
+.lösungBox h4 { margin: 0 0 8px; font: 800 17px/1.2 var(--font-display); color: var(--correct-ink); text-align: left; }
 .lösungsDetails p { margin: 4px 0; text-align: left; color: var(--ink); }
 
 .lösungTabelle { overflow-x: auto; margin: 8px 0; }

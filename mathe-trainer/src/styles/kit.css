@@ -18,12 +18,12 @@
 .bk-seg-btn-on, .bk-seg-btn-on:hover { background: var(--primary); color: var(--on-primary); }
 
 .bk-feedback { display: flex; gap: 10px; align-items: flex-start; padding: 14px 16px; border-radius: var(--radius-sm); border: 2px dashed transparent; font: 600 16px/1.45 var(--font-body); text-align: left; }
-.bk-feedback-ok { background: var(--correct-soft); border-color: var(--correct); color: var(--correct); }
-.bk-feedback-no { background: var(--wrong-soft); border-color: var(--wrong); color: var(--wrong); }
+.bk-feedback-ok { background: var(--correct-soft); border-color: var(--correct); color: var(--correct-ink); }
+.bk-feedback-no { background: var(--wrong-soft); border-color: var(--wrong); color: var(--wrong-ink); }
 .bk-feedback-info { background: var(--hint-soft); border-color: transparent; color: var(--ink); }
 
 .bk-solution { overflow-x: auto; margin-top: 20px; padding: 18px 20px; border: 2px solid var(--correct); border-radius: 16px; background: var(--surface); text-align: left; color: var(--ink); }
-.bk-solution-title { margin: 0 0 10px; font: 800 19px/1.2 var(--font-display); color: var(--correct); text-align: left; }
+.bk-solution-title { margin: 0 0 10px; font: 800 19px/1.2 var(--font-display); color: var(--correct-ink); text-align: left; }
 .bk-answer { margin-top: 12px; padding: 10px 14px; border-radius: 12px; background: var(--correct-soft); font: 700 18px/1.4 var(--font-display); }
 
 .bk-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }

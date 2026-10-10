@@ -441,16 +441,16 @@ export default function ParallelSenkrecht() {
                       
                       <p style={{ marginTop: '1rem' }}><strong>Ergebnis:</strong></p>
                       {aufgabe.beziehung === 'parallel' && (
-                        <p style={{ color: 'var(--correct)' }}>✓ m₁ = m₂ → die Geraden sind <strong>parallel</strong></p>
+                        <p style={{ color: 'var(--correct-ink)' }}>✓ m₁ = m₂ → die Geraden sind <strong>parallel</strong></p>
                       )}
                       {aufgabe.beziehung === 'senkrecht' && (
-                        <p style={{ color: 'var(--correct)' }}>
+                        <p style={{ color: 'var(--correct-ink)' }}>
                           ✓ m₁ · m₂ = {aufgabe.m1} · (−1/{aufgabe.m1}) = -1 → die Geraden sind <strong>senkrecht</strong>
                           {' '}(gerundet: m₂ ≈ {aufgabe.m2})
                         </p>
                       )}
                       {aufgabe.beziehung === 'keine' && (
-                        <p style={{ color: 'var(--correct)' }}>Die Geraden haben <strong>keine spezielle Beziehung</strong></p>
+                        <p style={{ color: 'var(--correct-ink)' }}>Die Geraden haben <strong>keine spezielle Beziehung</strong></p>
                       )}
                     </div>
                   )}
@@ -468,7 +468,7 @@ export default function ParallelSenkrecht() {
                       <MathDisplay latex={`$$${aufgabe.punkt.y} = ${aufgabe.m2} \\cdot ${aufgabe.punkt.x} + t$$`} />
                       <MathDisplay latex={`$$t = ${aufgabe.t2}$$`} />
                       
-                      <p style={{ marginTop: '1rem', color: 'var(--correct)', fontWeight: 'bold' }}>
+                      <p style={{ marginTop: '1rem', color: 'var(--correct-ink)', fontWeight: 'bold' }}>
                         Lösung: y = {aufgabe.m2}x {aufgabe.t2 >= 0 ? '+' : '−'} {Math.abs(aufgabe.t2)}
                       </p>
                     </div>

@@ -32,3 +32,16 @@ Der Modus wird nicht automatisch erkannt: Jede Seite muss ihn selbst einbinden.
 
 Fertige Änderungen immer direkt in `main` committen und pushen (ausdrücklicher Wunsch des Repo-Inhabers),
 nicht nur auf einen Feature-Branch. Vorher `main` aktualisieren und mergen, keine Force-Pushes.
+
+## Automatische Prüfung & Farben für richtig/falsch
+
+- Alle Aufgaben werden automatisch geprüft (`src/hooks/useAutoCheck.ts`, in `App.tsx` eingebunden):
+  Nach ca. 1,2 s Tipp-Pause oder beim Verlassen eines Feldes wird der „Prüfen“-Button der Aufgabe ausgelöst,
+  sobald alle Felder der Aufgabe ausgefüllt sind und sich die Eingaben seit der letzten Prüfung geändert haben.
+- Neue Aufgaben brauchen dafür nichts Eigenes, nur einen Button mit der Beschriftung „Prüfen“, „Überprüfen“,
+  „Lösung prüfen“ oder „Antwort prüfen“ hinter den Eingabefeldern derselben Aufgabe. Diese Beschriftungen beibehalten.
+- Eingabefelder nach dem Prüfen einzeln einfärben: richtig mit `var(--correct)` / `var(--correct-soft)`,
+  falsch mit `var(--wrong)` / `var(--wrong-soft)` (Tailwind: `green-*` / `red-*`, auf dieselbe Palette gelegt).
+  Für Text auf hellem Grund `var(--correct-ink)` / `var(--wrong-ink)` verwenden.
+- Farbe „richtig“ ist Pastell-Mint (#2f9e5b / #dcf5e3), „falsch“ Rot (#d64545 / #fde2e2). Kein Blau für „richtig“.
+- Abschalten für einen Bereich: Attribut `data-no-autocheck`. Prüfungsmodus-Seiten (URL mit „pruefung“) sind ausgenommen.
