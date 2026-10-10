@@ -37,6 +37,7 @@ import {
   vertexTex,
   vertexToGeneralLines,
 } from './quadratischShared'
+import TaskShell from '../../components/layout/TaskShell'
 
 // Sechs Aufgaben gleichzeitig auf der Seite
 const TOTAL_TASKS = 6
@@ -234,7 +235,7 @@ function pointsText(roots: number[]) {
 
 function SolutionSteps({ task }: { task: Task }) {
   return (
-    <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-left text-slate-700 space-y-3">
+    <div className="mt-6 bk-taskbox text-left text-slate-700 space-y-3">
       <h3 className="text-base font-bold text-slate-800 text-center">Lösungsweg</h3>
       {task.form === 'scheitel' && (
         <div>
@@ -455,7 +456,7 @@ function ExampleGraph() {
 
 function Erklaerung({ level }: { level: Level }) {
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200 text-left">
+    <div className="bk-panel text-left">
       <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">So berechnest du die Nullstellen</h2>
       <p className="text-slate-700 mb-3">
         Um die <strong>Nullstellen</strong>, also die Schnittpunkte einer Funktion mit der x-Achse, zu berechnen, gehst du wie folgt vor:
@@ -619,22 +620,21 @@ export default function Nullstellen() {
 
   const header = (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Nullstellen berechnen</h1>
       <p className="text-center text-slate-600">Berechne, wo die Parabel die x-Achse schneidet.</p>
     </div>
   )
 
   if (!level) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50">
-        <div className="mx-auto px-4 py-8 max-w-6xl w-full flex flex-col gap-6">
+      <TaskShell title="Nullstellen berechnen" width="narrow">
+        <div className="flex flex-col gap-6">
           {header}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
-                className="rounded-xl bg-green-600 hover:bg-green-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Einfach</p>
                 <Tex display className="text-xl mb-2 text-white" tex="y = ax^2 + bx + c" />
@@ -642,7 +642,7 @@ export default function Nullstellen() {
               </button>
               <button
                 onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-xl bg-red-600 hover:bg-red-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
                 <Tex display className="text-xl mb-1 text-white" tex="y = ax^2 + bx + c" />
@@ -652,13 +652,13 @@ export default function Nullstellen() {
             </div>
           </div>
         </div>
-      </div>
+      </TaskShell>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-6xl w-full flex flex-col gap-6">
+    <TaskShell title="Nullstellen berechnen" width="narrow">
+        <div className="flex flex-col gap-6">
         {header}
         <Erklaerung level={level} />
 
@@ -717,6 +717,6 @@ export default function Nullstellen() {
           </div>
         )}
       </div>
-    </div>
+    </TaskShell>
   )
 }

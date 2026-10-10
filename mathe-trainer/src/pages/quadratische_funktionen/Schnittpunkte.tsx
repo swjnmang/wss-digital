@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+import TaskShell from '../../components/layout/TaskShell'
 
 declare global {
     interface Window {
@@ -691,11 +692,9 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
     };
 
     return (
-        <div className="mx-auto px-4 py-8 max-w-6xl">
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-                <h1 className="text-3xl font-bold text-teal-800 text-center mb-6">
-                    Schnittpunkte berechnen
-                </h1>
+        <TaskShell title="Schnittpunkte berechnen" width="wide">
+        <div className="">
+            <div className="bk-panel p-6 mb-6">
 
                 <div className="flex flex-wrap gap-4 mb-6 justify-center">
                     <div className="flex rounded-lg bg-gray-100 p-1">
@@ -729,7 +728,7 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
                 <div className="flex justify-center">
                     <button
                         onClick={generateAllTasks}
-                        className="px-6 py-3 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors"
+                        className="bk-btn"
                     >
                         Neue Aufgaben
                     </button>
@@ -744,7 +743,7 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
                 const showGraph = showGraphs[index];
 
                 return (
-                    <div key={index} className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <div key={index} className="bk-panel p-6 mb-6">
                         <h2 className="text-lg font-bold text-teal-800 mb-4 text-center">Aufgabe {index + 1}</h2>
 
                         <div className="bg-blue-50 p-6 rounded-lg border border-blue-100 mb-6 text-center">
@@ -822,19 +821,19 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
                         <div className="flex flex-wrap gap-4 justify-center mb-6">
                             <button
                                 onClick={() => checkAnswer(index)}
-                                className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                                className="bk-btn bk-btn-primary"
                             >
                                 Prüfen
                             </button>
                             <button
                                 onClick={() => toggleSolution(index)}
-                                className="px-6 py-3 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors"
+                                className="bk-btn"
                             >
                                 {showSolution ? "Lösung verbergen" : "Lösung anzeigen"}
                             </button>
                             <button
                                 onClick={() => toggleGraph(index)}
-                                className="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+                                className="bk-btn"
                             >
                                 {showGraph ? "Graph verbergen" : "Graph anzeigen"}
                             </button>
@@ -861,6 +860,7 @@ const Schnittpunkte: React.FC<SchnittpunkteProps> = ({ initialTaskType = 'line-p
                 );
             })}
         </div>
+        </TaskShell>
     );
 };
 

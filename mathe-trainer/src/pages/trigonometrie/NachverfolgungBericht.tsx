@@ -12,6 +12,7 @@ import {
     TrackingArea,
     TrackingEntry
 } from '../../utils/tracking';
+import TaskShell from '../../components/layout/TaskShell'
 
 const formatPoints = (points: number) =>
     (Number.isInteger(points) ? String(points) : points.toFixed(1)).replace('.', ',');
@@ -155,10 +156,10 @@ const NachverfolgungBericht: React.FC<{ area?: TrackingArea }> = ({ area = 'trig
     };
 
     return (
-        <div className="mx-auto px-4 py-8 max-w-6xl">
-            <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
+        <TaskShell title={`Deine Nachverfolgung – ${areaInfo.title}`} width="wide">
+        <div className="">
+            <div className="bk-panel space-y-6">
                 <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-bold text-teal-800">Deine Nachverfolgung – {areaInfo.title}</h1>
                     {startedAt && <p className="text-sm text-gray-500">Sitzung gestartet am {formatDateTime(startedAt)}</p>}
                     <p className="text-sm text-gray-600 max-w-xl mx-auto">
                         Diese Daten bleiben ausschließlich in deinem Browser gespeichert. Es werden keine Namen oder Klassen
@@ -226,7 +227,7 @@ const NachverfolgungBericht: React.FC<{ area?: TrackingArea }> = ({ area = 'trig
                         <button
                             type="button"
                             onClick={() => setPdfDialogOpen(true)}
-                            className="bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-lg px-5 py-2.5 shadow"
+                            className="bk-btn"
                         >
                             <i className="fa-solid fa-file-pdf mr-2"></i>
                             Bericht als PDF herunterladen
@@ -284,7 +285,7 @@ const NachverfolgungBericht: React.FC<{ area?: TrackingArea }> = ({ area = 'trig
                                 <button
                                     type="submit"
                                     disabled={!canCreatePdf}
-                                    className="px-4 py-2 rounded-lg bg-teal-700 text-white font-semibold hover:bg-teal-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="bk-btn disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     PDF herunterladen
                                 </button>
@@ -301,6 +302,7 @@ const NachverfolgungBericht: React.FC<{ area?: TrackingArea }> = ({ area = 'trig
                 </div>
             </div>
         </div>
+        </TaskShell>
     );
 };
 

@@ -6,6 +6,7 @@ import GeoGebraMultiGraph from '../../components/GeoGebraMultiGraph'
 import { roundHalfAwayFromZero } from '../../utils/numbers'
 import { HelpUsage, logTrackingEntry } from '../../utils/tracking'
 import { useFlushOnLeave } from '../../hooks/useTaskTracking'
+import TaskShell from '../../components/layout/TaskShell'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -352,9 +353,6 @@ export default function GemischteAufgaben() {
   const [validierteZellen, setValidierteZellen] = useState<{ [key: number | string]: { [key: string]: boolean } }>({})
   const [fieldFeedback, setFieldFeedback] = useState<{ [key: number]: { [field: string]: 'correct' | 'incorrect' } }>({})
   useEffect(() => {
-    const script = document.createElement('script')
-    script.src = 'https://polyfill.io/v3/polyfill.min.js?features=es6'
-    document.head.appendChild(script)
 
     const mathjaxScript = document.createElement('script')
     mathjaxScript.id = 'MathJax-script'
@@ -586,15 +584,11 @@ export default function GemischteAufgaben() {
   }
 
   return (
-    <div className={`prose ${styles.container}`}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Übungsaufgaben</h1>
-        <p className={styles.subtitle}>Löse die Aufgaben und überprüfe deine Ergebnisse</p>
-        <p className={styles.roundingNote}>💡 Wichtig: Runde deine Ergebnisse auf 2 Stellen nach dem Komma!</p>
-      </div>
+    <TaskShell title="Übungsaufgaben" subtitle="Löse die Aufgaben und überprüfe deine Ergebnisse" width="full">
+      <p className={styles.roundingNote}><i className="fa-solid fa-lightbulb" aria-hidden="true" /> Wichtig: Runde deine Ergebnisse auf 2 Stellen nach dem Komma!</p>
 
       <button onClick={generiereAufgaben} className={styles.newButton}>
-        🔄 Neue Aufgaben
+        <i className="fa-solid fa-rotate" aria-hidden="true" /> Neue Aufgaben
       </button>
 
       <div className={styles.aufgabenContainer}>
@@ -824,6 +818,6 @@ export default function GemischteAufgaben() {
           </div>
         ))}
       </div>
-    </div>
+    </TaskShell>
   )
 }

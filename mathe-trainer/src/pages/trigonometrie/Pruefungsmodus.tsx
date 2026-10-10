@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
+import TaskShell from '../../components/layout/TaskShell'
 
 type RightHighlight = 'horizontal' | 'vertical' | 'hypotenuse' | 'angle' | 'none';
 type GeneralKey = 'a' | 'b' | 'c' | 'alpha' | 'beta' | 'gamma';
@@ -702,10 +703,10 @@ const Pruefungsmodus: React.FC = () => {
     };
 
     return (
-        <div className="mx-auto px-4 py-8 max-w-6xl">
-            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
+        <TaskShell title="Prüfungsmodus Trigonometrie" width="wide">
+        <div className="">
+            <div className="bk-panel p-6 space-y-6">
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold text-teal-800 mb-2">Prüfungsmodus Trigonometrie</h1>
                     <p className="text-gray-700 max-w-2xl mx-auto">
                         Zehn vermischte Aufgaben aus der Trigonometrie. Während der Prüfung gibt es keine Lösungswege –
                         die Auswertung mit Musterlösung erhältst du am Ende als PDF.
@@ -742,7 +743,7 @@ const Pruefungsmodus: React.FC = () => {
                             <button
                                 onClick={startExam}
                                 disabled={!canStart}
-                                className="px-6 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                                className="bk-btn disabled:bg-gray-300 disabled:cursor-not-allowed"
                             >
                                 Prüfung starten
                             </button>
@@ -789,7 +790,7 @@ const Pruefungsmodus: React.FC = () => {
                             <button
                                 onClick={() => setStage('result')}
                                 disabled={!allAnswered}
-                                className="px-6 py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                                className="bk-btn bk-btn-primary disabled:bg-gray-300 disabled:cursor-not-allowed"
                             >
                                 Prüfung abgeben
                             </button>
@@ -811,7 +812,7 @@ const Pruefungsmodus: React.FC = () => {
                         <div className="flex justify-center">
                             <button
                                 onClick={downloadPdf}
-                                className="px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors"
+                                className="bk-btn bk-btn-primary"
                             >
                                 📄 Auswertung als PDF herunterladen
                             </button>
@@ -846,13 +847,13 @@ const Pruefungsmodus: React.FC = () => {
                         <div className="flex justify-center flex-wrap gap-4 pt-2">
                             <button
                                 onClick={newExamSamePerson}
-                                className="px-6 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors"
+                                className="bk-btn"
                             >
                                 Neue Prüfung (gleiche Person)
                             </button>
                             <button
                                 onClick={restart}
-                                className="px-6 py-2 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors"
+                                className="bk-btn"
                             >
                                 Zurück zur Eingabe
                             </button>
@@ -868,6 +869,7 @@ const Pruefungsmodus: React.FC = () => {
                 </div>
             </div>
         </div>
+        </TaskShell>
     );
 };
 

@@ -13,6 +13,7 @@ import {
   createRatendarlehenPlanTask,
   createAnnuitaetPlanTask,
 } from './GemischteFinanzaufgaben';
+import TaskShell from '../../components/layout/TaskShell'
 
 interface PruefungsAufgabe {
   id: string;
@@ -191,9 +192,9 @@ const StartScreen: React.FC<{
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-8">
-        <h1 className="text-3xl font-bold text-center mb-2 text-blue-900">Prüfungsmodus</h1>
+    <TaskShell title="Prüfungsmodus" width="wide">
+    <div className="flex items-center">
+      <div className="bk-panel max-w-md w-full p-8">
         <p className="text-center text-gray-600 mb-6">Finanzmathe Test</p>
 
         <div className="space-y-4 mb-6">
@@ -248,12 +249,13 @@ const StartScreen: React.FC<{
         <button
           onClick={handleStart}
           disabled={!name.trim() || !klasse.trim() || !termsAccepted}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-4 rounded-lg transition duration-200"
+          className="bk-btn bk-btn-primary w-full disabled:bg-gray-400"
         >
           Prüfung starten
         </button>
       </div>
     </div>
+    </TaskShell>
   );
 };
 
@@ -298,12 +300,13 @@ const ExamScreen: React.FC<ExamScreenProps> = ({ zustand, onUpdateAnswer, onNavi
   const isFirstQuestion = zustand.aktuelleAufgabeIndex === 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <TaskShell title="Prüfungsmodus" width="wide">
+    <div className="">
       <div className="max-w-6xl mx-auto">
         {/* Header mit Fortschrittsbalken */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
-            <h1 className="text-2xl font-bold text-gray-900">Prüfung: {zustand.name}</h1>
+            <h2 className="text-2xl font-bold text-gray-900">Prüfung: {zustand.name}</h2>
             <span className="text-lg font-semibold text-blue-600">
               Aufgabe {zustand.aktuelleAufgabeIndex + 1}/{zustand.aufgaben.length}
             </span>
@@ -317,7 +320,7 @@ const ExamScreen: React.FC<ExamScreenProps> = ({ zustand, onUpdateAnswer, onNavi
         </div>
 
         {/* Aufgabenkarte */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <div className="bk-panel p-8 mb-8">
           {/* Aufgabentext */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Aufgabe</h2>
@@ -428,7 +431,7 @@ const ExamScreen: React.FC<ExamScreenProps> = ({ zustand, onUpdateAnswer, onNavi
             <button
               onClick={() => onNavigate('prev')}
               disabled={isFirstQuestion}
-              className="px-6 py-2 bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white font-semibold rounded-lg transition"
+              className="bk-btn disabled:bg-gray-300"
             >
               ← Zurück
             </button>
@@ -437,14 +440,14 @@ const ExamScreen: React.FC<ExamScreenProps> = ({ zustand, onUpdateAnswer, onNavi
               {!isLastQuestion ? (
                 <button
                   onClick={() => onNavigate('next')}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+                  className="bk-btn bk-btn-primary"
                 >
                   Weiter →
                 </button>
               ) : (
                 <button
                   onClick={onFinish}
-                  className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
+                  className="bk-btn bk-btn-primary"
                 >
                   Prüfung beenden
                 </button>
@@ -454,6 +457,7 @@ const ExamScreen: React.FC<ExamScreenProps> = ({ zustand, onUpdateAnswer, onNavi
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 };
 
@@ -660,12 +664,13 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+    <TaskShell title="Prüfungsmodus" width="wide">
+    <div className="">
       <div className="max-w-6xl mx-auto">
         {/* Ergebniskarte */}
-        <div className="bg-white rounded-lg shadow-2xl p-8 mb-8">
+        <div className="bk-panel mb-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Prüfung abgeschlossen!</h1>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Prüfung abgeschlossen!</h2>
             <p className="text-lg text-gray-600">Herzlichen Glückwunsch, {zustand.name}!</p>
           </div>
 
@@ -736,13 +741,13 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
           <div className="flex gap-4">
             <button
               onClick={generatePDF}
-              className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+              className="bk-btn bk-btn-primary flex-1"
             >
               📥 PDF herunterladen
             </button>
             <button
               onClick={onRestart}
-              className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition"
+              className="bk-btn flex-1"
             >
               Neue Prüfung starten
             </button>
@@ -750,6 +755,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ zustand, onRestart }) => 
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 };
 

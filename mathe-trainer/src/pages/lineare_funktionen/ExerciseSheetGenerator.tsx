@@ -3,6 +3,7 @@ import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import styles from './ExerciseSheet.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
+import TaskShell from '../../components/layout/TaskShell'
 
 type Difficulty = 'easy' | 'medium' | 'hard'
 type Theme = 'wertetabelle' | 'ablesen' | 'funktionsgleichung' | 'steigung' | 'punkt_gerade' | 'parallel' | 'nullstellen' | 'schnittpunkt' | 'graph_zeichnen'
@@ -522,10 +523,8 @@ export default function ExerciseSheetGenerator() {
   }
 
   return (
-    <div className={`${styles.container}`}>
+    <TaskShell title="Übungsblatt-Generator" subtitle="Stelle dir dein eigenes Übungsblatt zusammen!" width="narrow">
       <div className={styles.card}>
-        <h2 className={styles.title}>Übungsblatt-Generator</h2>
-        <p className={styles.subtitle}>Stelle dir dein eigenes Übungsblatt zusammen!</p>
 
         {!showPreview ? (
           <>
@@ -539,7 +538,7 @@ export default function ExerciseSheetGenerator() {
                     onClick={() => setDifficulty(level)}
                     className={`${styles.diffBtn} ${difficulty === level ? styles.active : ''}`}
                   >
-                    {level === 'easy' ? '⭐ Leicht' : level === 'medium' ? '⭐⭐ Mittel' : '⭐⭐⭐ Schwer'}
+                    {level === 'easy' ? 'Leicht' : level === 'medium' ? 'Mittel' : 'Schwer'}
                   </button>
                 ))}
               </div>
@@ -590,7 +589,7 @@ export default function ExerciseSheetGenerator() {
                 disabled={isGeneratingPdf}
                 className={styles.primaryBtn}
               >
-                {isGeneratingPdf ? '⏳ PDF wird generiert...' : '📥 PDF herunterladen'}
+                {isGeneratingPdf ? <><i className="fa-solid fa-spinner fa-spin" aria-hidden="true" /> PDF wird generiert...</> : <><i className="fa-solid fa-download" aria-hidden="true" /> PDF herunterladen</>}
               </button>
               <button onClick={() => setShowPreview(false)} className={styles.secondaryBtn}>
                 ← Zurück
@@ -599,6 +598,6 @@ export default function ExerciseSheetGenerator() {
           </>
         )}
       </div>
-    </div>
+    </TaskShell>
   )
 }

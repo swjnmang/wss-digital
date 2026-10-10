@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import TaskShell from '../../../components/layout/TaskShell'
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 type Op = '+' | '-' | '*' | ':';
@@ -91,19 +92,19 @@ export default function Gemischt() {
   function onKey(e: React.KeyboardEvent) { if (e.key === 'Enter') check(); }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-6xl min-h-[400px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
-          <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Gemischte Bruchaufgaben</h1>
+    <TaskShell title="Gemischte Bruchaufgaben" width="narrow">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center w-full">
+        <div className="bk-panel w-full max-w-6xl flex flex-col items-center">
 
           <div className="flex gap-2 mb-6">
-            <button onClick={() => setDifficulty('easy')} className={`px-4 py-2 rounded font-bold transition ${difficulty === 'easy' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Leicht</button>
-            <button onClick={() => setDifficulty('medium')} className={`px-4 py-2 rounded font-bold transition ${difficulty === 'medium' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Mittel</button>
-            <button onClick={() => setDifficulty('hard')} className={`px-4 py-2 rounded font-bold transition ${difficulty === 'hard' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Schwer</button>
+            <button onClick={() => setDifficulty('easy')} className={`bk-seg-btn ${difficulty === 'easy' ? 'bk-seg-btn-on' : ''}`}>Leicht</button>
+            <button onClick={() => setDifficulty('medium')} className={`bk-seg-btn ${difficulty === 'medium' ? 'bk-seg-btn-on' : ''}`}>Mittel</button>
+            <button onClick={() => setDifficulty('hard')} className={`bk-seg-btn ${difficulty === 'hard' ? 'bk-seg-btn-on' : ''}`}>Schwer</button>
           </div>
 
           {task && (
-            <div className="w-full max-w-xl bg-slate-100 border border-slate-200 rounded-lg p-6 mb-4 text-center">
+            <div className="w-full max-w-xl bk-taskbox mb-4 text-center">
               <div className="font-semibold text-blue-800 mb-2 text-base md:text-lg">Berechne die Lösung:</div>
               <div className="mb-4 text-2xl md:text-3xl flex items-center justify-center gap-4">
                 <Frac n={task.a.n} d={task.a.d} />
@@ -121,12 +122,12 @@ export default function Gemischt() {
           )}
 
           <div className="flex flex-wrap gap-4 mb-4">
-            <button onClick={check} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Überprüfen</button>
-            <button onClick={show} className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-6 rounded shadow transition-colors">Lösung zeigen</button>
-            <button onClick={() => next(difficulty)} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Nächste Aufgabe</button>
+            <button onClick={check} className="bk-btn bk-btn-primary">Überprüfen</button>
+            <button onClick={show} className="bk-btn">Lösung zeigen</button>
+            <button onClick={() => next(difficulty)} className="bk-btn">Nächste Aufgabe</button>
           </div>
 
-          {fb && (<div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${fbType === 'correct' ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>{fb}</div>)}
+          {fb && (<div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${fbType === 'correct' ? 'bk-feedback bk-feedback-ok block' : 'bk-feedback bk-feedback-no block'}`}>{fb}</div>)}
           {sol && (<div className="w-full max-w-xl bg-blue-50 border border-blue-200 rounded p-4 text-blue-900 mb-2 text-center text-base md:text-lg"><b>Musterlösung:</b> <br />{sol}</div>)}
 
           <div className="flex flex-wrap justify-center gap-8 mt-6 w-full max-w-2xl">
@@ -137,5 +138,6 @@ export default function Gemischt() {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }

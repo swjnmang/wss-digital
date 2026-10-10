@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import TaskShell from '../../../components/layout/TaskShell'
 
 type Level = 1 | 2 | 3 | 4;
 type Term = { coeff: number; base: string; exp: number };
@@ -111,10 +112,10 @@ export default function Addierensubtrahieren() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-3xl md:max-w-6xl min-h-[520px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
-          <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Potenzen addieren & subtrahieren</h1>
+    <TaskShell title="Potenzen addieren & subtrahieren" width="narrow">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center w-full">
+        <div className="bk-panel w-full max-w-3xl md:max-w-6xl min-h-[520px] flex flex-col items-center">
 
           <div className="w-full max-w-2xl bg-slate-100 border border-slate-200 rounded-lg p-4 mb-4 text-center">
             <div className="text-sm text-slate-700 mb-2">Fasse so weit wie möglich zusammen. Addition/Subtraktion nur bei identischer Basis und identischem Exponenten.</div>
@@ -123,18 +124,19 @@ export default function Addierensubtrahieren() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl mb-2">
             {q?.options.map((opt, i) => (
-              <button key={i} onClick={()=> check(opt)} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow text-base md:text-lg" dangerouslySetInnerHTML={{ __html: opt }} />
+              <button key={i} onClick={()=> check(opt)} className="bk-btn bk-btn-primary md:text-lg" dangerouslySetInnerHTML={{ __html: opt }} />
             ))}
           </div>
 
           <div className="flex gap-3 mb-2">
-            <button onClick={next} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded shadow">Nächste Frage</button>
+            <button onClick={next} className="bk-btn">Nächste Frage</button>
             <div className="text-sm text-slate-600 self-center">Level: {['Einfach','Mittel','Schwer','Ultimativ'][level-1]} · Punkte: {score} · Streak: {streak}</div>
           </div>
 
-          {feedback && (<div className={`w-full max-w-2xl text-center font-semibold rounded p-3 ${feedback.startsWith('✅')? 'bg-green-100 text-green-800 border border-green-300':'bg-red-100 text-red-800 border border-red-300'}`}>{feedback}</div>)}
+          {feedback && (<div className={`w-full max-w-2xl text-center font-semibold rounded p-3 ${feedback.startsWith('✅')? 'bk-feedback bk-feedback-ok block':'bk-feedback bk-feedback-no block'}`}>{feedback}</div>)}
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }

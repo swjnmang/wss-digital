@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BlockMath, InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import TaskShell from '../../components/layout/TaskShell'
+import { VideoEmbed } from '../../components/VideoButton'
 
 // Typ 1: Scheitelpunkt S(h|k) und ein weiterer Punkt P gegeben
 type ScheitelAufgabe = { typ: 'scheitel'; a: number; b: number; c: number; h: number; k: number; px: number; py: number };
@@ -508,13 +510,7 @@ const Lernvideo = ({ id, fall }: { id: string; fall: string }) => (
         {id ? (
             <div className="max-w-3xl mx-auto">
                 <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
-                    <iframe
-                        className="absolute inset-0 w-full h-full rounded-lg"
-                        src={`https://www.youtube-nocookie.com/embed/${id}`}
-                        title={`Lernvideo: Funktionsgleichung aufstellen – ${fall}`}
-                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                    />
+                    <VideoEmbed src={`https://www.youtube-nocookie.com/embed/${id}`} title={`Lernvideo: Funktionsgleichung aufstellen – ${fall}`} />
                 </div>
                 <a
                     href={`https://www.youtube.com/watch?v=${id}`}
@@ -565,9 +561,9 @@ const FunktionsgleichungAufstellen = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-7xl w-full mx-auto text-left">
-                <h1 className="text-3xl font-bold text-gray-800 mb-3">Funktionsgleichung aufstellen</h1>
+        <TaskShell title="Funktionsgleichung aufstellen" width="wide">
+        <div className="container">
+            <div className="bk-panel max-w-7xl w-full mx-auto text-left">
                 <p className="text-gray-700 mb-6">
                     Gesucht ist die Funktionsgleichung einer Parabel in allgemeiner Form <InlineMath math="y = ax^2 + bx + c" />. Du musst also
                     die drei Werte <InlineMath math="a" />, <InlineMath math="b" /> und <InlineMath math="c" /> herausfinden. Je nachdem, was über die Parabel
@@ -709,13 +705,14 @@ const FunktionsgleichungAufstellen = () => {
                 <div className="flex justify-center mt-8">
                     <button
                         onClick={() => neueAufgaben()}
-                        className="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                        className="bk-btn"
                     >
                         5 neue Aufgaben
                     </button>
                 </div>
             </div>
         </div>
+        </TaskShell>
     );
 };
 

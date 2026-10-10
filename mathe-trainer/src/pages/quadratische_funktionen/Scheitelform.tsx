@@ -4,6 +4,7 @@ import 'katex/dist/katex.min.css';
 import ParabelGraph from '../../components/ParabelGraph';
 import MarioSpiel from './MarioSpiel';
 import { SignToggle, eingabeKlasse, type Vorzeichen } from './quadratischShared';
+import TaskShell from '../../components/layout/TaskShell'
 
 type Level = 'einfach' | 'fortgeschritten';
 
@@ -248,13 +249,12 @@ const Scheitelform = () => {
     };
 
     const anzahlRichtig = ergebnisse.filter((r) => r?.richtig).length + (spielGeloest ? 1 : 0);
-    const ueberschrift = <h1 className="text-2xl font-bold text-gray-800">Scheitelform aus dem Graphen</h1>;
 
     if (!level) {
         return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="bg-white p-6 md:p-10 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-center">
-                    <div className="mb-6">{ueberschrift}</div>
+            <TaskShell title="Scheitelform aus dem Graphen" width="wide">
+            <div className="container">
+                <div className="bk-panel max-w-3xl w-full mx-auto text-center">
                     <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <button
@@ -278,16 +278,17 @@ const Scheitelform = () => {
                     </div>
                 </div>
             </div>
+            </TaskShell>
         );
     }
 
     const graphProps = { bereich: BEREICH, groesse: GRAPH_GROESSE, schrittweite: 1 };
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-4xl w-full mx-auto text-left [&_p]:text-left">
+        <TaskShell title="Scheitelform aus dem Graphen" width="wide">
+        <div className="container">
+            <div className="bk-panel max-w-4xl w-full mx-auto text-left [&_p]:text-left">
                 <div className="flex items-start justify-between gap-4 mb-2">
-                    {ueberschrift}
                     <span
                         className={`shrink-0 text-sm font-semibold px-3 py-1 rounded-full ${
                             anzahlRichtig === ANZAHL_AUFGABEN + 1
@@ -451,7 +452,7 @@ const Scheitelform = () => {
                                         <div className="flex flex-wrap items-center gap-3 mt-3">
                                             <button
                                                 onClick={() => pruefeAufgabe(i)}
-                                                className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-1.5 rounded-md font-semibold transition-colors"
+                                                className="bk-btn bk-btn-primary"
                                             >
                                                 Prüfen
                                             </button>
@@ -485,13 +486,14 @@ const Scheitelform = () => {
                 <div className="flex justify-center mt-8">
                     <button
                         onClick={() => neueAufgaben(level)}
-                        className="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                        className="bk-btn"
                     >
                         5 neue Aufgaben
                     </button>
                 </div>
             </div>
         </div>
+        </TaskShell>
     );
 };
 

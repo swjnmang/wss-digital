@@ -1,48 +1,67 @@
-
-import pages from '../data/pages.json'
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
+import { AREAS, exerciseCount } from '../data/areas'
+
+export const openSearch = () => window.dispatchEvent(new Event('bk:search'))
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] flex flex-col text-slate-900">
-      <header className="w-full text-white py-10 sm:py-14 text-center shadow-md relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-700" />
-        <div className="relative max-w-4xl mx-auto px-4 space-y-3">
-          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
-            Mathe-Trainer <span className="text-[var(--accent)] relative after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-full after:h-1 after:bg-blue-600/35">Digital</span>
-          </h1>
-          <p className="text-base sm:text-lg text-slate-200 max-w-2xl mx-auto">
-            Wähle einen Bereich, um zu starten – übe Funktionen, Finanzmathematik, Trigonometrie, Daten &amp; Zufall und mehr.
-          </p>
+    <div className="bk-page bk-home">
+      <header className="bk-home-head">
+        <div>
+          <h1>Los geht’s!</h1>
+          <p>Wähle einen Bereich – Funktionen, Finanzmathematik, Trigonometrie, Daten &amp; Zufall und mehr.</p>
         </div>
       </header>
 
-      <main className="flex-1 w-full px-4 sm:px-6 lg:px-10 py-6 sm:py-8 flex flex-col items-center">
-        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
-          {pages.map((p) => (
-            <Link
-              key={p.id}
-              to={p.reactPath ? p.reactPath : p.path.replace('.html', '')}
-              className="bg-white rounded-2xl p-4 sm:p-5 text-center text-slate-900 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-center h-full border border-slate-100"
-            >
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-blue-50 flex items-center justify-center text-lg sm:text-xl text-[var(--accent)] mb-3">
-                <i className={p.icon}></i>
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-1.5 text-slate-800">{p.title}</h3>
-              <p className="text-slate-500 leading-snug text-sm">{p.description}</p>
-              <div className="mt-auto" aria-hidden="true" />
-            </Link>
-          ))}
-        </div>
-      </main>
+      <div className="bk-bento">
+        <Link to="/gemischtes-training" className="bk-tile bk-tile-hero" style={{ ['--area' as string]: 'var(--area-linear)' } as CSSProperties}>
+          <div className="bk-hero-text">
+            <span className="bk-label" style={{ color: 'inherit' }}>Gemischtes Training</span>
+            <h2>10 Übungen aus allen Bereichen</h2>
+            <p>Jedes Mal neu gemischt.</p>
+            <span className="bk-chip"><i className="fa-solid fa-dice" aria-hidden="true" /> Los geht’s</span>
+          </div>
+          <div className="bk-dice" aria-hidden="true">
+            <b>¾</b><b>x²</b><b>sin</b><b>€</b>
+          </div>
+        </Link>
 
-      <footer className="w-full py-8 text-center text-slate-500 bg-white border-t border-slate-200">
-        <p>
-          © 2025 Mathenkik. Alle Rechte vorbehalten. ·{' '}
-          <Link to="/impressum" className="text-[var(--accent)] hover:text-blue-700 font-semibold">
-            Impressum
-          </Link>
-        </p>
+        <button type="button" className="bk-tile bk-tile-accent" onClick={openSearch}>
+          <i className="fa-solid fa-magnifying-glass bk-tile-icon" aria-hidden="true" />
+          <h3>Suchen</h3>
+          <p>z. B. „Nullstelle“ oder „Zins“</p>
+        </button>
+
+        <div className="bk-tile bk-tile-ink">
+          <i className="fa-solid fa-stopwatch bk-tile-icon" aria-hidden="true" />
+          <h3>Prüfungsmodus</h3>
+          <div className="bk-tile-links">
+            <Link to="/finanzmathe/pruefungsmodus">Finanzmathematik</Link>
+            <Link to="/trigonometrie/pruefungsmodus">Trigonometrie</Link>
+          </div>
+        </div>
+
+        {AREAS.map((a) => {
+          const count = exerciseCount(a)
+          return (
+            <Link key={a.id} to={a.path} className="bk-tile bk-tile-area" style={{ ['--area' as string]: `var(--area-${a.id})` } as CSSProperties}>
+              <span className="bk-tile-glyph">{a.glyph}</span>
+              <span className="bk-chip">{count} {a.unit}</span>
+              <h3>{a.title}</h3>
+            </Link>
+          )
+        })}
+
+        <Link to="/lineare_funktionen/ubungsblatt-generator" className="bk-tile bk-tile-dashed">
+          <i className="fa-solid fa-file-pdf bk-tile-icon" aria-hidden="true" />
+          <h3>Übungsblatt</h3>
+          <p>Lineare Funktionen als PDF</p>
+        </Link>
+      </div>
+
+      <footer className="bk-footer">
+        © 2025 Mathenkik. Alle Rechte vorbehalten. · <Link to="/impressum">Impressum</Link>
       </footer>
     </div>
   )

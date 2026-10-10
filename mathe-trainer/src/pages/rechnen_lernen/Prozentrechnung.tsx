@@ -1,52 +1,13 @@
-import { Link } from 'react-router-dom';
+import MenuPage, { type MenuItem } from '../../components/layout/MenuPage';
 
-const aufgaben = [
-  {
-    title: '1. Grundlagen der Prozentrechnung',
-    description: 'Lerne die Basics: Prozentwert, Prozentsatz und Grundwert berechnen.',
-    path: '/rechnen_lernen/prozentrechnung/prozentrechnung',
-  },
-  {
-    title: '2. Bezugskalkulation',
-    description: 'Berechne den Bezugs- oder Einstandspreis von Waren.',
-    path: '/rechnen_lernen/prozentrechnung/bezugskalkulation',
-  },
-  {
-    title: '3. Handelskalkulation (Vorwärts)',
-    description: 'Kalkuliere den Verkaufspreis vom Listeneinkaufspreis ausgehend.',
-    path: '/rechnen_lernen/prozentrechnung/handelskalkvw',
-  },
-  {
-    title: '4. Handelskalkulation (Rückwärts)',
-    description: 'Ermittle den maximalen Listeneinkaufspreis vom Verkaufspreis.',
-    path: '/rechnen_lernen/prozentrechnung/handelskalkrw',
-  },
-  {
-    title: '5. Handelskalkulation (Differenz)',
-    description: 'Berechne Gewinn, Handelsspanne und andere Kennzahlen.',
-    path: '/rechnen_lernen/prozentrechnung/handelskalkdif',
-  },
+export const aufgaben: MenuItem[] = [
+  { title: '1. Grundlagen der Prozentrechnung', desc: 'Lerne die Basics: Prozentwert, Prozentsatz und Grundwert berechnen.', path: '/rechnen_lernen/prozentrechnung/prozentrechnung' },
+  { title: '2. Bezugskalkulation', desc: 'Berechne den Bezugs- oder Einstandspreis von Waren.', path: '/rechnen_lernen/prozentrechnung/bezugskalkulation', icon: 'fa-solid fa-truck' },
+  { title: '3. Handelskalkulation (Vorwärts)', desc: 'Kalkuliere den Verkaufspreis vom Listeneinkaufspreis ausgehend.', path: '/rechnen_lernen/prozentrechnung/handelskalkvw', icon: 'fa-solid fa-arrow-right' },
+  { title: '4. Handelskalkulation (Rückwärts)', desc: 'Ermittle den maximalen Listeneinkaufspreis vom Verkaufspreis.', path: '/rechnen_lernen/prozentrechnung/handelskalkrw', icon: 'fa-solid fa-arrow-left' },
+  { title: '5. Handelskalkulation (Differenz)', desc: 'Berechne Gewinn, Handelsspanne und andere Kennzahlen.', path: '/rechnen_lernen/prozentrechnung/handelskalkdif', icon: 'fa-solid fa-scale-balanced' },
 ];
 
 export default function Prozentrechnung() {
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <header className="w-full py-8 px-4 md:px-12 flex flex-col items-center bg-white/80 shadow-sm">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-blue-900">Prozentrechnung & Kalkulation</h1>
-        <p className="text-lg text-blue-800">Wähle eine Aufgabe aus der folgenden Liste aus.</p>
-      </header>
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 py-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-center">
-            {aufgaben.map((a) => (
-              <Link
-                key={a.title}
-                to={a.path}
-                className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col items-center justify-center p-6 hover:shadow-xl transition-shadow no-underline text-inherit"
-              >
-                <h3 className="text-lg font-semibold mb-2 text-blue-900 text-center">{a.title}</h3>
-                <p className="text-base text-gray-700 text-center leading-relaxed">{a.description}</p>
-              </Link>
-            ))}
-      </main>
-    </div>
-  );
+  return <MenuPage title="Prozentrechnung & Kalkulation" items={aufgaben} />;
 }

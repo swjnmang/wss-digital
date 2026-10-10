@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { parseLocalizedNumber } from '../../../utils/numbers';
+import TaskShell from '../../../components/layout/TaskShell'
 
 type Difficulty = 'leicht' | 'schwer';
 
@@ -43,31 +44,32 @@ export default function WurzelnUebung() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-3xl md:max-w-6xl min-h-[480px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
-          <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Wurzelrechnung – Übung</h1>
+    <TaskShell title="Wurzelrechnung – Übung" width="narrow">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center w-full">
+        <div className="bk-panel w-full max-w-3xl md:max-w-6xl min-h-[480px] flex flex-col items-center">
           <div className="flex gap-2 mb-6">
-            <button onClick={() => setDifficulty('leicht')} className={`px-4 py-2 rounded font-bold transition ${difficulty === 'leicht' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Leicht</button>
-            <button onClick={() => setDifficulty('schwer')} className={`px-4 py-2 rounded font-bold transition ${difficulty === 'schwer' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Schwer</button>
+            <button onClick={() => setDifficulty('leicht')} className={`bk-seg-btn ${difficulty === 'leicht' ? 'bk-seg-btn-on' : ''}`}>Leicht</button>
+            <button onClick={() => setDifficulty('schwer')} className={`bk-seg-btn ${difficulty === 'schwer' ? 'bk-seg-btn-on' : ''}`}>Schwer</button>
           </div>
-          <div className="w-full max-w-xl bg-slate-100 border border-slate-200 rounded-lg p-6 mb-4 text-center">
+          <div className="w-full max-w-xl bk-taskbox mb-4 text-center">
             <div id="equation-display" className="equation-display text-2xl md:text-3xl" dangerouslySetInnerHTML={{ __html: equation }} />
             <div className="mt-4">
               <input ref={inputRef} type="number" placeholder="Ergebnis" className="w-40 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400" onKeyDown={(e: React.KeyboardEvent) => e.key === 'Enter' && check()} />
             </div>
           </div>
           <div className="flex flex-wrap gap-4 mb-4">
-            <button onClick={check} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Lösung prüfen</button>
-            <button onClick={() => setShowSteps(true)} disabled={feedback.startsWith('Richtig!')} className="bg-gray-700 hover:bg-gray-800 disabled:opacity-50 text-white font-bold py-2 px-6 rounded shadow transition-colors">Lösung anzeigen</button>
-            <button onClick={generate} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Neue Aufgabe</button>
+            <button onClick={check} className="bk-btn bk-btn-primary">Lösung prüfen</button>
+            <button onClick={() => setShowSteps(true)} disabled={feedback.startsWith('Richtig!')} className="bk-btn disabled:opacity-50">Lösung anzeigen</button>
+            <button onClick={generate} className="bk-btn">Neue Aufgabe</button>
           </div>
-          {feedback && (<div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedback.startsWith('Richtig') ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>{feedback}</div>)}
+          {feedback && (<div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedback.startsWith('Richtig') ? 'bk-feedback bk-feedback-ok block' : 'bk-feedback bk-feedback-no block'}`}>{feedback}</div>)}
           {showSteps && (
             <div id="solution-output" className="w-full max-w-xl bg-blue-50 border border-blue-200 rounded p-4 text-blue-900 mb-2 text-center text-base md:text-lg" dangerouslySetInnerHTML={{ __html: steps }} />
           )}
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }

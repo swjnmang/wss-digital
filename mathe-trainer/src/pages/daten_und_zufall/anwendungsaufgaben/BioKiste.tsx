@@ -4,6 +4,7 @@ import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import ProbabilityTree, { TreeEdge, TreeNode } from '../../../components/ProbabilityTree';
 import SimplePieChart from '../../../components/SimplePieChart';
+import TaskShell from '../../../components/layout/TaskShell'
 
 interface FieldCheck {
     field: string;
@@ -98,14 +99,14 @@ export default function BioKiste() {
             {checks && (
                 <button
                     onClick={() => checkPart(part, checks)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+                    className="bk-btn bk-btn-primary"
                 >
                     Prüfen
                 </button>
             )}
             <button
                 onClick={() => setShowSolution(prev => ({ ...prev, [part]: !prev[part] }))}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn"
             >
                 {showSolution[part] ? 'Lösung verbergen' : 'Lösung anzeigen'}
             </button>
@@ -113,14 +114,14 @@ export default function BioKiste() {
     );
 
     return (
-        <div className="min-h-screen bg-[var(--bg-color)] py-8">
-            <div className="mx-auto px-4 max-w-6xl">
+        <TaskShell title="Die Bio-Kiste" width="wide">
+        <div className="">
+            <div className="mx-auto max-w-6xl">
                 <Link to="/daten-und-zufall/anwendungsaufgaben" className="inline-flex items-center gap-2 text-blue-700 hover:text-blue-900 text-sm font-medium mb-4">
                     <i className="fa-solid fa-arrow-left"></i> Zurück zur Übersicht
                 </Link>
 
-                <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 space-y-8">
-                    <h1 className="text-3xl font-bold text-blue-700">Die Bio-Kiste</h1>
+                <div className="bk-panel p-6 md:p-8 space-y-8">
                     <p className="text-slate-600 -mt-4">
                         Der Bioladen „Gutes Grün“ verkauft drei Kistentypen: Standard, Familie und Gourmet. Die
                         Tabelle zeigt die verkauften Kisten einer Woche.
@@ -413,5 +414,6 @@ export default function BioKiste() {
                 </div>
             </div>
         </div>
+        </TaskShell>
     );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import TaskShell from '../../components/layout/TaskShell'
 
 const Baumdiagramme: React.FC = () => {
   const [kugeln, setKugeln] = useState({ rot: 0, blau: 0 });
@@ -56,11 +57,9 @@ const Baumdiagramme: React.FC = () => {
   const gesamt = kugeln.rot + kugeln.blau;
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800">Wahrscheinlichkeiten mit Baumdiagrammen</h2>
-        </div>
+    <TaskShell title="Wahrscheinlichkeiten mit Baumdiagrammen" width="wide">
+    <div className="space-y-6">
+      <div className="bk-panel !p-0 overflow-hidden">
         <div className="p-6 space-y-6">
           <p className="text-lg">{aufgabe}</p>
           
@@ -109,7 +108,7 @@ const Baumdiagramme: React.FC = () => {
             </div>
             <button 
               onClick={pruefen}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="bk-btn bk-btn-primary"
             >
               Antwort prüfen
             </button>
@@ -134,6 +133,7 @@ const Baumdiagramme: React.FC = () => {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 };
 

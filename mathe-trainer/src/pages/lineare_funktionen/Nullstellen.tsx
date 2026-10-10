@@ -4,6 +4,8 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber';
 import { useTaskTracking } from '../../hooks/useTaskTracking';
+import { VideoEmbed } from '../../components/VideoButton'
+import TaskShell from '../../components/layout/TaskShell'
 
 // Sechs Aufgaben auf einer Seite
 const TOTAL_TASKS = 6;
@@ -36,11 +38,9 @@ const LEVEL_LABEL: Record<Level, string> = {
   fortgeschritten: 'Fortgeschritten',
 };
 
-const btnPrimary =
-  'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors';
-const btnSecondary =
-  'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors';
-const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200';
+const btnPrimary = 'bk-btn bk-btn-primary';
+const btnSecondary = 'bk-btn';
+const panel = 'bk-panel text-center';
 
 const round2 = (v: number) => Math.round(v * 100) / 100;
 
@@ -265,7 +265,7 @@ const EXAMPLE: Task = { id: 0, m: 2, t: -4, swapped: false };
 
 function Intro({ onHide }: { onHide?: () => void }) {
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200">
+    <div className="bk-panel">
       <div className="flex items-start justify-between gap-3 mb-3">
         <h2 className="text-lg font-bold text-slate-800">So berechnest du eine Nullstelle</h2>
         {onHide && (
@@ -305,16 +305,7 @@ function Intro({ onHide }: { onHide?: () => void }) {
         </div>
       </div>
       <h3 className="text-base font-bold text-slate-800 mt-6 mb-2 text-center">Erklärvideo</h3>
-      <div className="relative w-full max-w-xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200 bg-black">
-        <iframe
-          className="absolute inset-0 w-full h-full"
-          src={VIDEO_EMBED_URL}
-          title="Erklärvideo: Nullstellen berechnen"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
+      <VideoEmbed src={VIDEO_EMBED_URL} title="Erklärvideo: Nullstellen berechnen" />
     </div>
   );
 }
@@ -451,7 +442,7 @@ function TaskCard({ number, task, level, onNewTask, onSolvedChange, onResult, on
       )}
 
       {showSolution && (
-        <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50">
+        <div className="mt-6 bk-taskbox">
           <h3 className="text-base font-bold text-slate-800 text-center mb-2">Lösungsweg</h3>
           <p className="text-sm text-slate-600">An der Nullstelle ist y = 0:</p>
           <MathDisplay
@@ -515,7 +506,6 @@ export default function Nullstellen() {
 
   const header = (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Nullstellen berechnen</h1>
       <p className="text-center text-slate-600">
         Die Nullstelle ist der Punkt, an dem die Gerade die x-Achse schneidet. Dort gilt y = 0.
       </p>
@@ -537,8 +527,8 @@ export default function Nullstellen() {
 
   if (!level) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50">
-        <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+      <TaskShell title="Nullstellen berechnen" width="narrow">
+        <div className="flex flex-col gap-6">
           {header}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">
@@ -547,7 +537,7 @@ export default function Nullstellen() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
-                className="rounded-xl bg-green-600 hover:bg-green-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Einfach</p>
                 <p className="text-xl font-serif italic mb-2 text-white">y = 2x − 6</p>
@@ -557,7 +547,7 @@ export default function Nullstellen() {
               </button>
               <button
                 onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-xl bg-red-600 hover:bg-red-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
                 <p className="text-xl font-serif italic mb-2 text-white">y = 3 − 2,5x</p>
@@ -568,13 +558,13 @@ export default function Nullstellen() {
             </div>
           </div>
         </div>
-      </div>
+      </TaskShell>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-5xl w-full flex flex-col gap-6">
+    <TaskShell title="Nullstellen berechnen" width="narrow">
+        <div className="flex flex-col gap-6">
         {header}
         {intro}
 
@@ -657,6 +647,6 @@ export default function Nullstellen() {
           </div>
         )}
       </div>
-    </div>
+    </TaskShell>
   );
 }

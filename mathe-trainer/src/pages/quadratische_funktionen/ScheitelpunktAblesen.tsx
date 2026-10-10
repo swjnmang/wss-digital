@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ParabelGraph from '../../components/ParabelGraph';
+import TaskShell from '../../components/layout/TaskShell'
+import VideoButton from '../../components/VideoButton'
 
 type Aufgabe = {
     a: number;
@@ -92,10 +94,10 @@ const ScheitelpunktAblesen = () => {
     ).length;
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-3xl w-full mx-auto text-left [&_p]:text-left">
+        <TaskShell title="Scheitelpunkt ablesen" width="wide">
+        <div className="container">
+            <div className="bk-panel max-w-3xl w-full mx-auto text-left [&_p]:text-left">
                 <div className="flex items-start justify-between gap-4 mb-2">
-                    <h1 className="text-2xl font-bold text-gray-800">Scheitelpunkt ablesen</h1>
                     <span
                         className={`shrink-0 text-sm font-semibold px-3 py-1 rounded-full ${
                             anzahlRichtig === ANZAHL_AUFGABEN ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
@@ -173,21 +175,15 @@ const ScheitelpunktAblesen = () => {
                 <div className="flex flex-wrap justify-center items-center gap-4 mt-8">
                     <button
                         onClick={neueAufgaben}
-                        className="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                        className="bk-btn"
                     >
                         5 neue Aufgaben
                     </button>
-                    <a
-                        href={VIDEO_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-red-600 hover:underline font-semibold"
-                    >
-                        ▶ Erklärvideo ansehen
-                    </a>
+                    <VideoButton url={VIDEO_URL} label="Erklärvideo ansehen" />
                 </div>
             </div>
         </div>
+        </TaskShell>
     );
 };
 

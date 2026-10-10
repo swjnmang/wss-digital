@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
 import { type Q, q, add, mul, neg, val, isInt, tq, tqp, sgq, polyTex, parseAnswer, isIncomplete } from './quadratischShared'
+import { VideoEmbed } from '../../components/VideoButton'
+import TaskShell from '../../components/layout/TaskShell'
 
 // Sieben Aufgaben gleichzeitig auf der Seite
 const TOTAL_TASKS = 7
@@ -15,9 +17,9 @@ type Level = 'einfach' | 'fortgeschritten'
 
 const LEVEL_LABEL: Record<Level, string> = { einfach: 'Einfach', fortgeschritten: 'Fortgeschritten' }
 
-const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
-const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
-const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
+const btnPrimary = 'bk-btn bk-btn-primary'
+const btnSecondary = 'bk-btn'
+const panel = 'bk-panel text-center'
 
 const PRAISE = [
   'Richtig! Super gemacht!',
@@ -155,7 +157,7 @@ function SolutionSteps({ task }: { task: Task }) {
   const quot = q(bb.n * vierA.d, bb.d * vierA.n)
   const naeherung = isInt(ys) ? '' : ` ${dezimal(ys)}`
   return (
-    <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-left text-slate-700 space-y-3">
+    <div className="mt-6 bk-taskbox text-left text-slate-700 space-y-3">
       <h3 className="text-base font-bold text-slate-800 text-center">Lösungsweg</h3>
       <p>
         Ablesen: <Tex tex={`a = ${tq(a)},\\quad b = ${tq(b)},\\quad c = ${tq(c)}`} />
@@ -359,7 +361,7 @@ function ExampleGraph() {
 
 function Erklaerung() {
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200">
+    <div className="bk-panel">
       <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">So berechnest du den Scheitelpunkt</h2>
       <p className="text-slate-700 mb-3">
         Der <strong>Scheitelpunkt S</strong> ist der höchste oder tiefste Punkt einer Parabel. Ist die Funktion in der{' '}
@@ -419,15 +421,7 @@ function Erklaerung() {
         </li>
       </ul>
       <h3 className="text-base font-bold text-slate-800 mt-5 mb-2 text-center">Erklärvideo</h3>
-      <div className="max-w-2xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200">
-        <iframe
-          className="w-full h-full"
-          src={`https://www.youtube.com/embed/${VIDEO_ID}`}
-          title="Erklärvideo: Scheitelpunkt berechnen"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
+      <VideoEmbed src={`https://www.youtube.com/embed/${VIDEO_ID}`} title="Erklärvideo: Scheitelpunkt berechnen" />
     </div>
   )
 }
@@ -465,22 +459,21 @@ export default function Scheitelpunkt() {
 
   const header = (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Scheitelpunkt berechnen</h1>
       <p className="text-center text-slate-600">Berechne den Scheitelpunkt einer Parabel aus der allgemeinen Form <Tex tex="f(x) = ax^2 + bx + c" />.</p>
     </div>
   )
 
   if (!level) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50">
-        <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+      <TaskShell title="Scheitelpunkt berechnen" width="narrow">
+        <div className="flex flex-col gap-6">
           {header}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
-                className="rounded-xl bg-green-600 hover:bg-green-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Einfach</p>
                 <Tex display className="text-xl mb-2 text-white" tex="f(x) = \pm x^2 + bx + c" />
@@ -488,7 +481,7 @@ export default function Scheitelpunkt() {
               </button>
               <button
                 onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-xl bg-red-600 hover:bg-red-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
                 <Tex display className="text-xl mb-2 text-white" tex="f(x) = \frac{1}{2}x^2 - 3x + \frac{5}{2}" />
@@ -497,13 +490,13 @@ export default function Scheitelpunkt() {
             </div>
           </div>
         </div>
-      </div>
+      </TaskShell>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+    <TaskShell title="Scheitelpunkt berechnen" width="narrow">
+        <div className="flex flex-col gap-6">
         {header}
         <Erklaerung />
 
@@ -560,6 +553,6 @@ export default function Scheitelpunkt() {
           </div>
         )}
       </div>
-    </div>
+    </TaskShell>
   )
 }

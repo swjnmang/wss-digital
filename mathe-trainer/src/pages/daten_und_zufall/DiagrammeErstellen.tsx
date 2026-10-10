@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PieChart, BarChart as BarChartIcon, BarChart2, RefreshCw, CheckCircle, HelpCircle } from 'lucide-react';
 import { PieChart as RePieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import TaskShell from '../../components/layout/TaskShell'
 
 type DiagramType = 'pie' | 'bar' | 'column';
 
@@ -445,10 +446,10 @@ const DiagrammeErstellen: React.FC = () => {
 
   if (!currentScenario) {
     return (
-      <div className="container mx-auto p-4 space-y-6">
-        <div className="bg-white rounded-lg shadow-md p-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8">Diagramme erstellen</h2>
-          <p className="text-gray-600 mb-8 text-lg">Wähle einen Diagrammtyp, den du üben möchtest:</p>
+      <TaskShell title="Diagramme erstellen" width="wide">
+      <div className="space-y-6">
+        <div className="bk-panel text-center">
+                    <p className="text-gray-600 mb-8 text-lg">Wähle einen Diagrammtyp, den du üben möchtest:</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <button onClick={() => handleStart('pie')} className="p-6 border-2 border-blue-100 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all flex flex-col items-center gap-4 group">
@@ -481,18 +482,20 @@ const DiagrammeErstellen: React.FC = () => {
           </div>
         </div>
       </div>
+      </TaskShell>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <TaskShell title="Diagramme erstellen" width="wide">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <button onClick={() => setCurrentScenario(null)} className="flex items-center text-blue-600 hover:text-blue-800">
           Auswahl ändern
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+      <div className="bk-panel !p-0 overflow-hidden">
         <div className="p-6 border-b border-gray-200 bg-gray-50">
           <h2 className="text-2xl font-bold text-gray-800">{currentScenario.title}</h2>
           <p className="text-gray-600 mt-2">{currentScenario.description}</p>
@@ -530,7 +533,7 @@ const DiagrammeErstellen: React.FC = () => {
             <div className="flex gap-4">
               <button 
                 onClick={() => setShowSolution(!showSolution)}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                className="bk-btn bk-btn-primary flex-1 flex items-center justify-center gap-2"
               >
                 <CheckCircle className="w-4 h-4" />
                 {showSolution ? "Lösung verbergen" : "Musterlösung anzeigen"}
@@ -545,7 +548,7 @@ const DiagrammeErstellen: React.FC = () => {
             </div>
           </div>
 
-          <div className="min-h-[400px] flex flex-col items-center justify-center bg-gray-50 rounded-lg border border-gray-200 p-4">
+          <div className=" flex flex-col items-center justify-center bg-gray-50 rounded-lg border border-gray-200 p-4">
             {showSolution ? (
               <div className="w-full h-full flex flex-col">
                 <h3 className="text-center font-bold text-gray-700 mb-4">Musterlösung</h3>
@@ -628,6 +631,7 @@ const DiagrammeErstellen: React.FC = () => {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 };
 

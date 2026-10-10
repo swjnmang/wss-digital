@@ -1,19 +1,19 @@
 /* General Theme & Variables */
 :root {
-    --primary-color: #2563eb; /* blue-600 */
-    --primary-hover: #1d4ed8; /* blue-700 */
-    --secondary-color: #6b7280; /* gray-500 */
-    --background-color: #f3f4f6; /* gray-100 */
+    --primary-color: #191919;
+    --primary-hover: #000000;
+    --secondary-color: #85817a;
+    --background-color: #f3f2ee;
     --card-background: #ffffff;
-    --text-primary: #1f2937; /* gray-800 */
-    --text-secondary: #4b5563; /* gray-600 */
-    --border-color: #d1d5db; /* gray-300 */
-    --success-color: #16a34a; /* green-600 */
-    --error-color: #dc2626; /* red-600 */
+    --text-primary: #191919;
+    --text-secondary: #5a5750;
+    --border-color: #e3e0d8;
+    --success-color: #0b6a8f;
+    --error-color: #b03a0a;
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Figtree Variable', Figtree, 'Segoe UI', system-ui, sans-serif;
     background-color: var(--background-color);
     color: var(--text-primary);
     margin: 0;
@@ -26,7 +26,7 @@ body {
 
 h1, h2, h3 {
     color: var(--text-primary);
-    text-align: center;
+    text-align: inherit;
     margin-bottom: 1rem;
 }
 
@@ -37,7 +37,7 @@ h3 { font-size: 1.25rem; font-weight: 600; }
 p {
     color: var(--text-secondary);
     line-height: 1.6;
-    text-align: center;
+    text-align: inherit;
     margin-bottom: 1.5rem;
 }
 

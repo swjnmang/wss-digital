@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, RefreshCw, CheckCircle, XCircle, Calculator, Youtube } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import TaskShell from '../../components/layout/TaskShell'
+import VideoButton from '../../components/VideoButton'
 
 interface Dataset {
   values: number[];
@@ -141,12 +143,9 @@ const StatistischeKennwerte: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-200 flex items-center gap-2">
-          <Calculator className="w-6 h-6 text-blue-600" />
-          <h2 className="text-2xl font-bold text-gray-800">Statistische Kennwerte</h2>
-        </div>
+    <TaskShell title="Statistische Kennwerte" width="wide">
+    <div className="space-y-6">
+      <div className="bk-panel !p-0 overflow-hidden">
         <div className="p-6 space-y-6">
           <div className="bg-slate-100 p-6 rounded-lg text-center">
             <h3 className="text-lg font-semibold mb-2">Aufgabe:</h3>
@@ -249,7 +248,7 @@ const StatistischeKennwerte: React.FC = () => {
           <div className="flex flex-wrap gap-4 mt-6">
             <button 
               onClick={checkAnswers} 
-              className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="bk-btn bk-btn-primary w-full sm:w-auto"
             >
               Lösung prüfen
             </button>
@@ -260,15 +259,7 @@ const StatistischeKennwerte: React.FC = () => {
               <RefreshCw className="w-4 h-4 mr-2" />
               Neue Aufgabe
             </button>
-            <a 
-              href="https://youtu.be/UxKgca3l1G4?si=RmHTHR7RnA5oywNV" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center justify-center gap-2 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-            >
-              <Youtube className="w-4 h-4" />
-              Erklärvideo
-            </a>
+            <VideoButton url="https://youtu.be/UxKgca3l1G4?si=RmHTHR7RnA5oywNV" label="Erklärvideo" className="bk-btn w-full sm:w-auto" />
           </div>
 
           {showSolution && (
@@ -279,6 +270,7 @@ const StatistischeKennwerte: React.FC = () => {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 };
 

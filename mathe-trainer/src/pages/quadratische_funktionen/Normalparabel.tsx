@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import TaskShell from '../../components/layout/TaskShell'
 
 declare global {
   interface Window {
@@ -435,12 +436,12 @@ export default function Normalparabel() {
   const allReady = appletsLoaded.main && appletsLoaded.match && appletsLoaded.guess;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-5 max-w-3xl w-full">
-        <h1 className="text-xl font-bold text-slate-800 mb-4 text-center">Eigenschaften von Parabeln</h1>
+    <TaskShell title="Eigenschaften von Parabeln" width="wide">
+    <div className="flex flex-col">
+      <div className="mx-auto max-w-3xl w-full">
 
         {/* Schieberegler-Sandbox */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+        <div className="bk-panel p-4 border border-slate-200 mb-5">
           <h2 className="text-base font-bold text-slate-800 mb-1">Entdecke den Einfluss von a</h2>
           <p className="text-xs text-slate-600 mb-3">
             Ziehe den Punkt auf dem Schieberegler im Graphen und beobachte, wie sich die blaue Parabel im Vergleich zur grauen Normalparabel verändert.
@@ -452,14 +453,14 @@ export default function Normalparabel() {
             <div className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded font-bold text-sm">
               f(x) = {Math.round(sandboxA * 100) / 100}x²
             </div>
-            <button onClick={resetSandbox} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm">
+            <button onClick={resetSandbox} className="bk-btn">
               Regler zurücksetzen
             </button>
           </div>
         </div>
 
         {/* Aufgabe 1: Eigenschaften ablesen */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+        <div className="bk-panel p-4 border border-slate-200 mb-5">
           <h2 className="text-base font-bold text-slate-800 mb-2">Aufgabe 1: Eigenschaften ablesen</h2>
 
           <div className="mb-2 border rounded-lg overflow-hidden shadow-inner bg-white flex justify-center">
@@ -516,7 +517,7 @@ export default function Normalparabel() {
               <div className="text-center pt-2">
                 <button
                   onClick={() => setMainShowSolution(true)}
-                  className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm"
+                  className="bk-btn"
                   disabled={mainShowSolution}
                 >
                   Lösung anzeigen
@@ -549,7 +550,7 @@ export default function Normalparabel() {
         </div>
 
         {/* Aufgabe 2: Zuordnungsaufgabe */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+        <div className="bk-panel p-4 border border-slate-200 mb-5">
           <h2 className="text-base font-bold text-slate-800 mb-2">Aufgabe 2: Parabeln zuordnen</h2>
           <p className="text-xs text-slate-600 mb-3 text-center">Ordne jeder farbigen Parabel die passende Funktionsgleichung zu.</p>
 
@@ -585,7 +586,7 @@ export default function Normalparabel() {
                 );
               })}
               <div className="text-center pt-1">
-                <button onClick={checkMatchTask} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm">
+                <button onClick={checkMatchTask} className="bk-btn bk-btn-primary">
                   Auswerten
                 </button>
               </div>
@@ -594,7 +595,7 @@ export default function Normalparabel() {
         </div>
 
         {/* Aufgabe 3: Schätz-Modus */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+        <div className="bk-panel p-4 border border-slate-200 mb-5">
           <h2 className="text-base font-bold text-slate-800 mb-2">Aufgabe 3: Schätze den Wert von a</h2>
           <p className="text-xs text-slate-600 mb-3 text-center">Schätze anhand des Graphen, welchen Wert der Formfaktor a hat (Toleranz: ±0,25).</p>
 
@@ -615,7 +616,7 @@ export default function Normalparabel() {
                   className="border border-slate-300 rounded px-2 py-1 w-24 text-center text-sm"
                   placeholder="z. B. 2"
                 />
-                <button onClick={checkGuess} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm">
+                <button onClick={checkGuess} className="bk-btn bk-btn-primary">
                   Prüfen
                 </button>
               </div>
@@ -624,7 +625,7 @@ export default function Normalparabel() {
               )}
               <button
                 onClick={() => setGuessShowSolution(true)}
-                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors text-sm"
+                className="bk-btn"
                 disabled={guessShowSolution}
               >
                 Lösung anzeigen
@@ -639,7 +640,7 @@ export default function Normalparabel() {
         </div>
 
         {/* Aufgabe 4: Umkehraufgabe */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200 mb-5">
+        <div className="bk-panel p-4 border border-slate-200 mb-5">
           <h2 className="text-base font-bold text-slate-800 mb-2">Aufgabe 4: Finde die passende Gleichung</h2>
 
           {reverseTask && (
@@ -661,11 +662,11 @@ export default function Normalparabel() {
         </div>
 
         {/* Steuerung */}
-        <div className="bg-white rounded-xl shadow-md p-4 border border-slate-200">
+        <div className="bk-panel p-4 border border-slate-200">
           <div className="flex flex-wrap justify-center gap-3 items-center">
             <button
               onClick={generateNewRound}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors disabled:opacity-50 text-sm"
+              className="bk-btn bk-btn-primary disabled:opacity-50"
               disabled={!allReady}
             >
               Neue Aufgaben
@@ -701,5 +702,6 @@ export default function Normalparabel() {
         }
       `}</style>
     </div>
+    </TaskShell>
   );
 }

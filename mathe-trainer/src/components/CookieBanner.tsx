@@ -20,22 +20,22 @@ const CookieBanner: React.FC = () => {
     if (!isVisible) return null;
 
     return (
-        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md bg-white border border-slate-200 rounded-2xl shadow-2xl shadow-slate-200/80 p-5 z-50">
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Cookies & lokale Speicherung</h3>
-            <p className="text-sm text-slate-600 mb-4">
+        <div className="bk-card fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md p-5 z-50" style={{ boxShadow: '0 6px 0 var(--edge)' }}>
+            <h3 className="text-xl font-extrabold text-ink mb-2 text-left">Cookies & lokale Speicherung</h3>
+            <p className="text-sm text-muted mb-4 text-left">
                 Diese Anwendung verwendet technisch notwendige Cookies und Lokalspeicher-Einträge, um deinen Fortschritt und
                 Einstellungen (z. B. Antworten, Einwilligungen) zu sichern. Es werden keine Tracking- oder Marketing-Cookies eingesetzt.
             </p>
             <div className="flex flex-wrap gap-3">
                 <button
                     onClick={acceptCookies}
-                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700"
+                    className="bk-btn bk-btn-primary"
                 >
                     Einverstanden
                 </button>
                 <button
                     onClick={acceptCookies}
-                    className="px-4 py-2 text-sm text-slate-600 font-semibold hover:text-slate-800"
+                    className="bk-btn bk-btn-ghost"
                 >
                     Nur notwendige speichern
                 </button>

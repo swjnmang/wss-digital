@@ -3,15 +3,15 @@ import { Link } from 'react-router-dom';
 
 const Impressum: React.FC = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white px-4 py-10">
-            <div className="max-w-3xl mx-auto space-y-6 bg-white border border-slate-200 shadow-lg rounded-3xl p-8">
+        <div className="bk-page">
+            <div className="bk-card max-w-3xl mx-auto space-y-6 p-6 sm:p-8 text-left">
                 <div className="flex items-center gap-3 text-sm text-slate-600">
                     <Link to="/" className="text-blue-600 font-semibold hover:text-blue-800">Startseite</Link>
                     <span>›</span>
                     <span>Impressum</span>
                 </div>
                 <div>
-                    <h1 className="text-3xl font-bold text-blue-900 mb-4">Impressum</h1>
+                    <h1 className="text-4xl font-extrabold text-ink mb-4 text-left">Impressum</h1>
                     <p className="text-slate-600">Angaben gemäß § 5 TMG</p>
                 </div>
                 <section className="space-y-1 text-slate-700">

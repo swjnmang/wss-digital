@@ -1,35 +1,31 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import TaskShell from '../../components/layout/TaskShell'
 
 export default function Anwendungsaufgaben() {
   const aufgaben = [
-    { title: '1. Der Fußballplatz', desc: 'Löse Aufgaben rund um einen Pass auf einem Fußballfeld mit linearen Funktionen.', href: 'fussballplatz', icon: '⚽' },
-    { title: '2. Das Tipi', desc: 'Berechne die Maße eines Tipis anhand von zwei linearen Funktionsgleichungen.', href: 'tipi', icon: '⛺' },
-    { title: '3. Der Berg', desc: 'Berechne Funktionsgleichungen und Schnittpunkte von Bergliften anhand eines Bergmassivs.', href: 'berg', icon: '⛰️' },
-    { title: '4. Die Sonne', desc: 'Untersuche die Eigenschaften von Sonnenstrahlen mit Hilfe linearer Funktionen.', href: 'sonne', icon: '☀️' },
-    { title: '5. Die Schrägseilbrücke', desc: 'Berechne Funktionsgleichungen und Schnittpunkte der Tragseile einer Brücke.', href: 'bruecke', icon: '🌉' },
-    { title: '6. Der Flughafen', desc: 'Untersuche zwei sich kreuzende Start- und Landebahnen mit linearen Funktionen.', href: 'flughafen', icon: '✈️' },
+    { title: '1. Der Fußballplatz', desc: 'Löse Aufgaben rund um einen Pass auf einem Fußballfeld mit linearen Funktionen.', href: 'fussballplatz', icon: 'fa-solid fa-futbol' },
+    { title: '2. Das Tipi', desc: 'Berechne die Maße eines Tipis anhand von zwei linearen Funktionsgleichungen.', href: 'tipi', icon: 'fa-solid fa-campground' },
+    { title: '3. Der Berg', desc: 'Berechne Funktionsgleichungen und Schnittpunkte von Bergliften anhand eines Bergmassivs.', href: 'berg', icon: 'fa-solid fa-mountain' },
+    { title: '4. Die Sonne', desc: 'Untersuche die Eigenschaften von Sonnenstrahlen mit Hilfe linearer Funktionen.', href: 'sonne', icon: 'fa-solid fa-sun' },
+    { title: '5. Die Schrägseilbrücke', desc: 'Berechne Funktionsgleichungen und Schnittpunkte der Tragseile einer Brücke.', href: 'bruecke', icon: 'fa-solid fa-bridge' },
+    { title: '6. Der Flughafen', desc: 'Untersuche zwei sich kreuzende Start- und Landebahnen mit linearen Funktionen.', href: 'flughafen', icon: 'fa-solid fa-plane' },
   ]
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <header className="w-full py-8 px-4 md:px-12 flex flex-col items-center bg-white/80 shadow-sm">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-blue-900">Anwendungsaufgaben - Lineare Funktionen</h1>
-        <p className="text-lg text-blue-800">Wähle eine Aufgabe aus der folgenden Liste aus.</p>
-      </header>
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 py-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-center">
+    <TaskShell title="Anwendungsaufgaben - Lineare Funktionen" subtitle="Wähle eine Aufgabe aus der folgenden Liste aus." width="wide">
+      <div className="bk-tiles">
         {aufgaben.map((a) => (
-          <Link
-            key={a.title}
-            to={`/lineare_funktionen/anwendungsaufgaben/${a.href}`}
-            className="bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col justify-center items-center p-6 hover:shadow-xl transition-shadow no-underline text-inherit text-center max-w-sm"
-          >
-            <div className="text-5xl mb-4">{a.icon}</div>
-            <h3 className="text-lg font-semibold mb-2 text-blue-900">{a.title}</h3>
-            <p className="text-base text-gray-700">{a.desc}</p>
+          <Link key={a.title} to={`/lineare_funktionen/anwendungsaufgaben/${a.href}`} className="bk-tile-ex">
+            <span className="bk-tile-top">
+              <b>{a.title.split('.')[0]}</b>
+              <i className={a.icon} aria-hidden="true" style={{ fontSize: 24 }} />
+            </span>
+            <strong>{a.title.replace(/^\d+\.\s*/, '')}</strong>
+            <small>{a.desc}</small>
           </Link>
         ))}
-      </main>
-    </div>
+      </div>
+    </TaskShell>
   )
 }

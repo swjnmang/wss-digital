@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import TaskShell from '../../components/layout/TaskShell'
 
 // ============================================================================
 // INTELLIGENTE VALIDIERUNGSFUNKTION FÜR POTENZEN
@@ -956,11 +957,11 @@ const TermeMitPotenzen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50 p-3">
+    <TaskShell title="Terme mit Potenzen" width="wide">
+    <div className="">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-orange-900 mb-1">Terme mit Potenzen</h1>
           <p className="text-xs text-gray-600">
             Wähle eine Kategorie und vereinfache die Terme. Tippe deine Antwort ein und überprüfe automatisch!
           </p>
@@ -1035,7 +1036,7 @@ const TermeMitPotenzen: React.FC = () => {
                   {/* Button */}
                   <button
                     onClick={() => toggleSolution(aufgabe.id)}
-                    className="text-sm px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-all whitespace-nowrap font-semibold"
+                    className="bk-btn whitespace-nowrap"
                   >
                     {showSolution ? '✕' : '?'}
                   </button>
@@ -1082,6 +1083,7 @@ const TermeMitPotenzen: React.FC = () => {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 };
 

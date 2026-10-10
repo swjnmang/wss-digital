@@ -1,6 +1,8 @@
 import React, { useEffect, useId, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
+import { VideoEmbed } from '../../components/VideoButton'
+import PageShell from '../../components/layout/TaskShell'
 
 // Sechs Aufgaben, jede mit einem eigenen Aufgabentyp
 const TOTAL_TASKS = 6
@@ -29,9 +31,9 @@ function shuffle<T>(list: T[]): T[] {
 const graphSlopes = [-2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2] as const
 const textSlopes = [-4, -3, -2.5, -2, -1.5, -1, -0.5, -0.25, 0.25, 0.5, 1, 1.5, 2, 3, 4] as const
 
-const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
-const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
-const panel = 'bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
+const btnPrimary = 'bk-btn bk-btn-primary'
+const btnSecondary = 'bk-btn'
+const panel = 'bk-panel'
 
 // ---------- Formatierung ----------
 
@@ -380,15 +382,7 @@ function Erklaerung() {
       {/* Erklärvideo */}
       <div className="space-y-2">
         <h3 className="font-bold text-slate-800 text-center">Erklärvideo</h3>
-        <div className="max-w-3xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200">
-          <iframe
-            className="w-full h-full"
-            src={`https://www.youtube.com/embed/${VIDEO_ID}`}
-            title="Erklärvideo: y-Achsenabschnitt"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
+        <VideoEmbed src={`https://www.youtube.com/embed/${VIDEO_ID}`} title="Erklärvideo: y-Achsenabschnitt" />
       </div>
     </div>
   )
@@ -531,7 +525,7 @@ function TaskShell({
         <button onClick={onShowSolution} className={btnSecondary}>Lösung anzeigen</button>
       </div>
       {solution && (
-        <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-left text-slate-700 space-y-1">
+        <div className="mt-6 bk-taskbox text-left text-slate-700 space-y-1">
           <h3 className="text-base font-bold text-slate-800 text-center mb-2">Lösungsweg</h3>
           {solution}
         </div>
@@ -1004,10 +998,9 @@ export default function YAchsenabschnitt() {
   ))
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-6xl w-full flex flex-col gap-6">
+    <PageShell title="y-Achsenabschnitt" width="wide">
+        <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">y-Achsenabschnitt</h1>
           <p className="text-center text-slate-600">
             Lerne Funktionen der Form <Eq>y = m · x + t</Eq> kennen: Was bedeutet t und wie verschiebt es die Gerade?
           </p>
@@ -1052,6 +1045,6 @@ export default function YAchsenabschnitt() {
           </div>
         )}
       </div>
-    </div>
+    </PageShell>
   )
 }

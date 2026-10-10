@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import 'katex/dist/katex.min.css';
 import { BlockMath, InlineMath } from 'react-katex';
+import TaskShell from '../../components/layout/TaskShell'
 
 type Timing = 'vor' | 'nach';
 type Unknown = 'Kn' | 'r' | 'n';
@@ -272,21 +273,21 @@ ${knLatex} \\cdot (q-1) &= ${rLatex} \\cdot ${rfLatex} \\cdot (q^n-1)\\\\
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-6xl min-h-[400px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
-          <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Rentenrechnung: Endwert</h1>
+    <TaskShell title="Rentenrechnung: Endwert" width="wide">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center w-full">
+        <div className="bk-panel w-full max-w-6xl flex flex-col items-center">
           <p className="text-gray-600 mb-6 text-center">Berechnung von Endwert, Rate oder Laufzeit (ohne Startkapital)</p>
 
           <div className="flex flex-wrap gap-2 mb-6 justify-center">
-            <button onClick={() => setUnknownType('random')} className={`px-4 py-2 rounded font-bold transition ${unknownType === 'random' ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'}`}>Zufall</button>
-            <button onClick={() => setUnknownType('Kn')} className={`px-4 py-2 rounded font-bold transition ${unknownType === 'Kn' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>Gesucht: <InlineMath math="K_n" /></button>
-            <button onClick={() => setUnknownType('r')} className={`px-4 py-2 rounded font-bold transition ${unknownType === 'r' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>Gesucht: <InlineMath math="r" /></button>
-            <button onClick={() => setUnknownType('n')} className={`px-4 py-2 rounded font-bold transition ${unknownType === 'n' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>Gesucht: <InlineMath math="n" /></button>
+            <button onClick={() => setUnknownType('random')} className={`bk-seg-btn ${unknownType === 'random' ? 'bk-seg-btn-on' : ''}`}>Zufall</button>
+            <button onClick={() => setUnknownType('Kn')} className={`bk-seg-btn ${unknownType === 'Kn' ? 'bk-seg-btn-on' : ''}`}>Gesucht: <InlineMath math="K_n" /></button>
+            <button onClick={() => setUnknownType('r')} className={`bk-seg-btn ${unknownType === 'r' ? 'bk-seg-btn-on' : ''}`}>Gesucht: <InlineMath math="r" /></button>
+            <button onClick={() => setUnknownType('n')} className={`bk-seg-btn ${unknownType === 'n' ? 'bk-seg-btn-on' : ''}`}>Gesucht: <InlineMath math="n" /></button>
           </div>
 
           {task && (
-            <div className="w-full max-w-xl bg-slate-100 border border-slate-200 rounded-lg p-6 mb-4">
+            <div className="w-full max-w-xl bk-taskbox mb-4">
               <div className="text-lg mb-4 leading-relaxed">
                 {task.question}
               </div>
@@ -312,13 +313,13 @@ ${knLatex} \\cdot (q-1) &= ${rLatex} \\cdot ${rfLatex} \\cdot (q^n-1)\\\\
           )}
 
           <div className="flex flex-wrap gap-4 mb-4">
-            <button onClick={checkAnswer} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Überprüfen</button>
-            <button onClick={showSolution} className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-6 rounded shadow transition-colors">Lösung zeigen</button>
-            <button onClick={generateNewTask} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Nächste Aufgabe</button>
+            <button onClick={checkAnswer} className="bk-btn bk-btn-primary">Überprüfen</button>
+            <button onClick={showSolution} className="bk-btn">Lösung zeigen</button>
+            <button onClick={generateNewTask} className="bk-btn">Nächste Aufgabe</button>
           </div>
 
           {feedback && (
-            <div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedbackType === 'correct' ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>
+            <div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedbackType === 'correct' ? 'bk-feedback bk-feedback-ok block' : 'bk-feedback bk-feedback-no block'}`}>
               {feedback}
             </div>
           )}
@@ -340,5 +341,6 @@ ${knLatex} \\cdot (q-1) &= ${rLatex} \\cdot ${rfLatex} \\cdot (q^n-1)\\\\
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }

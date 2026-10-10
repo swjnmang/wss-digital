@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import TaskShell from '../../components/layout/TaskShell'
+import VideoButton from '../../components/VideoButton'
 
 interface Task {
   K0: number;
@@ -299,11 +301,11 @@ export default function Ratendarlehen() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-5xl flex flex-col items-center p-6 sm:p-8">
+    <TaskShell title="Ratendarlehen: Tilgungsplan" width="wide">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center w-full">
+        <div className="bk-panel w-full max-w-5xl flex flex-col items-center p-6 sm:p-8">
           {/* Back button removed */}
-          <h1 className="text-3xl font-bold text-blue-900 mb-2 text-center">Ratendarlehen: Tilgungsplan</h1>
           
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 w-full">
             <p className="mb-2">{task.intro}</p>
@@ -551,12 +553,10 @@ export default function Ratendarlehen() {
           </div>
 
           <div className="flex flex-wrap gap-4 mb-4">
-            <button onClick={checkAnswers} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Prüfen</button>
-            <button onClick={revealSolution} className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-6 rounded shadow transition-colors">Lösung zeigen</button>
-            <button onClick={generateNewTask} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Neue Aufgabe</button>
-            <a href="https://youtu.be/w_UjVYwD_Xo?si=yh1nyuwz-teRXxqH" target="_blank" rel="noopener noreferrer" className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded shadow transition-colors flex items-center">
-              Lernvideo
-            </a>
+            <button onClick={checkAnswers} className="bk-btn bk-btn-primary">Prüfen</button>
+            <button onClick={revealSolution} className="bk-btn">Lösung zeigen</button>
+            <button onClick={generateNewTask} className="bk-btn">Neue Aufgabe</button>
+            <VideoButton url="https://youtu.be/w_UjVYwD_Xo?si=yh1nyuwz-teRXxqH" label="Lernvideo" className="bk-btn" />
           </div>
 
           <div className="flex flex-wrap justify-center gap-8 mt-6 w-full max-w-2xl">
@@ -582,6 +582,7 @@ export default function Ratendarlehen() {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FeedbackIcon, FeedbackStatus } from '../../../components/FeedbackIcon';
 import { parseLocalizedNumber } from '../../../utils/numbers';
 import { formatCurrency, formatPercent, roundToPointFive, roundToTwoDecimals, withinTolerance } from '../../../utils/prozent';
+import TaskShell from '../../../components/layout/TaskShell'
 
 type FieldKey =
   | 'listeneinkaufspreisNetto'
@@ -250,13 +251,13 @@ export default function Handelskalkrw() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="flex-1 flex flex-col items-center px-3 py-10">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-6xl p-6 sm:p-10">
-          <h1 className="text-3xl font-bold text-blue-900 mb-2">Handelskalkulation (Rohgewinnaufschlag)</h1>
+    <TaskShell title="Handelskalkulation (Rohgewinnaufschlag)" width="wide">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center">
+        <div className="bk-panel w-full max-w-6xl p-6 sm:p-10">
           <p className="text-slate-600 mb-6">Starte beim Bruttoverkaufspreis und rechne alle Stufen zurück bis zum Listeneinkaufspreis.</p>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 whitespace-pre-line text-slate-800 text-sm sm:text-base mb-6">
+          <div className="bk-taskbox whitespace-pre-line text-slate-800 text-sm sm:text-base mb-6">
             {problemText}
           </div>
 
@@ -494,9 +495,9 @@ export default function Handelskalkrw() {
           </div>
 
           <div className="flex flex-wrap gap-3 mb-4">
-            <button onClick={checkAnswers} className="flex-1 min-w-[180px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">Überprüfen</button>
-            <button onClick={generateNewProblem} className="flex-1 min-w-[180px] bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition">Neue Aufgabe</button>
-            <button onClick={handleShowSolution} className="flex-1 min-w-[180px] bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg transition">Musterlösung anzeigen</button>
+            <button onClick={checkAnswers} className="bk-btn bk-btn-primary flex-1 min-w-[180px]">Überprüfen</button>
+            <button onClick={generateNewProblem} className="bk-btn flex-1 min-w-[180px]">Neue Aufgabe</button>
+            <button onClick={handleShowSolution} className="bk-btn flex-1 min-w-[180px]">Musterlösung anzeigen</button>
           </div>
 
           {overallFeedback && (
@@ -512,7 +513,7 @@ export default function Handelskalkrw() {
           )}
 
           {showSolution && (
-            <pre className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm md:text-base whitespace-pre-line mb-4 text-slate-800">
+            <pre className="bk-taskbox text-sm md:text-base whitespace-pre-line mb-4 text-slate-800">
               {solutionText}
             </pre>
           )}
@@ -521,5 +522,6 @@ export default function Handelskalkrw() {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }

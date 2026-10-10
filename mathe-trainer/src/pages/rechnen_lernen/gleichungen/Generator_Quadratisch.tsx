@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import RechenwegDisplay from '../../../components/RechenwegDisplay';
+import TaskShell from '../../../components/layout/TaskShell'
 
 interface Aufgabe {
   id: string;
@@ -260,11 +261,11 @@ const Generator_Quadratisch: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-3">
+    <TaskShell title="Quadratische Gleichungen (rein)" width="wide">
+    <div className="">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-blue-900 mb-1">Quadratische Gleichungen (rein)</h1>
           <p className="text-xs text-gray-600">
             Löse die rein quadratischen Gleichungen. Gib eine Lösung ein (z.B.: 5, -2, 1.5)
           </p>
@@ -371,7 +372,7 @@ const Generator_Quadratisch: React.FC = () => {
                   {/* Button */}
                   <button
                     onClick={() => toggleSolution(aufgabe.id)}
-                    className="text-sm px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all whitespace-nowrap font-semibold flex-shrink-0"
+                    className="bk-btn bk-btn-primary whitespace-nowrap flex-shrink-0"
                   >
                     {showSolution ? '✕' : '?'}
                   </button>
@@ -412,6 +413,7 @@ const Generator_Quadratisch: React.FC = () => {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 };
 

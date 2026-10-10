@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { parseLocalizedNumber } from '../../../utils/numbers';
+import TaskShell from '../../../components/layout/TaskShell'
 
 const GOAL_SCORE = 20;
 
@@ -183,9 +184,9 @@ export default function Ohnevariablen() {
   const successRate = totalFirstTries > 0 ? Math.round((correctFirstTries / totalFirstTries) * 100) : 0;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className={`bg-white rounded-2xl shadow-md border border-slate-200 p-8 max-w-2xl w-full mt-12 ${feedbackClass === 'correct' ? 'ring-2 ring-green-400' : ''}`}> 
-        <h2 className="text-2xl font-bold text-blue-900 mb-2">Terme zusammenfassen</h2>
+    <TaskShell title="Terme ohne Variablen" width="narrow">
+    <div className="flex flex-col items-center">
+      <div className={`bk-panel max-w-2xl w-full ${feedbackClass === 'correct' ? 'ring-2 ring-green-400' : ''}`}> 
         <div className="mb-4">
           <div className="flex gap-2 justify-center mb-2">
             <button className={`difficulty-button px-4 py-2 rounded-lg border ${difficulty === 'easy' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-blue-900'}`} onClick={() => handleDifficulty('easy')}>Leicht</button>
@@ -210,12 +211,12 @@ export default function Ohnevariablen() {
             </div>
             <div className={`min-h-[24px] font-bold mb-2 ${feedbackClass === 'correct' ? 'text-green-600' : feedbackClass === 'incorrect' ? 'text-red-600' : ''}`}>{feedback}</div>
             <div className="flex gap-3 justify-center mt-2 flex-wrap">
-              <button className="generator-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow transition-colors" onClick={() => generateNewTask(difficulty)}>Neue Aufgabe</button>
-              <button className="generator-button bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg shadow transition-colors" onClick={checkSolution}>Lösung prüfen</button>
-              <button className="generator-button bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-5 rounded-lg shadow transition-colors" onClick={handleShowSolution} disabled={showSolution}>Lösung anzeigen</button>
+              <button className="bk-btn bk-btn-primary" onClick={() => generateNewTask(difficulty)}>Neue Aufgabe</button>
+              <button className="bk-btn bk-btn-primary" onClick={checkSolution}>Lösung prüfen</button>
+              <button className="bk-btn" onClick={handleShowSolution} disabled={showSolution}>Lösung anzeigen</button>
             </div>
             {showSolution && (
-              <div className="bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 mt-4" dangerouslySetInnerHTML={{ __html: solutionSteps }} />
+              <div className="bk-feedback bk-feedback-ok block rounded-lg p-4 mt-4" dangerouslySetInnerHTML={{ __html: solutionSteps }} />
             )}
           </>
         ) : (
@@ -223,10 +224,11 @@ export default function Ohnevariablen() {
             <h3 className="text-2xl font-bold text-green-700 mb-2">🎉 Geschafft! 🎉</h3>
             <p className="mb-2">Herzlichen Glückwunsch, du hast {GOAL_SCORE} Punkte erreicht!</p>
             <p className="font-bold text-blue-900 mb-4">Du hast {successRate}% der Fragen im ersten Versuch korrekt beantwortet.</p>
-            <button className="generator-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow transition-colors" onClick={handleNewGame}>Neue Runde starten</button>
+            <button className="bk-btn bk-btn-primary" onClick={handleNewGame}>Neue Runde starten</button>
           </div>
         )}
       </div>
     </div>
+    </TaskShell>
   );
 }

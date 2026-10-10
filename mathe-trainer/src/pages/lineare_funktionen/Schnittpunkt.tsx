@@ -2,6 +2,8 @@ import React, { useEffect, useId, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
+import { VideoEmbed } from '../../components/VideoButton'
+import TaskShell from '../../components/layout/TaskShell'
 
 const TOTAL_TASKS = 6
 
@@ -13,9 +15,9 @@ type Level = 'einfach' | 'fortgeschritten'
 
 const LEVEL_LABEL: Record<Level, string> = { einfach: 'Einfach', fortgeschritten: 'Fortgeschritten' }
 
-const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
-const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
-const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
+const btnPrimary = 'bk-btn bk-btn-primary'
+const btnSecondary = 'bk-btn'
+const panel = 'bk-panel text-center'
 
 function randomInt(max: number, min = 0) {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -241,7 +243,7 @@ function SolutionWay({ task }: { task: Task }) {
   const { m1, t1, m2, t2 } = task
   const s = intersection(m1, t1, m2, t2)
   return (
-    <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-slate-800">
+    <div className="mt-6 bk-taskbox text-slate-800">
       <h3 className="text-base font-bold text-center mb-2">Lösungsweg</h3>
       <p className="font-semibold text-left">1. Funktionsterme gleichsetzen und nach x auflösen</p>
       <EquationRows rows={solutionRows(m1, t1, m2, t2)} />
@@ -445,7 +447,7 @@ const statusBorder = (s: AnswerStatus) =>
 
 function AnswerField({ live, allowNone }: { live: ReturnType<typeof useLiveIntersection>; allowNone: boolean }) {
   const { xIn, setXIn, yIn, setYIn, none, setNone, xStatus, yStatus, status, solved, hint } = live
-  const inputCls = 'w-24 text-center border-2 rounded px-2 py-2 focus:outline-none disabled:bg-slate-100 disabled:border-slate-200'
+  const inputCls = 'bk-input w-24 text-center'
   return (
     <div>
       <div className="flex items-center justify-center gap-1 text-lg font-semibold text-slate-800">
@@ -695,7 +697,7 @@ const PARALLEL_EXAMPLE = { m: q(2), t1: q(1), t2: q(-3) }
 
 function Erklaerung() {
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200 text-slate-700">
+    <div className="bk-panel text-slate-700">
       <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">So berechnest du den Schnittpunkt</h2>
       <p className="mb-3">
         Im Schnittpunkt S haben beide Geraden <strong>denselben x-Wert und denselben y-Wert</strong>. Deshalb kannst du
@@ -730,15 +732,7 @@ function Erklaerung() {
         />
       </div>
       <h3 className="text-base font-bold text-slate-800 mt-5 mb-2 text-center">Erklärvideo</h3>
-      <div className="max-w-2xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200">
-        <iframe
-          className="w-full h-full"
-          src={`https://www.youtube.com/embed/${VIDEO_ID}`}
-          title="Erklärvideo: Schnittpunkt zweier Geraden"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
+      <VideoEmbed src={`https://www.youtube.com/embed/${VIDEO_ID}`} title="Erklärvideo: Schnittpunkt zweier Geraden" />
     </div>
   )
 }
@@ -802,22 +796,21 @@ export default function Schnittpunkt() {
 
   const header = (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Schnittpunkt zweier Geraden</h1>
       <p className="text-center text-slate-600">Berechne den Schnittpunkt zweier Geraden mit dem Gleichsetzungsverfahren.</p>
     </div>
   )
 
   if (!level) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50">
-        <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+      <TaskShell title="Schnittpunkt zweier Geraden" width="narrow">
+        <div className="flex flex-col gap-6">
           {header}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
-                className="rounded-xl bg-green-600 hover:bg-green-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Einfach</p>
                 <p className="text-xl font-serif italic mb-2 text-white">y = 2x − 1</p>
@@ -825,7 +818,7 @@ export default function Schnittpunkt() {
               </button>
               <button
                 onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-xl bg-red-600 hover:bg-red-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
                 <p className="text-xl font-serif italic mb-2 text-white">
@@ -836,13 +829,13 @@ export default function Schnittpunkt() {
             </div>
           </div>
         </div>
-      </div>
+      </TaskShell>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+    <TaskShell title="Schnittpunkt zweier Geraden" width="narrow">
+        <div className="flex flex-col gap-6">
         {header}
         <Erklaerung />
 
@@ -888,6 +881,6 @@ export default function Schnittpunkt() {
           </div>
         )}
       </div>
-    </div>
+    </TaskShell>
   )
 }

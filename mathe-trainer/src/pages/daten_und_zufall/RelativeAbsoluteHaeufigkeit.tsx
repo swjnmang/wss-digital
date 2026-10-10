@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, XCircle, RefreshCw, AlignLeft, Table2, Hash, BarChart3, PieChart as PieChartIcon, Lightbulb, LayoutGrid } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { generateTask, checkAnswer, GeneratedTask } from './haeufigkeit/generator';
+import TaskShell from '../../components/layout/TaskShell'
 
 const COLORS = ['#6366f1', '#f43f5e', '#10b981', '#f59e0b', '#0ea5e9', '#a855f7'];
 
@@ -77,18 +78,10 @@ const RelativeAbsoluteHaeufigkeit: React.FC = () => {
   const crosstab = task.crosstab;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to="/daten-und-zufall" className="text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-2">
-            <ArrowLeft className="w-5 h-5" />
-            Zurück
-          </Link>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Absolute und relative Häufigkeit</h1>
-        </div>
-      </header>
+    <TaskShell title="Absolute und relative Häufigkeit" width="wide">
+    <div className="">
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main>
         {/* Session-Statistik */}
         <div className="flex justify-between items-center mb-6 text-sm font-semibold text-slate-600">
           <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-100">
@@ -100,7 +93,7 @@ const RelativeAbsoluteHaeufigkeit: React.FC = () => {
           </span>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6">
+        <div className="bk-panel p-6 sm:p-8 mb-6">
           {/* Aufgabentext */}
           <div className="mb-6 space-y-2">
             {task.intro.map((line, idx) => (
@@ -300,7 +293,7 @@ const RelativeAbsoluteHaeufigkeit: React.FC = () => {
               <button
                 onClick={handleCheck}
                 disabled={!answer}
-                className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold rounded-lg transition-colors"
+                className="bk-btn bk-btn-primary flex-1 disabled:bg-slate-300"
               >
                 Antwort prüfen
               </button>
@@ -316,6 +309,7 @@ const RelativeAbsoluteHaeufigkeit: React.FC = () => {
         </div>
       </main>
     </div>
+    </TaskShell>
   );
 };
 

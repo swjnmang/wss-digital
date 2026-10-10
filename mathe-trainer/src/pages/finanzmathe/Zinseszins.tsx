@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import 'katex/dist/katex.min.css';
 import { BlockMath, InlineMath } from 'react-katex';
+import TaskShell from '../../components/layout/TaskShell'
+import VideoButton from '../../components/VideoButton'
 
 type TaskType = 'k_end' | 'k_start' | 'p' | 'n';
 
@@ -279,12 +281,12 @@ export default function Zinseszins() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-4 sm:px-4 md:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-6xl min-h-[400px] flex flex-col items-center p-4 sm:p-8 md:p-12">
-          <h1 className="text-2xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Zinseszins-Rechner</h1>
+    <TaskShell title="Zinseszins-Rechner" width="wide">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center w-full">
+        <div className="bk-panel w-full max-w-6xl flex flex-col items-center p-4 sm:p-8 md:p-12">
           
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6 w-full max-w-2xl text-center">
+          <div className="bk-taskbox mb-6 w-full max-w-2xl text-center">
             <div className="text-lg font-serif mb-2">
               <BlockMath math="K_n = K_0 \cdot q^n" />
             </div>
@@ -294,11 +296,11 @@ export default function Zinseszins() {
           </div>
 
           <div className="flex flex-wrap gap-2 mb-6 justify-center">
-            <button onClick={() => setTaskType('random')} className={`px-4 py-2 rounded font-bold transition ${taskType === 'random' ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'}`}>Zufall</button>
-            <button onClick={() => setTaskType('k_end')} className={`px-4 py-2 rounded font-bold transition ${taskType === 'k_end' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>Endkapital <InlineMath math="K_n" /></button>
-            <button onClick={() => setTaskType('k_start')} className={`px-4 py-2 rounded font-bold transition ${taskType === 'k_start' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>Anfangskapital <InlineMath math="K_0" /></button>
-            <button onClick={() => setTaskType('p')} className={`px-4 py-2 rounded font-bold transition ${taskType === 'p' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>Zinssatz <InlineMath math="p" /></button>
-            <button onClick={() => setTaskType('n')} className={`px-4 py-2 rounded font-bold transition ${taskType === 'n' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>Laufzeit <InlineMath math="n" /></button>
+            <button onClick={() => setTaskType('random')} className={`bk-seg-btn ${taskType === 'random' ? 'bk-seg-btn-on' : ''}`}>Zufall</button>
+            <button onClick={() => setTaskType('k_end')} className={`bk-seg-btn ${taskType === 'k_end' ? 'bk-seg-btn-on' : ''}`}>Endkapital <InlineMath math="K_n" /></button>
+            <button onClick={() => setTaskType('k_start')} className={`bk-seg-btn ${taskType === 'k_start' ? 'bk-seg-btn-on' : ''}`}>Anfangskapital <InlineMath math="K_0" /></button>
+            <button onClick={() => setTaskType('p')} className={`bk-seg-btn ${taskType === 'p' ? 'bk-seg-btn-on' : ''}`}>Zinssatz <InlineMath math="p" /></button>
+            <button onClick={() => setTaskType('n')} className={`bk-seg-btn ${taskType === 'n' ? 'bk-seg-btn-on' : ''}`}>Laufzeit <InlineMath math="n" /></button>
           </div>
 
           {task && (
@@ -340,18 +342,16 @@ export default function Zinseszins() {
           )}
 
           <div className="flex flex-col sm:flex-row gap-3 mb-4 w-full sm:w-auto">
-            <button onClick={checkAnswer} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full sm:w-auto">Überprüfen</button>
-            <button onClick={showSolution} className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full sm:w-auto">Lösung zeigen</button>
-            <button onClick={generateNewTask} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full sm:w-auto">Nächste Aufgabe</button>
+            <button onClick={checkAnswer} className="bk-btn bk-btn-primary w-full sm:w-auto">Überprüfen</button>
+            <button onClick={showSolution} className="bk-btn w-full sm:w-auto">Lösung zeigen</button>
+            <button onClick={generateNewTask} className="bk-btn w-full sm:w-auto">Nächste Aufgabe</button>
             {task && (
-              <a href={explainerVideos[task.type]} target="_blank" rel="noopener noreferrer" className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full sm:w-auto flex items-center justify-center">
-                Erklärvideo
-              </a>
+              <VideoButton url={explainerVideos[task.type]} label="Erklärvideo" className="bk-btn w-full sm:w-auto" />
             )}
           </div>
 
           {feedback && (
-            <div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedbackType === 'correct' ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>
+            <div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedbackType === 'correct' ? 'bk-feedback bk-feedback-ok block' : 'bk-feedback bk-feedback-no block'}`}>
               {feedback}
             </div>
           )}
@@ -373,5 +373,6 @@ export default function Zinseszins() {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }

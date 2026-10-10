@@ -4,6 +4,7 @@ import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import { renderTextWithMath } from '../../../components/TextWithMath';
 import { UNIT_OPTIONS, isWithinTolerance } from '../../../utils/anwendungsaufgabenHelpers';
+import TaskShell from '../../../components/layout/TaskShell'
 
 interface SolutionStep {
     heading: string;
@@ -260,14 +261,14 @@ const Bergbahn: React.FC = () => {
     };
 
     return (
-        <div className="py-8">
-            <div className="mx-auto px-4 max-w-6xl">
-                <Link to="/trigonometrie/anwendungsaufgaben" className="inline-flex items-center gap-2 text-teal-700 hover:text-teal-900 text-sm font-medium mb-4">
+        <TaskShell title="Die Bergbahn" width="wide">
+        <div className="">
+            <div className="mx-auto max-w-6xl">
+                <Link to="/trigonometrie/anwendungsaufgaben" className="bk-btn bk-btn-ghost mb-3">
                     <i className="fa-solid fa-arrow-left"></i> Zurück zur Übersicht
                 </Link>
 
-                <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
-                    <h1 className="text-3xl font-bold text-teal-800 text-center">Die Bergbahn</h1>
+                <div className="bk-panel p-6 space-y-6">
 
                     <div className="flex justify-center">
                         <img
@@ -316,7 +317,7 @@ const Bergbahn: React.FC = () => {
                                 </select>
                                 <button
                                     onClick={checkAnswer}
-                                    className="px-5 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                                    className="bk-btn bk-btn-primary"
                                 >
                                     Prüfen
                                 </button>
@@ -337,7 +338,7 @@ const Bergbahn: React.FC = () => {
                         <div className="flex flex-wrap justify-center gap-3">
                             <button
                                 onClick={() => setShowHint({ ...showHint, [currentTask]: !currentShowHint })}
-                                className="px-6 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors"
+                                className="bk-btn"
                             >
                                 <i className="fa-solid fa-lightbulb mr-2"></i>
                                 {currentShowHint ? 'Tipp verbergen' : 'Tipp anzeigen'}
@@ -346,7 +347,7 @@ const Bergbahn: React.FC = () => {
                             {currentWrongAttempt && (
                                 <button
                                     onClick={() => setShowSolution({ ...showSolution, [currentTask]: !currentShowSolution })}
-                                    className="px-6 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
+                                    className="bk-btn"
                                 >
                                     {currentShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
                                 </button>
@@ -426,6 +427,7 @@ const Bergbahn: React.FC = () => {
                 </div>
             </div>
         </div>
+        </TaskShell>
     );
 };
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { parseLocalizedNumber } from '../../../utils/numbers';
+import TaskShell from '../../../components/layout/TaskShell'
 
 type Schwierigkeit = 'leicht' | 'mittel' | 'schwer';
 type ProblemTyp = 'toScientific' | 'fromScientific';
@@ -174,27 +175,27 @@ export default function Zehnerpotenzen() {
   function keyDown(e: React.KeyboardEvent<HTMLInputElement>) { if (e.key === 'Enter') pruefen(); }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-3xl md:max-w-6xl min-h-[480px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
-          <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Zehnerpotenzen Umwandlung</h1>
+    <TaskShell title="Zehnerpotenzen Umwandlung" width="narrow">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center w-full">
+        <div className="bk-panel w-full max-w-3xl md:max-w-6xl min-h-[480px] flex flex-col items-center">
 
           {/* Schwierigkeit */}
           <div className="flex gap-2 mb-6">
-            <button onClick={() => setDifficulty('leicht')} className={`px-4 py-2 rounded font-bold transition ${difficulty === 'leicht' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Leicht</button>
-            <button onClick={() => setDifficulty('mittel')} className={`px-4 py-2 rounded font-bold transition ${difficulty === 'mittel' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Mittel</button>
-            <button onClick={() => setDifficulty('schwer')} className={`px-4 py-2 rounded font-bold transition ${difficulty === 'schwer' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Schwer</button>
+            <button onClick={() => setDifficulty('leicht')} className={`bk-seg-btn ${difficulty === 'leicht' ? 'bk-seg-btn-on' : ''}`}>Leicht</button>
+            <button onClick={() => setDifficulty('mittel')} className={`bk-seg-btn ${difficulty === 'mittel' ? 'bk-seg-btn-on' : ''}`}>Mittel</button>
+            <button onClick={() => setDifficulty('schwer')} className={`bk-seg-btn ${difficulty === 'schwer' ? 'bk-seg-btn-on' : ''}`}>Schwer</button>
           </div>
 
           {/* Neue Aufgabe */}
           <div className="flex flex-wrap gap-4 mb-4">
-            <button onClick={neueAufgabe} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Neue Aufgabe</button>
-            <button onClick={pruefen} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Überprüfen</button>
-            <button onClick={() => setShowTips(t => !t)} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded shadow transition-colors">Tipps</button>
+            <button onClick={neueAufgabe} className="bk-btn">Neue Aufgabe</button>
+            <button onClick={pruefen} className="bk-btn bk-btn-primary">Überprüfen</button>
+            <button onClick={() => setShowTips(t => !t)} className="bk-btn">Tipps</button>
           </div>
 
           {/* Aufgabenanzeige */}
-            <div className="w-full max-w-2xl bg-slate-100 border border-slate-200 rounded-lg p-6 mb-4 text-center min-h-[140px] flex flex-col justify-center">
+            <div className="w-full max-w-2xl bk-taskbox mb-4 text-center min-h-[140px] flex flex-col justify-center">
               {problem && (
                 <div className="text-base md:text-lg font-semibold text-blue-800 mb-3" dangerouslySetInnerHTML={{ __html: problem.anzeige }} />
               )}
@@ -256,12 +257,12 @@ export default function Zehnerpotenzen() {
 
           {/* Feedback */}
           {feedback && (
-            <div className={`w-full max-w-2xl text-center font-semibold rounded p-3 mb-2 ${feedback.startsWith('✅') ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>{feedback}</div>
+            <div className={`w-full max-w-2xl text-center font-semibold rounded p-3 mb-2 ${feedback.startsWith('✅') ? 'bk-feedback bk-feedback-ok block' : 'bk-feedback bk-feedback-no block'}`}>{feedback}</div>
           )}
 
           {/* Tipps */}
           {showTips && problem && (
-            <div className="w-full max-w-2xl bg-yellow-50 border border-yellow-200 text-yellow-900 rounded p-4 text-sm whitespace-pre-wrap mb-2">
+            <div className="w-full max-w-2xl bk-feedback bk-feedback-info block rounded p-4 text-sm whitespace-pre-wrap mb-2">
               <h3 className="font-bold mb-1">{tipText().titel}</h3>
               <div className="mb-2">{tipText().body}</div>
               <div className="italic text-yellow-800">{tipText().example}</div>
@@ -275,5 +276,6 @@ export default function Zehnerpotenzen() {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }

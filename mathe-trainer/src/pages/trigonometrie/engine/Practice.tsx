@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Rich from '../../raum_und_form/engine/Rich';
 import { useTaskTracking } from '../../../hooks/useTaskTracking';
 import { parseFlexibleNumber } from '../../../utils/parseFlexibleNumber';
+import { VideoEmbed } from '../../../components/VideoButton';
+import TaskShell from '../../../components/layout/TaskShell';
 import {
   LEVEL_LABEL,
   type ChoiceField,
@@ -17,15 +19,13 @@ const TOTAL_TASKS = 6;
 /** So lange muss eine falsche Eingabe stehen bleiben, bis sie rot wird und als Versuch zählt. */
 const WRONG_DELAY = 800;
 
-const btnPrimary =
-  'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors';
-const btnSecondary =
-  'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white';
-const panel = 'bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200';
+const btnPrimary = 'bk-btn bk-btn-primary';
+const btnSecondary = 'bk-btn';
+const panel = 'bk-panel';
 
 const LEVEL_STYLE: Record<Level, string> = {
   einfach: 'bg-green-600 hover:bg-green-700',
-  mittel: 'bg-amber-500 hover:bg-amber-600',
+  mittel: 'bg-amber-400 hover:bg-amber-300 !text-ink',
   schwer: 'bg-red-600 hover:bg-red-700',
 };
 
@@ -50,7 +50,7 @@ const statusBorder = (s: Status) =>
     ? 'border-green-500 bg-green-50'
     : s === 'wrong'
     ? 'border-red-500 bg-red-50'
-    : 'border-slate-300 bg-white';
+    : 'border-edge bg-white';
 
 // ---------- Aufgabenkarte ----------
 
@@ -163,9 +163,11 @@ const TaskCard: React.FC<CardProps> = ({
 
   return (
     <div className={panel}>
-      <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">Aufgabe {number}</h2>
+      <h2 className="flex items-center gap-3 text-xl font-extrabold text-ink mb-3 text-left">
+        <span className="bk-num">{number}</span>Aufgabe
+      </h2>
       <div className={task.figure ? 'grid grid-cols-1 md:grid-cols-2 gap-4 items-center' : ''}>
-        <div className="text-slate-700 leading-relaxed">
+        <div className="text-ink text-[17px] leading-relaxed text-left">
           <Rich text={task.text} />
         </div>
         {task.figure && <div>{task.figure}</div>}
@@ -188,10 +190,10 @@ const TaskCard: React.FC<CardProps> = ({
       </div>
 
       {solved && (
-        <p className="text-center font-bold mt-3 text-green-600">Richtig! Super gemacht!</p>
+        <p className="bk-feedback bk-feedback-ok mt-4 justify-center"><i className="fa-solid fa-check mt-1" aria-hidden="true" />Richtig! Super gemacht!</p>
       )}
       {!solved && anyWrongShown && (
-        <p className="text-center font-bold mt-3 text-red-600">
+        <p className="bk-feedback bk-feedback-no mt-4 justify-center">
           {task.fields.length > 1 && shown.some((s) => s === 'right')
             ? 'Ein Teil stimmt schon – prüfe die rot markierten Felder.'
             : 'Das stimmt noch nicht.'}
@@ -199,7 +201,7 @@ const TaskCard: React.FC<CardProps> = ({
       )}
 
       {tipsShown > 0 && (
-        <div className="mt-4 border-l-4 border-amber-400 bg-amber-50 rounded p-3 text-left text-slate-700">
+        <div className="mt-4 bk-feedback bk-feedback-info block font-normal">
           <ol className="space-y-2">
             {task.tips.slice(0, tipsShown).map((tip, i) => (
               <li key={i}>
@@ -211,7 +213,7 @@ const TaskCard: React.FC<CardProps> = ({
         </div>
       )}
 
-      <div className="flex flex-wrap justify-center gap-3 mt-6">
+      <div className="bk-actions justify-center mt-6">
         <button onClick={newTask} className={btnSecondary}>
           Neue Aufgabe
         </button>
@@ -233,14 +235,14 @@ const TaskCard: React.FC<CardProps> = ({
         </button>
       </div>
       {solutionLocked && !solved && (
-        <p className="text-xs text-slate-500 mt-2 text-center">
+        <p className="text-sm text-muted mt-2 text-center">
           Die Lösung kannst du erst nach einem falschen Versuch anzeigen.
         </p>
       )}
 
       {showSolution && (
-        <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-slate-800">
-          <h3 className="text-base font-bold text-center mb-2">Lösungsweg</h3>
+        <div className="bk-solution">
+          <h3 className="bk-solution-title">Lösungsweg</h3>
           <ol className="space-y-2">
             {task.solution.map((line, i) => (
               <li key={i} className="leading-relaxed">
@@ -275,7 +277,7 @@ const FieldInput: React.FC<FieldProps> = ({
 }) => {
   if (field.kind === 'num') {
     return (
-      <div className="flex items-center justify-center gap-2 text-lg text-slate-800">
+      <div className="flex items-center justify-center gap-2 text-lg text-ink">
         <span className="font-semibold">
           <Rich text={field.label} />
         </span>
@@ -285,7 +287,7 @@ const FieldInput: React.FC<FieldProps> = ({
           readOnly={disabled}
           inputMode="decimal"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onType(e.target.value)}
-          className={`w-32 text-center border-2 rounded px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 ${statusBorder(
+          className={`bk-input w-32 text-center ${statusBorder(
             status
           )}`}
           placeholder="?"
@@ -309,14 +311,14 @@ const FieldInput: React.FC<FieldProps> = ({
             ? status === 'right'
               ? 'border-green-500 bg-green-50 text-green-800'
               : 'border-red-500 bg-red-50 text-red-800'
-            : 'border-slate-300 bg-white hover:bg-slate-50 text-slate-700';
+            : 'border-edge bg-white hover:bg-sunken text-ink';
           return (
             <button
               key={o}
               type="button"
               disabled={disabled && !selected}
               onClick={() => onChoose(o)}
-              className={`min-w-[4rem] px-3 py-2 rounded-lg border-2 font-semibold transition-colors disabled:opacity-50 ${cls}`}
+              className={`min-w-[4rem] min-h-[48px] px-4 py-2 rounded-xl border-2 font-bold shadow-hard-sm transition-colors disabled:opacity-50 ${cls}`}
             >
               <Rich text={opt} />
             </button>
@@ -349,17 +351,11 @@ function buildRound(cfg: TopicConfig, level: Level): Task[] {
 
 function Erklaerung({ cfg }: { cfg: TopicConfig }) {
   return (
-    <div className={`${panel} text-slate-700`}>
-      <h2 className="text-lg font-bold text-slate-800 mb-3 text-center">Erklärung</h2>
+    <div className={`${panel} text-ink text-left`}>
+      <h2 className="text-xl font-extrabold text-ink mb-3 text-left">Erklärung</h2>
       {cfg.videoId && (
-        <div className="max-w-2xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200 mb-5">
-          <iframe
-            className="w-full h-full"
-            src={`https://www.youtube.com/embed/${cfg.videoId}`}
-            title={`Erklärvideo: ${cfg.title}`}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+        <div className="mb-5">
+          <VideoEmbed src={`https://www.youtube.com/embed/${cfg.videoId}`} title={`Erklärvideo: ${cfg.title}`} />
         </div>
       )}
       <div className="space-y-3">{cfg.explanation}</div>
@@ -368,7 +364,7 @@ function Erklaerung({ cfg }: { cfg: TopicConfig }) {
           <a
             href={cfg.pdf}
             download
-            className="text-blue-600 hover:underline text-sm font-semibold"
+            className="bk-btn bk-btn-sm"
           >
             <i className="fa-solid fa-file-pdf mr-1" /> Übungsblatt (PDF) herunterladen
           </a>
@@ -438,22 +434,13 @@ export default function Practice({ cfg }: { cfg: TopicConfig }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-4xl w-full flex flex-col gap-6">
-        <div>
-          <Link to="/trigonometrie" className="text-blue-600 hover:underline text-sm font-semibold">
-            ← Zurück zur Übersicht
-          </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mt-2 mb-2 text-center">
-            {cfg.title}
-          </h1>
-          <p className="text-center text-slate-600">{cfg.subtitle}</p>
-        </div>
+    <TaskShell title={cfg.title} subtitle={cfg.subtitle} width="narrow">
+      <div className="flex flex-col gap-6">
 
         <Erklaerung cfg={cfg} />
 
         <div id="aufgaben" className={`${panel} text-center scroll-mt-4`}>
-          <h2 className="text-lg font-bold text-slate-800 mb-4">
+          <h2 className="text-xl font-extrabold text-ink mb-4">
             {level
               ? `Schwierigkeitsgrad: ${LEVEL_LABEL[level]}`
               : 'Wähle deinen Schwierigkeitsgrad'}
@@ -467,26 +454,26 @@ export default function Practice({ cfg }: { cfg: TopicConfig }) {
               <button
                 key={l.id}
                 onClick={() => chooseLevel(l.id)}
-                className={`rounded-xl text-white p-4 shadow-sm transition-all ${
+                className={`rounded-2xl text-white p-4 border-2 border-edge shadow-hard text-left transition-all hover:-translate-y-0.5 ${
                   LEVEL_STYLE[l.id]
                 } ${level && level !== l.id ? 'opacity-50 hover:opacity-90' : ''} ${
-                  level === l.id ? 'ring-4 ring-offset-2 ring-blue-300' : ''
+                  level === l.id ? 'ring-4 ring-offset-2 ring-ink' : ''
                 }`}
               >
-                <p className="text-lg font-bold mb-1 text-white">{LEVEL_LABEL[l.id]}</p>
+                <p className="text-lg font-bold mb-1 text-inherit">{LEVEL_LABEL[l.id]}</p>
                 {l.example && (
-                  <p className="text-base mb-1 text-white">
+                  <p className="text-base mb-1 text-inherit">
                     <Rich text={l.example} />
                   </p>
                 )}
-                <p className="text-sm text-white/90">
+                <p className="text-sm text-inherit opacity-90">
                   <Rich text={l.description} />
                 </p>
               </button>
             ))}
           </div>
           {cfg.roundingNote && level && (
-            <p className="text-sm text-slate-500 mt-4">{cfg.roundingNote}</p>
+            <p className="text-sm text-muted mt-4">{cfg.roundingNote}</p>
           )}
         </div>
 
@@ -506,12 +493,12 @@ export default function Practice({ cfg }: { cfg: TopicConfig }) {
           ))}
 
         {level && (
-          <div className="flex justify-center gap-3 flex-wrap">
-            <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">
+          <div className="bk-actions justify-center">
+            <div className="bk-chip !text-base !py-2.5 !px-4">
               Gelöst: {solvedCount} / {TOTAL_TASKS}
             </div>
-            <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">
-              Richtig in Folge: {streak}
+            <div className="bk-streak">
+              <i className="fa-solid fa-fire" aria-hidden="true" /> Richtig in Folge: {streak}
             </div>
             <button onClick={newRound} className={btnSecondary}>
               Sechs neue Aufgaben
@@ -522,7 +509,7 @@ export default function Practice({ cfg }: { cfg: TopicConfig }) {
         {allSolved && (
           <div
             ref={completionRef}
-            className="bg-green-50 border-2 border-green-400 rounded-xl p-6 text-center"
+            className="bk-panel text-center !bg-[var(--correct-soft)]"
           >
             {finished ? (
               <>
@@ -560,6 +547,6 @@ export default function Practice({ cfg }: { cfg: TopicConfig }) {
           </div>
         )}
       </div>
-    </div>
+    </TaskShell>
   );
 }

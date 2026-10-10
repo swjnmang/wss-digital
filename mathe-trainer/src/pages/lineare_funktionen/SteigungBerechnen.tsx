@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
+import { VideoEmbed } from '../../components/VideoButton'
+import TaskShell from '../../components/layout/TaskShell'
 
 // Sechs Aufgaben im Wechsel: Punkte, Graph, Punkte, Graph, Punkte, Graph
 const TOTAL_TASKS = 6
@@ -40,11 +42,11 @@ type Level = 'einfach' | 'fortgeschritten'
 
 const LEVEL_LABEL: Record<Level, string> = { einfach: 'Einfach', fortgeschritten: 'Fortgeschritten' }
 
-const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
-const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
-const inputCls = 'w-40 text-center border border-slate-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500'
-const coordCls = 'w-20 text-center border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:border-blue-500'
-const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
+const btnPrimary = 'bk-btn bk-btn-primary'
+const btnSecondary = 'bk-btn'
+const inputCls = 'bk-input w-40 text-center'
+const coordCls = 'bk-input w-20 text-center'
+const panel = 'bk-panel text-center'
 
 const parseAnswer = (raw: string) => parseFloat(raw.replace(',', '.').replace(/[−–—‐]/g, '-'))
 
@@ -144,7 +146,7 @@ function solutionEl(
 ) {
   const value = Math.round(slope * 100) / 100
   return (
-    <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50">
+    <div className="mt-6 bk-taskbox">
       <h3 className="text-base font-bold text-slate-800 text-center mb-2">Lösungsweg</h3>
       <MathDisplay latex={`$$P_1(${pa.x}|${pa.y}) \\quad P_2(${pb.x}|${pb.y})$$`} />
       <MathDisplay latex={`$$m = \\dfrac{y_2 - y_1}{x_2 - x_1} = \\dfrac{${pb.y} - (${pa.y})}{${pb.x} - (${pa.x})} = \\dfrac{${dy}}{${dx}} = ${value}$$`} />
@@ -491,7 +493,7 @@ function Frac({ num, den }: { num: React.ReactNode; den: React.ReactNode }) {
 
 function Erklaerung() {
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200">
+    <div className="bk-panel">
       <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">So berechnest du die Steigung</h2>
       <p className="text-slate-700 mb-3">
         Die Steigung m gibt an, wie stark eine Gerade steigt oder fällt: Um wie viel ändert sich y, wenn x um 1 größer wird?
@@ -527,15 +529,7 @@ function Erklaerung() {
         <li>Die Reihenfolge der Punkte ist egal, solange oben und unten derselbe Punkt zuerst steht.</li>
       </ul>
       <h3 className="text-base font-bold text-slate-800 mt-5 mb-2 text-center">Erklärvideo</h3>
-      <div className="max-w-2xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200">
-        <iframe
-          className="w-full h-full"
-          src={`https://www.youtube.com/embed/${VIDEO_ID}`}
-          title="Erklärvideo: Steigung berechnen"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
+      <VideoEmbed src={`https://www.youtube.com/embed/${VIDEO_ID}`} title="Erklärvideo: Steigung berechnen" />
     </div>
   )
 }
@@ -606,7 +600,6 @@ export default function SteigungBerechnen() {
 
   const header = (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Die Steigung m berechnen</h1>
       <p className="text-center text-slate-600">Berechne die Steigung m einer Geraden aus zwei Punkten.</p>
     </div>
   )
@@ -615,15 +608,15 @@ export default function SteigungBerechnen() {
 
   if (!level) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50">
-        <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+      <TaskShell title="Die Steigung m berechnen" width="narrow">
+        <div className="flex flex-col gap-6">
           {header}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
-                className="rounded-xl bg-green-600 hover:bg-green-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Einfach</p>
                 <p className="text-xl font-serif italic mb-2 text-white">y = m · x</p>
@@ -631,7 +624,7 @@ export default function SteigungBerechnen() {
               </button>
               <button
                 onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-xl bg-red-600 hover:bg-red-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
                 <p className="text-xl font-serif italic mb-2 text-white">y = m · x + t</p>
@@ -640,13 +633,13 @@ export default function SteigungBerechnen() {
             </div>
           </div>
         </div>
-      </div>
+      </TaskShell>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+    <TaskShell title="Die Steigung m berechnen" width="narrow">
+        <div className="flex flex-col gap-6">
         {header}
         {explanation}
 
@@ -692,6 +685,6 @@ export default function SteigungBerechnen() {
           </div>
         )}
       </div>
-    </div>
+    </TaskShell>
   )
 }

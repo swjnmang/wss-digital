@@ -5,6 +5,7 @@ import 'katex/dist/katex.min.css';
 import RightTriangleSVG from '../../components/RightTriangleSVG';
 import GeoGebraTriangleSketch, { GgbAngle } from '../../components/GeoGebraTriangleSketch';
 import { HelpUsage, logTrackingEntry } from '../../utils/tracking';
+import TaskShell from '../../components/layout/TaskShell'
 
 // ---------- Allgemeine Hilfsfunktionen ----------
 
@@ -1202,29 +1203,21 @@ const GemischteUebungsaufgaben: React.FC = () => {
     const correctCount = cards.filter(c => c.feedbackType === 'correct').length;
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900">
-            <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="space-y-1">
-                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Trigonometrie</p>
-                        <h1 className="text-3xl font-bold">Gemischte Übungsaufgaben</h1>
-                        <p className="text-sm text-slate-600 max-w-2xl">
-                            Zehn zufällig gemischte Aufgaben aus allen Trigonometrie-Themen (ohne Sinusfunktion). Generiere
-                            einzelne Aufgaben neu oder starte mit einem komplett neuen Satz.
-                        </p>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                        <span className="rounded-xl bg-slate-900 text-white px-3 py-2 text-sm font-semibold">
-                            {correctCount} / {answeredCount} richtig ({cards.length} Aufgaben)
-                        </span>
-                        <button
-                            onClick={regenerateAll}
-                            className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent)] hover:opacity-90 text-white font-semibold px-4 py-2 shadow"
-                        >
-                            🔄 Alle Aufgaben neu
-                        </button>
-                    </div>
-                </div>
+        <TaskShell
+            title="Gemischte Übungsaufgaben"
+            width="wide"
+            subtitle={<>Zehn zufällig gemischte Aufgaben aus allen Trigonometrie-Themen (ohne Sinusfunktion). Generiere
+                            einzelne Aufgaben neu oder starte mit einem komplett neuen Satz.</>}
+            actions={
+                <>
+                    <span className="bk-chip !text-sm !py-2.5">{correctCount} / {answeredCount} richtig ({cards.length} Aufgaben)</span>
+                    <button onClick={regenerateAll} className="bk-btn">
+                        <i className="fa-solid fa-rotate" aria-hidden="true" /> Alle Aufgaben neu
+                    </button>
+                </>
+            }
+        >
+            <div className="space-y-6">
 
                 <div className="space-y-6">
                     {cards.map((card, index) => (
@@ -1251,7 +1244,7 @@ const GemischteUebungsaufgaben: React.FC = () => {
                     </Link>
                 </div>
             </div>
-        </div>
+        </TaskShell>
     );
 };
 
@@ -1282,21 +1275,20 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     const feedbackClass =
         card.feedbackType === 'correct'
-            ? 'bg-green-50 border-green-200 text-green-800'
+            ? 'bk-feedback-ok'
             : card.feedbackType === 'incorrect'
-            ? 'bg-red-50 border-red-200 text-red-800'
+            ? 'bk-feedback-no'
             : '';
 
     return (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+        <div className="bk-panel space-y-4">
             <div className="flex flex-wrap justify-between items-center gap-2">
                 <div className="flex items-center gap-2 text-sm">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-900 text-white font-semibold">
-                        Aufgabe {index + 1}
-                    </span>
+                    <span className="bk-num">{index + 1}</span>
+                    <span className="font-display text-lg font-extrabold">Aufgabe</span>
                 </div>
-                <button onClick={onRegenerate} className="text-sm text-[var(--accent)] font-semibold hover:underline">
-                    🔄 Aufgabe neu
+                <button onClick={onRegenerate} className="bk-btn bk-btn-sm">
+                    <i className="fa-solid fa-rotate" aria-hidden="true" /> Aufgabe neu
                 </button>
             </div>
 
@@ -1314,23 +1306,23 @@ const TaskCard: React.FC<TaskCardProps> = ({
                                 value={card.numericValue}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => onNumericChange(e.target.value)}
                                 placeholder="Deine Lösung"
-                                className="w-full sm:w-48 border border-slate-300 rounded-lg px-3 py-2 text-center"
+                                className="bk-input w-full sm:w-48 text-center"
                             />
                             <span className="text-slate-600 w-10">{task.unit}</span>
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
                             <button
                                 onClick={onCheck}
-                                className="rounded-xl bg-slate-900 text-white px-4 py-2 text-sm font-semibold hover:bg-slate-800"
+                                className="bk-btn bk-btn-primary"
                             >
                                 Prüfen
                             </button>
-                            <button onClick={onToggleSolution} className="text-sm text-slate-600 font-semibold hover:underline">
+                            <button onClick={onToggleSolution} className="bk-btn">
                                 {card.showSolution ? 'Lösungsweg ausblenden' : 'Lösungsweg anzeigen'}
                             </button>
                         </div>
                         {card.feedback && (
-                            <div className={`rounded-lg border px-3 py-2 text-sm font-semibold ${feedbackClass}`}>{card.feedback}</div>
+                            <div className={`bk-feedback block ${feedbackClass}`}>{card.feedback}</div>
                         )}
                         {card.showSolution && (
                             <div className="bg-slate-50 rounded-lg border border-slate-100 p-3">
@@ -1391,12 +1383,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
                         ))}
                         <button
                             onClick={onCheck}
-                            className="rounded-xl bg-slate-900 text-white px-4 py-2 text-sm font-semibold hover:bg-slate-800"
+                            className="bk-btn bk-btn-primary"
                         >
                             Prüfen
                         </button>
                         {card.feedback && (
-                            <div className={`rounded-lg border px-3 py-2 text-sm font-semibold ${feedbackClass}`}>{card.feedback}</div>
+                            <div className={`bk-feedback block ${feedbackClass}`}>{card.feedback}</div>
                         )}
                     </div>
                 </div>
@@ -1458,12 +1450,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
                         </div>
                         <button
                             onClick={onCheck}
-                            className="rounded-xl bg-slate-900 text-white px-4 py-2 text-sm font-semibold hover:bg-slate-800"
+                            className="bk-btn bk-btn-primary"
                         >
                             Prüfen
                         </button>
                         {card.feedback && (
-                            <div className={`rounded-lg border px-3 py-2 text-sm font-semibold ${feedbackClass}`}>{card.feedback}</div>
+                            <div className={`bk-feedback block ${feedbackClass}`}>{card.feedback}</div>
                         )}
                     </div>
                 </div>

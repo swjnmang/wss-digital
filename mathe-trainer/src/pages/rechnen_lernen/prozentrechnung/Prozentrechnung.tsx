@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { parseLocalizedNumber } from '../../../utils/numbers';
+import TaskShell from '../../../components/layout/TaskShell'
 
 type Difficulty = 'leicht' | 'mittel' | 'schwer';
 type Mode = 'W' | 'p' | 'G'; // Prozentwert, Prozentsatz, Grundwert
@@ -51,27 +52,28 @@ export default function ProzentrechnungUebung() {
   function onKey(e: React.KeyboardEvent) { if (e.key === 'Enter') check(); }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-3xl md:max-w-6xl min-h-[480px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
-          <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Prozentrechnung üben</h1>
+    <TaskShell title="Prozentrechnung üben" width="narrow">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center w-full">
+        <div className="bk-panel w-full max-w-3xl md:max-w-6xl min-h-[480px] flex flex-col items-center">
           <div className="flex gap-2 mb-6">
-            <button onClick={() => setDifficulty('leicht')} className={`px-4 py-2 rounded font-bold transition ${difficulty === 'leicht' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Leicht</button>
-            <button onClick={() => setDifficulty('mittel')} className={`px-4 py-2 rounded font-bold transition ${difficulty === 'mittel' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Mittel</button>
-            <button onClick={() => setDifficulty('schwer')} className={`px-4 py-2 rounded font-bold transition ${difficulty === 'schwer' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Schwer</button>
+            <button onClick={() => setDifficulty('leicht')} className={`bk-seg-btn ${difficulty === 'leicht' ? 'bk-seg-btn-on' : ''}`}>Leicht</button>
+            <button onClick={() => setDifficulty('mittel')} className={`bk-seg-btn ${difficulty === 'mittel' ? 'bk-seg-btn-on' : ''}`}>Mittel</button>
+            <button onClick={() => setDifficulty('schwer')} className={`bk-seg-btn ${difficulty === 'schwer' ? 'bk-seg-btn-on' : ''}`}>Schwer</button>
           </div>
-          <div className="w-full max-w-xl bg-slate-100 border border-slate-200 rounded-lg p-6 mb-4 text-center">
+          <div className="w-full max-w-xl bk-taskbox mb-4 text-center">
             <div className="font-semibold text-blue-800 mb-2 text-base md:text-lg">{question}</div>
             <input ref={inpRef} className="w-56 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400" type="number" value={input} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} onKeyDown={onKey} placeholder="Deine Lösung" />
           </div>
           <div className="flex flex-wrap gap-4 mb-4">
-            <button onClick={check} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Überprüfen</button>
-            <button onClick={gen} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Neue Aufgabe</button>
+            <button onClick={check} className="bk-btn bk-btn-primary">Überprüfen</button>
+            <button onClick={gen} className="bk-btn">Neue Aufgabe</button>
           </div>
-          {feedback && (<div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedback.startsWith('Richtig') ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>{feedback}</div>)}
+          {feedback && (<div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedback.startsWith('Richtig') ? 'bk-feedback bk-feedback-ok block' : 'bk-feedback bk-feedback-no block'}`}>{feedback}</div>)}
           {solution && (<div className="w-full max-w-xl bg-blue-50 border border-blue-200 rounded p-4 text-blue-900 mb-2 text-center text-base md:text-lg">{solution}</div>)}
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }
