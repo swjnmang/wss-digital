@@ -12,9 +12,11 @@ interface Props {
   children: ReactNode
   /** 'narrow' für reine Text-/Rechenaufgaben, 'wide' für Seiten mit Graph oder Tabelle */
   width?: 'narrow' | 'wide' | 'full'
+  /** Zwischenebene unter dem Bereich, z. B. das Thema bei Raum & Form */
+  parent?: { to: string; label: string }
 }
 
-export default function TaskShell({ title, subtitle, actions, children, width = 'wide' }: Props) {
+export default function TaskShell({ title, subtitle, actions, children, width = 'wide', parent }: Props) {
   const { pathname } = useLocation()
   const area = areaForPath(pathname)
   const ex = allExercises().find((e) => e.path === pathname)
@@ -29,6 +31,12 @@ export default function TaskShell({ title, subtitle, actions, children, width = 
               <span className="bk-task-glyph" aria-hidden="true">{area.glyph}</span>
               {area.title}
             </Link>
+          )}
+          {parent && (
+            <>
+              <span className="bk-task-crumb" aria-hidden="true">›</span>
+              <Link to={parent.to} className="bk-task-area">{parent.label}</Link>
+            </>
           )}
           <h1>
             {ex && <span className="bk-num">{ex.number}</span>}

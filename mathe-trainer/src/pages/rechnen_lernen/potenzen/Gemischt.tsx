@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { parseLocalizedNumber } from '../../../utils/numbers';
+import TaskShell from '../../../components/layout/TaskShell'
 
 type Level = 1 | 2 | 3 | 4;
 type Solution = { coeff: number; base1?: string; exp1?: number; base2?: string; exp2?: number };
@@ -254,25 +255,24 @@ export default function Gemischt() {
   function onEnter(e: React.KeyboardEvent<HTMLInputElement>) { if (e.key === 'Enter') check(); }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-6xl min-h-[560px] flex flex-col items-center p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24">
+    <TaskShell title="Potenzterme zusammenfassen · Gemischt" width="narrow">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center w-full">
+        <div className="bk-panel w-full max-w-6xl min-h-[560px] flex flex-col items-center">
           {/* Local style tweaks for fraction exponent vertical alignment */}
           <style>{`
             .fraction sup {font-size:0.65em; top:-0.2em; position:relative; line-height:1;}
             .fraction span {line-height:1.15;}
           `}</style>
-          <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Potenzterme zusammenfassen · Gemischt</h1>
-            <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2 text-center">Potenzterme zusammenfassen · Gemischt</h1>
 
           <div className="flex gap-2 mb-6">
-            <button onClick={() => setLevel(1)} className={`px-4 py-2 rounded font-bold transition ${level === 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Leicht</button>
-            <button onClick={() => setLevel(2)} className={`px-4 py-2 rounded font-bold transition ${level === 2 ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Mittel</button>
-            <button onClick={() => setLevel(3)} className={`px-4 py-2 rounded font-bold transition ${level === 3 ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Schwer</button>
-            <button onClick={() => setLevel(4)} className={`px-4 py-2 rounded font-bold transition ${level === 4 ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'}`}>Experte</button>
+            <button onClick={() => setLevel(1)} className={`bk-seg-btn ${level === 1 ? 'bk-seg-btn-on' : ''}`}>Leicht</button>
+            <button onClick={() => setLevel(2)} className={`bk-seg-btn ${level === 2 ? 'bk-seg-btn-on' : ''}`}>Mittel</button>
+            <button onClick={() => setLevel(3)} className={`bk-seg-btn ${level === 3 ? 'bk-seg-btn-on' : ''}`}>Schwer</button>
+            <button onClick={() => setLevel(4)} className={`bk-seg-btn ${level === 4 ? 'bk-seg-btn-on' : ''}`}>Experte</button>
           </div>
 
-          <div className="w-full bg-slate-100 border border-slate-200 rounded-lg p-6 mb-4 text-center min-h-[160px] flex flex-col justify-center">
+          <div className="w-full bk-taskbox mb-4 text-center min-h-[160px] flex flex-col justify-center">
             <div className="text-sm text-slate-700 mb-2">Fasse so weit wie möglich zusammen. Beachte Punkt-vor-Strich und Potenzregeln.</div>
             <div className="text-xl md:text-2xl font-semibold text-blue-800" dangerouslySetInnerHTML={{ __html: task?.html || '' }} />
           </div>
@@ -306,15 +306,16 @@ export default function Gemischt() {
           <div className="w-full max-w-2xl text-center text-slate-600 mb-2 border border-dashed border-slate-300 rounded p-3" dangerouslySetInnerHTML={{ __html: preview }} />
 
           <div className="flex flex-wrap gap-3 mb-3">
-            <button onClick={check} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow">Antwort prüfen</button>
-            <button onClick={newTask} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded shadow">Neue Aufgabe</button>
+            <button onClick={check} className="bk-btn bk-btn-primary">Antwort prüfen</button>
+            <button onClick={newTask} className="bk-btn">Neue Aufgabe</button>
           </div>
 
           {feedback && (
-            <div className={`w-full max-w-2xl text-center font-semibold rounded p-3 ${feedback.startsWith('✅') ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>{feedback}</div>
+            <div className={`w-full max-w-2xl text-center font-semibold rounded p-3 ${feedback.startsWith('✅') ? 'bk-feedback bk-feedback-ok block' : 'bk-feedback bk-feedback-no block'}`}>{feedback}</div>
           )}
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }

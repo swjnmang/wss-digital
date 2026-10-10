@@ -32,7 +32,8 @@ class Page:
         """Import nach dem letzten Import einfügen (falls noch nicht vorhanden)."""
         if line in self.s:
             return self
-        idx = [m.end() for m in re.finditer(r"^import [^\n]*\n", self.s, flags=re.M)]
+        # auch mehrzeilige Importe (import {\n  a,\n} from '...') vollständig überspringen
+        idx = [m.end() for m in re.finditer(r"^import (?:[^;'\"]*?from )?['\"][^'\"]+['\"];?[ \t]*\n", self.s, flags=re.M | re.S)]
         pos = idx[-1] if idx else 0
         self.s = self.s[:pos] + line + '\n' + self.s[pos:]
         return self

@@ -62,6 +62,11 @@ module.exports = {
         display: ['"Bricolage Grotesque Variable"', '"Bricolage Grotesque"', '"Segoe UI"', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
+        // weichere Ecken wie im Baukasten (auch für bestehende rounded-/rounded-lg-Klassen)
+        DEFAULT: '8px',
+        md: '10px',
+        lg: '12px',
+        xl: '16px',
         bk: '24px',
         'bk-sm': '12px',
       },

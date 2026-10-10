@@ -34,8 +34,6 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react';
 import Home from './pages/Home'
 import AreaPage from './pages/AreaPage'
-import QuadratischeIndex from './pages/QuadratischeIndex'
-import RechnenLernenIndex from './pages/RechnenLernenIndex'
 import Terme from './pages/rechnen_lernen/Terme'
 import Brueche from './pages/rechnen_lernen/Brueche'
 import Potenzen from './pages/rechnen_lernen/Potenzen'
@@ -76,7 +74,6 @@ import ParallelSenkrecht from './pages/lineare_funktionen/ParallelSenkrecht'
 import ExerciseSheetGenerator from './pages/lineare_funktionen/ExerciseSheetGenerator'
 import WerWirdMillionaer from './pages/lineare_funktionen/WerWirdMillionaer'
 // Finanzmathe
-import FinanzmatheIndex from './pages/FinanzmatheIndex';
 import ZinsrechnungMenu from './pages/finanzmathe/ZinsrechnungMenu';
 import Zinsrechnung from './pages/finanzmathe/Zinsrechnung';
 import Zinstage from './pages/finanzmathe/Zinstage';
@@ -100,7 +97,6 @@ import DasElektroauto from './pages/finanzmathe/DasElektroauto';
 import DerFoodtruck from './pages/finanzmathe/DerFoodtruck';
 import PruefungsModus from './pages/finanzmathe/PruefungsModus';
 // Quadratische Funktionen
-import QuadratischeFunktionenMenu from './pages/quadratische_funktionen/QuadratischeFunktionenMenu';
 import WertetabelleQF from './pages/quadratische_funktionen/Wertetabelle';
 import Normalparabel from './pages/quadratische_funktionen/Normalparabel';
 import VerschiebungNormalparabel from './pages/quadratische_funktionen/VerschiebungNormalparabel';
@@ -118,7 +114,6 @@ import SchnittpunkteGeradeQF from './pages/quadratische_funktionen/Schnittpunkte
 import SpielNullstellenQF from './pages/quadratische_funktionen/SpielNullstellen';
 import AbschlusstestQF from './pages/quadratische_funktionen/Abschlusstest';
 // Trigonometrie
-import TrigonometrieIndex from './pages/TrigonometrieIndex';
 import RechtwinkligBeschriften from './pages/trigonometrie/RechtwinkligBeschriften';
 import SinusKosinusTangensErkennen from './pages/trigonometrie/SinusKosinusTangensErkennen';
 import RechtwinkligStrecken from './pages/trigonometrie/RechtwinkligStrecken';
@@ -140,7 +135,6 @@ import Bergbahn from './pages/trigonometrie/anwendungsaufgaben/Bergbahn';
 import NachverfolgungBericht from './pages/trigonometrie/NachverfolgungBericht';
 import { useTrackingSession } from './hooks/useTaskTracking';
 // Daten und Zufall
-import DatenUndZufallIndex from './pages/DatenUndZufallIndex';
 import StatistischeKennwerte from './pages/daten_und_zufall/StatistischeKennwerte';
 import Baumdiagramme2 from './pages/daten_und_zufall/Baumdiagramme2';
 import DiagrammeErstellen from './pages/daten_und_zufall/DiagrammeErstellen';
@@ -154,7 +148,6 @@ import Sommerfest from './pages/daten_und_zufall/anwendungsaufgaben/Sommerfest';
 import Fahrradstation from './pages/daten_und_zufall/anwendungsaufgaben/Fahrradstation';
 import BioKiste from './pages/daten_und_zufall/anwendungsaufgaben/BioKiste';
 // Raum und Form
-import RaumUndFormIndex from './pages/RaumUndFormIndex';
 import RaumTopicIndex from './pages/raum_und_form/TopicIndex';
 import RaumPracticeRoute from './pages/raum_und_form/PracticeRoute';
 // Excel Trainer
@@ -185,7 +178,7 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/rechnen_lernen" element={<RechnenLernenIndex />} />
+          <Route path="/rechnen_lernen" element={<AreaPage id="rechnen" />} />
           <Route path="/rechnen_lernen/terme" element={<Terme />} />
           <Route path="/rechnen_lernen/terme/ohnevariablen" element={<Ohnevariablen />} />
           <Route path="/rechnen_lernen/terme/zusammenfassen" element={<TermeZusammenfassen />} />
@@ -246,7 +239,7 @@ export default function App() {
           <Route path="/lineare_funktionen/ubungsblatt-generator" element={<ExerciseSheetGenerator />} />
           <Route path="/lineare_funktionen/wer_wird_millionaer" element={<WerWirdMillionaer />} />
           
-          <Route path="/finanzmathe" element={<FinanzmatheIndex />} />
+          <Route path="/finanzmathe" element={<AreaPage id="finanz" />} />
           <Route path="/finanzmathe/zinsrechnung" element={<ZinsrechnungMenu />} />
           <Route path="/finanzmathe/zinsrechnung/ueben" element={<Zinsrechnung />} />
           <Route path="/finanzmathe/zinsrechnung/tage" element={<Zinstage />} />
@@ -270,7 +263,7 @@ export default function App() {
           <Route path="/finanzmathe/zinsen_test" element={<ZinsenTest />} />
           <Route path="/finanzmathe/pruefungsmodus" element={<PruefungsModus />} />
 
-          <Route path="/quadratische_funktionen" element={<QuadratischeFunktionenMenu />} />
+          <Route path="/quadratische_funktionen" element={<AreaPage id="quadrat" />} />
           <Route path="/quadratische_funktionen/wertetabelle" element={<WertetabelleQF />} />
           <Route path="/quadratische_funktionen/normalparabel" element={<Normalparabel />} />
           <Route path="/quadratische_funktionen/verschiebung_normalparabel" element={<VerschiebungNormalparabel />} />
@@ -289,7 +282,7 @@ export default function App() {
           <Route path="/quadratische_funktionen/spiel_nullstellen" element={<SpielNullstellenQF />} />
           <Route path="/quadratische_funktionen/abschlusstest" element={<AbschlusstestQF />} />
           
-          <Route path="/trigonometrie" element={<TrigonometrieIndex />} />
+          <Route path="/trigonometrie" element={<AreaPage id="trigo" />} />
           <Route path="/trigonometrie/rechtwinklig-beschriften" element={<RechtwinkligBeschriften />} />
           <Route path="/trigonometrie/sinus-kosinus-tangens-erkennen" element={<SinusKosinusTangensErkennen />} />
           <Route path="/trigonometrie/rechtwinklig-strecken" element={<RechtwinkligStrecken />} />
@@ -314,7 +307,7 @@ export default function App() {
           <Route path="/lineare_funktionen/nachverfolgung-bericht" element={<NachverfolgungBericht area="lineare_funktionen" />} />
 
           {/* Daten und Zufall */}
-          <Route path="/daten-und-zufall" element={<DatenUndZufallIndex />} />
+          <Route path="/daten-und-zufall" element={<AreaPage id="daten" />} />
           <Route path="/daten-und-zufall/statistische-kennwerte" element={<StatistischeKennwerte />} />
           <Route path="/daten-und-zufall/diagramme-erstellen" element={<DiagrammeErstellen />} />
           <Route path="/daten-und-zufall/baumdiagramme2" element={<Baumdiagramme2 />} />
@@ -329,7 +322,7 @@ export default function App() {
           <Route path="/daten-und-zufall/anwendungsaufgaben/bio-kiste" element={<BioKiste />} />
 
           {/* Raum und Form */}
-          <Route path="/raum-und-form" element={<RaumUndFormIndex />} />
+          <Route path="/raum-und-form" element={<AreaPage id="raum" />} />
           <Route path="/raum-und-form/:topic" element={<RaumTopicIndex />} />
           <Route path="/raum-und-form/:topic/:page" element={<RaumPracticeRoute />} />
 

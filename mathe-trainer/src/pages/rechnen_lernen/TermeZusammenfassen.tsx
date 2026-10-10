@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { checkAnswer, hasFactorOutsideBrackets } from './terme/termAlgebra';
 import { KATEGORIEN, GeneratedTask } from './terme/termAufgaben';
+import TaskShell from '../../components/layout/TaskShell'
 
 const AUFGABEN_PRO_SET = 8;
 
@@ -104,11 +105,11 @@ const TermeZusammenfassen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50 p-3">
+    <TaskShell title="Terme zusammenfassen" width="wide">
+    <div className="">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-orange-900 mb-1">Terme zusammenfassen</h1>
           <p className="text-xs text-gray-600">
             Wähle eine Kategorie und eine Stufe. Die Stufen bauen aufeinander auf – jede Aufgabe
             wird neu für dich erzeugt. Sind alle 8 Aufgaben beantwortet, entscheidest du, wie es
@@ -356,7 +357,7 @@ const TermeZusammenfassen: React.FC = () => {
                 {hatNaechsteStufe ? (
                   <button
                     onClick={zurNaechstenStufe}
-                    className="px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-all shadow"
+                    className="bk-btn"
                   >
                     Weiter zu „{kategorie.stufen[stufeIndex + 1].name}&quot;
                   </button>
@@ -377,6 +378,7 @@ const TermeZusammenfassen: React.FC = () => {
         )}
       </div>
     </div>
+    </TaskShell>
   );
 };
 

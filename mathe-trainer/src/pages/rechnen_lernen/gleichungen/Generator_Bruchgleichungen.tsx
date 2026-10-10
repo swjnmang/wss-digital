@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import RechenwegDisplay from '../../../components/RechenwegDisplay';
+import TaskShell from '../../../components/layout/TaskShell'
 
 /**
  * Vergleicht zwei Lösungen auf Äquivalenz
@@ -158,11 +159,11 @@ export default function Generator_Bruchgleichungen() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50 p-3">
+    <TaskShell title="Bruchgleichungen lösen" width="wide">
+    <div className="">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-purple-900 mb-1">Bruchgleichungen lösen</h1>
           <p className="text-xs text-gray-600">
             Löse die Bruchgleichung und gib nur die Lösung für x ein (z.B.: 5, -2, 1.5)
           </p>
@@ -278,5 +279,6 @@ export default function Generator_Bruchgleichungen() {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }

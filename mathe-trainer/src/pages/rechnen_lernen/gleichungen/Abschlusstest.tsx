@@ -1,12 +1,14 @@
 import React from 'react';
+import TaskShell from '../../../components/layout/TaskShell'
 
 export default function Abschlusstest() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-sky-100">
-      <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-8 max-w-2xl w-full mt-12">
-        <h1 className="text-2xl font-bold text-blue-900 mb-4">Abschlusstest Gleichungen</h1>
+    <TaskShell title="Abschlusstest Gleichungen" width="narrow">
+    <div className="flex flex-col items-center">
+      <div className="bk-panel max-w-2xl w-full">
         <p className="text-gray-700 mb-4">Teste dein Wissen im Lösen von linearen und quadratischen Gleichungen. (Platzhalter)</p>
       </div>
     </div>
+    </TaskShell>
   );
 }

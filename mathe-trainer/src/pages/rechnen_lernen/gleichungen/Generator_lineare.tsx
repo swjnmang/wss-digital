@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import RechenwegDisplay from '../../../components/RechenwegDisplay';
+import TaskShell from '../../../components/layout/TaskShell'
 
 // ============================================================================
 // ALGEBRA-KERN: Terme, Klammern und eine generische Gleichungs-Engine.
@@ -575,11 +576,11 @@ const LineareGleichungen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50 p-3">
+    <TaskShell title="Lineare Gleichungen lösen" width="wide">
+    <div className="">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-orange-900 mb-1">Lineare Gleichungen lösen</h1>
           <p className="text-xs text-gray-600">
             Löse die Gleichung und gib nur die Lösung für x ein (z.B.: 5, -2, 1,5 oder 1.5). Jede
             Aufgabe wird neu für dich erzeugt.
@@ -706,6 +707,7 @@ const LineareGleichungen: React.FC = () => {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 };
 

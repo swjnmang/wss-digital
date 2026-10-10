@@ -165,14 +165,33 @@ export const AREAS: Area[] = [
     unit: 'Übungen',
     sections: [
       {
-        name: 'Themen',
+        name: 'Graphen verstehen',
         items: [
-          { title: 'Funktionsgleichung aufstellen', desc: 'Stelle die Gleichung einer Parabel aus gegebenen Informationen auf.', path: '/quadratische_funktionen/funktionsgleichung_aufstellen', icon: fa('pen-ruler') },
-          { title: 'Graph zeichnen', desc: 'Übe das Zeichnen von quadratischen Funktionen im Koordinatensystem.', path: '/quadratische_funktionen/graph_zeichnen', icon: fa('pencil') },
-          { title: 'Normalparabel', desc: 'Lerne die Eigenschaften der Normalparabel kennen.', path: '/quadratische_funktionen/normalparabel', icon: fa('chart-line') },
-          { title: 'Nullstellen', desc: 'Finde die Schnittpunkte einer Parabel mit der x-Achse.', path: '/quadratische_funktionen/nullstellen', icon: fa('arrows-down-to-line') },
-          { title: 'Scheitelform', desc: 'Wandle Funktionsgleichungen in die Scheitelform um.', path: '/quadratische_funktionen/scheitelform', icon: fa('square-root-variable') },
-          { title: 'Scheitelpunkt', desc: 'Bestimme den Scheitelpunkt einer Parabel.', path: '/quadratische_funktionen/scheitelpunkt', icon: fa('bullseye') },
+          { title: 'Wertetabellen erstellen', desc: 'Erstelle oder vervollständige Wertetabellen für quadratische Funktionen.', path: '/quadratische_funktionen/wertetabelle', icon: fa('table') },
+          { title: 'Normalparabel', desc: 'Lerne die Grundlagen der Normalparabel und ihre Eigenschaften kennen.', path: '/quadratische_funktionen/normalparabel', icon: fa('bezier-curve') },
+          { title: 'Verschiebung der Normalparabel', desc: 'Lerne, wie d und c die Normalparabel entlang der x- und y-Achse verschieben.', path: '/quadratische_funktionen/verschiebung_normalparabel', icon: fa('arrows-up-down-left-right') },
+          { title: 'Scheitelpunkt ablesen', desc: 'Übe das Ablesen des Scheitelpunkts direkt aus dem Graphen.', path: '/quadratische_funktionen/scheitelpunkt_ablesen', icon: fa('map-pin') },
+          { title: 'Scheitelform ablesen', desc: 'Lies die Scheitelform einer Parabel direkt aus dem Graphen ab.', path: '/quadratische_funktionen/scheitelform', icon: fa('square-root-variable') },
+          { title: 'Graph zeichnen', desc: 'Zeichne Parabeln anhand ihrer Funktionsgleichung.', path: '/quadratische_funktionen/graph_zeichnen', icon: fa('pencil') },
+        ],
+      },
+      {
+        name: 'Rechnen',
+        items: [
+          { title: 'Umwandlung in Allg. Form', desc: 'Wandle die Scheitelpunktform in die allgemeine Form um.', path: '/quadratische_funktionen/scheitel_in_allg_form', icon: fa('left-right') },
+          { title: 'Scheitelpunkt berechnen', desc: 'Berechne den Scheitelpunkt aus der allgemeinen Form.', path: '/quadratische_funktionen/scheitelpunkt', icon: fa('calculator') },
+          { title: 'Umwandlung in Scheitelform', desc: 'Forme die allgemeine Form in die Scheitelpunktform um.', path: '/quadratische_funktionen/scheitelform_rechnerisch', icon: fa('right-left') },
+          { title: 'Nullstellen berechnen', desc: 'Finde die Schnittpunkte einer Parabel mit der x-Achse.', path: '/quadratische_funktionen/nullstellen', icon: fa('arrows-down-to-line') },
+          { title: 'Schnittpunkte (Parabel-Gerade)', desc: 'Berechne die Schnittpunkte zwischen einer Parabel und einer Geraden.', path: '/quadratische_funktionen/schnittpunkte_gerade', icon: fa('arrows-turn-to-dots') },
+          { title: 'Schnittpunkte (Parabel-Parabel)', desc: 'Berechne die Schnittpunkte zwischen zwei Parabeln.', path: '/quadratische_funktionen/schnittpunkte_parabel', icon: fa('code-compare') },
+          { title: 'Funktionsgleichung aufstellen', desc: 'Stelle eine Funktionsgleichung aus Punkten oder Eigenschaften auf.', path: '/quadratische_funktionen/funktionsgleichung_aufstellen', icon: fa('pen-ruler') },
+        ],
+      },
+      {
+        name: 'Spielen und Testen',
+        items: [
+          { title: 'Spiel: Nullstellen finden', desc: 'Eine spielerische Anwendung zum Thema Nullstellen.', path: '/quadratische_funktionen/spiel_nullstellen', icon: fa('gamepad') },
+          { title: 'Abschlusstest', desc: 'Teste dein Wissen über quadratische Funktionen.', path: '/quadratische_funktionen/abschlusstest', icon: fa('graduation-cap') },
         ],
       },
     ],

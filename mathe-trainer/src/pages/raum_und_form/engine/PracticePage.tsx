@@ -7,6 +7,7 @@ import TaskCard from './TaskCard';
 import type { Status } from './check';
 import type { Gen, PracticeConfig, Task, TopicConfig } from './types';
 import { shuffle } from './util';
+import TaskShell from '../../../components/layout/TaskShell';
 
 interface Slot {
   id: number;
@@ -73,8 +74,8 @@ function buildSlots(cfg: PracticeConfig, usedFixed: Set<Gen>): Slot[] {
 
 export function FormulaBox({ formulas }: { formulas: string[] }) {
   return (
-    <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2">
-      <p className="text-left mb-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-emerald-800">
+    <div className="rounded-2xl border-2 border-edge bg-sunken px-4 py-3">
+      <p className="bk-label text-left mb-1 flex items-center gap-1.5">
         <BookOpen className="h-3.5 w-3.5" /> Merkhilfe
       </p>
       <div className="space-y-0.5 text-[15px] [&_.katex-display]:my-1">
@@ -118,67 +119,48 @@ export default function PracticePage({ topic, cfg }: { topic: TopicConfig; cfg: 
   const ex = cfg.example;
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] text-left text-slate-900">
-      <div className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 sm:px-4">
-          <Link
-            to={`/raum-und-form/${topic.slug}`}
-            className="text-xs font-semibold uppercase tracking-wide text-[var(--accent)] hover:underline"
-          >
-            {topic.title}
-          </Link>
-          <h1 className="text-left text-lg font-bold tracking-tight sm:text-xl">{cfg.title}</h1>
-          <div className="ml-auto flex items-center gap-3">
-            <div className="flex items-center gap-2" title="richtig gelöste Teilaufgaben">
-              <div className="hidden h-2 w-24 overflow-hidden rounded-full bg-slate-200 sm:block">
-                <div
-                  className="h-full bg-emerald-500 transition-all"
-                  style={{ width: `${totalParts ? (100 * correctParts) / totalParts : 0}%` }}
-                />
-              </div>
-              <span className="text-sm font-semibold text-slate-600">
-                {correctParts}/{totalParts} richtig
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={regenerate}
-              className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-[var(--accent)] px-3 text-sm font-semibold text-white hover:bg-blue-600"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Neue Aufgaben
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <main className="mx-auto max-w-[1600px] space-y-3 px-2 py-3 sm:px-4 sm:py-4">
+    <TaskShell
+      title={cfg.title}
+      width="full"
+      parent={{ to: `/raum-und-form/${topic.slug}`, label: topic.title }}
+      actions={
+        <>
+          <span className="bk-chip" title="richtig gelöste Teilaufgaben">
+            <i className="fa-solid fa-check" aria-hidden="true" />
+            {correctParts}/{totalParts} richtig
+          </span>
+          <button type="button" onClick={regenerate} className="bk-btn">
+            <RotateCcw className="h-4 w-4" />
+            Neue Aufgaben
+          </button>
+        </>
+      }
+    >
+      <div className="space-y-4 text-left">
         {(ex || cfg.formulas) && (
-          <section className="rounded-xl border border-blue-200 bg-white shadow-sm">
+          <section className="bk-panel !p-0">
             <button
               type="button"
               onClick={() => setExampleOpen((v) => !v)}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left sm:px-4"
+              className="flex w-full min-h-[56px] items-center gap-3 px-4 py-2 text-left sm:px-5"
             >
-              <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-blue-800">
-                Beispiel
-              </span>
-              <span className="flex-1 font-semibold text-slate-800">{ex?.title ?? 'Formeln'}</span>
+              <span className="bk-chip">Beispiel</span>
+              <span className="flex-1 font-display text-lg font-extrabold text-ink">{ex?.title ?? 'Formeln'}</span>
               {exampleOpen ? (
-                <ChevronUp className="h-5 w-5 text-slate-400" />
+                <ChevronUp className="h-5 w-5 text-muted" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-slate-400" />
+                <ChevronDown className="h-5 w-5 text-muted" />
               )}
             </button>
             {exampleOpen && (
-              <div className="grid gap-3 border-t border-slate-100 px-3 pb-3 pt-2 sm:px-4 lg:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="grid gap-4 border-t-2 border-edge px-4 pb-4 pt-3 sm:px-5 lg:grid-cols-[minmax(0,1fr)_auto]">
                 {ex && (
                   <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
-                    <div className="space-y-2 text-[15px] leading-relaxed">
-                      <p className="text-left text-slate-800">
+                    <div className="space-y-2 text-[16px] leading-relaxed">
+                      <p className="text-left text-ink">
                         <Rich text={ex.text} />
                       </p>
-                      <ol className="space-y-1 rounded-lg bg-slate-50 px-3 py-2">
+                      <ol className="bk-taskbox space-y-1">
                         {ex.steps.map((s, i) => (
                           <li key={i}>
                             <Rich text={s} />
@@ -186,7 +168,7 @@ export default function PracticePage({ topic, cfg }: { topic: TopicConfig; cfg: 
                         ))}
                       </ol>
                       {ex.tip && (
-                        <p className="text-left rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm text-amber-900">
+                        <p className="bk-feedback bk-feedback-info text-sm">
                           <Rich text={ex.tip} />
                         </p>
                       )}
@@ -204,7 +186,7 @@ export default function PracticePage({ topic, cfg }: { topic: TopicConfig; cfg: 
           </section>
         )}
 
-        <div className="grid gap-3 lg:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2">
           {slots.map((s, i) => (
             <TaskCard
               key={s.id}
@@ -216,26 +198,23 @@ export default function PracticePage({ topic, cfg }: { topic: TopicConfig; cfg: 
           ))}
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 py-4">
+        <div className="bk-actions justify-center py-4">
           <button
             type="button"
             onClick={() => {
               regenerate();
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="inline-flex h-11 items-center gap-2 rounded-lg bg-[var(--accent)] px-5 font-semibold text-white hover:bg-blue-600"
+            className="bk-btn bk-btn-primary"
           >
             <RotateCcw className="h-4 w-4" />
             Neue Aufgaben
           </button>
-          <Link
-            to={`/raum-und-form/${topic.slug}`}
-            className="inline-flex h-11 items-center rounded-lg border border-slate-300 bg-white px-5 font-semibold text-slate-700 hover:bg-slate-50"
-          >
+          <Link to={`/raum-und-form/${topic.slug}`} className="bk-btn">
             Zur Themenübersicht
           </Link>
         </div>
-      </main>
-    </div>
+      </div>
+    </TaskShell>
   );
 }
