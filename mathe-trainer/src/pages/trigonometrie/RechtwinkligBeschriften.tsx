@@ -10,7 +10,7 @@ import {
   roleIndex,
   type Role,
 } from './engine/rightTriangle';
-import { pick, randInt, type Naming } from './engine/util';
+import { STANDARD, pick, randInt, type Naming } from './engine/util';
 
 const ROLES: Role[] = ['H', 'G', 'A'];
 
@@ -59,7 +59,13 @@ function generate(level: Level): Task {
     };
   }
 
-  const t = makeRT({ theta: randInt(25, 65), hyp: 10, standard: level === 'einfach' });
+  // Auch bei "einfach" (Buchstaben A, B, C) liegt der rechte Winkel an wechselnden Ecken,
+  // damit die Hypotenuse nicht immer c ist, sondern über die Lage erkannt werden muss.
+  const t = makeRT({
+    theta: randInt(25, 65),
+    hyp: 10,
+    naming: level === 'einfach' ? STANDARD : undefined,
+  });
   const { n } = t;
   const options = [0, 1, 2].map((i) => `$${n.s[i]}$`);
   const th = n.wt[t.p];
@@ -146,8 +152,11 @@ const explanation = (
     </ul>
     <div className="border-l-4 border-blue-400 bg-blue-50 rounded p-3">
       <p className="font-semibold text-slate-800 mb-1">Beispiel</p>
-      <Rich text="Dreieck ABC, rechter Winkel bei C. Hypotenuse ist $c$. Vom Winkel $\alpha$ aus ist $a$ die Gegenkathete und $b$ die Ankathete – vom Winkel $\beta$ aus genau umgekehrt." />
+      <Rich text="Dreieck ABC, rechter Winkel bei A. Hypotenuse ist hier $a$ – nicht $c$! Vom Winkel $\beta$ aus ist $b$ die Gegenkathete und $c$ die Ankathete – vom Winkel $\gamma$ aus genau umgekehrt." />
     </div>
+    <p className="text-sm text-slate-500">
+      <Rich text="Achtung: Die Hypotenuse heißt nicht automatisch $c$. Entscheidend ist nur, wo der rechte Winkel liegt." />
+    </p>
     <p className="text-sm text-slate-500">
       <Rich text="Merke: Die Seite gegenüber einer Ecke trägt deren Kleinbuchstaben (gegenüber von A liegt $a$)." />
     </p>
@@ -164,7 +173,7 @@ export const cfg: TopicConfig = {
   levels: [
     {
       id: 'einfach',
-      description: 'Dreieck ABC in verschiedenen Lagen – ordne die drei Seiten zu.',
+      description: 'Dreieck ABC in verschiedenen Lagen, der rechte Winkel kann an jeder Ecke liegen – ordne die drei Seiten zu.',
     },
     {
       id: 'mittel',
