@@ -14,20 +14,6 @@ export default function Home() {
       </header>
 
       <div className="bk-bento">
-        <Link to="/gemischtes-training" className="bk-tile bk-tile-hero" style={{ ['--area' as string]: 'var(--area-linear)' } as CSSProperties}>
-          <div className="bk-hero-text">
-            <span className="bk-label" style={{ color: 'inherit' }}>Gemischtes Training</span>
-            <h2>10 Übungen aus allen Bereichen</h2>
-            <p>Jedes Mal neu gemischt.</p>
-            <span className="bk-chip"><i className="fa-solid fa-dice" aria-hidden="true" /> Los geht’s</span>
-          </div>
-          <div className="bk-dice" aria-hidden="true">
-            <b>¾</b><b>x²</b><b>sin</b><b>€</b>
-          </div>
-        </Link>
-
-
-
         {AREAS.map((a) => {
           const count = exerciseCount(a)
           return (
@@ -39,6 +25,17 @@ export default function Home() {
           )
         })}
 
+        <Link to="/gemischtes-training" className="bk-tile bk-tile-hero" style={{ ['--area' as string]: 'var(--area-linear)' } as CSSProperties}>
+          <div className="bk-hero-text">
+            <span className="bk-label" style={{ color: 'inherit' }}>Gemischtes Training</span>
+            <h2>10 Übungen aus allen Bereichen</h2>
+            <p>Jedes Mal neu gemischt.</p>
+            <span className="bk-chip"><i className="fa-solid fa-dice" aria-hidden="true" /> Los geht’s</span>
+          </div>
+          <div className="bk-dice" aria-hidden="true">
+            <b>¾</b><b>x²</b><b>sin</b><b>€</b>
+          </div>
+        </Link>
       </div>
 
       <footer className="bk-footer">
