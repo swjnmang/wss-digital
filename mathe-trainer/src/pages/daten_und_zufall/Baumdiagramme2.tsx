@@ -3,6 +3,7 @@ import { ArrowLeft, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import TaskShell from '../../components/layout/TaskShell'
 import VideoButton from '../../components/VideoButton'
+import { fieldCheckClass } from '../../utils/fieldCheck';
 
 interface TaskData {
   description: string;
@@ -242,7 +243,7 @@ const Baumdiagramme2: React.FC = () => {
 
     const isActive = activeInputs[id];
     const isValid = validationResults[id];
-    const inputState = isValid === true ? 'border-green-500 text-green-600' : isValid === false ? 'border-red-500 text-red-600' : 'border-gray-300';
+    const inputState = isValid == null ? 'border-gray-300' : fieldCheckClass(isValid);
 
     return (
       <foreignObject key={`input_${id}`} x={x - 25} y={finalY - 25} width="50" height="50" className="overflow-visible">

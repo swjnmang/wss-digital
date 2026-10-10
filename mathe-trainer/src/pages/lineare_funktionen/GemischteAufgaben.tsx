@@ -507,6 +507,10 @@ export default function GemischteAufgaben() {
   }
 
   function isFieldCorrect(aufgabe: Aufgabe, field: string, rawValue: string): boolean {
+    // Graph-Zuordnung: Feld „g0“, „g1“ … = gewählte Gleichung für Graph 1, 2 …
+    if (aufgabe.typ === 'graphZuordnen' && /^g\d+$/.test(field)) {
+      return rawValue === (aufgabe.antwort as { [key: number]: string })[Number(field.slice(1))]
+    }
     const expected = getFieldExpectation(aufgabe, field)
     if (expected === null) return false
     const num = parseFlexibleNumber(rawValue)
@@ -733,8 +737,9 @@ export default function GemischteAufgaben() {
                                   [idx]: e.target.value
                                 }
                               })
+                              updateFieldFeedback(index, `g${idx}`, e.target.value)
                             }}
-                            className={styles.zuordnungSelect}
+                            className={`${styles.zuordnungSelect} ${fieldClass(index, `g${idx}`)}`}
                           >
                             <option value="">-- Gleichung wählen --</option>
                             {aufgabe.shuffledEquations.map((eqStr: string, eqIdx: number) => (

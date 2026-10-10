@@ -3,6 +3,7 @@ import { FeedbackIcon, FeedbackStatus } from '../../../components/FeedbackIcon';
 import { parseLocalizedNumber } from '../../../utils/numbers';
 import { formatCurrency, formatPercent, roundToPointFive, roundToTwoDecimals, withinTolerance } from '../../../utils/prozent';
 import TaskShell from '../../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../../utils/fieldCheck';
 
 type FieldKey =
   | 'listeneinkaufspreisNetto'
@@ -277,7 +278,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.listeneinkaufspreisNetto)}`}
                       value={userInputs.listeneinkaufspreisNetto}
                       onChange={handleInputChange('listeneinkaufspreisNetto')}
                     />
@@ -290,7 +291,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.liefererrabattBetrag)}`}
                       value={userInputs.liefererrabattBetrag}
                       onChange={handleInputChange('liefererrabattBetrag')}
                     />
@@ -303,7 +304,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.zieleinkaufspreisEinkauf)}`}
                       value={userInputs.zieleinkaufspreisEinkauf}
                       onChange={handleInputChange('zieleinkaufspreisEinkauf')}
                     />
@@ -316,7 +317,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.liefererskontoBetrag)}`}
                       value={userInputs.liefererskontoBetrag}
                       onChange={handleInputChange('liefererskontoBetrag')}
                     />
@@ -329,7 +330,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.bareinkaufspreis)}`}
                       value={userInputs.bareinkaufspreis}
                       onChange={handleInputChange('bareinkaufspreis')}
                     />
@@ -354,7 +355,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.bezugspreis)}`}
                       value={userInputs.bezugspreis}
                       onChange={handleInputChange('bezugspreis')}
                     />
@@ -367,7 +368,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.handlungskostenzuschlagBetrag)}`}
                       value={userInputs.handlungskostenzuschlagBetrag}
                       onChange={handleInputChange('handlungskostenzuschlagBetrag')}
                     />
@@ -380,7 +381,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.selbstkosten)}`}
                       value={userInputs.selbstkosten}
                       onChange={handleInputChange('selbstkosten')}
                     />
@@ -393,7 +394,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.gewinnBetrag)}`}
                       value={userInputs.gewinnBetrag}
                       onChange={handleInputChange('gewinnBetrag')}
                     />
@@ -406,7 +407,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.barverkaufspreisVerkauf)}`}
                       value={userInputs.barverkaufspreisVerkauf}
                       onChange={handleInputChange('barverkaufspreisVerkauf')}
                     />
@@ -419,7 +420,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.kundenskontoBetrag)}`}
                       value={userInputs.kundenskontoBetrag}
                       onChange={handleInputChange('kundenskontoBetrag')}
                     />
@@ -432,7 +433,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.zielverkaufspreis)}`}
                       value={userInputs.zielverkaufspreis}
                       onChange={handleInputChange('zielverkaufspreis')}
                     />
@@ -445,7 +446,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.kundenrabattBetrag)}`}
                       value={userInputs.kundenrabattBetrag}
                       onChange={handleInputChange('kundenrabattBetrag')}
                     />
@@ -458,7 +459,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.nettoverkaufspreis)}`}
                       value={userInputs.nettoverkaufspreis}
                       onChange={handleInputChange('nettoverkaufspreis')}
                     />
@@ -471,7 +472,7 @@ export default function Handelskalkrw() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.umsatzsteuerBetrag)}`}
                       value={userInputs.umsatzsteuerBetrag}
                       onChange={handleInputChange('umsatzsteuerBetrag')}
                     />

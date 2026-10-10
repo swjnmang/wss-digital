@@ -5,6 +5,7 @@ import ParabelGraph from '../../components/ParabelGraph';
 import MarioSpiel from './MarioSpiel';
 import { SignToggle, eingabeKlasse, type Vorzeichen } from './quadratischShared';
 import TaskShell from '../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../utils/fieldCheck';
 
 type Level = 'einfach' | 'fortgeschritten';
 
@@ -18,7 +19,7 @@ type Eingabe = {
     ysAbs: string;
 };
 
-type Ergebnis = { richtig: boolean; text: string } | null;
+type Ergebnis = { richtig: boolean; text: string; felder?: { a: boolean; xs: boolean; ys: boolean } } | null;
 
 const ANZAHL_AUFGABEN = 5;
 const STRECKFAKTOREN = [1, -1, 2, -2, 0.5, -0.5];
@@ -98,10 +99,11 @@ const pruefe = (t: Aufgabe, e: Eingabe): Ergebnis => {
     const ysRichtig =
         (t.ys === 0 || e.ysSign === (t.ys < 0 ? '-' : '+')) && Math.abs(parseZahl(e.ysAbs) - Math.abs(t.ys)) < 0.01;
 
-    if (aRichtig && xsRichtig && ysRichtig) return { richtig: true, text: 'Richtig!' };
+    const felder = { a: aRichtig, xs: xsRichtig, ys: ysRichtig };
+    if (aRichtig && xsRichtig && ysRichtig) return { richtig: true, text: 'Richtig!', felder };
 
     const fehler = [!aRichtig && 'a', !xsRichtig && 'Klammer', !ysRichtig && 'yₛ'].filter(Boolean).join(', ');
-    return { richtig: false, text: `Noch nicht ganz. Überprüfe: ${fehler}` };
+    return { richtig: false, text: `Noch nicht ganz. Überprüfe: ${fehler}`, felder };
 };
 
 /** Text, wie man a aus dem Graphen abliest, z. B. „1 nach rechts, 2 nach unten → a = −2“ */
@@ -406,7 +408,7 @@ const Scheitelform = () => {
                                                 }
                                                 placeholder="a"
                                                 aria-label="Formfaktor a"
-                                                className={eingabeKlasse}
+                                                className={`${eingabeKlasse} ${fieldCheckClass(r?.felder?.a)}`}
                                             />
                                             <span className="whitespace-nowrap shrink-0">(x</span>
                                             <SignToggle
@@ -422,7 +424,7 @@ const Scheitelform = () => {
                                                 }
                                                 placeholder="xs"
                                                 aria-label="Zahl im Klammerterm"
-                                                className={eingabeKlasse}
+                                                className={`${eingabeKlasse} ${fieldCheckClass(r?.felder?.xs)}`}
                                             />
                                             <span className="whitespace-nowrap shrink-0">)²</span>
                                             <SignToggle
@@ -438,7 +440,7 @@ const Scheitelform = () => {
                                                 }
                                                 placeholder="ys"
                                                 aria-label="Zahl ys"
-                                                className={eingabeKlasse}
+                                                className={`${eingabeKlasse} ${fieldCheckClass(r?.felder?.ys)}`}
                                             />
                                         </div>
 

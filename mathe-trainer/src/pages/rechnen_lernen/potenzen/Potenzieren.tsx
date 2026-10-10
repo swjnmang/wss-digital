@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import TaskShell from '../../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../../utils/fieldCheck';
 
 type Difficulty = 'leicht' | 'schwer';
 
@@ -20,6 +21,7 @@ export default function Potenzieren() {
   const [expInput, setExpInput] = useState('');
   const [answerOne, setAnswerOne] = useState('');
   const [feedback, setFeedback] = useState('');
+  const [fieldOk, setFieldOk] = useState<{ base?: boolean; exp?: boolean; one?: boolean }>({});
   const [punkte, setPunkte] = useState(0);
   const [showRules, setShowRules] = useState(false);
 
@@ -39,7 +41,7 @@ export default function Potenzieren() {
   }
 
   function neueAufgabe() {
-    setShowRules(false); setFeedback(''); setBaseInput(''); setExpInput(''); setAnswerOne('');
+    setShowRules(false); setFeedback(''); setFieldOk({}); setBaseInput(''); setExpInput(''); setAnswerOne('');
     let base: string | number; let innerExp: number; let outerExp: number; let isVariable = false;
     if (difficulty === 'leicht') {
       base = rand(2, 4);
@@ -86,6 +88,14 @@ export default function Potenzieren() {
         if (baseNum === aufgabe.base && exp === aufgabe.resultExp) korrekt = true;
       }
     }
+    if (aufgabe.resultExp === 0) {
+      setFieldOk({ one: korrekt });
+    } else {
+      const baseOk = aufgabe.isVariable
+        ? baseInput.trim() === aufgabe.base
+        : parseInt(baseInput.replace(/[−–—‐]/g, '-'), 10) === aufgabe.base;
+      setFieldOk({ base: baseOk, exp: parseInt(expInput.replace(/[−–—‐]/g, '-'), 10) === aufgabe.resultExp });
+    }
     if (korrekt) {
       setFeedback('✅ Richtig!'); setPunkte(p => p + (difficulty === 'leicht' ? 1 : 3));
       setTimeout(neueAufgabe, 1000);
@@ -118,7 +128,7 @@ export default function Potenzieren() {
             {aufgabe && aufgabe.resultExp === 0 ? (
               <div className="flex flex-col items-center gap-2">
                 <p className="text-sm text-slate-700">Sonderfall: Exponent wird 0 ⇒ Ergebnis ist 1 (für Basis ≠ 0).</p>
-                <input ref={oneRef} type="number" value={answerOne} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAnswerOne(e.target.value)} onKeyDown={key} placeholder="1" className="w-24 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400" />
+                <input ref={oneRef} type="number" value={answerOne} onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setAnswerOne(e.target.value); setFieldOk(f => ({ ...f, one: undefined })); }} onKeyDown={key} placeholder="1" className={`w-24 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400 ${fieldCheckClass(fieldOk.one)}`} />
               </div>
             ) : (
               <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -128,9 +138,9 @@ export default function Potenzieren() {
                     ref={baseRef}
                     type={aufgabe?.isVariable ? 'text' : 'number'}
                     value={baseInput}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBaseInput(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setBaseInput(e.target.value); setFieldOk(f => ({ ...f, base: undefined })); }}
                     onKeyDown={key}
-                    className="w-28 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400"
+                    className={`w-28 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400 ${fieldCheckClass(fieldOk.base)}`}
                     placeholder={aufgabe?.isVariable ? 'x' : 'Basis'}
                   />
                 </label>
@@ -141,9 +151,9 @@ export default function Potenzieren() {
                     ref={expRef}
                     type="number"
                     value={expInput}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setExpInput(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setExpInput(e.target.value); setFieldOk(f => ({ ...f, exp: undefined })); }}
                     onKeyDown={key}
-                    className="w-24 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400"
+                    className={`w-24 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400 ${fieldCheckClass(fieldOk.exp)}`}
                     placeholder="n"
                   />
                 </label>

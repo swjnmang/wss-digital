@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { fieldCheckClass } from '../utils/fieldCheck';
 
 export interface TreeNode {
     id: string;
@@ -123,11 +124,7 @@ export default function ProbabilityTree({ width, height, nodes, edges, stageLabe
                                     setResults(null);
                                 }}
                                 className={`absolute -translate-x-1/2 -translate-y-1/2 w-14 px-1 py-0.5 text-center text-sm border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                    state === true
-                                        ? 'border-green-500 bg-green-50'
-                                        : state === false
-                                        ? 'border-red-500 bg-red-50'
-                                        : 'border-slate-400'
+                                    state == null ? 'border-slate-400' : fieldCheckClass(state)
                                 }`}
                                 style={{ left: mx, top: my }}
                             />

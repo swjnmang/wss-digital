@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
 import TaskShell from '../../components/layout/TaskShell'
+import CheckedNumberInput from '../../components/CheckedNumberInput'
 
 interface PartAnswer {
   value: string
@@ -309,15 +310,15 @@ export default function EhepaartTempel() {
                   <tr className="bg-gray-50">
                     <td className="border border-gray-400 px-2 py-1 text-center font-semibold">1</td>
                     <td className="border border-gray-400 px-2 py-1 text-right">385.000,00 €</td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
+                    <td className="border border-gray-400 px-2 py-1 text-right"><CheckedNumberInput expected={4812.5} placeholder="€" className="w-full border border-gray-300 rounded px-2 py-1" /></td>
                     <td className="border border-gray-400 px-2 py-1 text-right">9.497,50 €</td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
+                    <td className="border border-gray-400 px-2 py-1 text-right"><CheckedNumberInput expected={14310} placeholder="€" className="w-full border border-gray-300 rounded px-2 py-1" /></td>
                   </tr>
                   <tr>
                     <td className="border border-gray-400 px-2 py-1 text-center font-semibold">2</td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
+                    <td className="border border-gray-400 px-2 py-1 text-right"><CheckedNumberInput expected={375502.5} placeholder="€" className="w-full border border-gray-300 rounded px-2 py-1" /></td>
                     <td className="border border-gray-400 px-2 py-1 text-right">4.693,78 €</td>
-                    <td className="border border-gray-400 px-2 py-1 text-right"><input type="text" className="w-full border border-gray-300 rounded px-2 py-1" placeholder="€" /></td>
+                    <td className="border border-gray-400 px-2 py-1 text-right"><CheckedNumberInput expected={9616.22} placeholder="€" className="w-full border border-gray-300 rounded px-2 py-1" /></td>
                     <td className="border border-gray-400 px-2 py-1 text-right">14.310,00 €</td>
                   </tr>
                 </tbody>

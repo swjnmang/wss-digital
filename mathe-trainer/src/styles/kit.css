@@ -39,3 +39,10 @@
 
 .bk-modal-backdrop { position: fixed; inset: 0; z-index: 60; background: rgba(18, 18, 18, .55); display: flex; align-items: center; justify-content: center; padding: 16px; }
 .bk-modal { width: 100%; max-width: 640px; max-height: calc(100vh - 32px); overflow-y: auto; background: var(--surface); border: 2px solid var(--edge); border-radius: var(--radius); box-shadow: 0 8px 0 var(--edge); padding: 22px; }
+
+/* Ergebnis der Prüfung am Feld (gesetzt von useAutoCheck oder von der Seite selbst) */
+input[data-check="ok"], select[data-check="ok"], textarea[data-check="ok"] { border-color: var(--correct); background-color: var(--correct-soft); color: var(--correct-ink); }
+input[data-check="no"], select[data-check="no"], textarea[data-check="no"] { border-color: var(--wrong); background-color: var(--wrong-soft); color: var(--wrong-ink); }
+/* Von der Seite gesetzt (fieldCheckClass in utils/fieldCheck.ts) – gewinnt gegen andere Rahmen-/Hintergrundklassen */
+.bk-field-ok { border-color: var(--correct) !important; background-color: var(--correct-soft) !important; color: var(--correct-ink) !important; }
+.bk-field-no { border-color: var(--wrong) !important; background-color: var(--wrong-soft) !important; color: var(--wrong-ink) !important; }

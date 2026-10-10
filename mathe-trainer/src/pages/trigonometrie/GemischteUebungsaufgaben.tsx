@@ -6,6 +6,7 @@ import RightTriangleSVG from '../../components/RightTriangleSVG';
 import GeoGebraTriangleSketch, { GgbAngle } from '../../components/GeoGebraTriangleSketch';
 import { HelpUsage, logTrackingEntry } from '../../utils/tracking';
 import TaskShell from '../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../utils/fieldCheck';
 
 // ---------- Allgemeine Hilfsfunktionen ----------
 
@@ -1370,7 +1371,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
                                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                                         onAssignmentChange(target, e.target.value === '-' ? '' : e.target.value)
                                     }
-                                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold"
+                                    className={`w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold ${
+                                        card.feedbackType && card.assignments[target]
+                                            ? fieldCheckClass(card.assignments[target] === task.correct[target])
+                                            : ''
+                                    }`}
                                 >
                                     <option value="-">-</option>
                                     {task.sideOptions.map(opt => (

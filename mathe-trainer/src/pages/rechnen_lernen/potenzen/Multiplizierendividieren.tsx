@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import TaskShell from '../../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../../utils/fieldCheck';
 
 type Difficulty = 'leicht' | 'mittel' | 'schwer';
 interface Aufgabe { base: string | number; terms: { op: '*' | ':'; exp: number }[]; resultExp: number; isVariable: boolean; }
@@ -12,6 +13,7 @@ export default function Multiplizierendividieren() {
   const [baseInput, setBaseInput] = useState('');
   const [expInput, setExpInput] = useState('');
   const [feedback, setFeedback] = useState('');
+  const [fieldOk, setFieldOk] = useState<{ base?: boolean; exp?: boolean; one?: boolean }>({});
   const [punkte, setPunkte] = useState(0);
   const [showRules, setShowRules] = useState(false);
 
@@ -28,7 +30,7 @@ export default function Multiplizierendividieren() {
   }
 
   function neueAufgabe() {
-    setFeedback(''); setBaseInput(''); setExpInput(''); setShowRules(false);
+    setFeedback(''); setFieldOk({}); setBaseInput(''); setExpInput(''); setShowRules(false);
     let numTerms = 2; let allowNeg = false; let base: string | number = 2; let isVar = false;
     if (difficulty === 'leicht') { numTerms = 2; base = rand(2,6); }
     else if (difficulty === 'mittel') { numTerms = 3; base = rand(2,6); }
@@ -68,6 +70,10 @@ export default function Multiplizierendividieren() {
       if (isNaN(baseNum) || isNaN(exp)) { setFeedback('❌ Basis und Exponent eingeben.'); return; }
       correct = baseNum === aufgabe.base && exp === aufgabe.resultExp;
     }
+    setFieldOk({
+      base: aufgabe.isVariable ? baseInput.trim() === aufgabe.base : parseInt(baseInput,10) === aufgabe.base,
+      exp: exp === aufgabe.resultExp,
+    });
     if (correct) { setFeedback('✅ Richtig!'); setPunkte(p=> p + (difficulty==='leicht'?1: difficulty==='mittel'?2:3)); setTimeout(neueAufgabe,1000); }
     else { setFeedback('❌ Leider nicht korrekt.'); setPunkte(p=> Math.max(0,p-0.5)); }
   }
@@ -98,12 +104,12 @@ export default function Multiplizierendividieren() {
               <div className="flex items-center justify-center gap-3 flex-wrap">
                 <label className="flex items-center gap-2">
                   <span className="text-xs text-slate-500">Basis</span>
-                  <input ref={baseRef} type={aufgabe.isVariable?'text':'number'} value={baseInput} onChange={(e:React.ChangeEvent<HTMLInputElement>)=> setBaseInput(e.target.value)} onKeyDown={key} className="w-28 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400" placeholder={aufgabe.isVariable?'x':'Basis'} />
+                  <input ref={baseRef} type={aufgabe.isVariable?'text':'number'} value={baseInput} onChange={(e:React.ChangeEvent<HTMLInputElement>)=> { setBaseInput(e.target.value); setFieldOk(f => ({ ...f, base: undefined })); }} onKeyDown={key} className={`w-28 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400 ${fieldCheckClass(fieldOk.base)}`} placeholder={aufgabe.isVariable?'x':'Basis'} />
                 </label>
                 <span className="text-xl font-semibold">^</span>
                 <label className="flex items-center gap-2">
                   <span className="text-xs text-slate-500">Exponent</span>
-                  <input ref={expRef} type="number" value={expInput} onChange={(e:React.ChangeEvent<HTMLInputElement>)=> setExpInput(e.target.value)} onKeyDown={key} className="w-24 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400" placeholder="n" />
+                  <input ref={expRef} type="number" value={expInput} onChange={(e:React.ChangeEvent<HTMLInputElement>)=> { setExpInput(e.target.value); setFieldOk(f => ({ ...f, exp: undefined })); }} onKeyDown={key} className={`w-24 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400 ${fieldCheckClass(fieldOk.exp)}`} placeholder="n" />
                 </label>
               </div>
             )}

@@ -5,6 +5,7 @@ import 'katex/dist/katex.min.css';
 import { renderTextWithMath } from '../../../components/TextWithMath';
 import { UNIT_OPTIONS, isWithinTolerance } from '../../../utils/anwendungsaufgabenHelpers';
 import TaskShell from '../../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../../utils/fieldCheck';
 
 interface SolutionStep {
     heading: string;
@@ -222,6 +223,10 @@ const Bergbahn: React.FC = () => {
     const currentAnswer = answers[currentTask] ?? '';
     const currentUnit = units[currentTask] ?? '';
     const currentFeedback = feedback[currentTask] ?? null;
+    // Nach dem Prüfen: Zahl und Einheit einzeln grün/rot einfärben
+    const parsedNow = parseFloat((currentAnswer.trim().includes(',') ? currentAnswer.trim().replace(/\./g, '').replace(',', '.').replace(/[−–—‐]/g, '-') : currentAnswer.trim()));
+    const numberOk = currentFeedback === null ? null : !isNaN(parsedNow) && isWithinTolerance(parsedNow, task.correctAnswer);
+    const unitOk = currentFeedback === null || !currentUnit ? null : currentUnit === task.correctUnit;
     const currentShowSolution = showSolution[currentTask] ?? false;
     const currentWrongAttempt = wrongAttempt[currentTask] ?? false;
     const currentShowHint = showHint[currentTask] ?? false;
@@ -299,12 +304,12 @@ const Bergbahn: React.FC = () => {
                                     value={currentAnswer}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleAnswerChange(e.target.value)}
                                     placeholder="Ergebnis"
-                                    className="w-32 px-3 py-2 border border-slate-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                    className={`w-32 px-3 py-2 border border-slate-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-teal-500 ${fieldCheckClass(numberOk)}`}
                                 />
                                 <select
                                     value={currentUnit}
                                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleUnitChange(e.target.value)}
-                                    className="px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                    className={`px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${fieldCheckClass(unitOk)}`}
                                 >
                                     <option value="" disabled>
                                         Einheit

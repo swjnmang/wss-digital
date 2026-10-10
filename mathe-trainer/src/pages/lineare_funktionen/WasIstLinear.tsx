@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../utils/fieldCheck'
 
 interface Fn {
   id: string
@@ -297,7 +298,7 @@ export default function WasIstLinear() {
                             setAnswers({ ...answers, [i]: e.target.value })
                             setChecked(false)
                           }}
-                          className="border border-slate-300 rounded px-2 py-1 bg-white"
+                          className={`border border-slate-300 rounded px-2 py-1 bg-white ${checked && answers[i] ? fieldCheckClass(results[i]) : ''}`}
                         >
                           <option value="">–</option>
                           {LETTERS.map((l) => <option key={l} value={l}>{l}</option>)}

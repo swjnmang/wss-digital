@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { parseLocalizedNumber } from '../../../utils/numbers';
 import TaskShell from '../../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../../utils/fieldCheck';
 
 type Schwierigkeit = 'leicht' | 'mittel' | 'schwer';
 type ProblemTyp = 'toScientific' | 'fromScientific';
@@ -27,6 +28,7 @@ export default function Zehnerpotenzen() {
   const [exponentInput, setExponentInput] = useState('');
   const [standardInput, setStandardInput] = useState('');
   const [feedback, setFeedback] = useState('');
+  const [fieldOk, setFieldOk] = useState<{ mantissa?: boolean; exponent?: boolean; standard?: boolean }>({});
   const [showTips, setShowTips] = useState(false);
   const [falschCounter, setFalschCounter] = useState(0);
   const [korrekt, setKorrekt] = useState(0);
@@ -50,7 +52,7 @@ export default function Zehnerpotenzen() {
   }, [problem]);
 
   function neueAufgabe() {
-    setFeedback(''); setShowTips(false); setFalschCounter(0);
+    setFeedback(''); setFieldOk({}); setShowTips(false); setFalschCounter(0);
     setMantissaInput(''); setExponentInput(''); setStandardInput('');
 
     const typ: ProblemTyp = Math.random() < 0.5 ? 'toScientific' : 'fromScientific';
@@ -126,6 +128,10 @@ export default function Zehnerpotenzen() {
         return;
       }
       const studentValue = m * Math.pow(10, e);
+      // Einzelne Felder: erwartete Normdarstellung m₀ · 10^e₀
+      const e0 = Math.floor(Math.log10(Math.abs(problem.value)));
+      const m0 = problem.value / Math.pow(10, e0);
+      setFieldOk({ mantissa: Math.abs(m - m0) < 1e-9 * Math.max(1, Math.abs(m0)), exponent: e === e0 });
       const standardFormat = problem.value >= 0 ? (m >= 1 && m < 10) : (m <= -1 && m > -10);
       if (Math.abs(studentValue - problem.value) < tolerance && standardFormat) {
         isCorrect = true;
@@ -141,6 +147,7 @@ export default function Zehnerpotenzen() {
         setFalschCounter(x => x + 1);
         return;
       }
+      setFieldOk({ standard: Math.abs(stu - problem.value) < tolerance });
       if (Math.abs(stu - problem.value) < tolerance) isCorrect = true; else setFeedback('❌ Leider nicht korrekt.');
     }
 
@@ -210,9 +217,9 @@ export default function Zehnerpotenzen() {
                         type="text"
                         aria-label="Basis (zwischen 1 und 10)"
                         value={mantissaInput}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMantissaInput(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setMantissaInput(e.target.value); setFieldOk(f => ({ ...f, mantissa: undefined })); }}
                         onKeyDown={keyDown}
-                        className="w-28 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400"
+                        className={`w-28 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400 ${fieldCheckClass(fieldOk.mantissa)}`}
                         placeholder="Basis"
                       />
                     </label>
@@ -224,9 +231,9 @@ export default function Zehnerpotenzen() {
                         type="text"
                         aria-label="Exponent"
                         value={exponentInput}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setExponentInput(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setExponentInput(e.target.value); setFieldOk(f => ({ ...f, exponent: undefined })); }}
                         onKeyDown={keyDown}
-                        className="w-24 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400"
+                        className={`w-24 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400 ${fieldCheckClass(fieldOk.exponent)}`}
                         placeholder="n"
                       />
                     </label>
@@ -241,9 +248,9 @@ export default function Zehnerpotenzen() {
                       ref={standardRef}
                       type="text"
                       value={standardInput}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStandardInput(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setStandardInput(e.target.value); setFieldOk(f => ({ ...f, standard: undefined })); }}
                       onKeyDown={keyDown}
-                      className="w-80 max-w-xs text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400"
+                      className={`w-80 max-w-xs text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400 ${fieldCheckClass(fieldOk.standard)}`}
                       placeholder="Standardzahl"
                       aria-label="Standardzahl"
                     />

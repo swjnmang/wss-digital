@@ -4,6 +4,7 @@ import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import ProbabilityTree, { TreeEdge, TreeNode } from '../../../components/ProbabilityTree';
 import TaskShell from '../../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../../utils/fieldCheck';
 
 interface FieldCheck {
     field: string;
@@ -41,13 +42,22 @@ const parseInput = (value: string) => {
 export default function MensaUmfrage() {
     const [inputs, setInputs] = useState<Record<string, string>>({});
     const [feedback, setFeedback] = useState<Record<string, string>>({});
+    // Nach dem Prüfen: jedes Feld einzeln grün/rot
+    const [fieldOk, setFieldOk] = useState<Record<string, boolean | undefined>>({});
     const [showSolution, setShowSolution] = useState<Record<string, boolean>>({});
 
     const setInput = (key: string, value: string) => {
         setInputs(prev => ({ ...prev, [key]: value }));
+        setFieldOk(prev => ({ ...prev, [key]: undefined }));
     };
 
     const checkPart = (part: string, checks: FieldCheck[]) => {
+        const marks: Record<string, boolean | undefined> = {};
+        for (const c of checks) {
+            const v = parseInput(inputs[`${part}.${c.field}`] ?? '');
+            marks[`${part}.${c.field}`] = isNaN(v) ? undefined : Math.abs(v - c.correct) <= Math.abs(c.correct) * 0.03;
+        }
+        setFieldOk(prev => ({ ...prev, ...marks }));
         for (const c of checks) {
             const v = parseInput(inputs[`${part}.${c.field}`] ?? '');
             if (isNaN(v)) {
@@ -73,7 +83,7 @@ export default function MensaUmfrage() {
                         value={inputs[`${part}.${c.field}`] ?? ''}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(`${part}.${c.field}`, e.target.value)}
                         placeholder={c.placeholder ?? ''}
-                        className="border border-slate-300 rounded px-3 py-2 w-32 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`border border-slate-300 rounded px-3 py-2 w-32 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${fieldCheckClass(fieldOk[`${part}.${c.field}`])}`}
                     />
                     {c.suffix && <span className="text-slate-600">{c.suffix}</span>}
                 </label>

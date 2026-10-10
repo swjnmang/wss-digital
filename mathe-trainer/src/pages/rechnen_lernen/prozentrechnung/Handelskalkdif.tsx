@@ -3,6 +3,7 @@ import { FeedbackIcon, FeedbackStatus } from '../../../components/FeedbackIcon';
 import { parseLocalizedNumber } from '../../../utils/numbers';
 import { formatCurrency, formatPercent, roundToPointFive, roundToTwoDecimals, withinTolerance } from '../../../utils/prozent';
 import TaskShell from '../../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../../utils/fieldCheck';
 
 type FieldKey =
   | 'liefererrabattBetrag'
@@ -213,6 +214,7 @@ export default function Handelskalkdif() {
   const [userInputs, setUserInputs] = useState<Record<FieldKey, string>>(createEmptyInputs);
   const [fieldFeedback, setFieldFeedback] = useState<Record<FieldKey, FeedbackStatus>>(createEmptyFeedback);
   const [percentInputs, setPercentInputs] = useState<Record<PercentageKey, string>>(createPercentInputs);
+  const [percentOkState, setPercentOkState] = useState<boolean | null>(null);
   const [missingStep, setMissingStep] = useState<PercentageKey>('gewinn');
   const [solutionText, setSolutionText] = useState('');
   const [showSolution, setShowSolution] = useState(false);
@@ -230,6 +232,7 @@ export default function Handelskalkdif() {
     setProblemText(description);
     setUserInputs(createEmptyInputs());
     setFieldFeedback(createEmptyFeedback());
+    setPercentOkState(null);
     setPercentInputs(createPercentInputs());
     setMissingStep(missing);
     setSolutionText(buildSolution(values, missing));
@@ -252,6 +255,7 @@ export default function Handelskalkdif() {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target;
       setPercentInputs((prev) => ({ ...prev, [key]: value }));
+      setPercentOkState(null);
       const amountKey = percentageMeta[key].amountKey;
       if (amountKey) {
         setFieldFeedback((prev) => ({ ...prev, [amountKey]: null }));
@@ -277,6 +281,7 @@ export default function Handelskalkdif() {
         const expectedPercent = correctValues[metaEntry[1].percentKey];
         const percentOk = typeof percentValue === 'number' && !Number.isNaN(percentValue) && withinTolerance(percentValue, expectedPercent, percentTolerance);
         isCorrect = isCorrect && percentOk;
+        setPercentOkState(percentOk);
       }
 
       nextFeedback[key] = isCorrect ? 'correct' : 'incorrect';
@@ -342,7 +347,7 @@ export default function Handelskalkdif() {
                             type="number"
                             step="0.1"
                             inputMode="decimal"
-                            className="w-20 border border-slate-200 rounded px-2 py-1 text-right"
+                            className={`w-20 border border-slate-200 rounded px-2 py-1 text-right ${missingStep === 'liefererrabatt' ? fieldCheckClass(percentOkState) : ''}`}
                             value={percentInputs.liefererrabatt}
                             onChange={handlePercentChange('liefererrabatt')}
                           />
@@ -354,14 +359,14 @@ export default function Handelskalkdif() {
                     </div>
                   </td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.liefererrabattBetrag} onChange={handleInputChange('liefererrabattBetrag')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.liefererrabattBetrag)}`} value={userInputs.liefererrabattBetrag} onChange={handleInputChange('liefererrabattBetrag')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.liefererrabattBetrag} /></td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200">= Zieleinkaufspreis</td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.zieleinkaufspreis} onChange={handleInputChange('zieleinkaufspreis')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.zieleinkaufspreis)}`} value={userInputs.zieleinkaufspreis} onChange={handleInputChange('zieleinkaufspreis')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.zieleinkaufspreis} /></td>
                 </tr>
@@ -371,7 +376,7 @@ export default function Handelskalkdif() {
                       <span>- Liefererskonto</span>
                       <div className="flex items-center gap-1 text-sm text-slate-600">
                         {isMissing('liefererskonto') ? (
-                          <input type="number" step="0.1" inputMode="decimal" className="w-20 border border-slate-200 rounded px-2 py-1 text-right" value={percentInputs.liefererskonto} onChange={handlePercentChange('liefererskonto')} />
+                          <input type="number" step="0.1" inputMode="decimal" className={`w-20 border border-slate-200 rounded px-2 py-1 text-right ${missingStep === 'liefererskonto' ? fieldCheckClass(percentOkState) : ''}`} value={percentInputs.liefererskonto} onChange={handlePercentChange('liefererskonto')} />
                         ) : (
                           <span>{formatPercent(correctValues?.liefererskontoProzent)}%</span>
                         )}
@@ -379,14 +384,14 @@ export default function Handelskalkdif() {
                     </div>
                   </td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.liefererskontoBetrag} onChange={handleInputChange('liefererskontoBetrag')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.liefererskontoBetrag)}`} value={userInputs.liefererskontoBetrag} onChange={handleInputChange('liefererskontoBetrag')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.liefererskontoBetrag} /></td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200">= Bareinkaufspreis</td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.bareinkaufspreis} onChange={handleInputChange('bareinkaufspreis')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.bareinkaufspreis)}`} value={userInputs.bareinkaufspreis} onChange={handleInputChange('bareinkaufspreis')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.bareinkaufspreis} /></td>
                 </tr>
@@ -400,7 +405,7 @@ export default function Handelskalkdif() {
                 <tr>
                   <td className="p-3 border border-slate-200">= Bezugspreis</td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.bezugspreis} onChange={handleInputChange('bezugspreis')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.bezugspreis)}`} value={userInputs.bezugspreis} onChange={handleInputChange('bezugspreis')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.bezugspreis} /></td>
                 </tr>
@@ -410,7 +415,7 @@ export default function Handelskalkdif() {
                       <span>+ Handlungskostenzuschlag</span>
                       <div className="flex items-center gap-1 text-sm text-slate-600">
                         {isMissing('handlungskostenzuschlag') ? (
-                          <input type="number" step="0.1" inputMode="decimal" className="w-20 border border-slate-200 rounded px-2 py-1 text-right" value={percentInputs.handlungskostenzuschlag} onChange={handlePercentChange('handlungskostenzuschlag')} />
+                          <input type="number" step="0.1" inputMode="decimal" className={`w-20 border border-slate-200 rounded px-2 py-1 text-right ${missingStep === 'handlungskostenzuschlag' ? fieldCheckClass(percentOkState) : ''}`} value={percentInputs.handlungskostenzuschlag} onChange={handlePercentChange('handlungskostenzuschlag')} />
                         ) : (
                           <span>{formatPercent(correctValues?.handlungskostenzuschlagProzent)}%</span>
                         )}
@@ -418,14 +423,14 @@ export default function Handelskalkdif() {
                     </div>
                   </td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.handlungskostenzuschlagBetrag} onChange={handleInputChange('handlungskostenzuschlagBetrag')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.handlungskostenzuschlagBetrag)}`} value={userInputs.handlungskostenzuschlagBetrag} onChange={handleInputChange('handlungskostenzuschlagBetrag')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.handlungskostenzuschlagBetrag} /></td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200">= Selbstkosten</td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.selbstkosten} onChange={handleInputChange('selbstkosten')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.selbstkosten)}`} value={userInputs.selbstkosten} onChange={handleInputChange('selbstkosten')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.selbstkosten} /></td>
                 </tr>
@@ -435,7 +440,7 @@ export default function Handelskalkdif() {
                       <span>+ Gewinn</span>
                       <div className="flex items-center gap-1 text-sm text-slate-600">
                         {isMissing('gewinn') ? (
-                          <input type="number" step="0.1" inputMode="decimal" className="w-20 border border-slate-200 rounded px-2 py-1 text-right" value={percentInputs.gewinn} onChange={handlePercentChange('gewinn')} />
+                          <input type="number" step="0.1" inputMode="decimal" className={`w-20 border border-slate-200 rounded px-2 py-1 text-right ${missingStep === 'gewinn' ? fieldCheckClass(percentOkState) : ''}`} value={percentInputs.gewinn} onChange={handlePercentChange('gewinn')} />
                         ) : (
                           <span>{formatPercent(correctValues?.gewinnProzent)}%</span>
                         )}
@@ -443,14 +448,14 @@ export default function Handelskalkdif() {
                     </div>
                   </td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.gewinnBetrag} onChange={handleInputChange('gewinnBetrag')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.gewinnBetrag)}`} value={userInputs.gewinnBetrag} onChange={handleInputChange('gewinnBetrag')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.gewinnBetrag} /></td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200">= Barverkaufspreis</td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.barverkaufspreisVerkauf} onChange={handleInputChange('barverkaufspreisVerkauf')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.barverkaufspreisVerkauf)}`} value={userInputs.barverkaufspreisVerkauf} onChange={handleInputChange('barverkaufspreisVerkauf')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.barverkaufspreisVerkauf} /></td>
                 </tr>
@@ -460,7 +465,7 @@ export default function Handelskalkdif() {
                       <span>+ Kundenskonto</span>
                       <div className="flex items-center gap-1 text-sm text-slate-600">
                         {isMissing('kundenskonto') ? (
-                          <input type="number" step="0.1" inputMode="decimal" className="w-20 border border-slate-200 rounded px-2 py-1 text-right" value={percentInputs.kundenskonto} onChange={handlePercentChange('kundenskonto')} />
+                          <input type="number" step="0.1" inputMode="decimal" className={`w-20 border border-slate-200 rounded px-2 py-1 text-right ${missingStep === 'kundenskonto' ? fieldCheckClass(percentOkState) : ''}`} value={percentInputs.kundenskonto} onChange={handlePercentChange('kundenskonto')} />
                         ) : (
                           <span>{formatPercent(correctValues?.kundenskontoProzent)}%</span>
                         )}
@@ -468,14 +473,14 @@ export default function Handelskalkdif() {
                     </div>
                   </td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.kundenskontoBetrag} onChange={handleInputChange('kundenskontoBetrag')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.kundenskontoBetrag)}`} value={userInputs.kundenskontoBetrag} onChange={handleInputChange('kundenskontoBetrag')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.kundenskontoBetrag} /></td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200">= Zielverkaufspreis</td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.zielverkaufspreis} onChange={handleInputChange('zielverkaufspreis')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.zielverkaufspreis)}`} value={userInputs.zielverkaufspreis} onChange={handleInputChange('zielverkaufspreis')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.zielverkaufspreis} /></td>
                 </tr>
@@ -485,7 +490,7 @@ export default function Handelskalkdif() {
                       <span>+ Kundenrabatt</span>
                       <div className="flex items-center gap-1 text-sm text-slate-600">
                         {isMissing('kundenrabatt') ? (
-                          <input type="number" step="0.1" inputMode="decimal" className="w-20 border border-slate-200 rounded px-2 py-1 text-right" value={percentInputs.kundenrabatt} onChange={handlePercentChange('kundenrabatt')} />
+                          <input type="number" step="0.1" inputMode="decimal" className={`w-20 border border-slate-200 rounded px-2 py-1 text-right ${missingStep === 'kundenrabatt' ? fieldCheckClass(percentOkState) : ''}`} value={percentInputs.kundenrabatt} onChange={handlePercentChange('kundenrabatt')} />
                         ) : (
                           <span>{formatPercent(correctValues?.kundenrabattProzent)}%</span>
                         )}
@@ -493,14 +498,14 @@ export default function Handelskalkdif() {
                     </div>
                   </td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.kundenrabattBetrag} onChange={handleInputChange('kundenrabattBetrag')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.kundenrabattBetrag)}`} value={userInputs.kundenrabattBetrag} onChange={handleInputChange('kundenrabattBetrag')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.kundenrabattBetrag} /></td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200">= Nettoverkaufspreis</td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.nettoverkaufspreis} onChange={handleInputChange('nettoverkaufspreis')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.nettoverkaufspreis)}`} value={userInputs.nettoverkaufspreis} onChange={handleInputChange('nettoverkaufspreis')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.nettoverkaufspreis} /></td>
                 </tr>
@@ -510,7 +515,7 @@ export default function Handelskalkdif() {
                       <span>+ Umsatzsteuer</span>
                       <div className="flex items-center gap-1 text-sm text-slate-600">
                         {isMissing('umsatzsteuer') ? (
-                          <input type="number" step="0.1" inputMode="decimal" className="w-20 border border-slate-200 rounded px-2 py-1 text-right" value={percentInputs.umsatzsteuer} onChange={handlePercentChange('umsatzsteuer')} />
+                          <input type="number" step="0.1" inputMode="decimal" className={`w-20 border border-slate-200 rounded px-2 py-1 text-right ${missingStep === 'umsatzsteuer' ? fieldCheckClass(percentOkState) : ''}`} value={percentInputs.umsatzsteuer} onChange={handlePercentChange('umsatzsteuer')} />
                         ) : (
                           <span>{formatPercent(correctValues?.umsatzsteuerProzent, 0)}%</span>
                         )}
@@ -518,7 +523,7 @@ export default function Handelskalkdif() {
                     </div>
                   </td>
                   <td className="p-3 border border-slate-200">
-                    <input type="number" inputMode="decimal" className="w-full border border-slate-200 rounded px-2 py-1 text-right" value={userInputs.umsatzsteuerBetrag} onChange={handleInputChange('umsatzsteuerBetrag')} />
+                    <input type="number" inputMode="decimal" className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.umsatzsteuerBetrag)}`} value={userInputs.umsatzsteuerBetrag} onChange={handleInputChange('umsatzsteuerBetrag')} />
                   </td>
                   <td className="p-3 border border-slate-200 text-center"><FeedbackIcon status={fieldFeedback.umsatzsteuerBetrag} /></td>
                 </tr>

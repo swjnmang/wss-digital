@@ -1,3 +1,4 @@
+import { fieldCheckClass } from '../../../utils/fieldCheck';
 import React, { useEffect, useRef, useState } from 'react';
 import { parseLocalizedNumber } from '../../../utils/numbers';
 import TaskShell from '../../../components/layout/TaskShell'
@@ -165,6 +166,7 @@ export default function Gemischt() {
   const [base2, setBase2] = useState('');
   const [exp2, setExp2] = useState('');
   const [feedback, setFeedback] = useState('');
+  const [fieldOk, setFieldOk] = useState<Record<string, boolean | undefined>>({});
 
   const coeffRef = useRef<HTMLInputElement>(null);
 
@@ -194,6 +196,7 @@ export default function Gemischt() {
 
   function newTask() {
     setFeedback('');
+    setFieldOk({});
     setCoeff(''); setBase1(''); setExp1(''); setBase2(''); setExp2('');
     const tpl = pickTemplate();
     if (!tpl) { setTask(null); return; }
@@ -241,6 +244,29 @@ export default function Gemischt() {
     } else {
       ok = c === sol.coeff && base1.trim().toLowerCase() === sol.base1 && e1 === sol.exp1;
     }
+    // Einzelne Felder einfärben
+    const marks: Record<string, boolean> = {};
+    if (ok) {
+      marks.coeff = true; marks.base1 = true; marks.exp1 = true;
+      if (base2.trim()) { marks.base2 = true; marks.exp2 = true; }
+    } else {
+      marks.coeff = c === sol.coeff;
+      if (sol.coeff !== 0) {
+        const a = base1.trim().toLowerCase();
+        const swapped = level === 4 && !!sol.base2 && a === sol.base2?.toLowerCase();
+        const s1 = (swapped ? sol.base2 : sol.base1)?.toLowerCase();
+        const x1 = swapped ? sol.exp2 : sol.exp1;
+        marks.base1 = a === s1;
+        marks.exp1 = e1 === x1;
+        if (needBase2 || base2.trim()) {
+          const s2 = (swapped ? sol.base1 : sol.base2)?.toLowerCase();
+          const x2 = swapped ? sol.exp1 : sol.exp2;
+          marks.base2 = !!s2 && base2.trim().toLowerCase() === s2;
+          marks.exp2 = !!s2 && e2 === x2;
+        }
+      }
+    }
+    setFieldOk(marks);
     if (ok) {
       setFeedback(`✅ Richtig! Die Lösung ist ${formatSolutionDisplay(sol)}.`);
       setTimeout(newTask, 900);
@@ -283,20 +309,20 @@ export default function Gemischt() {
             <div className="flex items-center flex-wrap gap-4 justify-center">
               <div className="flex items-center gap-2">
                 <span className="sr-only">Koeffizient</span>
-                <input ref={coeffRef} type="text" value={coeff} onChange={(e: React.ChangeEvent<HTMLInputElement>)=> setCoeff(e.target.value)} onKeyDown={onEnter} className="w-24 text-center border-2 rounded py-2 px-2 text-lg font-semibold focus:outline-blue-400" placeholder="z.B. 6" />
+                <input ref={coeffRef} type="text" value={coeff} onChange={(e: React.ChangeEvent<HTMLInputElement>)=> { setCoeff(e.target.value); setFieldOk(f => ({ ...f, coeff: undefined })); }} onKeyDown={onEnter} className={`w-24 text-center border-2 rounded py-2 px-2 text-lg font-semibold focus:outline-blue-400 ${fieldCheckClass(fieldOk.coeff)}`} placeholder="z.B. 6" />
               </div>
               <div className="relative inline-flex items-start">
                 <span className="sr-only">Basis 1</span>
-                <input type="text" value={base1} onChange={(e: React.ChangeEvent<HTMLInputElement>)=> setBase1(e.target.value.toLowerCase().slice(0,1))} onKeyDown={onEnter} className="w-16 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400" placeholder="x" />
-                  <input type="text" value={exp1} onChange={(e: React.ChangeEvent<HTMLInputElement>)=> setExp1(e.target.value)} onKeyDown={onEnter} className="absolute -top-3 -right-3 w-14 text-center border rounded py-1 text-sm bg-white shadow focus:outline-blue-400" placeholder="n" />
+                <input type="text" value={base1} onChange={(e: React.ChangeEvent<HTMLInputElement>)=> { setBase1(e.target.value.toLowerCase().slice(0,1)); setFieldOk(f => ({ ...f, base1: undefined })); }} onKeyDown={onEnter} className={`w-16 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400 ${fieldCheckClass(fieldOk.base1)}`} placeholder="x" />
+                  <input type="text" value={exp1} onChange={(e: React.ChangeEvent<HTMLInputElement>)=> { setExp1(e.target.value); setFieldOk(f => ({ ...f, exp1: undefined })); }} onKeyDown={onEnter} className={`absolute -top-3 -right-3 w-14 text-center border rounded py-1 text-sm bg-white shadow focus:outline-blue-400 ${fieldCheckClass(fieldOk.exp1)}`} placeholder="n" />
               </div>
               {level===4 && (
                 <>
                   <span className="text-xl font-bold">·</span>
                   <div className="relative inline-flex items-start">
                     <span className="sr-only">Basis 2</span>
-                    <input type="text" value={base2} onChange={(e: React.ChangeEvent<HTMLInputElement>)=> setBase2(e.target.value.toLowerCase().slice(0,1))} onKeyDown={onEnter} className="w-16 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400" placeholder="y" />
-                      <input type="text" value={exp2} onChange={(e: React.ChangeEvent<HTMLInputElement>)=> setExp2(e.target.value)} onKeyDown={onEnter} className="absolute -top-3 -right-3 w-14 text-center border rounded py-1 text-sm bg-white shadow focus:outline-blue-400" placeholder="m" />
+                    <input type="text" value={base2} onChange={(e: React.ChangeEvent<HTMLInputElement>)=> { setBase2(e.target.value.toLowerCase().slice(0,1)); setFieldOk(f => ({ ...f, base2: undefined })); }} onKeyDown={onEnter} className={`w-16 text-center border-2 rounded py-2 text-lg font-semibold focus:outline-blue-400 ${fieldCheckClass(fieldOk.base2)}`} placeholder="y" />
+                      <input type="text" value={exp2} onChange={(e: React.ChangeEvent<HTMLInputElement>)=> { setExp2(e.target.value); setFieldOk(f => ({ ...f, exp2: undefined })); }} onKeyDown={onEnter} className={`absolute -top-3 -right-3 w-14 text-center border rounded py-1 text-sm bg-white shadow focus:outline-blue-400 ${fieldCheckClass(fieldOk.exp2)}`} placeholder="m" />
                   </div>
                 </>
               )}

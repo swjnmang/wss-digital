@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import 'katex/dist/katex.min.css';
 import { InlineMath } from 'react-katex';
 import TaskShell from '../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../utils/fieldCheck';
 
 // Gamification System für Finanzmathematik Trainer
 const TASK_COUNT = 10;
@@ -2208,7 +2209,7 @@ export default function GemischteFinanzaufgaben() {
                                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                                     handleInputChange(card.id, input.id, e.target.value)
                                   }
-                                  className="flex-1 border-2 border-slate-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:border-blue-400 bg-white"
+                                  className={`flex-1 border-2 border-slate-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:border-blue-400 bg-white ${card.feedbackType && card.userAnswers[input.id] ? fieldCheckClass(isInputCorrect(input, card.userAnswers[input.id])) : ''}`}
                                 >
                                   <option value="">{input.placeholder}</option>
                                   {input.options?.map(opt => (
@@ -2225,7 +2226,7 @@ export default function GemischteFinanzaufgaben() {
                                     handleInputChange(card.id, input.id, e.target.value)
                                   }
                                   placeholder={input.placeholder}
-                                  className="flex-1 border-2 border-slate-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:border-blue-400"
+                                  className={`flex-1 border-2 border-slate-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:border-blue-400 ${card.feedbackType && card.userAnswers[input.id] ? fieldCheckClass(isInputCorrect(input, card.userAnswers[input.id])) : ''}`}
                                 />
                               )}
                               <span className="text-base font-bold text-slate-600">{input.unit}</span>
@@ -2248,7 +2249,7 @@ export default function GemischteFinanzaufgaben() {
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                               handleInputChange(card.id, tilgungsartInput.id, e.target.value)
                             }
-                            className="flex-1 border-2 border-slate-300 rounded-xl px-4 py-2 text-lg focus:outline-none focus:border-blue-400 bg-white max-w-sm"
+                            className={`flex-1 border-2 border-slate-300 rounded-xl px-4 py-2 text-lg focus:outline-none focus:border-blue-400 bg-white max-w-sm ${card.feedbackType && card.userAnswers[tilgungsartInput.id] ? fieldCheckClass(isInputCorrect(tilgungsartInput, card.userAnswers[tilgungsartInput.id])) : ''}`}
                           >
                             <option value="">{tilgungsartInput.placeholder}</option>
                             {tilgungsartInput.options?.map(opt => (

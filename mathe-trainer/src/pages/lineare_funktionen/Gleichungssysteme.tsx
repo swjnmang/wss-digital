@@ -3,6 +3,7 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { Link, useSearchParams } from 'react-router-dom';
 import TaskShell from '../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../utils/fieldCheck';
 
 type Method = 'einsetzen' | 'gleichsetzen' | 'addieren';
 
@@ -352,6 +353,7 @@ const Gleichungssysteme: React.FC = () => {
     const [xInput, setXInput] = useState('');
     const [yInput, setYInput] = useState('');
     const [feedback, setFeedback] = useState<'correct' | 'incorrect' | 'info' | null>(null);
+    const [fieldOk, setFieldOk] = useState<{ x?: boolean; y?: boolean }>({});
     const [showSolution, setShowSolution] = useState(false);
     // Ein Tracker pro Verfahren, damit der Eintrag das Thema des Verfahrens trägt.
     const trackers: Record<Method, ReturnType<typeof useTaskTracking>> = {
@@ -366,6 +368,7 @@ const Gleichungssysteme: React.FC = () => {
         setXInput('');
         setYInput('');
         setFeedback(null);
+        setFieldOk({});
         setShowSolution(false);
     };
 
@@ -389,6 +392,7 @@ const Gleichungssysteme: React.FC = () => {
         const isCorrect = xVal === task.x && yVal === task.y;
         trackers[task.method].onCheck(isCorrect);
         setFeedback(isCorrect ? 'correct' : 'incorrect');
+        setFieldOk({ x: xVal === task.x, y: yVal === task.y });
     };
 
     return (
@@ -449,8 +453,8 @@ const Gleichungssysteme: React.FC = () => {
                                     <input
                                         type="text"
                                         value={xInput}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setXInput(e.target.value)}
-                                        className="bk-input w-28 text-center"
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setXInput(e.target.value); setFieldOk(f => ({ ...f, x: undefined })); }}
+                                        className={`bk-input w-28 text-center ${fieldCheckClass(fieldOk.x)}`}
                                     />
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -458,8 +462,8 @@ const Gleichungssysteme: React.FC = () => {
                                     <input
                                         type="text"
                                         value={yInput}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setYInput(e.target.value)}
-                                        className="bk-input w-28 text-center"
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setYInput(e.target.value); setFieldOk(f => ({ ...f, y: undefined })); }}
+                                        className={`bk-input w-28 text-center ${fieldCheckClass(fieldOk.y)}`}
                                     />
                                 </div>
                             </div>

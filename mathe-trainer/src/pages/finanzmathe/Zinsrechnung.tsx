@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import 'katex/dist/katex.min.css';
 import { BlockMath, InlineMath } from 'react-katex';
 import TaskShell from '../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../utils/fieldCheck';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 type TaskType = 'zinsen' | 'kapital' | 'zinssatz' | 'laufzeit';
@@ -95,6 +96,7 @@ export default function Zinsrechnung() {
   const [userUnit, setUserUnit] = useState('');
   const [feedback, setFeedback] = useState<React.ReactNode | null>(null);
   const [feedbackType, setFeedbackType] = useState<'correct' | 'incorrect' | null>(null);
+  const [fieldOk, setFieldOk] = useState<{ number?: boolean; unit?: boolean }>({});
   const [solution, setSolution] = useState<React.ReactNode | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -109,7 +111,7 @@ export default function Zinsrechnung() {
     setFeedback(null);
     setFeedbackType(null);
     setSolution(null);
-    setUserAnswer('');
+    setUserAnswer(''); setFieldOk({});
     setUserUnit('');
 
     const types: TaskType[] = ['zinsen', 'kapital', 'zinssatz', 'laufzeit'];
@@ -177,6 +179,7 @@ export default function Zinsrechnung() {
     const diff = Math.abs(input - correctValue);
     const numberCorrect = diff <= tolerance;
     const unitCorrect = userUnit === unit;
+    setFieldOk({ number: numberCorrect, unit: unitCorrect });
 
     setTotalCount(c => c + 1);
 
@@ -299,16 +302,16 @@ export default function Zinsrechnung() {
                 <input
                   ref={inputRef}
                   type="text"
-                  className="flex-1 border-2 border-slate-300 rounded-lg p-2 text-lg focus:outline-blue-400"
+                  className={`flex-1 border-2 border-slate-300 rounded-lg p-2 text-lg focus:outline-blue-400 ${fieldCheckClass(fieldOk.number)}`}
                   value={userAnswer}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserAnswer(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setUserAnswer(e.target.value); setFieldOk(f => ({ ...f, number: undefined })); }}
                   onKeyDown={handleKeyDown}
                   placeholder="Ergebnis"
                 />
                 <select
-                  className="border-2 border-slate-300 rounded-lg p-2 text-lg font-bold text-gray-700 bg-white focus:outline-blue-400"
+                  className={`border-2 border-slate-300 rounded-lg p-2 text-lg font-bold text-gray-700 bg-white focus:outline-blue-400 ${fieldCheckClass(fieldOk.unit)}`}
                   value={userUnit}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setUserUnit(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => { setUserUnit(e.target.value); setFieldOk(f => ({ ...f, unit: undefined })); }}
                 >
                   <option value="" disabled>Einheit</option>
                   {UNIT_OPTIONS.map(u => (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import TaskShell from '../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../utils/fieldCheck';
 
 declare global {
   interface Window {
@@ -573,7 +574,7 @@ export default function Normalparabel() {
                     <select
                       value={matchSelections[idx] || ''}
                       onChange={(e) => setMatchSelections(s => ({ ...s, [idx]: e.target.value }))}
-                      className="border border-slate-300 rounded px-2 py-1 text-sm"
+                      className={`border border-slate-300 rounded px-2 py-1 text-sm ${isCorrect ? fieldCheckClass(true) : isWrong ? fieldCheckClass(false) : ''}`}
                     >
                       <option value="" disabled>Bitte wählen…</option>
                       {matchTask.shuffledEquations.map((eq, i2) => (

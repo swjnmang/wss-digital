@@ -39,9 +39,15 @@ nicht nur auf einen Feature-Branch. Vorher `main` aktualisieren und mergen, kein
   Nach ca. 1,2 s Tipp-Pause oder beim Verlassen eines Feldes wird der „Prüfen“-Button der Aufgabe ausgelöst,
   sobald alle Felder der Aufgabe ausgefüllt sind und sich die Eingaben seit der letzten Prüfung geändert haben.
 - Neue Aufgaben brauchen dafür nichts Eigenes, nur einen Button mit der Beschriftung „Prüfen“, „Überprüfen“,
-  „Lösung prüfen“ oder „Antwort prüfen“ hinter den Eingabefeldern derselben Aufgabe. Diese Beschriftungen beibehalten.
-- Eingabefelder nach dem Prüfen einzeln einfärben: richtig mit `var(--correct)` / `var(--correct-soft)`,
-  falsch mit `var(--wrong)` / `var(--wrong-soft)` (Tailwind: `green-*` / `red-*`, auf dieselbe Palette gelegt).
-  Für Text auf hellem Grund `var(--correct-ink)` / `var(--wrong-ink)` verwenden.
+  „Auswerten“ oder „<ein, zwei Wörter> prüfen“ (z. B. „Lösung prüfen“) in derselben Aufgabenkarte wie die Felder.
+- Jedes Eingabefeld (auch Auswahllisten) muss nach dem Prüfen einzeln grün (richtig) bzw. rot (falsch) werden.
+  Dafür `fieldCheckClass(zustand)` aus `src/utils/fieldCheck.ts` an die Klasse hängen
+  (`true`/'correct' = grün, `false`/'incorrect' = rot, sonst neutral) und den Zustand bei Eingabe und neuer Aufgabe zurücksetzen.
+  Bei Aufgaben mit nur einem Feld färbt `useAutoCheck` das Feld anhand der Rückmeldung auch selbst; bei mehreren Feldern
+  weiß nur die Seite, welches falsch ist, daher dort immer `fieldCheckClass` je Feld.
+- Tabellenfelder ohne eigenen Prüfen-Button (z. B. Tilgungsplan zum Ausfüllen): `CheckedNumberInput`
+  (`src/components/CheckedNumberInput.tsx`) mit `expected={…}` verwenden, das prüft sich selbst.
+- Farben nur über die Tokens: `var(--correct)` / `var(--correct-soft)` / `var(--correct-ink)` und
+  `var(--wrong)` / `var(--wrong-soft)` / `var(--wrong-ink)` (Tailwind `green-*` / `red-*` sind auf dieselbe Palette gelegt).
 - Farbe „richtig“ ist Pastell-Mint (#2f9e5b / #dcf5e3), „falsch“ Rot (#d64545 / #fde2e2). Kein Blau für „richtig“.
 - Abschalten für einen Bereich: Attribut `data-no-autocheck`. Prüfungsmodus-Seiten (URL mit „pruefung“) sind ausgenommen.

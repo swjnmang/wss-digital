@@ -3,6 +3,7 @@ import styles from './ParallelSenkrecht.module.css'
 import { getAreaFromPath, HelpUsage, logTrackingEntry } from '../../utils/tracking'
 import { useFlushOnLeave } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../utils/fieldCheck'
 
 // ===== MathDisplay Komponente =====
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -203,6 +204,10 @@ export default function ParallelSenkrecht() {
 
   const [antworten, setAntworten] = useState(aufgaben.map(() => ''))
   const [validiert, setValidiert] = useState(aufgaben.map(() => false))
+  // Nach dem Prüfen: Auswahl grün/rot einfärben (bis zur nächsten Änderung)
+  const [geprüft, setGeprüft] = useState(aufgaben.map(() => false))
+  const setGeprüftAt = (index: number, value: boolean) =>
+    setGeprüft(prev => prev.map((g, i) => (i === index ? value : g)))
   const [showLösung, setShowLösung] = useState(aufgaben.map(() => false))
   // Mehrere Aufgaben gleichzeitig offen -> eigene Versuchs-/Hilfe-Buchführung pro Aufgabe,
   // Eintrag direkt über logTrackingEntry (ein Eintrag = eine Aufgabe).
@@ -276,6 +281,7 @@ export default function ParallelSenkrecht() {
       newVal[index] = isCorrect
       return newVal
     })
+    setGeprüftAt(index, true)
   }
 
   const neueAufgaben = () => {
@@ -289,6 +295,7 @@ export default function ParallelSenkrecht() {
     setAufgaben(newAufgaben)
     setAntworten(newAufgaben.map(() => ''))
     setValidiert(newAufgaben.map(() => false))
+    setGeprüft(newAufgaben.map(() => false))
     setShowLösung(newAufgaben.map(() => false))
   }
 
@@ -318,19 +325,20 @@ export default function ParallelSenkrecht() {
                   <p className={styles.inputLabel}>Wähle die richtige Antwort:</p>
                   <div className={styles.mcOptions}>
                     {['parallel', 'senkrecht', 'keine'].map(option => (
-                      <label key={option} className={styles.mcOption}>
+                      <label key={option} className={`${styles.mcOption} ${geprüft[index] && antworten[index] === option ? fieldCheckClass(option === (aufgabe as { beziehung?: string }).beziehung) : ''}`}>
                         <input
                           type="radio"
                           name={`aufgabe_${index}`}
                           value={option}
                           checked={antworten[index] === option}
-                          onChange={e =>
+                          onChange={e => {
                             setAntworten(prev => {
                               const newA = [...prev]
                               newA[index] = e.target.value
                               return newA
                             })
-                          }
+                            setGeprüftAt(index, false)
+                          }}
                         />
                         <span className={styles.mcLabel}>
                           {option === 'parallel' && 'Die Geraden sind parallel'}
@@ -348,19 +356,20 @@ export default function ParallelSenkrecht() {
                   <p className={styles.inputLabel}>Wähle die richtige Gleichung:</p>
                   <div className={styles.mcOptions}>
                     {aufgabe.mcOptions.map((option: any, i: number) => (
-                      <label key={i} className={styles.mcOption}>
+                      <label key={i} className={`${styles.mcOption} ${geprüft[index] && antworten[index] === option.value ? fieldCheckClass(validiert[index]) : ''}`}>
                         <input
                           type="radio"
                           name={`aufgabe_${index}`}
                           value={option.value}
                           checked={antworten[index] === option.value}
-                          onChange={e =>
+                          onChange={e => {
                             setAntworten(prev => {
                               const newA = [...prev]
                               newA[index] = e.target.value
                               return newA
                             })
-                          }
+                            setGeprüftAt(index, false)
+                          }}
                         />
                         <span className={styles.mcLabel}>{option.label}</span>
                       </label>
@@ -386,8 +395,9 @@ export default function ParallelSenkrecht() {
                               newA[index] = parts.join('|')
                               return newA
                             })
+                            setGeprüftAt(index, false)
                           }}
-                          className={styles.zuordnungSelect}
+                          className={`${styles.zuordnungSelect} ${geprüft[index] && antworten[index].split('|')[i] ? fieldCheckClass(antworten[index].split('|')[i] === ['parallel', 'senkrecht', 'keine'][i]) : ''}`}
                         >
                           <option value="">-- wähle --</option>
                           <option value="parallel">parallel</option>

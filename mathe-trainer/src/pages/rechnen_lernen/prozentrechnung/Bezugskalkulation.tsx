@@ -3,6 +3,7 @@ import { FeedbackIcon, FeedbackStatus } from '../../../components/FeedbackIcon';
 import { parseLocalizedNumber } from '../../../utils/numbers';
 import { formatCurrency, formatPercent, roundToTwoDecimals, withinTolerance } from '../../../utils/prozent';
 import TaskShell from '../../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../../utils/fieldCheck';
 
 type FieldKey = 'rabattBetrag' | 'zieleinkaufspreis' | 'skontoBetrag' | 'bareinkaufspreis' | 'bezugspreis';
 
@@ -209,7 +210,7 @@ export default function Bezugskalkulation() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.rabattBetrag)}`}
                       value={userInputs.rabattBetrag}
                       onChange={handleInputChange('rabattBetrag')}
                     />
@@ -224,7 +225,7 @@ export default function Bezugskalkulation() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.zieleinkaufspreis)}`}
                       value={userInputs.zieleinkaufspreis}
                       onChange={handleInputChange('zieleinkaufspreis')}
                     />
@@ -239,7 +240,7 @@ export default function Bezugskalkulation() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.skontoBetrag)}`}
                       value={userInputs.skontoBetrag}
                       onChange={handleInputChange('skontoBetrag')}
                     />
@@ -254,7 +255,7 @@ export default function Bezugskalkulation() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.bareinkaufspreis)}`}
                       value={userInputs.bareinkaufspreis}
                       onChange={handleInputChange('bareinkaufspreis')}
                     />
@@ -281,7 +282,7 @@ export default function Bezugskalkulation() {
                     <input
                       type="number"
                       inputMode="decimal"
-                      className="w-full border border-slate-200 rounded px-2 py-1 text-right"
+                      className={`w-full border border-slate-200 rounded px-2 py-1 text-right ${fieldCheckClass(fieldFeedback.bezugspreis)}`}
                       value={userInputs.bezugspreis}
                       onChange={handleInputChange('bezugspreis')}
                     />

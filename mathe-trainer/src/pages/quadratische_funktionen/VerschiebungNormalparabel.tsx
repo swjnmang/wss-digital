@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import TaskShell from '../../components/layout/TaskShell'
+import { fieldCheckClass } from '../../utils/fieldCheck';
 
 declare global {
   interface Window {
@@ -239,6 +240,8 @@ export default function VerschiebungNormalparabel() {
   const combinedApiRef = useRef<any>(null);
   const [combinedTask, setCombinedTask] = useState<CombinedTaskState | null>(null);
   const [combinedXsInput, setCombinedXsInput] = useState('');
+  // Einzelne Felder nach dem Prüfen grün/rot
+  const [combinedFieldOk, setCombinedFieldOk] = useState<{ xs?: boolean; ys?: boolean; d?: boolean; c?: boolean }>({});
   const [combinedYsInput, setCombinedYsInput] = useState('');
   const [combinedVertexAnswered, setCombinedVertexAnswered] = useState(false);
   const [combinedVertexFeedback, setCombinedVertexFeedback] = useState<Feedback>(null);
@@ -534,6 +537,7 @@ export default function VerschiebungNormalparabel() {
 
     setCombinedTask({ d, c, colorName: color.name });
     setCombinedXsInput('');
+    setCombinedFieldOk({});
     setCombinedYsInput('');
     setCombinedVertexAnswered(false);
     setCombinedVertexFeedback(null);
@@ -571,6 +575,7 @@ export default function VerschiebungNormalparabel() {
     }
     const expectedXs = -fmt(combinedTask.d);
     const expectedYs = fmt(combinedTask.c);
+    setCombinedFieldOk(f => ({ ...f, xs: Math.abs(xs - expectedXs) < 0.01, ys: Math.abs(ys - expectedYs) < 0.01 }));
     if (Math.abs(xs - expectedXs) < 0.01 && Math.abs(ys - expectedYs) < 0.01) {
       setCombinedVertexFeedback({ text: 'Richtig!', type: 'correct' });
       setCombinedVertexAnswered(true);
@@ -593,6 +598,7 @@ export default function VerschiebungNormalparabel() {
     const expectedCSign = signStr(combinedTask.c);
     const isDCorrect = combinedDSign === expectedDSign && Math.abs(dAbsVal - Math.abs(fmt(combinedTask.d))) < 0.01;
     const isCCorrect = combinedCSign === expectedCSign && Math.abs(cAbsVal - Math.abs(fmt(combinedTask.c))) < 0.01;
+    setCombinedFieldOk(f => ({ ...f, d: isDCorrect, c: isCCorrect }));
     if (isDCorrect && isCCorrect) {
       setCombinedEqFeedback({ text: 'Richtig!', type: 'correct' });
       setCombinedEqAnswered(true);
@@ -995,9 +1001,9 @@ export default function VerschiebungNormalparabel() {
                     type="text"
                     inputMode="decimal"
                     value={combinedXsInput}
-                    onChange={(e) => setCombinedXsInput(e.target.value)}
+                    onChange={(e) => { setCombinedXsInput(e.target.value); setCombinedFieldOk(f => ({ ...f, xs: undefined })); }}
                     disabled={combinedVertexAnswered}
-                    className="border border-slate-300 rounded px-2 py-1 w-16 text-center text-sm disabled:opacity-60"
+                    className={`border border-slate-300 rounded px-2 py-1 w-16 text-center text-sm disabled:opacity-60 ${fieldCheckClass(combinedFieldOk.xs)}`}
                     placeholder="xs"
                   />
                   <span className="text-sm">|</span>
@@ -1005,9 +1011,9 @@ export default function VerschiebungNormalparabel() {
                     type="text"
                     inputMode="decimal"
                     value={combinedYsInput}
-                    onChange={(e) => setCombinedYsInput(e.target.value)}
+                    onChange={(e) => { setCombinedYsInput(e.target.value); setCombinedFieldOk(f => ({ ...f, ys: undefined })); }}
                     disabled={combinedVertexAnswered}
-                    className="border border-slate-300 rounded px-2 py-1 w-16 text-center text-sm disabled:opacity-60"
+                    className={`border border-slate-300 rounded px-2 py-1 w-16 text-center text-sm disabled:opacity-60 ${fieldCheckClass(combinedFieldOk.ys)}`}
                     placeholder="ys"
                   />
                   <span className="text-sm">)</span>
@@ -1024,22 +1030,22 @@ export default function VerschiebungNormalparabel() {
                   <input
                     type="text"
                     value={combinedDAbs}
-                    onChange={(e) => setCombinedDAbs(e.target.value)}
+                    onChange={(e) => { setCombinedDAbs(e.target.value); setCombinedFieldOk(f => ({ ...f, d: undefined })); }}
                     disabled={combinedEqAnswered}
                     placeholder="d"
                     aria-label="Zahl im Klammerterm"
-                    className="w-16 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center disabled:opacity-60"
+                    className={`w-16 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center disabled:opacity-60 ${fieldCheckClass(combinedFieldOk.d)}`}
                   />
                   <span className="whitespace-nowrap shrink-0">)²</span>
                   <SignToggle value={combinedCSign} onChange={setCombinedCSign} />
                   <input
                     type="text"
                     value={combinedCAbs}
-                    onChange={(e) => setCombinedCAbs(e.target.value)}
+                    onChange={(e) => { setCombinedCAbs(e.target.value); setCombinedFieldOk(f => ({ ...f, c: undefined })); }}
                     disabled={combinedEqAnswered}
                     placeholder="c"
                     aria-label="Zahl c"
-                    className="w-16 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center disabled:opacity-60"
+                    className={`w-16 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center disabled:opacity-60 ${fieldCheckClass(combinedFieldOk.c)}`}
                   />
                 </div>
                 <div className="mb-3 bg-blue-50 py-2 px-3 rounded-lg border border-blue-200 text-center overflow-x-auto">
@@ -1112,7 +1118,7 @@ export default function VerschiebungNormalparabel() {
                     <select
                       value={matchSelections[idx] || ''}
                       onChange={(e) => setMatchSelections(s => ({ ...s, [idx]: e.target.value }))}
-                      className="border border-slate-300 rounded px-2 py-1 text-sm"
+                      className={`border border-slate-300 rounded px-2 py-1 text-sm ${isCorrect ? fieldCheckClass(true) : isWrong ? fieldCheckClass(false) : ''}`}
                     >
                       <option value="" disabled>Bitte wählen…</option>
                       {matchTask.shuffledEquations.map((eq, i2) => (
