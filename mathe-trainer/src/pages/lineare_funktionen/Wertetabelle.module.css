@@ -3,8 +3,8 @@
 .header { display: none; }
 .title { font: 800 28px/1.15 var(--font-display); text-align: left; margin: 0; }
 .subtitle { margin: 6px 0 0; color: var(--ink-muted); text-align: left; }
-.newButton { composes: bk-btn from global; margin: 0 0 20px; }
-.aufgabenContainer { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 20px; align-items: start; }
+.newButton { composes: bk-btn from global; margin: 0; }
+.aufgabenContainer { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
 .aufgabeCard { background: var(--surface); border: 2px solid var(--edge); border-radius: 20px; box-shadow: var(--shadow-hard); overflow: hidden; text-align: left; }
 .cardCorrect { outline: 3px solid var(--correct); outline-offset: -6px; }
 .aufgabeHeader { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; background: var(--surface-sunken); border-bottom: 2px solid var(--edge); }
@@ -41,8 +41,8 @@
 .xCell { background: var(--surface-sunken); font-weight: 800; }
 .yRow td { background: var(--surface); }
 .givenValue { font: 700 17px/1 var(--font-display); }
-.tableInput { composes: bk-input from global; width: 72px; min-height: 44px; text-align: center; font-size: 17px; }
-.wertetabelle { border-collapse: separate; border-spacing: 0; border: 2px solid var(--edge); border-radius: 12px; overflow: hidden; }
+.tableInput { composes: bk-input from global; width: 100%; min-width: 56px; max-width: 160px; min-height: 44px; text-align: center; font-size: 17px; }
+.wertetabelle { width: 100%; border-collapse: separate; border-spacing: 0; border: 2px solid var(--edge); border-radius: 12px; overflow: hidden; }
 .wertetabelle th, .wertetabelle td { padding: 8px 10px; border-right: 1px solid var(--line); border-top: 1px solid var(--line); text-align: center; font: 600 16px/1.2 var(--font-display); min-width: 52px; }
 .wertetabelle tr:first-child th, .wertetabelle tr:first-child td { border-top: 0; }
 .graphBtn { composes: bk-btn from global; }
@@ -59,7 +59,7 @@
 .lösungsDetails p { margin: 4px 0; text-align: left; color: var(--ink); }
 
 .lösungTabelle { overflow-x: auto; margin: 8px 0; }
-.lösungTabelle table { border-collapse: separate; border-spacing: 0; border: 2px solid var(--edge); border-radius: 12px; overflow: hidden; }
+.lösungTabelle table { width: 100%; border-collapse: separate; border-spacing: 0; border: 2px solid var(--edge); border-radius: 12px; overflow: hidden; }
 .lösungTabelle th, .lösungTabelle td { padding: 8px 10px; border-right: 1px solid var(--line); border-top: 1px solid var(--line); text-align: center; font: 600 16px/1.2 var(--font-display); min-width: 52px; }
 
 .plotHint { font-size: 14px; color: var(--ink-muted); margin: 0 0 12px; text-align: left; }
