@@ -61,7 +61,7 @@ a.bk-tile:active, button.bk-tile:active { transform: translateY(2px); box-shadow
 .bk-dice b { width: 56px; height: 56px; border-radius: 12px; background: var(--surface); color: var(--ink); border: 2px solid var(--edge); display: flex; align-items: center; justify-content: center; font: 800 19px/1 var(--font-display); }
 .bk-dice b:nth-child(2) { transform: rotate(6deg); }
 .bk-dice b:nth-child(3) { transform: rotate(-5deg); }
-@media (min-width: 900px) { .bk-tile-hero { grid-column: span 2; } .bk-dice { display: grid; } }
+@media (min-width: 900px) { .bk-dice { display: grid; } }
 .bk-footer { margin: 32px 0 8px; text-align: center; color: var(--ink-muted); font-size: 14px; }
 .bk-footer a { color: var(--ink); font-weight: 700; }
 

@@ -2,8 +2,6 @@ import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { AREAS, exerciseCount } from '../data/areas'
 
-export const openSearch = () => window.dispatchEvent(new Event('bk:search'))
-
 export default function Home() {
   return (
     <div className="bk-page bk-home">
@@ -27,20 +25,7 @@ export default function Home() {
           </div>
         </Link>
 
-        <button type="button" className="bk-tile bk-tile-accent" onClick={openSearch}>
-          <i className="fa-solid fa-magnifying-glass bk-tile-icon" aria-hidden="true" />
-          <h3>Suchen</h3>
-          <p>z. B. „Nullstelle“ oder „Zins“</p>
-        </button>
 
-        <div className="bk-tile bk-tile-ink">
-          <i className="fa-solid fa-stopwatch bk-tile-icon" aria-hidden="true" />
-          <h3>Prüfungsmodus</h3>
-          <div className="bk-tile-links">
-            <Link to="/finanzmathe/pruefungsmodus">Finanzmathematik</Link>
-            <Link to="/trigonometrie/pruefungsmodus">Trigonometrie</Link>
-          </div>
-        </div>
 
         {AREAS.map((a) => {
           const count = exerciseCount(a)
@@ -53,11 +38,6 @@ export default function Home() {
           )
         })}
 
-        <Link to="/lineare_funktionen/ubungsblatt-generator" className="bk-tile bk-tile-dashed">
-          <i className="fa-solid fa-file-pdf bk-tile-icon" aria-hidden="true" />
-          <h3>Übungsblatt</h3>
-          <p>Lineare Funktionen als PDF</p>
-        </Link>
       </div>
 
       <footer className="bk-footer">
