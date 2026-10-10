@@ -23,7 +23,7 @@ export interface Area {
   short: string
   glyph: string
   path: string
-  /** Zähleinheit auf Kacheln: Themen (führen zu Unterseiten) oder Übungen */
+  /** Zähleinheit auf Kacheln (Wunsch des Nutzers: überall „Themen“) */
   unit: 'Themen' | 'Übungen'
   sections: Section[]
 }
@@ -79,7 +79,7 @@ export const AREAS: Area[] = [
     short: 'Zinsen, Zinseszins und Darlehensberechnungen verstehen.',
     glyph: '€',
     path: '/finanzmathe',
-    unit: 'Übungen',
+    unit: 'Themen',
     sections: [
       {
         name: 'Grundlagen',
@@ -113,7 +113,7 @@ export const AREAS: Area[] = [
     short: 'Geradengleichungen aufstellen, Nullstellen berechnen, Graphen zeichnen.',
     glyph: 'mx',
     path: '/lineare_funktionen',
-    unit: 'Übungen',
+    unit: 'Themen',
     sections: [
       {
         name: 'Einstieg',
@@ -162,7 +162,7 @@ export const AREAS: Area[] = [
     short: 'Parabeln, Scheitelpunkte und Schnittpunkte meistern.',
     glyph: 'x²',
     path: '/quadratische_funktionen',
-    unit: 'Übungen',
+    unit: 'Themen',
     sections: [
       {
         name: 'Graphen verstehen',
@@ -202,7 +202,7 @@ export const AREAS: Area[] = [
     short: 'Grundlagen der Wahrscheinlichkeit und Baumdiagramme.',
     glyph: 'P',
     path: '/daten-und-zufall',
-    unit: 'Übungen',
+    unit: 'Themen',
     sections: [
       {
         name: 'Grundlagen',
@@ -237,7 +237,7 @@ export const AREAS: Area[] = [
     short: 'Berechnungen an Dreiecken mit Sinus, Kosinus und Tangens.',
     glyph: 'sin',
     path: '/trigonometrie',
-    unit: 'Übungen',
+    unit: 'Themen',
     sections: [
       {
         name: 'Rechtwinklige Dreiecke',
