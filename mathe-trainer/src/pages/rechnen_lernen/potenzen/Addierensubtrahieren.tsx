@@ -124,7 +124,7 @@ export default function Addierensubtrahieren() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl mb-2">
             {q?.options.map((opt, i) => (
-              <button key={i} onClick={()=> check(opt)} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow text-base md:text-lg" dangerouslySetInnerHTML={{ __html: opt }} />
+              <button key={i} onClick={()=> check(opt)} className="bk-btn bk-btn-primary md:text-lg" dangerouslySetInnerHTML={{ __html: opt }} />
             ))}
           </div>
 

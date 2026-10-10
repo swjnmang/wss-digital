@@ -1036,7 +1036,7 @@ const TermeMitPotenzen: React.FC = () => {
                   {/* Button */}
                   <button
                     onClick={() => toggleSolution(aufgabe.id)}
-                    className="text-sm px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-all whitespace-nowrap font-semibold"
+                    className="bk-btn whitespace-nowrap"
                   >
                     {showSolution ? '✕' : '?'}
                   </button>

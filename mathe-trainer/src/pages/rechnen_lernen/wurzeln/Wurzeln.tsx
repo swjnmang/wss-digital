@@ -60,7 +60,7 @@ export default function WurzelnUebung() {
           </div>
           <div className="flex flex-wrap gap-4 mb-4">
             <button onClick={check} className="bk-btn bk-btn-primary">Lösung prüfen</button>
-            <button onClick={() => setShowSteps(true)} disabled={feedback.startsWith('Richtig!')} className="bg-gray-700 hover:bg-gray-800 disabled:opacity-50 text-white font-bold py-2 px-6 rounded shadow transition-colors">Lösung anzeigen</button>
+            <button onClick={() => setShowSteps(true)} disabled={feedback.startsWith('Richtig!')} className="bk-btn disabled:opacity-50">Lösung anzeigen</button>
             <button onClick={generate} className="bk-btn">Neue Aufgabe</button>
           </div>
           {feedback && (<div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedback.startsWith('Richtig') ? 'bk-feedback bk-feedback-ok block' : 'bk-feedback bk-feedback-no block'}`}>{feedback}</div>)}

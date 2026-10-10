@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import TaskShell from '../../components/layout/TaskShell'
 
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -137,28 +138,29 @@ export default function Zinstage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-emerald-100">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-2 py-8 sm:px-8">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 w-full max-w-6xl min-h-[400px] flex flex-col items-center p-6 sm:p-12">
+    <TaskShell title="Zinstage aus Datum berechnen" width="narrow">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center w-full">
+        <div className="bk-panel w-full max-w-6xl flex flex-col items-center p-6 sm:p-12">
           
           <div className="flex gap-4 mb-6">
             <button 
               onClick={() => setMode('practice')}
-              className={`px-4 py-2 rounded-lg font-bold transition-colors ${mode === 'practice' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              className={`bk-seg-btn ${mode === 'practice' ? 'bk-seg-btn-on' : ''}`}
             >
               Üben
             </button>
             <button 
               onClick={() => setMode('calculator')}
-              className={`px-4 py-2 rounded-lg font-bold transition-colors ${mode === 'calculator' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              className={`bk-seg-btn ${mode === 'calculator' ? 'bk-seg-btn-on' : ''}`}
             >
               Rechner
             </button>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-green-900 mb-2 text-center">
+          <h2 className="text-2xl font-extrabold text-ink mb-2 text-center">
             {mode === 'practice' ? 'Zinstage berechnen üben' : 'Zinstage Rechner'}
-          </h1>
+          </h2>
           <p className="text-gray-600 mb-8 text-center">Deutsche kaufmännische Methode (30/360)</p>
 
           {mode === 'practice' && pDate1 && pDate2 && (
@@ -184,13 +186,13 @@ export default function Zinstage() {
               </div>
 
               <div className="flex flex-wrap gap-4 mb-4 justify-center">
-                <button onClick={checkAnswer} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Überprüfen</button>
-                <button onClick={() => setShowSolution(true)} className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-6 rounded shadow transition-colors">Lösung zeigen</button>
-                <button onClick={generateNewTask} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Nächste Aufgabe</button>
+                <button onClick={checkAnswer} className="bk-btn bk-btn-primary">Überprüfen</button>
+                <button onClick={() => setShowSolution(true)} className="bk-btn">Lösung zeigen</button>
+                <button onClick={generateNewTask} className="bk-btn bk-btn-primary">Nächste Aufgabe</button>
               </div>
 
               {feedback && (
-                <div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedbackType === 'correct' ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>
+                <div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedbackType === 'correct' ? 'bk-feedback bk-feedback-ok block' : 'bk-feedback bk-feedback-no block'}`}>
                   {feedback}
                 </div>
               )}
@@ -279,7 +281,7 @@ export default function Zinstage() {
               <button 
                 onClick={calculateDays}
                 disabled={!cDate1 || !cDate2}
-                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded shadow transition-colors w-full"
+                className="bk-btn bk-btn-primary disabled:bg-gray-400 w-full"
               >
                 Berechnen
               </button>
@@ -295,5 +297,6 @@ export default function Zinstage() {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }

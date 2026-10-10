@@ -610,7 +610,7 @@ const LineareGleichungen: React.FC = () => {
             <p className="text-sm font-semibold text-gray-700">Löse die Gleichung</p>
             <button
               onClick={() => neueAufgaben(KATEGORIE_NAMEN[selectedCategory])}
-              className="px-3 py-1 text-sm bg-orange-500 text-white rounded font-semibold hover:bg-orange-600 transition-all shadow"
+              className="bk-btn"
             >
               Neue Aufgaben
             </button>
@@ -665,7 +665,7 @@ const LineareGleichungen: React.FC = () => {
                     {/* Button */}
                     <button
                       onClick={() => toggleSolution(aufgabe.id)}
-                      className="text-sm px-3 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-all whitespace-nowrap font-semibold flex-shrink-0"
+                      className="bk-btn whitespace-nowrap flex-shrink-0"
                     >
                       {showSolution ? '✕' : '?'}
                     </button>

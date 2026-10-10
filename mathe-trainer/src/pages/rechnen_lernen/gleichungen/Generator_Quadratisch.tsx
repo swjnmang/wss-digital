@@ -372,7 +372,7 @@ const Generator_Quadratisch: React.FC = () => {
                   {/* Button */}
                   <button
                     onClick={() => toggleSolution(aufgabe.id)}
-                    className="text-sm px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all whitespace-nowrap font-semibold flex-shrink-0"
+                    className="bk-btn bk-btn-primary whitespace-nowrap flex-shrink-0"
                   >
                     {showSolution ? '✕' : '?'}
                   </button>

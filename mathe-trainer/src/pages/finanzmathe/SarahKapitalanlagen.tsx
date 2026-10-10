@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import TaskShell from '../../components/layout/TaskShell'
 
 interface PartAnswer {
   input: string
@@ -43,7 +44,8 @@ export default function SarahKapitalanlagen() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 p-4 md:p-8">
+    <TaskShell title="Sarah's Finanzplanung" width="wide">
+    <div className="">
       <div className="max-w-5xl mx-auto">
         <button
           onClick={() => navigate('/finanzmathe/anwendungsaufgaben')}
@@ -53,8 +55,7 @@ export default function SarahKapitalanlagen() {
           Zurück
         </button>
 
-        <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
-          <h1 className="text-3xl font-bold text-purple-600 mb-2">Sarah's Finanzplanung</h1>
+        <div className="bk-panel p-6 md:p-8">
           <p className="text-gray-500 mb-8 text-sm">Abschlussprüfung Finanzmathematik - Bearbeitungszeit: ca. 45 Minuten</p>
 
           {/* Aufgabe 1.1 - Zinseszins mit Kontoauszug */}
@@ -135,13 +136,13 @@ export default function SarahKapitalanlagen() {
             <div className="flex gap-3 flex-wrap mb-4">
               <button
                 onClick={() => checkAnswer('1.1', 4245.84, 2)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn bk-btn-primary"
               >
                 Prüfen
               </button>
               <button
                 onClick={() => updateAnswer('1.1', 'showSolution', !answers['1.1'].showSolution)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn"
               >
                 {answers['1.1'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
@@ -182,13 +183,13 @@ export default function SarahKapitalanlagen() {
             <div className="flex gap-3 flex-wrap mb-4">
               <button
                 onClick={() => checkAnswer('1.2', 1.05, 0.15)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn bk-btn-primary"
               >
                 Prüfen
               </button>
               <button
                 onClick={() => updateAnswer('1.2', 'showSolution', !answers['1.2'].showSolution)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn"
               >
                 {answers['1.2'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
@@ -230,13 +231,13 @@ export default function SarahKapitalanlagen() {
             <div className="flex gap-3 flex-wrap mb-4">
               <button
                 onClick={() => checkAnswer('1.3', 19, 0.5)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn bk-btn-primary"
               >
                 Prüfen
               </button>
               <button
                 onClick={() => updateAnswer('1.3', 'showSolution', !answers['1.3'].showSolution)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn"
               >
                 {answers['1.3'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
@@ -340,7 +341,7 @@ export default function SarahKapitalanlagen() {
             <div className="flex gap-3 flex-wrap mb-4">
               <button
                 onClick={() => updateAnswer('1.4', 'showSolution', !answers['1.4'].showSolution)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn"
               >
                 {answers['1.4'].showSolution ? 'Erklärung verbergen' : 'Erklärung anzeigen'}
               </button>
@@ -386,13 +387,13 @@ export default function SarahKapitalanlagen() {
             <div className="flex gap-3 flex-wrap mb-4">
               <button
                 onClick={() => checkAnswer('1.5', 0.00, 1)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn bk-btn-primary"
               >
                 Prüfen
               </button>
               <button
                 onClick={() => updateAnswer('1.5', 'showSolution', !answers['1.5'].showSolution)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn"
               >
                 {answers['1.5'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
@@ -416,5 +417,6 @@ export default function SarahKapitalanlagen() {
         </div>
       </div>
     </div>
+    </TaskShell>
   )
 }

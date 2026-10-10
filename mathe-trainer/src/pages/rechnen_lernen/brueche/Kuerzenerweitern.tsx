@@ -302,7 +302,7 @@ export default function Kuerzenerweitern() {
           <div className="flex flex-wrap gap-4 mb-4">
             <button onClick={handleCheck} className="bk-btn bk-btn-primary">Überprüfen</button>
             <button onClick={handleShowSolution} className="bk-btn">Lösung zeigen</button>
-            <button onClick={() => generateNewTask(difficulty)} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">Nächste Aufgabe</button>
+            <button onClick={() => generateNewTask(difficulty)} className="bk-btn">Nächste Aufgabe</button>
           </div>
           {feedback && (
             <div className={`w-full max-w-xl text-center font-semibold rounded p-3 mb-2 ${feedbackType === 'correct' ? 'bk-feedback bk-feedback-ok block' : 'bk-feedback bk-feedback-no block'}`}>{feedback}</div>

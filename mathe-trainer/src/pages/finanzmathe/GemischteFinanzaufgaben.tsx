@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import 'katex/dist/katex.min.css';
 import { InlineMath } from 'react-katex';
+import TaskShell from '../../components/layout/TaskShell'
 
 // Gamification System für Finanzmathematik Trainer
 const TASK_COUNT = 10;
@@ -192,7 +193,7 @@ const LoanContractClassic: React.FC<LoanContractProps> = ({
   duration,
   type,
 }) => (
-  <div className="mb-6 border-2 border-gray-800 p-6 bg-white rounded-lg shadow-md max-w-3xl mx-auto">
+  <div className="mb-6 border-2 border-gray-800 p-6 bk-panel max-w-3xl mx-auto">
     <div className="text-center mb-6 border-b-2 border-gray-800 pb-4">
       <h2 className="text-2xl font-bold tracking-wide">Darlehensvertrag</h2>
       <p className="text-sm text-gray-600 mt-2">zwischen</p>
@@ -2134,12 +2135,12 @@ export default function GemischteFinanzaufgaben() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-100">
-      <div className="flex-1 flex flex-col items center px-3 py-8 sm:px-6">
+    <TaskShell title="Gemischte Übungsaufgaben" width="wide">
+    <div className="flex flex-col">
+      <div className="flex flex-col items center">
         <div className="w-full max-w-5xl bg-white/95 backdrop-blur rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-10">
           <div className="text-center mb-6">
             <p className="text-sm uppercase tracking-[0.3em] text-blue-500 font-semibold">Finanzmathematik</p>
-            <h1 className="text-3xl md:text-4xl font-bold text-blue-900">Gemischte Übungsaufgaben</h1>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
               Jede Runde liefert zehn Szenarien aus allen Themenblöcken – mindestens eine Aufgabe pro Bereich. Regeneriere
               einzelne Karten oder den kompletten Stapel.
@@ -2165,7 +2166,7 @@ export default function GemischteFinanzaufgaben() {
           <div className="flex flex-wrap gap-3 justify-end mb-6">
             <button
               onClick={regenerateAll}
-              className="inline-flex items-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 shadow"
+              className="bk-btn inline-flex items-center gap-2"
             >
               Alle Aufgaben neu
             </button>
@@ -2418,19 +2419,19 @@ export default function GemischteFinanzaufgaben() {
                 <div className="flex flex-wrap gap-3 mb-3 justify-center text-center">
                   <button
                     onClick={() => checkAnswer(card.id)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl shadow"
+                    className="bk-btn bk-btn-primary"
                   >
                     Überprüfen
                   </button>
                   <button
                     onClick={() => showTip(card.id)}
-                    className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-xl shadow"
+                    className="bk-btn"
                   >
                     💡 Tipp
                   </button>
                   <button
                     onClick={() => showSolution(card.id)}
-                    className="bg-slate-800 hover:bg-slate-900 text-white font-semibold px-4 py-2 rounded-xl shadow"
+                    className="bk-btn"
                   >
                     Lösung zeigen
                   </button>
@@ -2525,6 +2526,7 @@ export default function GemischteFinanzaufgaben() {
         </div>
       </div>
     </div>
+    </TaskShell>
   );
 }
 

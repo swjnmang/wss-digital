@@ -191,7 +191,7 @@ export default function Zehnerpotenzen() {
           <div className="flex flex-wrap gap-4 mb-4">
             <button onClick={neueAufgabe} className="bk-btn">Neue Aufgabe</button>
             <button onClick={pruefen} className="bk-btn bk-btn-primary">Überprüfen</button>
-            <button onClick={() => setShowTips(t => !t)} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded shadow transition-colors">Tipps</button>
+            <button onClick={() => setShowTips(t => !t)} className="bk-btn">Tipps</button>
           </div>
 
           {/* Aufgabenanzeige */}

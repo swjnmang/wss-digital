@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
+import TaskShell from '../../components/layout/TaskShell'
 
 interface PartAnswer {
   value: string
@@ -147,7 +148,8 @@ export default function FamilieKessler() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 p-4 md:p-8">
+    <TaskShell title="Familie Kessler" width="wide">
+    <div className="">
       <div className="max-w-6xl mx-auto">
         <button
           onClick={() => navigate('/finanzmathe/anwendungsaufgaben')}
@@ -157,8 +159,7 @@ export default function FamilieKessler() {
           Zurück
         </button>
 
-        <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
-          <h1 className="text-3xl font-bold text-purple-600 mb-2 text-center">Familie Kessler</h1>
+        <div className="bk-panel p-6 md:p-8">
           <p className="text-gray-600 text-center mb-8">Löse alle Aufgaben und überprüfe deine Ergebnisse</p>
 
           {/* Aufgabe 1.1 */}
@@ -200,7 +201,7 @@ export default function FamilieKessler() {
 
             <button
               onClick={() => toggleSolution('1.1')}
-              className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold"
+              className="bk-btn w-full"
             >
               {answers['1.1'].showSolution ? 'Lösung ausblenden' : 'Lösung anzeigen'}
             </button>
@@ -254,7 +255,7 @@ export default function FamilieKessler() {
 
             <button
               onClick={() => toggleSolution('1.2')}
-              className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold"
+              className="bk-btn w-full"
             >
               {answers['1.2'].showSolution ? 'Lösung ausblenden' : 'Lösung anzeigen'}
             </button>
@@ -310,7 +311,7 @@ export default function FamilieKessler() {
 
             <button
               onClick={() => toggleSolution('1.3')}
-              className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold"
+              className="bk-btn w-full"
             >
               {answers['1.3'].showSolution ? 'Lösung ausblenden' : 'Lösung anzeigen'}
             </button>
@@ -431,7 +432,7 @@ export default function FamilieKessler() {
 
             <button
               onClick={() => toggleSolution('1.4')}
-              className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold"
+              className="bk-btn w-full"
             >
               {answers['1.4'].showSolution ? 'Lösung ausblenden' : 'Lösung anzeigen'}
             </button>
@@ -504,7 +505,7 @@ export default function FamilieKessler() {
 
             <button
               onClick={() => toggleSolution('1.5')}
-              className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold"
+              className="bk-btn w-full"
             >
               {answers['1.5'].showSolution ? 'Lösung ausblenden' : 'Lösung anzeigen'}
             </button>
@@ -539,5 +540,6 @@ export default function FamilieKessler() {
         </div>
       </div>
     </div>
+    </TaskShell>
   )
 }

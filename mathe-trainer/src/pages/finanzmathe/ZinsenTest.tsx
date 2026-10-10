@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import TaskShell from '../../components/layout/TaskShell'
 
 interface Question {
   id: number;
@@ -168,12 +169,12 @@ export default function ZinsenTest() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-teal-50 text-slate-800">
-      <div className="flex-1 flex flex-col items-center justify-center w-full px-4 py-8">
+    <TaskShell title="Test: Zinsrechnung" width="wide">
+    <div className="flex flex-col text-slate-800">
+      <div className="flex flex-col items-center w-full">
         
         {step === 'start' && (
-          <div className="bg-white rounded-2xl shadow-lg border border-teal-100 w-full max-w-lg p-8">
-            <h1 className="text-3xl font-bold text-teal-800 mb-2 text-center">Test: Zinsrechnung</h1>
+          <div className="bk-panel border border-teal-100 w-full max-w-lg p-8">
             <p className="text-gray-600 mb-8 text-center">Bitte gib deine Daten ein, um den Test zu starten.</p>
             
             <form onSubmit={startQuiz} className="space-y-4">
@@ -203,7 +204,7 @@ export default function ZinsenTest() {
                 <input type="checkbox" required id="confirm" className="mt-1" />
                 <label htmlFor="confirm" className="text-sm text-gray-600">Ich bestätige, dass ich alle Rechenwege schriftlich festhalte.</label>
               </div>
-              <button type="submit" className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded transition shadow-md mt-4">
+              <button type="submit" className="bk-btn w-full mt-4">
                 Test starten
               </button>
             </form>
@@ -211,7 +212,7 @@ export default function ZinsenTest() {
         )}
 
         {step === 'quiz' && (
-          <div className="bg-white rounded-2xl shadow-lg border border-teal-100 w-full max-w-2xl p-8">
+          <div className="bk-panel border border-teal-100 w-full max-w-2xl p-8">
             <div className="flex justify-between items-center mb-6 border-b pb-4">
               <h2 className="text-xl font-bold text-teal-800">Aufgabe {currentQuestionIndex + 1} von 10</h2>
               <span className="text-sm text-gray-500">{studentName}, {studentClass}</span>
@@ -255,7 +256,7 @@ export default function ZinsenTest() {
               </button>
               <button 
                 onClick={nextQuestion}
-                className="px-6 py-2 rounded font-bold bg-teal-600 text-white hover:bg-teal-700 shadow"
+                className="bk-btn"
               >
                 {currentQuestionIndex === 9 ? 'Test beenden' : 'Nächste Frage'}
               </button>
@@ -264,7 +265,7 @@ export default function ZinsenTest() {
         )}
 
         {step === 'results' && (
-          <div className="bg-white rounded-2xl shadow-lg border border-teal-100 w-full max-w-3xl p-8">
+          <div className="bk-panel border border-teal-100 w-full max-w-3xl p-8">
             <h2 className="text-3xl font-bold text-teal-800 mb-2 text-center">Auswertung</h2>
             <p className="text-center text-gray-600 mb-8">Ergebnis für {studentName} ({studentClass})</p>
 
@@ -313,7 +314,7 @@ export default function ZinsenTest() {
             </div>
 
             <div className="flex justify-center gap-4 print:hidden">
-              <button onClick={() => window.print()} className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-6 rounded shadow">
+              <button onClick={() => window.print()} className="bk-btn">
                 Ergebnis drucken
               </button>
             </div>
@@ -321,5 +322,6 @@ export default function ZinsenTest() {
         )}
       </div>
     </div>
+    </TaskShell>
   );
 }

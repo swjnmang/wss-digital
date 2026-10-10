@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
+import TaskShell from '../../components/layout/TaskShell'
 
 interface PartAnswer {
   input: string
@@ -63,7 +64,8 @@ export default function SportladenEröffnung() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 p-4 md:p-8">
+    <TaskShell title="Sportladen Eröffnung" width="wide">
+    <div className="">
       <div className="max-w-5xl mx-auto">
         <button
           onClick={() => navigate('/finanzmathe/anwendungsaufgaben')}
@@ -73,8 +75,7 @@ export default function SportladenEröffnung() {
           Zurück
         </button>
 
-        <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
-          <h1 className="text-3xl font-bold text-purple-600 mb-8 text-center">Sportladen Eröffnung</h1>
+        <div className="bk-panel p-6 md:p-8">
 
           {/* Aufgabe 1 */}
           <div className="border-l-4 border-purple-600 pl-6 mb-8 pb-8 border-b">
@@ -136,13 +137,13 @@ export default function SportladenEröffnung() {
             <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
                 onClick={() => checkAnswer('1', 34232.27, 100)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn bk-btn-primary"
               >
                 Prüfen
               </button>
               <button
                 onClick={() => updateAnswer('1', 'showSolution', !answers['1'].showSolution)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn"
               >
                 {answers['1'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
@@ -184,13 +185,13 @@ export default function SportladenEröffnung() {
             <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
                 onClick={() => checkAnswer('2', 1.66, 0.1)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn bk-btn-primary"
               >
                 Prüfen
               </button>
               <button
                 onClick={() => updateAnswer('2', 'showSolution', !answers['2'].showSolution)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn"
               >
                 {answers['2'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
@@ -232,13 +233,13 @@ export default function SportladenEröffnung() {
             <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
                 onClick={() => checkAnswer('3', 8, 1)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn bk-btn-primary"
               >
                 Prüfen
               </button>
               <button
                 onClick={() => updateAnswer('3', 'showSolution', !answers['3'].showSolution)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn"
               >
                 {answers['3'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
@@ -334,7 +335,7 @@ export default function SportladenEröffnung() {
             <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
                 onClick={() => updateAnswer('4', 'showSolution', !answers['4'].showSolution)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn"
               >
                 {answers['4'].showSolution ? 'Erklärung verbergen' : 'Erklärung anzeigen'}
               </button>
@@ -379,13 +380,13 @@ export default function SportladenEröffnung() {
             <div className="flex gap-3 flex-wrap mb-4 justify-center">
               <button
                 onClick={() => checkAnswer('5', 9, 1)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn bk-btn-primary"
               >
                 Prüfen
               </button>
               <button
                 onClick={() => updateAnswer('5', 'showSolution', !answers['5'].showSolution)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                className="bk-btn"
               >
                 {answers['5'].showSolution ? 'Lösung verbergen' : 'Lösung anzeigen'}
               </button>
@@ -410,5 +411,6 @@ export default function SportladenEröffnung() {
         </div>
       </div>
     </div>
+    </TaskShell>
   )
 }

@@ -114,7 +114,7 @@ def buttons(p: Page):
             return m.group(0)
         n += 1
         return f'{m.group(1)}{m.group(2)}className="{new}"'
-    p.s = re.sub(r'(<(?:button|Link|a)\b)((?:(?!>)[^"]|"[^"]*")*?\s)className="([^"]*)"', repl, p.s, flags=re.S)
+    p.s = re.sub(r'(<(?:button|Link|a)\b)((?:=>|[^">]|"[^"]*")*?\s)className="([^"]*)"', repl, p.s, flags=re.S)
     return n
 
 
@@ -124,6 +124,8 @@ SKIN = [
     (r'bg-white rounded-(?:2xl|xl|lg) border border-(?:slate|gray)-(?:100|200) shadow(?:-md|-lg|-sm)?', 'bk-panel'),
     (r'bg-white rounded-(?:2xl|xl|lg) shadow(?:-md|-lg)?(?= )', 'bk-panel'),
     (r'bg-white p-6 md:p-10 rounded-xl shadow-lg', 'bk-panel'),
+    (r'bg-white rounded-(?:lg|xl|2xl) shadow-2xl(?: p-8)?', 'bk-panel'),
+    (r'bg-white rounded-(?:lg|xl) shadow-lg p-8', 'bk-panel'),
     (r'bg-white p-6 sm:p-8 rounded-xl shadow-lg', 'bk-panel'),
     (r' ?p-6 sm:p-12 md:p-16 lg:p-20 xl:p-24', ''),
     (r' ?min-h-\[400px\]', ''),

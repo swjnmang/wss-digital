@@ -238,7 +238,7 @@ export default function Generator_Bruchgleichungen() {
                   {/* Button */}
                   <button
                     onClick={() => toggleSolution(aufgabe.id)}
-                    className="text-base px-3 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-all whitespace-nowrap font-semibold"
+                    className="bk-btn whitespace-nowrap"
                   >
                     {showSolution ? '✕' : '?'}
                   </button>

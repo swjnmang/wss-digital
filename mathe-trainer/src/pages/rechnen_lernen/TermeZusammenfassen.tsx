@@ -157,7 +157,7 @@ const TermeZusammenfassen: React.FC = () => {
           <p className="text-sm text-gray-700">{stufe.beschreibung}</p>
           <button
             onClick={() => neueAufgaben(katIndex, stufeIndex)}
-            className="px-3 py-1 text-sm bg-orange-500 text-white rounded font-semibold hover:bg-orange-600 transition-all shadow"
+            className="bk-btn"
           >
             Neue Aufgaben
           </button>
@@ -227,7 +227,7 @@ const TermeZusammenfassen: React.FC = () => {
                       </div>
                       <button
                         onClick={() => toggleSolution(task.id)}
-                        className="text-sm px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-all whitespace-nowrap font-semibold"
+                        className="bk-btn whitespace-nowrap"
                       >
                         {showSolution ? '✕' : '?'}
                       </button>
@@ -277,7 +277,7 @@ const TermeZusammenfassen: React.FC = () => {
                         )}
                         <button
                           onClick={() => toggleSolution(task.id)}
-                          className="text-sm px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-all whitespace-nowrap font-semibold"
+                          className="bk-btn whitespace-nowrap"
                         >
                           {showSolution ? '✕' : '?'}
                         </button>
