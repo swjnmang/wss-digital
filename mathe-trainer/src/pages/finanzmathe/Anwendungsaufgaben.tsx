@@ -1,6 +1,6 @@
 import MenuPage, { type MenuItem } from '../../components/layout/MenuPage'
 
-const aufgaben: MenuItem[] = [
+export const aufgaben: MenuItem[] = [
   { title: '1. Ardas Kapitalanlagen', desc: 'Nachschüssige Rente, Zinseszins, vorschüssige Kapitalminderung, Annuitätendarlehen und Sondertilgung.', path: '/finanzmathe/anwendungsaufgaben/ardas-kapitalanlagen', icon: 'fa-solid fa-chart-line' },
   { title: '2. Sportladen Eröffnung', desc: 'Gründungsfinanzierung eines Sportladens - Vorschüssige Rente, Zinsberechnung, Kapitalminderung, Ratendarlehen und Zinsen aus Gewinnen.', path: '/finanzmathe/anwendungsaufgaben/sportladen-eröffnung', icon: 'fa-solid fa-store' },
   { title: '3. Die Unfallversicherung', desc: 'Versicherungssumme mit Zinseszins, nachschüssige Rente, vorschüssige Kapitalminderung, Ratendarlehen und Restschuldberechnung.', path: '/finanzmathe/anwendungsaufgaben/die-unfallversicherung', icon: 'fa-solid fa-shield' },

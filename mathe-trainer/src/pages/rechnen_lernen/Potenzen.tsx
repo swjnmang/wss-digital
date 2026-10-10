@@ -1,6 +1,6 @@
 import MenuPage, { type MenuItem } from '../../components/layout/MenuPage';
 
-const aufgaben: MenuItem[] = [
+export const aufgaben: MenuItem[] = [
   { title: '1. Schreibweise und Grundlagen', desc: 'Lerne die Grundlagen der Potenzschreibweise und einfache Berechnungen.', path: '/rechnen_lernen/potenzen/schreibweise' },
   { title: '2. Zehnerpotenzen', desc: 'Übungen zur wissenschaftlichen Schreibweise und zum Rechnen mit Zehnerpotenzen.', path: '/rechnen_lernen/potenzen/zehnerpotenzen', icon: 'fa-solid fa-superscript' },
   { title: '3. Addieren und Subtrahieren', desc: 'Übe das Addieren und Subtrahieren von Potenzen mit gleicher Basis.', path: '/rechnen_lernen/potenzen/addierensubtrahieren', icon: 'fa-solid fa-plus-minus' },

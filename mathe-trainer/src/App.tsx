@@ -34,6 +34,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react';
 import Home from './pages/Home'
 import AreaPage from './pages/AreaPage'
+import GemischtesTraining from './pages/GemischtesTraining'
 import Terme from './pages/rechnen_lernen/Terme'
 import Brueche from './pages/rechnen_lernen/Brueche'
 import Potenzen from './pages/rechnen_lernen/Potenzen'
@@ -329,6 +330,7 @@ export default function App() {
           {/* Excel Trainer */}
           <Route path="/excel-trainer" element={<ExcelTrainer />} />
 
+          <Route path="/gemischtes-training" element={<GemischtesTraining />} />
           <Route path="/impressum" element={<Impressum />} />
 
           <Route path="*" element={<Home />} />

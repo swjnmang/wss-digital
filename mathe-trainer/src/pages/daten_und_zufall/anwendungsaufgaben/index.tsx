@@ -1,6 +1,6 @@
 import MenuPage, { type MenuItem } from '../../../components/layout/MenuPage';
 
-const tasks: MenuItem[] = [
+export const tasks: MenuItem[] = [
   { title: '1. Die Mensa-Umfrage', desc: 'Zweistufiges Baumdiagramm zum Mensa-Essen, Pfad- und Summenregel sowie Kennwerte des Getränkeverkaufs.', path: '/daten-und-zufall/anwendungsaufgaben/mensa-umfrage', icon: 'fa-solid fa-utensils' },
   { title: '2. Die Ticketkontrolle', desc: 'Dreistufiges Baumdiagramm ohne Zurücklegen, Schwarzfahrer-Statistik und Fahrgastzählung mit Häufigkeiten.', path: '/daten-und-zufall/anwendungsaufgaben/ticketkontrolle', icon: 'fa-solid fa-bus' },
   { title: '3. Das Elfmeterschießen', desc: 'Relative Häufigkeit, Kennwerte der Zuschauerzahlen und dreistufiges Baumdiagramm mit konstanter Trefferquote.', path: '/daten-und-zufall/anwendungsaufgaben/elfmeterschiessen', icon: 'fa-solid fa-futbol' },

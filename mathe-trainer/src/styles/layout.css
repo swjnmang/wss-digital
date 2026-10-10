@@ -53,7 +53,7 @@ a.bk-tile:active, button.bk-tile:active { transform: translateY(2px); box-shadow
 .bk-tile-links a:hover { background: rgba(255, 255, 255, .22); }
 .bk-tile-dashed { border-style: dashed; box-shadow: none; }
 .bk-tile-dashed p { color: var(--ink-muted); }
-.bk-tile-hero { grid-column: 1 / -1; background: var(--area); color: var(--on-area); flex-direction: row; align-items: center; gap: 16px; cursor: default; }
+.bk-tile-hero { grid-column: 1 / -1; background: var(--area); color: var(--on-area); flex-direction: row; align-items: center; gap: 16px; cursor: pointer; }
 .bk-tile-hero h2 { margin: 6px 0 4px; font: 800 clamp(24px, 3vw, 30px)/1.05 var(--font-display); letter-spacing: -.02em; text-align: left; color: inherit; }
 .bk-tile-hero p { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
 .bk-hero-text { flex: 1; min-width: 0; }
@@ -150,3 +150,15 @@ a.bk-tile:active, button.bk-tile:active { transform: translateY(2px); box-shadow
 .bk-embed-play:hover .bk-embed-icon { transform: scale(1.06); }
 .bk-embed-title { font: 800 18px/1.2 var(--font-display); }
 .bk-embed-hint { font: 500 13px/1.3 var(--font-body); opacity: .8; }
+
+/* ── Druck ──────────────────────────────────────────────────────────────── */
+@media print {
+  body, html { background: #ffffff; }
+  .bk-header, .bk-keypad, .bk-task-actions, .bk-overlay, .bk-modal-backdrop, .bk-card.fixed { display: none !important; }
+  .bk-page { max-width: none; padding: 0; }
+  .bk-task-head, .bk-area-hero { box-shadow: none; background: #ffffff; border-width: 1px; }
+  .bk-panel, .bk-card, .bk-tile-ex, .bk-btn, .bk-choice { box-shadow: none !important; }
+  .bk-panel, .bk-card { break-inside: avoid; }
+  .app-root main, .app-root.keypad-open main { padding-bottom: 0; }
+  body { font-family: var(--font-body); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

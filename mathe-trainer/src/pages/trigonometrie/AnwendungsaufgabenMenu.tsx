@@ -1,6 +1,6 @@
 import MenuPage, { type MenuItem } from '../../components/layout/MenuPage';
 
-const tasks: MenuItem[] = [
+export const tasks: MenuItem[] = [
   { title: 'Olympiapark München', desc: 'Hängebrücke, Flying-Fox und Dreiecksberechnungen rund um den Olympiasee.', path: '/trigonometrie/anwendungsaufgaben/olympiapark-muenchen', icon: 'fa-solid fa-person-falling' },
   { title: 'Stadionneubau', desc: 'Steigung, Dachneigung und Flutlicht rund um einen Stadionquerschnitt.', path: '/trigonometrie/anwendungsaufgaben/stadion', icon: 'fa-solid fa-futbol' },
   { title: 'Das Fußballfeld', desc: 'Winkel, Flächen und Passwege zwischen Spielern auf dem Fußballfeld berechnen.', path: '/trigonometrie/anwendungsaufgaben/fussballfeld', icon: 'fa-solid fa-futbol' },

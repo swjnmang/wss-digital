@@ -1,6 +1,6 @@
 import MenuPage, { type MenuItem } from '../../components/layout/MenuPage';
 
-const aufgaben: MenuItem[] = [
+export const aufgaben: MenuItem[] = [
   { title: '1. Grundlagen der Prozentrechnung', desc: 'Lerne die Basics: Prozentwert, Prozentsatz und Grundwert berechnen.', path: '/rechnen_lernen/prozentrechnung/prozentrechnung' },
   { title: '2. Bezugskalkulation', desc: 'Berechne den Bezugs- oder Einstandspreis von Waren.', path: '/rechnen_lernen/prozentrechnung/bezugskalkulation', icon: 'fa-solid fa-truck' },
   { title: '3. Handelskalkulation (Vorwärts)', desc: 'Kalkuliere den Verkaufspreis vom Listeneinkaufspreis ausgehend.', path: '/rechnen_lernen/prozentrechnung/handelskalkvw', icon: 'fa-solid fa-arrow-right' },
