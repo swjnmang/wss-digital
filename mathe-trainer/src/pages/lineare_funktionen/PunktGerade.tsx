@@ -4,6 +4,8 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber';
 import { useTaskTracking } from '../../hooks/useTaskTracking';
+import { VideoEmbed } from '../../components/VideoButton'
+import TaskShell from '../../components/layout/TaskShell'
 
 // Sechs Aufgaben auf einer Seite (je zwei pro Aufgabentyp)
 const TOTAL_TASKS = 6;
@@ -53,12 +55,10 @@ const LEVEL_LABEL: Record<Level, string> = {
   schwer: 'Schwer',
 };
 
-const btnPrimary =
-  'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors';
-const btnSecondary =
-  'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors';
+const btnPrimary = 'bk-btn bk-btn-primary';
+const btnSecondary = 'bk-btn';
 const btnDisabled = 'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white';
-const panel = 'bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200';
+const panel = 'bk-panel';
 
 const round2 = (v: number) => Math.round(v * 100) / 100;
 const same = (a: number, b: number) => Math.abs(a - b) < 0.005;
@@ -355,16 +355,7 @@ function Intro({ onHide }: { onHide?: () => void }) {
         </p>
       </div>
       <h3 className="text-base font-bold text-slate-800 mt-6 mb-2 text-center">Erklärvideo</h3>
-      <div className="relative w-full max-w-xl mx-auto aspect-video rounded-lg overflow-hidden border border-slate-200 bg-black">
-        <iframe
-          className="absolute inset-0 w-full h-full"
-          src={VIDEO_EMBED_URL}
-          title="Erklärvideo: Punkt auf Gerade prüfen"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
+      <VideoEmbed src={VIDEO_EMBED_URL} title="Erklärvideo: Punkt auf Gerade prüfen" />
     </div>
   );
 }
@@ -772,7 +763,7 @@ function TaskCard({ number, task, level, onNewTask, onSolvedChange, onResult, on
       )}
 
       {showSolution && (
-        <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50">
+        <div className="mt-6 bk-taskbox">
           <h3 className="text-base font-bold text-slate-800 mb-2">Lösungsweg</h3>
           <Solution task={task} />
         </div>
@@ -842,9 +833,6 @@ export default function PunktGerade() {
 
   const header = (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">
-        Punkt auf Gerade prüfen
-      </h1>
       <p className="text-center text-slate-600">
         Prüfe rechnerisch, ob ein Punkt auf einer Geraden liegt, und berechne fehlende Koordinaten.
       </p>
@@ -866,8 +854,8 @@ export default function PunktGerade() {
 
   if (!level) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50">
-        <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+      <TaskShell title="Punkt auf Gerade prüfen" width="narrow">
+        <div className="flex flex-col gap-6">
           {header}
           {intro}
           <div className={`${panel} text-center`}>
@@ -889,13 +877,13 @@ export default function PunktGerade() {
             </div>
           </div>
         </div>
-      </div>
+      </TaskShell>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+    <TaskShell title="Punkt auf Gerade prüfen" width="narrow">
+        <div className="flex flex-col gap-6">
         {header}
         {intro}
 
@@ -977,6 +965,6 @@ export default function PunktGerade() {
           </div>
         )}
       </div>
-    </div>
+    </TaskShell>
   );
 }

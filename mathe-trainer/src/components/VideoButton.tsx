@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import type { MouseEvent as ReactMouseEvent } from 'react'
+import type { MouseEvent as ReactMouseEvent, ReactNode } from 'react'
 
-// Erklärvideo-Knopf: öffnet das YouTube-Video eingebettet in einem Fenster.
-// YouTube wird erst beim Klick geladen, über youtube-nocookie.com.
+// Erklärvideos: YouTube wird erst nach einem Klick geladen, über youtube-nocookie.com.
+// - VideoButton: Knopf, der das Video in einem Fenster öffnet
+// - VideoEmbed: Platzhalter in der Seite, der das Video an Ort und Stelle abspielt
 
 export function youtubeId(url: string): string | null {
   const m =
@@ -13,14 +14,44 @@ export function youtubeId(url: string): string | null {
   return m ? m[1] : null
 }
 
-interface Props {
+/** Startzeit aus „t=130“, „t=2m10s“ oder „start=130“ in der URL lesen. */
+function startFromUrl(url: string): number | undefined {
+  const m = url.match(/[?&](?:t|start)=(?:(\d+)m)?(\d+)s?/)
+  if (!m) return undefined
+  return (m[1] ? parseInt(m[1], 10) * 60 : 0) + parseInt(m[2], 10)
+}
+
+function embedSrc(url: string, start?: number, end?: number): string | null {
+  const id = youtubeId(url)
+  if (!id) return null
+  const params = new URLSearchParams({ autoplay: '1', rel: '0', modestbranding: '1', playsinline: '1' })
+  const from = start ?? startFromUrl(url)
+  if (from) params.set('start', String(from))
+  if (end) params.set('end', String(end))
+  return `https://www.youtube-nocookie.com/embed/${id}?${params.toString()}`
+}
+
+const watchUrl = (url: string) => {
+  const id = youtubeId(url)
+  return id ? `https://www.youtube.com/watch?v=${id}` : url
+}
+
+interface VideoProps {
   url: string
   title?: string
+  /** Startzeit in Sekunden (sonst aus der URL) */
+  start?: number
+  /** Endzeit in Sekunden – das Video hält dort an */
+  end?: number
+  note?: ReactNode
+}
+
+interface Props extends VideoProps {
   label?: string
   className?: string
 }
 
-export default function VideoButton({ url, title = 'Erklärvideo', label = 'Erklärvideo', className = 'bk-btn' }: Props) {
+export default function VideoButton({ url, title = 'Erklärvideo', label = 'Erklärvideo', className = 'bk-btn', start, end, note }: Props) {
   const [open, setOpen] = useState(false)
   return (
     <>
@@ -28,13 +59,13 @@ export default function VideoButton({ url, title = 'Erklärvideo', label = 'Erkl
         <i className="fa-solid fa-play" aria-hidden="true" />
         {label}
       </button>
-      {open && <VideoModal url={url} title={title} onClose={() => setOpen(false)} />}
+      {open && <VideoModal url={url} title={title} start={start} end={end} note={note} onClose={() => setOpen(false)} />}
     </>
   )
 }
 
-export function VideoModal({ url, title, onClose }: { url: string; title: string; onClose: () => void }) {
-  const id = youtubeId(url)
+export function VideoModal({ url, title = 'Erklärvideo', start, end, note, onClose }: VideoProps & { onClose: () => void }) {
+  const src = embedSrc(url, start, end)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
@@ -52,14 +83,9 @@ export function VideoModal({ url, title, onClose }: { url: string; title: string
             <i className="fa-solid fa-xmark" aria-hidden="true" />
           </button>
         </div>
-        {id ? (
+        {src ? (
           <div className="bk-video-frame">
-            <iframe
-              src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
-              title={title}
-              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-              allowFullScreen
-            />
+            <iframe src={src} title={title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
           </div>
         ) : (
           <p style={{ padding: 16 }}>
@@ -67,11 +93,33 @@ export function VideoModal({ url, title, onClose }: { url: string; title: string
           </p>
         )}
         <p className="bk-video-note">
+          {note && <>{note} </>}
           Beim Abspielen werden Daten an YouTube (Google) übertragen.{' '}
-          <a href={url} target="_blank" rel="noopener noreferrer">Auf YouTube öffnen</a>
+          <a href={watchUrl(url)} target="_blank" rel="noopener noreferrer">Auf YouTube öffnen</a>
         </p>
       </div>
     </div>,
     document.body
+  )
+}
+
+/** Video-Platzhalter in der Seite: lädt YouTube erst beim Antippen und spielt dann an derselben Stelle ab. */
+export function VideoEmbed({ src: url, title = 'Erklärvideo', start, end, className = '' }: { src: string; title?: string; start?: number; end?: number; className?: string }) {
+  const [playing, setPlaying] = useState(false)
+  const src = embedSrc(url, start, end)
+  return (
+    <div className={`bk-embed ${className}`}>
+      <div className="bk-video-frame">
+        {playing && src ? (
+          <iframe src={src} title={title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
+        ) : (
+          <button type="button" className="bk-embed-play" onClick={() => setPlaying(true)} aria-label={`${title} abspielen`}>
+            <span className="bk-embed-icon" aria-hidden="true"><i className="fa-solid fa-play" /></span>
+            <span className="bk-embed-title">{title}</span>
+            <span className="bk-embed-hint">Antippen zum Abspielen · lädt erst dann von YouTube</span>
+          </button>
+        )}
+      </div>
+    </div>
   )
 }

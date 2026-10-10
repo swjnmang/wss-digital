@@ -26,7 +26,7 @@ body {
 
 h1, h2, h3 {
     color: var(--text-primary);
-    text-align: center;
+    text-align: inherit;
     margin-bottom: 1rem;
 }
 
@@ -37,7 +37,7 @@ h3 { font-size: 1.25rem; font-weight: 600; }
 p {
     color: var(--text-secondary);
     line-height: 1.6;
-    text-align: center;
+    text-align: inherit;
     margin-bottom: 1.5rem;
 }
 

@@ -33,7 +33,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react';
 import Home from './pages/Home'
-import LineareIndex from './pages/LineareIndex'
+import AreaPage from './pages/AreaPage'
 import QuadratischeIndex from './pages/QuadratischeIndex'
 import RechnenLernenIndex from './pages/RechnenLernenIndex'
 import Terme from './pages/rechnen_lernen/Terme'
@@ -216,7 +216,7 @@ export default function App() {
           <Route path="/rechnen_lernen/gleichungen/quadratisch" element={<Quadratisch />} />
           <Route path="/rechnen_lernen/gleichungen/bruchgleichungen" element={<Bruchgleichungen />} />
           <Route path="/rechnen_lernen/gleichungen/abschlusstest" element={<Abschlusstest />} />
-          <Route path="/lineare_funktionen" element={<LineareIndex />} />
+          <Route path="/lineare_funktionen" element={<AreaPage id="linear" />} />
           <Route path="/lineare_funktionen/proportionale_zusammenhaenge" element={<Proportional />} />
           <Route path="/lineare_funktionen/was_ist_linear" element={<WasIstLinear />} />
           <Route path="/lineare_funktionen/wertetabelle" element={<Wertetabelle />} />

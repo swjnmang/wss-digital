@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import ResponsiveGraph from '../../components/ResponsiveGeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
+import TaskShell from '../../components/layout/TaskShell'
+import { VideoModal } from '../../components/VideoButton'
 
 declare global {
   interface Window {
@@ -14,9 +16,9 @@ declare global {
 const TOTAL_TASKS = 5
 const VIDEO_ID = 'r8vCu72ojYw'
 
-const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
-const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
-const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
+const btnPrimary = 'bk-btn bk-btn-primary'
+const btnSecondary = 'bk-btn'
+const panel = 'bk-panel text-center'
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -216,11 +218,11 @@ function TaskCard({ number, onSolvedChange, onResult, onVideo, level }: CardProp
         >
           Lösung anzeigen
         </button>
-        <button onClick={onVideo} className={btnSecondary}>Erklärvideo</button>
+        <button onClick={onVideo} className={btnSecondary}><i className="fa-solid fa-play" aria-hidden="true" /> Erklärvideo</button>
       </div>
 
       {showSolution && (
-        <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-slate-800">
+        <div className="mt-6 bk-taskbox text-slate-800">
           <h3 className="text-base font-bold mb-2">Lösung</h3>
           <p>Steigung m = {fmt(m)}</p>
           {easy ? (
@@ -244,7 +246,6 @@ export default function Ablesen() {
   const [streak, setStreak] = useState(0)
   const [finished, setFinished] = useState(false)
   const [showVideo, setShowVideo] = useState(false)
-  const playerRef = useRef<any>(null)
   const completionRef = useRef<HTMLDivElement>(null)
 
   const solvedCount = Object.values(solved).filter(Boolean).length
@@ -254,41 +255,6 @@ export default function Ablesen() {
     if (allSolved) completionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [allSolved])
 
-  // YouTube-Player im Erklärvideo-Fenster (pausiert bei 1:44)
-  useEffect(() => {
-    if (!showVideo) return
-    if (!window.YT) {
-      const tag = document.createElement('script')
-      tag.src = 'https://www.youtube.com/iframe_api'
-      document.body.appendChild(tag)
-    }
-    const init = () => {
-      if (window.YT && window.YT.Player && !playerRef.current) {
-        playerRef.current = new window.YT.Player('youtube-player', {
-          height: '390',
-          width: '640',
-          videoId: VIDEO_ID,
-          events: {
-            onReady: (e: any) => e.target.playVideo(),
-            onStateChange: (e: any) => {
-              const player = e.target
-              if (player && typeof player.getCurrentTime === 'function' && player.getCurrentTime() >= 104 && player.getPlayerState() === 1) {
-                player.pauseVideo()
-              }
-            },
-          },
-        })
-      }
-    }
-    if (window.YT && window.YT.Player) init()
-    else window.onYouTubeIframeAPIReady = init
-    return () => {
-      if (playerRef.current && typeof playerRef.current.destroy === 'function') {
-        playerRef.current.destroy()
-        playerRef.current = null
-      }
-    }
-  }, [showVideo])
 
   const [level, setLevel] = useState<Level | null>(null)
 
@@ -307,22 +273,21 @@ export default function Ablesen() {
 
   const header = (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Funktionsgleichung ablesen</h1>
       <p className="text-center text-slate-600">Lies m und t aus dem Graphen ab und setze sie in die Gleichung ein.</p>
     </div>
   )
 
   if (!level) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50">
-        <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+      <TaskShell title="Funktionsgleichung ablesen" width="narrow">
+        <div className="flex flex-col gap-6">
           {header}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
-                className="rounded-xl bg-green-600 hover:bg-green-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Einfach</p>
                 <p className="text-xl font-serif italic mb-2 text-white">y = m · x</p>
@@ -330,7 +295,7 @@ export default function Ablesen() {
               </button>
               <button
                 onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-xl bg-red-600 hover:bg-red-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
                 <p className="text-xl font-serif italic mb-2 text-white">y = m · x + t</p>
@@ -339,13 +304,13 @@ export default function Ablesen() {
             </div>
           </div>
         </div>
-      </div>
+      </TaskShell>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+    <TaskShell title="Funktionsgleichung ablesen" width="narrow">
+        <div className="flex flex-col gap-6">
         {header}
 
         <div className="flex flex-wrap items-center justify-center gap-3">
@@ -400,17 +365,8 @@ export default function Ablesen() {
       </div>
 
       {showVideo && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowVideo(false)}>
-          <div className="bg-white rounded-xl p-6 w-full max-w-3xl shadow-xl" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-slate-800">Erklärvideo: Funktionsgleichung ablesen</h3>
-              <button onClick={() => setShowVideo(false)} className="text-slate-500 hover:text-slate-800 text-xl" aria-label="Schließen">✕</button>
-            </div>
-            <div className="overflow-x-auto"><div id="youtube-player" /></div>
-            <p className="text-sm text-slate-500 mt-3">Das Video wird bei 1:44 automatisch pausiert.</p>
-          </div>
-        </div>
+        <VideoModal url={`https://youtu.be/${VIDEO_ID}`} title="Erklärvideo: Funktionsgleichung ablesen" end={104} note="Das Video wird bei 1:44 automatisch pausiert." onClose={() => setShowVideo(false)} />
       )}
-    </div>
+    </TaskShell>
   )
 }

@@ -2,6 +2,7 @@ import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
+import TaskShell from '../../components/layout/TaskShell'
 
 interface Fn {
   id: string
@@ -194,14 +195,13 @@ export default function WasIstLinear() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-5xl w-full">
-        <Link to="/lineare_funktionen" className="text-blue-600 hover:underline text-sm">← Zurück zur Übersicht</Link>
-        <h1 className="text-2xl font-bold text-slate-800 mt-2 mb-2 text-center">Was ist eine lineare Funktion?</h1>
+    <TaskShell title="Was ist eine lineare Funktion?" width="wide">
+        <div className="">
+        <Link to="/lineare_funktionen" className="bk-btn bk-btn-ghost" style={{ marginLeft: -12 }}><i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zur Übersicht</Link>
         <p className="text-center text-slate-600 mb-6">Wertetabelle, Graph, Gleichung und Text – vier Darstellungen derselben Funktion.</p>
 
         {/* Erklärung */}
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 mb-8">
+        <div className="bk-panel mb-8">
           <h2 className="text-lg font-bold text-slate-800 mb-2">Ein Beispiel</h2>
           <p className="text-slate-700 mb-4">
             Wir betrachten die Vorschrift: <strong>„{demo.text}“</strong> Das lässt sich auf vier Arten darstellen.
@@ -213,7 +213,7 @@ export default function WasIstLinear() {
               <button
                 key={x}
                 onClick={() => setDemoX(x)}
-                className={`px-4 py-1 rounded font-bold border ${demoX === x ? 'bg-amber-400 border-amber-500 text-white' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'}`}
+                className={`bk-seg-btn ${demoX === x ? 'bk-seg-btn-on' : ''}`}
               >
                 x = {fmt(x)}
               </button>
@@ -251,13 +251,13 @@ export default function WasIstLinear() {
         </div>
 
         {/* Übung */}
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
+        <div className="bk-panel">
           <h2 className="text-lg font-bold text-slate-800 mb-2">Übung: Was gehört zusammen?</h2>
           <div className="flex flex-wrap justify-center gap-2 mb-4">
-            <button onClick={() => switchLevel(false)} className={`px-4 py-1 rounded font-bold border ${!withT ? 'bg-blue-600 text-white border-blue-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'}`}>
+            <button onClick={() => switchLevel(false)} className={`bk-seg-btn ${!withT ? 'bk-seg-btn-on' : ''}`}>
               Stufe 1: Ursprungsgeraden (y = m · x)
             </button>
-            <button onClick={() => switchLevel(true)} className={`px-4 py-1 rounded font-bold border ${withT ? 'bg-blue-600 text-white border-blue-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'}`}>
+            <button onClick={() => switchLevel(true)} className={`bk-seg-btn ${withT ? 'bk-seg-btn-on' : ''}`}>
               Stufe 2: auch y = m · x + t
             </button>
           </div>
@@ -314,11 +314,11 @@ export default function WasIstLinear() {
             <button
               onClick={check}
               disabled={!allAnswered}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-2 px-6 rounded shadow transition-colors"
+              className="bk-btn bk-btn-primary"
             >
               Prüfen
             </button>
-            <button onClick={next} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">
+            <button onClick={next} className="bk-btn">
               Neue Aufgabe
             </button>
             <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">Punkte: {score}</div>
@@ -333,6 +333,6 @@ export default function WasIstLinear() {
           )}
         </div>
       </div>
-    </div>
+    </TaskShell>
   )
 }

@@ -1,3 +1,5 @@
+import { TOPICS } from '../pages/raum_und_form/registry'
+
 // Zentrales Verzeichnis aller Bereiche und ihrer Übungen (Startseite, Bereichsseiten, Suche).
 // Titel und Beschreibungen stammen aus den bisherigen Bereichsseiten; Reihenfolge unverändert.
 
@@ -27,6 +29,27 @@ export interface Area {
 }
 
 const fa = (n: string) => `fa-solid fa-${n}`
+
+// Raum & Form: Themen kommen aus dem Register, damit neue Themen automatisch erscheinen
+const RAUM_ICONS: Record<string, string> = {
+  scale: 'ruler', ruler: 'ruler-combined', triangle: 'play', expand: 'up-right-and-down-left-from-center',
+  circle: 'circle', box: 'cube', cone: 'ice-cream', pyramid: 'caret-up', cylinder: 'database', exam: 'graduation-cap',
+}
+const RAUM_KOERPER = ['kugel', 'prisma', 'kegel', 'pyramide', 'zylinder']
+
+function raumSections(): Section[] {
+  const toItem = (t: (typeof TOPICS)[number]): Exercise => ({
+    title: t.title, desc: t.description, path: `/raum-und-form/${t.slug}`, icon: fa(RAUM_ICONS[t.icon] ?? 'shapes'),
+  })
+  const anwenden = TOPICS.filter((t) => t.slug === 'anwendungsaufgaben')
+  const koerper = TOPICS.filter((t) => RAUM_KOERPER.includes(t.slug))
+  const flaechen = TOPICS.filter((t) => !anwenden.includes(t) && !koerper.includes(t))
+  return [
+    { name: 'Grundlagen und Flächen', items: flaechen.map(toItem) },
+    { name: 'Körper', items: koerper.map(toItem) },
+    { name: 'Anwenden', items: anwenden.map(toItem) },
+  ]
+}
 
 export const AREAS: Area[] = [
   {
@@ -93,33 +116,42 @@ export const AREAS: Area[] = [
     unit: 'Übungen',
     sections: [
       {
+        name: 'Einstieg',
+        items: [
+          { title: 'Proportionale Zusammenhänge (Einstieg)', desc: 'Fülle Wertetabellen zu Alltagsbeispielen aus und zeichne die passende Ursprungsgerade - der ideale Einstieg vor den linearen Funktionen.', path: '/lineare_funktionen/proportionale_zusammenhaenge', icon: 'fa-solid fa-compass' },
+          { title: 'Was ist eine lineare Funktion?', desc: 'Verstehe, wie Wertetabelle, Graph und Gleichung zusammengehören, und ordne sie einander zu.', path: '/lineare_funktionen/was_ist_linear', icon: 'fa-solid fa-lightbulb' },
+        ],
+      },
+      {
         name: 'Grundlagen',
         items: [
-          { title: 'Wertetabelle erstellen und vervollständigen', desc: 'Erstelle Wertetabellen für lineare Funktionen und löse fehlende Werte.', path: '/lineare_funktionen/wertetabelle', icon: fa('table') },
-          { title: 'Graph zeichnen', desc: 'Übe das Zeichnen von linearen Funktionen im Koordinatensystem.', path: '/lineare_funktionen/zeichnen', icon: fa('pencil') },
-          { title: 'Funktionsgleichung ablesen', desc: 'Lese die Funktionsgleichung direkt aus einem Graphen ab.', path: '/lineare_funktionen/ablesen', icon: fa('eye') },
-          { title: 'Steigung berechnen', desc: 'Lerne, die Steigung einer Geraden aus zwei Punkten zu ermitteln.', path: '/lineare_funktionen/steigung_berechnen', icon: fa('chart-line') },
-          { title: 'Funktionsgleichung aufstellen', desc: 'Stelle die Gleichung einer Geraden aus gegebenen Informationen auf.', path: '/lineare_funktionen/funktionsgleichung', icon: fa('pen-ruler') },
-          { title: 'Punkt auf Gerade prüfen', desc: 'Überprüfe rechnerisch, ob ein Punkt auf einer Geraden liegt.', path: '/lineare_funktionen/punkt_gerade', icon: fa('magnifying-glass-chart') },
-          { title: 'Parallele und senkrechte Geraden', desc: 'Erkenne parallele und senkrechte Geraden anhand ihrer Steigung.', path: '/lineare_funktionen/parallel_senkrecht', icon: fa('lines-leaning') },
-          { title: 'Nullstellen berechnen', desc: 'Finde den Schnittpunkt einer Geraden mit der x-Achse.', path: '/lineare_funktionen/nullstellen', icon: fa('arrows-down-to-line') },
-          { title: 'Schnittpunkt zweier Geraden', desc: 'Berechne den gemeinsamen Schnittpunkt von zwei Geraden.', path: '/lineare_funktionen/schnittpunkt', icon: fa('arrows-turn-to-dots') },
-          { title: 'Lineare Gleichungssysteme', desc: 'Löse Gleichungssysteme mit dem Einsetzungs-, Gleichsetzungs- und Additionsverfahren.', path: '/lineare_funktionen/gleichungssysteme', icon: fa('equals') },
+          { title: 'Wertetabelle erstellen und vervollständigen', desc: 'Erstelle Wertetabellen für lineare Funktionen und löse fehlende Werte.', path: '/lineare_funktionen/wertetabelle', icon: 'fa-solid fa-table' },
+          { title: 'Graph zeichnen', desc: 'Übe das Zeichnen von linearen Funktionen im Koordinatensystem.', path: '/lineare_funktionen/zeichnen', icon: 'fa-solid fa-pencil' },
+          { title: 'Die Steigung m', desc: 'Lies die Steigung einer Geraden mit dem Steigungsdreieck ab oder berechne sie aus zwei Punkten.', path: '/lineare_funktionen/steigung', icon: 'fa-solid fa-chart-line' },
+          { title: 'y-Achsenabschnitt', desc: 'Lerne Funktionen der Form y = m·x + t kennen: Der y-Achsenabschnitt t verschiebt die Gerade entlang der y-Achse.', path: '/lineare_funktionen/y_achsenabschnitt', icon: 'fa-solid fa-arrows-up-down' },
+          { title: 'Funktionsgleichung ablesen', desc: 'Lese die Funktionsgleichung direkt aus einem Graphen ab.', path: '/lineare_funktionen/ablesen', icon: 'fa-solid fa-eye' },
+          { title: 'Funktionsgleichung aufstellen', desc: 'Stelle die Gleichung einer Geraden aus gegebenen Informationen auf.', path: '/lineare_funktionen/funktionsgleichung', icon: 'fa-solid fa-pen-ruler' },
+          { title: 'Punkt auf Gerade prüfen', desc: 'Überprüfe rechnerisch, ob ein Punkt auf einer Geraden liegt.', path: '/lineare_funktionen/punkt_gerade', icon: 'fa-solid fa-magnifying-glass-chart' },
+          { title: 'Parallele und senkrechte Geraden', desc: 'Erkenne parallele und senkrechte Geraden anhand ihrer Steigung.', path: '/lineare_funktionen/parallel_senkrecht', icon: 'fa-solid fa-lines-leaning' },
+          { title: 'Nullstellen berechnen', desc: 'Finde den Schnittpunkt einer Geraden mit der x-Achse.', path: '/lineare_funktionen/nullstellen', icon: 'fa-solid fa-arrows-down-to-line' },
+          { title: 'Schnittpunkt zweier Geraden', desc: 'Berechne den gemeinsamen Schnittpunkt von zwei Geraden.', path: '/lineare_funktionen/schnittpunkt', icon: 'fa-solid fa-arrows-turn-to-dots' },
+          { title: 'Lineare Gleichungssysteme', desc: 'Löse Gleichungssysteme mit dem Einsetzungs-, Gleichsetzungs- und Additionsverfahren.', path: '/lineare_funktionen/gleichungssysteme', icon: 'fa-solid fa-equals' },
         ],
       },
       {
         name: 'Anwenden',
         items: [
-          { title: 'Gemischte Übungsaufgaben', desc: 'Gemischte Aufgaben zu allen Themen der linearen Funktionen.', path: '/lineare_funktionen/gemischte-aufgaben', icon: fa('shuffle') },
-          { title: 'Spiel: Münzen sammeln', desc: 'Eine spielerische Anwendung zum Thema lineare Funktionen.', path: '/lineare_funktionen/spiel_muenzen', icon: fa('gamepad') },
-          { title: 'Anwendungsaufgaben', desc: 'Realistische Aufgaben mit linearen Funktionen aus dem Alltag.', path: '/lineare_funktionen/anwendungsaufgaben', icon: fa('lightbulb') },
+          { title: 'Gemischte Übungsaufgaben', desc: 'Gemischte Aufgaben zu allen Themen der linearen Funktionen.', path: '/lineare_funktionen/gemischte-aufgaben', icon: 'fa-solid fa-shuffle' },
+          { title: 'Spiel: Münzen sammeln', desc: 'Eine spielerische Anwendung zum Thema lineare Funktionen.', path: '/lineare_funktionen/spiel_muenzen', icon: 'fa-solid fa-gamepad' },
+          { title: 'Anwendungsaufgaben', desc: 'Realistische Aufgaben mit linearen Funktionen aus dem Alltag.', path: '/lineare_funktionen/anwendungsaufgaben', icon: 'fa-solid fa-lightbulb' },
         ],
       },
       {
         name: 'Testen',
         items: [
-          { title: 'Abschlusstest', desc: 'Teste dein Wissen über lineare Funktionen.', path: '/lineare_funktionen/test', icon: fa('graduation-cap') },
-          { title: 'Übungsblatt-Generator', desc: 'Stelle dir ein personalisiertes Übungsblatt zusammen und lade es als PDF herunter.', path: '/lineare_funktionen/ubungsblatt-generator', icon: fa('file-pdf') },
+          { title: 'Abschlusstest', desc: 'Teste dein Wissen über lineare Funktionen.', path: '/lineare_funktionen/test', icon: 'fa-solid fa-graduation-cap' },
+          { title: 'Übungsblatt-Generator', desc: 'Stelle dir ein personalisiertes Übungsblatt zusammen und lade es als PDF herunter.', path: '/lineare_funktionen/ubungsblatt-generator', icon: 'fa-solid fa-file-pdf' },
+          { title: 'Wer wird Millionär?', desc: 'Das Quiz zu allen Themen der linearen Funktionen - mit 50:50-, Publikums- und Telefonjoker.', path: '/lineare_funktionen/wer_wird_millionaer', icon: 'fa-solid fa-sack-dollar' },
         ],
       },
     ],
@@ -178,32 +210,7 @@ export const AREAS: Area[] = [
     glyph: 'V',
     path: '/raum-und-form',
     unit: 'Themen',
-    sections: [
-      {
-        name: 'Flächen',
-        items: [
-          { title: 'Flächengeometrie', desc: 'Dreiecke, Vierecke und Kreis berechnen', path: '/raum-und-form/flaechengeometrie', icon: fa('ruler-combined') },
-          { title: 'Satz des Pythagoras', desc: 'Katheten und Hypotenuse verstehen', path: '/raum-und-form/satz-des-pythagoras', icon: fa('play') },
-          { title: 'Strahlensätze', desc: 'Streckenverhältnisse berechnen', path: '/raum-und-form/strahlensaetze', icon: fa('up-right-and-down-left-from-center') },
-        ],
-      },
-      {
-        name: 'Körper',
-        items: [
-          { title: 'Kugel', desc: 'Oberfläche und Volumen berechnen', path: '/raum-und-form/kugel', icon: fa('circle') },
-          { title: 'Prisma', desc: 'Oberfläche und Volumen berechnen', path: '/raum-und-form/prisma', icon: fa('cube') },
-          { title: 'Kegel', desc: 'Oberfläche und Volumen berechnen', path: '/raum-und-form/kegel', icon: fa('ice-cream') },
-          { title: 'Pyramide', desc: 'Oberfläche und Volumen berechnen', path: '/raum-und-form/pyramide', icon: fa('caret-up') },
-          { title: 'Zylinder', desc: 'Oberfläche und Volumen berechnen', path: '/raum-und-form/zylinder', icon: fa('database') },
-        ],
-      },
-      {
-        name: 'Anwenden',
-        items: [
-          { title: 'Anwendungsaufgaben', desc: 'Übungsaufgaben aus dem Alltag', path: '/raum-und-form/anwendungsaufgaben', icon: fa('book-open') },
-        ],
-      },
-    ],
+    sections: raumSections(),
   },
   {
     id: 'trigo',

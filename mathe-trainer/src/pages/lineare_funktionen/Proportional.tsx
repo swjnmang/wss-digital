@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
+import TaskShell from '../../components/layout/TaskShell'
 
 declare global {
   interface Window {
@@ -324,12 +325,11 @@ export default function Proportional() {
   const ctx = round.context
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-4xl w-full">
-        <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Proportionale Zusammenhänge</h1>
+    <TaskShell title="Proportionale Zusammenhänge" width="wide">
+        <div className="">
         <p className="text-center text-slate-600 mb-6">Ein Einstieg ins Thema lineare Funktionen anhand von Alltagsbeispielen.</p>
 
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 mb-8">
+        <div className="bk-panel mb-8">
           <h2 className="text-lg font-bold text-slate-800 mb-2">{ctx.title}</h2>
           <p className="text-slate-700 mb-6">{ctx.intro(round.k)}</p>
 
@@ -373,7 +373,7 @@ export default function Proportional() {
           </div>
 
           <div className="text-center">
-            <button onClick={checkTable} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">
+            <button onClick={checkTable} className="bk-btn bk-btn-primary">
               Prüfen
             </button>
           </div>
@@ -386,7 +386,7 @@ export default function Proportional() {
         </div>
 
         {tableSolved && (
-          <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 mb-8">
+          <div className="bk-panel mb-8">
             <h2 className="text-lg font-bold text-slate-800 mb-2">Punkte einzeichnen</h2>
             <p className="text-sm text-slate-600 mb-4">
               Klicke im Koordinatensystem auf die Punkte aus deiner Wertetabelle. Richtige Punkte werden grün markiert; sobald alle Punkte gesetzt sind, zeichnet die App automatisch die passende Gerade ein. Mit dem Mausrad, zwei Fingern (Touch) oder den +/− Knöpfen kannst du hinein- und herauszoomen, um genauer zu klicken.
@@ -400,7 +400,7 @@ export default function Proportional() {
               <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">
                 {achievedX.size} / {round.targets.length} Punkte gesetzt
               </div>
-              <button onClick={resetPlot} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">
+              <button onClick={resetPlot} className="bk-btn">
                 Punkte zurücksetzen
               </button>
             </div>
@@ -417,9 +417,9 @@ export default function Proportional() {
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
+        <div className="bk-panel">
           <div className="flex flex-wrap justify-center gap-4 items-center">
-            <button onClick={newTask} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition-colors">
+            <button onClick={newTask} className="bk-btn bk-btn-primary">
               Neue Aufgabe
             </button>
             <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">
@@ -428,6 +428,6 @@ export default function Proportional() {
           </div>
         </div>
       </div>
-    </div>
+    </TaskShell>
   )
 }

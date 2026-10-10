@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
+import TaskShell from '../../components/layout/TaskShell'
 
 const TOTAL_TASKS = 6
 
@@ -10,9 +11,9 @@ const TOTAL_TASKS = 6
 type Level = 'einfach' | 'fortgeschritten'
 const LEVEL_LABEL: Record<Level, string> = { einfach: 'Einfach', fortgeschritten: 'Fortgeschritten' }
 
-const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
-const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
-const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
+const btnPrimary = 'bk-btn bk-btn-primary'
+const btnSecondary = 'bk-btn'
+const panel = 'bk-panel text-center'
 
 // Sichtbarer Bereich im Graphen (quadratisch, damit die Kästchen quadratisch sind)
 const VIEW: [number, number, number, number] = [-6.5, 6.5, -6.5, 6.5]
@@ -232,7 +233,7 @@ function TaskCard({ number, initial, level, onSolvedChange, onResult, onHelp }: 
       </div>
 
       {showSolution && (
-        <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50 text-left">
+        <div className="mt-6 bk-taskbox text-left">
           <h3 className="text-base font-bold text-slate-800 text-center mb-2">Lösungsweg</h3>
           <ol className="list-decimal pl-5 space-y-1 text-slate-700">
             <li>
@@ -324,7 +325,7 @@ function Erklaerung({ level }: { level: Level }) {
   const ex1 = easy ? { p: 2, q: 3, t: 0, label: 'y = ⅔x' } : { p: 1, q: 2, t: 1, label: 'y = ½x + 1' }
   const ex2 = easy ? { p: -2, q: 1, t: 0, label: 'y = −2x' } : { p: -3, q: 2, t: 3, label: 'y = −1,5x + 3' }
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200">
+    <div className="bk-panel">
       <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">So liest du die Steigung ab</h2>
       <p className="text-slate-700 mb-3">
         Die Steigung m gibt an, um wie viel sich y ändert, wenn du auf der Geraden nach rechts gehst. Aus einem Graphen liest du sie mit
@@ -408,22 +409,21 @@ export default function SteigungAblesen() {
 
   const header = (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Die Steigung m ablesen</h1>
       <p className="text-center text-slate-600">Bestimme die Steigung m einer Geraden mit einem Steigungsdreieck.</p>
     </div>
   )
 
   if (!level) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50">
-        <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+      <TaskShell title="Die Steigung m ablesen" width="narrow">
+        <div className="flex flex-col gap-6">
           {header}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
-                className="rounded-xl bg-green-600 hover:bg-green-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">1. Einfach</p>
                 <p className="text-xl font-serif italic mb-2 text-white">y = m · x</p>
@@ -431,7 +431,7 @@ export default function SteigungAblesen() {
               </button>
               <button
                 onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-xl bg-red-600 hover:bg-red-700 text-white p-5 shadow-sm transition-colors"
+                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">2. Fortgeschritten</p>
                 <p className="text-xl font-serif italic mb-2 text-white">y = m · x + t</p>
@@ -440,13 +440,13 @@ export default function SteigungAblesen() {
             </div>
           </div>
         </div>
-      </div>
+      </TaskShell>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+    <TaskShell title="Die Steigung m ablesen" width="narrow">
+        <div className="flex flex-col gap-6">
         {header}
         <Erklaerung level={level} />
 
@@ -505,6 +505,6 @@ export default function SteigungAblesen() {
           </div>
         )}
       </div>
-    </div>
+    </TaskShell>
   )
 }

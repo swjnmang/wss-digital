@@ -4,6 +4,7 @@ import { InlineMath } from 'react-katex'
 import 'katex/dist/katex.min.css'
 import ResponsiveGeoGebraGraph from '../../components/ResponsiveGeoGebraGraph'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
+import TaskShell from '../../components/layout/TaskShell'
 
 const TOTAL_TASKS = 5
 
@@ -14,9 +15,9 @@ const LEVELS: { id: Level; label: string }[] = [
   { id: 'hard', label: 'Schwer' },
 ]
 
-const btnPrimary = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded shadow-sm transition-colors'
-const btnSecondary = 'bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-5 rounded border border-slate-300 transition-colors'
-const panel = 'text-center bg-white rounded-xl shadow-md p-4 sm:p-6 border border-slate-200'
+const btnPrimary = 'bk-btn bk-btn-primary'
+const btnSecondary = 'bk-btn'
+const panel = 'bk-panel text-center'
 
 // ---------- Zahlen und Formeln ----------
 
@@ -192,7 +193,7 @@ function DrawCard({ number, task, level, onNewTask, onSolvedChange }: CardProps)
       </div>
 
       {showSolution && (
-        <div className="mt-6 border border-slate-200 rounded-lg p-4 bg-slate-50">
+        <div className="mt-6 bk-taskbox">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-bold text-slate-800">Lösungsgraph</h3>
             <button onClick={() => setShowSolution(false)} className="text-slate-500 hover:text-slate-800 text-xl" aria-label="Schließen">✕</button>
@@ -362,10 +363,9 @@ export default function Zeichnen() {
   }, [allSolved])
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="mx-auto px-4 py-8 max-w-3xl w-full flex flex-col gap-6">
+    <TaskShell title="Lineare Funktionen zeichnen" width="narrow">
+        <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">Lineare Funktionen zeichnen</h1>
           <p className="text-center text-slate-600">
             Zeichne die Graphen in dein Heft. Ein guter Zeichenbereich für die x-Achse ist von −5 bis +5; die Länge der y-Achse legst du selbst fest, häufig reicht ebenfalls −5 bis +5.
           </p>
@@ -424,6 +424,6 @@ export default function Zeichnen() {
           </div>
         )}
       </div>
-    </div>
+    </TaskShell>
   )
 }
