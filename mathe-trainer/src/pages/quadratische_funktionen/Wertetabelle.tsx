@@ -802,6 +802,18 @@ export default function Wertetabelle() {
     setValidiert({ ...validiert, [aufgabeIndex]: false })
   }
 
+  // y-Eingabefeld einer Tabellenzelle (wird in der breiten und in der gekippten Tabelle verwendet)
+  const yEingabe = (index: number, i: number) => (
+    <input
+      type="text"
+      placeholder="?"
+      aria-label={`y-Wert ${i + 1}`}
+      value={antworten[index]?.[i]?.y || ''}
+      onChange={(e) => updateTableValue(index, i, e.target.value)}
+      className={`${styles.tableInput} ${fehlerhafteZellen[`${index}-${i}`] ? styles.inputError : ''} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
+    />
+  )
+
   return (
     <TaskShell
       title="Wertetabellen"
@@ -880,8 +892,10 @@ export default function Wertetabelle() {
                   <MathDisplay latex={aufgabe.funktionsgleichungLatex} />
 
                   {/* x-Werte sind stets vorgegeben, nur die y-Werte werden eingetragen */}
+                  {/* Breite Bildschirme: Tabelle quer über die volle Breite; Smartphone hochkant: Tabelle gekippt (x | y untereinander),
+                      damit nichts seitlich gescrollt werden muss. Beide Tabellen nutzen dieselben Eingaben. */}
                   <div className={styles.tableSection}>
-                    <table className={styles.wertetabelle}>
+                    <table className={`${styles.wertetabelle} ${styles.tableQuer}`}>
                       <tbody>
                         <tr>
                           <th>x</th>
@@ -895,16 +909,23 @@ export default function Wertetabelle() {
                           <th>y</th>
                           {aufgabe.yWerte.map((y: number, i: number) => (
                             <td key={`y-${i}`}>
-                              <input
-                                type="text"
-                                placeholder="?"
-                                value={antworten[index]?.[i]?.y || ''}
-                                onChange={(e) => updateTableValue(index, i, e.target.value)}
-                                className={`${styles.tableInput} ${fehlerhafteZellen[`${index}-${i}`] ? styles.inputError : ''} ${validierteZellen[`${index}-${i}`] ? styles.inputCorrect : ''}`}
-                              />
+                              {yEingabe(index, i)}
                             </td>
                           ))}
                         </tr>
+                      </tbody>
+                    </table>
+                    <table className={`${styles.wertetabelle} ${styles.tableHoch}`}>
+                      <thead>
+                        <tr><th>x</th><th>y</th></tr>
+                      </thead>
+                      <tbody>
+                        {aufgabe.xWerte.map((x: number, i: number) => (
+                          <tr key={`hx-${i}`} className={styles.yRow}>
+                            <td className={styles.xCell}><span className={styles.givenValue}>{x}</span></td>
+                            <td>{yEingabe(index, i)}</td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
@@ -952,7 +973,7 @@ export default function Wertetabelle() {
 
                       {aufgabe.xWerte && aufgabe.yWerte && (
                         <div className={styles.lösungTabelle}>
-                          <table className={styles.wertetabelle}>
+                          <table className={`${styles.wertetabelle} ${styles.tableQuer}`}>
                             <tbody>
                               <tr>
                                 <th>x</th>
@@ -966,6 +987,19 @@ export default function Wertetabelle() {
                                   <td key={`sol-y-${i}`} className={styles.sollution}>{y}</td>
                                 ))}
                               </tr>
+                            </tbody>
+                          </table>
+                          <table className={`${styles.wertetabelle} ${styles.tableHoch}`}>
+                            <thead>
+                              <tr><th>x</th><th>y</th></tr>
+                            </thead>
+                            <tbody>
+                              {aufgabe.xWerte.map((x: number, i: number) => (
+                                <tr key={`sol-h-${i}`} className={styles.yRow}>
+                                  <td className={styles.xCell}>{x}</td>
+                                  <td className={styles.sollution}>{aufgabe.yWerte[i]}</td>
+                                </tr>
+                              ))}
                             </tbody>
                           </table>
                         </div>
