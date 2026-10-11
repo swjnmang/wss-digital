@@ -32,14 +32,13 @@ export default function AppHeader({ onSearch, trackingActive }: Props) {
           </button>
         )}
         <Link to="/" className="bk-brand" aria-label="Mathe-Trainer – zur Startseite">
-          <span className="bk-logo" aria-hidden="true">M</span>
           <span className="bk-brand-name">Mathe-Trainer</span>
         </Link>
-        <span className="bk-grow" />
         <button type="button" onClick={onSearch} className="bk-search-btn" aria-label="Übung suchen">
           <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
-          <span className="bk-search-label">Übung suchen …</span>
+          <span className="bk-search-label">Übung suchen, z. B. Zinseszins</span>
         </button>
+        <span className="bk-grow" />
         <a href="https://swjnmang.github.io/wss-digital/" className="bk-header-link">
           WSS-Digital
         </a>

@@ -35,6 +35,7 @@ import { Analytics } from '@vercel/analytics/react';
 import Home from './pages/Home'
 import AreaPage from './pages/AreaPage'
 import GemischtesTraining from './pages/GemischtesTraining'
+import Abschlusspruefung, { AbschlusspruefungTeil } from './pages/Abschlusspruefung'
 import Terme from './pages/rechnen_lernen/Terme'
 import Brueche from './pages/rechnen_lernen/Brueche'
 import Potenzen from './pages/rechnen_lernen/Potenzen'
@@ -45,6 +46,7 @@ import Impressum from './pages/Impressum'
 import CookieBanner from './components/CookieBanner'
 import AppHeader from './components/layout/AppHeader'
 import SearchOverlay from './components/layout/SearchOverlay'
+import BottomNav from './components/layout/BottomNav'
 import MathKeypad from './components/MathKeypad'
 // lineare funktionen pages
 import SteigungBerechnen from './pages/lineare_funktionen/SteigungBerechnen'
@@ -341,11 +343,14 @@ export default function App() {
           <Route path="/excel-trainer" element={<ExcelTrainer />} />
 
           <Route path="/gemischtes-training" element={<GemischtesTraining />} />
+          <Route path="/abschlusspruefung" element={<Abschlusspruefung />} />
+          <Route path="/abschlusspruefung/:teil" element={<AbschlusspruefungTeil />} />
           <Route path="/impressum" element={<Impressum />} />
 
           <Route path="*" element={<Home />} />
         </Routes>
       </main>
+      <BottomNav onSearch={openSearch} />
       <CookieBanner />
       <MathKeypad />
     </div>
