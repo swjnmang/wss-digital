@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { PruefungKopf } from './PruefungKopf'
 import TeilA from './kopfrechnen/TeilA'
+import { ANWENDUNGEN } from '../quadratische_funktionen/anwendungsaufgaben/aufgaben'
 
 // „Alles gemischt“: Probe-Abschlussprüfung als Prüfungsmappe.
 // Teil A (ohne Taschenrechner) wird direkt hier gelöst; für Teil B wird je Bereich eine bestehende Anwendungsaufgabe
@@ -23,14 +24,8 @@ const TEIL_B: { id: string; titel: string; aufgaben: Aufgabe[] }[] = [
     ],
   },
   {
-    id: 'funktionen', titel: 'Funktionaler Zusammenhang', aufgaben: [
-      { title: 'Der Fußballplatz', path: '/lineare_funktionen/anwendungsaufgaben/fussballplatz' },
-      { title: 'Das Tipi', path: '/lineare_funktionen/anwendungsaufgaben/tipi' },
-      { title: 'Der Berg', path: '/lineare_funktionen/anwendungsaufgaben/berg' },
-      { title: 'Die Sonne', path: '/lineare_funktionen/anwendungsaufgaben/sonne' },
-      { title: 'Die Schrägseilbrücke', path: '/lineare_funktionen/anwendungsaufgaben/bruecke' },
-      { title: 'Der Flughafen', path: '/lineare_funktionen/anwendungsaufgaben/flughafen' },
-    ],
+    id: 'funktionen', titel: 'Funktionaler Zusammenhang',
+    aufgaben: ANWENDUNGEN.map((a) => ({ title: a.titel, path: `/quadratische_funktionen/anwendungsaufgaben/${a.slug}` })),
   },
   {
     id: 'trigo', titel: 'Trigonometrie', aufgaben: [

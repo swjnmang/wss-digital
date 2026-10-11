@@ -63,3 +63,13 @@ input[data-check="no"], select[data-check="no"], textarea[data-check="no"] { bor
 .bk-ka-teilb { flex-wrap: wrap; cursor: default; }
 .bk-ka-teilb .bk-topic-text { flex: 1 1 180px; }
 @media (max-width: 640px) { .bk-ka-teilb > .bk-actions { width: 100%; padding-left: 48px; } }
+
+/* Anwendungsaufgaben (Teil B): Skizze links stehen lassen, Teilaufgaben rechts (Tablet quer) */
+.bk-anw { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (min-width: 1000px) {
+  .bk-anw { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+  .bk-anw-skizze { position: sticky; top: 84px; max-height: calc(100vh - 100px); overflow-y: auto; }
+}
+.bk-anw-vorher { padding: 10px 14px; background: var(--surface-sunken); border-radius: 8px; font-size: 16px; color: var(--ink); }
+.bk-anw-vorher p:last-child { margin-bottom: 0 !important; }
+.bk-anw-svg { overflow-x: auto; }

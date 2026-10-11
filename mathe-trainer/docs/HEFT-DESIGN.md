@@ -42,3 +42,11 @@ Stand: 2026-10-11 · löst das Baukasten-Design ab. Entwürfe: https://claude.ai
   zufällige Anwendungsaufgabe (neuer Tab, abhaken, Punkte eintragen), 150 Min., nur sessionStorage. Neue Teil-B-Aufgaben in
   `TEIL_B` eintragen.
 - Unter `/abschlusspruefung` ist die automatische Prüfung aus (URL enthält „pruefung“); die Seiten haben eigene Prüfen-Knöpfe.
+
+## Anwendungsaufgaben quadratische Funktionen (Stand 2026-10-11)
+- 8 Aufgaben „Funktionaler Zusammenhang“ nach AP 2017, 2018, 2018 NT, 2019, 2021, 2022, 2023 NT, 2025 – Namen, Texte und
+  Zahlen verändert, alle Ergebnisse neu berechnet (je 15 Punkte). Daten: `pages/quadratische_funktionen/anwendungsaufgaben/aufgaben.ts`,
+  Skizzen (SVG, Koordinatensystem-Helfer `Plot`): `skizzen.tsx`, Seite: `AnwendungSeite.tsx` (Tablet quer: Skizze links bleibt stehen).
+- Nachweisaufgaben („Zeigen Sie …“) = entscheidender Zwischenwert + Auswahl ja/nein; Felder einzeln grün/rot, Teilpunkte.
+- Noch nicht umgesetzt (im PDF vorhanden): AP 2020 (Fußgängerbrücke), 2022 NT (Eisenbahntunnel), 2023 (Opernhaus), 2024 (Minigolf-Rampe).
+- Eingebunden: Bereich Quadratische Funktionen (Abschnitt „Anwenden“), Prüfungsteil „Funktionen“ und Teil B von „Alles gemischt“.
