@@ -1,9 +1,8 @@
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { allExercises, areaForPath } from '../../data/areas'
-import AreaIcon from './AreaIcon'
+import { allExercises, areaForPath, areaNumber } from '../../data/areas'
 
-// Rahmen für Übungsseiten: Kopfzeile in der Bereichsfarbe, darunter der Inhalt der Übung.
+// Rahmen für Übungsseiten im Heft-Design: Pfad (Inhalt / Kapitel / …), Nummer und Titel, darunter die Übung.
 // Die Übung selbst (Aufgaben, Prüflogik) bleibt unverändert im children-Bereich.
 
 interface Props {
@@ -21,26 +20,29 @@ export default function TaskShell({ title, subtitle, actions, children, width = 
   const { pathname } = useLocation()
   const area = areaForPath(pathname)
   const ex = allExercises().find((e) => e.path === pathname)
-  const style = { ['--area' as string]: area ? `var(--area-${area.id})` : 'var(--surface)' } as CSSProperties
+  const no = area ? areaNumber(area) : undefined
 
   return (
     <div className={`bk-page bk-task bk-w-${width}`}>
-      <header className="bk-task-head" style={style}>
+      <header className="bk-task-head">
         <div className="bk-task-titles">
-          {area && (
-            <Link to={area.path} className="bk-task-area">
-              <span className="bk-task-glyph" aria-hidden="true"><AreaIcon id={area.id} height={18} /></span>
-              {area.title}
-            </Link>
-          )}
-          {parent && (
-            <>
-              <span className="bk-task-crumb" aria-hidden="true">›</span>
-              <Link to={parent.to} className="bk-task-area">{parent.label}</Link>
-            </>
-          )}
+          <nav className="bk-crumbs" aria-label="Pfad">
+            <Link to="/">Inhalt</Link>
+            {area && (
+              <>
+                <span className="bk-crumb-sep" aria-hidden="true">/</span>
+                <Link to={area.path}>{no} {area.title}</Link>
+              </>
+            )}
+            {parent && (
+              <>
+                <span className="bk-crumb-sep" aria-hidden="true">/</span>
+                <Link to={parent.to}>{parent.label}</Link>
+              </>
+            )}
+          </nav>
           <h1>
-            {ex && <span className="bk-num">{ex.number}</span>}
+            {ex && no && <span className="bk-num">{no}.{ex.number}</span>}
             {title}
           </h1>
           {subtitle && <p className="bk-task-sub">{subtitle}</p>}

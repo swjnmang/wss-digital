@@ -284,6 +284,26 @@ export const AREAS: Area[] = [
 
 export const areaById = (id: AreaId) => AREAS.find((a) => a.id === id) as Area
 
+/** Kapitelnummer eines Bereichs im Inhaltsverzeichnis (1 = erster Bereich). */
+export const areaNumber = (a: Area) => AREAS.indexOf(a) + 1
+
+/** Vorbereitung Abschlussprüfung: Kapitel nach den Bereichen. Inhalte folgen später. */
+export const EXAM = {
+  title: 'Vorbereitung Abschlussprüfung',
+  short: 'Alle Prüfungsteile, sortiert nach Bereich',
+  path: '/abschlusspruefung',
+  parts: [
+    { slug: 'rechnen-ohne-taschenrechner', title: 'Rechnen ohne Taschenrechner' },
+    { slug: 'finanzmathe', title: 'Finanzmathe' },
+    { slug: 'funktionen', title: 'Funktionen' },
+    { slug: 'raum-und-form', title: 'Raum & Form' },
+    { slug: 'daten-und-zufall', title: 'Daten & Zufall' },
+    { slug: 'trigonometrie', title: 'Trigonometrie' },
+  ],
+  /** „Alles gemischt“ führt vorerst zum Gemischten Training */
+  mixedPath: '/gemischtes-training',
+}
+
 /** Bereich zu einem Pfad, z. B. für die Bereichsfarbe in Kopfzeilen von Übungsseiten. */
 export const areaForPath = (pathname: string): Area | undefined =>
   AREAS.find((a) => pathname === a.path || pathname.startsWith(a.path + '/'))

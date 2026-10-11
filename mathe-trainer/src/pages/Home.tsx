@@ -1,42 +1,21 @@
-import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
-import { AREAS, exerciseCount } from '../data/areas'
-import AreaIcon from '../components/layout/AreaIcon'
+import ContentIndex from '../components/layout/ContentIndex'
+
+// Startseite im Heft-Design: Suche oben, darunter das Inhaltsverzeichnis aller Bereiche.
 
 export default function Home() {
+  const openSearch = () => window.dispatchEvent(new Event('bk:search'))
+
   return (
     <div className="bk-page bk-home">
-      <header className="bk-home-head">
-        <div>
-          <h1>Los geht’s!</h1>
-          <p>Wähle einen Bereich – Funktionen, Finanzmathematik, Trigonometrie, Daten &amp; Zufall und mehr.</p>
-        </div>
-      </header>
+      <h1 className="sr-only">Mathe-Trainer</h1>
+      <button type="button" className="bk-home-search" onClick={openSearch}>
+        <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+        Übung suchen, z. B. Zinseszins
+      </button>
 
-      <div className="bk-bento">
-        {AREAS.map((a) => {
-          const count = exerciseCount(a)
-          return (
-            <Link key={a.id} to={a.path} className="bk-tile bk-tile-area" style={{ ['--area' as string]: `var(--area-${a.id})` } as CSSProperties}>
-              <span className="bk-tile-glyph"><AreaIcon id={a.id} height={52} /></span>
-              <span className="bk-chip">{count} {a.unit}</span>
-              <h3>{a.title}</h3>
-            </Link>
-          )
-        })}
-
-        <Link to="/gemischtes-training" className="bk-tile bk-tile-hero" style={{ ['--area' as string]: 'var(--area-linear)' } as CSSProperties}>
-          <div className="bk-hero-text">
-            <span className="bk-label" style={{ color: 'inherit' }}>Gemischtes Training</span>
-            <h2>10 Übungen aus allen Bereichen</h2>
-            <p>Jedes Mal neu gemischt.</p>
-            <span className="bk-chip"><i className="fa-solid fa-dice" aria-hidden="true" /> Los geht’s</span>
-          </div>
-          <div className="bk-dice" aria-hidden="true">
-            <b>¾</b><b>x²</b><b>sin</b><b>€</b>
-          </div>
-        </Link>
-      </div>
+      <span className="bk-index-label">Inhalt</span>
+      <ContentIndex showShort />
 
       <footer className="bk-footer">
         © 2025 Mathenkik. Alle Rechte vorbehalten. · <Link to="/impressum">Impressum</Link>

@@ -1,5 +1,5 @@
-@import '@fontsource-variable/figtree';
-@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource/atkinson-hyperlegible/400.css';
+@import '@fontsource/atkinson-hyperlegible/700.css';
 @import '@fortawesome/fontawesome-free/css/all.min.css';
 @import './styles/layout.css';
 @import './styles/kit.css';
@@ -9,24 +9,25 @@
 @tailwind utilities;
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Baukasten-Design · Tokens (Design-System „Mathe-Trainer“, Theme baukasten)
+   Heft-Design · Tokens (Karopapier, Tinte, Füller-Blau; Bereiche ohne eigene Farben)
+   Die Variablennamen stammen aus dem Baukasten-Design und werden von allen Seiten genutzt.
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  --ground: #f3f2ee;
+  --ground: #fbfbf8;
   --surface: #ffffff;
-  --surface-sunken: #f0eee8;
-  --grid: #e7e4dc;
-  --line: #e3e0d8;
-  --line-strong: #85817a;
-  --ink: #191919;
-  --ink-muted: #5a5750;
-  --edge: #191919;
-  --primary: #191919;
+  --surface-sunken: #f2f4f7;
+  --grid: #e6ebf2;
+  --line: #e3e6eb;
+  --line-strong: #8a93a1;
+  --ink: #1b2433;
+  --ink-muted: #5b6472;
+  --edge: #1b2433;
+  --primary: #1d3f9e;
   --on-primary: #ffffff;
-  --primary-ink: #1a56db;
-  --primary-soft: #ebe8df;
-  --highlight: #ffcf33;
-  --on-highlight: #191919;
+  --primary-ink: #1d3f9e;
+  --primary-soft: #e8edf8;
+  --highlight: #ffe58a;
+  --on-highlight: #1b2433;
   --correct: #2f9e5b;
   --correct-ink: #1e6b3d;
   --correct-soft: #dcf5e3;
@@ -35,23 +36,24 @@
   --wrong-soft: #fde2e2;
   --hint: #8a5a00;
   --hint-soft: #fff4cc;
-  --focus: #1a56db;
-  --area-rechnen: #ffcf33;
-  --area-finanz: #7ed6a5;
-  --area-linear: #8ec5ff;
-  --area-quadrat: #ff9f80;
-  --area-daten: #c9b6ff;
-  --area-raum: #ffb3d1;
-  --area-trigo: #6fd6d6;
-  --on-area: #191919;
-  --radius-sm: 12px;
-  --radius: 24px;
-  --shadow-hard: 0 4px 0 #191919;
-  --shadow-hard-sm: 0 3px 0 #191919;
+  --focus: #1d3f9e;
+  /* Bereiche haben im Heft-Design keine eigene Farbe mehr */
+  --area-rechnen: #ffffff;
+  --area-finanz: #ffffff;
+  --area-linear: #ffffff;
+  --area-quadrat: #ffffff;
+  --area-daten: #ffffff;
+  --area-raum: #ffffff;
+  --area-trigo: #ffffff;
+  --on-area: #1b2433;
+  --radius-sm: 10px;
+  --radius: 14px;
+  --shadow-hard: none;
+  --shadow-hard-sm: none;
   --touch-min: 48px;
-  --touch-primary: 56px;
-  --font-body: 'Figtree Variable', Figtree, 'Segoe UI', system-ui, sans-serif;
-  --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --touch-primary: 52px;
+  --font-body: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
 
   /* Alte Variablen, von bestehenden Seiten genutzt – auf Baukasten-Werte gelegt */
   --accent: var(--primary-ink);
@@ -66,11 +68,14 @@ html { background: var(--ground); }
 body {
   margin: 0;
   background-color: var(--ground);
+  /* Karopapier */
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 20px 20px;
   color: var(--ink);
   font-family: var(--font-body);
   -webkit-tap-highlight-color: transparent;
 }
-h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; }
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: 0; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 button, a, input, select, textarea { touch-action: manipulation; }
 
@@ -84,22 +89,22 @@ button, a, input, select, textarea { touch-action: manipulation; }
   min-height: var(--touch-min); padding: 0 20px;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   font: 700 16px/1.1 var(--font-body); text-align: center;
-  border-radius: var(--radius-sm); border: 2px solid var(--edge);
+  border-radius: var(--radius-sm); border: 1.5px solid var(--edge);
   background: var(--surface); color: var(--ink);
   box-shadow: var(--shadow-hard-sm); cursor: pointer;
   transition: transform .08s ease, box-shadow .08s ease;
 }
 .bk-btn:hover { transform: translateY(-1px); }
-.bk-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--edge); }
+.bk-btn:active { transform: translateY(2px); box-shadow: none; }
 .bk-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 .bk-btn-primary { background: var(--primary); color: var(--on-primary); min-height: var(--touch-primary); font-size: 17px; }
 .bk-btn-ghost { border-color: transparent; box-shadow: none; background: transparent; color: var(--primary-ink); padding: 0 12px; }
 .bk-btn-ghost:active { box-shadow: none; }
 .bk-btn-sm { min-height: 40px; padding: 0 14px; font-size: 15px; }
 
-.bk-card { background: var(--surface); border: 2px solid var(--edge); border-radius: var(--radius); box-shadow: var(--shadow-hard); }
+.bk-card { background: var(--surface); border: 1.5px solid var(--edge); border-radius: var(--radius); box-shadow: var(--shadow-hard); }
 .bk-label { font: 700 13px/1.3 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-muted); }
-.bk-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 2px solid var(--edge); background: var(--surface); font: 700 13px/1 var(--font-body); color: var(--ink); }
+.bk-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 1.5px solid var(--edge); background: var(--surface); font: 700 13px/1 var(--font-body); color: var(--ink); }
 
 .bk-fb { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--radius-sm); border: 2px dashed transparent; font-size: 16px; line-height: 1.45; }
 .bk-fb-ok { background: var(--correct-soft); border-color: var(--correct); }
@@ -112,15 +117,15 @@ button, a, input, select, textarea { touch-action: manipulation; }
 .generator-button {
   display: inline-flex; align-items: center; justify-content: center; text-align: center; gap: 0.35rem;
   min-height: var(--touch-min); padding: 0.55rem 1rem; font-size: 0.95rem; font-weight: 700; line-height: 1.2;
-  border-radius: var(--radius-sm); border: 2px solid var(--edge); box-shadow: var(--shadow-hard-sm);
+  border-radius: var(--radius-sm); border: 1.5px solid var(--edge); box-shadow: var(--shadow-hard-sm);
 }
 .generator-button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* Ältere Hilfsklassen */
-.btn-pill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: var(--touch-min); border-radius: var(--radius-sm); padding: 10px 18px; font-weight: 700; font-size: 15px; text-decoration: none; border: 2px solid var(--edge); box-shadow: var(--shadow-hard-sm); }
+.btn-pill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: var(--touch-min); border-radius: var(--radius-sm); padding: 10px 18px; font-weight: 700; font-size: 15px; text-decoration: none; border: 1.5px solid var(--edge); box-shadow: var(--shadow-hard-sm); }
 .btn-blue { background: var(--primary); color: var(--on-primary); }
 .btn-green { background: var(--correct-ink); color: #fff; }
-.btn-purple { background: var(--area-daten); color: var(--ink); }
+.btn-purple { background: var(--primary-soft); color: var(--primary-ink); }
 .ghost-link { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-muted); font-weight: 600; text-decoration: none; }
 .ghost-link:hover { color: var(--ink); }
 
