@@ -188,6 +188,12 @@ export const AREAS: Area[] = [
         ],
       },
       {
+        name: 'Anwenden',
+        items: [
+          { title: 'Anwendungsaufgaben', desc: 'Prüfungsaufgaben „Funktionaler Zusammenhang“ im Stil der Abschlussprüfung.', path: '/quadratische_funktionen/anwendungsaufgaben', icon: fa('person-running') },
+        ],
+      },
+      {
         name: 'Spielen und Testen',
         items: [
           { title: 'Spiel: Nullstellen finden', desc: 'Eine spielerische Anwendung zum Thema Nullstellen.', path: '/quadratische_funktionen/spiel_nullstellen', icon: fa('gamepad') },
@@ -299,7 +305,7 @@ export const EXAM = {
   parts: [
     { slug: 'rechnen-ohne-taschenrechner', title: 'Rechnen ohne Taschenrechner', desc: 'Teil A: Kopfrechenaufgaben üben oder als Prüfungsblock', path: '/abschlusspruefung/rechnen-ohne-taschenrechner' },
     { slug: 'finanzmathe', title: 'Finanzmathe', desc: 'Anwendungsaufgaben im Stil der Abschlussprüfung', path: '/finanzmathe/anwendungsaufgaben' },
-    { slug: 'funktionen', title: 'Funktionen', desc: 'Anwendungsaufgaben zu linearen Funktionen (quadratische folgen)', path: '/lineare_funktionen/anwendungsaufgaben' },
+    { slug: 'funktionen', title: 'Funktionen', desc: 'Anwendungsaufgaben zu quadratischen Funktionen aus Abschlussprüfungen', path: '/quadratische_funktionen/anwendungsaufgaben' },
     { slug: 'raum-und-form', title: 'Raum & Form', desc: 'Anwendungsaufgaben folgen' },
     { slug: 'daten-und-zufall', title: 'Daten & Zufall', desc: 'Anwendungsaufgaben im Stil der Abschlussprüfung', path: '/daten-und-zufall/anwendungsaufgaben' },
     { slug: 'trigonometrie', title: 'Trigonometrie', desc: 'Anwendungsaufgaben im Stil der Abschlussprüfung', path: '/trigonometrie/anwendungsaufgaben' },

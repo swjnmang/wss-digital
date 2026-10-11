@@ -37,6 +37,8 @@ import AreaPage from './pages/AreaPage'
 import GemischtesTraining from './pages/GemischtesTraining'
 import Abschlusspruefung, { AbschlusspruefungTeil } from './pages/abschlusspruefung/Abschlusspruefung'
 import RechnenOhneTR from './pages/abschlusspruefung/RechnenOhneTR'
+import AnwendungsaufgabenQF from './pages/quadratische_funktionen/anwendungsaufgaben/Uebersicht'
+import AnwendungSeiteQF from './pages/quadratische_funktionen/anwendungsaufgaben/AnwendungSeite'
 import AllesGemischt from './pages/abschlusspruefung/AllesGemischt'
 import Terme from './pages/rechnen_lernen/Terme'
 import Brueche from './pages/rechnen_lernen/Brueche'
@@ -296,6 +298,8 @@ export default function App() {
           <Route path="/quadratische_funktionen/schnittpunkte2" element={<Schnittpunkte2QF />} />
           <Route path="/quadratische_funktionen/spiel_nullstellen" element={<SpielNullstellenQF />} />
           <Route path="/quadratische_funktionen/abschlusstest" element={<AbschlusstestQF />} />
+          <Route path="/quadratische_funktionen/anwendungsaufgaben" element={<AnwendungsaufgabenQF />} />
+          <Route path="/quadratische_funktionen/anwendungsaufgaben/:slug" element={<AnwendungSeiteQF />} />
           
           <Route path="/trigonometrie" element={<AreaPage id="trigo" />} />
           <Route path="/trigonometrie/rechtwinklig-beschriften" element={<RechtwinkligBeschriften />} />
