@@ -25,3 +25,20 @@ Stand: 2026-10-11 · löst das Baukasten-Design ab. Entwürfe: https://claude.ai
 - `components/layout/ContentIndex.tsx` (Inhaltsverzeichnis), `BottomNav.tsx`, `TaskShell.tsx` (Pfad + Nummer),
   `MenuPage.tsx`, `pages/Home.tsx`, `pages/AreaPage.tsx` (Seitenleiste ab 900 px), `pages/Abschlusspruefung.tsx`.
 - Offene Idee: „Mathe-Stadt“ als zweite, spielerische Navigation (Skizze im Entwurf).
+
+## Vorbereitung Abschlussprüfung (Stand 2026-10-11)
+- Aufbau wie die AP: **Teil A** ohne Taschenrechner (15 Punkte: Block ohne Wahlmöglichkeit 7 P. + zwei von drei Wahlblöcken
+  Trigonometrie / Daten und Zufall / Raum und Form je 4 P., 25 Min.), **Teil B** mit Taschenrechner (je Bereich 15 P.).
+- **Rechnen ohne Taschenrechner** (`pages/abschlusspruefung/RechnenOhneTR.tsx`): Üben (nach Themen filterbar) und
+  Prüfungsblock Teil A (`kopfrechnen/TeilA.tsx`, Aufgaben werden je Block zufällig auf genau 7 bzw. 4 Punkte gezogen).
+  - Aufgabenpool: `kopfrechnen/aufgabenAP.ts` (Originale AP 2017–2019 und 2026, ohne Foto-/Kartenaufgaben, Skizzen
+    nachgezeichnet in `kopfrechnen/figuren.tsx`) und `kopfrechnen/aufgabenNeu.ts` (neue Aufgaben). Thema → Block über `blockVon`.
+  - Aufgabentypen: Auswahl A–D (`mc`), Zahlenfelder (`num`, auch w/f-Auswahl), Begründen/Schätzen (`self`: Musterlösung +
+    Selbsteinschätzung „stimmt / stimmt nicht“). Formeln in `$…$` (KaTeX), Rechenwege nach Merkhilfe.
+  - Neue Aufgaben einfach im Array ergänzen; Zahleneingaben akzeptieren Komma, Punkt, Tausenderpunkte und Brüche.
+- **Prüfungsteile Finanzmathe, Funktionen, Daten & Zufall, Trigonometrie** führen zu den bestehenden Anwendungsaufgaben
+  (`EXAM.parts` in `data/areas.ts`); Raum & Form sowie quadratische Funktionen folgen (Nutzer erstellt sie).
+- **Alles gemischt** (`AllesGemischt.tsx`): Probe-AP als Prüfungsmappe – Teil A direkt auf der Seite, Teil B je Bereich eine
+  zufällige Anwendungsaufgabe (neuer Tab, abhaken, Punkte eintragen), 150 Min., nur sessionStorage. Neue Teil-B-Aufgaben in
+  `TEIL_B` eintragen.
+- Unter `/abschlusspruefung` ist die automatische Prüfung aus (URL enthält „pruefung“); die Seiten haben eigene Prüfen-Knöpfe.
