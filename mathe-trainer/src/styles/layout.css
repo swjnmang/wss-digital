@@ -46,9 +46,11 @@
 
 /* ── Inhaltsverzeichnis (Startseite, Seitenleiste der Bereiche) ─────────── */
 .bk-home { max-width: 960px; }
-.bk-home-search { width: 100%; min-height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 16px; border: 1.5px solid var(--edge); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink-muted); font: 400 16px/1.2 var(--font-body); text-align: left; cursor: pointer; }
-.bk-home-search i { color: var(--ink); }
 .bk-index-label { display: block; margin: 22px 0 8px; font: 700 13px/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); }
+.bk-index-label-top { margin-top: 4px; }
+/* Prüfungskapitel: wie die anderen Zeilen, nur durch eine Linie abgesetzt */
+.bk-index-row.is-exam { border-top: 1.5px solid var(--edge); }
+.bk-index-row.is-exam .bk-index-no { color: var(--primary-ink); }
 .bk-index { display: flex; flex-direction: column; overflow: hidden; background: var(--surface); border: 1.5px solid var(--edge); border-radius: var(--radius-sm); }
 .bk-index-row { min-height: 60px; display: flex; align-items: center; gap: 14px; padding: 8px 16px; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }
 .bk-index-row:last-child { border-bottom: 0; }
@@ -60,16 +62,10 @@
 .bk-index-text small { font-size: 14px; line-height: 1.3; color: var(--ink-muted); }
 .bk-index-dots { flex: 1; min-width: 16px; align-self: center; margin-top: 8px; border-bottom: 2px dotted var(--line-strong); opacity: .6; }
 .bk-index-count { flex: none; font-size: 14px; color: var(--ink-muted); }
-.bk-index-row.is-exam { background: var(--primary); color: var(--on-primary); }
-.bk-index-row.is-exam:hover { background: #183585; }
-.bk-index-row.is-exam .bk-index-no, .bk-index-row.is-exam i { color: var(--on-primary); }
-.bk-index-row.is-exam .bk-index-text strong { color: var(--on-primary); }
-.bk-index-row.is-exam .bk-index-text small { color: #dbe3f6; }
 .bk-index-row > i.fa-chevron-right { margin-left: auto; font-size: 14px; color: var(--line-strong); }
 @media (max-width: 640px) {
   .bk-index-row { padding: 8px 14px; gap: 12px; }
   .bk-index-text small { display: none; }
-  .bk-index-row.is-exam .bk-index-text small { display: block; }
 }
 
 /* ── Bereichsseiten: Seitenleiste + Themen ──────────────────────────────── */
