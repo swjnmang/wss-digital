@@ -35,7 +35,9 @@ import { Analytics } from '@vercel/analytics/react';
 import Home from './pages/Home'
 import AreaPage from './pages/AreaPage'
 import GemischtesTraining from './pages/GemischtesTraining'
-import Abschlusspruefung, { AbschlusspruefungTeil } from './pages/Abschlusspruefung'
+import Abschlusspruefung, { AbschlusspruefungTeil } from './pages/abschlusspruefung/Abschlusspruefung'
+import RechnenOhneTR from './pages/abschlusspruefung/RechnenOhneTR'
+import AllesGemischt from './pages/abschlusspruefung/AllesGemischt'
 import Terme from './pages/rechnen_lernen/Terme'
 import Brueche from './pages/rechnen_lernen/Brueche'
 import Potenzen from './pages/rechnen_lernen/Potenzen'
@@ -344,6 +346,8 @@ export default function App() {
 
           <Route path="/gemischtes-training" element={<GemischtesTraining />} />
           <Route path="/abschlusspruefung" element={<Abschlusspruefung />} />
+          <Route path="/abschlusspruefung/rechnen-ohne-taschenrechner" element={<RechnenOhneTR />} />
+          <Route path="/abschlusspruefung/alles-gemischt" element={<AllesGemischt />} />
           <Route path="/abschlusspruefung/:teil" element={<AbschlusspruefungTeil />} />
           <Route path="/impressum" element={<Impressum />} />
 

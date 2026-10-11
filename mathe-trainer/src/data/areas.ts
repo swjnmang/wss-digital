@@ -287,21 +287,25 @@ export const areaById = (id: AreaId) => AREAS.find((a) => a.id === id) as Area
 /** Kapitelnummer eines Bereichs im Inhaltsverzeichnis (1 = erster Bereich). */
 export const areaNumber = (a: Area) => AREAS.indexOf(a) + 1
 
-/** Vorbereitung Abschlussprüfung: Kapitel nach den Bereichen. Inhalte folgen später. */
+/**
+ * Vorbereitung Abschlussprüfung: Kapitel nach den Bereichen.
+ * Teil A = Rechnen ohne Taschenrechner; die übrigen Teile führen zu den Anwendungsaufgaben (Teil B, aus alten Prüfungen).
+ * `path` fehlt = Inhalt folgt (Platzhalterseite).
+ */
 export const EXAM = {
   title: 'Vorbereitung Abschlussprüfung',
   short: 'Alle Prüfungsteile, sortiert nach Bereich',
   path: '/abschlusspruefung',
   parts: [
-    { slug: 'rechnen-ohne-taschenrechner', title: 'Rechnen ohne Taschenrechner' },
-    { slug: 'finanzmathe', title: 'Finanzmathe' },
-    { slug: 'funktionen', title: 'Funktionen' },
-    { slug: 'raum-und-form', title: 'Raum & Form' },
-    { slug: 'daten-und-zufall', title: 'Daten & Zufall' },
-    { slug: 'trigonometrie', title: 'Trigonometrie' },
-  ],
-  /** „Alles gemischt“ führt vorerst zum Gemischten Training */
-  mixedPath: '/gemischtes-training',
+    { slug: 'rechnen-ohne-taschenrechner', title: 'Rechnen ohne Taschenrechner', desc: 'Teil A: Kopfrechenaufgaben üben oder als Prüfungsblock', path: '/abschlusspruefung/rechnen-ohne-taschenrechner' },
+    { slug: 'finanzmathe', title: 'Finanzmathe', desc: 'Anwendungsaufgaben im Stil der Abschlussprüfung', path: '/finanzmathe/anwendungsaufgaben' },
+    { slug: 'funktionen', title: 'Funktionen', desc: 'Anwendungsaufgaben zu linearen Funktionen (quadratische folgen)', path: '/lineare_funktionen/anwendungsaufgaben' },
+    { slug: 'raum-und-form', title: 'Raum & Form', desc: 'Anwendungsaufgaben folgen' },
+    { slug: 'daten-und-zufall', title: 'Daten & Zufall', desc: 'Anwendungsaufgaben im Stil der Abschlussprüfung', path: '/daten-und-zufall/anwendungsaufgaben' },
+    { slug: 'trigonometrie', title: 'Trigonometrie', desc: 'Anwendungsaufgaben im Stil der Abschlussprüfung', path: '/trigonometrie/anwendungsaufgaben' },
+  ] as { slug: string; title: string; desc: string; path?: string }[],
+  /** „Alles gemischt“: vollständige Probe-Abschlussprüfung (Prüfungsmappe) */
+  mixedPath: '/abschlusspruefung/alles-gemischt',
 }
 
 /** Bereich zu einem Pfad, z. B. für die Bereichsfarbe in Kopfzeilen von Übungsseiten. */

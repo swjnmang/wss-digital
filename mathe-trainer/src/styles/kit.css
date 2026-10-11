@@ -46,3 +46,20 @@ input[data-check="no"], select[data-check="no"], textarea[data-check="no"] { bor
 /* Von der Seite gesetzt (fieldCheckClass in utils/fieldCheck.ts) – gewinnt gegen andere Rahmen-/Hintergrundklassen */
 .bk-field-ok { border-color: var(--correct) !important; background-color: var(--correct-soft) !important; color: var(--correct-ink) !important; }
 .bk-field-no { border-color: var(--wrong) !important; background-color: var(--wrong-soft) !important; color: var(--wrong-ink) !important; }
+
+/* Kopfrechenaufgaben (Vorbereitung Abschlussprüfung) */
+.bk-ka-text { font-size: 17px; }
+.bk-ka-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .bk-ka-options { grid-template-columns: minmax(0, 1fr); } }
+.bk-ka-option { justify-content: flex-start; text-align: left; min-height: 56px; font-weight: 400; }
+.bk-ka-option b { flex: none; width: 28px; height: 28px; border-radius: 8px; background: var(--primary-soft); color: var(--primary-ink); display: inline-flex; align-items: center; justify-content: center; font: 700 15px/1 var(--font-body); }
+.bk-ka-option.bk-choice-on { outline-color: var(--primary); }
+.bk-ka-fields { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+.bk-ka-field { display: inline-flex; align-items: center; gap: 8px; font-size: 17px; }
+.bk-ka-input { width: 150px; text-align: right; }
+.bk-ka-unit { color: var(--ink-muted); }
+.bk-ka-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.bk-topic.is-wide { grid-column: 1 / -1; }
+.bk-ka-teilb { flex-wrap: wrap; cursor: default; }
+.bk-ka-teilb .bk-topic-text { flex: 1 1 180px; }
+@media (max-width: 640px) { .bk-ka-teilb > .bk-actions { width: 100%; padding-left: 48px; } }

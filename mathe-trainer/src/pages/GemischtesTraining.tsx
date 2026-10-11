@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
-import { AREAS, EXAM, type AreaId } from '../data/areas'
+import { AREAS, type AreaId } from '../data/areas'
 import { drawTraining, trainingPool, type TrainingItem } from '../data/training'
 
 // Gemischtes Training: 10 Übungen aus allen (oder ausgewählten) Bereichen, jedes Mal neu gemischt.
@@ -76,9 +76,7 @@ export default function GemischtesTraining() {
           <nav className="bk-crumbs" aria-label="Pfad">
             <Link to="/">Inhalt</Link>
             <span className="bk-crumb-sep" aria-hidden="true">/</span>
-            <Link to={EXAM.path}>{EXAM.title}</Link>
-            <span className="bk-crumb-sep" aria-hidden="true">/</span>
-            <span>Alles gemischt</span>
+            <span>Gemischtes Training</span>
           </nav>
           <h1>{COUNT} Übungen aus allen Bereichen</h1>
           <p className="bk-task-sub">Jedes Mal neu gemischt. Öffne eine Übung, löse ein paar Aufgaben und komm hierher zurück.</p>
