@@ -391,9 +391,9 @@ function GraphTaskCard({ number, onSolvedChange, onResult, onHelp, level }: Card
         <div className="border border-slate-200 rounded-lg p-4 mb-4 bg-slate-50">
           <p className="text-sm font-semibold text-slate-700 mb-2">Punkt {selectedPoints.length + 1}: (x | y)</p>
           <div className="flex flex-wrap items-center justify-center gap-2">
-            <input type="number" step="0.1" value={pointInput.x} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPointInput({ ...pointInput, x: e.target.value })} className={coordCls} placeholder="x" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={pointInput.x} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPointInput({ ...pointInput, x: e.target.value })} className={coordCls} placeholder="x" />
             <span className="text-slate-500">|</span>
-            <input type="number" step="0.1" value={pointInput.y} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPointInput({ ...pointInput, y: e.target.value })} className={coordCls} placeholder="y" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={pointInput.y} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPointInput({ ...pointInput, y: e.target.value })} className={coordCls} placeholder="y" />
             <button onClick={() => addPoint(selectedPoints.length === 0 ? 1 : 2)} className={btnPrimary}>
               Punkt {selectedPoints.length + 1} annehmen
             </button>
