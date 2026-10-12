@@ -9,11 +9,13 @@ interface Props {
   currentId?: AreaId
   /** Kurzbeschreibung unter dem Titel zeigen (Startseite) */
   showShort?: boolean
+  /** Startseite: Bereichsglyphe statt Nummer, Prüfungsvorbereitung steht dort separat unter „Weitere Themen“ */
+  home?: boolean
 }
 
-export default function ContentIndex({ currentId, showShort = false }: Props) {
+export default function ContentIndex({ currentId, showShort = false, home = false }: Props) {
   return (
-    <nav className="bk-index" aria-label="Inhalt">
+    <nav className={`bk-index${home ? ' bk-index-home' : ''}`} aria-label="Inhalt">
       {AREAS.map((a, i) => (
         <Link
           key={a.id}
@@ -21,7 +23,11 @@ export default function ContentIndex({ currentId, showShort = false }: Props) {
           className={`bk-index-row${a.id === currentId ? ' is-current' : ''}`}
           aria-current={a.id === currentId ? 'page' : undefined}
         >
-          <span className="bk-index-no">{i + 1}</span>
+          {home ? (
+            <span className="bk-index-glyph" aria-hidden="true">{a.glyph}</span>
+          ) : (
+            <span className="bk-index-no">{i + 1}</span>
+          )}
           <span className="bk-index-text">
             <strong>{a.title}</strong>
             {showShort && <small>{a.short}</small>}
@@ -30,6 +36,7 @@ export default function ContentIndex({ currentId, showShort = false }: Props) {
           <span className="bk-index-count">{exerciseCount(a)}<span className="sr-only"> {a.unit}</span></span>
         </Link>
       ))}
+      {!home && <>
       <Link to={EXAM.path} className="bk-index-row is-exam">
         <span className="bk-index-no"><i className="fa-solid fa-graduation-cap" aria-hidden="true" /></span>
         <span className="bk-index-text">
@@ -46,6 +53,7 @@ export default function ContentIndex({ currentId, showShort = false }: Props) {
         </span>
         <i className="fa-solid fa-chevron-right" aria-hidden="true" />
       </Link>
+      </>}
     </nav>
   )
 }
