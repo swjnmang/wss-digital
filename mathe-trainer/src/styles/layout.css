@@ -119,11 +119,7 @@
 
 /* ── Bereichsseiten: Seitenleiste + Themen ──────────────────────────────── */
 .bk-area { display: flex; gap: 28px; align-items: flex-start; }
-.bk-area-side { width: 340px; flex: none; position: sticky; top: 88px; }
-.bk-area-side .bk-index-label { margin-top: 0; }
-.bk-area-side .bk-index-row { min-height: 54px; }
 .bk-area-main { flex: 1; min-width: 0; }
-@media (max-width: 899px) { .bk-area-side { display: none; } }
 .bk-chapter { font: 700 15px/1 var(--font-body); color: var(--primary-ink); }
 .bk-area-title { margin: 6px 0 4px; font: 700 clamp(26px, 3.2vw, 32px)/1.15 var(--font-display); color: var(--ink); text-align: left; }
 .bk-area-short { margin: 0 0 6px; font-size: 16px; color: var(--ink-muted); text-align: left; }
@@ -250,7 +246,7 @@ a.bk-tile:hover, button.bk-tile:hover { background: var(--surface-sunken); }
   body, html { background: #ffffff; }
   .bk-header, .bk-bottomnav, .bk-keypad, .bk-task-actions, .bk-overlay, .bk-modal-backdrop, .bk-card.fixed { display: none !important; }
   .bk-page { max-width: none; padding: 0; }
-  .bk-bottomnav, .bk-area-side { display: none !important; }
+  .bk-bottomnav { display: none !important; }
   body { background-image: none; }
   .bk-panel, .bk-card, .bk-tile-ex, .bk-btn, .bk-choice { box-shadow: none !important; }
   .bk-panel, .bk-card { break-inside: avoid; }
