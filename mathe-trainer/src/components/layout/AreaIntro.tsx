@@ -154,8 +154,8 @@ const INTROS: Record<AreaId, Intro> = {
   daten: {
     heading: 'Darum geht’s in diesem Kapitel',
     text: [
-      <>Wie wahrscheinlich ist ein Sechser beim Würfeln, ein Gewinn beim Glücksrad oder zweimal Kopf beim Münzwurf? Wahrscheinlichkeiten beschreiben, wie oft ein Ergebnis <strong>auf lange Sicht</strong> eintritt.</>,
-      <>Bei mehrstufigen Versuchen hilft dir das <strong>Baumdiagramm</strong>: Entlang eines Pfades wird multipliziert.</>,
+      <>Dieses Kapitel ist ein <strong>Lernpfad</strong>: Arbeite die Schritte der Reihe nach durch. Jeder Schritt erklärt dir das Thema mit Merkkasten und Beispiel, danach übst du mit immer neuen Aufgaben.</>,
+      <>Zuerst wertest du <strong>Daten</strong> aus (Häufigkeiten, Diagramme, Kennwerte), dann berechnest du <strong>Wahrscheinlichkeiten</strong> mit Baumdiagramm und Pfadregeln. Am Ende prüft dich der Abschluss-Check.</>,
     ],
     formula: <>P(E) = <Frac top={<span style={{ color: A }}>günstige</span>} bottom={<span style={{ color: B }}>mögliche</span>} /></>,
     noteA: <>Ergebnisse,<br />die zu E passen</>,

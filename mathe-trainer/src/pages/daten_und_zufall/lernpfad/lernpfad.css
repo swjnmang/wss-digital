@@ -1,0 +1,132 @@
+/* Lernpfad „Daten und Zufall“ – nur Farben aus den Tokens */
+
+.lp { display: flex; flex-direction: column; gap: 22px; }
+
+/* Schrittleiste */
+.lp-steps { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.lp-steps a {
+  display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;
+  border-radius: 999px; border: 1.5px solid var(--line-strong); background: var(--surface);
+  color: var(--ink-muted); font: 700 15px/1 var(--font-display); text-decoration: none;
+}
+.lp-steps a:hover { background: var(--primary-soft); color: var(--ink); }
+.lp-step-done a { border-color: var(--primary); color: var(--primary-ink); }
+.lp-step-on a { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+
+.lp-goal {
+  display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--radius);
+  background: var(--primary-soft); color: var(--ink); font-size: 17px; line-height: 1.5;
+}
+.lp-goal > i { color: var(--primary-ink); margin-top: 4px; }
+
+/* Abschnitte */
+.lp-section { display: flex; flex-direction: column; gap: 16px; }
+.lp-h2 { display: flex; align-items: center; gap: 12px; margin: 10px 0 0; font: 800 23px/1.2 var(--font-display); color: var(--ink); }
+.lp-h2-no {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 8px;
+  border-radius: 10px; background: var(--ink); color: var(--surface); font-size: 18px;
+}
+.lp-section p { margin: 0; font-size: 17px; line-height: 1.6; color: var(--ink); }
+.lp-grid2 { display: grid; gap: 16px; }
+@media (min-width: 900px) { .lp-grid2 { grid-template-columns: 1fr 1fr; } }
+
+/* Merkkasten */
+.lp-merke { border: 2px solid var(--primary); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.lp-merke-title { padding: 10px 16px; background: var(--primary); color: var(--on-primary); font: 800 17px/1.2 var(--font-display); }
+.lp-merke-body { padding: 14px 18px; font-size: 17px; line-height: 1.6; color: var(--ink); display: flex; flex-direction: column; gap: 10px; }
+.lp-merke-body p { margin: 0; }
+.lp-merke-body ul { margin: 0; padding-left: 22px; }
+.lp-merke-body .katex-display { margin: 6px 0; }
+
+.lp-howto { border-radius: var(--radius); background: var(--surface-sunken); padding: 14px 18px; }
+.lp-howto-title { font: 800 17px/1.2 var(--font-display); margin-bottom: 8px; color: var(--ink); }
+.lp-howto ol { margin: 0; padding-left: 24px; display: flex; flex-direction: column; gap: 6px; font-size: 17px; line-height: 1.5; }
+
+.lp-warn { border-radius: var(--radius); background: var(--hint-soft); padding: 14px 18px; }
+.lp-warn-title { font: 800 17px/1.2 var(--font-display); margin-bottom: 8px; color: var(--hint); }
+.lp-warn ul { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 16px; line-height: 1.5; }
+
+/* Beispiel */
+.lp-example { border: 1.5px dashed var(--line-strong); border-radius: var(--radius); padding: 16px 18px; background: var(--surface); display: flex; flex-direction: column; gap: 12px; }
+.lp-example-title { font: 800 18px/1.2 var(--font-display); color: var(--hint); }
+.lp-example-task { font-size: 17px; line-height: 1.55; }
+.lp-example-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.lp-example-steps li { border-left: 4px solid var(--primary); padding: 6px 0 6px 14px; animation: lp-in .25s ease; }
+.lp-example-step-title { font: 800 16px/1.3 var(--font-display); color: var(--primary-ink); margin-bottom: 4px; }
+.lp-example-step-body { font-size: 17px; line-height: 1.55; overflow-x: auto; }
+@keyframes lp-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+/* Übungen */
+.lp-exlist { display: flex; flex-direction: column; gap: 18px; }
+.lp-ex { display: flex; flex-direction: column; gap: 14px; }
+.lp-ex-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.lp-ex-title { display: flex; align-items: center; gap: 10px; margin: 0; font: 800 19px/1.25 var(--font-display); color: var(--ink); }
+.lp-ex-no {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 30px; padding: 0 6px;
+  border-radius: 8px; border: 1.5px solid var(--edge); font-size: 15px;
+}
+.lp-level { color: var(--hint); letter-spacing: 1px; white-space: nowrap; }
+.lp-level-off { color: var(--line); }
+.lp-ex-prompt { font-size: 17px; line-height: 1.6; color: var(--ink); display: flex; flex-direction: column; gap: 10px; }
+.lp-ex-prompt p { margin: 0; }
+.lp-fields { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; }
+.lp-field { display: flex; flex-direction: column; gap: 6px; }
+.lp-field-wide { flex-basis: 100%; }
+.lp-label { font: 700 15px/1.3 var(--font-body); color: var(--ink-muted); }
+.lp-num { display: inline-flex; align-items: center; gap: 6px; }
+.lp-input { text-align: center; }
+.lp-input-sm { width: 76px; min-height: 44px; font-size: 18px; padding: 4px 6px; }
+.lp-input-md { width: 140px; }
+.lp-input-lg { width: 200px; }
+.lp-unit { font: 700 17px/1 var(--font-body); color: var(--ink-muted); }
+.lp-select { min-width: 140px; font-size: 17px; }
+.lp-options { display: grid; gap: 10px; }
+@media (min-width: 700px) { .lp-options { grid-template-columns: 1fr 1fr; } }
+.lp-option { justify-content: flex-start; text-align: left; font-weight: 600; min-height: 56px; }
+.lp-hint { margin: 0; font-size: 15px; color: var(--ink-muted); }
+.lp-feedback { animation: lp-in .2s ease; }
+.lp-solution { margin-top: 0; font-size: 17px; line-height: 1.6; }
+.lp-solution p { margin: 0 0 8px; }
+.lp-solution .katex-display { margin: 6px 0; }
+
+.lp-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 6px; border-radius: 12px; border: 1.5px solid transparent; }
+.lp-chip {
+  min-width: 48px; min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1.5px solid var(--edge);
+  background: var(--surface); color: var(--ink); font: 700 17px/1 var(--font-display); cursor: pointer;
+}
+.lp-chip-on { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+
+/* Zahlenreihen und Tabellen */
+.lp-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.lp-cell {
+  min-width: 46px; padding: 6px 8px; border: 1.5px solid var(--line-strong); border-radius: 8px; background: var(--surface);
+  text-align: center; font: 700 17px/1.2 var(--font-display); font-variant-numeric: tabular-nums;
+}
+.lp-cell-on { background: var(--highlight); border-color: var(--edge); }
+.lp-table-wrap { overflow-x: auto; max-width: 100%; }
+.lp-table { border-collapse: collapse; font-size: 16px; white-space: nowrap; }
+.lp-table th, .lp-table td { border: 1.5px solid var(--line-strong); padding: 6px 10px; text-align: center; vertical-align: middle; }
+.lp-table thead th, .lp-table tbody th { background: var(--surface-sunken); font-weight: 700; }
+.lp-table tbody th { text-align: left; }
+.lp-table .lp-input-sm { width: 72px; }
+
+/* Diagramme */
+.lp-figure { max-width: 100%; overflow-x: auto; }
+.lp-figure svg { display: block; max-width: 100%; height: auto; }
+.lp-figure figcaption { font-size: 14px; color: var(--ink-muted); margin-top: 4px; }
+
+/* Baumdiagramm mit Eingabefeldern */
+.lp-tree { position: relative; width: 100%; min-width: 0; }
+.lp-tree-scroll { overflow-x: auto; max-width: 100%; }
+.lp-tree svg { display: block; width: 100%; height: auto; }
+.lp-tree-input { position: absolute; transform: translate(-50%, -50%); }
+.lp-tree-input .bk-input { width: 74px; min-height: 38px; padding: 2px 4px; font-size: 16px; text-align: center; }
+
+/* Navigation */
+.lp-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 10px; padding-top: 18px; border-top: 1.5px solid var(--line); }
+.lp-nav .bk-btn { text-decoration: none; white-space: normal; text-align: left; padding: 8px 18px; }
+
+.lp-score { font: 800 20px/1.3 var(--font-display); }
+
+/* lange Formeln auf schmalen Bildschirmen seitlich scrollen statt abschneiden */
+.lp .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }

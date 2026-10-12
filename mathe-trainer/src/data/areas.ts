@@ -1,4 +1,5 @@
 import { TOPICS } from '../pages/raum_und_form/registry'
+import { LESSONS, lessonPath, type Lesson } from '../pages/daten_und_zufall/lernpfad/lessons'
 
 // Zentrales Verzeichnis aller Bereiche und ihrer Übungen (Startseite, Bereichsseiten, Suche).
 // Titel und Beschreibungen stammen aus den bisherigen Bereichsseiten; Reihenfolge unverändert.
@@ -29,6 +30,8 @@ export interface Area {
 }
 
 const fa = (n: string) => `fa-solid fa-${n}`
+
+const lessonItem = (l: Lesson): Exercise => ({ title: l.title, desc: l.desc, path: lessonPath(l.slug), icon: fa(l.icon) })
 
 // Raum & Form: Themen kommen aus dem Register, damit neue Themen automatisch erscheinen
 const RAUM_ICONS: Record<string, string> = {
@@ -205,25 +208,26 @@ export const AREAS: Area[] = [
   {
     id: 'daten',
     title: 'Daten und Zufall',
-    short: 'Grundlagen der Wahrscheinlichkeit und Baumdiagramme.',
+    short: 'Ein Lernpfad in 9 Schritten: Daten auswerten, Kennwerte, Baumdiagramme und Pfadregeln.',
     glyph: 'P',
     path: '/daten-und-zufall',
     unit: 'Themen',
     sections: [
+      { name: 'Teil 1: Daten auswerten', items: LESSONS.filter((l) => l.part === 'daten').map(lessonItem) },
+      { name: 'Teil 2: Zufall und Wahrscheinlichkeit', items: LESSONS.filter((l) => l.part === 'zufall').map(lessonItem) },
       {
-        name: 'Grundlagen',
+        name: 'Testen und Anwenden',
         items: [
-          { title: 'Statistische Kennwerte', desc: 'Berechne Mittelwert, Median, Modalwert, Spannweite, Minimum und Maximum.', path: '/daten-und-zufall/statistische-kennwerte', icon: fa('chart-column') },
-          { title: 'Diagramme erstellen', desc: 'Erstelle Kreis-, Balken- und Säulendiagramme zu verschiedenen Themen.', path: '/daten-und-zufall/diagramme-erstellen', icon: fa('chart-pie') },
-          { title: 'Interaktives Baumdiagramm', desc: 'Erstelle Baumdiagramme interaktiv und berechne Wahrscheinlichkeiten.', path: '/daten-und-zufall/baumdiagramme2', icon: fa('sitemap') },
-          { title: 'Relative- und absolute Häufigkeit', desc: 'Lerne den Unterschied zwischen absoluter und relativer Häufigkeit mit praktischen Übungsaufgaben.', path: '/daten-und-zufall/relative-absolute-haeufigkeit', icon: fa('percent') },
-          { title: 'Wahrscheinlichkeiten berechnen', desc: '20 Aufgaben zu ein- und mehrstufigen Zufallsexperimenten mit Musterlösungen.', path: '/daten-und-zufall/wahrscheinlichkeiten', icon: fa('dice') },
+          ...LESSONS.filter((l) => l.part === 'test').map(lessonItem),
+          { title: 'Anwendungsaufgaben', desc: 'Prüfungsnahe Aufgaben mit Baumdiagrammen, Häufigkeiten und statistischen Kennwerten.', path: '/daten-und-zufall/anwendungsaufgaben', icon: fa('graduation-cap') },
         ],
       },
       {
-        name: 'Anwenden',
+        name: 'Mehr üben',
         items: [
-          { title: 'Anwendungsaufgaben', desc: 'Prüfungsnahe Aufgaben mit Baumdiagrammen, Häufigkeiten und statistischen Kennwerten.', path: '/daten-und-zufall/anwendungsaufgaben', icon: fa('graduation-cap') },
+          { title: 'Diagramme selbst zeichnen', desc: 'Erstelle Kreis-, Balken- und Säulendiagramme zu verschiedenen Themen.', path: '/daten-und-zufall/diagramme-erstellen', icon: fa('chart-pie') },
+          { title: 'Interaktives Baumdiagramm', desc: 'Erstelle Baumdiagramme interaktiv und berechne Wahrscheinlichkeiten.', path: '/daten-und-zufall/baumdiagramme2', icon: fa('sitemap') },
+          { title: 'Wahrscheinlichkeiten berechnen', desc: '20 Aufgaben zu ein- und mehrstufigen Zufallsexperimenten mit Musterlösungen.', path: '/daten-und-zufall/wahrscheinlichkeiten', icon: fa('dice') },
         ],
       },
     ],

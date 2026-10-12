@@ -156,6 +156,15 @@ import Elfmeterschiessen from './pages/daten_und_zufall/anwendungsaufgaben/Elfme
 import Sommerfest from './pages/daten_und_zufall/anwendungsaufgaben/Sommerfest';
 import Fahrradstation from './pages/daten_und_zufall/anwendungsaufgaben/Fahrradstation';
 import BioKiste from './pages/daten_und_zufall/anwendungsaufgaben/BioKiste';
+import LpDatenOrdnen from './pages/daten_und_zufall/lernpfad/DatenOrdnen';
+import LpHaeufigkeiten from './pages/daten_und_zufall/lernpfad/Haeufigkeiten';
+import LpDiagramme from './pages/daten_und_zufall/lernpfad/Diagramme';
+import LpKennwerte from './pages/daten_und_zufall/lernpfad/Kennwerte';
+import LpKennwerteBewerten from './pages/daten_und_zufall/lernpfad/KennwerteBewerten';
+import LpZufallsexperimente from './pages/daten_und_zufall/lernpfad/Zufallsexperimente';
+import LpBaumdiagramme from './pages/daten_und_zufall/lernpfad/Baumdiagramme';
+import LpPfadregeln from './pages/daten_und_zufall/lernpfad/Pfadregeln';
+import LpAbschlussCheck from './pages/daten_und_zufall/lernpfad/AbschlussCheck';
 // Raum und Form
 import RaumTopicIndex from './pages/raum_und_form/TopicIndex';
 import RaumPracticeRoute from './pages/raum_und_form/PracticeRoute';
@@ -331,6 +340,15 @@ export default function App() {
 
           {/* Daten und Zufall */}
           <Route path="/daten-und-zufall" element={<AreaPage id="daten" />} />
+          <Route path="/daten-und-zufall/daten-ordnen" element={<LpDatenOrdnen />} />
+          <Route path="/daten-und-zufall/haeufigkeiten" element={<LpHaeufigkeiten />} />
+          <Route path="/daten-und-zufall/diagramme" element={<LpDiagramme />} />
+          <Route path="/daten-und-zufall/kennwerte" element={<LpKennwerte />} />
+          <Route path="/daten-und-zufall/kennwerte-bewerten" element={<LpKennwerteBewerten />} />
+          <Route path="/daten-und-zufall/zufallsexperimente" element={<LpZufallsexperimente />} />
+          <Route path="/daten-und-zufall/baumdiagramme" element={<LpBaumdiagramme />} />
+          <Route path="/daten-und-zufall/pfadregeln" element={<LpPfadregeln />} />
+          <Route path="/daten-und-zufall/abschluss-check" element={<LpAbschlussCheck />} />
           <Route path="/daten-und-zufall/statistische-kennwerte" element={<StatistischeKennwerte />} />
           <Route path="/daten-und-zufall/diagramme-erstellen" element={<DiagrammeErstellen />} />
           <Route path="/daten-und-zufall/baumdiagramme2" element={<Baumdiagramme2 />} />
