@@ -295,6 +295,66 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://ws-mathe-trainer.vercel.app/daten-und-zufall/daten-ordnen</loc>
+    <lastmod>2026-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ws-mathe-trainer.vercel.app/daten-und-zufall/haeufigkeiten</loc>
+    <lastmod>2026-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ws-mathe-trainer.vercel.app/daten-und-zufall/diagramme</loc>
+    <lastmod>2026-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ws-mathe-trainer.vercel.app/daten-und-zufall/kennwerte</loc>
+    <lastmod>2026-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ws-mathe-trainer.vercel.app/daten-und-zufall/kennwerte-bewerten</loc>
+    <lastmod>2026-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ws-mathe-trainer.vercel.app/daten-und-zufall/zufallsexperimente</loc>
+    <lastmod>2026-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ws-mathe-trainer.vercel.app/daten-und-zufall/baumdiagramme</loc>
+    <lastmod>2026-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ws-mathe-trainer.vercel.app/daten-und-zufall/pfadregeln</loc>
+    <lastmod>2026-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ws-mathe-trainer.vercel.app/daten-und-zufall/abschluss-check</loc>
+    <lastmod>2026-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ws-mathe-trainer.vercel.app/daten-und-zufall/anwendungsaufgaben</loc>
+    <lastmod>2026-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://ws-mathe-trainer.vercel.app/raum-und-form</loc>
     <lastmod>2026-10-12</lastmod>
     <changefreq>monthly</changefreq>

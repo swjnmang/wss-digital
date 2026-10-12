@@ -77,6 +77,16 @@ const routes = [
 
   // Daten und Zufall
   { path: '/daten-und-zufall', priority: 0.8, changefreq: 'monthly' },
+  { path: '/daten-und-zufall/daten-ordnen', priority: 0.7, changefreq: 'monthly' },
+  { path: '/daten-und-zufall/haeufigkeiten', priority: 0.7, changefreq: 'monthly' },
+  { path: '/daten-und-zufall/diagramme', priority: 0.7, changefreq: 'monthly' },
+  { path: '/daten-und-zufall/kennwerte', priority: 0.7, changefreq: 'monthly' },
+  { path: '/daten-und-zufall/kennwerte-bewerten', priority: 0.7, changefreq: 'monthly' },
+  { path: '/daten-und-zufall/zufallsexperimente', priority: 0.7, changefreq: 'monthly' },
+  { path: '/daten-und-zufall/baumdiagramme', priority: 0.7, changefreq: 'monthly' },
+  { path: '/daten-und-zufall/pfadregeln', priority: 0.7, changefreq: 'monthly' },
+  { path: '/daten-und-zufall/abschluss-check', priority: 0.7, changefreq: 'monthly' },
+  { path: '/daten-und-zufall/anwendungsaufgaben', priority: 0.7, changefreq: 'monthly' },
 
   // Raum und Form
   { path: '/raum-und-form', priority: 0.8, changefreq: 'monthly' },
