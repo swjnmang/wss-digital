@@ -61,6 +61,8 @@ export interface PracticeConfig {
   slug: string;
   title: string;
   description: string;
+  /** kurze Erklärung des Themas (Absätze mit \n\n getrennt) */
+  intro?: Rich;
   /** Formeln aus der Merkhilfe (KaTeX) */
   formulas?: string[];
   example?: Example;

@@ -136,6 +136,9 @@ const routes = [
   { path: '/raum-und-form/anwendungsaufgaben/pruefungsaufgaben', priority: 0.6, changefreq: 'monthly' },
   { path: '/raum-und-form/anwendungsaufgaben/koerper-gemischt', priority: 0.6, changefreq: 'monthly' },
 
+  // Vorbereitung FOS/BOS (Unterseiten werden über die Übersicht verlinkt)
+  { path: '/fos-bos', priority: 0.9, changefreq: 'monthly' },
+
   // Sonstiges
   { path: '/excel-trainer', priority: 0.7, changefreq: 'monthly' },
   { path: '/impressum', priority: 0.5, changefreq: 'yearly' },

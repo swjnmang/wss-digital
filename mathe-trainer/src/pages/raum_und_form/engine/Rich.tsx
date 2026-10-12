@@ -25,7 +25,14 @@ export default function Rich({ text, className }: { text: string; className?: st
           {li > 0 && <br />}
           {line.split('$').map((seg, i) =>
             i % 2 === 1 ? (
-              <InlineMath key={`${li}-m${i}`} math={seg} />
+              seg.includes('\\begin') ? (
+                // breite Tabellen/Gleichungssysteme auf dem Handy seitlich scrollbar statt Seite zu verbreitern
+                <span key={`${li}-m${i}`} className="block max-w-full overflow-x-auto overflow-y-hidden py-1">
+                  <InlineMath math={seg} />
+                </span>
+              ) : (
+                <InlineMath key={`${li}-m${i}`} math={seg} />
+              )
             ) : (
               <Fragment key={`${li}-s${i}`}>{renderBold(seg, `${li}-${i}`)}</Fragment>
             ),

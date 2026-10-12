@@ -143,6 +143,12 @@ export function convert(x: number, from: UnitId, to: UnitId): number {
 export function parseNum(raw: string): number {
   let s = raw.trim().replace(/\s+/g, '').replace(/[−–—‐]/g, '-');
   if (s === '' || s === '-' || s === ',' || s === '.') return NaN;
+  // Bruch, z. B. 3/4 oder -5/12
+  const fr = /^(-?\d+(?:[.,]\d+)?)\/(-?\d+(?:[.,]\d+)?)$/.exec(s);
+  if (fr) {
+    const den = Number(fr[2].replace(',', '.'));
+    return den === 0 ? NaN : Number(fr[1].replace(',', '.')) / den;
+  }
   if (s.includes(',')) {
     s = s.replace(/\./g, '').replace(',', '.');
   } else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) {

@@ -159,6 +159,10 @@ import BioKiste from './pages/daten_und_zufall/anwendungsaufgaben/BioKiste';
 // Raum und Form
 import RaumTopicIndex from './pages/raum_und_form/TopicIndex';
 import RaumPracticeRoute from './pages/raum_und_form/PracticeRoute';
+// Vorbereitung FOS/BOS
+import FosOverview from './pages/fos/Overview';
+import FosTopicIndex from './pages/fos/TopicIndex';
+import FosPracticeRoute from './pages/fos/PracticeRoute';
 // Excel Trainer
 import { ExcelTrainer } from './pages/ExcelTrainer';
 // ... other imports will be added as files are created
@@ -344,6 +348,11 @@ export default function App() {
           <Route path="/raum-und-form" element={<AreaPage id="raum" />} />
           <Route path="/raum-und-form/:topic" element={<RaumTopicIndex />} />
           <Route path="/raum-und-form/:topic/:page" element={<RaumPracticeRoute />} />
+
+          {/* Vorbereitung FOS/BOS */}
+          <Route path="/fos-bos" element={<FosOverview />} />
+          <Route path="/fos-bos/:topic" element={<FosTopicIndex />} />
+          <Route path="/fos-bos/:topic/:page" element={<FosPracticeRoute />} />
 
           {/* Excel Trainer */}
           <Route path="/excel-trainer" element={<ExcelTrainer />} />

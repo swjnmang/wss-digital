@@ -13,7 +13,7 @@ interface Props {
   /** 'narrow' für reine Text-/Rechenaufgaben, 'wide' für Seiten mit Graph oder Tabelle */
   width?: 'narrow' | 'wide' | 'full'
   /** Zwischenebene unter dem Bereich, z. B. das Thema bei Raum & Form */
-  parent?: { to: string; label: string }
+  parent?: { to: string; label: string } | { to: string; label: string }[]
 }
 
 export default function TaskShell({ title, subtitle, actions, children, width = 'wide', parent }: Props) {
@@ -21,6 +21,7 @@ export default function TaskShell({ title, subtitle, actions, children, width = 
   const area = areaForPath(pathname)
   const ex = allExercises().find((e) => e.path === pathname)
   const no = area ? areaNumber(area) : undefined
+  const parents = Array.isArray(parent) ? parent : parent ? [parent] : []
 
   return (
     <div className={`bk-page bk-task bk-w-${width}`}>
@@ -34,12 +35,12 @@ export default function TaskShell({ title, subtitle, actions, children, width = 
                 <Link to={area.path}>{no} {area.title}</Link>
               </>
             )}
-            {parent && (
-              <>
+            {parents.map((p) => (
+              <span key={p.to} style={{ display: 'contents' }}>
                 <span className="bk-crumb-sep" aria-hidden="true">/</span>
-                <Link to={parent.to}>{parent.label}</Link>
-              </>
-            )}
+                <Link to={p.to}>{p.label}</Link>
+              </span>
+            ))}
           </nav>
           <h1>
             {ex && no && <span className="bk-num">{no}.{ex.number}</span>}
