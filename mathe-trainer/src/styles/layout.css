@@ -208,3 +208,4 @@ a.bk-tile:hover, button.bk-tile:hover { background: var(--surface-sunken); }
   .app-root main, .app-root.keypad-open main { padding-bottom: 0; }
   body { font-family: var(--font-body); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+.bk-index-row.is-fos { border-top: 1px solid var(--line); }

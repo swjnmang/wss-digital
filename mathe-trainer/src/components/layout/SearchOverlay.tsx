@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { allExercises } from '../../data/areas'
+import { allExercises, FOS } from '../../data/areas'
+import { FOS_BASE, FOS_TOPICS } from '../../pages/fos/registry'
 import AreaIcon from './AreaIcon'
+import type { AreaId } from '../../data/areas'
 
 const norm = (s: string) =>
   s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ß/g, 'ss')
@@ -18,7 +20,19 @@ export default function SearchOverlay({ open, onClose }: Props) {
   const [active, setActive] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const index = useMemo(
-    () => allExercises().map((e) => ({ ...e, hay: norm(`${e.title} ${e.desc} ${e.area.title} ${e.section}`) })),
+    () => [
+      ...allExercises().map((e) => ({
+        title: e.title, path: e.path, areaId: e.area.id as string | null, sub: `${e.area.title} · ${e.section}`,
+        hay: norm(`${e.title} ${e.desc} ${e.area.title} ${e.section}`),
+      })),
+      // Vorbereitung FOS/BOS
+      ...FOS_TOPICS.flatMap((t) =>
+        t.pages.map((pg) => ({
+          title: pg.title, path: `${FOS_BASE}/${t.slug}/${pg.slug}`, areaId: null as string | null, sub: `${FOS.title} · ${t.title}`,
+          hay: norm(`${pg.title} ${pg.description} ${FOS.title} FOS BOS ${t.title}`),
+        }))
+      ),
+    ],
     []
   )
 
@@ -84,10 +98,14 @@ export default function SearchOverlay({ open, onClose }: Props) {
               onMouseEnter={() => setActive(i)}
               onClick={() => go(r.path)}
             >
-              <span className="bk-glyph bk-glyph-sm" style={{ ['--area' as string]: `var(--area-${r.area.id})` }}><AreaIcon id={r.area.id} height={20} /></span>
+              {r.areaId ? (
+                <span className="bk-glyph bk-glyph-sm" style={{ ['--area' as string]: `var(--area-${r.areaId})` }}><AreaIcon id={r.areaId as AreaId} height={20} /></span>
+              ) : (
+                <span className="bk-glyph bk-glyph-sm"><i className="fa-solid fa-school" aria-hidden="true" /></span>
+              )}
               <span className="bk-search-text">
                 <strong>{r.title}</strong>
-                <small>{r.area.title} · {r.section}</small>
+                <small>{r.sub}</small>
               </span>
               <i className="fa-solid fa-chevron-right" aria-hidden="true" />
             </button>

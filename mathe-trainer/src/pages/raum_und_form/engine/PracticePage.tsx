@@ -74,11 +74,11 @@ function buildSlots(cfg: PracticeConfig, usedFixed: Set<Gen>): Slot[] {
 
 export function FormulaBox({ formulas }: { formulas: string[] }) {
   return (
-    <div className="rounded-2xl border-2 border-edge bg-sunken px-4 py-3">
+    <div className="min-w-0 rounded-2xl border-2 border-edge bg-sunken px-4 py-3">
       <p className="bk-label text-left mb-1 flex items-center gap-1.5">
         <BookOpen className="h-3.5 w-3.5" /> Merkhilfe
       </p>
-      <div className="space-y-0.5 text-[15px] [&_.katex-display]:my-1">
+      <div className="min-w-0 space-y-0.5 overflow-x-auto text-[15px] [&_.katex-display]:my-1 [&_.katex-display]:overflow-x-auto [&_.katex-display]:overflow-y-hidden">
         {formulas.map((f) => (
           <BlockMath key={f} math={f} />
         ))}
@@ -87,7 +87,16 @@ export function FormulaBox({ formulas }: { formulas: string[] }) {
   );
 }
 
-export default function PracticePage({ topic, cfg }: { topic: TopicConfig; cfg: PracticeConfig }) {
+interface PracticePageProps {
+  topic: TopicConfig;
+  cfg: PracticeConfig;
+  /** Pfad des Bereichs, unter dem die Themen liegen */
+  base?: string;
+  /** zusätzliche Pfad-Ebene vor dem Thema, z. B. „Vorbereitung FOS/BOS“ */
+  root?: { to: string; label: string };
+}
+
+export default function PracticePage({ topic, cfg, base = '/raum-und-form', root }: PracticePageProps) {
   const usedFixed = useMemo(() => new Set<Gen>(), []);
   const [slots, setSlots] = useState<Slot[]>(() => buildSlots(cfg, usedFixed));
   const [status, setStatus] = useState<Record<string, Status>>({});
@@ -122,7 +131,7 @@ export default function PracticePage({ topic, cfg }: { topic: TopicConfig; cfg: 
     <TaskShell
       title={cfg.title}
       width="full"
-      parent={{ to: `/raum-und-form/${topic.slug}`, label: topic.title }}
+      parent={[...(root ? [root] : []), { to: `${base}/${topic.slug}`, label: topic.title }]}
       actions={
         <>
           <span className="bk-chip" title="richtig gelöste Teilaufgaben">
@@ -137,15 +146,17 @@ export default function PracticePage({ topic, cfg }: { topic: TopicConfig; cfg: 
       }
     >
       <div className="space-y-4 text-left">
-        {(ex || cfg.formulas) && (
+        {(ex || cfg.formulas || cfg.intro) && (
           <section className="bk-panel !p-0">
             <button
               type="button"
               onClick={() => setExampleOpen((v) => !v)}
               className="flex w-full min-h-[56px] items-center gap-3 px-4 py-2 text-left sm:px-5"
             >
-              <span className="bk-chip">Beispiel</span>
-              <span className="flex-1 font-display text-lg font-extrabold text-ink">{ex?.title ?? 'Formeln'}</span>
+              <span className="bk-chip">{cfg.intro ? 'Erklärung' : 'Beispiel'}</span>
+              <span className="flex-1 font-display text-lg font-extrabold text-ink">
+                {cfg.intro ? cfg.title : (ex?.title ?? 'Formeln')}
+              </span>
               {exampleOpen ? (
                 <ChevronUp className="h-5 w-5 text-muted" />
               ) : (
@@ -153,9 +164,23 @@ export default function PracticePage({ topic, cfg }: { topic: TopicConfig; cfg: 
               )}
             </button>
             {exampleOpen && (
-              <div className="grid gap-4 border-t-2 border-edge px-4 pb-4 pt-3 sm:px-5 lg:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="grid grid-cols-1 gap-4 border-t-2 border-edge px-4 pb-4 pt-3 sm:px-5 lg:grid-cols-[minmax(0,1fr)_auto]">
+                {(ex || cfg.intro) && (
+                <div className="min-w-0 space-y-4">
+                {cfg.intro && (
+                  <div className="space-y-2 text-[16px] leading-relaxed text-ink">
+                    {cfg.intro.split('\n\n').map((para, i) => (
+                      <p key={i} className="text-left">
+                        <Rich text={para} />
+                      </p>
+                    ))}
+                  </div>
+                )}
                 {ex && (
-                  <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+                    <div className="md:col-span-2">
+                      {cfg.intro && <p className="bk-label text-left">Beispiel: {ex.title}</p>}
+                    </div>
                     <div className="space-y-2 text-[16px] leading-relaxed">
                       <p className="text-left text-ink">
                         <Rich text={ex.text} />
@@ -176,8 +201,10 @@ export default function PracticePage({ topic, cfg }: { topic: TopicConfig; cfg: 
                     {ex.figure && <div className="mx-auto w-full max-w-[280px]">{ex.figure}</div>}
                   </div>
                 )}
+                </div>
+                )}
                 {cfg.formulas && cfg.formulas.length > 0 && (
-                  <div className="lg:w-[300px]">
+                  <div className="min-w-0 lg:w-[300px]">
                     <FormulaBox formulas={cfg.formulas} />
                   </div>
                 )}
@@ -186,7 +213,7 @@ export default function PracticePage({ topic, cfg }: { topic: TopicConfig; cfg: 
           </section>
         )}
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 [&>*]:min-w-0">
           {slots.map((s, i) => (
             <TaskCard
               key={s.id}
@@ -210,7 +237,7 @@ export default function PracticePage({ topic, cfg }: { topic: TopicConfig; cfg: 
             <RotateCcw className="h-4 w-4" />
             Neue Aufgaben
           </button>
-          <Link to={`/raum-und-form/${topic.slug}`} className="bk-btn">
+          <Link to={`${base}/${topic.slug}`} className="bk-btn">
             Zur Themenübersicht
           </Link>
         </div>

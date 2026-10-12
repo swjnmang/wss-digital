@@ -314,6 +314,14 @@ export const EXAM = {
   mixedPath: '/abschlusspruefung/alles-gemischt',
 }
 
+/** Vorbereitung FOS/BOS: alle Lernbereiche der Vorklasse (Lehrplan Bayern), Seiten unter src/pages/fos */
+export const FOS = {
+  title: 'Vorbereitung FOS/BOS',
+  short: 'Alle Themen der Vorklasse: Logik, Gleichungen, Funktionen, Geometrie, Stochastik, Exponentialfunktion',
+  long: 'Alle acht Lernbereiche der Vorklasse (Mathematik, Bayern) mit Erklärung, Übungsaufgaben und Lösungswegen.',
+  path: '/fos-bos',
+}
+
 /** Bereich zu einem Pfad, z. B. für die Bereichsfarbe in Kopfzeilen von Übungsseiten. */
 export const areaForPath = (pathname: string): Area | undefined =>
   AREAS.find((a) => pathname === a.path || pathname.startsWith(a.path + '/'))

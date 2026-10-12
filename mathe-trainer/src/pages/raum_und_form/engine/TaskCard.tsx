@@ -5,6 +5,9 @@ import { checkNum, type CheckResult, type Status } from './check';
 import type { ChoicePart, NumPart, Task } from './types';
 import { UNIT_GROUPS, type UnitId } from './util';
 
+const PRAISE = ['Super, richtig!', 'Klasse, das stimmt!', 'Sehr gut gemacht!', 'Perfekt!', 'Stark, richtig gelöst!', 'Genau so!'];
+const praise = () => PRAISE[Math.floor(Math.random() * PRAISE.length)];
+
 const FIELD_STYLE: Record<Status, string> = {
   empty: 'border-edge bg-white',
   incomplete: 'border-amber-400 bg-amber-50',
@@ -21,7 +24,7 @@ function NumField({ part, onStatus }: { part: NumPart; onStatus: (s: Status) => 
   const commit = (r = raw, u = unit) => {
     window.clearTimeout(timer.current);
     const res = checkNum(part, r, u);
-    setShown(res);
+    setShown(res.status === 'correct' ? { ...res, msg: praise() } : res);
     onStatus(res.status);
   };
 
@@ -94,7 +97,13 @@ function NumField({ part, onStatus }: { part: NumPart; onStatus: (s: Status) => 
         {shown.status === 'wrong' && <X className="h-6 w-6 text-rose-600" aria-label="falsch" />}
       </div>
       {shown.msg && (
-        <p className={`text-sm ${shown.status === 'wrong' ? 'text-rose-700' : 'text-amber-700'}`}>{shown.msg}</p>
+        <p
+          className={`text-sm ${
+            shown.status === 'wrong' ? 'text-rose-700' : shown.status === 'correct' ? 'font-semibold text-emerald-700' : 'text-amber-700'
+          }`}
+        >
+          {shown.msg}
+        </p>
       )}
     </div>
   );
@@ -102,6 +111,7 @@ function NumField({ part, onStatus }: { part: NumPart; onStatus: (s: Status) => 
 
 function ChoiceField({ part, onStatus }: { part: ChoicePart; onStatus: (s: Status) => void }) {
   const [sel, setSel] = useState<number | null>(null);
+  const [msg, setMsg] = useState('');
   return (
     <div className="space-y-1.5">
       {part.q && (
@@ -123,6 +133,7 @@ function ChoiceField({ part, onStatus }: { part: ChoicePart; onStatus: (s: Statu
               type="button"
               onClick={() => {
                 setSel(i);
+                setMsg(i === part.correct ? praise() : 'Das stimmt noch nicht. Versuche es noch einmal.');
                 onStatus(i === part.correct ? 'correct' : 'wrong');
               }}
               className={`min-h-[48px] rounded-xl border-2 px-4 py-1.5 text-[16px] font-semibold shadow-hard-sm transition-colors ${cls}`}
@@ -132,6 +143,9 @@ function ChoiceField({ part, onStatus }: { part: ChoicePart; onStatus: (s: Statu
           );
         })}
       </div>
+      {sel !== null && msg && (
+        <p className={`text-sm ${sel === part.correct ? 'font-semibold text-emerald-700' : 'text-rose-700'}`}>{msg}</p>
+      )}
     </div>
   );
 }
@@ -152,7 +166,7 @@ export default function TaskCard({ task, index, onStatus, onRefresh }: TaskCardP
         <span className="bk-num !min-w-[36px]">
           {index + 1}
         </span>
-        <h3 className="text-left flex-1 pt-0.5 text-lg font-extrabold text-ink">{task.title}</h3>
+        <h3 className="text-left min-w-0 flex-1 hyphens-auto pt-0.5 text-lg font-extrabold text-ink [overflow-wrap:anywhere]">{task.title}</h3>
         {task.badge && (
           <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
             {task.badge}
@@ -164,7 +178,7 @@ export default function TaskCard({ task, index, onStatus, onRefresh }: TaskCardP
             onClick={onRefresh}
             title="Andere Aufgabe"
             aria-label="Andere Aufgabe"
-            className="bk-icon-btn !h-10 !w-10 !text-base"
+            className="bk-icon-btn shrink-0 !h-10 !w-10 !text-base"
           >
             <RefreshCw className="h-4 w-4" />
           </button>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { AREAS, EXAM, exerciseCount, type AreaId } from '../../data/areas'
+import { AREAS, EXAM, FOS, exerciseCount, type AreaId } from '../../data/areas'
 
 // Inhaltsverzeichnis im Heft-Design: Bereiche als nummerierte Kapitel, danach die Prüfungsvorbereitung.
 // Genutzt auf der Startseite und als Seitenleiste der Bereichsseiten (Tablet quer).
@@ -35,6 +35,14 @@ export default function ContentIndex({ currentId, showShort = false }: Props) {
         <span className="bk-index-text">
           <strong>{EXAM.title}</strong>
           {showShort && <small>{EXAM.short}</small>}
+        </span>
+        <i className="fa-solid fa-chevron-right" aria-hidden="true" />
+      </Link>
+      <Link to={FOS.path} className="bk-index-row is-exam is-fos">
+        <span className="bk-index-no"><i className="fa-solid fa-school" aria-hidden="true" /></span>
+        <span className="bk-index-text">
+          <strong>{FOS.title}</strong>
+          {showShort && <small>{FOS.short}</small>}
         </span>
         <i className="fa-solid fa-chevron-right" aria-hidden="true" />
       </Link>
