@@ -59,6 +59,12 @@ export default function MathKeypad() {
     const onFocusIn = (e: FocusEvent) => {
       const el = e.target
       if (eligible(el) && !systemKb.current.has(el)) {
+        // Zahlenfelder (type="number") verwerfen Zwischenstände wie „-“ oder „3-“ sofort als ungültig,
+        // das Minus wäre dann nicht sichtbar. Darum für die Tastatur als Textfeld führen (Komma wird zu Punkt).
+        if (el.type === 'number') {
+          el.dataset.kpNumeric = '1'
+          el.type = 'text'
+        }
         el.setAttribute('inputmode', 'none')
         setTarget(el)
         window.setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60)
@@ -107,6 +113,7 @@ export default function MathKeypad() {
     }
     const v = el.value
     const isNum = el.type === 'number'
+    const numeric = isNum || el.dataset.kpNumeric === '1'
     let start = isNum ? v.length : el.selectionStart ?? v.length
     let end = isNum ? v.length : el.selectionEnd ?? v.length
     if (key.k === 'del') {
@@ -115,8 +122,8 @@ export default function MathKeypad() {
       return
     }
     let ins = key.insert ?? key.k
-    if (isNum && ins === ',') ins = '.'
-    if (isNum && !/^[0-9.\-]$/.test(ins)) return
+    if (numeric && ins === ',') ins = '.'
+    if (numeric && !/^[0-9.\-]$/.test(ins)) return
     writeValue(el, v.slice(0, start) + ins + v.slice(end), start + ins.length)
   }
 
