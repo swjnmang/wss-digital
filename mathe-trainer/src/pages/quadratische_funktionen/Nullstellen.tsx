@@ -51,14 +51,19 @@ const TOTAL_TASKS = 6
 const VIDEO_ID = 'ldoXVAEAyLQ'
 
 // Einfach: y = ax² + bx + c mit ganzzahligen Koeffizienten (ohne Brüche)
+// Mittel (Diskriminante): Anzahl der Nullstellen über die Diskriminante D = b² − 4ac bestimmen
 // Fortgeschritten: y = ax² + bx + c mit Brüchen und Scheitelform y = a(x − x_S)² + y_S
-type Level = 'einfach' | 'fortgeschritten'
+type Level = 'einfach' | 'diskriminante' | 'fortgeschritten'
 type Form = 'allgemein' | 'scheitel'
 type Count = 0 | 1 | 2
 /** Sonderfälle: y = ax² + c (b = 0) bzw. y = ax² + bx (c = 0) */
 type Special = 'b0' | 'c0' | null
 
-const LEVEL_LABEL: Record<Level, string> = { einfach: 'Einfach', fortgeschritten: 'Fortgeschritten' }
+const LEVEL_LABEL: Record<Level, string> = {
+  einfach: 'Einfach',
+  diskriminante: 'Mittel – Die Diskriminante verstehen',
+  fortgeschritten: 'Fortgeschritten',
+}
 
 // ---------- Aufgaben erzeugen ----------
 
@@ -198,16 +203,18 @@ function newVertexTask(count: Count): Task {
 }
 
 function newTask(level: Level, spec: Spec): Task {
-  if (level === 'einfach') return newEasyTask(spec.count, spec.special)
+  if (level !== 'fortgeschritten') return newEasyTask(spec.count, spec.special)
   return spec.form === 'scheitel' ? newVertexTask(spec.count) : newFractionTask(spec.count, spec.special)
 }
 
 /**
- * Aufbau einer Seite: meist zwei Nullstellen, je einmal eine bzw. keine; Fortgeschritten im Wechsel mit Scheitelform.
+ * Aufbau einer Seite: meist zwei Nullstellen, je einmal eine bzw. keine (Diskriminante: je zweimal);
+ * Fortgeschritten im Wechsel mit Scheitelform.
  * Auf jeder Seite kommt einmal y = ax² + bx (c = 0) und einmal y = ax² + c (b = 0) vor.
  */
 function pageSpecs(level: Level): Spec[] {
-  const counts = shuffle<Count>([2, 2, 2, 2, 1, 0])
+  // Bei der Diskriminante kommen alle drei Fälle gleich oft vor
+  const counts = shuffle<Count>(level === 'diskriminante' ? [2, 2, 1, 1, 0, 0] : [2, 2, 2, 2, 1, 0])
   const specs: Spec[] = counts.map((count, i) => ({
     count,
     form: level === 'fortgeschritten' && i % 2 === 1 ? 'scheitel' : 'allgemein',
@@ -306,7 +313,7 @@ function ZeroCoefficientNote({ a, b, c }: { a: Q; b: Q; c: Q }) {
       )}
       <p>So sieht die Gleichung mit allen drei Summanden aus:</p>
       <Tex display tex={`${polyTex(a, b, c)} = 0 \\quad\\Longleftrightarrow\\quad ${fullPolyTex(a, b, c)} = 0`} />
-      <p>Mit diesen Werten rechnest du ganz normal mit der Mitternachtsformel weiter.</p>
+      <p>Mit diesen Werten rechnest du ganz normal weiter.</p>
     </div>
   )
 }
@@ -543,29 +550,235 @@ function TaskCard({ number, level, spec, initialTask, onSolvedChange, onResult, 
   )
 }
 
+// ---------- Mittel: Anzahl der Nullstellen mit der Diskriminante ----------
+
+const ORANGE = '#c2410c'
+
+/** D = b² − 4ac Schritt für Schritt (negative Zahlen in Klammern) */
+function discriminantLines(a: Q, b: Q, c: Q): string[] {
+  const ac4 = mul(q(4), mul(a, c))
+  const ac4Tex = ac4.n === 0 ? '- 0' : sgq(neg(ac4))
+  return [
+    'D = b^2 - 4 \\cdot a \\cdot c',
+    `D = ${tqp(b)}^2 - 4 \\cdot ${tqp(a)} \\cdot ${tqp(c)}`,
+    `D = ${tq(mul(b, b))} ${ac4Tex}`,
+    `D = \\mathbf{${tq(discriminant(a, b, c))}}`,
+  ]
+}
+
+/** Was das Vorzeichen von D über die Anzahl der Nullstellen sagt, mit Begründung über die Wurzel */
+function DiscriminantDecision({ D }: { D: Q }) {
+  if (D.n > 0)
+    return (
+      <p>
+        Da <Tex tex={`D = ${tq(D)} > 0`} /> ist, gibt es <strong>zwei Nullstellen</strong>. Begründung: In der Mitternachtsformel steht{' '}
+        <Tex tex={`\\pm\\sqrt{${tq(D)}}${sqrtQ(D) ? ` = \\pm ${sqrtTex(D)}` : ''}`} />. Ob du die Wurzel addierst oder subtrahierst, ergibt zwei verschiedene Ergebnisse.
+      </p>
+    )
+  if (D.n === 0)
+    return (
+      <p>
+        Da <Tex tex="D = 0" /> ist, gibt es <strong>genau eine Nullstelle</strong>. Begründung: <Tex tex="\sqrt{0} = 0" />. Ob du 0 addierst
+        oder subtrahierst, ergibt dasselbe Ergebnis. Die Parabel berührt die x-Achse nur mit ihrem Scheitelpunkt.
+      </p>
+    )
+  return (
+    <p>
+      Da <Tex tex={`D = ${tq(D)} < 0`} /> ist, gibt es <strong>keine Nullstelle</strong>. Begründung: Aus einer negativen Zahl kann man keine
+      Wurzel ziehen, die Mitternachtsformel liefert also keine Lösung. Die Parabel schneidet die x-Achse nicht.
+    </p>
+  )
+}
+
+function DiscriminantSolution({ task }: { task: Task }) {
+  const { a, b, c } = task
+  return (
+    <div className="mt-6 bk-taskbox text-left text-slate-700 space-y-3">
+      <h3 className="text-base font-bold text-slate-800 text-center">Lösungsweg</h3>
+      <div>
+        <p className="font-semibold text-slate-800">Schritt 1: Setze y = 0 und lies a, b und c ab</p>
+        <Tex display tex={`${polyTex(a, b, c)} = 0`} />
+        <Tex display tex={`a = ${tq(a)},\\quad b = ${tq(b)},\\quad c = ${tq(c)}`} />
+        <ZeroCoefficientNote a={a} b={b} c={c} />
+      </div>
+      <div>
+        <p className="font-semibold text-slate-800">Schritt 2: Berechne die Diskriminante</p>
+        <Steps lines={discriminantLines(a, b, c).map((tex) => ({ tex }))} />
+      </div>
+      <div>
+        <p className="font-semibold text-slate-800">Schritt 3: Entscheide anhand des Vorzeichens von D</p>
+        <DiscriminantDecision D={discriminant(a, b, c)} />
+      </div>
+    </div>
+  )
+}
+
+function DiscriminantCard({ number, spec, initialTask, onSolvedChange, onResult, onHelp }: Omit<CardProps, 'level'>) {
+  const [task, setTask] = useState(initialTask)
+  const [dIn, setDIn] = useState('')
+  const [count, setCount] = useState<Count | null>(null)
+  const [solved, setSolved] = useState(false)
+  const [praise, setPraise] = useState(PRAISE[0])
+  const [showSolution, setShowSolution] = useState(false)
+
+  const D = discriminant(task.a, task.b, task.c)
+  const roots = task.roots
+  const dValue = parseAnswer(dIn)
+  const dStatus: AnswerStatus = isIncomplete(dIn) ? 'idle' : Math.abs(dValue - val(D)) < 1e-9 ? 'right' : 'wrong'
+  const dRight = dStatus === 'right'
+  const countRight = count === roots.length
+
+  useEffect(() => {
+    if (solved) return
+    if (dRight && countRight) {
+      setSolved(true)
+      setPraise(pick(PRAISE))
+      setShowSolution(false)
+      onSolvedChange(true)
+      onResult(true)
+      return
+    }
+    // Falscher Versuch zählt erst, wenn die Eingabe kurz stehen bleibt
+    if (dStatus === 'wrong') {
+      const timer = setTimeout(() => onResult(false), 900)
+      return () => clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dIn, count, solved])
+
+  function changeD(v: string) {
+    if (solved) return
+    setDIn(v)
+    setCount(null)
+  }
+
+  function chooseCount(next: Count) {
+    if (solved) return
+    setCount(next)
+    if (next !== roots.length) onResult(false)
+  }
+
+  function generateNewTask() {
+    setTask(newTask('diskriminante', spec))
+    setDIn('')
+    setCount(null)
+    setSolved(false)
+    setShowSolution(false)
+    onSolvedChange(false)
+  }
+
+  function onShowSolution() {
+    setShowSolution(true)
+    onHelp()
+  }
+
+  let message: React.ReactNode = null
+  if (solved) {
+    message = (
+      <p className="text-center font-bold mt-4 text-green-600">
+        {praise} <Tex tex={`D = ${tq(D)}`} /> – {COUNT_LABEL[roots.length as Count]}.
+      </p>
+    )
+  } else if (dStatus === 'wrong') {
+    message = (
+      <p className="text-center font-bold mt-4 text-red-600">
+        Noch nicht richtig. Tipp: <Tex tex="D = b^2 - 4 \cdot a \cdot c" /> – setze negative Zahlen in Klammern.
+      </p>
+    )
+  } else if (dRight && count !== null && !countRight) {
+    message = (
+      <p className="text-center font-bold mt-4 text-red-600">
+        Die Anzahl stimmt noch nicht. Achte auf das Vorzeichen von D: Ist D positiv, null oder negativ?
+      </p>
+    )
+  } else if (dRight) {
+    message = <p className="text-center font-bold mt-4 text-green-600">D stimmt! Was sagt dir D über die Anzahl der Nullstellen?</p>
+  }
+
+  const countBtn = (c: Count) => {
+    const active = count === c
+    const cls = active
+      ? c === roots.length
+        ? 'border-green-500 bg-green-50 text-green-800'
+        : 'border-red-500 bg-red-50 text-red-800'
+      : 'border-slate-300 bg-white hover:bg-slate-100 text-slate-700'
+    return (
+      <button key={c} type="button" onClick={() => chooseCount(c)} disabled={solved && !active} className={`py-2 px-4 rounded border-2 font-semibold transition-colors disabled:opacity-50 ${cls}`}>
+        {COUNT_LABEL[c]}
+      </button>
+    )
+  }
+
+  return (
+    <div className={panel}>
+      <h2 className="text-lg font-bold text-slate-800 mb-2">Aufgabe {number}</h2>
+      <p className="text-slate-700 mb-1">Bestimme mithilfe der Diskriminante, wie viele Nullstellen die Funktion hat.</p>
+      <div className="text-center text-2xl text-slate-800 my-4">
+        <Tex display tex={task.tex} />
+      </div>
+
+      <p className="text-slate-700 font-semibold mb-2">1. Berechne die Diskriminante.</p>
+      <label className="flex items-center justify-center gap-2 text-xl text-slate-800">
+        <Tex tex="D =" />
+        <input
+          value={dIn}
+          readOnly={solved}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => changeD(e.target.value)}
+          className={`w-24 text-center border-2 rounded px-2 py-2 text-lg focus:outline-none transition-colors ${statusBorder(dStatus)}`}
+          inputMode="decimal"
+          aria-label="Diskriminante D"
+        />
+      </label>
+
+      {dRight && (
+        <>
+          <p className="text-slate-700 font-semibold mt-5 mb-2">2. Wie viele Nullstellen hat die Funktion?</p>
+          <div className="flex flex-wrap justify-center gap-2">{([2, 1, 0] as Count[]).map(countBtn)}</div>
+        </>
+      )}
+
+      {message}
+
+      <div className="flex flex-wrap justify-center gap-3 mt-6">
+        <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
+        <button onClick={onShowSolution} className={btnSecondary}>Lösung anzeigen</button>
+      </div>
+
+      {showSolution && <DiscriminantSolution task={task} />}
+    </div>
+  )
+}
+
 // ---------- Erklärung mit Beispiel (Graph + Rechnung) und Erklärvideo ----------
 
-// Beispiel: y = x² − 2x − 3  →  Nullstellen 3 und −1
 const SX = 30 // Pixel pro Einheit
 const X_MIN = -3, X_MAX = 5, Y_MIN = -5, Y_MAX = 5
 const toPx = (x: number, y: number) => ({ px: (x - X_MIN) * SX, py: (Y_MAX - y) * SX })
-const exampleF = (x: number) => x * x - 2 * x - 3
 
-function ExampleGraph() {
+interface GraphMark {
+  x: number
+  color: string
+  label: string
+  /** Beschriftung links vom Punkt */
+  left?: boolean
+}
+
+/** Parabel im Koordinatensystem (x: −3 … 5, y: −5 … 5) mit markierten Nullstellen */
+function ParabolaGraph({ f, marks, ariaLabel, className = 'max-w-xs' }: { f: (x: number) => number; marks: GraphMark[]; ariaLabel: string; className?: string }) {
   const w = (X_MAX - X_MIN) * SX
   const h = (Y_MAX - Y_MIN) * SX
   const o = toPx(0, 0)
-  const n1 = toPx(3, 0)
-  const n2 = toPx(-1, 0)
   const xs = Array.from({ length: X_MAX - X_MIN + 1 }, (_, i) => X_MIN + i)
   const ys = Array.from({ length: Y_MAX - Y_MIN + 1 }, (_, i) => Y_MIN + i)
   const pts: string[] = []
-  for (let x = -1.8; x <= 3.8; x += 0.05) {
-    const p = toPx(x, exampleF(x))
+  for (let x = X_MIN; x <= X_MAX + 1e-9; x += 0.05) {
+    const y = f(x)
+    if (y < Y_MIN - 0.3 || y > Y_MAX + 0.3) continue
+    const p = toPx(x, y)
     pts.push(`${p.px.toFixed(1)},${p.py.toFixed(1)}`)
   }
   return (
-    <svg viewBox={`-10 -10 ${w + 20} ${h + 20}`} className="w-full max-w-xs mx-auto" role="img" aria-label="Parabel y = x² − 2x − 3 mit den Nullstellen 3 und −1">
+    <svg viewBox={`-10 -10 ${w + 20} ${h + 20}`} className={`w-full mx-auto ${className}`} role="img" aria-label={ariaLabel}>
       {xs.map((x) => (
         <line key={`gx${x}`} x1={toPx(x, 0).px} y1={0} x2={toPx(x, 0).px} y2={h} stroke="#e2e8f0" strokeWidth={1} />
       ))}
@@ -583,11 +796,32 @@ function ExampleGraph() {
         <text key={`ly${y}`} x={o.px - 5} y={toPx(0, y).py + 3} fontSize={10} textAnchor="end" fill="#64748b">{y}</text>
       ))}
       <polyline points={pts.join(' ')} fill="none" stroke="#2563eb" strokeWidth={2.5} />
-      <circle cx={n1.px} cy={n1.py} r={5} fill={RED} />
-      <circle cx={n2.px} cy={n2.py} r={5} fill={BLUE} />
-      <text x={n1.px + 6} y={n1.py - 8} fontSize={12} fontWeight="bold" fill={RED}>N₁(3|0)</text>
-      <text x={n2.px - 6} y={n2.py - 8} fontSize={12} fontWeight="bold" textAnchor="end" fill={BLUE}>N₂(−1|0)</text>
+      {marks.map((m) => {
+        const n = toPx(m.x, 0)
+        return (
+          <g key={m.label}>
+            <circle cx={n.px} cy={n.py} r={5} fill={m.color} />
+            <text x={n.px + (m.left ? -6 : 6)} y={n.py - 8} fontSize={12} fontWeight="bold" textAnchor={m.left ? 'end' : 'start'} fill={m.color}>
+              {m.label}
+            </text>
+          </g>
+        )
+      })}
     </svg>
+  )
+}
+
+// Beispiel: y = x² − 2x − 3  →  Nullstellen 3 und −1
+function ExampleGraph() {
+  return (
+    <ParabolaGraph
+      f={(x) => x * x - 2 * x - 3}
+      marks={[
+        { x: 3, color: RED, label: 'N₁(3|0)' },
+        { x: -1, color: BLUE, label: 'N₂(−1|0)', left: true },
+      ]}
+      ariaLabel="Parabel y = x² − 2x − 3 mit den Nullstellen 3 und −1"
+    />
   )
 }
 
@@ -767,6 +1001,171 @@ function Erklaerung({ level }: { level: Level }) {
   )
 }
 
+// ---------- Erklärung Diskriminante ----------
+
+interface DCase {
+  title: string
+  tex: string
+  lines: string[]
+  why: React.ReactNode
+  result: string
+  graph: React.ReactNode
+}
+
+const D_CASES: DCase[] = [
+  {
+    title: 'D > 0',
+    tex: 'y = x^2 - 2x - 3',
+    lines: ['D = (-2)^2 - 4 \\cdot 1 \\cdot (-3)', 'D = 4 + 12 = 16'],
+    why: <><Tex tex="\pm\sqrt{16} = \pm 4" />: Plus und Minus ergeben zwei verschiedene Werte.</>,
+    result: 'Zwei Nullstellen',
+    graph: (
+      <ParabolaGraph
+        f={(x) => x * x - 2 * x - 3}
+        marks={[
+          { x: 3, color: RED, label: 'N₁' },
+          { x: -1, color: BLUE, label: 'N₂', left: true },
+        ]}
+        ariaLabel="Parabel y = x² − 2x − 3 schneidet die x-Achse zweimal"
+        className="max-w-[220px]"
+      />
+    ),
+  },
+  {
+    title: 'D = 0',
+    tex: 'y = x^2 - 4x + 4',
+    lines: ['D = (-4)^2 - 4 \\cdot 1 \\cdot 4', 'D = 16 - 16 = 0'],
+    why: <><Tex tex="\pm\sqrt{0} = \pm 0" />: Plus und Minus ergeben denselben Wert.</>,
+    result: 'Eine Nullstelle',
+    graph: (
+      <ParabolaGraph
+        f={(x) => x * x - 4 * x + 4}
+        marks={[{ x: 2, color: RED, label: 'N' }]}
+        ariaLabel="Parabel y = x² − 4x + 4 berührt die x-Achse in einem Punkt"
+        className="max-w-[220px]"
+      />
+    ),
+  },
+  {
+    title: 'D < 0',
+    tex: 'y = x^2 - 2x + 2',
+    lines: ['D = (-2)^2 - 4 \\cdot 1 \\cdot 2', 'D = 4 - 8 = -4'],
+    why: <><Tex tex="\sqrt{-4}" /> gibt es nicht: Aus einer negativen Zahl kann man keine Wurzel ziehen.</>,
+    result: 'Keine Nullstelle',
+    graph: (
+      <ParabolaGraph
+        f={(x) => x * x - 2 * x + 2}
+        marks={[]}
+        ariaLabel="Parabel y = x² − 2x + 2 schneidet die x-Achse nicht"
+        className="max-w-[220px]"
+      />
+    ),
+  },
+]
+
+function DiskriminanteErklaerung() {
+  return (
+    <div className="bk-panel text-left">
+      <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">Die Diskriminante verstehen</h2>
+      <p className="text-slate-700 mb-2">
+        Eine Parabel kann die x-Achse <strong>zweimal</strong>, <strong>einmal</strong> oder <strong>gar nicht</strong> treffen. Wie viele
+        Nullstellen es gibt, kannst du schon vorher ausrechnen – ohne die Nullstellen selbst zu bestimmen. Schau dir dazu die
+        Mitternachtsformel genau an:
+      </p>
+      <Tex display tex={`x_{1,2} = \\frac{-b \\pm \\sqrt{\\textcolor{${ORANGE}}{b^2 - 4ac}}}{2a}`} />
+      <p className="text-slate-700 mb-2">
+        Den Term unter der Wurzel nennt man <strong>Diskriminante D</strong> (lateinisch <em>discriminare</em> = unterscheiden). Sie
+        unterscheidet die drei Fälle:
+      </p>
+      <Tex display tex={`\\textcolor{${ORANGE}}{D = b^2 - 4ac}`} />
+
+      <StepTable
+        rows={[
+          {
+            step: (
+              <>
+                <strong>1.</strong> Setze <Tex tex="y = 0" /> und lies a, b und c ab. <strong>Achtung:</strong> Vorzeichen mitnehmen!
+              </>
+            ),
+            example: (
+              <>
+                <Tex display tex="2x^2 + 3x - 2 = 0" />
+                <Tex display tex="a = 2,\quad b = 3,\quad c = -2" />
+              </>
+            ),
+          },
+          {
+            step: (
+              <>
+                <strong>2.</strong> Setze a, b und c in <Tex tex="D = b^2 - 4 \cdot a \cdot c" /> ein und rechne D aus. Negative Zahlen in
+                Klammern setzen.
+              </>
+            ),
+            example: <Steps lines={['D = 3^2 - 4 \\cdot 2 \\cdot (-2)', 'D = 9 + 16 = 25'].map((tex) => ({ tex }))} />,
+          },
+          {
+            step: (
+              <>
+                <strong>3.</strong> Entscheide anhand des <strong>Vorzeichens</strong> von D, wie viele Nullstellen es gibt.
+              </>
+            ),
+            example: (
+              <p className="text-center">
+                <Tex tex="D = 25 > 0" /> → <strong>zwei Nullstellen</strong>
+              </p>
+            ),
+          },
+        ]}
+      />
+
+      <h3 className="text-base font-bold text-slate-800 mt-5 mb-2">Die drei Fälle</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {D_CASES.map((d) => (
+          <div key={d.title} className="bk-taskbox text-sm text-slate-700 space-y-1">
+            <p className="font-bold text-slate-800 text-center text-base">
+              <Tex tex={d.title} />
+            </p>
+            <Tex display tex={d.tex} />
+            <Steps lines={d.lines.map((tex) => ({ tex }))} />
+            {d.graph}
+            <p className="font-bold text-slate-800 text-center">{d.result}</p>
+            <p>{d.why}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 bg-amber-50 border border-amber-300 rounded-lg p-3 text-slate-700">
+        <p className="font-bold text-slate-800 mb-1">Merke</p>
+        <ul className="space-y-1">
+          <li>
+            <Tex tex="D > 0" />: zwei Nullstellen (die Parabel schneidet die x-Achse zweimal)
+          </li>
+          <li>
+            <Tex tex="D = 0" />: genau eine Nullstelle (die Parabel berührt die x-Achse mit dem Scheitelpunkt)
+          </li>
+          <li>
+            <Tex tex="D < 0" />: keine Nullstelle (die Parabel schneidet die x-Achse nicht)
+          </li>
+        </ul>
+      </div>
+
+      <ul className="list-disc pl-5 mt-4 text-slate-700 space-y-1 text-sm">
+        <li>
+          Negative Zahlen in Klammern setzen: <Tex tex="(-2)^2 = 4" />, aber <Tex tex="-2^2 = -4" />. Deshalb ist <Tex tex="b^2" /> nie negativ.
+        </li>
+        <li>
+          Fehlt ein Summand, ist der Koeffizient 0: Bei <Tex tex="y = x^2 - 9" /> ist <Tex tex="b = 0" />, bei <Tex tex="y = x^2 - 4x" /> ist{' '}
+          <Tex tex="c = 0" />.
+        </li>
+        <li>
+          Haben a und c <strong>verschiedene Vorzeichen</strong>, ist <Tex tex="-4ac" /> positiv – dann ist D immer größer als 0 und es gibt
+          zwei Nullstellen.
+        </li>
+      </ul>
+    </div>
+  )
+}
+
 // ---------- Seite: sechs Aufgaben auf einmal ----------
 
 export default function Nullstellen() {
@@ -814,22 +1213,31 @@ export default function Nullstellen() {
           {header}
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
                 className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Einfach</p>
-                <Tex display className="text-xl mb-2 text-white" tex="y = ax^2 + bx + c" />
+                <Tex display className="text-lg mb-2 text-white" tex="y = ax^2 + bx + c" />
                 <p className="text-sm text-white/90">Ganzzahlige Koeffizienten ohne Brüche, die Nullstellen sind ganze Zahlen.</p>
+              </button>
+              <button
+                onClick={() => chooseLevel('diskriminante')}
+                className="rounded-2xl bg-amber-500 hover:bg-amber-600 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+              >
+                <p className="text-lg font-bold mb-1 text-white">Mittel</p>
+                <p className="font-semibold text-white mb-1">Die Diskriminante verstehen</p>
+                <Tex display className="text-lg mb-2 text-white" tex="D = b^2 - 4ac" />
+                <p className="text-sm text-white/90">Bestimme mit der Diskriminante, wie viele Nullstellen eine Parabel hat.</p>
               </button>
               <button
                 onClick={() => chooseLevel('fortgeschritten')}
                 className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
-                <Tex display className="text-xl mb-1 text-white" tex="y = ax^2 + bx + c" />
-                <Tex display className="text-xl mb-2 text-white" tex="y = a(x - x_S)^2 + y_S" />
+                <Tex display className="text-lg mb-1 text-white" tex="y = ax^2 + bx + c" />
+                <Tex display className="text-lg mb-2 text-white" tex="y = a(x - x_S)^2 + y_S" />
                 <p className="text-sm text-white/90">Koeffizienten mit Brüchen und Funktionen in Scheitelform, Ergebnisse teils gerundet.</p>
               </button>
             </div>
@@ -843,7 +1251,7 @@ export default function Nullstellen() {
     <TaskShell title="Nullstellen berechnen" width="narrow">
         <div className="flex flex-col gap-6">
         {header}
-        <Erklaerung level={level} />
+        {level === 'diskriminante' ? <DiskriminanteErklaerung /> : <Erklaerung level={level} />}
 
         <div className="flex flex-wrap items-center justify-center gap-3">
           <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
@@ -857,15 +1265,26 @@ export default function Nullstellen() {
         {tasks.map(({ spec, task }, i) => (
           // Nach einem Neustart per key getrennt (frischer Zustand)
           <React.Fragment key={`${level}-${round}-${i}`}>
-            <TaskCard
-              number={i + 1}
-              level={level}
-              spec={spec}
-              initialTask={task}
-              onSolvedChange={(value) => setSolved((s) => ({ ...s, [i]: value }))}
-              onResult={(correct) => setStreak((s) => (correct ? s + 1 : 0))}
-              onHelp={() => setStreak(0)}
-            />
+            {level === 'diskriminante' ? (
+              <DiscriminantCard
+                number={i + 1}
+                spec={spec}
+                initialTask={task}
+                onSolvedChange={(value) => setSolved((s) => ({ ...s, [i]: value }))}
+                onResult={(correct) => setStreak((s) => (correct ? s + 1 : 0))}
+                onHelp={() => setStreak(0)}
+              />
+            ) : (
+              <TaskCard
+                number={i + 1}
+                level={level}
+                spec={spec}
+                initialTask={task}
+                onSolvedChange={(value) => setSolved((s) => ({ ...s, [i]: value }))}
+                onResult={(correct) => setStreak((s) => (correct ? s + 1 : 0))}
+                onHelp={() => setStreak(0)}
+              />
+            )}
           </React.Fragment>
         ))}
 
