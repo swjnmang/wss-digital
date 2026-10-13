@@ -73,6 +73,7 @@ export const AREAS: Area[] = [
           { title: 'Prozentrechnung', desc: 'Grundlagen und fortgeschrittene Aufgaben zur Prozentrechnung.', path: '/rechnen_lernen/prozentrechnung', icon: fa('percent') },
           { title: 'Gleichungen', desc: 'Löse lineare und quadratische Gleichungen Schritt für Schritt.', path: '/rechnen_lernen/gleichungen', icon: fa('equals') },
           { title: 'Ausklammern / Faktorisieren', desc: 'Klammere gemeinsame Faktoren aus Termen aus – von Zahlen bis zu ganzen Klammern.', path: '/rechnen_lernen/ausklammern', icon: fa('object-group') },
+          { title: 'Binomische Formeln', desc: 'Alle drei binomischen Formeln lernen und üben – ausmultiplizieren, faktorisieren und Terme vereinfachen.', path: '/rechnen_lernen/binomische-formeln', icon: fa('square') },
         ],
       },
     ],
