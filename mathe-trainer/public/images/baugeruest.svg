@@ -1,0 +1,56 @@
+<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<rect x="0" y="0" width="1000" height="600" fill="#f8fafc"/>
+<polygon points="195.0,472.4 195.0,120.0 443.5,29.0 692.0,120.0 692.0,507.2" fill="#fecaca" opacity="0.45" stroke="none"/>
+<line x1="6.0" y1="459.2" x2="1000.0" y2="528.7" stroke="#525252" stroke-width="4" stroke-linecap="round"/>
+<line x1="160.0" y1="470.0" x2="160.0" y2="431.5" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="160.0" y1="431.5" x2="160.0" y2="88.5" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+<line x1="349.0" y1="483.2" x2="349.0" y2="431.5" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="349.0" y1="431.5" x2="349.0" y2="88.5" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+<line x1="538.0" y1="496.4" x2="538.0" y2="431.5" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="538.0" y1="431.5" x2="538.0" y2="88.5" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+<line x1="727.0" y1="509.6" x2="727.0" y2="431.5" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="727.0" y1="431.5" x2="727.0" y2="88.5" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+<line x1="160.0" y1="431.5" x2="727.0" y2="431.5" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+<line x1="160.0" y1="291.5" x2="727.0" y2="291.5" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+<line x1="160.0" y1="151.5" x2="727.0" y2="151.5" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+<polygon points="160.0,291.5 254.5,361.5 349.0,291.5" fill="#93c5fd" opacity="0.9" stroke="none"/>
+<text x="254.5" y="297.3" font-size="16" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle" font-weight="bold">Logo</text>
+<line x1="160.0" y1="431.5" x2="349.0" y2="291.5" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="349.0" y1="431.5" x2="160.0" y2="291.5" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="71.2" y1="463.8" x2="160.0" y2="291.5" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="10 6"/>
+<line x1="727.0" y1="291.5" x2="971.4" y2="526.7" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="10 6"/>
+<text x="67.6" y="377.6" font-size="15" fill="#dc2626" text-anchor="middle" dominant-baseline="middle">Abspannseil</text>
+<text x="911.2" y="409.1" font-size="15" fill="#dc2626" text-anchor="middle" dominant-baseline="middle">Abspannseil</text>
+<path d="M 204.0 431.5 L 204.0 430.3 L 203.9 429.2 L 203.9 428.0 L 203.8 426.8 L 203.6 425.7 L 203.4 424.5 L 203.2 423.4 L 203.0 422.2 L 202.7 421.1 L 202.5 419.9 L 202.1 418.8 L 201.8 417.7 L 201.4 416.6 L 201.0 415.5 L 200.6 414.4 L 200.1 413.4 L 199.6 412.3 L 199.1 411.3 L 198.5 410.2 L 197.9 409.2 L 197.3 408.2 L 196.7 407.2 L 196.0 406.3 L 195.4 405.3 L 160.0 431.5 Z" fill="#047857" fill-opacity="0.15" stroke="none"/>
+<path d="M 204.0 431.5 L 204.0 430.3 L 203.9 429.2 L 203.9 428.0 L 203.8 426.8 L 203.6 425.7 L 203.4 424.5 L 203.2 423.4 L 203.0 422.2 L 202.7 421.1 L 202.5 419.9 L 202.1 418.8 L 201.8 417.7 L 201.4 416.6 L 201.0 415.5 L 200.6 414.4 L 200.1 413.4 L 199.6 412.3 L 199.1 411.3 L 198.5 410.2 L 197.9 409.2 L 197.3 408.2 L 196.7 407.2 L 196.0 406.3 L 195.4 405.3" fill="none" stroke="#047857" stroke-width="2.5"/>
+<text x="217.0" y="412.7" font-size="21" fill="#047857" text-anchor="middle" dominant-baseline="middle" font-style="italic" font-weight="bold">α</text>
+<path d="M 101.1 465.9 L 101.2 464.4 L 101.2 463.0 L 101.1 461.5 L 101.0 460.1 L 100.8 458.6 L 100.5 457.2 L 100.1 455.8 L 99.7 454.4 L 99.2 453.0 L 98.6 451.7 L 98.0 450.4 L 97.3 449.1 L 96.6 447.8 L 95.8 446.6 L 94.9 445.4 L 94.0 444.3 L 93.0 443.2 L 92.0 442.2 L 90.9 441.2 L 89.8 440.3 L 88.7 439.4 L 87.5 438.6 L 86.2 437.8 L 84.9 437.1 L 71.2 463.8 Z" fill="#047857" fill-opacity="0.15" stroke="none"/>
+<path d="M 101.1 465.9 L 101.2 464.4 L 101.2 463.0 L 101.1 461.5 L 101.0 460.1 L 100.8 458.6 L 100.5 457.2 L 100.1 455.8 L 99.7 454.4 L 99.2 453.0 L 98.6 451.7 L 98.0 450.4 L 97.3 449.1 L 96.6 447.8 L 95.8 446.6 L 94.9 445.4 L 94.0 444.3 L 93.0 443.2 L 92.0 442.2 L 90.9 441.2 L 89.8 440.3 L 88.7 439.4 L 87.5 438.6 L 86.2 437.8 L 84.9 437.1" fill="none" stroke="#047857" stroke-width="2.5"/>
+<text x="113.0" y="440.3" font-size="21" fill="#047857" text-anchor="middle" dominant-baseline="middle" font-style="italic" font-weight="bold">β</text>
+<path d="M 140.0 468.6 L 140.2 467.4 L 140.4 466.1 L 140.7 464.9 L 141.0 463.7 L 141.4 462.5 L 141.9 461.4 L 142.5 460.3 L 143.2 459.2 L 143.9 458.2 L 144.6 457.2 L 145.5 456.3 L 146.4 455.4 L 147.3 454.5 L 148.3 453.8 L 149.3 453.1 L 150.4 452.5 L 151.5 451.9 L 152.7 451.4 L 153.8 451.0 L 155.0 450.6 L 156.3 450.4 L 157.5 450.2 L 158.7 450.0 L 160.0 450.0 L 160.0 470.0 Z" fill="#7c3aed" fill-opacity="0.15" stroke="none"/>
+<path d="M 140.0 468.6 L 140.2 467.4 L 140.4 466.1 L 140.7 464.9 L 141.0 463.7 L 141.4 462.5 L 141.9 461.4 L 142.5 460.3 L 143.2 459.2 L 143.9 458.2 L 144.6 457.2 L 145.5 456.3 L 146.4 455.4 L 147.3 454.5 L 148.3 453.8 L 149.3 453.1 L 150.4 452.5 L 151.5 451.9 L 152.7 451.4 L 153.8 451.0 L 155.0 450.6 L 156.3 450.4 L 157.5 450.2 L 158.7 450.0 L 160.0 450.0" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+<text x="138.2" y="446.6" font-size="21" fill="#7c3aed" text-anchor="middle" dominant-baseline="middle" font-style="italic" font-weight="bold">γ</text>
+<circle cx="160.0" cy="431.5" r="5" fill="#334155"/>
+<text x="152.5" y="413.0" font-size="22" fill="#334155" text-anchor="middle" dominant-baseline="middle" font-weight="bold">A</text>
+<circle cx="349.0" cy="431.5" r="5" fill="#334155"/>
+<text x="359.0" y="448.8" font-size="22" fill="#334155" text-anchor="middle" dominant-baseline="middle" font-weight="bold">B</text>
+<circle cx="349.0" cy="291.5" r="5" fill="#334155"/>
+<text x="359.0" y="274.2" font-size="22" fill="#334155" text-anchor="middle" dominant-baseline="middle" font-weight="bold">C</text>
+<circle cx="160.0" cy="291.5" r="5" fill="#334155"/>
+<text x="142.7" y="281.5" font-size="22" fill="#334155" text-anchor="middle" dominant-baseline="middle" font-weight="bold">D</text>
+<circle cx="254.5" cy="361.5" r="5" fill="#334155"/>
+<text x="254.5" y="381.5" font-size="22" fill="#334155" text-anchor="middle" dominant-baseline="middle" font-weight="bold">E</text>
+<circle cx="160.0" cy="470.0" r="5" fill="#334155"/>
+<text x="163.5" y="489.7" font-size="22" fill="#334155" text-anchor="middle" dominant-baseline="middle" font-weight="bold">F</text>
+<circle cx="727.0" cy="509.6" r="5" fill="#334155"/>
+<text x="717.0" y="527.0" font-size="22" fill="#334155" text-anchor="middle" dominant-baseline="middle" font-weight="bold">G</text>
+<circle cx="971.4" cy="526.7" r="5" fill="#334155"/>
+<text x="981.4" y="544.1" font-size="22" fill="#334155" text-anchor="middle" dominant-baseline="middle" font-weight="bold">H</text>
+<circle cx="727.0" cy="291.5" r="5" fill="#334155"/>
+<text x="744.3" y="281.5" font-size="22" fill="#334155" text-anchor="middle" dominant-baseline="middle" font-weight="bold">J</text>
+<circle cx="727.0" cy="431.5" r="5" fill="#334155"/>
+<text x="744.3" y="441.5" font-size="22" fill="#334155" text-anchor="middle" dominant-baseline="middle" font-weight="bold">K</text>
+<circle cx="71.2" cy="463.8" r="5" fill="#334155"/>
+<text x="67.7" y="483.5" font-size="22" fill="#334155" text-anchor="middle" dominant-baseline="middle" font-weight="bold">L</text>
+<text x="984" y="586" font-size="15" fill="#64748b" text-anchor="end" font-style="italic">Skizze nicht maßstabsgetreu</text>
+</svg>

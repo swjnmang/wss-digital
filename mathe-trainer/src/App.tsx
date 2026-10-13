@@ -139,6 +139,10 @@ import OlympiaparkMuenchen from './pages/trigonometrie/anwendungsaufgaben/Olympi
 import Stadion from './pages/trigonometrie/anwendungsaufgaben/Stadion';
 import Fussballfeld from './pages/trigonometrie/anwendungsaufgaben/Fussballfeld';
 import Bergbahn from './pages/trigonometrie/anwendungsaufgaben/Bergbahn';
+import Strommast from './pages/trigonometrie/anwendungsaufgaben/Strommast';
+import Baugeruest from './pages/trigonometrie/anwendungsaufgaben/Baugeruest';
+import Badesee from './pages/trigonometrie/anwendungsaufgaben/Badesee';
+import Fachwerkhaus from './pages/trigonometrie/anwendungsaufgaben/Fachwerkhaus';
 import NachverfolgungBericht from './pages/trigonometrie/NachverfolgungBericht';
 import { useTrackingSession } from './hooks/useTaskTracking';
 import { useAppUpdate } from './hooks/useAppUpdate';
@@ -335,6 +339,10 @@ export default function App() {
           <Route path="/trigonometrie/anwendungsaufgaben/stadion" element={<Stadion />} />
           <Route path="/trigonometrie/anwendungsaufgaben/fussballfeld" element={<Fussballfeld />} />
           <Route path="/trigonometrie/anwendungsaufgaben/bergbahn" element={<Bergbahn />} />
+          <Route path="/trigonometrie/anwendungsaufgaben/strommast" element={<Strommast />} />
+          <Route path="/trigonometrie/anwendungsaufgaben/baugeruest" element={<Baugeruest />} />
+          <Route path="/trigonometrie/anwendungsaufgaben/badesee" element={<Badesee />} />
+          <Route path="/trigonometrie/anwendungsaufgaben/fachwerkhaus" element={<Fachwerkhaus />} />
           <Route path="/trigonometrie/nachverfolgung-bericht" element={<NachverfolgungBericht area="trigonometrie" />} />
           <Route path="/lineare_funktionen/nachverfolgung-bericht" element={<NachverfolgungBericht area="lineare_funktionen" />} />
 
