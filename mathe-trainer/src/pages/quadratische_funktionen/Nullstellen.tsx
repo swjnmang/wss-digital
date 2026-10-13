@@ -4,18 +4,24 @@ import {
   BLUE,
   GREEN,
   HALVES,
-  MitternachtsSteps,
   PRAISE,
   type AnswerStatus,
   type Q,
   RED,
   StepTable,
+  eqSign,
+  sgq,
+  sqrtTex,
+  sub,
+  tq,
+  tqp,
   Steps,
   Tex,
   Video,
   add,
   btnPrimary,
   btnSecondary,
+  coeff,
   discriminant,
   eqQ,
   isIncomplete,
@@ -49,6 +55,8 @@ const VIDEO_ID = 'ldoXVAEAyLQ'
 type Level = 'einfach' | 'fortgeschritten'
 type Form = 'allgemein' | 'scheitel'
 type Count = 0 | 1 | 2
+/** Sonderfälle: y = ax² + c (b = 0) bzw. y = ax² + bx (c = 0) */
+type Special = 'b0' | 'c0' | null
 
 const LEVEL_LABEL: Record<Level, string> = { einfach: 'Einfach', fortgeschritten: 'Fortgeschritten' }
 
@@ -70,6 +78,7 @@ interface Task {
 interface Spec {
   form: Form
   count: Count
+  special: Special
 }
 
 function fromRoots(a: Q, x1: Q, x2: Q) {
@@ -83,14 +92,28 @@ function generalTask(a: Q, b: Q, c: Q): Task {
   return { form: 'allgemein', a, b, c, xs: 0, ys: q(0), roots: solveQuadratic(a, b, c), tex: `y = ${polyTex(a, b, c)}` }
 }
 
-function newEasyTask(count: Count): Task {
+function newEasyTask(count: Count, special: Special): Task {
   for (;;) {
     const a = q(pick([1, 1, -1, -1, 2, -2, 3, -3]))
     let b: Q, c: Q
-    if (count === 2) {
+    if (special === 'c0') {
+      // y = ax² + bx: eine Nullstelle liegt bei 0
+      const x2 = randomInt(6, -6)
+      if (x2 === 0) continue
+      ;({ b, c } = fromRoots(a, q(0), q(x2)))
+    } else if (special === 'b0' && count === 2) {
+      // y = ax² + c mit Nullstellen ±r
+      const r = randomInt(6, 1)
+      ;({ b, c } = fromRoots(a, q(r), q(-r)))
+    } else if (special === 'b0') {
+      // y = ax² + c ohne Nullstelle (a und c mit gleichem Vorzeichen)
+      b = q(0)
+      c = q(Math.sign(a.n) * randomInt(9, 1))
+    } else if (count === 2) {
       const x1 = randomInt(6, -6)
       const x2 = randomInt(6, -6)
       if (x1 === x2) continue
+      if (x1 === 0 || x2 === 0 || x1 === -x2) continue
       ;({ b, c } = fromRoots(a, q(x1), q(x2)))
     } else if (count === 1) {
       const x0 = randomInt(5, -5)
@@ -109,11 +132,21 @@ function newEasyTask(count: Count): Task {
 
 const FRAC_A = [q(1, 2), q(-1, 2), q(1, 4), q(-1, 4), q(1, 3), q(-1, 3), q(3, 2), q(-3, 2), q(2, 3), q(-2, 3), q(2), q(-2), q(1), q(-1)]
 
-function newFractionTask(count: Count): Task {
+function newFractionTask(count: Count, special: Special): Task {
   for (;;) {
     const a = pick(FRAC_A)
     let b: Q, c: Q
-    if (count === 2 && Math.random() < 0.3) {
+    if (special === 'c0') {
+      const x2 = pick(HALVES)
+      if (x2.n === 0) continue
+      ;({ b, c } = fromRoots(a, q(0), x2))
+    } else if (special === 'b0' && count === 2) {
+      const r = pick(HALVES.filter((h) => h.n > 0))
+      ;({ b, c } = fromRoots(a, r, neg(r)))
+    } else if (special === 'b0') {
+      b = q(0)
+      c = mul(q(Math.sign(a.n)), pick(HALVES.filter((h) => h.n > 0)))
+    } else if (count === 2 && Math.random() < 0.3) {
       // Nullstellen sind keine "glatten" Zahlen: Ergebnis runden
       b = pick(HALVES)
       c = pick(HALVES)
@@ -122,7 +155,7 @@ function newFractionTask(count: Count): Task {
     } else if (count === 2) {
       const x1 = pick(HALVES)
       const x2 = pick(HALVES)
-      if (eqQ(x1, x2)) continue
+      if (eqQ(x1, x2) || x1.n === 0 || x2.n === 0 || eqQ(x1, neg(x2))) continue
       ;({ b, c } = fromRoots(a, x1, x2))
     } else if (count === 1) {
       const x0 = pick(HALVES)
@@ -165,14 +198,27 @@ function newVertexTask(count: Count): Task {
 }
 
 function newTask(level: Level, spec: Spec): Task {
-  if (level === 'einfach') return newEasyTask(spec.count)
-  return spec.form === 'scheitel' ? newVertexTask(spec.count) : newFractionTask(spec.count)
+  if (level === 'einfach') return newEasyTask(spec.count, spec.special)
+  return spec.form === 'scheitel' ? newVertexTask(spec.count) : newFractionTask(spec.count, spec.special)
 }
 
-/** Aufbau einer Seite: meist zwei Nullstellen, je einmal eine bzw. keine; Fortgeschritten im Wechsel mit Scheitelform */
+/**
+ * Aufbau einer Seite: meist zwei Nullstellen, je einmal eine bzw. keine; Fortgeschritten im Wechsel mit Scheitelform.
+ * Auf jeder Seite kommt einmal y = ax² + bx (c = 0) und einmal y = ax² + c (b = 0) vor.
+ */
 function pageSpecs(level: Level): Spec[] {
   const counts = shuffle<Count>([2, 2, 2, 2, 1, 0])
-  return counts.map((count, i) => ({ count, form: level === 'fortgeschritten' && i % 2 === 1 ? 'scheitel' : 'allgemein' }))
+  const specs: Spec[] = counts.map((count, i) => ({
+    count,
+    form: level === 'fortgeschritten' && i % 2 === 1 ? 'scheitel' : 'allgemein',
+    special: null,
+  }))
+  const general = specs.filter((s) => s.form === 'allgemein')
+  const c0 = general.find((s) => s.count === 2)
+  if (c0) c0.special = 'c0'
+  const b0 = general.find((s) => s.special === null && (s.count === 2 || s.count === 0))
+  if (b0) b0.special = 'b0'
+  return specs
 }
 
 /** Sechs paarweise verschiedene Aufgaben */
@@ -233,6 +279,97 @@ function pointsText(roots: number[]) {
   return roots.map((r, i) => `N_${i + 1}(${tn(r)} \\mid 0)`).join('\\quad ')
 }
 
+/** Fehlende Summanden mit 0 ausgeschrieben, z. B. "x^2 + 0 \cdot x - 9" */
+function fullPolyTex(a: Q, b: Q, c: Q) {
+  const bPart = b.n === 0 ? '+ 0 \\cdot x' : `${b.n < 0 ? '-' : '+'} ${coeff(q(Math.abs(b.n), b.d))}x`
+  const cPart = c.n === 0 ? '+ 0' : sgq(c)
+  return `${coeff(a)}x^2 ${bPart} ${cPart}`
+}
+
+/** Erklärt, warum b bzw. c gleich 0 ist (Summand fehlt in der Funktionsgleichung) */
+function ZeroCoefficientNote({ a, b, c }: { a: Q; b: Q; c: Q }) {
+  if (b.n !== 0 && c.n !== 0) return null
+  return (
+    <div className="bg-amber-50 border border-amber-300 rounded-lg p-3 text-sm space-y-2">
+      {b.n === 0 && (
+        <p>
+          <strong>Warum ist b = 0?</strong> In der Gleichung kommt <strong>kein Summand mit x</strong> vor (nur <Tex tex="x^2" /> und eine
+          Zahl). Ein fehlender Summand bedeutet: Es wird <Tex tex="0 \cdot x" /> addiert – und das ist 0. Der Koeffizient vor x ist also{' '}
+          <Tex tex="b = 0" />.
+        </p>
+      )}
+      {c.n === 0 && (
+        <p>
+          <strong>Warum ist c = 0?</strong> In der Gleichung steht <strong>keine Zahl ohne x</strong> (kein absolutes Glied). Ein fehlender
+          Summand bedeutet: Es wird 0 addiert. Also ist <Tex tex="c = 0" />.
+        </p>
+      )}
+      <p>So sieht die Gleichung mit allen drei Summanden aus:</p>
+      <Tex display tex={`${polyTex(a, b, c)} = 0 \\quad\\Longleftrightarrow\\quad ${fullPolyTex(a, b, c)} = 0`} />
+      <p>Mit diesen Werten rechnest du ganz normal mit der Mitternachtsformel weiter.</p>
+    </div>
+  )
+}
+
+/** Vollständiger Rechenweg mit der Mitternachtsformel: einsetzen, Wurzel ausrechnen, x₁ und x₂ bestimmen */
+function MitternachtsWeg({ a, b, c }: { a: Q; b: Q; c: Q }) {
+  const b2 = mul(b, b)
+  const ac4 = mul(q(4), mul(a, c))
+  const rad = sub(b2, ac4)
+  const twoA = mul(q(2), a)
+  const r = sqrtQ(rad)
+  const mb = tq(neg(b))
+  const ac4Tex = ac4.n === 0 ? '- 0' : sgq(neg(ac4))
+  const lines = [
+    `x_{1,2} = \\frac{-b \\pm \\sqrt{b^2 - 4 \\cdot a \\cdot c}}{2 \\cdot a}`,
+    `x_{1,2} = \\frac{-${tqp(b)} \\pm \\sqrt{${tqp(b)}^2 - 4 \\cdot ${tqp(a)} \\cdot ${tqp(c)}}}{2 \\cdot ${tqp(a)}}`,
+    `x_{1,2} = \\frac{${mb} \\pm \\sqrt{${tq(b2)} ${ac4Tex}}}{${tq(twoA)}}`,
+    `x_{1,2} = \\frac{${mb} \\pm \\sqrt{${tq(rad)}}}{${tq(twoA)}}`,
+  ]
+  if (r) lines.push(`x_{1,2} = \\frac{${mb} \\pm ${tq(r)}}{${tq(twoA)}}`)
+  return (
+    <>
+      <p>
+        Koeffizienten ablesen: <Tex tex={`a = ${tq(a)},\\quad b = ${tq(b)},\\quad c = ${tq(c)}`} />
+      </p>
+      <ZeroCoefficientNote a={a} b={b} c={c} />
+      <p>In die Mitternachtsformel einsetzen (negative Zahlen in Klammern) und ausrechnen:</p>
+      <Steps lines={lines.map((tex) => ({ tex }))} />
+      {rad.n < 0 && (
+        <p>
+          Unter der Wurzel steht die negative Zahl <Tex tex={tq(rad)} />. Aus einer negativen Zahl kann man keine Wurzel ziehen. Die
+          Gleichung hat deshalb <strong>keine Lösung</strong> – die Parabel hat <strong>keine Nullstelle</strong>.
+        </p>
+      )}
+      {rad.n === 0 && (
+        <>
+          <p>
+            Die Wurzel aus 0 ist 0. Ob du 0 addierst oder subtrahierst, macht keinen Unterschied: Es gibt <strong>genau eine Nullstelle</strong>.
+          </p>
+          <Tex display tex={`x = \\frac{${mb}}{${tq(twoA)}} = \\mathbf{${tn(-val(b) / val(twoA))}}`} />
+        </>
+      )}
+      {rad.n > 0 && (
+        <>
+          <p>Einmal mit + und einmal mit − rechnen:</p>
+          {(['+', '-'] as const).map((op, i) => {
+            const x = (val(neg(b)) + (op === '-' ? -1 : 1) * Math.sqrt(val(rad))) / val(twoA)
+            const num = r ? add(neg(b), op === '-' ? neg(r) : r) : null
+            return (
+              <div key={op}>
+                <Tex
+                  display
+                  tex={`x_${i + 1} = \\frac{${mb} ${op} ${sqrtTex(rad)}}{${tq(twoA)}} ${num ? `= \\frac{${tq(num)}}{${tq(twoA)}} ${eqSign(x)}` : '\\approx'} \\mathbf{${tn(x)}}`}
+                />
+              </div>
+            )
+          })}
+        </>
+      )}
+    </>
+  )
+}
+
 function SolutionSteps({ task }: { task: Task }) {
   return (
     <div className="mt-6 bk-taskbox text-left text-slate-700 space-y-3">
@@ -249,7 +386,7 @@ function SolutionSteps({ task }: { task: Task }) {
       </div>
       <div>
         <p className="font-semibold text-slate-800">{task.form === 'scheitel' ? 'Schritt 3: ' : ''}Mitternachtsformel</p>
-        <MitternachtsSteps a={task.a} b={task.b} c={task.c} noun="Nullstelle" />
+        <MitternachtsWeg a={task.a} b={task.b} c={task.c} />
       </div>
       <div className="font-bold text-slate-800 text-center text-lg">
         {task.roots.length === 0 ? <p>Keine Nullstelle</p> : <Tex display tex={pointsText(task.roots)} />}
@@ -337,9 +474,9 @@ function TaskCard({ number, level, spec, initialTask, onSolvedChange, onResult, 
 
   const countHint =
     task.form === 'scheitel' ? (
-      <>Tipp: Forme die Scheitelform zuerst in die allgemeine Form um und berechne dann die Diskriminante <Tex tex="D = b^2 - 4ac" />.</>
+      <>Tipp: Forme die Scheitelform zuerst in die allgemeine Form um, setze dann a, b und c in die Mitternachtsformel ein und rechne den Wert unter der Wurzel aus.</>
     ) : (
-      <>Tipp: Berechne zuerst die Diskriminante <Tex tex="D = b^2 - 4ac" />.</>
+      <>Tipp: Setze a, b und c in die Mitternachtsformel ein und rechne den Wert unter der Wurzel aus.</>
     )
 
   let message: React.ReactNode = null
@@ -490,8 +627,8 @@ function Erklaerung({ level }: { level: Level }) {
                   Dieses Zeichen gibt es auf dem Taschenrechner nicht – du musst also zwei Rechnungen durchführen (siehe Schritt 4).
                 </span>
                 <span className="block text-sm text-slate-600 mt-2">
-                  Der Wert unter der Wurzel heißt <strong>Diskriminante D</strong>. Ist <Tex tex="D < 0" />, gibt es keine Nullstelle; ist{' '}
-                  <Tex tex="D = 0" />, gibt es genau eine.
+                  Steht unter der Wurzel eine negative Zahl, kannst du keine Wurzel ziehen – dann gibt es keine Nullstelle. Steht unter der
+                  Wurzel 0, ist es egal, ob du 0 addierst oder subtrahierst – dann gibt es genau eine Nullstelle.
                 </span>
               </>
             ),
@@ -499,6 +636,7 @@ function Erklaerung({ level }: { level: Level }) {
               <>
                 <Tex display tex="x_{1,2} = \frac{-b \pm \sqrt{b^2 - 4 \cdot a \cdot c}}{2 \cdot a}" />
                 <Tex display tex="x_{1,2} = \frac{-(-2) \pm \sqrt{(-2)^2 - 4 \cdot 1 \cdot (-3)}}{2 \cdot 1}" />
+                <Tex display tex="x_{1,2} = \frac{2 \pm \sqrt{4 + 12}}{2} = \frac{2 \pm \sqrt{16}}{2}" />
               </>
             ),
           },
@@ -536,12 +674,17 @@ function Erklaerung({ level }: { level: Level }) {
         <>
           <h3 className="text-base font-bold text-slate-800 mt-5 mb-2">Brüche als Koeffizienten</h3>
           <p className="text-slate-700 mb-2">
-            Auch mit Brüchen setzt du a, b und c ganz normal in die Mitternachtsformel ein. Achte auf Klammern und rechne die
-            Diskriminante sorgfältig aus.
+            Auch mit Brüchen setzt du a, b und c ganz normal in die Mitternachtsformel ein. Achte auf Klammern und rechne den Wert
+            unter der Wurzel sorgfältig aus.
           </p>
           <Tex display tex="y = \tfrac{1}{2}x^2 - x - \tfrac{3}{2} \qquad a = \tfrac{1}{2},\; b = -1,\; c = -\tfrac{3}{2}" />
-          <Tex display tex="D = (-1)^2 - 4 \cdot \tfrac{1}{2} \cdot \left(-\tfrac{3}{2}\right) = 1 + 3 = 4" />
-          <Tex display tex={`x_{1,2} = \\frac{1 \\pm \\sqrt{4}}{2 \\cdot \\frac{1}{2}} = \\frac{1 \\pm 2}{1} \\quad\\Rightarrow\\quad x_1 = \\textcolor{${GREEN}}{\\mathbf{3}},\\; x_2 = \\textcolor{${GREEN}}{\\mathbf{-1}}`} />
+          <Steps
+            lines={[
+              { tex: 'x_{1,2} = \\frac{-(-1) \\pm \\sqrt{(-1)^2 - 4 \\cdot \\frac{1}{2} \\cdot \\left(-\\frac{3}{2}\\right)}}{2 \\cdot \\frac{1}{2}}' },
+              { tex: 'x_{1,2} = \\frac{1 \\pm \\sqrt{1 + 3}}{1} = \\frac{1 \\pm \\sqrt{4}}{1} = \\frac{1 \\pm 2}{1}' },
+            ]}
+          />
+          <Tex display tex={`x_1 = \\frac{1 + 2}{1} = \\textcolor{${GREEN}}{\\mathbf{3}},\\qquad x_2 = \\frac{1 - 2}{1} = \\textcolor{${GREEN}}{\\mathbf{-1}}`} />
           <p className="text-sm text-slate-600 mt-1">
             Tipp: Du kannst die Gleichung <Tex tex="0 = \tfrac{1}{2}x^2 - x - \tfrac{3}{2}" /> auch zuerst mit dem Hauptnenner (hier 2)
             multiplizieren: <Tex tex="0 = x^2 - 2x - 3" />. Die Nullstellen bleiben gleich.
@@ -561,14 +704,54 @@ function Erklaerung({ level }: { level: Level }) {
               { tex: 'y = 2x^2 - 4x - 6' },
             ]}
           />
-          <Tex display tex="a = 2,\quad b = -4,\quad c = -6 \qquad D = (-4)^2 - 4 \cdot 2 \cdot (-6) = 16 + 48 = 64" />
-          <Tex display tex={`x_{1,2} = \\frac{4 \\pm \\sqrt{64}}{2 \\cdot 2} = \\frac{4 \\pm 8}{4} \\quad\\Rightarrow\\quad x_1 = \\textcolor{${GREEN}}{\\mathbf{3}},\\; x_2 = \\textcolor{${GREEN}}{\\mathbf{-1}}`} />
+          <Tex display tex="a = 2,\quad b = -4,\quad c = -6" />
+          <Steps
+            lines={[
+              { tex: 'x_{1,2} = \\frac{-(-4) \\pm \\sqrt{(-4)^2 - 4 \\cdot 2 \\cdot (-6)}}{2 \\cdot 2}' },
+              { tex: 'x_{1,2} = \\frac{4 \\pm \\sqrt{16 + 48}}{4} = \\frac{4 \\pm \\sqrt{64}}{4} = \\frac{4 \\pm 8}{4}' },
+            ]}
+          />
+          <Tex display tex={`x_1 = \\frac{4 + 8}{4} = \\textcolor{${GREEN}}{\\mathbf{3}},\\qquad x_2 = \\frac{4 - 8}{4} = \\textcolor{${GREEN}}{\\mathbf{-1}}`} />
           <p className="text-sm text-slate-600 mt-1">
             Binomische Formeln: <Tex tex="(x - d)^2 = x^2 - 2dx + d^2" /> und <Tex tex="(x + d)^2 = x^2 + 2dx + d^2" />. Ist die Wurzel keine
             glatte Zahl, rundest du auf zwei Nachkommastellen.
           </p>
         </>
       )}
+
+      <h3 className="text-base font-bold text-slate-800 mt-5 mb-2">Sonderfälle: Es fehlt ein Summand</h3>
+      <p className="text-slate-700 mb-2">
+        Auch bei Funktionen wie <Tex tex="y = ax^2 + bx" /> oder <Tex tex="y = ax^2 + c" /> rechnest du mit der Mitternachtsformel. Fehlt in
+        der Gleichung ein Summand, wird dort <strong>0 addiert</strong> – der zugehörige Koeffizient ist also <strong>0</strong>.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bk-taskbox">
+          <p className="font-semibold text-slate-800 mb-1">Kein Summand mit x → b = 0</p>
+          <Tex display tex="x^2 - 9 = 0" />
+          <Tex display tex="x^2 + 0 \cdot x - 9 = 0" />
+          <Tex display tex="a = 1,\quad b = 0,\quad c = -9" />
+          <Steps
+            lines={[
+              { tex: 'x_{1,2} = \\frac{-0 \\pm \\sqrt{0^2 - 4 \\cdot 1 \\cdot (-9)}}{2 \\cdot 1}' },
+              { tex: 'x_{1,2} = \\frac{0 \\pm \\sqrt{0 + 36}}{2} = \\frac{0 \\pm 6}{2}' },
+            ]}
+          />
+          <Tex display tex={`x_1 = \\frac{0 + 6}{2} = \\textcolor{${RED}}{3},\\qquad x_2 = \\frac{0 - 6}{2} = \\textcolor{${BLUE}}{-3}`} />
+        </div>
+        <div className="bk-taskbox">
+          <p className="font-semibold text-slate-800 mb-1">Keine Zahl ohne x → c = 0</p>
+          <Tex display tex="x^2 - 4x = 0" />
+          <Tex display tex="x^2 - 4x + 0 = 0" />
+          <Tex display tex="a = 1,\quad b = -4,\quad c = 0" />
+          <Steps
+            lines={[
+              { tex: 'x_{1,2} = \\frac{-(-4) \\pm \\sqrt{(-4)^2 - 4 \\cdot 1 \\cdot 0}}{2 \\cdot 1}' },
+              { tex: 'x_{1,2} = \\frac{4 \\pm \\sqrt{16 - 0}}{2} = \\frac{4 \\pm 4}{2}' },
+            ]}
+          />
+          <Tex display tex={`x_1 = \\frac{4 + 4}{2} = \\textcolor{${RED}}{4},\\qquad x_2 = \\frac{4 - 4}{2} = \\textcolor{${BLUE}}{0}`} />
+        </div>
+      </div>
 
       <ul className="list-disc pl-5 mt-4 text-slate-700 space-y-1 text-sm">
         <li>
