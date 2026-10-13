@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fieldCheckClass } from '../../../utils/fieldCheck';
+import { VideoEmbed } from '../../../components/VideoButton';
 
 /**
  * Bruchgleichungen auf FOS/BOS-Niveau (Vorklasse):
@@ -431,6 +432,12 @@ export default function BruchgleichungenFOSBOS() {
           Ist die Lösungsmenge leer, tippe <code>leer</code>.
         </p>
       </div>
+
+      <VideoEmbed
+        src="https://www.youtube.com/watch?v=DZ29fqns_k0"
+        title="Erklärvideo: Bruchgleichungen lösen"
+        className="mb-4 max-w-[640px]"
+      />
 
       <div className="grid gap-4 grid-cols-1">
         {AUFGABEN.map((aufgabe, index) => {
