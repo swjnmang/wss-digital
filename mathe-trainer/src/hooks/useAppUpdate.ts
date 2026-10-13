@@ -7,13 +7,29 @@ import { useLocation } from 'react-router-dom'
 //   1. beim nächsten Seitenwechsel (die alte Seite wird ohnehin verlassen),
 //   2. wenn der Tab an einem neuen Tag wieder sichtbar wird oder 30 Minuten lang nichts eingegeben wurde,
 //   3. wenn der Nutzer im Hinweisband auf „Aktualisieren“ tippt.
+// Nach jedem Update (auch nach dem automatischen Neuladen oder beim nächsten Besuch) erscheint einmal
+// der Hinweis „Der Mathe-Trainer wurde aktualisiert“. Dazu merkt sich der Browser die zuletzt genutzte Build-Kennung.
 
 declare const __BUILD_ID__: string
 
-const CHECK_EVERY = 10 * 60 * 1000
+const CHECK_EVERY = 2 * 60 * 1000
+const CHECK_ON_NAV_AFTER = 30 * 1000
 const IDLE_LIMIT = 30 * 60 * 1000
+const SEEN_KEY = 'mathe-trainer-build'
 
 const dayOf = (t: number) => new Date(t).toDateString()
+
+/** true, wenn seit dem letzten Besuch eine neue Version geladen wurde; merkt sich die aktuelle Version */
+function updatedSinceLastVisit(): boolean {
+  if (import.meta.env.DEV) return false
+  try {
+    const seen = window.localStorage.getItem(SEEN_KEY)
+    window.localStorage.setItem(SEEN_KEY, __BUILD_ID__)
+    return seen !== null && seen !== __BUILD_ID__
+  } catch {
+    return false
+  }
+}
 
 async function latestBuild(): Promise<string | null> {
   try {
@@ -29,7 +45,9 @@ async function latestBuild(): Promise<string | null> {
 export function useAppUpdate() {
   const { pathname } = useLocation()
   const [available, setAvailable] = useState(false)
+  const [justUpdated, setJustUpdated] = useState(updatedSinceLastVisit)
   const availableRef = useRef(false)
+  const lastCheck = useRef(0)
   const lastActivity = useRef(Date.now())
   const firstPath = useRef(pathname)
 
@@ -37,6 +55,7 @@ export function useAppUpdate() {
 
   const check = useCallback(async () => {
     if (import.meta.env.DEV || availableRef.current) return availableRef.current
+    lastCheck.current = Date.now()
     const build = await latestBuild()
     if (build && build !== __BUILD_ID__) {
       availableRef.current = true
@@ -45,12 +64,13 @@ export function useAppUpdate() {
     return availableRef.current
   }, [])
 
-  // 1. Seitenwechsel: die neue Seite gleich frisch vom Server laden
+  // 1. Seitenwechsel: die neue Seite gleich frisch vom Server laden (sonst kurz nachsehen, ob es eine gibt)
   useEffect(() => {
     if (pathname === firstPath.current) return
     firstPath.current = pathname
     if (availableRef.current) reload()
-  }, [pathname, reload])
+    else if (Date.now() - lastCheck.current >= CHECK_ON_NAV_AFTER) void check()
+  }, [pathname, reload, check])
 
   // 2. Aktivität merken, regelmäßig prüfen, nach Pause oder am neuen Tag neu laden
   useEffect(() => {
@@ -91,6 +111,7 @@ export function useAppUpdate() {
     }
   }, [check, reload])
 
-  // 3. Hinweisband
-  return { available, reload }
+  // 3. Hinweisbänder
+  const dismissUpdated = useCallback(() => setJustUpdated(false), [])
+  return { available, reload, justUpdated, dismissUpdated }
 }
