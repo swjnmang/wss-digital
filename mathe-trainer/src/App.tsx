@@ -5,6 +5,7 @@ import TermeZusammenfassen from './pages/rechnen_lernen/TermeZusammenfassen';
 import TermeMitPotenzen from './pages/rechnen_lernen/TermeMitPotenzen';
 import Zusammenfassenpotenz from './pages/rechnen_lernen/terme/Zusammenfassenpotenz';
 import Ausklammern from './pages/rechnen_lernen/Ausklammern';
+import BinomischeFormeln from './pages/rechnen_lernen/BinomischeFormeln';
 // Rechnen lernen: Brüche
 import Kuerzenerweitern from './pages/rechnen_lernen/brueche/Kuerzenerweitern';
 import AddierensubtrahierenBruch from './pages/rechnen_lernen/brueche/Addierensubtrahieren';
@@ -220,6 +221,7 @@ export default function App() {
           <Route path="/rechnen_lernen/terme/mitpotenzen" element={<TermeMitPotenzen />} />
           <Route path="/rechnen_lernen/terme/zusammenfassenpotenz" element={<Zusammenfassenpotenz />} />
           <Route path="/rechnen_lernen/ausklammern" element={<Ausklammern />} />
+          <Route path="/rechnen_lernen/binomische-formeln" element={<BinomischeFormeln />} />
           <Route path="/rechnen_lernen/brueche" element={<Brueche />} />
           <Route path="/rechnen_lernen/brueche/kuerzenerweitern" element={<Kuerzenerweitern />} />
           <Route path="/rechnen_lernen/brueche/addierensubtrahieren" element={<AddierensubtrahierenBruch />} />
