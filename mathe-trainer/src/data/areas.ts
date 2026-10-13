@@ -72,6 +72,7 @@ export const AREAS: Area[] = [
           { title: 'Wurzeln', desc: 'Übungen zum Rechnen mit Wurzeln und zur Vereinfachung.', path: '/rechnen_lernen/wurzeln', icon: fa('square-root-variable') },
           { title: 'Prozentrechnung', desc: 'Grundlagen und fortgeschrittene Aufgaben zur Prozentrechnung.', path: '/rechnen_lernen/prozentrechnung', icon: fa('percent') },
           { title: 'Gleichungen', desc: 'Löse lineare und quadratische Gleichungen Schritt für Schritt.', path: '/rechnen_lernen/gleichungen', icon: fa('equals') },
+          { title: 'Ausklammern / Faktorisieren', desc: 'Klammere gemeinsame Faktoren aus Termen aus – von Zahlen bis zu ganzen Klammern.', path: '/rechnen_lernen/ausklammern', icon: fa('object-group') },
         ],
       },
     ],
