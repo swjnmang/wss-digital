@@ -1,5 +1,6 @@
 import type { Gen, PracticeConfig, TopicConfig } from '../../raum_und_form/engine/types';
-import { F, Fr, ch, chFixed, gcd, lcm, nm, nz, p, pick, poly, ri, setTex, sg, shuffle, t, WF } from '../lib';
+import { rechenregelnGens, rechenregelnSections } from './lb1_rechenregeln';
+import { F, ch, chFixed, gcd, nm, nz, p, pick, poly, ri, setTex, sg, shuffle, t, WF } from '../lib';
 
 // Lernbereich 1: Aussagenlogik, Mengenlehre mit Zahlenmengen, Rechenregeln
 
@@ -454,193 +455,6 @@ const teilmengen: Gen = () => {
     text: `Entscheide: $${s}$`,
     parts: [WF('Die Aussage ist …', v)],
     solution: [`$\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{Q} \\subset \\mathbb{R}$`, why, `Die Aussage ist **${v ? 'wahr' : 'falsch'}**.`],
-  };
-};
-
-// ---------------------------------------------------------------------------
-// Rechenregeln: Begriffe, ganze Zahlen, Brüche
-// ---------------------------------------------------------------------------
-
-const termArt: Gen = () => {
-  const a = ri(2, 9);
-  const b = ri(2, 9);
-  const c = ri(2, 9);
-  const d = ri(2, 9);
-  const items: [string, string, string][] = [
-    [`(${a} + ${b}) \\cdot ${c}`, 'Produkt', `Zuerst die Klammer, zuletzt wird mit $${c}$ multipliziert.`],
-    [`${a} \\cdot ${b} + ${c}`, 'Summe', 'Punkt vor Strich: zuletzt wird addiert.'],
-    [`${a * c + 10} - ${b * c} : ${c}`, 'Differenz', 'Punkt vor Strich: zuletzt wird subtrahiert.'],
-    [`(${a + b} - ${b}) : (${c} + ${d})`, 'Quotient', 'Beide Klammern zuerst, zuletzt wird dividiert.'],
-    [`${a} \\cdot (${b + c} - ${c}) - ${d}`, 'Differenz', 'Klammer, dann Produkt, zuletzt die Subtraktion.'],
-    [`${a} + ${b} \\cdot (${c} - ${d})`, 'Summe', 'Klammer, Produkt, zuletzt die Addition.'],
-    [`\\frac{${a} + ${b}}{${c}}`, 'Quotient', 'Der Bruchstrich ist die letzte Rechenart.'],
-  ];
-  const [term, art, why] = pick(items);
-  return {
-    title: 'Termart bestimmen',
-    text: `Wie heißt der Term $${term}$? (Die Termart richtet sich nach der Rechenart, die **zuletzt** ausgeführt wird.)`,
-    parts: [chFixed('Der Term ist eine …', ['Summe', 'Differenz', 'Produkt', 'Quotient'], ['Summe', 'Differenz', 'Produkt', 'Quotient'].indexOf(art))],
-    solution: [why, `Der Term ist eine **${art}**.`],
-  };
-};
-
-const operandName: Gen = () => {
-  const a = ri(12, 60);
-  const b = ri(2, 9);
-  const items: [string, string, string, string[]][] = [
-    [`${a} + ${b}`, `${b}`, 'Summand', ['Faktor', 'Subtrahend', 'Divisor']],
-    [`${a} - ${b}`, `${a}`, 'Minuend', ['Subtrahend', 'Summand', 'Dividend']],
-    [`${a} - ${b}`, `${b}`, 'Subtrahend', ['Minuend', 'Summand', 'Divisor']],
-    [`${a} \\cdot ${b}`, `${b}`, 'Faktor', ['Summand', 'Divisor', 'Produkt']],
-    [`${a * b} : ${b}`, `${a * b}`, 'Dividend', ['Divisor', 'Quotient', 'Faktor']],
-    [`${a * b} : ${b}`, `${b}`, 'Divisor', ['Dividend', 'Quotient', 'Subtrahend']],
-  ];
-  const [term, op, nameR, wrong] = pick(items);
-  return {
-    title: 'Operanden benennen',
-    text: `Im Term $${term}$: Wie heißt die Zahl $${op}$?`,
-    parts: [ch('Bezeichnung:', nameR, wrong)],
-    solution: [
-      'Summe: Summand + Summand · Differenz: Minuend − Subtrahend · Produkt: Faktor · Faktor · Quotient: Dividend : Divisor',
-      `$${op}$ ist hier der **${nameR}**.`,
-    ],
-  };
-};
-
-const ganzeZahlen: Gen = () => {
-  const k = ri(0, 3);
-  let term: string;
-  let steps: string[];
-  let val: number;
-  if (k === 0) {
-    const a = nz(-12, 12);
-    const b = nz(-6, 6);
-    const c = nz(-6, 6);
-    val = a - b * c;
-    term = `${a} - ${p(b)} \\cdot ${p(c)}`;
-    steps = [`Punkt vor Strich: $${p(b)} \\cdot ${p(c)} = ${b * c}$`, `$${a} - ${p(b * c)} = ${val}$`];
-  } else if (k === 1) {
-    const a = nz(-9, 9);
-    const b = nz(-9, 9);
-    const c = nz(-5, 5);
-    const d = nz(-9, 9);
-    val = (a + b) * c - d;
-    term = `(${a} ${sg(b)}) \\cdot ${p(c)} - ${p(d)}`;
-    steps = [`Klammer: $${a} ${sg(b)} = ${a + b}$`, `Produkt: $${p(a + b)} \\cdot ${p(c)} = ${(a + b) * c}$`, `$${(a + b) * c} - ${p(d)} = ${val}$`];
-  } else if (k === 2) {
-    const b = nz(-6, 6);
-    const q = nz(-8, 8);
-    const a = b * q;
-    const c = nz(-6, 6);
-    const d = nz(-6, 6);
-    val = q + c * d;
-    term = `${p(a)} : ${p(b)} + ${p(c)} \\cdot ${p(d)}`;
-    steps = [`Punktrechnungen zuerst: $${p(a)} : ${p(b)} = ${q}$ und $${p(c)} \\cdot ${p(d)} = ${c * d}$`, `$${q} + ${p(c * d)} = ${val}$`];
-  } else {
-    const a = nz(-4, 4);
-    const e = pick([2, 3]);
-    const b = nz(-9, 9);
-    val = a ** e - b;
-    term = `${p(a)}^{${e}} - ${p(b)}`;
-    steps = [`Potenz zuerst: $${p(a)}^{${e}} = ${a ** e}$`, `$${a ** e} - ${p(b)} = ${val}$`];
-  }
-  return {
-    title: 'Rechnen mit ganzen Zahlen',
-    text: `Berechne $${term}$.`,
-    parts: [nm('Ergebnis', val, { integer: true })],
-    solution: ['Reihenfolge: Klammer → Potenz → Punkt → Strich', ...steps],
-  };
-};
-
-function randFr(maxD = 9): Fr {
-  const d = ri(2, maxD);
-  let n = nz(-2 * d, 2 * d);
-  while (n % d === 0) n = nz(-2 * d, 2 * d);
-  return F(n, d);
-}
-
-const bruchAddSub: Gen = () => {
-  const a = randFr();
-  const b = randFr();
-  const plus = Math.random() < 0.5;
-  const r = plus ? a.add(b) : a.sub(b);
-  const hn = lcm(a.d, b.d);
-  const an = a.n * (hn / a.d);
-  const bn = b.n * (hn / b.d);
-  return {
-    title: 'Brüche addieren und subtrahieren',
-    text: `Berechne $${a.tex()} ${plus ? '+' : '-'} ${b.ptex()}$ und kürze vollständig. (Eingabe als Bruch, z. B. 5/6)`,
-    parts: [nm('Ergebnis', r, { tol: 0.002 })],
-    solution: [
-      `Hauptnenner: $${hn}$`,
-      `$${a.tex()} ${plus ? '+' : '-'} ${b.ptex()} = \\frac{${an}}{${hn}} ${plus ? '+' : '-'} ${bn < 0 ? `\\left(-\\frac{${-bn}}{${hn}}\\right)` : `\\frac{${bn}}{${hn}}`} = \\frac{${an} ${plus ? '+' : '-'} ${p(bn)}}{${hn}} = \\frac{${plus ? an + bn : an - bn}}{${hn}}$`,
-      `Gekürzt: $${r.tex()}$`,
-    ],
-  };
-};
-
-const bruchMulDiv: Gen = () => {
-  const a = randFr();
-  const b = randFr();
-  const mul = Math.random() < 0.5;
-  const r = mul ? a.mul(b) : a.div(b);
-  const inv = F(b.d, b.n);
-  return {
-    title: 'Brüche multiplizieren und dividieren',
-    text: `Berechne $${a.tex()} ${mul ? '\\cdot' : ':'} ${b.ptex()}$ und kürze vollständig.`,
-    parts: [nm('Ergebnis', r, { tol: 0.002 })],
-    solution: mul
-      ? [
-          'Zähler mal Zähler, Nenner mal Nenner (vorher kürzen, wenn möglich):',
-          `$${a.tex()} \\cdot ${b.ptex()} = \\frac{${a.n} \\cdot ${p(b.n)}}{${a.d} \\cdot ${b.d}} = ${r.tex()}$`,
-        ]
-      : [
-          'Durch einen Bruch dividieren = mit dem Kehrbruch multiplizieren:',
-          `$${a.tex()} : ${b.ptex()} = ${a.tex()} \\cdot ${inv.ptex()} = ${r.tex()}$`,
-        ],
-  };
-};
-
-const bruchGemischt: Gen = () => {
-  const a = randFr(6);
-  const b = randFr(6);
-  const c = randFr(5);
-  const s = a.add(b);
-  if (s.isZero()) return bruchAddSub();
-  const r = s.div(c);
-  return {
-    title: 'Bruchterm berechnen',
-    text: `Berechne $\\left(${a.tex()} + ${b.ptex()}\\right) : ${c.ptex()}$.`,
-    parts: [nm('Ergebnis', r, { tol: 0.002 })],
-    solution: [
-      `Klammer zuerst (Hauptnenner $${lcm(a.d, b.d)}$): $${a.tex()} + ${b.ptex()} = ${s.tex()}$`,
-      `Mit dem Kehrbruch multiplizieren: $${s.ptex()} \\cdot ${F(c.d, c.n).ptex()} = ${r.tex()}$`,
-    ],
-  };
-};
-
-const rechengesetze: Gen = () => {
-  const a = ri(2, 9);
-  const b = ri(2, 9);
-  const c = ri(2, 9);
-  const items: [string, string][] = [
-    [`${a} + ${b} = ${b} + ${a}`, 'Kommutativgesetz'],
-    [`${a} \\cdot ${b} = ${b} \\cdot ${a}`, 'Kommutativgesetz'],
-    [`(${a} + ${b}) + ${c} = ${a} + (${b} + ${c})`, 'Assoziativgesetz'],
-    [`(${a} \\cdot ${b}) \\cdot ${c} = ${a} \\cdot (${b} \\cdot ${c})`, 'Assoziativgesetz'],
-    [`${a} \\cdot (${b} + ${c}) = ${a} \\cdot ${b} + ${a} \\cdot ${c}`, 'Distributivgesetz'],
-    [`${a} \\cdot ${b} - ${a} \\cdot ${c} = ${a} \\cdot (${b} - ${c})`, 'Distributivgesetz'],
-  ];
-  const [eq, law] = pick(items);
-  const laws = ['Kommutativgesetz', 'Assoziativgesetz', 'Distributivgesetz'];
-  return {
-    title: 'Rechengesetze erkennen',
-    text: `Welches Rechengesetz wird hier angewendet?\n$${eq}$`,
-    parts: [chFixed('Gesetz:', laws, laws.indexOf(law))],
-    solution: [
-      'Kommutativgesetz: Reihenfolge vertauschen · Assoziativgesetz: Klammern versetzen · Distributivgesetz: ausmultiplizieren bzw. ausklammern',
-      `Hier: **${law}**.`,
-    ],
   };
 };
 
@@ -1213,17 +1027,13 @@ const pages: PracticeConfig[] = [
   {
     slug: 'rechenregeln',
     title: 'Rechenregeln, ganze Zahlen und Brüche',
-    description: 'Termart, Operanden, Rechengesetze, Bruchrechnen',
+    description: 'Termart, Fachbegriffe, Rechengesetze, ganze Zahlen, Bruchrechnen – in 8 Unterthemen',
     intro:
-      'Ein Term wird nach der Rechenart benannt, die **zuletzt** ausgeführt wird: Summe, Differenz, Produkt oder Quotient. Reihenfolge: **Klammer → Potenz → Punkt → Strich**.\n\nBrüche addieren/subtrahieren: auf den **Hauptnenner** erweitern. Multiplizieren: Zähler · Zähler und Nenner · Nenner. Dividieren: mit dem **Kehrbruch** multiplizieren. Ergebnisse immer vollständig kürzen. Brüche kannst du als z. B. **5/6** eingeben.',
+      'Dieses Thema ist in **8 Unterthemen** aufgeteilt. Wähle oben ein Unterthema, um es mit eigener Erklärung, Merkhilfe und Beispiel gezielt zu üben – oder übe alles gemischt.\n\nReihenfolge beim Rechnen: **Klammer → Potenz → Punkt → Strich**. Brüche kannst du als z. B. **-5/6** eingeben, Ergebnisse immer vollständig kürzen.',
     formulas: ['\\frac{a}{b} \\pm \\frac{c}{d} = \\frac{ad \\pm bc}{bd}', '\\frac{a}{b} \\cdot \\frac{c}{d} = \\frac{ac}{bd}', '\\frac{a}{b} : \\frac{c}{d} = \\frac{a}{b} \\cdot \\frac{d}{c}', 'a(b + c) = ab + ac'],
-    example: {
-      title: 'Brüche addieren',
-      text: 'Berechne $\\frac{3}{4} - \\frac{5}{6}$.',
-      steps: ['Hauptnenner $12$: $\\frac{9}{12} - \\frac{10}{12}$', '$= -\\frac{1}{12}$'],
-    },
-    gens: [termArt, operandName, rechengesetze, ganzeZahlen, bruchAddSub, bruchMulDiv, bruchGemischt],
-    nBasic: 6,
+    gens: rechenregelnGens,
+    nBasic: 8,
+    sections: rechenregelnSections,
   },
   {
     slug: 'potenzen-betrag',

@@ -2,7 +2,7 @@
 // Aufruf: npx tsx scripts/check-fos.tsx [Anzahl]
 import katex from 'katex';
 import { FOS_TOPICS } from '../src/pages/fos/registry';
-import type { Task } from '../src/pages/raum_und_form/engine/types';
+import type { Gen, PracticeConfig, Task } from '../src/pages/raum_und_form/engine/types';
 
 const N = Number(process.argv[2] ?? 200);
 let errors = 0;
@@ -62,29 +62,51 @@ function checkTask(task: Task, where: string) {
   });
 }
 
+const MIN_DISTINCT = 20;
+
+function checkGens(gens: Gen[], base: string, countDistinct: boolean) {
+  gens.forEach((g, gi) => {
+    const where = `${base}#${gi}`;
+    const distinct = new Set<string>();
+    let title = '';
+    for (let i = 0; i < N; i++) {
+      try {
+        const task = g();
+        title = task.title;
+        checkTask(task, where);
+        distinct.add(task.text);
+        seen.set(where, (seen.get(where) ?? 0) + 1);
+      } catch (e) {
+        errors++;
+        if (errors < 60) console.log(`[Exception] ${where}: ${(e as Error).message}`);
+      }
+    }
+    // Unterthemen: jeder Aufgabentyp muss mindestens 20 verschiedene Aufgaben liefern
+    if (countDistinct && distinct.size < MIN_DISTINCT) {
+      errors++;
+      console.log(`[zu wenig Aufgaben] ${where} „${title}“: nur ${distinct.size} verschiedene`);
+    }
+  });
+}
+
+function checkExplain(c: Pick<PracticeConfig, 'intro' | 'formulas' | 'example'>, pw: string) {
+  if (c.intro) texErrors(c.intro, pw + ' intro');
+  c.formulas?.forEach((f) => texErrors(`$${f}$`, pw + ' formel'));
+  if (c.example) {
+    texErrors(c.example.text, pw + ' beispiel');
+    c.example.steps.forEach((st) => texErrors(st, pw + ' beispiel'));
+    if (c.example.tip) texErrors(c.example.tip, pw + ' tipp');
+  }
+}
+
 for (const topic of FOS_TOPICS) {
   for (const page of topic.pages) {
     const pw = `${topic.slug}/${page.slug}`;
-    if (page.intro) texErrors(page.intro, pw + ' intro');
-    page.formulas?.forEach((f) => texErrors(`$${f}$`, pw + ' formel'));
-    if (page.example) {
-      texErrors(page.example.text, pw + ' beispiel');
-      page.example.steps.forEach((st) => texErrors(st, pw + ' beispiel'));
-      if (page.example.tip) texErrors(page.example.tip, pw + ' tipp');
-    }
-    const gens = [...page.gens, ...(page.apps ?? []), ...(page.fixed ?? [])];
-    gens.forEach((g, gi) => {
-      for (let i = 0; i < N; i++) {
-        const where = `${topic.slug}/${page.slug}#${gi}`;
-        try {
-          const task = g();
-          checkTask(task, where);
-          seen.set(where, (seen.get(where) ?? 0) + 1);
-        } catch (e) {
-          errors++;
-          if (errors < 60) console.log(`[Exception] ${where}: ${(e as Error).message}`);
-        }
-      }
+    checkExplain(page, pw);
+    checkGens([...page.gens, ...(page.apps ?? []), ...(page.fixed ?? [])], pw, false);
+    page.sections?.forEach((sec) => {
+      checkExplain(sec, `${pw}?teil=${sec.slug}`);
+      checkGens(sec.gens, `${pw}?teil=${sec.slug}`, true);
     });
   }
 }

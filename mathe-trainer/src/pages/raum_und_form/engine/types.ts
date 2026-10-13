@@ -57,6 +57,20 @@ export interface Example {
   tip?: Rich;
 }
 
+/** Unterthema einer Übungsseite mit eigener Erklärung und eigenen Aufgabentypen */
+export interface PracticeSection {
+  slug: string;
+  title: string;
+  description?: string;
+  intro?: Rich;
+  formulas?: string[];
+  example?: Example;
+  /** Aufgabentypen des Unterthemas */
+  gens: Gen[];
+  /** Anzahl der Aufgaben (Standard 8) */
+  nBasic?: number;
+}
+
 export interface PracticeConfig {
   slug: string;
   title: string;
@@ -77,6 +91,11 @@ export interface PracticeConfig {
   nBasic?: number;
   nApp?: number;
   nFixed?: number;
+  /**
+   * Unterthemen zum gezielten Üben (Auswahl oben auf der Seite, URL-Parameter ?teil=…).
+   * Ohne Auswahl werden `gens` gemischt geübt.
+   */
+  sections?: PracticeSection[];
 }
 
 export interface TopicConfig {
