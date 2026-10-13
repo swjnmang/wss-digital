@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import RechenwegDisplay from '../../../components/RechenwegDisplay';
 import TaskShell from '../../../components/layout/TaskShell'
+import BruchgleichungenFOSBOS from './Bruchgleichungen_FOSBOS';
 
 /**
  * Vergleicht zwei Lösungen auf Äquivalenz
@@ -124,7 +125,10 @@ export default function Generator_Bruchgleichungen() {
   const [answers, setAnswers] = useState<Record<string, { value: string; isCorrect: boolean | null }>>({});
   const [showSolutions, setShowSolutions] = useState<Record<string, boolean>>({});
 
-  const currentKategorie = AUFGABEN_KATEGORIEN[selectedCategory];
+  // Letzter Reiter: FOS/BOS-Niveau mit eigener Darstellung (Definitionsmenge, Hauptnenner, Lösungsmenge)
+  const fosBosIndex = AUFGABEN_KATEGORIEN.length;
+  const istFosBos = selectedCategory === fosBosIndex;
+  const currentKategorie = AUFGABEN_KATEGORIEN[istFosBos ? 0 : selectedCategory];
   const currentAufgaben = currentKategorie.aufgaben;
 
   // MathJax neu rendern, wenn sich die Aufgaben ändern
@@ -184,7 +188,22 @@ export default function Generator_Bruchgleichungen() {
               {kategorie.name}
             </button>
           ))}
+          <button
+            onClick={() => setSelectedCategory(fosBosIndex)}
+            className={`px-3 py-1 text-sm rounded font-semibold transition-all ${
+              istFosBos
+                ? 'bg-purple-500 text-white shadow-lg'
+                : 'bg-white text-gray-700 border border-gray-300 hover:border-purple-300'
+            }`}
+          >
+            FOS/BOS Niveau
+          </button>
         </div>
+
+        {istFosBos ? (
+          <BruchgleichungenFOSBOS />
+        ) : (
+        <>
 
         {/* Aufgaben */}
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -277,6 +296,8 @@ export default function Generator_Bruchgleichungen() {
             ></div>
           </div>
         </div>
+        </>
+        )}
       </div>
     </div>
     </TaskShell>
