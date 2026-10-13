@@ -63,6 +63,8 @@ export interface PracticeConfig {
   description: string;
   /** kurze Erklärung des Themas (Absätze mit \n\n getrennt) */
   intro?: Rich;
+  /** Erklärvideo (YouTube-Link), wird unter der Erklärung eingebettet */
+  video?: { src: string; title?: string };
   /** Formeln aus der Merkhilfe (KaTeX) */
   formulas?: string[];
   example?: Example;

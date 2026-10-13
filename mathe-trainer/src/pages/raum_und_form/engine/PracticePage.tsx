@@ -8,6 +8,7 @@ import type { Status } from './check';
 import type { Gen, PracticeConfig, Task, TopicConfig } from './types';
 import { shuffle } from './util';
 import TaskShell from '../../../components/layout/TaskShell';
+import { VideoEmbed } from '../../../components/VideoButton';
 
 interface Slot {
   id: number;
@@ -175,6 +176,9 @@ export default function PracticePage({ topic, cfg, base = '/raum-und-form', root
                       </p>
                     ))}
                   </div>
+                )}
+                {cfg.video && (
+                  <VideoEmbed src={cfg.video.src} title={cfg.video.title ?? `Erklärvideo: ${cfg.title}`} className="max-w-[640px]" />
                 )}
                 {ex && (
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto]">

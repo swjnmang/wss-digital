@@ -377,6 +377,7 @@ const pages: PracticeConfig[] = [
     description: 'Stufenform mit dem Gauß-Algorithmus, Rückwärtseinsetzen, Anwendungen',
     intro:
       'Beim **Gauß-Algorithmus** bringt man das LGS mit erlaubten Zeilenumformungen (Zeile vervielfachen, Zeilen addieren/subtrahieren, Zeilen tauschen) auf **Stufenform**: In der 2. Zeile fehlt $x$, in der 3. Zeile fehlen $x$ und $y$.\n\nDann löst man die letzte Zeile nach $z$ auf und setzt **rückwärts** ein. Übersichtlich ist die Schreibweise als erweiterte Koeffizientenmatrix (nur die Zahlen).',
+    video: { src: 'https://www.youtube.com/watch?v=vaahX3Wdxu8' },
     formulas: ['\\left(\\begin{array}{rrr|r} * & * & * & * \\\\ 0 & * & * & * \\\\ 0 & 0 & * & * \\end{array}\\right)'],
     example: {
       title: 'Stufenform',

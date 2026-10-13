@@ -868,6 +868,7 @@ const pages: PracticeConfig[] = [
     description: 'Lineare und quadratische Ungleichungen grafisch lösen, Intervall- und Mengenschreibweise',
     intro:
       'Eine Ungleichung $f(x) > 0$ fragt: **Wo liegt der Graph oberhalb der $x$-Achse?** Dazu bestimmt man die Nullstellen und skizziert den Graphen. Bei einer nach oben geöffneten Parabel ist $f(x) < 0$ **zwischen** den Nullstellen und $f(x) > 0$ **außerhalb**.\n\nDie Lösungsmenge gibt man beschreibend, z. B. $\\{x \\mid -1 < x < 3\\}$, oder als Intervall $]-1;\\,3[$ an. Bei $\\leq$ bzw. $\\geq$ gehören die Nullstellen dazu.',
+    video: { src: 'https://www.youtube.com/watch?v=DD5tEqYwhZY' },
     formulas: ['\\{x \\mid a < x < b\\} = ]a;\\,b[', '\\{x \\mid x \\leq a \\lor x \\geq b\\} = ]-\\infty;\\,a] \\cup [b;\\,+\\infty['],
     example: {
       title: 'Quadratische Ungleichung',
@@ -883,6 +884,7 @@ const pages: PracticeConfig[] = [
     description: 'Geradenbüschel, Parabelscharen, gemeinsame Punkte, Lage in Abhängigkeit vom Parameter',
     intro:
       'Enthält ein Funktionsterm einen **Parameter** (z. B. $k$, $t$ oder $m$), beschreibt er eine **Schar** von Graphen. Typische Fragen: Gibt es einen **gemeinsamen Punkt** aller Graphen? (Parameter ausklammern – wenn der Faktor beim Parameter null wird, ist der Funktionswert unabhängig vom Parameter.) Für welchen Parameterwert geht der Graph durch einen Punkt? (Punkt einsetzen, nach dem Parameter auflösen.)\n\nAnzahl der Nullstellen oder Schnittpunkte: Die **Diskriminante** hängt vom Parameter ab. Man löst $D = 0$, $D > 0$ und $D < 0$ nach dem Parameter auf.',
+    video: { src: 'https://www.youtube.com/watch?v=lSD30wNjr-0' },
     formulas: ['D = b^2 - 4ac', 'y = m \\cdot (x - x_0) + y_0'],
     example: {
       title: 'Parabelschar',
