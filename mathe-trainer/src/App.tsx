@@ -210,6 +210,12 @@ export default function App() {
           <button type="button" className="bk-btn bk-btn-sm" onClick={update.reload}>Aktualisieren</button>
         </div>
       )}
+      {!update.available && update.justUpdated && (
+        <div className="bk-update" role="status">
+          <span><i className="fa-solid fa-circle-check" aria-hidden="true" /> Der Mathe-Trainer wurde aktualisiert – du nutzt jetzt die neueste Version.</span>
+          <button type="button" className="bk-btn bk-btn-sm" onClick={update.dismissUpdated}>OK</button>
+        </div>
+      )}
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
