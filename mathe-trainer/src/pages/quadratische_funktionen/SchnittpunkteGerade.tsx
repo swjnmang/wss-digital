@@ -336,6 +336,110 @@ function SolutionSteps({ task, level }: { task: Task; level: Level }) {
       <div className="font-bold text-slate-800 text-center text-lg">
         {n === 0 ? <p>Kein Schnittpunkt</p> : <Tex display tex={pointsText(points)} />}
       </div>
+      <SolutionGraph task={task} />
+    </div>
+  )
+}
+
+// ---------- Grafische Lösung ----------
+
+const P_COLOR = '#2563eb'
+const G_COLOR = '#ea580c'
+const fmt = (n: number) => {
+  const r = Math.round(n * 100) / 100
+  return (r < 0 ? '−' : '') + String(Math.abs(r)).replace('.', ',')
+}
+const niceStep = (span: number) => [1, 2, 5, 10].find((s) => span / s <= 20) ?? 20
+
+/** Koordinatensystem mit Parabel, Gerade und den Schnittpunkten der Aufgabe */
+function SolutionGraph({ task }: { task: Task }) {
+  const { a, b, c, m, t, A, B, points } = task
+  const p = (x: number) => val(a) * x * x + val(b) * x + val(c)
+  const g = (x: number) => val(m) * x + val(t)
+
+  // Sichtbarer Bereich: Schnittpunkte, Scheitel und die Stelle, an der sich Parabel und Gerade am nächsten kommen
+  const xv = -val(b) / (2 * val(a))
+  const xd = -val(B) / (2 * val(A))
+  const relX = [0, xv, xd, ...points.map((pt) => pt.x)]
+  let xMin = Math.floor(Math.min(...relX) - 2)
+  let xMax = Math.ceil(Math.max(...relX) + 2)
+  while (xMax - xMin < 8) {
+    xMin--
+    xMax++
+  }
+  const relY = [0, p(xv), p(xd), g(xd), ...points.map((pt) => pt.y)]
+  const yMin = Math.floor(Math.min(...relY) - 2)
+  const yMax = Math.ceil(Math.max(...relY) + 2)
+
+  const W = 340
+  const ux = W / (xMax - xMin)
+  const H = Math.min(440, Math.max(260, (yMax - yMin) * ux))
+  const uy = H / (yMax - yMin)
+  const px = (x: number) => (x - xMin) * ux
+  const py = (y: number) => (yMax - y) * uy
+  const yStep = niceStep(yMax - yMin)
+  const xStep = niceStep(xMax - xMin)
+
+  const gridX = Array.from({ length: Math.floor(xMax / xStep) - Math.ceil(xMin / xStep) + 1 }, (_, i) => (Math.ceil(xMin / xStep) + i) * xStep)
+  const gridY = Array.from({ length: Math.floor(yMax / yStep) - Math.ceil(yMin / yStep) + 1 }, (_, i) => (Math.ceil(yMin / yStep) + i) * yStep)
+
+  const curve: string[] = []
+  for (let x = xMin; x <= xMax + 1e-9; x += (xMax - xMin) / 300) curve.push(`${px(x).toFixed(1)},${py(p(x)).toFixed(1)}`)
+
+  const id = `clip-${task.key.replace(/[^a-z0-9]/gi, '')}`
+  const n = points.length
+  const label = (i: number) => (n === 1 ? 'S' : `S${i === 0 ? '₁' : '₂'}`)
+  const caption =
+    n === 0
+      ? 'Parabel und Gerade haben keinen gemeinsamen Punkt.'
+      : n === 1
+        ? 'Die Gerade berührt die Parabel in genau einem Punkt.'
+        : 'Parabel und Gerade schneiden sich in den beiden berechneten Punkten.'
+
+  return (
+    <div>
+      <p className="font-semibold text-slate-800">Grafische Lösung</p>
+      <svg viewBox={`-12 -12 ${W + 24} ${H + 24}`} className="w-full max-w-sm mx-auto block" role="img" aria-label={`Parabel p und Gerade g. ${caption}`}>
+        <defs>
+          <clipPath id={id}>
+            <rect x={0} y={0} width={W} height={H} />
+          </clipPath>
+        </defs>
+        {gridX.map((x) => (
+          <line key={`gx${x}`} x1={px(x)} y1={0} x2={px(x)} y2={H} stroke="#e2e8f0" strokeWidth={1} />
+        ))}
+        {gridY.map((y) => (
+          <line key={`gy${y}`} x1={0} y1={py(y)} x2={W} y2={py(y)} stroke="#e2e8f0" strokeWidth={1} />
+        ))}
+        <line x1={0} y1={py(0)} x2={W} y2={py(0)} stroke="#334155" strokeWidth={1.5} />
+        <line x1={px(0)} y1={H} x2={px(0)} y2={0} stroke="#334155" strokeWidth={1.5} />
+        <text x={W - 4} y={py(0) - 6} fontSize={12} textAnchor="end" fill="#334155">x</text>
+        <text x={px(0) + 6} y={12} fontSize={12} fill="#334155">y</text>
+        {gridX.filter((x) => x !== 0 && x % (2 * xStep) === 0).map((x) => (
+          <text key={`lx${x}`} x={px(x)} y={py(0) + 13} fontSize={9} textAnchor="middle" fill="#64748b">{fmt(x)}</text>
+        ))}
+        {gridY.filter((y) => y !== 0 && y % (2 * yStep) === 0).map((y) => (
+          <text key={`ly${y}`} x={px(0) - 4} y={py(y) + 3} fontSize={9} textAnchor="end" fill="#64748b">{fmt(y)}</text>
+        ))}
+        <g clipPath={`url(#${id})`}>
+          <polyline points={curve.join(' ')} fill="none" stroke={P_COLOR} strokeWidth={2.5} />
+          <line x1={px(xMin)} y1={py(g(xMin))} x2={px(xMax)} y2={py(g(xMax))} stroke={G_COLOR} strokeWidth={2.5} />
+        </g>
+        {points.map((pt, i) => {
+          const right = px(pt.x) < W - 90
+          return (
+            <g key={i}>
+              <circle cx={px(pt.x)} cy={py(pt.y)} r={5} fill={RED} />
+              <text x={px(pt.x) + (right ? 8 : -8)} y={py(pt.y) + (i === 0 ? -6 : 14)} fontSize={12} fontWeight="bold" textAnchor={right ? 'start' : 'end'} fill={RED}>
+                {label(i)}({fmt(pt.x)}|{fmt(pt.y)})
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+      <p className="text-sm text-slate-600 text-center mt-1">
+        <span style={{ color: P_COLOR }} className="font-bold">p</span> Parabel, <span style={{ color: G_COLOR }} className="font-bold">g</span> Gerade. {caption}
+      </p>
     </div>
   )
 }
@@ -345,8 +449,7 @@ function SolutionSteps({ task, level }: { task: Task; level: Level }) {
 interface CardProps {
   number: number
   level: Level
-  spec: Spec
-  initialTask: Task
+  task: Task
   onSolvedChange: (solved: boolean) => void
   onResult: (correct: boolean) => void
   onHelp: () => void
@@ -359,8 +462,7 @@ const emptyInputs = (): PointInput[] => [
   { x: '', y: '' },
 ]
 
-function TaskCard({ number, level, spec, initialTask, onSolvedChange, onResult, onHelp }: CardProps) {
-  const [task, setTask] = useState(initialTask)
+function TaskCard({ number, level, task, onSolvedChange, onResult, onHelp }: CardProps) {
   const [count, setCount] = useState<Count | null>(null)
   const [inputs, setInputs] = useState<PointInput[]>(emptyInputs)
   const [solved, setSolved] = useState(false)
@@ -404,15 +506,6 @@ function TaskCard({ number, level, spec, initialTask, onSolvedChange, onResult, 
 
   function setInput(i: number, field: 'x' | 'y', value: string) {
     setInputs((prev) => prev.map((p, idx) => (idx === i ? { ...p, [field]: value } : p)))
-  }
-
-  function generateNewTask() {
-    setTask(newTask(level, spec))
-    setCount(null)
-    setInputs(emptyInputs())
-    setSolved(false)
-    setShowSolution(false)
-    onSolvedChange(false)
   }
 
   function onShowSolution() {
@@ -494,7 +587,6 @@ function TaskCard({ number, level, spec, initialTask, onSolvedChange, onResult, 
       {message}
 
       <div className="flex flex-wrap justify-center gap-3 mt-6">
-        <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
         <button onClick={onShowSolution} className={btnSecondary}>Lösung anzeigen</button>
       </div>
 
@@ -679,13 +771,14 @@ export default function SchnittpunkteGerade() {
   const [round, setRound] = useState(0)
   const [solved, setSolved] = useState<Record<number, boolean>>({})
   const [streak, setStreak] = useState(0)
-  const [finished, setFinished] = useState(false)
 
   const solvedCount = Object.values(solved).filter(Boolean).length
   const allSolved = solvedCount === TOTAL_TASKS
 
   // Pro Durchgang sechs verschiedene Aufgaben
   const tasks = useMemo(() => (level ? pageTasks(level) : []), [level, round])
+
+  const finalPraise = useMemo(() => pick(['Super, toll gemacht!', 'Klasse, alles richtig!', 'Hervorragend!']), [round])
 
   const completionRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -695,7 +788,6 @@ export default function SchnittpunkteGerade() {
   const startNewRound = () => {
     setRound((r) => r + 1)
     setSolved({})
-    setFinished(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -759,14 +851,13 @@ export default function SchnittpunkteGerade() {
           </button>
         </div>
 
-        {tasks.map(({ spec, task }, i) => (
+        {tasks.map(({ task }, i) => (
           // Nach einem Neustart per key getrennt (frischer Zustand)
           <React.Fragment key={`${level}-${round}-${i}`}>
             <TaskCard
               number={i + 1}
               level={level}
-              spec={spec}
-              initialTask={task}
+              task={task}
               onSolvedChange={(value) => setSolved((s) => ({ ...s, [i]: value }))}
               onResult={(correct) => setStreak((s) => (correct ? s + 1 : 0))}
               onHelp={() => setStreak(0)}
@@ -783,25 +874,21 @@ export default function SchnittpunkteGerade() {
 
         {allSolved && (
           <div ref={completionRef} className="bg-green-50 border-2 border-green-400 rounded-xl p-6 text-center">
-            {finished ? (
-              <>
-                <p className="text-green-800 font-semibold mb-4">Alles klar – bis zum nächsten Mal!</p>
-                <div className="flex flex-wrap justify-center gap-3">
-                  <button onClick={startNewRound} className={btnPrimary}>Doch noch neue Aufgaben</button>
-                  <button onClick={() => navigate('/quadratische_funktionen')} className={btnSecondary}>Zur Übersicht</button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="text-green-800 text-lg font-semibold mb-1">Super, toll gemacht!</p>
-                <p className="text-green-800 mb-4">Du hast alle {TOTAL_TASKS} Aufgaben richtig gelöst.</p>
-                <p className="text-slate-700 mb-4">Möchtest du neue Aufgaben üben oder hörst du hier auf?</p>
-                <div className="flex flex-wrap justify-center gap-3">
-                  <button onClick={startNewRound} className={btnPrimary}>Neue Aufgaben</button>
-                  <button onClick={() => setFinished(true)} className={btnSecondary}>Fertig für heute</button>
-                </div>
-              </>
-            )}
+            <p className="text-green-800 text-2xl font-bold mb-1">{finalPraise} 🎉</p>
+            <p className="text-green-800 mb-4">Du hast alle {TOTAL_TASKS} Aufgaben richtig gelöst.</p>
+            <p className="text-slate-700 mb-4">
+              {level === 'einfach'
+                ? 'Möchtest du 6 neue Aufgaben üben oder zum Schwierigkeitsgrad „Fortgeschritten“ wechseln?'
+                : 'Möchtest du 6 neue Aufgaben üben oder zurück zur Übersicht?'}
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <button onClick={startNewRound} className={btnSecondary}>6 neue Aufgaben</button>
+              {level === 'einfach' ? (
+                <button onClick={() => chooseLevel('fortgeschritten')} className={btnPrimary}>Weiter zu „Fortgeschritten“</button>
+              ) : (
+                <button onClick={() => navigate('/quadratische_funktionen')} className={btnPrimary}>Zur Übersicht</button>
+              )}
+            </div>
           </div>
         )}
       </div>
