@@ -276,6 +276,59 @@ export function MitternachtsSteps({ a, b, c, noun }: { a: Q; b: Q; c: Q; noun: '
   )
 }
 
+/**
+ * Lösungsweg ax² + bx + c = 0 ohne Diskriminanten-Argument: Die Mitternachtsformel wird immer komplett
+ * eingesetzt und ausgerechnet. Ist der Wert unter der Wurzel negativ, meldet der Taschenrechner „Math ERROR“.
+ */
+export function MitternachtsFullSteps({ a, b, c, noun }: { a: Q; b: Q; c: Q; noun: 'Nullstelle' | 'Schnittpunkt' }) {
+  const b2 = mul(b, b)
+  const ac4 = mul(q(4), mul(a, c))
+  const D = sub(b2, ac4)
+  const twoA = mul(q(2), a)
+  const r = sqrtQ(D)
+  const none = noun === 'Nullstelle' ? 'keine Nullstelle' : 'keinen Schnittpunkt'
+  const one = noun === 'Nullstelle' ? 'genau eine Nullstelle' : 'genau einen Schnittpunkt (Berührpunkt)'
+  const negB = tq(neg(b))
+  const insert = `x_{1,2} = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a} = \\frac{${tq(neg(b))} \\pm \\sqrt{${tqp(b)}^2 - 4 \\cdot ${tqp(a)} \\cdot ${tqp(c)}}}{2 \\cdot ${tqp(a)}} = \\frac{${negB} \\pm \\sqrt{${tq(b2)} ${sgq(neg(ac4))}}}{${tq(twoA)}} = \\frac{${negB} \\pm \\sqrt{${tq(D)}}}{${tq(twoA)}}`
+  return (
+    <>
+      <p>
+        Ablesen: <Tex tex={`a = ${tq(a)},\\quad b = ${tq(b)},\\quad c = ${tq(c)}`} />
+      </p>
+      <p>In die Mitternachtsformel einsetzen:</p>
+      <Tex display tex={insert} />
+      {D.n < 0 && (
+        <p>
+          Unter der Wurzel steht eine negative Zahl (<Tex tex={tq(D)} />). Der Taschenrechner zeigt <strong>„Math ERROR“</strong>, denn aus
+          einer negativen Zahl kann man keine Wurzel ziehen. Die Gleichung hat also keine Lösung, es gibt <strong>{none}</strong>.
+        </p>
+      )}
+      {D.n === 0 && (
+        <>
+          <Tex display tex={`x_{1,2} = \\frac{${negB} \\pm 0}{${tq(twoA)}} = \\mathbf{${tn(-val(b) / val(twoA))}}`} />
+          <p>
+            Unter der Wurzel steht 0, daher liefern <Tex tex="+" /> und <Tex tex="-" /> dasselbe Ergebnis (<Tex tex="x_1 = x_2" />). Es gibt{' '}
+            <strong>{one}</strong>.
+          </p>
+        </>
+      )}
+      {D.n > 0 &&
+        (['+', '-'] as const).map((op, i) => {
+          const x = (val(neg(b)) + (op === '-' ? -1 : 1) * Math.sqrt(val(D))) / val(twoA)
+          const num = r ? add(neg(b), op === '-' ? neg(r) : r) : null
+          return (
+            <div key={op}>
+              <Tex
+                display
+                tex={`x_${i + 1} = \\frac{${negB} ${op} ${sqrtTex(D)}}{${tq(twoA)}} ${num ? `= \\frac{${tq(num)}}{${tq(twoA)}} ${eqSign(x)}` : '\\approx'} \\mathbf{${tn(x)}}`}
+              />
+            </div>
+          )
+        })}
+    </>
+  )
+}
+
 // ---------- Erklärvideo ----------
 
 export function Video({ id, title }: { id: string; title: string }) {
