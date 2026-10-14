@@ -584,19 +584,9 @@ export default function Kalkulation() {
                 const status = getFieldStatus(row.key);
                 const profitStatus = getFieldStatus('gewinn_p');
                 
-                // Determine percentage label
-                let label = row.label;
+                // Keine Prozentsätze anzeigen: Der Schüler muss sie selbst aus dem Aufgabentext entnehmen
+                const label = row.operator ? `${row.operator} ${row.label}` : row.label;
                 const isDifferenceProfit = task.direction === 'Differenz' && row.key === 'gewinn';
-
-                if (row.percentageKey) {
-                  if (isDifferenceProfit) {
-                    label = `${row.operator} ${row.label}`;
-                  } else {
-                    label = `${row.operator} ${row.label} (${formatPercent(task.percentages[row.percentageKey])})`;
-                  }
-                } else if (row.operator) {
-                  label = `${row.operator} ${row.label}`;
-                }
 
                 return (
                   <div key={row.key} className={`grid grid-cols-[1fr_90px_32px] sm:grid-cols-[1fr_120px_50px] md:grid-cols-[1fr_180px_80px] border-b border-slate-100 items-center hover:bg-slate-50 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}`}>
