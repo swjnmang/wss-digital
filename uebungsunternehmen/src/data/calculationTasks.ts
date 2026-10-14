@@ -430,9 +430,10 @@ export const getRowsForSchema = (schema: CalculationSchema): CalculationRow[] =>
   return SCHEMA_ROWS.slice(0, bpIndex + 1);
 };
 
-/** Alle Felder, die der Schüler selbst ausfüllen muss. */
+/** Alle Felder, die der Schüler selbst ausfüllen muss – auch die gegebenen Werte
+ *  muss er selbst aus dem Aufgabentext übernehmen. */
 export const getEditableKeys = (task: CalcTask): string[] => {
-  const keys = getRowsForSchema(task.schema).map(r => r.key).filter(k => !isGivenField(task, k));
+  const keys = getRowsForSchema(task.schema).map(r => r.key);
   if (task.direction === 'Differenz') keys.push('gewinn_p');
   return keys;
 };
@@ -450,6 +451,8 @@ export const getCalculationExplanation = (
   const v = task.values;
   const f = formatEuro;
   const n = formatNumber;
+
+  if (isGivenField(task, key)) return `Gegebener Wert aus dem Aufgabentext (${f(v[key])})`;
 
   // Einkaufsseite vorwärts (Vorwärts- und Differenzkalkulation)
   const einkaufVorwaerts = (): string => {

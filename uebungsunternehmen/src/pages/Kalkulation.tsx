@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import {
   generateTask, type CalcTask, type CalculationSchema, type CalculationDirection, getCalculationExplanation,
-  formatPercent, getEditableKeys, getRowsForSchema, isGivenField, isInputCorrect
+  formatPercent, getEditableKeys, getRowsForSchema, isInputCorrect
 } from '../data/calculationTasks';
 
 type Mode = 'practice' | 'exam-intro' | 'exam' | 'exam-result';
@@ -56,31 +56,12 @@ export default function Kalkulation() {
   const newTask = () => {
     const t = generateTask(schema, direction);
     setTask(t);
-    resetInputs(t, direction, schema);
+    resetInputs();
   };
 
-  const resetInputs = (t: CalcTask, dir: CalculationDirection, sch: CalculationSchema) => {
-    // Pre-fill given values based on direction
-    const initialInputs: Record<string, string> = {};
-    
-    // Bezugskosten is typically given in both directions
-    initialInputs['bezugskosten'] = t.values.bezugskosten.toFixed(2).replace('.', ',');
-    
-    if (dir === 'Vorwärts') {
-      initialInputs['lep'] = t.values.lep.toFixed(2).replace('.', ',');
-    } else if (dir === 'Rückwärts') {
-      // Rückwärts
-      if (sch === 'Bezugskalkulation') {
-        initialInputs['bp'] = t.values.bp.toFixed(2).replace('.', ',');
-      } else {
-        initialInputs['brutto'] = t.values.brutto.toFixed(2).replace('.', ',');
-      }
-    } else if (dir === 'Differenz') {
-      initialInputs['lep'] = t.values.lep.toFixed(2).replace('.', ',');
-      initialInputs['brutto'] = t.values.brutto.toFixed(2).replace('.', ',');
-    }
-
-    setUserInputs(initialInputs);
+  const resetInputs = () => {
+    // Keine Werte vorbelegen: Der Schüler muss selbst erkennen, was gegeben und was gesucht ist
+    setUserInputs({});
     setFeedback({});
     setTouched({});
     setExpandedExplanations({});
@@ -122,7 +103,7 @@ export default function Kalkulation() {
     }));
     
     setTask(tasks[0]);
-    resetInputs(tasks[0], tasks[0].direction, tasks[0].schema);
+    resetInputs();
     setMode('exam');
   };
 
@@ -168,7 +149,7 @@ export default function Kalkulation() {
       }));
       
       setTask(nextTask);
-      resetInputs(nextTask, nextTask.direction, nextTask.schema);
+      resetInputs();
       window.scrollTo(0, 0);
     } else {
       // Finish
@@ -600,8 +581,7 @@ export default function Kalkulation() {
               </div>
 
               {visibleRows.map((row, idx) => {
-                const isReadOnly = isGivenField(task, row.key);
-                const status = isReadOnly ? undefined : getFieldStatus(row.key);
+                const status = getFieldStatus(row.key);
                 const profitStatus = getFieldStatus('gewinn_p');
                 
                 // Determine percentage label
@@ -644,10 +624,8 @@ export default function Kalkulation() {
                         onChange={(e) => handleInputChange(row.key, e.target.value)}
                         onBlur={() => markTouched(row.key)}
                         onKeyDown={(e) => { if (e.key === 'Enter') markTouched(row.key); }}
-                        disabled={isReadOnly || showSolution}
-                        className={`w-full p-0.5 md:p-1.5 border rounded text-right font-mono text-xs md:text-base outline-none ${
-                          isReadOnly ? 'bg-slate-100 text-slate-500 border-slate-300' : `focus:ring-2 focus:ring-blue-500 ${statusClasses(status)}`
-                        }`}
+                        disabled={showSolution}
+                        className={`w-full p-0.5 md:p-1.5 border rounded text-right font-mono text-xs md:text-base outline-none focus:ring-2 focus:ring-blue-500 ${statusClasses(status)}`}
                         placeholder="0,00"
                       />
                     </div>
