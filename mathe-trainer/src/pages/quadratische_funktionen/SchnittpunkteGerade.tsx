@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   BLUE,
   HALVES,
+  MitternachtsFullSteps,
   MitternachtsSteps,
   PRAISE,
   type AnswerStatus,
@@ -129,6 +130,8 @@ function newEasyTask(count: Count): Task {
     const c = add(quad.C, t)
     if (Math.abs(val(b)) > 10 || Math.abs(val(c)) > 15) continue
     const task = makeTask('allgemein', a, b, c, m, t)
+    // a, b und c sollen eindeutig sein: keine Gleichungen wie x² = 0, x² − 4 = 0 oder x² + 3x = 0
+    if (task.B.n === 0 || task.C.n === 0) continue
     if (task.points.some((p) => Math.abs(p.y) > 25)) continue
     return task
   }
@@ -275,7 +278,7 @@ function pointsText(points: { x: number; y: number }[]) {
   return points.map((p, i) => pointTex(i + 1, p)).join('\\quad ')
 }
 
-function SolutionSteps({ task }: { task: Task }) {
+function SolutionSteps({ task, level }: { task: Task; level: Level }) {
   const { a, b, c, m, t, xs, ys, A, B, C, points } = task
   const poly = polyTex(a, b, c)
   const line = lineTex(m, t)
@@ -311,7 +314,11 @@ function SolutionSteps({ task }: { task: Task }) {
       </div>
       <div>
         <p className="font-semibold text-slate-800">Schritt 3: Mitternachtsformel</p>
-        <MitternachtsSteps a={A} b={B} c={C} noun="Schnittpunkt" />
+        {level === 'einfach' ? (
+          <MitternachtsFullSteps a={A} b={B} c={C} noun="Schnittpunkt" />
+        ) : (
+          <MitternachtsSteps a={A} b={B} c={C} noun="Schnittpunkt" />
+        )}
       </div>
       {n > 0 && (
         <div>
@@ -423,8 +430,12 @@ function TaskCard({ number, level, spec, initialTask, onSolvedChange, onResult, 
   } else if (count !== null && !countRight) {
     message = (
       <p className="text-center font-bold mt-4 text-red-600">
-        Die Anzahl stimmt noch nicht. Tipp: Setze gleich, bringe alles auf eine Seite und berechne die Diskriminante{' '}
-        <Tex tex="D = b^2 - 4ac" />.
+        Die Anzahl stimmt noch nicht. Tipp: Setze gleich, bringe alles auf eine Seite und{' '}
+        {level === 'einfach' ? (
+          <>wende die Mitternachtsformel an. Zeigt der Taschenrechner „Math ERROR“, gibt es keine Lösung.</>
+        ) : (
+          <>berechne die Diskriminante <Tex tex="D = b^2 - 4ac" />.</>
+        )}
       </p>
     )
   } else if (dup) {
@@ -487,7 +498,7 @@ function TaskCard({ number, level, spec, initialTask, onSolvedChange, onResult, 
         <button onClick={onShowSolution} className={btnSecondary}>Lösung anzeigen</button>
       </div>
 
-      {showSolution && <SolutionSteps task={task} />}
+      {showSolution && <SolutionSteps task={task} level={level} />}
     </div>
   )
 }
@@ -585,10 +596,17 @@ function Erklaerung({ level }: { level: Level }) {
               <>
                 <strong>3.</strong> Löse die Gleichung mit Hilfe der <strong>Mitternachtsformel</strong>. Achte beim Einsetzen von a, b und c
                 darauf, dass negative Zahlen in Klammern geschrieben werden!
-                <span className="block text-sm text-slate-600 mt-2">
-                  Die Diskriminante <Tex tex="D = b^2 - 4ac" /> verrät die Anzahl: <Tex tex="D > 0" /> zwei Schnittpunkte,{' '}
-                  <Tex tex="D = 0" /> ein Berührpunkt, <Tex tex="D < 0" /> kein Schnittpunkt.
-                </span>
+                {level === 'einfach' ? (
+                  <span className="block text-sm text-slate-600 mt-2">
+                    Steht unter der Wurzel eine negative Zahl, zeigt der Taschenrechner „Math ERROR“: Dann gibt es keinen Schnittpunkt.
+                    Steht unter der Wurzel 0, sind <Tex tex="x_1" /> und <Tex tex="x_2" /> gleich: Dann gibt es genau einen Berührpunkt.
+                  </span>
+                ) : (
+                  <span className="block text-sm text-slate-600 mt-2">
+                    Die Diskriminante <Tex tex="D = b^2 - 4ac" /> verrät die Anzahl: <Tex tex="D > 0" /> zwei Schnittpunkte,{' '}
+                    <Tex tex="D = 0" /> ein Berührpunkt, <Tex tex="D < 0" /> kein Schnittpunkt.
+                  </span>
+                )}
               </>
             ),
             example: (
@@ -609,9 +627,9 @@ function Erklaerung({ level }: { level: Level }) {
             example: (
               <>
                 <Tex display tex={`y = 3 \\cdot (\\textcolor{${RED}}{3}) + 2 = 11`} />
-                <p className="text-center">→ Schnittpunkt <Tex tex="S_1(3 \\mid 11)" /></p>
+                <p className="text-center">→ Schnittpunkt <Tex tex="S_1(3 \mid 11)" /></p>
                 <Tex display tex={`y = 3 \\cdot (\\textcolor{${BLUE}}{-2}) + 2 = -4`} />
-                <p className="text-center">→ Schnittpunkt <Tex tex="S_2(-2 \\mid -4)" /></p>
+                <p className="text-center">→ Schnittpunkt <Tex tex="S_2(-2 \mid -4)" /></p>
               </>
             ),
           },
