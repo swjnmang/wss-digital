@@ -1,11 +1,13 @@
 import React, { useEffect, useId, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { BlockMath, InlineMath } from 'react-katex'
+import 'katex/dist/katex.min.css'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { VideoEmbed } from '../../components/VideoButton'
 import PageShell from '../../components/layout/TaskShell'
 
-// Sechs Aufgaben, jede mit einem eigenen Aufgabentyp
-const TOTAL_TASKS = 6
+// Zehn Aufgaben, jede mit einem eigenen Aufgabentyp
+const TOTAL_TASKS = 10
 
 // Erklärvideo zum y-Achsenabschnitt (YouTube)
 const VIDEO_ID = 'IgUrqycTKPQ'
@@ -58,9 +60,47 @@ function eq(m: number, t: number, reversed = false) {
   return `y = ${termMx(m)} ${t > 0 ? '+' : '−'} ${fmt(Math.abs(t))}`
 }
 
-const Eq = ({ children }: { children: React.ReactNode }) => (
-  <span className="font-serif italic whitespace-nowrap">{children}</span>
-)
+// ---------- KaTeX ----------
+
+/** Zahl als TeX mit deutschem Komma */
+function tex(n: number) {
+  const r = Math.round(n * 100) / 100
+  return String(r).replace('.', '{,}')
+}
+
+/** Negative Zahlen in Klammern, z. B. für 2 · (−3) */
+function texP(n: number) {
+  return n < 0 ? `(${tex(n)})` : tex(n)
+}
+
+function texMx(m: number) {
+  if (m === 1) return 'x'
+  if (m === -1) return '-x'
+  return `${tex(m)}x`
+}
+
+/** Rechte Seite m·x + t als TeX */
+function texRhs(m: number, t: number) {
+  if (m === 0) return tex(t)
+  if (t === 0) return texMx(m)
+  return `${texMx(m)} ${t > 0 ? '+' : '-'} ${tex(Math.abs(t))}`
+}
+
+function texEq(m: number, t: number) {
+  return `y = ${texRhs(m, t)}`
+}
+
+/** Wandelt die Klartext-Schreibweise (−, ·, 0,5) in TeX um */
+function plainToTex(s: string) {
+  return s
+    .replace(/[−–]/g, '-')
+    .replace(/·/g, '\\cdot ')
+    .replace(/(\d),(\d)/g, '$1{,}$2')
+}
+
+const M = ({ math }: { math: string }) => <InlineMath math={math} />
+
+const Eq = ({ children }: { children: string }) => <InlineMath math={plainToTex(children)} />
 
 // ---------- Koordinatensystem (SVG) ----------
 
@@ -220,7 +260,7 @@ function Erklaerung() {
         </p>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
+      <div className="flex flex-col gap-5">
       {/* Interaktive Darstellung */}
       <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-3 sm:p-4">
         <p className="font-semibold text-slate-800 text-center mb-3">Probiere es aus: Verändere t und beobachte die Gerade.</p>
@@ -303,7 +343,7 @@ function Erklaerung() {
       {/* Beispiel */}
       <div className="space-y-3">
         <h3 className="font-bold text-slate-800">Beispiel: <Eq>y = 2x − 3</Eq></h3>
-        <div className="grid gap-4 lg:grid-cols-2 lg:items-center">
+        <div className="flex flex-col gap-4">
         <div className="space-y-3">
         <p>
           Vergleiche die Wertetabellen von <Eq>y = 2x</Eq> und <Eq>y = 2x − 3</Eq>:
@@ -463,7 +503,7 @@ function AnswerFields({
           const border = s === 'right' ? 'border-green-500 bg-green-50' : s === 'wrong' ? 'border-red-500 bg-red-50' : 'border-slate-300'
           return (
             <label key={i} className="flex items-center gap-2">
-              <span className="font-semibold text-slate-800 font-serif italic">{label}</span>
+              <span className="font-semibold text-slate-800"><Eq>{label}</Eq></span>
               <input
                 value={inputs[i]}
                 readOnly={solved}
@@ -950,6 +990,359 @@ function FullGraphTaskCard(props: CardProps) {
   )
 }
 
+// ---------- Aufgabe 7: t mit einem Punkt berechnen ----------
+
+const niceSlopes = [-3, -2, -1, -0.5, 0.5, 1, 2, 3] as const
+
+function newPointTask() {
+  const m = pick(niceSlopes)
+  let x0 = 0
+  // bei halben Steigungen nur gerade x-Werte, damit t ganzzahlig bleibt
+  while (x0 === 0 || (!Number.isInteger(m) && x0 % 2 !== 0)) x0 = randomInt(4, -4)
+  const t = randomInt(6, -6)
+  return { m, x0, y0: m * x0 + t, t }
+}
+
+/** Äquivalenzumformung y0 = m·x0 + t  →  t = y0 − m·x0 */
+function solveForT(m: number, x0: number, y0: number) {
+  const mx = m * x0
+  const op = mx > 0 ? '-' : '+'
+  return String.raw`\begin{aligned}
+    ${tex(y0)} &= ${tex(m)} \cdot ${texP(x0)} + t \\
+    ${tex(y0)} &= ${tex(mx)} + t \qquad \left|\, ${op} ${tex(Math.abs(mx))} \right. \\
+    ${tex(y0)} ${op} ${tex(Math.abs(mx))} &= t \\
+    t &= ${tex(y0 - mx)}
+  \end{aligned}`
+}
+
+function PointTaskCard(props: CardProps) {
+  const { task, live, showSolution, newTask, showSol } = useInputTask(
+    'y-Achsenabschnitt mit Punkt berechnen',
+    newPointTask,
+    (k) => [k.t],
+    props,
+  )
+  const { m, x0, y0, t } = task
+
+  return (
+    <TaskShell
+      number={props.number}
+      title="y-Achsenabschnitt mit einem Punkt berechnen"
+      onNew={newTask}
+      onShowSolution={showSol}
+      solution={
+        showSolution && (
+          <>
+            <p>
+              <b>1. Ansatz:</b> <M math="y = m \cdot x + t" /> mit <M math={`m = ${tex(m)}`} />
+            </p>
+            <p>
+              <b>2. Punkt einsetzen:</b> <M math={`x = ${tex(x0)}`} /> und <M math={`y = ${tex(y0)}`} />, dann nach t
+              auflösen:
+            </p>
+            <BlockMath math={solveForT(m, x0, y0)} />
+            <p>
+              <b>3. Ergebnis:</b> <M math={texEq(m, t)} />, die Gerade schneidet die y-Achse in{' '}
+              <M math={`S_y(0\\,|\\,${tex(t)})`} />.
+            </p>
+          </>
+        )
+      }
+    >
+      <p className="text-slate-700 mb-4">
+        Eine Gerade hat die Steigung <M math={`m = ${tex(m)}`} /> und verläuft durch den Punkt{' '}
+        <M math={`P(${tex(x0)}\\,|\\,${tex(y0)})`} />. Berechne den y-Achsenabschnitt t.
+      </p>
+      <AnswerFields live={live} labels={['t =']} />
+    </TaskShell>
+  )
+}
+
+// ---------- Aufgabe 8: Gleichung in die Form y = m·x + t umformen ----------
+
+function newRearrangeTask() {
+  const variant = randomInt(2)
+  const m = pick(niceSlopes)
+  let t = 0
+  while (t === 0) t = randomInt(6, -6)
+  const k = Number.isInteger(m) ? pick([2, 3, 4, -2]) : pick([2, 4, -2])
+  return { variant, m, t, k }
+}
+
+function rearrangeTex({ variant, m, t, k }: ReturnType<typeof newRearrangeTask>) {
+  if (variant === 0) {
+    // y − t = m·x
+    const c = -t
+    const lhs = `y ${c > 0 ? '+' : '-'} ${tex(Math.abs(c))}`
+    return {
+      question: `${lhs} = ${texMx(m)}`,
+      steps: String.raw`\begin{aligned}
+        ${lhs} &= ${texMx(m)} \qquad \left|\, ${c > 0 ? '-' : '+'} ${tex(Math.abs(c))} \right. \\
+        y &= ${texRhs(m, t)}
+      \end{aligned}`,
+    }
+  }
+  if (variant === 1) {
+    // y − m·x = t
+    const lhs = `y ${m > 0 ? '-' : '+'} ${texMx(Math.abs(m))}`
+    return {
+      question: `${lhs} = ${tex(t)}`,
+      steps: String.raw`\begin{aligned}
+        ${lhs} &= ${tex(t)} \qquad \left|\, ${m > 0 ? '+' : '-'} ${texMx(Math.abs(m))} \right. \\
+        y &= ${tex(t)} ${m > 0 ? '+' : '-'} ${texMx(Math.abs(m))} \\
+        y &= ${texRhs(m, t)}
+      \end{aligned}`,
+    }
+  }
+  // k·y = k·m·x + k·t
+  return {
+    question: `${tex(k)}y = ${texRhs(k * m, k * t)}`,
+    steps: String.raw`\begin{aligned}
+      ${tex(k)}y &= ${texRhs(k * m, k * t)} \qquad \left|\, : ${texP(k)} \right. \\
+      y &= ${texRhs(m, t)}
+    \end{aligned}`,
+  }
+}
+
+function RearrangeTaskCard(props: CardProps) {
+  const { task, live, showSolution, newTask, showSol } = useInputTask(
+    'Gleichung umformen (m und t)',
+    newRearrangeTask,
+    (k) => [k.m, k.t],
+    props,
+  )
+  const { m, t } = task
+  const { question, steps } = rearrangeTex(task)
+
+  return (
+    <TaskShell
+      number={props.number}
+      title="Gleichung umformen"
+      onNew={newTask}
+      onShowSolution={showSol}
+      solution={
+        showSolution && (
+          <>
+            <p>Forme die Gleichung so um, dass y allein auf der linken Seite steht:</p>
+            <BlockMath math={steps} />
+            <p>
+              Jetzt kannst du ablesen: <b><M math={`m = ${tex(m)}`} /></b> und <b><M math={`t = ${tex(t)}`} /></b>.
+            </p>
+          </>
+        )
+      }
+    >
+      <p className="text-slate-700 mb-1">
+        Bringe die Gleichung in die Form <M math="y = m \cdot x + t" /> und gib m und t an.
+      </p>
+      <div className="text-xl text-slate-800 my-2">
+        <BlockMath math={question} />
+      </div>
+      <AnswerFields live={live} labels={['m =', 't =']} />
+    </TaskShell>
+  )
+}
+
+// ---------- Aufgabe 9: Sachaufgabe ----------
+
+type Context = { m: number; t: number; x: number; text: string; question: string; yUnit: string; xText: string }
+
+/** Zahl im deutschen Format für den Fließtext */
+function de(n: number, digits = 0) {
+  return n.toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: 2 })
+}
+
+const contexts: (() => Context)[] = [
+  () => {
+    const t = pick([2.5, 3, 3.5, 4])
+    const m = pick([1.5, 2, 2.5])
+    const x = randomInt(15, 3)
+    return {
+      m, t, x, yUnit: '€', xText: 'gefahrene Kilometer',
+      text: `Ein Taxiunternehmen verlangt eine Grundgebühr von ${de(t, 2)} € und ${de(m, 2)} € pro gefahrenem Kilometer. x steht für die gefahrenen Kilometer, y für den Fahrpreis in €.`,
+      question: `Fahrpreis für ${x} km`,
+    }
+  },
+  () => {
+    const t = pick([20, 24, 30])
+    const m = -pick([1.5, 2, 2.5])
+    const x = randomInt(Math.floor(t / -m) - 1, 2)
+    return {
+      m, t, x, yUnit: 'cm', xText: 'Brenndauer in Stunden',
+      text: `Eine Kerze ist zu Beginn ${de(t)} cm hoch. Pro Stunde brennt sie ${de(-m)} cm ab. x steht für die Brenndauer in Stunden, y für die Höhe der Kerze in cm.`,
+      question: `Höhe nach ${x} Stunden`,
+    }
+  },
+  () => {
+    const t = pick([29, 39, 49])
+    const m = pick([19, 24, 29])
+    const x = randomInt(12, 2)
+    return {
+      m, t, x, yUnit: '€', xText: 'Anzahl der Monate',
+      text: `Ein Fitnessstudio verlangt eine einmalige Aufnahmegebühr von ${de(t)} € und einen Monatsbeitrag von ${de(m)} €. x steht für die Anzahl der Monate, y für die Gesamtkosten in €.`,
+      question: `Gesamtkosten nach ${x} Monaten`,
+    }
+  },
+  () => {
+    const t = pick([50, 80, 120])
+    const m = pick([15, 20, 25])
+    const x = randomInt(10, 2)
+    return {
+      m, t, x, yUnit: 'Liter', xText: 'Zeit in Minuten',
+      text: `In einem Regenwassertank sind bereits ${de(t)} Liter Wasser. Eine Pumpe füllt pro Minute ${de(m)} Liter nach. x steht für die Zeit in Minuten, y für die Wassermenge in Litern.`,
+      question: `Wassermenge nach ${x} Minuten`,
+    }
+  },
+  () => {
+    const t = 100
+    const m = -pick([5, 8, 10])
+    const x = randomInt(Math.floor(100 / -m) - 1, 2)
+    return {
+      m, t, x, yUnit: '%', xText: 'Zeit in Stunden',
+      text: `Ein Handyakku ist vollständig geladen (${de(t)} %). Beim Spielen verliert er pro Stunde ${de(-m)} Prozentpunkte. x steht für die Spielzeit in Stunden, y für den Akkustand in %.`,
+      question: `Akkustand nach ${x} Stunden`,
+    }
+  },
+]
+
+function ContextTaskCard(props: CardProps) {
+  const { task, live, showSolution, newTask, showSol } = useInputTask(
+    'Sachaufgabe y-Achsenabschnitt',
+    () => pick(contexts)(),
+    (k) => [k.m, k.t, k.m * k.x + k.t],
+    props,
+  )
+  const { m, t, x, text, question, yUnit } = task
+  const y = m * x + t
+
+  return (
+    <TaskShell
+      number={props.number}
+      title="Sachaufgabe"
+      onNew={newTask}
+      onShowSolution={showSol}
+      solution={
+        showSolution && (
+          <>
+            <p>
+              <b>1. y-Achsenabschnitt:</b> Der Startwert (bei <M math="x = 0" />) ist <M math={`t = ${tex(t)}`} />.
+            </p>
+            <p>
+              <b>2. Steigung:</b> Die Änderung pro Einheit von x ist <M math={`m = ${tex(m)}`} />
+              {m < 0 && ' (der Wert nimmt ab, deshalb ist m negativ)'}.
+            </p>
+            <p>
+              <b>3. Gleichung:</b> <M math={texEq(m, t)} />
+            </p>
+            <p>
+              <b>4. Einsetzen:</b>
+            </p>
+            <BlockMath math={`y = ${tex(m)} \\cdot ${tex(x)} ${t >= 0 ? '+' : '-'} ${tex(Math.abs(t))} = ${tex(m * x)} ${t >= 0 ? '+' : '-'} ${tex(Math.abs(t))} = ${tex(y)}`} />
+            <p>
+              {question}: <b>{de(y, yUnit === '€' ? 2 : 0)} {yUnit}</b>
+            </p>
+          </>
+        )
+      }
+    >
+      <p className="text-slate-700 mb-3 text-left">{text}</p>
+      <ol className="text-slate-700 mb-4 text-left list-decimal pl-6 space-y-1">
+        <li>
+          Gib die Steigung m und den y-Achsenabschnitt t der Funktion <M math="y = m \cdot x + t" /> an.
+        </li>
+        <li>Berechne: {question} (y in {yUnit}).</li>
+      </ol>
+      <AnswerFields live={live} labels={['m =', 't =', 'y =']} />
+    </TaskShell>
+  )
+}
+
+// ---------- Aufgabe 10: m und t aus einer Wertetabelle ----------
+
+function newTableTask() {
+  const m = pick(niceSlopes)
+  const t = randomInt(5, -5)
+  const step = Number.isInteger(m) ? 1 : 2
+  const withZero = Math.random() < 0.5
+  const start = withZero ? (step === 1 ? randomInt(0, -3) : pick([-4, -2, 0])) : randomInt(3, 1)
+  const xs = [0, 1, 2, 3].map((i) => start + i * step)
+  return { m, t, xs, ys: xs.map((x) => m * x + t) }
+}
+
+function TableTaskCard(props: CardProps) {
+  const { task, live, showSolution, newTask, showSol } = useInputTask(
+    'm und t aus Wertetabelle',
+    newTableTask,
+    (k) => [k.m, k.t],
+    props,
+  )
+  const { m, t, xs, ys } = task
+  const zeroIndex = xs.indexOf(0)
+
+  return (
+    <TaskShell
+      number={props.number}
+      title="Wertetabelle auswerten"
+      onNew={newTask}
+      onShowSolution={showSol}
+      solution={
+        showSolution && (
+          <>
+            <p>
+              <b>1. Steigung:</b> Nimm zwei Wertepaare, z. B. <M math={`(${tex(xs[0])}\\,|\\,${tex(ys[0])})`} /> und{' '}
+              <M math={`(${tex(xs[1])}\\,|\\,${tex(ys[1])})`} />:
+            </p>
+            <BlockMath
+              math={`m = \\frac{y_2 - y_1}{x_2 - x_1} = \\frac{${tex(ys[1])} - ${texP(ys[0])}}{${tex(xs[1])} - ${texP(xs[0])}} = \\frac{${tex(ys[1] - ys[0])}}{${tex(xs[1] - xs[0])}} = ${tex(m)}`}
+            />
+            {zeroIndex >= 0 ? (
+              <p>
+                <b>2. y-Achsenabschnitt:</b> In der Tabelle steht bei <M math="x = 0" /> der Wert{' '}
+                <M math={`y = ${tex(t)}`} />, also <M math={`t = ${tex(t)}`} />.
+              </p>
+            ) : (
+              <>
+                <p>
+                  <b>2. y-Achsenabschnitt:</b> <M math="x = 0" /> steht nicht in der Tabelle. Setze ein Wertepaar,
+                  z. B. <M math={`(${tex(xs[0])}\\,|\\,${tex(ys[0])})`} />, in <M math={`y = ${tex(m)} \\cdot x + t`} />{' '}
+                  ein:
+                </p>
+                <BlockMath math={solveForT(m, xs[0], ys[0])} />
+              </>
+            )}
+            <p>
+              <b>3. Gleichung:</b> <M math={texEq(m, t)} />
+            </p>
+          </>
+        )
+      }
+    >
+      <p className="text-slate-700 mb-4">
+        Die Wertetabelle gehört zu einer linearen Funktion <M math="y = m \cdot x + t" />. Bestimme m und t.
+      </p>
+      <div className="overflow-x-auto mb-4">
+        <table className="mx-auto border-collapse text-center whitespace-nowrap">
+          <tbody>
+            <tr className="bg-slate-100">
+              <th className="border border-slate-300 px-4 py-1"><M math="x" /></th>
+              {xs.map((x) => (
+                <td key={x} className="border border-slate-300 px-4 py-1"><M math={tex(x)} /></td>
+              ))}
+            </tr>
+            <tr>
+              <th className="border border-slate-300 px-4 py-1"><M math="y" /></th>
+              {ys.map((y, i) => (
+                <td key={i} className="border border-slate-300 px-4 py-1"><M math={tex(y)} /></td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <AnswerFields live={live} labels={['m =', 't =']} />
+    </TaskShell>
+  )
+}
+
 // ---------- Seite ----------
 
 const cardTypes = [
@@ -959,6 +1352,10 @@ const cardTypes = [
   ShiftTextTaskCard,
   MatchTaskCard,
   FullGraphTaskCard,
+  PointTaskCard,
+  RearrangeTaskCard,
+  ContextTaskCard,
+  TableTaskCard,
 ]
 
 export default function YAchsenabschnitt() {
@@ -998,7 +1395,7 @@ export default function YAchsenabschnitt() {
   ))
 
   return (
-    <PageShell title="y-Achsenabschnitt" width="wide">
+    <PageShell title="y-Achsenabschnitt" width="narrow">
         <div className="flex flex-col gap-6">
         <div>
           <p className="text-center text-slate-600">
@@ -1012,7 +1409,7 @@ export default function YAchsenabschnitt() {
           Übungsaufgaben
         </h2>
 
-        <div className="grid gap-6 lg:grid-cols-2 lg:items-start">{cards}</div>
+        <div className="flex flex-col gap-6">{cards}</div>
 
         <div className="flex justify-center gap-3 flex-wrap">
           <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">
