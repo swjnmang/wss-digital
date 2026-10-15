@@ -318,7 +318,7 @@ function DrawCard({ number, task, level, onNewTask, onSolvedChange }: CardProps)
               <div>
                 <h4 className="font-bold text-lg text-blue-600 mb-2">Schritt 4: Punkte eintragen</h4>
                 <p className="text-gray-700">
-                  Beginne immer im Ursprung <InlineMath math="(0 \\mid 0)" />. Gehe zuerst den x-Wert nach rechts (+) oder links (−). Gehe dann den
+                  Beginne immer im Ursprung <InlineMath math="(0 \mid 0)" />. Gehe zuerst den x-Wert nach rechts (+) oder links (−). Gehe dann den
                   y-Wert nach oben (+) oder unten (−). Dort machst du ein kleines Kreuz.
                 </p>
               </div>
