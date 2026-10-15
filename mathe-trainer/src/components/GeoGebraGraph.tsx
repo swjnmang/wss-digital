@@ -17,6 +17,8 @@ interface GeoGebraGraphProps {
   view?: [number, number, number, number];
   /** Steigungsdreieck ab x = x1 mit waagrechter Kathete dx (Δx grün, Δy rot) */
   triangle?: { x1: number; dx: number } | null;
+  /** Feste Schrittweite für Achsenbeschriftung und Gitter (sonst wählt GeoGebra sie automatisch) */
+  step?: number;
 }
 
 const GGB_SRC = 'https://www.geogebra.org/apps/deployggb.js';
@@ -55,14 +57,15 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
   grid = false,
   view,
   triangle = null,
+  step,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const appletRef = useRef<any>(null);
   const elementIdRef = useRef<string>(`ggb-elem-${Math.random().toString(36).substr(2, 9)}`);
   const [scriptLoaded, setScriptLoaded] = React.useState<boolean>(!!window.GGBApplet);
   const [error, setError] = React.useState<boolean>(false);
-  const latest = useRef({ m, t, grid, view, triangle });
-  latest.current = { m, t, grid, view, triangle };
+  const latest = useRef({ m, t, grid, view, triangle, step });
+  latest.current = { m, t, grid, view, triangle, step };
 
   // Skript laden (einmal für die ganze Seite, alle Graphen warten auf dasselbe Laden)
   useEffect(() => {
@@ -144,15 +147,25 @@ const GeoGebraGraph: React.FC<GeoGebraGraphProps> = ({
       updateGraph(appletRef.current);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [m, t, grid, viewKey, triangleKey]);
+  }, [m, t, grid, viewKey, triangleKey, step]);
 
   const updateGraph = (api: any) => {
-    const { m, t, grid, view, triangle } = latest.current;
+    const { m, t, grid, view, triangle, step } = latest.current;
     try {
       api.reset();
       api.evalCommand(`f(x) = ${m}*x + ${t}`);
       if (grid) api.setGridVisible(true);
       if (view) api.setCoordSystem(view[0], view[1], view[2], view[3]);
+      if (step) {
+        const s = String(step);
+        api.setAxisSteps(1, s, s, s);
+        // Gitter passend zur Schrittweite (ältere GeoGebra-Versionen kennen das evtl. nicht)
+        try {
+          api.setGraphicsOptions?.(1, { gridDistance: { x: step, y: step } });
+        } catch {
+          /* Gitter bleibt automatisch */
+        }
+      }
       if (triangle) {
         const { x1, dx } = triangle;
         const x2 = x1 + dx;
