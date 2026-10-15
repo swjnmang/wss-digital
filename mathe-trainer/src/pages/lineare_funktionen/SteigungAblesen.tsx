@@ -4,8 +4,10 @@ import GeoGebraGraph from '../../components/GeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
+import { VideoEmbed } from '../../components/VideoButton'
 
 const TOTAL_TASKS = 6
+const VIDEO_ID = 'fN52WXY_72g'
 
 // Einfach: nur Ursprungsgeraden y = m·x, Fortgeschritten: Geraden y = m·x + t
 type Level = 'einfach' | 'fortgeschritten'
@@ -384,6 +386,8 @@ function Erklaerung({ level }: { level: Level }) {
         <li>Tipp: Gehst du genau 1 Kästchen nach rechts, kannst du m direkt als Δy ablesen. Bei Brüchen brauchst du aber meist mehr Kästchen.</li>
         <li>Du kannst das Ergebnis als Bruch (z. B. 2/3 oder −3/4) oder als Dezimalzahl eingeben.</li>
       </ul>
+      <h3 className="text-base font-bold text-slate-800 mt-5 mb-2 text-center">Erklärvideo</h3>
+      <VideoEmbed src={`https://www.youtube.com/embed/${VIDEO_ID}`} title="Erklärvideo: Steigung ablesen" />
     </div>
   )
 }
