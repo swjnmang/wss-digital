@@ -81,9 +81,8 @@ function buildTipps(m: number, t: number, decimal = false) {
   const direction = m > 0 ? 'nach oben' : 'nach unten'
   const right = denominator === 1 ? '1 Einheit' : `${denominator} Einheiten`
   const slopeText =
-    `Gehst du von einem deiner Punkte ${right} nach rechts, musst du ${rise} ${rise === 1 ? 'Einheit' : 'Einheiten'} ${direction} gehen, ` +
-    `um den nächsten Punkt auf der Geraden zu erreichen. Die Gerade verläuft deshalb von ` +
-    `${m > 0 ? 'links unten nach rechts oben' : 'links oben nach rechts unten'}.`
+    `Gehst du von einem Kreuz ${right} nach rechts, musst du ${rise} ${rise === 1 ? 'Einheit' : 'Einheiten'} ${direction} gehen. ` +
+    `Die Gerade geht also ${m > 0 ? 'von links nach rechts bergauf' : 'von links nach rechts bergab'}.`
 
   return { denominator, rows, mLatex: valueToLatex(m, decimal), slopeText }
 }
@@ -243,80 +242,101 @@ function DrawCard({ number, task, level, onNewTask, onSolvedChange }: CardProps)
 
             <div className="p-6 space-y-6 text-left">
               <p className="text-gray-700">
-                Diese Tipps passen zu deiner aktuellen Aufgabe: <InlineMath math={equationLatex} />
+                Deine Funktion: <InlineMath math={equationLatex} />
               </p>
 
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
+                <p className="text-gray-800">
+                  Es gibt verschiedene Wege, einen Graphen zu zeichnen. <strong>Ein einfacher Weg ist die Wertetabelle.</strong>{' '}
+                  Damit findest du ein paar Punkte, die auf der Geraden liegen. Dann musst du die Punkte nur noch verbinden.
+                </p>
+              </div>
+
               <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">1. Wertetabelle erstellen</h4>
-                <p className="text-gray-700 mb-3">
-                  Wähle einige x-Werte aus und schreibe sie in die erste Spalte. Setze dann jeden x-Wert für{' '}
-                  <InlineMath math="x" /> in die Funktionsgleichung ein und rechne aus. Das Ergebnis ist der passende
-                  y-Wert. Jede Zeile der Tabelle ergibt einen Punkt <InlineMath math="(x \mid y)" />.
+                <h4 className="font-bold text-lg text-blue-600 mb-2">Schritt 1: x-Werte aussuchen</h4>
+                <p className="text-gray-700">
+                  Such dir ein paar Zahlen für <InlineMath math="x" /> aus, zum Beispiel{' '}
+                  <InlineMath math={tipps.rows.map((r) => r.xLatex).join(';\ ')} />.
                 </p>
                 {tipps.denominator > 1 && (
-                  <p className="text-gray-700 mb-3">
+                  <p className="text-gray-700 mt-2">
                     <strong>Tipp:</strong>{' '}
                     {decimal
-                      ? <>Vor dem <InlineMath math="x" /> steht eine Zahl mit Nachkommastelle. Wähle deshalb gerade x-Werte (z. B. −2, 0, 2) – dann kommen beim Rechnen glatte Zahlen heraus.</>
-                      : <>Vor dem <InlineMath math="x" /> steht ein Bruch mit dem Nenner {tipps.denominator}. Wähle deshalb x-Werte, die durch {tipps.denominator} teilbar sind – dann kürzt sich der Bruch weg und das Rechnen wird leichter.</>}
+                      ? <>Vor dem <InlineMath math="x" /> steht eine Kommazahl. Nimm gerade Zahlen für <InlineMath math="x" /> (z. B. −2, 0, 2). Dann kommen beim Rechnen glatte Zahlen heraus.</>
+                      : <>Vor dem <InlineMath math="x" /> steht ein Bruch mit dem Nenner {tipps.denominator}. Nimm für <InlineMath math="x" /> Zahlen aus der {tipps.denominator}er-Reihe. Dann fällt der Bruch beim Rechnen weg.</>}
                   </p>
                 )}
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg text-blue-600 mb-2">Schritt 2: y-Werte ausrechnen</h4>
+                <p className="text-gray-700 mb-3">
+                  Setze jede Zahl für <InlineMath math="x" /> in die Gleichung ein und rechne aus. Das Ergebnis ist der y-Wert.
+                </p>
+                <ul className="space-y-2">
+                  {tipps.rows.map((row) => (
+                    <li key={row.x} className="bg-gray-50 rounded px-3 py-2 text-gray-800 overflow-x-auto">
+                      <span className="text-gray-600 mr-2">Für <InlineMath math={`x = ${row.xLatex}`} />:</span>
+                      <InlineMath math={row.calculation} />
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-sm text-gray-600 mt-2">
+                  Achtung bei negativen Zahlen: Setze sie in Klammern. Minus mal Minus ergibt Plus.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg text-blue-600 mb-2">Schritt 3: Wertetabelle ausfüllen</h4>
+                <p className="text-gray-700 mb-3">
+                  Schreibe oben die x-Werte und darunter die passenden y-Werte. Jede Spalte ist ein Punkt <InlineMath math="(x \mid y)" />.
+                </p>
                 <div className="overflow-x-auto">
-                  <table className="w-full border-collapse text-sm text-gray-800 not-prose">
-                    <thead>
-                      <tr className="bg-blue-100">
-                        <th className="border border-blue-300 px-3 py-2 text-center">x</th>
-                        <th className="border border-blue-300 px-3 py-2 text-left">x einsetzen und ausrechnen</th>
-                        <th className="border border-blue-300 px-3 py-2 text-center">y</th>
-                        <th className="border border-blue-300 px-3 py-2 text-center">Punkt</th>
-                      </tr>
-                    </thead>
+                  <table className="border-collapse text-gray-800 mx-auto">
                     <tbody>
-                      {tipps.rows.map((row) => (
-                        <tr key={row.x} className="odd:bg-white even:bg-blue-50">
-                          <td className="border border-blue-200 px-3 py-2 text-center"><InlineMath math={row.xLatex} /></td>
-                          <td className="border border-blue-200 px-3 py-2"><InlineMath math={row.calculation} /></td>
-                          <td className="border border-blue-200 px-3 py-2 text-center font-semibold"><InlineMath math={row.yLatex} /></td>
-                          <td className="border border-blue-200 px-3 py-2 text-center"><InlineMath math={row.point} /></td>
-                        </tr>
-                      ))}
+                      <tr>
+                        <th className="border border-blue-300 bg-blue-100 px-3 py-2 text-center">x</th>
+                        {tipps.rows.map((row) => (
+                          <td key={row.x} className="border border-blue-300 px-4 py-2 text-center"><InlineMath math={row.xLatex} /></td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th className="border border-blue-300 bg-blue-100 px-3 py-2 text-center">y</th>
+                        {tipps.rows.map((row) => (
+                          <td key={row.x} className="border border-blue-300 px-4 py-2 text-center font-semibold"><InlineMath math={row.yLatex} /></td>
+                        ))}
+                      </tr>
                     </tbody>
                   </table>
                 </div>
-                <p className="text-sm text-gray-600 mt-2">
-                  Achte beim Einsetzen von negativen Zahlen auf die Klammern und auf die Vorzeichenregeln: Minus mal Minus ergibt Plus.
+                <p className="text-gray-700 mt-3">
+                  Deine Punkte:{' '}
+                  <InlineMath math={tipps.rows.map((r) => r.point).join(';\ ')} />
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">2. Punkte ins Koordinatensystem eintragen</h4>
-                <p className="text-gray-700 mb-3">
-                  Trage die Punkte aus der letzten Spalte genau ins Koordinatensystem ein. Gehe beim x-Wert nach rechts
-                  (positiv) oder links (negativ) und beim y-Wert nach oben (positiv) oder unten (negativ). Markiere jeden
-                  Punkt als kleines Kreuz.
+                <h4 className="font-bold text-lg text-blue-600 mb-2">Schritt 4: Punkte eintragen</h4>
+                <p className="text-gray-700">
+                  Beginne immer im Ursprung <InlineMath math="(0 \\mid 0)" />. Gehe zuerst den x-Wert nach rechts (+) oder links (−). Gehe dann den
+                  y-Wert nach oben (+) oder unten (−). Dort machst du ein kleines Kreuz.
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">3. Kontrolle mit der Steigung</h4>
-                <p className="text-gray-700 mb-3">
-                  Die Zahl vor dem <InlineMath math="x" /> ist die Steigung <InlineMath math={`m = ${tipps.mLatex}`} />. {tipps.slopeText}
-                </p>
-              </div>
-
-              <div>
-                <h4 className="font-bold text-lg text-blue-600 mb-2">4. Gerade zeichnen</h4>
-                <p className="text-gray-700 mb-3">
-                  Verbinde die Punkte mit einem Lineal zu einer geraden Linie. Verlängere die Linie über die markierten Punkte
-                  hinaus bis zum Rand des Koordinatensystems.
+                <h4 className="font-bold text-lg text-blue-600 mb-2">Schritt 5: Gerade zeichnen</h4>
+                <p className="text-gray-700">
+                  Verbinde die Kreuze mit dem Lineal. Zeichne die Linie bis zum Rand des Koordinatensystems.
                 </p>
               </div>
 
               <div className="bg-green-50 border-l-4 border-green-600 p-4">
-                <h4 className="font-bold text-green-700 mb-2">💡 Profi-Tipp:</h4>
+                <h4 className="font-bold text-green-700 mb-2">💡 So kannst du dich kontrollieren</h4>
+                <p className="text-gray-700 mb-2">
+                  Liegen alle Kreuze auf einer Linie? Dann hast du richtig gerechnet. Liegt ein Kreuz daneben, rechne diesen Punkt noch einmal nach.
+                </p>
                 <p className="text-gray-700">
-                  Für eine Gerade reichen eigentlich zwei Punkte. Mit einem dritten Punkt kannst du aber prüfen, ob du dich
-                  verrechnet hast: Liegen alle Punkte auf einer Linie, hast du richtig gerechnet!
+                  Die Zahl vor dem <InlineMath math="x" /> ist die Steigung <InlineMath math={`m = ${tipps.mLatex}`} />. {tipps.slopeText}
                 </p>
               </div>
             </div>
