@@ -155,7 +155,7 @@ export default function WasIstLinear() {
   )
   const allCorrect = results.every(Boolean)
 
-  // Richtige Zuordnungen werden sofort grün. Sind alle richtig, gibt es einen Punkt
+  // Richtige Zuordnungen werden sofort grün, falsche rot. Sind alle richtig, gibt es einen Punkt
   // und nach kurzer Pause kommt automatisch eine neue Aufgabe.
   useEffect(() => {
     if (!allCorrect) return
@@ -248,7 +248,7 @@ export default function WasIstLinear() {
               Stufe 2: auch y = m · x + t
             </button>
           </div>
-          <p className="text-slate-700 mb-4">Unten stehen vier Texte (A–D). Ordne jeder Wertetabelle, jedem Graphen und jeder Gleichung den passenden Text zu. Richtige Zuordnungen werden sofort grün.</p>
+          <p className="text-slate-700 mb-4">Unten stehen vier Texte (A–D). Ordne jeder Wertetabelle, jedem Graphen und jeder Gleichung den passenden Text zu. Richtige Zuordnungen werden sofort grün, falsche rot.</p>
 
           <div className="grid sm:grid-cols-2 gap-3 mb-6">
             {fns.map((f, i) => (
@@ -268,7 +268,7 @@ export default function WasIstLinear() {
                 {cards.map((c, i) => {
                   if (c.kind !== kind) return null
                   const f = fns[c.fnIdx]
-                  const state = results[i] ? 'border-green-500 bg-green-50' : 'border-slate-200'
+                  const state = !answers[i] ? 'border-slate-200' : results[i] ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'
                   return (
                     <div key={i} className={`border-2 rounded-lg p-3 flex flex-col gap-2 ${state}`}>
                       <div className="flex-1 flex items-center justify-center overflow-x-auto">
@@ -283,7 +283,7 @@ export default function WasIstLinear() {
                           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                             setAnswers({ ...answers, [i]: e.target.value })
                           }}
-                          className={`border border-slate-300 rounded px-2 py-1 bg-white ${results[i] ? fieldCheckClass(true) : ''}`}
+                          className={`border border-slate-300 rounded px-2 py-1 bg-white ${answers[i] ? fieldCheckClass(results[i]) : ''}`}
                         >
                           <option value="">–</option>
                           {LETTERS.map((l) => <option key={l} value={l}>{l}</option>)}
