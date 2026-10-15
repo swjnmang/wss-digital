@@ -144,9 +144,7 @@ export default function WasIstLinear() {
   const [round, setRound] = useState(() => newRound(false))
   const [withT, setWithT] = useState(false)
   const [answers, setAnswers] = useState<Record<number, string>>({})
-  const [checked, setChecked] = useState(false)
   const [score, setScore] = useState(0)
-  const [scored, setScored] = useState(false)
 
   const demo = FUNCTIONS[0]
   const { fns, cards } = round
@@ -155,44 +153,32 @@ export default function WasIstLinear() {
     () => cards.map((c, i) => answers[i] === LETTERS[c.fnIdx]),
     [cards, answers],
   )
-  const allAnswered = cards.every((_, i) => answers[i])
   const allCorrect = results.every(Boolean)
 
-  const check = () => {
-    setChecked(true)
-    tracking.onCheck(allCorrect)
-    if (allCorrect && !scored) {
-      setScore((s) => s + 1)
-      setScored(true)
-    }
-  }
-  // Sind alle vier Zuordnungen richtig, kommt nach kurzer Pause automatisch eine neue Aufgabe.
+  // Richtige Zuordnungen werden sofort grün. Sind alle richtig, gibt es einen Punkt
+  // und nach kurzer Pause kommt automatisch eine neue Aufgabe.
   useEffect(() => {
-    if (!checked || !allCorrect) return
+    if (!allCorrect) return
+    tracking.onCheck(true)
+    setScore((s) => s + 1)
     const timer = setTimeout(() => {
       tracking.onTaskStart()
       setRound(newRound(withT))
       setAnswers({})
-      setChecked(false)
-      setScored(false)
     }, 2500)
     return () => clearTimeout(timer)
-  }, [checked, allCorrect, withT])
+  }, [allCorrect, withT])
 
   const switchLevel = (v: boolean) => {
     tracking.onTaskStart()
     setWithT(v)
     setRound(newRound(v))
     setAnswers({})
-    setChecked(false)
-    setScored(false)
   }
   const next = () => {
     tracking.onTaskStart()
     setRound(newRound(withT))
     setAnswers({})
-    setChecked(false)
-    setScored(false)
   }
 
   return (
@@ -262,7 +248,7 @@ export default function WasIstLinear() {
               Stufe 2: auch y = m · x + t
             </button>
           </div>
-          <p className="text-slate-700 mb-4">Unten stehen vier Texte (A–D). Ordne jeder Wertetabelle, jedem Graphen und jeder Gleichung den passenden Text zu.</p>
+          <p className="text-slate-700 mb-4">Unten stehen vier Texte (A–D). Ordne jeder Wertetabelle, jedem Graphen und jeder Gleichung den passenden Text zu. Richtige Zuordnungen werden sofort grün.</p>
 
           <div className="grid sm:grid-cols-2 gap-3 mb-6">
             {fns.map((f, i) => (
@@ -282,7 +268,7 @@ export default function WasIstLinear() {
                 {cards.map((c, i) => {
                   if (c.kind !== kind) return null
                   const f = fns[c.fnIdx]
-                  const state = checked && answers[i] ? (results[i] ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50') : 'border-slate-200'
+                  const state = results[i] ? 'border-green-500 bg-green-50' : 'border-slate-200'
                   return (
                     <div key={i} className={`border-2 rounded-lg p-3 flex flex-col gap-2 ${state}`}>
                       <div className="flex-1 flex items-center justify-center overflow-x-auto">
@@ -296,9 +282,8 @@ export default function WasIstLinear() {
                           value={answers[i] || ''}
                           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                             setAnswers({ ...answers, [i]: e.target.value })
-                            setChecked(false)
                           }}
-                          className={`border border-slate-300 rounded px-2 py-1 bg-white ${checked && answers[i] ? fieldCheckClass(results[i]) : ''}`}
+                          className={`border border-slate-300 rounded px-2 py-1 bg-white ${results[i] ? fieldCheckClass(true) : ''}`}
                         >
                           <option value="">–</option>
                           {LETTERS.map((l) => <option key={l} value={l}>{l}</option>)}
@@ -312,24 +297,15 @@ export default function WasIstLinear() {
           ))}
 
           <div className="flex flex-wrap justify-center gap-4 items-center">
-            <button
-              onClick={check}
-              disabled={!allAnswered}
-              className="bk-btn bk-btn-primary"
-            >
-              Prüfen
-            </button>
             <button onClick={next} className="bk-btn">
               Neue Aufgabe
             </button>
             <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">Punkte: {score}</div>
           </div>
 
-          {checked && (
-            <p className={`text-center font-bold mt-4 ${allCorrect ? 'text-green-600' : 'text-red-600'}`}>
-              {allCorrect
-                ? 'Super! Alles richtig zugeordnet. Gleich kommen vier neue Aufgaben …'
-                : `${results.filter(Boolean).length} von ${cards.length} richtig. Die rot markierten Karten passen noch nicht – probiere es nochmal!`}
+          {allCorrect && (
+            <p className="text-center font-bold mt-4 text-green-600">
+              Super! Alles richtig zugeordnet. Gleich kommen vier neue Aufgaben …
             </p>
           )}
         </div>
