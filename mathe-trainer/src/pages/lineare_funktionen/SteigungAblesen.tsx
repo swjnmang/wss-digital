@@ -136,6 +136,7 @@ function TaskCard({ number, initial, level, onSolvedChange, onResult, onHelp }: 
   const [input, setInput] = useState('')
   const [solved, setSolved] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
+  const [showTriangle, setShowTriangle] = useState(false)
   const { p, q, t } = line
   const m = p / q
   const status = slopeStatus(input, m)
@@ -185,6 +186,13 @@ function TaskCard({ number, initial, level, onSolvedChange, onResult, onHelp }: 
     setLine(randomLine(level, m))
   }
 
+  // Tipp im Schwierigkeitsgrad Einfach: nur das Steigungsdreieck einzeichnen, ohne Lösungsweg
+  function onShowTriangle() {
+    setShowTriangle(true)
+    onHelp()
+    tracking.onHintShown()
+  }
+
   function onShowAnswer() {
     setShowSolution(true)
     onHelp()
@@ -192,7 +200,7 @@ function TaskCard({ number, initial, level, onSolvedChange, onResult, onHelp }: 
   }
 
   // Steigungsdreieck ab dem Schnittpunkt mit der y-Achse, so weit nach rechts wie der Nenner
-  const triangle = showSolution || solved ? { x1: 0, dx: q } : null
+  const triangle = showSolution || showTriangle || solved ? { x1: 0, dx: q } : null
   const start = `(0|${fmt(t)})`
   const end = `(${q}|${fmt(t + p)})`
 
@@ -228,7 +236,13 @@ function TaskCard({ number, initial, level, onSolvedChange, onResult, onHelp }: 
       {status === 'wrong' && <p className="text-center font-bold mt-3 text-red-600">{wrongHint(input, m)}</p>}
 
       <div className="flex flex-wrap justify-center gap-3 mt-6">
-        <button onClick={newTask} className={btnSecondary}>Neue Aufgabe</button>
+        {level === 'einfach' ? (
+          <button onClick={onShowTriangle} disabled={showTriangle || showSolution || solved} className={btnSecondary}>
+            Steigungsdreieck einzeichnen lassen
+          </button>
+        ) : (
+          <button onClick={newTask} className={btnSecondary}>Neue Aufgabe</button>
+        )}
         <button onClick={onShowAnswer} className={btnSecondary}>Lösung anzeigen</button>
       </div>
 
@@ -495,11 +509,25 @@ export default function SteigungAblesen() {
               <>
                 <p className="text-green-800 text-lg font-semibold mb-1">Super, toll gemacht!</p>
                 <p className="text-green-800 mb-4">Du hast alle {TOTAL_TASKS} Aufgaben richtig gelöst.</p>
-                <p className="text-slate-700 mb-4">Möchtest du neue Aufgaben üben oder hörst du hier auf?</p>
-                <div className="flex flex-wrap justify-center gap-3">
-                  <button onClick={() => startNewRound()} className={btnPrimary}>Neue Aufgaben</button>
-                  <button onClick={() => setFinished(true)} className={btnSecondary}>Fertig für heute</button>
-                </div>
+                {level === 'einfach' ? (
+                  <>
+                    <p className="text-slate-700 mb-4">Möchtest du {TOTAL_TASKS} neue Aufgaben üben oder zum nächsten Schwierigkeitsgrad weitergehen?</p>
+                    <div className="flex flex-wrap justify-center gap-3">
+                      <button onClick={() => startNewRound()} className={btnSecondary}>{TOTAL_TASKS} neue Aufgaben</button>
+                      <button onClick={() => chooseLevel('fortgeschritten')} className={btnPrimary}>
+                        Weiter zu Fortgeschritten (y = m · x + t)
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-slate-700 mb-4">Möchtest du neue Aufgaben üben oder hörst du hier auf?</p>
+                    <div className="flex flex-wrap justify-center gap-3">
+                      <button onClick={() => startNewRound()} className={btnPrimary}>Neue Aufgaben</button>
+                      <button onClick={() => setFinished(true)} className={btnSecondary}>Fertig für heute</button>
+                    </div>
+                  </>
+                )}
               </>
             )}
           </div>
