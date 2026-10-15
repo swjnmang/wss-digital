@@ -124,6 +124,7 @@ export const AREAS: Area[] = [
         name: 'Einstieg',
         items: [
           { title: 'Proportionale Zusammenhänge (Einstieg)', desc: 'Fülle Wertetabellen zu Alltagsbeispielen aus und zeichne die passende Ursprungsgerade - der ideale Einstieg vor den linearen Funktionen.', path: '/lineare_funktionen/proportionale_zusammenhaenge', icon: 'fa-solid fa-compass' },
+          { title: 'Punktkoordinaten verstehen', desc: 'Koordinaten ablesen, Punkte einzeichnen und x und y nicht mehr verwechseln - Schritt für Schritt mit Eselsbrücken, Quadranten und Schatzkarte.', path: '/lineare_funktionen/punktkoordinaten', icon: 'fa-solid fa-location-dot' },
           { title: 'Was ist eine lineare Funktion?', desc: 'Verstehe, wie Wertetabelle, Graph und Gleichung zusammengehören, und ordne sie einander zu.', path: '/lineare_funktionen/was_ist_linear', icon: 'fa-solid fa-lightbulb' },
         ],
       },
