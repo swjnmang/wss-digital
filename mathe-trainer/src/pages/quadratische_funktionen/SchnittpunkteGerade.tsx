@@ -9,7 +9,6 @@ import {
   type AnswerStatus,
   type Q,
   RED,
-  StepTable,
   Steps,
   Tex,
   Video,
@@ -595,7 +594,7 @@ function TaskCard({ number, level, task, onSolvedChange, onResult, onHelp }: Car
   )
 }
 
-// ---------- Erklärung mit Beispiel (Graph + Rechnung) und Erklärvideo ----------
+// ---------- Erklärung als Slides (Beispiel mit mitwachsendem Graph) und Erklärvideo ----------
 
 // Beispiel: p: y = x² + 2x − 4 und g: y = 3x + 2  →  S₁(3|11), S₂(−2|−4)
 const SX = 22 // Pixel pro Einheit
@@ -604,7 +603,13 @@ const toPx = (x: number, y: number) => ({ px: (x - X_MIN) * SX, py: (Y_MAX - y) 
 const exP = (x: number) => x * x + 2 * x - 4
 const exG = (x: number) => 3 * x + 2
 
-function ExampleGraph() {
+/**
+ * Graph zum Beispiel, der mit den Slides mitwächst:
+ * problem = Schnittpunkte nur als „?“, x = die berechneten x-Werte als gestrichelte Linien, points = fertige Schnittpunkte
+ */
+type GraphStage = 'problem' | 'x' | 'points'
+
+function ExampleGraph({ stage }: { stage: GraphStage }) {
   const w = (X_MAX - X_MIN) * SX
   const h = (Y_MAX - Y_MIN) * SX
   const o = toPx(0, 0)
@@ -619,8 +624,12 @@ function ExampleGraph() {
   }
   const g1 = toPx(-8 / 3, exG(-8 / 3))
   const g2 = toPx(11 / 3, exG(11 / 3))
+  const label =
+    stage === 'points'
+      ? 'Parabel y = x² + 2x − 4 und Gerade y = 3x + 2 mit den Schnittpunkten S1(3|11) und S2(−2|−4)'
+      : 'Parabel y = x² + 2x − 4 und Gerade y = 3x + 2, die Schnittpunkte sind noch unbekannt'
   return (
-    <svg viewBox={`-10 -10 ${w + 20} ${h + 20}`} className="w-full max-w-xs mx-auto" role="img" aria-label="Parabel y = x² + 2x − 4 und Gerade y = 3x + 2 mit den Schnittpunkten S1(3|11) und S2(−2|−4)">
+    <svg viewBox={`-10 -10 ${w + 20} ${h + 20}`} className="w-full max-w-[16rem] mx-auto" role="img" aria-label={label}>
       {xs.map((x) => (
         <line key={`gx${x}`} x1={toPx(x, 0).px} y1={0} x2={toPx(x, 0).px} y2={h} stroke="#e2e8f0" strokeWidth={1} />
       ))}
@@ -637,127 +646,259 @@ function ExampleGraph() {
       {ys.filter((y) => y !== 0 && y % 2 === 0).map((y) => (
         <text key={`ly${y}`} x={o.px - 4} y={toPx(0, y).py + 3} fontSize={9} textAnchor="end" fill="#64748b">{y}</text>
       ))}
-      <polyline points={pts.join(' ')} fill="none" stroke="#2563eb" strokeWidth={2.5} />
-      <line x1={g1.px} y1={g1.py} x2={g2.px} y2={g2.py} stroke="#ea580c" strokeWidth={2.5} />
-      <text x={toPx(-4.6, 6).px} y={toPx(-4.6, 6).py} fontSize={12} fontWeight="bold" fill="#2563eb">p</text>
-      <text x={toPx(-2.2, -6).px} y={toPx(-2.2, -5.4).py} fontSize={12} fontWeight="bold" fill="#ea580c">g</text>
-      <circle cx={s1.px} cy={s1.py} r={5} fill={RED} />
-      <circle cx={s2.px} cy={s2.py} r={5} fill={BLUE} />
-      <text x={s1.px - 8} y={s1.py - 6} fontSize={12} fontWeight="bold" textAnchor="end" fill={RED}>S₁(3|11)</text>
-      <text x={s2.px - 8} y={s2.py + 4} fontSize={12} fontWeight="bold" textAnchor="end" fill={BLUE}>S₂(−2|−4)</text>
+      <polyline points={pts.join(' ')} fill="none" stroke={P_COLOR} strokeWidth={2.5} />
+      <line x1={g1.px} y1={g1.py} x2={g2.px} y2={g2.py} stroke={G_COLOR} strokeWidth={2.5} />
+      <text x={toPx(-4.6, 6).px} y={toPx(-4.6, 6).py} fontSize={12} fontWeight="bold" fill={P_COLOR}>p</text>
+      <text x={toPx(-2.2, -6).px} y={toPx(-2.2, -5.4).py} fontSize={12} fontWeight="bold" fill={G_COLOR}>g</text>
+      {stage === 'problem' &&
+        [s1, s2].map((s, i) => (
+          <g key={i}>
+            <circle cx={s.px} cy={s.py} r={9} fill="#fff" stroke="#334155" strokeWidth={2} />
+            <text x={s.px} y={s.py + 4.5} fontSize={13} fontWeight="bold" textAnchor="middle" fill="#334155">?</text>
+          </g>
+        ))}
+      {stage === 'x' && (
+        <>
+          <line x1={s1.px} y1={0} x2={s1.px} y2={h} stroke={RED} strokeWidth={1.5} strokeDasharray="5 4" />
+          <line x1={s2.px} y1={0} x2={s2.px} y2={h} stroke={BLUE} strokeWidth={1.5} strokeDasharray="5 4" />
+          <text x={s1.px - 4} y={12} fontSize={12} fontWeight="bold" textAnchor="end" fill={RED}>x₁ = 3</text>
+          <text x={s2.px - 4} y={12} fontSize={12} textAnchor="end" fontWeight="bold" fill={BLUE}>x₂ = −2</text>
+        </>
+      )}
+      {stage === 'points' && (
+        <>
+          <circle cx={s1.px} cy={s1.py} r={5} fill={RED} />
+          <circle cx={s2.px} cy={s2.py} r={5} fill={BLUE} />
+          <text x={s1.px - 8} y={s1.py - 6} fontSize={12} fontWeight="bold" textAnchor="end" fill={RED}>S₁(3|11)</text>
+          <text x={s2.px - 8} y={s2.py + 4} fontSize={12} fontWeight="bold" textAnchor="end" fill={BLUE}>S₂(−2|−4)</text>
+        </>
+      )}
     </svg>
   )
 }
 
-function Erklaerung({ level }: { level: Level }) {
-  return (
-    <div className="bk-panel text-left">
-      <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">So berechnest du die Schnittpunkte von Parabel und Gerade</h2>
-      <p className="text-slate-700 mb-3">
-        <strong>Beispiel:</strong> Bestimme die Schnittpunkte der Parabel <Tex tex="p\colon\; y = x^2 + 2x - 4" /> und der Geraden{' '}
-        <Tex tex="g\colon\; y = 3x + 2" />.
-      </p>
-      <StepTable
-        rows={[
-          {
-            step: (
-              <>
-                <strong>1.</strong> Setze die Funktionsterme gleich (Gleichsetzungsverfahren).
-              </>
-            ),
-            example: <Tex display tex="x^2 + 2x - 4 = 3x + 2" />,
-          },
-          {
-            step: (
-              <>
-                <strong>2.</strong> Bringe alles auf eine Seite, sodass links oder rechts die Zahl „0“ steht.
-              </>
-            ),
-            example: (
-              <Steps
-                lines={[
-                  { tex: 'x^2 + 2x - 4 = 3x + 2', op: '-3x' },
-                  { tex: 'x^2 - x - 4 = 2', op: '-2' },
-                  { tex: 'x^2 - x - 6 = 0' },
-                ]}
-              />
-            ),
-          },
-          {
-            step: (
-              <>
-                <strong>3.</strong> Löse die Gleichung mit Hilfe der <strong>Mitternachtsformel</strong>. Achte beim Einsetzen von a, b und c
-                darauf, dass negative Zahlen in Klammern geschrieben werden!
-                {level === 'einfach' ? (
-                  <span className="block text-sm text-slate-600 mt-2">
-                    Steht unter der Wurzel eine negative Zahl, zeigt der Taschenrechner „Math ERROR“: Dann gibt es keinen Schnittpunkt.
-                    Steht unter der Wurzel 0, sind <Tex tex="x_1" /> und <Tex tex="x_2" /> gleich: Dann gibt es genau einen Berührpunkt.
-                  </span>
-                ) : (
-                  <span className="block text-sm text-slate-600 mt-2">
-                    Die Diskriminante <Tex tex="D = b^2 - 4ac" /> verrät die Anzahl: <Tex tex="D > 0" /> zwei Schnittpunkte,{' '}
-                    <Tex tex="D = 0" /> ein Berührpunkt, <Tex tex="D < 0" /> kein Schnittpunkt.
-                  </span>
-                )}
-              </>
-            ),
-            example: (
-              <>
-                <Tex display tex="x_{1,2} = \frac{-b \pm \sqrt{b^2 - 4 \cdot a \cdot c}}{2 \cdot a}" />
-                <Tex display tex="x_{1,2} = \frac{-(-1) \pm \sqrt{(-1)^2 - 4 \cdot 1 \cdot (-6)}}{2 \cdot 1}" />
-                <Tex display tex={`x_1 = \\textcolor{${RED}}{3} \\;\\text{ bzw. }\\; x_2 = \\textcolor{${BLUE}}{-2}`} />
-              </>
-            ),
-          },
-          {
-            step: (
-              <>
-                <strong>4.</strong> Bestimme die y-Koordinate, indem du <Tex tex="x_1" /> und <Tex tex="x_2" /> in eine der beiden
-                Funktionsgleichungen (Parabel oder Gerade) einsetzt. Hier: in die Geradengleichung <Tex tex="y = 3x + 2" /> eingesetzt.
-              </>
-            ),
-            example: (
-              <>
-                <Tex display tex={`y = 3 \\cdot (\\textcolor{${RED}}{3}) + 2 = 11`} />
-                <p className="text-center">→ Schnittpunkt <Tex tex="S_1(3 \mid 11)" /></p>
-                <Tex display tex={`y = 3 \\cdot (\\textcolor{${BLUE}}{-2}) + 2 = -4`} />
-                <p className="text-center">→ Schnittpunkt <Tex tex="S_2(-2 \mid -4)" /></p>
-              </>
-            ),
-          },
-        ]}
-      />
-      <div className="mt-4">
-        <ExampleGraph />
-        <p className="text-sm text-slate-600 text-center mt-1">Parabel p und Gerade g schneiden sich in den beiden berechneten Punkten.</p>
-      </div>
+interface Slide {
+  title: string
+  body: React.ReactNode
+  /** Ohne Graph nimmt der Text die ganze Breite ein */
+  graph?: GraphStage
+}
 
-      {level === 'fortgeschritten' && (
+const P_TEX = `\\textcolor{${P_COLOR}}{x^2 + 2x - 4}`
+const G_TEX = `\\textcolor{${G_COLOR}}{3x + 2}`
+
+function exampleSlides(level: Level): Slide[] {
+  const slides: Slide[] = [
+    {
+      title: 'Das Problem',
+      graph: 'problem',
+      body: (
         <>
-          <h3 className="text-base font-bold text-slate-800 mt-5 mb-2">Parabel in Scheitelform</h3>
-          <p className="text-slate-700 mb-2">
-            Ist die Parabel in der Scheitelform <Tex tex="y = a(x - x_S)^2 + y_S" /> gegeben, multiplizierst du sie zuerst aus. Danach geht es
-            wie oben weiter:
-          </p>
-          <Tex display tex="y = (x + 1)^2 - 5 = x^2 + 2x + 1 - 5 = x^2 + 2x - 4" />
-          <p className="text-sm text-slate-600">
-            Tipp: Aus <Tex tex="(x + 1)^2" /> wird mit der binomischen Formel <Tex tex="x^2 + 2x + 1" />. Steht ein Faktor a vor der Klammer,
-            multiplizierst du ihn danach mit jedem Summanden in der Klammer.
-          </p>
-          <h3 className="text-base font-bold text-slate-800 mt-5 mb-2">Brüche</h3>
-          <p className="text-slate-700">
-            Mit Brüchen rechnest du genauso. Nach Schritt 2 kannst du die Gleichung auch mit dem Hauptnenner multiplizieren, z. B.{' '}
-            <Tex tex="\tfrac{1}{2}x^2 - \tfrac{1}{2}x - 3 = 0 \;\; | \cdot 2" /> ergibt <Tex tex="x^2 - x - 6 = 0" />. Die Lösungen bleiben
-            gleich. Sind die Ergebnisse keine glatten Zahlen, rundest du auf zwei Nachkommastellen.
+          <p>Gegeben sind eine Parabel und eine Gerade:</p>
+          <Tex display tex={`p\\colon\\; y = ${P_TEX}`} />
+          <Tex display tex={`g\\colon\\; y = ${G_TEX}`} />
+          <p>
+            Im Graph siehst du: Die beiden schneiden sich in <strong>zwei Punkten</strong>. Aber wo genau? Ablesen ist ungenau – deshalb
+            berechnen wir die Schnittpunkte.
           </p>
         </>
-      )}
+      ),
+    },
+    {
+      title: 'Die Idee',
+      graph: 'problem',
+      body: (
+        <>
+          <p>
+            In einem Schnittpunkt liegen Parabel und Gerade <strong>an derselben Stelle</strong>: Für dasselbe x haben beide denselben
+            y-Wert.
+          </p>
+          <p>Also muss gelten: y-Wert der Parabel = y-Wert der Geraden.</p>
+          <p className="font-semibold">Schritt 1: Funktionsterme gleichsetzen</p>
+          <Tex display tex={`${P_TEX} = ${G_TEX}`} />
+        </>
+      ),
+    },
+    {
+      title: 'Alles auf eine Seite',
+      graph: 'problem',
+      body: (
+        <>
+          <p>
+            <span className="font-semibold">Schritt 2:</span> Bringe alles auf die linke Seite, sodass rechts die Zahl 0 steht. Beim
+            Wegbringen wechselt das Rechenzeichen: Aus <Tex tex="+3x" /> wird <Tex tex="-3x" />.
+          </p>
+          <Steps
+            lines={[
+              { tex: 'x^2 + 2x - 4 = 3x + 2', op: '-3x' },
+              { tex: 'x^2 - x - 4 = 2', op: '-2' },
+              { tex: 'x^2 - x - 6 = 0' },
+            ]}
+          />
+          <p>Jetzt steht da eine quadratische Gleichung, die wir lösen können.</p>
+        </>
+      ),
+    },
+    {
+      title: 'a, b und c ablesen',
+      graph: 'problem',
+      body: (
+        <>
+          <p>
+            <span className="font-semibold">Schritt 3:</span> Lies die Zahlen vor <Tex tex="x^2" />, vor <Tex tex="x" /> und ohne x ab. Das
+            Vorzeichen gehört immer dazu!
+          </p>
+          <Tex display tex={`\\textcolor{${RED}}{1}x^2 \\textcolor{${BLUE}}{- 1}x \\textcolor{#15803d}{- 6} = 0`} />
+          <Tex display tex={`\\textcolor{${RED}}{a = 1},\\quad \\textcolor{${BLUE}}{b = -1},\\quad \\textcolor{#15803d}{c = -6}`} />
+          <p className="text-sm text-slate-600">
+            Steht vor <Tex tex="x^2" /> oder <Tex tex="x" /> keine Zahl, ist es die 1: <Tex tex="-x" /> bedeutet <Tex tex="-1x" />.
+          </p>
+        </>
+      ),
+    },
+    {
+      title: 'Mitternachtsformel',
+      graph: 'x',
+      body: (
+        <>
+          <p>
+            <span className="font-semibold">Schritt 4:</span> Setze a, b und c in die Mitternachtsformel ein. Negative Zahlen schreibst du
+            in Klammern!
+          </p>
+          <Tex display tex="x_{1,2} = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}" />
+          <Tex display tex="x_{1,2} = \frac{-(-1) \pm \sqrt{(-1)^2 - 4 \cdot 1 \cdot (-6)}}{2 \cdot 1}" />
+          <Tex display tex="x_{1,2} = \frac{1 \pm \sqrt{25}}{2} = \frac{1 \pm 5}{2}" />
+          <div className="flex flex-wrap justify-center gap-x-8">
+            <Tex display tex={`x_1 = \\frac{1 + 5}{2} = \\textcolor{${RED}}{3}`} />
+            <Tex display tex={`x_2 = \\frac{1 - 5}{2} = \\textcolor{${BLUE}}{-2}`} />
+          </div>
+          <p>Das sind die x-Werte der Schnittpunkte – im Graph als gestrichelte Linien.</p>
+        </>
+      ),
+    },
+    {
+      title: 'y-Koordinaten berechnen',
+      graph: 'points',
+      body: (
+        <>
+          <p>
+            <span className="font-semibold">Schritt 5:</span> Setze <Tex tex="x_1" /> und <Tex tex="x_2" /> in eine der beiden
+            Funktionsgleichungen ein. Die Gerade <Tex tex="y = 3x + 2" /> ist meist einfacher.
+          </p>
+          <Tex display tex={`y = 3 \\cdot \\textcolor{${RED}}{3} + 2 = 11 \\;\\Rightarrow\\; S_1(3 \\mid 11)`} />
+          <Tex display tex={`y = 3 \\cdot (\\textcolor{${BLUE}}{-2}) + 2 = -4 \\;\\Rightarrow\\; S_2(-2 \\mid -4)`} />
+          <p>
+            Fertig! Die Reihenfolge der Schnittpunkte ist egal. In der Parabel eingesetzt kommt übrigens dasselbe heraus – probier es aus.
+          </p>
+        </>
+      ),
+    },
+  ]
+  if (level === 'fortgeschritten') {
+    slides.push(
+      {
+        title: 'Parabel in Scheitelform',
+        body: (
+          <>
+            <p>
+              Ist die Parabel in der Scheitelform <Tex tex="y = a(x - x_S)^2 + y_S" /> gegeben, multiplizierst du sie zuerst aus. Danach geht es
+              wie im Beispiel weiter:
+            </p>
+            <Tex display tex="y = (x + 1)^2 - 5 = x^2 + 2x + 1 - 5 = x^2 + 2x - 4" />
+            <p className="text-sm text-slate-600">
+              Aus <Tex tex="(x + 1)^2" /> wird mit der binomischen Formel <Tex tex="x^2 + 2x + 1" />. Steht ein Faktor a vor der Klammer,
+              multiplizierst du ihn danach mit jedem Summanden in der Klammer.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: 'Brüche',
+        body: (
+          <>
+            <p>
+              Mit Brüchen rechnest du genauso. Nach Schritt 2 kannst du die Gleichung auch mit dem Hauptnenner multiplizieren, z. B.:
+            </p>
+            <Tex display tex="\tfrac{1}{2}x^2 - \tfrac{1}{2}x - 3 = 0 \;\; | \cdot 2 \quad\Rightarrow\quad x^2 - x - 6 = 0" />
+            <p>Die Lösungen bleiben gleich. Sind die Ergebnisse keine glatten Zahlen, rundest du auf zwei Nachkommastellen.</p>
+          </>
+        ),
+      },
+    )
+  }
+  return slides
+}
 
-      <ul className="list-disc pl-5 mt-4 text-slate-700 space-y-1 text-sm">
-        <li>Beim Wegbringen änderst du das Rechenzeichen: Aus <Tex tex="+3x" /> auf der einen Seite wird <Tex tex="-3x" /> auf beiden Seiten.</li>
-        <li>Zum Berechnen der y-Koordinate ist die Gerade meist einfacher als die Parabel – beide liefern dasselbe Ergebnis.</li>
-        <li>Die Reihenfolge der Schnittpunkte ist egal.</li>
-      </ul>
+function Erklaerung({ level }: { level: Level }) {
+  const slides = useMemo(() => exampleSlides(level), [level])
+  const [index, setIndex] = useState(0)
+  const touchX = useRef<number | null>(null)
+  const last = slides.length - 1
+  const go = (i: number) => setIndex(Math.max(0, Math.min(last, i)))
+  const slide = slides[Math.min(index, last)]
+
+  return (
+    <div
+      className="bk-panel text-left"
+      tabIndex={0}
+      aria-roledescription="Präsentation"
+      aria-label="Erklärung: Schnittpunkte von Parabel und Gerade"
+      onKeyDown={(e: React.KeyboardEvent) => {
+        if (e.key === 'ArrowRight') go(index + 1)
+        if (e.key === 'ArrowLeft') go(index - 1)
+      }}
+    >
+      <h2 className="text-lg font-bold text-slate-800 mb-1 text-center">So berechnest du die Schnittpunkte von Parabel und Gerade</h2>
+      <p className="text-sm text-slate-500 text-center mb-3">
+        Folie {index + 1} von {slides.length}
+      </p>
+
+      <div
+        className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5"
+        onTouchStart={(e: React.TouchEvent) => (touchX.current = e.touches[0].clientX)}
+        onTouchEnd={(e: React.TouchEvent) => {
+          if (touchX.current === null) return
+          const dx = e.changedTouches[0].clientX - touchX.current
+          touchX.current = null
+          if (Math.abs(dx) > 50) go(index + (dx < 0 ? 1 : -1))
+        }}
+      >
+        <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-3">{slide.title}</h3>
+        <div className={`grid gap-4 items-center ${slide.graph ? 'md:grid-cols-[3fr_2fr]' : ''} md:min-h-[20rem]`}>
+          <div className="text-slate-700 space-y-2 min-w-0" aria-live="polite">{slide.body}</div>
+          {slide.graph && (
+            <div>
+              <ExampleGraph stage={slide.graph} />
+              <p className="text-xs text-slate-500 text-center mt-1">
+                <span style={{ color: P_COLOR }} className="font-bold">p</span> Parabel,{' '}
+                <span style={{ color: G_COLOR }} className="font-bold">g</span> Gerade
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-3 mt-4">
+        <button onClick={() => go(index - 1)} disabled={index === 0} className={`${btnSecondary} whitespace-nowrap disabled:opacity-40`}>
+          ← Zurück
+        </button>
+        <div className="flex gap-1.5 flex-wrap justify-center">
+          {slides.map((s, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => go(i)}
+              aria-label={`Folie ${i + 1}: ${s.title}`}
+              aria-current={i === index ? 'step' : undefined}
+              className={`w-3 h-3 rounded-full transition-colors ${i === index ? 'bg-blue-600' : 'bg-slate-300 hover:bg-slate-400'}`}
+            />
+          ))}
+        </div>
+        <button onClick={() => go(index + 1)} disabled={index === last} className={`${btnPrimary} whitespace-nowrap disabled:opacity-40`}>
+          Weiter →
+        </button>
+      </div>
+
       <Video id={VIDEO_ID} title="Erklärvideo: Schnittpunkte von Parabel und Gerade" />
     </div>
   )
