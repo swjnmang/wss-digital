@@ -78,6 +78,7 @@ import BrueckeAufgabe from './pages/lineare_funktionen/BrueckeAufgabe'
 import FlughafenAufgabe from './pages/lineare_funktionen/FlughafenAufgabe'
 import Wertetabelle from './pages/lineare_funktionen/Wertetabelle'
 import Proportional from './pages/lineare_funktionen/Proportional'
+import PunktKoordinaten from './pages/lineare_funktionen/PunktKoordinaten'
 import WasIstLinear from './pages/lineare_funktionen/WasIstLinear'
 import ParallelSenkrecht from './pages/lineare_funktionen/ParallelSenkrecht'
 import ExerciseSheetGenerator from './pages/lineare_funktionen/ExerciseSheetGenerator'
@@ -255,6 +256,7 @@ export default function App() {
           <Route path="/rechnen_lernen/gleichungen/abschlusstest" element={<Abschlusstest />} />
           <Route path="/lineare_funktionen" element={<AreaPage id="linear" />} />
           <Route path="/lineare_funktionen/proportionale_zusammenhaenge" element={<Proportional />} />
+          <Route path="/lineare_funktionen/punktkoordinaten" element={<PunktKoordinaten />} />
           <Route path="/lineare_funktionen/was_ist_linear" element={<WasIstLinear />} />
           <Route path="/lineare_funktionen/wertetabelle" element={<Wertetabelle />} />
           <Route path="/lineare_funktionen/zeichnen" element={<Zeichnen />} />
