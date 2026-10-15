@@ -215,7 +215,7 @@ function TaskCard({ number, initial, level, onSolvedChange, onResult, onHelp }: 
 
       <div ref={boxRef} className="flex justify-center mb-4 w-full overflow-hidden">
         <div key={graphSize}>
-          <GeoGebraGraph m={m} t={t} width={graphSize} height={graphSize} grid view={VIEW} triangle={triangle} />
+          <GeoGebraGraph m={m} t={t} width={graphSize} height={graphSize} grid step={1} view={VIEW} triangle={triangle} />
         </div>
       </div>
 
