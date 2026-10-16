@@ -166,7 +166,11 @@ function aufgabeAusFaktor(stufe: StufeId, faktor: Monom, klammer: Poly): Aufgabe
   const summanden = klammer.map((t) => mulMonoms(faktor, t));
   const original = simplifyPoly(summanden);
   const g = gemeinsamerFaktor(summanden);
-  const loesungTex = `${faktorTex(faktor)}\\left(${polyTex(klammer)}\\right)`;
+  const loesungNegTex = `${faktorTex(faktor)}\\left(${polyTex(klammer)}\\right)`;
+  // Bei negativem Faktor ist auch die Variante mit positivem Faktor richtig: −F(K) = F(−K)
+  const posFaktor = monom(-faktor.coeff, faktor.vars);
+  const loesungPosTex = `${faktorTex(posFaktor)}\\left(${polyTex(klammer.map((t) => monom(-t.coeff, t.vars)))}\\right)`;
+  const loesungTex = faktor.coeff < 0 ? `${loesungNegTex} = ${loesungPosTex}` : loesungNegTex;
 
   const zahlen = summanden.map((m) => Math.abs(m.coeff));
   const gemVars = varsTex(g.vars);
@@ -187,6 +191,9 @@ function aufgabeAusFaktor(stufe: StufeId, faktor: Monom, klammer: Poly): Aufgabe
     rechenweg.push(
       `\\text{3. Der erste Summand ist negativ – wir klammern auch das Minus aus: } ${faktorTex(faktor)}`,
     );
+    rechenweg.push(
+      `\\quad \\text{(Ebenso richtig: nur } ${absMonomTex(faktor)} \\text{ ausklammern – dann bleiben die Vorzeichen in der Klammer gleich.)}`,
+    );
   } else {
     rechenweg.push(`\\text{3. Gemeinsamer Faktor: } ${absMonomTex(faktor)}`);
   }
@@ -196,7 +203,10 @@ function aufgabeAusFaktor(stufe: StufeId, faktor: Monom, klammer: Poly): Aufgabe
     const z = s.coeff < 0 ? `(${monomTex(s)})` : monomTex(s);
     rechenweg.push(`\\quad ${z} : ${f} = ${monomTex(klammer[i])}`);
   });
-  rechenweg.push(`\\text{5. Ergebnis: } ${polyTex(summanden)} = ${loesungTex}`);
+  rechenweg.push(`\\text{5. Ergebnis: } ${polyTex(summanden)} = ${loesungNegTex}`);
+  if (faktor.coeff < 0) {
+    rechenweg.push(`\\quad \\text{oder mit positivem Faktor: } ${polyTex(summanden)} = ${loesungPosTex}`);
+  }
   rechenweg.push(
     `\\text{Probe (ausmultiplizieren): } ${klammer
       .map((t) => {
@@ -364,6 +374,14 @@ export function pruefeAntwort(aufgabe: Aufgabe, eingabe: string): Ergebnis {
   const teile = zerlegeProdukt(eingabe);
 
   if (!gleichwertig) {
+    const negiert = aufgabe.original.map((m) => monom(-m.coeff, m.vars));
+    if (aufgabe.stufe !== 4 && teile && polysEquivalent(gesamt, negiert)) {
+      return {
+        status: 'falsch',
+        hinweis:
+          'Fast! Die Vorzeichen stimmen nicht. Klammerst du den positiven Faktor aus, bleiben die Vorzeichen in der Klammer gleich; klammerst du den negativen Faktor aus, drehen sich alle Vorzeichen in der Klammer um.',
+      };
+    }
     return {
       status: 'falsch',
       hinweis: 'Leider falsch. Multipliziere dein Ergebnis zur Probe aus – es muss wieder der Ausgangsterm herauskommen.',
