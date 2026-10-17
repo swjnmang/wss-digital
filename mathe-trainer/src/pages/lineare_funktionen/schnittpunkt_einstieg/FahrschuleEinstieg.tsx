@@ -574,8 +574,8 @@ export default function FahrschuleEinstieg({ erklaerung, onBack, onPractice }: {
         {/* 3 Erkunden */}
         <Phase no={3} title="Findet es heraus" social="PA" minutes={12}>
           <p>
-            <strong>Auftrag:</strong> Findet zu zweit heraus, für wen sich welche Fahrschule lohnt. Sucht euch einen Weg aus. Wer fertig ist, probiert einen zweiten Weg. Jede
-            Person tippt auf dem eigenen Gerät.
+            <strong>Auftrag:</strong> Findet zu zweit heraus, für wen sich welche Fahrschule lohnt. Ihr habt zwei Wege: Tabelle und Graph. Fangt mit einem an, wer fertig
+            ist, probiert auch den anderen. Jede Person tippt auf dem eigenen Gerät.
           </p>
 
           <div className="lp-ex bk-panel" data-no-autocheck>
@@ -611,69 +611,6 @@ export default function FahrschuleEinstieg({ erklaerung, onBack, onPractice }: {
           <KostenGraph />
 
           <CheckCard
-            title="Weg 3: Gleichung"
-            level="erweiterung"
-            prompt={
-              <>
-                <p>
-                  Stellt für jede Fahrschule eine Funktionsgleichung auf (<M>x</M> = Fahrstunden, <M>y</M> = Kosten in €). Gleich teuer heißt: Beide <M>y</M>-Werte sind gleich.
-                  Setzt die Terme gleich und löst nach <M>x</M> auf.
-                </p>
-                <p>
-                  <strong>Und umgekehrt:</strong> Fahrschule B will ihren Grundbetrag so ändern, dass beide erst bei <strong>20 Stunden</strong> gleich teuer sind. Welchen
-                  Grundbetrag muss B dann verlangen?
-                </p>
-              </>
-            }
-            fields={[
-              { kind: 'num', key: 'x', label: 'Gleich teuer bei … Stunden', expected: XS },
-              { kind: 'num', key: 'y', label: 'Kosten dann', expected: YS, unit: '€' },
-              { kind: 'num', key: 't', label: 'Neuer Grundbetrag von B', expected: 250, unit: '€' },
-            ]}
-            help={
-              <>
-                <Hilfen
-                  steps={[
-                    <>
-                      „Gleich teuer“ heißt: gleich viele Stunden <M>x</M> <strong>und</strong> gleiche Kosten <M>y</M>. Stellt zuerst für jede Fahrschule eine
-                      Funktionsgleichung der Form <M>{'y = m \\cdot x + t'}</M> auf. Welche Zahl zahlt man einmal, welche pro Stunde?
-                    </>,
-                    <>
-                      <p>
-                        <strong>Funktionsgleichungen aufstellen:</strong> <M>t</M> ist der Grundbetrag (den zahlt man auch bei 0 Stunden), <M>m</M> ist der Preis pro
-                        Stunde.
-                      </p>
-                      <MB>{'\\text{A: } y = 60x + 450 \\qquad \\text{B: } y = 70x + 300'}</MB>
-                      <p>
-                        <strong>Gleichsetzungsverfahren:</strong> 1. Die rechten Seiten gleichsetzen. 2. Alle <M>x</M> auf eine Seite bringen, alle Zahlen auf die
-                        andere, dann nach <M>x</M> auflösen. 3. <M>x</M> in eine der beiden Gleichungen einsetzen, das ergibt <M>y</M>.
-                      </p>
-                    </>,
-                    <>
-                      <MB>{'\\begin{aligned} 60x + 450 &= 70x + 300 && \\mid -60x \\\\ 450 &= 10x + 300 && \\mid -300 \\\\ 150 &= 10x && \\mid :10 \\end{aligned}'}</MB>
-                      <p>
-                        Jetzt fehlen nur noch der letzte Schritt für <M>x</M> und das Einsetzen für <M>y</M>. Für die umgekehrte Frage: Rechnet aus, was A bei 20
-                        Stunden kostet. B muss bei 20 Stunden genauso viel kosten: <M>{'70 \\cdot 20 + t = \\ldots'}</M>
-                      </p>
-                    </>,
-                  ]}
-                />
-                <ErklaerungAufklappen />
-              </>
-            }
-            solution={
-              <>
-                <p>Gleichsetzen der beiden Funktionsgleichungen:</p>
-                <MB>{'\\begin{aligned} 60x + 450 &= 70x + 300 && \\mid -60x \\\\ 450 &= 10x + 300 && \\mid -300 \\\\ 150 &= 10x && \\mid :10 \\\\ 15 &= x \\end{aligned}'}</MB>
-                <p>Einsetzen in eine der beiden Gleichungen:</p>
-                <MB>{'y = 60 \\cdot 15 + 450 = 1350'}</MB>
-                <p>Umgekehrte Frage: Bei 20 Stunden kostet A <M>{'60 \\cdot 20 + 450 = 1650'}</M> €. B soll dann genauso viel kosten:</p>
-                <MB>{'\\begin{aligned} 70 \\cdot 20 + t &= 1650 \\\\ 1400 + t &= 1650 && \\mid -1400 \\\\ t &= 250 \\end{aligned}'}</MB>
-              </>
-            }
-          />
-
-          <CheckCard
             title="Euer Ergebnis"
             prompt={<p>Egal, welchen Weg ihr genommen habt: Haltet euer Ergebnis fest.</p>}
             fields={[
@@ -692,13 +629,13 @@ export default function FahrschuleEinstieg({ erklaerung, onBack, onPractice }: {
               <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
             </div>
             <ul>
-              <li>Wo sieht man in der Tabelle, im Graphen und in der Gleichung, dass beide gleich teuer sind?</li>
+              <li>Wo sieht man in der Tabelle und im Graphen, dass beide gleich teuer sind?</li>
               <li>Was ist links vom Schnittpunkt los, was rechts davon?</li>
-              <li>Welcher Weg war für euch am schnellsten, welcher am genauesten?</li>
+              <li>Angenommen, A kostet 57 € pro Stunde statt 60 €. Findet ihr den Punkt mit Tabelle oder Graph dann noch genau?</li>
             </ul>
           </div>
           <p>
-            <strong>Du arbeitest allein?</strong> So haben drei andere Jugendliche gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
+            <strong>Du arbeitest allein?</strong> So haben zwei andere Jugendliche gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
           </p>
           <div className="ls-ways">
             <details className="ls-way">
@@ -719,17 +656,11 @@ export default function FahrschuleEinstieg({ erklaerung, onBack, onPractice }: {
                 </p>
               </div>
             </details>
-            <details className="ls-way">
-              <summary>Mia hat gleichgesetzt</summary>
-              <div className="ls-way-body">
-                <p>„Gleich teuer heißt, beide y-Werte sind gleich. Also habe ich die Terme gleichgesetzt.“</p>
-                <MB>{'60x + 450 = 70x + 300 \\;\\Rightarrow\\; x = 15,\\quad y = 60 \\cdot 15 + 450 = 1350'}</MB>
-                <p>
-                  <strong>Gut:</strong> immer exakt, auch bei krummen Zahlen. <strong>Aber:</strong> Ohne Deutung weiß man noch nicht, wer links und rechts günstiger ist.
-                </p>
-              </div>
-            </details>
           </div>
+          <p>
+            Beide Wege haben einen Haken: Liegt der Schnittpunkt nicht genau in der Tabelle oder auf einer Gitterlinie, findet man ihn nur ungefähr. Im nächsten Abschnitt
+            lernst du ein Verfahren, mit dem du ihn immer genau ausrechnest.
+          </p>
         </Phase>
 
         {/* 5 Verfahren und Sichern */}
@@ -918,6 +849,40 @@ export default function FahrschuleEinstieg({ erklaerung, onBack, onPractice }: {
                     </>,
                     <>
                       <M>{'25x + 80 = 30x + 20 \\;\\Rightarrow\\; 80 = 5x + 20 \\;\\Rightarrow\\; 60 = 5x'}</M>. Jetzt noch durch 5 teilen und x in A einsetzen.
+                    </>,
+                  ]}
+                />
+              }
+            />
+            <CheckCard
+              title="Übung 3: Umgekehrt gedacht"
+              level="erweiterung"
+              prompt={
+                <p>
+                  Fahrschule B will ihren Grundbetrag so ändern, dass beide Fahrschulen erst bei <strong>20 Fahrstunden</strong> gleich teuer sind. Der Preis pro Stunde (70 €)
+                  bleibt. Welchen Grundbetrag muss B dann verlangen?
+                </p>
+              }
+              fields={[{ kind: 'num', key: 't', label: 'Neuer Grundbetrag von B', expected: 250, unit: '€' }]}
+              solution={
+                <>
+                  <p>
+                    Im Schnittpunkt ist <M>{'x = 20'}</M>. Bei 20 Stunden kostet A <M>{'60 \\cdot 20 + 450 = 1650'}</M> €. B soll dann genauso viel kosten:
+                  </p>
+                  <MB>{'\\begin{aligned} 70 \\cdot 20 + t &= 1650 \\\\ 1400 + t &= 1650 && \\mid -1400 \\\\ t &= 250 \\end{aligned}'}</MB>
+                  <p>B muss also 250 € Grundbetrag verlangen, 50 € weniger als bisher.</p>
+                </>
+              }
+              help={
+                <Hilfen
+                  steps={[
+                    <>Diesmal kennst du den x-Wert des Schnittpunkts schon: 20 Stunden. Was kostet A bei 20 Stunden?</>,
+                    <>
+                      Im Schnittpunkt kosten beide gleich viel. Setze <M>{'x = 20'}</M> in die Gleichung von B ein, der Grundbetrag <M>t</M> ist die Unbekannte:{' '}
+                      <M>{'y = 70 \\cdot 20 + t'}</M>
+                    </>,
+                    <>
+                      A kostet <M>{'60 \\cdot 20 + 450 = 1650'}</M> €. Also gilt <M>{'1400 + t = 1650'}</M>. Jetzt nur noch nach <M>t</M> auflösen.
                     </>,
                   ]}
                 />
