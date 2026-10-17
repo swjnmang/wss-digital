@@ -824,41 +824,46 @@ export default function Schnittpunkt() {
       <TaskShell title="Schnittpunkt zweier Geraden" width="narrow">
         <div className="flex flex-col gap-6">
           {header}
-          <div className={panel}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Wie möchtest du starten?</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className={`${panel} flex flex-col`}>
+              <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
               <button
                 onClick={() => {
                   setLernsituation(true)
                   window.scrollTo({ top: 0 })
                 }}
                 style={{ background: 'var(--primary)' }}
-                className="rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+                className="flex-1 rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
-                <p className="text-lg font-bold mb-1 text-white">Lernsituation</p>
+                <p className="text-lg font-bold mb-1 text-white">Welche Fahrschule lohnt sich?</p>
                 <p className="text-xl mb-2 text-white">
-                  <i className="fa-solid fa-car" aria-hidden="true" /> Fahrschule
+                  <i className="fa-solid fa-car" aria-hidden="true" />
                 </p>
                 <p className="text-sm text-white/90">Neu beim Thema? Finde heraus, welche Fahrschule sich lohnt, und lerne dabei, wie man den Schnittpunkt berechnet.</p>
               </button>
-              <button
-                onClick={() => chooseLevel('einfach')}
-                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Einfach</p>
-                <p className="text-xl font-serif italic mb-2 text-white">y = 2x − 1</p>
-                <p className="text-sm text-white/90">Ganze Zahlen in den Gleichungen. Es gibt immer genau einen Schnittpunkt.</p>
-              </button>
-              <button
-                onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
-                <p className="text-xl font-serif italic mb-2 text-white">
-                  y = <Frac num={1} den={2} />x + 3
-                </p>
-                <p className="text-sm text-white/90">Brüche in den Gleichungen – und manchmal gibt es keinen Schnittpunkt, weil die Geraden parallel sind.</p>
-              </button>
+            </div>
+            <div className={`${panel} sm:col-span-2 flex flex-col`}>
+              <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button
+                  onClick={() => chooseLevel('einfach')}
+                  className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+                >
+                  <p className="text-lg font-bold mb-1 text-white">Einfach</p>
+                  <p className="text-xl font-serif italic mb-2 text-white">y = 2x − 1</p>
+                  <p className="text-sm text-white/90">Ganze Zahlen in den Gleichungen. Es gibt immer genau einen Schnittpunkt.</p>
+                </button>
+                <button
+                  onClick={() => chooseLevel('fortgeschritten')}
+                  className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+                >
+                  <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
+                  <p className="text-xl font-serif italic mb-2 text-white">
+                    y = <Frac num={1} den={2} />x + 3
+                  </p>
+                  <p className="text-sm text-white/90">Brüche in den Gleichungen – und manchmal gibt es keinen Schnittpunkt, weil die Geraden parallel sind.</p>
+                </button>
+              </div>
             </div>
           </div>
         </div>
