@@ -1,5 +1,5 @@
 import React, { useEffect, useId, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { VideoEmbed } from '../../components/VideoButton'
@@ -797,6 +797,12 @@ export default function Schnittpunkt() {
   const header = (
     <div>
       <p className="text-center text-slate-600">Berechne den Schnittpunkt zweier Geraden mit dem Gleichsetzungsverfahren.</p>
+      <p className="text-center text-slate-600 mt-2">
+        Neu beim Thema? Starte mit dem Einstieg{' '}
+        <Link to="/lineare_funktionen/schnittpunkt-einstieg" className="font-bold underline">
+          „Welche Fahrschule lohnt sich?“
+        </Link>
+      </p>
     </div>
   )
 

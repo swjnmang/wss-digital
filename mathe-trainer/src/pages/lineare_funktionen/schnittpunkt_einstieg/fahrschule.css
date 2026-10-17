@@ -1,0 +1,73 @@
+/* Lernsituation „Welche Fahrschule lohnt sich?“ – nur Farben aus den Tokens */
+
+.ls-phase-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.ls-phase-head .lp-h2 { margin: 10px 0 0; }
+.ls-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.ls-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px;
+  border: 1.5px solid var(--line-strong); background: var(--surface); color: var(--ink);
+  font: 700 14px/1.3 var(--font-body); white-space: nowrap;
+}
+.ls-chip-social { background: var(--primary-soft); border-color: var(--primary); color: var(--primary-ink); }
+
+/* Niveaustufen */
+.ls-level { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 8px; font: 800 13px/1.3 var(--font-body); border: 1.5px solid var(--edge); white-space: nowrap; }
+.ls-level-basis { background: var(--surface); }
+.ls-level-standard { background: var(--primary-soft); }
+.ls-level-erweiterung { background: var(--highlight); color: var(--on-highlight); }
+
+/* Situation */
+.ls-flyers { display: grid; gap: 14px; }
+@media (min-width: 640px) { .ls-flyers { grid-template-columns: 1fr 1fr; } }
+.ls-flyer { border: 2px solid var(--edge); border-radius: var(--radius); background: var(--surface); padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; }
+.ls-flyer-a { border-top: 8px solid var(--primary); }
+.ls-flyer-b { border-top: 8px solid var(--hint); }
+.ls-flyer-name { font: 800 20px/1.2 var(--font-display); }
+.ls-flyer-sub { font-size: 14px; color: var(--ink-muted); }
+.ls-flyer-price { display: flex; justify-content: space-between; gap: 10px; font-size: 17px; border-bottom: 1px dashed var(--line); padding: 4px 0; }
+.ls-flyer-price strong { font: 800 19px/1.2 var(--font-display); white-space: nowrap; }
+
+.ls-question {
+  border-radius: var(--radius); border: 2px solid var(--edge); background: var(--highlight); color: var(--on-highlight);
+  padding: 14px 18px; font: 800 20px/1.35 var(--font-display); display: flex; gap: 12px; align-items: flex-start;
+}
+
+.ls-slider { display: flex; flex-direction: column; gap: 8px; }
+.ls-slider input[type='range'] { width: 100%; height: 36px; accent-color: var(--primary); }
+.ls-slider-value { font: 800 22px/1.2 var(--font-display); }
+.ls-saved { border-radius: var(--radius); background: var(--correct-soft); color: var(--correct-ink); padding: 12px 16px; font-size: 17px; line-height: 1.5; }
+
+/* Hilfekarten */
+.ls-help { display: flex; flex-direction: column; gap: 8px; }
+.ls-help-card { border-left: 4px solid var(--hint); background: var(--hint-soft); border-radius: 0 10px 10px 0; padding: 10px 14px; font-size: 16px; line-height: 1.55; animation: lp-in .25s ease; }
+.ls-help-card-title { font: 800 15px/1.3 var(--font-display); color: var(--hint); margin-bottom: 2px; }
+
+/* Graph */
+.ls-graph svg { display: block; width: 100%; height: auto; max-width: 640px; }
+.ls-readout { display: grid; gap: 8px; }
+@media (min-width: 640px) { .ls-readout { grid-template-columns: 1fr 1fr; } }
+.ls-readout-box { border-radius: 10px; padding: 8px 12px; font-size: 16px; background: var(--surface-sunken); }
+.ls-readout-a { border-left: 5px solid var(--primary); }
+.ls-readout-b { border-left: 5px solid var(--hint); }
+.ls-equal { border-radius: 10px; padding: 8px 12px; background: var(--highlight); color: var(--on-highlight); font: 800 17px/1.4 var(--font-display); }
+
+/* Stopp-Kasten */
+.ls-stop { border: 3px solid var(--wrong); border-radius: var(--radius); background: var(--surface); padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.ls-stop-title { display: flex; align-items: center; gap: 10px; font: 800 20px/1.2 var(--font-display); color: var(--wrong-ink); }
+.ls-stop ul { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 17px; line-height: 1.5; }
+
+.ls-ways { display: flex; flex-direction: column; gap: 10px; }
+.ls-way { border: 1.5px solid var(--line-strong); border-radius: 12px; background: var(--surface); }
+.ls-way > summary { cursor: pointer; padding: 12px 16px; font: 800 17px/1.3 var(--font-display); list-style-position: inside; min-height: 48px; }
+.ls-way-body { padding: 0 16px 14px; font-size: 16px; line-height: 1.55; display: flex; flex-direction: column; gap: 8px; }
+.ls-way-body p { margin: 0; }
+
+/* Sichern */
+.ls-criteria { display: flex; flex-direction: column; gap: 8px; }
+.ls-criteria label { display: flex; gap: 10px; align-items: flex-start; font-size: 17px; line-height: 1.45; cursor: pointer; }
+.ls-criteria input { width: 22px; height: 22px; margin-top: 2px; accent-color: var(--correct); flex-shrink: 0; }
+.ls-back { border-radius: var(--radius); border: 2px solid var(--primary); background: var(--primary-soft); padding: 14px 18px; font-size: 17px; line-height: 1.55; display: flex; flex-direction: column; gap: 8px; }
+.ls-back p { margin: 0; }
+
+.ls-options { display: grid; gap: 10px; }
+.ls-option { justify-content: flex-start; text-align: left; font-weight: 600; min-height: 56px; }
