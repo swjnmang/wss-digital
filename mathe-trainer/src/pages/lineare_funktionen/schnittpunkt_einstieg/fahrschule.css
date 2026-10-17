@@ -49,6 +49,7 @@
 .ls-readout-box { border-radius: 10px; padding: 8px 12px; font-size: 16px; background: var(--surface-sunken); }
 .ls-readout-a { border-left: 5px solid var(--primary); }
 .ls-readout-b { border-left: 5px solid var(--hint); }
+.ls-readout-c { border-left: 5px solid var(--correct-ink); }
 .ls-equal { border-radius: 10px; padding: 8px 12px; background: var(--highlight); color: var(--on-highlight); font: 800 17px/1.4 var(--font-display); }
 
 /* Stopp-Kasten */

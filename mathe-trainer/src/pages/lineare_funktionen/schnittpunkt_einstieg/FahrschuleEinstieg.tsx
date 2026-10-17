@@ -39,6 +39,8 @@ const A = { t: 450, m: 60 }
 const B = { t: 300, m: 70 }
 const kostenA = (x: number) => A.t + A.m * x
 const kostenB = (x: number) => B.t + B.m * x
+// Zusatzfrage (Erweiterung): dritte Fahrschule ohne Grundbetrag
+const kostenC = (x: number) => 80 * x
 const XS = (A.t - B.t) / (B.m - A.m) // 15
 const YS = kostenA(XS) // 1350
 const TABLE_X = [0, 5, 10, 15, 20, 25, 30]
@@ -350,18 +352,18 @@ const G = { w: 620, h: 420, l: 70, r: 20, t: 30, b: 56, xMax: 30, yMax: 2500 }
 const gx = (x: number) => G.l + (x / G.xMax) * (G.w - G.l - G.r)
 const gy = (y: number) => G.h - G.b - (y / G.yMax) * (G.h - G.t - G.b)
 
-function KostenGraph() {
+const texEuro = (v: number) => fmt(v, 0).replace('.', '{.}')
+
+/** Graph mit Schieberegler; withC blendet Fahrschule C (Zusatzfrage) ein */
+function GraphAnsicht({ withC = false }: { withC?: boolean }) {
+  const sliderId = useId()
   const [x, setX] = useState(5)
   const a = kostenA(x)
   const b = kostenB(x)
+  const c = kostenC(x)
+  const equal = [a === b && 'A und B', withC && a === c && 'A und C', withC && b === c && 'B und C'].filter(Boolean) as string[]
   return (
-    <div className="lp-ex bk-panel">
-      <CardHead title="Weg 2: Graph" level="standard" />
-      <div className="lp-ex-prompt">
-        <p>
-          Die blaue Gerade zeigt die Kosten bei A, die braune die Kosten bei B. Bewegt den Regler und beobachtet beide Punkte: Wo sind die Kosten gleich?
-        </p>
-      </div>
+    <>
       <div className="bk-graph ls-graph">
         <svg viewBox={`0 0 ${G.w} ${G.h}`} role="img" aria-label="Graphen der Kosten von Fahrschule A und B">
           {[0, 5, 10, 15, 20, 25, 30].map((v) => (
@@ -399,27 +401,55 @@ function KostenGraph() {
           <line x1={gx(x)} x2={gx(x)} y1={gy(0)} y2={gy(Math.max(a, b))} stroke="var(--ink-muted)" strokeDasharray="4 4" />
           <circle cx={gx(x)} cy={gy(a)} r="7" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
           <circle cx={gx(x)} cy={gy(b)} r="7" fill="var(--hint)" stroke="var(--surface)" strokeWidth="2" />
+          {withC && (
+            <>
+              <line x1={gx(0)} y1={gy(kostenC(0))} x2={gx(30)} y2={gy(kostenC(30))} stroke="var(--correct-ink)" strokeWidth="3.5" strokeDasharray="3 5" strokeLinecap="round" />
+              <text x={gx(8)} y={gy(kostenC(8)) + 28} textAnchor="start" fontSize="22" fontWeight="700" fill="var(--correct-ink)">
+                C
+              </text>
+              <circle cx={gx(x)} cy={gy(c)} r="7" fill="var(--correct-ink)" stroke="var(--surface)" strokeWidth="2" />
+            </>
+          )}
         </svg>
       </div>
       <div className="ls-slider">
-        <label htmlFor="ls-graph-x">
+        <label htmlFor={sliderId}>
           Fahrstunden: <span className="ls-slider-value">{x}</span>
         </label>
-        <input id="ls-graph-x" type="range" min={0} max={30} step={1} value={x} onChange={(e: ChangeEvent<HTMLInputElement>) => setX(Number(e.target.value))} />
+        <input id={sliderId} type="range" min={0} max={30} step={1} value={x} onChange={(e: ChangeEvent<HTMLInputElement>) => setX(Number(e.target.value))} />
       </div>
       <div className="ls-readout">
         <div className="ls-readout-box ls-readout-a">
-          <strong>A:</strong> <M>{`450 + 60 \\cdot ${x} = ${fmt(a, 0).replace('.', '{.}')}`}</M> €
+          <strong>A:</strong> <M>{`450 + 60 \\cdot ${x} = ${texEuro(a)}`}</M> €
         </div>
         <div className="ls-readout-box ls-readout-b">
-          <strong>B:</strong> <M>{`300 + 70 \\cdot ${x} = ${fmt(b, 0).replace('.', '{.}')}`}</M> €
+          <strong>B:</strong> <M>{`300 + 70 \\cdot ${x} = ${texEuro(b)}`}</M> €
         </div>
+        {withC && (
+          <div className="ls-readout-box ls-readout-c">
+            <strong>C:</strong> <M>{`80 \\cdot ${x} = ${texEuro(c)}`}</M> €
+          </div>
+        )}
       </div>
-      {a === b && (
+      {equal.length > 0 && (
         <div className="ls-equal" role="status">
-          <i className="fa-solid fa-equals" aria-hidden="true" /> Hier treffen sich die Geraden: Beide Fahrschulen kosten gleich viel!
+          <i className="fa-solid fa-equals" aria-hidden="true" /> Hier treffen sich Geraden: {equal.join(' sowie ')} kosten gleich viel!
         </div>
       )}
+    </>
+  )
+}
+
+function KostenGraph() {
+  return (
+    <div className="lp-ex bk-panel">
+      <CardHead title="Weg 2: Graph" level="standard" />
+      <div className="lp-ex-prompt">
+        <p>
+          Die blaue Gerade zeigt die Kosten bei A, die braune die Kosten bei B. Bewegt den Regler und beobachtet beide Punkte: Wo sind die Kosten gleich?
+        </p>
+      </div>
+      <GraphAnsicht />
       <p className="lp-hint">
         Im Heft: Zeichnet beide Geraden in ein Koordinatensystem (x-Achse: 1 cm für 5 Stunden, y-Achse: 1 cm für 250 €) und markiert, wo sie sich schneiden.
       </p>
@@ -619,6 +649,64 @@ export default function FahrschuleEinstieg({ erklaerung, onBack, onPractice }: {
               { kind: 'select', key: 'wenig', label: 'Wer wenige Stunden braucht (z. B. 10), wählt …', options: ['Fahrschule A', 'Fahrschule B'], expected: 1 },
               { kind: 'select', key: 'viel', label: 'Wer viele Stunden braucht (z. B. 25), wählt …', options: ['Fahrschule A', 'Fahrschule B'], expected: 0 },
             ]}
+          />
+
+          <CheckCard
+            title="Zusatzfrage: Eine dritte Fahrschule"
+            level="erweiterung"
+            prompt={
+              <>
+                <p>
+                  Ihr seid schon fertig? Eine neue Fahrschule C wirbt: <strong>„Keine Grundgebühr! Nur 80 € pro Fahrstunde.“</strong> Die grüne gepunktete Gerade zeigt ihre
+                  Kosten.
+                </p>
+                <p>
+                  Für wen lohnt sich jetzt welche der drei Fahrschulen? Lohnt sich B überhaupt noch? Untersucht das mit dem Graphen und schreibt eine begründete Empfehlung
+                  für alle drei Fahrschulen ins Heft.
+                </p>
+                <GraphAnsicht withC />
+              </>
+            }
+            fields={[
+              { kind: 'num', key: 'bis', label: 'C ist am günstigsten bis einschließlich … Fahrstunden (ganze Zahl)', expected: 22, tol: 0 },
+              {
+                kind: 'select',
+                key: 'b',
+                label: 'Für wen lohnt sich B jetzt noch?',
+                options: ['Für alle mit wenigen Fahrstunden', 'Für alle mit vielen Fahrstunden', 'Für niemanden'],
+                expected: 2,
+              },
+            ]}
+            help={
+              <Hilfen
+                steps={[
+                  <>Vergleicht bei verschiedenen Stundenzahlen alle drei Preise. Welche Fahrschule ist jeweils am billigsten?</>,
+                  <>Schaut im Graphen, welche Gerade jeweils ganz unten liegt. An welcher Stelle wechselt die unterste Gerade?</>,
+                  <>
+                    Bei 22 Stunden: A 1770 €, B 1840 €, C 1760 €. Bei 23 Stunden: A 1830 €, B 1910 €, C 1840 €. Und liegt die Gerade von B irgendwo ganz unten?
+                  </>,
+                ]}
+              />
+            }
+            solution={
+              <>
+                <QuerTabelle
+                  rows={[
+                    { head: 'Fahrstunden', cells: [10, 15, 22, 23, 30].map((x) => <strong key={x}>{x}</strong>) },
+                    { head: 'A in €', cells: [10, 15, 22, 23, 30].map((x) => <span key={x}>{fmt(kostenA(x), 0)}</span>) },
+                    { head: 'B in €', cells: [10, 15, 22, 23, 30].map((x) => <span key={x}>{fmt(kostenB(x), 0)}</span>) },
+                    { head: 'C in €', cells: [10, 15, 22, 23, 30].map((x) => <span key={x}>{fmt(kostenC(x), 0)}</span>) },
+                  ]}
+                />
+                <p>
+                  Die Gerade von C liegt am Anfang ganz unten. Sie schneidet die Gerade von A bei 22,5 Stunden. Bis 22 Stunden ist also C am günstigsten, ab 23 Stunden A.
+                </p>
+                <p>
+                  Die Gerade von B liegt nie ganz unten: Bei wenigen Stunden ist C billiger, bei vielen Stunden A. B lohnt sich also für niemanden mehr. Erst bei 30
+                  Stunden holt B die Fahrschule C ein, da ist A aber längst günstiger.
+                </p>
+              </>
+            }
           />
         </Phase>
 
