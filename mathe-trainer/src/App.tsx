@@ -65,7 +65,6 @@ import Zeichnen from './pages/lineare_funktionen/Zeichnen'
 import Nullstellen from './pages/lineare_funktionen/Nullstellen'
 import PunktGerade from './pages/lineare_funktionen/PunktGerade'
 import Schnittpunkt from './pages/lineare_funktionen/Schnittpunkt'
-import FahrschuleEinstieg from './pages/lineare_funktionen/schnittpunkt_einstieg/FahrschuleEinstieg'
 import Gleichungssysteme from './pages/lineare_funktionen/Gleichungssysteme'
 import SpielMuenzen from './pages/lineare_funktionen/SpielMuenzen'
 import TestLF from './pages/lineare_funktionen/Test'
@@ -272,7 +271,7 @@ export default function App() {
           <Route path="/lineare_funktionen/parallel_senkrecht" element={<ParallelSenkrecht />} />
           <Route path="/lineare_funktionen/nullstellen" element={<Nullstellen />} />
           <Route path="/lineare_funktionen/schnittpunkt" element={<Schnittpunkt />} />
-          <Route path="/lineare_funktionen/schnittpunkt-einstieg" element={<FahrschuleEinstieg />} />
+          <Route path="/lineare_funktionen/schnittpunkt-einstieg" element={<Navigate to="/lineare_funktionen/schnittpunkt" replace />} />
           <Route path="/lineare_funktionen/gleichungssysteme" element={<Gleichungssysteme />} />
           <Route path="/lineare_funktionen/gemischte-aufgaben" element={<GemischteAufgabenLF />} />
           <Route path="/lineare_funktionen/anwendungsaufgaben" element={<AnwendungsaufgabenLF />} />

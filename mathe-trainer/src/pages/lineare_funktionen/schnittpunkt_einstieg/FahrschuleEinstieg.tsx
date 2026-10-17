@@ -1,16 +1,37 @@
-import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { createContext, useContext, useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import CheckedNumberInput from '../../../components/CheckedNumberInput'
 import { useTaskTracking } from '../../../hooks/useTaskTracking'
 import { fieldCheckClass } from '../../../utils/fieldCheck'
-import { M, MB, Merke, QuerTabelle, checkNumber, fmt, pick } from '../../daten_und_zufall/lernpfad/kit'
+import { Beispiel, M, MB, Merke, QuerTabelle, checkNumber, fmt, pick } from '../../daten_und_zufall/lernpfad/kit'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './fahrschule.css'
 
 // Einstiegs-Lernsituation „Welche Fahrschule lohnt sich für dich?“ zum Schnittpunkt zweier Geraden.
 // Phasen: Aktivieren → Situation & Vorhersage → Erkunden → Austausch → Sichern → Check.
 // Die Vorhersage bleibt nur im Seitenzustand (kein Speichern).
+// Wird als Modus „Lernsituation“ auf der Seite „Schnittpunkt zweier Geraden“ angezeigt; der Infoteil
+// (Erklärung mit Erklärvideo) kommt von dort, damit er nur an einer Stelle gepflegt wird.
+
+/** Infoteil der Übungsseite (Erklärung, Beispiel, Erklärvideo) */
+const ErklaerungCtx = createContext<ReactNode>(null)
+
+/** Infoteil zum Aufklappen, z. B. in den Hilfen */
+function ErklaerungAufklappen({ label = 'Erklärung mit Video öffnen' }: { label?: string }) {
+  const erklaerung = useContext(ErklaerungCtx)
+  const [open, setOpen] = useState(false)
+  if (!erklaerung) return null
+  return (
+    <div className="ls-help">
+      <div>
+        <button type="button" className="bk-btn bk-btn-sm" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+          <i className="fa-solid fa-circle-play" aria-hidden="true" /> {open ? 'Erklärung schließen' : label}
+        </button>
+      </div>
+      {open && erklaerung}
+    </div>
+  )
+}
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
@@ -415,17 +436,18 @@ function KostenGraph() {
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
-export default function FahrschuleEinstieg() {
+export default function FahrschuleEinstieg({ erklaerung, onBack, onPractice }: { erklaerung: ReactNode; onBack: () => void; onPractice: () => void }) {
   const [pred, setPred] = useState<Prediction>({ choice: null, hours: 20, saved: false })
 
   return (
-    <TaskShell
-      title="Welche Fahrschule lohnt sich für dich?"
-      subtitle="Einstieg: Schnittpunkt zweier Geraden"
-      width="wide"
-      parent={{ to: '/lineare_funktionen/schnittpunkt', label: 'Schnittpunkt zweier Geraden' }}
-    >
+    <ErklaerungCtx.Provider value={erklaerung}>
+    <TaskShell title="Schnittpunkt zweier Geraden" subtitle="Lernsituation: Welche Fahrschule lohnt sich für dich?" width="wide">
       <div className="lp">
+        <div>
+          <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={onBack}>
+            <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zur Auswahl
+          </button>
+        </div>
         <div className="lp-goal">
           <i className="fa-solid fa-bullseye" aria-hidden="true" />
           <div>
@@ -550,7 +572,7 @@ export default function FahrschuleEinstieg() {
         </Phase>
 
         {/* 3 Erkunden */}
-        <Phase no={3} title="Findet es heraus" social="PA" minutes={15}>
+        <Phase no={3} title="Findet es heraus" social="PA" minutes={12}>
           <p>
             <strong>Auftrag:</strong> Findet zu zweit heraus, für wen sich welche Fahrschule lohnt. Sucht euch einen Weg aus. Wer fertig ist, probiert einen zweiten Weg. Jede
             Person tippt auf dem eigenen Gerät.
@@ -609,17 +631,35 @@ export default function FahrschuleEinstieg() {
               { kind: 'num', key: 't', label: 'Neuer Grundbetrag von B', expected: 250, unit: '€' },
             ]}
             help={
-            <Hilfen
-              steps={[
-                <>Was bedeutet „gleich teuer“, wenn ihr zwei Funktionsgleichungen habt?</>,
-                <>
-                  Die Kosten von A sind <M>{'y = 60x + 450'}</M>. Stellt für B die Gleichung genauso auf und setzt die beiden rechten Seiten gleich.
-                </>,
-                <>
-                  <M>{'60x + 450 = 70x + 300'}</M>. Bringt zuerst alle <M>x</M> auf eine Seite: <M>{'\\mid -60x'}</M>.
-                </>,
-              ]}
-            />
+              <>
+                <Hilfen
+                  steps={[
+                    <>
+                      „Gleich teuer“ heißt: gleich viele Stunden <M>x</M> <strong>und</strong> gleiche Kosten <M>y</M>. Stellt zuerst für jede Fahrschule eine
+                      Funktionsgleichung der Form <M>{'y = m \\cdot x + t'}</M> auf. Welche Zahl zahlt man einmal, welche pro Stunde?
+                    </>,
+                    <>
+                      <p>
+                        <strong>Funktionsgleichungen aufstellen:</strong> <M>t</M> ist der Grundbetrag (den zahlt man auch bei 0 Stunden), <M>m</M> ist der Preis pro
+                        Stunde.
+                      </p>
+                      <MB>{'\\text{A: } y = 60x + 450 \\qquad \\text{B: } y = 70x + 300'}</MB>
+                      <p>
+                        <strong>Gleichsetzungsverfahren:</strong> 1. Die rechten Seiten gleichsetzen. 2. Alle <M>x</M> auf eine Seite bringen, alle Zahlen auf die
+                        andere, dann nach <M>x</M> auflösen. 3. <M>x</M> in eine der beiden Gleichungen einsetzen, das ergibt <M>y</M>.
+                      </p>
+                    </>,
+                    <>
+                      <MB>{'\\begin{aligned} 60x + 450 &= 70x + 300 && \\mid -60x \\\\ 450 &= 10x + 300 && \\mid -300 \\\\ 150 &= 10x && \\mid :10 \\end{aligned}'}</MB>
+                      <p>
+                        Jetzt fehlen nur noch der letzte Schritt für <M>x</M> und das Einsetzen für <M>y</M>. Für die umgekehrte Frage: Rechnet aus, was A bei 20
+                        Stunden kostet. B muss bei 20 Stunden genauso viel kosten: <M>{'70 \\cdot 20 + t = \\ldots'}</M>
+                      </p>
+                    </>,
+                  ]}
+                />
+                <ErklaerungAufklappen />
+              </>
             }
             solution={
               <>
@@ -692,9 +732,68 @@ export default function FahrschuleEinstieg() {
           </div>
         </Phase>
 
-        {/* 5 Sichern */}
-        <Phase no={5} title="Halte fest, was du herausgefunden hast" social="EA" minutes={7}>
+        {/* 5 Verfahren und Sichern */}
+        <Phase no={5} title="So rechnest du den Schnittpunkt aus" social="EA" minutes={8}>
           <Rueckbezug pred={pred} />
+          <p>
+            Tabelle und Graph zeigen den Schnittpunkt gut, aber oft nur ungefähr. Mit dem <strong>Gleichsetzungsverfahren</strong> rechnest du ihn immer genau aus.
+            Decke das Beispiel Schritt für Schritt auf.
+          </p>
+          <Beispiel
+            title="Die Fahrschulen rechnerisch vergleichen"
+            aufgabe={<p>Fahrschule A: 450 € Grundbetrag und 60 € pro Fahrstunde. Fahrschule B: 300 € Grundbetrag und 70 € pro Fahrstunde.</p>}
+            steps={[
+              {
+                title: 'Funktionsgleichungen aufstellen',
+                body: (
+                  <>
+                    <p>
+                      <M>x</M> = Anzahl der Fahrstunden, <M>y</M> = Kosten in €. Der Grundbetrag ist der y-Achsenabschnitt <M>t</M>, der Preis pro Stunde ist die
+                      Steigung <M>m</M>:
+                    </p>
+                    <MB>{'\\text{A: } y = 60x + 450 \\qquad \\text{B: } y = 70x + 300'}</MB>
+                  </>
+                ),
+              },
+              {
+                title: 'Gleichsetzen',
+                body: (
+                  <>
+                    <p>Im Schnittpunkt sind beide y-Werte gleich. Also darfst du die rechten Seiten gleichsetzen:</p>
+                    <MB>{'60x + 450 = 70x + 300'}</MB>
+                  </>
+                ),
+              },
+              {
+                title: 'Nach x auflösen',
+                body: (
+                  <>
+                    <p>Alle x auf eine Seite, alle Zahlen auf die andere. Tipp: Ziehe das kleinere x ab, dann bleibt kein Minus vor dem x.</p>
+                    <MB>{'\\begin{aligned} 60x + 450 &= 70x + 300 && \\mid -60x \\\\ 450 &= 10x + 300 && \\mid -300 \\\\ 150 &= 10x && \\mid :10 \\\\ 15 &= x \\end{aligned}'}</MB>
+                  </>
+                ),
+              },
+              {
+                title: 'x einsetzen und y ausrechnen',
+                body: (
+                  <>
+                    <p>Setze x = 15 in eine der beiden Gleichungen ein. Zur Probe in die andere:</p>
+                    <MB>{'\\text{A: } y = 60 \\cdot 15 + 450 = 1350 \\qquad \\text{Probe B: } 70 \\cdot 15 + 300 = 1350 \\;\\checkmark'}</MB>
+                  </>
+                ),
+              },
+              {
+                title: 'Schnittpunkt angeben und deuten',
+                body: (
+                  <>
+                    <MB>{'S(15 \\mid 1350)'}</MB>
+                    <p>Bei 15 Fahrstunden kosten beide Fahrschulen 1350 €. Wer weniger Stunden braucht, fährt mit B günstiger, wer mehr braucht, mit A.</p>
+                  </>
+                ),
+              },
+            ]}
+          />
+          <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
           <Merke title="Schnittpunkt zweier Geraden">
             <p>
               Im <strong>Schnittpunkt</strong> <M>{'S(x_S \\mid y_S)'}</M> haben beide Geraden denselben <M>x</M>-Wert <strong>und</strong> denselben <M>y</M>-Wert.
@@ -738,8 +837,97 @@ export default function FahrschuleEinstieg() {
           </div>
         </Phase>
 
-        {/* 6 Check */}
-        <Phase no={6} title="Check: Hast du es verstanden?" social="EA" minutes={8}>
+        {/* 6 Üben */}
+        <Phase no={6} title="Jetzt du: Schritt für Schritt üben" social="EA" minutes={7}>
+          <p>Hier rechnest du das Verfahren selbst. Die erste Aufgabe gibt dir die Schritte vor, bei der zweiten stellst du auch die Gleichungen selbst auf.</p>
+          <div className="lp-exlist">
+            <CheckCard
+              title="Übung 1: Mit Geländer"
+              level="basis"
+              prompt={
+                <>
+                  <p>Berechne den Schnittpunkt der beiden Geraden. Fülle die Lücken der Rechnung aus.</p>
+                  <MB>{'f(x) = 4x + 1 \\qquad g(x) = 2x + 7'}</MB>
+                  <MB>{'\\begin{aligned} 4x + 1 &= 2x + 7 && \\mid -2x \\\\ 2x + 1 &= 7 && \\mid -1 \\\\ 2x &= \\;\\fbox{?} && \\mid :2 \\\\ x &= \\;\\fbox{?} \\end{aligned}'}</MB>
+                  <p>
+                    Dann <M>x</M> in <M>f</M> einsetzen: <M>{'y = 4 \\cdot x + 1'}</M>
+                  </p>
+                </>
+              }
+              fields={[
+                { kind: 'num', key: 'zweix', label: <M>{'2x ='}</M>, expected: 6 },
+                { kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 3 },
+                { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 13 },
+              ]}
+              solution={
+                <>
+                  <MB>{'\\begin{aligned} 4x + 1 &= 2x + 7 && \\mid -2x \\\\ 2x + 1 &= 7 && \\mid -1 \\\\ 2x &= 6 && \\mid :2 \\\\ x &= 3 \\end{aligned}'}</MB>
+                  <MB>{'y = 4 \\cdot 3 + 1 = 13 \\qquad \\Rightarrow \\qquad S(3 \\mid 13)'}</MB>
+                </>
+              }
+              help={
+                <Hilfen
+                  steps={[
+                    <>Rechne Schritt für Schritt: Was bleibt übrig, wenn du auf beiden Seiten 1 abziehst?</>,
+                    <>
+                      Nach dem Abziehen steht links nur noch <M>2x</M>. Teile dann beide Seiten durch 2.
+                    </>,
+                    <>
+                      <M>{'2x = 6'}</M>, also <M>{'x = 3'}</M>. Für <M>y</M>: <M>{'4 \\cdot 3 + 1'}</M>
+                    </>,
+                  ]}
+                />
+              }
+            />
+            <CheckCard
+              title="Übung 2: Zwei Fitnessstudios"
+              level="standard"
+              prompt={
+                <>
+                  <p>
+                    Studio A verlangt 80 € Aufnahmegebühr und 25 € pro Monat. Studio B verlangt 20 € Aufnahmegebühr und 30 € pro Monat. <M>x</M> = Anzahl der
+                    Monate, <M>y</M> = Gesamtkosten in €.
+                  </p>
+                  <p>Stelle beide Funktionsgleichungen auf und berechne, nach wie vielen Monaten beide gleich viel gekostet haben.</p>
+                </>
+              }
+              fields={[
+                { kind: 'num', key: 'mA', label: <>A: Steigung <M>m</M></>, expected: 25 },
+                { kind: 'num', key: 'tA', label: <>A: <M>t</M></>, expected: 80 },
+                { kind: 'num', key: 'mB', label: <>B: Steigung <M>m</M></>, expected: 30 },
+                { kind: 'num', key: 'tB', label: <>B: <M>t</M></>, expected: 20 },
+                { kind: 'num', key: 'x', label: 'Gleich teuer nach … Monaten', expected: 12 },
+                { kind: 'num', key: 'y', label: 'Kosten dann', expected: 380, unit: '€' },
+              ]}
+              solution={
+                <>
+                  <MB>{'\\text{A: } y = 25x + 80 \\qquad \\text{B: } y = 30x + 20'}</MB>
+                  <MB>{'\\begin{aligned} 25x + 80 &= 30x + 20 && \\mid -25x \\\\ 80 &= 5x + 20 && \\mid -20 \\\\ 60 &= 5x && \\mid :5 \\\\ 12 &= x \\end{aligned}'}</MB>
+                  <MB>{'y = 25 \\cdot 12 + 80 = 380 \\qquad \\Rightarrow \\qquad S(12 \\mid 380)'}</MB>
+                  <p>Nach 12 Monaten haben beide Studios 380 € gekostet. Danach ist Studio A günstiger.</p>
+                </>
+              }
+              help={
+                <Hilfen
+                  steps={[
+                    <>
+                      Welcher Betrag fällt nur einmal an, welcher jeden Monat neu? Der einmalige Betrag ist <M>t</M>, der monatliche ist <M>m</M>.
+                    </>,
+                    <>
+                      A: <M>{'y = 25x + 80'}</M>. Stelle B genauso auf und setze beide rechten Seiten gleich. Ziehe dann das kleinere x ab (<M>{'\\mid -25x'}</M>).
+                    </>,
+                    <>
+                      <M>{'25x + 80 = 30x + 20 \\;\\Rightarrow\\; 80 = 5x + 20 \\;\\Rightarrow\\; 60 = 5x'}</M>. Jetzt noch durch 5 teilen und x in A einsetzen.
+                    </>,
+                  ]}
+                />
+              }
+            />
+          </div>
+        </Phase>
+
+        {/* 7 Check */}
+        <Phase no={7} title="Check: Hast du es verstanden?" social="EA" minutes={6}>
           <div className="lp-exlist">
             <TrackedMc
               topic="Schnittpunkt-Einstieg: Bedeutung (Basis)"
@@ -802,15 +990,16 @@ export default function FahrschuleEinstieg() {
         </Phase>
 
         <nav className="lp-nav" aria-label="Weiter">
-          <Link className="bk-btn" to="/lineare_funktionen">
-            <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zur Übersicht
-          </Link>
-          <Link className="bk-btn bk-btn-primary" to="/lineare_funktionen/schnittpunkt">
-            Weiter üben: Schnittpunkt zweier Geraden <i className="fa-solid fa-arrow-right" aria-hidden="true" />
-          </Link>
+          <button type="button" className="bk-btn" onClick={onBack}>
+            <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zur Auswahl
+          </button>
+          <button type="button" className="bk-btn bk-btn-primary" onClick={onPractice}>
+            Weiter üben: Schnittpunkt berechnen (Einfach) <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+          </button>
         </nav>
       </div>
     </TaskShell>
+    </ErklaerungCtx.Provider>
   )
 }
 
