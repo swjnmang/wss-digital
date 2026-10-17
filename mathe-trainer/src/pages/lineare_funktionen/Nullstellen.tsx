@@ -6,6 +6,7 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber';
 import { useTaskTracking } from '../../hooks/useTaskTracking';
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
+import BodenEinstieg from './nullstellen_einstieg/BodenEinstieg'
 
 // Sechs Aufgaben auf einer Seite
 const TOTAL_TASKS = 6;
@@ -470,6 +471,8 @@ function TaskCard({ number, task, level, onNewTask, onSolvedChange, onResult, on
 export default function Nullstellen() {
   const navigate = useNavigate();
   const [level, setLevel] = useState<Level | null>(null);
+  // Einstiegs-Lernsituation „Welche Gerade erreicht den Boden zuerst?“ als eigener Modus neben den Schwierigkeitsgraden
+  const [lernsituation, setLernsituation] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [solved, setSolved] = useState<Record<number, boolean>>({});
   const [streak, setStreak] = useState(0);
@@ -525,16 +528,52 @@ export default function Nullstellen() {
     </div>
   );
 
+  if (lernsituation) {
+    return (
+      <BodenEinstieg
+        erklaerung={<Intro />}
+        onBack={() => {
+          setLernsituation(false);
+          window.scrollTo({ top: 0 });
+        }}
+        onPractice={() => {
+          setLernsituation(false);
+          chooseLevel('einfach');
+        }}
+      />
+    );
+  }
+
   if (!level) {
     return (
       <TaskShell title="Nullstellen berechnen" width="narrow">
         <div className="flex flex-col gap-6">
           {header}
-          <div className={panel}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className={`${panel} flex flex-col`}>
+              <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
+              <button
+                onClick={() => {
+                  setLernsituation(true);
+                  window.scrollTo({ top: 0 });
+                }}
+                style={{ background: 'var(--primary)' }}
+                className="flex-1 rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+              >
+                <p className="text-lg font-bold mb-1 text-white">Welche Gerade landet zuerst?</p>
+                <p className="text-xl mb-2 text-white">
+                  <i className="fa-solid fa-plane-arrival" aria-hidden="true" />
+                </p>
+                <p className="text-sm text-white/90">
+                  Neu beim Thema? Finde heraus, wo drei Geraden die x-Achse berühren, und lerne dabei, wie man die Nullstelle berechnet.
+                </p>
+              </button>
+            </div>
+            <div className={`${panel} sm:col-span-2 flex flex-col`}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">
-              Wähle deinen Schwierigkeitsgrad
+              Übungsaufgaben
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
                 className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
@@ -555,6 +594,7 @@ export default function Nullstellen() {
                   Dezimalzahlen, wechselnde Schreibweise – die Nullstelle ist keine ganze Zahl.
                 </p>
               </button>
+            </div>
             </div>
           </div>
         </div>
