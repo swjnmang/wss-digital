@@ -1,9 +1,10 @@
 import React, { useEffect, useId, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
+import FahrschuleEinstieg from './schnittpunkt_einstieg/FahrschuleEinstieg'
 
 const TOTAL_TASKS = 6
 
@@ -763,6 +764,8 @@ export default function Schnittpunkt() {
   }, [allSolved])
 
   const [level, setLevel] = useState<Level | null>(null)
+  // Einstiegs-Lernsituation „Welche Fahrschule lohnt sich?“ als dritter Modus neben den Schwierigkeitsgraden
+  const [lernsituation, setLernsituation] = useState(false)
 
   const startNewRound = () => {
     setRound((r) => r + 1)
@@ -797,14 +800,24 @@ export default function Schnittpunkt() {
   const header = (
     <div>
       <p className="text-center text-slate-600">Berechne den Schnittpunkt zweier Geraden mit dem Gleichsetzungsverfahren.</p>
-      <p className="text-center text-slate-600 mt-2">
-        Neu beim Thema? Starte mit dem Einstieg{' '}
-        <Link to="/lineare_funktionen/schnittpunkt-einstieg" className="font-bold underline">
-          „Welche Fahrschule lohnt sich?“
-        </Link>
-      </p>
     </div>
   )
+
+  if (lernsituation) {
+    return (
+      <FahrschuleEinstieg
+        erklaerung={<Erklaerung />}
+        onBack={() => {
+          setLernsituation(false)
+          window.scrollTo({ top: 0 })
+        }}
+        onPractice={() => {
+          setLernsituation(false)
+          chooseLevel('einfach')
+        }}
+      />
+    )
+  }
 
   if (!level) {
     return (
@@ -812,8 +825,22 @@ export default function Schnittpunkt() {
         <div className="flex flex-col gap-6">
           {header}
           <div className={panel}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <h2 className="text-lg font-bold text-slate-800 mb-4">Wie möchtest du starten?</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <button
+                onClick={() => {
+                  setLernsituation(true)
+                  window.scrollTo({ top: 0 })
+                }}
+                style={{ background: 'var(--primary)' }}
+                className="rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+              >
+                <p className="text-lg font-bold mb-1 text-white">Lernsituation</p>
+                <p className="text-xl mb-2 text-white">
+                  <i className="fa-solid fa-car" aria-hidden="true" /> Fahrschule
+                </p>
+                <p className="text-sm text-white/90">Neu beim Thema? Finde heraus, welche Fahrschule sich lohnt, und lerne dabei, wie man den Schnittpunkt berechnet.</p>
+              </button>
               <button
                 onClick={() => chooseLevel('einfach')}
                 className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"

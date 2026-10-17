@@ -140,7 +140,6 @@ export const AREAS: Area[] = [
           { title: 'Punkt auf Gerade prüfen', desc: 'Überprüfe rechnerisch, ob ein Punkt auf einer Geraden liegt.', path: '/lineare_funktionen/punkt_gerade', icon: 'fa-solid fa-magnifying-glass-chart' },
           { title: 'Parallele und senkrechte Geraden', desc: 'Erkenne parallele und senkrechte Geraden anhand ihrer Steigung.', path: '/lineare_funktionen/parallel_senkrecht', icon: 'fa-solid fa-lines-leaning' },
           { title: 'Nullstellen berechnen', desc: 'Finde den Schnittpunkt einer Geraden mit der x-Achse.', path: '/lineare_funktionen/nullstellen', icon: 'fa-solid fa-arrows-down-to-line' },
-          { title: 'Schnittpunkt: Welche Fahrschule lohnt sich? (Einstieg)', desc: 'Lernsituation zum Einstieg: Vergleiche zwei Fahrschulen mit Tabelle, Graph und Gleichung und finde heraus, wann beide gleich teuer sind.', path: '/lineare_funktionen/schnittpunkt-einstieg', icon: 'fa-solid fa-car' },
           { title: 'Schnittpunkt zweier Geraden', desc: 'Berechne den gemeinsamen Schnittpunkt von zwei Geraden.', path: '/lineare_funktionen/schnittpunkt', icon: 'fa-solid fa-arrows-turn-to-dots' },
           { title: 'Lineare Gleichungssysteme', desc: 'Löse Gleichungssysteme mit dem Einsetzungs-, Gleichsetzungs- und Additionsverfahren.', path: '/lineare_funktionen/gleichungssysteme', icon: 'fa-solid fa-equals' },
         ],
