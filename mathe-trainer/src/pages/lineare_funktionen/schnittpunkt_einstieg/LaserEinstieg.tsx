@@ -148,7 +148,9 @@ function CheckCard({
   title,
   level,
   prompt,
+  lead,
   fields,
+  fieldsRow = false,
   solution,
   help,
   tracking = NO_TRACKING,
@@ -156,7 +158,11 @@ function CheckCard({
   title: ReactNode
   level?: Level
   prompt: ReactNode
+  /** Gleichung o. Ä., die direkt vor den Feldern in derselben Zeile steht */
+  lead?: ReactNode
   fields: CField[]
+  /** Felder nebeneinander statt untereinander */
+  fieldsRow?: boolean
   solution?: ReactNode
   /** Gestufte Hilfekarten unter der Aufgabe */
   help?: ReactNode
@@ -194,16 +200,17 @@ function CheckCard({
     <div className="lp-ex bk-panel">
       <CardHead title={title} level={level} />
       <div className="lp-ex-prompt">{prompt}</div>
-      <div className="lp-fields">
+      <div className={`ls-fields ${fieldsRow || lead ? 'ls-fields-row' : ''}`}>
+        {lead && <div className="ls-lead">{lead}</div>}
         {fields.map((f) => (
-          <div key={f.key} className="lp-field">
-            <label className="lp-label" htmlFor={`${uid}-${f.key}`}>
+          <div key={f.key} className="ls-field">
+            <label className="ls-label" htmlFor={`${uid}-${f.key}`}>
               {f.label}
             </label>
             {f.kind === 'select' ? (
               <select
                 id={`${uid}-${f.key}`}
-                className={`bk-input lp-select ${fieldCheckClass(marks[f.key])}`}
+                className={`bk-input lp-select ls-select ${fieldCheckClass(marks[f.key])}`}
                 value={values[f.key] ?? ''}
                 onChange={(e: ChangeEvent<HTMLSelectElement>) => setValue(f.key, e.target.value)}
               >
@@ -548,10 +555,10 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <p>Diese vier kurzen Aufgaben brauchst du gleich. Löse sie allein.</p>
           <div className="lp-exlist">
             <CheckCard
-              title="a) Liegt der Punkt auf der Geraden?"
+              title="a) Punktprobe"
               prompt={
                 <p>
-                  Liegt der Punkt <M>{'P(2 \\mid 1)'}</M> auf der Geraden <M>{'f(x) = -0{,}5x + 2'}</M>?
+                  Berechne, ob der Punkt <M>{'P(2 \\mid 1)'}</M> auf der Geraden <M>{'f(x) = -0{,}5x + 2'}</M> liegt. Halte deinen Rechenweg schriftlich fest.
                 </p>
               }
               fields={[{ kind: 'select', key: 'p', label: 'Antwort', options: ['Ja', 'Nein'], expected: 0 }]}
@@ -567,9 +574,10 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               title="b) Gleichung aus zwei Punkten"
               prompt={
                 <p>
-                  Eine Gerade geht durch <M>{'R(5 \\mid 4)'}</M> und <M>{'Q(-3 \\mid 0)'}</M>. Bestimme die Funktionsgleichung <M>{'g(x) = m x + t'}</M>.
+                  Eine Gerade geht durch <M>{'R(5 \\mid 4)'}</M> und <M>{'Q(-3 \\mid 0)'}</M>. Berechne die Funktionsgleichung <M>{'g(x) = m x + t'}</M>. Halte deine Rechenwege schriftlich fest.
                 </p>
               }
+              fieldsRow
               fields={[
                 { kind: 'num', key: 'm', label: <M>{'m ='}</M>, expected: 0.5 },
                 { kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 1.5 },
@@ -587,7 +595,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               title="c) y-Achsenabschnitt deuten"
               prompt={
                 <p>
-                  Ein Laserstrahl hat die Gleichung <M>{'f(x) = -0{,}5x + 2'}</M>. Die y-Achse geht durch die Mitte der Bühne. Was bedeutet die 2?
+                  Ein Laserstrahl hat die Gleichung <M>{'f(x) = -0{,}5x + 2'}</M>. Die y-Achse geht durch die Mitte der Bühne. Was bedeutet die 2? Wähle die passende Aussage.
                 </p>
               }
               options={[
@@ -599,7 +607,8 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             />
             <CheckCard
               title="d) Gleichung lösen"
-              prompt={<MB>{'0{,}5x + 1{,}5 = 2'}</MB>}
+              prompt={<p>Löse die gegebene Gleichung nach <M>x</M> auf. Halte deinen Rechenweg schriftlich fest.</p>}
+              lead={<M>{'0{,}5x + 1{,}5 = 2 \\qquad \\Rightarrow'}</M>}
               fields={[{ kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 1 }]}
               solution={<MB>{'\\begin{aligned} 0{,}5x + 1{,}5 &= 2 && \\mid -1{,}5 \\\\ 0{,}5x &= 0{,}5 && \\mid :0{,}5 \\\\ x &= 1 \\end{aligned}'}</MB>}
             />
@@ -738,10 +747,10 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
 
           <CheckCard
             title="Euer Ergebnis"
-            prompt={<p>Egal, welchen Weg ihr genommen habt: Haltet euer Ergebnis fest.</p>}
+            prompt={<p>Egal, welchen Weg ihr genommen habt: Tragt euer Ergebnis ein und haltet eure Rechenwege oder Ablesungen schriftlich fest.</p>}
             fields={[
               { kind: 'num', key: 'x', label: <>Die Strahlen kreuzen sich bei <M>x</M> =</>, expected: XS, unit: 'm' },
-              { kind: 'num', key: 'y', label: 'in der Höhe', expected: YS, unit: 'm' },
+              { kind: 'num', key: 'y', label: <>in der Höhe <M>y</M> =</>, expected: YS, unit: 'm' },
               {
                 kind: 'select',
                 key: 'pult',
@@ -761,13 +770,13 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   Ihr seid schon fertig? Der rechte Strahler hängt fest in <M>{'R(5 \\mid 4)'}</M>, aber ihr könnt ihn drehen. Dadurch ändert sich die Steigung seines Strahls.
                   Stellt ihn so ein, dass sich die Strahlen <strong>genau über der Mitte des Pults</strong> kreuzen.
                 </p>
-                <p>Beschreibt im Heft: In welche Richtung wandert der Kreuzungspunkt, wenn der rechte Strahl steiler wird? Warum?</p>
+                <p>Haltet eure Rechenwege schriftlich fest und beschreibt im Heft: In welche Richtung wandert der Kreuzungspunkt, wenn der rechte Strahl steiler wird? Warum?</p>
                 <DrehenAnsicht />
               </>
             }
             fields={[
-              { kind: 'num', key: 'm', label: <>Nötige Steigung <M>m</M></>, expected: 0.4 },
-              { kind: 'num', key: 'y', label: 'Höhe des Kreuzungspunkts', expected: 2, unit: 'm' },
+              { kind: 'num', key: 'm', label: <>Nötige Steigung <M>m</M> =</>, expected: 0.4 },
+              { kind: 'num', key: 'y', label: <>Höhe des Kreuzungspunkts <M>y</M> =</>, expected: 2, unit: 'm' },
             ]}
             help={
               <Hilfen
@@ -961,7 +970,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               level="basis"
               prompt={
                 <>
-                  <p>Berechne den Schnittpunkt der beiden Geraden. Fülle die Lücken der Rechnung aus.</p>
+                  <p>Berechne den Schnittpunkt der beiden Geraden. Fülle die Lücken der Rechnung aus und halte deinen Rechenweg schriftlich fest.</p>
                   <MB>{'f(x) = 4x + 1 \\qquad g(x) = 2x + 7'}</MB>
                   <MB>{'\\begin{aligned} 4x + 1 &= 2x + 7 && \\mid -2x \\\\ 2x + 1 &= 7 && \\mid -1 \\\\ 2x &= \\;\\fbox{?} && \\mid :2 \\\\ x &= \\;\\fbox{?} \\end{aligned}'}</MB>
                   <p>
@@ -969,6 +978,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   </p>
                 </>
               }
+              fieldsRow
               fields={[
                 { kind: 'num', key: 'zweix', label: <M>{'2x ='}</M>, expected: 6 },
                 { kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 3 },
@@ -1003,14 +1013,14 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                     Im Schultheater leuchten zwei Scheinwerfer auf die Bühne (1 LE = 1 m, y-Achse = Bühnenmitte). Der Lichtstrahl von Scheinwerfer 1 geht durch die Punkte{' '}
                     <M>{'A(0 \\mid 1)'}</M> und <M>{'B(5 \\mid 5)'}</M>, der von Scheinwerfer 2 durch <M>{'C(-4 \\mid 6{,}2)'}</M> und <M>{'D(6 \\mid 2{,}2)'}</M>.
                   </p>
-                  <p>Stelle beide Funktionsgleichungen auf und berechne, wo sich die Lichtstrahlen kreuzen.</p>
+                  <p>Stelle beide Funktionsgleichungen auf und berechne, wo sich die Lichtstrahlen kreuzen. Halte deine Rechenwege schriftlich fest.</p>
                 </>
               }
               fields={[
-                { kind: 'num', key: 'm1', label: <>Strahl 1: <M>m</M></>, expected: 0.8 },
-                { kind: 'num', key: 't1', label: <>Strahl 1: <M>t</M></>, expected: 1 },
-                { kind: 'num', key: 'm2', label: <>Strahl 2: <M>m</M></>, expected: -0.4 },
-                { kind: 'num', key: 't2', label: <>Strahl 2: <M>t</M></>, expected: 4.6 },
+                { kind: 'num', key: 'm1', label: <>Strahl 1: <M>m</M> =</>, expected: 0.8 },
+                { kind: 'num', key: 't1', label: <>Strahl 1: <M>t</M> =</>, expected: 1 },
+                { kind: 'num', key: 'm2', label: <>Strahl 2: <M>m</M> =</>, expected: -0.4 },
+                { kind: 'num', key: 't2', label: <>Strahl 2: <M>t</M> =</>, expected: 4.6 },
                 { kind: 'num', key: 'x', label: <M>{'x_S ='}</M>, expected: 3 },
                 { kind: 'num', key: 'y', label: <M>{'y_S ='}</M>, expected: 3.4 },
               ]}
@@ -1047,12 +1057,12 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <p>
                   Zurück zur Lasershow: Damit niemand geblendet wird, sollen sich die Strahlen in <strong>2,5 m Höhe</strong> kreuzen. Der linke Strahl bleibt{' '}
                   <M>{'f(x) = -0{,}5x + 2'}</M>, der rechte Strahler bleibt in <M>{'R(5 \\mid 4)'}</M> und wird gedreht. An welcher Stelle liegt der neue Kreuzungspunkt, und
-                  welche Steigung braucht der rechte Strahl?
+                  welche Steigung braucht der rechte Strahl? Halte deine Rechenwege schriftlich fest.
                 </p>
               }
               fields={[
                 { kind: 'num', key: 'x', label: <M>{'x_S ='}</M>, expected: -1 },
-                { kind: 'num', key: 'm', label: <>Steigung <M>m</M> rechts</>, expected: 0.25 },
+                { kind: 'num', key: 'm', label: <>Steigung <M>m</M> des rechten Strahls =</>, expected: 0.25 },
               ]}
               solution={
                 <>
@@ -1106,7 +1116,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               level="standard"
               prompt={
                 <>
-                  <p>Berechne den Schnittpunkt der beiden Geraden im Heft und wähle dann aus.</p>
+                  <p>Berechne den Schnittpunkt der beiden Geraden. Halte deinen Rechenweg schriftlich fest und wähle dann die richtige Antwort aus.</p>
                   <MB>{'f(x) = 2x + 1 \\qquad g(x) = -x + 7'}</MB>
                 </>
               }
@@ -1123,10 +1133,11 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               level="erweiterung"
               prompt={
                 <>
-                  <p>Berechne den Schnittpunkt durch Gleichsetzen.</p>
+                  <p>Berechne den Schnittpunkt durch Gleichsetzen. Halte deinen Rechenweg schriftlich fest.</p>
                   <MB>{'f(x) = 3x - 2 \\qquad g(x) = x + 4'}</MB>
                 </>
               }
+              fieldsRow
               fields={[
                 { kind: 'num', key: 'x', label: <M>{'x_S ='}</M>, expected: 3 },
                 { kind: 'num', key: 'y', label: <M>{'y_S ='}</M>, expected: 7 },
