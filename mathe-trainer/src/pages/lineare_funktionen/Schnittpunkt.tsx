@@ -4,7 +4,7 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
-import FahrschuleEinstieg from './schnittpunkt_einstieg/FahrschuleEinstieg'
+import LaserEinstieg from './schnittpunkt_einstieg/LaserEinstieg'
 
 const TOTAL_TASKS = 6
 
@@ -764,7 +764,7 @@ export default function Schnittpunkt() {
   }, [allSolved])
 
   const [level, setLevel] = useState<Level | null>(null)
-  // Einstiegs-Lernsituation „Welche Fahrschule lohnt sich?“ als dritter Modus neben den Schwierigkeitsgraden
+  // Einstiegs-Lernsituation „Treffen sich die Laserstrahlen über dem DJ-Pult?“ als dritter Modus neben den Schwierigkeitsgraden
   const [lernsituation, setLernsituation] = useState(false)
 
   const startNewRound = () => {
@@ -805,7 +805,7 @@ export default function Schnittpunkt() {
 
   if (lernsituation) {
     return (
-      <FahrschuleEinstieg
+      <LaserEinstieg
         erklaerung={<Erklaerung />}
         onBack={() => {
           setLernsituation(false)
@@ -835,11 +835,11 @@ export default function Schnittpunkt() {
                 style={{ background: 'var(--primary)' }}
                 className="flex-1 rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
-                <p className="text-lg font-bold mb-1 text-white">Welche Fahrschule lohnt sich?</p>
+                <p className="text-lg font-bold mb-1 text-white">Treffen sich die Laserstrahlen?</p>
                 <p className="text-xl mb-2 text-white">
-                  <i className="fa-solid fa-car" aria-hidden="true" />
+                  <i className="fa-solid fa-music" aria-hidden="true" />
                 </p>
-                <p className="text-sm text-white/90">Neu beim Thema? Finde heraus, welche Fahrschule sich lohnt, und lerne dabei, wie man den Schnittpunkt berechnet.</p>
+                <p className="text-sm text-white/90">Neu beim Thema? Finde heraus, ob sich zwei Laserstrahlen über dem DJ-Pult kreuzen, und lerne dabei, wie man den Schnittpunkt berechnet.</p>
               </button>
             </div>
             <div className={`${panel} sm:col-span-2 flex flex-col`}>
