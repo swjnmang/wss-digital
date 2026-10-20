@@ -43,6 +43,7 @@ import {
   vertexToGeneralLines,
 } from './quadratischShared'
 import TaskShell from '../../components/layout/TaskShell'
+import SkateEinstieg from './schnittpunkte_einstieg/SkateEinstieg'
 
 // Sechs Aufgaben gleichzeitig auf der Seite
 const TOTAL_TASKS = 6
@@ -910,6 +911,8 @@ export default function SchnittpunkteGerade() {
   const navigate = useNavigate()
   const [level, setLevel] = useState<Level | null>(null)
   const [round, setRound] = useState(0)
+  // Einstiegs-Lernsituation „Löst der Sprung die Lichtschranke aus?“ als eigener Modus neben den Schwierigkeitsgraden
+  const [lernsituation, setLernsituation] = useState(false)
   const [solved, setSolved] = useState<Record<number, boolean>>({})
   const [streak, setStreak] = useState(0)
 
@@ -944,13 +947,48 @@ export default function SchnittpunkteGerade() {
     </div>
   )
 
+  if (lernsituation) {
+    return (
+      <SkateEinstieg
+        erklaerung={<Erklaerung level="einfach" />}
+        onBack={() => {
+          setLernsituation(false)
+          window.scrollTo({ top: 0 })
+        }}
+        onPractice={() => {
+          setLernsituation(false)
+          chooseLevel('einfach')
+        }}
+      />
+    )
+  }
+
   if (!level) {
     return (
       <TaskShell title="Schnittpunkte von Parabel und Gerade" width="narrow">
         <div className="flex flex-col gap-6">
           {header}
+          <div className={`${panel} flex flex-col`}>
+            <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
+            <button
+              onClick={() => {
+                setLernsituation(true)
+                window.scrollTo({ top: 0 })
+              }}
+              style={{ background: 'var(--primary)' }}
+              className="rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+            >
+              <p className="text-lg font-bold mb-1 text-white">Löst der Sprung die Lichtschranke aus?</p>
+              <p className="text-xl mb-2 text-white">
+                <i className="fa-solid fa-person-skating" aria-hidden="true" />
+              </p>
+              <p className="text-sm text-white/90">
+                Neu beim Thema? Finde im Skatepark-Labor heraus, wie oft sich eine Parabel und eine Gerade schneiden können, und lerne dabei, die Schnittpunkte zu berechnen.
+              </p>
+            </button>
+          </div>
           <div className={panel}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
+            <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
