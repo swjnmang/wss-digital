@@ -51,3 +51,9 @@ nicht nur auf einen Feature-Branch. Vorher `main` aktualisieren und mergen, kein
   `var(--wrong)` / `var(--wrong-soft)` / `var(--wrong-ink)` (Tailwind `green-*` / `red-*` sind auf dieselbe Palette gelegt).
 - Farbe „richtig“ ist Pastell-Mint (#2f9e5b / #dcf5e3), „falsch“ Rot (#d64545 / #fde2e2). Kein Blau für „richtig“.
 - Abschalten für einen Bereich: Attribut `data-no-autocheck`. Prüfungsmodus-Seiten (URL mit „pruefung“) sind ausgenommen.
+
+## Seiten mit Lernsituation
+
+Hat eine Übungsseite eine Einstiegs-Lernsituation (Karte „Lernsituation“ in der Auswahl), heißt der Bereich darunter mit den
+Schwierigkeitsgraden immer **„Übungsaufgaben“** (nicht „Wähle deinen Schwierigkeitsgrad“). Das gilt für alle Seiten des Mathe-Trainers,
+auch für künftige. Die Scheitelform wird als `f(x) = (x − x_S)² + y_S` geschrieben, nicht mit d und e.
