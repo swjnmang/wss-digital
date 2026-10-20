@@ -565,49 +565,54 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
               />
             </LabKarte>
 
-            <LabKarte no={3} title="Die Berührhöhe berechnen" level="erweiterung">
+            <LabKarte no={3} title="Und bei t = 5,25?" level="erweiterung">
               <CheckCard
-                title="Wann berührt die Schranke die Bahn nur?"
+                title="Genau ein Punkt: nachrechnen"
                 prompt={
                   <>
                     <p>
-                      Jetzt ist <M>t</M> unbekannt. Gleichsetzen und auf Null bringen ergibt:
+                      Im Regler habt ihr gesehen: Bei <M>{'t = 5{,}25'}</M> gibt es nur einen gemeinsamen Punkt. Rechnet das nach. Geht genauso vor wie in Versuch 2, mit
                     </p>
-                    <MB>{'-0{,}25x^2 + 1{,}5x + (3 - t) = 0'}</MB>
                     <p>
-                      Setzt <M>{'a = -0{,}25'}</M>, <M>{'b = 1{,}5'}</M> und <M>{'c = 3 - t'}</M> in die Mitternachtsformel ein und vereinfacht die Zahl unter der Wurzel. Findet dann heraus, für
-                      welches <M>t</M> es genau eine Lösung gibt, und berechnet den Berührpunkt. Haltet eure Rechenwege schriftlich fest und beschreibt im Heft, was für größere <M>t</M> gilt.
+                      <M>{'p(x) = -0{,}25x^2 + x + 3'}</M> und <M>{'g(x) = -0{,}5x + 5{,}25'}</M>.
+                    </p>
+                    <p>
+                      Achtet darauf, was in der Mitternachtsformel unter der Wurzel herauskommt. Haltet eure Rechenwege schriftlich fest und beschreibt im Heft, warum es nur eine
+                      Lösung gibt.
                     </p>
                   </>
                 }
                 fieldsRow
                 fields={[
-                  { kind: 'num', key: 'u0', label: <>Zahl unter der Wurzel bei <M>{'t = 4{,}25'}</M>:</>, expected: 1 },
-                  { kind: 'num', key: 't', label: <>Berührhöhe <M>{'t ='}</M></>, expected: T_TOUCH, unit: 'm' },
+                  { kind: 'num', key: 'u', label: <>Zahl unter der Wurzel:</>, expected: 0 },
                   { kind: 'num', key: 'x', label: <>Berührpunkt <M>{'x ='}</M></>, expected: 3 },
                   { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 3.75 },
                 ]}
                 solution={
                   <>
-                    <MB>{'x_{1,2} = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (3 - t)}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm \\sqrt{2{,}25 + 3 - t}}{-0{,}5} = \\frac{-1{,}5 \\pm \\sqrt{5{,}25 - t}}{-0{,}5}'}</MB>
+                    <MB>{'\\begin{aligned} -0{,}25x^2 + x + 3 &= -0{,}5x + 5{,}25 && \\mid +0{,}5x \\mid -5{,}25 \\\\ -0{,}25x^2 + 1{,}5x - 2{,}25 &= 0 \\end{aligned}'}</MB>
                     <p>
-                      Genau eine Lösung gibt es, wenn die Wurzel 0 ist, denn dann fällt das ± weg: <M>{'5{,}25 - t = 0'}</M>, also <M>{'t = 5{,}25'}</M>.
+                      Also <M>{'a = -0{,}25'}</M>, <M>{'b = 1{,}5'}</M>, <M>{'c = -2{,}25'}</M>. Mitternachtsformel:
                     </p>
-                    <MB>{'x = \\frac{-1{,}5}{-0{,}5} = 3 \\qquad y = g(3) = -0{,}5 \\cdot 3 + 5{,}25 = 3{,}75'}</MB>
+                    <MB>{'x = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-2{,}25)}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm \\sqrt{2{,}25 - 2{,}25}}{-0{,}5} = \\frac{-1{,}5 \\pm 0}{-0{,}5} = 3'}</MB>
+                    <p>Unter der Wurzel steht 0. Das ± ändert nichts, es bleibt eine einzige Lösung.</p>
+                    <MB>{'y = g(3) = -0{,}5 \\cdot 3 + 5{,}25 = 3{,}75'}</MB>
                     <p>
-                      Der Berührpunkt ist <M>{'B(3 \\mid 3{,}75)'}</M>. Für <M>{'t > 5{,}25'}</M> steht unter der Wurzel eine negative Zahl: keine Lösung und kein Schnittpunkt.
+                      Die Lichtschranke berührt die Sprungbahn nur im Punkt <M>{'B(3 \\mid 3{,}75)'}</M>.
                     </p>
                   </>
                 }
                 help={
                   <Hilfen
                     steps={[
-                      <>Schaut euch die Mitternachtsformel an: Wann liefert das „±“ nur noch eine einzige Lösung, weil beide Seiten gleich sind? Überlegt, was dafür unter der Wurzel stehen muss.</>,
+                      <>Schlagt in der Infokarte die fünf Schritte nach. Der erste Schritt ist wieder das Gleichsetzen von <M>p(x)</M> und <M>g(x)</M>.</>,
                       <>
-                        Setzt in <M>{'b^2 - 4ac'}</M> ein: <M>{'1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (3 - t)'}</M>. Rechnet <M>{'1{,}5^2'}</M> und <M>{'4 \\cdot (-0{,}25)'}</M> getrennt aus. Das <M>t</M> bleibt dabei stehen.
+                        Addiert auf beiden Seiten <M>{'0{,}5x'}</M> und zieht <M>{'5{,}25'}</M> ab. Danach fasst ihr zusammen (<M>{'x + 0{,}5x'}</M> und <M>{'3 - 5{,}25'}</M>) und lest <M>a</M>,{' '}
+                        <M>b</M> und <M>c</M> ab.
                       </>,
                       <>
-                        Unter der Wurzel steht <M>{'5{,}25 - t'}</M>. Setzt diesen Term gleich 0 und löst nach <M>t</M> auf. Bei Wurzel 0 bleibt <M>{'x = \\frac{-b}{2a}'}</M>, danach den y-Wert mit der Geraden berechnen.
+                        Es entsteht <M>{'-0{,}25x^2 + 1{,}5x - 2{,}25 = 0'}</M>. Setzt in die Formel ein, mit Klammern bei negativen Zahlen:{' '}
+                        <M>{'x = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-2{,}25)}}{2 \\cdot (-0{,}25)}'}</M>. Rechnet zuerst die Zahl unter der Wurzel aus.
                       </>,
                     ]}
                   />
@@ -646,13 +651,13 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <summary>Tarek hat gerechnet</summary>
                 <div className="ls-way-body">
                   <p>
-                    „Ich habe <M>{'p(x) = g(x)'}</M> gleichgesetzt und alles auf eine Seite gebracht. In der Mitternachtsformel stand dann unter der Wurzel <M>{'5{,}25 - t'}</M>. Solange t
-                    kleiner als 5,25 ist, ist das positiv, also gibt es zwei Lösungen. Bei <M>{'t = 5{,}25'}</M> steht unter der Wurzel 0, also nur eine Lösung. Danach ist die Zahl negativ,
-                    und die Wurzel gibt es nicht.“
+                    „Ich habe <M>{'p(x) = g(x)'}</M> gleichgesetzt und mit der Mitternachtsformel gerechnet, einmal für <M>{'t = 5'}</M>, einmal für <M>{'t = 5{,}25'}</M> und einmal für{' '}
+                    <M>{'t = 6'}</M>. Unter der Wurzel kam <M>{'0{,}25'}</M>, dann <M>{'0'}</M> und dann <M>{'-0{,}75'}</M> heraus. Bei 0,25 gab es zwei Lösungen, bei 0 nur eine, und bei
+                    −0,75 geht die Wurzel nicht, also keine Lösung.“
                   </p>
                   <p>
-                    <strong>Gut:</strong> Man weiß genau, wann sich was ändert, auch ohne Zeichnung. <strong>Aber:</strong> Man muss sauber umformen und einsetzen, sonst stimmt die Zahl unter
-                    der Wurzel nicht.
+                    <strong>Gut:</strong> Man weiß genau, was bei einer bestimmten Höhe passiert, auch ohne Zeichnung. <strong>Aber:</strong> Man muss sauber umformen und einsetzen, sonst
+                    stimmt die Zahl unter der Wurzel nicht.
                   </p>
                 </div>
               </details>
@@ -811,44 +816,44 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 prompt={
                   <>
                     <p>
-                      Gegeben sind die Parabel <M>{'p(x) = x^2 + 3'}</M> und die Gerade <M>{'g(x) = 2x + t'}</M>. Für welches <M>t</M> berührt die Gerade die Parabel nur, sodass es genau
-                      einen Schnittpunkt gibt? Wo liegt der Berührpunkt? Rechne mit der Mitternachtsformel und halte deinen Rechenweg schriftlich fest.
+                      Berechne die Schnittpunkte der Parabel <M>{'p(x) = 0{,}5x^2 - 2x + 1'}</M> und der Geraden <M>{'g(x) = 0{,}5x - 2'}</M>. Rechne mit der Mitternachtsformel und
+                      halte deinen Rechenweg schriftlich fest.
                     </p>
                   </>
                 }
                 fieldsRow
                 fields={[
-                  { kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 2 },
-                  { kind: 'num', key: 'x', label: <M>{'x_B ='}</M>, expected: 1 },
-                  { kind: 'num', key: 'y', label: <M>{'y_B ='}</M>, expected: 4 },
+                  { kind: 'num', key: 'x1', label: <>kleinere Lösung <M>{'x_1 ='}</M></>, expected: 2 },
+                  { kind: 'num', key: 'x2', label: <>größere Lösung <M>{'x_2 ='}</M></>, expected: 3 },
+                  { kind: 'num', key: 'y1', label: <M>{'y_1 ='}</M>, expected: -1 },
+                  { kind: 'num', key: 'y2', label: <M>{'y_2 ='}</M>, expected: -0.5 },
                 ]}
                 solution={
                   <>
-                    <MB>{'\\begin{aligned} x^2 + 3 &= 2x + t && \\mid -2x \\mid -t \\\\ x^2 - 2x + (3 - t) &= 0 \\end{aligned}'}</MB>
+                    <MB>{'\\begin{aligned} 0{,}5x^2 - 2x + 1 &= 0{,}5x - 2 && \\mid -0{,}5x \\mid +2 \\\\ 0{,}5x^2 - 2{,}5x + 3 &= 0 \\end{aligned}'}</MB>
                     <p>
-                      Also <M>{'a = 1'}</M>, <M>{'b = -2'}</M>, <M>{'c = 3 - t'}</M>. Mitternachtsformel:
+                      Also <M>{'a = 0{,}5'}</M>, <M>{'b = -2{,}5'}</M>, <M>{'c = 3'}</M>. Mitternachtsformel:
                     </p>
-                    <MB>{'x_{1,2} = \\frac{2 \\pm \\sqrt{(-2)^2 - 4 \\cdot 1 \\cdot (3 - t)}}{2} = \\frac{2 \\pm \\sqrt{4t - 8}}{2}'}</MB>
+                    <MB>{'x_{1,2} = \\frac{2{,}5 \\pm \\sqrt{(-2{,}5)^2 - 4 \\cdot 0{,}5 \\cdot 3}}{2 \\cdot 0{,}5} = \\frac{2{,}5 \\pm \\sqrt{0{,}25}}{1} = 2{,}5 \\pm 0{,}5'}</MB>
+                    <MB>{'x_1 = 2 \\qquad x_2 = 3'}</MB>
+                    <MB>{'y_1 = g(2) = 0{,}5 \\cdot 2 - 2 = -1 \\qquad y_2 = g(3) = 0{,}5 \\cdot 3 - 2 = -0{,}5'}</MB>
                     <p>
-                      Genau eine Lösung gibt es, wenn die Wurzel 0 ist: <M>{'4t - 8 = 0'}</M>, also <M>{'t = 2'}</M>.
-                    </p>
-                    <MB>{'x_B = \\frac{2}{2} = 1 \\qquad y_B = g(1) = 2 \\cdot 1 + 2 = 4'}</MB>
-                    <p>
-                      Probe mit der Parabel: <M>{'p(1) = 1 + 3 = 4'}</M> ✓. Der Berührpunkt ist <M>{'B(1 \\mid 4)'}</M>.
+                      Probe mit der Parabel: <M>{'p(2) = 2 - 4 + 1 = -1'}</M> ✓ und <M>{'p(3) = 4{,}5 - 6 + 1 = -0{,}5'}</M> ✓. Die Schnittpunkte sind <M>{'S_1(2 \\mid -1)'}</M> und{' '}
+                      <M>{'S_2(3 \\mid -0{,}5)'}</M>.
                     </p>
                   </>
                 }
                 help={
                   <Hilfen
                     steps={[
-                      <>Wie in Versuch 3: Wann bleibt in der Mitternachtsformel nur eine Lösung übrig? Überlege, was dafür unter der Wurzel stehen muss.</>,
+                      <>Wie in der Infokarte: Zuerst gleichsetzen und alles auf eine Seite bringen, sodass rechts 0 steht.</>,
                       <>
-                        Setze die Terme gleich und bringe alles auf eine Seite. Dann ist <M>{'a = 1'}</M>, <M>{'b = -2'}</M> und <M>{'c = 3 - t'}</M>. Setze das in die Formel ein und vereinfache
-                        nur die Zahl unter der Wurzel.
+                        Ziehe auf beiden Seiten <M>{'0{,}5x'}</M> ab und addiere <M>{'2'}</M>. Fasse dann zusammen (<M>{'-2x - 0{,}5x'}</M> und <M>{'1 + 2'}</M>). Lies <M>a</M>, <M>b</M> und{' '}
+                        <M>c</M> ab.
                       </>,
                       <>
-                        Unter der Wurzel steht <M>{'(-2)^2 - 4 \\cdot 1 \\cdot (3 - t) = 4t - 8'}</M>. Setze das gleich 0 und löse nach <M>t</M> auf. Dann gilt <M>{'x = \\frac{-b}{2a}'}</M>. Den y-Wert
-                        rechnest du mit der Geraden aus.
+                        Es entsteht <M>{'0{,}5x^2 - 2{,}5x + 3 = 0'}</M>. Setze in die Formel ein: <M>{'x = \\frac{2{,}5 \\pm \\sqrt{(-2{,}5)^2 - 4 \\cdot 0{,}5 \\cdot 3}}{2 \\cdot 0{,}5}'}</M>. Die
+                        y-Werte rechnest du mit der Geraden aus.
                       </>,
                     ]}
                   />
