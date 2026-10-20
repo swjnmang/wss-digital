@@ -60,6 +60,7 @@ const routes = [
   { path: '/finanzmathe/zinsrechnung', priority: 0.8, changefreq: 'monthly' },
   { path: '/finanzmathe/zinsrechnung/ueben', priority: 0.8, changefreq: 'monthly' },
   { path: '/finanzmathe/zinseszins', priority: 0.8, changefreq: 'monthly' },
+  { path: '/finanzmathe/zinseszins-lernsituation', priority: 0.7, changefreq: 'monthly' },
   { path: '/finanzmathe/endwert', priority: 0.8, changefreq: 'monthly' },
   { path: '/finanzmathe/ratendarlehen', priority: 0.8, changefreq: 'monthly' },
   { path: '/finanzmathe/anwendungsaufgaben', priority: 0.8, changefreq: 'monthly' },

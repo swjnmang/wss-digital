@@ -88,6 +88,7 @@ import ZinsrechnungMenu from './pages/finanzmathe/ZinsrechnungMenu';
 import Zinsrechnung from './pages/finanzmathe/Zinsrechnung';
 import Zinstage from './pages/finanzmathe/Zinstage';
 import Zinseszins from './pages/finanzmathe/Zinseszins';
+import ZinseszinsLernsituation from './pages/finanzmathe/ZinseszinsLernsituation';
 import MehrungMinderung from './pages/finanzmathe/MehrungMinderung';
 import Endwert from './pages/finanzmathe/Endwert';
 import Ratendarlehen from './pages/finanzmathe/Ratendarlehen';
@@ -291,6 +292,7 @@ export default function App() {
           <Route path="/finanzmathe/zinsrechnung/ueben" element={<Zinsrechnung />} />
           <Route path="/finanzmathe/zinsrechnung/tage" element={<Zinstage />} />
           <Route path="/finanzmathe/zinseszins" element={<Zinseszins />} />
+          <Route path="/finanzmathe/zinseszins-lernsituation" element={<ZinseszinsLernsituation />} />
           <Route path="/finanzmathe/mehrung_minderung" element={<MehrungMinderung />} />
           <Route path="/finanzmathe/endwert" element={<Endwert />} />
           <Route path="/finanzmathe/ratendarlehen" element={<Ratendarlehen />} />
