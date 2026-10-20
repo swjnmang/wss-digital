@@ -988,7 +988,7 @@ export default function SchnittpunkteGerade() {
             </button>
           </div>
           <div className={panel}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
+            <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
