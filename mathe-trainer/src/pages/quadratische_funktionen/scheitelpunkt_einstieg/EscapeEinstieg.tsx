@@ -12,16 +12,17 @@ import './escape.css'
 // Instruktionsreihenfolge: Problem zuerst. Die SuS kennen Normalparabel und Scheitelform und können die Symmetrie der
 // Parabel selbst entdecken; die Formel x_S = −b/(2a) wird erst nach Raum 3 als Infokarte gesichert.
 // Stationen: 0 Einstieg und Festlegung → 1 Vorwissen → 2 Symmetrie → 3 Muster → 4 Tresor → 5 Austausch → 6 Merkkarte → 7 Check.
-// Die Räume 1 bis 4 liefern je eine Ziffer des Türcodes und schalten den nächsten Raum frei.
+// Die Räume 1 bis 4 liefern je einen Teil des Türcodes (Ziffern 2, 3, 5 und die Höhe 5,9 m) und schalten den nächsten Raum frei.
 // Die Festlegung bleibt nur im Seitenzustand (kein Speichern).
 // Wird als Modus „Lernsituation“ auf der Seite „Scheitelpunkt berechnen“ angezeigt; der Infoteil (Erklärung mit Erklärvideo)
 // kommt von dort, damit er nur an einer Stelle gepflegt wird.
 
 /* ── Situation: Wasserstrahl-Brunnen ─────────────────────────────────────── */
 
-// 1 LE = 1 m. Düse bei (0|1), Beckenrand bei (8|1), höchster Punkt S(4|9).
-const strahl = (x: number) => -0.5 * x * x + 4 * x + 1
-const CODE = [2, 3, 5, 9]
+// 1 LE = 1 m. Düse bei (0|1), Beckenrand bei (7|1), höchster Punkt S(3,5|5,9). Der Scheitelpunkt liegt bewusst nicht
+// auf glatten Zahlen, damit eine Schätzung immer etwas danebenliegt und man rechnen muss.
+const strahl = (x: number) => -0.4 * x * x + 2.8 * x + 1
+const CODE = ['2', '3', '5', '5,9']
 
 type Prediction = { x: number; y: number; saved: boolean }
 
@@ -100,7 +101,7 @@ function Diagramm({
 /** Brunnen von der Seite; mit Vermutung (Marke) oder mit dem berechneten höchsten Punkt */
 function BrunnenBild({ guess, showS = false }: { guess?: { x: number; y: number }; showS?: boolean }) {
   return (
-    <Diagramm f={strahl} xMin={-0.5} xMax={9} yMin={-1} yMax={10} yStep={2} label="Wasserstrahl des Brunnens als Parabel, Düse bei 0 Meter und Beckenrand bei 8 Meter">
+    <Diagramm f={strahl} xMin={-0.5} xMax={9} yMin={-1} yMax={10} yStep={2} label="Wasserstrahl des Brunnens als Parabel, Düse bei 0 Meter und Beckenrand bei 7 Meter">
       {(bx, by) => (
         <>
           <rect x={bx(-0.5)} y={by(0)} width={bx(9) - bx(-0.5)} height={by(-1) - by(0)} fill="var(--surface-sunken)" />
@@ -109,8 +110,8 @@ function BrunnenBild({ guess, showS = false }: { guess?: { x: number; y: number 
           <text x={bx(0) + 14} y={by(1) + 4} fontSize="15" fontWeight="700" fill="var(--ink)">
             Düse
           </text>
-          <rect x={bx(8)} y={by(1)} width={bx(9) - bx(8)} height={by(0) - by(1)} fill="var(--hint)" opacity="0.5" stroke="var(--ink)" strokeWidth="2" />
-          <text x={bx(8) + 4} y={by(1) - 6} fontSize="15" fontWeight="700" fill="var(--ink)">
+          <rect x={bx(7)} y={by(1)} width={bx(8.5) - bx(7)} height={by(0) - by(1)} fill="var(--hint)" opacity="0.5" stroke="var(--ink)" strokeWidth="2" />
+          <text x={bx(7) + 4} y={by(1) - 6} fontSize="15" fontWeight="700" fill="var(--ink)">
             Becken
           </text>
           {guess && (
@@ -124,10 +125,10 @@ function BrunnenBild({ guess, showS = false }: { guess?: { x: number; y: number 
           )}
           {showS && (
             <g>
-              <line x1={bx(4)} x2={bx(4)} y1={by(0)} y2={by(9)} stroke="var(--correct)" strokeDasharray="6 4" strokeWidth="2" />
-              <circle cx={bx(4)} cy={by(9)} r="9" fill="var(--correct)" stroke="var(--ink)" strokeWidth="2.5" />
-              <text x={bx(4) + 14} y={by(9) + 22} fontSize="16" fontWeight="700" fill="var(--correct-ink)">
-                S(4 | 9)
+              <line x1={bx(3.5)} x2={bx(3.5)} y1={by(0)} y2={by(5.9)} stroke="var(--correct)" strokeDasharray="6 4" strokeWidth="2" />
+              <circle cx={bx(3.5)} cy={by(5.9)} r="9" fill="var(--correct)" stroke="var(--ink)" strokeWidth="2.5" />
+              <text x={bx(3.5) + 14} y={by(5.9) + 22} fontSize="16" fontWeight="700" fill="var(--correct-ink)">
+                S(3,5 | 5,9)
               </text>
             </g>
           )}
@@ -171,12 +172,12 @@ function CodeLock({ index, task, expected, solved, onSolved }: { index: number; 
   return (
     <div className={`esc-lock ${solved ? 'is-open' : ''}`} data-no-autocheck>
       <div className="esc-lock-title">
-        <i className={`fa-solid ${solved ? 'fa-lock-open' : 'fa-lock'}`} aria-hidden="true" /> Schloss {index}: Ziffer {index} des Türcodes
+        <i className={`fa-solid ${solved ? 'fa-lock-open' : 'fa-lock'}`} aria-hidden="true" /> Schloss {index}: Teil {index} des Türcodes
       </div>
       <div>{task}</div>
       <div className="esc-lock-row">
         <label htmlFor={uid} className="ls-label">
-          Ziffer {index}
+          Eingabe
         </label>
         <input
           id={uid}
@@ -185,8 +186,8 @@ function CodeLock({ index, task, expected, solved, onSolved }: { index: number; 
           autoComplete="off"
           placeholder="?"
           disabled={solved}
-          className={`bk-input lp-input lp-input-sm ${fieldCheckClass(solved ? true : mark)}`}
-          value={solved ? String(expected) : value}
+          className={`bk-input lp-input lp-input-md ${fieldCheckClass(solved ? true : mark)}`}
+          value={solved ? String(expected).replace('.', ',') : value}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             setValue(e.target.value)
             setMark(undefined)
@@ -196,7 +197,7 @@ function CodeLock({ index, task, expected, solved, onSolved }: { index: number; 
         />
         {!solved && (
           <button type="button" className="bk-btn bk-btn-primary" onClick={check}>
-            Ziffer prüfen
+            Code prüfen
           </button>
         )}
       </div>
@@ -212,7 +213,7 @@ function CodeLock({ index, task, expected, solved, onSolved }: { index: number; 
       )}
       {msg === 'empty' && (
         <div className="bk-feedback bk-feedback-info lp-feedback" role="status">
-          <i className="fa-solid fa-pen" aria-hidden="true" /> Trage zuerst eine Ziffer ein.
+          <i className="fa-solid fa-pen" aria-hidden="true" /> Trage zuerst eine Zahl ein.
         </div>
       )}
     </div>
@@ -474,20 +475,20 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
               <Raum no="Start" title="Freitag, 19:05 Uhr im Lichtwerk">
                 <p className="esc-story">
                   Du bist Azubi bei der Werbetechnik-Firma „Lichtwerk“. Beim Abschließen fällt die Lagertür ins Schloss, und alle anderen sind schon weg. Am Türdisplay blinkt:
-                  <strong> „Code: 4 Ziffern. Die Ziffern stecken in der Brunnen-Anlage, die du letzte Woche für den Kunden mitgebaut hast.“</strong>
+                  <strong> „Code: 4 Teile. Die Zahlen stecken in der Brunnen-Anlage, die du letzte Woche für den Kunden mitgebaut hast.“</strong>
                 </p>
                 <BrunnenBild guess={pred.saved || pred.x !== 3 || pred.y !== 5 ? { x: pred.x, y: pred.y } : undefined} />
                 <p>
-                  Der Brunnen spritzt aus der Düse (1 m hoch) in ein Becken, dessen Rand 8 m entfernt ebenfalls 1 m hoch ist. Der Wasserstrahl ist eine Parabel mit
+                  Der Brunnen spritzt aus der Düse (1 m hoch) in ein Becken, dessen Rand 7 m entfernt ebenfalls 1 m hoch ist. Der Wasserstrahl ist eine Parabel mit
                   <strong>
                     {' '}
-                    <M>{'h(x) = -0{,}5x^2 + 4x + 1'}</M>
+                    <M>{'h(x) = -0{,}4x^2 + 2{,}8x + 1'}</M>
                   </strong>{' '}
                   (<M>x</M> und <M>h</M> in Metern).
                 </p>
                 <div className="ls-question">
                   <i className="fa-solid fa-circle-question" aria-hidden="true" />
-                  <span>Wo ist der höchste Punkt des Strahls, und wie hoch ist er dort?</span>
+                  <span>Wo ist der höchste Punkt des Strahls, und wie hoch ist er dort? Kannst du ihn genau ablesen?</span>
                 </div>
                 <div className="lp-ex bk-panel" data-no-autocheck>
                   <CardHead title="Deine Vermutung" />
@@ -505,18 +506,18 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                     </>
                   ) : (
                     <>
-                      <p>Rechne noch nicht! Schätze nur mit dem Bild. Verschiebe die rote Marke an die Stelle, wo du den höchsten Punkt vermutest.</p>
+                      <p>Rechne noch nicht! Schätze nur mit dem Bild. Verschiebe die rote Marke an die Stelle, wo du den höchsten Punkt vermutest. Die Regler arbeiten in 0,1-m-Schritten.</p>
                       <div className="ls-slider">
                         <label htmlFor="esc-px">
                           Entfernung von der Düse <M>x</M> ≈ <span className="ls-slider-value">{fmt(pred.x, 1)}</span> m
                         </label>
-                        <input id="esc-px" type="range" min={0} max={8} step={0.5} value={pred.x} onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, x: Number(e.target.value) })} />
+                        <input id="esc-px" type="range" min={0} max={8} step={0.1} value={pred.x} onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, x: Number(e.target.value) })} />
                       </div>
                       <div className="ls-slider">
                         <label htmlFor="esc-py">
                           Höhe <M>h</M> ≈ <span className="ls-slider-value">{fmt(pred.y, 1)}</span> m
                         </label>
-                        <input id="esc-py" type="range" min={0} max={10} step={0.5} value={pred.y} onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, y: Number(e.target.value) })} />
+                        <input id="esc-py" type="range" min={0} max={10} step={0.1} value={pred.y} onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, y: Number(e.target.value) })} />
                       </div>
                       <div>
                         <button type="button" className="bk-btn bk-btn-primary" onClick={() => setPred({ ...pred, saved: true })}>
@@ -603,7 +604,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   index={1}
                   task={
                     <p>
-                      Das Tor verlangt Ziffer 1: die <strong>y-Koordinate des Scheitelpunkts</strong> aus Aufgabe a).
+                      Das Tor verlangt Teil 1 des Codes: die <strong>y-Koordinate des Scheitelpunkts</strong> aus Aufgabe a).
                     </p>
                   }
                   expected={2}
@@ -686,7 +687,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   index={2}
                   task={
                     <p>
-                      Schloss 2 verlangt Ziffer 2: die <strong>x-Koordinate des Scheitelpunkts</strong> von <M>{'f(x) = x^2 - 6x + 5'}</M>.
+                      Schloss 2 verlangt Teil 2 des Codes: die <strong>x-Koordinate des Scheitelpunkts</strong> von <M>{'f(x) = x^2 - 6x + 5'}</M>.
                     </p>
                   }
                   expected={3}
@@ -795,7 +796,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   index={3}
                   task={
                     <p>
-                      Schloss 3 verlangt Ziffer 3: die <strong>x-Koordinate des Scheitelpunkts</strong> von <M>{'f(x) = 2x^2 - 20x + 5'}</M>.
+                      Schloss 3 verlangt Teil 3 des Codes: die <strong>x-Koordinate des Scheitelpunkts</strong> von <M>{'f(x) = 2x^2 - 20x + 5'}</M>.
                     </p>
                   }
                   expected={5}
@@ -811,34 +812,34 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
           <div hidden={hide(4)}>
             <Phase no={4} title="Raum 4: Der Tresor" social="PA" minutes={5}>
               <Raum no={4} title="Wie hoch spritzt der Brunnen wirklich?">
-                <p className="esc-story">Der Tresor steht neben dem Brunnen-Modell. Die letzte Ziffer ist die größte Höhe des Wasserstrahls. Jetzt kennt ihr eine Methode, die ohne Wertetabelle auskommt.</p>
+                <p className="esc-story">Der Tresor steht neben dem Brunnen-Modell. Der letzte Teil des Codes ist die größte Höhe des Wasserstrahls in Metern, mit Komma. Ablesen reicht hier nicht, aber ihr kennt jetzt eine Methode, die genau rechnet.</p>
                 <BrunnenBild showS={digits[3]} guess={pred.saved ? { x: pred.x, y: pred.y } : undefined} />
                 <CheckCard
                   title="Höchster Punkt des Strahls"
                   prompt={
                     <p>
-                      Strahl: <M>{'h(x) = -0{,}5x^2 + 4x + 1'}</M>. Berechnet den höchsten Punkt (<M>x_S</M> und <M>y_S</M>). Haltet den Rechenweg schriftlich fest.
+                      Strahl: <M>{'h(x) = -0{,}4x^2 + 2{,}8x + 1'}</M>. Berechnet den höchsten Punkt (<M>x_S</M> und <M>y_S</M>). Haltet den Rechenweg schriftlich fest.
                     </p>
                   }
                   fieldsRow
                   fields={[
-                    { kind: 'num', key: 'xs', label: <>Entfernung <M>{'x_S ='}</M></>, expected: 4, unit: 'm' },
-                    { kind: 'num', key: 'ys', label: <>Höhe <M>{'y_S ='}</M></>, expected: 9, unit: 'm' },
+                    { kind: 'num', key: 'xs', label: <>Entfernung <M>{'x_S ='}</M></>, expected: 3.5, unit: 'm' },
+                    { kind: 'num', key: 'ys', label: <>Höhe <M>{'y_S ='}</M></>, expected: 5.9, unit: 'm' },
                   ]}
                   solution={
                     <>
-                      <p>Es ist <M>{'a = -0{,}5'}</M>, <M>{'b = 4'}</M> und <M>{'c = 1'}</M>.</p>
-                      <MB>{'x_S = -\\frac{4}{2 \\cdot (-0{,}5)} = -\\frac{4}{-1} = 4'}</MB>
-                      <MB>{'y_S = h(4) = -0{,}5 \\cdot 16 + 4 \\cdot 4 + 1 = -8 + 16 + 1 = 9'}</MB>
-                      <p>Der höchste Punkt ist <M>{'S(4 \\mid 9)'}</M>.</p>
+                      <p>Es ist <M>{'a = -0{,}4'}</M>, <M>{'b = 2{,}8'}</M> und <M>{'c = 1'}</M>.</p>
+                      <MB>{'x_S = -\\frac{2{,}8}{2 \\cdot (-0{,}4)} = -\\frac{2{,}8}{-0{,}8} = 3{,}5'}</MB>
+                      <MB>{'y_S = h(3{,}5) = -0{,}4 \\cdot 12{,}25 + 2{,}8 \\cdot 3{,}5 + 1 = -4{,}9 + 9{,}8 + 1 = 5{,}9'}</MB>
+                      <p>Der höchste Punkt ist <M>{'S(3{,}5 \\mid 5{,}9)'}</M>.</p>
                     </>
                   }
                   help={
                     <Hilfen
                       steps={[
-                        <>Welche Zahlen sind <M>a</M>, <M>b</M> und <M>c</M> in <M>{'-0{,}5x^2 + 4x + 1'}</M>?</>,
+                        <>Welche Zahlen sind <M>a</M>, <M>b</M> und <M>c</M> in <M>{'-0{,}4x^2 + 2{,}8x + 1'}</M>?</>,
                         <>Rechne zuerst <M>{'x_S = -\\frac{b}{2a}'}</M>, dann setze das Ergebnis in <M>h(x)</M> ein.</>,
-                        <>Im Nenner steht <M>{'2 \\cdot (-0{,}5) = -1'}</M>. Das Minus vor dem Bruch und das Minus im Nenner heben sich auf.</>,
+                        <>Im Nenner steht <M>{'2 \\cdot (-0{,}4) = -0{,}8'}</M>. Das Minus vor dem Bruch und das Minus im Nenner heben sich auf. Für <M>{'y_S'}</M> rechnest du <M>{'3{,}5^2 = 12{,}25'}</M>.</>,
                       ]}
                     />
                   }
@@ -849,8 +850,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                       <strong>Du hattest vermutet:</strong> höchster Punkt bei x ≈ {fmt(pred.x, 1)} m in {fmt(pred.y, 1)} m Höhe.
                     </p>
                     <p>
-                      Berechnet wurde <strong>S(4 | 9)</strong>. Abweichung: {fmt(Math.abs(pred.x - 4), 1)} m in x-Richtung und {fmt(Math.abs(pred.y - 9), 1)} m in der Höhe.{' '}
-                      {Math.abs(pred.x - 4) < 0.01 ? 'Die Mitte hast du richtig gesehen. ' : ''}Die Symmetrie verrät dir die Mitte, aber wie hoch der Strahl genau steigt, weißt du erst durch die Rechnung.
+                      Berechnet wurde <strong>S(3,5 | 5,9)</strong>. Abweichung: {fmt(Math.abs(pred.x - 3.5), 1)} m in x-Richtung und {fmt(Math.abs(pred.y - 5.9), 1)} m in der Höhe. Ganz genau trifft man den Scheitelpunkt beim Schätzen kaum. Die Symmetrie verrät dir die Mitte, die genauen Koordinaten liefert aber erst die Rechnung.
                     </p>
                   </div>
                 )}
@@ -858,10 +858,10 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   index={4}
                   task={
                     <p>
-                      Schloss 4 verlangt Ziffer 4: die <strong>größte Höhe des Strahls in Metern</strong>.
+                      Schloss 4 verlangt Teil 4 des Codes: die <strong>größte Höhe des Strahls in Metern</strong> (mit Komma).
                     </p>
                   }
-                  expected={9}
+                  expected={5.9}
                   solved={digits[3]}
                   onSolved={() => solve(4)}
                 />
@@ -881,7 +881,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   <ul>
                     <li>Warum liegt der Scheitelpunkt genau in der Mitte zwischen zwei Punkten gleicher Höhe?</li>
                     <li>Was bewirkt c in <M>{'ax^2 + bx + c'}</M> für die x-Koordinate des Scheitelpunkts?</li>
-                    <li>Wie weit lagen eure Vermutungen aus dem Einstieg vom richtigen Wert S(4 | 9) entfernt?</li>
+                    <li>Wie weit lagen eure Vermutungen aus dem Einstieg vom richtigen Wert S(3,5 | 5,9) entfernt? Warum kann man den Scheitelpunkt nicht einfach ablesen?</li>
                   </ul>
                 </div>
                 <p>
@@ -891,7 +891,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   <details className="ls-way">
                     <summary>Lena hat die Wertetabelle genutzt</summary>
                     <div className="ls-way-body">
-                      <p>„Ich habe alle Werte von x = 0 bis 8 ausgerechnet und den größten gesucht. Das war bei x = 4.“</p>
+                      <p>„Ich habe die Höhen in 0,5-m-Schritten ausgerechnet. Am größten war es bei x = 3,5 mit 5,9 m. Ob es dazwischen noch höher geht, weiß ich nicht sicher.“</p>
                       <p>
                         <strong>Gut:</strong> Funktioniert immer und ist leicht zu verstehen. <strong>Aber:</strong> Es dauert lange und bei Werten zwischen den Schritten bleibt man unsicher.
                       </p>
@@ -900,7 +900,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   <details className="ls-way">
                     <summary>Jonas hat die Symmetrie genutzt</summary>
                     <div className="ls-way-body">
-                      <p>„Düse und Beckenrand liegen beide auf 1 m. Die Mitte ist bei x = 4, also ist dort der höchste Punkt.“</p>
+                      <p>„Düse und Beckenrand liegen beide auf 1 m. Die Mitte ist bei x = 3,5, also ist dort der höchste Punkt.“</p>
                       <p>
                         <strong>Gut:</strong> Sehr schnell, wenn man zwei Punkte gleicher Höhe kennt. <strong>Aber:</strong> Man findet nur x_S, die Höhe muss man noch ausrechnen.
                       </p>
@@ -909,7 +909,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   <details className="ls-way">
                     <summary>Mira hat die Formel genutzt</summary>
                     <div className="ls-way-body">
-                      <p>„Ich habe a = −0,5 und b = 4 abgelesen und x_S = −b/(2a) = 4 gerechnet. Dann h(4) = 9.“</p>
+                      <p>„Ich habe a = −0,4 und b = 2,8 abgelesen und x_S = −b/(2a) = 3,5 gerechnet. Dann h(3,5) = 5,9.“</p>
                       <p>
                         <strong>Gut:</strong> Klappt bei jeder Parabel in allgemeiner Form. <strong>Aber:</strong> Man muss auf die Vorzeichen achten.
                       </p>
@@ -935,12 +935,12 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
               </Merke>
               <Beispiel
                 title="Beispiel aus Raum 4"
-                aufgabe={<p>Berechne den höchsten Punkt von <M>{'h(x) = -0{,}5x^2 + 4x + 1'}</M>.</p>}
+                aufgabe={<p>Berechne den höchsten Punkt von <M>{'h(x) = -0{,}4x^2 + 2{,}8x + 1'}</M>.</p>}
                 steps={[
-                  { title: 'a, b, c ablesen', body: <MB>{'a = -0{,}5 \\qquad b = 4 \\qquad c = 1'}</MB> },
-                  { title: 'x_S berechnen', body: <MB>{'x_S = -\\frac{b}{2a} = -\\frac{4}{2 \\cdot (-0{,}5)} = 4'}</MB> },
-                  { title: 'y_S berechnen', body: <MB>{'y_S = h(4) = -0{,}5 \\cdot 4^2 + 4 \\cdot 4 + 1 = 9'}</MB> },
-                  { title: 'Antwort', body: <MB>{'S(4 \\mid 9)'}</MB> },
+                  { title: 'a, b, c ablesen', body: <MB>{'a = -0{,}4 \\qquad b = 2{,}8 \\qquad c = 1'}</MB> },
+                  { title: 'x_S berechnen', body: <MB>{'x_S = -\\frac{b}{2a} = -\\frac{2{,}8}{2 \\cdot (-0{,}4)} = 3{,}5'}</MB> },
+                  { title: 'y_S berechnen', body: <MB>{'y_S = h(3{,}5) = -0{,}4 \\cdot 3{,}5^2 + 2{,}8 \\cdot 3{,}5 + 1 = 5{,}9'}</MB> },
+                  { title: 'Antwort', body: <MB>{'S(3{,}5 \\mid 5{,}9)'}</MB> },
                 ]}
               />
               <Merkkarte />
