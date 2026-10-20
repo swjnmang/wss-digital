@@ -5,6 +5,7 @@ import 'katex/dist/katex.min.css'
 import { type Q, q, add, mul, neg, val, isInt, tq, tqp, sgq, polyTex, parseAnswer, isIncomplete } from './quadratischShared'
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
+import EscapeEinstieg from './scheitelpunkt_einstieg/EscapeEinstieg'
 
 // Sieben Aufgaben gleichzeitig auf der Seite
 const TOTAL_TASKS = 7
@@ -435,6 +436,8 @@ export default function Scheitelpunkt() {
   const [solved, setSolved] = useState<Record<number, boolean>>({})
   const [streak, setStreak] = useState(0)
   const [finished, setFinished] = useState(false)
+  // Einstiegs-Lernsituation „Eingeschlossen im Lichtwerk“ als eigener Modus neben den Schwierigkeitsgraden
+  const [lernsituation, setLernsituation] = useState(false)
 
   const solvedCount = Object.values(solved).filter(Boolean).length
   const allSolved = solvedCount === TOTAL_TASKS
@@ -463,11 +466,46 @@ export default function Scheitelpunkt() {
     </div>
   )
 
+  if (lernsituation) {
+    return (
+      <EscapeEinstieg
+        erklaerung={<Erklaerung />}
+        onBack={() => {
+          setLernsituation(false)
+          window.scrollTo({ top: 0 })
+        }}
+        onPractice={() => {
+          setLernsituation(false)
+          chooseLevel('einfach')
+        }}
+      />
+    )
+  }
+
   if (!level) {
     return (
       <TaskShell title="Scheitelpunkt berechnen" width="narrow">
         <div className="flex flex-col gap-6">
           {header}
+          <div className={`${panel} flex flex-col`}>
+            <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
+            <button
+              onClick={() => {
+                setLernsituation(true)
+                window.scrollTo({ top: 0 })
+              }}
+              style={{ background: 'var(--primary)' }}
+              className="rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+            >
+              <p className="text-lg font-bold mb-1 text-white">Eingeschlossen im Lichtwerk</p>
+              <p className="text-xl mb-2 text-white">
+                <i className="fa-solid fa-door-closed" aria-hidden="true" />
+              </p>
+              <p className="text-sm text-white/90">
+                Neu beim Thema? Knackt den Türcode im Escape-Room und findet dabei heraus, wie du den Scheitelpunkt einer Parabel aus der allgemeinen Form berechnest.
+              </p>
+            </button>
+          </div>
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

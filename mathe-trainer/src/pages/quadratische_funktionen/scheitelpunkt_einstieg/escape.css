@@ -1,0 +1,59 @@
+/* Einstiegs-Lernsituation „Eingeschlossen im Lichtwerk“: Look Levelmap mit Code-Schloss (Stepper).
+   Der feste Kern (Eingaben, Feedback, Hilfen, Stopp-Kasten) kommt unverändert aus lernsituation_kit/kit.css. */
+
+/* Levelmap: eine Station pro Kästchen */
+.esc-map { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0; padding: 0; list-style: none; }
+@media (min-width: 720px) { .esc-map { grid-template-columns: repeat(8, 1fr); } }
+.esc-map-btn {
+  width: 100%; min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  padding: 6px 4px; border: 2px solid var(--edge); border-radius: 12px; background: var(--surface); color: var(--ink);
+  font: 700 13px/1.2 var(--font-body); cursor: pointer;
+}
+.esc-map-btn i { font-size: 18px; }
+.esc-map-btn[disabled] { opacity: 0.45; cursor: not-allowed; background: var(--surface-sunken); }
+.esc-map-btn.is-done { background: var(--correct-soft); color: var(--correct-ink); }
+.esc-map-btn.is-current { background: var(--highlight); color: var(--on-highlight); outline: 3px solid var(--edge); outline-offset: 1px; }
+
+/* Code-Anzeige am Tor */
+.esc-code { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 16px; border: 2px solid var(--edge); border-radius: var(--radius); background: var(--surface-sunken); }
+.esc-code-label { font: 800 16px/1.3 var(--font-display); }
+.esc-digits { display: flex; gap: 8px; }
+.esc-digit {
+  width: 44px; height: 54px; display: grid; place-items: center; border: 2px solid var(--edge); border-radius: 10px;
+  background: var(--surface); font: 800 28px/1 var(--font-display); color: var(--ink-muted);
+}
+.esc-digit.is-on { background: var(--correct-soft); color: var(--correct-ink); }
+.esc-open { margin-left: auto; font: 800 16px/1.3 var(--font-display); color: var(--correct-ink); }
+
+/* Raum-Karte */
+.esc-room {
+  border: 2px solid var(--edge); border-radius: var(--radius); background-color: var(--surface);
+  background-image: repeating-linear-gradient(135deg, transparent 0 14px, var(--grid) 14px 15px);
+  padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 12px;
+}
+.esc-room > * { min-width: 0; }
+.esc-room .lp-ex.bk-panel { background: var(--surface); }
+.esc-room-tag {
+  align-self: flex-start; font: 800 13px/1.3 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 6px; border: 1.5px solid var(--edge); background: var(--highlight); color: var(--on-highlight);
+}
+.esc-story { margin: 0; padding: 10px 14px; border-left: 4px solid var(--hint); background: var(--hint-soft); border-radius: 0 10px 10px 0; font-size: 17px; line-height: 1.55; }
+
+/* Schloss mit Ziffer */
+.esc-lock { border: 3px solid var(--edge); border-radius: var(--radius); background: var(--surface); padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.esc-lock-title { display: flex; align-items: center; gap: 10px; font: 800 19px/1.3 var(--font-display); }
+.esc-lock.is-open { border-color: var(--correct); background: var(--correct-soft); }
+.esc-lock-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+/* Vermutung und Rückbezug */
+.esc-guess-readout { display: grid; gap: 8px; }
+@media (min-width: 640px) { .esc-guess-readout { grid-template-columns: 1fr 1fr; } }
+
+/* Merkkarte */
+.esc-karte { border: 3px dashed var(--edge); border-radius: var(--radius); background: var(--surface); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.esc-karte-title { font: 800 20px/1.25 var(--font-display); margin: 0; }
+.esc-karte ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 17px; line-height: 1.5; }
+.esc-karte-own { white-space: pre-wrap; border-left: 4px solid var(--primary); background: var(--primary-soft); border-radius: 0 10px 10px 0; padding: 8px 12px; font-size: 16px; }
+.esc-textarea { width: 100%; min-height: 84px; font: 500 17px/1.5 var(--font-body); resize: vertical; }
+
+.esc-step-nav { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; }
