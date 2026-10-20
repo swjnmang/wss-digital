@@ -551,7 +551,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   ]}
                   solution={
                     <p>
-                      In der Scheitelform <M>{'f(x) = (x - d)^2 + e'}</M> ist <M>{'S(d \\mid e)'}</M>. Hier ist <M>{'d = 3'}</M> und <M>{'e = 2'}</M>, also <M>{'S(3 \\mid 2)'}</M>.
+                      In der Scheitelform <M>{'f(x) = (x - x_S)^2 + y_S'}</M> ist <M>{'S(x_S \\mid y_S)'}</M>. Hier ist <M>{'x_S = 3'}</M> und <M>{'y_S = 2'}</M>, also <M>{'S(3 \\mid 2)'}</M>.
                     </p>
                   }
                   help={
