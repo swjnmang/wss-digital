@@ -86,6 +86,7 @@ import WerWirdMillionaer from './pages/lineare_funktionen/WerWirdMillionaer'
 // Finanzmathe
 import ZinsrechnungMenu from './pages/finanzmathe/ZinsrechnungMenu';
 import Zinsrechnung from './pages/finanzmathe/Zinsrechnung';
+import ZinsrechnungLernsituation from './pages/finanzmathe/ZinsrechnungLernsituation';
 import Zinstage from './pages/finanzmathe/Zinstage';
 import Zinseszins from './pages/finanzmathe/Zinseszins';
 import MehrungMinderung from './pages/finanzmathe/MehrungMinderung';
@@ -289,6 +290,7 @@ export default function App() {
           <Route path="/finanzmathe" element={<AreaPage id="finanz" />} />
           <Route path="/finanzmathe/zinsrechnung" element={<ZinsrechnungMenu />} />
           <Route path="/finanzmathe/zinsrechnung/ueben" element={<Zinsrechnung />} />
+          <Route path="/finanzmathe/zinsrechnung/lernsituation" element={<ZinsrechnungLernsituation />} />
           <Route path="/finanzmathe/zinsrechnung/tage" element={<Zinstage />} />
           <Route path="/finanzmathe/zinseszins" element={<Zinseszins />} />
           <Route path="/finanzmathe/mehrung_minderung" element={<MehrungMinderung />} />
