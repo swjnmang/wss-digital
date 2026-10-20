@@ -1,15 +1,16 @@
 import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import CheckedNumberInput from '../../../components/CheckedNumberInput'
-import { Beispiel, M, MB, Merke, QuerTabelle, fmt } from '../../daten_und_zufall/lernpfad/kit'
+import { Beispiel, M, MB, Merke, QuerTabelle, Vorgehen, fmt } from '../../daten_und_zufall/lernpfad/kit'
 import { CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, LevelTag, McCard, Phase, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './lab.css'
 
 // Einstiegs-Lernsituation „Löst der Sprung die Lichtschranke aus?“ zu Schnittpunkten von Parabel und Gerade.
 // Format Experimentierlabor, Look Laborprotokoll, Lernprodukt analog (Spickzettel).
-// Instruktionsreihenfolge: Problem zuerst. Die SuS können quadratische Gleichungen mit der abc-Formel lösen und
-// Geraden gleichsetzen; neu ist nur, dass die Anzahl der Lösungen die Anzahl der Schnittpunkte bestimmt.
+// Instruktionsreihenfolge: Problem zuerst, die Infokarte zum Gleichsetzen kommt nach dem ersten Versuch. Die SuS können
+// quadratische Gleichungen mit der Mitternachtsformel lösen; neu ist das Gleichsetzen von Parabel und Gerade und dass die
+// Zahl unter der Wurzel die Anzahl der Schnittpunkte bestimmt. Es wird immer vollständig mit der Mitternachtsformel gerechnet.
 // Phasen: Aktivieren → Situation & Festlegung → Experimentieren → Austausch → Sichern → Check.
 // Die Festlegung bleibt nur im Seitenzustand (kein Speichern).
 // Wird als Modus „Lernsituation“ auf der Seite „Schnittpunkte von Parabel und Gerade“ angezeigt; der Infoteil
@@ -21,14 +22,14 @@ import './lab.css'
 // Der Sensor der Lichtschranke steht am linken Pfosten in Höhe t, der Strahl steigt pro Meter um 0,5 m.
 const p = (x: number) => -0.25 * x * x + 2 * x
 const g = (t: number) => (x: number) => 0.5 * x + t
-/** Diskriminante von p(x) = g(x), also −0,25x² + 1,5x − t = 0 */
-const disc = (t: number) => 2.25 - t
+/** Zahl unter der Wurzel in der Mitternachtsformel für p(x) = g(x), also −0,25x² + 1,5x − t = 0 */
+const wurzelterm = (t: number) => 2.25 - t
 const T_TOUCH = 2.25
 const T_MAX = 4
 
 /** gemeinsame Punkte von Sprungbahn und Lichtschranke */
 function schnitt(t: number): { x: number; y: number }[] {
-  const d = disc(t)
+  const d = wurzelterm(t)
   if (d < -1e-9) return []
   if (Math.abs(d) < 1e-9) return [{ x: 3, y: g(t)(3) }]
   const w = 2 * Math.sqrt(d)
@@ -207,7 +208,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
 
           {/* 1 Aktivieren */}
           <Phase no={1} title="Fit für den Start" social="EA" minutes={5}>
-            <p>Diese drei kurzen Aufgaben brauchst du gleich. Löse sie allein.</p>
+            <p>Diese vier kurzen Aufgaben brauchst du gleich. Löse sie allein.</p>
             <div className="lp-exlist">
               <CheckCard
                 title="a) Punktprobe bei einer Parabel"
@@ -220,44 +221,55 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 solution={
                   <>
                     <p>x-Wert einsetzen und mit dem y-Wert vergleichen:</p>
-                    <MB>{'p(2) = -0{,}25 \\cdot 2^2 + 2 \\cdot 2 = -1 + 4 = 3 \\;\\checkmark'}</MB>
+                    <MB>{'p(2) = -0{,}25 \\cdot 2^2 + 2 \\cdot 2 = -1 + 4 = 3 \;\\checkmark'}</MB>
                     <p>Der y-Wert stimmt, also liegt P auf der Parabel.</p>
                   </>
                 }
               />
               <CheckCard
-                title="b) Quadratische Gleichung lösen"
+                title="b) y-Wert einer Geraden berechnen"
                 prompt={
                   <p>
-                    Löse <M>{'x^2 - 6x + 8 = 0'}</M> mit der abc-Formel. Berechne zuerst den Term unter der Wurzel <M>{'D = b^2 - 4ac'}</M>. Halte deinen Rechenweg schriftlich fest.
+                    Eine Gerade hat die Gleichung <M>{'g(x) = 0{,}5x + 2'}</M>. Berechne den y-Wert an der Stelle <M>{'x = 6'}</M>. Halte deinen Rechenweg schriftlich fest.
+                  </p>
+                }
+                fields={[{ kind: 'num', key: 'y', label: <M>{'g(6) ='}</M>, expected: 5 }]}
+                solution={<MB>{'g(6) = 0{,}5 \\cdot 6 + 2 = 3 + 2 = 5'}</MB>}
+              />
+              <CheckCard
+                title="c) Quadratische Gleichung lösen"
+                prompt={
+                  <p>
+                    Löse <M>{'x^2 - 6x + 8 = 0'}</M> mit der Mitternachtsformel. Halte deinen Rechenweg schriftlich fest.
                   </p>
                 }
                 fieldsRow
                 fields={[
-                  { kind: 'num', key: 'd', label: <M>{'D ='}</M>, expected: 4 },
                   { kind: 'num', key: 'x1', label: <>kleinere Lösung <M>{'x_1 ='}</M></>, expected: 2 },
                   { kind: 'num', key: 'x2', label: <>größere Lösung <M>{'x_2 ='}</M></>, expected: 4 },
                 ]}
                 solution={
                   <>
-                    <MB>{'D = b^2 - 4ac = (-6)^2 - 4 \\cdot 1 \\cdot 8 = 36 - 32 = 4'}</MB>
-                    <MB>{'x_{1,2} = \\frac{-b \\pm \\sqrt{D}}{2a} = \\frac{6 \\pm 2}{2} \\;\\Rightarrow\\; x_1 = 2,\\; x_2 = 4'}</MB>
+                    <p>
+                      Es ist <M>{'a = 1'}</M>, <M>{'b = -6'}</M> und <M>{'c = 8'}</M>.
+                    </p>
+                    <MB>{'x_{1,2} = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a} = \\frac{6 \\pm \\sqrt{36 - 32}}{2} = \\frac{6 \\pm 2}{2}'}</MB>
+                    <MB>{'x_1 = 2 \\qquad x_2 = 4'}</MB>
                   </>
                 }
               />
               <McCard
-                title="c) Gleichsetzen und umformen"
+                title="d) Wenn die Wurzel nicht geht"
                 prompt={
                   <p>
-                    Du setzt <M>{'p(x) = -0{,}25x^2 + 2x'}</M> und <M>{'g(x) = 0{,}5x + 2'}</M> gleich. Welche Gleichung entsteht, wenn du alles auf eine Seite bringst
-                    (rechts steht 0)?
+                    Du löst <M>{'x^2 + 2x + 5 = 0'}</M> mit der Mitternachtsformel. Unter der Wurzel steht <M>{'2^2 - 4 \\cdot 1 \\cdot 5'}</M>. Was ergibt sich für die Gleichung?
                   </p>
                 }
                 options={[
-                  { text: <M>{'-0{,}25x^2 + 1{,}5x - 2 = 0'}</M>, correct: true, feedback: 'Du ziehst 0,5x und 2 auf beiden Seiten ab: 2x − 0,5x = 1,5x.' },
-                  { text: <M>{'-0{,}25x^2 + 2{,}5x + 2 = 0'}</M>, feedback: 'Beim Verschieben auf die linke Seite ändern sich die Vorzeichen: Aus +0,5x wird −0,5x und aus +2 wird −2.' },
-                  { text: <M>{'-0{,}25x^2 + 1{,}5x + 2 = 0'}</M>, feedback: 'Die 1,5x stimmen, aber die 2 wechselt beim Verschieben auf die linke Seite das Vorzeichen: −2.' },
-                  { text: <M>{'-0{,}25x^2 + 2x = 0{,}5x + 2'}</M>, feedback: 'Das ist die Gleichung nach dem Gleichsetzen. Für die abc-Formel muss rechts aber 0 stehen.' },
+                  { text: 'Keine Lösung, denn unter der Wurzel steht −16.', correct: true, feedback: 'Aus einer negativen Zahl kann man im Reellen keine Wurzel ziehen, also gibt es keine Lösung.' },
+                  { text: 'Zwei Lösungen, denn man rechnet mit √16 = 4.', feedback: 'Unter der Wurzel steht 4 − 20 = −16, nicht +16. Das Vorzeichen ist entscheidend.' },
+                  { text: 'Eine Lösung x = −1.', feedback: 'Nur wenn unter der Wurzel genau 0 steht, bleibt eine Lösung übrig. Hier steht −16.' },
+                  { text: 'Zwei Lösungen, eine positive und eine negative.', feedback: 'Das ± in der Formel liefert nur zwei Lösungen, wenn die Wurzel ausgerechnet werden kann. Bei −16 geht das nicht.' },
                 ]}
               />
             </div>
@@ -349,10 +361,10 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
           </Phase>
 
           {/* 3 Experimentieren */}
-          <Phase no={3} title="Ab ins Labor: Findet es heraus" social="PA" minutes={15}>
+          <Phase no={3} title="Ab ins Labor: Findet es heraus" social="PA" minutes={17}>
             <p>
               <strong>Auftrag:</strong> Führt zu zweit die Versuche aus und haltet eure Beobachtungen im Laborprotokoll fest. Jede Person tippt auf dem eigenen Gerät, ihr
-              besprecht jede Antwort kurz miteinander.
+              besprecht jede Antwort kurz miteinander. Wie man Schnittpunkte genau berechnet, steht in der Infokarte nach Versuch 1.
             </p>
 
             <LabKarte no={1} title="Sensor verschieben und Punkte zählen" level="basis">
@@ -372,10 +384,11 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <p className="lp-hint">Bei t = 2,25 m sieht man im Bild nur einen Punkt. Versucht auch Höhen knapp darüber und darunter: 2 m und 2,5 m.</p>
                 <Hilfen
                   steps={[
-                    <>Zählt nur die gelben Punkte, in denen Sprungbahn und Lichtschranke wirklich zusammentreffen.</>,
-                    <>Schiebt den Regler in kleinen Schritten von unten nach oben und beobachtet, wann sich die Anzahl der Punkte ändert.</>,
+                    <>Stellt den Regler auf den Wert aus der Tabelle und zählt nur die gelben Punkte, in denen die Sprungbahn und die gestrichelte Linie wirklich zusammentreffen.</>,
+                    <>Geht die Tabelle von links nach rechts durch. Schiebt den Regler dazu jeweils genau auf die Höhe in der Spalte, zum Beispiel erst auf 0, dann auf 1.</>,
                     <>
-                      Bei <M>{'t = 0'}</M> trifft die Schranke die Sprungbahn schon beim Absprung <M>{'(0 \\mid 0)'}</M> und noch einmal weiter rechts. Das sind zwei Punkte.
+                      Bei <M>{'t = 0'}</M> startet die Linie im Absprungpunkt <M>{'(0 \\mid 0)'}</M> und kreuzt die Bahn noch ein zweites Mal weiter rechts. Das sind zwei Punkte, also tragt ihr
+                      eine 2 ein.
                     </>,
                   ]}
                 />
@@ -392,19 +405,97 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
               />
             </LabKarte>
 
+            <div className="lp-ex bk-panel">
+              <CardHead title="Infokarte: So berechnest du die Schnittpunkte von Parabel und Gerade" />
+              <p>
+                Zeichnen und Ablesen ist ungenau. Mit dem <strong>Gleichsetzungsverfahren</strong> und der Mitternachtsformel rechnest du die Schnittpunkte genau aus. Der Gedanke
+                dahinter: Im Schnittpunkt haben die Parabel und die Gerade <strong>denselben x-Wert und denselben y-Wert</strong>. Also dürfen die beiden Funktionsterme gleichgesetzt werden.
+              </p>
+              <Vorgehen
+                title="So gehst du vor"
+                steps={[
+                  <>
+                    <strong>Gleichsetzen:</strong> <M>{'p(x) = g(x)'}</M> hinschreiben.
+                  </>,
+                  <>
+                    <strong>Auf Null bringen:</strong> Alles auf eine Seite rechnen, bis rechts 0 steht. Gleichartige Terme zusammenfassen. Es entsteht <M>{'ax^2 + bx + c = 0'}</M>.
+                  </>,
+                  <>
+                    <strong>Mitternachtsformel:</strong> <M>a</M>, <M>b</M> und <M>c</M> ablesen und einsetzen: <M>{'x_{1,2} = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}'}</M>. Das liefert die x-Werte der
+                    Schnittpunkte.
+                  </>,
+                  <>
+                    <strong>y-Werte:</strong> Jeden x-Wert in die Geradengleichung einsetzen (das ist einfacher als in die Parabel). Zur Probe die Parabel nutzen.
+                  </>,
+                  <>
+                    <strong>Antwort:</strong> Schnittpunkte als <M>{'S_1(x_1 \\mid y_1)'}</M> und <M>{'S_2(x_2 \\mid y_2)'}</M> angeben und in der Situation deuten.
+                  </>,
+                ]}
+              />
+              <Beispiel
+                title="Parabel und Gerade mit anderen Zahlen"
+                aufgabe={
+                  <p>
+                    Berechne die Schnittpunkte von <M>{'p(x) = x^2 - 2x - 3'}</M> und <M>{'g(x) = x + 1'}</M>.
+                  </p>
+                }
+                steps={[
+                  {
+                    title: 'Gleichsetzen',
+                    body: <MB>{'x^2 - 2x - 3 = x + 1'}</MB>,
+                  },
+                  {
+                    title: 'Auf Null bringen',
+                    body: (
+                      <>
+                        <MB>{'\\begin{aligned} x^2 - 2x - 3 &= x + 1 && \\mid -x \\mid -1 \\\\ x^2 - 3x - 4 &= 0 \\end{aligned}'}</MB>
+                        <p>
+                          Jetzt kannst du ablesen: <M>{'a = 1'}</M>, <M>{'b = -3'}</M>, <M>{'c = -4'}</M>.
+                        </p>
+                      </>
+                    ),
+                  },
+                  {
+                    title: 'Mitternachtsformel',
+                    body: <MB>{'x_{1,2} = \\frac{3 \\pm \\sqrt{(-3)^2 - 4 \\cdot 1 \\cdot (-4)}}{2 \\cdot 1} = \\frac{3 \\pm \\sqrt{25}}{2} = \\frac{3 \\pm 5}{2} \;\\Rightarrow\; x_1 = 4,\; x_2 = -1'}</MB>,
+                  },
+                  {
+                    title: 'y-Werte mit der Geraden',
+                    body: (
+                      <>
+                        <MB>{'g(4) = 4 + 1 = 5 \\qquad g(-1) = -1 + 1 = 0'}</MB>
+                        <p>
+                          Probe mit der Parabel: <M>{'p(4) = 16 - 8 - 3 = 5'}</M> ✓ und <M>{'p(-1) = 1 + 2 - 3 = 0'}</M> ✓
+                        </p>
+                      </>
+                    ),
+                  },
+                  {
+                    title: 'Antwort',
+                    body: <MB>{'S_1(4 \\mid 5) \\qquad S_2(-1 \\mid 0)'}</MB>,
+                  },
+                ]}
+              />
+              <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
+            </div>
+
             <LabKarte no={2} title="Nachrechnen für t = 2" level="standard">
               <CheckCard
                 title="Rechnerisch prüfen"
                 prompt={
                   <>
                     <p>
-                      Die Tabelle zeigt für <M>{'t = 2'}</M> zwei Punkte. Berechnet sie jetzt genau. Setzt dazu <M>{'p(x) = g(x)'}</M> gleich:
+                      Die Tabelle zeigt für <M>{'t = 2'}</M> zwei Punkte. Berechnet sie jetzt genau und geht dabei Schritt für Schritt vor wie im Beispiel der Infokarte:
                     </p>
-                    <MB>{'-0{,}25x^2 + 2x = 0{,}5x + 2'}</MB>
                     <p>
-                      Bringt alles auf die linke Seite, sodass die Gleichung <M>{'ax^2 + bx + c = 0'}</M> entsteht, und löst sie mit der abc-Formel. Haltet eure Rechenwege
-                      schriftlich fest.
+                      Sprungbahn <M>{'p(x) = -0{,}25x^2 + 2x'}</M>, Lichtschranke <M>{'g(x) = 0{,}5x + 2'}</M>.
                     </p>
+                    <ol className="lp-hint">
+                      <li>Gleichsetzen und alles auf eine Seite bringen. Lest dann <M>a</M>, <M>b</M> und <M>c</M> ab.</li>
+                      <li>x-Werte mit der Mitternachtsformel berechnen.</li>
+                      <li>y-Werte mit der Geradengleichung berechnen.</li>
+                    </ol>
+                    <p>Haltet eure Rechenwege schriftlich fest.</p>
                   </>
                 }
                 fieldsRow
@@ -412,30 +503,40 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   { kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: -0.25 },
                   { kind: 'num', key: 'b', label: <M>{'b ='}</M>, expected: 1.5 },
                   { kind: 'num', key: 'c', label: <M>{'c ='}</M>, expected: -2 },
-                  { kind: 'num', key: 'd', label: <M>{'D = b^2 - 4ac ='}</M>, expected: 0.25 },
                   { kind: 'num', key: 'x1', label: <>kleinere Lösung <M>{'x_1 ='}</M></>, expected: 2 },
                   { kind: 'num', key: 'x2', label: <>größere Lösung <M>{'x_2 ='}</M></>, expected: 4 },
+                  { kind: 'num', key: 'y1', label: <><M>{'y_1 ='}</M></>, expected: 3 },
+                  { kind: 'num', key: 'y2', label: <><M>{'y_2 ='}</M></>, expected: 4 },
                 ]}
                 solution={
                   <>
+                    <p>Gleichsetzen und auf Null bringen:</p>
                     <MB>{'\\begin{aligned} -0{,}25x^2 + 2x &= 0{,}5x + 2 && \\mid -0{,}5x \\mid -2 \\\\ -0{,}25x^2 + 1{,}5x - 2 &= 0 \\end{aligned}'}</MB>
                     <p>
-                      Also <M>{'a = -0{,}25'}</M>, <M>{'b = 1{,}5'}</M>, <M>{'c = -2'}</M>.
+                      Also <M>{'a = -0{,}25'}</M>, <M>{'b = 1{,}5'}</M>, <M>{'c = -2'}</M>. Mitternachtsformel:
                     </p>
-                    <MB>{'D = 1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-2) = 2{,}25 - 2 = 0{,}25'}</MB>
-                    <MB>{'x_{1,2} = \\frac{-1{,}5 \\pm \\sqrt{0{,}25}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm 0{,}5}{-0{,}5} \\;\\Rightarrow\\; x_1 = 2,\\; x_2 = 4'}</MB>
-                    <p>Die zwei Lösungen entsprechen den zwei gelben Punkten im Bild.</p>
+                    <MB>{'x_{1,2} = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-2)}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm \\sqrt{0{,}25}}{-0{,}5} = \\frac{-1{,}5 \\pm 0{,}5}{-0{,}5}'}</MB>
+                    <MB>{'x_1 = 2 \\qquad x_2 = 4'}</MB>
+                    <MB>{'y_1 = g(2) = 0{,}5 \\cdot 2 + 2 = 3 \\qquad y_2 = g(4) = 0{,}5 \\cdot 4 + 2 = 4'}</MB>
+                    <p>
+                      Die Schnittpunkte sind <M>{'S_1(2 \\mid 3)'}</M> und <M>{'S_2(4 \\mid 4)'}</M>. Das passt zu den zwei gelben Punkten im Bild.
+                    </p>
                   </>
                 }
                 help={
                   <Hilfen
                     steps={[
-                      <>Auf welcher Seite soll am Ende die 0 stehen? Was musst du dafür auf beiden Seiten abziehen?</>,
                       <>
-                        Ziehe auf beiden Seiten <M>{'0{,}5x'}</M> und <M>{'2'}</M> ab und fasse die x-Terme zusammen: <M>{'2x - 0{,}5x'}</M>.
+                        Schlagt in der Infokarte das Beispiel auf. Dort steht <M>{'x^2 - 2x - 3 = x + 1'}</M> in Schritt 1 und <M>{'x^2 - 3x - 4 = 0'}</M> in Schritt 2. Genauso macht ihr aus{' '}
+                        <M>{'-0{,}25x^2 + 2x = 0{,}5x + 2'}</M> eine Gleichung mit 0 auf der rechten Seite.
                       </>,
                       <>
-                        Es entsteht <M>{'-0{,}25x^2 + 1{,}5x - 2 = 0'}</M>. Beachte beim Einsetzen in <M>{'D = b^2 - 4ac'}</M>, dass <M>a</M> und <M>c</M> negativ sind.
+                        Zieht auf beiden Seiten <M>{'0{,}5x'}</M> und <M>{'2'}</M> ab. Danach fasst ihr die x-Terme zusammen: <M>{'2x - 0{,}5x'}</M>. Die Zahl vor <M>{'x^2'}</M> ist <M>a</M>, die Zahl
+                        vor <M>x</M> ist <M>b</M> und die Zahl ohne x ist <M>c</M>.
+                      </>,
+                      <>
+                        Es entsteht <M>{'-0{,}25x^2 + 1{,}5x - 2 = 0'}</M>. Setzt in die Formel ein, mit Klammern bei negativen Zahlen:{' '}
+                        <M>{'x_{1,2} = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-2)}}{2 \\cdot (-0{,}25)}'}</M>
                       </>,
                     ]}
                   />
@@ -445,14 +546,15 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 title="Zusammenhang entdecken"
                 prompt={
                   <p>
-                    Für <M>{'t = 2'}</M> habt ihr <M>{'D = 0{,}25'}</M> berechnet und zwei Lösungen gefunden. Was vermutet ihr: Wie hängt <M>D</M> mit der Anzahl der Schnittpunkte zusammen?
+                    In eurer Rechnung stand unter der Wurzel die Zahl <M>{'0{,}25'}</M>, und ihr habt zwei Lösungen bekommen. Bei <M>{'t = 3'}</M> gibt es im Bild keinen Punkt, bei{' '}
+                    <M>{'t = 2{,}25'}</M> genau einen. Was entscheidet in der Mitternachtsformel darüber, ob es zwei, eine oder keine Lösung gibt?
                   </p>
                 }
                 options={[
-                  { text: 'Die Anzahl der Lösungen der Gleichung ist die Anzahl der Schnittpunkte. Und D zeigt, ob es zwei, eine oder keine Lösung gibt.', correct: true, feedback: 'Genau. Eine Lösung der Gleichung ist ein x-Wert, an dem Parabel und Gerade denselben y-Wert haben.' },
-                  { text: 'D ist die Anzahl der Schnittpunkte.', feedback: 'D ist eine Zahl unter der Wurzel, zum Beispiel 0,25. Die Anzahl der Schnittpunkte kann nur 0, 1 oder 2 sein.' },
-                  { text: 'Schnittpunkte gibt es nur, wenn D eine ganze Zahl ist.', feedback: 'D = 0,25 ist keine ganze Zahl, und trotzdem gibt es zwei Schnittpunkte.' },
-                  { text: 'Die Rechnung hat mit den Schnittpunkten nichts zu tun, man muss sie trotzdem im Bild zählen.', feedback: 'Doch: Beim Gleichsetzen suchst du die x-Werte, an denen beide y-Werte gleich sind. Das sind genau die Schnittpunkte.' },
+                  { text: 'Die Zahl unter der Wurzel: Ist sie positiv, gibt es zwei Lösungen, ist sie 0, eine Lösung, ist sie negativ, keine Lösung.', correct: true, feedback: 'Genau. Bei √0 fällt das ± weg, und bei einer negativen Zahl lässt sich die Wurzel nicht ziehen. Jede Lösung ist ein Schnittpunkt.' },
+                  { text: 'Der Wert von a: Ist a negativ, gibt es immer zwei Lösungen.', feedback: 'a ist in allen Versuchen negativ (−0,25) und trotzdem ändert sich die Anzahl der Punkte. Es kommt auf die Zahl unter der Wurzel an.' },
+                  { text: 'Der Nenner 2a: Nur wenn er ganzzahlig ist, gibt es Lösungen.', feedback: 'Der Nenner hier ist −0,5 und es gibt trotzdem zwei Lösungen. Entscheidend ist, was unter der Wurzel steht.' },
+                  { text: 'Nichts: Eine Gleichung hat immer genau zwei Lösungen, man muss nur richtig rechnen.', feedback: 'Bei einer negativen Zahl unter der Wurzel gibt es keine Lösung, bei 0 nur eine.' },
                 ]}
               />
             </LabKarte>
@@ -463,44 +565,43 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 prompt={
                   <>
                     <p>
-                      Jetzt ist <M>t</M> unbekannt. Setzt <M>{'p(x) = g(x)'}</M> gleich und bringt alles auf eine Seite:
+                      Jetzt ist <M>t</M> unbekannt. Gleichsetzen und auf Null bringen ergibt:
                     </p>
                     <MB>{'-0{,}25x^2 + 1{,}5x - t = 0'}</MB>
                     <p>
-                      Berechnet <M>D</M> in Abhängigkeit von <M>t</M> und bestimmt, für welches <M>t</M> es genau einen Schnittpunkt gibt. Gebt dann den Berührpunkt an. Haltet
-                      eure Rechenwege schriftlich fest und beschreibt im Heft, was für größere <M>t</M> gilt.
+                      Setzt <M>{'a = -0{,}25'}</M>, <M>{'b = 1{,}5'}</M> und <M>{'c = -t'}</M> in die Mitternachtsformel ein und vereinfacht die Zahl unter der Wurzel. Findet dann heraus, für
+                      welches <M>t</M> es genau eine Lösung gibt, und berechnet den Berührpunkt. Haltet eure Rechenwege schriftlich fest und beschreibt im Heft, was für größere <M>t</M> gilt.
                     </p>
                   </>
                 }
                 fieldsRow
                 fields={[
-                  { kind: 'num', key: 'd0', label: <><M>D</M> bei <M>{'t = 0'}</M>:</>, expected: 2.25 },
+                  { kind: 'num', key: 'u0', label: <>Zahl unter der Wurzel bei <M>{'t = 0'}</M>:</>, expected: 2.25 },
                   { kind: 'num', key: 't', label: <>Berührhöhe <M>{'t ='}</M></>, expected: T_TOUCH, unit: 'm' },
                   { kind: 'num', key: 'x', label: <>Berührpunkt <M>{'x ='}</M></>, expected: 3 },
                   { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 3.75 },
                 ]}
                 solution={
                   <>
-                    <MB>{'D = 1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-t) = 2{,}25 - t'}</MB>
+                    <MB>{'x_{1,2} = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-t)}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm \\sqrt{2{,}25 - t}}{-0{,}5}'}</MB>
                     <p>
-                      Genau ein Schnittpunkt heißt <M>{'D = 0'}</M>, also <M>{'2{,}25 - t = 0'}</M> und damit <M>{'t = 2{,}25'}</M>.
+                      Genau eine Lösung gibt es, wenn die Wurzel 0 ist, denn dann fällt das ± weg: <M>{'2{,}25 - t = 0'}</M>, also <M>{'t = 2{,}25'}</M>.
                     </p>
-                    <p>Bei D = 0 ist die Wurzel 0, es bleibt eine Lösung:</p>
-                    <MB>{'x = \\frac{-1{,}5}{2 \\cdot (-0{,}25)} = 3 \\qquad y = g(3) = 0{,}5 \\cdot 3 + 2{,}25 = 3{,}75'}</MB>
+                    <MB>{'x = \\frac{-1{,}5}{-0{,}5} = 3 \\qquad y = g(3) = 0{,}5 \\cdot 3 + 2{,}25 = 3{,}75'}</MB>
                     <p>
-                      Der Berührpunkt ist <M>{'B(3 \\mid 3{,}75)'}</M>. Für <M>{'t > 2{,}25'}</M> ist <M>{'D < 0'}</M>, es gibt keine Lösung und keinen Schnittpunkt.
+                      Der Berührpunkt ist <M>{'B(3 \\mid 3{,}75)'}</M>. Für <M>{'t > 2{,}25'}</M> steht unter der Wurzel eine negative Zahl: keine Lösung und kein Schnittpunkt.
                     </p>
                   </>
                 }
                 help={
                   <Hilfen
                     steps={[
-                      <>Was bedeutet „genau ein Schnittpunkt“ für die Anzahl der Lösungen der Gleichung, und was für D?</>,
+                      <>Schaut euch die Mitternachtsformel an: Wann liefert das „±“ nur noch eine einzige Lösung, weil beide Seiten gleich sind? Überlegt, was dafür unter der Wurzel stehen muss.</>,
                       <>
-                        Setze <M>{'a = -0{,}25'}</M>, <M>{'b = 1{,}5'}</M> und <M>{'c = -t'}</M> in <M>{'D = b^2 - 4ac'}</M> ein. Das Ergebnis enthält noch das <M>t</M>.
+                        Setzt in <M>{'b^2 - 4ac'}</M> ein: <M>{'1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-t)'}</M>. Rechnet <M>{'1{,}5^2'}</M> und <M>{'4 \\cdot (-0{,}25) \\cdot (-t)'}</M> getrennt aus. Das <M>t</M> bleibt dabei stehen.
                       </>,
                       <>
-                        <M>{'D = 2{,}25 - t'}</M>. Setze <M>{'D = 0'}</M> und löse nach <M>t</M> auf. Bei D = 0 gilt <M>{'x = \\frac{-b}{2a}'}</M>.
+                        Unter der Wurzel steht <M>{'2{,}25 - t'}</M>. Setzt diesen Term gleich 0 und löst nach <M>t</M> auf. Bei Wurzel 0 bleibt <M>{'x = \\frac{-b}{2a}'}</M>, danach den y-Wert mit der Geraden berechnen.
                       </>,
                     ]}
                   />
@@ -510,7 +611,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
           </Phase>
 
           {/* 4 Austausch */}
-          <Phase no={4} title="Vergleicht eure Ergebnisse" social="Plenum" minutes={5}>
+          <Phase no={4} title="Vergleicht eure Ergebnisse" social="Plenum" minutes={4}>
             <div className="ls-stop">
               <div className="ls-stop-title">
                 <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
@@ -518,7 +619,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
               <ul>
                 <li>Warum gibt es genau eine Höhe, bei der die Lichtschranke die Sprungbahn nur berührt?</li>
                 <li>Wie sicher kann man die Berührhöhe am Regler ablesen? Wie genau ist die Rechnung?</li>
-                <li>Was sagt das Vorzeichen von D über die Lichtschranke und die Sprungbahn?</li>
+                <li>Was passiert in der Mitternachtsformel, wenn die Zahl unter der Wurzel kleiner wird und schließlich negativ?</li>
               </ul>
             </div>
             <p>
@@ -539,12 +640,13 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <summary>Tarek hat gerechnet</summary>
                 <div className="ls-way-body">
                   <p>
-                    „Ich habe <M>{'p(x) = g(x)'}</M> gleichgesetzt und alles auf eine Seite gebracht. Dann habe ich D mit dem t darin ausgerechnet: <M>{'D = 2{,}25 - t'}</M>. Wenn t
-                    kleiner als 2,25 ist, ist D positiv, also gibt es zwei Lösungen. Bei <M>{'t = 2{,}25'}</M> ist D gleich 0, also eine Lösung. Danach ist D negativ, und die
-                    Wurzel gibt es nicht.“
+                    „Ich habe <M>{'p(x) = g(x)'}</M> gleichgesetzt und alles auf eine Seite gebracht. In der Mitternachtsformel stand dann unter der Wurzel <M>{'2{,}25 - t'}</M>. Solange t
+                    kleiner als 2,25 ist, ist das positiv, also gibt es zwei Lösungen. Bei <M>{'t = 2{,}25'}</M> steht unter der Wurzel 0, also nur eine Lösung. Danach ist die Zahl negativ,
+                    und die Wurzel gibt es nicht.“
                   </p>
                   <p>
-                    <strong>Gut:</strong> Man weiß genau, wann sich was ändert, auch ohne Zeichnung. <strong>Aber:</strong> Man muss sauber umformen, sonst stimmt D nicht.
+                    <strong>Gut:</strong> Man weiß genau, wann sich was ändert, auch ohne Zeichnung. <strong>Aber:</strong> Man muss sauber umformen und einsetzen, sonst stimmt die Zahl unter
+                    der Wurzel nicht.
                   </p>
                 </div>
               </details>
@@ -556,11 +658,8 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
           </Phase>
 
           {/* 5 Sichern */}
-          <Phase no={5} title="So findest du die Schnittpunkte" social="EA" minutes={8}>
+          <Phase no={5} title="Das hältst du fest" social="EA" minutes={8}>
             <Rueckbezug pred={pred} />
-            <p>
-              Du hast gesehen, dass die Gleichung <M>{'p(x) = g(x)'}</M> zwei, eine oder keine Lösung haben kann. Decke das Beispiel Schritt für Schritt auf.
-            </p>
             <Beispiel
               title="Wo löst der Sprung die Lichtschranke aus (t = 2)?"
               aufgabe={
@@ -583,30 +682,25 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   body: (
                     <>
                       <p>Alles auf eine Seite, rechts steht 0:</p>
-                      <MB>{'-0{,}25x^2 + 1{,}5x - 2 = 0 \\qquad (a = -0{,}25,\\; b = 1{,}5,\\; c = -2)'}</MB>
+                      <MB>{'-0{,}25x^2 + 1{,}5x - 2 = 0 \\qquad (a = -0{,}25,\; b = 1{,}5,\; c = -2)'}</MB>
                     </>
                   ),
                 },
                 {
-                  title: 'D berechnen und Anzahl bestimmen',
+                  title: 'Mitternachtsformel',
                   body: (
                     <>
-                      <MB>{'D = b^2 - 4ac = 1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-2) = 0{,}25'}</MB>
+                      <MB>{'x_{1,2} = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-2)}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm \\sqrt{0{,}25}}{-0{,}5} = \\frac{-1{,}5 \\pm 0{,}5}{-0{,}5}'}</MB>
                       <p>
-                        <M>{'D > 0'}</M>: Es gibt zwei Lösungen, also zwei Schnittpunkte.
+                        Unter der Wurzel steht eine positive Zahl. Das ± liefert zwei verschiedene Lösungen: <M>{'x_1 = 2'}</M> und <M>{'x_2 = 4'}</M>.
                       </p>
                     </>
                   ),
                 },
                 {
-                  title: 'x-Werte mit der abc-Formel',
-                  body: <MB>{'x_{1,2} = \\frac{-1{,}5 \\pm \\sqrt{0{,}25}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm 0{,}5}{-0{,}5} \\;\\Rightarrow\\; x_1 = 2,\\; x_2 = 4'}</MB>,
-                },
-                {
                   title: 'y-Werte mit der Geradengleichung',
                   body: (
                     <>
-                      <p>Setze die x-Werte in die einfachere Gleichung (die Gerade) ein:</p>
                       <MB>{'g(2) = 0{,}5 \\cdot 2 + 2 = 3 \\qquad g(4) = 0{,}5 \\cdot 4 + 2 = 4'}</MB>
                       <p>
                         Probe mit der Parabel: <M>{'p(2) = -1 + 4 = 3'}</M> ✓ und <M>{'p(4) = -4 + 8 = 4'}</M> ✓
@@ -628,7 +722,6 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 },
               ]}
             />
-            <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
             <Merke title="Schnittpunkte von Parabel und Gerade">
               <p>
                 Eine Parabel <M>{'p(x) = ax^2 + bx + c'}</M> und eine Gerade <M>{'g(x) = mx + t'}</M> haben <strong>höchstens zwei</strong> gemeinsame Punkte.
@@ -638,20 +731,13 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   Gleichsetzen <M>{'p(x) = g(x)'}</M> und alles auf eine Seite bringen: <M>{'Ax^2 + Bx + C = 0'}</M>.
                 </li>
                 <li>
-                  <M>{'D = B^2 - 4AC'}</M> berechnen. Das sagt dir, wie viele Schnittpunkte es gibt:
+                  Mitternachtsformel anwenden: <M>{'x_{1,2} = \\frac{-B \\pm \\sqrt{B^2 - 4AC}}{2A}'}</M>. Die Zahl unter der Wurzel entscheidet über die Anzahl der Schnittpunkte:
                   <ul>
-                    <li>
-                      <M>{'D > 0'}</M>: zwei Schnittpunkte (Sekante)
-                    </li>
-                    <li>
-                      <M>{'D = 0'}</M>: genau ein Schnittpunkt, die Gerade berührt die Parabel (Tangente)
-                    </li>
-                    <li>
-                      <M>{'D < 0'}</M>: kein Schnittpunkt (Passante)
-                    </li>
+                    <li>positiv: zwei Lösungen, also zwei Schnittpunkte</li>
+                    <li>gleich 0: eine Lösung, also genau ein Schnittpunkt (die Gerade berührt die Parabel)</li>
+                    <li>negativ: keine Lösung, also kein Schnittpunkt</li>
                   </ul>
                 </li>
-                <li>Die x-Werte mit der abc-Formel berechnen.</li>
                 <li>
                   Die y-Werte berechnen, indem du die x-Werte in die Geradengleichung einsetzt. Schnittpunkte als <M>{'S(x \\mid y)'}</M> angeben.
                 </li>
@@ -663,8 +749,8 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
               <div className="ls-criteria">
                 {[
                   'Drei kleine Skizzen: Gerade schneidet die Parabel zweimal, berührt sie, verfehlt sie',
-                  'Die Rechenschritte in der richtigen Reihenfolge: gleichsetzen, auf Null bringen, D, abc-Formel, y-Werte',
-                  'Eine Tabelle: D > 0, D = 0, D < 0 mit der Anzahl der Schnittpunkte',
+                  'Die Rechenschritte in der richtigen Reihenfolge: gleichsetzen, auf Null bringen, Mitternachtsformel, y-Werte',
+                  'Eine Tabelle: Zahl unter der Wurzel positiv, 0, negativ mit der Anzahl der Schnittpunkte',
                   'Ein eigenes kurzes Beispiel mit Antwortsatz',
                 ].map((c) => (
                   <label key={c}>
@@ -676,21 +762,21 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
           </Phase>
 
           {/* 6 Check */}
-          <Phase no={6} title="Check: Hast du es verstanden?" social="EA" minutes={7}>
+          <Phase no={6} title="Check: Hast du es verstanden?" social="EA" minutes={6}>
             <div className="lp-exlist">
               <McCard
-                title="Check 1: Was sagt D?"
+                title="Check 1: Was bedeutet das Ergebnis?"
                 level="basis"
                 prompt={
                   <p>
-                    Beim Gleichsetzen einer Parabel und einer Geraden kommt <M>{'D = -3'}</M> heraus. Was bedeutet das?
+                    Du setzt eine Parabel und eine Gerade gleich und bringst alles auf eine Seite. In der Mitternachtsformel steht unter der Wurzel <M>{'-3'}</M>. Was bedeutet das?
                   </p>
                 }
                 options={[
-                  { text: 'Es gibt zwei Schnittpunkte, weil die Zahl 3 vorkommt.', feedback: 'Nicht die Zahl 3 zählt, sondern das Vorzeichen von D.' },
+                  { text: 'Es gibt zwei Schnittpunkte, weil die Zahl 3 vorkommt.', feedback: 'Nicht die Zahl 3 zählt, sondern das Vorzeichen der Zahl unter der Wurzel.' },
                   { text: 'Es gibt keinen Schnittpunkt.', correct: true, feedback: 'Aus einer negativen Zahl gibt es keine Wurzel, also keine x-Werte und keinen Schnittpunkt.' },
-                  { text: 'Man hat sich verrechnet, D darf nie negativ sein.', feedback: 'D darf negativ sein. Dann hat die Gleichung keine Lösung und Parabel und Gerade haben keinen gemeinsamen Punkt.' },
-                  { text: 'Es gibt genau einen Schnittpunkt bei x = −3.', feedback: 'D = −3 ist kein x-Wert. Einen Schnittpunkt gäbe es nur bei D = 0.' },
+                  { text: 'Man hat sich verrechnet, unter der Wurzel darf nie etwas Negatives stehen.', feedback: 'Das kann vorkommen. Dann hat die Gleichung keine Lösung, und Parabel und Gerade haben keinen gemeinsamen Punkt.' },
+                  { text: 'Es gibt genau einen Schnittpunkt bei x = −3.', feedback: 'Die −3 unter der Wurzel ist kein x-Wert. Einen Schnittpunkt gäbe es nur, wenn dort 0 stünde.' },
                 ]}
               />
               <McCard
@@ -700,14 +786,14 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   <>
                     <p>
                       Parabel <M>{'p(x) = x^2'}</M> und Gerade <M>{'g(x) = 2x - 1'}</M>. Mia sagt: „Eine Gerade und eine Parabel schneiden sich immer zweimal.“ Leon sagt: „Hier ist es
-                      nur ein Punkt.“ Rechne nach (Gleichsetzen, D, ggf. abc-Formel) und wähle die richtige Aussage.
+                      nur ein Punkt.“ Rechne nach (Gleichsetzen, Mitternachtsformel, y-Wert) und wähle die richtige Aussage.
                     </p>
                   </>
                 }
                 options={[
-                  { text: 'Mia hat recht: Es gibt zwei Schnittpunkte, x = 1 und x = −1.', feedback: 'Aus x² = 2x − 1 wird x² − 2x + 1 = 0 mit D = 0. Damit gibt es nur eine Lösung. Außerdem gibt es nicht immer zwei Schnittpunkte.' },
-                  { text: 'Leon hat recht: Es gibt genau einen Schnittpunkt S(1 | 1).', correct: true, feedback: 'D = (−2)² − 4 · 1 · 1 = 0, also x = 1 und y = g(1) = 1. Die Gerade berührt die Parabel in S(1 | 1).' },
-                  { text: 'Beide haben unrecht: Es gibt keinen Schnittpunkt, weil D = 0 ist.', feedback: 'D = 0 heißt nicht „keine Lösung“. Keine Lösung gibt es bei D < 0. Bei D = 0 gibt es genau eine Lösung.' },
+                  { text: 'Mia hat recht: Es gibt zwei Schnittpunkte, x = 1 und x = −1.', feedback: 'Aus x² = 2x − 1 wird x² − 2x + 1 = 0. In der Formel steht unter der Wurzel 4 − 4 = 0, also nur eine Lösung. Außerdem gibt es nicht immer zwei Schnittpunkte.' },
+                  { text: 'Leon hat recht: Es gibt genau einen Schnittpunkt S(1 | 1).', correct: true, feedback: 'x = (2 ± √(4 − 4)) / 2 = 1, und y = g(1) = 1. Die Gerade berührt die Parabel in S(1 | 1).' },
+                  { text: 'Beide haben unrecht: Es gibt keinen Schnittpunkt, weil unter der Wurzel 0 steht.', feedback: 'Wurzel aus 0 ist 0, das geht. Dann bleibt genau eine Lösung. Keine Lösung gibt es nur bei einer negativen Zahl unter der Wurzel.' },
                   { text: 'Leon hat recht, der Schnittpunkt ist x = 1.', feedback: 'Der x-Wert stimmt, aber ein Schnittpunkt hat zwei Koordinaten. Setze x = 1 noch in g(x) ein.' },
                 ]}
               />
@@ -717,8 +803,8 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 prompt={
                   <>
                     <p>
-                      Gegeben sind die Parabel <M>{'p(x) = x^2 + 3'}</M> und die Gerade <M>{'g(x) = 2x + t'}</M>. Für welches <M>t</M> berührt die Gerade die Parabel nur? Wo liegt
-                      der Berührpunkt? Halte deinen Rechenweg schriftlich fest.
+                      Gegeben sind die Parabel <M>{'p(x) = x^2 + 3'}</M> und die Gerade <M>{'g(x) = 2x + t'}</M>. Für welches <M>t</M> berührt die Gerade die Parabel nur, sodass es genau
+                      einen Schnittpunkt gibt? Wo liegt der Berührpunkt? Rechne mit der Mitternachtsformel und halte deinen Rechenweg schriftlich fest.
                     </p>
                   </>
                 }
@@ -731,11 +817,14 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 solution={
                   <>
                     <MB>{'\\begin{aligned} x^2 + 3 &= 2x + t && \\mid -2x \\mid -t \\\\ x^2 - 2x + (3 - t) &= 0 \\end{aligned}'}</MB>
-                    <MB>{'D = (-2)^2 - 4 \\cdot 1 \\cdot (3 - t) = 4 - 12 + 4t = 4t - 8'}</MB>
                     <p>
-                      Genau ein Schnittpunkt heißt <M>{'D = 0'}</M>: <M>{'4t - 8 = 0'}</M>, also <M>{'t = 2'}</M>.
+                      Also <M>{'a = 1'}</M>, <M>{'b = -2'}</M>, <M>{'c = 3 - t'}</M>. Mitternachtsformel:
                     </p>
-                    <MB>{'x_B = \\frac{-b}{2a} = \\frac{2}{2} = 1 \\qquad y_B = g(1) = 2 \\cdot 1 + 2 = 4'}</MB>
+                    <MB>{'x_{1,2} = \\frac{2 \\pm \\sqrt{(-2)^2 - 4 \\cdot 1 \\cdot (3 - t)}}{2} = \\frac{2 \\pm \\sqrt{4t - 8}}{2}'}</MB>
+                    <p>
+                      Genau eine Lösung gibt es, wenn die Wurzel 0 ist: <M>{'4t - 8 = 0'}</M>, also <M>{'t = 2'}</M>.
+                    </p>
+                    <MB>{'x_B = \\frac{2}{2} = 1 \\qquad y_B = g(1) = 2 \\cdot 1 + 2 = 4'}</MB>
                     <p>
                       Probe mit der Parabel: <M>{'p(1) = 1 + 3 = 4'}</M> ✓. Der Berührpunkt ist <M>{'B(1 \\mid 4)'}</M>.
                     </p>
@@ -744,12 +833,14 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 help={
                   <Hilfen
                     steps={[
-                      <>Was muss für D gelten, damit es genau einen Schnittpunkt gibt?</>,
+                      <>Wie in Versuch 3: Wann bleibt in der Mitternachtsformel nur eine Lösung übrig? Überlege, was dafür unter der Wurzel stehen muss.</>,
                       <>
-                        Setze gleich und bringe alles auf eine Seite. Dann ist <M>{'a = 1'}</M>, <M>{'b = -2'}</M> und <M>{'c = 3 - t'}</M>.
+                        Setze die Terme gleich und bringe alles auf eine Seite. Dann ist <M>{'a = 1'}</M>, <M>{'b = -2'}</M> und <M>{'c = 3 - t'}</M>. Setze das in die Formel ein und vereinfache
+                        nur die Zahl unter der Wurzel.
                       </>,
                       <>
-                        <M>{'D = 4 - 4(3 - t) = 4t - 8'}</M>. Setze D = 0. Den x-Wert findest du bei D = 0 mit <M>{'x = \\frac{-b}{2a}'}</M>.
+                        Unter der Wurzel steht <M>{'(-2)^2 - 4 \\cdot 1 \\cdot (3 - t) = 4t - 8'}</M>. Setze das gleich 0 und löse nach <M>t</M> auf. Dann gilt <M>{'x = \\frac{-b}{2a}'}</M>. Den y-Wert
+                        rechnest du mit der Geraden aus.
                       </>,
                     ]}
                   />
@@ -796,7 +887,7 @@ function Rueckbezug({ pred }: { pred: Prediction }) {
       </p>
       <p>
         Die größte Sensorhöhe mit Auslösung ist <strong>t = 2,25 m</strong>, dort berührt die Lichtschranke die Bahn genau einmal.{' '}
-        {diff < 1e-9 ? 'Deine Schätzung war genau richtig!' : `Deine Schätzung lag ${fmt(diff, 2)} m daneben.`} Die Rechnung hat gezeigt, warum: Dort ist <M>{'D = 0'}</M>.
+        {diff < 1e-9 ? 'Deine Schätzung war genau richtig!' : `Deine Schätzung lag ${fmt(diff, 2)} m daneben.`} Die Rechnung hat gezeigt, warum: Dort steht unter der Wurzel genau 0.
       </p>
     </div>
   )
