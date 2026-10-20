@@ -18,14 +18,15 @@ import './lab.css'
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
-// Seitenansicht des Skateparks, 1 LE = 1 m. Absprung bei (0|0), Landung bei (8|0), höchster Punkt (4|4).
-// Der Sensor der Lichtschranke steht am linken Pfosten in Höhe t, der Strahl steigt pro Meter um 0,5 m.
-const p = (x: number) => -0.25 * x * x + 2 * x
-const g = (t: number) => (x: number) => 0.5 * x + t
-/** Zahl unter der Wurzel in der Mitternachtsformel für p(x) = g(x), also −0,25x² + 1,5x − t = 0 */
-const wurzelterm = (t: number) => 2.25 - t
-const T_TOUCH = 2.25
-const T_MAX = 4
+// Seitenansicht des Skateparks, 1 LE = 1 m. Absprung von der 3 m hohen Rampe bei (0|3), Landung bei (6|0),
+// höchster Punkt (2|4). Der Sensor der Lichtschranke steht am linken Pfosten in Höhe t, der Strahl fällt pro Meter um 0,5 m.
+const p = (x: number) => -0.25 * x * x + x + 3
+const g = (t: number) => (x: number) => -0.5 * x + t
+/** Zahl unter der Wurzel in der Mitternachtsformel für p(x) = g(x), also −0,25x² + 1,5x + (3 − t) = 0 */
+const wurzelterm = (t: number) => 5.25 - t
+const T_TOUCH = 5.25
+const T_MIN = 3
+const T_MAX = 6.5
 
 /** gemeinsame Punkte von Sprungbahn und Lichtschranke */
 function schnitt(t: number): { x: number; y: number }[] {
@@ -47,11 +48,11 @@ const CHOICE_TEXT: Record<Choice, string> = {
 
 /* ── Sachbild: Skatepark von der Seite ───────────────────────────────────── */
 
-const S = { w: 640, h: 330, l: 44, r: 14, t: 12, b: 34, xMin: -1, xMax: 9, yMin: -0.6, yMax: 5 }
+const S = { w: 640, h: 330, l: 44, r: 14, t: 12, b: 34, xMin: -1, xMax: 9, yMin: -0.6, yMax: 7 }
 const bx = (x: number) => S.l + ((x - S.xMin) / (S.xMax - S.xMin)) * (S.w - S.l - S.r)
 const by = (y: number) => S.h - S.b - ((y - S.yMin) / (S.yMax - S.yMin)) * (S.h - S.t - S.b)
 
-const PARABEL = Array.from({ length: 81 }, (_, i) => i / 10)
+const PARABEL = Array.from({ length: 61 }, (_, i) => i / 10)
   .map((x) => `${bx(x)},${by(p(x))}`)
   .join(' ')
 
@@ -68,7 +69,7 @@ function SkateBild({ t, punkte = true }: { t: number; punkte?: boolean }) {
             <rect x={bx(S.xMin)} y={S.t} width={bx(S.xMax) - bx(S.xMin)} height={by(S.yMin) - S.t} />
           </clipPath>
         </defs>
-        {Array.from({ length: 10 }, (_, i) => i).map((v) => (
+        {Array.from({ length: 9 }, (_, i) => i).map((v) => (
           <g key={`x${v}`}>
             <line x1={bx(v)} x2={bx(v)} y1={by(0)} y2={by(S.yMax)} stroke="var(--grid)" />
             <text x={bx(v)} y={by(0) + 24} textAnchor="middle" fontSize="19" fill="var(--ink-muted)">
@@ -76,7 +77,7 @@ function SkateBild({ t, punkte = true }: { t: number; punkte?: boolean }) {
             </text>
           </g>
         ))}
-        {[1, 2, 3, 4].map((v) => (
+        {[1, 2, 3, 4, 5, 6].map((v) => (
           <g key={`y${v}`}>
             <line x1={bx(0)} x2={bx(S.xMax)} y1={by(v)} y2={by(v)} stroke="var(--grid)" />
             <text x={bx(0) - 8} y={by(v) + 6} textAnchor="end" fontSize="19" fill="var(--ink-muted)">
@@ -96,16 +97,22 @@ function SkateBild({ t, punkte = true }: { t: number; punkte?: boolean }) {
           {/* Sprungbahn */}
           <polyline points={PARABEL} fill="none" stroke="var(--primary)" strokeWidth="4" strokeLinecap="round" />
         </g>
+        {/* Absprungrampe */}
+        <rect x={bx(-1)} y={by(3)} width={bx(0) - bx(-1)} height={by(0) - by(3)} fill="var(--surface-sunken)" stroke="var(--ink)" strokeWidth="2" />
+        <text x={(bx(-1) + bx(0)) / 2 + 2} y={by(1.5)} textAnchor="middle" fontSize="12" fontWeight="700" fill="var(--ink)">
+          Rampe
+        </text>
         {/* Sensor am Pfosten */}
+        <line x1={bx(0)} y1={by(3)} x2={bx(0)} y2={by(t)} stroke="var(--ink)" strokeWidth="3" />
         <rect x={bx(0) - 9} y={by(t) - 12} width="18" height="24" rx="3" fill="var(--ink)" />
-        <text x={bx(0) + 16} y={by(t) + 28} fontSize="15" fontWeight="700" fill="var(--ink)">
+        <text x={bx(0) + 14} y={by(t) - 14} fontSize="15" fontWeight="700" fill="var(--ink)">
           Sensor
         </text>
-        <text x={bx(1.2)} y={by(p(1.2)) - 14} fontSize="24" fontWeight="700" fill="var(--primary)">
+        <text x={bx(4.7)} y={by(p(4.7)) - 14} fontSize="24" fontWeight="700" fill="var(--primary)">
           p
         </text>
-        {gt(2.2) < S.yMax - 0.3 && (
-          <text x={bx(2.2)} y={by(gt(2.2)) - 12} fontSize="24" fontWeight="700" fill="var(--hint)">
+        {gt(6.6) > 0.3 && (
+          <text x={bx(6.6)} y={by(gt(6.6)) - 12} fontSize="24" fontWeight="700" fill="var(--hint)">
             g
           </text>
         )}
@@ -137,7 +144,7 @@ function LabKarte({ no, title, level, children }: { no: number; title: string; l
 /** Regler für die Sensorhöhe mit Bild und Anzeige */
 function LabRegler() {
   const sliderId = useId()
-  const [t, setT] = useState(1)
+  const [t, setT] = useState(4)
   const n = schnitt(t).length
   return (
     <div className="lp-ex bk-panel">
@@ -154,7 +161,7 @@ function LabRegler() {
         <input
           id={sliderId}
           type="range"
-          min={0}
+          min={T_MIN}
           max={T_MAX}
           step={0.25}
           value={t}
@@ -163,7 +170,7 @@ function LabRegler() {
       </div>
       <div className="ls-readout">
         <div className="ls-readout-box ls-readout-b">
-          <strong>Lichtschranke:</strong> <M>{`g(x) = 0{,}5x + ${tx(t)}`}</M>
+          <strong>Lichtschranke:</strong> <M>{`g(x) = -0{,}5x + ${tx(t)}`}</M>
         </div>
         <div className="ls-readout-box ls-readout-a">
           <strong>gelbe Punkte im Bild:</strong> {n}
@@ -182,12 +189,12 @@ function zaehlFeld(expected: number, key: number) {
   )
 }
 
-const VERSUCHE = [0, 1, 2, 2.25, 3]
+const VERSUCHE = [3, 4, 5, 5.25, 6]
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erklaerung: ReactNode; onBack: () => void; onPractice: () => void }) {
-  const [pred, setPred] = useState<Prediction>({ choice: null, tGrenze: 2, saved: false })
+  const [pred, setPred] = useState<Prediction>({ choice: null, tGrenze: 4.5, saved: false })
 
   return (
     <ErklaerungCtx.Provider value={erklaerung}>
@@ -214,14 +221,14 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 title="a) Punktprobe bei einer Parabel"
                 prompt={
                   <p>
-                    Liegt der Punkt <M>{'P(2 \\mid 3)'}</M> auf der Parabel <M>{'p(x) = -0{,}25x^2 + 2x'}</M>? Halte deinen Rechenweg schriftlich fest.
+                    Liegt der Punkt <M>{'P(2 \\mid 4)'}</M> auf der Parabel <M>{'p(x) = -0{,}25x^2 + x + 3'}</M>? Halte deinen Rechenweg schriftlich fest.
                   </p>
                 }
                 fields={[{ kind: 'select', key: 'p', label: 'Antwort', options: ['Ja', 'Nein'], expected: 0 }]}
                 solution={
                   <>
                     <p>x-Wert einsetzen und mit dem y-Wert vergleichen:</p>
-                    <MB>{'p(2) = -0{,}25 \\cdot 2^2 + 2 \\cdot 2 = -1 + 4 = 3 \;\\checkmark'}</MB>
+                    <MB>{'p(2) = -0{,}25 \\cdot 2^2 + 2 + 3 = -1 + 2 + 3 = 4 \;\\checkmark'}</MB>
                     <p>Der y-Wert stimmt, also liegt P auf der Parabel.</p>
                   </>
                 }
@@ -230,11 +237,11 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 title="b) y-Wert einer Geraden berechnen"
                 prompt={
                   <p>
-                    Eine Gerade hat die Gleichung <M>{'g(x) = 0{,}5x + 2'}</M>. Berechne den y-Wert an der Stelle <M>{'x = 6'}</M>. Halte deinen Rechenweg schriftlich fest.
+                    Eine Gerade hat die Gleichung <M>{'g(x) = -0{,}5x + 5'}</M>. Berechne den y-Wert an der Stelle <M>{'x = 4'}</M>. Halte deinen Rechenweg schriftlich fest.
                   </p>
                 }
-                fields={[{ kind: 'num', key: 'y', label: <M>{'g(6) ='}</M>, expected: 5 }]}
-                solution={<MB>{'g(6) = 0{,}5 \\cdot 6 + 2 = 3 + 2 = 5'}</MB>}
+                fields={[{ kind: 'num', key: 'y', label: <M>{'g(4) ='}</M>, expected: 3 }]}
+                solution={<MB>{'g(4) = -0{,}5 \\cdot 4 + 5 = -2 + 5 = 3'}</MB>}
               />
               <CheckCard
                 title="c) Quadratische Gleichung lösen"
@@ -279,17 +286,17 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <Phase no={2} title="Die Situation: Trick-Contest im Skatepark" social="EA" minutes={5}>
             <p>
               Im Skatepark wird ein Trick-Contest veranstaltet. Eine Lichtschranke misst, ob ein Sprung eine bestimmte Linie kreuzt. Das Bild zeigt den Park von der Seite
-              (1 Kästchen = 1 m). Der Sprung startet bei <M>{'x = 0'}</M> und landet bei <M>{'x = 8'}</M>. Die Wertung zählt jeden Punkt, an dem die Sprungbahn die Linie der
+              (1 Kästchen = 1 m). Der Sprung startet von einer 3 m hohen Rampe bei <M>{'x = 0'}</M> und landet bei <M>{'x = 6'}</M>. Die Wertung zählt jeden Punkt, an dem die Sprungbahn die Linie der
               Lichtschranke kreuzt.
             </p>
-            <SkateBild t={1} punkte={false} />
+            <SkateBild t={4} punkte={false} />
             <div className="ls-flyers">
               <div className="ls-flyer ls-flyer-a">
                 <div className="ls-flyer-name">Sprungbahn</div>
                 <div className="ls-flyer-price">
                   Parabel{' '}
                   <strong>
-                    <M>{'p(x) = -0{,}25x^2 + 2x'}</M>
+                    <M>{'p(x) = -0{,}25x^2 + x + 3'}</M>
                   </strong>
                 </div>
               </div>
@@ -298,11 +305,11 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <div className="ls-flyer-price">
                   Gerade{' '}
                   <strong>
-                    <M>{'g(x) = 0{,}5x + t'}</M>
+                    <M>{'g(x) = -0{,}5x + t'}</M>
                   </strong>
                 </div>
                 <div className="ls-flyer-sub">
-                  <M>t</M> ist die Höhe des Sensors am linken Pfosten. Im Bild ist <M>{'t = 1'}</M> m.
+                  <M>t</M> ist die Höhe des Sensors am linken Pfosten. Im Bild ist <M>{'t = 4'}</M> m.
                 </div>
               </div>
             </div>
@@ -316,7 +323,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
               {pred.saved && pred.choice ? (
                 <>
                   <div className="ls-saved" role="status">
-                    <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: <strong>{CHOICE_TEXT[pred.choice]}</strong> (bei <M>{'t = 1'}</M>). Deine Schätzung: Bis{' '}
+                    <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: <strong>{CHOICE_TEXT[pred.choice]}</strong> (bei <M>{'t = 4'}</M>). Deine Schätzung: Bis{' '}
                     <strong>t ≈ {fmt(pred.tGrenze, 2)} m</strong> löst der Sprung die Schranke noch aus. Am Ende schauen wir, ob du recht hattest.
                   </div>
                   <div>
@@ -328,7 +335,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
               ) : (
                 <>
                   <p>Rechne noch nicht! Entscheide spontan und schreibe einen Satz als Begründung in dein Heft.</p>
-                  <div className="ls-options" role="radiogroup" aria-label="Vermutung für t = 1">
+                  <div className="ls-options" role="radiogroup" aria-label="Vermutung für t = 4">
                     {(['null', 'eins', 'zwei'] as const).map((c) => (
                       <label key={c} className="bk-choice ls-option">
                         <input type="radio" name="lab-pred" checked={pred.choice === c} onChange={() => setPred({ ...pred, choice: c })} />
@@ -343,7 +350,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                     <input
                       id="lab-pred-t"
                       type="range"
-                      min={0}
+                      min={T_MIN}
                       max={T_MAX}
                       step={0.25}
                       value={pred.tGrenze}
@@ -381,14 +388,13 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                     ]}
                   />
                 </div>
-                <p className="lp-hint">Bei t = 2,25 m sieht man im Bild nur einen Punkt. Versucht auch Höhen knapp darüber und darunter: 2 m und 2,5 m.</p>
+                <p className="lp-hint">Bei t = 5,25 m sieht man im Bild nur einen Punkt. Schaut auch knapp darüber und darunter: 5 m und 5,5 m.</p>
                 <Hilfen
                   steps={[
                     <>Stellt den Regler auf den Wert aus der Tabelle und zählt nur die gelben Punkte, in denen die Sprungbahn und die gestrichelte Linie wirklich zusammentreffen.</>,
                     <>Geht die Tabelle von links nach rechts durch. Schiebt den Regler dazu jeweils genau auf die Höhe in der Spalte, zum Beispiel erst auf 0, dann auf 1.</>,
                     <>
-                      Bei <M>{'t = 0'}</M> startet die Linie im Absprungpunkt <M>{'(0 \\mid 0)'}</M> und kreuzt die Bahn noch ein zweites Mal weiter rechts. Das sind zwei Punkte, also tragt ihr
-                      eine 2 ein.
+                      Bei <M>{'t = 3'}</M> startet die Linie im Absprungpunkt <M>{'(0 \\mid 3)'}</M> und endet im Landepunkt <M>{'(6 \\mid 0)'}</M>. Das sind zwei Punkte, also tragt ihr eine 2 ein.
                     </>,
                   ]}
                 />
@@ -398,8 +404,8 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 prompt={<p>Was passiert, wenn der Sensor immer höher gestellt wird? Wähle die Beobachtung, die zu eurer Tabelle passt.</p>}
                 options={[
                   { text: 'Erst zwei gemeinsame Punkte, dann genau ein Punkt, dann kein Punkt.', correct: true, feedback: 'Zwischen „zwei“ und „keiner“ liegt genau eine Höhe, bei der die Gerade die Parabel nur berührt.' },
-                  { text: 'Erst zwei gemeinsame Punkte, dann plötzlich kein Punkt mehr.', feedback: 'Schaut noch einmal bei t = 2,25 m nach: Dort gibt es genau einen Punkt, die Lichtschranke berührt die Sprungbahn nur.' },
-                  { text: 'Es gibt immer zwei gemeinsame Punkte, egal wie hoch der Sensor steht.', feedback: 'Bei t = 3 m ist die Lichtschranke über der ganzen Sprungbahn, dort gibt es keinen gemeinsamen Punkt.' },
+                  { text: 'Erst zwei gemeinsame Punkte, dann plötzlich kein Punkt mehr.', feedback: 'Schaut noch einmal bei t = 5,25 m nach: Dort gibt es genau einen Punkt, die Lichtschranke berührt die Sprungbahn nur.' },
+                  { text: 'Es gibt immer zwei gemeinsame Punkte, egal wie hoch der Sensor steht.', feedback: 'Bei t = 6 m ist die Lichtschranke über der ganzen Sprungbahn, dort gibt es keinen gemeinsamen Punkt.' },
                   { text: 'Erst kein Punkt, dann ein Punkt, dann zwei Punkte.', feedback: 'Die Reihenfolge ist umgekehrt: Je höher der Sensor, desto weniger Punkte.' },
                 ]}
               />
@@ -479,16 +485,16 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
               <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
             </div>
 
-            <LabKarte no={2} title="Nachrechnen für t = 2" level="standard">
+            <LabKarte no={2} title="Nachrechnen für t = 5" level="standard">
               <CheckCard
                 title="Rechnerisch prüfen"
                 prompt={
                   <>
                     <p>
-                      Die Tabelle zeigt für <M>{'t = 2'}</M> zwei Punkte. Berechnet sie jetzt genau und geht dabei Schritt für Schritt vor wie im Beispiel der Infokarte:
+                      Die Tabelle zeigt für <M>{'t = 5'}</M> zwei Punkte. Berechnet sie jetzt genau und geht dabei Schritt für Schritt vor wie im Beispiel der Infokarte:
                     </p>
                     <p>
-                      Sprungbahn <M>{'p(x) = -0{,}25x^2 + 2x'}</M>, Lichtschranke <M>{'g(x) = 0{,}5x + 2'}</M>.
+                      Sprungbahn <M>{'p(x) = -0{,}25x^2 + x + 3'}</M>, Lichtschranke <M>{'g(x) = -0{,}5x + 5'}</M>.
                     </p>
                     <ol className="lp-hint">
                       <li>Gleichsetzen und alles auf eine Seite bringen. Lest dann <M>a</M>, <M>b</M> und <M>c</M> ab.</li>
@@ -505,21 +511,21 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   { kind: 'num', key: 'c', label: <M>{'c ='}</M>, expected: -2 },
                   { kind: 'num', key: 'x1', label: <>kleinere Lösung <M>{'x_1 ='}</M></>, expected: 2 },
                   { kind: 'num', key: 'x2', label: <>größere Lösung <M>{'x_2 ='}</M></>, expected: 4 },
-                  { kind: 'num', key: 'y1', label: <><M>{'y_1 ='}</M></>, expected: 3 },
-                  { kind: 'num', key: 'y2', label: <><M>{'y_2 ='}</M></>, expected: 4 },
+                  { kind: 'num', key: 'y1', label: <><M>{'y_1 ='}</M></>, expected: 4 },
+                  { kind: 'num', key: 'y2', label: <><M>{'y_2 ='}</M></>, expected: 3 },
                 ]}
                 solution={
                   <>
                     <p>Gleichsetzen und auf Null bringen:</p>
-                    <MB>{'\\begin{aligned} -0{,}25x^2 + 2x &= 0{,}5x + 2 && \\mid -0{,}5x \\mid -2 \\\\ -0{,}25x^2 + 1{,}5x - 2 &= 0 \\end{aligned}'}</MB>
+                    <MB>{'\\begin{aligned} -0{,}25x^2 + x + 3 &= -0{,}5x + 5 && \\mid +0{,}5x \\mid -5 \\\\ -0{,}25x^2 + 1{,}5x - 2 &= 0 \\end{aligned}'}</MB>
                     <p>
                       Also <M>{'a = -0{,}25'}</M>, <M>{'b = 1{,}5'}</M>, <M>{'c = -2'}</M>. Mitternachtsformel:
                     </p>
                     <MB>{'x_{1,2} = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-2)}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm \\sqrt{0{,}25}}{-0{,}5} = \\frac{-1{,}5 \\pm 0{,}5}{-0{,}5}'}</MB>
                     <MB>{'x_1 = 2 \\qquad x_2 = 4'}</MB>
-                    <MB>{'y_1 = g(2) = 0{,}5 \\cdot 2 + 2 = 3 \\qquad y_2 = g(4) = 0{,}5 \\cdot 4 + 2 = 4'}</MB>
+                    <MB>{'y_1 = g(2) = -0{,}5 \\cdot 2 + 5 = 4 \\qquad y_2 = g(4) = -0{,}5 \\cdot 4 + 5 = 3'}</MB>
                     <p>
-                      Die Schnittpunkte sind <M>{'S_1(2 \\mid 3)'}</M> und <M>{'S_2(4 \\mid 4)'}</M>. Das passt zu den zwei gelben Punkten im Bild.
+                      Die Schnittpunkte sind <M>{'S_1(2 \\mid 4)'}</M> und <M>{'S_2(4 \\mid 3)'}</M>. Das passt zu den zwei gelben Punkten im Bild.
                     </p>
                   </>
                 }
@@ -528,10 +534,10 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                     steps={[
                       <>
                         Schlagt in der Infokarte das Beispiel auf. Dort steht <M>{'x^2 - 2x - 3 = x + 1'}</M> in Schritt 1 und <M>{'x^2 - 3x - 4 = 0'}</M> in Schritt 2. Genauso macht ihr aus{' '}
-                        <M>{'-0{,}25x^2 + 2x = 0{,}5x + 2'}</M> eine Gleichung mit 0 auf der rechten Seite.
+                        <M>{'-0{,}25x^2 + x + 3 = -0{,}5x + 5'}</M> eine Gleichung mit 0 auf der rechten Seite.
                       </>,
                       <>
-                        Zieht auf beiden Seiten <M>{'0{,}5x'}</M> und <M>{'2'}</M> ab. Danach fasst ihr die x-Terme zusammen: <M>{'2x - 0{,}5x'}</M>. Die Zahl vor <M>{'x^2'}</M> ist <M>a</M>, die Zahl
+                        Addiert auf beiden Seiten <M>{'0{,}5x'}</M> und zieht <M>{'5'}</M> ab. Danach fasst ihr die x-Terme zusammen (<M>{'x + 0{,}5x'}</M>) und die Zahlen (<M>{'3 - 5'}</M>). Die Zahl vor <M>{'x^2'}</M> ist <M>a</M>, die Zahl
                         vor <M>x</M> ist <M>b</M> und die Zahl ohne x ist <M>c</M>.
                       </>,
                       <>
@@ -546,8 +552,8 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 title="Zusammenhang entdecken"
                 prompt={
                   <p>
-                    In eurer Rechnung stand unter der Wurzel die Zahl <M>{'0{,}25'}</M>, und ihr habt zwei Lösungen bekommen. Bei <M>{'t = 3'}</M> gibt es im Bild keinen Punkt, bei{' '}
-                    <M>{'t = 2{,}25'}</M> genau einen. Was entscheidet in der Mitternachtsformel darüber, ob es zwei, eine oder keine Lösung gibt?
+                    In eurer Rechnung stand unter der Wurzel die Zahl <M>{'0{,}25'}</M>, und ihr habt zwei Lösungen bekommen. Bei <M>{'t = 6'}</M> gibt es im Bild keinen Punkt, bei{' '}
+                    <M>{'t = 5{,}25'}</M> genau einen. Was entscheidet in der Mitternachtsformel darüber, ob es zwei, eine oder keine Lösung gibt?
                   </p>
                 }
                 options={[
@@ -567,29 +573,29 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                     <p>
                       Jetzt ist <M>t</M> unbekannt. Gleichsetzen und auf Null bringen ergibt:
                     </p>
-                    <MB>{'-0{,}25x^2 + 1{,}5x - t = 0'}</MB>
+                    <MB>{'-0{,}25x^2 + 1{,}5x + (3 - t) = 0'}</MB>
                     <p>
-                      Setzt <M>{'a = -0{,}25'}</M>, <M>{'b = 1{,}5'}</M> und <M>{'c = -t'}</M> in die Mitternachtsformel ein und vereinfacht die Zahl unter der Wurzel. Findet dann heraus, für
+                      Setzt <M>{'a = -0{,}25'}</M>, <M>{'b = 1{,}5'}</M> und <M>{'c = 3 - t'}</M> in die Mitternachtsformel ein und vereinfacht die Zahl unter der Wurzel. Findet dann heraus, für
                       welches <M>t</M> es genau eine Lösung gibt, und berechnet den Berührpunkt. Haltet eure Rechenwege schriftlich fest und beschreibt im Heft, was für größere <M>t</M> gilt.
                     </p>
                   </>
                 }
                 fieldsRow
                 fields={[
-                  { kind: 'num', key: 'u0', label: <>Zahl unter der Wurzel bei <M>{'t = 0'}</M>:</>, expected: 2.25 },
+                  { kind: 'num', key: 'u0', label: <>Zahl unter der Wurzel bei <M>{'t = 4{,}25'}</M>:</>, expected: 1 },
                   { kind: 'num', key: 't', label: <>Berührhöhe <M>{'t ='}</M></>, expected: T_TOUCH, unit: 'm' },
                   { kind: 'num', key: 'x', label: <>Berührpunkt <M>{'x ='}</M></>, expected: 3 },
                   { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 3.75 },
                 ]}
                 solution={
                   <>
-                    <MB>{'x_{1,2} = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-t)}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm \\sqrt{2{,}25 - t}}{-0{,}5}'}</MB>
+                    <MB>{'x_{1,2} = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (3 - t)}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm \\sqrt{2{,}25 + 3 - t}}{-0{,}5} = \\frac{-1{,}5 \\pm \\sqrt{5{,}25 - t}}{-0{,}5}'}</MB>
                     <p>
-                      Genau eine Lösung gibt es, wenn die Wurzel 0 ist, denn dann fällt das ± weg: <M>{'2{,}25 - t = 0'}</M>, also <M>{'t = 2{,}25'}</M>.
+                      Genau eine Lösung gibt es, wenn die Wurzel 0 ist, denn dann fällt das ± weg: <M>{'5{,}25 - t = 0'}</M>, also <M>{'t = 5{,}25'}</M>.
                     </p>
-                    <MB>{'x = \\frac{-1{,}5}{-0{,}5} = 3 \\qquad y = g(3) = 0{,}5 \\cdot 3 + 2{,}25 = 3{,}75'}</MB>
+                    <MB>{'x = \\frac{-1{,}5}{-0{,}5} = 3 \\qquad y = g(3) = -0{,}5 \\cdot 3 + 5{,}25 = 3{,}75'}</MB>
                     <p>
-                      Der Berührpunkt ist <M>{'B(3 \\mid 3{,}75)'}</M>. Für <M>{'t > 2{,}25'}</M> steht unter der Wurzel eine negative Zahl: keine Lösung und kein Schnittpunkt.
+                      Der Berührpunkt ist <M>{'B(3 \\mid 3{,}75)'}</M>. Für <M>{'t > 5{,}25'}</M> steht unter der Wurzel eine negative Zahl: keine Lösung und kein Schnittpunkt.
                     </p>
                   </>
                 }
@@ -598,10 +604,10 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                     steps={[
                       <>Schaut euch die Mitternachtsformel an: Wann liefert das „±“ nur noch eine einzige Lösung, weil beide Seiten gleich sind? Überlegt, was dafür unter der Wurzel stehen muss.</>,
                       <>
-                        Setzt in <M>{'b^2 - 4ac'}</M> ein: <M>{'1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-t)'}</M>. Rechnet <M>{'1{,}5^2'}</M> und <M>{'4 \\cdot (-0{,}25) \\cdot (-t)'}</M> getrennt aus. Das <M>t</M> bleibt dabei stehen.
+                        Setzt in <M>{'b^2 - 4ac'}</M> ein: <M>{'1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (3 - t)'}</M>. Rechnet <M>{'1{,}5^2'}</M> und <M>{'4 \\cdot (-0{,}25)'}</M> getrennt aus. Das <M>t</M> bleibt dabei stehen.
                       </>,
                       <>
-                        Unter der Wurzel steht <M>{'2{,}25 - t'}</M>. Setzt diesen Term gleich 0 und löst nach <M>t</M> auf. Bei Wurzel 0 bleibt <M>{'x = \\frac{-b}{2a}'}</M>, danach den y-Wert mit der Geraden berechnen.
+                        Unter der Wurzel steht <M>{'5{,}25 - t'}</M>. Setzt diesen Term gleich 0 und löst nach <M>t</M> auf. Bei Wurzel 0 bleibt <M>{'x = \\frac{-b}{2a}'}</M>, danach den y-Wert mit der Geraden berechnen.
                       </>,
                     ]}
                   />
@@ -629,9 +635,9 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
               <details className="ls-way">
                 <summary>Mila hat mit dem Regler gearbeitet</summary>
                 <div className="ls-way-body">
-                  <p>„Ich habe den Regler hochgeschoben, bis nur noch ein Punkt übrig war. Das war bei 2,25. Bei 2,5 war kein Punkt mehr da.“</p>
+                  <p>„Ich habe den Regler hochgeschoben, bis nur noch ein Punkt übrig war. Das war bei 5,25. Bei 5,5 war kein Punkt mehr da.“</p>
                   <p>
-                    <strong>Gut:</strong> Man sieht sofort, wie sich die Anzahl der Punkte ändert. <strong>Aber:</strong> Der Regler springt in 0,25er-Schritten. Ob es bei 2,3 noch
+                    <strong>Gut:</strong> Man sieht sofort, wie sich die Anzahl der Punkte ändert. <strong>Aber:</strong> Der Regler springt in 0,25er-Schritten. Ob es bei 5,3 noch
                     zwei Punkte gibt, weiß man nicht genau, und die Punktkoordinaten kann man nur schätzen.
                   </p>
                 </div>
@@ -640,8 +646,8 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <summary>Tarek hat gerechnet</summary>
                 <div className="ls-way-body">
                   <p>
-                    „Ich habe <M>{'p(x) = g(x)'}</M> gleichgesetzt und alles auf eine Seite gebracht. In der Mitternachtsformel stand dann unter der Wurzel <M>{'2{,}25 - t'}</M>. Solange t
-                    kleiner als 2,25 ist, ist das positiv, also gibt es zwei Lösungen. Bei <M>{'t = 2{,}25'}</M> steht unter der Wurzel 0, also nur eine Lösung. Danach ist die Zahl negativ,
+                    „Ich habe <M>{'p(x) = g(x)'}</M> gleichgesetzt und alles auf eine Seite gebracht. In der Mitternachtsformel stand dann unter der Wurzel <M>{'5{,}25 - t'}</M>. Solange t
+                    kleiner als 5,25 ist, ist das positiv, also gibt es zwei Lösungen. Bei <M>{'t = 5{,}25'}</M> steht unter der Wurzel 0, also nur eine Lösung. Danach ist die Zahl negativ,
                     und die Wurzel gibt es nicht.“
                   </p>
                   <p>
@@ -661,10 +667,10 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <Phase no={5} title="Das hältst du fest" social="EA" minutes={8}>
             <Rueckbezug pred={pred} />
             <Beispiel
-              title="Wo löst der Sprung die Lichtschranke aus (t = 2)?"
+              title="Wo löst der Sprung die Lichtschranke aus (t = 5)?"
               aufgabe={
                 <p>
-                  Sprungbahn <M>{'p(x) = -0{,}25x^2 + 2x'}</M>, Lichtschranke <M>{'g(x) = 0{,}5x + 2'}</M>. Berechne die gemeinsamen Punkte.
+                  Sprungbahn <M>{'p(x) = -0{,}25x^2 + x + 3'}</M>, Lichtschranke <M>{'g(x) = -0{,}5x + 5'}</M>. Berechne die gemeinsamen Punkte.
                 </p>
               }
               steps={[
@@ -673,7 +679,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   body: (
                     <>
                       <p>Im Schnittpunkt haben beide Funktionen denselben y-Wert:</p>
-                      <MB>{'-0{,}25x^2 + 2x = 0{,}5x + 2'}</MB>
+                      <MB>{'-0{,}25x^2 + x + 3 = -0{,}5x + 5'}</MB>
                     </>
                   ),
                 },
@@ -681,7 +687,9 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   title: 'Auf Null bringen',
                   body: (
                     <>
-                      <p>Alles auf eine Seite, rechts steht 0:</p>
+                      <p>
+                        Auf beiden Seiten <M>{'+0{,}5x'}</M> und <M>{'-5'}</M>, dann steht rechts 0:
+                      </p>
                       <MB>{'-0{,}25x^2 + 1{,}5x - 2 = 0 \\qquad (a = -0{,}25,\; b = 1{,}5,\; c = -2)'}</MB>
                     </>
                   ),
@@ -701,9 +709,9 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   title: 'y-Werte mit der Geradengleichung',
                   body: (
                     <>
-                      <MB>{'g(2) = 0{,}5 \\cdot 2 + 2 = 3 \\qquad g(4) = 0{,}5 \\cdot 4 + 2 = 4'}</MB>
+                      <MB>{'g(2) = -0{,}5 \\cdot 2 + 5 = 4 \\qquad g(4) = -0{,}5 \\cdot 4 + 5 = 3'}</MB>
                       <p>
-                        Probe mit der Parabel: <M>{'p(2) = -1 + 4 = 3'}</M> ✓ und <M>{'p(4) = -4 + 8 = 4'}</M> ✓
+                        Probe mit der Parabel: <M>{'p(2) = -1 + 2 + 3 = 4'}</M> ✓ und <M>{'p(4) = -4 + 4 + 3 = 3'}</M> ✓
                       </p>
                     </>
                   ),
@@ -712,10 +720,10 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   title: 'Schnittpunkte angeben und deuten',
                   body: (
                     <>
-                      <MB>{'S_1(2 \\mid 3) \\qquad S_2(4 \\mid 4)'}</MB>
+                      <MB>{'S_1(2 \\mid 4) \\qquad S_2(4 \\mid 3)'}</MB>
                       <p>
-                        Bei einem Sensor in 2 m Höhe kreuzt die Sprungbahn die Lichtschranke zweimal: nach 2 m in 3 m Höhe und nach 4 m in 4 m Höhe, genau am höchsten Punkt des
-                        Sprungs.
+                        Bei einem Sensor in 5 m Höhe kreuzt die Sprungbahn die Lichtschranke zweimal: nach 2 m in 4 m Höhe (genau am höchsten Punkt des Sprungs) und nach 4 m in 3 m
+                        Höhe.
                       </p>
                     </>
                   ),
@@ -876,17 +884,17 @@ function Rueckbezug({ pred }: { pred: Prediction }) {
   return (
     <div className="ls-back">
       <p>
-        <strong>Du hattest vermutet:</strong> {CHOICE_TEXT[pred.choice]} (bei <M>{'t = 1'}</M>) und die Schranke wird bis <M>t</M> ≈ {fmt(pred.tGrenze, 2)} m ausgelöst.
+        <strong>Du hattest vermutet:</strong> {CHOICE_TEXT[pred.choice]} (bei <M>{'t = 4'}</M>) und die Schranke wird bis <M>t</M> ≈ {fmt(pred.tGrenze, 2)} m ausgelöst.
       </p>
       <p>
         {pred.choice === 'zwei' ? (
-          <>Das stimmt: Bei t = 1 m gibt es zwei gemeinsame Punkte. Gut gesehen!</>
+          <>Das stimmt: Bei t = 4 m gibt es zwei gemeinsame Punkte. Gut gesehen!</>
         ) : (
-          <>Bei t = 1 m gibt es zwei gemeinsame Punkte, die Sprungbahn kreuzt die Lichtschranke also zweimal. Hier hat das Bild dich in die Irre geführt.</>
+          <>Bei t = 4 m gibt es zwei gemeinsame Punkte, die Sprungbahn kreuzt die Lichtschranke also zweimal. Hier hat das Bild dich in die Irre geführt.</>
         )}
       </p>
       <p>
-        Die größte Sensorhöhe mit Auslösung ist <strong>t = 2,25 m</strong>, dort berührt die Lichtschranke die Bahn genau einmal.{' '}
+        Die größte Sensorhöhe mit Auslösung ist <strong>t = 5,25 m</strong>, dort berührt die Lichtschranke die Bahn genau einmal.{' '}
         {diff < 1e-9 ? 'Deine Schätzung war genau richtig!' : `Deine Schätzung lag ${fmt(diff, 2)} m daneben.`} Die Rechnung hat gezeigt, warum: Dort steht unter der Wurzel genau 0.
       </p>
     </div>
