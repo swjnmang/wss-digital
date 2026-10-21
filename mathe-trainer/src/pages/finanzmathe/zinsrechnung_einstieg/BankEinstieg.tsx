@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
+import { VideoEmbed } from '../../../components/VideoButton'
 import { Beispiel, M, MB, Merke, Vorgehen, fmt } from '../../daten_und_zufall/lernpfad/kit'
 import { CardHead, CheckCard, Hilfen, LevelTag, McCard, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
@@ -13,7 +14,9 @@ import './intranet.css'
 // Aha: Der höhere Zinssatz (Festgeld) bringt weniger, weil das Geld kürzer verzinst wird, und „2,4 %“ heißt nicht 2,4 % vom Betrag.
 // Phasen: Aktivieren → Auftrag & Festlegung → Bearbeiten → Austausch → Sichern (Kundenbrief) → Check.
 // Die Festlegung bleibt nur im Seitenzustand (kein Speichern).
-// Wird über /finanzmathe/zinsrechnung/lernsituation aus dem Menü „Zinsrechnung“ geöffnet.
+// Wird über /finanzmathe/zinsrechnung/lernsituation aus dem Menü „Zinsrechnung“ geöffnet (Teil 1, Teil 2: K, p und t berechnen).
+
+export const VIDEO_ZINSEN = 'https://www.youtube.com/watch?v=bCjboGGTRGs'
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
@@ -53,11 +56,11 @@ function Schritt({ no, title, level, children }: { no: number; title: string; le
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
-export default function BankEinstieg({ onBack, onPractice }: { onBack: () => void; onPractice: () => void }) {
+export default function BankEinstieg({ onBack, onPractice, onNext }: { onBack: () => void; onPractice: () => void; onNext: () => void }) {
   const [pred, setPred] = useState<Prediction>({ choice: null, schaetzung: 100, saved: false })
 
   return (
-    <TaskShell title="Zinsrechnung" subtitle="Lernsituation: Wohin mit Lenas Autogeld?" width="wide">
+    <TaskShell title="Zinsrechnung" subtitle="Lernsituation Teil 1: Wohin mit Lenas Autogeld?" width="wide">
       <div className="lp">
         <div>
           <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={onBack}>
@@ -388,6 +391,8 @@ export default function BankEinstieg({ onBack, onPractice }: { onBack: () => voi
                 { title: 'Ausrechnen', body: <MB>{'Z = \\frac{1\\,704\\,960}{36\\,000} = 47{,}36 \\text{ €}'}</MB> },
               ]}
             />
+            <p>Im Erklärvideo siehst du noch einmal, wie du die Zinsen mit der Formel berechnest:</p>
+            <VideoEmbed src={VIDEO_ZINSEN} title="Erklärvideo: Zinsen berechnen" />
           </div>
 
           <Schritt no={3} title="Ein zweiter Kunde: Lenas Bruder Jonas" level="standard">
@@ -616,8 +621,11 @@ export default function BankEinstieg({ onBack, onPractice }: { onBack: () => voi
           <button type="button" className="bk-btn" onClick={onBack}>
             <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zur Auswahl
           </button>
-          <button type="button" className="bk-btn bk-btn-primary" onClick={onPractice}>
+          <button type="button" className="bk-btn" onClick={onPractice}>
             Weiter üben: Zinsrechnung <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+          </button>
+          <button type="button" className="bk-btn bk-btn-primary" onClick={onNext}>
+            Weiter mit Teil 2: K, p und t berechnen <i className="fa-solid fa-arrow-right" aria-hidden="true" />
           </button>
         </nav>
       </div>
