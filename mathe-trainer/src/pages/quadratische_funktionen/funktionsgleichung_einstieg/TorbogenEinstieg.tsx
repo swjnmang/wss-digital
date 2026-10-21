@@ -445,14 +445,38 @@ export default function TorbogenEinstieg({
                   </p>
                 }
                 steps={[
-                  { title: 'Scheitelpunkt einsetzen', body: <MB>{'f(x) = a(x - (-1))^2 + 5 = a(x + 1)^2 + 5'}</MB> },
+                  {
+                    title: 'Scheitelpunkt einsetzen',
+                    body: (
+                      <>
+                        <p>
+                          Setze <M>{'x_S = -1'}</M> und <M>{'y_S = 5'}</M> in die Scheitelform ein. Negative Zahlen immer in Klammern setzen:
+                        </p>
+                        <MB>{'\\begin{aligned} f(x) &= a(x - x_S)^2 + y_S \\\\ f(x) &= a(x - (-1))^2 + 5 \\\\ f(x) &= a(x + 1)^2 + 5 \\end{aligned}'}</MB>
+                      </>
+                    ),
+                  },
                   {
                     title: 'Punkt einsetzen und a berechnen',
-                    body: <MB>{'\\begin{aligned} 3 &= a(1 + 1)^2 + 5 \\\\ 3 &= 4a + 5 && \\mid -5 \\\\ -2 &= 4a && \\mid :4 \\\\ a &= -0{,}5 \\end{aligned}'}</MB>,
+                    body: (
+                      <>
+                        <p>
+                          Setze <M>{'P(1 \\mid 3)'}</M> in <M>{'f(x) = a(x + 1)^2 + 5'}</M> ein, also <M>{'x = 1'}</M> und <M>{'f(x) = 3'}</M>:
+                        </p>
+                        <MB>{'\\begin{aligned} 3 &= a \\cdot (1 + 1)^2 + 5 \\\\ 3 &= a \\cdot 2^2 + 5 \\\\ 3 &= 4a + 5 && \\mid -5 \\\\ -2 &= 4a && \\mid :4 \\\\ a &= -0{,}5 \\end{aligned}'}</MB>
+                      </>
+                    ),
                   },
                   {
                     title: 'Umwandeln',
-                    body: <MB>{'\\begin{aligned} f(x) &= -0{,}5(x + 1)^2 + 5 \\\\ &= -0{,}5(x^2 + 2x + 1) + 5 \\\\ &= -0{,}5x^2 - x - 0{,}5 + 5 \\\\ &= -0{,}5x^2 - x + 4{,}5 \\end{aligned}'}</MB>,
+                    body: (
+                      <>
+                        <p>
+                          Setze <M>{'a = -0{,}5'}</M> in die Scheitelform ein. Löse die Klammer auf, multipliziere dann <strong>jeden</strong> Summanden mit <M>a</M> (Punkt vor Strich) und fasse zusammen:
+                        </p>
+                        <MB>{'\\begin{aligned} f(x) &= -0{,}5 \\cdot (x + 1)^2 + 5 \\\\ f(x) &= -0{,}5 \\cdot [(x + 1) \\cdot (x + 1)] + 5 \\\\ f(x) &= -0{,}5 \\cdot [x^2 + 2x + 1] + 5 \\\\ f(x) &= -0{,}5x^2 - x - 0{,}5 + 5 \\\\ f(x) &= -0{,}5x^2 - x + 4{,}5 \\end{aligned}'}</MB>
+                      </>
+                    ),
                   },
                 ]}
               />
@@ -737,20 +761,25 @@ export default function TorbogenEinstieg({
                 ]}
                 solution={
                   <>
+                    <p>Der Transporter fährt mittig durch, also genau unter dem Scheitelpunkt. Zuerst den Scheitelpunkt berechnen:</p>
+                    <MB>{'\\begin{aligned} x_S &= -\\frac{b}{2a} = -\\frac{1}{2 \\cdot (-0{,}25)} = -\\frac{1}{-0{,}5} = 2 \\\\ y_S &= f(2) = -0{,}25 \\cdot 2^2 + 2 + 2 = -1 + 4 = 3 \\end{aligned}'}</MB>
                     <p>
-                      Die Mitte der Einfahrt ist bei <M>{'x = 2'}</M>. Die Außenkanten liegen 0,9 m links und rechts davon, bei <M>{'x = 1{,}1'}</M> und <M>{'x = 2{,}9'}</M>.
+                      Der Scheitelpunkt ist <M>{'S(2 \\mid 3)'}</M>, die Mitte der Einfahrt liegt also bei <M>{'x = 2'}</M>. Die Außenkanten liegen eine halbe Breite (0,9 m) links und rechts davon:{' '}
+                      <M>{'x = 2 - 0{,}9 = 1{,}1'}</M> und <M>{'x = 2 + 0{,}9 = 2{,}9'}</M>.
                     </p>
-                    <MB>{'f(1{,}1) = -0{,}25 \\cdot 1{,}1^2 + 1{,}1 + 2 = -0{,}3025 + 3{,}1 = 2{,}7975 \\approx 2{,}80'}</MB>
-                    <p>Wegen der Symmetrie ist der Bogen bei x = 2,9 genauso hoch. 2,80 m &gt; 2,6 m, der Transporter passt mit etwa 20 cm Luft durch.</p>
+                    <MB>{'\\begin{aligned} f(1{,}1) &= -0{,}25 \\cdot 1{,}1^2 + 1{,}1 + 2 = -0{,}3025 + 3{,}1 = 2{,}7975 \\approx 2{,}80 \\\\ f(2{,}9) &= -0{,}25 \\cdot 2{,}9^2 + 2{,}9 + 2 = -2{,}1025 + 4{,}9 = 2{,}7975 \\approx 2{,}80 \\end{aligned}'}</MB>
+                    <p>An beiden Außenkanten ist der Bogen etwa 2,80 m hoch. 2,80 m &gt; 2,6 m, der Transporter passt mit etwa 20 cm Luft durch.</p>
                   </>
                 }
                 help={
                   <Hilfen
                     steps={[
                       <>Zeichne den Transporter als Rechteck mittig unter den Bogen. An welchen Stellen x wird es am engsten?</>,
-                      <>Am engsten ist es an den oberen Ecken des Transporters. Sie liegen eine halbe Breite links und rechts von der Mitte x = 2.</>,
                       <>
-                        Die linke Ecke liegt bei <M>{'x = 2 - 0{,}9 = 1{,}1'}</M>. Berechne <M>{'f(1{,}1)'}</M> und vergleiche mit 2,6 m.
+                        Die Mitte der Einfahrt ist der Scheitelpunkt. Berechne ihn mit <M>{'x_S = -\\frac{b}{2a}'}</M>. Am engsten ist es an den oberen Ecken des Transporters, eine halbe Breite links und rechts von <M>{'x_S'}</M>.
+                      </>,
+                      <>
+                        <M>{'x_S = 2'}</M>, die Ecken liegen bei <M>{'x = 2 - 0{,}9 = 1{,}1'}</M> und <M>{'x = 2 + 0{,}9 = 2{,}9'}</M>. Berechne <M>{'f(1{,}1)'}</M> und <M>{'f(2{,}9)'}</M> und vergleiche mit 2,6 m.
                       </>,
                     ]}
                   />
