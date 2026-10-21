@@ -588,27 +588,33 @@ export default function BankEinstieg({ onBack, onPractice, onNext }: { onBack: (
               ]}
             />
             <CheckCard
-              title="Check 3: Andersherum gefragt"
+              title="Check 3: Zinstage und Zinsen ganz allein"
               level="erweiterung"
               prompt={
                 <p>
-                  Ein Kunde hatte 3.600 € für 200 Tage angelegt und 50 € Zinsen bekommen. Wie hoch war der Zinssatz? Stelle die Formel um und halte deinen Rechenweg schriftlich fest.
+                  Tim legt am <strong>31.01.</strong> 3.000 € zu 2,2 % p.a. auf ein Tagesgeldkonto und hebt das Geld am <strong>15.06.</strong> wieder ab. Bestimme die Zinstage nach der
+                  Bankregel und berechne die Zinsen. Halte deinen Rechenweg schriftlich fest.
                 </p>
               }
-              fields={[{ kind: 'num', key: 'p', label: <M>{'p ='}</M>, expected: 2.5, unit: '% p.a.' }]}
+              fieldsRow
+              fields={[
+                { kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 135, unit: 'Tage' },
+                { kind: 'num', key: 'z', label: <M>{'Z ='}</M>, expected: 24.75, unit: '€' },
+              ]}
               solution={
                 <>
-                  <MB>{'50 = \\frac{3\\,600 \\cdot p \\cdot 200}{100 \\cdot 360} \\quad\\Rightarrow\\quad p = \\frac{50 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 200} = \\frac{1\\,800\\,000}{720\\,000} = 2{,}5'}</MB>
-                  <p>Der Zinssatz war 2,5 % p.a.</p>
+                  <p>Der 31.01. zählt wie der 30.01. Vom 30.01. bis zum 30.06. wären es 5 Monate, der 15.06. liegt 15 Tage davor:</p>
+                  <MB>{'t = 5 \\cdot 30 - 15 = 135'}</MB>
+                  <MB>{'Z = \\frac{3\\,000 \\cdot 2{,}2 \\cdot 135}{100 \\cdot 360} = \\frac{891\\,000}{36\\,000} = 24{,}75 \\text{ €}'}</MB>
                 </>
               }
               help={
                 <Hilfen
                   steps={[
-                    <>Schreibe die Formel auf und setze alles ein, was du kennst. Welche Größe fehlt?</>,
-                    <>Multipliziere beide Seiten mit 100 · 360 und teile dann durch 3.600 · 200.</>,
+                    <>Erst die Zinstage, dann die Formel. Denk an die Bankregel: Wie zählt ein 31.?</>,
+                    <>Der 31.01. zählt wie der 30.01. Zähle die vollen Monate bis zum 30.06. und ziehe dann die Tage bis zum 15.06. ab.</>,
                     <>
-                      <M>{'p = \\frac{50 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 200}'}</M>
+                      <M>{'t = 5 \\cdot 30 - 15 = 135'}</M>. Setze ein: <M>{'Z = \\frac{3\\,000 \\cdot 2{,}2 \\cdot 135}{100 \\cdot 360}'}</M>
                     </>,
                   ]}
                 />
