@@ -3,7 +3,8 @@ import TaskShell from '../../../components/layout/TaskShell'
 import CheckedNumberInput from '../../../components/CheckedNumberInput'
 import { fieldCheckClass } from '../../../utils/fieldCheck'
 import { Beispiel, M, MB, Merke, QuerTabelle, checkNumber, fmt } from '../../daten_und_zufall/lernpfad/kit'
-import { Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, HeftHinweis, Hilfen, McCard, Phase, PRAISE } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, HeftHinweis, Hilfen, McCard, PRAISE } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Etappe, Teil } from '../../lineare_funktionen/lernsituation_kit/phasen'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './escape.css'
 
@@ -374,8 +375,8 @@ function Merkkarte() {
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 const STEPS = [
+  { label: 'Warm-up', icon: 'fa-lightbulb' },
   { label: 'Einstieg', icon: 'fa-door-closed' },
-  { label: 'Vorwissen', icon: 'fa-lightbulb' },
   { label: 'Symmetrie', icon: 'fa-arrows-left-right' },
   { label: 'Muster', icon: 'fa-table' },
   { label: 'Tresor', icon: 'fa-vault' },
@@ -390,8 +391,8 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
   // Ziffern 1 bis 4 gelöst
   const [digits, setDigits] = useState<boolean[]>([false, false, false, false])
 
-  // Tor für Station i: Vermutung festgehalten (0), Ziffer i gelöst (1 bis 4), danach frei
-  const gate = (i: number) => (i === 0 ? pred.saved : i <= 4 ? digits[i - 1] : true)
+  // Tor für Station i: Warm-up-Ziffer gelöst (0), Vermutung festgehalten (1), Ziffer i gelöst (2 bis 4), danach frei
+  const gate = (i: number) => (i === 0 ? digits[0] : i === 1 ? pred.saved : i <= 4 ? digits[i - 1] : true)
   const reachable = (i: number) => Array.from({ length: i }, (_, j) => j).every(gate)
   const doorOpen = digits.every(Boolean)
   const solve = (i: number) => setDigits((d) => d.map((v, j) => (j === i - 1 ? true : v)))
@@ -472,74 +473,15 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
             )}
           </div>
 
-          {/* 0 Einstieg und Festlegung */}
+          {/* 0 Warm-up */}
           <div hidden={hide(0)}>
-            <Phase no={0} title="Ausgesperrt: Wie hoch spritzt der Brunnen?" social="EA" minutes={5}>
-              <Raum no="Start" title="Freitag, 19:05 Uhr im Lichtwerk">
-                <p className="esc-story">
-                  Du bist Azubi bei der Werbetechnik-Firma „Lichtwerk“. Beim Abschließen fällt die Lagertür ins Schloss, und alle anderen sind schon weg. Am Türdisplay blinkt:
-                  <strong> „Code: 4 Teile. Die Zahlen stecken in der Brunnen-Anlage, die du letzte Woche für den Kunden mitgebaut hast.“</strong>
-                </p>
-                <BrunnenBild guess={pred.saved || pred.x !== 3 || pred.y !== 5 ? { x: pred.x, y: pred.y } : undefined} />
-                <p>
-                  Der Brunnen spritzt aus der Düse (1 m hoch) in ein Becken, dessen Rand 7 m entfernt ebenfalls 1 m hoch ist. Der Wasserstrahl ist eine Parabel mit
-                  <strong>
-                    {' '}
-                    <M>{'y = -0{,}4x^2 + 2{,}8x + 1'}</M>
-                  </strong>{' '}
-                  (<M>x</M> und <M>h</M> in Metern).
-                </p>
-                <div className="ls-question">
-                  <i className="fa-solid fa-circle-question" aria-hidden="true" />
-                  <span>Wo ist der höchste Punkt des Strahls, und wie hoch ist er dort? Kannst du ihn genau ablesen?</span>
-                </div>
-                <div className="lp-ex bk-panel" data-no-autocheck>
-                  <CardHead title="Deine Vermutung" />
-                  {pred.saved ? (
-                    <>
-                      <div className="ls-saved" role="status">
-                        <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: Höchster Punkt bei <strong>x ≈ {fmt(pred.x, 1)} m</strong> in <strong>{fmt(pred.y, 1)} m</strong> Höhe. In
-                        Raum 4 schauen wir nach, wie gut du geschätzt hast.
-                      </div>
-                      <div>
-                        <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={() => setPred({ ...pred, saved: false })}>
-                          Vermutung ändern
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <p>Rechne noch nicht! Schätze nur mit dem Bild. Verschiebe die rote Marke an die Stelle, wo du den höchsten Punkt vermutest. Die Regler arbeiten in 0,1-m-Schritten.</p>
-                      <div className="ls-slider">
-                        <label htmlFor="esc-px">
-                          Entfernung von der Düse <M>x</M> ≈ <span className="ls-slider-value">{fmt(pred.x, 1)}</span> m
-                        </label>
-                        <input id="esc-px" type="range" min={0} max={8} step={0.1} value={pred.x} onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, x: Number(e.target.value) })} />
-                      </div>
-                      <div className="ls-slider">
-                        <label htmlFor="esc-py">
-                          Höhe <M>h</M> ≈ <span className="ls-slider-value">{fmt(pred.y, 1)}</span> m
-                        </label>
-                        <input id="esc-py" type="range" min={0} max={10} step={0.1} value={pred.y} onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, y: Number(e.target.value) })} />
-                      </div>
-                      <div>
-                        <button type="button" className="bk-btn bk-btn-primary" onClick={() => setPred({ ...pred, saved: true })}>
-                          <i className="fa-solid fa-lock" aria-hidden="true" /> Vermutung festhalten
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-                {weiter(0)}
-              </Raum>
-            </Phase>
-          </div>
-
-          {/* 1 Vorwissen */}
-          <div hidden={hide(1)}>
-            <Phase no={1} title="Raum 1: Das Werkstatt-Tor" social="EA" minutes={6}>
+            <Etappe prefix="esc-1" art="start" social="EA" minutes={6} was={<>Das erste Rätsel-Panel allein lösen.</>} wozu={<>Du frischst auf, wie man eine Parabel in Scheitelform liest. Das brauchst du gleich.</>}>
+              <Teil title="Raum 1: Das Werkstatt-Tor">
               <Raum no={1} title="Scheitelform lesen">
-                <p className="esc-story">Das erste Schloss ist ein Rätsel-Panel. Zeig, dass du Parabeln in Scheitelform lesen kannst.</p>
+                <p className="esc-story">
+                  Du bist Azubi bei der Werbetechnik-Firma „Lichtwerk“. Beim Abschließen fällt die Lagertür ins Schloss, und alle anderen sind schon weg. Damit das Türdisplay angeht,
+                  musst du zuerst ein Rätsel-Panel lösen: Zeig, dass du Parabeln in Scheitelform lesen kannst.
+                </p>
                 <CheckCard
                   title="a) Scheitelpunkt ablesen"
                   rechnen={false}
@@ -616,14 +558,81 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   solved={digits[0]}
                   onSolved={() => solve(1)}
                 />
+                {weiter(0)}
+              </Raum>
+              </Teil>
+            </Etappe>
+          </div>
+
+          {/* 1 Einstieg und Festlegung */}
+          <div hidden={hide(1)}>
+            <Etappe prefix="esc-0" art="problem" social="EA" minutes={5} was={<>Die Geschichte lesen und schätzen, wo der höchste Punkt des Wasserstrahls liegt. Noch nicht rechnen.</>} wozu={<>Du weißt genau, welche Frage du in Phase 3 beantwortest.</>}>
+              <Teil title="Ausgesperrt: Wie hoch spritzt der Brunnen?">
+              <Raum no="Türdisplay" title="Freitag, 19:05 Uhr im Lichtwerk">
+                <p className="esc-story">
+                  Das Panel ist gelöst, und das Türdisplay geht an. Es blinkt:
+                  <strong> „Code: 4 Teile. Die Zahlen stecken in der Brunnen-Anlage, die du letzte Woche für den Kunden mitgebaut hast.“</strong>
+                </p>
+                <BrunnenBild guess={pred.saved || pred.x !== 3 || pred.y !== 5 ? { x: pred.x, y: pred.y } : undefined} />
+                <p>
+                  Der Brunnen spritzt aus der Düse (1 m hoch) in ein Becken, dessen Rand 7 m entfernt ebenfalls 1 m hoch ist. Der Wasserstrahl ist eine Parabel mit
+                  <strong>
+                    {' '}
+                    <M>{'y = -0{,}4x^2 + 2{,}8x + 1'}</M>
+                  </strong>{' '}
+                  (<M>x</M> und <M>h</M> in Metern).
+                </p>
+                <div className="ls-question">
+                  <i className="fa-solid fa-circle-question" aria-hidden="true" />
+                  <span>Wo ist der höchste Punkt des Strahls, und wie hoch ist er dort? Kannst du ihn genau ablesen?</span>
+                </div>
+                <div className="lp-ex bk-panel" data-no-autocheck>
+                  <CardHead title="Deine Vermutung" />
+                  {pred.saved ? (
+                    <>
+                      <div className="ls-saved" role="status">
+                        <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: Höchster Punkt bei <strong>x ≈ {fmt(pred.x, 1)} m</strong> in <strong>{fmt(pred.y, 1)} m</strong> Höhe. In
+                        Raum 4 schauen wir nach, wie gut du geschätzt hast.
+                      </div>
+                      <div>
+                        <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={() => setPred({ ...pred, saved: false })}>
+                          Vermutung ändern
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p>Rechne noch nicht! Schätze nur mit dem Bild. Verschiebe die rote Marke an die Stelle, wo du den höchsten Punkt vermutest. Die Regler arbeiten in 0,1-m-Schritten.</p>
+                      <div className="ls-slider">
+                        <label htmlFor="esc-px">
+                          Entfernung von der Düse <M>x</M> ≈ <span className="ls-slider-value">{fmt(pred.x, 1)}</span> m
+                        </label>
+                        <input id="esc-px" type="range" min={0} max={8} step={0.1} value={pred.x} onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, x: Number(e.target.value) })} />
+                      </div>
+                      <div className="ls-slider">
+                        <label htmlFor="esc-py">
+                          Höhe <M>h</M> ≈ <span className="ls-slider-value">{fmt(pred.y, 1)}</span> m
+                        </label>
+                        <input id="esc-py" type="range" min={0} max={10} step={0.1} value={pred.y} onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, y: Number(e.target.value) })} />
+                      </div>
+                      <div>
+                        <button type="button" className="bk-btn bk-btn-primary" onClick={() => setPred({ ...pred, saved: true })}>
+                          <i className="fa-solid fa-lock" aria-hidden="true" /> Vermutung festhalten
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
                 {weiter(1)}
               </Raum>
-            </Phase>
+              </Teil>
+            </Etappe>
           </div>
 
           {/* 2 Symmetrie */}
           <div hidden={hide(2)}>
-            <Phase no={2} title="Raum 2: Die Mitte der Parabel" social="PA" minutes={10}>
+            <Etappe prefix="esc-2" art="loesen" social="PA" minutes={10} was={<>Zu zweit die Räume knacken und herausfinden, wie man den Scheitelpunkt berechnet. Danach vergleicht ihr eure Wege.</>} wozu={<>So bestimmst du den Scheitelpunkt, auch wenn die Parabel in allgemeiner Form gegeben ist.</>}>
+              <Teil title="Raum 2: Die Mitte der Parabel">
               <Raum no={2} title="Punkte gleicher Höhe">
                 <p className="esc-story">Im Lager steht eine Werkbank mit einer Parabel-Schablone, <M>{'y = x^2 - 6x + 5'}</M>. Zu zweit findet ihr heraus, wie sich ihr Scheitelpunkt versteckt.</p>
                 <div className="lp-ex bk-panel">
@@ -702,12 +711,14 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                 />
                 {weiter(2)}
               </Raum>
-            </Phase>
+              </Teil>
+            </Etappe>
           </div>
 
           {/* 3 Muster */}
           <div hidden={hide(3)}>
-            <Phase no={3} title="Raum 3: Das Muster hinter der Mitte" social="PA" minutes={10}>
+            <Etappe prefix="esc-3" art="loesen" social="PA" minutes={10}>
+              <Teil title="Raum 3: Das Muster hinter der Mitte">
               <Raum no={3} title="Eine Formel für x_S entdecken">
                 <p className="esc-story">Ein Zettel an der Wand: „Nicht jede Parabel hat Punkte, die du so leicht findest. Finde die Regel, dann geht es immer.“</p>
                 <div className="lp-ex bk-panel">
@@ -814,12 +825,14 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                 />
                 {weiter(3)}
               </Raum>
-            </Phase>
+              </Teil>
+            </Etappe>
           </div>
 
           {/* 4 Tresor */}
           <div hidden={hide(4)}>
-            <Phase no={4} title="Raum 4: Der Tresor" social="PA" minutes={5}>
+            <Etappe prefix="esc-4" art="loesen" social="PA" minutes={5}>
+              <Teil title="Raum 4: Der Tresor">
               <Raum no={4} title="Wie hoch spritzt der Brunnen wirklich?">
                 <p className="esc-story">Der Tresor steht neben dem Brunnen-Modell. Der letzte Teil des Codes ist die größte Höhe des Wasserstrahls in Metern, mit Komma. Ablesen reicht hier nicht, aber ihr kennt jetzt eine Methode, die genau rechnet.</p>
                 <BrunnenBild showS={digits[3]} guess={pred.saved ? { x: pred.x, y: pred.y } : undefined} />
@@ -876,12 +889,14 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                 />
                 {weiter(4)}
               </Raum>
-            </Phase>
+              </Teil>
+            </Etappe>
           </div>
 
           {/* 5 Austausch */}
           <div hidden={hide(5)}>
-            <Phase no={5} title="Vergleicht eure Wege" social="Plenum" minutes={4}>
+            <Etappe prefix="esc-5" art="loesen" social="Plenum" minutes={4}>
+              <Teil title="Vergleicht eure Wege">
               <Raum no={5} title="Die Tür ist offen">
                 <div className="ls-stop">
                   <div className="ls-stop-title">
@@ -927,12 +942,14 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                 </div>
                 {weiter(5)}
               </Raum>
-            </Phase>
+              </Teil>
+            </Etappe>
           </div>
 
           {/* 6 Merkkarte */}
           <div hidden={hide(6)}>
-            <Phase no={6} title="Das hältst du fest: Merkkarte" social="PA" minutes={6}>
+            <Etappe prefix="esc-6" art="sichern" social="PA" minutes={6} was={<>Die Merkkarte gestalten und dann allein prüfen, ob du es kannst.</>} wozu={<>Mit der Merkkarte kannst du jede Aufgabe dieser Art lösen. Der Check zeigt dir, wo du noch unsicher bist.</>}>
+              <Teil title="Das hältst du fest: Merkkarte">
               <Merke title="Scheitelpunkt aus der allgemeinen Form">
                 <p>
                   Zu <M>{'y = ax^2 + bx + c'}</M> gehört der Scheitelpunkt <M>{'S(x_S \\mid y_S)'}</M> mit
@@ -954,12 +971,14 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
               />
               <Merkkarte />
               {weiter(6)}
-            </Phase>
+              </Teil>
+            </Etappe>
           </div>
 
           {/* 7 Check */}
           <div hidden={hide(7)}>
-            <Phase no={7} title="Check: Hast du es verstanden?" social="EA" minutes={5}>
+            <Etappe prefix="esc-7" art="sichern" social="EA" minutes={5}>
+              <Teil title="Check: Hast du es verstanden?">
               <div className="lp-exlist">
                 <McCard
                   title="Check 1: Welcher Scheitelpunkt stimmt?"
@@ -1031,7 +1050,8 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   Weiter üben: Scheitelpunkt berechnen (Einfach) <i className="fa-solid fa-arrow-right" aria-hidden="true" />
                 </button>
               </nav>
-            </Phase>
+              </Teil>
+            </Etappe>
           </div>
         </div>
       </TaskShell>

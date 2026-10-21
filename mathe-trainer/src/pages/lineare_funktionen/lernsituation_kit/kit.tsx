@@ -6,8 +6,8 @@ import { checkNumber, fmt, pick } from '../../daten_und_zufall/lernpfad/kit'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './kit.css'
 
-// Gemeinsame Bausteine der Einstiegs-Lernsituationen (Schnittpunkt, Nullstellen …):
-// Phasenkopf mit Sozialform und Zeit, Niveaustufen, gestufte Hilfen, Aufgabenkarten mit Prüfen, Auswahlaufgaben
+// Gemeinsame Bausteine der Einstiegs-Lernsituationen (Schnittpunkt, Nullstellen …). Die vier festen Phasen stehen in phasen.tsx.
+// Hier: Sozialformen, Niveaustufen, gestufte Hilfen, Aufgabenkarten mit Prüfen, Auswahlaufgaben
 // mit diagnostischem Feedback und der aufklappbare Infoteil der Übungsseite.
 
 /** Infoteil der Übungsseite (Erklärung, Beispiel, Erklärvideo) */
@@ -71,28 +71,6 @@ export const SOCIAL: Record<Social, { label: string; icon: string }> = {
   PA: { label: 'Partnerarbeit', icon: 'fa-user-group' },
   GA: { label: 'Gruppenarbeit', icon: 'fa-people-group' },
   Plenum: { label: 'Klasse', icon: 'fa-users' },
-}
-
-export function Phase({ no, title, social, minutes, children }: { no: number; title: string; social: Social; minutes: number; children: ReactNode }) {
-  return (
-    <section className="lp-section" aria-labelledby={`phase-${no}`}>
-      <div>
-        <h2 className="lp-h2" id={`phase-${no}`}>
-          <span className="lp-h2-no">{no}</span>
-          {title}
-        </h2>
-        <div className="ls-meta">
-          <span className="ls-chip ls-chip-social">
-            <i className={`fa-solid ${SOCIAL[social].icon}`} aria-hidden="true" /> {SOCIAL[social].label}
-          </span>
-          <span className="ls-chip">
-            <i className="fa-regular fa-clock" aria-hidden="true" /> ca. {minutes} min
-          </span>
-        </div>
-      </div>
-      {children}
-    </section>
-  )
 }
 
 export type Level = 'basis' | 'standard' | 'erweiterung'

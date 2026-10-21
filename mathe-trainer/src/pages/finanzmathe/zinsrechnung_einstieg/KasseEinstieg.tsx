@@ -2,7 +2,8 @@ import { useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import { VideoEmbed } from '../../../components/VideoButton'
 import { Beispiel, M, MB, Merke, Vorgehen, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { Arbeitsweise, CardHead, CheckCard, Hilfen, McCard, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Arbeitsweise, CardHead, CheckCard, Hilfen, McCard } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Etappe, Fortschritt, Teil } from '../../lineare_funktionen/lernsituation_kit/phasen'
 import { VIDEO_ZINSEN } from './BankEinstieg'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './pinnwand.css'
@@ -378,7 +379,16 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
         <Arbeitsweise />
 
         {/* 1 Aktivieren */}
-        <Phase no={1} title="Fit für den Start" social="EA" minutes={8}>
+        <Fortschritt prefix="kasse" />
+
+        <Etappe
+          prefix="kasse"
+          art="start"
+          social="EA"
+          minutes={8}
+          was={<>Kurze Aufgaben allein lösen.</>}
+          wozu={<>Du frischst auf, was du gleich zum Lösen des Problems brauchst.</>}
+        >
           <p>Diese Aufgaben brauchst du gleich. Löse sie allein.</p>
           <div className="lp-exlist">
             <CheckCard
@@ -431,448 +441,477 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
               solution={<MB>{'6 \\cdot 30 = 180 \\text{ Tage}'}</MB>}
             />
           </div>
-        </Phase>
+        </Etappe>
 
         {/* 2 Pinnwand & Festlegung */}
-        <Phase no={2} title="Die Pinnwand der Klasse 10b" social="Plenum" minutes={7}>
-          <p>
-            Die Klasse 10b (24 Schülerinnen und Schüler) fährt im Sommer auf Abschlussfahrt. Das Geld dafür liegt vom <strong>01.02.</strong> bis zum <strong>01.08.</strong> auf einem
-            Tagesgeldkonto mit <strong>3 % p.a.</strong> Von den Zinsen soll das Abschlussgrillen bezahlt werden: <strong>72 €</strong>. An der Pinnwand hängen drei Fragen.
-          </p>
-          <div className="pw-board">
-            <h3 className="pw-board-title">
-              <i className="fa-solid fa-thumbtack" aria-hidden="true" /> Abschlussfahrt 10b
-            </h3>
-            <div className="pw-notes">
-              <div className="pw-note pw-note-K">
-                <span className="pw-note-from">Emma, Klassensprecherin</span>
-                <p>„Wie viel Geld muss in der Kasse liegen, damit bis zum 01.08. genau 72 € Zinsen zusammenkommen? Wie viel muss dann jede und jeder einzahlen?“</p>
-              </div>
-              <div className="pw-note pw-note-p">
-                <span className="pw-note-from">Noah, Kassenwart</span>
-                <p>„Eine andere Bank verspricht: 4.800 € bringen in 180 Tagen 84 € Zinsen. Welcher Zinssatz ist das?“</p>
-              </div>
-              <div className="pw-note pw-note-t">
-                <span className="pw-note-from">Frau Yilmaz, Klassenleitung</span>
-                <p>„In der Kasse liegen schon 3.600 €. Wie lange müssten die bei 3 % liegen, bis 72 € Zinsen zusammen sind?“</p>
+        <Etappe
+          prefix="kasse"
+          art="problem"
+          social="Plenum"
+          minutes={7}
+          was={<>Die Situation lesen und deine Vermutung festhalten. Noch nicht rechnen.</>}
+          wozu={<>Du weißt genau, welche Frage du in Phase 3 beantwortest.</>}
+        >
+          <Teil title="Die Pinnwand der Klasse 10b">
+            <p>
+              Die Klasse 10b (24 Schülerinnen und Schüler) fährt im Sommer auf Abschlussfahrt. Das Geld dafür liegt vom <strong>01.02.</strong> bis zum <strong>01.08.</strong> auf einem
+              Tagesgeldkonto mit <strong>3 % p.a.</strong> Von den Zinsen soll das Abschlussgrillen bezahlt werden: <strong>72 €</strong>. An der Pinnwand hängen drei Fragen.
+            </p>
+            <div className="pw-board">
+              <h3 className="pw-board-title">
+                <i className="fa-solid fa-thumbtack" aria-hidden="true" /> Abschlussfahrt 10b
+              </h3>
+              <div className="pw-notes">
+                <div className="pw-note pw-note-K">
+                  <span className="pw-note-from">Emma, Klassensprecherin</span>
+                  <p>„Wie viel Geld muss in der Kasse liegen, damit bis zum 01.08. genau 72 € Zinsen zusammenkommen? Wie viel muss dann jede und jeder einzahlen?“</p>
+                </div>
+                <div className="pw-note pw-note-p">
+                  <span className="pw-note-from">Noah, Kassenwart</span>
+                  <p>„Eine andere Bank verspricht: 4.800 € bringen in 180 Tagen 84 € Zinsen. Welcher Zinssatz ist das?“</p>
+                </div>
+                <div className="pw-note pw-note-t">
+                  <span className="pw-note-from">Frau Yilmaz, Klassenleitung</span>
+                  <p>„In der Kasse liegen schon 3.600 €. Wie lange müssten die bei 3 % liegen, bis 72 € Zinsen zusammen sind?“</p>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="ls-question">
-            <i className="fa-solid fa-circle-question" aria-hidden="true" />
-            <span>Reicht das Geld in der Kasse für das Abschlussgrillen, und wenn nicht, was muss die Klasse tun?</span>
-          </div>
+            <div className="ls-question">
+              <i className="fa-solid fa-circle-question" aria-hidden="true" />
+              <span>Reicht das Geld in der Kasse für das Abschlussgrillen, und wenn nicht, was muss die Klasse tun?</span>
+            </div>
 
-          <div className="lp-ex bk-panel" data-no-autocheck>
-            <CardHead title="Deine Vermutung" />
-            {pred.saved && pred.choice ? (
-              <>
-                <div className="ls-saved" role="status">
-                  <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: <strong>{CHOICE_TEXT[pred.choice]}</strong>. Deine Schätzung: Für 72 € Zinsen braucht die Klasse
-                  etwa <strong>{fmt(pred.kapital, 0)} €</strong>. Am Ende schauen wir, ob du recht hattest.
-                </div>
-                <div>
-                  <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={() => setPred({ ...pred, saved: false })}>
-                    Vermutung ändern
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p>Rechne noch nicht! Entscheide spontan. Die Klasse stimmt kurz per Handzeichen ab.</p>
-                <div className="ls-options" role="radiogroup" aria-label="Reichen die 3.600 €?">
-                  {(['ja', 'nein'] as const).map((c) => (
-                    <label key={c} className="bk-choice ls-option">
-                      <input type="radio" name="kasse-pred" checked={pred.choice === c} onChange={() => setPred({ ...pred, choice: c })} />
-                      <span>{CHOICE_TEXT[c]}</span>
+            <div className="lp-ex bk-panel" data-no-autocheck>
+              <CardHead title="Deine Vermutung" />
+              {pred.saved && pred.choice ? (
+                <>
+                  <div className="ls-saved" role="status">
+                    <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: <strong>{CHOICE_TEXT[pred.choice]}</strong>. Deine Schätzung: Für 72 € Zinsen braucht die Klasse
+                    etwa <strong>{fmt(pred.kapital, 0)} €</strong>. Am Ende schauen wir, ob du recht hattest.
+                  </div>
+                  <div>
+                    <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={() => setPred({ ...pred, saved: false })}>
+                      Vermutung ändern
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p>Rechne noch nicht! Entscheide spontan. Die Klasse stimmt kurz per Handzeichen ab.</p>
+                  <div className="ls-options" role="radiogroup" aria-label="Reichen die 3.600 €?">
+                    {(['ja', 'nein'] as const).map((c) => (
+                      <label key={c} className="bk-choice ls-option">
+                        <input type="radio" name="kasse-pred" checked={pred.choice === c} onChange={() => setPred({ ...pred, choice: c })} />
+                        <span>{CHOICE_TEXT[c]}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="ls-slider">
+                    <label htmlFor="kasse-pred-k">
+                      Ich schätze: Für 72 € Zinsen bis zum 01.08. braucht die Klasse insgesamt etwa <span className="ls-slider-value">{fmt(pred.kapital, 0)} €</span>.
                     </label>
-                  ))}
-                </div>
-                <div className="ls-slider">
-                  <label htmlFor="kasse-pred-k">
-                    Ich schätze: Für 72 € Zinsen bis zum 01.08. braucht die Klasse insgesamt etwa <span className="ls-slider-value">{fmt(pred.kapital, 0)} €</span>.
-                  </label>
-                  <input
-                    id="kasse-pred-k"
-                    type="range"
-                    min={500}
-                    max={10000}
-                    step={100}
-                    value={pred.kapital}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, kapital: Number(e.target.value) })}
-                  />
-                </div>
-                <div>
-                  <button type="button" className="bk-btn bk-btn-primary" disabled={!pred.choice} onClick={() => setPred({ ...pred, saved: true })}>
-                    <i className="fa-solid fa-lock" aria-hidden="true" /> Vermutung festhalten
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </Phase>
+                    <input
+                      id="kasse-pred-k"
+                      type="range"
+                      min={500}
+                      max={10000}
+                      step={100}
+                      value={pred.kapital}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, kapital: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <button type="button" className="bk-btn bk-btn-primary" disabled={!pred.choice} onClick={() => setPred({ ...pred, saved: true })}>
+                      <i className="fa-solid fa-lock" aria-hidden="true" /> Vermutung festhalten
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </Teil>
+        </Etappe>
 
         {/* 3 Expertenphase */}
-        <Phase no={3} title="Expertenphase: Werdet Profis für eine Größe" social="GA" minutes={25}>
-          <div className="lp-ex bk-panel">
-            <CardHead title="So läuft das Gruppenpuzzle" />
-            <ol>
-              <li>
-                Bildet <strong>Stammgruppen</strong> zu dritt. Jede Person wählt eine andere Kachel: <M>K</M>, <M>p</M> oder <M>t</M>.
-              </li>
-              <li>
-                Alle mit derselben Kachel setzen sich zu einer <strong>Expertengruppe</strong> zusammen (2 bis 4 Personen) und arbeiten die Schritte 1 bis 4 durch.
-              </li>
-              <li>Danach geht jede Person zurück in ihre Stammgruppe und erklärt dort ihre Größe (Abschnitt 4).</li>
-            </ol>
-            <p className="lp-hint">Du arbeitest allein? Dann bearbeite nacheinander alle drei Kacheln.</p>
-          </div>
-          <div className="lp-ex bk-panel">
-            <CardHead title="Infokarte für alle: Der Umstell-Trick" />
-            <p>Egal, ob ihr K, p oder t sucht: Ihr geht immer gleich vor.</p>
-            <Vorgehen
-              steps={[
-                <>
-                  <strong>Bruch loswerden:</strong> Beide Seiten der Zinsformel mal 100 · 360 nehmen. Es entsteht <M>{'Z \\cdot 100 \\cdot 360 = K \\cdot p \\cdot t'}</M>.
-                </>,
-                <>
-                  <strong>Gesuchte Größe freistellen:</strong> Durch die beiden anderen Größen auf der rechten Seite teilen.
-                </>,
-                <>
-                  <strong>Einsetzen, ausrechnen, Probe:</strong> Ergebnis in die Zinsformel einsetzen. Es müssen wieder die Zinsen herauskommen.
-                </>,
-              ]}
-            />
-          </div>
-          <Expertenphase />
-        </Phase>
+        <Etappe
+          prefix="kasse"
+          art="loesen"
+          minutes={53}
+          was={<>In der Expertengruppe eine Größe erarbeiten, dann in der Stammgruppe die Fragen der Pinnwand lösen und die Wege vergleichen.</>}
+          wozu={<>So berechnest du Kapital, Zinssatz oder Zinstage, wenn die anderen Größen bekannt sind.</>}
+        >
+          <Teil title="Expertenphase: Werdet Profis für eine Größe" social="GA" minutes={25}>
+            <div className="lp-ex bk-panel">
+              <CardHead title="So läuft das Gruppenpuzzle" />
+              <ol>
+                <li>
+                  Bildet <strong>Stammgruppen</strong> zu dritt. Jede Person wählt eine andere Kachel: <M>K</M>, <M>p</M> oder <M>t</M>.
+                </li>
+                <li>
+                  Alle mit derselben Kachel setzen sich zu einer <strong>Expertengruppe</strong> zusammen (2 bis 4 Personen) und arbeiten die Schritte 1 bis 4 durch.
+                </li>
+                <li>Danach geht jede Person zurück in ihre Stammgruppe und erklärt dort ihre Größe (Abschnitt 4).</li>
+              </ol>
+              <p className="lp-hint">Du arbeitest allein? Dann bearbeite nacheinander alle drei Kacheln.</p>
+            </div>
+            <div className="lp-ex bk-panel">
+              <CardHead title="Infokarte für alle: Der Umstell-Trick" />
+              <p>Egal, ob ihr K, p oder t sucht: Ihr geht immer gleich vor.</p>
+              <Vorgehen
+                steps={[
+                  <>
+                    <strong>Bruch loswerden:</strong> Beide Seiten der Zinsformel mal 100 · 360 nehmen. Es entsteht <M>{'Z \\cdot 100 \\cdot 360 = K \\cdot p \\cdot t'}</M>.
+                  </>,
+                  <>
+                    <strong>Gesuchte Größe freistellen:</strong> Durch die beiden anderen Größen auf der rechten Seite teilen.
+                  </>,
+                  <>
+                    <strong>Einsetzen, ausrechnen, Probe:</strong> Ergebnis in die Zinsformel einsetzen. Es müssen wieder die Zinsen herauskommen.
+                  </>,
+                ]}
+              />
+            </div>
+            <Expertenphase />
+          </Teil>
+
 
         {/* 4 Stammgruppe */}
-        <Phase no={4} title="Stammgruppe: Löst die Fragen an der Pinnwand" social="GA" minutes={20}>
-          <p>
-            <strong>Auftrag:</strong> Ihr seid wieder in eurer Stammgruppe. Jede Frage gehört einer Expertin oder einem Experten: Sie oder er erklärt den Rechenweg, die anderen
-            rechnen mit und tragen das Ergebnis ein.
-          </p>
-          <div className="lp-exlist">
-            <CheckCard
-              title="Emmas Frage · Expertin oder Experte K erklärt"
-              level="standard"
-              prompt={
-                <p>
-                  Wie viel Geld muss in der Kasse liegen, damit es vom 01.02. bis zum 01.08. (180 Tage) bei 3 % p.a. genau 72 € Zinsen gibt? Wie viel muss dann jede der 24
-                  Personen einzahlen?
-                </p>
-              }
-              fieldsRow
-              fields={[
-                { kind: 'num', key: 'k', label: <M>{'K ='}</M>, expected: K_NOETIG, unit: '€' },
-                { kind: 'num', key: 'pp', label: 'pro Person:', expected: K_NOETIG / 24, unit: '€' },
-              ]}
-              solution={
-                <>
-                  <MB>{'K = \\frac{72 \\cdot 100 \\cdot 360}{3 \\cdot 180} = \\frac{2\\,592\\,000}{540} = 4\\,800'}</MB>
-                  <MB>{'4\\,800 \\text{ €} : 24 = 200 \\text{ €}'}</MB>
-                  <p>Probe: <M>{'\\frac{4\\,800 \\cdot 3 \\cdot 180}{36\\,000} = 72'}</M> ✓</p>
-                </>
-              }
-              help={
-                <Hilfen
-                  steps={[
-                    <>Gesucht ist das Kapital. Welche Werte kennt ihr? Z = 72 €, p = 3, t = 180.</>,
-                    <>Nehmt die Formel für K aus der Expertenphase und setzt ein. Danach teilt ihr das Kapital durch 24.</>,
-                    <>
-                      <M>{'K = \\frac{72 \\cdot 100 \\cdot 360}{3 \\cdot 180}'}</M>
-                    </>,
-                  ]}
-                />
-              }
-            />
-            <CheckCard
-              title="Noahs Frage · Expertin oder Experte p erklärt"
-              level="standard"
-              prompt={<p>Eine andere Bank verspricht: 4.800 € bringen in 180 Tagen 84 € Zinsen. Welcher Zinssatz steckt dahinter?</p>}
-              fields={[{ kind: 'num', key: 'p', label: <M>{'p ='}</M>, expected: 3.5, unit: '% p.a.' }]}
-              solution={
-                <>
-                  <MB>{'p = \\frac{84 \\cdot 100 \\cdot 360}{4\\,800 \\cdot 180} = \\frac{3\\,024\\,000}{864\\,000} = 3{,}5'}</MB>
-                  <p>Die andere Bank zahlt 3,5 % p.a.</p>
-                </>
-              }
-              help={
-                <Hilfen
-                  steps={[
-                    <>Gesucht ist der Zinssatz. Welche Werte kennt ihr? K = 4.800 €, t = 180, Z = 84 €.</>,
-                    <>Nehmt die Formel für p: oben Z · 100 · 360, unten K · t.</>,
-                    <>
-                      <M>{'p = \\frac{84 \\cdot 100 \\cdot 360}{4\\,800 \\cdot 180}'}</M>
-                    </>,
-                  ]}
-                />
-              }
-            />
-            <CheckCard
-              title="Frau Yilmaz’ Frage · Expertin oder Experte t erklärt"
-              level="standard"
-              prompt={<p>In der Kasse liegen schon 3.600 € zu 3 % p.a. Wie viele Tage müssten sie liegen, bis 72 € Zinsen zusammen sind? Reicht die Zeit bis zum 01.08.?</p>}
-              fieldsRow
-              fields={[
-                { kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 240, unit: 'Tage' },
-                { kind: 'select', key: 'r', label: 'Reicht die Zeit?', options: ['Ja, 180 Tage genügen', 'Nein, 180 Tage sind zu wenig'], expected: 1 },
-              ]}
-              solution={
-                <>
-                  <MB>{'t = \\frac{72 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 3} = \\frac{2\\,592\\,000}{10\\,800} = 240'}</MB>
-                  <p>Das Geld müsste 240 Tage liegen, bis zum 01.08. sind es aber nur 180 Tage. In 180 Tagen bringen die 3.600 € nur 54 €.</p>
-                </>
-              }
-              help={
-                <Hilfen
-                  steps={[
-                    <>Gesucht sind die Zinstage. Welche Werte kennt ihr? K = 3.600 €, p = 3, Z = 72 €.</>,
-                    <>Nehmt die Formel für t: oben Z · 100 · 360, unten K · p. Vergleicht das Ergebnis mit den 180 Tagen bis zum 01.08.</>,
-                    <>
-                      <M>{'t = \\frac{72 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 3}'}</M>
-                    </>,
-                  ]}
-                />
-              }
-            />
-            <McCard
-              title="Eure Empfehlung für die Klasse"
-              prompt={<p>Was empfehlt ihr der Klasse 10b, damit das Abschlussgrillen bis zum 01.08. bezahlt ist?</p>}
-              options={[
-                {
-                  text: 'Jede Person zahlt 200 € statt 150 € ein. Dann liegen 4.800 € in der Kasse, und es gibt genau 72 € Zinsen. Bei der anderen Bank wären es sogar 84 €.',
-                  correct: true,
-                  feedback: 'Mit 4.800 € reicht es: bei 3 % genau 72 €, bei 3,5 % sogar 84 €.',
-                },
-                {
-                  text: 'Nichts ändern: 3 % von 3.600 € sind 108 €, das reicht locker.',
-                  feedback: '108 € gäbe es nur für ein ganzes Jahr. Das Geld liegt aber nur 180 Tage, das bringt 54 €.',
-                },
-                {
-                  text: 'Das Geld einfach bis zum 01.08. liegen lassen, denn 240 Tage sind weniger als ein halbes Jahr.',
-                  feedback: '240 Tage sind 8 Monate, also mehr als ein halbes Jahr. Bis zum 01.08. sind es nur 180 Tage.',
-                },
-                {
-                  text: 'Jede Person zahlt 1 € mehr ein, das reicht für die fehlenden 18 €.',
-                  feedback: '24 € mehr Kapital bringen in 180 Tagen nur wenige Cent Zinsen. Für 18 € mehr Zinsen braucht man 1.200 € mehr Kapital.',
-                },
-              ]}
-            />
-            <CheckCard
-              title="Für Profis: Welcher Zinssatz würde reichen?"
-              level="erweiterung"
-              prompt={
-                <p>
-                  Die Klasse will nicht mehr einzahlen. Welchen Zinssatz bräuchten die 3.600 €, damit sie in 180 Tagen 72 € Zinsen bringen? Begründet im Heft, ob so ein Angebot
-                  realistisch ist.
-                </p>
-              }
-              fields={[{ kind: 'num', key: 'p', label: <M>{'p ='}</M>, expected: 4, unit: '% p.a.' }]}
-              solution={
-                <>
-                  <MB>{'p = \\frac{72 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 180} = \\frac{2\\,592\\,000}{648\\,000} = 4'}</MB>
-                  <p>Es bräuchte 4 % p.a. Das bieten Tagesgeldkonten derzeit kaum an, darum ist mehr Kapital der sicherere Weg.</p>
-                </>
-              }
-              help={
-                <Hilfen
-                  steps={[
-                    <>Diesmal ist p gesucht. Welche drei Werte kennt ihr?</>,
-                    <>K = 3.600 €, t = 180, Z = 72 €. Nehmt die Formel für p.</>,
-                    <>
-                      <M>{'p = \\frac{72 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 180}'}</M>
-                    </>,
-                  ]}
-                />
-              }
-            />
-          </div>
-        </Phase>
+          <Teil title="Stammgruppe: Löst die Fragen an der Pinnwand" social="GA" minutes={20}>
+            <p>
+              <strong>Auftrag:</strong> Ihr seid wieder in eurer Stammgruppe. Jede Frage gehört einer Expertin oder einem Experten: Sie oder er erklärt den Rechenweg, die anderen
+              rechnen mit und tragen das Ergebnis ein.
+            </p>
+            <div className="lp-exlist">
+              <CheckCard
+                title="Emmas Frage · Expertin oder Experte K erklärt"
+                level="standard"
+                prompt={
+                  <p>
+                    Wie viel Geld muss in der Kasse liegen, damit es vom 01.02. bis zum 01.08. (180 Tage) bei 3 % p.a. genau 72 € Zinsen gibt? Wie viel muss dann jede der 24
+                    Personen einzahlen?
+                  </p>
+                }
+                fieldsRow
+                fields={[
+                  { kind: 'num', key: 'k', label: <M>{'K ='}</M>, expected: K_NOETIG, unit: '€' },
+                  { kind: 'num', key: 'pp', label: 'pro Person:', expected: K_NOETIG / 24, unit: '€' },
+                ]}
+                solution={
+                  <>
+                    <MB>{'K = \\frac{72 \\cdot 100 \\cdot 360}{3 \\cdot 180} = \\frac{2\\,592\\,000}{540} = 4\\,800'}</MB>
+                    <MB>{'4\\,800 \\text{ €} : 24 = 200 \\text{ €}'}</MB>
+                    <p>Probe: <M>{'\\frac{4\\,800 \\cdot 3 \\cdot 180}{36\\,000} = 72'}</M> ✓</p>
+                  </>
+                }
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Gesucht ist das Kapital. Welche Werte kennt ihr? Z = 72 €, p = 3, t = 180.</>,
+                      <>Nehmt die Formel für K aus der Expertenphase und setzt ein. Danach teilt ihr das Kapital durch 24.</>,
+                      <>
+                        <M>{'K = \\frac{72 \\cdot 100 \\cdot 360}{3 \\cdot 180}'}</M>
+                      </>,
+                    ]}
+                  />
+                }
+              />
+              <CheckCard
+                title="Noahs Frage · Expertin oder Experte p erklärt"
+                level="standard"
+                prompt={<p>Eine andere Bank verspricht: 4.800 € bringen in 180 Tagen 84 € Zinsen. Welcher Zinssatz steckt dahinter?</p>}
+                fields={[{ kind: 'num', key: 'p', label: <M>{'p ='}</M>, expected: 3.5, unit: '% p.a.' }]}
+                solution={
+                  <>
+                    <MB>{'p = \\frac{84 \\cdot 100 \\cdot 360}{4\\,800 \\cdot 180} = \\frac{3\\,024\\,000}{864\\,000} = 3{,}5'}</MB>
+                    <p>Die andere Bank zahlt 3,5 % p.a.</p>
+                  </>
+                }
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Gesucht ist der Zinssatz. Welche Werte kennt ihr? K = 4.800 €, t = 180, Z = 84 €.</>,
+                      <>Nehmt die Formel für p: oben Z · 100 · 360, unten K · t.</>,
+                      <>
+                        <M>{'p = \\frac{84 \\cdot 100 \\cdot 360}{4\\,800 \\cdot 180}'}</M>
+                      </>,
+                    ]}
+                  />
+                }
+              />
+              <CheckCard
+                title="Frau Yilmaz’ Frage · Expertin oder Experte t erklärt"
+                level="standard"
+                prompt={<p>In der Kasse liegen schon 3.600 € zu 3 % p.a. Wie viele Tage müssten sie liegen, bis 72 € Zinsen zusammen sind? Reicht die Zeit bis zum 01.08.?</p>}
+                fieldsRow
+                fields={[
+                  { kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 240, unit: 'Tage' },
+                  { kind: 'select', key: 'r', label: 'Reicht die Zeit?', options: ['Ja, 180 Tage genügen', 'Nein, 180 Tage sind zu wenig'], expected: 1 },
+                ]}
+                solution={
+                  <>
+                    <MB>{'t = \\frac{72 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 3} = \\frac{2\\,592\\,000}{10\\,800} = 240'}</MB>
+                    <p>Das Geld müsste 240 Tage liegen, bis zum 01.08. sind es aber nur 180 Tage. In 180 Tagen bringen die 3.600 € nur 54 €.</p>
+                  </>
+                }
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Gesucht sind die Zinstage. Welche Werte kennt ihr? K = 3.600 €, p = 3, Z = 72 €.</>,
+                      <>Nehmt die Formel für t: oben Z · 100 · 360, unten K · p. Vergleicht das Ergebnis mit den 180 Tagen bis zum 01.08.</>,
+                      <>
+                        <M>{'t = \\frac{72 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 3}'}</M>
+                      </>,
+                    ]}
+                  />
+                }
+              />
+              <McCard
+                title="Eure Empfehlung für die Klasse"
+                prompt={<p>Was empfehlt ihr der Klasse 10b, damit das Abschlussgrillen bis zum 01.08. bezahlt ist?</p>}
+                options={[
+                  {
+                    text: 'Jede Person zahlt 200 € statt 150 € ein. Dann liegen 4.800 € in der Kasse, und es gibt genau 72 € Zinsen. Bei der anderen Bank wären es sogar 84 €.',
+                    correct: true,
+                    feedback: 'Mit 4.800 € reicht es: bei 3 % genau 72 €, bei 3,5 % sogar 84 €.',
+                  },
+                  {
+                    text: 'Nichts ändern: 3 % von 3.600 € sind 108 €, das reicht locker.',
+                    feedback: '108 € gäbe es nur für ein ganzes Jahr. Das Geld liegt aber nur 180 Tage, das bringt 54 €.',
+                  },
+                  {
+                    text: 'Das Geld einfach bis zum 01.08. liegen lassen, denn 240 Tage sind weniger als ein halbes Jahr.',
+                    feedback: '240 Tage sind 8 Monate, also mehr als ein halbes Jahr. Bis zum 01.08. sind es nur 180 Tage.',
+                  },
+                  {
+                    text: 'Jede Person zahlt 1 € mehr ein, das reicht für die fehlenden 18 €.',
+                    feedback: '24 € mehr Kapital bringen in 180 Tagen nur wenige Cent Zinsen. Für 18 € mehr Zinsen braucht man 1.200 € mehr Kapital.',
+                  },
+                ]}
+              />
+              <CheckCard
+                title="Für Profis: Welcher Zinssatz würde reichen?"
+                level="erweiterung"
+                prompt={
+                  <p>
+                    Die Klasse will nicht mehr einzahlen. Welchen Zinssatz bräuchten die 3.600 €, damit sie in 180 Tagen 72 € Zinsen bringen? Begründet im Heft, ob so ein Angebot
+                    realistisch ist.
+                  </p>
+                }
+                fields={[{ kind: 'num', key: 'p', label: <M>{'p ='}</M>, expected: 4, unit: '% p.a.' }]}
+                solution={
+                  <>
+                    <MB>{'p = \\frac{72 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 180} = \\frac{2\\,592\\,000}{648\\,000} = 4'}</MB>
+                    <p>Es bräuchte 4 % p.a. Das bieten Tagesgeldkonten derzeit kaum an, darum ist mehr Kapital der sicherere Weg.</p>
+                  </>
+                }
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Diesmal ist p gesucht. Welche drei Werte kennt ihr?</>,
+                      <>K = 3.600 €, t = 180, Z = 72 €. Nehmt die Formel für p.</>,
+                      <>
+                        <M>{'p = \\frac{72 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 180}'}</M>
+                      </>,
+                    ]}
+                  />
+                }
+              />
+            </div>
+          </Teil>
+
 
         {/* 5 Austausch */}
-        <Phase no={5} title="Vergleicht eure Wege" social="Plenum" minutes={8}>
-          <div className="ls-stop">
-            <div className="ls-stop-title">
-              <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
+          <Teil title="Vergleicht eure Wege" social="Plenum" minutes={8}>
+            <div className="ls-stop">
+              <div className="ls-stop-title">
+                <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
+              </div>
+              <ul>
+                <li>Warum reichen die 3.600 € nicht, obwohl „3 % von 3.600 €“ 108 € ergibt?</li>
+                <li>Welche Formel war am leichtesten, welche am schwersten? Warum ist es eigentlich immer derselbe Trick?</li>
+                <li>Wie merkt man schnell, dass ein Ergebnis nicht stimmen kann?</li>
+              </ul>
             </div>
-            <ul>
-              <li>Warum reichen die 3.600 € nicht, obwohl „3 % von 3.600 €“ 108 € ergibt?</li>
-              <li>Welche Formel war am leichtesten, welche am schwersten? Warum ist es eigentlich immer derselbe Trick?</li>
-              <li>Wie merkt man schnell, dass ein Ergebnis nicht stimmen kann?</li>
-            </ul>
-          </div>
-          <p>
-            <strong>Du arbeitest allein?</strong> So haben drei andere Jugendliche Emmas Frage gelöst. Klappe die Wege auf und vergleiche sie mit deinem.
-          </p>
-          <div className="ls-ways">
-            <details className="ls-way">
-              <summary>Tom hat die Formel umgestellt</summary>
-              <div className="ls-way-body">
-                <p>
-                  „Erst mal 100 · 360, dann durch <M>{'p \\cdot t'}</M>: <M>{'K = \\frac{72 \\cdot 100 \\cdot 360}{3 \\cdot 180} = 4\\,800'}</M>. Das sind 200 € pro Person.“
-                </p>
-                <p>
-                  <strong>Gut:</strong> Mit dem Umstell-Trick funktioniert das für K, p und t gleich.
-                </p>
-              </div>
-            </details>
-            <details className="ls-way">
-              <summary>Sara hat überlegt, was 1 € bringt</summary>
-              <div className="ls-way-body">
-                <p>
-                  „1 € bringt in 180 Tagen bei 3 %: <M>{'\\frac{1 \\cdot 3 \\cdot 180}{36\\,000} = 0{,}015'}</M> €. Für 72 € brauche ich <M>{'72 : 0{,}015 = 4\\,800'}</M> Euro.“
-                </p>
-                <p>
-                  <strong>Gut:</strong> So sieht man, warum man so viel Kapital braucht: Jeder Euro bringt nur anderthalb Cent. Das ist derselbe Rechenweg wie Toms, nur in zwei
-                  Schritten.
-                </p>
-              </div>
-            </details>
-            <details className="ls-way">
-              <summary>Jonas hat sich verrechnet</summary>
-              <div className="ls-way-body">
-                <p>
-                  „<M>{'K = \\frac{72 \\cdot 3 \\cdot 180}{100 \\cdot 360} = 1{,}08'}</M>. Die Klasse braucht also nur 1,08 €.“
-                </p>
-                <p>
-                  <strong>Problem:</strong> Jonas hat die Zinsformel nicht umgestellt, sondern Z an die Stelle von K gesetzt. 1,08 € Kapital können niemals 72 € Zinsen bringen.
-                  Eine kurze Probe oder ein Blick auf die Größenordnung zeigt den Fehler sofort.
-                </p>
-              </div>
-            </details>
-          </div>
-        </Phase>
+            <p>
+              <strong>Du arbeitest allein?</strong> So haben drei andere Jugendliche Emmas Frage gelöst. Klappe die Wege auf und vergleiche sie mit deinem.
+            </p>
+            <div className="ls-ways">
+              <details className="ls-way">
+                <summary>Tom hat die Formel umgestellt</summary>
+                <div className="ls-way-body">
+                  <p>
+                    „Erst mal 100 · 360, dann durch <M>{'p \\cdot t'}</M>: <M>{'K = \\frac{72 \\cdot 100 \\cdot 360}{3 \\cdot 180} = 4\\,800'}</M>. Das sind 200 € pro Person.“
+                  </p>
+                  <p>
+                    <strong>Gut:</strong> Mit dem Umstell-Trick funktioniert das für K, p und t gleich.
+                  </p>
+                </div>
+              </details>
+              <details className="ls-way">
+                <summary>Sara hat überlegt, was 1 € bringt</summary>
+                <div className="ls-way-body">
+                  <p>
+                    „1 € bringt in 180 Tagen bei 3 %: <M>{'\\frac{1 \\cdot 3 \\cdot 180}{36\\,000} = 0{,}015'}</M> €. Für 72 € brauche ich <M>{'72 : 0{,}015 = 4\\,800'}</M> Euro.“
+                  </p>
+                  <p>
+                    <strong>Gut:</strong> So sieht man, warum man so viel Kapital braucht: Jeder Euro bringt nur anderthalb Cent. Das ist derselbe Rechenweg wie Toms, nur in zwei
+                    Schritten.
+                  </p>
+                </div>
+              </details>
+              <details className="ls-way">
+                <summary>Jonas hat sich verrechnet</summary>
+                <div className="ls-way-body">
+                  <p>
+                    „<M>{'K = \\frac{72 \\cdot 3 \\cdot 180}{100 \\cdot 360} = 1{,}08'}</M>. Die Klasse braucht also nur 1,08 €.“
+                  </p>
+                  <p>
+                    <strong>Problem:</strong> Jonas hat die Zinsformel nicht umgestellt, sondern Z an die Stelle von K gesetzt. 1,08 € Kapital können niemals 72 € Zinsen bringen.
+                    Eine kurze Probe oder ein Blick auf die Größenordnung zeigt den Fehler sofort.
+                  </p>
+                </div>
+              </details>
+            </div>
+          </Teil>
+        </Etappe>
 
         {/* 6 Sichern & Lernprodukt */}
-        <Phase no={6} title="Das hältst du fest" social="EA" minutes={12}>
-          <Rueckbezug pred={pred} />
-          <Merke title="Die Zinsformel umstellen">
-            <p>Aus der Zinsformel wird durch „mal 100 · 360“ eine Gleichung ohne Bruch. Teilst du dann durch die beiden anderen Größen, erhältst du:</p>
-            <div className="pw-formulas">
-              <div>
-                <MB>{'Z = \\frac{K \\cdot p \\cdot t}{100 \\cdot 360}'}</MB>
+        <Etappe
+          prefix="kasse"
+          art="sichern"
+          social="EA"
+          minutes={22}
+          was={<>Das Wichtigste in deinem Heft festhalten und dann allein prüfen, ob du es kannst.</>}
+          wozu={<>Dein Hefteintrag hilft dir bei allen Aufgaben dieser Art. Der Check zeigt dir, wo du noch unsicher bist.</>}
+        >
+          <Teil title="Das hältst du fest" social="EA" minutes={12}>
+            <Rueckbezug pred={pred} />
+            <Merke title="Die Zinsformel umstellen">
+              <p>Aus der Zinsformel wird durch „mal 100 · 360“ eine Gleichung ohne Bruch. Teilst du dann durch die beiden anderen Größen, erhältst du:</p>
+              <div className="pw-formulas">
+                <div>
+                  <MB>{'Z = \\frac{K \\cdot p \\cdot t}{100 \\cdot 360}'}</MB>
+                </div>
+                <div>
+                  <MB>{'K = \\frac{Z \\cdot 100 \\cdot 360}{p \\cdot t}'}</MB>
+                </div>
+                <div>
+                  <MB>{'p = \\frac{Z \\cdot 100 \\cdot 360}{K \\cdot t}'}</MB>
+                </div>
+                <div>
+                  <MB>{'t = \\frac{Z \\cdot 100 \\cdot 360}{K \\cdot p}'}</MB>
+                </div>
               </div>
-              <div>
-                <MB>{'K = \\frac{Z \\cdot 100 \\cdot 360}{p \\cdot t}'}</MB>
+              <ul>
+                <li>Immer tagesgenau rechnen: t in Tagen, jeder Monat 30 Tage, das Jahr 360 Tage.</li>
+                <li>Probe: Ergebnis in die Zinsformel einsetzen. Es müssen wieder die Zinsen herauskommen.</li>
+                <li>Größenordnung prüfen: Für wenige Euro Zinsen braucht man viel Kapital oder viel Zeit.</li>
+              </ul>
+            </Merke>
+            <div className="lp-ex bk-panel">
+              <CardHead title="Dein Lernprodukt: Erfinde eine Aufgabe für die Pinnwand" />
+              <p>
+                Erfinde eine eigene Zinsaufgabe, bei der <M>K</M>, <M>p</M> oder <M>t</M> gesucht ist. Der Baukasten rechnet die Lösung für dich aus. Tauscht danach eure Aufgaben in der
+                Stammgruppe und löst sie im Heft. Hake ab, was deine Aufgabe erfüllt:
+              </p>
+              <div className="ls-criteria">
+                {[
+                  'Eine kleine Geschichte aus deinem Alltag und eine klare Frage',
+                  'Genau eine gesuchte Größe, die anderen drei sind gegeben',
+                  'Realistische Zahlen: Zinssatz höchstens 6 % p.a., höchstens 360 Tage',
+                  'Du kannst den Rechenweg deiner Aufgabe Schritt für Schritt erklären',
+                ].map((c) => (
+                  <label key={c}>
+                    <input type="checkbox" /> <span>{c}</span>
+                  </label>
+                ))}
               </div>
-              <div>
-                <MB>{'p = \\frac{Z \\cdot 100 \\cdot 360}{K \\cdot t}'}</MB>
-              </div>
-              <div>
-                <MB>{'t = \\frac{Z \\cdot 100 \\cdot 360}{K \\cdot p}'}</MB>
-              </div>
+              <Baukasten />
             </div>
-            <ul>
-              <li>Immer tagesgenau rechnen: t in Tagen, jeder Monat 30 Tage, das Jahr 360 Tage.</li>
-              <li>Probe: Ergebnis in die Zinsformel einsetzen. Es müssen wieder die Zinsen herauskommen.</li>
-              <li>Größenordnung prüfen: Für wenige Euro Zinsen braucht man viel Kapital oder viel Zeit.</li>
-            </ul>
-          </Merke>
-          <div className="lp-ex bk-panel">
-            <CardHead title="Dein Lernprodukt: Erfinde eine Aufgabe für die Pinnwand" />
-            <p>
-              Erfinde eine eigene Zinsaufgabe, bei der <M>K</M>, <M>p</M> oder <M>t</M> gesucht ist. Der Baukasten rechnet die Lösung für dich aus. Tauscht danach eure Aufgaben in der
-              Stammgruppe und löst sie im Heft. Hake ab, was deine Aufgabe erfüllt:
-            </p>
-            <div className="ls-criteria">
-              {[
-                'Eine kleine Geschichte aus deinem Alltag und eine klare Frage',
-                'Genau eine gesuchte Größe, die anderen drei sind gegeben',
-                'Realistische Zahlen: Zinssatz höchstens 6 % p.a., höchstens 360 Tage',
-                'Du kannst den Rechenweg deiner Aufgabe Schritt für Schritt erklären',
-              ].map((c) => (
-                <label key={c}>
-                  <input type="checkbox" /> <span>{c}</span>
-                </label>
-              ))}
-            </div>
-            <Baukasten />
-          </div>
-        </Phase>
+          </Teil>
+
 
         {/* 7 Check */}
-        <Phase no={7} title="Check: Hast du es verstanden?" social="EA" minutes={10}>
-          <div className="lp-exlist">
-            <McCard
-              title="Check 1: Die richtige Formel"
-              level="basis"
-              prompt={<p>Welche Formel berechnet die Zinstage t?</p>}
-              options={[
-                { text: <M>{'t = \\frac{K \\cdot p \\cdot 100 \\cdot 360}{Z}'}</M>, feedback: 'Hier sind Zähler und Nenner vertauscht. Z gehört nach oben, K und p nach unten.' },
-                { text: <M>{'t = \\frac{Z \\cdot 100 \\cdot 360}{K \\cdot p}'}</M>, correct: true, feedback: 'Erst mal 100 · 360, dann durch K · p teilen.' },
-                { text: <M>{'t = \\frac{Z \\cdot K \\cdot p}{100 \\cdot 360}'}</M>, feedback: 'Das ist die Zinsformel mit Z an der falschen Stelle. Beim Umstellen wandern 100 · 360 nach oben.' },
-                { text: <M>{'t = \\frac{Z}{K \\cdot p}'}</M>, feedback: 'Hier fehlt 100 · 360 im Zähler. Ohne diese Zahlen wird t viel zu klein.' },
-              ]}
-            />
-            <CheckCard
-              title="Check 2: Kapital berechnen"
-              level="standard"
-              prompt={<p>Wie viel Geld muss man zu 2,4 % p.a. anlegen, damit es in 75 Tagen 18 € Zinsen gibt?</p>}
-              fields={[{ kind: 'num', key: 'k', label: <M>{'K ='}</M>, expected: 3600, unit: '€' }]}
-              solution={<MB>{'K = \\frac{18 \\cdot 100 \\cdot 360}{2{,}4 \\cdot 75} = \\frac{648\\,000}{180} = 3\\,600'}</MB>}
-              help={
-                <Hilfen
-                  steps={[
-                    <>Welche Größe ist gesucht, welche sind gegeben?</>,
-                    <>Gesucht ist K. Oben steht Z · 100 · 360, unten p · t.</>,
-                    <>
-                      <M>{'K = \\frac{18 \\cdot 100 \\cdot 360}{2{,}4 \\cdot 75}'}</M>
-                    </>,
-                  ]}
-                />
-              }
-            />
-            <McCard
-              title="Check 3: Wer hat recht?"
-              rechnen
-              level="standard"
-              prompt={
-                <p>
-                  2.000 € liegen 90 Tage auf einem Konto und bringen 10 € Zinsen. Ben rechnet p = 0,02. Lea rechnet p = 2. Ali rechnet p = 0,5. Wer hat recht?
-                </p>
-              }
-              options={[
-                { text: 'Ben: 0,02 % p.a.', feedback: 'Ben hat die 100 vergessen: 10 · 360 / (2.000 · 90) = 0,02. Richtig ist 10 · 100 · 360 / (2.000 · 90).' },
-                { text: 'Lea: 2 % p.a.', correct: true, feedback: 'p = 10 · 100 · 360 / (2.000 · 90) = 360.000 / 180.000 = 2.' },
-                { text: 'Ali: 0,5 % p.a.', feedback: 'Ali hat den Bruch auf den Kopf gestellt: 2.000 · 90 / (10 · 100 · 360) = 0,5. Z · 100 · 360 gehört nach oben.' },
-                { text: 'Niemand, man kann p aus diesen Angaben nicht berechnen.', feedback: 'K, t und Z sind gegeben. Damit lässt sich p mit der umgestellten Formel berechnen.' },
-              ]}
-            />
-            <CheckCard
-              title="Check 4: Wann ist das Ziel erreicht?"
-              level="erweiterung"
-              prompt={
-                <p>
-                  Mira legt am 10.03. 5.000 € zu 2,4 % p.a. an. Sie möchte 25 € Zinsen für ein Konzertticket. Wie viele Zinstage braucht sie, und an welchem Tag hat sie die 25 €
-                  zusammen? (Bankregel: jeder Monat 30 Tage)
-                </p>
-              }
-              fieldsRow
-              fields={[
-                { kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 75, unit: 'Tage' },
-                { kind: 'num', key: 'd', label: 'Datum: Tag', expected: 25 },
-                { kind: 'num', key: 'm', label: 'Monat', expected: 5 },
-              ]}
-              solution={
-                <>
-                  <MB>{'t = \\frac{25 \\cdot 100 \\cdot 360}{5\\,000 \\cdot 2{,}4} = \\frac{900\\,000}{12\\,000} = 75'}</MB>
-                  <p>Vom 10.03. sind 60 Tage bis zum 10.05., dazu 15 Tage: Am 25.05. hat Mira die 25 € zusammen.</p>
-                </>
-              }
-              help={
-                <Hilfen
-                  steps={[
-                    <>Zuerst t mit der umgestellten Formel berechnen. Dann vom 10.03. aus weiterzählen.</>,
-                    <>75 Tage sind 2 Monate (60 Tage) und noch 15 Tage.</>,
-                    <>Vom 10.03. zwei Monate weiter ist der 10.05. Dazu kommen 15 Tage.</>,
-                  ]}
-                />
-              }
-            />
-          </div>
-        </Phase>
+          <Teil title="Check: Hast du es verstanden?" social="EA" minutes={10}>
+            <div className="lp-exlist">
+              <McCard
+                title="Check 1: Die richtige Formel"
+                level="basis"
+                prompt={<p>Welche Formel berechnet die Zinstage t?</p>}
+                options={[
+                  { text: <M>{'t = \\frac{K \\cdot p \\cdot 100 \\cdot 360}{Z}'}</M>, feedback: 'Hier sind Zähler und Nenner vertauscht. Z gehört nach oben, K und p nach unten.' },
+                  { text: <M>{'t = \\frac{Z \\cdot 100 \\cdot 360}{K \\cdot p}'}</M>, correct: true, feedback: 'Erst mal 100 · 360, dann durch K · p teilen.' },
+                  { text: <M>{'t = \\frac{Z \\cdot K \\cdot p}{100 \\cdot 360}'}</M>, feedback: 'Das ist die Zinsformel mit Z an der falschen Stelle. Beim Umstellen wandern 100 · 360 nach oben.' },
+                  { text: <M>{'t = \\frac{Z}{K \\cdot p}'}</M>, feedback: 'Hier fehlt 100 · 360 im Zähler. Ohne diese Zahlen wird t viel zu klein.' },
+                ]}
+              />
+              <CheckCard
+                title="Check 2: Kapital berechnen"
+                level="standard"
+                prompt={<p>Wie viel Geld muss man zu 2,4 % p.a. anlegen, damit es in 75 Tagen 18 € Zinsen gibt?</p>}
+                fields={[{ kind: 'num', key: 'k', label: <M>{'K ='}</M>, expected: 3600, unit: '€' }]}
+                solution={<MB>{'K = \\frac{18 \\cdot 100 \\cdot 360}{2{,}4 \\cdot 75} = \\frac{648\\,000}{180} = 3\\,600'}</MB>}
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Welche Größe ist gesucht, welche sind gegeben?</>,
+                      <>Gesucht ist K. Oben steht Z · 100 · 360, unten p · t.</>,
+                      <>
+                        <M>{'K = \\frac{18 \\cdot 100 \\cdot 360}{2{,}4 \\cdot 75}'}</M>
+                      </>,
+                    ]}
+                  />
+                }
+              />
+              <McCard
+                title="Check 3: Wer hat recht?"
+                rechnen
+                level="standard"
+                prompt={
+                  <p>
+                    2.000 € liegen 90 Tage auf einem Konto und bringen 10 € Zinsen. Ben rechnet p = 0,02. Lea rechnet p = 2. Ali rechnet p = 0,5. Wer hat recht?
+                  </p>
+                }
+                options={[
+                  { text: 'Ben: 0,02 % p.a.', feedback: 'Ben hat die 100 vergessen: 10 · 360 / (2.000 · 90) = 0,02. Richtig ist 10 · 100 · 360 / (2.000 · 90).' },
+                  { text: 'Lea: 2 % p.a.', correct: true, feedback: 'p = 10 · 100 · 360 / (2.000 · 90) = 360.000 / 180.000 = 2.' },
+                  { text: 'Ali: 0,5 % p.a.', feedback: 'Ali hat den Bruch auf den Kopf gestellt: 2.000 · 90 / (10 · 100 · 360) = 0,5. Z · 100 · 360 gehört nach oben.' },
+                  { text: 'Niemand, man kann p aus diesen Angaben nicht berechnen.', feedback: 'K, t und Z sind gegeben. Damit lässt sich p mit der umgestellten Formel berechnen.' },
+                ]}
+              />
+              <CheckCard
+                title="Check 4: Wann ist das Ziel erreicht?"
+                level="erweiterung"
+                prompt={
+                  <p>
+                    Mira legt am 10.03. 5.000 € zu 2,4 % p.a. an. Sie möchte 25 € Zinsen für ein Konzertticket. Wie viele Zinstage braucht sie, und an welchem Tag hat sie die 25 €
+                    zusammen? (Bankregel: jeder Monat 30 Tage)
+                  </p>
+                }
+                fieldsRow
+                fields={[
+                  { kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 75, unit: 'Tage' },
+                  { kind: 'num', key: 'd', label: 'Datum: Tag', expected: 25 },
+                  { kind: 'num', key: 'm', label: 'Monat', expected: 5 },
+                ]}
+                solution={
+                  <>
+                    <MB>{'t = \\frac{25 \\cdot 100 \\cdot 360}{5\\,000 \\cdot 2{,}4} = \\frac{900\\,000}{12\\,000} = 75'}</MB>
+                    <p>Vom 10.03. sind 60 Tage bis zum 10.05., dazu 15 Tage: Am 25.05. hat Mira die 25 € zusammen.</p>
+                  </>
+                }
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Zuerst t mit der umgestellten Formel berechnen. Dann vom 10.03. aus weiterzählen.</>,
+                      <>75 Tage sind 2 Monate (60 Tage) und noch 15 Tage.</>,
+                      <>Vom 10.03. zwei Monate weiter ist der 10.05. Dazu kommen 15 Tage.</>,
+                    ]}
+                  />
+                }
+              />
+            </div>
+          </Teil>
+        </Etappe>
 
         <nav className="lp-nav" aria-label="Weiter">
           <button type="button" className="bk-btn" onClick={onPrev}>
@@ -887,12 +926,12 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
   )
 }
 
-/** Rückbezug auf die Vermutung aus Abschnitt 2 */
+/** Rückbezug auf die Vermutung aus Phase 2 */
 function Rueckbezug({ pred }: { pred: Prediction }) {
   if (!pred.saved || !pred.choice) {
     return (
       <div className="ls-back">
-        <p>Du hast in Abschnitt 2 noch keine Vermutung festgehalten. Hole das kurz nach, dann siehst du hier, ob du richtig lagst.</p>
+        <p>Du hast in Phase 2 noch keine Vermutung festgehalten. Hole das kurz nach, dann siehst du hier, ob du richtig lagst.</p>
       </div>
     )
   }

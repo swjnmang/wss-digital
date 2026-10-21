@@ -2,9 +2,8 @@ import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import CheckedNumberInput from '../../../components/CheckedNumberInput'
 import { Beispiel, M, MB, Merke, QuerTabelle, fmt } from '../../daten_und_zufall/lernpfad/kit'
-import {
-  Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, HeftHinweis, Hilfen, McCard, Phase, TrackedCheck, TrackedMc, tx,
-} from '../lernsituation_kit/kit'
+import { Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, HeftHinweis, Hilfen, McCard, TrackedCheck, TrackedMc, tx } from '../lernsituation_kit/kit'
+import { Etappe, Fortschritt, Teil } from '../lernsituation_kit/phasen'
 
 // Einstiegs-Lernsituation „Welche Gerade erreicht den Boden zuerst?“ zu den Nullstellen linearer Funktionen.
 // Rein grafische Deutung: Die x-Achse ist der „Boden“, die Nullstelle ist der Punkt, an dem eine Gerade ihn berührt.
@@ -179,7 +178,16 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
         <Arbeitsweise />
 
         {/* 1 Aktivieren */}
-        <Phase no={1} title="Fit für den Start" social="EA" minutes={5}>
+        <Fortschritt prefix="boden" />
+
+        <Etappe
+          prefix="boden"
+          art="start"
+          social="EA"
+          minutes={5}
+          was={<>Kurze Aufgaben allein lösen.</>}
+          wozu={<>Du frischst auf, was du gleich zum Lösen des Problems brauchst.</>}
+        >
           <p>Diese vier kurzen Aufgaben brauchst du gleich. Löse sie allein.</p>
           <div className="lp-exlist">
             <CheckCard
@@ -221,510 +229,539 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               solution={<MB>{'\\begin{aligned} -2x + 10 &= 4 && \\mid -10 \\\\ -2x &= -6 && \\mid :(-2) \\\\ x &= 3 \\end{aligned}'}</MB>}
             />
           </div>
-        </Phase>
+        </Etappe>
 
         {/* 2 Situation & Vorhersage */}
-        <Phase no={2} title="Die Situation: Drei Geraden im Sinkflug" social="EA" minutes={5}>
-          <p>
-            Im Koordinatensystem starten drei Geraden an der y-Achse und fallen nach rechts. Die x-Achse ist der <strong>Boden</strong>. Eine Gerade „landet“, sobald sie
-            den Boden berührt.
-          </p>
-          <BodenBild />
-          <div className="ls-flyers ls-flyers-3">
-            <div className="ls-flyer ls-flyer-a">
-              <div className="ls-flyer-name">Gerade f</div>
-              <div className="ls-flyer-price">
-                <strong>
-                  <M>{'y = -2x + 8'}</M>
-                </strong>
+        <Etappe
+          prefix="boden"
+          art="problem"
+          social="EA"
+          minutes={5}
+          was={<>Die Situation lesen und deine Vermutung festhalten. Noch nicht rechnen.</>}
+          wozu={<>Du weißt genau, welche Frage du in Phase 3 beantwortest.</>}
+        >
+          <Teil title="Die Situation: Drei Geraden im Sinkflug">
+            <p>
+              Im Koordinatensystem starten drei Geraden an der y-Achse und fallen nach rechts. Die x-Achse ist der <strong>Boden</strong>. Eine Gerade „landet“, sobald sie
+              den Boden berührt.
+            </p>
+            <BodenBild />
+            <div className="ls-flyers ls-flyers-3">
+              <div className="ls-flyer ls-flyer-a">
+                <div className="ls-flyer-name">Gerade f</div>
+                <div className="ls-flyer-price">
+                  <strong>
+                    <M>{'y = -2x + 8'}</M>
+                  </strong>
+                </div>
+              </div>
+              <div className="ls-flyer ls-flyer-b">
+                <div className="ls-flyer-name">Gerade g</div>
+                <div className="ls-flyer-price">
+                  <strong>
+                    <M>{'y = -0{,}5x + 1{,}5'}</M>
+                  </strong>
+                </div>
+              </div>
+              <div className="ls-flyer ls-flyer-c">
+                <div className="ls-flyer-name">Gerade h</div>
+                <div className="ls-flyer-price">
+                  <strong>
+                    <M>{'y = -x + 3{,}75'}</M>
+                  </strong>
+                </div>
               </div>
             </div>
-            <div className="ls-flyer ls-flyer-b">
-              <div className="ls-flyer-name">Gerade g</div>
-              <div className="ls-flyer-price">
-                <strong>
-                  <M>{'y = -0{,}5x + 1{,}5'}</M>
-                </strong>
-              </div>
+            <div className="ls-question">
+              <i className="fa-solid fa-circle-question" aria-hidden="true" />
+              <span>Welche der drei Geraden erreicht den Boden zuerst?</span>
             </div>
-            <div className="ls-flyer ls-flyer-c">
-              <div className="ls-flyer-name">Gerade h</div>
-              <div className="ls-flyer-price">
-                <strong>
-                  <M>{'y = -x + 3{,}75'}</M>
-                </strong>
-              </div>
-            </div>
-          </div>
-          <div className="ls-question">
-            <i className="fa-solid fa-circle-question" aria-hidden="true" />
-            <span>Welche der drei Geraden erreicht den Boden zuerst?</span>
-          </div>
 
-          <div className="lp-ex bk-panel" data-no-autocheck>
-            <CardHead title="Deine Vermutung" />
-            {pred.saved && pred.first ? (
-              <>
-                <div className="ls-saved" role="status">
-                  <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: <strong>{FIRST_TEXT[pred.first]}</strong>. Gerade h schätzt du bei{' '}
-                  <strong>x ≈ {fmt(pred.x, 2)}</strong>. Am Ende schauen wir, ob du recht hattest.
-                </div>
-                <div>
-                  <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={() => setPred({ ...pred, saved: false })}>
-                    Vermutung ändern
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p>Rechne noch nicht! Schau nur auf das Bild, entscheide spontan und schreibe einen Satz als Begründung in dein Heft.</p>
-                <div className="ls-options" role="radiogroup" aria-label="Vermutung">
-                  {(['f', 'g', 'h'] as const).map((c) => (
-                    <label key={c} className="bk-choice ls-option">
-                      <input type="radio" name="ls-pred" checked={pred.first === c} onChange={() => setPred({ ...pred, first: c })} />
-                      <span>{FIRST_TEXT[c]}</span>
+            <div className="lp-ex bk-panel" data-no-autocheck>
+              <CardHead title="Deine Vermutung" />
+              {pred.saved && pred.first ? (
+                <>
+                  <div className="ls-saved" role="status">
+                    <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: <strong>{FIRST_TEXT[pred.first]}</strong>. Gerade h schätzt du bei{' '}
+                    <strong>x ≈ {fmt(pred.x, 2)}</strong>. Am Ende schauen wir, ob du recht hattest.
+                  </div>
+                  <div>
+                    <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={() => setPred({ ...pred, saved: false })}>
+                      Vermutung ändern
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p>Rechne noch nicht! Schau nur auf das Bild, entscheide spontan und schreibe einen Satz als Begründung in dein Heft.</p>
+                  <div className="ls-options" role="radiogroup" aria-label="Vermutung">
+                    {(['f', 'g', 'h'] as const).map((c) => (
+                      <label key={c} className="bk-choice ls-option">
+                        <input type="radio" name="ls-pred" checked={pred.first === c} onChange={() => setPred({ ...pred, first: c })} />
+                        <span>{FIRST_TEXT[c]}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="ls-slider">
+                    <label htmlFor="ls-pred-x">
+                      Gerade h berührt den Boden bei x ≈ <span className="ls-slider-value">{fmt(pred.x, 2)}</span>
                     </label>
-                  ))}
-                </div>
-                <div className="ls-slider">
-                  <label htmlFor="ls-pred-x">
-                    Gerade h berührt den Boden bei x ≈ <span className="ls-slider-value">{fmt(pred.x, 2)}</span>
-                  </label>
-                  <input
-                    id="ls-pred-x"
-                    type="range"
-                    min={2}
-                    max={5}
-                    step={0.25}
-                    value={pred.x}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, x: Math.round(Number(e.target.value) * 100) / 100 })}
-                  />
-                </div>
-                <div>
-                  <button type="button" className="bk-btn bk-btn-primary" disabled={!pred.first} onClick={() => setPred({ ...pred, saved: true })}>
-                    <i className="fa-solid fa-lock" aria-hidden="true" /> Vermutung festhalten
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </Phase>
+                    <input
+                      id="ls-pred-x"
+                      type="range"
+                      min={2}
+                      max={5}
+                      step={0.25}
+                      value={pred.x}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, x: Math.round(Number(e.target.value) * 100) / 100 })}
+                    />
+                  </div>
+                  <div>
+                    <button type="button" className="bk-btn bk-btn-primary" disabled={!pred.first} onClick={() => setPred({ ...pred, saved: true })}>
+                      <i className="fa-solid fa-lock" aria-hidden="true" /> Vermutung festhalten
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </Teil>
+        </Etappe>
 
         {/* 3 Erkunden */}
-        <Phase no={3} title="Findet es heraus" social="PA" minutes={12}>
-          <p>
-            <strong>Auftrag:</strong> Findet zu zweit heraus, wo jede Gerade den Boden berührt und in welcher Reihenfolge sie landen. Ihr habt zwei Wege: Tabelle und Graph.
-            Fangt mit einem an, wer fertig ist, probiert auch den anderen. Jede Person tippt auf dem eigenen Gerät.
-          </p>
+        <Etappe
+          prefix="boden"
+          art="loesen"
+          minutes={17}
+          was={<>Zu zweit herausfinden, welche Gerade den Boden zuerst erreicht. Danach vergleicht ihr eure Wege.</>}
+          wozu={<>So bestimmst du die Nullstelle einer Geraden.</>}
+        >
+          <Teil title="Findet es heraus" social="PA" minutes={12}>
+            <p>
+              <strong>Auftrag:</strong> Findet zu zweit heraus, wo jede Gerade den Boden berührt und in welcher Reihenfolge sie landen. Ihr habt zwei Wege: Tabelle und Graph.
+              Fangt mit einem an, wer fertig ist, probiert auch den anderen. Jede Person tippt auf dem eigenen Gerät.
+            </p>
 
-          <div className="lp-ex bk-panel" data-no-autocheck>
-            <CardHead title="Weg 1: Tabelle" level="basis" />
-            <div className="lp-ex-prompt">
-              <p>Wie hoch liegt jede Gerade an diesen Stellen über dem Boden? Füllt die Tabelle aus. Die Felder färben sich von selbst grün oder rot. Negative Werte heißen: unter dem Boden.</p>
-            </div>
-            <HeftHinweis><strong>Im Heft:</strong> Rechne die Tabellenwerte mit Rechenweg in deinem Heft aus. Trage dann nur die Ergebnisse ein.</HeftHinweis>
-            <QuerTabelle
-              rows={[
-                { head: 'x', cells: TABLE_X.map((x) => <strong key={x}>{x}</strong>) },
-                { head: 'y bei Gerade f', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{f(0)}</span> : cellInput(f(x), x))) },
-                { head: 'y bei Gerade g', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{fmt(g(0), 1)}</span> : cellInput(g(x), x))) },
-                { head: 'y bei Gerade h', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{fmt(h(0), 2)}</span> : cellInput(h(x), x))) },
-              ]}
-            />
-            <p className="lp-hint">Sucht in jeder Zeile die Stelle, an der der Wert 0 wird oder von positiv zu negativ wechselt. Was fällt euch bei h auf?</p>
-            <Hilfen
-              steps={[
-                <>Setzt jeden x-Wert in die Gleichung ein. Welcher y-Wert ergibt sich bei x = 2 für Gerade f, welcher für Gerade g?</>,
-                <>
-                  Pro Schritt nach rechts fällt f um 2, g um 0,5 und h um 1. Ihr könnt also auch vom vorigen Feld aus weiterrechnen. Achtung: Die Schritte in der Tabelle sind
-                  nicht immer 1 breit.
-                </>,
-                <>
-                  Für <M>x = 2</M> gilt bei Gerade f: <M>{'y = -2 \\cdot 2 + 8 = 4'}</M>, bei Gerade g: <M>{'y = -0{,}5 \\cdot 2 + 1{,}5 = 0{,}5'}</M>.
-                </>,
-              ]}
-            />
-          </div>
-
-          <GraphKarte />
-
-          <CheckCard
-            title="Euer Ergebnis"
-            rechnen={false}
-            prompt={<p>Egal, welchen Weg ihr genommen habt: Tragt euer Ergebnis ein und haltet eure Rechenwege oder Ablesungen schriftlich fest.</p>}
-            fields={[
-              { kind: 'num', key: 'xg', label: <>Gerade g berührt den Boden bei <M>x</M> =</>, expected: NG },
-              { kind: 'num', key: 'xf', label: <>Gerade f berührt den Boden bei <M>x</M> =</>, expected: NF },
-              { kind: 'num', key: 'xh', label: <>Gerade h berührt den Boden bei <M>x</M> ≈</>, expected: NH, tol: 0.3 },
-              { kind: 'select', key: 'first', label: 'Welche Gerade erreicht den Boden zuerst?', options: ['Gerade f', 'Gerade g', 'Gerade h'], expected: 1 },
-              { kind: 'select', key: 'last', label: 'Welche Gerade erreicht den Boden zuletzt?', options: ['Gerade f', 'Gerade g', 'Gerade h'], expected: 0 },
-            ]}
-          />
-
-          <CheckCard
-            title="Zusatzfrage: Über und unter dem Boden"
-            rechnen={false}
-            level="erweiterung"
-            prompt={
-              <>
-                <p>
-                  Ihr seid schon fertig? Schaut auf das Vorzeichen der y-Werte: Liegt eine Gerade über dem Boden, ist ihr y-Wert positiv, unter dem Boden negativ.
-                </p>
-                <p>Haltet im Heft fest: Was gilt links einer Nullstelle, was rechts davon? Warum ist das bei allen drei Geraden so?</p>
-                <BodenBild />
-              </>
-            }
-            fields={[
-              { kind: 'select', key: 'm', label: <>Welche Geraden liegen bei <M>{'x = 3{,}5'}</M> noch über dem Boden?</>, options: ['nur f', 'f und h', 'g und h', 'alle drei'], expected: 1 },
-              { kind: 'num', key: 'ab', label: 'Alle drei liegen unter dem Boden ab der ganzen Zahl x =', expected: 5, tol: 0 },
-            ]}
-            help={
+            <div className="lp-ex bk-panel" data-no-autocheck>
+              <CardHead title="Weg 1: Tabelle" level="basis" />
+              <div className="lp-ex-prompt">
+                <p>Wie hoch liegt jede Gerade an diesen Stellen über dem Boden? Füllt die Tabelle aus. Die Felder färben sich von selbst grün oder rot. Negative Werte heißen: unter dem Boden.</p>
+              </div>
+              <HeftHinweis><strong>Im Heft:</strong> Rechne die Tabellenwerte mit Rechenweg in deinem Heft aus. Trage dann nur die Ergebnisse ein.</HeftHinweis>
+              <QuerTabelle
+                rows={[
+                  { head: 'x', cells: TABLE_X.map((x) => <strong key={x}>{x}</strong>) },
+                  { head: 'y bei Gerade f', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{f(0)}</span> : cellInput(f(x), x))) },
+                  { head: 'y bei Gerade g', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{fmt(g(0), 1)}</span> : cellInput(g(x), x))) },
+                  { head: 'y bei Gerade h', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{fmt(h(0), 2)}</span> : cellInput(h(x), x))) },
+                ]}
+              />
+              <p className="lp-hint">Sucht in jeder Zeile die Stelle, an der der Wert 0 wird oder von positiv zu negativ wechselt. Was fällt euch bei h auf?</p>
               <Hilfen
                 steps={[
-                  <>Eine Gerade liegt über dem Boden, solange ihre Nullstelle noch weiter rechts liegt. Schaut deshalb auf die Nullstellen 3, 3,75 und 4.</>,
+                  <>Setzt jeden x-Wert in die Gleichung ein. Welcher y-Wert ergibt sich bei x = 2 für Gerade f, welcher für Gerade g?</>,
                   <>
-                    Bei <M>{'x = 3{,}5'}</M> haben g (Nullstelle 3) schon den Boden erreicht, f (4) und h (3,75) noch nicht.
+                    Pro Schritt nach rechts fällt f um 2, g um 0,5 und h um 1. Ihr könnt also auch vom vorigen Feld aus weiterrechnen. Achtung: Die Schritte in der Tabelle sind
+                    nicht immer 1 breit.
                   </>,
                   <>
-                    Alle drei sind unter dem Boden, wenn <M>x</M> größer ist als die größte Nullstelle, also größer als 4. Welche ganze Zahl ist das erste Mal größer?
+                    Für <M>x = 2</M> gilt bei Gerade f: <M>{'y = -2 \\cdot 2 + 8 = 4'}</M>, bei Gerade g: <M>{'y = -0{,}5 \\cdot 2 + 1{,}5 = 0{,}5'}</M>.
                   </>,
                 ]}
               />
-            }
-            solution={
-              <>
-                <p>
-                  Nullstellen: g bei 3, h bei 3,75, f bei 4. Eine Gerade liegt <strong>links</strong> ihrer Nullstelle über dem Boden (y positiv) und <strong>rechts</strong> davon unter
-                  dem Boden (y negativ), weil alle drei fallen.
-                </p>
-                <p>
-                  Bei <M>{'x = 3{,}5'}</M> liegen f und h noch über dem Boden, g schon darunter. Alle drei liegen unter dem Boden, sobald <M>x</M> größer als 4 ist. Die erste ganze Zahl
-                  dafür ist 5.
-                </p>
-              </>
-            }
-          />
-        </Phase>
+            </div>
+
+            <GraphKarte />
+
+            <CheckCard
+              title="Euer Ergebnis"
+              rechnen={false}
+              prompt={<p>Egal, welchen Weg ihr genommen habt: Tragt euer Ergebnis ein und haltet eure Rechenwege oder Ablesungen schriftlich fest.</p>}
+              fields={[
+                { kind: 'num', key: 'xg', label: <>Gerade g berührt den Boden bei <M>x</M> =</>, expected: NG },
+                { kind: 'num', key: 'xf', label: <>Gerade f berührt den Boden bei <M>x</M> =</>, expected: NF },
+                { kind: 'num', key: 'xh', label: <>Gerade h berührt den Boden bei <M>x</M> ≈</>, expected: NH, tol: 0.3 },
+                { kind: 'select', key: 'first', label: 'Welche Gerade erreicht den Boden zuerst?', options: ['Gerade f', 'Gerade g', 'Gerade h'], expected: 1 },
+                { kind: 'select', key: 'last', label: 'Welche Gerade erreicht den Boden zuletzt?', options: ['Gerade f', 'Gerade g', 'Gerade h'], expected: 0 },
+              ]}
+            />
+
+            <CheckCard
+              title="Zusatzfrage: Über und unter dem Boden"
+              rechnen={false}
+              level="erweiterung"
+              prompt={
+                <>
+                  <p>
+                    Ihr seid schon fertig? Schaut auf das Vorzeichen der y-Werte: Liegt eine Gerade über dem Boden, ist ihr y-Wert positiv, unter dem Boden negativ.
+                  </p>
+                  <p>Haltet im Heft fest: Was gilt links einer Nullstelle, was rechts davon? Warum ist das bei allen drei Geraden so?</p>
+                  <BodenBild />
+                </>
+              }
+              fields={[
+                { kind: 'select', key: 'm', label: <>Welche Geraden liegen bei <M>{'x = 3{,}5'}</M> noch über dem Boden?</>, options: ['nur f', 'f und h', 'g und h', 'alle drei'], expected: 1 },
+                { kind: 'num', key: 'ab', label: 'Alle drei liegen unter dem Boden ab der ganzen Zahl x =', expected: 5, tol: 0 },
+              ]}
+              help={
+                <Hilfen
+                  steps={[
+                    <>Eine Gerade liegt über dem Boden, solange ihre Nullstelle noch weiter rechts liegt. Schaut deshalb auf die Nullstellen 3, 3,75 und 4.</>,
+                    <>
+                      Bei <M>{'x = 3{,}5'}</M> haben g (Nullstelle 3) schon den Boden erreicht, f (4) und h (3,75) noch nicht.
+                    </>,
+                    <>
+                      Alle drei sind unter dem Boden, wenn <M>x</M> größer ist als die größte Nullstelle, also größer als 4. Welche ganze Zahl ist das erste Mal größer?
+                    </>,
+                  ]}
+                />
+              }
+              solution={
+                <>
+                  <p>
+                    Nullstellen: g bei 3, h bei 3,75, f bei 4. Eine Gerade liegt <strong>links</strong> ihrer Nullstelle über dem Boden (y positiv) und <strong>rechts</strong> davon unter
+                    dem Boden (y negativ), weil alle drei fallen.
+                  </p>
+                  <p>
+                    Bei <M>{'x = 3{,}5'}</M> liegen f und h noch über dem Boden, g schon darunter. Alle drei liegen unter dem Boden, sobald <M>x</M> größer als 4 ist. Die erste ganze Zahl
+                    dafür ist 5.
+                  </p>
+                </>
+              }
+            />
+          </Teil>
+
 
         {/* 4 Austausch */}
-        <Phase no={4} title="Vergleicht eure Wege" social="Plenum" minutes={5}>
-          <div className="ls-stop">
-            <div className="ls-stop-title">
-              <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
+          <Teil title="Vergleicht eure Wege" social="Plenum" minutes={5}>
+            <div className="ls-stop">
+              <div className="ls-stop-title">
+                <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
+              </div>
+              <ul>
+                <li>Woran erkennt ihr in der Tabelle und im Graphen, dass eine Gerade den Boden berührt?</li>
+                <li>Gerade f ist die steilste. Warum landet sie trotzdem zuletzt?</li>
+                <li>Bei Gerade h: Wie sicher könnt ihr den Wert ablesen? 3,7 oder 3,8?</li>
+              </ul>
             </div>
-            <ul>
-              <li>Woran erkennt ihr in der Tabelle und im Graphen, dass eine Gerade den Boden berührt?</li>
-              <li>Gerade f ist die steilste. Warum landet sie trotzdem zuletzt?</li>
-              <li>Bei Gerade h: Wie sicher könnt ihr den Wert ablesen? 3,7 oder 3,8?</li>
-            </ul>
-          </div>
-          <p>
-            <strong>Du arbeitest allein?</strong> So haben zwei andere Jugendliche gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
-          </p>
-          <div className="ls-ways">
-            <details className="ls-way">
-              <summary>Jonas hat eine Tabelle gemacht</summary>
-              <div className="ls-way-body">
-                <p>
-                  „Bei g steht bei x = 3 genau 0, bei f bei x = 4. Bei h steht bei x = 3 noch 0,75, bei x = 4 schon −0,25. Das Vorzeichen wechselt also dazwischen, wahrscheinlich
-                  näher bei 4.“
-                </p>
-                <p>
-                  <strong>Gut:</strong> Den Wechsel von positiv zu negativ erkennt man sofort. <strong>Aber:</strong> Liegt die Nullstelle nicht auf einem Tabellenwert, muss man
-                  immer feiner nachrechnen.
-                </p>
-              </div>
-            </details>
-            <details className="ls-way">
-              <summary>Aylin hat im Graphen abgelesen</summary>
-              <div className="ls-way-body">
-                <p>
-                  „Gerade f ist sehr steil, aber sie startet bei 8 ganz weit oben, deshalb braucht sie am längsten. h berührt den Boden kurz vor f. Ob bei 3,7 oder 3,8, kann ich nicht
-                  genau sehen.“
-                </p>
-                <p>
-                  <strong>Gut:</strong> Man sieht die Reihenfolge und das Gesamtbild. <strong>Aber:</strong> Ablesen ist nur so genau wie die Zeichnung.
-                </p>
-              </div>
-            </details>
-          </div>
-          <p>
-            Die Stelle, an der eine Gerade die x-Achse berührt, heißt <strong>Nullstelle</strong>. Beide Wege zeigen sie nur ungefähr, wenn sie zwischen zwei Tabellenwerten liegt.
-            Im nächsten Abschnitt lernst du, wie du sie immer genau ausrechnest.
-          </p>
-        </Phase>
+            <p>
+              <strong>Du arbeitest allein?</strong> So haben zwei andere Jugendliche gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
+            </p>
+            <div className="ls-ways">
+              <details className="ls-way">
+                <summary>Jonas hat eine Tabelle gemacht</summary>
+                <div className="ls-way-body">
+                  <p>
+                    „Bei g steht bei x = 3 genau 0, bei f bei x = 4. Bei h steht bei x = 3 noch 0,75, bei x = 4 schon −0,25. Das Vorzeichen wechselt also dazwischen, wahrscheinlich
+                    näher bei 4.“
+                  </p>
+                  <p>
+                    <strong>Gut:</strong> Den Wechsel von positiv zu negativ erkennt man sofort. <strong>Aber:</strong> Liegt die Nullstelle nicht auf einem Tabellenwert, muss man
+                    immer feiner nachrechnen.
+                  </p>
+                </div>
+              </details>
+              <details className="ls-way">
+                <summary>Aylin hat im Graphen abgelesen</summary>
+                <div className="ls-way-body">
+                  <p>
+                    „Gerade f ist sehr steil, aber sie startet bei 8 ganz weit oben, deshalb braucht sie am längsten. h berührt den Boden kurz vor f. Ob bei 3,7 oder 3,8, kann ich nicht
+                    genau sehen.“
+                  </p>
+                  <p>
+                    <strong>Gut:</strong> Man sieht die Reihenfolge und das Gesamtbild. <strong>Aber:</strong> Ablesen ist nur so genau wie die Zeichnung.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <p>
+              Die Stelle, an der eine Gerade die x-Achse berührt, heißt <strong>Nullstelle</strong>. Beide Wege zeigen sie nur ungefähr, wenn sie zwischen zwei Tabellenwerten liegt.
+              Im nächsten Abschnitt lernst du, wie du sie immer genau ausrechnest.
+            </p>
+          </Teil>
+        </Etappe>
 
         {/* 5 Verfahren und Sichern */}
-        <Phase no={5} title="So rechnest du die Nullstelle aus" social="EA" minutes={8}>
-          <Rueckbezug pred={pred} />
-          <p>
-            Eine Nullstelle liegt auf der x-Achse, dort ist der y-Wert immer 0. Das nutzt du zum Rechnen. Decke das Beispiel Schritt für Schritt auf.
-          </p>
-          <Beispiel
-            title="Wo berührt Gerade h den Boden?"
-            aufgabe={
-              <p>
-                Gerade h: <M>{'y = -x + 3{,}75'}</M>. Berechne die Nullstelle.
-              </p>
-            }
-            steps={[
-              {
-                title: 'Verstehen, was gesucht ist',
-                body: (
-                  <p>
-                    Die Nullstelle ist der <M>x</M>-Wert, an dem die Gerade die x-Achse schneidet. Dort ist die Höhe über dem Boden genau 0, also <M>{'y = 0'}</M>.
-                  </p>
-                ),
-              },
-              {
-                title: 'Den Funktionswert gleich 0 setzen',
-                body: (
-                  <>
-                    <p>Setze den Funktionsterm gleich 0:</p>
-                    <MB>{'-x + 3{,}75 = 0'}</MB>
-                  </>
-                ),
-              },
-              {
-                title: 'Nach x auflösen',
-                body: (
-                  <>
-                    <p>Bringe das x auf die Seite, auf der es positiv wird:</p>
-                    <MB>{'\\begin{aligned} -x + 3{,}75 &= 0 && \\mid +x \\\\ 3{,}75 &= x \\end{aligned}'}</MB>
-                  </>
-                ),
-              },
-              {
-                title: 'Nullstelle angeben und Probe',
-                body: (
-                  <>
-                    <MB>{'N(3{,}75 \\mid 0)'}</MB>
+        <Etappe
+          prefix="boden"
+          art="sichern"
+          social="EA"
+          minutes={21}
+          was={<>Das Wichtigste in deinem Heft festhalten und dann allein prüfen, ob du es kannst.</>}
+          wozu={<>Dein Hefteintrag hilft dir bei allen Aufgaben dieser Art. Der Check zeigt dir, wo du noch unsicher bist.</>}
+        >
+          <Teil title="So rechnest du die Nullstelle aus" social="EA" minutes={8}>
+            <Rueckbezug pred={pred} />
+            <p>
+              Eine Nullstelle liegt auf der x-Achse, dort ist der y-Wert immer 0. Das nutzt du zum Rechnen. Decke das Beispiel Schritt für Schritt auf.
+            </p>
+            <Beispiel
+              title="Wo berührt Gerade h den Boden?"
+              aufgabe={
+                <p>
+                  Gerade h: <M>{'y = -x + 3{,}75'}</M>. Berechne die Nullstelle.
+                </p>
+              }
+              steps={[
+                {
+                  title: 'Verstehen, was gesucht ist',
+                  body: (
                     <p>
-                      Probe mit <M>{'x = 3{,}75'}</M>: <M>{'y = -3{,}75 + 3{,}75 = 0'}</M> ✓
+                      Die Nullstelle ist der <M>x</M>-Wert, an dem die Gerade die x-Achse schneidet. Dort ist die Höhe über dem Boden genau 0, also <M>{'y = 0'}</M>.
                     </p>
-                  </>
-                ),
-              },
-              {
-                title: 'Im Bild deuten',
-                body: (
-                  <p>
-                    Gerade h berührt den Boden bei <M>{'x = 3{,}75'}</M>. Das liegt zwischen den Nullstellen von g (3) und f (4). Also landet erst g, dann h, zuletzt f.
-                  </p>
-                ),
-              },
-            ]}
-          />
-          <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
-          <Merke title="Nullstelle einer Geraden">
-            <p>
-              Die <strong>Nullstelle</strong> ist der <M>x</M>-Wert, bei dem die Gerade die x-Achse schneidet. Dort gilt <M>{'y = 0'}</M>. Der Punkt heißt{' '}
-              <M>{'N(x_N \\mid 0)'}</M>.
-            </p>
-            <p>So berechnest du sie:</p>
-            <ol>
-              <li>
-                Funktionsterm gleich 0 setzen: <M>{'m x + t = 0'}</M>
-              </li>
-              <li>
-                Nach <M>x</M> auflösen, das ergibt <M>{'x_N'}</M>.
-              </li>
-              <li>
-                Nullstelle angeben: <M>{'N(x_N \\mid 0)'}</M>, bei Sachaufgaben mit Antwortsatz und Deutung im Bild.
-              </li>
-            </ol>
-            <p>
-              Links der Nullstelle liegt eine fallende Gerade über der x-Achse, rechts davon darunter. Die Nullstelle ist die Grenze.
-            </p>
-          </Merke>
-          <div className="lp-ex bk-panel">
-            <CardHead title="Dein Hefteintrag" />
-            <p>Übertrage den Merkkasten in dein Heft und ergänze ihn mit dem Beispiel. Hake ab, was du schon hast:</p>
-            <div className="ls-criteria">
-              {[
-                'Überschrift „Nullstelle“ und die Gleichungen der drei Geraden f, g und h',
-                'Skizze der drei Geraden mit beschrifteten Achsen und den markierten Nullstellen N(3 | 0), N(3,75 | 0) und N(4 | 0)',
-                'Rechnung für h: Funktionsterm gleich 0 setzen, nach x auflösen, Probe',
-                'Antwortsatz: In welcher Reihenfolge landen die Geraden, und warum landet die steilste zuletzt?',
-              ].map((c) => (
-                <label key={c}>
-                  <input type="checkbox" /> <span>{c}</span>
-                </label>
-              ))}
+                  ),
+                },
+                {
+                  title: 'Den Funktionswert gleich 0 setzen',
+                  body: (
+                    <>
+                      <p>Setze den Funktionsterm gleich 0:</p>
+                      <MB>{'-x + 3{,}75 = 0'}</MB>
+                    </>
+                  ),
+                },
+                {
+                  title: 'Nach x auflösen',
+                  body: (
+                    <>
+                      <p>Bringe das x auf die Seite, auf der es positiv wird:</p>
+                      <MB>{'\\begin{aligned} -x + 3{,}75 &= 0 && \\mid +x \\\\ 3{,}75 &= x \\end{aligned}'}</MB>
+                    </>
+                  ),
+                },
+                {
+                  title: 'Nullstelle angeben und Probe',
+                  body: (
+                    <>
+                      <MB>{'N(3{,}75 \\mid 0)'}</MB>
+                      <p>
+                        Probe mit <M>{'x = 3{,}75'}</M>: <M>{'y = -3{,}75 + 3{,}75 = 0'}</M> ✓
+                      </p>
+                    </>
+                  ),
+                },
+                {
+                  title: 'Im Bild deuten',
+                  body: (
+                    <p>
+                      Gerade h berührt den Boden bei <M>{'x = 3{,}75'}</M>. Das liegt zwischen den Nullstellen von g (3) und f (4). Also landet erst g, dann h, zuletzt f.
+                    </p>
+                  ),
+                },
+              ]}
+            />
+            <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
+            <Merke title="Nullstelle einer Geraden">
+              <p>
+                Die <strong>Nullstelle</strong> ist der <M>x</M>-Wert, bei dem die Gerade die x-Achse schneidet. Dort gilt <M>{'y = 0'}</M>. Der Punkt heißt{' '}
+                <M>{'N(x_N \\mid 0)'}</M>.
+              </p>
+              <p>So berechnest du sie:</p>
+              <ol>
+                <li>
+                  Funktionsterm gleich 0 setzen: <M>{'m x + t = 0'}</M>
+                </li>
+                <li>
+                  Nach <M>x</M> auflösen, das ergibt <M>{'x_N'}</M>.
+                </li>
+                <li>
+                  Nullstelle angeben: <M>{'N(x_N \\mid 0)'}</M>, bei Sachaufgaben mit Antwortsatz und Deutung im Bild.
+                </li>
+              </ol>
+              <p>
+                Links der Nullstelle liegt eine fallende Gerade über der x-Achse, rechts davon darunter. Die Nullstelle ist die Grenze.
+              </p>
+            </Merke>
+            <div className="lp-ex bk-panel">
+              <CardHead title="Dein Hefteintrag" />
+              <p>Übertrage den Merkkasten in dein Heft und ergänze ihn mit dem Beispiel. Hake ab, was du schon hast:</p>
+              <div className="ls-criteria">
+                {[
+                  'Überschrift „Nullstelle“ und die Gleichungen der drei Geraden f, g und h',
+                  'Skizze der drei Geraden mit beschrifteten Achsen und den markierten Nullstellen N(3 | 0), N(3,75 | 0) und N(4 | 0)',
+                  'Rechnung für h: Funktionsterm gleich 0 setzen, nach x auflösen, Probe',
+                  'Antwortsatz: In welcher Reihenfolge landen die Geraden, und warum landet die steilste zuletzt?',
+                ].map((c) => (
+                  <label key={c}>
+                    <input type="checkbox" /> <span>{c}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
-        </Phase>
+          </Teil>
+
 
         {/* 6 Üben */}
-        <Phase no={6} title="Jetzt du: Schritt für Schritt üben" social="EA" minutes={7}>
-          <p>Hier rechnest du Nullstellen selbst. Die erste Aufgabe gibt dir die Schritte vor, bei der zweiten stellst du die Gleichung erst selbst auf.</p>
-          <div className="lp-exlist">
-            <CheckCard
-              title="Übung 1: Mit Geländer"
-              level="basis"
-              prompt={
-                <>
-                  <p>Berechne die Nullstelle der Geraden <M>{'y = 3x - 12'}</M>. Fülle die Lücken der Rechnung aus.</p>
-                </>
-              }
-              rechnung={[
-                { l: ['3x - 12'], r: ['0'], u: '\\mid +12' },
-                { l: ['3x'], r: [{ luecke: 'dreix' }], u: '\\mid :3' },
-                { l: ['x_N'], r: [{ luecke: 'x' }] },
-              ]}
-              fields={[
-                { kind: 'num', key: 'dreix', label: '3x', expected: 12 },
-                { kind: 'num', key: 'x', label: 'x_N', expected: 4 },
-              ]}
-              solution={
-                <>
-                  <MB>{'\\begin{aligned} 3x - 12 &= 0 && \\mid +12 \\\\ 3x &= 12 && \\mid :3 \\\\ x &= 4 \\end{aligned}'}</MB>
-                  <MB>{'N(4 \\mid 0)'}</MB>
-                </>
-              }
-              help={
-                <Hilfen
-                  steps={[
-                    <>Setze den Funktionsterm gleich 0. Was musst du auf beiden Seiten rechnen, damit links nur noch <M>3x</M> steht?</>,
-                    <>
-                      Addiere auf beiden Seiten 12. Dann steht links <M>3x</M> und rechts eine Zahl. Teile danach durch 3.
-                    </>,
-                    <>
-                      <M>{'3x = 12'}</M>, also <M>{'x = 4'}</M>.
-                    </>,
-                  ]}
-                />
-              }
-            />
-            <CheckCard
-              title="Übung 2: Gerade aus zwei Punkten"
-              level="standard"
-              prompt={
-                <>
+          <Teil title="Jetzt du: Schritt für Schritt üben" social="EA" minutes={7}>
+            <p>Hier rechnest du Nullstellen selbst. Die erste Aufgabe gibt dir die Schritte vor, bei der zweiten stellst du die Gleichung erst selbst auf.</p>
+            <div className="lp-exlist">
+              <CheckCard
+                title="Übung 1: Mit Geländer"
+                level="basis"
+                prompt={
+                  <>
+                    <p>Berechne die Nullstelle der Geraden <M>{'y = 3x - 12'}</M>. Fülle die Lücken der Rechnung aus.</p>
+                  </>
+                }
+                rechnung={[
+                  { l: ['3x - 12'], r: ['0'], u: '\\mid +12' },
+                  { l: ['3x'], r: [{ luecke: 'dreix' }], u: '\\mid :3' },
+                  { l: ['x_N'], r: [{ luecke: 'x' }] },
+                ]}
+                fields={[
+                  { kind: 'num', key: 'dreix', label: '3x', expected: 12 },
+                  { kind: 'num', key: 'x', label: 'x_N', expected: 4 },
+                ]}
+                solution={
+                  <>
+                    <MB>{'\\begin{aligned} 3x - 12 &= 0 && \\mid +12 \\\\ 3x &= 12 && \\mid :3 \\\\ x &= 4 \\end{aligned}'}</MB>
+                    <MB>{'N(4 \\mid 0)'}</MB>
+                  </>
+                }
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Setze den Funktionsterm gleich 0. Was musst du auf beiden Seiten rechnen, damit links nur noch <M>3x</M> steht?</>,
+                      <>
+                        Addiere auf beiden Seiten 12. Dann steht links <M>3x</M> und rechts eine Zahl. Teile danach durch 3.
+                      </>,
+                      <>
+                        <M>{'3x = 12'}</M>, also <M>{'x = 4'}</M>.
+                      </>,
+                    ]}
+                  />
+                }
+              />
+              <CheckCard
+                title="Übung 2: Gerade aus zwei Punkten"
+                level="standard"
+                prompt={
+                  <>
+                    <p>
+                      Eine Gerade geht durch die Punkte <M>{'A(0 \\mid 6)'}</M> und <M>{'B(2 \\mid 2)'}</M>. Stelle die Funktionsgleichung auf und berechne die Nullstelle.
+                    </p>
+                  </>
+                }
+                fields={[
+                  { kind: 'num', key: 'm', label: <M>{'m ='}</M>, expected: -2 },
+                  { kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 6 },
+                  { kind: 'num', key: 'x', label: <M>{'x_N ='}</M>, expected: 3 },
+                ]}
+                fieldsRow
+                solution={
+                  <>
+                    <MB>{'m = \\frac{2 - 6}{2 - 0} = -2 \\qquad t = 6 \\;(\\text{A liegt auf der y-Achse})'}</MB>
+                    <MB>{'y = -2x + 6'}</MB>
+                    <MB>{'\\begin{aligned} -2x + 6 &= 0 && \\mid -6 \\\\ -2x &= -6 && \\mid :(-2) \\\\ x &= 3 \\end{aligned}'}</MB>
+                    <MB>{'N(3 \\mid 0)'}</MB>
+                  </>
+                }
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Berechne zuerst die Steigung aus den beiden Punkten: <M>{'m = \\frac{y_2 - y_1}{x_2 - x_1}'}</M>.</>,
+                      <>
+                        Der Punkt A liegt auf der y-Achse (x = 0). Was sagt dir das über <M>t</M>?
+                      </>,
+                      <>
+                        <M>{'y = -2x + 6'}</M>. Setze den Term gleich 0 und löse: <M>{'-2x + 6 = 0'}</M>.
+                      </>,
+                    ]}
+                  />
+                }
+              />
+              <CheckCard
+                title="Übung 3: Umgekehrt gedacht"
+                level="erweiterung"
+                prompt={
                   <p>
-                    Eine Gerade geht durch die Punkte <M>{'A(0 \\mid 6)'}</M> und <M>{'B(2 \\mid 2)'}</M>. Stelle die Funktionsgleichung auf und berechne die Nullstelle.
+                    Die Gerade <M>{'y = -0{,}5x + t'}</M> soll den Boden bei <M>{'x = 5'}</M> berühren. Welchen Wert muss <M>t</M> haben?
                   </p>
-                </>
-              }
-              fields={[
-                { kind: 'num', key: 'm', label: <M>{'m ='}</M>, expected: -2 },
-                { kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 6 },
-                { kind: 'num', key: 'x', label: <M>{'x_N ='}</M>, expected: 3 },
-              ]}
-              fieldsRow
-              solution={
-                <>
-                  <MB>{'m = \\frac{2 - 6}{2 - 0} = -2 \\qquad t = 6 \\;(\\text{A liegt auf der y-Achse})'}</MB>
-                  <MB>{'y = -2x + 6'}</MB>
-                  <MB>{'\\begin{aligned} -2x + 6 &= 0 && \\mid -6 \\\\ -2x &= -6 && \\mid :(-2) \\\\ x &= 3 \\end{aligned}'}</MB>
-                  <MB>{'N(3 \\mid 0)'}</MB>
-                </>
-              }
-              help={
-                <Hilfen
-                  steps={[
-                    <>Berechne zuerst die Steigung aus den beiden Punkten: <M>{'m = \\frac{y_2 - y_1}{x_2 - x_1}'}</M>.</>,
-                    <>
-                      Der Punkt A liegt auf der y-Achse (x = 0). Was sagt dir das über <M>t</M>?
-                    </>,
-                    <>
-                      <M>{'y = -2x + 6'}</M>. Setze den Term gleich 0 und löse: <M>{'-2x + 6 = 0'}</M>.
-                    </>,
-                  ]}
-                />
-              }
-            />
-            <CheckCard
-              title="Übung 3: Umgekehrt gedacht"
-              level="erweiterung"
-              prompt={
-                <p>
-                  Die Gerade <M>{'y = -0{,}5x + t'}</M> soll den Boden bei <M>{'x = 5'}</M> berühren. Welchen Wert muss <M>t</M> haben?
-                </p>
-              }
-              fields={[{ kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 2.5 }]}
-              solution={
-                <>
-                  <p>Die Nullstelle ist 5, also muss bei <M>{'x = 5'}</M> der Wert <M>{'y = 0'}</M> herauskommen:</p>
-                  <MB>{'\\begin{aligned} -0{,}5 \\cdot 5 + t &= 0 \\\\ -2{,}5 + t &= 0 && \\mid +2{,}5 \\\\ t &= 2{,}5 \\end{aligned}'}</MB>
-                </>
-              }
-              help={
-                <Hilfen
-                  steps={[
-                    <>Diesmal kennst du die Nullstelle schon. Welcher y-Wert gehört zu <M>x = 5</M>?</>,
-                    <>
-                      Setze <M>{'x = 5'}</M> in den Term ein und den ganzen Term gleich 0. Die Unbekannte ist <M>t</M>.
-                    </>,
-                    <>
-                      <M>{'-0{,}5 \\cdot 5 + t = 0'}</M>, also <M>{'-2{,}5 + t = 0'}</M>. Jetzt nach <M>t</M> auflösen.
-                    </>,
-                  ]}
-                />
-              }
-            />
-          </div>
-        </Phase>
+                }
+                fields={[{ kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 2.5 }]}
+                solution={
+                  <>
+                    <p>Die Nullstelle ist 5, also muss bei <M>{'x = 5'}</M> der Wert <M>{'y = 0'}</M> herauskommen:</p>
+                    <MB>{'\\begin{aligned} -0{,}5 \\cdot 5 + t &= 0 \\\\ -2{,}5 + t &= 0 && \\mid +2{,}5 \\\\ t &= 2{,}5 \\end{aligned}'}</MB>
+                  </>
+                }
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Diesmal kennst du die Nullstelle schon. Welcher y-Wert gehört zu <M>x = 5</M>?</>,
+                      <>
+                        Setze <M>{'x = 5'}</M> in den Term ein und den ganzen Term gleich 0. Die Unbekannte ist <M>t</M>.
+                      </>,
+                      <>
+                        <M>{'-0{,}5 \\cdot 5 + t = 0'}</M>, also <M>{'-2{,}5 + t = 0'}</M>. Jetzt nach <M>t</M> auflösen.
+                      </>,
+                    ]}
+                  />
+                }
+              />
+            </div>
+          </Teil>
+
 
         {/* 7 Check */}
-        <Phase no={7} title="Check: Hast du es verstanden?" social="EA" minutes={6}>
-          <div className="lp-exlist">
-            <TrackedMc
-              topic="Nullstellen-Einstieg: Bedeutung (Basis)"
-              title="Check 1: Was bedeutet die Nullstelle?"
-              level="basis"
-              prompt={
-                <p>
-                  Für eine Gerade gilt <M>{'N(3 \\mid 0)'}</M>. Was bedeutet das?
-                </p>
-              }
-              options={[
-                { text: 'Die Gerade schneidet die x-Achse bei x = 3.', correct: true, feedback: 'N(3 | 0) liegt auf der x-Achse: Dort ist x = 3 und y = 0.' },
-                { text: 'Die Gerade schneidet die y-Achse bei y = 3.', feedback: 'Das wäre der y-Achsenabschnitt t = 3. Die Nullstelle liegt auf der x-Achse, dort ist y = 0.' },
-                { text: 'Die Gerade schneidet die y-Achse bei x = 0 und y = 3.', feedback: 'Hier sind die Koordinaten vertauscht: Bei N(3 | 0) steht zuerst der x-Wert 3, dann der y-Wert 0.' },
-                { text: 'Die Gerade geht durch den Ursprung.', feedback: 'Der Ursprung ist O(0 | 0). Hier ist x = 3, die Gerade berührt die x-Achse rechts davon.' },
-              ]}
-            />
-            <TrackedMc
-              topic="Nullstellen-Einstieg: Berechnen (Standard)"
-              title="Check 2: Nullstelle berechnen"
-              rechnen
-              level="standard"
-              prompt={
-                <>
-                  <p>Berechne die Nullstelle. Wähle dann die richtige Antwort aus.</p>
-                  <MB>{'y = -3x + 12'}</MB>
-                </>
-              }
-              options={[
-                { text: <M>{'x = -4'}</M>, feedback: 'Vorzeichenfehler: Aus −3x + 12 = 0 folgt −3x = −12, also x = (−12) : (−3) = 4.' },
-                { text: <M>{'x = 12'}</M>, feedback: 'Die 12 ist der y-Achsenabschnitt t, nicht die Nullstelle. Setze den Term gleich 0 und löse nach x auf.' },
-                { text: <M>{'N(0 \\mid 4)'}</M>, feedback: 'Die Zahl stimmt, aber die Koordinaten sind vertauscht. Die Nullstelle liegt auf der x-Achse: N(4 | 0).' },
-                { text: <M>{'x = 4'}</M>, correct: true, feedback: '−3x + 12 = 0 ergibt −3x = −12, also x = 4. Probe mit x = 4: y = −12 + 12 = 0.' },
-              ]}
-            />
-            <TrackedCheck
-              topic="Nullstellen-Einstieg: Berechnen (Erweiterung)"
-              title="Check 3: Jetzt ganz allein"
-              level="erweiterung"
-              prompt={
-                <>
-                  <p>Berechne die Nullstelle der Geraden.</p>
-                  <MB>{'y = 0{,}25x - 1{,}5'}</MB>
-                </>
-              }
-              fields={[{ kind: 'num', key: 'x', label: <M>{'x_N ='}</M>, expected: 6 }]}
-              solution={
-                <>
-                  <MB>{'\\begin{aligned} 0{,}25x - 1{,}5 &= 0 && \\mid +1{,}5 \\\\ 0{,}25x &= 1{,}5 && \\mid :0{,}25 \\\\ x &= 6 \\end{aligned}'}</MB>
+          <Teil title="Check: Hast du es verstanden?" social="EA" minutes={6}>
+            <div className="lp-exlist">
+              <TrackedMc
+                topic="Nullstellen-Einstieg: Bedeutung (Basis)"
+                title="Check 1: Was bedeutet die Nullstelle?"
+                level="basis"
+                prompt={
                   <p>
-                    Probe mit <M>{'x = 6'}</M>: <M>{'y = 0{,}25 \\cdot 6 - 1{,}5 = 0'}</M> ✓
+                    Für eine Gerade gilt <M>{'N(3 \\mid 0)'}</M>. Was bedeutet das?
                   </p>
-                </>
-              }
-            />
-          </div>
-        </Phase>
+                }
+                options={[
+                  { text: 'Die Gerade schneidet die x-Achse bei x = 3.', correct: true, feedback: 'N(3 | 0) liegt auf der x-Achse: Dort ist x = 3 und y = 0.' },
+                  { text: 'Die Gerade schneidet die y-Achse bei y = 3.', feedback: 'Das wäre der y-Achsenabschnitt t = 3. Die Nullstelle liegt auf der x-Achse, dort ist y = 0.' },
+                  { text: 'Die Gerade schneidet die y-Achse bei x = 0 und y = 3.', feedback: 'Hier sind die Koordinaten vertauscht: Bei N(3 | 0) steht zuerst der x-Wert 3, dann der y-Wert 0.' },
+                  { text: 'Die Gerade geht durch den Ursprung.', feedback: 'Der Ursprung ist O(0 | 0). Hier ist x = 3, die Gerade berührt die x-Achse rechts davon.' },
+                ]}
+              />
+              <TrackedMc
+                topic="Nullstellen-Einstieg: Berechnen (Standard)"
+                title="Check 2: Nullstelle berechnen"
+                rechnen
+                level="standard"
+                prompt={
+                  <>
+                    <p>Berechne die Nullstelle. Wähle dann die richtige Antwort aus.</p>
+                    <MB>{'y = -3x + 12'}</MB>
+                  </>
+                }
+                options={[
+                  { text: <M>{'x = -4'}</M>, feedback: 'Vorzeichenfehler: Aus −3x + 12 = 0 folgt −3x = −12, also x = (−12) : (−3) = 4.' },
+                  { text: <M>{'x = 12'}</M>, feedback: 'Die 12 ist der y-Achsenabschnitt t, nicht die Nullstelle. Setze den Term gleich 0 und löse nach x auf.' },
+                  { text: <M>{'N(0 \\mid 4)'}</M>, feedback: 'Die Zahl stimmt, aber die Koordinaten sind vertauscht. Die Nullstelle liegt auf der x-Achse: N(4 | 0).' },
+                  { text: <M>{'x = 4'}</M>, correct: true, feedback: '−3x + 12 = 0 ergibt −3x = −12, also x = 4. Probe mit x = 4: y = −12 + 12 = 0.' },
+                ]}
+              />
+              <TrackedCheck
+                topic="Nullstellen-Einstieg: Berechnen (Erweiterung)"
+                title="Check 3: Jetzt ganz allein"
+                level="erweiterung"
+                prompt={
+                  <>
+                    <p>Berechne die Nullstelle der Geraden.</p>
+                    <MB>{'y = 0{,}25x - 1{,}5'}</MB>
+                  </>
+                }
+                fields={[{ kind: 'num', key: 'x', label: <M>{'x_N ='}</M>, expected: 6 }]}
+                solution={
+                  <>
+                    <MB>{'\\begin{aligned} 0{,}25x - 1{,}5 &= 0 && \\mid +1{,}5 \\\\ 0{,}25x &= 1{,}5 && \\mid :0{,}25 \\\\ x &= 6 \\end{aligned}'}</MB>
+                    <p>
+                      Probe mit <M>{'x = 6'}</M>: <M>{'y = 0{,}25 \\cdot 6 - 1{,}5 = 0'}</M> ✓
+                    </p>
+                  </>
+                }
+              />
+            </div>
+          </Teil>
+        </Etappe>
 
         <nav className="lp-nav" aria-label="Weiter">
           <button type="button" className="bk-btn" onClick={onBack}>
@@ -745,7 +782,7 @@ function Rueckbezug({ pred }: { pred: Prediction }) {
   if (!pred.saved || !pred.first) {
     return (
       <div className="ls-back">
-        <p>Du hast in Abschnitt 2 noch keine Vermutung festgehalten. Hole das kurz nach, dann siehst du hier, ob du richtig lagst.</p>
+        <p>Du hast in Phase 2 noch keine Vermutung festgehalten. Hole das kurz nach, dann siehst du hier, ob du richtig lagst.</p>
       </div>
     )
   }
