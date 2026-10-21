@@ -5,7 +5,7 @@ import { Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx,
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './teamchat.css'
 
-// Lernsituation 2 „Lohnen sich 60 Hoodies?“: Funktionsgleichung aus einem bekannten Wert und zwei Punkten (Fall 2, ca. 100 min).
+// Lernsituation 2 „Lohnen sich 60 Hoodies?“: Funktionsgleichung aus einem bekannten Wert und zwei Punkten (Fall 2, ca. 95 min).
 // Format Entscheidungsfall, Look Team-Chat der Schülerfirma mit Lieferanten-Rechnungen, Lernprodukt digital (Sprachnachricht oder Erklärvideo).
 // Instruktionsreihenfolge: Problem zuerst. Die SuS stellen aus c = −200 und zwei Punkten selbst zwei Gleichungen auf und merken, dass
 // sie mit zwei Unbekannten nicht weiterkommen. Das Additionsverfahren ist neu: Es wird an zwei Rechnungen entdeckt (Rechnungen
@@ -190,21 +190,11 @@ export default function SchuelerfirmaEinstieg({
           <Arbeitsweise />
 
           {/* 1 Aktivieren */}
-          <Phase no={1} title="Fit für den Start" social="EA" minutes={8}>
-            <p>Diese vier kurzen Aufgaben brauchst du gleich. Löse sie allein.</p>
+          <Phase no={1} title="Fit für den Start" social="EA" minutes={6}>
+            <p>Diese drei kurzen Aufgaben brauchst du gleich. Löse sie allein.</p>
             <div className="lp-exlist">
               <CheckCard
-                title="a) Funktionswert berechnen"
-                prompt={
-                  <p>
-                    Berechne für <M>{'f(x) = 2x^2 - 3x + 1'}</M> den Wert <M>{'f(-2)'}</M>.
-                  </p>
-                }
-                fields={[{ kind: 'num', key: 'y', label: <M>{'f(-2) ='}</M>, expected: 15 }]}
-                solution={<MB>{'f(-2) = 2 \\cdot (-2)^2 - 3 \\cdot (-2) + 1 = 8 + 6 + 1 = 15'}</MB>}
-              />
-              <CheckCard
-                title="b) Gleichung lösen"
+                title="a) Gleichung lösen"
                 prompt={
                   <p>
                     Löse die Gleichung <M>{'400 = 20b - 200'}</M>.
@@ -214,7 +204,7 @@ export default function SchuelerfirmaEinstieg({
                 solution={<MB>{'\\begin{aligned} 400 &= 20b - 200 && \\mid +200 \\\\ 600 &= 20b && \\mid :20 \\\\ b &= 30 \\end{aligned}'}</MB>}
               />
               <McCard
-                title="c) Minus vor der Klammer"
+                title="b) Minus vor der Klammer"
                 prompt={
                   <p>
                     Vereinfache <M>{'(3x + 2y) - (3x - 4y)'}</M>.
@@ -228,7 +218,7 @@ export default function SchuelerfirmaEinstieg({
                 ]}
               />
               <CheckCard
-                title="d) Gewinn berechnen"
+                title="c) Gewinn berechnen"
                 prompt={<p>Eine Firma nimmt mit dem Verkauf 900 € ein (Erlös). Die Kosten betragen 650 €. Wie hoch ist der Gewinn?</p>}
                 fields={[{ kind: 'num', key: 'g', label: 'Gewinn', unit: '€', expected: 250 }]}
                 solution={<MB>{'\\text{Gewinn} = \\text{Erlös} - \\text{Kosten} = 900 - 650 = 250\\ €'}</MB>}
@@ -467,10 +457,7 @@ export default function SchuelerfirmaEinstieg({
                   </>,
                   <>
                     <strong>Lösen und einsetzen:</strong> Die Gleichung mit einer Unbekannten lösen. Das Ergebnis in eine der Ausgangsgleichungen einsetzen und die zweite Unbekannte
-                    berechnen.
-                  </>,
-                  <>
-                    <strong>Probe:</strong> Beide Werte in die andere Gleichung einsetzen.
+                    berechnen. Zur Probe beide Werte in die andere Gleichung einsetzen.
                   </>,
                 ]}
               />
@@ -759,7 +746,7 @@ export default function SchuelerfirmaEinstieg({
           </Phase>
 
           {/* 7 Sichern & Lernprodukt */}
-          <Phase no={7} title="Das hältst du fest" social="EA" minutes={15}>
+          <Phase no={7} title="Das hältst du fest" social="EA" minutes={12}>
             <Rueckbezug pred={pred} />
             <Merke title="Das Additionsverfahren">
               <p>Zwei Gleichungen mit zwei Unbekannten löst du, indem du sie so addierst oder subtrahierst, dass eine Unbekannte wegfällt.</p>
@@ -788,36 +775,6 @@ export default function SchuelerfirmaEinstieg({
                 ]}
               />
             </Merke>
-            <Beispiel
-              title="Die Gewinnfunktion der Schülerfirma"
-              aufgabe={
-                <p>
-                  Gesucht ist <M>{'G(x) = ax^2 + bx + c'}</M> mit <M>{'c = -200'}</M>, durch <M>{'(20 \\mid 200)'}</M> und <M>{'(40 \\mid 200)'}</M>.
-                </p>
-              }
-              steps={[
-                { title: 'Bekannten Wert einsetzen', body: <MB>{'G(x) = ax^2 + bx - 200'}</MB> },
-                {
-                  title: 'Beide Punkte einsetzen',
-                  body: <MB>{'\\begin{aligned} \\text{I: } 400 &= 400a + 20b \\\\ \\text{II: } 400 &= 1600a + 40b \\end{aligned}'}</MB>,
-                },
-                {
-                  title: 'Additionsverfahren',
-                  body: <MB>{'\\text{II} - \\text{I} \\cdot 2: \\; -400 = 800a \\;\\Rightarrow\\; a = -0{,}5 \\qquad \\text{in I: } b = 30'}</MB>,
-                },
-                {
-                  title: 'Gleichung angeben und Probe',
-                  body: (
-                    <>
-                      <MB>{'G(x) = -0{,}5x^2 + 30x - 200'}</MB>
-                      <p>
-                        Probe mit <M>{'(40 \\mid 200)'}</M>: <M>{'-0{,}5 \\cdot 1600 + 1200 - 200 = 200'}</M> ✓
-                      </p>
-                    </>
-                  ),
-                },
-              ]}
-            />
             <div className="lp-ex bk-panel" data-no-autocheck>
               <CardHead title="Deine Sprachnachricht an Finn (Lernprodukt)" />
               <p>

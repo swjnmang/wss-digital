@@ -1,4 +1,4 @@
-/* Lernsituation 1 „Der Torbogen für die Hofeinfahrt“: Look Werkstatt-Auftragsmappe (Fallmappe mit Reiter, Prüfberichte der Azubis, Stempel).
+/* Lernsituation 1 „Der Torbogen für die Hofeinfahrt“: Look Werkstatt-Auftragsmappe (Fallmappe mit Reiter, Azubi-Pläne im Check, Stempel).
    Der feste Kern (Eingaben, Feedback, Hilfen, Stopp-Kasten) kommt unverändert aus lernsituation_kit/kit.css. */
 
 .wm-mappe { display: flex; flex-direction: column; }
@@ -34,7 +34,7 @@
 .wm-notiz p:last-child { margin: 0; }
 
 .wm-berichte { display: grid; gap: 14px; }
-@media (min-width: 900px) { .wm-berichte { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 720px) { .wm-berichte-2 { grid-template-columns: repeat(2, 1fr); } }
 .wm-bericht {
   border: 2px solid var(--edge);
   border-radius: 10px;
@@ -54,9 +54,6 @@
 .wm-zeilen li { display: flex; gap: 8px; align-items: baseline; padding: 4px 6px; border-radius: 6px; background: var(--surface-sunken); overflow-x: auto; }
 .wm-zeilen b { flex: none; min-width: 1.6em; font: 800 14px/1.3 var(--font-display); color: var(--ink-muted); }
 .wm-ergebnis { padding: 6px 8px; border: 1.5px dashed var(--edge); border-radius: 8px; overflow-x: auto; }
-
-.wm-pruefstand { display: flex; flex-wrap: wrap; gap: 8px; }
-.wm-pruefstand .bk-btn[aria-pressed='true'] { background: var(--primary); color: var(--on-primary); }
 
 .wm-stempel {
   align-self: flex-start;

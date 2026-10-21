@@ -1,46 +1,39 @@
-import { useId, useState, type ReactNode } from 'react'
+import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
-import { Beispiel, M, MB, Merke, Vorgehen } from '../../daten_und_zufall/lernpfad/kit'
-import { Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Beispiel, M, MB, Merke, Vorgehen, fmt } from '../../daten_und_zufall/lernpfad/kit'
+import { Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, Phase, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './werkstatt.css'
 
 // Lernsituation 1 „Der Torbogen für die Hofeinfahrt“: Funktionsgleichung aus Scheitelpunkt und einem weiteren Punkt (Fall 1, 45 min).
-// Format Fehlerdetektiv, Look Werkstatt-Auftragsmappe (Metallbau), Lernprodukt analog (Spickzettel in drei Schritten).
-// Instruktionsreihenfolge: Fehlerbeispiele zuerst. Die SuS kennen die Scheitelform f(x) = a(x − x_S)² + y_S und können sie in die
-// allgemeine Form umwandeln; neu ist, a mit einem zweiten Punkt zu bestimmen. Drei ausgearbeitete Lösungen mit je einem typischen
-// Fehler (Vorzeichen von x_S, (−2)² = −4, a nicht mit allen Summanden multipliziert) zeigen das Verfahren und die Stolperstellen.
-// Aha: Jonas’ Gleichung besteht die Punktprobe mit dem linken Pfosten und ist trotzdem falsch. Eine Probe mit einem Punkt reicht nicht.
-// Phasen: Aktivieren → Auftrag & Festlegung → Fehlerdetektiv → Austausch → Sichern → Check.
+// Format Experimentierlabor mit Fehlerdetektiv im Check, Look Werkstatt-Auftragsmappe (Metallbau), Lernprodukt analog (Spickzettel).
+// Instruktionsreihenfolge: Problem zuerst. Die SuS kennen die Scheitelform f(x) = a(x − x_S)² + y_S und können sie in die allgemeine
+// Form umwandeln. Neu ist, a mit einem zweiten Punkt zu bestimmen: Sie setzen den Scheitel ein, suchen a erst am Regler und
+// berechnen es dann, indem sie den Pfosten einsetzen. Erst danach fasst eine Infokarte das Vorgehen zusammen.
+// Aha: Ist a über den linken Pfosten bestimmt, sitzt der Bogen automatisch auch auf dem rechten Pfosten (Symmetrie).
+// Fehlerhafte Azubi-Pläne kommen erst im Check, wenn die SuS den Weg selbst gerechnet haben.
+// Phasen: Aktivieren → Auftrag & Festlegung → Erkunden & Berechnen → Austausch → Sichern → Check.
 // Die Festlegung bleibt nur im Seitenzustand (kein Speichern).
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
 // Hofeinfahrt 4 m breit, Pfosten 2 m hoch bei x = 0 und x = 4, höchster Punkt des Bogens 3 m über der Mitte.
 // Richtig: f(x) = −0,25(x − 2)² + 3 = −0,25x² + x + 2
-type Azubi = 'jonas' | 'elif' | 'mara'
-type Plan = Azubi | 'soll'
+const A_SOLL = -0.25
+const bogen = (a: number) => (x: number) => a * (x - 2) ** 2 + 3
 
-const PLAENE: Record<Plan, { name: string; f: (x: number) => number; tex: string; farbe: string }> = {
-  jonas: { name: 'Jonas', f: (x) => -0.25 * x * x - x + 2, tex: 'f(x) = -0{,}25x^2 - x + 2', farbe: 'var(--primary)' },
-  elif: { name: 'Elif', f: (x) => 0.25 * x * x - x + 4, tex: 'f(x) = 0{,}25x^2 - x + 4', farbe: 'var(--hint)' },
-  mara: { name: 'Mara', f: (x) => -0.25 * x * x - 4 * x + 7, tex: 'f(x) = -0{,}25x^2 - 4x + 7', farbe: 'var(--accent)' },
-  soll: { name: 'richtige Gleichung', f: (x) => -0.25 * x * x + x + 2, tex: 'f(x) = -0{,}25x^2 + x + 2', farbe: 'var(--correct)' },
-}
-
-type Choice = Azubi | 'keiner'
-type Prediction = { choice: Choice | null; saved: boolean }
+type Choice = 'reicht' | 'punkt' | 'zwei'
+type Prediction = { choice: Choice | null; a: number; saved: boolean }
 
 const CHOICE_TEXT: Record<Choice, string> = {
-  jonas: 'Jonas hat richtig gerechnet',
-  elif: 'Elif hat richtig gerechnet',
-  mara: 'Mara hat richtig gerechnet',
-  keiner: 'Keine der drei Gleichungen stimmt',
+  reicht: 'Der Scheitelpunkt reicht, damit liegt der Bogen fest',
+  punkt: 'Man braucht zusätzlich einen Pfosten',
+  zwei: 'Man braucht zusätzlich beide Pfosten',
 }
 
 /* ── Sachbild: Hofeinfahrt mit Torbogen ──────────────────────────────────── */
 
-const S = { w: 640, h: 340, l: 44, r: 14, t: 12, b: 34, xMin: -4.5, xMax: 6.5, yMin: -0.6, yMax: 4.6 }
+const S = { w: 640, h: 340, l: 44, r: 14, t: 12, b: 34, xMin: -1.5, xMax: 5.5, yMin: -0.6, yMax: 4.6 }
 const bx = (x: number) => S.l + ((x - S.xMin) / (S.xMax - S.xMin)) * (S.w - S.l - S.r)
 const by = (y: number) => S.h - S.b - ((y - S.yMin) / (S.yMax - S.yMin)) * (S.h - S.t - S.b)
 
@@ -49,10 +42,10 @@ const kurve = (f: (x: number) => number, von: number, bis: number) =>
     .map((x) => `${bx(x)},${by(f(x))}`)
     .join(' ')
 
-const SOLL_BOGEN = kurve(PLAENE.soll.f, 0, 4)
+const SOLL_BOGEN = kurve(bogen(A_SOLL), 0, 4)
 
-/** Skizze der Einfahrt; plan = Graph eines Plans über die Skizze legen */
-function TorBild({ plan, masse = true }: { plan?: Plan | null; masse?: boolean }) {
+/** Skizze der Einfahrt; f = Parabel (z. B. vom Regler) über die gestrichelte Skizze legen */
+function TorBild({ f, farbe = 'var(--primary)' }: { f?: (x: number) => number; farbe?: string }) {
   const clip = useId().replace(/[^a-zA-Z0-9]/g, '')
   return (
     <div className="bk-graph ls-graph">
@@ -62,7 +55,7 @@ function TorBild({ plan, masse = true }: { plan?: Plan | null; masse?: boolean }
             <rect x={bx(S.xMin)} y={S.t} width={bx(S.xMax) - bx(S.xMin)} height={by(S.yMin) - S.t} />
           </clipPath>
         </defs>
-        {Array.from({ length: 11 }, (_, i) => i - 4).map((v) => (
+        {Array.from({ length: 6 }, (_, i) => i - 1).map((v) => (
           <g key={`x${v}`}>
             <line x1={bx(v)} x2={bx(v)} y1={by(0)} y2={by(S.yMax)} stroke="var(--grid)" />
             <text x={bx(v)} y={by(0) + 24} textAnchor="middle" fontSize="18" fill="var(--ink-muted)">
@@ -81,33 +74,27 @@ function TorBild({ plan, masse = true }: { plan?: Plan | null; masse?: boolean }
         <rect x={bx(S.xMin)} y={by(0)} width={bx(S.xMax) - bx(S.xMin)} height={by(S.yMin) - by(0)} fill="var(--surface-sunken)" />
         <line x1={bx(S.xMin)} x2={bx(S.xMax)} y1={by(0)} y2={by(0)} stroke="var(--ink)" strokeWidth="3" />
         <line x1={bx(0)} x2={bx(0)} y1={by(S.yMin)} y2={by(S.yMax)} stroke="var(--ink)" strokeWidth="1.5" />
-        {/* Pfosten */}
         {[0, 4].map((x) => (
           <rect key={x} x={bx(x) - 7} y={by(2)} width="14" height={by(0) - by(2)} fill="var(--ink-muted)" stroke="var(--ink)" strokeWidth="2" />
         ))}
-        {/* Torbogen laut Kundenwunsch (Skizze, gestrichelt) */}
         <polyline points={SOLL_BOGEN} fill="none" stroke="var(--ink)" strokeWidth="3" strokeDasharray="8 6" />
-        {plan && (
+        {f && (
           <g clipPath={`url(#${clip})`}>
-            <polyline points={kurve(PLAENE[plan].f, S.xMin, S.xMax)} fill="none" stroke={PLAENE[plan].farbe} strokeWidth="4.5" strokeLinecap="round" />
+            <polyline points={kurve(f, S.xMin, S.xMax)} fill="none" stroke={farbe} strokeWidth="4.5" strokeLinecap="round" />
           </g>
         )}
-        {masse && (
-          <>
-            <circle cx={bx(2)} cy={by(3)} r="7" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
-            <text x={bx(2)} y={by(3) - 14} textAnchor="middle" fontSize="18" fontWeight="700" fill="var(--ink)">
-              S(2 | 3)
-            </text>
-            <circle cx={bx(0)} cy={by(2)} r="7" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
-            <text x={bx(0) - 12} y={by(2) - 22} textAnchor="end" fontSize="18" fontWeight="700" fill="var(--ink)">
-              P(0 | 2)
-            </text>
-            <circle cx={bx(4)} cy={by(2)} r="7" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
-            <text x={bx(4) + 12} y={by(2) - 12} fontSize="18" fontWeight="700" fill="var(--ink)">
-              Q(4 | 2)
-            </text>
-          </>
-        )}
+        <circle cx={bx(2)} cy={by(3)} r="7" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
+        <text x={bx(2)} y={by(3) - 14} textAnchor="middle" fontSize="18" fontWeight="700" fill="var(--ink)">
+          S(2 | 3)
+        </text>
+        <circle cx={bx(0)} cy={by(2)} r="7" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
+        <text x={bx(0) - 12} y={by(2) - 22} textAnchor="end" fontSize="18" fontWeight="700" fill="var(--ink)">
+          P(0 | 2)
+        </text>
+        <circle cx={bx(4)} cy={by(2)} r="7" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
+        <text x={bx(4) + 12} y={by(2) - 22} fontSize="18" fontWeight="700" fill="var(--ink)">
+          Q(4 | 2)
+        </text>
         <text x={bx(S.xMax) - 4} y={by(0) - 8} textAnchor="end" fontSize="14" fill="var(--ink-muted)">
           Boden (x in m)
         </text>
@@ -116,40 +103,44 @@ function TorBild({ plan, masse = true }: { plan?: Plan | null; masse?: boolean }
   )
 }
 
-/** Prüfstand: Pläne der Azubis über die Skizze legen */
-function Pruefstand() {
-  const [plan, setPlan] = useState<Plan | null>(null)
+/** Regler für a: Bogen f(x) = a(x − 2)² + 3 über die Skizze legen */
+function ReglerA() {
+  const sliderId = useId()
+  const [a, setA] = useState(-1)
+  const f = bogen(a)
   return (
     <div className="lp-ex bk-panel">
-      <CardHead title="Prüfstand: Plan über die Skizze legen" />
-      <p>Tippe auf einen Namen. Dann wird die Parabel aus dem Plan über die gestrichelte Skizze des Kunden gelegt.</p>
-      <div className="wm-pruefstand">
-        {(['jonas', 'elif', 'mara'] as const).map((a) => (
-          <button key={a} type="button" className="bk-btn bk-btn-sm" aria-pressed={plan === a} onClick={() => setPlan(plan === a ? null : a)}>
-            Plan von {PLAENE[a].name}
-          </button>
-        ))}
+      <CardHead title="Schritt 2: a am Regler suchen" level="basis" />
+      <div className="lp-ex-prompt">
+        <p>
+          Jetzt fehlt nur noch a. Probiert es erst aus: Der Regler verändert <M>a</M> in <M>{'f(x) = a(x - 2)^2 + 3'}</M>. Der Scheitel bleibt dabei immer bei <M>{'S(2 \\mid 3)'}</M>. Sucht das <M>a</M>, bei dem der blaue Bogen
+          genau auf der gestrichelten Skizze liegt.
+        </p>
       </div>
-      <TorBild plan={plan} />
-      {plan && (
-        <div className="ls-readout">
-          <div className="ls-readout-box ls-readout-a">
-            <strong>{PLAENE[plan].name}:</strong> <M>{PLAENE[plan].tex}</M>
-          </div>
+      <TorBild f={f} />
+      <div className="ls-slider">
+        <label htmlFor={sliderId}>
+          <M>a</M> = <span className="ls-slider-value">{fmt(a, 2)}</span>
+        </label>
+        <input id={sliderId} type="range" min={-1.5} max={1} step={0.05} value={a} onChange={(e: ChangeEvent<HTMLInputElement>) => setA(Number(e.target.value))} />
+      </div>
+      <div className="ls-readout">
+        <div className="ls-readout-box ls-readout-a">
+          <strong>Höhe am linken Pfosten:</strong> <M>{`f(0) = ${tx(f(0), 2)}`}</M>
         </div>
-      )}
+        <div className="ls-readout-box ls-readout-b">
+          <strong>Höhe am rechten Pfosten:</strong> <M>{`f(4) = ${tx(f(4), 2)}`}</M>
+        </div>
+      </div>
     </div>
   )
 }
 
-/** Prüfbericht eines Azubis mit nummerierten Rechenschritten */
-function Bericht({ azubi, cls, rolle, zeilen }: { azubi: Azubi; cls: string; rolle: string; zeilen: string[][] }) {
+/** Plan eines Azubis mit nummerierten Rechenschritten (für den Check) */
+function Bericht({ name, cls, zeilen, ergebnis }: { name: string; cls: string; zeilen: string[][]; ergebnis: string }) {
   return (
     <div className={`wm-bericht ${cls}`}>
-      <div className="wm-bericht-name">
-        Plan von {PLAENE[azubi].name}
-        <small>{rolle}</small>
-      </div>
+      <div className="wm-bericht-name">Plan von {name}</div>
       <ul className="wm-zeilen">
         {zeilen.map((z, i) => (
           <li key={i}>
@@ -165,13 +156,12 @@ function Bericht({ azubi, cls, rolle, zeilen }: { azubi: Azubi; cls: string; rol
         ))}
       </ul>
       <div className="wm-ergebnis">
-        An die Biegemaschine: <M>{PLAENE[azubi].tex}</M>
+        An die Biegemaschine: <M>{ergebnis}</M>
       </div>
     </div>
   )
 }
 
-const JA_NEIN = ['ja', 'nein']
 const SCHRITTE = ['Schritt 1 (Scheitel einsetzen)', 'Schritt 2 (a berechnen)', 'Schritt 3 (umwandeln)']
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
@@ -187,7 +177,7 @@ export default function TorbogenEinstieg({
   onPractice: () => void
   onNext: () => void
 }) {
-  const [pred, setPred] = useState<Prediction>({ choice: null, saved: false })
+  const [pred, setPred] = useState<Prediction>({ choice: null, a: -1, saved: false })
 
   return (
     <ErklaerungCtx.Provider value={erklaerung}>
@@ -206,15 +196,14 @@ export default function TorbogenEinstieg({
           <div className="lp-goal">
             <i className="fa-solid fa-bullseye" aria-hidden="true" />
             <div>
-              <strong>Das lernst du hier:</strong> Du stellst die Funktionsgleichung einer Parabel auf, wenn du den Scheitelpunkt und einen weiteren Punkt kennst. Dabei lernst du
-              die typischen Fehler kennen und wie du sie mit einer Probe aufdeckst.
+              <strong>Das lernst du hier:</strong> Du stellst die Funktionsgleichung einer Parabel auf, wenn du den Scheitelpunkt und einen weiteren Punkt kennst.
             </div>
           </div>
           <Arbeitsweise />
 
           {/* 1 Aktivieren */}
-          <Phase no={1} title="Fit für den Start" social="EA" minutes={5}>
-            <p>Diese vier kurzen Aufgaben brauchst du gleich. Löse sie allein.</p>
+          <Phase no={1} title="Fit für den Start" social="EA" minutes={4}>
+            <p>Diese drei kurzen Aufgaben brauchst du gleich. Löse sie allein.</p>
             <div className="lp-exlist">
               <McCard
                 title="a) Scheitelpunkt ablesen"
@@ -245,17 +234,7 @@ export default function TorbogenEinstieg({
                 solution={<MB>{'(x - 3)^2 = (x - 3)(x - 3) = x^2 - 3x - 3x + 9 = x^2 - 6x + 9'}</MB>}
               />
               <CheckCard
-                title="c) Punktprobe"
-                prompt={
-                  <p>
-                    Liegt der Punkt <M>{'P(3 \\mid 8)'}</M> auf der Parabel <M>{'f(x) = (x - 1)^2 + 4'}</M>?
-                  </p>
-                }
-                fields={[{ kind: 'select', key: 'p', label: 'Antwort', options: ['Ja', 'Nein'], expected: 0 }]}
-                solution={<MB>{'f(3) = (3 - 1)^2 + 4 = 4 + 4 = 8 \\;\\checkmark'}</MB>}
-              />
-              <CheckCard
-                title="d) Gleichung lösen"
+                title="c) Gleichung lösen"
                 prompt={
                   <p>
                     Löse die Gleichung <M>{'7 = 4a + 3'}</M>.
@@ -285,8 +264,8 @@ export default function TorbogenEinstieg({
                 </div>
                 <div className="wm-notiz">
                   <p>
-                    Du machst eine Ausbildung zur Metallbauerin oder zum Metallbauer. Familie Berger möchte über ihrer 4 m breiten Hofeinfahrt einen Bogen aus Stahlrohr. Er sitzt
-                    auf zwei Pfosten, die 2 m hoch sind. In der Mitte soll der Bogen 3 m hoch sein.
+                    Du machst eine Ausbildung im Metallbau. Familie Berger möchte über ihrer 4 m breiten Hofeinfahrt einen Bogen aus Stahlrohr. Er sitzt auf zwei Pfosten, die 2 m
+                    hoch sind. In der Mitte soll der Bogen 3 m hoch sein.
                   </p>
                   <p>
                     Die Biegemaschine braucht die Form des Bogens als Funktionsgleichung in der allgemeinen Form <M>{'f(x) = ax^2 + bx + c'}</M>. Der Nullpunkt liegt am Fuß des
@@ -294,25 +273,11 @@ export default function TorbogenEinstieg({
                   </p>
                 </div>
                 <TorBild />
-                <p>
-                  Drei Azubis aus deinem Betrieb haben schon gerechnet und ihre Pläne in die Mappe gelegt. Die Meisterin will wissen, welcher Plan an die Maschine darf. Ein falscher
-                  Plan kostet ein ganzes Stahlrohr.
-                </p>
-                <div className="wm-berichte">
-                  {(['jonas', 'elif', 'mara'] as const).map((a, i) => (
-                    <div key={a} className={`wm-bericht wm-bericht-${'abc'[i]}`}>
-                      <div className="wm-bericht-name">Plan von {PLAENE[a].name}</div>
-                      <div className="wm-ergebnis">
-                        <M>{PLAENE[a].tex}</M>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
             <div className="ls-question">
               <i className="fa-solid fa-circle-question" aria-hidden="true" />
-              <span>Welcher Plan darf an die Biegemaschine? Und wie stellt man die Gleichung des Bogens sicher richtig auf?</span>
+              <span>Welche Gleichung gibst du in die Biegemaschine ein?</span>
             </div>
 
             <div className="lp-ex bk-panel" data-no-autocheck>
@@ -320,7 +285,8 @@ export default function TorbogenEinstieg({
               {pred.saved && pred.choice ? (
                 <>
                   <div className="ls-saved" role="status">
-                    <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: <strong>{CHOICE_TEXT[pred.choice]}</strong>. Am Ende schauen wir, ob du recht hattest.
+                    <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: <strong>{CHOICE_TEXT[pred.choice]}</strong>. Deine Schätzung: <strong>a ≈ {fmt(pred.a, 2)}</strong>.
+                    Am Ende schauen wir, ob du recht hattest.
                   </div>
                   <div>
                     <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={() => setPred({ ...pred, saved: false })}>
@@ -330,14 +296,31 @@ export default function TorbogenEinstieg({
                 </>
               ) : (
                 <>
-                  <p>Rechne noch nicht! Schau dir die drei Gleichungen an und entscheide spontan. Schreibe einen Satz als Begründung in dein Heft.</p>
+                  <p>
+                    Rechne noch nicht! Den Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> kennst du. Reicht das, um die Gleichung aufzustellen? Entscheide spontan und schreibe einen Satz als
+                    Begründung in dein Heft.
+                  </p>
                   <div className="ls-options" role="radiogroup" aria-label="Vermutung">
-                    {(['jonas', 'elif', 'mara', 'keiner'] as const).map((c) => (
+                    {(['reicht', 'punkt', 'zwei'] as const).map((c) => (
                       <label key={c} className="bk-choice ls-option">
                         <input type="radio" name="tor-pred" checked={pred.choice === c} onChange={() => setPred({ ...pred, choice: c })} />
                         <span>{CHOICE_TEXT[c]}</span>
                       </label>
                     ))}
+                  </div>
+                  <div className="ls-slider">
+                    <label htmlFor="tor-pred-a">
+                      Ich schätze die Zahl vor der Klammer: <M>a</M> ≈ <span className="ls-slider-value">{fmt(pred.a, 2)}</span>
+                    </label>
+                    <input
+                      id="tor-pred-a"
+                      type="range"
+                      min={-2}
+                      max={2}
+                      step={0.25}
+                      value={pred.a}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, a: Number(e.target.value) })}
+                    />
                   </div>
                   <div>
                     <button type="button" className="bk-btn bk-btn-primary" disabled={!pred.choice} onClick={() => setPred({ ...pred, saved: true })}>
@@ -349,149 +332,85 @@ export default function TorbogenEinstieg({
             </div>
           </Phase>
 
-          {/* 3 Fehlerdetektiv */}
-          <Phase no={3} title="Prüft die drei Pläne" social="PA" minutes={17}>
+          {/* 3 Erkunden & Berechnen */}
+          <Phase no={3} title="In der Werkstatt: Findet die Gleichung" social="PA" minutes={18}>
             <p>
-              <strong>Auftrag:</strong> Ihr seid zu zweit die Qualitätskontrolle. Lest die Rechenwege der drei Azubis genau, prüft sie und findet die Fehler. Jede Person tippt auf dem
-              eigenen Gerät, ihr besprecht jede Antwort kurz miteinander.
+              <strong>Auftrag:</strong> Arbeitet zu zweit Schritt für Schritt. Jede Person tippt auf dem eigenen Gerät, ihr besprecht jede Antwort kurz miteinander.
             </p>
-            <div className="wm-berichte">
-              <Bericht
-                azubi="jonas"
-                cls="wm-bericht-a"
-                rolle="2. Lehrjahr"
-                zeilen={[
-                  ['f(x) = a(x - x_S)^2 + y_S', 'f(x) = a(x + 2)^2 + 3'],
-                  ['P(0 \\mid 2):\\; 2 = a(0 + 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'],
-                  ['f(x) = -0{,}25(x + 2)^2 + 3', '= -0{,}25(x^2 + 4x + 4) + 3', '= -0{,}25x^2 - x + 2'],
-                ]}
-              />
-              <Bericht
-                azubi="elif"
-                cls="wm-bericht-b"
-                rolle="1. Lehrjahr"
-                zeilen={[
-                  ['f(x) = a(x - x_S)^2 + y_S', 'f(x) = a(x - 2)^2 + 3'],
-                  ['P(0 \\mid 2):\\; 2 = a(0 - 2)^2 + 3', '2 = -4a + 3 \\;\\Rightarrow\\; a = 0{,}25'],
-                  ['f(x) = 0{,}25(x - 2)^2 + 3', '= 0{,}25(x^2 - 4x + 4) + 3', '= 0{,}25x^2 - x + 4'],
-                ]}
-              />
-              <Bericht
-                azubi="mara"
-                cls="wm-bericht-c"
-                rolle="3. Lehrjahr"
-                zeilen={[
-                  ['f(x) = a(x - x_S)^2 + y_S', 'f(x) = a(x - 2)^2 + 3'],
-                  ['P(0 \\mid 2):\\; 2 = a(0 - 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'],
-                  ['f(x) = -0{,}25(x - 2)^2 + 3', '= -0{,}25x^2 - 4x + 4 + 3', '= -0{,}25x^2 - 4x + 7'],
-                ]}
-              />
-            </div>
-
             <div className="lp-exlist">
-              <CheckCard
-                title="Spur 1: Punktprobe an beiden Pfosten"
+              <McCard
+                title="Schritt 1: Den Scheitelpunkt einsetzen"
                 level="basis"
                 prompt={
-                  <>
-                    <p>
-                      Der Bogen muss oben auf beiden Pfosten sitzen, also durch <M>{'P(0 \\mid 2)'}</M> und <M>{'Q(4 \\mid 2)'}</M> gehen. Setzt <M>{'x = 0'}</M> und <M>{'x = 4'}</M> in die
-                      Gleichung jedes Plans ein und prüft, ob 2 herauskommt.
-                    </p>
-                  </>
+                  <p>
+                    Ihr kennt die Scheitelform <M>{'f(x) = a(x - x_S)^2 + y_S'}</M>. Setzt den Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> ein. Welcher Ansatz entsteht?
+                  </p>
                 }
+                options={[
+                  { text: 'f(x) = a(x + 2)² + 3', feedback: 'Vorsicht mit dem Vorzeichen: x − x_S = x − 2. Mit x + 2 läge der Scheitel bei x = −2, links neben der Einfahrt.' },
+                  { text: 'f(x) = a(x − 2)² + 3', correct: true, feedback: 'Genau. Jetzt fehlt nur noch die Zahl a vor der Klammer.' },
+                  { text: 'f(x) = a(x − 3)² + 2', feedback: 'Die Koordinaten sind vertauscht. In die Klammer gehört der x-Wert 2, hinten steht der y-Wert 3.' },
+                  { text: 'f(x) = 2(x − 3)²', feedback: 'Der Scheitelpunkt liefert nicht a. In die Klammer kommt x_S = 2, hinten wird y_S = 3 addiert.' },
+                ]}
+              />
+
+              <ReglerA />
+              <CheckCard
+                title="Was habt ihr am Regler gefunden?"
+                rechnen={false}
+                prompt={<p>Bei welchem a sitzt der Bogen auf dem linken Pfosten? Und was passiert dann am rechten Pfosten?</p>}
                 fieldsRow
                 fields={[
-                  { kind: 'select', key: 'jp', label: 'Jonas: P passt?', options: JA_NEIN, expected: 0 },
-                  { kind: 'select', key: 'jq', label: 'Jonas: Q passt?', options: JA_NEIN, expected: 1 },
-                  { kind: 'select', key: 'ep', label: 'Elif: P passt?', options: JA_NEIN, expected: 1 },
-                  { kind: 'select', key: 'eq', label: 'Elif: Q passt?', options: JA_NEIN, expected: 1 },
-                  { kind: 'select', key: 'mp', label: 'Mara: P passt?', options: JA_NEIN, expected: 1 },
-                  { kind: 'select', key: 'mq', label: 'Mara: Q passt?', options: JA_NEIN, expected: 1 },
+                  { kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: A_SOLL },
+                  { kind: 'select', key: 'q', label: 'Rechter Pfosten', options: ['passt dann auch', 'passt nicht'], expected: 0 },
                 ]}
                 solution={
-                  <>
-                    <MB>{'\\text{Jonas: } f(0) = 2 \\;\\checkmark \\qquad f(4) = -0{,}25 \\cdot 16 - 4 + 2 = -6 \\;\\times'}</MB>
-                    <MB>{'\\text{Elif: } f(0) = 4 \\;\\times \\qquad f(4) = 0{,}25 \\cdot 16 - 4 + 4 = 4 \\;\\times'}</MB>
-                    <MB>{'\\text{Mara: } f(0) = 7 \\;\\times \\qquad f(4) = -0{,}25 \\cdot 16 - 16 + 7 = -13 \\;\\times'}</MB>
-                    <p>Kein Plan geht durch beide Pfosten. Jonas’ Plan passt nur am linken Pfosten.</p>
-                  </>
+                  <p>
+                    Bei <M>{'a = -0{,}25'}</M> ist <M>{'f(0) = 2'}</M> und <M>{'f(4) = 2'}</M>. Der Bogen sitzt auf beiden Pfosten, weil die Parabel symmetrisch zum Scheitel ist: Beide
+                    Pfosten stehen 2 m von der Mitte entfernt.
+                  </p>
                 }
                 help={
                   <Hilfen
                     steps={[
-                      <>Ein Punkt liegt auf der Parabel, wenn beim Einsetzen seines x-Werts genau sein y-Wert herauskommt.</>,
-                      <>
-                        Nehmt die Gleichung, die an die Biegemaschine gehen soll (die letzte Zeile), und rechnet <M>{'f(0)'}</M> und <M>{'f(4)'}</M> aus. Kommt 2 heraus, passt der Punkt.
-                      </>,
-                      <>
-                        Bei Jonas: <M>{'f(0) = -0{,}25 \\cdot 0^2 - 0 + 2 = 2'}</M>, also passt P. Jetzt <M>{'f(4) = -0{,}25 \\cdot 4^2 - 4 + 2'}</M> ausrechnen.
-                      </>,
+                      <>Schaut auf die Anzeige „Höhe am linken Pfosten“. Der Pfosten ist 2 m hoch, dort muss also 2 stehen.</>,
+                      <>Ist f(0) zu groß, schiebt den Regler nach links (a kleiner), ist f(0) zu klein, nach rechts.</>,
+                      <>Der passende Wert liegt zwischen −0,5 und 0. Geht in kleinen Schritten vor.</>,
                     ]}
                   />
                 }
               />
-              <Pruefstand />
-              <McCard
-                title="Moment mal: Jonas’ Plan"
-                prompt={
-                  <p>
-                    Jonas sagt: „Ich habe die Probe mit dem Pfosten <M>{'P(0 \\mid 2)'}</M> gemacht, sie stimmt. Also ist mein Plan richtig.“ Schaut euch seinen Plan auf dem Prüfstand an. Was
-                    stimmt?
-                  </p>
-                }
-                options={[
-                  {
-                    text: 'Die Probe mit P reicht nicht. Durch einen Punkt gehen viele Parabeln. Jonas muss auch prüfen, ob der Scheitel stimmt oder ob Q passt.',
-                    correct: true,
-                    feedback: 'Genau. Jonas hat P selbst zum Berechnen von a benutzt, deshalb passt P automatisch. Sein Scheitel liegt aber bei (−2 | 3), also 4 m zu weit links.',
-                  },
-                  { text: 'Jonas hat recht, eine stimmende Probe beweist, dass die Gleichung richtig ist.', feedback: 'Auf dem Prüfstand seht ihr: Seine Parabel hat ihren höchsten Punkt links von der Einfahrt. Am rechten Pfosten liegt sie bei −6.' },
-                  { text: 'Die Probe ist falsch, weil man immer mit dem Scheitelpunkt testen muss.', feedback: 'Die Probe mit P ist richtig gerechnet. Sie ist nur nicht genug, weil P schon zum Berechnen von a benutzt wurde.' },
-                  { text: 'Der Plan ist richtig, nur der Bogen ist zu klein.', feedback: 'Der Bogen hat die richtige Höhe 3 m, aber an der falschen Stelle: bei x = −2 statt bei x = 2.' },
-                ]}
-              />
+
               <CheckCard
-                title="Spur 2: Wo steckt der Fehler?"
+                title="Schritt 3: a ohne Probieren berechnen"
                 level="standard"
-                rechnen={false}
                 prompt={
-                  <p>
-                    Jeder Plan hat genau einen Fehler. Vergleicht die Rechenwege Zeile für Zeile. In welchem Schritt hat sich die Person verrechnet? Schreibt den Fehler mit einem Satz ins
-                    Heft.
-                  </p>
-                }
-                fields={[
-                  { kind: 'select', key: 'j', label: 'Fehler bei Jonas', options: SCHRITTE, expected: 0 },
-                  { kind: 'select', key: 'e', label: 'Fehler bei Elif', options: SCHRITTE, expected: 1 },
-                  { kind: 'select', key: 'm', label: 'Fehler bei Mara', options: SCHRITTE, expected: 2 },
-                ]}
-                solution={
                   <>
                     <p>
-                      <strong>Jonas, Schritt 1:</strong> Bei <M>{'S(2 \\mid 3)'}</M> heißt die Klammer <M>{'(x - 2)'}</M>, nicht <M>{'(x + 2)'}</M>. In der Scheitelform steht{' '}
-                      <M>{'x - x_S'}</M>, das Minus gehört zur Formel.
+                      Probieren dauert und ist bei krummen Zahlen ungenau. Es geht auch genau: Der Bogen muss durch den Pfosten <M>{'P(0 \\mid 2)'}</M> gehen. Also muss beim Einsetzen von{' '}
+                      <M>{'x = 0'}</M> die Höhe 2 herauskommen.
                     </p>
                     <p>
-                      <strong>Elif, Schritt 2:</strong> <M>{'(0 - 2)^2 = (-2)^2 = 4'}</M>, nicht <M>{'-4'}</M>. Ein Quadrat ist nie negativ. Darum kommt bei ihr ein positives a heraus, und
-                      der Bogen hängt durch wie eine Schaukel.
-                    </p>
-                    <p>
-                      <strong>Mara, Schritt 3:</strong> Sie hat nur <M>{'x^2'}</M> mit <M>{'-0{,}25'}</M> multipliziert. Richtig ist{' '}
-                      <M>{'-0{,}25(x^2 - 4x + 4) + 3 = -0{,}25x^2 + x - 1 + 3'}</M>.
+                      Setzt <M>{'x = 0'}</M> und <M>{'f(x) = 2'}</M> in <M>{'f(x) = a(x - 2)^2 + 3'}</M> ein und löst nach <M>a</M> auf.
                     </p>
                   </>
+                }
+                lead={<M>{'2 = a \\cdot (0 - 2)^2 + 3 \\;\\Rightarrow\\; 2 = \\square \\cdot a + 3'}</M>}
+                fields={[
+                  { kind: 'num', key: 'q', label: 'Zahl im Kästchen', expected: 4 },
+                  { kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: A_SOLL },
+                ]}
+                solution={
+                  <MB>{'\\begin{aligned} 2 &= a \\cdot (0 - 2)^2 + 3 \\\\ 2 &= 4a + 3 && \\mid -3 \\\\ -1 &= 4a && \\mid :4 \\\\ a &= -0{,}25 \\end{aligned}'}</MB>
                 }
                 help={
                   <Hilfen
                     steps={[
-                      <>Schaut zuerst in Schritt 1: Haben alle den Scheitelpunkt gleich eingesetzt? Wer weicht ab?</>,
+                      <>Rechnet zuerst die Klammer aus: 0 − 2 = −2. Dann das Quadrat.</>,
                       <>
-                        In Schritt 2 lohnt sich ein Blick auf das Quadrat: Was ergibt <M>{'(-2)^2'}</M>? In Schritt 3: Wird jeder Summand in der Klammer mit a multipliziert?
+                        Ein Quadrat ist nie negativ: <M>{'(-2)^2 = 4'}</M>. Also steht da <M>{'2 = 4a + 3'}</M>.
                       </>,
-                      <>
-                        Jonas schreibt <M>{'(x + 2)^2'}</M>, obwohl <M>{'x_S = 2'}</M> ist. Sein Fehler steckt also in Schritt 1. Sucht bei Elif und Mara genauso.
-                      </>,
+                      <>Jetzt wie in der Aufwärmaufgabe c) lösen: erst − 3, dann durch 4 teilen.</>,
                     ]}
                   />
                 }
@@ -504,16 +423,13 @@ export default function TorbogenEinstieg({
                 title="So gehst du vor"
                 steps={[
                   <>
-                    <strong>Scheitelpunkt einsetzen:</strong> <M>{'x_S'}</M> und <M>{'y_S'}</M> in <M>{'f(x) = a(x - x_S)^2 + y_S'}</M> einsetzen. Achtung beim Vorzeichen in der Klammer.
+                    <strong>Scheitelpunkt einsetzen:</strong> <M>{'f(x) = a(x - x_S)^2 + y_S'}</M>. Achtung beim Vorzeichen in der Klammer.
                   </>,
                   <>
-                    <strong>Punkt einsetzen und a berechnen:</strong> Den zweiten Punkt für <M>x</M> und <M>{'f(x)'}</M> einsetzen. Erst das Quadrat ausrechnen, dann nach <M>a</M> auflösen.
+                    <strong>Punkt einsetzen und a berechnen:</strong> x-Wert und y-Wert des zweiten Punkts einsetzen, erst das Quadrat ausrechnen, dann nach <M>a</M> auflösen.
                   </>,
                   <>
-                    <strong>Umwandeln:</strong> Die Klammer mit der binomischen Formel auflösen, dann <strong>jeden</strong> Summanden mit <M>a</M> multiplizieren und zusammenfassen.
-                  </>,
-                  <>
-                    <strong>Probe:</strong> Mit einem Punkt prüfen, den du noch nicht zum Rechnen benutzt hast, z. B. dem Scheitelpunkt oder einem symmetrischen Punkt.
+                    <strong>Umwandeln:</strong> Klammer mit der binomischen Formel auflösen, dann <strong>jeden</strong> Summanden mit <M>a</M> multiplizieren und zusammenfassen.
                   </>,
                 ]}
               />
@@ -534,14 +450,6 @@ export default function TorbogenEinstieg({
                     title: 'Umwandeln',
                     body: <MB>{'\\begin{aligned} f(x) &= -0{,}5(x + 1)^2 + 5 \\\\ &= -0{,}5(x^2 + 2x + 1) + 5 \\\\ &= -0{,}5x^2 - x - 0{,}5 + 5 \\\\ &= -0{,}5x^2 - x + 4{,}5 \\end{aligned}'}</MB>,
                   },
-                  {
-                    title: 'Probe mit einem neuen Punkt',
-                    body: (
-                      <p>
-                        Symmetrisch zu P liegt <M>{'(-3 \\mid 3)'}</M>: <M>{'f(-3) = -0{,}5 \\cdot 9 + 3 + 4{,}5 = 3'}</M> ✓
-                      </p>
-                    ),
-                  },
                 ]}
               />
               <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
@@ -549,40 +457,36 @@ export default function TorbogenEinstieg({
 
             <div className="lp-exlist">
               <CheckCard
-                title="Jetzt ihr: der richtige Plan"
+                title="Schritt 4: Die Gleichung für die Biegemaschine"
                 level="standard"
                 prompt={
                   <p>
-                    Stellt die Gleichung des Torbogens selbst richtig auf: Scheitelpunkt <M>{'S(2 \\mid 3)'}</M>, Pfosten <M>{'P(0 \\mid 2)'}</M>. Gebt erst <M>a</M> an und dann die
-                    allgemeine Form <M>{'f(x) = ax^2 + bx + c'}</M>. Macht zum Schluss die Probe mit <M>{'Q(4 \\mid 2)'}</M>.
+                    Ihr habt <M>{'f(x) = -0{,}25(x - 2)^2 + 3'}</M>. Wandelt in die allgemeine Form <M>{'f(x) = ax^2 + bx + c'}</M> um. Macht zum Schluss die Probe mit dem rechten
+                    Pfosten <M>{'Q(4 \\mid 2)'}</M>.
                   </p>
                 }
                 fieldsRow
                 fields={[
-                  { kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: -0.25 },
                   { kind: 'num', key: 'b', label: <M>{'b ='}</M>, expected: 1 },
                   { kind: 'num', key: 'c', label: <M>{'c ='}</M>, expected: 2 },
                 ]}
                 solution={
                   <>
-                    <MB>{'f(x) = a(x - 2)^2 + 3'}</MB>
-                    <MB>{'\\begin{aligned} 2 &= a(0 - 2)^2 + 3 \\\\ 2 &= 4a + 3 && \\mid -3 \\\\ -1 &= 4a && \\mid :4 \\\\ a &= -0{,}25 \\end{aligned}'}</MB>
                     <MB>{'\\begin{aligned} f(x) &= -0{,}25(x - 2)^2 + 3 \\\\ &= -0{,}25(x^2 - 4x + 4) + 3 \\\\ &= -0{,}25x^2 + x - 1 + 3 \\\\ &= -0{,}25x^2 + x + 2 \\end{aligned}'}</MB>
                     <p>
-                      Probe: <M>{'f(4) = -0{,}25 \\cdot 16 + 4 + 2 = 2'}</M> ✓. Der Bogen sitzt auf beiden Pfosten.
+                      Probe: <M>{'f(4) = -0{,}25 \\cdot 16 + 4 + 2 = 2'}</M> ✓
                     </p>
                   </>
                 }
                 help={
                   <Hilfen
                     steps={[
-                      <>Ihr kennt die Fehler der drei Azubis. Macht es wie sie, aber vermeidet in jedem Schritt den Fehler, den ihr gefunden habt.</>,
+                      <>Wie im Beispiel der Infokarte: erst die Klammer, dann mal a, dann zusammenfassen.</>,
                       <>
-                        Schritt 1 und 2 hat Mara richtig gemacht. Rechnet ab <M>{'f(x) = -0{,}25(x - 2)^2 + 3'}</M> selbst weiter.
+                        <M>{'(x - 2)^2 = x^2 - 4x + 4'}</M>. Jetzt jeden der drei Summanden mit <M>{'-0{,}25'}</M> multiplizieren.
                       </>,
                       <>
-                        <M>{'(x - 2)^2 = x^2 - 4x + 4'}</M>. Jetzt jeden Summanden mit <M>{'-0{,}25'}</M> multiplizieren: <M>{'-0{,}25 \\cdot x^2'}</M>, <M>{'-0{,}25 \\cdot (-4x)'}</M> und{' '}
-                        <M>{'-0{,}25 \\cdot 4'}</M>.
+                        <M>{'-0{,}25 \\cdot x^2 = -0{,}25x^2'}</M>, <M>{'-0{,}25 \\cdot (-4x) = +x'}</M>, <M>{'-0{,}25 \\cdot 4 = -1'}</M>. Dann noch + 3.
                       </>,
                     ]}
                   />
@@ -594,7 +498,7 @@ export default function TorbogenEinstieg({
                 prompt={
                   <p>
                     Familie Berger ruft an: Der Bogen soll in der Mitte 3,5 m hoch sein, die Pfosten bleiben 2 m hoch. Berechnet das neue <M>a</M>. Wird der Bogen dadurch steiler oder
-                    flacher? Begründet im Heft, wie sich <M>a</M> verändert hat.
+                    flacher? Begründet im Heft.
                   </p>
                 }
                 fieldsRow
@@ -613,7 +517,7 @@ export default function TorbogenEinstieg({
                 help={
                   <Hilfen
                     steps={[
-                      <>Welcher Punkt ändert sich, welcher bleibt gleich? Der Scheitel liegt jetzt höher, der Pfosten bleibt bei P(0 | 2).</>,
+                      <>Der Scheitel liegt jetzt bei S(2 | 3,5), der Pfosten bleibt bei P(0 | 2).</>,
                       <>
                         Neuer Ansatz: <M>{'f(x) = a(x - 2)^2 + 3{,}5'}</M>. Setzt P ein und löst nach a auf.
                       </>,
@@ -628,49 +532,45 @@ export default function TorbogenEinstieg({
           </Phase>
 
           {/* 4 Austausch */}
-          <Phase no={4} title="Vergleicht eure Prüfberichte" social="Plenum" minutes={4}>
+          <Phase no={4} title="Vergleicht eure Wege" social="Plenum" minutes={4}>
             <div className="ls-stop">
               <div className="ls-stop-title">
                 <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
               </div>
               <ul>
-                <li>Welcher Fehler war am schwersten zu finden? Warum?</li>
-                <li>Warum hat Jonas’ Probe gestimmt, obwohl sein Plan falsch ist?</li>
+                <li>Warum reicht ein Pfosten, um a festzulegen? Warum passt der zweite Pfosten dann von selbst?</li>
+                <li>Was ist besser: a am Regler suchen oder a berechnen?</li>
                 <li>Woran erkennt man schon vor dem Rechnen, dass a beim Torbogen negativ sein muss?</li>
               </ul>
             </div>
             <p>
-              <strong>Du arbeitest allein?</strong> So haben zwei andere Azubis geprüft. Klappe die Wege auf und vergleiche sie mit deinem.
+              <strong>Du arbeitest allein?</strong> So haben zwei andere Azubis gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
             </p>
             <div className="ls-ways">
               <details className="ls-way">
-                <summary>Leon hat nur auf das Vorzeichen von a geschaut</summary>
+                <summary>Leon hat nur den Regler benutzt</summary>
                 <div className="ls-way-body">
-                  <p>„Der Bogen ist oben rund und hängt nicht durch, also muss a negativ sein. Elif hat a = 0,25, das kann nicht stimmen.“</p>
+                  <p>„Ich habe geschoben, bis der Bogen auf der Skizze lag. Bei −0,25 hat es gepasst.“</p>
                   <p>
-                    <strong>Gut:</strong> Ein schneller Plausibilitäts-Check ohne Rechnung. <strong>Aber:</strong> Jonas und Mara haben auch ein negatives a. Ihre Fehler findet Leon so
-                    nicht.
+                    <strong>Gut:</strong> Man sieht, was a mit dem Bogen macht. <strong>Aber:</strong> Bei einem Kunden mit krummen Maßen findet man a am Regler nicht genau, und eine
+                    Biegemaschine braucht exakte Werte.
                   </p>
                 </div>
               </details>
               <details className="ls-way">
-                <summary>Sophie hat beide Pfosten geprüft</summary>
+                <summary>Sophie hat gerechnet</summary>
                 <div className="ls-way-body">
-                  <p>„Ich habe f(0) und f(4) ausgerechnet. Da muss beide Male 2 herauskommen, weil der Bogen auf beiden Pfosten sitzt. Bei allen drei Plänen ging das schief.“</p>
+                  <p>„Der Bogen muss durch P(0 | 2). Also habe ich x = 0 und y = 2 eingesetzt: 2 = 4a + 3, also a = −0,25. Die Probe mit Q(4 | 2) hat auch gepasst.“</p>
                   <p>
-                    <strong>Gut:</strong> Die Probe mit Q deckt auch Jonas’ Fehler auf, weil er Q nicht zum Rechnen benutzt hat. <strong>Aber:</strong> Man weiß dann noch nicht, in welchem
-                    Schritt der Fehler steckt. Dafür muss man den Rechenweg lesen.
+                    <strong>Gut:</strong> Genau und schnell, egal wie krumm die Zahlen sind. <strong>Aber:</strong> Man muss beim Quadrat aufpassen: <M>{'(-2)^2'}</M> ist 4, nicht −4.
                   </p>
                 </div>
               </details>
             </div>
-            <p>
-              Am sichersten ist beides: auf Vorzeichen und Scheitel achten <strong>und</strong> mit einem neuen Punkt die Probe machen.
-            </p>
           </Phase>
 
           {/* 5 Sichern */}
-          <Phase no={5} title="Das hältst du fest" social="EA" minutes={7}>
+          <Phase no={5} title="Das hältst du fest" social="EA" minutes={5}>
             <Rueckbezug pred={pred} />
             <div className="wm-mappe">
               <span className="wm-reiter">Auftragsmappe 2026-117</span>
@@ -679,7 +579,6 @@ export default function TorbogenEinstieg({
                 <p>
                   An die Biegemaschine geht: <M>{'f(x) = -0{,}25x^2 + x + 2'}</M>, in Scheitelform <M>{'f(x) = -0{,}25(x - 2)^2 + 3'}</M>.
                 </p>
-                <TorBild plan="soll" />
               </div>
             </div>
             <Merke title="Funktionsgleichung aus Scheitelpunkt und einem Punkt (Fall 1)">
@@ -693,7 +592,6 @@ export default function TorbogenEinstieg({
                 <li>
                   In die allgemeine Form <M>{'f(x) = ax^2 + bx + c'}</M> umwandeln: binomische Formel, dann jeden Summanden mit <M>a</M> multiplizieren.
                 </li>
-                <li>Probe mit einem Punkt, den du noch nicht benutzt hast.</li>
               </ol>
             </Merke>
             <div className="lp-ex bk-panel">
@@ -702,8 +600,8 @@ export default function TorbogenEinstieg({
               <div className="ls-criteria">
                 {[
                   'Die drei Schritte in der richtigen Reihenfolge, jeder mit einem kurzen Merksatz',
-                  'Bei jedem Schritt eine Warnung vor dem typischen Fehler (Vorzeichen in der Klammer, Quadrat negativer Zahlen, a mal jeden Summanden)',
-                  'Ein eigenes Beispiel mit anderen Zahlen und Probe',
+                  'Bei jedem Schritt eine Warnung vor einem typischen Fehler',
+                  'Ein eigenes Beispiel mit anderen Zahlen',
                   'Eine kleine Skizze, an der man das Vorzeichen von a erkennt',
                 ].map((c) => (
                   <label key={c}>
@@ -715,22 +613,55 @@ export default function TorbogenEinstieg({
           </Phase>
 
           {/* 6 Check */}
-          <Phase no={6} title="Check: Hast du es verstanden?" social="EA" minutes={7}>
+          <Phase no={6} title="Check: Hast du es verstanden?" social="EA" minutes={9}>
             <div className="lp-exlist">
-              <McCard
-                title="Check 1: Der richtige Ansatz"
-                level="basis"
-                prompt={
-                  <p>
-                    Eine Parabel hat den Scheitelpunkt <M>{'S(-1 \\mid 4)'}</M>. Mit welchem Ansatz startest du?
-                  </p>
-                }
-                options={[
-                  { text: 'f(x) = a(x − 1)² + 4', feedback: 'Vorsicht mit dem Vorzeichen: x − x_S = x − (−1) = x + 1.' },
-                  { text: 'f(x) = a(x + 1)² + 4', correct: true, feedback: 'x − (−1) wird zu x + 1. Der y-Wert 4 steht hinten.' },
-                  { text: 'f(x) = a(x + 4)² − 1', feedback: 'Die Koordinaten sind vertauscht. In die Klammer gehört der x-Wert des Scheitels, hinten steht der y-Wert.' },
-                  { text: 'f(x) = −1(x − 4)² + a', feedback: 'Der Scheitelpunkt ist kein Streckfaktor. a ist die unbekannte Zahl vor der Klammer.' },
+              <div className="lp-ex bk-panel">
+                <CardHead title="Check 1: Qualitätskontrolle" level="standard" />
+                <p>Zwei Azubis haben den Torbogen auch berechnet. Beide Pläne sind falsch. Findest du die Fehler?</p>
+                <div className="wm-berichte wm-berichte-2">
+                  <Bericht
+                    name="Jonas"
+                    cls="wm-bericht-a"
+                    zeilen={[
+                      ['f(x) = a(x + 2)^2 + 3'],
+                      ['2 = a(0 + 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'],
+                      ['f(x) = -0{,}25(x^2 + 4x + 4) + 3', '= -0{,}25x^2 - x + 2'],
+                    ]}
+                    ergebnis="f(x) = -0{,}25x^2 - x + 2"
+                  />
+                  <Bericht
+                    name="Mara"
+                    cls="wm-bericht-c"
+                    zeilen={[
+                      ['f(x) = a(x - 2)^2 + 3'],
+                      ['2 = a(0 - 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'],
+                      ['f(x) = -0{,}25x^2 - 4x + 4 + 3', '= -0{,}25x^2 - 4x + 7'],
+                    ]}
+                    ergebnis="f(x) = -0{,}25x^2 - 4x + 7"
+                  />
+                </div>
+              </div>
+              <CheckCard
+                title="Wo stecken die Fehler?"
+                rechnen={false}
+                prompt={<p>Wähle für jeden Plan den Schritt, in dem der Fehler steckt. Schreibe den Fehler mit einem Satz ins Heft.</p>}
+                fieldsRow
+                fields={[
+                  { kind: 'select', key: 'j', label: 'Fehler bei Jonas', options: SCHRITTE, expected: 0 },
+                  { kind: 'select', key: 'm', label: 'Fehler bei Mara', options: SCHRITTE, expected: 2 },
                 ]}
+                solution={
+                  <>
+                    <p>
+                      <strong>Jonas, Schritt 1:</strong> Bei <M>{'S(2 \\mid 3)'}</M> heißt die Klammer <M>{'(x - 2)'}</M>, nicht <M>{'(x + 2)'}</M>. Seine Probe mit P stimmt trotzdem,
+                      weil er P zum Rechnen benutzt hat. Die Probe mit Q deckt den Fehler auf: <M>{'f(4) = -6'}</M>.
+                    </p>
+                    <p>
+                      <strong>Mara, Schritt 3:</strong> Sie hat nur <M>{'x^2'}</M> mit <M>{'-0{,}25'}</M> multipliziert. Richtig ist{' '}
+                      <M>{'-0{,}25(x^2 - 4x + 4) + 3 = -0{,}25x^2 + x - 1 + 3'}</M>.
+                    </p>
+                  </>
+                }
               />
               <CheckCard
                 title="Check 2: Gleichung aufstellen"
@@ -750,9 +681,9 @@ export default function TorbogenEinstieg({
                 solution={
                   <>
                     <MB>{'\\begin{aligned} 6 &= a(3 - 1)^2 - 2 \\\\ 6 &= 4a - 2 && \\mid +2 \\\\ 8 &= 4a && \\mid :4 \\\\ a &= 2 \\end{aligned}'}</MB>
-                    <MB>{'\\begin{aligned} f(x) &= 2(x - 1)^2 - 2 \\\\ &= 2(x^2 - 2x + 1) - 2 \\\\ &= 2x^2 - 4x + 2 - 2 \\\\ &= 2x^2 - 4x \\end{aligned}'}</MB>
+                    <MB>{'\\begin{aligned} f(x) &= 2(x - 1)^2 - 2 \\\\ &= 2(x^2 - 2x + 1) - 2 \\\\ &= 2x^2 - 4x \\end{aligned}'}</MB>
                     <p>
-                      Es ist also <M>{'c = 0'}</M>. Probe mit dem symmetrischen Punkt <M>{'(-1 \\mid 6)'}</M>: <M>{'f(-1) = 2 + 4 = 6'}</M> ✓
+                      Es ist also <M>{'c = 0'}</M>.
                     </p>
                   </>
                 }
@@ -771,7 +702,7 @@ export default function TorbogenEinstieg({
                 }
               />
               <McCard
-                title="Check 3: Wer hat richtig umgewandelt?"
+                title="Check 3: Richtig umgewandelt?"
                 level="standard"
                 rechnen
                 prompt={
@@ -850,24 +781,21 @@ function Rueckbezug({ pred }: { pred: Prediction }) {
       </div>
     )
   }
+  const diff = Math.abs(pred.a - A_SOLL)
   return (
     <div className="ls-back">
       <p>
-        <strong>Du hattest vermutet:</strong> {CHOICE_TEXT[pred.choice]}.
+        <strong>Du hattest vermutet:</strong> {CHOICE_TEXT[pred.choice]}. Deine Schätzung: a ≈ {fmt(pred.a, 2)}.
       </p>
       <p>
-        {pred.choice === 'keiner' ? (
-          <>Das stimmt: Jeder der drei Pläne hatte einen Fehler. Gut aufgepasst!</>
-        ) : (
-          <>
-            Tatsächlich hatte jeder Plan einen Fehler, auch der von {PLAENE[pred.choice].name}.{' '}
-            {pred.choice === 'jonas' && 'Sein Plan wirkt richtig, weil er durch den linken Pfosten geht, aber der Scheitel liegt an der falschen Stelle.'}
-            {pred.choice === 'elif' && 'Ihr Bogen hängt durch, weil (−2)² bei ihr negativ wurde.'}
-            {pred.choice === 'mara' && 'Ihre Scheitelform stimmt, aber beim Umwandeln hat sie nicht jeden Summanden mit a multipliziert.'}
-          </>
-        )}
+        {pred.choice === 'punkt' && <>Das stimmt: Mit dem Scheitel und einem Pfosten liegt der Bogen fest. Gut gedacht!</>}
+        {pred.choice === 'reicht' && <>Der Scheitel allein reicht nicht: Durch S(2 | 3) gehen viele Parabeln, breite und schmale. Erst ein weiterer Punkt legt a fest.</>}
+        {pred.choice === 'zwei' && <>Ein Pfosten reicht schon. Der zweite passt wegen der Symmetrie von selbst, er ist eine gute Probe.</>}
       </p>
-      <p>Die Probe mit einem zweiten, noch nicht benutzten Punkt hätte jeden der drei Fehler aufgedeckt.</p>
+      <p>
+        Richtig ist <strong>a = −0,25</strong>. {diff === 0 ? 'Deine Schätzung war genau richtig!' : `Deine Schätzung lag ${fmt(diff, 2)} daneben.`}{' '}
+        {pred.a > 0 && 'Ein positives a würde den Bogen durchhängen lassen wie eine Schaukel.'}
+      </p>
     </div>
   )
 }
