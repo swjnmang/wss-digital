@@ -291,6 +291,7 @@ export default function App() {
           <Route path="/finanzmathe/zinsrechnung" element={<ZinsrechnungMenu />} />
           <Route path="/finanzmathe/zinsrechnung/ueben" element={<Zinsrechnung />} />
           <Route path="/finanzmathe/zinsrechnung/lernsituation" element={<ZinsrechnungLernsituation />} />
+          <Route path="/finanzmathe/zinsrechnung/lernsituation-2" element={<ZinsrechnungLernsituation teil={2} />} />
           <Route path="/finanzmathe/zinsrechnung/tage" element={<Zinstage />} />
           <Route path="/finanzmathe/zinseszins" element={<Zinseszins />} />
           <Route path="/finanzmathe/mehrung_minderung" element={<MehrungMinderung />} />
