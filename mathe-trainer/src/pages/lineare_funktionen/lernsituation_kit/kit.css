@@ -97,3 +97,24 @@
 .ls-arbeitsweise > i { font-size: 22px; color: var(--primary-ink); margin-top: 2px; }
 .ls-heft { margin: 0; display: flex; gap: 8px; align-items: flex-start; padding: 8px 12px; border-radius: 10px; background: var(--primary-soft); color: var(--primary-ink); font-size: 15px; line-height: 1.45; }
 .ls-heft > i { margin-top: 3px; }
+
+/* Lückenrechnung: Eingabefelder direkt in der Gleichung, Gleichheitszeichen untereinander */
+.ls-rechnung {
+  display: grid;
+  grid-template-columns: auto minmax(0, auto) 1fr;
+  align-items: center;
+  gap: 10px 8px;
+  font-size: 19px;
+  min-width: 0;
+  max-width: 100%;
+}
+.ls-rechnung-zeile { display: contents; }
+.ls-rechnung-l { justify-self: end; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+/* Rechte Seite darf auf schmalen Bildschirmen umbrechen */
+.ls-rechnung-r { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 4px; min-width: 0; }
+.ls-rechnung-u { color: var(--ink-muted); white-space: nowrap; padding-left: 10px; }
+@media (max-width: 520px) {
+  .ls-rechnung { grid-template-columns: auto minmax(0, 1fr); }
+  .ls-rechnung-u { grid-column: 2; padding-left: 0; margin-top: -6px; }
+}
+.ls-gap.lp-input-sm { width: 72px; }

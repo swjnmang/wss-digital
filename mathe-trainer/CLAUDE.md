@@ -63,3 +63,9 @@ nur zur Kontrolle. Dafür jede Lernsituation mit `<Arbeitsweise />` (nach dem Le
 `lineare_funktionen/lernsituation_kit/kit.tsx` nutzen: `CheckCard` zeigt den Heft-Hinweis automatisch (bei Ablesen, Ordnen,
 Auswählen ohne Rechnung `rechnen={false}`), `McCard` nach einer Rechnung mit `rechnen`, Tabellen zum Ausrechnen mit `<HeftHinweis>`.
 Regler und Erkunden brauchen keinen Rechenweg. Keine zusätzlichen Sätze „Halte deinen Rechenweg schriftlich fest“ in die Aufgaben schreiben.
+
+Lücken in Gleichungen und Rechnungen: Zahlenwerte, die die SuS in eine Gleichung einsetzen oder ergänzen, tragen sie **direkt in der
+Gleichung** ein, nicht in ein extra Feld neben oder unter der Rechnung (kein `\square`/`\fbox{?}` im TeX mit Feld daneben). Dafür in der
+`CheckCard` die Prop `rechnung` nutzen: Jede Zeile `{ l: [...], r: [...], u?: '\\mid -3' }` besteht aus TeX-Stücken und Lücken
+`{ luecke: 'feldKey' }` (für lange Zahlen `breit: true`); das Feld mit diesem Schlüssel steht in `fields` und wird dann nur in der Gleichung
+angezeigt. Beispiel: `TorbogenEinstieg.tsx` (Schritt 3), `LaserEinstieg.tsx` (Übung 1).

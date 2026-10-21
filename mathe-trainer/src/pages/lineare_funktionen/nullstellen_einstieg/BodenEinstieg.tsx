@@ -565,13 +565,16 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               prompt={
                 <>
                   <p>Berechne die Nullstelle der Geraden <M>{'p(x) = 3x - 12'}</M>. Fülle die Lücken der Rechnung aus.</p>
-                  <MB>{'\\begin{aligned} 3x - 12 &= 0 && \\mid +12 \\\\ 3x &= \\;\\fbox{?} && \\mid :3 \\\\ x &= \\;\\fbox{?} \\end{aligned}'}</MB>
                 </>
               }
-              fieldsRow
+              rechnung={[
+                { l: ['3x - 12'], r: ['0'], u: '\\mid +12' },
+                { l: ['3x'], r: [{ luecke: 'dreix' }], u: '\\mid :3' },
+                { l: ['x_N'], r: [{ luecke: 'x' }] },
+              ]}
               fields={[
-                { kind: 'num', key: 'dreix', label: <M>{'3x ='}</M>, expected: 12 },
-                { kind: 'num', key: 'x', label: <M>{'x_N ='}</M>, expected: 4 },
+                { kind: 'num', key: 'dreix', label: '3x', expected: 12 },
+                { kind: 'num', key: 'x', label: 'x_N', expected: 4 },
               ]}
               solution={
                 <>

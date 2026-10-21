@@ -352,10 +352,13 @@ export default function SchuelerfirmaEinstieg({
                 level="standard"
                 prompt={
                   <p>
-                    Setzt genauso <M>{'(40 \\mid 200)'}</M> ein. Ergänzt die Zahlen in Gleichung II: <M>{'\\text{II: } \\square = \\square \\cdot a + \\square \\cdot b'}</M>
+                    Setzt genauso <M>{'(40 \\mid 200)'}</M> ein und bringt die −200 auf die linke Seite. Füllt die Lücken in Gleichung II aus.
                   </p>
                 }
-                fieldsRow
+                rechnung={[
+                  { l: ['200'], r: ['a \\cdot 40^2 + b \\cdot 40 - 200'], u: '\\mid +200' },
+                  { l: ['\\text{II: }', { luecke: 'l' }], r: [{ luecke: 'a', breit: true }, '\\cdot a \\, +', { luecke: 'b' }, '\\cdot b'] },
+                ]}
                 fields={[
                   { kind: 'num', key: 'l', label: 'linke Seite', expected: 400 },
                   { kind: 'num', key: 'a', label: 'Zahl vor a', expected: 1600 },
