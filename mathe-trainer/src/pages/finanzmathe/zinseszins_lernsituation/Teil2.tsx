@@ -10,7 +10,6 @@ import { Chat, Festlegung, Frage, Kriterien, Msg, Stopp, Wege, eur, eurTex, fakt
 // Festlegung: Wie lange dauert eine Verdopplung? (Gegenintuitiv: nicht 100 : p.) Die Festlegung bleibt nur im Seitenzustand.
 // n wird auf zwei Wegen bestimmt: Probieren mit der Tabelle und Logarithmus.
 
-const VIDEO_UMSTELLEN = 'https://www.youtube.com/watch?v=uz5l8_O1dxs&t=1s'
 const VIDEO_K0 = 'https://youtu.be/vs0o8S9ksjg?list=PLI8kX0XEfSujoc5mrNv30D7mptBkAN3E8&t=130'
 const VIDEO_P = 'https://youtu.be/BeJd9e5Qv-E?si=XokDQ8yfwluJy1IW'
 const VIDEO_N = 'https://youtu.be/oUjYapq1AX8?si=lx02oGVSFGhtEVdA'
@@ -52,12 +51,6 @@ export default function Teil2() {
       {/* 1 Aktivieren */}
       <Phase no={1} title="Fit für den Start" social="EA" minutes={10}>
         <p>Diese vier Aufgaben holen aus Teil 1 und aus dem Taschenrechner ab, was du gleich brauchst.</p>
-        <details className="ls-way">
-          <summary>Umstellen vergessen? Hier ist ein Erklärvideo: Zinsformel nach K, p und t auflösen</summary>
-          <div className="ls-way-body">
-            <VideoEmbed src={VIDEO_UMSTELLEN} title="Erklärvideo: Zinsformel nach K, p und t auflösen" />
-          </div>
-        </details>
         <div className="lp-exlist">
           <CheckCard
             title="a) Endkapital mit Zinseszins"

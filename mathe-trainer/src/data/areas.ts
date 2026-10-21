@@ -91,7 +91,6 @@ export const AREAS: Area[] = [
         items: [
           { title: 'Zinsrechnung', desc: 'Grundlagen der Zinsrechnung üben.', path: '/finanzmathe/zinsrechnung', icon: fa('percent') },
           { title: 'Zinseszins', desc: 'Zinseszins und gemischte Aufgaben.', path: '/finanzmathe/zinseszins', icon: fa('chart-line') },
-          { title: 'Zinseszins: Lernsituation', desc: 'Wer hat nach 10 Jahren mehr? Endkapital, Anfangskapital, Zinssatz und Laufzeit entdecken (2 × 90 min).', path: '/finanzmathe/zinseszins-lernsituation', icon: fa('comments-dollar') },
           { title: 'Kapitalmehrung und - minderung', desc: 'Kombinierte Zinseszins- und Rentenrechnung.', path: '/finanzmathe/mehrung_minderung', icon: fa('coins') },
           { title: 'Rentenrechnung: Endwert', desc: 'Berechnung von Endwert, Rate oder Laufzeit (ohne Startkapital).', path: '/finanzmathe/endwert', icon: fa('piggy-bank') },
           { title: 'Ratendarlehen', desc: 'Tilgungspläne für Ratendarlehen erstellen.', path: '/finanzmathe/ratendarlehen', icon: fa('file-invoice-dollar') },

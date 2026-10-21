@@ -7,7 +7,7 @@ import Teil2 from './zinseszins_lernsituation/Teil2'
 
 // Einstiegs-Lernsituation „Wer hat nach 10 Jahren mehr?“ zum Zinseszins, zwei Teile à 90 Minuten.
 // Teil 1: Endkapital K_n. Teil 2: K_0, q (p) und n. Format Kontrastierende Fälle, Look Messenger-Chat,
-// Lernprodukt analog (Concept Map). Die Videos kommen aus der Übungsseite „Zinseszins“, die unverändert bleibt.
+// Lernprodukt analog (Concept Map). Die Videos stammen aus dem Zinseszinsrechner (Übungsaufgaben); Route /finanzmathe/zinseszins/lernsituation.
 // Der Teil steht in der Adresse (?teil=2), damit die Lehrkraft direkt auf Teil 2 verlinken kann.
 
 export default function ZinseszinsLernsituation() {
@@ -36,8 +36,8 @@ export default function ZinseszinsLernsituation() {
         <nav className="lp-nav" aria-label="Weiter">
           {teil === 1 ? (
             <>
-              <Link className="bk-btn" to="/finanzmathe">
-                <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zur Übersicht Finanzmathematik
+              <Link className="bk-btn" to="/finanzmathe/zinseszins">
+                <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zur Auswahl
               </Link>
               <button type="button" className="bk-btn bk-btn-primary" onClick={() => wechsel(2)}>
                 Weiter zu Teil 2 <i className="fa-solid fa-arrow-right" aria-hidden="true" />
@@ -48,7 +48,7 @@ export default function ZinseszinsLernsituation() {
               <button type="button" className="bk-btn" onClick={() => wechsel(1)}>
                 <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zu Teil 1
               </button>
-              <Link className="bk-btn bk-btn-primary" to="/finanzmathe/zinseszins">
+              <Link className="bk-btn bk-btn-primary" to="/finanzmathe/zinseszins/ueben">
                 Weiter üben: Zinseszins-Aufgaben <i className="fa-solid fa-arrow-right" aria-hidden="true" />
               </Link>
             </>

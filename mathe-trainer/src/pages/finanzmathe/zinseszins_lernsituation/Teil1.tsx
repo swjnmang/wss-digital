@@ -12,7 +12,6 @@ import { Chat, Festlegung, Frage, Kriterien, Msg, Stopp, WachstumGraph, Wege, eu
 // Die Festlegung bleibt nur im Seitenzustand (kein Speichern).
 
 const VIDEO_KN = 'https://youtu.be/4A8DaY8-Mgw?si=L4IT09_79obIao_W'
-const VIDEO_ZINSEN = 'https://www.youtube.com/watch?v=bCjboGGTRGs&t=1s'
 
 const K0 = 5000
 const P = 3
@@ -112,12 +111,6 @@ export default function Teil1() {
       {/* 1 Aktivieren */}
       <Phase no={1} title="Fit für den Start" social="EA" minutes={10}>
         <p>Diese vier kurzen Aufgaben zur Zinsrechnung brauchst du gleich. Löse sie allein.</p>
-        <details className="ls-way">
-          <summary>Zinsrechnung vergessen? Hier ist ein Erklärvideo zum Auffrischen</summary>
-          <div className="ls-way-body">
-            <VideoEmbed src={VIDEO_ZINSEN} title="Erklärvideo: Zinsrechnung" />
-          </div>
-        </details>
         <div className="lp-exlist">
           <CheckCard
             title="a) Zinsen für ein Jahr"
