@@ -8,7 +8,7 @@ import './werkstatt.css'
 
 // Lernsituation 1 „Der Torbogen für die Hofeinfahrt“: Funktionsgleichung aus Scheitelpunkt und einem weiteren Punkt (Fall 1, 45 min).
 // Format Experimentierlabor mit Fehlerdetektiv im Check, Look Werkstatt-Auftragsmappe (Metallbau), Lernprodukt analog (Spickzettel).
-// Instruktionsreihenfolge: Problem zuerst. Die SuS kennen die Scheitelform f(x) = a(x − x_S)² + y_S und können sie in die allgemeine
+// Instruktionsreihenfolge: Problem zuerst. Die SuS kennen die Scheitelform y = a(x − x_S)² + y_S und können sie in die allgemeine
 // Form umwandeln. Zentrales Problem (Karte „Gegeben / Gesucht“ in Phase 2, läuft in Phase 3 mit): aus Scheitelpunkt und einem weiteren
 // Punkt die Funktionsgleichung aufstellen. Die Festlegung fragt genau danach („Wie kommst du an a?“).
 // Phase 3 folgt genau den drei Schritten des späteren Merke-Kastens (gleiche Namen, gleiche Nummern), der Regler dient nur zur Kontrolle.
@@ -21,7 +21,7 @@ import './werkstatt.css'
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
 // Hofeinfahrt 4 m breit, Pfosten 2 m hoch bei x = 0 und x = 4, höchster Punkt des Bogens 3 m über der Mitte.
-// Richtig: f(x) = −0,25(x − 2)² + 3 = −0,25x² + x + 2
+// Richtig: y = −0,25(x − 2)² + 3 = −0,25x² + x + 2
 const A_SOLL = -0.25
 const bogen = (a: number) => (x: number) => a * (x - 2) ** 2 + 3
 
@@ -55,7 +55,7 @@ function Problemkarte({ kompakt }: { kompakt?: boolean }) {
         </div>
         <div>
           <span className="tb-problem-label">Gesucht</span>
-          Funktionsgleichung <M>{'f(x) = ax^2 + bx + c'}</M>
+          Funktionsgleichung <M>{'y = ax^2 + bx + c'}</M>
         </div>
       </div>
       {!kompakt && <p className="tb-problem-frage">Welche Gleichung gibst du in die Biegemaschine ein?</p>}
@@ -135,7 +135,7 @@ function TorBild({ f, farbe = 'var(--primary)' }: { f?: (x: number) => number; f
   )
 }
 
-/** Regler für a: Bogen f(x) = a(x − 2)² + 3 über die Skizze legen */
+/** Regler für a: Bogen y = a(x − 2)² + 3 über die Skizze legen */
 function ReglerA() {
   const sliderId = useId()
   const [a, setA] = useState(-1)
@@ -145,7 +145,7 @@ function ReglerA() {
       <CardHead title="Kontrolle am Regler: Passt euer a?" />
       <div className="lp-ex-prompt">
         <p>
-          Stellt am Regler euer berechnetes <M>a</M> ein. Der Regler verändert <M>a</M> in <M>{'f(x) = a(x - 2)^2 + 3'}</M>, der Scheitel bleibt dabei immer bei{' '}
+          Stellt am Regler euer berechnetes <M>a</M> ein. Der Regler verändert <M>a</M> in <M>{'y = a(x - 2)^2 + 3'}</M>, der Scheitel bleibt dabei immer bei{' '}
           <M>{'S(2 \\mid 3)'}</M>. Liegt der blaue Bogen genau auf der gestrichelten Skizze und auf beiden Pfosten? Wenn nicht, sucht den Fehler in Schritt 2.
         </p>
       </div>
@@ -158,10 +158,10 @@ function ReglerA() {
       </div>
       <div className="ls-readout">
         <div className="ls-readout-box ls-readout-a">
-          <strong>Höhe am linken Pfosten:</strong> <M>{`f(0) = ${tx(f(0), 2)}`}</M>
+          <strong>Höhe am linken Pfosten (x = 0):</strong> <M>{`y = ${tx(f(0), 2)}`}</M>
         </div>
         <div className="ls-readout-box ls-readout-b">
-          <strong>Höhe am rechten Pfosten:</strong> <M>{`f(4) = ${tx(f(4), 2)}`}</M>
+          <strong>Höhe am rechten Pfosten (x = 4):</strong> <M>{`y = ${tx(f(4), 2)}`}</M>
         </div>
       </div>
     </div>
@@ -250,11 +250,11 @@ export default function TorbogenEinstieg({
                 title="Für Schritt 1: Scheitelpunkt ablesen"
                 prompt={
                   <p>
-                    Welchen Scheitelpunkt hat die Parabel <M>{'f(x) = -2(x - 1)^2 + 4'}</M>?
+                    Welchen Scheitelpunkt hat die Parabel <M>{'y = -2(x - 1)^2 + 4'}</M>?
                   </p>
                 }
                 options={[
-                  { text: 'S(1 | 4)', correct: true, feedback: 'In der Scheitelform f(x) = a(x − x_S)² + y_S steht x_S mit umgekehrtem Vorzeichen in der Klammer.' },
+                  { text: 'S(1 | 4)', correct: true, feedback: 'In der Scheitelform y = a(x − x_S)² + y_S steht x_S mit umgekehrtem Vorzeichen in der Klammer.' },
                   { text: 'S(−1 | 4)', feedback: 'In der Klammer steht x − 1. Das Minus gehört zur Formel, der Scheitel liegt also bei x = 1.' },
                   { text: 'S(4 | 1)', feedback: 'Die Koordinaten sind vertauscht. Die Zahl in der Klammer gehört zum x-Wert, die Zahl hinten zum y-Wert.' },
                   { text: 'S(−2 | 4)', feedback: 'Die −2 vor der Klammer ist der Streckfaktor a. Sie sagt, wie steil die Parabel ist, nicht wo der Scheitel liegt.' },
@@ -317,7 +317,7 @@ export default function TorbogenEinstieg({
                     hoch sind. In der Mitte soll der Bogen 3 m hoch sein.
                   </p>
                   <p>
-                    Die Biegemaschine braucht die Form des Bogens als Funktionsgleichung in der allgemeinen Form <M>{'f(x) = ax^2 + bx + c'}</M>. Der Nullpunkt liegt am Fuß des
+                    Die Biegemaschine braucht die Form des Bogens als Funktionsgleichung in der allgemeinen Form <M>{'y = ax^2 + bx + c'}</M>. Der Nullpunkt liegt am Fuß des
                     linken Pfostens, 1 Kästchen = 1 m.
                   </p>
                 </div>
@@ -342,7 +342,7 @@ export default function TorbogenEinstieg({
               ) : (
                 <>
                   <p>
-                    Rechne noch nicht! Den Scheitelpunkt kannst du in die Scheitelform einsetzen: <M>{'f(x) = a(x - 2)^2 + 3'}</M>. Dann fehlt nur noch die Zahl <M>a</M>. Wie
+                    Rechne noch nicht! Den Scheitelpunkt kannst du in die Scheitelform einsetzen: <M>{'y = a(x - 2)^2 + 3'}</M>. Dann fehlt nur noch die Zahl <M>a</M>. Wie
                     kommst du an <M>a</M>? Entscheide spontan und schreibe einen Satz als Begründung in dein Heft.
                   </p>
                   <div className="ls-options" role="radiogroup" aria-label="Vermutung">
@@ -399,14 +399,14 @@ export default function TorbogenEinstieg({
                 level="basis"
                 prompt={
                   <p>
-                    Ihr kennt die Scheitelform <M>{'f(x) = a(x - x_S)^2 + y_S'}</M>. Setzt den Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> ein. Welcher Ansatz entsteht?
+                    Ihr kennt die Scheitelform <M>{'y = a(x - x_S)^2 + y_S'}</M>. Setzt den Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> ein. Welcher Ansatz entsteht?
                   </p>
                 }
                 options={[
-                  { text: 'f(x) = a(x + 2)² + 3', feedback: 'Vorsicht mit dem Vorzeichen: x − x_S = x − 2. Mit x + 2 läge der Scheitel bei x = −2, links neben der Einfahrt.' },
-                  { text: 'f(x) = a(x − 2)² + 3', correct: true, feedback: 'Genau. Jetzt fehlt nur noch die Zahl a vor der Klammer.' },
-                  { text: 'f(x) = a(x − 3)² + 2', feedback: 'Die Koordinaten sind vertauscht. In die Klammer gehört der x-Wert 2, hinten steht der y-Wert 3.' },
-                  { text: 'f(x) = 2(x − 3)²', feedback: 'Der Scheitelpunkt liefert nicht a. In die Klammer kommt x_S = 2, hinten wird y_S = 3 addiert.' },
+                  { text: 'y = a(x + 2)² + 3', feedback: 'Vorsicht mit dem Vorzeichen: x − x_S = x − 2. Mit x + 2 läge der Scheitel bei x = −2, links neben der Einfahrt.' },
+                  { text: 'y = a(x − 2)² + 3', correct: true, feedback: 'Genau. Jetzt fehlt nur noch die Zahl a vor der Klammer.' },
+                  { text: 'y = a(x − 3)² + 2', feedback: 'Die Koordinaten sind vertauscht. In die Klammer gehört der x-Wert 2, hinten steht der y-Wert 3.' },
+                  { text: 'y = 2(x − 3)²', feedback: 'Der Scheitelpunkt liefert nicht a. In die Klammer kommt x_S = 2, hinten wird y_S = 3 addiert.' },
                 ]}
               />
               <CheckCard
@@ -414,8 +414,8 @@ export default function TorbogenEinstieg({
                 level="standard"
                 prompt={
                   <p>
-                    Jetzt fehlt nur noch <M>a</M>. Der Bogen muss durch den Pfosten <M>{'P(0 \\mid 2)'}</M> gehen. Setzt also <M>{'x = 0'}</M> und <M>{'f(x) = 2'}</M> in{' '}
-                    <M>{'f(x) = a(x - 2)^2 + 3'}</M> ein und löst nach <M>a</M> auf. Füllt die Lücken aus.
+                    Jetzt fehlt nur noch <M>a</M>. Der Bogen muss durch den Pfosten <M>{'P(0 \\mid 2)'}</M> gehen. Setzt also <M>{'x = 0'}</M> und <M>{'y = 2'}</M> in{' '}
+                    <M>{'y = a(x - 2)^2 + 3'}</M> ein und löst nach <M>a</M> auf. Füllt die Lücken aus.
                   </p>
                 }
                 rechnung={[
@@ -448,7 +448,7 @@ export default function TorbogenEinstieg({
                 level="standard"
                 prompt={
                   <p>
-                    Ihr habt <M>{'f(x) = -0{,}25(x - 2)^2 + 3'}</M>. Wandelt in die allgemeine Form <M>{'f(x) = ax^2 + bx + c'}</M> um. Macht zum Schluss die Probe mit dem rechten
+                    Ihr habt <M>{'y = -0{,}25(x - 2)^2 + 3'}</M>. Wandelt in die allgemeine Form <M>{'y = ax^2 + bx + c'}</M> um. Macht zum Schluss die Probe mit dem rechten
                     Pfosten <M>{'Q(4 \\mid 2)'}</M>.
                   </p>
                 }
@@ -459,9 +459,9 @@ export default function TorbogenEinstieg({
                 ]}
                 solution={
                   <>
-                    <MB>{'\\begin{aligned} f(x) &= -0{,}25(x - 2)^2 + 3 \\\\ &= -0{,}25(x^2 - 4x + 4) + 3 \\\\ &= -0{,}25x^2 + x - 1 + 3 \\\\ &= -0{,}25x^2 + x + 2 \\end{aligned}'}</MB>
+                    <MB>{'\\begin{aligned} y &= -0{,}25(x - 2)^2 + 3 \\\\ &= -0{,}25(x^2 - 4x + 4) + 3 \\\\ &= -0{,}25x^2 + x - 1 + 3 \\\\ &= -0{,}25x^2 + x + 2 \\end{aligned}'}</MB>
                     <p>
-                      Probe: <M>{'f(4) = -0{,}25 \\cdot 16 + 4 + 2 = 2'}</M> ✓
+                      Probe mit <M>{'x = 4'}</M>: <M>{'y = -0{,}25 \\cdot 16 + 4 + 2 = 2'}</M> ✓
                     </p>
                   </>
                 }
@@ -535,20 +535,20 @@ export default function TorbogenEinstieg({
                 <div className="wm-blatt">
                   <span className="wm-stempel">Freigegeben</span>
                   <p>
-                    An die Biegemaschine geht: <M>{'f(x) = -0{,}25x^2 + x + 2'}</M>, in Scheitelform <M>{'f(x) = -0{,}25(x - 2)^2 + 3'}</M>.
+                    An die Biegemaschine geht: <M>{'y = -0{,}25x^2 + x + 2'}</M>, in Scheitelform <M>{'y = -0{,}25(x - 2)^2 + 3'}</M>.
                   </p>
                 </div>
               </div>
               <Merke title="Funktionsgleichung aus Scheitelpunkt und einem Punkt (Fall 1)">
                 <ol>
                   <li>
-                    Scheitelpunkt in die Scheitelform einsetzen: <M>{'f(x) = a(x - x_S)^2 + y_S'}</M>.
+                    Scheitelpunkt in die Scheitelform einsetzen: <M>{'y = a(x - x_S)^2 + y_S'}</M>.
                   </li>
                   <li>
-                    Den zweiten Punkt für <M>x</M> und <M>{'f(x)'}</M> einsetzen und nach <M>a</M> auflösen.
+                    Den zweiten Punkt für <M>x</M> und <M>y</M> einsetzen und nach <M>a</M> auflösen.
                   </li>
                   <li>
-                    In die allgemeine Form <M>{'f(x) = ax^2 + bx + c'}</M> umwandeln: binomische Formel, dann jeden Summanden mit <M>a</M> multiplizieren.
+                    In die allgemeine Form <M>{'y = ax^2 + bx + c'}</M> umwandeln: binomische Formel, dann jeden Summanden mit <M>a</M> multiplizieren.
                   </li>
                 </ol>
               </Merke>
@@ -569,7 +569,7 @@ export default function TorbogenEinstieg({
                         <p>
                           Setze <M>{'x_S = -1'}</M> und <M>{'y_S = 5'}</M> in die Scheitelform ein. Negative Zahlen immer in Klammern setzen:
                         </p>
-                        <MB>{'\\begin{aligned} f(x) &= a(x - x_S)^2 + y_S \\\\ f(x) &= a(x - (-1))^2 + 5 \\\\ f(x) &= a(x + 1)^2 + 5 \\end{aligned}'}</MB>
+                        <MB>{'\\begin{aligned} y &= a(x - x_S)^2 + y_S \\\\ y &= a(x - (-1))^2 + 5 \\\\ y &= a(x + 1)^2 + 5 \\end{aligned}'}</MB>
                       </>
                     ),
                   },
@@ -578,7 +578,7 @@ export default function TorbogenEinstieg({
                     body: (
                       <>
                         <p>
-                          Setze <M>{'P(1 \\mid 3)'}</M> in <M>{'f(x) = a(x + 1)^2 + 5'}</M> ein, also <M>{'x = 1'}</M> und <M>{'f(x) = 3'}</M>:
+                          Setze <M>{'P(1 \\mid 3)'}</M> in <M>{'y = a(x + 1)^2 + 5'}</M> ein, also <M>{'x = 1'}</M> und <M>{'y = 3'}</M>:
                         </p>
                         <MB>{'\\begin{aligned} 3 &= a \\cdot (1 + 1)^2 + 5 \\\\ 3 &= a \\cdot 2^2 + 5 \\\\ 3 &= 4a + 5 && \\mid -5 \\\\ -2 &= 4a && \\mid :4 \\\\ a &= -0{,}5 \\end{aligned}'}</MB>
                       </>
@@ -591,7 +591,7 @@ export default function TorbogenEinstieg({
                         <p>
                           Setze <M>{'a = -0{,}5'}</M> in die Scheitelform ein. Löse die Klammer auf, multipliziere dann <strong>jeden</strong> Summanden mit <M>a</M> (Punkt vor Strich) und fasse zusammen:
                         </p>
-                        <MB>{'\\begin{aligned} f(x) &= -0{,}5 \\cdot (x + 1)^2 + 5 \\\\ f(x) &= -0{,}5 \\cdot [(x + 1) \\cdot (x + 1)] + 5 \\\\ f(x) &= -0{,}5 \\cdot [x^2 + 2x + 1] + 5 \\\\ f(x) &= -0{,}5x^2 - x - 0{,}5 + 5 \\\\ f(x) &= -0{,}5x^2 - x + 4{,}5 \\end{aligned}'}</MB>
+                        <MB>{'\\begin{aligned} y &= -0{,}5 \\cdot (x + 1)^2 + 5 \\\\ y &= -0{,}5 \\cdot [(x + 1) \\cdot (x + 1)] + 5 \\\\ y &= -0{,}5 \\cdot [x^2 + 2x + 1] + 5 \\\\ y &= -0{,}5x^2 - x - 0{,}5 + 5 \\\\ y &= -0{,}5x^2 - x + 4{,}5 \\end{aligned}'}</MB>
                       </>
                     ),
                   },
@@ -626,21 +626,21 @@ export default function TorbogenEinstieg({
                       name="Jonas"
                       cls="wm-bericht-a"
                       zeilen={[
-                        ['f(x) = a(x + 2)^2 + 3'],
+                        ['y = a(x + 2)^2 + 3'],
                         ['2 = a(0 + 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'],
-                        ['f(x) = -0{,}25(x^2 + 4x + 4) + 3', '= -0{,}25x^2 - x + 2'],
+                        ['y = -0{,}25(x^2 + 4x + 4) + 3', '= -0{,}25x^2 - x + 2'],
                       ]}
-                      ergebnis="f(x) = -0{,}25x^2 - x + 2"
+                      ergebnis="y = -0{,}25x^2 - x + 2"
                     />
                     <Bericht
                       name="Mara"
                       cls="wm-bericht-c"
                       zeilen={[
-                        ['f(x) = a(x - 2)^2 + 3'],
+                        ['y = a(x - 2)^2 + 3'],
                         ['2 = a(0 - 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'],
-                        ['f(x) = -0{,}25x^2 - 4x + 4 + 3', '= -0{,}25x^2 - 4x + 7'],
+                        ['y = -0{,}25x^2 - 4x + 4 + 3', '= -0{,}25x^2 - 4x + 7'],
                       ]}
-                      ergebnis="f(x) = -0{,}25x^2 - 4x + 7"
+                      ergebnis="y = -0{,}25x^2 - 4x + 7"
                     />
                   </div>
                 </div>
@@ -657,7 +657,7 @@ export default function TorbogenEinstieg({
                     <>
                       <p>
                         <strong>Jonas, Schritt 1:</strong> Bei <M>{'S(2 \\mid 3)'}</M> heißt die Klammer <M>{'(x - 2)'}</M>, nicht <M>{'(x + 2)'}</M>. Seine Probe mit P stimmt trotzdem,
-                        weil er P zum Rechnen benutzt hat. Die Probe mit Q deckt den Fehler auf: <M>{'f(4) = -6'}</M>.
+                        weil er P zum Rechnen benutzt hat. Die Probe mit Q deckt den Fehler auf: Bei <M>{'x = 4'}</M> ergibt sich <M>{'y = -6'}</M> statt 2.
                       </p>
                       <p>
                         <strong>Mara, Schritt 3:</strong> Sie hat nur <M>{'x^2'}</M> mit <M>{'-0{,}25'}</M> multipliziert. Richtig ist{' '}
@@ -672,7 +672,7 @@ export default function TorbogenEinstieg({
                   prompt={
                     <p>
                       Eine Parabel hat den Scheitelpunkt <M>{'S(1 \\mid -2)'}</M> und geht durch <M>{'P(3 \\mid 6)'}</M>. Bestimme <M>a</M> und die allgemeine Form{' '}
-                      <M>{'f(x) = ax^2 + bx + c'}</M>.
+                      <M>{'y = ax^2 + bx + c'}</M>.
                     </p>
                   }
                   fieldsRow
@@ -684,7 +684,7 @@ export default function TorbogenEinstieg({
                   solution={
                     <>
                       <MB>{'\\begin{aligned} 6 &= a(3 - 1)^2 - 2 \\\\ 6 &= 4a - 2 && \\mid +2 \\\\ 8 &= 4a && \\mid :4 \\\\ a &= 2 \\end{aligned}'}</MB>
-                      <MB>{'\\begin{aligned} f(x) &= 2(x - 1)^2 - 2 \\\\ &= 2(x^2 - 2x + 1) - 2 \\\\ &= 2x^2 - 4x \\end{aligned}'}</MB>
+                      <MB>{'\\begin{aligned} y &= 2(x - 1)^2 - 2 \\\\ &= 2(x^2 - 2x + 1) - 2 \\\\ &= 2x^2 - 4x \\end{aligned}'}</MB>
                       <p>
                         Es ist also <M>{'c = 0'}</M>.
                       </p>
@@ -695,7 +695,7 @@ export default function TorbogenEinstieg({
                       steps={[
                         <>Gehe wie auf deinem Spickzettel vor: erst der Scheitelpunkt, dann der Punkt P, dann umwandeln.</>,
                         <>
-                          Ansatz: <M>{'f(x) = a(x - 1)^2 - 2'}</M>. Setze <M>{'x = 3'}</M> und <M>{'f(x) = 6'}</M> ein.
+                          Ansatz: <M>{'y = a(x - 1)^2 - 2'}</M>. Setze <M>{'x = 3'}</M> und <M>{'y = 6'}</M> ein.
                         </>,
                         <>
                           <M>{'6 = 4a - 2'}</M> ergibt <M>{'a = 2'}</M>. Danach <M>{'2(x^2 - 2x + 1) - 2'}</M> ausmultiplizieren.
@@ -710,14 +710,14 @@ export default function TorbogenEinstieg({
                   rechnen
                   prompt={
                     <p>
-                      Wandle <M>{'f(x) = -0{,}5(x + 2)^2 + 1'}</M> in die allgemeine Form um.
+                      Wandle <M>{'y = -0{,}5(x + 2)^2 + 1'}</M> in die allgemeine Form um.
                     </p>
                   }
                   options={[
-                    { text: 'f(x) = −0,5x² − 1', feedback: 'Hier wurde (x + 2)² = x² + 4 gerechnet. Es fehlt das Mittelglied: (x + 2)² = x² + 4x + 4.' },
-                    { text: 'f(x) = −0,5x² + 4x + 5', feedback: 'Nur x² wurde mit −0,5 multipliziert, so wie bei Mara. Jeder Summand in der Klammer muss mal −0,5 genommen werden.' },
-                    { text: 'f(x) = −0,5x² − 2x − 1', correct: true, feedback: '−0,5(x² + 4x + 4) + 1 = −0,5x² − 2x − 2 + 1 = −0,5x² − 2x − 1.' },
-                    { text: 'f(x) = −0,5x² − 2x + 3', feedback: 'Fast: −0,5 · 4 ist −2, nicht +2. Dann ergibt sich −2 + 1 = −1.' },
+                    { text: 'y = −0,5x² − 1', feedback: 'Hier wurde (x + 2)² = x² + 4 gerechnet. Es fehlt das Mittelglied: (x + 2)² = x² + 4x + 4.' },
+                    { text: 'y = −0,5x² + 4x + 5', feedback: 'Nur x² wurde mit −0,5 multipliziert, so wie bei Mara. Jeder Summand in der Klammer muss mal −0,5 genommen werden.' },
+                    { text: 'y = −0,5x² − 2x − 1', correct: true, feedback: '−0,5(x² + 4x + 4) + 1 = −0,5x² − 2x − 2 + 1 = −0,5x² − 2x − 1.' },
+                    { text: 'y = −0,5x² − 2x + 3', feedback: 'Fast: −0,5 · 4 ist −2, nicht +2. Dann ergibt sich −2 + 1 = −1.' },
                   ]}
                 />
                 <CheckCard
@@ -747,7 +747,7 @@ export default function TorbogenEinstieg({
                       steps={[
                         <>Der Scheitel liegt jetzt bei S(2 | 3,5), der Pfosten bleibt bei P(0 | 2).</>,
                         <>
-                          Neuer Ansatz: <M>{'f(x) = a(x - 2)^2 + 3{,}5'}</M>. Setze P ein und löse nach a auf.
+                          Neuer Ansatz: <M>{'y = a(x - 2)^2 + 3{,}5'}</M>. Setze P ein und löse nach a auf.
                         </>,
                         <>
                           <M>{'2 = 4a + 3{,}5'}</M>. Vergleiche danach den Betrag des neuen a mit 0,25: Größerer Betrag heißt schmalere Parabel.
@@ -761,7 +761,7 @@ export default function TorbogenEinstieg({
                   level="erweiterung"
                   prompt={
                     <p>
-                      Ein Transporter ist 1,8 m breit und 2,6 m hoch. Er fährt genau mittig durch den Torbogen <M>{'f(x) = -0{,}25x^2 + x + 2'}</M>. Wie hoch ist der Bogen über den
+                      Ein Transporter ist 1,8 m breit und 2,6 m hoch. Er fährt genau mittig durch den Torbogen <M>{'y = -0{,}25x^2 + x + 2'}</M>. Wie hoch ist der Bogen über den
                       Außenkanten des Transporters? Passt er durch? Begründe im Heft mit einer Skizze.
                     </p>
                   }
@@ -773,12 +773,12 @@ export default function TorbogenEinstieg({
                   solution={
                     <>
                       <p>Der Transporter fährt mittig durch, also genau unter dem Scheitelpunkt. Zuerst den Scheitelpunkt berechnen:</p>
-                      <MB>{'\\begin{aligned} x_S &= -\\frac{b}{2a} = -\\frac{1}{2 \\cdot (-0{,}25)} = -\\frac{1}{-0{,}5} = 2 \\\\ y_S &= f(2) = -0{,}25 \\cdot 2^2 + 2 + 2 = -1 + 4 = 3 \\end{aligned}'}</MB>
+                      <MB>{'\\begin{aligned} x_S &= -\\frac{b}{2a} = -\\frac{1}{2 \\cdot (-0{,}25)} = -\\frac{1}{-0{,}5} = 2 \\\\ y_S &= -0{,}25 \\cdot 2^2 + 2 + 2 = -1 + 4 = 3 \\end{aligned}'}</MB>
                       <p>
                         Der Scheitelpunkt ist <M>{'S(2 \\mid 3)'}</M>, die Mitte der Einfahrt liegt also bei <M>{'x = 2'}</M>. Die Außenkanten liegen eine halbe Breite (0,9 m) links und rechts davon:{' '}
                         <M>{'x = 2 - 0{,}9 = 1{,}1'}</M> und <M>{'x = 2 + 0{,}9 = 2{,}9'}</M>.
                       </p>
-                      <MB>{'\\begin{aligned} f(1{,}1) &= -0{,}25 \\cdot 1{,}1^2 + 1{,}1 + 2 = -0{,}3025 + 3{,}1 = 2{,}7975 \\approx 2{,}80 \\\\ f(2{,}9) &= -0{,}25 \\cdot 2{,}9^2 + 2{,}9 + 2 = -2{,}1025 + 4{,}9 = 2{,}7975 \\approx 2{,}80 \\end{aligned}'}</MB>
+                      <MB>{'\\begin{aligned} x = 1{,}1\\text{: }\\quad y &= -0{,}25 \\cdot 1{,}1^2 + 1{,}1 + 2 = -0{,}3025 + 3{,}1 = 2{,}7975 \\approx 2{,}80 \\\\ x = 2{,}9\\text{: }\\quad y &= -0{,}25 \\cdot 2{,}9^2 + 2{,}9 + 2 = -2{,}1025 + 4{,}9 = 2{,}7975 \\approx 2{,}80 \\end{aligned}'}</MB>
                       <p>An beiden Außenkanten ist der Bogen etwa 2,80 m hoch. 2,80 m &gt; 2,6 m, der Transporter passt mit etwa 20 cm Luft durch.</p>
                     </>
                   }
@@ -790,7 +790,7 @@ export default function TorbogenEinstieg({
                           Die Mitte der Einfahrt ist der Scheitelpunkt. Berechne ihn mit <M>{'x_S = -\\frac{b}{2a}'}</M>. Am engsten ist es an den oberen Ecken des Transporters, eine halbe Breite links und rechts von <M>{'x_S'}</M>.
                         </>,
                         <>
-                          <M>{'x_S = 2'}</M>, die Ecken liegen bei <M>{'x = 2 - 0{,}9 = 1{,}1'}</M> und <M>{'x = 2 + 0{,}9 = 2{,}9'}</M>. Berechne <M>{'f(1{,}1)'}</M> und <M>{'f(2{,}9)'}</M> und vergleiche mit 2,6 m.
+                          <M>{'x_S = 2'}</M>, die Ecken liegen bei <M>{'x = 2 - 0{,}9 = 1{,}1'}</M> und <M>{'x = 2 + 0{,}9 = 2{,}9'}</M>. Setze <M>{'x = 1{,}1'}</M> und <M>{'x = 2{,}9'}</M> ein, berechne jeweils y und vergleiche mit 2,6 m.
                         </>,
                       ]}
                     />

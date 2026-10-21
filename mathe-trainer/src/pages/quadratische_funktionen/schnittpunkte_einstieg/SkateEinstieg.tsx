@@ -22,7 +22,7 @@ import './lab.css'
 // höchster Punkt (2|4). Der Sensor der Lichtschranke steht am linken Pfosten in Höhe t, der Strahl fällt pro Meter um 0,5 m.
 const p = (x: number) => -0.25 * x * x + x + 3
 const g = (t: number) => (x: number) => -0.5 * x + t
-/** Zahl unter der Wurzel in der Mitternachtsformel für p(x) = g(x), also −0,25x² + 1,5x + (3 − t) = 0 */
+/** Zahl unter der Wurzel in der Mitternachtsformel beim Gleichsetzen von Sprungbahn und Lichtschranke, also −0,25x² + 1,5x + (3 − t) = 0 */
 const wurzelterm = (t: number) => 5.25 - t
 const T_TOUCH = 5.25
 const T_MIN = 3
@@ -170,7 +170,7 @@ function LabRegler() {
       </div>
       <div className="ls-readout">
         <div className="ls-readout-box ls-readout-b">
-          <strong>Lichtschranke:</strong> <M>{`g(x) = -0{,}5x + ${tx(t)}`}</M>
+          <strong>Lichtschranke:</strong> <M>{`y = -0{,}5x + ${tx(t)}`}</M>
         </div>
         <div className="ls-readout-box ls-readout-a">
           <strong>gelbe Punkte im Bild:</strong> {n}
@@ -222,14 +222,14 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 title="a) Punktprobe bei einer Parabel"
                 prompt={
                   <p>
-                    Liegt der Punkt <M>{'P(2 \\mid 4)'}</M> auf der Parabel <M>{'p(x) = -0{,}25x^2 + x + 3'}</M>?
+                    Liegt der Punkt <M>{'P(2 \\mid 4)'}</M> auf der Parabel <M>{'y = -0{,}25x^2 + x + 3'}</M>?
                   </p>
                 }
                 fields={[{ kind: 'select', key: 'p', label: 'Antwort', options: ['Ja', 'Nein'], expected: 0 }]}
                 solution={
                   <>
                     <p>x-Wert einsetzen und mit dem y-Wert vergleichen:</p>
-                    <MB>{'p(2) = -0{,}25 \\cdot 2^2 + 2 + 3 = -1 + 2 + 3 = 4 \;\\checkmark'}</MB>
+                    <MB>{'x = 2: \\quad y = -0{,}25 \\cdot 2^2 + 2 + 3 = -1 + 2 + 3 = 4 \\;\\checkmark'}</MB>
                     <p>Der y-Wert stimmt, also liegt P auf der Parabel.</p>
                   </>
                 }
@@ -238,11 +238,11 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 title="b) y-Wert einer Geraden berechnen"
                 prompt={
                   <p>
-                    Eine Gerade hat die Gleichung <M>{'g(x) = -0{,}5x + 5'}</M>. Berechne den y-Wert an der Stelle <M>{'x = 4'}</M>.
+                    Eine Gerade hat die Gleichung <M>{'y = -0{,}5x + 5'}</M>. Berechne den y-Wert an der Stelle <M>{'x = 4'}</M>.
                   </p>
                 }
-                fields={[{ kind: 'num', key: 'y', label: <M>{'g(4) ='}</M>, expected: 3 }]}
-                solution={<MB>{'g(4) = -0{,}5 \\cdot 4 + 5 = -2 + 5 = 3'}</MB>}
+                fields={[{ kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 3 }]}
+                solution={<MB>{'x = 4: \\quad y = -0{,}5 \\cdot 4 + 5 = -2 + 5 = 3'}</MB>}
               />
               <CheckCard
                 title="c) Quadratische Gleichung lösen"
@@ -297,7 +297,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <div className="ls-flyer-price">
                   Parabel{' '}
                   <strong>
-                    <M>{'p(x) = -0{,}25x^2 + x + 3'}</M>
+                    <M>{'y = -0{,}25x^2 + x + 3'}</M>
                   </strong>
                 </div>
               </div>
@@ -306,7 +306,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <div className="ls-flyer-price">
                   Gerade{' '}
                   <strong>
-                    <M>{'g(x) = -0{,}5x + t'}</M>
+                    <M>{'y = -0{,}5x + t'}</M>
                   </strong>
                 </div>
                 <div className="ls-flyer-sub">
@@ -422,7 +422,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 title="So gehst du vor"
                 steps={[
                   <>
-                    <strong>Gleichsetzen:</strong> <M>{'p(x) = g(x)'}</M> hinschreiben.
+                    <strong>Gleichsetzen:</strong> Den Term der Parabel und den Term der Geraden gleichsetzen.
                   </>,
                   <>
                     <strong>Auf Null bringen:</strong> Alles auf eine Seite rechnen, bis rechts 0 steht. Gleichartige Terme zusammenfassen. Es entsteht <M>{'ax^2 + bx + c = 0'}</M>.
@@ -443,7 +443,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 title="Parabel und Gerade mit anderen Zahlen"
                 aufgabe={
                   <p>
-                    Berechne die Schnittpunkte von <M>{'p(x) = x^2 - 2x - 3'}</M> und <M>{'g(x) = x + 1'}</M>.
+                    Berechne die Schnittpunkte der Parabel <M>{'y = x^2 - 2x - 3'}</M> und der Geraden <M>{'y = x + 1'}</M>.
                   </p>
                 }
                 steps={[
@@ -464,15 +464,15 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   },
                   {
                     title: 'Mitternachtsformel',
-                    body: <MB>{'x_{1,2} = \\frac{3 \\pm \\sqrt{(-3)^2 - 4 \\cdot 1 \\cdot (-4)}}{2 \\cdot 1} = \\frac{3 \\pm \\sqrt{25}}{2} = \\frac{3 \\pm 5}{2} \;\\Rightarrow\; x_1 = 4,\; x_2 = -1'}</MB>,
+                    body: <MB>{'x_{1,2} = \\frac{3 \\pm \\sqrt{(-3)^2 - 4 \\cdot 1 \\cdot (-4)}}{2 \\cdot 1} = \\frac{3 \\pm \\sqrt{25}}{2} = \\frac{3 \\pm 5}{2} \\;\\Rightarrow\\; x_1 = 4,\\; x_2 = -1'}</MB>,
                   },
                   {
                     title: 'y-Werte mit der Geraden',
                     body: (
                       <>
-                        <MB>{'g(4) = 4 + 1 = 5 \\qquad g(-1) = -1 + 1 = 0'}</MB>
+                        <MB>{'x = 4: \\; y = 4 + 1 = 5 \\qquad x = -1: \\; y = -1 + 1 = 0'}</MB>
                         <p>
-                          Probe mit der Parabel: <M>{'p(4) = 16 - 8 - 3 = 5'}</M> ✓ und <M>{'p(-1) = 1 + 2 - 3 = 0'}</M> ✓
+                          Probe mit der Parabel: <M>{'x = 4: \\; y = 16 - 8 - 3 = 5'}</M> ✓ und <M>{'x = -1: \\; y = 1 + 2 - 3 = 0'}</M> ✓
                         </p>
                       </>
                     ),
@@ -495,7 +495,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                       Die Tabelle zeigt für <M>{'t = 5'}</M> zwei Punkte. Berechnet sie jetzt genau und geht dabei Schritt für Schritt vor wie im Beispiel der Infokarte:
                     </p>
                     <p>
-                      Sprungbahn <M>{'p(x) = -0{,}25x^2 + x + 3'}</M>, Lichtschranke <M>{'g(x) = -0{,}5x + 5'}</M>.
+                      Sprungbahn <M>{'y = -0{,}25x^2 + x + 3'}</M>, Lichtschranke <M>{'y = -0{,}5x + 5'}</M>.
                     </p>
                     <ol className="lp-hint">
                       <li>Gleichsetzen und alles auf eine Seite bringen. Lest dann <M>a</M>, <M>b</M> und <M>c</M> ab.</li>
@@ -523,7 +523,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                     </p>
                     <MB>{'x_{1,2} = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-2)}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm \\sqrt{0{,}25}}{-0{,}5} = \\frac{-1{,}5 \\pm 0{,}5}{-0{,}5}'}</MB>
                     <MB>{'x_1 = 2 \\qquad x_2 = 4'}</MB>
-                    <MB>{'y_1 = g(2) = -0{,}5 \\cdot 2 + 5 = 4 \\qquad y_2 = g(4) = -0{,}5 \\cdot 4 + 5 = 3'}</MB>
+                    <MB>{'y_1 = -0{,}5 \\cdot 2 + 5 = 4 \\qquad y_2 = -0{,}5 \\cdot 4 + 5 = 3'}</MB>
                     <p>
                       Die Schnittpunkte sind <M>{'S_1(2 \\mid 4)'}</M> und <M>{'S_2(4 \\mid 3)'}</M>. Das passt zu den zwei gelben Punkten im Bild.
                     </p>
@@ -574,7 +574,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                       Im Regler habt ihr gesehen: Bei <M>{'t = 5{,}25'}</M> gibt es nur einen gemeinsamen Punkt. Rechnet das nach. Geht genauso vor wie in Versuch 2, mit
                     </p>
                     <p>
-                      <M>{'p(x) = -0{,}25x^2 + x + 3'}</M> und <M>{'g(x) = -0{,}5x + 5{,}25'}</M>.
+                      <M>{'y = -0{,}25x^2 + x + 3'}</M> und <M>{'y = -0{,}5x + 5{,}25'}</M>.
                     </p>
                     <p>
                       Achtet darauf, was in der Mitternachtsformel unter der Wurzel herauskommt. Beschreibt im Heft, warum es nur eine
@@ -596,7 +596,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                     </p>
                     <MB>{'x = \\frac{-1{,}5 \\pm \\sqrt{1{,}5^2 - 4 \\cdot (-0{,}25) \\cdot (-2{,}25)}}{2 \\cdot (-0{,}25)} = \\frac{-1{,}5 \\pm \\sqrt{2{,}25 - 2{,}25}}{-0{,}5} = \\frac{-1{,}5 \\pm 0}{-0{,}5} = 3'}</MB>
                     <p>Unter der Wurzel steht 0. Das ± ändert nichts, es bleibt eine einzige Lösung.</p>
-                    <MB>{'y = g(3) = -0{,}5 \\cdot 3 + 5{,}25 = 3{,}75'}</MB>
+                    <MB>{'y = -0{,}5 \\cdot 3 + 5{,}25 = 3{,}75'}</MB>
                     <p>
                       Die Lichtschranke berührt die Sprungbahn nur im Punkt <M>{'B(3 \\mid 3{,}75)'}</M>.
                     </p>
@@ -605,7 +605,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 help={
                   <Hilfen
                     steps={[
-                      <>Schlagt in der Infokarte die fünf Schritte nach. Der erste Schritt ist wieder das Gleichsetzen von <M>p(x)</M> und <M>g(x)</M>.</>,
+                      <>Schlagt in der Infokarte die fünf Schritte nach. Der erste Schritt ist wieder das Gleichsetzen der beiden Terme.</>,
                       <>
                         Addiert auf beiden Seiten <M>{'0{,}5x'}</M> und zieht <M>{'5{,}25'}</M> ab. Danach fasst ihr zusammen (<M>{'x + 0{,}5x'}</M> und <M>{'3 - 5{,}25'}</M>) und lest <M>a</M>,{' '}
                         <M>b</M> und <M>c</M> ab.
@@ -651,7 +651,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <summary>Tarek hat gerechnet</summary>
                 <div className="ls-way-body">
                   <p>
-                    „Ich habe <M>{'p(x) = g(x)'}</M> gleichgesetzt und mit der Mitternachtsformel gerechnet, einmal für <M>{'t = 5'}</M>, einmal für <M>{'t = 5{,}25'}</M> und einmal für{' '}
+                    „Ich habe die Terme von Sprungbahn und Lichtschranke gleichgesetzt und mit der Mitternachtsformel gerechnet, einmal für <M>{'t = 5'}</M>, einmal für <M>{'t = 5{,}25'}</M> und einmal für{' '}
                     <M>{'t = 6'}</M>. Unter der Wurzel kam <M>{'0{,}25'}</M>, dann <M>{'0'}</M> und dann <M>{'-0{,}75'}</M> heraus. Bei 0,25 gab es zwei Lösungen, bei 0 nur eine, und bei
                     −0,75 geht die Wurzel nicht, also keine Lösung.“
                   </p>
@@ -675,7 +675,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
               title="Wo löst der Sprung die Lichtschranke aus (t = 5)?"
               aufgabe={
                 <p>
-                  Sprungbahn <M>{'p(x) = -0{,}25x^2 + x + 3'}</M>, Lichtschranke <M>{'g(x) = -0{,}5x + 5'}</M>. Berechne die gemeinsamen Punkte.
+                  Sprungbahn <M>{'y = -0{,}25x^2 + x + 3'}</M>, Lichtschranke <M>{'y = -0{,}5x + 5'}</M>. Berechne die gemeinsamen Punkte.
                 </p>
               }
               steps={[
@@ -695,7 +695,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                       <p>
                         Auf beiden Seiten <M>{'+0{,}5x'}</M> und <M>{'-5'}</M>, dann steht rechts 0:
                       </p>
-                      <MB>{'-0{,}25x^2 + 1{,}5x - 2 = 0 \\qquad (a = -0{,}25,\; b = 1{,}5,\; c = -2)'}</MB>
+                      <MB>{'-0{,}25x^2 + 1{,}5x - 2 = 0 \\qquad (a = -0{,}25,\\; b = 1{,}5,\\; c = -2)'}</MB>
                     </>
                   ),
                 },
@@ -714,9 +714,9 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   title: 'y-Werte mit der Geradengleichung',
                   body: (
                     <>
-                      <MB>{'g(2) = -0{,}5 \\cdot 2 + 5 = 4 \\qquad g(4) = -0{,}5 \\cdot 4 + 5 = 3'}</MB>
+                      <MB>{'x = 2: \\; y = -0{,}5 \\cdot 2 + 5 = 4 \\qquad x = 4: \\; y = -0{,}5 \\cdot 4 + 5 = 3'}</MB>
                       <p>
-                        Probe mit der Parabel: <M>{'p(2) = -1 + 2 + 3 = 4'}</M> ✓ und <M>{'p(4) = -4 + 4 + 3 = 3'}</M> ✓
+                        Probe mit der Parabel: <M>{'x = 2: \\; y = -1 + 2 + 3 = 4'}</M> ✓ und <M>{'x = 4: \\; y = -4 + 4 + 3 = 3'}</M> ✓
                       </p>
                     </>
                   ),
@@ -737,11 +737,11 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
             />
             <Merke title="Schnittpunkte von Parabel und Gerade">
               <p>
-                Eine Parabel <M>{'p(x) = ax^2 + bx + c'}</M> und eine Gerade <M>{'g(x) = mx + t'}</M> haben <strong>höchstens zwei</strong> gemeinsame Punkte.
+                Eine Parabel <M>{'y = ax^2 + bx + c'}</M> und eine Gerade <M>{'y = mx + t'}</M> haben <strong>höchstens zwei</strong> gemeinsame Punkte.
               </p>
               <ol>
                 <li>
-                  Gleichsetzen <M>{'p(x) = g(x)'}</M> und alles auf eine Seite bringen: <M>{'Ax^2 + Bx + C = 0'}</M>.
+                  Die Terme gleichsetzen <M>{'ax^2 + bx + c = mx + t'}</M> und alles auf eine Seite bringen: <M>{'Ax^2 + Bx + C = 0'}</M>.
                 </li>
                 <li>
                   Mitternachtsformel anwenden: <M>{'x_{1,2} = \\frac{-B \\pm \\sqrt{B^2 - 4AC}}{2A}'}</M>. Die Zahl unter der Wurzel entscheidet über die Anzahl der Schnittpunkte:
@@ -799,16 +799,16 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 prompt={
                   <>
                     <p>
-                      Parabel <M>{'p(x) = x^2'}</M> und Gerade <M>{'g(x) = 2x - 1'}</M>. Mia sagt: „Eine Gerade und eine Parabel schneiden sich immer zweimal.“ Leon sagt: „Hier ist es
+                      Parabel <M>{'y = x^2'}</M> und Gerade <M>{'y = 2x - 1'}</M>. Mia sagt: „Eine Gerade und eine Parabel schneiden sich immer zweimal.“ Leon sagt: „Hier ist es
                       nur ein Punkt.“ Rechne nach (Gleichsetzen, Mitternachtsformel, y-Wert) und wähle die richtige Aussage.
                     </p>
                   </>
                 }
                 options={[
                   { text: 'Mia hat recht: Es gibt zwei Schnittpunkte, x = 1 und x = −1.', feedback: 'Aus x² = 2x − 1 wird x² − 2x + 1 = 0. In der Formel steht unter der Wurzel 4 − 4 = 0, also nur eine Lösung. Außerdem gibt es nicht immer zwei Schnittpunkte.' },
-                  { text: 'Leon hat recht: Es gibt genau einen Schnittpunkt S(1 | 1).', correct: true, feedback: 'x = (2 ± √(4 − 4)) / 2 = 1, und y = g(1) = 1. Die Gerade berührt die Parabel in S(1 | 1).' },
+                  { text: 'Leon hat recht: Es gibt genau einen Schnittpunkt S(1 | 1).', correct: true, feedback: 'x = (2 ± √(4 − 4)) / 2 = 1, und y = 2 · 1 − 1 = 1. Die Gerade berührt die Parabel in S(1 | 1).' },
                   { text: 'Beide haben unrecht: Es gibt keinen Schnittpunkt, weil unter der Wurzel 0 steht.', feedback: 'Wurzel aus 0 ist 0, das geht. Dann bleibt genau eine Lösung. Keine Lösung gibt es nur bei einer negativen Zahl unter der Wurzel.' },
-                  { text: 'Leon hat recht, der Schnittpunkt ist x = 1.', feedback: 'Der x-Wert stimmt, aber ein Schnittpunkt hat zwei Koordinaten. Setze x = 1 noch in g(x) ein.' },
+                  { text: 'Leon hat recht, der Schnittpunkt ist x = 1.', feedback: 'Der x-Wert stimmt, aber ein Schnittpunkt hat zwei Koordinaten. Setze x = 1 noch in die Geradengleichung ein.' },
                 ]}
               />
               <CheckCard
@@ -817,7 +817,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 prompt={
                   <>
                     <p>
-                      Berechne die Schnittpunkte der Parabel <M>{'p(x) = 0{,}5x^2 - 2x + 1'}</M> und der Geraden <M>{'g(x) = 0{,}5x - 2'}</M>. Rechne mit der Mitternachtsformel.
+                      Berechne die Schnittpunkte der Parabel <M>{'y = 0{,}5x^2 - 2x + 1'}</M> und der Geraden <M>{'y = 0{,}5x - 2'}</M>. Rechne mit der Mitternachtsformel.
                     </p>
                   </>
                 }
@@ -836,9 +836,9 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                     </p>
                     <MB>{'x_{1,2} = \\frac{2{,}5 \\pm \\sqrt{(-2{,}5)^2 - 4 \\cdot 0{,}5 \\cdot 3}}{2 \\cdot 0{,}5} = \\frac{2{,}5 \\pm \\sqrt{0{,}25}}{1} = 2{,}5 \\pm 0{,}5'}</MB>
                     <MB>{'x_1 = 2 \\qquad x_2 = 3'}</MB>
-                    <MB>{'y_1 = g(2) = 0{,}5 \\cdot 2 - 2 = -1 \\qquad y_2 = g(3) = 0{,}5 \\cdot 3 - 2 = -0{,}5'}</MB>
+                    <MB>{'y_1 = 0{,}5 \\cdot 2 - 2 = -1 \\qquad y_2 = 0{,}5 \\cdot 3 - 2 = -0{,}5'}</MB>
                     <p>
-                      Probe mit der Parabel: <M>{'p(2) = 2 - 4 + 1 = -1'}</M> ✓ und <M>{'p(3) = 4{,}5 - 6 + 1 = -0{,}5'}</M> ✓. Die Schnittpunkte sind <M>{'S_1(2 \\mid -1)'}</M> und{' '}
+                      Probe mit der Parabel: <M>{'x = 2: \\; y = 2 - 4 + 1 = -1'}</M> ✓ und <M>{'x = 3: \\; y = 4{,}5 - 6 + 1 = -0{,}5'}</M> ✓. Die Schnittpunkte sind <M>{'S_1(2 \\mid -1)'}</M> und{' '}
                       <M>{'S_2(3 \\mid -0{,}5)'}</M>.
                     </p>
                   </>
