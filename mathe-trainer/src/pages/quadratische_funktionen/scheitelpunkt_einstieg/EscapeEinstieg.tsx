@@ -3,7 +3,7 @@ import TaskShell from '../../../components/layout/TaskShell'
 import CheckedNumberInput from '../../../components/CheckedNumberInput'
 import { fieldCheckClass } from '../../../utils/fieldCheck'
 import { Beispiel, M, MB, Merke, QuerTabelle, checkNumber, fmt } from '../../daten_und_zufall/lernpfad/kit'
-import { CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, PRAISE, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, HeftHinweis, Hilfen, McCard, Phase, PRAISE } from '../../lineare_funktionen/lernsituation_kit/kit'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './escape.css'
 
@@ -296,6 +296,7 @@ function Merkkarte() {
     <>
       <CheckCard
         title="Baustein 1: Die Schritte in die richtige Reihenfolge bringen"
+        rechnen={false}
         prompt={<p>Ordne die vier Schritte so, wie du beim Berechnen des Scheitelpunkts vorgehst.</p>}
         fields={[0, 1, 2, 3].map((i) => ({
           kind: 'select' as const,
@@ -316,6 +317,7 @@ function Merkkarte() {
       />
       <CheckCard
         title="Baustein 2: Die Formel"
+        rechnen={false}
         prompt={<p>Wähle die richtige Formel für die x-Koordinate des Scheitelpunkts.</p>}
         fields={[
           {
@@ -433,6 +435,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
               und berechnest ihn mit einer Formel.
             </div>
           </div>
+          <Arbeitsweise />
 
           <ol className="esc-map" aria-label="Levelmap">
             {STEPS.map((s, i) => (
@@ -539,6 +542,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                 <p className="esc-story">Das erste Schloss ist ein Rätsel-Panel. Zeig, dass du Parabeln in Scheitelform lesen kannst.</p>
                 <CheckCard
                   title="a) Scheitelpunkt ablesen"
+                  rechnen={false}
                   prompt={
                     <p>
                       Gib den Scheitelpunkt der Parabel <M>{'f(x) = (x - 3)^2 + 2'}</M> an. Halte deinen Gedanken schriftlich fest.
@@ -566,6 +570,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                 />
                 <CheckCard
                   title="b) Hoch- oder Tiefpunkt?"
+                  rechnen={false}
                   level="standard"
                   prompt={
                     <p>
@@ -624,6 +629,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                 <div className="lp-ex bk-panel">
                   <CardHead title="Versuch 1: Wertetabelle" level="basis" />
                   <p>Füllt die Tabelle zu zweit aus. Die Felder färben sich von selbst grün oder rot. Welche Werte kommen doppelt vor?</p>
+                  <HeftHinweis><strong>Im Heft:</strong> Rechne die Tabellenwerte mit Rechenweg in deinem Heft aus. Trage dann nur die Ergebnisse ein.</HeftHinweis>
                   <QuerTabelle
                     rows={[
                       { head: 'x', cells: [0, 1, 2, 3, 4, 5, 6].map((x) => <strong key={x}>{x}</strong>) },
@@ -658,7 +664,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="standard"
                   prompt={
                     <p>
-                      Die Punkte <M>{'(0 \\mid 5)'}</M> und <M>{'(?\\mid 5)'}</M> liegen auf gleicher Höhe. Bestimmt damit den Scheitelpunkt von <M>{'f(x) = x^2 - 6x + 5'}</M>. Haltet den Gedanken schriftlich fest.
+                      Die Punkte <M>{'(0 \\mid 5)'}</M> und <M>{'(?\\mid 5)'}</M> liegen auf gleicher Höhe. Bestimmt damit den Scheitelpunkt von <M>{'f(x) = x^2 - 6x + 5'}</M>.
                     </p>
                   }
                   fieldsRow
@@ -752,7 +758,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="standard"
                   prompt={
                     <p>
-                      Bestimmt den Scheitelpunkt-x-Wert von <M>{'f(x) = 2x^2 - 20x + 5'}</M>. Lest <M>a</M> und <M>b</M> ab und setzt in die Formel ein. Haltet den Rechenweg schriftlich fest.
+                      Bestimmt den Scheitelpunkt-x-Wert von <M>{'f(x) = 2x^2 - 20x + 5'}</M>. Lest <M>a</M> und <M>b</M> ab und setzt in die Formel ein.
                     </p>
                   }
                   fieldsRow
@@ -777,7 +783,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="erweiterung"
                   prompt={
                     <p>
-                      Für welches <M>b</M> liegt der Scheitelpunkt von <M>{'f(x) = x^2 + bx + 1'}</M> bei <M>{'x_S = 3'}</M>? Wie groß ist dann <M>{'y_S'}</M>? Haltet den Rechenweg schriftlich fest.
+                      Für welches <M>b</M> liegt der Scheitelpunkt von <M>{'f(x) = x^2 + bx + 1'}</M> bei <M>{'x_S = 3'}</M>? Wie groß ist dann <M>{'y_S'}</M>?
                     </p>
                   }
                   fieldsRow
@@ -795,9 +801,12 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                 <CodeLock
                   index={3}
                   task={
-                    <p>
-                      Schloss 3 verlangt Teil 3 des Codes: die <strong>x-Koordinate des Scheitelpunkts</strong> von <M>{'f(x) = 2x^2 - 20x + 5'}</M>.
-                    </p>
+                    <>
+                      <p>
+                        Schloss 3 verlangt Teil 3 des Codes: die <strong>x-Koordinate des Scheitelpunkts</strong> von <M>{'f(x) = 2x^2 - 20x + 5'}</M>.
+                      </p>
+                      <HeftHinweis />
+                    </>
                   }
                   expected={5}
                   solved={digits[2]}
@@ -818,7 +827,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   title="Höchster Punkt des Strahls"
                   prompt={
                     <p>
-                      Strahl: <M>{'h(x) = -0{,}4x^2 + 2{,}8x + 1'}</M>. Berechnet den höchsten Punkt (<M>x_S</M> und <M>y_S</M>). Haltet den Rechenweg schriftlich fest.
+                      Strahl: <M>{'h(x) = -0{,}4x^2 + 2{,}8x + 1'}</M>. Berechnet den höchsten Punkt (<M>x_S</M> und <M>y_S</M>).
                     </p>
                   }
                   fieldsRow
@@ -954,6 +963,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
               <div className="lp-exlist">
                 <McCard
                   title="Check 1: Welcher Scheitelpunkt stimmt?"
+                  rechnen
                   level="basis"
                   prompt={
                     <p>
@@ -969,6 +979,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                 />
                 <McCard
                   title="Check 2: Wer hat recht?"
+                  rechnen
                   level="standard"
                   prompt={
                     <p>
@@ -987,7 +998,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="erweiterung"
                   prompt={
                     <p>
-                      Eine Parabel hat den Scheitelpunkt <M>{'S(2 \\mid 1)'}</M> und die Form <M>{'f(x) = x^2 + bx + c'}</M>. Bestimme <M>b</M> und <M>c</M>. Halte den Rechenweg schriftlich fest.
+                      Eine Parabel hat den Scheitelpunkt <M>{'S(2 \\mid 1)'}</M> und die Form <M>{'f(x) = x^2 + bx + c'}</M>. Bestimme <M>b</M> und <M>c</M>.
                     </p>
                   }
                   fieldsRow

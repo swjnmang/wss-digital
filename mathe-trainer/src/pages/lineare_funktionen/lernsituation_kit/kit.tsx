@@ -35,6 +35,33 @@ export const tx = (v: number, d = 3) => fmt(v, d).replace(/\./g, '').replace(','
 
 export const PRAISE = ['Super, richtig! 🎉', 'Klasse, genau so!', 'Stark, richtig gelöst! 💪', 'Perfekt, das stimmt!', 'Richtig! Weiter so!']
 
+/* ── Arbeiten im Heft ─────────────────────────────────────────────────────── */
+// Alles, was gerechnet wird, rechnen die SuS von Hand im Heft (Rechenweg und Ergebnis). Das Tablet dient nur zur Kontrolle.
+// Rechen-Karten zeigen dafür automatisch den Heft-Hinweis; Karten ohne Rechnung (Regler, Ablesen, Auswählen) bekommen rechnen={false}.
+
+/** Arbeitsregel oben auf jeder Lernsituation */
+export function Arbeitsweise() {
+  return (
+    <div className="ls-arbeitsweise">
+      <i className="fa-solid fa-pen-to-square" aria-hidden="true" />
+      <div>
+        <strong>So arbeitest du:</strong> Alles, was du rechnest, rechnest du von Hand in deinem Heft, mit Rechenweg und Ergebnis. Erst dann trägst du das Ergebnis hier ein.
+        Das Tablet nutzt du nur, um dein Ergebnis zu überprüfen. Beim Erkunden mit Reglern und Bildern musst du nichts aufschreiben.
+      </div>
+    </div>
+  )
+}
+
+/** Hinweis an einer Rechenaufgabe: erst im Heft rechnen, dann eintragen */
+export function HeftHinweis({ children }: { children?: ReactNode }) {
+  return (
+    <p className="ls-heft">
+      <i className="fa-solid fa-pen" aria-hidden="true" />
+      <span>{children ?? <><strong>Im Heft:</strong> Rechenweg und Ergebnis aufschreiben. Dann das Ergebnis hier eintragen und prüfen.</>}</span>
+    </p>
+  )
+}
+
 /* ── Kleine Bausteine ────────────────────────────────────────────────────── */
 
 export type Social = 'EA' | 'PA' | 'GA' | 'Plenum'
@@ -127,6 +154,7 @@ export function CheckCard({
   fieldsRow = false,
   solution,
   help,
+  rechnen = true,
   tracking = NO_TRACKING,
 }: {
   title: ReactNode
@@ -140,6 +168,8 @@ export function CheckCard({
   solution?: ReactNode
   /** Gestufte Hilfekarten unter der Aufgabe */
   help?: ReactNode
+  /** Rechenaufgabe: Heft-Hinweis anzeigen (aus bei Ablesen, Ordnen, Auswählen) */
+  rechnen?: boolean
   tracking?: Tracking
 }) {
   const uid = useId()
@@ -174,6 +204,7 @@ export function CheckCard({
     <div className="lp-ex bk-panel">
       <CardHead title={title} level={level} />
       <div className="lp-ex-prompt">{prompt}</div>
+      {rechnen && <HeftHinweis />}
       <div className={`ls-fields ${fieldsRow || lead ? 'ls-fields-row' : ''}`}>
         {lead && <div className="ls-lead">{lead}</div>}
         {fields.map((f) => (
@@ -268,7 +299,22 @@ export function Feedback({ status, praise, wrongText }: { status: 'idle' | 'ok' 
 type McOption = { text: ReactNode; correct?: boolean; feedback: ReactNode }
 
 /** Auswahlaufgabe; jede falsche Antwort steht für eine typische Fehlvorstellung und bekommt eine eigene Rückmeldung. */
-export function McCard({ title, level, prompt, options, tracking = NO_TRACKING }: { title: ReactNode; level?: Level; prompt: ReactNode; options: McOption[]; tracking?: Tracking }) {
+export function McCard({
+  title,
+  level,
+  prompt,
+  options,
+  rechnen = false,
+  tracking = NO_TRACKING,
+}: {
+  title: ReactNode
+  level?: Level
+  prompt: ReactNode
+  options: McOption[]
+  /** Auswahl erst nach einer Rechnung: Heft-Hinweis anzeigen */
+  rechnen?: boolean
+  tracking?: Tracking
+}) {
   const uid = useId()
   const [choice, setChoice] = useState<number | null>(null)
   const [status, setStatus] = useState<'idle' | 'ok' | 'no' | 'empty'>('idle')
@@ -287,6 +333,11 @@ export function McCard({ title, level, prompt, options, tracking = NO_TRACKING }
     <div className="lp-ex bk-panel">
       <CardHead title={title} level={level} />
       <div className="lp-ex-prompt">{prompt}</div>
+      {rechnen && (
+        <HeftHinweis>
+          <strong>Im Heft:</strong> Erst selbst mit Rechenweg rechnen, dann die passende Antwort auswählen.
+        </HeftHinweis>
+      )}
       <div className="ls-options" role="radiogroup">
         {options.map((o, i) => (
           <label key={i} className={`bk-choice ls-option ${choice === i ? fieldCheckClass(mark) : ''}`}>

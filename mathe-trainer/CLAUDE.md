@@ -57,3 +57,9 @@ nicht nur auf einen Feature-Branch. Vorher `main` aktualisieren und mergen, kein
 Hat eine Übungsseite eine Einstiegs-Lernsituation (Karte „Lernsituation“ in der Auswahl), heißt der Bereich darunter mit den
 Schwierigkeitsgraden immer **„Übungsaufgaben“** (nicht „Wähle deinen Schwierigkeitsgrad“). Das gilt für alle Seiten des Mathe-Trainers,
 auch für künftige. Die Scheitelform wird als `f(x) = (x − x_S)² + y_S` geschrieben, nicht mit d und e.
+
+Rechnen in Lernsituationen: Alles, was gerechnet wird, rechnen die SuS von Hand im Heft (Rechenweg und Ergebnis), das Tablet dient
+nur zur Kontrolle. Dafür jede Lernsituation mit `<Arbeitsweise />` (nach dem Lernziel) beginnen und die Bausteine aus
+`lineare_funktionen/lernsituation_kit/kit.tsx` nutzen: `CheckCard` zeigt den Heft-Hinweis automatisch (bei Ablesen, Ordnen,
+Auswählen ohne Rechnung `rechnen={false}`), `McCard` nach einer Rechnung mit `rechnen`, Tabellen zum Ausrechnen mit `<HeftHinweis>`.
+Regler und Erkunden brauchen keinen Rechenweg. Keine zusätzlichen Sätze „Halte deinen Rechenweg schriftlich fest“ in die Aufgaben schreiben.

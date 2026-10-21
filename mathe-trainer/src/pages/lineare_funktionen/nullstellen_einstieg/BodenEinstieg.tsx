@@ -3,7 +3,7 @@ import TaskShell from '../../../components/layout/TaskShell'
 import CheckedNumberInput from '../../../components/CheckedNumberInput'
 import { Beispiel, M, MB, Merke, QuerTabelle, fmt } from '../../daten_und_zufall/lernpfad/kit'
 import {
-  CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, Phase, TrackedCheck, TrackedMc, tx,
+  Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, HeftHinweis, Hilfen, McCard, Phase, TrackedCheck, TrackedMc, tx,
 } from '../lernsituation_kit/kit'
 
 // Einstiegs-Lernsituation „Welche Gerade erreicht den Boden zuerst?“ zu den Nullstellen linearer Funktionen.
@@ -176,6 +176,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
             Nullstelle.
           </div>
         </div>
+        <Arbeitsweise />
 
         {/* 1 Aktivieren */}
         <Phase no={1} title="Fit für den Start" social="EA" minutes={5}>
@@ -185,7 +186,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               title="a) y-Wert berechnen"
               prompt={
                 <p>
-                  Berechne den y-Wert der Geraden <M>{'g(x) = -0{,}5x + 1{,}5'}</M> an der Stelle <M>{'x = 2'}</M>. Halte deinen Rechenweg schriftlich fest.
+                  Berechne den y-Wert der Geraden <M>{'g(x) = -0{,}5x + 1{,}5'}</M> an der Stelle <M>{'x = 2'}</M>.
                 </p>
               }
               fields={[{ kind: 'num', key: 'y', label: <M>{'g(2) ='}</M>, expected: 0.5 }]}
@@ -193,7 +194,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
             />
             <CheckCard
               title="b) Gleichung lösen"
-              prompt={<p>Löse die gegebene Gleichung nach <M>x</M> auf. Halte deinen Rechenweg schriftlich fest.</p>}
+              prompt={<p>Löse die gegebene Gleichung nach <M>x</M> auf.</p>}
               lead={<M>{'2x + 6 = 14 \\qquad \\Rightarrow'}</M>}
               fields={[{ kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 4 }]}
               solution={<MB>{'\\begin{aligned} 2x + 6 &= 14 && \\mid -6 \\\\ 2x &= 8 && \\mid :2 \\\\ x &= 4 \\end{aligned}'}</MB>}
@@ -214,7 +215,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
             />
             <CheckCard
               title="d) Gleichung lösen"
-              prompt={<p>Löse die gegebene Gleichung nach <M>x</M> auf. Halte deinen Rechenweg schriftlich fest.</p>}
+              prompt={<p>Löse die gegebene Gleichung nach <M>x</M> auf.</p>}
               lead={<M>{'-2x + 10 = 4 \\qquad \\Rightarrow'}</M>}
               fields={[{ kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 3 }]}
               solution={<MB>{'\\begin{aligned} -2x + 10 &= 4 && \\mid -10 \\\\ -2x &= -6 && \\mid :(-2) \\\\ x &= 3 \\end{aligned}'}</MB>}
@@ -321,6 +322,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
             <div className="lp-ex-prompt">
               <p>Wie hoch liegt jede Gerade an diesen Stellen über dem Boden? Füllt die Tabelle aus. Die Felder färben sich von selbst grün oder rot. Negative Werte heißen: unter dem Boden.</p>
             </div>
+            <HeftHinweis><strong>Im Heft:</strong> Rechne die Tabellenwerte mit Rechenweg in deinem Heft aus. Trage dann nur die Ergebnisse ein.</HeftHinweis>
             <QuerTabelle
               rows={[
                 { head: 'x', cells: TABLE_X.map((x) => <strong key={x}>{x}</strong>) },
@@ -348,6 +350,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
 
           <CheckCard
             title="Euer Ergebnis"
+            rechnen={false}
             prompt={<p>Egal, welchen Weg ihr genommen habt: Tragt euer Ergebnis ein und haltet eure Rechenwege oder Ablesungen schriftlich fest.</p>}
             fields={[
               { kind: 'num', key: 'xg', label: <>Gerade g berührt den Boden bei <M>x</M> =</>, expected: NG },
@@ -360,6 +363,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
 
           <CheckCard
             title="Zusatzfrage: Über und unter dem Boden"
+            rechnen={false}
             level="erweiterung"
             prompt={
               <>
@@ -560,7 +564,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               level="basis"
               prompt={
                 <>
-                  <p>Berechne die Nullstelle der Geraden <M>{'p(x) = 3x - 12'}</M>. Fülle die Lücken der Rechnung aus und halte deinen Rechenweg schriftlich fest.</p>
+                  <p>Berechne die Nullstelle der Geraden <M>{'p(x) = 3x - 12'}</M>. Fülle die Lücken der Rechnung aus.</p>
                   <MB>{'\\begin{aligned} 3x - 12 &= 0 && \\mid +12 \\\\ 3x &= \\;\\fbox{?} && \\mid :3 \\\\ x &= \\;\\fbox{?} \\end{aligned}'}</MB>
                 </>
               }
@@ -595,8 +599,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               prompt={
                 <>
                   <p>
-                    Eine Gerade geht durch die Punkte <M>{'A(0 \\mid 6)'}</M> und <M>{'B(2 \\mid 2)'}</M>. Stelle die Funktionsgleichung auf und berechne die Nullstelle. Halte deine
-                    Rechenwege schriftlich fest.
+                    Eine Gerade geht durch die Punkte <M>{'A(0 \\mid 6)'}</M> und <M>{'B(2 \\mid 2)'}</M>. Stelle die Funktionsgleichung auf und berechne die Nullstelle.
                   </p>
                 </>
               }
@@ -633,7 +636,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               level="erweiterung"
               prompt={
                 <p>
-                  Die Gerade <M>{'k(x) = -0{,}5x + t'}</M> soll den Boden bei <M>{'x = 5'}</M> berühren. Welchen Wert muss <M>t</M> haben? Halte deine Rechenwege schriftlich fest.
+                  Die Gerade <M>{'k(x) = -0{,}5x + t'}</M> soll den Boden bei <M>{'x = 5'}</M> berühren. Welchen Wert muss <M>t</M> haben?
                 </p>
               }
               fields={[{ kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 2.5 }]}
@@ -682,10 +685,11 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
             <TrackedMc
               topic="Nullstellen-Einstieg: Berechnen (Standard)"
               title="Check 2: Nullstelle berechnen"
+              rechnen
               level="standard"
               prompt={
                 <>
-                  <p>Berechne die Nullstelle. Halte deinen Rechenweg schriftlich fest und wähle dann die richtige Antwort aus.</p>
+                  <p>Berechne die Nullstelle. Wähle dann die richtige Antwort aus.</p>
                   <MB>{'f(x) = -3x + 12'}</MB>
                 </>
               }
@@ -702,7 +706,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               level="erweiterung"
               prompt={
                 <>
-                  <p>Berechne die Nullstelle der Geraden. Halte deinen Rechenweg schriftlich fest.</p>
+                  <p>Berechne die Nullstelle der Geraden.</p>
                   <MB>{'k(x) = 0{,}25x - 1{,}5'}</MB>
                 </>
               }

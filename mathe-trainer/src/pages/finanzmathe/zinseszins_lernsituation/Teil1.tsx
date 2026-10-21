@@ -2,7 +2,7 @@ import { useState } from 'react'
 import CheckedNumberInput from '../../../components/CheckedNumberInput'
 import { VideoEmbed } from '../../../components/VideoButton'
 import { Beispiel, M, MB, Merke, fmt } from '../../daten_und_zufall/lernpfad/kit'
-import { CardHead, CheckCard, Hilfen, McCard, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Arbeitsweise, CardHead, CheckCard, HeftHinweis, Hilfen, McCard, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
 import { Chat, Festlegung, Frage, Kriterien, Msg, Stopp, WachstumGraph, Wege, eur, eurTex, kn, knEinfach } from './shared'
 
 // Teil 1 (ca. 90 min) der Einstiegs-Lernsituation „Wer hat nach 10 Jahren mehr?“ zum Zinseszins: das Endkapital K_n.
@@ -107,6 +107,7 @@ export default function Teil1() {
           <M>{'K_n'}</M> mit der Zinseszinsformel.
         </div>
       </div>
+      <Arbeitsweise />
 
       {/* 1 Aktivieren */}
       <Phase no={1} title="Fit für den Start" social="EA" minutes={10}>
@@ -117,7 +118,7 @@ export default function Teil1() {
             level="basis"
             prompt={
               <p>
-                Ein Kapital von <M>{'5000\\text{ €}'}</M> wird mit <M>{'3\\,\\%'}</M> pro Jahr verzinst. Wie viel Zinsen gibt es für ein Jahr? Halte deinen Rechenweg schriftlich fest.
+                Ein Kapital von <M>{'5000\\text{ €}'}</M> wird mit <M>{'3\\,\\%'}</M> pro Jahr verzinst. Wie viel Zinsen gibt es für ein Jahr?
               </p>
             }
             fields={[{ kind: 'num', key: 'z', label: <M>{'Z ='}</M>, expected: 150, unit: '€' }]}
@@ -155,6 +156,7 @@ export default function Teil1() {
           />
           <McCard
             title="d) Kapital nach einem Jahr"
+            rechnen
             level="standard"
             prompt={
               <p>
@@ -224,6 +226,7 @@ export default function Teil1() {
         </p>
         <div className="lp-ex bk-panel">
           <CardHead title="Aufgabe 1: Die ersten 5 Jahre" level="basis" />
+          <HeftHinweis><strong>Im Heft:</strong> Rechne die Tabellenwerte mit Rechenweg in deinem Heft aus. Trage dann nur die Ergebnisse ein.</HeftHinweis>
           <TabellenKarte />
           <Hilfen
             steps={[
@@ -244,7 +247,6 @@ export default function Teil1() {
             <>
               <p>
                 Wie viel Geld haben Jonas und Mira nach <strong>10 Jahren</strong> jeweils insgesamt? Rechne mit dem Taschenrechner weiter, aber überlege dir einen möglichst schnellen Weg.
-                Halte deinen Rechenweg schriftlich fest.
               </p>
             </>
           }
@@ -525,6 +527,7 @@ export default function Teil1() {
           />
           <McCard
             title="Check 2: Wer hat recht?"
+            rechnen
             level="standard"
             prompt={
               <p>
@@ -544,7 +547,7 @@ export default function Teil1() {
             level="standard"
             prompt={
               <p>
-                Lena legt <M>{'3500\\text{ €}'}</M> für 8 Jahre zu <M>{'2{,}5\\,\\%'}</M> an. Die Zinsen bleiben auf dem Konto. Wie viel Geld hat sie am Ende? Halte deinen Rechenweg schriftlich fest.
+                Lena legt <M>{'3500\\text{ €}'}</M> für 8 Jahre zu <M>{'2{,}5\\,\\%'}</M> an. Die Zinsen bleiben auf dem Konto. Wie viel Geld hat sie am Ende?
               </p>
             }
             fields={[{ kind: 'num', key: 'k', label: <M>{'K_8 ='}</M>, expected: kn(3500, 2.5, 8), unit: '€', tol: 0.05 }]}
