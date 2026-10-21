@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { BlockMath, InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import TaskShell from '../../components/layout/TaskShell'
@@ -33,8 +33,8 @@ const TYPEN: Record<Modus, Aufgabe['typ'][]> = {
 };
 const LOB = ['Super, alles richtig!', 'Sehr gut gemacht!', 'Top, perfekt gerechnet!', 'Stark, das stimmt alles!', 'Klasse Arbeit!'];
 // Lernvideos je Fall (Fall 3 = gemischt hat kein eigenes Video)
-const LERNVIDEO_FALL1 = 'xgiAK3rLCow';
-const LERNVIDEO_FALL2 = 'hg9QipwqXxI';
+export const LERNVIDEO_FALL1 = 'xgiAK3rLCow';
+export const LERNVIDEO_FALL2 = 'hg9QipwqXxI';
 const GLEICHUNGSSYSTEME_PFAD = '/lineare_funktionen/gleichungssysteme?verfahren=addieren';
 
 const BEISPIEL_SCHEITEL: ScheitelAufgabe = { typ: 'scheitel', a: 1, b: -4, c: 3, h: 2, k: -1, px: 4, py: 3 };
@@ -462,7 +462,7 @@ const Voraussetzung = () => (
     </div>
 );
 
-const ErklaerungFall1 = () => (
+export const ErklaerungFall1 = () => (
     <div className="border border-gray-200 rounded-xl p-5">
         <h2 className="text-xl font-semibold text-gray-800 mb-2">Fall 1: Scheitelpunkt und ein weiterer Punkt</h2>
         <p className="text-gray-700 mb-3">
@@ -479,7 +479,7 @@ const ErklaerungFall1 = () => (
     </div>
 );
 
-const ErklaerungFall2 = () => (
+export const ErklaerungFall2 = () => (
     <div className="border border-gray-200 rounded-xl p-5">
         <h2 className="text-xl font-semibold text-gray-800 mb-2">Fall 2: Ein Wert (a, b oder c) und zwei Punkte</h2>
         <p className="text-gray-700 mb-3">
@@ -504,7 +504,7 @@ const ErklaerungFall2 = () => (
     </div>
 );
 
-const Lernvideo = ({ id, fall }: { id: string; fall: string }) => (
+export const Lernvideo = ({ id, fall }: { id: string; fall: string }) => (
     <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-800 mb-3">Lernvideo zu {fall}</h2>
         {id ? (
@@ -530,8 +530,13 @@ const Lernvideo = ({ id, fall }: { id: string; fall: string }) => (
 );
 
 // ---------- Seite ----------
+// Startfall über die URL wählbar, z. B. ?fall=punkte (Weiter-Button der Lernsituation 2)
+const istModus = (v: string | null): v is Modus => v === 'scheitel' || v === 'punkte' || v === 'gemischt';
+
 const FunktionsgleichungAufstellen = () => {
-    const [modus, setModus] = useState<Modus>('scheitel');
+    const [params] = useSearchParams();
+    const startModus = params.get('fall');
+    const [modus, setModus] = useState<Modus>(istModus(startModus) ? startModus : 'scheitel');
     const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
     const [eingaben, setEingaben] = useState<Eingabe[]>(leereEingaben());
     const [tippSchritte, setTippSchritte] = useState<number[]>(Array(ANZAHL_AUFGABEN).fill(0));
@@ -543,7 +548,7 @@ const FunktionsgleichungAufstellen = () => {
     };
 
     useEffect(() => {
-        neueAufgaben('scheitel');
+        neueAufgaben(modus);
     }, []);
 
     const wechsleModus = (m: Modus) => {
@@ -561,7 +566,11 @@ const FunktionsgleichungAufstellen = () => {
     };
 
     return (
-        <TaskShell title="Funktionsgleichung aufstellen" width="wide">
+        <TaskShell
+            title="Funktionsgleichung aufstellen üben"
+            width="wide"
+            parent={{ to: '/quadratische_funktionen/funktionsgleichung_aufstellen', label: 'Funktionsgleichung aufstellen' }}
+        >
         <div className="container">
             <div className="bk-panel max-w-7xl w-full mx-auto text-left">
                 <p className="text-gray-700 mb-6">
