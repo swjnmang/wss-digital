@@ -14,8 +14,8 @@ import './werkstatt.css'
 // meldet für linken Pfosten, Mitte und rechten Pfosten, ob die Höhe stimmt. Nach drei Versuchen kommt die Erkenntnis: Raten reicht nicht.
 // Die Versuche ersetzen die Festlegung und werden in Phase 4 wieder aufgegriffen.
 // Vier feste Phasen (lernsituation_kit/phasen.tsx): Warm-up (drei Abrufaufgaben, je eine pro Rechenschritt) → Problem erkennen
-// (Auftrag, Gegeben/Gesucht, Biegemaschine) → Problem lösen (eine Lückenrechnung durch die drei Schritte,
-// dann Austausch) → Festhalten und Prüfen (Merke, Musterbeispiel, Spickzettel, drei Checks).
+// (Auftrag, Gegeben/Gesucht, Biegemaschine) → Problem lösen (Aufgabe mit Graph nur mit S und P, Rechenbeispiel mit anderen Zahlen,
+// dann eigene Lückenrechnung: Scheitelform, dann allgemeine Form) → Festhalten und Prüfen (Merke, Spickzettel, drei Checks).
 // Aha: Durch Raten trifft man die Gleichung kaum, mit Scheitelpunkt und einem weiteren Punkt lässt sie sich sicher berechnen.
 // Fehlerhafte Azubi-Pläne kommen erst im Check, wenn die SuS den Weg selbst gerechnet haben.
 // Die Versuche an der Maschine bleiben nur im Seitenzustand (kein Speichern).
@@ -93,11 +93,10 @@ const kurve = (f: (x: number) => number, von: number, bis: number) =>
 
 const SOLL_BOGEN = kurve(bogen(A_SOLL), 0, 4)
 
-/** Skizze der Einfahrt; f = Parabel (z. B. vom Regler) über die gestrichelte Skizze legen */
 type Kurve = { f: (x: number) => number; farbe: string; breite: number }
 
-/** Skizze der Einfahrt; kurven = Parabeln (z. B. Versuche an der Maschine) über die gestrichelte Skizze legen */
-function TorBild({ kurven = [] }: { kurven?: Kurve[] }) {
+/** Skizze der Einfahrt; kurven = Parabeln (z. B. Versuche an der Maschine) über die gestrichelte Skizze legen; nurP = ohne rechten Pfosten Q */
+function TorBild({ kurven = [], nurP = false }: { kurven?: Kurve[]; nurP?: boolean }) {
   const clip = useId().replace(/[^a-zA-Z0-9]/g, '')
   return (
     <div className="bk-graph ls-graph">
@@ -126,7 +125,7 @@ function TorBild({ kurven = [] }: { kurven?: Kurve[] }) {
         <rect x={bx(S.xMin)} y={by(0)} width={bx(S.xMax) - bx(S.xMin)} height={by(S.yMin) - by(0)} fill="var(--surface-sunken)" />
         <line x1={bx(S.xMin)} x2={bx(S.xMax)} y1={by(0)} y2={by(0)} stroke="var(--ink)" strokeWidth="3" />
         <line x1={bx(0)} x2={bx(0)} y1={by(S.yMin)} y2={by(S.yMax)} stroke="var(--ink)" strokeWidth="1.5" />
-        {[0, 4].map((x) => (
+        {(nurP ? [0] : [0, 4]).map((x) => (
           <rect key={x} x={bx(x) - 7} y={by(2)} width="14" height={by(0) - by(2)} fill="var(--ink-muted)" stroke="var(--ink)" strokeWidth="2" />
         ))}
         <polyline points={SOLL_BOGEN} fill="none" stroke="var(--ink)" strokeWidth="3" strokeDasharray="8 6" />
@@ -145,10 +144,14 @@ function TorBild({ kurven = [] }: { kurven?: Kurve[] }) {
         <text x={bx(0) - 12} y={by(2) - 22} textAnchor="end" fontSize="18" fontWeight="700" fill="var(--ink)">
           P(0 | 2)
         </text>
-        <circle cx={bx(4)} cy={by(2)} r="7" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
-        <text x={bx(4) + 12} y={by(2) - 22} fontSize="18" fontWeight="700" fill="var(--ink)">
-          Q(4 | 2)
-        </text>
+        {!nurP && (
+          <>
+            <circle cx={bx(4)} cy={by(2)} r="7" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
+            <text x={bx(4) + 12} y={by(2) - 22} fontSize="18" fontWeight="700" fill="var(--ink)">
+              Q(4 | 2)
+            </text>
+          </>
+        )}
         <text x={bx(S.xMax) - 4} y={by(0) - 8} textAnchor="end" fontSize="14" fill="var(--ink-muted)">
           Boden (x in m)
         </text>
@@ -382,35 +385,105 @@ export default function TorbogenEinstieg({
           <Etappe
             prefix="tb"
             art="loesen"
-            minutes={20}
-            was={<>Zu zweit aus dem Scheitelpunkt und dem Pfosten die Funktionsgleichung berechnen. Danach vergleicht ihr eure Wege mit der Klasse.</>}
+            social="EA"
+            minutes={18}
+            was={<>Die Funktionsgleichung des Torbogens erst in Scheitelform und dann in allgemeiner Form aufstellen. Zuerst siehst du an einem Rechenbeispiel, wie das geht.</>}
             wozu={<>So stellst du die Gleichung jeder Parabel auf, von der du den Scheitelpunkt und einen weiteren Punkt kennst.</>}
           >
-            <Teil title="Die Gleichung für die Biegemaschine" social="PA" minutes={16}>
+            <Teil title="Deine Aufgabe">
+              <div className="tb-problem">
+                <div className="tb-problem-title">
+                  <i className="fa-solid fa-bullseye" aria-hidden="true" /> Stelle die Funktionsgleichung auf
+                </div>
+                <p>
+                  Gegeben sind der Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> und der Pfosten <M>{'P(0 \\mid 2)'}</M>. Stelle die Funktionsgleichung zuerst in <strong>Scheitelform</strong>{' '}
+                  <M>{'y = a(x - x_S)^2 + y_S'}</M> und anschließend in <strong>allgemeiner Form</strong> <M>{'y = ax^2 + bx + c'}</M> auf.
+                </p>
+                <p>Wie das funktioniert, siehst du am Rechenbeispiel darunter. Führe danach die Berechnung selbst für deine Werte durch.</p>
+              </div>
+              <TorBild nurP />
+            </Teil>
+
+            <Teil title="So geht's: Rechenbeispiel mit anderen Zahlen">
+              <Beispiel
+                offen
+                title="Scheitelpunkt S(−1 | 5) und Punkt P(1 | 3)"
+                aufgabe={
+                  <p>
+                    Eine Parabel hat den Scheitelpunkt <M>{'S(-1 \\mid 5)'}</M> und geht durch den Punkt <M>{'P(1 \\mid 3)'}</M>. Stelle die Funktionsgleichung in Scheitelform und in
+                    allgemeiner Form auf.
+                  </p>
+                }
+                steps={[
+                  {
+                    title: 'Scheitelpunkt in die Scheitelform einsetzen',
+                    body: (
+                      <>
+                        <p>
+                          Setze <M>{'x_S = -1'}</M> und <M>{'y_S = 5'}</M> ein. Negative Zahlen immer in Klammern setzen:
+                        </p>
+                        <MB>{'\\begin{aligned} y &= a(x - x_S)^2 + y_S \\\\ y &= a(x - (-1))^2 + 5 \\\\ y &= a(x + 1)^2 + 5 \\end{aligned}'}</MB>
+                      </>
+                    ),
+                  },
+                  {
+                    title: 'Punkt einsetzen und a berechnen',
+                    body: (
+                      <>
+                        <p>
+                          Setze <M>{'P(1 \\mid 3)'}</M> ein, also <M>{'x = 1'}</M> und <M>{'y = 3'}</M>, und löse nach <M>a</M> auf:
+                        </p>
+                        <MB>{'\\begin{aligned} 3 &= a \\cdot (1 + 1)^2 + 5 \\\\ 3 &= a \\cdot 2^2 + 5 \\\\ 3 &= 4a + 5 && \\mid -5 \\\\ -2 &= 4a && \\mid :4 \\\\ a &= -0{,}5 \\end{aligned}'}</MB>
+                      </>
+                    ),
+                  },
+                  {
+                    title: 'Funktionsgleichung in Scheitelform angeben',
+                    body: (
+                      <>
+                        <p>
+                          Setze <M>{'a = -0{,}5'}</M> in den Ansatz aus Schritt 1 ein:
+                        </p>
+                        <MB>{'y = -0{,}5(x + 1)^2 + 5'}</MB>
+                      </>
+                    ),
+                  },
+                  {
+                    title: 'In die allgemeine Form umwandeln',
+                    body: (
+                      <>
+                        <p>
+                          Löse die Klammer auf, multipliziere dann <strong>jeden</strong> Summanden mit <M>a</M> (Punkt vor Strich) und fasse zusammen:
+                        </p>
+                        <MB>{'\\begin{aligned} y &= -0{,}5 \\cdot (x + 1)^2 + 5 \\\\ y &= -0{,}5 \\cdot [(x + 1) \\cdot (x + 1)] + 5 \\\\ y &= -0{,}5 \\cdot [x^2 + 2x + 1] + 5 \\\\ y &= -0{,}5x^2 - x - 0{,}5 + 5 \\\\ y &= -0{,}5x^2 - x + 4{,}5 \\end{aligned}'}</MB>
+                      </>
+                    ),
+                  },
+                ]}
+              />
+              <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
+            </Teil>
+
+            <Teil title="Jetzt du: die Gleichung für die Biegemaschine">
               <CheckCard
-                title="Stellt die Funktionsgleichung auf"
+                title="Stelle die Funktionsgleichung auf"
                 prompt={
-                  <>
-                    <p>
-                      <strong>Gegeben:</strong> Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> und Pfosten <M>{'P(0 \\mid 2)'}</M>. <strong>Gesucht:</strong> <M>{'y = ax^2 + bx + c'}</M>.
-                    </p>
-                    <p>
-                      Rechnet in drei Schritten. Jede Person tippt auf dem eigenen Gerät, ihr besprecht jeden Schritt kurz. Füllt die Lücken aus.
-                    </p>
-                  </>
+                  <p>
+                    Gegeben: <M>{'S(2 \\mid 3)'}</M> und <M>{'P(0 \\mid 2)'}</M>. Rechne in den Schritten des Rechenbeispiels und fülle die Lücken aus.
+                  </p>
                 }
                 rechnung={[
                   { l: ['y'], r: ['a \\cdot (x -', { luecke: 'xs' }, ')^2 +', { luecke: 'ys' }], u: '\\text{① Scheitelpunkt einsetzen}' },
                   { l: ['2'], r: ['a \\cdot (0 - 2)^2 + 3'], u: '\\text{② Punkt P einsetzen}' },
                   { l: ['2'], r: [{ luecke: 'q' }, '\\cdot a + 3'] },
-                  { l: ['a'], r: [{ luecke: 'a' }] },
-                  { l: ['y'], r: [{ luecke: 'a2' }, 'x^2 +', { luecke: 'b' }, 'x +', { luecke: 'c' }], u: '\\text{③ umwandeln}' },
+                  { l: ['y'], r: [{ luecke: 'as' }, '\\cdot (x - 2)^2 + 3'], u: '\\text{③ Scheitelform}' },
+                  { l: ['y'], r: [{ luecke: 'a2' }, 'x^2 +', { luecke: 'b' }, 'x +', { luecke: 'c' }], u: '\\text{④ allgemeine Form}' },
                 ]}
                 fields={[
                   { kind: 'num', key: 'xs', label: 'x-Wert des Scheitels', expected: 2 },
                   { kind: 'num', key: 'ys', label: 'y-Wert des Scheitels', expected: 3 },
                   { kind: 'num', key: 'q', label: 'Zahl vor a', expected: 4 },
-                  { kind: 'num', key: 'a', label: 'a', expected: A_SOLL },
+                  { kind: 'num', key: 'as', label: 'a in der Scheitelform', expected: A_SOLL },
                   { kind: 'num', key: 'a2', label: 'Zahl vor x²', expected: A_SOLL },
                   { kind: 'num', key: 'b', label: 'Zahl vor x', expected: 1 },
                   { kind: 'num', key: 'c', label: 'Zahl ohne x', expected: 2 },
@@ -421,22 +494,20 @@ export default function TorbogenEinstieg({
                     <MB>{'y = a(x - 2)^2 + 3'}</MB>
                     <p>② Pfosten P einsetzen (x = 0, y = 2) und nach a auflösen:</p>
                     <MB>{'\\begin{aligned} 2 &= a \\cdot (0 - 2)^2 + 3 \\\\ 2 &= 4a + 3 && \\mid -3 \\\\ -1 &= 4a && \\mid :4 \\\\ a &= -0{,}25 \\end{aligned}'}</MB>
-                    <p>③ In die allgemeine Form umwandeln:</p>
-                    <MB>{'\\begin{aligned} y &= -0{,}25(x - 2)^2 + 3 \\\\ &= -0{,}25(x^2 - 4x + 4) + 3 \\\\ &= -0{,}25x^2 + x - 1 + 3 \\\\ &= -0{,}25x^2 + x + 2 \\end{aligned}'}</MB>
-                    <p>
-                      Probe mit dem rechten Pfosten <M>{'x = 4'}</M>: <M>{'y = -0{,}25 \\cdot 16 + 4 + 2 = 2'}</M> ✓
-                    </p>
+                    <p>③ Scheitelform:</p>
+                    <MB>{'y = -0{,}25(x - 2)^2 + 3'}</MB>
+                    <p>④ In die allgemeine Form umwandeln:</p>
+                    <MB>{'\\begin{aligned} y &= -0{,}25 \\cdot [(x - 2) \\cdot (x - 2)] + 3 \\\\ y &= -0{,}25 \\cdot [x^2 - 4x + 4] + 3 \\\\ y &= -0{,}25x^2 + x - 1 + 3 \\\\ y &= -0{,}25x^2 + x + 2 \\end{aligned}'}</MB>
                   </>
                 }
                 help={
                   <Hilfen
                     steps={[
                       <>
-                        Beginnt mit der Scheitelform <M>{'y = a(x - x_S)^2 + y_S'}</M>. Was gehört für <M>{'x_S'}</M> und <M>{'y_S'}</M> hinein? Dann fehlt nur noch <M>a</M>.
+                        Schau im Rechenbeispiel bei Schritt 1: Setze <M>{'x_S = 2'}</M> und <M>{'y_S = 3'}</M> in <M>{'y = a(x - x_S)^2 + y_S'}</M> ein.
                       </>,
                       <>
-                        Der Bogen geht durch den Pfosten <M>{'P(0 \\mid 2)'}</M>. Setzt <M>{'x = 0'}</M> und <M>{'y = 2'}</M> ein. Achtung: <M>{'(-2)^2 = 4'}</M>, ein Quadrat ist nie
-                        negativ. Dann wie beim Warm-up nach a auflösen.
+                        Setze den Pfosten ein: <M>{'x = 0'}</M> und <M>{'y = 2'}</M>. Achtung: <M>{'(-2)^2 = 4'}</M>, ein Quadrat ist nie negativ. Dann wie beim Warm-up nach a auflösen.
                       </>,
                       <>
                         Mit <M>{'a = -0{,}25'}</M>: <M>{'(x - 2)^2 = x^2 - 4x + 4'}</M>. Jetzt jeden der drei Summanden mit <M>{'-0{,}25'}</M> multiplizieren und + 3 dazurechnen.
@@ -445,40 +516,6 @@ export default function TorbogenEinstieg({
                   />
                 }
               />
-            </Teil>
-            <Teil title="Vergleicht eure Wege" social="Plenum" minutes={4}>
-              <div className="ls-stop">
-                <div className="ls-stop-title">
-                  <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
-                </div>
-                <ul>
-                  <li>Wie seid ihr an a gekommen? Warum braucht man dafür den Punkt P und nicht nur den Scheitelpunkt?</li>
-                  <li>Woran erkennt man schon vor dem Rechnen, dass a beim Torbogen negativ sein muss?</li>
-                </ul>
-              </div>
-              <p>
-                <strong>Du arbeitest allein?</strong> So haben zwei andere Azubis gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
-              </p>
-              <div className="ls-ways">
-                <details className="ls-way">
-                  <summary>Leon hat a ausprobiert</summary>
-                  <div className="ls-way-body">
-                    <p>„Ich habe für a verschiedene Zahlen eingesetzt, bis am Pfosten 2 herauskam. Bei −0,25 hat es gepasst.“</p>
-                    <p>
-                      <strong>Gut:</strong> Das Ergebnis stimmt. <strong>Aber:</strong> Bei krummen Maßen probiert man ewig, und eine Biegemaschine braucht exakte Werte.
-                    </p>
-                  </div>
-                </details>
-                <details className="ls-way">
-                  <summary>Sophie hat gerechnet</summary>
-                  <div className="ls-way-body">
-                    <p>„Der Bogen muss durch P(0 | 2). Also habe ich x = 0 und y = 2 eingesetzt: 2 = 4a + 3, also a = −0,25. Die Probe mit Q(4 | 2) hat auch gepasst.“</p>
-                    <p>
-                      <strong>Gut:</strong> Genau und schnell, egal wie krumm die Zahlen sind. <strong>Aber:</strong> Man muss beim Quadrat aufpassen: <M>{'(-2)^2'}</M> ist 4, nicht −4.
-                    </p>
-                  </div>
-                </details>
-              </div>
             </Teil>
           </Etappe>
 
@@ -514,53 +551,6 @@ export default function TorbogenEinstieg({
                   </li>
                 </ol>
               </Merke>
-              <div className="lp-ex bk-panel">
-                <CardHead title="Musterbeispiel mit anderen Zahlen" />
-              <Beispiel
-                title="Andere Zahlen: S(−1 | 5) und P(1 | 3)"
-                aufgabe={
-                  <p>
-                    Eine Parabel hat den Scheitelpunkt <M>{'S(-1 \\mid 5)'}</M> und geht durch <M>{'P(1 \\mid 3)'}</M>. Bestimme die Gleichung in allgemeiner Form.
-                  </p>
-                }
-                steps={[
-                  {
-                    title: 'Scheitelpunkt einsetzen',
-                    body: (
-                      <>
-                        <p>
-                          Setze <M>{'x_S = -1'}</M> und <M>{'y_S = 5'}</M> in die Scheitelform ein. Negative Zahlen immer in Klammern setzen:
-                        </p>
-                        <MB>{'\\begin{aligned} y &= a(x - x_S)^2 + y_S \\\\ y &= a(x - (-1))^2 + 5 \\\\ y &= a(x + 1)^2 + 5 \\end{aligned}'}</MB>
-                      </>
-                    ),
-                  },
-                  {
-                    title: 'Punkt einsetzen und a berechnen',
-                    body: (
-                      <>
-                        <p>
-                          Setze <M>{'P(1 \\mid 3)'}</M> in <M>{'y = a(x + 1)^2 + 5'}</M> ein, also <M>{'x = 1'}</M> und <M>{'y = 3'}</M>:
-                        </p>
-                        <MB>{'\\begin{aligned} 3 &= a \\cdot (1 + 1)^2 + 5 \\\\ 3 &= a \\cdot 2^2 + 5 \\\\ 3 &= 4a + 5 && \\mid -5 \\\\ -2 &= 4a && \\mid :4 \\\\ a &= -0{,}5 \\end{aligned}'}</MB>
-                      </>
-                    ),
-                  },
-                  {
-                    title: 'Umwandeln',
-                    body: (
-                      <>
-                        <p>
-                          Setze <M>{'a = -0{,}5'}</M> in die Scheitelform ein. Löse die Klammer auf, multipliziere dann <strong>jeden</strong> Summanden mit <M>a</M> (Punkt vor Strich) und fasse zusammen:
-                        </p>
-                        <MB>{'\\begin{aligned} y &= -0{,}5 \\cdot (x + 1)^2 + 5 \\\\ y &= -0{,}5 \\cdot [(x + 1) \\cdot (x + 1)] + 5 \\\\ y &= -0{,}5 \\cdot [x^2 + 2x + 1] + 5 \\\\ y &= -0{,}5x^2 - x - 0{,}5 + 5 \\\\ y &= -0{,}5x^2 - x + 4{,}5 \\end{aligned}'}</MB>
-                      </>
-                    ),
-                  },
-                ]}
-              />
-                <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
-              </div>
               <div className="lp-ex bk-panel">
                 <CardHead title="Dein Spickzettel (Lernprodukt)" />
                 <p>Gestalte eine Karteikarte „Gleichung aus dem Scheitelpunkt aufstellen“. Sie darf genau eine Karteikarte füllen. Hake ab, was du schon hast:</p>

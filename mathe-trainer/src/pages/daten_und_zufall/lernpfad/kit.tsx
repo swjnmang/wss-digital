@@ -240,8 +240,9 @@ export function Achtung({ items }: { items: ReactNode[] }) {
 }
 
 /** Musterbeispiel: Aufgabe sichtbar, Lösungsschritte nacheinander aufdecken */
-export function Beispiel({ title, aufgabe, steps }: { title: string; aufgabe: ReactNode; steps: { title: string; body: ReactNode }[] }) {
-  const [shown, setShown] = useState(0)
+/** Ausgearbeitetes Beispiel; offen = alle Schritte gleich sichtbar statt Schritt für Schritt aufdecken */
+export function Beispiel({ title, aufgabe, steps, offen = false }: { title: string; aufgabe: ReactNode; steps: { title: string; body: ReactNode }[]; offen?: boolean }) {
+  const [shown, setShown] = useState(offen ? steps.length : 0)
   return (
     <div className="lp-example">
       <div className="lp-example-title">
