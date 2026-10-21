@@ -49,7 +49,7 @@ function TabellenKarte() {
               {jahre.map((j) => (
                 <tr key={j}>
                   <td>{j}</td>
-                  <td>{eur(mira(j - 1))}</td>
+                  <td>{j === 1 ? eur(K0) : <Feld expected={mira(j - 1)} />}</td>
                   <td>
                     <Feld expected={mira(j - 1) * 0.03} />
                   </td>
@@ -78,7 +78,7 @@ function TabellenKarte() {
               {jahre.map((j) => (
                 <tr key={j}>
                   <td>{j}</td>
-                  <td>{eur(K0)}</td>
+                  <td>{j === 1 ? eur(K0) : <Feld expected={K0} />}</td>
                   <td>
                     <Feld expected={Z * j} />
                   </td>
@@ -219,8 +219,8 @@ export default function Teil1() {
       {/* 3 Eigene Denkarbeit */}
       <Phase no={3} title="Jahr für Jahr nachrechnen" social="EA" minutes={20}>
         <p>
-          Rechne zuerst allein. Beide haben <M>{'5000\\text{ €}'}</M> bei <M>{'3\\,\\%'}</M>. Miras Zinsen werden im Folgejahr mitverzinst, Jonas’ Zinsen nicht. Rechne die Zinsen jedes Jahres aus
-          und trage die Werte ein. Die Felder werden grün, wenn sie stimmen (Rundung auf Cent).
+          Rechne zuerst allein. Beide haben <M>{'5000\\text{ €}'}</M> bei <M>{'3\\,\\%'}</M>. Miras Zinsen werden im Folgejahr mitverzinst, Jonas’ Zinsen nicht. Nur das Startkapital ist vorgegeben. Rechne die Zinsen jedes Jahres aus
+          und trage alle Werte selbst ein. Die Felder werden grün, wenn sie stimmen (Rundung auf Cent).
         </p>
         <div className="lp-ex bk-panel">
           <CardHead title="Aufgabe 1: Die ersten 5 Jahre" level="basis" />
