@@ -241,11 +241,11 @@ function SymmetrieLabor() {
     <div className="lp-ex bk-panel">
       <div className="lp-ex-prompt">
         <p>
-          Das ist die Parabel <M>{'f(x) = x^2 - 6x + 5'}</M>. Zieht die Linie mit dem Regler auf verschiedene Höhen. Die beiden roten Punkte liegen auf der <strong>gleichen Höhe</strong>.
+          Das ist die Parabel <M>{'y = x^2 - 6x + 5'}</M>. Zieht die Linie mit dem Regler auf verschiedene Höhen. Die beiden roten Punkte liegen auf der <strong>gleichen Höhe</strong>.
           Wo liegt ihre Mitte?
         </p>
       </div>
-      <Diagramm f={symF} xMin={-1} xMax={7} yMin={-5} yMax={6} label="Parabel f(x) = x² − 6x + 5 mit waagerechter Linie und zwei Punkten gleicher Höhe">
+      <Diagramm f={symF} xMin={-1} xMax={7} yMin={-5} yMax={6} label="Parabel y = x² − 6x + 5 mit waagerechter Linie und zwei Punkten gleicher Höhe">
         {(bx, by) => (
           <>
             <line x1={bx(-1)} x2={bx(7)} y1={by(h)} y2={by(h)} stroke="var(--hint)" strokeWidth="3" strokeDasharray="10 5" />
@@ -277,9 +277,9 @@ function SymmetrieLabor() {
 /* ── Merkkarte (Lernprodukt) ─────────────────────────────────────────────── */
 
 const SCHRITTE = [
-  'a, b und c aus f(x) = ax² + bx + c ablesen',
+  'a, b und c aus y = ax² + bx + c ablesen',
   'x_S mit der Formel berechnen',
-  'x_S in f(x) einsetzen und y_S berechnen',
+  'x_S in die Funktionsgleichung einsetzen und y_S berechnen',
   'Scheitelpunkt S(x_S | y_S) angeben',
 ]
 
@@ -336,7 +336,7 @@ function Merkkarte() {
         <label className="ls-label" htmlFor="esc-beispiel">
           Mein Beispiel (Funktion, x_S, y_S, Scheitelpunkt)
         </label>
-        <textarea id="esc-beispiel" className="bk-input esc-textarea" value={beispiel} onChange={(e) => setBeispiel(e.target.value)} placeholder="z. B. f(x) = x² − 10x + 3 …" />
+        <textarea id="esc-beispiel" className="bk-input esc-textarea" value={beispiel} onChange={(e) => setBeispiel(e.target.value)} placeholder="z. B. y = x² − 10x + 3 …" />
         <label className="ls-label" htmlFor="esc-symmetrie">
           Warum liegt der Scheitelpunkt in der Mitte zwischen zwei Punkten gleicher Höhe?
         </label>
@@ -353,7 +353,7 @@ function Merkkarte() {
         <h3 className="esc-karte-title">
           <i className="fa-solid fa-note-sticky" aria-hidden="true" /> Merkkarte: Scheitelpunkt aus der allgemeinen Form
         </h3>
-        <MB>{'f(x) = ax^2 + bx + c \\qquad x_S = -\\frac{b}{2a} \\qquad y_S = f(x_S)'}</MB>
+        <MB>{'y = ax^2 + bx + c \\qquad x_S = -\\frac{b}{2a} \\qquad y_S\\text{: } x_S \\text{ einsetzen}'}</MB>
         <ol>
           {[0, 1, 2, 3].map((i) => (
             <li key={i}>{[SCHRITTE[0], SCHRITTE[1], SCHRITTE[2], SCHRITTE[3]][i]}</li>
@@ -485,7 +485,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   Der Brunnen spritzt aus der Düse (1 m hoch) in ein Becken, dessen Rand 7 m entfernt ebenfalls 1 m hoch ist. Der Wasserstrahl ist eine Parabel mit
                   <strong>
                     {' '}
-                    <M>{'h(x) = -0{,}4x^2 + 2{,}8x + 1'}</M>
+                    <M>{'y = -0{,}4x^2 + 2{,}8x + 1'}</M>
                   </strong>{' '}
                   (<M>x</M> und <M>h</M> in Metern).
                 </p>
@@ -545,7 +545,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   rechnen={false}
                   prompt={
                     <p>
-                      Gib den Scheitelpunkt der Parabel <M>{'f(x) = (x - 3)^2 + 2'}</M> an. Halte deinen Gedanken schriftlich fest.
+                      Gib den Scheitelpunkt der Parabel <M>{'y = (x - 3)^2 + 2'}</M> an. Halte deinen Gedanken schriftlich fest.
                     </p>
                   }
                   fieldsRow
@@ -555,7 +555,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   ]}
                   solution={
                     <p>
-                      In der Scheitelform <M>{'f(x) = (x - x_S)^2 + y_S'}</M> ist <M>{'S(x_S \\mid y_S)'}</M>. Hier ist <M>{'x_S = 3'}</M> und <M>{'y_S = 2'}</M>, also <M>{'S(3 \\mid 2)'}</M>.
+                      In der Scheitelform <M>{'y = (x - x_S)^2 + y_S'}</M> ist <M>{'S(x_S \\mid y_S)'}</M>. Hier ist <M>{'x_S = 3'}</M> und <M>{'y_S = 2'}</M>, also <M>{'S(3 \\mid 2)'}</M>.
                     </p>
                   }
                   help={
@@ -574,7 +574,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="standard"
                   prompt={
                     <p>
-                      Gib den Scheitelpunkt von <M>{'g(x) = -(x + 1)^2 + 4'}</M> an und entscheide, ob er ein Hoch- oder Tiefpunkt ist.
+                      Gib den Scheitelpunkt von <M>{'y = -(x + 1)^2 + 4'}</M> an und entscheide, ob er ein Hoch- oder Tiefpunkt ist.
                     </p>
                   }
                   fieldsRow
@@ -595,7 +595,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="standard"
                   prompt={
                     <p>
-                      Das nächste Display zeigt <M>{'f(x) = x^2 - 6x + 5'}</M> und verlangt den Scheitelpunkt. Welche Aussage stimmt?
+                      Das nächste Display zeigt <M>{'y = x^2 - 6x + 5'}</M> und verlangt den Scheitelpunkt. Welche Aussage stimmt?
                     </p>
                   }
                   options={[
@@ -625,7 +625,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
           <div hidden={hide(2)}>
             <Phase no={2} title="Raum 2: Die Mitte der Parabel" social="PA" minutes={10}>
               <Raum no={2} title="Punkte gleicher Höhe">
-                <p className="esc-story">Im Lager steht eine Werkbank mit einer Parabel-Schablone, <M>{'f(x) = x^2 - 6x + 5'}</M>. Zu zweit findet ihr heraus, wie sich ihr Scheitelpunkt versteckt.</p>
+                <p className="esc-story">Im Lager steht eine Werkbank mit einer Parabel-Schablone, <M>{'y = x^2 - 6x + 5'}</M>. Zu zweit findet ihr heraus, wie sich ihr Scheitelpunkt versteckt.</p>
                 <div className="lp-ex bk-panel">
                   <CardHead title="Versuch 1: Wertetabelle" level="basis" />
                   <p>Füllt die Tabelle zu zweit aus. Die Felder färben sich von selbst grün oder rot. Welche Werte kommen doppelt vor?</p>
@@ -633,7 +633,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   <QuerTabelle
                     rows={[
                       { head: 'x', cells: [0, 1, 2, 3, 4, 5, 6].map((x) => <strong key={x}>{x}</strong>) },
-                      { head: <M>{'f(x)'}</M>, cells: [0, 1, 2, 3, 4, 5, 6].map((x) => feld(symF(x), x)) },
+                      { head: <M>y</M>, cells: [0, 1, 2, 3, 4, 5, 6].map((x) => feld(symF(x), x)) },
                     ]}
                   />
                   <Hilfen
@@ -664,7 +664,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="standard"
                   prompt={
                     <p>
-                      Die Punkte <M>{'(0 \\mid 5)'}</M> und <M>{'(?\\mid 5)'}</M> liegen auf gleicher Höhe. Bestimmt damit den Scheitelpunkt von <M>{'f(x) = x^2 - 6x + 5'}</M>.
+                      Die Punkte <M>{'(0 \\mid 5)'}</M> und <M>{'(?\\mid 5)'}</M> liegen auf gleicher Höhe. Bestimmt damit den Scheitelpunkt von <M>{'y = x^2 - 6x + 5'}</M>.
                     </p>
                   }
                   fieldsRow
@@ -676,7 +676,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   solution={
                     <>
                       <p>Auf der Höhe 5 liegen die Punkte bei <M>{'x = 0'}</M> und <M>{'x = 6'}</M>. Ihre Mitte ist der Scheitel:</p>
-                      <MB>{'x_S = \\frac{0 + 6}{2} = 3 \\qquad y_S = f(3) = 9 - 18 + 5 = -4'}</MB>
+                      <MB>{'x_S = \\frac{0 + 6}{2} = 3 \\qquad y_S = 9 - 18 + 5 = -4'}</MB>
                     </>
                   }
                   help={
@@ -684,7 +684,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                       steps={[
                         <>Auf welcher Höhe liegt der Punkt bei <M>{'x = 0'}</M>? Welchen zweiten x-Wert hat die Tabelle auf derselben Höhe?</>,
                         <>Der Scheitelpunkt liegt in der Mitte zwischen diesen beiden x-Werten. Danach setzt du das <M>{'x_S'}</M> in die Funktion ein.</>,
-                        <><M>{'x_S = \\frac{0 + 6}{2} = 3'}</M>. Rechne nun <M>{'f(3)'}</M> aus.</>,
+                        <><M>{'x_S = \\frac{0 + 6}{2} = 3'}</M>. Setze nun <M>{'x = 3'}</M> ein und berechne <M>y</M>.</>,
                       ]}
                     />
                   }
@@ -693,7 +693,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   index={2}
                   task={
                     <p>
-                      Schloss 2 verlangt Teil 2 des Codes: die <strong>x-Koordinate des Scheitelpunkts</strong> von <M>{'f(x) = x^2 - 6x + 5'}</M>.
+                      Schloss 2 verlangt Teil 2 des Codes: die <strong>x-Koordinate des Scheitelpunkts</strong> von <M>{'y = x^2 - 6x + 5'}</M>.
                     </p>
                   }
                   expected={3}
@@ -713,7 +713,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                 <div className="lp-ex bk-panel">
                   <CardHead title="Versuch 3: Punkte auf der Höhe von x = 0" level="standard" />
                   <p>
-                    Bei <M>{'f(x) = x^2 + bx + c'}</M> liegt der Punkt bei <M>x = 0</M> auf der Höhe <M>c</M>. Es gibt einen zweiten Punkt auf dieser Höhe. Berechnet ihn und den Scheitelpunkt-x-Wert in der Tabelle. Vergleicht danach <M>b</M> und <M>{'x_S'}</M>.
+                    Bei <M>{'y = x^2 + bx + c'}</M> liegt der Punkt bei <M>x = 0</M> auf der Höhe <M>c</M>. Es gibt einen zweiten Punkt auf dieser Höhe. Berechnet ihn und den Scheitelpunkt-x-Wert in der Tabelle. Vergleicht danach <M>b</M> und <M>{'x_S'}</M>.
                   </p>
                   <QuerTabelle
                     rows={[
@@ -749,7 +749,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   </p>
                   <MB>{'x_S = \\frac{0 + \\left(-\\frac{b}{a}\\right)}{2} = -\\frac{b}{2a}'}</MB>
                   <p>
-                    Danach rechnest du <M>{'y_S = f(x_S)'}</M>. Die Zahl <M>c</M> bewirkt nur, dass die Parabel höher oder tiefer liegt.
+                    Danach setzt du <M>{'x_S'}</M> in die Gleichung ein und erhältst <M>{'y_S'}</M>. Die Zahl <M>c</M> bewirkt nur, dass die Parabel höher oder tiefer liegt.
                   </p>
                   <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
                 </div>
@@ -758,7 +758,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="standard"
                   prompt={
                     <p>
-                      Bestimmt den Scheitelpunkt-x-Wert von <M>{'f(x) = 2x^2 - 20x + 5'}</M>. Lest <M>a</M> und <M>b</M> ab und setzt in die Formel ein.
+                      Bestimmt den Scheitelpunkt-x-Wert von <M>{'y = 2x^2 - 20x + 5'}</M>. Lest <M>a</M> und <M>b</M> ab und setzt in die Formel ein.
                     </p>
                   }
                   fieldsRow
@@ -783,7 +783,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="erweiterung"
                   prompt={
                     <p>
-                      Für welches <M>b</M> liegt der Scheitelpunkt von <M>{'f(x) = x^2 + bx + 1'}</M> bei <M>{'x_S = 3'}</M>? Wie groß ist dann <M>{'y_S'}</M>?
+                      Für welches <M>b</M> liegt der Scheitelpunkt von <M>{'y = x^2 + bx + 1'}</M> bei <M>{'x_S = 3'}</M>? Wie groß ist dann <M>{'y_S'}</M>?
                     </p>
                   }
                   fieldsRow
@@ -794,7 +794,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   solution={
                     <>
                       <MB>{'3 = -\\frac{b}{2 \\cdot 1} \\Rightarrow b = -6'}</MB>
-                      <MB>{'f(x) = x^2 - 6x + 1 \\qquad y_S = f(3) = 9 - 18 + 1 = -8'}</MB>
+                      <MB>{'y = x^2 - 6x + 1 \\qquad y_S = 9 - 18 + 1 = -8'}</MB>
                     </>
                   }
                 />
@@ -803,7 +803,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   task={
                     <>
                       <p>
-                        Schloss 3 verlangt Teil 3 des Codes: die <strong>x-Koordinate des Scheitelpunkts</strong> von <M>{'f(x) = 2x^2 - 20x + 5'}</M>.
+                        Schloss 3 verlangt Teil 3 des Codes: die <strong>x-Koordinate des Scheitelpunkts</strong> von <M>{'y = 2x^2 - 20x + 5'}</M>.
                       </p>
                       <HeftHinweis />
                     </>
@@ -827,7 +827,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   title="Höchster Punkt des Strahls"
                   prompt={
                     <p>
-                      Strahl: <M>{'h(x) = -0{,}4x^2 + 2{,}8x + 1'}</M>. Berechnet den höchsten Punkt (<M>x_S</M> und <M>y_S</M>).
+                      Strahl: <M>{'y = -0{,}4x^2 + 2{,}8x + 1'}</M>. Berechnet den höchsten Punkt (<M>x_S</M> und <M>y_S</M>).
                     </p>
                   }
                   fieldsRow
@@ -839,7 +839,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                     <>
                       <p>Es ist <M>{'a = -0{,}4'}</M>, <M>{'b = 2{,}8'}</M> und <M>{'c = 1'}</M>.</p>
                       <MB>{'x_S = -\\frac{2{,}8}{2 \\cdot (-0{,}4)} = -\\frac{2{,}8}{-0{,}8} = 3{,}5'}</MB>
-                      <MB>{'y_S = h(3{,}5) = -0{,}4 \\cdot 12{,}25 + 2{,}8 \\cdot 3{,}5 + 1 = -4{,}9 + 9{,}8 + 1 = 5{,}9'}</MB>
+                      <MB>{'y_S = -0{,}4 \\cdot 12{,}25 + 2{,}8 \\cdot 3{,}5 + 1 = -4{,}9 + 9{,}8 + 1 = 5{,}9'}</MB>
                       <p>Der höchste Punkt ist <M>{'S(3{,}5 \\mid 5{,}9)'}</M>.</p>
                     </>
                   }
@@ -847,7 +847,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                     <Hilfen
                       steps={[
                         <>Welche Zahlen sind <M>a</M>, <M>b</M> und <M>c</M> in <M>{'-0{,}4x^2 + 2{,}8x + 1'}</M>?</>,
-                        <>Rechne zuerst <M>{'x_S = -\\frac{b}{2a}'}</M>, dann setze das Ergebnis in <M>h(x)</M> ein.</>,
+                        <>Rechne zuerst <M>{'x_S = -\\frac{b}{2a}'}</M>, dann setze das Ergebnis in die Gleichung ein.</>,
                         <>Im Nenner steht <M>{'2 \\cdot (-0{,}4) = -0{,}8'}</M>. Das Minus vor dem Bruch und das Minus im Nenner heben sich auf. Für <M>{'y_S'}</M> rechnest du <M>{'3{,}5^2 = 12{,}25'}</M>.</>,
                       ]}
                     />
@@ -918,7 +918,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   <details className="ls-way">
                     <summary>Mira hat die Formel genutzt</summary>
                     <div className="ls-way-body">
-                      <p>„Ich habe a = −0,4 und b = 2,8 abgelesen und x_S = −b/(2a) = 3,5 gerechnet. Dann h(3,5) = 5,9.“</p>
+                      <p>„Ich habe a = −0,4 und b = 2,8 abgelesen und x_S = −b/(2a) = 3,5 gerechnet. Dann x = 3,5 eingesetzt: y = 5,9.“</p>
                       <p>
                         <strong>Gut:</strong> Klappt bei jeder Parabel in allgemeiner Form. <strong>Aber:</strong> Man muss auf die Vorzeichen achten.
                       </p>
@@ -935,20 +935,20 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
             <Phase no={6} title="Das hältst du fest: Merkkarte" social="PA" minutes={6}>
               <Merke title="Scheitelpunkt aus der allgemeinen Form">
                 <p>
-                  Zu <M>{'f(x) = ax^2 + bx + c'}</M> gehört der Scheitelpunkt <M>{'S(x_S \\mid y_S)'}</M> mit
+                  Zu <M>{'y = ax^2 + bx + c'}</M> gehört der Scheitelpunkt <M>{'S(x_S \\mid y_S)'}</M> mit
                 </p>
-                <MB>{'x_S = -\\frac{b}{2a} \\qquad y_S = f(x_S)'}</MB>
+                <MB>{'x_S = -\\frac{b}{2a} \\qquad y_S\\text{: } x_S \\text{ einsetzen}'}</MB>
                 <p>
                   Der Scheitelpunkt liegt in der Mitte zwischen zwei Punkten gleicher Höhe. Ist <M>{'a > 0'}</M>, ist S der tiefste Punkt, ist <M>{'a < 0'}</M>, der höchste.
                 </p>
               </Merke>
               <Beispiel
                 title="Beispiel aus Raum 4"
-                aufgabe={<p>Berechne den höchsten Punkt von <M>{'h(x) = -0{,}4x^2 + 2{,}8x + 1'}</M>.</p>}
+                aufgabe={<p>Berechne den höchsten Punkt von <M>{'y = -0{,}4x^2 + 2{,}8x + 1'}</M>.</p>}
                 steps={[
                   { title: 'a, b, c ablesen', body: <MB>{'a = -0{,}4 \\qquad b = 2{,}8 \\qquad c = 1'}</MB> },
                   { title: 'x_S berechnen', body: <MB>{'x_S = -\\frac{b}{2a} = -\\frac{2{,}8}{2 \\cdot (-0{,}4)} = 3{,}5'}</MB> },
-                  { title: 'y_S berechnen', body: <MB>{'y_S = h(3{,}5) = -0{,}4 \\cdot 3{,}5^2 + 2{,}8 \\cdot 3{,}5 + 1 = 5{,}9'}</MB> },
+                  { title: 'y_S berechnen', body: <MB>{'y_S = -0{,}4 \\cdot 3{,}5^2 + 2{,}8 \\cdot 3{,}5 + 1 = 5{,}9'}</MB> },
                   { title: 'Antwort', body: <MB>{'S(3{,}5 \\mid 5{,}9)'}</MB> },
                 ]}
               />
@@ -967,14 +967,14 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="basis"
                   prompt={
                     <p>
-                      Berechne den Scheitelpunkt von <M>{'f(x) = 2x^2 - 8x + 3'}</M>.
+                      Berechne den Scheitelpunkt von <M>{'y = 2x^2 - 8x + 3'}</M>.
                     </p>
                   }
                   options={[
-                    { text: 'S(2 | −5)', correct: true, feedback: 'x_S = 8 / 4 = 2 und y_S = f(2) = 8 − 16 + 3 = −5.' },
+                    { text: 'S(2 | −5)', correct: true, feedback: 'x_S = 8 / 4 = 2 und y_S = 8 − 16 + 3 = −5.' },
                     { text: 'S(−2 | 27)', feedback: 'Das Vorzeichen von b wurde nicht umgedreht. Es gilt x_S = −b/(2a) = −(−8)/4 = 2.' },
                     { text: 'S(4 | 3)', feedback: 'Hier wurde durch a statt durch 2a geteilt. Der Nenner ist 2 · 2 = 4.' },
-                    { text: 'S(2 | 3)', feedback: 'Der x-Wert stimmt, aber y_S ist nicht c. Setze x_S = 2 in f(x) ein.' },
+                    { text: 'S(2 | 3)', feedback: 'Der x-Wert stimmt, aber y_S ist nicht c. Setze x_S = 2 in die Gleichung ein.' },
                   ]}
                 />
                 <McCard
@@ -983,7 +983,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="standard"
                   prompt={
                     <p>
-                      Mia sagt: „Bei <M>{'f(x) = x^2 + 6x + 2'}</M> liegt der Scheitelpunkt bei <M>{'x_S = 3'}</M>.“ Leon sagt: „Nein, bei <M>{'x_S = -3'}</M>.“ Rechne nach und entscheide.
+                      Mia sagt: „Bei <M>{'y = x^2 + 6x + 2'}</M> liegt der Scheitelpunkt bei <M>{'x_S = 3'}</M>.“ Leon sagt: „Nein, bei <M>{'x_S = -3'}</M>.“ Rechne nach und entscheide.
                     </p>
                   }
                   options={[
@@ -998,7 +998,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   level="erweiterung"
                   prompt={
                     <p>
-                      Eine Parabel hat den Scheitelpunkt <M>{'S(2 \\mid 1)'}</M> und die Form <M>{'f(x) = x^2 + bx + c'}</M>. Bestimme <M>b</M> und <M>c</M>.
+                      Eine Parabel hat den Scheitelpunkt <M>{'S(2 \\mid 1)'}</M> und die Form <M>{'y = x^2 + bx + c'}</M>. Bestimme <M>b</M> und <M>c</M>.
                     </p>
                   }
                   fieldsRow
@@ -1009,15 +1009,15 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                   solution={
                     <>
                       <MB>{'2 = -\\frac{b}{2 \\cdot 1} \\Rightarrow b = -4'}</MB>
-                      <MB>{'f(2) = 4 - 8 + c = 1 \\Rightarrow c = 5'}</MB>
+                      <MB>{'x = 2: \\quad y = 4 - 8 + c = 1 \\Rightarrow c = 5'}</MB>
                     </>
                   }
                   help={
                     <Hilfen
                       steps={[
                         <>Du kennst x_S. Welche Formel verbindet x_S und b?</>,
-                        <>Setze x_S = 2 und a = 1 in die Formel ein und löse nach b auf. Danach brauchst du noch f(2) = 1.</>,
-                        <>Mit b = −4 gilt <M>{'f(2) = 2^2 - 4 \\cdot 2 + c = 1'}</M>. Löse nach c auf.</>,
+                        <>Setze x_S = 2 und a = 1 in die Formel ein und löse nach b auf. Danach setzt du den Scheitelpunkt ein: Bei x = 2 muss y = 1 herauskommen.</>,
+                        <>Mit b = −4 gilt <M>{'y = 2^2 - 4 \\cdot 2 + c = 1'}</M>. Löse nach c auf.</>,
                       ]}
                     />
                   }

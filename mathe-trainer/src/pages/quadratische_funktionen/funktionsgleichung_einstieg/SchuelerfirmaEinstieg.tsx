@@ -16,7 +16,7 @@ import './teamchat.css'
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
-// Gewinn in € bei x verkauften Hoodies: G(x) = −0,5x² + 30x − 200 (Fixkosten 200 €, G(20) = G(40) = 200, G(60) = −200, Maximum G(30) = 250)
+// Gewinn y in € bei x verkauften Hoodies: y = −0,5x² + 30x − 200 (Fixkosten 200 €, bei 20 und 40 Hoodies 200 €, bei 60 Hoodies −200 €, Maximum 250 € bei 30)
 const G = (x: number) => -0.5 * x * x + 30 * x - 200
 const G60 = G(60)
 
@@ -243,7 +243,7 @@ export default function SchuelerfirmaEinstieg({
                   Wer mehr Hoodies verkaufen will, muss sie billiger anbieten. Darum steigt der Gewinn nicht einfach immer weiter. Man kann ihn mit einer Parabel beschreiben:
                 </p>
                 <p>
-                  <M>{'G(x) = ax^2 + bx + c'}</M> mit <M>x</M> = Anzahl verkaufter Hoodies und <M>{'G(x)'}</M> = Gewinn in €.
+                  <M>{'y = ax^2 + bx + c'}</M> mit <M>x</M> = Anzahl verkaufter Hoodies und <M>y</M> = Gewinn in €.
                 </p>
                 <p>Die Fixkosten für Siebdruckrahmen und Standmiete sind jedes Jahr 200 €. Die fallen auch an, wenn ihr keinen einzigen Hoodie verkauft.</p>
               </Nachricht>
@@ -253,7 +253,7 @@ export default function SchuelerfirmaEinstieg({
             </Chat>
             <Tabelle
               head={['verkaufte Hoodies x', '0', '20', '40', '60']}
-              rows={[['Gewinn G(x) in €', '−200', '200', '200', '?']]}
+              rows={[['Gewinn y in €', '−200', '200', '200', '?']]}
             />
             <div className="ls-question">
               <i className="fa-solid fa-circle-question" aria-hidden="true" />
@@ -312,8 +312,8 @@ export default function SchuelerfirmaEinstieg({
           {/* 3 Gleichungen aufstellen */}
           <Phase no={3} title="Was wissen wir über die Parabel?" social="PA" minutes={10}>
             <p>
-              <strong>Auftrag:</strong> Um <M>{'G(60)'}</M> auszurechnen, braucht ihr die Gleichung der Parabel. Den Scheitelpunkt kennt ihr diesmal nicht. Ihr wisst aber: Bei 0
-              Hoodies bleibt nur der Verlust der Fixkosten, also <M>{'G(0) = -200'}</M>. Und ihr kennt zwei Punkte der Parabel: <M>{'(20 \\mid 200)'}</M> und <M>{'(40 \\mid 200)'}</M>.
+              <strong>Auftrag:</strong> Um den Gewinn bei 60 Hoodies auszurechnen, braucht ihr die Gleichung der Parabel. Den Scheitelpunkt kennt ihr diesmal nicht. Ihr wisst aber: Bei 0
+              Hoodies bleibt nur der Verlust der Fixkosten, also ist bei <M>{'x = 0'}</M> der Gewinn <M>{'y = -200'}</M>. Und ihr kennt zwei Punkte der Parabel: <M>{'(20 \\mid 200)'}</M> und <M>{'(40 \\mid 200)'}</M>.
             </p>
             <div className="lp-exlist">
               <McCard
@@ -321,14 +321,14 @@ export default function SchuelerfirmaEinstieg({
                 level="basis"
                 prompt={
                   <p>
-                    Setzt <M>{'x = 0'}</M> in <M>{'G(x) = ax^2 + bx + c'}</M> ein. Was folgt aus <M>{'G(0) = -200'}</M>?
+                    Setzt <M>{'x = 0'}</M> in <M>{'y = ax^2 + bx + c'}</M> ein. Was folgt daraus, dass dann <M>{'y = -200'}</M> herauskommt?
                   </p>
                 }
                 options={[
-                  { text: 'c = −200', correct: true, feedback: 'G(0) = a · 0 + b · 0 + c = c. Die Gleichung heißt also G(x) = ax² + bx − 200.' },
+                  { text: 'c = −200', correct: true, feedback: 'Mit x = 0 wird y = a · 0 + b · 0 + c = c. Die Gleichung heißt also y = ax² + bx − 200.' },
                   { text: 'c = 200', feedback: 'Die 200 € sind Kosten. Ohne verkauften Hoodie ist der Gewinn negativ: −200 €.' },
                   { text: 'a = −200', feedback: 'Bei x = 0 fallen a · 0² und b · 0 weg. Übrig bleibt nur c.' },
-                  { text: 'Man kann c noch nicht bestimmen.', feedback: 'Doch: Setzt man x = 0 ein, bleibt nur c übrig, also c = G(0) = −200.' },
+                  { text: 'Man kann c noch nicht bestimmen.', feedback: 'Doch: Setzt man x = 0 ein, bleibt nur c übrig, also c = −200.' },
                 ]}
               />
               <McCard
@@ -337,14 +337,14 @@ export default function SchuelerfirmaEinstieg({
                 rechnen
                 prompt={
                   <p>
-                    Setzt den Punkt <M>{'(20 \\mid 200)'}</M> in <M>{'G(x) = ax^2 + bx - 200'}</M> ein und bringt die −200 auf die linke Seite. Welche Gleichung entsteht?
+                    Setzt den Punkt <M>{'(20 \\mid 200)'}</M> in <M>{'y = ax^2 + bx - 200'}</M> ein und bringt die −200 auf die linke Seite. Welche Gleichung entsteht?
                   </p>
                 }
                 options={[
                   { text: 'I: 400 = 20a + 20b', feedback: 'Vor a steht x², also 20² = 400, nicht 20.' },
                   { text: 'I: 400 = 400a + 20b', correct: true, feedback: '200 = a · 20² + b · 20 − 200 = 400a + 20b − 200. Mit + 200 auf beiden Seiten: 400 = 400a + 20b.' },
                   { text: 'I: 200 = 400a + 20b', feedback: 'Die −200 muss auf die andere Seite: 200 + 200 = 400.' },
-                  { text: 'I: 20 = 40 000a + 200b − 200', feedback: 'x und y sind vertauscht. Für x wird 20 eingesetzt, für G(x) der Gewinn 200.' },
+                  { text: 'I: 20 = 40 000a + 200b − 200', feedback: 'x und y sind vertauscht. Für x wird 20 eingesetzt, für y der Gewinn 200.' },
                 ]}
               />
               <CheckCard
@@ -601,7 +601,7 @@ export default function SchuelerfirmaEinstieg({
                   <>
                     <MB>{'\\begin{aligned} \\text{I: } 400 &= 400a + 20b \\\\ \\text{II: } 400 &= 1600a + 40b \\end{aligned}'}</MB>
                     <p>
-                      Löst das Gleichungssystem mit dem Additionsverfahren und gebt die Gewinnfunktion an: <M>{'G(x) = ax^2 + bx - 200'}</M>.
+                      Löst das Gleichungssystem mit dem Additionsverfahren und gebt die Gewinnfunktion an: <M>{'y = ax^2 + bx - 200'}</M>.
                     </p>
                   </>
                 }
@@ -616,7 +616,7 @@ export default function SchuelerfirmaEinstieg({
                     <MB>{'\\text{I} \\cdot 2: \\quad 800 = 800a + 40b'}</MB>
                     <MB>{'\\text{II} - \\text{I} \\cdot 2: \\quad 400 - 800 = 1600a - 800a \\;\\Rightarrow\\; -400 = 800a \\;\\Rightarrow\\; a = -0{,}5'}</MB>
                     <MB>{'\\text{in I: } 400 = 400 \\cdot (-0{,}5) + 20b = -200 + 20b \\;\\Rightarrow\\; 600 = 20b \\;\\Rightarrow\\; b = 30'}</MB>
-                    <MB>{'G(x) = -0{,}5x^2 + 30x - 200'}</MB>
+                    <MB>{'y = -0{,}5x^2 + 30x - 200'}</MB>
                   </>
                 }
                 help={
@@ -636,17 +636,17 @@ export default function SchuelerfirmaEinstieg({
                 level="standard"
                 prompt={
                   <p>
-                    Berechnet mit <M>{'G(x) = -0{,}5x^2 + 30x - 200'}</M> den Gewinn bei 60 verkauften Hoodies. Lohnt sich die große Bestellung?
+                    Berechnet mit <M>{'y = -0{,}5x^2 + 30x - 200'}</M> den Gewinn bei 60 verkauften Hoodies. Lohnt sich die große Bestellung?
                   </p>
                 }
                 fieldsRow
                 fields={[
-                  { kind: 'num', key: 'g', label: <M>{'G(60) ='}</M>, unit: '€', expected: G60 },
+                  { kind: 'num', key: 'g', label: <>Gewinn bei <M>{'x = 60'}</M>: <M>{'y ='}</M></>, unit: '€', expected: G60 },
                   { kind: 'select', key: 'l', label: 'Lohnt sich das?', options: ['ja', 'nein'], expected: 1 },
                 ]}
                 solution={
                   <>
-                    <MB>{'G(60) = -0{,}5 \\cdot 60^2 + 30 \\cdot 60 - 200 = -1800 + 1800 - 200 = -200'}</MB>
+                    <MB>{'x = 60: \\quad y = -0{,}5 \\cdot 60^2 + 30 \\cdot 60 - 200 = -1800 + 1800 - 200 = -200'}</MB>
                     <p>Bei 60 Hoodies macht die Schülerfirma 200 € Verlust. Die große Bestellung lohnt sich nicht.</p>
                   </>
                 }
@@ -690,7 +690,7 @@ export default function SchuelerfirmaEinstieg({
                   <>
                     <p>Eine Parabel ist symmetrisch. Zwei Punkte mit demselben y-Wert liegen gleich weit links und rechts vom Scheitel, der also genau in der Mitte liegt:</p>
                     <MB>{'x_S = \\frac{20 + 40}{2} = 30 \\qquad \\text{oder} \\qquad x_S = -\\frac{b}{2a} = -\\frac{30}{2 \\cdot (-0{,}5)} = 30'}</MB>
-                    <MB>{'y_S = G(30) = -0{,}5 \\cdot 900 + 900 - 200 = 250'}</MB>
+                    <MB>{'x = 30: \\quad y_S = -0{,}5 \\cdot 30^2 + 30 \\cdot 30 - 200 = 250'}</MB>
                     <p>Bei 30 verkauften Hoodies ist der Gewinn mit 250 € am größten.</p>
                   </>
                 }
@@ -700,7 +700,7 @@ export default function SchuelerfirmaEinstieg({
                       <>Der Scheitelpunkt ist hier der höchste Punkt der Parabel. Wo liegt er im Graphen ungefähr?</>,
                       <>Wegen der Symmetrie liegt der Scheitel genau in der Mitte zwischen zwei Punkten mit demselben y-Wert.</>,
                       <>
-                        Die Mitte zwischen 20 und 40 ist 30. Berechnet <M>{'G(30)'}</M>.
+                        Die Mitte zwischen 20 und 40 ist 30. Setzt <M>{'x = 30'}</M> ein und berechnet den Gewinn.
                       </>,
                     ]}
                   />
@@ -763,7 +763,7 @@ export default function SchuelerfirmaEinstieg({
             <Merke title="Funktionsgleichung aus einem Wert und zwei Punkten (Fall 2)">
               <ol>
                 <li>
-                  Den bekannten Wert (<M>a</M>, <M>b</M> oder <M>c</M>) in <M>{'f(x) = ax^2 + bx + c'}</M> einsetzen.
+                  Den bekannten Wert (<M>a</M>, <M>b</M> oder <M>c</M>) in <M>{'y = ax^2 + bx + c'}</M> einsetzen.
                 </li>
                 <li>Beide Punkte einsetzen. Es entstehen Gleichung I und Gleichung II mit den zwei fehlenden Werten.</li>
                 <li>Das Gleichungssystem mit dem Additionsverfahren lösen.</li>
@@ -845,12 +845,12 @@ export default function SchuelerfirmaEinstieg({
                 rechnen
                 prompt={
                   <p>
-                    Eine Parabel hat die Gleichung <M>{'f(x) = ax^2 + bx + 4'}</M> und geht durch <M>{'P(2 \\mid 10)'}</M>. Welche Gleichung entsteht beim Einsetzen von P?
+                    Eine Parabel hat die Gleichung <M>{'y = ax^2 + bx + 4'}</M> und geht durch <M>{'P(2 \\mid 10)'}</M>. Welche Gleichung entsteht beim Einsetzen von P?
                   </p>
                 }
                 options={[
                   { text: '10 = 2a + 2b + 4', feedback: 'Vor a steht x², also 2² = 4.' },
-                  { text: '2 = 100a + 10b + 4', feedback: 'x und y sind vertauscht. Für x wird 2 eingesetzt, für f(x) die 10.' },
+                  { text: '2 = 100a + 10b + 4', feedback: 'x und y sind vertauscht. Für x wird 2 eingesetzt, für y die 10.' },
                   { text: '10 = 4a + 2b + 4', correct: true, feedback: 'a · 2² + b · 2 + 4 = 4a + 2b + 4. Nach − 4 auf beiden Seiten: 6 = 4a + 2b.' },
                   { text: '10 = 4a + 2b', feedback: 'Das c = 4 darf nicht verloren gehen. Es gehört mit in die Gleichung.' },
                 ]}
@@ -890,14 +890,14 @@ export default function SchuelerfirmaEinstieg({
                     <MB>{'\\begin{aligned} \\text{I: } 2 &= 1 + b + c &&\\Rightarrow\\; 1 = b + c \\\\ \\text{II: } 6 &= 9 + 3b + c &&\\Rightarrow\\; -3 = 3b + c \\end{aligned}'}</MB>
                     <MB>{'\\text{I} - \\text{II}: \\quad 4 = -2b \\;\\Rightarrow\\; b = -2 \\qquad \\text{in I: } 1 = -2 + c \\;\\Rightarrow\\; c = 3'}</MB>
                     <p>
-                      <M>{'f(x) = x^2 - 2x + 3'}</M>. Probe: <M>{'f(3) = 9 - 6 + 3 = 6'}</M> ✓
+                      <M>{'y = x^2 - 2x + 3'}</M>. Probe mit <M>{'x = 3'}</M>: <M>{'y = 9 - 6 + 3 = 6'}</M> ✓
                     </p>
                   </>
                 }
                 help={
                   <Hilfen
                     steps={[
-                      <>Setze a = 1 ein: f(x) = x² + bx + c. Dann beide Punkte einsetzen.</>,
+                      <>Setze a = 1 ein: y = x² + bx + c. Dann beide Punkte einsetzen.</>,
                       <>Bring die Zahl, die aus x² entsteht, auf die linke Seite. Vor c steht dann in beiden Gleichungen 1.</>,
                       <>
                         <M>{'\\text{I: } 1 = b + c'}</M> und <M>{'\\text{II: } -3 = 3b + c'}</M>. Rechne I − II, dann fällt c weg.
@@ -911,7 +911,7 @@ export default function SchuelerfirmaEinstieg({
                 level="erweiterung"
                 prompt={
                   <p>
-                    Für die Parabel <M>{'f(x) = ax^2 + bx + c'}</M> gilt <M>{'b = 2'}</M>. Sie geht durch <M>{'P(1 \\mid 1)'}</M> und <M>{'Q(-2 \\mid -8)'}</M>. Bestimme <M>a</M> und{' '}
+                    Für die Parabel <M>{'y = ax^2 + bx + c'}</M> gilt <M>{'b = 2'}</M>. Sie geht durch <M>{'P(1 \\mid 1)'}</M> und <M>{'Q(-2 \\mid -8)'}</M>. Bestimme <M>a</M> und{' '}
                     <M>c</M>. Erkläre im Heft, welche Unbekannte du wegfallen lässt und warum.
                   </p>
                 }
@@ -925,7 +925,7 @@ export default function SchuelerfirmaEinstieg({
                     <MB>{'\\begin{aligned} \\text{I: } 1 &= a + 2 + c &&\\Rightarrow\\; -1 = a + c \\\\ \\text{II: } -8 &= 4a - 4 + c &&\\Rightarrow\\; -4 = 4a + c \\end{aligned}'}</MB>
                     <MB>{'\\text{II} - \\text{I}: \\quad -3 = 3a \\;\\Rightarrow\\; a = -1 \\qquad \\text{in I: } -1 = -1 + c \\;\\Rightarrow\\; c = 0'}</MB>
                     <p>
-                      <M>{'f(x) = -x^2 + 2x'}</M>. Vor c steht in beiden Gleichungen 1, darum fällt c beim Subtrahieren direkt weg.
+                      <M>{'y = -x^2 + 2x'}</M>. Vor c steht in beiden Gleichungen 1, darum fällt c beim Subtrahieren direkt weg.
                     </p>
                   </>
                 }

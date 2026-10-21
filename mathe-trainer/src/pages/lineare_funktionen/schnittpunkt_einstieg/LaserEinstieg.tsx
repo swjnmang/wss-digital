@@ -151,10 +151,10 @@ function GraphKarte() {
       </div>
       <div className="ls-readout">
         <div className="ls-readout-box ls-readout-a">
-          <strong>linker Strahl:</strong> <M>{`f(${tx(x)}) = ${tx(a)}`}</M> m
+          <strong>linker Strahl:</strong> <M>{`y = ${tx(a)}`}</M> m
         </div>
         <div className="ls-readout-box ls-readout-b">
-          <strong>rechter Strahl:</strong> <M>{`g(${tx(x)}) = ${tx(b)}`}</M> m
+          <strong>rechter Strahl:</strong> <M>{`y = ${tx(b)}`}</M> m
         </div>
       </div>
       {Math.abs(a - b) < 1e-9 && (
@@ -239,14 +239,14 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               title="a) Punktprobe"
               prompt={
                 <p>
-                  Berechne, ob der Punkt <M>{'P(2 \\mid 1)'}</M> auf der Geraden <M>{'f(x) = -0{,}5x + 2'}</M> liegt.
+                  Berechne, ob der Punkt <M>{'P(2 \\mid 1)'}</M> auf der Geraden <M>{'y = -0{,}5x + 2'}</M> liegt.
                 </p>
               }
               fields={[{ kind: 'select', key: 'p', label: 'Antwort', options: ['Ja', 'Nein'], expected: 0 }]}
               solution={
                 <>
                   <p>x-Wert einsetzen und mit dem y-Wert vergleichen:</p>
-                  <MB>{'f(2) = -0{,}5 \\cdot 2 + 2 = 1 \\;\\checkmark'}</MB>
+                  <MB>{'x = 2: \\quad y = -0{,}5 \\cdot 2 + 2 = 1 \\;\\checkmark'}</MB>
                   <p>Der y-Wert stimmt, also liegt P auf der Geraden.</p>
                 </>
               }
@@ -255,7 +255,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               title="b) Gleichung aus zwei Punkten"
               prompt={
                 <p>
-                  Eine Gerade geht durch <M>{'R(5 \\mid 4)'}</M> und <M>{'Q(-3 \\mid 0)'}</M>. Berechne die Funktionsgleichung <M>{'g(x) = m x + t'}</M>.
+                  Eine Gerade geht durch <M>{'R(5 \\mid 4)'}</M> und <M>{'Q(-3 \\mid 0)'}</M>. Berechne die Funktionsgleichung <M>{'y = m x + t'}</M>.
                 </p>
               }
               fieldsRow
@@ -268,7 +268,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   <MB>{'m = \\frac{y_2 - y_1}{x_2 - x_1} = \\frac{4 - 0}{5 - (-3)} = \\frac{4}{8} = 0{,}5'}</MB>
                   <p>Einen Punkt einsetzen, z. B. R:</p>
                   <MB>{'\\begin{aligned} 4 &= 0{,}5 \\cdot 5 + t \\\\ 4 &= 2{,}5 + t && \\mid -2{,}5 \\\\ t &= 1{,}5 \\end{aligned}'}</MB>
-                  <MB>{'g(x) = 0{,}5x + 1{,}5'}</MB>
+                  <MB>{'y = 0{,}5x + 1{,}5'}</MB>
                 </>
               }
             />
@@ -276,11 +276,11 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               title="c) y-Achsenabschnitt deuten"
               prompt={
                 <p>
-                  Ein Laserstrahl hat die Gleichung <M>{'f(x) = -0{,}5x + 2'}</M>. Die y-Achse geht durch die Mitte der Bühne. Was bedeutet die 2? Wähle die passende Aussage.
+                  Ein Laserstrahl hat die Gleichung <M>{'y = -0{,}5x + 2'}</M>. Die y-Achse geht durch die Mitte der Bühne. Was bedeutet die 2? Wähle die passende Aussage.
                 </p>
               }
               options={[
-                { text: 'Der Strahl ist in der Bühnenmitte 2 m hoch.', correct: true, feedback: 'Bei x = 0 ist f(0) = 2. Dort schneidet der Strahl die y-Achse.' },
+                { text: 'Der Strahl ist in der Bühnenmitte 2 m hoch.', correct: true, feedback: 'Bei x = 0 ist y = 2. Dort schneidet der Strahl die y-Achse.' },
                 { text: 'Der Strahl trifft 2 m neben der Mitte auf den Boden.', feedback: 'Das wäre die Nullstelle. Die liegt hier bei x = 4.' },
                 { text: 'Der Strahler hängt 2 m hoch.', feedback: 'Der Strahler hängt weiter außen. Die 2 gilt nur genau in der Bühnenmitte (x = 0).' },
                 { text: 'Der Strahl fällt pro Meter um 2 m.', feedback: 'Das wäre die Steigung m. Die ist hier −0,5: pro Meter nach rechts fällt der Strahl um 0,5 m.' },
@@ -312,7 +312,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               <div className="ls-flyer-name">Linker Laser</div>
               <div className="ls-flyer-price">
                 Strahl <strong>
-                  <M>{'f(x) = -0{,}5x + 2'}</M>
+                  <M>{'y = -0{,}5x + 2'}</M>
                 </strong>
               </div>
             </div>
@@ -320,7 +320,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               <div className="ls-flyer-name">Rechter Laser</div>
               <div className="ls-flyer-price">
                 Strahl <strong>
-                  <M>{'g(x) = 0{,}5x + 1{,}5'}</M>
+                  <M>{'y = 0{,}5x + 1{,}5'}</M>
                 </strong>
               </div>
             </div>
@@ -396,8 +396,8 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             <QuerTabelle
               rows={[
                 { head: 'x in m', cells: COARSE_X.map((x) => <strong key={x}>{fmt(x, 2)}</strong>) },
-                { head: 'linker Strahl f(x)', cells: COARSE_X.map((x) => cellInput(f(x), x)) },
-                { head: 'rechter Strahl g(x)', cells: COARSE_X.map((x) => cellInput(g(x), x)) },
+                { head: 'linker Strahl y', cells: COARSE_X.map((x) => cellInput(f(x), x)) },
+                { head: 'rechter Strahl y', cells: COARSE_X.map((x) => cellInput(g(x), x)) },
               ]}
             />
             <p>
@@ -406,20 +406,20 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             <QuerTabelle
               rows={[
                 { head: 'x in m', cells: LUPE_X.map((x) => <strong key={x}>{fmt(x, 2)}</strong>) },
-                { head: 'linker Strahl f(x)', cells: LUPE_X.map((x) => (x === 0 || x === 1 ? <span key={x}>{fmt(f(x), 3)}</span> : cellInput(f(x), x))) },
-                { head: 'rechter Strahl g(x)', cells: LUPE_X.map((x) => (x === 0 || x === 1 ? <span key={x}>{fmt(g(x), 3)}</span> : cellInput(g(x), x))) },
+                { head: 'linker Strahl y', cells: LUPE_X.map((x) => (x === 0 || x === 1 ? <span key={x}>{fmt(f(x), 3)}</span> : cellInput(f(x), x))) },
+                { head: 'rechter Strahl y', cells: LUPE_X.map((x) => (x === 0 || x === 1 ? <span key={x}>{fmt(g(x), 3)}</span> : cellInput(g(x), x))) },
               ]}
             />
             <p className="lp-hint">Vergleicht die beiden Zeilen Spalte für Spalte: Wo sind beide Strahlen gleich hoch?</p>
             <Hilfen
               steps={[
-                <>Setzt jeden x-Wert in die Gleichung ein. Was ist f(0), was ist g(0)?</>,
+                <>Setzt jeden x-Wert in die Gleichung ein. Welcher y-Wert ergibt sich bei x = 0 für den linken, welcher für den rechten Strahl?</>,
                 <>
                   Pro Meter nach rechts wird der linke Strahl 0,5 m tiefer, der rechte 0,5 m höher. Ihr könnt also auch vom vorigen Feld aus weiterrechnen. In der Lupe sind es
                   Schritte von 0,25 m, also ändert sich die Höhe um 0,125 m.
                 </>,
                 <>
-                  Für <M>{'x = -2'}</M>: <M>{'f(-2) = -0{,}5 \\cdot (-2) + 2 = 3'}</M> und <M>{'g(-2) = 0{,}5 \\cdot (-2) + 1{,}5 = 0{,}5'}</M>.
+                  Für <M>{'x = -2'}</M> gilt beim linken Strahl: <M>{'y = -0{,}5 \\cdot (-2) + 2 = 3'}</M>, beim rechten Strahl: <M>{'y = 0{,}5 \\cdot (-2) + 1{,}5 = 0{,}5'}</M>.
                 </>,
               ]}
             />
@@ -478,7 +478,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             solution={
               <>
                 <p>
-                  Über der Pultmitte ist <M>{'x = 0'}</M>. Der linke Strahl ist dort <M>{'f(0) = 2'}</M> m hoch. Der rechte Strahl muss also durch <M>{'(0 \\mid 2)'}</M> und{' '}
+                  Über der Pultmitte ist <M>{'x = 0'}</M>. Der linke Strahl ist dort 2 m hoch (<M>{'y = 2'}</M>). Der rechte Strahl muss also durch <M>{'(0 \\mid 2)'}</M> und{' '}
                   <M>{'R(5 \\mid 4)'}</M> gehen:
                 </p>
                 <MB>{'m = \\frac{4 - 2}{5 - 0} = \\frac{2}{5} = 0{,}4'}</MB>
@@ -547,7 +547,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             title="Wo kreuzen sich die Laserstrahlen?"
             aufgabe={
               <p>
-                Linker Strahl: <M>{'f(x) = -0{,}5x + 2'}</M>, rechter Strahl: <M>{'g(x) = 0{,}5x + 1{,}5'}</M>. Das Pult reicht von <M>{'x = -0{,}4'}</M> bis{' '}
+                Linker Strahl: <M>{'y = -0{,}5x + 2'}</M>, rechter Strahl: <M>{'y = 0{,}5x + 1{,}5'}</M>. Das Pult reicht von <M>{'x = -0{,}4'}</M> bis{' '}
                 <M>{'x = 0{,}4'}</M>.
               </p>
             }
@@ -584,7 +584,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 body: (
                   <>
                     <p>Setze x = 0,5 in eine der beiden Gleichungen ein. Zur Probe in die andere:</p>
-                    <MB>{'f(0{,}5) = -0{,}5 \\cdot 0{,}5 + 2 = 1{,}75 \\qquad \\text{Probe: } g(0{,}5) = 0{,}25 + 1{,}5 = 1{,}75 \\;\\checkmark'}</MB>
+                    <MB>{'x = 0{,}5: \\quad y = -0{,}5 \\cdot 0{,}5 + 2 = 1{,}75 \\qquad \\text{Probe mit dem rechten Strahl: } y = 0{,}25 + 1{,}5 = 1{,}75 \\;\\checkmark'}</MB>
                   </>
                 ),
               },
@@ -654,9 +654,9 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               prompt={
                 <>
                   <p>Berechne den Schnittpunkt der beiden Geraden. Fülle die Lücken der Rechnung aus.</p>
-                  <MB>{'f(x) = 4x + 1 \\qquad g(x) = 2x + 7'}</MB>
+                  <MB>{'\\text{Gerade 1: } y = 4x + 1 \\qquad \\text{Gerade 2: } y = 2x + 7'}</MB>
                   <p>
-                    Zum Schluss setzt du <M>x</M> in <M>f</M> ein und berechnest <M>y</M>.
+                    Zum Schluss setzt du <M>x</M> in die Gleichung von Gerade 1 ein und berechnest <M>y</M>.
                   </p>
                 </>
               }
@@ -732,7 +732,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                       nach <M>t</M> auf.
                     </>,
                     <>
-                      <M>{'f(x) = 0{,}8x + 1'}</M> und <M>{'g(x) = -0{,}4x + 4{,}6'}</M>. Gleichsetzen und zuerst <M>{'\\mid +0{,}4x'}</M> rechnen.
+                      <M>{'y = 0{,}8x + 1'}</M> und <M>{'y = -0{,}4x + 4{,}6'}</M>. Gleichsetzen und zuerst <M>{'\\mid +0{,}4x'}</M> rechnen.
                     </>,
                   ]}
                 />
@@ -744,7 +744,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               prompt={
                 <p>
                   Zurück zur Lasershow: Damit niemand geblendet wird, sollen sich die Strahlen in <strong>2,5 m Höhe</strong> kreuzen. Der linke Strahl bleibt{' '}
-                  <M>{'f(x) = -0{,}5x + 2'}</M>, der rechte Strahler bleibt in <M>{'R(5 \\mid 4)'}</M> und wird gedreht. An welcher Stelle liegt der neue Kreuzungspunkt, und
+                  <M>{'y = -0{,}5x + 2'}</M>, der rechte Strahler bleibt in <M>{'R(5 \\mid 4)'}</M> und wird gedreht. An welcher Stelle liegt der neue Kreuzungspunkt, und
                   welche Steigung braucht der rechte Strahl?
                 </p>
               }
@@ -767,7 +767,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   steps={[
                     <>Diesmal kennst du den y-Wert des Schnittpunkts schon. Auf welchem Strahl liegt er sicher?</>,
                     <>
-                      Setze <M>{'f(x) = 2{,}5'}</M> und löse nach <M>x</M> auf. Dann kennst du einen zweiten Punkt des rechten Strahls.
+                      Setze beim linken Strahl <M>{'y = 2{,}5'}</M> ein, also <M>{'2{,}5 = -0{,}5x + 2'}</M>, und löse nach <M>x</M> auf. Dann kennst du einen zweiten Punkt des rechten Strahls.
                     </>,
                     <>
                       <M>{'x = -1'}</M>. Der rechte Strahl geht also durch <M>{'(-1 \\mid 2{,}5)'}</M> und <M>{'R(5 \\mid 4)'}</M>. Jetzt die Steigung aus zwei Punkten berechnen.
@@ -794,7 +794,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               options={[
                 { text: 'Die Strahlen kreuzen sich 1,75 m rechts von der Pultmitte in 0,5 m Höhe.', feedback: 'Hier sind x und y vertauscht: Zuerst kommt der x-Wert (Stelle), dann der y-Wert (Höhe).' },
                 { text: 'Die Strahlen kreuzen sich 0,5 m rechts von der Pultmitte in 1,75 m Höhe.', correct: true, feedback: 'x = 0,5 m ist die Stelle, y = 1,75 m die Höhe des Kreuzungspunkts.' },
-                { text: 'Der linke Strahl ist über der Pultmitte 1,75 m hoch.', feedback: 'Über der Pultmitte (x = 0) ist der linke Strahl f(0) = 2 m hoch, das ist der y-Achsenabschnitt. Der Schnittpunkt liegt woanders.' },
+                { text: 'Der linke Strahl ist über der Pultmitte 1,75 m hoch.', feedback: 'Über der Pultmitte (x = 0) ist der linke Strahl 2 m hoch (y = 2), das ist der y-Achsenabschnitt. Der Schnittpunkt liegt woanders.' },
                 { text: 'Die Strahlen kreuzen sich über dem Pult, weil 0,5 fast 0 ist.', feedback: 'Das Pult reicht nur bis x = 0,4. Der Kreuzungspunkt bei 0,5 liegt 10 cm daneben.' },
               ]}
             />
@@ -806,11 +806,11 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               prompt={
                 <>
                   <p>Berechne den Schnittpunkt der beiden Geraden. Wähle dann die richtige Antwort aus.</p>
-                  <MB>{'f(x) = 2x + 1 \\qquad g(x) = -x + 7'}</MB>
+                  <MB>{'\\text{Gerade 1: } y = 2x + 1 \\qquad \\text{Gerade 2: } y = -x + 7'}</MB>
                 </>
               }
               options={[
-                { text: <M>{'x = 2'}</M>, feedback: 'Der x-Wert stimmt, aber ein Schnittpunkt hat zwei Koordinaten. Setze x = 2 noch in f(x) ein.' },
+                { text: <M>{'x = 2'}</M>, feedback: 'Der x-Wert stimmt, aber ein Schnittpunkt hat zwei Koordinaten. Setze x = 2 noch in eine der beiden Gleichungen ein.' },
                 { text: <M>{'S(5 \\mid 2)'}</M>, feedback: 'Die Zahlen stimmen, aber x und y sind vertauscht. Zuerst kommt der x-Wert.' },
                 { text: <M>{'S(6 \\mid 13)'}</M>, feedback: 'Beim Umstellen ist ein Vorzeichen verloren gegangen: Aus 2x + 1 = −x + 7 wird mit +x die Gleichung 3x + 1 = 7.' },
                 { text: <M>{'S(2 \\mid 5)'}</M>, correct: true, feedback: '2x + 1 = −x + 7 ergibt 3x = 6, also x = 2 und y = 2 · 2 + 1 = 5.' },
@@ -823,7 +823,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               prompt={
                 <>
                   <p>Berechne den Schnittpunkt durch Gleichsetzen.</p>
-                  <MB>{'f(x) = 3x - 2 \\qquad g(x) = x + 4'}</MB>
+                  <MB>{'\\text{Gerade 1: } y = 3x - 2 \\qquad \\text{Gerade 2: } y = x + 4'}</MB>
                 </>
               }
               fieldsRow
@@ -836,7 +836,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   <MB>{'\\begin{aligned} 3x - 2 &= x + 4 && \\mid -x \\\\ 2x - 2 &= 4 && \\mid +2 \\\\ 2x &= 6 && \\mid :2 \\\\ x &= 3 \\end{aligned}'}</MB>
                   <MB>{'y = 3 \\cdot 3 - 2 = 7 \\qquad \\Rightarrow \\qquad S(3 \\mid 7)'}</MB>
                   <p>
-                    Probe mit <M>{'g'}</M>: <M>{'3 + 4 = 7'}</M>. Stimmt!
+                    Probe mit Gerade 2: <M>{'y = 3 + 4 = 7'}</M>. Stimmt!
                   </p>
                 </>
               }

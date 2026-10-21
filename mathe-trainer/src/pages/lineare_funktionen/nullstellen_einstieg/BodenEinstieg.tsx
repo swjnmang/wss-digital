@@ -120,7 +120,7 @@ function GraphKarte() {
       <div className="ls-readout ls-readout-3">
         {LINES.map((l) => (
           <div key={l.id} className={`ls-readout-box ls-readout-${l.id}`}>
-            <M>{`${l.id}(${tx(x, 2)}) = ${tx(l.fn(x), 3)}`}</M>
+            <strong>Gerade {l.id}:</strong> <M>{`y = ${tx(l.fn(x), 3)}`}</M>
             <div className="ls-readout-note">{l.fn(x) > 1e-9 ? 'über dem Boden' : l.fn(x) < -1e-9 ? 'unter dem Boden' : 'auf dem Boden'}</div>
           </div>
         ))}
@@ -186,11 +186,11 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               title="a) y-Wert berechnen"
               prompt={
                 <p>
-                  Berechne den y-Wert der Geraden <M>{'g(x) = -0{,}5x + 1{,}5'}</M> an der Stelle <M>{'x = 2'}</M>.
+                  Berechne den y-Wert der Geraden <M>{'y = -0{,}5x + 1{,}5'}</M> an der Stelle <M>{'x = 2'}</M>.
                 </p>
               }
-              fields={[{ kind: 'num', key: 'y', label: <M>{'g(2) ='}</M>, expected: 0.5 }]}
-              solution={<MB>{'g(2) = -0{,}5 \\cdot 2 + 1{,}5 = -1 + 1{,}5 = 0{,}5'}</MB>}
+              fields={[{ kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 0.5 }]}
+              solution={<MB>{'x = 2: \\quad y = -0{,}5 \\cdot 2 + 1{,}5 = -1 + 1{,}5 = 0{,}5'}</MB>}
             />
             <CheckCard
               title="b) Gleichung lösen"
@@ -235,7 +235,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               <div className="ls-flyer-name">Gerade f</div>
               <div className="ls-flyer-price">
                 <strong>
-                  <M>{'f(x) = -2x + 8'}</M>
+                  <M>{'y = -2x + 8'}</M>
                 </strong>
               </div>
             </div>
@@ -243,7 +243,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               <div className="ls-flyer-name">Gerade g</div>
               <div className="ls-flyer-price">
                 <strong>
-                  <M>{'g(x) = -0{,}5x + 1{,}5'}</M>
+                  <M>{'y = -0{,}5x + 1{,}5'}</M>
                 </strong>
               </div>
             </div>
@@ -251,7 +251,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               <div className="ls-flyer-name">Gerade h</div>
               <div className="ls-flyer-price">
                 <strong>
-                  <M>{'h(x) = -x + 3{,}75'}</M>
+                  <M>{'y = -x + 3{,}75'}</M>
                 </strong>
               </div>
             </div>
@@ -326,21 +326,21 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
             <QuerTabelle
               rows={[
                 { head: 'x', cells: TABLE_X.map((x) => <strong key={x}>{x}</strong>) },
-                { head: 'f(x)', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{f(0)}</span> : cellInput(f(x), x))) },
-                { head: 'g(x)', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{fmt(g(0), 1)}</span> : cellInput(g(x), x))) },
-                { head: 'h(x)', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{fmt(h(0), 2)}</span> : cellInput(h(x), x))) },
+                { head: 'y bei Gerade f', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{f(0)}</span> : cellInput(f(x), x))) },
+                { head: 'y bei Gerade g', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{fmt(g(0), 1)}</span> : cellInput(g(x), x))) },
+                { head: 'y bei Gerade h', cells: TABLE_X.map((x) => (x === 0 ? <span key={x}>{fmt(h(0), 2)}</span> : cellInput(h(x), x))) },
               ]}
             />
             <p className="lp-hint">Sucht in jeder Zeile die Stelle, an der der Wert 0 wird oder von positiv zu negativ wechselt. Was fällt euch bei h auf?</p>
             <Hilfen
               steps={[
-                <>Setzt jeden x-Wert in die Gleichung ein. Was ist f(2), was ist g(2)?</>,
+                <>Setzt jeden x-Wert in die Gleichung ein. Welcher y-Wert ergibt sich bei x = 2 für Gerade f, welcher für Gerade g?</>,
                 <>
                   Pro Schritt nach rechts fällt f um 2, g um 0,5 und h um 1. Ihr könnt also auch vom vorigen Feld aus weiterrechnen. Achtung: Die Schritte in der Tabelle sind
                   nicht immer 1 breit.
                 </>,
                 <>
-                  Für <M>x = 2</M>: <M>{'f(2) = -2 \\cdot 2 + 8 = 4'}</M> und <M>{'g(2) = -0{,}5 \\cdot 2 + 1{,}5 = 0{,}5'}</M>.
+                  Für <M>x = 2</M> gilt bei Gerade f: <M>{'y = -2 \\cdot 2 + 8 = 4'}</M>, bei Gerade g: <M>{'y = -0{,}5 \\cdot 2 + 1{,}5 = 0{,}5'}</M>.
                 </>,
               ]}
             />
@@ -464,7 +464,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
             title="Wo berührt Gerade h den Boden?"
             aufgabe={
               <p>
-                Gerade h: <M>{'h(x) = -x + 3{,}75'}</M>. Berechne die Nullstelle.
+                Gerade h: <M>{'y = -x + 3{,}75'}</M>. Berechne die Nullstelle.
               </p>
             }
             steps={[
@@ -500,7 +500,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   <>
                     <MB>{'N(3{,}75 \\mid 0)'}</MB>
                     <p>
-                      Probe: <M>{'h(3{,}75) = -3{,}75 + 3{,}75 = 0'}</M> ✓
+                      Probe mit <M>{'x = 3{,}75'}</M>: <M>{'y = -3{,}75 + 3{,}75 = 0'}</M> ✓
                     </p>
                   </>
                 ),
@@ -518,7 +518,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
           <Merke title="Nullstelle einer Geraden">
             <p>
-              Die <strong>Nullstelle</strong> ist der <M>x</M>-Wert, bei dem die Gerade die x-Achse schneidet. Dort gilt <M>{'f(x) = 0'}</M>. Der Punkt heißt{' '}
+              Die <strong>Nullstelle</strong> ist der <M>x</M>-Wert, bei dem die Gerade die x-Achse schneidet. Dort gilt <M>{'y = 0'}</M>. Der Punkt heißt{' '}
               <M>{'N(x_N \\mid 0)'}</M>.
             </p>
             <p>So berechnest du sie:</p>
@@ -564,7 +564,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               level="basis"
               prompt={
                 <>
-                  <p>Berechne die Nullstelle der Geraden <M>{'p(x) = 3x - 12'}</M>. Fülle die Lücken der Rechnung aus.</p>
+                  <p>Berechne die Nullstelle der Geraden <M>{'y = 3x - 12'}</M>. Fülle die Lücken der Rechnung aus.</p>
                 </>
               }
               rechnung={[
@@ -615,7 +615,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               solution={
                 <>
                   <MB>{'m = \\frac{2 - 6}{2 - 0} = -2 \\qquad t = 6 \\;(\\text{A liegt auf der y-Achse})'}</MB>
-                  <MB>{'f(x) = -2x + 6'}</MB>
+                  <MB>{'y = -2x + 6'}</MB>
                   <MB>{'\\begin{aligned} -2x + 6 &= 0 && \\mid -6 \\\\ -2x &= -6 && \\mid :(-2) \\\\ x &= 3 \\end{aligned}'}</MB>
                   <MB>{'N(3 \\mid 0)'}</MB>
                 </>
@@ -628,7 +628,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
                       Der Punkt A liegt auf der y-Achse (x = 0). Was sagt dir das über <M>t</M>?
                     </>,
                     <>
-                      <M>{'f(x) = -2x + 6'}</M>. Setze den Term gleich 0 und löse: <M>{'-2x + 6 = 0'}</M>.
+                      <M>{'y = -2x + 6'}</M>. Setze den Term gleich 0 und löse: <M>{'-2x + 6 = 0'}</M>.
                     </>,
                   ]}
                 />
@@ -639,13 +639,13 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               level="erweiterung"
               prompt={
                 <p>
-                  Die Gerade <M>{'k(x) = -0{,}5x + t'}</M> soll den Boden bei <M>{'x = 5'}</M> berühren. Welchen Wert muss <M>t</M> haben?
+                  Die Gerade <M>{'y = -0{,}5x + t'}</M> soll den Boden bei <M>{'x = 5'}</M> berühren. Welchen Wert muss <M>t</M> haben?
                 </p>
               }
               fields={[{ kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 2.5 }]}
               solution={
                 <>
-                  <p>Die Nullstelle ist 5, also muss <M>{'k(5) = 0'}</M> sein:</p>
+                  <p>Die Nullstelle ist 5, also muss bei <M>{'x = 5'}</M> der Wert <M>{'y = 0'}</M> herauskommen:</p>
                   <MB>{'\\begin{aligned} -0{,}5 \\cdot 5 + t &= 0 \\\\ -2{,}5 + t &= 0 && \\mid +2{,}5 \\\\ t &= 2{,}5 \\end{aligned}'}</MB>
                 </>
               }
@@ -693,14 +693,14 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               prompt={
                 <>
                   <p>Berechne die Nullstelle. Wähle dann die richtige Antwort aus.</p>
-                  <MB>{'f(x) = -3x + 12'}</MB>
+                  <MB>{'y = -3x + 12'}</MB>
                 </>
               }
               options={[
                 { text: <M>{'x = -4'}</M>, feedback: 'Vorzeichenfehler: Aus −3x + 12 = 0 folgt −3x = −12, also x = (−12) : (−3) = 4.' },
                 { text: <M>{'x = 12'}</M>, feedback: 'Die 12 ist der y-Achsenabschnitt t, nicht die Nullstelle. Setze den Term gleich 0 und löse nach x auf.' },
                 { text: <M>{'N(0 \\mid 4)'}</M>, feedback: 'Die Zahl stimmt, aber die Koordinaten sind vertauscht. Die Nullstelle liegt auf der x-Achse: N(4 | 0).' },
-                { text: <M>{'x = 4'}</M>, correct: true, feedback: '−3x + 12 = 0 ergibt −3x = −12, also x = 4. Probe: f(4) = −12 + 12 = 0.' },
+                { text: <M>{'x = 4'}</M>, correct: true, feedback: '−3x + 12 = 0 ergibt −3x = −12, also x = 4. Probe mit x = 4: y = −12 + 12 = 0.' },
               ]}
             />
             <TrackedCheck
@@ -710,7 +710,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
               prompt={
                 <>
                   <p>Berechne die Nullstelle der Geraden.</p>
-                  <MB>{'k(x) = 0{,}25x - 1{,}5'}</MB>
+                  <MB>{'y = 0{,}25x - 1{,}5'}</MB>
                 </>
               }
               fields={[{ kind: 'num', key: 'x', label: <M>{'x_N ='}</M>, expected: 6 }]}
@@ -718,7 +718,7 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <>
                   <MB>{'\\begin{aligned} 0{,}25x - 1{,}5 &= 0 && \\mid +1{,}5 \\\\ 0{,}25x &= 1{,}5 && \\mid :0{,}25 \\\\ x &= 6 \\end{aligned}'}</MB>
                   <p>
-                    Probe: <M>{'k(6) = 0{,}25 \\cdot 6 - 1{,}5 = 0'}</M> ✓
+                    Probe mit <M>{'x = 6'}</M>: <M>{'y = 0{,}25 \\cdot 6 - 1{,}5 = 0'}</M> ✓
                   </p>
                 </>
               }
