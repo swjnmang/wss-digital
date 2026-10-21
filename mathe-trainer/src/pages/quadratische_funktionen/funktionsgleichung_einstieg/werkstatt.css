@@ -66,3 +66,23 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+/* Zentrales Problem: Gegeben / Gesucht */
+.tb-problem {
+  display: flex; flex-direction: column; gap: 10px; padding: 14px 18px;
+  border: 3px solid #b54708; border-radius: var(--radius); background: var(--surface);
+}
+.tb-problem-title { display: flex; align-items: center; gap: 10px; font: 800 20px/1.2 var(--font-display); color: #b54708; }
+.tb-problem-grid { display: grid; gap: 8px; font-size: 17px; line-height: 1.5; }
+@media (min-width: 640px) { .tb-problem-grid { grid-template-columns: 1fr 1fr; } }
+.tb-problem-grid > div { padding: 8px 12px; border-radius: 10px; background: #fff1e6; }
+.tb-problem-label { display: block; font: 800 13px/1.3 var(--font-body); letter-spacing: 0.05em; text-transform: uppercase; color: #b54708; }
+.tb-problem-frage { padding: 10px 14px; border-radius: 10px; background: var(--highlight); color: var(--on-highlight); font: 800 19px/1.35 var(--font-display) !important; }
+.tb-problem-kompakt { padding: 10px 14px; gap: 6px; border-width: 2px; }
+.tb-problem-kompakt .tb-problem-title { font-size: 16px; }
+.tb-problem-kompakt .tb-problem-grid { font-size: 16px; }
+.tb-problem-kompakt .tb-problem-grid > div { padding: 4px 10px; }
+/* Auf großen Bildschirmen läuft das Problem in Phase 3 unter der Fortschrittsleiste mit */
+@media (min-width: 900px) and (min-height: 700px) {
+  .tb-problem-kompakt { position: sticky; top: calc(var(--et-top, 65px) + 66px); z-index: 10; box-shadow: 0 6px 14px rgba(27, 36, 51, 0.12); }
+}

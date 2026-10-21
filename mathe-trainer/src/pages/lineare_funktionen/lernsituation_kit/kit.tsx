@@ -66,7 +66,7 @@ export function HeftHinweis({ children }: { children?: ReactNode }) {
 /* ── Kleine Bausteine ────────────────────────────────────────────────────── */
 
 export type Social = 'EA' | 'PA' | 'GA' | 'Plenum'
-const SOCIAL: Record<Social, { label: string; icon: string }> = {
+export const SOCIAL: Record<Social, { label: string; icon: string }> = {
   EA: { label: 'Einzelarbeit', icon: 'fa-user' },
   PA: { label: 'Partnerarbeit', icon: 'fa-user-group' },
   GA: { label: 'Gruppenarbeit', icon: 'fa-people-group' },
