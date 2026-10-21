@@ -255,11 +255,18 @@ a.bk-tile:hover, button.bk-tile:hover { background: var(--surface-sunken); }
 .bk-keypad-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .bk-keypad-title { font: 700 13px/1 var(--font-body); color: var(--ink-muted); letter-spacing: .06em; text-transform: uppercase; }
 .bk-keypad-tool { min-height: 40px; min-width: 48px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px; border: 2px solid var(--line-strong); background: var(--surface); font: 700 14px/1 var(--font-body); color: var(--ink); }
-.bk-keypad-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.bk-keypad-bar { min-height: 56px; }
+.bk-keypad-preview { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; text-align: center; font-size: 20px; color: var(--ink); white-space: nowrap; padding: 2px 4px; scrollbar-width: none; }
+.bk-keypad-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .bk-key { height: 52px; border-radius: 12px; border: 1.5px solid var(--edge); background: var(--surface); box-shadow: none; font: 700 22px/1 var(--font-display); color: var(--ink); display: flex; align-items: center; justify-content: center; user-select: none; -webkit-user-select: none; }
 .bk-key:active { transform: translateY(2px); box-shadow: none; }
 .bk-key.op { background: var(--primary-soft); }
-.bk-key.go { grid-column: span 3; background: var(--primary); color: var(--on-primary); font: 700 17px/1 var(--font-body); }
+.bk-key sup { font-size: .65em; vertical-align: .75em; margin-left: 1px; }
+.bk-key-box { display: inline-block; width: 13px; height: 15px; border: 2px solid currentColor; border-radius: 3px; vertical-align: -1px; }
+.bk-key-frac { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; }
+.bk-key-frac .bk-key-box { width: 12px; height: 12px; }
+.bk-key-line { display: block; width: 22px; height: 2.5px; background: currentColor; border-radius: 2px; }
+.bk-key.go { grid-column: span 5; background: var(--primary); color: var(--on-primary); font: 700 17px/1 var(--font-body); }
 @media (max-height: 560px) { .bk-key { height: 44px; } .bk-keypad-bar { margin-bottom: 4px; } }
 /* Video-Platzhalter in der Seite */
 .bk-embed { width: 100%; max-width: 720px; margin: 0 auto; border: 1.5px solid var(--edge); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-hard-sm); }
