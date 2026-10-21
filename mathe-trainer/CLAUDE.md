@@ -54,6 +54,12 @@ nicht nur auf einen Feature-Branch. Vorher `main` aktualisieren und mergen, kein
 
 ## Seiten mit Lernsituation
 
+Jede Lernsituation hat genau vier Phasen in fester Reihenfolge: **1 Warm-up**, **2 Problem erkennen**, **3 Problem lösen**,
+**4 Festhalten und Prüfen**. Dafür `Etappe`, `Teil` und `Fortschritt` aus `lineare_funktionen/lernsituation_kit/phasen.tsx` nutzen
+(`<Etappe prefix="…" art="start|problem|loesen|sichern">`); Namen und Reihenfolge stehen nur dort. Abschnitte mit eigener Sozialform
+(Austausch, Check, Merke) sind `<Teil>` innerhalb einer Phase. In „Problem lösen“ steht das eigentliche Problem im Mittelpunkt, ohne
+vorgeschaltete Nebenaufgaben. Beispiel: `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx`.
+
 Hat eine Übungsseite eine Einstiegs-Lernsituation (Karte „Lernsituation“ in der Auswahl), heißt der Bereich darunter mit den
 Schwierigkeitsgraden immer **„Übungsaufgaben“** (nicht „Wähle deinen Schwierigkeitsgrad“). Das gilt für alle Seiten des Mathe-Trainers,
 auch für künftige. Die Scheitelform wird als `y = a(x − x_S)² + y_S` geschrieben, nicht mit d und e.

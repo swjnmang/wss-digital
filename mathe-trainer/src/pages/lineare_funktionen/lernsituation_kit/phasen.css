@@ -1,4 +1,5 @@
-/* Großphasen einer Lernsituation (etappen.tsx): jede Phase mit eigener Farbe, Icon und Auftragskasten, dazu die Fortschrittsleiste. */
+/* Vier feste Phasen jeder Lernsituation (phasen.tsx): Warm-up, Problem erkennen, Problem lösen, Festhalten und Prüfen.
+   Jede Phase mit eigener Farbe, Icon und Auftragskasten, dazu die mitlaufende Fortschrittsleiste. */
 
 .et-start { --et: #5b6472; --et-soft: #eef0f3; }
 .et-problem, .et-bar-problem { --et: #b54708; --et-soft: #fff1e6; }
@@ -68,3 +69,4 @@
 .et-teil { display: flex; flex-direction: column; gap: 14px; padding-top: 14px; border-top: 2px dashed var(--et); }
 .et-teil-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .et-teil-head h3 { margin: 0; font: 800 20px/1.25 var(--font-display); color: var(--et); }
+.et-body > .et-teil:first-child { border-top: 0; padding-top: 0; }

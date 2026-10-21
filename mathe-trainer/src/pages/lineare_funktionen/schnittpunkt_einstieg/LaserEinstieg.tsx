@@ -2,9 +2,8 @@ import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import CheckedNumberInput from '../../../components/CheckedNumberInput'
 import { Beispiel, M, MB, Merke, QuerTabelle, fmt } from '../../daten_und_zufall/lernpfad/kit'
-import {
-  Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, HeftHinweis, Hilfen, McCard, Phase, TrackedCheck, TrackedMc, tx,
-} from '../lernsituation_kit/kit'
+import { Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, HeftHinweis, Hilfen, McCard, TrackedCheck, TrackedMc, tx } from '../lernsituation_kit/kit'
+import { Etappe, Fortschritt, Teil } from '../lernsituation_kit/phasen'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 
 // Einstiegs-Lernsituation „Treffen sich die Laserstrahlen über dem DJ-Pult?“ zum Schnittpunkt zweier Geraden
@@ -232,7 +231,16 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
         <Arbeitsweise />
 
         {/* 1 Aktivieren */}
-        <Phase no={1} title="Fit für den Start" social="EA" minutes={5}>
+        <Fortschritt prefix="laser" />
+
+        <Etappe
+          prefix="laser"
+          art="start"
+          social="EA"
+          minutes={5}
+          was={<>Kurze Aufgaben allein lösen.</>}
+          wozu={<>Du frischst auf, was du gleich zum Lösen des Problems brauchst.</>}
+        >
           <p>Diese vier kurzen Aufgaben brauchst du gleich. Löse sie allein.</p>
           <div className="lp-exlist">
             <CheckCard
@@ -294,555 +302,584 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               solution={<MB>{'\\begin{aligned} 0{,}5x + 1{,}5 &= 2 && \\mid -1{,}5 \\\\ 0{,}5x &= 0{,}5 && \\mid :0{,}5 \\\\ x &= 1 \\end{aligned}'}</MB>}
             />
           </div>
-        </Phase>
+        </Etappe>
 
         {/* 2 Situation & Vorhersage */}
-        <Phase no={2} title="Die Situation: Lasershow für die Abschlussparty" social="EA" minutes={5}>
-          <p>
-            Für eure Abschlussparty baut ihr in der Aula eine Lasershow auf. An der Decke hängen zwei Laserstrahler. Ihr wollt, dass sich die beiden Strahlen genau über dem
-            DJ-Pult kreuzen, das sieht am besten aus.
-          </p>
-          <p>
-            Das Bild zeigt die Bühne von der Seite in einem Koordinatensystem. Ein Kästchen ist 1 m. Die y-Achse geht genau durch die Mitte des DJ-Pults, die x-Achse ist der
-            Boden.
-          </p>
-          <LaserBild />
-          <div className="ls-flyers">
-            <div className="ls-flyer ls-flyer-a">
-              <div className="ls-flyer-name">Linker Laser</div>
-              <div className="ls-flyer-price">
-                Strahl <strong>
-                  <M>{'y = -0{,}5x + 2'}</M>
-                </strong>
+        <Etappe
+          prefix="laser"
+          art="problem"
+          social="EA"
+          minutes={5}
+          was={<>Die Situation lesen und deine Vermutung festhalten. Noch nicht rechnen.</>}
+          wozu={<>Du weißt genau, welche Frage du in Phase 3 beantwortest.</>}
+        >
+          <Teil title="Die Situation: Lasershow für die Abschlussparty">
+            <p>
+              Für eure Abschlussparty baut ihr in der Aula eine Lasershow auf. An der Decke hängen zwei Laserstrahler. Ihr wollt, dass sich die beiden Strahlen genau über dem
+              DJ-Pult kreuzen, das sieht am besten aus.
+            </p>
+            <p>
+              Das Bild zeigt die Bühne von der Seite in einem Koordinatensystem. Ein Kästchen ist 1 m. Die y-Achse geht genau durch die Mitte des DJ-Pults, die x-Achse ist der
+              Boden.
+            </p>
+            <LaserBild />
+            <div className="ls-flyers">
+              <div className="ls-flyer ls-flyer-a">
+                <div className="ls-flyer-name">Linker Laser</div>
+                <div className="ls-flyer-price">
+                  Strahl <strong>
+                    <M>{'y = -0{,}5x + 2'}</M>
+                  </strong>
+                </div>
+              </div>
+              <div className="ls-flyer ls-flyer-b">
+                <div className="ls-flyer-name">Rechter Laser</div>
+                <div className="ls-flyer-price">
+                  Strahl <strong>
+                    <M>{'y = 0{,}5x + 1{,}5'}</M>
+                  </strong>
+                </div>
               </div>
             </div>
-            <div className="ls-flyer ls-flyer-b">
-              <div className="ls-flyer-name">Rechter Laser</div>
-              <div className="ls-flyer-price">
-                Strahl <strong>
-                  <M>{'y = 0{,}5x + 1{,}5'}</M>
-                </strong>
-              </div>
+            <p>Das DJ-Pult ist 80 cm breit (von x = −0,4 bis x = 0,4) und 1,10 m hoch.</p>
+            <div className="ls-question">
+              <i className="fa-solid fa-circle-question" aria-hidden="true" />
+              <span>Kreuzen sich die beiden Laserstrahlen über dem DJ-Pult?</span>
             </div>
-          </div>
-          <p>Das DJ-Pult ist 80 cm breit (von x = −0,4 bis x = 0,4) und 1,10 m hoch.</p>
-          <div className="ls-question">
-            <i className="fa-solid fa-circle-question" aria-hidden="true" />
-            <span>Kreuzen sich die beiden Laserstrahlen über dem DJ-Pult?</span>
-          </div>
 
-          <div className="lp-ex bk-panel" data-no-autocheck>
-            <CardHead title="Deine Vermutung" />
-            {pred.saved && pred.choice ? (
-              <>
-                <div className="ls-saved" role="status">
-                  <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: <strong>{CHOICE_TEXT[pred.choice]}</strong>. Deine Schätzung: bei etwa{' '}
-                  <strong>x = {fmt(pred.x, 1)}</strong>. Am Ende schauen wir, ob du recht hattest.
-                </div>
-                <div>
-                  <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={() => setPred({ ...pred, saved: false })}>
-                    Vermutung ändern
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p>Rechne noch nicht! Schau nur auf das Bild, entscheide spontan und schreibe einen Satz als Begründung in dein Heft.</p>
-                <div className="ls-options" role="radiogroup" aria-label="Vermutung">
-                  {(['ueber', 'links', 'rechts'] as const).map((c) => (
-                    <label key={c} className="bk-choice ls-option">
-                      <input type="radio" name="ls-pred" checked={pred.choice === c} onChange={() => setPred({ ...pred, choice: c })} />
-                      <span>{CHOICE_TEXT[c]}</span>
+            <div className="lp-ex bk-panel" data-no-autocheck>
+              <CardHead title="Deine Vermutung" />
+              {pred.saved && pred.choice ? (
+                <>
+                  <div className="ls-saved" role="status">
+                    <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: <strong>{CHOICE_TEXT[pred.choice]}</strong>. Deine Schätzung: bei etwa{' '}
+                    <strong>x = {fmt(pred.x, 1)}</strong>. Am Ende schauen wir, ob du recht hattest.
+                  </div>
+                  <div>
+                    <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={() => setPred({ ...pred, saved: false })}>
+                      Vermutung ändern
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p>Rechne noch nicht! Schau nur auf das Bild, entscheide spontan und schreibe einen Satz als Begründung in dein Heft.</p>
+                  <div className="ls-options" role="radiogroup" aria-label="Vermutung">
+                    {(['ueber', 'links', 'rechts'] as const).map((c) => (
+                      <label key={c} className="bk-choice ls-option">
+                        <input type="radio" name="ls-pred" checked={pred.choice === c} onChange={() => setPred({ ...pred, choice: c })} />
+                        <span>{CHOICE_TEXT[c]}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="ls-slider">
+                    <label htmlFor="ls-pred-x">
+                      Ich schätze, die Strahlen kreuzen sich bei x ≈ <span className="ls-slider-value">{fmt(pred.x, 1)}</span>
                     </label>
-                  ))}
-                </div>
-                <div className="ls-slider">
-                  <label htmlFor="ls-pred-x">
-                    Ich schätze, die Strahlen kreuzen sich bei x ≈ <span className="ls-slider-value">{fmt(pred.x, 1)}</span>
-                  </label>
-                  <input
-                    id="ls-pred-x"
-                    type="range"
-                    min={-2}
-                    max={2}
-                    step={0.1}
-                    value={pred.x}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, x: Math.round(Number(e.target.value) * 10) / 10 })}
-                  />
-                </div>
-                <div>
-                  <button type="button" className="bk-btn bk-btn-primary" disabled={!pred.choice} onClick={() => setPred({ ...pred, saved: true })}>
-                    <i className="fa-solid fa-lock" aria-hidden="true" /> Vermutung festhalten
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </Phase>
+                    <input
+                      id="ls-pred-x"
+                      type="range"
+                      min={-2}
+                      max={2}
+                      step={0.1}
+                      value={pred.x}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => setPred({ ...pred, x: Math.round(Number(e.target.value) * 10) / 10 })}
+                    />
+                  </div>
+                  <div>
+                    <button type="button" className="bk-btn bk-btn-primary" disabled={!pred.choice} onClick={() => setPred({ ...pred, saved: true })}>
+                      <i className="fa-solid fa-lock" aria-hidden="true" /> Vermutung festhalten
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </Teil>
+        </Etappe>
 
         {/* 3 Erkunden */}
-        <Phase no={3} title="Findet es heraus" social="PA" minutes={12}>
-          <p>
-            <strong>Auftrag:</strong> Findet zu zweit heraus, wo sich die beiden Strahlen kreuzen und ob das über dem Pult ist. Ihr habt zwei Wege: Tabelle und Graph. Fangt
-            mit einem an, wer fertig ist, probiert auch den anderen. Jede Person tippt auf dem eigenen Gerät.
-          </p>
-
-          <div className="lp-ex bk-panel" data-no-autocheck>
-            <CardHead title="Weg 1: Tabelle" level="basis" />
-            <div className="lp-ex-prompt">
-              <p>Wie hoch sind die Strahlen an diesen Stellen? Füllt die Tabelle aus. Die Felder färben sich von selbst grün oder rot.</p>
-            </div>
-            <HeftHinweis><strong>Im Heft:</strong> Rechne die Tabellenwerte mit Rechenweg in deinem Heft aus. Trage dann nur die Ergebnisse ein.</HeftHinweis>
-            <QuerTabelle
-              rows={[
-                { head: 'x in m', cells: COARSE_X.map((x) => <strong key={x}>{fmt(x, 2)}</strong>) },
-                { head: 'linker Strahl y', cells: COARSE_X.map((x) => cellInput(f(x), x)) },
-                { head: 'rechter Strahl y', cells: COARSE_X.map((x) => cellInput(g(x), x)) },
-              ]}
-            />
+        <Etappe
+          prefix="laser"
+          art="loesen"
+          minutes={17}
+          was={<>Zu zweit herausfinden, ob und wo sich die beiden Laserstrahlen treffen. Danach vergleicht ihr eure Wege.</>}
+          wozu={<>So bestimmst du den Schnittpunkt zweier Geraden.</>}
+        >
+          <Teil title="Findet es heraus" social="PA" minutes={12}>
             <p>
-              Zwischen welchen beiden x-Werten tauschen die Strahlen die Plätze, sodass plötzlich der andere höher ist? Schaut mit der Lupe genauer hin:
+              <strong>Auftrag:</strong> Findet zu zweit heraus, wo sich die beiden Strahlen kreuzen und ob das über dem Pult ist. Ihr habt zwei Wege: Tabelle und Graph. Fangt
+              mit einem an, wer fertig ist, probiert auch den anderen. Jede Person tippt auf dem eigenen Gerät.
             </p>
-            <QuerTabelle
-              rows={[
-                { head: 'x in m', cells: LUPE_X.map((x) => <strong key={x}>{fmt(x, 2)}</strong>) },
-                { head: 'linker Strahl y', cells: LUPE_X.map((x) => (x === 0 || x === 1 ? <span key={x}>{fmt(f(x), 3)}</span> : cellInput(f(x), x))) },
-                { head: 'rechter Strahl y', cells: LUPE_X.map((x) => (x === 0 || x === 1 ? <span key={x}>{fmt(g(x), 3)}</span> : cellInput(g(x), x))) },
-              ]}
-            />
-            <p className="lp-hint">Vergleicht die beiden Zeilen Spalte für Spalte: Wo sind beide Strahlen gleich hoch?</p>
-            <Hilfen
-              steps={[
-                <>Setzt jeden x-Wert in die Gleichung ein. Welcher y-Wert ergibt sich bei x = 0 für den linken, welcher für den rechten Strahl?</>,
-                <>
-                  Pro Meter nach rechts wird der linke Strahl 0,5 m tiefer, der rechte 0,5 m höher. Ihr könnt also auch vom vorigen Feld aus weiterrechnen. In der Lupe sind es
-                  Schritte von 0,25 m, also ändert sich die Höhe um 0,125 m.
-                </>,
-                <>
-                  Für <M>{'x = -2'}</M> gilt beim linken Strahl: <M>{'y = -0{,}5 \\cdot (-2) + 2 = 3'}</M>, beim rechten Strahl: <M>{'y = 0{,}5 \\cdot (-2) + 1{,}5 = 0{,}5'}</M>.
-                </>,
-              ]}
-            />
-          </div>
 
-          <GraphKarte />
-
-          <CheckCard
-            title="Euer Ergebnis"
-            rechnen={false}
-            prompt={<p>Egal, welchen Weg ihr genommen habt: Tragt euer Ergebnis ein und haltet eure Rechenwege oder Ablesungen schriftlich fest.</p>}
-            fields={[
-              { kind: 'num', key: 'x', label: <>Die Strahlen kreuzen sich bei <M>x</M> =</>, expected: XS, unit: 'm' },
-              { kind: 'num', key: 'y', label: <>in der Höhe <M>y</M> =</>, expected: YS, unit: 'm' },
-              {
-                kind: 'select',
-                key: 'pult',
-                label: 'Kreuzen sich die Strahlen über dem Pult?',
-                options: ['Ja, genau über der Mitte', 'Ja, über dem Pult, aber nicht in der Mitte', 'Nein, knapp rechts neben dem Pult', 'Nein, links neben dem Pult'],
-                expected: 2,
-              },
-            ]}
-          />
-
-          <CheckCard
-            title="Zusatzfrage: Den Strahler neu ausrichten"
-            level="erweiterung"
-            prompt={
-              <>
-                <p>
-                  Ihr seid schon fertig? Der rechte Strahler hängt fest in <M>{'R(5 \\mid 4)'}</M>, aber ihr könnt ihn drehen. Dadurch ändert sich die Steigung seines Strahls.
-                  Stellt ihn so ein, dass sich die Strahlen <strong>genau über der Mitte des Pults</strong> kreuzen.
-                </p>
-                <p>Beschreibt im Heft: In welche Richtung wandert der Kreuzungspunkt, wenn der rechte Strahl steiler wird? Warum?</p>
-                <DrehenAnsicht />
-              </>
-            }
-            fields={[
-              { kind: 'num', key: 'm', label: <>Nötige Steigung <M>m</M> =</>, expected: 0.4 },
-              { kind: 'num', key: 'y', label: <>Höhe des Kreuzungspunkts <M>y</M> =</>, expected: 2, unit: 'm' },
-            ]}
-            help={
+            <div className="lp-ex bk-panel" data-no-autocheck>
+              <CardHead title="Weg 1: Tabelle" level="basis" />
+              <div className="lp-ex-prompt">
+                <p>Wie hoch sind die Strahlen an diesen Stellen? Füllt die Tabelle aus. Die Felder färben sich von selbst grün oder rot.</p>
+              </div>
+              <HeftHinweis><strong>Im Heft:</strong> Rechne die Tabellenwerte mit Rechenweg in deinem Heft aus. Trage dann nur die Ergebnisse ein.</HeftHinweis>
+              <QuerTabelle
+                rows={[
+                  { head: 'x in m', cells: COARSE_X.map((x) => <strong key={x}>{fmt(x, 2)}</strong>) },
+                  { head: 'linker Strahl y', cells: COARSE_X.map((x) => cellInput(f(x), x)) },
+                  { head: 'rechter Strahl y', cells: COARSE_X.map((x) => cellInput(g(x), x)) },
+                ]}
+              />
+              <p>
+                Zwischen welchen beiden x-Werten tauschen die Strahlen die Plätze, sodass plötzlich der andere höher ist? Schaut mit der Lupe genauer hin:
+              </p>
+              <QuerTabelle
+                rows={[
+                  { head: 'x in m', cells: LUPE_X.map((x) => <strong key={x}>{fmt(x, 2)}</strong>) },
+                  { head: 'linker Strahl y', cells: LUPE_X.map((x) => (x === 0 || x === 1 ? <span key={x}>{fmt(f(x), 3)}</span> : cellInput(f(x), x))) },
+                  { head: 'rechter Strahl y', cells: LUPE_X.map((x) => (x === 0 || x === 1 ? <span key={x}>{fmt(g(x), 3)}</span> : cellInput(g(x), x))) },
+                ]}
+              />
+              <p className="lp-hint">Vergleicht die beiden Zeilen Spalte für Spalte: Wo sind beide Strahlen gleich hoch?</p>
               <Hilfen
                 steps={[
-                  <>Schiebt den Regler: Wandert der Kreuzungspunkt nach links oder nach rechts, wenn der Strahl steiler wird?</>,
+                  <>Setzt jeden x-Wert in die Gleichung ein. Welcher y-Wert ergibt sich bei x = 0 für den linken, welcher für den rechten Strahl?</>,
                   <>
-                    Über der Pultmitte ist <M>{'x = 0'}</M>. Wie hoch ist der linke Strahl dort? Das ist sein y-Achsenabschnitt.
+                    Pro Meter nach rechts wird der linke Strahl 0,5 m tiefer, der rechte 0,5 m höher. Ihr könnt also auch vom vorigen Feld aus weiterrechnen. In der Lupe sind es
+                    Schritte von 0,25 m, also ändert sich die Höhe um 0,125 m.
                   </>,
                   <>
-                    Der rechte Strahl muss durch <M>{'R(5 \\mid 4)'}</M> und durch <M>{'(0 \\mid 2)'}</M> gehen. Steigung aus zwei Punkten:{' '}
-                    <M>{'m = \\frac{4 - 2}{5 - 0}'}</M>
+                    Für <M>{'x = -2'}</M> gilt beim linken Strahl: <M>{'y = -0{,}5 \\cdot (-2) + 2 = 3'}</M>, beim rechten Strahl: <M>{'y = 0{,}5 \\cdot (-2) + 1{,}5 = 0{,}5'}</M>.
                   </>,
                 ]}
               />
-            }
-            solution={
-              <>
-                <p>
-                  Über der Pultmitte ist <M>{'x = 0'}</M>. Der linke Strahl ist dort 2 m hoch (<M>{'y = 2'}</M>). Der rechte Strahl muss also durch <M>{'(0 \\mid 2)'}</M> und{' '}
-                  <M>{'R(5 \\mid 4)'}</M> gehen:
-                </p>
-                <MB>{'m = \\frac{4 - 2}{5 - 0} = \\frac{2}{5} = 0{,}4'}</MB>
-                <p>
-                  Der Kreuzungspunkt liegt dann bei <M>{'S(0 \\mid 2)'}</M>, also 2 m hoch über der Pultmitte. Je steiler der rechte Strahl ist, desto weiter rechts und tiefer
-                  liegt der Kreuzungspunkt, denn der Strahl fällt nach links schneller ab.
-                </p>
-              </>
-            }
-          />
-        </Phase>
+            </div>
+
+            <GraphKarte />
+
+            <CheckCard
+              title="Euer Ergebnis"
+              rechnen={false}
+              prompt={<p>Egal, welchen Weg ihr genommen habt: Tragt euer Ergebnis ein und haltet eure Rechenwege oder Ablesungen schriftlich fest.</p>}
+              fields={[
+                { kind: 'num', key: 'x', label: <>Die Strahlen kreuzen sich bei <M>x</M> =</>, expected: XS, unit: 'm' },
+                { kind: 'num', key: 'y', label: <>in der Höhe <M>y</M> =</>, expected: YS, unit: 'm' },
+                {
+                  kind: 'select',
+                  key: 'pult',
+                  label: 'Kreuzen sich die Strahlen über dem Pult?',
+                  options: ['Ja, genau über der Mitte', 'Ja, über dem Pult, aber nicht in der Mitte', 'Nein, knapp rechts neben dem Pult', 'Nein, links neben dem Pult'],
+                  expected: 2,
+                },
+              ]}
+            />
+
+            <CheckCard
+              title="Zusatzfrage: Den Strahler neu ausrichten"
+              level="erweiterung"
+              prompt={
+                <>
+                  <p>
+                    Ihr seid schon fertig? Der rechte Strahler hängt fest in <M>{'R(5 \\mid 4)'}</M>, aber ihr könnt ihn drehen. Dadurch ändert sich die Steigung seines Strahls.
+                    Stellt ihn so ein, dass sich die Strahlen <strong>genau über der Mitte des Pults</strong> kreuzen.
+                  </p>
+                  <p>Beschreibt im Heft: In welche Richtung wandert der Kreuzungspunkt, wenn der rechte Strahl steiler wird? Warum?</p>
+                  <DrehenAnsicht />
+                </>
+              }
+              fields={[
+                { kind: 'num', key: 'm', label: <>Nötige Steigung <M>m</M> =</>, expected: 0.4 },
+                { kind: 'num', key: 'y', label: <>Höhe des Kreuzungspunkts <M>y</M> =</>, expected: 2, unit: 'm' },
+              ]}
+              help={
+                <Hilfen
+                  steps={[
+                    <>Schiebt den Regler: Wandert der Kreuzungspunkt nach links oder nach rechts, wenn der Strahl steiler wird?</>,
+                    <>
+                      Über der Pultmitte ist <M>{'x = 0'}</M>. Wie hoch ist der linke Strahl dort? Das ist sein y-Achsenabschnitt.
+                    </>,
+                    <>
+                      Der rechte Strahl muss durch <M>{'R(5 \\mid 4)'}</M> und durch <M>{'(0 \\mid 2)'}</M> gehen. Steigung aus zwei Punkten:{' '}
+                      <M>{'m = \\frac{4 - 2}{5 - 0}'}</M>
+                    </>,
+                  ]}
+                />
+              }
+              solution={
+                <>
+                  <p>
+                    Über der Pultmitte ist <M>{'x = 0'}</M>. Der linke Strahl ist dort 2 m hoch (<M>{'y = 2'}</M>). Der rechte Strahl muss also durch <M>{'(0 \\mid 2)'}</M> und{' '}
+                    <M>{'R(5 \\mid 4)'}</M> gehen:
+                  </p>
+                  <MB>{'m = \\frac{4 - 2}{5 - 0} = \\frac{2}{5} = 0{,}4'}</MB>
+                  <p>
+                    Der Kreuzungspunkt liegt dann bei <M>{'S(0 \\mid 2)'}</M>, also 2 m hoch über der Pultmitte. Je steiler der rechte Strahl ist, desto weiter rechts und tiefer
+                    liegt der Kreuzungspunkt, denn der Strahl fällt nach links schneller ab.
+                  </p>
+                </>
+              }
+            />
+          </Teil>
+
 
         {/* 4 Austausch */}
-        <Phase no={4} title="Vergleicht eure Wege" social="Plenum" minutes={5}>
-          <div className="ls-stop">
-            <div className="ls-stop-title">
-              <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
+          <Teil title="Vergleicht eure Wege" social="Plenum" minutes={5}>
+            <div className="ls-stop">
+              <div className="ls-stop-title">
+                <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
+              </div>
+              <ul>
+                <li>Wo sieht man in der Tabelle und im Bild, dass sich die Strahlen kreuzen?</li>
+                <li>Warum hat die Tabelle mit ganzen Metern nicht gereicht?</li>
+                <li>Im Bild sieht es fast so aus, als würden sich die Strahlen über dem Pult kreuzen. Wie sicher könnt ihr euch beim Ablesen sein?</li>
+              </ul>
             </div>
-            <ul>
-              <li>Wo sieht man in der Tabelle und im Bild, dass sich die Strahlen kreuzen?</li>
-              <li>Warum hat die Tabelle mit ganzen Metern nicht gereicht?</li>
-              <li>Im Bild sieht es fast so aus, als würden sich die Strahlen über dem Pult kreuzen. Wie sicher könnt ihr euch beim Ablesen sein?</li>
-            </ul>
-          </div>
-          <p>
-            <strong>Du arbeitest allein?</strong> So haben zwei andere Jugendliche gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
-          </p>
-          <div className="ls-ways">
-            <details className="ls-way">
-              <summary>Jonas hat eine Tabelle gemacht</summary>
-              <div className="ls-way-body">
-                <p>
-                  „Bei x = 0 ist der linke Strahl höher, bei x = 1 der rechte. Dazwischen müssen sie sich kreuzen. Mit der Lupe habe ich gesehen: Bei x = 0,5 sind beide 1,75 m
-                  hoch.“
-                </p>
-                <p>
-                  <strong>Gut:</strong> Man kann den Bereich Schritt für Schritt eingrenzen. <strong>Aber:</strong> Liegt der Punkt nicht genau auf einem Tabellenwert, muss man
-                  immer feiner rechnen.
-                </p>
-              </div>
-            </details>
-            <details className="ls-way">
-              <summary>Aylin hat im Bild abgelesen</summary>
-              <div className="ls-way-body">
-                <p>„Die Strahlen kreuzen sich ein Stück rechts von der y-Achse, knapp unter 2 m. Ist das jetzt noch über dem Pult oder schon daneben? Das sehe ich nicht genau.“</p>
-                <p>
-                  <strong>Gut:</strong> Man sieht sofort, wo ungefähr der Schnittpunkt liegt. <strong>Aber:</strong> Ablesen ist nur so genau wie die Zeichnung, bei 10 cm
-                  Unterschied reicht das nicht.
-                </p>
-              </div>
-            </details>
-          </div>
-          <p>
-            Beide Wege haben einen Haken: Liegt der Schnittpunkt nicht genau in der Tabelle oder auf einer Gitterlinie, findet man ihn nur ungefähr. Im nächsten Abschnitt
-            lernst du ein Verfahren, mit dem du ihn immer genau ausrechnest.
-          </p>
-        </Phase>
+            <p>
+              <strong>Du arbeitest allein?</strong> So haben zwei andere Jugendliche gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
+            </p>
+            <div className="ls-ways">
+              <details className="ls-way">
+                <summary>Jonas hat eine Tabelle gemacht</summary>
+                <div className="ls-way-body">
+                  <p>
+                    „Bei x = 0 ist der linke Strahl höher, bei x = 1 der rechte. Dazwischen müssen sie sich kreuzen. Mit der Lupe habe ich gesehen: Bei x = 0,5 sind beide 1,75 m
+                    hoch.“
+                  </p>
+                  <p>
+                    <strong>Gut:</strong> Man kann den Bereich Schritt für Schritt eingrenzen. <strong>Aber:</strong> Liegt der Punkt nicht genau auf einem Tabellenwert, muss man
+                    immer feiner rechnen.
+                  </p>
+                </div>
+              </details>
+              <details className="ls-way">
+                <summary>Aylin hat im Bild abgelesen</summary>
+                <div className="ls-way-body">
+                  <p>„Die Strahlen kreuzen sich ein Stück rechts von der y-Achse, knapp unter 2 m. Ist das jetzt noch über dem Pult oder schon daneben? Das sehe ich nicht genau.“</p>
+                  <p>
+                    <strong>Gut:</strong> Man sieht sofort, wo ungefähr der Schnittpunkt liegt. <strong>Aber:</strong> Ablesen ist nur so genau wie die Zeichnung, bei 10 cm
+                    Unterschied reicht das nicht.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <p>
+              Beide Wege haben einen Haken: Liegt der Schnittpunkt nicht genau in der Tabelle oder auf einer Gitterlinie, findet man ihn nur ungefähr. Im nächsten Abschnitt
+              lernst du ein Verfahren, mit dem du ihn immer genau ausrechnest.
+            </p>
+          </Teil>
+        </Etappe>
 
         {/* 5 Verfahren und Sichern */}
-        <Phase no={5} title="So rechnest du den Schnittpunkt aus" social="EA" minutes={8}>
-          <Rueckbezug pred={pred} />
-          <p>
-            Mit dem <strong>Gleichsetzungsverfahren</strong> rechnest du den Schnittpunkt immer genau aus. Decke das Beispiel Schritt für Schritt auf.
-          </p>
-          <Beispiel
-            title="Wo kreuzen sich die Laserstrahlen?"
-            aufgabe={
-              <p>
-                Linker Strahl: <M>{'y = -0{,}5x + 2'}</M>, rechter Strahl: <M>{'y = 0{,}5x + 1{,}5'}</M>. Das Pult reicht von <M>{'x = -0{,}4'}</M> bis{' '}
-                <M>{'x = 0{,}4'}</M>.
-              </p>
-            }
-            steps={[
-              {
-                title: 'Funktionsgleichungen bereitlegen',
-                body: (
-                  <p>
-                    Hier sind sie gegeben. In Prüfungsaufgaben musst du sie oft zuerst aus zwei Punkten aufstellen, wie in Aufgabe 1 b): <M>{'m = \\frac{y_2 - y_1}{x_2 - x_1}'}</M>,
-                    dann einen Punkt einsetzen und <M>t</M> berechnen.
-                  </p>
-                ),
-              },
-              {
-                title: 'Gleichsetzen',
-                body: (
-                  <>
-                    <p>Im Schnittpunkt sind beide Strahlen gleich hoch, also sind beide y-Werte gleich. Deshalb darfst du die rechten Seiten gleichsetzen:</p>
-                    <MB>{'-0{,}5x + 2 = 0{,}5x + 1{,}5'}</MB>
-                  </>
-                ),
-              },
-              {
-                title: 'Nach x auflösen',
-                body: (
-                  <>
-                    <p>Alle x auf eine Seite, alle Zahlen auf die andere. Tipp: Bringe die x auf die Seite, auf der sie positiv bleiben.</p>
-                    <MB>{'\\begin{aligned} -0{,}5x + 2 &= 0{,}5x + 1{,}5 && \\mid +0{,}5x \\\\ 2 &= x + 1{,}5 && \\mid -1{,}5 \\\\ 0{,}5 &= x \\end{aligned}'}</MB>
-                  </>
-                ),
-              },
-              {
-                title: 'x einsetzen und y ausrechnen',
-                body: (
-                  <>
-                    <p>Setze x = 0,5 in eine der beiden Gleichungen ein. Zur Probe in die andere:</p>
-                    <MB>{'x = 0{,}5: \\quad y = -0{,}5 \\cdot 0{,}5 + 2 = 1{,}75 \\qquad \\text{Probe mit dem rechten Strahl: } y = 0{,}25 + 1{,}5 = 1{,}75 \\;\\checkmark'}</MB>
-                  </>
-                ),
-              },
-              {
-                title: 'Schnittpunkt angeben und im Bild deuten',
-                body: (
-                  <>
-                    <MB>{'S(0{,}5 \\mid 1{,}75)'}</MB>
+        <Etappe
+          prefix="laser"
+          art="sichern"
+          social="EA"
+          minutes={21}
+          was={<>Das Wichtigste in deinem Heft festhalten und dann allein prüfen, ob du es kannst.</>}
+          wozu={<>Dein Hefteintrag hilft dir bei allen Aufgaben dieser Art. Der Check zeigt dir, wo du noch unsicher bist.</>}
+        >
+          <Teil title="So rechnest du den Schnittpunkt aus" social="EA" minutes={8}>
+            <Rueckbezug pred={pred} />
+            <p>
+              Mit dem <strong>Gleichsetzungsverfahren</strong> rechnest du den Schnittpunkt immer genau aus. Decke das Beispiel Schritt für Schritt auf.
+            </p>
+            <Beispiel
+              title="Wo kreuzen sich die Laserstrahlen?"
+              aufgabe={
+                <p>
+                  Linker Strahl: <M>{'y = -0{,}5x + 2'}</M>, rechter Strahl: <M>{'y = 0{,}5x + 1{,}5'}</M>. Das Pult reicht von <M>{'x = -0{,}4'}</M> bis{' '}
+                  <M>{'x = 0{,}4'}</M>.
+                </p>
+              }
+              steps={[
+                {
+                  title: 'Funktionsgleichungen bereitlegen',
+                  body: (
                     <p>
-                      Die Strahlen kreuzen sich 0,5 m rechts von der Pultmitte in 1,75 m Höhe. Das Pult reicht nur bis 0,4 m, der Kreuzungspunkt liegt also 10 cm rechts neben
-                      dem Pult. Außerdem sind 1,75 m genau Kopfhöhe, und Laser dürfen niemandem in die Augen leuchten. Der Strahler sollte also neu ausgerichtet werden.
+                      Hier sind sie gegeben. In Prüfungsaufgaben musst du sie oft zuerst aus zwei Punkten aufstellen, wie in Aufgabe 1 b): <M>{'m = \\frac{y_2 - y_1}{x_2 - x_1}'}</M>,
+                      dann einen Punkt einsetzen und <M>t</M> berechnen.
                     </p>
-                  </>
-                ),
-              },
-            ]}
-          />
-          <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
-          <Merke title="Schnittpunkt zweier Geraden">
-            <p>
-              Im <strong>Schnittpunkt</strong> <M>{'S(x_S \\mid y_S)'}</M> haben beide Geraden denselben <M>x</M>-Wert <strong>und</strong> denselben <M>y</M>-Wert.
-            </p>
-            <p>So berechnest du ihn (Gleichsetzungsverfahren):</p>
-            <ol>
-              <li>
-                Beide Funktionsterme gleichsetzen: <M>{'m_1 x + t_1 = m_2 x + t_2'}</M>
-              </li>
-              <li>
-                Nach <M>x</M> auflösen, das ergibt <M>{'x_S'}</M>.
-              </li>
-              <li>
-                <M>{'x_S'}</M> in eine der beiden Gleichungen einsetzen, das ergibt <M>{'y_S'}</M>.
-              </li>
-              <li>
-                Schnittpunkt angeben: <M>{'S(x_S \\mid y_S)'}</M>, bei Sachaufgaben mit Antwortsatz und Deutung im Bild.
-              </li>
-            </ol>
-            <p>
-              Lasershow: <M>{'S(0{,}5 \\mid 1{,}75)'}</M>: Die Strahlen kreuzen sich 0,5 m rechts der Pultmitte in 1,75 m Höhe, also knapp neben dem Pult.
-            </p>
-          </Merke>
-          <div className="lp-ex bk-panel">
-            <CardHead title="Dein Hefteintrag" />
-            <p>Übertrage den Merkkasten in dein Heft und ergänze ihn mit dem Laser-Beispiel. Hake ab, was du schon hast:</p>
-            <div className="ls-criteria">
-              {[
-                'Überschrift „Schnittpunkt zweier Geraden“ und die beiden Funktionsgleichungen der Strahlen',
-                'Skizze der Bühne mit beiden Strahlen, dem Pult und dem markierten Schnittpunkt S(0,5 | 1,75)',
-                'Gleichsetzen mit allen Rechenschritten, Einsetzen für y und Probe',
-                'Antwortsatz: Wo genau und wie hoch kreuzen sich die Strahlen, und ist das über dem Pult?',
-              ].map((c) => (
-                <label key={c}>
-                  <input type="checkbox" /> <span>{c}</span>
-                </label>
-              ))}
+                  ),
+                },
+                {
+                  title: 'Gleichsetzen',
+                  body: (
+                    <>
+                      <p>Im Schnittpunkt sind beide Strahlen gleich hoch, also sind beide y-Werte gleich. Deshalb darfst du die rechten Seiten gleichsetzen:</p>
+                      <MB>{'-0{,}5x + 2 = 0{,}5x + 1{,}5'}</MB>
+                    </>
+                  ),
+                },
+                {
+                  title: 'Nach x auflösen',
+                  body: (
+                    <>
+                      <p>Alle x auf eine Seite, alle Zahlen auf die andere. Tipp: Bringe die x auf die Seite, auf der sie positiv bleiben.</p>
+                      <MB>{'\\begin{aligned} -0{,}5x + 2 &= 0{,}5x + 1{,}5 && \\mid +0{,}5x \\\\ 2 &= x + 1{,}5 && \\mid -1{,}5 \\\\ 0{,}5 &= x \\end{aligned}'}</MB>
+                    </>
+                  ),
+                },
+                {
+                  title: 'x einsetzen und y ausrechnen',
+                  body: (
+                    <>
+                      <p>Setze x = 0,5 in eine der beiden Gleichungen ein. Zur Probe in die andere:</p>
+                      <MB>{'x = 0{,}5: \\quad y = -0{,}5 \\cdot 0{,}5 + 2 = 1{,}75 \\qquad \\text{Probe mit dem rechten Strahl: } y = 0{,}25 + 1{,}5 = 1{,}75 \\;\\checkmark'}</MB>
+                    </>
+                  ),
+                },
+                {
+                  title: 'Schnittpunkt angeben und im Bild deuten',
+                  body: (
+                    <>
+                      <MB>{'S(0{,}5 \\mid 1{,}75)'}</MB>
+                      <p>
+                        Die Strahlen kreuzen sich 0,5 m rechts von der Pultmitte in 1,75 m Höhe. Das Pult reicht nur bis 0,4 m, der Kreuzungspunkt liegt also 10 cm rechts neben
+                        dem Pult. Außerdem sind 1,75 m genau Kopfhöhe, und Laser dürfen niemandem in die Augen leuchten. Der Strahler sollte also neu ausgerichtet werden.
+                      </p>
+                    </>
+                  ),
+                },
+              ]}
+            />
+            <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
+            <Merke title="Schnittpunkt zweier Geraden">
+              <p>
+                Im <strong>Schnittpunkt</strong> <M>{'S(x_S \\mid y_S)'}</M> haben beide Geraden denselben <M>x</M>-Wert <strong>und</strong> denselben <M>y</M>-Wert.
+              </p>
+              <p>So berechnest du ihn (Gleichsetzungsverfahren):</p>
+              <ol>
+                <li>
+                  Beide Funktionsterme gleichsetzen: <M>{'m_1 x + t_1 = m_2 x + t_2'}</M>
+                </li>
+                <li>
+                  Nach <M>x</M> auflösen, das ergibt <M>{'x_S'}</M>.
+                </li>
+                <li>
+                  <M>{'x_S'}</M> in eine der beiden Gleichungen einsetzen, das ergibt <M>{'y_S'}</M>.
+                </li>
+                <li>
+                  Schnittpunkt angeben: <M>{'S(x_S \\mid y_S)'}</M>, bei Sachaufgaben mit Antwortsatz und Deutung im Bild.
+                </li>
+              </ol>
+              <p>
+                Lasershow: <M>{'S(0{,}5 \\mid 1{,}75)'}</M>: Die Strahlen kreuzen sich 0,5 m rechts der Pultmitte in 1,75 m Höhe, also knapp neben dem Pult.
+              </p>
+            </Merke>
+            <div className="lp-ex bk-panel">
+              <CardHead title="Dein Hefteintrag" />
+              <p>Übertrage den Merkkasten in dein Heft und ergänze ihn mit dem Laser-Beispiel. Hake ab, was du schon hast:</p>
+              <div className="ls-criteria">
+                {[
+                  'Überschrift „Schnittpunkt zweier Geraden“ und die beiden Funktionsgleichungen der Strahlen',
+                  'Skizze der Bühne mit beiden Strahlen, dem Pult und dem markierten Schnittpunkt S(0,5 | 1,75)',
+                  'Gleichsetzen mit allen Rechenschritten, Einsetzen für y und Probe',
+                  'Antwortsatz: Wo genau und wie hoch kreuzen sich die Strahlen, und ist das über dem Pult?',
+                ].map((c) => (
+                  <label key={c}>
+                    <input type="checkbox" /> <span>{c}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
-        </Phase>
+          </Teil>
+
 
         {/* 6 Üben */}
-        <Phase no={6} title="Jetzt du: Schritt für Schritt üben" social="EA" minutes={7}>
-          <p>Hier rechnest du das Verfahren selbst. Die erste Aufgabe gibt dir die Schritte vor, bei der zweiten stellst du auch die Gleichungen aus zwei Punkten auf.</p>
-          <div className="lp-exlist">
-            <CheckCard
-              title="Übung 1: Mit Geländer"
-              level="basis"
-              prompt={
-                <>
-                  <p>Berechne den Schnittpunkt der beiden Geraden. Fülle die Lücken der Rechnung aus.</p>
-                  <MB>{'\\text{Gerade 1: } y = 4x + 1 \\qquad \\text{Gerade 2: } y = 2x + 7'}</MB>
+          <Teil title="Jetzt du: Schritt für Schritt üben" social="EA" minutes={7}>
+            <p>Hier rechnest du das Verfahren selbst. Die erste Aufgabe gibt dir die Schritte vor, bei der zweiten stellst du auch die Gleichungen aus zwei Punkten auf.</p>
+            <div className="lp-exlist">
+              <CheckCard
+                title="Übung 1: Mit Geländer"
+                level="basis"
+                prompt={
+                  <>
+                    <p>Berechne den Schnittpunkt der beiden Geraden. Fülle die Lücken der Rechnung aus.</p>
+                    <MB>{'\\text{Gerade 1: } y = 4x + 1 \\qquad \\text{Gerade 2: } y = 2x + 7'}</MB>
+                    <p>
+                      Zum Schluss setzt du <M>x</M> in die Gleichung von Gerade 1 ein und berechnest <M>y</M>.
+                    </p>
+                  </>
+                }
+                rechnung={[
+                  { l: ['4x + 1'], r: ['2x + 7'], u: '\\mid -2x' },
+                  { l: ['2x + 1'], r: ['7'], u: '\\mid -1' },
+                  { l: ['2x'], r: [{ luecke: 'zweix' }], u: '\\mid :2' },
+                  { l: ['x'], r: [{ luecke: 'x' }] },
+                  { l: ['y'], r: ['4 \\cdot x + 1 =', { luecke: 'y' }] },
+                ]}
+                fields={[
+                  { kind: 'num', key: 'zweix', label: '2x', expected: 6 },
+                  { kind: 'num', key: 'x', label: 'x', expected: 3 },
+                  { kind: 'num', key: 'y', label: 'y', expected: 13 },
+                ]}
+                solution={
+                  <>
+                    <MB>{'\\begin{aligned} 4x + 1 &= 2x + 7 && \\mid -2x \\\\ 2x + 1 &= 7 && \\mid -1 \\\\ 2x &= 6 && \\mid :2 \\\\ x &= 3 \\end{aligned}'}</MB>
+                    <MB>{'y = 4 \\cdot 3 + 1 = 13 \\qquad \\Rightarrow \\qquad S(3 \\mid 13)'}</MB>
+                  </>
+                }
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Rechne Schritt für Schritt: Was bleibt übrig, wenn du auf beiden Seiten 1 abziehst?</>,
+                      <>
+                        Nach dem Abziehen steht links nur noch <M>2x</M>. Teile dann beide Seiten durch 2.
+                      </>,
+                      <>
+                        <M>{'2x = 6'}</M>, also <M>{'x = 3'}</M>. Für <M>y</M>: <M>{'4 \\cdot 3 + 1'}</M>
+                      </>,
+                    ]}
+                  />
+                }
+              />
+              <CheckCard
+                title="Übung 2: Scheinwerfer im Schultheater"
+                level="standard"
+                prompt={
+                  <>
+                    <p>
+                      Im Schultheater leuchten zwei Scheinwerfer auf die Bühne (1 LE = 1 m, y-Achse = Bühnenmitte). Der Lichtstrahl von Scheinwerfer 1 geht durch die Punkte{' '}
+                      <M>{'A(0 \\mid 1)'}</M> und <M>{'B(5 \\mid 5)'}</M>, der von Scheinwerfer 2 durch <M>{'C(-4 \\mid 6{,}2)'}</M> und <M>{'D(6 \\mid 2{,}2)'}</M>.
+                    </p>
+                    <p>Stelle beide Funktionsgleichungen auf und berechne, wo sich die Lichtstrahlen kreuzen.</p>
+                  </>
+                }
+                fields={[
+                  { kind: 'num', key: 'm1', label: <>Strahl 1: <M>m</M> =</>, expected: 0.8 },
+                  { kind: 'num', key: 't1', label: <>Strahl 1: <M>t</M> =</>, expected: 1 },
+                  { kind: 'num', key: 'm2', label: <>Strahl 2: <M>m</M> =</>, expected: -0.4 },
+                  { kind: 'num', key: 't2', label: <>Strahl 2: <M>t</M> =</>, expected: 4.6 },
+                  { kind: 'num', key: 'x', label: <M>{'x_S ='}</M>, expected: 3 },
+                  { kind: 'num', key: 'y', label: <M>{'y_S ='}</M>, expected: 3.4 },
+                ]}
+                solution={
+                  <>
+                    <MB>{'m_1 = \\frac{5 - 1}{5 - 0} = 0{,}8 \\qquad t_1 = 1 \\;(\\text{A liegt auf der y-Achse})'}</MB>
+                    <MB>{'m_2 = \\frac{2{,}2 - 6{,}2}{6 - (-4)} = \\frac{-4}{10} = -0{,}4 \\qquad 2{,}2 = -0{,}4 \\cdot 6 + t_2 \\;\\Rightarrow\\; t_2 = 4{,}6'}</MB>
+                    <MB>{'\\begin{aligned} 0{,}8x + 1 &= -0{,}4x + 4{,}6 && \\mid +0{,}4x \\\\ 1{,}2x + 1 &= 4{,}6 && \\mid -1 \\\\ 1{,}2x &= 3{,}6 && \\mid :1{,}2 \\\\ x &= 3 \\end{aligned}'}</MB>
+                    <MB>{'y = 0{,}8 \\cdot 3 + 1 = 3{,}4 \\qquad \\Rightarrow \\qquad S(3 \\mid 3{,}4)'}</MB>
+                    <p>Die Lichtstrahlen kreuzen sich 3 m rechts der Bühnenmitte in 3,4 m Höhe.</p>
+                  </>
+                }
+                help={
+                  <Hilfen
+                    steps={[
+                      <>
+                        Zuerst die Steigung aus zwei Punkten: <M>{'m = \\frac{y_2 - y_1}{x_2 - x_1}'}</M>. Fällt dir bei Punkt A etwas auf?
+                      </>,
+                      <>
+                        A liegt auf der y-Achse, also ist <M>{'t_1 = 1'}</M>. Bei Strahl 2 setzt du nach der Steigung einen Punkt ein, z. B. <M>{'D(6 \\mid 2{,}2)'}</M>, und löst
+                        nach <M>t</M> auf.
+                      </>,
+                      <>
+                        <M>{'y = 0{,}8x + 1'}</M> und <M>{'y = -0{,}4x + 4{,}6'}</M>. Gleichsetzen und zuerst <M>{'\\mid +0{,}4x'}</M> rechnen.
+                      </>,
+                    ]}
+                  />
+                }
+              />
+              <CheckCard
+                title="Übung 3: Umgekehrt gedacht"
+                level="erweiterung"
+                prompt={
                   <p>
-                    Zum Schluss setzt du <M>x</M> in die Gleichung von Gerade 1 ein und berechnest <M>y</M>.
+                    Zurück zur Lasershow: Damit niemand geblendet wird, sollen sich die Strahlen in <strong>2,5 m Höhe</strong> kreuzen. Der linke Strahl bleibt{' '}
+                    <M>{'y = -0{,}5x + 2'}</M>, der rechte Strahler bleibt in <M>{'R(5 \\mid 4)'}</M> und wird gedreht. An welcher Stelle liegt der neue Kreuzungspunkt, und
+                    welche Steigung braucht der rechte Strahl?
                   </p>
-                </>
-              }
-              rechnung={[
-                { l: ['4x + 1'], r: ['2x + 7'], u: '\\mid -2x' },
-                { l: ['2x + 1'], r: ['7'], u: '\\mid -1' },
-                { l: ['2x'], r: [{ luecke: 'zweix' }], u: '\\mid :2' },
-                { l: ['x'], r: [{ luecke: 'x' }] },
-                { l: ['y'], r: ['4 \\cdot x + 1 =', { luecke: 'y' }] },
-              ]}
-              fields={[
-                { kind: 'num', key: 'zweix', label: '2x', expected: 6 },
-                { kind: 'num', key: 'x', label: 'x', expected: 3 },
-                { kind: 'num', key: 'y', label: 'y', expected: 13 },
-              ]}
-              solution={
-                <>
-                  <MB>{'\\begin{aligned} 4x + 1 &= 2x + 7 && \\mid -2x \\\\ 2x + 1 &= 7 && \\mid -1 \\\\ 2x &= 6 && \\mid :2 \\\\ x &= 3 \\end{aligned}'}</MB>
-                  <MB>{'y = 4 \\cdot 3 + 1 = 13 \\qquad \\Rightarrow \\qquad S(3 \\mid 13)'}</MB>
-                </>
-              }
-              help={
-                <Hilfen
-                  steps={[
-                    <>Rechne Schritt für Schritt: Was bleibt übrig, wenn du auf beiden Seiten 1 abziehst?</>,
-                    <>
-                      Nach dem Abziehen steht links nur noch <M>2x</M>. Teile dann beide Seiten durch 2.
-                    </>,
-                    <>
-                      <M>{'2x = 6'}</M>, also <M>{'x = 3'}</M>. Für <M>y</M>: <M>{'4 \\cdot 3 + 1'}</M>
-                    </>,
-                  ]}
-                />
-              }
-            />
-            <CheckCard
-              title="Übung 2: Scheinwerfer im Schultheater"
-              level="standard"
-              prompt={
-                <>
-                  <p>
-                    Im Schultheater leuchten zwei Scheinwerfer auf die Bühne (1 LE = 1 m, y-Achse = Bühnenmitte). Der Lichtstrahl von Scheinwerfer 1 geht durch die Punkte{' '}
-                    <M>{'A(0 \\mid 1)'}</M> und <M>{'B(5 \\mid 5)'}</M>, der von Scheinwerfer 2 durch <M>{'C(-4 \\mid 6{,}2)'}</M> und <M>{'D(6 \\mid 2{,}2)'}</M>.
-                  </p>
-                  <p>Stelle beide Funktionsgleichungen auf und berechne, wo sich die Lichtstrahlen kreuzen.</p>
-                </>
-              }
-              fields={[
-                { kind: 'num', key: 'm1', label: <>Strahl 1: <M>m</M> =</>, expected: 0.8 },
-                { kind: 'num', key: 't1', label: <>Strahl 1: <M>t</M> =</>, expected: 1 },
-                { kind: 'num', key: 'm2', label: <>Strahl 2: <M>m</M> =</>, expected: -0.4 },
-                { kind: 'num', key: 't2', label: <>Strahl 2: <M>t</M> =</>, expected: 4.6 },
-                { kind: 'num', key: 'x', label: <M>{'x_S ='}</M>, expected: 3 },
-                { kind: 'num', key: 'y', label: <M>{'y_S ='}</M>, expected: 3.4 },
-              ]}
-              solution={
-                <>
-                  <MB>{'m_1 = \\frac{5 - 1}{5 - 0} = 0{,}8 \\qquad t_1 = 1 \\;(\\text{A liegt auf der y-Achse})'}</MB>
-                  <MB>{'m_2 = \\frac{2{,}2 - 6{,}2}{6 - (-4)} = \\frac{-4}{10} = -0{,}4 \\qquad 2{,}2 = -0{,}4 \\cdot 6 + t_2 \\;\\Rightarrow\\; t_2 = 4{,}6'}</MB>
-                  <MB>{'\\begin{aligned} 0{,}8x + 1 &= -0{,}4x + 4{,}6 && \\mid +0{,}4x \\\\ 1{,}2x + 1 &= 4{,}6 && \\mid -1 \\\\ 1{,}2x &= 3{,}6 && \\mid :1{,}2 \\\\ x &= 3 \\end{aligned}'}</MB>
-                  <MB>{'y = 0{,}8 \\cdot 3 + 1 = 3{,}4 \\qquad \\Rightarrow \\qquad S(3 \\mid 3{,}4)'}</MB>
-                  <p>Die Lichtstrahlen kreuzen sich 3 m rechts der Bühnenmitte in 3,4 m Höhe.</p>
-                </>
-              }
-              help={
-                <Hilfen
-                  steps={[
-                    <>
-                      Zuerst die Steigung aus zwei Punkten: <M>{'m = \\frac{y_2 - y_1}{x_2 - x_1}'}</M>. Fällt dir bei Punkt A etwas auf?
-                    </>,
-                    <>
-                      A liegt auf der y-Achse, also ist <M>{'t_1 = 1'}</M>. Bei Strahl 2 setzt du nach der Steigung einen Punkt ein, z. B. <M>{'D(6 \\mid 2{,}2)'}</M>, und löst
-                      nach <M>t</M> auf.
-                    </>,
-                    <>
-                      <M>{'y = 0{,}8x + 1'}</M> und <M>{'y = -0{,}4x + 4{,}6'}</M>. Gleichsetzen und zuerst <M>{'\\mid +0{,}4x'}</M> rechnen.
-                    </>,
-                  ]}
-                />
-              }
-            />
-            <CheckCard
-              title="Übung 3: Umgekehrt gedacht"
-              level="erweiterung"
-              prompt={
-                <p>
-                  Zurück zur Lasershow: Damit niemand geblendet wird, sollen sich die Strahlen in <strong>2,5 m Höhe</strong> kreuzen. Der linke Strahl bleibt{' '}
-                  <M>{'y = -0{,}5x + 2'}</M>, der rechte Strahler bleibt in <M>{'R(5 \\mid 4)'}</M> und wird gedreht. An welcher Stelle liegt der neue Kreuzungspunkt, und
-                  welche Steigung braucht der rechte Strahl?
-                </p>
-              }
-              fields={[
-                { kind: 'num', key: 'x', label: <M>{'x_S ='}</M>, expected: -1 },
-                { kind: 'num', key: 'm', label: <>Steigung <M>m</M> des rechten Strahls =</>, expected: 0.25 },
-              ]}
-              solution={
-                <>
-                  <p>Der Kreuzungspunkt liegt auf dem linken Strahl in 2,5 m Höhe:</p>
-                  <MB>{'\\begin{aligned} -0{,}5x + 2 &= 2{,}5 && \\mid -2 \\\\ -0{,}5x &= 0{,}5 && \\mid :(-0{,}5) \\\\ x &= -1 \\end{aligned}'}</MB>
-                  <p>
-                    Der rechte Strahl muss durch <M>{'S(-1 \\mid 2{,}5)'}</M> und <M>{'R(5 \\mid 4)'}</M> gehen:
-                  </p>
-                  <MB>{'m = \\frac{4 - 2{,}5}{5 - (-1)} = \\frac{1{,}5}{6} = 0{,}25'}</MB>
-                </>
-              }
-              help={
-                <Hilfen
-                  steps={[
-                    <>Diesmal kennst du den y-Wert des Schnittpunkts schon. Auf welchem Strahl liegt er sicher?</>,
-                    <>
-                      Setze beim linken Strahl <M>{'y = 2{,}5'}</M> ein, also <M>{'2{,}5 = -0{,}5x + 2'}</M>, und löse nach <M>x</M> auf. Dann kennst du einen zweiten Punkt des rechten Strahls.
-                    </>,
-                    <>
-                      <M>{'x = -1'}</M>. Der rechte Strahl geht also durch <M>{'(-1 \\mid 2{,}5)'}</M> und <M>{'R(5 \\mid 4)'}</M>. Jetzt die Steigung aus zwei Punkten berechnen.
-                    </>,
-                  ]}
-                />
-              }
-            />
-          </div>
-        </Phase>
+                }
+                fields={[
+                  { kind: 'num', key: 'x', label: <M>{'x_S ='}</M>, expected: -1 },
+                  { kind: 'num', key: 'm', label: <>Steigung <M>m</M> des rechten Strahls =</>, expected: 0.25 },
+                ]}
+                solution={
+                  <>
+                    <p>Der Kreuzungspunkt liegt auf dem linken Strahl in 2,5 m Höhe:</p>
+                    <MB>{'\\begin{aligned} -0{,}5x + 2 &= 2{,}5 && \\mid -2 \\\\ -0{,}5x &= 0{,}5 && \\mid :(-0{,}5) \\\\ x &= -1 \\end{aligned}'}</MB>
+                    <p>
+                      Der rechte Strahl muss durch <M>{'S(-1 \\mid 2{,}5)'}</M> und <M>{'R(5 \\mid 4)'}</M> gehen:
+                    </p>
+                    <MB>{'m = \\frac{4 - 2{,}5}{5 - (-1)} = \\frac{1{,}5}{6} = 0{,}25'}</MB>
+                  </>
+                }
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Diesmal kennst du den y-Wert des Schnittpunkts schon. Auf welchem Strahl liegt er sicher?</>,
+                      <>
+                        Setze beim linken Strahl <M>{'y = 2{,}5'}</M> ein, also <M>{'2{,}5 = -0{,}5x + 2'}</M>, und löse nach <M>x</M> auf. Dann kennst du einen zweiten Punkt des rechten Strahls.
+                      </>,
+                      <>
+                        <M>{'x = -1'}</M>. Der rechte Strahl geht also durch <M>{'(-1 \\mid 2{,}5)'}</M> und <M>{'R(5 \\mid 4)'}</M>. Jetzt die Steigung aus zwei Punkten berechnen.
+                      </>,
+                    ]}
+                  />
+                }
+              />
+            </div>
+          </Teil>
+
 
         {/* 7 Check */}
-        <Phase no={7} title="Check: Hast du es verstanden?" social="EA" minutes={6}>
-          <div className="lp-exlist">
-            <TrackedMc
-              topic="Schnittpunkt-Einstieg: Deutung im Bild (Basis)"
-              title="Check 1: Was bedeutet der Schnittpunkt?"
-              level="basis"
-              prompt={
-                <p>
-                  Für die Lasershow gilt <M>{'S(0{,}5 \\mid 1{,}75)'}</M>. Die y-Achse ist die Pultmitte, die x-Achse der Boden. Was bedeutet das?
-                </p>
-              }
-              options={[
-                { text: 'Die Strahlen kreuzen sich 1,75 m rechts von der Pultmitte in 0,5 m Höhe.', feedback: 'Hier sind x und y vertauscht: Zuerst kommt der x-Wert (Stelle), dann der y-Wert (Höhe).' },
-                { text: 'Die Strahlen kreuzen sich 0,5 m rechts von der Pultmitte in 1,75 m Höhe.', correct: true, feedback: 'x = 0,5 m ist die Stelle, y = 1,75 m die Höhe des Kreuzungspunkts.' },
-                { text: 'Der linke Strahl ist über der Pultmitte 1,75 m hoch.', feedback: 'Über der Pultmitte (x = 0) ist der linke Strahl 2 m hoch (y = 2), das ist der y-Achsenabschnitt. Der Schnittpunkt liegt woanders.' },
-                { text: 'Die Strahlen kreuzen sich über dem Pult, weil 0,5 fast 0 ist.', feedback: 'Das Pult reicht nur bis x = 0,4. Der Kreuzungspunkt bei 0,5 liegt 10 cm daneben.' },
-              ]}
-            />
-            <TrackedMc
-              topic="Schnittpunkt-Einstieg: Gleichsetzen (Standard)"
-              title="Check 2: Schnittpunkt berechnen"
-              rechnen
-              level="standard"
-              prompt={
-                <>
-                  <p>Berechne den Schnittpunkt der beiden Geraden. Wähle dann die richtige Antwort aus.</p>
-                  <MB>{'\\text{Gerade 1: } y = 2x + 1 \\qquad \\text{Gerade 2: } y = -x + 7'}</MB>
-                </>
-              }
-              options={[
-                { text: <M>{'x = 2'}</M>, feedback: 'Der x-Wert stimmt, aber ein Schnittpunkt hat zwei Koordinaten. Setze x = 2 noch in eine der beiden Gleichungen ein.' },
-                { text: <M>{'S(5 \\mid 2)'}</M>, feedback: 'Die Zahlen stimmen, aber x und y sind vertauscht. Zuerst kommt der x-Wert.' },
-                { text: <M>{'S(6 \\mid 13)'}</M>, feedback: 'Beim Umstellen ist ein Vorzeichen verloren gegangen: Aus 2x + 1 = −x + 7 wird mit +x die Gleichung 3x + 1 = 7.' },
-                { text: <M>{'S(2 \\mid 5)'}</M>, correct: true, feedback: '2x + 1 = −x + 7 ergibt 3x = 6, also x = 2 und y = 2 · 2 + 1 = 5.' },
-              ]}
-            />
-            <TrackedCheck
-              topic="Schnittpunkt-Einstieg: Gleichsetzen (Erweiterung)"
-              title="Check 3: Jetzt ganz allein"
-              level="erweiterung"
-              prompt={
-                <>
-                  <p>Berechne den Schnittpunkt durch Gleichsetzen.</p>
-                  <MB>{'\\text{Gerade 1: } y = 3x - 2 \\qquad \\text{Gerade 2: } y = x + 4'}</MB>
-                </>
-              }
-              fieldsRow
-              fields={[
-                { kind: 'num', key: 'x', label: <M>{'x_S ='}</M>, expected: 3 },
-                { kind: 'num', key: 'y', label: <M>{'y_S ='}</M>, expected: 7 },
-              ]}
-              solution={
-                <>
-                  <MB>{'\\begin{aligned} 3x - 2 &= x + 4 && \\mid -x \\\\ 2x - 2 &= 4 && \\mid +2 \\\\ 2x &= 6 && \\mid :2 \\\\ x &= 3 \\end{aligned}'}</MB>
-                  <MB>{'y = 3 \\cdot 3 - 2 = 7 \\qquad \\Rightarrow \\qquad S(3 \\mid 7)'}</MB>
+          <Teil title="Check: Hast du es verstanden?" social="EA" minutes={6}>
+            <div className="lp-exlist">
+              <TrackedMc
+                topic="Schnittpunkt-Einstieg: Deutung im Bild (Basis)"
+                title="Check 1: Was bedeutet der Schnittpunkt?"
+                level="basis"
+                prompt={
                   <p>
-                    Probe mit Gerade 2: <M>{'y = 3 + 4 = 7'}</M>. Stimmt!
+                    Für die Lasershow gilt <M>{'S(0{,}5 \\mid 1{,}75)'}</M>. Die y-Achse ist die Pultmitte, die x-Achse der Boden. Was bedeutet das?
                   </p>
-                </>
-              }
-            />
-          </div>
-        </Phase>
+                }
+                options={[
+                  { text: 'Die Strahlen kreuzen sich 1,75 m rechts von der Pultmitte in 0,5 m Höhe.', feedback: 'Hier sind x und y vertauscht: Zuerst kommt der x-Wert (Stelle), dann der y-Wert (Höhe).' },
+                  { text: 'Die Strahlen kreuzen sich 0,5 m rechts von der Pultmitte in 1,75 m Höhe.', correct: true, feedback: 'x = 0,5 m ist die Stelle, y = 1,75 m die Höhe des Kreuzungspunkts.' },
+                  { text: 'Der linke Strahl ist über der Pultmitte 1,75 m hoch.', feedback: 'Über der Pultmitte (x = 0) ist der linke Strahl 2 m hoch (y = 2), das ist der y-Achsenabschnitt. Der Schnittpunkt liegt woanders.' },
+                  { text: 'Die Strahlen kreuzen sich über dem Pult, weil 0,5 fast 0 ist.', feedback: 'Das Pult reicht nur bis x = 0,4. Der Kreuzungspunkt bei 0,5 liegt 10 cm daneben.' },
+                ]}
+              />
+              <TrackedMc
+                topic="Schnittpunkt-Einstieg: Gleichsetzen (Standard)"
+                title="Check 2: Schnittpunkt berechnen"
+                rechnen
+                level="standard"
+                prompt={
+                  <>
+                    <p>Berechne den Schnittpunkt der beiden Geraden. Wähle dann die richtige Antwort aus.</p>
+                    <MB>{'\\text{Gerade 1: } y = 2x + 1 \\qquad \\text{Gerade 2: } y = -x + 7'}</MB>
+                  </>
+                }
+                options={[
+                  { text: <M>{'x = 2'}</M>, feedback: 'Der x-Wert stimmt, aber ein Schnittpunkt hat zwei Koordinaten. Setze x = 2 noch in eine der beiden Gleichungen ein.' },
+                  { text: <M>{'S(5 \\mid 2)'}</M>, feedback: 'Die Zahlen stimmen, aber x und y sind vertauscht. Zuerst kommt der x-Wert.' },
+                  { text: <M>{'S(6 \\mid 13)'}</M>, feedback: 'Beim Umstellen ist ein Vorzeichen verloren gegangen: Aus 2x + 1 = −x + 7 wird mit +x die Gleichung 3x + 1 = 7.' },
+                  { text: <M>{'S(2 \\mid 5)'}</M>, correct: true, feedback: '2x + 1 = −x + 7 ergibt 3x = 6, also x = 2 und y = 2 · 2 + 1 = 5.' },
+                ]}
+              />
+              <TrackedCheck
+                topic="Schnittpunkt-Einstieg: Gleichsetzen (Erweiterung)"
+                title="Check 3: Jetzt ganz allein"
+                level="erweiterung"
+                prompt={
+                  <>
+                    <p>Berechne den Schnittpunkt durch Gleichsetzen.</p>
+                    <MB>{'\\text{Gerade 1: } y = 3x - 2 \\qquad \\text{Gerade 2: } y = x + 4'}</MB>
+                  </>
+                }
+                fieldsRow
+                fields={[
+                  { kind: 'num', key: 'x', label: <M>{'x_S ='}</M>, expected: 3 },
+                  { kind: 'num', key: 'y', label: <M>{'y_S ='}</M>, expected: 7 },
+                ]}
+                solution={
+                  <>
+                    <MB>{'\\begin{aligned} 3x - 2 &= x + 4 && \\mid -x \\\\ 2x - 2 &= 4 && \\mid +2 \\\\ 2x &= 6 && \\mid :2 \\\\ x &= 3 \\end{aligned}'}</MB>
+                    <MB>{'y = 3 \\cdot 3 - 2 = 7 \\qquad \\Rightarrow \\qquad S(3 \\mid 7)'}</MB>
+                    <p>
+                      Probe mit Gerade 2: <M>{'y = 3 + 4 = 7'}</M>. Stimmt!
+                    </p>
+                  </>
+                }
+              />
+            </div>
+          </Teil>
+        </Etappe>
 
         <nav className="lp-nav" aria-label="Weiter">
           <button type="button" className="bk-btn" onClick={onBack}>
@@ -863,7 +900,7 @@ function Rueckbezug({ pred }: { pred: Prediction }) {
   if (!pred.saved || !pred.choice) {
     return (
       <div className="ls-back">
-        <p>Du hast in Abschnitt 2 noch keine Vermutung festgehalten. Hole das kurz nach, dann siehst du hier, ob du richtig lagst.</p>
+        <p>Du hast in Phase 2 noch keine Vermutung festgehalten. Hole das kurz nach, dann siehst du hier, ob du richtig lagst.</p>
       </div>
     )
   }
