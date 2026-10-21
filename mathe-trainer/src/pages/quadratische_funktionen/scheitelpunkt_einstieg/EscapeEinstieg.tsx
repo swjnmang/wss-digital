@@ -380,7 +380,6 @@ const STEPS = [
   { label: 'Symmetrie', icon: 'fa-arrows-left-right' },
   { label: 'Muster', icon: 'fa-table' },
   { label: 'Tresor', icon: 'fa-vault' },
-  { label: 'Austausch', icon: 'fa-comments' },
   { label: 'Merkkarte', icon: 'fa-note-sticky' },
   { label: 'Check', icon: 'fa-circle-check' },
 ]
@@ -631,7 +630,7 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
 
           {/* 2 Symmetrie */}
           <div hidden={hide(2)}>
-            <Etappe prefix="esc-2" art="loesen" social="PA" minutes={10} was={<>Zu zweit die Räume knacken und herausfinden, wie man den Scheitelpunkt berechnet. Danach vergleicht ihr eure Wege.</>} wozu={<>So bestimmst du den Scheitelpunkt, auch wenn die Parabel in allgemeiner Form gegeben ist.</>}>
+            <Etappe prefix="esc-2" art="loesen" social="PA" minutes={10} was={<>Zu zweit die Räume knacken und herausfinden, wie man den Scheitelpunkt berechnet.</>} wozu={<>So bestimmst du den Scheitelpunkt, auch wenn die Parabel in allgemeiner Form gegeben ist.</>}>
               <Teil title="Raum 2: Die Mitte der Parabel">
               <Raum no={2} title="Punkte gleicher Höhe">
                 <p className="esc-story">Im Lager steht eine Werkbank mit einer Parabel-Schablone, <M>{'y = x^2 - 6x + 5'}</M>. Zu zweit findet ihr heraus, wie sich ihr Scheitelpunkt versteckt.</p>
@@ -893,62 +892,9 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
             </Etappe>
           </div>
 
-          {/* 5 Austausch */}
+          {/* 5 Merkkarte */}
           <div hidden={hide(5)}>
-            <Etappe prefix="esc-5" art="loesen" social="Plenum" minutes={4}>
-              <Teil title="Vergleicht eure Wege">
-              <Raum no={5} title="Die Tür ist offen">
-                <div className="ls-stop">
-                  <div className="ls-stop-title">
-                    <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
-                  </div>
-                  <ul>
-                    <li>Warum liegt der Scheitelpunkt genau in der Mitte zwischen zwei Punkten gleicher Höhe?</li>
-                    <li>Was bewirkt c in <M>{'ax^2 + bx + c'}</M> für die x-Koordinate des Scheitelpunkts?</li>
-                    <li>Wie weit lagen eure Vermutungen aus dem Einstieg vom richtigen Wert S(3,5 | 5,9) entfernt? Warum kann man den Scheitelpunkt nicht einfach ablesen?</li>
-                  </ul>
-                </div>
-                <p>
-                  <strong>Du arbeitest allein?</strong> So haben drei andere Jugendliche gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
-                </p>
-                <div className="ls-ways">
-                  <details className="ls-way">
-                    <summary>Lena hat die Wertetabelle genutzt</summary>
-                    <div className="ls-way-body">
-                      <p>„Ich habe die Höhen in 0,5-m-Schritten ausgerechnet. Am größten war es bei x = 3,5 mit 5,9 m. Ob es dazwischen noch höher geht, weiß ich nicht sicher.“</p>
-                      <p>
-                        <strong>Gut:</strong> Funktioniert immer und ist leicht zu verstehen. <strong>Aber:</strong> Es dauert lange und bei Werten zwischen den Schritten bleibt man unsicher.
-                      </p>
-                    </div>
-                  </details>
-                  <details className="ls-way">
-                    <summary>Jonas hat die Symmetrie genutzt</summary>
-                    <div className="ls-way-body">
-                      <p>„Düse und Beckenrand liegen beide auf 1 m. Die Mitte ist bei x = 3,5, also ist dort der höchste Punkt.“</p>
-                      <p>
-                        <strong>Gut:</strong> Sehr schnell, wenn man zwei Punkte gleicher Höhe kennt. <strong>Aber:</strong> Man findet nur x_S, die Höhe muss man noch ausrechnen.
-                      </p>
-                    </div>
-                  </details>
-                  <details className="ls-way">
-                    <summary>Mira hat die Formel genutzt</summary>
-                    <div className="ls-way-body">
-                      <p>„Ich habe a = −0,4 und b = 2,8 abgelesen und x_S = −b/(2a) = 3,5 gerechnet. Dann x = 3,5 eingesetzt: y = 5,9.“</p>
-                      <p>
-                        <strong>Gut:</strong> Klappt bei jeder Parabel in allgemeiner Form. <strong>Aber:</strong> Man muss auf die Vorzeichen achten.
-                      </p>
-                    </div>
-                  </details>
-                </div>
-                {weiter(5)}
-              </Raum>
-              </Teil>
-            </Etappe>
-          </div>
-
-          {/* 6 Merkkarte */}
-          <div hidden={hide(6)}>
-            <Etappe prefix="esc-6" art="sichern" social="PA" minutes={6} was={<>Die Merkkarte gestalten und dann allein prüfen, ob du es kannst.</>} wozu={<>Mit der Merkkarte kannst du jede Aufgabe dieser Art lösen. Der Check zeigt dir, wo du noch unsicher bist.</>}>
+            <Etappe prefix="esc-5" art="sichern" social="PA" minutes={6} was={<>Die Merkkarte gestalten und dann allein prüfen, ob du es kannst.</>} wozu={<>Mit der Merkkarte kannst du jede Aufgabe dieser Art lösen. Der Check zeigt dir, wo du noch unsicher bist.</>}>
               <Teil title="Das hältst du fest: Merkkarte">
               <Merke title="Scheitelpunkt aus der allgemeinen Form">
                 <p>
@@ -970,14 +916,14 @@ export default function EscapeEinstieg({ erklaerung, onBack, onPractice }: { erk
                 ]}
               />
               <Merkkarte />
-              {weiter(6)}
+              {weiter(5)}
               </Teil>
             </Etappe>
           </div>
 
-          {/* 7 Check */}
-          <div hidden={hide(7)}>
-            <Etappe prefix="esc-7" art="sichern" social="EA" minutes={5}>
+          {/* 6 Check */}
+          <div hidden={hide(6)}>
+            <Etappe prefix="esc-6" art="sichern" social="EA" minutes={5}>
               <Teil title="Check: Hast du es verstanden?">
               <div className="lp-exlist">
                 <McCard

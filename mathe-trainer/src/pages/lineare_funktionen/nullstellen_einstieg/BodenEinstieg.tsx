@@ -331,8 +331,8 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
         <Etappe
           prefix="boden"
           art="loesen"
-          minutes={17}
-          was={<>Zu zweit herausfinden, welche Gerade den Boden zuerst erreicht. Danach vergleicht ihr eure Wege.</>}
+          minutes={12}
+          was={<>Zu zweit herausfinden, welche Gerade den Boden zuerst erreicht.</>}
           wozu={<>So bestimmst du die Nullstelle einer Geraden.</>}
         >
           <Teil title="Findet es heraus" social="PA" minutes={12}>
@@ -431,53 +431,6 @@ export default function BodenEinstieg({ erklaerung, onBack, onPractice }: { erkl
           </Teil>
 
 
-        {/* 4 Austausch */}
-          <Teil title="Vergleicht eure Wege" social="Plenum" minutes={5}>
-            <div className="ls-stop">
-              <div className="ls-stop-title">
-                <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
-              </div>
-              <ul>
-                <li>Woran erkennt ihr in der Tabelle und im Graphen, dass eine Gerade den Boden berührt?</li>
-                <li>Gerade f ist die steilste. Warum landet sie trotzdem zuletzt?</li>
-                <li>Bei Gerade h: Wie sicher könnt ihr den Wert ablesen? 3,7 oder 3,8?</li>
-              </ul>
-            </div>
-            <p>
-              <strong>Du arbeitest allein?</strong> So haben zwei andere Jugendliche gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
-            </p>
-            <div className="ls-ways">
-              <details className="ls-way">
-                <summary>Jonas hat eine Tabelle gemacht</summary>
-                <div className="ls-way-body">
-                  <p>
-                    „Bei g steht bei x = 3 genau 0, bei f bei x = 4. Bei h steht bei x = 3 noch 0,75, bei x = 4 schon −0,25. Das Vorzeichen wechselt also dazwischen, wahrscheinlich
-                    näher bei 4.“
-                  </p>
-                  <p>
-                    <strong>Gut:</strong> Den Wechsel von positiv zu negativ erkennt man sofort. <strong>Aber:</strong> Liegt die Nullstelle nicht auf einem Tabellenwert, muss man
-                    immer feiner nachrechnen.
-                  </p>
-                </div>
-              </details>
-              <details className="ls-way">
-                <summary>Aylin hat im Graphen abgelesen</summary>
-                <div className="ls-way-body">
-                  <p>
-                    „Gerade f ist sehr steil, aber sie startet bei 8 ganz weit oben, deshalb braucht sie am längsten. h berührt den Boden kurz vor f. Ob bei 3,7 oder 3,8, kann ich nicht
-                    genau sehen.“
-                  </p>
-                  <p>
-                    <strong>Gut:</strong> Man sieht die Reihenfolge und das Gesamtbild. <strong>Aber:</strong> Ablesen ist nur so genau wie die Zeichnung.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <p>
-              Die Stelle, an der eine Gerade die x-Achse berührt, heißt <strong>Nullstelle</strong>. Beide Wege zeigen sie nur ungefähr, wenn sie zwischen zwei Tabellenwerten liegt.
-              Im nächsten Abschnitt lernst du, wie du sie immer genau ausrechnest.
-            </p>
-          </Teil>
         </Etappe>
 
         {/* 5 Verfahren und Sichern */}

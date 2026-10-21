@@ -4,7 +4,7 @@ import { VideoEmbed } from '../../../components/VideoButton'
 import { Beispiel, M, MB, Merke, fmt } from '../../daten_und_zufall/lernpfad/kit'
 import { Arbeitsweise, CardHead, CheckCard, HeftHinweis, Hilfen, McCard } from '../../lineare_funktionen/lernsituation_kit/kit'
 import { Etappe, Fortschritt, Teil } from '../../lineare_funktionen/lernsituation_kit/phasen'
-import { Chat, Festlegung, Frage, Kriterien, Msg, Stopp, WachstumGraph, Wege, eur, eurTex, kn, knEinfach } from './shared'
+import { Chat, Festlegung, Frage, Kriterien, Msg, WachstumGraph, eur, eurTex, kn, knEinfach } from './shared'
 
 // Teil 1 (ca. 90 min) der Einstiegs-Lernsituation „Wer hat nach 10 Jahren mehr?“ zum Zinseszins: das Endkapital K_n.
 // Format Kontrastierende Fälle, Look Messenger-Chat, Lernprodukt analog (Concept Map).
@@ -241,8 +241,8 @@ export default function Teil1() {
       <Etappe
         prefix="zz1"
         art="loesen"
-        minutes={50}
-        was={<>Jahr für Jahr nachrechnen, wie die beiden Konten wachsen, die Ergebnisse vergleichen und die Formel kennenlernen.</>}
+        minutes={40}
+        was={<>Jahr für Jahr nachrechnen, wie die beiden Konten wachsen und die Formel kennenlernen.</>}
         wozu={<>So berechnest du, wie Kapital mit Zinseszins wächst.</>}
       >
         <Teil title="Jahr für Jahr nachrechnen" social="EA" minutes={20}>
@@ -339,62 +339,6 @@ export default function Teil1() {
         </Teil>
 
 
-      {/* 4 Austausch */}
-        <Teil title="Vergleicht eure Ergebnisse" social="PA" minutes={10}>
-          <Stopp
-            title="Besprecht eure Ergebnisse in der Klasse."
-            items={[
-              'Was ist der Unterschied zwischen Jonas und Mira? Was passiert mit den Zinsen?',
-              'Vergleicht eure Zahlen nach 5 und nach 10 Jahren. Wie groß ist der Unterschied jeweils?',
-              'Welchen Weg habt ihr für „nach 10 Jahren“ gefunden? Wer hat eine Abkürzung entdeckt?',
-            ]}
-          />
-          <p>
-            <strong>Du arbeitest allein?</strong> So haben andere gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
-          </p>
-          <Wege
-            items={[
-              {
-                summary: 'Lea hat die Tabelle bis Jahr 10 weitergeführt',
-                body: (
-                  <>
-                    <p>„Ich habe die Tabelle einfach 10 Jahre lang fortgesetzt: erst die Zinsen ausgerechnet, dann zum Kapital addiert. Das war viel Rechnerei, aber ich habe am Ende 6.719,58 € gehabt.“</p>
-                    <p>
-                      <strong>Gut:</strong> Man sieht jedes Jahr, was passiert. <strong>Aber:</strong> Es dauert lange und man kann sich leicht verrechnen.
-                    </p>
-                  </>
-                ),
-              },
-              {
-                summary: 'Emre hat immer „mal 1,03“ gerechnet',
-                body: (
-                  <>
-                    <p>
-                      „Kapital plus 3 % ist dasselbe wie Kapital mal 1,03. Also habe ich 5000 · 1,03 = 5150 gerechnet, dann 5150 · 1,03 und so weiter. Zehnmal ‚mal 1,03‘ im Taschenrechner.“
-                    </p>
-                    <p>
-                      <strong>Gut:</strong> Viel schneller, und man braucht keine extra Zinsrechnung. <strong>Aber:</strong> Bei 30 Jahren wären das 30 Mal tippen.
-                    </p>
-                  </>
-                ),
-              },
-              {
-                summary: 'Sofia hat Miras Zinsen nur addiert',
-                body: (
-                  <>
-                    <p>
-                      „Mira hat doch auch 3 % Zinsen, also 150 € pro Jahr. Nach 10 Jahren sind das 1.500 € Zinsen, und das Kapital wäre dann 6.500 €, wie bei Jonas.“
-                    </p>
-                    <p>
-                      <strong>Fehler:</strong> Miras Zinsen im 2. Jahr sind 3 % von 5.150 €, also 154,50 €, nicht mehr 150 €. Die Zinsen vom 1. Jahr werden selbst wieder verzinst. Rechne selbst nach: Welcher
-                      Betrag fehlt in Sofias Rechnung?
-                    </p>
-                  </>
-                ),
-              },
-            ]}
-          />
-        </Teil>
 
 
       {/* 5 Information */}

@@ -332,8 +332,8 @@ export default function SchuelerfirmaEinstieg({
           <Etappe
             prefix="firma"
             art="loesen"
-            minutes={58}
-            was={<>Zu zweit die Gleichungen aufstellen, das Additionsverfahren kennenlernen und damit Finn antworten. Danach vergleicht ihr eure Wege.</>}
+            minutes={50}
+            was={<>Zu zweit die Gleichungen aufstellen, das Additionsverfahren kennenlernen und damit Finn antworten.</>}
             wozu={<>So stellst du die Gleichung einer Parabel auf, wenn ein Wert und zwei Punkte bekannt sind.</>}
           >
             <Teil title="Was wissen wir über die Parabel?" social="PA" minutes={10}>
@@ -738,44 +738,6 @@ export default function SchuelerfirmaEinstieg({
             </Teil>
 
 
-          {/* 6 Austausch */}
-            <Teil title="Vergleicht eure Wege" social="Plenum" minutes={8}>
-              <div className="ls-stop">
-                <div className="ls-stop-title">
-                  <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
-                </div>
-                <ul>
-                  <li>Warum bringt ein größerer Verkauf nicht automatisch mehr Gewinn?</li>
-                  <li>Welche Unbekannte habt ihr beim Additionsverfahren zuerst wegfallen lassen? Wie seid ihr darauf gekommen?</li>
-                  <li>Wozu braucht man drei Angaben (c und zwei Punkte), um die Parabel festzulegen?</li>
-                </ul>
-              </div>
-              <p>
-                <strong>Du arbeitest allein?</strong> So haben zwei andere Teams das Gleichungssystem gelöst. Klappe die Wege auf und vergleiche sie mit deinem.
-              </p>
-              <div className="ls-ways">
-                <details className="ls-way">
-                  <summary>Team A hat zuerst b wegfallen lassen</summary>
-                  <div className="ls-way-body">
-                    <p>„Wir haben Gleichung I mal 2 genommen, dann stand in beiden 40b. II minus I · 2 ergab −400 = 800a, also a = −0,5. Dann a in I eingesetzt: b = 30.“</p>
-                    <p>
-                      <strong>Gut:</strong> Man muss nur mit 2 multiplizieren, die Zahlen bleiben klein. <strong>Aber:</strong> Beim Subtrahieren aufpassen: 400 − 800 ist negativ.
-                    </p>
-                  </div>
-                </details>
-                <details className="ls-way">
-                  <summary>Team B hat zuerst a wegfallen lassen</summary>
-                  <div className="ls-way-body">
-                    <p>„Wir haben I mal 4 genommen: 1600 = 1600a + 80b. Dann minus II: 1200 = 40b, also b = 30. Danach b in I eingesetzt: a = −0,5.“</p>
-                    <p>
-                      <strong>Gut:</strong> Funktioniert genauso, das Ergebnis ist gleich. <strong>Aber:</strong> Die Zahlen werden größer. Es lohnt sich, vorher kurz zu schauen, welche
-                      Unbekannte leichter wegfällt.
-                    </p>
-                  </div>
-                </details>
-              </div>
-              <p>Beide Wege sind richtig. Beim Additionsverfahren darfst du selbst wählen, welche Unbekannte zuerst wegfällt.</p>
-            </Teil>
           </Etappe>
 
           {/* 7 Sichern & Lernprodukt */}

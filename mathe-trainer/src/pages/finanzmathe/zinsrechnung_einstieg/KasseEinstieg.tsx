@@ -535,8 +535,8 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
         <Etappe
           prefix="kasse"
           art="loesen"
-          minutes={53}
-          was={<>In der Expertengruppe eine Größe erarbeiten, dann in der Stammgruppe die Fragen der Pinnwand lösen und die Wege vergleichen.</>}
+          minutes={45}
+          was={<>In der Expertengruppe eine Größe erarbeiten, dann in der Stammgruppe die Fragen der Pinnwand lösen.</>}
           wozu={<>So berechnest du Kapital, Zinssatz oder Zinstage, wenn die anderen Größen bekannt sind.</>}
         >
           <Teil title="Expertenphase: Werdet Profis für eine Größe" social="GA" minutes={25}>
@@ -719,59 +719,6 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
           </Teil>
 
 
-        {/* 5 Austausch */}
-          <Teil title="Vergleicht eure Wege" social="Plenum" minutes={8}>
-            <div className="ls-stop">
-              <div className="ls-stop-title">
-                <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
-              </div>
-              <ul>
-                <li>Warum reichen die 3.600 € nicht, obwohl „3 % von 3.600 €“ 108 € ergibt?</li>
-                <li>Welche Formel war am leichtesten, welche am schwersten? Warum ist es eigentlich immer derselbe Trick?</li>
-                <li>Wie merkt man schnell, dass ein Ergebnis nicht stimmen kann?</li>
-              </ul>
-            </div>
-            <p>
-              <strong>Du arbeitest allein?</strong> So haben drei andere Jugendliche Emmas Frage gelöst. Klappe die Wege auf und vergleiche sie mit deinem.
-            </p>
-            <div className="ls-ways">
-              <details className="ls-way">
-                <summary>Tom hat die Formel umgestellt</summary>
-                <div className="ls-way-body">
-                  <p>
-                    „Erst mal 100 · 360, dann durch <M>{'p \\cdot t'}</M>: <M>{'K = \\frac{72 \\cdot 100 \\cdot 360}{3 \\cdot 180} = 4\\,800'}</M>. Das sind 200 € pro Person.“
-                  </p>
-                  <p>
-                    <strong>Gut:</strong> Mit dem Umstell-Trick funktioniert das für K, p und t gleich.
-                  </p>
-                </div>
-              </details>
-              <details className="ls-way">
-                <summary>Sara hat überlegt, was 1 € bringt</summary>
-                <div className="ls-way-body">
-                  <p>
-                    „1 € bringt in 180 Tagen bei 3 %: <M>{'\\frac{1 \\cdot 3 \\cdot 180}{36\\,000} = 0{,}015'}</M> €. Für 72 € brauche ich <M>{'72 : 0{,}015 = 4\\,800'}</M> Euro.“
-                  </p>
-                  <p>
-                    <strong>Gut:</strong> So sieht man, warum man so viel Kapital braucht: Jeder Euro bringt nur anderthalb Cent. Das ist derselbe Rechenweg wie Toms, nur in zwei
-                    Schritten.
-                  </p>
-                </div>
-              </details>
-              <details className="ls-way">
-                <summary>Jonas hat sich verrechnet</summary>
-                <div className="ls-way-body">
-                  <p>
-                    „<M>{'K = \\frac{72 \\cdot 3 \\cdot 180}{100 \\cdot 360} = 1{,}08'}</M>. Die Klasse braucht also nur 1,08 €.“
-                  </p>
-                  <p>
-                    <strong>Problem:</strong> Jonas hat die Zinsformel nicht umgestellt, sondern Z an die Stelle von K gesetzt. 1,08 € Kapital können niemals 72 € Zinsen bringen.
-                    Eine kurze Probe oder ein Blick auf die Größenordnung zeigt den Fehler sofort.
-                  </p>
-                </div>
-              </details>
-            </div>
-          </Teil>
         </Etappe>
 
         {/* 6 Sichern & Lernprodukt */}
