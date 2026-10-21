@@ -1,21 +1,24 @@
-import { useId, useState, type ReactNode } from 'react'
+import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
-import { Beispiel, M, MB, Merke } from '../../daten_und_zufall/lernpfad/kit'
-import { Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
+import { Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
 import { Etappe, Fortschritt, Teil } from '../../lineare_funktionen/lernsituation_kit/phasen'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './werkstatt.css'
 
 // Lernsituation 1 „Der Torbogen für die Hofeinfahrt“: Funktionsgleichung aus Scheitelpunkt und einem weiteren Punkt (Fall 1, 45 min).
-// Format Experimentierlabor mit Fehlerdetektiv im Check, Look Werkstatt-Auftragsmappe (Metallbau), Lernprodukt analog (Spickzettel).
+// Format Kundenauftrag (Gleichungen an die Biegemaschine raten, dann berechnen), Fehlerdetektiv im Check, Look Werkstatt (Metallbau), Lernprodukt analog (Spickzettel).
 // Instruktionsreihenfolge: Problem zuerst. Die SuS kennen die Scheitelform y = a(x − x_S)² + y_S und können sie in die allgemeine
 // Form umwandeln. Neu ist, a mit einem zweiten Punkt zu bestimmen.
+// Problem erkennen: Die SuS raten Gleichungen und schicken sie an die Biegemaschine. Jeder Versuch erscheint in der Skizze, die Maschine
+// meldet für linken Pfosten, Mitte und rechten Pfosten, ob die Höhe stimmt. Nach drei Versuchen kommt die Erkenntnis: Raten reicht nicht.
+// Die Versuche ersetzen die Festlegung und werden in Phase 4 wieder aufgegriffen.
 // Vier feste Phasen (lernsituation_kit/phasen.tsx): Warm-up (drei Abrufaufgaben, je eine pro Rechenschritt) → Problem erkennen
-// (Auftrag, Skizze, Gegeben/Gesucht, Festlegung „Wie kommst du an a?“) → Problem lösen (eine Lückenrechnung durch die drei Schritte,
+// (Auftrag, Gegeben/Gesucht, Biegemaschine) → Problem lösen (eine Lückenrechnung durch die drei Schritte,
 // dann Austausch) → Festhalten und Prüfen (Merke, Musterbeispiel, Spickzettel, drei Checks).
-// Aha: Ein einziger weiterer Punkt legt a fest, man muss nicht probieren und kann a nicht am Scheitel ablesen.
+// Aha: Durch Raten trifft man die Gleichung kaum, mit Scheitelpunkt und einem weiteren Punkt lässt sie sich sicher berechnen.
 // Fehlerhafte Azubi-Pläne kommen erst im Check, wenn die SuS den Weg selbst gerechnet haben.
-// Die Festlegung bleibt nur im Seitenzustand (kein Speichern).
+// Die Versuche an der Maschine bleiben nur im Seitenzustand (kein Speichern).
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
@@ -24,13 +27,35 @@ import './werkstatt.css'
 const A_SOLL = -0.25
 const bogen = (a: number) => (x: number) => a * (x - 2) ** 2 + 3
 
-type Choice = 'probieren' | 'einsetzen' | 'ablesen'
-type Prediction = { choice: Choice | null; saved: boolean }
+/** Eine Gleichung, die an die Biegemaschine geschickt wurde */
+type Versuch = { a: number; b: number; c: number }
+const wert = (v: Versuch) => (x: number) => v.a * x * x + v.b * x + v.c
+const nah = (u: number, w: number) => Math.abs(u - w) < 1e-9
+/** Die Maschine prüft drei Stellen: linker Pfosten, Mitte (Scheitel), rechter Pfosten. Drei Punkte legen die Parabel fest. */
+const pruefung = (v: Versuch) => {
+  const f = wert(v)
+  return [
+    { name: 'linker Pfosten (x = 0)', soll: 2, ist: f(0) },
+    { name: 'Mitte (x = 2)', soll: 3, ist: f(2) },
+    { name: 'rechter Pfosten (x = 4)', soll: 2, ist: f(4) },
+  ].map((p) => ({ ...p, ok: nah(p.ist, p.soll) }))
+}
+const passt = (v: Versuch) => pruefung(v).every((p) => p.ok)
 
-const CHOICE_TEXT: Record<Choice, string> = {
-  probieren: 'Ausprobieren, bis der Bogen auf der Skizze liegt',
-  einsetzen: 'Den Pfosten P(0 | 2) einsetzen und a ausrechnen',
-  ablesen: 'a kann man am Scheitelpunkt ablesen',
+/** Höhe als Text mit echtem Minuszeichen, z. B. „−1,5 m“ */
+const meter = (v: number) => `${fmt(v, 2).replace('-', '−')} m`
+
+/** Gleichung als TeX, z. B. y = −0,5x² + 2x + 1 */
+function gleichungTex(v: Versuch) {
+  const glied = (k: number, x: string, erstes: boolean) => {
+    if (k === 0) return ''
+    const betrag = Math.abs(k)
+    const zahl = x && betrag === 1 ? '' : tx(betrag)
+    const vz = k < 0 ? '-' : erstes ? '' : '+'
+    return ` ${vz} ${zahl}${x}`
+  }
+  const t = glied(v.a, 'x^2', true) + glied(v.b, 'x', v.a === 0) + glied(v.c, '', v.a === 0 && v.b === 0)
+  return `y =${t || ' 0'}`
 }
 
 /** Das zentrale Problem der Lernsituation: Gegeben / Gesucht */
@@ -50,7 +75,7 @@ function Problemkarte() {
           Funktionsgleichung <M>{'y = ax^2 + bx + c'}</M>
         </div>
       </div>
-      <p className="tb-problem-frage">Welche Gleichung gibst du in die Biegemaschine ein?</p>
+      <p className="tb-problem-frage">Welche Gleichung gibst du in die Biegemaschine ein? Probiere es aus.</p>
     </div>
   )
 }
@@ -69,7 +94,10 @@ const kurve = (f: (x: number) => number, von: number, bis: number) =>
 const SOLL_BOGEN = kurve(bogen(A_SOLL), 0, 4)
 
 /** Skizze der Einfahrt; f = Parabel (z. B. vom Regler) über die gestrichelte Skizze legen */
-function TorBild({ f, farbe = 'var(--primary)' }: { f?: (x: number) => number; farbe?: string }) {
+type Kurve = { f: (x: number) => number; farbe: string; breite: number }
+
+/** Skizze der Einfahrt; kurven = Parabeln (z. B. Versuche an der Maschine) über die gestrichelte Skizze legen */
+function TorBild({ kurven = [] }: { kurven?: Kurve[] }) {
   const clip = useId().replace(/[^a-zA-Z0-9]/g, '')
   return (
     <div className="bk-graph ls-graph">
@@ -102,9 +130,11 @@ function TorBild({ f, farbe = 'var(--primary)' }: { f?: (x: number) => number; f
           <rect key={x} x={bx(x) - 7} y={by(2)} width="14" height={by(0) - by(2)} fill="var(--ink-muted)" stroke="var(--ink)" strokeWidth="2" />
         ))}
         <polyline points={SOLL_BOGEN} fill="none" stroke="var(--ink)" strokeWidth="3" strokeDasharray="8 6" />
-        {f && (
+        {kurven.length > 0 && (
           <g clipPath={`url(#${clip})`}>
-            <polyline points={kurve(f, S.xMin, S.xMax)} fill="none" stroke={farbe} strokeWidth="4.5" strokeLinecap="round" />
+            {kurven.map((k, i) => (
+              <polyline key={i} points={kurve(k.f, S.xMin, S.xMax)} fill="none" stroke={k.farbe} strokeWidth={k.breite} strokeLinecap="round" />
+            ))}
           </g>
         )}
         <circle cx={bx(2)} cy={by(3)} r="7" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
@@ -123,6 +153,93 @@ function TorBild({ f, farbe = 'var(--primary)' }: { f?: (x: number) => number; f
           Boden (x in m)
         </text>
       </svg>
+    </div>
+  )
+}
+
+/** Biegemaschine: Gleichung eintippen, senden, Bogen erscheint in der Skizze, die Maschine meldet, was passt */
+function Biegemaschine({ versuche, onSenden }: { versuche: Versuch[]; onSenden: (v: Versuch) => void }) {
+  const uid = useId()
+  const [eingabe, setEingabe] = useState({ a: '', b: '', c: '' })
+  const [fehlt, setFehlt] = useState(false)
+  const letzter = versuche[versuche.length - 1]
+  const treffer = versuche.some(passt)
+  const kurven: Kurve[] = versuche.map((v, i) => ({
+    f: wert(v),
+    farbe: passt(v) ? 'var(--correct)' : i === versuche.length - 1 ? 'var(--primary)' : 'var(--line-strong)',
+    breite: i === versuche.length - 1 ? 4.5 : 2.5,
+  }))
+
+  const senden = () => {
+    const a = parseInput(eingabe.a)
+    const b = parseInput(eingabe.b)
+    const c = parseInput(eingabe.c)
+    if (!a || !b || !c) return setFehlt(true)
+    setFehlt(false)
+    onSenden({ a: a.value, b: b.value, c: c.value })
+  }
+  const feld = (k: 'a' | 'b' | 'c', label: string) => (
+    <input
+      type="text"
+      inputMode="decimal"
+      autoComplete="off"
+      placeholder="?"
+      aria-label={label}
+      id={`${uid}-${k}`}
+      className="bk-input lp-input lp-input-sm ls-gap"
+      value={eingabe[k]}
+      onChange={(e: ChangeEvent<HTMLInputElement>) => setEingabe({ ...eingabe, [k]: e.target.value })}
+    />
+  )
+
+  return (
+    <div className="lp-ex bk-panel tb-maschine" data-no-autocheck>
+      <CardHead title="Die Biegemaschine" />
+      <p>
+        Tippe eine Funktionsgleichung ein und schicke sie an die Maschine. Sie biegt den Bogen und zeichnet ihn in die Skizze. Versuche, die gestrichelte Skizze genau zu treffen.
+        Probiere ruhig mehrmals.
+      </p>
+      <TorBild kurven={kurven} />
+      <div className="tb-eingabe">
+        <M>{'y ='}</M> {feld('a', 'Zahl vor x²')} <M>{'x^2 +'}</M> {feld('b', 'Zahl vor x')} <M>{'x +'}</M> {feld('c', 'Zahl ohne x')}
+      </div>
+      <div>
+        <button type="button" className="bk-btn bk-btn-primary" onClick={senden}>
+          <i className="fa-solid fa-paper-plane" aria-hidden="true" /> An die Maschine senden
+        </button>
+      </div>
+      {fehlt && (
+        <div className="bk-feedback bk-feedback-info lp-feedback" role="status">
+          <i className="fa-solid fa-pen" aria-hidden="true" /> Bitte trage in alle drei Felder eine Zahl ein, auch 0 ist erlaubt.
+        </div>
+      )}
+      {letzter && (
+        <div className={`tb-display ${passt(letzter) ? 'tb-display-ok' : ''}`} role="status">
+          <div className="tb-display-head">
+            Versuch {versuche.length}: <M>{gleichungTex(letzter)}</M>
+          </div>
+          <ul>
+            {pruefung(letzter).map((p) => (
+              <li key={p.name}>
+                <i className={`fa-solid ${p.ok ? 'fa-circle-check' : 'fa-circle-xmark'}`} aria-hidden="true" /> {p.name}:{' '}
+                {p.ok ? <>Höhe {meter(p.soll)}, passt</> : <>Höhe {meter(p.ist)} statt {meter(p.soll)}</>}
+              </li>
+            ))}
+          </ul>
+          <strong>{passt(letzter) ? 'Bogen passt. Die Maschine nimmt die Gleichung an.' : 'Bogen passt nicht. Die Maschine lehnt die Gleichung ab.'}</strong>
+        </div>
+      )}
+      {(versuche.length >= 3 || treffer) && (
+        <div className="ls-question">
+          <i className="fa-solid fa-lightbulb" aria-hidden="true" />
+          <span>
+            {treffer
+              ? 'Treffer! Aber beim nächsten Kunden hat der Bogen andere Maße. Raten dauert, und man weiß nie, ob es klappt.'
+              : 'Raten bringt dich kaum ans Ziel: Passt der Bogen an einer Stelle, stimmt er an einer anderen nicht.'}{' '}
+            In Phase 3 berechnest du die Gleichung deshalb sicher aus dem Scheitelpunkt und einem weiteren Punkt.
+          </span>
+        </div>
+      )}
     </div>
   )
 }
@@ -168,7 +285,7 @@ export default function TorbogenEinstieg({
   onPractice: () => void
   onNext: () => void
 }) {
-  const [pred, setPred] = useState<Prediction>({ choice: null, saved: false })
+  const [versuche, setVersuche] = useState<Versuch[]>([])
 
   return (
     <ErklaerungCtx.Provider value={erklaerung}>
@@ -248,9 +365,9 @@ export default function TorbogenEinstieg({
             prefix="tb"
             art="problem"
             social="EA"
-            minutes={4}
-            was={<>Den Auftrag lesen und festhalten, wie du an die fehlende Zahl kommst. Noch nicht rechnen.</>}
-            wozu={<>Du weißt genau, was gegeben und was gesucht ist.</>}
+            minutes={6}
+            was={<>Den Auftrag lesen und Gleichungen an die Biegemaschine schicken. Noch nicht rechnen, einfach ausprobieren.</>}
+            wozu={<>Du merkst, ob du die richtige Gleichung durch Raten findest, oder ob du ein Verfahren brauchst.</>}
           >
             <div className="wm-notiz">
               <p>
@@ -258,43 +375,8 @@ export default function TorbogenEinstieg({
                 Mitte 3 m hoch. Die Biegemaschine braucht dafür die Funktionsgleichung des Bogens.
               </p>
             </div>
-            <TorBild />
             <Problemkarte />
-            <div className="lp-ex bk-panel" data-no-autocheck>
-              <CardHead title="Deine Vermutung" />
-              {pred.saved && pred.choice ? (
-                <>
-                  <div className="ls-saved" role="status">
-                    <i className="fa-solid fa-lock" aria-hidden="true" /> Gespeichert: <strong>{CHOICE_TEXT[pred.choice]}</strong>. In Phase 4 schaust du, ob du recht hattest.
-                  </div>
-                  <div>
-                    <button type="button" className="bk-btn bk-btn-sm bk-btn-ghost" onClick={() => setPred({ ...pred, saved: false })}>
-                      Vermutung ändern
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p>
-                    Setzt du den Scheitelpunkt in die Scheitelform ein, erhältst du <M>{'y = a(x - 2)^2 + 3'}</M>. Es fehlt nur noch die Zahl <M>a</M>. Wie kommst du an{' '}
-                    <M>a</M>? Entscheide spontan und schreibe einen Satz als Begründung in dein Heft.
-                  </p>
-                  <div className="ls-options" role="radiogroup" aria-label="Vermutung">
-                    {(['probieren', 'einsetzen', 'ablesen'] as const).map((c) => (
-                      <label key={c} className="bk-choice ls-option">
-                        <input type="radio" name="tor-pred" checked={pred.choice === c} onChange={() => setPred({ ...pred, choice: c })} />
-                        <span>{CHOICE_TEXT[c]}</span>
-                      </label>
-                    ))}
-                  </div>
-                  <div>
-                    <button type="button" className="bk-btn bk-btn-primary" disabled={!pred.choice} onClick={() => setPred({ ...pred, saved: true })}>
-                      <i className="fa-solid fa-lock" aria-hidden="true" /> Vermutung festhalten
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+            <Biegemaschine versuche={versuche} onSenden={(v) => setVersuche((alt) => [...alt, v])} />
           </Etappe>
 
           <Etappe
@@ -409,7 +491,7 @@ export default function TorbogenEinstieg({
             wozu={<>Mit deinem Spickzettel kannst du jede Aufgabe dieser Art lösen. Der Check zeigt dir, wo du noch unsicher bist.</>}
           >
             <Teil title="Das hältst du fest">
-              <Rueckbezug pred={pred} />
+              <Rueckbezug versuche={versuche} />
               <div className="wm-mappe">
                 <span className="wm-reiter">Auftragsmappe 2026-117</span>
                 <div className="wm-blatt">
@@ -641,27 +723,26 @@ export default function TorbogenEinstieg({
   )
 }
 
-/** Rückbezug auf die Vermutung aus Abschnitt 2 */
-function Rueckbezug({ pred }: { pred: Prediction }) {
-  if (!pred.saved || !pred.choice) {
-    return (
-      <div className="ls-back">
-        <p>Du hast in Phase 2 noch keine Vermutung festgehalten. Hole das kurz nach, dann siehst du hier, ob du richtig lagst.</p>
-      </div>
-    )
-  }
+/** Rückbezug auf die Versuche an der Biegemaschine aus Phase 2 */
+function Rueckbezug({ versuche }: { versuche: Versuch[] }) {
+  const treffer = versuche.some(passt)
   return (
     <div className="ls-back">
       <p>
-        <strong>Du hattest vermutet:</strong> {CHOICE_TEXT[pred.choice]}.
+        {versuche.length === 0 ? (
+          <>Du hast in Phase 2 keine Gleichung an die Biegemaschine geschickt.</>
+        ) : (
+          <>
+            <strong>
+              Du hast in Phase 2 {versuche.length} {versuche.length === 1 ? 'Gleichung' : 'Gleichungen'} an die Biegemaschine geschickt.
+            </strong>{' '}
+            {treffer ? 'Ein Treffer war dabei, durch Raten oder schon durch Rechnen.' : 'Keine davon hat gepasst.'}
+          </>
+        )}
       </p>
       <p>
-        {pred.choice === 'einsetzen' && <>Genau so geht es: den Punkt einsetzen und nach a auflösen. Gut gedacht!</>}
-        {pred.choice === 'probieren' && <>Probieren klappt am Regler, aber nur ungefähr. Mit dem Einsetzen von P bekommst du a genau, auch bei krummen Zahlen.</>}
-        {pred.choice === 'ablesen' && <>Der Scheitelpunkt verrät a nicht: Durch S(2 | 3) gehen viele Parabeln, breite und schmale. Erst ein weiterer Punkt legt a fest.</>}
-      </p>
-      <p>
-        Richtig ist <strong>a = −0,25</strong>. Das Minus passt zum Bogen: Er ist oben rund und hängt nicht durch.
+        Mit dem Scheitelpunkt und einem weiteren Punkt rechnest du die Gleichung in drei Schritten sicher aus, statt zu raten: <strong>y = −0,25x² + x + 2</strong>. Das Minus vor
+        x² passt zum Bogen: Er ist oben rund und hängt nicht durch.
       </p>
     </div>
   )
