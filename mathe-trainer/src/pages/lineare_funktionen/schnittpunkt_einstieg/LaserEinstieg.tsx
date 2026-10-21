@@ -3,7 +3,7 @@ import TaskShell from '../../../components/layout/TaskShell'
 import CheckedNumberInput from '../../../components/CheckedNumberInput'
 import { Beispiel, M, MB, Merke, QuerTabelle, fmt } from '../../daten_und_zufall/lernpfad/kit'
 import {
-  CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, Phase, TrackedCheck, TrackedMc, tx,
+  Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, HeftHinweis, Hilfen, McCard, Phase, TrackedCheck, TrackedMc, tx,
 } from '../lernsituation_kit/kit'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 
@@ -229,6 +229,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             Gleichsetzungsverfahren. Und du deutest den Schnittpunkt in der Situation.
           </div>
         </div>
+        <Arbeitsweise />
 
         {/* 1 Aktivieren */}
         <Phase no={1} title="Fit für den Start" social="EA" minutes={5}>
@@ -238,7 +239,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               title="a) Punktprobe"
               prompt={
                 <p>
-                  Berechne, ob der Punkt <M>{'P(2 \\mid 1)'}</M> auf der Geraden <M>{'f(x) = -0{,}5x + 2'}</M> liegt. Halte deinen Rechenweg schriftlich fest.
+                  Berechne, ob der Punkt <M>{'P(2 \\mid 1)'}</M> auf der Geraden <M>{'f(x) = -0{,}5x + 2'}</M> liegt.
                 </p>
               }
               fields={[{ kind: 'select', key: 'p', label: 'Antwort', options: ['Ja', 'Nein'], expected: 0 }]}
@@ -254,7 +255,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               title="b) Gleichung aus zwei Punkten"
               prompt={
                 <p>
-                  Eine Gerade geht durch <M>{'R(5 \\mid 4)'}</M> und <M>{'Q(-3 \\mid 0)'}</M>. Berechne die Funktionsgleichung <M>{'g(x) = m x + t'}</M>. Halte deine Rechenwege schriftlich fest.
+                  Eine Gerade geht durch <M>{'R(5 \\mid 4)'}</M> und <M>{'Q(-3 \\mid 0)'}</M>. Berechne die Funktionsgleichung <M>{'g(x) = m x + t'}</M>.
                 </p>
               }
               fieldsRow
@@ -287,7 +288,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             />
             <CheckCard
               title="d) Gleichung lösen"
-              prompt={<p>Löse die gegebene Gleichung nach <M>x</M> auf. Halte deinen Rechenweg schriftlich fest.</p>}
+              prompt={<p>Löse die gegebene Gleichung nach <M>x</M> auf.</p>}
               lead={<M>{'0{,}5x + 1{,}5 = 2 \\qquad \\Rightarrow'}</M>}
               fields={[{ kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 1 }]}
               solution={<MB>{'\\begin{aligned} 0{,}5x + 1{,}5 &= 2 && \\mid -1{,}5 \\\\ 0{,}5x &= 0{,}5 && \\mid :0{,}5 \\\\ x &= 1 \\end{aligned}'}</MB>}
@@ -391,6 +392,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             <div className="lp-ex-prompt">
               <p>Wie hoch sind die Strahlen an diesen Stellen? Füllt die Tabelle aus. Die Felder färben sich von selbst grün oder rot.</p>
             </div>
+            <HeftHinweis><strong>Im Heft:</strong> Rechne die Tabellenwerte mit Rechenweg in deinem Heft aus. Trage dann nur die Ergebnisse ein.</HeftHinweis>
             <QuerTabelle
               rows={[
                 { head: 'x in m', cells: COARSE_X.map((x) => <strong key={x}>{fmt(x, 2)}</strong>) },
@@ -427,6 +429,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
 
           <CheckCard
             title="Euer Ergebnis"
+            rechnen={false}
             prompt={<p>Egal, welchen Weg ihr genommen habt: Tragt euer Ergebnis ein und haltet eure Rechenwege oder Ablesungen schriftlich fest.</p>}
             fields={[
               { kind: 'num', key: 'x', label: <>Die Strahlen kreuzen sich bei <M>x</M> =</>, expected: XS, unit: 'm' },
@@ -450,7 +453,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   Ihr seid schon fertig? Der rechte Strahler hängt fest in <M>{'R(5 \\mid 4)'}</M>, aber ihr könnt ihn drehen. Dadurch ändert sich die Steigung seines Strahls.
                   Stellt ihn so ein, dass sich die Strahlen <strong>genau über der Mitte des Pults</strong> kreuzen.
                 </p>
-                <p>Haltet eure Rechenwege schriftlich fest und beschreibt im Heft: In welche Richtung wandert der Kreuzungspunkt, wenn der rechte Strahl steiler wird? Warum?</p>
+                <p>Beschreibt im Heft: In welche Richtung wandert der Kreuzungspunkt, wenn der rechte Strahl steiler wird? Warum?</p>
                 <DrehenAnsicht />
               </>
             }
@@ -650,7 +653,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               level="basis"
               prompt={
                 <>
-                  <p>Berechne den Schnittpunkt der beiden Geraden. Fülle die Lücken der Rechnung aus und halte deinen Rechenweg schriftlich fest.</p>
+                  <p>Berechne den Schnittpunkt der beiden Geraden. Fülle die Lücken der Rechnung aus.</p>
                   <MB>{'f(x) = 4x + 1 \\qquad g(x) = 2x + 7'}</MB>
                   <MB>{'\\begin{aligned} 4x + 1 &= 2x + 7 && \\mid -2x \\\\ 2x + 1 &= 7 && \\mid -1 \\\\ 2x &= \\;\\fbox{?} && \\mid :2 \\\\ x &= \\;\\fbox{?} \\end{aligned}'}</MB>
                   <p>
@@ -693,7 +696,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                     Im Schultheater leuchten zwei Scheinwerfer auf die Bühne (1 LE = 1 m, y-Achse = Bühnenmitte). Der Lichtstrahl von Scheinwerfer 1 geht durch die Punkte{' '}
                     <M>{'A(0 \\mid 1)'}</M> und <M>{'B(5 \\mid 5)'}</M>, der von Scheinwerfer 2 durch <M>{'C(-4 \\mid 6{,}2)'}</M> und <M>{'D(6 \\mid 2{,}2)'}</M>.
                   </p>
-                  <p>Stelle beide Funktionsgleichungen auf und berechne, wo sich die Lichtstrahlen kreuzen. Halte deine Rechenwege schriftlich fest.</p>
+                  <p>Stelle beide Funktionsgleichungen auf und berechne, wo sich die Lichtstrahlen kreuzen.</p>
                 </>
               }
               fields={[
@@ -737,7 +740,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <p>
                   Zurück zur Lasershow: Damit niemand geblendet wird, sollen sich die Strahlen in <strong>2,5 m Höhe</strong> kreuzen. Der linke Strahl bleibt{' '}
                   <M>{'f(x) = -0{,}5x + 2'}</M>, der rechte Strahler bleibt in <M>{'R(5 \\mid 4)'}</M> und wird gedreht. An welcher Stelle liegt der neue Kreuzungspunkt, und
-                  welche Steigung braucht der rechte Strahl? Halte deine Rechenwege schriftlich fest.
+                  welche Steigung braucht der rechte Strahl?
                 </p>
               }
               fields={[
@@ -793,10 +796,11 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             <TrackedMc
               topic="Schnittpunkt-Einstieg: Gleichsetzen (Standard)"
               title="Check 2: Schnittpunkt berechnen"
+              rechnen
               level="standard"
               prompt={
                 <>
-                  <p>Berechne den Schnittpunkt der beiden Geraden. Halte deinen Rechenweg schriftlich fest und wähle dann die richtige Antwort aus.</p>
+                  <p>Berechne den Schnittpunkt der beiden Geraden. Wähle dann die richtige Antwort aus.</p>
                   <MB>{'f(x) = 2x + 1 \\qquad g(x) = -x + 7'}</MB>
                 </>
               }
@@ -813,7 +817,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               level="erweiterung"
               prompt={
                 <>
-                  <p>Berechne den Schnittpunkt durch Gleichsetzen. Halte deinen Rechenweg schriftlich fest.</p>
+                  <p>Berechne den Schnittpunkt durch Gleichsetzen.</p>
                   <MB>{'f(x) = 3x - 2 \\qquad g(x) = x + 4'}</MB>
                 </>
               }

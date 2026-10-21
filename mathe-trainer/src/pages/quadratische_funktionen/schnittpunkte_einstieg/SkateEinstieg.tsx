@@ -2,7 +2,7 @@ import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import CheckedNumberInput from '../../../components/CheckedNumberInput'
 import { Beispiel, M, MB, Merke, QuerTabelle, Vorgehen, fmt } from '../../daten_und_zufall/lernpfad/kit'
-import { CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, LevelTag, McCard, Phase, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Arbeitsweise, CardHead, CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, LevelTag, McCard, Phase, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './lab.css'
 
@@ -212,6 +212,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
               erkennst. Dann berechnest du die Schnittpunkte.
             </div>
           </div>
+          <Arbeitsweise />
 
           {/* 1 Aktivieren */}
           <Phase no={1} title="Fit für den Start" social="EA" minutes={5}>
@@ -221,7 +222,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 title="a) Punktprobe bei einer Parabel"
                 prompt={
                   <p>
-                    Liegt der Punkt <M>{'P(2 \\mid 4)'}</M> auf der Parabel <M>{'p(x) = -0{,}25x^2 + x + 3'}</M>? Halte deinen Rechenweg schriftlich fest.
+                    Liegt der Punkt <M>{'P(2 \\mid 4)'}</M> auf der Parabel <M>{'p(x) = -0{,}25x^2 + x + 3'}</M>?
                   </p>
                 }
                 fields={[{ kind: 'select', key: 'p', label: 'Antwort', options: ['Ja', 'Nein'], expected: 0 }]}
@@ -237,7 +238,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 title="b) y-Wert einer Geraden berechnen"
                 prompt={
                   <p>
-                    Eine Gerade hat die Gleichung <M>{'g(x) = -0{,}5x + 5'}</M>. Berechne den y-Wert an der Stelle <M>{'x = 4'}</M>. Halte deinen Rechenweg schriftlich fest.
+                    Eine Gerade hat die Gleichung <M>{'g(x) = -0{,}5x + 5'}</M>. Berechne den y-Wert an der Stelle <M>{'x = 4'}</M>.
                   </p>
                 }
                 fields={[{ kind: 'num', key: 'y', label: <M>{'g(4) ='}</M>, expected: 3 }]}
@@ -247,7 +248,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 title="c) Quadratische Gleichung lösen"
                 prompt={
                   <p>
-                    Löse <M>{'x^2 - 6x + 8 = 0'}</M> mit der Mitternachtsformel. Halte deinen Rechenweg schriftlich fest.
+                    Löse <M>{'x^2 - 6x + 8 = 0'}</M> mit der Mitternachtsformel.
                   </p>
                 }
                 fieldsRow
@@ -501,7 +502,6 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                       <li>x-Werte mit der Mitternachtsformel berechnen.</li>
                       <li>y-Werte mit der Geradengleichung berechnen.</li>
                     </ol>
-                    <p>Haltet eure Rechenwege schriftlich fest.</p>
                   </>
                 }
                 fieldsRow
@@ -577,7 +577,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                       <M>{'p(x) = -0{,}25x^2 + x + 3'}</M> und <M>{'g(x) = -0{,}5x + 5{,}25'}</M>.
                     </p>
                     <p>
-                      Achtet darauf, was in der Mitternachtsformel unter der Wurzel herauskommt. Haltet eure Rechenwege schriftlich fest und beschreibt im Heft, warum es nur eine
+                      Achtet darauf, was in der Mitternachtsformel unter der Wurzel herauskommt. Beschreibt im Heft, warum es nur eine
                       Lösung gibt.
                     </p>
                   </>
@@ -794,6 +794,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
               />
               <McCard
                 title="Check 2: Wer hat recht?"
+                rechnen
                 level="standard"
                 prompt={
                   <>
@@ -816,8 +817,7 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 prompt={
                   <>
                     <p>
-                      Berechne die Schnittpunkte der Parabel <M>{'p(x) = 0{,}5x^2 - 2x + 1'}</M> und der Geraden <M>{'g(x) = 0{,}5x - 2'}</M>. Rechne mit der Mitternachtsformel und
-                      halte deinen Rechenweg schriftlich fest.
+                      Berechne die Schnittpunkte der Parabel <M>{'p(x) = 0{,}5x^2 - 2x + 1'}</M> und der Geraden <M>{'g(x) = 0{,}5x - 2'}</M>. Rechne mit der Mitternachtsformel.
                     </p>
                   </>
                 }

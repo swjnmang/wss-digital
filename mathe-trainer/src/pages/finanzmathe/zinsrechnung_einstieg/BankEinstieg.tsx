@@ -2,7 +2,7 @@ import { useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import { VideoEmbed } from '../../../components/VideoButton'
 import { Beispiel, M, MB, Merke, Vorgehen, fmt } from '../../daten_und_zufall/lernpfad/kit'
-import { CardHead, CheckCard, Hilfen, LevelTag, McCard, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Arbeitsweise, CardHead, CheckCard, Hilfen, LevelTag, McCard, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './intranet.css'
 
@@ -74,6 +74,7 @@ export default function BankEinstieg({ onBack, onPractice, onNext }: { onBack: (
             Formel für die Tageszinsen selbst.
           </div>
         </div>
+        <Arbeitsweise />
 
         {/* 1 Aktivieren */}
         <Phase no={1} title="Fit für den Start" social="EA" minutes={5}>
@@ -83,7 +84,7 @@ export default function BankEinstieg({ onBack, onPractice, onNext }: { onBack: (
               title="a) Zinsen für ein Jahr"
               prompt={
                 <p>
-                  Ein Sparkonto zahlt <strong>2 % Zinsen pro Jahr</strong>. Wie viel Zinsen bringen 3.500 € in einem Jahr? Halte deinen Rechenweg schriftlich fest.
+                  Ein Sparkonto zahlt <strong>2 % Zinsen pro Jahr</strong>. Wie viel Zinsen bringen 3.500 € in einem Jahr?
                 </p>
               }
               fields={[{ kind: 'num', key: 'z', label: 'Zinsen:', expected: 70, unit: '€' }]}
@@ -281,7 +282,7 @@ export default function BankEinstieg({ onBack, onPractice, onNext }: { onBack: (
             </p>
             <CheckCard
               title="Angebot A: Tagesgeld, 2,4 % p.a., 148 Tage"
-              prompt={<p>Berechnet die Zinsen für ein ganzes Jahr, dann für einen Tag (360 Tage pro Jahr) und dann für Lenas 148 Tage. Haltet den Rechenweg im Heft fest.</p>}
+              prompt={<p>Berechnet die Zinsen für ein ganzes Jahr, dann für einen Tag (360 Tage pro Jahr) und dann für Lenas 148 Tage.</p>}
               fieldsRow
               fields={[
                 { kind: 'num', key: 'j', label: '1 Jahr:', expected: 115.2, unit: '€' },
@@ -401,7 +402,7 @@ export default function BankEinstieg({ onBack, onPractice, onNext }: { onBack: (
               prompt={
                 <p>
                   Jonas legt <strong>2.700 €</strong> vom <strong>01.03.</strong> bis zum <strong>20.07.</strong> auf das Tagesgeld (2,4 % p.a.). Bestimmt die Zinstage und berechnet
-                  die Zinsen mit der Formel. Haltet den Rechenweg im Heft fest.
+                  die Zinsen mit der Formel.
                 </p>
               }
               fieldsRow
@@ -562,6 +563,7 @@ export default function BankEinstieg({ onBack, onPractice, onNext }: { onBack: (
           <div className="lp-exlist">
             <McCard
               title="Check 1: Wie viel Zinsen?"
+              rechnen
               level="basis"
               prompt={<p>6.000 € werden 60 Tage lang zu 3 % p.a. angelegt. Wie viel Zinsen gibt es?</p>}
               options={[
@@ -573,6 +575,7 @@ export default function BankEinstieg({ onBack, onPractice, onNext }: { onBack: (
             />
             <McCard
               title="Check 2: Wer hat recht?"
+              rechnen
               level="standard"
               prompt={
                 <p>
@@ -593,7 +596,7 @@ export default function BankEinstieg({ onBack, onPractice, onNext }: { onBack: (
               prompt={
                 <p>
                   Tim legt am <strong>31.01.</strong> 3.000 € zu 2,2 % p.a. auf ein Tagesgeldkonto und hebt das Geld am <strong>15.06.</strong> wieder ab. Bestimme die Zinstage nach der
-                  Bankregel und berechne die Zinsen. Halte deinen Rechenweg schriftlich fest.
+                  Bankregel und berechne die Zinsen.
                 </p>
               }
               fieldsRow

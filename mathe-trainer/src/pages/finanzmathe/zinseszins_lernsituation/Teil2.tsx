@@ -2,7 +2,7 @@ import { useState } from 'react'
 import CheckedNumberInput from '../../../components/CheckedNumberInput'
 import { VideoEmbed } from '../../../components/VideoButton'
 import { Beispiel, M, MB, Merke, fmt } from '../../daten_und_zufall/lernpfad/kit'
-import { CardHead, CheckCard, Hilfen, McCard, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Arbeitsweise, CardHead, CheckCard, HeftHinweis, Hilfen, McCard, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
 import { Chat, Festlegung, Frage, Kriterien, Msg, Stopp, Wege, eur, eurTex, faktor, kn, zt } from './shared'
 
 // Teil 2 (ca. 90 min) der Lernsituation „Wer hat nach 10 Jahren mehr?“: die Umkehrungen K_0, q (p) und n.
@@ -47,6 +47,7 @@ export default function Teil2() {
           Laufzeit <M>n</M>.
         </div>
       </div>
+      <Arbeitsweise />
 
       {/* 1 Aktivieren */}
       <Phase no={1} title="Fit für den Start" social="EA" minutes={10}>
@@ -153,6 +154,7 @@ export default function Teil2() {
             Mira möchte nach 8 Jahren <M>{'6000\\text{ €}'}</M> haben (3 %, Zinsen bleiben). Gehe gedanklich <strong>rückwärts</strong>: Am Ende des 8. Jahres sind es 6.000 €. Wie viel waren es ein Jahr vorher?
             Und noch ein Jahr früher? Das Kapital wurde ja jedes Jahr mit <M>{'1{,}03'}</M> multipliziert.
           </p>
+          <HeftHinweis><strong>Im Heft:</strong> Rechne die Tabellenwerte mit Rechenweg in deinem Heft aus. Trage dann nur die Ergebnisse ein.</HeftHinweis>
           <div className="zz-table-wrap">
             <table className="lp-table">
               <thead>
@@ -209,7 +211,7 @@ export default function Teil2() {
           level="standard"
           prompt={
             <p>
-              Ein Sparer möchte nach 5 Jahren <M>{'8000\\text{ €}'}</M> für ein Motorrad haben. Die Bank zahlt <M>{'2{,}5\\,\\%'}</M> Zinseszins. Wie viel muss er heute anlegen? Halte deinen Rechenweg schriftlich fest.
+              Ein Sparer möchte nach 5 Jahren <M>{'8000\\text{ €}'}</M> für ein Motorrad haben. Die Bank zahlt <M>{'2{,}5\\,\\%'}</M> Zinseszins. Wie viel muss er heute anlegen?
             </p>
           }
           fields={[{ kind: 'num', key: 'k', label: <M>{'K_0 ='}</M>, expected: 8000 / faktor(2.5) ** 5, unit: '€', tol: 0.05 }]}
@@ -276,6 +278,7 @@ export default function Teil2() {
           <p>
             Das Angebot: Aus <M>{'5000\\text{ €}'}</M> werden in 6 Jahren <M>{'6000\\text{ €}'}</M>. Teste, welche Zinssätze infrage kommen, und rechne das Endkapital nach 6 Jahren für verschiedene Zinssätze aus.
           </p>
+          <HeftHinweis><strong>Im Heft:</strong> Rechne die Tabellenwerte mit Rechenweg in deinem Heft aus. Trage dann nur die Ergebnisse ein.</HeftHinweis>
           <div className="zz-table-wrap">
             <table className="lp-table">
               <thead>
@@ -300,6 +303,7 @@ export default function Teil2() {
           </div>
           <CheckCard
             title="Wo liegt der gesuchte Zinssatz?"
+            rechnen={false}
             prompt={<p>Vergleiche deine Ergebnisse mit dem Ziel von 6.000 €.</p>}
             fields={[{ kind: 'select', key: 'z', label: 'Der Zinssatz liegt', options: ['unter 2 %', 'zwischen 2 % und 3 %', 'zwischen 3 % und 4 %', 'über 4 %'], expected: 2 }]}
             solution={
@@ -368,7 +372,7 @@ export default function Teil2() {
           level="standard"
           prompt={
             <p>
-              Aus <M>{'4000\\text{ €}'}</M> werden in 7 Jahren <M>{'5000\\text{ €}'}</M>. Berechne den Zinsfaktor und den Zinssatz in Prozent. Halte deinen Rechenweg schriftlich fest.
+              Aus <M>{'4000\\text{ €}'}</M> werden in 7 Jahren <M>{'5000\\text{ €}'}</M>. Berechne den Zinsfaktor und den Zinssatz in Prozent.
             </p>
           }
           fieldsRow
@@ -436,6 +440,7 @@ export default function Teil2() {
             Wann hat sich Miras Guthaben von <M>{'5000\\text{ €}'}</M> bei <M>{'3\\,\\%'}</M> auf mindestens <M>{'10000\\text{ €}'}</M> verdoppelt? Probiert in der Gruppe verschiedene Laufzeiten aus
             und tragt das Endkapital ein. Teilt die Laufzeiten untereinander auf.
           </p>
+          <HeftHinweis><strong>Im Heft:</strong> Rechne die Tabellenwerte mit Rechenweg in deinem Heft aus. Trage dann nur die Ergebnisse ein.</HeftHinweis>
           <div className="zz-table-wrap">
             <table className="lp-table">
               <thead>
@@ -458,6 +463,7 @@ export default function Teil2() {
           </div>
           <CheckCard
             title="Wann sind es erstmals mehr als 10.000 €?"
+            rechnen={false}
             prompt={<p>Nach wie vielen vollen Jahren ist das Kapital zum ersten Mal mindestens 10.000 €?</p>}
             fields={[{ kind: 'num', key: 'n', label: <>nach</>, expected: nDvoll, unit: 'Jahren', tol: 0.01 }]}
             solution={
@@ -558,8 +564,7 @@ export default function Teil2() {
           level="standard"
           prompt={
             <p>
-              <M>{'3000\\text{ €}'}</M> werden mit <M>{'4\\,\\%'}</M> Zinseszins angelegt. Nach wie vielen Jahren sind daraus zum ersten Mal mindestens <M>{'4500\\text{ €}'}</M> geworden? Halte deinen Rechenweg
-              schriftlich fest.
+              <M>{'3000\\text{ €}'}</M> werden mit <M>{'4\\,\\%'}</M> Zinseszins angelegt. Nach wie vielen Jahren sind daraus zum ersten Mal mindestens <M>{'4500\\text{ €}'}</M> geworden?
             </p>
           }
           fieldsRow
@@ -630,6 +635,7 @@ export default function Teil2() {
         <div className="lp-exlist">
           <McCard
             title="Check 1: Wer hat recht?"
+            rechnen
             level="basis"
             prompt={
               <p>
@@ -649,6 +655,7 @@ export default function Teil2() {
           />
           <McCard
             title="Check 2: Zinssatz bestimmen"
+            rechnen
             level="standard"
             prompt={
               <p>
@@ -664,6 +671,7 @@ export default function Teil2() {
           />
           <McCard
             title="Check 3: Verdopplung bei 5 %"
+            rechnen
             level="standard"
             prompt={
               <p>

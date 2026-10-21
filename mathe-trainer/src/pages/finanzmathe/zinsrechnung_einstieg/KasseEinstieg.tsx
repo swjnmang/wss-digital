@@ -2,7 +2,7 @@ import { useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import { VideoEmbed } from '../../../components/VideoButton'
 import { Beispiel, M, MB, Merke, Vorgehen, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CardHead, CheckCard, Hilfen, McCard, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { Arbeitsweise, CardHead, CheckCard, Hilfen, McCard, Phase } from '../../lineare_funktionen/lernsituation_kit/kit'
 import { VIDEO_ZINSEN } from './BankEinstieg'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './pinnwand.css'
@@ -124,8 +124,7 @@ function ExpertenAufgabe({ g }: { g: Gesucht }) {
         level="basis"
         prompt={
           <p>
-            Der Sportverein möchte in 150 Tagen 45 € Zinsen für neue Bälle bekommen. Das Tagesgeld zahlt 2,5 % p.a. Wie viel Geld muss der Verein anlegen? Haltet den Rechenweg
-            im Heft fest.
+            Der Sportverein möchte in 150 Tagen 45 € Zinsen für neue Bälle bekommen. Das Tagesgeld zahlt 2,5 % p.a. Wie viel Geld muss der Verein anlegen?
           </p>
         }
         fields={[{ kind: 'num', key: 'k', label: <M>{'K ='}</M>, expected: 4320, unit: '€' }]}
@@ -155,7 +154,7 @@ function ExpertenAufgabe({ g }: { g: Gesucht }) {
         level="basis"
         prompt={
           <p>
-            Der Sportverein hat 4.320 € für 150 Tage angelegt und 54 € Zinsen bekommen. Welcher Zinssatz war das? Haltet den Rechenweg im Heft fest.
+            Der Sportverein hat 4.320 € für 150 Tage angelegt und 54 € Zinsen bekommen. Welcher Zinssatz war das?
           </p>
         }
         fields={[{ kind: 'num', key: 'p', label: <M>{'p ='}</M>, expected: 3, unit: '% p.a.' }]}
@@ -184,7 +183,7 @@ function ExpertenAufgabe({ g }: { g: Gesucht }) {
       level="basis"
       prompt={
         <p>
-          Der Sportverein legt 4.320 € zu 2,5 % p.a. an. Nach wie vielen Tagen hat er 60 € Zinsen? Haltet den Rechenweg im Heft fest.
+          Der Sportverein legt 4.320 € zu 2,5 % p.a. an. Nach wie vielen Tagen hat er 60 € Zinsen?
         </p>
       }
       fields={[{ kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 200, unit: 'Tage' }]}
@@ -376,6 +375,7 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
             Ihr arbeitet als Gruppenpuzzle: Erst wirst du Expertin oder Experte für eine Größe, dann löst ihr in der Stammgruppe gemeinsam einen echten Fall.
           </div>
         </div>
+        <Arbeitsweise />
 
         {/* 1 Aktivieren */}
         <Phase no={1} title="Fit für den Start" social="EA" minutes={8}>
@@ -809,7 +809,7 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
             <CheckCard
               title="Check 2: Kapital berechnen"
               level="standard"
-              prompt={<p>Wie viel Geld muss man zu 2,4 % p.a. anlegen, damit es in 75 Tagen 18 € Zinsen gibt? Halte deinen Rechenweg schriftlich fest.</p>}
+              prompt={<p>Wie viel Geld muss man zu 2,4 % p.a. anlegen, damit es in 75 Tagen 18 € Zinsen gibt?</p>}
               fields={[{ kind: 'num', key: 'k', label: <M>{'K ='}</M>, expected: 3600, unit: '€' }]}
               solution={<MB>{'K = \\frac{18 \\cdot 100 \\cdot 360}{2{,}4 \\cdot 75} = \\frac{648\\,000}{180} = 3\\,600'}</MB>}
               help={
@@ -826,6 +826,7 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
             />
             <McCard
               title="Check 3: Wer hat recht?"
+              rechnen
               level="standard"
               prompt={
                 <p>
