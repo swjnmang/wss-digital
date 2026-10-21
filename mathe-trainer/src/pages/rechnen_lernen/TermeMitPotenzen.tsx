@@ -994,21 +994,22 @@ const TermeMitPotenzen: React.FC = () => {
             return (
               <div key={aufgabe.id} className="space-y-1">
                 {/* Aufgabe in einer Zeile */}
-                <div className="bg-white rounded p-2 shadow border-l-2 border-orange-300 flex items-center gap-2">
+                <div className="bg-white rounded p-2 shadow border-l-2 border-orange-300 flex flex-wrap items-center gap-2">
                   {/* Nummer */}
                   <span className="text-sm font-bold text-gray-600 whitespace-nowrap">
                     {index + 1})
                   </span>
 
                   {/* Aufgabe */}
-                  <div className="text-sm font-mono bg-gray-50 px-2 py-1 rounded border border-gray-200 whitespace-nowrap">
+                  <div className="text-sm font-mono bg-gray-50 px-2 py-1 rounded border border-gray-200 whitespace-nowrap max-w-full overflow-x-auto">
                     {aufgabe.aufgabe}
                   </div>
 
                   {/* Gleichheitszeichen */}
                   <span className="text-lg font-bold text-gray-500">=</span>
 
-                  {/* Input */}
+                  {/* Input, Status und Button rutschen auf schmalen Bildschirmen gemeinsam in die nächste Zeile */}
+                  <div className="flex flex-1 min-w-[12rem] items-center gap-2">
                   <input
                     type="text"
                     placeholder="..."
@@ -1040,6 +1041,7 @@ const TermeMitPotenzen: React.FC = () => {
                   >
                     {showSolution ? '✕' : '?'}
                   </button>
+                  </div>
                 </div>
 
                 {/* Rechenweg - ausklappbar unter der Aufgabe */}
