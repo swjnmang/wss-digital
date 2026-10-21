@@ -4,7 +4,7 @@ import { VideoEmbed } from '../../../components/VideoButton'
 import { Beispiel, M, MB, Merke, fmt } from '../../daten_und_zufall/lernpfad/kit'
 import { Arbeitsweise, CardHead, CheckCard, HeftHinweis, Hilfen, McCard } from '../../lineare_funktionen/lernsituation_kit/kit'
 import { Etappe, Fortschritt, Teil } from '../../lineare_funktionen/lernsituation_kit/phasen'
-import { Chat, Festlegung, Frage, Kriterien, Msg, Stopp, Wege, eur, eurTex, faktor, kn, zt } from './shared'
+import { Chat, Festlegung, Frage, Kriterien, Msg, Wege, eur, eurTex, faktor, kn, zt } from './shared'
 
 // Teil 2 (ca. 90 min) der Lernsituation „Wer hat nach 10 Jahren mehr?“: die Umkehrungen K_0, q (p) und n.
 // Format Kontrastierende Fälle (Fortsetzung), Look Messenger-Chat, Lernprodukt analog (Concept Map wird ergänzt).
@@ -510,36 +510,6 @@ export default function Teil2() {
               ]}
             />
           </div>
-          <Stopp
-            title="Vergleicht eure Wege."
-            items={[
-              'Wie viele Rechnungen habt ihr gebraucht? Wie habt ihr entschieden, welche Laufzeit ihr als Nächstes probiert?',
-              'Was wäre, wenn ihr 60 Jahre hättet? Gäbe es einen schnelleren Weg?',
-            ]}
-          />
-          <p>
-            <strong>Du arbeitest allein?</strong> So haben andere gedacht:
-          </p>
-          <Wege
-            items={[
-              {
-                summary: 'Nora hat die Laufzeit schrittweise verdoppelt und halbiert',
-                body: (
-                  <p>
-                    „Ich habe mit 20 Jahren angefangen, das waren 9.030 €. Zu wenig, also 30: 12.136 €, zu viel. Dann 25, dann 23, dann 24. Nach 5 Rechnungen wusste ich, dass es 24 Jahre sind.“
-                  </p>
-                ),
-              },
-              {
-                summary: 'Kai hat den Logarithmus benutzt',
-                body: (
-                  <p>
-                    „Aus 10.000 = 5.000 · 1,03ⁿ wird 2 = 1,03ⁿ. Dann habe ich auf beiden Seiten den Logarithmus genommen und durch lg(1,03) geteilt: n ≈ 23,45. Das ging in einer Rechnung.“
-                  </p>
-                ),
-              },
-            ]}
-          />
           <p>Der Logarithmus ist eine Taste im Taschenrechner, die das Probieren überflüssig macht. Schau dir das Erklärvideo an.</p>
           <VideoEmbed src={VIDEO_N} title="Erklärvideo: Laufzeit n berechnen" />
           <Beispiel
@@ -795,15 +765,8 @@ export default function Teil2() {
               'Alle vier gesuchten Größen (K_n, K_0, q bzw. p, n) sind mit einem Beispiel belegt',
             ]}
           />
-          <Stopp
-            title="Gallery Walk: Vergleicht eure Plakate."
-            items={[
-              'Geht in Gruppen von Plakat zu Plakat. Was hat die andere Gruppe anders dargestellt?',
-              'Gebt jeder Gruppe ein Lob und einen Tipp auf einem Klebezettel.',
-            ]}
-          />
           <p>
-            <strong>Du arbeitest allein?</strong> So könnte eine fertige Concept Map aufgebaut sein:
+            <strong>Zum Vergleichen:</strong> So könnte eine fertige Concept Map aufgebaut sein.
           </p>
           <Wege
             items={[

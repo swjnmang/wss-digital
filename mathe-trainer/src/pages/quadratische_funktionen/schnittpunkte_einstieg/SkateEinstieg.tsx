@@ -391,8 +391,8 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <Etappe
             prefix="skate"
             art="loesen"
-            minutes={21}
-            was={<>Zu zweit im Labor untersuchen, wie oft die Sprungbahn die Lichtschranke kreuzt. Danach vergleicht ihr eure Ergebnisse.</>}
+            minutes={17}
+            was={<>Zu zweit im Labor untersuchen, wie oft die Sprungbahn die Lichtschranke kreuzt.</>}
             wozu={<>So berechnest du die Schnittpunkte von Parabel und Gerade und erkennst, wie viele es gibt.</>}
           >
             <Teil title="Ab ins Labor: Findet es heraus" social="PA" minutes={17}>
@@ -648,52 +648,6 @@ export default function SkateEinstieg({ erklaerung, onBack, onPractice }: { erkl
             </Teil>
 
 
-          {/* 4 Austausch */}
-            <Teil title="Vergleicht eure Ergebnisse" social="Plenum" minutes={4}>
-              <div className="ls-stop">
-                <div className="ls-stop-title">
-                  <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
-                </div>
-                <ul>
-                  <li>Warum gibt es genau eine Höhe, bei der die Lichtschranke die Sprungbahn nur berührt?</li>
-                  <li>Wie sicher kann man die Berührhöhe am Regler ablesen? Wie genau ist die Rechnung?</li>
-                  <li>Was passiert in der Mitternachtsformel, wenn die Zahl unter der Wurzel kleiner wird und schließlich negativ?</li>
-                </ul>
-              </div>
-              <p>
-                <strong>Du arbeitest allein?</strong> So haben zwei andere Jugendliche gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
-              </p>
-              <div className="ls-ways">
-                <details className="ls-way">
-                  <summary>Mila hat mit dem Regler gearbeitet</summary>
-                  <div className="ls-way-body">
-                    <p>„Ich habe den Regler hochgeschoben, bis nur noch ein Punkt übrig war. Das war bei 5,25. Bei 5,5 war kein Punkt mehr da.“</p>
-                    <p>
-                      <strong>Gut:</strong> Man sieht sofort, wie sich die Anzahl der Punkte ändert. <strong>Aber:</strong> Der Regler springt in 0,25er-Schritten. Ob es bei 5,3 noch
-                      zwei Punkte gibt, weiß man nicht genau, und die Punktkoordinaten kann man nur schätzen.
-                    </p>
-                  </div>
-                </details>
-                <details className="ls-way">
-                  <summary>Tarek hat gerechnet</summary>
-                  <div className="ls-way-body">
-                    <p>
-                      „Ich habe die Terme von Sprungbahn und Lichtschranke gleichgesetzt und mit der Mitternachtsformel gerechnet, einmal für <M>{'t = 5'}</M>, einmal für <M>{'t = 5{,}25'}</M> und einmal für{' '}
-                      <M>{'t = 6'}</M>. Unter der Wurzel kam <M>{'0{,}25'}</M>, dann <M>{'0'}</M> und dann <M>{'-0{,}75'}</M> heraus. Bei 0,25 gab es zwei Lösungen, bei 0 nur eine, und bei
-                      −0,75 geht die Wurzel nicht, also keine Lösung.“
-                    </p>
-                    <p>
-                      <strong>Gut:</strong> Man weiß genau, was bei einer bestimmten Höhe passiert, auch ohne Zeichnung. <strong>Aber:</strong> Man muss sauber umformen und einsetzen, sonst
-                      stimmt die Zahl unter der Wurzel nicht.
-                    </p>
-                  </div>
-                </details>
-              </div>
-              <p>
-                Beide Wege führen zum selben Ergebnis. Der Regler hilft beim Verstehen, die Rechnung liefert dir die genauen Punkte und die Antwort auf die Frage nach der Anzahl, ohne
-                dass du zeichnen musst.
-              </p>
-            </Teil>
           </Etappe>
 
           {/* 5 Sichern */}

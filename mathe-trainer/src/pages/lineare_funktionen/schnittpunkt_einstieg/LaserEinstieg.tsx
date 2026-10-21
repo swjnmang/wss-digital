@@ -401,8 +401,8 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
         <Etappe
           prefix="laser"
           art="loesen"
-          minutes={17}
-          was={<>Zu zweit herausfinden, ob und wo sich die beiden Laserstrahlen treffen. Danach vergleicht ihr eure Wege.</>}
+          minutes={12}
+          was={<>Zu zweit herausfinden, ob und wo sich die beiden Laserstrahlen treffen.</>}
           wozu={<>So bestimmst du den Schnittpunkt zweier Geraden.</>}
         >
           <Teil title="Findet es heraus" social="PA" minutes={12}>
@@ -516,51 +516,6 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           </Teil>
 
 
-        {/* 4 Austausch */}
-          <Teil title="Vergleicht eure Wege" social="Plenum" minutes={5}>
-            <div className="ls-stop">
-              <div className="ls-stop-title">
-                <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
-              </div>
-              <ul>
-                <li>Wo sieht man in der Tabelle und im Bild, dass sich die Strahlen kreuzen?</li>
-                <li>Warum hat die Tabelle mit ganzen Metern nicht gereicht?</li>
-                <li>Im Bild sieht es fast so aus, als würden sich die Strahlen über dem Pult kreuzen. Wie sicher könnt ihr euch beim Ablesen sein?</li>
-              </ul>
-            </div>
-            <p>
-              <strong>Du arbeitest allein?</strong> So haben zwei andere Jugendliche gedacht. Klappe die Wege auf und vergleiche sie mit deinem.
-            </p>
-            <div className="ls-ways">
-              <details className="ls-way">
-                <summary>Jonas hat eine Tabelle gemacht</summary>
-                <div className="ls-way-body">
-                  <p>
-                    „Bei x = 0 ist der linke Strahl höher, bei x = 1 der rechte. Dazwischen müssen sie sich kreuzen. Mit der Lupe habe ich gesehen: Bei x = 0,5 sind beide 1,75 m
-                    hoch.“
-                  </p>
-                  <p>
-                    <strong>Gut:</strong> Man kann den Bereich Schritt für Schritt eingrenzen. <strong>Aber:</strong> Liegt der Punkt nicht genau auf einem Tabellenwert, muss man
-                    immer feiner rechnen.
-                  </p>
-                </div>
-              </details>
-              <details className="ls-way">
-                <summary>Aylin hat im Bild abgelesen</summary>
-                <div className="ls-way-body">
-                  <p>„Die Strahlen kreuzen sich ein Stück rechts von der y-Achse, knapp unter 2 m. Ist das jetzt noch über dem Pult oder schon daneben? Das sehe ich nicht genau.“</p>
-                  <p>
-                    <strong>Gut:</strong> Man sieht sofort, wo ungefähr der Schnittpunkt liegt. <strong>Aber:</strong> Ablesen ist nur so genau wie die Zeichnung, bei 10 cm
-                    Unterschied reicht das nicht.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <p>
-              Beide Wege haben einen Haken: Liegt der Schnittpunkt nicht genau in der Tabelle oder auf einer Gitterlinie, findet man ihn nur ungefähr. Im nächsten Abschnitt
-              lernst du ein Verfahren, mit dem du ihn immer genau ausrechnest.
-            </p>
-          </Teil>
         </Etappe>
 
         {/* 5 Verfahren und Sichern */}

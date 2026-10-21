@@ -4,7 +4,7 @@ import { CardHead } from '../../lineare_funktionen/lernsituation_kit/kit'
 import './chat.css'
 
 // Gemeinsame Bausteine der Zinseszins-Lernsituation (Teil 1 und Teil 2): Chat-Look, Festlegung per Regler,
-// Zahlenhelfer, Wachstumsgraph, Stopp-Kasten, „So haben andere gedacht“ und Kriterienliste für das Lernprodukt.
+// Zahlenhelfer, Wachstumsgraph, aufklappbare Beispiele und Kriterienliste für das Lernprodukt.
 
 /* ── Zahlen ──────────────────────────────────────────────────────────────── */
 
@@ -61,28 +61,13 @@ export function Msg({ who, children }: { who: Sprecher; children: ReactNode }) {
   )
 }
 
-/* ── Leitfrage, Stopp, Wege, Kriterien ───────────────────────────────────── */
+/* ── Leitfrage, Wege, Kriterien ────────────────────────────────────────────── */
 
 export function Frage({ children }: { children: ReactNode }) {
   return (
     <div className="ls-question">
       <i className="fa-solid fa-circle-question" aria-hidden="true" />
       <span>{children}</span>
-    </div>
-  )
-}
-
-export function Stopp({ title, items }: { title: string; items: ReactNode[] }) {
-  return (
-    <div className="ls-stop">
-      <div className="ls-stop-title">
-        <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: {title}
-      </div>
-      <ul>
-        {items.map((it, i) => (
-          <li key={i}>{it}</li>
-        ))}
-      </ul>
     </div>
   )
 }

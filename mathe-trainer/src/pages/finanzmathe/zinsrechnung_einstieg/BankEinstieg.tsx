@@ -263,8 +263,8 @@ export default function BankEinstieg({ onBack, onPractice, onNext }: { onBack: (
         <Etappe
           prefix="bank"
           art="loesen"
-          minutes={21}
-          was={<>Zu zweit das Ticket bearbeiten und die Zinsen für Lena berechnen. Danach vergleicht ihr eure Wege.</>}
+          minutes={17}
+          was={<>Zu zweit das Ticket bearbeiten und die Zinsen für Lena berechnen.</>}
           wozu={<>So berechnest du Zinsen für einige Tage statt für ein ganzes Jahr.</>}
         >
           <Teil title="Das Ticket bearbeiten" social="PA" minutes={17}>
@@ -496,53 +496,6 @@ export default function BankEinstieg({ onBack, onPractice, onNext }: { onBack: (
           </Teil>
 
 
-        {/* 4 Austausch */}
-          <Teil title="Vergleicht eure Wege" social="Plenum" minutes={4}>
-            <div className="ls-stop">
-              <div className="ls-stop-title">
-                <i className="fa-solid fa-hand" aria-hidden="true" /> Stopp: Besprecht eure Ergebnisse mit der Klasse.
-              </div>
-              <ul>
-                <li>Warum stimmt Lenas Rechnung „3 % von 4.800 € = 144 €“ nicht?</li>
-                <li>Warum bringt das Festgeld trotz des höheren Zinssatzes weniger?</li>
-                <li>Woher kommen die 100 und die 360 in der Formel?</li>
-              </ul>
-            </div>
-            <p>
-              <strong>Du arbeitest allein?</strong> So haben drei andere Azubis gerechnet. Klappe die Wege auf und vergleiche sie mit deinem.
-            </p>
-            <div className="ls-ways">
-              <details className="ls-way">
-                <summary>Ben hat einfach den Zinssatz genommen</summary>
-                <div className="ls-way-body">
-                  <p>„2,4 % von 4.800 € sind 115,20 €. Das bekommt Lena beim Tagesgeld.“</p>
-                  <p>
-                    <strong>Problem:</strong> 115,20 € sind die Zinsen für ein <strong>ganzes Jahr</strong>. Lenas Geld liegt aber nur 148 Tage auf dem Konto. Ben hat die Zeit
-                    vergessen.
-                  </p>
-                </div>
-              </details>
-              <details className="ls-way">
-                <summary>Can hat mit Monaten gerechnet</summary>
-                <div className="ls-way-body">
-                  <p>„Mai bis Oktober sind ungefähr 5 Monate. 115,20 € durch 12 mal 5 sind 48 €.“</p>
-                  <p>
-                    <strong>Problem:</strong> Lena hebt das Geld schon am 14.10. ab, nicht am 16.10. Banken rechnen <strong>tagesgenau</strong>: 148 Tage, nicht 150. Darum
-                    stimmen Cans 48 € nicht, richtig sind 47,36 €. Rechne deshalb immer mit Tagen, nie mit Monaten.
-                  </p>
-                </div>
-              </details>
-              <details className="ls-way">
-                <summary>Aylin ist über einen Tag gegangen</summary>
-                <div className="ls-way-body">
-                  <p>„Ein Jahr bringt 115,20 €. Ein Tag ist der 360. Teil davon, also 0,32 €. Für 148 Tage sind das 0,32 € · 148 = 47,36 €.“</p>
-                  <p>
-                    <strong>Gut:</strong> Genau so rechnet die Bank. Fasst man Aylins drei Schritte zusammen, entsteht die Formel <M>{'Z = \\frac{K \\cdot p \\cdot t}{100 \\cdot 360}'}</M>.
-                  </p>
-                </div>
-              </details>
-            </div>
-          </Teil>
         </Etappe>
 
         {/* 5 Sichern */}

@@ -59,6 +59,8 @@ Jede Lernsituation hat genau vier Phasen in fester Reihenfolge: **1 Warm-up**, *
 (`<Etappe prefix="…" art="start|problem|loesen|sichern">`); Namen und Reihenfolge stehen nur dort. Abschnitte mit eigener Sozialform
 (Austausch, Check, Merke) sind `<Teil>` innerhalb einer Phase. In „Problem lösen“ steht das eigentliche Problem im Mittelpunkt, ohne
 vorgeschaltete Nebenaufgaben. Beispiel: `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx`.
+Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
+aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
 
 Hat eine Übungsseite eine Einstiegs-Lernsituation (Karte „Lernsituation“ in der Auswahl), heißt der Bereich darunter mit den
 Schwierigkeitsgraden immer **„Übungsaufgaben“** (nicht „Wähle deinen Schwierigkeitsgrad“). Das gilt für alle Seiten des Mathe-Trainers,
