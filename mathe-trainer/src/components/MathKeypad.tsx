@@ -1,10 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import katex from 'katex'
+import 'katex/dist/katex.min.css'
+import { toLatex } from './mathPreview'
 
 // Mathe-Tastatur für Touch-Geräte.
 // Hängt sich an jedes Eingabefeld der Trainer, ohne deren Logik zu verändern: Die Tasten schreiben
 // über den nativen Value-Setter in das Feld und lösen ein normales input-Ereignis aus, sodass
 // onChange-Handler wie bei echter Tastatureingabe reagieren. Am PC (Maus) bleibt sie aus.
 // Ein Feld mit data-no-keypad (oder in einem solchen Bereich) wird ausgelassen.
+// Brüche und Potenzen werden als Text eingegeben („3/4“, „x^2“), wie es die Auswertung erwartet;
+// die Vorschau oben in der Tastatur zeigt sie gestapelt bzw. hochgestellt (siehe mathPreview.ts).
 
 const TEXT_TYPES = new Set(['', 'text', 'number', 'tel', 'search', 'decimal'])
 const SKIP_INSIDE = '[data-no-keypad], .GeoGebraFrame, .applet_scaler, [id^="ggbApplet"], .univer-container, [class*="univer"]'
@@ -32,17 +37,21 @@ function writeValue(el: HTMLInputElement, value: string, caret?: number) {
   }
 }
 
-type Key = { k: string; label?: string; insert?: string; cls?: string; aria?: string }
+type Key = { k: string; label?: React.ReactNode; insert?: string; cls?: string; aria?: string }
+const BOX = <span className="bk-key-box" />
+const FRAC_LABEL = <span className="bk-key-frac" aria-hidden="true">{BOX}<span className="bk-key-line" />{BOX}</span>
+const POW_LABEL = <span aria-hidden="true">{BOX}<sup>n</sup></span>
 const ROWS: Key[][] = [
-  [{ k: '7' }, { k: '8' }, { k: '9' }, { k: '(', cls: 'op' }, { k: ')', cls: 'op' }, { k: 'del', label: '⌫', cls: 'op', aria: 'Zeichen löschen' }],
-  [{ k: '4' }, { k: '5' }, { k: '6' }, { k: 'x', cls: 'op' }, { k: '²', cls: 'op' }, { k: '^', cls: 'op' }],
-  [{ k: '1' }, { k: '2' }, { k: '3' }, { k: '+', cls: 'op' }, { k: '−', insert: '-', cls: 'op', aria: 'Minus' }, { k: '/', cls: 'op', aria: 'Bruchstrich' }],
-  [{ k: '0' }, { k: ',' }, { k: '%', cls: 'op' }, { k: 'enter', label: 'Fertig ↵', cls: 'go', aria: 'Eingabe bestätigen' }],
+  [{ k: '7' }, { k: '8' }, { k: '9' }, { k: '(', cls: 'op' }, { k: ')', cls: 'op' }, { k: '%', cls: 'op' }, { k: 'del', label: '⌫', cls: 'op', aria: 'Zeichen löschen' }],
+  [{ k: '4' }, { k: '5' }, { k: '6' }, { k: 'x', cls: 'op' }, { k: '²', label: <span aria-hidden="true">{BOX}<sup>2</sup></span>, cls: 'op', aria: 'hoch 2' }, { k: '^', label: POW_LABEL, cls: 'op', aria: 'Potenz: Exponent eingeben' }, { k: 'left', label: '←', cls: 'op', aria: 'Cursor nach links' }],
+  [{ k: '1' }, { k: '2' }, { k: '3' }, { k: '+', cls: 'op' }, { k: '−', insert: '-', cls: 'op', aria: 'Minus' }, { k: '/', label: FRAC_LABEL, cls: 'op', aria: 'Bruch: Nenner eingeben' }, { k: 'right', label: '→', cls: 'op', aria: 'Cursor nach rechts' }],
+  [{ k: '0' }, { k: ',' }, { k: 'enter', label: 'Fertig ↵', cls: 'go', aria: 'Eingabe bestätigen' }],
 ]
 
 export default function MathKeypad() {
   const [target, setTarget] = useState<HTMLInputElement | null>(null)
   const systemKb = useRef(new WeakSet<HTMLInputElement>())
+  const [, rerender] = useState(0)
 
   const close = useCallback(() => setTarget(null), [])
 
@@ -86,6 +95,18 @@ export default function MathKeypad() {
     }
   }, [])
 
+  // Vorschau aktuell halten, auch wenn die Seite den Wert ändert oder der Cursor per Antippen wandert
+  useEffect(() => {
+    if (!target) return
+    const update = () => rerender((n) => n + 1)
+    target.addEventListener('input', update)
+    document.addEventListener('selectionchange', update)
+    return () => {
+      target.removeEventListener('input', update)
+      document.removeEventListener('selectionchange', update)
+    }
+  }, [target])
+
   useEffect(() => {
     const root = document.querySelector('.app-root')
     root?.classList.toggle('keypad-open', !!target)
@@ -116,6 +137,13 @@ export default function MathKeypad() {
     const numeric = isNum || el.dataset.kpNumeric === '1'
     let start = isNum ? v.length : el.selectionStart ?? v.length
     let end = isNum ? v.length : el.selectionEnd ?? v.length
+    if (key.k === 'left' || key.k === 'right') {
+      if (isNum) return
+      const to = key.k === 'left' ? (start === end ? Math.max(0, start - 1) : start) : (start === end ? Math.min(v.length, end + 1) : end)
+      try { el.setSelectionRange(to, to) } catch { /* Feldtyp ohne Cursor */ }
+      rerender((n) => n + 1)
+      return
+    }
     if (key.k === 'del') {
       if (start === end && start > 0) start -= 1
       writeValue(el, v.slice(0, start) + v.slice(end), start)
@@ -138,6 +166,11 @@ export default function MathKeypad() {
     window.setTimeout(() => el.focus(), 50)
   }
 
+  const caret = target.type === 'number' ? undefined : target.selectionEnd ?? undefined
+  const preview = target.value
+    ? katex.renderToString(toLatex(target.value, caret), { throwOnError: false, displayMode: false })
+    : ''
+
   const keep = (e: React.PointerEvent | React.MouseEvent) => e.preventDefault()
 
   return (
@@ -147,7 +180,9 @@ export default function MathKeypad() {
           <button type="button" className="bk-keypad-tool" onClick={switchToSystem}>
             <i className="fa-solid fa-keyboard" aria-hidden="true" /> ABC
           </button>
-          <span className="bk-keypad-title">Mathe-Tastatur</span>
+          {preview
+            ? <span className="bk-keypad-preview" aria-hidden="true" dangerouslySetInnerHTML={{ __html: preview }} />
+            : <span className="bk-keypad-title">Mathe-Tastatur</span>}
           <button type="button" className="bk-keypad-tool" onClick={() => { target.blur(); close() }} aria-label="Tastatur schließen">
             <i className="fa-solid fa-chevron-down" aria-hidden="true" />
           </button>

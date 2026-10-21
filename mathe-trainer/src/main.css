@@ -83,7 +83,7 @@ button, a, input, select, textarea { touch-action: manipulation; }
 /* ── App-Rahmen ─────────────────────────────────────────────────────────── */
 .app-shell { max-width: 1440px; width: 100%; margin: 0 auto; padding: 0 20px; }
 .app-root main { padding: 0 0 32px; }
-.app-root.keypad-open main { padding-bottom: calc(320px + env(safe-area-inset-bottom, 0px)); }
+.app-root.keypad-open main { padding-bottom: calc(340px + env(safe-area-inset-bottom, 0px)); }
 
 /* ── Bausteine ──────────────────────────────────────────────────────────── */
 .bk-btn {
