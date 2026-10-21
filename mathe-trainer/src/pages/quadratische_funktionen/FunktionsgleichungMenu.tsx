@@ -15,7 +15,7 @@ const LERNSITUATIONEN = [
     title: 'Der Torbogen für die Hofeinfahrt',
     icon: 'fa-solid fa-archway',
     path: `${BASIS}/lernsituation-1`,
-    desc: 'Drei Azubis haben die Gleichung für einen Torbogen berechnet, aber passt eine davon wirklich? Finde die Fehler und lerne, wie du die Gleichung aus dem Scheitelpunkt aufstellst.',
+    desc: 'Eine Biegemaschine braucht die Gleichung für einen Torbogen. Finde heraus, wie du aus dem Scheitelpunkt und einem Pfosten die Funktionsgleichung aufstellst.',
   },
   {
     teil: 'Lernsituation 2 · Ein Wert und zwei Punkte',
