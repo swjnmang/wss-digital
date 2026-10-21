@@ -1,0 +1,57 @@
+/* Lernsituation 2 „Lohnen sich 60 Hoodies?“: Look Team-Chat der Schülerfirma (Messenger) mit Lieferanten-Rechnungen als Kassenbons.
+   Der feste Kern (Eingaben, Feedback, Hilfen, Stopp-Kasten) kommt unverändert aus lernsituation_kit/kit.css. */
+
+.tc-chat { border: 2px solid var(--edge); border-radius: var(--radius); background: var(--surface-sunken); overflow: hidden; }
+.tc-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font: 800 16px/1.3 var(--font-display);
+}
+.tc-head small { display: block; font: 600 13px/1.3 var(--font-body); opacity: 0.9; }
+.tc-avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  color: var(--primary-ink);
+  font-size: 17px;
+}
+.tc-body { display: flex; flex-direction: column; gap: 10px; padding: 14px; }
+.tc-msg {
+  max-width: min(520px, 92%);
+  padding: 8px 12px 10px;
+  border: 1.5px solid var(--edge);
+  border-radius: 4px 14px 14px 14px;
+  background: var(--surface);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.tc-msg p { margin: 0 0 4px; }
+.tc-msg p:last-child { margin: 0; }
+.tc-msg-me { align-self: flex-end; border-radius: 14px 4px 14px 14px; background: var(--primary-soft); }
+.tc-name { font: 800 14px/1.3 var(--font-display); color: var(--primary-ink); margin-bottom: 2px; }
+.tc-time { display: block; text-align: right; font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+
+.tc-bons { display: grid; gap: 14px; }
+@media (min-width: 640px) { .tc-bons { grid-template-columns: 1fr 1fr; } }
+.tc-bon {
+  border: 2px dashed var(--edge);
+  border-radius: 6px;
+  background: var(--surface);
+  padding: 12px 16px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.tc-bon-title { font-weight: 800; text-align: center; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+.tc-bon-row { display: flex; justify-content: space-between; gap: 10px; }
+.tc-bon-sum { border-top: 2px solid var(--edge); margin-top: 6px; padding-top: 4px; font-weight: 800; }
+
+.tc-skript { width: 100%; min-height: 120px; resize: vertical; font: inherit; }

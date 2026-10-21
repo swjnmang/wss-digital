@@ -1,0 +1,71 @@
+/* Lernsituation 1 „Der Torbogen für die Hofeinfahrt“: Look Werkstatt-Auftragsmappe (Fallmappe mit Reiter, Prüfberichte der Azubis, Stempel).
+   Der feste Kern (Eingaben, Feedback, Hilfen, Stopp-Kasten) kommt unverändert aus lernsituation_kit/kit.css. */
+
+.wm-mappe { display: flex; flex-direction: column; }
+.wm-reiter {
+  align-self: flex-start;
+  margin-left: 18px;
+  padding: 6px 16px 4px;
+  border: 2px solid var(--edge);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  background: var(--highlight);
+  color: var(--on-highlight);
+  font: 800 14px/1.3 var(--font-display);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.wm-blatt {
+  border: 2px solid var(--edge);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.wm-blatt > * { min-width: 0; }
+.wm-kopf { display: grid; gap: 6px 18px; grid-template-columns: 1fr; font-size: 15px; }
+@media (min-width: 640px) { .wm-kopf { grid-template-columns: repeat(3, 1fr); } }
+.wm-kopf div { display: flex; flex-direction: column; padding: 6px 10px; border-radius: 8px; background: var(--surface-sunken); }
+.wm-kopf span { font-size: 13px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
+.wm-notiz { margin: 0; padding: 12px 16px; border-left: 4px solid var(--primary); background: var(--primary-soft); border-radius: 0 10px 10px 0; font-size: 17px; line-height: 1.55; }
+.wm-notiz p { margin: 0 0 6px; }
+.wm-notiz p:last-child { margin: 0; }
+
+.wm-berichte { display: grid; gap: 14px; }
+@media (min-width: 900px) { .wm-berichte { grid-template-columns: repeat(3, 1fr); } }
+.wm-bericht {
+  border: 2px solid var(--edge);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.wm-bericht-a { border-top: 8px solid var(--primary); }
+.wm-bericht-b { border-top: 8px solid var(--hint); }
+.wm-bericht-c { border-top: 8px solid var(--accent); }
+.wm-bericht-name { font: 800 18px/1.2 var(--font-display); }
+.wm-bericht-name small { display: block; font: 600 13px/1.3 var(--font-body); color: var(--ink-muted); }
+.wm-zeilen { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.wm-zeilen li { display: flex; gap: 8px; align-items: baseline; padding: 4px 6px; border-radius: 6px; background: var(--surface-sunken); overflow-x: auto; }
+.wm-zeilen b { flex: none; min-width: 1.6em; font: 800 14px/1.3 var(--font-display); color: var(--ink-muted); }
+.wm-ergebnis { padding: 6px 8px; border: 1.5px dashed var(--edge); border-radius: 8px; overflow-x: auto; }
+
+.wm-pruefstand { display: flex; flex-wrap: wrap; gap: 8px; }
+.wm-pruefstand .bk-btn[aria-pressed='true'] { background: var(--primary); color: var(--on-primary); }
+
+.wm-stempel {
+  align-self: flex-start;
+  transform: rotate(-4deg);
+  padding: 6px 14px;
+  border: 3px solid var(--correct);
+  border-radius: 8px;
+  color: var(--correct-ink);
+  font: 800 18px/1.2 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

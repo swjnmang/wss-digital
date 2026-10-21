@@ -120,6 +120,8 @@ import GraphZeichnen from './pages/quadratische_funktionen/GraphZeichnen';
 import ScheitelformRechnerisch from './pages/quadratische_funktionen/ScheitelformRechnerisch';
 import ScheitelInAllgForm from './pages/quadratische_funktionen/ScheitelInAllgForm';
 import FunktionsgleichungAufstellen from './pages/quadratische_funktionen/FunktionsgleichungAufstellen';
+import FunktionsgleichungMenu from './pages/quadratische_funktionen/FunktionsgleichungMenu';
+import FunktionsgleichungLernsituation from './pages/quadratische_funktionen/FunktionsgleichungLernsituation';
 import NullstellenQF from './pages/quadratische_funktionen/Nullstellen';
 import SchnittpunkteQF from './pages/quadratische_funktionen/Schnittpunkte';
 import Schnittpunkte2QF from './pages/quadratische_funktionen/Schnittpunkte2';
@@ -328,7 +330,10 @@ export default function App() {
           <Route path="/quadratische_funktionen/graph_zeichnen" element={<GraphZeichnen />} />
           <Route path="/quadratische_funktionen/scheitelform_rechnerisch" element={<ScheitelformRechnerisch />} />
           <Route path="/quadratische_funktionen/scheitel_in_allg_form" element={<ScheitelInAllgForm />} />
-          <Route path="/quadratische_funktionen/funktionsgleichung_aufstellen" element={<FunktionsgleichungAufstellen />} />
+          <Route path="/quadratische_funktionen/funktionsgleichung_aufstellen" element={<FunktionsgleichungMenu />} />
+          <Route path="/quadratische_funktionen/funktionsgleichung_aufstellen/ueben" element={<FunktionsgleichungAufstellen />} />
+          <Route path="/quadratische_funktionen/funktionsgleichung_aufstellen/lernsituation-1" element={<FunktionsgleichungLernsituation teil={1} />} />
+          <Route path="/quadratische_funktionen/funktionsgleichung_aufstellen/lernsituation-2" element={<FunktionsgleichungLernsituation teil={2} />} />
           <Route path="/quadratische_funktionen/nullstellen" element={<NullstellenQF />} />
           <Route path="/quadratische_funktionen/schnittpunkte" element={<SchnittpunkteGeradeQF />} />
           <Route path="/quadratische_funktionen/schnittpunkte_gerade" element={<SchnittpunkteGeradeQF />} />

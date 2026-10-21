@@ -8,6 +8,7 @@ import { aufgaben as wurzeln } from '../pages/rechnen_lernen/Wurzeln'
 import { aufgaben as prozent } from '../pages/rechnen_lernen/Prozentrechnung'
 import { aufgaben as gleichungen } from '../pages/rechnen_lernen/Gleichungen'
 import { aufgaben as zinsrechnung } from '../pages/finanzmathe/ZinsrechnungMenu'
+import { aufgaben as funktionsgleichungQF } from '../pages/quadratische_funktionen/FunktionsgleichungMenu'
 import { aufgaben as finanzAnwendung } from '../pages/finanzmathe/Anwendungsaufgaben'
 import { tasks as trigoAnwendung } from '../pages/trigonometrie/AnwendungsaufgabenMenu'
 import { tasks as datenAnwendung } from '../pages/daten_und_zufall/anwendungsaufgaben/index'
@@ -44,6 +45,8 @@ const SUBMENUS: Record<string, MenuItem[]> = {
   '/rechnen_lernen/prozentrechnung': prozent,
   '/rechnen_lernen/gleichungen': gleichungen,
   '/finanzmathe/zinsrechnung': zinsrechnung,
+  // nur die eigene Übung, das Additionsverfahren gehört zu den linearen Funktionen
+  '/quadratische_funktionen/funktionsgleichung_aufstellen': funktionsgleichungQF.slice(0, 1),
   '/finanzmathe/anwendungsaufgaben': finanzAnwendung,
   '/trigonometrie/anwendungsaufgaben': trigoAnwendung,
   '/daten-und-zufall/anwendungsaufgaben': datenAnwendung,
