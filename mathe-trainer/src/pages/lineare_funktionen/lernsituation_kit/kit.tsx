@@ -1,4 +1,5 @@
 import { createContext, useContext, useId, useState, type ChangeEvent, type ReactNode } from 'react'
+import { InlineMath } from 'react-katex'
 import { useTaskTracking } from '../../../hooks/useTaskTracking'
 import { fieldCheckClass } from '../../../utils/fieldCheck'
 import { checkNumber, fmt, pick } from '../../daten_und_zufall/lernpfad/kit'
@@ -141,6 +142,11 @@ type Tracking = { onInput: () => void; onCheck: (ok: boolean) => void; onHintSho
 const NO_TRACKING: Tracking = { onInput: () => {}, onCheck: () => {}, onHintShown: () => {} }
 
 type NumField = { kind: 'num'; key: string; label: ReactNode; expected: number; unit?: string; tol?: number }
+
+/** Teil einer Lückenrechnung: TeX-Text oder eine Lücke (Schlüssel eines Zahlenfelds der Karte) */
+export type Seg = string | { luecke: string; breit?: boolean }
+/** Zeile einer Lückenrechnung: linke Seite = rechte Seite, optional mit Umformung (TeX, z. B. '\\mid -3') */
+export type Zeile = { l: Seg[]; r: Seg[]; u?: string }
 type SelectField = { kind: 'select'; key: string; label: ReactNode; options: string[]; expected: number }
 type CField = NumField | SelectField
 
@@ -150,6 +156,7 @@ export function CheckCard({
   level,
   prompt,
   lead,
+  rechnung,
   fields,
   fieldsRow = false,
   solution,
@@ -162,6 +169,8 @@ export function CheckCard({
   prompt: ReactNode
   /** Gleichung o. Ä., die direkt vor den Feldern in derselben Zeile steht */
   lead?: ReactNode
+  /** Rechnung mit Lücken: Die Zahlenfelder, auf die eine Lücke verweist, stehen direkt in der Gleichung statt darunter */
+  rechnung?: Zeile[]
   fields: CField[]
   /** Felder nebeneinander statt untereinander */
   fieldsRow?: boolean
@@ -186,6 +195,28 @@ export function CheckCard({
     tracking.onInput()
   }
 
+  const inlineKeys = new Set((rechnung ?? []).flatMap((z) => [...z.l, ...z.r]).flatMap((seg) => (typeof seg === 'string' ? [] : [seg.luecke])))
+  const listFields = fields.filter((f) => !inlineKeys.has(f.key))
+
+  const segment = (seg: Seg, i: number) => {
+    if (typeof seg === 'string') return <InlineMath key={i} math={seg} />
+    const f = fields.find((x) => x.key === seg.luecke)
+    if (!f) return null
+    return (
+      <input
+        key={i}
+        type="text"
+        inputMode="decimal"
+        autoComplete="off"
+        placeholder="?"
+        aria-label={typeof f.label === 'string' ? f.label : 'Lücke'}
+        className={`bk-input lp-input ${seg.breit ? 'lp-input-md' : 'lp-input-sm'} ls-gap ${fieldCheckClass(marks[f.key])}`}
+        value={values[f.key] ?? ''}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(f.key, e.target.value)}
+      />
+    )
+  }
+
   const check = () => {
     const m: Record<string, boolean | undefined> = {}
     for (const f of fields) {
@@ -205,45 +236,60 @@ export function CheckCard({
       <CardHead title={title} level={level} />
       <div className="lp-ex-prompt">{prompt}</div>
       {rechnen && <HeftHinweis />}
-      <div className={`ls-fields ${fieldsRow || lead ? 'ls-fields-row' : ''}`}>
-        {lead && <div className="ls-lead">{lead}</div>}
-        {fields.map((f) => (
-          <div key={f.key} className="ls-field">
-            <label className="ls-label" htmlFor={`${uid}-${f.key}`}>
-              {f.label}
-            </label>
-            {f.kind === 'select' ? (
-              <select
-                id={`${uid}-${f.key}`}
-                className={`bk-input lp-select ls-select ${fieldCheckClass(marks[f.key])}`}
-                value={values[f.key] ?? ''}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) => setValue(f.key, e.target.value)}
-              >
-                <option value="">–</option>
-                {f.options.map((o, i) => (
-                  <option key={i} value={i}>
-                    {o}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <span className="lp-num">
-                <input
-                  id={`${uid}-${f.key}`}
-                  type="text"
-                  inputMode="decimal"
-                  autoComplete="off"
-                  placeholder="?"
-                  className={`bk-input lp-input lp-input-md ${fieldCheckClass(marks[f.key])}`}
-                  value={values[f.key] ?? ''}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(f.key, e.target.value)}
-                />
-                {f.unit && <span className="lp-unit">{f.unit}</span>}
+      {rechnung && (
+        <div className="ls-rechnung">
+          {rechnung.map((z, i) => (
+            <div key={i} className="ls-rechnung-zeile">
+              <span className="ls-rechnung-l">{z.l.map(segment)}</span>
+              <span className="ls-rechnung-r">
+                <InlineMath math="=" /> {z.r.map(segment)}
               </span>
-            )}
-          </div>
-        ))}
-      </div>
+              <span className="ls-rechnung-u">{z.u && <InlineMath math={z.u} />}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {(listFields.length > 0 || lead) && (
+        <div className={`ls-fields ${fieldsRow || lead ? 'ls-fields-row' : ''}`}>
+          {lead && <div className="ls-lead">{lead}</div>}
+          {listFields.map((f) => (
+            <div key={f.key} className="ls-field">
+              <label className="ls-label" htmlFor={`${uid}-${f.key}`}>
+                {f.label}
+              </label>
+              {f.kind === 'select' ? (
+                <select
+                  id={`${uid}-${f.key}`}
+                  className={`bk-input lp-select ls-select ${fieldCheckClass(marks[f.key])}`}
+                  value={values[f.key] ?? ''}
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => setValue(f.key, e.target.value)}
+                >
+                  <option value="">–</option>
+                  {f.options.map((o, i) => (
+                    <option key={i} value={i}>
+                      {o}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span className="lp-num">
+                  <input
+                    id={`${uid}-${f.key}`}
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
+                    placeholder="?"
+                    className={`bk-input lp-input lp-input-md ${fieldCheckClass(marks[f.key])}`}
+                    value={values[f.key] ?? ''}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(f.key, e.target.value)}
+                  />
+                  {f.unit && <span className="lp-unit">{f.unit}</span>}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
       <div className="bk-actions lp-ex-actions">
         <button type="button" className="bk-btn bk-btn-primary" onClick={check}>
           Prüfen

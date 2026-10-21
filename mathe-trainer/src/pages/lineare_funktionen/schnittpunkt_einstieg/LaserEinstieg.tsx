@@ -655,17 +655,22 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 <>
                   <p>Berechne den Schnittpunkt der beiden Geraden. Fülle die Lücken der Rechnung aus.</p>
                   <MB>{'f(x) = 4x + 1 \\qquad g(x) = 2x + 7'}</MB>
-                  <MB>{'\\begin{aligned} 4x + 1 &= 2x + 7 && \\mid -2x \\\\ 2x + 1 &= 7 && \\mid -1 \\\\ 2x &= \\;\\fbox{?} && \\mid :2 \\\\ x &= \\;\\fbox{?} \\end{aligned}'}</MB>
                   <p>
-                    Dann <M>x</M> in <M>f</M> einsetzen: <M>{'y = 4 \\cdot x + 1'}</M>
+                    Zum Schluss setzt du <M>x</M> in <M>f</M> ein und berechnest <M>y</M>.
                   </p>
                 </>
               }
-              fieldsRow
+              rechnung={[
+                { l: ['4x + 1'], r: ['2x + 7'], u: '\\mid -2x' },
+                { l: ['2x + 1'], r: ['7'], u: '\\mid -1' },
+                { l: ['2x'], r: [{ luecke: 'zweix' }], u: '\\mid :2' },
+                { l: ['x'], r: [{ luecke: 'x' }] },
+                { l: ['y'], r: ['4 \\cdot x + 1 =', { luecke: 'y' }] },
+              ]}
               fields={[
-                { kind: 'num', key: 'zweix', label: <M>{'2x ='}</M>, expected: 6 },
-                { kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 3 },
-                { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 13 },
+                { kind: 'num', key: 'zweix', label: '2x', expected: 6 },
+                { kind: 'num', key: 'x', label: 'x', expected: 3 },
+                { kind: 'num', key: 'y', label: 'y', expected: 13 },
               ]}
               solution={
                 <>

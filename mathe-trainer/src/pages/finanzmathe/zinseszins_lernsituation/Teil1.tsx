@@ -461,14 +461,14 @@ export default function Teil1() {
           prompt={
             <>
               <p>
-                Tim legt <M>{'2000\\text{ €}'}</M> zu <M>{'4\\,\\%'}</M> für 3 Jahre an. Die Zinsen bleiben auf dem Konto. Ergänze: <M>{'K_3 = 2000 \\cdot \\square^{\\,3}'}</M>.
+                Tim legt <M>{'2000\\text{ €}'}</M> zu <M>{'4\\,\\%'}</M> für 3 Jahre an. Die Zinsen bleiben auf dem Konto. Ergänze die Lücken: erst den Zinsfaktor, dann das Endkapital.
               </p>
             </>
           }
-          fieldsRow
+          rechnung={[{ l: ['K_3'], r: ['2000 \\cdot', { luecke: 'q' }, '{}^{3} =', { luecke: 'k', breit: true }, '\\text{€}'] }]}
           fields={[
-            { kind: 'num', key: 'q', label: <>Zinsfaktor <M>q</M></>, expected: 1.04, tol: 0.0001 },
-            { kind: 'num', key: 'k', label: <M>{'K_3 ='}</M>, expected: kn(2000, 4, 3), unit: '€', tol: 0.05 },
+            { kind: 'num', key: 'q', label: 'Zinsfaktor q', expected: 1.04, tol: 0.0001 },
+            { kind: 'num', key: 'k', label: 'K_3 in €', expected: kn(2000, 4, 3), tol: 0.05 },
           ]}
           solution={
             <>

@@ -391,14 +391,18 @@ export default function TorbogenEinstieg({
                       <M>{'x = 0'}</M> die Höhe 2 herauskommen.
                     </p>
                     <p>
-                      Setzt <M>{'x = 0'}</M> und <M>{'f(x) = 2'}</M> in <M>{'f(x) = a(x - 2)^2 + 3'}</M> ein und löst nach <M>a</M> auf.
+                      Setzt <M>{'x = 0'}</M> und <M>{'f(x) = 2'}</M> in <M>{'f(x) = a(x - 2)^2 + 3'}</M> ein und löst nach <M>a</M> auf. Füllt die Lücken aus.
                     </p>
                   </>
                 }
-                lead={<M>{'2 = a \\cdot (0 - 2)^2 + 3 \\;\\Rightarrow\\; 2 = \\square \\cdot a + 3'}</M>}
+                rechnung={[
+                  { l: ['2'], r: ['a \\cdot (0 - 2)^2 + 3'] },
+                  { l: ['2'], r: [{ luecke: 'q' }, '\\cdot a + 3'] },
+                  { l: ['a'], r: [{ luecke: 'a' }] },
+                ]}
                 fields={[
-                  { kind: 'num', key: 'q', label: 'Zahl im Kästchen', expected: 4 },
-                  { kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: A_SOLL },
+                  { kind: 'num', key: 'q', label: 'Zahl vor a', expected: 4 },
+                  { kind: 'num', key: 'a', label: 'a', expected: A_SOLL },
                 ]}
                 solution={
                   <MB>{'\\begin{aligned} 2 &= a \\cdot (0 - 2)^2 + 3 \\\\ 2 &= 4a + 3 && \\mid -3 \\\\ -1 &= 4a && \\mid :4 \\\\ a &= -0{,}25 \\end{aligned}'}</MB>
