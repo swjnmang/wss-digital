@@ -1,0 +1,32 @@
+/* Lernsituation 1 „Der Torbogen für die Hofeinfahrt“ im ruhigen Grunddesign: eine Spalte, keine Kontext-Optik.
+   Der feste Kern (Eingaben, Feedback, Hilfen) kommt unverändert aus lernsituation_kit/kit.css. */
+
+/* Biegemaschine in Phase 2: Text, Auftrag, Skizze, Eingabe und Anzeige untereinander */
+.tb-maschine { display: flex; flex-direction: column; gap: 10px; }
+.tb-maschine .bk-graph svg { max-height: 186px; }
+.tb-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 6px; font-size: 20px; }
+.tb-eingabe .bk-btn { margin-left: 10px; min-height: 44px; }
+.tb-eingabe .lp-input { min-height: 44px; }
+.tb-display {
+  display: flex; flex-direction: column; gap: 2px; padding: 6px 14px;
+  border-radius: 10px; background: var(--wrong-soft); color: var(--wrong-ink);
+  font-size: 14px; line-height: 1.4;
+}
+.tb-display-ok { background: var(--correct-soft); color: var(--correct-ink); }
+.tb-display-head { font-weight: 700; }
+.tb-display ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 0 18px; }
+.tb-display .fa-circle-check { color: var(--correct); }
+.tb-display .fa-circle-xmark { color: var(--wrong); }
+
+/* Kleinere Skizze auf Seiten, auf denen der Text im Mittelpunkt steht */
+.tb-bild-klein .bk-graph svg { max-height: 205px; }
+
+/* Check 1: Pläne der Azubis untereinander */
+.wm-berichte { display: flex; flex-direction: column; gap: 10px; }
+.wm-bericht { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); }
+.wm-bericht-name { font: 800 17px/1.2 var(--font-display); }
+.wm-zeilen { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.wm-zeilen li { display: flex; gap: 8px; align-items: baseline; overflow-x: auto; }
+.wm-zeilen li > span { display: flex; flex-wrap: wrap; gap: 0 10px; }
+.wm-zeilen b { flex: none; font: 800 14px/1.3 var(--font-display); color: var(--ink-muted); }
+.wm-ergebnis { overflow-x: auto; color: var(--ink-muted); }

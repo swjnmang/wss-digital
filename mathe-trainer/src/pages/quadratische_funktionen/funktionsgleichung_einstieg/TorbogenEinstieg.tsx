@@ -2,12 +2,13 @@ import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
 import { CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, SchrittHilfen, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
-import { SeitenLernsituation, ZweiSpalten, type Seite } from '../../lineare_funktionen/lernsituation_kit/seiten'
+import { SeitenLernsituation, type Seite } from '../../lineare_funktionen/lernsituation_kit/seiten'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
-import './werkstatt.css'
+import './torbogen.css'
 
 // Lernsituation 1 „Der Torbogen für die Hofeinfahrt“: Funktionsgleichung aus Scheitelpunkt und einem weiteren Punkt (Fall 1, 45 min).
-// Format Kundenauftrag (Gleichungen an die Biegemaschine raten, dann berechnen), Fehlerdetektiv im Check, Look Werkstatt (Metallbau), Lernprodukt analog (Spickzettel).
+// Format Kundenauftrag (Gleichungen an die Biegemaschine raten, dann berechnen), Fehlerdetektiv im Check, Lernprodukt analog (Spickzettel).
+// Ruhiges Grunddesign (SeitenLernsituation mit ruhig): eine Spalte, eine Akzentfarbe, pro Seite nur der Auftrag hervorgehoben.
 // Instruktionsreihenfolge: Problem zuerst. Die SuS kennen die Scheitelform y = a(x − x_S)² + y_S und können sie in die allgemeine
 // Form umwandeln. Neu ist, a mit einem zweiten Punkt zu bestimmen.
 // Problem erkennen: Die SuS raten Gleichungen und schicken sie an die Biegemaschine. Jeder Versuch erscheint in der Skizze, die Maschine
@@ -38,9 +39,9 @@ const nah = (u: number, w: number) => Math.abs(u - w) < 1e-9
 const pruefung = (v: Versuch) => {
   const f = wert(v)
   return [
-    { key: 'links', name: <>linker Pfosten (<M>{'x = 0'}</M>)</>, soll: 2, ist: f(0) },
-    { key: 'mitte', name: <>Mitte (<M>{'x = 2'}</M>)</>, soll: 3, ist: f(2) },
-    { key: 'rechts', name: <>rechter Pfosten (<M>{'x = 4'}</M>)</>, soll: 2, ist: f(4) },
+    { key: 'links', name: 'linker Pfosten', soll: 2, ist: f(0) },
+    { key: 'mitte', name: 'Mitte', soll: 3, ist: f(2) },
+    { key: 'rechts', name: 'rechter Pfosten', soll: 2, ist: f(4) },
   ].map((p) => ({ ...p, ok: nah(p.ist, p.soll) }))
 }
 const passt = (v: Versuch) => pruefung(v).every((p) => p.ok)
@@ -61,28 +62,25 @@ function gleichungTex(v: Versuch) {
   return `y =${t || ' 0'}`
 }
 
-/** Das zentrale Problem der Lernsituation: Gegeben / Gesucht */
-function Problemkarte() {
+/** Phase 2: Situation, Problem und Auftrag als Fließtext; nur der Auftrag ist hervorgehoben */
+function ProblemText() {
   return (
-    <div className="tb-problem">
-      <div className="tb-problem-title">
-        <i className="fa-solid fa-bullseye" aria-hidden="true" /> Das Problem
-      </div>
-      <div className="tb-problem-grid">
-        <div>
-          <span className="tb-problem-label">Gegeben</span>
-          Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> und Pfosten <M>{'P(0 \\mid 2)'}</M>
-        </div>
-        <div>
-          <span className="tb-problem-label">Gesucht</span>
-          Funktionsgleichung <M>{'y = ax^2 + bx + c'}</M>
-        </div>
-      </div>
-      <p className="tb-problem-frage">
-        <i className="fa-solid fa-dice" aria-hidden="true" /> Dein Auftrag jetzt: Probiere einfach aus! Rate Zahlen für <M>a</M>, <M>b</M> und <M>c</M>, trage sie unter
-        der Skizze ein und schicke die Gleichung an die Biegemaschine. Rechnen musst du hier noch nicht.
+    <>
+      <p className="sl-text">
+        Du bist Azubi im Metallbau. Über einer 4&nbsp;m breiten Hofeinfahrt entsteht ein Torbogen aus Stahlrohr: Die Pfosten sind 2&nbsp;m hoch, in der Mitte ist der Bogen
+        3&nbsp;m hoch.
       </p>
-    </div>
+      <p className="sl-text">
+        Du kennst also den Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> und einen weiteren Punkt <M>{'P(0 \\mid 2)'}</M> des Bogens. Die Biegemaschine braucht die
+        Funktionsgleichung in allgemeiner Form <M>{'y = ax^2 + bx + c'}</M>.
+      </p>
+      <div className="sl-fokus">
+        <p className="sl-fokus-titel">Dein Auftrag: Probier es aus, ohne zu rechnen</p>
+        <p>
+          Rate Werte für <M>a</M>, <M>b</M> und <M>c</M> und schicke die Gleichung an die Biegemaschine.
+        </p>
+      </div>
+    </>
   )
 }
 
@@ -103,8 +101,10 @@ type Kurve = { f: (x: number) => number; farbe: string; breite: number }
 
 /** Skizze der Einfahrt; kurven = Parabeln (z. B. Versuche an der Maschine) über die gestrichelte Skizze legen; nurP = ohne rechten Pfosten Q */
 /** neuS: Sonderwunsch mit neuer Scheitelhöhe; der bisherige Bogen bleibt blass zum Vergleich stehen */
-function TorBild({ kurven = [], nurP = false, neuS }: { kurven?: Kurve[]; nurP?: boolean; neuS?: number }) {
+function TorBild({ kurven = [], nurP = false, neuS, gross = false }: { kurven?: Kurve[]; nurP?: boolean; neuS?: number; gross?: boolean }) {
   const clip = useId().replace(/[^a-zA-Z0-9]/g, '')
+  /** gross: größere Beschriftung für flach dargestellte Skizzen */
+  const fs = (n: number) => (gross ? Math.round(n * 1.55) : n)
   return (
     <div className="bk-graph ls-graph">
       <svg viewBox={`0 0 ${S.w} ${S.h}`} role="img" aria-label="Skizze der Hofeinfahrt mit zwei Pfosten und einem parabelförmigen Torbogen im Koordinatensystem">
@@ -116,7 +116,7 @@ function TorBild({ kurven = [], nurP = false, neuS }: { kurven?: Kurve[]; nurP?:
         {Array.from({ length: 6 }, (_, i) => i - 1).map((v) => (
           <g key={`x${v}`}>
             <line x1={bx(v)} x2={bx(v)} y1={by(0)} y2={by(S.yMax)} stroke="var(--grid)" />
-            <text x={bx(v)} y={by(0) + 24} textAnchor="middle" fontSize="18" fill="var(--ink-muted)">
+            <text x={bx(v)} y={by(0) + 24} textAnchor="middle" fontSize={fs(18)} fill="var(--ink-muted)">
               {v}
             </text>
           </g>
@@ -124,7 +124,7 @@ function TorBild({ kurven = [], nurP = false, neuS }: { kurven?: Kurve[]; nurP?:
         {[1, 2, 3, 4].map((v) => (
           <g key={`y${v}`}>
             <line x1={bx(S.xMin)} x2={bx(S.xMax)} y1={by(v)} y2={by(v)} stroke="var(--grid)" />
-            <text x={bx(0) - 8} y={by(v) + 6} textAnchor="end" fontSize="18" fill="var(--ink-muted)">
+            <text x={bx(0) - 8} y={by(v) + 6} textAnchor="end" fontSize={fs(18)} fill="var(--ink-muted)">
               {v}
             </text>
           </g>
@@ -152,40 +152,40 @@ function TorBild({ kurven = [], nurP = false, neuS }: { kurven?: Kurve[]; nurP?:
         {neuS ? (
           <>
             <line x1={bx(2)} x2={bx(2)} y1={by(0)} y2={by(neuS)} stroke="var(--primary)" strokeWidth="2" strokeDasharray="4 4" />
-            <text x={bx(2) + 8} y={by(neuS / 2)} fontSize="16" fontWeight="700" fill="var(--primary)">
+            <text x={bx(2) + 8} y={by(neuS / 2)} fontSize={fs(16)} fontWeight="700" fill="var(--primary)">
               {fmt(neuS)} m
             </text>
             <circle cx={bx(2)} cy={by(3)} r="5" fill="var(--surface)" stroke="var(--line-strong)" strokeWidth="2" />
-            <text x={bx(3.6)} y={by(3.1)} fontSize="15" fill="var(--ink-muted)">
+            <text x={bx(3.6)} y={by(3.1)} fontSize={fs(15)} fill="var(--ink-muted)">
               bisheriger Bogen
             </text>
-            <circle cx={bx(2)} cy={by(neuS)} r="8" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
-            <text x={bx(2)} y={by(neuS) - 14} textAnchor="middle" fontSize="18" fontWeight="700" fill="var(--ink)">
+            <circle cx={bx(2)} cy={by(neuS)} r="8" fill="var(--highlight)" stroke="var(--ink)" strokeWidth={gross ? 3 : 2.5} />
+            <text x={bx(2)} y={by(neuS) - 14} textAnchor="middle" fontSize={fs(18)} fontWeight="700" fill="var(--ink)">
               neu: S(2 | {fmt(neuS)})
             </text>
           </>
         ) : (
           <>
-            <circle cx={bx(2)} cy={by(3)} r="7" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
-            <text x={bx(2)} y={by(3) - 14} textAnchor="middle" fontSize="18" fontWeight="700" fill="var(--ink)">
+            <circle cx={bx(2)} cy={by(3)} r={gross ? 9 : 7} fill="var(--highlight)" stroke="var(--ink)" strokeWidth={gross ? 3 : 2.5} />
+            <text x={bx(2)} y={by(3) - 14} textAnchor="middle" fontSize={fs(18)} fontWeight="700" fill="var(--ink)">
               S(2 | 3)
             </text>
           </>
         )}
-        <circle cx={bx(0)} cy={by(2)} r="7" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
-        <text x={bx(0) - 12} y={by(2) - 22} textAnchor="end" fontSize="18" fontWeight="700" fill="var(--ink)">
+        <circle cx={bx(0)} cy={by(2)} r={gross ? 9 : 7} fill="var(--surface)" stroke="var(--ink)" strokeWidth={gross ? 3 : 2.5} />
+        <text x={bx(0) - 12} y={by(2) - 22} textAnchor="end" fontSize={fs(18)} fontWeight="700" fill="var(--ink)">
           P(0 | 2)
         </text>
         {!nurP && (
           <>
-            <circle cx={bx(4)} cy={by(2)} r="7" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
-            <text x={bx(4) + 12} y={by(2) - 22} fontSize="18" fontWeight="700" fill="var(--ink)">
+            <circle cx={bx(4)} cy={by(2)} r={gross ? 9 : 7} fill="var(--surface)" stroke="var(--ink)" strokeWidth={gross ? 3 : 2.5} />
+            <text x={bx(4) + 12} y={by(2) - 22} fontSize={fs(18)} fontWeight="700" fill="var(--ink)">
               Q(4 | 2)
             </text>
           </>
         )}
-        <text x={bx(S.xMax) - 4} y={by(0) - 8} textAnchor="end" fontSize="14" fill="var(--ink-muted)">
-          Boden (x in m)
+        <text x={bx(S.xMax) - 4} y={by(0) - 8} textAnchor="end" fontSize={fs(14)} fill="var(--ink-muted)">
+          {gross ? 'x in m' : 'Boden (x in m)'}
         </text>
       </svg>
     </div>
@@ -229,56 +229,39 @@ function Biegemaschine({ auftrag, versuche, onSenden }: { auftrag: ReactNode; ve
 
   return (
     <div className="tb-maschine" data-no-autocheck>
-      <ZweiSpalten
-        links={
-          <div className="tb-maschine-links">
-            {auftrag}
-            {(versuche.length >= 3 || treffer) && (
-              <div className="ls-question">
-                <i className="fa-solid fa-lightbulb" aria-hidden="true" />
-                <span>
-                  {treffer ? 'Treffer! Aber beim nächsten Kunden hat der Bogen andere Maße.' : 'Raten bringt dich kaum ans Ziel.'} Gleich lernst du, wie du die Gleichung aus dem
-                  Scheitelpunkt und einem weiteren Punkt sicher berechnest.
-                </span>
-              </div>
-            )}
+      {auftrag}
+      <TorBild kurven={kurven} gross />
+      <div className="tb-eingabe">
+        <M>{'y ='}</M> {feld('a', 'Zahl vor x²')} <M>{'x^2 +'}</M> {feld('b', 'Zahl vor x')} <M>{'x +'}</M> {feld('c', 'Zahl ohne x')}
+        <button type="button" className="bk-btn bk-btn-primary" onClick={senden}>
+          <i className="fa-solid fa-paper-plane" aria-hidden="true" /> An die Maschine senden
+        </button>
+      </div>
+      {fehlt && (
+        <div className="bk-feedback bk-feedback-info lp-feedback" role="status">
+          <i className="fa-solid fa-pen" aria-hidden="true" /> Bitte trage in alle drei Felder eine Zahl ein, auch 0 ist erlaubt.
+        </div>
+      )}
+      {letzter && (
+        <div className={`tb-display ${passt(letzter) ? 'tb-display-ok' : ''}`} role="status">
+          <div className="tb-display-head">
+            Versuch {versuche.length}: <M>{gleichungTex(letzter)}</M>
           </div>
-        }
-        rechts={
-          <div className="tb-maschine-rechts">
-            <TorBild kurven={kurven} />
-            <div className="tb-eingabe">
-              <M>{'y ='}</M> {feld('a', 'Zahl vor x²')} <M>{'x^2 +'}</M> {feld('b', 'Zahl vor x')} <M>{'x +'}</M> {feld('c', 'Zahl ohne x')}
-            </div>
-            <div>
-              <button type="button" className="bk-btn bk-btn-primary" onClick={senden}>
-                <i className="fa-solid fa-paper-plane" aria-hidden="true" /> An die Maschine senden
-              </button>
-            </div>
-            {fehlt && (
-              <div className="bk-feedback bk-feedback-info lp-feedback" role="status">
-                <i className="fa-solid fa-pen" aria-hidden="true" /> Bitte trage in alle drei Felder eine Zahl ein, auch 0 ist erlaubt.
-              </div>
-            )}
-            {letzter && (
-              <div className={`tb-display ${passt(letzter) ? 'tb-display-ok' : ''}`} role="status">
-                <div className="tb-display-head">
-                  Versuch {versuche.length}: <M>{gleichungTex(letzter)}</M>
-                </div>
-                <ul>
-                  {pruefung(letzter).map((p) => (
-                    <li key={p.key}>
-                      <i className={`fa-solid ${p.ok ? 'fa-circle-check' : 'fa-circle-xmark'}`} aria-hidden="true" /> {p.name}:{' '}
-                      {p.ok ? <>{meter(p.soll)}, passt</> : <>{meter(p.ist)} statt {meter(p.soll)}</>}
-                    </li>
-                  ))}
-                </ul>
-                <strong>{passt(letzter) ? 'Bogen passt. Die Maschine nimmt die Gleichung an.' : 'Bogen passt nicht. Die Maschine lehnt die Gleichung ab.'}</strong>
-              </div>
-            )}
-          </div>
-        }
-      />
+          <ul>
+            {pruefung(letzter).map((p) => (
+              <li key={p.key}>
+                <i className={`fa-solid ${p.ok ? 'fa-circle-check' : 'fa-circle-xmark'}`} aria-hidden="true" /> {p.name}:{' '}
+                {p.ok ? <>{meter(p.soll)}, passt</> : <>{meter(p.ist)} statt {meter(p.soll)}</>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {(versuche.length >= 3 || treffer) && (
+        <p className="sl-hinweis">
+          {treffer ? 'Treffer! Aber der nächste Bogen hat andere Maße.' : 'Raten bringt dich kaum ans Ziel.'} Gleich lernst du, wie du sicher rechnest.
+        </p>
+      )}
     </div>
   )
 }
@@ -427,15 +410,6 @@ export default function TorbogenEinstieg({
           }
           options={[
             {
-              text: <M>{'S(1 \\mid 4)'}</M>,
-              correct: true,
-              feedback: (
-                <>
-                  In der Scheitelform <M>{'y = a(x - x_S)^2 + y_S'}</M> steht <M>{'x_S'}</M> mit umgekehrtem Vorzeichen in der Klammer.
-                </>
-              ),
-            },
-            {
               text: <M>{'S(-1 \\mid 4)'}</M>,
               feedback: (
                 <>
@@ -446,6 +420,15 @@ export default function TorbogenEinstieg({
             {
               text: <M>{'S(4 \\mid 1)'}</M>,
               feedback: <>Die Koordinaten sind vertauscht. Die Zahl in der Klammer gehört zum x-Wert, die Zahl hinten zum y-Wert.</>,
+            },
+            {
+              text: <M>{'S(1 \\mid 4)'}</M>,
+              correct: true,
+              feedback: (
+                <>
+                  In der Scheitelform <M>{'y = a(x - x_S)^2 + y_S'}</M> steht <M>{'x_S'}</M> mit umgekehrtem Vorzeichen in der Klammer.
+                </>
+              ),
             },
             {
               text: <M>{'S(-2 \\mid 4)'}</M>,
@@ -499,21 +482,11 @@ export default function TorbogenEinstieg({
     },
     {
       art: 'problem',
-      titel: "Der Auftrag: Probier's aus!",
-      bedingung: 'Probiere mindestens drei Gleichungen an der Maschine aus, dann geht es weiter.',
+      titel: 'Der Torbogen für die Hofeinfahrt',
+      bedingung: 'Nach drei Versuchen geht es weiter.',
       inhalt: (fertig) => (
         <Biegemaschine
-          auftrag={
-            <>
-              <div className="wm-notiz">
-                <p>
-                  Du bist Azubi im Metallbau. Über einer 4&nbsp;m breiten Hofeinfahrt entsteht ein Torbogen aus Stahlrohr: Pfosten 2&nbsp;m hoch, in der Mitte
-                  3&nbsp;m hoch. Die Biegemaschine braucht die Funktionsgleichung des Bogens.
-                </p>
-              </div>
-              <Problemkarte />
-            </>
-          }
+          auftrag={<ProblemText />}
           versuche={versuche}
           onSenden={(v) => {
             setVersuche((alt) => [...alt, v])
@@ -527,21 +500,19 @@ export default function TorbogenEinstieg({
       titel: 'Deine Aufgabe',
       frei: true,
       inhalt: () => (
-        <ZweiSpalten
-          links={
-            <div className="tb-problem">
-              <div className="tb-problem-title">
-                <i className="fa-solid fa-bullseye" aria-hidden="true" /> Stelle die Funktionsgleichung auf
-              </div>
-              <p>
-                Gegeben sind der Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> und der Pfosten <M>{'P(0 \\mid 2)'}</M>. Stelle die Funktionsgleichung zuerst in{' '}
-                <strong>Scheitelform</strong> <M>{'y = a(x - x_S)^2 + y_S'}</M> und anschließend in <strong>allgemeiner Form</strong> <M>{'y = ax^2 + bx + c'}</M> auf.
-              </p>
-              <p>Wie das funktioniert, siehst du auf der nächsten Seite an einem Rechenbeispiel. Danach führst du die Berechnung selbst für deine Werte durch.</p>
-            </div>
-          }
-          rechts={<TorBild nurP />}
-        />
+        <>
+          <div className="sl-fokus">
+            <p className="sl-fokus-titel">Stelle die Funktionsgleichung auf</p>
+            <p>
+              Gegeben sind der Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> und der Pfosten <M>{'P(0 \\mid 2)'}</M>. Stelle die Funktionsgleichung zuerst in{' '}
+              <strong>Scheitelform</strong> <M>{'y = a(x - x_S)^2 + y_S'}</M> und anschließend in <strong>allgemeiner Form</strong> <M>{'y = ax^2 + bx + c'}</M> auf.
+            </p>
+          </div>
+          <div className="tb-bild-klein">
+            <TorBild nurP gross />
+          </div>
+          <p className="sl-hinweis">Wie das funktioniert, siehst du auf der nächsten Seite an einem Rechenbeispiel. Danach rechnest du selbst.</p>
+        </>
       ),
     },
     {
@@ -668,23 +639,9 @@ export default function TorbogenEinstieg({
       titel: 'Das hältst du fest',
       frei: true,
       inhalt: () => (
-        <ZweiSpalten
-          links={
-            <>
-              <Rueckbezug versuche={versuche} />
-              <div className="wm-mappe">
-                <span className="wm-reiter">Auftragsmappe 2026-117</span>
-                <div className="wm-blatt">
-                  <span className="wm-stempel">Freigegeben</span>
-                  <p>
-                    An die Biegemaschine geht: <M>{'y = -0{,}25x^2 + x + 2'}</M>, in Scheitelform <M>{'y = -0{,}25(x - 2)^2 + 3'}</M>.
-                  </p>
-                </div>
-              </div>
-            </>
-          }
-          rechts={
-            <Merke title="Funktionsgleichung aus Scheitelpunkt und einem Punkt (Fall 1)">
+        <>
+          <Rueckbezug versuche={versuche} />
+          <Merke title="Funktionsgleichung aus Scheitelpunkt und einem Punkt (Fall 1)">
               <ol>
                 <li>
                   Scheitelpunkt in die Scheitelform einsetzen: <M>{'y = a(x - x_S)^2 + y_S'}</M>.
@@ -696,9 +653,8 @@ export default function TorbogenEinstieg({
                   In die allgemeine Form <M>{'y = ax^2 + bx + c'}</M> umwandeln: binomische Formel, dann jeden Summanden mit <M>a</M> multiplizieren.
                 </li>
               </ol>
-            </Merke>
-          }
-        />
+          </Merke>
+        </>
       ),
     },
     {
@@ -718,7 +674,7 @@ export default function TorbogenEinstieg({
           rechnen={false}
           prompt={
             <>
-              <p>Zwei Azubis haben den Torbogen auch berechnet. Beide Pläne sind falsch. Wähle für jeden Plan den Schritt mit dem Fehler und schreibe den Fehler mit einem Satz ins Heft.</p>
+              <p>Beide Pläne sind falsch. Wähle jeweils den Schritt mit dem Fehler und beschreibe den Fehler im Heft.</p>
               <div className="wm-berichte wm-berichte-2">
                 <Bericht
                   name="Jonas"
@@ -817,25 +773,21 @@ export default function TorbogenEinstieg({
           title="Check 3: Sonderwunsch, der Bogen soll höher werden"
           level="erweiterung"
           prompt={
-            <ZweiSpalten
-              links={
-                <p>
-                  Familie Berger ruft an: Der Bogen soll in der Mitte 3,5&nbsp;m hoch sein, die Pfosten bleiben 2&nbsp;m hoch. Der Scheitelpunkt wandert also nach oben auf{' '}
-                  <M>{'{S(2 \\mid 3{,}5)}'}</M>, der Pfosten bleibt bei <M>{'{P(0 \\mid 2)}'}</M>. Berechne das neue <M>a</M>. Wird der Bogen dadurch steiler oder flacher? Begründe im
-                  Heft.
-                </p>
-              }
-              rechts={
-                <div className="tb-sonder-bild">
-                  <TorBild neuS={3.5} />
-                </div>
-              }
-            />
+            <>
+              <p>
+                Familie Berger ruft an: Der Bogen soll in der Mitte 3,5&nbsp;m hoch sein, die Pfosten bleiben 2&nbsp;m hoch. Der Scheitelpunkt wandert also nach oben auf{' '}
+                <M>{'{S(2 \\mid 3{,}5)}'}</M>, der Pfosten bleibt bei <M>{'{P(0 \\mid 2)}'}</M>. Berechne das neue <M>a</M>. Wird der Bogen dadurch steiler oder flacher? Begründe im
+                Heft.
+              </p>
+              <div className="tb-bild-klein">
+                <TorBild neuS={3.5} gross />
+              </div>
+            </>
           }
           fieldsRow
           fields={[
             { kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: -0.375 },
-            { kind: 'select', key: 's', label: 'Der Bogen wird …', options: ['steiler', 'flacher'], expected: 0 },
+            { kind: 'select', key: 's', label: 'Der Bogen wird …', options: ['flacher', 'steiler'], expected: 1 },
           ]}
           solution={
             <>
@@ -898,6 +850,7 @@ export default function TorbogenEinstieg({
         parent={{ to: '/quadratische_funktionen/funktionsgleichung_aufstellen', label: 'Funktionsgleichung aufstellen' }}
       >
         <SeitenLernsituation
+          ruhig
           ziel={<>In dieser Lernsituation lernst du, wie du die Funktionsgleichung einer Parabel aufstellst, wenn du den Scheitelpunkt und einen weiteren Punkt kennst.</>}
           seiten={seiten}
         />

@@ -19,7 +19,8 @@ export type Seite = {
   inhalt: (fertig: () => void) => ReactNode
 }
 
-export function SeitenLernsituation({ ziel, seiten }: { ziel: ReactNode; seiten: Seite[] }) {
+/** ruhig: ruhiges Grunddesign (eine Spalte, eine Akzentfarbe, keine Farbstreifen), siehe docs/skills/lernsituationen/SKILL.md */
+export function SeitenLernsituation({ ziel, seiten, ruhig = false }: { ziel: ReactNode; seiten: Seite[]; ruhig?: boolean }) {
   const [bestaetigt, setBestaetigt] = useState(false)
   const [haken, setHaken] = useState(false)
   const [nr, setNr] = useState(0)
@@ -31,7 +32,7 @@ export function SeitenLernsituation({ ziel, seiten }: { ziel: ReactNode; seiten:
 
   if (!bestaetigt) {
     return (
-      <div className="sl-start">
+      <div className={`sl-start${ruhig ? ' sl-ruhig' : ''}`}>
         <div className="sl-start-icon">
           <i className="fa-solid fa-pen-to-square" aria-hidden="true" />
         </div>
@@ -58,7 +59,7 @@ export function SeitenLernsituation({ ziel, seiten }: { ziel: ReactNode; seiten:
   const fertig = (i: number) => () => setErledigt((e) => (e[i] ? e : e.map((v, j) => (j === i ? true : v))))
 
   return (
-    <div className="sl">
+    <div className={`sl${ruhig ? ' sl-ruhig' : ''}`}>
       <div className="sl-bar">
         <button type="button" className="bk-btn bk-btn-sm" disabled={nr === 0} onClick={() => setNr(nr - 1)} aria-label="Vorherige Seite">
           <i className="fa-solid fa-arrow-left" aria-hidden="true" />
