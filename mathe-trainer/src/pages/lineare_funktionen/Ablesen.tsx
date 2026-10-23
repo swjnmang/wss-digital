@@ -74,7 +74,7 @@ function tStatus(raw: string, t: number): { status: Status; hint: string } {
 }
 
 const fieldCls = (status: Status) =>
-  `w-20 text-center border-2 rounded px-2 py-2 focus:outline-none ${
+  `w-16 sm:w-20 text-center border-2 rounded px-2 py-2 focus:outline-none ${
     status === 'right' ? 'border-green-500 bg-green-50' : status === 'wrong' ? 'border-red-500 bg-red-50' : 'border-slate-300'
   }`
 
@@ -183,27 +183,9 @@ function TaskCard({ number, onSolvedChange, onResult, onVideo, level }: CardProp
         />
         )}
       </div>
-      {/* Auf Handys fehlt auf der Zahlentastatur das Plus: Tasten setzen das Vorzeichen (der Schüler entscheidet selbst, welches) */}
-      {!solved && !easy && (
-        <div className="flex justify-center items-center gap-2 mt-2 text-sm text-slate-600">
-          <span>Vorzeichen für t:</span>
-          {(['+', '−'] as const).map((sign) => (
-            <button
-              key={sign}
-              type="button"
-              onClick={() => setTInput((v) => sign + v.trim().replace(/^[+\-−–—‐]\s*/, ''))}
-              className="w-9 h-9 rounded border border-slate-300 bg-white hover:bg-slate-100 text-lg font-semibold text-slate-700"
-              aria-label={sign === '+' ? 'Plus einsetzen' : 'Minus einsetzen'}
-            >
-              {sign}
-            </button>
-          ))}
-        </div>
-      )}
-
       <p className="mt-4 text-xl text-slate-800 min-h-8">{preview}</p>
 
-      {solved && <p className="text-center font-bold mt-2 text-green-600">Richtig! Die Funktionsgleichung lautet {equationText(m, t)}.</p>}
+      {solved && <p className="text-center font-bold mt-2 text-green-600">Super, richtig gelesen! Die Funktionsgleichung lautet {equationText(m, t)}.</p>}
       {!solved && hint && <p className="text-center font-bold mt-2 text-red-600">{hint}</p>}
       {!solved && !hint && anyWrong && <p className="text-center font-bold mt-2 text-red-600">Noch nicht richtig.</p>}
 
@@ -242,6 +224,7 @@ function TaskCard({ number, onSolvedChange, onResult, onVideo, level }: CardProp
 export default function Ablesen() {
   const navigate = useNavigate()
   const [round, setRound] = useState(0)
+  const [current, setCurrent] = useState(0)
   const [solved, setSolved] = useState<Record<number, boolean>>({})
   const [streak, setStreak] = useState(0)
   const [finished, setFinished] = useState(false)
@@ -261,6 +244,7 @@ export default function Ablesen() {
   const startNewRound = () => {
     setRound((r) => r + 1)
     setSolved({})
+    setCurrent(0)
     setFinished(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -322,17 +306,22 @@ export default function Ablesen() {
           </button>
         </div>
 
-        {Array.from({ length: TOTAL_TASKS }, (_, i) => (
-          <React.Fragment key={`${level}-${round}-${i}`}>
-            <TaskCard
-              number={i + 1}
-              onSolvedChange={(value) => setSolved((s) => ({ ...s, [i]: value }))}
-              onResult={(correct) => setStreak((s) => (correct ? s + 1 : 0))}
-              onVideo={() => setShowVideo(true)}
-              level={level}
-            />
-          </React.Fragment>
-        ))}
+        <p className="text-center text-sm font-semibold text-slate-600">Aufgabe {current + 1} von {TOTAL_TASKS}</p>
+
+        <TaskCard
+          key={`${level}-${round}-${current}`}
+          number={current + 1}
+          onSolvedChange={(value) => setSolved((s) => ({ ...s, [current]: value }))}
+          onResult={(correct) => setStreak((s) => (correct ? s + 1 : 0))}
+          onVideo={() => setShowVideo(true)}
+          level={level}
+        />
+
+        {solved[current] && current < TOTAL_TASKS - 1 && (
+          <div className="flex justify-center">
+            <button onClick={() => setCurrent((c) => c + 1)} className={btnPrimary}>Nächste Aufgabe</button>
+          </div>
+        )}
 
         <div className="flex justify-center gap-3 flex-wrap">
           <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">Gelöst: {solvedCount} / {TOTAL_TASKS}</div>
