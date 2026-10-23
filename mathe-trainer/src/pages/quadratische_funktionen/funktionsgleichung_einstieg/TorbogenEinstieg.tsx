@@ -102,7 +102,8 @@ const SOLL_BOGEN = kurve(bogen(A_SOLL), 0, 4)
 type Kurve = { f: (x: number) => number; farbe: string; breite: number }
 
 /** Skizze der Einfahrt; kurven = Parabeln (z. B. Versuche an der Maschine) über die gestrichelte Skizze legen; nurP = ohne rechten Pfosten Q */
-function TorBild({ kurven = [], nurP = false }: { kurven?: Kurve[]; nurP?: boolean }) {
+/** neuS: Sonderwunsch mit neuer Scheitelhöhe; der bisherige Bogen bleibt blass zum Vergleich stehen */
+function TorBild({ kurven = [], nurP = false, neuS }: { kurven?: Kurve[]; nurP?: boolean; neuS?: number }) {
   const clip = useId().replace(/[^a-zA-Z0-9]/g, '')
   return (
     <div className="bk-graph ls-graph">
@@ -134,7 +135,13 @@ function TorBild({ kurven = [], nurP = false }: { kurven?: Kurve[]; nurP?: boole
         {(nurP ? [0] : [0, 4]).map((x) => (
           <rect key={x} x={bx(x) - 7} y={by(2)} width="14" height={by(0) - by(2)} fill="var(--ink-muted)" stroke="var(--ink)" strokeWidth="2" />
         ))}
-        <polyline points={SOLL_BOGEN} fill="none" stroke="var(--ink)" strokeWidth="3" strokeDasharray="8 6" />
+        <polyline
+          points={SOLL_BOGEN}
+          fill="none"
+          stroke={neuS ? 'var(--line-strong)' : 'var(--ink)'}
+          strokeWidth={neuS ? 2 : 3}
+          strokeDasharray="8 6"
+        />
         {kurven.length > 0 && (
           <g clipPath={`url(#${clip})`}>
             {kurven.map((k, i) => (
@@ -142,10 +149,29 @@ function TorBild({ kurven = [], nurP = false }: { kurven?: Kurve[]; nurP?: boole
             ))}
           </g>
         )}
-        <circle cx={bx(2)} cy={by(3)} r="7" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
-        <text x={bx(2)} y={by(3) - 14} textAnchor="middle" fontSize="18" fontWeight="700" fill="var(--ink)">
-          S(2 | 3)
-        </text>
+        {neuS ? (
+          <>
+            <line x1={bx(2)} x2={bx(2)} y1={by(0)} y2={by(neuS)} stroke="var(--primary)" strokeWidth="2" strokeDasharray="4 4" />
+            <text x={bx(2) + 8} y={by(neuS / 2)} fontSize="16" fontWeight="700" fill="var(--primary)">
+              {fmt(neuS)} m
+            </text>
+            <circle cx={bx(2)} cy={by(3)} r="5" fill="var(--surface)" stroke="var(--line-strong)" strokeWidth="2" />
+            <text x={bx(3.6)} y={by(3.1)} fontSize="15" fill="var(--ink-muted)">
+              bisheriger Bogen
+            </text>
+            <circle cx={bx(2)} cy={by(neuS)} r="8" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
+            <text x={bx(2)} y={by(neuS) - 14} textAnchor="middle" fontSize="18" fontWeight="700" fill="var(--ink)">
+              neu: S(2 | {fmt(neuS)})
+            </text>
+          </>
+        ) : (
+          <>
+            <circle cx={bx(2)} cy={by(3)} r="7" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
+            <text x={bx(2)} y={by(3) - 14} textAnchor="middle" fontSize="18" fontWeight="700" fill="var(--ink)">
+              S(2 | 3)
+            </text>
+          </>
+        )}
         <circle cx={bx(0)} cy={by(2)} r="7" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
         <text x={bx(0) - 12} y={by(2) - 22} textAnchor="end" fontSize="18" fontWeight="700" fill="var(--ink)">
           P(0 | 2)
@@ -791,10 +817,20 @@ export default function TorbogenEinstieg({
           title="Check 3: Sonderwunsch, der Bogen soll höher werden"
           level="erweiterung"
           prompt={
-            <p>
-              Familie Berger ruft an: Der Bogen soll in der Mitte 3,5&nbsp;m hoch sein, die Pfosten bleiben 2&nbsp;m hoch. Berechne das neue <M>a</M>. Wird der Bogen dadurch steiler oder
-              flacher? Begründe im Heft.
-            </p>
+            <ZweiSpalten
+              links={
+                <p>
+                  Familie Berger ruft an: Der Bogen soll in der Mitte 3,5&nbsp;m hoch sein, die Pfosten bleiben 2&nbsp;m hoch. Der Scheitelpunkt wandert also nach oben auf{' '}
+                  <M>{'{S(2 \\mid 3{,}5)}'}</M>, der Pfosten bleibt bei <M>{'{P(0 \\mid 2)}'}</M>. Berechne das neue <M>a</M>. Wird der Bogen dadurch steiler oder flacher? Begründe im
+                  Heft.
+                </p>
+              }
+              rechts={
+                <div className="tb-sonder-bild">
+                  <TorBild neuS={3.5} />
+                </div>
+              }
+            />
           }
           fieldsRow
           fields={[

@@ -112,3 +112,6 @@
 .tb-maschine-links .tb-problem-grid > div { padding: 6px 10px; }
 .tb-maschine-links .tb-problem-frage { padding: 8px 12px; }
 .tb-maschine-links .ls-question { font-size: 15px; }
+/* Check 3: Skizze mit neuem Scheitelpunkt, unter dem Niveau-Abzeichen und flach genug fürs Tablet */
+.tb-sonder-bild { padding-top: 26px; }
+.tb-sonder-bild .bk-graph svg { max-height: 185px; }
