@@ -378,6 +378,8 @@ export function McCard({
   onSolved?: () => void
 }) {
   const uid = useId()
+  // Regel aus dem Lernsituationen-Skill: Antwort A ist nie die richtige.
+  if ((import.meta as { env?: { DEV?: boolean } }).env?.DEV && options[0]?.correct) console.warn('McCard: Die erste Antwort (A) darf nicht die richtige sein.', title)
   const [choice, setChoice] = useState<number | null>(null)
   const [status, setStatus] = useState<'idle' | 'ok' | 'no' | 'empty'>('idle')
   const [praise, setPraise] = useState(PRAISE[0])

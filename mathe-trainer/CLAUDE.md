@@ -62,8 +62,12 @@ vorgeschaltete Nebenaufgaben. Beispiel: `quadratische_funktionen/funktionsgleich
 Seitenansicht: Lernsituationen beginnen mit einer Startbox, in der die SuS bestätigen, dass sie alle Rechenschritte im Heft
 dokumentieren. Danach steht genau eine Aufgabe pro Seite; „Weiter“ wird erst frei, wenn die Seite erledigt ist. Dafür
 `SeitenLernsituation` aus `lineare_funktionen/lernsituation_kit/seiten.tsx` nutzen (`onSolved` an `CheckCard`/`McCard`, `frei` für
-Info-Seiten) und `TaskShell` mit `kompakt`. Jede Seite muss ohne Scrollen auf ein Tablet im Querformat passen (mindestens 1024 × 700,
+Info-Seiten) und `TaskShell` mit `kompakt`. Jede Seite muss ohne Scrollen auf ein Tablet im Querformat passen (1180 × 820,
 auch nach dem Prüfen). Beispiel: `TorbogenEinstieg.tsx`.
+Ruhiges Grunddesign (seit 2026-10-23, Vorlage `TorbogenEinstieg.tsx`): `SeitenLernsituation` mit `ruhig`, immer einspaltig (auch auf breiten
+Monitoren, kein `ZweiSpalten`), passt ohne Scrollen auf 1180 × 820; eine Akzentfarbe, keine Farbstreifen, keine verschachtelten Kästen,
+keine Kontext-Looks; pro Seite ist nur der Auftrag hervorgehoben (`sl-fokus`). Reihenfolge in „Problem lösen“ immer: Aufgabe → Rechenbeispiel →
+eigene Rechnung. Bei Auswahlaufgaben ist Antwort A nie die richtige. Details: `docs/skills/lernsituationen/SKILL.md`.
 Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
 aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
 

@@ -93,3 +93,38 @@
   .sl-seite .lp-ex.bk-panel:has(> .ls-help-schritte) > .lp-solution { order: 3; }
   .sl-seite .ls-help-schritte .ls-help-card { font-size: 15px; line-height: 1.45; padding: 8px 12px; }
 }
+
+/* ── Ruhiges Grunddesign (SeitenLernsituation mit ruhig) ───────────────────────────────────────────────
+   Eine Spalte, eine Akzentfarbe statt Phasenfarben, kein Farbstreifen, kein Großbuchstaben-Kicker über dem Titel
+   (die Phase steht in der Leiste). Hervorgehoben wird pro Seite nur der Auftrag (.sl-fokus). */
+.sl-ruhig, .sl-ruhig .sl-phasen li, .sl-ruhig .sl-seite { --et: var(--primary); --et-soft: var(--primary-soft); }
+.sl-ruhig .sl-bar { width: 100%; max-width: 900px; margin: 0 auto; }
+.sl-ruhig .sl-phasen li { border-width: 1.5px; min-height: 44px; }
+.sl-ruhig .sl-bar .bk-btn { min-height: 44px; min-width: 44px; }
+.sl-ruhig .sl-seite { width: 100%; max-width: 760px; margin: 6px auto 0; padding-left: 0; border-left: 0; gap: 14px; }
+.sl-ruhig .sl-kicker { display: none; }
+.sl-ruhig .sl-kopf { flex-direction: column; align-items: flex-start; gap: 4px; }
+.sl-ruhig .sl-titel { font-size: 24px; }
+.sl-ruhig .sl-sperre { padding: 0; background: none; color: var(--ink-muted); font: 600 15px/1.4 var(--font-body); }
+.sl-ruhig .sl-zwei { grid-template-columns: minmax(0, 1fr); }
+.sl-ruhig .sl-seite .lp-example-steps { grid-template-columns: minmax(0, 1fr); }
+.sl-ruhig .sl-seite .lp-ex.bk-panel > .ls-rechnung,
+.sl-ruhig .sl-seite .lp-ex.bk-panel > .ls-help-schritte { flex: 1 1 100%; }
+
+/* Text, Problem und Auftrag einer Seite */
+.sl-text { margin: 0; font-size: 17px; line-height: 1.55; }
+.sl-fokus {
+  display: flex; flex-direction: column; gap: 6px; padding: 14px 18px;
+  border-radius: 12px; background: var(--primary-soft); font-size: 18px; line-height: 1.5;
+}
+.sl-fokus p { margin: 0; }
+.sl-fokus-titel { margin: 0; font: 800 18px/1.3 var(--font-display); color: var(--primary); }
+.sl-hinweis { margin: 0; color: var(--ink-muted); font-size: 16px; line-height: 1.45; }
+.sl-start.sl-ruhig { box-shadow: none; border-width: 1.5px; }
+.sl-start.sl-ruhig .sl-start-regel { border-left: 0; border-radius: 12px; }
+.sl-ruhig .sl-bar { max-width: 1060px; }
+.sl-ruhig .sl-seite { margin-top: 2px; gap: 12px; }
+.sl-ruhig .sl-titel { font-size: 23px; }
+.sl-ruhig .sl-seite .bk-graph { border-color: var(--line); padding: 4px; }
+.sl-ruhig .sl-fokus { padding: 10px 16px; gap: 2px; }
+.sl-ruhig .ls-back { padding: 0; border: 0; background: none; }
