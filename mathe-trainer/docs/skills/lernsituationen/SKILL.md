@@ -259,7 +259,7 @@ Keine Animationen oder Effekte ohne Funktion.
 Jede Lernsituation bekommt ein eigenes Gesicht, damit sie sich von den anderen unterscheidet und die SuS jederzeit wissen, wo sie sind. Die Identität entsteht aus vier Merkmalen, die alle aus dem Kontext abgeleitet werden. Umsetzung: Prop `thema` an `SeitenLernsituation` (`{ name, farbe, icon, bild }`, Typ `Thema` aus `seiten.tsx`).
 
 1. **Themenfarbe** aus der Palette `THEMEN` in `seiten.tsx`: blau, petrol, violett, beere, ocker, schiefer, indigo, kupfer. Alle sind mit weißer Schrift kontraststark; Grün und Rot gibt es bewusst nicht, weil sie für richtig/falsch reserviert sind. Die Farbe passt zum Kontext (z. B. Kupfer für Metallbau, Indigo für Nacht und Energie, Petrol für Wasser oder Umwelt, Beere für Freizeit) und ersetzt innerhalb der Lernsituation die Standardfarbe Blau. Keine neuen Farben ohne Kontrastprüfung (weiße Schrift mindestens 4,5 : 1).
-2. **Kennung:** ein passendes Font-Awesome-Symbol (`icon`, z. B. `fa-archway`, `fa-battery-half`, `fa-helicopter`, `fa-piggy-bank`) und ein kurzer Name (2–3 Wörter, z. B. "Der Torbogen"). Beides steht als Kennung links in der Phasenleiste auf **jeder** Seite (auf schmaleren Bildschirmen nur das Symbol) und als Überschrift der Startbox.
+2. **Kennung:** ein passendes Font-Awesome-Symbol (`icon`, z. B. `fa-archway`, `fa-battery-half`, `fa-helicopter`, `fa-piggy-bank`) und ein kurzer Name (2–3 Wörter, z. B. "Der Torbogen"). Beides steht als Kennung links in der Phasenleiste auf **jeder** Seite (auf schmaleren Bildschirmen nur das Symbol), als Überschrift der Startbox und auf der Karte der Auswahlseite.
 3. **Titelbild:** ein eigenes, flaches SVG-Sachbild der Situation (`bild`) oben in der Startbox, etwa 720 × 250. Es zeigt die Szene mit den wichtigsten Größen (z. B. Hofeinfahrt mit Torbogen und den Maßen 2 m, 3 m, 4 m). Flächen in Themenfarbe und Themenfarbe-hell, Linien in `--ink`, keine Fotos, keine Verläufe, keine Figuren mit Gesichtern.
 4. **Leitobjekt:** ein Gegenstand, eine Person oder ein Gerät aus der Situation, das durch alle Phasen trägt und benannt wird (z. B. die Biegemaschine: in Phase 2 wird ausprobiert, in Phase 3 "die Gleichung für die Biegemaschine", in Phase 4 der Rückbezug). Es taucht in Seitentiteln, Rückmeldungen und im Rückbezug auf.
 
@@ -358,6 +358,7 @@ Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle 
 ### A. Kundenauftrag / Maschine: Funktionsgleichung aus Scheitelpunkt und einem Punkt (umgesetzt: Torbogen)
 - **Kontext:** Azubi im Metallbau, ein Torbogen über einer 4 m breiten Hofeinfahrt.
 - **Identität:** Themenfarbe Kupfer, Symbol `fa-archway`, Name "Der Torbogen", Titelbild Hofeinfahrt zwischen zwei Häusern mit Maßen, Leitobjekt Biegemaschine.
+- **Auswahlseite:** Variante B (`FunktionsgleichungMenu.tsx`, zusammen mit Lernsituation 2).
 - **Warm-up:** Scheitelpunkt ablesen, Gleichung nach a lösen, Klammer ausmultiplizieren.
 - **Problem erkennen:** Situation, Problem und Auftrag untereinander, darunter Skizze und `y = [a]x² + [b]x + [c]`. Jede gesendete Gleichung wird live in die Skizze gezeichnet, die Biegemaschine meldet, welche Pfosten und welche Höhe passen. Nach drei Versuchen: "Raten bringt dich kaum ans Ziel."
 - **Problem lösen:** klarer Auftrag mit S(2 | 3) und P(0 | 2), Skizze nur mit S und P, Rechenbeispiel über zwei Seiten, dann Lückenrechnung ① S einsetzen, ② P einsetzen, `a = [ ]`, ③ Scheitelform, ④ allgemeine Form, mit Schritt-Hilfen.
@@ -366,6 +367,7 @@ Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle 
 ### B. Experimentierlabor: Nullstellen linearer Funktionen (umgesetzt: Stromspeicher)
 - **Kontext:** Der Stromspeicher einer Solaranlage hat um 20 Uhr noch 2,5 kWh, das Haus verbraucht nachts 0,4 kWh pro Stunde: y = −0,4x + 2,5.
 - **Identität:** Themenfarbe Indigo, Symbol `fa-battery-half`, Name "Der Stromspeicher", Titelbild Haus mit Solaranlage bei Nacht, Leitobjekt Stromspeicher.
+- **Auswahlseite:** Variante A (Modus in `Nullstellen.tsx`, daneben die Schwierigkeitsgrade Einfach und Fortgeschritten).
 - **Problem erkennen:** Die SuS fragen den Speicher zu selbst gewählten Zeiten ab; jeder Versuch erscheint als Punkt im Graphen. Den genauen Zeitpunkt (x = 6,25, also 2:15 Uhr) treffen sie kaum.
 - **Problem lösen:** Aufgabe, Rechenbeispiel E-Bike-Akku, Lückenrechnung bis zur Uhrzeit mit Schritt-Hilfen.
 - **Lernprodukt (digital):** eigene Speicher-Aufgabe erstellen, prüfen lassen und mit Partner tauschen.
