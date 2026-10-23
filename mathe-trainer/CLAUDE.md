@@ -72,6 +72,8 @@ eigene Rechnung. Bei Auswahlaufgaben ist Antwort A nie die richtige. Details: `d
 Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
 aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
 
+Zu jeder neuen Lernsituation wird die Startseite des Themas zur Auswahl „Lernsituation“ / „Übungsaufgaben“ umgebaut (Karte
+`LernsituationKarte` aus `lernsituation_kit/seiten.tsx` in der Themenfarbe; Varianten A und B in `docs/skills/lernsituationen/SKILL.md`).
 Hat eine Übungsseite eine Einstiegs-Lernsituation (Karte „Lernsituation“ in der Auswahl), heißt der Bereich darunter mit den
 Schwierigkeitsgraden immer **„Übungsaufgaben“** (nicht „Wähle deinen Schwierigkeitsgrad“). Das gilt für alle Seiten des Mathe-Trainers,
 auch für künftige. Die Scheitelform wird als `y = a(x − x_S)² + y_S` geschrieben, nicht mit d und e.

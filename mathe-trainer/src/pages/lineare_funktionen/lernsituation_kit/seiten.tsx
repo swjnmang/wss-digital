@@ -142,3 +142,38 @@ export function ZweiSpalten({ links, rechts }: { links: ReactNode; rechts: React
     </div>
   )
 }
+
+/** Karte für die Auswahlseite eines Themas: führt in eine Lernsituation, in deren Themenfarbe, mit Symbol und Name */
+export function LernsituationKarte({
+  thema,
+  teil,
+  beschreibung,
+  onClick,
+  className = '',
+}: {
+  thema: Pick<Thema, 'name' | 'farbe' | 'icon'>
+  /** z. B. „Lernsituation 1 · Scheitelpunkt und ein Punkt“ */
+  teil?: string
+  beschreibung: ReactNode
+  onClick: () => void
+  className?: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        onClick()
+        window.scrollTo({ top: 0 })
+      }}
+      style={{ background: THEMEN[thema.farbe].farbe }}
+      className={`rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5 ${className}`}
+    >
+      {teil && <p className="text-sm font-bold mb-1 text-white/90">{teil}</p>}
+      <p className="text-lg font-bold mb-1 text-white">{thema.name}</p>
+      <p className="text-xl mb-2 text-white">
+        <i className={`fa-solid ${thema.icon}`} aria-hidden="true" />
+      </p>
+      <p className="text-sm text-white/90">{beschreibung}</p>
+    </button>
+  )
+}

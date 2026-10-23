@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { type MenuItem } from '../../components/layout/MenuPage'
 import TaskShell from '../../components/layout/TaskShell'
+import { LernsituationKarte, type Thema } from '../lineare_funktionen/lernsituation_kit/seiten'
 
 export const BASIS = '/quadratische_funktionen/funktionsgleichung_aufstellen'
 
@@ -9,18 +10,16 @@ export const aufgaben: MenuItem[] = [
   { title: 'Additionsverfahren üben', desc: 'Lineare Gleichungssysteme mit dem Additionsverfahren lösen.', path: '/lineare_funktionen/gleichungssysteme?verfahren=addieren', icon: 'fa-solid fa-plus-minus' },
 ]
 
-const LERNSITUATIONEN = [
+const LERNSITUATIONEN: { teil: string; thema: Pick<Thema, 'name' | 'farbe' | 'icon'>; path: string; desc: string }[] = [
   {
     teil: 'Lernsituation 1 · Scheitelpunkt und ein Punkt',
-    title: 'Der Torbogen für die Hofeinfahrt',
-    icon: 'fa-solid fa-archway',
+    thema: { name: 'Der Torbogen', farbe: 'kupfer', icon: 'fa-archway' },
     path: `${BASIS}/lernsituation-1`,
     desc: 'Eine Biegemaschine braucht die Gleichung für einen Torbogen. Finde heraus, wie du aus dem Scheitelpunkt und einem Pfosten die Funktionsgleichung aufstellst.',
   },
   {
     teil: 'Lernsituation 2 · Ein Wert und zwei Punkte',
-    title: 'Lohnen sich 60 Hoodies?',
-    icon: 'fa-solid fa-shirt',
+    thema: { name: 'Lohnen sich 60 Hoodies?', farbe: 'blau', icon: 'fa-shirt' },
     path: `${BASIS}/lernsituation-2`,
     desc: 'Die Schülerfirma will groß bestellen. Lerne das Additionsverfahren kennen, stelle die Gewinnfunktion auf und entscheide, ob sich die Bestellung lohnt.',
   },
@@ -36,22 +35,9 @@ export default function FunktionsgleichungMenu() {
           <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {LERNSITUATIONEN.map((l) => (
-              <button
-                key={l.path}
-                onClick={() => {
-                  navigate(l.path)
-                  window.scrollTo({ top: 0 })
-                }}
-                style={{ background: 'var(--primary)' }}
-                className="rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-sm font-bold mb-1 text-white/90">{l.teil}</p>
-                <p className="text-lg font-bold mb-1 text-white">{l.title}</p>
-                <p className="text-xl mb-2 text-white">
-                  <i className={l.icon} aria-hidden="true" />
-                </p>
-                <p className="text-sm text-white/90">{l.desc}</p>
-              </button>
+              <div key={l.path} className="flex">
+                <LernsituationKarte className="w-full" teil={l.teil} thema={l.thema} beschreibung={l.desc} onClick={() => navigate(l.path)} />
+              </div>
             ))}
           </div>
         </div>
