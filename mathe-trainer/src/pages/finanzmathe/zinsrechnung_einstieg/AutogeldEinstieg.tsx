@@ -324,6 +324,26 @@ export default function AutogeldEinstieg({ onBack, onPractice, onNext }: { onBac
             { kind: 'num', key: 'a', label: 'Zinsen mit Angebot A:', expected: ZINS_A, unit: '€' },
             { kind: 'num', key: 'b', label: 'Zinsen mit Angebot B:', expected: ZINS_B, unit: '€' },
           ]}
+          loesungNachFehler
+          solution={
+            <>
+              <p>Vom 16.05. bis zum 16.10. sind es 5 volle Monate, der 14.10. liegt 2 Tage davor:</p>
+              <MB>{'t = 5 \\cdot 30 - 2 = 148 \\text{ Tage}'}</MB>
+              <MB>{'Z_A = \\frac{4\\,800 \\cdot 2{,}4 \\cdot 148}{100 \\cdot 360} = 47{,}36 \\text{ €} \\qquad Z_B = \\frac{4\\,800 \\cdot 3 \\cdot 90}{100 \\cdot 360} = 36{,}00 \\text{ €}'}</MB>
+              <p>Die 144 € aus Lenas Nachricht sind die Zinsen für ein ganzes Jahr. Beim Festgeld gibt es nur 90 Tage lang Zinsen.</p>
+            </>
+          }
+          help={
+            <Hilfen
+              steps={[
+                <>Zähle zuerst die vollen Monate vom 16.05. bis zum 16.10. (je 30 Tage). Der 14.10. liegt 2 Tage vor dem 16.10.</>,
+                <>Rechne wie im Beispiel mit Jonas: Jahreszinsen, durch 360, mal die Zinstage. Bei Angebot B gibt es nur 90 Zinstage.</>,
+                <>
+                  <M>{'t = 5 \\cdot 30 - 2'}</M>. Angebot A: <M>{'\\frac{4\\,800 \\cdot 2{,}4}{100} = 115{,}20'}</M> € pro Jahr. Angebot B: <M>{'\\frac{4\\,800 \\cdot 3}{100} = 144'}</M> € pro Jahr.
+                </>,
+              ]}
+            />
+          }
         />
       ),
     },
@@ -376,6 +396,25 @@ export default function AutogeldEinstieg({ onBack, onPractice, onNext }: { onBac
             { kind: 'num', key: 't', label: 'Tage Tagesgeld:', expected: 58, unit: 'Tage' },
             { kind: 'num', key: 'z', label: 'Zinsen insgesamt:', expected: 54.56, unit: '€' },
           ]}
+          loesungNachFehler
+          solution={
+            <>
+              <MB>{'148 - 90 = 58 \\text{ Tage} \\qquad Z = \\frac{4\\,800 \\cdot 2{,}4 \\cdot 58}{100 \\cdot 360} = 18{,}56 \\text{ €}'}</MB>
+              <MB>{'36{,}00 \\text{ €} + 18{,}56 \\text{ €} = 54{,}56 \\text{ €}'}</MB>
+              <p>Das sind 7,20 € mehr als nur mit dem Tagesgeld. Dafür muss Lena das Geld nach 90 Tagen selbst umbuchen.</p>
+            </>
+          }
+          help={
+            <Hilfen
+              steps={[
+                <>Insgesamt hat Lena 148 Zinstage. Wie viele davon sind schon durch das Festgeld belegt?</>,
+                <>Berechne die Tagesgeld-Zinsen für die restlichen Tage und addiere die 36,00 € vom Festgeld.</>,
+                <>
+                  <M>{'148 - 90 = 58'}</M> Tage. <M>{'Z = \\frac{4\\,800 \\cdot 2{,}4 \\cdot 58}{100 \\cdot 360}'}</M>, dazu kommen 36,00 €.
+                </>,
+              ]}
+            />
+          }
         />
       ),
     },
