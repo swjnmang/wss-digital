@@ -45,14 +45,21 @@ function DrohnenBild({
   ringe = RINGE,
   fokus,
   rechenpunkt,
+  linie = { m: 0.5, t: 2 },
+  hoehe,
 }: {
-  ringe?: Ring[]
+  ringe?: { id: string; x: number; y: number }[]
   /** Ring der aktuellen Station: hervorgehoben, mit senkrechter Hilfslinie bei seinem x-Wert */
-  fokus?: RingId
+  fokus?: string
+  /** Flugbahn y = m·x + t (Standard: y = 0,5x + 2) */
+  linie?: { m: number; t: number }
+  /** gestrichelte Höhe für einen Ring, dessen x-Wert noch gesucht ist */
+  hoehe?: { y: number; name: string }
   /** Ergebnis der Rechnung: der Punkt der Flugbahn bei x (erscheint erst nach dem Lösen) */
   rechenpunkt?: { x: number; y: number }
 }) {
   const f = ringe.find((r) => r.id === fokus)
+  const lf = (x: number) => linie.m * x + linie.t
   return (
     <div className="bk-graph ls-graph">
       <svg viewBox={`0 0 ${S.w} ${S.h}`} role="img" aria-label="Koordinatensystem mit der geraden Flugbahn einer Drohne und mehreren Leuchtringen">
@@ -82,15 +89,25 @@ function DrohnenBild({
         <text x={bx(0) + 8} y={by(S.yMax) + 14} fontSize="14" fill="var(--ink-muted)">
           Höhe y (m)
         </text>
-        <line x1={bx(0)} y1={by(bahn(0))} x2={bx(13)} y2={by(bahn(13))} stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" />
-        <text x={bx(9.6)} y={by(bahn(9.6)) + 28} fontSize="16" fontWeight="700" fill="var(--primary)">
+        <line x1={bx(0)} y1={by(lf(0))} x2={bx(13)} y2={by(lf(13))} stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" />
+        <text x={bx(linie.m < 0 ? 2.5 : 9.6)} y={by(lf(linie.m < 0 ? 2.5 : 9.6)) + (linie.m < 0 ? -12 : 28)} fontSize="16" fontWeight="700" fill="var(--primary)">
           Flugbahn
         </text>
-        <circle cx={bx(0)} cy={by(2)} r="6" fill="var(--primary)" />
-        <text x={bx(0) + 10} y={by(2) + 20} fontSize="14" fill="var(--ink-muted)">
-          Start
-        </text>
-        {f && <line x1={bx(f.x)} x2={bx(f.x)} y1={by(0)} y2={by(bahn(f.x))} stroke="var(--ink-muted)" strokeWidth="2" strokeDasharray="5 4" />}
+        <circle cx={bx(0)} cy={by(lf(0))} r="6" fill="var(--primary)" />
+        {linie.m > 0 && (
+          <text x={bx(0) + 10} y={by(lf(0)) + 20} fontSize="14" fill="var(--ink-muted)">
+            Start
+          </text>
+        )}
+        {hoehe && (
+          <>
+            <line x1={bx(0)} x2={bx(S.xMax)} y1={by(hoehe.y)} y2={by(hoehe.y)} stroke="var(--ink-muted)" strokeDasharray="6 5" />
+            <text x={bx(S.xMax) - 4} y={by(hoehe.y) - 6} textAnchor="end" fontSize="15" fontWeight="700" fill="var(--ink)">
+              Ring {hoehe.name} hängt in {hoehe.y} m Höhe
+            </text>
+          </>
+        )}
+        {f && <line x1={bx(f.x)} x2={bx(f.x)} y1={by(0)} y2={by(lf(f.x))} stroke="var(--ink-muted)" strokeWidth="2" strokeDasharray="5 4" />}
         {rechenpunkt && (
           <g>
             <rect x={bx(rechenpunkt.x) - 6} y={by(rechenpunkt.y) - 6} width="12" height="12" fill="var(--correct)" stroke="var(--ink)" strokeWidth="1.5" transform={`rotate(45 ${bx(rechenpunkt.x)} ${by(rechenpunkt.y)})`} />
@@ -206,6 +223,7 @@ function MerkkarteHeft({ onFertig }: { onFertig: () => void }) {
 
 export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erklaerung: ReactNode; onBack: () => void; onPractice: () => void }) {
   const [tipps, setTipps] = useState<Tipps>({})
+  const [check3, setCheck3] = useState(false)
   const [geloest, setGeloest] = useState<boolean[]>([false, false, false])
   const markiere = (i: number) => () => setGeloest((g) => (g[i] ? g : g.map((v, j) => (j === i ? true : v))))
 
@@ -586,16 +604,19 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
       art: 'sichern',
       titel: 'Check 3: Zweite Drohne',
       inhalt: (fertig) => (
+        <div className="dr-zwei dr-zwei-gleich">
         <TrackedCheck
           rechnen={false}
           topic="Punkt auf Gerade prüfen (Lernsituation)"
-          onSolved={fertig}
+          onSolved={() => {
+            setCheck3(true)
+            fertig()
+          }}
           title="Check 3"
           level="erweiterung"
           prompt={
             <p>
-              Eine zweite Drohne fliegt auf <M>{'y = -0{,}5x + 9'}</M>. Ring <M>{'R(10 \\mid 4)'}</M> hängt schon. Liegt er auf der Flugbahn? Ein weiterer Ring <M>{'S(x \\mid 6)'}</M> soll
-              getroffen werden. Wo muss er hängen?
+              Zweite Drohne: <M>{'y = -0{,}5x + 9'}</M>. Liegt <M>{'R(10 \\mid 4)'}</M> auf der Flugbahn? Wo muss <M>{'S(x \\mid 6)'}</M> hängen, damit sie trifft?
             </p>
           }
           fieldsRow
@@ -619,6 +640,12 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
             />
           }
         />
+        <DrohnenBild
+          linie={{ m: -0.5, t: 9 }}
+          ringe={[{ id: 'R', x: 10, y: 4 }, ...(check3 ? [{ id: 'S', x: 6, y: 6 }] : [])]}
+          hoehe={check3 ? undefined : { y: 6, name: 'S' }}
+        />
+        </div>
       ),
     },
     {
