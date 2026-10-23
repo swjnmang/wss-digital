@@ -309,108 +309,21 @@ export default function AutogeldEinstieg({ onBack, onPractice, onNext }: { onBac
     },
     {
       art: 'loesen',
-      titel: 'Jetzt du: Lenas Zinstage',
+      titel: 'Jetzt du: Berechne Lenas Zinsen',
       inhalt: (fertig) => (
         <CheckCard
           onSolved={fertig}
-          title="Zinstage bis zum Autokauf"
-          prompt={<p>Lena legt das Geld am 16.05. an und hebt es am 14.10. ab. Wie viele Zinstage sind das nach der Bankregel?</p>}
-          fields={[{ kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: T_GESAMT, unit: 'Tage' }]}
-          solution={
-            <>
-              <p>Vom 16.05. bis zum 16.10. sind es 5 volle Monate. Der 14.10. liegt 2 Tage davor:</p>
-              <MB>{'t = 5 \\cdot 30 - 2 = 148 \\text{ Tage}'}</MB>
-            </>
+          title="Lenas Zinsen"
+          prompt={
+            <p>
+              Berechne in deinem Heft die Zinstage von Lenas Geld und die Zinsen, die sie mit Angebot A und mit Angebot B bekommt. Trage deine Ergebnisse ein und prüfe sie.
+            </p>
           }
-          help={
-            <Hilfen
-              steps={[
-                <>Zähle zuerst die vollen Monate. Wie viele Monate liegen zwischen dem 16.05. und dem 16.10.?</>,
-                <>Jeder volle Monat zählt 30 Tage. Danach korrigierst du: Der 14.10. liegt vor dem 16.10.</>,
-                <>
-                  Mai bis Oktober sind 5 Monate, also <M>{'5 \\cdot 30 = 150'}</M> Tage bis zum 16.10. Wie viele Tage musst du abziehen?
-                </>,
-              ]}
-            />
-          }
-        />
-      ),
-    },
-    {
-      art: 'loesen',
-      titel: 'Jetzt du: Zinsen mit Angebot A',
-      inhalt: (fertig) => (
-        <CheckCard
-          onSolved={fertig}
-          title="Angebot A"
-          prompt={<p>Tagesgeld, 2,4 % p.a., 148 Zinstage. Rechne wie im Beispiel: erst ein Jahr, dann ein Tag, dann alle Zinstage.</p>}
-          rechnung={[
-            { l: ['\\text{1 Jahr}'], r: ['\\frac{4\\,800 \\cdot 2{,}4}{100} =', { luecke: 'j' }, '\\text{ €}'] },
-            { l: ['\\text{1 Tag}'], r: ['\\text{Jahreszinsen} : 360 =', { luecke: 'd' }, '\\text{ €}'] },
-            { l: ['\\text{148 Tage}'], r: ['\\text{Tageszinsen} \\cdot 148 =', { luecke: 'z' }, '\\text{ €}'] },
-          ]}
           fields={[
-            { kind: 'num', key: 'j', label: 'Jahreszinsen', expected: 115.2 },
-            { kind: 'num', key: 'd', label: 'Zinsen für 1 Tag', expected: 0.32 },
-            { kind: 'num', key: 'z', label: 'Zinsen für 148 Tage', expected: ZINS_A },
+            { kind: 'num', key: 't', label: 'Zinstage bis zum Autokauf:', expected: T_GESAMT, unit: 'Tage' },
+            { kind: 'num', key: 'a', label: 'Zinsen mit Angebot A:', expected: ZINS_A, unit: '€' },
+            { kind: 'num', key: 'b', label: 'Zinsen mit Angebot B:', expected: ZINS_B, unit: '€' },
           ]}
-          solution={
-            <>
-              <MB>{'\\frac{4\\,800 \\cdot 2{,}4}{100} = 115{,}20 \\text{ €} \\qquad 115{,}20 \\text{ €} : 360 = 0{,}32 \\text{ €} \\qquad 0{,}32 \\text{ €} \\cdot 148 = 47{,}36 \\text{ €}'}</MB>
-              <p>
-                Mit der Formel: <M>{'Z = \\frac{4\\,800 \\cdot 2{,}4 \\cdot 148}{100 \\cdot 360} = 47{,}36 \\text{ €}'}</M>
-              </p>
-            </>
-          }
-          help={
-            <Hilfen
-              steps={[
-                <>Schau dir im Beispiel an, wie Jonas’ Zinsen berechnet werden. Du rechnest genauso, nur mit Lenas Zahlen.</>,
-                <>Erst die Jahreszinsen (4.800 · 2,4 : 100), dann durch 360, dann mal 148.</>,
-                <>
-                  <M>{'4\\,800 \\cdot 2{,}4 : 100 = 115{,}20'}</M>. Jetzt <M>{'115{,}20 : 360'}</M> und das Ergebnis mal 148.
-                </>,
-              ]}
-            />
-          }
-        />
-      ),
-    },
-    {
-      art: 'loesen',
-      titel: 'Jetzt du: Zinsen mit Angebot B',
-      inhalt: (fertig) => (
-        <CheckCard
-          onSolved={fertig}
-          title="Angebot B"
-          prompt={<p>Festgeld, 3,0 % p.a. Das Geld bekommt nur 90 Tage lang Zinsen, danach liegt es ohne Zinsen auf dem Girokonto.</p>}
-          rechnung={[
-            { l: ['\\text{1 Jahr}'], r: ['\\frac{4\\,800 \\cdot 3}{100} =', { luecke: 'j' }, '\\text{ €}'] },
-            { l: ['\\text{1 Tag}'], r: ['\\text{Jahreszinsen} : 360 =', { luecke: 'd' }, '\\text{ €}'] },
-            { l: ['\\text{90 Tage}'], r: ['\\text{Tageszinsen} \\cdot 90 =', { luecke: 'z' }, '\\text{ €}'] },
-          ]}
-          fields={[
-            { kind: 'num', key: 'j', label: 'Jahreszinsen', expected: 144 },
-            { kind: 'num', key: 'd', label: 'Zinsen für 1 Tag', expected: 0.4 },
-            { kind: 'num', key: 'z', label: 'Zinsen für 90 Tage', expected: ZINS_B },
-          ]}
-          solution={
-            <>
-              <MB>{'\\frac{4\\,800 \\cdot 3}{100} = 144 \\text{ €} \\qquad 144 \\text{ €} : 360 = 0{,}40 \\text{ €} \\qquad 0{,}40 \\text{ €} \\cdot 90 = 36 \\text{ €}'}</MB>
-              <p>Die 144 € aus Lenas Nachricht sind die Zinsen für ein ganzes Jahr. Für 90 Tage gibt es nur einen Teil davon.</p>
-            </>
-          }
-          help={
-            <Hilfen
-              steps={[
-                <>Lena hat mit 144 € schon die Zinsen für ein ganzes Jahr ausgerechnet. Das Geld liegt aber nicht ein ganzes Jahr fest.</>,
-                <>Teile die Jahreszinsen durch 360 und nimm das Ergebnis mal 90.</>,
-                <>
-                  <M>{'144 : 360 = 0{,}40'}</M>. Jetzt noch <M>{'0{,}40 \\cdot 90'}</M> rechnen.
-                </>,
-              ]}
-            />
-          }
         />
       ),
     },
@@ -463,24 +376,6 @@ export default function AutogeldEinstieg({ onBack, onPractice, onNext }: { onBac
             { kind: 'num', key: 't', label: 'Tage Tagesgeld:', expected: 58, unit: 'Tage' },
             { kind: 'num', key: 'z', label: 'Zinsen insgesamt:', expected: 54.56, unit: '€' },
           ]}
-          solution={
-            <>
-              <MB>{'148 - 90 = 58 \\text{ Tage} \\qquad Z = \\frac{4\\,800 \\cdot 2{,}4 \\cdot 58}{100 \\cdot 360} = 18{,}56 \\text{ €}'}</MB>
-              <MB>{'36{,}00 \\text{ €} + 18{,}56 \\text{ €} = 54{,}56 \\text{ €}'}</MB>
-              <p>Das sind 7,20 € mehr als nur mit dem Tagesgeld. Dafür muss Lena das Geld nach 90 Tagen selbst umbuchen.</p>
-            </>
-          }
-          help={
-            <Hilfen
-              steps={[
-                <>Insgesamt hat Lena 148 Zinstage. Wie viele davon sind schon durch das Festgeld belegt?</>,
-                <>Berechne die Tagesgeld-Zinsen für die restlichen Tage mit der Formel und addiere die 36,00 € vom Festgeld.</>,
-                <>
-                  <M>{'148 - 90 = 58'}</M> Tage. <M>{'Z = \\frac{4\\,800 \\cdot 2{,}4 \\cdot 58}{100 \\cdot 360}'}</M>, dazu kommen 36,00 €.
-                </>,
-              ]}
-            />
-          }
         />
       ),
     },
