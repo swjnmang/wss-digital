@@ -1,0 +1,29 @@
+/* Bausteine der Zins-Lernsituationen im ruhigen Grunddesign. Farben kommen über --primary aus dem Thema. */
+
+.zk-zitat { margin: 0; display: flex; flex-direction: column; gap: 2px; }
+.zk-zitat figcaption { font: 800 15px/1.3 var(--font-display); color: var(--primary); }
+.zk-zitat blockquote { margin: 0; font-size: 17px; line-height: 1.55; }
+.zk-zitat blockquote p { margin: 0; }
+.zk-zitat blockquote p + p { margin-top: 6px; }
+
+.zk-video { display: flex; flex-direction: column; gap: 10px; }
+.zk-vermutung { display: flex; flex-direction: column; gap: 12px; }
+.zk-vermutung .ls-saved { margin: 0; }
+
+.zk-gg { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; margin: 0; font-size: 17px; line-height: 1.5; }
+.zk-gg dt { font-weight: 800; color: var(--ink-muted); }
+.zk-gg dd { margin: 0; }
+
+/* Leitobjekte (SVG) */
+.zk-bild { border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); padding: 6px; }
+.zk-bild svg { display: block; width: 100%; height: auto; max-height: 300px; margin: 0 auto; }
+
+/* Angebote, Fragen o. Ä. als schlichte Liste */
+.zk-liste { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 17px; line-height: 1.5; }
+.zk-liste li::marker { color: var(--primary); font-weight: 800; }
+
+/* Aufgaben-Baukasten (Lernprodukt) */
+.zk-bau { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.zk-bau-feld { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 220px); align-items: center; gap: 10px; font-size: 17px; }
+@media (max-width: 480px) { .zk-bau-feld { grid-template-columns: 1fr; gap: 4px; } }
+.zk-bau-feld .bk-input { min-height: 44px; width: 100%; }

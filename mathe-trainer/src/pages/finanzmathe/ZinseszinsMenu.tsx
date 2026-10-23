@@ -1,35 +1,42 @@
 import { Link, useNavigate } from 'react-router-dom'
 import TaskShell from '../../components/layout/TaskShell'
+import { LernsituationKarte, type Thema } from '../lineare_funktionen/lernsituation_kit/seiten'
 
-// Kapitel 2.2 Zinseszins: Auswahl zwischen der Einstiegs-Lernsituation „Wer hat nach 10 Jahren mehr?“
-// und dem Zinseszinsrechner (Übungsaufgaben). Aufbau wie bei Kapitel 2.1 Zinsrechnung.
+// Kapitel 2.2 Zinseszins: Auswahl zwischen den beiden Einstiegs-Lernsituationen und dem Zinseszinsrechner (Übungsaufgaben).
+// Aufbau wie bei Kapitel 2.1 Zinsrechnung.
 const aufgaben = [
   { title: 'Zinseszinsrechner', desc: 'Berechne Endkapital, Anfangskapital, Zinssatz oder Laufzeit mit Erklärvideos.', path: '/finanzmathe/zinseszins/ueben' },
+]
+
+const LERNSITUATIONEN: { teil: string; thema: Pick<Thema, 'name' | 'farbe' | 'icon'>; path: string; desc: string }[] = [
+  {
+    teil: 'Lernsituation 1 · Endkapital',
+    thema: { name: 'Wer hat nach 10 Jahren mehr?', farbe: 'violett', icon: 'fa-seedling' },
+    path: '/finanzmathe/zinseszins/lernsituation',
+    desc: 'Mira lässt die Zinsen auf dem Konto, Jonas lässt sie auszahlen. Finde heraus, wie Zinseszins wirkt, und berechne das Endkapital.',
+  },
+  {
+    teil: 'Lernsituation 2 · Anfangskapital, Zinssatz, Laufzeit',
+    thema: { name: 'Miras drei Fragen', farbe: 'ocker', icon: 'fa-hourglass-half' },
+    path: '/finanzmathe/zinseszins/lernsituation-2',
+    desc: 'Wie viel muss Mira anlegen, welcher Zinssatz steckt im Angebot, wann hat sich ihr Geld verdoppelt? Stelle die Zinseszinsformel um.',
+  },
 ]
 
 export default function ZinseszinsMenu() {
   const navigate = useNavigate()
   return (
-    <TaskShell title="Zinseszins" subtitle="Wähle die Lernsituation oder eine Übungsaufgabe aus." width="wide">
+    <TaskShell title="Zinseszins" subtitle="Wähle eine Lernsituation oder eine Übungsaufgabe aus." width="wide">
       <div className="flex flex-col gap-6">
         <div className="bk-panel text-center flex flex-col">
           <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-          <button
-            onClick={() => {
-              navigate('/finanzmathe/zinseszins/lernsituation')
-              window.scrollTo({ top: 0 })
-            }}
-            style={{ background: 'var(--primary)' }}
-            className="rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-          >
-            <p className="text-lg font-bold mb-1 text-white">Wer hat nach 10 Jahren mehr?</p>
-            <p className="text-xl mb-2 text-white">
-              <i className="fa-solid fa-comments-dollar" aria-hidden="true" />
-            </p>
-            <p className="text-sm text-white/90">
-              Neu beim Thema? Vergleiche im Chat zwei Sparkonten und entdecke, wie Zinseszins wirkt. Teil 1: Endkapital, Teil 2: Anfangskapital, Zinssatz und Laufzeit (2 × 90 min).
-            </p>
-          </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {LERNSITUATIONEN.map((l) => (
+              <div key={l.path} className="flex">
+                <LernsituationKarte className="w-full" teil={l.teil} thema={l.thema} beschreibung={l.desc} onClick={() => navigate(l.path)} />
+              </div>
+            ))}
+          </div>
         </div>
         <div className="bk-panel">
           <h2 className="text-lg font-bold text-slate-800 mb-4 text-center">Übungsaufgaben</h2>

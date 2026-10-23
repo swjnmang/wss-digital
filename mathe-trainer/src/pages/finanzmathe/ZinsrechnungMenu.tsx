@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { type MenuItem } from '../../components/layout/MenuPage';
 import TaskShell from '../../components/layout/TaskShell'
+import { LernsituationKarte, type Thema } from '../lineare_funktionen/lernsituation_kit/seiten'
 
 export const aufgaben: MenuItem[] = [
   { title: 'Zinsrechnung üben', desc: 'Berechne Zinsen, Kapital, Zinssatz oder Laufzeit.', path: '/finanzmathe/zinsrechnung/ueben', icon: 'fa-solid fa-percent' },
@@ -8,20 +9,18 @@ export const aufgaben: MenuItem[] = [
   { title: 'Test: Zinsrechnung', desc: 'Teste dein Wissen unter Prüfungsbedingungen.', path: '/finanzmathe/zinsen_test', icon: 'fa-solid fa-graduation-cap' },
 ];
 
-const LERNSITUATIONEN = [
+const LERNSITUATIONEN: { teil: string; thema: Pick<Thema, 'name' | 'farbe' | 'icon'>; path: string; desc: string }[] = [
   {
-    teil: 'Teil 1 · Zinsen berechnen',
-    title: 'Wohin mit Lenas Autogeld?',
-    icon: 'fa-solid fa-building-columns',
+    teil: 'Lernsituation 1 · Zinsen berechnen',
+    thema: { name: 'Lenas Autogeld', farbe: 'petrol', icon: 'fa-car-side' },
     path: '/finanzmathe/zinsrechnung/lernsituation',
-    desc: 'Neu beim Thema? Berate als Azubi in der Bank eine Kundin und finde heraus, wie du Zinsen für einige Tage statt für ein ganzes Jahr berechnest.',
+    desc: 'Berate als Azubi in der Bank eine Kundin und finde heraus, wie du Zinsen für einige Tage statt für ein ganzes Jahr berechnest.',
   },
   {
-    teil: 'Teil 2 · K, p und t berechnen',
-    title: 'Die Abschlussfahrt-Kasse',
-    icon: 'fa-solid fa-thumbtack',
+    teil: 'Lernsituation 2 · K, p und t berechnen',
+    thema: { name: 'Die Abschlussfahrt-Kasse', farbe: 'beere', icon: 'fa-bus' },
     path: '/finanzmathe/zinsrechnung/lernsituation-2',
-    desc: 'Gruppenpuzzle: Werde Expertin oder Experte für Kapital, Zinssatz oder Zinstage und hilf der Klasse 10b, ihr Abschlussgrillen zu finanzieren.',
+    desc: 'Beantworte die drei Fragen der Klasse 10b: Wie viel Kapital, welcher Zinssatz, wie viele Tage? So stellst du die Zinsformel um.',
   },
 ]
 
@@ -35,22 +34,9 @@ export default function ZinsrechnungMenu() {
           <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {LERNSITUATIONEN.map((l) => (
-              <button
-                key={l.path}
-                onClick={() => {
-                  navigate(l.path)
-                  window.scrollTo({ top: 0 })
-                }}
-                style={{ background: 'var(--primary)' }}
-                className="rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-sm font-bold mb-1 text-white/90">{l.teil}</p>
-                <p className="text-lg font-bold mb-1 text-white">{l.title}</p>
-                <p className="text-xl mb-2 text-white">
-                  <i className={l.icon} aria-hidden="true" />
-                </p>
-                <p className="text-sm text-white/90">{l.desc}</p>
-              </button>
+              <div key={l.path} className="flex">
+                <LernsituationKarte className="w-full" teil={l.teil} thema={l.thema} beschreibung={l.desc} onClick={() => navigate(l.path)} />
+              </div>
             ))}
           </div>
         </div>
