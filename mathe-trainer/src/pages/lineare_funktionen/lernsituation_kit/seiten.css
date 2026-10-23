@@ -83,3 +83,13 @@
 .sl-seite .lp-ex.bk-panel > * { flex: 1 1 100%; min-width: 0; }
 .sl-seite .lp-ex.bk-panel > .lp-ex-actions { flex: 0 0 auto; }
 .sl-seite .lp-ex.bk-panel > .lp-feedback { flex: 1 1 260px; margin: 0; }
+/* Schritt-Hilfen neben der Lückenrechnung statt darunter, damit die Seite auch mit offener Hilfe passt */
+@media (min-width: 900px) {
+  .sl-seite .lp-ex.bk-panel:has(> .ls-help-schritte) { align-items: flex-start; }
+  .sl-seite .lp-ex.bk-panel:has(> .ls-help-schritte) > .ls-rechnung { order: 1; flex: 1 1 calc(100% - 320px); }
+  .sl-seite .lp-ex.bk-panel > .ls-help-schritte { order: 2; flex: 0 0 300px; }
+  .sl-seite .lp-ex.bk-panel:has(> .ls-help-schritte) > .lp-ex-actions,
+  .sl-seite .lp-ex.bk-panel:has(> .ls-help-schritte) > .lp-feedback,
+  .sl-seite .lp-ex.bk-panel:has(> .ls-help-schritte) > .lp-solution { order: 3; }
+  .sl-seite .ls-help-schritte .ls-help-card { font-size: 15px; line-height: 1.45; padding: 8px 12px; }
+}
