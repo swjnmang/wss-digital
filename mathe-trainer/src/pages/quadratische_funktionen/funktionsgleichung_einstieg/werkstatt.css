@@ -98,3 +98,17 @@
 .sl-seite .wm-bericht { padding: 8px 12px 10px; gap: 6px; }
 .sl-seite .wm-zeilen li { padding: 2px 6px; }
 .sl-seite .wm-ergebnis { padding: 4px 8px; }
+/* Auftrag und Biegemaschine auf einer Seite: Skizze etwas flacher, damit Eingabe und Anzeige darunter passen */
+.tb-maschine .bk-graph svg { max-height: 185px; }
+.tb-maschine-links .wm-notiz { font-size: 15px; line-height: 1.4; padding: 10px 14px; }
+.tb-maschine-links .tb-problem { padding: 10px 14px; gap: 8px; }
+.tb-maschine-links .tb-problem-grid { font-size: 16px; }
+.tb-maschine-links .tb-problem-frage { font-size: 16px !important; }
+.tb-maschine .tb-eingabe { font-size: 18px; }
+.tb-maschine-links .ls-question { font-size: 16px; line-height: 1.35; padding: 8px 12px; }
+.tb-maschine .tb-display { font-size: 13px; line-height: 1.4; }
+.tb-maschine-links .tb-problem-title { font-size: 17px; }
+.tb-maschine-links { gap: 8px; }
+.tb-maschine-links .tb-problem-grid > div { padding: 6px 10px; }
+.tb-maschine-links .tb-problem-frage { padding: 8px 12px; }
+.tb-maschine-links .ls-question { font-size: 15px; }
