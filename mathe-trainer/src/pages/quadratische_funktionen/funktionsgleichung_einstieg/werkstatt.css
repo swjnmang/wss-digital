@@ -91,3 +91,10 @@
 .tb-display ul { margin: 0; padding: 0; list-style: none; }
 .tb-display .fa-circle-check { color: var(--correct); }
 .tb-display .fa-circle-xmark { color: var(--wrong); }
+.tb-maschine-rechts { display: flex; flex-direction: column; gap: 10px; }
+.tb-maschine-rechts > p { margin: 0; font-size: 16px; line-height: 1.5; }
+.tb-display { padding: 8px 12px; gap: 4px; font-size: 14px; }
+.tb-maschine-links { display: flex; flex-direction: column; gap: 10px; }
+.sl-seite .wm-bericht { padding: 8px 12px 10px; gap: 6px; }
+.sl-seite .wm-zeilen li { padding: 2px 6px; }
+.sl-seite .wm-ergebnis { padding: 4px 8px; }

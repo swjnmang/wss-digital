@@ -141,6 +141,7 @@ export function CheckCard({
   help,
   rechnen = true,
   tracking = NO_TRACKING,
+  onSolved,
 }: {
   title: ReactNode
   level?: Level
@@ -158,6 +159,8 @@ export function CheckCard({
   /** Rechenaufgabe: Heft-Hinweis anzeigen (aus bei Ablesen, Ordnen, Auswählen) */
   rechnen?: boolean
   tracking?: Tracking
+  /** Wird aufgerufen, sobald alle Felder richtig sind (z. B. um in der Seitenansicht „Weiter“ freizuschalten) */
+  onSolved?: () => void
 }) {
   const uid = useId()
   const [values, setValues] = useState<Record<string, string>>({})
@@ -205,7 +208,10 @@ export function CheckCard({
     if (fields.some((f) => m[f.key] === undefined)) return setStatus('empty')
     const ok = fields.every((f) => m[f.key])
     setStatus(ok ? 'ok' : 'no')
-    if (ok) setPraise(pick(PRAISE))
+    if (ok) {
+      setPraise(pick(PRAISE))
+      onSolved?.()
+    }
     tracking.onCheck(ok)
   }
 
@@ -330,6 +336,7 @@ export function McCard({
   options,
   rechnen = false,
   tracking = NO_TRACKING,
+  onSolved,
 }: {
   title: ReactNode
   level?: Level
@@ -338,6 +345,8 @@ export function McCard({
   /** Auswahl erst nach einer Rechnung: Heft-Hinweis anzeigen */
   rechnen?: boolean
   tracking?: Tracking
+  /** Wird aufgerufen, sobald die richtige Antwort geprüft wurde */
+  onSolved?: () => void
 }) {
   const uid = useId()
   const [choice, setChoice] = useState<number | null>(null)
@@ -348,7 +357,10 @@ export function McCard({
     if (choice === null) return setStatus('empty')
     const ok = !!options[choice].correct
     setStatus(ok ? 'ok' : 'no')
-    if (ok) setPraise(pick(PRAISE))
+    if (ok) {
+      setPraise(pick(PRAISE))
+      onSolved?.()
+    }
     tracking.onCheck(ok)
   }
   const mark = status === 'ok' ? true : status === 'no' ? false : undefined

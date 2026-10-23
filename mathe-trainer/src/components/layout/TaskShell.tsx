@@ -14,9 +14,11 @@ interface Props {
   width?: 'narrow' | 'wide' | 'full'
   /** Zwischenebene unter dem Bereich, z. B. das Thema bei Raum & Form */
   parent?: { to: string; label: string } | { to: string; label: string }[]
+  /** Knapper Kopf (kleinere Überschrift, weniger Abstand), z. B. für Lernsituationen in der Seitenansicht */
+  kompakt?: boolean
 }
 
-export default function TaskShell({ title, subtitle, actions, children, width = 'wide', parent }: Props) {
+export default function TaskShell({ title, subtitle, actions, children, width = 'wide', parent, kompakt = false }: Props) {
   const { pathname } = useLocation()
   const area = areaForPath(pathname)
   const ex = allExercises().find((e) => e.path === pathname)
@@ -24,7 +26,7 @@ export default function TaskShell({ title, subtitle, actions, children, width = 
   const parents = Array.isArray(parent) ? parent : parent ? [parent] : []
 
   return (
-    <div className={`bk-page bk-task bk-w-${width}`}>
+    <div className={`bk-page bk-task bk-w-${width}${kompakt ? ' bk-task-kompakt' : ''}`}>
       <header className="bk-task-head">
         <div className="bk-task-titles">
           <nav className="bk-crumbs" aria-label="Pfad">
