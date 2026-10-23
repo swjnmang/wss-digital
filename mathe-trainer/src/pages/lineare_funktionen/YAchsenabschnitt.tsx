@@ -1246,7 +1246,7 @@ const cardTypes = [
 export default function YAchsenabschnitt() {
   const navigate = useNavigate()
   const [round, setRound] = useState(0)
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent] = useState(-1) // -1 = Erklärungsseite
   const [solved, setSolved] = useState<Record<number, boolean>>({})
   const [streak, setStreak] = useState(0)
   const [finished, setFinished] = useState(false)
@@ -1269,8 +1269,8 @@ export default function YAchsenabschnitt() {
     exercisesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  const Card = cardTypes[current]
-  const cards = (
+  const Card = cardTypes[Math.max(current, 0)]
+  const cards = current < 0 ? null : (
     // Die Karte bleibt per key getrennt (frischer Zustand, eigenes Tracking)
     <React.Fragment key={`${round}-${current}`}>
       <Card
@@ -1291,27 +1291,36 @@ export default function YAchsenabschnitt() {
           </p>
         </div>
 
-        <Erklaerung />
-
-        <h2 ref={exercisesRef} className="text-xl font-bold text-slate-800 text-center mt-2 scroll-mt-4">
-          Übungsaufgaben
-        </h2>
-
-        <div className="flex flex-col gap-6">
-          {cards}
-          {solved[current] && current < TOTAL_TASKS - 1 && (
+        {current < 0 ? (
+          <>
+            <Erklaerung />
             <div className="flex justify-center">
-              <button onClick={() => setCurrent((c) => c + 1)} className={btnPrimary}>Nächste Aufgabe</button>
+              <button onClick={() => setCurrent(0)} className={btnPrimary}>Weiter zu den Aufgaben</button>
             </div>
-          )}
-        </div>
+          </>
+        ) : (
+          <>
+            <h2 ref={exercisesRef} className="text-xl font-bold text-slate-800 text-center mt-2 scroll-mt-4">
+              Übungsaufgaben
+            </h2>
+            <p className="text-center text-sm font-semibold text-slate-600">Aufgabe {current + 1} von {TOTAL_TASKS}</p>
+            <div className="flex flex-col gap-6">
+              {cards}
+              {solved[current] && current < TOTAL_TASKS - 1 && (
+                <div className="flex justify-center">
+                  <button onClick={() => setCurrent((c) => c + 1)} className={btnPrimary}>Nächste Aufgabe</button>
+                </div>
+              )}
+            </div>
+          </>
+        )}
 
-        <div className="flex justify-center gap-3 flex-wrap">
+        {current >= 0 && <div className="flex justify-center gap-3 flex-wrap">
           <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">
             Gelöst: {solvedCount} / {TOTAL_TASKS}
           </div>
           <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">Richtig in Folge: {streak}</div>
-        </div>
+        </div>}
 
         {allSolved && (
           <div ref={completionRef} className="bg-green-50 border-2 border-green-400 rounded-xl p-6 text-center">
