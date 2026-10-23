@@ -6,8 +6,8 @@ import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { VideoEmbed } from '../../components/VideoButton'
 import PageShell from '../../components/layout/TaskShell'
 
-// Zehn Aufgaben, jede mit einem eigenen Aufgabentyp
-const TOTAL_TASKS = 10
+// Neun Aufgaben, jede mit einem eigenen Aufgabentyp
+const TOTAL_TASKS = 9
 
 // Erklärvideo zum y-Achsenabschnitt (YouTube)
 const VIDEO_ID = 'IgUrqycTKPQ'
@@ -1143,120 +1143,6 @@ function RearrangeTaskCard(props: CardProps) {
   )
 }
 
-// ---------- Aufgabe 9: Sachaufgabe ----------
-
-type Context = { m: number; t: number; x: number; text: string; question: string; yUnit: string; xText: string }
-
-/** Zahl im deutschen Format für den Fließtext */
-function de(n: number, digits = 0) {
-  return n.toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: 2 })
-}
-
-const contexts: (() => Context)[] = [
-  () => {
-    const t = pick([2.5, 3, 3.5, 4])
-    const m = pick([1.5, 2, 2.5])
-    const x = randomInt(15, 3)
-    return {
-      m, t, x, yUnit: '€', xText: 'gefahrene Kilometer',
-      text: `Ein Taxiunternehmen verlangt eine Grundgebühr von ${de(t, 2)} € und ${de(m, 2)} € pro gefahrenem Kilometer. x steht für die gefahrenen Kilometer, y für den Fahrpreis in €.`,
-      question: `Fahrpreis für ${x} km`,
-    }
-  },
-  () => {
-    const t = pick([20, 24, 30])
-    const m = -pick([1.5, 2, 2.5])
-    const x = randomInt(Math.floor(t / -m) - 1, 2)
-    return {
-      m, t, x, yUnit: 'cm', xText: 'Brenndauer in Stunden',
-      text: `Eine Kerze ist zu Beginn ${de(t)} cm hoch. Pro Stunde brennt sie ${de(-m)} cm ab. x steht für die Brenndauer in Stunden, y für die Höhe der Kerze in cm.`,
-      question: `Höhe nach ${x} Stunden`,
-    }
-  },
-  () => {
-    const t = pick([29, 39, 49])
-    const m = pick([19, 24, 29])
-    const x = randomInt(12, 2)
-    return {
-      m, t, x, yUnit: '€', xText: 'Anzahl der Monate',
-      text: `Ein Fitnessstudio verlangt eine einmalige Aufnahmegebühr von ${de(t)} € und einen Monatsbeitrag von ${de(m)} €. x steht für die Anzahl der Monate, y für die Gesamtkosten in €.`,
-      question: `Gesamtkosten nach ${x} Monaten`,
-    }
-  },
-  () => {
-    const t = pick([50, 80, 120])
-    const m = pick([15, 20, 25])
-    const x = randomInt(10, 2)
-    return {
-      m, t, x, yUnit: 'Liter', xText: 'Zeit in Minuten',
-      text: `In einem Regenwassertank sind bereits ${de(t)} Liter Wasser. Eine Pumpe füllt pro Minute ${de(m)} Liter nach. x steht für die Zeit in Minuten, y für die Wassermenge in Litern.`,
-      question: `Wassermenge nach ${x} Minuten`,
-    }
-  },
-  () => {
-    const t = 100
-    const m = -pick([5, 8, 10])
-    const x = randomInt(Math.floor(100 / -m) - 1, 2)
-    return {
-      m, t, x, yUnit: '%', xText: 'Zeit in Stunden',
-      text: `Ein Handyakku ist vollständig geladen (${de(t)} %). Beim Spielen verliert er pro Stunde ${de(-m)} Prozentpunkte. x steht für die Spielzeit in Stunden, y für den Akkustand in %.`,
-      question: `Akkustand nach ${x} Stunden`,
-    }
-  },
-]
-
-function ContextTaskCard(props: CardProps) {
-  const { task, live, showSolution, newTask, showSol } = useInputTask(
-    'Sachaufgabe y-Achsenabschnitt',
-    () => pick(contexts)(),
-    (k) => [k.m, k.t, k.m * k.x + k.t],
-    props,
-  )
-  const { m, t, x, text, question, yUnit } = task
-  const y = m * x + t
-
-  return (
-    <TaskShell
-      number={props.number}
-      title="Sachaufgabe"
-      onNew={newTask}
-      onShowSolution={showSol}
-      solution={
-        showSolution && (
-          <>
-            <p>
-              <b>1. y-Achsenabschnitt:</b> Der Startwert (bei <M math="x = 0" />) ist <M math={`t = ${tex(t)}`} />.
-            </p>
-            <p>
-              <b>2. Steigung:</b> Die Änderung pro Einheit von x ist <M math={`m = ${tex(m)}`} />
-              {m < 0 && ' (der Wert nimmt ab, deshalb ist m negativ)'}.
-            </p>
-            <p>
-              <b>3. Gleichung:</b> <M math={texEq(m, t)} />
-            </p>
-            <p>
-              <b>4. Einsetzen:</b>
-            </p>
-            <BlockMath math={`y = ${tex(m)} \\cdot ${tex(x)} ${t >= 0 ? '+' : '-'} ${tex(Math.abs(t))} = ${tex(m * x)} ${t >= 0 ? '+' : '-'} ${tex(Math.abs(t))} = ${tex(y)}`} />
-            <p>
-              {question}: <b>{de(y, yUnit === '€' ? 2 : 0)} {yUnit}</b>
-            </p>
-          </>
-        )
-      }
-    >
-      <p className="text-slate-700 mb-3 text-left">{text}</p>
-      <ol className="text-slate-700 mb-4 text-left list-decimal pl-6 space-y-1">
-        <li>
-          Gib die Steigung m und den y-Achsenabschnitt t der Funktion <M math="y = m \cdot x + t" /> an.
-        </li>
-        <li>Berechne: {question} (y in {yUnit}).</li>
-      </ol>
-      <AnswerFields live={live} labels={['m =', 't =', 'y =']} />
-    </TaskShell>
-  )
-}
-
 // ---------- Aufgabe 10: m und t aus einer Wertetabelle ----------
 
 function newTableTask() {
@@ -1354,13 +1240,13 @@ const cardTypes = [
   FullGraphTaskCard,
   PointTaskCard,
   RearrangeTaskCard,
-  ContextTaskCard,
   TableTaskCard,
 ]
 
 export default function YAchsenabschnitt() {
   const navigate = useNavigate()
   const [round, setRound] = useState(0)
+  const [current, setCurrent] = useState(0)
   const [solved, setSolved] = useState<Record<number, boolean>>({})
   const [streak, setStreak] = useState(0)
   const [finished, setFinished] = useState(false)
@@ -1378,21 +1264,23 @@ export default function YAchsenabschnitt() {
   const startNewRound = () => {
     setRound((r) => r + 1)
     setSolved({})
+    setCurrent(0)
     setFinished(false)
     exercisesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  const cards = cardTypes.map((Card, i) => (
-    // Die Karten bleiben nach einem Neustart per key getrennt (frischer Zustand, eigenes Tracking)
-    <React.Fragment key={`${round}-${i}`}>
+  const Card = cardTypes[current]
+  const cards = (
+    // Die Karte bleibt per key getrennt (frischer Zustand, eigenes Tracking)
+    <React.Fragment key={`${round}-${current}`}>
       <Card
-        number={i + 1}
-        onSolvedChange={(value) => setSolved((s) => ({ ...s, [i]: value }))}
+        number={current + 1}
+        onSolvedChange={(value) => setSolved((s) => ({ ...s, [current]: value }))}
         onResult={(correct) => setStreak((s) => (correct ? s + 1 : 0))}
         onHelp={() => setStreak(0)}
       />
     </React.Fragment>
-  ))
+  )
 
   return (
     <PageShell title="y-Achsenabschnitt" width="narrow">
@@ -1409,7 +1297,14 @@ export default function YAchsenabschnitt() {
           Übungsaufgaben
         </h2>
 
-        <div className="flex flex-col gap-6">{cards}</div>
+        <div className="flex flex-col gap-6">
+          {cards}
+          {solved[current] && current < TOTAL_TASKS - 1 && (
+            <div className="flex justify-center">
+              <button onClick={() => setCurrent((c) => c + 1)} className={btnPrimary}>Nächste Aufgabe</button>
+            </div>
+          )}
+        </div>
 
         <div className="flex justify-center gap-3 flex-wrap">
           <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">
