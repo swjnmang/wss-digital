@@ -10,7 +10,7 @@ import './drohne.css'
 // Format Rätsel / Escape-Room (Stationen öffnen den Code für das Hangar-Tor), Look Levelmap mit Code-Schloss, Lernprodukt digitale Merkkarte.
 // Instruktionsreihenfolge: Problem zuerst. Die SuS können Wertetabellen und Geraden zeichnen und kennen y = mx + t. Neu ist die rechnerische Punktprobe.
 // Problem erkennen: Auftrag und Festlegung (Ampel je Ring: trifft / trifft nicht / unsicher). Ring C liegt im Graphen scheinbar auf der Flugbahn.
-// Problem lösen: Rechenbeispiel (Ring A), Station 1 (Ring B), Station 2 (Ring C, Aha: sieht nah aus, trifft aber nicht), Station 3 (fehlende Koordinate).
+// Problem lösen: Rechenbeispiel (Ring A), Station 1 (Ring B, geführte Lückenrechnung), Station 2 (Ring C, freies Rechnen, Aha: sieht nah aus, trifft aber nicht), Station 3 (fehlende Koordinate).
 // Festhalten und Prüfen: Rückbezug auf die Ampel, Merke, digitale Merkkarte, drei Checks (Check 1 mit typischen Fehlern als Antwortoptionen).
 // Die Festlegung bleibt nur im Seitenzustand (kein Speichern).
 
@@ -481,17 +481,12 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
             level="standard"
             prompt={
               <p>
-                Trifft die Drohne die Mitte von <M>{'C(6 \\mid 5{,}5)'}</M>?
+                Trifft die Drohne die Mitte von <M>{'C(6 \\mid 5{,}5)'}</M>? Berechne selbst die Höhe der Flugbahn bei <M>{'x = 6'}</M> und entscheide.
               </p>
             }
-            rechnung={[
-              { l: ['y'], r: ['0{,}5 \\cdot', { luecke: 'x' }, '+ 2'], u: '\\text{① } x \\text{ von } C \\text{ einsetzen}' },
-              { l: ['y'], r: [{ luecke: 'y' }], u: '\\text{② ausrechnen}' },
-            ]}
             fields={[
-              { kind: 'num', key: 'x', label: 'x-Wert von C', expected: 6 },
-              { kind: 'num', key: 'y', label: 'berechnete Höhe', expected: 5 },
-              { kind: 'select', key: 'e', label: <>③ Die Drohne …</>, options: ['trifft Ring C', 'trifft C nicht'], expected: 1 },
+              { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 5 },
+              { kind: 'select', key: 'e', label: <>Die Drohne …</>, options: ['trifft Ring C', 'trifft C nicht'], expected: 1 },
             ]}
             solution={<MB>{'y = 0{,}5 \\cdot 6 + 2 = 3 + 2 = 5 \\quad \\Rightarrow \\quad 5 \\neq 5{,}5 \\text{ (kein Treffer)}'}</MB>}
             help={
@@ -537,12 +532,12 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
             level="erweiterung"
             prompt={
               <p>
-                Bei welchem <M>x</M> hängt <M>{'F(x \\mid 8)'}</M>, damit die Drohne trifft? Setze <M>y</M> ein.</p>
+                Bei welchem <M>x</M> hängt <M>{'F(x \\mid 8)'}</M>, damit die Drohne trifft?</p>
             }
             rechnung={[
-              { l: ['8'], r: ['0{,}5x + 2'], u: '\\text{① } y \\text{ von } F \\text{ einsetzen}' },
-              { l: [{ luecke: 'a' }], r: ['0{,}5x'], u: '\\mid -2' },
-              { l: ['x'], r: [{ luecke: 'b' }], u: '\\mid :0{,}5' },
+              { l: ['8'], r: ['0{,}5x + 2'], u: '\\mid -2' },
+              { l: [{ luecke: 'a' }], r: ['0{,}5x'], u: '\\mid :0{,}5' },
+              { l: ['x'], r: [{ luecke: 'b' }] },
             ]}
             fields={[
               { kind: 'num', key: 'a', label: 'Zahl links', expected: 6 },
