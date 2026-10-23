@@ -240,8 +240,21 @@ export function Achtung({ items }: { items: ReactNode[] }) {
 }
 
 /** Musterbeispiel: Aufgabe sichtbar, Lösungsschritte nacheinander aufdecken */
-/** Ausgearbeitetes Beispiel; offen = alle Schritte gleich sichtbar statt Schritt für Schritt aufdecken */
-export function Beispiel({ title, aufgabe, steps, offen = false }: { title: string; aufgabe: ReactNode; steps: { title: string; body: ReactNode }[]; offen?: boolean }) {
+/** Ausgearbeitetes Beispiel; offen = alle Schritte gleich sichtbar statt Schritt für Schritt aufdecken; ab = Nummer des ersten Schritts */
+export function Beispiel({
+  title,
+  aufgabe,
+  steps,
+  offen = false,
+  ab = 1,
+}: {
+  title: string
+  aufgabe: ReactNode
+  steps: { title: string; body: ReactNode }[]
+  offen?: boolean
+  /** Nummer des ersten Schritts, wenn ein Beispiel auf mehrere Seiten verteilt ist */
+  ab?: number
+}) {
   const [shown, setShown] = useState(offen ? steps.length : 0)
   return (
     <div className="lp-example">
@@ -253,12 +266,13 @@ export function Beispiel({ title, aufgabe, steps, offen = false }: { title: stri
         {steps.slice(0, shown).map((s, i) => (
           <li key={i}>
             <div className="lp-example-step-title">
-              Schritt {i + 1}: {s.title}
+              Schritt {i + ab}: {s.title}
             </div>
             <div className="lp-example-step-body">{s.body}</div>
           </li>
         ))}
       </ol>
+      {!offen && (
       <div className="bk-actions">
         {shown < steps.length ? (
           <>
@@ -275,6 +289,7 @@ export function Beispiel({ title, aufgabe, steps, offen = false }: { title: stri
           </button>
         )}
       </div>
+      )}
     </div>
   )
 }

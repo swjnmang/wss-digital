@@ -59,6 +59,11 @@ Jede Lernsituation hat genau vier Phasen in fester Reihenfolge: **1 Warm-up**, *
 (`<Etappe prefix="…" art="start|problem|loesen|sichern">`); Namen und Reihenfolge stehen nur dort. Abschnitte mit eigener Sozialform
 (Austausch, Check, Merke) sind `<Teil>` innerhalb einer Phase. In „Problem lösen“ steht das eigentliche Problem im Mittelpunkt, ohne
 vorgeschaltete Nebenaufgaben. Beispiel: `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx`.
+Seitenansicht: Lernsituationen beginnen mit einer Startbox, in der die SuS bestätigen, dass sie alle Rechenschritte im Heft
+dokumentieren. Danach steht genau eine Aufgabe pro Seite; „Weiter“ wird erst frei, wenn die Seite erledigt ist. Dafür
+`SeitenLernsituation` aus `lineare_funktionen/lernsituation_kit/seiten.tsx` nutzen (`onSolved` an `CheckCard`/`McCard`, `frei` für
+Info-Seiten) und `TaskShell` mit `kompakt`. Jede Seite muss ohne Scrollen auf ein Tablet im Querformat passen (mindestens 1024 × 700,
+auch nach dem Prüfen). Beispiel: `TorbogenEinstieg.tsx`.
 Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
 aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
 

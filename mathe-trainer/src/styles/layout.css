@@ -214,6 +214,12 @@ a.bk-tile:hover, button.bk-tile:hover { background: var(--surface-sunken); }
 .bk-task-sub { margin: 6px 0 0; text-align: left; color: var(--ink-muted); font-size: 16px; }
 .bk-task-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .bk-task-body { margin: 18px 0 0; }
+/* Kompakter Kopf (TaskShell kompakt), z. B. Lernsituationen in der Seitenansicht: jede Seite soll ohne Scrollen auf ein Tablet passen */
+.bk-task-kompakt.bk-page { padding-top: 10px; }
+.bk-task-kompakt .bk-task-titles { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 16px; }
+.bk-task-kompakt .bk-task-head h1 { margin: 0; font-size: 18px; }
+.bk-task-kompakt .bk-task-sub { display: none; }
+.bk-task-kompakt .bk-task-body { margin: 6px 0 0; }
 .bk-task.bk-w-narrow { max-width: calc(920px + 64px); }
 .bk-task.bk-w-wide { max-width: calc(1280px + 64px); }
 .bk-task.bk-w-full { max-width: 1440px; }
