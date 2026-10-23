@@ -10,7 +10,8 @@ import './seiten.css'
 
 export type Seite = {
   art: PhaseArt
-  titel: string
+  /** Seitentitel, darf Formeln enthalten */
+  titel: ReactNode
   /** Info-Seite: „Weiter“ ist sofort frei */
   frei?: boolean
   /** Hinweis, was zum Freischalten nötig ist (Standard: Aufgabe richtig lösen) */
@@ -86,7 +87,7 @@ export function SeitenLernsituation({ ziel, seiten }: { ziel: ReactNode; seiten:
         )}
       </div>
       {seiten.map((s, i) => (
-        <section key={i} hidden={i !== nr} className={`sl-seite et-${s.art}`} aria-label={s.titel}>
+        <section key={i} hidden={i !== nr} className={`sl-seite et-${s.art}`}>
           <div className="sl-kopf">
             <h2 className="sl-titel">
               <span className="sl-kicker">{PHASEN.find((p) => p.art === s.art)?.title}</span>
