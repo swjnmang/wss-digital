@@ -157,8 +157,10 @@ function TaskCard({ number, onSolvedChange, onResult, onVideo, level }: CardProp
           : 'Lies Steigung m und y-Achsenabschnitt t aus dem Graphen ab und trage sie in die Gleichung ein.'}
       </p>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
       <ResponsiveGraph m={m} t={t} />
 
+      <div>
       <p className="text-sm text-slate-600 mb-3">Gegeben: {easy ? 'y = m · x' : 'y = m · x + t'}</p>
 
       <div className="flex flex-wrap items-center justify-center gap-2 text-xl font-semibold text-slate-800">
@@ -188,6 +190,9 @@ function TaskCard({ number, onSolvedChange, onResult, onVideo, level }: CardProp
       {solved && <p className="text-center font-bold mt-2 text-green-600">Super, richtig gelesen! Die Funktionsgleichung lautet {equationText(m, t)}.</p>}
       {!solved && hint && <p className="text-center font-bold mt-2 text-red-600">{hint}</p>}
       {!solved && !hint && anyWrong && <p className="text-center font-bold mt-2 text-red-600">Noch nicht richtig.</p>}
+
+      </div>
+      </div>
 
       <div className="flex flex-wrap justify-center gap-3 mt-6">
         <button onClick={newTask} className={btnSecondary}>Neue Aufgabe</button>
