@@ -18,8 +18,8 @@ Dieser Skill entwickelt **Einstiegs-Lernsituationen** für neue Mathe-Themen und
 Lernsituationen dürfen **nicht nach Schema F** ablaufen. Gleichförmigkeit langweilt und demotiviert.
 
 - **Fest** sind die vier Phasen, die Abfolge **Problem → Beispiel → eigene Lösung**, die Seitenansicht, das **ruhige Grunddesign**, die didaktischen Leitlinien, die Pflichtfunktionen und die Schreib- und Rechenkonventionen.
-- **Variabel** sind Kontext, Dramaturgie (Format), Lernprodukt, Sozialformen und die Methoden innerhalb der Phasen.
-- **Abwechslung entsteht über Inhalt und Methode, nicht über die Optik.** Das Design bleibt in allen Lernsituationen gleich ruhig.
+- **Variabel** sind Kontext, Dramaturgie (Format), Lernprodukt, Sozialformen, die Methoden innerhalb der Phasen und die **Identität** der Lernsituation.
+- **Ruhig, aber unverwechselbar:** Alle Lernsituationen haben dasselbe ruhige Gerüst, aber jede hat ein eigenes Gesicht (Abschnitt "Identität jeder Lernsituation"). Die SuS sollen auf jeder Seite sofort erkennen, in welcher Lernsituation sie sind.
 - **Abwechslung wird geprüft**, nicht dem Zufall überlassen (Abschnitt "Abwechslung absichern").
 
 ## Ablauf
@@ -40,6 +40,7 @@ Schlage 2 bis 3 **komplette Kombinationen** vor. Jede besteht aus:
 - **Format** (aus dem Formatkatalog)
 - **Problem erkennen:** Woran merken die SuS, dass sie mit Raten oder Vorwissen nicht sicher weiterkommen?
 - **Lernprodukt** (aus dem Produktkatalog)
+- **Identität:** Themenfarbe, Symbol, Titelbild und Leitobjekt (Abschnitt "Identität jeder Lernsituation")
 - einem Satz, warum die Kombination zum Inhalt passt und kognitiv aktiviert
 
 Die Kombinationen unterscheiden sich untereinander deutlich und halten die Abwechslungsregel ein. Die Lehrkraft wählt eine aus oder kombiniert.
@@ -210,7 +211,7 @@ Jedes Lernprodukt hat einen klaren Auftrag und 2 bis 4 Kriterien. Auf der Seite 
 
 ## Ruhiges Grunddesign
 
-Alle Lernsituationen nutzen **dasselbe ruhige Design**. Es gibt keine kontextabhängigen Looks mehr (kein Messenger-, Kassenbon-, Dashboard-, Werkstatt- oder Zeitungs-Look). Der Kontext lebt vom Text und von der Skizze.
+Alle Lernsituationen nutzen **dasselbe ruhige Gerüst**. Es gibt keine kontextabhängigen Looks mehr, die das Layout umbauen (kein Messenger-, Kassenbon-, Dashboard-, Werkstatt- oder Zeitungs-Look). Unterscheidbar werden die Lernsituationen über ihre **Identität** (nächster Abschnitt), nicht über Rahmen, Kästen oder Zusatzfarben.
 
 **Layout**
 - **Immer einspaltig**, auch auf breiten Monitoren: Inhalt mittig mit `max-width` von etwa 760 px; Skizzen und Graphen dürfen etwas breiter sein (bis etwa 900 px).
@@ -224,7 +225,7 @@ Alle Lernsituationen nutzen **dasselbe ruhige Design**. Es gibt keine kontextabh
 - **Keine dekorativen Farbstreifen** am Rand, keine farbigen Banner, keine Icons ohne Funktion.
 
 **Farben**
-- Neutraler Grundton plus **eine Akzentfarbe** für Buttons, Links und den Fokus-Bereich.
+- Neutraler Grundton plus **eine Akzentfarbe**: die **Themenfarbe** der Lernsituation, für Buttons, Phasenleiste, Kennung und den Fokus-Bereich.
 - Grün und Rot nur für Feedback richtig/falsch (Tokens `--correct`, `--wrong`).
 - Keine unterschiedlichen Farben pro Phase innerhalb der Seite (die Phasenleiste darf die Phase markieren).
 
@@ -233,6 +234,17 @@ Alle Lernsituationen nutzen **dasselbe ruhige Design**. Es gibt keine kontextabh
 **Touch-Bedienung:** Buttons und Eingabefelder mindestens 44 × 44 px, ausreichender Abstand zwischen Tippzielen, Fließtext mindestens 17 px.
 
 Keine Animationen oder Effekte ohne Funktion.
+
+## Identität jeder Lernsituation (Pflicht)
+
+Jede Lernsituation bekommt ein eigenes Gesicht, damit sie sich von den anderen unterscheidet und die SuS jederzeit wissen, wo sie sind. Die Identität entsteht aus vier Merkmalen, die alle aus dem Kontext abgeleitet werden. Umsetzung: Prop `thema` an `SeitenLernsituation` (`{ name, farbe, icon, bild }`, Typ `Thema` aus `seiten.tsx`).
+
+1. **Themenfarbe** aus der Palette `THEMEN` in `seiten.tsx`: blau, petrol, violett, beere, ocker, schiefer, indigo, kupfer. Alle sind mit weißer Schrift kontraststark; Grün und Rot gibt es bewusst nicht, weil sie für richtig/falsch reserviert sind. Die Farbe passt zum Kontext (z. B. Kupfer für Metallbau, Petrol für Wasser oder Umwelt, Beere für Freizeit) und ersetzt innerhalb der Lernsituation die Standardfarbe Blau. Keine neuen Farben ohne Kontrastprüfung (weiße Schrift mindestens 4,5 : 1).
+2. **Kennung:** ein passendes Font-Awesome-Symbol (`icon`, z. B. `fa-archway`, `fa-helicopter`, `fa-piggy-bank`) und ein kurzer Name (2–3 Wörter, z. B. "Der Torbogen"). Beides steht als Kennung links in der Phasenleiste auf **jeder** Seite (auf schmaleren Bildschirmen nur das Symbol) und als Überschrift der Startbox.
+3. **Titelbild:** ein eigenes, flaches SVG-Sachbild der Situation (`bild`) oben in der Startbox, etwa 720 × 250. Es zeigt die Szene mit den wichtigsten Größen (z. B. Hofeinfahrt mit Torbogen und den Maßen 2 m, 3 m, 4 m). Flächen in Themenfarbe und Themenfarbe-hell, Linien in `--ink`, keine Fotos, keine Verläufe, keine Figuren mit Gesichtern.
+4. **Leitobjekt:** ein Gegenstand, eine Person oder ein Gerät aus der Situation, das durch alle Phasen trägt und benannt wird (z. B. die Biegemaschine: in Phase 2 wird ausprobiert, in Phase 3 "die Gleichung für die Biegemaschine", in Phase 4 der Rückbezug). Es taucht in Seitentiteln, Rückmeldungen und im Rückbezug auf.
+
+Die Identität bleibt im ruhigen Rahmen: keine zusätzlichen Kästen, Banner oder Farbstreifen, keine zweite Akzentfarbe, keine Animationen. Die Skizzen in den Aufgaben verwenden für das Wichtigste (Bogen, Graph, aktueller Versuch) die Themenfarbe.
 
 ## Auswahlaufgaben (Multiple Choice)
 
@@ -244,8 +256,8 @@ Keine Animationen oder Effekte ohne Funktion.
 
 ## Abwechslung absichern
 
-- Im Repo liegt `lernsituationen-log.md` mit einer Tabelle: Datum, Thema, Seite, Format, Lernprodukt, Optik/Layout, Kontextbereich, Sozialformen. Die Spalte Optik/Layout ist seit dem ruhigen Grunddesign für neue Einträge immer "Grunddesign".
-- **Regel:** Gegenüber den letzten drei Lernsituationen unterscheidet sich eine neue Lernsituation **mindestens in Format und Lernprodukt**, möglichst auch im Kontextbereich. Die vier Phasen, die Seitenansicht und das Grunddesign sind immer gleich und zählen nicht als Wiederholung.
+- Im Repo liegt `lernsituationen-log.md` mit einer Tabelle: Datum, Thema, Seite, Format, Lernprodukt, Optik/Layout, Kontextbereich, Sozialformen. In der Spalte Optik/Layout steht seit dem ruhigen Grunddesign die **Identität**: Themenfarbe, Symbol, Leitobjekt (z. B. "Kupfer, fa-archway, Biegemaschine").
+- **Regel:** Gegenüber den letzten drei Lernsituationen unterscheidet sich eine neue Lernsituation **mindestens in Format, Lernprodukt und Themenfarbe**, möglichst auch im Kontextbereich. Symbol, Titelbild und Leitobjekt sind immer neu. Die vier Phasen, die Seitenansicht und das ruhige Gerüst sind immer gleich und zählen nicht als Wiederholung.
 - **Analog und digital** beim Lernprodukt wechseln sich ab.
 - Wünscht die Lehrkraft ausdrücklich eine Wiederholung, ist das erlaubt. Weise dann kurz auf die Wiederholung hin.
 
@@ -313,6 +325,7 @@ Anforderungen an einen guten Kontext:
 - [ ] Mindestens zwei Darstellungen werden verknüpft.
 - [ ] Das Lernprodukt passt zum Inhalt und hat 2 bis 4 Kriterien.
 - [ ] Ruhiges Grunddesign: einspaltig (auch bei 1920 × 1080), ein Fokus pro Seite, keine verschachtelten Kästen, keine Farbstreifen oder Banner, eine Akzentfarbe, Touch-Ziele mindestens 44 px.
+- [ ] Identität vollständig: Themenfarbe (anders als in den letzten drei Lernsituationen), Symbol und Name als Kennung in der Leiste, eigenes Titelbild in der Startbox, Leitobjekt durch alle Phasen.
 - [ ] `frontend-design` vor dem Bauen geladen, `design:design-critique` mit Screenshots danach angewendet und die Punkte behoben.
 - [ ] Bei keiner Auswahlaufgabe ist Antwort A richtig.
 - [ ] Der Check enthält mindestens eine diagnostische Aufgabe mit typischen Fehlern als Antwortoptionen.
@@ -325,6 +338,7 @@ Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle 
 
 ### A. Kundenauftrag / Maschine: Funktionsgleichung aus Scheitelpunkt und einem Punkt (umgesetzt: Torbogen)
 - **Kontext:** Azubi im Metallbau, ein Torbogen über einer 4 m breiten Hofeinfahrt.
+- **Identität:** Themenfarbe Kupfer, Symbol `fa-archway`, Name "Der Torbogen", Titelbild Hofeinfahrt zwischen zwei Häusern mit Maßen, Leitobjekt Biegemaschine.
 - **Warm-up:** Scheitelpunkt ablesen, Gleichung nach a lösen, Klammer ausmultiplizieren.
 - **Problem erkennen:** Auftrag, Skizze und `y = [a]x² + [b]x + [c]` auf einer Seite. Jede gesendete Gleichung wird live in die Skizze gezeichnet, die Maschine meldet, welche Pfosten und welche Höhe passen. Nach drei Versuchen: "Raten bringt dich kaum ans Ziel."
 - **Problem lösen:** klarer Auftrag mit S(2 | 3) und P(0 | 2), Skizze nur mit S und P, Rechenbeispiel über zwei Seiten, dann Lückenrechnung ① S einsetzen, ② P einsetzen, `a = [ ]`, ③ Scheitelform, ④ allgemeine Form, mit Schritt-Hilfen.
@@ -332,6 +346,7 @@ Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle 
 
 ### B. Entscheidungsfall: Schnittpunkte linearer Funktionen
 - **Kontext:** Eine Freundin schreibt: "Welche Fahrschule soll ich nehmen?"
+- **Identität:** z. B. Themenfarbe Beere, Symbol `fa-car`, Titelbild zwei Fahrschulschilder an einer Straße, Leitobjekt das Fahrschul-Angebot.
 - **Situation:** Fahrschule A: 400 € Grundbetrag und 55 € pro Fahrstunde. Fahrschule B: 250 € und 65 € pro Fahrstunde.
 - **Problem erkennen:** Die SuS probieren verschiedene Stundenzahlen aus und sehen die Kosten beider Schulen; die Antwort kippt irgendwo, aber wo genau?
 - **Problem lösen:** Kosten A: y = 55x + 400, Kosten B: y = 65x + 250, die Terme gleichsetzen, Lückenrechnung.

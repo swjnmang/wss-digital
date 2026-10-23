@@ -2,7 +2,7 @@ import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
 import { CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, SchrittHilfen, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
-import { SeitenLernsituation, type Seite } from '../../lineare_funktionen/lernsituation_kit/seiten'
+import { SeitenLernsituation, type Seite, type Thema } from '../../lineare_funktionen/lernsituation_kit/seiten'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './torbogen.css'
 
@@ -83,6 +83,45 @@ function ProblemText() {
     </>
   )
 }
+
+/* ── Identität: Titelbild, Themenfarbe Kupfer (Metallbau), Leitobjekt Biegemaschine ───── */
+
+/** Titelbild der Startbox: Hofeinfahrt zwischen zwei Hauswänden, Torbogen aus Stahlrohr mit den Maßen aus dem Auftrag */
+function Titelbild() {
+  // Maßstab: 1 m = 46 px, Boden bei y = 212, linker Pfosten bei x = 268
+  const X = (m: number) => 268 + m * 46
+  const Y = (m: number) => 212 - m * 46
+  const bogen = Array.from({ length: 41 }, (_, i) => i / 10).map((m) => `${X(m)},${Y(-0.25 * (m - 2) ** 2 + 3)}`).join(' ')
+  return (
+    <svg viewBox="0 0 720 252" role="img" aria-label="Hofeinfahrt mit einem Torbogen aus Stahlrohr: 4 m breit, Pfosten 2 m hoch, in der Mitte 3 m hoch">
+      <rect x="0" y="212" width="720" height="40" fill="var(--surface-sunken)" />
+      <line x1="0" x2="720" y1="212" y2="212" stroke="var(--ink)" strokeWidth="2" />
+      {/* Hauswände links und rechts */}
+      <rect x="40" y="70" width="200" height="142" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
+      <polygon points="30,72 140,22 250,72" fill="var(--primary)" opacity="0.85" />
+      <rect x="80" y="110" width="44" height="40" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
+      <rect x="160" y="140" width="44" height="72" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
+      <rect x="480" y="90" width="200" height="122" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
+      <polygon points="470,92 580,46 690,92" fill="var(--primary)" opacity="0.85" />
+      <rect x="520" y="126" width="44" height="40" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
+      <rect x="600" y="126" width="44" height="40" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
+      {/* Torbogen */}
+      <rect x={X(0) - 6} y={Y(2)} width="12" height={Y(0) - Y(2)} fill="var(--ink-muted)" stroke="var(--ink)" strokeWidth="2" />
+      <rect x={X(4) - 6} y={Y(2)} width="12" height={Y(0) - Y(2)} fill="var(--ink-muted)" stroke="var(--ink)" strokeWidth="2" />
+      <polyline points={bogen} fill="none" stroke="var(--primary)" strokeWidth="7" strokeLinecap="round" />
+      {/* Maße */}
+      <line x1={X(2)} x2={X(2)} y1={Y(0)} y2={Y(3) + 6} stroke="var(--ink)" strokeWidth="1.5" strokeDasharray="5 4" />
+      <text x={X(2) + 8} y={Y(1.5)} fontSize="17" fontWeight="700" fill="var(--ink)">3 m</text>
+      <text x={X(0) + 12} y={Y(1)} fontSize="17" fontWeight="700" fill="var(--ink)">2 m</text>
+      <line x1={X(0)} x2={X(4)} y1="224" y2="224" stroke="var(--ink)" strokeWidth="1.5" />
+      <line x1={X(0)} x2={X(0)} y1="218" y2="230" stroke="var(--ink)" strokeWidth="1.5" />
+      <line x1={X(4)} x2={X(4)} y1="218" y2="230" stroke="var(--ink)" strokeWidth="1.5" />
+      <text x={X(2)} y="246" textAnchor="middle" fontSize="17" fontWeight="700" fill="var(--ink)">4 m</text>
+    </svg>
+  )
+}
+
+const THEMA: Thema = { name: 'Der Torbogen', farbe: 'kupfer', icon: 'fa-archway', bild: <Titelbild /> }
 
 /* ── Sachbild: Hofeinfahrt mit Torbogen ──────────────────────────────────── */
 
@@ -245,7 +284,7 @@ function Biegemaschine({ auftrag, versuche, onSenden }: { auftrag: ReactNode; ve
       {letzter && (
         <div className={`tb-display ${passt(letzter) ? 'tb-display-ok' : ''}`} role="status">
           <div className="tb-display-head">
-            Versuch {versuche.length}: <M>{gleichungTex(letzter)}</M>
+            <i className="fa-solid fa-gears" aria-hidden="true" /> Biegemaschine, Versuch {versuche.length}: <M>{gleichungTex(letzter)}</M>
           </div>
           <ul>
             {pruefung(letzter).map((p) => (
@@ -851,6 +890,7 @@ export default function TorbogenEinstieg({
       >
         <SeitenLernsituation
           ruhig
+          thema={THEMA}
           ziel={<>In dieser Lernsituation lernst du, wie du die Funktionsgleichung einer Parabel aufstellst, wenn du den Scheitelpunkt und einen weiteren Punkt kennst.</>}
           seiten={seiten}
         />

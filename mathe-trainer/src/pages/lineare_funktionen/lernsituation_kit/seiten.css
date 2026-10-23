@@ -128,3 +128,20 @@
 .sl-ruhig .sl-seite .bk-graph { border-color: var(--line); padding: 4px; }
 .sl-ruhig .sl-fokus { padding: 10px 16px; gap: 2px; }
 .sl-ruhig .ls-back { padding: 0; border: 0; background: none; }
+
+/* ── Identität einer Lernsituation (SeitenLernsituation mit thema) ─────────────────────────────────────
+   Themenfarbe ersetzt --primary nur innerhalb der Lernsituation; Kennung (Symbol + Name) steht links in der Leiste;
+   das Titelbild der Startbox zeigt die Situation. */
+.sl-marke {
+  flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px 0 4px;
+  border-radius: 999px; background: var(--primary-soft); color: var(--primary); font: 800 15px/1.1 var(--font-display);
+}
+.sl-marke i { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 999px; background: var(--primary); color: #fff; font-size: 17px; }
+.sl-marke-name { white-space: nowrap; }
+@media (max-width: 1320px) { .sl-marke-name { display: none; } .sl-marke { padding: 0 4px; } }
+.sl-thema .sl-titel { color: var(--ink); }
+.sl-start.sl-thema { padding-top: 0; overflow: hidden; }
+.sl-start-bild { width: calc(100% + 52px); margin: 0 -26px 4px; background: var(--primary-soft); }
+.sl-start-bild svg { display: block; width: 100%; height: auto; }
+.sl-start.sl-thema h2 { font-size: 28px; color: var(--primary); }
+.sl-ruhig .sl-bar { max-width: 1180px; }
