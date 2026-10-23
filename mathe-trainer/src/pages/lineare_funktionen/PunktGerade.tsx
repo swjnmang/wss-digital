@@ -6,6 +6,7 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber';
 import { useTaskTracking } from '../../hooks/useTaskTracking';
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
+import DrohneEinstieg from './punkt_gerade_einstieg/DrohneEinstieg'
 
 // Sechs Aufgaben auf einer Seite (je zwei pro Aufgabentyp)
 const TOTAL_TASKS = 6;
@@ -803,6 +804,8 @@ export default function PunktGerade() {
   const [streak, setStreak] = useState(0);
   const [finished, setFinished] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
+  // Einstiegs-Lernsituation „Drohnen-Parcours“ als eigener Modus neben den Schwierigkeitsgraden
+  const [lernsituation, setLernsituation] = useState(false);
 
   const solvedCount = Object.values(solved).filter(Boolean).length;
   const allSolved = level !== null && solvedCount === TOTAL_TASKS;
@@ -852,16 +855,49 @@ export default function PunktGerade() {
     </div>
   );
 
+  if (lernsituation) {
+    return (
+      <DrohneEinstieg
+        erklaerung={<Intro />}
+        onBack={() => {
+          setLernsituation(false);
+          window.scrollTo({ top: 0 });
+        }}
+        onPractice={() => {
+          setLernsituation(false);
+          chooseLevel('leicht');
+        }}
+      />
+    );
+  }
+
   if (!level) {
     return (
       <TaskShell title="Punkt auf Gerade prüfen" width="narrow">
         <div className="flex flex-col gap-6">
           {header}
           {intro}
+          <div className={`${panel} flex flex-col`}>
+            <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
+            <button
+              onClick={() => {
+                setLernsituation(true);
+                window.scrollTo({ top: 0 });
+              }}
+              style={{ background: 'var(--primary)' }}
+              className="rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+            >
+              <p className="text-lg font-bold mb-1 text-white">Drohnen-Parcours</p>
+              <p className="text-xl mb-2 text-white">
+                <i className="fa-solid fa-plane-up" aria-hidden="true" />
+              </p>
+              <p className="text-sm text-white/90">
+                Neu beim Thema? Finde heraus, welche Leuchtringe eine Drohne trifft, und lerne dabei die Punktprobe.
+              </p>
+            </button>
+          </div>
           <div className={`${panel} text-center`}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">
-              Wähle deinen Schwierigkeitsgrad
-            </h2>
+            <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
             <div className="flex flex-col gap-4">
               {LEVELS.map((l) => (
                 <button
