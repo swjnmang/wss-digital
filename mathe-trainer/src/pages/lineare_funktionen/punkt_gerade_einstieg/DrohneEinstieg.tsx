@@ -7,11 +7,11 @@ import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './drohne.css'
 
 // Lernsituation „Drohnen-Parcours“ zur Punktprobe: Liegt ein Punkt auf einer Geraden? (45 min)
-// Format Rätsel / Escape-Room (Stationen öffnen den Code für das Hangar-Tor), Look Levelmap mit Code-Schloss, Lernprodukt digitale Merkkarte.
+// Format Rätsel / Escape-Room (Stationen öffnen den Code für das Hangar-Tor), Look Levelmap mit Code-Schloss, Lernprodukt handschriftliche Merkkarte (analog).
 // Instruktionsreihenfolge: Problem zuerst. Die SuS können Wertetabellen und Geraden zeichnen und kennen y = mx + t. Neu ist die rechnerische Punktprobe.
-// Problem erkennen: Auftrag und Festlegung (Ampel je Ring: trifft / trifft nicht / unsicher). Ring C liegt im Graphen scheinbar auf der Flugbahn.
-// Problem lösen: Rechenbeispiel (Ring A), Station 1 (Ring B, geführte Lückenrechnung), Station 2 (Ring C, freies Rechnen, Aha: sieht nah aus, trifft aber nicht), Station 3 (fehlende Koordinate).
-// Festhalten und Prüfen: Rückbezug auf die Ampel, Merke, digitale Merkkarte, drei Checks (Check 1 mit typischen Fehlern als Antwortoptionen).
+// Problem erkennen: Auftrag und Festlegung auf einer Seite (Ampel je Ring: trifft / trifft nicht / unsicher). Ring C liegt nur 0,2 m neben der Flugbahn und ist im Graphen nicht eindeutig.
+// Problem lösen: Rechenbeispiel (Ring A), Station 1 (Ring B, geführte Lückenrechnung), Station 2 (Ring D, freies Rechnen), Station 3 (Ring C, freies Rechnen, Aha: sieht nach Treffer aus, ist aber daneben).
+// Festhalten und Prüfen: Rückbezug auf die Ampel, Merke, handschriftliche Merkkarte, drei Checks (Check 1 mit typischen Fehlern als Antwortoptionen).
 // Die Festlegung bleibt nur im Seitenzustand (kein Speichern).
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
@@ -24,8 +24,8 @@ type Ring = { id: RingId; x: number; y: number }
 const RINGE: Ring[] = [
   { id: 'A', x: 2, y: 3 },
   { id: 'B', x: 5, y: 4.5 },
-  { id: 'C', x: 6, y: 5.5 },
-  { id: 'D', x: 8, y: 6 },
+  { id: 'C', x: 6, y: 5.2 },
+  { id: 'D', x: 8, y: 7 },
 ]
 const trifft = (r: Ring) => Math.abs(bahn(r.x) - r.y) < 1e-9
 const komma = (v: number) => String(v).replace('.', ',')
@@ -40,17 +40,13 @@ const S = { w: 640, h: 330, l: 44, r: 14, t: 12, b: 36, xMin: -0.5, xMax: 13.5, 
 const bx = (x: number) => S.l + ((x - S.xMin) / (S.xMax - S.xMin)) * (S.w - S.l - S.r)
 const by = (y: number) => S.h - S.b - ((y - S.yMin) / (S.yMax - S.yMin)) * (S.h - S.t - S.b)
 
-/** ringe: welche Ringe gezeichnet werden; letzterRing: gestrichelte Höhe 8 m für Ring F; fx: Position von Ring F */
+/** ringe: welche Ringe gezeichnet werden */
 function DrohnenBild({
   ringe = RINGE,
-  letzterRing = false,
-  fx,
   fokus,
   rechenpunkt,
 }: {
   ringe?: Ring[]
-  letzterRing?: boolean
-  fx?: number
   /** Ring der aktuellen Station: hervorgehoben, mit senkrechter Hilfslinie bei seinem x-Wert */
   fokus?: RingId
   /** Ergebnis der Rechnung: der Punkt der Flugbahn bei x (erscheint erst nach dem Lösen) */
@@ -94,20 +90,6 @@ function DrohnenBild({
         <text x={bx(0) + 10} y={by(2) + 20} fontSize="14" fill="var(--ink-muted)">
           Start
         </text>
-        {letzterRing && (
-          <>
-            <line x1={bx(0)} x2={bx(S.xMax)} y1={by(8)} y2={by(8)} stroke="var(--ink-muted)" strokeDasharray="6 5" />
-            <text x={bx(0.3)} y={by(8) - 6} fontSize="15" fontWeight="700" fill="var(--ink)">
-              Ring F hängt in 8 m Höhe
-            </text>
-            {fx !== undefined && (
-              <>
-                <circle cx={bx(fx)} cy={by(8)} r="15" fill="none" stroke="var(--correct)" strokeWidth="3.5" />
-                <circle cx={bx(fx)} cy={by(8)} r="3.5" fill="var(--correct)" />
-              </>
-            )}
-          </>
-        )}
         {f && <line x1={bx(f.x)} x2={bx(f.x)} y1={by(0)} y2={by(bahn(f.x))} stroke="var(--ink-muted)" strokeWidth="2" strokeDasharray="5 4" />}
         {rechenpunkt && (
           <g>
@@ -132,8 +114,8 @@ function DrohnenBild({
 
 /* ── Levelmap und Code-Schloss ───────────────────────────────────────────── */
 
-const STATIONEN = ['Ring B', 'Ring C', 'Ring F']
-const CODE = ['4,5', '5', '12']
+const STATIONEN = ['Ring B', 'Ring D', 'Ring C']
+const CODE = ['4,5', '6', '5']
 
 /** Levelmap mit drei Stationen; die Ziffern des Codes erscheinen, sobald eine Station gelöst ist */
 function Levelmap({ geloest, aktuell, kompakt = false }: { geloest: boolean[]; aktuell?: number; kompakt?: boolean }) {
@@ -185,69 +167,38 @@ function Ampel({ tipps, onTipp }: { tipps: Tipps; onTipp: (id: RingId, t: Tipp) 
   )
 }
 
-/* ── Digitale Merkkarte (Lernprodukt) ────────────────────────────────────── */
+/* ── Merkkarte (Lernprodukt, handschriftlich): erst wenn alle Kriterien abgehakt sind, geht es weiter ── */
 
-type KartenFeld = 's1' | 's2' | 's3' | 'bsp' | 'fehler'
-const KARTE_FELDER: { key: KartenFeld; label: ReactNode; platzhalter: string }[] = [
-  { key: 's1', label: 'Schritt 1', platzhalter: 'Was machst du zuerst?' },
-  { key: 's2', label: 'Schritt 2', platzhalter: 'Was rechnest du dann?' },
-  { key: 's3', label: 'Schritt 3', platzhalter: 'Womit vergleichst du, und was heißt das Ergebnis?' },
-  { key: 'bsp', label: 'Eigenes Beispiel mit anderen Zahlen', platzhalter: 'z. B. Gerade, Punkt und Rechnung' },
-  { key: 'fehler', label: 'Typischer Fehler, auf den du achten musst', platzhalter: 'Wo passieren die meisten Fehler?' },
-]
-
-function Merkkarte({ werte, setWerte, onFertig }: { werte: Record<KartenFeld, string>; setWerte: (w: Record<KartenFeld, string>) => void; onFertig: () => void }) {
-  const fertig = KARTE_FELDER.every((f) => werte[f.key].trim().length >= 8)
-  const aendern = (key: KartenFeld, v: string) => {
-    const neu = { ...werte, [key]: v }
-    setWerte(neu)
-    if (KARTE_FELDER.every((f) => neu[f.key].trim().length >= 8)) onFertig()
-  }
+function MerkkarteHeft({ onFertig }: { onFertig: () => void }) {
+  const KRITERIEN = [
+    'Die drei Schritte der Punktprobe in der richtigen Reihenfolge, jeder mit einem kurzen Merksatz',
+    'Ein eigenes Beispiel mit anderer Geraden und anderem Punkt, vollständig vorgerechnet',
+    'Eine Warnung vor einem typischen Fehler (z. B. x und y vertauschen oder Vorzeichen)',
+    'Eine kleine Skizze: Gerade mit einem Punkt, der darauf liegt, und einem, der nicht darauf liegt',
+  ]
+  const [haken, setHaken] = useState<boolean[]>(KRITERIEN.map(() => false))
   return (
-    <ZweiSpalten
-      links={
     <div className="lp-ex bk-panel">
-      <p>Baue deine Merkkarte in eigenen Worten (danach auch ins Heft).</p>
-      <div className="dr-karte-form">
-        {KARTE_FELDER.map((f) => (
-          <label key={f.key}>
-            {f.label}
-            <textarea
-              rows={1}
-              className="bk-input"
-              placeholder={f.platzhalter}
-              value={werte[f.key]}
-              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => aendern(f.key, e.target.value)}
-            />
+      <p>
+        Gestalte in deinem Heft eine Karteikarte „Punktprobe“. Sie darf genau eine Karteikarte füllen. Hake ab, was du schon hast:
+      </p>
+      <div className="ls-criteria">
+        {KRITERIEN.map((c, i) => (
+          <label key={i}>
+            <input
+              type="checkbox"
+              checked={haken[i]}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const neu = haken.map((v, j) => (j === i ? e.target.checked : v))
+                setHaken(neu)
+                if (neu.every(Boolean)) onFertig()
+              }}
+            />{' '}
+            <span>{c}</span>
           </label>
         ))}
       </div>
     </div>
-      }
-      rechts={
-      <>
-      {fertig && (
-        <div className="dr-karte">
-          <h4 className="dr-karte-title">
-            <i className="fa-solid fa-id-card" aria-hidden="true" /> Meine Merkkarte: Punktprobe
-          </h4>
-          <ol>
-            <li>{werte.s1}</li>
-            <li>{werte.s2}</li>
-            <li>{werte.s3}</li>
-          </ol>
-          <p>
-            <strong>Beispiel:</strong> {werte.bsp}
-          </p>
-          <p>
-            <strong>Achtung:</strong> {werte.fehler}
-          </p>
-        </div>
-      )}
-      {!fertig && <p className="dr-hinweis">Kriterien: drei Schritte in der richtigen Reihenfolge, ein eigenes Beispiel, eine Warnung vor einem typischen Fehler. Hier erscheint deine fertige Karte.</p>}
-      </>
-      }
-    />
   )
 }
 
@@ -256,9 +207,7 @@ function Merkkarte({ werte, setWerte, onFertig }: { werte: Record<KartenFeld, st
 export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erklaerung: ReactNode; onBack: () => void; onPractice: () => void }) {
   const [tipps, setTipps] = useState<Tipps>({})
   const [geloest, setGeloest] = useState<boolean[]>([false, false, false])
-  const [karte, setKarte] = useState<Record<KartenFeld, string>>({ s1: '', s2: '', s3: '', bsp: '', fehler: '' })
   const markiere = (i: number) => () => setGeloest((g) => (g[i] ? g : g.map((v, j) => (j === i ? true : v))))
-  const alleGetippt = RINGE.every((r) => tipps[r.id])
 
   const seiten: Seite[] = [
     {
@@ -287,6 +236,7 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
       titel: 'Aufwärmen 2: x einsetzen',
       inhalt: (fertig) => (
         <CheckCard
+          rechnen={false}
           onSolved={fertig}
           title="b) x einsetzen"
           prompt={
@@ -304,6 +254,7 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
       titel: 'Aufwärmen 3: negative Zahl einsetzen',
       inhalt: (fertig) => (
         <CheckCard
+          rechnen={false}
           onSolved={fertig}
           title="c) negatives x einsetzen"
           prompt={
@@ -332,39 +283,21 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
     {
       art: 'problem',
       titel: 'Der Auftrag: Drohnen-Show',
-      frei: true,
-      inhalt: () => (
+      bedingung: 'Lege dich für alle vier Ringe fest, dann geht es weiter.',
+      inhalt: (fertig) => (
         <ZweiSpalten
           links={
-            <>
+            <div className="dr-links">
               <div className="dr-story">
                 <p>
-                  Lichtshow fürs Schulfest: Eine Drohne fliegt <strong>geradlinig</strong> durch vier Leuchtringe. Flugbahn: <M>{'y = 0{,}5x + 2'}</M> (<M>x</M> Entfernung, <M>y</M> Höhe in m).
-                </p>
-                <p>
-                  Ein Treffer zählt nur, wenn sie <strong>genau durch die Ringmitte</strong> fliegt. Der Hangar öffnet sich mit einem Code aus drei Stationen.
+                  Lichtshow fürs Schulfest: Eine Drohne fliegt <strong>geradlinig</strong> auf <M>{'y = 0{,}5x + 2'}</M> (<M>x</M> Entfernung, <M>y</M> Höhe in m) durch vier Leuchtringe. Ein Treffer zählt
+                  nur durch die <strong>Ringmitte</strong>.
                 </p>
               </div>
               <div className="ls-question">
                 <i className="fa-solid fa-lightbulb" aria-hidden="true" />
-                <span>Welche Ringe trifft die Drohne, und wo muss Ring F (8 m hoch) hängen?</span>
+                <span>Welche Ringe trifft die Drohne? Lege dich fest.</span>
               </div>
-            </>
-          }
-          rechts={<DrohnenBild />}
-        />
-      ),
-    },
-    {
-      art: 'problem',
-      titel: 'Deine Vermutung: Trifft die Drohne?',
-      bedingung: 'Lege dich für alle vier Ringe fest, dann geht es weiter.',
-      inhalt: (fertig) => (
-        <ZweiSpalten
-          links={<DrohnenBild />}
-          rechts={
-            <div className="lp-ex bk-panel">
-              <p>Schau dir den Graphen an. Was meinst du: Fliegt die Drohne durch die Mitte des Rings? „Unsicher“ ist erlaubt.</p>
               <Ampel
                 tipps={tipps}
                 onTipp={(id, t) => {
@@ -373,9 +306,9 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
                   if (RINGE.every((r) => neu[r.id])) fertig()
                 }}
               />
-              {alleGetippt && <p className="dr-hinweis">Gespeichert. Am Ende vergleichst du mit der Rechnung.</p>}
             </div>
           }
+          rechts={<DrohnenBild />}
         />
       ),
     },
@@ -423,6 +356,7 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
           <div className="dr-zwei">
           <div>
           <CheckCard
+            rechnen={false}
             onSolved={() => {
               markiere(0)()
               fertig()
@@ -432,7 +366,7 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
             level="basis"
             prompt={
               <p>
-                Trifft die Drohne <M>{'B(5 \\mid 4{,}5)'}</M>?
+                Flugbahn: <M>{'y = 0{,}5x + 2'}</M>. Trifft die Drohne <M>{'B(5 \\mid 4{,}5)'}</M>?
               </p>
             }
             rechnung={[
@@ -466,107 +400,97 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
     },
     {
       art: 'loesen',
-      titel: 'Station 2: Ring C',
+      titel: 'Station 2: Ring D',
       inhalt: (fertig) => (
         <div className="dr-stat">
           <div className="dr-zwei">
-          <div>
-          <CheckCard
-            onSolved={() => {
-              markiere(1)()
-              fertig()
-            }}
-            title="Station 2: Ring C"
-            fieldsRow
-            level="standard"
-            prompt={
-              <p>
-                Trifft die Drohne die Mitte von <M>{'C(6 \\mid 5{,}5)'}</M>? Berechne selbst die Höhe der Flugbahn bei <M>{'x = 6'}</M> und entscheide.
-              </p>
-            }
-            fields={[
-              { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 5 },
-              { kind: 'select', key: 'e', label: <>Die Drohne …</>, options: ['trifft Ring C', 'trifft C nicht'], expected: 1 },
-            ]}
-            solution={<MB>{'y = 0{,}5 \\cdot 6 + 2 = 3 + 2 = 5 \\quad \\Rightarrow \\quad 5 \\neq 5{,}5 \\text{ (kein Treffer)}'}</MB>}
-            help={
-              <SchrittHilfen
-                schritte={[
-                  { kurz: '①', titel: 'x einsetzen', hilfe: <>Die x-Koordinate von <M>{'C(6 \\mid 5{,}5)'}</M> ist 6. Sie kommt für <M>x</M> in die Flugbahn.</> },
-                  { kurz: '②', titel: 'ausrechnen', hilfe: <><M>{'0{,}5 \\cdot 6'}</M> ist die Hälfte von 6. Dann noch <M>{'+2'}</M> rechnen.</> },
-                  { kurz: '③', titel: 'vergleichen', hilfe: <>Die Flugbahn liegt bei 6 m Entfernung auf einer anderen Höhe als der Ringmittelpunkt. Sind 5 und 5,5 gleich?</> },
+            <div>
+              <CheckCard
+                onSolved={() => {
+                  markiere(1)()
+                  fertig()
+                }}
+                title="Station 2: Ring D"
+                fieldsRow
+                rechnen={false}
+                level="standard"
+                prompt={
+                  <p>
+                    Flugbahn: <M>{'y = 0{,}5x + 2'}</M>. Trifft die Drohne die Mitte von <M>{'D(8 \\mid 7)'}</M>? Berechne selbst die Höhe der Flugbahn bei <M>{'x = 8'}</M> und entscheide.
+                  </p>
+                }
+                fields={[
+                  { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 6 },
+                  { kind: 'select', key: 'e', label: <>Die Drohne …</>, options: ['trifft Ring D', 'trifft D nicht'], expected: 1 },
                 ]}
+                solution={<MB>{'y = 0{,}5 \\cdot 8 + 2 = 4 + 2 = 6 \\quad \\Rightarrow \\quad 6 \\neq 7 \\text{ (kein Treffer)}'}</MB>}
+                help={
+                  <SchrittHilfen
+                    schritte={[
+                      { kurz: '①', titel: 'x einsetzen', hilfe: <>Die x-Koordinate von <M>{'D(8 \\mid 7)'}</M> ist 8. Sie kommt für <M>x</M> in die Flugbahn.</> },
+                      { kurz: '②', titel: 'ausrechnen', hilfe: <><M>{'0{,}5 \\cdot 8'}</M> ist die Hälfte von 8. Dann noch <M>{'+2'}</M> rechnen.</> },
+                      { kurz: '③', titel: 'vergleichen', hilfe: <>Vergleiche das Ergebnis mit der y-Koordinate 7 des Rings. Sind die Werte gleich?</> },
+                    ]}
+                  />
+                }
               />
-            }
-          />
-          </div>
-          <div>
-          <Levelmap geloest={geloest} aktuell={1} kompakt />
-          <DrohnenBild fokus="C" rechenpunkt={geloest[1] ? { x: 6, y: 5 } : undefined} />
-          {geloest[1] && (
-            <div className="ls-question">
-              <i className="fa-solid fa-bolt" aria-hidden="true" />
-              <span>
-                Aha: Ring C sah wie ein Treffer aus, ist aber 0,5 m daneben.
-              </span>
             </div>
-          )}
-          </div>
+            <div>
+              <Levelmap geloest={geloest} aktuell={1} kompakt />
+              <DrohnenBild fokus="D" rechenpunkt={geloest[1] ? { x: 8, y: 6 } : undefined} />
+            </div>
           </div>
         </div>
       ),
     },
     {
       art: 'loesen',
-      titel: 'Station 3: Wo hängt Ring F?',
+      titel: 'Station 3: Ring C',
       inhalt: (fertig) => (
         <div className="dr-stat">
           <div className="dr-zwei">
-          <div>
-          <CheckCard
-            onSolved={() => {
-              markiere(2)()
-              fertig()
-            }}
-            title="Station 3: Ring F"
-            level="erweiterung"
-            prompt={
-              <p>
-                Bei welchem <M>x</M> hängt <M>{'F(x \\mid 8)'}</M>, damit die Drohne trifft?</p>
-            }
-            rechnung={[
-              { l: ['8'], r: ['0{,}5x + 2'], u: '\\mid -2' },
-              { l: [{ luecke: 'a' }], r: ['0{,}5x'], u: '\\mid :0{,}5' },
-              { l: ['x'], r: [{ luecke: 'b' }] },
-            ]}
-            fields={[
-              { kind: 'num', key: 'a', label: 'Zahl links', expected: 6 },
-              { kind: 'num', key: 'b', label: 'Entfernung x', expected: 12 },
-            ]}
-            solution={<MB>{'\\begin{aligned} 8 &= 0{,}5x + 2 && \\mid -2 \\\\ 6 &= 0{,}5x && \\mid :0{,}5 \\\\ x &= 12 \\end{aligned}'}</MB>}
-            help={
-              <SchrittHilfen
-                schritte={[
-                  { kurz: '①', titel: 'y einsetzen', hilfe: <>Diesmal ist <M>y = 8</M> bekannt und <M>x</M> gesucht. Die 8 steht links, <M>x</M> bleibt als Buchstabe stehen.</> },
-                  { kurz: '②', titel: '−2 rechnen', hilfe: <>Ziehe auf beiden Seiten 2 ab: <M>{'8 - 2'}</M> ergibt die Zahl links.</> },
-                  { kurz: '③', titel: 'durch 0,5 teilen', hilfe: <>Durch 0,5 teilen ist dasselbe wie mal 2 rechnen.</> },
+            <div>
+              <CheckCard
+                onSolved={() => {
+                  markiere(2)()
+                  fertig()
+                }}
+                title="Station 3: Ring C"
+                fieldsRow
+                rechnen={false}
+                level="erweiterung"
+                prompt={
+                  <p>
+                    Flugbahn: <M>{'y = 0{,}5x + 2'}</M>. Bei <M>{'C(6 \\mid 5{,}2)'}</M> ist es knapp. Trifft die Drohne die Ringmitte? Wie viele Meter daneben?
+                  </p>
+                }
+                fields={[
+                  { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 5 },
+                  { kind: 'select', key: 'e', label: <>Die Drohne …</>, options: ['trifft Ring C', 'trifft C nicht'], expected: 1 },
+                  { kind: 'num', key: 'd', label: 'Abstand', expected: 0.2, unit: 'm' },
                 ]}
+                solution={<MB>{'y = 0{,}5 \\cdot 6 + 2 = 3 + 2 = 5 \\quad \\Rightarrow \\quad 5 \\neq 5{,}2 \\text{ (kein Treffer, } 0{,}2\\,\\text{m daneben)}'}</MB>}
+                help={
+                  <SchrittHilfen
+                    schritte={[
+                      { kurz: '①', titel: 'x einsetzen', hilfe: <>Die x-Koordinate von <M>{'C(6 \\mid 5{,}2)'}</M> ist 6. Sie kommt für <M>x</M> in die Flugbahn.</> },
+                      { kurz: '②', titel: 'ausrechnen', hilfe: <><M>{'0{,}5 \\cdot 6'}</M> ist die Hälfte von 6. Dann noch <M>{'+2'}</M> rechnen.</> },
+                      { kurz: '③', titel: 'Abstand', hilfe: <>Der Abstand ist der Unterschied zwischen berechneter Höhe und y-Koordinate des Rings: <M>{'5{,}2 - 5'}</M>.</> },
+                    ]}
+                  />
+                }
               />
-            }
-          />
-          </div>
-          <div>
-          <Levelmap geloest={geloest} aktuell={2} kompakt />
-          <DrohnenBild letzterRing fx={geloest[2] ? 12 : undefined} />
-          {geloest[2] && (
-            <>
-              <div className="ls-question">
-                <i className="fa-solid fa-lock-open" aria-hidden="true" />
-                <span>Code geknackt: 4,5 – 5 – 12. Das Hangar-Tor öffnet sich, und die Show kann starten.</span>
-              </div>
-            </>
-          )}
-          </div>
+            </div>
+            <div>
+              <Levelmap geloest={geloest} aktuell={2} kompakt />
+              <DrohnenBild fokus="C" rechenpunkt={geloest[2] ? { x: 6, y: 5 } : undefined} />
+              {geloest[2] && (
+                <div className="ls-question">
+                  <i className="fa-solid fa-lock-open" aria-hidden="true" />
+                  <span>Aha: C sah nach Treffer aus, ist aber 0,2 m daneben. Code 4,5 – 6 – 5: Das Tor öffnet sich.</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ),
@@ -599,8 +523,8 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
     {
       art: 'sichern',
       titel: 'Deine Merkkarte (Lernprodukt)',
-      bedingung: 'Fülle alle fünf Felder aus.',
-      inhalt: (fertig) => <Merkkarte werte={karte} setWerte={setKarte} onFertig={fertig} />,
+      bedingung: 'Hake alle vier Punkte ab, sobald sie auf deiner Merkkarte stehen.',
+      inhalt: (fertig) => <MerkkarteHeft onFertig={fertig} />,
     },
     {
       art: 'sichern',
@@ -611,7 +535,6 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
           onSolved={fertig}
           title="Check 1"
           level="standard"
-          rechnen
           prompt={
             <p>
               Liegt <M>{'P(-2 \\mid 7)'}</M> auf der Geraden <M>{'y = -2x + 3'}</M>? Rechne im Heft und wähle dann.
@@ -631,6 +554,7 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
       titel: 'Check 2: Punktprobe selbst rechnen',
       inhalt: (fertig) => (
         <TrackedCheck
+          rechnen={false}
           topic="Punkt auf Gerade prüfen (Lernsituation)"
           onSolved={fertig}
           title="Check 2"
@@ -663,6 +587,7 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
       titel: 'Check 3: Zweite Drohne',
       inhalt: (fertig) => (
         <TrackedCheck
+          rechnen={false}
           topic="Punkt auf Gerade prüfen (Lernsituation)"
           onSolved={fertig}
           title="Check 3"
