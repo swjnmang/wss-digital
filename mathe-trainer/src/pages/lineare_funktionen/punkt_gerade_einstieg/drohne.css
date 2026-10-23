@@ -59,3 +59,4 @@
 .dr-zwei > div > .dr-map { margin-bottom: 8px; }
 .dr-links { display: flex; flex-direction: column; gap: 12px; }
 .dr-links > * { margin: 0; }
+@media (min-width: 900px) { .dr-zwei.dr-zwei-gleich { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); } }
