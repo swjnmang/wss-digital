@@ -248,9 +248,9 @@ export function Beispiel({
   offen = false,
   ab = 1,
 }: {
-  title: string
+  title: ReactNode
   aufgabe: ReactNode
-  steps: { title: string; body: ReactNode }[]
+  steps: { title: ReactNode; body: ReactNode }[]
   offen?: boolean
   /** Nummer des ersten Schritts, wenn ein Beispiel auf mehrere Seiten verteilt ist */
   ab?: number
