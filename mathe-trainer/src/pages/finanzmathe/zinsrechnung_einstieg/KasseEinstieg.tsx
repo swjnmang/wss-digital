@@ -456,34 +456,11 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
           onSolved={fertig}
           title="Kapital berechnen"
           level="standard"
-          prompt={<p>Berechnet das nötige Kapital. Wie viel muss dann jede der 24 Personen einzahlen?</p>}
-          rechnung={[
-            { l: ['K'], r: ['\\frac{72 \\cdot 100 \\cdot 360}{3 \\cdot 180} =', { luecke: 'k', breit: true }, '\\text{ €}'] },
-            { l: ['\\text{pro Person}'], r: ['K : 24 =', { luecke: 'pp' }, '\\text{ €}'] },
-          ]}
+          prompt={<p>Berechnet in eurem Heft, wie viel Geld in der Kasse liegen muss, damit es bis zum 01.08. genau 72 € Zinsen gibt, und wie viel dann jede der 24 Personen einzahlen muss. Tragt eure Ergebnisse ein und prüft sie.</p>}
           fields={[
-            { kind: 'num', key: 'k', label: 'Kapital', expected: K_NOETIG },
-            { kind: 'num', key: 'pp', label: 'pro Person', expected: K_NOETIG / 24 },
+            { kind: 'num', key: 'k', label: 'Nötiges Kapital:', expected: K_NOETIG, unit: '€' },
+            { kind: 'num', key: 'pp', label: 'Pro Person:', expected: K_NOETIG / 24, unit: '€' },
           ]}
-          solution={
-            <>
-              <MB>{'K = \\frac{72 \\cdot 100 \\cdot 360}{3 \\cdot 180} = \\frac{2\\,592\\,000}{540} = 4\\,800 \\qquad 4\\,800 \\text{ €} : 24 = 200 \\text{ €}'}</MB>
-              <p>
-                Probe: <M>{'\\frac{4\\,800 \\cdot 3 \\cdot 180}{36\\,000} = 72'}</M> ✓
-              </p>
-            </>
-          }
-          help={
-            <Hilfen
-              steps={[
-                <>Gesucht ist das Kapital. Ihr kennt Z = 72 €, p = 3 und t = 180.</>,
-                <>Nehmt die Formel für K aus dem Beispiel: oben Z · 100 · 360, unten p · t. Danach teilt ihr das Kapital durch 24.</>,
-                <>
-                  Oben: <M>{'72 \\cdot 100 \\cdot 360 = 2\\,592\\,000'}</M>, unten: <M>{'3 \\cdot 180 = 540'}</M>. Jetzt teilen.
-                </>,
-              ]}
-            />
-          }
         />
       ),
     },
@@ -506,28 +483,10 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
           onSolved={fertig}
           title="Zinssatz berechnen"
           level="standard"
-          prompt={<p>Stellt die Formel nach p um, setzt ein und rechnet aus.</p>}
-          rechnung={[{ l: ['p'], r: ['\\frac{84 \\cdot 100 \\cdot 360}{4\\,800 \\cdot 180} =', { luecke: 'p' }] }]}
+          prompt={<p>Berechnet in eurem Heft den Zinssatz, den Noahs Bank zahlt. Tragt euer Ergebnis ein und prüft es.</p>}
           fields={[
-            { kind: 'num', key: 'p', label: 'Zinssatz in % p.a.', expected: 3.5 },
+            { kind: 'num', key: 'p', label: 'Zinssatz:', expected: 3.5, unit: '% p.a.' },
           ]}
-          solution={
-            <>
-              <MB>{'p = \\frac{84 \\cdot 100 \\cdot 360}{4\\,800 \\cdot 180} = \\frac{3\\,024\\,000}{864\\,000} = 3{,}5'}</MB>
-              <p>Die andere Bank zahlt 3,5 % p.a.</p>
-            </>
-          }
-          help={
-            <Hilfen
-              steps={[
-                <>Gesucht ist der Zinssatz. Ihr kennt K = 4.800 €, t = 180 und Z = 84 €.</>,
-                <>Nehmt die Formel für p: oben Z · 100 · 360, unten K · t.</>,
-                <>
-                  Oben: <M>{'84 \\cdot 100 \\cdot 360 = 3\\,024\\,000'}</M>, unten: <M>{'4\\,800 \\cdot 180 = 864\\,000'}</M>.
-                </>,
-              ]}
-            />
-          }
         />
       ),
     },
@@ -550,29 +509,11 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
           onSolved={fertig}
           title="Zinstage berechnen"
           level="standard"
-          prompt={<p>Berechnet die Zinstage und vergleicht mit den 180 Tagen bis zum 01.08.</p>}
-          rechnung={[{ l: ['t'], r: ['\\frac{72 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 3} =', { luecke: 't' }, '\\text{ Tage}'] }]}
+          prompt={<p>Berechnet in eurem Heft, wie viele Tage die 3.600 € bei 3 % p.a. liegen müssten, bis 72 € Zinsen zusammen sind. Tragt euer Ergebnis ein und entscheidet, ob die Zeit bis zum 01.08. reicht.</p>}
           fields={[
-            { kind: 'num', key: 't', label: 'Zinstage', expected: 240 },
+            { kind: 'num', key: 't', label: 'Zinstage:', expected: 240, unit: 'Tage' },
             { kind: 'select', key: 'r', label: 'Reicht die Zeit bis zum 01.08.?', options: ['Ja, 180 Tage genügen', 'Nein, 180 Tage sind zu wenig'], expected: 1 },
           ]}
-          solution={
-            <>
-              <MB>{'t = \\frac{72 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 3} = \\frac{2\\,592\\,000}{10\\,800} = 240'}</MB>
-              <p>Das Geld müsste 240 Tage liegen, bis zum 01.08. sind es aber nur 180 Tage.</p>
-            </>
-          }
-          help={
-            <Hilfen
-              steps={[
-                <>Gesucht sind die Zinstage. Ihr kennt K = 3.600 €, p = 3 und Z = 72 €.</>,
-                <>Nehmt die Formel für t: oben Z · 100 · 360, unten K · p.</>,
-                <>
-                  Oben: <M>{'2\\,592\\,000'}</M>, unten: <M>{'3\\,600 \\cdot 3 = 10\\,800'}</M>. Vergleicht das Ergebnis mit 180.
-                </>,
-              ]}
-            />
-          }
         />
       ),
     },
