@@ -300,6 +300,7 @@ export default function App() {
           <Route path="/finanzmathe/zinseszins" element={<ZinseszinsMenu />} />
           <Route path="/finanzmathe/zinseszins/ueben" element={<Zinseszins />} />
           <Route path="/finanzmathe/zinseszins/lernsituation" element={<ZinseszinsLernsituation />} />
+          <Route path="/finanzmathe/zinseszins/lernsituation-2" element={<ZinseszinsLernsituation teil={2} />} />
           <Route path="/finanzmathe/zinseszins-lernsituation" element={<Navigate to="/finanzmathe/zinseszins/lernsituation" replace />} />
           <Route path="/finanzmathe/mehrung_minderung" element={<MehrungMinderung />} />
           <Route path="/finanzmathe/endwert" element={<Endwert />} />

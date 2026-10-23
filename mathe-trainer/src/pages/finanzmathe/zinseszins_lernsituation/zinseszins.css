@@ -1,0 +1,11 @@
+/* Zinseszins-Lernsituationen im ruhigen Grunddesign. Farben kommen über --primary aus dem Thema. */
+
+.zz-wachstum { display: flex; flex-direction: column; gap: 10px; }
+.zz-legende { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 16px; }
+.zz-legende i { display: inline-block; width: 28px; height: 0; vertical-align: middle; margin-right: 6px; }
+.zz-linie-mira { border-top: 5px solid var(--primary); }
+.zz-linie-jonas { border-top: 4px dashed var(--ink-muted); }
+
+/* Formel-Leiste: die gesuchte Größe ist markiert */
+.zz-formel { font-size: 26px; text-align: center; padding: 6px 0; }
+.zz-formel .katex-display { margin: 0; }
