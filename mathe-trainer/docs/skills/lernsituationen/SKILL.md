@@ -155,7 +155,7 @@ Für beide Varianten gilt:
 - **KaTeX für alles Mathematische**, auch im Fließtext, in Titeln, Hilfen und Rückmeldungen: Punkte `S(2 \mid 3)`, Variablen `a`, Gleichungen, Zahlen mit Rechenzeichen. Keine Formeln als Klartext ("x²", "(2|3)", "x_S"). Dezimalkomma als `0{,}25`, echtes Minus.
 - **Funktionsschreibweise:** Funktionsgleichungen immer mit `y = …`, nicht `f(x) = …`. Bei mehreren Funktionen steht der Name im Text davor ("Gerade 1: y = …", "Sprungbahn: y = …"). Funktionswerte als "x einsetzen": "x = 4: y = −0,25 · 4² + 4 + 2 = 2" statt f(4). In Feldern "y =", in Tabellenköpfen "y". Gleichsetzen heißt "die Terme gleichsetzen".
 - **Scheitelform** als `y = a(x − x_S)² + y_S` (nicht mit d und e).
-- **Rechnen im Heft:** Alles, was gerechnet wird, rechnen die SuS von Hand im Heft, das Tablet dient zur Kontrolle. `CheckCard` zeigt den Heft-Hinweis automatisch (`rechnen={false}` bei Ablesen, Ordnen, Auswählen). Keine zusätzlichen Sätze "Halte deinen Rechenweg schriftlich fest".
+- **Rechnen im Heft:** Alles, was gerechnet wird, rechnen die SuS von Hand im Heft, das Tablet dient zur Kontrolle. Das bestätigen sie **einmal** in der Startbox. Deshalb steht an den einzelnen Aufgaben **kein** Heft-Hinweis ("Im Heft: Rechenweg und Ergebnis aufschreiben …"): `SeitenLernsituation` blendet ihn über `HeftBestaetigtCtx` automatisch aus. Schreibe auch keine eigenen Sätze wie "Halte deinen Rechenweg schriftlich fest" oder "Rechne im Heft" in die Aufgaben.
 - **Lücken direkt in der Gleichung:** Werte, die die SuS in eine Gleichung einsetzen oder ergänzen, tragen sie im Kästchen **in der Gleichung** ein, nicht in einem Feld daneben oder darunter (kein `\square` mit Feld daneben). Dafür `CheckCard` mit `rechnung`: Zeilen `{ l: [...], r: [...], u?: '\\mid -3' }` aus TeX-Stücken und Lücken `{ luecke: 'feldKey' }`.
 - **Eine Zeile pro Zwischenergebnis:** Bei mehrschrittigen Rechnungen bekommt jedes wichtige Zwischenergebnis eine eigene Zeile, damit die SuS die Struktur sehen. Beispiel: Vor der Scheitelform steht `a = [ ]` ("Formfaktor a"), damit klar ist, dass zuerst a berechnet wird. Die Zeilen sind am rechten Rand kurz benannt (① S einsetzen, ② P einsetzen, Formfaktor a, ③ Scheitelform, ④ allg. Form), Umformungen als `| −3  | :4`.
 - **Live-Rückmeldung bei Graphen:** Geben SuS eine Gleichung oder einen Wert ein, wird das Ergebnis beim Absenden sofort in die Skizze gezeichnet (frühere Versuche blass, aktueller kräftig in Themenfarbe, Treffer grün).
@@ -312,7 +312,7 @@ Anforderungen an einen guten Kontext:
 - **Konventionen von `mathe-aufgaben` gelten:** KaTeX, Merkhilfe der Wirtschaftsschule Bayern für Formeln und Abkürzungen, nachvollziehbare Rechenwege, Eingabefelder mit grün/rot und Lob, automatische Prüfung (Button "Prüfen").
 - **Bausteine aus `mathe-trainer/src/pages/lineare_funktionen/lernsituation_kit/`:**
   - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Optionen `ruhig` und `thema`), `LernsituationKarte` (Karte für die Auswahlseite), `THEMEN`, Typ `Thema`, Typ `Seite = { art, titel, frei?, bedingung?, inhalt: (fertig) => … }`
-  - `kit.tsx`: `CheckCard` (mit `rechnung`, `fields`, `solution`, `help`, `onSolved`), `McCard` (`onSolved`, `rechnen`), `TrackedCheck`/`TrackedMc` (für Bereiche mit Nachverfolgung), `SchrittHilfen`, `Hilfen`, `HeftHinweis`
+  - `kit.tsx`: `CheckCard` (mit `rechnung`, `fields`, `solution`, `help`, `onSolved`), `McCard` (`onSolved`), `TrackedCheck`/`TrackedMc` (für Bereiche mit Nachverfolgung), `SchrittHilfen`, `Hilfen` (`HeftHinweis` wird in der Seitenansicht nicht angezeigt)
   - `phasen.tsx`: `PHASEN` (Namen und Reihenfolge der vier Phasen)
   - `Beispiel` aus `daten_und_zufall/lernpfad/kit.tsx` für Rechenbeispiele (`offen` zeigt alle Schritte, `ab` setzt die Schrittnummerierung fort)
   - `TaskShell` mit `kompakt`
@@ -333,6 +333,7 @@ Anforderungen an einen guten Kontext:
 - [ ] In "Problem erkennen" ist klar, dass es ums Ausprobieren geht; Auftrag und Ausprobieren stehen auf einer Seite; die SuS merken, dass ihr Vorwissen nicht sicher reicht.
 - [ ] "Problem erkennen" zeigt Situation, Problem (gegeben/gesucht als Fließtext) und den Auftrag als einzigen Fokus.
 - [ ] "Problem lösen" beginnt mit einem klaren Arbeitsauftrag (gegeben, gesucht, Form des Ergebnisses), ohne Nebenaufgaben davor; erst danach kommt das Rechenbeispiel. Kein Beispiel vor dem Problem.
+- [ ] Kein Heft-Hinweis und kein "Schreibe … ins Heft" an den Aufgaben (die Bestätigung in der Startbox genügt).
 - [ ] Alles Mathematische ist mit KaTeX gesetzt, auch im Fließtext; keine `.katex-error`.
 - [ ] Funktionsgleichungen mit `y = …`, Funktionswerte als "x einsetzen", Scheitelform `y = a(x − x_S)² + y_S`.
 - [ ] Lücken stehen direkt in der Gleichung; jedes Zwischenergebnis hat eine eigene Zeile (z. B. `a = [ ]`).

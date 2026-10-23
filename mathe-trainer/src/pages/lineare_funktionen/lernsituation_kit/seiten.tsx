@@ -1,4 +1,5 @@
 import { useEffect, useState, type CSSProperties, type ChangeEvent, type ReactNode } from 'react'
+import { HeftBestaetigtCtx } from './kit'
 import { PHASEN, type PhaseArt } from './phasen'
 import './phasen.css'
 import './seiten.css'
@@ -117,6 +118,7 @@ export function SeitenLernsituation({ ziel, seiten, ruhig = false, thema }: { zi
           </button>
         )}
       </div>
+      <HeftBestaetigtCtx.Provider value={true}>
       {seiten.map((s, i) => (
         <section key={i} hidden={i !== nr} className={`sl-seite et-${s.art}`}>
           <div className="sl-kopf">
@@ -129,6 +131,7 @@ export function SeitenLernsituation({ ziel, seiten, ruhig = false, thema }: { zi
           {s.inhalt(fertig(i))}
         </section>
       ))}
+      </HeftBestaetigtCtx.Provider>
     </div>
   )
 }

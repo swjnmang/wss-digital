@@ -53,8 +53,14 @@ export function Arbeitsweise() {
   )
 }
 
-/** Hinweis an einer Rechenaufgabe: erst im Heft rechnen, dann eintragen */
+/** true, sobald die SuS in der Startbox bestätigt haben, alle Rechenschritte im Heft festzuhalten (SeitenLernsituation).
+ *  Dann entfällt der Heft-Hinweis an den einzelnen Aufgaben. */
+export const HeftBestaetigtCtx = createContext(false)
+
+/** Hinweis an einer Rechenaufgabe: erst im Heft rechnen, dann eintragen (entfällt nach der Bestätigung in der Startbox) */
 export function HeftHinweis({ children }: { children?: ReactNode }) {
+  const bestaetigt = useContext(HeftBestaetigtCtx)
+  if (bestaetigt) return null
   return (
     <p className="ls-heft">
       <i className="fa-solid fa-pen" aria-hidden="true" />
