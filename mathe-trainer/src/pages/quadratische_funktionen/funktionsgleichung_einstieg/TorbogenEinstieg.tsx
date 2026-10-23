@@ -25,7 +25,7 @@ import './werkstatt.css'
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
-// Hofeinfahrt 4 m breit, Pfosten 2 m hoch bei x = 0 und x = 4, höchster Punkt des Bogens 3 m über der Mitte.
+// Hofeinfahrt 4 m breit, Pfosten 2 m hoch bei x = 0 und x = 4, höchster Punkt des Bogens 3 m über der Mitte.
 // Richtig: y = −0,25(x − 2)² + 3 = −0,25x² + x + 2
 const A_SOLL = -0.25
 const bogen = (a: number) => (x: number) => a * (x - 2) ** 2 + 3
@@ -79,8 +79,8 @@ function Problemkarte() {
         </div>
       </div>
       <p className="tb-problem-frage">
-        <i className="fa-solid fa-dice" aria-hidden="true" /> Dein Auftrag jetzt: Probiere einfach aus! Rate eine Gleichung und schicke sie an die Biegemaschine. Rechnen
-        musst du hier noch nicht.
+        <i className="fa-solid fa-dice" aria-hidden="true" /> Dein Auftrag jetzt: Probiere einfach aus! Rate Zahlen für <M>a</M>, <M>b</M> und <M>c</M>, trage sie unter
+        der Skizze ein und schicke die Gleichung an die Biegemaschine. Rechnen musst du hier noch nicht.
       </p>
     </div>
   )
@@ -167,7 +167,7 @@ function TorBild({ kurven = [], nurP = false }: { kurven?: Kurve[]; nurP?: boole
 }
 
 /** Biegemaschine: Gleichung eintippen, senden, Bogen erscheint in der Skizze, die Maschine meldet, was passt */
-function Biegemaschine({ versuche, onSenden }: { versuche: Versuch[]; onSenden: (v: Versuch) => void }) {
+function Biegemaschine({ auftrag, versuche, onSenden }: { auftrag: ReactNode; versuche: Versuch[]; onSenden: (v: Versuch) => void }) {
   const uid = useId()
   const [eingabe, setEingabe] = useState({ a: '', b: '', c: '' })
   const [fehlt, setFehlt] = useState(false)
@@ -202,28 +202,25 @@ function Biegemaschine({ versuche, onSenden }: { versuche: Versuch[]; onSenden: 
   )
 
   return (
-    <div className="lp-ex bk-panel tb-maschine" data-no-autocheck>
+    <div className="tb-maschine" data-no-autocheck>
       <ZweiSpalten
         links={
           <div className="tb-maschine-links">
-            <TorBild kurven={kurven} />
-              {(versuche.length >= 3 || treffer) && (
-                <div className="ls-question">
-                  <i className="fa-solid fa-lightbulb" aria-hidden="true" />
-                  <span>
-                    {treffer ? 'Treffer! Aber beim nächsten Kunden hat der Bogen andere Maße.' : 'Raten bringt dich kaum ans Ziel.'} Gleich lernst du, wie du die Gleichung aus dem
-                    Scheitelpunkt und einem weiteren Punkt sicher berechnest.
-                  </span>
-                </div>
-              )}
+            {auftrag}
+            {(versuche.length >= 3 || treffer) && (
+              <div className="ls-question">
+                <i className="fa-solid fa-lightbulb" aria-hidden="true" />
+                <span>
+                  {treffer ? 'Treffer! Aber beim nächsten Kunden hat der Bogen andere Maße.' : 'Raten bringt dich kaum ans Ziel.'} Gleich lernst du, wie du die Gleichung aus dem
+                  Scheitelpunkt und einem weiteren Punkt sicher berechnest.
+                </span>
+              </div>
+            )}
           </div>
         }
         rechts={
           <div className="tb-maschine-rechts">
-            <p>
-              <strong>Probiere einfach aus:</strong> Denk dir drei Zahlen aus, trage sie ein und schicke die Gleichung an die Maschine. Sie zeichnet den Bogen in die Skizze. Ändere
-              die Zahlen und versuche, die gestrichelte Skizze zu treffen. Du musst noch nicht rechnen.
-            </p>
+            <TorBild kurven={kurven} />
             <div className="tb-eingabe">
               <M>{'y ='}</M> {feld('a', 'Zahl vor x²')} <M>{'x^2 +'}</M> {feld('b', 'Zahl vor x')} <M>{'x +'}</M> {feld('c', 'Zahl ohne x')}
             </div>
@@ -476,31 +473,21 @@ export default function TorbogenEinstieg({
     },
     {
       art: 'problem',
-      titel: 'Der Auftrag',
-      frei: true,
-      inhalt: () => (
-        <ZweiSpalten
-          links={
+      titel: "Der Auftrag: Probier's aus!",
+      bedingung: 'Probiere mindestens drei Gleichungen an der Maschine aus, dann geht es weiter.',
+      inhalt: (fertig) => (
+        <Biegemaschine
+          auftrag={
             <>
               <div className="wm-notiz">
                 <p>
-                  Du machst eine Ausbildung im Metallbau. Über einer 4 m breiten Hofeinfahrt soll ein Torbogen aus Stahlrohr entstehen. Er sitzt auf zwei 2 m hohen Pfosten
-                  und ist in der Mitte 3 m hoch. Die Biegemaschine braucht dafür die Funktionsgleichung des Bogens.
+                  Du bist Azubi im Metallbau. Über einer 4&nbsp;m breiten Hofeinfahrt entsteht ein Torbogen aus Stahlrohr: Pfosten 2&nbsp;m hoch, in der Mitte
+                  3&nbsp;m hoch. Die Biegemaschine braucht die Funktionsgleichung des Bogens.
                 </p>
               </div>
               <Problemkarte />
             </>
           }
-          rechts={<TorBild />}
-        />
-      ),
-    },
-    {
-      art: 'problem',
-      titel: "Die Biegemaschine: Probier's aus!",
-      bedingung: 'Probiere mindestens drei Gleichungen an der Maschine aus, dann geht es weiter.',
-      inhalt: (fertig) => (
-        <Biegemaschine
           versuche={versuche}
           onSenden={(v) => {
             setVersuche((alt) => [...alt, v])
@@ -763,7 +750,7 @@ export default function TorbogenEinstieg({
           level="erweiterung"
           prompt={
             <p>
-              Familie Berger ruft an: Der Bogen soll in der Mitte 3,5 m hoch sein, die Pfosten bleiben 2 m hoch. Berechne das neue <M>a</M>. Wird der Bogen dadurch steiler oder
+              Familie Berger ruft an: Der Bogen soll in der Mitte 3,5&nbsp;m hoch sein, die Pfosten bleiben 2&nbsp;m hoch. Berechne das neue <M>a</M>. Wird der Bogen dadurch steiler oder
               flacher? Begründe im Heft.
             </p>
           }
