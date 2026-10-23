@@ -61,8 +61,8 @@ Baue die Seite erst nach Freigabe (außer die Lehrkraft will ausdrücklich direk
 ### 5. Design vorbereiten
 Lade **vor dem ersten Code** den Skill `frontend-design` mit dem Skill-Tool. Wende ihn innerhalb der Vorgaben aus "Ruhiges Grunddesign" und "Identität jeder Lernsituation" an: Diese Vorgaben haben Vorrang, `frontend-design` hilft bei Typografie, Abständen, Hierarchie, Fokus und beim Titelbild.
 
-### 6. Seite bauen
-Siehe Abschnitte "Die vier Phasen", "Seitenansicht", "Ruhiges Grunddesign", "Identität jeder Lernsituation" und "Digitale Umsetzung".
+### 6. Seite bauen und Auswahlseite umbauen
+Siehe Abschnitte "Die vier Phasen", "Seitenansicht", "Ruhiges Grunddesign", "Identität jeder Lernsituation" und "Digitale Umsetzung". **Immer dazu:** die Startseite des Themas so umbauen, dass die SuS zwischen der Lernsituation und den bereits vorhandenen Übungsaufgaben wählen (Abschnitt "Auswahlseite des Themas").
 
 ### 7. Design prüfen
 Lade nach dem Bauen den Skill `design:design-critique` mit dem Skill-Tool. Erstelle mit Playwright Screenshots **jeder Seite** und der Startbox bei 1180 × 820 (Tablet quer) und bei 1920 × 1080 (breiter Monitor, muss ebenfalls einspaltig bleiben), bei Bedarf als ganze Seite (`full_page`), sieh sie dir an und prüfe sie mit der Design-Kritik, besonders:
@@ -133,6 +133,22 @@ Jede Lernsituation läuft in der Seitenansicht `SeitenLernsituation` aus `linear
 - **Nach unten scrollen ist erlaubt, zur Seite nie:** Eine Seite darf länger als der Bildschirm sein; die SuS scrollen dann nach unten weiter. **Lesbarkeit geht vor Passform:** Skizzen und Graphen werden **nicht** gestaucht, damit alles auf einen Bildschirm passt. Richtwert auf dem Tablet: Skizzen und Graphen etwa 260–320 px hoch, Beschriftungen mindestens 14 px und höchstens etwa 20 px auf dem Bildschirm. Wünschenswert ist, dass Titel, Auftrag und der Anfang der Interaktion im ersten Bildschirm sichtbar sind. **Horizontales Scrollen ist verboten**, auf jeder Bildschirmbreite (Tablet, Monitor, Smartphone). Eine Seite wird nur geteilt, wenn sie sonst unübersichtlich lang wird; nie werden zwei Aufgaben auf eine Seite gelegt. **Keine Zweispalter** (`ZweiSpalten` nicht mehr verwenden): Einspaltigkeit hat Vorrang.
 - **Test:** Mit Playwright (`vite build` + `vite preview`) alle Seiten bei 1180×820, 1920×1080 und 390×844 (Smartphone) durchklicken (Cookie-Hinweis vorher schließen), jeweils vor und nach dem Lösen `document.documentElement.scrollWidth - innerWidth` messen (muss 0 sein, kein seitliches Scrollen) und auf `.katex-error` prüfen. Die Höhe darf überstehen; prüfe auf den Screenshots, dass Skizzen groß genug und Beschriftungen lesbar sind.
 - Am Ende eine Abschlussseite mit Buttons zurück zur Auswahl, zu den Übungsaufgaben und ggf. zur nächsten Lernsituation.
+
+## Auswahlseite des Themas (Pflicht)
+
+Jede Lernsituation gehört zu einem Thema, für das es meist schon Übungsaufgaben gibt. Die **Startseite des Themas** (die Adresse, unter der das Thema in der Themenübersicht verlinkt ist) wird immer so umgebaut, dass die SuS dort wählen: **"Lernsituation"** oder **"Übungsaufgaben"**. Bestehende Übungsaufgaben bleiben vollständig erhalten und erreichbar; nichts wird entfernt.
+
+Wähle das Muster, das zum Thema passt:
+
+- **Variante A: eine Übungsseite mit Schwierigkeitsgraden** (z. B. `lineare_funktionen/Nullstellen.tsx`, `PunktGerade.tsx`, `Schnittpunkt.tsx`, `quadratische_funktionen/Scheitelpunkt.tsx`). Die Lernsituation wird ein eigener Modus der bestehenden Seite (`const [lernsituation, setLernsituation] = useState(false)`). In der Startansicht (noch kein Schwierigkeitsgrad gewählt) stehen nebeneinander zwei Felder: links **"Lernsituation"** mit der Karte, rechts **"Übungsaufgaben"** mit den vorhandenen Schwierigkeitsgraden. Die Lernsituation bekommt `erklaerung` (der Erklärteil der Seite, z. B. `<Intro />`), `onBack` (zurück zur Auswahl) und `onPractice` (direkt in den leichtesten Schwierigkeitsgrad).
+- **Variante B: mehrere Lernsituationen oder mehrere Übungsseiten** (z. B. `quadratische_funktionen/FunktionsgleichungMenu.tsx`, `finanzmathe/ZinsrechnungMenu.tsx`). Unter der bisherigen Adresse entsteht eine eigene Auswahlseite `<Thema>Menu.tsx`: oben das Feld **"Lernsituation"** mit einer Karte pro Lernsituation, darunter das Feld **"Übungsaufgaben"** als Liste (`bk-topics`). Die bisherige Übungsseite zieht nach `<Adresse>/ueben`, die Lernsituationen bekommen eigene Adressen `<Adresse>/lernsituation-1`, `-2`, … Routen in `App.tsx` eintragen und alle Links prüfen, die direkt auf die alte Übungsseite zeigen (Suche, Themenübersicht, "Weiter üben"-Buttons), und bei Bedarf auf `/ueben` umstellen.
+- Kommt zu einem Thema mit Variante A eine zweite Lernsituation dazu, wird auf Variante B umgestellt.
+
+Für beide Varianten gilt:
+- **Karte:** immer `LernsituationKarte` aus `lernsituation_kit/seiten.tsx` mit der Identität der Lernsituation (`thema={{ name, farbe, icon }}`, bei mehreren Lernsituationen `teil="Lernsituation 1 · …"`) und einer Beschreibung in ein bis zwei Sätzen, die die Situation und das Lernziel nennt. Die Karte hat so dieselbe Themenfarbe, dasselbe Symbol und denselben Namen wie die Lernsituation selbst.
+- Die Überschriften heißen genau **"Lernsituation"** und **"Übungsaufgaben"** (nicht "Wähle deinen Schwierigkeitsgrad").
+- Die Abschlussseite der Lernsituation führt mit "Weiter üben" zu den Übungsaufgaben dieses Themas.
+- Die Auswahlseite wird mitgetestet: kein seitliches Scrollen bei 1180 × 820 und 390 × 844, Karte öffnet die Lernsituation, "Übungsaufgaben" öffnen die bisherigen Aufgaben.
 
 ## Schreib- und Rechenkonventionen (Pflicht)
 
@@ -295,7 +311,7 @@ Anforderungen an einen guten Kontext:
 
 - **Konventionen von `mathe-aufgaben` gelten:** KaTeX, Merkhilfe der Wirtschaftsschule Bayern für Formeln und Abkürzungen, nachvollziehbare Rechenwege, Eingabefelder mit grün/rot und Lob, automatische Prüfung (Button "Prüfen").
 - **Bausteine aus `mathe-trainer/src/pages/lineare_funktionen/lernsituation_kit/`:**
-  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Optionen `ruhig` und `thema`), `THEMEN`, Typ `Thema`, Typ `Seite = { art, titel, frei?, bedingung?, inhalt: (fertig) => … }`
+  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Optionen `ruhig` und `thema`), `LernsituationKarte` (Karte für die Auswahlseite), `THEMEN`, Typ `Thema`, Typ `Seite = { art, titel, frei?, bedingung?, inhalt: (fertig) => … }`
   - `kit.tsx`: `CheckCard` (mit `rechnung`, `fields`, `solution`, `help`, `onSolved`), `McCard` (`onSolved`, `rechnen`), `TrackedCheck`/`TrackedMc` (für Bereiche mit Nachverfolgung), `SchrittHilfen`, `Hilfen`, `HeftHinweis`
   - `phasen.tsx`: `PHASEN` (Namen und Reihenfolge der vier Phasen)
   - `Beispiel` aus `daten_und_zufall/lernpfad/kit.tsx` für Rechenbeispiele (`offen` zeigt alle Schritte, `ab` setzt die Schrittnummerierung fort)
@@ -304,7 +320,7 @@ Anforderungen an einen guten Kontext:
 - **Festlegung merken:** Vermutungen und Versuche bleiben im Seitenzustand und werden in Phase 4 wieder angezeigt. Kein Login. Wenn `localStorage` genutzt wird, immer mit try/catch.
 - **Interaktive Elemente** einsetzen, wo sie das Denken unterstützen: Ausprobieren mit Live-Graph, Schieberegler, auszufüllende Tabellen, Code-Schlösser, Drag-and-drop. Nicht als Dekoration.
 - **Tablet zuerst, einspaltig, Smartphone bedienbar:** Primär Tablet im Querformat, einspaltig; nach unten scrollen ist überall erlaubt, seitlich nie.
-- **Navigation:** Lernsituationen werden über eine Auswahlseite des Themas erreicht: oben die Karten "Lernsituation 1, 2, …", darunter der Bereich **"Übungsaufgaben"** (nicht "Wähle deinen Schwierigkeitsgrad"). Neue Seite in Routen, Navigation und Themenübersicht eintragen.
+- **Navigation:** Lernsituationen werden über die Auswahlseite des Themas erreicht (Abschnitt "Auswahlseite des Themas"). Neue Seiten in Routen, Navigation und Themenübersicht eintragen.
 
 ## Checkliste vor der Abgabe
 
@@ -332,7 +348,8 @@ Anforderungen an einen guten Kontext:
 - [ ] Bei keiner Auswahlaufgabe ist Antwort A richtig.
 - [ ] Der Check enthält mindestens eine diagnostische Aufgabe mit typischen Fehlern als Antwortoptionen.
 - [ ] Die Seite führt ein und sichert, sie wird nicht zur Übungsseite.
-- [ ] Erreichbar über die Auswahlseite mit Bereich "Übungsaufgaben"; committet und mit `--no-ff` in `main` gemergt.
+- [ ] Startseite des Themas umgebaut: Wahl zwischen "Lernsituation" (Karte `LernsituationKarte` in Themenfarbe) und "Übungsaufgaben" (alle bisherigen Aufgaben erreichbar); alte Links geprüft; "Weiter üben" führt zu den Übungsaufgaben.
+- [ ] Committet und mit `--no-ff` in `main` gemergt.
 
 ## Beispiele in verschiedenen Formaten
 
