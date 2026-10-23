@@ -6,7 +6,7 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber';
 import { useTaskTracking } from '../../hooks/useTaskTracking';
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
-import BodenEinstieg from './nullstellen_einstieg/BodenEinstieg'
+import StromspeicherEinstieg from './nullstellen_einstieg/StromspeicherEinstieg'
 
 // Sechs Aufgaben auf einer Seite
 const TOTAL_TASKS = 6;
@@ -471,7 +471,7 @@ function TaskCard({ number, task, level, onNewTask, onSolvedChange, onResult, on
 export default function Nullstellen() {
   const navigate = useNavigate();
   const [level, setLevel] = useState<Level | null>(null);
-  // Einstiegs-Lernsituation „Welche Gerade erreicht den Boden zuerst?“ als eigener Modus neben den Schwierigkeitsgraden
+  // Einstiegs-Lernsituation „Der Stromspeicher“ als eigener Modus neben den Schwierigkeitsgraden
   const [lernsituation, setLernsituation] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [solved, setSolved] = useState<Record<number, boolean>>({});
@@ -530,7 +530,7 @@ export default function Nullstellen() {
 
   if (lernsituation) {
     return (
-      <BodenEinstieg
+      <StromspeicherEinstieg
         erklaerung={<Intro />}
         onBack={() => {
           setLernsituation(false);
@@ -557,15 +557,15 @@ export default function Nullstellen() {
                   setLernsituation(true);
                   window.scrollTo({ top: 0 });
                 }}
-                style={{ background: 'var(--primary)' }}
+                style={{ background: '#4338a6' }}
                 className="flex-1 rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
-                <p className="text-lg font-bold mb-1 text-white">Welche Gerade landet zuerst?</p>
+                <p className="text-lg font-bold mb-1 text-white">Der Stromspeicher</p>
                 <p className="text-xl mb-2 text-white">
-                  <i className="fa-solid fa-plane-arrival" aria-hidden="true" />
+                  <i className="fa-solid fa-battery-half" aria-hidden="true" />
                 </p>
                 <p className="text-sm text-white/90">
-                  Neu beim Thema? Finde heraus, wo drei Geraden die x-Achse berühren, und lerne dabei, wie man die Nullstelle berechnet.
+                  Neu beim Thema? Finde heraus, wann der Stromspeicher einer Solaranlage in der Nacht leer ist, und lerne dabei, wie man die Nullstelle berechnet.
                 </p>
               </button>
             </div>
