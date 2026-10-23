@@ -177,6 +177,7 @@ export function CheckCard({
   rechnen = true,
   tracking = NO_TRACKING,
   onSolved,
+  loesungNachFehler = false,
 }: {
   title: ReactNode
   level?: Level
@@ -196,8 +197,11 @@ export function CheckCard({
   tracking?: Tracking
   /** Wird aufgerufen, sobald alle Felder richtig sind (z. B. um in der Seitenansicht „Weiter“ freizuschalten) */
   onSolved?: () => void
+  /** Lösungsweg erst anbieten, nachdem einmal falsch geprüft wurde (eigene Rechnung ohne Vorstrukturierung) */
+  loesungNachFehler?: boolean
 }) {
   const uid = useId()
+  const [malFalsch, setMalFalsch] = useState(false)
   const [values, setValues] = useState<Record<string, string>>({})
   const [marks, setMarks] = useState<Record<string, boolean | undefined>>({})
   const [status, setStatus] = useState<'idle' | 'ok' | 'no' | 'empty'>('idle')
@@ -243,6 +247,7 @@ export function CheckCard({
     if (fields.some((f) => m[f.key] === undefined)) return setStatus('empty')
     const ok = fields.every((f) => m[f.key])
     setStatus(ok ? 'ok' : 'no')
+    if (!ok) setMalFalsch(true)
     if (ok) {
       setPraise(pick(PRAISE))
       onSolved?.()
@@ -313,7 +318,7 @@ export function CheckCard({
         <button type="button" className="bk-btn bk-btn-primary" onClick={check}>
           Prüfen
         </button>
-        {solution && (
+        {solution && (!loesungNachFehler || malFalsch || status === 'ok') && (
           <button
             type="button"
             className="bk-btn"

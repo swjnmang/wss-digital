@@ -461,6 +461,26 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
             { kind: 'num', key: 'k', label: 'Nötiges Kapital:', expected: K_NOETIG, unit: '€' },
             { kind: 'num', key: 'pp', label: 'Pro Person:', expected: K_NOETIG / 24, unit: '€' },
           ]}
+          loesungNachFehler
+          solution={
+            <>
+              <MB>{'K = \\frac{72 \\cdot 100 \\cdot 360}{3 \\cdot 180} = \\frac{2\\,592\\,000}{540} = 4\\,800 \\qquad 4\\,800 \\text{ €} : 24 = 200 \\text{ €}'}</MB>
+              <p>
+                Probe: <M>{'\\frac{4\\,800 \\cdot 3 \\cdot 180}{36\\,000} = 72'}</M> ✓
+              </p>
+            </>
+          }
+          help={
+            <Hilfen
+              steps={[
+                <>Gesucht ist das Kapital. Ihr kennt Z = 72 €, p = 3 und t = 180.</>,
+                <>Nehmt die Formel für K aus dem Beispiel: oben Z · 100 · 360, unten p · t. Danach teilt ihr das Kapital durch 24.</>,
+                <>
+                  Oben: <M>{'72 \\cdot 100 \\cdot 360 = 2\\,592\\,000'}</M>, unten: <M>{'3 \\cdot 180 = 540'}</M>. Jetzt teilen.
+                </>,
+              ]}
+            />
+          }
         />
       ),
     },
@@ -487,6 +507,24 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
           fields={[
             { kind: 'num', key: 'p', label: 'Zinssatz:', expected: 3.5, unit: '% p.a.' },
           ]}
+          loesungNachFehler
+          solution={
+            <>
+              <MB>{'p = \\frac{84 \\cdot 100 \\cdot 360}{4\\,800 \\cdot 180} = \\frac{3\\,024\\,000}{864\\,000} = 3{,}5'}</MB>
+              <p>Noahs Bank zahlt 3,5 % p.a.</p>
+            </>
+          }
+          help={
+            <Hilfen
+              steps={[
+                <>Gesucht ist der Zinssatz. Ihr kennt K = 4.800 €, t = 180 und Z = 84 €.</>,
+                <>Nehmt die Formel für p: oben Z · 100 · 360, unten K · t.</>,
+                <>
+                  Oben: <M>{'84 \\cdot 100 \\cdot 360 = 3\\,024\\,000'}</M>, unten: <M>{'4\\,800 \\cdot 180 = 864\\,000'}</M>.
+                </>,
+              ]}
+            />
+          }
         />
       ),
     },
@@ -514,6 +552,24 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
             { kind: 'num', key: 't', label: 'Zinstage:', expected: 240, unit: 'Tage' },
             { kind: 'select', key: 'r', label: 'Reicht die Zeit bis zum 01.08.?', options: ['Ja, 180 Tage genügen', 'Nein, 180 Tage sind zu wenig'], expected: 1 },
           ]}
+          loesungNachFehler
+          solution={
+            <>
+              <MB>{'t = \\frac{72 \\cdot 100 \\cdot 360}{3\\,600 \\cdot 3} = \\frac{2\\,592\\,000}{10\\,800} = 240'}</MB>
+              <p>Das Geld müsste 240 Tage liegen, bis zum 01.08. sind es aber nur 180 Tage.</p>
+            </>
+          }
+          help={
+            <Hilfen
+              steps={[
+                <>Gesucht sind die Zinstage. Ihr kennt K = 3.600 €, p = 3 und Z = 72 €.</>,
+                <>Nehmt die Formel für t: oben Z · 100 · 360, unten K · p.</>,
+                <>
+                  Oben: <M>{'2\\,592\\,000'}</M>, unten: <M>{'3\\,600 \\cdot 3 = 10\\,800'}</M>. Vergleicht das Ergebnis mit 180.
+                </>,
+              ]}
+            />
+          }
         />
       ),
     },
