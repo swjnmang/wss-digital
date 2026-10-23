@@ -12,7 +12,7 @@ import './stromspeicher.css'
 // eigene Rechnung. Lernprodukt digital: eine eigene Speicher-Aufgabe erstellen und mit einer Partnerin oder einem Partner tauschen.
 // Identität: Themenfarbe Indigo (Nacht), Symbol Batterie, Titelbild Haus mit Solaranlage bei Nacht, Leitobjekt der Stromspeicher.
 // Kontext Gesellschaft und Umwelt (Energie). Versuche bleiben nur im Seitenzustand.
-// Ruhiges Grunddesign: eine Spalte, pro Seite ist nur der Auftrag hervorgehoben. Passform geprüft bei 1180 × 820 und 1920 × 1080.
+// Ruhiges Grunddesign: eine Spalte, pro Seite ist nur der Auftrag hervorgehoben. Nach unten scrollen ist erlaubt, seitlich nie.
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
@@ -101,7 +101,7 @@ function LadeGraph({ punkte = [], frage = false }: { punkte?: Punkt[]; frage?: b
           <g key={`x${v}`}>
             <line x1={gx(v)} x2={gx(v)} y1={gy(G.yMin)} y2={gy(G.yMax)} stroke="var(--grid)" />
             {v % 2 === 0 && (
-              <text x={gx(v)} y={gy(G.yMin) + 28} textAnchor="middle" fontSize="22" fill="var(--ink-muted)">
+              <text x={gx(v)} y={gy(G.yMin) + 28} textAnchor="middle" fontSize="20" fill="var(--ink-muted)">
                 {v}
               </text>
             )}
@@ -110,17 +110,17 @@ function LadeGraph({ punkte = [], frage = false }: { punkte?: Punkt[]; frage?: b
         {[-1, 1, 2, 3].map((v) => (
           <g key={`y${v}`}>
             <line x1={gx(G.xMin)} x2={gx(G.xMax)} y1={gy(v)} y2={gy(v)} stroke="var(--grid)" />
-            <text x={gx(0) - 10} y={gy(v) + 8} textAnchor="end" fontSize="22" fill="var(--ink-muted)">
+            <text x={gx(0) - 10} y={gy(v) + 8} textAnchor="end" fontSize="20" fill="var(--ink-muted)">
               {v}
             </text>
           </g>
         ))}
         <line x1={gx(0)} x2={gx(0)} y1={gy(G.yMin)} y2={gy(G.yMax)} stroke="var(--ink)" strokeWidth="1.5" />
         <line x1={gx(G.xMin)} x2={gx(G.xMax)} y1={gy(0)} y2={gy(0)} stroke="var(--ink)" strokeWidth="3" />
-        <text x={gx(0.15)} y={gy(-0.85)} fontSize="20" fill="var(--ink-muted)">
+        <text x={gx(0.15)} y={gy(-0.85)} fontSize="18" fill="var(--ink-muted)">
           x in Stunden ab 20 Uhr
         </text>
-        <text x={gx(0) + 10} y={gy(G.yMax) + 18} fontSize="20" fill="var(--ink-muted)">
+        <text x={gx(0) + 10} y={gy(G.yMax) + 18} fontSize="18" fill="var(--ink-muted)">
           y in kWh
         </text>
         <line x1={gx(0)} y1={gy(ladung(0))} x2={gx(9)} y2={gy(ladung(9))} stroke="var(--primary)" strokeWidth="4.5" strokeLinecap="round" />
@@ -316,7 +316,9 @@ function EigeneAufgabe({ onFertig }: { onFertig: () => void }) {
       {status === 'leer' && <p className="sl-hinweis">Trage drei positive Zahlen ein.</p>}
       {status === 'falsch' && loesung !== null && (
         <div className="bk-feedback bk-feedback-no lp-feedback" role="status">
+          <span>
           Das passt noch nicht. Stelle die Gleichung <M>{`y = -${tex(v!.value)}x + ${tex(s!.value)}`}</M> auf und setze sie gleich 0.
+          </span>
         </div>
       )}
       {status === 'ok' && loesung !== null && (

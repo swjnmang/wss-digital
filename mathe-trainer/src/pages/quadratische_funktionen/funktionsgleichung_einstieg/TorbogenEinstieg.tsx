@@ -16,8 +16,8 @@ import './torbogen.css'
 // Die Versuche ersetzen die Festlegung und werden in Phase 4 wieder aufgegriffen.
 // Seitenansicht (lernsituation_kit/seiten.tsx): Startbox mit Bestätigung, dass alle Rechenschritte im Heft dokumentiert werden,
 // dann eine Aufgabe pro Seite in den vier Phasen. „Weiter“ wird erst frei, wenn die Seite erledigt ist (Aufgabe richtig gelöst,
-// drei Versuche an der Biegemaschine, alle Spickzettel-Punkte abgehakt; Info-Seiten sind frei). Jede Seite passt ohne Scrollen
-// auf ein Tablet im Querformat (geprüft mit 1024 × 700, 1080 × 740, 1180 × 760 und 1280 × 720).
+// drei Versuche an der Biegemaschine, alle Spickzettel-Punkte abgehakt; Info-Seiten sind frei). Nach unten scrollen ist
+// erlaubt, seitlich nie (geprüft mit 1180 × 820, 1920 × 1080 und 390 × 844).
 // Warm-up (drei Abrufaufgaben) → Problem erkennen (Auftrag, Biegemaschine) → Problem lösen (Aufgabe mit Graph nur mit S und P,
 // Rechenbeispiel auf zwei Seiten, eigene Lückenrechnung) → Festhalten und Prüfen (Merke, Spickzettel, drei Checks, Abschluss).
 // Aha: Durch Raten trifft man die Gleichung kaum, mit Scheitelpunkt und einem weiteren Punkt lässt sie sich sicher berechnen.
@@ -143,7 +143,7 @@ type Kurve = { f: (x: number) => number; farbe: string; breite: number }
 function TorBild({ kurven = [], nurP = false, neuS, gross = false }: { kurven?: Kurve[]; nurP?: boolean; neuS?: number; gross?: boolean }) {
   const clip = useId().replace(/[^a-zA-Z0-9]/g, '')
   /** gross: größere Beschriftung für flach dargestellte Skizzen */
-  const fs = (n: number) => (gross ? Math.round(n * 1.55) : n)
+  const fs = (n: number) => (gross ? Math.round(n * 1.2) : n)
   return (
     <div className="bk-graph ls-graph">
       <svg viewBox={`0 0 ${S.w} ${S.h}`} role="img" aria-label="Skizze der Hofeinfahrt mit zwei Pfosten und einem parabelförmigen Torbogen im Koordinatensystem">
