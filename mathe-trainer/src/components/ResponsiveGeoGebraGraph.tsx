@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import GeoGebraGraph from './GeoGebraGraph'
 
-/** GeoGebra-Graph, der sich der verfügbaren Breite anpasst (quadratisch, 240–480 px). */
+/** GeoGebra-Graph, der sich der verfügbaren Breite anpasst (quadratisch, 200–480 px) und der Fensterhöhe. */
 export default function ResponsiveGeoGebraGraph({ m, t }: { m: number; t: number }) {
   const boxRef = useRef<HTMLDivElement>(null)
   const [size, setSize] = useState(400)
@@ -10,11 +10,18 @@ export default function ResponsiveGeoGebraGraph({ m, t }: { m: number; t: number
     const el = boxRef.current
     if (!el) return
     // Größe in 40-px-Schritten, damit der Graph nicht bei jedem Pixel neu lädt
-    const update = () => setSize(Math.max(240, Math.min(480, Math.floor((el.clientWidth - 24) / 40) * 40)))
+    const update = () => {
+      const byHeight = Math.floor(window.innerHeight * 0.5)
+      setSize(Math.max(200, Math.min(480, byHeight, Math.floor((el.clientWidth - 24) / 40) * 40)))
+    }
     update()
     const ro = new ResizeObserver(update)
     ro.observe(el)
-    return () => ro.disconnect()
+    window.addEventListener('resize', update)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', update)
+    }
   }, [])
 
   return (
