@@ -248,7 +248,7 @@ Alle Lernsituationen nutzen **dasselbe ruhige Gerüst**. Es gibt keine kontextab
 - Grün und Rot nur für Feedback richtig/falsch (Tokens `--correct`, `--wrong`).
 - Keine unterschiedlichen Farben pro Phase innerhalb der Seite.
 
-**Fester Kern (immer gleich):** Seitenansicht mit Phasenleiste und "Weiter", Eingabefelder, Feedbackfarben grün/rot, Hilfen, Niveaustufen-Kennzeichnung, Sozialform-Markierung, Heft-Hinweis. Sozialform und Zeit sind unauffällige Textlabels, keine bunten Badges.
+**Fester Kern (immer gleich):** Seitenansicht mit Phasenleiste und "Weiter", Eingabefelder, Feedbackfarben grün/rot, Hilfen, Niveaustufen-Kennzeichnung, Sozialform-Markierung. Sozialform und Zeit sind unauffällige Textlabels, keine bunten Badges.
 
 **Touch-Bedienung:** Buttons und Eingabefelder mindestens 44 × 44 px, ausreichender Abstand zwischen Tippzielen, Fließtext mindestens 17 px.
 
