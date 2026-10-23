@@ -10,8 +10,9 @@ Dieser Skill entwickelt **Einstiegs-Lernsituationen** für neue Mathe-Themen und
 - **Zielgruppe:** Schülerinnen und Schüler (SuS) der Wirtschaftsschule in Bayern, 15 bis 18 Jahre.
 - **Nur für den Themeneinstieg.** Vertiefende Übungsseiten laufen über den Skill `mathe-aufgaben`. Eine Lernsituation führt ein Thema ein und sichert die Kernidee, sie übt nicht ausführlich.
 - **Kein Lehrkraft-Material** auf der Seite. Alles richtet sich direkt an die SuS.
-- **Endgerät:** Tablet im **Querformat**. Jede Seite ist trotzdem **einspaltig** (siehe "Ruhiges Grunddesign").
-- **Referenz-Umsetzung:** `mathe-trainer/src/pages/quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx` (Seitenansicht, vier Phasen, Ausprobieren an der Biegemaschine, Lückenrechnung mit Schritt-Hilfen). Vor dem Bauen ansehen.
+- **Endgerät:** Tablet im **Querformat**. Jede Seite ist trotzdem **einspaltig** (siehe "Ruhiges Grunddesign"). Nach unten scrollen ist erlaubt, zur Seite nie.
+- **Referenz-Umsetzungen:** `mathe-trainer/src/pages/quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx` und `mathe-trainer/src/pages/lineare_funktionen/nullstellen_einstieg/StromspeicherEinstieg.tsx` (Seitenansicht, vier Phasen, Identität, Ausprobieren mit Live-Rückmeldung, Lückenrechnung mit Schritt-Hilfen). Vor dem Bauen ansehen.
+- **Aktuelle Fassung dieses Skills** liegt im Repo unter `mathe-trainer/docs/skills/lernsituationen/SKILL.md`. Weicht sie ab, gilt die Repo-Fassung.
 
 ## Grundidee: fester Kern, variable Bausteine
 
@@ -25,7 +26,7 @@ Lernsituationen dürfen **nicht nach Schema F** ablaufen. Gleichförmigkeit lang
 ## Ablauf
 
 ### 1. Log lesen
-Lies vor allem anderen `lernsituationen-log.md` im Repo (Abschnitt "Abwechslung absichern"). Notiere, welche Formate, Produkte und Kontextbereiche in den letzten drei Lernsituationen vorkamen. Existiert die Datei noch nicht, lege sie an und trage vorhandene Lernsituationen-Seiten aus dem Repo nachträglich ein.
+Lies vor allem anderen `lernsituationen-log.md` im Repo (Abschnitt "Abwechslung absichern"). Notiere, welche Formate, Produkte, Themenfarben und Kontextbereiche in den letzten drei Lernsituationen vorkamen. Existiert die Datei noch nicht, lege sie an und trage vorhandene Lernsituationen-Seiten aus dem Repo nachträglich ein.
 
 ### 2. Kurz nachfragen
 Stelle der Lehrkraft höchstens 4 Fragen, falls nicht schon beantwortet:
@@ -43,7 +44,7 @@ Schlage 2 bis 3 **komplette Kombinationen** vor. Jede besteht aus:
 - **Identität:** Themenfarbe, Symbol, Titelbild und Leitobjekt (Abschnitt "Identität jeder Lernsituation")
 - einem Satz, warum die Kombination zum Inhalt passt und kognitiv aktiviert
 
-Die Kombinationen unterscheiden sich untereinander deutlich und halten die Abwechslungsregel ein. Die Lehrkraft wählt eine aus oder kombiniert.
+Die Kombinationen unterscheiden sich untereinander deutlich und halten die Abwechslungsregel ein. Die Lehrkraft wählt eine aus oder kombiniert. Will die Lehrkraft ausdrücklich, dass direkt gebaut wird, entscheide selbst nach der Abwechslungsregel und nenne die Wahl am Ende.
 
 ### 4. Didaktisches Konzept zur Abstimmung
 Lege ein kompaktes Konzept vor:
@@ -55,24 +56,26 @@ Lege ein kompaktes Konzept vor:
 - Der Aha- oder Widerspruchsmoment
 - Typische Fehlvorstellungen, auf die der Check zielt
 
-Baue die Seite erst nach Freigabe.
+Baue die Seite erst nach Freigabe (außer die Lehrkraft will ausdrücklich direkt gebaut haben).
 
 ### 5. Design vorbereiten
-Lade **vor dem ersten Code** den Skill `frontend-design` mit dem Skill-Tool. Wende ihn innerhalb der Vorgaben aus "Ruhiges Grunddesign" an: Diese Vorgaben haben Vorrang, `frontend-design` hilft bei Typografie, Abständen, Hierarchie und Fokus.
+Lade **vor dem ersten Code** den Skill `frontend-design` mit dem Skill-Tool. Wende ihn innerhalb der Vorgaben aus "Ruhiges Grunddesign" und "Identität jeder Lernsituation" an: Diese Vorgaben haben Vorrang, `frontend-design` hilft bei Typografie, Abständen, Hierarchie, Fokus und beim Titelbild.
 
 ### 6. Seite bauen
-Siehe Abschnitte "Die vier Phasen", "Seitenansicht", "Ruhiges Grunddesign" und "Digitale Umsetzung".
+Siehe Abschnitte "Die vier Phasen", "Seitenansicht", "Ruhiges Grunddesign", "Identität jeder Lernsituation" und "Digitale Umsetzung".
 
 ### 7. Design prüfen
-Lade nach dem Bauen den Skill `design:design-critique` mit dem Skill-Tool. Erstelle mit Playwright Screenshots **jeder Seite** bei 1180 × 820 (Tablet quer) und bei 1920 × 1080 (breiter Monitor, muss ebenfalls einspaltig bleiben), sieh sie dir an und prüfe sie mit der Design-Kritik, besonders:
+Lade nach dem Bauen den Skill `design:design-critique` mit dem Skill-Tool. Erstelle mit Playwright Screenshots **jeder Seite** und der Startbox bei 1180 × 820 (Tablet quer) und bei 1920 × 1080 (breiter Monitor, muss ebenfalls einspaltig bleiben), bei Bedarf als ganze Seite (`full_page`), sieh sie dir an und prüfe sie mit der Design-Kritik, besonders:
 - Ist auf jeder Seite sofort klar, was das Wichtigste ist (Problem bzw. Auftrag)?
+- Erkennt man auf jeder Seite, in welcher Lernsituation man ist?
 - Gibt es überflüssige Rahmen, Kästen, Farbstreifen, Banner oder Farben?
-- Ist alles einspaltig, ruhig und auf dem Tablet gut bedienbar?
+- Sind Skizzen und Graphen groß genug und ihre Beschriftungen gut lesbar?
+- Ist alles einspaltig, ruhig und auf dem Tablet gut bedienbar (Phasennamen nicht abgeschnitten, kein seitliches Scrollen)?
 
 Behebe die gefundenen Punkte, bevor du die Seite übergibst.
 
 ### 8. Log aktualisieren und Selbstcheck
-Trage die neue Lernsituation ins Log ein. Prüfe die Seite mit der Checkliste am Ende, teste die Passform aller Seiten (Abschnitt "Seitenansicht") und nenne der Lehrkraft offene Punkte.
+Trage die neue Lernsituation ins Log ein. Prüfe die Seite mit der Checkliste am Ende, führe den Test aus dem Abschnitt "Seitenansicht" aus und nenne der Lehrkraft offene Punkte.
 
 ### 9. Veröffentlichen
 Wie in `CLAUDE.md` des Repos: direkt committen, pushen und mit eigenem Merge-Commit (`git merge --no-ff`) in `main` mergen, `main` zuerst pushen. Keinen Pull Request anlegen, nicht nachfragen.
@@ -95,11 +98,11 @@ Jede Lernsituation hat **genau diese vier Phasen in dieser Reihenfolge**. Namen 
 ### Phase 2: Aufbau der Seite "Problem erkennen"
 
 Von oben nach unten, einspaltig, ohne verschachtelte Kästen:
-1. **Seitentitel** (z. B. "Der Auftrag: Probier's aus!"). Die Phase steht bereits in der Phasenleiste.
+1. **Seitentitel** (z. B. "Der Torbogen für die Hofeinfahrt"). Die Phase steht bereits in der Phasenleiste.
 2. **Situation** als kurzer Fließtext (2–3 Sätze), z. B. "Du bist Azubi im Metallbau. …"
 3. **Problem** als Fließtext: was gegeben und was gesucht ist, z. B. "Du kennst den Scheitelpunkt S(2 | 3) und einen weiteren Punkt P(0 | 2) des Bogens. Gesucht ist die Funktionsgleichung in allgemeiner Form y = ax² + bx + c." Keine getrennten Kacheln "Gegeben"/"Gesucht".
 4. **Auftrag:** das einzige hervorgehobene Element der Seite. Ein klarer Satz, was jetzt zu tun ist.
-5. **Skizze und Interaktion** darunter (kompakte Skizze, Eingaben, Button, Rückmeldung).
+5. **Skizze und Interaktion** darunter (Skizze in gut lesbarer Größe, Eingaben, Button, Rückmeldung). Die SuS dürfen dafür nach unten scrollen.
 
 Hinweise wie "Probiere mindestens drei Gleichungen aus, dann geht es weiter" stehen als `bedingung` im Seitenkopf bzw. bei der Interaktion, nicht als zusätzliches farbiges Banner.
 
@@ -107,7 +110,7 @@ Hinweise wie "Probiere mindestens drei Gleichungen aus, dann geht es weiter" ste
 
 Wo es inhaltlich passt, probieren die SuS selbst Lösungen aus und bekommen sofort sichtbare Rückmeldung. Sie merken dabei, dass Raten nicht zuverlässig zum Ziel führt. Beispiel Torbogen: Die SuS tippen Werte für a, b und c direkt in `y = [a]x² + [b]x + [c]` ein, klicken "An die Maschine senden", der Graph wird **sofort in die Skizze gezeichnet** und die Maschine meldet, welche Bedingungen passen und welche nicht.
 
-- Der Auftrag sagt ausdrücklich, dass es ums **Ausprobieren** geht ("Probiere einfach aus! … Rechnen musst du hier noch nicht.").
+- Der Auftrag sagt ausdrücklich, dass es ums **Ausprobieren** geht ("Probier es aus, ohne zu rechnen").
 - Auftrag, Skizze, Eingabe und Rückmeldung stehen **auf derselben Seite**, nicht auf zwei Seiten verteilt.
 - Freischaltung nach einer Mindestzahl an Versuchen (z. B. 3) oder einem Treffer. Danach eine kurze Erkenntnis ("Raten bringt dich kaum ans Ziel. Gleich lernst du, wie …").
 - Andere Wege bleiben möglich, wenn Ausprobieren nicht passt: Widerspruch, Entscheidungsfrage, Schätzung mit Auflösung.
@@ -116,19 +119,19 @@ Wo es inhaltlich passt, probieren die SuS selbst Lösungen aus und bekommen sofo
 
 **Feste Reihenfolge, ohne Ausnahme:** (1) "Deine Aufgabe" stellt das Problem konkret dar, (2) das passende Rechenbeispiel, (3) "Jetzt du" mit der eigenen Rechnung. **Ein Rechenbeispiel vor der Problemdarstellung ist nicht erlaubt**, auch nicht im Warm-up oder in Phase 2.
 
-- **Klarer Arbeitsauftrag** in eigenen Worten: was gegeben ist, was gesucht ist und in welcher Form das Ergebnis stehen soll. Beispiel: "Stelle die Funktionsgleichung auf. Gegeben sind der Scheitelpunkt S(2 | 3) und der Pfosten P(0 | 2). Stelle sie zunächst in Scheitelform und anschließend in allgemeiner Form auf. Wie das geht, siehst du im folgenden Rechenbeispiel. Führe danach die Berechnung selbst durch."
+- **Klarer Arbeitsauftrag** in eigenen Worten: was gegeben ist, was gesucht ist und in welcher Form das Ergebnis stehen soll. Beispiel: "Stelle die Funktionsgleichung auf. Gegeben sind der Scheitelpunkt S(2 | 3) und der Pfosten P(0 | 2). Stelle sie zunächst in Scheitelform und anschließend in allgemeiner Form auf. Wie das geht, siehst du im folgenden Rechenbeispiel. Danach rechnest du selbst."
 - Die Skizze zeigt nur die gegebenen Größen, keine Informationen, die nicht gebraucht werden.
-- **Ausgearbeitetes Rechenbeispiel** mit anderen Zahlen, Schritt für Schritt (ggf. über zwei Seiten verteilt), dann die **eigene Rechnung** als Lückenrechnung.
+- **Ausgearbeitetes Rechenbeispiel** mit anderen Zahlen, Schritt für Schritt (bei vielen Schritten über zwei Seiten verteilt), dann die **eigene Rechnung** als Lückenrechnung.
 
 ## Seitenansicht (Pflicht)
 
-Jede Lernsituation läuft in der Seitenansicht `SeitenLernsituation` aus `lineare_funktionen/lernsituation_kit/seiten.tsx` mit **`ruhig`** (ruhiges Grunddesign), eingebettet in `TaskShell` mit `kompakt`. Für Situation, Problem und Auftrag gibt es die Klassen `sl-text`, `sl-fokus` (mit `sl-fokus-titel`) und `sl-hinweis`. Lange Scrollseiten, Kachel-Übersichten und eigene Stepper werden nicht mehr gebaut.
+Jede Lernsituation läuft in der Seitenansicht `SeitenLernsituation` aus `lineare_funktionen/lernsituation_kit/seiten.tsx` mit **`ruhig`** (ruhiges Grunddesign) und **`thema`** (Identität), eingebettet in `TaskShell` mit `kompakt`. Für Situation, Problem und Auftrag gibt es die Klassen `sl-text`, `sl-fokus` (mit `sl-fokus-titel`) und `sl-hinweis`. Lange Scrollseiten mit allen Phasen untereinander, Kachel-Übersichten und eigene Stepper werden nicht mehr gebaut.
 
-- **Startbox:** Vor der ersten Seite bestätigen die SuS per Haken "Ich dokumentiere bei jeder Aufgabe alle Rechenschritte schriftlich in meinem Heft." Erst dann geht es los.
+- **Startbox:** Titelbild, Name der Lernsituation, Lernziel. Vor der ersten Seite bestätigen die SuS per Haken "Ich dokumentiere bei jeder Aufgabe alle Rechenschritte schriftlich in meinem Heft." Erst dann geht es los.
 - **Eine Aufgabe pro Seite.** Jede Seite gehört zu genau einer Phase (`art`) und hat einen kurzen Titel.
-- **"Weiter" erst, wenn die Seite erledigt ist:** Aufgabe richtig gelöst (`onSolved` an `CheckCard`/`McCard` ruft `fertig()`), Mindestzahl an Versuchen erreicht, alle Kriterien des Lernprodukts abgehakt o. Ä. Reine Info-Seiten (Rechenbeispiel, Merke) sind `frei`. Ist die Bedingung nicht offensichtlich, steht sie als `bedingung` im Seitenkopf.
-- **Ohne Scrollen aufs Tablet im Querformat:** Jede Seite passt einspaltig vollständig auf 1180 × 820 px, auch nach dem Prüfen (Rückmeldung sichtbar) und mit geöffneter Hilfe. Auf kleineren Tablets darf eine Seite etwas scrollen; Einspaltigkeit hat Vorrang. Skizzen werden dafür flacher, aber mit größerer Beschriftung (mindestens etwa 14 px auf dem Bildschirm). Passt eine Seite nicht, wird sie gestrafft (kürzere Texte, kompaktere Skizze) oder sinnvoll geteilt, aber nie zwei Aufgaben auf eine Seite gelegt. **Keine Zweispalter** (`ZweiSpalten` nicht mehr verwenden): Einspaltigkeit hat Vorrang.
-- **Test:** Mit Playwright (`vite build` + `vite preview`) alle Seiten bei 1180×820 und 1920×1080 durchklicken (Cookie-Hinweis vorher schließen), jeweils vor und nach dem Lösen `document.documentElement.scrollHeight - innerHeight` messen (muss 0 sein) und auf `.katex-error` prüfen.
+- **"Weiter" erst, wenn die Seite erledigt ist:** Aufgabe richtig gelöst (`onSolved` an `CheckCard`/`McCard` ruft `fertig()`), Mindestzahl an Versuchen erreicht, alle Kriterien des Lernprodukts abgehakt o. Ä. Reine Info-Seiten (Rechenbeispiel, Merke) sind `frei`. Ist die Bedingung nicht offensichtlich, steht sie als `bedingung` im Seitenkopf. Die Phasenleiste mit "Weiter" bleibt beim Scrollen oben stehen.
+- **Nach unten scrollen ist erlaubt, zur Seite nie:** Eine Seite darf länger als der Bildschirm sein; die SuS scrollen dann nach unten weiter. **Lesbarkeit geht vor Passform:** Skizzen und Graphen werden **nicht** gestaucht, damit alles auf einen Bildschirm passt. Richtwert auf dem Tablet: Skizzen und Graphen etwa 260–320 px hoch, Beschriftungen mindestens 14 px und höchstens etwa 20 px auf dem Bildschirm. Wünschenswert ist, dass Titel, Auftrag und der Anfang der Interaktion im ersten Bildschirm sichtbar sind. **Horizontales Scrollen ist verboten**, auf jeder Bildschirmbreite (Tablet, Monitor, Smartphone). Eine Seite wird nur geteilt, wenn sie sonst unübersichtlich lang wird; nie werden zwei Aufgaben auf eine Seite gelegt. **Keine Zweispalter** (`ZweiSpalten` nicht mehr verwenden): Einspaltigkeit hat Vorrang.
+- **Test:** Mit Playwright (`vite build` + `vite preview`) alle Seiten bei 1180×820, 1920×1080 und 390×844 (Smartphone) durchklicken (Cookie-Hinweis vorher schließen), jeweils vor und nach dem Lösen `document.documentElement.scrollWidth - innerWidth` messen (muss 0 sein, kein seitliches Scrollen) und auf `.katex-error` prüfen. Die Höhe darf überstehen; prüfe auf den Screenshots, dass Skizzen groß genug und Beschriftungen lesbar sind.
 - Am Ende eine Abschlussseite mit Buttons zurück zur Auswahl, zu den Übungsaufgaben und ggf. zur nächsten Lernsituation.
 
 ## Schreib- und Rechenkonventionen (Pflicht)
@@ -139,7 +142,7 @@ Jede Lernsituation läuft in der Seitenansicht `SeitenLernsituation` aus `linear
 - **Rechnen im Heft:** Alles, was gerechnet wird, rechnen die SuS von Hand im Heft, das Tablet dient zur Kontrolle. `CheckCard` zeigt den Heft-Hinweis automatisch (`rechnen={false}` bei Ablesen, Ordnen, Auswählen). Keine zusätzlichen Sätze "Halte deinen Rechenweg schriftlich fest".
 - **Lücken direkt in der Gleichung:** Werte, die die SuS in eine Gleichung einsetzen oder ergänzen, tragen sie im Kästchen **in der Gleichung** ein, nicht in einem Feld daneben oder darunter (kein `\square` mit Feld daneben). Dafür `CheckCard` mit `rechnung`: Zeilen `{ l: [...], r: [...], u?: '\\mid -3' }` aus TeX-Stücken und Lücken `{ luecke: 'feldKey' }`.
 - **Eine Zeile pro Zwischenergebnis:** Bei mehrschrittigen Rechnungen bekommt jedes wichtige Zwischenergebnis eine eigene Zeile, damit die SuS die Struktur sehen. Beispiel: Vor der Scheitelform steht `a = [ ]` ("Formfaktor a"), damit klar ist, dass zuerst a berechnet wird. Die Zeilen sind am rechten Rand kurz benannt (① S einsetzen, ② P einsetzen, Formfaktor a, ③ Scheitelform, ④ allg. Form), Umformungen als `| −3  | :4`.
-- **Live-Rückmeldung bei Graphen:** Geben SuS eine Gleichung ein, wird der zugehörige Graph beim Absenden sofort in die Skizze gezeichnet (frühere Versuche blass, aktueller kräftig, Treffer grün).
+- **Live-Rückmeldung bei Graphen:** Geben SuS eine Gleichung oder einen Wert ein, wird das Ergebnis beim Absenden sofort in die Skizze gezeichnet (frühere Versuche blass, aktueller kräftig in Themenfarbe, Treffer grün).
 
 ## Didaktische Leitlinien
 
@@ -185,7 +188,7 @@ Das Format bestimmt die Geschichte innerhalb der vier Phasen. Wähle nach Inhalt
 | **Rätsel / Escape-Room** | Teilerkenntnisse liefern Codes, die nächste Seiten freischalten; Story-Rahmen | Verfahren mit mehreren Schritten, Gleichungen, Terme |
 | **Kontrastierende Fälle** (Schwartz & Bransford) | 2–3 fast gleiche Situationen vergleichen: Was macht den Unterschied? Danach Begriff klären | Begriffsbildung, z. B. proportional vs. linear, Zins vs. Zinseszins |
 | **Fehlerdetektiv / Wer hat recht?** | Zwei fiktive Mitschüler lösen unterschiedlich; Fehler finden, begründen, korrigieren (im Check, nach dem Erarbeiten) | Verfahren mit typischen Fehlern |
-| **Experimentierlabor** | Hypothese aufstellen, mit Schieberegler oder Simulation testen, Regel formulieren | Parameter in Funktionen, Wachstum, Wahrscheinlichkeit |
+| **Experimentierlabor** | Hypothese aufstellen, mit Schieberegler oder Simulation testen, Regel formulieren | Parameter in Funktionen, Wachstum, Wahrscheinlichkeit, Nullstellen |
 | **Schätzen & Fermi** | grob schätzen, Annahmen offenlegen, mit neuem Werkzeug präzisieren | Größen, Prozente, Potenzen, Statistik |
 | **Rollenspiel / Beratungsauftrag** | SuS sind Azubis, Berater o. Ä. und erstellen für eine Person ein Angebot oder eine Empfehlung | kaufmännisches Rechnen, Kalkulation, Finanzmathematik |
 | **Gruppenpuzzle** (Aronson) | Expertengruppen erarbeiten je einen Aspekt, Stammgruppe setzt zusammen | 90 min, Themen mit mehreren Teilaspekten |
@@ -215,8 +218,8 @@ Alle Lernsituationen nutzen **dasselbe ruhige Gerüst**. Es gibt keine kontextab
 
 **Layout**
 - **Immer einspaltig**, auch auf breiten Monitoren: Inhalt mittig mit `max-width` von etwa 760 px; Skizzen und Graphen dürfen etwas breiter sein (bis etwa 900 px).
-- Optimiert für **Tablet im Querformat**. Skizzen stehen **unter** dem zugehörigen Text, nie daneben, und sind so kompakt, dass die Seite ohne Scrollen passt.
-- Kein horizontales Scrollen.
+- Optimiert für **Tablet im Querformat**. Skizzen stehen **unter** dem zugehörigen Text, nie daneben, und sind groß genug, dass man alles gut lesen kann (siehe "Seitenansicht"). Nach unten scrollen ist in Ordnung.
+- **Kein horizontales Scrollen**, auf keiner Bildschirmbreite. Breite Inhalte (Rechnungen, Tabellen, Skizzen) passen sich an oder brechen um.
 
 **Fokus und Hierarchie**
 - Pro Seite gibt es **genau einen Fokus**: das Problem bzw. den Auftrag. Nur dieses Element wird hervorgehoben (dezente Hintergrundfläche **oder** ein einzelner Rahmen).
@@ -227,7 +230,7 @@ Alle Lernsituationen nutzen **dasselbe ruhige Gerüst**. Es gibt keine kontextab
 **Farben**
 - Neutraler Grundton plus **eine Akzentfarbe**: die **Themenfarbe** der Lernsituation, für Buttons, Phasenleiste, Kennung und den Fokus-Bereich.
 - Grün und Rot nur für Feedback richtig/falsch (Tokens `--correct`, `--wrong`).
-- Keine unterschiedlichen Farben pro Phase innerhalb der Seite (die Phasenleiste darf die Phase markieren).
+- Keine unterschiedlichen Farben pro Phase innerhalb der Seite.
 
 **Fester Kern (immer gleich):** Seitenansicht mit Phasenleiste und "Weiter", Eingabefelder, Feedbackfarben grün/rot, Hilfen, Niveaustufen-Kennzeichnung, Sozialform-Markierung, Heft-Hinweis. Sozialform und Zeit sind unauffällige Textlabels, keine bunten Badges.
 
@@ -239,8 +242,8 @@ Keine Animationen oder Effekte ohne Funktion.
 
 Jede Lernsituation bekommt ein eigenes Gesicht, damit sie sich von den anderen unterscheidet und die SuS jederzeit wissen, wo sie sind. Die Identität entsteht aus vier Merkmalen, die alle aus dem Kontext abgeleitet werden. Umsetzung: Prop `thema` an `SeitenLernsituation` (`{ name, farbe, icon, bild }`, Typ `Thema` aus `seiten.tsx`).
 
-1. **Themenfarbe** aus der Palette `THEMEN` in `seiten.tsx`: blau, petrol, violett, beere, ocker, schiefer, indigo, kupfer. Alle sind mit weißer Schrift kontraststark; Grün und Rot gibt es bewusst nicht, weil sie für richtig/falsch reserviert sind. Die Farbe passt zum Kontext (z. B. Kupfer für Metallbau, Petrol für Wasser oder Umwelt, Beere für Freizeit) und ersetzt innerhalb der Lernsituation die Standardfarbe Blau. Keine neuen Farben ohne Kontrastprüfung (weiße Schrift mindestens 4,5 : 1).
-2. **Kennung:** ein passendes Font-Awesome-Symbol (`icon`, z. B. `fa-archway`, `fa-helicopter`, `fa-piggy-bank`) und ein kurzer Name (2–3 Wörter, z. B. "Der Torbogen"). Beides steht als Kennung links in der Phasenleiste auf **jeder** Seite (auf schmaleren Bildschirmen nur das Symbol) und als Überschrift der Startbox.
+1. **Themenfarbe** aus der Palette `THEMEN` in `seiten.tsx`: blau, petrol, violett, beere, ocker, schiefer, indigo, kupfer. Alle sind mit weißer Schrift kontraststark; Grün und Rot gibt es bewusst nicht, weil sie für richtig/falsch reserviert sind. Die Farbe passt zum Kontext (z. B. Kupfer für Metallbau, Indigo für Nacht und Energie, Petrol für Wasser oder Umwelt, Beere für Freizeit) und ersetzt innerhalb der Lernsituation die Standardfarbe Blau. Keine neuen Farben ohne Kontrastprüfung (weiße Schrift mindestens 4,5 : 1).
+2. **Kennung:** ein passendes Font-Awesome-Symbol (`icon`, z. B. `fa-archway`, `fa-battery-half`, `fa-helicopter`, `fa-piggy-bank`) und ein kurzer Name (2–3 Wörter, z. B. "Der Torbogen"). Beides steht als Kennung links in der Phasenleiste auf **jeder** Seite (auf schmaleren Bildschirmen nur das Symbol) und als Überschrift der Startbox.
 3. **Titelbild:** ein eigenes, flaches SVG-Sachbild der Situation (`bild`) oben in der Startbox, etwa 720 × 250. Es zeigt die Szene mit den wichtigsten Größen (z. B. Hofeinfahrt mit Torbogen und den Maßen 2 m, 3 m, 4 m). Flächen in Themenfarbe und Themenfarbe-hell, Linien in `--ink`, keine Fotos, keine Verläufe, keine Figuren mit Gesichtern.
 4. **Leitobjekt:** ein Gegenstand, eine Person oder ein Gerät aus der Situation, das durch alle Phasen trägt und benannt wird (z. B. die Biegemaschine: in Phase 2 wird ausprobiert, in Phase 3 "die Gleichung für die Biegemaschine", in Phase 4 der Rückbezug). Es taucht in Seitentiteln, Rückmeldungen und im Rückbezug auf.
 
@@ -284,34 +287,33 @@ Anforderungen an einen guten Kontext:
 ## Differenzierung
 
 - **Hilfen je nach Aufgabe:**
-  - **Mehrschrittige Rechnungen** (Lückenrechnung mit mehreren Zeilen): `SchrittHilfen` aus `lernsituation_kit/kit.tsx`. Neben der Rechnung steht "Hilfe zu: ① ② a ③ ④". Die SuS wählen den Schritt, bei dem sie hängen; es ist immer nur eine Hilfe offen. Jede Hilfe ist eine **konkrete Anleitung** für genau diesen Schritt (was wohin eingesetzt wird, welche Umformung, eine Kontrollmöglichkeit), kein allgemeiner Denkanstoß. Die Kurzbezeichnungen der Hilfen entsprechen den Zeilennamen der Rechnung.
+  - **Mehrschrittige Rechnungen** (Lückenrechnung mit mehreren Zeilen): `SchrittHilfen` aus `lernsituation_kit/kit.tsx`. Bei der Rechnung steht "Hilfe zu: ① ② a ③ ④". Die SuS wählen den Schritt, bei dem sie hängen; es ist immer nur eine Hilfe offen. Jede Hilfe ist eine **konkrete Anleitung** für genau diesen Schritt (was wohin eingesetzt wird, welche Umformung, eine Kontrollmöglichkeit), kein allgemeiner Denkanstoß. Die Kurzbezeichnungen der Hilfen entsprechen den Zeilennamen der Rechnung.
   - **Andere Denkaufgaben** (Auswählen, Begründen, Erkunden): drei gestufte Hilfen mit `Hilfen` (1 Denkanstoß, 2 Strategie, 3 erster Schritt bzw. Teillösung).
-  - Hilfen dürfen die Seite nicht über den Bildschirm hinaus verlängern (Passform mit geöffneter Hilfe testen).
 - **Niveaustufen** Basis, Standard und Erweiterung bei Denkarbeit und Check, sichtbar gekennzeichnet. Die Erweiterung enthält eine offene oder umgekehrte Aufgabe oder eine Begründung.
 
 ## Digitale Umsetzung
 
 - **Konventionen von `mathe-aufgaben` gelten:** KaTeX, Merkhilfe der Wirtschaftsschule Bayern für Formeln und Abkürzungen, nachvollziehbare Rechenwege, Eingabefelder mit grün/rot und Lob, automatische Prüfung (Button "Prüfen").
 - **Bausteine aus `mathe-trainer/src/pages/lineare_funktionen/lernsituation_kit/`:**
-  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Option `ruhig`), Typ `Seite = { art, titel, frei?, bedingung?, inhalt: (fertig) => … }`
-  - `kit.tsx`: `CheckCard` (mit `rechnung`, `fields`, `solution`, `help`, `onSolved`), `McCard` (`onSolved`, `rechnen`), `SchrittHilfen`, `Hilfen`, `HeftHinweis`
+  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Optionen `ruhig` und `thema`), `THEMEN`, Typ `Thema`, Typ `Seite = { art, titel, frei?, bedingung?, inhalt: (fertig) => … }`
+  - `kit.tsx`: `CheckCard` (mit `rechnung`, `fields`, `solution`, `help`, `onSolved`), `McCard` (`onSolved`, `rechnen`), `TrackedCheck`/`TrackedMc` (für Bereiche mit Nachverfolgung), `SchrittHilfen`, `Hilfen`, `HeftHinweis`
   - `phasen.tsx`: `PHASEN` (Namen und Reihenfolge der vier Phasen)
   - `Beispiel` aus `daten_und_zufall/lernpfad/kit.tsx` für Rechenbeispiele (`offen` zeigt alle Schritte, `ab` setzt die Schrittnummerierung fort)
   - `TaskShell` mit `kompakt`
-- **Am bestehenden Code orientieren:** Sieh dir vor dem Bauen `TorbogenEinstieg.tsx` an und übernimm Navigation, Grundstyles und Komponenten für den festen Kern. Bestehende Styles, die dem ruhigen Grunddesign widersprechen (Farbstreifen, verschachtelte Rahmen, Banner, `ZweiSpalten`, eigene Look-CSS wie `werkstatt.css` oder `teamchat.css`), werden **nicht** übernommen. Führe keine neuen Frameworks oder Bibliotheken ein, ohne zu fragen.
+- **Am bestehenden Code orientieren:** Sieh dir vor dem Bauen die Referenz-Umsetzungen an und übernimm Navigation, Grundstyles, Identität (`Titelbild`, `THEMA`) und Komponenten für den festen Kern. Bestehende Styles, die dem ruhigen Grunddesign widersprechen (Farbstreifen, verschachtelte Rahmen, Banner, `ZweiSpalten`, eigene Look-CSS wie `teamchat.css`), werden **nicht** übernommen. Führe keine neuen Frameworks oder Bibliotheken ein, ohne zu fragen.
 - **Festlegung merken:** Vermutungen und Versuche bleiben im Seitenzustand und werden in Phase 4 wieder angezeigt. Kein Login. Wenn `localStorage` genutzt wird, immer mit try/catch.
 - **Interaktive Elemente** einsetzen, wo sie das Denken unterstützen: Ausprobieren mit Live-Graph, Schieberegler, auszufüllende Tabellen, Code-Schlösser, Drag-and-drop. Nicht als Dekoration.
-- **Tablet zuerst, einspaltig, Smartphone bedienbar:** Primär Tablet im Querformat (einspaltig, ohne Scrollen), auf dem Smartphone darf gescrollt werden, alles bleibt bedienbar.
+- **Tablet zuerst, einspaltig, Smartphone bedienbar:** Primär Tablet im Querformat, einspaltig; nach unten scrollen ist überall erlaubt, seitlich nie.
 - **Navigation:** Lernsituationen werden über eine Auswahlseite des Themas erreicht: oben die Karten "Lernsituation 1, 2, …", darunter der Bereich **"Übungsaufgaben"** (nicht "Wähle deinen Schwierigkeitsgrad"). Neue Seite in Routen, Navigation und Themenübersicht eintragen.
 
 ## Checkliste vor der Abgabe
 
-- [ ] Das Log wurde gelesen, die neue Situation unterscheidet sich von den letzten drei mindestens in Format und Lernprodukt, und sie ist eingetragen.
+- [ ] Das Log wurde gelesen, die neue Situation unterscheidet sich von den letzten drei mindestens in Format, Lernprodukt und Themenfarbe, und sie ist eingetragen.
 - [ ] Genau vier Phasen in fester Reihenfolge: Warm-up, Problem erkennen, Problem lösen, Festhalten und Prüfen.
 - [ ] Nichts wird geprüft, bevor es erarbeitet wurde.
 - [ ] Keine Austausch-Phase, keine Stopp-Kästen, kein "Vergleicht eure Wege", kein "So haben andere gedacht".
-- [ ] Seitenansicht mit Startbox (Heft-Bestätigung), eine Aufgabe pro Seite, "Weiter" erst nach dem Erledigen.
-- [ ] Jede Seite passt einspaltig ohne Scrollen auf 1180 × 820, auch nach dem Prüfen und mit geöffneter Hilfe (per Playwright getestet); bei 1920 × 1080 bleibt sie einspaltig.
+- [ ] Seitenansicht mit Startbox (Titelbild, Name, Heft-Bestätigung), eine Aufgabe pro Seite, "Weiter" erst nach dem Erledigen.
+- [ ] Kein seitliches Scrollen bei 1180 × 820, 1920 × 1080 und 390 × 844 (per Playwright getestet); bei 1920 × 1080 bleibt jede Seite einspaltig. Nach unten scrollen ist erlaubt; Skizzen und Graphen sind nicht gestaucht, Beschriftungen gut lesbar.
 - [ ] In "Problem erkennen" ist klar, dass es ums Ausprobieren geht; Auftrag und Ausprobieren stehen auf einer Seite; die SuS merken, dass ihr Vorwissen nicht sicher reicht.
 - [ ] "Problem erkennen" zeigt Situation, Problem (gegeben/gesucht als Fließtext) und den Auftrag als einzigen Fokus.
 - [ ] "Problem lösen" beginnt mit einem klaren Arbeitsauftrag (gegeben, gesucht, Form des Ergebnisses), ohne Nebenaufgaben davor; erst danach kommt das Rechenbeispiel. Kein Beispiel vor dem Problem.
@@ -334,27 +336,35 @@ Anforderungen an einen guten Kontext:
 
 ## Beispiele in verschiedenen Formaten
 
-Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle nutzen das ruhige Grunddesign.
+Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle nutzen das ruhige Grunddesign mit eigener Identität.
 
 ### A. Kundenauftrag / Maschine: Funktionsgleichung aus Scheitelpunkt und einem Punkt (umgesetzt: Torbogen)
 - **Kontext:** Azubi im Metallbau, ein Torbogen über einer 4 m breiten Hofeinfahrt.
 - **Identität:** Themenfarbe Kupfer, Symbol `fa-archway`, Name "Der Torbogen", Titelbild Hofeinfahrt zwischen zwei Häusern mit Maßen, Leitobjekt Biegemaschine.
 - **Warm-up:** Scheitelpunkt ablesen, Gleichung nach a lösen, Klammer ausmultiplizieren.
-- **Problem erkennen:** Auftrag, Skizze und `y = [a]x² + [b]x + [c]` auf einer Seite. Jede gesendete Gleichung wird live in die Skizze gezeichnet, die Maschine meldet, welche Pfosten und welche Höhe passen. Nach drei Versuchen: "Raten bringt dich kaum ans Ziel."
+- **Problem erkennen:** Situation, Problem und Auftrag untereinander, darunter Skizze und `y = [a]x² + [b]x + [c]`. Jede gesendete Gleichung wird live in die Skizze gezeichnet, die Biegemaschine meldet, welche Pfosten und welche Höhe passen. Nach drei Versuchen: "Raten bringt dich kaum ans Ziel."
 - **Problem lösen:** klarer Auftrag mit S(2 | 3) und P(0 | 2), Skizze nur mit S und P, Rechenbeispiel über zwei Seiten, dann Lückenrechnung ① S einsetzen, ② P einsetzen, `a = [ ]`, ③ Scheitelform, ④ allgemeine Form, mit Schritt-Hilfen.
 - **Festhalten und Prüfen:** Rückbezug auf die Versuche, Merke, Spickzettel (analog) mit Kriterien zum Abhaken, Checks (Fehler im Azubi-Plan finden, neue Gleichung aufstellen, Sonderwunsch).
 
-### B. Entscheidungsfall: Schnittpunkte linearer Funktionen
+### B. Experimentierlabor: Nullstellen linearer Funktionen (umgesetzt: Stromspeicher)
+- **Kontext:** Der Stromspeicher einer Solaranlage hat um 20 Uhr noch 2,5 kWh, das Haus verbraucht nachts 0,4 kWh pro Stunde: y = −0,4x + 2,5.
+- **Identität:** Themenfarbe Indigo, Symbol `fa-battery-half`, Name "Der Stromspeicher", Titelbild Haus mit Solaranlage bei Nacht, Leitobjekt Stromspeicher.
+- **Problem erkennen:** Die SuS fragen den Speicher zu selbst gewählten Zeiten ab; jeder Versuch erscheint als Punkt im Graphen. Den genauen Zeitpunkt (x = 6,25, also 2:15 Uhr) treffen sie kaum.
+- **Problem lösen:** Aufgabe, Rechenbeispiel E-Bike-Akku, Lückenrechnung bis zur Uhrzeit mit Schritt-Hilfen.
+- **Lernprodukt (digital):** eigene Speicher-Aufgabe erstellen, prüfen lassen und mit Partner tauschen.
+- **Check:** Bedeutung von N(5 | 0), Nullstelle berechnen (A: x = −4 Vorzeichenfehler, B: x = 12 t verwechselt, C: N(0 | 4) vertauscht, D: N(4 | 0) richtig), umgekehrt: Startwert für "reicht bis 6 Uhr".
+
+### C. Entscheidungsfall: Schnittpunkte linearer Funktionen
 - **Kontext:** Eine Freundin schreibt: "Welche Fahrschule soll ich nehmen?"
 - **Identität:** z. B. Themenfarbe Beere, Symbol `fa-car`, Titelbild zwei Fahrschulschilder an einer Straße, Leitobjekt das Fahrschul-Angebot.
 - **Situation:** Fahrschule A: 400 € Grundbetrag und 55 € pro Fahrstunde. Fahrschule B: 250 € und 65 € pro Fahrstunde.
 - **Problem erkennen:** Die SuS probieren verschiedene Stundenzahlen aus und sehen die Kosten beider Schulen; die Antwort kippt irgendwo, aber wo genau?
 - **Problem lösen:** Kosten A: y = 55x + 400, Kosten B: y = 65x + 250, die Terme gleichsetzen, Lückenrechnung.
 - **Aha:** Bei 15 Fahrstunden kippt die Antwort.
-- **Lernprodukt (digital):** Antwortnachricht an die Freundin im Chat, mit Graph und Begründung.
+- **Lernprodukt (digital):** Antwortnachricht an die Freundin, mit Graph und Begründung.
 - **Check:** Gerade 1: y = 2x + 1, Gerade 2: y = −x + 7. A: x = 2 (nur x-Wert), B: S(5 | 2) (vertauscht), C: S(2 | 5) (richtig), D: S(6 | 13) (Vorzeichenfehler).
 
-### C. Kontrastierende Fälle: Zinseszins
+### D. Kontrastierende Fälle: Zinseszins
 - **Situation:** Zwei Sparpläne über 10 Jahre mit gleichem Zinssatz. Bei einem werden die Zinsen ausgezahlt, beim anderen mitverzinst.
 - **Problem erkennen:** Schieberegler "Wie groß ist der Unterschied nach 10 Jahren?", dann Auflösung.
 - **Problem lösen:** Tabelle Jahr für Jahr ausfüllen, Unterschied beschreiben, dann Faktorschreibweise entdecken.
@@ -362,7 +372,7 @@ Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle 
 - **Lernprodukt (analog):** Concept Map "einfacher Zins vs. Zinseszins" mit Tabelle, Graph und Formel.
 - **Check:** Auswahl der richtigen Formel. A: K·(1 + p·n), B: K·p^n, C: K·(1 + p)^n (richtig).
 
-### D. Fehlerdetektiv / Rätsel: Prozentrechnung (Rabatt auf Rabatt)
+### E. Fehlerdetektiv / Rätsel: Prozentrechnung (Rabatt auf Rabatt)
 - **Ablauf:** Code-Schloss schaltet die nächste Seite frei.
 - **Situation:** Im Sale gibt es 20 % und an der Kasse nochmal 30 %. Mia sagt: "Das sind 50 %!" Leon sagt: "Nein, weniger."
 - **Problem erkennen:** Wer hat recht? Festlegung, dann mit einem Beispielpreis ausprobieren.

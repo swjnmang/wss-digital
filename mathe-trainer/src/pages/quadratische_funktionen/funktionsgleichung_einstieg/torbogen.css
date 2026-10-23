@@ -3,7 +3,7 @@
 
 /* Biegemaschine in Phase 2: Text, Auftrag, Skizze, Eingabe und Anzeige untereinander */
 .tb-maschine { display: flex; flex-direction: column; gap: 10px; }
-.tb-maschine .bk-graph svg { max-height: 186px; }
+.tb-maschine .bk-graph svg { max-height: 300px; }
 .tb-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 6px; font-size: 20px; }
 .tb-eingabe .bk-btn { margin-left: 10px; min-height: 44px; }
 .tb-eingabe .lp-input { min-height: 44px; }
@@ -18,8 +18,8 @@
 .tb-display .fa-circle-check { color: var(--correct); }
 .tb-display .fa-circle-xmark { color: var(--wrong); }
 
-/* Kleinere Skizze auf Seiten, auf denen der Text im Mittelpunkt steht */
-.tb-bild-klein .bk-graph svg { max-height: 205px; }
+/* Skizzen in gut lesbarer Größe; nach unten scrollen ist erlaubt */
+.tb-bild-klein .bk-graph svg { max-height: 300px; }
 
 /* Check 1: Pläne der Azubis untereinander */
 .wm-berichte { display: flex; flex-direction: column; gap: 10px; }

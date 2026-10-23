@@ -343,7 +343,7 @@ export function Feedback({ status, praise, wrongText }: { status: 'idle' | 'ok' 
     return (
       <div className="bk-feedback bk-feedback-no lp-feedback" role="status">
         <i className="fa-solid fa-circle-xmark" aria-hidden="true" />{' '}
-        {wrongText ?? 'Leider noch nicht ganz richtig. Die roten Felder stimmen noch nicht – rechne sie noch einmal nach.'}
+        <span>{wrongText ?? 'Leider noch nicht ganz richtig. Die roten Felder stimmen noch nicht – rechne sie noch einmal nach.'}</span>
       </div>
     )
   if (status === 'empty')
@@ -429,7 +429,10 @@ export function McCard({
       </div>
       {status === 'ok' && choice !== null && (
         <div className="bk-feedback bk-feedback-ok lp-feedback" role="status">
-          <i className="fa-solid fa-circle-check" aria-hidden="true" /> {praise} {options[choice].feedback}
+          <i className="fa-solid fa-circle-check" aria-hidden="true" />{' '}
+          <span>
+            {praise} {options[choice].feedback}
+          </span>
         </div>
       )}
       {status === 'no' && choice !== null && (
