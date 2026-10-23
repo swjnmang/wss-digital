@@ -281,7 +281,7 @@ Anforderungen an einen guten Kontext:
 
 - **Konventionen von `mathe-aufgaben` gelten:** KaTeX, Merkhilfe der Wirtschaftsschule Bayern für Formeln und Abkürzungen, nachvollziehbare Rechenwege, Eingabefelder mit grün/rot und Lob, automatische Prüfung (Button "Prüfen").
 - **Bausteine aus `mathe-trainer/src/pages/lineare_funktionen/lernsituation_kit/`:**
-  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter"), `ZweiSpalten`, Typ `Seite = { art, titel, frei?, bedingung?, inhalt: (fertig) => … }`
+  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Option `ruhig`), Typ `Seite = { art, titel, frei?, bedingung?, inhalt: (fertig) => … }`
   - `kit.tsx`: `CheckCard` (mit `rechnung`, `fields`, `solution`, `help`, `onSolved`), `McCard` (`onSolved`, `rechnen`), `SchrittHilfen`, `Hilfen`, `HeftHinweis`
   - `phasen.tsx`: `PHASEN` (Namen und Reihenfolge der vier Phasen)
   - `Beispiel` aus `daten_und_zufall/lernpfad/kit.tsx` für Rechenbeispiele (`offen` zeigt alle Schritte, `ab` setzt die Schrittnummerierung fort)
