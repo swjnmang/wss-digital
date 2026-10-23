@@ -876,7 +876,6 @@ export default function PunktGerade() {
       <TaskShell title="Punkt auf Gerade prüfen" width="narrow">
         <div className="flex flex-col gap-6">
           {header}
-          {intro}
           <div className={`${panel} flex flex-col`}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
             <button

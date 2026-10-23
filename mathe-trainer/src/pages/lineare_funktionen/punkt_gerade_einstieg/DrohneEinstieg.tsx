@@ -41,7 +41,22 @@ const bx = (x: number) => S.l + ((x - S.xMin) / (S.xMax - S.xMin)) * (S.w - S.l 
 const by = (y: number) => S.h - S.b - ((y - S.yMin) / (S.yMax - S.yMin)) * (S.h - S.t - S.b)
 
 /** ringe: welche Ringe gezeichnet werden; letzterRing: gestrichelte Höhe 8 m für Ring F; fx: Position von Ring F */
-function DrohnenBild({ ringe = RINGE, letzterRing = false, fx }: { ringe?: Ring[]; letzterRing?: boolean; fx?: number }) {
+function DrohnenBild({
+  ringe = RINGE,
+  letzterRing = false,
+  fx,
+  fokus,
+  rechenpunkt,
+}: {
+  ringe?: Ring[]
+  letzterRing?: boolean
+  fx?: number
+  /** Ring der aktuellen Station: hervorgehoben, mit senkrechter Hilfslinie bei seinem x-Wert */
+  fokus?: RingId
+  /** Ergebnis der Rechnung: der Punkt der Flugbahn bei x (erscheint erst nach dem Lösen) */
+  rechenpunkt?: { x: number; y: number }
+}) {
+  const f = ringe.find((r) => r.id === fokus)
   return (
     <div className="bk-graph ls-graph">
       <svg viewBox={`0 0 ${S.w} ${S.h}`} role="img" aria-label="Koordinatensystem mit der geraden Flugbahn einer Drohne und mehreren Leuchtringen">
@@ -93,9 +108,18 @@ function DrohnenBild({ ringe = RINGE, letzterRing = false, fx }: { ringe?: Ring[
             )}
           </>
         )}
+        {f && <line x1={bx(f.x)} x2={bx(f.x)} y1={by(0)} y2={by(bahn(f.x))} stroke="var(--ink-muted)" strokeWidth="2" strokeDasharray="5 4" />}
+        {rechenpunkt && (
+          <g>
+            <rect x={bx(rechenpunkt.x) - 6} y={by(rechenpunkt.y) - 6} width="12" height="12" fill="var(--correct)" stroke="var(--ink)" strokeWidth="1.5" transform={`rotate(45 ${bx(rechenpunkt.x)} ${by(rechenpunkt.y)})`} />
+            <text x={bx(rechenpunkt.x) + 14} y={by(rechenpunkt.y) + 22} fontSize="15" fontWeight="700" fill="var(--correct-ink)">
+              Rechnung: y = {komma(rechenpunkt.y)}
+            </text>
+          </g>
+        )}
         {ringe.map((r) => (
           <g key={r.id}>
-            <circle cx={bx(r.x)} cy={by(r.y)} r="19" fill="var(--surface)" fillOpacity="0.4" stroke="var(--ink)" strokeWidth="3" />
+            <circle cx={bx(r.x)} cy={by(r.y)} r="19" fill={r.id === fokus ? 'var(--highlight)' : 'var(--surface)'} fillOpacity={r.id === fokus ? 0.7 : 0.4} stroke="var(--ink)" strokeWidth={r.id === fokus ? 4.5 : 3} />
             <text x={bx(r.x)} y={r.id === 'B' ? by(r.y) + 40 : by(r.y) - 26} textAnchor="middle" fontSize="16" fontWeight="700" fill="var(--ink)">
               {r.id}({komma(r.x)} | {komma(r.y)})
             </text>
@@ -112,17 +136,17 @@ const STATIONEN = ['Ring B', 'Ring C', 'Ring F']
 const CODE = ['4,5', '5', '12']
 
 /** Levelmap mit drei Stationen; die Ziffern des Codes erscheinen, sobald eine Station gelöst ist */
-function Levelmap({ geloest, aktuell }: { geloest: boolean[]; aktuell?: number }) {
+function Levelmap({ geloest, aktuell, kompakt = false }: { geloest: boolean[]; aktuell?: number; kompakt?: boolean }) {
   const offen = geloest.every(Boolean)
   return (
-    <ol className="dr-map" aria-label="Levelmap mit drei Stationen und dem Hangar-Tor">
+    <ol className={`dr-map${kompakt ? ' dr-map-kompakt' : ''}`} aria-label="Levelmap mit drei Stationen und dem Hangar-Tor">
       {STATIONEN.map((s, i) => (
         <li key={s} className={geloest[i] ? 'is-done' : aktuell === i ? 'is-current' : ''}>
-          <i className={`fa-solid ${geloest[i] ? 'fa-circle-check' : 'fa-location-dot'}`} aria-hidden="true" /> Station {i + 1}: {s}
+          <i className={`fa-solid ${geloest[i] ? 'fa-circle-check' : 'fa-location-dot'}`} aria-hidden="true" /> {kompakt ? s : `Station ${i + 1}: ${s}`}
         </li>
       ))}
       <li className={`is-tor ${offen ? 'is-done' : ''}`}>
-        <i className={`fa-solid ${offen ? 'fa-lock-open' : 'fa-lock'}`} aria-hidden="true" /> Hangar-Tor
+        <i className={`fa-solid ${offen ? 'fa-lock-open' : 'fa-lock'}`} aria-hidden="true" /> {kompakt ? 'Tor' : 'Hangar-Tor'}
         <span className="dr-code" aria-label="Code">
           {CODE.map((c, i) => (
             <span key={i} className={`dr-digit ${geloest[i] ? 'is-on' : ''}`}>
@@ -382,7 +406,12 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
               ]}
             />
           }
-          rechts={<DrohnenBild ringe={RINGE.filter((r) => r.id === 'A')} />}
+          rechts={
+            <>
+              <DrohnenBild fokus="A" rechenpunkt={{ x: 2, y: 3 }} ringe={RINGE.filter((r) => r.id === 'A')} />
+              <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
+            </>
+          }
         />
       ),
     },
@@ -391,17 +420,19 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
       titel: 'Station 1: Ring B',
       inhalt: (fertig) => (
         <div className="dr-stat">
-          <Levelmap geloest={geloest} aktuell={0} />
+          <div className="dr-zwei">
+          <div>
           <CheckCard
             onSolved={() => {
               markiere(0)()
               fertig()
             }}
             title="Station 1: Ring B"
+            fieldsRow
             level="basis"
             prompt={
               <p>
-                Trifft die Drohne Ring <M>{'B(5 \\mid 4{,}5)'}</M>? Rechne wie im Beispiel. Die berechnete Höhe ist die Ziffer für dein Code-Schloss.
+                Trifft die Drohne <M>{'B(5 \\mid 4{,}5)'}</M>?
               </p>
             }
             rechnung={[
@@ -411,7 +442,7 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
             fields={[
               { kind: 'num', key: 'x', label: 'x-Wert von B', expected: 5 },
               { kind: 'num', key: 'y', label: 'berechnete Höhe', expected: 4.5 },
-              { kind: 'select', key: 'e', label: <>③ Ring B hängt bei <M>{'y = 4{,}5'}</M>. Die Drohne …</>, options: ['trifft Ring B', 'trifft Ring B nicht'], expected: 0 },
+              { kind: 'select', key: 'e', label: <>③ Die Drohne …</>, options: ['trifft Ring B', 'trifft B nicht'], expected: 0 },
             ]}
             solution={<MB>{'y = 0{,}5 \\cdot 5 + 2 = 2{,}5 + 2 = 4{,}5 \\quad \\Rightarrow \\quad 4{,}5 = 4{,}5 \\text{ (Treffer)}'}</MB>}
             help={
@@ -424,6 +455,12 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
               />
             }
           />
+          </div>
+          <div>
+          <Levelmap geloest={geloest} aktuell={0} kompakt />
+          <DrohnenBild fokus="B" rechenpunkt={geloest[0] ? { x: 5, y: 4.5 } : undefined} />
+          </div>
+          </div>
         </div>
       ),
     },
@@ -432,17 +469,19 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
       titel: 'Station 2: Ring C',
       inhalt: (fertig) => (
         <div className="dr-stat">
-          <Levelmap geloest={geloest} aktuell={1} />
+          <div className="dr-zwei">
+          <div>
           <CheckCard
             onSolved={() => {
               markiere(1)()
               fertig()
             }}
             title="Station 2: Ring C"
+            fieldsRow
             level="standard"
             prompt={
               <p>
-                Ring <M>{'C(6 \\mid 5{,}5)'}</M> sah im Graphen ganz nah an der Flugbahn aus. Trifft die Drohne die Mitte?
+                Trifft die Drohne die Mitte von <M>{'C(6 \\mid 5{,}5)'}</M>?
               </p>
             }
             rechnung={[
@@ -452,7 +491,7 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
             fields={[
               { kind: 'num', key: 'x', label: 'x-Wert von C', expected: 6 },
               { kind: 'num', key: 'y', label: 'berechnete Höhe', expected: 5 },
-              { kind: 'select', key: 'e', label: <>③ Ring C hängt bei <M>{'y = 5{,}5'}</M>. Die Drohne …</>, options: ['trifft Ring C', 'trifft Ring C nicht'], expected: 1 },
+              { kind: 'select', key: 'e', label: <>③ Die Drohne …</>, options: ['trifft Ring C', 'trifft C nicht'], expected: 1 },
             ]}
             solution={<MB>{'y = 0{,}5 \\cdot 6 + 2 = 3 + 2 = 5 \\quad \\Rightarrow \\quad 5 \\neq 5{,}5 \\text{ (kein Treffer)}'}</MB>}
             help={
@@ -465,6 +504,10 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
               />
             }
           />
+          </div>
+          <div>
+          <Levelmap geloest={geloest} aktuell={1} kompakt />
+          <DrohnenBild fokus="C" rechenpunkt={geloest[1] ? { x: 6, y: 5 } : undefined} />
           {geloest[1] && (
             <div className="ls-question">
               <i className="fa-solid fa-bolt" aria-hidden="true" />
@@ -473,6 +516,8 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
               </span>
             </div>
           )}
+          </div>
+          </div>
         </div>
       ),
     },
@@ -481,7 +526,8 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
       titel: 'Station 3: Wo hängt Ring F?',
       inhalt: (fertig) => (
         <div className="dr-stat">
-          <Levelmap geloest={geloest} aktuell={2} />
+          <div className="dr-zwei">
+          <div>
           <CheckCard
             onSolved={() => {
               markiere(2)()
@@ -491,9 +537,7 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
             level="erweiterung"
             prompt={
               <p>
-                Der letzte Ring <M>F</M> hängt in 8 m Höhe, also <M>{'F(x \\mid 8)'}</M>. Bei welcher Entfernung <M>x</M> muss er hängen, damit die Drohne ihn trifft? Setze diesmal die
-                y-Koordinate ein.
-              </p>
+                Bei welchem <M>x</M> hängt <M>{'F(x \\mid 8)'}</M>, damit die Drohne trifft? Setze <M>y</M> ein.</p>
             }
             rechnung={[
               { l: ['8'], r: ['0{,}5x + 2'], u: '\\text{① } y \\text{ von } F \\text{ einsetzen}' },
@@ -515,6 +559,10 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
               />
             }
           />
+          </div>
+          <div>
+          <Levelmap geloest={geloest} aktuell={2} kompakt />
+          <DrohnenBild letzterRing fx={geloest[2] ? 12 : undefined} />
           {geloest[2] && (
             <>
               <div className="ls-question">
@@ -523,6 +571,8 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
               </div>
             </>
           )}
+          </div>
+          </div>
         </div>
       ),
     },
@@ -546,7 +596,6 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
                   Vergleiche mit der <strong>y-Koordinate</strong> des Punkts: gleich → der Punkt liegt auf der Geraden, verschieden → er liegt nicht darauf.
                 </li>
               </ol>
-              <ErklaerungAufklappen label="Erklärung und Erklärvideo ansehen" />
             </Merke>
           }
         />
