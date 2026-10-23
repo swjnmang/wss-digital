@@ -116,6 +116,35 @@ export function Hilfen({ steps }: { steps: [ReactNode, ReactNode, ReactNode] }) 
   )
 }
 
+// Hilfen je Rechenschritt: Die SuS wählen den Schritt, bei dem sie hängen; es ist immer nur eine Hilfe offen.
+export function SchrittHilfen({ schritte }: { schritte: { kurz: ReactNode; titel: ReactNode; hilfe: ReactNode }[] }) {
+  const [offen, setOffen] = useState<number | null>(null)
+  return (
+    <div className="ls-help ls-help-schritte">
+      <div className="ls-help-wahl">
+        <span>Hilfe zu:</span>
+        {schritte.map((s, i) => (
+          <button
+            key={i}
+            type="button"
+            className={`bk-btn bk-btn-sm ${offen === i ? 'bk-btn-primary' : ''}`}
+            aria-pressed={offen === i}
+            onClick={() => setOffen(offen === i ? null : i)}
+          >
+            {s.kurz}
+          </button>
+        ))}
+      </div>
+      {offen !== null && (
+        <div className="ls-help-card">
+          <div className="ls-help-card-title">Hilfe: {schritte[offen].titel}</div>
+          {schritte[offen].hilfe}
+        </div>
+      )}
+    </div>
+  )
+}
+
 type Tracking = { onInput: () => void; onCheck: (ok: boolean) => void; onHintShown: () => void }
 const NO_TRACKING: Tracking = { onInput: () => {}, onCheck: () => {}, onHintShown: () => {} }
 

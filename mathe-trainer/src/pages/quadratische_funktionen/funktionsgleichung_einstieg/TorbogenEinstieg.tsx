@@ -1,7 +1,7 @@
 import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, SchrittHilfen, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
 import { SeitenLernsituation, ZweiSpalten, type Seite } from '../../lineare_funktionen/lernsituation_kit/seiten'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './werkstatt.css'
@@ -548,16 +548,18 @@ export default function TorbogenEinstieg({
             </p>
           }
           rechnung={[
-            { l: ['y'], r: ['a \\cdot (x -', { luecke: 'xs' }, ')^2 +', { luecke: 'ys' }], u: '\\text{① Scheitelpunkt einsetzen}' },
-            { l: ['2'], r: ['a \\cdot (0 - 2)^2 + 3'], u: '\\text{② Punkt P einsetzen}' },
-            { l: ['2'], r: [{ luecke: 'q' }, '\\cdot a + 3'] },
+            { l: ['y'], r: ['a \\cdot (x -', { luecke: 'xs' }, ')^2 +', { luecke: 'ys' }], u: '\\text{① } S \\text{ einsetzen}' },
+            { l: ['2'], r: ['a \\cdot (0 - 2)^2 + 3'], u: '\\text{② } P \\text{ einsetzen}' },
+            { l: ['2'], r: [{ luecke: 'q' }, '\\cdot a + 3'], u: '\\mid -3 \\quad \\mid :4' },
+            { l: ['a'], r: [{ luecke: 'a1' }], u: '\\text{Formfaktor } a' },
             { l: ['y'], r: [{ luecke: 'as' }, '\\cdot (x - 2)^2 + 3'], u: '\\text{③ Scheitelform}' },
-            { l: ['y'], r: [{ luecke: 'a2' }, 'x^2 +', { luecke: 'b' }, 'x +', { luecke: 'c' }], u: '\\text{④ allgemeine Form}' },
+            { l: ['y'], r: [{ luecke: 'a2' }, 'x^2 +', { luecke: 'b' }, 'x +', { luecke: 'c' }], u: '\\text{④ allg. Form}' },
           ]}
           fields={[
             { kind: 'num', key: 'xs', label: 'x-Wert des Scheitels', expected: 2 },
             { kind: 'num', key: 'ys', label: 'y-Wert des Scheitels', expected: 3 },
             { kind: 'num', key: 'q', label: 'Zahl vor a', expected: 4 },
+            { kind: 'num', key: 'a1', label: 'Formfaktor a', expected: A_SOLL },
             { kind: 'num', key: 'as', label: 'a in der Scheitelform', expected: A_SOLL },
             { kind: 'num', key: 'a2', label: 'Zahl vor x²', expected: A_SOLL },
             { kind: 'num', key: 'b', label: 'Zahl vor x', expected: 1 },
@@ -578,17 +580,57 @@ export default function TorbogenEinstieg({
             </>
           }
           help={
-            <Hilfen
-              steps={[
-                <>
-                  Schau im Rechenbeispiel bei Schritt 1: Setze <M>{'x_S = 2'}</M> und <M>{'y_S = 3'}</M> in <M>{'y = a(x - x_S)^2 + y_S'}</M> ein.
-                </>,
-                <>
-                  Setze den Pfosten ein: <M>{'x = 0'}</M> und <M>{'y = 2'}</M>. Achtung: <M>{'(-2)^2 = 4'}</M>, ein Quadrat ist nie negativ. Dann wie beim Warm-up nach <M>a</M> auflösen.
-                </>,
-                <>
-                  Mit <M>{'a = -0{,}25'}</M>: <M>{'(x - 2)^2 = x^2 - 4x + 4'}</M>. Jetzt jeden der drei Summanden mit <M>{'-0{,}25'}</M> multiplizieren und <M>{'+3'}</M> dazurechnen.
-                </>,
+            <SchrittHilfen
+              schritte={[
+                {
+                  kurz: '①',
+                  titel: 'Scheitelpunkt einsetzen',
+                  hilfe: (
+                    <>
+                      Aus <M>{'S(2 \\mid 3)'}</M> liest du <M>{'x_S = 2'}</M> und <M>{'y_S = 3'}</M> ab. In <M>{'y = a(x - x_S)^2 + y_S'}</M> kommt <M>{'x_S'}</M> in die Klammer und{' '}
+                      <M>{'y_S'}</M> ans Ende. Das <M>a</M> kennst du noch nicht, es bleibt als Buchstabe stehen.
+                    </>
+                  ),
+                },
+                {
+                  kurz: '②',
+                  titel: 'Punkt P einsetzen',
+                  hilfe: (
+                    <>
+                      Vom Pfosten <M>{'P(0 \\mid 2)'}</M> setzt du <M>{'x = 0'}</M> in die Klammer und <M>{'y = 2'}</M> links ein. Rechne die Klammer aus: <M>{'0 - 2 = -2'}</M> und{' '}
+                      <M>{'(-2)^2 = (-2) \\cdot (-2)'}</M>. Ein Quadrat ist nie negativ. Das Ergebnis ist die Zahl vor <M>a</M>.
+                    </>
+                  ),
+                },
+                {
+                  kurz: <M>a</M>,
+                  titel: <>Formfaktor <M>a</M> berechnen</>,
+                  hilfe: (
+                    <>
+                      Jetzt ist nur noch <M>a</M> unbekannt. Löse wie im Warm-up: erst auf beiden Seiten <M>{'-3'}</M>, dann durch die Zahl vor <M>a</M> teilen. Zur Kontrolle: Der Bogen ist
+                      nach unten geöffnet, also muss <M>a</M> negativ sein.
+                    </>
+                  ),
+                },
+                {
+                  kurz: '③',
+                  titel: 'Scheitelform',
+                  hilfe: (
+                    <>
+                      Das berechnete <M>a</M> ersetzt den Buchstaben <M>a</M> in <M>{'y = a(x - 2)^2 + 3'}</M>. Der Rest der Gleichung bleibt gleich.
+                    </>
+                  ),
+                },
+                {
+                  kurz: '④',
+                  titel: 'allgemeine Form',
+                  hilfe: (
+                    <>
+                      Zuerst die Klammer ausmultiplizieren: <M>{'(x - 2)^2 = (x - 2)(x - 2) = x^2 - 4x + 4'}</M>. Dann jeden der drei Summanden mal <M>a</M> nehmen und zum Schluss{' '}
+                      <M>{'+3'}</M> zur Zahl ohne <M>x</M> addieren.
+                    </>
+                  ),
+                },
               ]}
             />
           }
