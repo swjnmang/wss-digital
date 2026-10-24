@@ -1,13 +1,13 @@
-import { useState, type ChangeEvent, type ReactNode } from 'react';
+import { useState, type ChangeEvent, type FocusEvent, type ReactNode } from 'react';
 import TaskShell from '../../../components/layout/TaskShell';
-import { Beispiel, M, MB, Merke, checkNumber, pick } from '../../daten_und_zufall/lernpfad/kit';
+import { Beispiel, M, MB, Merke, checkNumber } from '../../daten_und_zufall/lernpfad/kit';
 import { fieldCheckClass } from '../../../utils/fieldCheck';
 import {
   CardHead,
   CheckCard,
   Feedback,
   Hilfen,
-  PRAISE,
+  useLiveCheck,
   McCard,
   SchrittHilfen,
   TrackedCheck,
@@ -415,7 +415,7 @@ type Spalte = (typeof SPALTEN)[number]['key'];
 
 /**
  * Tilgungsplan zum Ausfüllen wie in der Übung „Tilgungsplan ausfüllen“: eine Zeile pro Jahr, optional eine Summenzeile.
- * Jedes Feld wird nach dem Prüfen einzeln grün oder rot, „Lösungsweg zeigen“ erst nach einem Fehlversuch.
+ * Jedes Feld prüft sich selbst (richtig sofort grün, falsch nach kurzer Pause rot), „Lösungsweg zeigen“ erst nach einem Fehlversuch.
  */
 function TilgungsplanCheck({
   title,
@@ -438,25 +438,11 @@ function TilgungsplanCheck({
     ...zeilen.flatMap((z) => SPALTEN.map((sp) => ({ key: `${z.jahr}-${sp.key}`, expected: z[sp.key] }))),
     ...SPALTEN.flatMap((sp) => (summe?.[sp.key] !== undefined ? [{ key: `summe-${sp.key}`, expected: summe[sp.key] as number }] : [])),
   ];
-  const [werte, setWerte] = useState<Record<string, string>>({});
-  const [marks, setMarks] = useState<Record<string, boolean | undefined>>({});
-  const [status, setStatus] = useState<'idle' | 'ok' | 'no' | 'empty'>('idle');
-  const [praise, setPraise] = useState(PRAISE[0]);
-  const [malFalsch, setMalFalsch] = useState(false);
+  const { values, marks, status, praise, malFalsch, setValue, blur } = useLiveCheck(
+    felder.map((f) => ({ key: f.key, pruefe: (v: string) => checkNumber(v, f.expected) })),
+    { onSolved },
+  );
   const [zeigen, setZeigen] = useState(false);
-
-  const pruefen = () => {
-    if (felder.some((f) => !(werte[f.key] ?? '').trim())) return setStatus('empty');
-    const m: Record<string, boolean | undefined> = {};
-    felder.forEach((f) => (m[f.key] = checkNumber(werte[f.key] ?? '', f.expected)));
-    setMarks(m);
-    const ok = felder.every((f) => m[f.key]);
-    setStatus(ok ? 'ok' : 'no');
-    if (ok) {
-      setPraise(pick(PRAISE));
-      onSolved();
-    } else setMalFalsch(true);
-  };
 
   const feld = (key: string, label: string) => (
     <input
@@ -466,12 +452,9 @@ function TilgungsplanCheck({
       placeholder="?"
       aria-label={label}
       className={`bk-input rd-feld ${fieldCheckClass(marks[key])}`}
-      value={werte[key] ?? ''}
-      onChange={(e: ChangeEvent<HTMLInputElement>) => {
-        setWerte((w) => ({ ...w, [key]: e.target.value }));
-        setMarks((mk) => ({ ...mk, [key]: undefined }));
-        setStatus('idle');
-      }}
+      value={values[key] ?? ''}
+      onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(key, e.target.value)}
+      onBlur={(e: FocusEvent<HTMLInputElement>) => blur(key, e.currentTarget.value)}
     />
   );
 
@@ -511,16 +494,13 @@ function TilgungsplanCheck({
           )}
         </table>
       </div>
-      <div className="bk-actions lp-ex-actions">
-        <button type="button" className="bk-btn bk-btn-primary" onClick={pruefen}>
-          Prüfen
-        </button>
-        {(malFalsch || status === 'ok') && (
+      {(malFalsch || status === 'ok') && (
+        <div className="bk-actions lp-ex-actions">
           <button type="button" className="bk-btn" onClick={() => setZeigen((z) => !z)}>
             <i className="fa-solid fa-route" aria-hidden="true" /> {zeigen ? 'Lösungsweg ausblenden' : 'Lösungsweg zeigen'}
           </button>
-        )}
-      </div>
+        </div>
+      )}
       <Feedback status={status} praise={praise} />
       {help}
       {zeigen && (
@@ -804,17 +784,9 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
               <HeftBild />
               <p className="sl-text">
                 Lege in deinem Heft den Tilgungsplan für den Ofen-Kredit an: eine Tabelle mit allen 5 Jahren und einer Summenzeile, darunter ein
-                Balkendiagramm der Annuitäten mit der Budget-Linie bei 14.500 €. Schreibe zum Schluss einen Antwortsatz an Frau Sommer. Trage deine
-                Ergebnisse danach unten ein und prüfe sie.
+                Balkendiagramm der Annuitäten mit der Budget-Linie bei 14.500 €. Schreibe zum Schluss einen Antwortsatz an Frau Sommer. Übertrage deinen
+                Tilgungsplan danach unten in die Tabelle.
               </p>
-              <Aufklappbar label="Gerüst ansehen" icon="fa-table">
-                <ul className="zk-liste">
-                  <li>Spalten: Jahr, Schuld am Jahresanfang, Zinsen, Tilgung, Annuität</li>
-                  <li>Balken: unten die Tilgung, oben drauf die Zinsen, beides zusammen ist die Annuität</li>
-                  <li>„Liebe Frau Sommer, im 1. Jahr zahlen Sie … €, danach …“</li>
-                  <li>„Insgesamt zahlen Sie … € Zinsen und nicht 15.000 €, weil …“</li>
-                </ul>
-              </Aufklappbar>
             </Handlungsprodukt>
             <Abschnitt titel="Deine Ergebnisse prüfen">
               <WegWahl

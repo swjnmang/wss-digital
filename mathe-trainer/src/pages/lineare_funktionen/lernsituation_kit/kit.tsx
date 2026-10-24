@@ -1,4 +1,4 @@
-import { createContext, useContext, useId, useState, type ChangeEvent, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useId, useRef, useState, type ChangeEvent, type FocusEvent, type ReactNode } from 'react'
 import { InlineMath } from 'react-katex'
 import { useTaskTracking } from '../../../hooks/useTaskTracking'
 import { fieldCheckClass } from '../../../utils/fieldCheck'
@@ -7,7 +7,7 @@ import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './kit.css'
 
 // Gemeinsame Bausteine der Einstiegs-Lernsituationen (Schnittpunkt, Nullstellen …). Die vier festen Phasen stehen in phasen.tsx.
-// Hier: Sozialformen, Niveaustufen, gestufte Hilfen, Aufgabenkarten mit Prüfen, Auswahlaufgaben
+// Hier: Sozialformen, Niveaustufen, gestufte Hilfen, Aufgabenkarten mit automatischer Prüfung je Feld, Auswahlaufgaben mit Prüfen
 // mit diagnostischem Feedback und der aufklappbare Infoteil der Übungsseite.
 
 /** Infoteil der Übungsseite (Erklärung, Beispiel, Erklärvideo) */
@@ -154,6 +154,65 @@ export function SchrittHilfen({ schritte }: { schritte: { kurz: ReactNode; titel
 type Tracking = { onInput: () => void; onCheck: (ok: boolean) => void; onHintShown: () => void }
 const NO_TRACKING: Tracking = { onInput: () => {}, onCheck: () => {}, onHintShown: () => {} }
 
+const TIPP_PAUSE_MS = 1200
+
+/**
+ * Automatische Prüfung je Feld (ohne Prüfen-Button): Ein richtiger Wert wird sofort grün,
+ * ein falscher nach einer kurzen Tipp-Pause oder beim Verlassen des Feldes rot.
+ * Sobald alle Felder richtig sind, kommt das Lob und onSolved wird aufgerufen.
+ */
+export function useLiveCheck(
+  felder: { key: string; pruefe: (v: string) => boolean | undefined; sofort?: boolean }[],
+  { onSolved, tracking = NO_TRACKING }: { onSolved?: () => void; tracking?: Tracking } = {},
+) {
+  const [values, setValues] = useState<Record<string, string>>({})
+  const [marks, setMarks] = useState<Record<string, boolean | undefined>>({})
+  const [status, setStatus] = useState<'idle' | 'ok' | 'no'>('idle')
+  const [praise, setPraise] = useState(PRAISE[0])
+  const [malFalsch, setMalFalsch] = useState(false)
+  const timer = useRef<Record<string, number>>({})
+  const letzte = useRef('')
+
+  useEffect(() => () => Object.values(timer.current).forEach((t) => window.clearTimeout(t)), [])
+
+  const pruefe = (key: string, v: string) => felder.find((f) => f.key === key)?.pruefe(v)
+  const markiere = (key: string, m: boolean | undefined) => setMarks((p) => (p[key] === m ? p : { ...p, [key]: m }))
+
+  const setValue = (key: string, v: string) => {
+    setValues((p) => ({ ...p, [key]: v }))
+    tracking.onInput()
+    window.clearTimeout(timer.current[key])
+    const m = pruefe(key, v)
+    if (m === true || felder.find((f) => f.key === key)?.sofort) return markiere(key, m)
+    markiere(key, undefined)
+    if (m === false) timer.current[key] = window.setTimeout(() => markiere(key, false), TIPP_PAUSE_MS)
+  }
+  const blur = (key: string, v: string) => {
+    window.clearTimeout(timer.current[key])
+    markiere(key, pruefe(key, v))
+  }
+
+  useEffect(() => {
+    const alle = felder.every((f) => marks[f.key] !== undefined)
+    const falsch = felder.some((f) => marks[f.key] === false)
+    const ok = alle && !falsch
+    setStatus(ok ? 'ok' : falsch ? 'no' : 'idle')
+    if (falsch) setMalFalsch(true)
+    const sig = JSON.stringify(felder.map((f) => marks[f.key] ?? null))
+    if (alle && sig !== letzte.current) {
+      letzte.current = sig
+      tracking.onCheck(ok)
+      if (ok) {
+        setPraise(pick(PRAISE))
+        onSolved?.()
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [marks])
+
+  return { values, marks, status, praise, malFalsch, setValue, blur }
+}
+
 type NumField = { kind: 'num'; key: string; label: ReactNode; expected: number; unit?: string; tol?: number }
 
 /** Teil einer Lückenrechnung: TeX-Text oder eine Lücke (Schlüssel eines Zahlenfelds der Karte) */
@@ -163,7 +222,7 @@ export type Zeile = { l: Seg[]; r: Seg[]; u?: string }
 type SelectField = { kind: 'select'; key: string; label: ReactNode; options: string[]; expected: number }
 type CField = NumField | SelectField
 
-/** Aufgabenkarte mit Zahlenfeldern / Auswahllisten, Prüfen, Lob und Lösungsweg */
+/** Aufgabenkarte mit Zahlenfeldern / Auswahllisten: jedes Feld prüft sich selbst (richtig sofort grün, falsch nach kurzer Pause rot), Lob und Lösungsweg */
 export function CheckCard({
   title,
   level,
@@ -201,19 +260,15 @@ export function CheckCard({
   loesungNachFehler?: boolean
 }) {
   const uid = useId()
-  const [malFalsch, setMalFalsch] = useState(false)
-  const [values, setValues] = useState<Record<string, string>>({})
-  const [marks, setMarks] = useState<Record<string, boolean | undefined>>({})
-  const [status, setStatus] = useState<'idle' | 'ok' | 'no' | 'empty'>('idle')
-  const [praise, setPraise] = useState(PRAISE[0])
   const [showSolution, setShowSolution] = useState(false)
-
-  const setValue = (key: string, v: string) => {
-    setValues((p) => ({ ...p, [key]: v }))
-    setMarks((p) => ({ ...p, [key]: undefined }))
-    setStatus('idle')
-    tracking.onInput()
-  }
+  const { values, marks, status, praise, malFalsch, setValue, blur } = useLiveCheck(
+    fields.map((f) => ({
+      key: f.key,
+      sofort: f.kind === 'select',
+      pruefe: (v: string) => (f.kind === 'select' ? (v === '' ? undefined : Number(v) === f.expected) : checkNumber(v, f.expected, f.tol)),
+    })),
+    { onSolved, tracking },
+  )
 
   const inlineKeys = new Set((rechnung ?? []).flatMap((z) => [...z.l, ...z.r]).flatMap((seg) => (typeof seg === 'string' ? [] : [seg.luecke])))
   const listFields = fields.filter((f) => !inlineKeys.has(f.key))
@@ -233,26 +288,9 @@ export function CheckCard({
         className={`bk-input lp-input ${seg.breit ? 'lp-input-md' : 'lp-input-sm'} ls-gap ${fieldCheckClass(marks[f.key])}`}
         value={values[f.key] ?? ''}
         onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(f.key, e.target.value)}
+        onBlur={(e: FocusEvent<HTMLInputElement>) => blur(f.key, e.currentTarget.value)}
       />
     )
-  }
-
-  const check = () => {
-    const m: Record<string, boolean | undefined> = {}
-    for (const f of fields) {
-      const v = values[f.key] ?? ''
-      m[f.key] = f.kind === 'select' ? (v === '' ? undefined : Number(v) === f.expected) : checkNumber(v, f.expected, f.tol)
-    }
-    setMarks(m)
-    if (fields.some((f) => m[f.key] === undefined)) return setStatus('empty')
-    const ok = fields.every((f) => m[f.key])
-    setStatus(ok ? 'ok' : 'no')
-    if (!ok) setMalFalsch(true)
-    if (ok) {
-      setPraise(pick(PRAISE))
-      onSolved?.()
-    }
-    tracking.onCheck(ok)
   }
 
   return (
@@ -306,6 +344,7 @@ export function CheckCard({
                     className={`bk-input lp-input lp-input-md ${fieldCheckClass(marks[f.key])}`}
                     value={values[f.key] ?? ''}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(f.key, e.target.value)}
+                    onBlur={(e: FocusEvent<HTMLInputElement>) => blur(f.key, e.currentTarget.value)}
                   />
                   {f.unit && <span className="lp-unit">{f.unit}</span>}
                 </span>
@@ -314,11 +353,8 @@ export function CheckCard({
           ))}
         </div>
       )}
-      <div className="bk-actions lp-ex-actions">
-        <button type="button" className="bk-btn bk-btn-primary" onClick={check}>
-          Prüfen
-        </button>
-        {solution && (!loesungNachFehler || malFalsch || status === 'ok') && (
+      {solution && (!loesungNachFehler || malFalsch || status === 'ok') && (
+        <div className="bk-actions lp-ex-actions">
           <button
             type="button"
             className="bk-btn"
@@ -329,8 +365,8 @@ export function CheckCard({
           >
             <i className="fa-solid fa-route" aria-hidden="true" /> {showSolution ? 'Lösungsweg ausblenden' : 'Lösungsweg zeigen'}
           </button>
-        )}
-      </div>
+        </div>
+      )}
       <Feedback status={status} praise={praise} />
       {help}
       {showSolution && solution && (

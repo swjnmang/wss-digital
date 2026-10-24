@@ -171,6 +171,8 @@ Für beide Varianten gilt:
 - **Rechnen im Heft:** Alles, was gerechnet wird, rechnen die SuS von Hand im Heft, das Tablet dient zur Kontrolle. Das bestätigen sie **einmal** in der Startbox. Deshalb steht an den einzelnen Aufgaben **kein** Heft-Hinweis ("Im Heft: Rechenweg und Ergebnis aufschreiben …"): `SeitenLernsituation` blendet ihn über `HeftBestaetigtCtx` automatisch aus. Schreibe auch keine eigenen Sätze wie "Halte deinen Rechenweg schriftlich fest" oder "Rechne im Heft" in die Aufgaben.
 - **Lücken direkt in der Gleichung:** Werte, die die SuS in eine Gleichung einsetzen oder ergänzen, tragen sie im Kästchen **in der Gleichung** ein, nicht in einem Feld daneben oder darunter (kein `\square` mit Feld daneben). Dafür `CheckCard` mit `rechnung`: Zeilen `{ l: [...], r: [...], u?: '\\mid -3' }` aus TeX-Stücken und Lücken `{ luecke: 'feldKey' }`.
 - **Eine Zeile pro Zwischenergebnis:** Bei mehrschrittigen Rechnungen bekommt jedes wichtige Zwischenergebnis eine eigene Zeile, damit die SuS die Struktur sehen. Beispiel: Vor der Scheitelform steht `a = [ ]` ("Formfaktor a"), damit klar ist, dass zuerst a berechnet wird. Die Zeilen sind am rechten Rand kurz benannt (① S einsetzen, ② P einsetzen, Formfaktor a, ③ Scheitelform, ④ allg. Form), Umformungen als `| −3  | :4`.
+- **Automatische Prüfung ohne Prüfen-Button:** Eingabefelder prüfen sich selbst. Ein richtiges Ergebnis wird sofort grün, ein falsches nach einer kurzen Tipp-Pause (ca. 1,2 s) oder beim Verlassen des Feldes rot. Es gibt keinen Button "Prüfen". `CheckCard` macht das automatisch; eigene Eingabe-Bausteine (z. B. Tabellen) nutzen dafür `useLiveCheck` aus `lernsituation_kit/kit.tsx`. Sobald alle Felder grün sind, kommen Lob und `onSolved`. Nur Auswahlaufgaben (`McCard`) behalten den Prüfen-Button, weil dort nichts ausgefüllt wird.
+- **Gleiche Darstellung wie in den Übungsaufgaben:** Werden Ergebnisse geprüft, die in den Übungsaufgaben des Themas eine feste Form haben, sehen die Felder genauso aus, z. B. der Tilgungsplan als Tabelle (Jahr, Schuld am Jahresanfang, Tilgung, Zinsen, Annuität, Summenzeile) statt einer Liste einzelner Felder.
 - **Live-Rückmeldung bei Graphen:** Geben SuS eine Gleichung oder einen Wert ein, wird das Ergebnis beim Absenden sofort in die Skizze gezeichnet (frühere Versuche blass, aktueller kräftig in Themenfarbe, Treffer grün).
 
 ## Didaktische Leitlinien
@@ -328,12 +330,12 @@ Anforderungen an einen guten Kontext:
 - **Hilfen je nach Weg:**
   - **Lösungsschema** (Lückenrechnung mit mehreren Zeilen): `SchrittHilfen` aus `lernsituation_kit/kit.tsx`. Bei der Rechnung steht "Hilfe zu: ① ② ③ …". Die SuS wählen den Schritt, bei dem sie hängen; es ist immer nur eine Hilfe offen. Jede Hilfe ist eine **konkrete Anleitung** für genau diesen Schritt, kein allgemeiner Denkanstoß. Die Kurzbezeichnungen entsprechen den Zeilennamen der Rechnung.
   - **Selbst rechnen und andere Denkaufgaben** (Auswählen, Begründen, Erkunden): drei gestufte Hilfen mit `Hilfen` (1 Denkanstoß, 2 Strategie, 3 erster Schritt bzw. Teillösung).
-- **Lösungsweg erst nach einem Fehlversuch:** In "Problem lösen" bekommen die `CheckCard`s `loesungNachFehler`. Der Knopf "Lösungsweg zeigen" erscheint erst, nachdem einmal falsch geprüft wurde.
+- **Lösungsweg erst nach einem Fehlversuch:** In "Problem lösen" bekommen die `CheckCard`s `loesungNachFehler`. Der Knopf "Lösungsweg zeigen" erscheint erst, nachdem ein Feld einmal rot war.
 - **Niveaustufen** Basis, Standard und Erweiterung bei den Übungsaufgaben in Phase 4, sichtbar gekennzeichnet. Die Erweiterung enthält eine offene oder umgekehrte Aufgabe oder eine Begründung.
 
 ## Digitale Umsetzung
 
-- **Konventionen von `mathe-aufgaben` gelten:** KaTeX, Merkhilfe der Wirtschaftsschule Bayern für Formeln und Abkürzungen, nachvollziehbare Rechenwege, Eingabefelder mit grün/rot und Lob, automatische Prüfung (Button "Prüfen").
+- **Konventionen von `mathe-aufgaben` gelten:** KaTeX, Merkhilfe der Wirtschaftsschule Bayern für Formeln und Abkürzungen, nachvollziehbare Rechenwege, Eingabefelder mit grün/rot und Lob. In Lernsituationen prüft sich jedes Feld selbst (richtig sofort grün, falsch nach kurzer Pause rot), ohne Button "Prüfen".
 - **Bausteine aus `mathe-trainer/src/pages/lineare_funktionen/lernsituation_kit/`:**
   - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Optionen `ruhig` und `thema`), Typ `Seite = { art, titel, frei?, bedingung?, pflicht?, inhalt: (fertig) => … }` mit `fertig()` bzw. `fertig.teil('schluessel')`, `Abschnitt` (Zwischenüberschrift), `Aufklappbar` (Rechenbeispiel, Satzanfänge), `WegWahl` (selbst rechnen / Lösungsschema), `Handlungsprodukt` (Auftrag), `LernsituationKarte` (Karte für die Auswahlseite), `THEMEN`, Typ `Thema`
   - `kit.tsx`: `CheckCard` (mit `rechnung`, `fields`, `solution`, `help`, `onSolved`, `loesungNachFehler`), `McCard` (`onSolved`), `TrackedCheck`/`TrackedMc` (für Bereiche mit Nachverfolgung), `SchrittHilfen`, `Hilfen` (`HeftHinweis` wird in der Seitenansicht nicht angezeigt)
@@ -358,6 +360,7 @@ Anforderungen an einen guten Kontext:
 - [ ] "Problem erkennen" zeigt Situation, Problem (gegeben/gesucht als Fließtext) und den Auftrag als einzigen Fokus.
 - [ ] "Problem lösen": Problem oben als Fokus, darunter Rechenbeispiel (andere Zahlen) zum Aufklappen, Auftrag zum Handlungsprodukt, Wahl "Selbst rechnen / Mit Lösungsschema" mit denselben Ergebnissen, Lösungsweg erst nach einem Fehlversuch, am Ende Rückbezug und Merke. Kein Beispiel vor dem Problem.
 - [ ] Kein Heft-Hinweis und kein "Schreibe … ins Heft" an den Aufgaben (die Bestätigung in der Startbox genügt).
+- [ ] Eingabefelder prüfen sich selbst (richtig sofort grün, falsch nach kurzer Pause rot), kein Prüfen-Button außer bei Auswahlaufgaben.
 - [ ] Alles Mathematische ist mit KaTeX gesetzt, auch im Fließtext; keine `.katex-error`.
 - [ ] Funktionsgleichungen mit `y = …`, Funktionswerte als "x einsetzen", Scheitelform `y = a(x − x_S)² + y_S`.
 - [ ] Im Lösungsschema stehen die Lücken direkt in der Gleichung; jedes Zwischenergebnis hat eine eigene Zeile (z. B. `a = [ ]`).
