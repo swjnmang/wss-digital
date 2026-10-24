@@ -2,7 +2,7 @@ import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
 import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../../lineare_funktionen/lernsituation_kit/kit'
-import { SeitenLernsituation, type Seite, type Thema } from '../../lineare_funktionen/lernsituation_kit/seiten'
+import { SeitenLernsituation, THEMEN, type Seite, type Thema } from '../../lineare_funktionen/lernsituation_kit/seiten'
 import { GegebenGesucht, Kriterien, VideoAufklappen, Vermutung, euro, type Festlegung } from '../zins_kit/zins_kit'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 
@@ -183,6 +183,56 @@ function UmstellBeispiel({ g }: { g: Gesucht }) {
   )
 }
 
+/* ── Bilder für „Problem erkennen“ und „Problem lösen“ ─────────────────── */
+
+const NOTIZEN: { x: number; dreh: number; wer: string; groesse: string; frage: string }[] = [
+  { x: 40, dreh: -3, wer: 'Emma', groesse: 'K', frage: 'Wie viel Geld?' },
+  { x: 270, dreh: 2, wer: 'Noah', groesse: 'p', frage: 'Welcher Zinssatz?' },
+  { x: 500, dreh: -2, wer: 'Frau Yilmaz', groesse: 't', frage: 'Wie viele Tage?' },
+]
+
+/** Die Pinnwand der Klasse 10b mit drei Zetteln: Gesucht ist einmal K, einmal p, einmal t */
+function PinnwandBild() {
+  return (
+    <div className="zk-bild">
+      <svg viewBox="0 0 720 240" role="img" aria-label="Pinnwand der Klasse 10b mit drei Zetteln: Emma fragt nach dem Kapital K, Noah nach dem Zinssatz p, Frau Yilmaz nach den Zinstagen t.">
+        <rect x="8" y="8" width="704" height="224" rx="14" fill="var(--surface-sunken)" stroke="var(--ink)" strokeWidth="2" />
+        <text x="360" y="38" textAnchor="middle" fontSize="18" fontWeight="800" fill="var(--ink)">
+          Abschlussfahrt 10b
+        </text>
+        {NOTIZEN.map((n) => (
+          <g key={n.wer} transform={`rotate(${n.dreh} ${n.x + 90} 140)`}>
+            <rect x={n.x} y="56" width="180" height="160" rx="6" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="1.5" />
+            <circle cx={n.x + 90} cy="64" r="8" fill="var(--primary)" stroke="var(--ink)" strokeWidth="1.5" />
+            <text x={n.x + 90} y="102" textAnchor="middle" fontSize="17" fontWeight="700" fill="var(--ink)">
+              {n.wer}
+            </text>
+            <text x={n.x + 90} y="160" textAnchor="middle" fontSize="44" fontWeight="800" fontStyle="italic" fill="var(--primary)">
+              {n.groesse} = ?
+            </text>
+            <text x={n.x + 90} y="196" textAnchor="middle" fontSize="16" fill="var(--ink)">
+              {n.frage}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  )
+}
+
+const { farbe: BEERE, soft: BEERE_SOFT } = THEMEN.beere
+const markiert = (t: string) => `\\fcolorbox{${BEERE}}{${BEERE_SOFT}}{$${t}$}`
+
+/** Die Zinsformel; die gesuchte Größe ist markiert (Leitbild in „Problem lösen“) */
+function FormelBild({ ziel }: { ziel?: Gesucht }) {
+  const g = (x: Gesucht) => (ziel === x ? markiert(x) : x)
+  return (
+    <div className="zk-formel" aria-label={ziel ? `Zinsformel, gesucht ist ${ziel}` : 'Zinsformel'}>
+      <MB>{`Z = \\frac{${g('K')} \\cdot ${g('p')} \\cdot ${g('t')}}{100 \\cdot 360}`}</MB>
+    </div>
+  )
+}
+
 /* ── Lernprodukt: Aufgaben-Baukasten ───────────────────────────────────── */
 
 function Baukasten({ onFertig }: { onFertig: () => void }) {
@@ -290,6 +340,7 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
           <p className="sl-fokus-titel">Eure Aufgabe</p>
           <p>{frage}</p>
         </div>
+        <FormelBild ziel={g} />
         <GegebenGesucht gegeben={gegeben} gesucht={gesucht} />
         <p className="sl-hinweis">So stellst du die Zinsformel um, an einem Beispiel mit anderen Zahlen:</p>
         <UmstellBeispiel g={g} />
@@ -376,6 +427,7 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
           </p>
           <ZielBalken />
           <p className="sl-text">An der Pinnwand der Klasse hängen drei Fragen:</p>
+          <PinnwandBild />
           <ol className="zk-liste">
             <li>
               <strong>Emma, Klassensprecherin:</strong> „Wie viel Geld muss in der Kasse liegen, damit bis zum 01.08. genau 72 € Zinsen zusammenkommen?“
@@ -428,7 +480,7 @@ export default function KasseEinstieg({ onBack, onPractice, onPrev }: { onBack: 
               Zinsformel um.
             </p>
           </div>
-          <MB>{'Z = \\frac{K \\cdot p \\cdot t}{100 \\cdot 360}'}</MB>
+          <FormelBild />
           <p className="sl-text">
             Arbeitet zu zweit. Bei jeder Frage erklärt abwechselnd eine Person den Rechenweg, die andere rechnet mit. Ihr löst die Fragen nacheinander: Bei jeder seht ihr zuerst ein
             Rechenbeispiel, dann rechnet ihr selbst.

@@ -140,6 +140,98 @@ const THEMA: Thema = {
   bild: <Titelbild />,
 };
 
+/* ── Bilder für „Problem erkennen“ und „Problem lösen“ ─────────────────── */
+
+/** Die beiden Angebote als Sachbild: Sparschwein (Tagesgeld, jederzeit verfügbar) und Tresor (Festgeld, 90 Tage fest) */
+function AngeboteBild() {
+  return (
+    <div className="zk-bild">
+      <svg viewBox="0 0 720 230" role="img" aria-label="Zwei Angebote der Bank. A: Tagesgeld mit 2,4 Prozent pro Jahr, jederzeit verfügbar, dargestellt als Sparschwein. B: Festgeld mit 3,0 Prozent pro Jahr, 90 Tage fest angelegt, dargestellt als Tresor mit Schloss.">
+        {/* Karte A */}
+        <rect x="12" y="12" width="336" height="206" rx="16" fill="var(--surface)" stroke="var(--line)" strokeWidth="2" />
+        <rect x="12" y="12" width="336" height="44" rx="16" fill="var(--primary-soft)" />
+        <rect x="12" y="40" width="336" height="16" fill="var(--primary-soft)" />
+        <text x="32" y="42" fontSize="20" fontWeight="800" fill="var(--ink)">
+          A: Tagesgeld
+        </text>
+        <ellipse cx="104" cy="148" rx="62" ry="44" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
+        <circle cx="164" cy="146" r="16" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
+        <circle cx="160" cy="143" r="3" fill="var(--ink)" />
+        <circle cx="168" cy="149" r="3" fill="var(--ink)" />
+        <polygon points="120,108 134,88 142,112" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
+        <circle cx="136" cy="132" r="4" fill="#fff" />
+        <rect x="66" y="184" width="14" height="20" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
+        <rect x="120" y="184" width="14" height="20" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
+        <rect x="86" y="104" width="34" height="7" rx="3" fill="var(--ink)" />
+        <ellipse cx="103" cy="84" rx="16" ry="6" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
+        <text x="196" y="132" fontSize="32" fontWeight="800" fill="var(--primary)">
+          2,4 %
+        </text>
+        <text x="198" y="156" fontSize="16" fill="var(--ink-muted)">
+          pro Jahr
+        </text>
+        <text x="198" y="188" fontSize="15" fontWeight="700" fill="var(--ink)">
+          jederzeit verfügbar
+        </text>
+        {/* Karte B */}
+        <rect x="372" y="12" width="336" height="206" rx="16" fill="var(--surface)" stroke="var(--line)" strokeWidth="2" />
+        <rect x="372" y="12" width="336" height="44" rx="16" fill="var(--primary-soft)" />
+        <rect x="372" y="40" width="336" height="16" fill="var(--primary-soft)" />
+        <text x="392" y="42" fontSize="20" fontWeight="800" fill="var(--ink)">
+          B: Festgeld
+        </text>
+        <rect x="400" y="84" width="124" height="112" rx="10" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
+        <rect x="412" y="96" width="100" height="88" rx="6" fill="none" stroke="#fff" strokeWidth="2" opacity="0.6" />
+        <circle cx="462" cy="140" r="22" fill="#fff" stroke="var(--ink)" strokeWidth="2" />
+        <line x1="462" y1="140" x2="474" y2="128" stroke="var(--ink)" strokeWidth="3" strokeLinecap="round" />
+        <rect x="410" y="196" width="16" height="10" fill="var(--ink)" />
+        <rect x="498" y="196" width="16" height="10" fill="var(--ink)" />
+        <path d="M510 92 v-12 a12 12 0 0 1 24 0 v12" fill="none" stroke="var(--ink)" strokeWidth="4" />
+        <rect x="504" y="90" width="36" height="28" rx="5" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
+        <text x="556" y="132" fontSize="32" fontWeight="800" fill="var(--primary)">
+          3,0 %
+        </text>
+        <text x="558" y="156" fontSize="16" fill="var(--ink-muted)">
+          pro Jahr
+        </text>
+        <text x="558" y="188" fontSize="15" fontWeight="700" fill="var(--ink)">
+          90 Tage fest
+        </text>
+      </svg>
+    </div>
+  )
+}
+
+/** Handlungsprodukt: Antwortbrief an Lena mit Umschlag und Stift */
+function BriefBild() {
+  return (
+    <div className="zk-bild zk-bild-klein">
+      <svg viewBox="0 0 720 190" role="img" aria-label="Ein Briefumschlag an Lena und ein Blatt mit dem Anfang der Antwort: Liebe Lena, ich empfehle dir …">
+        <rect x="40" y="40" width="230" height="140" rx="10" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
+        <polyline points="40,44 155,120 270,44" fill="none" stroke="var(--ink)" strokeWidth="2" />
+        <rect x="222" y="54" width="34" height="40" rx="3" fill="var(--primary)" />
+        <text x="72" y="164" fontSize="18" fontWeight="700" fill="var(--ink)">
+          An: Lena
+        </text>
+        <rect x="320" y="14" width="300" height="168" rx="6" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
+        <text x="344" y="50" fontSize="20" fontStyle="italic" fill="var(--ink)">
+          Liebe Lena,
+        </text>
+        <text x="344" y="80" fontSize="18" fontStyle="italic" fill="var(--ink-muted)">
+          ich empfehle dir …
+        </text>
+        {[108, 132, 156].map((y) => (
+          <line key={y} x1="344" x2="596" y1={y} y2={y} stroke="var(--line)" strokeWidth="2" />
+        ))}
+        <g transform="rotate(-35 660 120)">
+          <rect x="600" y="110" width="120" height="18" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
+          <polygon points="600,110 584,119 600,128" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
+        </g>
+      </svg>
+    </div>
+  )
+}
+
 /* ── Leitobjekt: die Zinstage-Leiste ────────────────────────────────────── */
 
 const L = { x0: 24, x1: 656 };
@@ -382,6 +474,7 @@ export default function AutogeldEinstieg({
               nehmen?
             </p>
           </Zitat>
+          <AngeboteBild />
           <ZinstageLeiste />
           <p className="sl-hinweis">
             „p.a.“ heißt „pro Jahr“ (lateinisch: per annum). Nach den 90 Tagen kommt das Festgeld
@@ -453,6 +546,7 @@ export default function AutogeldEinstieg({
               <VideoAufklappen src={VIDEO_ZINSEN} title="Erklärvideo: Zinsen berechnen" />
             </Aufklappbar>
             <Handlungsprodukt titel="Antwort an Lena">
+              <BriefBild />
               <p className="sl-text">
                 Schreibe Lena in deinem Heft eine Antwort. Rechne darin die Zinstage und die Zinsen
                 für beide Angebote vor und gib ihr eine klare Empfehlung. Trage deine Ergebnisse
