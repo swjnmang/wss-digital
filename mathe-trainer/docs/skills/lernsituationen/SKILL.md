@@ -381,8 +381,8 @@ Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle 
 - **Auswahlseite:** Variante B (`FunktionsgleichungMenu.tsx`, zusammen mit Lernsituation 2).
 - **Warm-up:** Scheitelpunkt ablesen, Gleichung nach a lösen, Klammer ausmultiplizieren.
 - **Problem erkennen:** Situation, Problem und Auftrag untereinander, darunter Skizze und `y = [a]x² + [b]x + [c]`. Jede gesendete Gleichung wird live in die Skizze gezeichnet, die Biegemaschine meldet, welche Pfosten und welche Höhe passen. Nach drei Versuchen: "Raten bringt dich kaum ans Ziel."
-- **Problem lösen:** klarer Auftrag mit S(2 | 3) und P(0 | 2), Skizze nur mit S und P, Rechenbeispiel über zwei Seiten, dann Lückenrechnung ① S einsetzen, ② P einsetzen, `a = [ ]`, ③ Scheitelform, ④ allgemeine Form, mit Schritt-Hilfen.
-- **Wissen prüfen und vertiefen:** Rückbezug auf die Versuche, Merke, Spickzettel (analog) mit Kriterien zum Abhaken, Checks (Fehler im Azubi-Plan finden, neue Gleichung aufstellen, Sonderwunsch).
+- **Problem lösen:** klarer Auftrag mit S(2 | 3) und P(0 | 2), Skizze nur mit S und P, Rechenbeispiel zum Aufklappen, Handlungsprodukt Spickzettel (analog), dann selbst rechnen oder Lösungsschema ① S einsetzen, ② P einsetzen, `a = [ ]`, ③ Scheitelform, ④ allgemeine Form, mit Schritt-Hilfen; danach Rückbezug auf die Versuche und Merke.
+- **Wissen prüfen und vertiefen:** Übungsaufgaben (Fehler im Azubi-Plan finden, neue Gleichung aufstellen, Sonderwunsch).
 
 ### B. Experimentierlabor: Nullstellen linearer Funktionen (umgesetzt: Stromspeicher)
 - **Kontext:** Der Stromspeicher einer Solaranlage hat um 20 Uhr noch 2,5 kWh, das Haus verbraucht nachts 0,4 kWh pro Stunde: y = −0,4x + 2,5.
@@ -400,7 +400,7 @@ Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle 
 - **Problem erkennen:** Die SuS probieren verschiedene Stundenzahlen aus und sehen die Kosten beider Schulen; die Antwort kippt irgendwo, aber wo genau?
 - **Problem lösen:** Kosten A: y = 55x + 400, Kosten B: y = 65x + 250, die Terme gleichsetzen, Lückenrechnung.
 - **Aha:** Bei 15 Fahrstunden kippt die Antwort.
-- **Handlungsprodukt (digital, Ausnahme):** Antwortnachricht an die Freundin, mit Graph und Begründung.
+- **Handlungsprodukt (analog):** Antwort an die Freundin im Heft, mit Skizze der beiden Kostengeraden und Begründung.
 - **Übungsaufgaben:** Gerade 1: y = 2x + 1, Gerade 2: y = −x + 7. A: x = 2 (nur x-Wert), B: S(5 | 2) (vertauscht), C: S(2 | 5) (richtig), D: S(6 | 13) (Vorzeichenfehler).
 
 ### D. Kontrastierende Fälle: Zinseszins
