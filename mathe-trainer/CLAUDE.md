@@ -71,6 +71,9 @@ Monitoren, kein `ZweiSpalten`), kein seitliches Scrollen; eine Akzentfarbe, kein
 keine Kontext-Looks; pro Seite ist nur der Auftrag hervorgehoben (`sl-fokus`). Jede Lernsituation hat trotzdem eine eigene Identität
 (Prop `thema`: Themenfarbe aus `THEMEN`, Symbol, Name, Titelbild, dazu ein Leitobjekt), damit sie nicht wie alle anderen aussieht. Reihenfolge in „Problem lösen“ immer: Problem → Rechenbeispiel (aufklappbar) →
 Handlungsprodukt → eigene Rechnung. Bei Auswahlaufgaben ist Antwort A nie die richtige. Details: `docs/skills/lernsituationen/SKILL.md`.
+Eingabefelder in Lernsituationen prüfen sich selbst (richtig sofort grün, falsch nach kurzer Tipp-Pause oder beim Verlassen rot),
+ohne Prüfen-Button: `CheckCard` macht das automatisch, eigene Eingabe-Bausteine nutzen `useLiveCheck` aus `lernsituation_kit/kit.tsx`.
+Nur Auswahlaufgaben (`McCard`) behalten „Prüfen“.
 Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
 aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
 
