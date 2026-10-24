@@ -55,20 +55,22 @@ nicht nur auf einen Feature-Branch. Vorher `main` aktualisieren und mergen, kein
 ## Seiten mit Lernsituation
 
 Jede Lernsituation hat genau vier Phasen in fester Reihenfolge: **1 Warm-up**, **2 Problem erkennen**, **3 Problem lösen**,
-**4 Festhalten und Prüfen**. Dafür `Etappe`, `Teil` und `Fortschritt` aus `lineare_funktionen/lernsituation_kit/phasen.tsx` nutzen
-(`<Etappe prefix="…" art="start|problem|loesen|sichern">`); Namen und Reihenfolge stehen nur dort. Abschnitte mit eigener Sozialform
-(Austausch, Check, Merke) sind `<Teil>` innerhalb einer Phase. In „Problem lösen“ steht das eigentliche Problem im Mittelpunkt, ohne
-vorgeschaltete Nebenaufgaben. Beispiel: `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx`.
+**4 Wissen prüfen und vertiefen** (mindestens 3–4 Übungsaufgaben). Seit 2026-10-24 steht **jede Phase auf genau einer Seite**
+(`Seite.pflicht` + `fertig.teil('…')`, „Weiter“ erst, wenn alle Pflichtaufgaben gelöst sind). „Problem lösen“: Problem oben, Rechenbeispiel
+zum Aufklappen (`Aufklappbar`), Auftrag zum meist analogen Handlungsprodukt (`Handlungsprodukt`), dann `WegWahl` „Selbst rechnen“
+(nur Ergebnisfelder, `Hilfen`) oder „Mit Lösungsschema“ (Lückenrechnung, `SchrittHilfen`), beide mit `loesungNachFehler`; danach Rückbezug
+und Merke. Vorlage: `finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx`. Namen und Reihenfolge der Phasen stehen nur in `PHASEN`
+(`lineare_funktionen/lernsituation_kit/phasen.tsx`). In „Problem lösen“ steht das eigentliche Problem im Mittelpunkt, ohne vorgeschaltete Nebenaufgaben.
 Seitenansicht: Lernsituationen beginnen mit einer Startbox, in der die SuS bestätigen, dass sie alle Rechenschritte im Heft
-dokumentieren. Danach steht genau eine Aufgabe pro Seite; „Weiter“ wird erst frei, wenn die Seite erledigt ist. Dafür
+dokumentieren. Danach folgt eine Seite pro Phase; „Weiter“ wird erst frei, wenn die Seite erledigt ist. Dafür
 `SeitenLernsituation` aus `lineare_funktionen/lernsituation_kit/seiten.tsx` nutzen (`onSolved` an `CheckCard`/`McCard`, `frei` für
 Info-Seiten) und `TaskShell` mit `kompakt`. Optimiert für Tablets im Querformat: nach unten scrollen ist erlaubt, seitlich scrollen nie;
 Skizzen und Graphen nicht stauchen, damit alles auf einen Bildschirm passt. Beispiel: `TorbogenEinstieg.tsx`.
 Ruhiges Grunddesign (seit 2026-10-23, Vorlage `TorbogenEinstieg.tsx`): `SeitenLernsituation` mit `ruhig`, immer einspaltig (auch auf breiten
 Monitoren, kein `ZweiSpalten`), kein seitliches Scrollen; eine Akzentfarbe, keine Farbstreifen, keine verschachtelten Kästen,
 keine Kontext-Looks; pro Seite ist nur der Auftrag hervorgehoben (`sl-fokus`). Jede Lernsituation hat trotzdem eine eigene Identität
-(Prop `thema`: Themenfarbe aus `THEMEN`, Symbol, Name, Titelbild, dazu ein Leitobjekt), damit sie nicht wie alle anderen aussieht. Reihenfolge in „Problem lösen“ immer: Aufgabe → Rechenbeispiel →
-eigene Rechnung. Bei Auswahlaufgaben ist Antwort A nie die richtige. Details: `docs/skills/lernsituationen/SKILL.md`.
+(Prop `thema`: Themenfarbe aus `THEMEN`, Symbol, Name, Titelbild, dazu ein Leitobjekt), damit sie nicht wie alle anderen aussieht. Reihenfolge in „Problem lösen“ immer: Problem → Rechenbeispiel (aufklappbar) →
+Handlungsprodukt → eigene Rechnung. Bei Auswahlaufgaben ist Antwort A nie die richtige. Details: `docs/skills/lernsituationen/SKILL.md`.
 Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
 aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
 
