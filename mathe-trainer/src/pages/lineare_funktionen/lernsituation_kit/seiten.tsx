@@ -1,13 +1,13 @@
-import { useEffect, useState, type CSSProperties, type ChangeEvent, type ReactNode } from 'react'
-import { HeftBestaetigtCtx } from './kit'
-import { PHASEN, type PhaseArt } from './phasen'
-import './phasen.css'
-import './seiten.css'
+import { useEffect, useState, type CSSProperties, type ChangeEvent, type ReactNode } from 'react';
+import { HeftBestaetigtCtx } from './kit';
+import { PHASEN, type PhaseArt } from './phasen';
+import './phasen.css';
+import './seiten.css';
 
 // Seitenansicht einer Lernsituation: zuerst eine Startbox, in der die SuS bestätigen, dass sie alle Rechenschritte im Heft
-// dokumentieren. Danach genau eine Aufgabe pro Seite. „Weiter“ wird erst frei, wenn die Seite erledigt ist (fertig() wurde
+// dokumentieren. Danach eine Seite pro Phase. „Weiter“ wird erst frei, wenn die Seite erledigt ist (fertig() bzw. alle fertig.teil() der pflicht wurden
 // aufgerufen) oder die Seite als frei markiert ist (reine Info-Seiten). Alle Seiten bleiben eingehängt, damit Eingaben beim
-// Zurückblättern erhalten bleiben. Jede Seite muss auf ein Tablet im Querformat passen (ohne Scrollen).
+// Zurückblättern erhalten bleiben. Nach unten scrollen ist erlaubt, seitlich nie.
 
 /** Themenfarben für die Identität einer Lernsituation (alle mit weißer Schrift kontraststark, bewusst ohne Grün und Rot) */
 export const THEMEN = {
@@ -19,41 +19,80 @@ export const THEMEN = {
   schiefer: { farbe: '#3c5466', soft: '#e8eef2' },
   indigo: { farbe: '#4338a6', soft: '#ecebf9' },
   kupfer: { farbe: '#9a4515', soft: '#fbece3' },
-} as const
+} as const;
 
 /** Identität einer Lernsituation: Name, Themenfarbe, Symbol (Font-Awesome-Klasse) und Titelbild für die Startbox */
-export type Thema = { name: string; farbe: keyof typeof THEMEN; icon: string; bild?: ReactNode }
+export type Thema = { name: string; farbe: keyof typeof THEMEN; icon: string; bild?: ReactNode };
 
 const themaStil = (t?: Thema) =>
   t
-    ? ({ '--primary': THEMEN[t.farbe].farbe, '--primary-ink': THEMEN[t.farbe].farbe, '--primary-soft': THEMEN[t.farbe].soft, '--accent': THEMEN[t.farbe].farbe } as CSSProperties)
-    : undefined
+    ? ({
+        '--primary': THEMEN[t.farbe].farbe,
+        '--primary-ink': THEMEN[t.farbe].farbe,
+        '--primary-soft': THEMEN[t.farbe].soft,
+        '--accent': THEMEN[t.farbe].farbe,
+      } as CSSProperties)
+    : undefined;
+
+/**
+ * Freischalten einer Seite: fertig() schaltet die ganze Seite frei. Steht auf der Seite mehr als eine Pflichtaufgabe
+ * (eine Seite pro Phase), meldet jede Aufgabe sich mit fertig.teil('schluessel') und die Seite nennt die Schlüssel in pflicht.
+ */
+export type Fertig = (() => void) & { teil: (key: string) => () => void };
 
 export type Seite = {
-  art: PhaseArt
+  art: PhaseArt;
   /** Seitentitel, darf Formeln enthalten */
-  titel: ReactNode
+  titel: ReactNode;
   /** Info-Seite: „Weiter“ ist sofort frei */
-  frei?: boolean
+  frei?: boolean;
   /** Hinweis, was zum Freischalten nötig ist (Standard: Aufgabe richtig lösen) */
-  bedingung?: string
-  inhalt: (fertig: () => void) => ReactNode
-}
+  bedingung?: string;
+  /** Schlüssel aller Pflichtaufgaben der Seite; „Weiter“ wird frei, wenn jede mit fertig.teil(schluessel) gemeldet ist */
+  pflicht?: string[];
+  inhalt: (fertig: Fertig) => ReactNode;
+};
 
 /** ruhig: ruhiges Grunddesign (eine Spalte, eine Akzentfarbe, keine Farbstreifen), siehe docs/skills/lernsituationen/SKILL.md */
-export function SeitenLernsituation({ ziel, seiten, ruhig = false, thema }: { ziel: ReactNode; seiten: Seite[]; ruhig?: boolean; thema?: Thema }) {
-  const [bestaetigt, setBestaetigt] = useState(false)
-  const [haken, setHaken] = useState(false)
-  const [nr, setNr] = useState(0)
-  const [erledigt, setErledigt] = useState<boolean[]>(() => seiten.map((s) => !!s.frei))
+export function SeitenLernsituation({
+  ziel,
+  seiten,
+  ruhig = false,
+  thema,
+}: {
+  ziel: ReactNode;
+  seiten: Seite[];
+  ruhig?: boolean;
+  thema?: Thema;
+}) {
+  const [bestaetigt, setBestaetigt] = useState(false);
+  const [haken, setHaken] = useState(false);
+  const [nr, setNr] = useState(0);
+  const [erledigt, setErledigt] = useState<boolean[]>(() => seiten.map((s) => !!s.frei));
+  const [teile, setTeile] = useState<Record<number, string[]>>({});
 
   useEffect(() => {
-    window.scrollTo({ top: 0 })
-  }, [nr, bestaetigt])
+    window.scrollTo({ top: 0 });
+  }, [nr, bestaetigt]);
+
+  // Seiten mit mehreren Pflichtaufgaben: frei, sobald alle gemeldet sind
+  useEffect(() => {
+    setErledigt((e) => {
+      const neu = e.map(
+        (v, i) =>
+          v ||
+          (!!seiten[i].pflicht?.length && seiten[i].pflicht!.every((k) => teile[i]?.includes(k)))
+      );
+      return neu.some((v, i) => v !== e[i]) ? neu : e;
+    });
+  }, [teile, seiten]);
 
   if (!bestaetigt) {
     return (
-      <div className={`sl-start${ruhig ? ' sl-ruhig' : ''}${thema ? ' sl-thema' : ''}`} style={themaStil(thema)}>
+      <div
+        className={`sl-start${ruhig ? ' sl-ruhig' : ''}${thema ? ' sl-thema' : ''}`}
+        style={themaStil(thema)}
+      >
         {thema?.bild ? (
           <div className="sl-start-bild">{thema.bild}</div>
         ) : (
@@ -64,27 +103,53 @@ export function SeitenLernsituation({ ziel, seiten, ruhig = false, thema }: { zi
         <h2>{thema ? thema.name : 'Bevor es losgeht'}</h2>
         <p className="sl-start-ziel">{ziel}</p>
         <div className="sl-start-regel">
-          <strong>Deine Arbeitsweise:</strong> Bearbeite jede Aufgabe in deinem Heft und schreibe dabei <strong>alle Rechenschritte</strong> vollständig auf, nicht nur
-          das Ergebnis. Erst dann trägst du das Ergebnis hier ein und prüfst es.
+          <strong>Deine Arbeitsweise:</strong> Bearbeite jede Aufgabe in deinem Heft und schreibe
+          dabei <strong>alle Rechenschritte</strong> vollständig auf, nicht nur das Ergebnis. Erst
+          dann trägst du das Ergebnis hier ein und prüfst es.
         </div>
         <label className="sl-start-check">
-          <input type="checkbox" checked={haken} onChange={(e: ChangeEvent<HTMLInputElement>) => setHaken(e.target.checked)} />
-          <span>Ich dokumentiere bei jeder Aufgabe alle Rechenschritte schriftlich in meinem Heft.</span>
+          <input
+            type="checkbox"
+            checked={haken}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setHaken(e.target.checked)}
+          />
+          <span>
+            Ich dokumentiere bei jeder Aufgabe alle Rechenschritte schriftlich in meinem Heft.
+          </span>
         </label>
-        <button type="button" className="bk-btn bk-btn-primary" disabled={!haken} onClick={() => setBestaetigt(true)}>
+        <button
+          type="button"
+          className="bk-btn bk-btn-primary"
+          disabled={!haken}
+          onClick={() => setBestaetigt(true)}
+        >
           Bestätigen und starten <i className="fa-solid fa-arrow-right" aria-hidden="true" />
         </button>
       </div>
-    )
+    );
   }
 
-  const seite = seiten[nr]
-  const phaseIdx = PHASEN.findIndex((p) => p.art === seite.art)
-  const frei = erledigt[nr]
-  const fertig = (i: number) => () => setErledigt((e) => (e[i] ? e : e.map((v, j) => (j === i ? true : v))))
+  const seite = seiten[nr];
+  const phaseIdx = PHASEN.findIndex((p) => p.art === seite.art);
+  const frei = erledigt[nr];
+  const fertig = (i: number): Fertig => {
+    const f = (() =>
+      setErledigt((e) => (e[i] ? e : e.map((v, j) => (j === i ? true : v))))) as Fertig;
+    f.teil = (key: string) => () =>
+      setTeile((t) => (t[i]?.includes(key) ? t : { ...t, [i]: [...(t[i] ?? []), key] }));
+    return f;
+  };
+  const offen = (i: number) => {
+    const p = seiten[i].pflicht;
+    if (!p?.length) return null;
+    return `${p.filter((k) => teile[i]?.includes(k)).length} von ${p.length} Aufgaben gelöst`;
+  };
 
   return (
-    <div className={`sl${ruhig ? ' sl-ruhig' : ''}${thema ? ' sl-thema' : ''}`} style={themaStil(thema)}>
+    <div
+      className={`sl${ruhig ? ' sl-ruhig' : ''}${thema ? ' sl-thema' : ''}`}
+      style={themaStil(thema)}
+    >
       <div className="sl-bar">
         {thema && (
           <span className="sl-marke" title={thema.name}>
@@ -92,20 +157,36 @@ export function SeitenLernsituation({ ziel, seiten, ruhig = false, thema }: { zi
             <span className="sl-marke-name">{thema.name}</span>
           </span>
         )}
-        <button type="button" className="bk-btn bk-btn-sm" disabled={nr === 0} onClick={() => setNr(nr - 1)} aria-label="Vorherige Seite">
+        <button
+          type="button"
+          className="bk-btn bk-btn-sm"
+          disabled={nr === 0}
+          onClick={() => setNr(nr - 1)}
+          aria-label="Vorherige Seite"
+        >
           <i className="fa-solid fa-arrow-left" aria-hidden="true" />
         </button>
         <ol className="sl-phasen" aria-label="Phasen der Lernsituation">
           {PHASEN.map((p, i) => (
-            <li key={p.art} className={`et-bar-${p.art}${i === phaseIdx ? ' sl-on' : ''}${i < phaseIdx ? ' sl-done' : ''}`} aria-current={i === phaseIdx ? 'step' : undefined}>
-              <span className="sl-no">{i < phaseIdx ? <i className="fa-solid fa-check" aria-hidden="true" /> : i + 1}</span>
+            <li
+              key={p.art}
+              className={`et-bar-${p.art}${i === phaseIdx ? ' sl-on' : ''}${
+                i < phaseIdx ? ' sl-done' : ''
+              }`}
+              aria-current={i === phaseIdx ? 'step' : undefined}
+            >
+              <span className="sl-no">
+                {i < phaseIdx ? <i className="fa-solid fa-check" aria-hidden="true" /> : i + 1}
+              </span>
               <span className="sl-name">{p.title}</span>
             </li>
           ))}
         </ol>
-        <span className="sl-zaehler" aria-label={`Seite ${nr + 1} von ${seiten.length}`}>
-          {ruhig ? `${nr + 1} / ${seiten.length}` : `Seite ${nr + 1} von ${seiten.length}`}
-        </span>
+        {!(ruhig && seiten.length === PHASEN.length) && (
+          <span className="sl-zaehler" aria-label={`Seite ${nr + 1} von ${seiten.length}`}>
+            {ruhig ? `${nr + 1} / ${seiten.length}` : `Seite ${nr + 1} von ${seiten.length}`}
+          </span>
+        )}
         {nr < seiten.length - 1 && (
           <button
             type="button"
@@ -119,21 +200,109 @@ export function SeitenLernsituation({ ziel, seiten, ruhig = false, thema }: { zi
         )}
       </div>
       <HeftBestaetigtCtx.Provider value={true}>
-      {seiten.map((s, i) => (
-        <section key={i} hidden={i !== nr} className={`sl-seite et-${s.art}`}>
-          <div className="sl-kopf">
-            <h2 className="sl-titel">
-              <span className="sl-kicker">{PHASEN.find((p) => p.art === s.art)?.title}</span>
-              {s.titel}
-            </h2>
-            {s.bedingung && !erledigt[i] && <p className="sl-sperre">{s.bedingung}</p>}
-          </div>
-          {s.inhalt(fertig(i))}
-        </section>
-      ))}
+        {seiten.map((s, i) => (
+          <section key={i} hidden={i !== nr} className={`sl-seite et-${s.art}`}>
+            <div className="sl-kopf">
+              <h2 className="sl-titel">
+                <span className="sl-kicker">{PHASEN.find((p) => p.art === s.art)?.title}</span>
+                {s.titel}
+              </h2>
+              {(s.bedingung || s.pflicht?.length) && !erledigt[i] && (
+                <p className="sl-sperre">
+                  {s.bedingung ?? 'Löse alle Aufgaben dieser Phase, dann geht es weiter.'}
+                  {offen(i) && <> ({offen(i)})</>}
+                </p>
+              )}
+            </div>
+            {s.inhalt(fertig(i))}
+          </section>
+        ))}
       </HeftBestaetigtCtx.Provider>
     </div>
-  )
+  );
+}
+
+/** Abschnitt innerhalb einer Phasen-Seite mit eigener Zwischenüberschrift */
+export function Abschnitt({ titel, children }: { titel: ReactNode; children: ReactNode }) {
+  return (
+    <section className="sl-abschnitt">
+      <h3 className="sl-abschnitt-titel">{titel}</h3>
+      {children}
+    </section>
+  );
+}
+
+/** Inhalt erst auf Knopfdruck zeigen, z. B. das Rechenbeispiel in „Problem lösen“ */
+export function Aufklappbar({
+  label,
+  icon = 'fa-lightbulb',
+  children,
+}: {
+  label: string;
+  icon?: string;
+  children: ReactNode;
+}) {
+  const [offen, setOffen] = useState(false);
+  return (
+    <div className="sl-aufklappbar">
+      <div>
+        <button
+          type="button"
+          className="bk-btn"
+          aria-expanded={offen}
+          onClick={() => setOffen((o) => !o)}
+        >
+          <i className={`fa-solid ${offen ? 'fa-chevron-up' : icon}`} aria-hidden="true" />{' '}
+          {offen ? `${label.replace(/ ansehen$/, '')} schließen` : label}
+        </button>
+      </div>
+      {offen && <div className="sl-aufklappbar-inhalt">{children}</div>}
+    </div>
+  );
+}
+
+/**
+ * Wahl in „Problem lösen“: selbstständig rechnen (nur Ergebnisfelder) oder mit Lösungsschema (Lückenrechnung).
+ * Beide Wege prüfen dieselben Ergebnisse; beide bleiben eingehängt, damit Eingaben beim Wechseln erhalten bleiben.
+ */
+export function WegWahl({ selbst, schema }: { selbst: ReactNode; schema: ReactNode }) {
+  const [weg, setWeg] = useState<'selbst' | 'schema'>('selbst');
+  return (
+    <div className="sl-wegwahl">
+      <div className="sl-wegwahl-knoepfe" role="group" aria-label="Wie möchtest du rechnen?">
+        <button
+          type="button"
+          className={`bk-btn${weg === 'selbst' ? ' bk-btn-primary' : ''}`}
+          aria-pressed={weg === 'selbst'}
+          onClick={() => setWeg('selbst')}
+        >
+          <i className="fa-solid fa-pen" aria-hidden="true" /> Selbst rechnen
+        </button>
+        <button
+          type="button"
+          className={`bk-btn${weg === 'schema' ? ' bk-btn-primary' : ''}`}
+          aria-pressed={weg === 'schema'}
+          onClick={() => setWeg('schema')}
+        >
+          <i className="fa-solid fa-list-ol" aria-hidden="true" /> Mit Lösungsschema
+        </button>
+      </div>
+      <div hidden={weg !== 'selbst'}>{selbst}</div>
+      <div hidden={weg !== 'schema'}>{schema}</div>
+    </div>
+  );
+}
+
+/** Auftrag zum Handlungsprodukt (meist analog im Heft) mit optionalen Kriterien zum Abhaken */
+export function Handlungsprodukt({ titel, children }: { titel: ReactNode; children: ReactNode }) {
+  return (
+    <section className="sl-produkt">
+      <h3 className="sl-abschnitt-titel">
+        <i className="fa-solid fa-pen-ruler" aria-hidden="true" /> Dein Handlungsprodukt: {titel}
+      </h3>
+      {children}
+    </section>
+  );
 }
 
 /** Zwei Spalten nebeneinander (ab Tablet-Breite), z. B. Grafik links und Aufgabe rechts */
@@ -143,7 +312,7 @@ export function ZweiSpalten({ links, rechts }: { links: ReactNode; rechts: React
       <div>{links}</div>
       <div>{rechts}</div>
     </div>
-  )
+  );
 }
 
 /** Karte für die Auswahlseite eines Themas: führt in eine Lernsituation, in deren Themenfarbe, mit Symbol und Name */
@@ -154,19 +323,19 @@ export function LernsituationKarte({
   onClick,
   className = '',
 }: {
-  thema: Pick<Thema, 'name' | 'farbe' | 'icon'>
+  thema: Pick<Thema, 'name' | 'farbe' | 'icon'>;
   /** z. B. „Lernsituation 1 · Scheitelpunkt und ein Punkt“ */
-  teil?: string
-  beschreibung: ReactNode
-  onClick: () => void
-  className?: string
+  teil?: string;
+  beschreibung: ReactNode;
+  onClick: () => void;
+  className?: string;
 }) {
   return (
     <button
       type="button"
       onClick={() => {
-        onClick()
-        window.scrollTo({ top: 0 })
+        onClick();
+        window.scrollTo({ top: 0 });
       }}
       style={{ background: THEMEN[thema.farbe].farbe }}
       className={`rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5 ${className}`}
@@ -178,5 +347,5 @@ export function LernsituationKarte({
       </p>
       <p className="text-sm text-white/90">{beschreibung}</p>
     </button>
-  )
+  );
 }

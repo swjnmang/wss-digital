@@ -3,7 +3,7 @@ import { SOCIAL, type Social } from './kit'
 import './phasen.css'
 
 // Die vier festen Phasen jeder Lernsituation. Namen und Reihenfolge stehen nur hier:
-// 1 Warm-up → 2 Problem erkennen → 3 Problem lösen → 4 Festhalten und Prüfen.
+// 1 Warm-up → 2 Problem erkennen → 3 Problem lösen → 4 Wissen prüfen und vertiefen.
 // Jede Phase hat Farbe und Icon, beginnt mit „Das machst du jetzt / Wozu“ und erscheint in der mitlaufenden Fortschrittsleiste.
 // Abschnitte innerhalb einer Phase (z. B. Austausch, Check) sind <Teil> mit eigener Sozialform und Zeit.
 
@@ -13,7 +13,7 @@ export const PHASEN: { art: PhaseArt; title: string; icon: string }[] = [
   { art: 'start', title: 'Warm-up', icon: 'fa-toolbox' },
   { art: 'problem', title: 'Problem erkennen', icon: 'fa-bullseye' },
   { art: 'loesen', title: 'Problem lösen', icon: 'fa-lightbulb' },
-  { art: 'sichern', title: 'Festhalten und Prüfen', icon: 'fa-thumbtack' },
+  { art: 'sichern', title: 'Wissen prüfen und vertiefen', icon: 'fa-thumbtack' },
 ]
 
 const phaseId = (prefix: string, art: PhaseArt) => `${prefix}-${art}`

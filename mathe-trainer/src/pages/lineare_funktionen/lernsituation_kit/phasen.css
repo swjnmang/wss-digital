@@ -1,4 +1,4 @@
-/* Vier feste Phasen jeder Lernsituation (phasen.tsx): Warm-up, Problem erkennen, Problem lösen, Festhalten und Prüfen.
+/* Vier feste Phasen jeder Lernsituation (phasen.tsx): Warm-up, Problem erkennen, Problem lösen, Wissen prüfen und vertiefen.
    Jede Phase mit eigener Farbe, Icon und Auftragskasten, dazu die mitlaufende Fortschrittsleiste. */
 
 .et-start { --et: #5b6472; --et-soft: #eef0f3; }
