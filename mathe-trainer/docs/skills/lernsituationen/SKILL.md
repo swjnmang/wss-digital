@@ -372,7 +372,7 @@ Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle 
 - **Identität:** Petrol, `fa-car-side`, Titelbild Auto mit Kalenderblatt, Leitobjekt die Zinstage-Leiste (A 148 Tage, B 90 Tage).
 - **Seite 1 Warm-up:** drei kurze Aufgaben untereinander (Jahreszinsen, Jahr → Tag, Zinstage nach der Bankregel).
 - **Seite 2 Problem erkennen:** Lenas Anfrage ("3 % von 4.800 € sind 144 €, oder?"), Zinstage-Leiste, Auftrag "Lege dich fest", Auswahl plus Schätzregler.
-- **Seite 3 Problem lösen:** Problem oben, "Rechenbeispiel ansehen" (Jonas, 2.700 €, 139 Tage, mit Video), Handlungsprodukt "Antwort an Lena" mit Satzanfängen zum Aufklappen, Wahl "Selbst rechnen" (Zinstage, Zinsen A, Zinsen B) oder "Mit Lösungsschema" (fünf Zeilen mit Schritt-Hilfen), Empfehlung per Auswahl, Kriterien des Briefs abhaken, danach Rückbezug und Merke.
+- **Seite 3 Problem lösen:** Problem oben, "Rechenbeispiel ansehen" (Jonas, 2.700 €, 139 Tage, mit Video), Handlungsprodukt "Antwort an Lena" mit Satzanfängen zum Aufklappen, Wahl "Selbst rechnen" (Zinstage, Zinsen A, Zinsen B) oder "Mit Lösungsschema" (drei Zeilen: Zinstage, Zinsformel für A, Zinsformel für B, mit Schritt-Hilfen); das Rechenbeispiel hat nur zwei Schritte: Zinstage zählen, in die Zinsformel einsetzen, Empfehlung per Auswahl, Kriterien des Briefs abhaken, danach Rückbezug und Merke.
 - **Seite 4 Wissen prüfen und vertiefen:** vier Übungsaufgaben (Zinsen auswählen, "Wer hat recht?" zu Zinstagen, Zinstage und Zinsen selbst berechnen, Profi-Aufgabe Festgeld plus Tagesgeld), darunter die Abschluss-Buttons.
 
 ### A. Kundenauftrag / Maschine: Funktionsgleichung aus Scheitelpunkt und einem Punkt (umgesetzt: Torbogen)

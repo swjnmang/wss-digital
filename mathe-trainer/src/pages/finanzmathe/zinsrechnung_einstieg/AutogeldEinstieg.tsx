@@ -242,37 +242,19 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     ),
   },
   {
-    title: 'Zinsen für ein ganzes Jahr',
-    body: <MB>{'\\frac{2\\,700 \\cdot 2{,}4}{100} = 64{,}80 \\text{ €}'}</MB>,
-  },
-  {
-    title: 'Zinsen für einen Tag',
+    title: 'In die Zinsformel einsetzen',
     body: (
       <>
-        <p>Das Bankjahr hat 360 Tage:</p>
-        <MB>{'64{,}80 \\text{ €} : 360 = 0{,}18 \\text{ €}'}</MB>
-      </>
-    ),
-  },
-  {
-    title: 'Zinsen für alle Zinstage',
-    body: (
-      <>
-        <MB>{'0{,}18 \\text{ €} \\cdot 139 = 25{,}02 \\text{ €}'}</MB>
-        <p>Jonas bekommt 25,02 € Zinsen.</p>
-      </>
-    ),
-  },
-  {
-    title: 'Alles in einer Formel',
-    body: (
-      <>
-        <p>Jahreszinsen, durch 360, mal die Zinstage: Das lässt sich in einen Bruch schreiben.</p>
+        <p>
+          Der Zinssatz gilt für ein Jahr (360 Tage). Für <M>t</M> Tage gibt es nur den Teil{' '}
+          <M>{'\\frac{t}{360}'}</M> davon. Das steckt in der Zinsformel:
+        </p>
         <MB>
           {
-            'Z = \\frac{K \\cdot p \\cdot t}{100 \\cdot 360} = \\frac{2\\,700 \\cdot 2{,}4 \\cdot 139}{100 \\cdot 360} = 25{,}02 \\text{ €}'
+            'Z = \\frac{K \\cdot p \\cdot t}{100 \\cdot 360} = \\frac{2\\,700 \\cdot 2{,}4 \\cdot 139}{100 \\cdot 360} = \\frac{900\\,720}{36\\,000} = 25{,}02 \\text{ €}'
           }
         </MB>
+        <p>Jonas bekommt 25,02 € Zinsen.</p>
       </>
     ),
   },
@@ -527,13 +509,14 @@ export default function AutogeldEinstieg({
                             Der 14.10. liegt 2 Tage vor dem 16.10.
                           </>,
                           <>
-                            Rechne wie im Beispiel mit Jonas: Jahreszinsen, durch 360, mal die
-                            Zinstage. Bei Angebot B gibt es nur 90 Zinstage.
+                            Setze wie im Beispiel mit Jonas in die Zinsformel ein. Bei Angebot B
+                            gibt es nur 90 Zinstage.
                           </>,
                           <>
                             <M>{'t = 5 \\cdot 30 - 2'}</M>. Angebot A:{' '}
-                            <M>{'\\frac{4\\,800 \\cdot 2{,}4}{100} = 115{,}20'}</M> € pro Jahr.
-                            Angebot B: <M>{'\\frac{4\\,800 \\cdot 3}{100} = 144'}</M> € pro Jahr.
+                            <M>{'Z = \\frac{4\\,800 \\cdot 2{,}4 \\cdot t}{100 \\cdot 360}'}</M>.
+                            Angebot B:{' '}
+                            <M>{'Z = \\frac{4\\,800 \\cdot 3 \\cdot 90}{100 \\cdot 360}'}</M>.
                           </>,
                         ]}
                       />
@@ -546,8 +529,8 @@ export default function AutogeldEinstieg({
                     title="Lenas Zinsen mit Lösungsschema"
                     prompt={
                       <p>
-                        Rechne Schritt für Schritt wie im Beispiel und trage die Zwischenergebnisse
-                        ein.
+                        Rechne in deinem Heft nach diesem Schema wie im Beispiel und trage die
+                        Ergebnisse ein.
                       </p>
                     }
                     rechnung={[
@@ -557,35 +540,27 @@ export default function AutogeldEinstieg({
                         u: '\\text{① Zinstage}',
                       },
                       {
-                        l: ['\\text{A: 1 Jahr}'],
-                        r: ['\\frac{K \\cdot p}{100} =', { luecke: 'ja' }, '\\text{ €}'],
-                        u: '\\text{②}',
-                      },
-                      {
-                        l: ['\\text{A: } t \\text{ Tage}'],
-                        r: ['\\text{Jahreszinsen} : 360 \\cdot t =', { luecke: 'a' }, '\\text{ €}'],
-                        u: '\\text{③}',
-                      },
-                      {
-                        l: ['\\text{B: 1 Jahr}'],
-                        r: ['\\frac{K \\cdot p}{100} =', { luecke: 'jb' }, '\\text{ €}'],
-                        u: '\\text{④}',
-                      },
-                      {
-                        l: ['\\text{B: 90 Tage}'],
+                        l: ['Z_A'],
                         r: [
-                          '\\text{Jahreszinsen} : 360 \\cdot 90 =',
+                          '\\frac{K \\cdot p \\cdot t}{100 \\cdot 360} =',
+                          { luecke: 'a' },
+                          '\\text{ €}',
+                        ],
+                        u: '\\text{② Angebot A}',
+                      },
+                      {
+                        l: ['Z_B'],
+                        r: [
+                          '\\frac{K \\cdot p \\cdot 90}{100 \\cdot 360} =',
                           { luecke: 'b' },
                           '\\text{ €}',
                         ],
-                        u: '\\text{⑤}',
+                        u: '\\text{③ Angebot B}',
                       },
                     ]}
                     fields={[
                       { kind: 'num', key: 't', label: 'Zinstage', expected: T_GESAMT },
-                      { kind: 'num', key: 'ja', label: 'Jahreszinsen A', expected: 115.2 },
                       { kind: 'num', key: 'a', label: 'Zinsen A', expected: ZINS_A },
-                      { kind: 'num', key: 'jb', label: 'Jahreszinsen B', expected: 144 },
                       { kind: 'num', key: 'b', label: 'Zinsen B', expected: ZINS_B },
                     ]}
                     loesungNachFehler
@@ -605,41 +580,22 @@ export default function AutogeldEinstieg({
                           },
                           {
                             kurz: '②',
-                            titel: 'Jahreszinsen A',
+                            titel: 'Angebot A',
                             hilfe: (
                               <>
-                                Setze <M>{'K = 4\\,800'}</M> und <M>{'p = 2{,}4'}</M> ein:{' '}
-                                <M>{'4\\,800 \\cdot 2{,}4 : 100'}</M>.
+                                Setze <M>{'K = 4\\,800'}</M>, <M>{'p = 2{,}4'}</M> und die Zinstage
+                                aus ① ein:{' '}
+                                <M>{'\\frac{4\\,800 \\cdot 2{,}4 \\cdot 148}{36\\,000}'}</M>.
                               </>
                             ),
                           },
                           {
                             kurz: '③',
-                            titel: 'Zinsen A',
+                            titel: 'Angebot B',
                             hilfe: (
                               <>
-                                Teile die Jahreszinsen durch 360 (Zinsen für einen Tag) und nimm das
-                                Ergebnis mal die Zinstage aus ①.
-                              </>
-                            ),
-                          },
-                          {
-                            kurz: '④',
-                            titel: 'Jahreszinsen B',
-                            hilfe: (
-                              <>
-                                Wie ②, aber mit <M>{'p = 3'}</M>. Das sind genau die 144 € aus Lenas
-                                Nachricht.
-                              </>
-                            ),
-                          },
-                          {
-                            kurz: '⑤',
-                            titel: 'Zinsen B',
-                            hilfe: (
-                              <>
-                                Das Festgeld bekommt nur 90 Tage lang Zinsen: Jahreszinsen durch
-                                360, dann mal 90.
+                                Das Festgeld bekommt nur 90 Tage lang Zinsen:{' '}
+                                <M>{'\\frac{4\\,800 \\cdot 3 \\cdot 90}{36\\,000}'}</M>.
                               </>
                             ),
                           },
