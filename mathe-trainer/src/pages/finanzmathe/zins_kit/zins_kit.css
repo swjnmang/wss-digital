@@ -27,3 +27,6 @@
 .zk-bau-feld { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 220px); align-items: center; gap: 10px; font-size: 17px; }
 @media (max-width: 480px) { .zk-bau-feld { grid-template-columns: 1fr; gap: 4px; } }
 .zk-bau-feld .bk-input { min-height: 44px; width: 100%; }
+.zk-bild-klein svg { max-height: 190px; }
+.zk-formel { font-size: 24px; text-align: center; padding: 4px 0; }
+.zk-formel .katex-display { margin: 0; }
