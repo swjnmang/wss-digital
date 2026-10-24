@@ -1,0 +1,12 @@
+/* Lernsituation Ratendarlehen „Der neue Backofen“. Farben kommen über --primary aus dem Thema. */
+
+.rd-diagramm { display: flex; flex-direction: column; gap: 8px; }
+.rd-legende { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 16px; padding: 0 8px 4px; }
+.rd-legende i { display: inline-block; width: 18px; height: 18px; border-radius: 4px; vertical-align: -3px; margin-right: 6px; border: 1.5px solid var(--ink); }
+.rd-legende .rd-tilgung { background: var(--primary); }
+.rd-legende .rd-zinsen { background: var(--highlight); }
+.rd-legende .rd-budget { width: 28px; height: 0; border: 0; border-top: 3px dashed var(--ink); border-radius: 0; vertical-align: middle; }
+
+.rd-plan { white-space: nowrap; }
+.rd-plan td { text-align: right; }
+.rd-plan tfoot td, .rd-plan tfoot th { font-weight: 800; background: var(--surface-sunken); }

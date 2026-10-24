@@ -301,7 +301,7 @@ export default function Ratendarlehen() {
   );
 
   return (
-    <TaskShell title="Ratendarlehen: Tilgungsplan" width="wide">
+    <TaskShell title="Ratendarlehen: Tilgungsplan" width="wide" parent={{ to: '/finanzmathe/ratendarlehen', label: 'Ratendarlehen' }}>
     <div className="flex flex-col">
       <div className="flex flex-col items-center w-full">
         <div className="bk-panel w-full max-w-5xl flex flex-col items-center p-6 sm:p-8">
