@@ -69,6 +69,7 @@ Lade nach dem Bauen den Skill `design:design-critique` mit dem Skill-Tool. Erste
 - Ist auf jeder Seite sofort klar, was das Wichtigste ist (Problem bzw. Auftrag)?
 - Erkennt man auf jeder Seite, in welcher Lernsituation man ist?
 - Gibt es überflüssige Rahmen, Kästen, Farbstreifen, Banner oder Farben?
+- Haben "Problem erkennen" und "Problem lösen" ein passendes Bild, oder ist dort nur Text?
 - Sind Skizzen und Graphen groß genug und ihre Beschriftungen gut lesbar?
 - Ist alles einspaltig, ruhig und auf dem Tablet gut bedienbar (Phasennamen nicht abgeschnitten, kein seitliches Scrollen)?
 
@@ -104,7 +105,8 @@ Von oben nach unten, einspaltig, ohne verschachtelte Kästen:
 2. **Situation** als kurzer Fließtext (2–3 Sätze), z. B. "Du bist Azubi im Metallbau. …"
 3. **Problem** als Fließtext: was gegeben und was gesucht ist, z. B. "Du kennst den Scheitelpunkt S(2 | 3) und einen weiteren Punkt P(0 | 2) des Bogens. Gesucht ist die Funktionsgleichung in allgemeiner Form y = ax² + bx + c." Keine getrennten Kacheln "Gegeben"/"Gesucht".
 4. **Auftrag:** das einzige hervorgehobene Element der Seite. Ein klarer Satz, was jetzt zu tun ist.
-5. **Skizze und Interaktion** darunter (Skizze in gut lesbarer Größe, Eingaben, Button, Rückmeldung). Die SuS dürfen dafür nach unten scrollen.
+5. **Bild der Situation** (Abschnitt "Bilder in Problem erkennen und Problem lösen"), z. B. ein Sachbild der Angebote, eine Pinnwand oder ein Funktionsgraph.
+6. **Skizze und Interaktion** darunter (Skizze in gut lesbarer Größe, Eingaben, Button, Rückmeldung). Die SuS dürfen dafür nach unten scrollen.
 
 Hinweise wie "Probiere mindestens drei Gleichungen aus, dann geht es weiter" stehen als `bedingung` im Seitenkopf bzw. bei der Interaktion, nicht als zusätzliches farbiges Banner.
 
@@ -121,9 +123,9 @@ Wo es inhaltlich passt, probieren die SuS selbst Lösungen aus und bekommen sofo
 
 Alles auf einer Seite, **immer in dieser Reihenfolge** von oben nach unten:
 
-1. **Das Problem noch einmal oben** als einziger Fokus (`sl-fokus`): konkreter Arbeitsauftrag in eigenen Worten, was gegeben und was gesucht ist und in welcher Form das Ergebnis stehen soll. Darunter bei Bedarf das Leitobjekt bzw. die Skizze mit nur den gegebenen Größen.
+1. **Das Problem noch einmal oben** als einziger Fokus (`sl-fokus`): konkreter Arbeitsauftrag in eigenen Worten, was gegeben und was gesucht ist und in welcher Form das Ergebnis stehen soll. Darunter ein Bild zum Problem (Leitobjekt, Skizze oder Graph mit nur den gegebenen Größen, bei Umstellaufgaben die Formel mit markierter gesuchter Größe).
 2. **Rechenbeispiel zum Aufklappen** (`Aufklappbar` mit "Rechenbeispiel ansehen"): ein ausgearbeitetes Beispiel mit **anderen Zahlen**, Schritt für Schritt (`Beispiel offen`), ggf. mit Erklärvideo. Die SuS entscheiden selbst, ob sie es brauchen. Ein Rechenbeispiel vor der Problemdarstellung ist nicht erlaubt, auch nicht im Warm-up oder in Phase 2.
-3. **Auftrag zum Handlungsprodukt** (`Handlungsprodukt`): Die SuS werden **an dieser Stelle immer** aufgefordert, ihr Handlungsprodukt im Heft zu erstellen (Abschnitt "Handlungsprodukte"), z. B. "Schreibe Lena eine Antwort und rechne darin …". Satzanfänge oder ein Gerüst dürfen aufklappbar dabei sein.
+3. **Auftrag zum Handlungsprodukt** (`Handlungsprodukt`): Die SuS werden **an dieser Stelle immer** aufgefordert, ihr Handlungsprodukt im Heft zu erstellen (Abschnitt "Handlungsprodukte"), z. B. "Schreibe Lena eine Antwort und rechne darin …". Ein kleines Bild zum Produkt (z. B. Brief, Karteikarte, Plakat) macht den Auftrag anschaulich. Satzanfänge oder ein Gerüst dürfen aufklappbar dabei sein.
 4. **Eigene Lösung mit Wahl des Wegs** (`WegWahl`): Zwei Knöpfe "Selbst rechnen" und "Mit Lösungsschema".
    - **Selbst rechnen** (Standard): nur der Auftrag "Trage die Ergebnisse aus deinem Heft ein und prüfe sie" und die Ergebnisfelder. Keine Vorstrukturierung. Dazu drei gestufte `Hilfen`.
    - **Mit Lösungsschema**: dieselben Ergebnisse als Lückenrechnung (`rechnung`) mit einer Zeile pro Zwischenergebnis und `SchrittHilfen`. Das Schema nennt die Schritte, verrät aber nicht die Zahlen der Lösung.
@@ -273,6 +275,18 @@ Jede Lernsituation bekommt ein eigenes Gesicht, damit sie sich von den anderen u
 
 Die Identität bleibt im ruhigen Rahmen: keine zusätzlichen Kästen, Banner oder Farbstreifen, keine zweite Akzentfarbe, keine Animationen. Die Skizzen in den Aufgaben verwenden für das Wichtigste (Bogen, Graph, aktueller Versuch) die Themenfarbe.
 
+## Bilder in Problem erkennen und Problem lösen (Pflicht)
+
+Die Seiten "Problem erkennen" und "Problem lösen" bestehen nie nur aus Text. Jede der beiden Seiten hat **mindestens ein Bild**, das die Situation anschaulich macht und die Seite optisch aufwertet. Es zeigt etwas Inhaltliches, nicht bloß Dekoration.
+
+- **Funktionen (lineare, quadratische):** Funktionsgraph oder Skizze der Situation mit den gegebenen Größen (z. B. Torbogen, Ladestand des Stromspeichers), bei Ausprobieren mit Live-Rückmeldung.
+- **Finanzmathematik, Prozente, kaufmännisches Rechnen:** ein hübsches Sachbild, z. B. die Angebote als Sparschwein und Tresor, eine Zeitleiste der Zinstage, eine Pinnwand mit den Fragen ("K = ?", "p = ?", "t = ?"), ein Zielbalken, zwei Sparkonten, die Formel mit farbig markierter gesuchter Größe.
+- **Beim Handlungsprodukt** ein kleines Bild, das zeigt, was entstehen soll (Brief mit Umschlag, Karteikarte, Plakat, Concept Map).
+- **Gestaltung:** flache Inline-SVGs im Stil des Titelbilds: Flächen in Themenfarbe und Themenfarbe-hell (`var(--primary)`, `var(--primary-soft)`), Linien in `var(--ink)`, Münzen und Akzente in `var(--highlight)`, keine Fotos, keine Verläufe, keine Figuren mit Gesichtern. Einbinden in der Klasse `zk-bild` (Rahmen, 300 px hoch) bzw. `zk-bild-klein` (bis 190 px) oder `bk-graph` bei Graphen. Beschriftungen im SVG mindestens 15 px, damit sie auf dem Tablet lesbar bleiben. Immer mit `role="img"` und einer `aria-label`, die den Inhalt beschreibt.
+- **Nicht zu viel verraten:** Das Bild zeigt nur das Gegebene. Es nimmt die Lösung nicht vorweg (keine Zinsen, keine Nullstelle, kein Ergebnis im Bild, bevor die SuS gerechnet haben).
+- Auch Warm-up und "Wissen prüfen und vertiefen" dürfen Bilder haben, wo sie helfen. Pflicht sind sie dort nicht.
+- Beispiele: `AngeboteBild` und `BriefBild` in `finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx`, `PinnwandBild` und `FormelBild` in `KasseEinstieg.tsx`, `ZweiKonten` und `WachstumGraph` in `finanzmathe/zinseszins_lernsituation/`.
+
 ## Auswahlaufgaben (Multiple Choice)
 
 - **Antwortmöglichkeit A ist nie richtig.** Die richtige Antwort ist immer B, C oder D (bei weniger Optionen eine der hinteren). `McCard` warnt in der Entwicklung, wenn die erste Option richtig ist.
@@ -352,6 +366,7 @@ Anforderungen an einen guten Kontext:
 - [ ] Der Kontext passt zur Lebenswelt von 15- bis 18-Jährigen, die Zahlen sind realistisch.
 - [ ] Festlegung bzw. Versuche werden am Ende von "Problem lösen" wieder aufgegriffen.
 - [ ] Mindestens zwei Darstellungen werden verknüpft.
+- [ ] "Problem erkennen" und "Problem lösen" haben je mindestens ein inhaltliches Bild (Graph, Skizze oder Sachbild im Stil des Titelbilds), das nichts von der Lösung verrät; beim Handlungsprodukt zeigt ein kleines Bild, was entstehen soll.
 - [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat 2 bis 4 Kriterien zum Abhaken.
 - [ ] "Wissen prüfen und vertiefen" hat mindestens 3, besser 4 passende Übungsaufgaben (Basis bis Erweiterung) und darunter die Abschluss-Buttons.
 - [ ] Ruhiges Grunddesign: einspaltig (auch bei 1920 × 1080), ein Fokus pro Seite, keine verschachtelten Kästen, keine Farbstreifen oder Banner, eine Akzentfarbe, Touch-Ziele mindestens 44 px.
@@ -368,11 +383,12 @@ Anforderungen an einen guten Kontext:
 Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle nutzen das ruhige Grunddesign mit eigener Identität. Beispiel R ist die Referenz für den Aufbau mit einer Seite pro Phase; A bis E beschreiben Format und Inhalt und werden beim Bauen genauso auf vier Seiten verteilt.
 
 ### R. Rollenspiel / Beratungsauftrag: Tageszinsen (umgesetzt: Lenas Autogeld, Referenz)
+- **Rechenbeispiel:** nur zwei Schritte (Zinstage nach der Bankregel zählen, alles in die Zinsformel einsetzen), keine Zwischenschritte über Jahres- und Tageszinsen.
 - **Kontext:** Azubi in der Bank. Lena legt 4.800 € vom 16.05. bis zum 14.10. an: Tagesgeld 2,4 % p.a. oder Festgeld 3 % p.a. für 90 Tage.
 - **Identität:** Petrol, `fa-car-side`, Titelbild Auto mit Kalenderblatt, Leitobjekt die Zinstage-Leiste (A 148 Tage, B 90 Tage).
 - **Seite 1 Warm-up:** drei kurze Aufgaben untereinander (Jahreszinsen, Jahr → Tag, Zinstage nach der Bankregel).
-- **Seite 2 Problem erkennen:** Lenas Anfrage ("3 % von 4.800 € sind 144 €, oder?"), Zinstage-Leiste, Auftrag "Lege dich fest", Auswahl plus Schätzregler.
-- **Seite 3 Problem lösen:** Problem oben, "Rechenbeispiel ansehen" (Jonas, 2.700 €, 139 Tage, mit Video), Handlungsprodukt "Antwort an Lena" mit Satzanfängen zum Aufklappen, Wahl "Selbst rechnen" (Zinstage, Zinsen A, Zinsen B) oder "Mit Lösungsschema" (drei Zeilen: Zinstage, Zinsformel für A, Zinsformel für B, mit Schritt-Hilfen); das Rechenbeispiel hat nur zwei Schritte: Zinstage zählen, in die Zinsformel einsetzen, Empfehlung per Auswahl, Kriterien des Briefs abhaken, danach Rückbezug und Merke.
+- **Seite 2 Problem erkennen:** Lenas Anfrage ("3 % von 4.800 € sind 144 €, oder?"), Sachbild der beiden Angebote (Sparschwein für das Tagesgeld, Tresor mit Schloss für das Festgeld), Zinstage-Leiste, Auftrag "Lege dich fest", Auswahl plus Schätzregler.
+- **Seite 3 Problem lösen:** Problem oben, "Rechenbeispiel ansehen" (Jonas, 2.700 €, 139 Tage, mit Video), Handlungsprodukt "Antwort an Lena" mit Brief-Bild (Umschlag, angefangener Brief, Stift) und Satzanfängen zum Aufklappen, Wahl "Selbst rechnen" (Zinstage, Zinsen A, Zinsen B) oder "Mit Lösungsschema" (drei Zeilen: Zinstage, Zinsformel für A, Zinsformel für B, mit Schritt-Hilfen), Empfehlung per Auswahl, Kriterien des Briefs abhaken, danach Rückbezug und Merke.
 - **Seite 4 Wissen prüfen und vertiefen:** vier Übungsaufgaben (Zinsen auswählen, "Wer hat recht?" zu Zinstagen, Zinstage und Zinsen selbst berechnen, Profi-Aufgabe Festgeld plus Tagesgeld), darunter die Abschluss-Buttons.
 
 ### A. Kundenauftrag / Maschine: Funktionsgleichung aus Scheitelpunkt und einem Punkt (umgesetzt: Torbogen)
