@@ -1,9 +1,13 @@
-import { useState, type ReactNode } from 'react';
+import { useState, type ChangeEvent, type ReactNode } from 'react';
 import TaskShell from '../../../components/layout/TaskShell';
-import { Beispiel, M, MB, Merke } from '../../daten_und_zufall/lernpfad/kit';
+import { Beispiel, M, MB, Merke, checkNumber, pick } from '../../daten_und_zufall/lernpfad/kit';
+import { fieldCheckClass } from '../../../utils/fieldCheck';
 import {
+  CardHead,
   CheckCard,
+  Feedback,
   Hilfen,
+  PRAISE,
   McCard,
   SchrittHilfen,
   TrackedCheck,
@@ -369,8 +373,8 @@ function PlanTabelle({
           <tr>
             <th>Jahr</th>
             <th>Schuld am Jahresanfang</th>
-            <th>Zinsen</th>
             <th>Tilgung</th>
+            <th>Zinsen</th>
             <th>Annuität</th>
           </tr>
         </thead>
@@ -379,8 +383,8 @@ function PlanTabelle({
             <tr key={z.jahr}>
               <th>{z.jahr}</th>
               <td>{euro(z.schuld)}</td>
-              <td>{euro(z.zinsen)}</td>
               <td>{euro(z.tilgung)}</td>
+              <td>{euro(z.zinsen)}</td>
               <td>{euro(z.annuitaet)}</td>
             </tr>
           ))}
@@ -390,13 +394,141 @@ function PlanTabelle({
             <tr>
               <th>Summe</th>
               <td />
-              <td>{euro(summe.zinsen)}</td>
               <td>{euro(summe.tilgung)}</td>
+              <td>{euro(summe.zinsen)}</td>
               <td>{euro(summe.annuitaet)}</td>
             </tr>
           </tfoot>
         )}
       </table>
+    </div>
+  );
+}
+
+const SPALTEN = [
+  { key: 'schuld', titel: 'Schuld am Jahresanfang' },
+  { key: 'tilgung', titel: 'Tilgung' },
+  { key: 'zinsen', titel: 'Zinsen' },
+  { key: 'annuitaet', titel: 'Annuität' },
+] as const;
+type Spalte = (typeof SPALTEN)[number]['key'];
+
+/**
+ * Tilgungsplan zum Ausfüllen wie in der Übung „Tilgungsplan ausfüllen“: eine Zeile pro Jahr, optional eine Summenzeile.
+ * Jedes Feld wird nach dem Prüfen einzeln grün oder rot, „Lösungsweg zeigen“ erst nach einem Fehlversuch.
+ */
+function TilgungsplanCheck({
+  title,
+  prompt,
+  zeilen,
+  summe,
+  solution,
+  help,
+  onSolved,
+}: {
+  title: ReactNode;
+  prompt: ReactNode;
+  zeilen: ({ jahr: number } & Record<Spalte, number>)[];
+  summe?: Partial<Record<Spalte, number>>;
+  solution: ReactNode;
+  help: ReactNode;
+  onSolved: () => void;
+}) {
+  const felder = [
+    ...zeilen.flatMap((z) => SPALTEN.map((sp) => ({ key: `${z.jahr}-${sp.key}`, expected: z[sp.key] }))),
+    ...SPALTEN.flatMap((sp) => (summe?.[sp.key] !== undefined ? [{ key: `summe-${sp.key}`, expected: summe[sp.key] as number }] : [])),
+  ];
+  const [werte, setWerte] = useState<Record<string, string>>({});
+  const [marks, setMarks] = useState<Record<string, boolean | undefined>>({});
+  const [status, setStatus] = useState<'idle' | 'ok' | 'no' | 'empty'>('idle');
+  const [praise, setPraise] = useState(PRAISE[0]);
+  const [malFalsch, setMalFalsch] = useState(false);
+  const [zeigen, setZeigen] = useState(false);
+
+  const pruefen = () => {
+    if (felder.some((f) => !(werte[f.key] ?? '').trim())) return setStatus('empty');
+    const m: Record<string, boolean | undefined> = {};
+    felder.forEach((f) => (m[f.key] = checkNumber(werte[f.key] ?? '', f.expected)));
+    setMarks(m);
+    const ok = felder.every((f) => m[f.key]);
+    setStatus(ok ? 'ok' : 'no');
+    if (ok) {
+      setPraise(pick(PRAISE));
+      onSolved();
+    } else setMalFalsch(true);
+  };
+
+  const feld = (key: string, label: string) => (
+    <input
+      type="text"
+      inputMode="decimal"
+      autoComplete="off"
+      placeholder="?"
+      aria-label={label}
+      className={`bk-input rd-feld ${fieldCheckClass(marks[key])}`}
+      value={werte[key] ?? ''}
+      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+        setWerte((w) => ({ ...w, [key]: e.target.value }));
+        setMarks((mk) => ({ ...mk, [key]: undefined }));
+        setStatus('idle');
+      }}
+    />
+  );
+
+  return (
+    <div className="lp-ex bk-panel">
+      <CardHead title={title} />
+      <div className="lp-ex-prompt">{prompt}</div>
+      <div className="lp-table-wrap">
+        <table className="lp-table rd-plan rd-plan-eingabe">
+          <thead>
+            <tr>
+              <th>Jahr</th>
+              {SPALTEN.map((sp) => (
+                <th key={sp.key}>{sp.titel} in €</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {zeilen.map((z) => (
+              <tr key={z.jahr}>
+                <th>{z.jahr}</th>
+                {SPALTEN.map((sp) => (
+                  <td key={sp.key}>{feld(`${z.jahr}-${sp.key}`, `${sp.titel}, Jahr ${z.jahr}`)}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+          {summe && (
+            <tfoot>
+              <tr>
+                <th>Summe</th>
+                {SPALTEN.map((sp) => (
+                  <td key={sp.key}>{summe[sp.key] !== undefined && feld(`summe-${sp.key}`, `${sp.titel}, Summe`)}</td>
+                ))}
+              </tr>
+            </tfoot>
+          )}
+        </table>
+      </div>
+      <div className="bk-actions lp-ex-actions">
+        <button type="button" className="bk-btn bk-btn-primary" onClick={pruefen}>
+          Prüfen
+        </button>
+        {(malFalsch || status === 'ok') && (
+          <button type="button" className="bk-btn" onClick={() => setZeigen((z) => !z)}>
+            <i className="fa-solid fa-route" aria-hidden="true" /> {zeigen ? 'Lösungsweg ausblenden' : 'Lösungsweg zeigen'}
+          </button>
+        )}
+      </div>
+      <Feedback status={status} praise={praise} />
+      {help}
+      {zeigen && (
+        <div className="bk-solution lp-solution">
+          <div className="bk-solution-title">Lösungsweg</div>
+          {solution}
+        </div>
+      )}
     </div>
   );
 }
@@ -687,21 +819,12 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
             <Abschnitt titel="Deine Ergebnisse prüfen">
               <WegWahl
                 selbst={
-                  <CheckCard
+                  <TilgungsplanCheck
                     onSolved={planMelden}
                     title="Tilgungsplan für den Ofen"
-                    prompt={<p>Trage die Ergebnisse aus deinem Tilgungsplan ein und prüfe sie.</p>}
-                    fields={[
-                      { kind: 'num', key: 't', label: 'Tilgung pro Jahr:', expected: T, unit: '€' },
-                      { kind: 'num', key: 'z1', label: 'Zinsen im 1. Jahr:', expected: PLAN[0].zinsen, unit: '€' },
-                      { kind: 'num', key: 'a1', label: 'Annuität im 1. Jahr:', expected: PLAN[0].annuitaet, unit: '€' },
-                      { kind: 'num', key: 'k1', label: 'Restschuld am Ende des 1. Jahres:', expected: PLAN[0].rest, unit: '€' },
-                      { kind: 'num', key: 'z2', label: 'Zinsen im 2. Jahr:', expected: PLAN[1].zinsen, unit: '€' },
-                      { kind: 'num', key: 'a2', label: 'Annuität im 2. Jahr:', expected: PLAN[1].annuitaet, unit: '€' },
-                      { kind: 'num', key: 'a5', label: 'Annuität im 5. Jahr:', expected: PLAN[4].annuitaet, unit: '€' },
-                      { kind: 'num', key: 'zg', label: 'Zinsen insgesamt:', expected: Z_GES, unit: '€' },
-                    ]}
-                    loesungNachFehler
+                    prompt={<p>Übertrage deinen Tilgungsplan aus dem Heft in die Tabelle und prüfe ihn.</p>}
+                    zeilen={PLAN.map((r) => ({ jahr: r.jahr, schuld: r.schuld, tilgung: T, zinsen: r.zinsen, annuitaet: r.annuitaet }))}
+                    summe={{ tilgung: K0, zinsen: Z_GES, annuitaet: K0 + Z_GES }}
                     solution={LOESUNG_PLAN}
                     help={
                       <Hilfen
@@ -838,17 +961,11 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
               </Aufklappbar>
               <WegWahl
                 selbst={
-                  <CheckCard
+                  <TilgungsplanCheck
                     onSolved={jahrMelden}
                     title="Das 10. Jahr"
-                    prompt={<p>Trage die Ergebnisse aus deinem Heft ein und prüfe sie.</p>}
-                    fields={[
-                      { kind: 'num', key: 't', label: 'Tilgung pro Jahr:', expected: T2, unit: '€' },
-                      { kind: 'num', key: 'k9', label: 'Schuld zu Beginn des 10. Jahres:', expected: K9, unit: '€' },
-                      { kind: 'num', key: 'z10', label: 'Zinsen im 10. Jahr:', expected: Z10, unit: '€' },
-                      { kind: 'num', key: 'a10', label: 'Annuität im 10. Jahr:', expected: A10, unit: '€' },
-                    ]}
-                    loesungNachFehler
+                    prompt={<p>Trage die Werte für das 10. Jahr aus deinem Heft in die Zeile des Tilgungsplans ein und prüfe sie.</p>}
+                    zeilen={[{ jahr: V2, schuld: K9, tilgung: T2, zinsen: Z10, annuitaet: A10 }]}
                     solution={LOESUNG_JAHR10}
                     help={
                       <Hilfen
