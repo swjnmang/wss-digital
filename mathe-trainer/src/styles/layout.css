@@ -35,7 +35,6 @@
   .bk-bottomnav a, .bk-bottomnav button { min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 0; background: transparent; color: var(--ink-muted); font: 400 12px/1 var(--font-body); text-decoration: none; cursor: pointer; }
   .bk-bottomnav i { font-size: 20px; }
   .bk-bottomnav .is-active { color: var(--primary-ink); font-weight: 700; }
-  .app-root main { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 }
 
 /* ── Seiten ─────────────────────────────────────────────────────────────── */

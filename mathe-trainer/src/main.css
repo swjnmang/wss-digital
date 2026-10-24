@@ -84,6 +84,10 @@ button, a, input, select, textarea { touch-action: manipulation; }
 .app-shell { max-width: 1440px; width: 100%; margin: 0 auto; padding: 0 20px; }
 .app-root main { padding: 0 0 32px; }
 .app-root.keypad-open main { padding-bottom: calc(340px + env(safe-area-inset-bottom, 0px)); }
+/* Platz für die feste Leiste unten (.bk-bottomnav, nur Handy). Muss nach .app-root main stehen, sonst gewinnen die 32px. */
+@media (max-width: 640px) {
+  .app-root main { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+}
 
 /* ── Bausteine ──────────────────────────────────────────────────────────── */
 .bk-btn {
