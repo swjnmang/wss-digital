@@ -237,6 +237,15 @@ function SeitenAnsicht({
               )}
             </div>
             {s.inhalt(fertig(i))}
+            {/* Sind alle Aufgaben der Seite gelöst, steht „Weiter“ auch am Seitenende, damit niemand nach oben scrollen muss */}
+            {erledigt[i] && i < seiten.length - 1 && (
+              <div className="sl-weiter-unten">
+                <button type="button" className="bk-btn bk-btn-primary" onClick={() => setNr(i + 1)}>
+                  Weiter zu {PHASEN.find((p) => p.art === seiten[i + 1].art)?.title ?? 'nächsten Seite'}{' '}
+                  <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+                </button>
+              </div>
+            )}
           </section>
         ))}
       </HeftBestaetigtCtx.Provider>
