@@ -7,7 +7,7 @@ import { useSpielPunkte } from '../lernsituation_kit/punkte'
 // Gerade y = −mx + t. Auf der x-Achse stehen vier Fähnchen, eines davon an der Nullstelle. Die SuS rechnen die Nullstelle
 // aus, wählen das Fähnchen und starten den Countdown. Erst dann läuft der Akku die Gerade entlang leer, damit man die Nullstelle
 // nicht vorher ablesen kann. Die falschen Fähnchen sind typische Fehler: Vorzeichenfehler (−x_N), y-Achsenabschnitt t statt
-// Nullstelle, falsch herum geteilt (m : t) und mal statt geteilt (m · t). Fünf Runden, jeder Treffer bringt eine Münze.
+// Nullstelle, falsch herum geteilt (m : t) und mal statt geteilt (m · t). Vier Runden, jeder Treffer bringt eine Münze.
 // Bedienung: Fähnchen antippen oder Pfeiltasten, dann „Countdown starten“ bzw. Enter.
 
 type Fehler = 'richtig' | 'vorzeichen' | 'achse' | 'kehrwert' | 'mal'
@@ -15,7 +15,7 @@ type Ziel = { x: number; art: Fehler }
 type Runde = { geraet: string; m: number; t: number; ziele: Ziel[] }
 type Phase = 'start' | 'wahl' | 'lauf' | 'ergebnis' | 'ende'
 
-const RUNDEN = 5
+const RUNDEN = 4 // je Münze 2 Punkte: höchstens 8, also nicht mehr als die beste Übungsaufgabe
 const LAUF_DAUER = 1.6 // Sekunden, bis der Akku an der Nullstelle angekommen ist
 
 const G = { w: 760, h: 300, l: 24, r: 24, t: 20, b: 46, xMin: -9, xMax: 10, yMax: 6.5 }

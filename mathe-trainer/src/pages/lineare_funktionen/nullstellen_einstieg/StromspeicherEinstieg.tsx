@@ -15,8 +15,8 @@ import './stromspeicher.css'
 // Problem lösen: Problem → Beispielrechnung E-Bike-Akku mit Lernvideo → Ergebnisse aus dem Heft abgleichen mit Fehlersuche →
 // Handlungsprodukt analog: Nachricht an Familie Demir mit Rechnung, Skizze und Uhrzeit. Danach Rückbezug und Merke.
 // Phase 4: vier Übungen (Bedeutung, Berechnen, Wer hat recht?, umgekehrt), Profi-Aufgabe ohne Nullstelle, Bonus-Spiel „Akku-Countdown“.
-// Punkte nach Aufwand: Warm-up 2/3/2/2/2, Ausprobieren 3, Kernaufgabe 15, Nachricht 5, Übungen 4/5/5/8, Profi 8
-// (Pflicht zusammen 56: Warm-up 20 %, Problem lösen 36 %, Übungen 39 %).
+// Punkte nach Aufwand: Warm-up 2/3/2/2/3, Ausprobieren 3, Kernaufgabe 15, Entscheidung 4, Nachricht 5, Übungen 4/5/5/8, Profi 8,
+// Bonus-Spiel 4 Runden à 2 (Pflicht zusammen 61: Warm-up 12 = 20 %, Problem lösen 24 = 39 %, Übungen 22 = 36 %).
 // Identität: Themenfarbe Indigo (Nacht), Symbol Batterie, Titelbild Haus mit Solaranlage bei Nacht, Leitobjekt der Stromspeicher.
 // Kontext Gesellschaft und Umwelt (Energie). Versuche bleiben nur im Seitenzustand.
 // Ruhiges Grunddesign: eine Spalte, pro Seite ist nur der Auftrag hervorgehoben. Nach unten scrollen ist erlaubt, seitlich nie.
@@ -421,7 +421,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           />
           <CheckCard
             onSolved={fertig.teil('e')}
-            punkte={2}
+            punkte={3}
             title="e) Stunden in eine Uhrzeit umrechnen"
             prompt={
               <p>
@@ -463,7 +463,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
             <>
               <p className="sl-text">
                 Familie Demir hat eine Solaranlage mit Stromspeicher. Nach einem bewölkten Tag sind um 20 Uhr noch 2,5&nbsp;kWh im Speicher. Über Nacht verbraucht das Haus
-                gleichmäßig 0,4&nbsp;kWh pro Stunde. Ist der Speicher leer, kauft die Familie teuren Strom aus dem Netz.
+                gleichmäßig 0,4&nbsp;kWh pro Stunde. Ist der Speicher leer, muss die Familie Strom aus dem Netz kaufen. Ab 2 Uhr nachts gilt dafür ein günstiger Nachttarif.
               </p>
               <p className="sl-text">
                 Der Ladestand nach <M>x</M> Stunden ist <M>{'y = -0{,}4x + 2{,}5'}</M> (in kWh). Gesucht ist die Uhrzeit, zu der der Speicher leer ist.
@@ -486,7 +486,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
     {
       art: 'loesen',
       titel: 'Wann ist der Stromspeicher leer?',
-      pflicht: ['ergebnis', 'produkt'],
+      pflicht: ['ergebnis', 'entscheidung', 'produkt'],
       inhalt: (fertig) => (
         <>
           <p className="sl-hinweis">Einzelarbeit, ca. 20 Minuten.</p>
@@ -556,6 +556,38 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
               />
             </Fehlersuche>
           </Abschnitt>
+          <Abschnitt titel="Deine Entscheidung">
+            <McCard
+              onSolved={fertig.teil('entscheidung')}
+              punkte={4}
+              title="Teurer Strom in dieser Nacht?"
+              prompt={
+                <p>
+                  Vor 2 Uhr ist Strom aus dem Netz teuer, ab 2 Uhr gilt der günstige Nachttarif. Muss Familie Demir in dieser Nacht teuren Strom kaufen? Entscheide mit deinem
+                  Ergebnis.
+                </p>
+              }
+              options={[
+                {
+                  text: 'Ja, ab 2:15 Uhr kauft sie teuren Strom.',
+                  feedback: 'Ab 2:15 Uhr kauft sie zwar Strom aus dem Netz, aber ab 2 Uhr gilt schon der günstige Nachttarif.',
+                },
+                {
+                  text: 'Ja, denn der Speicher ist schon um 22:30 Uhr leer.',
+                  feedback: 'Hier wurde 2,5 kWh als 2,5 Stunden gelesen. Der Startwert t ist der Ladestand, nicht die Zeit bis zum Leerwerden.',
+                },
+                {
+                  text: 'Nein: Der Speicher reicht bis 2:15 Uhr, danach gilt schon der Nachttarif.',
+                  correct: true,
+                  feedback: 'Genau, knapp, aber es reicht: Der Speicher ist erst eine Viertelstunde nach Beginn des Nachttarifs leer.',
+                },
+                {
+                  text: 'Nein, der Speicher wird in dieser Nacht gar nicht leer.',
+                  feedback: 'Die Gerade fällt und schneidet die x-Achse bei x = 6,25. Der Speicher wird also leer, nur eben erst um 2:15 Uhr.',
+                },
+              ]}
+            />
+          </Abschnitt>
           <Handlungsprodukt titel="Nachricht an Familie Demir">
             <NachrichtBild />
             <p className="sl-text">
@@ -568,6 +600,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
                 <li>„Deshalb setze ich den Term gleich 0: …“</li>
                 <li>„Die Nullstelle ist … Das bedeutet: Nach … Stunden, also um … Uhr, …“</li>
                 <li>„In der Skizze seht ihr: Der Graph schneidet die x-Achse bei …“</li>
+                <li>„Teuren Strom müsst ihr …, weil der Nachttarif um 2 Uhr beginnt.“</li>
                 <li>
                   „Abkürzungen: <M>{'x_N'}</M> = …, <M>N</M> = …, <M>m</M> = …, <M>t</M> = …“
                 </li>
