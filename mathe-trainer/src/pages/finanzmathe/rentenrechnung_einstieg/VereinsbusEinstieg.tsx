@@ -588,8 +588,8 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                     title="Kontostand am Ende des 6. Jahres"
                     prompt={<p>Trage die Ergebnisse aus deinem Heft ein und prüfe sie.</p>}
                     fields={[
-                      { kind: 'num', key: 'vor', label: 'Einzahlung am Jahresanfang:', expected: KN_VOR, unit: '€', tol: 0.5 },
-                      { kind: 'num', key: 'nach', label: 'Einzahlung am Jahresende:', expected: KN_NACH, unit: '€', tol: 0.5 },
+                      { kind: 'num', key: 'vor', label: 'Wie viel Geld ist am Ende des 6. Jahres auf dem Konto, wenn die Sparrate immer am Jahresanfang eingezahlt wird?', expected: KN_VOR, unit: '€', tol: 0.5 },
+                      { kind: 'num', key: 'nach', label: 'Wie hoch wäre der Kontostand, wenn die Einzahlung immer am Jahresende stattfindet?', expected: KN_NACH, unit: '€', tol: 0.5 },
                     ]}
                     loesungNachFehler
                     solution={LOESUNG}
