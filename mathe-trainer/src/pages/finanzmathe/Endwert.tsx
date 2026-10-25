@@ -273,7 +273,7 @@ ${knLatex} \\cdot (q-1) &= ${rLatex} \\cdot ${rfLatex} \\cdot (q^n-1)\\\\
   };
 
   return (
-    <TaskShell title="Rentenrechnung: Endwert" width="wide">
+    <TaskShell title="Rentenrechnung: Endwert" width="wide" parent={{ to: '/finanzmathe/endwert', label: 'Rentenrechnung: Endwert' }}>
     <div className="flex flex-col">
       <div className="flex flex-col items-center w-full">
         <div className="bk-panel w-full max-w-6xl flex flex-col items-center">

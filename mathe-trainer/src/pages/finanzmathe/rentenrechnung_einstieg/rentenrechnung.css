@@ -1,0 +1,6 @@
+/* Lernsituation Rentenrechnung „Der Vereinsbus“. Farben kommen über --primary aus dem Thema. */
+
+.rr-zeitstrahl { display: flex; flex-direction: column; gap: 8px; }
+.rr-umschalten { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 16px; padding: 4px 6px 0; }
+.rr-umschalten .bk-btn { min-height: 44px; }
+.rr-erkenntnis { margin: 0; font-size: 17px; line-height: 1.55; }
