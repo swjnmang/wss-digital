@@ -19,6 +19,7 @@ import {
   type Seite,
   type Thema,
 } from '../../lineare_funktionen/lernsituation_kit/seiten';
+import { Bilanz } from '../../lineare_funktionen/lernsituation_kit/punkte';
 import { Kriterien, Vermutung, Zitat, euro, type Festlegung } from '../zins_kit/zins_kit';
 import '../../daten_und_zufall/lernpfad/lernpfad.css';
 import BusRallye from './BusRallye';
@@ -664,6 +665,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                   <CheckCard
                     onSolved={geloestMelden}
                     title="Kontostand mit Lösungsschema"
+                    punkte={8}
                     prompt={<p>Rechne in deinem Heft nach diesem Schema wie im Beispiel und trage die Ergebnisse ein.</p>}
                     rechnung={[
                       { l: ['q'], r: ['1 + \\frac{p}{100} =', { luecke: 'q' }], u: '\\text{① Zinsfaktor}' },
@@ -945,6 +947,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
             <CheckCard
               title="Welche Rate braucht der Verein?"
               level="erweiterung"
+              profi
               prompt={
                 <p>
                   Der Kassenwart bleibt dabei: Der Verein zahlt erst am Jahresende ein. Wie hoch muss die jährliche Rate mindestens sein,
@@ -978,6 +981,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
           <BonusSpiel frei={uebungen.length === 3} titel="Vereinsbus-Rallye">
             <BusRallye />
           </BonusSpiel>
+          <Bilanz />
           <div className="sl-ende">
             <p>
               Du kannst jetzt den Endwert regelmäßiger Einzahlungen berechnen, am Jahresanfang und am Jahresende. Bei den Übungsaufgaben
@@ -1006,6 +1010,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
     >
       <SeitenLernsituation
         ruhig
+        punkte
         thema={THEMA}
         ziel={
           <>

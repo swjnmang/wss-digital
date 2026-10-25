@@ -11,6 +11,7 @@ Dieser Skill entwickelt **Einstiegs-Lernsituationen** für neue Mathe-Themen und
 - **Nur für den Themeneinstieg.** Vertiefende Übungsseiten laufen über den Skill `mathe-aufgaben`. Eine Lernsituation führt ein Thema ein und sichert die Kernidee, sie übt nicht ausführlich.
 - **Kein Lehrkraft-Material** auf der Seite. Alles richtet sich direkt an die SuS.
 - **Endgerät:** Tablet im **Querformat**. Jede Seite ist trotzdem **einspaltig** (siehe "Ruhiges Grunddesign"). Nach unten scrollen ist erlaubt, zur Seite nie.
+- **Neueste Umsetzung mit allen aktuellen Regeln** (5 Warm-up-Aufgaben, Kriterium Begriffe und Abkürzungen, Bonus-Spiel, Punkte und Bilanz): `mathe-trainer/src/pages/finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Der Vereinsbus) mit `BusRallye.tsx`.
 - **Referenz-Umsetzung:** `mathe-trainer/src/pages/finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx` (Lenas Autogeld): eine Seite pro Phase, "Problem lösen" mit aufklappbarem Rechenbeispiel, Wahl zwischen selbst rechnen und Lösungsschema, Handlungsprodukt, Phase 4 mit vier Übungsaufgaben. Für Ausprobieren mit Live-Rückmeldung und Titelbilder zusätzlich `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx` und `lineare_funktionen/nullstellen_einstieg/StromspeicherEinstieg.tsx` ansehen (diese beiden haben noch die ältere Aufteilung mit einer Aufgabe pro Seite). Vor dem Bauen ansehen.
 - **Aktuelle Fassung dieses Skills** liegt im Repo unter `mathe-trainer/docs/skills/lernsituationen/SKILL.md`. Weicht sie ab, gilt die Repo-Fassung.
 
@@ -163,6 +164,27 @@ Für beide Varianten gilt:
 - Die Überschriften heißen genau **"Lernsituation"** und **"Übungsaufgaben"** (nicht "Wähle deinen Schwierigkeitsgrad").
 - Die Abschluss-Buttons der Lernsituation führen mit "Weiter üben" zu den Übungsaufgaben dieses Themas.
 - Die Auswahlseite wird mitgetestet: kein seitliches Scrollen bei 1180 × 820 und 390 × 844, Karte öffnet die Lernsituation, "Übungsaufgaben" öffnen die bisherigen Aufgaben.
+
+## Gamification: Punkte, Serien und Abzeichen (Pflicht)
+
+Jede Lernsituation belohnt richtige Lösungen mit Punkten. Die Elemente sollen motivieren, aber nicht vom Lernen ablenken: Sie sind klein, stehen am Rand (Punkte in der Phasenleiste) und belohnen selbstständiges, sorgfältiges Arbeiten.
+
+- **Einschalten:** `SeitenLernsituation` mit `punkte`. Alles Weitere erledigen die Bausteine selbst (`lernsituation_kit/punkte.tsx`): `CheckCard`, `McCard`, `Hilfen`, `SchrittHilfen`, `Vermutung` und `Kriterien` melden sich automatisch. Eigene Aufgaben-Bausteine nutzen `usePunkteAufgabe()` (`geloest`, `fehler`, `hilfe`, `loesung`).
+- **Punkteregeln** (Werte in `PUNKTE`):
+  - richtig gelöste Aufgabe: 10 Punkte; jede angezeigte Hilfe −2, jeder Fehlversuch −2 (höchstens 3 zählen), mindestens 2 Punkte für eine selbst gelöste Aufgabe
+  - Lösungsweg **vor** dem Lösen angesehen: die Aufgabe bringt 0 Punkte und es gibt 3 Punkte **Abzug** vom Gesamtstand (nach dem Lösen ist das Ansehen kostenlos)
+  - Weg „Mit Lösungsschema“: höchstens 8 Punkte (`punkte={8}` an der Schema-`CheckCard`); beide Wege der `WegWahl` zählen als eine Aufgabe
+  - Festlegung (`Vermutung`) und abgehakte Kriterien des Handlungsprodukts: je 5 Punkte
+  - Rechenbeispiel und Lernvideo sind kostenlos, sie gehören zum Lernen
+  - Die Kosten stehen sichtbar an den Knöpfen („Hilfe 1 anzeigen (−2 Punkte)“, „Lösungsweg zeigen (−3 Punkte)“), damit die SuS bewusst entscheiden. Hilfe bleibt immer erreichbar.
+- **Weitere Elemente:**
+  - **Punktestand** in der Phasenleiste mit kurzen Meldungen (+10, Abzug), die nach gut 2 Sekunden verschwinden
+  - **Serien-Bonus:** 3 Aufgaben am Stück ohne Hilfe und ohne Fehler bringen +5
+  - **Spielregeln in der Startbox** (`PunkteRegeln`, automatisch)
+  - **Bilanz** am Ende der letzten Seite (`<Bilanz />` unter dem Bonus-Spiel, über den Abschluss-Buttons): Punkte, 0 bis 3 Sterne mit Rang (Einsteiger, Bronze, Silber, Gold; nur aus den Aufgabenpunkten der Pflichtaufgaben), persönlicher Rekord (localStorage, mit try/catch) und vier Abzeichen: „Ganz allein“ (alle Pflichtaufgaben ohne Hilfe und Lösungsweg), „Serienstar“ (5 am Stück), „Profi“ (Profi-Aufgabe gelöst), „Spielchampion“ (im Bonus-Spiel fast alle Münzen)
+  - **Bonus-Spiel:** Münzen bringen je 5 Punkte, nur das beste Ergebnis zählt (`useSpielPunkte`)
+- **Profi-Aufgaben** bekommen `profi` (zählen nicht zum Maximum der Sterne, aber zum Abzeichen „Profi“).
+- **Keine Ablenkung:** keine Ranglisten mit Namen, kein Vergleich mit Mitschülern, keine Zeitwertung, keine Animationen außer den kurzen Meldungen; bei `prefers-reduced-motion` ohne Animation. Punkte verschwinden nie wegen langsamen Arbeitens.
 
 ## Bonus-Spiel zum Abschluss (Pflicht)
 
@@ -394,6 +416,7 @@ Anforderungen an einen guten Kontext:
 - [ ] "Problem erkennen" und "Problem lösen" haben je mindestens ein inhaltliches Bild (Graph, Skizze oder Sachbild im Stil des Titelbilds), das nichts von der Lösung verrät; beim Handlungsprodukt zeigt ein kleines Bild, was entstehen soll.
 - [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat 2 bis 4 Kriterien zum Abhaken, dazu das Kriterium „unbekannte Begriffe und Bedeutung der Abkürzungen der Formel aufschreiben“ mit den konkreten Abkürzungen.
 - [ ] "Wissen prüfen und vertiefen" hat mindestens 3, besser 4 passende Übungsaufgaben (Basis bis Erweiterung) und darunter die Abschluss-Buttons.
+- [ ] Gamification an: `SeitenLernsituation` mit `punkte`, Schema-Weg mit `punkte={8}`, Profi-Aufgabe mit `profi`, `<Bilanz />` am Ende der letzten Seite; die Punkte wurden im Test nachgerechnet.
 - [ ] Nach allen Pflicht-Übungen wird ein thematisch passendes Bonus-Spiel freigeschaltet (`BonusSpiel`), das das Wissen spielerisch prüft, auf dem Tablet bedienbar ist und "Nochmal spielen" anbietet.
 - [ ] Ruhiges Grunddesign: einspaltig (auch bei 1920 × 1080), ein Fokus pro Seite, keine verschachtelten Kästen, keine Farbstreifen oder Banner, eine Akzentfarbe, Touch-Ziele mindestens 44 px.
 - [ ] Identität vollständig: Themenfarbe (anders als in den letzten drei Lernsituationen), Symbol und Name als Kennung in der Leiste, eigenes Titelbild in der Startbox, Leitobjekt durch alle Phasen.

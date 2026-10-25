@@ -121,3 +121,4 @@
 .ls-help-wahl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
 .ls-help-wahl > span { font-weight: 700; color: var(--ink-muted); }
 .ls-help-wahl .bk-btn-sm { min-width: 44px; justify-content: center; }
+.ls-kosten { font-weight: 600; opacity: 0.75; }

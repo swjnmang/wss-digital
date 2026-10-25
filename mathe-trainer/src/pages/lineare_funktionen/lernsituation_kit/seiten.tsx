@@ -1,6 +1,7 @@
-import { useEffect, useState, type CSSProperties, type ChangeEvent, type ReactNode } from 'react';
+import { useEffect, useId, useState, type CSSProperties, type ChangeEvent, type ReactNode } from 'react';
 import { HeftBestaetigtCtx } from './kit';
 import { PHASEN, type PhaseArt } from './phasen';
+import { PunkteAnzeige, PunkteGruppeCtx, PunkteProvider, PunkteRegeln } from './punkte';
 import './phasen.css';
 import './seiten.css';
 
@@ -53,8 +54,26 @@ export type Seite = {
   inhalt: (fertig: Fertig) => ReactNode;
 };
 
-/** ruhig: ruhiges Grunddesign (eine Spalte, eine Akzentfarbe, keine Farbstreifen), siehe docs/skills/lernsituationen/SKILL.md */
-export function SeitenLernsituation({
+/**
+ * ruhig: ruhiges Grunddesign (eine Spalte, eine Akzentfarbe, keine Farbstreifen), siehe docs/skills/lernsituationen/SKILL.md.
+ * punkte: Gamification (Punkte in der Leiste, Abzüge für Hilfen und Lösungsweg, Serien-Bonus; Bilanz mit <Bilanz /> aus punkte.tsx).
+ */
+export function SeitenLernsituation(props: {
+  ziel: ReactNode;
+  seiten: Seite[];
+  ruhig?: boolean;
+  thema?: Thema;
+  punkte?: boolean;
+}) {
+  if (!props.punkte) return <SeitenAnsicht {...props} />;
+  return (
+    <PunkteProvider name={props.thema?.name ?? 'Lernsituation'}>
+      <SeitenAnsicht {...props} />
+    </PunkteProvider>
+  );
+}
+
+function SeitenAnsicht({
   ziel,
   seiten,
   ruhig = false,
@@ -107,6 +126,7 @@ export function SeitenLernsituation({
           dabei <strong>alle Rechenschritte</strong> vollständig auf, nicht nur das Ergebnis. Erst
           dann trägst du das Ergebnis hier ein und prüfst es.
         </div>
+        <PunkteRegeln />
         <label className="sl-start-check">
           <input
             type="checkbox"
@@ -187,6 +207,7 @@ export function SeitenLernsituation({
             {ruhig ? `${nr + 1} / ${seiten.length}` : `Seite ${nr + 1} von ${seiten.length}`}
           </span>
         )}
+        <PunkteAnzeige />
         {nr < seiten.length - 1 && (
           <button
             type="button"
@@ -267,7 +288,10 @@ export function Aufklappbar({
  */
 export function WegWahl({ selbst, schema }: { selbst: ReactNode; schema: ReactNode }) {
   const [weg, setWeg] = useState<'selbst' | 'schema'>('selbst');
+  // Beide Wege zählen bei den Punkten als eine Aufgabe
+  const gruppe = useId();
   return (
+    <PunkteGruppeCtx.Provider value={gruppe}>
     <div className="sl-wegwahl">
       <div className="sl-wegwahl-knoepfe" role="group" aria-label="Wie möchtest du rechnen?">
         <button
@@ -290,6 +314,7 @@ export function WegWahl({ selbst, schema }: { selbst: ReactNode; schema: ReactNo
       <div hidden={weg !== 'selbst'}>{selbst}</div>
       <div hidden={weg !== 'schema'}>{schema}</div>
     </div>
+    </PunkteGruppeCtx.Provider>
   );
 }
 

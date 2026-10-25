@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useSpielPunkte } from '../../lineare_funktionen/lernsituation_kit/punkte';
 import { euro } from '../zins_kit/zins_kit';
 
 // Bonus-Spiel „Vereinsbus-Rallye“ am Ende der Lernsituation „Der Vereinsbus“: Der Bus fährt auf drei Spuren auf Schilder mit
@@ -81,6 +82,13 @@ export default function BusRallye() {
   const letzte = useRef<number | undefined>(undefined);
   const spurRef = useRef(spur);
   spurRef.current = spur;
+  const meldeSpiel = useSpielPunkte();
+
+  // Am Ende das Ergebnis an die Punkte melden (nur das beste Ergebnis zählt)
+  useEffect(() => {
+    if (phase === 'ende') meldeSpiel(muenzen, RUNDEN);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
 
   useEffect(() => {
     if (phase !== 'fahrt') return;
