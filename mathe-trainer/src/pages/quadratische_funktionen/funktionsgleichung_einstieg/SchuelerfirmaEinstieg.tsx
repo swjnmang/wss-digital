@@ -13,7 +13,7 @@ import {
   type Seite,
   type Thema,
 } from '../../lineare_funktionen/lernsituation_kit/seiten'
-import { Bilanz, usePunkteAufgabe } from '../../lineare_funktionen/lernsituation_kit/punkte'
+import { Bilanz, PUNKTE, usePunkteAufgabe } from '../../lineare_funktionen/lernsituation_kit/punkte'
 import { Kriterien, Vermutung, Zitat, type Festlegung } from '../../finanzmathe/zins_kit/zins_kit'
 import { LERNVIDEO_FALL2 } from '../FunktionsgleichungAufstellen'
 import HoodieKanone from './HoodieKanone'
@@ -31,6 +31,8 @@ import './hoodie.css'
 // Aha: 20 und 40 Hoodies bringen beide 200 € Gewinn, 60 Hoodies bringen 200 € Verlust. Mehr verkaufen heißt nicht mehr Gewinn.
 // Identität: Themenfarbe Beere, Symbol fa-shirt, Titelbild Verkaufsstand am Sommerfest mit Hoodies und Bestellkarton, Leitobjekt der
 // Gewinn-Rechner der Schülerfirma. Festlegung und Versuche bleiben nur im Seitenzustand (kein Speichern).
+// Punkte nach Aufwand: Warm-up 2/2/3/2/3, Festlegung und Gewinn-Rechner je 3, Teil 1 10, Teil 2 14, Empfehlung 3, Steckbrief 5,
+// Übungen 4/5/6/8, Profi 9 (Pflicht zusammen 73: Warm-up 16 %, Problem lösen 44 %, Übungen 32 %).
 
 /** Lernvideo zu Fall 2 (auch bei den Übungsaufgaben unter /funktionsgleichung_aufstellen/ueben verlinkt) */
 const VIDEO_FALL2 = `https://www.youtube.com/watch?v=${LERNVIDEO_FALL2}`
@@ -231,8 +233,8 @@ function GewinnRechner({ versuche, onZeichnen }: { versuche: Kurve[]; onZeichnen
   const [fehlt, setFehlt] = useState(false)
   const letzter = versuche[versuche.length - 1]
   const getroffen = versuche.some(treffer)
-  // Ausprobieren zählt wie eine Festlegung: 5 Punkte, sobald die Seite frei ist
-  const pt = usePunkteAufgabe({ wert: 5, serie: false })
+  // Ausprobieren zählt wie eine Festlegung (PUNKTE.festlegung), sobald die Seite frei ist
+  const pt = usePunkteAufgabe({ wert: PUNKTE.festlegung, serie: false })
   const frei = versuche.length >= 3 || getroffen
   useEffect(() => {
     if (frei) pt.geloest()
@@ -506,6 +508,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
           <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich. Einzelarbeit, ca. 10 Minuten.</p>
           <CheckCard
             onSolved={fertig.teil('a')}
+            punkte={2}
             title="a) x einsetzen"
             prompt={
               <p>
@@ -528,6 +531,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
           />
           <CheckCard
             onSolved={fertig.teil('b')}
+            punkte={2}
             title="b) Einen Punkt einsetzen"
             prompt={
               <p>
@@ -556,6 +560,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
           />
           <CheckCard
             onSolved={fertig.teil('c')}
+            punkte={3}
             title="c) Gleichung lösen"
             prompt={
               <p>
@@ -581,6 +586,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
           />
           <CheckCard
             onSolved={fertig.teil('d')}
+            punkte={2}
             title="d) Minus vor der Klammer"
             prompt={<p>Vereinfache. Trage die Zahl vor <M>b</M> ein.</p>}
             rechnung={[{ l: ['(5a + 3b) - (5a - b)'], r: [{ luecke: 'k' }, 'b'] }]}
@@ -602,6 +608,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
           />
           <CheckCard
             onSolved={fertig.teil('e')}
+            punkte={3}
             title="e) Eine Gleichung multiplizieren"
             prompt={<p>Multipliziere die Gleichung auf beiden Seiten mit 2.</p>}
             rechnung={[
@@ -716,6 +723,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
             <CheckCard
               onSolved={fertig.teil('teil1')}
               onFehler={() => setFehler1(true)}
+              punkte={10}
               title="Gleichung I und Gleichung II"
               prompt={
                 <p>
@@ -785,6 +793,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
                 setGeloest(true)
               }}
               onFehler={() => setFehler2(true)}
+              punkte={14}
               title="Die Gewinnfunktion"
               prompt={
                 <>
@@ -841,6 +850,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
             <Abschnitt titel="Deine Empfehlung an Finn">
               <McCard
                 onSolved={fertig.teil('entscheidung')}
+                punkte={3}
                 title="Was empfiehlst du?"
                 prompt={<p>Finn wartet auf deine Antwort. Was schreibst du ihm?</p>}
                 options={[
@@ -938,6 +948,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
           <Abschnitt titel="Übung 1: Punkt einsetzen">
             <McCard
               onSolved={uebung('1', fertig.teil('1'))}
+              punkte={4}
               title="Übung 1"
               level="basis"
               rechnen
@@ -957,6 +968,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
           <Abschnitt titel="Übung 2: Wer hat recht?">
             <McCard
               onSolved={uebung('2', fertig.teil('2'))}
+              punkte={5}
               title="Übung 2"
               level="standard"
               rechnen
@@ -977,6 +989,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
           <Abschnitt titel="Übung 3: Verschobene Normalparabel">
             <CheckCard
               onSolved={uebung('3', fertig.teil('3'))}
+              punkte={6}
               title="Übung 3"
               level="standard"
               prompt={
@@ -1014,6 +1027,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
           <Abschnitt titel="Übung 4: Die Cap-Kalkulation">
             <CheckCard
               onSolved={uebung('4', fertig.teil('4'))}
+              punkte={8}
               title="Übung 4"
               level="erweiterung"
               prompt={
@@ -1056,6 +1070,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
           </Abschnitt>
           <Abschnitt titel="Übung 5 für Profis: Wie viele Hoodies sind ideal?">
             <CheckCard
+              punkte={9}
               title="Übung 5"
               profi
               level="erweiterung"
