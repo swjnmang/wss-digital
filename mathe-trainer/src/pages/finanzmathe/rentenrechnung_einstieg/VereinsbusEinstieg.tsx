@@ -373,10 +373,10 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
     {
       art: 'start',
       titel: 'Aufwärmen',
-      pflicht: ['a', 'b', 'c'],
+      pflicht: ['a', 'b', 'c', 'd', 'e'],
       inhalt: (fertig) => (
         <>
-          <p className="sl-text">Diese drei kurzen Aufgaben brauchst du gleich.</p>
+          <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich.</p>
           <CheckCard
             onSolved={fertig.teil('a')}
             title="a) Zinsfaktor"
@@ -421,6 +421,50 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                 Vom 01.01.2027 bis zum 31.12.2029 sind es die drei Jahre 2027, 2028 und 2029. Geld vom 31.12.2027 bekommt erst ab 2028 Zinsen,
                 also nur 2 Jahre.
               </p>
+            }
+          />
+          <CheckCard
+            onSolved={fertig.teil('d')}
+            title="d) Potenz mit dem Taschenrechner"
+            prompt={<p>Berechne mit dem Taschenrechner und runde auf 4 Nachkommastellen.</p>}
+            fieldsRow
+            fields={[
+              { kind: 'num', key: 'p6', label: <M>{'1{,}03^6 \\approx'}</M>, expected: 1.03 ** 6, tol: 0.0001 },
+              { kind: 'num', key: 'p10', label: <M>{'1{,}02^{10} \\approx'}</M>, expected: 1.02 ** 10, tol: 0.0001 },
+            ]}
+            solution={
+              <>
+                <MB>{'1{,}03^6 \\approx 1{,}1941 \\qquad 1{,}02^{10} \\approx 1{,}2190'}</MB>
+                <p>Am Taschenrechner: Basis eingeben, dann die Potenztaste (z. B. ^ oder xʸ), dann den Exponenten.</p>
+              </>
+            }
+          />
+          <CheckCard
+            onSolved={fertig.teil('e')}
+            title="e) Bruch mit Klammern"
+            prompt={
+              <p>
+                Berechne mit dem Taschenrechner. Achte darauf, Zähler und Nenner jeweils in Klammern einzugeben.
+              </p>
+            }
+            fieldsRow
+            fields={[
+              { kind: 'num', key: 'b1', label: <M>{'\\dfrac{1{,}2 - 1}{1{,}04 - 1} ='}</M>, expected: 5 },
+              { kind: 'num', key: 'b2', label: <M>{'\\dfrac{1{,}5^2 - 1}{1{,}5 - 1} ='}</M>, expected: 2.5 },
+            ]}
+            solution={
+              <MB>{'\\frac{1{,}2 - 1}{1{,}04 - 1} = \\frac{0{,}2}{0{,}04} = 5 \\qquad \\frac{1{,}5^2 - 1}{1{,}5 - 1} = \\frac{2{,}25 - 1}{0{,}5} = \\frac{1{,}25}{0{,}5} = 2{,}5'}</MB>
+            }
+            help={
+              <Hilfen
+                steps={[
+                  <>Der Bruchstrich wirkt wie eine Klammer um Zähler und Nenner.</>,
+                  <>Rechne zuerst den Zähler aus, dann den Nenner, und teile danach.</>,
+                  <>
+                    <M>{'1{,}2 - 1 = 0{,}2'}</M> und <M>{'1{,}04 - 1 = 0{,}04'}</M>, also <M>{'0{,}2 : 0{,}04'}</M>.
+                  </>,
+                ]}
+              />
             }
           />
         </>
@@ -577,6 +621,9 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                   <li>„Die 1. Rate wird … Jahre verzinst, die letzte nur …“</li>
                   <li>„Zahlen wir am Jahresanfang ein, haben wir am Ende …, am Jahresende nur …“</li>
                   <li>„Der Vorstand hat nur mit 900 € Zinsen gerechnet. In Wirklichkeit sind es …, weil …“</li>
+                  <li>
+                    „Abkürzungen: <M>{'K_n'}</M> = …, <M>r</M> = Rate (Rente), <M>q</M> = …, <M>n</M> = … Vorschüssig heißt …“
+                  </li>
                 </ul>
               </Aufklappbar>
             </Handlungsprodukt>
@@ -724,6 +771,12 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                   'Die Rechnung mit der Rentenformel für den Jahresanfang und das Jahresende',
                   'Eine klare Empfehlung: Wann soll der Verein einzahlen?',
                   'Eine Erklärung, warum die Rechnung des Vorstands (30.900 €) zu niedrig ist',
+                  <>
+                    Unter deinem Aushang steht, wofür die Abkürzungen der Formel stehen: <M>{'K_n'}</M> (Endwert, Kontostand nach{' '}
+                    <M>n</M> Jahren), <M>r</M> (Rate, auch Rente genannt), <M>q</M> (Zinsfaktor), <M>p</M> (Zinssatz) und <M>n</M> (Anzahl
+                    der Jahre). Außerdem erklärst du die Begriffe vorschüssig und nachschüssig und alle anderen Wörter, die für dich neu
+                    waren.
+                  </>,
                 ]}
               />
             </Abschnitt>

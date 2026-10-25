@@ -74,6 +74,10 @@ Handlungsprodukt → eigene Rechnung. Bei Auswahlaufgaben ist Antwort A nie die 
 Eingabefelder in Lernsituationen prüfen sich selbst (richtig sofort grün, falsch nach kurzer Tipp-Pause oder beim Verlassen rot),
 ohne Prüfen-Button: `CheckCard` macht das automatisch, eigene Eingabe-Bausteine nutzen `useLiveCheck` aus `lernsituation_kit/kit.tsx`.
 Nur Auswahlaufgaben (`McCard`) behalten „Prüfen“.
+Warm-up: mindestens 5 kurze Aufgaben, alle Pflicht. Beim Rechenbeispiel in „Problem lösen“ steht immer das passende Lernvideo zum Aufklappen
+(`VideoAufklappen`), falls es eines gibt; die Videos sind meist schon bei den Übungsaufgaben des Themas verlinkt und werden von dort übernommen.
+Die Kriterien des Handlungsprodukts enthalten immer einen Punkt „unbekannte Begriffe und die Bedeutung aller Abkürzungen der Formel aufschreiben“,
+mit den konkreten Abkürzungen des Themas (z. B. Rentenrechnung: r = Rate bzw. Rente).
 Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
 aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
 
