@@ -157,3 +157,5 @@
 .sl-wegwahl-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; }
 .sl-wegwahl [hidden] { display: none; }
 .sl-aufklappbar-breit > div > .bk-btn { width: 100%; justify-content: center; }
+.sl-weiter-unten { margin-top: 18px; }
+.sl-weiter-unten .bk-btn { width: 100%; min-height: 52px; justify-content: center; font-size: 18px; }
