@@ -93,6 +93,8 @@ import ZinseszinsLernsituation from './pages/finanzmathe/ZinseszinsLernsituation
 import ZinseszinsMenu from './pages/finanzmathe/ZinseszinsMenu';
 import MehrungMinderung from './pages/finanzmathe/MehrungMinderung';
 import Endwert from './pages/finanzmathe/Endwert';
+import EndwertMenu from './pages/finanzmathe/EndwertMenu';
+import EndwertLernsituation from './pages/finanzmathe/EndwertLernsituation';
 import Ratendarlehen from './pages/finanzmathe/Ratendarlehen';
 import RatendarlehenMenu from './pages/finanzmathe/RatendarlehenMenu';
 import RatendarlehenLernsituation from './pages/finanzmathe/RatendarlehenLernsituation';
@@ -305,7 +307,9 @@ export default function App() {
           <Route path="/finanzmathe/zinseszins/lernsituation-2" element={<ZinseszinsLernsituation teil={2} />} />
           <Route path="/finanzmathe/zinseszins-lernsituation" element={<Navigate to="/finanzmathe/zinseszins/lernsituation" replace />} />
           <Route path="/finanzmathe/mehrung_minderung" element={<MehrungMinderung />} />
-          <Route path="/finanzmathe/endwert" element={<Endwert />} />
+          <Route path="/finanzmathe/endwert" element={<EndwertMenu />} />
+          <Route path="/finanzmathe/endwert/ueben" element={<Endwert />} />
+          <Route path="/finanzmathe/endwert/lernsituation" element={<EndwertLernsituation />} />
           <Route path="/finanzmathe/ratendarlehen" element={<RatendarlehenMenu />} />
           <Route path="/finanzmathe/ratendarlehen/ueben" element={<Ratendarlehen />} />
           <Route path="/finanzmathe/ratendarlehen/lernsituation" element={<RatendarlehenLernsituation />} />
