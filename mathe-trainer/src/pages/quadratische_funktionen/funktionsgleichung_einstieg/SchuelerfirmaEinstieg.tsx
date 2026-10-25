@@ -31,8 +31,8 @@ import './hoodie.css'
 // Aha: 20 und 40 Hoodies bringen beide 200 € Gewinn, 60 Hoodies bringen 200 € Verlust. Mehr verkaufen heißt nicht mehr Gewinn.
 // Identität: Themenfarbe Beere, Symbol fa-shirt, Titelbild Verkaufsstand am Sommerfest mit Hoodies und Bestellkarton, Leitobjekt der
 // Gewinn-Rechner der Schülerfirma. Festlegung und Versuche bleiben nur im Seitenzustand (kein Speichern).
-// Punkte nach Aufwand: Warm-up 2/2/3/2/3, Festlegung und Gewinn-Rechner je 3, Teil 1 10, Teil 2 14, Empfehlung 3, Steckbrief 5,
-// Übungen 4/5/6/8, Profi 9 (Pflicht zusammen 73: Warm-up 16 %, Problem lösen 44 %, Übungen 32 %).
+// Punkte nach Aufwand: Warm-up 2/2/3/2/2, Festlegung und Gewinn-Rechner je 3, Teil 1 10, Teil 2 14, Empfehlung 3, Steckbrief 5,
+// Übungen 4/5/6/8, Profi 9, Bonus-Spiel 4 Münzen à 2 (Pflicht zusammen 72: Warm-up 15 %, Problem erkennen 8 %, Problem lösen 44 %, Übungen 32 %).
 
 /** Lernvideo zu Fall 2 (auch bei den Übungsaufgaben unter /funktionsgleichung_aufstellen/ueben verlinkt) */
 const VIDEO_FALL2 = `https://www.youtube.com/watch?v=${LERNVIDEO_FALL2}`
@@ -608,7 +608,7 @@ export default function SchuelerfirmaEinstieg({ onBack, onPractice, onPrev }: { 
           />
           <CheckCard
             onSolved={fertig.teil('e')}
-            punkte={3}
+            punkte={2}
             title="e) Eine Gleichung multiplizieren"
             prompt={<p>Multipliziere die Gleichung auf beiden Seiten mit 2.</p>}
             rechnung={[

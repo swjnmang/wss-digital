@@ -7,7 +7,7 @@ import { useSpielPunkte } from '../../lineare_funktionen/lernsituation_kit/punkt
 // Hoodies ins Publikum. Bekannt sind die Abschusshöhe c und zwei Ringe P und Q, durch die der Hoodie fliegen soll.
 // Die SuS stellen das Gleichungssystem auf (oder machen mit den vier Angeboten die Punktprobe) und wählen die Flugbahn.
 // Die Flugbahn wird erst beim Abschuss gezeichnet. Falsche Angebote sind typische Fehler: Vorzeichen von a oder b
-// verdreht, a und b vertauscht. Fünf Runden, jeder Hoodie durch beide Ringe bringt eine Münze.
+// verdreht, a und b vertauscht. Vier Runden, jeder Hoodie durch beide Ringe bringt eine Münze.
 // Bedienung: Flugbahn antippen oder Pfeiltasten, dann „Feuer!“ bzw. Enter.
 
 type Fehler = 'richtig' | 'vorzeichenA' | 'vorzeichenB' | 'vertauscht'
@@ -16,7 +16,7 @@ type Ring = { x: number; y: number }
 type Runde = { c: number; p: Ring; q: Ring; bahnen: Bahn[] }
 type Phase = 'start' | 'wahl' | 'flug' | 'ergebnis' | 'ende'
 
-const RUNDEN = 5
+const RUNDEN = 4 // 4 Münzen à 2 Punkte: das Spiel bringt nicht mehr als die größte Übungsaufgabe (8)
 const FLUG_DAUER = 2.2 // Sekunden für den ganzen Flug
 
 const G = { w: 760, h: 340, l: 40, r: 16, t: 16, b: 40, xMax: 12, yMax: 10 }
@@ -302,8 +302,8 @@ export default function HoodieKanone() {
       {phase === 'ende' && (
         <>
           <p className="hb-spiel-ende">
-            <i className={`fa-solid ${muenzen >= 4 ? 'fa-trophy' : 'fa-shirt'}`} aria-hidden="true" /> {muenzen} von {RUNDEN} Hoodies sind durch beide Ringe geflogen.{' '}
-            {muenzen === RUNDEN ? 'Perfekt, das Publikum jubelt!' : muenzen >= 4 ? 'Stark, fast alles richtig!' : 'Probier es noch einmal, du schaffst mehr!'}
+            <i className={`fa-solid ${muenzen >= 3 ? 'fa-trophy' : 'fa-shirt'}`} aria-hidden="true" /> {muenzen} von {RUNDEN} Hoodies sind durch beide Ringe geflogen.{' '}
+            {muenzen === RUNDEN ? 'Perfekt, das Publikum jubelt!' : muenzen >= 3 ? 'Stark, fast alles richtig!' : 'Probier es noch einmal, du schaffst mehr!'}
           </p>
           <div className="bk-actions">
             <button type="button" className="bk-btn bk-btn-primary" onClick={nochmal}>
