@@ -1,18 +1,28 @@
-import { useId, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useId, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, SchrittHilfen, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
-import { SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
+import { CheckCard, ErklaerungCtx, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
+import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Fehlersuche, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
+import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
+import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import AkkuCountdown from './AkkuCountdown'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './stromspeicher.css'
 
-// Lernsituation „Der Stromspeicher“: Nullstellen linearer Funktionen (ca. 45 min).
+// Lernsituation „Der Stromspeicher“: Nullstellen linearer Funktionen (ca. 45–60 min).
 // Format Experimentierlabor: Die SuS probieren Uhrzeiten aus und beobachten den Ladestand des Speichers. Den genauen Zeitpunkt,
-// an dem der Speicher leer ist (2:15 Uhr), treffen sie durch Probieren kaum. Danach: Aufgabe → Rechenbeispiel (E-Bike-Akku) →
-// eigene Rechnung. Lernprodukt digital: eine eigene Speicher-Aufgabe erstellen und mit einer Partnerin oder einem Partner tauschen.
+// an dem der Speicher leer ist (2:15 Uhr), treffen sie durch Probieren kaum.
+// Problem lösen: Problem → Beispielrechnung E-Bike-Akku mit Lernvideo → Ergebnisse aus dem Heft abgleichen mit Fehlersuche →
+// Handlungsprodukt analog: Nachricht an Familie Demir mit Rechnung, Skizze und Uhrzeit. Danach Rückbezug und Merke.
+// Phase 4: vier Übungen (Bedeutung, Berechnen, Wer hat recht?, umgekehrt), Profi-Aufgabe ohne Nullstelle, Bonus-Spiel „Akku-Countdown“.
+// Punkte nach Aufwand: Warm-up 2/3/2/2/2, Ausprobieren 3, Kernaufgabe 15, Nachricht 5, Übungen 4/5/5/8, Profi 8
+// (Pflicht zusammen 56: Warm-up 20 %, Problem lösen 36 %, Übungen 39 %).
 // Identität: Themenfarbe Indigo (Nacht), Symbol Batterie, Titelbild Haus mit Solaranlage bei Nacht, Leitobjekt der Stromspeicher.
 // Kontext Gesellschaft und Umwelt (Energie). Versuche bleiben nur im Seitenzustand.
 // Ruhiges Grunddesign: eine Spalte, pro Seite ist nur der Auftrag hervorgehoben. Nach unten scrollen ist erlaubt, seitlich nie.
+
+/** Lernvideo aus den Übungsaufgaben „Nullstellen berechnen“ */
+const VIDEO_NULLSTELLEN = 'https://www.youtube.com/watch?v=yIaIp8YaZp4'
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
@@ -156,6 +166,12 @@ function Ausprobieren({ auftrag, versuche, onTesten }: { auftrag: ReactNode; ver
   const [fehler, setFehler] = useState<string | null>(null)
   const letzter = versuche[versuche.length - 1]
   const treffer = versuche.some((x) => Math.abs(x - X_LEER) < 1e-9)
+  // Ausprobieren zählt wie eine Festlegung (PUNKTE.festlegung), sobald die Seite frei ist
+  const pt = usePunkteAufgabe({ wert: PUNKTE.festlegung, serie: false })
+  const frei = versuche.length >= 3 || treffer
+  useEffect(() => {
+    if (frei) pt.geloest()
+  }, [frei, pt])
 
   const testen = () => {
     const p = parseInput(eingabe)
@@ -210,7 +226,7 @@ function Ausprobieren({ auftrag, versuche, onTesten }: { auftrag: ReactNode; ver
           </span>
         </div>
       )}
-      {(versuche.length >= 3 || treffer) && (
+      {frei && (
         <p className="sl-hinweis">
           {treffer ? 'Treffer! Bei anderen Werten klappt das Raten aber kaum.' : 'Ganz genau triffst du den Zeitpunkt durch Probieren kaum.'} Gleich lernst du, wie du ihn ausrechnest.
         </p>
@@ -219,14 +235,42 @@ function Ausprobieren({ auftrag, versuche, onTesten }: { auftrag: ReactNode; ver
   )
 }
 
-/* ── Phase 3: Rechenbeispiel (E-Bike-Akku) ──────────────────────────────── */
+/* ── Phase 3: Bilder und Rechenbeispiel (E-Bike-Akku) ───────────────────── */
+
+/** Handlungsprodukt: Nachricht an Familie Demir mit kleiner Skizze des Ladestands */
+function NachrichtBild() {
+  return (
+    <div className="zk-bild zk-bild-klein">
+      <svg viewBox="0 0 720 190" role="img" aria-label="Ein Notizzettel mit der Überschrift Liebe Familie Demir, darunter Zeilen für die Rechnung und eine kleine Skizze einer fallenden Geraden, daneben ein Stift.">
+        <rect x="150" y="14" width="420" height="168" rx="8" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
+        <rect x="150" y="14" width="420" height="40" rx="8" fill="var(--primary-soft)" />
+        <line x1="150" x2="570" y1="54" y2="54" stroke="var(--primary)" strokeWidth="2" />
+        <text x="172" y="42" fontSize="21" fontWeight="800" fill="var(--ink)">
+          Liebe Familie Demir,
+        </text>
+        {[0, 1, 2, 3].map((i) => (
+          <line key={i} x1="172" x2={i % 2 ? 380 : 420} y1={82 + i * 26} y2={82 + i * 26} stroke="var(--line-strong)" strokeWidth="2" />
+        ))}
+        <line x1="450" x2="450" y1="72" y2="164" stroke="var(--ink)" strokeWidth="2" />
+        <line x1="450" x2="552" y1="152" y2="152" stroke="var(--ink)" strokeWidth="2" />
+        <line x1="450" y1="84" x2="530" y2="152" stroke="var(--primary)" strokeWidth="3.5" />
+        <circle cx="530" cy="152" r="6" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
+        <g transform="rotate(-35 640 120)">
+          <rect x="590" y="110" width="110" height="18" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
+          <polygon points="590,110 574,119 590,128" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
+        </g>
+      </svg>
+    </div>
+  )
+}
 
 const BSP_AUFGABE = (
   <p>
-    Der Akku eines E-Bikes hat beim Losfahren <M>{'0{,}6'}</M> kWh. Ladestand nach <M>x</M> Stunden Fahrt: <M>{'y = -0{,}15x + 0{,}6'}</M>. Wann ist der Akku leer?
+    Der Akku eines E-Bikes hat beim Losfahren <M>{'0{,}6'}</M> kWh. Ladestand nach <M>x</M> Stunden Fahrt: <M>{'y = -0{,}15x + 0{,}6'}</M>. Lena fährt um 9 Uhr los. Wann ist
+    der Akku leer?
   </p>
 )
-const BSP_SCHRITTE = [
+const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
   {
     title: <>Ansatz: <M>{'y = 0'}</M> setzen</>,
     body: (
@@ -250,98 +294,34 @@ const BSP_SCHRITTE = [
     ),
   },
   {
-    title: 'Nullstelle angeben und deuten',
+    title: 'Nullstelle angeben, Probe machen und deuten',
     body: (
       <>
-        <MB>{'N(4 \\mid 0)'}</MB>
-        <p>
-          Nach 4 Stunden Fahrt ist der Akku leer. Probe mit <M>{'x = 4'}</M>: <M>{'y = -0{,}15 \\cdot 4 + 0{,}6 = 0'}</M> ✓
-        </p>
+        <MB>{'N(4 \\mid 0) \\qquad \\text{Probe: } x = 4{:}\\; y = -0{,}15 \\cdot 4 + 0{,}6 = 0 \\;\\checkmark'}</MB>
+        <p>Nach 4 Stunden Fahrt ist der Akku leer. Lena ist um 9 Uhr losgefahren, also ist der Akku um 13 Uhr leer.</p>
       </>
     ),
   },
 ]
 
-/* ── Phase 4: Lernprodukt ───────────────────────────────────────────────── */
+/** Lösungsweg für den Stromspeicher */
+const LOESUNG = (
+  <>
+    <MB>{'\\begin{aligned} -0{,}4x + 2{,}5 &= 0 && \\mid -2{,}5 \\\\ -0{,}4x &= -2{,}5 && \\mid :(-0{,}4) \\\\ x_N &= 6{,}25 \\end{aligned}'}</MB>
+    <MB>{'N(6{,}25 \\mid 0) \\qquad \\text{Probe: } x = 6{,}25{:}\\; y = -0{,}4 \\cdot 6{,}25 + 2{,}5 = 0 \\;\\checkmark'}</MB>
+    <p>
+      <M>{'6{,}25'}</M> Stunden sind 6 Stunden und <M>{'0{,}25 \\cdot 60 = 15'}</M> Minuten. 20 Uhr plus 6 h 15 min ergibt 2:15 Uhr.
+    </p>
+  </>
+)
 
-/** Eigene Speicher-Aufgabe erstellen: Startwert und Verbrauch wählen, Nullstelle selbst berechnen, dann mit Partner tauschen */
-function EigeneAufgabe({ onFertig }: { onFertig: () => void }) {
-  const uid = useId()
-  const [w, setW] = useState({ start: '', verbrauch: '', x: '' })
-  const [status, setStatus] = useState<'idle' | 'ok' | 'falsch' | 'leer'>('idle')
-  const [haken, setHaken] = useState([false, false])
-  const s = parseInput(w.start)
-  const v = parseInput(w.verbrauch)
-  const loesung = s && v && v.value > 0 ? s.value / v.value : null
+/* ── Phase 4: Wer hat recht? ─────────────────────────────────────────────── */
 
-  const pruefen = () => {
-    const x = parseInput(w.x)
-    if (!s || !v || !x || s.value <= 0 || v.value <= 0) return setStatus('leer')
-    const ok = Math.abs(x.value - s.value / v.value) < 0.01
-    setStatus(ok ? 'ok' : 'falsch')
-    if (ok && haken.every(Boolean)) onFertig()
-  }
-  const feld = (k: 'start' | 'verbrauch' | 'x', label: ReactNode, einheit: string) => (
-    <label className="ss-feld" htmlFor={`${uid}-${k}`}>
-      <span>{label}</span>
-      <input
-        id={`${uid}-${k}`}
-        type="text"
-        inputMode="decimal"
-        autoComplete="off"
-        className={`bk-input lp-input lp-input-sm`}
-        value={w[k]}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          setW({ ...w, [k]: e.target.value })
-          setStatus('idle')
-        }}
-      />
-      <span>{einheit}</span>
-    </label>
-  )
+function Plan({ name, tex: t }: { name: string; tex: string }) {
   return (
-    <div className="ss-produkt" data-no-autocheck>
-      <div className="sl-fokus">
-        <p className="sl-fokus-titel">Erfinde eine Speicher-Aufgabe für deine Partnerin oder deinen Partner</p>
-        <p>Wähle einen Ladestand um 20 Uhr und einen Verbrauch pro Stunde. Berechne im Heft, wann dein Speicher leer ist, und lass es hier prüfen.</p>
-      </div>
-      <div className="ss-felder">
-        {feld('start', 'Ladestand um 20 Uhr', 'kWh')}
-        {feld('verbrauch', 'Verbrauch pro Stunde', 'kWh')}
-        {feld('x', <>Leer nach <M>{'x_N'}</M> =</>, 'Stunden')}
-        <button type="button" className="bk-btn bk-btn-primary" onClick={pruefen}>
-          Prüfen
-        </button>
-      </div>
-      {status === 'leer' && <p className="sl-hinweis">Trage drei positive Zahlen ein.</p>}
-      {status === 'falsch' && loesung !== null && (
-        <div className="bk-feedback bk-feedback-no lp-feedback" role="status">
-          <span>
-          Das passt noch nicht. Stelle die Gleichung <M>{`y = -${tex(v!.value)}x + ${tex(s!.value)}`}</M> auf und setze sie gleich 0.
-          </span>
-        </div>
-      )}
-      {status === 'ok' && loesung !== null && (
-        <div className="bk-feedback bk-feedback-ok lp-feedback" role="status">
-          <i className="fa-solid fa-circle-check" aria-hidden="true" /> Stimmt: Dein Speicher ist um {uhrzeit(loesung)} leer. Schreib die Aufgabe ohne Lösung auf und tausche sie.
-        </div>
-      )}
-      <div className="ls-criteria">
-        {['Aufgabe mit Funktionsgleichung im Heft notiert, Lösung auf der Rückseite', 'Aufgabe mit Partnerin oder Partner getauscht und die Lösungen verglichen'].map((c, i) => (
-          <label key={c}>
-            <input
-              type="checkbox"
-              checked={haken[i]}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                const neu = haken.map((h, j) => (j === i ? e.target.checked : h))
-                setHaken(neu)
-                if (status === 'ok' && neu.every(Boolean)) onFertig()
-              }}
-            />{' '}
-            <span>{c}</span>
-          </label>
-        ))}
-      </div>
+    <div className="ss-plan">
+      <div className="ss-plan-name">Rechnung von {name}</div>
+      <MB>{t}</MB>
     </div>
   )
 }
@@ -350,79 +330,149 @@ function EigeneAufgabe({ onFertig }: { onFertig: () => void }) {
 
 export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }: { erklaerung: ReactNode; onBack: () => void; onPractice: () => void }) {
   const [versuche, setVersuche] = useState<number[]>([])
+  const [geloest, setGeloest] = useState(false)
+  const [fehler, setFehler] = useState(false)
+  const [uebungen, setUebungen] = useState<string[]>([])
+  /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
+  const uebung = (k: string, fertig: () => void) => () => {
+    fertig()
+    setUebungen((u) => (u.includes(k) ? u : [...u, k]))
+  }
 
   const seiten: Seite[] = [
     {
       art: 'start',
-      titel: 'Aufwärmen 1: Ladestand berechnen',
+      titel: 'Aufwärmen',
+      pflicht: ['a', 'b', 'c', 'd', 'e'],
       inhalt: (fertig) => (
-        <CheckCard
-          onSolved={fertig}
-          title="a) y-Wert berechnen"
-          prompt={
-            <p>
-              Ein Speicher hat den Ladestand <M>{'y = -0{,}4x + 2{,}5'}</M>. Wie viel ist nach <M>{'x = 5'}</M> Stunden noch drin?
-            </p>
-          }
-          fields={[{ kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 0.5 }]}
-          solution={<MB>{'x = 5: \\quad y = -0{,}4 \\cdot 5 + 2{,}5 = -2 + 2{,}5 = 0{,}5'}</MB>}
-        />
-      ),
-    },
-    {
-      art: 'start',
-      titel: 'Aufwärmen 2: Gleichung lösen',
-      inhalt: (fertig) => (
-        <CheckCard
-          onSolved={fertig}
-          title="b) Gleichung lösen"
-          prompt={<p>Löse die Gleichung nach <M>x</M> auf.</p>}
-          lead={<M>{'-2x + 10 = 4 \\qquad \\Rightarrow'}</M>}
-          fields={[{ kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 3 }]}
-          solution={<MB>{'\\begin{aligned} -2x + 10 &= 4 && \\mid -10 \\\\ -2x &= -6 && \\mid :(-2) \\\\ x &= 3 \\end{aligned}'}</MB>}
-        />
-      ),
-    },
-    {
-      art: 'start',
-      titel: <>Aufwärmen 3: Punkte mit <M>{'y = 0'}</M></>,
-      inhalt: (fertig) => (
-        <McCard
-          onSolved={fertig}
-          title="c) Wo liegt der Punkt?"
-          prompt={
-            <p>
-              Der Punkt <M>{'P(5 \\mid 0)'}</M> hat die y-Koordinate 0. Wo liegt er im Koordinatensystem?
-            </p>
-          }
-          options={[
-            { text: 'Auf der y-Achse.', feedback: 'Auf der y-Achse liegen Punkte mit x = 0, nicht mit y = 0.' },
-            { text: 'Auf der x-Achse.', correct: true, feedback: 'Alle Punkte mit y = 0 liegen auf der x-Achse.' },
-            { text: 'Im Ursprung.', feedback: 'Der Ursprung ist O(0 | 0). Hier ist aber x = 5, der Punkt liegt rechts davon.' },
-            { text: 'Unterhalb der x-Achse.', feedback: 'Unterhalb der x-Achse ist y negativ. Bei y = 0 liegt der Punkt genau auf der Achse.' },
-          ]}
-        />
+        <>
+          <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich. Einzelarbeit, ca. 8 Minuten.</p>
+          <CheckCard
+            onSolved={fertig.teil('a')}
+            punkte={2}
+            title="a) x einsetzen"
+            prompt={
+              <p>
+                Ein Speicher hat den Ladestand <M>{'y = -0{,}4x + 2{,}5'}</M> (in kWh). Wie viel ist nach <M>{'x = 5'}</M> Stunden noch drin?
+              </p>
+            }
+            fields={[{ kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 0.5, unit: 'kWh' }]}
+            solution={<MB>{'x = 5{:}\\quad y = -0{,}4 \\cdot 5 + 2{,}5 = -2 + 2{,}5 = 0{,}5'}</MB>}
+          />
+          <CheckCard
+            onSolved={fertig.teil('b')}
+            punkte={3}
+            title="b) Gleichung lösen"
+            prompt={
+              <p>
+                Löse die Gleichung nach <M>x</M> auf. Schreibe zu jeder Umformung dazu, was du rechnest, z. B. <M>{'\\mid -10'}</M>.
+              </p>
+            }
+            lead={<M>{'-2x + 10 = 4 \\qquad \\Rightarrow'}</M>}
+            fields={[{ kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 3 }]}
+            solution={<MB>{'\\begin{aligned} -2x + 10 &= 4 && \\mid -10 \\\\ -2x &= -6 && \\mid :(-2) \\\\ x &= 3 \\end{aligned}'}</MB>}
+            help={
+              <Hilfen
+                steps={[
+                  <>Ziel: Am Ende steht <M>x</M> allein auf einer Seite. Was stört dich links noch?</>,
+                  <>Zuerst die Zahl ohne <M>x</M> wegbringen, dann durch die Zahl vor <M>x</M> teilen.</>,
+                  <>
+                    <M>{'\\mid -10'}</M> ergibt <M>{'-2x = -6'}</M>. Jetzt <M>{'\\mid :(-2)'}</M>: Minus durch Minus ergibt Plus.
+                  </>,
+                ]}
+              />
+            }
+          />
+          <McCard
+            onSolved={fertig.teil('c')}
+            punkte={2}
+            title="c) Wo liegt der Punkt?"
+            prompt={
+              <p>
+                Der Punkt <M>{'P(5 \\mid 0)'}</M> hat die y-Koordinate 0. Wo liegt er im Koordinatensystem?
+              </p>
+            }
+            options={[
+              { text: 'Auf der y-Achse.', feedback: 'Auf der y-Achse liegen Punkte mit x = 0, nicht mit y = 0.' },
+              { text: 'Auf der x-Achse.', correct: true, feedback: 'Alle Punkte mit y = 0 liegen auf der x-Achse.' },
+              { text: 'Im Ursprung.', feedback: 'Der Ursprung ist O(0 | 0). Hier ist aber x = 5, der Punkt liegt rechts davon.' },
+              { text: 'Unterhalb der x-Achse.', feedback: 'Unterhalb der x-Achse ist y negativ. Bei y = 0 liegt der Punkt genau auf der Achse.' },
+            ]}
+          />
+          <CheckCard
+            onSolved={fertig.teil('d')}
+            punkte={2}
+            title="d) Durch eine negative Dezimalzahl teilen"
+            prompt={<p>Löse die Gleichung. Achte beim Teilen auf das Vorzeichen.</p>}
+            lead={<M>{'-0{,}5x = -3 \\qquad \\Rightarrow'}</M>}
+            fields={[{ kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 6 }]}
+            solution={<MB>{'\\begin{aligned} -0{,}5x &= -3 && \\mid :(-0{,}5) \\\\ x &= 6 \\end{aligned}'}</MB>}
+            help={
+              <Hilfen
+                steps={[
+                  <>Teile beide Seiten durch die Zahl vor <M>x</M>, also durch <M>{'-0{,}5'}</M>.</>,
+                  <>Minus durch Minus ergibt Plus. Das Ergebnis ist also positiv.</>,
+                  <>
+                    Durch <M>{'0{,}5'}</M> teilen heißt mal 2 rechnen: <M>{'3 : 0{,}5 = 6'}</M>.
+                  </>,
+                ]}
+              />
+            }
+          />
+          <CheckCard
+            onSolved={fertig.teil('e')}
+            punkte={2}
+            title="e) Stunden in eine Uhrzeit umrechnen"
+            prompt={
+              <p>
+                Es ist 20 Uhr. Wie spät ist es <M>{'3{,}5'}</M> Stunden später?
+              </p>
+            }
+            rechnung={[{ l: ['\\text{Uhrzeit}'], r: [{ luecke: 'h' }, ':', { luecke: 'min' }, '\\;\\text{Uhr}'] }]}
+            fields={[
+              { kind: 'num', key: 'h', label: 'Stunde', expected: 23 },
+              { kind: 'num', key: 'min', label: 'Minuten', expected: 30 },
+            ]}
+            solution={
+              <p>
+                <M>{'3{,}5'}</M> Stunden sind 3 Stunden und <M>{'0{,}5 \\cdot 60 = 30'}</M> Minuten. 20 Uhr plus 3 h 30 min ergibt 23:30 Uhr.
+              </p>
+            }
+            help={
+              <Hilfen
+                steps={[
+                  <>Teile die Stunden in ganze Stunden und den Rest auf.</>,
+                  <>
+                    <M>{'0{,}5'}</M> Stunden sind eine halbe Stunde, also <M>{'0{,}5 \\cdot 60'}</M> Minuten.
+                  </>,
+                  <>Rechne von 20 Uhr aus 3 Stunden weiter und dann noch 30 Minuten.</>,
+                ]}
+              />
+            }
+          />
+        </>
       ),
     },
     {
       art: 'problem',
       titel: 'Der Stromspeicher in der Nacht',
-      bedingung: 'Nach drei Versuchen geht es weiter.',
+      bedingung: 'Nach drei Versuchen am Speicher geht es weiter.',
       inhalt: (fertig) => (
         <Ausprobieren
           auftrag={
             <>
               <p className="sl-text">
                 Familie Demir hat eine Solaranlage mit Stromspeicher. Nach einem bewölkten Tag sind um 20 Uhr noch 2,5&nbsp;kWh im Speicher. Über Nacht verbraucht das Haus
-                gleichmäßig 0,4&nbsp;kWh pro Stunde.
+                gleichmäßig 0,4&nbsp;kWh pro Stunde. Ist der Speicher leer, kauft die Familie teuren Strom aus dem Netz.
               </p>
               <p className="sl-text">
                 Der Ladestand nach <M>x</M> Stunden ist <M>{'y = -0{,}4x + 2{,}5'}</M> (in kWh). Gesucht ist die Uhrzeit, zu der der Speicher leer ist.
               </p>
               <div className="sl-fokus">
                 <p className="sl-fokus-titel">Dein Auftrag: Probier es aus, ohne zu rechnen</p>
-                <p>Gib eine Stundenzahl ein und frag den Speicher ab. Wann ist er genau leer?</p>
+                <p>Gib eine Stundenzahl ein und frag den Speicher ab. Schaffst du es, den Zeitpunkt zu finden, an dem er genau leer ist?</p>
               </div>
+              <p className="sl-hinweis">Einzel- oder Partnerarbeit, ca. 7 Minuten.</p>
             </>
           }
           versuche={versuche}
@@ -435,262 +485,295 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
     },
     {
       art: 'loesen',
-      titel: 'Deine Aufgabe',
-      frei: true,
-      inhalt: () => (
+      titel: 'Wann ist der Stromspeicher leer?',
+      pflicht: ['ergebnis', 'produkt'],
+      inhalt: (fertig) => (
         <>
+          <p className="sl-hinweis">Einzelarbeit, ca. 20 Minuten.</p>
           <div className="sl-fokus">
-            <p className="sl-fokus-titel">Berechne, wann der Speicher leer ist</p>
+            <p className="sl-fokus-titel">Deine Aufgabe: Berechne, wann der Stromspeicher leer ist</p>
             <p>
-              Gegeben ist der Ladestand <M>{'y = -0{,}4x + 2{,}5'}</M>. Gesucht ist die <strong>Nullstelle</strong> <M>{'x_N'}</M>: die Stelle, an der der Graph die x-Achse
-              schneidet, also <M>{'y = 0'}</M>. Gib sie als Punkt <M>{'N(x_N \\mid 0)'}</M> und als Uhrzeit an.
+              Gegeben ist der Ladestand <M>{'y = -0{,}4x + 2{,}5'}</M> (<M>x</M> in Stunden ab 20 Uhr). Gesucht ist die <strong>Nullstelle</strong> <M>{'x_N'}</M>: die
+              Stelle, an der der Graph die x-Achse schneidet, also <M>{'y = 0'}</M>. Berechne sie in deinem Heft, gib sie als Punkt <M>{'N(x_N \\mid 0)'}</M> an und rechne sie
+              in eine Uhrzeit um.
             </p>
           </div>
-          <div className="ss-bild-klein">
-            <LadeGraph frage />
-          </div>
-          <p className="sl-hinweis">Wie das geht, siehst du auf der nächsten Seite an einem Rechenbeispiel. Danach rechnest du selbst.</p>
-        </>
-      ),
-    },
-    {
-      art: 'loesen',
-      titel: "So geht's: Rechenbeispiel (Schritte 1 und 2)",
-      frei: true,
-      inhalt: () => <Beispiel offen title="Wann ist der E-Bike-Akku leer?" aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE.slice(0, 2)} />,
-    },
-    {
-      art: 'loesen',
-      titel: "So geht's: Rechenbeispiel (Schritte 3 und 4)",
-      frei: true,
-      inhalt: () => (
-        <>
-          <Beispiel offen title="Fortsetzung: E-Bike-Akku" aufgabe={<p>Aus Schritt 2 kennst du schon <M>{'-0{,}15x = -0{,}6'}</M>.</p>} steps={BSP_SCHRITTE.slice(2)} ab={3} />
-          <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
-        </>
-      ),
-    },
-    {
-      art: 'loesen',
-      titel: 'Jetzt du: Wann ist der Stromspeicher leer?',
-      inhalt: (fertig) => (
-        <CheckCard
-          onSolved={fertig}
-          title="Nullstelle berechnen"
-          prompt={
-            <p>
-              Ladestand: <M>{'y = -0{,}4x + 2{,}5'}</M>. Rechne in den Schritten des Rechenbeispiels und fülle die Lücken aus.
-            </p>
-          }
-          rechnung={[
-            { l: ['-0{,}4x + 2{,}5'], r: ['0'], u: '\\text{① } y = 0 \\quad \\mid -2{,}5' },
-            { l: ['-0{,}4x'], r: [{ luecke: 'rechts' }], u: '\\text{②} \\quad \\mid :(-0{,}4)' },
-            { l: ['x_N'], r: [{ luecke: 'xn' }], u: '\\text{③ Nullstelle}' },
-            { l: ['N'], r: ['(', { luecke: 'n1' }, '\\mid', { luecke: 'n2' }, ')'], u: '\\text{④ Punkt}' },
-            { l: ['\\text{Uhrzeit}'], r: [{ luecke: 'h' }, ':', { luecke: 'min' }, '\\;\\text{Uhr}'], u: '\\text{⑤ Uhrzeit}' },
-          ]}
-          fields={[
-            { kind: 'num', key: 'rechts', label: 'rechte Seite', expected: -2.5 },
-            { kind: 'num', key: 'xn', label: 'Nullstelle', expected: X_LEER },
-            { kind: 'num', key: 'n1', label: 'x-Koordinate von N', expected: X_LEER },
-            { kind: 'num', key: 'n2', label: 'y-Koordinate von N', expected: 0 },
-            { kind: 'num', key: 'h', label: 'Stunde', expected: 2 },
-            { kind: 'num', key: 'min', label: 'Minuten', expected: 15 },
-          ]}
-          solution={
-            <>
-              <MB>{'\\begin{aligned} -0{,}4x + 2{,}5 &= 0 && \\mid -2{,}5 \\\\ -0{,}4x &= -2{,}5 && \\mid :(-0{,}4) \\\\ x_N &= 6{,}25 \\end{aligned}'}</MB>
-              <p>
-                <M>{'N(6{,}25 \\mid 0)'}</M>. 6,25 Stunden sind 6 Stunden und 15 Minuten. 20 Uhr plus 6 h 15 min ergibt 2:15 Uhr.
-              </p>
-            </>
-          }
-          help={
-            <SchrittHilfen
-              schritte={[
-                {
-                  kurz: '①',
-                  titel: <>Gleich 0 setzen und <M>{'2{,}5'}</M> abziehen</>,
-                  hilfe: (
-                    <>
-                      Leer heißt <M>{'y = 0'}</M>. Ziehe auf beiden Seiten <M>{'2{,}5'}</M> ab. Rechts steht dann <M>{'0 - 2{,}5'}</M>.
-                    </>
-                  ),
-                },
-                {
-                  kurz: '②',
-                  titel: <>Durch <M>{'-0{,}4'}</M> teilen</>,
-                  hilfe: (
-                    <>
-                      Teile <M>{'-2{,}5'}</M> durch <M>{'-0{,}4'}</M>. Minus durch Minus ergibt Plus. Tipp: <M>{'2{,}5 : 0{,}4 = 25 : 4'}</M>.
-                    </>
-                  ),
-                },
-                {
-                  kurz: '③',
-                  titel: 'Nullstelle',
-                  hilfe: <>Das Ergebnis aus Schritt ② ist die Nullstelle <M>{'x_N'}</M>. Sie muss positiv sein, denn der Speicher wird erst nach 20 Uhr leer.</>,
-                },
-                {
-                  kurz: '④',
-                  titel: 'Punkt N',
-                  hilfe: (
-                    <>
-                      Eine Nullstelle liegt auf der x-Achse. Vorne steht <M>{'x_N'}</M>, hinten der y-Wert, und der ist auf der x-Achse immer 0.
-                    </>
-                  ),
-                },
-                {
-                  kurz: '⑤',
-                  titel: 'Uhrzeit',
-                  hilfe: (
-                    <>
-                      <M>{'0{,}25'}</M> Stunden sind 15 Minuten. Zähle von 20 Uhr aus 6 Stunden weiter (über Mitternacht) und dann noch 15 Minuten.
-                    </>
-                  ),
-                },
+          <LadeGraph frage />
+          <BeispielMitVideo video={VIDEO_NULLSTELLEN} videoTitel="Lernvideo: Nullstellen berechnen">
+            <div className="ss-beispiel">
+              <Beispiel offen title="Wann ist der E-Bike-Akku leer?" aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE} />
+            </div>
+          </BeispielMitVideo>
+          <Abschnitt titel="Vergleiche deine Ergebnisse">
+            <CheckCard
+              onSolved={() => {
+                fertig.teil('ergebnis')()
+                setGeloest(true)
+              }}
+              punkte={15}
+              onFehler={() => setFehler(true)}
+              title="Der Stromspeicher ist leer"
+              prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
+              fields={[
+                { kind: 'num', key: 'xn', label: <>Nach wie vielen Stunden ist der Speicher leer? <M>{'x_N ='}</M></>, expected: X_LEER, unit: 'h' },
+                { kind: 'num', key: 'h', label: 'Um wie viel Uhr ist er leer? Stunde:', expected: 2 },
+                { kind: 'num', key: 'min', label: 'Minuten:', expected: 15 },
               ]}
+              loesungNachFehler
+              solution={LOESUNG}
+              help={
+                <Hilfen
+                  steps={[
+                    <>Leer heißt: Der Ladestand ist 0. Was bedeutet das für den Funktionsterm?</>,
+                    <>
+                      Setze den Term gleich 0: <M>{'-0{,}4x + 2{,}5 = 0'}</M>. Bringe dann die Zahl ohne <M>x</M> auf die andere Seite und teile durch die Zahl vor <M>x</M>.
+                    </>,
+                    <>
+                      <M>{'\\mid -2{,}5'}</M> ergibt <M>{'-0{,}4x = -2{,}5'}</M>. Teile durch <M>{'-0{,}4'}</M>. Für die Uhrzeit: <M>{'0{,}25'}</M> Stunden sind
+                      15 Minuten.
+                    </>,
+                  ]}
+                />
+              }
             />
-          }
-        />
-      ),
-    },
-    {
-      art: 'sichern',
-      titel: 'Das hältst du fest',
-      frei: true,
-      inhalt: () => (
-        <>
-          <Rueckbezug versuche={versuche} />
-          <Merke title="Nullstelle einer linearen Funktion">
-            <p>
-              Die <strong>Nullstelle</strong> <M>{'x_N'}</M> ist die Stelle, an der der Graph die x-Achse schneidet. Dort gilt <M>{'y = 0'}</M>, der Punkt heißt{' '}
-              <M>{'N(x_N \\mid 0)'}</M>.
+            <Fehlersuche fehler={fehler}>
+              <CheckCard
+                title="Fehlersuche: Wo steckt der Fehler?"
+                rechnen={false}
+                ohnePunkte
+                prompt={<p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>}
+                rechnung={[
+                  { l: ['-0{,}4x + 2{,}5'], r: ['0'], u: '\\mid -2{,}5 \\;\\; \\text{①}' },
+                  { l: ['-0{,}4x'], r: [{ luecke: 'r' }], u: '\\mid :(-0{,}4) \\;\\; \\text{②}' },
+                  { l: ['x_N'], r: [{ luecke: 'xn' }], u: '\\text{③ Nullstelle}' },
+                  { l: ['0{,}25 \\text{ h}'], r: [{ luecke: 'min' }, '\\;\\text{min}'], u: '\\text{④ Minuten}' },
+                ]}
+                fields={[
+                  { kind: 'num', key: 'r', label: 'rechte Seite nach | −2,5', expected: -2.5 },
+                  { kind: 'num', key: 'xn', label: 'Nullstelle', expected: X_LEER },
+                  { kind: 'num', key: 'min', label: 'Minuten für 0,25 Stunden', expected: 15 },
+                ]}
+              />
+            </Fehlersuche>
+          </Abschnitt>
+          <Handlungsprodukt titel="Nachricht an Familie Demir">
+            <NachrichtBild />
+            <p className="sl-text">
+              Familie Demir möchte wissen, ab wann sie in dieser Nacht Strom aus dem Netz kaufen muss. Schreibe ihr in deinem Heft eine kurze Nachricht mit deiner Rechnung, einer
+              Skizze des Ladestands und der Uhrzeit.
             </p>
-            <ol>
-              <li>
-                Funktionsterm gleich 0 setzen: <M>{'mx + t = 0'}</M>
-              </li>
-              <li>
-                Nach <M>x</M> auflösen: erst <M>t</M> abziehen, dann durch <M>m</M> teilen.
-              </li>
-              <li>Nullstelle als Punkt angeben und in der Situation deuten.</li>
-            </ol>
-          </Merke>
-        </>
-      ),
-    },
-    {
-      art: 'sichern',
-      titel: 'Deine eigene Speicher-Aufgabe (Lernprodukt, Partnerarbeit)',
-      bedingung: 'Aufgabe prüfen lassen und beide Punkte abhaken.',
-      inhalt: (fertig) => <EigeneAufgabe onFertig={fertig} />,
-    },
-    {
-      art: 'sichern',
-      titel: 'Check 1: Was bedeutet die Nullstelle?',
-      inhalt: (fertig) => (
-        <TrackedMc
-          onSolved={fertig}
-          topic="Nullstellen-Einstieg: Bedeutung (Basis)"
-          title="Check 1"
-          level="basis"
-          prompt={
-            <p>
-              Für den Ladestand eines Speichers gilt <M>{'N(5 \\mid 0)'}</M>. Was bedeutet das?
-            </p>
-          }
-          options={[
-            { text: 'Nach 5 Stunden sind noch 5 kWh im Speicher.', feedback: 'Bei N(5 | 0) ist der y-Wert 0. Es ist also nichts mehr im Speicher.' },
-            { text: 'Am Anfang sind 5 kWh im Speicher.', feedback: 'Der Anfangswert ist der y-Achsenabschnitt t. Die Nullstelle liegt auf der x-Achse, dort ist y = 0.' },
-            { text: 'Nach 5 Stunden ist der Speicher leer.', correct: true, feedback: 'N(5 | 0): Bei x = 5 Stunden ist der Ladestand y = 0.' },
-            { text: 'Der Speicher verliert 5 kWh pro Stunde.', feedback: 'Wie viel pro Stunde verloren geht, sagt die Steigung m, nicht die Nullstelle.' },
-          ]}
-        />
-      ),
-    },
-    {
-      art: 'sichern',
-      titel: 'Check 2: Nullstelle berechnen',
-      inhalt: (fertig) => (
-        <TrackedMc
-          onSolved={fertig}
-          topic="Nullstellen-Einstieg: Berechnen (Standard)"
-          title="Check 2"
-          rechnen
-          level="standard"
-          prompt={
-            <>
-              <p>Berechne die Nullstelle der Geraden. Wähle dann die richtige Antwort.</p>
-              <MB>{'y = -3x + 12'}</MB>
-            </>
-          }
-          options={[
-            { text: <M>{'x_N = -4'}</M>, feedback: 'Vorzeichenfehler: Aus −3x + 12 = 0 folgt −3x = −12, also x = (−12) : (−3) = 4.' },
-            { text: <M>{'x_N = 12'}</M>, feedback: 'Die 12 ist der y-Achsenabschnitt t, nicht die Nullstelle. Setze den Term gleich 0 und löse nach x auf.' },
-            { text: <M>{'N(0 \\mid 4)'}</M>, feedback: 'Die Zahl stimmt, aber die Koordinaten sind vertauscht. Die Nullstelle liegt auf der x-Achse: N(4 | 0).' },
-            { text: <M>{'N(4 \\mid 0)'}</M>, correct: true, feedback: '−3x + 12 = 0 ergibt −3x = −12, also x = 4. Probe: y = −12 + 12 = 0.' },
-          ]}
-        />
-      ),
-    },
-    {
-      art: 'sichern',
-      titel: 'Check 3: Reicht es bis 6 Uhr?',
-      inhalt: (fertig) => (
-        <TrackedCheck
-          onSolved={fertig}
-          topic="Nullstellen-Einstieg: Umgekehrt (Erweiterung)"
-          title="Check 3"
-          level="erweiterung"
-          prompt={
-            <p>
-              Familie Demir möchte, dass der Speicher bis 6 Uhr morgens reicht, also <M>{'x_N = 10'}</M>. Der Verbrauch bleibt bei 0,4&nbsp;kWh pro Stunde:{' '}
-              <M>{'y = -0{,}4x + t'}</M>. Wie viel muss um 20 Uhr mindestens im Speicher sein?
-            </p>
-          }
-          fields={[{ kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 4 }]}
-          solution={
-            <>
-              <p>
-                Bei <M>{'x = 10'}</M> muss <M>{'y = 0'}</M> sein:
-              </p>
-              <MB>{'\\begin{aligned} -0{,}4 \\cdot 10 + t &= 0 \\\\ -4 + t &= 0 && \\mid +4 \\\\ t &= 4 \\end{aligned}'}</MB>
-              <p>Um 20 Uhr müssen mindestens 4 kWh im Speicher sein.</p>
-            </>
-          }
-          help={
-            <Hilfen
-              steps={[
-                <>Diesmal kennst du die Nullstelle schon: <M>{'x_N = 10'}</M>. Welcher y-Wert gehört dazu?</>,
+            <Aufklappbar label="Satzanfänge ansehen" icon="fa-comment-dots">
+              <ul className="zk-liste">
+                <li>„Liebe Familie Demir, euer Speicher ist leer, wenn der Ladestand …“</li>
+                <li>„Deshalb setze ich den Term gleich 0: …“</li>
+                <li>„Die Nullstelle ist … Das bedeutet: Nach … Stunden, also um … Uhr, …“</li>
+                <li>„In der Skizze seht ihr: Der Graph schneidet die x-Achse bei …“</li>
+                <li>
+                  „Abkürzungen: <M>{'x_N'}</M> = …, <M>N</M> = …, <M>m</M> = …, <M>t</M> = …“
+                </li>
+              </ul>
+            </Aufklappbar>
+          </Handlungsprodukt>
+          <Abschnitt titel="Ist deine Nachricht vollständig?">
+            <Kriterien
+              onAlle={fertig.teil('produkt')}
+              items={[
+                <>Ein Satz, warum man den Term gleich 0 setzt (leer heißt <M>{'y = 0'}</M>)</>,
+                <>Die Rechnung mit allen Umformungen wie <M>{'\\mid -2{,}5'}</M> und <M>{'\\mid :(-0{,}4)'}</M>, dazu die Probe</>,
+                'Eine Skizze des Graphen mit beschrifteten Achsen, in der die Nullstelle N markiert ist',
+                'Ein Antwortsatz mit der Uhrzeit, zu der der Speicher leer ist',
                 <>
-                  Setze <M>{'x = 10'}</M> ein und den Term gleich 0. Unbekannt ist jetzt <M>t</M>.
-                </>,
-                <>
-                  <M>{'-0{,}4 \\cdot 10 + t = 0'}</M>, also <M>{'-4 + t = 0'}</M>. Jetzt nach <M>t</M> auflösen.
+                  In deiner Nachricht steht, wofür die Abkürzungen stehen: <M>{'x_N'}</M> (Nullstelle), <M>{'N(x_N \\mid 0)'}</M> (Schnittpunkt mit der x-Achse), <M>m</M>{' '}
+                  (Steigung, hier der Verbrauch pro Stunde) und <M>t</M> (y-Achsenabschnitt, hier der Ladestand um 20 Uhr). Außerdem erklärst du den Begriff „Nullstelle“ und
+                  alle anderen Wörter, die für dich neu waren.
                 </>,
               ]}
             />
-          }
-        />
+          </Abschnitt>
+          {geloest && (
+            <Abschnitt titel="Das hältst du fest">
+              <Rueckbezug versuche={versuche} />
+              <Merke title="Nullstelle einer linearen Funktion">
+                <p>
+                  Die <strong>Nullstelle</strong> <M>{'x_N'}</M> ist die Stelle, an der der Graph die x-Achse schneidet. Dort gilt <M>{'y = 0'}</M>, der Punkt heißt{' '}
+                  <M>{'N(x_N \\mid 0)'}</M>.
+                </p>
+                <ol className="zk-liste" style={{ listStyleType: 'decimal' }}>
+                  <li>
+                    Funktionsterm gleich 0 setzen: <M>{'mx + t = 0'}</M>
+                  </li>
+                  <li>
+                    Nach <M>x</M> auflösen: erst <M>t</M> abziehen, dann durch <M>m</M> teilen. Bei negativem <M>m</M> auf das Vorzeichen achten.
+                  </li>
+                  <li>
+                    Nullstelle als Punkt angeben und in der Situation deuten: <M>{'N(6{,}25 \\mid 0)'}</M>, der Speicher ist um 2:15 Uhr leer.
+                  </li>
+                </ol>
+              </Merke>
+            </Abschnitt>
+          )}
+        </>
       ),
     },
     {
       art: 'sichern',
-      titel: 'Geschafft!',
-      frei: true,
-      inhalt: () => (
-        <div className="sl-ende">
-          <p>Du kannst jetzt die Nullstelle einer linearen Funktion berechnen und in einer Situation deuten. Übe das Verfahren mit weiteren Aufgaben.</p>
-          <div className="bk-actions">
-            <button type="button" className="bk-btn" onClick={onBack}>
-              <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zur Auswahl
-            </button>
-            <button type="button" className="bk-btn bk-btn-primary" onClick={onPractice}>
-              Weiter üben: Nullstellen (Einfach) <i className="fa-solid fa-arrow-right" aria-hidden="true" />
-            </button>
+      titel: 'Übungsaufgaben',
+      pflicht: ['1', '2', '3', '4'],
+      inhalt: (fertig) => (
+        <>
+          <p className="sl-text">
+            Prüfe und vertiefe dein Wissen mit vier Aufgaben. Die fünfte ist freiwillig für Profis. Wenn du die vier Pflichtaufgaben gelöst hast, wartet unten ein Spiel auf dich.
+            Einzelarbeit, ca. 15 Minuten.
+          </p>
+          <Abschnitt titel="Übung 1: Was bedeutet die Nullstelle?">
+            <TrackedMc
+              onSolved={uebung('1', fertig.teil('1'))}
+              punkte={4}
+              topic="Nullstellen-Einstieg: Bedeutung (Basis)"
+              title="Übung 1"
+              level="basis"
+              prompt={
+                <p>
+                  Für den Ladestand eines Speichers gilt <M>{'N(5 \\mid 0)'}</M>. Was bedeutet das?
+                </p>
+              }
+              options={[
+                { text: 'Nach 5 Stunden sind noch 5 kWh im Speicher.', feedback: 'Bei N(5 | 0) ist der y-Wert 0. Es ist also nichts mehr im Speicher.' },
+                { text: 'Am Anfang sind 5 kWh im Speicher.', feedback: 'Der Anfangswert ist der y-Achsenabschnitt t. Die Nullstelle liegt auf der x-Achse, dort ist y = 0.' },
+                { text: 'Nach 5 Stunden ist der Speicher leer.', correct: true, feedback: 'N(5 | 0): Bei x = 5 Stunden ist der Ladestand y = 0.' },
+                { text: 'Der Speicher verliert 5 kWh pro Stunde.', feedback: 'Wie viel pro Stunde verloren geht, sagt die Steigung m, nicht die Nullstelle.' },
+              ]}
+            />
+          </Abschnitt>
+          <Abschnitt titel="Übung 2: Welche Nullstelle stimmt?">
+            <TrackedMc
+              onSolved={uebung('2', fertig.teil('2'))}
+              punkte={5}
+              topic="Nullstellen-Einstieg: Berechnen (Standard)"
+              title="Übung 2"
+              rechnen
+              level="standard"
+              prompt={
+                <p>
+                  Gerade: <M>{'y = -3x + 12'}</M>. Berechne die Nullstelle und wähle die richtige Antwort.
+                </p>
+              }
+              options={[
+                { text: <M>{'x_N = -4'}</M>, feedback: 'Vorzeichenfehler: Aus −3x + 12 = 0 folgt −3x = −12, also x = (−12) : (−3) = 4.' },
+                { text: <M>{'x_N = 12'}</M>, feedback: 'Die 12 ist der y-Achsenabschnitt t, nicht die Nullstelle. Setze den Term gleich 0 und löse nach x auf.' },
+                { text: <M>{'N(0 \\mid 4)'}</M>, feedback: 'Die Zahl stimmt, aber die Koordinaten sind vertauscht. Die Nullstelle liegt auf der x-Achse: N(4 | 0).' },
+                { text: <M>{'N(4 \\mid 0)'}</M>, correct: true, feedback: '−3x + 12 = 0 ergibt −3x = −12, also x = 4. Probe: y = −12 + 12 = 0.' },
+              ]}
+            />
+          </Abschnitt>
+          <Abschnitt titel="Übung 3: Wer hat recht?">
+            <TrackedMc
+              onSolved={uebung('3', fertig.teil('3'))}
+              punkte={5}
+              topic="Nullstellen-Einstieg: Fehler beim Umformen (Standard)"
+              title="Übung 3"
+              level="standard"
+              prompt={
+                <>
+                  <p>
+                    Zwei Azubis berechnen die Nullstelle der Geraden <M>{'y = 0{,}5x + 3'}</M>. Wer hat recht?
+                  </p>
+                  <div className="ss-plaene">
+                    <Plan name="Leon" tex={'\\begin{aligned} 0{,}5x + 3 &= 0 && \\mid -3 \\\\ 0{,}5x &= 3 && \\mid :0{,}5 \\\\ x_N &= 6 \\end{aligned}'} />
+                    <Plan name="Mia" tex={'\\begin{aligned} 0{,}5x + 3 &= 0 && \\mid -3 \\\\ 0{,}5x &= -3 && \\mid :0{,}5 \\\\ x_N &= -6 \\end{aligned}'} />
+                  </div>
+                </>
+              }
+              options={[
+                { text: 'Leon, denn eine Nullstelle ist immer positiv.', feedback: 'Nullstellen können auch negativ sein. Prüfe Leons zweite Zeile: Was ergibt 0 − 3?' },
+                {
+                  text: 'Mia. Leon hat beim Abziehen von 3 das Minus vergessen.',
+                  correct: true,
+                  feedback: '0 − 3 = −3, also 0,5x = −3 und x = −6. Probe: y = 0,5 · (−6) + 3 = 0. Die Gerade steigt und schneidet die x-Achse links vom Ursprung.',
+                },
+                { text: 'Beide, eine Gerade hat zwei Nullstellen.', feedback: 'Eine steigende oder fallende Gerade schneidet die x-Achse genau einmal. Einer der beiden hat sich verrechnet.' },
+                { text: 'Keiner, die Nullstelle ist x = 3.', feedback: 'Die 3 ist der y-Achsenabschnitt t. Setze x = 3 ein: y = 1,5 + 3 = 4,5, nicht 0.' },
+              ]}
+            />
+          </Abschnitt>
+          <Abschnitt titel="Übung 4: Reicht es bis 6 Uhr?">
+            <TrackedCheck
+              onSolved={uebung('4', fertig.teil('4'))}
+              punkte={8}
+              topic="Nullstellen-Einstieg: Umgekehrt (Erweiterung)"
+              title="Übung 4"
+              level="erweiterung"
+              prompt={
+                <p>
+                  Familie Demir möchte, dass der Speicher bis 6 Uhr morgens reicht, also <M>{'x_N = 10'}</M>. Der Verbrauch bleibt bei 0,4&nbsp;kWh pro Stunde:{' '}
+                  <M>{'y = -0{,}4x + t'}</M>. Wie viel muss um 20 Uhr mindestens im Speicher sein?
+                </p>
+              }
+              fields={[{ kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 4, unit: 'kWh' }]}
+              solution={
+                <>
+                  <p>
+                    Bei <M>{'x = 10'}</M> muss <M>{'y = 0'}</M> sein:
+                  </p>
+                  <MB>{'\\begin{aligned} -0{,}4 \\cdot 10 + t &= 0 \\\\ -4 + t &= 0 && \\mid +4 \\\\ t &= 4 \\end{aligned}'}</MB>
+                  <p>Um 20 Uhr müssen mindestens 4 kWh im Speicher sein.</p>
+                </>
+              }
+              help={
+                <Hilfen
+                  steps={[
+                    <>Diesmal kennst du die Nullstelle schon: <M>{'x_N = 10'}</M>. Welcher y-Wert gehört dazu?</>,
+                    <>
+                      Setze <M>{'x = 10'}</M> ein und den Term gleich 0. Unbekannt ist jetzt <M>t</M>.
+                    </>,
+                    <>
+                      <M>{'-0{,}4 \\cdot 10 + t = 0'}</M>, also <M>{'-4 + t = 0'}</M>. Jetzt nach <M>t</M> auflösen.
+                    </>,
+                  ]}
+                />
+              }
+            />
+          </Abschnitt>
+          <Abschnitt titel="Übung 5 für Profis: Wird der Speicher überhaupt leer?">
+            <McCard
+              title="Übung 5"
+              punkte={8}
+              profi
+              level="erweiterung"
+              prompt={
+                <p>
+                  In einer Sommernacht läuft im Haus nur der Kühlschrank, und der Speicher wird zusätzlich von einem kleinen Windrad gleich schnell nachgeladen. Der Ladestand
+                  bleibt die ganze Nacht bei <M>{'y = 3'}</M>. Wo liegt die Nullstelle?
+                </p>
+              }
+              options={[
+                { text: <M>{'N(3 \\mid 0)'}</M>, feedback: 'Setze x = 3 ein: y ist auch dort 3, nicht 0. Die 3 ist der y-Achsenabschnitt.' },
+                { text: <M>{'N(0 \\mid 3)'}</M>, feedback: 'Das ist der Schnittpunkt mit der y-Achse. Eine Nullstelle hat immer den y-Wert 0.' },
+                {
+                  text: 'Es gibt keine: Die Gerade verläuft parallel zur x-Achse.',
+                  correct: true,
+                  feedback: 'Gleich 0 setzen ergibt 3 = 0. Das stimmt nie: Die Gerade hat die Steigung 0 und schneidet die x-Achse nicht. Der Speicher wird nicht leer.',
+                },
+                { text: <M>{'x_N = 0'}</M>, feedback: 'Bei x = 0 ist y = 3, nicht 0. Gleich 0 setzen ergibt 3 = 0, und das stimmt nie.' },
+              ]}
+            />
+          </Abschnitt>
+          <BonusSpiel frei={uebungen.length === 4} titel="Akku-Countdown">
+            <AkkuCountdown />
+          </BonusSpiel>
+          <Bilanz />
+          <div className="sl-ende">
+            <p>Du kannst jetzt die Nullstelle einer linearen Funktion berechnen und in einer Situation deuten. In den Übungsaufgaben trainierst du das Verfahren weiter, auch mit Dezimalzahlen.</p>
+            <div className="bk-actions">
+              <button type="button" className="bk-btn" onClick={onBack}>
+                <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zur Auswahl
+              </button>
+              <button type="button" className="bk-btn bk-btn-primary" onClick={onPractice}>
+                Weiter üben: Nullstellen <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       ),
     },
   ]
@@ -700,6 +783,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
       <TaskShell title="Nullstellen: Der Stromspeicher" width="wide" kompakt parent={{ to: '/lineare_funktionen/nullstellen', label: 'Nullstellen berechnen' }}>
         <SeitenLernsituation
           ruhig
+          punkte
           thema={THEMA}
           ziel={<>In dieser Lernsituation lernst du, wie du die Nullstelle einer linearen Funktion berechnest und was sie in einer Situation bedeutet.</>}
           seiten={seiten}
