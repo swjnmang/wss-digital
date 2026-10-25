@@ -12,7 +12,7 @@ Dieser Skill entwickelt **Einstiegs-Lernsituationen** für neue Mathe-Themen und
 - **Kein Lehrkraft-Material** auf der Seite. Alles richtet sich direkt an die SuS.
 - **Endgerät:** Tablet im **Querformat**. Jede Seite ist trotzdem **einspaltig** (siehe "Ruhiges Grunddesign"). Nach unten scrollen ist erlaubt, zur Seite nie.
 - **Neueste Umsetzung mit allen aktuellen Regeln** (5 Warm-up-Aufgaben, Kriterium Begriffe und Abkürzungen, Bonus-Spiel, Punkte und Bilanz): `mathe-trainer/src/pages/finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Der Vereinsbus) mit `BusRallye.tsx`.
-- **Referenz-Umsetzung:** `mathe-trainer/src/pages/finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx` (Lenas Autogeld): eine Seite pro Phase und Phase 4 mit vier Übungsaufgaben. Achtung: Ihr "Problem lösen" hat noch den alten Aufbau mit `WegWahl`; maßgeblich für "Problem lösen" ist der Vereinsbus. Für Ausprobieren mit Live-Rückmeldung und Titelbilder zusätzlich `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx` und `lineare_funktionen/nullstellen_einstieg/StromspeicherEinstieg.tsx` ansehen (diese beiden haben noch die ältere Aufteilung mit einer Aufgabe pro Seite). Vor dem Bauen ansehen.
+- **Referenz-Umsetzung:** `mathe-trainer/src/pages/finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx` (Lenas Autogeld): eine Seite pro Phase und Phase 4 mit vier Übungsaufgaben. Achtung: Ihr "Problem lösen" hat noch den alten Aufbau mit `WegWahl`; maßgeblich für "Problem lösen" ist der Vereinsbus. Für Ausprobieren mit Live-Rückmeldung und Titelbilder zusätzlich `lineare_funktionen/nullstellen_einstieg/StromspeicherEinstieg.tsx` (nach neuer Fassung überarbeitet) und `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx` (noch ältere Aufteilung mit einer Aufgabe pro Seite) ansehen. Vor dem Bauen ansehen.
 - **Diese Datei ist die maßgebliche Fassung des Skills.** Der Skill „lernsituationen“ im claude.ai-Konto der Lehrkraft verweist nur hierher. Neue oder geänderte Regeln werden **nur hier** eingetragen (und bei Bedarf kurz in `mathe-trainer/CLAUDE.md`), dann wie üblich in `main` gemergt. Die Lehrkraft muss danach nichts neu hochladen.
 
 ## Grundidee: fester Kern, variable Bausteine
@@ -453,9 +453,9 @@ Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle 
 - **Identität:** Themenfarbe Indigo, Symbol `fa-battery-half`, Name "Der Stromspeicher", Titelbild Haus mit Solaranlage bei Nacht, Leitobjekt Stromspeicher.
 - **Auswahlseite:** Variante A (Modus in `Nullstellen.tsx`, daneben die Schwierigkeitsgrade Einfach und Fortgeschritten).
 - **Problem erkennen:** Die SuS fragen den Speicher zu selbst gewählten Zeiten ab; jeder Versuch erscheint als Punkt im Graphen. Den genauen Zeitpunkt (x = 6,25, also 2:15 Uhr) treffen sie kaum.
-- **Problem lösen:** Aufgabe, Rechenbeispiel E-Bike-Akku, Lückenrechnung bis zur Uhrzeit mit Schritt-Hilfen.
-- **Handlungsprodukt (digital, Ausnahme):** eigene Speicher-Aufgabe erstellen, prüfen lassen und mit Partner tauschen.
-- **Übungsaufgaben:** Bedeutung von N(5 | 0), Nullstelle berechnen (A: x = −4 Vorzeichenfehler, B: x = 12 t verwechselt, C: N(0 | 4) vertauscht, D: N(4 | 0) richtig), umgekehrt: Startwert für "reicht bis 6 Uhr".
+- **Problem lösen:** Problem mit Graph (Nullstelle als „?“), Beispielrechnung E-Bike-Akku mit Lernvideo, Ergebnisse abgleichen (x_N, Uhrzeit) mit Fehlersuche (rechte Seite, x_N, Minuten).
+- **Handlungsprodukt (analog):** Nachricht an Familie Demir mit Rechnung, Skizze und Uhrzeit.
+- **Übungsaufgaben:** Bedeutung von N(5 | 0), Nullstelle berechnen (A: x = −4 Vorzeichenfehler, B: x = 12 t verwechselt, C: N(0 | 4) vertauscht, D: N(4 | 0) richtig), Wer hat recht? (Minus beim Abziehen vergessen), umgekehrt: Startwert für "reicht bis 6 Uhr", Profi: y = 3 hat keine Nullstelle. Bonus-Spiel „Akku-Countdown“.
 
 ### C. Entscheidungsfall: Schnittpunkte linearer Funktionen
 - **Kontext:** Eine Freundin schreibt: "Welche Fahrschule soll ich nehmen?"
