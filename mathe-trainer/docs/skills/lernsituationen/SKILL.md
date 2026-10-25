@@ -171,11 +171,11 @@ Jede Lernsituation belohnt richtige Lösungen mit Punkten. Die Elemente sollen m
 - **Einschalten:** `SeitenLernsituation` mit `punkte`. Alles Weitere erledigen die Bausteine selbst (`lernsituation_kit/punkte.tsx`): `CheckCard`, `McCard`, `Hilfen`, `SchrittHilfen`, `Vermutung` und `Kriterien` melden sich automatisch. Eigene Aufgaben-Bausteine nutzen `usePunkteAufgabe()` (`geloest`, `fehler`, `hilfe`, `loesung`).
 - **Punkteregeln** (Werte in `PUNKTE`):
   - richtig gelöste Aufgabe: 10 Punkte; jede angezeigte Hilfe −2, jeder Fehlversuch −2 (höchstens 3 zählen), mindestens 2 Punkte für eine selbst gelöste Aufgabe
-  - Lösungsweg **vor** dem Lösen angesehen: die Aufgabe bringt 0 Punkte und es gibt 3 Punkte **Abzug** vom Gesamtstand (nach dem Lösen ist das Ansehen kostenlos)
+  - Lösungsweg **vor** dem Lösen angesehen: Abzug von **zwei Dritteln** der Punkte, die diese Aufgabe höchstens bringt (gerundet, `PUNKTE.loesungAnteil`, `loesungKosten`): bei 10 Punkten −7, die Aufgabe bringt also noch 3 Punkte. Hilfen und Fehlversuche werden dann nicht zusätzlich abgezogen. Nach dem Lösen ist das Ansehen kostenlos.
   - Die Fehlersuche (`ohnePunkte`) bringt und kostet nichts
   - Festlegung (`Vermutung`) und abgehakte Kriterien des Handlungsprodukts: je 5 Punkte
   - Rechenbeispiel und Lernvideo sind kostenlos, sie gehören zum Lernen
-  - Die Kosten stehen sichtbar an den Knöpfen („Hilfe 1 anzeigen (−2 Punkte)“, „Lösungsweg zeigen (−3 Punkte)“), damit die SuS bewusst entscheiden. Hilfe bleibt immer erreichbar.
+  - Die Kosten stehen sichtbar an den Knöpfen („Hilfe 1 anzeigen (−2 Punkte)“, „Lösungsweg zeigen (−7 Punkte)“, der Wert wird aus den Aufgabenpunkten berechnet), damit die SuS bewusst entscheiden. Hilfe bleibt immer erreichbar.
 - **Weitere Elemente:**
   - **Punktestand** in der Phasenleiste mit kurzen Meldungen (+10, Abzug), die nach gut 2 Sekunden verschwinden
   - **Serien-Bonus:** 3 Aufgaben am Stück ohne Hilfe und ohne Fehler bringen +5

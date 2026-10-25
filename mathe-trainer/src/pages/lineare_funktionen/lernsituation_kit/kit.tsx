@@ -412,7 +412,7 @@ export function CheckCard({
             }}
           >
             <i className="fa-solid fa-route" aria-hidden="true" /> {showSolution ? 'Lösungsweg ausblenden' : 'Lösungsweg zeigen'}
-            {pt.aktiv && !showSolution && status !== 'ok' && <span className="ls-kosten"> (−{PUNKTE.loesungAbzug} Punkte)</span>}
+            {pt.aktiv && !showSolution && status !== 'ok' && <span className="ls-kosten"> (−{pt.loesungKosten} Punkte)</span>}
           </button>
         </div>
       )}

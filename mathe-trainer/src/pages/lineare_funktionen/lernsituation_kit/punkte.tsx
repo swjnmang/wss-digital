@@ -1,17 +1,20 @@
 import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import './punkte.css'
 
-// Gamification der Lernsituationen: Punkte für gelöste Aufgaben, weniger Punkte mit Hilfen, Abzug für den Lösungsweg vor dem Lösen,
+// Gamification der Lernsituationen: Punkte für gelöste Aufgaben, weniger Punkte mit Hilfen, zwei Drittel Abzug für den Lösungsweg vor dem Lösen,
 // Serien-Bonus, Abzeichen, Sterne und persönlicher Rekord. Aktiv nur innerhalb von <PunkteProvider> (SeitenLernsituation mit punkte).
 // Die Aufgaben-Bausteine (CheckCard, McCard, Hilfen, SchrittHilfen, Vermutung, Kriterien) melden sich selbst über usePunkteAufgabe.
 // Rechenbeispiel und Lernvideo sind kostenlos: Sie gehören zum Lernen. Hilfen und der Lösungsweg kosten Punkte.
+
+/** Abzug für den Lösungsweg vor dem Lösen: zwei Drittel der Aufgabenpunkte (gerundet) */
+export const loesungKosten = (max: number) => Math.round(max * PUNKTE.loesungAnteil)
 
 export const PUNKTE = {
   aufgabe: 10, // volle Punkte für eine Aufgabe ohne Hilfe und ohne Fehlversuch
   hilfe: 2, // je angezeigter Hilfe
   fehler: 2, // je Fehlversuch (höchstens 3 werden gezählt)
   minimum: 2, // so viel bringt eine selbst gelöste Aufgabe mindestens
-  loesungAbzug: 3, // Abzug, wenn der Lösungsweg vor dem Lösen angesehen wird (die Aufgabe bringt dann 0 Punkte)
+  loesungAnteil: 2 / 3, // Lösungsweg vor dem Lösen angesehen: Abzug von 2/3 der Aufgabenpunkte (bei 10 Punkten bleiben 3)
   serie: 3, // so viele Aufgaben am Stück ohne Hilfe und ohne Fehler ergeben einen Serien-Bonus
   serienBonus: 5,
   muenze: 5, // je Münze im Bonus-Spiel (nur das beste Ergebnis zählt)
@@ -63,7 +66,6 @@ const schreibeRekord = (key: string, v: number) => {
 
 export function PunkteProvider({ name, children }: { name: string; children: ReactNode }) {
   const [aufgaben, setAufgaben] = useState<Record<string, Aufgabe>>({})
-  const [abzug, setAbzug] = useState(0)
   const [bonus, setBonus] = useState(0)
   const [serie, setSerie] = useState(0)
   const [besteSerie, setBesteSerie] = useState(0)
@@ -122,17 +124,17 @@ export function PunkteProvider({ name, children }: { name: string; children: Rea
         const a = ref.current[id]
         if (!a || a.geloest || a.loesung) return
         aendere(id, (x) => ({ ...x, loesung: true }))
-        setAbzug((v) => v + PUNKTE.loesungAbzug)
         serieRef.current = 0
         setSerie(0)
-        melde(`Lösungsweg angesehen: −${PUNKTE.loesungAbzug} Punkte`, false)
+        melde(`Lösungsweg angesehen: −${loesungKosten(a.max)} Punkte für diese Aufgabe`, false)
       },
       geloest: (id, wert, mitSerie = true) => {
         const a = ref.current[id]
         if (!a || a.geloest) return
         const max = wert ?? a.max
+        // Mit Lösungsweg bleibt ein Drittel der Punkte (Hilfen und Fehlversuche werden dann nicht zusätzlich abgezogen)
         const punkte = a.loesung
-          ? 0
+          ? max - loesungKosten(max)
           : Math.max(Math.min(PUNKTE.minimum, max), max - PUNKTE.hilfe * a.hilfen - PUNKTE.fehler * Math.min(a.fehler, 3))
         aendere(id, (x) => ({ ...x, geloest: true, punkte }))
         if (punkte > 0) melde(`+${punkte} Punkte`, true)
@@ -166,7 +168,7 @@ export function PunkteProvider({ name, children }: { name: string; children: Rea
   )
 
   const liste = Object.values(aufgaben)
-  const gesamt = Math.max(0, liste.reduce((s, a) => s + a.punkte, 0) + bonus - abzug)
+  const gesamt = Math.max(0, liste.reduce((s, a) => s + a.punkte, 0) + bonus)
   const max = liste.reduce((s, a) => s + a.max, 0)
 
   // Rekord: bisheriger Bestwert (beim Öffnen gelesen) wird überschrieben, sobald der aktuelle Stand höher ist
@@ -209,9 +211,10 @@ export function usePunkteAufgabe({
       hilfe: () => api?.hilfe(id),
       fehler: () => api?.fehler(id),
       loesung: () => api?.loesung(id),
+      loesungKosten: loesungKosten(wert ?? max),
       geloest: () => api?.geloest(id, wert, serie),
     }),
-    [api, id, wert, serie]
+    [api, id, wert, serie, max]
   )
 }
 
@@ -292,7 +295,7 @@ export function Bilanz() {
       <p className="sl-hinweis">
         {geloest.length} von {liste.length} Aufgaben gelöst.{' '}
         {stand.rekord !== null && stand.rekord > 0 ? `Dein bisheriger Rekord: ${stand.rekord} Punkte. ` : ''}
-        Hilfen kosten {PUNKTE.hilfe} Punkte, der Lösungsweg vor dem Lösen {PUNKTE.loesungAbzug} Punkte.
+        Hilfen kosten {PUNKTE.hilfe} Punkte, der Lösungsweg vor dem Lösen zwei Drittel der Punkte einer Aufgabe.
       </p>
       <ul className="sl-abzeichen">
         {abzeichen.map((a) => (
@@ -316,7 +319,7 @@ export function PunkteRegeln() {
   return (
     <p className="sl-punkte-regeln">
       <i className="fa-solid fa-star" aria-hidden="true" /> <strong>Punkte sammeln:</strong> Jede richtig gelöste Aufgabe bringt bis zu{' '}
-      {PUNKTE.aufgabe} Punkte. Jede Hilfe kostet {PUNKTE.hilfe} Punkte, der Lösungsweg vor dem Lösen {PUNKTE.loesungAbzug} Punkte Abzug.
+      {PUNKTE.aufgabe} Punkte. Jede Hilfe kostet {PUNKTE.hilfe} Punkte. Wer sich vor dem Lösen den Lösungsweg anzeigen lässt, bekommt für diese Aufgabe nur noch ein Drittel der Punkte.
       Für {PUNKTE.serie} richtige Aufgaben am Stück ohne Hilfe gibt es einen Bonus. Am Ende warten Sterne, Abzeichen und ein Spiel.
     </p>
   )
