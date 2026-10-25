@@ -8,16 +8,22 @@ import './punkte.css'
 
 /** Abzug für den Lösungsweg vor dem Lösen: zwei Drittel der Aufgabenpunkte (gerundet) */
 export const loesungKosten = (max: number) => Math.round(max * PUNKTE.loesungAnteil)
+/** Abzug je Hilfe und je Fehlversuch: ein Fünftel der Aufgabenpunkte, mindestens 1 (bei 10 Punkten −2, bei 3 Punkten −1) */
+export const hilfeKosten = (max: number) => Math.max(1, Math.round(max * PUNKTE.abzugAnteil))
+/** So viel bringt eine selbst gelöste Aufgabe mindestens: ein Fünftel der Aufgabenpunkte, mindestens 1 */
+export const mindestPunkte = (max: number) => Math.min(max, Math.max(1, Math.round(max * PUNKTE.abzugAnteil)))
 
+// Punkte nach Aufwand (Balancing, siehe docs/skills/lernsituationen/SKILL.md): Jede Aufgabe bekommt mit `punkte` ihren Wert,
+// z. B. 2 für einen Abruf im Warm-up, 12 für die Kernaufgabe in „Problem lösen“. Ohne Angabe gilt PUNKTE.aufgabe.
 export const PUNKTE = {
-  aufgabe: 10, // volle Punkte für eine Aufgabe ohne Hilfe und ohne Fehlversuch
-  hilfe: 2, // je angezeigter Hilfe
-  fehler: 2, // je Fehlversuch (höchstens 3 werden gezählt)
-  minimum: 2, // so viel bringt eine selbst gelöste Aufgabe mindestens
+  aufgabe: 10, // Standardwert, wenn eine Aufgabe keinen eigenen Wert hat
+  abzugAnteil: 1 / 5, // je angezeigter Hilfe und je Fehlversuch (höchstens 3 werden gezählt); zugleich der Mindestanteil einer selbst gelösten Aufgabe
   loesungAnteil: 2 / 3, // Lösungsweg vor dem Lösen angesehen: Abzug von 2/3 der Aufgabenpunkte (bei 10 Punkten bleiben 3)
+  festlegung: 3, // Festlegung bzw. Ausprobieren in „Problem erkennen“
+  kriterien: 5, // alle Kriterien des Handlungsprodukts abgehakt
   serie: 3, // so viele Aufgaben am Stück ohne Hilfe und ohne Fehler ergeben einen Serien-Bonus
-  serienBonus: 5,
-  muenze: 5, // je Münze im Bonus-Spiel (nur das beste Ergebnis zählt)
+  serienBonus: 3,
+  muenze: 2, // je Münze im Bonus-Spiel (nur das beste Ergebnis zählt)
 } as const
 
 type Aufgabe = { max: number; hilfen: number; fehler: number; loesung: boolean; geloest: boolean; punkte: number; profi: boolean }
@@ -113,7 +119,7 @@ export function PunkteProvider({ name, children }: { name: string; children: Rea
         const a = ref.current[id]
         if (!a || a.geloest) return
         aendere(id, (x) => ({ ...x, hilfen: x.hilfen + 1 }))
-        melde(`Hilfe: −${PUNKTE.hilfe} Punkte für diese Aufgabe`, false)
+        melde(`Hilfe: −${hilfeKosten(a.max)} ${hilfeKosten(a.max) === 1 ? 'Punkt' : 'Punkte'} für diese Aufgabe`, false)
       },
       fehler: (id) => {
         const a = ref.current[id]
@@ -135,7 +141,7 @@ export function PunkteProvider({ name, children }: { name: string; children: Rea
         // Mit Lösungsweg bleibt ein Drittel der Punkte (Hilfen und Fehlversuche werden dann nicht zusätzlich abgezogen)
         const punkte = a.loesung
           ? max - loesungKosten(max)
-          : Math.max(Math.min(PUNKTE.minimum, max), max - PUNKTE.hilfe * a.hilfen - PUNKTE.fehler * Math.min(a.fehler, 3))
+          : Math.max(mindestPunkte(max), max - hilfeKosten(max) * (a.hilfen + Math.min(a.fehler, 3)))
         aendere(id, (x) => ({ ...x, geloest: true, punkte }))
         if (punkte > 0) melde(`+${punkte} Punkte`, true)
         // Serie nur für echte Aufgaben (Festlegungen und Kriterien zählen nicht)
@@ -185,8 +191,8 @@ export function PunkteProvider({ name, children }: { name: string; children: Rea
 }
 
 /**
- * Meldung einer Aufgabe an die Punkte (ohne Provider passiert nichts). wert: Punkte statt der vollen Aufgabenpunkte, z. B. 8 für
- * den Weg mit Lösungsschema oder 5 für eine Festlegung bzw. die Kriterien (dann serie: false, zählt nicht zur Serie).
+ * Meldung einer Aufgabe an die Punkte (ohne Provider passiert nichts). wert: Punkte der Aufgabe nach Aufwand, z. B. 2 für einen
+ * Abruf im Warm-up oder 12 für die Kernaufgabe; Festlegung und Kriterien mit serie: false (zählen nicht zur Serie).
  * profi: freiwillige Erweiterung (zählt nicht zum Maximum der Sterne, bringt das Abzeichen „Profi“).
  * zaehlt: false für Aufgaben ohne Punkte, z. B. die Fehlersuche (sie soll nichts kosten und nichts bringen).
  */
@@ -201,7 +207,7 @@ export function usePunkteAufgabe({
   const gruppe = useContext(PunkteGruppeCtx)
   const eigene = useId()
   const id = gruppe ?? eigene
-  const max = serie ? PUNKTE.aufgabe : wert ?? PUNKTE.aufgabe
+  const max = wert ?? PUNKTE.aufgabe
   useEffect(() => {
     api?.registriere(id, max, profi)
   }, [api, id, max, profi])
@@ -211,15 +217,19 @@ export function usePunkteAufgabe({
       hilfe: () => api?.hilfe(id),
       fehler: () => api?.fehler(id),
       loesung: () => api?.loesung(id),
-      loesungKosten: loesungKosten(wert ?? max),
-      geloest: () => api?.geloest(id, wert, serie),
+      loesungKosten: loesungKosten(max),
+      hilfeKosten: hilfeKosten(max),
+      geloest: () => api?.geloest(id, max, serie),
     }),
-    [api, id, wert, serie, max]
+    [api, id, serie, max]
   )
 }
 
-/** Aktuelle Aufgabe für Hilfen innerhalb einer Karte (CheckCard/McCard stellen sie bereit) */
-export const AufgabePunkteCtx = createContext<{ hilfe: () => void } | null>(null)
+/** Aktuelle Aufgabe für Hilfen innerhalb einer Karte (CheckCard/McCard stellen sie bereit); hilfeKosten für die Anzeige am Knopf */
+export const AufgabePunkteCtx = createContext<{ hilfe: () => void; hilfeKosten: number } | null>(null)
+
+/** „1 Punkt“ bzw. „3 Punkte“ */
+export const punkteText = (n: number) => `${n} ${n === 1 ? 'Punkt' : 'Punkte'}`
 
 /** Ergebnis eines Bonus-Spiels melden (nur das beste Ergebnis zählt) */
 export function useSpielPunkte() {
@@ -295,7 +305,7 @@ export function Bilanz() {
       <p className="sl-hinweis">
         {geloest.length} von {liste.length} Aufgaben gelöst.{' '}
         {stand.rekord !== null && stand.rekord > 0 ? `Dein bisheriger Rekord: ${stand.rekord} Punkte. ` : ''}
-        Hilfen kosten {PUNKTE.hilfe} Punkte, der Lösungsweg vor dem Lösen zwei Drittel der Punkte einer Aufgabe.
+        Eine Hilfe kostet ein Fünftel, der Lösungsweg vor dem Lösen zwei Drittel der Punkte einer Aufgabe.
       </p>
       <ul className="sl-abzeichen">
         {abzeichen.map((a) => (
@@ -318,9 +328,10 @@ export function PunkteRegeln() {
   if (!stand) return null
   return (
     <p className="sl-punkte-regeln">
-      <i className="fa-solid fa-star" aria-hidden="true" /> <strong>Punkte sammeln:</strong> Jede richtig gelöste Aufgabe bringt bis zu{' '}
-      {PUNKTE.aufgabe} Punkte. Jede Hilfe kostet {PUNKTE.hilfe} Punkte. Wer sich vor dem Lösen den Lösungsweg anzeigen lässt, bekommt für diese Aufgabe nur noch ein Drittel der Punkte.
-      Für {PUNKTE.serie} richtige Aufgaben am Stück ohne Hilfe gibt es einen Bonus. Am Ende warten Sterne, Abzeichen und ein Spiel.
+      <i className="fa-solid fa-star" aria-hidden="true" /> <strong>Punkte sammeln:</strong> Jede richtig gelöste Aufgabe bringt Punkte, je
+      aufwendiger, desto mehr: kurze Aufwärmaufgaben 2 bis 4, die großen Aufgaben bis zu 12. Jede Hilfe und jeder Fehlversuch kostet ein Fünftel der Punkte der
+      Aufgabe (die Kosten stehen am Knopf). Wer sich vor dem Lösen den Lösungsweg anzeigen lässt, bekommt für diese Aufgabe nur noch ein Drittel der Punkte. Für{' '}
+      {PUNKTE.serie} richtige Aufgaben am Stück ohne Hilfe gibt es einen Bonus. Am Ende warten Sterne, Abzeichen und ein Spiel.
     </p>
   )
 }
