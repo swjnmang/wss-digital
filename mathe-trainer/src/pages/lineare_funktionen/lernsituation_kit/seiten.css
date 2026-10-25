@@ -76,6 +76,8 @@
 .sl-seite .lp-ex.bk-panel { position: relative; }
 .sl-seite .lp-ex-head:has(.ls-level) { position: absolute; top: 10px; right: 14px; }
 .sl-seite .lp-ex:has(> .lp-ex-head .ls-level) > .lp-ex-prompt > :first-child { padding-right: 120px; }
+/* „★★★ Erweiterung“ ist breiter als die anderen Niveau-Schilder */
+.sl-seite .lp-ex:has(> .lp-ex-head .ls-level-erweiterung) > .lp-ex-prompt > :first-child { padding-right: 150px; }
 .sl-seite .lp-ex-actions { margin-top: 0; }
 
 /* Rückmeldung in derselben Zeile wie „Prüfen“, damit sie die Seite nicht verlängert */
