@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import 'katex/dist/katex.min.css';
 import { BlockMath, InlineMath } from 'react-katex';
 import TaskShell from '../../components/layout/TaskShell'
+import VideoButton from '../../components/VideoButton'
 
 type Timing = 'vor' | 'nach';
 type Unknown = 'Kn' | 'r' | 'n';
@@ -316,6 +317,7 @@ ${knLatex} \\cdot (q-1) &= ${rLatex} \\cdot ${rfLatex} \\cdot (q^n-1)\\\\
             <button onClick={checkAnswer} className="bk-btn bk-btn-primary">Überprüfen</button>
             <button onClick={showSolution} className="bk-btn">Lösung zeigen</button>
             <button onClick={generateNewTask} className="bk-btn">Nächste Aufgabe</button>
+            <VideoButton url="https://www.youtube.com/watch?v=46OXNN-TSFM" label="Lernvideo" title="Lernvideo: Rentenrechnung, Endwert berechnen" className="bk-btn" />
           </div>
 
           {feedback && (
