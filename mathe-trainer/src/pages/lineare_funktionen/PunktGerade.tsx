@@ -7,6 +7,7 @@ import { useTaskTracking } from '../../hooks/useTaskTracking';
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import DrohneEinstieg from './punkt_gerade_einstieg/DrohneEinstieg'
+import { useBackHandler } from '../../hooks/useBackHandler';
 
 // Sechs Aufgaben auf einer Seite (je zwei pro Aufgabentyp)
 const TOTAL_TASKS = 6;
@@ -806,6 +807,8 @@ export default function PunktGerade() {
   const [showIntro, setShowIntro] = useState(true);
   // Einstiegs-Lernsituation „Drohnen-Parcours“ als eigener Modus neben den Schwierigkeitsgraden
   const [lernsituation, setLernsituation] = useState(false);
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+  useBackHandler(lernsituation || level !== null, () => { setLernsituation(false); chooseLevel(null) });
 
   const solvedCount = Object.values(solved).filter(Boolean).length;
   const allSolved = level !== null && solvedCount === TOTAL_TASKS;

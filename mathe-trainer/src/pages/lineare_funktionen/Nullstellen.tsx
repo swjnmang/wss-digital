@@ -8,6 +8,7 @@ import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import StromspeicherEinstieg from './nullstellen_einstieg/StromspeicherEinstieg'
 import { LernsituationKarte } from './lernsituation_kit/seiten'
+import { useBackHandler } from '../../hooks/useBackHandler';
 
 // Sechs Aufgaben auf einer Seite
 const TOTAL_TASKS = 6;
@@ -474,6 +475,8 @@ export default function Nullstellen() {
   const [level, setLevel] = useState<Level | null>(null);
   // Einstiegs-Lernsituation „Der Stromspeicher“ als eigener Modus neben den Schwierigkeitsgraden
   const [lernsituation, setLernsituation] = useState(false);
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+  useBackHandler(lernsituation || level !== null, () => { setLernsituation(false); chooseLevel(null) });
   const [tasks, setTasks] = useState<Task[]>([]);
   const [solved, setSolved] = useState<Record<number, boolean>>({});
   const [streak, setStreak] = useState(0);

@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { getAreaFromPath, startTrackingSession } from '../../utils/tracking'
+import { runBackHandler } from '../../hooks/useBackHandler'
 
 interface Props {
   onSearch: () => void
@@ -13,6 +14,8 @@ export default function AppHeader({ onSearch, trackingActive }: Props) {
   const trackingArea = getAreaFromPath(location.pathname)
 
   const handleBack = () => {
+    // Erst innerhalb der Seite zurück zur Auswahl (Lernsituation / Schwierigkeitsgrad), dann eine Ebene höher
+    if (runBackHandler()) return
     const segments = location.pathname.split('/').filter(Boolean)
     if (segments.length <= 1) navigate('/')
     else navigate('/' + segments.slice(0, -1).join('/'))

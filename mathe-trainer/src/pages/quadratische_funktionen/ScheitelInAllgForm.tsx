@@ -3,6 +3,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import TaskShell from '../../components/layout/TaskShell'
 import { VideoEmbed } from '../../components/VideoButton'
+import { useBackHandler } from '../../hooks/useBackHandler';
 
 // ---------- Brüche (exakt rechnen, keine Rundungsfehler) ----------
 
@@ -234,6 +235,8 @@ const Loesungsweg = ({ t, anzahl, titel }: { t: Aufgabe; anzahl: number; titel?:
 
 const ScheitelInAllgForm = () => {
     const [level, setLevel] = useState<Level | null>(null);
+    // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+    useBackHandler(level !== null, () => waehleLevel(null));
     const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
     const [eingaben, setEingaben] = useState<Eingabe[]>(leereEingaben());
     const [tippSchritte, setTippSchritte] = useState<number[]>(Array(ANZAHL_AUFGABEN).fill(0));

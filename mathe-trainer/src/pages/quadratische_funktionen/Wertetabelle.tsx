@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import styles from './Wertetabelle.module.css'
 import { roundHalfAwayFromZero } from '../../utils/numbers'
 import TaskShell from '../../components/layout/TaskShell'
+import { useBackHandler } from '../../hooks/useBackHandler'
 
 declare global {
   interface Window {
@@ -375,6 +376,8 @@ export default function Wertetabelle() {
   const [fehlerhafteZellen, setFehlerhafteZellen] = useState<{ [key: string]: boolean }>({})
   const [punkte, setPunkte] = useState<number>(0)
   const [schwierigkeitsgrad, setSchwierigkeitsgrad] = useState<'einfach' | 'mittel' | 'schwer' | null>(null)
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+  useBackHandler(schwierigkeitsgrad !== null, () => setSchwierigkeitsgrad(null))
 
   // --- Interaktives Einzeichnen der Punkte/Parabel (pro Aufgabe) ---
   const plotApiRefs = useRef<{ [index: number]: any }>({})

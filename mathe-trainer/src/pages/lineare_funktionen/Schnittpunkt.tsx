@@ -2,6 +2,7 @@ import React, { useEffect, useId, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
+import { useBackHandler } from '../../hooks/useBackHandler'
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import LaserEinstieg from './schnittpunkt_einstieg/LaserEinstieg'
@@ -767,6 +768,10 @@ export default function Schnittpunkt() {
   const [level, setLevel] = useState<Level | null>(null)
   // Einstiegs-Lernsituation „Die Lasershow“ als eigener Modus neben den Schwierigkeitsgraden
   const [lernsituation, setLernsituation] = useState(false)
+  useBackHandler(lernsituation || level !== null, () => {
+    setLernsituation(false)
+    setLevel(null)
+  })
 
   const startNewRound = () => {
     setRound((r) => r + 1)

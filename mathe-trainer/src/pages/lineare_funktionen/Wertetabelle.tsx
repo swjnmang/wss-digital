@@ -3,6 +3,7 @@ import styles from './Wertetabelle.module.css'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
+import { useBackHandler } from '../../hooks/useBackHandler'
 
 declare global {
   interface Window {
@@ -370,6 +371,8 @@ export default function Wertetabelle() {
   const [fehlerhafteZellen, setFehlerhafteZellen] = useState<{ [key: string]: boolean }>({})
   const [punkte, setPunkte] = useState<number>(0)
   const [schwierigkeitsgrad, setSchwierigkeitsgrad] = useState<'einfach' | 'mittel' | 'schwer' | null>(null)
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+  useBackHandler(schwierigkeitsgrad !== null, () => setSchwierigkeitsgrad(null))
 
   // GeoGebra-Applets der Lösungsgraphen (pro Aufgabe), damit jeder Graph nur einmal injiziert wird
   const lösungGraphRefs = useRef<{ [index: number]: boolean }>({})

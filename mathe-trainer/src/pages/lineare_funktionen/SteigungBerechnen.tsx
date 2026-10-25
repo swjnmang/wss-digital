@@ -5,6 +5,7 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
+import { useBackHandler } from '../../hooks/useBackHandler'
 
 // Sechs Aufgaben im Wechsel: Punkte, Graph, Punkte, Graph, Punkte, Graph
 const TOTAL_TASKS = 6
@@ -566,6 +567,10 @@ export default function SteigungBerechnen() {
   }, [allSolved])
 
   const [level, setLevel] = useState<Level | null>(null)
+
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+
+  useBackHandler(level !== null, () => chooseLevel(null))
 
   const startNewRound = () => {
     setRound((r) => r + 1)

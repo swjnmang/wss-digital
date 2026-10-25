@@ -5,6 +5,7 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
 import { VideoModal } from '../../components/VideoButton'
+import { useBackHandler } from '../../hooks/useBackHandler'
 
 declare global {
   interface Window {
@@ -245,6 +246,12 @@ export default function Ablesen() {
 
 
   const [level, setLevel] = useState<Level | null>(null)
+
+
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+
+
+  useBackHandler(level !== null, () => chooseLevel(null))
 
   const startNewRound = () => {
     setRound((r) => r + 1)
