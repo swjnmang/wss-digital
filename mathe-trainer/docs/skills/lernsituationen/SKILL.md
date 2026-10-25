@@ -91,7 +91,7 @@ Jede Lernsituation hat **genau diese vier Phasen in dieser Reihenfolge**. Namen 
 | **1 Warm-up** | Vorwissen abrufen, das gleich gebraucht wird (Retrieval Practice): **mindestens 5** kurze Aufgaben untereinander (alle Pflicht), z. B. Wert ablesen, einfache Gleichung lösen, Klammer ausmultiplizieren. |
 | **2 Problem erkennen** | Kontext, Leitfrage und Festlegung bzw. Ausprobieren. Die SuS merken selbst, dass sie das Problem mit ihrem bisherigen Wissen nicht sicher lösen können. |
 | **3 Problem lösen** | Problem oben, Rechenbeispiel zum Aufklappen, Auftrag zum Handlungsprodukt, eigene Lösung (selbst rechnen oder mit Lösungsschema), ggf. Entscheidung, danach "Das hältst du fest" (Rückbezug und Merke). |
-| **4 Wissen prüfen und vertiefen** | Mindestens 3, besser 4 passende Übungsaufgaben mit steigendem Niveau (Basis, Standard, Erweiterung), mit typischen Fehlern als Antwortoptionen; darunter die Abschluss-Buttons. |
+| **4 Wissen prüfen und vertiefen** | Mindestens 3, besser 4 passende Übungsaufgaben mit steigendem Niveau (Basis, Standard, Erweiterung), mit typischen Fehlern als Antwortoptionen; darunter das **Bonus-Spiel** (frei, sobald alle Pflichtaufgaben gelöst sind) und die Abschluss-Buttons. |
 
 Namen und Reihenfolge stehen im Code nur in `PHASEN` (`phasen.tsx`). Die Phasenleiste zeigt die vier Phasen; einen Seitenzähler gibt es nicht mehr, weil jede Phase genau eine Seite ist.
 
@@ -146,7 +146,7 @@ Jede Lernsituation läuft in der Seitenansicht `SeitenLernsituation` aus `linear
 - **"Weiter" erst, wenn alles gelöst ist:** Die Seite nennt ihre Pflichtaufgaben in `pflicht: ['a', 'b', …]`, jede Aufgabe meldet sich mit `onSolved={fertig.teil('a')}` (bzw. `onFest`, `onAlle`). Erst wenn alle gemeldet sind, wird "Weiter" frei; im Seitenkopf steht automatisch "(2 von 3 Aufgaben gelöst)". Freiwillige Profi-Aufgaben stehen nicht in `pflicht`. Eine Seite mit nur einer Pflichtaufgabe kann weiter `fertig()` nutzen. Die Phasenleiste mit "Weiter" bleibt beim Scrollen oben stehen.
 - **Nach unten scrollen ist erlaubt, zur Seite nie:** Eine Seite darf länger als der Bildschirm sein; die SuS scrollen dann nach unten weiter. **Lesbarkeit geht vor Passform:** Skizzen und Graphen werden **nicht** gestaucht, damit alles auf einen Bildschirm passt. Richtwert auf dem Tablet: Skizzen und Graphen etwa 260–320 px hoch, Beschriftungen mindestens 14 px und höchstens etwa 20 px auf dem Bildschirm. Wünschenswert ist, dass Titel, Auftrag und der Anfang der Interaktion im ersten Bildschirm sichtbar sind. **Horizontales Scrollen ist verboten**, auf jeder Bildschirmbreite (Tablet, Monitor, Smartphone). Eine Phase wird nie auf mehrere Seiten verteilt; lange Phasen-Seiten sind in Ordnung. **Keine Zweispalter** (`ZweiSpalten` nicht mehr verwenden): Einspaltigkeit hat Vorrang.
 - **Test:** Mit Playwright (`vite build` + `vite preview`) alle vier Seiten bei 1180×820, 1920×1080 und 390×844 (Smartphone) durchklicken (Cookie-Hinweis vorher schließen), jeweils vor und nach dem Lösen `document.documentElement.scrollWidth - innerWidth` messen (muss 0 sein, kein seitliches Scrollen) und auf `.katex-error` prüfen. In "Problem lösen" beide Wege (selbst rechnen und Lösungsschema) und das aufgeklappte Rechenbeispiel testen und prüfen, dass "Weiter" erst nach allen Pflichtaufgaben frei wird. Die Höhe darf überstehen; prüfe auf den Screenshots, dass Skizzen groß genug und Beschriftungen lesbar sind.
-- Am Ende der Seite "Wissen prüfen und vertiefen" stehen die Buttons zurück zur Auswahl, zu den Übungsaufgaben und ggf. zur nächsten Lernsituation (keine eigene Abschlussseite).
+- Am Ende der Seite "Wissen prüfen und vertiefen" steht das Bonus-Spiel (Abschnitt "Bonus-Spiel zum Abschluss"), darunter die Buttons zurück zur Auswahl, zu den Übungsaufgaben und ggf. zur nächsten Lernsituation (keine eigene Abschlussseite).
 
 ## Auswahlseite des Themas (Pflicht)
 
@@ -163,6 +163,24 @@ Für beide Varianten gilt:
 - Die Überschriften heißen genau **"Lernsituation"** und **"Übungsaufgaben"** (nicht "Wähle deinen Schwierigkeitsgrad").
 - Die Abschluss-Buttons der Lernsituation führen mit "Weiter üben" zu den Übungsaufgaben dieses Themas.
 - Die Auswahlseite wird mitgetestet: kein seitliches Scrollen bei 1180 × 820 und 390 × 844, Karte öffnet die Lernsituation, "Übungsaufgaben" öffnen die bisherigen Aufgaben.
+
+## Bonus-Spiel zum Abschluss (Pflicht)
+
+Ganz am Ende jeder Lernsituation wird ein kleines **mathematisches Spiel** freigeschaltet, das zum Thema passt. Es soll motivieren und Spaß machen und dabei das gerade Gelernte noch einmal kurz prüfen. Welches Spiel es wird, entscheidest du frei; es muss zum Inhalt passen und mit vertretbarem Aufwand einzubauen sein.
+
+- **Ort und Freischaltung:** auf der Seite "Wissen prüfen und vertiefen" unter den Übungsaufgaben, über den Abschluss-Buttons, mit `BonusSpiel` aus `lernsituation_kit/seiten.tsx` (`frei`, `titel`). Gesperrt steht dort nur ein kurzer Hinweis; frei wird es, sobald alle Pflicht-Übungen gelöst sind (freiwillige Profi-Aufgaben zählen nicht). Dafür die `onSolved`-Meldungen der Übungen zusätzlich im Seitenzustand mitzählen. Im Einleitungssatz der Seite steht, dass ein Spiel wartet.
+- **Mathematik trägt das Spiel:** Jede Spielaktion ist eine kurze Aufgabe zum Thema (rechnen, ablesen, einsetzen, schätzen). Falsche Ziele bzw. Antworten bilden typische Fehler ab und bekommen nach der Runde eine kurze Erklärung. Kein reines Geschicklichkeitsspiel.
+- **Umfang:** 3 bis 5 Runden mit neuen Zufallszahlen (ca. 3 bis 5 Minuten), Punkte oder Münzen sichtbar, am Ende Ergebnis mit Lob und "Nochmal spielen". Keine Zeitnot: Tempo so langsam, dass mit Taschenrechner gerechnet werden kann, dazu ein Knopf zum Beschleunigen.
+- **Bedienung:** Tablet zuerst: Tippen auf Ziele bzw. Knöpfe mit mindestens 44 px, zusätzlich Pfeiltasten; kein seitliches Scrollen. Die Spielfläche ist ein Inline-SVG (oder Canvas) mit `role="img"`/`aria-label`, Animation mit `requestAnimationFrame`. Keine externen Bibliotheken, keine echten Markenfiguren oder Logos (Spielidee ja, Original-Grafiken nein).
+- **Gestaltung:** Spielfläche in Themenfarbe (`--primary`, `--primary-soft`), Münzen in `--highlight`, richtig/falsch mit `--correct`/`--wrong`. Das Leitobjekt der Lernsituation darf die Spielfigur sein (z. B. der Vereinsbus). Das Spiel darf etwas verspielter sein als der Rest der Seite, bleibt aber in einer Spalte.
+- **Bestehende Spiele:** `quadratische_funktionen/MarioSpiel.tsx` (Funktionsgleichung eingeben, die Figur springt den Bogen entlang und sammelt Münzen), `finanzmathe/rentenrechnung_einstieg/BusRallye.tsx` (Vereinsbus auf die Spur mit dem richtigen Endwert lenken).
+- **Ideen nach Thema** (frei wählbar, abwechseln):
+  - Funktionen: Sprung- oder Flugbahn durch Münzen bzw. Ringe (Gleichung eingeben), Kanone zielt auf ein Ziel (Parameter einstellen), Punkte auf der Geraden einsammeln, Snake auf dem Koordinatengitter (nur Felder auf der Geraden fressen)
+  - Gleichungen und Terme: Pac-Man-Labyrinth (in den Gang mit der richtigen Lösung abbiegen), Ballons platzen lassen (richtige Lösung treffen), Tetris-artiges Zuordnen von Term und Ergebnis
+  - Finanzmathematik und Prozente: Spur-Rallye (auf das Schild mit dem richtigen Betrag fahren), Münzregen (richtige Beträge im Korb fangen), Börsen- oder Sparschwein-Rennen, Preisschild-Schätzduell
+  - Daten und Zufall: Glücksrad oder Würfelduell mit Wahrscheinlichkeiten, Balken ins richtige Fach sortieren
+  - Geometrie und Trigonometrie: Laser oder Billard über Winkel ins Ziel lenken, Leiter- oder Rampenbau mit der richtigen Länge
+- In der Phasenleiste zählt das Spiel nicht als Pflicht; die Lernsituation ist auch ohne Spielen abgeschlossen.
 
 ## Schreib- und Rechenkonventionen (Pflicht)
 
@@ -376,6 +394,7 @@ Anforderungen an einen guten Kontext:
 - [ ] "Problem erkennen" und "Problem lösen" haben je mindestens ein inhaltliches Bild (Graph, Skizze oder Sachbild im Stil des Titelbilds), das nichts von der Lösung verrät; beim Handlungsprodukt zeigt ein kleines Bild, was entstehen soll.
 - [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat 2 bis 4 Kriterien zum Abhaken, dazu das Kriterium „unbekannte Begriffe und Bedeutung der Abkürzungen der Formel aufschreiben“ mit den konkreten Abkürzungen.
 - [ ] "Wissen prüfen und vertiefen" hat mindestens 3, besser 4 passende Übungsaufgaben (Basis bis Erweiterung) und darunter die Abschluss-Buttons.
+- [ ] Nach allen Pflicht-Übungen wird ein thematisch passendes Bonus-Spiel freigeschaltet (`BonusSpiel`), das das Wissen spielerisch prüft, auf dem Tablet bedienbar ist und "Nochmal spielen" anbietet.
 - [ ] Ruhiges Grunddesign: einspaltig (auch bei 1920 × 1080), ein Fokus pro Seite, keine verschachtelten Kästen, keine Farbstreifen oder Banner, eine Akzentfarbe, Touch-Ziele mindestens 44 px.
 - [ ] Identität vollständig: Themenfarbe (anders als in den letzten drei Lernsituationen), Symbol und Name als Kennung in der Leiste, eigenes Titelbild in der Startbox, Leitobjekt durch alle Phasen.
 - [ ] `frontend-design` vor dem Bauen geladen, `design:design-critique` mit Screenshots danach angewendet und die Punkte behoben.

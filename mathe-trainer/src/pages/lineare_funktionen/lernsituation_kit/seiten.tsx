@@ -349,3 +349,30 @@ export function LernsituationKarte({
     </button>
   );
 }
+
+/**
+ * Bonus-Spiel am Ende der Lernsituation (unter den Übungsaufgaben): gesperrt, bis alle Pflichtaufgaben der letzten Seite gelöst sind,
+ * dann frei. Das Spiel selbst (children) passt zum Thema und prüft das Wissen noch einmal spielerisch.
+ */
+export function BonusSpiel({
+  frei,
+  titel,
+  children,
+}: {
+  frei: boolean;
+  titel: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className="sl-abschnitt sl-bonus">
+      <h3 className="sl-abschnitt-titel">
+        <i className={`fa-solid ${frei ? 'fa-gamepad' : 'fa-lock'}`} aria-hidden="true" /> Bonus-Spiel: {titel}
+      </h3>
+      {frei ? (
+        children
+      ) : (
+        <p className="sl-hinweis">Löse alle Übungsaufgaben oben, dann wird hier ein Spiel freigeschaltet.</p>
+      )}
+    </section>
+  );
+}

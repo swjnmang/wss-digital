@@ -12,6 +12,7 @@ import {
 import {
   Abschnitt,
   Aufklappbar,
+  BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
   WegWahl,
@@ -20,6 +21,7 @@ import {
 } from '../../lineare_funktionen/lernsituation_kit/seiten';
 import { Kriterien, Vermutung, Zitat, euro, type Festlegung } from '../zins_kit/zins_kit';
 import '../../daten_und_zufall/lernpfad/lernpfad.css';
+import BusRallye from './BusRallye';
 import './rentenrechnung.css';
 
 // Lernsituation Rentenrechnung „Der Vereinsbus“: Endwert regelmäßiger Einzahlungen, vorschüssig und nachschüssig (ca. 60 bis 90 min).
@@ -367,6 +369,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
   const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 31000, fest: false });
   const [raten, setRaten] = useState<number[]>([]);
   const [geloest, setGeloest] = useState(false);
+  const [uebungen, setUebungen] = useState<string[]>([]);
   const rateGeprueft = (i: number) => () => setRaten((r) => (r.includes(i) ? r : [...r, i]));
 
   const seiten: Seite[] = [
@@ -813,10 +816,16 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
       titel: 'Übungsaufgaben',
       inhalt: (fertig) => (
         <>
-          <p className="sl-text">Prüfe und vertiefe dein Wissen mit vier Aufgaben. Die letzte ist für Profis.</p>
+          <p className="sl-text">
+            Prüfe und vertiefe dein Wissen mit vier Aufgaben. Die letzte ist für Profis. Hast du Übung 1 bis 3 gelöst, wird unten ein
+            Spiel freigeschaltet.
+          </p>
           <Abschnitt titel="Übung 1: Wie viel ist auf dem Konto?">
             <TrackedMc
-              onSolved={fertig.teil('1')}
+              onSolved={() => {
+                fertig.teil('1')();
+                setUebungen((u) => (u.includes('1') ? u : [...u, '1']));
+              }}
               topic="Rentenrechnung-Einstieg: Endwert nachschüssig (Basis)"
               title="Übung 1"
               rechnen
@@ -852,7 +861,10 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
           </Abschnitt>
           <Abschnitt titel="Übung 2: Wer hat recht?">
             <TrackedMc
-              onSolved={fertig.teil('2')}
+              onSolved={() => {
+                fertig.teil('2')();
+                setUebungen((u) => (u.includes('2') ? u : [...u, '2']));
+              }}
               topic="Rentenrechnung-Einstieg: vorschüssig oder nachschüssig (Standard)"
               title="Übung 2"
               rechnen
@@ -890,7 +902,10 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
           </Abschnitt>
           <Abschnitt titel="Übung 3: Leonies Sparplan">
             <TrackedCheck
-              onSolved={fertig.teil('3')}
+              onSolved={() => {
+                fertig.teil('3')();
+                setUebungen((u) => (u.includes('3') ? u : [...u, '3']));
+              }}
               topic="Rentenrechnung-Einstieg: Endwert vorschüssig (Standard)"
               title="Übung 3"
               level="standard"
@@ -960,6 +975,9 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
               }
             />
           </Abschnitt>
+          <BonusSpiel frei={uebungen.length === 3} titel="Vereinsbus-Rallye">
+            <BusRallye />
+          </BonusSpiel>
           <div className="sl-ende">
             <p>
               Du kannst jetzt den Endwert regelmäßiger Einzahlungen berechnen, am Jahresanfang und am Jahresende. Bei den Übungsaufgaben
