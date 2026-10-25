@@ -3,7 +3,7 @@ import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
 import { CheckCard, ErklaerungCtx, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
 import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Fehlersuche, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
-import { Bilanz, usePunkteAufgabe } from '../lernsituation_kit/punkte'
+import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
 import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
 import AkkuCountdown from './AkkuCountdown'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
@@ -15,6 +15,8 @@ import './stromspeicher.css'
 // Problem lösen: Problem → Beispielrechnung E-Bike-Akku mit Lernvideo → Ergebnisse aus dem Heft abgleichen mit Fehlersuche →
 // Handlungsprodukt analog: Nachricht an Familie Demir mit Rechnung, Skizze und Uhrzeit. Danach Rückbezug und Merke.
 // Phase 4: vier Übungen (Bedeutung, Berechnen, Wer hat recht?, umgekehrt), Profi-Aufgabe ohne Nullstelle, Bonus-Spiel „Akku-Countdown“.
+// Punkte nach Aufwand: Warm-up 2/3/2/2/2, Ausprobieren 3, Kernaufgabe 15, Nachricht 5, Übungen 4/5/5/8, Profi 8
+// (Pflicht zusammen 56: Warm-up 20 %, Problem lösen 36 %, Übungen 39 %).
 // Identität: Themenfarbe Indigo (Nacht), Symbol Batterie, Titelbild Haus mit Solaranlage bei Nacht, Leitobjekt der Stromspeicher.
 // Kontext Gesellschaft und Umwelt (Energie). Versuche bleiben nur im Seitenzustand.
 // Ruhiges Grunddesign: eine Spalte, pro Seite ist nur der Auftrag hervorgehoben. Nach unten scrollen ist erlaubt, seitlich nie.
@@ -164,8 +166,8 @@ function Ausprobieren({ auftrag, versuche, onTesten }: { auftrag: ReactNode; ver
   const [fehler, setFehler] = useState<string | null>(null)
   const letzter = versuche[versuche.length - 1]
   const treffer = versuche.some((x) => Math.abs(x - X_LEER) < 1e-9)
-  // Ausprobieren zählt wie eine Festlegung: 5 Punkte, sobald die Seite frei ist
-  const pt = usePunkteAufgabe({ wert: 5, serie: false })
+  // Ausprobieren zählt wie eine Festlegung (PUNKTE.festlegung), sobald die Seite frei ist
+  const pt = usePunkteAufgabe({ wert: PUNKTE.festlegung, serie: false })
   const frei = versuche.length >= 3 || treffer
   useEffect(() => {
     if (frei) pt.geloest()
@@ -347,6 +349,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich. Einzelarbeit, ca. 8 Minuten.</p>
           <CheckCard
             onSolved={fertig.teil('a')}
+            punkte={2}
             title="a) x einsetzen"
             prompt={
               <p>
@@ -358,6 +361,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           />
           <CheckCard
             onSolved={fertig.teil('b')}
+            punkte={3}
             title="b) Gleichung lösen"
             prompt={
               <p>
@@ -381,6 +385,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           />
           <McCard
             onSolved={fertig.teil('c')}
+            punkte={2}
             title="c) Wo liegt der Punkt?"
             prompt={
               <p>
@@ -396,6 +401,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           />
           <CheckCard
             onSolved={fertig.teil('d')}
+            punkte={2}
             title="d) Durch eine negative Dezimalzahl teilen"
             prompt={<p>Löse die Gleichung. Achte beim Teilen auf das Vorzeichen.</p>}
             lead={<M>{'-0{,}5x = -3 \\qquad \\Rightarrow'}</M>}
@@ -415,6 +421,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           />
           <CheckCard
             onSolved={fertig.teil('e')}
+            punkte={2}
             title="e) Stunden in eine Uhrzeit umrechnen"
             prompt={
               <p>
@@ -503,6 +510,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
                 fertig.teil('ergebnis')()
                 setGeloest(true)
               }}
+              punkte={15}
               onFehler={() => setFehler(true)}
               title="Der Stromspeicher ist leer"
               prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
@@ -620,6 +628,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           <Abschnitt titel="Übung 1: Was bedeutet die Nullstelle?">
             <TrackedMc
               onSolved={uebung('1', fertig.teil('1'))}
+              punkte={4}
               topic="Nullstellen-Einstieg: Bedeutung (Basis)"
               title="Übung 1"
               level="basis"
@@ -639,6 +648,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           <Abschnitt titel="Übung 2: Welche Nullstelle stimmt?">
             <TrackedMc
               onSolved={uebung('2', fertig.teil('2'))}
+              punkte={5}
               topic="Nullstellen-Einstieg: Berechnen (Standard)"
               title="Übung 2"
               rechnen
@@ -659,6 +669,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           <Abschnitt titel="Übung 3: Wer hat recht?">
             <TrackedMc
               onSolved={uebung('3', fertig.teil('3'))}
+              punkte={5}
               topic="Nullstellen-Einstieg: Fehler beim Umformen (Standard)"
               title="Übung 3"
               level="standard"
@@ -688,6 +699,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           <Abschnitt titel="Übung 4: Reicht es bis 6 Uhr?">
             <TrackedCheck
               onSolved={uebung('4', fertig.teil('4'))}
+              punkte={8}
               topic="Nullstellen-Einstieg: Umgekehrt (Erweiterung)"
               title="Übung 4"
               level="erweiterung"
@@ -725,6 +737,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           <Abschnitt titel="Übung 5 für Profis: Wird der Speicher überhaupt leer?">
             <McCard
               title="Übung 5"
+              punkte={8}
               profi
               level="erweiterung"
               prompt={

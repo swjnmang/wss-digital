@@ -81,9 +81,11 @@ mit den konkreten Abkürzungen des Themas (z. B. Rentenrechnung: r = Rate bzw. R
 Ganz am Ende („Wissen prüfen und vertiefen“, unter den Übungen) wird nach allen Pflicht-Übungen ein kleines thematisch passendes Mathe-Spiel
 freigeschaltet (`BonusSpiel` aus `lernsituation_kit/seiten.tsx`; Beispiele `quadratische_funktionen/MarioSpiel.tsx`,
 `finanzmathe/rentenrechnung_einstieg/BusRallye.tsx`; Regeln und Ideen im Skill).
-Gamification: `SeitenLernsituation` mit `punkte` (Punkte in der Leiste: 10 je Aufgabe, Hilfe −2, Fehlversuch −2, Lösungsweg vor dem Lösen
-−2/3 der Aufgabenpunkte (bei 10 Punkten bleiben 3), Fehlersuche ohne Punkte, Serien-Bonus; `<Bilanz />` mit Sternen, Abzeichen und Rekord am Ende; Bausteine in
-`lernsituation_kit/punkte.tsx`, Vorlage `finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx`).
+Gamification: `SeitenLernsituation` mit `punkte` (Punkte in der Leiste, Lösungsweg vor dem Lösen −2/3 der Aufgabenpunkte, Fehlersuche ohne Punkte,
+Serien-Bonus; `<Bilanz />` mit Sternen, Abzeichen und Rekord am Ende; Bausteine in `lernsituation_kit/punkte.tsx`, Vorlage
+`finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx`). **Punkte nach Aufwand:** jede Aufgabe bekommt `punkte={…}` (Abruf im Warm-up 2,
+kurze Gleichung 3, Kernaufgabe in „Problem lösen“ 10–15, Übungen 3–8, Profi 8–10; Tabelle im Skill); Hilfe und Fehlversuch kosten je ein Fünftel
+der Aufgabenpunkte; „Problem lösen“ bringt etwa 40 % der Pflichtpunkte. Vorlage `lineare_funktionen/schnittpunkt_einstieg/LaserEinstieg.tsx`.
 Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
 aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
 
