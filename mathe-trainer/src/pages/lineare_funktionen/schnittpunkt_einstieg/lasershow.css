@@ -1,0 +1,28 @@
+/* Lernsituation „Die Lasershow“ im ruhigen Grunddesign: eine Spalte, Farben kommen über --primary aus dem Thema.
+   Der feste Kern (Eingaben, Feedback, Hilfen) kommt unverändert aus lernsituation_kit/kit.css. */
+
+/* Skizzen in gut lesbarer Größe; nach unten scrollen ist erlaubt */
+.lz-bild .bk-graph svg { max-height: 320px; max-width: 760px; }
+
+/* Laserpult in „Problem erkennen“: Skizze, Eingabe und Anzeige untereinander */
+.lz-pult { display: flex; flex-direction: column; gap: 10px; }
+.lz-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 19px; }
+.lz-eingabe label { display: inline-flex; align-items: center; gap: 6px; }
+.lz-eingabe .lp-input { min-height: 44px; }
+.lz-eingabe .bk-btn { min-height: 44px; }
+.lz-display {
+  display: flex; flex-direction: column; gap: 2px; padding: 8px 14px;
+  border-radius: 10px; background: var(--wrong-soft); color: var(--wrong-ink);
+  font-size: 15px; line-height: 1.45;
+}
+.lz-display-ok { background: var(--correct-soft); color: var(--correct-ink); }
+.lz-display-head { font-weight: 700; }
+.lz-display ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.lz-display .fa-circle-check { color: var(--correct); }
+.lz-display .fa-circle-xmark { color: var(--wrong); }
+
+/* Pläne zweier Azubis in „Wer hat recht?“ */
+.lz-plaene { display: flex; flex-direction: column; gap: 10px; }
+.lz-plan { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); }
+.lz-plan-name { font: 800 17px/1.2 var(--font-display); }
+.lz-plan .katex-display { margin: 0; overflow-x: auto; overflow-y: hidden; }

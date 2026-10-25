@@ -5,6 +5,7 @@ import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import LaserEinstieg from './schnittpunkt_einstieg/LaserEinstieg'
+import { LernsituationKarte } from './lernsituation_kit/seiten'
 
 const TOTAL_TASKS = 6
 
@@ -764,7 +765,7 @@ export default function Schnittpunkt() {
   }, [allSolved])
 
   const [level, setLevel] = useState<Level | null>(null)
-  // Einstiegs-Lernsituation „Treffen sich die Laserstrahlen über dem DJ-Pult?“ als dritter Modus neben den Schwierigkeitsgraden
+  // Einstiegs-Lernsituation „Die Lasershow“ als eigener Modus neben den Schwierigkeitsgraden
   const [lernsituation, setLernsituation] = useState(false)
 
   const startNewRound = () => {
@@ -827,20 +828,12 @@ export default function Schnittpunkt() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className={`${panel} flex flex-col`}>
               <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-              <button
-                onClick={() => {
-                  setLernsituation(true)
-                  window.scrollTo({ top: 0 })
-                }}
-                style={{ background: 'var(--primary)' }}
-                className="flex-1 rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Treffen sich die Laserstrahlen?</p>
-                <p className="text-xl mb-2 text-white">
-                  <i className="fa-solid fa-music" aria-hidden="true" />
-                </p>
-                <p className="text-sm text-white/90">Neu beim Thema? Finde heraus, ob sich zwei Laserstrahlen über dem DJ-Pult kreuzen, und lerne dabei, wie man den Schnittpunkt berechnet.</p>
-              </button>
+              <LernsituationKarte
+                className="flex-1"
+                thema={{ name: 'Die Lasershow', farbe: 'indigo', icon: 'fa-compact-disc' }}
+                beschreibung="Neu beim Thema? Hänge die Spiegelkugel für die Abschlussparty genau dorthin, wo sich zwei Laserstrahlen kreuzen, und lerne dabei, wie man den Schnittpunkt berechnet."
+                onClick={() => setLernsituation(true)}
+              />
             </div>
             <div className={`${panel} sm:col-span-2 flex flex-col`}>
               <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
