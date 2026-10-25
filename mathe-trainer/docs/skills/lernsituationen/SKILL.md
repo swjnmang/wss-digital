@@ -11,7 +11,7 @@ Dieser Skill entwickelt **Einstiegs-Lernsituationen** für neue Mathe-Themen und
 - **Nur für den Themeneinstieg.** Vertiefende Übungsseiten laufen über den Skill `mathe-aufgaben`. Eine Lernsituation führt ein Thema ein und sichert die Kernidee, sie übt nicht ausführlich.
 - **Kein Lehrkraft-Material** auf der Seite. Alles richtet sich direkt an die SuS.
 - **Endgerät:** Tablet im **Querformat**. Jede Seite ist trotzdem **einspaltig** (siehe "Ruhiges Grunddesign"). Nach unten scrollen ist erlaubt, zur Seite nie.
-- **Neueste Umsetzung mit allen aktuellen Regeln** (5 Warm-up-Aufgaben, Kriterium Begriffe und Abkürzungen, Bonus-Spiel, Punkte und Bilanz): `mathe-trainer/src/pages/finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Der Vereinsbus) mit `BusRallye.tsx`.
+- **Neueste Umsetzung mit allen aktuellen Regeln** (5 Warm-up-Aufgaben, Kriterium Begriffe und Abkürzungen, Bonus-Spiel, Punkte und Bilanz): `mathe-trainer/src/pages/finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Der Vereinsbus) mit `BusRallye.tsx`. Vorlage für **Punkte nach Aufwand** (Balancing): `mathe-trainer/src/pages/lineare_funktionen/schnittpunkt_einstieg/LaserEinstieg.tsx` (Die Lasershow) mit dem Spiel `KugelTreffer.tsx`.
 - **Referenz-Umsetzung:** `mathe-trainer/src/pages/finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx` (Lenas Autogeld): eine Seite pro Phase und Phase 4 mit vier Übungsaufgaben. Achtung: Ihr "Problem lösen" hat noch den alten Aufbau mit `WegWahl`; maßgeblich für "Problem lösen" ist der Vereinsbus. Für Ausprobieren mit Live-Rückmeldung und Titelbilder zusätzlich `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx` und `lineare_funktionen/nullstellen_einstieg/StromspeicherEinstieg.tsx` ansehen (diese beiden haben noch die ältere Aufteilung mit einer Aufgabe pro Seite). Vor dem Bauen ansehen.
 - **Diese Datei ist die maßgebliche Fassung des Skills.** Der Skill „lernsituationen“ im claude.ai-Konto der Lehrkraft verweist nur hierher. Neue oder geänderte Regeln werden **nur hier** eingetragen (und bei Bedarf kurz in `mathe-trainer/CLAUDE.md`), dann wie üblich in `main` gemergt. Die Lehrkraft muss danach nichts neu hochladen.
 
@@ -169,19 +169,36 @@ Für beide Varianten gilt:
 Jede Lernsituation belohnt richtige Lösungen mit Punkten. Die Elemente sollen motivieren, aber nicht vom Lernen ablenken: Sie sind klein, stehen am Rand (Punkte in der Phasenleiste) und belohnen selbstständiges, sorgfältiges Arbeiten.
 
 - **Einschalten:** `SeitenLernsituation` mit `punkte`. Alles Weitere erledigen die Bausteine selbst (`lernsituation_kit/punkte.tsx`): `CheckCard`, `McCard`, `Hilfen`, `SchrittHilfen`, `Vermutung` und `Kriterien` melden sich automatisch. Eigene Aufgaben-Bausteine nutzen `usePunkteAufgabe()` (`geloest`, `fehler`, `hilfe`, `loesung`).
-- **Punkteregeln** (Werte in `PUNKTE`):
-  - richtig gelöste Aufgabe: 10 Punkte; jede angezeigte Hilfe −2, jeder Fehlversuch −2 (höchstens 3 zählen), mindestens 2 Punkte für eine selbst gelöste Aufgabe
-  - Lösungsweg **vor** dem Lösen angesehen: Abzug von **zwei Dritteln** der Punkte, die diese Aufgabe höchstens bringt (gerundet, `PUNKTE.loesungAnteil`, `loesungKosten`): bei 10 Punkten −7, die Aufgabe bringt also noch 3 Punkte. Hilfen und Fehlversuche werden dann nicht zusätzlich abgezogen. Nach dem Lösen ist das Ansehen kostenlos.
+- **Punkte nach Aufwand (Balancing, Pflicht):** Jede Aufgabe bekommt mit `punkte={…}` (an `CheckCard`, `McCard`, `TrackedCheck`, `TrackedMc`) einen Wert, der zu ihrem Aufwand passt. Eine kurze Abrufaufgabe darf nie so viel bringen wie die Kernaufgabe der Lernsituation. Richtwerte:
+
+  | Aufgabe | Punkte |
+  | --- | --- |
+  | Abruf mit einem Schritt (einsetzen, ablesen, zusammenfassen, einfache Auswahl) | 2 |
+  | kurze Aufgabe mit zwei Schritten (einfache Gleichung lösen, Zinsen für ein Jahr) | 3 |
+  | Aufgabe mit drei oder mehr Schritten im Warm-up (Gerade aus zwei Punkten, Zinstage) | 4 |
+  | Festlegung bzw. Ausprobieren in „Problem erkennen“ (`PUNKTE.festlegung`) | 3 |
+  | Kernaufgabe in „Problem lösen“ (Ergebnis-Abgleich), je Teilproblem | 10 bis 15 |
+  | Entscheidung in „Problem lösen“ (Auswahl nach der Rechnung) | 3 bis 4 |
+  | alle Kriterien des Handlungsprodukts abgehakt (`PUNKTE.kriterien`) | 5 |
+  | Übung Basis (Auswahl mit Fehloptionen) | 3 bis 4 |
+  | Übung Standard („Wer hat recht?“, Rechenaufgabe) | 5 bis 6 |
+  | Übung Erweiterung (umgekehrte oder offene Aufgabe) | 7 bis 8 |
+  | Profi-Aufgabe (`profi`, zählt nicht zu den Sternen) | 8 bis 10 |
+
+  Leitplanken für die ganze Lernsituation: "Problem lösen" bringt etwa 40 % der Punkte der Pflichtaufgaben, das Warm-up höchstens 20 %, "Wissen prüfen und vertiefen" etwa ein Drittel. Insgesamt kommen meist 60 bis 100 Punkte zusammen. Die Verteilung steht als Kommentar oben in der Datei und wird im Test nachgerechnet.
+- **Punkteregeln** (Werte und Formeln in `PUNKTE`, `hilfeKosten`, `mindestPunkte`, `loesungKosten`):
+  - richtig gelöste Aufgabe: ihre Punkte; jede angezeigte Hilfe und jeder Fehlversuch (höchstens 3 zählen) kostet **ein Fünftel** der Aufgabenpunkte, mindestens 1 (bei 12 Punkten −2, bei 3 Punkten −1). Eine selbst gelöste Aufgabe bringt mindestens ein Fünftel ihrer Punkte, mindestens 1.
+  - Lösungsweg **vor** dem Lösen angesehen: Abzug von **zwei Dritteln** der Punkte, die diese Aufgabe höchstens bringt (gerundet, `PUNKTE.loesungAnteil`, `loesungKosten`): bei 12 Punkten −8, die Aufgabe bringt also noch 4 Punkte. Hilfen und Fehlversuche werden dann nicht zusätzlich abgezogen. Nach dem Lösen ist das Ansehen kostenlos.
   - Die Fehlersuche (`ohnePunkte`) bringt und kostet nichts
-  - Festlegung (`Vermutung`) und abgehakte Kriterien des Handlungsprodukts: je 5 Punkte
+  - Festlegung (`Vermutung`, eigenes Ausprobieren mit `usePunkteAufgabe({ wert: PUNKTE.festlegung, serie: false })`): 3 Punkte; abgehakte Kriterien des Handlungsprodukts: 5 Punkte
   - Rechenbeispiel und Lernvideo sind kostenlos, sie gehören zum Lernen
-  - Die Kosten stehen sichtbar an den Knöpfen („Hilfe 1 anzeigen (−2 Punkte)“, „Lösungsweg zeigen (−7 Punkte)“, der Wert wird aus den Aufgabenpunkten berechnet), damit die SuS bewusst entscheiden. Hilfe bleibt immer erreichbar.
+  - Die Kosten stehen sichtbar an den Knöpfen („Hilfe 1 anzeigen (−2 Punkte)“, „Lösungsweg zeigen (−8 Punkte)“), automatisch aus den Aufgabenpunkten berechnet, damit die SuS bewusst entscheiden. Hilfe bleibt immer erreichbar.
 - **Weitere Elemente:**
   - **Punktestand** in der Phasenleiste mit kurzen Meldungen (+10, Abzug), die nach gut 2 Sekunden verschwinden
-  - **Serien-Bonus:** 3 Aufgaben am Stück ohne Hilfe und ohne Fehler bringen +5
+  - **Serien-Bonus:** 3 Aufgaben am Stück ohne Hilfe und ohne Fehler bringen +3
   - **Spielregeln in der Startbox** (`PunkteRegeln`, automatisch)
   - **Bilanz** am Ende der letzten Seite (`<Bilanz />` unter dem Bonus-Spiel, über den Abschluss-Buttons): Punkte, 0 bis 3 Sterne mit Rang (Einsteiger, Bronze, Silber, Gold; nur aus den Aufgabenpunkten der Pflichtaufgaben), persönlicher Rekord (localStorage, mit try/catch) und vier Abzeichen: „Ganz allein“ (alle Pflichtaufgaben ohne Hilfe und Lösungsweg), „Serienstar“ (5 am Stück), „Profi“ (Profi-Aufgabe gelöst), „Spielchampion“ (im Bonus-Spiel fast alle Münzen)
-  - **Bonus-Spiel:** Münzen bringen je 5 Punkte, nur das beste Ergebnis zählt (`useSpielPunkte`)
+  - **Bonus-Spiel:** Münzen bringen je 2 Punkte, nur das beste Ergebnis zählt (`useSpielPunkte`); das Spiel ist ein Bonus und soll nicht mehr bringen als eine Übungsaufgabe
 - **Profi-Aufgaben** bekommen `profi` (zählen nicht zum Maximum der Sterne, aber zum Abzeichen „Profi“).
 - **Keine Ablenkung:** keine Ranglisten mit Namen, kein Vergleich mit Mitschülern, keine Zeitwertung, keine Animationen außer den kurzen Meldungen; bei `prefers-reduced-motion` ohne Animation. Punkte verschwinden nie wegen langsamen Arbeitens.
 
@@ -416,6 +433,7 @@ Anforderungen an einen guten Kontext:
 - [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat 2 bis 4 Kriterien zum Abhaken, dazu das Kriterium „unbekannte Begriffe und Bedeutung der Abkürzungen der Formel aufschreiben“ mit den konkreten Abkürzungen.
 - [ ] "Wissen prüfen und vertiefen" hat mindestens 3, besser 4 passende Übungsaufgaben (Basis bis Erweiterung) und darunter die Abschluss-Buttons.
 - [ ] Gamification an: `SeitenLernsituation` mit `punkte`, Fehlersuche mit `ohnePunkte`, Profi-Aufgabe mit `profi`, `<Bilanz />` am Ende der letzten Seite; die Punkte wurden im Test nachgerechnet.
+- [ ] Punkte nach Aufwand: jede Aufgabe hat `punkte={…}` nach der Richtwert-Tabelle (Abruf 2, Kernaufgabe 10 bis 15 …), "Problem lösen" bringt etwa 40 % der Pflichtpunkte, das Warm-up höchstens 20 %; die Verteilung steht als Kommentar in der Datei.
 - [ ] Nach allen Pflicht-Übungen wird ein thematisch passendes Bonus-Spiel freigeschaltet (`BonusSpiel`), das das Wissen spielerisch prüft, auf dem Tablet bedienbar ist und "Nochmal spielen" anbietet.
 - [ ] Ruhiges Grunddesign: einspaltig (auch bei 1920 × 1080), ein Fokus pro Seite, keine verschachtelten Kästen, keine Farbstreifen oder Banner, eine Akzentfarbe, Touch-Ziele mindestens 44 px.
 - [ ] Identität vollständig: Themenfarbe (anders als in den letzten drei Lernsituationen), Symbol und Name als Kennung in der Leiste, eigenes Titelbild in der Startbox, Leitobjekt durch alle Phasen.

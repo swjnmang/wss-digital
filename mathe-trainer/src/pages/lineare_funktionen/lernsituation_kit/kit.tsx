@@ -3,7 +3,7 @@ import { InlineMath } from 'react-katex'
 import { useTaskTracking } from '../../../hooks/useTaskTracking'
 import { fieldCheckClass } from '../../../utils/fieldCheck'
 import { checkNumber, fmt, pick } from '../../daten_und_zufall/lernpfad/kit'
-import { AufgabePunkteCtx, PUNKTE, usePunkteAufgabe } from './punkte'
+import { AufgabePunkteCtx, punkteText, usePunkteAufgabe } from './punkte'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './kit.css'
 
@@ -124,7 +124,7 @@ export function Hilfen({ steps }: { steps: [ReactNode, ReactNode, ReactNode] }) 
             }}
           >
             <i className="fa-solid fa-life-ring" aria-hidden="true" /> {`Hilfe ${shown + 1} anzeigen`}
-            {punkte && <span className="ls-kosten"> (−{PUNKTE.hilfe} Punkte)</span>}
+            {punkte && <span className="ls-kosten"> (−{punkteText(punkte.hilfeKosten)})</span>}
           </button>
         </div>
       )}
@@ -147,7 +147,7 @@ export function SchrittHilfen({ schritte }: { schritte: { kurz: ReactNode; titel
   return (
     <div className="ls-help ls-help-schritte">
       <div className="ls-help-wahl">
-        <span>Hilfe zu{punkte && <span className="ls-kosten"> (je −{PUNKTE.hilfe} Punkte)</span>}:</span>
+        <span>Hilfe zu{punkte && <span className="ls-kosten"> (je −{punkteText(punkte.hilfeKosten)})</span>}:</span>
         {schritte.map((s, i) => (
           <button
             key={i}
@@ -281,7 +281,7 @@ export function CheckCard({
   onSolved?: () => void
   /** Lösungsweg erst anbieten, nachdem einmal falsch geprüft wurde (eigene Rechnung ohne Vorstrukturierung) */
   loesungNachFehler?: boolean
-  /** Punkte statt der vollen Aufgabenpunkte (z. B. 8 für den Weg mit Lösungsschema) */
+  /** Punkte der Aufgabe nach Aufwand (Standard PUNKTE.aufgabe), z. B. 2 für einen Abruf im Warm-up, 12 für die Kernaufgabe */
   punkte?: number
   /** Freiwillige Profi-Aufgabe (zählt nicht zum Maximum der Sterne) */
   profi?: boolean
@@ -412,7 +412,7 @@ export function CheckCard({
             }}
           >
             <i className="fa-solid fa-route" aria-hidden="true" /> {showSolution ? 'Lösungsweg ausblenden' : 'Lösungsweg zeigen'}
-            {pt.aktiv && !showSolution && status !== 'ok' && <span className="ls-kosten"> (−{pt.loesungKosten} Punkte)</span>}
+            {pt.aktiv && !showSolution && status !== 'ok' && <span className="ls-kosten"> (−{punkteText(pt.loesungKosten)})</span>}
           </button>
         </div>
       )}
@@ -463,6 +463,7 @@ export function McCard({
   tracking = NO_TRACKING,
   onSolved,
   profi = false,
+  punkte,
 }: {
   title: ReactNode
   level?: Level
@@ -470,6 +471,8 @@ export function McCard({
   options: McOption[]
   /** Freiwillige Profi-Aufgabe (zählt nicht zum Maximum der Sterne) */
   profi?: boolean
+  /** Punkte der Aufgabe nach Aufwand (Standard PUNKTE.aufgabe) */
+  punkte?: number
   /** Auswahl erst nach einer Rechnung: Heft-Hinweis anzeigen */
   rechnen?: boolean
   tracking?: Tracking
@@ -482,7 +485,7 @@ export function McCard({
   const [choice, setChoice] = useState<number | null>(null)
   const [status, setStatus] = useState<'idle' | 'ok' | 'no' | 'empty'>('idle')
   const [praise, setPraise] = useState(PRAISE[0])
-  const pt = usePunkteAufgabe({ profi })
+  const pt = usePunkteAufgabe({ wert: punkte, profi })
 
   const check = () => {
     if (choice === null) return setStatus('empty')

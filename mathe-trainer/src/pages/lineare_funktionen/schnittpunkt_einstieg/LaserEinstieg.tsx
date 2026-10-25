@@ -3,7 +3,7 @@ import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
 import { CheckCard, ErklaerungCtx, Hilfen, McCard, TrackedCheck, TrackedMc, tx } from '../lernsituation_kit/kit'
 import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Fehlersuche, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
-import { Bilanz, usePunkteAufgabe } from '../lernsituation_kit/punkte'
+import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
 import KugelTreffer from './KugelTreffer'
 import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
@@ -19,6 +19,7 @@ import './lasershow.css'
 // Seiten noch unsicher, deshalb zeigen Rechenbeispiel und Lösungsschema jede Umformung in einer eigenen Zeile.
 // Handlungsprodukt analog: Spickzettel (Karteikarte) „Schnittpunkt berechnen“.
 // Aha: Nur wo beide Strahlen gleich hoch sind, treffen sie sich. Diese Stelle findet man nicht durch Raten, sondern durch Gleichsetzen.
+// Punkte nach Aufwand: Warm-up 2–4, Laserpult 3, Teil 1 und 2 je 12, Spickzettel 5, Übungen 4/5/6/8, Profi 8 (Pflicht zusammen 69).
 // Identität: Themenfarbe Indigo (Nacht, Party), Symbol fa-compact-disc, Titelbild Partyraum mit Lasern und Spiegelkugel,
 // Leitobjekt das Laserpult mit der Spiegelkugel. Die Versuche bleiben nur im Seitenzustand (kein Speichern).
 // Wird als Modus „Lernsituation“ auf der Seite „Schnittpunkt zweier Geraden“ angezeigt; der Infoteil (Erklärung mit
@@ -243,8 +244,8 @@ function Laserpult({ versuche, onEinstellen }: { versuche: Kugel[]; onEinstellen
   const [fehlt, setFehlt] = useState(false)
   const letzter = versuche[versuche.length - 1]
   const treffer = versuche.some(beideTreffen)
-  // Ausprobieren zählt wie eine Festlegung: 5 Punkte, sobald die Seite frei ist
-  const pt = usePunkteAufgabe({ wert: 5, serie: false })
+  // Ausprobieren zählt wie eine Festlegung (PUNKTE.festlegung), sobald die Seite frei ist
+  const pt = usePunkteAufgabe({ wert: PUNKTE.festlegung, serie: false })
   const frei = versuche.length >= 3 || treffer
   useEffect(() => {
     if (frei) pt.geloest()
@@ -532,6 +533,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich. Einzelarbeit, ca. 10 Minuten.</p>
           <CheckCard
             onSolved={fertig.teil('a')}
+            punkte={2}
             title="a) x einsetzen"
             prompt={
               <p>
@@ -543,6 +545,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           />
           <CheckCard
             onSolved={fertig.teil('b')}
+            punkte={2}
             title="b) x-Terme zusammenfassen"
             prompt={<p>Fasse zusammen. Trage die Zahl vor <M>x</M> ein.</p>}
             rechnung={[
@@ -557,6 +560,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           />
           <CheckCard
             onSolved={fertig.teil('c')}
+            punkte={3}
             title="c) Gleichung lösen"
             prompt={
               <p>
@@ -580,6 +584,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           />
           <CheckCard
             onSolved={fertig.teil('d')}
+            punkte={3}
             title="d) Durch eine negative Zahl teilen"
             prompt={<p>Löse die Gleichung nach <M>x</M> auf. Achte beim Teilen auf das Vorzeichen.</p>}
             lead={<M>{'-2x + 7 = 1 \\qquad \\Rightarrow'}</M>}
@@ -599,6 +604,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           />
           <CheckCard
             onSolved={fertig.teil('e')}
+            punkte={4}
             title="e) Gleichung aus zwei Punkten"
             prompt={
               <p>
@@ -690,6 +696,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             <Abschnitt titel="Teil 1: Vergleiche deine Ergebnisse">
               <CheckCard
                 onSolved={teil1Melden}
+                punkte={12}
                 onFehler={() => setFehler1(true)}
                 title="Position der Spiegelkugel"
                 prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
@@ -754,6 +761,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               </BeispielMitVideo>
               <CheckCard
                 onSolved={fertig.teil('teil2')}
+                punkte={12}
                 onFehler={() => setFehler2(true)}
                 title="Zweite Show"
                 prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
@@ -870,6 +878,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <Abschnitt titel="Übung 1: Welcher Schnittpunkt stimmt?">
             <TrackedMc
               onSolved={uebung('1', fertig.teil('1'))}
+              punkte={4}
               topic="Schnittpunkt-Einstieg: Schnittpunkt auswählen (Basis)"
               title="Übung 1"
               rechnen
@@ -890,6 +899,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <Abschnitt titel="Übung 2: Wer hat recht?">
             <TrackedMc
               onSolved={uebung('2', fertig.teil('2'))}
+              punkte={5}
               topic="Schnittpunkt-Einstieg: Fehler beim Umformen (Standard)"
               title="Übung 2"
               level="standard"
@@ -925,6 +935,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <Abschnitt titel="Übung 3: Scheinwerfer im Schultheater">
             <TrackedCheck
               onSolved={uebung('3', fertig.teil('3'))}
+              punkte={6}
               topic="Schnittpunkt-Einstieg: Schnittpunkt berechnen (Standard)"
               title="Übung 3"
               level="standard"
@@ -962,6 +973,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <Abschnitt titel="Übung 4: Umgekehrt gedacht">
             <TrackedCheck
               onSolved={uebung('4', fertig.teil('4'))}
+              punkte={8}
               topic="Schnittpunkt-Einstieg: Gerade durch den Schnittpunkt (Erweiterung)"
               title="Übung 4"
               level="erweiterung"
@@ -1003,6 +1015,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             <McCard
               title="Übung 5"
               profi
+              punkte={8}
               level="erweiterung"
               prompt={
                 <>
