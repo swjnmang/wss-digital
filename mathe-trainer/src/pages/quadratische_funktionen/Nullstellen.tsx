@@ -44,6 +44,7 @@ import {
   vertexToGeneralLines,
 } from './quadratischShared'
 import TaskShell from '../../components/layout/TaskShell'
+import { useBackHandler } from '../../hooks/useBackHandler'
 
 // Sechs Aufgaben gleichzeitig auf der Seite
 const TOTAL_TASKS = 6
@@ -1171,6 +1172,8 @@ function DiskriminanteErklaerung() {
 export default function Nullstellen() {
   const navigate = useNavigate()
   const [level, setLevel] = useState<Level | null>(null)
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+  useBackHandler(level !== null, () => chooseLevel(null))
   const [round, setRound] = useState(0)
   const [solved, setSolved] = useState<Record<number, boolean>>({})
   const [streak, setStreak] = useState(0)

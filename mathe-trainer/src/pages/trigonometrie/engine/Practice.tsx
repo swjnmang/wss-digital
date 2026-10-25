@@ -14,6 +14,7 @@ import {
   type Task,
   type TopicConfig,
 } from './types';
+import { useBackHandler } from '../../../hooks/useBackHandler';
 
 const TOTAL_TASKS = 6;
 /** So lange muss eine falsche Eingabe stehen bleiben, bis sie rot wird und als Versuch zählt. */
@@ -377,6 +378,8 @@ function Erklaerung({ cfg }: { cfg: TopicConfig }) {
 export default function Practice({ cfg }: { cfg: TopicConfig }) {
   const navigate = useNavigate();
   const [level, setLevel] = useState<Level | null>(null);
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+  useBackHandler(level !== null, () => chooseLevel(null));
   const [round, setRound] = useState(0);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [versions, setVersions] = useState<number[]>(() => Array(TOTAL_TASKS).fill(0));

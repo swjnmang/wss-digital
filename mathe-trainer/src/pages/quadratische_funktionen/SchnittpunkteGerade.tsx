@@ -44,6 +44,7 @@ import {
 } from './quadratischShared'
 import TaskShell from '../../components/layout/TaskShell'
 import SkateEinstieg from './schnittpunkte_einstieg/SkateEinstieg'
+import { useBackHandler } from '../../hooks/useBackHandler'
 
 // Sechs Aufgaben gleichzeitig auf der Seite
 const TOTAL_TASKS = 6
@@ -913,6 +914,8 @@ export default function SchnittpunkteGerade() {
   const [round, setRound] = useState(0)
   // Einstiegs-Lernsituation „Löst der Sprung die Lichtschranke aus?“ als eigener Modus neben den Schwierigkeitsgraden
   const [lernsituation, setLernsituation] = useState(false)
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+  useBackHandler(lernsituation || level !== null, () => { setLernsituation(false); chooseLevel(null) })
   const [solved, setSolved] = useState<Record<number, boolean>>({})
   const [streak, setStreak] = useState(0)
 

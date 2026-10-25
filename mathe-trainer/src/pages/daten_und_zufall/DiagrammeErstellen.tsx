@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { PieChart, BarChart as BarChartIcon, BarChart2, RefreshCw, CheckCircle, HelpCircle } from 'lucide-react';
 import { PieChart as RePieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import TaskShell from '../../components/layout/TaskShell'
+import { useBackHandler } from '../../hooks/useBackHandler';
 
 type DiagramType = 'pie' | 'bar' | 'column';
 
@@ -26,6 +27,8 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'
 const DiagrammeErstellen: React.FC = () => {
   const [selectedType, setSelectedType] = useState<DiagramType | 'random' | null>(null);
   const [currentScenario, setCurrentScenario] = useState<Scenario | null>(null);
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+  useBackHandler(currentScenario !== null, () => setCurrentScenario(null));
   const [showSolution, setShowSolution] = useState(false);
 
   const generateScenario = (type: DiagramType | 'random'): Scenario => {

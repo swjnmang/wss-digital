@@ -6,6 +6,7 @@ import MarioSpiel from './MarioSpiel';
 import { SignToggle, eingabeKlasse, type Vorzeichen } from './quadratischShared';
 import TaskShell from '../../components/layout/TaskShell'
 import { fieldCheckClass } from '../../utils/fieldCheck';
+import { useBackHandler } from '../../hooks/useBackHandler';
 
 type Level = 'einfach' | 'fortgeschritten';
 
@@ -218,6 +219,8 @@ const BeispielFortgeschritten = ({ graphProps }: { graphProps: GraphProps }) => 
 
 const Scheitelform = () => {
     const [level, setLevel] = useState<Level | null>(null);
+    // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+    useBackHandler(level !== null, () => waehleLevel(null));
     const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
     const [eingaben, setEingaben] = useState<Eingabe[]>([]);
     const [ergebnisse, setErgebnisse] = useState<Ergebnis[]>([]);

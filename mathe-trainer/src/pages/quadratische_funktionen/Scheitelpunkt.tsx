@@ -6,6 +6,7 @@ import { type Q, q, add, mul, neg, val, isInt, tq, tqp, sgq, polyTex, parseAnswe
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import EscapeEinstieg from './scheitelpunkt_einstieg/EscapeEinstieg'
+import { useBackHandler } from '../../hooks/useBackHandler'
 
 // Sieben Aufgaben gleichzeitig auf der Seite
 const TOTAL_TASKS = 7
@@ -438,6 +439,8 @@ export default function Scheitelpunkt() {
   const [finished, setFinished] = useState(false)
   // Einstiegs-Lernsituation „Eingeschlossen im Lichtwerk“ als eigener Modus neben den Schwierigkeitsgraden
   const [lernsituation, setLernsituation] = useState(false)
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+  useBackHandler(lernsituation || level !== null, () => { setLernsituation(false); chooseLevel(null) })
 
   const solvedCount = Object.values(solved).filter(Boolean).length
   const allSolved = solvedCount === TOTAL_TASKS

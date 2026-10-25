@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import TaskShell from '../../components/layout/TaskShell'
 import { VideoEmbed } from '../../components/VideoButton'
+import { useBackHandler } from '../../hooks/useBackHandler';
 
 type Aufgabe = {
     a: number;
@@ -251,6 +252,8 @@ const Loesungsweg = ({ t, anzahl, titel }: { t: Aufgabe; anzahl: number; titel?:
 
 const GraphZeichnen = () => {
     const [level, setLevel] = useState<Level | null>(null);
+    // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+    useBackHandler(level !== null, () => waehleLevel(null));
     const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
     const [eingaben, setEingaben] = useState<string[][]>([]);
     const [tippSchritte, setTippSchritte] = useState<number[]>(Array(ANZAHL_AUFGABEN).fill(0));

@@ -5,6 +5,7 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
 import { VideoEmbed } from '../../components/VideoButton'
+import { useBackHandler } from '../../hooks/useBackHandler'
 
 const TOTAL_TASKS = 6
 const VIDEO_ID = 'fN52WXY_72g'
@@ -397,6 +398,8 @@ function Erklaerung({ level }: { level: Level }) {
 export default function SteigungAblesen() {
   const navigate = useNavigate()
   const [level, setLevel] = useState<Level | null>(null)
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+  useBackHandler(level !== null, () => chooseLevel(null))
   const [round, setRound] = useState(0)
   const [lines, setLines] = useState<Line[]>([])
   const [solved, setSolved] = useState<Record<number, boolean>>({})
