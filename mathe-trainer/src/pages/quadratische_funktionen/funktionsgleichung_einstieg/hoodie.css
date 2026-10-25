@@ -1,0 +1,38 @@
+/* Lernsituation „Die Hoodie-Bestellung“ im ruhigen Grunddesign: eine Spalte, Farben kommen über --primary aus dem Thema.
+   Der feste Kern (Eingaben, Feedback, Hilfen) kommt unverändert aus lernsituation_kit/kit.css. */
+
+/* Skizzen in gut lesbarer Größe; nach unten scrollen ist erlaubt */
+.hb-bild .bk-graph svg,
+.hb-bild svg { max-height: 320px; max-width: 760px; }
+
+/* Gewinn-Rechner in „Problem erkennen“: Skizze, Eingabe und Anzeige untereinander */
+.hb-rechner { display: flex; flex-direction: column; gap: 10px; }
+.hb-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 19px; }
+.hb-eingabe .hb-gleichung { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.hb-eingabe .lp-input { min-height: 44px; }
+.hb-eingabe .bk-btn { min-height: 44px; }
+.hb-display {
+  display: flex; flex-direction: column; gap: 2px; padding: 8px 14px;
+  border-radius: 10px; background: var(--wrong-soft); color: var(--wrong-ink);
+  font-size: 15px; line-height: 1.45;
+}
+.hb-display-ok { background: var(--correct-soft); color: var(--correct-ink); }
+.hb-display-head { font-weight: 700; }
+.hb-display ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.hb-display .fa-circle-check { color: var(--correct); }
+.hb-display .fa-circle-xmark { color: var(--wrong); }
+
+/* Bonus-Spiel Hoodie-Kanone */
+.hb-spiel { display: flex; flex-direction: column; gap: 12px; outline: none; }
+.hb-spiel-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 800 17px/1.3 var(--font-display); color: var(--primary); }
+.hb-muenzen { display: flex; gap: 6px; font-size: 20px; color: var(--line-strong); }
+.hb-muenzen .hb-muenze-an { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.hb-spiel-frage { margin: 0; font-size: 18px; line-height: 1.6; }
+.hb-spiel-bild { display: block; width: 100%; height: auto; max-height: 340px; touch-action: manipulation; user-select: none; }
+.hb-steuer { align-items: center; }
+.hb-steuer .bk-btn { min-height: 48px; }
+.hb-spiel-ende { margin: 0; font: 800 20px/1.4 var(--font-display); color: var(--ink); }
+.hb-spiel-ende i { color: var(--primary); margin-right: 6px; }
+.hb-wahl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.hb-wahl .bk-btn { min-height: 52px; justify-content: center; font-size: 17px; white-space: normal; }
+@media (max-width: 520px) { .hb-wahl { grid-template-columns: minmax(0, 1fr); } }
