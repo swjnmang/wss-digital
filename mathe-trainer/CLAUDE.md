@@ -78,6 +78,9 @@ Warm-up: mindestens 5 kurze Aufgaben, alle Pflicht. Beim Rechenbeispiel in „Pr
 (`VideoAufklappen`), falls es eines gibt; die Videos sind meist schon bei den Übungsaufgaben des Themas verlinkt und werden von dort übernommen.
 Die Kriterien des Handlungsprodukts enthalten immer einen Punkt „unbekannte Begriffe und die Bedeutung aller Abkürzungen der Formel aufschreiben“,
 mit den konkreten Abkürzungen des Themas (z. B. Rentenrechnung: r = Rate bzw. Rente).
+Ganz am Ende („Wissen prüfen und vertiefen“, unter den Übungen) wird nach allen Pflicht-Übungen ein kleines thematisch passendes Mathe-Spiel
+freigeschaltet (`BonusSpiel` aus `lernsituation_kit/seiten.tsx`; Beispiele `quadratische_funktionen/MarioSpiel.tsx`,
+`finanzmathe/rentenrechnung_einstieg/BusRallye.tsx`; Regeln und Ideen im Skill).
 Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
 aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
 

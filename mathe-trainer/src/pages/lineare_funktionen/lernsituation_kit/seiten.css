@@ -150,6 +150,7 @@
 .sl-abschnitt, .sl-produkt { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
 .sl-abschnitt-titel { margin: 0; display: flex; align-items: baseline; gap: 8px; font: 800 19px/1.3 var(--font-display); color: var(--ink); }
 .sl-produkt .sl-abschnitt-titel i { color: var(--primary); }
+.sl-bonus .sl-abschnitt-titel i { color: var(--primary); }
 .sl-aufklappbar { display: flex; flex-direction: column; gap: 10px; }
 .sl-aufklappbar .bk-btn, .sl-wegwahl-knoepfe .bk-btn { min-height: 44px; }
 .sl-wegwahl { display: flex; flex-direction: column; gap: 10px; }
