@@ -113,12 +113,12 @@ export function Vermutung<C extends string>({
 }
 
 /** Kriterien zum Abhaken; onAlle, sobald alle abgehakt sind */
-export function Kriterien({ items, onAlle }: { items: string[]; onAlle: () => void }) {
+export function Kriterien({ items, onAlle }: { items: ReactNode[]; onAlle: () => void }) {
   const [haken, setHaken] = useState(items.map(() => false))
   return (
     <div className="ls-criteria">
       {items.map((c, i) => (
-        <label key={c}>
+        <label key={i}>
           <input
             type="checkbox"
             checked={haken[i]}

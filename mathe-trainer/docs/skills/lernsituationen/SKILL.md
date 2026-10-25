@@ -51,7 +51,8 @@ Lege ein kompaktes Konzept vor:
 - Lernziel in einem Satz
 - Plan der vier Phasen-Seiten: je Phase die Aufgaben, die Pflichtaufgaben für "Weiter" und die ungefähre Zeit
 - Das Problem in einem Satz (gegeben, gesucht), das passende Rechenbeispiel mit anderen Zahlen und das Lösungsschema
-- Handlungsprodukt mit 2 bis 4 Kriterien
+- Handlungsprodukt mit 2 bis 4 Kriterien, dazu immer das Kriterium „Begriffe und Abkürzungen“
+- Passendes Lernvideo für das Rechenbeispiel (aus den Übungsaufgaben des Themas), falls vorhanden
 - Hilfen (Schritt-Hilfen beim Lösungsschema, gestufte Hilfen beim selbstständigen Rechnen) und Niveaustufen
 - Der Aha- oder Widerspruchsmoment
 - 3 bis 4 Übungsaufgaben für Phase 4 und die typischen Fehlvorstellungen, auf die sie zielen
@@ -87,7 +88,7 @@ Jede Lernsituation hat **genau diese vier Phasen in dieser Reihenfolge**. Namen 
 
 | Phase | Inhalt (alles auf **einer** Seite) |
 | --- | --- |
-| **1 Warm-up** | Vorwissen abrufen, das gleich gebraucht wird (Retrieval Practice): 2 bis 3 kurze Aufgaben untereinander, z. B. Wert ablesen, einfache Gleichung lösen, Klammer ausmultiplizieren. |
+| **1 Warm-up** | Vorwissen abrufen, das gleich gebraucht wird (Retrieval Practice): **mindestens 5** kurze Aufgaben untereinander (alle Pflicht), z. B. Wert ablesen, einfache Gleichung lösen, Klammer ausmultiplizieren. |
 | **2 Problem erkennen** | Kontext, Leitfrage und Festlegung bzw. Ausprobieren. Die SuS merken selbst, dass sie das Problem mit ihrem bisherigen Wissen nicht sicher lösen können. |
 | **3 Problem lösen** | Problem oben, Rechenbeispiel zum Aufklappen, Auftrag zum Handlungsprodukt, eigene Lösung (selbst rechnen oder mit Lösungsschema), ggf. Entscheidung, danach "Das hältst du fest" (Rückbezug und Merke). |
 | **4 Wissen prüfen und vertiefen** | Mindestens 3, besser 4 passende Übungsaufgaben mit steigendem Niveau (Basis, Standard, Erweiterung), mit typischen Fehlern als Antwortoptionen; darunter die Abschluss-Buttons. |
@@ -124,14 +125,14 @@ Wo es inhaltlich passt, probieren die SuS selbst Lösungen aus und bekommen sofo
 Alles auf einer Seite, **immer in dieser Reihenfolge** von oben nach unten:
 
 1. **Das Problem noch einmal oben** als einziger Fokus (`sl-fokus`): konkreter Arbeitsauftrag in eigenen Worten, was gegeben und was gesucht ist und in welcher Form das Ergebnis stehen soll. Darunter ein Bild zum Problem (Leitobjekt, Skizze oder Graph mit nur den gegebenen Größen, bei Umstellaufgaben die Formel mit markierter gesuchter Größe).
-2. **Rechenbeispiel zum Aufklappen** (`Aufklappbar` mit "Rechenbeispiel ansehen"): ein ausgearbeitetes Beispiel mit **anderen Zahlen**, Schritt für Schritt (`Beispiel offen`), ggf. mit Erklärvideo. Die SuS entscheiden selbst, ob sie es brauchen. Ein Rechenbeispiel vor der Problemdarstellung ist nicht erlaubt, auch nicht im Warm-up oder in Phase 2.
+2. **Rechenbeispiel zum Aufklappen** (`Aufklappbar` mit "Rechenbeispiel ansehen"): ein ausgearbeitetes Beispiel mit **anderen Zahlen**, Schritt für Schritt (`Beispiel offen`), und **immer mit dem passenden Lernvideo, wenn es eines gibt** (`VideoAufklappen` aus `finanzmathe/zins_kit/zins_kit.tsx` direkt unter dem Beispiel in derselben `Aufklappbar`). Die SuS entscheiden selbst, ob sie das Rechenbeispiel, das Video oder beides nutzen. Die Lernvideos sind meist schon bei den Übungsaufgaben des Themas verlinkt (z. B. `VideoButton url=…` oder eine `VIDEO`-Liste in der Übungsseite): Von dort übernehmen. Gibt es keines, der Lehrkraft am Ende als offenen Punkt nennen. Ein Rechenbeispiel vor der Problemdarstellung ist nicht erlaubt, auch nicht im Warm-up oder in Phase 2.
 3. **Auftrag zum Handlungsprodukt** (`Handlungsprodukt`): Die SuS werden **an dieser Stelle immer** aufgefordert, ihr Handlungsprodukt im Heft zu erstellen (Abschnitt "Handlungsprodukte"), z. B. "Schreibe Lena eine Antwort und rechne darin …". Ein kleines Bild zum Produkt (z. B. Brief, Karteikarte, Plakat) macht den Auftrag anschaulich. Satzanfänge oder ein Gerüst dürfen aufklappbar dabei sein.
 4. **Eigene Lösung mit Wahl des Wegs** (`WegWahl`): Zwei Knöpfe "Selbst rechnen" und "Mit Lösungsschema".
    - **Selbst rechnen** (Standard): nur der Auftrag "Trage die Ergebnisse aus deinem Heft ein und prüfe sie" und die Ergebnisfelder. Keine Vorstrukturierung. Dazu drei gestufte `Hilfen`.
    - **Mit Lösungsschema**: dieselben Ergebnisse als Lückenrechnung (`rechnung`) mit einer Zeile pro Zwischenergebnis und `SchrittHilfen`. Das Schema nennt die Schritte, verrät aber nicht die Zahlen der Lösung.
    - Beide prüfen dieselben Ergebnisse und melden dieselbe Pflichtaufgabe. Bei beiden gibt es **"Lösungsweg zeigen" erst nach einem Fehlversuch** (`loesungNachFehler`).
 5. **Entscheidung** (wenn die Situation eine verlangt), z. B. per Auswahl "Welches Angebot empfiehlst du?".
-6. **Kriterien des Handlungsprodukts abhaken** ("Ist deine Antwort vollständig?").
+6. **Kriterien des Handlungsprodukts abhaken** ("Ist deine Antwort vollständig?"). Ein Kriterium ist **immer**: unbekannte Begriffe und die Bedeutung aller Abkürzungen der Formel aufschreiben, konkret für das Thema benannt (z. B. „Was bedeuten K_n, r, q und n? r ist die Rate (Rente) …, außerdem: vorschüssig, nachschüssig“).
 7. **"Das hältst du fest"**, sobald die Rechnung gelöst ist: Rückbezug auf die Festlegung bzw. die Versuche aus Phase 2 und der Merkkasten.
 
 Sind mehrere Teilprobleme nötig (z. B. erst K, dann p, dann t), folgen sie auf derselben Seite nacheinander, jedes mit Problem, Rechenbeispiel zum Aufklappen und Wahl des Wegs. Zwischenüberschriften mit `Abschnitt`.
@@ -196,7 +197,7 @@ Jede Lernsituation erfüllt diese Funktionen innerhalb der vier Phasen. **Method
 
 | Funktion | Phase | Beispiele für Methoden (abwechseln!) |
 | --- | --- | --- |
-| Vorwissen abrufen | Warm-up | 2–3 kurze Abrufaufgaben, Ablesen, einfache Umformung |
+| Vorwissen abrufen | Warm-up | mindestens 5 kurze Abrufaufgaben, Ablesen, einfache Umformung |
 | Einstieg mit Spannung | Problem erkennen | Kundenauftrag, Entscheidungsfrage, Rätsel, Widerspruch, Schätzfrage, Chatnachricht |
 | Festlegung / Ausprobieren | Problem erkennen | interaktives Ausprobieren mit Rückmeldung (bevorzugt), Auswahl, Schieberegler, Schätzduell, Rangfolge |
 | Eigene Denkarbeit | Problem lösen | Rechenbeispiel zum Aufklappen, selbst rechnen oder Lösungsschema, Experiment mit Schieberegler, Fallvergleich, Code knacken |
@@ -205,7 +206,7 @@ Jede Lernsituation erfüllt diese Funktionen innerhalb der vier Phasen. **Method
 | Üben und Prüfen | Wissen prüfen und vertiefen | 3 bis 4 Übungsaufgaben: Auswahl mit Fehloptionen, "Wer hat recht?", Rechenaufgabe, umgekehrte oder offene Aufgabe |
 
 Richtwerte für die Dauer:
-- **Kurz (15–25 min):** 1–2 Warm-up-Aufgaben, Problem erkennen, Problem lösen mit knapper Sicherung, drei kurze Übungsaufgaben.
+- **Kurz (15–25 min):** mindestens 5 kurze Warm-up-Aufgaben, Problem erkennen, Problem lösen mit knapper Sicherung, drei kurze Übungsaufgaben.
 - **45 min:** alle Funktionen, Problem lösen etwa 15–20 min, drei bis vier Übungsaufgaben.
 - **90 min:** alle Funktionen, ggf. ein vorab neu zu lernendes Verfahren als eigener Abschnitt in "Problem lösen", aufwendigeres Handlungsprodukt, vier Übungsaufgaben.
 
@@ -238,6 +239,7 @@ Das Handlungsprodukt entsteht in **"Problem lösen"**: Direkt nach dem Problem u
   - **Geschichte** → Comic-Strip in drei Bildern, Plakat
 - **Digital nur ausnahmsweise,** wenn es deutlich besser passt (z. B. eine eigene Aufgabe mit Prüffunktion erstellen und tauschen).
 - Jedes Handlungsprodukt hat einen klaren Auftrag und **2 bis 4 Kriterien**, die die SuS auf derselben Seite abhaken (`Kriterien`, Pflichtaufgabe). Satzanfänge oder ein Gerüst gibt es zum Aufklappen.
+- **Begriffe und Abkürzungen (Pflicht-Kriterium):** Zusätzlich zu den inhaltlichen Kriterien steht in jeder Kriterienliste ein Punkt, der die SuS auffordert, unbekannte Begriffe zu erklären und aufzuschreiben, wofür jede Abkürzung der Formel steht. Die Abkürzungen und Begriffe werden im Kriterium ausdrücklich genannt (z. B. Rentenrechnung: „Unter deinem Aushang steht, was K_n, r, q und n bedeuten (r ist die Rate, auch Rente genannt) und was vorschüssig und nachschüssig heißt“).
 - Über mehrere Lernsituationen hinweg wechselt die **Art** des Produkts (Rechenweg, Brief, Spickzettel, Concept Map, Skizze …).
 
 ## Ruhiges Grunddesign
@@ -352,6 +354,8 @@ Anforderungen an einen guten Kontext:
 
 - [ ] Das Log wurde gelesen, die neue Situation unterscheidet sich von den letzten drei mindestens in Format, Art des Handlungsprodukts und Themenfarbe, und sie ist eingetragen.
 - [ ] Genau vier Phasen in fester Reihenfolge, **jede auf genau einer Seite**: Warm-up, Problem erkennen, Problem lösen, Wissen prüfen und vertiefen.
+- [ ] Das Warm-up hat mindestens 5 Aufgaben, alle in `pflicht`.
+- [ ] Das Lernvideo des Themas (aus den Übungsaufgaben) steht beim Rechenbeispiel zum Aufklappen; gibt es keines, ist es als offener Punkt genannt.
 - [ ] Nichts wird geprüft, bevor es erarbeitet wurde.
 - [ ] Keine Austausch-Phase, keine Stopp-Kästen, kein "Vergleicht eure Wege", kein "So haben andere gedacht".
 - [ ] Seitenansicht mit Startbox (Titelbild, Name, Heft-Bestätigung); "Weiter" erst, wenn alle Pflichtaufgaben der Phase gelöst sind (`pflicht`, `fertig.teil`).
@@ -370,7 +374,7 @@ Anforderungen an einen guten Kontext:
 - [ ] Festlegung bzw. Versuche werden am Ende von "Problem lösen" wieder aufgegriffen.
 - [ ] Mindestens zwei Darstellungen werden verknüpft.
 - [ ] "Problem erkennen" und "Problem lösen" haben je mindestens ein inhaltliches Bild (Graph, Skizze oder Sachbild im Stil des Titelbilds), das nichts von der Lösung verrät; beim Handlungsprodukt zeigt ein kleines Bild, was entstehen soll.
-- [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat 2 bis 4 Kriterien zum Abhaken.
+- [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat 2 bis 4 Kriterien zum Abhaken, dazu das Kriterium „unbekannte Begriffe und Bedeutung der Abkürzungen der Formel aufschreiben“ mit den konkreten Abkürzungen.
 - [ ] "Wissen prüfen und vertiefen" hat mindestens 3, besser 4 passende Übungsaufgaben (Basis bis Erweiterung) und darunter die Abschluss-Buttons.
 - [ ] Ruhiges Grunddesign: einspaltig (auch bei 1920 × 1080), ein Fokus pro Seite, keine verschachtelten Kästen, keine Farbstreifen oder Banner, eine Akzentfarbe, Touch-Ziele mindestens 44 px.
 - [ ] Identität vollständig: Themenfarbe (anders als in den letzten drei Lernsituationen), Symbol und Name als Kennung in der Leiste, eigenes Titelbild in der Startbox, Leitobjekt durch alle Phasen.
