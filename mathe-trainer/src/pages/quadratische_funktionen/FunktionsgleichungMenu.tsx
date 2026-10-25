@@ -19,9 +19,9 @@ const LERNSITUATIONEN: { teil: string; thema: Pick<Thema, 'name' | 'farbe' | 'ic
   },
   {
     teil: 'Lernsituation 2 · Ein Wert und zwei Punkte',
-    thema: { name: 'Lohnen sich 60 Hoodies?', farbe: 'blau', icon: 'fa-shirt' },
+    thema: { name: 'Die Hoodie-Bestellung', farbe: 'beere', icon: 'fa-shirt' },
     path: `${BASIS}/lernsituation-2`,
-    desc: 'Die Schülerfirma will groß bestellen. Lerne das Additionsverfahren kennen, stelle die Gewinnfunktion auf und entscheide, ob sich die Bestellung lohnt.',
+    desc: 'Finn will für die Schülerfirma 60 Hoodies bestellen. Lerne das Additionsverfahren kennen, stelle die Gewinnfunktion aus zwei Vorjahren auf und berate ihn.',
   },
 ]
 
