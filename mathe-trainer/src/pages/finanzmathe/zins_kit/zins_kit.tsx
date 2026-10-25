@@ -1,6 +1,7 @@
 import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import { VideoEmbed } from '../../../components/VideoButton'
 import { fmt } from '../../daten_und_zufall/lernpfad/kit'
+import { usePunkteAufgabe } from '../../lineare_funktionen/lernsituation_kit/punkte'
 import './zins_kit.css'
 
 // Gemeinsame Bausteine der Lernsituationen zur Zins- und Zinseszinsrechnung im ruhigen Grunddesign
@@ -56,6 +57,7 @@ export function Vermutung<C extends string>({
   gespeichert: (w: Festlegung<C>) => ReactNode
 }) {
   const uid = useId()
+  const pt = usePunkteAufgabe({ wert: 5, serie: false })
   if (wert.fest) {
     return (
       <div className="zk-vermutung" data-no-autocheck>
@@ -102,6 +104,7 @@ export function Vermutung<C extends string>({
           disabled={!!optionen && !wert.wahl}
           onClick={() => {
             onChange({ ...wert, fest: true })
+            pt.geloest()
             onFest()
           }}
         >
@@ -115,6 +118,7 @@ export function Vermutung<C extends string>({
 /** Kriterien zum Abhaken; onAlle, sobald alle abgehakt sind */
 export function Kriterien({ items, onAlle }: { items: ReactNode[]; onAlle: () => void }) {
   const [haken, setHaken] = useState(items.map(() => false))
+  const pt = usePunkteAufgabe({ wert: 5, serie: false })
   return (
     <div className="ls-criteria">
       {items.map((c, i) => (
@@ -125,7 +129,10 @@ export function Kriterien({ items, onAlle }: { items: ReactNode[]; onAlle: () =>
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               const neu = haken.map((h, j) => (j === i ? e.target.checked : h))
               setHaken(neu)
-              if (neu.every(Boolean)) onAlle()
+              if (neu.every(Boolean)) {
+                pt.geloest()
+                onAlle()
+              }
             }}
           />{' '}
           <span>{c}</span>

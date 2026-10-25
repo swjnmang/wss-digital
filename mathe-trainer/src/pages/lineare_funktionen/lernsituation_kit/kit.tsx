@@ -3,6 +3,7 @@ import { InlineMath } from 'react-katex'
 import { useTaskTracking } from '../../../hooks/useTaskTracking'
 import { fieldCheckClass } from '../../../utils/fieldCheck'
 import { checkNumber, fmt, pick } from '../../daten_und_zufall/lernpfad/kit'
+import { AufgabePunkteCtx, PUNKTE, usePunkteAufgabe } from './punkte'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './kit.css'
 
@@ -102,6 +103,7 @@ export function CardHead({ title, level }: { title: ReactNode; level?: Level }) 
 /** Gestufte Hilfekarten: Denkanstoß → Strategie → erster Schritt, nacheinander aufdecken */
 export function Hilfen({ steps }: { steps: [ReactNode, ReactNode, ReactNode] }) {
   const [shown, setShown] = useState(0)
+  const punkte = useContext(AufgabePunkteCtx)
   const titles = ['Hilfe 1 · Denkanstoß', 'Hilfe 2 · Strategie', 'Hilfe 3 · Erster Schritt']
   return (
     <div className="ls-help">
@@ -113,8 +115,16 @@ export function Hilfen({ steps }: { steps: [ReactNode, ReactNode, ReactNode] }) 
       ))}
       {shown < 3 && (
         <div>
-          <button type="button" className="bk-btn bk-btn-sm" onClick={() => setShown(shown + 1)}>
-            <i className="fa-solid fa-life-ring" aria-hidden="true" /> {shown === 0 ? 'Hilfe 1 anzeigen' : `Hilfe ${shown + 1} anzeigen`}
+          <button
+            type="button"
+            className="bk-btn bk-btn-sm"
+            onClick={() => {
+              punkte?.hilfe()
+              setShown(shown + 1)
+            }}
+          >
+            <i className="fa-solid fa-life-ring" aria-hidden="true" /> {`Hilfe ${shown + 1} anzeigen`}
+            {punkte && <span className="ls-kosten"> (−{PUNKTE.hilfe} Punkte)</span>}
           </button>
         </div>
       )}
@@ -125,17 +135,26 @@ export function Hilfen({ steps }: { steps: [ReactNode, ReactNode, ReactNode] }) 
 // Hilfen je Rechenschritt: Die SuS wählen den Schritt, bei dem sie hängen; es ist immer nur eine Hilfe offen.
 export function SchrittHilfen({ schritte }: { schritte: { kurz: ReactNode; titel: ReactNode; hilfe: ReactNode }[] }) {
   const [offen, setOffen] = useState<number | null>(null)
+  const [gesehen, setGesehen] = useState<number[]>([])
+  const punkte = useContext(AufgabePunkteCtx)
+  const oeffne = (i: number) => {
+    if (offen !== i && !gesehen.includes(i)) {
+      punkte?.hilfe()
+      setGesehen((g) => [...g, i])
+    }
+    setOffen(offen === i ? null : i)
+  }
   return (
     <div className="ls-help ls-help-schritte">
       <div className="ls-help-wahl">
-        <span>Hilfe zu:</span>
+        <span>Hilfe zu{punkte && <span className="ls-kosten"> (je −{PUNKTE.hilfe} Punkte)</span>}:</span>
         {schritte.map((s, i) => (
           <button
             key={i}
             type="button"
             className={`bk-btn bk-btn-sm ${offen === i ? 'bk-btn-primary' : ''}`}
             aria-pressed={offen === i}
-            onClick={() => setOffen(offen === i ? null : i)}
+            onClick={() => oeffne(i)}
           >
             {s.kurz}
           </button>
@@ -237,6 +256,8 @@ export function CheckCard({
   tracking = NO_TRACKING,
   onSolved,
   loesungNachFehler = false,
+  punkte,
+  profi = false,
 }: {
   title: ReactNode
   level?: Level
@@ -258,17 +279,32 @@ export function CheckCard({
   onSolved?: () => void
   /** Lösungsweg erst anbieten, nachdem einmal falsch geprüft wurde (eigene Rechnung ohne Vorstrukturierung) */
   loesungNachFehler?: boolean
+  /** Punkte statt der vollen Aufgabenpunkte (z. B. 8 für den Weg mit Lösungsschema) */
+  punkte?: number
+  /** Freiwillige Profi-Aufgabe (zählt nicht zum Maximum der Sterne) */
+  profi?: boolean
 }) {
   const uid = useId()
   const [showSolution, setShowSolution] = useState(false)
+  const pt = usePunkteAufgabe({ wert: punkte, profi })
   const { values, marks, status, praise, malFalsch, setValue, blur } = useLiveCheck(
     fields.map((f) => ({
       key: f.key,
       sofort: f.kind === 'select',
       pruefe: (v: string) => (f.kind === 'select' ? (v === '' ? undefined : Number(v) === f.expected) : checkNumber(v, f.expected, f.tol)),
     })),
-    { onSolved, tracking },
+    {
+      onSolved: () => {
+        pt.geloest()
+        onSolved?.()
+      },
+      tracking,
+    },
   )
+  useEffect(() => {
+    if (status === 'no') pt.fehler()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
 
   const inlineKeys = new Set((rechnung ?? []).flatMap((z) => [...z.l, ...z.r]).flatMap((seg) => (typeof seg === 'string' ? [] : [seg.luecke])))
   const listFields = fields.filter((f) => !inlineKeys.has(f.key))
@@ -359,16 +395,20 @@ export function CheckCard({
             type="button"
             className="bk-btn"
             onClick={() => {
-              if (!showSolution) tracking.onHintShown()
+              if (!showSolution) {
+                tracking.onHintShown()
+                if (status !== 'ok') pt.loesung()
+              }
               setShowSolution((s) => !s)
             }}
           >
             <i className="fa-solid fa-route" aria-hidden="true" /> {showSolution ? 'Lösungsweg ausblenden' : 'Lösungsweg zeigen'}
+            {pt.aktiv && !showSolution && status !== 'ok' && <span className="ls-kosten"> (−{PUNKTE.loesungAbzug} Punkte)</span>}
           </button>
         </div>
       )}
       <Feedback status={status} praise={praise} />
-      {help}
+      <AufgabePunkteCtx.Provider value={pt.aktiv ? pt : null}>{help}</AufgabePunkteCtx.Provider>
       {showSolution && solution && (
         <div className="bk-solution lp-solution">
           <div className="bk-solution-title">Lösungsweg</div>
@@ -413,11 +453,14 @@ export function McCard({
   rechnen = false,
   tracking = NO_TRACKING,
   onSolved,
+  profi = false,
 }: {
   title: ReactNode
   level?: Level
   prompt: ReactNode
   options: McOption[]
+  /** Freiwillige Profi-Aufgabe (zählt nicht zum Maximum der Sterne) */
+  profi?: boolean
   /** Auswahl erst nach einer Rechnung: Heft-Hinweis anzeigen */
   rechnen?: boolean
   tracking?: Tracking
@@ -430,6 +473,7 @@ export function McCard({
   const [choice, setChoice] = useState<number | null>(null)
   const [status, setStatus] = useState<'idle' | 'ok' | 'no' | 'empty'>('idle')
   const [praise, setPraise] = useState(PRAISE[0])
+  const pt = usePunkteAufgabe({ profi })
 
   const check = () => {
     if (choice === null) return setStatus('empty')
@@ -437,8 +481,9 @@ export function McCard({
     setStatus(ok ? 'ok' : 'no')
     if (ok) {
       setPraise(pick(PRAISE))
+      pt.geloest()
       onSolved?.()
-    }
+    } else pt.fehler()
     tracking.onCheck(ok)
   }
   const mark = status === 'ok' ? true : status === 'no' ? false : undefined

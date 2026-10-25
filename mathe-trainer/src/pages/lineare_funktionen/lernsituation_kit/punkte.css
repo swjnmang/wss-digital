@@ -1,0 +1,27 @@
+/* Gamification der Lernsituationen: Punkte in der Phasenleiste, kurze Meldungen und Bilanz am Ende. Farben über das Thema. */
+
+.sl-punkte { position: relative; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font: 800 17px/1 var(--font-display); white-space: nowrap; }
+.sl-punkte i { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.sl-punkte-meldungen { position: absolute; top: calc(100% + 6px); right: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; pointer-events: none; z-index: 30; }
+.sl-punkte-meldung { padding: 6px 10px; border-radius: 10px; font: 700 15px/1.3 var(--font-body); white-space: nowrap; box-shadow: 0 2px 6px rgb(0 0 0 / 0.12); animation: sl-meldung 2.2s ease forwards; }
+.sl-punkte-meldung.sl-plus { background: var(--correct-soft); color: var(--correct-ink); border: 1.5px solid var(--correct); }
+.sl-punkte-meldung.sl-minus { background: var(--surface); color: var(--ink-muted); border: 1.5px solid var(--line-strong); }
+@keyframes sl-meldung { 0% { opacity: 0; transform: translateY(-4px); } 10%, 80% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sl-punkte-meldung { animation: none; } }
+@media (max-width: 480px) { .sl-punkte { padding: 0 8px; font-size: 15px; } .sl-punkte-meldung { white-space: normal; width: max-content; max-width: 220px; } }
+
+.sl-bilanz-kopf { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; }
+.sl-bilanz-punkte { font: 800 24px/1.2 var(--font-display); color: var(--primary); }
+.sl-bilanz-punkte i, .sl-bilanz-sterne i.sl-an { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.sl-bilanz-sterne { display: inline-flex; align-items: center; gap: 4px; font-size: 24px; color: var(--line-strong); }
+.sl-bilanz-sterne span { margin-left: 8px; font: 700 17px/1.2 var(--font-body); color: var(--ink); }
+.sl-abzeichen { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 10px; }
+.sl-abzeichen li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1.5px dashed var(--line-strong); border-radius: 12px; color: var(--ink-muted); }
+.sl-abzeichen li i { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 999px; background: var(--surface-sunken); font-size: 18px; }
+.sl-abzeichen li span { display: flex; flex-direction: column; gap: 2px; }
+.sl-abzeichen li small { font-size: 14px; line-height: 1.35; }
+.sl-abzeichen li.sl-an { border: 1.5px solid var(--primary); color: var(--ink); background: var(--primary-soft); }
+.sl-abzeichen li.sl-an i { background: var(--primary); color: #fff; }
+.sl-bilanz .sl-abschnitt-titel i { color: var(--primary); }
+.sl-punkte-regeln { margin: 0; font-size: 16px; line-height: 1.5; color: var(--ink); }
+.sl-punkte-regeln i { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
