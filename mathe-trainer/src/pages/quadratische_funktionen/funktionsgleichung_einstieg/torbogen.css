@@ -30,3 +30,26 @@
 .wm-zeilen li > span { display: flex; flex-wrap: wrap; gap: 0 10px; }
 .wm-zeilen b { flex: none; font: 800 14px/1.3 var(--font-display); color: var(--ink-muted); }
 .wm-ergebnis { overflow-x: auto; color: var(--ink-muted); }
+
+/* Bonus-Spiel Bogen-Kran */
+.tb-spiel { display: flex; flex-direction: column; gap: 12px; outline: none; }
+.tb-spiel-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 800 17px/1.3 var(--font-display); color: var(--primary); }
+.tb-muenzen { display: flex; gap: 6px; font-size: 20px; color: var(--line-strong); }
+.tb-muenzen .tb-muenze-an { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.tb-spiel-frage { margin: 0; font-size: 18px; line-height: 1.6; }
+.tb-kran-wahl { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+.tb-kran-bogen {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 64px; min-width: 0;
+  padding: 8px 12px; border: 2px solid var(--line); border-radius: 10px; background: var(--surface);
+  color: var(--ink); font-size: 16px; text-align: left; cursor: pointer;
+}
+.tb-kran-bogen .katex { white-space: normal; }
+.tb-kran-bogen:disabled { cursor: default; opacity: 0.6; }
+.tb-kran-an { border-color: var(--primary); background: var(--primary-soft); }
+.tb-kran-ok { border-color: var(--correct); background: var(--correct-soft); opacity: 1 !important; }
+.tb-kran-no { border-color: var(--wrong); background: var(--wrong-soft); }
+.tb-kran-nr { font: 800 14px/1.2 var(--font-display); color: var(--ink-muted); }
+.tb-spiel-bild { display: block; width: 100%; height: auto; max-height: 360px; touch-action: manipulation; user-select: none; }
+.tb-steuer .bk-btn { min-height: 48px; }
+.tb-spiel-ende { margin: 0; font: 800 20px/1.4 var(--font-display); color: var(--ink); }
+.tb-spiel-ende i { color: var(--primary); margin-right: 6px; }

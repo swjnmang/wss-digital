@@ -1,28 +1,36 @@
 import { useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, ErklaerungAufklappen, ErklaerungCtx, Hilfen, McCard, SchrittHilfen, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
-import { SeitenLernsituation, type Seite, type Thema } from '../../lineare_funktionen/lernsituation_kit/seiten'
+import { CheckCard, Hilfen, McCard, SchrittHilfen, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
+import {
+  Abschnitt,
+  Aufklappbar,
+  BeispielMitVideo,
+  BonusSpiel,
+  Fehlersuche,
+  Handlungsprodukt,
+  SeitenLernsituation,
+  type Seite,
+  type Thema,
+} from '../../lineare_funktionen/lernsituation_kit/seiten'
+import { Bilanz } from '../../lineare_funktionen/lernsituation_kit/punkte'
+import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import { LERNVIDEO_FALL1 } from '../FunktionsgleichungAufstellen'
+import BogenKran from './BogenKran'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './torbogen.css'
 
-// Lernsituation 1 „Der Torbogen für die Hofeinfahrt“: Funktionsgleichung aus Scheitelpunkt und einem weiteren Punkt (Fall 1, 45 min).
-// Format Kundenauftrag (Gleichungen an die Biegemaschine raten, dann berechnen), Fehlerdetektiv im Check, Lernprodukt analog (Spickzettel).
-// Ruhiges Grunddesign (SeitenLernsituation mit ruhig): eine Spalte, eine Akzentfarbe, pro Seite nur der Auftrag hervorgehoben.
-// Instruktionsreihenfolge: Problem zuerst. Die SuS kennen die Scheitelform y = a(x − x_S)² + y_S und können sie in die allgemeine
-// Form umwandeln. Neu ist, a mit einem zweiten Punkt zu bestimmen.
-// Problem erkennen: Die SuS raten Gleichungen und schicken sie an die Biegemaschine. Jeder Versuch erscheint in der Skizze, die Maschine
-// meldet für linken Pfosten, Mitte und rechten Pfosten, ob die Höhe stimmt. Nach drei Versuchen kommt die Erkenntnis: Raten reicht nicht.
-// Die Versuche ersetzen die Festlegung und werden in Phase 4 wieder aufgegriffen.
-// Seitenansicht (lernsituation_kit/seiten.tsx): Startbox mit Bestätigung, dass alle Rechenschritte im Heft dokumentiert werden,
-// dann eine Aufgabe pro Seite in den vier Phasen. „Weiter“ wird erst frei, wenn die Seite erledigt ist (Aufgabe richtig gelöst,
-// drei Versuche an der Biegemaschine, alle Spickzettel-Punkte abgehakt; Info-Seiten sind frei). Nach unten scrollen ist
-// erlaubt, seitlich nie (geprüft mit 1180 × 820, 1920 × 1080 und 390 × 844).
-// Warm-up (drei Abrufaufgaben) → Problem erkennen (Auftrag, Biegemaschine) → Problem lösen (Aufgabe mit Graph nur mit S und P,
-// Rechenbeispiel auf zwei Seiten, eigene Lückenrechnung) → Festhalten und Prüfen (Merke, Spickzettel, drei Checks, Abschluss).
+// Lernsituation 1 „Der Torbogen für die Hofeinfahrt“: Funktionsgleichung aus Scheitelpunkt und einem weiteren Punkt (Fall 1, ca. 45–60 min).
+// Format Kundenauftrag / Maschine: Die SuS raten Gleichungen und schicken sie an die Biegemaschine (Live-Skizze, die Maschine meldet
+// linken Pfosten, Mitte und rechten Pfosten). Nach drei Versuchen: Raten reicht nicht. Danach berechnen sie die Gleichung.
+// Lernprodukt analog: Auftragsblatt für die Biegemaschine (Skizze, Rechnung in Schritten, beide Formen, Probe mit Q, Abkürzungen).
+// Vorwissen: Scheitelform y = a(x − x_S)² + y_S und Umwandeln in die allgemeine Form. Neu ist, a mit einem zweiten Punkt zu bestimmen.
+// Eine Seite pro Phase (SeitenLernsituation mit ruhig und punkte): Warm-up (5 Aufgaben) → Problem erkennen (Biegemaschine) →
+// Problem lösen (Problem → Beispielrechnung mit Lernvideo → Ergebnisse abgleichen mit Fehlersuche → Auftragsblatt → Das hältst du fest)
+// → Wissen prüfen und vertiefen (vier Übungen, Bonus-Spiel „Bogen-Kran“, Bilanz).
 // Aha: Durch Raten trifft man die Gleichung kaum, mit Scheitelpunkt und einem weiteren Punkt lässt sie sich sicher berechnen.
-// Fehlerhafte Azubi-Pläne kommen erst im Check, wenn die SuS den Weg selbst gerechnet haben.
-// Die Versuche an der Maschine bleiben nur im Seitenzustand (kein Speichern).
+// Fehlerhafte Azubi-Pläne kommen erst in Phase 4, wenn die SuS den Weg selbst gerechnet haben.
+// Die Versuche an der Maschine bleiben nur im Seitenzustand (kein Speichern) und werden in „Das hältst du fest“ wieder aufgegriffen.
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
@@ -305,39 +313,44 @@ function Biegemaschine({ auftrag, versuche, onSenden }: { auftrag: ReactNode; ve
   )
 }
 
-/** Spickzettel (Lernprodukt): erst wenn alle Kriterien abgehakt sind, geht es weiter */
-function Spickzettel({ onFertig }: { onFertig: () => void }) {
-  const KRITERIEN = [
-    'Die Schritte in der richtigen Reihenfolge, jeder mit einem kurzen Merksatz',
-    'Bei jedem Schritt eine Warnung vor einem typischen Fehler',
-    'Ein eigenes Beispiel mit anderen Zahlen',
-    <>Eine kleine Skizze, an der man das Vorzeichen von <M>a</M> erkennt</>,
-  ]
-  const [haken, setHaken] = useState<boolean[]>(KRITERIEN.map(() => false))
+/** Handlungsprodukt: Auftragsblatt für die Kollegin an der Biegemaschine */
+function AuftragsblattBild() {
   return (
-    <div className="lp-ex bk-panel">
-      <p>Gestalte in deinem Heft eine Karteikarte „Gleichung aus dem Scheitelpunkt aufstellen“. Sie darf genau eine Karteikarte füllen. Hake ab, was du schon hast:</p>
-      <div className="ls-criteria">
-        {KRITERIEN.map((c, i) => (
-          <label key={i}>
-            <input
-              type="checkbox"
-              checked={haken[i]}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                const neu = haken.map((v, j) => (j === i ? e.target.checked : v))
-                setHaken(neu)
-                if (neu.every(Boolean)) onFertig()
-              }}
-            />{' '}
-            <span>{c}</span>
-          </label>
+    <div className="zk-bild zk-bild-klein">
+      <svg
+        viewBox="0 0 720 190"
+        role="img"
+        aria-label="Ein Auftragsblatt auf einem Klemmbrett mit der Überschrift Auftrag Torbogen. Links eine kleine Skizze mit Bogen und zwei Pfosten, rechts Zeilen für die Rechnung und die Gleichung für die Maschine."
+      >
+        <rect x="170" y="10" width="380" height="174" rx="10" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
+        <rect x="190" y="26" width="340" height="150" rx="4" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
+        <rect x="320" y="2" width="80" height="20" rx="6" fill="var(--ink-muted)" stroke="var(--ink)" strokeWidth="2" />
+        <text x="360" y="54" textAnchor="middle" fontSize="19" fontWeight="800" fill="var(--ink)">
+          Auftrag Torbogen
+        </text>
+        {/* kleine Skizze */}
+        <line x1="206" x2="320" y1="160" y2="160" stroke="var(--ink)" strokeWidth="2" />
+        <rect x="218" y="122" width="7" height="38" fill="var(--ink-muted)" />
+        <rect x="301" y="122" width="7" height="38" fill="var(--ink-muted)" />
+        <path d="M221 122 Q263 74 305 122" fill="none" stroke="var(--primary)" strokeWidth="5" strokeLinecap="round" />
+        <circle cx="263" cy="98" r="5" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
+        {/* Zeilen */}
+        <text x="340" y="88" fontSize="16" fill="var(--ink)" fontStyle="italic">
+          ① ② ③ ④ …
+        </text>
+        {[104, 124].map((y) => (
+          <line key={y} x1="340" x2="512" y1={y} y2={y} stroke="var(--line-strong)" strokeWidth="2" />
         ))}
-      </div>
+        <text x="340" y="154" fontSize="16" fill="var(--ink)">
+          <tspan fontStyle="italic">An die Maschine:</tspan> y = …
+        </text>
+      </svg>
     </div>
   )
 }
 
-/** Rechenbeispiel für „Problem lösen“: auf zwei Seiten verteilt (Schritte 1–2 und 3–4), damit jede Seite auf einen Bildschirm passt */
+/* ── Rechenbeispiel (andere Zahlen): S(−1 | 5) und P(1 | 3) ─────────────── */
+
 const BSP_AUFGABE = (
   <p>
     Eine Parabel hat den Scheitelpunkt <M>{'S(-1 \\mid 5)'}</M> und geht durch den Punkt <M>{'P(1 \\mid 3)'}</M>. Stelle die Funktionsgleichung in Scheitelform und in
@@ -391,10 +404,26 @@ const BSP_SCHRITTE = [
   },
 ]
 
-/** Plan eines Azubis mit nummerierten Rechenschritten (für den Check) */
-function Bericht({ name, cls, zeilen, ergebnis }: { name: string; cls: string; zeilen: string[][]; ergebnis: string }) {
+/** Lösungsweg für den Torbogen */
+const LOESUNG = (
+  <>
+    <p>① Scheitelpunkt einsetzen:</p>
+    <MB>{'y = a(x - 2)^2 + 3'}</MB>
+    <p>
+      ② Pfosten <M>P</M> einsetzen (<M>{'x = 0'}</M>, <M>{'y = 2'}</M>) und nach <M>a</M> auflösen:
+    </p>
+    <MB>{'\\begin{aligned} 2 &= a \\cdot (0 - 2)^2 + 3 \\\\ 2 &= 4a + 3 && \\mid -3 \\\\ -1 &= 4a && \\mid :4 \\\\ a &= -0{,}25 \\end{aligned}'}</MB>
+    <p>③ Scheitelform:</p>
+    <MB>{'y = -0{,}25(x - 2)^2 + 3'}</MB>
+    <p>④ In die allgemeine Form umwandeln:</p>
+    <MB>{'\\begin{aligned} y &= -0{,}25 \\cdot [(x - 2) \\cdot (x - 2)] + 3 \\\\ y &= -0{,}25 \\cdot [x^2 - 4x + 4] + 3 \\\\ y &= -0{,}25x^2 + x - 1 + 3 \\\\ y &= -0{,}25x^2 + x + 2 \\end{aligned}'}</MB>
+  </>
+)
+
+/** Plan eines Azubis mit nummerierten Rechenschritten (für „Wer hat recht?“) */
+function Bericht({ name, zeilen, ergebnis }: { name: string; zeilen: string[][]; ergebnis: string }) {
   return (
-    <div className={`wm-bericht ${cls}`}>
+    <div className="wm-bericht">
       <div className="wm-bericht-name">Plan von {name}</div>
       <ul className="wm-zeilen">
         {zeilen.map((z, i) => (
@@ -421,102 +450,133 @@ const SCHRITTE = ['Schritt 1 (Scheitel einsetzen)', 'Schritt 2 (a berechnen)', '
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
-export default function TorbogenEinstieg({
-  erklaerung,
-  onBack,
-  onPractice,
-  onNext,
-}: {
-  erklaerung: ReactNode
-  onBack: () => void
-  onPractice: () => void
-  onNext: () => void
-}) {
+export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBack: () => void; onPractice: () => void; onNext: () => void }) {
   const [versuche, setVersuche] = useState<Versuch[]>([])
+  const [geloest, setGeloest] = useState(false)
+  const [fehler, setFehler] = useState(false)
+  const [uebungen, setUebungen] = useState<string[]>([])
+  const uebung = (k: string, fertig: () => void) => () => {
+    fertig()
+    setUebungen((u) => (u.includes(k) ? u : [...u, k]))
+  }
 
   const seiten: Seite[] = [
     {
       art: 'start',
-      titel: 'Aufwärmen 1: Scheitelpunkt ablesen',
+      titel: 'Aufwärmen',
+      pflicht: ['a', 'b', 'c', 'd', 'e'],
       inhalt: (fertig) => (
-        <McCard
-          onSolved={fertig}
-          title="a) Scheitelpunkt ablesen"
-          prompt={
-            <p>
-              Welchen Scheitelpunkt hat die Parabel <M>{'y = -2(x - 1)^2 + 4'}</M>?
-            </p>
-          }
-          options={[
-            {
-              text: <M>{'S(-1 \\mid 4)'}</M>,
-              feedback: (
-                <>
-                  In der Klammer steht <M>{'x - 1'}</M>. Das Minus gehört zur Formel, der Scheitel liegt also bei <M>{'x = 1'}</M>.
-                </>
-              ),
-            },
-            {
-              text: <M>{'S(4 \\mid 1)'}</M>,
-              feedback: <>Die Koordinaten sind vertauscht. Die Zahl in der Klammer gehört zum x-Wert, die Zahl hinten zum y-Wert.</>,
-            },
-            {
-              text: <M>{'S(1 \\mid 4)'}</M>,
-              correct: true,
-              feedback: (
-                <>
-                  In der Scheitelform <M>{'y = a(x - x_S)^2 + y_S'}</M> steht <M>{'x_S'}</M> mit umgekehrtem Vorzeichen in der Klammer.
-                </>
-              ),
-            },
-            {
-              text: <M>{'S(-2 \\mid 4)'}</M>,
-              feedback: (
-                <>
-                  Die <M>{'-2'}</M> vor der Klammer ist der Streckfaktor <M>a</M>. Sie sagt, wie steil die Parabel ist, nicht wo der Scheitel liegt.
-                </>
-              ),
-            },
-          ]}
-        />
-      ),
-    },
-    {
-      art: 'start',
-      titel: <>Aufwärmen 2: Gleichung nach <M>a</M> lösen</>,
-      inhalt: (fertig) => (
-        <CheckCard
-          onSolved={fertig}
-          title={<>b) Gleichung nach <M>a</M> lösen</>}
-          prompt={
-            <p>
-              Löse die Gleichung <M>{'7 = 4a + 3'}</M>.
-            </p>
-          }
-          fields={[{ kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: 1 }]}
-          solution={<MB>{'\\begin{aligned} 7 &= 4a + 3 && \\mid -3 \\\\ 4 &= 4a && \\mid :4 \\\\ a &= 1 \\end{aligned}'}</MB>}
-        />
-      ),
-    },
-    {
-      art: 'start',
-      titel: 'Aufwärmen 3: Klammer ausmultiplizieren',
-      inhalt: (fertig) => (
-        <CheckCard
-          onSolved={fertig}
-          title="c) Klammer ausmultiplizieren"
-          prompt={
-            <p>
-              Schreibe <M>{'(x - 3)^2'}</M> ohne Klammer als <M>{'x^2 + bx + c'}</M>.
-            </p>
-          }
-          fieldsRow
-          fields={[
-            { kind: 'num', key: 'b', label: <M>{'b ='}</M>, expected: -6 },
-            { kind: 'num', key: 'c', label: <M>{'c ='}</M>, expected: 9 },
-          ]}
-          solution={<MB>{'(x - 3)^2 = (x - 3)(x - 3) = x^2 - 3x - 3x + 9 = x^2 - 6x + 9'}</MB>}
-        />
+        <>
+          <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich für den Torbogen.</p>
+          <McCard
+            onSolved={fertig.teil('a')}
+            title="a) Scheitelpunkt ablesen"
+            prompt={
+              <p>
+                Welchen Scheitelpunkt hat die Parabel <M>{'y = -2(x - 1)^2 + 4'}</M>?
+              </p>
+            }
+            options={[
+              {
+                text: <M>{'S(-1 \\mid 4)'}</M>,
+                feedback: (
+                  <>
+                    In der Klammer steht <M>{'x - 1'}</M>. Das Minus gehört zur Formel, der Scheitel liegt also bei <M>{'x = 1'}</M>.
+                  </>
+                ),
+              },
+              {
+                text: <M>{'S(4 \\mid 1)'}</M>,
+                feedback: <>Die Koordinaten sind vertauscht. Die Zahl in der Klammer gehört zum x-Wert, die Zahl hinten zum y-Wert.</>,
+              },
+              {
+                text: <M>{'S(1 \\mid 4)'}</M>,
+                correct: true,
+                feedback: (
+                  <>
+                    In der Scheitelform <M>{'y = a(x - x_S)^2 + y_S'}</M> steht <M>{'x_S'}</M> mit umgekehrtem Vorzeichen in der Klammer.
+                  </>
+                ),
+              },
+              {
+                text: <M>{'S(-2 \\mid 4)'}</M>,
+                feedback: (
+                  <>
+                    Die <M>{'-2'}</M> vor der Klammer ist der Formfaktor <M>a</M>. Er sagt, wie steil die Parabel ist, nicht wo der Scheitel liegt.
+                  </>
+                ),
+              },
+            ]}
+          />
+          <CheckCard
+            onSolved={fertig.teil('b')}
+            title="b) Scheitelform aufschreiben"
+            rechnen={false}
+            prompt={
+              <p>
+                Eine Parabel hat den Scheitelpunkt <M>{'S(3 \\mid -1)'}</M>. Setze ihn in die Scheitelform <M>{'y = a(x - x_S)^2 + y_S'}</M> ein. Das <M>a</M> bleibt als
+                Buchstabe stehen.
+              </p>
+            }
+            rechnung={[{ l: ['y'], r: ['a \\cdot (x -', { luecke: 'xs' }, ')^2 +', { luecke: 'ys' }] }]}
+            fields={[
+              { kind: 'num', key: 'xs', label: 'x-Wert in der Klammer', expected: 3 },
+              { kind: 'num', key: 'ys', label: 'Zahl am Ende', expected: -1 },
+            ]}
+            solution={
+              <>
+                <MB>{'y = a(x - 3)^2 + (-1) = a(x - 3)^2 - 1'}</MB>
+                <p>
+                  <M>{'x_S = 3'}</M> kommt in die Klammer, <M>{'y_S = -1'}</M> ans Ende.
+                </p>
+              </>
+            }
+          />
+          <CheckCard
+            onSolved={fertig.teil('c')}
+            title="c) Klammer mit Quadrat ausrechnen"
+            prompt={<p>Rechne aus. Achte auf das Vorzeichen.</p>}
+            fieldsRow
+            fields={[
+              { kind: 'num', key: 'q1', label: <M>{'(0 - 2)^2 ='}</M>, expected: 4 },
+              { kind: 'num', key: 'q2', label: <M>{'(1 - 4)^2 ='}</M>, expected: 9 },
+            ]}
+            solution={<MB>{'(0 - 2)^2 = (-2) \\cdot (-2) = 4 \\qquad (1 - 4)^2 = (-3) \\cdot (-3) = 9'}</MB>}
+          />
+          <CheckCard
+            onSolved={fertig.teil('d')}
+            title={<>d) Gleichung nach <M>a</M> lösen</>}
+            prompt={
+              <p>
+                Löse die Gleichung <M>{'7 = 4a + 3'}</M>.
+              </p>
+            }
+            fields={[{ kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: 1 }]}
+            solution={<MB>{'\\begin{aligned} 7 &= 4a + 3 && \\mid -3 \\\\ 4 &= 4a && \\mid :4 \\\\ a &= 1 \\end{aligned}'}</MB>}
+          />
+          <CheckCard
+            onSolved={fertig.teil('e')}
+            title="e) Klammer ausmultiplizieren"
+            prompt={
+              <p>
+                Schreibe <M>{'-0{,}5 \\cdot (x - 3)^2'}</M> ohne Klammer. Löse zuerst das Quadrat auf und multipliziere dann jeden Summanden mit <M>{'-0{,}5'}</M>.
+              </p>
+            }
+            rechnung={[
+              { l: ['(x - 3)^2'], r: ['x^2', { luecke: 'b1' }, 'x +', { luecke: 'c1' }] },
+              { l: ['-0{,}5 \\cdot (x - 3)^2'], r: ['-0{,}5x^2 +', { luecke: 'b2' }, 'x +', { luecke: 'c2' }] },
+            ]}
+            fields={[
+              { kind: 'num', key: 'b1', label: 'Zahl vor x', expected: -6 },
+              { kind: 'num', key: 'c1', label: 'Zahl ohne x', expected: 9 },
+              { kind: 'num', key: 'b2', label: 'Zahl vor x', expected: 3 },
+              { kind: 'num', key: 'c2', label: 'Zahl ohne x', expected: -4.5 },
+            ]}
+            solution={
+              <MB>{'\\begin{aligned} (x - 3)^2 &= (x - 3)(x - 3) = x^2 - 6x + 9 \\\\ -0{,}5 \\cdot (x^2 - 6x + 9) &= -0{,}5x^2 + 3x - 4{,}5 \\end{aligned}'}</MB>
+            }
+          />
+        </>
       ),
     },
     {
@@ -536,389 +596,446 @@ export default function TorbogenEinstieg({
     },
     {
       art: 'loesen',
-      titel: 'Deine Aufgabe',
-      frei: true,
-      inhalt: () => (
+      titel: 'Die Gleichung für die Biegemaschine',
+      pflicht: ['rechnung', 'produkt'],
+      inhalt: (fertig) => (
         <>
           <div className="sl-fokus">
-            <p className="sl-fokus-titel">Stelle die Funktionsgleichung auf</p>
+            <p className="sl-fokus-titel">Deine Aufgabe: Berechne die Gleichung für die Biegemaschine</p>
             <p>
-              Gegeben sind der Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> und der Pfosten <M>{'P(0 \\mid 2)'}</M>. Stelle die Funktionsgleichung zuerst in{' '}
-              <strong>Scheitelform</strong> <M>{'y = a(x - x_S)^2 + y_S'}</M> und anschließend in <strong>allgemeiner Form</strong> <M>{'y = ax^2 + bx + c'}</M> auf.
+              Gegeben sind der Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> und der linke Pfosten <M>{'P(0 \\mid 2)'}</M>. Stelle in deinem Heft die Funktionsgleichung des Bogens
+              zuerst in <strong>Scheitelform</strong> <M>{'y = a(x - x_S)^2 + y_S'}</M> und dann in <strong>allgemeiner Form</strong> <M>{'y = ax^2 + bx + c'}</M> auf. Die
+              allgemeine Form schickst du an die Maschine.
             </p>
           </div>
           <div className="tb-bild-klein">
             <TorBild nurP gross />
           </div>
-          <p className="sl-hinweis">Wie das funktioniert, siehst du auf der nächsten Seite an einem Rechenbeispiel. Danach rechnest du selbst.</p>
-        </>
-      ),
-    },
-    {
-      art: 'loesen',
-      titel: "So geht's: Rechenbeispiel (Schritte 1 und 2)",
-      frei: true,
-      inhalt: () => <Beispiel offen title={<>Scheitelpunkt <M>{'S(-1 \\mid 5)'}</M> und Punkt <M>{'P(1 \\mid 3)'}</M></>} aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE.slice(0, 2)} />,
-    },
-    {
-      art: 'loesen',
-      titel: "So geht's: Rechenbeispiel (Schritte 3 und 4)",
-      frei: true,
-      inhalt: () => (
-        <>
-          <Beispiel offen title={<>Fortsetzung: <M>{'S(-1 \\mid 5)'}</M> und <M>{'P(1 \\mid 3)'}</M></>} aufgabe={<p>Aus Schritt 2 kennst du schon <M>{'a = -0{,}5'}</M>.</p>} steps={BSP_SCHRITTE.slice(2)} ab={3} />
-          <ErklaerungAufklappen label="Noch ein Beispiel und das Erklärvideo ansehen" />
-        </>
-      ),
-    },
-    {
-      art: 'loesen',
-      titel: 'Jetzt du: die Gleichung für die Biegemaschine',
-      inhalt: (fertig) => (
-        <CheckCard
-          onSolved={fertig}
-          title="Stelle die Funktionsgleichung auf"
-          prompt={
-            <p>
-              Gegeben: <M>{'S(2 \\mid 3)'}</M> und <M>{'P(0 \\mid 2)'}</M>. Rechne in den Schritten des Rechenbeispiels und fülle die Lücken aus.
-            </p>
-          }
-          rechnung={[
-            { l: ['y'], r: ['a \\cdot (x -', { luecke: 'xs' }, ')^2 +', { luecke: 'ys' }], u: '\\text{① } S \\text{ einsetzen}' },
-            { l: ['2'], r: ['a \\cdot (0 - 2)^2 + 3'], u: '\\text{② } P \\text{ einsetzen}' },
-            { l: ['2'], r: [{ luecke: 'q' }, '\\cdot a + 3'], u: '\\mid -3 \\quad \\mid :4' },
-            { l: ['a'], r: [{ luecke: 'a1' }], u: '\\text{Formfaktor } a' },
-            { l: ['y'], r: [{ luecke: 'as' }, '\\cdot (x - 2)^2 + 3'], u: '\\text{③ Scheitelform}' },
-            { l: ['y'], r: [{ luecke: 'a2' }, 'x^2 +', { luecke: 'b' }, 'x +', { luecke: 'c' }], u: '\\text{④ allg. Form}' },
-          ]}
-          fields={[
-            { kind: 'num', key: 'xs', label: 'x-Wert des Scheitels', expected: 2 },
-            { kind: 'num', key: 'ys', label: 'y-Wert des Scheitels', expected: 3 },
-            { kind: 'num', key: 'q', label: 'Zahl vor a', expected: 4 },
-            { kind: 'num', key: 'a1', label: 'Formfaktor a', expected: A_SOLL },
-            { kind: 'num', key: 'as', label: 'a in der Scheitelform', expected: A_SOLL },
-            { kind: 'num', key: 'a2', label: 'Zahl vor x²', expected: A_SOLL },
-            { kind: 'num', key: 'b', label: 'Zahl vor x', expected: 1 },
-            { kind: 'num', key: 'c', label: 'Zahl ohne x', expected: 2 },
-          ]}
-          solution={
-            <>
-              <p>① Scheitelpunkt einsetzen:</p>
-              <MB>{'y = a(x - 2)^2 + 3'}</MB>
-              <p>
-                ② Pfosten <M>P</M> einsetzen (<M>{'x = 0'}</M>, <M>{'y = 2'}</M>) und nach <M>a</M> auflösen:
-              </p>
-              <MB>{'\\begin{aligned} 2 &= a \\cdot (0 - 2)^2 + 3 \\\\ 2 &= 4a + 3 && \\mid -3 \\\\ -1 &= 4a && \\mid :4 \\\\ a &= -0{,}25 \\end{aligned}'}</MB>
-              <p>③ Scheitelform:</p>
-              <MB>{'y = -0{,}25(x - 2)^2 + 3'}</MB>
-              <p>④ In die allgemeine Form umwandeln:</p>
-              <MB>{'\\begin{aligned} y &= -0{,}25 \\cdot [(x - 2) \\cdot (x - 2)] + 3 \\\\ y &= -0{,}25 \\cdot [x^2 - 4x + 4] + 3 \\\\ y &= -0{,}25x^2 + x - 1 + 3 \\\\ y &= -0{,}25x^2 + x + 2 \\end{aligned}'}</MB>
-            </>
-          }
-          help={
-            <SchrittHilfen
-              schritte={[
-                {
-                  kurz: '①',
-                  titel: 'Scheitelpunkt einsetzen',
-                  hilfe: (
-                    <>
-                      Aus <M>{'S(2 \\mid 3)'}</M> liest du <M>{'x_S = 2'}</M> und <M>{'y_S = 3'}</M> ab. In <M>{'y = a(x - x_S)^2 + y_S'}</M> kommt <M>{'x_S'}</M> in die Klammer und{' '}
-                      <M>{'y_S'}</M> ans Ende. Das <M>a</M> kennst du noch nicht, es bleibt als Buchstabe stehen.
-                    </>
-                  ),
-                },
-                {
-                  kurz: '②',
-                  titel: 'Punkt P einsetzen',
-                  hilfe: (
-                    <>
-                      Vom Pfosten <M>{'P(0 \\mid 2)'}</M> setzt du <M>{'x = 0'}</M> in die Klammer und <M>{'y = 2'}</M> links ein. Rechne die Klammer aus: <M>{'0 - 2 = -2'}</M> und{' '}
-                      <M>{'(-2)^2 = (-2) \\cdot (-2)'}</M>. Ein Quadrat ist nie negativ. Das Ergebnis ist die Zahl vor <M>a</M>.
-                    </>
-                  ),
-                },
-                {
-                  kurz: <M>a</M>,
-                  titel: <>Formfaktor <M>a</M> berechnen</>,
-                  hilfe: (
-                    <>
-                      Jetzt ist nur noch <M>a</M> unbekannt. Löse wie im Warm-up: erst auf beiden Seiten <M>{'-3'}</M>, dann durch die Zahl vor <M>a</M> teilen. Zur Kontrolle: Der Bogen ist
-                      nach unten geöffnet, also muss <M>a</M> negativ sein.
-                    </>
-                  ),
-                },
-                {
-                  kurz: '③',
-                  titel: 'Scheitelform',
-                  hilfe: (
-                    <>
-                      Das berechnete <M>a</M> ersetzt den Buchstaben <M>a</M> in <M>{'y = a(x - 2)^2 + 3'}</M>. Der Rest der Gleichung bleibt gleich.
-                    </>
-                  ),
-                },
-                {
-                  kurz: '④',
-                  titel: 'allgemeine Form',
-                  hilfe: (
-                    <>
-                      Zuerst die Klammer ausmultiplizieren: <M>{'(x - 2)^2 = (x - 2)(x - 2) = x^2 - 4x + 4'}</M>. Dann jeden der drei Summanden mal <M>a</M> nehmen und zum Schluss{' '}
-                      <M>{'+3'}</M> zur Zahl ohne <M>x</M> addieren.
-                    </>
-                  ),
-                },
-              ]}
-            />
-          }
-        />
-      ),
-    },
-    {
-      art: 'sichern',
-      titel: 'Das hältst du fest',
-      frei: true,
-      inhalt: () => (
-        <>
-          <Rueckbezug versuche={versuche} />
-          <Merke title="Funktionsgleichung aus Scheitelpunkt und einem Punkt (Fall 1)">
-              <ol>
-                <li>
-                  Scheitelpunkt in die Scheitelform einsetzen: <M>{'y = a(x - x_S)^2 + y_S'}</M>.
-                </li>
-                <li>
-                  Den zweiten Punkt für <M>x</M> und <M>y</M> einsetzen und nach <M>a</M> auflösen.
-                </li>
-                <li>
-                  In die allgemeine Form <M>{'y = ax^2 + bx + c'}</M> umwandeln: binomische Formel, dann jeden Summanden mit <M>a</M> multiplizieren.
-                </li>
-              </ol>
-          </Merke>
-        </>
-      ),
-    },
-    {
-      art: 'sichern',
-      titel: 'Dein Spickzettel (Lernprodukt)',
-      bedingung: 'Hake alle vier Punkte ab, sobald sie auf deinem Spickzettel stehen.',
-      inhalt: (fertig) => <Spickzettel onFertig={fertig} />,
-    },
-    {
-      art: 'sichern',
-      titel: 'Check 1: Qualitätskontrolle',
-      inhalt: (fertig) => (
-        <CheckCard
-          onSolved={fertig}
-          title="Wo stecken die Fehler?"
-          level="standard"
-          rechnen={false}
-          prompt={
-            <>
-              <p>Beide Pläne sind falsch. Wähle jeweils den Schritt mit dem Fehler und beschreibe den Fehler im Heft.</p>
-              <div className="wm-berichte wm-berichte-2">
-                <Bericht
-                  name="Jonas"
-                  cls="wm-bericht-a"
-                  zeilen={[
-                    ['y = a(x + 2)^2 + 3'],
-                    ['2 = a(0 + 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'],
-                    ['y = -0{,}25(x^2 + 4x + 4) + 3', '= -0{,}25x^2 - x + 2'],
-                  ]}
-                  ergebnis="y = -0{,}25x^2 - x + 2"
-                />
-                <Bericht
-                  name="Mara"
-                  cls="wm-bericht-c"
-                  zeilen={[
-                    ['y = a(x - 2)^2 + 3'],
-                    ['2 = a(0 - 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'],
-                    ['y = -0{,}25x^2 - 4x + 4 + 3', '= -0{,}25x^2 - 4x + 7'],
-                  ]}
-                  ergebnis="y = -0{,}25x^2 - 4x + 7"
-                />
-              </div>
-            </>
-          }
-          fieldsRow
-          fields={[
-              { kind: 'select', key: 'j', label: 'Fehler bei Jonas', options: SCHRITTE, expected: 0 },
-              { kind: 'select', key: 'm', label: 'Fehler bei Mara', options: SCHRITTE, expected: 2 },
-            ]}
-          solution={
-              <>
+          <BeispielMitVideo video={`https://www.youtube.com/watch?v=${LERNVIDEO_FALL1}`} videoTitel="Lernvideo: Funktionsgleichung aus Scheitelpunkt und Punkt aufstellen">
+            <Beispiel offen title={<>Scheitelpunkt <M>{'S(-1 \\mid 5)'}</M> und Punkt <M>{'P(1 \\mid 3)'}</M></>} aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE} />
+          </BeispielMitVideo>
+          <Abschnitt titel="Vergleiche deine Ergebnisse">
+            <CheckCard
+              onSolved={() => {
+                fertig.teil('rechnung')()
+                setGeloest(true)
+              }}
+              onFehler={() => setFehler(true)}
+              title="Die Gleichung des Torbogens"
+              rechnen={false}
+              prompt={
                 <p>
-                  <strong>Jonas, Schritt 1:</strong> Bei <M>{'S(2 \\mid 3)'}</M> heißt die Klammer <M>{'(x - 2)'}</M>, nicht <M>{'(x + 2)'}</M>. Seine Probe mit <M>P</M> stimmt trotzdem,
-                  weil er <M>P</M> zum Rechnen benutzt hat. Die Probe mit <M>Q</M> deckt den Fehler auf: Bei <M>{'x = 4'}</M> ergibt sich <M>{'y = -6'}</M> statt <M>{'y = 2'}</M>.
+                  Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt. Wie lautet die Gleichung des Bogens in Scheitelform, und welche
+                  Gleichung in allgemeiner Form schickst du an die Biegemaschine?
                 </p>
-                <p>
-                  <strong>Mara, Schritt 3:</strong> Sie hat nur <M>{'x^2'}</M> mit <M>{'-0{,}25'}</M> multipliziert. Richtig ist{' '}
-                  <M>{'-0{,}25(x^2 - 4x + 4) + 3 = -0{,}25x^2 + x - 1 + 3'}</M>.
-                </p>
-              </>
-            }
-        />
-      ),
-    },
-    {
-      art: 'sichern',
-      titel: 'Check 2: Gleichung aufstellen',
-      inhalt: (fertig) => (
-        <CheckCard
-          onSolved={fertig}
-          title="Check 2: Gleichung aufstellen"
-          level="standard"
-          prompt={
-            <p>
-              Eine Parabel hat den Scheitelpunkt <M>{'S(1 \\mid -2)'}</M> und geht durch <M>{'P(3 \\mid 6)'}</M>. Bestimme <M>a</M> und die allgemeine Form{' '}
-              <M>{'y = ax^2 + bx + c'}</M>.
+              }
+              rechnung={[
+                { l: ['y'], r: [{ luecke: 'as' }, '\\cdot (x - 2)^2 + 3'], u: '\\text{Scheitelform}' },
+                { l: ['y'], r: [{ luecke: 'a' }, 'x^2 +', { luecke: 'b' }, 'x +', { luecke: 'c' }], u: '\\text{allg. Form}' },
+              ]}
+              fields={[
+                { kind: 'num', key: 'as', label: 'Formfaktor a in der Scheitelform', expected: A_SOLL },
+                { kind: 'num', key: 'a', label: 'Zahl vor x²', expected: A_SOLL },
+                { kind: 'num', key: 'b', label: 'Zahl vor x', expected: 1 },
+                { kind: 'num', key: 'c', label: 'Zahl ohne x', expected: 2 },
+              ]}
+              loesungNachFehler
+              solution={LOESUNG}
+              help={
+                <Hilfen
+                  steps={[
+                    <>Gehe vor wie im Rechenbeispiel: erst den Scheitelpunkt einsetzen, dann den Pfosten, dann umwandeln.</>,
+                    <>
+                      Ansatz: <M>{'y = a(x - 2)^2 + 3'}</M>. Setze vom Pfosten <M>{'x = 0'}</M> und <M>{'y = 2'}</M> ein und löse nach <M>a</M> auf.
+                    </>,
+                    <>
+                      <M>{'2 = a \\cdot (0 - 2)^2 + 3 = 4a + 3'}</M>. Danach <M>{'(x - 2)^2 = x^2 - 4x + 4'}</M> und jeden Summanden mit <M>a</M> multiplizieren.
+                    </>,
+                  ]}
+                />
+              }
+            />
+            <Fehlersuche fehler={fehler}>
+              <CheckCard
+                title="Fehlersuche: Wo steckt der Fehler?"
+                rechnen={false}
+                ohnePunkte
+                prompt={<p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>}
+                rechnung={[
+                  { l: ['2'], r: [{ luecke: 'q' }, '\\cdot a + 3'], u: '\\text{②}' },
+                  { l: [{ luecke: 'm' }], r: ['4a'], u: '\\mid -3' },
+                  { l: ['(x - 2)^2'], r: ['x^2 +', { luecke: 'b1' }, 'x +', { luecke: 'c1' }], u: '\\text{④}' },
+                  { l: ['-0{,}25 \\cdot (x^2 - 4x + 4)'], r: ['-0{,}25x^2 +', { luecke: 'b2' }, 'x +', { luecke: 'c2' }], u: '\\text{mal } a' },
+                ]}
+                fields={[
+                  { kind: 'num', key: 'q', label: 'Zahl vor a', expected: 4 },
+                  { kind: 'num', key: 'm', label: 'linke Seite nach −3', expected: -1 },
+                  { kind: 'num', key: 'b1', label: 'Zahl vor x', expected: -4 },
+                  { kind: 'num', key: 'c1', label: 'Zahl ohne x', expected: 4 },
+                  { kind: 'num', key: 'b2', label: 'Zahl vor x', expected: 1 },
+                  { kind: 'num', key: 'c2', label: 'Zahl ohne x', expected: -1 },
+                ]}
+              />
+            </Fehlersuche>
+          </Abschnitt>
+          <Handlungsprodukt titel="Auftragsblatt für die Biegemaschine">
+            <AuftragsblattBild />
+            <p className="sl-text">
+              Deine Kollegin an der Biegemaschine will nachvollziehen, wie du auf die Gleichung kommst. Gestalte in deinem Heft ein Auftragsblatt: Skizze der Einfahrt, deine
+              Rechnung in nummerierten Schritten, die Gleichung für die Maschine und eine Probe.
             </p>
-          }
-          fieldsRow
-          fields={[
-            { kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: 2 },
-            { kind: 'num', key: 'b', label: <M>{'b ='}</M>, expected: -4 },
-            { kind: 'num', key: 'c', label: <M>{'c ='}</M>, expected: 0 },
-          ]}
-          solution={
-            <>
-              <MB>{'\\begin{aligned} 6 &= a(3 - 1)^2 - 2 \\\\ 6 &= 4a - 2 && \\mid +2 \\\\ 8 &= 4a && \\mid :4 \\\\ a &= 2 \\end{aligned}'}</MB>
-              <MB>{'\\begin{aligned} y &= 2(x - 1)^2 - 2 \\\\ &= 2(x^2 - 2x + 1) - 2 \\\\ &= 2x^2 - 4x \\end{aligned}'}</MB>
-              <p>
-                Es ist also <M>{'c = 0'}</M>.
-              </p>
-            </>
-          }
-          help={
-            <Hilfen
-              steps={[
-                <>Gehe wie auf deinem Spickzettel vor: erst der Scheitelpunkt, dann der Punkt <M>P</M>, dann umwandeln.</>,
+            <Aufklappbar label="Satzanfänge ansehen" icon="fa-comment-dots">
+              <ul className="zk-liste">
+                <li>„Auftrag Torbogen: Die Einfahrt ist … breit, die Pfosten sind … hoch, die Mitte …“</li>
+                <li>„① Ich setze den Scheitelpunkt in die Scheitelform ein: …“</li>
+                <li>„② Ich setze den Pfosten P ein und erhalte a = …“</li>
+                <li>„③ Scheitelform: …  ④ An die Maschine: y = …“</li>
+                <li>„Probe mit dem rechten Pfosten Q(4 | 2): …“</li>
+              </ul>
+            </Aufklappbar>
+          </Handlungsprodukt>
+          <Abschnitt titel="Ist dein Auftragsblatt vollständig?">
+            <Kriterien
+              onAlle={fertig.teil('produkt')}
+              items={[
                 <>
-                  Ansatz: <M>{'y = a(x - 1)^2 - 2'}</M>. Setze <M>{'x = 3'}</M> und <M>{'y = 6'}</M> ein.
+                  Eine Skizze der Einfahrt im Koordinatensystem mit <M>{'S(2 \\mid 3)'}</M>, <M>{'P(0 \\mid 2)'}</M> und <M>{'Q(4 \\mid 2)'}</M>
+                </>,
+                <>Die Rechnung in nummerierten Schritten: Scheitelpunkt einsetzen, Pfosten einsetzen und <M>a</M> berechnen, in die allgemeine Form umwandeln</>,
+                <>
+                  Die Gleichung in Scheitelform und in allgemeiner Form, dazu die Probe mit dem rechten Pfosten: <M>{'x = 4'}</M> einsetzen ergibt <M>{'y = 2'}</M>
                 </>,
                 <>
-                  <M>{'6 = 4a - 2'}</M> ergibt <M>{'a = 2'}</M>. Danach <M>{'2(x^2 - 2x + 1) - 2'}</M> ausmultiplizieren.
+                  Unter deinem Auftragsblatt steht, wofür die Abkürzungen stehen: <M>S</M> (Scheitelpunkt, höchster Punkt des Bogens), <M>{'x_S'}</M> und <M>{'y_S'}</M>{' '}
+                  (Koordinaten des Scheitelpunkts), <M>a</M> (Formfaktor: Vorzeichen und Steilheit), <M>b</M> und <M>c</M> (Zahl vor <M>x</M> und Zahl ohne <M>x</M> in der
+                  allgemeinen Form). Außerdem erklärst du die Begriffe Scheitelform und allgemeine Form und alle anderen Wörter, die für dich neu waren.
                 </>,
               ]}
             />
-          }
-        />
+          </Abschnitt>
+          {geloest && (
+            <Abschnitt titel="Das hältst du fest">
+              <Rueckbezug versuche={versuche} />
+              <Merke title="Funktionsgleichung aus Scheitelpunkt und einem Punkt (Fall 1)">
+                <ol>
+                  <li>
+                    Scheitelpunkt in die Scheitelform einsetzen: <M>{'y = a(x - x_S)^2 + y_S'}</M>.
+                  </li>
+                  <li>
+                    Den zweiten Punkt für <M>x</M> und <M>y</M> einsetzen und nach <M>a</M> auflösen.
+                  </li>
+                  <li>
+                    In die allgemeine Form <M>{'y = ax^2 + bx + c'}</M> umwandeln: Klammer auflösen, dann jeden Summanden mit <M>a</M> multiplizieren.
+                  </li>
+                </ol>
+                <p>
+                  Ist <M>a</M> negativ, ist die Parabel nach unten geöffnet (wie ein Torbogen). Je größer der Betrag von <M>a</M>, desto schmaler und steiler die Parabel.
+                </p>
+              </Merke>
+            </Abschnitt>
+          )}
+        </>
       ),
     },
     {
       art: 'sichern',
-      titel: 'Check 3: Sonderwunsch',
+      titel: 'Übungsaufgaben',
+      pflicht: ['1', '2', '3'],
       inhalt: (fertig) => (
-        <CheckCard
-          onSolved={fertig}
-          title="Check 3: Sonderwunsch, der Bogen soll höher werden"
-          level="erweiterung"
-          prompt={
-            <>
-              <p>
-                Familie Berger ruft an: Der Bogen soll in der Mitte 3,5&nbsp;m hoch sein, die Pfosten bleiben 2&nbsp;m hoch. Der Scheitelpunkt wandert also nach oben auf{' '}
-                <M>{'{S(2 \\mid 3{,}5)}'}</M>, der Pfosten bleibt bei <M>{'{P(0 \\mid 2)}'}</M>. Berechne das neue <M>a</M>. Wird der Bogen dadurch steiler oder flacher? Begründe im
-                Heft.
-              </p>
-              <div className="tb-bild-klein">
-                <TorBild neuS={3.5} gross />
-              </div>
-            </>
-          }
-          fieldsRow
-          fields={[
-            { kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: -0.375 },
-            { kind: 'select', key: 's', label: 'Der Bogen wird …', options: ['flacher', 'steiler'], expected: 1 },
-          ]}
-          solution={
-            <>
-              <MB>{'\\begin{aligned} 2 &= a(0 - 2)^2 + 3{,}5 \\\\ 2 &= 4a + 3{,}5 && \\mid -3{,}5 \\\\ -1{,}5 &= 4a && \\mid :4 \\\\ a &= -0{,}375 \\end{aligned}'}</MB>
-              <p>
-                Vorher war <M>{'a = -0{,}25'}</M>. Der Betrag von <M>a</M> ist größer geworden, also ist die Parabel schmaler und steiler.
-              </p>
-            </>
-          }
-          help={
-            <Hilfen
-              steps={[
-                <>
-                  Der Scheitel liegt jetzt bei <M>{'S(2 \\mid 3{,}5)'}</M>, der Pfosten bleibt bei <M>{'P(0 \\mid 2)'}</M>.
-                </>,
-                <>
-                  Neuer Ansatz: <M>{'y = a(x - 2)^2 + 3{,}5'}</M>. Setze <M>P</M> ein und löse nach <M>a</M> auf.
-                </>,
-                <>
-                  <M>{'2 = 4a + 3{,}5'}</M>. Vergleiche danach den Betrag des neuen <M>a</M> mit <M>{'0{,}25'}</M>: Größerer Betrag heißt schmalere Parabel.
-                </>,
-              ]}
-            />
-          }
-        />
-      ),
-    },
-    {
-      art: 'sichern',
-      titel: 'Geschafft!',
-      frei: true,
-      inhalt: () => (
-        <div className="sl-ende">
-          <p>
-            Du kannst jetzt die Funktionsgleichung einer Parabel aufstellen, wenn du den Scheitelpunkt und einen weiteren Punkt kennst. Übe das Verfahren weiter oder mach mit
-            Lernsituation 2 weiter.
+        <>
+          <p className="sl-text">
+            Prüfe und vertiefe dein Wissen mit vier Aufgaben. Die letzte ist für Profis. Hast du Übung 1 bis 3 gelöst, wird unten ein Spiel mit dem Kran freigeschaltet.
           </p>
-          <div className="bk-actions">
-            <button type="button" className="bk-btn" onClick={onBack}>
-              <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zur Auswahl
-            </button>
-            <button type="button" className="bk-btn" onClick={onPractice}>
-              Weiter üben: Fall 1 <i className="fa-solid fa-dumbbell" aria-hidden="true" />
-            </button>
-            <button type="button" className="bk-btn bk-btn-primary" onClick={onNext}>
-              Zu Lernsituation 2 <i className="fa-solid fa-arrow-right" aria-hidden="true" />
-            </button>
+          <Abschnitt titel={<>Übung 1: Welches <M>a</M> passt?</>}>
+            <McCard
+              onSolved={uebung('1', fertig.teil('1'))}
+              title="Übung 1"
+              level="basis"
+              rechnen
+              prompt={
+                <p>
+                  Eine Parabel hat den Scheitelpunkt <M>{'S(1 \\mid -2)'}</M> und geht durch <M>{'P(3 \\mid 6)'}</M>. Welchen Formfaktor <M>a</M> hat sie?
+                </p>
+              }
+              options={[
+                {
+                  text: <M>{'a = 1'}</M>,
+                  feedback: (
+                    <>
+                      Hier wurde mit <M>{'+2'}</M> statt <M>{'-2'}</M> gerechnet: <M>{'6 = 4a + 2'}</M>. Der Scheitel liegt bei <M>{'y_S = -2'}</M>, also <M>{'6 = 4a - 2'}</M>.
+                    </>
+                  ),
+                },
+                {
+                  text: <M>{'a = 4'}</M>,
+                  feedback: (
+                    <>
+                      Die Klammer wurde nicht quadriert: <M>{'(3 - 1)^2 = 4'}</M>, nicht <M>2</M>.
+                    </>
+                  ),
+                },
+                {
+                  text: <M>{'a = 0{,}5'}</M>,
+                  feedback: (
+                    <>
+                      Hier wurde <M>{'(x + 1)'}</M> statt <M>{'(x - 1)'}</M> verwendet: <M>{'(3 + 1)^2 = 16'}</M>. Bei <M>{'x_S = 1'}</M> steht in der Klammer <M>{'x - 1'}</M>.
+                    </>
+                  ),
+                },
+                {
+                  text: <M>{'a = 2'}</M>,
+                  correct: true,
+                  feedback: <M>{'6 = a \\cdot (3 - 1)^2 - 2 = 4a - 2 \\;\\Rightarrow\\; 8 = 4a \\;\\Rightarrow\\; a = 2'}</M>,
+                },
+              ]}
+            />
+          </Abschnitt>
+          <Abschnitt titel="Übung 2: Wer hat sich verrechnet?">
+            <CheckCard
+              onSolved={uebung('2', fertig.teil('2'))}
+              title="Übung 2: Qualitätskontrolle"
+              level="standard"
+              rechnen={false}
+              prompt={
+                <>
+                  <p>
+                    Jonas und Mara haben die Gleichung für den Torbogen mit <M>{'S(2 \\mid 3)'}</M> und <M>{'P(0 \\mid 2)'}</M> berechnet. Beide Pläne sind falsch. Wähle
+                    jeweils den Schritt mit dem Fehler.
+                  </p>
+                  <div className="wm-berichte">
+                    <Bericht
+                      name="Jonas"
+                      zeilen={[['y = a(x + 2)^2 + 3'], ['2 = a(0 + 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'], ['y = -0{,}25(x^2 + 4x + 4) + 3', '= -0{,}25x^2 - x + 2']]}
+                      ergebnis="y = -0{,}25x^2 - x + 2"
+                    />
+                    <Bericht
+                      name="Mara"
+                      zeilen={[['y = a(x - 2)^2 + 3'], ['2 = a(0 - 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'], ['y = -0{,}25x^2 - 4x + 4 + 3', '= -0{,}25x^2 - 4x + 7']]}
+                      ergebnis="y = -0{,}25x^2 - 4x + 7"
+                    />
+                  </div>
+                </>
+              }
+              fieldsRow
+              fields={[
+                { kind: 'select', key: 'j', label: 'Fehler bei Jonas', options: SCHRITTE, expected: 0 },
+                { kind: 'select', key: 'm', label: 'Fehler bei Mara', options: SCHRITTE, expected: 2 },
+              ]}
+              solution={
+                <>
+                  <p>
+                    <strong>Jonas, Schritt 1:</strong> Bei <M>{'S(2 \\mid 3)'}</M> heißt die Klammer <M>{'(x - 2)'}</M>, nicht <M>{'(x + 2)'}</M>. Seine Probe mit <M>P</M> stimmt
+                    trotzdem, weil er <M>P</M> zum Rechnen benutzt hat. Die Probe mit <M>Q</M> deckt den Fehler auf: <M>{'x = 4'}</M> eingesetzt ergibt <M>{'y = -6'}</M> statt{' '}
+                    <M>{'y = 2'}</M>.
+                  </p>
+                  <p>
+                    <strong>Mara, Schritt 3:</strong> Sie hat nur <M>{'x^2'}</M> mit <M>{'-0{,}25'}</M> multipliziert. Richtig ist{' '}
+                    <M>{'-0{,}25(x^2 - 4x + 4) + 3 = -0{,}25x^2 + x - 1 + 3'}</M>.
+                  </p>
+                </>
+              }
+              help={
+                <Hilfen
+                  steps={[
+                    <>Vergleiche jeden Schritt mit deinem eigenen Auftragsblatt.</>,
+                    <>
+                      Prüfe bei Jonas die Klammer in Schritt 1: Welches Vorzeichen gehört bei <M>{'x_S = 2'}</M> in die Klammer?
+                    </>,
+                    <>
+                      Prüfe bei Mara Schritt 3: Wurde wirklich <strong>jeder</strong> Summand in der Klammer mit <M>{'-0{,}25'}</M> multipliziert?
+                    </>,
+                  ]}
+                />
+              }
+            />
+          </Abschnitt>
+          <Abschnitt titel="Übung 3: Das Gartentor der Nachbarn">
+            <CheckCard
+              onSolved={uebung('3', fertig.teil('3'))}
+              title="Übung 3"
+              level="standard"
+              prompt={
+                <p>
+                  Die Nachbarn wollen auch einen Bogen über ihr Gartentor. Sein höchster Punkt ist <M>{'S(3 \\mid 4)'}</M>, der linke Pfosten steht bei <M>{'P(1 \\mid 2)'}</M>.
+                  Fülle die Lücken aus.
+                </p>
+              }
+              rechnung={[
+                { l: ['y'], r: ['a \\cdot (x -', { luecke: 'xs' }, ')^2 +', { luecke: 'ys' }], u: '\\text{① } S \\text{ einsetzen}' },
+                { l: ['2'], r: [{ luecke: 'q' }, '\\cdot a + 4'], u: '\\text{② } P \\text{ einsetzen}' },
+                { l: ['a'], r: [{ luecke: 'a1' }], u: '\\text{Formfaktor } a' },
+                { l: ['y'], r: [{ luecke: 'a2' }, 'x^2 +', { luecke: 'b' }, 'x +', { luecke: 'c' }], u: '\\text{③ allg. Form}' },
+              ]}
+              fields={[
+                { kind: 'num', key: 'xs', label: 'x-Wert des Scheitels', expected: 3 },
+                { kind: 'num', key: 'ys', label: 'y-Wert des Scheitels', expected: 4 },
+                { kind: 'num', key: 'q', label: 'Zahl vor a', expected: 4 },
+                { kind: 'num', key: 'a1', label: 'Formfaktor a', expected: -0.5 },
+                { kind: 'num', key: 'a2', label: 'Zahl vor x²', expected: -0.5 },
+                { kind: 'num', key: 'b', label: 'Zahl vor x', expected: 3 },
+                { kind: 'num', key: 'c', label: 'Zahl ohne x', expected: -0.5 },
+              ]}
+              solution={
+                <>
+                  <MB>{'\\begin{aligned} y &= a(x - 3)^2 + 4 \\\\ 2 &= a \\cdot (1 - 3)^2 + 4 = 4a + 4 && \\mid -4 \\\\ -2 &= 4a && \\mid :4 \\\\ a &= -0{,}5 \\end{aligned}'}</MB>
+                  <MB>{'\\begin{aligned} y &= -0{,}5 \\cdot [x^2 - 6x + 9] + 4 \\\\ y &= -0{,}5x^2 + 3x - 4{,}5 + 4 \\\\ y &= -0{,}5x^2 + 3x - 0{,}5 \\end{aligned}'}</MB>
+                </>
+              }
+              help={
+                <SchrittHilfen
+                  schritte={[
+                    {
+                      kurz: '①',
+                      titel: 'Scheitelpunkt einsetzen',
+                      hilfe: (
+                        <>
+                          Aus <M>{'S(3 \\mid 4)'}</M> liest du <M>{'x_S = 3'}</M> und <M>{'y_S = 4'}</M> ab. <M>{'x_S'}</M> kommt in die Klammer, <M>{'y_S'}</M> ans Ende.
+                        </>
+                      ),
+                    },
+                    {
+                      kurz: '②',
+                      titel: 'Punkt P einsetzen',
+                      hilfe: (
+                        <>
+                          Setze <M>{'x = 1'}</M> in die Klammer und <M>{'y = 2'}</M> links ein: <M>{'(1 - 3)^2 = (-2)^2 = 4'}</M>. Das ist die Zahl vor <M>a</M>.
+                        </>
+                      ),
+                    },
+                    {
+                      kurz: <M>a</M>,
+                      titel: <>Formfaktor <M>a</M> berechnen</>,
+                      hilfe: (
+                        <>
+                          <M>{'2 = 4a + 4'}</M>: Rechne auf beiden Seiten <M>{'-4'}</M>, dann teile durch <M>4</M>. Der Bogen ist oben rund, also muss <M>a</M> negativ sein.
+                        </>
+                      ),
+                    },
+                    {
+                      kurz: '③',
+                      titel: 'allgemeine Form',
+                      hilfe: (
+                        <>
+                          <M>{'(x - 3)^2 = x^2 - 6x + 9'}</M>. Multipliziere jeden Summanden mit <M>{'-0{,}5'}</M> und addiere zum Schluss <M>{'+4'}</M> zur Zahl ohne <M>x</M>.
+                        </>
+                      ),
+                    },
+                  ]}
+                />
+              }
+            />
+          </Abschnitt>
+          <Abschnitt titel="Übung 4 für Profis: Der Sonderwunsch">
+            <CheckCard
+              title="Der Bogen soll höher werden"
+              level="erweiterung"
+              profi
+              prompt={
+                <>
+                  <p>
+                    Familie Berger ruft an: Der Bogen soll in der Mitte 3,5&nbsp;m hoch sein, die Pfosten bleiben 2&nbsp;m hoch. Der Scheitelpunkt wandert also nach oben auf{' '}
+                    <M>{'S(2 \\mid 3{,}5)'}</M>, der Pfosten bleibt bei <M>{'P(0 \\mid 2)'}</M>. Berechne das neue <M>a</M>. Wird der Bogen dadurch steiler oder flacher?
+                    Begründe.
+                  </p>
+                  <div className="tb-bild-klein">
+                    <TorBild neuS={3.5} gross />
+                  </div>
+                </>
+              }
+              fieldsRow
+              fields={[
+                { kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: -0.375 },
+                { kind: 'select', key: 's', label: 'Der Bogen wird …', options: ['flacher', 'steiler'], expected: 1 },
+              ]}
+              solution={
+                <>
+                  <MB>{'\\begin{aligned} 2 &= a(0 - 2)^2 + 3{,}5 \\\\ 2 &= 4a + 3{,}5 && \\mid -3{,}5 \\\\ -1{,}5 &= 4a && \\mid :4 \\\\ a &= -0{,}375 \\end{aligned}'}</MB>
+                  <p>
+                    Vorher war <M>{'a = -0{,}25'}</M>. Der Betrag von <M>a</M> ist größer geworden, also ist die Parabel schmaler und steiler.
+                  </p>
+                </>
+              }
+              help={
+                <Hilfen
+                  steps={[
+                    <>
+                      Der Scheitel liegt jetzt bei <M>{'S(2 \\mid 3{,}5)'}</M>, der Pfosten bleibt bei <M>{'P(0 \\mid 2)'}</M>.
+                    </>,
+                    <>
+                      Neuer Ansatz: <M>{'y = a(x - 2)^2 + 3{,}5'}</M>. Setze <M>P</M> ein und löse nach <M>a</M> auf.
+                    </>,
+                    <>
+                      <M>{'2 = 4a + 3{,}5'}</M>. Vergleiche danach den Betrag des neuen <M>a</M> mit <M>{'0{,}25'}</M>: Größerer Betrag heißt schmalere Parabel.
+                    </>,
+                  ]}
+                />
+              }
+            />
+          </Abschnitt>
+          <BonusSpiel frei={uebungen.length === 3} titel="Bogen-Kran">
+            <BogenKran />
+          </BonusSpiel>
+          <Bilanz />
+          <div className="sl-ende">
+            <p>
+              Du kannst jetzt die Funktionsgleichung einer Parabel aufstellen, wenn du den Scheitelpunkt und einen weiteren Punkt kennst. Übe das Verfahren weiter oder mach mit
+              Lernsituation 2 weiter.
+            </p>
+            <div className="bk-actions">
+              <button type="button" className="bk-btn" onClick={onBack}>
+                <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zur Auswahl
+              </button>
+              <button type="button" className="bk-btn" onClick={onPractice}>
+                Weiter üben: Fall 1 <i className="fa-solid fa-dumbbell" aria-hidden="true" />
+              </button>
+              <button type="button" className="bk-btn bk-btn-primary" onClick={onNext}>
+                Zu Lernsituation 2 <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       ),
     },
   ]
 
   return (
-    <ErklaerungCtx.Provider value={erklaerung}>
-      <TaskShell
-        title="Funktionsgleichung aufstellen: Der Torbogen"
-        width="wide"
-        kompakt
-        parent={{ to: '/quadratische_funktionen/funktionsgleichung_aufstellen', label: 'Funktionsgleichung aufstellen' }}
-      >
-        <SeitenLernsituation
-          ruhig
-          thema={THEMA}
-          ziel={<>In dieser Lernsituation lernst du, wie du die Funktionsgleichung einer Parabel aufstellst, wenn du den Scheitelpunkt und einen weiteren Punkt kennst.</>}
-          seiten={seiten}
-        />
-      </TaskShell>
-    </ErklaerungCtx.Provider>
+    <TaskShell
+      title="Funktionsgleichung aufstellen: Der Torbogen"
+      width="wide"
+      kompakt
+      parent={{ to: '/quadratische_funktionen/funktionsgleichung_aufstellen', label: 'Funktionsgleichung aufstellen' }}
+    >
+      <SeitenLernsituation
+        ruhig
+        punkte
+        thema={THEMA}
+        ziel={<>In dieser Lernsituation lernst du, wie du die Funktionsgleichung einer Parabel aufstellst, wenn du den Scheitelpunkt und einen weiteren Punkt kennst.</>}
+        seiten={seiten}
+      />
+    </TaskShell>
   )
 }
 
-/** Rückbezug auf die Versuche an der Biegemaschine aus Phase 2 */
+/** Rückbezug auf die Versuche an der Biegemaschine aus „Problem erkennen“ */
 function Rueckbezug({ versuche }: { versuche: Versuch[] }) {
   const treffer = versuche.some(passt)
   return (
     <div className="ls-back">
       <p>
         {versuche.length === 0 ? (
-          <>Du hast in Phase 2 keine Gleichung an die Biegemaschine geschickt.</>
+          <>Du hast vorhin keine Gleichung an die Biegemaschine geschickt.</>
         ) : (
           <>
             <strong>
-              Du hast in Phase 2 {versuche.length} {versuche.length === 1 ? 'Gleichung' : 'Gleichungen'} an die Biegemaschine geschickt.
+              Du hast vorhin {versuche.length} {versuche.length === 1 ? 'Gleichung' : 'Gleichungen'} an die Biegemaschine geschickt.
             </strong>{' '}
             {treffer ? 'Ein Treffer war dabei, durch Raten oder schon durch Rechnen.' : 'Keine davon hat gepasst.'}
           </>
         )}
       </p>
       <p>
-        Mit dem Scheitelpunkt und einem weiteren Punkt rechnest du die Gleichung in drei Schritten sicher aus, statt zu raten: <M>{'y = -0{,}25x^2 + x + 2'}</M>. Das Minus vor <M>{'x^2'}</M>
-        passt zum Bogen: Er ist oben rund und hängt nicht durch.
+        Mit dem Scheitelpunkt und einem weiteren Punkt rechnest du die Gleichung in drei Schritten sicher aus, statt zu raten: <M>{'y = -0{,}25x^2 + x + 2'}</M>. Das Minus vor{' '}
+        <M>{'x^2'}</M> passt zum Bogen: Er ist oben rund und hängt nicht durch.
       </p>
     </div>
   )
