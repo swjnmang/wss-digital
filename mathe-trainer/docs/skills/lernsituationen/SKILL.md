@@ -13,7 +13,7 @@ Dieser Skill entwickelt **Einstiegs-Lernsituationen** für neue Mathe-Themen und
 - **Endgerät:** Tablet im **Querformat**. Jede Seite ist trotzdem **einspaltig** (siehe "Ruhiges Grunddesign"). Nach unten scrollen ist erlaubt, zur Seite nie.
 - **Neueste Umsetzung mit allen aktuellen Regeln** (5 Warm-up-Aufgaben, Kriterium Begriffe und Abkürzungen, Bonus-Spiel, Punkte und Bilanz): `mathe-trainer/src/pages/finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Der Vereinsbus) mit `BusRallye.tsx`.
 - **Referenz-Umsetzung:** `mathe-trainer/src/pages/finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx` (Lenas Autogeld): eine Seite pro Phase, "Problem lösen" mit aufklappbarem Rechenbeispiel, Wahl zwischen selbst rechnen und Lösungsschema, Handlungsprodukt, Phase 4 mit vier Übungsaufgaben. Für Ausprobieren mit Live-Rückmeldung und Titelbilder zusätzlich `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx` und `lineare_funktionen/nullstellen_einstieg/StromspeicherEinstieg.tsx` ansehen (diese beiden haben noch die ältere Aufteilung mit einer Aufgabe pro Seite). Vor dem Bauen ansehen.
-- **Aktuelle Fassung dieses Skills** liegt im Repo unter `mathe-trainer/docs/skills/lernsituationen/SKILL.md`. Weicht sie ab, gilt die Repo-Fassung.
+- **Diese Datei ist die maßgebliche Fassung des Skills.** Der Skill „lernsituationen“ im claude.ai-Konto der Lehrkraft verweist nur hierher. Neue oder geänderte Regeln werden **nur hier** eingetragen (und bei Bedarf kurz in `mathe-trainer/CLAUDE.md`), dann wie üblich in `main` gemergt. Die Lehrkraft muss danach nichts neu hochladen.
 
 ## Grundidee: fester Kern, variable Bausteine
 
