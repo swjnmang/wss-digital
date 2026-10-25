@@ -5,7 +5,6 @@ import {
   CheckCard,
   Hilfen,
   McCard,
-  SchrittHilfen,
   TrackedCheck,
   TrackedMc,
 } from '../../lineare_funktionen/lernsituation_kit/kit';
@@ -15,7 +14,8 @@ import {
   BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
-  WegWahl,
+  BeispielMitVideo,
+  Fehlersuche,
   type Seite,
   type Thema,
 } from '../../lineare_funktionen/lernsituation_kit/seiten';
@@ -370,6 +370,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
   const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 31000, fest: false });
   const [raten, setRaten] = useState<number[]>([]);
   const [geloest, setGeloest] = useState(false);
+  const [fehler, setFehler] = useState(false);
   const [uebungen, setUebungen] = useState<string[]>([]);
   const rateGeprueft = (i: number) => () => setRaten((r) => (r.includes(i) ? r : [...r, i]));
 
@@ -603,49 +604,29 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
               <p className="sl-fokus-titel">Deine Aufgabe: Berechne den Kontostand und berate den Vorstand</p>
               <p>
                 Der Verein zahlt 6 Jahre lang jedes Jahr 5.000 € auf den Sparplan mit 3 % p.a. ein. Der Kassenwart möchte lieber erst am
-                Jahresende einzahlen, wenn alle Mitgliedsbeiträge da sind. Berechne den Kontostand am Ende des 6. Jahres für beide Fälle:
+                Jahresende einzahlen, wenn alle Mitgliedsbeiträge da sind. Berechne in deinem Heft den Kontostand am Ende des 6. Jahres für beide Fälle:
                 Einzahlung am <strong>Jahresanfang</strong> (vorschüssig) und am <strong>Jahresende</strong> (nachschüssig). Reicht es für
                 den Bus mit 33.000 €?
               </p>
             </div>
             <ZeitstrahlUmschalten werte={raten} />
-            <Aufklappbar label="Rechenbeispiel ansehen">
+            <BeispielMitVideo>
               <Beispiel offen title="Der Sparplan der Tischtennisabteilung" aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE} />
-            </Aufklappbar>
-            <Handlungsprodukt titel="Aushang für die Mitgliederversammlung">
-              <AushangBild />
-              <p className="sl-text">
-                Gestalte in deinem Heft einen Aushang für die Pinnwand im Vereinsheim. Zeichne den Zeitstrahl der sechs Raten, rechne den
-                Kontostand für beide Einzahlungstermine vor und gib dem Vorstand eine klare Empfehlung. Trage deine Ergebnisse danach unten
-                ein und prüfe sie.
-              </p>
-              <Aufklappbar label="Satzanfänge ansehen" icon="fa-comment-dots">
-                <ul className="zk-liste">
-                  <li>„Reicht es für den Vereinsbus? Ja, wenn …“</li>
-                  <li>„Die 1. Rate wird … Jahre verzinst, die letzte nur …“</li>
-                  <li>„Zahlen wir am Jahresanfang ein, haben wir am Ende …, am Jahresende nur …“</li>
-                  <li>„Der Vorstand hat nur mit 900 € Zinsen gerechnet. In Wirklichkeit sind es …, weil …“</li>
-                  <li>
-                    „Abkürzungen: <M>{'K_n'}</M> = …, <M>r</M> = Rate (Rente), <M>q</M> = …, <M>n</M> = … Vorschüssig heißt …“
-                  </li>
-                </ul>
-              </Aufklappbar>
-            </Handlungsprodukt>
-            <Abschnitt titel="Deine Ergebnisse prüfen">
-              <WegWahl
-                selbst={
-                  <CheckCard
-                    onSolved={geloestMelden}
-                    title="Kontostand am Ende des 6. Jahres"
-                    prompt={<p>Trage die Ergebnisse aus deinem Heft ein und prüfe sie.</p>}
-                    fields={[
-                      { kind: 'num', key: 'vor', label: 'Wie viel Geld ist am Ende des 6. Jahres auf dem Konto, wenn die Sparrate immer am Jahresanfang eingezahlt wird?', expected: KN_VOR, unit: '€', tol: 0.5 },
-                      { kind: 'num', key: 'nach', label: 'Wie hoch wäre der Kontostand, wenn die Einzahlung immer am Jahresende stattfindet?', expected: KN_NACH, unit: '€', tol: 0.5 },
-                    ]}
-                    loesungNachFehler
-                    solution={LOESUNG}
-                    help={
-                      <Hilfen
+            </BeispielMitVideo>
+            <Abschnitt titel="Vergleiche deine Ergebnisse">
+              <CheckCard
+                onSolved={geloestMelden}
+                onFehler={() => setFehler(true)}
+                title="Kontostand am Ende des 6. Jahres"
+                prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
+                fields={[
+                  { kind: 'num', key: 'vor', label: 'Wie viel Geld ist am Ende des 6. Jahres auf dem Konto, wenn die Sparrate immer am Jahresanfang eingezahlt wird?', expected: KN_VOR, unit: '€', tol: 0.5 },
+                  { kind: 'num', key: 'nach', label: 'Wie hoch wäre der Kontostand, wenn die Einzahlung immer am Jahresende stattfindet?', expected: KN_NACH, unit: '€', tol: 0.5 },
+                ]}
+                loesungNachFehler
+                solution={LOESUNG}
+                help={
+                  <Hilfen
                         steps={[
                           <>Rechne wie im Beispiel der Tischtennisabteilung: erst den Zinsfaktor, dann die Rentenformel.</>,
                           <>
@@ -658,87 +639,22 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                           </>,
                         ]}
                       />
-                    }
-                  />
-                }
-                schema={
-                  <CheckCard
-                    onSolved={geloestMelden}
-                    title="Kontostand mit Lösungsschema"
-                    punkte={8}
-                    prompt={<p>Rechne in deinem Heft nach diesem Schema wie im Beispiel und trage die Ergebnisse ein.</p>}
-                    rechnung={[
-                      { l: ['q'], r: ['1 + \\frac{p}{100} =', { luecke: 'q' }], u: '\\text{① Zinsfaktor}' },
-                      {
-                        l: ['\\frac{q^6 - 1}{q - 1}'],
-                        r: [{ luecke: 'f', breit: true }],
-                        u: '\\text{② Bruch}',
-                      },
-                      {
-                        l: ['K_6'],
-                        r: ['r \\cdot \\frac{q^6 - 1}{q - 1} =', { luecke: 'nach', breit: true }, '\\text{ €}'],
-                        u: '\\text{③ Jahresende}',
-                      },
-                      {
-                        l: ['K_6'],
-                        r: ['r \\cdot q \\cdot \\frac{q^6 - 1}{q - 1} =', { luecke: 'vor', breit: true }, '\\text{ €}'],
-                        u: '\\text{④ Jahresanfang}',
-                      },
-                    ]}
-                    fields={[
-                      { kind: 'num', key: 'q', label: 'Zinsfaktor', expected: Q, tol: 0.0001 },
-                      { kind: 'num', key: 'f', label: 'Bruch', expected: FAKTOR, tol: 0.0005 },
-                      { kind: 'num', key: 'nach', label: 'Kontostand Jahresende', expected: KN_NACH, tol: 0.5 },
-                      { kind: 'num', key: 'vor', label: 'Kontostand Jahresanfang', expected: KN_VOR, tol: 0.5 },
-                    ]}
-                    loesungNachFehler
-                    solution={LOESUNG}
-                    help={
-                      <SchrittHilfen
-                        schritte={[
-                          {
-                            kurz: '①',
-                            titel: 'Zinsfaktor',
-                            hilfe: (
-                              <>
-                                Setze <M>{'p = 3'}</M> ein: <M>{'q = 1 + \\frac{3}{100}'}</M>.
-                              </>
-                            ),
-                          },
-                          {
-                            kurz: '②',
-                            titel: 'Bruch',
-                            hilfe: (
-                              <>
-                                Rechne zuerst <M>{'1{,}03^6'}</M> mit dem Taschenrechner, ziehe 1 ab und teile durch <M>{'1{,}03 - 1 = 0{,}03'}</M>.
-                                Runde auf 4 Nachkommastellen.
-                              </>
-                            ),
-                          },
-                          {
-                            kurz: '③',
-                            titel: 'Jahresende',
-                            hilfe: (
-                              <>
-                                Multipliziere die Rate <M>{'r = 5\\,000'}</M> mit dem Bruch aus ②.
-                              </>
-                            ),
-                          },
-                          {
-                            kurz: '④',
-                            titel: 'Jahresanfang',
-                            hilfe: (
-                              <>
-                                Jede Rate liegt ein Jahr länger auf dem Konto. Multipliziere das Ergebnis aus ③ noch mit <M>{'q = 1{,}03'}</M>.
-                              </>
-                            ),
-                          },
-                        ]}
-                      />
-                    }
-                  />
                 }
               />
+              <Fehlersuche fehler={fehler}>
+                <CheckCard
+                  title="Fehlersuche: Wo steckt der Fehler?"
+                  rechnen={false}
+                  ohnePunkte
+                  prompt={<p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>}
+                  fieldsRow
+                  fields={[
+                    { kind: 'num', key: 'q', label: <M>{'q ='}</M>, expected: Q, tol: 0.0001 },
+                    { kind: 'num', key: 'q6', label: <M>{'q^6 ='}</M>, expected: Q ** N, tol: 0.0001 },
+                    { kind: 'num', key: 'f', label: <M>{'\\dfrac{q^6 - 1}{q - 1} ='}</M>, expected: FAKTOR, tol: 0.0005 },
+                  ]}
+                />
+              </Fehlersuche>
             </Abschnitt>
             <Abschnitt titel="Deine Empfehlung">
               <McCard
@@ -768,6 +684,24 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                 ]}
               />
             </Abschnitt>
+            <Handlungsprodukt titel="Aushang für die Mitgliederversammlung">
+              <AushangBild />
+              <p className="sl-text">
+                Gestalte in deinem Heft einen Aushang für die Pinnwand im Vereinsheim. Zeichne den Zeitstrahl der sechs Raten, schreibe
+                deine Rechnung für beide Einzahlungstermine sauber auf und gib dem Vorstand eine klare Empfehlung.
+              </p>
+              <Aufklappbar label="Satzanfänge ansehen" icon="fa-comment-dots">
+                <ul className="zk-liste">
+                  <li>„Reicht es für den Vereinsbus? Ja, wenn …“</li>
+                  <li>„Die 1. Rate wird … Jahre verzinst, die letzte nur …“</li>
+                  <li>„Zahlen wir am Jahresanfang ein, haben wir am Ende …, am Jahresende nur …“</li>
+                  <li>„Der Vorstand hat nur mit 900 € Zinsen gerechnet. In Wirklichkeit sind es …, weil …“</li>
+                  <li>
+                    „Abkürzungen: <M>{'K_n'}</M> = …, <M>r</M> = Rate (Rente), <M>q</M> = …, <M>n</M> = … Vorschüssig heißt …“
+                  </li>
+                </ul>
+              </Aufklappbar>
+            </Handlungsprodukt>
             <Abschnitt titel="Ist dein Aushang vollständig?">
               <Kriterien
                 onAlle={fertig.teil('produkt')}

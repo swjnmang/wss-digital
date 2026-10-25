@@ -2,6 +2,7 @@ import { useEffect, useId, useState, type CSSProperties, type ChangeEvent, type 
 import { HeftBestaetigtCtx } from './kit';
 import { PHASEN, type PhaseArt } from './phasen';
 import { PunkteAnzeige, PunkteGruppeCtx, PunkteProvider, PunkteRegeln } from './punkte';
+import { VideoEmbed } from '../../../components/VideoButton';
 import './phasen.css';
 import './seiten.css';
 
@@ -257,15 +258,29 @@ export function Abschnitt({ titel, children }: { titel: ReactNode; children: Rea
 export function Aufklappbar({
   label,
   icon = 'fa-lightbulb',
+  breit = false,
+  offen: offenVon,
+  onToggle,
   children,
 }: {
   label: string;
   icon?: string;
+  /** Knopf so breit wie die übrigen Elemente der Seite */
+  breit?: boolean;
+  /** Von außen gesteuert (z. B. Fehlersuche, die sich nach einem Fehler öffnet) */
+  offen?: boolean;
+  onToggle?: (offen: boolean) => void;
   children: ReactNode;
 }) {
-  const [offen, setOffen] = useState(false);
+  const [offenIntern, setOffenIntern] = useState(false);
+  const offen = offenVon ?? offenIntern;
+  const setOffen = (f: (o: boolean) => boolean) => {
+    const neu = f(offen);
+    setOffenIntern(neu);
+    onToggle?.(neu);
+  };
   return (
-    <div className="sl-aufklappbar">
+    <div className={`sl-aufklappbar${breit ? ' sl-aufklappbar-breit' : ''}`}>
       <div>
         <button
           type="button"
@@ -399,5 +414,57 @@ export function BonusSpiel({
         <p className="sl-hinweis">Löse alle Übungsaufgaben oben, dann wird hier ein Spiel freigeschaltet.</p>
       )}
     </section>
+  );
+}
+
+/**
+ * „Problem lösen“: Beispielrechnung mit Lernvideo hinter einem breiten Knopf. Aufgeklappt steht oben das Lernvideo (falls es eines gibt),
+ * darunter die Beispielrechnung (meist <Beispiel offen …/>). Rechenbeispiel und Video sind kostenlos.
+ */
+export function BeispielMitVideo({
+  video,
+  videoTitel = 'Lernvideo',
+  children,
+}: {
+  /** YouTube-Adresse des Lernvideos aus den Übungsaufgaben des Themas */
+  video?: string;
+  videoTitel?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Aufklappbar
+      breit
+      icon={video ? 'fa-circle-play' : 'fa-lightbulb'}
+      label={video ? 'Beispielrechnung mit Lernvideo ansehen' : 'Beispielrechnung ansehen'}
+    >
+      {video && <VideoEmbed src={video} title={videoTitel} />}
+      {children}
+    </Aufklappbar>
+  );
+}
+
+/**
+ * Fehlersuche unter dem Ergebnis-Abgleich in „Problem lösen“: breiter Knopf, öffnet sich automatisch, sobald ein Ergebnis rot war
+ * (onFehler der Ergebnis-CheckCard → fehler). Darin eine CheckCard mit den Zwischenergebnissen und ohnePunkte.
+ */
+export function Fehlersuche({ fehler, children }: { fehler: boolean; children: ReactNode }) {
+  const [offen, setOffen] = useState(false);
+  const [geschlossen, setGeschlossen] = useState(false);
+  useEffect(() => {
+    if (fehler && !geschlossen) setOffen(true);
+  }, [fehler, geschlossen]);
+  return (
+    <Aufklappbar
+      breit
+      icon="fa-magnifying-glass"
+      label="Ein Ergebnis ist rot? Fehler suchen"
+      offen={offen}
+      onToggle={(o) => {
+        setOffen(o);
+        if (!o) setGeschlossen(true);
+      }}
+    >
+      {children}
+    </Aufklappbar>
   );
 }

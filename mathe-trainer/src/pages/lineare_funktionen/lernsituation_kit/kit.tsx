@@ -258,6 +258,8 @@ export function CheckCard({
   loesungNachFehler = false,
   punkte,
   profi = false,
+  ohnePunkte = false,
+  onFehler,
 }: {
   title: ReactNode
   level?: Level
@@ -283,10 +285,14 @@ export function CheckCard({
   punkte?: number
   /** Freiwillige Profi-Aufgabe (zählt nicht zum Maximum der Sterne) */
   profi?: boolean
+  /** Ohne Punkte (z. B. die Fehlersuche): bringt nichts und kostet nichts */
+  ohnePunkte?: boolean
+  /** Wird aufgerufen, sobald ein Feld rot wird (z. B. um die Fehlersuche zu öffnen) */
+  onFehler?: () => void
 }) {
   const uid = useId()
   const [showSolution, setShowSolution] = useState(false)
-  const pt = usePunkteAufgabe({ wert: punkte, profi })
+  const pt = usePunkteAufgabe({ wert: punkte, profi, zaehlt: !ohnePunkte })
   const { values, marks, status, praise, malFalsch, setValue, blur } = useLiveCheck(
     fields.map((f) => ({
       key: f.key,
@@ -302,7 +308,10 @@ export function CheckCard({
     },
   )
   useEffect(() => {
-    if (status === 'no') pt.fehler()
+    if (status === 'no') {
+      pt.fehler()
+      onFehler?.()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status])
 

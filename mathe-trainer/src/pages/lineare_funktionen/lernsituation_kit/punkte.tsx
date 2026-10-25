@@ -186,9 +186,16 @@ export function PunkteProvider({ name, children }: { name: string; children: Rea
  * Meldung einer Aufgabe an die Punkte (ohne Provider passiert nichts). wert: Punkte statt der vollen Aufgabenpunkte, z. B. 8 für
  * den Weg mit Lösungsschema oder 5 für eine Festlegung bzw. die Kriterien (dann serie: false, zählt nicht zur Serie).
  * profi: freiwillige Erweiterung (zählt nicht zum Maximum der Sterne, bringt das Abzeichen „Profi“).
+ * zaehlt: false für Aufgaben ohne Punkte, z. B. die Fehlersuche (sie soll nichts kosten und nichts bringen).
  */
-export function usePunkteAufgabe({ wert, profi = false, serie = true }: { wert?: number; profi?: boolean; serie?: boolean } = {}) {
-  const api = useContext(ApiCtx)
+export function usePunkteAufgabe({
+  wert,
+  profi = false,
+  serie = true,
+  zaehlt = true,
+}: { wert?: number; profi?: boolean; serie?: boolean; zaehlt?: boolean } = {}) {
+  const ctxApi = useContext(ApiCtx)
+  const api = zaehlt ? ctxApi : null
   const gruppe = useContext(PunkteGruppeCtx)
   const eigene = useId()
   const id = gruppe ?? eigene

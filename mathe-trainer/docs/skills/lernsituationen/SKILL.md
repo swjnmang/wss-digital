@@ -12,14 +12,14 @@ Dieser Skill entwickelt **Einstiegs-Lernsituationen** für neue Mathe-Themen und
 - **Kein Lehrkraft-Material** auf der Seite. Alles richtet sich direkt an die SuS.
 - **Endgerät:** Tablet im **Querformat**. Jede Seite ist trotzdem **einspaltig** (siehe "Ruhiges Grunddesign"). Nach unten scrollen ist erlaubt, zur Seite nie.
 - **Neueste Umsetzung mit allen aktuellen Regeln** (5 Warm-up-Aufgaben, Kriterium Begriffe und Abkürzungen, Bonus-Spiel, Punkte und Bilanz): `mathe-trainer/src/pages/finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Der Vereinsbus) mit `BusRallye.tsx`.
-- **Referenz-Umsetzung:** `mathe-trainer/src/pages/finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx` (Lenas Autogeld): eine Seite pro Phase, "Problem lösen" mit aufklappbarem Rechenbeispiel, Wahl zwischen selbst rechnen und Lösungsschema, Handlungsprodukt, Phase 4 mit vier Übungsaufgaben. Für Ausprobieren mit Live-Rückmeldung und Titelbilder zusätzlich `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx` und `lineare_funktionen/nullstellen_einstieg/StromspeicherEinstieg.tsx` ansehen (diese beiden haben noch die ältere Aufteilung mit einer Aufgabe pro Seite). Vor dem Bauen ansehen.
+- **Referenz-Umsetzung:** `mathe-trainer/src/pages/finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx` (Lenas Autogeld): eine Seite pro Phase und Phase 4 mit vier Übungsaufgaben. Achtung: Ihr "Problem lösen" hat noch den alten Aufbau mit `WegWahl`; maßgeblich für "Problem lösen" ist der Vereinsbus. Für Ausprobieren mit Live-Rückmeldung und Titelbilder zusätzlich `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx` und `lineare_funktionen/nullstellen_einstieg/StromspeicherEinstieg.tsx` ansehen (diese beiden haben noch die ältere Aufteilung mit einer Aufgabe pro Seite). Vor dem Bauen ansehen.
 - **Diese Datei ist die maßgebliche Fassung des Skills.** Der Skill „lernsituationen“ im claude.ai-Konto der Lehrkraft verweist nur hierher. Neue oder geänderte Regeln werden **nur hier** eingetragen (und bei Bedarf kurz in `mathe-trainer/CLAUDE.md`), dann wie üblich in `main` gemergt. Die Lehrkraft muss danach nichts neu hochladen.
 
 ## Grundidee: fester Kern, variable Bausteine
 
 Lernsituationen dürfen **nicht nach Schema F** ablaufen. Gleichförmigkeit langweilt und demotiviert.
 
-- **Fest** sind die vier Phasen mit **genau einer Seite pro Phase**, der Aufbau von "Problem lösen" (Problem → Rechenbeispiel zum Aufklappen → Handlungsprodukt → eigene Lösung mit Wahl des Wegs), die Seitenansicht, das **ruhige Grunddesign**, die didaktischen Leitlinien, die Pflichtfunktionen und die Schreib- und Rechenkonventionen.
+- **Fest** sind die vier Phasen mit **genau einer Seite pro Phase**, der Aufbau von "Problem lösen" (Problem → Beispielrechnung mit Lernvideo zum Aufklappen → Ergebnisse abgleichen mit Fehlersuche → Handlungsprodukt), die Seitenansicht, das **ruhige Grunddesign**, die didaktischen Leitlinien, die Pflichtfunktionen und die Schreib- und Rechenkonventionen.
 - **Variabel** sind Kontext, Dramaturgie (Format), Handlungsprodukt, Sozialformen, die Methoden innerhalb der Phasen und die **Identität** der Lernsituation.
 - **Ruhig, aber unverwechselbar:** Alle Lernsituationen haben dasselbe ruhige Gerüst, aber jede hat ein eigenes Gesicht (Abschnitt "Identität jeder Lernsituation"). Die SuS sollen auf jeder Seite sofort erkennen, in welcher Lernsituation sie sind.
 - **Abwechslung wird geprüft**, nicht dem Zufall überlassen (Abschnitt "Abwechslung absichern").
@@ -51,10 +51,10 @@ Die Kombinationen unterscheiden sich untereinander deutlich und halten die Abwec
 Lege ein kompaktes Konzept vor:
 - Lernziel in einem Satz
 - Plan der vier Phasen-Seiten: je Phase die Aufgaben, die Pflichtaufgaben für "Weiter" und die ungefähre Zeit
-- Das Problem in einem Satz (gegeben, gesucht), das passende Rechenbeispiel mit anderen Zahlen und das Lösungsschema
+- Das Problem in einem Satz (gegeben, gesucht), das passende Rechenbeispiel mit anderen Zahlen, die Ergebnisfelder und die Zwischenergebnisse für die Fehlersuche
 - Handlungsprodukt mit 2 bis 4 Kriterien, dazu immer das Kriterium „Begriffe und Abkürzungen“
 - Passendes Lernvideo für das Rechenbeispiel (aus den Übungsaufgaben des Themas), falls vorhanden
-- Hilfen (Schritt-Hilfen beim Lösungsschema, gestufte Hilfen beim selbstständigen Rechnen) und Niveaustufen
+- Hilfen (drei gestufte Hilfen beim Ergebnis-Abgleich) und Niveaustufen
 - Der Aha- oder Widerspruchsmoment
 - 3 bis 4 Übungsaufgaben für Phase 4 und die typischen Fehlvorstellungen, auf die sie zielen
 
@@ -91,7 +91,7 @@ Jede Lernsituation hat **genau diese vier Phasen in dieser Reihenfolge**. Namen 
 | --- | --- |
 | **1 Warm-up** | Vorwissen abrufen, das gleich gebraucht wird (Retrieval Practice): **mindestens 5** kurze Aufgaben untereinander (alle Pflicht), z. B. Wert ablesen, einfache Gleichung lösen, Klammer ausmultiplizieren. |
 | **2 Problem erkennen** | Kontext, Leitfrage und Festlegung bzw. Ausprobieren. Die SuS merken selbst, dass sie das Problem mit ihrem bisherigen Wissen nicht sicher lösen können. |
-| **3 Problem lösen** | Problem oben, Rechenbeispiel zum Aufklappen, Auftrag zum Handlungsprodukt, eigene Lösung (selbst rechnen oder mit Lösungsschema), ggf. Entscheidung, danach "Das hältst du fest" (Rückbezug und Merke). |
+| **3 Problem lösen** | Problem oben, Beispielrechnung mit Lernvideo zum Aufklappen (breiter Knopf), Ergebnisse aus dem Heft abgleichen mit automatischer Fehlersuche, ggf. Entscheidung, Handlungsprodukt mit Kriterien, danach "Das hältst du fest" (Rückbezug und Merke). |
 | **4 Wissen prüfen und vertiefen** | Mindestens 3, besser 4 passende Übungsaufgaben mit steigendem Niveau (Basis, Standard, Erweiterung), mit typischen Fehlern als Antwortoptionen; darunter das **Bonus-Spiel** (frei, sobald alle Pflichtaufgaben gelöst sind) und die Abschluss-Buttons. |
 
 Namen und Reihenfolge stehen im Code nur in `PHASEN` (`phasen.tsx`). Die Phasenleiste zeigt die vier Phasen; einen Seitenzähler gibt es nicht mehr, weil jede Phase genau eine Seite ist.
@@ -126,17 +126,16 @@ Wo es inhaltlich passt, probieren die SuS selbst Lösungen aus und bekommen sofo
 Alles auf einer Seite, **immer in dieser Reihenfolge** von oben nach unten:
 
 1. **Das Problem noch einmal oben** als einziger Fokus (`sl-fokus`): konkreter Arbeitsauftrag in eigenen Worten, was gegeben und was gesucht ist und in welcher Form das Ergebnis stehen soll. Darunter ein Bild zum Problem (Leitobjekt, Skizze oder Graph mit nur den gegebenen Größen, bei Umstellaufgaben die Formel mit markierter gesuchter Größe).
-2. **Rechenbeispiel zum Aufklappen** (`Aufklappbar` mit "Rechenbeispiel ansehen"): ein ausgearbeitetes Beispiel mit **anderen Zahlen**, Schritt für Schritt (`Beispiel offen`), und **immer mit dem passenden Lernvideo, wenn es eines gibt** (`VideoAufklappen` aus `finanzmathe/zins_kit/zins_kit.tsx` direkt unter dem Beispiel in derselben `Aufklappbar`). Die SuS entscheiden selbst, ob sie das Rechenbeispiel, das Video oder beides nutzen. Die Lernvideos sind meist schon bei den Übungsaufgaben des Themas verlinkt (z. B. `VideoButton url=…` oder eine `VIDEO`-Liste in der Übungsseite): Von dort übernehmen. Gibt es keines, der Lehrkraft am Ende als offenen Punkt nennen. Ein Rechenbeispiel vor der Problemdarstellung ist nicht erlaubt, auch nicht im Warm-up oder in Phase 2.
-3. **Auftrag zum Handlungsprodukt** (`Handlungsprodukt`): Die SuS werden **an dieser Stelle immer** aufgefordert, ihr Handlungsprodukt im Heft zu erstellen (Abschnitt "Handlungsprodukte"), z. B. "Schreibe Lena eine Antwort und rechne darin …". Ein kleines Bild zum Produkt (z. B. Brief, Karteikarte, Plakat) macht den Auftrag anschaulich. Satzanfänge oder ein Gerüst dürfen aufklappbar dabei sein.
-4. **Eigene Lösung mit Wahl des Wegs** (`WegWahl`): Zwei Knöpfe "Selbst rechnen" und "Mit Lösungsschema".
-   - **Selbst rechnen** (Standard): nur der Auftrag "Trage die Ergebnisse aus deinem Heft ein und prüfe sie" und die Ergebnisfelder. Keine Vorstrukturierung. Dazu drei gestufte `Hilfen`.
-   - **Mit Lösungsschema**: dieselben Ergebnisse als Lückenrechnung (`rechnung`) mit einer Zeile pro Zwischenergebnis und `SchrittHilfen`. Das Schema nennt die Schritte, verrät aber nicht die Zahlen der Lösung.
-   - Beide prüfen dieselben Ergebnisse und melden dieselbe Pflichtaufgabe. Bei beiden gibt es **"Lösungsweg zeigen" erst nach einem Fehlversuch** (`loesungNachFehler`).
+2. **Beispielrechnung mit Lernvideo** (`BeispielMitVideo` aus `lernsituation_kit/seiten.tsx`): **ein** Knopf „Beispielrechnung mit Lernvideo ansehen“ (ohne Video: „Beispielrechnung ansehen“), **so breit wie die übrigen Elemente der Seite**. Aufgeklappt steht oben das eingebettete Lernvideo (`video="…"`, lädt erst nach Antippen), darunter das ausgearbeitete Beispiel mit **anderen Zahlen**, Schritt für Schritt (`<Beispiel offen …/>`). Die SuS entscheiden selbst, ob sie Video, Beispiel oder beides nutzen; beides ist kostenlos. Die Lernvideos sind meist schon bei den Übungsaufgaben des Themas verlinkt (z. B. `VideoButton url=…` oder eine `VIDEO`-Liste in der Übungsseite): Von dort übernehmen. Gibt es keines, der Lehrkraft am Ende als offenen Punkt nennen. Ein Rechenbeispiel vor der Problemdarstellung ist nicht erlaubt, auch nicht im Warm-up oder in Phase 2.
+3. **„Vergleiche deine Ergebnisse“** (`Abschnitt` mit einer `CheckCard`): Die SuS rechnen im Heft und tippen nur ihre **Endergebnisse** in die Felder („Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.“). Die Felder sind als Fragen formuliert (z. B. „Wie viel Geld ist am Ende des 6. Jahres auf dem Konto, wenn …?“), keine Vorstrukturierung des Rechenwegs. Dazu drei gestufte `Hilfen`, `loesungNachFehler` und `onFehler={() => setFehler(true)}`. Es gibt **keine** Wahl „Selbst rechnen / Mit Lösungsschema“ mehr (`WegWahl` nicht mehr verwenden).
+4. **Fehlersuche** (`Fehlersuche` aus `seiten.tsx`) direkt darunter: breiter Knopf „Ein Ergebnis ist rot? Fehler suchen“, der **sich automatisch öffnet**, sobald ein Ergebnisfeld rot wurde (`fehler={fehler}`). Darin eine `CheckCard` mit `ohnePunkte`, `rechnen={false}` und `fieldsRow` für die wichtigen **Zwischenergebnisse** (z. B. `q`, `q^6`, Bruch), mit dem Satz „Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.“ Die Fehlersuche ist freiwillig, keine Pflichtaufgabe und kostet keine Punkte.
 5. **Entscheidung** (wenn die Situation eine verlangt), z. B. per Auswahl "Welches Angebot empfiehlst du?".
-6. **Kriterien des Handlungsprodukts abhaken** ("Ist deine Antwort vollständig?"). Ein Kriterium ist **immer**: unbekannte Begriffe und die Bedeutung aller Abkürzungen der Formel aufschreiben, konkret für das Thema benannt (z. B. „Was bedeuten K_n, r, q und n? r ist die Rate (Rente) …, außerdem: vorschüssig, nachschüssig“).
+6. **Handlungsprodukt** (`Handlungsprodukt`): Auftrag, das Handlungsprodukt im Heft zu gestalten (Abschnitt "Handlungsprodukte"), mit kleinem Bild (Brief, Karteikarte, Plakat) und aufklappbaren Satzanfängen. Darunter die **Kriterien zum Abhaken** ("Ist deine Antwort vollständig?"). Ein Kriterium ist **immer**: unbekannte Begriffe und die Bedeutung aller Abkürzungen der Formel aufschreiben, konkret für das Thema benannt (z. B. „Was bedeuten K_n, r, q und n? r ist die Rate (Rente) …, außerdem: vorschüssig, nachschüssig“).
 7. **"Das hältst du fest"**, sobald die Rechnung gelöst ist: Rückbezug auf die Festlegung bzw. die Versuche aus Phase 2 und der Merkkasten.
 
-Sind mehrere Teilprobleme nötig (z. B. erst K, dann p, dann t), folgen sie auf derselben Seite nacheinander, jedes mit Problem, Rechenbeispiel zum Aufklappen und Wahl des Wegs. Zwischenüberschriften mit `Abschnitt`.
+Vorlage: `finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Seite „Der Kontostand für den Vereinsbus“).
+
+Sind mehrere Teilprobleme nötig (z. B. erst K, dann p, dann t), folgen sie auf derselben Seite nacheinander, jedes mit Problem, Beispielrechnung mit Lernvideo, Ergebnis-Abgleich und Fehlersuche. Zwischenüberschriften mit `Abschnitt`.
 
 ## Seitenansicht (Pflicht)
 
@@ -146,7 +145,7 @@ Jede Lernsituation läuft in der Seitenansicht `SeitenLernsituation` aus `linear
 - **Genau eine Seite pro Phase.** Die Lernsituation hat vier Seiten (`art`: `start`, `problem`, `loesen`, `sichern`), jede mit kurzem Titel. Mehrere Aufgaben einer Phase stehen untereinander auf dieser Seite, gegliedert mit `Abschnitt`.
 - **"Weiter" erst, wenn alles gelöst ist:** Die Seite nennt ihre Pflichtaufgaben in `pflicht: ['a', 'b', …]`, jede Aufgabe meldet sich mit `onSolved={fertig.teil('a')}` (bzw. `onFest`, `onAlle`). Erst wenn alle gemeldet sind, wird "Weiter" frei; im Seitenkopf steht automatisch "(2 von 3 Aufgaben gelöst)". Freiwillige Profi-Aufgaben stehen nicht in `pflicht`. Eine Seite mit nur einer Pflichtaufgabe kann weiter `fertig()` nutzen. Die Phasenleiste mit "Weiter" bleibt beim Scrollen oben stehen.
 - **Nach unten scrollen ist erlaubt, zur Seite nie:** Eine Seite darf länger als der Bildschirm sein; die SuS scrollen dann nach unten weiter. **Lesbarkeit geht vor Passform:** Skizzen und Graphen werden **nicht** gestaucht, damit alles auf einen Bildschirm passt. Richtwert auf dem Tablet: Skizzen und Graphen etwa 260–320 px hoch, Beschriftungen mindestens 14 px und höchstens etwa 20 px auf dem Bildschirm. Wünschenswert ist, dass Titel, Auftrag und der Anfang der Interaktion im ersten Bildschirm sichtbar sind. **Horizontales Scrollen ist verboten**, auf jeder Bildschirmbreite (Tablet, Monitor, Smartphone). Eine Phase wird nie auf mehrere Seiten verteilt; lange Phasen-Seiten sind in Ordnung. **Keine Zweispalter** (`ZweiSpalten` nicht mehr verwenden): Einspaltigkeit hat Vorrang.
-- **Test:** Mit Playwright (`vite build` + `vite preview`) alle vier Seiten bei 1180×820, 1920×1080 und 390×844 (Smartphone) durchklicken (Cookie-Hinweis vorher schließen), jeweils vor und nach dem Lösen `document.documentElement.scrollWidth - innerWidth` messen (muss 0 sein, kein seitliches Scrollen) und auf `.katex-error` prüfen. In "Problem lösen" beide Wege (selbst rechnen und Lösungsschema) und das aufgeklappte Rechenbeispiel testen und prüfen, dass "Weiter" erst nach allen Pflichtaufgaben frei wird. Die Höhe darf überstehen; prüfe auf den Screenshots, dass Skizzen groß genug und Beschriftungen lesbar sind.
+- **Test:** Mit Playwright (`vite build` + `vite preview`) alle vier Seiten bei 1180×820, 1920×1080 und 390×844 (Smartphone) durchklicken (Cookie-Hinweis vorher schließen), jeweils vor und nach dem Lösen `document.documentElement.scrollWidth - innerWidth` messen (muss 0 sein, kein seitliches Scrollen) und auf `.katex-error` prüfen. In "Problem lösen" das aufgeklappte Rechenbeispiel (Knopf so breit wie der Fokus-Kasten), einen Fehlversuch (die Fehlersuche öffnet sich) und das richtige Ergebnis testen und prüfen, dass "Weiter" erst nach allen Pflichtaufgaben frei wird. Die Höhe darf überstehen; prüfe auf den Screenshots, dass Skizzen groß genug und Beschriftungen lesbar sind.
 - Am Ende der Seite "Wissen prüfen und vertiefen" steht das Bonus-Spiel (Abschnitt "Bonus-Spiel zum Abschluss"), darunter die Buttons zurück zur Auswahl, zu den Übungsaufgaben und ggf. zur nächsten Lernsituation (keine eigene Abschlussseite).
 
 ## Auswahlseite des Themas (Pflicht)
@@ -173,7 +172,7 @@ Jede Lernsituation belohnt richtige Lösungen mit Punkten. Die Elemente sollen m
 - **Punkteregeln** (Werte in `PUNKTE`):
   - richtig gelöste Aufgabe: 10 Punkte; jede angezeigte Hilfe −2, jeder Fehlversuch −2 (höchstens 3 zählen), mindestens 2 Punkte für eine selbst gelöste Aufgabe
   - Lösungsweg **vor** dem Lösen angesehen: die Aufgabe bringt 0 Punkte und es gibt 3 Punkte **Abzug** vom Gesamtstand (nach dem Lösen ist das Ansehen kostenlos)
-  - Weg „Mit Lösungsschema“: höchstens 8 Punkte (`punkte={8}` an der Schema-`CheckCard`); beide Wege der `WegWahl` zählen als eine Aufgabe
+  - Die Fehlersuche (`ohnePunkte`) bringt und kostet nichts
   - Festlegung (`Vermutung`) und abgehakte Kriterien des Handlungsprodukts: je 5 Punkte
   - Rechenbeispiel und Lernvideo sind kostenlos, sie gehören zum Lernen
   - Die Kosten stehen sichtbar an den Knöpfen („Hilfe 1 anzeigen (−2 Punkte)“, „Lösungsweg zeigen (−3 Punkte)“), damit die SuS bewusst entscheiden. Hilfe bleibt immer erreichbar.
@@ -240,7 +239,7 @@ Jede Lernsituation erfüllt diese Funktionen innerhalb der vier Phasen. **Method
 | Vorwissen abrufen | Warm-up | mindestens 5 kurze Abrufaufgaben, Ablesen, einfache Umformung |
 | Einstieg mit Spannung | Problem erkennen | Kundenauftrag, Entscheidungsfrage, Rätsel, Widerspruch, Schätzfrage, Chatnachricht |
 | Festlegung / Ausprobieren | Problem erkennen | interaktives Ausprobieren mit Rückmeldung (bevorzugt), Auswahl, Schieberegler, Schätzduell, Rangfolge |
-| Eigene Denkarbeit | Problem lösen | Rechenbeispiel zum Aufklappen, selbst rechnen oder Lösungsschema, Experiment mit Schieberegler, Fallvergleich, Code knacken |
+| Eigene Denkarbeit | Problem lösen | im Heft rechnen und Ergebnisse abgleichen (Beispielrechnung und Lernvideo zum Aufklappen, Fehlersuche), Experiment mit Schieberegler, Fallvergleich, Code knacken |
 | Handlungsprodukt | Problem lösen | strukturierter Rechenweg im Heft, Kundenbrief, Skizze, Spickzettel (überwiegend analog) |
 | Sicherung | Problem lösen | Rückbezug zur Festlegung, Merke ("Das hältst du fest") |
 | Üben und Prüfen | Wissen prüfen und vertiefen | 3 bis 4 Übungsaufgaben: Auswahl mit Fehloptionen, "Wer hat recht?", Rechenaufgabe, umgekehrte oder offene Aufgabe |
@@ -302,7 +301,7 @@ Alle Lernsituationen nutzen **dasselbe ruhige Gerüst**. Es gibt keine kontextab
 - Grün und Rot nur für Feedback richtig/falsch (Tokens `--correct`, `--wrong`).
 - Keine unterschiedlichen Farben pro Phase innerhalb der Seite.
 
-**Fester Kern (immer gleich):** Seitenansicht mit Phasenleiste und "Weiter", Aufklapp-Knöpfe, die Wahl "Selbst rechnen / Mit Lösungsschema", Eingabefelder, Feedbackfarben grün/rot, Hilfen, Niveaustufen-Kennzeichnung, Sozialform-Markierung. Sozialform und Zeit sind unauffällige Textlabels, keine bunten Badges.
+**Fester Kern (immer gleich):** Seitenansicht mit Phasenleiste und "Weiter", Aufklapp-Knöpfe (Beispielrechnung mit Lernvideo und Fehlersuche in voller Breite), Eingabefelder, Feedbackfarben grün/rot, Hilfen, Niveaustufen-Kennzeichnung, Sozialform-Markierung. Sozialform und Zeit sind unauffällige Textlabels, keine bunten Badges.
 
 **Touch-Bedienung:** Buttons und Eingabefelder mindestens 44 × 44 px, ausreichender Abstand zwischen Tippzielen, Fließtext mindestens 17 px.
 
@@ -368,10 +367,10 @@ Anforderungen an einen guten Kontext:
 
 ## Differenzierung
 
-- **Wahl des Wegs in "Problem lösen"** (`WegWahl`): selbstständig rechnen (nur Ergebnisfelder) oder mit Lösungsschema (Lückenrechnung). Rechenbeispiel und Satzanfänge sind aufklappbar. So entscheiden die SuS selbst, wie viel Unterstützung sie brauchen.
+- **Unterstützung nach Bedarf in "Problem lösen"**: Beispielrechnung mit Lernvideo, gestufte Hilfen, die Fehlersuche mit Zwischenergebnissen und die Satzanfänge sind aufklappbar. Alle rechnen selbst im Heft; wer Hilfe braucht, holt sie sich gezielt.
 - **Hilfen je nach Weg:**
-  - **Lösungsschema** (Lückenrechnung mit mehreren Zeilen): `SchrittHilfen` aus `lernsituation_kit/kit.tsx`. Bei der Rechnung steht "Hilfe zu: ① ② ③ …". Die SuS wählen den Schritt, bei dem sie hängen; es ist immer nur eine Hilfe offen. Jede Hilfe ist eine **konkrete Anleitung** für genau diesen Schritt, kein allgemeiner Denkanstoß. Die Kurzbezeichnungen entsprechen den Zeilennamen der Rechnung.
-  - **Selbst rechnen und andere Denkaufgaben** (Auswählen, Begründen, Erkunden): drei gestufte Hilfen mit `Hilfen` (1 Denkanstoß, 2 Strategie, 3 erster Schritt bzw. Teillösung).
+  - **Lückenrechnungen** (z. B. in Übungsaufgaben mit mehreren Zeilen): `SchrittHilfen` aus `lernsituation_kit/kit.tsx`. Bei der Rechnung steht "Hilfe zu: ① ② ③ …". Die SuS wählen den Schritt, bei dem sie hängen; es ist immer nur eine Hilfe offen. Jede Hilfe ist eine **konkrete Anleitung** für genau diesen Schritt, kein allgemeiner Denkanstoß. Die Kurzbezeichnungen entsprechen den Zeilennamen der Rechnung.
+  - **Ergebnis-Abgleich in "Problem lösen" und andere Denkaufgaben** (Auswählen, Begründen, Erkunden): drei gestufte Hilfen mit `Hilfen` (1 Denkanstoß, 2 Strategie, 3 erster Schritt bzw. Teillösung).
 - **Lösungsweg erst nach einem Fehlversuch:** In "Problem lösen" bekommen die `CheckCard`s `loesungNachFehler`. Der Knopf "Lösungsweg zeigen" erscheint erst, nachdem ein Feld einmal rot war.
 - **Niveaustufen** Basis, Standard und Erweiterung bei den Übungsaufgaben in Phase 4, sichtbar gekennzeichnet. Die Erweiterung enthält eine offene oder umgekehrte Aufgabe oder eine Begründung.
 
@@ -379,8 +378,8 @@ Anforderungen an einen guten Kontext:
 
 - **Konventionen von `mathe-aufgaben` gelten:** KaTeX, Merkhilfe der Wirtschaftsschule Bayern für Formeln und Abkürzungen, nachvollziehbare Rechenwege, Eingabefelder mit grün/rot und Lob. In Lernsituationen prüft sich jedes Feld selbst (richtig sofort grün, falsch nach kurzer Pause rot), ohne Button "Prüfen".
 - **Bausteine aus `mathe-trainer/src/pages/lineare_funktionen/lernsituation_kit/`:**
-  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Optionen `ruhig` und `thema`), Typ `Seite = { art, titel, frei?, bedingung?, pflicht?, inhalt: (fertig) => … }` mit `fertig()` bzw. `fertig.teil('schluessel')`, `Abschnitt` (Zwischenüberschrift), `Aufklappbar` (Rechenbeispiel, Satzanfänge), `WegWahl` (selbst rechnen / Lösungsschema), `Handlungsprodukt` (Auftrag), `LernsituationKarte` (Karte für die Auswahlseite), `THEMEN`, Typ `Thema`
-  - `kit.tsx`: `CheckCard` (mit `rechnung`, `fields`, `solution`, `help`, `onSolved`, `loesungNachFehler`), `McCard` (`onSolved`), `TrackedCheck`/`TrackedMc` (für Bereiche mit Nachverfolgung), `SchrittHilfen`, `Hilfen` (`HeftHinweis` wird in der Seitenansicht nicht angezeigt)
+  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Optionen `ruhig` und `thema`), Typ `Seite = { art, titel, frei?, bedingung?, pflicht?, inhalt: (fertig) => … }` mit `fertig()` bzw. `fertig.teil('schluessel')`, `Abschnitt` (Zwischenüberschrift), `Aufklappbar` (Satzanfänge; `breit` für volle Breite), `BeispielMitVideo` (Beispielrechnung mit Lernvideo), `Fehlersuche` (öffnet sich nach einem Fehler), `Handlungsprodukt` (Auftrag), `BonusSpiel`; `WegWahl` nur noch in älteren Lernsituationen, `LernsituationKarte` (Karte für die Auswahlseite), `THEMEN`, Typ `Thema`
+  - `kit.tsx`: `CheckCard` (mit `rechnung`, `fields`, `solution`, `help`, `onSolved`, `loesungNachFehler`, `onFehler`, `ohnePunkte`, `profi`), `McCard` (`onSolved`), `TrackedCheck`/`TrackedMc` (für Bereiche mit Nachverfolgung), `SchrittHilfen`, `Hilfen` (`HeftHinweis` wird in der Seitenansicht nicht angezeigt)
   - `phasen.tsx`: `PHASEN` (Namen und Reihenfolge der vier Phasen)
   - `Beispiel` aus `daten_und_zufall/lernpfad/kit.tsx` für Rechenbeispiele (`offen` zeigt alle Schritte, `ab` setzt die Schrittnummerierung fort)
   - `TaskShell` mit `kompakt`
@@ -395,20 +394,20 @@ Anforderungen an einen guten Kontext:
 - [ ] Das Log wurde gelesen, die neue Situation unterscheidet sich von den letzten drei mindestens in Format, Art des Handlungsprodukts und Themenfarbe, und sie ist eingetragen.
 - [ ] Genau vier Phasen in fester Reihenfolge, **jede auf genau einer Seite**: Warm-up, Problem erkennen, Problem lösen, Wissen prüfen und vertiefen.
 - [ ] Das Warm-up hat mindestens 5 Aufgaben, alle in `pflicht`.
-- [ ] Das Lernvideo des Themas (aus den Übungsaufgaben) steht beim Rechenbeispiel zum Aufklappen; gibt es keines, ist es als offener Punkt genannt.
+- [ ] Das Lernvideo des Themas (aus den Übungsaufgaben) ist in `BeispielMitVideo` eingebettet; gibt es keines, ist es als offener Punkt genannt.
 - [ ] Nichts wird geprüft, bevor es erarbeitet wurde.
 - [ ] Keine Austausch-Phase, keine Stopp-Kästen, kein "Vergleicht eure Wege", kein "So haben andere gedacht".
 - [ ] Seitenansicht mit Startbox (Titelbild, Name, Heft-Bestätigung); "Weiter" erst, wenn alle Pflichtaufgaben der Phase gelöst sind (`pflicht`, `fertig.teil`).
 - [ ] Kein seitliches Scrollen bei 1180 × 820, 1920 × 1080 und 390 × 844 (per Playwright getestet); bei 1920 × 1080 bleibt jede Seite einspaltig. Nach unten scrollen ist erlaubt; Skizzen und Graphen sind nicht gestaucht, Beschriftungen gut lesbar.
 - [ ] In "Problem erkennen" ist klar, dass es ums Ausprobieren geht; Auftrag und Ausprobieren stehen auf einer Seite; die SuS merken, dass ihr Vorwissen nicht sicher reicht.
 - [ ] "Problem erkennen" zeigt Situation, Problem (gegeben/gesucht als Fließtext) und den Auftrag als einzigen Fokus.
-- [ ] "Problem lösen": Problem oben als Fokus, darunter Rechenbeispiel (andere Zahlen) zum Aufklappen, Auftrag zum Handlungsprodukt, Wahl "Selbst rechnen / Mit Lösungsschema" mit denselben Ergebnissen, Lösungsweg erst nach einem Fehlversuch, am Ende Rückbezug und Merke. Kein Beispiel vor dem Problem.
+- [ ] "Problem lösen": Problem oben als Fokus, darunter `BeispielMitVideo` (breiter Knopf, Video oben, Beispiel mit anderen Zahlen darunter), "Vergleiche deine Ergebnisse" mit den Endergebnissen als Fragen, gestuften Hilfen und Lösungsweg erst nach einem Fehlversuch, darunter die `Fehlersuche` mit Zwischenergebnissen (öffnet sich automatisch), dann ggf. Entscheidung, Handlungsprodukt mit Kriterien, am Ende Rückbezug und Merke. Kein Beispiel vor dem Problem, keine `WegWahl`.
 - [ ] Kein Heft-Hinweis und kein "Schreibe … ins Heft" an den Aufgaben (die Bestätigung in der Startbox genügt).
 - [ ] Eingabefelder prüfen sich selbst (richtig sofort grün, falsch nach kurzer Pause rot), kein Prüfen-Button außer bei Auswahlaufgaben.
 - [ ] Alles Mathematische ist mit KaTeX gesetzt, auch im Fließtext; keine `.katex-error`.
 - [ ] Funktionsgleichungen mit `y = …`, Funktionswerte als "x einsetzen", Scheitelform `y = a(x − x_S)² + y_S`.
-- [ ] Im Lösungsschema stehen die Lücken direkt in der Gleichung; jedes Zwischenergebnis hat eine eigene Zeile (z. B. `a = [ ]`).
-- [ ] Lösungsschema mit Schritt-Hilfen (konkrete Anleitungen), selbst rechnen und andere Denkaufgaben mit drei gestuften Hilfen; Niveaustufen sind gekennzeichnet.
+- [ ] Wo es Lückenrechnungen gibt (z. B. in Übungsaufgaben), stehen die Lücken direkt in der Gleichung; jedes Zwischenergebnis hat eine eigene Zeile (z. B. `a = [ ]`).
+- [ ] Ergebnis-Abgleich und andere Denkaufgaben mit drei gestuften Hilfen, Lückenrechnungen mit Schritt-Hilfen (konkrete Anleitungen); Niveaustufen sind gekennzeichnet.
 - [ ] Es gibt genau einen klaren Aha- oder Widerspruchsmoment.
 - [ ] Der Kontext passt zur Lebenswelt von 15- bis 18-Jährigen, die Zahlen sind realistisch.
 - [ ] Festlegung bzw. Versuche werden am Ende von "Problem lösen" wieder aufgegriffen.
@@ -416,7 +415,7 @@ Anforderungen an einen guten Kontext:
 - [ ] "Problem erkennen" und "Problem lösen" haben je mindestens ein inhaltliches Bild (Graph, Skizze oder Sachbild im Stil des Titelbilds), das nichts von der Lösung verrät; beim Handlungsprodukt zeigt ein kleines Bild, was entstehen soll.
 - [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat 2 bis 4 Kriterien zum Abhaken, dazu das Kriterium „unbekannte Begriffe und Bedeutung der Abkürzungen der Formel aufschreiben“ mit den konkreten Abkürzungen.
 - [ ] "Wissen prüfen und vertiefen" hat mindestens 3, besser 4 passende Übungsaufgaben (Basis bis Erweiterung) und darunter die Abschluss-Buttons.
-- [ ] Gamification an: `SeitenLernsituation` mit `punkte`, Schema-Weg mit `punkte={8}`, Profi-Aufgabe mit `profi`, `<Bilanz />` am Ende der letzten Seite; die Punkte wurden im Test nachgerechnet.
+- [ ] Gamification an: `SeitenLernsituation` mit `punkte`, Fehlersuche mit `ohnePunkte`, Profi-Aufgabe mit `profi`, `<Bilanz />` am Ende der letzten Seite; die Punkte wurden im Test nachgerechnet.
 - [ ] Nach allen Pflicht-Übungen wird ein thematisch passendes Bonus-Spiel freigeschaltet (`BonusSpiel`), das das Wissen spielerisch prüft, auf dem Tablet bedienbar ist und "Nochmal spielen" anbietet.
 - [ ] Ruhiges Grunddesign: einspaltig (auch bei 1920 × 1080), ein Fokus pro Seite, keine verschachtelten Kästen, keine Farbstreifen oder Banner, eine Akzentfarbe, Touch-Ziele mindestens 44 px.
 - [ ] Identität vollständig: Themenfarbe (anders als in den letzten drei Lernsituationen), Symbol und Name als Kennung in der Leiste, eigenes Titelbild in der Startbox, Leitobjekt durch alle Phasen.

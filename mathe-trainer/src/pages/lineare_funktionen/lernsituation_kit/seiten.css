@@ -156,3 +156,4 @@
 .sl-wegwahl { display: flex; flex-direction: column; gap: 10px; }
 .sl-wegwahl-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; }
 .sl-wegwahl [hidden] { display: none; }
+.sl-aufklappbar-breit > div > .bk-btn { width: 100%; justify-content: center; }

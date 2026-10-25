@@ -56,10 +56,10 @@ nicht nur auf einen Feature-Branch. Vorher `main` aktualisieren und mergen, kein
 
 Jede Lernsituation hat genau vier Phasen in fester Reihenfolge: **1 Warm-up**, **2 Problem erkennen**, **3 Problem lösen**,
 **4 Wissen prüfen und vertiefen** (mindestens 3–4 Übungsaufgaben). Seit 2026-10-24 steht **jede Phase auf genau einer Seite**
-(`Seite.pflicht` + `fertig.teil('…')`, „Weiter“ erst, wenn alle Pflichtaufgaben gelöst sind). „Problem lösen“: Problem oben, Rechenbeispiel
-zum Aufklappen (`Aufklappbar`), Auftrag zum meist analogen Handlungsprodukt (`Handlungsprodukt`), dann `WegWahl` „Selbst rechnen“
-(nur Ergebnisfelder, `Hilfen`) oder „Mit Lösungsschema“ (Lückenrechnung, `SchrittHilfen`), beide mit `loesungNachFehler`; danach Rückbezug
-und Merke. Vorlage: `finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx`. Namen und Reihenfolge der Phasen stehen nur in `PHASEN`
+(`Seite.pflicht` + `fertig.teil('…')`, „Weiter“ erst, wenn alle Pflichtaufgaben gelöst sind). „Problem lösen“ (seit 2026-10-25): Problem oben, `BeispielMitVideo`
+(ein breiter Knopf, Lernvideo eingebettet, darunter das Rechenbeispiel), „Vergleiche deine Ergebnisse“ (CheckCard nur mit den Endergebnissen
+aus dem Heft, `Hilfen`, `loesungNachFehler`, `onFehler`), darunter `Fehlersuche` mit Zwischenergebnissen (öffnet sich nach einem Fehler,
+`ohnePunkte`), ggf. Entscheidung, Handlungsprodukt mit Kriterien, Rückbezug und Merke. Keine `WegWahl` mehr. Vorlage: `VereinsbusEinstieg.tsx`. Seitenansicht und Phasen sonst wie `finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx`. Namen und Reihenfolge der Phasen stehen nur in `PHASEN`
 (`lineare_funktionen/lernsituation_kit/phasen.tsx`). In „Problem lösen“ steht das eigentliche Problem im Mittelpunkt, ohne vorgeschaltete Nebenaufgaben.
 Seitenansicht: Lernsituationen beginnen mit einer Startbox, in der die SuS bestätigen, dass sie alle Rechenschritte im Heft
 dokumentieren. Danach folgt eine Seite pro Phase; „Weiter“ wird erst frei, wenn die Seite erledigt ist. Dafür
@@ -69,20 +69,20 @@ Skizzen und Graphen nicht stauchen, damit alles auf einen Bildschirm passt. Beis
 Ruhiges Grunddesign (seit 2026-10-23, Vorlage `TorbogenEinstieg.tsx`): `SeitenLernsituation` mit `ruhig`, immer einspaltig (auch auf breiten
 Monitoren, kein `ZweiSpalten`), kein seitliches Scrollen; eine Akzentfarbe, keine Farbstreifen, keine verschachtelten Kästen,
 keine Kontext-Looks; pro Seite ist nur der Auftrag hervorgehoben (`sl-fokus`). Jede Lernsituation hat trotzdem eine eigene Identität
-(Prop `thema`: Themenfarbe aus `THEMEN`, Symbol, Name, Titelbild, dazu ein Leitobjekt), damit sie nicht wie alle anderen aussieht. Reihenfolge in „Problem lösen“ immer: Problem → Rechenbeispiel (aufklappbar) →
-Handlungsprodukt → eigene Rechnung. Bei Auswahlaufgaben ist Antwort A nie die richtige. Details: `docs/skills/lernsituationen/SKILL.md`.
+(Prop `thema`: Themenfarbe aus `THEMEN`, Symbol, Name, Titelbild, dazu ein Leitobjekt), damit sie nicht wie alle anderen aussieht. Reihenfolge in „Problem lösen“ immer: Problem → Beispielrechnung mit Lernvideo (aufklappbar) →
+Ergebnisse abgleichen mit Fehlersuche → Handlungsprodukt. Bei Auswahlaufgaben ist Antwort A nie die richtige. Details: `docs/skills/lernsituationen/SKILL.md`.
 Eingabefelder in Lernsituationen prüfen sich selbst (richtig sofort grün, falsch nach kurzer Tipp-Pause oder beim Verlassen rot),
 ohne Prüfen-Button: `CheckCard` macht das automatisch, eigene Eingabe-Bausteine nutzen `useLiveCheck` aus `lernsituation_kit/kit.tsx`.
 Nur Auswahlaufgaben (`McCard`) behalten „Prüfen“.
-Warm-up: mindestens 5 kurze Aufgaben, alle Pflicht. Beim Rechenbeispiel in „Problem lösen“ steht immer das passende Lernvideo zum Aufklappen
-(`VideoAufklappen`), falls es eines gibt; die Videos sind meist schon bei den Übungsaufgaben des Themas verlinkt und werden von dort übernommen.
+Warm-up: mindestens 5 kurze Aufgaben, alle Pflicht. Beim Rechenbeispiel in „Problem lösen“ ist immer das passende Lernvideo eingebettet
+(`BeispielMitVideo` mit `video`), falls es eines gibt; die Videos sind meist schon bei den Übungsaufgaben des Themas verlinkt und werden von dort übernommen.
 Die Kriterien des Handlungsprodukts enthalten immer einen Punkt „unbekannte Begriffe und die Bedeutung aller Abkürzungen der Formel aufschreiben“,
 mit den konkreten Abkürzungen des Themas (z. B. Rentenrechnung: r = Rate bzw. Rente).
 Ganz am Ende („Wissen prüfen und vertiefen“, unter den Übungen) wird nach allen Pflicht-Übungen ein kleines thematisch passendes Mathe-Spiel
 freigeschaltet (`BonusSpiel` aus `lernsituation_kit/seiten.tsx`; Beispiele `quadratische_funktionen/MarioSpiel.tsx`,
 `finanzmathe/rentenrechnung_einstieg/BusRallye.tsx`; Regeln und Ideen im Skill).
 Gamification: `SeitenLernsituation` mit `punkte` (Punkte in der Leiste: 10 je Aufgabe, Hilfe −2, Fehlversuch −2, Lösungsweg vor dem Lösen
-0 Punkte und −3 Abzug, Lösungsschema höchstens 8, Serien-Bonus; `<Bilanz />` mit Sternen, Abzeichen und Rekord am Ende; Bausteine in
+0 Punkte und −3 Abzug, Fehlersuche ohne Punkte, Serien-Bonus; `<Bilanz />` mit Sternen, Abzeichen und Rekord am Ende; Bausteine in
 `lernsituation_kit/punkte.tsx`, Vorlage `finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx`).
 Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
 aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
