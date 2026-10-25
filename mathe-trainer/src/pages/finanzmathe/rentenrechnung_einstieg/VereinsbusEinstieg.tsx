@@ -35,6 +35,9 @@ import './rentenrechnung.css';
 // Identität: Themenfarbe Schiefer, Symbol Kleinbus, Titelbild Vereinsheim mit Kleinbus, Leitobjekt der Raten-Zeitstrahl
 // (wie lange jede Rate verzinst wird). Die Festlegung bleibt nur im Seitenzustand.
 
+/** Lernvideo zum Endwert (auch bei den Übungsaufgaben unter /finanzmathe/endwert/ueben verlinkt) */
+export const VIDEO_ENDWERT = 'https://www.youtube.com/watch?v=46OXNN-TSFM';
+
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
 // 6 Raten zu 5.000 €, 3 % p.a., Bus 33.000 €.
@@ -610,7 +613,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
               </p>
             </div>
             <ZeitstrahlUmschalten werte={raten} />
-            <BeispielMitVideo>
+            <BeispielMitVideo video={VIDEO_ENDWERT} videoTitel="Lernvideo: Rentenrechnung, Endwert berechnen">
               <Beispiel offen title="Der Sparplan der Tischtennisabteilung" aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE} />
             </BeispielMitVideo>
             <Abschnitt titel="Vergleiche deine Ergebnisse">
