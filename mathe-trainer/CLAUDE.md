@@ -74,7 +74,7 @@ Ergebnisse abgleichen mit Fehlersuche → Handlungsprodukt. Bei Auswahlaufgaben 
 Eingabefelder in Lernsituationen prüfen sich selbst (richtig sofort grün, falsch nach kurzer Tipp-Pause oder beim Verlassen rot),
 ohne Prüfen-Button: `CheckCard` macht das automatisch, eigene Eingabe-Bausteine nutzen `useLiveCheck` aus `lernsituation_kit/kit.tsx`.
 Nur Auswahlaufgaben (`McCard`) behalten „Prüfen“.
-Warm-up: mindestens 5 kurze Aufgaben, alle Pflicht. Beim Rechenbeispiel in „Problem lösen“ ist immer das passende Lernvideo eingebettet
+Warm-up: mindestens 5 kurze Aufgaben, alle Pflicht, jede sichtbar nummeriert (Kartentitel „a) Kurzname“, „b) …“; `seiten.css` zeigt die Titel auf der Warm-up-Seite an). Beim Rechenbeispiel in „Problem lösen“ ist immer das passende Lernvideo eingebettet
 (`BeispielMitVideo` mit `video`), falls es eines gibt; die Videos sind meist schon bei den Übungsaufgaben des Themas verlinkt und werden von dort übernommen.
 Die Kriterien des Handlungsprodukts enthalten immer einen Punkt „unbekannte Begriffe und die Bedeutung aller Abkürzungen der Formel aufschreiben“,
 mit den konkreten Abkürzungen des Themas (z. B. Rentenrechnung: r = Rate bzw. Rente).

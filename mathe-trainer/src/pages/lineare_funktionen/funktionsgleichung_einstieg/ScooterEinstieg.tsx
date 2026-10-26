@@ -510,7 +510,7 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
           <CheckCard
             onSolved={fertig.teil('e')}
             punkte={2}
-            title="e) x einsetzen"
+            title={<>e) <M>x</M> einsetzen</>}
             prompt={
               <p>
                 Gerade: <M>{'y = 0{,}4x + 1{,}5'}</M>. Welchen y-Wert hat sie bei <M>{'x = 10'}</M>?

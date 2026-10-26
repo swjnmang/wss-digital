@@ -420,7 +420,7 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
           <CheckCard
             onSolved={fertig.teil('a')}
             punkte={2}
-            title="a) x einsetzen"
+            title={<>a) <M>x</M> einsetzen</>}
             prompt={
               <p>
                 Ein Ball fliegt auf der Bahn <M>{'y = -0{,}5x^2 + 2x + 1'}</M>. Wie hoch ist er bei <M>{'x = 3'}</M>?
