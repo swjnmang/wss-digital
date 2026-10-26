@@ -45,7 +45,7 @@ const SUBMENUS: Record<string, MenuItem[]> = {
   '/rechnen_lernen/prozentrechnung': prozent,
   '/rechnen_lernen/gleichungen': gleichungen,
   '/finanzmathe/zinsrechnung': zinsrechnung,
-  // nur die eigene Übung, das Additionsverfahren gehört zu den linearen Funktionen
+  // nur die eigene Übung, das Additions- und Subtraktionsverfahren gehört zu den linearen Funktionen
   '/quadratische_funktionen/funktionsgleichung_aufstellen': funktionsgleichungQF.slice(0, 1),
   '/finanzmathe/anwendungsaufgaben': finanzAnwendung,
   '/trigonometrie/anwendungsaufgaben': trigoAnwendung,

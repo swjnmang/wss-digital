@@ -343,6 +343,7 @@ export default function App() {
           <Route path="/quadratische_funktionen/funktionsgleichung_aufstellen/ueben" element={<FunktionsgleichungAufstellen />} />
           <Route path="/quadratische_funktionen/funktionsgleichung_aufstellen/lernsituation-1" element={<FunktionsgleichungLernsituation teil={1} />} />
           <Route path="/quadratische_funktionen/funktionsgleichung_aufstellen/lernsituation-2" element={<FunktionsgleichungLernsituation teil={2} />} />
+          <Route path="/quadratische_funktionen/funktionsgleichung_aufstellen/lernsituation-3" element={<FunktionsgleichungLernsituation teil={3} />} />
           <Route path="/quadratische_funktionen/nullstellen" element={<NullstellenQF />} />
           <Route path="/quadratische_funktionen/schnittpunkte" element={<SchnittpunkteGeradeQF />} />
           <Route path="/quadratische_funktionen/schnittpunkte_gerade" element={<SchnittpunkteGeradeQF />} />

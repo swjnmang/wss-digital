@@ -1,0 +1,48 @@
+/* Lernsituation „Das Gleichungs-Labor“ im ruhigen Grunddesign: eine Spalte, Farben kommen über --primary aus dem Thema.
+   Der feste Kern (Eingaben, Feedback, Hilfen) kommt unverändert aus lernsituation_kit/kit.css. */
+
+/* Skizzen in gut lesbarer Größe; nach unten scrollen ist erlaubt */
+.gl-bild svg { max-height: 320px; max-width: 760px; }
+
+/* Punkt-Test in „Problem erkennen“: Skizze, Eingabe und Anzeige untereinander */
+.gl-test { display: flex; flex-direction: column; gap: 10px; }
+.gl-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 19px; }
+.gl-eingabe label { display: inline-flex; align-items: center; gap: 6px; }
+.gl-eingabe .lp-input, .gl-eingabe .bk-btn { min-height: 44px; }
+.gl-display {
+  display: flex; flex-direction: column; gap: 2px; padding: 8px 14px;
+  border-radius: 10px; background: var(--wrong-soft); color: var(--wrong-ink);
+  font-size: 15px; line-height: 1.45;
+}
+.gl-display-ok { background: var(--correct-soft); color: var(--correct-ink); }
+.gl-display-head { font-weight: 700; }
+.gl-display ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.gl-display .fa-circle-check { color: var(--correct); }
+.gl-display .fa-circle-xmark { color: var(--wrong); }
+
+/* Das Gleichungs-Labor: zwei Gleichungen, Faktoren, Rechnung und Ergebnis */
+.gl-labor { display: flex; flex-direction: column; gap: 10px; padding: 14px 18px; border: 2px solid var(--line); border-radius: 14px; background: var(--surface); }
+.gl-labor-kopf { display: flex; align-items: center; gap: 8px; margin: 0; font: 800 17px/1.3 var(--font-display); color: var(--primary); }
+.gl-zeilen { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; gap: 6px 14px; font-size: 19px; }
+.gl-zeilen .gl-name { font-weight: 800; color: var(--ink-muted); font-size: 16px; }
+.gl-strich { grid-column: 1 / -1; border-top: 2.5px solid var(--ink); margin: 2px 0; }
+.gl-knoepfe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.gl-knoepfe > span { font-weight: 700; font-size: 16px; color: var(--ink-muted); }
+.gl-knoepfe .bk-btn { min-height: 44px; min-width: 52px; justify-content: center; }
+.gl-meldung { margin: 0; padding: 8px 14px; border-radius: 10px; background: var(--surface-sunken); font-size: 16px; line-height: 1.45; }
+.gl-meldung-weg { background: var(--correct-soft); color: var(--correct-ink); font-weight: 700; }
+.gl-weg { color: var(--correct-ink); text-decoration: line-through; text-decoration-thickness: 2px; }
+
+/* Bonus-Spiel Ballon-Labor */
+.gl-spiel { display: flex; flex-direction: column; gap: 12px; outline: none; }
+.gl-spiel-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 800 17px/1.3 var(--font-display); color: var(--primary); }
+.gl-muenzen { display: flex; gap: 6px; font-size: 20px; color: var(--line-strong); }
+.gl-muenzen .gl-muenze-an { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.gl-spiel-frage { margin: 0; font-size: 18px; line-height: 1.6; }
+.gl-spiel-gleichungen { display: flex; flex-wrap: wrap; gap: 4px 32px; }
+.gl-spiel-bild { display: block; width: 100%; height: auto; max-height: 340px; touch-action: manipulation; user-select: none; }
+.gl-spiel-bild .gl-ballon { cursor: pointer; }
+.gl-spiel-bild .gl-ballon:focus { outline: none; }
+.gl-spiel-bild .gl-ballon:focus-visible ellipse { stroke-width: 5; }
+.gl-spiel-ende { margin: 0; font: 800 20px/1.4 var(--font-display); color: var(--ink); }
+.gl-spiel-ende i { color: var(--primary); margin-right: 6px; }
