@@ -1,10 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './Funktionsgleichung.module.css'
 import GeoGebraGraph from '../../components/GeoGebraGraph'
-import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { checkLinearEquation, parseLinearEquation, texLinearEquation } from '../../utils/parseLinearEquation'
+import { fieldCheckClass } from '../../utils/fieldCheck'
+import GleichungEingabe from '../../components/GleichungEingabe'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import VideoButton from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
+import { InlineMath } from 'react-katex'
+import 'katex/dist/katex.min.css'
+import { useBackHandler } from '../../hooks/useBackHandler'
+import { LernsituationKarte } from './lernsituation_kit/seiten'
+import ScooterEinstieg from './funktionsgleichung_einstieg/ScooterEinstieg'
 
 declare global {
   interface Window { 
@@ -32,40 +39,19 @@ function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-function validateInput(value: string, correctValue: number, tolerance: number): 'correct' | 'incorrect' | null {
-  if (value.trim() === '') return null
-  const parsed = parseFlexibleNumber(value)
-  if (isNaN(parsed)) return 'incorrect'
-  return Math.abs(parsed - correctValue) <= tolerance ? 'correct' : 'incorrect'
-}
-
-function formatEquationPreview(m: string, sign: string, t: string): string {
-  if (!m && !sign && !t) return 'y = ? \\cdot x + ?'
-  
-  const mVal = m || '?'
-  const signVal = sign || '?'
-  const tVal = t || '?'
-  
-  const mDisplay = m ? `${m}` : '?'
-  const signDisplay = sign ? ` ${sign} ` : ' ? '
-  const tDisplay = t ? `${t}` : '?'
-  
-  return `y = ${mDisplay} \\cdot x${signDisplay}${tDisplay}`
-}
-
 export default function Funktionsgleichung(){
-  const tracking = useTaskTracking('Funktionsgleichung aufstellen')
+  // Beim Öffnen steht zuerst die Auswahl „Lernsituation“ / „Übungsaufgaben“, noch keine Aufgabe
+  const tracking = useTaskTracking('Funktionsgleichung aufstellen', { shownOnMount: false })
+  const [ansicht, setAnsicht] = useState<'auswahl' | 'lernsituation' | 'ueben'>('auswahl')
+  // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
+  useBackHandler(ansicht !== 'auswahl', () => setAnsicht('auswahl'))
   const [mode, setMode] = useState<'twoPoints'|'pointSlope'|'readGraph'>('twoPoints')
   const [p1, setP1] = useState({ x: 1, y: 2 })
   const [p2, setP2] = useState({ x: 4, y: 5 })
   const [mCorrect, setMCorrect] = useState<number>( (p2.y - p1.y) / (p2.x - p1.x) )
   const [tCorrect, setTCorrect] = useState<number>( p1.y - mCorrect * p1.x )
-  const [mInput, setMInput] = useState('')
-  const [signInput, setSignInput] = useState('')
-  const [tInput, setTInput] = useState('')
-  const [mCorrectness, setMCorrectness] = useState<'correct' | 'incorrect' | null>(null)
-  const [signCorrectness, setSignCorrectness] = useState<'correct' | 'incorrect' | null>(null)
-  const [tCorrectness, setTCorrectness] = useState<'correct' | 'incorrect' | null>(null)
+  const [eingabe, setEingabe] = useState('')
+  const [eingabeStatus, setEingabeStatus] = useState<'correct' | 'incorrect' | null>(null)
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
   const [punkte, setPunkte] = useState(0)
@@ -99,12 +85,8 @@ export default function Funktionsgleichung(){
     setP1({ x: x1, y: y1 })
     setP2({ x: x2, y: y2 })
     setMode('twoPoints')
-    setMInput('')
-    setSignInput('')
-    setTInput('')
-    setMCorrectness(null)
-    setSignCorrectness(null)
-    setTCorrectness(null)
+    setEingabe('')
+    setEingabeStatus(null)
     setFeedback('')
     setShowSolution(false)
   }
@@ -118,12 +100,8 @@ export default function Funktionsgleichung(){
     // represent as point-slope: point P1 and slope m
     setP2({ x: x + 1, y: y + m })
     setMode('pointSlope')
-    setMInput('')
-    setSignInput('')
-    setTInput('')
-    setMCorrectness(null)
-    setSignCorrectness(null)
-    setTCorrectness(null)
+    setEingabe('')
+    setEingabeStatus(null)
     setFeedback('')
     setShowSolution(false)
   }
@@ -146,50 +124,100 @@ export default function Funktionsgleichung(){
     setP2({ x: 1, y: t + m })
     
     setMode('readGraph')
-    setMInput('')
-    setSignInput('')
-    setTInput('')
-    setMCorrectness(null)
-    setSignCorrectness(null)
-    setTCorrectness(null)
+    setEingabe('')
+    setEingabeStatus(null)
     setFeedback('')
     setShowSolution(false)
   }
 
   function check() {
-    setFeedback('')
-    const mi = parseFlexibleNumber(mInput)
-    const ti = parseFlexibleNumber(tInput)
-    const sign = signInput.trim()
-
-    if (isNaN(mi) || isNaN(ti) || !sign) {
-      setFeedback('Bitte alle Werte eingeben.')
+    const tol = mode === 'readGraph' ? 0 : 0.02
+    const r = checkLinearEquation(eingabe, mCorrect, tCorrect, tol)
+    if (r.status === 'invalid') {
+      // Eingabefehler (Form der Gleichung): Hinweis, aber kein Prüfversuch
+      setEingabeStatus('incorrect')
+      setFeedback(r.text)
       return
     }
-
-    if (sign !== '+' && sign !== '-') {
-      setFeedback('Bitte + oder - eingeben.')
-      return
-    }
-
-    // Die Validierung hat bereits stattgefunden, daher prüften wir nur die Status
-    const allCorrect = mCorrectness === 'correct' && signCorrectness === 'correct' && tCorrectness === 'correct'
-    tracking.onCheck(allCorrect)
-    if (allCorrect) {
-      setFeedback('✓ Perfekt! Alle Werte sind korrekt!')
-      // Punkte vergeben nur wenn Lösung nicht angezeigt wurde
+    const ok = r.status === 'ok'
+    setEingabeStatus(ok ? 'correct' : 'incorrect')
+    tracking.onCheck(ok)
+    if (ok) {
       if (!showSolution) {
         setPunkte(punkte + 3)
-        setFeedback('✓ Perfekt! +3 Punkte! 🎉')
-      }
+        setFeedback('✓ Perfekt, die Gleichung stimmt! +3 Punkte! 🎉')
+      } else setFeedback('✓ Richtig, die Gleichung stimmt!')
     } else {
-      setFeedback('✗ Leider nicht vollständig korrekt. Überprüfe deine Eingaben.')
+      setFeedback(`✗ ${r.text}`)
     }
   }
 
   function showSol() {
     setShowSolution(true)
     tracking.onHintShown()
+  }
+
+  const ueben = (art: 'twoPoints' | 'readGraph') => {
+    if (art === 'twoPoints') genTwoPoints()
+    else genReadGraph()
+    setAnsicht('ueben')
+    window.scrollTo({ top: 0 })
+  }
+
+  if (ansicht === 'lernsituation') {
+    return (
+      <ScooterEinstieg
+        onBack={() => {
+          setAnsicht('auswahl')
+          window.scrollTo({ top: 0 })
+        }}
+        onPractice={() => ueben('twoPoints')}
+      />
+    )
+  }
+
+  if (ansicht === 'auswahl') {
+    return (
+      <TaskShell title="Funktionsgleichung aufstellen" width="narrow">
+        <div className="flex flex-col gap-6">
+          <p className="text-center text-slate-600">Aus zwei Punkten oder einem Graphen die Gleichung y = mx + t einer Geraden aufstellen.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bk-panel text-center flex flex-col">
+              <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
+              <LernsituationKarte
+                className="flex-1"
+                thema={{ name: 'Die Scooter-App', farbe: 'petrol', icon: 'fa-mobile-screen-button' }}
+                beschreibung="Neu beim Thema? Knacke den Tarif deiner E-Scooter-App aus zwei Fahrten und lerne dabei, wie man die Funktionsgleichung aus zwei Punkten aufstellt."
+                onClick={() => setAnsicht('lernsituation')}
+              />
+            </div>
+            <div className="bk-panel text-center sm:col-span-2 flex flex-col">
+              <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => ueben('twoPoints')}
+                  className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+                >
+                  <p className="text-lg font-bold mb-1 text-white">Aus zwei Punkten</p>
+                  <p className="text-xl font-serif italic mb-2 text-white">P₁(1|2), P₂(4|5)</p>
+                  <p className="text-sm text-white/90">Zwei Punkte sind gegeben. Du tippst die ganze Gleichung ein.</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => ueben('readGraph')}
+                  className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+                >
+                  <p className="text-lg font-bold mb-1 text-white">Graph ablesen</p>
+                  <p className="text-xl font-serif italic mb-2 text-white">y = ?</p>
+                  <p className="text-sm text-white/90">Ein Graph ist gegeben. Du liest zwei Punkte ab und tippst die ganze Gleichung ein.</p>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </TaskShell>
+    )
   }
 
   return (
@@ -204,11 +232,11 @@ export default function Funktionsgleichung(){
         {/* Task - nur Text, kein Kasten */}
         <div className={styles.taskText}>
           {mode === 'twoPoints' ? (
-            <p>Gegeben sind die Punkte P₁({p1.x}|{p1.y}) und P₂({p2.x}|{p2.y}). Stelle die Gleichung y = mx + t auf.<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
+            <p>Gegeben sind die Punkte P₁({p1.x}|{p1.y}) und P₂({p2.x}|{p2.y}). Stelle die Funktionsgleichung auf und tippe sie vollständig ein.<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
           ) : mode === 'pointSlope' ? (
-            <p>Gegeben ist der Punkt P({p1.x}|{p1.y}) und die Steigung m (oben). Stelle die Gleichung y = mx + t auf.<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
+            <p>Gegeben ist der Punkt P({p1.x}|{p1.y}) und die Steigung m (oben). Stelle die Funktionsgleichung auf und tippe sie vollständig ein.<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
           ) : (
-            <p>Betrachte den dargestellten Funktionsgraphen. Wähle dir zwei passende Punkte aus und berechne die Funktionsgleichung y = mx + t!<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
+            <p>Betrachte den dargestellten Funktionsgraphen. Wähle dir zwei passende Punkte aus und bestimme die Funktionsgleichung. Tippe sie vollständig ein!<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
           )}
         </div>
 
@@ -224,57 +252,33 @@ export default function Funktionsgleichung(){
           </div>
         )}
 
-        {/* Solution Input - 3 Boxen */}
+        {/* Eingabe: die komplette Funktionsgleichung, z. B. y = 2x + 3 */}
         <div className={styles.solutionInputContainer}>
-          <div>Die Funktionsgleichung lautet: y = </div>
-          <input 
-            type="text"
-            value={mInput}
-            onChange={(e) => {
-              setMInput(e.target.value)
-              const tolerance = mode === 'readGraph' ? 0 : 0.02
-              setMCorrectness(validateInput(e.target.value, mCorrect, tolerance))
+          <label htmlFor="fg-eingabe">Funktionsgleichung:</label>
+          <GleichungEingabe
+            id="fg-eingabe"
+            value={eingabe}
+            onChange={(v) => {
+              setEingabe(v)
+              setEingabeStatus(null)
+              setFeedback('')
+              tracking.onInput()
             }}
-            className={`${styles.solutionInputBox} ${mCorrectness === 'correct' ? styles.correct : mCorrectness === 'incorrect' ? styles.incorrect : ''}`}
-            placeholder="m"
-          />
-          <div>*x</div>
-          <input 
-            type="text"
-            value={signInput}
-            onChange={(e) => {
-              const val = e.target.value.trim().toUpperCase()
-              if (val === '' || val === '+' || val === '-') {
-                setSignInput(val)
-                if (val === '') {
-                  setSignCorrectness(null)
-                } else {
-                  const correctSign = tCorrect >= 0 ? '+' : '-'
-                  setSignCorrectness(val === correctSign ? 'correct' : 'incorrect')
-                }
-              }
-            }}
-            maxLength={1}
-            className={`${styles.solutionInputBox} ${styles.signBox} ${signCorrectness === 'correct' ? styles.correct : signCorrectness === 'incorrect' ? styles.incorrect : ''}`}
-            placeholder="±"
-          />
-          <input 
-            type="text"
-            value={tInput}
-            onChange={(e) => {
-              setTInput(e.target.value)
-              const tolerance = mode === 'readGraph' ? 0 : 0.02
-              setTCorrectness(validateInput(e.target.value, Math.abs(tCorrect), tolerance))
-            }}
-            className={`${styles.solutionInputBox} ${tCorrectness === 'correct' ? styles.correct : tCorrectness === 'incorrect' ? styles.incorrect : ''}`}
-            placeholder="t"
+            className={fieldCheckClass(eingabeStatus)}
           />
         </div>
+        <p className={styles.eingabeHinweis}>Tippe die ganze Gleichung ein, mit „y =“, Steigung, x und y-Achsenabschnitt (z. B. y = −0,5x + 2).</p>
 
-        {/* Live-Vorschau der Gleichung */}
-        <div className={styles.equationPreview}>
-          <MathDisplay latex={`$$${formatEquationPreview(mInput, signInput, tInput)}$$`} />
-        </div>
+        {/* Live-Vorschau: so wird die Eingabe gelesen */}
+        {(() => {
+          const p = parseLinearEquation(eingabe)
+          return p.ok ? (
+            <div className={styles.equationPreview} aria-live="polite">
+              <span className={styles.previewLabel}>So lese ich deine Eingabe:</span>
+              <span className={styles.previewMath}><InlineMath math={texLinearEquation(p.m, p.t)} /></span>
+            </div>
+          ) : null
+        })()}
 
         {feedback && (
           <div className={`${styles.feedback} ${feedback.includes('✓') ? styles.success : styles.error}`}>
@@ -371,7 +375,7 @@ export default function Funktionsgleichung(){
               )}
             </div>
             <div className={styles.answerBox}>
-              <MathDisplay latex={`$$y = ${mCorrect}x ${tCorrect >= 0 ? '+' : '-'} ${Math.abs(tCorrect)}$$`} />
+              <MathDisplay latex={`$$${texLinearEquation(mCorrect, tCorrect)}$$`} />
             </div>
           </div>
         )}

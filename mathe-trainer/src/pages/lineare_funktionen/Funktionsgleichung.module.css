@@ -29,3 +29,7 @@
 .solutionStep { background: var(--surface-sunken); border-radius: 12px; padding: 10px 14px; margin: 8px 0; overflow-x: auto; }
 .mathDisplay { margin: 4px 0; font-size: 1.05rem; }
 .answerBox { composes: bk-answer from global; }
+.solutionInputContainer label { padding-top: 10px; align-self: flex-start; }
+.eingabeHinweis { margin: -6px 0 12px; color: var(--ink-muted); font-size: 14px; }
+.previewLabel { display: block; font-size: 13px; color: var(--ink-muted); margin-top: 2px; }
+.previewMath { display: block; font-size: 1.3rem; padding: 4px 0; }

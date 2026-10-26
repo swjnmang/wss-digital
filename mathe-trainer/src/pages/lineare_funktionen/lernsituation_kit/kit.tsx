@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useId, useRef, useState, type Cha
 import { InlineMath } from 'react-katex'
 import { useTaskTracking } from '../../../hooks/useTaskTracking'
 import { fieldCheckClass } from '../../../utils/fieldCheck'
+import { checkLinearEquation } from '../../../utils/parseLinearEquation'
+import GleichungEingabe from '../../../components/GleichungEingabe'
 import { checkNumber, fmt, pick } from '../../daten_und_zufall/lernpfad/kit'
 import { AufgabePunkteCtx, punkteText, usePunkteAufgabe } from './punkte'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
@@ -239,7 +241,9 @@ export type Seg = string | { luecke: string; breit?: boolean }
 /** Zeile einer Lückenrechnung: linke Seite = rechte Seite, optional mit Umformung (TeX, z. B. '\\mid -3') */
 export type Zeile = { l: Seg[]; r: Seg[]; u?: string }
 type SelectField = { kind: 'select'; key: string; label: ReactNode; options: string[]; expected: number }
-type CField = NumField | SelectField
+/** Vollständig eingetippte lineare Funktionsgleichung, z. B. „y = 0,2x + 1“ (m und t sind die richtigen Werte) */
+type GleichungField = { kind: 'gleichung'; key: string; label: ReactNode; m: number; t: number; tol?: number }
+type CField = NumField | SelectField | GleichungField
 
 /** Aufgabenkarte mit Zahlenfeldern / Auswahllisten: jedes Feld prüft sich selbst (richtig sofort grün, falsch nach kurzer Pause rot), Lob und Lösungsweg */
 export function CheckCard({
@@ -297,7 +301,16 @@ export function CheckCard({
     fields.map((f) => ({
       key: f.key,
       sofort: f.kind === 'select',
-      pruefe: (v: string) => (f.kind === 'select' ? (v === '' ? undefined : Number(v) === f.expected) : checkNumber(v, f.expected, f.tol)),
+      pruefe: (v: string) =>
+        f.kind === 'select'
+          ? v === ''
+            ? undefined
+            : Number(v) === f.expected
+          : f.kind === 'gleichung'
+            ? v.trim() === ''
+              ? undefined
+              : checkLinearEquation(v, f.m, f.t, f.tol).status === 'ok'
+            : checkNumber(v, f.expected, f.tol),
     })),
     {
       onSolved: () => {
@@ -321,7 +334,7 @@ export function CheckCard({
   const segment = (seg: Seg, i: number) => {
     if (typeof seg === 'string') return <InlineMath key={i} math={seg} />
     const f = fields.find((x) => x.key === seg.luecke)
-    if (!f) return null
+    if (!f || f.kind === 'gleichung') return null
     return (
       <input
         key={i}
@@ -378,6 +391,21 @@ export function CheckCard({
                     </option>
                   ))}
                 </select>
+              ) : f.kind === 'gleichung' ? (
+                <span className="ls-gleichung">
+                  <GleichungEingabe
+                    id={`${uid}-${f.key}`}
+                    value={values[f.key] ?? ''}
+                    onChange={(v) => setValue(f.key, v)}
+                    onBlur={(v) => blur(f.key, v)}
+                    className={fieldCheckClass(marks[f.key])}
+                  />
+                  {marks[f.key] === false && (
+                    <span className="ls-gleichung-hinweis" role="status">
+                      {checkLinearEquation(values[f.key] ?? '', f.m, f.t, f.tol).text}
+                    </span>
+                  )}
+                </span>
               ) : (
                 <span className="lp-num">
                   <input
