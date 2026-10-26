@@ -1,0 +1,41 @@
+/* Lernsituation „Die Scooter-App“ im ruhigen Grunddesign: eine Spalte, Themenfarbe kommt über --primary aus thema. */
+
+.es-labor { display: flex; flex-direction: column; gap: 10px; }
+.es-graph svg { max-height: 320px; }
+
+.es-eingabe { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 12px; font-size: 19px; }
+.es-eingabe > label { padding-top: 10px; font-weight: 700; }
+.es-eingabe .bk-btn { min-height: 44px; }
+
+.es-anzeige {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;
+  border-radius: 10px; background: var(--primary-soft); color: var(--ink); font-size: 16px; line-height: 1.5;
+}
+.es-anzeige > i { margin-top: 4px; color: var(--primary); font-size: 18px; }
+.es-anzeige ul { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.es-anzeige li i { width: 16px; color: var(--wrong); }
+.es-anzeige li i.fa-check { color: var(--correct); }
+.es-anzeige-ok { background: var(--correct-soft); color: var(--correct-ink); }
+.es-anzeige-ok > i { color: var(--correct); }
+
+/* Rechnungen zweier Mitschüler in „Wer hat recht?“ */
+.es-plaene { display: flex; flex-direction: column; gap: 10px; }
+.es-plan { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); }
+.es-plan-name { font: 800 17px/1.2 var(--font-display); }
+.es-plan .katex-display { margin: 0; overflow-x: auto; overflow-y: hidden; }
+
+/* Lange Zeilen im Rechenbeispiel scrollen auf schmalen Bildschirmen in sich, die Seite bleibt fest */
+.es-beispiel { min-width: 0; }
+.es-beispiel .katex-display { overflow-x: auto; overflow-y: hidden; }
+
+/* Bonus-Spiel Scooter-Route */
+.es-spiel { display: flex; flex-direction: column; gap: 12px; }
+.es-spiel-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 800 17px/1.3 var(--font-display); color: var(--primary); }
+.es-muenzen { display: flex; gap: 6px; font-size: 20px; color: var(--line-strong); }
+.es-muenzen .es-muenze-an { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.es-spiel-frage { margin: 0; font-size: 18px; line-height: 1.6; }
+.es-spiel-bild { display: block; width: 100%; height: auto; max-height: 400px; touch-action: manipulation; user-select: none; }
+.es-steuer { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 12px; }
+.es-steuer .bk-btn-primary { min-height: 48px; }
+.es-spiel-ende { margin: 0; font: 800 20px/1.4 var(--font-display); color: var(--ink); }
+.es-spiel-ende i { color: var(--primary); margin-right: 6px; }
