@@ -257,6 +257,7 @@ a.bk-tile:hover, button.bk-tile:hover { background: var(--surface-sunken); }
 .bk-keypad { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: var(--surface-sunken); border-top: 1.5px solid var(--edge); padding: 8px 8px calc(10px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -8px 24px rgba(0, 0, 0, .12); animation: bkSlide .16s ease-out; }
 @keyframes bkSlide { from { transform: translateY(30%); opacity: .4; } to { transform: none; opacity: 1; } }
 .bk-keypad-inner { max-width: 720px; margin: 0 auto; }
+.bk-keypad-return { position: fixed; left: 0; right: 0; z-index: 50; display: flex; justify-content: center; padding: 6px 8px; background: var(--surface-sunken); border-top: 1.5px solid var(--edge); }
 .bk-keypad-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .bk-keypad-title { font: 700 13px/1 var(--font-body); color: var(--ink-muted); letter-spacing: .06em; text-transform: uppercase; }
 .bk-keypad-tool { min-height: 40px; min-width: 48px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px; border: 2px solid var(--line-strong); background: var(--surface); font: 700 14px/1 var(--font-body); color: var(--ink); }
@@ -284,7 +285,7 @@ a.bk-tile:hover, button.bk-tile:hover { background: var(--surface-sunken); }
 /* ── Druck ──────────────────────────────────────────────────────────────── */
 @media print {
   body, html { background: #ffffff; }
-  .bk-header, .bk-bottomnav, .bk-keypad, .bk-task-actions, .bk-overlay, .bk-modal-backdrop, .bk-card.fixed { display: none !important; }
+  .bk-header, .bk-bottomnav, .bk-keypad, .bk-keypad-return, .bk-task-actions, .bk-overlay, .bk-modal-backdrop, .bk-card.fixed { display: none !important; }
   .bk-page { max-width: none; padding: 0; }
   .bk-bottomnav { display: none !important; }
   body { background-image: none; }
