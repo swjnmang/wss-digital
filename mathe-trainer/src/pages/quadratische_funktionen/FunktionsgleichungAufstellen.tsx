@@ -15,8 +15,13 @@ type Bekannt = 'a' | 'b' | 'c';
 type PunkteAufgabe = { typ: 'punkte'; bekannt: Bekannt; a: number; b: number; c: number; x1: number; y1: number; x2: number; y2: number };
 type Aufgabe = ScheitelAufgabe | PunkteAufgabe;
 
-/** Die vollständig eingetippte allgemeine Form, z. B. „y = 2x² − 4x + 3“ */
-type Eingabe = string;
+/** Die vollständig eingetippten Gleichungen in Scheitelform und allgemeiner Form */
+type Form = 'scheitel' | 'allgemein';
+type Eingabe = Record<Form, string>;
+const FORMEN: { form: Form; label: string; placeholder: string }[] = [
+    { form: 'scheitel', label: 'Scheitelform', placeholder: 'z. B. y = 2(x − 1)² + 3' },
+    { form: 'allgemein', label: 'Allgemeine Form', placeholder: 'z. B. y = 2x² − 4x + 5' },
+];
 type Schritt = { text: string; formeln: string[] };
 
 const ANZAHL_AUFGABEN = 5;
@@ -74,17 +79,27 @@ const erzeugeScheitelAufgabe = (): ScheitelAufgabe => {
 };
 
 const erzeugePunkteAufgabe = (bekannt: Bekannt): PunkteAufgabe => {
-    const a = auswahl([1, -1, 2, -2]);
-    // Der bekannte Wert ist nie 0, sonst wäre die Angabe nichtssagend
-    const b = bekannt === 'b' ? auswahl([-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]) : zufall(-6, 6);
-    const c = bekannt === 'c' ? auswahl([-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]) : zufall(-6, 6);
-    const xWerte = [-3, -2, -1, 1, 2, 3];
-    const x1 = auswahl(xWerte);
-    // Bei bekanntem b muss x2 ≠ -x1 sein, sonst fällt beim Abziehen auch a weg
-    const x2 = auswahl(xWerte.filter(x => x !== x1 && (bekannt !== 'b' || x !== -x1)));
-    const f = (x: number) => a * x * x + b * x + c;
-    return { typ: 'punkte', bekannt, a, b, c, x1, y1: f(x1), x2, y2: f(x2) };
+    // Über einen ganzzahligen Scheitelpunkt erzeugt, damit auch die Scheitelform glatte Zahlen hat
+    for (;;) {
+        const a = auswahl([1, -1, 2, -2]);
+        const h = zufall(-3, 3);
+        const k = zufall(-6, 6);
+        const b = -2 * a * h;
+        const c = a * h * h + k;
+        // Der bekannte Wert ist nie 0, sonst wäre die Angabe nichtssagend
+        if ((bekannt === 'b' && b === 0) || (bekannt === 'c' && c === 0) || Math.abs(c) > 10) continue;
+        const xWerte = [-3, -2, -1, 1, 2, 3];
+        const x1 = auswahl(xWerte);
+        // Bei bekanntem b muss x2 ≠ -x1 sein, sonst fällt beim Abziehen auch a weg
+        const x2 = auswahl(xWerte.filter(x => x !== x1 && (bekannt !== 'b' || x !== -x1)));
+        const f = (x: number) => a * x * x + b * x + c;
+        if (Math.abs(f(x1)) > 25 || Math.abs(f(x2)) > 25) continue;
+        return { typ: 'punkte', bekannt, a, b, c, x1, y1: f(x1), x2, y2: f(x2) };
+    }
 };
+
+// Scheitelpunkt jeder Aufgabe (bei Fall 2 aus a, b und c berechnet)
+const scheitelpunkt = (t: Aufgabe) => (t.typ === 'scheitel' ? { h: t.h, k: t.k } : { h: -t.b / (2 * t.a), k: t.c - (t.b * t.b) / (4 * t.a) });
 
 const schluessel = (t: Aufgabe) =>
     t.typ === 'scheitel' ? `s${t.h},${t.k},${t.px},${t.a}` : `p${t.bekannt},${t.a},${t.x1},${t.y1},${t.x2},${t.y2}`;
@@ -114,9 +129,9 @@ const erzeugeAufgaben = (modus: Modus): Aufgabe[] => {
     });
 };
 
-const leereEingaben = (): Eingabe[] => Array.from({ length: ANZAHL_AUFGABEN }, () => '');
+const leereEingaben = (): Eingabe[] => Array.from({ length: ANZAHL_AUFGABEN }, () => ({ scheitel: '', allgemein: '' }));
 
-const pruefeGleichung = (eingabe: string, t: Aufgabe) => checkQuadraticEquation(eingabe, { a: t.a, b: t.b, c: t.c }, 'allgemein', 1e-6);
+const pruefeGleichung = (eingabe: string, t: Aufgabe, form: Form) => checkQuadraticEquation(eingabe, { a: t.a, b: t.b, c: t.c }, form, 1e-6);
 
 // ---------- Lösungsschritte ----------
 const schritteScheitel = (t: ScheitelAufgabe): Schritt[] => {
@@ -128,7 +143,7 @@ const schritteScheitel = (t: ScheitelAufgabe): Schritt[] => {
     return [
         {
             text: `Scheitelpunkt S(${h}|${k}) in die Scheitelform einsetzen:`,
-            formeln: ['y = a \\cdot (x - x_s)^2 + y_s', `y = a \\cdot ${klammer(h)}${summand(k)}`],
+            formeln: ['y = a(x - x_S)^2 + y_S', `y = a \\cdot ${klammer(h)}${summand(k)}`],
         },
         {
             text: `Punkt P(${px}|${py}) einsetzen (x = ${px}, y = ${py}) und nach a auflösen:`,
@@ -296,15 +311,34 @@ const schritteCBekannt = (t: PunkteAufgabe): Schritt[] => {
 const ohneDoppelte = (liste: Schritt[]) =>
     liste.map(s => ({ ...s, formeln: s.formeln.filter((f, i, arr) => i === 0 || f !== arr[i - 1]) }));
 
+// Fall 2: aus der allgemeinen Form den Scheitelpunkt berechnen und die Scheitelform aufschreiben
+const schritteZurScheitelform = (t: PunkteAufgabe): Schritt[] => {
+    const { a, b, c } = t;
+    const { h, k } = scheitelpunkt(t);
+    return [
+        {
+            text: 'x-Koordinate des Scheitelpunkts berechnen:',
+            formeln: [`x_S = -\\frac{b}{2a} = -\\frac{${num(b)}}{2 \\cdot ${kl(a)}} = ${num(h)}`],
+        },
+        {
+            text: `x = ${h} in die allgemeine Form einsetzen und die y-Koordinate des Scheitelpunkts berechnen:`,
+            formeln: [`y_S = ${num(a)} \\cdot ${kl(h)}^2 + ${kl(b)} \\cdot ${kl(h)} + ${kl(c)} = ${num(k)}`],
+        },
+        {
+            text: `Scheitelpunkt S(${h}|${k}) und a = ${a} in die Scheitelform einsetzen:`,
+            formeln: ['y = a(x - x_S)^2 + y_S', scheitelForm(a, h, k)],
+        },
+    ];
+};
+
 const schritte = (t: Aufgabe) =>
     ohneDoppelte(
         t.typ === 'scheitel'
             ? schritteScheitel(t)
-            : t.bekannt === 'a'
-              ? schritteABekannt(t)
-              : t.bekannt === 'b'
-                ? schritteBBekannt(t)
-                : schritteCBekannt(t)
+            : [
+                  ...(t.bekannt === 'a' ? schritteABekannt(t) : t.bekannt === 'b' ? schritteBBekannt(t) : schritteCBekannt(t)),
+                  ...schritteZurScheitelform(t),
+              ]
     );
 
 const gegebenePunkte = (t: Aufgabe) =>
@@ -406,31 +440,31 @@ const Loesungsweg = ({ t, anzahl, titel }: { t: Aufgabe; anzahl: number; titel?:
                 ))}
             </ol>
             {fertig && (
-                <p className="mt-3 font-bold text-center bg-blue-100 rounded-md p-2">
-                    Ergebnis: a = {t.a}, b = {t.b}, c = {t.c}
-                </p>
+                <div className="mt-3 font-bold text-center bg-blue-100 rounded-md p-2 space-y-1">
+                    <p>Scheitelform: <InlineMath math={scheitelForm(t.a, scheitelpunkt(t).h, scheitelpunkt(t).k)} /></p>
+                    <p>Allgemeine Form: <InlineMath math={allgForm(t.a, t.b, t.c)} /></p>
+                </div>
             )}
         </div>
     );
 };
 
-const AufgabenText = ({ t }: { t: Aufgabe }) =>
-    t.typ === 'scheitel' ? (
+const AufgabenText = ({ t }: { t: Aufgabe }) => {
+    const [p1, p2] = gegebenePunkte(t).map(p => `${p.label}(${p.x}|${p.y})`);
+    return (
         <span>
-            Die Parabel hat den Scheitelpunkt <strong>S({t.h}|{t.k})</strong> und verläuft durch den Punkt <strong>P({t.px}|{t.py})</strong>.
-        </span>
-    ) : (
-        <span>
-            {t.bekannt === 'a' ? (
-                <>Die Parabel hat den Formfaktor <strong>a = {t.a}</strong></>
+            {t.typ === 'scheitel' ? (
+                <>Der Punkt <strong>S</strong> ist der Scheitelpunkt der Parabel.</>
+            ) : t.bekannt === 'a' ? (
+                <>Die Parabel hat den Formfaktor <strong>a = {t.a}</strong>.</>
             ) : (
-                <>
-                    Für die Parabel <InlineMath math="y = ax^2 + bx + c" /> gilt <strong>{t.bekannt} = {t[t.bekannt]}</strong>. Sie
-                </>
+                <>Für die Parabel <InlineMath math="y = ax^2 + bx + c" /> gilt <strong>{t.bekannt} = {t[t.bekannt]}</strong>.</>
             )}{' '}
-            {t.bekannt === 'a' ? 'und verläuft' : 'verläuft'} durch die Punkte <strong>P({t.x1}|{t.y1})</strong> und <strong>Q({t.x2}|{t.y2})</strong>.
+            Bestimme rechnerisch die Funktionsgleichung, die durch die Punkte <strong>{p1}</strong> und <strong>{p2}</strong> geht, in{' '}
+            <strong>Scheitelform</strong>. Berechne anschließend die dazugehörige <strong>allgemeine Form</strong>.
         </span>
     );
+};
 
 // ---------- Erklärungen ----------
 const Voraussetzung = () => (
@@ -451,7 +485,7 @@ export const ErklaerungFall1 = () => (
         <h2 className="text-xl font-semibold text-gray-800 mb-2">Fall 1: Scheitelpunkt und ein weiterer Punkt</h2>
         <p className="text-gray-700 mb-3">
             Kennst du den Scheitelpunkt, startest du mit der <strong>Scheitelform</strong>{' '}
-            <InlineMath math="y = a \cdot (x - x_s)^2 + y_s" />. Setze den Scheitelpunkt ein. Dann fehlt nur noch <InlineMath math="a" />:
+            <InlineMath math="y = a(x - x_S)^2 + y_S" />. Setze den Scheitelpunkt ein. Dann fehlt nur noch <InlineMath math="a" />:
             Dafür setzt du den zweiten Punkt für <InlineMath math="x" /> und <InlineMath math="y" /> ein und löst nach <InlineMath math="a" /> auf.
             Zum Schluss wandelst du die Scheitelform in die allgemeine Form um.
         </p>
@@ -471,6 +505,8 @@ export const ErklaerungFall2 = () => (
             <InlineMath math="y = ax^2 + bx + c" /> ein. Dann setzt du nacheinander beide Punkte ein und erhältst zwei Gleichungen (I und II)
             mit den zwei noch fehlenden Werten. Dieses Gleichungssystem löst du mit dem <strong>Additions- und Subtraktionsverfahren</strong>: Ziehst du II von I
             ab, fällt eine Unbekannte weg und du kannst die andere berechnen. Diese setzt du in Gleichung I ein und erhältst den letzten Wert.
+            Für die Scheitelform berechnest du anschließend den Scheitelpunkt: <InlineMath math="x_S = -\frac{b}{2a}" />, und{' '}
+            <InlineMath math="y_S" /> erhältst du, indem du <InlineMath math="x_S" /> in die allgemeine Form einsetzt.
         </p>
         <ul className="list-disc pl-5 text-gray-700 mb-3 space-y-1">
             <li><strong><InlineMath math="a" /> bekannt:</strong> Beim Abziehen fällt <InlineMath math="c" /> weg → zuerst <InlineMath math="b" />, dann <InlineMath math="c" />.</li>
@@ -492,10 +528,8 @@ export const Lernvideo = ({ id, fall }: { id: string; fall: string }) => (
     <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-800 mb-3">Lernvideo zu {fall}</h2>
         {id ? (
-            <div className="max-w-3xl mx-auto">
-                <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
-                    <VideoEmbed src={`https://www.youtube-nocookie.com/embed/${id}`} title={`Lernvideo: Funktionsgleichung aufstellen – ${fall}`} />
-                </div>
+            <div className="max-w-3xl mx-auto text-center">
+                <VideoEmbed src={`https://www.youtube-nocookie.com/embed/${id}`} title={`Lernvideo: Funktionsgleichung aufstellen – ${fall}`} />
                 <a
                     href={`https://www.youtube.com/watch?v=${id}`}
                     target="_blank"
@@ -526,7 +560,7 @@ const FunktionsgleichungAufstellen = () => {
     const [tippSchritte, setTippSchritte] = useState<number[]>(Array(ANZAHL_AUFGABEN).fill(0));
     // Eingabe, die nach einer Tipp-Pause bewertet wurde: Erst dann wird eine falsche Gleichung rot
     const [bewertet, setBewertet] = useState<Eingabe[]>(leereEingaben());
-    const timer = useRef<Record<number, number>>({});
+    const timer = useRef<Record<string, number>>({});
 
     const neueAufgaben = (m: Modus = modus) => {
         setAufgaben(erzeugeAufgaben(m));
@@ -545,24 +579,24 @@ const FunktionsgleichungAufstellen = () => {
         neueAufgaben(m);
     };
 
-    const setEingabe = (i: number, wert: string) => {
-        setEingaben(prev => prev.map((e, idx) => (idx === i ? wert : e)));
-        window.clearTimeout(timer.current[i]);
-        timer.current[i] = window.setTimeout(() => bewerte(i, wert), 1200);
+    const setEingabe = (i: number, form: Form, wert: string) => {
+        setEingaben(prev => prev.map((e, idx) => (idx === i ? { ...e, [form]: wert } : e)));
+        window.clearTimeout(timer.current[`${i}${form}`]);
+        timer.current[`${i}${form}`] = window.setTimeout(() => bewerte(i, form, wert), 1200);
     };
 
-    const bewerte = (i: number, wert: string) => {
-        window.clearTimeout(timer.current[i]);
-        setBewertet(prev => prev.map((e, idx) => (idx === i ? wert : e)));
+    const bewerte = (i: number, form: Form, wert: string) => {
+        window.clearTimeout(timer.current[`${i}${form}`]);
+        setBewertet(prev => prev.map((e, idx) => (idx === i ? { ...e, [form]: wert } : e)));
     };
 
     /** richtig sofort, falsch erst nach der Tipp-Pause (bzw. beim Verlassen des Feldes) */
-    const zustand = (i: number): { richtig: boolean; fehler: string } => {
-        const e = eingaben[i] ?? '';
+    const zustand = (i: number, form: Form): { richtig: boolean; fehler: string } => {
+        const e = eingaben[i]?.[form] ?? '';
         if (!aufgaben[i] || e.trim() === '') return { richtig: false, fehler: '' };
-        const r = pruefeGleichung(e, aufgaben[i]);
+        const r = pruefeGleichung(e, aufgaben[i], form);
         if (r.status === 'ok') return { richtig: true, fehler: '' };
-        return { richtig: false, fehler: bewertet[i] === e ? r.text : '' };
+        return { richtig: false, fehler: bewertet[i]?.[form] === e ? r.text : '' };
     };
 
     const setTipp = (i: number, wert: number) => {
@@ -632,39 +666,53 @@ const FunktionsgleichungAufstellen = () => {
 
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">Deine Aufgaben</h2>
                 <p className="text-gray-600 mb-6">
-                    Bestimme jeweils die Funktionsgleichung in allgemeiner Form <InlineMath math="y = ax^2 + bx + c" />. Rechne zuerst im Heft und tippe
-                    dann die vollständige Gleichung ein, z. B. y = 2x² − 4x + 3. Eine richtige Gleichung wird sofort grün, eine falsche nach kurzer Pause rot. Wenn du nicht weiterkommst, zeigt dir „Tipp anzeigen“ den
-                    Lösungsweg Schritt für Schritt.
+                    Bestimme jeweils die Funktionsgleichung in Scheitelform <InlineMath math="y = a(x - x_S)^2 + y_S" /> und in allgemeiner Form{' '}
+                    <InlineMath math="y = ax^2 + bx + c" />. Rechne zuerst im Heft und tippe dann beide Gleichungen vollständig ein, z. B. y = 2(x − 1)² + 3
+                    und y = 2x² − 4x + 5. Eine richtige Gleichung wird sofort grün, eine falsche nach kurzer Pause rot. Wenn du nicht weiterkommst, zeigt dir
+                    „Tipp anzeigen“ den Lösungsweg Schritt für Schritt.
                 </p>
 
                 <div className="flex flex-col gap-6">
                     {aufgaben.map((t, i) => {
                         const anzahlSchritte = schritte(t).length;
-                        const { richtig: alleRichtig, fehler } = zustand(i);
+                        const felder = FORMEN.map(f => ({ ...f, ...zustand(i, f.form) }));
+                        const alleRichtig = felder.every(f => f.richtig);
+                        const { h, k } = scheitelpunkt(t);
                         return (
                             <div key={i} className="border border-gray-200 rounded-lg p-4">
-                                <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-md mb-4 text-gray-800">
-                                    <span className="font-semibold mr-2">Aufgabe {i + 1}:</span>
-                                    <AufgabenText t={t} />
-                                </div>
+                                <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] items-start">
+                                    <div>
+                                        <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-md mb-4 text-gray-800">
+                                            <span className="font-semibold mr-2">Aufgabe {i + 1}:</span>
+                                            <AufgabenText t={t} />
+                                        </div>
 
-                                <div className="mb-2">
-                                    <GleichungEingabe
-                                        quadratisch
-                                        id={`gl-${i}`}
-                                        value={eingaben[i] ?? ''}
-                                        onChange={v => setEingabe(i, v)}
-                                        onBlur={v => bewerte(i, v)}
-                                        placeholder="z. B. y = 2x² − 4x + 3"
-                                        ariaLabel="Funktionsgleichung in allgemeiner Form"
-                                        className={fieldCheckClass(alleRichtig ? true : fehler ? false : null)}
-                                    />
-                                    {fehler && <p className="mt-1 text-sm text-red-600 font-semibold">{fehler}</p>}
+                                        {felder.map(f => (
+                                            <div key={f.form} className="mb-3">
+                                                <label htmlFor={`gl-${i}-${f.form}`} className="block text-sm font-semibold text-gray-700 mb-1">
+                                                    {f.label}:
+                                                </label>
+                                                <GleichungEingabe
+                                                    quadratisch
+                                                    id={`gl-${i}-${f.form}`}
+                                                    value={eingaben[i]?.[f.form] ?? ''}
+                                                    onChange={v => setEingabe(i, f.form, v)}
+                                                    onBlur={v => bewerte(i, f.form, v)}
+                                                    placeholder={f.placeholder}
+                                                    ariaLabel={`Funktionsgleichung in ${f.form === 'scheitel' ? 'Scheitelform' : 'allgemeiner Form'}`}
+                                                    className={fieldCheckClass(f.richtig ? true : f.fehler ? false : null)}
+                                                />
+                                                {f.fehler && <p className="mt-1 text-sm text-red-600 font-semibold">{f.fehler}</p>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <ParabelGraph a={t.a} b={t.b} c={t.c} punkte={gegebenePunkte(t)} />
                                 </div>
 
                                 {alleRichtig && (
                                     <div className="mt-3 p-3 bg-green-100 border border-green-400 rounded-md text-green-900 font-semibold">
-                                        🎉 {LOB[i % LOB.length]} <InlineMath math={allgForm(t.a, t.b, t.c)} />{' '}
+                                        🎉 {LOB[i % LOB.length]} <InlineMath math={scheitelForm(t.a, h, k)} /> bzw.{' '}
+                                        <InlineMath math={allgForm(t.a, t.b, t.c)} />{' '}
                                         {i < aufgaben.length - 1
                                             ? `Weiter geht's mit Aufgabe ${i + 2}!`
                                             : 'Du hast alle Aufgaben geschafft – klicke unten auf „5 neue Aufgaben“, um weiterzuüben.'}
@@ -692,12 +740,6 @@ const FunktionsgleichungAufstellen = () => {
 
                                 {tippSchritte[i] > 0 && <Loesungsweg t={t} anzahl={tippSchritte[i]} />}
 
-                                {(alleRichtig || tippSchritte[i] >= anzahlSchritte) && (
-                                    <div className="mt-4">
-                                        <p className="text-sm font-semibold text-gray-600 mb-2">Graph zur Kontrolle:</p>
-                                        <ParabelGraph a={t.a} b={t.b} c={t.c} punkte={gegebenePunkte(t)} />
-                                    </div>
-                                )}
                             </div>
                         );
                     })}
