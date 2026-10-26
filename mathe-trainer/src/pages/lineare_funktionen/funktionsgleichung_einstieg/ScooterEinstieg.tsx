@@ -19,11 +19,12 @@ import './scooter.css'
 // Problem lösen: Problem → Beispielrechnung Fahrradverleih mit Lernvideo → Ergebnisse abgleichen (Gleichung vollständig
 // eingetippt, Preis für 30 min) mit Fehlersuche → Entscheidung → Handlungsprodukt analog: Schritt-für-Schritt-Anleitung
 // „Tarif knacken“ für Lina mit eigenem Beispiel. Danach Rückbezug und Merke.
-// Phase 4: vier Übungen (Gleichung wählen, Wer hat recht?, Taxi-Tarif eintippen, fallender Akku eintippen), Profi-Aufgabe
+// Phase 4: fünf Übungen (Gleichung wählen, Wer hat recht?, Gleichung aus zwei Punkten im Graphen ohne Sachkontext, Taxi-Tarif eintippen,
+// fallender Akku eintippen), Profi-Aufgabe
 // waagrechte Gerade, Bonus-Spiel „Scooter-Route“ (Gleichung durch zwei Münzen eintippen).
 // Punkte nach Aufwand: Warm-up 3/2/3/2/2, Festlegung 3, Ausprobieren 3, Kernaufgabe 15, Entscheidung 4, Anleitung 5,
-// Übungen 3/5/6/7, Profi 8, Bonus-Spiel 4 Runden à 2
-// (Pflicht zusammen 63: Warm-up 12 = 19 %, Problem lösen 24 = 38 %, Übungen 21 = 33 %).
+// Übungen 3/5/5/6/7, Profi 8, Bonus-Spiel 4 Runden à 2
+// (Pflicht zusammen 68: Warm-up 12 = 18 %, Problem lösen 24 = 35 %, Übungen 26 = 38 %).
 // Identität: Themenfarbe Petrol, Symbol Smartphone, Titelbild Weg zum Badesee mit E-Scooter, Leitobjekt die Scooter-App
 // (Fahrtenverlauf und Tarif-Rechner). Kontext Privatleben (Freizeit, Mobilität). Festlegung und Versuche bleiben im Seitenzustand.
 // Ruhiges Grunddesign: eine Spalte, pro Seite ist nur der Auftrag hervorgehoben. Nach unten scrollen ist erlaubt, seitlich nie.
@@ -389,6 +390,64 @@ const LOESUNG = (
   </>
 )
 
+/* ── Phase 4: Gleichung aus dem Graphen ─────────────────────────────────── */
+
+/** Übung 3: Gerade durch P₁(−2 | 1) und P₂(4 | 4) im Koordinatensystem, ohne Sachkontext */
+const Z = { w: 560, h: 340, l: 36, r: 16, t: 14, b: 34, xMin: -5, xMax: 6, yMin: -2, yMax: 6 }
+const zx = (x: number) => Z.l + ((x - Z.xMin) / (Z.xMax - Z.xMin)) * (Z.w - Z.l - Z.r)
+const zy = (y: number) => Z.h - Z.b - ((y - Z.yMin) / (Z.yMax - Z.yMin)) * (Z.h - Z.t - Z.b)
+
+function ZweiPunkteGraph() {
+  const g = (x: number) => 0.5 * x + 2
+  const punkte = [
+    { x: -2, y: 1, text: 'P₁(−2 | 1)' },
+    { x: 4, y: 4, text: 'P₂(4 | 4)' },
+  ]
+  return (
+    <div className="bk-graph ls-graph es-graph">
+      <svg viewBox={`0 0 ${Z.w} ${Z.h}`} role="img" aria-label="Koordinatensystem mit einer steigenden Geraden durch die Punkte P1(−2 | 1) und P2(4 | 4)">
+        {Array.from({ length: Z.xMax - Z.xMin + 1 }, (_, i) => Z.xMin + i).map((v) => (
+          <g key={`x${v}`}>
+            <line x1={zx(v)} x2={zx(v)} y1={zy(Z.yMin)} y2={zy(Z.yMax)} stroke="var(--grid)" />
+            {v !== 0 && v !== Z.xMin && (
+              <text x={zx(v)} y={zy(0) + 20} textAnchor="middle" fontSize="15" fill="var(--ink-muted)">
+                {String(v).replace('-', '−')}
+              </text>
+            )}
+          </g>
+        ))}
+        {Array.from({ length: Z.yMax - Z.yMin + 1 }, (_, i) => Z.yMin + i).map((v) => (
+          <g key={`y${v}`}>
+            <line x1={zx(Z.xMin)} x2={zx(Z.xMax)} y1={zy(v)} y2={zy(v)} stroke="var(--grid)" />
+            {v !== 0 && (
+              <text x={zx(0) - 7} y={zy(v) + 5} textAnchor="end" fontSize="15" fill="var(--ink-muted)">
+                {String(v).replace('-', '−')}
+              </text>
+            )}
+          </g>
+        ))}
+        <line x1={zx(Z.xMin)} x2={zx(Z.xMax)} y1={zy(0)} y2={zy(0)} stroke="var(--ink)" strokeWidth="2" />
+        <line x1={zx(0)} x2={zx(0)} y1={zy(Z.yMin)} y2={zy(Z.yMax)} stroke="var(--ink)" strokeWidth="2" />
+        <text x={zx(Z.xMax) - 4} y={zy(0) - 8} textAnchor="end" fontSize="16" fontStyle="italic" fill="var(--ink)">
+          x
+        </text>
+        <text x={zx(0) + 8} y={zy(Z.yMax) + 14} fontSize="16" fontStyle="italic" fill="var(--ink)">
+          y
+        </text>
+        <line x1={zx(Z.xMin)} y1={zy(g(Z.xMin))} x2={zx(Z.xMax)} y2={zy(g(Z.xMax))} stroke="var(--primary)" strokeWidth="3.5" strokeLinecap="round" />
+        {punkte.map((p) => (
+          <g key={p.text}>
+            <circle cx={zx(p.x)} cy={zy(p.y)} r="7" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
+            <text x={zx(p.x) + 10} y={zy(p.y) + 24} fontSize="17" fontWeight="700" fill="var(--ink)">
+              {p.text}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  )
+}
+
 /* ── Phase 4: Wer hat recht? ─────────────────────────────────────────────── */
 
 function Plan({ name, tex: t }: { name: string; tex: string }) {
@@ -473,16 +532,20 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
             title="c) Einen Punkt einsetzen"
             prompt={
               <p>
-                Die Gerade <M>{'y = 3x + t'}</M> geht durch <M>{'P(2 \\mid 11)'}</M>. Setze den Punkt ein und berechne <M>t</M>.
+                Die Gerade <M>{'y = 3x + t'}</M> geht durch <M>{'P(2 \\mid 11)'}</M>. Setze die Koordinaten des Punktes für <M>x</M> und <M>y</M> ein und berechne{' '}
+                <M>t</M>.
               </p>
             }
             rechnung={[
-              { l: ['11'], r: ['3 \\cdot 2 + t'] },
-              { l: ['11'], r: [{ luecke: 'p' }, '+ t'] },
+              { l: [{ luecke: 'y1' }], r: ['3 \\cdot', { luecke: 'x1' }, '+ t'], u: '\\text{Punkt einsetzen}' },
+              { l: [{ luecke: 'y2' }], r: [{ luecke: 'p' }, '+ t'], u: '\\text{ausrechnen}' },
               { l: ['t'], r: [{ luecke: 't' }] },
             ]}
             fields={[
-              { kind: 'num', key: 'p', label: '3 · 2', expected: 6 },
+              { kind: 'num', key: 'y1', label: 'y-Wert des Punktes', expected: 11 },
+              { kind: 'num', key: 'x1', label: 'x-Wert des Punktes', expected: 2 },
+              { kind: 'num', key: 'y2', label: 'y-Wert des Punktes', expected: 11 },
+              { kind: 'num', key: 'p', label: '3 mal x', expected: 6 },
               { kind: 'num', key: 't', label: 't', expected: 5 },
             ]}
             solution={<MB>{'\\begin{aligned} 11 &= 3 \\cdot 2 + t \\\\ 11 &= 6 + t && \\mid -6 \\\\ t &= 5 \\end{aligned}'}</MB>}
@@ -522,8 +585,7 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
                 Gerade: <M>{'y = 0{,}4x + 1{,}5'}</M>. Welchen y-Wert hat sie bei <M>{'x = 10'}</M>?
               </p>
             }
-            rechnung={[{ l: ['x = 10{:}\\quad y'], r: ['0{,}4 \\cdot 10 + 1{,}5 =', { luecke: 'y' }] }]}
-            fields={[{ kind: 'num', key: 'y', label: 'y', expected: 5.5 }]}
+            fields={[{ kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 5.5 }]}
             solution={<MB>{'x = 10{:}\\quad y = 0{,}4 \\cdot 10 + 1{,}5 = 4 + 1{,}5 = 5{,}5'}</MB>}
           />
         </>
@@ -712,7 +774,6 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
                   Gleichung aufschreiben
                 </>,
                 <>Jeder Schritt ist an Linas Fahrten vorgerechnet, am Ende steht ihre vollständige Gleichung <M>{'y = \\ldots'}</M></>,
-                'Eine Probe mit der zweiten Fahrt und ein Satz, warum der Dreisatz bei diesem Tarif nicht klappt',
                 <>
                   In deiner Anleitung steht, wofür die Abkürzungen stehen: <M>x</M> (Fahrzeit in Minuten), <M>y</M> (Preis in €), <M>m</M> (Steigung, hier der Preis pro
                   Minute), <M>t</M> (y-Achsenabschnitt, hier die Entsperrgebühr), <M>{'P_1(x_1 \\mid y_1)'}</M> und <M>{'P_2(x_2 \\mid y_2)'}</M> (die beiden Punkte).
@@ -748,11 +809,11 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
     {
       art: 'sichern',
       titel: 'Übungsaufgaben',
-      pflicht: ['1', '2', '3', '4'],
+      pflicht: ['1', '2', '3', '4', '5'],
       inhalt: (fertig) => (
         <>
           <p className="sl-text">
-            Prüfe und vertiefe dein Wissen mit vier Aufgaben. Die fünfte ist freiwillig für Profis. Wenn du die vier Pflichtaufgaben gelöst hast, wartet unten ein Spiel auf dich.
+            Prüfe und vertiefe dein Wissen mit fünf Aufgaben. Die sechste ist freiwillig für Profis. Wenn du die vier Pflichtaufgaben gelöst hast, wartet unten ein Spiel auf dich.
             Einzelarbeit, ca. 20 Minuten.
           </p>
           <Abschnitt titel="Übung 1: Welche Gleichung passt?">
@@ -807,17 +868,60 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
               ]}
             />
           </Abschnitt>
-          <Abschnitt titel="Übung 3: Der Taxi-Tarif">
+          <Abschnitt titel="Übung 3: Gleichung aus dem Graphen">
             <TrackedCheck
               onSolved={uebung('3', fertig.teil('3'))}
-              punkte={6}
-              topic="Funktionsgleichung-Einstieg: Taxi-Tarif (Standard)"
+              punkte={5}
+              topic="Funktionsgleichung-Einstieg: Gleichung aus zwei Punkten im Graphen (Standard)"
               title="Übung 3"
               level="standard"
               prompt={
+                <>
+                  <p>
+                    Die Gerade geht durch die Punkte <M>{'P_1(-2 \\mid 1)'}</M> und <M>{'P_2(4 \\mid 4)'}</M>. Berechne die vollständige Funktionsgleichung.
+                  </p>
+                  <ZweiPunkteGraph />
+                </>
+              }
+              fields={[{ kind: 'gleichung', key: 'gl', label: 'Funktionsgleichung:', m: 0.5, t: 2, tol: 0.001 }]}
+              solution={
+                <>
+                  <MB>{'m = \\dfrac{4 - 1}{4 - (-2)} = \\dfrac{3}{6} = 0{,}5'}</MB>
+                  <MB>{'\\begin{aligned} 1 &= 0{,}5 \\cdot (-2) + t \\\\ 1 &= -1 + t && \\mid +1 \\\\ t &= 2 \\end{aligned}'}</MB>
+                  <MB>{'y = 0{,}5x + 2'}</MB>
+                  <p>
+                    Probe mit <M>{'P_2'}</M>: <M>{'x = 4{:}\\; y = 0{,}5 \\cdot 4 + 2 = 4'}</M>. Im Graphen siehst du außerdem: Die Gerade schneidet die y-Achse bei 2.
+                  </p>
+                </>
+              }
+              help={
+                <Hilfen
+                  steps={[
+                    <>Du brauchst <M>m</M> und <M>t</M>. Welche der beiden Zahlen berechnest du zuerst?</>,
+                    <>
+                      Erst die Steigung <M>{'m = \\dfrac{y_2 - y_1}{x_2 - x_1}'}</M>, dann <M>m</M> und einen Punkt in <M>{'y = mx + t'}</M> einsetzen. Vorsicht bei{' '}
+                      <M>{'x_1 = -2'}</M>.
+                    </>,
+                    <>
+                      <M>{'m = \\dfrac{4 - 1}{4 - (-2)} = \\dfrac{3}{6}'}</M>. Danach <M>{'1 = m \\cdot (-2) + t'}</M>.
+                    </>,
+                  ]}
+                />
+              }
+            />
+          </Abschnitt>
+          <Abschnitt titel="Übung 4: Der Taxi-Tarif">
+            <TrackedCheck
+              onSolved={uebung('4', fertig.teil('4'))}
+              punkte={6}
+              topic="Funktionsgleichung-Einstieg: Taxi-Tarif (Standard)"
+              title="Übung 4"
+              level="standard"
+              prompt={
                 <p>
-                  Nach der Party fahrt ihr Taxi. Eine Fahrt über 4&nbsp;km kostet 12,60&nbsp;€, eine über 10&nbsp;km 25,80&nbsp;€. Stelle die Funktionsgleichung des Tarifs auf (
-                  <M>x</M> in km, <M>y</M> in €) und tippe sie vollständig ein.
+                  Nach der Party fahrt ihr Taxi. Eine Fahrt über 4&nbsp;km kostet 12,60&nbsp;€, eine über 10&nbsp;km 25,80&nbsp;€. Als Punkte sind das{' '}
+                  <M>{'P_1(4 \\mid 12{,}6)'}</M> und <M>{'P_2(10 \\mid 25{,}8)'}</M> (<M>x</M> in km, <M>y</M> in €). Stelle die Funktionsgleichung des Tarifs auf und
+                  tippe sie vollständig ein.
                 </p>
               }
               fields={[{ kind: 'gleichung', key: 'gl', label: 'Gleichung des Taxi-Tarifs:', m: 2.2, t: 3.8, tol: 0.001 }]}
@@ -832,7 +936,7 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
               help={
                 <Hilfen
                   steps={[
-                    <>Schreibe die Fahrten als Punkte: <M>{'P_1(4 \\mid 12{,}6)'}</M> und <M>{'P_2(10 \\mid 25{,}8)'}</M>.</>,
+                    <>Wie bei der Scooter-App: Was berechnest du zuerst, <M>m</M> oder <M>t</M>?</>,
                     <>Erst <M>m</M> berechnen, dann <M>m</M> und einen Punkt einsetzen und nach <M>t</M> auflösen.</>,
                     <>
                       <M>{'m = 13{,}2 : 6 = 2{,}2'}</M>. Dann <M>{'12{,}6 = 2{,}2 \\cdot 4 + t'}</M>.
@@ -842,12 +946,12 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
               }
             />
           </Abschnitt>
-          <Abschnitt titel="Übung 4: Der Akku des Scooters">
+          <Abschnitt titel="Übung 5: Der Akku des Scooters">
             <TrackedCheck
-              onSolved={uebung('4', fertig.teil('4'))}
+              onSolved={uebung('5', fertig.teil('5'))}
               punkte={7}
               topic="Funktionsgleichung-Einstieg: Fallende Gerade (Erweiterung)"
-              title="Übung 4"
+              title="Übung 5"
               level="erweiterung"
               prompt={
                 <p>
@@ -882,9 +986,9 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
               }
             />
           </Abschnitt>
-          <Abschnitt titel="Übung 5 für Profis: Gleiche Höhe">
+          <Abschnitt titel="Übung 6 für Profis: Gleiche Höhe">
             <McCard
-              title="Übung 5"
+              title="Übung 6"
               punkte={8}
               profi
               level="erweiterung"
@@ -901,7 +1005,7 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
               ]}
             />
           </Abschnitt>
-          <BonusSpiel frei={uebungen.length === 4} titel="Scooter-Route">
+          <BonusSpiel frei={uebungen.length === 5} titel="Scooter-Route">
             <ScooterRoute />
           </BonusSpiel>
           <Bilanz />
