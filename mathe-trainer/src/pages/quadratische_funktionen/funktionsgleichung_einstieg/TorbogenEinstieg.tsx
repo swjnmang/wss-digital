@@ -437,7 +437,7 @@ const LOESUNG = (
   </>
 )
 
-/** Plan eines Azubis mit nummerierten Rechenschritten (für „Wer hat recht?“) */
+/** Plan eines Azubis mit nummerierten Rechenschritten (für „Wer hat recht?“); die Zeilen eines Schritts stehen untereinander, am = ausgerichtet */
 function Bericht({ name, zeilen, ergebnis }: { name: string; zeilen: string[][]; ergebnis: string }) {
   return (
     <div className="wm-bericht">
@@ -447,11 +447,7 @@ function Bericht({ name, zeilen, ergebnis }: { name: string; zeilen: string[][];
           <li key={i}>
             <b>{i + 1}</b>
             <span>
-              {z.map((t, j) => (
-                <div key={j}>
-                  <M>{t}</M>
-                </div>
-              ))}
+              <M>{`\\begin{aligned} ${z.join(' \\\\ ')} \\end{aligned}`}</M>
             </span>
           </li>
         ))}
@@ -830,12 +826,20 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
                   <div className="wm-berichte">
                     <Bericht
                       name="Jonas"
-                      zeilen={[['y = a(x + 2)^2 + 3'], ['2 = a(0 + 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'], ['y = -0{,}25(x^2 + 4x + 4) + 3', '= -0{,}25x^2 - x + 2']]}
+                      zeilen={[
+                        ['y &= a(x + 2)^2 + 3'],
+                        ['2 &= a \\cdot (0 + 2)^2 + 3', '2 &= 4a + 3 && \\mid -3', '-1 &= 4a && \\mid :4', 'a &= -0{,}25'],
+                        ['y &= -0{,}25 \\cdot [(x + 2)(x + 2)] + 3', 'y &= -0{,}25 \\cdot [x^2 + 4x + 4] + 3', 'y &= -0{,}25x^2 - x - 1 + 3', 'y &= -0{,}25x^2 - x + 2'],
+                      ]}
                       ergebnis="y = -0{,}25x^2 - x + 2"
                     />
                     <Bericht
                       name="Mara"
-                      zeilen={[['y = a(x - 2)^2 + 3'], ['2 = a(0 - 2)^2 + 3', '2 = 4a + 3 \\;\\Rightarrow\\; a = -0{,}25'], ['y = -0{,}25x^2 - 4x + 4 + 3', '= -0{,}25x^2 - 4x + 7']]}
+                      zeilen={[
+                        ['y &= a(x - 2)^2 + 3'],
+                        ['2 &= a \\cdot (0 - 2)^2 + 3', '2 &= 4a + 3 && \\mid -3', '-1 &= 4a && \\mid :4', 'a &= -0{,}25'],
+                        ['y &= -0{,}25 \\cdot [(x - 2)(x - 2)] + 3', 'y &= -0{,}25 \\cdot [x^2 - 4x + 4] + 3', 'y &= -0{,}25x^2 - 4x + 4 + 3', 'y &= -0{,}25x^2 - 4x + 7'],
+                      ]}
                       ergebnis="y = -0{,}25x^2 - 4x + 7"
                     />
                   </div>
@@ -855,7 +859,7 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
                   </p>
                   <p>
                     <strong>Mara, Schritt 3:</strong> Sie hat nur <M>{'x^2'}</M> mit <M>{'-0{,}25'}</M> multipliziert. Richtig ist{' '}
-                    <M>{'-0{,}25(x^2 - 4x + 4) + 3 = -0{,}25x^2 + x - 1 + 3'}</M>.
+                    <M>{'-0{,}25 \\cdot [x^2 - 4x + 4] + 3 = -0{,}25x^2 + x - 1 + 3'}</M>.
                   </p>
                 </>
               }

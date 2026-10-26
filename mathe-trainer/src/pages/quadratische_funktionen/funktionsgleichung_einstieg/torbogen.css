@@ -25,10 +25,10 @@
 .wm-berichte { display: flex; flex-direction: column; gap: 10px; }
 .wm-bericht { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); }
 .wm-bericht-name { font: 800 17px/1.2 var(--font-display); }
-.wm-zeilen { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 18px; }
-.wm-zeilen li { display: flex; gap: 8px; align-items: baseline; overflow-x: auto; }
-.wm-zeilen li > span { display: flex; flex-wrap: wrap; gap: 0 10px; }
-.wm-zeilen b { flex: none; font: 800 14px/1.3 var(--font-display); color: var(--ink-muted); }
+.wm-zeilen { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.wm-zeilen li { display: flex; gap: 8px; align-items: flex-start; overflow-x: auto; }
+.wm-zeilen li > span { min-width: 0; }
+.wm-zeilen b { flex: none; padding-top: 4px; font: 800 14px/1.3 var(--font-display); color: var(--ink-muted); }
 .wm-ergebnis { overflow-x: auto; color: var(--ink-muted); }
 
 /* Bonus-Spiel Bogen-Kran */
