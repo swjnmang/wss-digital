@@ -7,7 +7,7 @@ import { useSpielPunkte } from '../lernsituation_kit/punkte'
 // Vier Spiegelkugeln hängen im Raum, eine davon im Schnittpunkt. Die SuS rechnen den Schnittpunkt aus, wählen die Kugel
 // und schalten die Laser an. Die Strahlen werden erst dann gezeichnet, damit man den Schnittpunkt nicht ablesen kann.
 // Die falschen Kugeln sind typische Fehler: x und y vertauscht, Vorzeichenfehler beim Umstellen, y-Achsenabschnitt einer Geraden.
-// Fünf Runden, jede getroffene Kugel bringt eine Münze. Bedienung: Kugel antippen oder Pfeiltasten, dann „Laser an!“ bzw. Enter.
+// Vier Runden, jede getroffene Kugel bringt eine Münze (je 2 Punkte, zusammen höchstens 8 wie die beste Übungsaufgabe). Bedienung: Kugel antippen oder Pfeiltasten, dann „Laser an!“ bzw. Enter.
 
 type Fehler = 'richtig' | 'vertauscht' | 'vorzeichen' | 'achse1' | 'achse2'
 type Ziel = { x: number; y: number; art: Fehler }
@@ -15,7 +15,7 @@ type Strahl = { m: number; t: number }
 type Runde = { a: Strahl; b: Strahl; ziele: Ziel[] }
 type Phase = 'start' | 'wahl' | 'laser' | 'ergebnis' | 'ende'
 
-const RUNDEN = 5
+const RUNDEN = 4
 const LASER_DAUER = 1.4 // Sekunden, bis die Strahlen ganz gezeichnet sind
 
 const G = { w: 760, h: 340, l: 40, r: 16, t: 16, b: 40, xMin: -5, xMax: 5, yMax: 5 }
@@ -262,8 +262,8 @@ export default function KugelTreffer() {
       {phase === 'ende' && (
         <>
           <p className="lz-spiel-ende">
-            <i className={`fa-solid ${muenzen >= 4 ? 'fa-trophy' : 'fa-compact-disc'}`} aria-hidden="true" /> Du hast {muenzen} von {RUNDEN} Kugeln getroffen.{' '}
-            {muenzen === RUNDEN ? 'Perfekt, die Lasershow kann starten!' : muenzen >= 4 ? 'Stark, fast alles richtig!' : 'Probier es noch einmal, du schaffst mehr!'}
+            <i className={`fa-solid ${muenzen >= RUNDEN - 1 ? 'fa-trophy' : 'fa-compact-disc'}`} aria-hidden="true" /> Du hast {muenzen} von {RUNDEN} Kugeln getroffen.{' '}
+            {muenzen === RUNDEN ? 'Perfekt, die Lasershow kann starten!' : muenzen >= RUNDEN - 1 ? 'Stark, fast alles richtig!' : 'Probier es noch einmal, du schaffst mehr!'}
           </p>
           <div className="bk-actions">
             <button type="button" className="bk-btn bk-btn-primary" onClick={nochmal}>
