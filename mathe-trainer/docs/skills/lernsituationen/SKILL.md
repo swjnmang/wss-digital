@@ -89,7 +89,7 @@ Jede Lernsituation hat **genau diese vier Phasen in dieser Reihenfolge**. Namen 
 
 | Phase | Inhalt (alles auf **einer** Seite) |
 | --- | --- |
-| **1 Warm-up** | Vorwissen abrufen, das gleich gebraucht wird (Retrieval Practice): **mindestens 5** kurze Aufgaben untereinander (alle Pflicht), z. B. Wert ablesen, einfache Gleichung lösen, Klammer ausmultiplizieren. |
+| **1 Warm-up** | Vorwissen abrufen, das gleich gebraucht wird (Retrieval Practice): **mindestens 5** kurze Aufgaben untereinander (alle Pflicht), z. B. Wert ablesen, einfache Gleichung lösen, Klammer ausmultiplizieren. Jede Aufgabe ist **sichtbar nummeriert** (siehe unten). |
 | **2 Problem erkennen** | Kontext, Leitfrage und Festlegung bzw. Ausprobieren. Die SuS merken selbst, dass sie das Problem mit ihrem bisherigen Wissen nicht sicher lösen können. |
 | **3 Problem lösen** | Problem oben, Beispielrechnung mit Lernvideo zum Aufklappen (breiter Knopf), Ergebnisse aus dem Heft abgleichen mit automatischer Fehlersuche, ggf. Entscheidung, Handlungsprodukt mit Kriterien, danach "Das hältst du fest" (Rückbezug und Merke). |
 | **4 Wissen prüfen und vertiefen** | Mindestens 3, besser 4 passende Übungsaufgaben mit steigendem Niveau (Basis, Standard, Erweiterung), mit typischen Fehlern als Antwortoptionen; darunter das **Bonus-Spiel** (frei, sobald alle Pflichtaufgaben gelöst sind) und die Abschluss-Buttons. |
@@ -99,6 +99,10 @@ Namen und Reihenfolge stehen im Code nur in `PHASEN` (`phasen.tsx`). Die Phasenl
 **Logik der Reihenfolge:** Nie etwas prüfen oder abfragen, das die SuS noch nicht lernen konnten. Erst entdecken bzw. erarbeiten, dann sichern, dann prüfen. Auch Fehlerbeispiele ("Wer hat recht?") gehören erst in Phase 4 "Wissen prüfen und vertiefen".
 
 **Keine Austausch-Phase:** Es gibt keinen Stopp-Kasten "Besprecht eure Ergebnisse mit der Klasse", kein "Vergleicht eure Wege" und keine aufklappbaren Lösungswege anderer ("Du arbeitest allein? So haben andere gedacht …"). Partner- oder Gruppenarbeit innerhalb einer Phase ist erlaubt und wird markiert.
+
+### Phase 1: Nummerierung im Warm-up
+
+Jede Aufgabe im Warm-up bekommt eine sichtbare Nummer, damit die SuS im Heft und im Gespräch sagen können, welche Aufgabe gemeint ist („Bei b) komme ich nicht weiter“). Dafür bekommt jede Karte (`CheckCard`, `McCard`) einen `title` aus Buchstabe und kurzem Namen in der Reihenfolge der Seite: „a) x einsetzen“, „b) Gleichung lösen“, „c) …“. In der Seitenansicht sind Kartentitel sonst ausgeblendet; auf der Warm-up-Seite zeigt `seiten.css` sie automatisch in der Themenfarbe über der Aufgabe an (`.sl-seite.et-start .lp-ex-title`). Die Buchstaben laufen über die ganze Warm-up-Seite durch, auch wenn Aufgaben mit `Abschnitt` gegliedert sind. In "Wissen prüfen und vertiefen" heißen die Aufgaben weiter „Übung 1“, „Übung 2“ … (Zwischenüberschriften mit `Abschnitt`).
 
 ### Phase 2: Aufbau der Seite "Problem erkennen"
 
@@ -411,7 +415,7 @@ Anforderungen an einen guten Kontext:
 
 - [ ] Das Log wurde gelesen, die neue Situation unterscheidet sich von den letzten drei mindestens in Format, Art des Handlungsprodukts und Themenfarbe, und sie ist eingetragen.
 - [ ] Genau vier Phasen in fester Reihenfolge, **jede auf genau einer Seite**: Warm-up, Problem erkennen, Problem lösen, Wissen prüfen und vertiefen.
-- [ ] Das Warm-up hat mindestens 5 Aufgaben, alle in `pflicht`.
+- [ ] Das Warm-up hat mindestens 5 Aufgaben, alle in `pflicht`, jede sichtbar nummeriert mit „a) Kurzname“, „b) …“ (`title` der Karte).
 - [ ] Das Lernvideo des Themas (aus den Übungsaufgaben) ist in `BeispielMitVideo` eingebettet; gibt es keines, ist es als offener Punkt genannt.
 - [ ] Nichts wird geprüft, bevor es erarbeitet wurde.
 - [ ] Keine Austausch-Phase, keine Stopp-Kästen, kein "Vergleicht eure Wege", kein "So haben andere gedacht".

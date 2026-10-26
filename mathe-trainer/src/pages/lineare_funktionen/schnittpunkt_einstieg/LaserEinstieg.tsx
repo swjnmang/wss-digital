@@ -535,7 +535,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <CheckCard
             onSolved={fertig.teil('a')}
             punkte={2}
-            title="a) x einsetzen"
+            title={<>a) <M>x</M> einsetzen</>}
             prompt={
               <p>
                 Ein Laserstrahl hat die Gleichung <M>{'y = 0{,}5x + 2'}</M>. Wie hoch ist er an der Stelle <M>{'x = -2'}</M>?
@@ -547,7 +547,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
           <CheckCard
             onSolved={fertig.teil('b')}
             punkte={2}
-            title="b) x-Terme zusammenfassen"
+            title={<>b) <M>x</M>-Terme zusammenfassen</>}
             prompt={<p>Fasse zusammen. Trage die Zahl vor <M>x</M> ein.</p>}
             rechnung={[
               { l: ['0{,}5x + x'], r: [{ luecke: 'k1' }, 'x'] },

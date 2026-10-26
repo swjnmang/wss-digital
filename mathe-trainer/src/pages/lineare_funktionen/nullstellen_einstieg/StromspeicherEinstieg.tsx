@@ -350,7 +350,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           <CheckCard
             onSolved={fertig.teil('a')}
             punkte={2}
-            title="a) x einsetzen"
+            title={<>a) <M>x</M> einsetzen</>}
             prompt={
               <p>
                 Ein Speicher hat den Ladestand <M>{'y = -0{,}4x + 2{,}5'}</M> (in kWh). Wie viel ist nach <M>{'x = 5'}</M> Stunden noch drin?

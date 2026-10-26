@@ -256,7 +256,7 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
         <CheckCard
           rechnen={false}
           onSolved={fertig}
-          title="b) x einsetzen"
+          title={<>b) <M>x</M> einsetzen</>}
           prompt={
             <p>
               Gerade <M>{'y = 2x + 1'}</M>. Berechne den y-Wert für <M>{'x = 3'}</M>.
@@ -274,7 +274,7 @@ export default function DrohneEinstieg({ erklaerung, onBack, onPractice }: { erk
         <CheckCard
           rechnen={false}
           onSolved={fertig}
-          title="c) negatives x einsetzen"
+          title={<>c) negatives <M>x</M> einsetzen</>}
           prompt={
             <p>
               Gerade <M>{'y = -x + 5'}</M>. Berechne den y-Wert für <M>{'x = -2'}</M>.
