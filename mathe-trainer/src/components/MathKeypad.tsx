@@ -50,6 +50,9 @@ const ROWS: Key[][] = [
 
 export default function MathKeypad() {
   const [target, setTarget] = useState<HTMLInputElement | null>(null)
+  // Feld, das gerade mit der Systemtastatur bearbeitet wird: Dafür gibt es einen Knopf zurück zur Mathe-Tastatur
+  const [sysTarget, setSysTarget] = useState<HTMLInputElement | null>(null)
+  const [vvBottom, setVvBottom] = useState<number | null>(null)
   const systemKb = useRef(new WeakSet<HTMLInputElement>())
   const [, rerender] = useState(0)
 
@@ -77,12 +80,15 @@ export default function MathKeypad() {
         el.setAttribute('inputmode', 'none')
         setTarget(el)
         window.setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60)
+      } else if (eligible(el)) {
+        setSysTarget(el)
       }
     }
     const onFocusOut = () => {
       window.setTimeout(() => {
         const a = document.activeElement
         if (!eligible(a) || systemKb.current.has(a as HTMLInputElement)) setTarget(null)
+        if (!eligible(a) || !systemKb.current.has(a as HTMLInputElement)) setSysTarget(null)
       }, 0)
     }
     document.addEventListener('pointerdown', onPointerDown, true)
@@ -107,13 +113,48 @@ export default function MathKeypad() {
     }
   }, [target])
 
+  // Der Zurück-Knopf sitzt direkt über der Systemtastatur. iOS verkleinert dafür nur den sichtbaren
+  // Bereich (visualViewport), nicht das Layout, darum wird die Unterkante daraus berechnet.
+  useEffect(() => {
+    if (!sysTarget) return
+    const vv = window.visualViewport
+    if (!vv) return
+    const update = () => setVvBottom(window.innerHeight - (vv.offsetTop + vv.height))
+    update()
+    vv.addEventListener('resize', update)
+    vv.addEventListener('scroll', update)
+    return () => {
+      vv.removeEventListener('resize', update)
+      vv.removeEventListener('scroll', update)
+    }
+  }, [sysTarget])
+
   useEffect(() => {
     const root = document.querySelector('.app-root')
     root?.classList.toggle('keypad-open', !!target)
     if (target && !document.contains(target)) setTarget(null)
   })
 
-  if (!target) return null
+  const keep = (e: React.PointerEvent | React.MouseEvent) => e.preventDefault()
+
+  if (!target) {
+    if (!sysTarget) return null
+    const switchToKeypad = () => {
+      const el = sysTarget
+      systemKb.current.delete(el)
+      el.setAttribute('inputmode', 'none')
+      setSysTarget(null)
+      el.blur()
+      window.setTimeout(() => el.focus(), 50)
+    }
+    return (
+      <div className="bk-keypad-return" style={{ bottom: Math.max(0, vvBottom ?? 0) }} onPointerDown={keep} onMouseDown={keep}>
+        <button type="button" className="bk-keypad-tool" onClick={switchToKeypad}>
+          <i className="fa-solid fa-calculator" aria-hidden="true" /> Mathe-Tastatur (123, Brüche)
+        </button>
+      </div>
+    )
+  }
 
   const press = (key: Key) => {
     const el = target
@@ -170,8 +211,6 @@ export default function MathKeypad() {
   const preview = target.value
     ? katex.renderToString(toLatex(target.value, caret), { throwOnError: false, displayMode: false })
     : ''
-
-  const keep = (e: React.PointerEvent | React.MouseEvent) => e.preventDefault()
 
   return (
     <div className="bk-keypad" role="group" aria-label="Mathe-Tastatur" onPointerDown={keep} onMouseDown={keep}>
