@@ -141,7 +141,7 @@ export const AREAS: Area[] = [
           { title: 'Parallele und senkrechte Geraden', desc: 'Erkenne parallele und senkrechte Geraden anhand ihrer Steigung.', path: '/lineare_funktionen/parallel_senkrecht', icon: 'fa-solid fa-lines-leaning' },
           { title: 'Nullstellen berechnen', desc: 'Finde den Schnittpunkt einer Geraden mit der x-Achse.', path: '/lineare_funktionen/nullstellen', icon: 'fa-solid fa-arrows-down-to-line' },
           { title: 'Schnittpunkt zweier Geraden', desc: 'Berechne den gemeinsamen Schnittpunkt von zwei Geraden.', path: '/lineare_funktionen/schnittpunkt', icon: 'fa-solid fa-arrows-turn-to-dots' },
-          { title: 'Lineare Gleichungssysteme', desc: 'Löse Gleichungssysteme mit dem Einsetzungs-, Gleichsetzungs- und Additionsverfahren.', path: '/lineare_funktionen/gleichungssysteme', icon: 'fa-solid fa-equals' },
+          { title: 'Lineare Gleichungssysteme', desc: 'Löse Gleichungssysteme mit dem Einsetzungs-, Gleichsetzungs- sowie Additions- und Subtraktionsverfahren.', path: '/lineare_funktionen/gleichungssysteme', icon: 'fa-solid fa-equals' },
         ],
       },
       {

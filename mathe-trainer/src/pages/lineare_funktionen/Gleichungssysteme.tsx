@@ -236,7 +236,7 @@ const buildGleichsetzenHard = (): Task => {
     };
 };
 
-// --- Additionsverfahren ---
+// --- Additions- und Subtraktionsverfahren ---
 
 // Leicht: Die y-Koeffizienten sind bereits Gegenzahlen (b1 = -b2), es kann direkt addiert werden.
 const buildAddierenEasy = (): Task => {
@@ -270,7 +270,7 @@ const buildAddierenEasy = (): Task => {
     return {
         method: 'addieren',
         systemLines: [`I:   ${eqString(a1, b1, c1)}`, `II:  ${eqString(a2, b2, c2)}`],
-        question: 'Löse das lineare Gleichungssystem mit dem Additionsverfahren.',
+        question: 'Löse das lineare Gleichungssystem mit dem Additions- und Subtraktionsverfahren.',
         steps,
         x: x0,
         y,
@@ -320,7 +320,7 @@ const buildAddierenHard = (): Task => {
     return {
         method: 'addieren',
         systemLines: [`I:   ${eqString(a1, b1, c1)}`, `II:  ${eqString(a2, b2, c2)}`],
-        question: 'Löse das lineare Gleichungssystem mit dem Additionsverfahren.',
+        question: 'Löse das lineare Gleichungssystem mit dem Additions- und Subtraktionsverfahren.',
         steps,
         x,
         y,
@@ -339,7 +339,7 @@ const buildTask = (method: Method): Task => {
 const METHOD_LABEL: Record<Method, string> = {
     einsetzen: 'Einsetzungsverfahren',
     gleichsetzen: 'Gleichsetzungsverfahren',
-    addieren: 'Additionsverfahren'
+    addieren: 'Additions-/Subtraktionsverfahren'
 };
 
 // Startverfahren über die URL wählbar, z. B. ?verfahren=addieren
@@ -359,7 +359,7 @@ const Gleichungssysteme: React.FC = () => {
     const trackers: Record<Method, ReturnType<typeof useTaskTracking>> = {
         einsetzen: useTaskTracking('Einsetzungsverfahren'),
         gleichsetzen: useTaskTracking('Gleichsetzungsverfahren'),
-        addieren: useTaskTracking('Additionsverfahren')
+        addieren: useTaskTracking('Additions- und Subtraktionsverfahren')
     };
 
     const generateTask = (m: Method) => {
@@ -401,7 +401,7 @@ const Gleichungssysteme: React.FC = () => {
                 <div>
                     <p className="text-ink text-left" style={{ maxWidth: '68ch' }}>
                         Übe die drei rechnerischen Lösungsverfahren für lineare Gleichungssysteme mit zwei
-                        Unbekannten – Einsetzungs-, Gleichsetzungs- und Additionsverfahren. Die Aufgaben wechseln
+                        Unbekannten – Einsetzungs-, Gleichsetzungs- sowie Additions- und Subtraktionsverfahren. Die Aufgaben wechseln
                         zufällig zwischen einer leichteren Variante (Gleichung(en) bereits nach einer Variablen
                         aufgelöst) und einer schwereren Variante, bei der du zuerst selbst umformen musst. Das
                         grafische Lösungsverfahren (Schnittpunkt zweier Geraden) findest du unter{' '}

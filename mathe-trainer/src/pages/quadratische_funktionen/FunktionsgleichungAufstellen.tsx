@@ -435,9 +435,9 @@ const AufgabenText = ({ t }: { t: Aufgabe }) =>
 // ---------- Erklärungen ----------
 const Voraussetzung = () => (
     <div className="bg-amber-50 border-l-4 border-amber-500 rounded-md p-4 text-gray-800">
-        <p className="font-semibold mb-1">⚠️ Voraussetzung: Additionsverfahren</p>
+        <p className="font-semibold mb-1">⚠️ Voraussetzung: Additions- und Subtraktionsverfahren</p>
         <p>
-            Für Fall 2 musst du ein lineares Gleichungssystem mit dem <strong>Additionsverfahren</strong> lösen können (Gleichungen
+            Für Fall 2 musst du ein lineares Gleichungssystem mit dem <strong>Additions- und Subtraktionsverfahren</strong> lösen können (Gleichungen
             gegebenenfalls multiplizieren und dann voneinander abziehen, sodass eine Unbekannte wegfällt). Wenn du das noch nicht sicher beherrschst, übe es zuerst noch einmal:{' '}
             <Link to={GLEICHUNGSSYSTEME_PFAD} className="font-semibold text-blue-700 underline hover:text-blue-900">
                 Lineare Gleichungssysteme üben
@@ -469,7 +469,7 @@ export const ErklaerungFall2 = () => (
         <p className="text-gray-700 mb-3">
             Ist einer der drei Werte bekannt (z. B. „verschobene Normalparabel“ bedeutet <InlineMath math="a = 1" />), setzt du ihn in{' '}
             <InlineMath math="y = ax^2 + bx + c" /> ein. Dann setzt du nacheinander beide Punkte ein und erhältst zwei Gleichungen (I und II)
-            mit den zwei noch fehlenden Werten. Dieses Gleichungssystem löst du mit dem <strong>Additionsverfahren</strong>: Ziehst du II von I
+            mit den zwei noch fehlenden Werten. Dieses Gleichungssystem löst du mit dem <strong>Additions- und Subtraktionsverfahren</strong>: Ziehst du II von I
             ab, fällt eine Unbekannte weg und du kannst die andere berechnen. Diese setzt du in Gleichung I ein und erhältst den letzten Wert.
         </p>
         <ul className="list-disc pl-5 text-gray-700 mb-3 space-y-1">

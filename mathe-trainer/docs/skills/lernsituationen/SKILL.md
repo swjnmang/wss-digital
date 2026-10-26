@@ -460,7 +460,7 @@ Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle 
 ### A. Kundenauftrag / Maschine: Funktionsgleichung aus Scheitelpunkt und einem Punkt (umgesetzt: Torbogen)
 - **Kontext:** Azubi im Metallbau, ein Torbogen über einer 4 m breiten Hofeinfahrt.
 - **Identität:** Themenfarbe Kupfer, Symbol `fa-archway`, Name "Der Torbogen", Titelbild Hofeinfahrt zwischen zwei Häusern mit Maßen, Leitobjekt Biegemaschine.
-- **Auswahlseite:** Variante B (`FunktionsgleichungMenu.tsx`, zusammen mit Lernsituation 2).
+- **Auswahlseite:** Variante B (`FunktionsgleichungMenu.tsx`, zusammen mit Lernsituation 2 „Das Gleichungs-Labor“ (Additions- und Subtraktionsverfahren, ohne Sachkontext) und Lernsituation 3 „Der Korbwurf“ (Fall 2, graphisch gedeutet)).
 - **Warm-up:** Scheitelpunkt ablesen, Gleichung nach a lösen, Klammer ausmultiplizieren.
 - **Problem erkennen:** Situation, Problem und Auftrag untereinander, darunter Skizze und `y = [a]x² + [b]x + [c]`. Jede gesendete Gleichung wird live in die Skizze gezeichnet, die Biegemaschine meldet, welche Pfosten und welche Höhe passen. Nach drei Versuchen: "Raten bringt dich kaum ans Ziel."
 - **Problem lösen:** klarer Auftrag mit S(2 | 3) und P(0 | 2), Skizze nur mit S und P, Rechenbeispiel zum Aufklappen, Handlungsprodukt Spickzettel (analog), dann selbst rechnen oder Lösungsschema ① S einsetzen, ② P einsetzen, `a = [ ]`, ③ Scheitelform, ④ allgemeine Form, mit Schritt-Hilfen; danach Rückbezug auf die Versuche und Merke.

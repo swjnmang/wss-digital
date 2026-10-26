@@ -7,7 +7,7 @@ export const BASIS = '/quadratische_funktionen/funktionsgleichung_aufstellen'
 
 export const aufgaben: MenuItem[] = [
   { title: 'Funktionsgleichung aufstellen üben', desc: 'Fall 1, Fall 2 und gemischte Aufgaben mit Lösungsweg.', path: `${BASIS}/ueben`, icon: 'fa-solid fa-pen-ruler' },
-  { title: 'Additionsverfahren üben', desc: 'Lineare Gleichungssysteme mit dem Additionsverfahren lösen.', path: '/lineare_funktionen/gleichungssysteme?verfahren=addieren', icon: 'fa-solid fa-plus-minus' },
+  { title: 'Additions- und Subtraktionsverfahren üben', desc: 'Lineare Gleichungssysteme mit dem Additions- und Subtraktionsverfahren lösen.', path: '/lineare_funktionen/gleichungssysteme?verfahren=addieren', icon: 'fa-solid fa-plus-minus' },
 ]
 
 const LERNSITUATIONEN: { teil: string; thema: Pick<Thema, 'name' | 'farbe' | 'icon'>; path: string; desc: string }[] = [
@@ -18,14 +18,20 @@ const LERNSITUATIONEN: { teil: string; thema: Pick<Thema, 'name' | 'farbe' | 'ic
     desc: 'Eine Biegemaschine braucht die Gleichung für einen Torbogen. Finde heraus, wie du aus dem Scheitelpunkt und einem Pfosten die Funktionsgleichung aufstellst.',
   },
   {
-    teil: 'Lernsituation 2 · Ein Wert und zwei Punkte',
-    thema: { name: 'Die Hoodie-Bestellung', farbe: 'beere', icon: 'fa-shirt' },
+    teil: 'Lernsituation 2 · Additions- und Subtraktionsverfahren',
+    thema: { name: 'Das Gleichungs-Labor', farbe: 'violett', icon: 'fa-flask' },
     path: `${BASIS}/lernsituation-2`,
-    desc: 'Finn will für die Schülerfirma 60 Hoodies bestellen. Lerne das Additionsverfahren kennen, stelle die Gewinnfunktion aus zwei Vorjahren auf und berate ihn.',
+    desc: 'Lerne im Gleichungs-Labor, wie du zwei Gleichungen addierst oder subtrahierst, bis eine Variable verschwindet. Das brauchst du für Lernsituation 3.',
+  },
+  {
+    teil: 'Lernsituation 3 · Ein Wert und zwei Punkte',
+    thema: { name: 'Der Korbwurf', farbe: 'ocker', icon: 'fa-basketball' },
+    path: `${BASIS}/lernsituation-3`,
+    desc: 'Baut auf Lernsituation 2 auf. Die Videoanalyse hat nur den Anfang eines Freiwurfs gefilmt. Stelle die Gleichung der Wurfbahn auf und finde heraus, ob der Ball trifft.',
   },
 ]
 
-// Auswahl mit den beiden Einstiegs-Lernsituationen (Fall 1 und Fall 2) und der bisherigen Seite als Übungsaufgaben
+// Auswahl mit den drei Einstiegs-Lernsituationen (Fall 1, Additions- und Subtraktionsverfahren, Fall 2) und der bisherigen Seite als Übungsaufgaben
 export default function FunktionsgleichungMenu() {
   const navigate = useNavigate()
   return (
@@ -33,7 +39,7 @@ export default function FunktionsgleichungMenu() {
       <div className="flex flex-col gap-6">
         <div className="bk-panel text-center flex flex-col">
           <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {LERNSITUATIONEN.map((l) => (
               <div key={l.path} className="flex">
                 <LernsituationKarte className="w-full" teil={l.teil} thema={l.thema} beschreibung={l.desc} onClick={() => navigate(l.path)} />
