@@ -19,7 +19,8 @@ import './lasershow.css'
 // Seiten noch unsicher, deshalb zeigen Rechenbeispiel und Lösungsschema jede Umformung in einer eigenen Zeile.
 // Handlungsprodukt analog: Spickzettel (Karteikarte) „Schnittpunkt berechnen“.
 // Aha: Nur wo beide Strahlen gleich hoch sind, treffen sie sich. Diese Stelle findet man nicht durch Raten, sondern durch Gleichsetzen.
-// Punkte nach Aufwand: Warm-up 2–4, Laserpult 3, Teil 1 und 2 je 12, Spickzettel 5, Übungen 4/5/6/8, Profi 8 (Pflicht zusammen 69).
+// Punkte nach Aufwand: Warm-up 2–4, Laserpult 3, Teil 1 und 2 je 12, Spickzettel 5, Übungen 4/5/6/8, Profi 8 (Pflicht zusammen 69:
+// Warm-up 14 = 20 %, Problem lösen 29 = 42 %, Übungen 23 = 33 %), Bonus-Spiel 4 Runden à 2 (höchstens 8 wie die beste Übung).
 // Identität: Themenfarbe Indigo (Nacht, Party), Symbol fa-compact-disc, Titelbild Partyraum mit Lasern und Spiegelkugel,
 // Leitobjekt das Laserpult mit der Spiegelkugel. Die Versuche bleiben nur im Seitenzustand (kein Speichern).
 // Wird als Modus „Lernsituation“ auf der Seite „Schnittpunkt zweier Geraden“ angezeigt; der Infoteil (Erklärung mit

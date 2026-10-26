@@ -10,14 +10,17 @@ import './punkte.css'
 export const loesungKosten = (max: number) => Math.round(max * PUNKTE.loesungAnteil)
 /** Abzug je Hilfe und je Fehlversuch: ein Fünftel der Aufgabenpunkte, mindestens 1 (bei 10 Punkten −2, bei 3 Punkten −1) */
 export const hilfeKosten = (max: number) => Math.max(1, Math.round(max * PUNKTE.abzugAnteil))
-/** So viel bringt eine selbst gelöste Aufgabe mindestens: ein Fünftel der Aufgabenpunkte, mindestens 1 */
-export const mindestPunkte = (max: number) => Math.min(max, Math.max(1, Math.round(max * PUNKTE.abzugAnteil)))
+/**
+ * So viel bringt eine selbst gelöste Aufgabe mindestens: genauso viel wie mit Lösungsweg (ein Drittel, mindestens 1).
+ * Wer sich mit Hilfen und Fehlversuchen durchkämpft, steht so nie schlechter da als jemand, der sofort den Lösungsweg ansieht.
+ */
+export const mindestPunkte = (max: number) => Math.min(max, Math.max(1, max - loesungKosten(max)))
 
 // Punkte nach Aufwand (Balancing, siehe docs/skills/lernsituationen/SKILL.md): Jede Aufgabe bekommt mit `punkte` ihren Wert,
 // z. B. 2 für einen Abruf im Warm-up, 12 für die Kernaufgabe in „Problem lösen“. Ohne Angabe gilt PUNKTE.aufgabe.
 export const PUNKTE = {
   aufgabe: 10, // Standardwert, wenn eine Aufgabe keinen eigenen Wert hat
-  abzugAnteil: 1 / 5, // je angezeigter Hilfe und je Fehlversuch (höchstens 3 werden gezählt); zugleich der Mindestanteil einer selbst gelösten Aufgabe
+  abzugAnteil: 1 / 5, // je angezeigter Hilfe und je Fehlversuch (höchstens 3 werden gezählt), mindestens 1 Punkt
   loesungAnteil: 2 / 3, // Lösungsweg vor dem Lösen angesehen: Abzug von 2/3 der Aufgabenpunkte (bei 10 Punkten bleiben 3)
   festlegung: 3, // Festlegung bzw. Ausprobieren in „Problem erkennen“
   kriterien: 5, // alle Kriterien des Handlungsprodukts abgehakt

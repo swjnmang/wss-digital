@@ -187,7 +187,8 @@ Jede Lernsituation belohnt richtige Lösungen mit Punkten. Die Elemente sollen m
 
   Leitplanken für die ganze Lernsituation: "Problem lösen" bringt etwa 40 % der Punkte der Pflichtaufgaben, das Warm-up höchstens 20 %, "Wissen prüfen und vertiefen" etwa ein Drittel. Insgesamt kommen meist 60 bis 100 Punkte zusammen. Die Verteilung steht als Kommentar oben in der Datei und wird im Test nachgerechnet.
 - **Punkteregeln** (Werte und Formeln in `PUNKTE`, `hilfeKosten`, `mindestPunkte`, `loesungKosten`):
-  - richtig gelöste Aufgabe: ihre Punkte; jede angezeigte Hilfe und jeder Fehlversuch (höchstens 3 zählen) kostet **ein Fünftel** der Aufgabenpunkte, mindestens 1 (bei 12 Punkten −2, bei 3 Punkten −1). Eine selbst gelöste Aufgabe bringt mindestens ein Fünftel ihrer Punkte, mindestens 1.
+  - richtig gelöste Aufgabe: ihre Punkte; jede angezeigte Hilfe und jeder Fehlversuch (höchstens 3 zählen) kostet **ein Fünftel** der Aufgabenpunkte, mindestens 1 (bei 12 Punkten −2, bei 3 Punkten −1). Eine selbst gelöste Aufgabe bringt **nie weniger als mit Lösungsweg**, also mindestens ein Drittel ihrer Punkte, mindestens 1 (`mindestPunkte`). Der Lösungsweg vor dem Lösen bleibt damit immer die teuerste Wahl.
+  - **Was als Fehlversuch zählt:** Ein Feld wird nach der Tipp-Pause zwar rot, das allein ist aber noch kein Fehlversuch (wer kurz überlegt oder die Komma-Taste sucht, tippt weiter, z. B. „0“ → „0,5“). Gezählt wird erst, wenn ein falscher Wert beim Verlassen des Feldes stehen bleibt, ein rot markierter Wert ersetzt oder gelöscht wird, in einer Auswahlliste falsch gewählt oder bei einer Auswahlaufgabe falsch geprüft wird; jeder falsche Wert zählt nur einmal. `useLiveCheck` meldet das über `onFehlversuch`, `CheckCard` gibt es an `onFehler` weiter (Fehlersuche öffnen, „Lösungsweg zeigen“ freischalten).
   - Lösungsweg **vor** dem Lösen angesehen: Abzug von **zwei Dritteln** der Punkte, die diese Aufgabe höchstens bringt (gerundet, `PUNKTE.loesungAnteil`, `loesungKosten`): bei 12 Punkten −8, die Aufgabe bringt also noch 4 Punkte. Hilfen und Fehlversuche werden dann nicht zusätzlich abgezogen. Nach dem Lösen ist das Ansehen kostenlos.
   - Die Fehlersuche (`ohnePunkte`) bringt und kostet nichts
   - Festlegung (`Vermutung`, eigenes Ausprobieren mit `usePunkteAufgabe({ wert: PUNKTE.festlegung, serie: false })`): 3 Punkte; abgehakte Kriterien des Handlungsprodukts: 5 Punkte
@@ -198,7 +199,7 @@ Jede Lernsituation belohnt richtige Lösungen mit Punkten. Die Elemente sollen m
   - **Serien-Bonus:** 3 Aufgaben am Stück ohne Hilfe und ohne Fehler bringen +3
   - **Spielregeln in der Startbox** (`PunkteRegeln`, automatisch)
   - **Bilanz** am Ende der letzten Seite (`<Bilanz />` unter dem Bonus-Spiel, über den Abschluss-Buttons): Punkte, 0 bis 3 Sterne mit Rang (Einsteiger, Bronze, Silber, Gold; nur aus den Aufgabenpunkten der Pflichtaufgaben), persönlicher Rekord (localStorage, mit try/catch) und vier Abzeichen: „Ganz allein“ (alle Pflichtaufgaben ohne Hilfe und Lösungsweg), „Serienstar“ (5 am Stück), „Profi“ (Profi-Aufgabe gelöst), „Spielchampion“ (im Bonus-Spiel fast alle Münzen)
-  - **Bonus-Spiel:** Münzen bringen je 2 Punkte, nur das beste Ergebnis zählt (`useSpielPunkte`); das Spiel ist ein Bonus und soll nicht mehr bringen als eine Übungsaufgabe
+  - **Bonus-Spiel:** Münzen bringen je 2 Punkte, nur das beste Ergebnis zählt (`useSpielPunkte`); das Spiel ist ein Bonus und bringt höchstens so viel wie die beste Übungsaufgabe (Rundenzahl entsprechend wählen, z. B. 4 Runden à 2 = 8 Punkte)
 - **Profi-Aufgaben** bekommen `profi` (zählen nicht zum Maximum der Sterne, aber zum Abzeichen „Profi“).
 - **Keine Ablenkung:** keine Ranglisten mit Namen, kein Vergleich mit Mitschülern, keine Zeitwertung, keine Animationen außer den kurzen Meldungen; bei `prefers-reduced-motion` ohne Animation. Punkte verschwinden nie wegen langsamen Arbeitens.
 
@@ -388,7 +389,7 @@ Anforderungen an einen guten Kontext:
 - **Hilfen je nach Weg:**
   - **Lückenrechnungen** (z. B. in Übungsaufgaben mit mehreren Zeilen): `SchrittHilfen` aus `lernsituation_kit/kit.tsx`. Bei der Rechnung steht "Hilfe zu: ① ② ③ …". Die SuS wählen den Schritt, bei dem sie hängen; es ist immer nur eine Hilfe offen. Jede Hilfe ist eine **konkrete Anleitung** für genau diesen Schritt, kein allgemeiner Denkanstoß. Die Kurzbezeichnungen entsprechen den Zeilennamen der Rechnung.
   - **Ergebnis-Abgleich in "Problem lösen" und andere Denkaufgaben** (Auswählen, Begründen, Erkunden): drei gestufte Hilfen mit `Hilfen` (1 Denkanstoß, 2 Strategie, 3 erster Schritt bzw. Teillösung).
-- **Lösungsweg erst nach einem Fehlversuch:** In "Problem lösen" bekommen die `CheckCard`s `loesungNachFehler`. Der Knopf "Lösungsweg zeigen" erscheint erst, nachdem ein Feld einmal rot war.
+- **Lösungsweg erst nach einem Fehlversuch:** In "Problem lösen" bekommen die `CheckCard`s `loesungNachFehler`. Der Knopf "Lösungsweg zeigen" erscheint erst nach einem Fehlversuch (falscher Wert beim Verlassen des Feldes oder ersetzt, siehe "Gamification").
 - **Niveaustufen** Basis, Standard und Erweiterung bei den Übungsaufgaben in Phase 4, sichtbar gekennzeichnet. Die Erweiterung enthält eine offene oder umgekehrte Aufgabe oder eine Begründung.
 
 ## Digitale Umsetzung
@@ -433,7 +434,8 @@ Anforderungen an einen guten Kontext:
 - [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat 2 bis 4 Kriterien zum Abhaken, dazu das Kriterium „unbekannte Begriffe und Bedeutung der Abkürzungen der Formel aufschreiben“ mit den konkreten Abkürzungen.
 - [ ] "Wissen prüfen und vertiefen" hat mindestens 3, besser 4 passende Übungsaufgaben (Basis bis Erweiterung) und darunter die Abschluss-Buttons.
 - [ ] Gamification an: `SeitenLernsituation` mit `punkte`, Fehlersuche mit `ohnePunkte`, Profi-Aufgabe mit `profi`, `<Bilanz />` am Ende der letzten Seite; die Punkte wurden im Test nachgerechnet.
-- [ ] Punkte nach Aufwand: jede Aufgabe hat `punkte={…}` nach der Richtwert-Tabelle (Abruf 2, Kernaufgabe 10 bis 15 …), "Problem lösen" bringt etwa 40 % der Pflichtpunkte, das Warm-up höchstens 20 %; die Verteilung steht als Kommentar in der Datei.
+- [ ] Punkte nach Aufwand: jede Aufgabe hat `punkte={…}` nach der Richtwert-Tabelle (Abruf 2, Kernaufgabe 10 bis 15 …), "Problem lösen" bringt etwa 40 % der Pflichtpunkte, das Warm-up höchstens 20 %; das Bonus-Spiel bringt höchstens so viel wie die beste Übung; die Verteilung steht als Kommentar in der Datei.
+- [ ] Im Test geprüft: Eine Tipp-Pause mitten in einer richtigen Eingabe (z. B. „0“, Pause, „,5“) kostet keine Punkte.
 - [ ] Nach allen Pflicht-Übungen wird ein thematisch passendes Bonus-Spiel freigeschaltet (`BonusSpiel`), das das Wissen spielerisch prüft, auf dem Tablet bedienbar ist und "Nochmal spielen" anbietet.
 - [ ] Ruhiges Grunddesign: einspaltig (auch bei 1920 × 1080), ein Fokus pro Seite, keine verschachtelten Kästen, keine Farbstreifen oder Banner, eine Akzentfarbe, Touch-Ziele mindestens 44 px.
 - [ ] Identität vollständig: Themenfarbe (anders als in den letzten drei Lernsituationen), Symbol und Name als Kennung in der Leiste, eigenes Titelbild in der Startbox, Leitobjekt durch alle Phasen.

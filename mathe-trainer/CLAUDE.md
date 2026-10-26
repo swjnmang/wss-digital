@@ -85,7 +85,9 @@ Gamification: `SeitenLernsituation` mit `punkte` (Punkte in der Leiste, Lösungs
 Serien-Bonus; `<Bilanz />` mit Sternen, Abzeichen und Rekord am Ende; Bausteine in `lernsituation_kit/punkte.tsx`, Vorlage
 `finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx`). **Punkte nach Aufwand:** jede Aufgabe bekommt `punkte={…}` (Abruf im Warm-up 2,
 kurze Gleichung 3, Kernaufgabe in „Problem lösen“ 10–15, Übungen 3–8, Profi 8–10; Tabelle im Skill); Hilfe und Fehlversuch kosten je ein Fünftel
-der Aufgabenpunkte; „Problem lösen“ bringt etwa 40 % der Pflichtpunkte. Vorlage `lineare_funktionen/schnittpunkt_einstieg/LaserEinstieg.tsx`.
+der Aufgabenpunkte, eine selbst gelöste Aufgabe bringt aber nie weniger als mit Lösungsweg (ein Drittel); als Fehlversuch zählt erst
+ein falscher Wert beim Verlassen des Feldes oder ein ersetzter roter Wert, nicht schon das Rot nach einer Tipp-Pause; das Bonus-Spiel bringt höchstens
+so viel wie die beste Übung; „Problem lösen“ bringt etwa 40 % der Pflichtpunkte. Vorlage `lineare_funktionen/schnittpunkt_einstieg/LaserEinstieg.tsx`.
 Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
 aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
 

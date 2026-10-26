@@ -181,10 +181,13 @@ const TIPP_PAUSE_MS = 1200
  * Automatische Prüfung je Feld (ohne Prüfen-Button): Ein richtiger Wert wird sofort grün,
  * ein falscher nach einer kurzen Tipp-Pause oder beim Verlassen des Feldes rot.
  * Sobald alle Felder richtig sind, kommt das Lob und onSolved wird aufgerufen.
+ * Fehlversuch (onFehlversuch, kostet Punkte und öffnet z. B. die Fehlersuche): Rot nach einer Tipp-Pause allein zählt nicht, denn wer
+ * kurz überlegt oder die Komma-Taste sucht, tippt weiter („0“ → „0,5“). Gezählt wird erst, wenn ein falscher Wert beim Verlassen des
+ * Feldes stehen bleibt, ein rot markierter Wert ersetzt oder gelöscht wird oder in einer Auswahlliste falsch gewählt wird; jeder Wert einmal.
  */
 export function useLiveCheck(
   felder: { key: string; pruefe: (v: string) => boolean | undefined; sofort?: boolean }[],
-  { onSolved, tracking = NO_TRACKING }: { onSolved?: () => void; tracking?: Tracking } = {},
+  { onSolved, onFehlversuch, tracking = NO_TRACKING }: { onSolved?: () => void; onFehlversuch?: () => void; tracking?: Tracking } = {},
 ) {
   const [values, setValues] = useState<Record<string, string>>({})
   const [marks, setMarks] = useState<Record<string, boolean | undefined>>({})
@@ -193,24 +196,51 @@ export function useLiveCheck(
   const [malFalsch, setMalFalsch] = useState(false)
   const timer = useRef<Record<string, number>>({})
   const letzte = useRef('')
+  /** nach der Tipp-Pause rot markierter Wert je Feld */
+  const rot = useRef<Record<string, string>>({})
+  /** schon als Fehlversuch gezählter Wert je Feld */
+  const gezaehlt = useRef<Record<string, string>>({})
 
   useEffect(() => () => Object.values(timer.current).forEach((t) => window.clearTimeout(t)), [])
 
   const pruefe = (key: string, v: string) => felder.find((f) => f.key === key)?.pruefe(v)
   const markiere = (key: string, m: boolean | undefined) => setMarks((p) => (p[key] === m ? p : { ...p, [key]: m }))
+  const fehlversuch = (key: string, v: string) => {
+    if (gezaehlt.current[key] === v) return
+    gezaehlt.current[key] = v
+    setMalFalsch(true)
+    onFehlversuch?.()
+  }
 
   const setValue = (key: string, v: string) => {
+    // Ein rot markierter Wert wird ersetzt oder gelöscht: Das war ein Fehlversuch. Weitertippen am Ende zählt nicht.
+    const alt = rot.current[key]
+    if (alt !== undefined && !v.startsWith(alt)) fehlversuch(key, alt)
+    delete rot.current[key]
     setValues((p) => ({ ...p, [key]: v }))
     tracking.onInput()
     window.clearTimeout(timer.current[key])
     const m = pruefe(key, v)
-    if (m === true || felder.find((f) => f.key === key)?.sofort) return markiere(key, m)
+    if (felder.find((f) => f.key === key)?.sofort) {
+      if (m === false) fehlversuch(key, v)
+      return markiere(key, m)
+    }
+    if (m === true) return markiere(key, m)
     markiere(key, undefined)
-    if (m === false) timer.current[key] = window.setTimeout(() => markiere(key, false), TIPP_PAUSE_MS)
+    if (m === false)
+      timer.current[key] = window.setTimeout(() => {
+        rot.current[key] = v
+        markiere(key, false)
+      }, TIPP_PAUSE_MS)
   }
   const blur = (key: string, v: string) => {
     window.clearTimeout(timer.current[key])
-    markiere(key, pruefe(key, v))
+    const m = pruefe(key, v)
+    if (m === false) {
+      rot.current[key] = v
+      fehlversuch(key, v)
+    }
+    markiere(key, m)
   }
 
   useEffect(() => {
@@ -218,7 +248,6 @@ export function useLiveCheck(
     const falsch = felder.some((f) => marks[f.key] === false)
     const ok = alle && !falsch
     setStatus(ok ? 'ok' : falsch ? 'no' : 'idle')
-    if (falsch) setMalFalsch(true)
     const sig = JSON.stringify(felder.map((f) => marks[f.key] ?? null))
     if (alle && sig !== letzte.current) {
       letzte.current = sig
@@ -291,7 +320,7 @@ export function CheckCard({
   profi?: boolean
   /** Ohne Punkte (z. B. die Fehlersuche): bringt nichts und kostet nichts */
   ohnePunkte?: boolean
-  /** Wird aufgerufen, sobald ein Feld rot wird (z. B. um die Fehlersuche zu öffnen) */
+  /** Wird bei einem Fehlversuch aufgerufen (Feld mit falschem Wert verlassen oder roten Wert ersetzt), z. B. um die Fehlersuche zu öffnen */
   onFehler?: () => void
 }) {
   const uid = useId()
@@ -317,16 +346,14 @@ export function CheckCard({
         pt.geloest()
         onSolved?.()
       },
+      // Fehlversuch erst beim Verlassen des Feldes oder Ersetzen eines roten Werts, nicht schon bei einer Tipp-Pause
+      onFehlversuch: () => {
+        pt.fehler()
+        onFehler?.()
+      },
       tracking,
     },
   )
-  useEffect(() => {
-    if (status === 'no') {
-      pt.fehler()
-      onFehler?.()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status])
 
   const inlineKeys = new Set((rechnung ?? []).flatMap((z) => [...z.l, ...z.r]).flatMap((seg) => (typeof seg === 'string' ? [] : [seg.luecke])))
   const listFields = fields.filter((f) => !inlineKeys.has(f.key))
