@@ -71,6 +71,8 @@ export function parseInput(raw: string): { value: number; decimals: number; perc
   // Punkt als Tausendertrenner nur, wenn auch ein Komma vorkommt oder genau Dreiergruppen folgen
   if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.')
   else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '')
+  // Vorzeichen „+“ ist erlaubt (Lücken, in denen das Vorzeichen selbst eingetragen wird)
+  s = s.replace(/^\+(?=[\d.])/, '')
   if (!/^-?\d*\.?\d+$/.test(s)) return null
   const value = parseFloat(s)
   const decimals = s.includes('.') ? s.split('.')[1].length : 0

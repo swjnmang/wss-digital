@@ -287,7 +287,7 @@ function Biegemaschine({ auftrag, versuche, onSenden }: { auftrag: ReactNode; ve
       {auftrag}
       <TorBild kurven={kurven} gross />
       <div className="tb-eingabe">
-        <M>{'y ='}</M> {feld('a', 'Zahl vor x²')} <M>{'x^2 +'}</M> {feld('b', 'Zahl vor x')} <M>{'x +'}</M> {feld('c', 'Zahl ohne x')}
+        <M>{'y ='}</M> {feld('a', 'Zahl vor x²')} <M>{'x^2'}</M> {feld('b', 'Zahl vor x mit Vorzeichen')} <M>{'x'}</M> {feld('c', 'Zahl ohne x mit Vorzeichen')}
         <button type="button" className="bk-btn bk-btn-primary" onClick={senden}>
           <i className="fa-solid fa-paper-plane" aria-hidden="true" /> An die Maschine senden
         </button>
@@ -357,6 +357,11 @@ function AuftragsblattBild() {
   )
 }
 
+// Farben im Lösungsweg: Werte des Scheitelpunkts blau, Werte des Punkts P grün, der berechnete Formfaktor a orange
+const FS = (t: string) => `\\textcolor{#1d4ed8}{${t}}`
+const FP = (t: string) => `\\textcolor{#15803d}{${t}}`
+const FA = (t: string) => `\\textcolor{#c2410c}{${t}}`
+
 /* ── Rechenbeispiel (andere Zahlen): S(−1 | 5) und P(1 | 3) ─────────────── */
 
 const BSP_AUFGABE = (
@@ -371,9 +376,9 @@ const BSP_SCHRITTE = [
     body: (
       <>
         <p>
-          Setze <M>{'x_S = -1'}</M> und <M>{'y_S = 5'}</M> ein. Negative Zahlen immer in Klammern setzen:
+          Setze <M>{FS('x_S = -1')}</M> und <M>{FS('y_S = 5')}</M> ein. Negative Zahlen immer in Klammern setzen:
         </p>
-        <MB>{'\\begin{aligned} y &= a(x - x_S)^2 + y_S \\\\ y &= a(x - (-1))^2 + 5 \\\\ y &= a(x + 1)^2 + 5 \\end{aligned}'}</MB>
+        <MB>{`\\begin{aligned} y &= a(x - ${FS('x_S')})^2 + ${FS('y_S')} \\\\ y &= a(x - ${FS('(-1)')})^2 + ${FS('5')} \\\\ y &= a(x + 1)^2 + 5 \\end{aligned}`}</MB>
       </>
     ),
   },
@@ -382,9 +387,9 @@ const BSP_SCHRITTE = [
     body: (
       <>
         <p>
-          Setze <M>{'P(1 \\mid 3)'}</M> ein, also <M>{'x = 1'}</M> und <M>{'y = 3'}</M>, und löse nach <M>a</M> auf:
+          Setze <M>{FP('P(1 \\mid 3)')}</M> ein, also <M>{FP('x = 1')}</M> und <M>{FP('y = 3')}</M>, und löse nach <M>a</M> auf:
         </p>
-        <MB>{'\\begin{aligned} 3 &= a \\cdot (1 + 1)^2 + 5 \\\\ 3 &= a \\cdot 2^2 + 5 \\\\ 3 &= 4a + 5 && \\mid -5 \\\\ -2 &= 4a && \\mid :4 \\\\ a &= -0{,}5 \\end{aligned}'}</MB>
+        <MB>{`\\begin{aligned} y &= a(x + 1)^2 + 5 \\\\ ${FP('3')} &= a \\cdot (${FP('1')} + 1)^2 + 5 \\\\ 3 &= a \\cdot 2^2 + 5 \\\\ 3 &= 4a + 5 && \\mid -5 \\\\ -2 &= 4a && \\mid :4 \\\\ a &= ${FA('-0{,}5')} \\end{aligned}`}</MB>
       </>
     ),
   },
@@ -393,9 +398,9 @@ const BSP_SCHRITTE = [
     body: (
       <>
         <p>
-          Setze <M>{'a = -0{,}5'}</M> in den Ansatz aus Schritt 1 ein:
+          Setze <M>{FA('a = -0{,}5')}</M> in den Ansatz aus Schritt 1 ein:
         </p>
-        <MB>{'y = -0{,}5(x + 1)^2 + 5'}</MB>
+        <MB>{`\\begin{aligned} y &= ${FA('a')}(x + 1)^2 + 5 \\\\ y &= ${FA('-0{,}5')}(x + 1)^2 + 5 \\end{aligned}`}</MB>
       </>
     ),
   },
@@ -415,14 +420,18 @@ const BSP_SCHRITTE = [
 /** Lösungsweg für den Torbogen */
 const LOESUNG = (
   <>
-    <p>① Scheitelpunkt einsetzen:</p>
-    <MB>{'y = a(x - 2)^2 + 3'}</MB>
     <p>
-      ② Pfosten <M>P</M> einsetzen (<M>{'x = 0'}</M>, <M>{'y = 2'}</M>) und nach <M>a</M> auflösen:
+      ① Scheitelpunkt <M>{FS('S(2 \\mid 3)')}</M> einsetzen:
     </p>
-    <MB>{'\\begin{aligned} 2 &= a \\cdot (0 - 2)^2 + 3 \\\\ 2 &= 4a + 3 && \\mid -3 \\\\ -1 &= 4a && \\mid :4 \\\\ a &= -0{,}25 \\end{aligned}'}</MB>
-    <p>③ Scheitelform:</p>
-    <MB>{'y = -0{,}25(x - 2)^2 + 3'}</MB>
+    <MB>{`\\begin{aligned} y &= a(x - ${FS('x_S')})^2 + ${FS('y_S')} \\\\ y &= a(x - ${FS('2')})^2 + ${FS('3')} \\end{aligned}`}</MB>
+    <p>
+      ② Pfosten <M>{FP('P(0 \\mid 2)')}</M> einsetzen (<M>{FP('x = 0')}</M>, <M>{FP('y = 2')}</M>) und nach <M>a</M> auflösen:
+    </p>
+    <MB>{`\\begin{aligned} ${FP('2')} &= a \\cdot (${FP('0')} - 2)^2 + 3 \\\\ 2 &= 4a + 3 && \\mid -3 \\\\ -1 &= 4a && \\mid :4 \\\\ a &= ${FA('-0{,}25')} \\end{aligned}`}</MB>
+    <p>
+      ③ <M>{FA('a = -0{,}25')}</M> einsetzen, Scheitelform:
+    </p>
+    <MB>{`y = ${FA('-0{,}25')}(x - 2)^2 + 3`}</MB>
     <p>④ In die allgemeine Form umwandeln:</p>
     <MB>{'\\begin{aligned} y &= -0{,}25 \\cdot [(x - 2) \\cdot (x - 2)] + 3 \\\\ y &= -0{,}25 \\cdot [x^2 - 4x + 4] + 3 \\\\ y &= -0{,}25x^2 + x - 1 + 3 \\\\ y &= -0{,}25x^2 + x + 2 \\end{aligned}'}</MB>
   </>
@@ -525,13 +534,13 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
             prompt={
               <p>
                 Eine Parabel hat den Scheitelpunkt <M>{'S(3 \\mid -1)'}</M>. Setze ihn in die Scheitelform <M>{'y = a(x - x_S)^2 + y_S'}</M> ein. Das <M>a</M> bleibt als
-                Buchstabe stehen.
+                Buchstabe stehen. Trage die Zahl am Ende mit Vorzeichen ein, z.&nbsp;B. <M>{'+2'}</M> oder <M>{'-2'}</M>.
               </p>
             }
-            rechnung={[{ l: ['y'], r: ['a \\cdot (x -', { luecke: 'xs' }, ')^2 +', { luecke: 'ys' }] }]}
+            rechnung={[{ l: ['y'], r: ['a \\cdot (x -', { luecke: 'xs' }, ')^2', { luecke: 'ys' }] }]}
             fields={[
               { kind: 'num', key: 'xs', label: 'x-Wert in der Klammer', expected: 3 },
-              { kind: 'num', key: 'ys', label: 'Zahl am Ende', expected: -1 },
+              { kind: 'num', key: 'ys', label: 'Zahl am Ende mit Vorzeichen', expected: -1 },
             ]}
             solution={
               <>
@@ -572,18 +581,18 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
             title="e) Klammer ausmultiplizieren"
             prompt={
               <p>
-                Schreibe <M>{'-0{,}5 \\cdot (x - 3)^2'}</M> ohne Klammer. Löse zuerst das Quadrat auf und multipliziere dann jeden Summanden mit <M>{'-0{,}5'}</M>.
+                Schreibe <M>{'-0{,}5 \\cdot (x - 3)^2'}</M> ohne Klammer. Löse zuerst das Quadrat auf und multipliziere dann jeden Summanden mit <M>{'-0{,}5'}</M>. Trage die Zahlen mit Vorzeichen ein, z.&nbsp;B. <M>{'+9'}</M> oder <M>{'-6'}</M>.
               </p>
             }
             rechnung={[
-              { l: ['(x - 3)^2'], r: ['x^2', { luecke: 'b1' }, 'x +', { luecke: 'c1' }] },
-              { l: ['-0{,}5 \\cdot (x - 3)^2'], r: ['-0{,}5x^2 +', { luecke: 'b2' }, 'x +', { luecke: 'c2' }] },
+              { l: ['(x - 3)^2'], r: ['x^2', { luecke: 'b1' }, 'x', { luecke: 'c1' }] },
+              { l: ['-0{,}5 \\cdot (x - 3)^2'], r: ['-0{,}5x^2', { luecke: 'b2' }, 'x', { luecke: 'c2' }] },
             ]}
             fields={[
-              { kind: 'num', key: 'b1', label: 'Zahl vor x', expected: -6 },
-              { kind: 'num', key: 'c1', label: 'Zahl ohne x', expected: 9 },
-              { kind: 'num', key: 'b2', label: 'Zahl vor x', expected: 3 },
-              { kind: 'num', key: 'c2', label: 'Zahl ohne x', expected: -4.5 },
+              { kind: 'num', key: 'b1', label: 'Zahl vor x mit Vorzeichen', expected: -6 },
+              { kind: 'num', key: 'c1', label: 'Zahl ohne x mit Vorzeichen', expected: 9 },
+              { kind: 'num', key: 'b2', label: 'Zahl vor x mit Vorzeichen', expected: 3 },
+              { kind: 'num', key: 'c2', label: 'Zahl ohne x mit Vorzeichen', expected: -4.5 },
             ]}
             solution={
               <MB>{'\\begin{aligned} (x - 3)^2 &= (x - 3)(x - 3) = x^2 - 6x + 9 \\\\ -0{,}5 \\cdot (x^2 - 6x + 9) &= -0{,}5x^2 + 3x - 4{,}5 \\end{aligned}'}</MB>
@@ -639,19 +648,19 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
               rechnen={false}
               prompt={
                 <p>
-                  Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt. Wie lautet die Gleichung des Bogens in Scheitelform, und welche
+                  Trage die Ergebnisse aus deinem Heft ein. Trage die Zahlen mit Vorzeichen ein. Jedes Feld zeigt dir sofort, ob es stimmt. Wie lautet die Gleichung des Bogens in Scheitelform, und welche
                   Gleichung in allgemeiner Form schickst du an die Biegemaschine?
                 </p>
               }
               rechnung={[
                 { l: ['y'], r: [{ luecke: 'as' }, '\\cdot (x - 2)^2 + 3'], u: '\\text{Scheitelform}' },
-                { l: ['y'], r: [{ luecke: 'a' }, 'x^2 +', { luecke: 'b' }, 'x +', { luecke: 'c' }], u: '\\text{allg. Form}' },
+                { l: ['y'], r: [{ luecke: 'a' }, 'x^2', { luecke: 'b' }, 'x', { luecke: 'c' }], u: '\\text{allg. Form}' },
               ]}
               fields={[
                 { kind: 'num', key: 'as', label: 'Formfaktor a in der Scheitelform', expected: A_SOLL },
                 { kind: 'num', key: 'a', label: 'Zahl vor x²', expected: A_SOLL },
-                { kind: 'num', key: 'b', label: 'Zahl vor x', expected: 1 },
-                { kind: 'num', key: 'c', label: 'Zahl ohne x', expected: 2 },
+                { kind: 'num', key: 'b', label: 'Zahl vor x mit Vorzeichen', expected: 1 },
+                { kind: 'num', key: 'c', label: 'Zahl ohne x mit Vorzeichen', expected: 2 },
               ]}
               loesungNachFehler
               solution={LOESUNG}
@@ -678,16 +687,16 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
                 rechnung={[
                   { l: ['2'], r: [{ luecke: 'q' }, '\\cdot a + 3'], u: '\\text{②}' },
                   { l: [{ luecke: 'm' }], r: ['4a'], u: '\\mid -3' },
-                  { l: ['(x - 2)^2'], r: ['x^2 +', { luecke: 'b1' }, 'x +', { luecke: 'c1' }], u: '\\text{④}' },
-                  { l: ['-0{,}25 \\cdot (x^2 - 4x + 4)'], r: ['-0{,}25x^2 +', { luecke: 'b2' }, 'x +', { luecke: 'c2' }], u: '\\text{mal } a' },
+                  { l: ['(x - 2)^2'], r: ['x^2', { luecke: 'b1' }, 'x', { luecke: 'c1' }], u: '\\text{④}' },
+                  { l: ['-0{,}25 \\cdot (x^2 - 4x + 4)'], r: ['-0{,}25x^2', { luecke: 'b2' }, 'x', { luecke: 'c2' }], u: '\\text{mal } a' },
                 ]}
                 fields={[
                   { kind: 'num', key: 'q', label: 'Zahl vor a', expected: 4 },
                   { kind: 'num', key: 'm', label: 'linke Seite nach −3', expected: -1 },
-                  { kind: 'num', key: 'b1', label: 'Zahl vor x', expected: -4 },
-                  { kind: 'num', key: 'c1', label: 'Zahl ohne x', expected: 4 },
-                  { kind: 'num', key: 'b2', label: 'Zahl vor x', expected: 1 },
-                  { kind: 'num', key: 'c2', label: 'Zahl ohne x', expected: -1 },
+                  { kind: 'num', key: 'b1', label: 'Zahl vor x mit Vorzeichen', expected: -4 },
+                  { kind: 'num', key: 'c1', label: 'Zahl ohne x mit Vorzeichen', expected: 4 },
+                  { kind: 'num', key: 'b2', label: 'Zahl vor x mit Vorzeichen', expected: 1 },
+                  { kind: 'num', key: 'c2', label: 'Zahl ohne x mit Vorzeichen', expected: -1 },
                 ]}
               />
             </Fehlersuche>
@@ -874,28 +883,28 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
               prompt={
                 <p>
                   Die Nachbarn wollen auch einen Bogen über ihr Gartentor. Sein höchster Punkt ist <M>{'S(3 \\mid 4)'}</M>, der linke Pfosten steht bei <M>{'P(1 \\mid 2)'}</M>.
-                  Fülle die Lücken aus.
+                  Fülle die Lücken aus und trage die Zahlen mit Vorzeichen ein.
                 </p>
               }
               rechnung={[
-                { l: ['y'], r: ['a \\cdot (x -', { luecke: 'xs' }, ')^2 +', { luecke: 'ys' }], u: '\\text{① } S \\text{ einsetzen}' },
+                { l: ['y'], r: ['a \\cdot (x -', { luecke: 'xs' }, ')^2', { luecke: 'ys' }], u: '\\text{① } S \\text{ einsetzen}' },
                 { l: ['2'], r: [{ luecke: 'q' }, '\\cdot a + 4'], u: '\\text{② } P \\text{ einsetzen}' },
                 { l: ['a'], r: [{ luecke: 'a1' }], u: '\\text{Formfaktor } a' },
-                { l: ['y'], r: [{ luecke: 'a2' }, 'x^2 +', { luecke: 'b' }, 'x +', { luecke: 'c' }], u: '\\text{③ allg. Form}' },
+                { l: ['y'], r: [{ luecke: 'a2' }, 'x^2', { luecke: 'b' }, 'x', { luecke: 'c' }], u: '\\text{③ allg. Form}' },
               ]}
               fields={[
                 { kind: 'num', key: 'xs', label: 'x-Wert des Scheitels', expected: 3 },
-                { kind: 'num', key: 'ys', label: 'y-Wert des Scheitels', expected: 4 },
+                { kind: 'num', key: 'ys', label: 'y-Wert des Scheitels mit Vorzeichen', expected: 4 },
                 { kind: 'num', key: 'q', label: 'Zahl vor a', expected: 4 },
                 { kind: 'num', key: 'a1', label: 'Formfaktor a', expected: -0.5 },
                 { kind: 'num', key: 'a2', label: 'Zahl vor x²', expected: -0.5 },
-                { kind: 'num', key: 'b', label: 'Zahl vor x', expected: 3 },
-                { kind: 'num', key: 'c', label: 'Zahl ohne x', expected: -0.5 },
+                { kind: 'num', key: 'b', label: 'Zahl vor x mit Vorzeichen', expected: 3 },
+                { kind: 'num', key: 'c', label: 'Zahl ohne x mit Vorzeichen', expected: -0.5 },
               ]}
               solution={
                 <>
-                  <MB>{'\\begin{aligned} y &= a(x - 3)^2 + 4 \\\\ 2 &= a \\cdot (1 - 3)^2 + 4 = 4a + 4 && \\mid -4 \\\\ -2 &= 4a && \\mid :4 \\\\ a &= -0{,}5 \\end{aligned}'}</MB>
-                  <MB>{'\\begin{aligned} y &= -0{,}5 \\cdot [x^2 - 6x + 9] + 4 \\\\ y &= -0{,}5x^2 + 3x - 4{,}5 + 4 \\\\ y &= -0{,}5x^2 + 3x - 0{,}5 \\end{aligned}'}</MB>
+                  <MB>{`\\begin{aligned} y &= a(x - ${FS('3')})^2 + ${FS('4')} \\\\ ${FP('2')} &= a \\cdot (${FP('1')} - 3)^2 + 4 = 4a + 4 && \\mid -4 \\\\ -2 &= 4a && \\mid :4 \\\\ a &= ${FA('-0{,}5')} \\end{aligned}`}</MB>
+                  <MB>{`\\begin{aligned} y &= ${FA('-0{,}5')} \\cdot [x^2 - 6x + 9] + 4 \\\\ y &= -0{,}5x^2 + 3x - 4{,}5 + 4 \\\\ y &= -0{,}5x^2 + 3x - 0{,}5 \\end{aligned}`}</MB>
                 </>
               }
               help={
