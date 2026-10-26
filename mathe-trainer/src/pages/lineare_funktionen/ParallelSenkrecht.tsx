@@ -4,6 +4,8 @@ import { getAreaFromPath, HelpUsage, logTrackingEntry } from '../../utils/tracki
 import { useFlushOnLeave } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
 import { fieldCheckClass } from '../../utils/fieldCheck'
+import GleichungEingabe from '../../components/GleichungEingabe'
+import { checkLinearEquation } from '../../utils/parseLinearEquation'
 
 // ===== MathDisplay Komponente =====
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -103,35 +105,17 @@ const aufgabenBanks = {
     
     const t2 = y - m2 * x
     
-    // Generiere MC-Optionen
-    const correctAnswer = `y=${Math.round(m2 * 100) / 100}x${t2 >= 0 ? '+' : '-'}${Math.abs(Math.round(t2 * 100) / 100)}`
-    const mcOptions = [{ label: correctAnswer, value: correctAnswer, isCorrect: true }]
-    
-    for (let i = 0; i < 2; i++) {
-      let mOpt = m2 + randInt(-2, 2) / 100
-      while (Math.abs(mOpt - m2) < 0.01) mOpt = m2 + randInt(-2, 2) / 100
-      
-      let tOpt = t2 + randInt(-3, 3)
-      while (tOpt === t2) tOpt = t2 + randInt(-3, 3)
-      
-      const label = `y=${Math.round(mOpt * 100) / 100}x${tOpt >= 0 ? '+' : '-'}${Math.abs(Math.round(tOpt * 100) / 100)}`
-      mcOptions.push({ label, value: label, isCorrect: false })
-    }
-    
-    const shuffledOptions = mcOptions.sort(() => Math.random() - 0.5)
-    
     return {
       typ: 'geradeDurchPunkt',
       nummer: 2,
       thema: 'Gerade konstruieren',
       aufgabentyp,
-      frage: `Gegeben ist die Gerade g: y = ${m1}x ${t1 >= 0 ? '+' : '-'} ${Math.abs(t1)} und der Punkt P(${x}|${y}).\n\nBestimme die Gleichung der Geraden, die ${aufgabentyp === 'parallel' ? 'parallel' : 'senkrecht'} zu g verläuft und durch P geht. Zeige deinen Rechenweg:`,
+      frage: `Gegeben ist die Gerade g: y = ${m1}x ${t1 >= 0 ? '+' : '-'} ${Math.abs(t1)} und der Punkt P(${x}|${y}).\n\nBestimme die Gleichung der Geraden, die ${aufgabentyp === 'parallel' ? 'parallel' : 'senkrecht'} zu g verläuft und durch P geht. Tippe die vollständige Funktionsgleichung ein.`,
       m1,
       t1,
       punkt: { x, y },
       m2: Math.round(m2 * 100) / 100,
       t2: Math.round(t2 * 100) / 100,
-      mcOptions: shuffledOptions,
       lösungsweg: `
       \\text{Schritt 1: Steigung bestimmen}\\n
       ${aufgabentyp === 'parallel' ? `m_2 = m_1 = ${m1}` : `m_1 \\cdot m_2 = -1 \\Rightarrow m_2 = -\\frac{1}{${m1}} = ${Math.round(m2 * 100) / 100}`}\\n\\n
@@ -204,6 +188,8 @@ export default function ParallelSenkrecht() {
 
   const [antworten, setAntworten] = useState(aufgaben.map(() => ''))
   const [validiert, setValidiert] = useState(aufgaben.map(() => false))
+  // Rückmeldung zur eingetippten Gleichung (welcher Teil falsch ist)
+  const [gleichungHinweis, setGleichungHinweis] = useState<Record<number, string>>({})
   // Nach dem Prüfen: Auswahl grün/rot einfärben (bis zur nächsten Änderung)
   const [geprüft, setGeprüft] = useState(aufgaben.map(() => false))
   const setGeprüftAt = (index: number, value: boolean) =>
@@ -266,8 +252,15 @@ export default function ParallelSenkrecht() {
     if (aufgabe.typ === 'gleichungenPrüfen') {
       isCorrect = antwort === aufgabe.beziehung
     } else if (aufgabe.typ === 'geradeDurchPunkt') {
-      const correctAnswer = `y=${aufgabe.m2}x${aufgabe.t2 >= 0 ? '+' : '-'}${Math.abs(aufgabe.t2)}`
-      isCorrect = antwort === correctAnswer
+      const r = checkLinearEquation(antwort, aufgabe.m2, aufgabe.t2, 0.05)
+      setGleichungHinweis(prev => ({ ...prev, [index]: r.text }))
+      if (r.status === 'invalid') {
+        // Eingabefehler: Hinweis, aber kein Prüfversuch
+        setValidiert(prev => prev.map((v, i) => (i === index ? false : v)))
+        setGeprüftAt(index, true)
+        return
+      }
+      isCorrect = r.status === 'ok'
     } else if (aufgabe.typ === 'mehrereGeraden') {
       const parts = antwort.split('|')
       const expected = ['parallel', 'senkrecht', 'keine']
@@ -300,7 +293,7 @@ export default function ParallelSenkrecht() {
   }
 
   return (
-    <TaskShell title="Parallele und senkrechte Geraden" subtitle="Untersuche die Beziehungen zwischen Geraden rechnerisch (Multiple Choice)" width="full">
+    <TaskShell title="Parallele und senkrechte Geraden" subtitle="Untersuche die Beziehungen zwischen Geraden rechnerisch" width="full">
 
       <button className={styles.newButton} onClick={neueAufgaben}>
         Neue Aufgaben generieren
@@ -353,28 +346,22 @@ export default function ParallelSenkrecht() {
 
               {aufgabe.typ === 'geradeDurchPunkt' && (
                 <div className={styles.inputGroup}>
-                  <p className={styles.inputLabel}>Wähle die richtige Gleichung:</p>
-                  <div className={styles.mcOptions}>
-                    {aufgabe.mcOptions.map((option: any, i: number) => (
-                      <label key={i} className={`${styles.mcOption} ${geprüft[index] && antworten[index] === option.value ? fieldCheckClass(validiert[index]) : ''}`}>
-                        <input
-                          type="radio"
-                          name={`aufgabe_${index}`}
-                          value={option.value}
-                          checked={antworten[index] === option.value}
-                          onChange={e => {
-                            setAntworten(prev => {
-                              const newA = [...prev]
-                              newA[index] = e.target.value
-                              return newA
-                            })
-                            setGeprüftAt(index, false)
-                          }}
-                        />
-                        <span className={styles.mcLabel}>{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
+                  <p className={styles.inputLabel}>Funktionsgleichung der gesuchten Geraden:</p>
+                  <GleichungEingabe
+                    value={antworten[index]}
+                    onChange={v => {
+                      setAntworten(prev => {
+                        const newA = [...prev]
+                        newA[index] = v
+                        return newA
+                      })
+                      setGeprüftAt(index, false)
+                    }}
+                    className={geprüft[index] ? fieldCheckClass(validiert[index]) : ''}
+                  />
+                  {geprüft[index] && !validiert[index] && gleichungHinweis[index] && (
+                    <p className={styles.inputLabel} style={{ color: 'var(--wrong-ink)', marginTop: 8 }}>{gleichungHinweis[index]}</p>
+                  )}
                 </div>
               )}
 

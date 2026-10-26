@@ -2,9 +2,11 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import React, { useState } from 'react'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
+import { GleichungFelder, pruefeGleichungen, type GesuchteGleichung } from '../../components/GleichungFelder'
 
 interface Solution {
-  type: 'number' | 'text' | 'wertetabelle'
+  type: 'number' | 'text' | 'wertetabelle' | 'gleichung'
+  gleichungen?: GesuchteGleichung[] // type 'gleichung': gesuchte Funktionsgleichung(en)
   answer?: string | number
   tolerance?: number
   labels?: string[] // für mehrteilige Antworten (z.B. x, y)
@@ -23,6 +25,8 @@ export default function SonneAufgabe() {
   const [currentTask, setCurrentTask] = useState(0)
   const [inputs, setInputs] = useState<Record<number, string | Record<string, string>>>({})
   const [feedback, setFeedback] = useState<Record<number, string>>({})
+  const [gleichungMarks, setGleichungMarks] = useState<Record<number, Record<string, boolean | null>>>({})
+  const [gleichungText, setGleichungText] = useState<Record<number, string>>({})
   const [fieldFeedback, setFieldFeedback] = useState<Record<number, Record<string, 'correct' | 'incorrect' | ''>>>({})
   const [showSolution, setShowSolution] = useState<Record<number, boolean>>({})
   // Nachverfolgung: jede Teilaufgabe ist ein Eintrag (Wechsel der Teilaufgabe schließt den Eintrag ab)
@@ -33,11 +37,10 @@ export default function SonneAufgabe() {
       id: 1,
       title: 'Aufgabe 1',
       question:
-        'Der rechte Sonnenstrahl hat die Funktionsgleichung f: y = 1,86x - 2. Berechne die Funktionsgleichung des zweiten Sonnenstrahles, der durch die Punkte G (-1|2) und H (1,39|3,32) verläuft. Gib die Steigung m und den y-Achsenabschnitt t an.',
+        'Der rechte Sonnenstrahl hat die Funktionsgleichung f: y = 1,86x - 2. Berechne die Funktionsgleichung des zweiten Sonnenstrahles, der durch die Punkte G (-1|2) und H (1,39|3,32) verläuft. Gib die vollständige Funktionsgleichung ein.',
       solution: {
-        type: 'number',
-        labels: ['m', 't'],
-        answers: [0.55, 2.55],
+        type: 'gleichung',
+        gleichungen: [{ name: 'zweiter Sonnenstrahl', m: 0.55, t: 2.55 }],
         tolerance: 0.02,
       },
       hint: 'Verwende die Zwei-Punkte-Form: m = (3,32 - 2) / (1,39 - (-1)) = 1,32 / 2,39 ≈ 0,55. Setze Punkt G ein: 2 = 0,55 · (-1) + t → t ≈ 2,55',
@@ -108,6 +111,16 @@ export default function SonneAufgabe() {
 
   const validateAnswer = () => {
     const solution = currentTaskData.solution
+    // Vollständig eingetippte Funktionsgleichung(en)
+    if (solution.type === 'gleichung' && solution.gleichungen) {
+      const r = pruefeGleichungen(solution.gleichungen, (inputs[currentTask] as Record<string, string>) || {}, solution.tolerance)
+      setGleichungMarks({ ...gleichungMarks, [currentTask]: r.marks })
+      setGleichungText({ ...gleichungText, [currentTask]: r.text })
+      // Eingabefehler (z. B. fehlendes „y =“) zählen nicht als Prüfversuch
+      if (r.status !== 'invalid') tracking.onCheck(r.status === 'ok')
+      setFeedback({ ...feedback, [currentTask]: r.status === 'ok' ? 'correct' : 'incorrect' })
+      return
+    }
     let isCorrect = false
 
     const roundTo2Decimals = (num: number): number => {
@@ -249,56 +262,19 @@ export default function SonneAufgabe() {
             <p className="text-lg text-gray-800 mb-6 whitespace-normal">{renderQuestion(currentTaskData.question)}</p>
 
             {/* Input */}
-            {currentTaskData.solution.answers && currentTaskData.solution.labels ? (
+            {currentTaskData.solution.type === 'gleichung' && currentTaskData.solution.gleichungen ? (
+              <GleichungFelder
+                gleichungen={currentTaskData.solution.gleichungen}
+                values={(inputs[currentTask] as Record<string, string>) || {}}
+                onChange={(name, v) => {
+                  handleMultiInputChange(name, v)
+                  setGleichungMarks({ ...gleichungMarks, [currentTask]: {} })
+                  tracking.onInput()
+                }}
+                marks={gleichungMarks[currentTask]}
+              />
+            ) : currentTaskData.solution.answers && currentTaskData.solution.labels ? (
               <div>
-                {/* Aufgabe 1: m und t in einer Zeile */}
-                {currentTask === 0 ? (
-                  <div>
-                    <div className="mb-4 grid grid-cols-2 gap-4">
-                      {currentTaskData.solution.labels.map((label, index) => {
-                        const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
-                        return (
-                          <div key={index}>
-                            <label className="block text-sm font-bold text-ink mb-1">{label}:</label>
-                            <input
-                              type="text"
-                              value={currentInputs[label] || ''}
-                              onChange={(e) => handleMultiInputChange(label, e.target.value)}
-                              placeholder={`${label} eingeben...`}
-                              className={`w-full bk-input ${
-                                feedbackState === 'correct'
-                                  ? 'border-green-500 bg-green-50'
-                                  : feedbackState === 'incorrect'
-                                    ? 'border-red-500 bg-red-50'
-                                    : 'border-edge'
-                              }`}
-                            />
-                          </div>
-                        )
-                      })}
-                    </div>
-
-                    {/* Live-Anzeige der Funktionsgleichung */}
-                    <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-300">
-                      <p className="text-sm font-semibold text-blue-900 mb-2">Funktionsgleichung:</p>
-                      <div className="text-xl font-bold text-blue-800">
-                        y = {(() => {
-                          const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
-                          const m = currentInputs['m'] ? currentInputs['m'].replace(',', '.').replace(/[−–—‐]/g, '-') : '?'
-                          const t = currentInputs['t'] ? currentInputs['t'].replace(',', '.').replace(/[−–—‐]/g, '-') : '?'
-                          
-                          // Prüfe ob t positiv oder negativ ist für die Anzeige
-                          if (m === '?' || t === '?') {
-                            return `${m}x ${t !== '?' && parseFloat(t) >= 0 ? '+' : ''} ${t}`
-                          }
-                          const tNum = parseFloat(t)
-                          return `${m}x ${tNum >= 0 ? '+' : ''} ${t}`
-                        })()}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  // Andere Aufgaben: Labels vertikal untereinander
                   <div className="mb-4 space-y-3">
                     {currentTaskData.solution.labels.map((label, index) => {
                       const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
@@ -322,7 +298,6 @@ export default function SonneAufgabe() {
                       )
                     })}
                   </div>
-                )}
               </div>
             ) : (
               // Einzelne Eingabe
@@ -347,7 +322,7 @@ export default function SonneAufgabe() {
             {feedbackState === 'correct' && <div className="bk-feedback bk-feedback-ok mb-4">✓ Richtig!</div>}
 
             {feedbackState === 'incorrect' && (
-              <div className="bk-feedback bk-feedback-no mb-4">✗ Leider nicht richtig. Versuche es nochmal!</div>
+              <div className="bk-feedback bk-feedback-no mb-4">✗ {gleichungText[currentTask] || 'Leider nicht richtig. Versuche es nochmal!'}</div>
             )}
 
             {/* Lösung anzeigen Button */}

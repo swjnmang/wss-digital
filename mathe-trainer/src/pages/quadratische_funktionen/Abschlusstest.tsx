@@ -3,6 +3,8 @@ import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import { Check, X, ArrowRight, RotateCcw, Play } from 'lucide-react';
 import TaskShell from '../../components/layout/TaskShell'
+import GleichungEingabe from '../../components/GleichungEingabe';
+import { checkQuadraticEquation } from '../../utils/parseFunctionEquation';
 
 // --- Helper Functions ---
 const randomInt = (max: number, min: number = 0) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -41,8 +43,9 @@ const Abschlusstest: React.FC = () => {
     // Input states
     const [inputVertex, setInputVertex] = useState({ xs: '', ys: '' });
     const [inputNullstellen, setInputNullstellen] = useState({ n1: '', n2: '', isNone: false });
-    const [inputGeneral, setInputGeneral] = useState({ a: '', b: '', c: '' });
-    const [inputVertexForm, setInputVertexForm] = useState({ a: '', xs: '', ys: '' });
+    // Funktionsgleichungen werden vollständig eingetippt
+    const [inputGeneral, setInputGeneral] = useState('');
+    const [inputVertexForm, setInputVertexForm] = useState('');
     const [inputMC, setInputMC] = useState<{ stretch: string | null, opening: string | null }>({ stretch: null, opening: null });
 
     // --- Question Generators ---
@@ -331,8 +334,8 @@ const Abschlusstest: React.FC = () => {
     const resetInputs = () => {
         setInputVertex({ xs: '', ys: '' });
         setInputNullstellen({ n1: '', n2: '', isNone: false });
-        setInputGeneral({ a: '', b: '', c: '' });
-        setInputVertexForm({ a: '', xs: '', ys: '' });
+        setInputGeneral('');
+        setInputVertexForm('');
         setInputMC({ stretch: null, opening: null });
     };
 
@@ -345,9 +348,9 @@ const Abschlusstest: React.FC = () => {
         } else if (currentQ.answerFormat === 'nullstellen') {
             userAnswer = { ...inputNullstellen };
         } else if (currentQ.answerFormat === 'general_form') {
-            userAnswer = { ...inputGeneral };
+            userAnswer = inputGeneral;
         } else if (currentQ.answerFormat === 'vertex_form') {
-            userAnswer = { ...inputVertexForm };
+            userAnswer = inputVertexForm;
         } else if (currentQ.answerFormat === 'mc_properties') {
             userAnswer = { ...inputMC };
         }
@@ -419,19 +422,11 @@ const Abschlusstest: React.FC = () => {
                         }
                     }
                 } else if (q.answerFormat === 'general_form') {
-                    const u_a = parseFloat(ua.a.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                    const u_b = parseFloat(ua.b.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                    const u_c = parseFloat(ua.c.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                    if (!isNaN(u_a) && !isNaN(u_b) && !isNaN(u_c)) {
-                        isCorrect = Math.abs(u_a - ca.a) < 0.1 && Math.abs(u_b - ca.b) < 0.1 && Math.abs(u_c - ca.c) < 0.1;
-                    }
+                    isCorrect = checkQuadraticEquation(ua, { a: ca.a, b: ca.b, c: ca.c }, 'allgemein', 0.1).status === 'ok';
                 } else if (q.answerFormat === 'vertex_form') {
-                    const u_a = parseFloat(ua.a.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                    const u_xs = parseFloat(ua.xs.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                    const u_ys = parseFloat(ua.ys.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                    if (!isNaN(u_a) && !isNaN(u_xs) && !isNaN(u_ys)) {
-                        isCorrect = Math.abs(u_a - ca.a) < 0.1 && Math.abs(u_xs - ca.xs) < 0.1 && Math.abs(u_ys - ca.ys) < 0.1;
-                    }
+                    // y = a(x − xs)² + ys = ax² − 2a·xs·x + a·xs² + ys
+                    const soll = { a: ca.a, b: -2 * ca.a * ca.xs, c: ca.a * ca.xs * ca.xs + ca.ys };
+                    isCorrect = checkQuadraticEquation(ua, soll, 'scheitel', 0.1).status === 'ok';
                 } else if (q.answerFormat === 'mc_properties') {
                     isCorrect = ua.stretch === ca.stretch && ua.opening === ca.opening;
                 }
@@ -453,15 +448,22 @@ const Abschlusstest: React.FC = () => {
 
     const formatAnswerString = (q: Question, ans: any) => {
         if (!ans) return "Keine Antwort";
+        // eingetippte Gleichung des Schülers
+        if (typeof ans === 'string') return ans.trim() || "Keine Antwort";
         if (q.answerFormat === 'vertex') {
             return `S(${ans.xs}|${ans.ys})`;
         } else if (q.answerFormat === 'nullstellen') {
             if (ans.isNone) return "Keine Nullstelle";
             return `x₁=${formatNumber(ans.n1)}, x₂=${formatNumber(ans.n2)}`;
         } else if (q.answerFormat === 'general_form') {
-            return `y = ${ans.a}x² + ${ans.b}x + ${ans.c}`;
+            const glied = (n: number, x: string, erstes = false) =>
+                n === 0 ? '' : `${n < 0 ? (erstes ? '−' : ' − ') : erstes ? '' : ' + '}${Math.abs(n) === 1 && x ? '' : formatNumber(Math.abs(n))}${x}`;
+            return `y = ${glied(ans.a, 'x²', true)}${glied(ans.b, 'x')}${glied(ans.c, '')}`;
         } else if (q.answerFormat === 'vertex_form') {
-            return `y = ${ans.a}(x - ${ans.xs})² + ${ans.ys}`;
+            const a = ans.a === 1 ? '' : ans.a === -1 ? '−' : formatNumber(ans.a).replace('-', '−');
+            const klammer = ans.xs === 0 ? 'x²' : `(x ${ans.xs > 0 ? '−' : '+'} ${formatNumber(Math.abs(ans.xs))})²`;
+            const ys = ans.ys === 0 ? '' : ` ${ans.ys < 0 ? '−' : '+'} ${formatNumber(Math.abs(ans.ys))}`;
+            return `y = ${a}${klammer}${ys}`;
         } else if (q.answerFormat === 'mc_properties') {
             return `Form: ${ans.stretch}, Öffnung: ${ans.opening}`;
         }
@@ -532,60 +534,14 @@ const Abschlusstest: React.FC = () => {
             );
         } else if (q.answerFormat === 'general_form') {
             return (
-                <div className="flex items-center gap-2 justify-center mt-4 flex-wrap">
-                    <span className="text-xl">y = </span>
-                    <input 
-                        type="text" 
-                        value={inputGeneral.a} 
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputGeneral({...inputGeneral, a: event.target.value})}
-                        className="border p-2 rounded w-16 text-center" 
-                        placeholder="a"
-                    />
-                    <span className="text-xl">x² + </span>
-                    <input 
-                        type="text" 
-                        value={inputGeneral.b} 
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputGeneral({...inputGeneral, b: event.target.value})}
-                        className="border p-2 rounded w-16 text-center" 
-                        placeholder="b"
-                    />
-                    <span className="text-xl">x + </span>
-                    <input 
-                        type="text" 
-                        value={inputGeneral.c} 
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputGeneral({...inputGeneral, c: event.target.value})}
-                        className="border p-2 rounded w-16 text-center" 
-                        placeholder="c"
-                    />
+                <div className="flex justify-center mt-4">
+                    <GleichungEingabe quadratisch value={inputGeneral} onChange={setInputGeneral} placeholder="z. B. y = 2x² − 3x + 1" />
                 </div>
             );
         } else if (q.answerFormat === 'vertex_form') {
             return (
-                <div className="flex items-center gap-2 justify-center mt-4 flex-wrap">
-                    <span className="text-xl">y = </span>
-                    <input 
-                        type="text" 
-                        value={inputVertexForm.a} 
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputVertexForm({...inputVertexForm, a: event.target.value})}
-                        className="border p-2 rounded w-16 text-center" 
-                        placeholder="a"
-                    />
-                    <span className="text-xl">(x - </span>
-                    <input 
-                        type="text" 
-                        value={inputVertexForm.xs} 
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputVertexForm({...inputVertexForm, xs: event.target.value})}
-                        className="border p-2 rounded w-16 text-center" 
-                        placeholder="xs"
-                    />
-                    <span className="text-xl">)² + </span>
-                    <input 
-                        type="text" 
-                        value={inputVertexForm.ys} 
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputVertexForm({...inputVertexForm, ys: event.target.value})}
-                        className="border p-2 rounded w-16 text-center" 
-                        placeholder="ys"
-                    />
+                <div className="flex justify-center mt-4">
+                    <GleichungEingabe quadratisch value={inputVertexForm} onChange={setInputVertexForm} placeholder="z. B. y = 2(x − 3)² + 1" />
                 </div>
             );
         } else if (q.answerFormat === 'mc_properties') {
@@ -693,15 +649,9 @@ const Abschlusstest: React.FC = () => {
                                     }
                                 }
                             } else if (q.answerFormat === 'general_form') {
-                                const u_a = parseFloat(ua.a.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                                const u_b = parseFloat(ua.b.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                                const u_c = parseFloat(ua.c.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                                if (!isNaN(u_a) && !isNaN(u_b) && !isNaN(u_c)) correct = Math.abs(u_a - ca.a) < 0.1 && Math.abs(u_b - ca.b) < 0.1 && Math.abs(u_c - ca.c) < 0.1;
+                                correct = checkQuadraticEquation(ua, { a: ca.a, b: ca.b, c: ca.c }, 'allgemein', 0.1).status === 'ok';
                             } else if (q.answerFormat === 'vertex_form') {
-                                const u_a = parseFloat(ua.a.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                                const u_xs = parseFloat(ua.xs.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                                const u_ys = parseFloat(ua.ys.replace(',', '.').replace(/[−–—‐]/g, '-'));
-                                if (!isNaN(u_a) && !isNaN(u_xs) && !isNaN(u_ys)) correct = Math.abs(u_a - ca.a) < 0.1 && Math.abs(u_xs - ca.xs) < 0.1 && Math.abs(u_ys - ca.ys) < 0.1;
+                                correct = checkQuadraticEquation(ua, { a: ca.a, b: -2 * ca.a * ca.xs, c: ca.a * ca.xs * ca.xs + ca.ys }, 'scheitel', 0.1).status === 'ok';
                             } else if (q.answerFormat === 'mc_properties') {
                                 correct = ua.stretch === ca.stretch && ua.opening === ca.opening;
                             }

@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ResponsiveGraph from '../../components/ResponsiveGeoGebraGraph'
-import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
+import { checkLinearEquation } from '../../utils/parseLinearEquation'
+import { fieldCheckClass } from '../../utils/fieldCheck'
+import GleichungEingabe from '../../components/GleichungEingabe'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
 import { VideoModal } from '../../components/VideoButton'
@@ -47,38 +49,6 @@ function equationText(m: number, t: number) {
   return `y = ${mPart}x ${t < 0 ? '−' : '+'} ${fmt(Math.abs(t))}`
 }
 
-// ---------- Auswertung der beiden Felder ----------
-
-type Status = 'idle' | 'right' | 'wrong'
-const isSign = (c: string) => /[+\-−–—‐]/.test(c)
-
-function mStatus(raw: string, m: number): Status {
-  const s = raw.trim()
-  if (s === '' || (s.length === 1 && (isSign(s) || s === ',' || s === '.'))) return 'idle'
-  const v = parseFlexibleNumber(s)
-  if (Number.isNaN(v)) return 'wrong'
-  return Math.abs(v - m) < 0.03 ? 'right' : 'wrong'
-}
-
-/** Das zweite Feld enthält Vorzeichen und Wert von t, z. B. "+3" oder "−2": Das Vorzeichen muss der Schüler selbst setzen. */
-function tStatus(raw: string, t: number): { status: Status; hint: string } {
-  const s = raw.trim()
-  if (s === '' || (s.length === 1 && (isSign(s) || s === ',' || s === '.'))) return { status: 'idle', hint: '' }
-  const match = s.replace(/\s+/g, '').match(/^([+\-−–—‐])(\d+(?:[.,]\d+)?)$/)
-  if (!match) {
-    return /^\d/.test(s)
-      ? { status: 'wrong', hint: 'Setze ein Vorzeichen (+ oder −) davor.' }
-      : { status: 'wrong', hint: '' }
-  }
-  const value = (/[\-−–—‐]/.test(match[1]) ? -1 : 1) * parseFloat(match[2].replace(',', '.'))
-  return Math.abs(value - t) < 0.03 ? { status: 'right', hint: '' } : { status: 'wrong', hint: '' }
-}
-
-const fieldCls = (status: Status) =>
-  `w-16 sm:w-20 text-center border-2 rounded px-2 py-2 focus:outline-none ${
-    status === 'right' ? 'border-green-500 bg-green-50' : status === 'wrong' ? 'border-red-500 bg-red-50' : 'border-slate-300'
-  }`
-
 // ---------- Eine Aufgabe ----------
 
 interface CardProps {
@@ -93,20 +63,18 @@ function TaskCard({ number, onSolvedChange, onResult, onVideo, level }: CardProp
   const tracking = useTaskTracking(`Funktionsgleichung ablesen (${LEVEL_LABEL[level]})`)
   const easy = level === 'einfach'
   const [{ m, t }, setLine] = useState(() => newLine(level))
-  const [mInput, setMInput] = useState('')
-  const [tInput, setTInput] = useState('')
+  const [eingabe, setEingabe] = useState('')
   const [solved, setSolved] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
-
-  const ms = mStatus(mInput, m)
-  // Einfach: Ursprungsgerade, es gibt kein Feld für t
-  const { status: ts, hint } = easy ? { status: 'right' as Status, hint: '' } : tStatus(tInput, t)
-  const bothRight = ms === 'right' && ts === 'right'
-  const anyWrong = ms === 'wrong' || ts === 'wrong'
+  // Rückmeldung erst nach einer kurzen Tipp-Pause, damit eine halb getippte Gleichung nicht gleich rot wird
+  const [falsch, setFalsch] = useState<{ text: string } | null>(null)
 
   useEffect(() => {
     if (solved) return
-    if (bothRight) {
+    setFalsch(null)
+    if (eingabe.trim() === '') return
+    const r = checkLinearEquation(eingabe, m, t, 0.03)
+    if (r.status === 'ok') {
       setSolved(true)
       tracking.onCheck(true)
       onResult(true)
@@ -114,83 +82,59 @@ function TaskCard({ number, onSolvedChange, onResult, onVideo, level }: CardProp
       setShowSolution(false)
       return
     }
-    if (anyWrong) {
-      // Ein falscher Versuch zählt erst, wenn die Eingabe kurz stehen bleibt
-      const timer = setTimeout(() => {
+    const timer = setTimeout(() => {
+      setFalsch({ text: r.text })
+      // Eingabefehler (unvollständige Gleichung) zählen nicht als Fehlversuch
+      if (r.status === 'no') {
         tracking.onCheck(false)
         onResult(false)
-      }, 900)
-      return () => clearTimeout(timer)
-    }
+      }
+    }, 1200)
+    return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mInput, tInput, solved])
+  }, [eingabe, solved])
 
   function newTask() {
     tracking.onTaskStart()
     onSolvedChange(false)
     setSolved(false)
     setShowSolution(false)
-    setMInput('')
-    setTInput('')
+    setEingabe('')
+    setFalsch(null)
     setLine(newLine(level))
   }
-
-  // Live mitgerenderte Gleichung aus den Eingaben des Schülers
-  const tShown = tInput.trim().replace(/\s+/g, '').replace(/^([+\-−–—‐])/, (c) => (/[+]/.test(c) ? '+ ' : '− '))
-  const preview = (
-    <>
-      y = <span className={mInput.trim() ? '' : 'text-slate-400'}>{mInput.trim() ? mInput.trim().replace(/[\-–—‐]/g, '−') : 'm'}</span>x
-      {!easy && (
-        <>
-          {' '}
-          <span className={tInput.trim() ? '' : 'text-slate-400'}>{tInput.trim() ? tShown : '± t'}</span>
-        </>
-      )}
-    </>
-  )
 
   return (
     <div className={panel}>
       <h2 className="text-lg font-bold text-slate-800 mb-2">Aufgabe {number}: Funktionsgleichung ablesen</h2>
       <p className="text-slate-700 mb-4">
         {easy
-          ? 'Die Gerade ist eine Ursprungsgerade. Lies die Steigung m aus dem Graphen ab und trage sie in die Gleichung ein.'
-          : 'Lies Steigung m und y-Achsenabschnitt t aus dem Graphen ab und trage sie in die Gleichung ein.'}
+          ? 'Die Gerade ist eine Ursprungsgerade. Lies die Steigung m aus dem Graphen ab und tippe die vollständige Funktionsgleichung ein.'
+          : 'Lies Steigung m und y-Achsenabschnitt t aus dem Graphen ab und tippe die vollständige Funktionsgleichung ein.'}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
       <ResponsiveGraph m={m} t={t} />
 
       <div>
-      <p className="text-sm text-slate-600 mb-3">Gegeben: {easy ? 'y = m · x' : 'y = m · x + t'}</p>
+      <p className="text-sm text-slate-600 mb-3">Form: {easy ? 'y = m · x' : 'y = m · x + t'}</p>
 
-      <div className="flex flex-wrap items-center justify-center gap-2 text-xl font-semibold text-slate-800">
-        <span>y =</span>
-        <input
-          aria-label="Wert für m"
-          value={mInput}
+      <div className="flex justify-center">
+        <GleichungEingabe
+          ariaLabel="Funktionsgleichung"
+          value={eingabe}
           readOnly={solved}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMInput(e.target.value)}
-          className={fieldCls(ms)}
-          inputMode="decimal"
+          onChange={(v) => {
+            setEingabe(v)
+            tracking.onInput()
+          }}
+          className={fieldCheckClass(solved ? true : falsch ? false : null)}
+          placeholder={easy ? 'z. B. y = 2x' : 'z. B. y = 2x − 1'}
         />
-        <span>x</span>
-        {!easy && (
-        <input
-          aria-label="Vorzeichen und Wert für t"
-          value={tInput}
-          readOnly={solved}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTInput(e.target.value)}
-          className={fieldCls(ts)}
-          inputMode="text"
-        />
-        )}
       </div>
-      <p className="mt-4 text-xl text-slate-800 min-h-8">{preview}</p>
 
       {solved && <p className="text-center font-bold mt-2 text-green-600">Super, richtig gelesen! Die Funktionsgleichung lautet {equationText(m, t)}.</p>}
-      {!solved && hint && <p className="text-center font-bold mt-2 text-red-600">{hint}</p>}
-      {!solved && !hint && anyWrong && <p className="text-center font-bold mt-2 text-red-600">Noch nicht richtig.</p>}
+      {!solved && falsch && <p className="text-center font-bold mt-2 text-red-600">{falsch.text}</p>}
 
       </div>
       </div>

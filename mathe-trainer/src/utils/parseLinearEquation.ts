@@ -36,8 +36,9 @@ export function parseLinearEquation(raw: string): LinearParse {
   const teile = s.split('=')
   if (teile.length !== 2) return { ok: false, fehler: 'In der Gleichung darf nur ein Gleichheitszeichen stehen.' }
   let [links, rechts] = teile
-  // "f(x)=" wird wie "y=" behandelt, Gleichung darf auch andersherum stehen ("2x+3=y")
-  if (links === 'f(x)') links = 'y'
+  // "f(x)=" (auch g(x), h(x) …) wird wie "y=" behandelt, Gleichung darf auch andersherum stehen ("2x+3=y")
+  if (/^[a-wz]\(x\)$/.test(links)) links = 'y'
+  if (/^[a-wz]\(x\)$/.test(rechts)) rechts = 'y'
   if (rechts === 'y' && links !== 'y') [links, rechts] = [rechts, links]
   if (links !== 'y') return { ok: false, fehler: 'Links vom Gleichheitszeichen steht nur „y“: y = …' }
   if (rechts === '') return { ok: false, fehler: 'Rechts vom Gleichheitszeichen fehlt noch der Term.' }

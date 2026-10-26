@@ -265,6 +265,7 @@ export default function Funktionsgleichung(){
               tracking.onInput()
             }}
             className={fieldCheckClass(eingabeStatus)}
+            vorschau={false}
           />
         </div>
         <p className={styles.eingabeHinweis}>Tippe die ganze Gleichung ein, mit „y =“, Steigung, x und y-Achsenabschnitt (z. B. y = −0,5x + 2).</p>

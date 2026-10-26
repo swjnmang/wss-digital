@@ -33,7 +33,21 @@ export interface ChoicePart {
   correct: number;
 }
 
-export type Part = NumPart | ChoicePart;
+/** Vollständig eingetippte Funktionsgleichung (Gerade oder Parabel), z. B. „f(x) = 2x² − 3x + 1“ */
+export interface EquationPart {
+  kind: 'equation';
+  q?: Rich;
+  /** Beschriftung vor dem Feld, z. B. "$g$:" */
+  label?: Rich;
+  /** richtige Koeffizienten [c, b, a] bzw. [t, m] (Index = Potenz von x) */
+  koeff: number[];
+  /** verlangte Form bei Parabeln (Standard: jede gleichwertige Schreibweise) */
+  form?: 'allgemein' | 'scheitel' | 'beliebig';
+  /** absolute Toleranz je Koeffizient (Standard 0,01) */
+  tol?: number;
+}
+
+export type Part = NumPart | ChoicePart | EquationPart;
 
 export interface Task {
   title: string;

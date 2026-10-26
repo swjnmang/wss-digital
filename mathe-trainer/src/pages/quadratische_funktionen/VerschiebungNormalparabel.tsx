@@ -3,6 +3,8 @@ import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import TaskShell from '../../components/layout/TaskShell'
 import { fieldCheckClass } from '../../utils/fieldCheck';
+import GleichungEingabe from '../../components/GleichungEingabe';
+import { checkQuadraticEquation } from '../../utils/parseFunctionEquation';
 
 declare global {
   interface Window {
@@ -166,29 +168,6 @@ function getResponsiveSize(desiredWidth: number, desiredHeight: number) {
   return { width, height };
 }
 
-// Kleiner Umschalter für ein Vorzeichen, damit man das Vorzeichen wählen kann,
-// statt es im Kopf umdrehen und mittippen zu müssen.
-const SignToggle = ({ value, onChange }: { value: '+' | '-' | null; onChange: (v: '+' | '-') => void }) => (
-  <div className="inline-flex shrink-0 rounded-md overflow-hidden border-2 border-slate-300">
-    <button
-      type="button"
-      onClick={() => onChange('+')}
-      aria-label="Plus"
-      className={`w-6 h-9 flex items-center justify-center text-sm font-bold transition-colors ${value === '+' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
-    >
-      +
-    </button>
-    <button
-      type="button"
-      onClick={() => onChange('-')}
-      aria-label="Minus"
-      className={`w-6 h-9 flex items-center justify-center text-sm font-bold transition-colors border-l-2 border-slate-300 ${value === '-' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-100'}`}
-    >
-      −
-    </button>
-  </div>
-);
-
 // Kleiner Ein-/Ausklapp-Button für kurze Konzept-Erklärungen.
 const ExplainToggle = ({ open, onToggle }: { open: boolean; onToggle: () => void }) => (
   <button
@@ -241,14 +220,12 @@ export default function VerschiebungNormalparabel() {
   const [combinedTask, setCombinedTask] = useState<CombinedTaskState | null>(null);
   const [combinedXsInput, setCombinedXsInput] = useState('');
   // Einzelne Felder nach dem Prüfen grün/rot
-  const [combinedFieldOk, setCombinedFieldOk] = useState<{ xs?: boolean; ys?: boolean; d?: boolean; c?: boolean }>({});
+  const [combinedFieldOk, setCombinedFieldOk] = useState<{ xs?: boolean; ys?: boolean; eq?: boolean }>({});
   const [combinedYsInput, setCombinedYsInput] = useState('');
   const [combinedVertexAnswered, setCombinedVertexAnswered] = useState(false);
   const [combinedVertexFeedback, setCombinedVertexFeedback] = useState<Feedback>(null);
-  const [combinedDSign, setCombinedDSign] = useState<'+' | '-' | null>(null);
-  const [combinedDAbs, setCombinedDAbs] = useState('');
-  const [combinedCSign, setCombinedCSign] = useState<'+' | '-' | null>(null);
-  const [combinedCAbs, setCombinedCAbs] = useState('');
+  // vollständig eingetippte Gleichung, z. B. „y = (x + 2)² − 3“
+  const [combinedEq, setCombinedEq] = useState('');
   const [combinedEqAnswered, setCombinedEqAnswered] = useState(false);
   const [combinedEqFeedback, setCombinedEqFeedback] = useState<Feedback>(null);
   const [combinedShowSolution, setCombinedShowSolution] = useState(false);
@@ -541,10 +518,7 @@ export default function VerschiebungNormalparabel() {
     setCombinedYsInput('');
     setCombinedVertexAnswered(false);
     setCombinedVertexFeedback(null);
-    setCombinedDSign(null);
-    setCombinedDAbs('');
-    setCombinedCSign(null);
-    setCombinedCAbs('');
+    setCombinedEq('');
     setCombinedEqAnswered(false);
     setCombinedEqFeedback(null);
     setCombinedShowSolution(false);
@@ -588,33 +562,25 @@ export default function VerschiebungNormalparabel() {
 
   const checkCombinedEquation = () => {
     if (!combinedTask || combinedEqAnswered) return;
-    if (combinedDSign === null || combinedDAbs.trim() === '' || combinedCSign === null || combinedCAbs.trim() === '') {
-      setCombinedEqFeedback({ text: 'Bitte fülle alle Felder aus und wähle die Vorzeichen.', type: 'incorrect' });
+    // y = (x + d)² + c = x² + 2d·x + d² + c
+    const d = fmt(combinedTask.d);
+    const c = fmt(combinedTask.c);
+    const r = checkQuadraticEquation(combinedEq, { a: 1, b: 2 * d, c: d * d + c }, 'scheitel', 0.01);
+    if (r.status === 'invalid') {
+      setCombinedFieldOk(f => ({ ...f, eq: false }));
+      setCombinedEqFeedback({ text: r.text, type: 'incorrect' });
       return;
     }
-    const dAbsVal = parseSignedInput(combinedDAbs);
-    const cAbsVal = parseSignedInput(combinedCAbs);
-    const expectedDSign = signStr(combinedTask.d);
-    const expectedCSign = signStr(combinedTask.c);
-    const isDCorrect = combinedDSign === expectedDSign && Math.abs(dAbsVal - Math.abs(fmt(combinedTask.d))) < 0.01;
-    const isCCorrect = combinedCSign === expectedCSign && Math.abs(cAbsVal - Math.abs(fmt(combinedTask.c))) < 0.01;
-    setCombinedFieldOk(f => ({ ...f, d: isDCorrect, c: isCCorrect }));
-    if (isDCorrect && isCCorrect) {
+    const ok = r.status === 'ok';
+    setCombinedFieldOk(f => ({ ...f, eq: ok }));
+    if (ok) {
       setCombinedEqFeedback({ text: 'Richtig!', type: 'correct' });
       setCombinedEqAnswered(true);
       setScore(s => s + 1);
     } else {
-      setCombinedEqFeedback({ text: 'Leider nicht ganz richtig. Überprüfe Vorzeichen und Zahlen!', type: 'incorrect' });
+      setCombinedEqFeedback({ text: r.text, type: 'incorrect' });
       setScore(s => s - 0.5);
     }
-  };
-
-  const combinedLivePreview = (): string => {
-    const dPart = combinedDAbs.trim() !== '' ? parseSignedInput(combinedDAbs) || combinedDAbs : 'd';
-    const cPart = combinedCAbs.trim() !== '' ? parseSignedInput(combinedCAbs) || combinedCAbs : 'c';
-    const dSignLatex = combinedDSign ?? '\\pm';
-    const cSignLatex = combinedCSign ?? '\\pm';
-    return `y = \\left(x ${dSignLatex} ${dPart}\\right)^2 ${cSignLatex} ${cPart}`;
   };
 
   // ---------------------------------------------------------------------
@@ -977,7 +943,7 @@ export default function VerschiebungNormalparabel() {
               Lies zuerst den Scheitelpunkt <InlineMath math="S(x_s \mid y_s)" /> ab. Da{' '}
               <InlineMath math="x_s = -d" /> und <InlineMath math="y_s = c" />, gilt umgekehrt:{' '}
               <InlineMath math="d = -x_s" /> und <InlineMath math="c = y_s" />. In der Gleichung{' '}
-              <InlineMath math="y = (x + d)^2 + c" /> trägst du dann d und c mit ihrem eigenen Vorzeichen ein.
+              <InlineMath math="y = (x + d)^2 + c" /> schreibst du dann d und c mit ihrem eigenen Vorzeichen.
             </div>
           )}
 
@@ -1023,34 +989,17 @@ export default function VerschiebungNormalparabel() {
               </div>
 
               <div className="text-center border-t border-slate-200 pt-3">
-                <p className="font-semibold text-sm mb-2">2. Stelle die Funktionsgleichung auf:</p>
-                <div className="flex flex-nowrap items-center justify-center gap-1 mb-3 bg-slate-50 py-2 px-1.5 rounded-lg border border-slate-200 font-mono text-sm overflow-x-auto">
-                  <span className="whitespace-nowrap shrink-0">y = (x</span>
-                  <SignToggle value={combinedDSign} onChange={setCombinedDSign} />
-                  <input
-                    type="text"
-                    value={combinedDAbs}
-                    onChange={(e) => { setCombinedDAbs(e.target.value); setCombinedFieldOk(f => ({ ...f, d: undefined })); }}
-                    disabled={combinedEqAnswered}
-                    placeholder="d"
-                    aria-label="Zahl im Klammerterm"
-                    className={`w-16 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center disabled:opacity-60 ${fieldCheckClass(combinedFieldOk.d)}`}
+                <p className="font-semibold text-sm mb-2">2. Stelle die Funktionsgleichung auf und tippe sie vollständig ein:</p>
+                <div className="flex justify-center mb-3">
+                  <GleichungEingabe
+                    quadratisch
+                    value={combinedEq}
+                    readOnly={combinedEqAnswered}
+                    onChange={(v) => { setCombinedEq(v); setCombinedFieldOk(f => ({ ...f, eq: undefined })); setCombinedEqFeedback(null); }}
+                    onEnter={checkCombinedEquation}
+                    placeholder="z. B. y = (x + 2)² − 3"
+                    className={fieldCheckClass(combinedFieldOk.eq)}
                   />
-                  <span className="whitespace-nowrap shrink-0">)²</span>
-                  <SignToggle value={combinedCSign} onChange={setCombinedCSign} />
-                  <input
-                    type="text"
-                    value={combinedCAbs}
-                    onChange={(e) => { setCombinedCAbs(e.target.value); setCombinedFieldOk(f => ({ ...f, c: undefined })); }}
-                    disabled={combinedEqAnswered}
-                    placeholder="c"
-                    aria-label="Zahl c"
-                    className={`w-16 h-9 shrink-0 p-1 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-center disabled:opacity-60 ${fieldCheckClass(combinedFieldOk.c)}`}
-                  />
-                </div>
-                <div className="mb-3 bg-blue-50 py-2 px-3 rounded-lg border border-blue-200 text-center overflow-x-auto">
-                  <p className="text-xs font-semibold text-blue-700 mb-1">Deine Gleichung:</p>
-                  <InlineMath math={combinedLivePreview()} />
                 </div>
                 <button onClick={checkCombinedEquation} className="btn-option" disabled={combinedEqAnswered}>Prüfen</button>
                 {combinedEqFeedback && <p className={`text-center font-bold text-sm mt-1 ${combinedEqFeedback.type === 'correct' ? 'text-green-600' : 'text-red-600'}`}>{combinedEqFeedback.text}</p>}

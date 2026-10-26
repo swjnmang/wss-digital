@@ -273,6 +273,10 @@ a.bk-tile:hover, button.bk-tile:hover { background: var(--surface-sunken); }
 .bk-key-frac .bk-key-box { width: 12px; height: 12px; }
 .bk-key-line { display: block; width: 22px; height: 2.5px; background: currentColor; border-radius: 2px; }
 .bk-key.go { grid-column: span 5; background: var(--primary); color: var(--on-primary); font: 700 17px/1 var(--font-body); }
+.bk-key.go.go-kurz { grid-column: span 3; }
+/* Zeichenleiste der Gleichungseingabe: auf Touch-Geräten übernimmt die Mathe-Tastatur */
+@media (pointer: coarse) { .gl-eingabe-tasten, .gl-eingabe-vorschau { display: none !important; } }
+.gl-eingabe-vorschau { font-size: 20px; color: var(--ink); min-height: 1.6em; overflow-x: auto; overflow-y: hidden; max-width: 100%; }
 @media (max-height: 560px) { .bk-key { height: 44px; } .bk-keypad-bar { margin-bottom: 4px; } }
 /* Video-Platzhalter in der Seite */
 .bk-embed { width: 100%; max-width: 720px; margin: 0 auto; border: 1.5px solid var(--edge); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-hard-sm); }

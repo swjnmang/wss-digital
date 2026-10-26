@@ -2,9 +2,11 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import React, { useState } from 'react'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
+import { GleichungFelder, pruefeGleichungen, type GesuchteGleichung } from '../../components/GleichungFelder'
 
 interface Solution {
-  type: 'number' | 'text'
+  type: 'number' | 'text' | 'gleichung'
+  gleichungen?: GesuchteGleichung[] // type 'gleichung': gesuchte Funktionsgleichung(en)
   answer: string | number
   tolerance?: number
   labels?: string[]
@@ -23,6 +25,8 @@ export default function TipiAufgabe() {
   const [currentTask, setCurrentTask] = useState(0)
   const [inputs, setInputs] = useState<Record<number, string | Record<string, string>>>({})
   const [feedback, setFeedback] = useState<Record<number, string>>({})
+  const [gleichungMarks, setGleichungMarks] = useState<Record<number, Record<string, boolean | null>>>({})
+  const [gleichungText, setGleichungText] = useState<Record<number, string>>({})
   const [showSolution, setShowSolution] = useState<Record<number, boolean>>({})
   // Nachverfolgung: jede Teilaufgabe ist ein Eintrag (Wechsel der Teilaufgabe schließt den Eintrag ab)
   const tracking = useTaskTracking('Anwendung: Tipi')
@@ -32,11 +36,14 @@ export default function TipiAufgabe() {
       id: 1,
       title: 'Aufgabe 3.1',
       question:
-        'Bestimmen Sie rechnerisch die Funktionsgleichungen der beiden Geraden f und g. Punkt A (4|9) und B (−6| − 9) liegen auf f. Punkt C (4| − 4.6) und D (1|0.65) liegen auf g.',
+        'Bestimmen Sie rechnerisch die Funktionsgleichungen der beiden Geraden f und g. Punkt A (4|9) und B (−6| − 9) liegen auf f. Punkt C (4| − 4.6) und D (1|0.65) liegen auf g. Gib beide Funktionsgleichungen vollständig ein.',
       solution: {
-        type: 'number',
-        labels: ['f(x): m', 'f(x): t', 'g(x): m', 'g(x): t'],
-        answers: [1.8, 1.8, -1.75, 2.4],
+        type: 'gleichung',
+        answer: '',
+        gleichungen: [
+          { name: 'Gerade f', m: 1.8, t: 1.8 },
+          { name: 'Gerade g', m: -1.75, t: 2.4 },
+        ],
         tolerance: 0.05,
       },
       hint: 'Nutze zwei Punkte pro Gerade um m und t mit der Punkt-Steigungsform zu berechnen.',
@@ -103,6 +110,16 @@ export default function TipiAufgabe() {
 
   const validateAnswer = () => {
     const solution = currentTaskData.solution
+    // Vollständig eingetippte Funktionsgleichung(en)
+    if (solution.type === 'gleichung' && solution.gleichungen) {
+      const r = pruefeGleichungen(solution.gleichungen, (inputs[currentTask] as Record<string, string>) || {}, solution.tolerance)
+      setGleichungMarks({ ...gleichungMarks, [currentTask]: r.marks })
+      setGleichungText({ ...gleichungText, [currentTask]: r.text })
+      // Eingabefehler (z. B. fehlendes „y =“) zählen nicht als Prüfversuch
+      if (r.status !== 'invalid') tracking.onCheck(r.status === 'ok')
+      setFeedback({ ...feedback, [currentTask]: r.status === 'ok' ? 'correct' : 'incorrect' })
+      return
+    }
     let isCorrect = false
 
     // Mehrteilige Antwort (z.B. f(x) und g(x))
@@ -213,79 +230,20 @@ export default function TipiAufgabe() {
           <p className="text-lg text-gray-800 mb-6">{currentTaskData.question}</p>
 
           {/* Input */}
-          {currentTaskData.solution.answers && currentTaskData.solution.labels ? (
+          {currentTaskData.solution.type === 'gleichung' && currentTaskData.solution.gleichungen ? (
+              <GleichungFelder
+                gleichungen={currentTaskData.solution.gleichungen}
+                values={(inputs[currentTask] as Record<string, string>) || {}}
+                onChange={(name, v) => {
+                  handleMultiInputChange(name, v)
+                  setGleichungMarks({ ...gleichungMarks, [currentTask]: {} })
+                  tracking.onInput()
+                }}
+                marks={gleichungMarks[currentTask]}
+              />
+            ) : currentTaskData.solution.answers && currentTaskData.solution.labels ? (
             // Mehrteilige Eingabe (z.B. m und t für Funktionsgleichungen)
             <div className="mb-4 space-y-4">
-              {currentTask === 0 ? (
-                // Spezialformat für Aufgabe 3.1: strukturierte Funktionsgleichungen
-                <div className="space-y-4">
-                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <div className="mb-4">
-                      <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium text-gray-700 whitespace-nowrap">f(x) = </label>
-                        <input
-                          type="text"
-                          value={((inputs[currentTask] as Record<string, string>) || {})['f(x): m'] || ''}
-                          onChange={(e) => handleMultiInputChange('f(x): m', e.target.value)}
-                          placeholder="m"
-                          className={`w-16 bk-input text-center ${
-                            feedbackState === 'correct'
-                              ? 'border-green-500 bg-green-50'
-                              : feedbackState === 'incorrect'
-                                ? 'border-red-500 bg-red-50'
-                                : 'border-edge'
-                          }`}
-                        />
-                        <span className="text-gray-700 font-medium">x +</span>
-                        <input
-                          type="text"
-                          value={((inputs[currentTask] as Record<string, string>) || {})['f(x): t'] || ''}
-                          onChange={(e) => handleMultiInputChange('f(x): t', e.target.value)}
-                          placeholder="t"
-                          className={`w-16 bk-input text-center ${
-                            feedbackState === 'correct'
-                              ? 'border-green-500 bg-green-50'
-                              : feedbackState === 'incorrect'
-                                ? 'border-red-500 bg-red-50'
-                                : 'border-edge'
-                          }`}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm font-medium text-gray-700 whitespace-nowrap">g(x) = </label>
-                      <input
-                        type="text"
-                        value={((inputs[currentTask] as Record<string, string>) || {})['g(x): m'] || ''}
-                        onChange={(e) => handleMultiInputChange('g(x): m', e.target.value)}
-                        placeholder="m"
-                        className={`w-16 bk-input text-center ${
-                          feedbackState === 'correct'
-                            ? 'border-green-500 bg-green-50'
-                            : feedbackState === 'incorrect'
-                              ? 'border-red-500 bg-red-50'
-                              : 'border-edge'
-                        }`}
-                      />
-                      <span className="text-gray-700 font-medium">x +</span>
-                      <input
-                        type="text"
-                        value={((inputs[currentTask] as Record<string, string>) || {})['g(x): t'] || ''}
-                        onChange={(e) => handleMultiInputChange('g(x): t', e.target.value)}
-                        placeholder="t"
-                        className={`w-16 bk-input text-center ${
-                          feedbackState === 'correct'
-                            ? 'border-green-500 bg-green-50'
-                            : feedbackState === 'incorrect'
-                              ? 'border-red-500 bg-red-50'
-                              : 'border-edge'
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                // Standard mehrteilige Eingabe für andere Aufgaben
                 <div className="space-y-3">
                   {currentTaskData.solution.labels.map((label, index) => {
                     const currentInputs = (inputs[currentTask] as Record<string, string>) || {}
@@ -309,7 +267,6 @@ export default function TipiAufgabe() {
                     )
                   })}
                 </div>
-              )}
             </div>
           ) : (
             // Einzelne Eingabe
@@ -334,7 +291,7 @@ export default function TipiAufgabe() {
           {feedbackState === 'correct' && <div className="bk-feedback bk-feedback-ok mb-4">✓ Richtig!</div>}
 
           {feedbackState === 'incorrect' && (
-            <div className="bk-feedback bk-feedback-no mb-4">✗ Leider nicht richtig. Versuche es nochmal!</div>
+            <div className="bk-feedback bk-feedback-no mb-4">✗ {gleichungText[currentTask] || 'Leider nicht richtig. Versuche es nochmal!'}</div>
           )}
 
           {/* Lösung anzeigen Button */}

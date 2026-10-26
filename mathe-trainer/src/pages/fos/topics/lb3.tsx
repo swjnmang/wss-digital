@@ -1,5 +1,5 @@
 import type { Gen, PracticeConfig, TopicConfig } from '../../raum_und_form/engine/types';
-import { F, Fr, ch, chFixed, nm, nz, p, pick, poly, ri, sg, shuffle, t, xm } from '../lib';
+import { F, Fr, ch, chFixed, gl, nm, nz, p, pick, poly, ri, sg, shuffle, t, xm } from '../lib';
 import Plot from '../Plot';
 
 // Lernbereich 3: Lineare und quadratische Funktionen
@@ -161,9 +161,9 @@ const geradeAblesen: Gen = () => {
   const dx = m.d;
   return {
     title: 'Geradengleichung ablesen',
-    text: 'Bestimme die Steigung $m$ und den $y$-Achsenabschnitt $t$ der abgebildeten Geraden $g$. (Brüche als z. B. 2/3 eingeben)',
+    text: 'Bestimme die Gleichung der abgebildeten Geraden $g$ und tippe sie vollständig ein. (Brüche als z. B. 2/3 eingeben)',
     figure: <Plot x={[-5, 5]} y={[-5, 5]} curves={[{ f: (x) => m.v * x + tt, label: 'g' }]} points={[{ x: 0, y: tt }, { x: dx, y: tt + m.n }]} />,
-    parts: [nm('$m$', m, { tol: 0.01 }), nm('$t$', tt, { integer: true })],
+    parts: [gl([tt, m], { label: '$g$:' })],
     solution: [
       `$y$-Achsenabschnitt ablesen: Die Gerade schneidet die $y$-Achse bei $${P(0, tt)}$, also $t = ${tt}$.`,
       `Steigungsdreieck: $${dx}$ nach rechts, $${m.n}$ ${m.n > 0 ? 'nach oben' : 'nach unten'} → $m = \\frac{${m.n}}{${dx}} = ${m.tex()}$`,
@@ -181,8 +181,8 @@ const zweiPunkte: Gen = () => {
   const tt = F(y1).sub(m.mul(x1));
   return {
     title: 'Gerade durch zwei Punkte',
-    text: `Die Gerade $g$ verläuft durch $A${P(x1, y1)}$ und $B${P(x2, y2)}$. Bestimme $m$ und $t$ in $g: y = mx + t$.`,
-    parts: [nm('$m$', m, { tol: 0.002 }), nm('$t$', tt, { tol: 0.002 })],
+    text: `Die Gerade $g$ verläuft durch $A${P(x1, y1)}$ und $B${P(x2, y2)}$. Bestimme die Gleichung von $g$ in der Form $y = mx + t$.`,
+    parts: [gl([tt, m], { label: '$g$:', tol: 0.002 })],
     solution: [
       `$m = \\frac{y_B - y_A}{x_B - x_A} = \\frac{${y2} - ${p(y1)}}{${x2} - ${p(x1)}} = \\frac{${y2 - y1}}{${x2 - x1}} = ${m.tex()}$`,
       `$A$ einsetzen: $${y1} = ${m.tex()} \\cdot ${p(x1)} + t \\iff t = ${y1} - ${m.mul(x1).ptex()} = ${tt.tex()}$`,
@@ -199,7 +199,7 @@ const punktSteigung: Gen = () => {
   return {
     title: 'Punkt-Steigungs-Form',
     text: `Eine Gerade hat die Steigung $m = ${m.tex()}$ und verläuft durch $P${P(x0, y0)}$. Gib die Gleichung in der Form $y = mx + t$ an.`,
-    parts: [nm('$t$', tt, { tol: 0.002 })],
+    parts: [gl([tt, m], { tol: 0.002 })],
     solution: [
       '$y = m \\cdot (x - x_0) + y_0$ (Punkt-Steigungs-Form)',
       `$y = ${m.tex()} \\cdot (${xm(x0)}) ${y0 ? sg(y0) : ''}$`,
@@ -305,7 +305,7 @@ const scheitelInAllg: Gen = () => {
   return {
     title: 'Scheitelform → allgemeine Form',
     text: `Schreibe $f(x) = ${sq(a, xs, ys)}$ in der Form $f(x) = ax^2 + bx + c$.`,
-    parts: [nm('$a$', a, { integer: true }), nm('$b$', b, { integer: true }), nm('$c$', c, { integer: true })],
+    parts: [gl([c, b, a], { form: 'allgemein', tol: 1e-6 })],
     solution: [
       `Binomische Formel: $(${xm(xs)})^2 = ${poly([1, -2 * xs, xs * xs])}$`,
       `$f(x) = ${k1(a)}(${poly([1, -2 * xs, xs * xs])}) ${ys ? sg(ys) : ''}$`,
@@ -381,7 +381,7 @@ const parabelAusGraph: Gen = () => {
     title: 'Funktionsgleichung aus dem Graphen',
     text: 'Bestimme die Gleichung der abgebildeten Parabel in Scheitelform $f(x) = a(x - x_S)^2 + y_S$.',
     figure: <Plot x={[-6, 6]} y={[-7, 7]} curves={[{ f, label: 'Gf' }]} points={[{ x: xs, y: ys, label: 'S' }, { x: xs + dx, y: f(xs + dx), label: 'P' }]} />,
-    parts: [nm('$x_S$', xs, { integer: true }), nm('$y_S$', ys, { integer: true }), nm('$a$', a, { tol: 0.01 })],
+    parts: [gl([a * xs * xs + ys, -2 * a * xs, a], { form: 'scheitel' })],
     solution: [
       `Scheitel ablesen: $S${P(xs, ys)}$`,
       `Punkt ablesen: $P${P(xs + dx, f(xs + dx))}$`,
