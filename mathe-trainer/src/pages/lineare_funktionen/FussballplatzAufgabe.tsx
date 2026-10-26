@@ -2,9 +2,11 @@ import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import React, { useState } from 'react'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
+import { GleichungFelder, pruefeGleichungen, type GesuchteGleichung } from '../../components/GleichungFelder'
 
 interface Solution {
-  type: 'number' | 'text'
+  type: 'number' | 'text' | 'gleichung'
+  gleichungen?: GesuchteGleichung[] // type 'gleichung': gesuchte Funktionsgleichung(en)
   answer: string | number
   tolerance?: number
   labels?: string[] // für mehrteilige Antworten (z.B. x, y)
@@ -23,6 +25,8 @@ export default function FussballplatzAufgabe() {
   const [currentTask, setCurrentTask] = useState(0)
   const [inputs, setInputs] = useState<Record<number, string | Record<string, string>>>({})
   const [feedback, setFeedback] = useState<Record<number, string>>({})
+  const [gleichungMarks, setGleichungMarks] = useState<Record<number, Record<string, boolean | null>>>({})
+  const [gleichungText, setGleichungText] = useState<Record<number, string>>({})
   const [showSolution, setShowSolution] = useState<Record<number, boolean>>({})
   // Nachverfolgung: jede Teilaufgabe ist ein Eintrag (Wechsel der Teilaufgabe schließt den Eintrag ab)
   const tracking = useTaskTracking('Anwendung: Fußballplatz')
@@ -32,10 +36,11 @@ export default function FussballplatzAufgabe() {
       id: 1,
       title: 'Aufgabe 2.1',
       question:
-        'Eine Fußballspielerin steht direkt auf Punkt A (−6|−3) und spielt den Ball mit einem geradlinigen Pass zu ihrer Mitspielerin, die in Punkt B (4|3) steht. Berechne die dazugehörige Funktionsgleichung in der Form y = mx + t',
+        'Eine Fußballspielerin steht direkt auf Punkt A (−6|−3) und spielt den Ball mit einem geradlinigen Pass zu ihrer Mitspielerin, die in Punkt B (4|3) steht. Berechne die dazugehörige Funktionsgleichung in der Form y = mx + t und gib sie vollständig ein.',
       solution: {
-        type: 'text',
-        answer: 'y=0.6x+0.6',
+        type: 'gleichung',
+        answer: '',
+        gleichungen: [{ name: 'Pass', m: 0.6, t: 0.6 }],
       },
       hint: 'Nutze die zwei Punkte A(-6|-3) und B(4|3) um m und t zu berechnen.',
     },
@@ -112,6 +117,16 @@ export default function FussballplatzAufgabe() {
 
   const validateAnswer = () => {
     const solution = currentTaskData.solution
+    // Vollständig eingetippte Funktionsgleichung(en)
+    if (solution.type === 'gleichung' && solution.gleichungen) {
+      const r = pruefeGleichungen(solution.gleichungen, (inputs[currentTask] as Record<string, string>) || {}, solution.tolerance)
+      setGleichungMarks({ ...gleichungMarks, [currentTask]: r.marks })
+      setGleichungText({ ...gleichungText, [currentTask]: r.text })
+      // Eingabefehler (z. B. fehlendes „y =“) zählen nicht als Prüfversuch
+      if (r.status !== 'invalid') tracking.onCheck(r.status === 'ok')
+      setFeedback({ ...feedback, [currentTask]: r.status === 'ok' ? 'correct' : 'incorrect' })
+      return
+    }
     let isCorrect = false
 
     // Mehrteilige Antwort (z.B. x und y für Schnittpunkt)
@@ -213,7 +228,18 @@ export default function FussballplatzAufgabe() {
           <p className="text-lg text-gray-800 mb-6">{currentTaskData.question}</p>
 
           {/* Input */}
-          {currentTaskData.solution.answers && currentTaskData.solution.labels ? (
+          {currentTaskData.solution.type === 'gleichung' && currentTaskData.solution.gleichungen ? (
+              <GleichungFelder
+                gleichungen={currentTaskData.solution.gleichungen}
+                values={(inputs[currentTask] as Record<string, string>) || {}}
+                onChange={(name, v) => {
+                  handleMultiInputChange(name, v)
+                  setGleichungMarks({ ...gleichungMarks, [currentTask]: {} })
+                  tracking.onInput()
+                }}
+                marks={gleichungMarks[currentTask]}
+              />
+            ) : currentTaskData.solution.answers && currentTaskData.solution.labels ? (
             // Mehrteilige Eingabe (z.B. x und y)
             <div className="mb-4 space-y-3">
               {currentTaskData.solution.labels.map((label, index) => {
@@ -261,7 +287,7 @@ export default function FussballplatzAufgabe() {
           {feedbackState === 'correct' && <div className="bk-feedback bk-feedback-ok mb-4">✓ Richtig!</div>}
 
           {feedbackState === 'incorrect' && (
-            <div className="bk-feedback bk-feedback-no mb-4">✗ Leider nicht richtig. Versuche es nochmal!</div>
+            <div className="bk-feedback bk-feedback-no mb-4">✗ {gleichungText[currentTask] || 'Leider nicht richtig. Versuche es nochmal!'}</div>
           )}
 
           {/* Lösung anzeigen Button */}

@@ -1,9 +1,14 @@
 import { useRef, type ChangeEvent, type CSSProperties, type FocusEvent, type KeyboardEvent, type MouseEvent, type TouchEvent } from 'react'
+import katex from 'katex'
+import 'katex/dist/katex.min.css'
+import { toLatex } from './mathPreview'
 
 // Eingabefeld für eine vollständig eingetippte Funktionsgleichung (z. B. „y = 2x + 3“).
-// Darunter eine kleine Zeichenleiste (y, =, x, +, −, Komma, Bruchstrich), damit man auf dem Tablet
-// nicht ständig zwischen Buchstaben- und Zeichentastatur wechseln muss. Die Tasten behalten den Fokus im Feld,
+// Darunter eine kleine Zeichenleiste (y, =, x, +, −, Komma, Bruchstrich, bei quadratischen Funktionen auch ² und Klammern)
+// und eine Vorschau (Brüche gestapelt, Hochzahlen hochgestellt). Die Tasten behalten den Fokus im Feld,
 // so dass die automatische Prüfung nicht schon beim Antippen einer Taste startet.
+// Auf Touch-Geräten übernimmt die Mathe-Tastatur (MathKeypad, dort mit y und = über data-keypad="gleichung");
+// Zeichenleiste und Vorschau sind dann ausgeblendet (styles/layout.css).
 
 const TASTEN: { zeichen: string; label: string; aria: string }[] = [
   { zeichen: 'y', label: 'y', aria: 'y einfügen' },
@@ -14,22 +19,33 @@ const TASTEN: { zeichen: string; label: string; aria: string }[] = [
   { zeichen: ',', label: ',', aria: 'Komma einfügen' },
   { zeichen: '/', label: '/', aria: 'Bruchstrich einfügen' },
 ]
+const TASTEN_QUADRATISCH = [
+  ...TASTEN,
+  { zeichen: '²', label: 'x²', aria: 'hoch 2 einfügen' },
+  { zeichen: '(', label: '(', aria: 'Klammer auf einfügen' },
+  { zeichen: ')', label: ')', aria: 'Klammer zu einfügen' },
+]
 
 export default function GleichungEingabe({
   value,
   onChange,
   onBlur,
   className = '',
-  placeholder = 'z. B. y = 4x − 1',
+  quadratisch = false,
+  placeholder = quadratisch ? 'z. B. y = 2x² − 3x + 1' : 'z. B. y = 4x − 1',
   ariaLabel = 'Funktionsgleichung',
   id,
   tasten = true,
+  vorschau = true,
+  readOnly,
   style,
   onEnter,
 }: {
   value: string
   onChange: (v: string) => void
   onBlur?: (v: string) => void
+  /** Zeichenleiste mit x², ( und ) für quadratische Funktionen */
+  quadratisch?: boolean
   /** zusätzliche Klassen, z. B. fieldCheckClass(…) */
   className?: string
   placeholder?: string
@@ -37,6 +53,9 @@ export default function GleichungEingabe({
   id?: string
   /** Zeichenleiste anzeigen */
   tasten?: boolean
+  /** Vorschau der Eingabe (gestapelte Brüche, Hochzahlen) unter dem Feld */
+  vorschau?: boolean
+  readOnly?: boolean
   style?: CSSProperties
   /** Enter im Feld, z. B. zum Absenden */
   onEnter?: () => void
@@ -69,6 +88,8 @@ export default function GleichungEingabe({
       <input
         ref={ref}
         id={id}
+        data-keypad="gleichung"
+        readOnly={readOnly}
         type="text"
         inputMode="text"
         autoComplete="off"
@@ -89,9 +110,16 @@ export default function GleichungEingabe({
           }
         }}
       />
-      {tasten && (
-        <span style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }} aria-label="Zeichen einfügen">
-          {TASTEN.map((t) => (
+      {vorschau && value.trim() !== '' && (
+        <span
+          className="gl-eingabe-vorschau"
+          aria-hidden="true"
+          dangerouslySetInnerHTML={{ __html: katex.renderToString(toLatex(value), { throwOnError: false, displayMode: false }) }}
+        />
+      )}
+      {tasten && !readOnly && (
+        <span className="gl-eingabe-tasten" style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }} aria-label="Zeichen einfügen">
+          {(quadratisch ? TASTEN_QUADRATISCH : TASTEN).map((t) => (
             <button
               key={t.label}
               type="button"

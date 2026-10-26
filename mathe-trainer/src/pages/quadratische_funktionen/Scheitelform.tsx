@@ -3,7 +3,8 @@ import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import ParabelGraph from '../../components/ParabelGraph';
 import MarioSpiel from './MarioSpiel';
-import { SignToggle, eingabeKlasse, type Vorzeichen } from './quadratischShared';
+import GleichungEingabe from '../../components/GleichungEingabe';
+import { checkQuadraticEquation } from '../../utils/parseFunctionEquation';
 import TaskShell from '../../components/layout/TaskShell'
 import { fieldCheckClass } from '../../utils/fieldCheck';
 import { useBackHandler } from '../../hooks/useBackHandler';
@@ -12,15 +13,10 @@ type Level = 'einfach' | 'fortgeschritten';
 
 type Aufgabe = { a: number; xs: number; ys: number };
 
-type Eingabe = {
-    a: string;
-    xsSign: Vorzeichen;
-    xsAbs: string;
-    ysSign: Vorzeichen;
-    ysAbs: string;
-};
+/** Die vollständig eingetippte Scheitelform, z. B. „y = 2(x + 3)² + 1“ */
+type Eingabe = string;
 
-type Ergebnis = { richtig: boolean; text: string; felder?: { a: boolean; xs: boolean; ys: boolean } } | null;
+type Ergebnis = { richtig: boolean; text: string } | null;
 
 const ANZAHL_AUFGABEN = 5;
 const STRECKFAKTOREN = [1, -1, 2, -2, 0.5, -0.5];
@@ -34,14 +30,6 @@ const GRAPH_GROESSE = 360;
 
 const zufall = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const zahl = (n: number) => String(n).replace('.', ',');
-const parseZahl = (s: string) =>
-    parseFloat(
-        s
-            .trim()
-            .replace(',', '.')
-            .replace(/[−–—‐]/g, '-')
-    );
-
 /** Schritte zum Ablesen von a: bei |a| < 1 zwei Einheiten nach rechts, sonst eine */
 const ableseSchritt = (a: number) => {
     const dx = Math.abs(a) < 1 ? 2 : 1;
@@ -64,7 +52,7 @@ const erzeugeAufgaben = (level: Level): Aufgabe[] => {
     });
 };
 
-const leereEingabe = (): Eingabe => ({ a: '', xsSign: null, xsAbs: '', ysSign: null, ysAbs: '' });
+const leereEingabe = (): Eingabe => '';
 
 /** Fertige Scheitelform als LaTeX, z. B. y = 2(x + 3)^2 + 1 */
 const scheitelformLatex = ({ a, xs, ys }: Aufgabe) => {
@@ -74,37 +62,10 @@ const scheitelformLatex = ({ a, xs, ys }: Aufgabe) => {
     return `y = ${faktor}${klammer}${rest}`;
 };
 
-/** Live-Vorschau aus den bisherigen Eingaben */
-const vorschauLatex = (e: Eingabe) => {
-    const sauber = (raw: string) =>
-        raw
-            .trim()
-            .replace(',', '{,}')
-            .replace(/[−–—‐]/g, '-');
-    const a = e.a.trim() !== '' ? sauber(e.a) : 'a';
-    const xs = e.xsAbs.trim() !== '' ? sauber(e.xsAbs) : 'x_s';
-    const ys = e.ysAbs.trim() !== '' ? sauber(e.ysAbs) : 'y_s';
-    return `y = ${a}\\left(x ${e.xsSign ?? '\\pm'} ${xs}\\right)^2 ${e.ysSign ?? '\\pm'} ${ys}`;
-};
-
 const pruefe = (t: Aufgabe, e: Eingabe): Ergebnis => {
-    if (e.a === '' || e.xsAbs === '' || e.ysAbs === '' || e.xsSign === null || e.ysSign === null) {
-        return { richtig: false, text: 'Bitte fülle alle Felder aus und wähle die Vorzeichen.' };
-    }
-
-    const aRichtig = Math.abs(parseZahl(e.a) - t.a) < 0.01;
-    // In der Klammer steht das UMGEKEHRTE Vorzeichen von xs.
-    const xsRichtig =
-        (t.xs === 0 || e.xsSign === (t.xs > 0 ? '-' : '+')) && Math.abs(parseZahl(e.xsAbs) - Math.abs(t.xs)) < 0.01;
-    // Hinter der Klammer steht ys mit seinem eigenen Vorzeichen.
-    const ysRichtig =
-        (t.ys === 0 || e.ysSign === (t.ys < 0 ? '-' : '+')) && Math.abs(parseZahl(e.ysAbs) - Math.abs(t.ys)) < 0.01;
-
-    const felder = { a: aRichtig, xs: xsRichtig, ys: ysRichtig };
-    if (aRichtig && xsRichtig && ysRichtig) return { richtig: true, text: 'Richtig!', felder };
-
-    const fehler = [!aRichtig && 'a', !xsRichtig && 'Klammer', !ysRichtig && 'yₛ'].filter(Boolean).join(', ');
-    return { richtig: false, text: `Noch nicht ganz. Überprüfe: ${fehler}`, felder };
+    // y = a(x − xs)² + ys = ax² − 2a·xs·x + a·xs² + ys
+    const r = checkQuadraticEquation(e, { a: t.a, b: -2 * t.a * t.xs, c: t.a * t.xs * t.xs + t.ys }, 'scheitel', 0.01);
+    return r.status === 'ok' ? { richtig: true, text: 'Richtig!' } : { richtig: false, text: r.text };
 };
 
 /** Text, wie man a aus dem Graphen abliest, z. B. „1 nach rechts, 2 nach unten → a = −2“ */
@@ -240,8 +201,8 @@ const Scheitelform = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const setEingabe = (i: number, teil: Partial<Eingabe>) => {
-        setEingaben((prev) => prev.map((e, idx) => (idx === i ? { ...e, ...teil } : e)));
+    const setEingabe = (i: number, wert: Eingabe) => {
+        setEingaben((prev) => prev.map((e, idx) => (idx === i ? wert : e)));
         setErgebnisse((prev) => prev.map((r, idx) => (idx === i ? null : r)));
     };
 
@@ -319,12 +280,12 @@ const Scheitelform = () => {
                     {level === 'einfach' ? (
                         <>
                             Lies den Scheitelpunkt aus dem Graphen ab und stelle mit dem gegebenen Formfaktor a die
-                            Scheitelform <InlineMath math="y = a(x - x_s)^2 + y_s" /> auf.
+                            Scheitelform <InlineMath math="y = a(x - x_s)^2 + y_s" /> auf. Tippe die vollständige Gleichung ein.
                         </>
                     ) : (
                         <>
                             Lies den Scheitelpunkt <b>und</b> den Formfaktor a aus dem Graphen ab und stelle die
-                            Scheitelform <InlineMath math="y = a(x - x_s)^2 + y_s" /> auf.
+                            Scheitelform <InlineMath math="y = a(x - x_s)^2 + y_s" /> auf. Tippe die vollständige Gleichung ein.
                         </>
                     )}
                 </p>
@@ -376,7 +337,7 @@ const Scheitelform = () => {
                     {aufgaben.map((t, i) => {
                         const e = eingaben[i];
                         const r = ergebnisse[i];
-                        if (!e) return null;
+                        if (e === undefined) return null;
                         return (
                             <div
                                 key={i}
@@ -400,59 +361,14 @@ const Scheitelform = () => {
                                                 <>Formfaktor a: aus dem Graphen ablesen</>
                                             )}
                                         </p>
-                                        <div className="flex flex-nowrap items-center gap-1 bg-slate-50 py-2 px-1.5 rounded-lg border border-slate-200 font-mono text-sm overflow-x-auto">
-                                            <span className="whitespace-nowrap shrink-0">y =</span>
-                                            <input
-                                                type="text"
-                                                inputMode="decimal"
-                                                value={e.a}
-                                                onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                                                    setEingabe(i, { a: ev.target.value })
-                                                }
-                                                placeholder="a"
-                                                aria-label="Formfaktor a"
-                                                className={`${eingabeKlasse} ${fieldCheckClass(r?.felder?.a)}`}
-                                            />
-                                            <span className="whitespace-nowrap shrink-0">(x</span>
-                                            <SignToggle
-                                                value={e.xsSign}
-                                                onChange={(v) => setEingabe(i, { xsSign: v })}
-                                            />
-                                            <input
-                                                type="text"
-                                                inputMode="decimal"
-                                                value={e.xsAbs}
-                                                onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                                                    setEingabe(i, { xsAbs: ev.target.value })
-                                                }
-                                                placeholder="xs"
-                                                aria-label="Zahl im Klammerterm"
-                                                className={`${eingabeKlasse} ${fieldCheckClass(r?.felder?.xs)}`}
-                                            />
-                                            <span className="whitespace-nowrap shrink-0">)²</span>
-                                            <SignToggle
-                                                value={e.ysSign}
-                                                onChange={(v) => setEingabe(i, { ysSign: v })}
-                                            />
-                                            <input
-                                                type="text"
-                                                inputMode="decimal"
-                                                value={e.ysAbs}
-                                                onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                                                    setEingabe(i, { ysAbs: ev.target.value })
-                                                }
-                                                placeholder="ys"
-                                                aria-label="Zahl ys"
-                                                className={`${eingabeKlasse} ${fieldCheckClass(r?.felder?.ys)}`}
-                                            />
-                                        </div>
-
-                                        <div className="mt-2 text-sm text-blue-900 overflow-x-auto">
-                                            <span className="text-xs font-semibold text-blue-700 mr-2">
-                                                Deine Gleichung:
-                                            </span>
-                                            <InlineMath math={vorschauLatex(e)} />
-                                        </div>
+                                        <GleichungEingabe
+                                            quadratisch
+                                            value={e}
+                                            onChange={(v) => setEingabe(i, v)}
+                                            placeholder="z. B. y = 2(x + 3)² + 1"
+                                            ariaLabel="Funktionsgleichung in Scheitelform"
+                                            className={r ? fieldCheckClass(r.richtig) : ''}
+                                        />
 
                                         <div className="flex flex-wrap items-center gap-3 mt-3">
                                             <button

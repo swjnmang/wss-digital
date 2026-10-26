@@ -1,14 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
-import { SignToggle, eingabeKlasse, type Vorzeichen } from './quadratischShared';
+import GleichungEingabe from '../../components/GleichungEingabe';
+import { parsePolynomEquation } from '../../utils/parseFunctionEquation';
 
 // Bonus-Aufgabe: Münzen liegen auf einer nach unten geöffneten Parabel. Mario läuft auf der x-Achse
 // von links nach rechts und springt auf der Parabel, die der Schüler in Scheitelform eingibt.
 // Mario folgt y = max(0, f(x)): Wo die Parabel über dem Boden liegt, ist er in der Luft.
 
 type Level = { a: number; xs: number; ys: number; muenzen: { x: number; y: number }[] };
-type Eingabe = { a: string; xsSign: Vorzeichen; xsAbs: string; ysSign: Vorzeichen; ysAbs: string };
+/** Eingetippte Parabelgleichung in Scheitelform, z. B. „y = −0,5(x − 2)² + 4“ */
+type Eingabe = string;
 type Parabel = { a: number; xs: number; ys: number };
 type Phase = 'bereit' | 'laeuft' | 'fertig';
 
@@ -30,16 +32,6 @@ const py = (y: number) => BODEN - y * U;
 const zahl = (n: number) => String(n).replace('.', ',');
 const zufall = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-const parseZahl = (raw: string) => {
-    const s = raw.trim().replace(/[−–—‐]/g, '-').replace(/,/g, '.');
-    if (s === '' || s === '-') return NaN;
-    if (s.includes('/')) {
-        const [z, n] = s.split('/').map(Number);
-        return n ? z / n : NaN;
-    }
-    return Number(s);
-};
-
 const erzeugeLevel = (vorher?: Level): Level => {
     for (;;) {
         const a = [-0.25, -0.5, -1, -2][zufall(0, 3)];
@@ -57,30 +49,18 @@ const erzeugeLevel = (vorher?: Level): Level => {
     }
 };
 
-const leereEingabe = (): Eingabe => ({ a: '', xsSign: null, xsAbs: '', ysSign: null, ysAbs: '' });
+const leereEingabe = (): Eingabe => '';
 
 const leseParabel = (e: Eingabe): Parabel | string => {
-    if (e.a.trim() === '' || e.xsAbs.trim() === '' || e.ysAbs.trim() === '' || !e.xsSign || !e.ysSign) {
-        return 'Bitte fülle alle Felder aus und wähle die Vorzeichen.';
-    }
-    const a = parseZahl(e.a);
-    const xsBetrag = parseZahl(e.xsAbs);
-    const ysBetrag = parseZahl(e.ysAbs);
-    if ([a, xsBetrag, ysBetrag].some((v) => !Number.isFinite(v))) return 'Bitte gib nur Zahlen ein (z. B. -0,5).';
-    // In der Klammer steht das umgekehrte Vorzeichen von xs.
-    const xs = e.xsSign === '-' ? xsBetrag : -xsBetrag;
-    const ys = e.ysSign === '+' ? ysBetrag : -ysBetrag;
+    const p = parsePolynomEquation(e);
+    if (!p.ok) return p.fehler;
+    const [c = 0, b = 0, a = 0, ...rest] = p.koeff;
+    if (rest.some((k) => Math.abs(k) > 1e-9) || Math.abs(a) < 1e-12) return 'Gib eine Parabel ein: y = a(x − xₛ)² + yₛ.';
     if (a >= 0) return 'So springt Mario nicht: Ein Sprung ist eine nach unten geöffnete Parabel – a muss negativ sein.';
+    const xs = -b / (2 * a);
+    const ys = c - (b * b) / (4 * a);
     if (ys <= 0) return 'Mit diesem Scheitelpunkt hebt Mario nicht ab – der höchste Punkt muss über dem Boden liegen.';
     return { a, xs, ys };
-};
-
-const vorschauLatex = (e: Eingabe) => {
-    const sauber = (raw: string) => raw.trim().replace(',', '{,}').replace(/[−–—‐]/g, '-');
-    const a = e.a.trim() !== '' ? sauber(e.a) : 'a';
-    const xs = e.xsAbs.trim() !== '' ? sauber(e.xsAbs) : 'x_s';
-    const ys = e.ysAbs.trim() !== '' ? sauber(e.ysAbs) : 'y_s';
-    return `y = ${a}\\left(x ${e.xsSign ?? '\\pm'} ${xs}\\right)^2 ${e.ysSign ?? '\\pm'} ${ys}`;
 };
 
 const scheitelformLatex = ({ a, xs, ys }: Parabel) => {
@@ -368,8 +348,8 @@ const MarioSpiel = ({ onGeloest }: { onGeloest?: (geloest: boolean) => void }) =
         return () => cancelAnimationFrame(id);
     }, [level]);
 
-    const aendere = (teil: Partial<Eingabe>) => {
-        setEingabe((e) => ({ ...e, ...teil }));
+    const aendere = (wert: Eingabe) => {
+        setEingabe(wert);
         setMeldung(null);
     };
 
@@ -419,46 +399,16 @@ const MarioSpiel = ({ onGeloest }: { onGeloest?: (geloest: boolean) => void }) =
                 />
             </div>
 
-            <div className="mt-3 flex flex-nowrap items-center gap-1 bg-slate-50 py-2 px-1.5 rounded-lg border border-slate-200 font-mono text-sm overflow-x-auto">
-                <span className="whitespace-nowrap shrink-0">y =</span>
-                <input
-                    type="text"
-                    inputMode="decimal"
-                    value={eingabe.a}
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => aendere({ a: ev.target.value })}
-                    placeholder="a"
-                    aria-label="Formfaktor a"
-                    className={eingabeKlasse}
-                    disabled={phase === 'laeuft'}
+            <div className="mt-3">
+                <GleichungEingabe
+                    quadratisch
+                    value={eingabe}
+                    onChange={aendere}
+                    onEnter={start}
+                    readOnly={phase === 'laeuft'}
+                    placeholder="z. B. y = −0,5(x − 2)² + 4"
+                    ariaLabel="Sprungparabel in Scheitelform"
                 />
-                <span className="whitespace-nowrap shrink-0">(x</span>
-                <SignToggle value={eingabe.xsSign} onChange={(v) => aendere({ xsSign: v })} />
-                <input
-                    type="text"
-                    inputMode="decimal"
-                    value={eingabe.xsAbs}
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => aendere({ xsAbs: ev.target.value })}
-                    placeholder="xs"
-                    aria-label="Zahl im Klammerterm"
-                    className={eingabeKlasse}
-                    disabled={phase === 'laeuft'}
-                />
-                <span className="whitespace-nowrap shrink-0">)²</span>
-                <SignToggle value={eingabe.ysSign} onChange={(v) => aendere({ ysSign: v })} />
-                <input
-                    type="text"
-                    inputMode="decimal"
-                    value={eingabe.ysAbs}
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => aendere({ ysAbs: ev.target.value })}
-                    placeholder="ys"
-                    aria-label="Zahl ys"
-                    className={eingabeKlasse}
-                    disabled={phase === 'laeuft'}
-                />
-            </div>
-            <div className="mt-2 text-sm text-blue-900 overflow-x-auto">
-                <span className="text-xs font-semibold text-blue-700 mr-2">Deine Gleichung:</span>
-                <InlineMath math={vorschauLatex(eingabe)} />
             </div>
 
             <div className="flex flex-wrap items-center gap-3 mt-3">

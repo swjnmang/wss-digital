@@ -4,7 +4,10 @@ import TaskShell from '../../../components/layout/TaskShell'
 import { MathLines, MathText } from '../../abschlusspruefung/kopfrechnen/MathText'
 import { feldRichtig, lob } from '../../abschlusspruefung/kopfrechnen/pruefen'
 import { fieldCheckClass } from '../../../utils/fieldCheck'
-import { ANWENDUNGEN, anwendungBySlug, type Teil } from './aufgaben'
+import { ANWENDUNGEN, anwendungBySlug, type GesuchteGleichung, type Teil } from './aufgaben'
+import GleichungEingabe from '../../../components/GleichungEingabe'
+import { checkLinearEquation } from '../../../utils/parseLinearEquation'
+import { checkQuadraticEquation, type EquationCheck } from '../../../utils/parseFunctionEquation'
 import Skizze from './skizzen'
 
 // Anwendungsaufgabe „Funktionaler Zusammenhang“ wie in Teil B der Abschlussprüfung (15 Punkte).
@@ -13,17 +16,32 @@ import Skizze from './skizzen'
 
 const UEBERSICHT = '/quadratische_funktionen/anwendungsaufgaben'
 
+/** Eingetippte Funktionsgleichung prüfen (Gerade: m und t, Parabel: a, b und c; jede Schreibweise zählt) */
+function pruefeGleichung(g: GesuchteGleichung, eingabe: string): EquationCheck {
+  return 'm' in g ? checkLinearEquation(eingabe, g.m, g.t, 0.01) : checkQuadraticEquation(eingabe, { a: g.a, b: g.b, c: g.c }, 'beliebig', 0.01)
+}
+
 function TeilKarte({ teil, onPunkte }: { teil: Teil; onPunkte: (p: number) => void }) {
   const [werte, setWerte] = useState<string[]>([])
   const [zustand, setZustand] = useState<boolean[] | null>(null)
   const [loesung, setLoesung] = useState(false)
   const [lobText] = useState(lob)
+  // Funktionsgleichung als Ganzes (Teil.gleichung): Eingabe und Rückmeldung
+  const [gleichung, setGleichung] = useState('')
+  const [gleichungCheck, setGleichungCheck] = useState<EquationCheck | null>(null)
 
   const setze = (i: number, v: string) => {
     setWerte((alt) => { const neu = [...alt]; neu[i] = v; return neu })
     setZustand(null)
   }
   const pruefen = () => {
+    if (teil.gleichung) {
+      const r = pruefeGleichung(teil.gleichung, gleichung)
+      setGleichungCheck(r)
+      setZustand([r.status === 'ok'])
+      onPunkte(r.status === 'ok' ? teil.punkte : 0)
+      return
+    }
     const z = teil.felder.map((f, i) => feldRichtig(f, werte[i]))
     setZustand(z)
     const anteil = z.filter(Boolean).length / z.length
@@ -39,6 +57,22 @@ function TeilKarte({ teil, onPunkte }: { teil: Teil; onPunkte: (p: number) => vo
         <span style={{ marginLeft: 'auto', fontSize: 14, color: 'var(--ink-muted)' }}>{teil.punkte} {teil.punkte === 1 ? 'Punkt' : 'Punkte'}</span>
       </header>
       <MathLines lines={teil.text} className="bk-ka-text" />
+      {teil.gleichung && (
+        <div className="bk-ka-field">
+          <span className="bk-ka-label"><MathText text={teil.gleichung.name} /></span>
+          <GleichungEingabe
+            quadratisch={'a' in teil.gleichung}
+            value={gleichung}
+            onChange={(v) => {
+              setGleichung(v)
+              setZustand(null)
+              setGleichungCheck(null)
+            }}
+            placeholder={'a' in teil.gleichung ? 'z. B. y = −0,2x² + 1,5x + 2' : 'z. B. y = 0,5x − 3'}
+            className={fieldCheckClass(zustand ? zustand[0] : null)}
+          />
+        </div>
+      )}
       <div className="bk-ka-fields">
         {teil.felder.map((f, i) => (
           <label key={i} className="bk-ka-field">
@@ -71,7 +105,7 @@ function TeilKarte({ teil, onPunkte }: { teil: Teil; onPunkte: (p: number) => vo
       {zustand && (
         <div className={`bk-feedback ${alleRichtig ? 'bk-feedback-ok' : 'bk-feedback-no'}`} role="status">
           <i className={`fa-solid ${alleRichtig ? 'fa-circle-check' : 'fa-circle-xmark'}`} aria-hidden="true" />
-          <span>{alleRichtig ? lobText : 'Noch nicht alles richtig – rot markierte Felder prüfen oder den Lösungsweg ansehen. Runde auf zwei Nachkommastellen.'}</span>
+          <span>{alleRichtig ? lobText : gleichungCheck ? gleichungCheck.text : 'Noch nicht alles richtig – rot markierte Felder prüfen oder den Lösungsweg ansehen. Runde auf zwei Nachkommastellen.'}</span>
         </div>
       )}
       {loesung && (

@@ -3,6 +3,9 @@ import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import TaskShell from '../../components/layout/TaskShell'
 import VideoButton from '../../components/VideoButton'
+import GleichungEingabe from '../../components/GleichungEingabe'
+import { fieldCheckClass } from '../../utils/fieldCheck'
+import { checkQuadraticEquation } from '../../utils/parseFunctionEquation'
 
 declare global {
   interface Window {
@@ -18,12 +21,13 @@ interface Task {
     ys: number;
 }
 
-type FieldKey = 'xs' | 'ys' | 'a' | 'fa' | 'fx' | 'fy';
+// gl = vollständig eingetippte Scheitelform
+type FieldKey = 'xs' | 'ys' | 'a' | 'gl';
 type FieldState = Record<FieldKey, string>;
 type FieldResult = Record<FieldKey, boolean | null>;
 
-const EMPTY_FIELDS: FieldState = { xs: '', ys: '', a: '', fa: '', fx: '', fy: '' };
-const EMPTY_RESULTS: FieldResult = { xs: null, ys: null, a: null, fa: null, fx: null, fy: null };
+const EMPTY_FIELDS: FieldState = { xs: '', ys: '', a: '', gl: '' };
+const EMPTY_RESULTS: FieldResult = { xs: null, ys: null, a: null, gl: null };
 
 const round = (n: number) => Math.round(n * 1000) / 1000;
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -170,13 +174,12 @@ const ScheitelformRechnerisch = () => {
         }
 
         const ok = (key: FieldKey, expected: number) => Math.abs(parseInput(fields[key]) - expected) < 0.01;
+        const gl = checkQuadraticEquation(fields.gl, { a: task.a, b: task.b, c: task.c }, 'scheitel', 0.01);
         const res: FieldResult = {
             xs: ok('xs', task.xs),
             ys: ok('ys', task.ys),
             a: ok('a', task.a),
-            fa: ok('fa', task.a),
-            fx: ok('fx', -task.xs),
-            fy: ok('fy', task.ys),
+            gl: gl.status === 'ok',
         };
         setResults(res);
 
@@ -194,7 +197,7 @@ const ScheitelformRechnerisch = () => {
         } else if (!res.a) {
             setFeedback('Der Scheitelpunkt stimmt! Schau dir den Formfaktor a nochmal an: Welche Zahl steht in der allgemeinen Form vor x²?');
         } else {
-            setFeedback('Scheitelpunkt und a stimmen! In der Scheitelform ist aber noch ein Fehler – beachte das Minus in (x − xₛ).');
+            setFeedback(`Scheitelpunkt und a stimmen! In der Scheitelform ist aber noch ein Fehler: ${gl.text}`);
         }
     };
 
@@ -314,22 +317,19 @@ const ScheitelformRechnerisch = () => {
                         <div>
                             <h3 className="font-bold text-slate-800 mb-1">Schritt 3: Funktionsgleichung in Scheitelform angeben</h3>
                             <p className="text-sm text-slate-600 mb-3">
-                                Setze a und den Scheitelpunkt in <InlineMath>{`y = a \\cdot (x - x_s)^2 + y_s`}</InlineMath> ein.
-                                Trage die Zahlen jeweils mit Vorzeichen ein (z. B. <strong>+3</strong> oder <strong>−2</strong>).
+                                Setze a und den Scheitelpunkt in <InlineMath>{`y = a \\cdot (x - x_s)^2 + y_s`}</InlineMath> ein und tippe die
+                                vollständige Gleichung ein.
                             </p>
-                            <div className="flex flex-wrap items-center justify-center gap-2 text-lg">
-                                <InlineMath>{`y =`}</InlineMath>
-                                <input type="text" inputMode="decimal" aria-label="Formfaktor in der Scheitelform" placeholder="a"
-                                    value={fields.fa} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setField('fa', e.target.value)} onKeyDown={onKeyDown}
-                                    className={inputClass('fa', 'w-16')} />
-                                <InlineMath>{`\\cdot\\, (x`}</InlineMath>
-                                <input type="text" inputMode="decimal" aria-label="Zahl in der Klammer" placeholder="±"
-                                    value={fields.fx} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setField('fx', e.target.value)} onKeyDown={onKeyDown}
-                                    className={inputClass('fx', 'w-16')} />
-                                <InlineMath>{`)^2`}</InlineMath>
-                                <input type="text" inputMode="decimal" aria-label="Summand hinter der Klammer" placeholder="±"
-                                    value={fields.fy} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setField('fy', e.target.value)} onKeyDown={onKeyDown}
-                                    className={inputClass('fy', 'w-16')} />
+                            <div className="flex justify-center">
+                                <GleichungEingabe
+                                    quadratisch
+                                    value={fields.gl}
+                                    onChange={(v) => setField('gl', v)}
+                                    onEnter={checkSolution}
+                                    placeholder="z. B. y = 2(x − 3)² + 1"
+                                    ariaLabel="Funktionsgleichung in Scheitelform"
+                                    className={fieldCheckClass(results.gl)}
+                                />
                             </div>
                         </div>
 

@@ -5,6 +5,9 @@ import 'katex/dist/katex.min.css'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { VideoEmbed } from '../../components/VideoButton'
 import PageShell from '../../components/layout/TaskShell'
+import GleichungEingabe from '../../components/GleichungEingabe'
+import { checkLinearEquation } from '../../utils/parseLinearEquation'
+import { fieldCheckClass } from '../../utils/fieldCheck'
 
 // Neun Aufgaben, jede mit einem eigenen Aufgabentyp
 const TOTAL_TASKS = 9
@@ -785,10 +788,10 @@ function newShiftTextTask() {
 }
 
 function ShiftTextTaskCard(props: CardProps) {
-  const { task, live, showSolution, newTask, showSol } = useInputTask(
+  const { task, showSolution, newTask, showSol, feld } = useGleichungTask(
     'Parallelverschiebung berechnen',
     newShiftTextTask,
-    (k) => [k.m, k.t0 + k.k],
+    (k) => ({ m: k.m, t: k.t0 + k.k }),
     props,
   )
   const { m, t0, k } = task
@@ -820,10 +823,10 @@ function ShiftTextTaskCard(props: CardProps) {
     >
       <p className="text-slate-700 mb-4">
         Die Gerade <Eq>{eq(m, t0)}</Eq> wird um <b>{fmt(Math.abs(k))}</b>{' '}
-        {Math.abs(k) === 1 ? 'Einheit' : 'Einheiten'} nach <b>{k > 0 ? 'oben' : 'unten'}</b> verschoben. Gib m und t
-        der verschobenen Geraden an.
+        {Math.abs(k) === 1 ? 'Einheit' : 'Einheiten'} nach <b>{k > 0 ? 'oben' : 'unten'}</b> verschoben. Tippe die
+        vollständige Gleichung der verschobenen Geraden ein.
       </p>
-      <AnswerFields live={live} labels={['m =', 't =']} />
+      {feld}
     </TaskShell>
   )
 }
@@ -934,11 +937,90 @@ function newFullGraphTask() {
   return { m: pick(graphSlopes), t: randomInt(4, -4) }
 }
 
+/**
+ * Wie useInputTask, aber für Aufgaben, deren Ergebnis eine ganze Gleichung ist: Die SuS tippen
+ * „y = 2x − 1“ vollständig ein. Richtig wird sofort grün, falsch erst nach einer Tipp-Pause rot.
+ */
+function useGleichungTask<T>(
+  topic: string,
+  create: () => T,
+  answer: (task: T) => { m: number; t: number },
+  { onSolvedChange, onResult, onHelp }: CardProps,
+) {
+  const tracking = useTaskTracking(topic)
+  const [task, setTask] = useState<T>(create)
+  const [showSolution, setShowSolution] = useState(false)
+  const [eingabe, setEingabe] = useState('')
+  const [solved, setSolved] = useState(false)
+  const [falsch, setFalsch] = useState('')
+  const { m, t } = answer(task)
+
+  useEffect(() => {
+    if (solved) return
+    setFalsch('')
+    if (eingabe.trim() === '') return
+    const r = checkLinearEquation(eingabe, m, t, 0.03)
+    if (r.status === 'ok') {
+      setSolved(true)
+      tracking.onCheck(true)
+      onResult(true)
+      onSolvedChange(true)
+      return
+    }
+    // Eingabefehler (z. B. halb getippte Gleichung) zählen nicht als Fehlversuch
+    const timer = setTimeout(() => {
+      setFalsch(r.text)
+      if (r.status === 'no') {
+        tracking.onCheck(false)
+        onResult(false)
+      }
+    }, 1200)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eingabe, solved])
+
+  const newTask = () => {
+    tracking.onTaskStart()
+    onSolvedChange(false)
+    setSolved(false)
+    setEingabe('')
+    setFalsch('')
+    setShowSolution(false)
+    setTask(create())
+  }
+
+  const showSol = () => {
+    setShowSolution(true)
+    onHelp()
+    tracking.onHintShown()
+  }
+
+  const feld = (
+    <>
+      <div className="flex justify-center">
+        <GleichungEingabe
+          value={eingabe}
+          readOnly={solved}
+          onChange={(v) => {
+            setEingabe(v)
+            tracking.onInput()
+          }}
+          className={fieldCheckClass(solved ? true : falsch ? false : null)}
+        />
+      </div>
+      {solved && <p className="text-center font-bold mt-3 text-green-600">Richtig! Die Gleichung lautet <Eq>{eq(m, t)}</Eq>.</p>}
+      {!solved && falsch && <p className="text-center font-bold mt-3 text-red-600">{falsch}</p>}
+    </>
+  )
+
+  return { task, showSolution, newTask, showSol, feld }
+}
+
 function FullGraphTaskCard(props: CardProps) {
-  const { task, live, showSolution, newTask, showSol } = useInputTask(
+  const { task, showSolution, newTask, showSol, feld } = useGleichungTask(
     'Gleichung aus Graph (m und t)',
     newFullGraphTask,
-    (k) => [k.m, k.t],
+    (k) => k,
     props,
   )
   const { m, t } = task
@@ -971,7 +1053,7 @@ function FullGraphTaskCard(props: CardProps) {
       }
     >
       <p className="text-slate-700 mb-4">
-        Bestimme die Steigung m und den y-Achsenabschnitt t und damit die Gleichung <Eq>y = m · x + t</Eq>.
+        Bestimme die Steigung m und den y-Achsenabschnitt t und tippe die vollständige Gleichung <Eq>y = m · x + t</Eq> ein.
       </p>
       <Koordinatensystem
         lines={[{ m, t, color: BLUE }]}
@@ -985,7 +1067,7 @@ function FullGraphTaskCard(props: CardProps) {
         }
         className="w-full max-w-[380px] mb-4"
       />
-      <AnswerFields live={live} labels={['m =', 't =']} />
+      {feld}
     </TaskShell>
   )
 }
@@ -1105,10 +1187,10 @@ function rearrangeTex({ variant, m, t, k }: ReturnType<typeof newRearrangeTask>)
 }
 
 function RearrangeTaskCard(props: CardProps) {
-  const { task, live, showSolution, newTask, showSol } = useInputTask(
+  const { task, showSolution, newTask, showSol, feld } = useGleichungTask(
     'Gleichung umformen (m und t)',
     newRearrangeTask,
-    (k) => [k.m, k.t],
+    (k) => k,
     props,
   )
   const { m, t } = task
@@ -1133,12 +1215,12 @@ function RearrangeTaskCard(props: CardProps) {
       }
     >
       <p className="text-slate-700 mb-1">
-        Bringe die Gleichung in die Form <M math="y = m \cdot x + t" /> und gib m und t an.
+        Bringe die Gleichung in die Form <M math="y = m \cdot x + t" /> und tippe sie vollständig ein.
       </p>
       <div className="text-xl text-slate-800 my-2">
         <BlockMath math={question} />
       </div>
-      <AnswerFields live={live} labels={['m =', 't =']} />
+      {feld}
     </TaskShell>
   )
 }
@@ -1156,10 +1238,10 @@ function newTableTask() {
 }
 
 function TableTaskCard(props: CardProps) {
-  const { task, live, showSolution, newTask, showSol } = useInputTask(
+  const { task, showSolution, newTask, showSol, feld } = useGleichungTask(
     'm und t aus Wertetabelle',
     newTableTask,
-    (k) => [k.m, k.t],
+    (k) => k,
     props,
   )
   const { m, t, xs, ys } = task
@@ -1204,7 +1286,7 @@ function TableTaskCard(props: CardProps) {
       }
     >
       <p className="text-slate-700 mb-4">
-        Die Wertetabelle gehört zu einer linearen Funktion <M math="y = m \cdot x + t" />. Bestimme m und t.
+        Die Wertetabelle gehört zu einer linearen Funktion <M math="y = m \cdot x + t" />. Bestimme m und t und tippe die vollständige Gleichung ein.
       </p>
       <div className="overflow-x-auto mb-4">
         <table className="mx-auto border-collapse text-center whitespace-nowrap">
@@ -1224,7 +1306,7 @@ function TableTaskCard(props: CardProps) {
           </tbody>
         </table>
       </div>
-      <AnswerFields live={live} labels={['m =', 't =']} />
+      {feld}
     </TaskShell>
   )
 }

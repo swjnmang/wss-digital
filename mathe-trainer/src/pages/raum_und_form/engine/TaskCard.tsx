@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Check, X, RefreshCw, Lightbulb } from 'lucide-react';
 import Rich from './Rich';
 import { checkNum, type CheckResult, type Status } from './check';
-import type { ChoicePart, NumPart, Task } from './types';
+import type { ChoicePart, EquationPart, NumPart, Task } from './types';
+import GleichungEingabe from '../../../components/GleichungEingabe';
+import { fieldCheckClass } from '../../../utils/fieldCheck';
+import { checkLinearEquation } from '../../../utils/parseLinearEquation';
+import { checkQuadraticEquation } from '../../../utils/parseFunctionEquation';
 import { UNIT_GROUPS, type UnitId } from './util';
 
 const PRAISE = ['Super, richtig!', 'Klasse, das stimmt!', 'Sehr gut gemacht!', 'Perfekt!', 'Stark, richtig gelöst!', 'Genau so!'];
@@ -109,6 +113,70 @@ function NumField({ part, onStatus }: { part: NumPart; onStatus: (s: Status) => 
   );
 }
 
+function checkEquation(part: EquationPart, raw: string): CheckResult {
+  if (raw.trim() === '') return { status: 'empty' };
+  const [c = 0, b = 0, a = 0] = part.koeff;
+  const tol = part.tol ?? 0.01;
+  const r = part.koeff.length <= 2 ? checkLinearEquation(raw, b, c, tol) : checkQuadraticEquation(raw, { a, b, c }, part.form ?? 'beliebig', tol);
+  if (r.status === 'ok') return { status: 'correct' };
+  return { status: r.status === 'invalid' ? 'incomplete' : 'wrong', msg: r.text };
+}
+
+function EquationField({ part, onStatus }: { part: EquationPart; onStatus: (s: Status) => void }) {
+  const [raw, setRaw] = useState('');
+  const [shown, setShown] = useState<CheckResult>({ status: 'empty' });
+  const timer = useRef<number | undefined>(undefined);
+
+  const commit = (r = raw) => {
+    window.clearTimeout(timer.current);
+    const res = checkEquation(part, r);
+    setShown(res.status === 'correct' ? { ...res, msg: praise() } : res);
+    onStatus(res.status);
+  };
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  return (
+    <div className="space-y-1">
+      {part.q && (
+        <p className="text-left text-[15px] text-slate-700">
+          <Rich text={part.q} />
+        </p>
+      )}
+      <div className="flex flex-wrap items-start gap-2">
+        {part.label && (
+          <span className="min-w-[2.5rem] pt-3 text-[15px] font-medium text-slate-700">
+            <Rich text={part.label} />
+          </span>
+        )}
+        <GleichungEingabe
+          quadratisch={part.koeff.length > 2}
+          value={raw}
+          onChange={(v) => {
+            setRaw(v);
+            window.clearTimeout(timer.current);
+            if (shown.status !== 'empty') {
+              setShown({ status: 'empty' });
+              onStatus('empty');
+            }
+            // Gleichungen sind länger als Zahlen: etwas mehr Zeit bis zur Prüfung
+            timer.current = window.setTimeout(() => commit(v), 1500);
+          }}
+          onBlur={(v) => commit(v)}
+          onEnter={() => commit()}
+          placeholder={part.koeff.length > 2 ? 'z. B. f(x) = 2x² − 3x + 1' : 'z. B. y = 2x − 1'}
+          className={fieldCheckClass(shown.status === 'correct' ? true : shown.status === 'wrong' || shown.status === 'incomplete' ? false : null)}
+        />
+        {shown.status === 'correct' && <Check className="mt-3 h-6 w-6 text-emerald-600" aria-label="richtig" />}
+        {shown.status === 'wrong' && <X className="mt-3 h-6 w-6 text-rose-600" aria-label="falsch" />}
+      </div>
+      {shown.msg && (
+        <p className={`text-sm ${shown.status === 'correct' ? 'font-semibold text-emerald-700' : 'text-rose-700'}`}>{shown.msg}</p>
+      )}
+    </div>
+  );
+}
+
 function ChoiceField({ part, onStatus }: { part: ChoicePart; onStatus: (s: Status) => void }) {
   const [sel, setSel] = useState<number | null>(null);
   const [msg, setMsg] = useState('');
@@ -197,6 +265,8 @@ export default function TaskCard({ task, index, onStatus, onRefresh }: TaskCardP
         {task.parts.map((p, i) =>
           p.kind === 'num' ? (
             <NumField key={i} part={p} onStatus={(s) => onStatus(i, s)} />
+          ) : p.kind === 'equation' ? (
+            <EquationField key={i} part={p} onStatus={(s) => onStatus(i, s)} />
           ) : (
             <ChoiceField key={i} part={p} onStatus={(s) => onStatus(i, s)} />
           ),

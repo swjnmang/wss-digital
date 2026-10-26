@@ -3,6 +3,8 @@ import GeoGebraGraph from '../../components/GeoGebraGraph'
 import { parseFlexibleNumber } from '../../utils/parseFlexibleNumber'
 import { logTrackingEntry } from '../../utils/tracking'
 import TaskShell from '../../components/layout/TaskShell'
+import GleichungEingabe from '../../components/GleichungEingabe'
+import { checkLinearEquation, formatLinearEquation } from '../../utils/parseLinearEquation'
 
 type QuestionType = 'slope' | 'missing_coord' | 'equation_ps' | 'equation_2p' | 'zero' | 'intersection' | 'graph'
 type AnswerFormat = 'single_number' | 'point' | 'equation'
@@ -184,7 +186,7 @@ export default function Test() {
     } else if (q.answerFormat === 'point') {
       setInputState(s => ({ ...s, [current]: { xVal: '', yVal: '', isNone: false } }))
     } else if (q.answerFormat === 'equation') {
-      setInputState(s => ({ ...s, [current]: { mVal: '', tVal: '' } }))
+      setInputState(s => ({ ...s, [current]: { eqVal: '' } }))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current])
@@ -242,10 +244,7 @@ export default function Test() {
         if (isNaN(x) || isNaN(y)) return false
         return Math.abs(x - Number(q.answer.x)) < 0.01 && Math.abs(y - Number(q.answer.y)) < 0.01
       } else if (q.answerFormat === 'equation') {
-        const m = parseFlexibleNumber(user.m)
-        const t = parseFlexibleNumber(user.t)
-        if (isNaN(m) || isNaN(t)) return false
-        return Math.abs(m - Number(q.answer.m)) < 0.01 && Math.abs(t - Number(q.answer.t)) < 0.01
+        return checkLinearEquation(user.eq || '', Number(q.answer.m), Number(q.answer.t), 0.01).status === 'ok'
       }
     } catch (e) {
       console.error('Error in isCorrect:', e)
@@ -300,10 +299,10 @@ export default function Test() {
               <div key={i} className="result-item border-b pb-3 mb-3">
                 <div className="result-question font-bold">{q.text}</div>
                 <div className={isCorrect(q, userAnswers[i]) ? 'user-answer correct text-green-600 font-semibold' : 'user-answer incorrect text-red-600 font-semibold'}>
-                  Deine Antwort: {q.answerFormat === 'single_number' ? userAnswers[i]?.val : q.answerFormat === 'point' ? (userAnswers[i]?.isNone ? 'Kein Schnittpunkt' : `S(${userAnswers[i]?.x}|${userAnswers[i]?.y})`) : q.answerFormat === 'equation' ? `y = ${userAnswers[i]?.m}x + ${userAnswers[i]?.t}` : ''}
+                  Deine Antwort: {q.answerFormat === 'single_number' ? userAnswers[i]?.val : q.answerFormat === 'point' ? (userAnswers[i]?.isNone ? 'Kein Schnittpunkt' : `S(${userAnswers[i]?.x}|${userAnswers[i]?.y})`) : q.answerFormat === 'equation' ? (userAnswers[i]?.eq || '–') : ''}
                 </div>
                 {!isCorrect(q, userAnswers[i]) && (
-                  <div className="correct-answer">Richtig: {q.answerFormat === 'single_number' ? q.answer.val : q.answerFormat === 'point' ? (q.answer === 'none' ? 'Kein Schnittpunkt' : `S(${q.answer.x}|${q.answer.y})`) : q.answerFormat === 'equation' ? `y = ${q.answer.m}x + ${q.answer.t}` : ''}</div>
+                  <div className="correct-answer">Richtig: {q.answerFormat === 'single_number' ? q.answer.val : q.answerFormat === 'point' ? (q.answer === 'none' ? 'Kein Schnittpunkt' : `S(${q.answer.x}|${q.answer.y})`) : q.answerFormat === 'equation' ? formatLinearEquation(Number(q.answer.m), Number(q.answer.t)) : ''}</div>
                 )}
               </div>
             ))}
@@ -345,8 +344,7 @@ export default function Test() {
       ans.y = (state.yVal || '').replace(',', '.').replace(/[−–—‐]/g, '-')
       ans.isNone = !!state.isNone
     } else if (q.answerFormat === 'equation') {
-      ans.m = (state.mVal || '').replace(',', '.').replace(/[−–—‐]/g, '-')
-      ans.t = (state.tVal || '').replace(',', '.').replace(/[−–—‐]/g, '-')
+      ans.eq = state.eqVal || ''
     }
     handleAnswer(ans)
     // Nachverfolgung: Der Test gibt kein Feedback und keine Hilfe -> pro Frage sofort ein Eintrag
@@ -397,11 +395,8 @@ export default function Test() {
           </div>
         )}
         {q.answerFormat === 'equation' && (
-          <div className="flex items-center gap-3 mb-4 text-2xl font-display font-bold">
-            <span>y =</span>
-            <input type="text" className="bk-input w-16 text-center" value={inputState[current]?.mVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('mVal', e.target.value)} placeholder="m" />
-            <span>x +</span>
-            <input type="text" className="bk-input w-16 text-center" value={inputState[current]?.tVal || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('tVal', e.target.value)} placeholder="t" />
+          <div className="mb-4">
+            <GleichungEingabe key={current} value={inputState[current]?.eqVal || ''} onChange={(v) => handleInputChange('eqVal', v)} />
           </div>
         )}
         <button className="bk-btn bk-btn-primary" onClick={handleNext}>Nächste Frage</button>

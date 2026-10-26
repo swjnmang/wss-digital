@@ -7,6 +7,8 @@ import { roundHalfAwayFromZero } from '../../utils/numbers'
 import { HelpUsage, logTrackingEntry } from '../../utils/tracking'
 import { useFlushOnLeave } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
+import GleichungEingabe from '../../components/GleichungEingabe'
+import { checkLinearEquation } from '../../utils/parseLinearEquation'
 
 // MathJax-Komponente
 const MathDisplay = ({ latex }: { latex: string }) => {
@@ -149,7 +151,7 @@ const aufgabenBanks = {
     return {
       typ: 'ablesen',
       thema: '2. Funktionsgleichung ablesen',
-      frage: `Wie lautet die Funktionsgleichung des abgebildeten Funktionsgraphen? Lies m und t aus dem Graphen ab.`,
+      frage: `Wie lautet die Funktionsgleichung des abgebildeten Funktionsgraphen? Lies m und t aus dem Graphen ab und tippe die vollständige Gleichung ein.`,
       isGraph: true,
       m,
       t,
@@ -195,7 +197,7 @@ const aufgabenBanks = {
     return {
       typ: 'funktionsgleichung',
       thema: '4. Funktionsgleichung aufstellen',
-      frage: `Wie lautet die Funktionsgleichung der Geraden, die durch die Punkte P₁(${x1}|${y1}), P₂(${x2}|${y2}) verläuft? Berechne!`,
+      frage: `Wie lautet die Funktionsgleichung der Geraden, die durch die Punkte P₁(${x1}|${y1}), P₂(${x2}|${y2}) verläuft? Berechne und tippe die vollständige Gleichung ein!`,
       antwort: `${mRound};${tRound}`,
       lösungsweg: `Schritt 1: Steigung m berechnen\n$$m = \\dfrac{${y2} - (${y1})}{${x2} - (${x1})} = \\dfrac{${y2 - y1}}{${x2 - x1}} = ${mRound}$$\nSchritt 2: m und einen Punkt, z.B. P₁(${x1}|${y1}), in die allgemeine Form y = mx + t einsetzen\n$$${y1} = ${mRound} \\cdot (${x1}) + t$$\nSchritt 3: Gleichung nach t auflösen\n$$t = ${y1} - ${mRound} \\cdot (${x1}) = ${tRound}$$\nLösung: Funktionsgleichung\n$$y = ${mRound}x ${tRound >= 0 ? '+' : '-'} ${Math.abs(tRound)}$$`
     }
@@ -347,11 +349,12 @@ interface Aufgabe {
 
 export default function GemischteAufgaben() {
   const [aufgaben, setAufgaben] = useState<Aufgabe[]>([])
-  const [antworten, setAntworten] = useState<{ [key: number]: { m?: string; t?: string; x?: string; y?: string; value?: string; [key: number]: any } }>({})
+  const [antworten, setAntworten] = useState<{ [key: number]: { m?: string; t?: string; x?: string; y?: string; value?: string; gleichung?: string; [key: number]: any } }>({})
   const [validiert, setValidiert] = useState<{ [key: number]: boolean }>({})
   const [showLösung, setShowLösung] = useState<{ [key: number]: boolean }>({})
   const [validierteZellen, setValidierteZellen] = useState<{ [key: number | string]: { [key: string]: boolean } }>({})
   const [fieldFeedback, setFieldFeedback] = useState<{ [key: number]: { [field: string]: 'correct' | 'incorrect' } }>({})
+  const [gleichungHinweis, setGleichungHinweis] = useState<{ [key: number]: string }>({})
   useEffect(() => {
 
     const mathjaxScript = document.createElement('script')
@@ -426,13 +429,7 @@ export default function GemischteAufgaben() {
       const correctCount = Object.values(cellsForThisTask).filter(Boolean).length
       return correctCount >= 2
     } else if (aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen') {
-      const m = parseFloat((inputData.m || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
-      const t = parseFloat((inputData.t || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
-      if (isNaN(m) || isNaN(t)) return false
-      const expectedParts = (aufgabe.antwort as string).split(';').map(p => parseFloat(p.trim()))
-      const toleranzM = Math.max(Math.abs(expectedParts[0]) * 0.01, 0.02)
-      const toleranzT = Math.max(Math.abs(expectedParts[1]) * 0.01, 0.02)
-      return Math.abs(m - expectedParts[0]) <= toleranzM && Math.abs(t - expectedParts[1]) <= toleranzT
+      return gleichungPruefung(aufgabe, inputData.gleichung || '').status === 'ok'
     } else if (aufgabe.typ === 'schnittpunkt') {
       const x = parseFloat((inputData.x || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
       const y = parseFloat((inputData.y || '').replace(',', '.').replace(/[−–—‐]/g, '-'))
@@ -469,7 +466,24 @@ export default function GemischteAufgaben() {
     }
   }
 
+  // Eingetippte Funktionsgleichung (Aufgaben „ablesen“ und „funktionsgleichung“)
+  function gleichungPruefung(aufgabe: Aufgabe, eingabe: string) {
+    const [m, t] = (aufgabe.antwort as string).split(';').map(p => parseFloat(p.trim()))
+    return checkLinearEquation(eingabe, m, t, Math.max(Math.abs(m) * 0.01, Math.abs(t) * 0.01, 0.02))
+  }
+
   function checkAnswer(index: number) {
+    const aufgabe = aufgaben[index]
+    if (aufgabe && (aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen')) {
+      const r = gleichungPruefung(aufgabe, antworten[index]?.gleichung || '')
+      setGleichungHinweis({ ...gleichungHinweis, [index]: r.text })
+      setFieldFeedback(prev => ({ ...prev, [index]: { gleichung: r.status === 'ok' ? 'correct' : 'incorrect' } }))
+      // Eingabefehler (z. B. fehlendes „y =“): Hinweis, aber kein Prüfversuch
+      if (r.status === 'invalid') {
+        setValidiert({ ...validiert, [index]: false })
+        return
+      }
+    }
     const isCorrect = validateAnswer(index, antworten[index] || {})
     setValidiert({ ...validiert, [index]: isCorrect })
 
@@ -539,15 +553,16 @@ export default function GemischteAufgaben() {
     return state === 'correct' ? styles.correct : state === 'incorrect' ? styles.incorrect : ''
   }
 
-  function handleMtChange(index: number, field: 'm' | 't', value: string) {
+  function handleGleichungChange(index: number, value: string) {
     setAntworten({
       ...antworten,
       [index]: {
         ...antworten[index],
-        [field]: value
+        gleichung: value
       }
     })
-    updateFieldFeedback(index, field, value)
+    setFieldFeedback(prev => ({ ...prev, [index]: {} }))
+    setGleichungHinweis({ ...gleichungHinweis, [index]: '' })
   }
 
   function handleValueChange(index: number, value: string) {
@@ -640,37 +655,16 @@ export default function GemischteAufgaben() {
                   </div>
                 )}
 
-                {/* M und T Eingabe mit Live-Anzeige */}
+                {/* Vollständige Funktionsgleichung */}
                 {(aufgabe.typ === 'funktionsgleichung' || aufgabe.typ === 'ablesen') && (
                   <div className={styles.mtSection}>
-                    <div className={styles.mtInputs}>
-                      <div className={styles.mtGroup}>
-                        <label>m =</label>
-                        <input
-                          type="text"
-                          placeholder="z.B. 2"
-                          value={antworten[index]?.m || ''}
-                          onChange={(e) => handleMtChange(index, 'm', e.target.value)}
-                          className={`${styles.mtInput} ${fieldClass(index, 'm')}`}
-                        />
-                      </div>
-                      <div className={styles.mtGroup}>
-                        <label>t =</label>
-                        <input
-                          type="text"
-                          placeholder="z.B. -3"
-                          value={antworten[index]?.t || ''}
-                          onChange={(e) => handleMtChange(index, 't', e.target.value)}
-                          className={`${styles.mtInput} ${fieldClass(index, 't')}`}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Live-Anzeige */}
-                    {antworten[index]?.m && antworten[index]?.t && (
-                      <div className={styles.livePreview}>
-                        <MathDisplay latex={`$$y = ${antworten[index]?.m}x ${parseFloat(antworten[index]?.t || '0') >= 0 ? '+' : ''} ${antworten[index]?.t}$$`} />
-                      </div>
+                    <GleichungEingabe
+                      value={antworten[index]?.gleichung || ''}
+                      onChange={(v) => handleGleichungChange(index, v)}
+                      className={fieldClass(index, 'gleichung')}
+                    />
+                    {gleichungHinweis[index] && fieldFeedback[index]?.gleichung === 'incorrect' && (
+                      <p style={{ color: 'var(--wrong-ink)', marginTop: 8, fontWeight: 600 }}>{gleichungHinweis[index]}</p>
                     )}
                   </div>
                 )}

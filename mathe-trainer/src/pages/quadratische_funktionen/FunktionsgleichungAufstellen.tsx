@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { BlockMath, InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import TaskShell from '../../components/layout/TaskShell'
 import { VideoEmbed } from '../../components/VideoButton'
+import GleichungEingabe from '../../components/GleichungEingabe';
+import { fieldCheckClass } from '../../utils/fieldCheck';
+import { checkQuadraticEquation } from '../../utils/parseFunctionEquation';
 
 // Typ 1: Scheitelpunkt S(h|k) und ein weiterer Punkt P gegeben
 type ScheitelAufgabe = { typ: 'scheitel'; a: number; b: number; c: number; h: number; k: number; px: number; py: number };
@@ -12,9 +15,8 @@ type Bekannt = 'a' | 'b' | 'c';
 type PunkteAufgabe = { typ: 'punkte'; bekannt: Bekannt; a: number; b: number; c: number; x1: number; y1: number; x2: number; y2: number };
 type Aufgabe = ScheitelAufgabe | PunkteAufgabe;
 
-type Eingabe = { a: string; b: string; c: string };
-type Feld = keyof Eingabe;
-type Status = 'leer' | 'richtig' | 'vorzeichen' | 'falsch';
+/** Die vollständig eingetippte allgemeine Form, z. B. „y = 2x² − 4x + 3“ */
+type Eingabe = string;
 type Schritt = { text: string; formeln: string[] };
 
 const ANZAHL_AUFGABEN = 5;
@@ -112,27 +114,9 @@ const erzeugeAufgaben = (modus: Modus): Aufgabe[] => {
     });
 };
 
-const leereEingaben = (): Eingabe[] => Array.from({ length: ANZAHL_AUFGABEN }, () => ({ a: '', b: '', c: '' }));
+const leereEingaben = (): Eingabe[] => Array.from({ length: ANZAHL_AUFGABEN }, () => '');
 
-const parseZahl = (s: string) => {
-    const t = s.trim().replace(/\s+/g, '').replace(/[−–—‐]/g, '-').replace(',', '.').replace(/^\+/, '');
-    return t === '' ? NaN : Number(t);
-};
-
-const bewerte = (eingabe: string, korrekt: number): Status => {
-    const wert = parseZahl(eingabe);
-    if (Number.isNaN(wert)) return 'leer';
-    if (Math.abs(wert - korrekt) < 1e-9) return 'richtig';
-    if (korrekt !== 0 && Math.abs(wert + korrekt) < 1e-9) return 'vorzeichen';
-    return 'falsch';
-};
-
-const farbKlasse = (status: Status) =>
-    status === 'richtig'
-        ? 'border-green-500 bg-green-50 text-green-800 focus:ring-green-500 focus:border-green-500'
-        : status === 'leer'
-          ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-          : 'border-red-500 bg-red-50 text-red-800 focus:ring-red-500 focus:border-red-500';
+const pruefeGleichung = (eingabe: string, t: Aufgabe) => checkQuadraticEquation(eingabe, { a: t.a, b: t.b, c: t.c }, 'allgemein', 1e-6);
 
 // ---------- Lösungsschritte ----------
 const schritteScheitel = (t: ScheitelAufgabe): Schritt[] => {
@@ -540,10 +524,14 @@ const FunktionsgleichungAufstellen = () => {
     const [aufgaben, setAufgaben] = useState<Aufgabe[]>([]);
     const [eingaben, setEingaben] = useState<Eingabe[]>(leereEingaben());
     const [tippSchritte, setTippSchritte] = useState<number[]>(Array(ANZAHL_AUFGABEN).fill(0));
+    // Eingabe, die nach einer Tipp-Pause bewertet wurde: Erst dann wird eine falsche Gleichung rot
+    const [bewertet, setBewertet] = useState<Eingabe[]>(leereEingaben());
+    const timer = useRef<Record<number, number>>({});
 
     const neueAufgaben = (m: Modus = modus) => {
         setAufgaben(erzeugeAufgaben(m));
         setEingaben(leereEingaben());
+        setBewertet(leereEingaben());
         setTippSchritte(Array(ANZAHL_AUFGABEN).fill(0));
     };
 
@@ -557,8 +545,24 @@ const FunktionsgleichungAufstellen = () => {
         neueAufgaben(m);
     };
 
-    const setEingabe = (i: number, feld: Feld, wert: string) => {
-        setEingaben(prev => prev.map((e, idx) => (idx === i ? { ...e, [feld]: wert } : e)));
+    const setEingabe = (i: number, wert: string) => {
+        setEingaben(prev => prev.map((e, idx) => (idx === i ? wert : e)));
+        window.clearTimeout(timer.current[i]);
+        timer.current[i] = window.setTimeout(() => bewerte(i, wert), 1200);
+    };
+
+    const bewerte = (i: number, wert: string) => {
+        window.clearTimeout(timer.current[i]);
+        setBewertet(prev => prev.map((e, idx) => (idx === i ? wert : e)));
+    };
+
+    /** richtig sofort, falsch erst nach der Tipp-Pause (bzw. beim Verlassen des Feldes) */
+    const zustand = (i: number): { richtig: boolean; fehler: string } => {
+        const e = eingaben[i] ?? '';
+        if (!aufgaben[i] || e.trim() === '') return { richtig: false, fehler: '' };
+        const r = pruefeGleichung(e, aufgaben[i]);
+        if (r.status === 'ok') return { richtig: true, fehler: '' };
+        return { richtig: false, fehler: bewertet[i] === e ? r.text : '' };
     };
 
     const setTipp = (i: number, wert: number) => {
@@ -628,15 +632,15 @@ const FunktionsgleichungAufstellen = () => {
 
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">Deine Aufgaben</h2>
                 <p className="text-gray-600 mb-6">
-                    Bestimme jeweils die Funktionsgleichung in allgemeiner Form <InlineMath math="y = ax^2 + bx + c" />. Rechne zuerst im Heft und trage
-                    dann a, b und c ein. Richtige Werte werden sofort grün, falsche rot. Wenn du nicht weiterkommst, zeigt dir „Tipp anzeigen“ den
+                    Bestimme jeweils die Funktionsgleichung in allgemeiner Form <InlineMath math="y = ax^2 + bx + c" />. Rechne zuerst im Heft und tippe
+                    dann die vollständige Gleichung ein, z. B. y = 2x² − 4x + 3. Eine richtige Gleichung wird sofort grün, eine falsche nach kurzer Pause rot. Wenn du nicht weiterkommst, zeigt dir „Tipp anzeigen“ den
                     Lösungsweg Schritt für Schritt.
                 </p>
 
                 <div className="flex flex-col gap-6">
                     {aufgaben.map((t, i) => {
                         const anzahlSchritte = schritte(t).length;
-                        const alleRichtig = (['a', 'b', 'c'] as const).every(f => bewerte(eingaben[i]?.[f] ?? '', t[f]) === 'richtig');
+                        const { richtig: alleRichtig, fehler } = zustand(i);
                         return (
                             <div key={i} className="border border-gray-200 rounded-lg p-4">
                                 <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-md mb-4 text-gray-800">
@@ -644,30 +648,18 @@ const FunktionsgleichungAufstellen = () => {
                                     <AufgabenText t={t} />
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
-                                    {(['a', 'b', 'c'] as const).map(feld => {
-                                        const status = bewerte(eingaben[i]?.[feld] ?? '', t[feld]);
-                                        return (
-                                            <div key={feld}>
-                                                <div className="flex items-center space-x-2">
-                                                    <label htmlFor={`${feld}-${i}`} className="text-lg font-medium text-gray-600 whitespace-nowrap">
-                                                        {feld} =
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        inputMode="decimal"
-                                                        id={`${feld}-${i}`}
-                                                        value={eingaben[i]?.[feld] ?? ''}
-                                                        onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEingabe(i, feld, ev.target.value)}
-                                                        className={`block w-full p-2 border-2 rounded-md shadow-sm ${farbKlasse(status)}`}
-                                                    />
-                                                </div>
-                                                {status === 'vorzeichen' && (
-                                                    <p className="mt-1 text-sm text-red-600 font-semibold">Fast! Nur das Vorzeichen ist falsch.</p>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                <div className="mb-2">
+                                    <GleichungEingabe
+                                        quadratisch
+                                        id={`gl-${i}`}
+                                        value={eingaben[i] ?? ''}
+                                        onChange={v => setEingabe(i, v)}
+                                        onBlur={v => bewerte(i, v)}
+                                        placeholder="z. B. y = 2x² − 4x + 3"
+                                        ariaLabel="Funktionsgleichung in allgemeiner Form"
+                                        className={fieldCheckClass(alleRichtig ? true : fehler ? false : null)}
+                                    />
+                                    {fehler && <p className="mt-1 text-sm text-red-600 font-semibold">{fehler}</p>}
                                 </div>
 
                                 {alleRichtig && (

@@ -1,7 +1,7 @@
 // Hilfsfunktionen für den Bereich „Vorbereitung FOS/BOS“:
 // exakte Brüche, Terme als KaTeX und Auswahl-/Zahl-Teilaufgaben.
 
-import type { ChoicePart, NumPart } from '../raum_und_form/engine/types';
+import type { ChoicePart, EquationPart, NumPart } from '../raum_und_form/engine/types';
 import { pick, round, shuffle, tx } from '../raum_und_form/engine/util';
 
 export { pick, ri, rs, round, shuffle, tx, de } from '../raum_und_form/engine/util';
@@ -160,6 +160,11 @@ export const setTex = (xs: (number | string)[]) =>
 /** Zahl-Eingabe ohne Einheit */
 export function nm(label: string, value: number | Fr, opts: Partial<NumPart> = {}): NumPart {
   return { kind: 'num', label, value: value instanceof Fr ? value.v : value, unit: null, ...opts };
+}
+
+/** Vollständig eingetippte Funktionsgleichung; koeff = [c, b, a] bzw. [t, m] (Index = Potenz von x) */
+export function gl(koeff: (number | Fr)[], opts: Partial<EquationPart> = {}): EquationPart {
+  return { kind: 'equation', koeff: koeff.map((k) => (k instanceof Fr ? k.v : k)), ...opts };
 }
 
 /** Auswahl; die erste Option ist richtig. Doppelte Distraktoren werden entfernt. */

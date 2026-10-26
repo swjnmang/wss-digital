@@ -13,8 +13,13 @@ export interface Teil {
   vorher?: string[]
   text: string[]
   felder: Feld[]
+  /** Funktionsgleichung, die als Ganzes eingetippt wird (statt einzelner Felder für m, t bzw. a, b, c) */
+  gleichung?: GesuchteGleichung
   loesung: string[]
 }
+
+/** name: Beschriftung vor dem Feld (KaTeX), z. B. „$p\\colon$“ */
+export type GesuchteGleichung = { name: string } & ({ m: number; t: number } | { a: number; b: number; c: number })
 
 export interface Anwendung {
   slug: string
@@ -37,14 +42,16 @@ export const ANWENDUNGEN: Anwendung[] = [
       {
         nr: '2.1', punkte: 4,
         text: ['Ermitteln Sie die Funktionsgleichung der Flugparabel p durch $A\\,(0 \\mid 2)$, $B\\,(10 \\mid 5{,}5)$ und $C\\,(20 \\mid 7)$.', '(Ergebnis: $p\\colon y = -0{,}01x^2 + 0{,}45x + 2$)'],
-        felder: [{ label: '$a =$', answer: -0.01 }, { label: '$b =$', answer: 0.45 }, { label: '$c =$', answer: 2 }],
+        felder: [],
+        gleichung: { name: '$p\\colon$', a: -0.01, b: 0.45, c: 2 },
         loesung: ['Aus $A\\,(0 \\mid 2)$ folgt $c = 2$, also $y = a \\cdot x^2 + b \\cdot x + 2$.', '$$\\begin{aligned} \\text{I}\\colon\\; 5{,}5 &= a \\cdot 10^2 + b \\cdot 10 + 2 &&\\Rightarrow\\; 100a + 10b = 3{,}5 \\\\ \\text{II}\\colon\\; 7 &= a \\cdot 20^2 + b \\cdot 20 + 2 &&\\Rightarrow\\; 400a + 20b = 5 \\end{aligned}', '$$\\text{II} - 2 \\cdot \\text{I}\\colon\\; 200a = -2 \\;\\Rightarrow\\; a = -0{,}01', '$a$ in I: $\\;-1 + 10b = 3{,}5 \\;\\Rightarrow\\; b = 0{,}45$', '$$p\\colon y = -0{,}01x^2 + 0{,}45x + 2'],
       },
       {
         nr: '2.2', punkte: 3,
         vorher: ['Der Hang wird durch die Gerade h beschrieben, die durch die Punkte $D\\,(12 \\mid 0)$ und $E\\,(28 \\mid 2{,}4)$ verläuft.'],
         text: ['Bestimmen Sie die Funktionsgleichung des Hanges h.', '(Ergebnis: $h\\colon y = 0{,}15x - 1{,}8$)'],
-        felder: [{ label: '$m =$', answer: 0.15 }, { label: '$t =$', answer: -1.8 }],
+        felder: [],
+        gleichung: { name: '$h\\colon$', m: 0.15, t: -1.8 },
         loesung: ['$$m = \\frac{y_2 - y_1}{x_2 - x_1} = \\frac{2{,}4 - 0}{28 - 12} = \\frac{2{,}4}{16} = 0{,}15', '$D$ einsetzen in $y = m \\cdot x + t$: $\\;0 = 0{,}15 \\cdot 12 + t \\;\\Rightarrow\\; t = -1{,}8$', '$$h\\colon y = 0{,}15x - 1{,}8'],
       },
       {
@@ -75,7 +82,8 @@ export const ANWENDUNGEN: Anwendung[] = [
       {
         nr: '2.1', punkte: 3,
         text: ['Ermitteln Sie die Funktionsgleichung der Flugparabel $p_1$.', '(Ergebnis: $p_1\\colon y = -0{,}25x^2 + 1{,}6x + 2{,}5$)'],
-        felder: [{ label: '$b =$', answer: 1.6 }, { label: '$c =$', answer: 2.5 }],
+        felder: [],
+        gleichung: { name: '$p_1\\colon$', a: -0.25, b: 1.6, c: 2.5 },
         loesung: ['Aus $A\\,(0 \\mid 2{,}5)$ folgt $c = 2{,}5$: $\\;y = -0{,}25x^2 + b \\cdot x + 2{,}5$', '$B\\,(2 \\mid 4{,}7)$ einsetzen:', '$$\\begin{aligned} 4{,}7 &= -0{,}25 \\cdot 2^2 + b \\cdot 2 + 2{,}5 \\\\ 4{,}7 &= -1 + 2b + 2{,}5 \\quad &&| -1{,}5 \\\\ 3{,}2 &= 2b &&| :2 \\\\ b &= 1{,}6 \\end{aligned}', '$$p_1\\colon y = -0{,}25x^2 + 1{,}6x + 2{,}5'],
       },
       {
@@ -95,7 +103,8 @@ export const ANWENDUNGEN: Anwendung[] = [
         nr: '2.4', punkte: 3,
         vorher: ['Damit der Ball nach einem Treffer zurückspringt, stellt Jonas eine Sitzbank g schräg an die Wand.'],
         text: ['Ermitteln Sie die Funktionsgleichung der Bank g durch die Punkte $P\\,(5 \\mid 0)$ und $Q\\,(7 \\mid 1{,}6)$.', '(Ergebnis: $g\\colon y = 0{,}8x - 4$)'],
-        felder: [{ label: '$m =$', answer: 0.8 }, { label: '$t =$', answer: -4 }],
+        felder: [],
+        gleichung: { name: '$g\\colon$', m: 0.8, t: -4 },
         loesung: ['$$m = \\frac{1{,}6 - 0}{7 - 5} = 0{,}8', '$P$ einsetzen: $\\;0 = 0{,}8 \\cdot 5 + t \\;\\Rightarrow\\; t = -4$', '$$g\\colon y = 0{,}8x - 4'],
       },
       {
@@ -122,7 +131,8 @@ export const ANWENDUNGEN: Anwendung[] = [
         nr: '2.1', punkte: 3,
         vorher: ['Die rechte Dachseite $d_1$ verläuft durch die Punkte $A\\,(16 \\mid 4)$ und $B\\,(14 \\mid 6{,}4)$.'],
         text: ['Ermitteln Sie die Funktionsgleichung der Geraden $d_1$.', '(Ergebnis: $d_1\\colon y = -1{,}2x + 23{,}2$)'],
-        felder: [{ label: '$m =$', answer: -1.2 }, { label: '$t =$', answer: 23.2 }],
+        felder: [],
+        gleichung: { name: '$d_1\\colon$', m: -1.2, t: 23.2 },
         loesung: ['Zweipunkteform:', '$$\\frac{y - 4}{x - 16} = \\frac{6{,}4 - 4}{14 - 16} = \\frac{2{,}4}{-2} = -1{,}2', '$$y - 4 = -1{,}2 \\cdot (x - 16) \\;\\Rightarrow\\; y = -1{,}2x + 23{,}2'],
       },
       {
@@ -136,7 +146,8 @@ export const ANWENDUNGEN: Anwendung[] = [
         nr: '2.3', punkte: 4,
         vorher: ['Der Wasserstrahl p verläuft durch den Punkt $W\\,(4 \\mid 6{,}92)$ und erreicht im Punkt $S\\,(7 \\mid 8)$ seinen höchsten Punkt.'],
         text: ['Bestimmen Sie die allgemeine Form der Funktionsgleichung des Wasserstrahls p.', '(Ergebnis: $p\\colon y = -0{,}12x^2 + 1{,}68x + 2{,}12$)'],
-        felder: [{ label: '$a =$', answer: -0.12 }, { label: '$b =$', answer: 1.68 }, { label: '$c =$', answer: 2.12 }],
+        felder: [],
+        gleichung: { name: '$p\\colon$', a: -0.12, b: 1.68, c: 2.12 },
         loesung: ['Scheitelform mit $S\\,(7 \\mid 8)$: $\\;y = a \\cdot (x - 7)^2 + 8$', '$W$ einsetzen:', '$$\\begin{aligned} 6{,}92 &= a \\cdot (4 - 7)^2 + 8 \\quad &&| -8 \\\\ -1{,}08 &= 9a &&| :9 \\\\ a &= -0{,}12 \\end{aligned}', '$$\\begin{aligned} y &= -0{,}12 \\cdot (x - 7)^2 + 8 \\\\ &= -0{,}12 \\cdot (x^2 - 14x + 49) + 8 \\\\ &= -0{,}12x^2 + 1{,}68x + 2{,}12 \\end{aligned}'],
       },
       {
@@ -162,7 +173,8 @@ export const ANWENDUNGEN: Anwendung[] = [
       {
         nr: '2.1', punkte: 4,
         text: ['Das mittlere Parabelstück $p_2$ verläuft durch $C\\,(2 \\mid 5{,}2)$ und $D\\,(4 \\mid 3{,}2)$ und hat den Formfaktor $a = 0{,}1$. Bestimmen Sie seine Funktionsgleichung.', '(Ergebnis: $p_2\\colon y = 0{,}1x^2 - 1{,}6x + 8$)'],
-        felder: [{ label: '$b =$', answer: -1.6 }, { label: '$c =$', answer: 8 }],
+        felder: [],
+        gleichung: { name: '$p_2\\colon$', a: 0.1, b: -1.6, c: 8 },
         loesung: ['$$\\begin{aligned} \\text{I}\\colon\\; 5{,}2 &= 0{,}1 \\cdot 2^2 + 2b + c &&\\Rightarrow\\; 2b + c = 4{,}8 \\\\ \\text{II}\\colon\\; 3{,}2 &= 0{,}1 \\cdot 4^2 + 4b + c &&\\Rightarrow\\; 4b + c = 1{,}6 \\end{aligned}', '$$\\text{II} - \\text{I}\\colon\\; 2b = -3{,}2 \\;\\Rightarrow\\; b = -1{,}6', '$b$ in I: $\\;-3{,}2 + c = 4{,}8 \\;\\Rightarrow\\; c = 8$', '$$p_2\\colon y = 0{,}1x^2 - 1{,}6x + 8'],
       },
       {
@@ -189,7 +201,8 @@ export const ANWENDUNGEN: Anwendung[] = [
         nr: '2.5', punkte: 3,
         vorher: ['Vom Punkt $G\\,(16 \\mid -6)$ am Fluss führt ein geradliniger Weg g zum Auflager $B\\,(24 \\mid 0)$, auf dem Kajakfahrer ihr Boot nach oben tragen.'],
         text: ['Bestimmen Sie die Funktionsgleichung des Bootsausstiegs g.'],
-        felder: [{ label: '$m =$', answer: 0.75 }, { label: '$t =$', answer: -18 }],
+        felder: [],
+        gleichung: { name: '$g\\colon$', m: 0.75, t: -18 },
         loesung: ['$$m = \\frac{y_2 - y_1}{x_2 - x_1} = \\frac{0 - (-6)}{24 - 16} = \\frac{6}{8} = 0{,}75', '$B$ einsetzen: $\\;0 = 0{,}75 \\cdot 24 + t \\;\\Rightarrow\\; t = -18$', '$$g\\colon y = 0{,}75x - 18'],
       },
     ],
@@ -209,7 +222,8 @@ export const ANWENDUNGEN: Anwendung[] = [
         nr: '2.2', punkte: 4,
         vorher: ['Emres Flugbahn ist eine Parabel p durch die Punkte $D\\,(2 \\mid 2{,}45)$ und $E\\,(4 \\mid 1{,}85)$ mit dem Formfaktor $a = -0{,}25$.'],
         text: ['Bestimmen Sie die Funktionsgleichung der Flugparabel p.', '(Ergebnis: $p\\colon y = -0{,}25x^2 + 1{,}2x + 1{,}05$)'],
-        felder: [{ label: '$b =$', answer: 1.2 }, { label: '$c =$', answer: 1.05 }],
+        felder: [],
+        gleichung: { name: '$p\\colon$', a: -0.25, b: 1.2, c: 1.05 },
         loesung: ['$$\\begin{aligned} \\text{I}\\colon\\; 2{,}45 &= -0{,}25 \\cdot 2^2 + 2b + c &&\\Rightarrow\\; 2b + c = 3{,}45 \\\\ \\text{II}\\colon\\; 1{,}85 &= -0{,}25 \\cdot 4^2 + 4b + c &&\\Rightarrow\\; 4b + c = 5{,}85 \\end{aligned}', '$$\\text{II} - \\text{I}\\colon\\; 2b = 2{,}4 \\;\\Rightarrow\\; b = 1{,}2', '$b$ in I: $\\;2{,}4 + c = 3{,}45 \\;\\Rightarrow\\; c = 1{,}05$', '$$p\\colon y = -0{,}25x^2 + 1{,}2x + 1{,}05'],
       },
       {
@@ -242,7 +256,8 @@ export const ANWENDUNGEN: Anwendung[] = [
       {
         nr: '2.1', punkte: 3,
         text: ['Ermitteln Sie die Funktionsgleichung p des Tunnels in allgemeiner Form.', '(Ergebnis: $p\\colon y = -0{,}25x^2 + 3x - 2{,}75$)'],
-        felder: [{ label: '$a =$', answer: -0.25 }, { label: '$b =$', answer: 3 }, { label: '$c =$', answer: -2.75 }],
+        felder: [],
+        gleichung: { name: '$p\\colon$', a: -0.25, b: 3, c: -2.75 },
         loesung: ['Scheitelform: $\\;y = a \\cdot (x - 6)^2 + 6{,}25$; $\\;A$ einsetzen:', '$$\\begin{aligned} 2{,}25 &= a \\cdot (2 - 6)^2 + 6{,}25 \\quad &&| -6{,}25 \\\\ -4 &= 16a &&| :16 \\\\ a &= -0{,}25 \\end{aligned}', '$$y = -0{,}25 \\cdot (x^2 - 12x + 36) + 6{,}25 = -0{,}25x^2 + 3x - 2{,}75'],
       },
       {
@@ -256,7 +271,8 @@ export const ANWENDUNGEN: Anwendung[] = [
         nr: '2.3', punkte: 3,
         vorher: ['Eine geradlinige Rolltreppe g durch die Punkte $B\\,(-3 \\mid 2)$ und $C\\,(10 \\mid 8{,}5)$ führt zur Besucherplattform.'],
         text: ['Berechnen Sie die Funktionsgleichung der Rolltreppe g.', '(Ergebnis: $g\\colon y = 0{,}5x + 3{,}5$)'],
-        felder: [{ label: '$m =$', answer: 0.5 }, { label: '$t =$', answer: 3.5 }],
+        felder: [],
+        gleichung: { name: '$g\\colon$', m: 0.5, t: 3.5 },
         loesung: ['$$m = \\frac{8{,}5 - 2}{10 - (-3)} = \\frac{6{,}5}{13} = 0{,}5', '$C$ einsetzen: $\\;8{,}5 = 0{,}5 \\cdot 10 + t \\;\\Rightarrow\\; t = 3{,}5$', '$$g\\colon y = 0{,}5x + 3{,}5'],
       },
       {
@@ -282,7 +298,8 @@ export const ANWENDUNGEN: Anwendung[] = [
       {
         nr: '2.1', punkte: 4,
         text: ['Ermitteln Sie die Funktionsgleichung der Flugparabel p durch $B\\,(2 \\mid 1{,}8)$ und $C\\,(8 \\mid 1{,}2)$ mit dem Formfaktor $a = -0{,}1$.', '(Ergebnis: $p\\colon y = -0{,}1x^2 + 0{,}9x + 0{,}4$)'],
-        felder: [{ label: '$b =$', answer: 0.9 }, { label: '$c =$', answer: 0.4 }],
+        felder: [],
+        gleichung: { name: '$p\\colon$', a: -0.1, b: 0.9, c: 0.4 },
         loesung: ['$$\\begin{aligned} \\text{I}\\colon\\; 1{,}8 &= -0{,}1 \\cdot 2^2 + 2b + c &&\\Rightarrow\\; 2b + c = 2{,}2 \\\\ \\text{II}\\colon\\; 1{,}2 &= -0{,}1 \\cdot 8^2 + 8b + c &&\\Rightarrow\\; 8b + c = 7{,}6 \\end{aligned}', '$$\\text{II} - \\text{I}\\colon\\; 6b = 5{,}4 \\;\\Rightarrow\\; b = 0{,}9', '$b$ in I: $\\;1{,}8 + c = 2{,}2 \\;\\Rightarrow\\; c = 0{,}4$', '$$p\\colon y = -0{,}1x^2 + 0{,}9x + 0{,}4'],
       },
       {
@@ -302,7 +319,8 @@ export const ANWENDUNGEN: Anwendung[] = [
         nr: '2.4', punkte: 3,
         vorher: ['Das Brett verläuft durch die Punkte $M\\,(5 \\mid 0)$ und $N\\,(10 \\mid 4{,}5)$ und wird durch eine lineare Funktion g beschrieben.'],
         text: ['Bestimmen Sie rechnerisch die Funktionsgleichung der Geraden g.', '(Ergebnis: $g\\colon y = 0{,}9x - 4{,}5$)'],
-        felder: [{ label: '$m =$', answer: 0.9 }, { label: '$t =$', answer: -4.5 }],
+        felder: [],
+        gleichung: { name: '$g\\colon$', m: 0.9, t: -4.5 },
         loesung: ['$$m = \\frac{4{,}5 - 0}{10 - 5} = 0{,}9', '$M$ einsetzen: $\\;0 = 0{,}9 \\cdot 5 + t \\;\\Rightarrow\\; t = -4{,}5$', '$$g\\colon y = 0{,}9x - 4{,}5'],
       },
       {
@@ -322,7 +340,8 @@ export const ANWENDUNGEN: Anwendung[] = [
       {
         nr: '2.1', punkte: 4,
         text: ['Ermitteln Sie die Funktionsgleichung der Parabel p.', '(Ergebnis: $p\\colon y = -0{,}025x^2 + 7{,}5x - 402{,}5$)'],
-        felder: [{ label: '$b =$', answer: 7.5 }, { label: '$c =$', answer: -402.5 }],
+        felder: [],
+        gleichung: { name: '$p\\colon$', a: -0.025, b: 7.5, c: -402.5 },
         loesung: ['$$\\begin{aligned} \\text{I}\\colon\\; 97{,}5 &= -0{,}025 \\cdot 100^2 + 100b + c &&\\Rightarrow\\; 100b + c = 347{,}5 \\\\ \\text{II}\\colon\\; 97{,}5 &= -0{,}025 \\cdot 200^2 + 200b + c &&\\Rightarrow\\; 200b + c = 1097{,}5 \\end{aligned}', '$$\\text{II} - \\text{I}\\colon\\; 100b = 750 \\;\\Rightarrow\\; b = 7{,}5', '$b$ in I: $\\;750 + c = 347{,}5 \\;\\Rightarrow\\; c = -402{,}5$', '$$p\\colon y = -0{,}025x^2 + 7{,}5x - 402{,}5'],
       },
       {
@@ -343,7 +362,8 @@ export const ANWENDUNGEN: Anwendung[] = [
         nr: '2.4', punkte: 3,
         vorher: ['Den Skywalk erreicht und verlässt man mit Gondeln. Die Gondelbahnen g und h verlaufen geradlinig.'],
         text: ['Berechnen Sie die Funktionsgleichung der Gondelbahn g durch die Punkte $C\\,(-20 \\mid 25{,}5)$ und $A\\,(100 \\mid 97{,}5)$.'],
-        felder: [{ label: '$m =$', answer: 0.6 }, { label: '$t =$', answer: 37.5 }],
+        felder: [],
+        gleichung: { name: '$g\\colon$', m: 0.6, t: 37.5 },
         loesung: ['$$m = \\frac{97{,}5 - 25{,}5}{100 - (-20)} = \\frac{72}{120} = 0{,}6', '$A$ einsetzen: $\\;97{,}5 = 0{,}6 \\cdot 100 + t \\;\\Rightarrow\\; t = 37{,}5$', '$$g\\colon y = 0{,}6x + 37{,}5'],
       },
       {
