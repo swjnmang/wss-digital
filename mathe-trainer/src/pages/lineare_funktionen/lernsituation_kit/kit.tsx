@@ -293,6 +293,7 @@ export function CheckCard({
   profi = false,
   ohnePunkte = false,
   onFehler,
+  onEingabe,
 }: {
   title: ReactNode
   level?: Level
@@ -322,6 +323,8 @@ export function CheckCard({
   ohnePunkte?: boolean
   /** Wird bei einem Fehlversuch aufgerufen (Feld mit falschem Wert verlassen oder roten Wert ersetzt), z. B. um die Fehlersuche zu öffnen */
   onFehler?: () => void
+  /** Wird bei jeder Eingabe mit allen Feldwerten aufgerufen, z. B. um eine eingetippte Gleichung sofort in eine Skizze zu zeichnen */
+  onEingabe?: (werte: Record<string, string>) => void
 }) {
   const uid = useId()
   const [showSolution, setShowSolution] = useState(false)
@@ -354,6 +357,12 @@ export function CheckCard({
       tracking,
     },
   )
+  // Eingaben nach außen melden; über eine Ref, damit eine neue Funktion je Render keine Schleife auslöst
+  const eingabeRef = useRef(onEingabe)
+  eingabeRef.current = onEingabe
+  useEffect(() => {
+    eingabeRef.current?.(values)
+  }, [values])
 
   const inlineKeys = new Set((rechnung ?? []).flatMap((z) => [...z.l, ...z.r]).flatMap((seg) => (typeof seg === 'string' ? [] : [seg.luecke])))
   const listFields = fields.filter((f) => !inlineKeys.has(f.key))

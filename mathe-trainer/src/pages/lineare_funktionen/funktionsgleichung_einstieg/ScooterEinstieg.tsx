@@ -409,6 +409,12 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
   const [versuche, setVersuche] = useState<Versuch[]>([])
   const [geloest, setGeloest] = useState(false)
   const [fehler, setFehler] = useState(false)
+  /** in „Problem lösen“ eingetippte Gleichung, wird live in den Graphen gezeichnet */
+  const [eigeneGleichung, setEigeneGleichung] = useState('')
+  const eigene = parseLinearEquation(eigeneGleichung)
+  const eigeneLinie: Linie[] = eigene.ok
+    ? [{ m: eigene.m, t: eigene.t, aktuell: true, treffer: Math.abs(eigene.m - M_TARIF) < 0.001 && Math.abs(eigene.t - T_TARIF) < 0.001 }]
+    : []
   const [uebungen, setUebungen] = useState<string[]>([])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
@@ -588,7 +594,7 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
               die <strong>Funktionsgleichung</strong> <M>{'y = mx + t'}</M> des Tarifs auf. Berechne dann, was eine Fahrt von 30 Minuten kostet.
             </p>
           </div>
-          <TarifGraph frage />
+          <TarifGraph frage linien={eigeneLinie} />
           <BeispielMitVideo video={VIDEO_FUNKTIONSGLEICHUNG} videoTitel="Lernvideo: Funktionsgleichung aufstellen">
             <div className="es-beispiel">
               <Beispiel offen title="Der Tarif des Fahrradverleihs" aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE} />
@@ -602,8 +608,14 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
               }}
               punkte={15}
               onFehler={() => setFehler(true)}
+              onEingabe={(w) => setEigeneGleichung(w.gl ?? '')}
               title="Der Tarif ist geknackt"
-              prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Tippe die Gleichung vollständig ein, mit „y =“. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
+              prompt={
+                <p>
+                  Trage die Ergebnisse aus deinem Heft ein. Tippe die Gleichung vollständig ein, mit „y =“. Jedes Feld zeigt dir sofort, ob es stimmt, und deine Gerade
+                  erscheint oben im Graphen: Geht sie durch beide Fahrten?
+                </p>
+              }
               fields={[
                 { kind: 'gleichung', key: 'gl', label: <>Mit welcher Funktionsgleichung rechnet die App?</>, m: M_TARIF, t: T_TARIF, tol: 0.001 },
                 { kind: 'num', key: 'y30', label: 'Was kostet eine Fahrt von 30 Minuten?', expected: preis(DAUER), unit: '€' },
