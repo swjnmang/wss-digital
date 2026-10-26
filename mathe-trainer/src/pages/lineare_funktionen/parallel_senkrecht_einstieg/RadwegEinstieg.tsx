@@ -15,7 +15,7 @@ import './radweg.css'
 // parallel zur Bahnlinie y = 0,5x + 1 durch R(4 | −1) und eine Fußgängerbrücke senkrecht über die Gleise am Bahnhof B(2 | 2).
 // Sie tippen Steigungen ein, der Plan zeichnet die Gerade sofort und meldet, ob der Radweg die Gleise kreuzt bzw. welchen Winkel
 // die Brücke mit den Gleisen bildet. Aha: Weder −0,5 (nur Vorzeichen) noch 2 (nur Kehrwert) ergeben 90°, erst −2.
-// Problem lösen: Problem → Beispielrechnung Stadtpark (ohne Lernvideo, dafür mit Skizzen: Steigungsdreieck verschieben bzw. um 90°
+// Problem lösen: Problem → Beispielrechnung Stadtpark mit Lernvideo und Skizzen (Steigungsdreieck verschieben bzw. um 90°
 // drehen) → Ergebnisse abgleichen (beide Gleichungen) mit Fehlersuche → Entscheidung (Weg senkrecht zum Radweg) → Handlungsprodukt
 // analog: beschriftete Planskizze im Heft mit Steigungsdreiecken und rechtem Winkel. Danach Rückbezug und Merke.
 // Phase 4: Senkrechte wählen (Fehloptionen nur Vorzeichen, nur Kehrwert, parallel), Wer hat recht? (gedrehtes Dreieck), Senkrechte
@@ -25,8 +25,10 @@ import './radweg.css'
 // (Pflicht zusammen 61: Warm-up 11 = 18 %, Problem erkennen 5 = 8 %, Problem lösen 23 = 38 %, Übungen 22 = 36 %).
 // Identität: Themenfarbe Blau, Symbol Fahrrad, Titelbild Bahnlinie mit Bahnhof, Radweg und Brücke, Leitobjekt der Planungstisch
 // des Bauamts. Kontext Gesellschaft und Umwelt (Mobilität, Stadtplanung). Versuche bleiben im Seitenzustand.
-// Es gibt kein Lernvideo zum Thema, deshalb ist die Beispielrechnung mit Skizzen zu jedem Schritt ausführlich erklärt.
 // Ruhiges Grunddesign: eine Spalte, pro Seite ist nur der Auftrag hervorgehoben. Nach unten scrollen ist erlaubt, seitlich nie.
+
+/** Lernvideo „Parallele und senkrechte Geraden“ */
+const VIDEO_PARALLEL_SENKRECHT = 'https://www.youtube.com/watch?v=Jpu96O3QmQc'
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
@@ -661,9 +663,8 @@ export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => v
             </p>
           </div>
           <Plan />
-          <BeispielMitVideo>
+          <BeispielMitVideo video={VIDEO_PARALLEL_SENKRECHT} videoTitel="Lernvideo: Parallele und senkrechte Geraden">
             <div className="rw-beispiel">
-              <p className="sl-text">Zu diesem Thema gibt es kein Lernvideo. Das Beispiel erklärt dir deshalb jeden Schritt mit einer Skizze.</p>
               <Beispiel offen title="Weg und Steg im Stadtpark" aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE} />
             </div>
           </BeispielMitVideo>
