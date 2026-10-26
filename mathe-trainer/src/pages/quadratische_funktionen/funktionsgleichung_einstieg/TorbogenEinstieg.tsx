@@ -273,7 +273,7 @@ function Biegemaschine({ auftrag, versuche, onSenden }: { auftrag: ReactNode; ve
       type="text"
       inputMode="decimal"
       autoComplete="off"
-      placeholder="?"
+      placeholder={k}
       aria-label={label}
       id={`${uid}-${k}`}
       className="bk-input lp-input lp-input-sm ls-gap"
@@ -577,7 +577,8 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
             title="e) Klammer ausmultiplizieren"
             prompt={
               <p>
-                Schreibe <M>{'-0{,}5 \\cdot (x - 3)^2'}</M> ohne Klammer. Löse zuerst das Quadrat auf und multipliziere dann jeden Summanden mit <M>{'-0{,}5'}</M>. Trage die Zahlen mit Vorzeichen ein, z.&nbsp;B. <M>{'+9'}</M> oder <M>{'-6'}</M>.
+                Fasse die nachfolgenden Terme zusammen, indem du die Klammern vollständig auflöst. Trage die Zahlen mit Vorzeichen ein, z.&nbsp;B. <M>{'+9'}</M> oder{' '}
+                <M>{'-6'}</M>.
               </p>
             }
             rechnung={[
@@ -621,9 +622,10 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
           <div className="sl-fokus">
             <p className="sl-fokus-titel">Deine Aufgabe: Berechne die Gleichung für die Biegemaschine</p>
             <p>
-              Gegeben sind der Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> und der linke Pfosten <M>{'P(0 \\mid 2)'}</M>. Stelle in deinem Heft die Funktionsgleichung des Bogens
-              zuerst in <strong>Scheitelform</strong> <M>{'y = a(x - x_S)^2 + y_S'}</M> und dann in <strong>allgemeiner Form</strong> <M>{'y = ax^2 + bx + c'}</M> auf. Die
-              allgemeine Form schickst du an die Maschine.
+              Der Torbogen verläuft durch den Scheitelpunkt <M>{'S(2 \\mid 3)'}</M> und den linken Pfosten <M>{'P(0 \\mid 2)'}</M>. Deine Aufgabe besteht darin, die
+              Funktionsgleichung rechnerisch zu bestimmen. Berechne dazu die Funktionsgleichung des Bogens zuerst in <strong>Scheitelform</strong>{' '}
+              <M>{'y = a(x - x_S)^2 + y_S'}</M> und forme diese anschließend in die <strong>allgemeine Form</strong> <M>{'y = ax^2 + bx + c'}</M> um. Deine Lösung kannst
+              du zur Kontrolle unten eingeben und abgleichen. Passendes Informationsmaterial findest du unter „Beispielrechnung mit Lernvideo“.
             </p>
           </div>
           <div className="tb-bild-klein">
