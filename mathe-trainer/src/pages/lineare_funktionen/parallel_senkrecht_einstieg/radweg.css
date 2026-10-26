@@ -1,0 +1,38 @@
+/* Lernsituation „Der neue Radweg“ im ruhigen Grunddesign: eine Spalte, Themenfarbe kommt über --primary aus thema. */
+
+.rw-plan svg { display: block; width: 100%; height: auto; max-height: 380px; margin: 0 auto; }
+.rw-klein svg { display: block; width: 100%; height: auto; max-height: 300px; margin: 0 auto; }
+.rw-labor { display: flex; flex-direction: column; gap: 10px; }
+
+.rw-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 19px; }
+.rw-eingabe > label { font-weight: 700; }
+.rw-eingabe .bk-btn { min-height: 48px; }
+.rw-feld { width: 130px; max-width: 100%; }
+
+.rw-anzeige {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;
+  border-radius: 10px; background: var(--primary-soft); color: var(--ink); font-size: 17px; line-height: 1.5;
+}
+.rw-anzeige > i { margin-top: 4px; color: var(--primary); font-size: 18px; }
+.rw-anzeige-ok { background: var(--correct-soft); color: var(--correct-ink); }
+.rw-anzeige-ok > i { color: var(--correct); }
+
+/* Rechenbeispiel: lange Zeilen scrollen auf schmalen Bildschirmen in sich, die Seite bleibt fest */
+.rw-beispiel { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.rw-beispiel .katex-display { overflow-x: auto; overflow-y: hidden; }
+.rw-beispiel .bk-graph { margin: 8px 0; }
+
+/* Bonus-Spiel Brückenbauer */
+.rw-spiel { display: flex; flex-direction: column; gap: 12px; }
+.rw-spiel-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 800 17px/1.3 var(--font-display); color: var(--primary); }
+.rw-muenzen { display: flex; gap: 6px; font-size: 20px; color: var(--line-strong); }
+.rw-muenzen .rw-muenze-an { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.rw-spiel-frage { margin: 0; font-size: 18px; line-height: 1.6; }
+.rw-spiel-bild { display: block; width: 100%; height: auto; max-height: 400px; touch-action: manipulation; user-select: none; }
+.rw-optionen { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.rw-optionen .bk-btn { min-height: 56px; justify-content: center; font-size: 18px; }
+.rw-optionen .bk-btn:disabled { opacity: 1; }
+.rw-opt-ok { background: var(--correct-soft) !important; border-color: var(--correct) !important; color: var(--correct-ink) !important; }
+.rw-opt-no { background: var(--wrong-soft) !important; border-color: var(--wrong) !important; color: var(--wrong-ink) !important; }
+.rw-spiel-ende { margin: 0; font: 800 20px/1.4 var(--font-display); color: var(--ink); }
+.rw-spiel-ende i { color: var(--primary); margin-right: 6px; }
