@@ -19,7 +19,7 @@ Dieser Skill entwickelt **Einstiegs-Lernsituationen** für neue Mathe-Themen und
 
 Lernsituationen dürfen **nicht nach Schema F** ablaufen. Gleichförmigkeit langweilt und demotiviert.
 
-- **Fest** sind die vier Phasen mit **genau einer Seite pro Phase**, der Aufbau von "Problem lösen" (Problem → Beispielrechnung mit Lernvideo zum Aufklappen → Ergebnisse abgleichen mit Fehlersuche → Handlungsprodukt), die Seitenansicht, das **ruhige Grunddesign**, die didaktischen Leitlinien, die Pflichtfunktionen und die Schreib- und Rechenkonventionen.
+- **Fest** sind die vier Phasen mit **genau einer Seite pro Phase**, der Aufbau von "Problem lösen" (Problem → Beispielrechnung mit Lernvideo zum Aufklappen → Ergebnisse abgleichen (ohne Fehlersuche) → Handlungsprodukt), die Seitenansicht, das **ruhige Grunddesign**, die didaktischen Leitlinien, die Pflichtfunktionen und die Schreib- und Rechenkonventionen.
 - **Variabel** sind Kontext, Dramaturgie (Format), Handlungsprodukt, Sozialformen, die Methoden innerhalb der Phasen und die **Identität** der Lernsituation.
 - **Ruhig, aber unverwechselbar:** Alle Lernsituationen haben dasselbe ruhige Gerüst, aber jede hat ein eigenes Gesicht (Abschnitt "Identität jeder Lernsituation"). Die SuS sollen auf jeder Seite sofort erkennen, in welcher Lernsituation sie sind.
 - **Abwechslung wird geprüft**, nicht dem Zufall überlassen (Abschnitt "Abwechslung absichern").
@@ -51,7 +51,7 @@ Die Kombinationen unterscheiden sich untereinander deutlich und halten die Abwec
 Lege ein kompaktes Konzept vor:
 - Lernziel in einem Satz
 - Plan der vier Phasen-Seiten: je Phase die Aufgaben, die Pflichtaufgaben für "Weiter" und die ungefähre Zeit
-- Das Problem in einem Satz (gegeben, gesucht), das passende Rechenbeispiel mit anderen Zahlen, die Ergebnisfelder und die Zwischenergebnisse für die Fehlersuche
+- Das Problem in einem Satz (gegeben, gesucht), das passende Rechenbeispiel mit anderen Zahlen und die Ergebnisfelder
 - Handlungsprodukt mit 2 bis 4 Kriterien, dazu immer das Kriterium „Begriffe und Abkürzungen“
 - Passendes Lernvideo für das Rechenbeispiel (aus den Übungsaufgaben des Themas), falls vorhanden
 - Hilfen (drei gestufte Hilfen beim Ergebnis-Abgleich) und Niveaustufen
@@ -91,7 +91,7 @@ Jede Lernsituation hat **genau diese vier Phasen in dieser Reihenfolge**. Namen 
 | --- | --- |
 | **1 Warm-up** | Vorwissen abrufen, das gleich gebraucht wird (Retrieval Practice): **mindestens 5** kurze Aufgaben untereinander (alle Pflicht), z. B. Wert ablesen, einfache Gleichung lösen, Klammer ausmultiplizieren. Jede Aufgabe ist **sichtbar nummeriert** (siehe unten). |
 | **2 Problem erkennen** | Kontext, Leitfrage und Festlegung bzw. Ausprobieren. Die SuS merken selbst, dass sie das Problem mit ihrem bisherigen Wissen nicht sicher lösen können. |
-| **3 Problem lösen** | Problem oben, Beispielrechnung mit Lernvideo zum Aufklappen (breiter Knopf), Ergebnisse aus dem Heft abgleichen mit automatischer Fehlersuche, ggf. Entscheidung, Handlungsprodukt mit Kriterien, danach "Das hältst du fest" (Rückbezug und Merke). |
+| **3 Problem lösen** | Problem oben, Beispielrechnung mit Lernvideo zum Aufklappen (breiter Knopf), Ergebnisse aus dem Heft abgleichen (ohne Fehlersuche), ggf. Entscheidung, Handlungsprodukt mit Kriterien, danach "Das hältst du fest" (Rückbezug und Merke). |
 | **4 Wissen prüfen und vertiefen** | Mindestens 3, besser 4 passende Übungsaufgaben mit steigendem Niveau (Basis, Standard, Erweiterung), mit typischen Fehlern als Antwortoptionen; darunter das **Bonus-Spiel** (frei, sobald alle Pflichtaufgaben gelöst sind) und die Abschluss-Buttons. |
 
 Namen und Reihenfolge stehen im Code nur in `PHASEN` (`phasen.tsx`). Die Phasenleiste zeigt die vier Phasen; einen Seitenzähler gibt es nicht mehr, weil jede Phase genau eine Seite ist.
@@ -131,15 +131,15 @@ Alles auf einer Seite, **immer in dieser Reihenfolge** von oben nach unten:
 
 1. **Das Problem noch einmal oben** als einziger Fokus (`sl-fokus`): konkreter Arbeitsauftrag in eigenen Worten, was gegeben und was gesucht ist und in welcher Form das Ergebnis stehen soll. Darunter ein Bild zum Problem (Leitobjekt, Skizze oder Graph mit nur den gegebenen Größen, bei Umstellaufgaben die Formel mit markierter gesuchter Größe).
 2. **Beispielrechnung mit Lernvideo** (`BeispielMitVideo` aus `lernsituation_kit/seiten.tsx`): **ein** Knopf „Beispielrechnung mit Lernvideo ansehen“ (ohne Video: „Beispielrechnung ansehen“), **so breit wie die übrigen Elemente der Seite**. Aufgeklappt steht oben das eingebettete Lernvideo (`video="…"`, lädt erst nach Antippen), darunter das ausgearbeitete Beispiel mit **anderen Zahlen**, Schritt für Schritt (`<Beispiel offen …/>`). Die SuS entscheiden selbst, ob sie Video, Beispiel oder beides nutzen; beides ist kostenlos. Die Lernvideos sind meist schon bei den Übungsaufgaben des Themas verlinkt (z. B. `VideoButton url=…` oder eine `VIDEO`-Liste in der Übungsseite): Von dort übernehmen. Gibt es keines, der Lehrkraft am Ende als offenen Punkt nennen. Ein Rechenbeispiel vor der Problemdarstellung ist nicht erlaubt, auch nicht im Warm-up oder in Phase 2.
-3. **„Vergleiche deine Ergebnisse“** (`Abschnitt` mit einer `CheckCard`): Die SuS rechnen im Heft und tippen nur ihre **Endergebnisse** in die Felder („Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.“). Die Felder sind als Fragen formuliert (z. B. „Wie viel Geld ist am Ende des 6. Jahres auf dem Konto, wenn …?“), keine Vorstrukturierung des Rechenwegs. Dazu drei gestufte `Hilfen`, `loesungNachFehler` und `onFehler={() => setFehler(true)}`. Es gibt **keine** Wahl „Selbst rechnen / Mit Lösungsschema“ mehr (`WegWahl` nicht mehr verwenden).
-4. **Fehlersuche** (`Fehlersuche` aus `seiten.tsx`) direkt darunter: breiter Knopf „Ein Ergebnis ist rot? Fehler suchen“, der **sich automatisch öffnet**, sobald ein Ergebnisfeld rot wurde (`fehler={fehler}`). Darin eine `CheckCard` mit `ohnePunkte`, `rechnen={false}` und `fieldsRow` für die wichtigen **Zwischenergebnisse** (z. B. `q`, `q^6`, Bruch), mit dem Satz „Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.“ Die Fehlersuche ist freiwillig, keine Pflichtaufgabe und kostet keine Punkte.
+3. **„Vergleiche deine Ergebnisse“** (`Abschnitt` mit einer `CheckCard`): Die SuS rechnen im Heft und tippen nur ihre **Endergebnisse** in die Felder („Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.“). Die Felder sind als Fragen formuliert (z. B. „Wie viel Geld ist am Ende des 6. Jahres auf dem Konto, wenn …?“), keine Vorstrukturierung des Rechenwegs. Dazu drei gestufte `Hilfen`, `loesungNachFehler`. Es gibt **keine** Wahl „Selbst rechnen / Mit Lösungsschema“ mehr (`WegWahl` nicht mehr verwenden).
+4. **Keine Fehlersuche:** Unter dem Ergebnis-Abgleich steht **kein** Kasten „Fehlersuche: Wo steckt der Fehler?“ bzw. „Prüfe deine Zwischenergebnisse …“ mit Feldern für Zwischenergebnisse (die Komponente `Fehlersuche` gibt es nicht mehr, seit 2026-10-27). Wer einen Fehler hat, nutzt die gestuften `Hilfen` und den Lösungsweg nach dem Fehlversuch.
 5. **Entscheidung** (wenn die Situation eine verlangt), z. B. per Auswahl "Welches Angebot empfiehlst du?".
 6. **Handlungsprodukt** (`Handlungsprodukt`): Auftrag, das Handlungsprodukt im Heft zu gestalten (Abschnitt "Handlungsprodukte"), mit kleinem Bild (Brief, Karteikarte, Plakat) und aufklappbaren Satzanfängen. Darunter die **Kriterien zum Abhaken** ("Ist deine Antwort vollständig?"). Ein Kriterium ist **immer**: unbekannte Begriffe und die Bedeutung aller Abkürzungen der Formel aufschreiben, konkret für das Thema benannt (z. B. „Was bedeuten K_n, r, q und n? r ist die Rate (Rente) …, außerdem: vorschüssig, nachschüssig“).
 7. **"Das hältst du fest"**, sobald die Rechnung gelöst ist: Rückbezug auf die Festlegung bzw. die Versuche aus Phase 2 und der Merkkasten.
 
 Vorlage: `finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Seite „Der Kontostand für den Vereinsbus“).
 
-Sind mehrere Teilprobleme nötig (z. B. erst K, dann p, dann t), folgen sie auf derselben Seite nacheinander, jedes mit Problem, Beispielrechnung mit Lernvideo, Ergebnis-Abgleich und Fehlersuche. Zwischenüberschriften mit `Abschnitt`.
+Sind mehrere Teilprobleme nötig (z. B. erst K, dann p, dann t), folgen sie auf derselben Seite nacheinander, jedes mit Problem, Beispielrechnung mit Lernvideo, Ergebnis-Abgleich. Zwischenüberschriften mit `Abschnitt`.
 
 ## Seitenansicht (Pflicht)
 
@@ -149,7 +149,7 @@ Jede Lernsituation läuft in der Seitenansicht `SeitenLernsituation` aus `linear
 - **Genau eine Seite pro Phase.** Die Lernsituation hat vier Seiten (`art`: `start`, `problem`, `loesen`, `sichern`), jede mit kurzem Titel. Mehrere Aufgaben einer Phase stehen untereinander auf dieser Seite, gegliedert mit `Abschnitt`.
 - **"Weiter" erst, wenn alles gelöst ist:** Die Seite nennt ihre Pflichtaufgaben in `pflicht: ['a', 'b', …]`, jede Aufgabe meldet sich mit `onSolved={fertig.teil('a')}` (bzw. `onFest`, `onAlle`). Erst wenn alle gemeldet sind, wird "Weiter" frei; im Seitenkopf steht automatisch "(2 von 3 Aufgaben gelöst)". Freiwillige Profi-Aufgaben stehen nicht in `pflicht`. Eine Seite mit nur einer Pflichtaufgabe kann weiter `fertig()` nutzen. Die Phasenleiste mit "Weiter" bleibt beim Scrollen oben stehen. Sobald alle Pflichtaufgaben einer Seite gelöst sind, erscheint **zusätzlich am Seitenende** ein breiter Knopf „Weiter zu <nächste Phase>“ (automatisch durch `SeitenLernsituation`, nicht auf der letzten Seite), damit die SuS nicht nach oben scrollen müssen.
 - **Nach unten scrollen ist erlaubt, zur Seite nie:** Eine Seite darf länger als der Bildschirm sein; die SuS scrollen dann nach unten weiter. **Lesbarkeit geht vor Passform:** Skizzen und Graphen werden **nicht** gestaucht, damit alles auf einen Bildschirm passt. Richtwert auf dem Tablet: Skizzen und Graphen etwa 260–320 px hoch, Beschriftungen mindestens 14 px und höchstens etwa 20 px auf dem Bildschirm. Wünschenswert ist, dass Titel, Auftrag und der Anfang der Interaktion im ersten Bildschirm sichtbar sind. **Horizontales Scrollen ist verboten**, auf jeder Bildschirmbreite (Tablet, Monitor, Smartphone). Eine Phase wird nie auf mehrere Seiten verteilt; lange Phasen-Seiten sind in Ordnung. **Keine Zweispalter** (`ZweiSpalten` nicht mehr verwenden): Einspaltigkeit hat Vorrang.
-- **Test:** Mit Playwright (`vite build` + `vite preview`) alle vier Seiten bei 1180×820, 1920×1080 und 390×844 (Smartphone) durchklicken (Cookie-Hinweis vorher schließen), jeweils vor und nach dem Lösen `document.documentElement.scrollWidth - innerWidth` messen (muss 0 sein, kein seitliches Scrollen) und auf `.katex-error` prüfen. In "Problem lösen" das aufgeklappte Rechenbeispiel (Knopf so breit wie der Fokus-Kasten), einen Fehlversuch (die Fehlersuche öffnet sich) und das richtige Ergebnis testen und prüfen, dass "Weiter" erst nach allen Pflichtaufgaben frei wird. Die Höhe darf überstehen; prüfe auf den Screenshots, dass Skizzen groß genug und Beschriftungen lesbar sind.
+- **Test:** Mit Playwright (`vite build` + `vite preview`) alle vier Seiten bei 1180×820, 1920×1080 und 390×844 (Smartphone) durchklicken (Cookie-Hinweis vorher schließen), jeweils vor und nach dem Lösen `document.documentElement.scrollWidth - innerWidth` messen (muss 0 sein, kein seitliches Scrollen) und auf `.katex-error` prüfen. In "Problem lösen" das aufgeklappte Rechenbeispiel (Knopf so breit wie der Fokus-Kasten), einen Fehlversuch (Lösungsweg wird angeboten) und das richtige Ergebnis testen und prüfen, dass "Weiter" erst nach allen Pflichtaufgaben frei wird. Die Höhe darf überstehen; prüfe auf den Screenshots, dass Skizzen groß genug und Beschriftungen lesbar sind.
 - Am Ende der Seite "Wissen prüfen und vertiefen" steht das Bonus-Spiel (Abschnitt "Bonus-Spiel zum Abschluss"), darunter die Buttons zurück zur Auswahl, zu den Übungsaufgaben und ggf. zur nächsten Lernsituation (keine eigene Abschlussseite).
 
 ## Auswahlseite des Themas (Pflicht)
@@ -194,7 +194,6 @@ Jede Lernsituation belohnt richtige Lösungen mit Punkten. Die Elemente sollen m
   - richtig gelöste Aufgabe: ihre Punkte; jede angezeigte Hilfe und jeder Fehlversuch (höchstens 3 zählen) kostet **ein Fünftel** der Aufgabenpunkte, mindestens 1 (bei 12 Punkten −2, bei 3 Punkten −1). Eine selbst gelöste Aufgabe bringt **nie weniger als mit Lösungsweg**, also mindestens ein Drittel ihrer Punkte, mindestens 1 (`mindestPunkte`). Der Lösungsweg vor dem Lösen bleibt damit immer die teuerste Wahl.
   - **Was als Fehlversuch zählt:** Ein Feld wird nach der Tipp-Pause zwar rot, das allein ist aber noch kein Fehlversuch (wer kurz überlegt oder die Komma-Taste sucht, tippt weiter, z. B. „0“ → „0,5“). Gezählt wird erst, wenn ein falscher Wert beim Verlassen des Feldes stehen bleibt, ein rot markierter Wert ersetzt oder gelöscht wird, in einer Auswahlliste falsch gewählt oder bei einer Auswahlaufgabe falsch geprüft wird; jeder falsche Wert zählt nur einmal. `useLiveCheck` meldet das über `onFehlversuch`, `CheckCard` gibt es an `onFehler` weiter (Fehlersuche öffnen, „Lösungsweg zeigen“ freischalten).
   - Lösungsweg **vor** dem Lösen angesehen: Abzug von **zwei Dritteln** der Punkte, die diese Aufgabe höchstens bringt (gerundet, `PUNKTE.loesungAnteil`, `loesungKosten`): bei 12 Punkten −8, die Aufgabe bringt also noch 4 Punkte. Hilfen und Fehlversuche werden dann nicht zusätzlich abgezogen. Nach dem Lösen ist das Ansehen kostenlos.
-  - Die Fehlersuche (`ohnePunkte`) bringt und kostet nichts
   - Festlegung (`Vermutung`, eigenes Ausprobieren mit `usePunkteAufgabe({ wert: PUNKTE.festlegung, serie: false })`): 3 Punkte; abgehakte Kriterien des Handlungsprodukts: 5 Punkte
   - Rechenbeispiel und Lernvideo sind kostenlos, sie gehören zum Lernen
   - Die Kosten stehen sichtbar an den Knöpfen („Hilfe 1 anzeigen (−2 Punkte)“, „Lösungsweg zeigen (−8 Punkte)“), automatisch aus den Aufgabenpunkten berechnet, damit die SuS bewusst entscheiden. Hilfe bleibt immer erreichbar.
@@ -261,7 +260,7 @@ Jede Lernsituation erfüllt diese Funktionen innerhalb der vier Phasen. **Method
 | Vorwissen abrufen | Warm-up | mindestens 5 kurze Abrufaufgaben, Ablesen, einfache Umformung |
 | Einstieg mit Spannung | Problem erkennen | Kundenauftrag, Entscheidungsfrage, Rätsel, Widerspruch, Schätzfrage, Chatnachricht |
 | Festlegung / Ausprobieren | Problem erkennen | interaktives Ausprobieren mit Rückmeldung (bevorzugt), Auswahl, Schieberegler, Schätzduell, Rangfolge |
-| Eigene Denkarbeit | Problem lösen | im Heft rechnen und Ergebnisse abgleichen (Beispielrechnung und Lernvideo zum Aufklappen, Fehlersuche), Experiment mit Schieberegler, Fallvergleich, Code knacken |
+| Eigene Denkarbeit | Problem lösen | im Heft rechnen und Ergebnisse abgleichen (Beispielrechnung und Lernvideo zum Aufklappen), Experiment mit Schieberegler, Fallvergleich, Code knacken |
 | Handlungsprodukt | Problem lösen | strukturierter Rechenweg im Heft, Kundenbrief, Skizze, Spickzettel (überwiegend analog) |
 | Sicherung | Problem lösen | Rückbezug zur Festlegung, Merke ("Das hältst du fest") |
 | Üben und Prüfen | Wissen prüfen und vertiefen | 3 bis 4 Übungsaufgaben: Auswahl mit Fehloptionen, "Wer hat recht?", Rechenaufgabe, umgekehrte oder offene Aufgabe |
@@ -323,7 +322,7 @@ Alle Lernsituationen nutzen **dasselbe ruhige Gerüst**. Es gibt keine kontextab
 - Grün und Rot nur für Feedback richtig/falsch (Tokens `--correct`, `--wrong`).
 - Keine unterschiedlichen Farben pro Phase innerhalb der Seite.
 
-**Fester Kern (immer gleich):** Seitenansicht mit Phasenleiste und "Weiter", Aufklapp-Knöpfe (Beispielrechnung mit Lernvideo und Fehlersuche in voller Breite), Eingabefelder, Feedbackfarben grün/rot, Hilfen, Niveaustufen-Kennzeichnung, Sozialform-Markierung. Sozialform und Zeit sind unauffällige Textlabels, keine bunten Badges.
+**Fester Kern (immer gleich):** Seitenansicht mit Phasenleiste und "Weiter", Aufklapp-Knöpfe (Beispielrechnung mit Lernvideo in voller Breite), Eingabefelder, Feedbackfarben grün/rot, Hilfen, Niveaustufen-Kennzeichnung, Sozialform-Markierung. Sozialform und Zeit sind unauffällige Textlabels, keine bunten Badges.
 
 **Touch-Bedienung:** Buttons und Eingabefelder mindestens 44 × 44 px, ausreichender Abstand zwischen Tippzielen, Fließtext mindestens 17 px.
 
@@ -389,7 +388,7 @@ Anforderungen an einen guten Kontext:
 
 ## Differenzierung
 
-- **Unterstützung nach Bedarf in "Problem lösen"**: Beispielrechnung mit Lernvideo, gestufte Hilfen, die Fehlersuche mit Zwischenergebnissen und die Satzanfänge sind aufklappbar. Alle rechnen selbst im Heft; wer Hilfe braucht, holt sie sich gezielt.
+- **Unterstützung nach Bedarf in "Problem lösen"**: Beispielrechnung mit Lernvideo, gestufte Hilfen und die Satzanfänge sind aufklappbar. Alle rechnen selbst im Heft; wer Hilfe braucht, holt sie sich gezielt.
 - **Hilfen je nach Weg:**
   - **Lückenrechnungen** (z. B. in Übungsaufgaben mit mehreren Zeilen): `SchrittHilfen` aus `lernsituation_kit/kit.tsx`. Bei der Rechnung steht "Hilfe zu: ① ② ③ …". Die SuS wählen den Schritt, bei dem sie hängen; es ist immer nur eine Hilfe offen. Jede Hilfe ist eine **konkrete Anleitung** für genau diesen Schritt, kein allgemeiner Denkanstoß. Die Kurzbezeichnungen entsprechen den Zeilennamen der Rechnung.
   - **Ergebnis-Abgleich in "Problem lösen" und andere Denkaufgaben** (Auswählen, Begründen, Erkunden): drei gestufte Hilfen mit `Hilfen` (1 Denkanstoß, 2 Strategie, 3 erster Schritt bzw. Teillösung).
@@ -400,7 +399,7 @@ Anforderungen an einen guten Kontext:
 
 - **Konventionen von `mathe-aufgaben` gelten:** KaTeX, Merkhilfe der Wirtschaftsschule Bayern für Formeln und Abkürzungen, nachvollziehbare Rechenwege, Eingabefelder mit grün/rot und Lob. In Lernsituationen prüft sich jedes Feld selbst (richtig sofort grün, falsch nach kurzer Pause rot), ohne Button "Prüfen".
 - **Bausteine aus `mathe-trainer/src/pages/lineare_funktionen/lernsituation_kit/`:**
-  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Optionen `ruhig` und `thema`), Typ `Seite = { art, titel, frei?, bedingung?, pflicht?, inhalt: (fertig) => … }` mit `fertig()` bzw. `fertig.teil('schluessel')`, `Abschnitt` (Zwischenüberschrift), `Aufklappbar` (Satzanfänge; `breit` für volle Breite), `BeispielMitVideo` (Beispielrechnung mit Lernvideo), `Fehlersuche` (öffnet sich nach einem Fehler), `Handlungsprodukt` (Auftrag), `BonusSpiel`; `WegWahl` nur noch in älteren Lernsituationen, `LernsituationKarte` (Karte für die Auswahlseite), `THEMEN`, Typ `Thema`
+  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Optionen `ruhig` und `thema`), Typ `Seite = { art, titel, frei?, bedingung?, pflicht?, inhalt: (fertig) => … }` mit `fertig()` bzw. `fertig.teil('schluessel')`, `Abschnitt` (Zwischenüberschrift), `Aufklappbar` (Satzanfänge; `breit` für volle Breite), `BeispielMitVideo` (Beispielrechnung mit Lernvideo), `Handlungsprodukt` (Auftrag), `BonusSpiel`; `WegWahl` nur noch in älteren Lernsituationen, `LernsituationKarte` (Karte für die Auswahlseite), `THEMEN`, Typ `Thema`
   - `kit.tsx`: `CheckCard` (mit `rechnung`, `fields`, `solution`, `help`, `onSolved`, `loesungNachFehler`, `onFehler`, `onEingabe`, `ohnePunkte`, `profi`, `punkte`), `McCard` (`onSolved`), `TrackedCheck`/`TrackedMc` (für Bereiche mit Nachverfolgung), `SchrittHilfen`, `Hilfen` (`HeftHinweis` wird in der Seitenansicht nicht angezeigt)
   - `phasen.tsx`: `PHASEN` (Namen und Reihenfolge der vier Phasen)
   - `Beispiel` aus `daten_und_zufall/lernpfad/kit.tsx` für Rechenbeispiele (`offen` zeigt alle Schritte, `ab` setzt die Schrittnummerierung fort)
@@ -423,7 +422,7 @@ Anforderungen an einen guten Kontext:
 - [ ] Kein seitliches Scrollen bei 1180 × 820, 1920 × 1080 und 390 × 844 (per Playwright getestet); bei 1920 × 1080 bleibt jede Seite einspaltig. Nach unten scrollen ist erlaubt; Skizzen und Graphen sind nicht gestaucht, Beschriftungen gut lesbar.
 - [ ] In "Problem erkennen" ist klar, dass es ums Ausprobieren geht; Auftrag und Ausprobieren stehen auf einer Seite; die SuS merken, dass ihr Vorwissen nicht sicher reicht.
 - [ ] "Problem erkennen" zeigt Situation, Problem (gegeben/gesucht als Fließtext) und den Auftrag als einzigen Fokus.
-- [ ] "Problem lösen": Problem oben als Fokus, darunter `BeispielMitVideo` (breiter Knopf, Video oben, Beispiel mit anderen Zahlen darunter), "Vergleiche deine Ergebnisse" mit den Endergebnissen als Fragen, gestuften Hilfen und Lösungsweg erst nach einem Fehlversuch, darunter die `Fehlersuche` mit Zwischenergebnissen (öffnet sich automatisch), dann ggf. Entscheidung, Handlungsprodukt mit Kriterien, am Ende Rückbezug und Merke. Kein Beispiel vor dem Problem, keine `WegWahl`.
+- [ ] "Problem lösen": Problem oben als Fokus, darunter `BeispielMitVideo` (breiter Knopf, Video oben, Beispiel mit anderen Zahlen darunter), "Vergleiche deine Ergebnisse" mit den Endergebnissen als Fragen, gestuften Hilfen und Lösungsweg erst nach einem Fehlversuch, **keine** Fehlersuche mit Zwischenergebnissen, dann ggf. Entscheidung, Handlungsprodukt mit Kriterien, am Ende Rückbezug und Merke. Kein Beispiel vor dem Problem, keine `WegWahl`.
 - [ ] Kein Heft-Hinweis und kein "Schreibe … ins Heft" an den Aufgaben (die Bestätigung in der Startbox genügt).
 - [ ] Eingabefelder prüfen sich selbst (richtig sofort grün, falsch nach kurzer Pause rot), kein Prüfen-Button außer bei Auswahlaufgaben.
 - [ ] Alles Mathematische ist mit KaTeX gesetzt, auch im Fließtext; keine `.katex-error`.
@@ -437,7 +436,7 @@ Anforderungen an einen guten Kontext:
 - [ ] "Problem erkennen" und "Problem lösen" haben je mindestens ein inhaltliches Bild (Graph, Skizze oder Sachbild im Stil des Titelbilds), das nichts von der Lösung verrät; beim Handlungsprodukt zeigt ein kleines Bild, was entstehen soll.
 - [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat 2 bis 4 Kriterien zum Abhaken, dazu das Kriterium „unbekannte Begriffe und Bedeutung der Abkürzungen der Formel aufschreiben“ mit den konkreten Abkürzungen.
 - [ ] "Wissen prüfen und vertiefen" hat mindestens 3, besser 4 passende Übungsaufgaben (Basis bis Erweiterung) und darunter die Abschluss-Buttons.
-- [ ] Gamification an: `SeitenLernsituation` mit `punkte`, Fehlersuche mit `ohnePunkte`, Profi-Aufgabe mit `profi`, `<Bilanz />` am Ende der letzten Seite; die Punkte wurden im Test nachgerechnet.
+- [ ] Gamification an: `SeitenLernsituation` mit `punkte`, Profi-Aufgabe mit `profi`, `<Bilanz />` am Ende der letzten Seite; die Punkte wurden im Test nachgerechnet.
 - [ ] Punkte nach Aufwand: jede Aufgabe hat `punkte={…}` nach der Richtwert-Tabelle (Abruf 2, Kernaufgabe 10 bis 15 …), "Problem lösen" bringt etwa 40 % der Pflichtpunkte, das Warm-up höchstens 20 %; das Bonus-Spiel bringt höchstens so viel wie die beste Übung; die Verteilung steht als Kommentar in der Datei.
 - [ ] Im Test geprüft: Eine Tipp-Pause mitten in einer richtigen Eingabe (z. B. „0“, Pause, „,5“) kostet keine Punkte.
 - [ ] Nach allen Pflicht-Übungen wird ein thematisch passendes Bonus-Spiel freigeschaltet (`BonusSpiel`), das das Wissen spielerisch prüft, auf dem Tablet bedienbar ist und "Nochmal spielen" anbietet.
@@ -477,7 +476,7 @@ Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle 
 - **Identität:** Themenfarbe Indigo, Symbol `fa-battery-half`, Name "Der Stromspeicher", Titelbild Haus mit Solaranlage bei Nacht, Leitobjekt Stromspeicher.
 - **Auswahlseite:** Variante A (Modus in `Nullstellen.tsx`, daneben die Schwierigkeitsgrade Einfach und Fortgeschritten).
 - **Problem erkennen:** Die SuS fragen den Speicher zu selbst gewählten Zeiten ab; jeder Versuch erscheint als Punkt im Graphen. Den genauen Zeitpunkt (x = 6,25, also 2:15 Uhr) treffen sie kaum.
-- **Problem lösen:** Problem mit Graph (Nullstelle als „?“), Beispielrechnung E-Bike-Akku mit Lernvideo, Ergebnisse abgleichen (x_N, Uhrzeit) mit Fehlersuche (rechte Seite, x_N, Minuten).
+- **Problem lösen:** Problem mit Graph (Nullstelle als „?“), Beispielrechnung E-Bike-Akku mit Lernvideo, Ergebnisse abgleichen (x_N, Uhrzeit).
 - **Handlungsprodukt (analog):** Nachricht an Familie Demir mit Rechnung, Skizze und Uhrzeit.
 - **Übungsaufgaben:** Bedeutung von N(5 | 0), Nullstelle berechnen (A: x = −4 Vorzeichenfehler, B: x = 12 t verwechselt, C: N(0 | 4) vertauscht, D: N(4 | 0) richtig), Wer hat recht? (Minus beim Abziehen vergessen), umgekehrt: Startwert für "reicht bis 6 Uhr", Profi: y = 3 hat keine Nullstelle. Bonus-Spiel „Akku-Countdown“.
 

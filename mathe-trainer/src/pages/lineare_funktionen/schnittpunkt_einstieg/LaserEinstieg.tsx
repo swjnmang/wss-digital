@@ -2,7 +2,7 @@ import { useEffect, useId, useState, type ChangeEvent, type KeyboardEvent, type 
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
 import { CheckCard, ErklaerungCtx, Hilfen, McCard, TrackedCheck, TrackedMc, tx } from '../lernsituation_kit/kit'
-import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Fehlersuche, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
+import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
 import KugelTreffer from './KugelTreffer'
 import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
@@ -515,8 +515,6 @@ function Plan({ name, tex }: { name: string; tex: string }) {
 export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erklaerung: ReactNode; onBack: () => void; onPractice: () => void }) {
   const [versuche, setVersuche] = useState<Kugel[]>([])
   const [geloest, setGeloest] = useState(false)
-  const [fehler1, setFehler1] = useState(false)
-  const [fehler2, setFehler2] = useState(false)
   const [uebungen, setUebungen] = useState<string[]>([])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
@@ -698,7 +696,6 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               <CheckCard
                 onSolved={teil1Melden}
                 punkte={12}
-                onFehler={() => setFehler1(true)}
                 title="Position der Spiegelkugel"
                 prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
                 fields={[
@@ -722,24 +719,6 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   />
                 }
               />
-              <Fehlersuche fehler={fehler1}>
-                <CheckCard
-                  title="Fehlersuche: Wo steckt der Fehler?"
-                  rechnen={false}
-                  ohnePunkte
-                  prompt={<p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>}
-                  rechnung={[
-                    { l: ['0{,}5x + 2'], r: ['-x + 4{,}4'], u: '\\mid +x \\;\\; \\text{① gleichsetzen}' },
-                    { l: [{ luecke: 'k' }, 'x + 2'], r: ['4{,}4'], u: '\\mid -2 \\;\\; \\text{② } x \\text{ links}' },
-                    { l: [{ luecke: 'k2' }, 'x'], r: [{ luecke: 'z' }], u: '\\text{③ Zahlen rechts}' },
-                  ]}
-                  fields={[
-                    { kind: 'num', key: 'k', label: 'Zahl vor x nach | +x', expected: 1.5 },
-                    { kind: 'num', key: 'k2', label: 'Zahl vor x nach | −2', expected: 1.5 },
-                    { kind: 'num', key: 'z', label: 'rechte Seite nach | −2', expected: 2.4 },
-                  ]}
-                />
-              </Fehlersuche>
             </Abschnitt>
             <Abschnitt titel="Teil 2: Die zweite Show">
               <div className="sl-fokus">
@@ -763,7 +742,6 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               <CheckCard
                 onSolved={fertig.teil('teil2')}
                 punkte={12}
-                onFehler={() => setFehler2(true)}
                 title="Zweite Show"
                 prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
                 fields={[
@@ -786,25 +764,6 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                   />
                 }
               />
-              <Fehlersuche fehler={fehler2}>
-                <CheckCard
-                  title="Fehlersuche: Wo steckt der Fehler?"
-                  rechnen={false}
-                  ohnePunkte
-                  prompt={<p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>}
-                  rechnung={[
-                    { l: ['m'], r: ['\\frac{4 - 0}{1 - 5} =', { luecke: 'm' }], u: '\\text{① Steigung}' },
-                    { l: ['t'], r: [{ luecke: 't' }], u: '\\text{② } R \\text{ einsetzen}' },
-                    { l: ['0{,}5x + 2'], r: [{ luecke: 'm2' }, 'x +', { luecke: 't2' }], u: '\\text{③ gleichsetzen}' },
-                  ]}
-                  fields={[
-                    { kind: 'num', key: 'm', label: 'Steigung von Strahl 3', expected: -1 },
-                    { kind: 'num', key: 't', label: 'y-Achsenabschnitt von Strahl 3', expected: 5 },
-                    { kind: 'num', key: 'm2', label: 'Steigung im gleichgesetzten Term', expected: -1 },
-                    { kind: 'num', key: 't2', label: 'y-Achsenabschnitt im gleichgesetzten Term', expected: 5 },
-                  ]}
-                />
-              </Fehlersuche>
             </Abschnitt>
             <Handlungsprodukt titel="Spickzettel „Schnittpunkt berechnen“">
               <KarteikarteBild />

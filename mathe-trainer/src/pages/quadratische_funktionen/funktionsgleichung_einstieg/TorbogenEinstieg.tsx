@@ -7,7 +7,6 @@ import {
   Aufklappbar,
   BeispielMitVideo,
   BonusSpiel,
-  Fehlersuche,
   Handlungsprodukt,
   SeitenLernsituation,
   type Seite,
@@ -26,7 +25,7 @@ import './torbogen.css'
 // Lernprodukt analog: Auftragsblatt für die Biegemaschine (Skizze, Rechnung in Schritten, beide Formen, Probe mit Q, Abkürzungen).
 // Vorwissen: Scheitelform y = a(x − x_S)² + y_S und Umwandeln in die allgemeine Form. Neu ist, a mit einem zweiten Punkt zu bestimmen.
 // Eine Seite pro Phase (SeitenLernsituation mit ruhig und punkte): Warm-up (5 Aufgaben) → Problem erkennen (Biegemaschine) →
-// Problem lösen (Problem → Beispielrechnung mit Lernvideo → Ergebnisse abgleichen mit Fehlersuche → Auftragsblatt → Das hältst du fest)
+// Problem lösen (Problem → Beispielrechnung mit Lernvideo → Ergebnisse abgleichen → Auftragsblatt → Das hältst du fest)
 // → Wissen prüfen und vertiefen (vier Übungen, Bonus-Spiel „Bogen-Kran“, Bilanz).
 // Aha: Durch Raten trifft man die Gleichung kaum, mit Scheitelpunkt und einem weiteren Punkt lässt sie sich sicher berechnen.
 // Fehlerhafte Azubi-Pläne kommen erst in Phase 4, wenn die SuS den Weg selbst gerechnet haben.
@@ -466,7 +465,6 @@ const SCHRITTE = ['Schritt 1 (Scheitel einsetzen)', 'Schritt 2 (a berechnen)', '
 export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBack: () => void; onPractice: () => void; onNext: () => void }) {
   const [versuche, setVersuche] = useState<Versuch[]>([])
   const [geloest, setGeloest] = useState(false)
-  const [fehler, setFehler] = useState(false)
   const [uebungen, setUebungen] = useState<string[]>([])
   const uebung = (k: string, fertig: () => void) => () => {
     fertig()
@@ -640,7 +638,6 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
                 fertig.teil('rechnung')()
                 setGeloest(true)
               }}
-              onFehler={() => setFehler(true)}
               punkte={15}
               title="Die Gleichung des Torbogens"
               rechnen={false}
@@ -676,28 +673,6 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
                 />
               }
             />
-            <Fehlersuche fehler={fehler}>
-              <CheckCard
-                title="Fehlersuche: Wo steckt der Fehler?"
-                rechnen={false}
-                ohnePunkte
-                prompt={<p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>}
-                rechnung={[
-                  { l: ['2'], r: [{ luecke: 'q' }, '\\cdot a + 3'], u: '\\text{②}' },
-                  { l: [{ luecke: 'm' }], r: ['4a'], u: '\\mid -3' },
-                  { l: ['(x - 2)^2'], r: ['x^2', { luecke: 'b1' }, 'x', { luecke: 'c1' }], u: '\\text{④}' },
-                  { l: ['-0{,}25 \\cdot (x^2 - 4x + 4)'], r: ['-0{,}25x^2', { luecke: 'b2' }, 'x', { luecke: 'c2' }], u: '\\text{mal } a' },
-                ]}
-                fields={[
-                  { kind: 'num', key: 'q', label: 'Zahl vor a', expected: 4 },
-                  { kind: 'num', key: 'm', label: 'linke Seite nach −3', expected: -1 },
-                  { kind: 'num', key: 'b1', label: 'Zahl vor x mit Vorzeichen', expected: -4 },
-                  { kind: 'num', key: 'c1', label: 'Zahl ohne x mit Vorzeichen', expected: 4 },
-                  { kind: 'num', key: 'b2', label: 'Zahl vor x mit Vorzeichen', expected: 1 },
-                  { kind: 'num', key: 'c2', label: 'Zahl ohne x mit Vorzeichen', expected: -1 },
-                ]}
-              />
-            </Fehlersuche>
           </Abschnitt>
           <Handlungsprodukt titel="Auftragsblatt für die Biegemaschine">
             <AuftragsblattBild />

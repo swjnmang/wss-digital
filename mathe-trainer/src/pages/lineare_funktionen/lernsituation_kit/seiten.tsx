@@ -452,28 +452,3 @@ export function BeispielMitVideo({
   );
 }
 
-/**
- * Fehlersuche unter dem Ergebnis-Abgleich in „Problem lösen“: breiter Knopf, öffnet sich automatisch, sobald ein Ergebnis rot war
- * (onFehler der Ergebnis-CheckCard → fehler). Darin eine CheckCard mit den Zwischenergebnissen und ohnePunkte.
- */
-export function Fehlersuche({ fehler, children }: { fehler: boolean; children: ReactNode }) {
-  const [offen, setOffen] = useState(false);
-  const [geschlossen, setGeschlossen] = useState(false);
-  useEffect(() => {
-    if (fehler && !geschlossen) setOffen(true);
-  }, [fehler, geschlossen]);
-  return (
-    <Aufklappbar
-      breit
-      icon="fa-magnifying-glass"
-      label="Ein Ergebnis ist rot? Fehler suchen"
-      offen={offen}
-      onToggle={(o) => {
-        setOffen(o);
-        if (!o) setGeschlossen(true);
-      }}
-    >
-      {children}
-    </Aufklappbar>
-  );
-}

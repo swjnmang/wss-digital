@@ -15,7 +15,6 @@ import {
   Handlungsprodukt,
   SeitenLernsituation,
   BeispielMitVideo,
-  Fehlersuche,
   type Seite,
   type Thema,
 } from '../../lineare_funktionen/lernsituation_kit/seiten';
@@ -373,7 +372,6 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
   const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 31000, fest: false });
   const [raten, setRaten] = useState<number[]>([]);
   const [geloest, setGeloest] = useState(false);
-  const [fehler, setFehler] = useState(false);
   const [uebungen, setUebungen] = useState<string[]>([]);
   const rateGeprueft = (i: number) => () => setRaten((r) => (r.includes(i) ? r : [...r, i]));
 
@@ -619,7 +617,6 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
             <Abschnitt titel="Vergleiche deine Ergebnisse">
               <CheckCard
                 onSolved={geloestMelden}
-                onFehler={() => setFehler(true)}
                 title="Kontostand am Ende des 6. Jahres"
                 prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
                 fields={[
@@ -644,20 +641,6 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                       />
                 }
               />
-              <Fehlersuche fehler={fehler}>
-                <CheckCard
-                  title="Fehlersuche: Wo steckt der Fehler?"
-                  rechnen={false}
-                  ohnePunkte
-                  prompt={<p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>}
-                  fieldsRow
-                  fields={[
-                    { kind: 'num', key: 'q', label: <M>{'q ='}</M>, expected: Q, tol: 0.0001 },
-                    { kind: 'num', key: 'q6', label: <M>{'q^6 ='}</M>, expected: Q ** N, tol: 0.0001 },
-                    { kind: 'num', key: 'f', label: <M>{'\\dfrac{q^6 - 1}{q - 1} ='}</M>, expected: FAKTOR, tol: 0.0005 },
-                  ]}
-                />
-              </Fehlersuche>
             </Abschnitt>
             <Abschnitt titel="Deine Empfehlung">
               <McCard
