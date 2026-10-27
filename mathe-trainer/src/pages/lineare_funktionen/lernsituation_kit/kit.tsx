@@ -364,6 +364,20 @@ export function CheckCard({
     eingabeRef.current?.(values)
   }, [values])
 
+  // Passt eine Rechnung samt Umformungen nicht in die Karte, rutschen die Umformungen unter ihre Zeile (ls-rechnung-eng)
+  const rechnungRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = rechnungRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const messen = () => {
+      el.classList.remove('ls-rechnung-eng')
+      el.classList.toggle('ls-rechnung-eng', el.scrollWidth > el.clientWidth + 1)
+    }
+    const ro = new ResizeObserver(messen)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [rechnung])
+
   const inlineKeys = new Set((rechnung ?? []).flatMap((z) => [...z.l, ...z.r]).flatMap((seg) => (typeof seg === 'string' ? [] : [seg.luecke])))
   const listFields = fields.filter((f) => !inlineKeys.has(f.key))
 
@@ -393,7 +407,7 @@ export function CheckCard({
       <div className="lp-ex-prompt">{prompt}</div>
       {rechnen && <HeftHinweis />}
       {rechnung && (
-        <div className="ls-rechnung">
+        <div className="ls-rechnung" ref={rechnungRef}>
           {rechnung.map((z, i) => (
             <div key={i} className="ls-rechnung-zeile">
               <span className="ls-rechnung-l">{z.l.map(segment)}</span>
