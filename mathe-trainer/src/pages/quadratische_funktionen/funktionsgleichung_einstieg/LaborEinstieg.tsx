@@ -1083,35 +1083,34 @@ export default function LaborEinstieg({
               punkte={7}
               title="Übung 3"
               level="standard"
-              prompt={
-                <>
-                  <MB>{'\\begin{aligned} \\text{I: } 3x + 2y &= 4 \\\\ \\text{II: } 5x - 2y &= 12 \\end{aligned}'}</MB>
-                  <p>Löse das Gleichungssystem. Trage jedes Zwischenergebnis direkt in die Rechnung ein.</p>
-                </>
-              }
+              prompt={<p>Löse das Gleichungssystem mit dem Additionsverfahren. Trage jedes Zwischenergebnis direkt in die Rechnung ein.</p>}
               rechnung={[
-                { l: ['\\text{I} + \\text{II: }', { luecke: 'k' }, 'x'], r: [{ luecke: 'r' }], u: '\\text{① addieren}' },
-                { l: ['x'], r: [{ luecke: 'x' }], u: '\\text{② } \\mid :8' },
-                { l: ['2y'], r: [{ luecke: 'zy' }], u: '\\text{③ in I einsetzen}' },
-                { l: ['y'], r: [{ luecke: 'y' }], u: '\\text{④ } \\mid :2' },
+                { l: ['\\text{I: } 3x + 2y'], r: ['4'] },
+                { l: ['\\text{II: } 5x - 2y'], r: ['12'] },
+                { l: ['\\text{I} + \\text{II: }', { luecke: 'k' }, 'x'], r: [{ luecke: 'r' }], u: '\\mid :8' },
+                { l: ['x'], r: [{ luecke: 'x' }] },
+                { l: ['\\text{in I: } 3 \\cdot', { luecke: 'xe' }, '+ 2y'], r: ['4'], u: '\\mid -6' },
+                { l: ['2y'], r: [{ luecke: 'zy' }], u: '\\mid :2' },
+                { l: ['y'], r: [{ luecke: 'y' }] },
               ]}
               fields={[
                 { kind: 'num', key: 'k', label: 'Zahl vor x', expected: 8 },
                 { kind: 'num', key: 'r', label: 'rechte Seite nach dem Addieren', expected: 16 },
                 { kind: 'num', key: 'x', label: 'x', expected: 2 },
+                { kind: 'num', key: 'xe', label: 'eingesetzter x-Wert', expected: 2 },
                 { kind: 'num', key: 'zy', label: 'rechte Seite von 2y = …', expected: -2 },
                 { kind: 'num', key: 'y', label: 'y', expected: -1 },
               ]}
               solution={
-                <MB>{'\\begin{aligned} \\text{I} + \\text{II: } 8x &= 16 && \\mid :8 \\\\ x &= 2 \\\\ \\text{in I: } 3 \\cdot 2 + 2y &= 4 && \\mid -6 \\\\ 2y &= -2 && \\mid :2 \\\\ y &= -1 \\end{aligned}'}</MB>
+                <MB>{'\\begin{aligned} \\text{I: } 3x + 2y &= 4 \\\\ \\text{II: } 5x - 2y &= 12 \\\\ \\hline \\text{I} + \\text{II: } 8x &= 16 && \\mid :8 \\\\ x &= 2 \\\\ \\text{in I: } 3 \\cdot 2 + 2y &= 4 && \\mid -6 \\\\ 2y &= -2 && \\mid :2 \\\\ y &= -1 \\end{aligned}'}</MB>
               }
               help={
                 <SchrittHilfen
                   schritte={[
                     { kurz: '①', titel: 'addieren', hilfe: <>Vor <M>y</M> stehen <M>{'2'}</M> und <M>{'-2'}</M>. Addiere links <M>{'3x + 5x'}</M> und rechts <M>{'4 + 12'}</M>.</> },
-                    { kurz: '②', titel: 'durch 8 teilen', hilfe: <>Teile beide Seiten durch die Zahl vor <M>x</M>: <M>{'16 : 8'}</M>.</> },
-                    { kurz: '③', titel: 'in I einsetzen', hilfe: <><M>{'3 \\cdot 2 + 2y = 4'}</M>, also <M>{'6 + 2y = 4'}</M>. Rechne <M>{'\\mid -6'}</M>: <M>{'4 - 6'}</M>.</> },
-                    { kurz: '④', titel: 'nach y auflösen', hilfe: <>Teile durch 2. Minus durch Plus ergibt Minus.</> },
+                    { kurz: '②', titel: 'nach x auflösen', hilfe: <>Teile beide Seiten durch die Zahl vor <M>x</M>: <M>{'16 : 8'}</M>.</> },
+                    { kurz: '③', titel: 'in I einsetzen', hilfe: <>Setze dein <M>x</M> in I ein: <M>{'3 \\cdot 2 + 2y = 4'}</M>, also <M>{'6 + 2y = 4'}</M>.</> },
+                    { kurz: '④', titel: 'nach y auflösen', hilfe: <>Rechne <M>{'\\mid -6'}</M>: <M>{'2y = 4 - 6'}</M>. Teile dann durch 2. Minus durch Plus ergibt Minus.</> },
                   ]}
                 />
               }
