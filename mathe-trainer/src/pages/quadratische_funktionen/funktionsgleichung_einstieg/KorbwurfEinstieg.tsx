@@ -7,7 +7,6 @@ import {
   Aufklappbar,
   BeispielMitVideo,
   BonusSpiel,
-  Fehlersuche,
   Handlungsprodukt,
   SeitenLernsituation,
   type Seite,
@@ -27,7 +26,7 @@ import './korbwurf.css'
 // dann lief jemand durchs Bild. Trifft Linas Wurf? Und der von Jonas?
 // Problem erkennen: Festlegung (Treffer, zu kurz, zu weit), dann in der App b und c ausprobieren (a = −0,5 kennt die App aus der Abwurfgeschwindigkeit).
 // Die Bahn wird sofort gezeichnet, die App vergleicht mit den Messpunkten P(1 | 3,8) und Q(2 | 4,55). Durch Raten trifft man beide kaum.
-// Problem lösen in zwei Teilen, je Problem → Beispielrechnung mit Lernvideo Fall 2 → Ergebnisse abgleichen mit Fehlersuche:
+// Problem lösen in zwei Teilen, je Problem → Beispielrechnung mit Lernvideo Fall 2 → Ergebnisse abgleichen:
 // Teil 1 a bekannt (Lina: II − I, c fällt weg): y = −0,5x² + 2,25x + 2,05, bei x = 4 genau 3,05 m → Treffer.
 // Teil 2 c bekannt (Jonas, Abwurfhöhe 2,2 m: I · 2, dann subtrahieren): y = −0,4x² + 1,6x + 2,2, bei x = 4 nur 2,2 m → zu kurz.
 // Aha: Jonas' Ball steigt am Anfang fast genauso wie Linas, ist bei x = 2 aber schon am höchsten Punkt und fliegt 85 cm unter dem Ring durch.
@@ -388,7 +387,6 @@ const LOESUNG2 = (
   </>
 )
 
-const FEHLERSUCHE_TEXT = <p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
@@ -396,7 +394,6 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
   const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 3, fest: false })
   const [versuche, setVersuche] = useState<Versuch[]>([])
   const [geloest, setGeloest] = useState<string[]>([])
-  const [fehler, setFehler] = useState({ t1: false, t2: false })
   const [uebungen, setUebungen] = useState<string[]>([])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
@@ -407,7 +404,6 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
     fertig()
     setGeloest((g) => (g.includes(k) ? g : [...g, k]))
   }
-  const fehlerAn = (k: keyof typeof fehler) => () => setFehler((f) => (f[k] ? f : { ...f, [k]: true }))
 
   const seiten: Seite[] = [
     {
@@ -647,7 +643,6 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
             </BeispielMitVideo>
             <CheckCard
               onSolved={teilGeloest('t1', fertig.teil('t1'))}
-              onFehler={fehlerAn('t1')}
               punkte={12}
               title="Linas Wurfbahn"
               prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
@@ -672,26 +667,6 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
                 />
               }
             />
-            <Fehlersuche fehler={fehler.t1}>
-              <CheckCard
-                title="Fehlersuche: Wo steckt der Fehler?"
-                rechnen={false}
-                ohnePunkte
-                prompt={FEHLERSUCHE_TEXT}
-                rechnung={[
-                  { l: ['\\text{I: } b + c'], r: [{ luecke: 'r1' }], u: '\\text{① P einsetzen}' },
-                  { l: ['\\text{II: } 2b + c'], r: [{ luecke: 'r2', breit: true }], u: '\\text{② Q einsetzen}' },
-                  { l: ['\\text{II} - \\text{I: } b'], r: [{ luecke: 'b', breit: true }], u: '\\text{③ subtrahieren}' },
-                  { l: ['-0{,}5 \\cdot 4^2'], r: [{ luecke: 'q' }], u: '\\text{④ } x = 4 \\text{ einsetzen}' },
-                ]}
-                fields={[
-                  { kind: 'num', key: 'r1', label: 'rechte Seite von Gleichung I', expected: 4.3 },
-                  { kind: 'num', key: 'r2', label: 'rechte Seite von Gleichung II', expected: 6.55 },
-                  { kind: 'num', key: 'b', label: 'b', expected: 2.25 },
-                  { kind: 'num', key: 'q', label: '−0,5 mal 4 zum Quadrat', expected: -8 },
-                ]}
-              />
-            </Fehlersuche>
           </Abschnitt>
           <Abschnitt titel="Teil 2: Jonas' Wurf, c ist bekannt">
             <p className="sl-text">
@@ -709,7 +684,6 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
             </BeispielMitVideo>
             <CheckCard
               onSolved={teilGeloest('t2', fertig.teil('t2'))}
-              onFehler={fehlerAn('t2')}
               punkte={14}
               title="Jonas' Wurfbahn"
               prompt={<p>Trage die Ergebnisse aus deinem Heft ein.</p>}
@@ -734,26 +708,6 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
                 />
               }
             />
-            <Fehlersuche fehler={fehler.t2}>
-              <CheckCard
-                title="Fehlersuche: Wo steckt der Fehler?"
-                rechnen={false}
-                ohnePunkte
-                prompt={FEHLERSUCHE_TEXT}
-                rechnung={[
-                  { l: ['\\text{I: } a + b'], r: [{ luecke: 'r1' }], u: '\\text{① P einsetzen}' },
-                  { l: ['\\text{II: } 4a + 2b'], r: [{ luecke: 'r2' }], u: '\\text{② Q einsetzen}' },
-                  { l: ['\\text{I} \\cdot 2{:}\\; 2a + 2b'], r: [{ luecke: 'r3' }], u: '\\text{③ mal 2}' },
-                  { l: ['\\text{II} - \\text{I} \\cdot 2{:}\\; 2a'], r: [{ luecke: 'r4', breit: true }], u: '\\text{④ subtrahieren}' },
-                ]}
-                fields={[
-                  { kind: 'num', key: 'r1', label: 'rechte Seite von Gleichung I', expected: 1.2 },
-                  { kind: 'num', key: 'r2', label: 'rechte Seite von Gleichung II', expected: 1.6 },
-                  { kind: 'num', key: 'r3', label: 'rechte Seite von I mal 2', expected: 2.4 },
-                  { kind: 'num', key: 'r4', label: 'rechte Seite nach dem Subtrahieren', expected: -0.8 },
-                ]}
-              />
-            </Fehlersuche>
           </Abschnitt>
           {geloest.length === 2 && (
             <Abschnitt titel="Dein Urteil für die Trainerin">

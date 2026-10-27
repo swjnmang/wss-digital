@@ -2,7 +2,7 @@ import { useEffect, useId, useState, type ChangeEvent, type KeyboardEvent, type 
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
 import { CheckCard, ErklaerungCtx, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
-import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Fehlersuche, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
+import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
 import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
 import AkkuCountdown from './AkkuCountdown'
@@ -12,7 +12,7 @@ import './stromspeicher.css'
 // Lernsituation „Der Stromspeicher“: Nullstellen linearer Funktionen (ca. 45–60 min).
 // Format Experimentierlabor: Die SuS probieren Uhrzeiten aus und beobachten den Ladestand des Speichers. Den genauen Zeitpunkt,
 // an dem der Speicher leer ist (2:15 Uhr), treffen sie durch Probieren kaum.
-// Problem lösen: Problem → Beispielrechnung E-Bike-Akku mit Lernvideo → Ergebnisse aus dem Heft abgleichen mit Fehlersuche →
+// Problem lösen: Problem → Beispielrechnung E-Bike-Akku mit Lernvideo → Ergebnisse aus dem Heft abgleichen →
 // Handlungsprodukt analog: Nachricht an Familie Demir mit Rechnung, Skizze und Uhrzeit. Danach Rückbezug und Merke.
 // Phase 4: vier Übungen (Bedeutung, Berechnen, Wer hat recht?, umgekehrt), Profi-Aufgabe ohne Nullstelle, Bonus-Spiel „Akku-Countdown“.
 // Punkte nach Aufwand: Warm-up 2/3/2/2/3, Ausprobieren 3, Kernaufgabe 15, Entscheidung 4, Nachricht 5, Übungen 4/5/5/8, Profi 8,
@@ -331,7 +331,6 @@ function Plan({ name, tex: t }: { name: string; tex: string }) {
 export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }: { erklaerung: ReactNode; onBack: () => void; onPractice: () => void }) {
   const [versuche, setVersuche] = useState<number[]>([])
   const [geloest, setGeloest] = useState(false)
-  const [fehler, setFehler] = useState(false)
   const [uebungen, setUebungen] = useState<string[]>([])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
@@ -511,7 +510,6 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
                 setGeloest(true)
               }}
               punkte={15}
-              onFehler={() => setFehler(true)}
               title="Der Stromspeicher ist leer"
               prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
               fields={[
@@ -536,25 +534,6 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
                 />
               }
             />
-            <Fehlersuche fehler={fehler}>
-              <CheckCard
-                title="Fehlersuche: Wo steckt der Fehler?"
-                rechnen={false}
-                ohnePunkte
-                prompt={<p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>}
-                rechnung={[
-                  { l: ['-0{,}4x + 2{,}5'], r: ['0'], u: '\\mid -2{,}5 \\;\\; \\text{①}' },
-                  { l: ['-0{,}4x'], r: [{ luecke: 'r' }], u: '\\mid :(-0{,}4) \\;\\; \\text{②}' },
-                  { l: ['x_N'], r: [{ luecke: 'xn' }], u: '\\text{③ Nullstelle}' },
-                  { l: ['0{,}25 \\text{ h}'], r: [{ luecke: 'min' }, '\\;\\text{min}'], u: '\\text{④ Minuten}' },
-                ]}
-                fields={[
-                  { kind: 'num', key: 'r', label: 'rechte Seite nach | −2,5', expected: -2.5 },
-                  { kind: 'num', key: 'xn', label: 'Nullstelle', expected: X_LEER },
-                  { kind: 'num', key: 'min', label: 'Minuten für 0,25 Stunden', expected: 15 },
-                ]}
-              />
-            </Fehlersuche>
           </Abschnitt>
           <Abschnitt titel="Deine Entscheidung">
             <McCard

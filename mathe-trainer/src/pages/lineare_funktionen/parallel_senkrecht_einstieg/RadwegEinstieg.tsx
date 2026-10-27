@@ -2,7 +2,7 @@ import { useEffect, useState, type ChangeEvent, type KeyboardEvent, type ReactNo
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, parseInput } from '../../daten_und_zufall/lernpfad/kit'
 import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
-import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Fehlersuche, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
+import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
 import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
 import { Koordinaten, winkelZwischen, type Linie } from './Koordinaten'
@@ -16,7 +16,7 @@ import './radweg.css'
 // Sie tippen Steigungen ein, der Plan zeichnet die Gerade sofort und meldet, ob der Radweg die Gleise kreuzt bzw. welchen Winkel
 // die Brücke mit den Gleisen bildet. Aha: Weder −0,5 (nur Vorzeichen) noch 2 (nur Kehrwert) ergeben 90°, erst −2.
 // Problem lösen: Problem → Beispielrechnung Stadtpark mit Lernvideo und Skizzen (Steigungsdreieck verschieben bzw. um 90°
-// drehen) → Ergebnisse abgleichen (beide Gleichungen) mit Fehlersuche → Entscheidung (Weg senkrecht zum Radweg) → Handlungsprodukt
+// drehen) → Ergebnisse abgleichen (beide Gleichungen) → Entscheidung (Weg senkrecht zum Radweg) → Handlungsprodukt
 // analog: beschriftete Planskizze im Heft mit Steigungsdreiecken und rechtem Winkel. Danach Rückbezug und Merke.
 // Phase 4: Senkrechte wählen (Fehloptionen nur Vorzeichen, nur Kehrwert, parallel), Wer hat recht? (gedrehtes Dreieck), Senkrechte
 // durch P eintippen, Senkrechte zu einer Geraden durch zwei Punkte, Profi waagrechte Gerade. Bonus-Spiel „Brückenbauer“.
@@ -488,7 +488,6 @@ export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => v
   const [radweg, setRadweg] = useState<number[]>([])
   const [bruecke, setBruecke] = useState<number[]>([])
   const [geloest, setGeloest] = useState(false)
-  const [fehler, setFehler] = useState(false)
   const [uebungen, setUebungen] = useState<string[]>([])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
@@ -675,7 +674,6 @@ export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => v
                 setGeloest(true)
               }}
               punkte={15}
-              onFehler={() => setFehler(true)}
               title="Die Pläne sind fertig"
               prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Tippe die Gleichungen vollständig ein, mit „y =“. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
               fields={[
@@ -699,30 +697,6 @@ export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => v
                 />
               }
             />
-            <Fehlersuche fehler={fehler}>
-              <CheckCard
-                title="Fehlersuche: Wo steckt der Fehler?"
-                rechnen={false}
-                ohnePunkte
-                prompt={<p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>}
-                rechnung={[
-                  { l: ['m_R'], r: [{ luecke: 'mr' }], u: '\\text{① Steigung Radweg}' },
-                  { l: ['-1'], r: [{ luecke: 'mx' }, '+ t'], u: '\\text{② } R \\text{ einsetzen}' },
-                  { l: ['t_R'], r: [{ luecke: 'tr' }], u: '\\text{③ } t \\text{ Radweg}' },
-                  { l: ['m_B'], r: [{ luecke: 'mb' }], u: '\\text{④ Steigung Brücke}' },
-                  { l: ['2'], r: [{ luecke: 'mbx' }, '+ t'], u: '\\text{⑤ } B \\text{ einsetzen}' },
-                  { l: ['t_B'], r: [{ luecke: 'tb' }], u: '\\text{⑥ } t \\text{ Brücke}' },
-                ]}
-                fields={[
-                  { kind: 'num', key: 'mr', label: 'Steigung Radweg', expected: RADWEG.m },
-                  { kind: 'num', key: 'mx', label: 'm · 4', expected: 2 },
-                  { kind: 'num', key: 'tr', label: 't Radweg', expected: RADWEG.t },
-                  { kind: 'num', key: 'mb', label: 'Steigung Brücke', expected: BRUECKE.m },
-                  { kind: 'num', key: 'mbx', label: 'm · 2', expected: -4 },
-                  { kind: 'num', key: 'tb', label: 't Brücke', expected: BRUECKE.t },
-                ]}
-              />
-            </Fehlersuche>
           </Abschnitt>
           <Abschnitt titel="Noch eine Frage vom Bauamt">
             <McCard

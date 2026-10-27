@@ -7,7 +7,6 @@ import {
   Aufklappbar,
   BeispielMitVideo,
   BonusSpiel,
-  Fehlersuche,
   Handlungsprodukt,
   SeitenLernsituation,
   type Seite,
@@ -26,7 +25,7 @@ import './labor.css'
 // Format Experimentierlabor: In „Problem erkennen“ raten die SuS das Lösungspaar von I: 3x + 2y = 12, II: x + 2y = 7 (Lösung (2,5 | 2,25),
 // im Graphen nur ungefähr abzulesen, Gleichsetzen geht nicht direkt). Danach probieren sie im Gleichungs-Labor I + II und I − II aus.
 // Aha: Bei I − II verschwindet y, übrig bleibt 2x = 5.
-// Problem lösen in drei Teilen, je Problem → Beispielrechnung mit Lernvideo → Ergebnisse abgleichen mit Fehlersuche:
+// Problem lösen in drei Teilen, je Problem → Beispielrechnung mit Lernvideo → Ergebnisse abgleichen:
 // Teil 1 subtrahieren (gleiche Zahl vor einer Variablen), Teil 2 addieren (Gegenzahlen), Teil 3 erst eine Gleichung multiplizieren.
 // Handlungsprodukt analog: Entscheidungs-Flussdiagramm „Welcher Weg?“ im Heft (Kriterium Begriffe: LGS, I, II, Koeffizient, Lösungspaar, Gegenzahl, Probe).
 // Identität: Themenfarbe Violett, Symbol fa-flask, Titelbild Labortafel mit zwei Gleichungen und zwei Geraden, Leitobjekt das Gleichungs-Labor.
@@ -611,7 +610,6 @@ const LOESUNG3 = (
   </>
 )
 
-const FEHLERSUCHE_TEXT = <p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
@@ -629,7 +627,6 @@ export default function LaborEinstieg({
   const [versuche, setVersuche] = useState<Paar[]>([])
   const [entdeckt, setEntdeckt] = useState<string | null>(null)
   const [geloest, setGeloest] = useState<string[]>([])
-  const [fehler, setFehler] = useState({ t1: false, t2: false, t3: false })
   const [uebungen, setUebungen] = useState<string[]>([])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
@@ -640,7 +637,6 @@ export default function LaborEinstieg({
     fertig()
     setGeloest((g) => (g.includes(k) ? g : [...g, k]))
   }
-  const fehlerAn = (k: keyof typeof fehler) => () => setFehler((f) => (f[k] ? f : { ...f, [k]: true }))
 
   const seiten: Seite[] = [
     {
@@ -869,7 +865,6 @@ export default function LaborEinstieg({
             </BeispielMitVideo>
             <CheckCard
               onSolved={teilGeloest('t1', fertig.teil('t1'))}
-              onFehler={fehlerAn('t1')}
               punkte={10}
               title="Das Lösungspaar"
               prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
@@ -893,25 +888,6 @@ export default function LaborEinstieg({
                 />
               }
             />
-            <Fehlersuche fehler={fehler.t1}>
-              <CheckCard
-                title="Fehlersuche: Wo steckt der Fehler?"
-                rechnen={false}
-                ohnePunkte
-                prompt={FEHLERSUCHE_TEXT}
-                rechnung={[
-                  { l: ['\\text{I} - \\text{II: }', { luecke: 'k' }, 'x'], r: [{ luecke: 'r' }], u: '\\text{① subtrahieren}' },
-                  { l: ['x'], r: [{ luecke: 'x' }], u: '\\text{② } \\mid :2' },
-                  { l: ['2y'], r: [{ luecke: 'zy' }], u: '\\text{③ in II einsetzen}' },
-                ]}
-                fields={[
-                  { kind: 'num', key: 'k', label: 'Zahl vor x nach dem Subtrahieren', expected: 2 },
-                  { kind: 'num', key: 'r', label: 'rechte Seite nach dem Subtrahieren', expected: 5 },
-                  { kind: 'num', key: 'x', label: 'x', expected: 2.5 },
-                  { kind: 'num', key: 'zy', label: 'rechte Seite von 2y = …', expected: 4.5 },
-                ]}
-              />
-            </Fehlersuche>
           </Abschnitt>
           <Abschnitt titel="Teil 2: Gegenzahlen, also addieren">
             <p className="sl-text">
@@ -923,7 +899,6 @@ export default function LaborEinstieg({
             </BeispielMitVideo>
             <CheckCard
               onSolved={teilGeloest('t2', fertig.teil('t2'))}
-              onFehler={fehlerAn('t2')}
               punkte={10}
               title="Teil 2"
               prompt={<p>Trage die Ergebnisse aus deinem Heft ein.</p>}
@@ -949,25 +924,6 @@ export default function LaborEinstieg({
                 />
               }
             />
-            <Fehlersuche fehler={fehler.t2}>
-              <CheckCard
-                title="Fehlersuche: Wo steckt der Fehler?"
-                rechnen={false}
-                ohnePunkte
-                prompt={FEHLERSUCHE_TEXT}
-                rechnung={[
-                  { l: ['\\text{I} + \\text{II: }', { luecke: 'k' }, 'x'], r: [{ luecke: 'r' }], u: '\\text{① addieren}' },
-                  { l: ['x'], r: [{ luecke: 'x' }], u: '\\text{② } \\mid :6' },
-                  { l: ['3y'], r: [{ luecke: 'zy' }], u: '\\text{③ in I: } 6 + 3y = 3' },
-                ]}
-                fields={[
-                  { kind: 'num', key: 'k', label: 'Zahl vor x nach dem Addieren', expected: 6 },
-                  { kind: 'num', key: 'r', label: 'rechte Seite nach dem Addieren', expected: 18 },
-                  { kind: 'num', key: 'x', label: 'x', expected: 3 },
-                  { kind: 'num', key: 'zy', label: 'rechte Seite von 3y = …', expected: -3 },
-                ]}
-              />
-            </Fehlersuche>
           </Abschnitt>
           <Abschnitt titel="Teil 3: Erst multiplizieren">
             <p className="sl-text">
@@ -980,7 +936,6 @@ export default function LaborEinstieg({
             </BeispielMitVideo>
             <CheckCard
               onSolved={teilGeloest('t3', fertig.teil('t3'))}
-              onFehler={fehlerAn('t3')}
               punkte={12}
               title="Teil 3"
               prompt={<p>Trage die Ergebnisse aus deinem Heft ein.</p>}
@@ -1004,26 +959,6 @@ export default function LaborEinstieg({
                 />
               }
             />
-            <Fehlersuche fehler={fehler.t3}>
-              <CheckCard
-                title="Fehlersuche: Wo steckt der Fehler?"
-                rechnen={false}
-                ohnePunkte
-                prompt={FEHLERSUCHE_TEXT}
-                rechnung={[
-                  { l: ['\\text{II} \\cdot 2{:}\\;', { luecke: 'a' }, 'x +', { luecke: 'b' }, 'y'], r: [{ luecke: 'c' }], u: '\\text{① mal 2}' },
-                  { l: ['\\text{I} - \\text{II} \\cdot 2{:}\\; y'], r: [{ luecke: 'y' }], u: '\\text{② subtrahieren}' },
-                  { l: ['x'], r: [{ luecke: 'x' }], u: '\\text{③ in II einsetzen}' },
-                ]}
-                fields={[
-                  { kind: 'num', key: 'a', label: 'Zahl vor x in II mal 2', expected: 2 },
-                  { kind: 'num', key: 'b', label: 'Zahl vor y in II mal 2', expected: 2 },
-                  { kind: 'num', key: 'c', label: 'rechte Seite von II mal 2', expected: 10 },
-                  { kind: 'num', key: 'y', label: 'y', expected: 3 },
-                  { kind: 'num', key: 'x', label: 'x', expected: 2 },
-                ]}
-              />
-            </Fehlersuche>
           </Abschnitt>
           <Handlungsprodukt titel="Flussdiagramm „Welcher Weg?“">
             <FlussdiagrammBild />

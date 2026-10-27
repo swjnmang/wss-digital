@@ -3,7 +3,7 @@ import TaskShell from '../../../components/layout/TaskShell'
 import GleichungEingabe from '../../../components/GleichungEingabe'
 import { Beispiel, M, MB, Merke, fmt } from '../../daten_und_zufall/lernpfad/kit'
 import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
-import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Fehlersuche, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
+import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
 import { Kriterien, Vermutung, type Festlegung } from '../../finanzmathe/zins_kit/zins_kit'
 import { formatLinearEquation, parseLinearEquation, texLinearEquation } from '../../../utils/parseLinearEquation'
@@ -17,7 +17,7 @@ import './scooter.css'
 // im Tarif-Rechner aus (vollständig eingetippt, Live-Graph mit den beiden Fahrten). Aha: Der Dreisatz liefert aus Fahrt 1
 // 9,75 €, aus Fahrt 2 aber 7,50 €. Beides kann nicht stimmen, weil die Entsperrgebühr bei jeder Fahrt gleich bleibt.
 // Problem lösen: Problem → Beispielrechnung Fahrradverleih mit Lernvideo → Ergebnisse abgleichen (Gleichung vollständig
-// eingetippt, Preis für 30 min) mit Fehlersuche → Entscheidung → Handlungsprodukt analog: Schritt-für-Schritt-Anleitung
+// eingetippt, Preis für 30 min) → Entscheidung → Handlungsprodukt analog: Schritt-für-Schritt-Anleitung
 // „Tarif knacken“ für Lina mit eigenem Beispiel. Danach Rückbezug und Merke.
 // Phase 4: fünf Übungen (Gleichung wählen, Wer hat recht?, Gleichung aus zwei Punkten im Graphen ohne Sachkontext, Taxi-Tarif eintippen,
 // fallender Akku eintippen), Profi-Aufgabe
@@ -467,7 +467,6 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
   const [vermutung, setVermutung] = useState<Festlegung<Wahl>>({ wahl: null, wert: 8, fest: false })
   const [versuche, setVersuche] = useState<Versuch[]>([])
   const [geloest, setGeloest] = useState(false)
-  const [fehler, setFehler] = useState(false)
   /** in „Problem lösen“ eingetippte Gleichung, wird live in den Graphen gezeichnet */
   const [eigeneGleichung, setEigeneGleichung] = useState('')
   const eigene = parseLinearEquation(eigeneGleichung)
@@ -669,7 +668,6 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
                 setGeloest(true)
               }}
               punkte={15}
-              onFehler={() => setFehler(true)}
               onEingabe={(w) => setEigeneGleichung(w.gl ?? '')}
               title="Der Tarif ist geknackt"
               prompt={
@@ -699,26 +697,6 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
                 />
               }
             />
-            <Fehlersuche fehler={fehler}>
-              <CheckCard
-                title="Fehlersuche: Wo steckt der Fehler?"
-                rechnen={false}
-                ohnePunkte
-                prompt={<p>Prüfe deine Zwischenergebnisse. Das erste rote Feld zeigt dir, in welchem Schritt du nachrechnen musst.</p>}
-                rechnung={[
-                  { l: ['m'], r: ['\\dfrac{5 - 2{,}6}{20 - 8} =', { luecke: 'm' }], u: '\\text{① Steigung}' },
-                  { l: ['2{,}6'], r: [{ luecke: 'mx' }, '+ t'], u: '\\text{② } P_1 \\text{ einsetzen}' },
-                  { l: ['t'], r: [{ luecke: 't' }], u: '\\text{③ } t' },
-                  { l: ['x = 30{:}\\; y'], r: [{ luecke: 'y' }], u: '\\text{④ Preis}' },
-                ]}
-                fields={[
-                  { kind: 'num', key: 'm', label: 'Steigung m', expected: M_TARIF },
-                  { kind: 'num', key: 'mx', label: 'm · 8', expected: 1.6 },
-                  { kind: 'num', key: 't', label: 't', expected: T_TARIF },
-                  { kind: 'num', key: 'y', label: 'Preis für 30 Minuten', expected: preis(DAUER) },
-                ]}
-              />
-            </Fehlersuche>
           </Abschnitt>
           <Abschnitt titel="Deine Entscheidung">
             <McCard
