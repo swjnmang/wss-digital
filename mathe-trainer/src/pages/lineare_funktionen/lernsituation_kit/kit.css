@@ -113,10 +113,18 @@
 /* Rechte Seite darf auf schmalen Bildschirmen umbrechen */
 .ls-rechnung-r { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 4px; min-width: 0; }
 .ls-rechnung-u { color: var(--ink-muted); white-space: nowrap; padding-left: 10px; }
+/* Schmale Bildschirme: Umformung bleibt rechts neben der Gleichung, dafür kleinere Schrift und Lücken */
 @media (max-width: 520px) {
-  .ls-rechnung { grid-template-columns: auto minmax(0, 1fr); }
-  .ls-rechnung-u { grid-column: 2; padding-left: 0; margin-top: -6px; }
+  .ls-rechnung, .sl-seite .ls-rechnung { grid-template-columns: auto auto auto; justify-content: start; column-gap: 4px; font-size: 16px; }
+  .ls-rechnung-l { gap: 2px; }
+  .ls-rechnung-r { flex-wrap: nowrap; gap: 4px 2px; min-width: max-content; }
+  .ls-rechnung-u { padding-left: 4px; }
+  .ls-rechnung .ls-gap.lp-input-sm { width: 52px; padding: 4px 2px; }
 }
+/* Fallback, falls die Zeilen trotzdem zu breit sind (lange Schrittnamen): Umformung unter der rechten Seite */
+.ls-rechnung.ls-rechnung-eng, .sl-seite .ls-rechnung.ls-rechnung-eng { grid-template-columns: auto auto; }
+.ls-rechnung-eng .ls-rechnung-u { grid-column: 2; padding-left: 0; margin-top: -4px; }
+.ls-rechnung-eng .ls-rechnung-u:empty { display: none; }
 .ls-gap.lp-input-sm { width: 72px; }
 .ls-help-wahl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
 .ls-help-wahl > span { font-weight: 700; color: var(--ink-muted); }
