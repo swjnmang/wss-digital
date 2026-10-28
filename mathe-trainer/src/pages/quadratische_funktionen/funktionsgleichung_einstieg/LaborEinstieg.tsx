@@ -650,9 +650,9 @@ export default function LaborEinstieg({
             onSolved={fertig.teil('a')}
             punkte={2}
             title="a) Minus vor der Klammer"
-            prompt={<p>Fasse zusammen. Trage die Zahl vor <M>y</M> ein.</p>}
-            rechnung={[{ l: ['(4x + 3y) - (4x + y)'], r: [{ luecke: 'k' }, 'y'] }]}
-            fields={[{ kind: 'num', key: 'k', label: 'Zahl vor y', expected: 2 }]}
+            prompt={<p>Fasse zusammen. Trage das vollständige Ergebnis ein, also Zahl und Variable.</p>}
+            rechnung={[{ l: ['(4x + 3y) - (4x + y)'], r: [{ luecke: 'k', breit: true }] }]}
+            fields={[{ kind: 'term', key: 'k', label: 'Ergebnis', expected: 2, variable: 'y' }]}
             solution={<MB>{'(4x + 3y) - (4x + y) = 4x + 3y - 4x - y = 2y'}</MB>}
             help={
               <Hilfen
@@ -672,9 +672,9 @@ export default function LaborEinstieg({
             onSolved={fertig.teil('b')}
             punkte={2}
             title="b) Gegenzahlen"
-            prompt={<p>Fasse zusammen. Trage die Zahl vor <M>x</M> ein.</p>}
-            rechnung={[{ l: ['(2x + 5y) + (3x - 5y)'], r: [{ luecke: 'k' }, 'x'] }]}
-            fields={[{ kind: 'num', key: 'k', label: 'Zahl vor x', expected: 5 }]}
+            prompt={<p>Fasse zusammen. Trage das vollständige Ergebnis ein, also Zahl und Variable.</p>}
+            rechnung={[{ l: ['(2x + 5y) + (3x - 5y)'], r: [{ luecke: 'k', breit: true }] }]}
+            fields={[{ kind: 'term', key: 'k', label: 'Ergebnis', expected: 5, variable: 'x' }]}
             solution={<MB>{'(2x + 5y) + (3x - 5y) = 2x + 3x + 5y - 5y = 5x'}</MB>}
             help={
               <Hilfen
@@ -727,15 +727,16 @@ export default function LaborEinstieg({
               </p>
             }
             rechnung={[
-              { l: ['2 \\cdot 2 + 3y'], r: ['13'], u: '\\mid -4' },
+              { l: ['2 \\cdot', { luecke: 'x' }, '+ 3y'], r: ['13'], u: '\\mid -4' },
               { l: ['3y'], r: [{ luecke: 'r' }], u: '\\mid :3' },
               { l: ['y'], r: [{ luecke: 'y' }] },
             ]}
             fields={[
+              { kind: 'num', key: 'x', label: 'eingesetzter Wert für x', expected: 2 },
               { kind: 'num', key: 'r', label: 'rechte Seite nach minus 4', expected: 9 },
               { kind: 'num', key: 'y', label: 'Wert von y', expected: 3 },
             ]}
-            solution={<MB>{'\\begin{aligned} 4 + 3y &= 13 && \\mid -4 \\\\ 3y &= 9 && \\mid :3 \\\\ y &= 3 \\end{aligned}'}</MB>}
+            solution={<MB>{'\\begin{aligned} 2 \\cdot 2 + 3y &= 13 \\\\ 4 + 3y &= 13 && \\mid -4 \\\\ 3y &= 9 && \\mid :3 \\\\ y &= 3 \\end{aligned}'}</MB>}
             help={
               <Hilfen
                 steps={[

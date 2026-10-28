@@ -427,8 +427,8 @@ export function BonusSpiel({
 }
 
 /**
- * „Problem lösen“: Beispielrechnung mit Lernvideo hinter einem breiten Knopf. Aufgeklappt steht oben das Lernvideo (falls es eines gibt),
- * darunter die Beispielrechnung (meist <Beispiel offen …/>). Rechenbeispiel und Video sind kostenlos.
+ * „Problem lösen“: Beispielrechnung mit Lernvideo hinter einem breiten Knopf. Aufgeklappt steht oben die Beispielrechnung
+ * (meist <Beispiel offen …/>), darunter das Lernvideo (falls es eines gibt). Rechenbeispiel und Video sind kostenlos.
  */
 export function BeispielMitVideo({
   video,
@@ -446,8 +446,8 @@ export function BeispielMitVideo({
       icon={video ? 'fa-circle-play' : 'fa-lightbulb'}
       label={video ? 'Beispielrechnung mit Lernvideo ansehen' : 'Beispielrechnung ansehen'}
     >
-      {video && <VideoEmbed src={video} title={videoTitel} />}
       {children}
+      {video && <VideoEmbed src={video} title={videoTitel} />}
     </Aufklappbar>
   );
 }

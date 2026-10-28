@@ -272,7 +272,19 @@ export type Zeile = { l: Seg[]; r: Seg[]; u?: string }
 type SelectField = { kind: 'select'; key: string; label: ReactNode; options: string[]; expected: number }
 /** Vollständig eingetippte lineare Funktionsgleichung, z. B. „y = 0,2x + 1“ (m und t sind die richtigen Werte) */
 type GleichungField = { kind: 'gleichung'; key: string; label: ReactNode; m: number; t: number; tol?: number }
-type CField = NumField | SelectField | GleichungField
+/** Eingetippter Term aus Zahl und Variable, z. B. „2y“ (die SuS schreiben die Variable selbst dazu) */
+type TermField = { kind: 'term'; key: string; label: ReactNode; expected: number; variable: string }
+type CField = NumField | SelectField | GleichungField | TermField
+
+/** Prüft einen Term wie „2y“, „-x“ oder „0,5·y“: undefined bei leerem Feld */
+function checkTerm(v: string, expected: number, variable: string): boolean | undefined {
+  const s = v.replace(/\s|\*|·|⋅/g, '').replace(/−/g, '-').toLowerCase()
+  if (s === '') return undefined
+  const m = s.match(new RegExp(`^([+-]?)(\\d*(?:[.,]\\d+)?)${variable.toLowerCase()}$`))
+  if (!m) return false
+  const zahl = m[2] === '' ? 1 : Number(m[2].replace(',', '.'))
+  return (m[1] === '-' ? -zahl : zahl) === expected
+}
 
 /** Aufgabenkarte mit Zahlenfeldern / Auswahllisten: jedes Feld prüft sich selbst (richtig sofort grün, falsch nach kurzer Pause rot), Lob und Lösungsweg */
 export function CheckCard({
@@ -342,7 +354,9 @@ export function CheckCard({
             ? v.trim() === ''
               ? undefined
               : checkLinearEquation(v, f.m, f.t, f.tol).status === 'ok'
-            : checkNumber(v, f.expected, f.tol),
+            : f.kind === 'term'
+              ? checkTerm(v, f.expected, f.variable)
+              : checkNumber(v, f.expected, f.tol),
     })),
     {
       onSolved: () => {
@@ -389,8 +403,9 @@ export function CheckCard({
       <input
         key={i}
         type="text"
-        inputMode="decimal"
+        inputMode={f.kind === 'term' ? 'text' : 'decimal'}
         autoComplete="off"
+        autoCapitalize="off"
         placeholder="?"
         aria-label={typeof f.label === 'string' ? f.label : 'Lücke'}
         className={`bk-input lp-input ${seg.breit ? 'lp-input-md' : 'lp-input-sm'} ls-gap ${fieldCheckClass(marks[f.key])}`}
@@ -461,15 +476,16 @@ export function CheckCard({
                   <input
                     id={`${uid}-${f.key}`}
                     type="text"
-                    inputMode="decimal"
+                    inputMode={f.kind === 'term' ? 'text' : 'decimal'}
                     autoComplete="off"
+                    autoCapitalize="off"
                     placeholder="?"
                     className={`bk-input lp-input lp-input-md ${fieldCheckClass(marks[f.key])}`}
                     value={values[f.key] ?? ''}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(f.key, e.target.value)}
                     onBlur={(e: FocusEvent<HTMLInputElement>) => blur(f.key, e.currentTarget.value)}
                   />
-                  {f.unit && <span className="lp-unit">{f.unit}</span>}
+                  {f.kind === 'num' && f.unit && <span className="lp-unit">{f.unit}</span>}
                 </span>
               )}
             </div>
