@@ -376,22 +376,113 @@ const BSP2_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
   },
 ]
 
+/** Lösungsweg Schritt für Schritt, im selben Aufbau wie die Rechenbeispiele */
+function LoesungsSchritte({ steps, fazit }: { steps: { title: ReactNode; body: ReactNode }[]; fazit: ReactNode }) {
+  return (
+    <>
+      <ol className="lp-example-steps">
+        {steps.map((s, i) => (
+          <li key={i}>
+            <div className="lp-example-step-title">
+              Schritt {i + 1}: {s.title}
+            </div>
+            <div className="lp-example-step-body">{s.body}</div>
+          </li>
+        ))}
+      </ol>
+      <p>{fazit}</p>
+    </>
+  )
+}
+
 const LOESUNG1 = (
-  <>
-    <MB>{'\\begin{aligned} 3{,}8 &= -0{,}5 + b + c && \\mid +0{,}5 &&\\Rightarrow\\; \\text{I: } b + c = 4{,}3 \\\\ 4{,}55 &= -2 + 2b + c && \\mid +2 &&\\Rightarrow\\; \\text{II: } 2b + c = 6{,}55 \\end{aligned}'}</MB>
-    <MB>{'\\text{II} - \\text{I: } b = 2{,}25 \\qquad \\text{in I: } 2{,}25 + c = 4{,}3 \\;\\Rightarrow\\; c = 2{,}05'}</MB>
-    <MB>{'y = -0{,}5x^2 + 2{,}25x + 2{,}05 \\qquad x = 4{:}\\; y = -8 + 9 + 2{,}05 = 3{,}05'}</MB>
-    <p>Bei der Korbmitte ist der Ball genau auf Ringhöhe: Linas Wurf ist ein Treffer.</p>
-  </>
+  <LoesungsSchritte
+    steps={[
+      {
+        title: <>Den bekannten Wert <M>a</M> einsetzen</>,
+        body: <MB>{'y = -0{,}5x^2 + bx + c'}</MB>,
+      },
+      {
+        title: <>Punkt <M>{'P(1 \\mid 3{,}8)'}</M> einsetzen: Gleichung I</>,
+        body: <MB>{'\\begin{aligned} 3{,}8 &= -0{,}5 \\cdot 1^2 + b \\cdot 1 + c \\\\ 3{,}8 &= -0{,}5 + b + c && \\mid +0{,}5 \\\\ \\text{I: } b + c &= 4{,}3 \\end{aligned}'}</MB>,
+      },
+      {
+        title: <>Punkt <M>{'Q(2 \\mid 4{,}55)'}</M> einsetzen: Gleichung II</>,
+        body: <MB>{'\\begin{aligned} 4{,}55 &= -0{,}5 \\cdot 2^2 + b \\cdot 2 + c \\\\ 4{,}55 &= -2 + 2b + c && \\mid +2 \\\\ \\text{II: } 2b + c &= 6{,}55 \\end{aligned}'}</MB>,
+      },
+      {
+        title: 'Das Gleichungssystem mit dem Subtraktionsverfahren lösen',
+        body: (
+          <>
+            <p>
+              Vor <M>c</M> steht in beiden Gleichungen 1. Rechne II − I, dann fällt <M>c</M> weg. Setze <M>b</M> danach in I ein:
+            </p>
+            <MB>{'\\begin{aligned} \\text{II: } 2b + c &= 6{,}55 \\\\ \\text{I: } b + c &= 4{,}3 \\\\ \\hline \\text{II} - \\text{I: } b &= 2{,}25 \\\\ \\text{in I: } 2{,}25 + c &= 4{,}3 && \\mid -2{,}25 \\\\ c &= 2{,}05 \\end{aligned}'}</MB>
+          </>
+        ),
+      },
+      {
+        title: 'Funktionsgleichung angeben und die Höhe bei der Korbmitte berechnen',
+        body: (
+          <>
+            <MB>{'y = -0{,}5x^2 + 2{,}25x + 2{,}05'}</MB>
+            <MB>{'x = 4{:}\\quad y = -0{,}5 \\cdot 4^2 + 2{,}25 \\cdot 4 + 2{,}05 = -8 + 9 + 2{,}05 = 3{,}05'}</MB>
+          </>
+        ),
+      },
+    ]}
+    fazit="Bei der Korbmitte ist der Ball genau auf Ringhöhe (3,05 m): Linas Wurf ist ein Treffer."
+  />
 )
 const LOESUNG2 = (
-  <>
-    <MB>{'\\begin{aligned} 3{,}4 &= a + b + 2{,}2 && \\mid -2{,}2 &&\\Rightarrow\\; \\text{I: } a + b = 1{,}2 \\\\ 3{,}8 &= 4a + 2b + 2{,}2 && \\mid -2{,}2 &&\\Rightarrow\\; \\text{II: } 4a + 2b = 1{,}6 \\end{aligned}'}</MB>
-    <MB>{'\\text{I} \\cdot 2{:}\\; 2a + 2b = 2{,}4 \\qquad \\text{II} - \\text{I} \\cdot 2{:}\\; 2a = -0{,}8 \\;\\Rightarrow\\; a = -0{,}4'}</MB>
-    <MB>{'\\text{in I: } -0{,}4 + b = 1{,}2 \\;\\Rightarrow\\; b = 1{,}6 \\qquad y = -0{,}4x^2 + 1{,}6x + 2{,}2'}</MB>
-    <MB>{'x = 4{:}\\; y = -0{,}4 \\cdot 16 + 1{,}6 \\cdot 4 + 2{,}2 = -6{,}4 + 6{,}4 + 2{,}2 = 2{,}2'}</MB>
-    <p>Bei der Korbmitte ist der Ball nur 2,2 m hoch, 85 cm unter dem Ring: Jonas' Wurf ist zu kurz.</p>
-  </>
+  <LoesungsSchritte
+    steps={[
+      {
+        title: <>Den bekannten Wert <M>c</M> einsetzen</>,
+        body: <MB>{'y = ax^2 + bx + 2{,}2'}</MB>,
+      },
+      {
+        title: <>Punkt <M>{'P(1 \\mid 3{,}4)'}</M> einsetzen: Gleichung I</>,
+        body: <MB>{'\\begin{aligned} 3{,}4 &= a \\cdot 1^2 + b \\cdot 1 + 2{,}2 \\\\ 3{,}4 &= a + b + 2{,}2 && \\mid -2{,}2 \\\\ \\text{I: } a + b &= 1{,}2 \\end{aligned}'}</MB>,
+      },
+      {
+        title: <>Punkt <M>{'Q(2 \\mid 3{,}8)'}</M> einsetzen: Gleichung II</>,
+        body: <MB>{'\\begin{aligned} 3{,}8 &= a \\cdot 2^2 + b \\cdot 2 + 2{,}2 \\\\ 3{,}8 &= 4a + 2b + 2{,}2 && \\mid -2{,}2 \\\\ \\text{II: } 4a + 2b &= 1{,}6 \\end{aligned}'}</MB>,
+      },
+      {
+        title: 'Gleichung I passend multiplizieren',
+        body: (
+          <>
+            <p>
+              Vor <M>b</M> stehen 1 und 2. Multipliziere I auf beiden Seiten mit 2, dann steht in beiden Gleichungen <M>{'2b'}</M>:
+            </p>
+            <MB>{'\\begin{aligned} \\text{I: } a + b &= 1{,}2 && \\mid \\cdot 2 \\\\ \\text{I} \\cdot 2{:}\; 2a + 2b &= 2{,}4 \\end{aligned}'}</MB>
+          </>
+        ),
+      },
+      {
+        title: 'Das Gleichungssystem mit dem Subtraktionsverfahren lösen',
+        body: (
+          <>
+            <p>
+              Rechne II − I · 2, dann fällt <M>b</M> weg. Setze <M>a</M> danach in I ein:
+            </p>
+            <MB>{'\\begin{aligned} \\text{II: } 4a + 2b &= 1{,}6 \\\\ \\text{I} \\cdot 2{:}\; 2a + 2b &= 2{,}4 \\\\ \\hline \\text{II} - \\text{I} \\cdot 2{:}\; 2a &= -0{,}8 && \\mid :2 \\\\ a &= -0{,}4 \\\\ \\text{in I: } -0{,}4 + b &= 1{,}2 && \\mid +0{,}4 \\\\ b &= 1{,}6 \\end{aligned}'}</MB>
+          </>
+        ),
+      },
+      {
+        title: 'Funktionsgleichung angeben und die Höhe bei der Korbmitte berechnen',
+        body: (
+          <>
+            <MB>{'y = -0{,}4x^2 + 1{,}6x + 2{,}2'}</MB>
+            <MB>{'x = 4{:}\\quad y = -0{,}4 \\cdot 4^2 + 1{,}6 \\cdot 4 + 2{,}2 = -6{,}4 + 6{,}4 + 2{,}2 = 2{,}2'}</MB>
+          </>
+        ),
+      },
+    ]}
+    fazit="Bei der Korbmitte ist der Ball nur 2,2 m hoch, 85 cm unter dem Ring: Jonas' Wurf ist zu kurz."
+  />
 )
 
 
