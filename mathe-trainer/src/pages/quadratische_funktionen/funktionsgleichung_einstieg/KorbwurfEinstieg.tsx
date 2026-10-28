@@ -24,7 +24,7 @@ import './korbwurf.css'
 // Voraussetzung: das Additions- und Subtraktionsverfahren aus Lernsituation 2 („Das Gleichungs-Labor“).
 // Format Entscheidungsfall: Die Basketball-AG filmt Freiwürfe mit einer Videoanalyse-App. Die Kamera hat nur den Anfang der Würfe aufgenommen,
 // dann lief jemand durchs Bild. Trifft Linas Wurf? Und der von Jonas?
-// Problem erkennen: Festlegung (Treffer, zu kurz, zu weit), dann in der App b und c ausprobieren (a = −0,5 kennt die App aus der Abwurfgeschwindigkeit).
+// Problem erkennen: Festlegung (Treffer, zu kurz, zu weit), dann in der App a, b und c ausprobieren (a = −0,5 ist aus der Abwurfgeschwindigkeit bekannt).
 // Die Bahn wird sofort gezeichnet, die App vergleicht mit den Messpunkten P(1 | 3,8) und Q(2 | 4,55). Durch Raten trifft man beide kaum.
 // Problem lösen in zwei Teilen, je Problem → Beispielrechnung mit Lernvideo Fall 2 → Ergebnisse abgleichen:
 // Teil 1 a bekannt (Lina: II − I, c fällt weg): y = −0,5x² + 2,25x + 2,05, bei x = 4 genau 3,05 m → Treffer.
@@ -57,12 +57,13 @@ const WAHL: Record<Wahl, string> = {
   treffer: 'Der Ball geht in den Korb.',
 }
 
-/** Ein Versuch in der App: b und c, a = −0,5 ist fest */
-type Versuch = { b: number; c: number }
-const alsBahn = (v: Versuch): Bahn => ({ a: LINA.a, ...v })
-const passt = (v: Versuch, p: { x: number; y: number }) => Math.abs(hoehe(alsBahn(v), p.x) - p.y) < 0.0051
-const treffer = (v: Versuch) => passt(v, P1) && passt(v, Q1)
-const daneben = (v: Versuch) => Math.abs(hoehe(alsBahn(v), P1.x) - P1.y) + Math.abs(hoehe(alsBahn(v), Q1.x) - Q1.y)
+/** Ein Versuch in der App: a, b und c */
+type Versuch = Bahn
+const passt = (v: Versuch, p: { x: number; y: number }) => Math.abs(hoehe(v, p.x) - p.y) < 0.0051
+/** a muss stimmen (aus der Abwurfgeschwindigkeit bekannt), dann muss die Bahn durch P und Q gehen */
+const aPasst = (v: Versuch) => Math.abs(v.a - LINA.a) < 0.0001
+const treffer = (v: Versuch) => aPasst(v) && passt(v, P1) && passt(v, Q1)
+const daneben = (v: Versuch) => Math.abs(hoehe(v, P1.x) - P1.y) + Math.abs(hoehe(v, Q1.x) - Q1.y)
 /** Länge in m als Text mit Komma und echtem Minus */
 const meter = (v: number) => `${fmt(v, 2).replace('-', '−')} m`
 /** Bahn als TeX, z. B. „y = −0,5x² + 2,25x + 2,05“ */
@@ -145,10 +146,10 @@ const PUNKTE_JONAS = [
 
 /* ── Phase 2: die Videoanalyse-App ───────────────────────────────────────── */
 
-/** Videoanalyse-App: b und c eintippen, die Bahn erscheint sofort im Spielfeld, die App vergleicht mit den Messpunkten */
+/** Videoanalyse-App: a, b und c eintippen, die Bahn erscheint sofort im Spielfeld, die App vergleicht mit den Messpunkten */
 function AnalyseApp({ versuche, onZeichnen }: { versuche: Versuch[]; onZeichnen: (v: Versuch) => void }) {
   const uid = useId()
-  const [eingabe, setEingabe] = useState({ b: '', c: '' })
+  const [eingabe, setEingabe] = useState({ a: '', b: '', c: '' })
   const [fehlt, setFehlt] = useState(false)
   const letzter = versuche[versuche.length - 1]
   const getroffen = versuche.some(treffer)
@@ -159,18 +160,19 @@ function AnalyseApp({ versuche, onZeichnen }: { versuche: Versuch[]; onZeichnen:
     if (frei) pt.geloest()
   }, [frei, pt])
   const bahnen: BahnBild[] = versuche.map((v, i) => ({
-    ...alsBahn(v),
+    ...v,
     art: treffer(v) ? 'treffer' : i === versuche.length - 1 ? 'aktuell' : 'alt',
   }))
 
   const zeichnen = () => {
+    const a = parseInput(eingabe.a)
     const b = parseInput(eingabe.b)
     const c = parseInput(eingabe.c)
-    if (!b || !c) return setFehlt(true)
+    if (!a || !b || !c) return setFehlt(true)
     setFehlt(false)
-    onZeichnen({ b: b.value, c: c.value })
+    onZeichnen({ a: a.value, b: b.value, c: c.value })
   }
-  const feld = (k: 'b' | 'c', label: string) => (
+  const feld = (k: 'a' | 'b' | 'c', label: string) => (
     <input
       id={`${uid}-${k}`}
       type="text"
@@ -191,7 +193,7 @@ function AnalyseApp({ versuche, onZeichnen }: { versuche: Versuch[]; onZeichnen:
     return (
       <li>
         <i className={`fa-solid ${ok ? 'fa-circle-check' : 'fa-circle-xmark'}`} aria-hidden="true" /> Bei <M>{`x = ${tx(p.x)}`}</M> ist deine Bahn{' '}
-        {meter(hoehe(alsBahn(v), p.x))} hoch{ok ? ', genau wie im Video.' : <>, im Video waren es {meter(p.y)}.</>}
+        {meter(hoehe(v, p.x))} hoch{ok ? ', genau wie im Video.' : <>, im Video waren es {meter(p.y)}.</>}
       </li>
     )
   }
@@ -205,7 +207,7 @@ function AnalyseApp({ versuche, onZeichnen }: { versuche: Versuch[]; onZeichnen:
       />
       <div className="kw-eingabe">
         <span className="kw-gleichung">
-          <M>{'y = -0{,}5x^2 +'}</M> {feld('b', 'Wert für b')} <M>{'x +'}</M> {feld('c', 'Wert für c')}
+          <M>{'y ='}</M> {feld('a', 'Wert für a')} <M>{'x^2 +'}</M> {feld('b', 'Wert für b')} <M>{'x +'}</M> {feld('c', 'Wert für c')}
         </span>
         <button type="button" className="bk-btn bk-btn-primary" onClick={zeichnen}>
           <i className="fa-solid fa-basketball" aria-hidden="true" /> Bahn zeichnen
@@ -213,15 +215,20 @@ function AnalyseApp({ versuche, onZeichnen }: { versuche: Versuch[]; onZeichnen:
       </div>
       {fehlt && (
         <div className="bk-feedback bk-feedback-info lp-feedback" role="status">
-          <i className="fa-solid fa-pen" aria-hidden="true" /> Bitte trage für <M>b</M> und <M>c</M> eine Zahl ein, z. B. 2 oder 1,5.
+          <i className="fa-solid fa-pen" aria-hidden="true" /> Bitte trage für <M>a</M>, <M>b</M> und <M>c</M> je eine Zahl ein, z. B. −0,5, 2 oder 1,5.
         </div>
       )}
       {letzter && (
         <div className={`kw-display ${treffer(letzter) ? 'kw-display-ok' : ''}`} role="status">
           <div className="kw-display-head">
-            <i className="fa-solid fa-mobile-screen-button" aria-hidden="true" /> Analyse-App, Versuch {versuche.length}: <M>{bahnTex(alsBahn(letzter))}</M>
+            <i className="fa-solid fa-mobile-screen-button" aria-hidden="true" /> Analyse-App, Versuch {versuche.length}: <M>{bahnTex(letzter)}</M>
           </div>
           <ul>
+            {!aPasst(letzter) && (
+              <li>
+                <i className="fa-solid fa-circle-xmark" aria-hidden="true" /> Die Krümmung ist aus der Abwurfgeschwindigkeit bekannt: <M>{'a = -0{,}5'}</M>.
+              </li>
+            )}
             {meldung(letzter, P1)}
             {meldung(letzter, Q1)}
           </ul>
@@ -232,7 +239,7 @@ function AnalyseApp({ versuche, onZeichnen }: { versuche: Versuch[]; onZeichnen:
           {getroffen
             ? 'Treffer! Aber beim nächsten Wurf sind die Zahlen anders, und dann?'
             : 'Raten bringt dich kaum ans Ziel: Die Bahn muss durch P und Q gleichzeitig gehen, und jede Änderung an b verschiebt beide Punkte.'}{' '}
-          Gleich lernst du, wie du <M>b</M> und <M>c</M> mit dem Subtraktionsverfahren aus Lernsituation 2 sicher berechnest.
+          Gleich lernst du, wie du die fehlenden Werte mit dem Subtraktionsverfahren aus Lernsituation 2 sicher berechnest.
         </p>
       )}
     </div>
@@ -471,11 +478,11 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
           <CheckCard
             onSolved={fertig.teil('c')}
             punkte={3}
-            title="c) Subtrahieren wie im Labor"
+            title="c) Lineares Gleichungssystem lösen"
             prompt={
               <>
                 <MB>{'\\begin{aligned} \\text{I: } 3b + c &= 8 \\\\ \\text{II: } b + c &= 2 \\end{aligned}'}</MB>
-                <p>Löse das Gleichungssystem.</p>
+                <p>Löse das lineare Gleichungssystem.</p>
               </>
             }
             fieldsRow
@@ -565,13 +572,13 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
             <p>„Bei Linas Wurf ist jemand durchs Bild gelaufen, das Ende fehlt. Ging der Ball rein oder nicht? Kannst du das aus dem Video herausfinden?“</p>
           </Zitat>
           <p className="sl-text">
-            Die Bahn eines Wurfs ist eine Parabel <M>{'y = ax^2 + bx + c'}</M>. Aus der Abwurfgeschwindigkeit kennt die App die Krümmung <M>{'a = -0{,}5'}</M>. Gemessen hat sie
+            Die Bahn eines Wurfs ist eine Parabel <M>{'y = ax^2 + bx + c'}</M>. Aus der Abwurfgeschwindigkeit ist die Krümmung bekannt: <M>{'a = -0{,}5'}</M>. Gemessen hat sie
             zwei Punkte: <M>{'P(1 \\mid 3{,}8)'}</M> und <M>{'Q(2 \\mid 4{,}55)'}</M>. Gesucht sind <M>b</M> und <M>c</M> und damit die Höhe des Balls bei der Korbmitte.
           </p>
           <div className="sl-fokus">
             <p className="sl-fokus-titel">Dein Auftrag: Erst festlegen, dann in der App ausprobieren</p>
             <p>
-              Trifft Linas Wurf? Lege dich zuerst fest, ohne zu rechnen. Probier dann in der App Werte für <M>b</M> und <M>c</M> aus, bis die Bahn durch P und Q geht.
+              Trifft Linas Wurf? Lege dich zuerst fest, ohne zu rechnen. Probier dann in der App Werte für <M>a</M>, <M>b</M> und <M>c</M> aus und lass die Bahn zeichnen, bis sie durch P und Q geht.
             </p>
           </div>
           <p className="sl-hinweis">Einzel- oder Partnerarbeit, ca. 10 Minuten.</p>
@@ -604,7 +611,7 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
           {fest.fest && (
             <Abschnitt titel="Die Videoanalyse-App">
               <p className="sl-text">
-                Tippe Werte für <M>b</M> und <M>c</M> ein. Die App zeichnet die Bahn und vergleicht sie mit den Messpunkten. Probier es aus, ohne zu rechnen.
+                Tippe Werte für <M>a</M>, <M>b</M> und <M>c</M> ein und tippe auf „Bahn zeichnen“. Die App zeichnet die Bahn und vergleicht sie mit den Messpunkten. Probier es aus, ohne zu rechnen.
               </p>
               <AnalyseApp
                 versuche={versuche}
@@ -628,8 +635,9 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
           <div className="sl-fokus">
             <p className="sl-fokus-titel">Deine Aufgabe: Berechne Linas Wurfbahn und prüfe, ob der Ball trifft</p>
             <p>
-              Die Bahn <M>{'y = -0{,}5x^2 + bx + c'}</M> geht durch <M>{'P(1 \\mid 3{,}8)'}</M> und <M>{'Q(2 \\mid 4{,}55)'}</M>. Stelle in deinem Heft die Gleichungen I und II auf, löse
-              das Gleichungssystem, gib die Gleichung der Bahn an und berechne die Höhe des Balls bei der Korbmitte <M>{'x = 4'}</M>.
+              Die Wurfbahn geht durch die Punkte <M>{'P(1 \\mid 3{,}8)'}</M> und <M>{'Q(2 \\mid 4{,}55)'}</M>, und wir wissen, dass <M>{'a = -0{,}5'}</M> ist. Stelle die
+              Funktionsgleichung in der allgemeinen Form <M>{'y = ax^2 + bx + c'}</M> auf. Informationen und Rechenbeispiele findest du weiter unten. Halte deine Rechenschritte
+              schriftlich fest. Berechne anschließend die Wurfhöhe des Balls bei <M>{'x = 4'}</M>.
             </p>
           </div>
           <Feld
@@ -645,10 +653,14 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
               onSolved={teilGeloest('t1', fertig.teil('t1'))}
               punkte={12}
               title="Linas Wurfbahn"
-              prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
+              prompt={
+                <p>
+                  Trage die Ergebnisse aus deinem Heft ein: die vollständige Funktionsgleichung in der Form <M>{'y = ax^2 + bx + c'}</M> und die Wurfhöhe. Jedes Feld zeigt dir
+                  sofort, ob es stimmt.
+                </p>
+              }
               fields={[
-                { kind: 'num', key: 'b', label: <>Welchen Wert hat <M>b</M>? <M>{'b ='}</M></>, expected: LINA.b },
-                { kind: 'num', key: 'c', label: <>Welchen Wert hat <M>c</M>? <M>{'c ='}</M></>, expected: LINA.c },
+                { kind: 'parabel', key: 'gl', label: 'Linas Wurfbahn:', ...LINA },
                 { kind: 'num', key: 'h', label: <>Wie hoch ist der Ball bei der Korbmitte (<M>{'x = 4'}</M>)? <M>{'y ='}</M></>, expected: hoehe(LINA, KORB_X), unit: 'm' },
               ]}
               loesungNachFehler
@@ -671,8 +683,8 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
           <Abschnitt titel="Teil 2: Jonas' Wurf, c ist bekannt">
             <p className="sl-text">
               Auch bei Jonas fehlt das Ende des Videos. Jonas ist größer und wirft aus <strong>2,2 m Höhe</strong> ab, also ist <M>{'c = 2{,}2'}</M>. Er wirft flacher als Lina, deshalb
-              kennt die App <M>a</M> diesmal nicht. Gemessen sind <M>{'P(1 \\mid 3{,}4)'}</M> und <M>{'Q(2 \\mid 3{,}8)'}</M>. Berechne in deinem Heft <M>a</M> und <M>b</M> und die
-              Höhe bei der Korbmitte.
+              kennt die App <M>a</M> diesmal nicht. Gemessen sind <M>{'P(1 \\mid 3{,}4)'}</M> und <M>{'Q(2 \\mid 3{,}8)'}</M>. Berechne die vollständige
+              Funktionsgleichung der Wurfparabel und die Höhe bei der Korbmitte.
             </p>
             <Feld
               punkte={PUNKTE_JONAS}
@@ -686,10 +698,13 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
               onSolved={teilGeloest('t2', fertig.teil('t2'))}
               punkte={14}
               title="Jonas' Wurfbahn"
-              prompt={<p>Trage die Ergebnisse aus deinem Heft ein.</p>}
+              prompt={
+                <p>
+                  Trage die Ergebnisse aus deinem Heft ein: die vollständige Funktionsgleichung in der Form <M>{'y = ax^2 + bx + c'}</M> und die Wurfhöhe.
+                </p>
+              }
               fields={[
-                { kind: 'num', key: 'a', label: <>Welchen Wert hat <M>a</M>? <M>{'a ='}</M></>, expected: JONAS.a },
-                { kind: 'num', key: 'b', label: <>Welchen Wert hat <M>b</M>? <M>{'b ='}</M></>, expected: JONAS.b },
+                { kind: 'parabel', key: 'gl', label: "Jonas' Wurfbahn:", ...JONAS },
                 { kind: 'num', key: 'h', label: <>Wie hoch ist der Ball bei der Korbmitte (<M>{'x = 4'}</M>)? <M>{'y ='}</M></>, expected: hoehe(JONAS, KORB_X), unit: 'm' },
               ]}
               loesungNachFehler
@@ -1042,7 +1057,7 @@ function Rueckbezug({ fest, versuche }: { fest: Festlegung<Wahl>; versuche: Vers
       )}
       {bester && (
         <p>
-          In der App hattest du {versuche.length} Versuche. Dein bester war <M>{bahnTex(alsBahn(bester))}</M>
+          In der App hattest du {versuche.length} Versuche. Dein bester war <M>{bahnTex(bester)}</M>
           {treffer(bester) ? ', ein Treffer!' : <>, zusammen {meter(daneben(bester))} neben den Messpunkten.</>} Gerechnet weißt du es sicher:{' '}
           <M>{bahnTex(LINA)}</M>.
         </p>
