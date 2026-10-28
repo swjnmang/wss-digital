@@ -62,7 +62,7 @@ type Special = 'b0' | 'c0' | null
 
 const LEVEL_LABEL: Record<Level, string> = {
   einfach: 'Einfach',
-  diskriminante: 'Mittel – Die Diskriminante verstehen',
+  diskriminante: 'Mittel – Anzahl der Nullstellen mit der Diskriminante bestimmen',
   fortgeschritten: 'Fortgeschritten',
 }
 
@@ -591,6 +591,124 @@ function DiscriminantDecision({ D }: { D: Q }) {
   )
 }
 
+/** Schrittweite der Achsenbeschriftung, sodass höchstens etwa 10 Striche entstehen */
+function tickStep(range: number) {
+  return [1, 2, 5, 10, 20, 50].find((s) => range / s <= 10) ?? 100
+}
+
+const numLabel = (n: number) => tn(n).replace('{,}', ',').replace('-', '−')
+
+/** Funktionsgraph zur Aufgabe: Ausschnitt um den Scheitelpunkt, Nullstellen bzw. Scheitelpunkt markiert */
+function TaskGraph({ task }: { task: Task }) {
+  const a = val(task.a), b = val(task.b), c = val(task.c)
+  const f = (x: number) => a * x * x + b * x + c
+  const xv = -b / (2 * a)
+  const yv = f(xv)
+  const roots = task.roots
+
+  // x-Bereich: Scheitelpunkt und Nullstellen mit Rand, mindestens 8 Einheiten breit
+  const xsAll = [xv, ...roots]
+  let xMin = Math.floor(Math.min(...xsAll)) - 2
+  let xMax = Math.ceil(Math.max(...xsAll)) + 2
+  while (xMax - xMin < 8) {
+    xMin -= 1
+    xMax += 1
+  }
+  // y-Bereich: Scheitelpunkt und x-Achse, in Öffnungsrichtung mehr Platz
+  const lo = Math.min(yv, 0), hi = Math.max(yv, 0)
+  const pad = Math.max(3, (hi - lo) * 0.5)
+  let yMin = Math.floor(a > 0 ? lo - 1 : lo - pad)
+  let yMax = Math.ceil(a > 0 ? hi + pad : hi + 1)
+  if (yMax - yMin < 6) {
+    if (a > 0) yMax = yMin + 6
+    else yMin = yMax - 6
+  }
+
+  const W = 340, H = 280
+  const sx = W / (xMax - xMin), sy = H / (yMax - yMin)
+  const px = (x: number) => (x - xMin) * sx
+  const py = (y: number) => (yMax - y) * sy
+  const stepX = tickStep(xMax - xMin), stepY = tickStep(yMax - yMin)
+  const ticks = (min: number, max: number, step: number) => {
+    const out: number[] = []
+    for (let t = Math.ceil(min / step) * step; t <= max; t += step) out.push(t)
+    return out
+  }
+  const gx = ticks(xMin, xMax, stepX)
+  const gy = ticks(yMin, yMax, stepY)
+
+  const pts: string[] = []
+  for (let i = 0; i <= 200; i++) {
+    const x = xMin + ((xMax - xMin) * i) / 200
+    const y = f(x)
+    if (y < yMin - 1 || y > yMax + 1) continue
+    pts.push(`${px(x).toFixed(1)},${py(Math.max(yMin - 1, Math.min(yMax + 1, y))).toFixed(1)}`)
+  }
+
+  const count = roots.length
+  const marks =
+    count === 2
+      ? [
+          { x: Math.max(...roots), y: 0, color: RED, label: `N₁(${numLabel(Math.max(...roots))}|0)`, left: false },
+          { x: Math.min(...roots), y: 0, color: BLUE, label: `N₂(${numLabel(Math.min(...roots))}|0)`, left: true },
+        ]
+      : count === 1
+        ? [{ x: roots[0], y: 0, color: RED, label: `N(${numLabel(roots[0])}|0)`, left: false }]
+        : [{ x: xv, y: yv, color: '#64748b', label: `S(${numLabel(xv)}|${numLabel(yv)})`, left: false }]
+
+  const caption =
+    count === 2
+      ? 'Die Parabel schneidet die x-Achse zweimal: zwei Nullstellen.'
+      : count === 1
+        ? 'Die Parabel berührt die x-Achse nur mit ihrem Scheitelpunkt: eine Nullstelle.'
+        : `Der Scheitelpunkt liegt ${a > 0 ? 'über' : 'unter'} der x-Achse und die Parabel ist nach ${a > 0 ? 'oben' : 'unten'} geöffnet: keine Nullstelle.`
+
+  const ox = Math.min(Math.max(px(0), 0), W)
+  const oy = Math.min(Math.max(py(0), 0), H)
+  return (
+    <figure>
+      <svg viewBox={`-28 -12 ${W + 44} ${H + 30}`} className="w-full mx-auto max-w-sm" role="img" aria-label={`Graph von ${task.tex}`}>
+        {gx.map((x) => (
+          <line key={`gx${x}`} x1={px(x)} y1={0} x2={px(x)} y2={H} stroke="#e2e8f0" strokeWidth={1} />
+        ))}
+        {gy.map((y) => (
+          <line key={`gy${y}`} x1={0} y1={py(y)} x2={W} y2={py(y)} stroke="#e2e8f0" strokeWidth={1} />
+        ))}
+        <line x1={0} y1={oy} x2={W} y2={oy} stroke="#334155" strokeWidth={1.5} />
+        <line x1={ox} y1={H} x2={ox} y2={0} stroke="#334155" strokeWidth={1.5} />
+        <text x={W - 4} y={oy - 6} fontSize={13} textAnchor="end" fill="#334155">x</text>
+        <text x={ox + 6} y={10} fontSize={13} fill="#334155">y</text>
+        {gx.filter((x) => x !== 0).map((x) => (
+          <text key={`lx${x}`} x={px(x)} y={oy + 14} fontSize={10} textAnchor="middle" fill="#64748b">{numLabel(x)}</text>
+        ))}
+        {gy.filter((y) => y !== 0 && py(y) > 14).map((y) => (
+          <text key={`ly${y}`} x={ox - 5} y={py(y) + 3} fontSize={10} textAnchor="end" fill="#64748b">{numLabel(y)}</text>
+        ))}
+        <polyline points={pts.join(' ')} fill="none" stroke="#2563eb" strokeWidth={2.5} />
+        {marks.map((m) => (
+          <g key={m.label}>
+            <circle cx={px(m.x)} cy={py(m.y)} r={5} fill={m.color} />
+            <text
+              x={px(m.x) + (m.left ? -6 : 6)}
+              y={py(m.y) + (count === 0 && a > 0 ? 18 : -9)}
+              fontSize={12}
+              fontWeight="bold"
+              stroke="white"
+              strokeWidth={4}
+              paintOrder="stroke"
+              textAnchor={m.left ? 'end' : 'start'}
+              fill={m.color}
+            >
+              {m.label}
+            </text>
+          </g>
+        ))}
+      </svg>
+      <figcaption className="text-sm text-slate-600 text-center mt-1">{caption}</figcaption>
+    </figure>
+  )
+}
+
 function DiscriminantSolution({ task }: { task: Task }) {
   const { a, b, c } = task
   return (
@@ -609,6 +727,10 @@ function DiscriminantSolution({ task }: { task: Task }) {
       <div>
         <p className="font-semibold text-slate-800">Schritt 3: Entscheide anhand des Vorzeichens von D</p>
         <DiscriminantDecision D={discriminant(a, b, c)} />
+      </div>
+      <div>
+        <p className="font-semibold text-slate-800">Schritt 4: Kontrolle am Funktionsgraphen</p>
+        <TaskGraph task={task} />
       </div>
     </div>
   )
@@ -650,7 +772,6 @@ function DiscriminantCard({ number, spec, initialTask, onSolvedChange, onResult,
   function changeD(v: string) {
     if (solved) return
     setDIn(v)
-    setCount(null)
   }
 
   function chooseCount(next: Count) {
@@ -686,7 +807,7 @@ function DiscriminantCard({ number, spec, initialTask, onSolvedChange, onResult,
         Noch nicht richtig. Tipp: <Tex tex="D = b^2 - 4 \cdot a \cdot c" /> – setze negative Zahlen in Klammern.
       </p>
     )
-  } else if (dRight && count !== null && !countRight) {
+  } else if (count !== null && !countRight) {
     message = (
       <p className="text-center font-bold mt-4 text-red-600">
         Die Anzahl stimmt noch nicht. Achte auf das Vorzeichen von D: Ist D positiv, null oder negativ?
@@ -713,7 +834,7 @@ function DiscriminantCard({ number, spec, initialTask, onSolvedChange, onResult,
   return (
     <div className={panel}>
       <h2 className="text-lg font-bold text-slate-800 mb-2">Aufgabe {number}</h2>
-      <p className="text-slate-700 mb-1">Bestimme mithilfe der Diskriminante, wie viele Nullstellen die Funktion hat.</p>
+      <p className="text-slate-700 mb-1">Berechne die Diskriminante und gib an, wie viele Nullstellen der Funktionsgraph hat.</p>
       <div className="text-center text-2xl text-slate-800 my-4">
         <Tex display tex={task.tex} />
       </div>
@@ -731,14 +852,16 @@ function DiscriminantCard({ number, spec, initialTask, onSolvedChange, onResult,
         />
       </label>
 
-      {dRight && (
-        <>
-          <p className="text-slate-700 font-semibold mt-5 mb-2">2. Wie viele Nullstellen hat die Funktion?</p>
-          <div className="flex flex-wrap justify-center gap-2">{([2, 1, 0] as Count[]).map(countBtn)}</div>
-        </>
-      )}
+      <p className="text-slate-700 font-semibold mt-5 mb-2">2. Gib an, wie viele Nullstellen der Funktionsgraph hat.</p>
+      <div className="flex flex-wrap justify-center gap-2">{([2, 1, 0] as Count[]).map(countBtn)}</div>
 
       {message}
+
+      {solved && !showSolution && (
+        <div className="mt-4">
+          <TaskGraph task={task} />
+        </div>
+      )}
 
       <div className="flex flex-wrap justify-center gap-3 mt-6">
         <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
@@ -1067,7 +1190,7 @@ const D_CASES: DCase[] = [
 function DiskriminanteErklaerung() {
   return (
     <div className="bk-panel text-left">
-      <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">Die Diskriminante verstehen</h2>
+      <h2 className="text-lg font-bold text-slate-800 mb-2 text-center">Anzahl der Nullstellen mit der Diskriminante bestimmen</h2>
       <p className="text-slate-700 mb-2">
         Eine Parabel kann die x-Achse <strong>zweimal</strong>, <strong>einmal</strong> oder <strong>gar nicht</strong> treffen. Wie viele
         Nullstellen es gibt, kannst du schon vorher ausrechnen – ohne die Nullstellen selbst zu bestimmen. Schau dir dazu die
@@ -1230,9 +1353,9 @@ export default function Nullstellen() {
                 className="rounded-2xl bg-amber-500 hover:bg-amber-600 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
               >
                 <p className="text-lg font-bold mb-1 text-white">Mittel</p>
-                <p className="font-semibold text-white mb-1">Die Diskriminante verstehen</p>
+                <p className="font-semibold text-white mb-1">Anzahl der Nullstellen mit der Diskriminante bestimmen</p>
                 <Tex display className="text-lg mb-2 text-white" tex="D = b^2 - 4ac" />
-                <p className="text-sm text-white/90">Bestimme mit der Diskriminante, wie viele Nullstellen eine Parabel hat.</p>
+                <p className="text-sm text-white/90">Berechne die Diskriminante und gib an, wie viele Nullstellen der Funktionsgraph hat.</p>
               </button>
               <button
                 onClick={() => chooseLevel('fortgeschritten')}
