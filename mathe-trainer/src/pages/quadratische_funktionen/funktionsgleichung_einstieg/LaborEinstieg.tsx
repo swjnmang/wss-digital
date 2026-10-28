@@ -277,7 +277,7 @@ function PunktTest({ versuche, onTesten }: { versuche: Paar[]; onTesten: (p: Paa
 
   return (
     <div className="gl-test" data-no-autocheck>
-      <GeradenBild versuche={bilder} label="Koordinatensystem mit den Geraden zu Gleichung I und Gleichung II und den Punkten aus deinen Versuchen" />
+      <GeradenBild versuche={bilder} frage label="Koordinatensystem mit den Geraden zu Gleichung I und Gleichung II, ihrem Schnittpunkt S(? | ?) und den Punkten aus deinen Versuchen" />
       <div className="gl-eingabe">
         <span>Lösungspaar</span>
         <label htmlFor={`${uid}-x`}>
@@ -802,8 +802,8 @@ export default function LaborEinstieg({
           </p>
           <MB>{'\\begin{aligned} \\text{I: } 3x + 2y &= 12 \\\\ \\text{II: } x + 2y &= 7 \\end{aligned}'}</MB>
           <p className="sl-text">
-            Gesucht ist das <strong>Lösungspaar</strong> <M>{'(x \\mid y)'}</M>, das beide Gleichungen gleichzeitig erfüllt. Im Koordinatensystem ist das der Schnittpunkt der beiden
-            Geraden.
+            Gesucht ist das <strong>Lösungspaar</strong> <M>{'(x \\mid y)'}</M>, das beide Gleichungen gleichzeitig erfüllt. Im Koordinatensystem ist das der <strong>Schnittpunkt S</strong> der
+            beiden Geraden: Nur dieser Punkt liegt auf beiden Geraden gleichzeitig.
           </p>
           <div className="sl-fokus">
             <p className="sl-fokus-titel">Dein Auftrag: Probier es aus, ohne zu rechnen</p>
