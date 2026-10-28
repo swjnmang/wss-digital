@@ -379,8 +379,8 @@ const LEVEL_KARTEN: { level: Level; farbe: string; tex: string; text: string }[]
   {
     level: 'anwendung',
     farbe: 'bg-blue-600 hover:bg-blue-700',
-    tex: 'G(x) = -0{,}5x^2 + 40x - 300',
-    text: 'Sieben Sachaufgaben: Gewinn, Wurfhöhe, Kosten, Brückenbogen und mehr.',
+    tex: 'h(x) = -0{,}25x^2 + 2{,}5x',
+    text: 'Sieben Sachaufgaben mit Skizze: Passt der Lkw durch den Tunnel? Erreicht die Rakete die Mindesthöhe? Und mehr.',
   },
 ]
 
