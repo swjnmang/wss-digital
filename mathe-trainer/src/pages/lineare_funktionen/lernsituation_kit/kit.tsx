@@ -3,6 +3,7 @@ import { InlineMath } from 'react-katex'
 import { useTaskTracking } from '../../../hooks/useTaskTracking'
 import { fieldCheckClass } from '../../../utils/fieldCheck'
 import { checkLinearEquation } from '../../../utils/parseLinearEquation'
+import { checkQuadraticEquation } from '../../../utils/parseFunctionEquation'
 import GleichungEingabe from '../../../components/GleichungEingabe'
 import { checkNumber, fmt, pick } from '../../daten_und_zufall/lernpfad/kit'
 import { AufgabePunkteCtx, punkteText, usePunkteAufgabe } from './punkte'
@@ -272,9 +273,15 @@ export type Zeile = { l: Seg[]; r: Seg[]; u?: string }
 type SelectField = { kind: 'select'; key: string; label: ReactNode; options: string[]; expected: number }
 /** Vollständig eingetippte lineare Funktionsgleichung, z. B. „y = 0,2x + 1“ (m und t sind die richtigen Werte) */
 type GleichungField = { kind: 'gleichung'; key: string; label: ReactNode; m: number; t: number; tol?: number }
+/** Vollständig eingetippte quadratische Funktionsgleichung in allgemeiner Form, z. B. „y = −0,5x² + 2x + 1“ */
+type ParabelField = { kind: 'parabel'; key: string; label: ReactNode; a: number; b: number; c: number; tol?: number }
 /** Eingetippter Term aus Zahl und Variable, z. B. „2y“ (die SuS schreiben die Variable selbst dazu) */
 type TermField = { kind: 'term'; key: string; label: ReactNode; expected: number; variable: string }
-type CField = NumField | SelectField | GleichungField | TermField
+type CField = NumField | SelectField | GleichungField | ParabelField | TermField
+
+/** Prüfung einer eingetippten Funktionsgleichung (linear oder quadratisch in allgemeiner Form) */
+const pruefeGleichung = (f: GleichungField | ParabelField, v: string) =>
+  f.kind === 'gleichung' ? checkLinearEquation(v, f.m, f.t, f.tol) : checkQuadraticEquation(v, { a: f.a, b: f.b, c: f.c }, 'allgemein', f.tol ?? 0.005)
 
 /** Prüft einen Term wie „2y“, „-x“ oder „0,5·y“: undefined bei leerem Feld */
 function checkTerm(v: string, expected: number, variable: string): boolean | undefined {
@@ -350,10 +357,10 @@ export function CheckCard({
           ? v === ''
             ? undefined
             : Number(v) === f.expected
-          : f.kind === 'gleichung'
+          : f.kind === 'gleichung' || f.kind === 'parabel'
             ? v.trim() === ''
               ? undefined
-              : checkLinearEquation(v, f.m, f.t, f.tol).status === 'ok'
+              : pruefeGleichung(f, v).status === 'ok'
             : f.kind === 'term'
               ? checkTerm(v, f.expected, f.variable)
               : checkNumber(v, f.expected, f.tol),
@@ -398,7 +405,7 @@ export function CheckCard({
   const segment = (seg: Seg, i: number) => {
     if (typeof seg === 'string') return <InlineMath key={i} math={seg} />
     const f = fields.find((x) => x.key === seg.luecke)
-    if (!f || f.kind === 'gleichung') return null
+    if (!f || f.kind === 'gleichung' || f.kind === 'parabel') return null
     return (
       <input
         key={i}
@@ -456,9 +463,10 @@ export function CheckCard({
                     </option>
                   ))}
                 </select>
-              ) : f.kind === 'gleichung' ? (
+              ) : f.kind === 'gleichung' || f.kind === 'parabel' ? (
                 <span className="ls-gleichung">
                   <GleichungEingabe
+                    quadratisch={f.kind === 'parabel'}
                     id={`${uid}-${f.key}`}
                     value={values[f.key] ?? ''}
                     onChange={(v) => setValue(f.key, v)}
@@ -467,7 +475,7 @@ export function CheckCard({
                   />
                   {marks[f.key] === false && (
                     <span className="ls-gleichung-hinweis" role="status">
-                      {checkLinearEquation(values[f.key] ?? '', f.m, f.t, f.tol).text}
+                      {pruefeGleichung(f, values[f.key] ?? '').text}
                     </span>
                   )}
                 </span>

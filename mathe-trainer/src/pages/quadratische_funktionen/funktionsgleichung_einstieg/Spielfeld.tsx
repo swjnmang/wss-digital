@@ -48,7 +48,7 @@ export function Spielfeld({
   /** x-Wert der Korbmitte, null ohne Korb */
   korb?: number | null
   ball?: { x: number; y: number }
-  /** kurzer Text oben links, z. B. „Bahn: y = ?“ */
+  /** kurzer Text unten links, z. B. „Bahn: y = ?“ */
   frage?: string
   label: string
 }) {
@@ -153,7 +153,8 @@ export function Spielfeld({
         </g>
       )}
       {frage && (
-        <text x={fx(0) + 16} y={fy(F.yMax) + 48} fontSize="20" fontWeight="800" fill="var(--ink)">
+        // unten links, wo keine Messpunkte und Bahnen liegen
+        <text x={fx(0) + 16} y={fy(0) - 18} fontSize="20" fontWeight="800" fill="var(--ink)" stroke="var(--surface)" strokeWidth="5" paintOrder="stroke">
           {frage}
         </text>
       )}
