@@ -1,7 +1,7 @@
 // Aufgabentypen für „Scheitelpunkt berechnen“: Jede Runde mischt verschiedene Formate
 // (von geführt bis frei, mit Sachaufgabe). Rechnerisch geht es immer um x_S = −b/(2a) und y_S = f(x_S).
 import React from 'react'
-import { type Q, q, add, mul, neg, val, isInt, tq, tn, round2, pick, shuffle, randomInt, Tex, Steps } from '../quadratischShared'
+import { type Q, q, add, sub, mul, neg, val, isInt, tq, tn, round2, pick, shuffle, randomInt, Tex, Steps } from '../quadratischShared'
 
 export type Level = 'einfach' | 'mittel' | 'fortgeschritten' | 'anwendung'
 type RechenLevel = Exclude<Level, 'anwendung'>
@@ -61,8 +61,6 @@ const ausXsC = (a: Q, xs: Q, c: Q): Koeff => {
   const b = mul(q(-2), mul(a, xs))
   return { a, b, c, xs, ys: add(mul(b, xs), add(mul(a, mul(xs, xs)), c)) }
 }
-/** Aus Streckfaktor und Scheitelpunkt: c = y_S + a·x_S² */
-const ausScheitel = (a: Q, xs: Q, ys: Q): Koeff => ({ a, b: mul(q(-2), mul(a, xs)), c: add(ys, mul(a, mul(xs, xs))), xs, ys })
 
 /** Zahl hat höchstens zwei Nachkommastellen */
 const dez2 = (x: Q) => 100 % x.d === 0
@@ -632,197 +630,374 @@ function fehlerFinden(level: RechenLevel): Aufgabe {
   }
 }
 
-// ---------- 7. Sachaufgaben ----------
+// ---------- 7. Sachaufgaben: Scheitelpunkt berechnen und geometrisch deuten ----------
+
+type SkizzenObjekt =
+  | { typ: 'fahrzeug'; x: number; h: number; label: string }
+  | { typ: 'linie'; y: number; label: string }
+  | { typ: 'mast'; x: number; h: number; label?: string }
+
+/** Skizze der Situation (nicht maßstabsgetreu): Parabel über dem Boden bzw. Wasser, dazu Fahrzeuge, Masten oder Höhenlinien */
+function Skizze({ k, x1, objekte = [], wasser, v = 'x' }: { k: Koeff; x1: number; objekte?: SkizzenObjekt[]; wasser?: boolean; v?: string }) {
+  const W = 320
+  const H = 170
+  const pad = 24
+  const fx = (x: number) => val(k.a) * x * x + val(k.b) * x + val(k.c)
+  const hoehen = [fx(0), fx(x1), val(k.ys), ...objekte.map((o) => (o.typ === 'linie' ? o.y : o.h))]
+  const yMax = Math.max(...hoehen) * 1.18
+  const px = (x: number) => pad + (x / x1) * (W - 2 * pad)
+  const py = (y: number) => H - pad - (y / yMax) * (H - 2 * pad)
+  const pts: string[] = []
+  for (let i = 0; i <= 120; i++) {
+    const x = (i / 120) * x1
+    const y = fx(x)
+    if (y >= -1e-9) pts.push(`${px(x).toFixed(1)},${py(y).toFixed(1)}`)
+  }
+  return (
+    <figure className="my-3">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-md mx-auto" role="img" aria-label="Skizze der Situation">
+        <line x1={pad - 10} y1={py(0)} x2={W - pad + 10} y2={py(0)} stroke={wasser ? '#0284c7' : '#334155'} strokeWidth={wasser ? 3 : 2} />
+        <text x={W - pad + 8} y={py(0) + 14} fontSize={10} textAnchor="end" fill="#64748b">{v}</text>
+        {objekte.map((o, i) =>
+          o.typ === 'linie' ? (
+            <g key={i}>
+              <line x1={pad - 10} y1={py(o.y)} x2={W - pad + 10} y2={py(o.y)} stroke="#c2410c" strokeWidth={1.5} strokeDasharray="6 4" />
+              <text x={W - pad + 8} y={py(o.y) - 5} fontSize={11} fontWeight="bold" textAnchor="end" fill="#c2410c">{o.label}</text>
+            </g>
+          ) : o.typ === 'mast' ? (
+            <g key={i}>
+              <line x1={px(o.x)} y1={py(0)} x2={px(o.x)} y2={py(o.h)} stroke="#475569" strokeWidth={4} />
+              {o.label && <text x={px(o.x) + (o.x < x1 / 2 ? 6 : -6)} y={py(o.h / 2)} fontSize={11} textAnchor={o.x < x1 / 2 ? 'start' : 'end'} fill="#475569">{o.label}</text>}
+            </g>
+          ) : (
+            <g key={i}>
+              <rect x={px(o.x) - 22} y={py(o.h)} width={44} height={py(0) - py(o.h)} rx={3} fill="#fde68a" stroke="#b45309" strokeWidth={1.5} />
+              <text x={px(o.x)} y={py(o.h / 2) + 4} fontSize={10} fontWeight="bold" textAnchor="middle" fill="#92400e">{o.label}</text>
+            </g>
+          ),
+        )}
+        <polyline points={pts.join(' ')} fill="none" stroke="#2563eb" strokeWidth={2.5} />
+      </svg>
+      <figcaption className="text-xs text-slate-500 text-center">Skizze, nicht maßstabsgetreu</figcaption>
+    </figure>
+  )
+}
 
 interface Kontext {
   titel: string
   text: React.ReactNode
+  /** Text unter der Funktionsgleichung */
+  zusatz?: React.ReactNode
   fn: string
   v: string
   k: Koeff
+  skizze: React.ReactNode
+  /** Felder für die Koordinaten des Scheitelpunkts */
   frageX: string
   einheitX: string
   frageY: string
   einheitY: string
-  antwort: (x: string, y: string) => string
+  /** Deutung: Ja/Nein-Entscheidung oder ein Abstand */
+  deutung: Feld
+  /** Erklärung der Deutung im Lösungsweg */
+  erklaerung: React.ReactNode
+  antwort: string
 }
 
 const dez = (x: number) => q(Math.round(x * 100), 100)
 /** Zahl im Fließtext mit Komma */
-const zahl = (x: Q) => String(round2(val(x))).replace('.', ',')
+const zahl = (x: Q | number) => String(round2(typeof x === 'number' ? x : val(x))).replace('.', ',')
+const JA_NEIN = ['Ja', 'Nein']
+/** Zufälliger Unterschied zum Scheitelwert, mal darüber, mal darunter */
+const knapp = (werte: number[]) => pick(werte) * pick([1, -1])
+
+const vergleichHint = (
+  <>
+    Noch nicht richtig. Vergleiche die geforderte Höhe mit der y-Koordinate des Scheitelpunkts, denn das ist die größte bzw. kleinste Höhe.
+  </>
+)
 
 const KONTEXTE: (() => Kontext)[] = [
-  // Gewinn
+  // Tunnel: passt das Fahrzeug durch?
   () => {
     for (;;) {
-      const [a, xsListe] = pick([
-        [q(-1), [10, 15, 20, 25]],
-        [q(-1, 2), [20, 30, 40, 50]],
-        [q(-1, 5), [30, 40, 50, 60]],
-        [q(-1, 10), [50, 60, 80, 100]],
-      ] as const)
-      const xs = q(pick(xsListe))
-      const ys = q(50 * randomInt(30, 2))
-      const k = ausScheitel(a, xs, ys)
-      if (k.c.n >= 0 || val(k.c) < -2000) continue
+      const w = pick([8, 10, 12])
+      const a = dez(pick([-0.15, -0.18, -0.2, -0.24, -0.25, -0.3, -0.35]))
+      const k = ausXsC(a, q(w / 2), q(0))
+      if (!dez2(k.ys) || val(k.ys) < 3.5 || val(k.ys) > 7) continue
+      const fahrzeug = pick(['Lkw', 'Reisebus', 'Wohnmobil'])
+      const hoehe = round2(val(k.ys) + knapp([0.1, 0.2, 0.3, 0.4]))
+      const passt = val(k.ys) > hoehe
       return {
-        titel: 'Gewinn',
+        titel: 'Tunnel',
         text: (
           <>
-            Ein kleines Unternehmen stellt Skateboards her. Der Gewinn <Tex tex="G" /> (in €) pro Monat hängt von der Anzahl <Tex tex="x" /> der verkauften Skateboards ab:
+            Eine Straße führt durch einen parabelförmigen Tunnel. Die Höhe <Tex tex="h" /> der Tunneldecke über der Fahrbahn (in m) in der Entfernung <Tex tex="x" /> vom linken
+            Tunnelrand (in m) beträgt:
           </>
         ),
-        fn: 'G',
-        v: 'x',
-        k,
-        frageX: 'Bei welcher Stückzahl ist der Gewinn am größten?',
-        einheitX: 'Stück',
-        frageY: 'Wie hoch ist der größtmögliche Gewinn?',
-        einheitY: '€',
-        antwort: (x, y) => `Bei ${x} verkauften Skateboards ist der Gewinn mit ${y} € am größten.`,
-      }
-    }
-  },
-  // Wurf
-  () => {
-    const xs = dez(pick([0.8, 1, 1.2, 1.5]))
-    const c = dez(pick([1.6, 1.8, 2, 2.2]))
-    const k = ausXsC(q(-5), xs, c)
-    return {
-      titel: 'Basketball',
-      text: (
-        <>
-          Bei einem Wurf beim Basketball lässt sich die Höhe <Tex tex="h" /> des Balls (in m) nach <Tex tex="t" /> Sekunden so beschreiben:
-        </>
-      ),
-      fn: 'h',
-      v: 't',
-      k,
-      frageX: 'Nach wie vielen Sekunden ist der Ball am höchsten?',
-      einheitX: 's',
-      frageY: 'Wie hoch ist der Ball an seinem höchsten Punkt?',
-      einheitY: 'm',
-      antwort: (x, y) => `Nach ${x} Sekunden erreicht der Ball seine größte Höhe von ${y} m.`,
-    }
-  },
-  // Stückkosten
-  () => {
-    const a = pick([q(1, 10), q(1, 5), q(1, 2)])
-    const xs = q(pick([10, 20, 30, 40]))
-    const k = ausScheitel(a, xs, q(5 * randomInt(12, 4)))
-    return {
-      titel: 'Stückkosten',
-      text: (
-        <>
-          Eine Schreinerei fertigt Gartenbänke. Die Kosten <Tex tex="k" /> pro Bank (in €) hängen von der Anzahl <Tex tex="x" /> der gefertigten Bänke ab:
-        </>
-      ),
-      fn: 'k',
-      v: 'x',
-      k,
-      frageX: 'Bei welcher Anzahl sind die Kosten pro Bank am niedrigsten?',
-      einheitX: 'Stück',
-      frageY: 'Wie hoch sind die niedrigsten Kosten pro Bank?',
-      einheitY: '€',
-      antwort: (x, y) => `Bei ${x} Bänken sind die Kosten pro Bank mit ${y} € am niedrigsten.`,
-    }
-  },
-  // Brückenbogen
-  () => {
-    for (;;) {
-      const a = pick([q(-1, 50), q(-1, 25), q(-1, 20), q(-1, 10)])
-      const xs = q(pick([10, 15, 20, 25, 30]))
-      const k = ausXsC(a, xs, q(0))
-      if (val(k.ys) < 4 || val(k.ys) > 40 || !dez2(k.ys)) continue
-      return {
-        titel: 'Brückenbogen',
-        text: (
-          <>
-            Ein Brückenbogen beginnt am linken Ufer am Boden. Seine Höhe <Tex tex="h" /> (in m) in der waagrechten Entfernung <Tex tex="x" /> (in m) vom linken Fußpunkt beträgt:
-          </>
-        ),
+        zusatz: <>Ein {fahrzeug} ist {zahl(hoehe)} m hoch und fährt genau in der Tunnelmitte.</>,
         fn: 'h',
         v: 'x',
         k,
-        frageX: 'In welcher Entfernung vom linken Fußpunkt ist der Bogen am höchsten?',
+        skizze: <Skizze k={k} x1={w} objekte={[{ typ: 'fahrzeug', x: w / 2, h: val(k.ys), label: fahrzeug }]} />,
+        frageX: 'In welcher Entfernung vom linken Rand ist der Tunnel am höchsten?',
         einheitX: 'm',
-        frageY: 'Wie hoch ist der Bogen an seiner höchsten Stelle?',
+        frageY: 'Wie hoch ist der Tunnel an dieser Stelle?',
         einheitY: 'm',
-        antwort: (x, y) => `${x} m vom linken Fußpunkt entfernt ist der Bogen mit ${y} m am höchsten.`,
-      }
-    }
-  },
-  // Temperatur
-  () => {
-    for (;;) {
-      const a = pick([q(-1, 4), q(-1, 2)])
-      const xs = q(pick([6, 7, 8]))
-      const k = ausScheitel(a, xs, q(randomInt(32, 22)))
-      if (val(k.c) < 5 || val(k.c) > 18 || !dez2(k.b) || !dez2(k.c)) continue
-      return {
-        titel: 'Temperatur',
-        text: (
+        deutung: { kind: 'choice', id: 'deutung', label: `Passt der ${fahrzeug} (${zahl(hoehe)} m) unter der Tunneldecke durch?`, options: JA_NEIN, correct: passt ? 0 : 1, hint: vergleichHint },
+        erklaerung: (
           <>
-            An einem Sommertag lässt sich die Temperatur <Tex tex="T" /> (in °C) <Tex tex="t" /> Stunden nach 6 Uhr morgens so beschreiben:
+            Der Tunnel ist an seiner höchsten Stelle {zahl(k.ys)} m hoch. Der {fahrzeug} ist {zahl(hoehe)} m hoch:{' '}
+            <Tex tex={`${tn(val(k.ys))} ${passt ? '>' : '<'} ${tn(hoehe)}`} />.
           </>
         ),
-        fn: 'T',
-        v: 't',
-        k,
-        frageX: 'Wie viele Stunden nach 6 Uhr ist es am wärmsten?',
-        einheitX: 'h',
-        frageY: 'Wie hoch ist die Höchsttemperatur?',
-        einheitY: '°C',
-        antwort: (x, y) => `${x} Stunden nach 6 Uhr, also um ${6 + Number(x)} Uhr, ist es mit ${y} °C am wärmsten.`,
+        antwort: passt
+          ? `Der ${fahrzeug} passt durch, oben bleiben ${zahl(val(k.ys) - hoehe)} m Platz.`
+          : `Der ${fahrzeug} passt nicht durch, er ist ${zahl(hoehe - val(k.ys))} m zu hoch.`,
       }
     }
   },
-  // Springbrunnen
+  // Brückenbogen über einem Fluss: Platz über dem Schiffsmast
   () => {
     for (;;) {
-      const a = pick([q(-1, 2), q(-1, 4), q(-1)])
-      const xs = dez(pick([1, 1.5, 2, 2.5, 3]))
-      const k = ausXsC(a, xs, dez(pick([0.5, 1, 1.5])))
-      if (!dez2(k.b) || !dez2(k.ys) || val(k.ys) > 6) continue
+      const xs = pick([10, 15, 20, 25])
+      const a = dez(pick([-0.02, -0.03, -0.04, -0.05]))
+      const k = ausXsC(a, q(xs), q(0))
+      if (!dez2(k.ys) || val(k.ys) < 5 || val(k.ys) > 20) continue
+      const mast = round2(val(k.ys) - pick([0.5, 0.75, 1, 1.5, 2, 2.5]))
+      const platz = dez(val(k.ys) - mast)
+      return {
+        titel: 'Brücke und Schiff',
+        text: (
+          <>
+            Eine Brücke überspannt einen Fluss mit einem parabelförmigen Bogen. Die Höhe <Tex tex="h" /> des Bogens über dem Wasser (in m) in der Entfernung <Tex tex="x" /> vom linken
+            Ufer (in m) beträgt:
+          </>
+        ),
+        zusatz: <>Ein Segelschiff mit einer Masthöhe von {zahl(mast)} m fährt genau unter der höchsten Stelle des Bogens hindurch.</>,
+        fn: 'h',
+        v: 'x',
+        k,
+        skizze: <Skizze k={k} x1={2 * xs} wasser objekte={[{ typ: 'mast', x: xs, h: val(k.ys) * 0.8, label: 'Mast' }]} />,
+        frageX: 'In welcher Entfernung vom linken Ufer ist der Bogen am höchsten?',
+        einheitX: 'm',
+        frageY: 'Wie hoch ist der Bogen dort über dem Wasser?',
+        einheitY: 'm',
+        deutung: {
+          kind: 'num',
+          id: 'deutung',
+          label: 'Wie viel Platz bleibt zwischen Mastspitze und Brückenbogen?',
+          unit: 'm',
+          correct: platz,
+          hint: <>Noch nicht richtig. Ziehe die Masthöhe von der Höhe des Bogens an seiner höchsten Stelle ab.</>,
+        },
+        erklaerung: <Tex tex={`${tn(val(k.ys))} - ${tn(mast)} = ${tn(val(platz))}`} />,
+        antwort: `Zwischen Mastspitze und Brückenbogen bleiben ${zahl(platz)} m Platz.`,
+      }
+    }
+  },
+  // Stromleitung zwischen zwei Masten: Mindesthöhe eingehalten?
+  () => {
+    for (;;) {
+      const xs = pick([10, 15, 20, 25])
+      const a = dez(pick([0.01, 0.02, 0.03, 0.04]))
+      const c = q(randomInt(20, 10))
+      const k = ausXsC(a, q(xs), c)
+      if (!dez2(k.ys) || val(k.ys) < 4 || val(k.ys) > val(c) - 2) continue
+      const mindest = round2(val(k.ys) + knapp([0.2, 0.3, 0.5]))
+      const ok = val(k.ys) > mindest
+      return {
+        titel: 'Stromleitung',
+        text: (
+          <>
+            Zwischen zwei gleich hohen Masten hängt eine Stromleitung über einem Feld. Ihre Höhe <Tex tex="h" /> über dem Boden (in m) in der Entfernung <Tex tex="x" /> vom linken Mast
+            (in m) beträgt:
+          </>
+        ),
+        zusatz: <>Vorgeschrieben ist, dass die Leitung überall mindestens {zahl(mindest)} m über dem Boden hängt.</>,
+        fn: 'h',
+        v: 'x',
+        k,
+        skizze: (
+          <Skizze
+            k={k}
+            x1={2 * xs}
+            objekte={[
+              { typ: 'mast', x: 0, h: val(c) },
+              { typ: 'mast', x: 2 * xs, h: val(c) },
+              { typ: 'linie', y: val(k.ys), label: `${zahl(mindest)} m` },
+            ]}
+          />
+        ),
+        frageX: 'In welcher Entfernung vom linken Mast hängt die Leitung am tiefsten?',
+        einheitX: 'm',
+        frageY: 'Wie hoch hängt sie an dieser Stelle?',
+        einheitY: 'm',
+        deutung: { kind: 'choice', id: 'deutung', label: `Hält die Leitung die Mindesthöhe von ${zahl(mindest)} m ein?`, options: JA_NEIN, correct: ok ? 0 : 1, hint: vergleichHint },
+        erklaerung: (
+          <>
+            Weil <Tex tex="a > 0" /> ist, ist S der <strong>tiefste</strong> Punkt der Leitung. Dort hängt sie {zahl(k.ys)} m hoch:{' '}
+            <Tex tex={`${tn(val(k.ys))} ${ok ? '>' : '<'} ${tn(mindest)}`} />.
+          </>
+        ),
+        antwort: ok
+          ? `Die Leitung hält die Vorschrift ein, sie hängt an der tiefsten Stelle noch ${zahl(val(k.ys) - mindest)} m höher als vorgeschrieben.`
+          : `Die Leitung hängt an der tiefsten Stelle ${zahl(mindest - val(k.ys))} m zu tief, die Vorschrift ist nicht erfüllt.`,
+      }
+    }
+  },
+  // Feuerwerksrakete: Mindesthöhe erreicht?
+  () => {
+    const xs = dez(pick([3, 3.5, 4, 4.5, 5]))
+    const k = ausXsC(q(-5), xs, dez(pick([0.5, 1, 1.5])))
+    const mindest = Math.round(val(k.ys)) + knapp([2, 3, 5])
+    const ok = val(k.ys) > mindest
+    return {
+      titel: 'Feuerwerk',
+      text: (
+        <>
+          Eine Feuerwerksrakete wird senkrecht nach oben geschossen. Ihre Höhe <Tex tex="h" /> (in m) nach <Tex tex="t" /> Sekunden beträgt:
+        </>
+      ),
+      zusatz: <>Die Rakete zündet an ihrem höchsten Punkt. Damit alle Zuschauer das Feuerwerk über den Bäumen sehen, muss sie dort mindestens {mindest} m hoch sein.</>,
+      fn: 'h',
+      v: 't',
+      k,
+      skizze: <Skizze k={k} x1={2 * val(xs)} v="t" objekte={[{ typ: 'linie', y: val(k.ys), label: `${mindest} m` }]} />,
+      frageX: 'Nach wie vielen Sekunden zündet die Rakete?',
+      einheitX: 's',
+      frageY: 'In welcher Höhe zündet sie?',
+      einheitY: 'm',
+      deutung: { kind: 'choice', id: 'deutung', label: `Erreicht die Rakete die Mindesthöhe von ${mindest} m?`, options: JA_NEIN, correct: ok ? 0 : 1, hint: vergleichHint },
+      erklaerung: (
+        <>
+          Die Rakete erreicht höchstens {zahl(k.ys)} m: <Tex tex={`${tn(val(k.ys))} ${ok ? '>' : '<'} ${mindest}`} />.
+        </>
+      ),
+      antwort: ok
+        ? `Die Rakete zündet nach ${zahl(xs)} s in ${zahl(k.ys)} m Höhe und erreicht damit die Mindesthöhe.`
+        : `Die Rakete zündet nach ${zahl(xs)} s in nur ${zahl(k.ys)} m Höhe, das sind ${zahl(mindest - val(k.ys))} m zu wenig.`,
+    }
+  },
+  // Springbrunnen unter einem Glasdach
+  () => {
+    for (;;) {
+      const a = dez(pick([-0.25, -0.5, -1]))
+      const xs = dez(pick([1, 1.5, 2, 2.5]))
+      const k = ausXsC(a, xs, dez(pick([0.5, 1])))
+      if (!dez2(k.b) || !dez2(k.ys) || val(k.ys) < 2 || val(k.ys) > 6) continue
+      const dach = round2(val(k.ys) + knapp([0.1, 0.2, 0.3, 0.4]))
+      const stoesst = val(k.ys) > dach
+      const ende = (-val(k.b) - Math.sqrt(val(k.b) ** 2 - 4 * val(k.a) * val(k.c))) / (2 * val(k.a))
       return {
         titel: 'Springbrunnen',
         text: (
           <>
-            Der Wasserstrahl eines Springbrunnens kommt aus einer Düse. Seine Höhe <Tex tex="h" /> (in m) in der waagrechten Entfernung <Tex tex="x" /> (in m) von der Düse beträgt:
+            In einem Einkaufszentrum steht ein Springbrunnen unter einem Glasdach, das {zahl(dach)} m hoch ist. Die Höhe <Tex tex="h" /> des Wasserstrahls (in m) in der waagrechten
+            Entfernung <Tex tex="x" /> von der Düse (in m) beträgt:
           </>
         ),
         fn: 'h',
         v: 'x',
         k,
-        frageX: 'In welcher waagrechten Entfernung von der Düse ist der Strahl am höchsten?',
+        skizze: <Skizze k={k} x1={ende} objekte={[{ typ: 'linie', y: val(k.ys), label: `Dach ${zahl(dach)} m` }]} />,
+        frageX: 'In welcher Entfernung von der Düse ist der Strahl am höchsten?',
         einheitX: 'm',
-        frageY: 'Wie hoch ist der höchste Punkt des Strahls?',
+        frageY: 'Wie hoch ist der Strahl dort?',
         einheitY: 'm',
-        antwort: (x, y) => `${x} m von der Düse entfernt erreicht der Strahl seine größte Höhe von ${y} m.`,
+        deutung: { kind: 'choice', id: 'deutung', label: 'Spritzt der Strahl an das Glasdach?', options: JA_NEIN, correct: stoesst ? 0 : 1, hint: vergleichHint },
+        erklaerung: (
+          <>
+            Der Strahl wird höchstens {zahl(k.ys)} m hoch, das Dach ist {zahl(dach)} m hoch: <Tex tex={`${tn(val(k.ys))} ${stoesst ? '>' : '<'} ${tn(dach)}`} />.
+          </>
+        ),
+        antwort: stoesst
+          ? `Der Strahl spritzt an das Dach, er wäre ohne Dach ${zahl(val(k.ys) - dach)} m höher.`
+          : `Der Strahl erreicht das Dach nicht, es bleiben ${zahl(dach - val(k.ys))} m Abstand.`,
       }
     }
   },
-  // Einnahmen
+  // Basketball: wie hoch über dem Korb?
   () => {
-    const a = q(-pick([20, 25, 40]))
-    const xs = dez(pick([5, 6, 7.5, 8]))
-    const k = ausXsC(a, xs, q(0))
-    return {
-      titel: 'Einnahmen',
-      text: (
-        <>
-          Ein Jugendtreff veranstaltet einen Kinoabend. Die Einnahmen <Tex tex="E" /> (in €) hängen vom Eintrittspreis <Tex tex="p" /> (in €) ab, denn je teurer der Eintritt, desto weniger Gäste
-          kommen:
-        </>
-      ),
-      fn: 'E',
-      v: 'p',
-      k,
-      frageX: 'Bei welchem Eintrittspreis sind die Einnahmen am höchsten?',
-      einheitX: '€',
-      frageY: 'Wie hoch sind die Einnahmen dann?',
-      einheitY: '€',
-      antwort: (x, y) => `Bei einem Eintrittspreis von ${x} € sind die Einnahmen mit ${y} € am höchsten.`,
+    for (;;) {
+      const a = dez(pick([-0.2, -0.25, -0.4, -0.5]))
+      const xs = dez(pick([2, 2.5, 3]))
+      const k = ausXsC(a, xs, dez(pick([2, 2.1, 2.2])))
+      if (!dez2(k.b) || !dez2(k.ys) || val(k.ys) < 3.3 || val(k.ys) > 5.5) continue
+      const ueber = dez(val(k.ys) - 3.05)
+      return {
+        titel: 'Basketball',
+        text: (
+          <>
+            Bei einem Wurf auf den Korb beschreibt der Ball eine Parabel. Seine Höhe <Tex tex="h" /> (in m) in der waagrechten Entfernung <Tex tex="x" /> vom Abwurfpunkt (in m) beträgt:
+          </>
+        ),
+        zusatz: <>Der Korbring hängt in 3,05 m Höhe.</>,
+        fn: 'h',
+        v: 'x',
+        k,
+        skizze: <Skizze k={k} x1={2 * val(xs) + 0.6} objekte={[{ typ: 'linie', y: 3.05, label: 'Korb 3,05 m' }]} />,
+        frageX: 'In welcher waagrechten Entfernung vom Abwurfpunkt ist der Ball am höchsten?',
+        einheitX: 'm',
+        frageY: 'Wie hoch ist der Ball an seinem höchsten Punkt?',
+        einheitY: 'm',
+        deutung: {
+          kind: 'num',
+          id: 'deutung',
+          label: 'Wie viel höher als der Korbring ist der Ball an seinem höchsten Punkt?',
+          unit: 'm',
+          correct: ueber,
+          hint: <>Noch nicht richtig. Ziehe die Höhe des Korbrings (3,05 m) von der größten Höhe des Balls ab.</>,
+        },
+        erklaerung: <Tex tex={`${tn(val(k.ys))} - 3{,}05 = ${tn(val(ueber))}`} />,
+        antwort: `Der Ball fliegt an seinem höchsten Punkt ${zahl(ueber)} m über den Korbring.`,
+      }
+    }
+  },
+  // Halfpipe: Tiefe der Rampe
+  () => {
+    for (;;) {
+      const a = dez(pick([0.2, 0.25, 0.4, 0.5]))
+      const xs = dez(pick([2, 2.5, 3, 4]))
+      const k = ausXsC(a, xs, dez(pick([2, 2.5, 3, 3.5, 4])))
+      if (!dez2(k.ys) || val(k.ys) < 0.2 || val(k.ys) > 1.2) continue
+      const tiefe = sub(k.c, k.ys)
+      return {
+        titel: 'Halfpipe',
+        text: (
+          <>
+            Im Querschnitt hat eine Halfpipe im Skatepark die Form einer Parabel. Die Höhe <Tex tex="h" /> der Fahrfläche über dem Boden (in m) in der Entfernung <Tex tex="x" /> vom
+            linken Rand (in m) beträgt:
+          </>
+        ),
+        fn: 'h',
+        v: 'x',
+        k,
+        skizze: <Skizze k={k} x1={2 * val(xs)} objekte={[{ typ: 'mast', x: 0, h: val(k.c) }, { typ: 'mast', x: 2 * val(xs), h: val(k.c) }]} />,
+        frageX: 'In welcher Entfernung vom linken Rand liegt die tiefste Stelle?',
+        einheitX: 'm',
+        frageY: 'Wie hoch liegt die tiefste Stelle über dem Boden?',
+        einheitY: 'm',
+        deutung: {
+          kind: 'num',
+          id: 'deutung',
+          label: 'Wie groß ist der Höhenunterschied zwischen dem Rand und der tiefsten Stelle?',
+          unit: 'm',
+          correct: tiefe,
+          hint: (
+            <>
+              Noch nicht richtig. Der Rand liegt bei <Tex tex="x = 0" />, also in der Höhe <Tex tex="h(0) = c" />. Ziehe davon die Höhe der tiefsten Stelle ab.
+            </>
+          ),
+        },
+        erklaerung: (
+          <>
+            Der Rand ist <Tex tex={`h(0) = ${tn(val(k.c))}`} /> m hoch, die tiefste Stelle {zahl(k.ys)} m: <Tex tex={`${tn(val(k.c))} - ${tn(val(k.ys))} = ${tn(val(tiefe))}`} />.
+          </>
+        ),
+        antwort: `Die tiefste Stelle liegt ${zahl(xs)} m vom linken Rand entfernt und ${zahl(tiefe)} m tiefer als der Rand.`,
+      }
     }
   },
 ]
@@ -839,6 +1014,8 @@ function sachaufgabe(kontextNr?: number): Aufgabe {
       <>
         <p className="text-slate-700 text-left">{kx.text}</p>
         <Gleichung tex={`${fn}(${v}) = ${poly(f, k, v)}`} />
+        {kx.zusatz && <p className="text-slate-700 text-left">{kx.zusatz}</p>}
+        {kx.skizze}
       </>
     ),
     felder: [
@@ -866,13 +1043,18 @@ function sachaufgabe(kontextNr?: number): Aufgabe {
           </>
         ),
       },
+      kx.deutung,
     ],
     loesung: (
       <Loesungsweg f={f} k={k} fn={fn} v={v} ohneErgebnis>
         <p className="font-semibold text-slate-800">
           Scheitelpunkt: <Tex tex={`S\\left(${f.n(k.xs)} \\mid ${f.n(k.ys)}\\right)`} />
         </p>
-        <p className="font-bold text-slate-800">Antwort: {kx.antwort(zahl(k.xs), zahl(k.ys))}</p>
+        <div>
+          <p className="font-semibold text-slate-800">Schritt 3: Ergebnis deuten</p>
+          <p>{kx.erklaerung}</p>
+        </div>
+        <p className="font-bold text-slate-800">Antwort: {kx.antwort}</p>
       </Loesungsweg>
     ),
   }
