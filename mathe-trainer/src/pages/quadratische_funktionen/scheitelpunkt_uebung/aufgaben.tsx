@@ -355,14 +355,13 @@ function sonderfall(level: RechenLevel): Aufgabe {
 
 function schaetzen(level: RechenLevel): Aufgabe {
   const f = fmtFuer(level)
-  const k = koeff(level, { xsNicht0: true })
+  const k = koeff(level)
   const hoch = k.a.n < 0
-  const links = k.xs.n < 0
   return {
     titel: 'Erst überlegen, dann rechnen',
     auftrag: (
       <>
-        <p className="text-slate-700">Überlege zuerst ohne zu rechnen, wo der Scheitelpunkt liegt. Berechne ihn danach und prüfe, ob deine Überlegung stimmt.</p>
+        <p className="text-slate-700">Überlege zuerst ohne zu rechnen, ob der Scheitelpunkt ein Hoch- oder ein Tiefpunkt ist. Berechne ihn danach.</p>
         <Gleichung tex={`f(x) = ${poly(f, k)}`} />
       </>
     ),
@@ -379,18 +378,6 @@ function schaetzen(level: RechenLevel): Aufgabe {
           </>
         ),
       },
-      {
-        kind: 'choice',
-        id: 'seite',
-        label: 'Liegt S links oder rechts der y-Achse?',
-        options: ['links', 'rechts'],
-        correct: links ? 0 : 1,
-        hint: (
-          <>
-            <Tex tex="x_S = -\frac{b}{2a}" />: Haben <Tex tex="a" /> und <Tex tex="b" /> dasselbe Vorzeichen, ist <Tex tex="x_S" /> negativ (links), sonst positiv (rechts).
-          </>
-        ),
-      },
       punkt(k),
     ],
     loesung: (
@@ -398,15 +385,9 @@ function schaetzen(level: RechenLevel): Aufgabe {
         f={f}
         k={k}
         vorab={
-          <ul className="list-disc pl-5 space-y-1">
-            <li>
-              <Tex tex={`a = ${f.n(k.a)} ${hoch ? '< 0' : '> 0'}`} />: Die Parabel ist nach {hoch ? 'unten' : 'oben'} geöffnet, S ist ein <strong>{hoch ? 'Hochpunkt' : 'Tiefpunkt'}</strong>.
-            </li>
-            <li>
-              <Tex tex="a" /> und <Tex tex="b" /> haben {(k.a.n < 0) === (k.b.n < 0) ? 'dasselbe' : 'verschiedene'} Vorzeichen, also ist <Tex tex="x_S = -\frac{b}{2a}" />{' '}
-              {links ? 'negativ' : 'positiv'}: S liegt <strong>{links ? 'links' : 'rechts'}</strong> der y-Achse.
-            </li>
-          </ul>
+          <p>
+            <Tex tex={`a = ${f.n(k.a)} ${hoch ? '< 0' : '> 0'}`} />: Die Parabel ist nach {hoch ? 'unten' : 'oben'} geöffnet, S ist ein <strong>{hoch ? 'Hochpunkt' : 'Tiefpunkt'}</strong>.
+          </p>
         }
       />
     ),
