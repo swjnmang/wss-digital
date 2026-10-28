@@ -1,188 +1,74 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import katex from 'katex'
-import 'katex/dist/katex.min.css'
-import { type Q, q, add, mul, neg, val, isInt, tq, tqp, sgq, polyTex, parseAnswer, isIncomplete } from './quadratischShared'
+import { type Q, val, parseAnswer, isIncomplete, Tex, GREEN, RED, PRAISE, pick, btnPrimary, btnSecondary, panel } from './quadratischShared'
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import EscapeEinstieg from './scheitelpunkt_einstieg/EscapeEinstieg'
 import { useBackHandler } from '../../hooks/useBackHandler'
+import { type Level, type Feld, LEVEL_LABEL, ANZAHL_AUFGABEN, neueAufgabe } from './scheitelpunkt_uebung/aufgaben'
 
-// Sieben Aufgaben gleichzeitig auf der Seite
-const TOTAL_TASKS = 7
+// Sieben Aufgaben gleichzeitig auf der Seite, von geführt (Lückentext) bis frei (Sachaufgabe)
+const TOTAL_TASKS = ANZAHL_AUFGABEN
 
 const VIDEO_ID = 'Im1FRd6_o-w'
-
-// Einfach: a = 1 oder a = −1, ganzzahliger Scheitelpunkt
-// Fortgeschritten: Brüche in der Funktionsgleichung (Streckfaktor, b und/oder c), Scheitelpunkt oft als Bruch
-type Level = 'einfach' | 'fortgeschritten'
-
-const LEVEL_LABEL: Record<Level, string> = { einfach: 'Einfach', fortgeschritten: 'Fortgeschritten' }
-
-const btnPrimary = 'bk-btn bk-btn-primary'
-const btnSecondary = 'bk-btn'
-const panel = 'bk-panel text-center'
-
-const PRAISE = [
-  'Richtig! Super gemacht!',
-  'Klasse, das stimmt!',
-  'Perfekt gelöst!',
-  'Sehr gut, weiter so!',
-  'Stark! Genau richtig!',
-  'Prima, du hast es drauf!',
-]
-
-function randomInt(max: number, min = 0) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
-function pick<T>(list: readonly T[]): T {
-  return list[Math.floor(Math.random() * list.length)]
-}
-
-const round2 = (n: number) => Math.round(n * 100) / 100
-
-// Zahl als LaTeX mit deutschem Dezimalkomma ({,} verhindert den Abstand nach dem Komma)
-const tn = (n: number) => {
-  const r = round2(n)
-  return (r < 0 ? '-' : '') + String(Math.abs(r)).replace('.', '{,}')
-}
-
-const GREEN = '#15803d'
-const RED = '#b91c1c'
-
-/** KaTeX-Formel; display = abgesetzt (bei Platzmangel horizontal scrollbar) */
-function Tex({ tex, display = false, className = '' }: { tex: string; display?: boolean; className?: string }) {
-  const html = useMemo(() => katex.renderToString(tex, { throwOnError: false, displayMode: display }), [tex, display])
-  return display ? (
-    <div className={`overflow-x-auto overflow-y-hidden ${className}`} dangerouslySetInnerHTML={{ __html: html }} />
-  ) : (
-    <span className={className} dangerouslySetInnerHTML={{ __html: html }} />
-  )
-}
-
-interface Task {
-  a: Q
-  b: Q
-  c: Q
-  xs: Q
-  ys: Q
-}
-
-const taskFrom = (a: Q, xs: Q, c: Q): Task => {
-  const b = mul(q(-2), mul(a, xs))
-  return { a, b, c, xs, ys: add(mul(b, xs), add(mul(a, mul(xs, xs)), c)) }
-}
-
-// Fortgeschritten: Streckfaktoren (meist Brüche) und mögliche Werte für x_S und c
-const A_FORTGESCHRITTEN = [[1, 2], [-1, 2], [1, 3], [-1, 3], [2, 3], [-2, 3], [1, 4], [-1, 4], [3, 4], [-3, 4], [3, 2], [-3, 2], [2, 1], [-2, 1]] as const
-const XS_FORTGESCHRITTEN = Array.from({ length: 17 }, (_, i) => q(i - 8, 2)).filter((x) => x.n !== 0)
-const C_FORTGESCHRITTEN = [
-  ...Array.from({ length: 13 }, (_, i) => q(i - 6)),
-  ...[-5, -3, -1, 1, 3, 5].map((n) => q(n, 2)),
-  ...[-3, -1, 1, 3].map((n) => q(n, 4)),
-  ...[-2, -1, 1, 2].map((n) => q(n, 3)),
-].filter((c) => c.n !== 0)
-
-function newTask(level: Level): Task {
-  if (level === 'einfach') {
-    let xs: number
-    do xs = randomInt(5, -5)
-    while (xs === 0)
-    let c: number
-    do c = randomInt(9, -9)
-    while (c === 0)
-    return taskFrom(q(pick([1, -1])), q(xs), q(c))
-  }
-  for (;;) {
-    const [an, ad] = pick(A_FORTGESCHRITTEN)
-    const t = taskFrom(q(an, ad), pick(XS_FORTGESCHRITTEN), pick(C_FORTGESCHRITTEN))
-    // Mindestens ein Bruch in der Gleichung, überschaubare Nenner und Beträge
-    const mitBruch = !isInt(t.a) || !isInt(t.b) || !isInt(t.c)
-    if (mitBruch && t.b.n !== 0 && t.b.d <= 4 && Math.abs(val(t.b)) <= 12 && t.ys.d <= 6 && Math.abs(val(t.ys)) <= 12) return t
-  }
-}
-
-/** Bruch als gerundete Dezimalzahl in LaTeX, z. B. "2{,}33" */
-const dezimalWert = (x: Q) => tn(val(x))
-/** "= 2{,}5" bzw. "\\approx 2{,}33" */
-const dezimal = (x: Q) => `${Math.abs(val(x) - round2(val(x))) < 1e-9 ? '=' : '\\approx'} ${dezimalWert(x)}`
 
 // ---------- Live-Auswertung einer Eingabe ----------
 
 type AnswerStatus = 'idle' | 'right' | 'wrong'
 
 // Brüche (z. B. 7/3) werden exakt verglichen, Dezimalzahlen müssen auf zwei Nachkommastellen stimmen.
-function getStatus(input: string, correct: Q): AnswerStatus {
-  if (isIncomplete(input)) return 'idle'
+function getStatus(input: string | undefined, correct: Q): AnswerStatus {
+  if (!input || isIncomplete(input)) return 'idle'
   const parsed = parseAnswer(input)
   if (Number.isNaN(parsed)) return 'idle'
   return Math.abs(parsed - val(correct)) < 0.0051 ? 'right' : 'wrong'
 }
 
-function CoordInput({
+const statusClass = (status: AnswerStatus) =>
+  status === 'right' ? 'border-green-500 bg-green-50 text-green-800' : status === 'wrong' ? 'border-red-500 bg-red-50 text-red-800' : 'border-slate-300'
+
+function NumInput({
   value,
   status,
   onChange,
   placeholder,
   readOnly,
+  label,
 }: {
   value: string
   status: AnswerStatus
   onChange: (v: string) => void
-  placeholder: string
+  placeholder?: string
   readOnly: boolean
+  label: string
 }) {
-  const border =
-    status === 'right' ? 'border-green-500 bg-green-50 text-green-800' : status === 'wrong' ? 'border-red-500 bg-red-50 text-red-800' : 'border-slate-300'
   return (
     <input
       value={value}
       readOnly={readOnly}
       onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-      className={`w-24 text-center border-2 rounded px-2 py-2 text-lg focus:outline-none transition-colors ${border}`}
+      className={`w-24 text-center border-2 rounded px-2 py-2 text-lg focus:outline-none transition-colors ${statusClass(status)}`}
       placeholder={placeholder}
       inputMode="decimal"
-      aria-label={`${placeholder}-Koordinate des Scheitelpunkts`}
+      aria-label={label}
     />
   )
 }
 
-// ---------- Lösungsweg ----------
-
-function SolutionSteps({ task }: { task: Task }) {
-  const { a, b, c, xs, ys } = task
-  const t1 = mul(a, mul(xs, xs))
-  const t2 = mul(b, xs)
-  const bb = mul(b, b)
-  const vierA = mul(q(4), a)
-  const quot = q(bb.n * vierA.d, bb.d * vierA.n)
-  const naeherung = isInt(ys) ? '' : ` ${dezimal(ys)}`
-  return (
-    <div className="mt-6 bk-taskbox text-left text-slate-700 space-y-3">
-      <h3 className="text-base font-bold text-slate-800 text-center">Lösungsweg</h3>
-      <p>
-        Ablesen: <Tex tex={`a = ${tq(a)},\\quad b = ${tq(b)},\\quad c = ${tq(c)}`} />
-      </p>
-      <div>
-        <p className="font-semibold text-slate-800">Schritt 1: x-Koordinate berechnen</p>
-        <Tex display tex={`x_S = -\\frac{b}{2 \\cdot a} = -\\frac{${tq(b)}}{2 \\cdot ${tqp(a)}} = \\frac{${tq(neg(b))}}{${tq(mul(q(2), a))}} = \\mathbf{${tq(xs)}}`} />
-      </div>
-      <div>
-        <p className="font-semibold text-slate-800">
-          Schritt 2: <Tex tex="x_S" /> in <Tex tex="f(x)" /> einsetzen
-        </p>
-        <Tex display tex={`\\begin{aligned} y_S &= f\\left(${tq(xs)}\\right) = ${tq(a)} \\cdot ${tqp(xs)}^2 ${b.n < 0 ? '-' : '+'} ${tq(q(Math.abs(b.n), b.d))} \\cdot ${tqp(xs)} ${sgq(c)} \\\\ &= ${tq(t1)} ${sgq(t2)} ${sgq(c)} = \\mathbf{${tq(ys)}}${naeherung} \\end{aligned}`} />
-        <p className="mt-2">
-          oder mit der Formel <Tex tex="y_S = c - \frac{b^2}{4 \cdot a}" />:
-        </p>
-        <Tex display tex={`\\begin{aligned} y_S &= ${tq(c)} - \\frac{${tqp(b)}^2}{4 \\cdot ${tqp(a)}} = ${tq(c)} - \\frac{${tq(bb)}}{${tq(vierA)}} \\\\ &= ${tq(c)} ${sgq(neg(quot))} = \\mathbf{${tq(ys)}}${naeherung} \\end{aligned}`} />
-      </div>
-      <div className="font-bold text-slate-800 text-center text-lg">
-        <Tex display tex={`S\\left({${tq(xs)}} \\;\\middle|\\; {${tq(ys)}}\\right)${isInt(xs) && isInt(ys) ? '' : ` \\approx S\\left({${dezimalWert(xs)}} \\;\\middle|\\; {${dezimalWert(ys)}}\\right)`}`} />
-      </div>
-    </div>
-  )
+/** Status jedes einzelnen Eingabefelds (Schlüssel wie in den Eingaben) mit passendem Tipp */
+function auswerten(felder: Feld[], werte: Record<string, string>) {
+  const liste: { key: string; status: AnswerStatus; hint: React.ReactNode }[] = []
+  for (const feld of felder) {
+    if (feld.kind === 'num') liste.push({ key: feld.id, status: getStatus(werte[feld.id], feld.correct), hint: feld.hint })
+    else if (feld.kind === 'point') {
+      liste.push({ key: `${feld.id}x`, status: getStatus(werte[`${feld.id}x`], feld.xs), hint: feld.hintX })
+      liste.push({ key: `${feld.id}y`, status: getStatus(werte[`${feld.id}y`], feld.ys), hint: feld.hintY })
+    } else {
+      const w = werte[feld.id]
+      liste.push({ key: feld.id, status: w === undefined ? 'idle' : Number(w) === feld.correct ? 'right' : 'wrong', hint: feld.hint })
+    }
+  }
+  return liste
 }
 
 // ---------- Aufgabenkarte ----------
@@ -196,19 +82,21 @@ interface CardProps {
 }
 
 function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps) {
-  const [task, setTask] = useState(() => newTask(level))
-  const [xIn, setXIn] = useState('')
-  const [yIn, setYIn] = useState('')
+  const [aufgabe, setAufgabe] = useState(() => neueAufgabe(level, number - 1))
+  const [werte, setWerte] = useState<Record<string, string>>({})
   const [solved, setSolved] = useState(false)
   const [praise, setPraise] = useState(PRAISE[0])
   const [showSolution, setShowSolution] = useState(false)
   // Lösung erst nach einem eigenen, falschen Versuch (bleibt danach für die Aufgabe freigeschaltet)
   const [triedWrong, setTriedWrong] = useState(false)
 
-  const xStatus = getStatus(xIn, task.xs)
-  const yStatus = getStatus(yIn, task.ys)
-  const bothRight = xStatus === 'right' && yStatus === 'right'
-  const anyWrong = xStatus === 'wrong' || yStatus === 'wrong'
+  const statusListe = auswerten(aufgabe.felder, werte)
+  const status = Object.fromEntries(statusListe.map((s) => [s.key, s.status])) as Record<string, AnswerStatus>
+  const allRight = statusListe.every((s) => s.status === 'right')
+  const anyWrong = statusListe.some((s) => s.status === 'wrong')
+  const allFilled = statusListe.every((s) => s.status !== 'idle')
+  const ersterFehler = statusListe.find((s) => s.status === 'wrong')
+  const werteKey = JSON.stringify(werte)
 
   useEffect(() => {
     if (anyWrong) setTriedWrong(true)
@@ -216,7 +104,7 @@ function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps
 
   useEffect(() => {
     if (solved) return
-    if (bothRight) {
+    if (allRight) {
       setSolved(true)
       setPraise(pick(PRAISE))
       setShowSolution(false)
@@ -224,18 +112,19 @@ function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps
       onResult(true)
       return
     }
-    // Falscher Versuch zählt erst, wenn die Eingabe kurz stehen bleibt
-    if (anyWrong && xStatus !== 'idle' && yStatus !== 'idle') {
+    // Falscher Versuch zählt erst, wenn alles ausgefüllt ist und die Eingabe kurz stehen bleibt
+    if (anyWrong && allFilled) {
       const timer = setTimeout(() => onResult(false), 900)
       return () => clearTimeout(timer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [xIn, yIn, solved])
+  }, [werteKey, solved])
+
+  const setWert = (key: string, value: string) => setWerte((w) => ({ ...w, [key]: value }))
 
   function generateNewTask() {
-    setTask(newTask(level))
-    setXIn('')
-    setYIn('')
+    setAufgabe(neueAufgabe(level, number - 1))
+    setWerte({})
     setSolved(false)
     setShowSolution(false)
     setTriedWrong(false)
@@ -248,46 +137,84 @@ function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps
     onHelp()
   }
 
-  let message: React.ReactNode = null
-  if (solved) {
-    message = <p className="text-center font-bold mt-3 text-green-600">{praise}</p>
-  } else if (xStatus === 'right' && yStatus !== 'right') {
-    message = (
-      <p className={`text-center font-bold mt-3 ${yStatus === 'wrong' ? 'text-red-600' : 'text-green-600'}`}>
-        {yStatus === 'wrong' ? 'x stimmt, aber y ist noch nicht richtig. Setze ' : 'Gut, x stimmt! Jetzt noch y: Setze '}
-        <Tex tex="x_S" /> in <Tex tex="f(x)" /> ein oder nutze <Tex tex="y_S = c - \frac{b^2}{4a}" />.
-      </p>
-    )
-  } else if (xStatus === 'wrong') {
-    message = (
-      <p className="text-center font-bold mt-3 text-red-600">
-        x ist noch nicht richtig. Tipp: <Tex tex="x_S = -\frac{b}{2a}" />
-      </p>
-    )
-  } else if (yStatus === 'wrong') {
-    message = <p className="text-center font-bold mt-3 text-red-600">y ist noch nicht richtig.</p>
-  }
+  const hatZahlenfeld = aufgabe.felder.some((f) => f.kind !== 'choice')
 
   return (
     <div className={panel}>
-      <h2 className="text-lg font-bold text-slate-800 mb-2">Aufgabe {number}</h2>
-      <p className="text-slate-700 mb-1">
-        Berechne den Scheitelpunkt S der Parabel.
-        {level === 'fortgeschritten' && ' Gib Brüche mit Schrägstrich ein (z. B. 7/3) oder als Dezimalzahl, auf zwei Nachkommastellen gerundet.'}
+      <h2 className="text-lg font-bold text-slate-800 mb-1">Aufgabe {number}</h2>
+      <p className="mb-3">
+        <span className="inline-block bg-slate-100 text-slate-700 px-3 py-0.5 rounded-full text-sm font-semibold">{aufgabe.titel}</span>
       </p>
-      <div className="text-center text-2xl text-slate-800 my-4">
-        <Tex tex={`f(x) = ${polyTex(task.a, task.b, task.c)}`} />
+      {aufgabe.auftrag}
+
+      <div className="flex flex-wrap justify-center gap-x-6 gap-y-4">
+        {aufgabe.felder.map((feld) => {
+          if (feld.kind === 'num') {
+            return (
+              <label key={feld.id} className={`flex flex-wrap items-center justify-center gap-2 text-lg text-slate-800 ${feld.kurz ? '' : 'w-full'}`}>
+                <span>{feld.label}</span>
+                <NumInput
+                  value={werte[feld.id] ?? ''}
+                  status={status[feld.id]}
+                  onChange={(v) => setWert(feld.id, v)}
+                  readOnly={solved}
+                  label={typeof feld.label === 'string' ? feld.label : feld.id}
+                />
+                {feld.unit && <span>{feld.unit}</span>}
+              </label>
+            )
+          }
+          if (feld.kind === 'point') {
+            return (
+              <div key={feld.id} className="w-full flex items-center justify-center gap-2 text-2xl text-slate-800">
+                <Tex tex="S\Big(" />
+                <NumInput value={werte[`${feld.id}x`] ?? ''} status={status[`${feld.id}x`]} onChange={(v) => setWert(`${feld.id}x`, v)} placeholder="x" readOnly={solved} label="x-Koordinate des Scheitelpunkts" />
+                <Tex tex="\Big|" />
+                <NumInput value={werte[`${feld.id}y`] ?? ''} status={status[`${feld.id}y`]} onChange={(v) => setWert(`${feld.id}y`, v)} placeholder="y" readOnly={solved} label="y-Koordinate des Scheitelpunkts" />
+                <Tex tex="\Big)" />
+              </div>
+            )
+          }
+          return (
+            <div key={feld.id} className="w-full">
+              <p className="font-semibold text-slate-800 mb-2">{feld.label}</p>
+              <div className={feld.grafisch ? 'grid grid-cols-3 gap-2' : 'flex flex-wrap justify-center gap-2'}>
+                {feld.options.map((opt, i) => {
+                  const gewaehlt = werte[feld.id] === String(i)
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      disabled={solved}
+                      onClick={() => setWert(feld.id, String(i))}
+                      aria-pressed={gewaehlt}
+                      className={`border-2 rounded-lg px-4 py-2 font-semibold transition-colors ${
+                        gewaehlt ? statusClass(status[feld.id]) : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                      } ${feld.grafisch ? 'px-1' : ''}`}
+                    >
+                      {opt}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
       </div>
 
-      <div className="flex items-center justify-center gap-2 text-2xl text-slate-800">
-        <Tex tex="S\Big(" />
-        <CoordInput value={xIn} status={xStatus} onChange={setXIn} placeholder="x" readOnly={solved} />
-        <Tex tex="\Big|" />
-        <CoordInput value={yIn} status={yStatus} onChange={setYIn} placeholder="y" readOnly={solved} />
-        <Tex tex="\Big)" />
-      </div>
+      {solved ? (
+        <p className="text-center font-bold mt-3 text-green-600">{praise}</p>
+      ) : ersterFehler ? (
+        <p className="text-center font-bold mt-3 text-red-600">{ersterFehler.hint}</p>
+      ) : null}
 
-      {message}
+      {hatZahlenfeld && !solved && (
+        <p className="mt-3 text-sm text-slate-500">
+          {level === 'fortgeschritten'
+            ? 'Gib Brüche mit Schrägstrich ein (z. B. 7/3) oder als Dezimalzahl, auf zwei Nachkommastellen gerundet.'
+            : 'Dezimalzahlen mit Komma eingeben, z. B. 2,5.'}
+        </p>
+      )}
 
       <div className="flex flex-wrap justify-center gap-3 mt-6">
         <button onClick={generateNewTask} className={btnSecondary}>Neue Aufgabe</button>
@@ -304,7 +231,7 @@ function TaskCard({ number, level, onSolvedChange, onResult, onHelp }: CardProps
         <p className="mt-2 text-sm text-slate-500">Die Lösung kannst du dir anzeigen lassen, sobald du die Aufgabe selbst versucht hast.</p>
       )}
 
-      {showSolution && <SolutionSteps task={task} />}
+      {showSolution && aufgabe.loesung}
     </div>
   )
 }
@@ -430,6 +357,33 @@ function Erklaerung() {
 
 // ---------- Seite: sieben Aufgaben auf einmal ----------
 
+const LEVEL_KARTEN: { level: Level; farbe: string; tex: string; text: string }[] = [
+  {
+    level: 'einfach',
+    farbe: 'bg-green-600 hover:bg-green-700',
+    tex: 'f(x) = \\pm x^2 + bx + c',
+    text: 'Ohne Streckfaktor (a = 1 oder a = −1), der Scheitelpunkt hat ganzzahlige Koordinaten.',
+  },
+  {
+    level: 'mittel',
+    farbe: 'bg-amber-500 hover:bg-amber-600',
+    tex: 'f(x) = 2x^2 - 8x + 3',
+    text: 'Mit Streckfaktor: ganze Zahlen wie 2 oder −3 und Dezimalzahlen wie 0,5.',
+  },
+  {
+    level: 'fortgeschritten',
+    farbe: 'bg-red-600 hover:bg-red-700',
+    tex: 'f(x) = \\frac{1}{2}x^2 - 3x + \\frac{5}{2}',
+    text: 'Mit Brüchen in der Funktionsgleichung – rechne mit Bruchrechnung.',
+  },
+  {
+    level: 'anwendung',
+    farbe: 'bg-blue-600 hover:bg-blue-700',
+    tex: 'G(x) = -0{,}5x^2 + 40x - 300',
+    text: 'Sieben Sachaufgaben: Gewinn, Wurfhöhe, Kosten, Brückenbogen und mehr.',
+  },
+]
+
 export default function Scheitelpunkt() {
   const navigate = useNavigate()
   const [level, setLevel] = useState<Level | null>(null)
@@ -512,23 +466,21 @@ export default function Scheitelpunkt() {
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button
-                onClick={() => chooseLevel('einfach')}
-                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Einfach</p>
-                <Tex display className="text-xl mb-2 text-white" tex="f(x) = \pm x^2 + bx + c" />
-                <p className="text-sm text-white/90">Ohne Streckfaktor (a = 1 oder a = −1), der Scheitelpunkt hat ganzzahlige Koordinaten.</p>
-              </button>
-              <button
-                onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
-                <Tex display className="text-xl mb-2 text-white" tex="f(x) = \frac{1}{2}x^2 - 3x + \frac{5}{2}" />
-                <p className="text-sm text-white/90">Mit Brüchen in der Funktionsgleichung – rechne mit Bruchrechnung.</p>
-              </button>
+              {LEVEL_KARTEN.map((karte) => (
+                <button
+                  key={karte.level}
+                  onClick={() => chooseLevel(karte.level)}
+                  className={`rounded-2xl ${karte.farbe} text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5`}
+                >
+                  <p className="text-lg font-bold mb-1 text-white">{LEVEL_LABEL[karte.level]}</p>
+                  <Tex display className="text-xl mb-2 text-white" tex={karte.tex} />
+                  <p className="text-sm text-white/90">{karte.text}</p>
+                </button>
+              ))}
             </div>
+            <p className="text-sm text-slate-600 mt-4">
+              Jede Runde besteht aus sieben verschiedenen Aufgabenarten: von „Schritt für Schritt“ über Fehlersuche bis zur Sachaufgabe.
+            </p>
           </div>
         </div>
       </TaskShell>
