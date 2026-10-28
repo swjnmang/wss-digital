@@ -22,6 +22,8 @@ const FORMEN: { form: Form; label: string; placeholder: string }[] = [
     { form: 'scheitel', label: 'Scheitelform', placeholder: 'z. B. y = 2(x − 1)² + 3' },
     { form: 'allgemein', label: 'Allgemeine Form', placeholder: 'z. B. y = 2x² − 4x + 5' },
 ];
+/** Fall 1: Scheitelform und allgemeine Form, Fall 2: nur die allgemeine Form */
+const formenFuer = (t: Aufgabe) => (t.typ === 'scheitel' ? FORMEN : FORMEN.filter(f => f.form === 'allgemein'));
 type Schritt = { text: string; formeln: string[] };
 
 const ANZAHL_AUFGABEN = 5;
@@ -45,7 +47,7 @@ export const LERNVIDEO_FALL2 = 'hg9QipwqXxI';
 const GLEICHUNGSSYSTEME_PFAD = '/lineare_funktionen/gleichungssysteme?verfahren=addieren';
 
 const BEISPIEL_SCHEITEL: ScheitelAufgabe = { typ: 'scheitel', a: 1, b: -4, c: 3, h: 2, k: -1, px: 4, py: 3 };
-const BEISPIEL_PUNKTE: PunkteAufgabe = { typ: 'punkte', bekannt: 'a', a: -1, b: 2, c: 4, x1: 1, y1: 5, x2: 3, y2: 1 };
+const BEISPIEL_PUNKTE: PunkteAufgabe = { typ: 'punkte', bekannt: 'a', a: -1, b: 2, c: 4, x1: 2, y1: 4, x2: 3, y2: 1 };
 
 const zufall = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const auswahl = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
@@ -79,7 +81,7 @@ const erzeugeScheitelAufgabe = (): ScheitelAufgabe => {
 };
 
 const erzeugePunkteAufgabe = (bekannt: Bekannt): PunkteAufgabe => {
-    // Über einen ganzzahligen Scheitelpunkt erzeugt, damit auch die Scheitelform glatte Zahlen hat
+    // Über einen ganzzahligen Scheitelpunkt erzeugt, damit a, b und c glatte Zahlen sind
     for (;;) {
         const a = auswahl([1, -1, 2, -2]);
         const h = zufall(-3, 3);
@@ -88,7 +90,8 @@ const erzeugePunkteAufgabe = (bekannt: Bekannt): PunkteAufgabe => {
         const c = a * h * h + k;
         // Der bekannte Wert ist nie 0, sonst wäre die Angabe nichtssagend
         if ((bekannt === 'b' && b === 0) || (bekannt === 'c' && c === 0) || Math.abs(c) > 10) continue;
-        const xWerte = [-3, -2, -1, 1, 2, 3];
+        // Keiner der gegebenen Punkte ist der Scheitelpunkt (x ≠ h)
+        const xWerte = [-3, -2, -1, 1, 2, 3].filter(x => x !== h);
         const x1 = auswahl(xWerte);
         // Bei bekanntem b muss x2 ≠ -x1 sein, sonst fällt beim Abziehen auch a weg
         const x2 = auswahl(xWerte.filter(x => x !== x1 && (bekannt !== 'b' || x !== -x1)));
@@ -98,8 +101,6 @@ const erzeugePunkteAufgabe = (bekannt: Bekannt): PunkteAufgabe => {
     }
 };
 
-// Scheitelpunkt jeder Aufgabe (bei Fall 2 aus a, b und c berechnet)
-const scheitelpunkt = (t: Aufgabe) => (t.typ === 'scheitel' ? { h: t.h, k: t.k } : { h: -t.b / (2 * t.a), k: t.c - (t.b * t.b) / (4 * t.a) });
 
 const schluessel = (t: Aufgabe) =>
     t.typ === 'scheitel' ? `s${t.h},${t.k},${t.px},${t.a}` : `p${t.bekannt},${t.a},${t.x1},${t.y1},${t.x2},${t.y2}`;
@@ -178,18 +179,81 @@ const schritteScheitel = (t: ScheitelAufgabe): Schritt[] => {
     ];
 };
 
+// ---------- Lineares Gleichungssystem darstellen ----------
+// Zeile eines Gleichungssystems: Bezeichnung (TeX), linke Seite, rechte Seite, Umformung; 'strich' = Strich vor dem Ergebnis
+type LgsZeile = [string, string, string, string?];
+const lgs = (zeilen: (LgsZeile | 'strich')[]) => {
+    const rows: string[] = [];
+    let strich = false;
+    for (const z of zeilen) {
+        if (z === 'strich') {
+            strich = true;
+            continue;
+        }
+        rows.push(`${strich ? '\\hline ' : ''}${z[0]} & ${z[1]} & = & ${z[2]} & ${z[3] ?? ''}`);
+        strich = false;
+    }
+    return `\\begin{array}{lrcll} ${rows.join(' \\\\ ')} \\end{array}`;
+};
+const I = '\\text{I:}';
+const II = '\\text{II:}';
+// Umformung hinter der Gleichung, z. B. "| : 3"
+const umf = (s: string) => `\\quad |\\, ${s}`;
+// Zahl auf die andere Seite bringen: "| − 3" bzw. "| + 3" (leer bei 0)
+const weg = (n: number) => (n === 0 ? '' : umf(`${n > 0 ? '-' : '+'}\\, ${num(Math.abs(n))}`));
+// Durch den Vorfaktor teilen (leer bei 1)
+const teilen = (n: number) => (n === 1 ? '' : umf(`: ${kl(n)}`));
+// Term aus Vorfaktor und Unbekannter, z. B. "3b", "-b"
+const tm = (k: number, v: string) => `${vorfaktor(k)}${v}`;
+
+// a bekannt (Unbekannte b, c) oder b bekannt (Unbekannte a, c): I: k1·u + c = r1, II: k2·u + c = r2
+const schritteCFaelltWeg = (t: PunkteAufgabe, u: 'a' | 'b', k1: number, k2: number, r1: number, r2: number): Schritt[] => {
+    const wert = t[u];
+    const diff = k1 - k2;
+    const prod = k1 * wert;
+    return [
+        {
+            text:
+                `Die Gleichungen I und II bilden ein lineares Gleichungssystem mit den zwei Unbekannten ${u} und c. ` +
+                `Schreibe es geordnet untereinander: die Unbekannten links (gleiche Unbekannte genau untereinander), die Zahl rechts. ` +
+                `Vor c steht in beiden Gleichungen dieselbe Zahl, nämlich 1. Ziehst du deshalb Gleichung II von Gleichung I ab (I − II), ` +
+                `fällt c weg (c − c = 0). Du rechnest spaltenweise: ${u} minus ${u}, c minus c und rechts Zahl minus Zahl. ` +
+                `Übrig bleibt eine Gleichung mit nur einer Unbekannten, die du nach ${u} auflöst:`,
+            formeln: [
+                lgs([
+                    [I, `${tm(k1, u)} + c`, num(r1)],
+                    [II, `${tm(k2, u)} + c`, num(r2)],
+                    'strich',
+                    ['\\text{I} - \\text{II:}', `${tm(k1, u)} - (${tm(k2, u)}) + c - c`, `${num(r1)} - ${kl(r2)}`],
+                    ['', tm(diff, u), num(r1 - r2), teilen(diff)],
+                    ['', u, num(wert)],
+                ]),
+            ],
+        },
+        {
+            text: `${u} = ${num(wert).replace('{,}', ',')} in Gleichung I einsetzen und nach c auflösen:`,
+            formeln: [
+                lgs([
+                    [I, `${tm(k1, u)} + c`, num(r1)],
+                    ['', `${num(k1)} \\cdot ${kl(wert)} + c`, num(r1)],
+                    ['', `${num(prod)} + c`, num(r1), weg(prod)],
+                    ['', 'c', num(t.c)],
+                ]),
+            ],
+        },
+    ];
+};
+
 const schritteABekannt = (t: PunkteAufgabe): Schritt[] => {
     const { a, b, c, x1, y1, x2, y2 } = t;
     const r1 = y1 - a * x1 * x1;
     const r2 = y2 - a * x2 * x2;
-    const bTerm = (x: number) => `${vorfaktor(x)}b`;
     const bSumm = (x: number) => summand(x, 'b');
     const gleichung = (nr: string, x: number, y: number, r: number) => [
         `\\text{${nr}:}\\quad {${num(y)}} = ${num(a)} \\cdot ${kl(x)}^2 + b \\cdot ${kl(x)} + c`,
         `\\text{${nr}:}\\quad {${num(y)}} = ${num(a * x * x)}${bSumm(x)} + c${minusRechnen(a * x * x)}`,
-        `\\text{${nr}:}\\quad {${num(r)}} = ${bTerm(x)} + c`,
+        `\\text{${nr}:}\\quad {${num(r)}} = ${tm(x, 'b')} + c`,
     ];
-    const diff = x1 - x2;
     return [
         {
             text: `Den bekannten Formfaktor a = ${a} in die allgemeine Form einsetzen:`,
@@ -197,22 +261,7 @@ const schritteABekannt = (t: PunkteAufgabe): Schritt[] => {
         },
         { text: `Punkt P(${x1}|${y1}) einsetzen → Gleichung I:`, formeln: gleichung('I', x1, y1, r1) },
         { text: `Punkt Q(${x2}|${y2}) einsetzen → Gleichung II:`, formeln: gleichung('II', x2, y2, r2) },
-        {
-            text: 'Gleichung II von Gleichung I abziehen (I − II). Dadurch fällt c weg und du kannst b berechnen:',
-            formeln: [
-                `${num(r1)} - ${kl(r2)} = ${bTerm(x1)} - ${x2 < 0 ? `(${bTerm(x2)})` : bTerm(x2)}`,
-                `${num(r1 - r2)} = ${bTerm(diff)}${diff === 1 ? '' : ` \\quad |\\, : ${kl(diff)}`}`,
-                `b = ${num(b)}`,
-            ],
-        },
-        {
-            text: 'b in Gleichung I einsetzen und c berechnen:',
-            formeln: [
-                `${num(r1)} = ${num(x1)} \\cdot ${kl(b)} + c`,
-                `${num(r1)} = ${num(x1 * b)} + c${minusRechnen(x1 * b)}`,
-                `c = ${num(c)}`,
-            ],
-        },
+        ...schritteCFaelltWeg(t, 'b', x1, x2, r1, r2),
         { text: 'a, b und c in die allgemeine Form einsetzen:', formeln: [allgForm(a, b, c)] },
     ];
 };
@@ -226,7 +275,6 @@ const schritteBBekannt = (t: PunkteAufgabe): Schritt[] => {
         `\\text{${nr}:}\\quad {${num(y)}} = ${vorfaktor(x * x)}a${summand(b * x)} + c${minusRechnen(b * x)}`,
         `\\text{${nr}:}\\quad {${num(r)}} = ${vorfaktor(x * x)}a + c`,
     ];
-    const diff = x1 * x1 - x2 * x2;
     return [
         {
             text: `Den bekannten Wert b = ${b} in die allgemeine Form einsetzen:`,
@@ -234,22 +282,7 @@ const schritteBBekannt = (t: PunkteAufgabe): Schritt[] => {
         },
         { text: `Punkt P(${x1}|${y1}) einsetzen → Gleichung I:`, formeln: gleichung('I', x1, y1, r1) },
         { text: `Punkt Q(${x2}|${y2}) einsetzen → Gleichung II:`, formeln: gleichung('II', x2, y2, r2) },
-        {
-            text: 'Gleichung II von Gleichung I abziehen (I − II). Dadurch fällt c weg und du kannst a berechnen:',
-            formeln: [
-                `${num(r1)} - ${kl(r2)} = ${vorfaktor(x1 * x1)}a - ${vorfaktor(x2 * x2)}a`,
-                `${num(r1 - r2)} = ${vorfaktor(diff)}a${diff === 1 ? '' : ` \\quad |\\, : ${kl(diff)}`}`,
-                `a = ${num(a)}`,
-            ],
-        },
-        {
-            text: 'a in Gleichung I einsetzen und c berechnen:',
-            formeln: [
-                `${num(r1)} = ${num(x1 * x1)} \\cdot ${kl(a)} + c`,
-                `${num(r1)} = ${num(x1 * x1 * a)} + c${minusRechnen(x1 * x1 * a)}`,
-                `c = ${num(c)}`,
-            ],
-        },
+        ...schritteCFaelltWeg(t, 'a', x1 * x1, x2 * x2, r1, r2),
         { text: 'a, b und c in die allgemeine Form einsetzen:', formeln: [allgForm(a, b, c)] },
     ];
 };
@@ -269,11 +302,15 @@ const schritteCBekannt = (t: PunkteAufgabe): Schritt[] => {
         `\\text{${nr}:}\\quad {${num(y)}} = ${vorfaktor(x * x)}a${summand(x, 'b')}${summand(c)}${minusRechnen(c)}`,
         `\\text{${nr}:}\\quad {${num(r)}} = ${vorfaktor(x * x)}a${summand(x, 'b')}`,
     ];
-    const multipliziert = (nr: string, f: number, x: number, r: number) =>
-        f === 1 ? [] : [`\\text{${nr}} \\cdot ${kl(f)}:\\quad {${num(r * f)}} = ${vorfaktor(x * x * f)}a${summand(kgV, 'b')}`];
-    const faktorText = [f1 !== 1 ? `Gleichung I mit ${f1}` : '', f2 !== 1 ? `Gleichung II mit ${f2}` : ''].filter(Boolean).join(' und ');
-    const koeffA = x1 * x1 * f1 - x2 * x2 * f2;
-    const rest = r1 - x1 * x1 * a;
+    const links = (x: number, f: number) => `${tm(x * x * f, 'a')}${summand(x * f, 'b')}`;
+    const name = (nr: string, f: number) => (f === 1 ? `\\text{${nr}}` : `\\text{${nr}} \\cdot ${kl(f)}`);
+    const zahlText = (n: number) => (n < 0 ? `(−${-n})` : String(n));
+    const faktorText = [f1 !== 1 ? `Gleichung I mit ${zahlText(f1)}` : '', f2 !== 1 ? `Gleichung II mit ${zahlText(f2)}` : ''].filter(Boolean).join(' und ');
+    const A1 = x1 * x1 * f1;
+    const A2 = x2 * x2 * f2;
+    const koeffA = A1 - A2;
+    const prod = x1 * x1 * a;
+    const rest = r1 - prod;
     return [
         {
             text: `Den bekannten Wert c = ${c} in die allgemeine Form einsetzen:`,
@@ -283,24 +320,47 @@ const schritteCBekannt = (t: PunkteAufgabe): Schritt[] => {
         { text: `Punkt Q(${x2}|${y2}) einsetzen → Gleichung II:`, formeln: gleichung('II', x2, y2, r2) },
         {
             text:
-                (faktorText
-                    ? `Damit b wegfällt, muss vor b in beiden Gleichungen dieselbe Zahl stehen. Multipliziere dazu ${faktorText}. `
-                    : 'Vor b steht in beiden Gleichungen schon dieselbe Zahl. ') +
-                'Ziehe dann Gleichung II von Gleichung I ab (I − II) und berechne a:',
+                'Die Gleichungen I und II bilden ein lineares Gleichungssystem mit den zwei Unbekannten a und b. ' +
+                'Schreibe es geordnet untereinander: die Unbekannten links (gleiche Unbekannte genau untereinander), die Zahl rechts. ' +
+                'Damit beim Abziehen eine Unbekannte wegfällt, muss vor ihr in beiden Gleichungen dieselbe Zahl stehen. ' +
+                `Vor b stehen ${zahlText(x1)} und ${zahlText(x2)}. Multipliziere deshalb ${faktorText}, dann steht vor b in beiden Gleichungen ${kgV}. ` +
+                'Wichtig: Jede Zahl auf beiden Seiten der Gleichung wird multipliziert.',
             formeln: [
-                ...multipliziert('I', f1, x1, r1),
-                ...multipliziert('II', f2, x2, r2),
-                `\\text{I} - \\text{II}:\\quad {${num(r1 * f1 - r2 * f2)}} = ${vorfaktor(koeffA)}a${koeffA === 1 ? '' : ` \\quad |\\, : ${kl(koeffA)}`}`,
-                `a = ${num(a)}`,
+                lgs([
+                    [I, links(x1, 1), num(r1), f1 === 1 ? '' : umf(`\\cdot ${kl(f1)}`)],
+                    [II, links(x2, 1), num(r2), f2 === 1 ? '' : umf(`\\cdot ${kl(f2)}`)],
+                ]),
+                lgs([
+                    [`${name('I', f1)}:`, links(x1, f1), num(r1 * f1)],
+                    [`${name('II', f2)}:`, links(x2, f2), num(r2 * f2)],
+                ]),
             ],
         },
         {
-            text: 'a in Gleichung I einsetzen und b berechnen:',
+            text:
+                `Jetzt steht vor b in beiden Gleichungen ${kgV}. Ziehe die zweite Gleichung von der ersten ab: ` +
+                'Du rechnest spaltenweise a minus a, b minus b und rechts Zahl minus Zahl. Dadurch fällt b weg und du kannst a berechnen:',
             formeln: [
-                `${num(r1)} = ${num(x1 * x1)} \\cdot ${kl(a)}${summand(x1, 'b')}`,
-                `${num(r1)} = ${num(x1 * x1 * a)}${summand(x1, 'b')}${minusRechnen(x1 * x1 * a)}`,
-                `${num(rest)} = ${vorfaktor(x1)}b${x1 === 1 ? '' : ` \\quad |\\, : ${kl(x1)}`}`,
-                `b = ${num(b)}`,
+                lgs([
+                    [`${name('I', f1)}:`, links(x1, f1), num(r1 * f1)],
+                    [`${name('II', f2)}:`, links(x2, f2), num(r2 * f2)],
+                    'strich',
+                    [`${name('I', f1)} - ${name('II', f2)}:`, `${tm(A1, 'a')} - (${tm(A2, 'a')}) + ${tm(kgV, 'b')} - ${tm(kgV, 'b')}`, `${num(r1 * f1)} - ${kl(r2 * f2)}`],
+                    ['', tm(koeffA, 'a'), num(r1 * f1 - r2 * f2), teilen(koeffA)],
+                    ['', 'a', num(a)],
+                ]),
+            ],
+        },
+        {
+            text: `a = ${num(a).replace('{,}', ',')} in Gleichung I einsetzen und nach b auflösen:`,
+            formeln: [
+                lgs([
+                    [I, links(x1, 1), num(r1)],
+                    ['', `${num(x1 * x1)} \\cdot ${kl(a)}${summand(x1, 'b')}`, num(r1)],
+                    ['', `${num(prod)}${summand(x1, 'b')}`, num(r1), weg(prod)],
+                    ['', tm(x1, 'b'), num(rest), teilen(x1)],
+                    ['', 'b', num(b)],
+                ]),
             ],
         },
         { text: 'a, b und c in die allgemeine Form einsetzen:', formeln: [allgForm(a, b, c)] },
@@ -311,34 +371,16 @@ const schritteCBekannt = (t: PunkteAufgabe): Schritt[] => {
 const ohneDoppelte = (liste: Schritt[]) =>
     liste.map(s => ({ ...s, formeln: s.formeln.filter((f, i, arr) => i === 0 || f !== arr[i - 1]) }));
 
-// Fall 2: aus der allgemeinen Form den Scheitelpunkt berechnen und die Scheitelform aufschreiben
-const schritteZurScheitelform = (t: PunkteAufgabe): Schritt[] => {
-    const { a, b, c } = t;
-    const { h, k } = scheitelpunkt(t);
-    return [
-        {
-            text: 'x-Koordinate des Scheitelpunkts berechnen:',
-            formeln: [`x_S = -\\frac{b}{2a} = -\\frac{${num(b)}}{2 \\cdot ${kl(a)}} = ${num(h)}`],
-        },
-        {
-            text: `x = ${h} in die allgemeine Form einsetzen und die y-Koordinate des Scheitelpunkts berechnen:`,
-            formeln: [`y_S = ${num(a)} \\cdot ${kl(h)}^2 + ${kl(b)} \\cdot ${kl(h)} + ${kl(c)} = ${num(k)}`],
-        },
-        {
-            text: `Scheitelpunkt S(${h}|${k}) und a = ${a} in die Scheitelform einsetzen:`,
-            formeln: ['y = a(x - x_S)^2 + y_S', scheitelForm(a, h, k)],
-        },
-    ];
-};
-
+// Fall 2 endet mit der allgemeinen Form (kein Scheitelpunkt, keine Scheitelform)
 const schritte = (t: Aufgabe) =>
     ohneDoppelte(
         t.typ === 'scheitel'
             ? schritteScheitel(t)
-            : [
-                  ...(t.bekannt === 'a' ? schritteABekannt(t) : t.bekannt === 'b' ? schritteBBekannt(t) : schritteCBekannt(t)),
-                  ...schritteZurScheitelform(t),
-              ]
+            : t.bekannt === 'a'
+              ? schritteABekannt(t)
+              : t.bekannt === 'b'
+                ? schritteBBekannt(t)
+                : schritteCBekannt(t)
     );
 
 const gegebenePunkte = (t: Aufgabe) =>
@@ -441,7 +483,7 @@ const Loesungsweg = ({ t, anzahl, titel }: { t: Aufgabe; anzahl: number; titel?:
             </ol>
             {fertig && (
                 <div className="mt-3 font-bold text-center bg-blue-100 rounded-md p-2 space-y-1">
-                    <p>Scheitelform: <InlineMath math={scheitelForm(t.a, scheitelpunkt(t).h, scheitelpunkt(t).k)} /></p>
+                    {t.typ === 'scheitel' && <p>Scheitelform: <InlineMath math={scheitelForm(t.a, t.h, t.k)} /></p>}
                     <p>Allgemeine Form: <InlineMath math={allgForm(t.a, t.b, t.c)} /></p>
                 </div>
             )}
@@ -460,8 +502,17 @@ const AufgabenText = ({ t }: { t: Aufgabe }) => {
             ) : (
                 <>Für die Parabel <InlineMath math="y = ax^2 + bx + c" /> gilt <strong>{t.bekannt} = {t[t.bekannt]}</strong>.</>
             )}{' '}
-            Bestimme rechnerisch die Funktionsgleichung, die durch die Punkte <strong>{p1}</strong> und <strong>{p2}</strong> geht, in{' '}
-            <strong>Scheitelform</strong>. Berechne anschließend die dazugehörige <strong>allgemeine Form</strong>.
+            {t.typ === 'scheitel' ? (
+                <>
+                    Bestimme rechnerisch die Funktionsgleichung, die durch die Punkte <strong>{p1}</strong> und <strong>{p2}</strong> geht, in{' '}
+                    <strong>Scheitelform</strong>. Berechne anschließend die dazugehörige <strong>allgemeine Form</strong>.
+                </>
+            ) : (
+                <>
+                    Bestimme rechnerisch die Funktionsgleichung der Parabel, die durch die Punkte <strong>{p1}</strong> und <strong>{p2}</strong> geht, in{' '}
+                    <strong>allgemeiner Form</strong> <InlineMath math="y = ax^2 + bx + c" />.
+                </>
+            )}
         </span>
     );
 };
@@ -505,8 +556,7 @@ export const ErklaerungFall2 = () => (
             <InlineMath math="y = ax^2 + bx + c" /> ein. Dann setzt du nacheinander beide Punkte ein und erhältst zwei Gleichungen (I und II)
             mit den zwei noch fehlenden Werten. Dieses Gleichungssystem löst du mit dem <strong>Additions- und Subtraktionsverfahren</strong>: Ziehst du II von I
             ab, fällt eine Unbekannte weg und du kannst die andere berechnen. Diese setzt du in Gleichung I ein und erhältst den letzten Wert.
-            Für die Scheitelform berechnest du anschließend den Scheitelpunkt: <InlineMath math="x_S = -\frac{b}{2a}" />, und{' '}
-            <InlineMath math="y_S" /> erhältst du, indem du <InlineMath math="x_S" /> in die allgemeine Form einsetzt.
+            Zum Schluss setzt du <InlineMath math="a" />, <InlineMath math="b" /> und <InlineMath math="c" /> in die allgemeine Form ein.
         </p>
         <ul className="list-disc pl-5 text-gray-700 mb-3 space-y-1">
             <li><strong><InlineMath math="a" /> bekannt:</strong> Beim Abziehen fällt <InlineMath math="c" /> weg → zuerst <InlineMath math="b" />, dann <InlineMath math="c" />.</li>
@@ -517,7 +567,7 @@ export const ErklaerungFall2 = () => (
             </li>
         </ul>
         <p className="text-gray-700 mb-3">
-            <strong>Beispiel:</strong> <strong>a = −1</strong>, Punkte <strong>P(1|5)</strong> und <strong>Q(3|1)</strong>
+            <strong>Beispiel:</strong> <strong>a = −1</strong>, Punkte <strong>P(2|4)</strong> und <strong>Q(3|1)</strong>
         </p>
         <ParabelGraph a={BEISPIEL_PUNKTE.a} b={BEISPIEL_PUNKTE.b} c={BEISPIEL_PUNKTE.c} punkte={gegebenePunkte(BEISPIEL_PUNKTE)} />
         <Loesungsweg t={BEISPIEL_PUNKTE} anzahl={schritte(BEISPIEL_PUNKTE).length} titel="Beispiel: Lösungsweg" />
@@ -666,18 +716,28 @@ const FunktionsgleichungAufstellen = () => {
 
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">Deine Aufgaben</h2>
                 <p className="text-gray-600 mb-6">
-                    Bestimme jeweils die Funktionsgleichung in Scheitelform <InlineMath math="y = a(x - x_S)^2 + y_S" /> und in allgemeiner Form{' '}
-                    <InlineMath math="y = ax^2 + bx + c" />. Rechne zuerst im Heft und tippe dann beide Gleichungen vollständig ein, z. B. y = 2(x − 1)² + 3
-                    und y = 2x² − 4x + 5. Eine richtige Gleichung wird sofort grün, eine falsche nach kurzer Pause rot. Wenn du nicht weiterkommst, zeigt dir
+                    {modus === 'punkte' ? (
+                        <>
+                            Bestimme jeweils die Funktionsgleichung in allgemeiner Form <InlineMath math="y = ax^2 + bx + c" />. Rechne zuerst im Heft und tippe
+                            dann die Gleichung vollständig ein, z. B. y = 2x² − 4x + 5.
+                        </>
+                    ) : (
+                        <>
+                            Bestimme {modus === 'gemischt' ? 'bei Fall 1' : 'jeweils'} die Funktionsgleichung in Scheitelform{' '}
+                            <InlineMath math="y = a(x - x_S)^2 + y_S" /> und in allgemeiner Form <InlineMath math="y = ax^2 + bx + c" />
+                            {modus === 'gemischt' ? ', bei Fall 2 nur in allgemeiner Form' : ''}. Rechne zuerst im Heft und tippe dann die Gleichungen vollständig
+                            ein, z. B. y = 2(x − 1)² + 3 und y = 2x² − 4x + 5.
+                        </>
+                    )}{' '}
+                    Eine richtige Gleichung wird sofort grün, eine falsche nach kurzer Pause rot. Wenn du nicht weiterkommst, zeigt dir
                     „Tipp anzeigen“ den Lösungsweg Schritt für Schritt.
                 </p>
 
                 <div className="flex flex-col gap-6">
                     {aufgaben.map((t, i) => {
                         const anzahlSchritte = schritte(t).length;
-                        const felder = FORMEN.map(f => ({ ...f, ...zustand(i, f.form) }));
+                        const felder = formenFuer(t).map(f => ({ ...f, ...zustand(i, f.form) }));
                         const alleRichtig = felder.every(f => f.richtig);
-                        const { h, k } = scheitelpunkt(t);
                         return (
                             <div key={i} className="border border-gray-200 rounded-lg p-4">
                                 <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] items-start">
@@ -711,7 +771,12 @@ const FunktionsgleichungAufstellen = () => {
 
                                 {alleRichtig && (
                                     <div className="mt-3 p-3 bg-green-100 border border-green-400 rounded-md text-green-900 font-semibold">
-                                        🎉 {LOB[i % LOB.length]} <InlineMath math={scheitelForm(t.a, h, k)} /> bzw.{' '}
+                                        🎉 {LOB[i % LOB.length]}{' '}
+                                        {t.typ === 'scheitel' && (
+                                            <>
+                                                <InlineMath math={scheitelForm(t.a, t.h, t.k)} /> bzw.{' '}
+                                            </>
+                                        )}
                                         <InlineMath math={allgForm(t.a, t.b, t.c)} />{' '}
                                         {i < aufgaben.length - 1
                                             ? `Weiter geht's mit Aufgabe ${i + 2}!`
