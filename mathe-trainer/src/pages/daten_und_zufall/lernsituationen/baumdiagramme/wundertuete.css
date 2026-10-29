@@ -1,0 +1,22 @@
+/* Lernsituation 5.7 „Die Wundertüte“. Farben kommen über --primary aus dem Thema. */
+
+.wt-bild { text-align: center; }
+.wt-tuete { display: block; width: 100%; height: auto; max-width: 720px; margin: 0 auto; }
+.wt-baum { display: block; width: 100%; height: auto; max-width: 600px; margin: 0 auto; }
+.wt-ziehen { display: flex; flex-direction: column; gap: 12px; }
+.wt-ziehen .bk-btn { min-height: 48px; }
+.wt-zaehler { margin: 0; font-size: 17px; line-height: 1.5; }
+.wt-erkenntnis { margin: 0; font-size: 17px; line-height: 1.55; }
+
+/* Bonus-Spiel Pfade-Jagd */
+.wt-spiel { display: flex; flex-direction: column; gap: 12px; }
+.wt-spiel-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 800 17px/1.3 var(--font-display); color: var(--primary); }
+.wt-muenzen { display: flex; gap: 6px; font-size: 20px; color: var(--line-strong); }
+.wt-muenzen .wt-muenze-an { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.wt-spiel-frage { margin: 0; font-size: 18px; line-height: 1.5; }
+.wt-optionen { display: flex; flex-wrap: wrap; gap: 10px; }
+.wt-option { min-height: 52px; min-width: 120px; flex: 1 1 120px; font-size: 20px; font-weight: 800; }
+.wt-option.wt-richtig { background: var(--correct-soft); border-color: var(--correct); color: var(--correct-ink); }
+.wt-option.wt-falsch { background: var(--wrong-soft); border-color: var(--wrong); color: var(--wrong-ink); }
+.wt-spiel-ende { margin: 0; font: 800 20px/1.4 var(--font-display); color: var(--ink); }
+.wt-spiel-ende i { color: var(--primary); margin-right: 6px; }

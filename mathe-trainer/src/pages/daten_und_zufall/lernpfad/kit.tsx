@@ -117,7 +117,7 @@ const PART_LABEL = { daten: 'Teil 1 · Daten auswerten', zufall: 'Teil 2 · Zufa
 
 export function Lesson({ goal, children }: { goal: ReactNode; children: ReactNode }) {
   const { pathname } = useLocation()
-  const index = LESSONS.findIndex((l) => pathname.endsWith(`/${l.slug}`))
+  const index = LESSONS.findIndex((l) => pathname.replace(/\/ueben$/, '').endsWith(`/${l.slug}`))
   const lesson = LESSONS[index]
   const prev = LESSONS[index - 1]
   const next = LESSONS[index + 1]

@@ -1,0 +1,16 @@
+/* Lernsituation „Das Freiwurf-Duell“. Farben kommen über --primary aus dem Thema. */
+
+.fw-erkenntnis { margin: 0; font-size: 17px; line-height: 1.55; }
+
+/* Bonus-Spiel Korbwurf-Duell */
+.fw-spiel { display: flex; flex-direction: column; gap: 12px; outline: none; }
+.fw-spiel-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 800 17px/1.3 var(--font-display); color: var(--primary); }
+.fw-muenzen { display: flex; gap: 6px; font-size: 20px; color: var(--line-strong); }
+.fw-muenzen .fw-muenze-an { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.fw-spiel-frage { margin: 0; font-size: 18px; line-height: 1.5; }
+.fw-h { font-style: italic; font-weight: 700; }
+.fw-spiel-bild { display: block; width: 100%; height: auto; max-height: 340px; touch-action: manipulation; user-select: none; }
+.fw-steuer { flex-wrap: wrap; }
+.fw-steuer .bk-btn { min-height: 48px; }
+.fw-spiel-ende { margin: 0; font: 800 20px/1.4 var(--font-display); color: var(--ink); }
+.fw-spiel-ende i { color: var(--primary); margin-right: 6px; }
