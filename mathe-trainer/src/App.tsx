@@ -180,6 +180,14 @@ import LpKennwerteBewerten from './pages/daten_und_zufall/lernpfad/KennwerteBewe
 import LpZufallsexperimente from './pages/daten_und_zufall/lernpfad/Zufallsexperimente';
 import LpBaumdiagramme from './pages/daten_und_zufall/lernpfad/Baumdiagramme';
 import LpPfadregeln from './pages/daten_und_zufall/lernpfad/Pfadregeln';
+import KioskEinstieg from './pages/daten_und_zufall/lernsituationen/daten-ordnen/KioskEinstieg';
+import FreiwurfEinstieg from './pages/daten_und_zufall/lernsituationen/haeufigkeiten/FreiwurfEinstieg';
+import SchlagzeileEinstieg from './pages/daten_und_zufall/lernsituationen/diagramme/SchlagzeileEinstieg';
+import PizzaboteEinstieg from './pages/daten_und_zufall/lernsituationen/kennwerte/PizzaboteEinstieg';
+import GehaltEinstieg from './pages/daten_und_zufall/lernsituationen/kennwerte-bewerten/GehaltEinstieg';
+import GluecksradEinstieg from './pages/daten_und_zufall/lernsituationen/zufallsexperimente/GluecksradEinstieg';
+import WundertueteEinstieg from './pages/daten_und_zufall/lernsituationen/baumdiagramme/WundertueteEinstieg';
+import LernsituationMenu from './pages/daten_und_zufall/lernpfad/LernsituationMenu';
 import LpAbschlussCheck from './pages/daten_und_zufall/lernpfad/AbschlussCheck';
 // Raum und Form
 import RaumTopicIndex from './pages/raum_und_form/TopicIndex';
@@ -384,13 +392,27 @@ export default function App() {
 
           {/* Daten und Zufall */}
           <Route path="/daten-und-zufall" element={<AreaPage id="daten" />} />
-          <Route path="/daten-und-zufall/daten-ordnen" element={<LpDatenOrdnen />} />
-          <Route path="/daten-und-zufall/haeufigkeiten" element={<LpHaeufigkeiten />} />
-          <Route path="/daten-und-zufall/diagramme" element={<LpDiagramme />} />
-          <Route path="/daten-und-zufall/kennwerte" element={<LpKennwerte />} />
-          <Route path="/daten-und-zufall/kennwerte-bewerten" element={<LpKennwerteBewerten />} />
-          <Route path="/daten-und-zufall/zufallsexperimente" element={<LpZufallsexperimente />} />
-          <Route path="/daten-und-zufall/baumdiagramme" element={<LpBaumdiagramme />} />
+          <Route path="/daten-und-zufall/daten-ordnen" element={<LernsituationMenu slug="daten-ordnen" />} />
+          <Route path="/daten-und-zufall/daten-ordnen/ueben" element={<LpDatenOrdnen />} />
+          <Route path="/daten-und-zufall/daten-ordnen/lernsituation" element={<KioskEinstieg />} />
+          <Route path="/daten-und-zufall/haeufigkeiten" element={<LernsituationMenu slug="haeufigkeiten" />} />
+          <Route path="/daten-und-zufall/haeufigkeiten/ueben" element={<LpHaeufigkeiten />} />
+          <Route path="/daten-und-zufall/haeufigkeiten/lernsituation" element={<FreiwurfEinstieg />} />
+          <Route path="/daten-und-zufall/diagramme" element={<LernsituationMenu slug="diagramme" />} />
+          <Route path="/daten-und-zufall/diagramme/ueben" element={<LpDiagramme />} />
+          <Route path="/daten-und-zufall/diagramme/lernsituation" element={<SchlagzeileEinstieg />} />
+          <Route path="/daten-und-zufall/kennwerte" element={<LernsituationMenu slug="kennwerte" />} />
+          <Route path="/daten-und-zufall/kennwerte/ueben" element={<LpKennwerte />} />
+          <Route path="/daten-und-zufall/kennwerte/lernsituation" element={<PizzaboteEinstieg />} />
+          <Route path="/daten-und-zufall/kennwerte-bewerten" element={<LernsituationMenu slug="kennwerte-bewerten" />} />
+          <Route path="/daten-und-zufall/kennwerte-bewerten/ueben" element={<LpKennwerteBewerten />} />
+          <Route path="/daten-und-zufall/kennwerte-bewerten/lernsituation" element={<GehaltEinstieg />} />
+          <Route path="/daten-und-zufall/zufallsexperimente" element={<LernsituationMenu slug="zufallsexperimente" />} />
+          <Route path="/daten-und-zufall/zufallsexperimente/ueben" element={<LpZufallsexperimente />} />
+          <Route path="/daten-und-zufall/zufallsexperimente/lernsituation" element={<GluecksradEinstieg />} />
+          <Route path="/daten-und-zufall/baumdiagramme" element={<LernsituationMenu slug="baumdiagramme" />} />
+          <Route path="/daten-und-zufall/baumdiagramme/ueben" element={<LpBaumdiagramme />} />
+          <Route path="/daten-und-zufall/baumdiagramme/lernsituation" element={<WundertueteEinstieg />} />
           <Route path="/daten-und-zufall/pfadregeln" element={<LpPfadregeln />} />
           <Route path="/daten-und-zufall/abschluss-check" element={<LpAbschlussCheck />} />
           <Route path="/daten-und-zufall/statistische-kennwerte" element={<StatistischeKennwerte />} />
