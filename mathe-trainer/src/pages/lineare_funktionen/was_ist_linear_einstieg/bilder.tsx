@@ -15,37 +15,36 @@ export type Pkt = { x: number; y: number; art?: 'fest' | 'alt' | 'neu'; text?: s
 export type Linie = { m: number; t?: number; art?: 'haupt' | 'blass' | 'live' }
 
 /**
- * Koordinatensystem mit x von −6 bis 6. yMax und yStep legen die y-Achse fest (z. B. 15 und 3 für y = 3x).
+ * Kartesisches Koordinatensystem: x von −xMax bis xMax, y von −yMax bis yMax, Schrittweite 1 auf beiden Achsen und
+ * auf beiden Achsen gleich lang (einheit = Pixel pro Einheit). Jede ganze Zahl ist beschriftet.
  * Punkte: fest (weiß), alt (Themenfarbe), neu (hervorgehoben); Linien: haupt (kräftig), blass, live (gestrichelt, eingetippt).
  */
 export function KoSystem({
+  xMax,
   yMax,
-  yStep,
+  einheit = 32,
   punkte = [],
   linien = [],
   label,
-  w = 680,
-  h = 340,
-  xMax = 6,
 }: {
+  xMax: number
   yMax: number
-  yStep: number
+  einheit?: number
   punkte?: Pkt[]
   linien?: Linie[]
   label: string
-  w?: number
-  h?: number
-  xMax?: number
 }) {
   const clip = `fm-clip-${useId().replace(/[^a-zA-Z0-9]/g, '')}`
-  const K = { l: 44, r: 26, t: 22, b: 30 }
-  const fs = w < 400 ? 15 : 17
-  const sx = (x: number) => K.l + ((x + xMax) / (2 * xMax)) * (w - K.l - K.r)
-  const sy = (y: number) => K.t + ((yMax - y) / (2 * yMax)) * (h - K.t - K.b)
+  const K = { l: 40, r: 30, t: 30, b: 28 }
+  const w = K.l + K.r + 2 * xMax * einheit
+  const h = K.t + K.b + 2 * yMax * einheit
+  const fs = einheit < 30 ? 14 : 16
+  const sx = (x: number) => K.l + (x + xMax) * einheit
+  const sy = (y: number) => K.t + (yMax - y) * einheit
   const xs = Array.from({ length: 2 * xMax + 1 }, (_, i) => i - xMax)
-  const ys = Array.from({ length: Math.floor((2 * yMax) / yStep) + 1 }, (_, i) => -yMax + i * yStep)
+  const ys = Array.from({ length: 2 * yMax + 1 }, (_, i) => i - yMax)
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label={label}>
+    <svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label={label} style={{ maxWidth: Math.round(w * 1.15) }}>
       <defs>
         <clipPath id={clip}>
           <rect x={sx(-xMax)} y={sy(yMax)} width={sx(xMax) - sx(-xMax)} height={sy(-yMax) - sy(yMax)} />
@@ -315,13 +314,14 @@ export function SteckbriefBild() {
 }
 
 /** Protokoll einer Maschine als Wertetabelle (Spalten brechen auf schmalen Bildschirmen um). neu: x-Wert der zuletzt eingeworfenen Zahl */
-export function Protokoll({ paare, neu, label }: { paare: { x: number; y: number }[]; neu?: number; label: string }) {
+export function Protokoll({ paare, neu, label, faktor }: { paare: { x: number; y: number }[]; neu?: number; label: string; faktor?: string }) {
   return (
-    <div className="fm-tabelle" role="table" aria-label={label}>
+    <div className={`fm-tabelle${faktor ? ' fm-mit-faktor' : ''}`} role="table" aria-label={faktor ? `${label}. Jede Spalte: x-Wert mal ${faktor} ergibt den y-Wert.` : label}>
       <div className="fm-spalte fm-kopf" role="row">
         <span role="rowheader">
           <i>x</i>
         </span>
+        {faktor && <span className="fm-faktor" aria-hidden="true" />}
         <span role="rowheader">
           <i>y</i>
         </span>
@@ -329,9 +329,37 @@ export function Protokoll({ paare, neu, label }: { paare: { x: number; y: number
       {paare.map((p, i) => (
         <div key={i} className={`fm-spalte${p.x === neu ? ' fm-neu' : ''}`} role="row">
           <span role="cell">{zahl(p.x)}</span>
+          {faktor && (
+            <span className="fm-faktor" aria-hidden="true">
+              ↓ · {faktor}
+            </span>
+          )}
           <span role="cell">{zahl(p.y)}</span>
         </div>
       ))}
     </div>
+  )
+}
+
+/**
+ * Brücke vom Satz zur Funktionsgleichung in drei Zeilen: In Worten → Als Rechnung → Als Gleichung.
+ * Fehlt gleichung, steht dort ein Fragezeichen (in „Problem erkennen“ ist die Gleichung noch offen).
+ */
+export function Bruecke({ worte, rechnung, gleichung }: { worte: ReactNode; rechnung: ReactNode; gleichung?: ReactNode }) {
+  return (
+    <ol className="fm-bruecke">
+      <li>
+        <span className="fm-bruecke-art">In Worten</span>
+        <span>{worte}</span>
+      </li>
+      <li>
+        <span className="fm-bruecke-art">Als Rechnung</span>
+        <span>{rechnung}</span>
+      </li>
+      <li>
+        <span className="fm-bruecke-art">Als Gleichung</span>
+        <span>{gleichung ?? <strong>?</strong>}</span>
+      </li>
+    </ol>
   )
 }
