@@ -309,7 +309,7 @@ Das Handlungsprodukt entsteht in **"Problem lösen"**: Direkt nach dem Problem u
 Alle Lernsituationen nutzen **dasselbe ruhige Gerüst**. Es gibt keine kontextabhängigen Looks mehr, die das Layout umbauen (kein Messenger-, Kassenbon-, Dashboard-, Werkstatt- oder Zeitungs-Look). Unterscheidbar werden die Lernsituationen über ihre **Identität** (nächster Abschnitt), nicht über Rahmen, Kästen oder Zusatzfarben.
 
 **Layout**
-- **Immer einspaltig**, auch auf breiten Monitoren: Inhalt mittig mit `max-width` von etwa 760 px; Skizzen und Graphen dürfen etwas breiter sein (bis etwa 900 px).
+- **Immer einspaltig**, auch auf breiten Monitoren. Der Inhalt jeder Seite ist **so breit wie die Phasenleiste darüber** (höchstens 1180 px, Variable `--sl-breite` in `lernsituation_kit/seiten.css`), damit links und rechts keine breiten leeren Ränder entstehen. Auf Tablet und Smartphone wird er automatisch schmaler. Keine eigene, schmalere `max-width` für Seiten oder Texte setzen. Skizzen, Graphen und Bilder stehen mittig und bekommen eine eigene `max-width`, damit sie nicht riesig werden (Richtwerte siehe "Seitenansicht").
 - Optimiert für **Tablet im Querformat**. Skizzen stehen **unter** dem zugehörigen Text, nie daneben, und sind groß genug, dass man alles gut lesen kann (siehe "Seitenansicht"). Nach unten scrollen ist in Ordnung.
 - **Kein horizontales Scrollen**, auf keiner Bildschirmbreite. Breite Inhalte (Rechnungen, Tabellen, Skizzen) passen sich an oder brechen um.
 
