@@ -123,9 +123,9 @@ export function KoSystem({
 /* ── Leitobjekt: die Funktionsmaschine ───────────────────────────────────── */
 
 /** Zahnrad mit acht Zähnen */
-function Zahnrad({ cx, cy, r }: { cx: number; cy: number; r: number }) {
+function Zahnrad({ cx, cy, r, dreht }: { cx: number; cy: number; r: number; dreht?: string }) {
   return (
-    <g>
+    <g className={dreht}>
       {Array.from({ length: 8 }, (_, i) => (
         <rect key={i} x={cx - r * 0.18} y={cy - r - r * 0.28} width={r * 0.36} height={r * 0.5} rx="2" fill="var(--primary)" transform={`rotate(${i * 45} ${cx} ${cy})`} />
       ))}
@@ -138,6 +138,8 @@ function Zahnrad({ cx, cy, r }: { cx: number; cy: number; r: number }) {
 /**
  * Die Funktionsmaschine: oben der Einwurf mit der Zahl x, in der Mitte das Fenster mit der Regel, rechts unten die Ausgabe y.
  * ein/aus: angezeigte Zahlen (leer: „?“); regel: Text im Regelfenster (Standard „geheim“); fehler: Ausgabe zeigt „Fehler“.
+ * lauf: Animation beim Einwerfen (einwurf: Kärtchen fällt in den Trichter, rechnen: Zahnräder drehen sich, die Ausgabe zeigt „…“).
+ * wurf: Nummer des Wurfs; ändert sie sich, springt die neue Ausgabe kurz auf.
  */
 export function MaschinenBild({
   name,
@@ -147,6 +149,8 @@ export function MaschinenBild({
   fehler = false,
   label,
   platz,
+  lauf,
+  wurf,
 }: {
   name: string
   ein?: string
@@ -156,7 +160,10 @@ export function MaschinenBild({
   label: string
   /** Lage im Titelbild (verschachteltes SVG) */
   platz?: { x: number; y: number; width: number; height: number }
+  lauf?: 'einwurf' | 'rechnen'
+  wurf?: number
 }) {
+  const ausgabe = lauf ? 'y = …' : fehler ? 'Fehler' : `y = ${aus ?? '?'}`
   return (
     <svg viewBox="0 0 560 250" role={platz ? undefined : 'img'} aria-label={platz ? undefined : label} {...platz}>
       {/* Einwurf-Trichter mit Zahl x */}
@@ -165,33 +172,61 @@ export function MaschinenBild({
       <text x="200" y="40" textAnchor="middle" fontSize="23" fontWeight="800" fill="var(--ink)">
         x = {ein ?? '?'}
       </text>
+      {/* Kärtchen mit der Zahl fällt durch den Trichter in die Maschine */}
+      {lauf === 'einwurf' && (
+        <g className="fm-karte">
+          <rect x="172" y="12" width="56" height="38" rx="7" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
+          <text x="200" y="39" textAnchor="middle" fontSize="21" fontWeight="800" fill="var(--ink)">
+            {ein}
+          </text>
+        </g>
+      )}
       {/* Gehäuse */}
       <rect x="70" y="96" width="340" height="122" rx="18" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2.5" />
       <text x="88" y="124" fontSize="17" fontWeight="800" fill="var(--ink)">
         {name}
       </text>
-      <Zahnrad cx={118} cy={176} r={22} />
-      <Zahnrad cx={162} cy={160} r={14} />
+      <Zahnrad cx={118} cy={176} r={22} dreht={lauf === 'rechnen' ? 'fm-dreht' : undefined} />
+      <Zahnrad cx={162} cy={160} r={14} dreht={lauf === 'rechnen' ? 'fm-dreht fm-dreht-links' : undefined} />
       {/* Regelfenster */}
       <rect x="206" y="138" width="180" height="58" rx="10" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
       <text x="296" y="160" textAnchor="middle" fontSize="15" fill="var(--ink-muted)">
         Regel
       </text>
-      <text x="296" y="186" textAnchor="middle" fontSize="22" fontWeight="800" fill="var(--primary)">
-        {regel}
-      </text>
+      {lauf === 'rechnen' ? (
+        <g className="fm-denkt" fill="var(--primary)">
+          <circle cx="276" cy="180" r="5" />
+          <circle cx="296" cy="180" r="5" />
+          <circle cx="316" cy="180" r="5" />
+        </g>
+      ) : (
+        <text x="296" y="186" textAnchor="middle" fontSize="22" fontWeight="800" fill="var(--primary)">
+          {regel}
+        </text>
+      )}
       {/* Füße */}
       <rect x="96" y="218" width="40" height="14" rx="4" fill="var(--ink)" />
       <rect x="344" y="218" width="40" height="14" rx="4" fill="var(--ink)" />
       {/* Ausgabe-Rutsche mit Anzeige y */}
       <polygon points="410,168 448,168 448,204 410,204" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2.5" strokeLinejoin="round" />
-      <rect x="444" y="150" width="108" height="72" rx="10" fill={fehler ? 'var(--wrong-soft)' : aus !== undefined ? 'var(--highlight)' : 'var(--surface)'} stroke="var(--ink)" strokeWidth="2.5" />
-      <text x="498" y="181" textAnchor="middle" fontSize="15" fill="var(--ink)">
-        Ausgabe
-      </text>
-      <text x="498" y="208" textAnchor="middle" fontSize={fehler ? 19 : 23} fontWeight="800" fill={fehler ? 'var(--wrong-ink)' : 'var(--ink)'}>
-        {fehler ? 'Fehler' : `y = ${aus ?? '?'}`}
-      </text>
+      <g key={lauf ? 'lauf' : `wurf-${wurf ?? 0}`} className={!lauf && wurf ? 'fm-pop' : undefined}>
+        <rect
+          x="444"
+          y="150"
+          width="108"
+          height="72"
+          rx="10"
+          fill={lauf ? 'var(--surface)' : fehler ? 'var(--wrong-soft)' : aus !== undefined ? 'var(--highlight)' : 'var(--surface)'}
+          stroke="var(--ink)"
+          strokeWidth="2.5"
+        />
+        <text x="498" y="181" textAnchor="middle" fontSize="15" fill="var(--ink)">
+          Ausgabe
+        </text>
+        <text x="498" y="208" textAnchor="middle" fontSize={!lauf && fehler ? 19 : 23} fontWeight="800" fill={!lauf && fehler ? 'var(--wrong-ink)' : 'var(--ink)'}>
+          {ausgabe}
+        </text>
+      </g>
     </svg>
   )
 }

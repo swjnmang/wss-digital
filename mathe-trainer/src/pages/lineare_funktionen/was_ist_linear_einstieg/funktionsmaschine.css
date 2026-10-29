@@ -7,6 +7,31 @@
 .fm-bild-klein svg { max-width: 560px; max-height: 320px; }
 .fm-maschine svg { display: block; width: 100%; height: auto; max-width: 560px; max-height: 250px; margin: 0 auto; }
 
+/* Animation beim Einwerfen: Kärtchen fällt in den Trichter, Zahnräder drehen, Regel „denkt“, Ausgabe springt auf */
+.fm-karte { transform-box: fill-box; transform-origin: center; animation: fm-einwurf 0.7s ease-in forwards; }
+@keyframes fm-einwurf {
+  0% { transform: translateY(-24px) scale(1); opacity: 0; }
+  20% { transform: translateY(0) scale(1); opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(78px) scale(0.4); opacity: 0; }
+}
+.fm-dreht { transform-box: fill-box; transform-origin: center; animation: fm-drehen 0.8s linear infinite; }
+.fm-dreht-links { animation-direction: reverse; animation-duration: 0.55s; }
+@keyframes fm-drehen { to { transform: rotate(360deg); } }
+.fm-denkt circle { animation: fm-blinken 0.9s ease-in-out infinite; }
+.fm-denkt circle:nth-child(2) { animation-delay: 0.15s; }
+.fm-denkt circle:nth-child(3) { animation-delay: 0.3s; }
+@keyframes fm-blinken { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+.fm-pop { transform-box: fill-box; transform-origin: center; animation: fm-pop 0.5s ease-out; }
+@keyframes fm-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  65% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fm-karte, .fm-dreht, .fm-denkt circle, .fm-pop { animation: none; }
+}
+
 /* Vermutung vor dem Ausprobieren */
 .fm-tipp { display: flex; flex-direction: column; gap: 10px; }
 .fm-tipp-wahl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }

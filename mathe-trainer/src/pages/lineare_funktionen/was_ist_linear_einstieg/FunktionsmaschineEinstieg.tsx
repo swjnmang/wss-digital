@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, parseInput } from '../../daten_und_zufall/lernpfad/kit'
 import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
@@ -40,6 +40,26 @@ const TASTEN = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
 
 /** Protokoll aus x-Werten: jeder x-Wert nur einmal, aufsteigend sortiert */
 const paareAus = (xs: number[], m: number) => [...new Set(xs)].sort((a, b) => a - b).map((x) => ({ x, y: m * x }))
+
+/** Ablauf beim Einwerfen: erst fällt die Zahl in die Maschine (0,7 s), dann rechnet sie (1,2 s), dann kommt das Ergebnis heraus */
+type Lauf = { x: string; schritt: 'einwurf' | 'rechnen' } | null
+function useMaschinenLauf() {
+  const [lauf, setLauf] = useState<Lauf>(null)
+  const timer = useRef<number[]>([])
+  useEffect(() => () => timer.current.forEach((t) => window.clearTimeout(t)), [])
+  const starte = (x: string, fertig: () => void) => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return fertig()
+    setLauf({ x, schritt: 'einwurf' })
+    timer.current = [
+      window.setTimeout(() => setLauf({ x, schritt: 'rechnen' }), 700),
+      window.setTimeout(() => {
+        setLauf(null)
+        fertig()
+      }, 1900),
+    ]
+  }
+  return { lauf, starte }
+}
 
 /** Festlegung vor dem Ausprobieren: Was gibt Maschine A bei x = −4 aus? */
 function Tipp({ tipp, fest, onTipp, onFest }: { tipp: number | null; fest: boolean; onTipp: (v: number) => void; onFest: () => void }) {
@@ -96,6 +116,7 @@ function MaschineA({
   onFertig: () => void
 }) {
   const letzter = wuerfe[wuerfe.length - 1]
+  const { lauf, starte } = useMaschinenLauf()
   const verschiedene = new Set(wuerfe).size
   const minus4 = wuerfe.includes(-4)
   const fertig = verschiedene >= 5 && minus4
@@ -109,10 +130,14 @@ function MaschineA({
       <div className="fm-maschine">
         <MaschinenBild
           name="Maschine A"
-          ein={letzter === undefined ? undefined : zahl(letzter)}
+          ein={lauf ? lauf.x : letzter === undefined ? undefined : zahl(letzter)}
           aus={letzter === undefined ? undefined : zahl(M_A * letzter)}
+          lauf={lauf?.schritt}
+          wurf={wuerfe.length}
           label={
-            letzter === undefined
+            lauf
+              ? `Maschine A: Die Zahl ${lauf.x} wird verarbeitet.`
+              : letzter === undefined
               ? 'Maschine A mit geheimer Regel. Es wurde noch keine Zahl eingeworfen.'
               : `Maschine A: Eingabe x = ${zahl(letzter)}, Ausgabe y = ${zahl(M_A * letzter)}. Die Regel bleibt geheim.`
           }
@@ -121,7 +146,14 @@ function MaschineA({
       <p className="sl-text">{frei ? 'Tippe eine Zahl an, um sie in die Maschine zu werfen:' : 'Halte zuerst oben deinen Tipp fest. Dann kannst du Zahlen einwerfen.'}</p>
       <div className="fm-tasten" role="group" aria-label="Zahl einwerfen">
         {TASTEN.map((x) => (
-          <button key={x} type="button" className={`bk-btn${x === letzter ? ' bk-btn-primary' : ''}`} disabled={!frei} onClick={() => onWurf(x)} aria-label={`${zahl(x)} einwerfen`}>
+          <button
+            key={x}
+            type="button"
+            className={`bk-btn${x === letzter ? ' bk-btn-primary' : ''}`}
+            disabled={!frei || lauf !== null}
+            onClick={() => starte(zahl(x), () => onWurf(x))}
+            aria-label={`${zahl(x)} einwerfen`}
+          >
             {zahl(x)}
           </button>
         ))}
@@ -169,15 +201,28 @@ function MaschineA({
 }
 
 /** Große Zahl einwerfen: Die Maschine nimmt nur ganze Zahlen von −5 bis 5 */
-function Grenze({ onWurf, onFehler, fehlerZahl }: { onWurf: (x: number) => void; onFehler: (z: string) => void; fehlerZahl: string | null }) {
+function Grenze({ onWurf, onFehler }: { onWurf: (x: number) => void; onFehler: () => void }) {
   const [eingabe, setEingabe] = useState('')
   const [leer, setLeer] = useState(false)
+  const [versuche, setVersuche] = useState(0)
+  /** Letzter Wurf in diesem Abschnitt: aus fehlt, wenn die Maschine die Zahl nicht annimmt */
+  const [ergebnis, setErgebnis] = useState<{ ein: string; aus?: string } | null>(null)
+  const { lauf, starte } = useMaschinenLauf()
   const einwerfen = () => {
+    if (lauf) return
     const p = parseInput(eingabe)
     if (!p) return setLeer(true)
     setLeer(false)
-    if (Number.isInteger(p.value) && Math.abs(p.value) <= 5) onWurf(p.value)
-    else onFehler(zahl(p.value))
+    starte(zahl(p.value), () => {
+      setVersuche((v) => v + 1)
+      if (Number.isInteger(p.value) && Math.abs(p.value) <= 5) {
+        setErgebnis({ ein: zahl(p.value), aus: zahl(M_A * p.value) })
+        onWurf(p.value)
+      } else {
+        setErgebnis({ ein: zahl(p.value) })
+        onFehler()
+      }
+    })
   }
   return (
     <div className="fm-tipp" data-no-autocheck>
@@ -198,16 +243,32 @@ function Grenze({ onWurf, onFehler, fehlerZahl }: { onWurf: (x: number) => void;
             }}
           />
         </label>
-        <button type="button" className="bk-btn bk-btn-primary" onClick={einwerfen}>
+        <button type="button" className="bk-btn bk-btn-primary" onClick={einwerfen} disabled={lauf !== null}>
           <i className="fa-solid fa-arrow-down" aria-hidden="true" /> Einwerfen
         </button>
       </div>
       {leer && <p className="sl-hinweis">Trage eine Zahl ein, z. B. 40.</p>}
-      {fehlerZahl !== null && (
+      {(lauf || ergebnis) && (
+        <div className="fm-maschine">
+          <MaschinenBild
+            name="Maschine A"
+            ein={lauf ? lauf.x : ergebnis?.ein}
+            aus={ergebnis?.aus}
+            fehler={!ergebnis?.aus}
+            lauf={lauf?.schritt}
+            wurf={versuche}
+            label={
+              lauf
+                ? `Maschine A: Die Zahl ${lauf.x} wird verarbeitet.`
+                : ergebnis?.aus
+                  ? `Maschine A: Eingabe x = ${ergebnis.ein}, Ausgabe y = ${ergebnis.aus}.`
+                  : `Maschine A: Eingabe x = ${ergebnis?.ein}, die Anzeige meldet einen Fehler.`
+            }
+          />
+        </div>
+      )}
+      {!lauf && ergebnis && !ergebnis.aus && (
         <>
-          <div className="fm-maschine">
-            <MaschinenBild name="Maschine A" ein={fehlerZahl} fehler label={`Maschine A: Eingabe x = ${fehlerZahl}, die Anzeige meldet einen Fehler.`} />
-          </div>
           <p className="fm-fehler" role="status">
             <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" /> Fehler: Ich nehme nur ganze Zahlen von −5 bis 5.
           </p>
@@ -338,7 +399,6 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
   const [tippFest, setTippFest] = useState(false)
   const [wuerfe, setWuerfe] = useState<number[]>([])
   const [verbunden, setVerbunden] = useState(false)
-  const [fehlerZahl, setFehlerZahl] = useState<string | null>(null)
   const [liveB, setLiveB] = useState<Linie | null>(null)
   const [geloest, setGeloest] = useState(false)
   const [uebungen, setUebungen] = useState<string[]>([])
@@ -543,11 +603,7 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
               <p className="sl-text">Wirf eine große Zahl ein, zum Beispiel 40 oder −100.</p>
               <Grenze
                 onWurf={(x) => setWuerfe((w) => [...w, x])}
-                fehlerZahl={fehlerZahl}
-                onFehler={(z) => {
-                  setFehlerZahl(z)
-                  fertig.teil('grenze')()
-                }}
+                onFehler={fertig.teil('grenze')}
               />
             </Abschnitt>
           )}
