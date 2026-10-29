@@ -1,9 +1,11 @@
 import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
+import { useBackHandler } from '../../hooks/useBackHandler'
 import TaskShell from '../../components/layout/TaskShell'
 import { fieldCheckClass } from '../../utils/fieldCheck'
+import { LernsituationKarte } from './lernsituation_kit/seiten'
+import FunktionsmaschineEinstieg from './was_ist_linear_einstieg/FunktionsmaschineEinstieg'
 
 interface Fn {
   id: string
@@ -139,7 +141,10 @@ function newRound(withT: boolean) {
 }
 
 export default function WasIstLinear() {
-  const tracking = useTaskTracking('Was ist eine lineare Funktion?')
+  // Beim Öffnen steht die Auswahl „Lernsituation“ / „Übungsaufgaben“, noch keine Aufgabe
+  const tracking = useTaskTracking('Was ist eine lineare Funktion?', { shownOnMount: false })
+  const [modus, setModus] = useState<'auswahl' | 'lernsituation' | 'ueben'>('auswahl')
+  useBackHandler(modus !== 'auswahl', () => setModus('auswahl'))
   const [demoX, setDemoX] = useState(2)
   const [round, setRound] = useState(() => newRound(false))
   const [withT, setWithT] = useState(false)
@@ -175,16 +180,75 @@ export default function WasIstLinear() {
     setRound(newRound(v))
     setAnswers({})
   }
+  const ueben = (v: boolean) => {
+    switchLevel(v)
+    setModus('ueben')
+    window.scrollTo({ top: 0 })
+  }
   const next = () => {
     tracking.onTaskStart()
     setRound(newRound(withT))
     setAnswers({})
   }
 
+  if (modus === 'lernsituation') {
+    return (
+      <FunktionsmaschineEinstieg
+        onBack={() => {
+          setModus('auswahl')
+          window.scrollTo({ top: 0 })
+        }}
+        onPractice={() => ueben(false)}
+      />
+    )
+  }
+
+  if (modus === 'auswahl') {
+    return (
+      <TaskShell title="Was ist eine lineare Funktion?" width="narrow">
+        <div className="flex flex-col gap-6">
+          <p className="text-center text-slate-600">Wertetabelle, Graph und Gleichung: verschiedene Darstellungen derselben Funktion.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bk-panel text-center flex flex-col">
+              <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
+              <LernsituationKarte
+                className="flex-1"
+                thema={{ name: 'Die Funktionsmaschine', farbe: 'schiefer', icon: 'fa-gears' }}
+                beschreibung="Neu beim Thema? Knacke die geheimen Regeln von Funktionsmaschinen und lerne, was eine Funktion ist und wie Wertetabelle, Graph und Gleichung zusammenhängen."
+                onClick={() => setModus('lernsituation')}
+              />
+            </div>
+            <div className="bk-panel text-center sm:col-span-2 flex flex-col">
+              <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button
+                  onClick={() => ueben(false)}
+                  className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+                >
+                  <p className="text-lg font-bold mb-1 text-white">Stufe 1</p>
+                  <p className="text-xl font-serif italic mb-2 text-white">y = m · x</p>
+                  <p className="text-sm text-white/90">Ordne Texte, Wertetabellen, Graphen und Gleichungen von Ursprungsgeraden einander zu.</p>
+                </button>
+                <button
+                  onClick={() => ueben(true)}
+                  className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
+                >
+                  <p className="text-lg font-bold mb-1 text-white">Stufe 2</p>
+                  <p className="text-xl font-serif italic mb-2 text-white">y = m · x + t</p>
+                  <p className="text-sm text-white/90">Dazu kommen Geraden, die nicht durch den Ursprung gehen.</p>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </TaskShell>
+    )
+  }
+
   return (
     <TaskShell title="Was ist eine lineare Funktion?" width="wide">
         <div className="">
-        <Link to="/lineare_funktionen" className="bk-btn bk-btn-ghost" style={{ marginLeft: -12 }}><i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zur Übersicht</Link>
+        <button type="button" onClick={() => setModus('auswahl')} className="bk-btn bk-btn-ghost" style={{ marginLeft: -12 }}><i className="fa-solid fa-arrow-left" aria-hidden="true" /> Zurück zur Auswahl</button>
         <p className="text-center text-slate-600 mb-6">Wertetabelle, Graph, Gleichung und Text – vier Darstellungen derselben Funktion.</p>
 
         {/* Erklärung */}
