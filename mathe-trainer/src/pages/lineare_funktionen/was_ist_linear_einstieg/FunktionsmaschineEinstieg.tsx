@@ -6,7 +6,7 @@ import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt,
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
 import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
 import { parseLinearEquation } from '../../../utils/parseLinearEquation'
-import { KoSystem, MaschinenBild, Protokoll, SteckbriefBild, Titelbild, zahl, type Linie } from './bilder'
+import { Bruecke, KoSystem, MaschinenBild, Protokoll, SteckbriefBild, Titelbild, zahl, type Linie } from './bilder'
 import ZeichenRoboter from './ZeichenRoboter'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './funktionsmaschine.css'
@@ -15,28 +15,33 @@ import './funktionsmaschine.css'
 // Die Klasse hat große Schwierigkeiten mit dem Einstieg. Deshalb bewusst ohne Sachkontext (Alltagsbeispiele mit y = m · x wären
 // für die SuS nur der bekannte Dreisatz) und mit einem Bild, das durch alle Phasen trägt: Eingabe x → Regel → Ausgabe y.
 // Jeder Begriff hängt an der Maschine: Wertetabelle = Protokoll, Funktionsgraph = alle Paare als Punkte, Funktionsgleichung = Bauplan.
-// In Phase 2 und 3 ist m ganzzahlig (3 und −2), Kommazahlen erst in der Profi-Aufgabe.
-// Format Rätsel / Code knacken. Problem erkennen: Tipp für x = −4 bei Maschine A (y = 3x), dann selbst Zahlen von −5 bis 5
-// einwerfen (Protokoll und Punkte live), Punkte verbinden, große Zahl einwerfen → Fehler. Aha: „Mal 3 macht größer“ stimmt bei
-// negativen Zahlen nicht (−12 statt 12), und alle Punkte liegen auf einer Geraden durch (0 | 0).
+// In Phase 2 und 3 ist m ganzzahlig (2 und −2), Kommazahlen erst in der Profi-Aufgabe. Alle Koordinatensysteme sind kartesisch
+// (Schrittweite 1, beide Achsen gleich lang), deshalb Maschine A mit y = 2x und Eingaben von −4 bis 4.
+// Der schwierige Sprung von der proportionalen Zuordnung zur Gleichung läuft über einen Satz: Jede Maschine wird zuerst in Worten
+// beschrieben („Jeder y-Wert ist das Doppelte vom x-Wert“), dann als Rechnung (y-Wert = 2 · x-Wert), erst dann als Gleichung
+// (y = 2 · x), siehe Bruecke in bilder.tsx.
+// Format Rätsel / Code knacken. Problem erkennen: Tipp für x = −4 bei Maschine A (y = 2x), dann selbst Zahlen von −4 bis 4
+// einwerfen (Protokoll und Punkte live), Punkte verbinden, Regel als Satz wählen (Protokoll zeigt danach „· 2“), große Zahl
+// einwerfen → Fehler. Aha: „Mal 2 macht größer“ stimmt bei negativen Zahlen nicht (−8 statt 8), und alle Punkte liegen auf
+// einer Geraden durch (0 | 0).
 // Problem lösen: Maschine B zeigt nur ihr Protokoll (−2 | 4), (1 | −2), (3 | −6). Regel über y : x knacken (Quotientengleichheit
-// aus den proportionalen Zuordnungen), Gleichung y = −2x, Werte für x = 10 und x = −7, passenden Graphen wählen.
+// aus den proportionalen Zuordnungen), als Satz wählen, Gleichung y = −2x, Werte für x = 10 und x = −7, passenden Graphen wählen.
 // Rechenbeispiel Maschine Z (y = 0,5x), noch ohne Lernvideo (offener Punkt).
 // Handlungsprodukt analog: Maschinen-Steckbrief (Karteikarte) mit Regel in Worten, Wertetabelle, Graph und Gleichung.
-// Punkte nach Aufwand: Warm-up 6 × 2 = 12, Tipp 3, Kernaufgabe 15, Graph wählen 4, Steckbrief 5, Übungen 4/4/5/8, Profi 8
-// (Pflicht zusammen 60: Warm-up 12 = 20 %, Problem lösen 24 = 40 %, Übungen 21 = 35 %), Bonus-Spiel 4 Runden à 2 = 8 wie die beste Übung.
+// Punkte nach Aufwand: Warm-up 6 × 2 = 12, Tipp 3, Satz A 3, Satz B 3, Kernaufgabe 15, Graph wählen 4, Steckbrief 5, Übungen 4/4/5/8,
+// Profi 8 (Pflicht zusammen 66: Warm-up 12 = 18 %, Problem lösen 27 = 41 %, Übungen 21 = 32 %), Bonus-Spiel 4 Runden à 2 = 8 wie die beste Übung.
 // Identität: Themenfarbe Schiefer, Symbol fa-gears, Titelbild Funktionsmaschine mit Zahlenkärtchen, Leitobjekt die Funktionsmaschine.
 // Wird als Modus „Lernsituation“ auf der Seite „Was ist eine lineare Funktion?“ angezeigt.
 
 const THEMA: Thema = { name: 'Die Funktionsmaschine', farbe: 'schiefer', icon: 'fa-gears', bild: <Titelbild /> }
 
-/* ── Maschine A (Problem erkennen): y = 3x ───────────────────────────────── */
+/* ── Maschine A (Problem erkennen): y = 2x ───────────────────────────────── */
 
-const M_A = 3
+const M_A = 2
 /** Diese drei Paare stehen schon im Protokoll */
-const START_A = [1, 2, 4]
-const TIPPS = [12, -12, 1, -1]
-const TASTEN = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+const START_A = [1, 2, 3]
+const TIPPS = [8, -8, 2, -2]
+const TASTEN = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
 
 /** Protokoll aus x-Werten: jeder x-Wert nur einmal, aufsteigend sortiert */
 const paareAus = (xs: number[], m: number) => [...new Set(xs)].sort((a, b) => a - b).map((x) => ({ x, y: m * x }))
@@ -168,8 +173,9 @@ function MaschineA({
       </Abschnitt>
       <div className="bk-graph fm-bild">
         <KoSystem
-          yMax={15}
-          yStep={3}
+          xMax={5}
+          yMax={9}
+          einheit={28}
           punkte={paare.map((p) => ({ ...p, art: p.x === letzter ? 'neu' : START_A.includes(p.x) && !wuerfe.includes(p.x) ? 'fest' : 'alt' }))}
           linien={verbunden ? [{ m: M_A, art: 'haupt' }] : []}
           label={`Koordinatensystem mit den Punkten aus dem Protokoll von Maschine A${verbunden ? ', verbunden durch eine Gerade durch den Ursprung' : ''}.`}
@@ -178,9 +184,9 @@ function MaschineA({
       {minus4 && tipp !== null && (
         <p className="sl-text" role="status">
           <strong>
-            Dein Tipp war <M>{`y = ${zahl(tipp)}`}</M>. Die Maschine gibt bei <M>{'x = -4'}</M> aber <M>{'y = -12'}</M> aus.
+            Dein Tipp war <M>{`y = ${zahl(tipp)}`}</M>. Die Maschine gibt bei <M>{'x = -4'}</M> aber <M>{'y = -8'}</M> aus.
           </strong>{' '}
-          {tipp === -12 ? 'Stark, das hattest du richtig!' : <>Viele denken: „Mal 3 macht die Zahl größer.“ Bei negativen Zahlen stimmt das nicht: <M>{'3 \\cdot (-4) = -12'}</M>.</>}
+          {tipp === -8 ? 'Stark, das hattest du richtig!' : <>Viele denken: „Das Doppelte ist immer größer.“ Bei negativen Zahlen stimmt das nicht: Das Doppelte von −4 ist <M>{'2 \\cdot (-4) = -8'}</M>.</>}
         </p>
       )}
       {fertig && !verbunden && (
@@ -192,7 +198,7 @@ function MaschineA({
       )}
       {verbunden && (
         <p className="sl-text">
-          Alle Punkte liegen auf <strong>einer Geraden</strong>. Sie geht durch den Ursprung <M>{'(0 \\mid 0)'}</M>, denn <M>{'3 \\cdot 0 = 0'}</M>. Auch die Punkte für negative
+          Alle Punkte liegen auf <strong>einer Geraden</strong>. Sie geht durch den Ursprung <M>{'(0 \\mid 0)'}</M>, denn <M>{'2 \\cdot 0 = 0'}</M>. Auch die Punkte für negative
           Zahlen liegen darauf, unten links.
         </p>
       )}
@@ -200,7 +206,7 @@ function MaschineA({
   )
 }
 
-/** Große Zahl einwerfen: Die Maschine nimmt nur ganze Zahlen von −5 bis 5 */
+/** Große Zahl einwerfen: Die Maschine nimmt nur ganze Zahlen von −4 bis 4 */
 function Grenze({ onWurf, onFehler }: { onWurf: (x: number) => void; onFehler: () => void }) {
   const [eingabe, setEingabe] = useState('')
   const [leer, setLeer] = useState(false)
@@ -215,7 +221,7 @@ function Grenze({ onWurf, onFehler }: { onWurf: (x: number) => void; onFehler: (
     setLeer(false)
     starte(zahl(p.value), () => {
       setVersuche((v) => v + 1)
-      if (Number.isInteger(p.value) && Math.abs(p.value) <= 5) {
+      if (Number.isInteger(p.value) && Math.abs(p.value) <= 4) {
         setErgebnis({ ein: zahl(p.value), aus: zahl(M_A * p.value) })
         onWurf(p.value)
       } else {
@@ -270,11 +276,12 @@ function Grenze({ onWurf, onFehler }: { onWurf: (x: number) => void; onFehler: (
       {!lauf && ergebnis && !ergebnis.aus && (
         <>
           <p className="fm-fehler" role="status">
-            <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" /> Fehler: Ich nehme nur ganze Zahlen von −5 bis 5.
+            <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" /> Fehler: Ich nehme nur ganze Zahlen von −4 bis 4.
           </p>
           <p className="sl-text">
-            <strong>Die Maschine hilft dir hier nicht weiter.</strong> Wenn du aber ihre Regel kennst, rechnest du jede Zahl selbst aus, auch 40, −100 oder 7,5. Dann brauchst du die
-            Maschine gar nicht mehr. Auf der nächsten Seite knackst du die Regel einer Maschine und schreibst sie als Gleichung auf.
+            <strong>Die Maschine hilft dir hier nicht weiter.</strong> Mit ihrer Regel rechnest du es aber selbst aus: Das Doppelte von 40 ist 80. So geht es mit jeder Zahl, auch
+            mit −100 oder 7,5. Wer die Regel kennt, braucht die Maschine nicht mehr. Auf der nächsten Seite knackst du die Regel einer anderen Maschine und schreibst sie als
+            Gleichung auf.
           </p>
         </>
       )}
@@ -292,7 +299,10 @@ const PROTOKOLL_B = [
 
 const BSP_AUFGABE = (
   <>
-    <p>Maschine Z zeigt nur ihr Protokoll. Knacke ihre Regel, schreibe die Funktionsgleichung auf und berechne, was sie bei <M>{'x = 10'}</M> und <M>{'x = -8'}</M> ausgibt.</p>
+    <p>
+      Maschine Z zeigt nur ihr Protokoll. Knacke ihre Regel, beschreibe sie in einem Satz, schreibe die Funktionsgleichung auf und berechne, was sie bei <M>{'x = 10'}</M> und{' '}
+      <M>{'x = -8'}</M> ausgibt.
+    </p>
     <Protokoll
       paare={[
         { x: -6, y: -3 },
@@ -316,13 +326,31 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     ),
   },
   {
-    title: 'Die Funktionsgleichung aufschreiben',
+    title: 'Die Regel in einem Satz sagen',
     body: (
       <>
+        <p>Mal 0,5 heißt: die Hälfte. Prüfe den Satz an einem Paar aus dem Protokoll: Die Hälfte von 4 ist 2. Passt!</p>
+        <p className="fm-satz">„Jeder y-Wert ist die Hälfte vom x-Wert.“</p>
+      </>
+    ),
+  },
+  {
+    title: 'Vom Satz zur Funktionsgleichung',
+    body: (
+      <>
+        <p>Jetzt übersetzt du den Satz Schritt für Schritt in die Sprache der Mathematik. Aus „die Hälfte vom“ wird „mal 0,5“, aus „ist“ wird „=“.</p>
+        <Bruecke
+          worte="Jeder y-Wert ist die Hälfte vom x-Wert."
+          rechnung={<M>{'y\\text{-Wert} = 0{,}5 \\cdot x\\text{-Wert}'}</M>}
+          gleichung={
+            <>
+              <M>{'y = 0{,}5 \\cdot x'}</M>, kurz <M>{'y = 0{,}5x'}</M>
+            </>
+          }
+        />
         <p>
-          Der Bauplan der Maschine lautet <M>{'y = m \\cdot x'}</M>. Mit <M>{'m = 0{,}5'}</M>:
+          Das ist die Funktionsgleichung, der Bauplan der Maschine. Allgemein heißt sie <M>{'y = m \\cdot x'}</M>, hier mit <M>{'m = 0{,}5'}</M>.
         </p>
-        <MB>{'y = 0{,}5x'}</MB>
       </>
     ),
   },
@@ -345,10 +373,9 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
         </p>
         <div className="bk-graph fm-bild fm-bild-klein">
           <KoSystem
+            xMax={6}
             yMax={4}
-            yStep={1}
-            w={520}
-            h={300}
+            einheit={34}
             punkte={[
               { x: -6, y: -3, art: 'alt' },
               { x: 2, y: 1, art: 'alt' },
@@ -377,7 +404,7 @@ const LOESUNG_B = (
 function MiniGraph({ linie, label }: { linie: Linie; label: string }) {
   return (
     <span className="fm-mini">
-      <KoSystem yMax={6} yStep={2} w={340} h={240} xMax={4} linien={[linie]} label={label} />
+      <KoSystem xMax={3} yMax={4} einheit={30} linien={[linie]} label={label} />
     </span>
   )
 }
@@ -399,6 +426,7 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
   const [tippFest, setTippFest] = useState(false)
   const [wuerfe, setWuerfe] = useState<number[]>([])
   const [verbunden, setVerbunden] = useState(false)
+  const [satzA, setSatzA] = useState(false)
   const [liveB, setLiveB] = useState<Linie | null>(null)
   const [geloest, setGeloest] = useState(false)
   const [uebungen, setUebungen] = useState<string[]>([])
@@ -509,7 +537,7 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
                   Lies die Koordinaten von Punkt <M>P</M> ab.
                 </p>
                 <div className="bk-graph fm-bild fm-bild-klein">
-                  <KoSystem yMax={5} yStep={1} w={520} h={320} punkte={[{ x: -3, y: 2, art: 'alt', text: 'P' }]} label="Koordinatensystem mit dem Punkt P links oberhalb der x-Achse" />
+                  <KoSystem xMax={5} yMax={3} einheit={36} punkte={[{ x: -3, y: 2, art: 'alt', text: 'P' }]} label="Koordinatensystem mit dem Punkt P links oberhalb der x-Achse" />
                 </div>
               </>
             }
@@ -531,10 +559,9 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
                 </p>
                 <div className="bk-graph fm-bild fm-bild-klein">
                   <KoSystem
+                    xMax={4}
                     yMax={4}
-                    yStep={1}
-                    w={520}
-                    h={300}
+                    einheit={36}
                     punkte={[
                       { x: -1, y: 3, art: 'alt', text: 'A' },
                       { x: 3, y: -1, art: 'alt', text: 'B', unten: true },
@@ -559,8 +586,8 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
     {
       art: 'problem',
       titel: 'Die geheime Regel der Funktionsmaschine',
-      bedingung: 'Halte deinen Tipp fest, wirf mindestens fünf Zahlen ein (auch die −4) und probiere eine große Zahl aus.',
-      pflicht: ['tipp', 'probieren', 'grenze'],
+      bedingung: 'Halte deinen Tipp fest, wirf mindestens fünf Zahlen ein (auch die −4), beschreibe die Regel in einem Satz und probiere eine große Zahl aus.',
+      pflicht: ['tipp', 'probieren', 'satz', 'grenze'],
       inhalt: (fertig) => (
         <>
           <p className="sl-text">
@@ -568,7 +595,7 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
             <M>y</M> aus.
           </p>
           <p className="sl-text">
-            Das Protokoll von Maschine A zeigt schon drei Würfe: Aus 1 wird 3, aus 2 wird 6, aus 4 wird 12. Gesucht ist, was die Maschine bei <M>{'x = -4'}</M> ausgibt, und am Ende
+            Das Protokoll von Maschine A zeigt schon drei Würfe: Aus 1 wird 2, aus 2 wird 4, aus 3 wird 6. Gesucht ist, was die Maschine bei <M>{'x = -4'}</M> ausgibt, und am Ende
             bei ganz großen Zahlen wie 40.
           </p>
           <div className="sl-fokus">
@@ -599,7 +626,34 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
             />
           </Abschnitt>
           {new Set(wuerfe).size >= 5 && wuerfe.includes(-4) && (
-            <Abschnitt titel={<>3. Und bei <M>{'x = 40'}</M>?</>}>
+            <Abschnitt titel="3. Welcher Satz beschreibt die Regel von Maschine A?">
+              <McCard
+                onSolved={() => {
+                  setSatzA(true)
+                  fertig.teil('satz')()
+                }}
+                punkte={3}
+                title="Regel in Worten"
+                prompt={<p>Schau dir das Protokoll an. Wie wird aus jedem x-Wert der y-Wert? Prüfe den Satz an mehreren Paaren, auch an einem mit Minus.</p>}
+                options={[
+                  { text: 'Jeder y-Wert ist um 2 größer als der x-Wert.', feedback: 'Das passt nur zum Paar (2 | 4). Prüfe (1 | 2): 1 + 2 = 3, die Maschine gibt aber 2 aus.' },
+                  { text: 'Jeder x-Wert ist das Doppelte vom y-Wert.', feedback: 'Hier sind x und y vertauscht. Bei (3 | 6) ist 6 das Doppelte von 3. Also ist der y-Wert das Doppelte.' },
+                  { text: 'Jeder y-Wert ist das Doppelte vom x-Wert, also 2-mal der x-Wert.', correct: true, feedback: 'Genau: 2 · 3 = 6 und 2 · (−4) = −8. Die Maschine nimmt jedes x mal 2.' },
+                  { text: 'Jeder y-Wert ist die Hälfte vom x-Wert.', feedback: 'Die Hälfte von 3 wäre 1,5. Die Maschine gibt bei 3 aber 6 aus.' },
+                ]}
+              />
+              {satzA && (
+                <>
+                  <p className="sl-text">So rechnet die Maschine bei jedem Wurf. Im Protokoll siehst du es jetzt: Aus jedem x-Wert wird mit „mal 2“ der y-Wert.</p>
+                  <Protokoll paare={paareAus([...START_A, ...wuerfe], M_A)} faktor="2" label="Protokoll von Maschine A" />
+                  <Bruecke worte="Jeder y-Wert ist das Doppelte vom x-Wert." rechnung={<M>{'y\\text{-Wert} = 2 \\cdot x\\text{-Wert}'}</M>} />
+                  <p className="sl-hinweis">Wie man das als Gleichung noch kürzer schreibt, lernst du auf der nächsten Seite.</p>
+                </>
+              )}
+            </Abschnitt>
+          )}
+          {satzA && (
+            <Abschnitt titel={<>4. Und bei <M>{'x = 40'}</M>?</>}>
               <p className="sl-text">Wirf eine große Zahl ein, zum Beispiel 40 oder −100.</p>
               <Grenze
                 onWurf={(x) => setWuerfe((w) => [...w, x])}
@@ -613,22 +667,23 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
     {
       art: 'loesen',
       titel: 'Die Regel von Maschine B knacken',
-      pflicht: ['kern', 'graph', 'produkt'],
+      pflicht: ['satz', 'kern', 'graph', 'produkt'],
       inhalt: (fertig) => (
         <>
           <p className="sl-hinweis">Einzelarbeit, ca. 20 Minuten.</p>
           <div className="sl-fokus">
             <p className="sl-fokus-titel">Deine Aufgabe: Knacke die Regel von Maschine B</p>
             <p>
-              Maschine B ist kaputt. Sie zeigt nur noch ihr Protokoll. Finde heraus, mit welcher Zahl sie jedes <M>x</M> malnimmt, und schreibe ihre Funktionsgleichung{' '}
-              <M>{'y = m \\cdot x'}</M> auf. Berechne damit, was sie bei <M>{'x = 10'}</M> und bei <M>{'x = -7'}</M> ausgeben würde. Zeichne ihren Graphen in dein Heft.
+              Maschine B ist kaputt. Sie zeigt nur noch ihr Protokoll. Finde heraus, mit welcher Zahl sie jedes <M>x</M> malnimmt, beschreibe ihre Regel in einem Satz und
+              übersetze den Satz in ihre Funktionsgleichung <M>{'y = m \\cdot x'}</M>. Berechne damit, was sie bei <M>{'x = 10'}</M> und bei <M>{'x = -7'}</M> ausgeben würde. Zeichne ihren Graphen in dein Heft.
             </p>
           </div>
           <Protokoll paare={PROTOKOLL_B} label="Protokoll von Maschine B: aus −2 wird 4, aus 1 wird −2, aus 3 wird −6" />
           <div className="bk-graph fm-bild">
             <KoSystem
-              yMax={10}
-              yStep={2}
+              xMax={5}
+              yMax={7}
+              einheit={30}
               punkte={PROTOKOLL_B.map((p) => ({ ...p, art: 'alt' as const, text: `(${zahl(p.x)} | ${zahl(p.y)})` }))}
               linien={liveB ? [{ ...liveB, art: geloest ? 'haupt' : 'live' }] : []}
               label={`Koordinatensystem mit den drei Punkten aus dem Protokoll von Maschine B${liveB ? ' und der Geraden zu deiner eingetippten Gleichung' : ''}.`}
@@ -638,6 +693,22 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
             <Beispiel offen title="Die Regel von Maschine Z knacken" aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE} />
           </BeispielMitVideo>
           <Abschnitt titel="Vergleiche deine Ergebnisse">
+            <McCard
+              onSolved={fertig.teil('satz')}
+              punkte={3}
+              title="Satz für Maschine B"
+              prompt={<p>Welcher Satz beschreibt die Regel von Maschine B?</p>}
+              options={[
+                { text: 'Jeder y-Wert ist um 2 kleiner als der x-Wert.', feedback: 'Prüfe (1 | −2): 1 − 2 = −1, die Maschine gibt aber −2 aus.' },
+                { text: 'Jeder y-Wert ist das Doppelte vom x-Wert.', feedback: 'Das Doppelte von 1 wäre 2, die Maschine gibt aber −2 aus. Das Vorzeichen dreht sich um.' },
+                { text: 'Jeder y-Wert ist die Hälfte vom x-Wert, aber mit umgekehrtem Vorzeichen.', feedback: 'Die Hälfte von 3 wäre 1,5. Hier wurde x : y statt y : x gerechnet.' },
+                {
+                  text: 'Jeder y-Wert ist das Doppelte vom x-Wert, aber mit umgekehrtem Vorzeichen, also (−2)-mal der x-Wert.',
+                  correct: true,
+                  feedback: 'Genau: (−2) · 3 = −6 und (−2) · (−2) = 4. Übersetzt heißt das: y = −2 · x.',
+                },
+              ]}
+            />
             <CheckCard
               onSolved={() => {
                 fertig.teil('kern')()
@@ -711,6 +782,7 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
             </p>
             <Aufklappbar label="Satzanfänge ansehen" icon="fa-comment-dots">
               <ul className="zk-liste">
+                <li>„Jeder y-Wert ist … vom x-Wert, aber …“</li>
                 <li>„Maschine B nimmt jede Zahl mal …“</li>
                 <li>„Wertetabelle: Für x = −2, −1, 0, 1, 2 kommt … heraus.“</li>
                 <li>„Die Funktionsgleichung heißt y = …“</li>
@@ -730,7 +802,7 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
                   <strong>Funktionsgraph:</strong> alle Paare <M>{'(x \\mid y)'}</M> als Punkte im Koordinatensystem.
                 </li>
                 <li>
-                  <strong>Funktionsgleichung:</strong> der Bauplan der Maschine, z. B. <M>{'y = 3x'}</M>.
+                  <strong>Funktionsgleichung:</strong> der Bauplan der Maschine, z. B. <M>{'y = 2x'}</M>.
                 </li>
                 <li>
                   <strong>Ursprung:</strong> der Punkt <M>{'(0 \\mid 0)'}</M>, wo sich die Achsen kreuzen.
@@ -774,9 +846,22 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
                     <strong>Funktionsgleichung:</strong> der Bauplan, mit dem du jedes <M>y</M> ausrechnest, z. B. <M>{'y = -2x'}</M>.
                   </li>
                 </ul>
+                <p>So kommst du von der Regel in Worten zur Funktionsgleichung:</p>
+                <Bruecke
+                  worte="Jeder y-Wert ist das Doppelte vom x-Wert, aber mit umgekehrtem Vorzeichen."
+                  rechnung={<M>{'y\\text{-Wert} = (-2) \\cdot x\\text{-Wert}'}</M>}
+                  gleichung={
+                    <>
+                      <M>{'y = -2 \\cdot x'}</M>, kurz <M>{'y = -2x'}</M>
+                    </>
+                  }
+                />
                 <p>
-                  Bei <M>{'y = m \\cdot x'}</M> ist der Graph eine <strong>Gerade durch den Ursprung</strong> <M>{'(0 \\mid 0)'}</M>. Das ist eine <strong>lineare Funktion</strong>. Die
-                  Zahl <M>m</M> bekommst du, wenn du bei einem Punkt <M>y : x</M> rechnest.
+                  Allgemein: Jeder y-Wert ist das <M>m</M>-Fache vom x-Wert. Als Gleichung: <M>{'y = m \\cdot x'}</M>. Die Zahl <M>m</M> bekommst du, wenn du bei einem Punkt{' '}
+                  <M>y : x</M> rechnest.
+                </p>
+                <p>
+                  Bei <M>{'y = m \\cdot x'}</M> ist der Graph eine <strong>Gerade durch den Ursprung</strong> <M>{'(0 \\mid 0)'}</M>. Das ist eine <strong>lineare Funktion</strong>.
                 </p>
                 <p>
                   Proportionale Zuordnungen kennst du schon. <M>{'y = m \\cdot x'}</M> beschreibt sie mathematisch, jetzt aber auch für negative Zahlen und Kommazahlen.
@@ -941,10 +1026,9 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
                   </p>
                   <div className="bk-graph fm-bild fm-bild-klein">
                     <KoSystem
-                      yMax={4}
-                      yStep={1}
-                      w={520}
-                      h={300}
+                      xMax={5}
+                      yMax={3}
+                      einheit={36}
                       punkte={[
                         { x: -4, y: 2, art: 'alt' },
                         { x: 2, y: -1, art: 'alt' },
@@ -1024,9 +1108,9 @@ function Rueckbezug({ tipp, wuerfe }: { tipp: number | null; wuerfe: number[] })
   return (
     <div className="ls-back">
       <p>
-        <strong>Bei Maschine A hattest du für <M>{'x = -4'}</M> den Wert {zahl(tipp)} getippt.</strong> Die Maschine gab <M>{'-12'}</M> aus, denn ihre Funktionsgleichung ist{' '}
-        <M>{'y = 3x'}</M> und <M>{'3 \\cdot (-4) = -12'}</M>. Du hast {new Set(wuerfe).size} verschiedene Zahlen eingeworfen. Mit der Gleichung brauchst du die Maschine nicht mehr:{' '}
-        <M>{'x = 40{:}\\; y = 3 \\cdot 40 = 120'}</M>.
+        <strong>Bei Maschine A hattest du für <M>{'x = -4'}</M> den Wert {zahl(tipp)} getippt.</strong> Die Maschine gab <M>{'-8'}</M> aus. Ihre Regel: Jeder y-Wert ist das
+        Doppelte vom x-Wert. Als Funktionsgleichung heißt das <M>{'y = 2x'}</M>, und <M>{'2 \\cdot (-4) = -8'}</M>. Du hast {new Set(wuerfe).size} verschiedene Zahlen
+        eingeworfen. Mit der Gleichung brauchst du die Maschine nicht mehr: <M>{'x = 40{:}\\; y = 2 \\cdot 40 = 80'}</M>.
       </p>
     </div>
   )

@@ -19,9 +19,11 @@ type Phase = 'start' | 'wahl' | 'zeichnen' | 'ergebnis' | 'ende'
 const RUNDEN = 4
 const DAUER = 1.4 // Sekunden, bis die Gerade ganz gezeichnet ist
 
-const G = { w: 680, h: 360, l: 44, r: 26, t: 20, b: 30, xMax: 6, yMax: 10 }
-const gx = (x: number) => G.l + ((x + G.xMax) / (2 * G.xMax)) * (G.w - G.l - G.r)
-const gy = (y: number) => G.t + ((G.yMax - y) / (2 * G.yMax)) * (G.h - G.t - G.b)
+// Kartesisch: Schrittweite 1, beide Achsen gleich lang (u Pixel pro Einheit)
+const R = { l: 40, r: 26, t: 20, b: 30, xMax: 6, yMax: 6, u: 34 }
+const G = { ...R, w: R.l + R.r + 2 * R.xMax * R.u, h: R.t + R.b + 2 * R.yMax * R.u }
+const gx = (x: number) => G.l + (x + G.xMax) * G.u
+const gy = (y: number) => G.t + (G.yMax - y) * G.u
 
 const pick = <T,>(a: readonly T[]) => a[Math.floor(Math.random() * a.length)]
 const mischen = <T,>(a: T[]) => [...a].sort(() => Math.random() - 0.5)
@@ -30,7 +32,7 @@ function neueRunde(): Runde {
   for (;;) {
     const m = pick([-3, -2, -0.5, 0.5, 2, 3])
     // Münzen auf ganzzahligen Punkten, eine links und eine rechts der y-Achse
-    const passt = (x: number) => Number.isInteger(m * x) && Math.abs(m * x) <= 9
+    const passt = (x: number) => Number.isInteger(m * x) && Math.abs(m * x) <= 5
     const links = [-5, -4, -3, -2, -1].filter(passt)
     const rechts = [1, 2, 3, 4, 5].filter(passt)
     if (!links.length || !rechts.length) continue
@@ -197,7 +199,7 @@ export default function ZeichenRoboter() {
                 )}
               </g>
             ))}
-            {Array.from({ length: G.yMax + 1 }, (_, i) => -G.yMax + 2 * i).map((v) => (
+            {Array.from({ length: 2 * G.yMax + 1 }, (_, i) => i - G.yMax).map((v) => (
               <g key={`y${v}`}>
                 <line x1={gx(-G.xMax)} x2={gx(G.xMax)} y1={gy(v)} y2={gy(v)} stroke="var(--surface)" strokeWidth="1.5" />
                 {v !== 0 && (
