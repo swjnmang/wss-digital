@@ -1,0 +1,30 @@
+/* Lernsituation „Das Glücksrad“ im ruhigen Grunddesign. Farben kommen über --primary aus dem Thema. */
+
+.gr-labor { display: flex; flex-direction: column; gap: 12px; }
+.gr-rad svg { max-height: 300px; }
+.gr-steuer .bk-btn { min-height: 48px; }
+.gr-status { margin: 0; }
+
+.gr-tabelle { width: 100%; border-collapse: collapse; font-size: 17px; }
+.gr-tabelle caption { text-align: left; font: 800 16px/1.3 var(--font-display); color: var(--primary); padding-bottom: 4px; }
+.gr-tabelle th, .gr-tabelle td { border-bottom: 1.5px solid var(--line); padding: 8px 10px; text-align: left; }
+.gr-tabelle thead th { font-size: 15px; color: var(--ink-muted); }
+.gr-tabelle td { font-variant-numeric: tabular-nums; }
+.gr-summe th, .gr-summe td { font-weight: 800; border-bottom: 0; }
+@media (max-width: 480px) { .gr-tabelle th, .gr-tabelle td { padding: 6px 4px; font-size: 15px; } }
+
+.gr-erkenntnis { margin: 0; font-size: 17px; line-height: 1.55; }
+
+/* Bonus-Spiel Rad-Casino */
+.gr-spiel { display: flex; flex-direction: column; gap: 12px; }
+.gr-spiel-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 800 17px/1.3 var(--font-display); color: var(--primary); }
+.gr-muenzen { display: flex; gap: 6px; font-size: 20px; color: var(--line-strong); }
+.gr-muenzen .gr-muenze-an { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.gr-spiel-frage { margin: 0; font-size: 18px; line-height: 1.5; }
+.gr-spiel-bild svg { max-height: 300px; }
+.gr-wahl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.gr-wahl .bk-btn { min-height: 56px; justify-content: center; font-size: 18px; }
+.gr-wahl .gr-richtig { border-color: var(--correct); background: var(--correct-soft); color: var(--correct-ink); }
+.gr-wahl .gr-falsch { border-color: var(--wrong); background: var(--wrong-soft); color: var(--wrong-ink); }
+.gr-spiel-ende { margin: 0; font: 800 20px/1.4 var(--font-display); color: var(--ink); }
+.gr-spiel-ende i { color: var(--primary); margin-right: 6px; }
