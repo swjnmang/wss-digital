@@ -67,7 +67,7 @@ dokumentieren. Danach folgt eine Seite pro Phase; „Weiter“ wird erst frei, w
 Info-Seiten) und `TaskShell` mit `kompakt`. Optimiert für Tablets im Querformat: nach unten scrollen ist erlaubt, seitlich scrollen nie;
 Skizzen und Graphen nicht stauchen, damit alles auf einen Bildschirm passt. Beispiel: `TorbogenEinstieg.tsx`.
 Ruhiges Grunddesign (seit 2026-10-23, Vorlage `TorbogenEinstieg.tsx`): `SeitenLernsituation` mit `ruhig`, immer einspaltig (auch auf breiten
-Monitoren, kein `ZweiSpalten`), kein seitliches Scrollen; eine Akzentfarbe, keine Farbstreifen, keine verschachtelten Kästen,
+Monitoren, kein `ZweiSpalten`), Inhalt so breit wie die Phasenleiste (`--sl-breite`, höchstens 1180 px, seit 2026-10-29), kein seitliches Scrollen; eine Akzentfarbe, keine Farbstreifen, keine verschachtelten Kästen,
 keine Kontext-Looks; pro Seite ist nur der Auftrag hervorgehoben (`sl-fokus`). Jede Lernsituation hat trotzdem eine eigene Identität
 (Prop `thema`: Themenfarbe aus `THEMEN`, Symbol, Name, Titelbild, dazu ein Leitobjekt), damit sie nicht wie alle anderen aussieht. Reihenfolge in „Problem lösen“ immer: Problem → Beispielrechnung mit Lernvideo (aufklappbar) →
 Ergebnisse abgleichen → Handlungsprodukt. Bei Auswahlaufgaben ist Antwort A nie die richtige. Details: `docs/skills/lernsituationen/SKILL.md`.

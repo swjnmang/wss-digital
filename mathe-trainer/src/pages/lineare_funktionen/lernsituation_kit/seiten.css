@@ -104,10 +104,12 @@
    Eine Spalte, eine Akzentfarbe statt Phasenfarben, kein Farbstreifen, kein Großbuchstaben-Kicker über dem Titel
    (die Phase steht in der Leiste). Hervorgehoben wird pro Seite nur der Auftrag (.sl-fokus). */
 .sl-ruhig, .sl-ruhig .sl-phasen li, .sl-ruhig .sl-seite { --et: var(--primary); --et-soft: var(--primary-soft); }
-.sl-ruhig .sl-bar { width: 100%; max-width: 900px; margin: 0 auto; }
+/* Inhalt so breit wie die Leiste darüber (keine breiten leeren Ränder); auf Tablet und Handy automatisch schmaler */
+.sl-ruhig { --sl-breite: 1180px; }
+.sl-ruhig .sl-bar { width: 100%; max-width: var(--sl-breite); margin: 0 auto; }
 .sl-ruhig .sl-phasen li { border-width: 1.5px; min-height: 44px; }
 .sl-ruhig .sl-bar .bk-btn { min-height: 44px; min-width: 44px; }
-.sl-ruhig .sl-seite { width: 100%; max-width: 760px; margin: 6px auto 0; padding-left: 0; border-left: 0; gap: 14px; }
+.sl-ruhig .sl-seite { width: 100%; max-width: var(--sl-breite); margin: 6px auto 0; padding-left: 0; border-left: 0; gap: 14px; }
 .sl-ruhig .sl-kicker { display: none; }
 .sl-ruhig .sl-kopf { flex-direction: column; align-items: flex-start; gap: 4px; }
 .sl-ruhig .sl-titel { font-size: 24px; }
@@ -128,7 +130,6 @@
 .sl-hinweis { margin: 0; color: var(--ink-muted); font-size: 16px; line-height: 1.45; }
 .sl-start.sl-ruhig { box-shadow: none; border-width: 1.5px; }
 .sl-start.sl-ruhig .sl-start-regel { border-left: 0; border-radius: 12px; }
-.sl-ruhig .sl-bar { max-width: 1060px; }
 .sl-ruhig .sl-seite { margin-top: 2px; gap: 12px; }
 .sl-ruhig .sl-titel { font-size: 23px; }
 .sl-ruhig .sl-seite .bk-graph { border-color: var(--line); padding: 4px; }
@@ -150,7 +151,6 @@
 .sl-start-bild { width: calc(100% + 52px); margin: 0 -26px 4px; background: var(--primary-soft); }
 .sl-start-bild svg { display: block; width: 100%; height: auto; }
 .sl-start.sl-thema h2 { font-size: 28px; color: var(--primary); }
-.sl-ruhig .sl-bar { max-width: 1180px; }
 
 /* ── Eine Seite pro Phase: Abschnitte, Aufklappen, Wegwahl, Handlungsprodukt ─────────────────────────── */
 .sl-abschnitt, .sl-produkt { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
