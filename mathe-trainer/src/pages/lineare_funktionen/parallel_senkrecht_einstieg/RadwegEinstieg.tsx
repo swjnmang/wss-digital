@@ -586,11 +586,11 @@ export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => v
             prompt={
               <p>
                 Eine Gerade hat die Steigung <M>{'m = -\\dfrac{2}{3}'}</M>. Du zeichnest ihr Steigungsdreieck und gehst 3 Kästchen nach rechts. Wie viele Kästchen geht es dann
-                nach oben? (Nach unten ist negativ.)
+                nach unten?
               </p>
             }
-            fields={[{ kind: 'num', key: 'h', label: 'nach oben:', expected: -2, unit: 'Kästchen' }]}
-            solution={<p>Unten im Bruch steht der Schritt nach rechts (3), oben der Schritt nach oben (−2). Es geht also 2 Kästchen nach unten: −2.</p>}
+            fields={[{ kind: 'num', key: 'h', label: 'nach unten:', expected: 2, unit: 'Kästchen' }]}
+            solution={<p>Unten im Bruch steht der Schritt nach rechts (3), oben der Schritt nach oben (−2). Das Minus bedeutet: Es geht 2 Kästchen nach unten.</p>}
           />
         </>
       ),
