@@ -269,9 +269,9 @@ export default function Funktionsgleichung(){
         {/* Task - nur Text, kein Kasten */}
         <div className={styles.taskText}>
           {mode === 'twoPoints' ? (
-            <p>Gegeben sind die Punkte P₁({p1.x}|{p1.y}) und P₂({p2.x}|{p2.y}). Stelle die Funktionsgleichung auf und tippe sie vollständig ein.<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
+            <p>Gegeben sind die Punkte P₁({p1.x}|{p1.y}) und P₂({p2.x}|{p2.y}). Stelle die Funktionsgleichung auf und tippe sie vollständig ein.<br/><small>(Runde auf 2 Nachkommastellen, auch das Zwischenergebnis für m. Rechne mit dem gerundeten m weiter.)</small></p>
           ) : mode === 'pointSlope' ? (
-            <p>Gegeben ist der Punkt P({p1.x}|{p1.y}) und die Steigung m (oben). Stelle die Funktionsgleichung auf und tippe sie vollständig ein.<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
+            <p>Gegeben ist der Punkt P({p1.x}|{p1.y}) und die Steigung m (oben). Stelle die Funktionsgleichung auf und tippe sie vollständig ein.<br/><small>(Runde auf 2 Nachkommastellen, auch das Zwischenergebnis für m. Rechne mit dem gerundeten m weiter.)</small></p>
           ) : (
             <p>Lies zwei Punkte aus dem Funktionsgraphen ab und bestimme anschließend rechnerisch die Funktionsgleichung y = mx + t.<br/><small>Klicke dazu zwei Punkte an, die du genau ablesen kannst. Tippe die Gleichung dann vollständig ein.</small></p>
           )}
