@@ -25,7 +25,7 @@ import './labor.css'
 // Format Experimentierlabor: In „Problem erkennen“ raten die SuS das Lösungspaar von I: 3x + 2y = 12, II: x + 2y = 7 (Lösung (2,5 | 2,25),
 // im Graphen nur ungefähr abzulesen, Gleichsetzen geht nicht direkt). Danach probieren sie im Gleichungs-Labor I + II und I − II aus.
 // Aha: Bei I − II verschwindet y, übrig bleibt 2x = 5.
-// Problem lösen in drei Teilen, je Problem → Beispielrechnung mit Lernvideo → Ergebnisse abgleichen:
+// Problem lösen in drei Teilen auf je einer eigenen Seite (Teil 2 erst nach Teil 1 usw.), je Problem → Beispielrechnung mit Lernvideo → Ergebnisse abgleichen:
 // Teil 1 subtrahieren (gleiche Zahl vor einer Variablen), Teil 2 addieren (Gegenzahlen), Teil 3 erst eine Gleichung multiplizieren.
 // Handlungsprodukt analog: Entscheidungs-Flussdiagramm „Welcher Weg?“ im Heft (Kriterium Begriffe: LGS, I, II, Koeffizient, Lösungspaar, Gegenzahl, Probe).
 // Identität: Themenfarbe Violett, Symbol fa-flask, Titelbild Labortafel mit zwei Gleichungen und zwei Geraden, Leitobjekt das Gleichungs-Labor.
@@ -847,11 +847,12 @@ export default function LaborEinstieg({
     },
     {
       art: 'loesen',
-      titel: 'Das Additions- und Subtraktionsverfahren',
-      pflicht: ['t1', 't2', 't3', 'produkt'],
+      titel: 'Teil 1: Gleiche Zahl, also subtrahieren',
+      pflicht: ['t1'],
+      bedingung: 'Berechne das Lösungspaar von Teil 1 richtig, dann geht es zu Teil 2.',
       inhalt: (fertig) => (
         <>
-          <p className="sl-hinweis">Einzelarbeit, Teil 2 und 3 auch in Partnerarbeit, ca. 45 Minuten.</p>
+          <p className="sl-hinweis">Einzelarbeit, ca. 15 Minuten.</p>
           <div className="sl-fokus">
             <p className="sl-fokus-titel">Deine Aufgabe: Berechne das Lösungspaar, ohne zu raten</p>
             <p>
@@ -860,7 +861,7 @@ export default function LaborEinstieg({
             </p>
           </div>
           <GeradenBild frage label="Die Geraden zu Gleichung I und Gleichung II. Ihr Schnittpunkt ist mit S(? | ?) markiert." />
-          <Abschnitt titel="Teil 1: Gleiche Zahl, also subtrahieren">
+          <Abschnitt titel="So geht es">
             <BeispielMitVideo video={VIDEO_VERFAHREN} videoTitel="Lernvideo: Additions- und Subtraktionsverfahren">
               <Beispiel offen title="Subtrahieren" aufgabe={BSP1_AUFGABE} steps={BSP1_SCHRITTE} />
             </BeispielMitVideo>
@@ -890,11 +891,25 @@ export default function LaborEinstieg({
               }
             />
           </Abschnitt>
-          <Abschnitt titel="Teil 2: Gegenzahlen, also addieren">
-            <p className="sl-text">
+        </>
+      ),
+    },
+    {
+      art: 'loesen',
+      titel: 'Teil 2: Gegenzahlen, also addieren',
+      pflicht: ['t2'],
+      bedingung: 'Berechne das Lösungspaar von Teil 2 richtig, dann geht es zu Teil 3.',
+      inhalt: (fertig) => (
+        <>
+          <p className="sl-hinweis">Einzel- oder Partnerarbeit, ca. 10 Minuten.</p>
+          <div className="sl-fokus">
+            <p className="sl-fokus-titel">Deine Aufgabe</p>
+            <p>
               Löse in deinem Heft: <M>{'\\text{I: } 2x + 3y = 3'}</M> und <M>{'\\text{II: } 4x - 3y = 15'}</M>. Vor <M>y</M> stehen hier <M>{'3'}</M> und <M>{'-3'}</M>.
               Subtrahierst du, wird daraus <M>{'3y - (-3y) = 6y'}</M>. Was passiert beim Addieren?
             </p>
+          </div>
+          <Abschnitt titel="So geht es">
             <BeispielMitVideo video={VIDEO_VERFAHREN} videoTitel="Lernvideo: Additions- und Subtraktionsverfahren">
               <Beispiel offen title="Addieren" aufgabe={BSP2_AUFGABE} steps={BSP2_SCHRITTE} />
             </BeispielMitVideo>
@@ -926,11 +941,24 @@ export default function LaborEinstieg({
               }
             />
           </Abschnitt>
-          <Abschnitt titel="Teil 3: Erst multiplizieren">
-            <p className="sl-text">
+        </>
+      ),
+    },
+    {
+      art: 'loesen',
+      titel: 'Teil 3: Erst multiplizieren',
+      pflicht: ['t3', 'produkt'],
+      inhalt: (fertig) => (
+        <>
+          <p className="sl-hinweis">Einzel- oder Partnerarbeit, ca. 20 Minuten.</p>
+          <div className="sl-fokus">
+            <p className="sl-fokus-titel">Deine Aufgabe</p>
+            <p>
               Löse in deinem Heft: <M>{'\\text{I: } 2x + 3y = 13'}</M> und <M>{'\\text{II: } x + y = 5'}</M>. Hier fällt weder beim Addieren noch beim Subtrahieren etwas weg.
               Probiere im Labor, womit du eine Gleichung vorher multiplizieren musst.
             </p>
+          </div>
+          <Abschnitt titel="So geht es">
             <GleichungsLabor I={I3} II={II3} faktoren />
             <BeispielMitVideo video={VIDEO_VERFAHREN} videoTitel="Lernvideo: Additions- und Subtraktionsverfahren">
               <Beispiel offen title="Erst multiplizieren, dann subtrahieren" aufgabe={BSP3_AUFGABE} steps={BSP3_SCHRITTE} />

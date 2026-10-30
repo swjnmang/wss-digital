@@ -270,7 +270,10 @@ function SeitenAnsicht({
             {erledigt[i] && i < seiten.length - 1 && (
               <div className="sl-weiter-unten">
                 <button type="button" className="bk-btn bk-btn-primary" onClick={() => setNr(i + 1)}>
-                  Weiter zu {PHASEN.find((p) => p.art === seiten[i + 1].art)?.title ?? 'nächsten Seite'}{' '}
+                  Weiter zu{' '}
+                  {seiten[i + 1].art === s.art
+                    ? seiten[i + 1].titel
+                    : PHASEN.find((p) => p.art === seiten[i + 1].art)?.title ?? 'nächsten Seite'}{' '}
                   <i className="fa-solid fa-arrow-right" aria-hidden="true" />
                 </button>
               </div>
