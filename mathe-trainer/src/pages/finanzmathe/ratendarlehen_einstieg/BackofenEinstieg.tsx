@@ -440,7 +440,7 @@ function TilgungsplanCheck({
   ];
   const { values, marks, status, praise, malFalsch, setValue, blur } = useLiveCheck(
     felder.map((f) => ({ key: f.key, pruefe: (v: string) => checkNumber(v, f.expected) })),
-    { onSolved },
+    { onSolved, onSchonGeloest: onSolved },
   );
   const [zeigen, setZeigen] = useState(false);
 
