@@ -160,7 +160,7 @@ function Item({ item, slug }: { item: AuftragItem; slug: string }): ReactNode {
         src={`${BASE}/${slug}/img/${item.img}`}
         alt=""
         draggable={false}
-        className="my-1 max-h-64 w-auto max-w-full rounded-md border border-slate-200 self-start"
+        className="my-1 max-h-56 w-auto max-w-full sm:max-w-md rounded-md border border-slate-200 self-start"
       />
     );
   if ('beispiel' in item)
@@ -193,18 +193,28 @@ function Material({ a }: { a: Arbeitsauftrag }) {
           </a>
         ))}
       </div>
-      <div className="border-t border-slate-100 pt-4">
+    </section>
+  );
+}
+
+// Lösung immer ganz unten am Ende des Arbeitsauftrags
+function Loesung({ a, fertig }: { a: Arbeitsauftrag; fertig: boolean }) {
+  return (
+    <section className={`rounded-xl border shadow-sm p-5 flex flex-col sm:flex-row sm:items-center gap-4 ${fertig ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-200'}`}>
+      <div className="flex-1">
         <h3 className="font-bold text-slate-800">✅ Lösung zum Abgleich</h3>
-        <p className="text-sm text-slate-500 mb-3">Öffne die Lösung erst, wenn du mit allen Arbeitsaufträgen fertig bist.</p>
-        <a
+        <p className="text-sm text-slate-500">
+          {fertig ? 'Super, alle Schritte sind abgehakt! Vergleiche jetzt dein Ergebnis mit der Lösung.' : 'Öffne die Lösung erst, wenn du mit allen Arbeitsaufträgen fertig bist.'}
+        </p>
+      </div>
+      <a
           href={`${BASE}/${a.slug}/loesung.pdf`}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors"
+          className="shrink-0 self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors"
         >
           Lösung öffnen (PDF)
         </a>
-      </div>
     </section>
   );
 }
@@ -333,6 +343,8 @@ export default function LayoutArbeitsauftraege() {
                 );
               })}
             </section>
+
+            <Loesung a={current} fertig={done.length === current.rows.length} />
 
             <div className="flex justify-between gap-3 text-sm">
               <button onClick={() => select(null)} className="px-4 py-2 bg-white border border-slate-300 rounded-lg font-semibold">

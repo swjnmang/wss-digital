@@ -893,7 +893,9 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
       {
         "titel": "Erster Absatz („Ein schlecht gedämmtes Haus … Geld sparen.“)",
         "inhalt": [
-          { "t": "Bild 1 einfügen:" },
+          {
+            "t": "Bild 1 einfügen:"
+          },
           {
             "b": "Textumbruch: Quadrat (Doppelklick auf das Bild ➔ {{Textumbruch > Quadrat}})"
           },
@@ -925,7 +927,9 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
       {
         "titel": "Dritter Absatz: Aufzählung nach „So haben die … folgende Werte:“",
         "inhalt": [
-          { "t": "Die angegebenen U-Werte der Außenbauteile sollen als Aufzählung (Aufzählungszeichen: ▪) mit Einzug links: 0 cm und Sondereinzug hängend: 0,75 cm formatiert werden." }
+          {
+            "t": "Die angegebenen U-Werte der Außenbauteile sollen als Aufzählung (Aufzählungszeichen: ▪) mit Einzug links: 0 cm und Sondereinzug hängend: 0,75 cm formatiert werden."
+          }
         ]
       },
       {
@@ -988,6 +992,173 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
         "inhalt": [
           {
             "b": "Speichere den Flyer unter deinem Nachnamen (nachname.docx) sowie zusätzlich als PDF ab."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "sparkasse",
+    "kurz": "Werbeflyer „PrivatKonto Young“",
+    "level": "Mittel",
+    "teaser": "Designfarben und Schriftartset, Bild zuschneiden, WordArt, Aufzählung, Spalten mit Umbruch, Tabellenrahmen und Fußnote.",
+    "material": [
+      {
+        "label": "Vorlage (.docx)",
+        "datei": "vorlage.docx",
+        "downloadName": "01 vorlage – Sparkasse.docx"
+      },
+      {
+        "label": "Bild „banner.jpg“",
+        "datei": "banner.jpg",
+        "downloadName": "banner.jpg"
+      }
+    ],
+    "thema": "Sparkasse",
+    "titel": "Erstellung eines Werbeflyers",
+    "szenario": "Sie erstellen für Ihren Arbeitgeber, die Sparkasse, einen Werbeflyer für das neue Konto YOUNG für junge Leute. Öffne die passende Vorlagendatei und nimm folgende Änderungen vor:",
+    "start": 0,
+    "rows": [
+      {
+        "titel": "Vorbereitung",
+        "inhalt": [
+          {
+            "b": "Name, Klasse und Datum in der Fußzeile eintragen. Das Datum soll im Format **TT.MM.JJ** angezeigt werden und sich **automatisch aktualisieren**."
+          }
+        ]
+      },
+      {
+        "titel": "Grundlegende Formatierung",
+        "inhalt": [
+          {
+            "b": "Schriftartset: **Arial** ({{Entwurf > Schriftarten}})"
+          },
+          {
+            "b": "Designfarben/Farbset: **Rotorange** ({{Entwurf > Farben}})"
+          },
+          {
+            "b": "Seitenränder: alle Seiten **1 cm** ({{Layout > Seitenränder > Benutzerdefinierte Seitenränder}})"
+          }
+        ]
+      },
+      {
+        "titel": "Alle Absätze mit Fließtext und Tabelle (außer den Überschriften)",
+        "inhalt": [
+          {
+            "b": "Schriftart **Arial 11 pt**"
+          },
+          {
+            "b": "**Automatische Silbentrennung** ({{Layout > Silbentrennung > Automatisch}})"
+          }
+        ]
+      },
+      {
+        "titel": "Bild",
+        "inhalt": [
+          {
+            "b": "Über der Überschrift „PrivatKonto Young“ das Bild **„banner.jpg“** einfügen"
+          },
+          {
+            "b": "**Schneide** das Bild in der Höhe zu. Es soll zwischen **4,4 und 4,7 cm** hoch sein, die Breite bleibt gleich (Doppelklick auf das Bild ➔ {{Bildformat > Zuschneiden}})"
+          }
+        ]
+      },
+      {
+        "titel": "Hauptüberschrift („PrivatKonto Young“)",
+        "inhalt": [
+          {
+            "b": "Als WordArt einfügen: **„Rot, Akzent 1, Schatten“** (1. Zeile, 2. Füllung) (Überschrift markieren ➔ {{Einfügen > WordArt}})"
+          },
+          {
+            "b": "Textumbruch: **Mit Text in Zeile**"
+          },
+          {
+            "b": "Textkontur **Rot, Akzent 1, heller 80 %**"
+          },
+          {
+            "b": "Schriftart **Arial Black**"
+          },
+          {
+            "b": "Schriftgröße: **26 pt**"
+          }
+        ]
+      },
+      {
+        "titel": "Alle Unterüberschriften („Ihre Vorteile …“, „Mobiles Bezahlen“, „Preisvergleich“)",
+        "inhalt": [
+          {
+            "b": "Schriftart Arial, **fett**"
+          },
+          {
+            "b": "Schriftgröße **12 pt**"
+          }
+        ]
+      },
+      {
+        "titel": "Absatztext nach „Ihre Vorteile im Überblick“",
+        "inhalt": [
+          {
+            "b": "Aufzählung mit **schwarzem gefülltem Kreis**"
+          },
+          {
+            "b": "Einzug links bei **0 cm**"
+          },
+          {
+            "b": "Sondereinzug **hängend** bei **0,75 cm**"
+          }
+        ]
+      },
+      {
+        "titel": "Absatztext nach „Mobiles Bezahlen“",
+        "inhalt": [
+          {
+            "b": "**Zwei Spalten** (kompletten Absatz ohne die Überschrift markieren ➔ {{Layout > Spalten > Weitere Spalten}})"
+          },
+          {
+            "b": "**Zwischenlinie** einfügen"
+          },
+          {
+            "b": "Abstand zwischen den Spalten auf **1 cm** einstellen"
+          },
+          {
+            "b": "**Spaltenumbruch** vor „hinzu, …“ (vor das Wort „hinzu“ klicken ➔ {{Layout > Umbrüche > Spalte}})"
+          }
+        ]
+      },
+      {
+        "titel": "Tabelle nach „Preisvergleich“",
+        "inhalt": [
+          {
+            "img": "spk_tabelle.png"
+          },
+          {
+            "b": "Die **Rahmenlinien** sollst du wie oben abgebildet formatieren"
+          },
+          {
+            "b": "Die Euro-Beträge sollen die Hintergrundfarbe **Rot, Akzent 1, heller 80 %** erhalten"
+          },
+          {
+            "b": "Textfarbe der Zeilen- und Spaltenüberschriften: **Dunkelrot, Akzent 6, heller 40 %**"
+          },
+          {
+            "b": "Spaltenüberschriften **zentriert** ausrichten (markieren ➔ {{Tabellenlayout}})"
+          },
+          {
+            "b": "**Fußnote** nach „0,00 EUR“ (Standardnummerierung) bei der Kontoführung des Premium-Kontos ({{Referenzen > Fußnote einfügen}})"
+          },
+          {
+            "s": "Text der Fußnote: **mtl. Mindestgeldeingang 5.000 EUR, sonst 12,90 EUR**"
+          }
+        ]
+      },
+      {
+        "titel": "Abschluss",
+        "inhalt": [
+          {
+            "b": "Lösche überflüssige Leerzeilen am Ende des Dokuments. Die Datei sollte am Ende **nur eine A4-Seite** enthalten."
+          },
+          {
+            "b": "Speichere den Werbeflyer unter deinem Nachnamen (nachname.docx) ab."
           }
         ]
       }
