@@ -1165,6 +1165,232 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
     ]
   },
   {
+    "slug": "wintersport",
+    "kurz": "Zeitungsartikel „Wintersport“",
+    "level": "Mittel",
+    "teaser": "Designfarben, Initiale, Überschrift mit Schattierung, Pro-/Contra-Tabelle mit Bildern, Tabellenausrichtung und Fußnote.",
+    "material": [
+      {
+        "label": "Vorlage (.docx)",
+        "datei": "vorlage.docx",
+        "downloadName": "01 Vorlage – Wintersport.docx"
+      },
+      {
+        "label": "Bild „Wintersport“",
+        "datei": "wintersport.jpg",
+        "downloadName": "Wintersport.jpg"
+      },
+      {
+        "label": "Bild „Nachteile“",
+        "datei": "nachteile.jpg",
+        "downloadName": "Nachteile.jpg"
+      }
+    ],
+    "thema": "Wintersport",
+    "titel": "Gestaltung eines Zeitungsartikels",
+    "szenario": "Sie sollen einen DIN-A4-Zeitungsartikel zum Thema „Wintersport“ anpassen. Der Text wurde bereits zur Verfügung gestellt (Vorlage.docx). Sie passen lediglich das Layout wie folgt an:",
+    "start": 1,
+    "rows": [
+      {
+        "titel": "Textbegrenzungen",
+        "inhalt": [
+          {
+            "b": "Aktiviere die Textbegrenzungen: {{Datei > Optionen > Erweitert}} ➔ nach unten scrollen bis „Dokumentinhalt anzeigen“ ➔ **„Textbegrenzungen anzeigen“** aktivieren"
+          }
+        ]
+      },
+      {
+        "titel": "Name, Klasse und Datum",
+        "inhalt": [
+          {
+            "b": "Nachname, Vorname und Klasse oben eintragen. Füge das Datum ein. Es soll sich **automatisch aktualisieren**."
+          },
+          {
+            "tipp": "An manchen Computern wird das Datum trotz korrekter Eingabe nicht angezeigt. Das ist nicht dein Fehler! Mit **Alt + F9** kannst du es überprüfen."
+          }
+        ]
+      },
+      {
+        "titel": "Farbset",
+        "inhalt": [
+          {
+            "b": "Stelle das Farbset (Designfarben) auf **„Blau“**: {{Entwurf > Farben > Blau}}"
+          },
+          {
+            "img": "ws_farbset.png"
+          }
+        ]
+      },
+      {
+        "titel": "Kompletter Text",
+        "inhalt": [
+          {
+            "t": "Markiere den **kompletten Text** (Strg + A) und nimm folgende Änderungen vor:"
+          },
+          {
+            "b": "Schriftart **Aptos Narrow**, Schriftgröße **11**"
+          },
+          {
+            "b": "Zeilenabstand **„Einfach“**, Abstand Vor und Nach auf **0** einstellen"
+          },
+          {
+            "s": "Öffne dazu das Absatzmenü: {{Start > Absatz}} ➔ auf die kleine Ecke mit dem Pfeil klicken – dort kannst du alle Einstellungen vornehmen"
+          },
+          {
+            "img": "ws_absatz1.png"
+          },
+          {
+            "img": "ws_absatz2.png"
+          },
+          {
+            "b": "Aktiviere die **automatische Silbentrennung**: {{Layout > Silbentrennung > Automatisch}}"
+          }
+        ]
+      },
+      {
+        "titel": "Seitenränder",
+        "inhalt": [
+          {
+            "b": "Links und rechts **2 cm**; oben **2,5 cm**; unten **2 cm** ({{Layout > Seitenränder > Benutzerdefinierte Seitenränder}})"
+          },
+          {
+            "b": "Entferne die aktuell bestehende **Kontur** der Ränder ({{Entwurf > Seitenränder}})"
+          }
+        ]
+      },
+      {
+        "titel": "Absatz 1 („Für Ski-Fans … ein Fazit.“) und Absatz 2 („Auf Skiurlaub … gefährdet werden.“)",
+        "inhalt": [
+          {
+            "b": "Als **Blocksatz** formatieren"
+          },
+          {
+            "b": "**Initiale im Text** einfügen, **Höhe 2** (Absatz markieren ➔ {{Einfügen > Initiale > Initialoptionen}})"
+          },
+          {
+            "img": "ws_initiale.png"
+          }
+        ]
+      },
+      {
+        "titel": "Hauptüberschrift („Am Wintersport scheiden sich die Geister“)",
+        "inhalt": [
+          {
+            "b": "Schriftgröße **16**"
+          },
+          {
+            "b": "Schattierung: **Dunkelblau, Text 2** (Text markieren ➔ über den Farbeimer {{Start > Absatz > Schattierung}} die passende Farbe wählen)"
+          },
+          {
+            "b": "Schriftfarbe: **Weiß** (falls nicht bereits automatisch übernommen)"
+          },
+          {
+            "b": "**zentriert** ausrichten"
+          }
+        ]
+      },
+      {
+        "titel": "Nach dem ersten Absatz („… sprechen und ein Fazit.“): Pro-/Contra-Tabelle",
+        "inhalt": [
+          {
+            "img": "ws_tabelle_pro_contra.png"
+          },
+          {
+            "b": "Füge eine Tabelle mit **2 Spalten und 3 Zeilen** ein. Vor und nach der Tabelle soll **exakt eine freie Zeile** sein."
+          },
+          {
+            "b": "Die erste Spalte bekommt die Überschrift **„PRO“**, die zweite Spalte die Überschrift **„CONTRA“** – fett formatieren."
+          },
+          {
+            "b": "Überschriften **zentriert** ausrichten, Schattierung: **Weiß, Hintergrund 1, dunkler 25 %**"
+          },
+          {
+            "b": "Bild **„Wintersport“** in die Zelle unter „PRO“ einfügen und Bild **„Nachteile“** unter „CONTRA“ einfügen:"
+          },
+          {
+            "s": "Textumbruch: Mit Text in Zeile (voreingestellt), Breite: **7 cm**"
+          },
+          {
+            "s": "Zentriert ausrichten, Absatzabstand „vor“ und „nach“ auf **4** einstellen"
+          },
+          {
+            "b": "Text für „PRO“ und „CONTRA“ im Dokument ausschneiden (**Strg + X**) und in die passende Zelle der Tabelle einfügen (**Strg + V**), Schriftgröße **10**"
+          },
+          {
+            "s": "Fließtext in der Tabelle markieren ➔ Absatzmenü öffnen ➔ Abstand „vor“ und „nach“ auf **2** einstellen"
+          },
+          {
+            "b": "Achte darauf, dass beide Spalten **gleich breit** sind: beide Spalten markieren ➔ Rechtsklick ➔ **Spalten gleichmäßig verteilen**"
+          }
+        ]
+      },
+      {
+        "titel": "Absatz „Auf Skiurlaub muss …“ und Regel-Tabelle",
+        "inhalt": [
+          {
+            "img": "ws_tabelle_regeln.png"
+          },
+          {
+            "b": "Satz **vor** der Tabelle („Auf Skiurlaub muss nicht …“): Schriftgröße **11 pt** und **fett**"
+          },
+          {
+            "b": "Inhalt **in** der Tabelle: Größe **10 pt**"
+          },
+          {
+            "b": "Textinhalt **mittig links** ausrichten (Text markieren ➔ {{Tabellenlayout > Ausrichtung > Zentriert links}})"
+          },
+          {
+            "b": "Vergrößere die Tabelle auf die **komplette Breite** der Textbegrenzung. Verteile die Spalten 2 und 3 gleichmäßig (Spalten 2 + 3 markieren ➔ Rechtsklick ➔ **Spalten gleichmäßig verteilen**)"
+          }
+        ]
+      },
+      {
+        "titel": "Bild am Ende einfügen",
+        "inhalt": [
+          {
+            "b": "Lasse nach der Tabelle **eine Zeile frei**"
+          },
+          {
+            "b": "Suche dir selbst ein passendes Bild, das thematisch zum Zeitungsartikel passt (z. B. per Google)."
+          },
+          {
+            "b": "Füge es nach der leeren Zeile ein und bearbeite es so, dass die Breite **17 cm** und die Höhe **3 cm** beträgt."
+          }
+        ]
+      },
+      {
+        "titel": "Fußnote",
+        "inhalt": [
+          {
+            "b": "Füge eine passende Fußnote hinter „… Knieverletzungen“ ein ({{Referenzen > Fußnote einfügen}}). Das Symbol darfst du frei und passend wählen."
+          },
+          {
+            "b": "Fußnotentext: **„Besonders häufig reißt das Kreuzband oder die Patellasehne.“**"
+          }
+        ]
+      },
+      {
+        "titel": "Kontrolle",
+        "inhalt": [
+          {
+            "b": "Vergleiche dein Ergebnis mit der Musterlösung (ganz unten auf dieser Seite). Lösche überflüssige Leerzeilen und Elemente aus dem Dokument!"
+          },
+          {
+            "b": "Prüfe kritisch, ob das Design in sich stimmig aussieht. Der Artikel muss auf **eine Seite** passen."
+          }
+        ]
+      },
+      {
+        "titel": "Speichern",
+        "inhalt": [
+          {
+            "b": "Speichere den Zeitungsartikel unter deinem Nachnamen als **Word-** und als **PDF-Dokument** ab."
+          }
+        ]
+      }
+    ]
+  },
+  {
     "slug": "bericht",
     "kurz": "Bericht für die Schülerzeitung",
     "level": "Schwer",
