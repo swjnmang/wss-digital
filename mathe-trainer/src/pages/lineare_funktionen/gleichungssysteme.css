@@ -1,0 +1,18 @@
+/* Lösungsweg der LGS-Übungen wie im Heft: links die Erklärung, rechts die Gleichungen mit I, II, III …,
+   Umformung rechts daneben und Strich unter jedem Gleichungspaar */
+.lgs-weg { display: flex; flex-direction: column; border: 1.5px solid var(--line-strong, #cfd6df); border-radius: 12px; overflow: hidden; background: var(--surface, #fff); }
+.lgs-schritt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 4px 20px; padding: 12px 16px; text-align: left; }
+.lgs-schritt + .lgs-schritt { border-top: 1.5px solid var(--line-strong, #cfd6df); }
+.lgs-text { margin: 0; color: var(--ink); line-height: 1.5; }
+.lgs-zeilen { display: grid; grid-template-columns: auto auto auto 1fr; column-gap: 0; row-gap: 4px; align-content: start; align-items: baseline;
+  font-family: var(--font-display, inherit); font-weight: 700; font-size: 1.05rem; color: var(--ink); }
+.lgs-label { white-space: nowrap; padding-right: 10px; }
+.lgs-eq { white-space: nowrap; }
+.lgs-op { white-space: nowrap; padding-left: 14px; color: var(--primary, #6b3fa0); }
+.lgs-note { padding-left: 14px; font-weight: 500; font-size: 0.9rem; color: var(--ink-muted, #5b6573); }
+.lgs-strich { border-bottom: 2px solid var(--ink); padding-bottom: 2px; }
+@media (max-width: 760px) {
+  .lgs-schritt { grid-template-columns: minmax(0, 1fr); }
+  .lgs-zeilen { overflow-x: auto; }
+}
+.lgs-zeile { display: contents; }

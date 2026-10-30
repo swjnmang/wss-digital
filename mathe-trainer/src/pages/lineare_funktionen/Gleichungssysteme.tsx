@@ -4,11 +4,23 @@ import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { Link, useSearchParams } from 'react-router-dom';
 import TaskShell from '../../components/layout/TaskShell'
 import { fieldCheckClass } from '../../utils/fieldCheck';
+import './gleichungssysteme.css';
 
 type Method = 'einsetzen' | 'gleichsetzen' | 'addieren';
 
+/** Eine Zeile im LGS-Block: Name der Gleichung (I, II, III …), Gleichung, Umformung (z. B. „| :2“), Hinweis, Strich darunter */
+interface Zeile {
+    label?: string;
+    eq: string;
+    op?: string;
+    note?: string;
+    strich?: boolean;
+}
+
+/** Ein Schritt des Lösungswegs: Erklärung links, Gleichungen rechts (wie im Heft) */
 interface SolutionStep {
     text: string;
+    zeilen: Zeile[];
 }
 
 interface Task {
@@ -31,6 +43,9 @@ const nonZeroXY = () => {
     return v;
 };
 
+/** Zahl mit echtem Minuszeichen */
+const num = (n: number): string => (n < 0 ? `−${Math.abs(n)}` : `${n}`);
+
 // Formatiert einen Term "coef * varName" mit korrektem Vorzeichen; isFirst = ohne führendes Vorzeichenleerzeichen
 const term = (coef: number, varName: string, isFirst: boolean): string => {
     const abs = Math.abs(coef);
@@ -40,22 +55,62 @@ const term = (coef: number, varName: string, isFirst: boolean): string => {
 };
 
 const eqString = (a: number, b: number, c: number, varX = 'x', varY = 'y'): string =>
-    `${term(a, varX, true)}${term(b, varY, false)} = ${c}`;
+    `${term(a, varX, true)}${term(b, varY, false)} = ${num(c)}`;
 
-const slopeForm = (m: number, t: number): string =>
-    `y = ${term(m, 'x', true)}${t === 0 ? '' : t > 0 ? ` + ${t}` : ` − ${Math.abs(t)}`}`;
+// Zeigt "+ t" bzw. "− t" als angehängten Summanden
+const plusTerm = (t: number): string => (t === 0 ? '' : t > 0 ? ` + ${t}` : ` − ${Math.abs(t)}`);
+
+const mxt = (m: number, t: number): string => `${term(m, 'x', true)}${plusTerm(t)}`;
+const slopeForm = (m: number, t: number): string => `y = ${mxt(m, t)}`;
 
 const signedNum = (n: number): string => (n < 0 ? `(−${Math.abs(n)})` : `${n}`);
 
 // Stellt "coef * value" korrekt dar, z. B. für die Substitution eines Zahlenwerts in einen Term
 const mulTerm = (coef: number, value: number): string => {
-    if (coef === 1) return `${value < 0 ? `(${value})` : value}`;
-    if (coef === -1) return `−(${value})`;
-    return `${coef < 0 ? `−${Math.abs(coef)}` : coef} · (${value})`;
+    const v = value < 0 ? `(${num(value)})` : `${value}`;
+    if (coef === 1) return v;
+    if (coef === -1) return `−${value < 0 ? v : `(${value})`}`;
+    return `${num(coef)} · ${v}`;
 };
 
-// Zeigt "y = m·x + t" als angehängten Term nach einem bereits eingesetzten x-Wert
-const plusTerm = (t: number): string => (t === 0 ? '' : t > 0 ? ` + ${t}` : ` − ${Math.abs(t)}`);
+/** Umformung, die den Summanden k (mit Variable v) von der linken Seite entfernt, z. B. „| − 4“ oder „| + 2x“ */
+const opWeg = (k: number, v = ''): string => `| ${k > 0 ? '−' : '+'} ${Math.abs(k) === 1 && v ? '' : Math.abs(k)}${v}`;
+/** Umformung, damit vor der Variablen 1 steht */
+const opDurch = (k: number): string | undefined => (k === 1 ? undefined : k === -1 ? '| · (−1)' : `| : ${signedNum(k)}`);
+
+/** Löst „coef·v + konst = rhs“ Zeile für Zeile nach v auf (erste Zeile ist die Gleichung selbst) */
+const loese = (coef: number, konst: number, rhs: number, v: string, wert: number, label?: string, note?: string): Zeile[] => {
+    const zeilen: Zeile[] = [];
+    if (konst !== 0) zeilen.push({ label, note, eq: `${term(coef, v, true)}${plusTerm(konst)} = ${num(rhs)}`, op: opWeg(konst) });
+    if (coef !== 1) zeilen.push({ label: zeilen.length ? undefined : label, note: zeilen.length ? undefined : note, eq: `${term(coef, v, true)} = ${num(rhs - konst)}`, op: opDurch(coef) });
+    zeilen.push({ label: zeilen.length ? undefined : label, note: zeilen.length ? undefined : note, eq: `${v} = ${num(wert)}` });
+    zeilen[zeilen.length - 1].eq = `⇒ ${zeilen[zeilen.length - 1].eq}`;
+    return zeilen;
+};
+
+/** x-Wert in „a·x + b·y = c“ einsetzen und nach y auflösen */
+const xEinsetzen = (a: number, b: number, c: number, x: number, y: number, label: string): Zeile[] => {
+    const zeilen: Zeile[] = [{ label, eq: `${mulTerm(a, x)}${term(b, 'y', false)} = ${num(c)}` }];
+    if (a * x !== 0) zeilen.push({ eq: `${num(a * x)}${term(b, 'y', false)} = ${num(c)}`, op: opWeg(a * x) });
+    return [...zeilen, ...loese(b, 0, c - a * x, 'y', y)];
+};
+
+/** „a·x + b·y = c“ nach y auflösen (b = ±1) */
+const nachYAufloesen = (a: number, b: number, c: number, label: string): Zeile[] => {
+    const zeilen: Zeile[] = [{ label, eq: eqString(a, b, c), op: opWeg(a, 'x') }];
+    if (b === -1) zeilen.push({ eq: `−y = ${mxt(-a, c)}`, op: opDurch(-1) });
+    zeilen.push({ eq: `⇒ ${slopeForm(-a * b, c * b)}` });
+    return zeilen;
+};
+
+/** Gleichungssystem untereinander, Strich nach der zweiten Gleichung */
+const untereinander = (eqI: string, eqII: string): SolutionStep => ({
+    text: 'Schreibe die beiden Gleichungen exakt untereinander und ziehe darunter einen Strich.',
+    zeilen: [
+        { label: 'I:', eq: eqI },
+        { label: 'II:', eq: eqII, strich: true },
+    ],
+});
 
 // --- Einsetzungsverfahren ---
 
@@ -80,11 +135,19 @@ const buildEinsetzenEasy = (): Task => {
     const rhs = c2 - b2 * t1;
 
     const steps: SolutionStep[] = [
-        { text: `Gleichung I ist bereits nach y aufgelöst: ${slopeForm(m1, t1)}` },
-        { text: `Setze Gleichung I in Gleichung II ein: ${term(a2, 'x', true)} + ${signedNum(b2)} · (${slopeForm(m1, t1).replace('y = ', '')}) = ${c2}` },
-        { text: `Klammer auflösen und zusammenfassen: ${term(xCoeff, 'x', true)} = ${rhs}` },
-        { text: `Nach x auflösen: x = ${rhs} : ${xCoeff} = ${x0}` },
-        { text: `x in Gleichung I einsetzen: y = ${mulTerm(m1, x0)}${plusTerm(t1)} = ${y0}` }
+        untereinander(slopeForm(m1, t1), eqString(a2, b2, c2)),
+        {
+            text: 'Gleichung I ist schon nach y aufgelöst. Setze den Term für y aus I in Gleichung II ein (Klammer nicht vergessen), löse die Klammer auf, fasse zusammen und löse nach x auf.',
+            zeilen: [
+                { label: 'I in II:', eq: `${term(a2, 'x', true)} + ${signedNum(b2)} · (${mxt(m1, t1)}) = ${num(c2)}` },
+                { eq: `${term(a2, 'x', true)}${term(b2 * m1, 'x', false)}${plusTerm(b2 * t1)} = ${num(c2)}` },
+                ...loese(xCoeff, b2 * t1, c2, 'x', x0),
+            ],
+        },
+        {
+            text: `Setze x = ${num(x0)} in Gleichung I ein und berechne y.`,
+            zeilen: [{ label: 'x in I:', eq: `y = ${mulTerm(m1, x0)}${plusTerm(t1)}` }, { eq: `⇒ y = ${num(y0)}` }],
+        },
     ];
 
     return {
@@ -132,11 +195,23 @@ const buildEinsetzenHard = (): Task => {
         : [`I:   ${eqString(aB, bB, cB)}`, `II:  ${eqString(aA, bA, cA)}`];
 
     const steps: SolutionStep[] = [
-        { text: `Gleichung ${labelA} ist noch nicht nach einer Variablen aufgelöst. Löse sie zunächst nach y auf: ${eqString(aA, bA, cA)}  ⇒  ${slopeForm(m1, t1)}` },
-        { text: `Setze das Ergebnis in Gleichung ${labelB} ein: ${term(aB, 'x', true)} + ${signedNum(bB)} · (${slopeForm(m1, t1).replace('y = ', '')}) = ${cB}` },
-        { text: `Klammer auflösen und zusammenfassen: ${term(xCoeff, 'x', true)} = ${rhs}` },
-        { text: `Nach x auflösen: x = ${rhs} : ${xCoeff} = ${x0}` },
-        { text: `x in Gleichung ${labelA} einsetzen: y = ${mulTerm(m1, x0)}${plusTerm(t1)} = ${y0}` }
+        untereinander(systemLines[0].replace(/^I:\s*/, ''), systemLines[1].replace(/^II:\s*/, '')),
+        {
+            text: `Gleichung ${labelA} ist noch nicht nach einer Variablen aufgelöst. Löse sie zuerst nach y auf.`,
+            zeilen: nachYAufloesen(aA, bA, cA, `${labelA}:`),
+        },
+        {
+            text: `Setze den Term für y in Gleichung ${labelB} ein (Klammer nicht vergessen), löse die Klammer auf, fasse zusammen und löse nach x auf.`,
+            zeilen: [
+                { label: `${labelA} in ${labelB}:`, eq: `${term(aB, 'x', true)} + ${signedNum(bB)} · (${mxt(m1, t1)}) = ${num(cB)}` },
+                { eq: `${term(aB, 'x', true)}${term(bB * m1, 'x', false)}${plusTerm(bB * t1)} = ${num(cB)}` },
+                ...loese(xCoeff, bB * t1, cB, 'x', x0),
+            ],
+        },
+        {
+            text: `Setze x = ${num(x0)} in die nach y aufgelöste Gleichung ${labelA} ein und berechne y.`,
+            zeilen: [{ label: `x in ${labelA}:`, eq: `y = ${mulTerm(m1, x0)}${plusTerm(t1)}` }, { eq: `⇒ y = ${num(y0)}` }],
+        },
     ];
 
     return {
@@ -167,11 +242,18 @@ const buildGleichsetzenEasy = (): Task => {
     const rhs = t2 - t1;
 
     const steps: SolutionStep[] = [
-        { text: 'Beide Gleichungen sind nach y aufgelöst. Gleichsetzen der rechten Seiten:' },
-        { text: `${slopeForm(m1, t1).replace('y = ', '')} = ${slopeForm(m2, t2).replace('y = ', '')}` },
-        { text: `x-Terme und Zahlen sortieren: ${term(xCoeff, 'x', true)} = ${rhs}` },
-        { text: `Nach x auflösen: x = ${rhs} : ${xCoeff} = ${x0}` },
-        { text: `x in Gleichung I einsetzen: y = ${mulTerm(m1, x0)}${plusTerm(t1)} = ${y0}` }
+        untereinander(slopeForm(m1, t1), slopeForm(m2, t2)),
+        {
+            text: 'Beide Gleichungen sind nach y aufgelöst. Setze die rechten Seiten gleich, bringe alle x auf die linke Seite und löse nach x auf.',
+            zeilen: [
+                { label: 'I = II:', eq: `${mxt(m1, t1)} = ${mxt(m2, t2)}`, op: opWeg(m2, 'x') },
+                ...loese(xCoeff, t1, t2, 'x', x0),
+            ],
+        },
+        {
+            text: `Setze x = ${num(x0)} in Gleichung I ein und berechne y.`,
+            zeilen: [{ label: 'x in I:', eq: `y = ${mulTerm(m1, x0)}${plusTerm(t1)}` }, { eq: `⇒ y = ${num(y0)}` }],
+        },
     ];
 
     return {
@@ -215,13 +297,22 @@ const buildGleichsetzenHard = (): Task => {
     const rhs = tC - tA;
 
     const steps: SolutionStep[] = [
-        { text: 'Beide Gleichungen sind noch nicht nach einer Variablen aufgelöst. Löse zunächst beide nach y auf:' },
-        { text: `I:  ${eqString(aA, bA, cA)}  ⇒  ${slopeForm(mA, tA)}` },
-        { text: `II: ${eqString(aC, bC, cC)}  ⇒  ${slopeForm(mC, tC)}` },
-        { text: `Gleichsetzen der rechten Seiten: ${slopeForm(mA, tA).replace('y = ', '')} = ${slopeForm(mC, tC).replace('y = ', '')}` },
-        { text: `x-Terme und Zahlen sortieren: ${term(xCoeff, 'x', true)} = ${rhs}` },
-        { text: `Nach x auflösen: x = ${rhs} : ${xCoeff} = ${x0}` },
-        { text: `x in Gleichung I einsetzen: y = ${mulTerm(mA, x0)}${plusTerm(tA)} = ${y0}` }
+        untereinander(eqString(aA, bA, cA), eqString(aC, bC, cC)),
+        {
+            text: 'Beide Gleichungen sind noch nicht nach y aufgelöst. Löse zuerst beide nach y auf.',
+            zeilen: [...nachYAufloesen(aA, bA, cA, 'I:'), ...nachYAufloesen(aC, bC, cC, 'II:')],
+        },
+        {
+            text: 'Setze die rechten Seiten gleich, bringe alle x auf die linke Seite und löse nach x auf.',
+            zeilen: [
+                { label: 'I = II:', eq: `${mxt(mA, tA)} = ${mxt(mC, tC)}`, op: opWeg(mC, 'x') },
+                ...loese(xCoeff, tA, tC, 'x', x0),
+            ],
+        },
+        {
+            text: `Setze x = ${num(x0)} in die nach y aufgelöste Gleichung I ein und berechne y.`,
+            zeilen: [{ label: 'x in I:', eq: `y = ${mulTerm(mA, x0)}${plusTerm(tA)}` }, { eq: `⇒ y = ${num(y0)}` }],
+        },
     ];
 
     return {
@@ -261,10 +352,23 @@ const buildAddierenEasy = (): Task => {
     const y = (c1 - a1 * x0) / b1;
 
     const steps: SolutionStep[] = [
-        { text: 'Die y-Koeffizienten sind bereits Gegenzahlen (b₁ = −b₂) – du kannst die Gleichungen direkt addieren:' },
-        { text: `I + II: ${term(xCoeff, 'x', true)} = ${rhs}` },
-        { text: `Nach x auflösen: x = ${rhs} : ${xCoeff} = ${x0}` },
-        { text: `x in Gleichung I einsetzen: ${mulTerm(a1, x0)}${term(b1, 'y', false)} = ${c1} → y = ${y}` }
+        untereinander(eqString(a1, b1, c1), eqString(a2, b2, c2)),
+        {
+            text: `Vor y stehen schon Gegenzahlen (${num(b1)} und ${num(b2)}). Addiere die beiden Gleichungen Seite für Seite (I + II), dann fällt y weg. So entsteht Gleichung III.`,
+            zeilen: [
+                { label: 'I:', eq: eqString(a1, b1, c1) },
+                { label: 'II:', eq: eqString(a2, b2, c2), strich: true },
+                { label: 'III:', eq: `${term(xCoeff, 'x', true)} = ${num(rhs)}`, note: '(I + II)' },
+            ],
+        },
+        {
+            text: 'Löse Gleichung III wie gewohnt mit Äquivalenzumformungen nach x auf.',
+            zeilen: loese(xCoeff, 0, rhs, 'x', x0, 'III:'),
+        },
+        {
+            text: `Setze x = ${num(x0)} in Gleichung I ein und löse nach y auf.`,
+            zeilen: xEinsetzen(a1, b1, c1, x0, y, 'x in I:'),
+        },
     ];
 
     return {
@@ -279,8 +383,8 @@ const buildAddierenEasy = (): Task => {
     };
 };
 
-// Schwer: Allgemeiner Fall – beide Gleichungen müssen mit unterschiedlichen Faktoren multipliziert
-// werden, damit sich beim Addieren eine Variable aufhebt.
+// Schwer: Allgemeiner Fall – eine oder beide Gleichungen müssen erst multipliziert werden, damit vor y dieselbe Zahl steht;
+// danach wird subtrahiert (gleiches Vorzeichen) oder addiert (Gegenzahlen).
 const buildAddierenHard = (): Task => {
     const x0 = nonZeroXY();
     const y0 = nonZeroXY();
@@ -299,22 +403,63 @@ const buildAddierenHard = (): Task => {
     const c1 = a1 * x0 + b1 * y0;
     const c2 = a2 * x0 + b2 * y0;
 
-    const mult1 = b2;
-    const mult2 = -b1;
-    const xCoeff = a1 * mult1 + a2 * mult2;
-    const rhs = c1 * mult1 + c2 * mult2;
+    // Kleinste positive Faktoren, damit vor y dieselbe Zahl steht (bis aufs Vorzeichen):
+    // gleiches Vorzeichen → subtrahieren, Gegenzahlen → addieren
+    const ggt = (p: number, q: number): number => (q === 0 ? p : ggt(q, p % q));
+    const g = ggt(Math.abs(b1), Math.abs(b2));
+    const mult1 = Math.abs(b2) / g;
+    const mult2 = Math.abs(b1) / g;
+    const B1 = b1 * mult1;
+    const B2 = b2 * mult2;
+    const minus = B1 === B2;
+    const xCoeff = minus ? a1 * mult1 - a2 * mult2 : a1 * mult1 + a2 * mult2;
+    const rhs = minus ? c1 * mult1 - c2 * mult2 : c1 * mult1 + c2 * mult2;
     const x = rhs / xCoeff;
     const y = (c1 - a1 * x) / b1;
 
+    // Mit Faktor 1 bleibt eine Gleichung, wie sie ist; sonst entsteht eine neue Gleichung (III, IV …)
+    const neu: Zeile[] = [];
+    let nr = 3;
+    const roemisch = ['', 'I', 'II', 'III', 'IV', 'V'];
+    const gleichung = (alt: string, f: number, a: number, b: number, c: number) => {
+        if (f === 1) return { label: `${alt}:`, eq: eqString(a, b, c) };
+        return { label: `${roemisch[nr++]}:`, eq: eqString(a * f, b * f, c * f), note: `(${alt} · ${f})` };
+    };
+    neu.push(gleichung('I', mult1, a1, b1, c1));
+    neu.push({ ...gleichung('II', mult2, a2, b2, c2), strich: true });
+    const summe = `${roemisch[nr]}:`;
+    const nameA = neu[0].label?.replace(':', '');
+    const nameB = neu[1].label?.replace(':', '');
+    const multText = [mult1 === 1 ? '' : `Gleichung I mit ${mult1}`, mult2 === 1 ? '' : `Gleichung II mit ${mult2}`].filter(Boolean).join(' und ');
+
     const steps: SolutionStep[] = [
+        untereinander(eqString(a1, b1, c1), eqString(a2, b2, c2)),
+        ...(mult1 === 1 && mult2 === 1
+            ? []
+            : [
+                  {
+                      text: `Ziel ist es, vor einer der beiden Variablen (hier: y) dieselbe Zahl zu erhalten. Multipliziere dazu ${multText}, jeweils beide Seiten.`,
+                      zeilen: [
+                          { label: 'I:', eq: eqString(a1, b1, c1), op: mult1 === 1 ? undefined : `| · ${mult1}` },
+                          { label: 'II:', eq: eqString(a2, b2, c2), op: mult2 === 1 ? undefined : `| · ${mult2}`, strich: true },
+                          ...neu,
+                      ],
+                  },
+              ]),
         {
-            text: `Damit sich die y-Terme beim Addieren aufheben, wird Gleichung I mit ${signedNum(mult1)} und Gleichung II mit ${signedNum(mult2)} multipliziert:`
+            text: minus
+                ? `Vor y steht jetzt dieselbe Zahl (${num(B1)}) mit demselben Vorzeichen. Subtrahiere die Gleichungen Seite für Seite (${nameA} − ${nameB}), dann fällt y weg.`
+                : `Vor y stehen jetzt Gegenzahlen (${num(B1)} und ${num(B2)}). Addiere die Gleichungen Seite für Seite (${nameA} + ${nameB}), dann fällt y weg.`,
+            zeilen: [...neu, { label: summe, eq: `${term(xCoeff, 'x', true)} = ${num(rhs)}`, note: `(${nameA} ${minus ? '−' : '+'} ${nameB})` }],
         },
-        { text: `I':  ${eqString(a1 * mult1, b1 * mult1, c1 * mult1)}` },
-        { text: `II': ${eqString(a2 * mult2, b2 * mult2, c2 * mult2)}` },
-        { text: `Addition von I' und II': ${term(xCoeff, 'x', true)} = ${rhs}` },
-        { text: `Nach x auflösen: x = ${rhs} : ${xCoeff} = ${x}` },
-        { text: `x in Gleichung I einsetzen: ${mulTerm(a1, x)}${term(b1, 'y', false)} = ${c1} → y = ${y}` }
+        {
+            text: `Löse Gleichung ${summe.replace(':', '')} wie gewohnt mit Äquivalenzumformungen nach x auf.`,
+            zeilen: loese(xCoeff, 0, rhs, 'x', x, summe),
+        },
+        {
+            text: `Setze x = ${num(x)} in Gleichung I ein und löse nach y auf.`,
+            zeilen: xEinsetzen(a1, b1, c1, x, y, 'x in I:'),
+        },
     ];
 
     return {
@@ -505,13 +650,27 @@ const Gleichungssysteme: React.FC = () => {
                             {showSolution && (
                                 <div className="bk-solution space-y-3">
                                     <h3 className="bk-solution-title">Lösungsweg</h3>
-                                    <ul className="list-decimal pl-5 text-ink space-y-2">
+                                    <div className="lgs-weg">
                                         {task.steps.map((step, index) => (
-                                            <li key={`lgs-step-${index}`}>{step.text}</li>
+                                            <div key={`lgs-step-${index}`} className="lgs-schritt">
+                                                <p className="lgs-text">
+                                                    <strong>{index + 1}.</strong> {step.text}
+                                                </p>
+                                                <div className="lgs-zeilen">
+                                                    {step.zeilen.map((z, i) => (
+                                                        <div key={i} className="lgs-zeile">
+                                                            <span className={`lgs-label${z.strich ? ' lgs-strich' : ''}`}>{z.label}</span>
+                                                            <span className={`lgs-eq${z.strich ? ' lgs-strich' : ''}`}>{z.eq}</span>
+                                                            <span className="lgs-op">{z.op}</span>
+                                                            <span className="lgs-note">{z.note}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         ))}
-                                    </ul>
+                                    </div>
                                     <div className="bk-answer">
-                                        Ergebnis: {task.xLabel} = {task.x}, {task.yLabel} = {task.y}
+                                        Ergebnis: {task.xLabel} = {num(task.x)}, {task.yLabel} = {num(task.y)}
                                     </div>
                                 </div>
                             )}
