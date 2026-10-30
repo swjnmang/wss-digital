@@ -141,7 +141,7 @@ Alles auf einer Seite, **immer in dieser Reihenfolge** von oben nach unten:
 
 Vorlage: `finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Seite „Der Kontostand für den Vereinsbus“).
 
-Sind mehrere Teilprobleme nötig (z. B. erst K, dann p, dann t), folgen sie auf derselben Seite nacheinander, jedes mit Problem, Beispielrechnung mit Lernvideo, Ergebnis-Abgleich. Zwischenüberschriften mit `Abschnitt`.
+Sind mehrere Teilprobleme nötig (z. B. erst K, dann p, dann t), steht **jedes Teilproblem auf einer eigenen Seite** (mehrere Seiten mit `art: 'loesen'`, Titel „Teil 1: …“, „Teil 2: …“), jede mit Problem (`sl-fokus`), Beispielrechnung mit Lernvideo und Ergebnis-Abgleich. Zu Teil 2 kommt man erst, wenn Teil 1 richtig gelöst ist (`pflicht` je Seite, `bedingung` z. B. „Berechne das Lösungspaar von Teil 1 richtig, dann geht es zu Teil 2.“). Handlungsprodukt, Rückbezug und Merke stehen auf der Seite des letzten Teils. Der Knopf am Seitenende heißt dann automatisch „Weiter zu Teil 2: …“. Vorlage: `quadratische_funktionen/funktionsgleichung_einstieg/LaborEinstieg.tsx`.
 
 ## Seitenansicht (Pflicht)
 
