@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styles from './Funktionsgleichung.module.css'
-import GeoGebraGraph from '../../components/GeoGebraGraph'
+import KlickGraph from '../../components/KlickGraph'
+import type { Pt } from '../../components/CoordSystem'
 import { checkLinearEquation, parseLinearEquation, texLinearEquation } from '../../utils/parseLinearEquation'
 import { fieldCheckClass } from '../../utils/fieldCheck'
 import GleichungEingabe from '../../components/GleichungEingabe'
@@ -55,6 +56,9 @@ export default function Funktionsgleichung(){
   const [feedback, setFeedback] = useState('')
   const [showSolution, setShowSolution] = useState(false)
   const [punkte, setPunkte] = useState(0)
+  // Vom Schüler im Graphen angeklickte Punkte (höchstens zwei) und Hinweis bei einem Fehlklick
+  const [gewaehlt, setGewaehlt] = useState<Pt[]>([])
+  const [klickHinweis, setKlickHinweis] = useState('')
 
   // MathJax laden
   useEffect(() => {
@@ -89,6 +93,8 @@ export default function Funktionsgleichung(){
     setEingabeStatus(null)
     setFeedback('')
     setShowSolution(false)
+    setGewaehlt([])
+    setKlickHinweis('')
   }
 
   function genPointSlope() {
@@ -104,6 +110,8 @@ export default function Funktionsgleichung(){
     setEingabeStatus(null)
     setFeedback('')
     setShowSolution(false)
+    setGewaehlt([])
+    setKlickHinweis('')
   }
 
   function genReadGraph() {
@@ -128,6 +136,21 @@ export default function Funktionsgleichung(){
     setEingabeStatus(null)
     setFeedback('')
     setShowSolution(false)
+    setGewaehlt([])
+    setKlickHinweis('')
+  }
+
+  function pickPunkt(p: Pt | null) {
+    if (!p) {
+      setKlickHinweis('Dort liegt kein Punkt des Graphen. Klicke genau auf die Gerade, am besten dort, wo sie durch ein Gitterkreuz läuft.')
+      return
+    }
+    setKlickHinweis('')
+    setGewaehlt((alt) => {
+      if (alt.some((q) => q.x === p.x && q.y === p.y)) return alt.filter((q) => q.x !== p.x || q.y !== p.y)
+      return alt.length < 2 ? [...alt, p] : [alt[1], p]
+    })
+    tracking.onInput()
   }
 
   function check() {
@@ -156,6 +179,10 @@ export default function Funktionsgleichung(){
     setShowSolution(true)
     tracking.onHintShown()
   }
+
+  const gelesen = mode === 'readGraph' && gewaehlt.length === 2
+  const s1 = gelesen ? gewaehlt[0] : p1
+  const s2 = gelesen ? gewaehlt[1] : p2
 
   const ueben = (art: 'twoPoints' | 'readGraph') => {
     if (art === 'twoPoints') genTwoPoints()
@@ -210,7 +237,7 @@ export default function Funktionsgleichung(){
                 >
                   <p className="text-lg font-bold mb-1 text-white">Graph ablesen</p>
                   <p className="text-xl font-serif italic mb-2 text-white">y = ?</p>
-                  <p className="text-sm text-white/90">Ein Graph ist gegeben. Du liest zwei Punkte ab und tippst die ganze Gleichung ein.</p>
+                  <p className="text-sm text-white/90">Klicke zwei Punkte auf dem Graphen an und bestimme rechnerisch die Gleichung.</p>
                 </button>
               </div>
             </div>
@@ -221,7 +248,7 @@ export default function Funktionsgleichung(){
   }
 
   return (
-    <TaskShell title="Funktionsgleichung aufstellen" width="narrow" actions={<div className={styles.pointsCounter} aria-label={`${punkte} Punkte`}><i className="fa-solid fa-star" aria-hidden="true" /><span className={styles.pointsText}>{punkte}</span></div>}>
+    <TaskShell title="Funktionsgleichung aufstellen" width="wide" actions={<div className={styles.pointsCounter} aria-label={`${punkte} Punkte`}><i className="fa-solid fa-star" aria-hidden="true" /><span className={styles.pointsText}>{punkte}</span></div>}>
       <div className={styles.card}>
 
         <div className={styles.controls}>
@@ -229,6 +256,8 @@ export default function Funktionsgleichung(){
           <button onClick={genReadGraph} className={styles.btn}>Neue Aufgabe: Graph ablesen</button>
         </div>
 
+        <div className={styles.layout}>
+        <div className={styles.colTask}>
         {/* Task - nur Text, kein Kasten */}
         <div className={styles.taskText}>
           {mode === 'twoPoints' ? (
@@ -236,21 +265,29 @@ export default function Funktionsgleichung(){
           ) : mode === 'pointSlope' ? (
             <p>Gegeben ist der Punkt P({p1.x}|{p1.y}) und die Steigung m (oben). Stelle die Funktionsgleichung auf und tippe sie vollständig ein.<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
           ) : (
-            <p>Betrachte den dargestellten Funktionsgraphen. Wähle dir zwei passende Punkte aus und bestimme die Funktionsgleichung. Tippe sie vollständig ein!<br/><small>(Ergebnisse dürfen auf 2 Dezimalstellen gerundet werden.)</small></p>
+            <p>Lies zwei Punkte aus dem Funktionsgraphen ab und bestimme anschließend rechnerisch die Funktionsgleichung y = mx + t.<br/><small>Klicke dazu zwei Punkte an, die du genau ablesen kannst. Tippe die Gleichung dann vollständig ein.</small></p>
           )}
         </div>
 
-        {/* GeoGebra Graph für readGraph Mode */}
         {mode === 'readGraph' && (
-          <div className={styles.graphContainer}>
-            <GeoGebraGraph 
-              m={mCorrect} 
-              t={tCorrect} 
-              width={600} 
-              height={450}
-            />
-          </div>
+          <>
+            <div className={styles.graphContainer}>
+              <KlickGraph m={mCorrect} t={tCorrect} points={gewaehlt} onPick={pickPunkt} />
+            </div>
+            <p className={styles.punktInfo} aria-live="polite">
+              {klickHinweis ? (
+                <span className={styles.punktFehler}>{klickHinweis}</span>
+              ) : gewaehlt.length === 0 ? (
+                'Klicke zwei Punkte auf dem Graphen an.'
+              ) : (
+                <>Abgelesen: {gewaehlt.map((p, i) => <strong key={i}>P<sub>{i + 1}</sub>({p.x}|{p.y}){i < gewaehlt.length - 1 ? '  ' : ''}</strong>)}{gewaehlt.length < 2 && ' – noch ein Punkt fehlt.'}</>
+              )}
+            </p>
+          </>
         )}
+        </div>
+
+        <div className={styles.colWork}>
 
         {/* Eingabe: die komplette Funktionsgleichung, z. B. y = 2x + 3 */}
         <div className={styles.solutionInputContainer}>
@@ -297,51 +334,32 @@ export default function Funktionsgleichung(){
           <div className={styles.solutionOutput}>
             <h3 className={styles.solutionTitle}>Lösungsweg</h3>
             <div className={styles.solutionStep}>
-              {mode === 'readGraph' ? (
+              {mode === 'readGraph' || mode === 'twoPoints' ? (
                 <>
                   {(() => {
-                    return (
-                      <>
-                        <MathDisplay latex={`$$\\textbf{Lösungsweg: Graph ablesen}$$`} />
-                        <MathDisplay latex={`$$\\textbf{Schritt 1: Zwei Punkte ablesen}$$`} />
-                        <MathDisplay latex={`$$P_1(0|${tCorrect}) \\quad \\textbf{(Y-Achsenabschnitt)}$$`} />
-                        <MathDisplay latex={`$$P_2(1|${tCorrect + mCorrect})$$`} />
-                        
-                        <MathDisplay latex={`$$\\textbf{Schritt 2: Steigung m berechnen}$$`} />
-                        <MathDisplay latex={`$$m = \\dfrac{${tCorrect + mCorrect} - (${tCorrect})}{1 - 0} = \\dfrac{${mCorrect}}{1} = ${mCorrect}$$`} />
-                        
-                        <MathDisplay latex={`$$\\textbf{Schritt 3: Y-Achsenabschnitt ablesen}$$`} />
-                        <MathDisplay latex={`$$t = ${tCorrect}$$`} />
-                      </>
-                    )
-                  })()}
-                </>
-              ) : mode === 'twoPoints' ? (
-                <>
-                  {(() => {
-                    const product = Math.round(mCorrect * p1.x * 100) / 100
+                    const product = Math.round(mCorrect * s1.x * 100) / 100
                     const operation = product < 0 ? '+' : '-'
                     const operand = Math.abs(product)
                     return (
                       <>
                         <MathDisplay latex={`$$\\textbf{Schritt 1: Punkte aufschreiben}$$`} />
-                        <MathDisplay latex={`$$P_1(${p1.x}|${p1.y}) \\quad P_2(${p2.x}|${p2.y})$$`} />
+                        <MathDisplay latex={`$$P_1(${s1.x}|${s1.y}) \\quad P_2(${s2.x}|${s2.y})$$`} />
                         
                         <MathDisplay latex={`$$\\textbf{Schritt 2: Ansatz}$$`} />
                         <MathDisplay latex={`$$y = m \\cdot x + t$$`} />
                         
                         <MathDisplay latex={`$$\\textbf{Schritt 3: Steigung m berechnen}$$`} />
-                        <MathDisplay latex={`$$m = \\dfrac{y_2 - y_1}{x_2 - x_1} = \\dfrac{${p2.y} - (${p1.y})}{${p2.x} - (${p1.x})} = \\dfrac{${p2.y - p1.y}}{${p2.x - p1.x}} = ${mCorrect}$$`} />
+                        <MathDisplay latex={`$$m = \\dfrac{y_2 - y_1}{x_2 - x_1} = \\dfrac{${s2.y} - (${s1.y})}{${s2.x} - (${s1.x})} = \\dfrac{${s2.y - s1.y}}{${s2.x - s1.x}} = ${mCorrect}$$`} />
                         
                         <MathDisplay latex={`$$\\textbf{Schritt 4: m einsetzen}$$`} />
                         <MathDisplay latex={`$$y = ${mCorrect} \\cdot x + t$$`} />
                         
-                        <MathDisplay latex={`$$\\textbf{Schritt 5: Punkt } P_1(${p1.x}|${p1.y}) \\textbf{ einsetzen}$$`} />
-                        <MathDisplay latex={`$$${p1.y} = ${mCorrect} \\cdot ${p1.x} + t$$`} />
+                        <MathDisplay latex={`$$\\textbf{Schritt 5: Punkt } P_1(${s1.x}|${s1.y}) \\textbf{ einsetzen}$$`} />
+                        <MathDisplay latex={`$$${s1.y} = ${mCorrect} \\cdot ${s1.x} + t$$`} />
                         
                         <MathDisplay latex={`$$\\textbf{Schritt 6: Nach t auflösen}$$`} />
-                        <MathDisplay latex={`$$${p1.y} = ${product} + t \\quad | ${operation} ${operand}$$`} />
-                        <MathDisplay latex={`$$t = ${p1.y} ${operation} ${operand} = ${tCorrect}$$`} />
+                        <MathDisplay latex={`$$${s1.y} = ${product} + t \\quad | ${operation} ${operand}$$`} />
+                        <MathDisplay latex={`$$t = ${s1.y} ${operation} ${operand} = ${tCorrect}$$`} />
                       </>
                     )
                   })()}
@@ -380,6 +398,8 @@ export default function Funktionsgleichung(){
             </div>
           </div>
         )}
+        </div>
+        </div>
       </div>
 
     </TaskShell>
