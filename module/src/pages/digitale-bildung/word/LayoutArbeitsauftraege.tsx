@@ -1,6 +1,98 @@
-import { Fragment, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ARBEITSAUFTRAEGE, type Arbeitsauftrag, type AuftragItem } from '../../../lib/word-layout/arbeitsauftraege';
+import { druckblattAlsPdf } from '../../../lib/word-layout/auftrag-pdf';
+import AuftragDruckblatt, { SHEET_PAD } from './AuftragDruckblatt';
+
+const STORE = (slug: string) => `word-layout-auftrag-erledigt-${slug}`;
+
+function loadDone(slug: string): number[] {
+  try {
+    const v = JSON.parse(localStorage.getItem(STORE(slug)) ?? '[]');
+    return Array.isArray(v) ? v.filter((n) => typeof n === 'number') : [];
+  } catch {
+    return [];
+  }
+}
+function saveDone(slug: string, done: number[]) {
+  try {
+    localStorage.setItem(STORE(slug), JSON.stringify(done));
+  } catch {
+    /* Speicher nicht verfügbar – Häkchen gelten dann nur bis zum Neuladen */
+  }
+}
+
+// Erledigt-Häkchen pro Arbeitsschritt, im Browser gespeichert
+function useErledigt(slug: string | undefined) {
+  const [done, setDone] = useState<number[]>([]);
+  useEffect(() => setDone(slug ? loadDone(slug) : []), [slug]);
+  const update = (next: number[]) => {
+    setDone(next);
+    if (slug) saveDone(slug, next);
+  };
+  return {
+    done,
+    toggle: (i: number) => update(done.includes(i) ? done.filter((n) => n !== i) : [...done, i]),
+    reset: () => update([]),
+  };
+}
+
+// Werkzeugleiste oben: Fortschritt, Drucken, PDF
+function Werkzeugleiste({ a, erledigt, onReset }: { a: Arbeitsauftrag; erledigt: number; onReset: () => void }) {
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const total = a.rows.length;
+  const pct = total ? Math.round((erledigt / total) * 100) : 0;
+
+  const pdf = async () => {
+    if (!sheetRef.current || pdfBusy) return;
+    setPdfBusy(true);
+    try {
+      await druckblattAlsPdf(sheetRef.current, SHEET_PAD, `Arbeitsauftrag – ${a.kurz.replace(/[„“"]/g, '')}.pdf`);
+    } finally {
+      setPdfBusy(false);
+    }
+  };
+
+  return (
+    <section className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between text-sm mb-1.5">
+          <span className="font-semibold text-slate-800">
+            {erledigt === total ? '🎉 Alles erledigt!' : `${erledigt} von ${total} Schritten erledigt`}
+          </span>
+          {erledigt > 0 && (
+            <button onClick={onReset} className="text-xs text-slate-500 hover:text-slate-800 underline">
+              Zurücksetzen
+            </button>
+          )}
+        </div>
+        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div className={`h-full transition-all ${erledigt === total ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${pct}%` }} />
+        </div>
+      </div>
+      <div className="flex gap-2 shrink-0">
+        <button
+          onClick={() => window.print()}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 text-white text-sm font-semibold hover:bg-slate-700 transition-colors"
+        >
+          🖨 Drucken
+        </button>
+        <button
+          onClick={pdf}
+          disabled={pdfBusy}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-300 text-slate-800 text-sm font-semibold hover:border-slate-500 transition-colors disabled:opacity-60"
+        >
+          {pdfBusy ? '⏳ PDF wird erstellt …' : '📄 Als PDF speichern'}
+        </button>
+      </div>
+      {/* Unsichtbares Druckblatt als Quelle für den PDF-Export */}
+      <div aria-hidden className="fixed top-0 pointer-events-none" style={{ left: -10000 }}>
+        <AuftragDruckblatt ref={sheetRef} a={a} />
+      </div>
+    </section>
+  );
+}
 
 const BASE = '/word-layout';
 
@@ -120,6 +212,7 @@ function Material({ a }: { a: Arbeitsauftrag }) {
 export default function LayoutArbeitsauftraege() {
   const [params, setParams] = useSearchParams();
   const current = ARBEITSAUFTRAEGE.find((a) => a.slug === params.get('auftrag')) ?? null;
+  const { done, toggle, reset } = useErledigt(current?.slug);
 
   const select = (slug: string | null) => {
     setParams(slug ? { auftrag: slug } : {});
@@ -127,7 +220,15 @@ export default function LayoutArbeitsauftraege() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <>
+    {/* Druckansicht: nur das kompakte Druckblatt (max. 2 A4-Seiten) */}
+    {current && (
+      <div className="hidden print:block">
+        <style>{`@page { size: A4; margin: 12mm; } @media print { .druckblatt { width: auto !important; padding: 0 !important; } body { background: #fff !important; } footer { display: none !important; } }`}</style>
+        <AuftragDruckblatt a={current} />
+      </div>
+    )}
+    <div className="min-h-screen bg-slate-50 flex flex-col print:hidden">
       <header className="bg-gradient-to-br from-slate-800 to-slate-700 text-white pt-12 pb-8 sm:py-8 px-4 text-center relative">
         <Link
           to="/digitale-bildung/word/layout"
@@ -195,26 +296,42 @@ export default function LayoutArbeitsauftraege() {
               <p className="text-sm italic text-slate-600 leading-relaxed">{current.szenario}</p>
             </section>
 
+            <Werkzeugleiste a={current} erledigt={done.length} onReset={reset} />
+
             <Material a={current} />
 
             <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden select-none" onContextMenu={(e) => e.preventDefault()}>
-              {current.rows.map((row, i) => (
-                <div key={i} className="flex border-b border-slate-200 last:border-b-0">
-                  <div className="w-10 sm:w-12 shrink-0 bg-[#1F497D] text-white text-sm font-semibold flex justify-center pt-3">
+              {current.rows.map((row, i) => {
+                const isDone = done.includes(i);
+                return (
+                <div key={i} className={`flex border-b border-slate-200 last:border-b-0 transition-colors ${isDone ? 'bg-emerald-50/60' : ''}`}>
+                  <div className={`w-10 sm:w-12 shrink-0 text-white text-sm font-semibold flex justify-center pt-3 transition-colors ${isDone ? 'bg-emerald-600' : 'bg-[#1F497D]'}`}>
                     {current.start + i}
                   </div>
                   <div className="flex-1 p-3 sm:p-4 flex flex-col gap-1.5 min-w-0">
-                    <h3 className="font-bold text-slate-800">
-                      <Rich text={row.titel} />
-                    </h3>
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className={`font-bold text-slate-800 ${isDone ? 'line-through decoration-emerald-600/60' : ''}`}>
+                        <Rich text={row.titel} />
+                      </h3>
+                      <label className="shrink-0 inline-flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer select-none rounded-md px-2 py-1 hover:bg-slate-100">
+                        <input
+                          type="checkbox"
+                          checked={isDone}
+                          onChange={() => toggle(i)}
+                          className="w-5 h-5 accent-emerald-600 cursor-pointer"
+                        />
+                        erledigt
+                      </label>
+                    </div>
+                    <div className={`flex flex-col gap-1.5 ${isDone ? 'opacity-50' : ''}`}>
                       {row.inhalt.map((item, j) => (
                         <Item key={j} item={item} slug={current.slug} />
                       ))}
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </section>
 
             <div className="flex justify-between gap-3 text-sm">
@@ -235,5 +352,6 @@ export default function LayoutArbeitsauftraege() {
         )}
       </main>
     </div>
+    </>
   );
 }
