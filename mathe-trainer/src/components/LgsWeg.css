@@ -1,4 +1,4 @@
-/* Lösungsweg der LGS-Übungen wie im Heft: links die Erklärung, rechts die Gleichungen mit I, II, III …,
+/* Lösungsweg eines linearen Gleichungssystems wie im Heft (LgsWeg.tsx): links die Erklärung, rechts die Gleichungen mit I, II, III …,
    Umformung rechts daneben und Strich unter jedem Gleichungspaar */
 .lgs-weg { display: flex; flex-direction: column; border: 1.5px solid var(--line-strong, #cfd6df); border-radius: 12px; overflow: hidden; background: var(--surface, #fff); }
 .lgs-schritt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 4px 20px; padding: 12px 16px; text-align: left; }
@@ -16,3 +16,9 @@
   .lgs-zeilen { overflow-x: auto; }
 }
 .lgs-zeile { display: contents; }
+/* Gleichungsblock ohne Erklärung (z. B. in einem Rechenbeispiel) */
+.lgs-block { margin: 6px 0; }
+.lgs-zeilen .katex { font-size: 1.05em; }
+.lgs-text .katex { font-size: 1em; }
+.lgs-schritt .lgs-block { margin: 0; }
+.lgs-schritt-text { grid-template-columns: minmax(0, 1fr); }

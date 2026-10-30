@@ -4,24 +4,12 @@ import { useTaskTracking } from '../../hooks/useTaskTracking'
 import { Link, useSearchParams } from 'react-router-dom';
 import TaskShell from '../../components/layout/TaskShell'
 import { fieldCheckClass } from '../../utils/fieldCheck';
-import './gleichungssysteme.css';
+import { LgsWeg, type LgsSchritt, type LgsZeile } from '../../components/LgsWeg';
 
 type Method = 'einsetzen' | 'gleichsetzen' | 'addieren';
 
-/** Eine Zeile im LGS-Block: Name der Gleichung (I, II, III …), Gleichung, Umformung (z. B. „| :2“), Hinweis, Strich darunter */
-interface Zeile {
-    label?: string;
-    eq: string;
-    op?: string;
-    note?: string;
-    strich?: boolean;
-}
-
-/** Ein Schritt des Lösungswegs: Erklärung links, Gleichungen rechts (wie im Heft) */
-interface SolutionStep {
-    text: string;
-    zeilen: Zeile[];
-}
+type Zeile = LgsZeile;
+type SolutionStep = LgsSchritt;
 
 interface Task {
     method: Method;
@@ -650,25 +638,7 @@ const Gleichungssysteme: React.FC = () => {
                             {showSolution && (
                                 <div className="bk-solution space-y-3">
                                     <h3 className="bk-solution-title">Lösungsweg</h3>
-                                    <div className="lgs-weg">
-                                        {task.steps.map((step, index) => (
-                                            <div key={`lgs-step-${index}`} className="lgs-schritt">
-                                                <p className="lgs-text">
-                                                    <strong>{index + 1}.</strong> {step.text}
-                                                </p>
-                                                <div className="lgs-zeilen">
-                                                    {step.zeilen.map((z, i) => (
-                                                        <div key={i} className="lgs-zeile">
-                                                            <span className={`lgs-label${z.strich ? ' lgs-strich' : ''}`}>{z.label}</span>
-                                                            <span className={`lgs-eq${z.strich ? ' lgs-strich' : ''}`}>{z.eq}</span>
-                                                            <span className="lgs-op">{z.op}</span>
-                                                            <span className="lgs-note">{z.note}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <LgsWeg schritte={task.steps} />
                                     <div className="bk-answer">
                                         Ergebnis: {task.xLabel} = {num(task.x)}, {task.yLabel} = {num(task.y)}
                                     </div>

@@ -14,6 +14,7 @@ import {
 } from '../../lineare_funktionen/lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../../lineare_funktionen/lernsituation_kit/punkte'
 import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import { LgsBlock, LgsWeg } from '../../../components/LgsWeg'
 import BallonLabor from './BallonLabor'
 import { glTex, type Gl } from './gleichungen'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
@@ -488,13 +489,28 @@ const BSP1_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     body: (
       <>
         <p>Rechne Seite für Seite: links minus links, rechts minus rechts.</p>
-        <MB>{'\\begin{aligned} \\text{I: } 5x + 3y &= 21 \\\\ \\text{II: } 2x + 3y &= 12 \\\\ \\hline \\text{I} - \\text{II: } 3x + 0y &= 9 \\end{aligned}'}</MB>
+        <LgsBlock
+          tex
+          zeilen={[
+            { label: 'I:', eq: '5x + 3y = 21' },
+            { label: 'II:', eq: '2x + 3y = 12', strich: true },
+            { label: 'III:', eq: '3x = 9', note: '(I − II)' },
+          ]}
+        />
       </>
     ),
   },
   {
     title: <>Nach <M>x</M> auflösen</>,
-    body: <MB>{'\\begin{aligned} 3x &= 9 && \\mid :3 \\\\ x &= 3 \\end{aligned}'}</MB>,
+    body: (
+      <LgsBlock
+        tex
+        zeilen={[
+          { label: 'III:', eq: '3x = 9', op: '\\mid :3' },
+          { eq: '\\Rightarrow x = 3' },
+        ]}
+      />
+    ),
   },
   {
     title: <>
@@ -503,7 +519,15 @@ const BSP1_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     body: (
       <>
         <p>Nimm die einfachere Gleichung, hier II:</p>
-        <MB>{'\\begin{aligned} 2 \\cdot 3 + 3y &= 12 \\\\ 6 + 3y &= 12 && \\mid -6 \\\\ 3y &= 6 && \\mid :3 \\\\ y &= 2 \\end{aligned}'}</MB>
+        <LgsBlock
+          tex
+          zeilen={[
+            { label: 'x in II:', eq: '2 \\cdot 3 + 3y = 12' },
+            { eq: '6 + 3y = 12', op: '\\mid -6' },
+            { eq: '3y = 6', op: '\\mid :3' },
+            { eq: '\\Rightarrow y = 2' },
+          ]}
+        />
       </>
     ),
   },
@@ -530,13 +554,31 @@ const BSP2_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
         <p>
           Vor <M>y</M> stehen <M>{'2'}</M> und <M>{'-2'}</M>, also Gegenzahlen. Beim Addieren wird <M>{'2y + (-2y) = 0'}</M>:
         </p>
-        <MB>{'\\begin{aligned} \\text{I: } x + 2y &= 8 \\\\ \\text{II: } 3x - 2y &= 0 \\\\ \\hline \\text{I} + \\text{II: } 4x + 0y &= 8 \\end{aligned}'}</MB>
+        <LgsBlock
+          tex
+          zeilen={[
+            { label: 'I:', eq: 'x + 2y = 8' },
+            { label: 'II:', eq: '3x - 2y = 0', strich: true },
+            { label: 'III:', eq: '4x = 8', note: '(I + II)' },
+          ]}
+        />
       </>
     ),
   },
   {
     title: <>Nach <M>x</M> auflösen und einsetzen</>,
-    body: <MB>{'\\begin{aligned} 4x &= 8 && \\mid :4 \\\\ x &= 2 \\\\ \\text{in I: } 2 + 2y &= 8 && \\mid -2 \\\\ 2y &= 6 && \\mid :2 \\\\ y &= 3 \\end{aligned}'}</MB>,
+    body: (
+      <LgsBlock
+        tex
+        zeilen={[
+          { label: 'III:', eq: '4x = 8', op: '\\mid :4' },
+          { eq: '\\Rightarrow x = 2' },
+          { label: 'x in I:', eq: '2 + 2y = 8', op: '\\mid -2' },
+          { eq: '2y = 6', op: '\\mid :2' },
+          { eq: '\\Rightarrow y = 3' },
+        ]}
+      />
+    ),
   },
   {
     title: 'Lösung und Probe',
@@ -560,17 +602,42 @@ const BSP3_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
           Vor <M>y</M> stehen <M>{'2'}</M> und <M>{'1'}</M>, vor <M>x</M> stehen <M>{'3'}</M> und <M>{'1'}</M>: Nichts fällt sofort weg. Multipliziere Gleichung II auf{' '}
           <strong>beiden</strong> Seiten mit 2. Dann steht vor <M>y</M> in beiden Gleichungen <M>{'2'}</M>:
         </p>
-        <MB>{'\\begin{aligned} \\text{II: } x + y &= 6 && \\mid \\cdot 2 \\\\ \\text{II} \\cdot 2{:}\\; 2x + 2y &= 12 \\end{aligned}'}</MB>
+        <LgsBlock
+          tex
+          zeilen={[
+            { label: 'I:', eq: '3x + 2y = 16' },
+            { label: 'II:', eq: 'x + y = 6', op: '\\mid \\cdot 2', strich: true },
+            { label: 'I:', eq: '3x + 2y = 16', note: '(übernommen)' },
+            { label: 'III:', eq: '2x + 2y = 12', note: '(II · 2)', strich: true },
+          ]}
+        />
       </>
     ),
   },
   {
     title: 'Subtrahieren',
-    body: <MB>{'\\begin{aligned} \\text{I: } 3x + 2y &= 16 \\\\ \\text{II} \\cdot 2{:}\\; 2x + 2y &= 12 \\\\ \\hline \\text{I} - \\text{II} \\cdot 2{:}\\; x + 0y &= 4 \\end{aligned}'}</MB>,
+    body: (
+      <LgsBlock
+        tex
+        zeilen={[
+          { label: 'I:', eq: '3x + 2y = 16' },
+          { label: 'III:', eq: '2x + 2y = 12', strich: true },
+          { label: 'IV:', eq: 'x = 4', note: '(I − III)' },
+        ]}
+      />
+    ),
   },
   {
     title: <>Einsetzen und <M>y</M> berechnen</>,
-    body: <MB>{'\\begin{aligned} x &= 4 \\\\ \\text{in II: } 4 + y &= 6 && \\mid -4 \\\\ y &= 2 \\end{aligned}'}</MB>,
+    body: (
+      <LgsBlock
+        tex
+        zeilen={[
+          { label: 'x in II:', eq: '4 + y = 6', op: '\\mid -4' },
+          { eq: '\\Rightarrow y = 2' },
+        ]}
+      />
+    ),
   },
   {
     title: 'Lösung und Probe',
@@ -582,32 +649,72 @@ const BSP3_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
   },
 ]
 
+const UNTEREINANDER = 'Schreibe die beiden Gleichungen exakt untereinander und ziehe darunter einen Strich.'
+
 const LOESUNG1 = (
-  <>
-    <MB>{'\\begin{aligned} \\text{I: } 3x + 2y &= 12 \\\\ \\text{II: } x + 2y &= 7 \\\\ \\hline \\text{I} - \\text{II: } 2x &= 5 && \\mid :2 \\\\ x &= 2{,}5 \\end{aligned}'}</MB>
-    <MB>{'\\begin{aligned} \\text{in II: } 2{,}5 + 2y &= 7 && \\mid -2{,}5 \\\\ 2y &= 4{,}5 && \\mid :2 \\\\ y &= 2{,}25 \\end{aligned}'}</MB>
-    <p>
-      Lösungspaar <M>{'(2{,}5 \\mid 2{,}25)'}</M>. Probe in I: <M>{'3 \\cdot 2{,}5 + 2 \\cdot 2{,}25 = 7{,}5 + 4{,}5 = 12 \\;\\checkmark'}</M>
-    </p>
-  </>
+  <LgsWeg
+    tex
+    schritte={[
+      { text: UNTEREINANDER, zeilen: [{ label: 'I:', eq: '3x + 2y = 12' }, { label: 'II:', eq: 'x + 2y = 7', strich: true }] },
+      {
+        text: <>Vor <M>y</M> steht in beiden Gleichungen dieselbe Zahl (2) mit demselben Vorzeichen. Subtrahiere die Gleichungen (I − II), dann fällt <M>y</M> weg.</>,
+        zeilen: [{ label: 'I:', eq: '3x + 2y = 12' }, { label: 'II:', eq: 'x + 2y = 7', strich: true }, { label: 'III:', eq: '2x = 5', note: '(I − II)' }],
+      },
+      { text: 'Löse Gleichung III nach x auf.', zeilen: [{ label: 'III:', eq: '2x = 5', op: '\\mid :2' }, { eq: '\\Rightarrow x = 2{,}5' }] },
+      {
+        text: <>Setze <M>{'x = 2{,}5'}</M> in Gleichung II ein und löse nach <M>y</M> auf.</>,
+        zeilen: [{ label: 'x in II:', eq: '2{,}5 + 2y = 7', op: '\\mid -2{,}5' }, { eq: '2y = 4{,}5', op: '\\mid :2' }, { eq: '\\Rightarrow y = 2{,}25' }],
+      },
+      {
+        text: <>Lösungspaar <M>{'(2{,}5 \\mid 2{,}25)'}</M>. Probe in I: <M>{'3 \\cdot 2{,}5 + 2 \\cdot 2{,}25 = 7{,}5 + 4{,}5 = 12 \\;\\checkmark'}</M></>,
+        zeilen: [],
+      },
+    ]}
+  />
 )
 const LOESUNG2 = (
-  <>
-    <MB>{'\\begin{aligned} \\text{I: } 2x + 3y &= 3 \\\\ \\text{II: } 4x - 3y &= 15 \\\\ \\hline \\text{I} + \\text{II: } 6x &= 18 && \\mid :6 \\\\ x &= 3 \\end{aligned}'}</MB>
-    <MB>{'\\begin{aligned} \\text{in I: } 2 \\cdot 3 + 3y &= 3 && \\mid -6 \\\\ 3y &= -3 && \\mid :3 \\\\ y &= -1 \\end{aligned}'}</MB>
-    <p>
-      Lösungspaar <M>{'(3 \\mid -1)'}</M>. Probe in II: <M>{'4 \\cdot 3 - 3 \\cdot (-1) = 12 + 3 = 15 \\;\\checkmark'}</M>
-    </p>
-  </>
+  <LgsWeg
+    tex
+    schritte={[
+      { text: UNTEREINANDER, zeilen: [{ label: 'I:', eq: '2x + 3y = 3' }, { label: 'II:', eq: '4x - 3y = 15', strich: true }] },
+      {
+        text: <>Vor <M>y</M> stehen Gegenzahlen (3 und −3). Addiere die Gleichungen (I + II), dann fällt <M>y</M> weg.</>,
+        zeilen: [{ label: 'I:', eq: '2x + 3y = 3' }, { label: 'II:', eq: '4x - 3y = 15', strich: true }, { label: 'III:', eq: '6x = 18', note: '(I + II)' }],
+      },
+      { text: 'Löse Gleichung III nach x auf.', zeilen: [{ label: 'III:', eq: '6x = 18', op: '\\mid :6' }, { eq: '\\Rightarrow x = 3' }] },
+      {
+        text: <>Setze <M>{'x = 3'}</M> in Gleichung I ein und löse nach <M>y</M> auf.</>,
+        zeilen: [{ label: 'x in I:', eq: '2 \\cdot 3 + 3y = 3' }, { eq: '6 + 3y = 3', op: '\\mid -6' }, { eq: '3y = -3', op: '\\mid :3' }, { eq: '\\Rightarrow y = -1' }],
+      },
+      { text: <>Lösungspaar <M>{'(3 \\mid -1)'}</M>. Probe in II: <M>{'4 \\cdot 3 - 3 \\cdot (-1) = 12 + 3 = 15 \\;\\checkmark'}</M></>, zeilen: [] },
+    ]}
+  />
 )
 const LOESUNG3 = (
-  <>
-    <MB>{'\\begin{aligned} \\text{II} \\cdot 2{:}\\; 2x + 2y &= 10 \\\\ \\text{I} - \\text{II} \\cdot 2{:}\\; (2x + 3y) - (2x + 2y) &= 13 - 10 \\\\ y &= 3 \\end{aligned}'}</MB>
-    <MB>{'\\begin{aligned} \\text{in II: } x + 3 &= 5 && \\mid -3 \\\\ x &= 2 \\end{aligned}'}</MB>
-    <p>
-      Lösungspaar <M>{'(2 \\mid 3)'}</M>. Probe in I: <M>{'2 \\cdot 2 + 3 \\cdot 3 = 4 + 9 = 13 \\;\\checkmark'}</M>
-    </p>
-  </>
+  <LgsWeg
+    tex
+    schritte={[
+      { text: UNTEREINANDER, zeilen: [{ label: 'I:', eq: '2x + 3y = 13' }, { label: 'II:', eq: 'x + y = 5', strich: true }] },
+      {
+        text: <>Ziel: vor einer Variablen dieselbe Zahl. Multipliziere Gleichung II auf beiden Seiten mit 2, dann steht vor <M>x</M> überall 2. So entsteht Gleichung III.</>,
+        zeilen: [
+          { label: 'I:', eq: '2x + 3y = 13' },
+          { label: 'II:', eq: 'x + y = 5', op: '\\mid \\cdot 2', strich: true },
+          { label: 'I:', eq: '2x + 3y = 13', note: '(übernommen)' },
+          { label: 'III:', eq: '2x + 2y = 10', note: '(II · 2)', strich: true },
+        ],
+      },
+      {
+        text: <>Vor <M>x</M> steht jetzt dieselbe Zahl mit demselben Vorzeichen. Subtrahiere die Gleichungen (I − III), dann fällt <M>x</M> weg.</>,
+        zeilen: [{ label: 'I:', eq: '2x + 3y = 13' }, { label: 'III:', eq: '2x + 2y = 10', strich: true }, { label: 'IV:', eq: 'y = 3', note: '(I − III)' }],
+      },
+      {
+        text: <>Setze <M>{'y = 3'}</M> in Gleichung II ein und löse nach <M>x</M> auf.</>,
+        zeilen: [{ label: 'y in II:', eq: 'x + 3 = 5', op: '\\mid -3' }, { eq: '\\Rightarrow x = 2' }],
+      },
+      { text: <>Lösungspaar <M>{'(2 \\mid 3)'}</M>. Probe in I: <M>{'2 \\cdot 2 + 3 \\cdot 3 = 4 + 9 = 13 \\;\\checkmark'}</M></>, zeilen: [] },
+    ]}
+  />
 )
 
 
@@ -1131,7 +1238,20 @@ export default function LaborEinstieg({
                 { kind: 'num', key: 'y', label: 'y', expected: -1 },
               ]}
               solution={
-                <MB>{'\\begin{aligned} \\text{I: } 3x + 2y &= 4 \\\\ \\text{II: } 5x - 2y &= 12 \\\\ \\hline \\text{I} + \\text{II: } 8x &= 16 && \\mid :8 \\\\ x &= 2 \\\\ \\text{in I: } 3 \\cdot 2 + 2y &= 4 && \\mid -6 \\\\ 2y &= -2 && \\mid :2 \\\\ y &= -1 \\end{aligned}'}</MB>
+                <LgsWeg
+                  tex
+                  schritte={[
+                    {
+                      text: <>Vor <M>y</M> stehen Gegenzahlen (2 und −2). Addiere die Gleichungen (I + II).</>,
+                      zeilen: [{ label: 'I:', eq: '3x + 2y = 4' }, { label: 'II:', eq: '5x - 2y = 12', strich: true }, { label: 'III:', eq: '8x = 16', note: '(I + II)' }],
+                    },
+                    { text: 'Löse Gleichung III nach x auf.', zeilen: [{ label: 'III:', eq: '8x = 16', op: '\\mid :8' }, { eq: '\\Rightarrow x = 2' }] },
+                    {
+                      text: <>Setze <M>{'x = 2'}</M> in Gleichung I ein und löse nach <M>y</M> auf.</>,
+                      zeilen: [{ label: 'x in I:', eq: '3 \\cdot 2 + 2y = 4' }, { eq: '6 + 2y = 4', op: '\\mid -6' }, { eq: '2y = -2', op: '\\mid :2' }, { eq: '\\Rightarrow y = -1' }],
+                    },
+                  ]}
+                />
               }
               help={
                 <SchrittHilfen
@@ -1163,10 +1283,30 @@ export default function LaborEinstieg({
                 { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 2 },
               ]}
               solution={
-                <>
-                  <MB>{'\\begin{aligned} \\text{I} \\cdot 3{:}\\; 9x + 6y &= 21 \\\\ \\text{II} \\cdot 2{:}\\; 4x + 6y &= 16 \\\\ \\hline \\text{I} \\cdot 3 - \\text{II} \\cdot 2{:}\\; 5x &= 5 && \\mid :5 \\\\ x &= 1 \\end{aligned}'}</MB>
-                  <MB>{'\\begin{aligned} \\text{in I: } 3 + 2y &= 7 && \\mid -3 \\\\ 2y &= 4 && \\mid :2 \\\\ y &= 2 \\end{aligned}'}</MB>
-                </>
+                <LgsWeg
+                  tex
+                  schritte={[
+                    { text: UNTEREINANDER, zeilen: [{ label: 'I:', eq: '3x + 2y = 7' }, { label: 'II:', eq: '2x + 3y = 8', strich: true }] },
+                    {
+                      text: <>Ziel: vor <M>y</M> dieselbe Zahl (6). Multipliziere Gleichung I mit 3 und Gleichung II mit 2, jeweils beide Seiten.</>,
+                      zeilen: [
+                        { label: 'I:', eq: '3x + 2y = 7', op: '\\mid \\cdot 3' },
+                        { label: 'II:', eq: '2x + 3y = 8', op: '\\mid \\cdot 2', strich: true },
+                        { label: 'III:', eq: '9x + 6y = 21', note: '(I · 3)' },
+                        { label: 'IV:', eq: '4x + 6y = 16', note: '(II · 2)', strich: true },
+                      ],
+                    },
+                    {
+                      text: <>Vor <M>y</M> steht jetzt dieselbe Zahl mit demselben Vorzeichen. Subtrahiere die Gleichungen (III − IV).</>,
+                      zeilen: [{ label: 'III:', eq: '9x + 6y = 21' }, { label: 'IV:', eq: '4x + 6y = 16', strich: true }, { label: 'V:', eq: '5x = 5', note: '(III − IV)' }],
+                    },
+                    { text: 'Löse Gleichung V nach x auf.', zeilen: [{ label: 'V:', eq: '5x = 5', op: '\\mid :5' }, { eq: '\\Rightarrow x = 1' }] },
+                    {
+                      text: <>Setze <M>{'x = 1'}</M> in Gleichung I ein und löse nach <M>y</M> auf.</>,
+                      zeilen: [{ label: 'x in I:', eq: '3 \\cdot 1 + 2y = 7' }, { eq: '3 + 2y = 7', op: '\\mid -3' }, { eq: '2y = 4', op: '\\mid :2' }, { eq: '\\Rightarrow y = 2' }],
+                    },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -1204,10 +1344,27 @@ export default function LaborEinstieg({
                 { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 3 },
               ]}
               solution={
-                <>
-                  <MB>{'\\begin{aligned} \\text{I: } 2x + 3y &= 11 && (\\mid +3y) \\\\ \\text{II: } 2x + 4y &= 14 \\\\ \\hline \\text{II} - \\text{I: } y &= 3 \\end{aligned}'}</MB>
-                  <MB>{'\\begin{aligned} \\text{in I: } 2x + 9 &= 11 && \\mid -9 \\\\ 2x &= 2 && \\mid :2 \\\\ x &= 1 \\end{aligned}'}</MB>
-                </>
+                <LgsWeg
+                  tex
+                  schritte={[
+                    {
+                      text: <>Ordne beide Gleichungen: links <M>x</M> und <M>y</M>, rechts die Zahl. In I bringst du <M>{'-3y'}</M> nach links, in II tauschst du die Reihenfolge.</>,
+                      zeilen: [
+                        { label: 'I:', eq: '2x = 11 - 3y', op: '\\mid +3y' },
+                        { label: 'II:', eq: '4y + 2x = 14', note: '(Reihenfolge tauschen)' },
+                      ],
+                    },
+                    { text: UNTEREINANDER, zeilen: [{ label: 'I:', eq: '2x + 3y = 11' }, { label: 'II:', eq: '2x + 4y = 14', strich: true }] },
+                    {
+                      text: <>Vor <M>x</M> steht in beiden Gleichungen 2. Subtrahiere die Gleichungen (II − I), dann fällt <M>x</M> weg.</>,
+                      zeilen: [{ label: 'II:', eq: '2x + 4y = 14' }, { label: 'I:', eq: '2x + 3y = 11', strich: true }, { label: 'III:', eq: 'y = 3', note: '(II − I)' }],
+                    },
+                    {
+                      text: <>Setze <M>{'y = 3'}</M> in Gleichung I ein und löse nach <M>x</M> auf.</>,
+                      zeilen: [{ label: 'y in I:', eq: '2x + 3 \\cdot 3 = 11' }, { eq: '2x + 9 = 11', op: '\\mid -9' }, { eq: '2x = 2', op: '\\mid :2' }, { eq: '\\Rightarrow x = 1' }],
+                    },
+                  ]}
+                />
               }
               help={
                 <Hilfen
