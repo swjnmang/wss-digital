@@ -189,7 +189,18 @@ const TIPP_PAUSE_MS = 1200
  */
 export function useLiveCheck(
   felder: { key: string; pruefe: (v: string) => boolean | undefined; sofort?: boolean }[],
-  { onSolved, onFehlversuch, tracking = NO_TRACKING }: { onSolved?: () => void; onFehlversuch?: () => void; tracking?: Tracking } = {},
+  {
+    onSolved,
+    onFehlversuch,
+    onSchonGeloest,
+    tracking = NO_TRACKING,
+  }: {
+    onSolved?: () => void
+    onFehlversuch?: () => void
+    /** Wiederhergestellter Stand ist vollständig richtig (nach Zurück/Neuladen): der Seite erneut melden, ohne Punkte und Tracking */
+    onSchonGeloest?: () => void
+    tracking?: Tracking
+  } = {},
 ) {
   // Eingaben und Markierungen überleben Zurück und Neuladen (Sitzungsspeicher)
   const signatur = felder.map((f) => f.key).join(',')
@@ -207,6 +218,18 @@ export function useLiveCheck(
   const gezaehlt = useRef<Record<string, string>>({})
 
   useEffect(() => () => Object.values(timer.current).forEach((t) => window.clearTimeout(t)), [])
+
+  // Wiederhergestellte Eingaben neu prüfen und eine gelöste Aufgabe der Seite erneut melden. Sonst bleibt „Weiter“ gesperrt, wenn der
+  // Stand der Seite (erledigte Aufgaben) nicht mehr zu den Karten passt, z. B. nach einer neuen Version mit anderer Seitenzahl.
+  useEffect(() => {
+    if (!felder.some((f) => values[f.key])) return
+    const neu = Object.fromEntries(felder.map((f) => [f.key, values[f.key] ? pruefe(f.key, values[f.key]) : undefined]))
+    const alle = felder.every((f) => neu[f.key] !== undefined)
+    letzte.current = alle ? JSON.stringify(felder.map((f) => neu[f.key] ?? null)) : ''
+    setMarks(neu)
+    if (felder.every((f) => neu[f.key] === true)) onSchonGeloest?.()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const pruefe = (key: string, v: string) => felder.find((f) => f.key === key)?.pruefe(v)
   const markiere = (key: string, m: boolean | undefined) => setMarks((p) => (p[key] === m ? p : { ...p, [key]: m }))
@@ -379,6 +402,7 @@ export function CheckCard({
         pt.fehler()
         onFehler?.()
       },
+      onSchonGeloest: () => onSolved?.(),
       tracking,
     },
   )
@@ -592,6 +616,11 @@ export function McCard({
   const [status, setStatus] = useSitzungState<'idle' | 'ok' | 'no' | 'empty'>('mc-status', 'idle', String(options.length))
   const [praise, setPraise] = useState(PRAISE[0])
   const pt = usePunkteAufgabe({ wert: punkte, profi })
+  // Wiederhergestellte richtige Antwort der Seite erneut melden (ohne Punkte), damit „Weiter“ nicht gesperrt bleibt
+  useEffect(() => {
+    if (status === 'ok' && choice !== null && options[choice]?.correct) onSolved?.()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const check = () => {
     if (choice === null) return setStatus('empty')
