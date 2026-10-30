@@ -165,3 +165,14 @@
 .sl-aufklappbar-breit > div > .bk-btn { width: 100%; justify-content: center; }
 .sl-weiter-unten { margin-top: 18px; }
 .sl-weiter-unten .bk-btn { width: 100%; min-height: 52px; justify-content: center; font-size: 18px; }
+
+/* „Neu beginnen“ in der Leiste: auf schmalen Bildschirmen nur das Symbol */
+.sl-neu {
+  flex: none;
+  opacity: 0.85;
+}
+@media (max-width: 720px) {
+  .sl-neu-text {
+    display: none;
+  }
+}

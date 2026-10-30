@@ -34,6 +34,7 @@ import Abschlusstest from './pages/rechnen_lernen/gleichungen/Abschlusstest';
 import { useCallback, useEffect, useState } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react';
+import { SitzungProvider } from './hooks/useSitzung'
 import Home from './pages/Home'
 import AreaPage from './pages/AreaPage'
 import GemischtesTraining from './pages/GemischtesTraining'
@@ -236,6 +237,8 @@ export default function App() {
         </div>
       )}
       <main>
+        {/* Sitzungsspeicher je Seite: Seiten, die useSitzungState nutzen, behalten ihren Stand 30 Minuten ab der letzten Aktion */}
+        <SitzungProvider key={location.pathname} name={location.pathname}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/rechnen_lernen" element={<AreaPage id="rechnen" />} />
@@ -450,6 +453,7 @@ export default function App() {
 
           <Route path="*" element={<Home />} />
         </Routes>
+        </SitzungProvider>
       </main>
       <BottomNav onSearch={openSearch} />
       <CookieBanner />

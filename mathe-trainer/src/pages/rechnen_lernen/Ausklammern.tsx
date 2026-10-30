@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useSitzungState } from '../../hooks/useSitzung';
 import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import TaskShell from '../../components/layout/TaskShell';
@@ -30,11 +31,14 @@ interface Antwort {
 }
 
 export default function Ausklammern() {
-  const [stufe, setStufe] = useState<StufeId>(1);
-  const [aufgaben, setAufgaben] = useState<Aufgabe[]>(() => generiereSet(1, AUFGABEN_PRO_SET));
-  const [antworten, setAntworten] = useState<Record<string, Antwort>>({});
-  const [loesungAuf, setLoesungAuf] = useState<Record<string, boolean>>({});
+  // Aufgaben (mit ihren Zufallszahlen) und Eingaben bleiben nach Zurück/Neuladen erhalten (Sitzungsspeicher)
+  const [stufe, setStufe] = useSitzungState<StufeId>('stufe', 1);
+  const [aufgaben, setAufgaben] = useSitzungState<Aufgabe[]>('aufgaben', () => generiereSet(1, AUFGABEN_PRO_SET));
+  const [antworten, setAntworten] = useSitzungState<Record<string, Antwort>>('antworten', {});
+  const [loesungAuf, setLoesungAuf] = useSitzungState<Record<string, boolean>>('loesung', {});
   const [zeigeErklaerung, setZeigeErklaerung] = useState(true);
+  // Beim Öffnen stehen die Aufgaben schon (neu erzeugt oder wiederhergestellt); neu erzeugt wird erst bei einem Stufenwechsel
+  const letzteStufe = useRef(stufe);
 
   const neueAufgaben = useCallback((s: StufeId) => {
     setAufgaben(generiereSet(s, AUFGABEN_PRO_SET));
@@ -43,6 +47,8 @@ export default function Ausklammern() {
   }, []);
 
   useEffect(() => {
+    if (letzteStufe.current === stufe) return;
+    letzteStufe.current = stufe;
     neueAufgaben(stufe);
   }, [stufe, neueAufgaben]);
 

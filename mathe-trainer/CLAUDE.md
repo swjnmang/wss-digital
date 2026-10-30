@@ -28,6 +28,21 @@ Der Modus wird nicht automatisch erkannt: Jede Seite muss ihn selbst einbinden.
 - In der Entwicklung (`npm run dev`, React StrictMode) erscheinen zusätzliche „nicht bearbeitet“-Einträge,
   weil Effekte doppelt laufen. Tracking daher mit `vite build` + `vite preview` testen.
 
+## Sitzungsspeicher (Stand bleibt nach „Zurück“ erhalten)
+
+Der Stand einer Seite (Eingaben, erledigte Aufgaben, Punkte, zufällig erzeugte Aufgaben) bleibt im `localStorage`, damit er nach
+Zurück, Neuladen oder einem vom Browser verworfenen Tab noch da ist. Er verfällt **30 Minuten nach der letzten Aktion** (ein Eintrag je
+Seite mit gemeinsamem Zeitstempel, `src/utils/sitzung.ts`; Hooks in `src/hooks/useSitzung.tsx`). `App.tsx` stellt je Adresse einen `SitzungProvider` bereit.
+
+- **Lernsituationen** (`SeitenLernsituation`): automatisch. Phase, erledigte Seiten, Punkte, Eingaben und Markierungen von `CheckCard`, `McCard`,
+  `Hilfen`, `SchrittHilfen` liegen im Speicher; in der Leiste gibt es „Neu beginnen“ (löscht den Stand). Eigene Zustände in einer Lernsituationsseite
+  (Regler, Kriterien-Haken usw.) mit `useSitzungState(art, initial)` statt `useState` speichern. Bausteine nur speichern, wenn sie nicht erst durch
+  Eingaben der SuS eingehängt werden (die Zuordnung läuft über die Einhängereihenfolge).
+- **Übungsseiten**: `useSitzungState(art, initial, signatur?)` ist ein Ersatz für `useState` (Werte müssen JSON-tauglich sein, keine Set/Map/Funktionen).
+  Zufällig erzeugte Aufgaben als **Funktion** übergeben (`useSitzungState('aufgaben', () => erzeuge())`), dann werden sie gleich mitgespeichert.
+  Achtung: Ein `useEffect`, der beim Öffnen neue Aufgaben erzeugt, würde den wiederhergestellten Stand überschreiben, er darf nur bei einer
+  echten Änderung (z. B. Stufenwechsel) laufen. Vorlage: `rechnen_lernen/Ausklammern.tsx`. Neue Übungsseiten verwenden `useSitzungState`.
+
 ## Git-Workflow
 
 Fertige Änderungen immer direkt in `main` committen und pushen (ausdrücklicher Wunsch des Repo-Inhabers),

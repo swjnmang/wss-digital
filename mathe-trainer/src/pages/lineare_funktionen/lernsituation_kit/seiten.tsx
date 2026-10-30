@@ -1,4 +1,6 @@
 import { useEffect, useId, useState, type CSSProperties, type ChangeEvent, type ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
+import { SitzungProvider, useSitzung, useSitzungState } from '../../../hooks/useSitzung';
 import { HeftBestaetigtCtx } from './kit';
 import { PHASEN, type PhaseArt } from './phasen';
 import { PunkteAnzeige, PunkteGruppeCtx, PunkteProvider, PunkteRegeln } from './punkte';
@@ -66,11 +68,20 @@ export function SeitenLernsituation(props: {
   thema?: Thema;
   punkte?: boolean;
 }) {
-  if (!props.punkte) return <SeitenAnsicht {...props} />;
+  const { pathname } = useLocation();
+  // „Neu beginnen“ löscht den Stand und hängt die ganze Lernsituation neu ein
+  const [durchgang, setDurchgang] = useState(0);
+  const neuBeginnen = () => setDurchgang((d) => d + 1);
   return (
-    <PunkteProvider name={props.thema?.name ?? 'Lernsituation'}>
-      <SeitenAnsicht {...props} />
-    </PunkteProvider>
+    <SitzungProvider key={durchgang} name={`${pathname}:${props.thema?.name ?? ''}`}>
+      {props.punkte ? (
+        <PunkteProvider name={props.thema?.name ?? 'Lernsituation'}>
+          <SeitenAnsicht {...props} neuBeginnen={neuBeginnen} />
+        </PunkteProvider>
+      ) : (
+        <SeitenAnsicht {...props} neuBeginnen={neuBeginnen} />
+      )}
+    </SitzungProvider>
   );
 }
 
@@ -79,17 +90,22 @@ function SeitenAnsicht({
   seiten,
   ruhig = false,
   thema,
+  neuBeginnen,
 }: {
   ziel: ReactNode;
   seiten: Seite[];
   ruhig?: boolean;
   thema?: Thema;
+  neuBeginnen: () => void;
 }) {
-  const [bestaetigt, setBestaetigt] = useState(false);
+  // Der Stand überlebt Zurück und Neuladen (30 Minuten ab der letzten Aktion, siehe utils/sitzung.ts)
+  const sitzung = useSitzung();
+  const sig = String(seiten.length);
+  const [bestaetigt, setBestaetigt] = useSitzungState('sl-bestaetigt', false, sig);
   const [haken, setHaken] = useState(false);
-  const [nr, setNr] = useState(0);
-  const [erledigt, setErledigt] = useState<boolean[]>(() => seiten.map((s) => !!s.frei));
-  const [teile, setTeile] = useState<Record<number, string[]>>({});
+  const [nr, setNr] = useSitzungState('sl-seite', 0, sig);
+  const [erledigt, setErledigt] = useSitzungState<boolean[]>('sl-erledigt', () => seiten.map((s) => !!s.frei), sig);
+  const [teile, setTeile] = useSitzungState<Record<number, string[]>>('sl-teile', {}, sig);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -209,6 +225,19 @@ function SeitenAnsicht({
           </span>
         )}
         <PunkteAnzeige />
+        <button
+          type="button"
+          className="bk-btn bk-btn-sm sl-neu"
+          title="Alles löschen und von vorn beginnen"
+          onClick={() => {
+            if (window.confirm('Neu beginnen? Alle Eingaben und Punkte dieser Lernsituation werden gelöscht.')) {
+              sitzung?.reset();
+              neuBeginnen();
+            }
+          }}
+        >
+          <i className="fa-solid fa-rotate-left" aria-hidden="true" /> <span className="sl-neu-text">Neu beginnen</span>
+        </button>
         {nr < seiten.length - 1 && (
           <button
             type="button"

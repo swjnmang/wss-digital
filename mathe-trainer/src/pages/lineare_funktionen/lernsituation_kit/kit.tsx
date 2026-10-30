@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useId, useRef, useState, type ChangeEvent, type FocusEvent, type ReactNode } from 'react'
 import { InlineMath } from 'react-katex'
+import { useSitzungState } from '../../../hooks/useSitzung'
 import { useTaskTracking } from '../../../hooks/useTaskTracking'
 import { fieldCheckClass } from '../../../utils/fieldCheck'
 import { checkLinearEquation } from '../../../utils/parseLinearEquation'
@@ -105,7 +106,7 @@ export function CardHead({ title, level }: { title: ReactNode; level?: Level }) 
 
 /** Gestufte Hilfekarten: Denkanstoß → Strategie → erster Schritt, nacheinander aufdecken */
 export function Hilfen({ steps }: { steps: [ReactNode, ReactNode, ReactNode] }) {
-  const [shown, setShown] = useState(0)
+  const [shown, setShown] = useSitzungState('hilfen', 0)
   const punkte = useContext(AufgabePunkteCtx)
   const titles = ['Hilfe 1 · Denkanstoß', 'Hilfe 2 · Strategie', 'Hilfe 3 · Erster Schritt']
   return (
@@ -137,8 +138,8 @@ export function Hilfen({ steps }: { steps: [ReactNode, ReactNode, ReactNode] }) 
 
 // Hilfen je Rechenschritt: Die SuS wählen den Schritt, bei dem sie hängen; es ist immer nur eine Hilfe offen.
 export function SchrittHilfen({ schritte }: { schritte: { kurz: ReactNode; titel: ReactNode; hilfe: ReactNode }[] }) {
-  const [offen, setOffen] = useState<number | null>(null)
-  const [gesehen, setGesehen] = useState<number[]>([])
+  const [offen, setOffen] = useSitzungState<number | null>('schritt-offen', null)
+  const [gesehen, setGesehen] = useSitzungState<number[]>('schritt-gesehen', [])
   const punkte = useContext(AufgabePunkteCtx)
   const oeffne = (i: number) => {
     if (offen !== i && !gesehen.includes(i)) {
@@ -190,13 +191,16 @@ export function useLiveCheck(
   felder: { key: string; pruefe: (v: string) => boolean | undefined; sofort?: boolean }[],
   { onSolved, onFehlversuch, tracking = NO_TRACKING }: { onSolved?: () => void; onFehlversuch?: () => void; tracking?: Tracking } = {},
 ) {
-  const [values, setValues] = useState<Record<string, string>>({})
-  const [marks, setMarks] = useState<Record<string, boolean | undefined>>({})
+  // Eingaben und Markierungen überleben Zurück und Neuladen (Sitzungsspeicher)
+  const signatur = felder.map((f) => f.key).join(',')
+  const [values, setValues] = useSitzungState<Record<string, string>>('live-werte', {}, signatur)
+  const [marks, setMarks] = useSitzungState<Record<string, boolean | undefined>>('live-marken', {}, signatur)
   const [status, setStatus] = useState<'idle' | 'ok' | 'no'>('idle')
   const [praise, setPraise] = useState(PRAISE[0])
-  const [malFalsch, setMalFalsch] = useState(false)
+  const [malFalsch, setMalFalsch] = useSitzungState('live-fehler', false, signatur)
   const timer = useRef<Record<string, number>>({})
-  const letzte = useRef('')
+  // Ein wiederhergestellter Stand gilt als schon gemeldet: kein zweiter Tracking-Eintrag, keine doppelten Punkte
+  const letzte = useRef(felder.every((f) => marks[f.key] !== undefined) ? JSON.stringify(felder.map((f) => marks[f.key] ?? null)) : '')
   /** nach der Tipp-Pause rot markierter Wert je Feld */
   const rot = useRef<Record<string, string>>({})
   /** schon als Fehlversuch gezählter Wert je Feld */
@@ -346,7 +350,7 @@ export function CheckCard({
   onEingabe?: (werte: Record<string, string>) => void
 }) {
   const uid = useId()
-  const [showSolution, setShowSolution] = useState(false)
+  const [showSolution, setShowSolution] = useSitzungState('loesung', false)
   const pt = usePunkteAufgabe({ wert: punkte, profi, zaehlt: !ohnePunkte })
   const { values, marks, status, praise, malFalsch, setValue, blur } = useLiveCheck(
     fields.map((f) => ({
@@ -584,8 +588,8 @@ export function McCard({
   const uid = useId()
   // Regel aus dem Lernsituationen-Skill: Antwort A ist nie die richtige.
   if ((import.meta as { env?: { DEV?: boolean } }).env?.DEV && options[0]?.correct) console.warn('McCard: Die erste Antwort (A) darf nicht die richtige sein.', title)
-  const [choice, setChoice] = useState<number | null>(null)
-  const [status, setStatus] = useState<'idle' | 'ok' | 'no' | 'empty'>('idle')
+  const [choice, setChoice] = useSitzungState<number | null>('mc-wahl', null, String(options.length))
+  const [status, setStatus] = useSitzungState<'idle' | 'ok' | 'no' | 'empty'>('mc-status', 'idle', String(options.length))
   const [praise, setPraise] = useState(PRAISE[0])
   const pt = usePunkteAufgabe({ wert: punkte, profi })
 
