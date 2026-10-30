@@ -7,7 +7,7 @@ import { toLatex } from './mathPreview'
 // Darunter eine kleine Zeichenleiste (y, =, x, +, −, Komma, Bruchstrich, bei quadratischen Funktionen auch ² und Klammern)
 // und eine Vorschau (Brüche gestapelt, Hochzahlen hochgestellt). Die Tasten behalten den Fokus im Feld,
 // so dass die automatische Prüfung nicht schon beim Antippen einer Taste startet.
-// Auf Touch-Geräten übernimmt die Mathe-Tastatur (MathKeypad, dort mit y und = über data-keypad="gleichung");
+// Auf Touch-Geräten übernimmt die Mathe-Tastatur (MathKeypad, mit y und =);
 // Zeichenleiste und Vorschau sind dann ausgeblendet (styles/layout.css).
 
 const TASTEN: { zeichen: string; label: string; aria: string }[] = [

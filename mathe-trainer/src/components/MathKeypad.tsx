@@ -45,11 +45,7 @@ const ROWS: Key[][] = [
   [{ k: '7' }, { k: '8' }, { k: '9' }, { k: '(', cls: 'op' }, { k: ')', cls: 'op' }, { k: '%', cls: 'op' }, { k: 'del', label: '⌫', cls: 'op', aria: 'Zeichen löschen' }],
   [{ k: '4' }, { k: '5' }, { k: '6' }, { k: 'x', cls: 'op' }, { k: '²', label: <span aria-hidden="true">{BOX}<sup>2</sup></span>, cls: 'op', aria: 'hoch 2' }, { k: '^', label: POW_LABEL, cls: 'op', aria: 'Potenz: Exponent eingeben' }, { k: 'left', label: '←', cls: 'op', aria: 'Cursor nach links' }],
   [{ k: '1' }, { k: '2' }, { k: '3' }, { k: '+', cls: 'op' }, { k: '−', insert: '-', cls: 'op', aria: 'Minus' }, { k: '/', label: FRAC_LABEL, cls: 'op', aria: 'Bruch: Nenner eingeben' }, { k: 'right', label: '→', cls: 'op', aria: 'Cursor nach rechts' }],
-  [{ k: '0' }, { k: ',' }, { k: 'enter', label: 'Fertig ↵', cls: 'go', aria: 'Eingabe bestätigen' }],
-]
-// Felder für ganze Funktionsgleichungen (data-keypad="gleichung", siehe GleichungEingabe) bekommen zusätzlich y und =
-const ROWS_GLEICHUNG: Key[][] = [
-  ...ROWS.slice(0, 3),
+  // y und = in jedem Feld, damit für Gleichungen nie die Systemtastatur nötig ist (reine Zahlenfelder ignorieren sie)
   [{ k: '0' }, { k: ',' }, { k: 'y', cls: 'op' }, { k: '=', insert: ' = ', cls: 'op', aria: 'Gleichheitszeichen' }, { k: 'enter', label: 'Fertig ↵', cls: 'go go-kurz', aria: 'Eingabe bestätigen' }],
 ]
 
@@ -232,7 +228,7 @@ export default function MathKeypad() {
           </button>
         </div>
         <div className="bk-keypad-grid">
-          {(target.dataset.keypad === 'gleichung' ? ROWS_GLEICHUNG : ROWS).flat().map((key) => (
+          {ROWS.flat().map((key) => (
             <button
               key={key.k}
               type="button"
