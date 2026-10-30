@@ -23,5 +23,3 @@
 .sl-abzeichen li.sl-an { border: 1.5px solid var(--primary); color: var(--ink); background: var(--primary-soft); }
 .sl-abzeichen li.sl-an i { background: var(--primary); color: #fff; }
 .sl-bilanz .sl-abschnitt-titel i { color: var(--primary); }
-.sl-punkte-regeln { margin: 0; font-size: 16px; line-height: 1.5; color: var(--ink); }
-.sl-punkte-regeln i { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }

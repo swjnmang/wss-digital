@@ -326,17 +326,3 @@ export function Bilanz() {
     </section>
   )
 }
-
-/** Kurze Spielregeln für die Startbox */
-export function PunkteRegeln() {
-  const stand = useContext(StandCtx)
-  if (!stand) return null
-  return (
-    <p className="sl-punkte-regeln">
-      <i className="fa-solid fa-star" aria-hidden="true" /> <strong>Punkte sammeln:</strong> Jede richtig gelöste Aufgabe bringt Punkte, je
-      aufwendiger, desto mehr: kurze Aufwärmaufgaben 2 bis 4, die großen Aufgaben bis zu 12. Jede Hilfe und jeder Fehlversuch kostet ein Fünftel der Punkte der
-      Aufgabe (die Kosten stehen am Knopf). Wer sich vor dem Lösen den Lösungsweg anzeigen lässt, bekommt für diese Aufgabe nur noch ein Drittel der Punkte. Für{' '}
-      {PUNKTE.serie} richtige Aufgaben am Stück ohne Hilfe gibt es einen Bonus. Am Ende warten Sterne, Abzeichen und ein Spiel.
-    </p>
-  )
-}
