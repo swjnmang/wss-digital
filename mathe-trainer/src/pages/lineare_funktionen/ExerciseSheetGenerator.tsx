@@ -204,9 +204,10 @@ function generateFunktionsgleichungExercise(difficulty: Difficulty) {
   y2 = randInt(-5, 5)
   
   const m = (y2 - y1) / (x2 - x1)
-  const t = y1 - m * x1
   const mRounded = Math.round(m * 100) / 100
-  const tRounded = Math.round(t * 100) / 100
+  // Mit dem gerundeten m weiterrechnen
+  const tRounded = Math.round((y1 - mRounded * x1) * 100) / 100
+  const t = tRounded
   
   return {
     type: 'funktionsgleichung',

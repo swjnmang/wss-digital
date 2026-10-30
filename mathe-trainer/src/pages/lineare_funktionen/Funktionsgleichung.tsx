@@ -73,8 +73,10 @@ export default function Funktionsgleichung(){
 
   useEffect(() => {
     const m = (p2.y - p1.y) / (p2.x - p1.x)
-    setMCorrect(Number((Math.round(m * 100) / 100).toFixed(2)))
-    setTCorrect(Number((Math.round((p1.y - m * p1.x) * 100) / 100).toFixed(2)))
+    // Wie im Lösungsweg wird mit dem gerundeten m weitergerechnet
+    const mRund = Math.round(m * 100) / 100
+    setMCorrect(Number(mRund.toFixed(2)))
+    setTCorrect(Number((Math.round((p1.y - mRund * p1.x) * 100) / 100).toFixed(2)))
   }, [p1, p2])
 
   function genTwoPoints() {
@@ -155,7 +157,13 @@ export default function Funktionsgleichung(){
 
   function check() {
     const tol = mode === 'readGraph' ? 0 : 0.02
-    const r = checkLinearEquation(eingabe, mCorrect, tCorrect, tol)
+    let r = checkLinearEquation(eingabe, mCorrect, tCorrect, tol)
+    if (r.status === 'no' && mode !== 'readGraph') {
+      // Auch t aus dem ungerundeten m gilt als richtig
+      const tExakt = p1.y - ((p2.y - p1.y) / (p2.x - p1.x)) * p1.x
+      const r2 = checkLinearEquation(eingabe, mCorrect, tExakt, tol)
+      if (r2.status === 'ok') r = r2
+    }
     if (r.status === 'invalid') {
       // Eingabefehler (Form der Gleichung): Hinweis, aber kein Prüfversuch
       setEingabeStatus('incorrect')
