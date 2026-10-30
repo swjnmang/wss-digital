@@ -11,7 +11,7 @@
 .taskText { composes: bk-taskbox from global; margin-bottom: 20px; }
 .taskText p { margin: 0; text-align: left; color: var(--ink); font-size: 18px; line-height: 1.55; }
 .taskText small { display: block; margin-top: 6px; color: var(--ink-muted); font-size: 14px; }
-.graphContainer { composes: bk-graph from global; display: flex; justify-content: center; margin: 0 auto 20px; width: fit-content; }
+.graphContainer { composes: bk-graph from global; margin: 0 auto 8px; width: min(100%, 440px); }
 .solutionInputContainer { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; font: 700 22px/1.2 var(--font-display); }
 .solutionInputBox { composes: bk-input from global; width: 110px; text-align: center; }
 .signBox { width: 64px; }
@@ -33,3 +33,25 @@
 .eingabeHinweis { margin: -6px 0 12px; color: var(--ink-muted); font-size: 14px; }
 .previewLabel { display: block; font-size: 13px; color: var(--ink-muted); margin-top: 2px; }
 .previewMath { display: block; font-size: 1.3rem; padding: 4px 0; }
+
+.layout { display: block; }
+.colTask, .colWork { min-width: 0; }
+.punktInfo { margin: 0 0 16px; text-align: center; color: var(--ink-muted); font-size: 15px; }
+.punktInfo strong { color: var(--ink); margin: 0 6px; font-family: var(--font-display); }
+.punktFehler { color: var(--wrong-ink); font-weight: 600; }
+.mathDisplay :global(mjx-container[display="true"]) { margin: 0.3em 0 !important; }
+
+/* Querformat (Tablet, Laptop): links Aufgabe und Graph, rechts Eingabe, Rückmeldung und Lösungsweg – alles auf einer Seite */
+@media (orientation: landscape) and (min-width: 720px) {
+  .card { padding: 12px 18px; }
+  .controls { margin-bottom: 10px; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .taskText { margin-bottom: 10px; padding: 10px 14px; }
+  .taskText p { font-size: 16px; line-height: 1.45; }
+  .graphContainer { width: min(100%, max(240px, calc(100dvh - 400px))); }
+  .punktInfo { margin-bottom: 0; }
+  .colWork { max-height: calc(100dvh - 230px); overflow-y: auto; padding: 2px 4px 8px 2px; }
+  .solutionInputContainer { margin-bottom: 10px; }
+  .solutionStep { padding: 6px 12px; }
+  .solutionOutput { margin-top: 12px; }
+}
