@@ -1391,6 +1391,204 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
     ]
   },
   {
+    "slug": "mallorca",
+    "kurz": "Werbeflyer „Mallorca“ (Reisewelt Behrens)",
+    "level": "Mittel",
+    "teaser": "Seitenrand mit Kontur, WordArt mit Transformation, Format übertragen, Bilder zuschneiden und schärfen, drei Spalten, Fußnote und Logo in der Fußzeile.",
+    "material": [
+      {
+        "label": "Vorlage (.docx)",
+        "datei": "vorlage.docx",
+        "downloadName": "01 vorlage – Mallorca.docx"
+      },
+      {
+        "label": "Bild „karte.jpg“",
+        "datei": "karte.jpg",
+        "downloadName": "karte.jpg"
+      },
+      {
+        "label": "Bild „wetterbericht.jpg“",
+        "datei": "wetterbericht.jpg",
+        "downloadName": "wetterbericht.jpg"
+      },
+      {
+        "label": "Bild „logo.jpg“",
+        "datei": "logo.jpg",
+        "downloadName": "logo.jpg"
+      }
+    ],
+    "thema": "Mallorca",
+    "titel": "Erstellung eines Werbeflyers – Reisewelt Behrens",
+    "szenario": "Sie sind Angestellte/-r bei Reisewelt Behrens. Ihr Vorgesetzter, Christian Behrens, hat Sie gebeten, für das Reiseziel Mallorca einen DIN-A4-Werbeflyer zu erstellen. Der Text wurde bereits erstellt (Datei 01 vorlage.docx). Sie sollen lediglich das Layout an folgende Angaben anpassen:",
+    "start": 1,
+    "rows": [
+      {
+        "titel": "Seitenrand",
+        "inhalt": [
+          {
+            "b": "Links, rechts, oben und unten auf **2 cm** einstellen ({{Layout > Seitenränder > Benutzerdefinierte Seitenränder}})"
+          },
+          {
+            "b": "Ränder darstellen durch eine **Kontur mit 3 pt** ({{Layout > Seite einrichten > Ränder}})"
+          },
+          {
+            "s": "Farbe: **Gold, Akzent 4**"
+          },
+          {
+            "s": "**Nur links und rechts** (nicht oben und unten!)"
+          }
+        ]
+      },
+      {
+        "titel": "Absätze mit Fließtext (nicht die Überschriften)",
+        "inhalt": [
+          {
+            "b": "Schriftart **MV Boli**, Schriftgröße **10**"
+          },
+          {
+            "b": "**Blocksatz**"
+          },
+          {
+            "b": "**Automatische Silbentrennung** aktivieren ({{Layout > Silbentrennung > Automatisch}})"
+          }
+        ]
+      },
+      {
+        "titel": "Hauptüberschrift („Mallorca – Sonne, Strand und mehr“)",
+        "inhalt": [
+          {
+            "b": "Als **WordArt** einfügen: Überschrift markieren ➔ {{Einfügen > WordArt}} ➔ gelbes A mit **Farbverlauf – Gold, Akzent 4, Kontur – Akzent 4**"
+          },
+          {
+            "s": "Transformation: {{Formformat > Texteffekte > Transformieren}} ➔ Verzerrung: **Rechteck**"
+          },
+          {
+            "b": "Schriftart **MV Boli**, Schriftgröße **27**"
+          }
+        ]
+      },
+      {
+        "titel": "Unterüberschriften („Geografie …“, „Menschen …“, „Klima …“)",
+        "inhalt": [
+          {
+            "tipp": "Formatiere die erste Unterüberschrift und übertrage das Format mit {{Start > Format übertragen}} (Pinsel-Symbol) auf die anderen."
+          },
+          {
+            "b": "Schriftart **MV Boli**, Schriftgröße **14**"
+          },
+          {
+            "b": "Abstand nach: **4 pt**"
+          },
+          {
+            "b": "Farbe: **Orange, Akzent 2, dunkler 25 %**"
+          },
+          {
+            "b": "Jeweils das **erste Wort** (inkl. Doppelpunkt) **fett**"
+          }
+        ]
+      },
+      {
+        "titel": "Erster Absatz („Mit einer Fläche von … Steilküsten.“)",
+        "inhalt": [
+          {
+            "b": "Bild **„karte.jpg“** rechts neben den ersten Absatz einfügen"
+          },
+          {
+            "b": "Nach Doppelklick auf das Bild von unten **zuschneiden** ({{Bildformat > Zuschneiden}}): Die dunkelgraue Straße und das Auto sind nicht mehr zu sehen."
+          },
+          {
+            "b": "Textumbruch **Quadrat**"
+          },
+          {
+            "b": "Größe: Höhe **4,9 cm**, Breite **5,6 cm** (zur Not entsprechend zuschneiden!)"
+          }
+        ]
+      },
+      {
+        "titel": "Zweiter Absatz („Die Inselbewohner … geöffnet.“)",
+        "inhalt": [
+          {
+            "b": "**Dreispaltig** formatieren: Absatz ohne die Überschrift markieren ➔ {{Layout > Spalten > Weitere Spalten}}"
+          },
+          {
+            "s": "Abstand zwischen den Spalten: **0,7 cm**"
+          },
+          {
+            "s": "**Zwischenlinie** einfügen"
+          },
+          {
+            "b": "**Fußnote** nach „Plazas“ (zweite Spalte) einfügen: {{Referenzen > Fußnotenmenü}} (kleiner Pfeil)"
+          },
+          {
+            "s": "Symbol: **❷** (Schaltfläche „Symbol“ ➔ Schriftart **Wingdings**, Zeichencode **140**)"
+          },
+          {
+            "s": "Fußnotentext (Arial, 9 pt): **spanisch für „Platz“**"
+          }
+        ]
+      },
+      {
+        "titel": "Dritter Absatz („Auf Mallorca … 10–18 °C.“)",
+        "inhalt": [
+          {
+            "b": "Bild **„wetterbericht.jpg“** einfügen"
+          },
+          {
+            "b": "Textumbruch **Quadrat**"
+          },
+          {
+            "b": "**Links** neben den dritten Absatz, unter die Überschrift"
+          },
+          {
+            "b": "Breite: **3,6 cm** (das Bild beginnt auf Höhe der Oberkante der Überschrift)"
+          },
+          {
+            "b": "Das Bild ist zu unscharf, daher bitte **Korrektur** anwenden: um **50 % schärfen** ({{Bildformat > Korrekturen}})"
+          }
+        ]
+      },
+      {
+        "titel": "Text in der Fußzeile",
+        "inhalt": [
+          {
+            "b": "**zentrieren**"
+          },
+          {
+            "b": "Schrift: **Arial, 8 pt**"
+          },
+          {
+            "b": "„Reisewelt Behrens“ **fett**"
+          }
+        ]
+      },
+      {
+        "titel": "Firmenlogo: Bild „logo.jpg“",
+        "inhalt": [
+          {
+            "img": "mal_logo.jpg"
+          },
+          {
+            "b": "**Unten rechts** in der Fußzeile einfügen"
+          },
+          {
+            "b": "Textumbruch: **Vor den Text**"
+          },
+          {
+            "b": "Größe auf **2 cm** ändern (Höhe und Breite)"
+          }
+        ]
+      },
+      {
+        "titel": "Speichern",
+        "inhalt": [
+          {
+            "b": "Speichere deine Lösung als **.docx** und als **.pdf** in deinem DB-Ordner ab."
+          }
+        ]
+      }
+    ]
+  },
+  {
     "slug": "bericht",
     "kurz": "Bericht für die Schülerzeitung",
     "level": "Schwer",
