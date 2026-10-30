@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { SitzungProvider, useSitzung, useSitzungState } from '../../../hooks/useSitzung';
 import { HeftBestaetigtCtx } from './kit';
 import { PHASEN, type PhaseArt } from './phasen';
-import { PunkteAnzeige, PunkteGruppeCtx, PunkteProvider, PunkteRegeln } from './punkte';
+import { PunkteAnzeige, PunkteGruppeCtx, PunkteProvider } from './punkte';
 import { VideoEmbed } from '../../../components/VideoButton';
 import './phasen.css';
 import './seiten.css';
@@ -143,7 +143,6 @@ function SeitenAnsicht({
           dabei <strong>alle Rechenschritte</strong> vollständig auf, nicht nur das Ergebnis. Erst
           dann trägst du das Ergebnis hier ein und prüfst es.
         </div>
-        <PunkteRegeln />
         <label className="sl-start-check">
           <input
             type="checkbox"

@@ -202,7 +202,7 @@ Jede Lernsituation belohnt richtige Lösungen mit Punkten. Die Elemente sollen m
 - **Weitere Elemente:**
   - **Punktestand** in der Phasenleiste mit kurzen Meldungen (+10, Abzug), die nach gut 2 Sekunden verschwinden
   - **Serien-Bonus:** 3 Aufgaben am Stück ohne Hilfe und ohne Fehler bringen +3
-  - **Spielregeln in der Startbox** (`PunkteRegeln`, automatisch)
+  - **Keine Spielregeln in der Startbox:** Die Startbox enthält keinen Text zum Punktesystem; die Kosten stehen an den Knöpfen.
   - **Bilanz** am Ende der letzten Seite (`<Bilanz />` unter dem Bonus-Spiel, über den Abschluss-Buttons): Punkte, 0 bis 3 Sterne mit Rang (Einsteiger, Bronze, Silber, Gold; nur aus den Aufgabenpunkten der Pflichtaufgaben), persönlicher Rekord (localStorage, mit try/catch) und vier Abzeichen: „Ganz allein“ (alle Pflichtaufgaben ohne Hilfe und Lösungsweg), „Serienstar“ (5 am Stück), „Profi“ (Profi-Aufgabe gelöst), „Spielchampion“ (im Bonus-Spiel fast alle Münzen)
   - **Bonus-Spiel:** Münzen bringen je 2 Punkte, nur das beste Ergebnis zählt (`useSpielPunkte`); das Spiel ist ein Bonus und bringt höchstens so viel wie die beste Übungsaufgabe (Rundenzahl entsprechend wählen, z. B. 4 Runden à 2 = 8 Punkte)
 - **Profi-Aufgaben** bekommen `profi` (zählen nicht zum Maximum der Sterne, aber zum Abzeichen „Profi“).
