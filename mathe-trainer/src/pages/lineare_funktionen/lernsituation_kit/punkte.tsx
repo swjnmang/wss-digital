@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useSitzungId, useSitzungState } from '../../../hooks/useSitzung'
 import './punkte.css'
 
 // Gamification der Lernsituationen: Punkte für gelöste Aufgaben, weniger Punkte mit Hilfen, zwei Drittel Abzug für den Lösungsweg vor dem Lösen,
@@ -74,12 +75,13 @@ const schreibeRekord = (key: string, v: number) => {
 }
 
 export function PunkteProvider({ name, children }: { name: string; children: ReactNode }) {
-  const [aufgaben, setAufgaben] = useState<Record<string, Aufgabe>>({})
-  const [bonus, setBonus] = useState(0)
-  const [serie, setSerie] = useState(0)
-  const [besteSerie, setBesteSerie] = useState(0)
-  const [spielMuenzen, setSpielMuenzen] = useState(0)
-  const [spielRunden, setSpielRunden] = useState(0)
+  // Der Stand überlebt Zurück und Neuladen (Sitzungsspeicher, 30 Minuten ab der letzten Aktion)
+  const [aufgaben, setAufgaben] = useSitzungState<Record<string, Aufgabe>>('punkte-aufgaben', {})
+  const [bonus, setBonus] = useSitzungState('punkte-bonus', 0)
+  const [serie, setSerie] = useSitzungState('punkte-serie', 0)
+  const [besteSerie, setBesteSerie] = useSitzungState('punkte-beste-serie', 0)
+  const [spielMuenzen, setSpielMuenzen] = useSitzungState('punkte-muenzen', 0)
+  const [spielRunden, setSpielRunden] = useSitzungState('punkte-runden', 0)
   const [meldungen, setMeldungen] = useState<Meldung[]>([])
   const rekordKey = `lernsituation-punkte:${name}`
   const [rekord] = useState(() => leseRekord(rekordKey))
@@ -87,7 +89,7 @@ export function PunkteProvider({ name, children }: { name: string; children: Rea
   const ref = useRef(aufgaben)
   const serieRef = useRef(serie)
   serieRef.current = serie
-  const spielRef = useRef(0)
+  const spielRef = useRef(spielMuenzen)
 
   const melde = useCallback((text: string, plus: boolean) => {
     const id = ++zaehler.current
@@ -208,7 +210,7 @@ export function usePunkteAufgabe({
   const ctxApi = useContext(ApiCtx)
   const api = zaehlt ? ctxApi : null
   const gruppe = useContext(PunkteGruppeCtx)
-  const eigene = useId()
+  const eigene = useSitzungId('punkte')
   const id = gruppe ?? eigene
   const max = wert ?? PUNKTE.aufgabe
   useEffect(() => {
