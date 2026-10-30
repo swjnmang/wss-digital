@@ -26,7 +26,7 @@ import './korbwurf.css'
 // dann lief jemand durchs Bild. Trifft Linas Wurf? Und der von Jonas?
 // Problem erkennen: Festlegung (Treffer, zu kurz, zu weit), dann in der App a, b und c ausprobieren (a = −0,5 ist aus der Abwurfgeschwindigkeit bekannt).
 // Die Bahn wird sofort gezeichnet, die App vergleicht mit den Messpunkten P(1 | 3,8) und Q(2 | 4,55). Durch Raten trifft man beide kaum.
-// Problem lösen in zwei Teilen, je Problem → Beispielrechnung mit Lernvideo Fall 2 → Ergebnisse abgleichen:
+// Problem lösen in zwei Teilen auf je einer eigenen Seite (Teil 2 erst nach Teil 1), je Problem → Beispielrechnung mit Lernvideo Fall 2 → Ergebnisse abgleichen:
 // Teil 1 a bekannt (Lina: II − I, c fällt weg): y = −0,5x² + 2,25x + 2,05, bei x = 4 genau 3,05 m → Treffer.
 // Teil 2 c bekannt (Jonas, Abwurfhöhe 2,2 m: I · 2, dann subtrahieren): y = −0,4x² + 1,6x + 2,2, bei x = 4 nur 2,2 m → zu kurz.
 // Aha: Jonas' Ball steigt am Anfang fast genauso wie Linas, ist bei x = 2 aber schon am höchsten Punkt und fliegt 85 cm unter dem Ring durch.
@@ -718,11 +718,12 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
     },
     {
       art: 'loesen',
-      titel: 'Die Wurfbahnen berechnen',
-      pflicht: ['t1', 't2', 'entscheidung', 'produkt'],
+      titel: 'Teil 1: Linas Wurf, a ist bekannt',
+      pflicht: ['t1'],
+      bedingung: 'Berechne Linas Wurfbahn und die Wurfhöhe richtig, dann geht es zu Teil 2.',
       inhalt: (fertig) => (
         <>
-          <p className="sl-hinweis">Einzelarbeit, Teil 2 auch in Partnerarbeit, ca. 45 Minuten.</p>
+          <p className="sl-hinweis">Einzelarbeit, ca. 20 Minuten.</p>
           <div className="sl-fokus">
             <p className="sl-fokus-titel">Deine Aufgabe: Berechne Linas Wurfbahn und prüfe, ob der Ball trifft</p>
             <p>
@@ -736,7 +737,7 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
             frage="Linas Bahn: y = −0,5x² + bx + c"
             label="Spielfeld mit P(1 | 3,8), Q(2 | 4,55) und dem Korb bei x = 4 in 3,05 m Höhe."
           />
-          <Abschnitt titel="Teil 1: Linas Wurf, a ist bekannt">
+          <Abschnitt titel="So geht es">
             <BeispielMitVideo video={VIDEO_FALL2} videoTitel="Lernvideo: Funktionsgleichung aufstellen – Fall 2">
               <Beispiel offen title="Emils Wurf" aufgabe={BSP1_AUFGABE} steps={BSP1_SCHRITTE} />
             </BeispielMitVideo>
@@ -771,17 +772,30 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
               }
             />
           </Abschnitt>
-          <Abschnitt titel="Teil 2: Jonas' Wurf, c ist bekannt">
-            <p className="sl-text">
+        </>
+      ),
+    },
+    {
+      art: 'loesen',
+      titel: "Teil 2: Jonas' Wurf, c ist bekannt",
+      pflicht: ['t2', 'entscheidung', 'produkt'],
+      inhalt: (fertig) => (
+        <>
+          <p className="sl-hinweis">Einzel- oder Partnerarbeit, ca. 25 Minuten.</p>
+          <div className="sl-fokus">
+            <p className="sl-fokus-titel">Deine Aufgabe: Berechne Jonas' Wurfbahn</p>
+            <p>
               Auch bei Jonas fehlt das Ende des Videos. Jonas ist größer und wirft aus <strong>2,2 m Höhe</strong> ab, also ist <M>{'c = 2{,}2'}</M>. Er wirft flacher als Lina, deshalb
               kennt die App <M>a</M> diesmal nicht. Gemessen sind <M>{'P(1 \\mid 3{,}4)'}</M> und <M>{'Q(2 \\mid 3{,}8)'}</M>. Berechne die vollständige
               Funktionsgleichung der Wurfparabel und die Höhe bei der Korbmitte.
             </p>
-            <Feld
-              punkte={PUNKTE_JONAS}
-              frage="Jonas' Bahn: y = ax² + bx + 2,2"
-              label="Spielfeld mit Jonas' Messpunkten P(1 | 3,4) und Q(2 | 3,8) und dem Korb bei x = 4 in 3,05 m Höhe."
-            />
+          </div>
+          <Feld
+            punkte={PUNKTE_JONAS}
+            frage="Jonas' Bahn: y = ax² + bx + 2,2"
+            label="Spielfeld mit Jonas' Messpunkten P(1 | 3,4) und Q(2 | 3,8) und dem Korb bei x = 4 in 3,05 m Höhe."
+          />
+          <Abschnitt titel="So geht es">
             <BeispielMitVideo video={VIDEO_FALL2} videoTitel="Lernvideo: Funktionsgleichung aufstellen – Fall 2">
               <Beispiel offen title="Mias Wurf" aufgabe={BSP2_AUFGABE} steps={BSP2_SCHRITTE} />
             </BeispielMitVideo>
