@@ -1,12 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTaskTracking } from '../../hooks/useTaskTracking'
 import TaskShell from '../../components/layout/TaskShell'
-
-declare global {
-  interface Window {
-    GGBApplet: any
-  }
-}
+import PunktePlot from '../../components/PunktePlot'
 
 interface ProportionalContext {
   id: string
@@ -106,29 +101,6 @@ function generateRound(prevContextId?: string): Round {
   return { context, k, targets }
 }
 
-function injectApplet(containerId: string, width: number, height: number, onLoad: (api: any) => void) {
-  const params: any = {
-    appName: 'classic',
-    width,
-    height,
-    showToolBar: false,
-    showAlgebraInput: false,
-    showMenuBar: false,
-    perspective: 'G',
-    useBrowserForJS: true,
-    enableShiftDragZoom: true,
-    showResetIcon: true,
-    showZoomButtons: true,
-    appletOnLoad: onLoad,
-  }
-  try {
-    const applet = new window.GGBApplet(params, true)
-    applet.inject(containerId)
-  } catch (e) {
-    console.error(`GeoGebra Error (${containerId}):`, e)
-  }
-}
-
 export default function Proportional() {
   const tracking = useTaskTracking('Proportionale Zusammenhänge')
   const [score, setScore] = useState(0)
@@ -138,149 +110,35 @@ export default function Proportional() {
   const [tableSolved, setTableSolved] = useState(false)
   const [tableScored, setTableScored] = useState(false)
 
-  const [achievedX, setAchievedX] = useState<Set<number>>(new Set())
-  const [plotDone, setPlotDone] = useState(false)
+  const [achievedX, setAchievedX] = useState<number[]>([])
+  const [wrongClick, setWrongClick] = useState<{ x: number; y: number } | null>(null)
   const [plotScored, setPlotScored] = useState(false)
   const [plotFeedback, setPlotFeedback] = useState<string | null>(null)
+  const wrongTimer = useRef<number | undefined>(undefined)
 
-  const plotApiRef = useRef<any>(null)
-  const achievedRef = useRef<Set<number>>(new Set())
-  const plotDoneRef = useRef(false)
-  const roundRef = useRef(round)
-  roundRef.current = round
+  const plotDone = achievedX.length === round.targets.length
+  const xMax = Math.max(...round.context.xValues) * 1.1
+  const yMax = Math.max(...round.targets.map((t) => t.y)) * 1.1
 
-  // GeoGebra-Skript einmalig laden
-  useEffect(() => {
-    const existing = document.querySelector('script[src="https://www.geogebra.org/apps/deployggb.js"]')
-    if (!existing) {
-      const script = document.createElement('script')
-      script.src = 'https://www.geogebra.org/apps/deployggb.js'
-      script.async = true
-      document.body.appendChild(script)
-    }
-  }, [])
+  useEffect(() => () => window.clearTimeout(wrongTimer.current), [])
 
-  // Zeichenfläche erst injizieren, wenn die Wertetabelle korrekt gelöst wurde
-  useEffect(() => {
-    if (!tableSolved) return
-
-    achievedRef.current = new Set()
-    plotDoneRef.current = false
-    setAchievedX(new Set())
-    setPlotDone(false)
-    setPlotFeedback(null)
-
-    let cancelled = false
-    const tryInject = () => {
-      if (cancelled) return
-      if (!window.GGBApplet) {
-        setTimeout(tryInject, 150)
-        return
-      }
-      injectApplet('ggb-proportional-plot', 600, 400, (api: any) => {
-        plotApiRef.current = api
-        setupPlot(api)
-      })
-    }
-    tryInject()
-
-    return () => {
-      cancelled = true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tableSolved, round])
-
-  const setupPlot = (api: any) => {
-    const ctx = roundRef.current.context
-    const targets = roundRef.current.targets
-    // x- und y-Achse unabhängig voneinander eng an die echten Werte anpassen
-    // (x und y sind unterschiedliche Größen, z.B. Stück vs. Euro - ein
-    // erzwungener gemeinsamer Pixel-Maßstab würde eine Achse künstlich
-    // aufblähen und die Punkte in eine Ecke quetschen).
-    const xMax = Math.max(...ctx.xValues) * 1.1
-    const yMax = Math.max(...targets.map((t) => t.y)) * 1.1
-
-    try {
-      api.reset()
-      api.setCoordSystem(-xMax * 0.06, xMax, -yMax * 0.06, yMax)
-      api.setMode(1) // Punkt-Werkzeug: Klicks erzeugen einen Punkt
-      api.registerAddListener((objName: string) => {
-        handlePointAdded(api, objName, xMax, yMax)
-      })
-    } catch (e) {
-      console.error('GeoGebra Setup-Error:', e)
-    }
-  }
-
-  const handlePointAdded = (api: any, objName: string, xMax: number, yMax: number) => {
-    if (plotDoneRef.current) return
-
-    let rawX = 0
-    let rawY = 0
-    try {
-      rawX = api.getXcoord(objName)
-      rawY = api.getYcoord(objName)
-    } catch (e) {
+  const handlePick = (hit: { x: number; y: number } | null, click: { x: number; y: number }) => {
+    if (plotDone) return
+    if (hit) {
+      setPlotFeedback(null)
+      setAchievedX((a) => (a.includes(hit.x) ? a : [...a, hit.x]))
       return
     }
-
-    const targets = roundRef.current.targets
-    let nearest: { x: number; y: number } | null = null
-    let nearestDist = Infinity
-    for (const t of targets) {
-      const dx = (rawX - t.x) / xMax
-      const dy = (rawY - t.y) / yMax
-      const dist = Math.sqrt(dx * dx + dy * dy)
-      if (dist < nearestDist) {
-        nearestDist = dist
-        nearest = t
-      }
-    }
-
-    const captureRadius = 0.08
-
-    if (nearest && nearestDist <= captureRadius) {
-      if (achievedRef.current.has(nearest.x)) {
-        try { api.deleteObject(objName) } catch (e) { /* ignore */ }
-        return
-      }
-      try {
-        api.setCoords(objName, nearest.x, nearest.y)
-        api.setColor(objName, 22, 163, 74)
-      } catch (e) { /* ignore */ }
-
-      achievedRef.current.add(nearest.x)
-      setAchievedX(new Set(achievedRef.current))
-      setPlotFeedback(null)
-
-      if (achievedRef.current.size === targets.length) {
-        plotDoneRef.current = true
-        setPlotDone(true)
-        try {
-          const k = roundRef.current.k
-          api.evalCommand(`g(x) = ${k}*x`)
-          api.setColor('g', 37, 99, 235)
-          api.setMode(0)
-        } catch (e) { /* ignore */ }
-      }
-    } else {
-      try { api.setColor(objName, 220, 38, 38) } catch (e) { /* ignore */ }
-      setPlotFeedback('Das passt zu keinem Wertepaar aus deiner Tabelle. Versuch es noch einmal!')
-      setTimeout(() => {
-        try { api.deleteObject(objName) } catch (e) { /* ignore */ }
-      }, 900)
-    }
+    setWrongClick(click)
+    setPlotFeedback('Das passt zu keinem Wertepaar aus deiner Tabelle. Versuch es noch einmal!')
+    window.clearTimeout(wrongTimer.current)
+    wrongTimer.current = window.setTimeout(() => setWrongClick(null), 900)
   }
 
   const resetPlot = () => {
-    const api = plotApiRef.current
-    if (!api) return
-    achievedRef.current = new Set()
-    plotDoneRef.current = false
-    setAchievedX(new Set())
-    setPlotDone(false)
+    setAchievedX([])
+    setWrongClick(null)
     setPlotFeedback(null)
-    setupPlot(api)
   }
 
   const checkTable = () => {
@@ -309,8 +167,8 @@ export default function Proportional() {
     setTableChecked(null)
     setTableSolved(false)
     setTableScored(false)
-    setAchievedX(new Set())
-    setPlotDone(false)
+    setAchievedX([])
+    setWrongClick(null)
     setPlotScored(false)
     setPlotFeedback(null)
   }
@@ -389,16 +247,27 @@ export default function Proportional() {
           <div className="bk-panel mb-8">
             <h2 className="text-lg font-bold text-slate-800 mb-2">Punkte einzeichnen</h2>
             <p className="text-sm text-slate-600 mb-4">
-              Klicke im Koordinatensystem auf die Punkte aus deiner Wertetabelle. Richtige Punkte werden grün markiert; sobald alle Punkte gesetzt sind, zeichnet die App automatisch die passende Gerade ein. Mit dem Mausrad, zwei Fingern (Touch) oder den +/− Knöpfen kannst du hinein- und herauszoomen, um genauer zu klicken.
+              Klicke (oder tippe) im Koordinatensystem auf die Punkte aus deiner Wertetabelle. Richtige Punkte werden grün markiert; sobald alle Punkte gesetzt sind, zeichnet die App automatisch die passende Gerade ein. Tippe auf die Stelle, an der der Punkt liegt – er rastet ein, wenn du ihn ungefähr triffst.
             </p>
 
             <div className="mb-4 flex justify-center border rounded-lg overflow-hidden shadow-inner bg-white">
-              <div id="ggb-proportional-plot" style={{ width: '600px', height: '400px' }}></div>
+              <PunktePlot
+                xMax={xMax}
+                yMax={yMax}
+                xLabel={ctx.xLabel}
+                yLabel={ctx.yLabel}
+                points={round.targets.filter((t) => achievedX.includes(t.x))}
+                wrong={wrongClick}
+                k={plotDone ? round.k : null}
+                targets={round.targets}
+                disabled={plotDone}
+                onPick={handlePick}
+              />
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-4">
               <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded font-bold">
-                {achievedX.size} / {round.targets.length} Punkte gesetzt
+                {achievedX.length} / {round.targets.length} Punkte gesetzt
               </div>
               <button onClick={resetPlot} className="bk-btn">
                 Punkte zurücksetzen
