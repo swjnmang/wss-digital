@@ -56,7 +56,7 @@ export default function LayoutTrainer() {
   const task = taskId ? getLayoutTask(taskId) : undefined;
 
   useEffect(() => {
-    if (!task) navigate('/digitale-bildung/word/layout', { replace: true });
+    if (!task) navigate('/digitale-bildung/word/layout/uebungen', { replace: true });
   }, [task, navigate]);
 
   // key: beim Aufgabenwechsel beginnt der Trainer mit frischem Zustand
@@ -160,7 +160,7 @@ function Trainer({ task }: { task: LayoutTask }) {
     <div className="fixed inset-0 z-30 flex flex-col bg-slate-100">
       {/* Kopfleiste */}
       <header className="shrink-0 bg-slate-800 text-white px-3 py-2 flex items-center gap-2">
-        <Link to="/digitale-bildung/word/layout" className="shrink-0 text-slate-300 hover:text-white text-sm px-2 py-1.5 rounded-md hover:bg-white/10" title="Zur Aufgabenübersicht">
+        <Link to="/digitale-bildung/word/layout/uebungen" className="shrink-0 text-slate-300 hover:text-white text-sm px-2 py-1.5 rounded-md hover:bg-white/10" title="Zur Aufgabenübersicht">
           ← <span className="hidden sm:inline">Übersicht</span>
         </Link>
         <h1 className="flex-1 min-w-0 truncate text-sm sm:text-base font-semibold">{task.title}</h1>

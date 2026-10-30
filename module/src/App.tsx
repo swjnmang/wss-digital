@@ -14,6 +14,8 @@ import ExcelTaskSelect from './pages/digitale-bildung/ExcelTaskSelect'
 import ExcelTrainer from './pages/digitale-bildung/ExcelTrainer'
 import { ExcelSessionProvider } from './lib/excel-trainer/ExcelSessionContext'
 import LayoutIndex from './pages/digitale-bildung/word/LayoutIndex'
+import LayoutHub from './pages/digitale-bildung/word/LayoutHub'
+import LayoutArbeitsauftraege from './pages/digitale-bildung/word/LayoutArbeitsauftraege'
 import LayoutTrainer from './pages/digitale-bildung/word/LayoutTrainer'
 import WordIndex from './pages/digitale-bildung/word/WordIndex'
 import GeschaeftsbriefIndex from './pages/digitale-bildung/word/GeschaeftsbriefIndex'
@@ -65,7 +67,9 @@ function App() {
           <Route path=":taskId" element={<ExcelTrainer />} />
         </Route>
         <Route path="/digitale-bildung/word" element={<WordIndex />} />
-        <Route path="/digitale-bildung/word/layout" element={<LayoutIndex />} />
+        <Route path="/digitale-bildung/word/layout" element={<LayoutHub />} />
+        <Route path="/digitale-bildung/word/layout/uebungen" element={<LayoutIndex />} />
+        <Route path="/digitale-bildung/word/layout/arbeitsauftraege" element={<LayoutArbeitsauftraege />} />
         <Route path="/digitale-bildung/word/layout/:taskId" element={<LayoutTrainer />} />
         <Route path="/digitale-bildung/word/geschaeftsbrief" element={<GeschaeftsbriefIndex />} />
         <Route

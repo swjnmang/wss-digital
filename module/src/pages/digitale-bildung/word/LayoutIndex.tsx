@@ -26,12 +26,12 @@ export default function LayoutIndex() {
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-gradient-to-br from-slate-800 to-slate-700 text-white py-8 px-4 text-center relative">
         <Link
-          to="/digitale-bildung/word"
+          to="/digitale-bildung/word/layout"
           className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors"
         >
-          ← Word
+          ← Layouten
         </Link>
-        <h1 className="text-2xl font-bold">🎨 Layouten mit Word</h1>
+        <h1 className="text-2xl font-bold">💻 Digitale Übungen</h1>
         <p className="text-slate-300 text-sm mt-1">Wähle eine Aufgabe aus.</p>
       </header>
 
