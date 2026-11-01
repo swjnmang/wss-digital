@@ -24,9 +24,9 @@ export function XQuadrat() {
       erklaerungTitel="So löst du x² = d durch Wurzelziehen"
       weiter={{ to: `${QG_BASIS}/ax2-gleich-d`, label: 'Gleichungen der Form ax² = d' }}
       stufen={[
-        { id: 1, name: 'Stufe 1: Quadratzahlen', beschreibung: 'Rechts steht eine Quadratzahl, z. B. x² = 49.' },
-        { id: 2, name: 'Stufe 2: Dezimalzahlen und große Zahlen', beschreibung: 'Z. B. x² = 0,36 oder x² = 400.' },
-        { id: 3, name: 'Stufe 3: Runden', beschreibung: 'Keine Quadratzahl – runde auf zwei Nachkommastellen (Taschenrechner).' },
+        { id: 1, name: 'Stufe 1: Grundform', beschreibung: 'Immer nach demselben Schema: x² = Quadratzahl, z. B. x² = 49.' },
+        { id: 2, name: 'Stufe 2: verschiedene Schreibweisen', beschreibung: 'Andere Variablen, Seiten getauscht, Brüche und Dezimalzahlen, z. B. 400 = z², t² − 81 = 0, a² = 9/16.' },
+        { id: 3, name: 'Stufe 3: Runden', beschreibung: 'Keine Quadratzahl, gemischte Schreibweisen – runde auf zwei Nachkommastellen (Taschenrechner).' },
       ]}
       erzeuge={erzeugeXQuadrat}
       erklaerung={
@@ -51,7 +51,7 @@ export function XQuadrat() {
             ]}
             schluss="\mathbb{L} = \{-7;\ 7\}"
           />
-          <p className="text-xs text-gray-500">Eingabe: Trage beide Lösungen ein, die Reihenfolge ist egal. Dezimalzahlen mit Komma, z. B. 0,6.</p>
+          <p className="text-xs text-gray-500">Eingabe: Trage beide Lösungen ein, die Reihenfolge ist egal. Dezimalzahlen mit Komma (z. B. 0,6) oder Brüche (z. B. 3/4). Ab Stufe 2 heißt die Variable nicht immer x.</p>
         </>
       }
     />
@@ -65,9 +65,9 @@ export function AXQuadrat() {
       erklaerungTitel="So löst du ax² = d"
       weiter={{ to: `${QG_BASIS}/ax2-plus-c`, label: 'Gleichungen der Form ax² + c = d' }}
       stufen={[
-        { id: 1, name: 'Stufe 1: a positiv', beschreibung: 'Z. B. 3x² = 75.' },
-        { id: 2, name: 'Stufe 2: a negativ oder Dezimalzahl', beschreibung: 'Z. B. −2x² = −32 oder 0,5x² = 8.' },
-        { id: 3, name: 'Stufe 3: Runden', beschreibung: 'Ergebnis auf zwei Nachkommastellen runden.' },
+        { id: 1, name: 'Stufe 1: Grundform', beschreibung: 'Immer nach demselben Schema: ax² = d, z. B. 3x² = 75.' },
+        { id: 2, name: 'Stufe 2: verschiedene Schreibweisen', beschreibung: 'a negativ, als Dezimalzahl oder Bruch, Seiten getauscht, z. B. −2t² = −32, 8 = ½z², x²/4 = 9.' },
+        { id: 3, name: 'Stufe 3: Runden', beschreibung: 'Gemischte Schreibweisen, Ergebnis auf zwei Nachkommastellen runden.' },
       ]}
       erzeuge={erzeugeAXQuadrat}
       erklaerung={
@@ -107,9 +107,9 @@ export function AXQuadratC() {
       erklaerungTitel="So löst du ax² + c = d"
       weiter={{ to: `${QG_BASIS}/anzahl-loesungen`, label: 'Anzahl der Lösungen' }}
       stufen={[
-        { id: 1, name: 'Stufe 1: x² + c = d', beschreibung: 'Z. B. x² − 16 = 0 oder x² + 5 = 41.' },
-        { id: 2, name: 'Stufe 2: ax² + c = d', beschreibung: 'Z. B. 2x² − 8 = 42.' },
-        { id: 3, name: 'Stufe 3: Profi', beschreibung: 'Negative Zahlen, Dezimalzahlen und Runden.' },
+        { id: 1, name: 'Stufe 1: Grundform', beschreibung: 'Immer nach demselben Schema: x² + c = d, z. B. x² + 5 = 41.' },
+        { id: 2, name: 'Stufe 2: verschiedene Schreibweisen', beschreibung: 'Mit a vor x², Zahl vorne, Seiten getauscht, z. B. 50 − 2z² = 18 oder 42 = 2t² − 8.' },
+        { id: 3, name: 'Stufe 3: Profi', beschreibung: 'Brüche, Dezimalzahlen, negative Zahlen und Runden, z. B. ½a² + 3 = 21.' },
       ]}
       erzeuge={erzeugeAXQuadratC}
       erklaerung={
@@ -148,8 +148,8 @@ export function AnzahlLoesungen() {
       erklaerungTitel="Zwei, eine oder keine Lösung?"
       weiter={{ to: `${QG_BASIS}/erst-umformen`, label: 'Gleichungen erst umformen' }}
       stufen={[
-        { id: 1, name: 'Stufe 1: ax² = d', beschreibung: 'Entscheide, wie viele Lösungen es gibt, und gib sie an.' },
-        { id: 2, name: 'Stufe 2: ax² + c = d', beschreibung: 'Erst umformen, dann entscheiden.' },
+        { id: 1, name: 'Stufe 1: Grundform ax² = d', beschreibung: 'Entscheide, wie viele Lösungen es gibt, und gib sie an.' },
+        { id: 2, name: 'Stufe 2: verschiedene Schreibweisen', beschreibung: 'Erst umformen, dann entscheiden – mit Zahl vorne, getauschten Seiten und anderen Variablen.' },
       ]}
       erzeuge={erzeugeAnzahl}
       erklaerung={
@@ -184,8 +184,9 @@ export function ErstUmformen() {
       erklaerungTitel="Mit Termumformungen zur Form x² = d"
       weiter={{ to: `${QG_BASIS}/satz-vom-nullprodukt`, label: 'Satz vom Nullprodukt' }}
       stufen={[
-        { id: 1, name: 'Stufe 1: x² auf beiden Seiten', beschreibung: 'Z. B. 5x² − 7 = 2x² + 20.' },
-        { id: 2, name: 'Stufe 2: mit Klammern', beschreibung: 'Z. B. 3(x² − 4) = 2x² + 13.' },
+        { id: 1, name: 'Stufe 1: Grundform', beschreibung: 'Immer nach demselben Schema: x² auf beiden Seiten, z. B. 5x² − 7 = 2x² + 20.' },
+        { id: 2, name: 'Stufe 2: eine Klammer', beschreibung: 'Klammer links oder rechts, mehr x² auf der rechten Seite, z. B. 3(t² − 4) = 2t² + 13 oder 6z² − 4 = 4(z² + 2).' },
+        { id: 3, name: 'Stufe 3: mehrere Klammern', beschreibung: 'Zwei Klammern, Minus vor der Klammer, z. B. 3(x² + 2) − 2(x² − 4) = 30.' },
       ]}
       erzeuge={erzeugeUmformen}
       erklaerung={
@@ -219,10 +220,10 @@ export function Nullprodukt() {
       erklaerungTitel="So löst du ax² + bx = 0 mit Ausklammern und dem Satz vom Nullprodukt"
       weiter={{ to: `${QG_BASIS}/gemischte-uebungen`, label: 'Gemischte Übungen' }}
       stufen={[
-        { id: 1, name: 'Stufe 1: Satz vom Nullprodukt verstehen', beschreibung: 'Das x ist schon ausgeklammert, z. B. x(x − 4) = 0.' },
-        { id: 2, name: 'Stufe 2: x² + bx = 0', beschreibung: 'Erst x ausklammern, z. B. x² − 6x = 0.' },
-        { id: 3, name: 'Stufe 3: ax² + bx = 0', beschreibung: 'Mit einer Zahl vor x², z. B. 2x² + 10x = 0.' },
-        { id: 4, name: 'Stufe 4: erst umformen', beschreibung: 'Zuerst alles auf eine Seite bringen, z. B. 3x² = 12x.' },
+        { id: 1, name: 'Stufe 1: Grundform', beschreibung: 'Immer nach demselben Schema: x ist schon ausgeklammert, z. B. x(x − 4) = 0.' },
+        { id: 2, name: 'Stufe 2: x² + bx = 0', beschreibung: 'Erst ausklammern – in verschiedenen Reihenfolgen, z. B. x² − 6x = 0, −6t + t² = 0, 0 = z² + 4z.' },
+        { id: 3, name: 'Stufe 3: ax² + bx = 0', beschreibung: 'Mit einer Zahl vor x², z. B. 2x² + 10x = 0 oder 9a − 3a² = 0.' },
+        { id: 4, name: 'Stufe 4: erst umformen', beschreibung: 'Zuerst alles auf eine Seite bringen, z. B. 3x² = 12x, 8z = 2z² oder 2t² + 3t + 5 = 9t + 5.' },
       ]}
       erzeuge={erzeugeNullprodukt}
       erklaerung={
