@@ -67,6 +67,16 @@ const routes = [
   { path: '/finanzmathe/anwendungsaufgaben', priority: 0.8, changefreq: 'monthly' },
   { path: '/finanzmathe/anwendungsaufgaben/escape-room-zinseszins', priority: 0.6, changefreq: 'monthly' },
 
+  // Quadratische Gleichungen
+  { path: '/quadratische_gleichungen', priority: 0.9, changefreq: 'monthly' },
+  { path: '/quadratische_gleichungen/x2-gleich-d', priority: 0.8, changefreq: 'monthly' },
+  { path: '/quadratische_gleichungen/ax2-gleich-d', priority: 0.8, changefreq: 'monthly' },
+  { path: '/quadratische_gleichungen/ax2-plus-c', priority: 0.8, changefreq: 'monthly' },
+  { path: '/quadratische_gleichungen/anzahl-loesungen', priority: 0.8, changefreq: 'monthly' },
+  { path: '/quadratische_gleichungen/erst-umformen', priority: 0.8, changefreq: 'monthly' },
+  { path: '/quadratische_gleichungen/anwendungsaufgaben', priority: 0.8, changefreq: 'monthly' },
+  { path: '/quadratische_gleichungen/gemischte-uebungen', priority: 0.8, changefreq: 'monthly' },
+
   // Quadratische Funktionen
   { path: '/quadratische_funktionen', priority: 0.9, changefreq: 'monthly' },
   { path: '/quadratische_funktionen/normalparabel', priority: 0.8, changefreq: 'monthly' },

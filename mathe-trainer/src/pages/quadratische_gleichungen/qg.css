@@ -1,0 +1,3 @@
+/* Rechenwege der quadratischen Gleichungen linksbündig (KaTeX zentriert Display-Formeln sonst) */
+.qg-weg .katex-display { text-align: left; margin: 0.4em 0 0.4em 1rem; }
+.qg-weg .katex-display > .katex { text-align: left; }
