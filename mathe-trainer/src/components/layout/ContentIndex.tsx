@@ -33,7 +33,7 @@ export default function ContentIndex({ currentId, showShort = false, home = fals
             {showShort && <small>{a.short}</small>}
           </span>
           <span className="bk-index-dots" aria-hidden="true" />
-          <span className="bk-index-count">{exerciseCount(a)}<span className="sr-only"> {a.unit}</span></span>
+          <span className="bk-index-count">{exerciseCount(a)} {exerciseCount(a) === 1 ? (a.unit === 'Themen' ? 'Thema' : 'Übung') : a.unit}</span>
         </Link>
       ))}
       {!home && <>
