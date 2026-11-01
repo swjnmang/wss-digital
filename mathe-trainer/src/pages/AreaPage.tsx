@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { areaById, areaNumber, exerciseCount, type AreaId } from '../data/areas'
 import AreaIntro from '../components/layout/AreaIntro'
+import EinstufungstestKarte from './rechnen_lernen/einstufungstest/EinstufungstestKarte'
 
 // Bereichsseite im Heft-Design: die Themen des Kapitels mit Nummern (z. B. 2.5), gruppiert in Abschnitte.
 // Ohne Inhaltsverzeichnis daneben (Wunsch des Nutzers) – das steht nur auf der Startseite. Reihenfolge wie bisher.
@@ -17,6 +18,7 @@ export default function AreaPage({ id }: { id: AreaId }) {
         <h1 className="bk-area-title">{area.title}</h1>
         <p className="bk-area-short">{area.short} · {exerciseCount(area)} {area.unit}</p>
         <AreaIntro id={area.id} />
+        {area.id === 'rechnen' && <EinstufungstestKarte />}
 
         {area.sections.map((section) => (
           <section key={section.name} className="bk-area-section" aria-labelledby={`sec-${section.name}`}>

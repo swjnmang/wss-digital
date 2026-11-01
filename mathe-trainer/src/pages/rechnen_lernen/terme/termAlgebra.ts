@@ -254,7 +254,7 @@ export function parseExpression(raw: string): Poly | null {
     if (isOp(peek(), '^')) {
       pos++;
       const e = peek();
-      if (!e || e.kind !== 'num' || !Number.isInteger(e.value) || e.value < 0 || e.value > 6) {
+      if (!e || e.kind !== 'num' || !Number.isInteger(e.value) || e.value < 0 || e.value > 30) {
         return null;
       }
       pos++;
