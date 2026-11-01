@@ -20,6 +20,7 @@ const routes = [
 
   // Rechnen Lernen
   { path: '/rechnen_lernen', priority: 0.9, changefreq: 'monthly' },
+  { path: '/rechnen_lernen/einstufungstest', priority: 0.8, changefreq: 'monthly' },
   { path: '/rechnen_lernen/terme', priority: 0.8, changefreq: 'monthly' },
   { path: '/rechnen_lernen/terme/ohnevariablen', priority: 0.7, changefreq: 'monthly' },
   { path: '/rechnen_lernen/terme/zusammenfassen', priority: 0.7, changefreq: 'monthly' },

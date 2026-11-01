@@ -1,0 +1,85 @@
+/* Einstufungstest „Rechnen lernen“ – ruhiges Heft-Design, Farben nur über die Tokens */
+.et-wrap { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.et-karte { background: var(--surface); border: 1.5px solid var(--edge); border-radius: 14px; padding: 16px 18px; }
+.et-karte h2 { margin: 0 0 10px; font-size: 18px; font-weight: 700; color: var(--ink); }
+.et-liste { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink); line-height: 1.5; }
+
+.et-start { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.et-start label { font-weight: 700; color: var(--ink); }
+.et-start input { flex: 1 1 220px; min-width: 0; padding: 8px 12px; border: 2px solid var(--edge); border-radius: 10px; font-size: 16px; background: var(--surface); color: var(--ink); }
+
+/* Leiste mit Uhr, bleibt beim Scrollen sichtbar */
+.et-leiste { position: sticky; top: 72px; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--surface); border: 1.5px solid var(--edge); border-radius: 14px; padding: 10px 14px; box-shadow: 0 6px 18px rgba(0, 0, 0, .06); }
+.et-uhr { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.et-fortschritt { color: var(--ink-muted); font-size: 14px; }
+.et-knapp { border-color: var(--wrong); }
+.et-knapp .et-uhr { color: var(--wrong-ink); }
+.et-warnung { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--wrong-soft); color: var(--wrong-ink); font-weight: 600; }
+
+.et-bereich { display: flex; flex-direction: column; gap: 8px; }
+.et-bereich h2 { margin: 10px 0 2px; font-size: 18px; font-weight: 700; color: var(--ink); }
+.et-aufgabe, .et-detail { display: flex; gap: 12px; background: var(--surface); border: 1.5px solid var(--edge); border-radius: 12px; padding: 12px 14px; }
+.et-nr { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px;
+  background: var(--surface-sunken); color: var(--ink); }
+.et-inhalt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.et-inhalt p { margin: 0; color: var(--ink); line-height: 1.45; }
+.et-frage { font-weight: 600; }
+.et-term { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 17px; }
+.et-tex { font-size: 18px; overflow-x: auto; }
+.et-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--ink); }
+.et-eingabe input { width: 220px; max-width: 100%; padding: 6px 10px; border: 2px solid var(--edge); border-radius: 10px; font-size: 16px; background: var(--surface); color: var(--ink); }
+.et-eingabe input:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+.et-hinweis { font-size: 13px; color: var(--ink-muted) !important; }
+.et-ende { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px; color: var(--ink-muted); }
+.et-ende p { margin: 0; }
+
+/* Auswertung */
+.et-kopf { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
+.et-name { margin: 0; font-size: 20px; font-weight: 700; color: var(--ink); }
+.et-meta { margin: 2px 0 0; color: var(--ink-muted); font-size: 14px; }
+.et-gesamt { display: flex; flex-direction: column; align-items: center; }
+.et-gesamt strong { font-size: 28px; color: var(--ink); }
+.et-gesamt span { color: var(--ink-muted); font-size: 14px; }
+.et-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.et-tabelle { display: flex; flex-direction: column; }
+.et-zeile { display: grid; grid-template-columns: 20px minmax(110px, 1.1fr) 52px minmax(110px, 1fr) minmax(0, 1.6fr); align-items: center; gap: 10px;
+  padding: 9px 0; border-bottom: 1px solid var(--edge); color: var(--ink); }
+.et-zeile:last-child { border-bottom: none; }
+.et-bname { font-weight: 700; }
+.et-urteil { font-weight: 600; }
+.et-links { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.et-links a, .et-plan a, .et-detail a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.et-links a:hover, .et-plan a:hover, .et-detail a:hover { text-decoration: underline; }
+@media (max-width: 640px) {
+  .et-zeile { grid-template-columns: 20px 1fr auto; }
+  .et-urteil { grid-column: 2 / 4; }
+  .et-links { grid-column: 2 / 4; }
+}
+
+.et-ampel { display: inline-block; width: 16px; height: 16px; border-radius: 50%; vertical-align: -2px; }
+.et-ampel.et-gruen { background: var(--correct); }
+.et-ampel.et-gelb { background: #f2b705; }
+.et-ampel.et-rot { background: var(--wrong); }
+.et-urteil.et-gruen { color: var(--correct-ink); }
+.et-urteil.et-gelb { color: #8a5a00; }
+.et-urteil.et-rot { color: var(--wrong-ink); }
+.et-legende { margin: 10px 0 0; font-size: 13px; color: var(--ink-muted); }
+.et-plan { margin: 0; padding-left: 22px; display: grid; gap: 6px; color: var(--ink); }
+
+.et-detail-bereich h3 { margin: 12px 0 6px; font-size: 16px; color: var(--ink); }
+.et-detail { margin-bottom: 6px; }
+.et-detail.et-ok { border-left: 5px solid var(--correct); }
+.et-detail.et-falsch { border-left: 5px solid var(--wrong); }
+
+/* Karte auf der Seite „Rechnen lernen“ */
+.et-teaser { display: flex; align-items: center; gap: 16px; margin: 18px 0 4px; padding: 16px 18px; border: 2px solid var(--primary); border-radius: 14px;
+  background: var(--surface); color: var(--ink); text-decoration: none; transition: box-shadow .15s; }
+.et-teaser:hover { box-shadow: 0 6px 18px rgba(0, 0, 0, .08); }
+.et-teaser-icon { flex: none; font-size: 28px; color: var(--primary); }
+.et-teaser-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; text-align: left; }
+.et-teaser-text strong { font-size: 17px; }
+.et-teaser-text small { font-size: 14px; color: var(--ink-muted); line-height: 1.4; }
+.et-teaser-los { flex: none; font-weight: 700; color: var(--primary); white-space: nowrap; }
+@media (max-width: 560px) { .et-teaser { flex-wrap: wrap; } .et-teaser-los { width: 100%; text-align: right; } }

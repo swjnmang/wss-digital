@@ -30,6 +30,7 @@ import Handelskalkdif from './pages/rechnen_lernen/prozentrechnung/Handelskalkdi
 import GeneratorLineare from './pages/rechnen_lernen/gleichungen/Generator_lineare';
 import Bruchgleichungen from './pages/rechnen_lernen/gleichungen/Bruchgleichungen';
 import Abschlusstest from './pages/rechnen_lernen/gleichungen/Abschlusstest';
+import Einstufungstest from './pages/rechnen_lernen/einstufungstest/Einstufungstest';
 import { useCallback, useEffect, useState } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react';
@@ -243,6 +244,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/rechnen_lernen" element={<AreaPage id="rechnen" />} />
+          <Route path="/rechnen_lernen/einstufungstest" element={<Einstufungstest />} />
           <Route path="/rechnen_lernen/terme" element={<Terme />} />
           <Route path="/rechnen_lernen/terme/ohnevariablen" element={<Ohnevariablen />} />
           <Route path="/rechnen_lernen/terme/zusammenfassen" element={<TermeZusammenfassen />} />
