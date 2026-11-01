@@ -83,3 +83,10 @@
 .et-teaser-text small { font-size: 14px; color: var(--ink-muted); line-height: 1.4; }
 .et-teaser-los { flex: none; font-weight: 700; color: var(--primary); white-space: nowrap; }
 @media (max-width: 560px) { .et-teaser { flex-wrap: wrap; } .et-teaser-los { width: 100%; text-align: right; } }
+
+/* Bestätigung vor dem Start: Aufgaben abschreiben und Rechenschritte festhalten */
+.et-bestaetigung { flex: 1 1 100%; display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 10px;
+  background: var(--surface-sunken); color: var(--ink); font-weight: 400 !important; line-height: 1.45; cursor: pointer; }
+.et-bestaetigung input { flex: none; width: 20px; height: 20px; margin-top: 1px; accent-color: var(--primary); cursor: pointer; }
+.et-erinnerung { margin: 0; font-size: 14px; color: var(--ink-muted); }
+.et-erinnerung i { color: var(--primary); margin-right: 4px; }
