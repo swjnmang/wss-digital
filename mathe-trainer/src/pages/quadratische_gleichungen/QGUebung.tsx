@@ -7,6 +7,7 @@ import TaskShell from '../../components/layout/TaskShell'
 import { useSitzungState } from '../../hooks/useSitzung'
 import { fieldCheckClass } from '../../utils/fieldCheck'
 import { gleich, leseZahl, wahl, type Aufgabe } from './aufgaben'
+import { QG_PFAD } from './pfad'
 
 // Gemeinsame Übungsseite für alle Themen „Quadratische Gleichungen“ (nur reinquadratische Gleichungen):
 // Erklärung mit Merke und Beispiel, Stufen, mehrere Aufgaben, Eingabe mit grün/rot, Lob und Lösungsweg mit Äquivalenzumformungen.
@@ -193,7 +194,7 @@ export default function QGUebung({ titel, erklaerungTitel, erklaerung, stufen, e
   const feldKlasse = 'w-28 px-2 py-1 rounded border-2 border-gray-300 text-base text-center'
 
   return (
-    <TaskShell title={titel} width="wide">
+    <TaskShell title={titel} width="wide" parent={QG_PFAD}>
       <div className="max-w-5xl mx-auto">
         {/* Erklärung */}
         <div className="mb-4 bg-white rounded-lg shadow border border-gray-200">

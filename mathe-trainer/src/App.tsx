@@ -28,7 +28,6 @@ import Handelskalkrw from './pages/rechnen_lernen/prozentrechnung/Handelskalkrw'
 import Handelskalkdif from './pages/rechnen_lernen/prozentrechnung/Handelskalkdif';
 // Rechnen lernen: Gleichungen
 import GeneratorLineare from './pages/rechnen_lernen/gleichungen/Generator_lineare';
-import Quadratisch from './pages/rechnen_lernen/gleichungen/Quadratisch';
 import Bruchgleichungen from './pages/rechnen_lernen/gleichungen/Bruchgleichungen';
 import Abschlusstest from './pages/rechnen_lernen/gleichungen/Abschlusstest';
 import { useCallback, useEffect, useState } from 'react'
@@ -115,7 +114,7 @@ import DasElektroauto from './pages/finanzmathe/DasElektroauto';
 import DerFoodtruck from './pages/finanzmathe/DerFoodtruck';
 import PruefungsModus from './pages/finanzmathe/PruefungsModus';
 // Quadratische Gleichungen
-import { XQuadrat as QGXQuadrat, AXQuadrat as QGAXQuadrat, AXQuadratC as QGAXQuadratC, AnzahlLoesungen as QGAnzahl, ErstUmformen as QGUmformen, Nullprodukt as QGNullprodukt, GemischteUebungen as QGGemischt } from './pages/quadratische_gleichungen/Seiten';
+import { XQuadrat as QGXQuadrat, AXQuadrat as QGAXQuadrat, AXQuadratC as QGAXQuadratC, AnzahlLoesungen as QGAnzahl, ErstUmformen as QGUmformen, Nullprodukt as QGNullprodukt, GemischteUebungen as QGGemischt, QGMenu } from './pages/quadratische_gleichungen/Seiten';
 // Quadratische Funktionen
 import WertetabelleQF from './pages/quadratische_funktionen/Wertetabelle';
 import Normalparabel from './pages/quadratische_funktionen/Normalparabel';
@@ -273,7 +272,14 @@ export default function App() {
           <Route path="/rechnen_lernen/prozentrechnung/handelskalkdif" element={<Handelskalkdif />} />
           <Route path="/rechnen_lernen/gleichungen" element={<Gleichungen />} />
           <Route path="/rechnen_lernen/gleichungen/generator_lineare" element={<GeneratorLineare />} />
-          <Route path="/rechnen_lernen/gleichungen/quadratisch" element={<Quadratisch />} />
+          <Route path="/rechnen_lernen/gleichungen/quadratisch" element={<QGMenu />} />
+          <Route path="/rechnen_lernen/gleichungen/quadratisch/x2-gleich-d" element={<QGXQuadrat />} />
+          <Route path="/rechnen_lernen/gleichungen/quadratisch/ax2-gleich-d" element={<QGAXQuadrat />} />
+          <Route path="/rechnen_lernen/gleichungen/quadratisch/ax2-plus-c" element={<QGAXQuadratC />} />
+          <Route path="/rechnen_lernen/gleichungen/quadratisch/anzahl-loesungen" element={<QGAnzahl />} />
+          <Route path="/rechnen_lernen/gleichungen/quadratisch/erst-umformen" element={<QGUmformen />} />
+          <Route path="/rechnen_lernen/gleichungen/quadratisch/satz-vom-nullprodukt" element={<QGNullprodukt />} />
+          <Route path="/rechnen_lernen/gleichungen/quadratisch/gemischte-uebungen" element={<QGGemischt />} />
           <Route path="/rechnen_lernen/gleichungen/bruchgleichungen" element={<Bruchgleichungen />} />
           <Route path="/rechnen_lernen/gleichungen/abschlusstest" element={<Abschlusstest />} />
           <Route path="/lineare_funktionen" element={<AreaPage id="linear" />} />
@@ -342,14 +348,15 @@ export default function App() {
           <Route path="/finanzmathe/zinsen_test" element={<ZinsenTest />} />
           <Route path="/finanzmathe/pruefungsmodus" element={<PruefungsModus />} />
 
-          <Route path="/quadratische_gleichungen" element={<AreaPage id="qgl" />} />
-          <Route path="/quadratische_gleichungen/x2-gleich-d" element={<QGXQuadrat />} />
-          <Route path="/quadratische_gleichungen/ax2-gleich-d" element={<QGAXQuadrat />} />
-          <Route path="/quadratische_gleichungen/ax2-plus-c" element={<QGAXQuadratC />} />
-          <Route path="/quadratische_gleichungen/anzahl-loesungen" element={<QGAnzahl />} />
-          <Route path="/quadratische_gleichungen/erst-umformen" element={<QGUmformen />} />
-          <Route path="/quadratische_gleichungen/satz-vom-nullprodukt" element={<QGNullprodukt />} />
-          <Route path="/quadratische_gleichungen/gemischte-uebungen" element={<QGGemischt />} />
+          {/* frühere Adressen des eigenen Kapitels „Quadratische Gleichungen“ */}
+          <Route path="/quadratische_gleichungen" element={<Navigate to="/rechnen_lernen/gleichungen/quadratisch" replace />} />
+          <Route path="/quadratische_gleichungen/x2-gleich-d" element={<Navigate to="/rechnen_lernen/gleichungen/quadratisch/x2-gleich-d" replace />} />
+          <Route path="/quadratische_gleichungen/ax2-gleich-d" element={<Navigate to="/rechnen_lernen/gleichungen/quadratisch/ax2-gleich-d" replace />} />
+          <Route path="/quadratische_gleichungen/ax2-plus-c" element={<Navigate to="/rechnen_lernen/gleichungen/quadratisch/ax2-plus-c" replace />} />
+          <Route path="/quadratische_gleichungen/anzahl-loesungen" element={<Navigate to="/rechnen_lernen/gleichungen/quadratisch/anzahl-loesungen" replace />} />
+          <Route path="/quadratische_gleichungen/erst-umformen" element={<Navigate to="/rechnen_lernen/gleichungen/quadratisch/erst-umformen" replace />} />
+          <Route path="/quadratische_gleichungen/satz-vom-nullprodukt" element={<Navigate to="/rechnen_lernen/gleichungen/quadratisch/satz-vom-nullprodukt" replace />} />
+          <Route path="/quadratische_gleichungen/gemischte-uebungen" element={<Navigate to="/rechnen_lernen/gleichungen/quadratisch/gemischte-uebungen" replace />} />
 
           <Route path="/quadratische_funktionen" element={<AreaPage id="quadrat" />} />
           <Route path="/quadratische_funktionen/wertetabelle" element={<WertetabelleQF />} />

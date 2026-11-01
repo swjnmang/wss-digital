@@ -15,11 +15,13 @@ interface Props {
   title: string
   subtitle?: string
   items: MenuItem[]
+  /** Zwischenebenen im Pfad, z. B. Gleichungen */
+  parent?: { to: string; label: string } | { to: string; label: string }[]
 }
 
-export default function MenuPage({ title, subtitle = 'Wähle eine Aufgabe aus der folgenden Liste aus.', items }: Props) {
+export default function MenuPage({ title, subtitle = 'Wähle eine Aufgabe aus der folgenden Liste aus.', items, parent }: Props) {
   return (
-    <TaskShell title={title} subtitle={subtitle} width="wide">
+    <TaskShell title={title} subtitle={subtitle} width="wide" parent={parent}>
       <div className="bk-topics">
         {items.map((it, i) => (
           <Link key={it.path} to={it.path} className="bk-topic">
