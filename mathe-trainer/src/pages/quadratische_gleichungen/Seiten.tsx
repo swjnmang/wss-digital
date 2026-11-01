@@ -5,13 +5,14 @@ import {
   erzeugeAXQuadrat,
   erzeugeAXQuadratC,
   erzeugeGemischt,
-  erzeugeSach,
+  erzeugeNullprodukt,
   erzeugeUmformen,
   erzeugeXQuadrat,
 } from './aufgaben'
 
 // Die Themenseiten des Bereichs „Quadratische Gleichungen“ (Reihenfolge = Lernweg).
-// Nur reinquadratische Gleichungen: Lösen durch Umformen nach x² und Wurzelziehen, keine Lösungsformel.
+// Nur reinquadratische Gleichungen (Umformen nach x², Wurzelziehen) und ax² + bx = 0 (x ausklammern, Satz vom Nullprodukt).
+// Keine Lösungsformel, keine binomischen Formeln (Wunsch der Lehrkraft).
 
 export const QG_BASIS = '/quadratische_gleichungen'
 const W = '\\mid \\sqrt{\\phantom{x}}'
@@ -181,11 +182,10 @@ export function ErstUmformen() {
     <QGUebung
       titel="Gleichungen erst umformen"
       erklaerungTitel="Mit Termumformungen zur Form x² = d"
-      weiter={{ to: `${QG_BASIS}/anwendungsaufgaben`, label: 'Anwendungsaufgaben' }}
+      weiter={{ to: `${QG_BASIS}/satz-vom-nullprodukt`, label: 'Satz vom Nullprodukt' }}
       stufen={[
         { id: 1, name: 'Stufe 1: x² auf beiden Seiten', beschreibung: 'Z. B. 5x² − 7 = 2x² + 20.' },
         { id: 2, name: 'Stufe 2: mit Klammern', beschreibung: 'Z. B. 3(x² − 4) = 2x² + 13.' },
-        { id: 3, name: 'Stufe 3: binomische Formeln', beschreibung: 'Z. B. (x + 3)(x − 3) = 16.' },
       ]}
       erzeuge={erzeugeUmformen}
       erklaerung={
@@ -205,53 +205,58 @@ export function ErstUmformen() {
             ]}
             schluss="\mathbb{L} = \{-5;\ 5\}"
           />
-          <Merke>
-            Binomische Formeln: <InlineMath math="(a+b)^2 = a^2 + 2ab + b^2" />, <InlineMath math="(a-b)^2 = a^2 - 2ab + b^2" />,{' '}
-            <InlineMath math="(a+b)(a-b) = a^2 - b^2" />. In diesen Aufgaben heben sich die Glieder mit einzelnem x immer auf.
-          </Merke>
+          <Merke>Was du auf der einen Seite machst, machst du auch auf der anderen Seite.</Merke>
         </>
       }
     />
   )
 }
 
-export function Anwendungsaufgaben() {
+export function Nullprodukt() {
   return (
     <QGUebung
-      titel="Anwendungsaufgaben"
-      erklaerungTitel="So löst du Sachaufgaben mit quadratischen Gleichungen"
+      titel="Satz vom Nullprodukt"
+      erklaerungTitel="So löst du ax² + bx = 0 mit Ausklammern und dem Satz vom Nullprodukt"
       weiter={{ to: `${QG_BASIS}/gemischte-uebungen`, label: 'Gemischte Übungen' }}
-      anzahl={5}
       stufen={[
-        { id: 1, name: 'Stufe 1: glatte Ergebnisse', beschreibung: 'Flächen, Würfel und Zahlenrätsel mit glatten Ergebnissen.' },
-        { id: 2, name: 'Stufe 2: mit Runden', beschreibung: 'Auch Kreis und freier Fall – Ergebnis auf zwei Nachkommastellen runden.' },
+        { id: 1, name: 'Stufe 1: Satz vom Nullprodukt verstehen', beschreibung: 'Das x ist schon ausgeklammert, z. B. x(x − 4) = 0.' },
+        { id: 2, name: 'Stufe 2: x² + bx = 0', beschreibung: 'Erst x ausklammern, z. B. x² − 6x = 0.' },
+        { id: 3, name: 'Stufe 3: ax² + bx = 0', beschreibung: 'Mit einer Zahl vor x², z. B. 2x² + 10x = 0.' },
+        { id: 4, name: 'Stufe 4: erst umformen', beschreibung: 'Zuerst alles auf eine Seite bringen, z. B. 3x² = 12x.' },
       ]}
-      erzeuge={erzeugeSach}
+      erzeuge={erzeugeNullprodukt}
       erklaerung={
         <>
+          <p>
+            Bei Gleichungen wie <InlineMath math="x^2 - 6x = 0" /> fehlt die Zahl ohne x. Hier hilft kein Wurzelziehen, denn
+            x kommt einmal als <InlineMath math="x^2" /> und einmal als <InlineMath math="x" /> vor. Stattdessen{' '}
+            <strong>klammerst du x aus</strong>:
+          </p>
+          <BlockMath math="x^2 - 6x = x \cdot x - 6 \cdot x = x(x - 6)" />
+          <Merke>
+            <strong>Satz vom Nullprodukt:</strong> Ein Produkt ist genau dann 0, wenn mindestens einer der Faktoren 0 ist.
+            <br />
+            Aus <InlineMath math="x \cdot (x - 6) = 0" /> folgt: <InlineMath math="x = 0" /> <strong>oder</strong>{' '}
+            <InlineMath math="x - 6 = 0" />.
+          </Merke>
           <ol className="list-decimal ml-5 space-y-1">
-            <li>Lege fest, wofür die Variable steht (z. B. x = Seitenlänge in m).</li>
-            <li>Stelle mit der passenden Formel aus der Merkhilfe eine Gleichung auf.</li>
-            <li>Löse die Gleichung durch Umformen und Wurzelziehen.</li>
-            <li>Prüfe, welche Lösung sinnvoll ist: Längen und Zeiten sind nie negativ.</li>
-            <li>Schreibe einen Antwortsatz.</li>
+            <li>Alles auf eine Seite bringen, sodass rechts 0 steht.</li>
+            <li>x ausklammern → <InlineMath math="x(\ldots) = 0" /></li>
+            <li>Jeden Faktor gleich 0 setzen: <InlineMath math="x_1 = 0" /> und die Klammer nach x auflösen.</li>
           </ol>
-          <p>
-            Formeln aus der Merkhilfe: Quadrat <InlineMath math="A = a^2" />, Rechteck <InlineMath math="A = l \cdot b" />, Kreis{' '}
-            <InlineMath math="A = r^2 \cdot \pi" />, Würfel <InlineMath math="O = 6 \cdot a^2" />.
-          </p>
           <Beispiel
-            titel="Beispiel: Ein quadratisches Feld hat 196 m² – wie lang ist eine Seite?"
             zeilen={[
-              ['x^2', '196', W],
-              ['x_1', '\\sqrt{196} = 14'],
-              ['x_2', '-\\sqrt{196} = -14'],
+              ['2x^2 - 8x', '0', '\\text{x ausklammern}'],
+              ['x(2x - 8)', '0', '\\text{Satz vom Nullprodukt}'],
+              ['x_1 = 0 \\quad \\text{oder} \\quad 2x - 8', '0', '\\mid +8'],
+              ['2x', '8', '\\mid\\ {:}\\,2'],
+              ['x_2', '4'],
             ]}
+            schluss="\mathbb{L} = \{0;\ 4\}"
           />
-          <p>
-            <InlineMath math="x_2 = -14" /> entfällt, denn eine Länge kann nicht negativ sein. <strong>Antwort:</strong> Eine Seite
-            ist 14 m lang.
-          </p>
+          <Merke>
+            Teile <strong>nie durch x</strong>! Dabei verlierst du die Lösung <InlineMath math="x = 0" />.
+          </Merke>
         </>
       }
     />
@@ -267,17 +272,17 @@ export function GemischteUebungen() {
       stufen={[
         { id: 1, name: 'Stufe 1: Basis', beschreibung: 'Gemischte Aufgaben aller Themen – zuerst die Anzahl der Lösungen wählen.' },
         { id: 2, name: 'Stufe 2: Fortgeschritten', beschreibung: 'Mit negativen Zahlen, Dezimalzahlen und Klammern.' },
-        { id: 3, name: 'Stufe 3: Profi', beschreibung: 'Mit binomischen Formeln und Runden auf zwei Nachkommastellen.' },
+        { id: 3, name: 'Stufe 3: Profi', beschreibung: 'Mit Klammern, Satz vom Nullprodukt und Runden auf zwei Nachkommastellen.' },
       ]}
       erzeuge={erzeugeGemischt}
       erklaerung={
         <>
-          <p>Hier kommen alle Arten reinquadratischer Gleichungen gemischt vor. Gehe immer gleich vor:</p>
+          <p>Hier kommen alle Arten von Gleichungen aus diesem Kapitel gemischt vor. Gehe immer so vor:</p>
           <ol className="list-decimal ml-5 space-y-1">
             <li>Klammern auflösen und zusammenfassen (falls nötig)</li>
             <li>x²-Glieder auf eine Seite, Zahlen auf die andere Seite bringen</li>
-            <li>Durch die Zahl vor x² teilen → <InlineMath math="x^2 = d" /></li>
-            <li>An d die Anzahl der Lösungen ablesen und ggf. die Wurzel ziehen</li>
+            <li>Gibt es ein Glied mit einzelnem x und rechts steht 0? → x ausklammern und Satz vom Nullprodukt</li>
+            <li>Sonst: durch die Zahl vor x² teilen → <InlineMath math="x^2 = d" />, an d die Anzahl der Lösungen ablesen und ggf. die Wurzel ziehen</li>
           </ol>
         </>
       }

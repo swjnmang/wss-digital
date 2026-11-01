@@ -127,7 +127,7 @@ const INTROS: Record<AreaId, Intro> = {
     heading: 'Darum geht’s in diesem Kapitel',
     text: [
       <>In einer <strong>reinquadratischen Gleichung</strong> kommt x nur als x² vor, z. B. 2x² − 8 = 42. Du formst so lange um, bis x² allein steht, und ziehst dann die <strong>Wurzel</strong>.</>,
-      <>Arbeite die Themen der Reihe nach durch: von x² = d bis zu Gleichungen mit Klammern und Anwendungsaufgaben.</>,
+      <>Fehlt die Zahl ohne x, z. B. bei x² − 6x = 0, klammerst du x aus und nutzt den <strong>Satz vom Nullprodukt</strong>. Arbeite die Themen der Reihe nach durch.</>,
     ],
     formula: <>x² = <span style={{ color: B }}>d</span> → x = ±√<span style={{ color: B }}>d</span></>,
     noteA: <>zwei Lösungen:<br />+ und −</>,

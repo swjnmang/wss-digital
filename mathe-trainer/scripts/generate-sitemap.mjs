@@ -74,7 +74,7 @@ const routes = [
   { path: '/quadratische_gleichungen/ax2-plus-c', priority: 0.8, changefreq: 'monthly' },
   { path: '/quadratische_gleichungen/anzahl-loesungen', priority: 0.8, changefreq: 'monthly' },
   { path: '/quadratische_gleichungen/erst-umformen', priority: 0.8, changefreq: 'monthly' },
-  { path: '/quadratische_gleichungen/anwendungsaufgaben', priority: 0.8, changefreq: 'monthly' },
+  { path: '/quadratische_gleichungen/satz-vom-nullprodukt', priority: 0.8, changefreq: 'monthly' },
   { path: '/quadratische_gleichungen/gemischte-uebungen', priority: 0.8, changefreq: 'monthly' },
 
   // Quadratische Funktionen
