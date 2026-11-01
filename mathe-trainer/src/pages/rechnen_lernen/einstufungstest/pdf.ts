@@ -62,6 +62,7 @@ export async function ladePdf(stand: TestStand): Promise<void> {
     ['Datum:', datum],
     ['Bearbeitungszeit:', `${mmText(stand.ende - stand.start)} (von ${DAUER_MINUTEN} min)${stand.zeitAbgelaufen ? ' - Zeit abgelaufen' : ''}`],
     ['Ergebnis:', `${auswertung.richtig} von ${auswertung.gesamt} Aufgaben richtig (${prozent} %)`],
+    ['Rechenweg:', 'Vor dem Start bestätigt: alle Aufgaben abschreiben und alle Rechenschritte festhalten'],
   ]
   for (const [k, v] of zeilen) {
     doc.setFont('helvetica', 'bold')

@@ -122,7 +122,9 @@ export default function Einstufungstest() {
   const starten = (e: FormEvent) => {
     e.preventDefault()
     const name = nameEingabe.trim()
-    if (!name) return
+    const form = e.currentTarget as HTMLFormElement
+    const haken = form.querySelector<HTMLInputElement>('.et-bestaetigung input')
+    if (!name || !haken?.checked) return
     const start = Date.now()
     setJetzt(start)
     setStand(() => ({ phase: 'test', name, start, ende: 0, zeitAbgelaufen: false, aufgaben: erzeugeTest(), antworten: {} }))
@@ -143,6 +145,7 @@ export default function Einstufungstest() {
 // ---------- Start ----------
 
 function Startseite({ name, setName, starten }: { name: string; setName: (s: string) => void; starten: (e: FormEvent) => void }) {
+  const [bestaetigt, setBestaetigt] = useState(false)
   return (
     <TaskShell title="Einstufungstest" subtitle="Finde heraus, was du schon kannst – und wo du noch üben solltest." width="wide">
       <div className="et-wrap">
@@ -157,7 +160,7 @@ function Startseite({ name, setName, starten }: { name: string; setName: (s: str
               Du hast <strong>{DAUER_MINUTEN} Minuten</strong> Zeit. Die Uhr startet, sobald du auf „Test starten“ tippst. Ist die Zeit um, wird der
               Test automatisch abgegeben.
             </li>
-            <li>Ein Taschenrechner ist erlaubt. Rechne auf einem Blatt und gib nur die Ergebnisse ein.</li>
+            <li>Ein Taschenrechner ist erlaubt. Schreibe jede Aufgabe ab, rechne sie mit allen Rechenschritten auf einem Blatt bzw. im Heft und gib hier nur das Ergebnis ein.</li>
             <li>Während des Tests gibt es <strong>keine Rückmeldung, keine Hilfen und keine Lösungswege</strong>.</li>
             <li>Am Ende siehst du, welche Bereiche schon gut sitzen und welche du noch üben solltest, und kannst dein Ergebnis als PDF herunterladen.</li>
           </ul>
@@ -173,7 +176,14 @@ function Startseite({ name, setName, starten }: { name: string; setName: (s: str
             placeholder="Vor- und Nachname"
             maxLength={60}
           />
-          <button type="submit" className="bk-btn bk-btn-primary" disabled={!name.trim()}>
+          <label className="et-bestaetigung">
+            <input type="checkbox" checked={bestaetigt} onChange={(e: ChangeEvent<HTMLInputElement>) => setBestaetigt(e.target.checked)} />
+            <span>
+              Ich schreibe <strong>alle Aufgaben ab</strong> und halte <strong>alle Rechenschritte</strong> schriftlich fest (auf einem Blatt bzw. im
+              Heft).
+            </span>
+          </label>
+          <button type="submit" className="bk-btn bk-btn-primary" disabled={!name.trim() || !bestaetigt}>
             Test starten <i className="fa-solid fa-play" aria-hidden="true" />
           </button>
         </form>
@@ -213,6 +223,9 @@ function Test({ stand, rest, setStand, abgeben }: { stand: TestStand; rest: numb
           </button>
         </div>
         {knapp && <p className="et-warnung">Nur noch wenige Minuten – gib deine Ergebnisse ein!</p>}
+        <p className="et-erinnerung">
+          <i className="fa-solid fa-pen" aria-hidden="true" /> Schreibe jede Aufgabe ab und halte alle Rechenschritte schriftlich fest. Hier gibst du nur das Ergebnis ein.
+        </p>
 
         {BEREICHE.map((b, bi) => (
           <section key={b.id} className="et-bereich" aria-labelledby={`et-b-${b.id}`}>
