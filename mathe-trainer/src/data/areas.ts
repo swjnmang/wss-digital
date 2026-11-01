@@ -4,7 +4,7 @@ import { LESSONS, lessonPath, type Lesson } from '../pages/daten_und_zufall/lern
 // Zentrales Verzeichnis aller Bereiche und ihrer Übungen (Startseite, Bereichsseiten, Suche).
 // Titel und Beschreibungen stammen aus den bisherigen Bereichsseiten; Reihenfolge unverändert.
 
-export type AreaId = 'rechnen' | 'finanz' | 'linear' | 'quadrat' | 'daten' | 'raum' | 'trigo'
+export type AreaId = 'rechnen' | 'finanz' | 'linear' | 'qgl' | 'quadrat' | 'daten' | 'raum' | 'trigo'
 
 export interface Exercise {
   title: string
@@ -158,6 +158,33 @@ export const AREAS: Area[] = [
           { title: 'Abschlusstest', desc: 'Teste dein Wissen über lineare Funktionen.', path: '/lineare_funktionen/test', icon: 'fa-solid fa-graduation-cap' },
           { title: 'Übungsblatt-Generator', desc: 'Stelle dir ein personalisiertes Übungsblatt zusammen und lade es als PDF herunter.', path: '/lineare_funktionen/ubungsblatt-generator', icon: 'fa-solid fa-file-pdf' },
           { title: 'Wer wird Millionär?', desc: 'Das Quiz zu allen Themen der linearen Funktionen - mit 50:50-, Publikums- und Telefonjoker.', path: '/lineare_funktionen/wer_wird_millionaer', icon: 'fa-solid fa-sack-dollar' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'qgl',
+    title: 'Quadratische Gleichungen',
+    short: 'Reinquadratische Gleichungen Schritt für Schritt durch Umformen und Wurzelziehen lösen.',
+    glyph: '√',
+    path: '/quadratische_gleichungen',
+    unit: 'Themen',
+    sections: [
+      {
+        name: 'Schritt für Schritt',
+        items: [
+          { title: 'Gleichungen der Form x² = d', desc: 'Löse einfache quadratische Gleichungen durch Wurzelziehen – mit beiden Lösungen.', path: '/quadratische_gleichungen/x2-gleich-d', icon: fa('square-root-variable') },
+          { title: 'Gleichungen der Form ax² = d', desc: 'Erst durch a teilen, dann die Wurzel ziehen.', path: '/quadratische_gleichungen/ax2-gleich-d', icon: fa('divide') },
+          { title: 'Gleichungen der Form ax² + c = d', desc: 'Mit Äquivalenzumformungen nach x² auflösen und lösen.', path: '/quadratische_gleichungen/ax2-plus-c', icon: fa('equals') },
+          { title: 'Anzahl der Lösungen', desc: 'Zwei, eine oder keine Lösung? Entscheide am Vorzeichen von d.', path: '/quadratische_gleichungen/anzahl-loesungen', icon: fa('list-ol') },
+          { title: 'Gleichungen erst umformen', desc: 'Klammern auflösen, binomische Formeln nutzen und zusammenfassen – dann lösen.', path: '/quadratische_gleichungen/erst-umformen', icon: fa('right-left') },
+        ],
+      },
+      {
+        name: 'Anwenden',
+        items: [
+          { title: 'Anwendungsaufgaben', desc: 'Flächen, Würfel, Kreis, freier Fall und Zahlenrätsel mit quadratischen Gleichungen.', path: '/quadratische_gleichungen/anwendungsaufgaben', icon: fa('lightbulb') },
+          { title: 'Gemischte Übungen', desc: 'Alle Arten reinquadratischer Gleichungen gemischt.', path: '/quadratische_gleichungen/gemischte-uebungen', icon: fa('shuffle') },
         ],
       },
     ],
