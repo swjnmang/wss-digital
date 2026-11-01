@@ -165,7 +165,7 @@ export const AREAS: Area[] = [
   {
     id: 'qgl',
     title: 'Quadratische Gleichungen',
-    short: 'Reinquadratische Gleichungen Schritt für Schritt durch Umformen und Wurzelziehen lösen.',
+    short: 'Quadratische Gleichungen Schritt für Schritt lösen: Wurzelziehen und Satz vom Nullprodukt.',
     glyph: '√',
     path: '/quadratische_gleichungen',
     unit: 'Themen',
@@ -177,14 +177,14 @@ export const AREAS: Area[] = [
           { title: 'Gleichungen der Form ax² = d', desc: 'Erst durch a teilen, dann die Wurzel ziehen.', path: '/quadratische_gleichungen/ax2-gleich-d', icon: fa('divide') },
           { title: 'Gleichungen der Form ax² + c = d', desc: 'Mit Äquivalenzumformungen nach x² auflösen und lösen.', path: '/quadratische_gleichungen/ax2-plus-c', icon: fa('equals') },
           { title: 'Anzahl der Lösungen', desc: 'Zwei, eine oder keine Lösung? Entscheide am Vorzeichen von d.', path: '/quadratische_gleichungen/anzahl-loesungen', icon: fa('list-ol') },
-          { title: 'Gleichungen erst umformen', desc: 'Klammern auflösen, binomische Formeln nutzen und zusammenfassen – dann lösen.', path: '/quadratische_gleichungen/erst-umformen', icon: fa('right-left') },
+          { title: 'Gleichungen erst umformen', desc: 'Klammern auflösen und zusammenfassen – dann nach x² auflösen und lösen.', path: '/quadratische_gleichungen/erst-umformen', icon: fa('right-left') },
+          { title: 'Satz vom Nullprodukt', desc: 'Gleichungen der Form ax² + bx = 0: x ausklammern und den Satz vom Nullprodukt anwenden.', path: '/quadratische_gleichungen/satz-vom-nullprodukt', icon: fa('xmark') },
         ],
       },
       {
-        name: 'Anwenden',
+        name: 'Üben',
         items: [
-          { title: 'Anwendungsaufgaben', desc: 'Flächen, Würfel, Kreis, freier Fall und Zahlenrätsel mit quadratischen Gleichungen.', path: '/quadratische_gleichungen/anwendungsaufgaben', icon: fa('lightbulb') },
-          { title: 'Gemischte Übungen', desc: 'Alle Arten reinquadratischer Gleichungen gemischt.', path: '/quadratische_gleichungen/gemischte-uebungen', icon: fa('shuffle') },
+          { title: 'Gemischte Übungen', desc: 'Alle Gleichungen dieses Kapitels gemischt.', path: '/quadratische_gleichungen/gemischte-uebungen', icon: fa('shuffle') },
         ],
       },
     ],

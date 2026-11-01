@@ -53,7 +53,6 @@ const LEER: Antwort = { anzahl: '', x1: '', x2: '', geprueft: false, ok: false, 
 
 /** Wie viele Lösungsfelder gezeigt werden */
 function feldAnzahl(a: Aufgabe, ant: Antwort): number {
-  if (a.modus === 'sach') return 1
   if (a.modus === 'zwei') return 2
   return ant.anzahl === '' ? 0 : Number(ant.anzahl)
 }
@@ -92,12 +91,15 @@ function pruefe(a: Aufgabe, ant: Antwort): Antwort {
   let meldung = 'Leider noch nicht richtig. Rechne noch einmal nach oder schau dir den Lösungsweg an.'
   const einRichtig = felder.x1 || felder.x2
   const w = werte as number[]
-  if (n === 2 && einRichtig) {
+  const nullprodukt = soll.length === 2 && soll.includes(0)
+  if (nullprodukt) {
+    const nullDa = w.some((x) => x === 0)
+    if (nullDa && einRichtig) meldung = 'x = 0 stimmt. Setze jetzt die Klammer gleich 0 und löse nach x auf.'
+    else if (!nullDa) meldung = 'Denk an die Lösung x = 0: Nach dem Ausklammern ist der Faktor x selbst gleich 0.'
+  } else if (n === 2 && einRichtig) {
     meldung = gleich(w[0], w[1], a.runden) || gleich(Math.abs(w[0]), Math.abs(w[1]), a.runden)
       ? 'Eine Lösung stimmt. Beim Wurzelziehen gibt es zwei Lösungen: eine positive und eine negative.'
       : 'Eine Lösung stimmt. Denk an die zweite Lösung mit umgekehrtem Vorzeichen.'
-  } else if (a.modus === 'sach' && w[0] < 0) {
-    meldung = 'Eine negative Länge oder Zeit ergibt hier keinen Sinn. Nimm die positive Lösung.'
   } else if (a.runden) {
     meldung = 'Leider noch nicht richtig. Runde auf zwei Nachkommastellen.'
   }
@@ -217,7 +219,7 @@ export default function QGUebung({ titel, erklaerungTitel, erklaerung, stufen, e
           {aufgaben.map((a, index) => {
             const ant = antworten[a.id] ?? LEER
             const n = feldAnzahl(a, ant)
-            const v = a.modus === 'sach' ? '' : 'x'
+            const v = 'x'
             return (
               <div key={a.id} className="bg-white rounded p-3 shadow border-l-2 border-blue-300">
                 <div className="flex items-start gap-2 flex-wrap">
@@ -255,11 +257,7 @@ export default function QGUebung({ titel, erklaerungTitel, erklaerung, stufen, e
                   )}
                   {(['x1', 'x2'] as const).slice(0, n).map((k, i) => (
                     <label key={k} className="flex items-center gap-1">
-                      {a.modus === 'sach' ? (
-                        <span className="text-sm">Ergebnis:</span>
-                      ) : (
-                        <InlineMath math={n === 1 ? `${v} =` : `${v}_${i + 1} =`} />
-                      )}
+                      <InlineMath math={n === 1 ? `${v} =` : `${v}_${i + 1} =`} />
                       <input
                         type="text"
                         inputMode="decimal"
@@ -268,7 +266,7 @@ export default function QGUebung({ titel, erklaerungTitel, erklaerung, stufen, e
                         onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
                           if (e.key === 'Enter') pruefen(a)
                         }}
-                        aria-label={a.modus === 'sach' ? 'Ergebnis' : `x${i + 1}`}
+                        aria-label={`x${i + 1}`}
                         className={`${feldKlasse} ${fieldCheckClass(ant.felder[k])}`}
                       />
                       {a.einheit && <span className="text-sm">{a.einheit}</span>}

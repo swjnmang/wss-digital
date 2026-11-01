@@ -115,7 +115,7 @@ import DasElektroauto from './pages/finanzmathe/DasElektroauto';
 import DerFoodtruck from './pages/finanzmathe/DerFoodtruck';
 import PruefungsModus from './pages/finanzmathe/PruefungsModus';
 // Quadratische Gleichungen
-import { XQuadrat as QGXQuadrat, AXQuadrat as QGAXQuadrat, AXQuadratC as QGAXQuadratC, AnzahlLoesungen as QGAnzahl, ErstUmformen as QGUmformen, Anwendungsaufgaben as QGAnwendung, GemischteUebungen as QGGemischt } from './pages/quadratische_gleichungen/Seiten';
+import { XQuadrat as QGXQuadrat, AXQuadrat as QGAXQuadrat, AXQuadratC as QGAXQuadratC, AnzahlLoesungen as QGAnzahl, ErstUmformen as QGUmformen, Nullprodukt as QGNullprodukt, GemischteUebungen as QGGemischt } from './pages/quadratische_gleichungen/Seiten';
 // Quadratische Funktionen
 import WertetabelleQF from './pages/quadratische_funktionen/Wertetabelle';
 import Normalparabel from './pages/quadratische_funktionen/Normalparabel';
@@ -348,7 +348,7 @@ export default function App() {
           <Route path="/quadratische_gleichungen/ax2-plus-c" element={<QGAXQuadratC />} />
           <Route path="/quadratische_gleichungen/anzahl-loesungen" element={<QGAnzahl />} />
           <Route path="/quadratische_gleichungen/erst-umformen" element={<QGUmformen />} />
-          <Route path="/quadratische_gleichungen/anwendungsaufgaben" element={<QGAnwendung />} />
+          <Route path="/quadratische_gleichungen/satz-vom-nullprodukt" element={<QGNullprodukt />} />
           <Route path="/quadratische_gleichungen/gemischte-uebungen" element={<QGGemischt />} />
 
           <Route path="/quadratische_funktionen" element={<AreaPage id="quadrat" />} />

@@ -2,7 +2,7 @@
 // Bewusst NUR reinquadratische Gleichungen (Form ax² = d bzw. ax² + c = d, ggf. nach Termumformung):
 // Sie werden durch Umformen nach x² und Wurzelziehen gelöst – nie mit der Lösungsformel (kein Term mit bx).
 
-export type Modus = 'zwei' | 'anzahl' | 'sach'
+export type Modus = 'zwei' | 'anzahl'
 
 export interface Zeile {
   l: string
@@ -258,7 +258,7 @@ export function erzeugeUmformen(stufe: number): Aufgabe {
     const rest = loeseAb(A, r6(c2 - c1), false)
     return fertig({ tex: `${links} = ${rechtsT}`, modus: 'anzahl', loesungen: rest.loesungen, runden: false, weg: [...weg, ...rest.weg], schluss: [{ tex: rest.menge }] })
   }
-  if (stufe === 2) {
+  if (stufe >= 2) {
     // k·(x² + m) = s·x² + c2  →  (k − s)·x² = c2 − k·m
     const q = qWahl()
     const k = rnd(2, 5)
@@ -276,176 +276,120 @@ export function erzeugeUmformen(stufe: number): Aufgabe {
     const rest = loeseAb(A, r6(c2 - k * m), false)
     return fertig({ tex: `${links} = ${rechtsT}`, modus: 'anzahl', loesungen: rest.loesungen, runden: false, weg: [...weg, ...rest.weg], schluss: [{ tex: rest.menge }] })
   }
-  // Stufe 3: binomische Formeln, bei denen sich die x-Glieder aufheben
-  if (rnd(0, 1) === 0) {
-    // (x + b)(x − b) = r  →  x² − b² = r
-    const b = rnd(1, 9)
-    const q = qWahl() >= 0 ? rnd(1, 12) ** 2 : -(rnd(1, 4) ** 2)
-    const r = r6(q - b * b)
-    const weg: Zeile[] = [
-      { l: `(x + ${b})(x - ${b})`, r: num(r), u: '\\text{3. binomische Formel}' },
-      { l: `x^2 - ${b * b}`, r: num(r), u: `\\mid +${b * b}` },
-    ]
-    const rest = loeseAb(1, q, false)
-    return fertig({ tex: `(x + ${b})(x - ${b}) = ${num(r)}`, modus: 'anzahl', loesungen: rest.loesungen, runden: false, weg: [...weg, ...rest.weg], schluss: [{ tex: rest.menge }] })
+  return erzeugeUmformen(2)
+}
+
+// ---------- Thema 6: Satz vom Nullprodukt (ax² + bx = 0) ----------
+
+/** Lösung einer linearen Gleichung p·x + r = 0 als Rechenzeilen (für den zweiten Faktor) */
+function linearZeilen(p: number, r: number): { zeilen: Zeile[]; x: number } {
+  const x = r6(-r / p)
+  const zeilen: Zeile[] = []
+  const lin = `${p === 1 ? '' : p === -1 ? '-' : num(p)}x`
+  if (p === 1) {
+    zeilen.push({ l: 'x_2', r: num(x) })
+  } else {
+    zeilen.push({ l: lin, r: num(-r), u: teile(p) })
+    zeilen.push({ l: 'x_2', r: num(x) })
   }
-  // (x + b)² + (x − b)² = r  →  2x² + 2b² = r
-  const b = rnd(1, 6)
-  const q = rnd(0, 6) === 0 ? 0 : rnd(1, 10) ** 2
-  const r = r6(2 * q + 2 * b * b)
+  return { zeilen, x }
+}
+
+/** zweiter Faktor p·x + r als TeX */
+function linTerm(p: number, r: number): string {
+  const lin = p === 1 ? 'x' : p === -1 ? '-x' : `${num(p)}x`
+  return `${lin}${plus(r)}`
+}
+
+/** x-Glied b·x als TeX mit Vorzeichen (für ax² + bx) */
+function plusX(b: number): string {
+  if (b === 1) return ' + x'
+  if (b === -1) return ' - x'
+  return b > 0 ? ` + ${num(b)}x` : ` - ${num(-b)}x`
+}
+
+function nullproduktAufgabe(tex: string, vorZeilen: Zeile[], p: number, r: number): Aufgabe {
+  // x · (p·x + r) = 0
+  const faktor = `x(${linTerm(p, r)})`
+  const lin = linearZeilen(p, r)
   const weg: Zeile[] = [
-    { l: `(x + ${b})^2 + (x - ${b})^2`, r: num(r), u: '\\text{1. und 2. binomische Formel}' },
-    { l: `x^2 + ${2 * b}x + ${b * b} + x^2 - ${2 * b}x + ${b * b}`, r: num(r), u: '\\text{zusammenfassen}' },
-    { l: `2x^2 + ${2 * b * b}`, r: num(r), u: `\\mid -${2 * b * b}` },
+    ...vorZeilen,
+    { l: faktor, r: '0', u: '\\text{Satz vom Nullprodukt}' },
+    { l: `x_1 = 0 \\quad \\text{oder} \\quad ${linTerm(p, r)}`, r: '0', u: wegC(r) },
+    ...lin.zeilen,
   ]
-  const rest = loeseAb(2, 2 * q, false)
-  return fertig({ tex: `(x + ${b})^2 + (x - ${b})^2 = ${num(r)}`, modus: 'anzahl', loesungen: rest.loesungen, runden: false, weg: [...weg, ...rest.weg], schluss: [{ tex: rest.menge }] })
-}
-
-// ---------- Thema 6: Anwendungsaufgaben ----------
-
-/** Sachaufgabe: Ansatz (Text) und Gleichung a·v² = d (ggf. mit vorgeschalteten Zeilen), gesucht ist die positive Lösung */
-function sach(p: {
-  text: string
-  frage: string
-  einheit: string
-  ansatz: string
-  vorZeilen?: Zeile[]
-  a: number
-  d: number
-  runden: boolean
-  v?: string
-  antwort: (w: string) => string
-  grund: string
-}): Aufgabe {
-  const v = p.v ?? 'x'
-  const rest = loeseAb(p.a, p.d, p.runden, v)
-  const w = rest.loesungen[rest.loesungen.length - 1]
-  const rund = !gleich(w * w * p.a, p.d, false)
+  const loesungen = [0, lin.x].sort((u, v) => u - v)
   return fertig({
-    tex: '',
-    text: p.text,
-    frage: p.frage,
-    einheit: p.einheit,
-    ansatz: p.ansatz,
-    modus: 'sach',
-    loesungen: [w],
-    runden: p.runden,
-    weg: [...(p.vorZeilen ?? []), ...rest.weg],
-    schluss: [
-      { text: `Die negative Lösung ${v}₂ ${rund ? '≈' : '='} ${txt(-w)} entfällt, ${p.grund}` },
-      { text: p.antwort(`${rund ? 'etwa ' : ''}${txt(w)}`) },
-    ],
-  })
-}
-
-export function erzeugeSach(stufe: number): Aufgabe {
-  const runden = stufe >= 2
-  const art = wahl(stufe === 1 ? ['quadrat', 'rechteck', 'zahl', 'wuerfel'] as const : ['quadrat', 'rechteck', 'kreis', 'fall', 'wuerfel', 'zahl'] as const)
-  if (art === 'quadrat') {
-    const A = runden ? nichtQuadrat(50, 900) : rnd(5, 40) ** 2
-    return sach({
-      text: `Ein quadratisches Grundstück hat einen Flächeninhalt von ${txt(A)} m².`,
-      frage: 'Wie lang ist eine Seite des Grundstücks?',
-      einheit: 'm',
-      ansatz: 'Ansatz: Seitenlänge x (in m), Flächeninhalt A = x²',
-      a: 1, d: A, runden,
-      antwort: (w) => `Eine Seite des Grundstücks ist ${w} m lang.`,
-      grund: 'denn eine Länge kann nicht negativ sein.',
-    })
-  }
-  if (art === 'rechteck') {
-    const k = rnd(2, 4)
-    const A = runden ? k * nichtQuadrat(10, 120) : k * rnd(3, 15) ** 2
-    const fakt = ['', '', 'doppelt', 'dreimal', 'viermal'][k]
-    return sach({
-      text: `Ein rechteckiges Beet ist ${fakt} so lang wie breit. Sein Flächeninhalt beträgt ${txt(A)} m².`,
-      frage: 'Wie breit ist das Beet?',
-      einheit: 'm',
-      ansatz: `Ansatz: Breite x (in m), Länge ${k}x, Flächeninhalt A = Länge · Breite`,
-      vorZeilen: [{ l: `${k}x \\cdot x`, r: num(A), u: '\\text{zusammenfassen}' }],
-      a: k, d: A, runden,
-      antwort: (w) => `Das Beet ist ${w} m breit.`,
-      grund: 'denn eine Breite kann nicht negativ sein.',
-    })
-  }
-  if (art === 'kreis') {
-    const A = rnd(20, 500)
-    const q = A / Math.PI
-    const rr = r2(Math.sqrt(q))
-    return fertig({
-      tex: '',
-      text: `Ein kreisrunder Teich hat einen Flächeninhalt von ${A} m².`,
-      frage: 'Wie groß ist sein Radius?',
-      einheit: 'm',
-      ansatz: 'Ansatz: Radius r (in m), Flächeninhalt A = r² · π',
-      modus: 'sach',
-      loesungen: [rr],
-      runden: true,
-      weg: [
-        { l: 'r^2 \\cdot \\pi', r: `${A}`, u: '\\mid\\ {:}\\,\\pi' },
-        { l: 'r^2', r: `\\dfrac{${A}}{\\pi} \\approx ${num(r2(q))}`, u: '\\mid \\sqrt{\\phantom{x}}' },
-        { l: 'r_1', r: `\\sqrt{\\dfrac{${A}}{\\pi}} \\approx ${num(rr)}` },
-        { l: 'r_2', r: `-\\sqrt{\\dfrac{${A}}{\\pi}} \\approx ${num(-rr)}` },
-      ],
-      schluss: [
-        { text: `Die negative Lösung r₂ ≈ ${txt(-rr)} entfällt, denn ein Radius kann nicht negativ sein.` },
-        { text: `Der Teich hat einen Radius von etwa ${txt(rr)} m.` },
-      ],
-    })
-  }
-  if (art === 'fall') {
-    const s = rnd(10, 150)
-    return sach({
-      text: `Ein Stein fällt von einer ${s} m hohen Brücke. Für den Fallweg gilt näherungsweise s = 5 · t² (s in m, t in s).`,
-      frage: 'Nach wie vielen Sekunden kommt der Stein unten an?',
-      einheit: 's',
-      ansatz: `Ansatz: s = ${s} in s = 5 · t² einsetzen`,
-      a: 5, d: s, runden: true, v: 't',
-      antwort: (w) => `Der Stein kommt nach ${w} Sekunden unten an.`,
-      grund: 'denn eine Zeit kann nicht negativ sein.',
-    })
-  }
-  if (art === 'wuerfel') {
-    const O = runden ? 6 * nichtQuadrat(5, 150) : 6 * rnd(2, 15) ** 2
-    return sach({
-      text: `Ein Würfel hat eine Oberfläche von ${txt(O)} cm².`,
-      frage: 'Wie lang ist eine Kante des Würfels?',
-      einheit: 'cm',
-      ansatz: 'Ansatz: Kantenlänge a (in cm), Oberfläche O = 6 · a²',
-      a: 6, d: O, runden, v: 'a',
-      antwort: (w) => `Eine Kante des Würfels ist ${w} cm lang.`,
-      grund: 'denn eine Kantenlänge kann nicht negativ sein.',
-    })
-  }
-  // Zahlenrätsel: beide Lösungen gesucht
-  const k = rnd(2, 5)
-  const x = rnd(2, 10)
-  const c = rnd(1, 30)
-  const minus = rnd(0, 1) === 0
-  const rechts = minus ? k * x * x - c : k * x * x + c
-  const fakt = ['', '', 'Das Doppelte', 'Das Dreifache', 'Das Vierfache', 'Das Fünffache'][k]
-  const weg: Zeile[] = [{ l: `${k}x^2 ${minus ? '-' : '+'} ${c}`, r: `${rechts}`, u: minus ? `\\mid +${c}` : `\\mid -${c}` }]
-  const rest = loeseAb(k, k * x * x, false)
-  return fertig({
-    tex: '',
-    text: `${fakt} des Quadrats einer Zahl ${minus ? 'vermindert' : 'vermehrt'} um ${c} ergibt ${rechts}. Bestimme alle Zahlen, für die das gilt.`,
-    ansatz: 'Ansatz: gesuchte Zahl x, ihr Quadrat x²',
+    tex,
     modus: 'zwei',
-    loesungen: rest.loesungen,
+    loesungen,
     runden: false,
-    weg: [...weg, ...rest.weg],
-    schluss: [{ tex: rest.menge }, { text: `Beide Zahlen erfüllen das Rätsel: ${txt(x)} und ${txt(-x)}.` }],
+    weg,
+    schluss: [{ tex: `\\mathbb{L} = \\{${num(loesungen[0])};\\ ${num(loesungen[1])}\\}` }],
   })
+}
+
+export function erzeugeNullprodukt(stufe: number): Aufgabe {
+  const nz = (min: number, max: number) => wahl([-1, 1]) * rnd(min, max)
+  if (stufe === 1) {
+    // schon faktorisiert: x(x + r) = 0 oder k·x(x + r) = 0
+    const r = nz(1, 12)
+    const k = rnd(0, 2) === 0 ? rnd(2, 5) : 1
+    const tex = `${k === 1 ? '' : k}x(x${plus(r)}) = 0`
+    const x2 = -r
+    const weg: Zeile[] = [
+      { l: `${k === 1 ? '' : k}x(x${plus(r)})`, r: '0', u: '\\text{Satz vom Nullprodukt}' },
+      { l: `${k === 1 ? 'x_1 = 0' : `${k}x = 0 \;\\Rightarrow\; x_1 = 0`} \\quad \\text{oder} \\quad x${plus(r)}`, r: '0', u: wegC(r) },
+      { l: 'x_2', r: num(x2) },
+    ]
+    const loesungen = [0, x2].sort((u, v) => u - v)
+    return fertig({ tex, modus: 'zwei', loesungen, runden: false, weg, schluss: [{ tex: `\\mathbb{L} = \\{${num(loesungen[0])};\\ ${num(loesungen[1])}\\}` }] })
+  }
+  if (stufe === 2) {
+    // x² + bx = 0
+    const b = nz(1, 15)
+    const tex = `x^2${plusX(b)} = 0`
+    return nullproduktAufgabe(tex, [{ l: `x^2${plusX(b)}`, r: '0', u: '\\text{x ausklammern}' }], 1, b)
+  }
+  if (stufe === 3) {
+    // a·x² + b·x = 0, Lösung ganzzahlig oder ,5
+    const a = wahl([2, 3, 4, 5, -2, -3])
+    const x2 = rnd(0, 3) === 0 ? nz(1, 9) + 0.5 * wahl([-1, 1]) : nz(1, 10)
+    const b = r6(-a * x2)
+    const tex = `${ax2(a)}${plusX(b)} = 0`
+    return nullproduktAufgabe(tex, [{ l: `${ax2(a)}${plusX(b)}`, r: '0', u: '\\text{x ausklammern}' }], a, b)
+  }
+  // Stufe 4: erst auf eine Seite bringen: a·x² = c·x  bzw.  a·x² + b·x = c·x
+  const a = wahl([1, 2, 3, 4, -2])
+  const x2 = nz(1, 10)
+  const b = r6(-a * x2)
+  if (rnd(0, 1) === 0) {
+    // a·x² = −b·x
+    const c = -b
+    const tex = `${ax2(a)} = ${c === 1 ? '' : c === -1 ? '-' : num(c)}x`
+    return nullproduktAufgabe(tex, [
+      { l: ax2(a), r: `${c === 1 ? '' : c === -1 ? '-' : num(c)}x`, u: c > 0 ? `\\mid -${c === 1 ? '' : num(c)}x` : `\\mid +${c === -1 ? '' : num(-c)}x` },
+      { l: `${ax2(a)}${plusX(b)}`, r: '0', u: '\\text{x ausklammern}' },
+    ], a, b)
+  }
+  // a·x² + b1·x = c·x mit b1 − c = b
+  const c = nz(1, 9)
+  const b1 = r6(b + c)
+  const links = `${ax2(a)}${b1 === 0 ? '' : plusX(b1)}`
+  const rechts = `${c === 1 ? '' : c === -1 ? '-' : num(c)}x`
+  return nullproduktAufgabe(`${links} = ${rechts}`, [
+    { l: links, r: rechts, u: c > 0 ? `\\mid -${c === 1 ? '' : num(c)}x` : `\\mid +${c === -1 ? '' : num(-c)}x` },
+    { l: `${ax2(a)}${plusX(b)}`, r: '0', u: '\\text{x ausklammern}' },
+  ], a, b)
 }
 
 // ---------- Gemischt ----------
 
 export function erzeugeGemischt(stufe: number): Aufgabe {
-  const gen = wahl([erzeugeXQuadrat, erzeugeAXQuadrat, erzeugeAXQuadratC, erzeugeAnzahl, erzeugeUmformen])
-  const a = gen(stufe)
+  const gen = wahl([erzeugeXQuadrat, erzeugeAXQuadrat, erzeugeAXQuadratC, erzeugeAnzahl, erzeugeUmformen, erzeugeNullprodukt])
+  const a = gen(gen === erzeugeNullprodukt ? stufe + 1 : stufe)
   // Im gemischten Training immer zuerst die Anzahl der Lösungen angeben
-  return { ...a, modus: a.modus === 'sach' ? 'sach' : 'anzahl', schluss: a.schluss.filter((s) => s.tex) }
+  return { ...a, modus: 'anzahl', schluss: a.schluss.filter((s) => s.tex) }
 }
 
 // ---------- Prüfen ----------
