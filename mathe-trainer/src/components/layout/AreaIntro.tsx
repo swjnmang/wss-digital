@@ -123,35 +123,6 @@ const INTROS: Record<AreaId, Intro> = {
     ),
   },
 
-  qgl: {
-    heading: 'Darum geht’s in diesem Kapitel',
-    text: [
-      <>In einer <strong>reinquadratischen Gleichung</strong> kommt x nur als x² vor, z. B. 2x² − 8 = 42. Du formst so lange um, bis x² allein steht, und ziehst dann die <strong>Wurzel</strong>.</>,
-      <>Fehlt die Zahl ohne x, z. B. bei x² − 6x = 0, klammerst du x aus und nutzt den <strong>Satz vom Nullprodukt</strong>. Arbeite die Themen der Reihe nach durch.</>,
-    ],
-    formula: <>x² = <span style={{ color: B }}>d</span> → x = ±√<span style={{ color: B }}>d</span></>,
-    noteA: <>zwei Lösungen:<br />+ und −</>,
-    noteB: <>d &lt; 0:<br />keine Lösung</>,
-    sketchLabel: 'Rechenweg: 2x² − 8 = 42, +8, 2x² = 50, :2, x² = 25, x₁ = 5, x₂ = −5',
-    sketch: (
-      <svg viewBox="0 0 440 200" role="img" aria-label="Rechenweg: 2x² − 8 = 42, +8, 2x² = 50, :2, x² = 25, x₁ = 5, x₂ = −5">
-        <KaroDefs id="ai-k-qgl" />
-        <rect width="440" height="200" fill="url(#ai-k-qgl)" />
-        <g fontFamily={HAND} fontSize="28" fill="#1b2433">
-          <text x="30" y="40">2x² − 8 = 42</text>
-          <text x="30" y="80">2x² = 50</text>
-          <text x="30" y="120">x² = 25</text>
-          <text x="30" y="170" fontWeight="700" fill={A}>x₁ = 5 ; x₂ = −5</text>
-        </g>
-        <g fontFamily={HAND} fontSize="24" fill={B}>
-          <text x="250" y="40">| + 8</text>
-          <text x="250" y="80">| : 2</text>
-          <text x="250" y="120">| √</text>
-        </g>
-      </svg>
-    ),
-  },
-
   quadrat: {
     heading: 'Darum geht’s in diesem Kapitel',
     text: [

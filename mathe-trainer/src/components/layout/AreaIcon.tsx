@@ -42,15 +42,6 @@ const ICONS: Record<AreaId, ReactNode> = {
       <circle cx="36" cy="25" r="3.6" fill={W} stroke="currentColor" strokeWidth="2.5" />
     </>
   ),
-  // Waage mit x² auf der einen und √ auf der anderen Seite
-  qgl: (
-    <>
-      <path d="M36 4 V44 M12 12 H60" {...S} fill="none" />
-      <text x="16" y="38" textAnchor="middle" fontSize="18" fontWeight="700" fill="currentColor">x²</text>
-      <text x="56" y="38" textAnchor="middle" fontSize="18" fontWeight="700" fill="currentColor">±√</text>
-      <path d="M26 44 H46" {...S} />
-    </>
-  ),
   // Wurfbahn eines Balls
   quadrat: (
     <>

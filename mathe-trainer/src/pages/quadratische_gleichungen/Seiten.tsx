@@ -1,5 +1,7 @@
 import { InlineMath, BlockMath } from 'react-katex'
+import MenuPage, { type MenuItem } from '../../components/layout/MenuPage'
 import QGUebung, { Beispiel, Merke } from './QGUebung'
+import { QG_BASIS } from './pfad'
 import {
   erzeugeAnzahl,
   erzeugeAXQuadrat,
@@ -14,7 +16,6 @@ import {
 // Nur reinquadratische Gleichungen (Umformen nach x², Wurzelziehen) und ax² + bx = 0 (x ausklammern, Satz vom Nullprodukt).
 // Keine Lösungsformel, keine binomischen Formeln (Wunsch der Lehrkraft).
 
-export const QG_BASIS = '/quadratische_gleichungen'
 const W = '\\mid \\sqrt{\\phantom{x}}'
 
 export function XQuadrat() {
@@ -287,6 +288,28 @@ export function GemischteUebungen() {
           </ol>
         </>
       }
+    />
+  )
+}
+
+/** Untermenü „Quadratische Gleichungen“ unter Rechnen lernen → Gleichungen (Reihenfolge = Lernweg) */
+export const QG_THEMEN: MenuItem[] = [
+  { title: 'Gleichungen der Form x² = d', desc: 'Löse einfache quadratische Gleichungen durch Wurzelziehen – mit beiden Lösungen.', path: `${QG_BASIS}/x2-gleich-d` },
+  { title: 'Gleichungen der Form ax² = d', desc: 'Erst durch a teilen, dann die Wurzel ziehen.', path: `${QG_BASIS}/ax2-gleich-d` },
+  { title: 'Gleichungen der Form ax² + c = d', desc: 'Mit Äquivalenzumformungen nach x² auflösen und lösen.', path: `${QG_BASIS}/ax2-plus-c` },
+  { title: 'Anzahl der Lösungen', desc: 'Zwei, eine oder keine Lösung? Entscheide am Vorzeichen von d.', path: `${QG_BASIS}/anzahl-loesungen` },
+  { title: 'Gleichungen erst umformen', desc: 'Klammern auflösen und zusammenfassen – dann nach x² auflösen und lösen.', path: `${QG_BASIS}/erst-umformen` },
+  { title: 'Satz vom Nullprodukt', desc: 'Gleichungen der Form ax² + bx = 0: x ausklammern und den Satz vom Nullprodukt anwenden.', path: `${QG_BASIS}/satz-vom-nullprodukt` },
+  { title: 'Gemischte Übungen', desc: 'Alle Arten von quadratischen Gleichungen gemischt.', path: `${QG_BASIS}/gemischte-uebungen` },
+]
+
+export function QGMenu() {
+  return (
+    <MenuPage
+      title="Quadratische Gleichungen"
+      subtitle="Arbeite die Themen der Reihe nach durch – in jedem Thema gibt es mehrere Stufen."
+      items={QG_THEMEN}
+      parent={{ to: '/rechnen_lernen/gleichungen', label: 'Gleichungen' }}
     />
   )
 }

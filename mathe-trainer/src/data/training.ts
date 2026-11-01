@@ -6,7 +6,12 @@ import { aufgaben as brueche } from '../pages/rechnen_lernen/Brueche'
 import { aufgaben as potenzen } from '../pages/rechnen_lernen/Potenzen'
 import { aufgaben as wurzeln } from '../pages/rechnen_lernen/Wurzeln'
 import { aufgaben as prozent } from '../pages/rechnen_lernen/Prozentrechnung'
-import { aufgaben as gleichungen } from '../pages/rechnen_lernen/Gleichungen'
+import { aufgaben as gleichungenMenu } from '../pages/rechnen_lernen/Gleichungen'
+import { QG_THEMEN } from '../pages/quadratische_gleichungen/Seiten'
+import { QG_BASIS } from '../pages/quadratische_gleichungen/pfad'
+
+// Das Untermenü „Quadratische Gleichungen“ durch seine Themen ersetzen
+const gleichungen = gleichungenMenu.flatMap((it) => (it.path === QG_BASIS ? QG_THEMEN.map((t) => ({ ...t, title: `Quadratische Gleichungen: ${t.title}` })) : [it]))
 import { aufgaben as zinsrechnung } from '../pages/finanzmathe/ZinsrechnungMenu'
 import { aufgaben as funktionsgleichungQF } from '../pages/quadratische_funktionen/FunktionsgleichungMenu'
 import { aufgaben as finanzAnwendung } from '../pages/finanzmathe/Anwendungsaufgaben'
