@@ -66,7 +66,7 @@ function pruefe(a: Aufgabe, ant: Antwort): Antwort {
     if (!felder.anzahl) {
       return {
         ...ant, geprueft: true, ok: false, felder,
-        meldung: 'Die Anzahl der Lösungen stimmt noch nicht. Forme zuerst nach x² um: Ist die Zahl rechts positiv, 0 oder negativ?',
+        meldung: `Die Anzahl der Lösungen stimmt noch nicht. Forme zuerst nach ${a.v ?? 'x'}² um: Ist die Zahl rechts positiv, 0 oder negativ?`,
       }
     }
     if (soll.length === 0) return { ...ant, geprueft: true, ok: true, felder, meldung: wahl(LOB) }
@@ -94,8 +94,9 @@ function pruefe(a: Aufgabe, ant: Antwort): Antwort {
   const nullprodukt = soll.length === 2 && soll.includes(0)
   if (nullprodukt) {
     const nullDa = w.some((x) => x === 0)
-    if (nullDa && einRichtig) meldung = 'x = 0 stimmt. Setze jetzt die Klammer gleich 0 und löse nach x auf.'
-    else if (!nullDa) meldung = 'Denk an die Lösung x = 0: Nach dem Ausklammern ist der Faktor x selbst gleich 0.'
+    const v = a.v ?? 'x'
+    if (nullDa && einRichtig) meldung = `${v} = 0 stimmt. Setze jetzt die Klammer gleich 0 und löse nach ${v} auf.`
+    else if (!nullDa) meldung = `Denk an die Lösung ${v} = 0: Nach dem Ausklammern ist der Faktor ${v} selbst gleich 0.`
   } else if (n === 2 && einRichtig) {
     meldung = gleich(w[0], w[1], a.runden) || gleich(Math.abs(w[0]), Math.abs(w[1]), a.runden)
       ? 'Eine Lösung stimmt. Beim Wurzelziehen gibt es zwei Lösungen: eine positive und eine negative.'
@@ -124,7 +125,24 @@ function Rechenweg({ a }: { a: Aufgabe }) {
 }
 
 export default function QGUebung({ titel, erklaerungTitel, erklaerung, stufen, erzeuge, anzahl = 6, weiter }: Props) {
-  const neuesSet = useCallback((s: number) => Array.from({ length: anzahl }, () => erzeuge(s)), [anzahl, erzeuge])
+  // Neues Set: möglichst lauter verschiedene Schemata (Zahlen und Variable egal), auf keinen Fall doppelte Gleichungen
+  const neuesSet = useCallback(
+    (s: number) => {
+      const schema = (a: Aufgabe) => a.tex.replace(/\{,\}/g, '').replace(/\d+/g, '#').split(a.v ?? 'x').join('□')
+      const set: Aufgabe[] = []
+      for (let versuch = 0; set.length < anzahl && versuch < anzahl * 40; versuch++) {
+        const a = erzeuge(s)
+        if (!set.some((b) => schema(b) === schema(a))) set.push(a)
+      }
+      for (let versuch = 0; set.length < anzahl && versuch < anzahl * 30; versuch++) {
+        const a = erzeuge(s)
+        if (!set.some((b) => b.tex === a.tex)) set.push(a)
+      }
+      while (set.length < anzahl) set.push(erzeuge(s))
+      return set
+    },
+    [anzahl, erzeuge],
+  )
   const [stufe, setStufe] = useSitzungState<number>('stufe', stufen[0].id)
   const [aufgaben, setAufgaben] = useSitzungState<Aufgabe[]>('aufgaben', () => neuesSet(stufen[0].id))
   const [antworten, setAntworten] = useSitzungState<Record<string, Antwort>>('antworten', {})
@@ -219,7 +237,7 @@ export default function QGUebung({ titel, erklaerungTitel, erklaerung, stufen, e
           {aufgaben.map((a, index) => {
             const ant = antworten[a.id] ?? LEER
             const n = feldAnzahl(a, ant)
-            const v = 'x'
+            const v = a.v ?? 'x'
             return (
               <div key={a.id} className="bg-white rounded p-3 shadow border-l-2 border-blue-300">
                 <div className="flex items-start gap-2 flex-wrap">
@@ -266,7 +284,7 @@ export default function QGUebung({ titel, erklaerungTitel, erklaerung, stufen, e
                         onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
                           if (e.key === 'Enter') pruefen(a)
                         }}
-                        aria-label={`x${i + 1}`}
+                        aria-label={`${v}${i + 1}`}
                         className={`${feldKlasse} ${fieldCheckClass(ant.felder[k])}`}
                       />
                       {a.einheit && <span className="text-sm">{a.einheit}</span>}
