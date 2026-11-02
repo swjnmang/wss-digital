@@ -27,25 +27,25 @@ export function RecordingControls({ recording, onStart, onFinish }: RecordingCon
       {!recording ? (
         <button
           onClick={onStart}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-medium text-sm transition-colors"
+          className="flex items-center gap-2 min-h-11 px-4 py-2 bg-shell hover:bg-shell-2 text-white rounded-lg font-medium text-sm transition-colors"
         >
-          ⏺ Aufzeichnung starten
+          Aufzeichnung starten
         </button>
       ) : (
         <button
           onClick={handleFinishClick}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg font-medium text-xs transition-colors whitespace-nowrap"
+          className="inline-flex h-11 items-center gap-2 rounded-md border border-shell-line px-3.5 text-[15.5px] font-semibold whitespace-nowrap text-white transition-colors hover:bg-shell-2"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+          <span className="h-2 w-2 rounded-full bg-[#ff8a5c] animate-pulse" />
           Aufzeichnung beenden
         </button>
       )}
 
       {showNamePrompt && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-slate-800 mb-2">Arbeitsnachweis erstellen</h3>
-            <p className="text-sm text-slate-600 mb-4">
+        <div className="werkbank-light fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface rounded-lg shadow-xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-bold text-ink mb-2">Arbeitsnachweis erstellen</h3>
+            <p className="text-sm text-ink-soft mb-4">
               Bitte gib deinen Namen ein. Danach wird ein PDF mit deinem Arbeitsnachweis heruntergeladen.
             </p>
             <input
@@ -55,19 +55,19 @@ export function RecordingControls({ recording, onStart, onFinish }: RecordingCon
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
               placeholder="Vor- und Nachname"
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full min-h-11 px-3 py-2 border border-line-strong rounded-lg text-sm mb-4 focus:border-tool"
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowNamePrompt(false)}
-                className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800"
+                className="min-h-11 px-4 py-2 text-sm text-ink-soft hover:text-ink"
               >
                 Abbrechen
               </button>
               <button
                 onClick={handleConfirm}
                 disabled={!name.trim()}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white rounded-lg text-sm font-semibold"
+                className="min-h-11 px-4 py-2 bg-tool hover:bg-tool-dark disabled:opacity-40 text-white rounded-lg text-sm font-semibold"
               >
                 PDF erstellen
               </button>

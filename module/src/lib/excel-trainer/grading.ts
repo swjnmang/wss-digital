@@ -40,7 +40,7 @@ function runCheck(sheet: ReturnType<FWorkbook['getActiveSheet']>, check: ExcelCh
       return {
         label: check.label,
         success,
-        message: success ? check.feedback.correct ?? '✅ Korrekt!' : check.feedback.wrong ?? '❌ Nicht korrekt.',
+        message: success ? check.feedback.correct ?? 'Korrekt!' : check.feedback.wrong ?? 'Nicht korrekt.',
       };
     }
 
@@ -57,8 +57,8 @@ function runCheck(sheet: ReturnType<FWorkbook['getActiveSheet']>, check: ExcelCh
         label: check.label,
         success,
         message: success
-          ? check.feedback.correct ?? '✅ Korrekt!'
-          : `${check.feedback.wrong ?? '❌ Nicht korrekt.'} (Zeile${failedRows.length > 1 ? 'n' : ''} ${failedRows.join(', ')})`,
+          ? check.feedback.correct ?? 'Korrekt!'
+          : `${check.feedback.wrong ?? 'Nicht korrekt.'} (Zeile${failedRows.length > 1 ? 'n' : ''} ${failedRows.join(', ')})`,
       };
     }
 
@@ -74,7 +74,7 @@ function runCheck(sheet: ReturnType<FWorkbook['getActiveSheet']>, check: ExcelCh
       return {
         label: check.label,
         success,
-        message: success ? check.feedback.correct ?? '✅ Korrekt!' : check.feedback.wrong ?? '❌ Nicht korrekt.',
+        message: success ? check.feedback.correct ?? 'Korrekt!' : check.feedback.wrong ?? 'Nicht korrekt.',
       };
     }
 
@@ -85,7 +85,7 @@ function runCheck(sheet: ReturnType<FWorkbook['getActiveSheet']>, check: ExcelCh
       return {
         label: check.label,
         success,
-        message: success ? check.feedback.correct ?? '✅ Korrekt!' : check.feedback.wrong ?? '❌ Nicht korrekt.',
+        message: success ? check.feedback.correct ?? 'Korrekt!' : check.feedback.wrong ?? 'Nicht korrekt.',
       };
     }
 
@@ -96,7 +96,7 @@ function runCheck(sheet: ReturnType<FWorkbook['getActiveSheet']>, check: ExcelCh
       return {
         label: check.label,
         success,
-        message: success ? check.feedback.correct ?? '✅ Korrekt!' : check.feedback.wrong ?? '❌ Nicht korrekt.',
+        message: success ? check.feedback.correct ?? 'Korrekt!' : check.feedback.wrong ?? 'Nicht korrekt.',
       };
     }
 
@@ -117,7 +117,7 @@ function runCheck(sheet: ReturnType<FWorkbook['getActiveSheet']>, check: ExcelCh
       return {
         label: check.label,
         success,
-        message: success ? check.feedback.correct ?? '✅ Korrekt!' : check.feedback.wrong ?? '❌ Nicht korrekt.',
+        message: success ? check.feedback.correct ?? 'Korrekt!' : check.feedback.wrong ?? 'Nicht korrekt.',
       };
     }
 
@@ -127,7 +127,7 @@ function runCheck(sheet: ReturnType<FWorkbook['getActiveSheet']>, check: ExcelCh
       return {
         label: check.label,
         success,
-        message: success ? check.feedback.correct ?? '✅ Korrekt!' : check.feedback.wrong ?? '❌ Nicht korrekt.',
+        message: success ? check.feedback.correct ?? 'Korrekt!' : check.feedback.wrong ?? 'Nicht korrekt.',
       };
     }
 
@@ -137,7 +137,7 @@ function runCheck(sheet: ReturnType<FWorkbook['getActiveSheet']>, check: ExcelCh
       return {
         label: check.label,
         success,
-        message: success ? check.feedback.correct ?? '✅ Korrekt!' : check.feedback.wrong ?? '❌ Nicht korrekt.',
+        message: success ? check.feedback.correct ?? 'Korrekt!' : check.feedback.wrong ?? 'Nicht korrekt.',
       };
     }
 
@@ -147,7 +147,7 @@ function runCheck(sheet: ReturnType<FWorkbook['getActiveSheet']>, check: ExcelCh
       return {
         label: check.label,
         success,
-        message: success ? check.feedback.correct ?? '✅ Korrekt!' : check.feedback.wrong ?? '❌ Nicht korrekt.',
+        message: success ? check.feedback.correct ?? 'Korrekt!' : check.feedback.wrong ?? 'Nicht korrekt.',
       };
     }
 
@@ -156,7 +156,7 @@ function runCheck(sheet: ReturnType<FWorkbook['getActiveSheet']>, check: ExcelCh
       return {
         label: check.label,
         success,
-        message: success ? check.feedback.correct ?? '✅ Korrekt!' : check.feedback.wrong ?? '❌ Nicht korrekt.',
+        message: success ? check.feedback.correct ?? 'Korrekt!' : check.feedback.wrong ?? 'Nicht korrekt.',
       };
     }
 

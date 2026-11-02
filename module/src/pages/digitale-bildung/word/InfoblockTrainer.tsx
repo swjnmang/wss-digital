@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { INFOBLOCK_TASKS, getInfoblockTaskById } from '../../../lib/geschaeftsbrief/infoblock-tasks';
 import { nameProblem, deriveInitials, deriveEmail, isTodayGerman } from '../../../lib/geschaeftsbrief/infoblock-types';
 import { InfoblockTippsButton } from './InfoblockTipps';
+import { ResultBanner, ShellPrimary, TrainerHeader, TrainerPage, TrainerSplit, briefLabelClass, shellSecondaryClass, trainerMainClass } from '../../../components/digitale-bildung/Werkbank';
 
 const difficultyLabel: Record<string, string> = {
   einfach: 'Einfach',
@@ -130,7 +131,7 @@ export default function InfoblockTrainer() {
     return (
       <div key={line.id}>
         <div className="grid grid-cols-[130px_1fr] gap-x-3 items-center">
-          <label className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 leading-tight">
+          <label className="text-[13px] font-semibold text-ink-soft leading-tight">
             {line.caption}
           </label>
           <input
@@ -138,12 +139,12 @@ export default function InfoblockTrainer() {
             value={value}
             onChange={(e) => changeGraded(line.id, e.target.value)}
             placeholder={placeholder}
-            className={`w-full px-3 py-2 rounded-lg text-sm font-mono border-2 transition-all outline-none ${
+            className={`w-full min-h-11 px-3 py-2 rounded-lg text-[15px] font-werkbank-mono border-2 transition-all outline-none ${
               showResult
                 ? correct
-                  ? 'bg-green-50 border-green-400 text-green-800'
-                  : 'bg-red-50 border-red-400 text-red-800'
-                : 'bg-white border-slate-200 text-slate-800 focus:border-blue-400'
+                  ? 'bg-correct-soft border-correct text-correct'
+                  : 'bg-notyet-soft border-notyet text-notyet-ink'
+                : 'bg-surface border-line text-ink focus:border-tool'
             }`}
           />
         </div>
@@ -151,8 +152,8 @@ export default function InfoblockTrainer() {
           <div className="grid grid-cols-[130px_1fr] gap-x-3">
             <div />
             <p
-              className={`mt-1 text-xs rounded-lg px-3 py-2 ${
-                correct ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+              className={`mt-1 text-[13px] rounded-lg px-3 py-2 ${
+                correct ? 'bg-correct-soft text-correct' : 'bg-notyet-soft text-notyet-ink'
               }`}
             >
               {explanationOf(line)}
@@ -165,17 +166,17 @@ export default function InfoblockTrainer() {
             <button
               type="button"
               onClick={() => setRevealed((prev) => ({ ...prev, [line.id]: true }))}
-              className="mt-1 justify-self-start text-xs font-semibold text-blue-700 hover:text-blue-900 underline"
+              className="mt-1 justify-self-start text-[13px] font-semibold text-tool-dark hover:text-ink underline"
             >
-              💡 Lösung für dieses Feld anzeigen
+              Lösung für dieses Feld anzeigen
             </button>
           </div>
         )}
         {revealed[line.id] && (
           <div className="grid grid-cols-[130px_1fr] gap-x-3">
             <div />
-            <p className="mt-1 text-xs rounded-lg px-3 py-2 bg-blue-50 text-blue-900">
-              Lösung: <span className="font-mono font-semibold">{solutionOf(line)}</span>
+            <p className="mt-1 text-[13px] rounded-lg px-3 py-2 bg-tool-soft text-ink">
+              Lösung: <span className="font-werkbank-mono font-semibold">{solutionOf(line)}</span>
             </p>
           </div>
         )}
@@ -184,44 +185,43 @@ export default function InfoblockTrainer() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-gradient-to-br from-slate-800 to-slate-700 text-white py-6 px-4 relative">
-        <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
-          <Link
-            to="/digitale-bildung/word/geschaeftsbrief/infoblock/uebersicht"
-            className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors"
-          >
-            ← Aufgabenübersicht
-          </Link>
-          <InfoblockTippsButton className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/20 text-white transition-colors" />
-          <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-200 bg-white/10 rounded-full px-2 py-1 mb-2">
-            {difficultyLabel[task.difficulty] ?? task.difficulty}
-          </span>
-          <h1 className="text-xl font-bold">{task.title}</h1>
-        </div>
-      </header>
+    <TrainerPage tool="word">
+      <TrainerHeader
+        title={task.title}
+        meta={difficultyLabel[task.difficulty] ?? task.difficulty}
+        back={{ to: '/digitale-bildung/word/geschaeftsbrief/infoblock/uebersicht', label: 'Zur Aufgabenübersicht' }}
+        recent="Word · Infoblock"
+      >
+        <InfoblockTippsButton className={shellSecondaryClass} />
+        <ShellPrimary onClick={() => setChecked(true)} disabled={!allAnswered}>
+          Prüfen
+        </ShellPrimary>
+      </TrainerHeader>
 
-      <main className="flex-1 w-full max-w-6xl mx-auto p-6 flex flex-col gap-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-2">📝 Arbeitsauftrag</p>
-          {task.arbeitsauftrag.split('\n\n').map((absatz, i) => (
-            <p key={i} className="text-slate-700 mb-2 last:mb-0 whitespace-pre-line">
-              {absatz}
-            </p>
-          ))}
-        </div>
-
-        {/* Briefseite: Anschriftenfeld und Infoblock nebeneinander, wie auf einem echten Briefbogen */}
-        <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-6 md:p-10">
-          <div className="flex flex-col md:flex-row md:items-start gap-8 md:gap-16">
+      <TrainerSplit
+        brief={
+          <>
+            <p className={briefLabelClass}>Arbeitsauftrag</p>
+            {task.arbeitsauftrag.split('\n\n').map((absatz, i) => (
+              <p key={i} className="m-0 mb-2 text-[17px] leading-normal whitespace-pre-line last:mb-0">
+                {absatz}
+              </p>
+            ))}
+          </>
+        }
+      >
+      <main className={trainerMainClass}>
+                {/* Briefseite: Anschriftenfeld und Infoblock nebeneinander, wie auf einem echten Briefbogen */}
+        <div className="bg-surface rounded-lg border border-line p-6 md:p-10">
+          <div className="flex flex-col xl:flex-row xl:items-start gap-8 xl:gap-12">
             {/* Anschriftenfeld (Kontext) */}
-            <div className="w-full md:w-[360px] shrink-0 md:sticky md:top-6">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Anschriftenfeld</p>
-              <div className="border border-dashed border-slate-300 rounded-lg p-3 bg-slate-50 font-mono">
-                <div className="text-[10px] text-slate-500 mb-1">{task.senderLine}</div>
-                <div className="border-t border-slate-300 my-1" />
+            <div className="w-full xl:w-[340px] shrink-0">
+              <p className="text-[13px] font-semibold text-ink-muted mb-2">Anschriftenfeld</p>
+              <div className="border border-dashed border-line-strong rounded-lg p-3 bg-canvas font-werkbank-mono">
+                <div className="text-[13px] text-ink-soft mb-1">{task.senderLine}</div>
+                <div className="border-t border-line-strong my-1" />
                 {task.empfaengerLines.map((line) => (
-                  <div key={line} className="text-sm text-slate-800">
+                  <div key={line} className="text-[15px] text-ink">
                     {line}
                   </div>
                 ))}
@@ -229,8 +229,8 @@ export default function InfoblockTrainer() {
             </div>
 
             {/* Infoblock: direkt ausfüllbar */}
-            <div className="w-full md:w-[460px] shrink-0">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">Infoblock</p>
+            <div className="w-full xl:w-[460px] xl:shrink-0">
+              <p className="text-[13px] font-semibold text-ink-muted mb-3">Infoblock</p>
               <div className="flex flex-col gap-3">
                 {task.lines.map((line, i) => (
                   <div key={line.id}>
@@ -240,23 +240,12 @@ export default function InfoblockTrainer() {
                 ))}
               </div>
 
-              <div className="mt-5 pt-4 border-t border-slate-200">
-                <div className="text-sm font-semibold text-slate-600 mb-3">
+              <div className="mt-5 pt-4 border-t border-line">
+                <div className="text-[15px] font-semibold text-ink-soft mb-3">
                   {checked ? `${correctCount} / ${gradableLines.length} Felder korrekt` : 'Noch nicht geprüft'}
                 </div>
-                <button
-                  onClick={() => setChecked(true)}
-                  disabled={!allAnswered}
-                  className={`w-full px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-                    allAnswered
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                  }`}
-                >
-                  Prüfen
-                </button>
                 {!allAnswered && (
-                  <p className="mt-2 text-xs text-slate-400 text-center">
+                  <p className="mt-2 text-[13px] text-ink-muted text-center">
                     Fülle alle Felder aus, die eine Angabe benötigen, bevor du prüfst.
                   </p>
                 )}
@@ -264,41 +253,24 @@ export default function InfoblockTrainer() {
             </div>
           </div>
 
-          <div className="hidden md:block mt-10 pt-6 border-t border-dashed border-slate-200 text-xs text-slate-300 text-center">
+          <div className="hidden md:block mt-10 pt-6 border-t border-dashed border-line text-[13px] text-ink-muted text-center">
             (Brieftext folgt hier im weiteren Verlauf des Geschäftsbriefs …)
           </div>
         </div>
 
-        {allCorrect && (
-          <div className="bg-green-50 border-2 border-green-400 rounded-xl p-5 text-center">
-            <p className="text-green-800 font-semibold mb-3">🎉 Super! Der Infoblock ist korrekt ausgefüllt.</p>
-            {nextTask ? (
-              <button
-                onClick={() => navigate(`/digitale-bildung/word/geschaeftsbrief/infoblock/${nextTask.id}`)}
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Nächste Aufgabe →
-              </button>
-            ) : (
-              <Link
-                to="/digitale-bildung/word/geschaeftsbrief/infoblock/uebersicht"
-                className="inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Zur Aufgabenübersicht
-              </Link>
-            )}
-          </div>
-        )}
-        {checked && !allCorrect && (
-          <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 text-center">
-            <p className="text-amber-800 font-semibold">
-              Noch nicht ganz richtig ({correctCount} / {gradableLines.length}). Korrigiere die rot markierten Felder
-              und klicke erneut auf „Prüfen“. Wenn du nicht weiterkommst, kannst du dir die Lösung einzelner Felder
-              anzeigen lassen.
-            </p>
-          </div>
-        )}
+                <ResultBanner
+          allCorrect={allCorrect}
+          checked={checked}
+          correctText="Der Infoblock ist korrekt ausgefüllt."
+          wrongText={`${correctCount} von ${gradableLines.length} Feldern stimmen. Korrigiere die markierten Felder und klicke erneut auf „Prüfen“. Wenn du nicht weiterkommst, kannst du dir die Lösung einzelner Felder anzeigen lassen.`}
+          next={
+            nextTask
+              ? { label: 'Nächste Aufgabe', onClick: () => navigate(`/digitale-bildung/word/geschaeftsbrief/infoblock/${nextTask.id}`) }
+              : { label: 'Zur Aufgabenübersicht', to: '/digitale-bildung/word/geschaeftsbrief/infoblock/uebersicht' }
+          }
+        />
       </main>
-    </div>
+      </TrainerSplit>
+    </TrainerPage>
   );
 }

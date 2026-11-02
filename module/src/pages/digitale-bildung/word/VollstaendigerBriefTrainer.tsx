@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { ClipboardEvent, MouseEvent } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   VOLLSTAENDIGER_BRIEF_TASKS,
   getVollstaendigerBriefTaskById,
@@ -8,6 +8,7 @@ import {
 import { allLineFields, brieftextMatches } from '../../../lib/geschaeftsbrief/vollstaendiger-brief-types';
 import { AnschriftenfeldTippsButton } from './AnschriftenfeldTipps';
 import { InfoblockTippsButton } from './InfoblockTipps';
+import { ResultBanner, ShellPrimary, TrainerHeader, TrainerPage, TrainerSplit, briefLabelClass, shellSecondaryClass, trainerMainClass } from '../../../components/digitale-bildung/Werkbank';
 
 const difficultyLabel: Record<string, string> = {
   einfach: 'Einfach',
@@ -80,7 +81,7 @@ export default function VollstaendigerBriefTrainer() {
     return (
       <div key={line.id}>
         <div className="grid grid-cols-[170px_1fr] gap-x-3 items-center">
-          <label className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 leading-tight">
+          <label className="text-[13px] font-semibold text-ink-soft leading-tight">
             {line.caption}
           </label>
           <input
@@ -88,14 +89,14 @@ export default function VollstaendigerBriefTrainer() {
             value={value}
             onChange={(e) => change(line.id, e.target.value)}
             placeholder={line.placeholder}
-            className={`w-full px-3 py-2 rounded-lg font-mono border-2 transition-all outline-none ${
-              small ? 'text-xs' : 'text-sm'
+            className={`w-full min-h-11 px-3 py-2 rounded-lg font-werkbank-mono border-2 transition-all outline-none ${
+              small ? 'text-[13px]' : 'text-[15px]'
             } ${
               showResult
                 ? correct
-                  ? 'bg-green-50 border-green-400 text-green-800'
-                  : 'bg-red-50 border-red-400 text-red-800'
-                : 'bg-white border-slate-200 text-slate-800 focus:border-blue-400'
+                  ? 'bg-correct-soft border-correct text-correct'
+                  : 'bg-notyet-soft border-notyet text-notyet-ink'
+                : 'bg-surface border-line text-ink focus:border-tool'
             }`}
           />
         </div>
@@ -103,8 +104,8 @@ export default function VollstaendigerBriefTrainer() {
           <div className="grid grid-cols-[170px_1fr] gap-x-3">
             <div />
             <p
-              className={`mt-1 text-xs rounded-lg px-3 py-2 ${
-                correct ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+              className={`mt-1 text-[13px] rounded-lg px-3 py-2 ${
+                correct ? 'bg-correct-soft text-correct' : 'bg-notyet-soft text-notyet-ink'
               }`}
             >
               {line.explanation}
@@ -118,55 +119,56 @@ export default function VollstaendigerBriefTrainer() {
   const renderSection = (title: string, sectionLines: SimpleLine[], options?: { bare?: boolean }) => {
     const content = (
       <>
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">{title}</p>
+        <p className="text-[13px] font-semibold text-ink-muted mb-3">{title}</p>
         <div className="flex flex-col gap-3">{sectionLines.map(renderRow)}</div>
       </>
     );
     if (options?.bare) {
       return <div>{content}</div>;
     }
-    return <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-5">{content}</div>;
+    return <div className="bg-surface rounded-lg border border-line p-5">{content}</div>;
   };
 
   const brieftextShowResult = checked && brieftext.trim() !== '';
   const brieftextOk = isBrieftextCorrect();
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-gradient-to-br from-slate-800 to-slate-700 text-white py-6 px-4 relative">
-        <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
-          <Link
-            to="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief/uebersicht"
-            className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors"
-          >
-            ← Aufgabenübersicht
-          </Link>
-          <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-200 bg-white/10 rounded-full px-2 py-1 mb-2">
-            {difficultyLabel[task.difficulty] ?? task.difficulty}
-          </span>
-          <h1 className="text-xl font-bold">{task.title}</h1>
-        </div>
-      </header>
+    <TrainerPage tool="word">
+      <TrainerHeader
+        title={task.title}
+        meta={difficultyLabel[task.difficulty] ?? task.difficulty}
+        back={{ to: '/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief/uebersicht', label: 'Zur Aufgabenübersicht' }}
+        recent="Word · Vollständiger Geschäftsbrief"
+      >
+        <AnschriftenfeldTippsButton className={shellSecondaryClass} label="Tipps Anschrift" />
+        <InfoblockTippsButton className={shellSecondaryClass} label="Tipps Infoblock" />
+        <ShellPrimary onClick={() => setChecked(true)} disabled={!allAnswered}>
+          Prüfen
+        </ShellPrimary>
+      </TrainerHeader>
 
-      <main className="flex-1 w-full max-w-5xl mx-auto p-6 flex flex-col gap-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-2">📝 Arbeitsauftrag</p>
-          {task.arbeitsauftrag.split('\n\n').map((absatz, i) => (
-            <p key={i} className="text-slate-700 mb-2 last:mb-0 whitespace-pre-line">
-              {absatz}
-            </p>
-          ))}
-        </div>
-
-        <div className="flex flex-col gap-5">
+      <TrainerSplit
+        brief={
+          <>
+            <p className={briefLabelClass}>Arbeitsauftrag</p>
+            {task.arbeitsauftrag.split('\n\n').map((absatz, i) => (
+              <p key={i} className="m-0 mb-2 text-[17px] leading-normal whitespace-pre-line last:mb-0">
+                {absatz}
+              </p>
+            ))}
+          </>
+        }
+      >
+      <main className={trainerMainClass}>
+                <div className="flex flex-col gap-5">
           {/* Der eigentliche Brief: eine durchgehende Briefseite, von oben nach unten wie ein Word-Dokument. */}
-          <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-6 md:p-8 flex flex-col gap-8">
+          <div className="bg-surface rounded-lg border border-line p-6 md:p-8 flex flex-col gap-8">
             {/* Briefkopf: Anschriftenfeld oben links, Infoblock oben rechts (DIN 5008) */}
-            <div className="flex flex-col md:flex-row md:justify-between gap-6">
-              <div className="w-full md:w-[360px]">
+            <div className="flex flex-col xl:flex-row xl:justify-between gap-6">
+              <div className="w-full xl:w-[340px]">
                 {renderSection('1. Anschriftenfeld', task.anschriftenfeld as SimpleLine[], { bare: true })}
               </div>
-              <div className="w-full md:w-[420px]">
+              <div className="w-full xl:w-[400px]">
                 {renderSection('2. Infoblock', task.infoblock as SimpleLine[], { bare: true })}
               </div>
             </div>
@@ -176,13 +178,13 @@ export default function VollstaendigerBriefTrainer() {
 
             {/* Brieftext: Referenztext anzeigen (nicht kopierbar), Student tippt selbst ab */}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">5. Brieftext</p>
-              <p className="text-xs text-slate-500 mb-2">
+              <p className="text-[13px] font-semibold text-ink-muted mb-3">5. Brieftext</p>
+              <p className="text-[13px] text-ink-soft mb-2">
                 Lies den vorgegebenen Brieftext und tippe ihn vollständig und wortgenau in das Textfeld darunter ab.
                 Der Text lässt sich nicht kopieren – du musst ihn selbst schreiben.
               </p>
               <div
-                className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 mb-3 text-sm text-slate-700 leading-relaxed flex flex-col gap-3"
+                className="bg-canvas border border-dashed border-line-strong rounded-lg p-4 mb-3 text-[15px] text-ink leading-relaxed flex flex-col gap-3"
                 style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
                 onCopy={preventCopy}
                 onCut={preventCopy}
@@ -201,18 +203,18 @@ export default function VollstaendigerBriefTrainer() {
                 onPaste={preventCopy}
                 rows={8}
                 placeholder="Tippe hier den Brieftext ab …"
-                className={`w-full px-3 py-2 rounded-lg text-sm border-2 transition-all outline-none leading-relaxed ${
+                className={`w-full min-h-11 px-3 py-2 rounded-lg text-[15px] border-2 transition-all outline-none leading-relaxed ${
                   brieftextShowResult
                     ? brieftextOk
-                      ? 'bg-green-50 border-green-400 text-green-800'
-                      : 'bg-red-50 border-red-400 text-red-800'
-                    : 'bg-white border-slate-200 text-slate-800 focus:border-blue-400'
+                      ? 'bg-correct-soft border-correct text-correct'
+                      : 'bg-notyet-soft border-notyet text-notyet-ink'
+                    : 'bg-surface border-line text-ink focus:border-tool'
                 }`}
               />
               {brieftextShowResult && (
                 <p
-                  className={`mt-2 text-xs rounded-lg px-3 py-2 ${
-                    brieftextOk ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                  className={`mt-2 text-[13px] rounded-lg px-3 py-2 ${
+                    brieftextOk ? 'bg-correct-soft text-correct' : 'bg-notyet-soft text-notyet-ink'
                   }`}
                 >
                   {brieftextOk
@@ -225,62 +227,31 @@ export default function VollstaendigerBriefTrainer() {
             {renderSection('6. Grußformel & Unterschrift', task.grussformel as SimpleLine[], { bare: true })}
           </div>
 
-          <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-5">
-            <div className="text-sm font-semibold text-slate-600 mb-3">
+          <div className="bg-surface rounded-lg border border-line p-5">
+            <div className="text-[15px] font-semibold text-ink-soft mb-3">
               {checked ? `${correctCount} / ${totalFields} Felder korrekt` : 'Noch nicht geprüft'}
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setChecked(true)}
-                disabled={!allAnswered}
-                className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-                  allAnswered
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                }`}
-              >
-                Prüfen
-              </button>
-              <AnschriftenfeldTippsButton className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors whitespace-nowrap" />
-              <InfoblockTippsButton className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors whitespace-nowrap" />
-            </div>
             {!allAnswered && (
-              <p className="mt-2 text-xs text-slate-400 text-center">
+              <p className="mt-2 text-[13px] text-ink-muted text-center">
                 Fülle alle Felder sowie den Brieftext aus, bevor du prüfst.
               </p>
             )}
           </div>
         </div>
 
-        {allCorrect && (
-          <div className="bg-green-50 border-2 border-green-400 rounded-xl p-5 text-center">
-            <p className="text-green-800 font-semibold mb-3">🎉 Super! Der komplette Geschäftsbrief ist korrekt.</p>
-            {nextTask ? (
-              <button
-                onClick={() => navigate(`/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief/${nextTask.id}`)}
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Nächste Aufgabe →
-              </button>
-            ) : (
-              <Link
-                to="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief/uebersicht"
-                className="inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Zur Aufgabenübersicht
-              </Link>
-            )}
-          </div>
-        )}
-        {checked && !allCorrect && (
-          <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 text-center">
-            <p className="text-amber-800 font-semibold">
-              Noch nicht ganz richtig ({correctCount} / {totalFields}). Korrigiere die rot markierten Felder und
-              klicke erneut auf „Prüfen“.
-            </p>
-          </div>
-        )}
+                <ResultBanner
+          allCorrect={allCorrect}
+          checked={checked}
+          correctText="Der komplette Geschäftsbrief ist korrekt."
+          wrongText={`${correctCount} von ${totalFields} Feldern stimmen. Korrigiere die markierten Felder und klicke erneut auf „Prüfen“.`}
+          next={
+            nextTask
+              ? { label: 'Nächste Aufgabe', onClick: () => navigate(`/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief/${nextTask.id}`) }
+              : { label: 'Zur Aufgabenübersicht', to: '/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief/uebersicht' }
+          }
+        />
       </main>
-    </div>
+      </TrainerSplit>
+    </TrainerPage>
   );
 }

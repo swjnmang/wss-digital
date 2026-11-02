@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { GRUSSFORMEL_TASKS, getGrussformelTaskById } from '../../../lib/geschaeftsbrief/grussformel-tasks';
 import { GrussformelTippsButton } from './GrussformelTipps';
+import { ResultBanner, ShellPrimary, TrainerHeader, TrainerPage, TrainerSplit, briefLabelClass, shellSecondaryClass, trainerMainClass } from '../../../components/digitale-bildung/Werkbank';
 
 const difficultyLabel: Record<string, string> = {
   einfach: 'Einfach',
@@ -64,7 +65,7 @@ export default function GrussformelTrainer() {
     return { text, neutral: false, correct: isCorrect(lineId) };
   };
 
-  const blankRow = <div className="text-slate-300">(Leerzeile)</div>;
+  const blankRow = <div className="text-ink-muted">(Leerzeile)</div>;
 
   const rows: { key: string; content: 'blank' | { text: string; neutral: boolean; correct?: boolean } }[] = [
     { key: 'gruss', content: previewRow('gruss') },
@@ -78,40 +79,38 @@ export default function GrussformelTrainer() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-gradient-to-br from-slate-800 to-slate-700 text-white py-6 px-4 relative">
-        <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
-          <Link
-            to="/digitale-bildung/word/geschaeftsbrief/grussformel/uebersicht"
-            className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors"
-          >
-            ← Aufgabenübersicht
-          </Link>
-          <GrussformelTippsButton className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/20 text-white transition-colors" />
-          <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-200 bg-white/10 rounded-full px-2 py-1 mb-2">
-            {difficultyLabel[task.difficulty] ?? task.difficulty}
-          </span>
-          <h1 className="text-xl font-bold">{task.title}</h1>
-        </div>
-      </header>
+    <TrainerPage tool="word">
+      <TrainerHeader
+        title={task.title}
+        meta={difficultyLabel[task.difficulty] ?? task.difficulty}
+        back={{ to: '/digitale-bildung/word/geschaeftsbrief/grussformel/uebersicht', label: 'Zur Aufgabenübersicht' }}
+        recent="Word · Grußformel & Unterschrift"
+      >
+        <GrussformelTippsButton className={shellSecondaryClass} />
+        <ShellPrimary onClick={() => setChecked(true)} disabled={!allAnswered}>
+          Prüfen
+        </ShellPrimary>
+      </TrainerHeader>
 
-      <main className="flex-1 w-full max-w-4xl mx-auto p-6 flex flex-col gap-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-          <p className="text-slate-700 mb-3">{task.scenario}</p>
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-2">🗒️ Notizzettel</p>
-            <ul className="text-sm text-amber-900 list-disc list-inside space-y-0.5">
+      <TrainerSplit
+        brief={
+          <>
+            <p className={briefLabelClass}>Arbeitsauftrag</p>
+            <p className="m-0 mb-3 text-[17px] leading-normal">{task.scenario}</p>
+            <p className={briefLabelClass}>Notizzettel</p>
+            <ul className="m-0 list-disc space-y-0.5 pl-5 text-[15.5px]">
               {task.facts.map((fact) => (
                 <li key={fact}>{fact}</li>
               ))}
             </ul>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,320px)_1fr] gap-6 items-start">
-          <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-4 lg:sticky lg:top-6">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Grußformel-Block</p>
-            <div className="border border-dashed border-slate-300 rounded-lg p-3 bg-slate-50 font-mono text-sm">
+          </>
+        }
+      >
+      <main className={trainerMainClass}>
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,320px)_1fr] gap-6 items-start">
+          <div className="bg-surface rounded-lg border border-line p-4 xl:sticky xl:top-20">
+            <p className="text-[13px] font-semibold text-ink-muted mb-2">Grußformel-Block</p>
+            <div className="border border-dashed border-line-strong rounded-lg p-3 bg-canvas font-werkbank-mono text-[15px]">
               {rows.map((row) => {
                 if (row.content === 'blank') return <div key={row.key}>{blankRow}</div>;
                 const { text, neutral, correct } = row.content as { text: string; neutral: boolean; correct?: boolean };
@@ -120,12 +119,12 @@ export default function GrussformelTrainer() {
                     key={row.key}
                     className={
                       neutral
-                        ? 'text-slate-300'
+                        ? 'text-ink-muted'
                         : correct === undefined
-                          ? 'text-slate-800 font-medium'
+                          ? 'text-ink font-medium'
                           : correct
-                            ? 'text-green-700 font-medium'
-                            : 'text-red-600 font-medium'
+                            ? 'text-correct font-medium'
+                            : 'text-notyet-ink font-medium'
                     }
                   >
                     {text}
@@ -133,22 +132,11 @@ export default function GrussformelTrainer() {
                 );
               })}
             </div>
-            <div className="mt-3 text-sm font-semibold text-slate-600">
+            <div className="mt-3 text-[15px] font-semibold text-ink-soft">
               {checked ? `${correctCount} / ${task.lines.length} Zeilen korrekt` : 'Noch nicht geprüft'}
             </div>
-            <button
-              onClick={() => setChecked(true)}
-              disabled={!allAnswered}
-              className={`mt-3 w-full px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-                allAnswered
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-              }`}
-            >
-              Prüfen
-            </button>
             {!allAnswered && (
-              <p className="mt-2 text-xs text-slate-400 text-center">
+              <p className="mt-2 text-[13px] text-ink-muted text-center">
                 Wähle für jede Zeile eine Option, bevor du prüfst.
               </p>
             )}
@@ -160,8 +148,8 @@ export default function GrussformelTrainer() {
               const chosenId = selections[line.id];
               const correct = isCorrect(line.id);
               return (
-                <div key={line.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-                  <p className="text-sm font-semibold text-slate-700 mb-3">{line.caption}</p>
+                <div key={line.id} className="bg-surface rounded-lg border border-line p-4">
+                  <p className="text-[15px] font-semibold text-ink mb-3">{line.caption}</p>
                   <div className="flex flex-wrap gap-2">
                     {line.options.map((option) => {
                       const selected = chosenId === option.id;
@@ -170,17 +158,17 @@ export default function GrussformelTrainer() {
                         <button
                           key={option.id}
                           onClick={() => choose(line.id, option.id)}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium border-2 transition-all ${
+                          className={`min-h-11 px-3 py-2 rounded-lg text-[15px] font-medium border-2 transition-all ${
                             showResult
                               ? option.correct
-                                ? 'bg-green-100 text-green-800 border-green-400'
-                                : 'bg-red-100 text-red-800 border-red-400'
+                                ? 'bg-correct-soft text-correct border-correct'
+                                : 'bg-notyet-soft text-notyet-ink border-notyet'
                               : selected
-                                ? 'bg-blue-100 text-blue-800 border-blue-400'
-                                : 'bg-slate-50 text-slate-700 border-transparent hover:border-slate-200'
+                                ? 'bg-tool-soft text-tool-dark border-tool'
+                                : 'bg-canvas text-ink border-transparent hover:border-line-strong'
                           }`}
                         >
-                          {showResult && (option.correct ? '✅ ' : '❌ ')}
+                          {showResult && (option.correct ? 'Richtig: ' : 'Noch nicht: ')}
                           {option.text}
                         </button>
                       );
@@ -188,8 +176,8 @@ export default function GrussformelTrainer() {
                   </div>
                   {checked && chosenId && (
                     <p
-                      className={`mt-3 text-sm rounded-lg px-3 py-2 ${
-                        correct ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                      className={`mt-3 text-[15px] rounded-lg px-3 py-2 ${
+                        correct ? 'bg-correct-soft text-correct' : 'bg-notyet-soft text-notyet-ink'
                       }`}
                     >
                       {line.explanation}
@@ -201,35 +189,19 @@ export default function GrussformelTrainer() {
           </div>
         </div>
 
-        {allCorrect && (
-          <div className="bg-green-50 border-2 border-green-400 rounded-xl p-5 text-center">
-            <p className="text-green-800 font-semibold mb-3">🎉 Super! Grußformel und Unterschrift sind korrekt.</p>
-            {nextTask ? (
-              <button
-                onClick={() => navigate(`/digitale-bildung/word/geschaeftsbrief/grussformel/${nextTask.id}`)}
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Nächste Aufgabe →
-              </button>
-            ) : (
-              <Link
-                to="/digitale-bildung/word/geschaeftsbrief/grussformel/uebersicht"
-                className="inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Zur Aufgabenübersicht
-              </Link>
-            )}
-          </div>
-        )}
-        {checked && !allCorrect && (
-          <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 text-center">
-            <p className="text-amber-800 font-semibold">
-              Noch nicht ganz richtig ({correctCount} / {task.lines.length}). Korrigiere die rot markierten Zeilen und
-              klicke erneut auf „Prüfen“.
-            </p>
-          </div>
-        )}
+                <ResultBanner
+          allCorrect={allCorrect}
+          checked={checked}
+          correctText="Grußformel und Unterschrift sind korrekt."
+          wrongText={`${correctCount} von ${task.lines.length} Zeilen stimmen. Korrigiere die markierten Zeilen und klicke erneut auf „Prüfen“.`}
+          next={
+            nextTask
+              ? { label: 'Nächste Aufgabe', onClick: () => navigate(`/digitale-bildung/word/geschaeftsbrief/grussformel/${nextTask.id}`) }
+              : { label: 'Zur Aufgabenübersicht', to: '/digitale-bildung/word/geschaeftsbrief/grussformel/uebersicht' }
+          }
+        />
       </main>
-    </div>
+      </TrainerSplit>
+    </TrainerPage>
   );
 }

@@ -24,3 +24,76 @@ body {
 .aufgabe-einblenden {
   animation: aufgabe-einblenden 0.35s ease-out;
 }
+
+/* Werkbank-Designsystem für den Bereich „Digitale Bildung“ */
+@theme {
+  --color-shell: #12161c;
+  --color-shell-2: #2d3541;
+  --color-shell-line: #4a5563;
+  --color-shell-ink: #e8ecf1;
+  --color-shell-muted: #a3aebb;
+  --color-canvas: #f3f5f7;
+  --color-surface: #ffffff;
+  --color-ink: #12161c;
+  --color-ink-soft: #3b444e;
+  --color-ink-muted: #525c68;
+  --color-line: #d5dbe1;
+  --color-line-soft: #e4e8ec;
+  --color-line-strong: #8792a0;
+  --color-ki: #6b3fc4;
+  --color-correct: #0b6e6e;
+  --color-correct-soft: #dff2f0;
+  --color-notyet: #a84300;
+  --color-notyet-ink: #7a3300;
+  --color-notyet-soft: #fcebdd;
+  --font-werkbank: 'Schibsted Grotesk Variable', 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-werkbank-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+
+@theme inline {
+  --color-tool: var(--tool);
+  --color-tool-dark: var(--tool-dark);
+  --color-tool-soft: var(--tool-soft);
+  --color-tool-on-shell: var(--tool-on-shell);
+}
+
+.werkbank {
+  --tool: #2456c9;
+  --tool-dark: #1b429c;
+  --tool-soft: #e5ecfb;
+  --tool-on-shell: #6e9bff;
+}
+
+.werkbank[data-tool='excel'] {
+  --tool: #0f7b4f;
+  --tool-dark: #0b6642;
+  --tool-soft: #e9f4ef;
+  --tool-on-shell: #17a06a;
+}
+
+.werkbank :focus-visible {
+  outline: 3px solid var(--tool);
+  outline-offset: 2px;
+}
+
+.werkbank .werkbank-dark :focus-visible {
+  outline-color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .werkbank * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.werkbank .werkbank-dark .werkbank-light :focus-visible {
+  outline-color: var(--tool);
+}
+
+/* Offene Tipps schieben die Arbeitsfläche zur Seite, statt sie zu verdecken. */
+@media (min-width: 1000px) {
+  html.tips-open .werkbank {
+    padding-right: 460px;
+  }
+}

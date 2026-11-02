@@ -6,12 +6,12 @@ const PAGE_WIDTH = 210;
 const CONTENT_WIDTH = PAGE_WIDTH - PAGE_MARGIN * 2;
 
 // jsPDF's base-14 fonts (helvetica) only support WinAnsi/Latin-1. Emoji and
-// symbol glyphs (✅ ❌ 🎉 etc.) aren't in that encoding and corrupt the glyph
+// symbol glyphs (🎉 etc.) aren't in that encoding and corrupt the glyph
 // metrics jsPDF uses for line wrapping, so text after them renders with wrong
 // spacing and runs off the page. Strip them and use plain ASCII markers instead.
 function sanitizeForPdf(text: string): string {
   return text
-    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}✅❌✓✗]/gu, '')
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}✓✗]/gu, '')
     .replace(/\s+/g, ' ')
     .trim();
 }

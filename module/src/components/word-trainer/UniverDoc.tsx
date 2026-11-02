@@ -66,7 +66,7 @@ export const UniverDoc = forwardRef<UniverDocHandle, UniverDocProps>(({ task }, 
     },
   }));
 
-  return <div ref={containerRef} style={{ width: '100%', height: 'calc(100vh - 220px)', minHeight: '480px' }} />;
+  return <div ref={containerRef} style={{ width: '100%', height: 'calc(100vh - 110px)', minHeight: '480px' }} />;
 });
 
 UniverDoc.displayName = 'UniverDoc';

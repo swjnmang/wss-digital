@@ -78,7 +78,7 @@ function gradeTextLine(line: TextLine, actual: string): ValidationResult {
   return {
     label: line.caption,
     success,
-    message: success ? '✅ Korrekt!' : `❌ Nicht korrekt. ${line.explanation}`,
+    message: success ? 'Korrekt!' : `Nicht korrekt. ${line.explanation}`,
   };
 }
 
@@ -155,13 +155,13 @@ function gradeInfoblock(fDocument: FDocument, task: WordDokumentTask): Validatio
       results.push({
         label: line.label,
         success,
-        message: success ? '✅ Korrekt!' : `❌ Nicht korrekt. ${line.explanation}`,
+        message: success ? 'Korrekt!' : `Nicht korrekt. ${line.explanation}`,
       });
     } else if (line.kind === 'field-date') {
       const paragraph = fDocument.findParagraphByText(`${line.label}:`);
       const actual = paragraph ? valueAfterLabel(paragraph.getText(), line.label) : '';
       const success = isTodayGerman(actual);
-      results.push({ label: line.label, success, message: success ? '✅ Korrekt!' : `❌ Nicht korrekt. ${line.explanation}` });
+      results.push({ label: line.label, success, message: success ? 'Korrekt!' : `Nicht korrekt. ${line.explanation}` });
     }
   }
   return results;
@@ -203,8 +203,8 @@ function gradeLetterBody(fDocument: FDocument, task: WordDokumentTask): Validati
     label: 'Brieftext',
     success: brieftextSuccess,
     message: brieftextSuccess
-      ? '✅ Der Brieftext stimmt (kleine Abweichungen bei Leerzeichen werden toleriert).'
-      : '❌ Der abgetippte Text weicht noch vom vorgegebenen Brieftext ab. Vergleiche jedes Wort und jedes Satzzeichen genau.',
+      ? 'Der Brieftext stimmt (kleine Abweichungen bei Leerzeichen werden toleriert).'
+      : 'Der abgetippte Text weicht noch vom vorgegebenen Brieftext ab. Vergleiche jedes Wort und jedes Satzzeichen genau.',
   });
 
   results.push(...task.grussformel.map((line, i) => gradeTextLine(line, grussformelTexts[i] ?? '')));

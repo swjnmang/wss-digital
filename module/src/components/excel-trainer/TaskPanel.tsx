@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import type { ExcelTask, ValidationResult } from '../../lib/excel-trainer/types';
+import { ResultRow, ShellPrimary, StepButtons, TrainerHeader, backLinkClass } from '../digitale-bildung/Werkbank';
+import { GuardedBackLink } from './GuardedBackLink';
 import { RecordingControls } from './RecordingControls';
 
 interface TaskPanelProps {
@@ -8,6 +11,7 @@ interface TaskPanelProps {
   onCheck: () => void;
   recording: boolean;
   onFinishRecording: (studentName: string) => void;
+  children: ReactNode;
 }
 
 const difficultyLabel: Record<ExcelTask['difficulty'], string> = {
@@ -16,86 +20,79 @@ const difficultyLabel: Record<ExcelTask['difficulty'], string> = {
   schwer: 'Schwer',
 };
 
-export function TaskPanel({ task, results, onCheck, recording, onFinishRecording }: TaskPanelProps) {
+export function TaskPanel({ task, results, onCheck, recording, onFinishRecording, children }: TaskPanelProps) {
   const allCorrect = results !== null && results.every((r) => r.success);
+  const [showResults, setShowResults] = useState(true);
 
   const [context, ...steps] = task.instruction;
   const [stepIndex, setStepIndex] = useState(0);
-  const currentStep = steps[stepIndex] ?? context;
+  const currentStep = (steps[stepIndex] ?? context).replace(/^\d+\.\s*/, '');
+
+  const check = () => {
+    setShowResults(true);
+    onCheck();
+  };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3 flex flex-col gap-2">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-600 bg-blue-50 rounded-full px-2 py-0.5">
-            {difficultyLabel[task.difficulty]}
-          </span>
-          <h2 className="text-base font-bold text-slate-800">{task.title}</h2>
-        </div>
+    <>
+      <TrainerHeader
+        title={task.title}
+        meta={difficultyLabel[task.difficulty]}
+        recent="Excel"
+        backSlot={
+          <GuardedBackLink to="/digitale-bildung/excel-trainer" label="Zur Aufgabenübersicht" className={backLinkClass}>
+            <ArrowLeft size={22} aria-hidden="true" />
+          </GuardedBackLink>
+        }
+      >
         {recording && <RecordingControls recording onStart={() => {}} onFinish={onFinishRecording} />}
-      </div>
+        {steps.length > 1 && <StepButtons count={steps.length} current={stepIndex} label="Teilaufgabe" onSelect={setStepIndex} />}
+        <ShellPrimary onClick={check}>Prüfen</ShellPrimary>
+      </TrainerHeader>
 
-      <div className="flex flex-wrap items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-3 py-1.5">
-        <button
-          onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
-          disabled={stepIndex === 0}
-          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-semibold text-sm px-2 py-1 rounded-md hover:bg-blue-100 disabled:hover:bg-transparent shrink-0 whitespace-nowrap"
-        >
-          ← Zurück zur letzten Aufgabe
-        </button>
-        <p className="text-sm text-slate-800 flex-1 min-w-[200px]">
-          <span className="text-xs font-semibold uppercase tracking-wide text-blue-500 mr-2">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-line bg-tool-soft px-4 py-2.5">
+        {steps.length > 0 && (
+          <span className="font-werkbank-mono text-sm font-medium text-tool-dark">
             {stepIndex + 1}/{steps.length}
           </span>
-          {currentStep}
-        </p>
-        <button
-          onClick={() => setStepIndex((i) => Math.min(steps.length - 1, i + 1))}
-          disabled={stepIndex === steps.length - 1}
-          className="text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed font-semibold text-sm px-2 py-1 rounded-md hover:bg-blue-100 disabled:hover:bg-transparent shrink-0 whitespace-nowrap"
-        >
-          Zur nächsten Teilaufgabe →
-        </button>
-        <button
-          onClick={onCheck}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg px-5 py-1.5 text-sm transition-colors shrink-0"
-        >
-          Prüfen
-        </button>
+        )}
+        <p className="m-0 min-w-[240px] flex-1 text-lg leading-snug font-medium">{currentStep}</p>
+        <details className="text-[15.5px]">
+          <summary className="cursor-pointer py-1 font-semibold">Kontext &amp; Hinweis</summary>
+          <div className="mt-1 flex max-w-xl flex-col gap-2 leading-snug">
+            {context && <p className="m-0">{context}</p>}
+            {task.hint && <p className="m-0">{task.hint}</p>}
+            <p className="m-0 text-sm text-ink-soft">
+              Argumente innerhalb einer Formel werden mit Komma <code>,</code> statt Semikolon <code>;</code> getrennt (z. B.{' '}
+              <code>=WENN(A1&gt;5,"ja","nein")</code>).
+            </p>
+          </div>
+        </details>
       </div>
 
-      <details className="text-sm text-slate-500 bg-slate-50 rounded-lg px-3 py-1.5">
-        <summary className="cursor-pointer font-semibold text-slate-600 text-sm">💡 Kontext &amp; Hinweis</summary>
-        <div className="mt-2 space-y-2">
-          {context && <p>{context}</p>}
-          {task.hint && <p>{task.hint}</p>}
-          <p className="text-xs text-slate-400">
-            ℹ️ Argumente innerhalb einer Formel werden mit Komma <code>,</code> statt Semikolon <code>;</code>{' '}
-            getrennt (z. B. <code>=WENN(A1&gt;5,"ja","nein")</code>).
-          </p>
-        </div>
-      </details>
+      {children}
 
-      {results && (
-        <div className="space-y-1.5 border-t border-slate-100 pt-2">
-          <p className={`text-sm font-semibold ${allCorrect ? 'text-green-600' : 'text-amber-600'}`}>
-            {allCorrect ? '🎉 Alles richtig!' : 'Es sind noch nicht alle Punkte korrekt.'}
-          </p>
-          <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-1.5">
+      {results && showResults && (
+        <div role="status" className="sticky bottom-0 z-10 max-h-52 overflow-y-auto border-t border-line-strong bg-surface px-4 py-2.5">
+          <div className="mb-1.5 flex items-center justify-between gap-3">
+            <ResultRow ok={allCorrect}>
+              <strong>{allCorrect ? 'Richtig!' : 'Noch nicht.'}</strong> {allCorrect ? 'Alle Punkte stimmen.' : 'Es stimmen noch nicht alle Punkte.'}
+            </ResultRow>
+            <button onClick={() => setShowResults(false)} className="min-h-11 shrink-0 px-2 text-[15px] font-semibold text-tool-dark underline">
+              Ausblenden
+            </button>
+          </div>
+          <ul className="m-0 grid list-none grid-cols-1 gap-x-4 gap-y-1 p-0 md:grid-cols-2 xl:grid-cols-3">
             {results.map((r, i) => (
-              <li
-                key={i}
-                className={`text-sm rounded-lg px-3 py-1.5 ${
-                  r.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-                }`}
-              >
-                <span className="font-semibold">{r.label}: </span>
-                {r.message}
+              <li key={i}>
+                <ResultRow ok={r.success}>
+                  <strong>{r.label}:</strong> {r.message}
+                </ResultRow>
               </li>
             ))}
           </ul>
         </div>
       )}
-    </div>
+    </>
   );
 }

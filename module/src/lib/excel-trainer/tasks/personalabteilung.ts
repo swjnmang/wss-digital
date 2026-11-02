@@ -71,13 +71,13 @@ export const personalabteilungTask: ExcelTask = {
   difficulty: 'mittel',
   sheetName: 'Personalabteilung',
   instruction: [
-    'Sie arbeiten in der Personalabteilung der IT-Profi GmbH und werten Bewerbungen für eine studienbegleitende IT-Ausbildung aus.',
-    '1. Berechnen Sie in Spalte I den Durchschnitt (Mittelwert) der vier Schulnoten mit einer Nachkommastelle.',
-    '2. Heben Sie die Noten farblich hervor: Note bis maximal 2 grün, ab Note 4 rot (bedingte Formatierung).',
-    '3. Berechnen Sie in Spalte K die Erstattung der Fahrtkosten (Anfahrtsweg × Erstattungssatz in L3).',
-    '4. Ändern Sie den Erstattungssatz in L3 auf 0,50 €.',
-    '5. Berechnen Sie in Spalte M die Gesamtkosten je Bewerber (Erstattung + Bewirtungskosten) mit der Summen-Formel.',
-    '6. Sortieren Sie die Bewerber nach Nachnamen von A-Z und filtern Sie: nur Bewerber mit Abitur (nicht Fachabitur) und Informatik-Note 2 oder besser.',
+    'Du arbeitest in der Personalabteilung der IT-Profi GmbH und wertest Bewerbungen für eine studienbegleitende IT-Ausbildung aus.',
+    '1. Berechne in Spalte I den Durchschnitt (Mittelwert) der vier Schulnoten mit einer Nachkommastelle.',
+    '2. Hebe die Noten farblich hervor: Note bis maximal 2 grün, ab Note 4 rot (bedingte Formatierung).',
+    '3. Berechne in Spalte K die Erstattung der Fahrtkosten (Anfahrtsweg × Erstattungssatz in L3).',
+    '4. Ändere den Erstattungssatz in L3 auf 0,50 €.',
+    '5. Berechne in Spalte M die Gesamtkosten je Bewerber (Erstattung + Bewirtungskosten) mit der Summen-Formel.',
+    '6. Sortiere die Bewerber nach Nachnamen von A-Z und filtere: nur Bewerber mit Abitur (nicht Fachabitur) und Informatik-Note 2 oder besser.',
   ],
   hint: 'MITTELWERT(E5:H5) für den Notendurchschnitt. Erstattung = Anfahrtsweg × $L$3, damit der Bezug beim Herunterziehen erhalten bleibt.',
   seed,
@@ -91,8 +91,8 @@ export const personalabteilungTask: ExcelTask = {
       label: 'Notendurchschnitt (Spalte I)',
       expected: (row) => [`=MITTELWERT(E${row}:H${row})`, `=MITTELWERT(E${row};F${row};G${row};H${row})`],
       feedback: {
-        correct: '✅ Durchschnitt korrekt berechnet.',
-        wrong: '❌ Der Notendurchschnitt ist nicht in jeder Zeile korrekt.',
+        correct: 'Durchschnitt korrekt berechnet.',
+        wrong: 'Der Notendurchschnitt ist nicht in jeder Zeile korrekt.',
         hint: 'Verwende z. B. =MITTELWERT(E5:H5).',
       },
     },
@@ -100,8 +100,8 @@ export const personalabteilungTask: ExcelTask = {
       type: 'conditionalFormatExists',
       label: 'Farbliche Hervorhebung der Noten',
       feedback: {
-        correct: '✅ Bedingte Formatierung vorhanden.',
-        wrong: '❌ Es wurde noch keine bedingte Formatierung für die Noten angelegt.',
+        correct: 'Bedingte Formatierung vorhanden.',
+        wrong: 'Es wurde noch keine bedingte Formatierung für die Noten angelegt.',
       },
     },
     {
@@ -112,8 +112,8 @@ export const personalabteilungTask: ExcelTask = {
       label: 'Erstattung Fahrtkosten (Spalte K)',
       expected: (row) => [`=J${row}*$L$3`, `=J${row}*L3`],
       feedback: {
-        correct: '✅ Erstattung korrekt berechnet.',
-        wrong: '❌ Erstattung = Anfahrtsweg × Erstattungssatz (L3), am besten mit $-Bezug.',
+        correct: 'Erstattung korrekt berechnet.',
+        wrong: 'Erstattung = Anfahrtsweg × Erstattungssatz (L3), am besten mit $-Bezug.',
       },
     },
     {
@@ -122,7 +122,7 @@ export const personalabteilungTask: ExcelTask = {
       label: 'Erstattungssatz auf 0,50 € geändert',
       expected: 0.5,
       tolerance: 0.001,
-      feedback: { correct: '✅ Korrekt geändert.', wrong: '❌ Ändere den Wert in L3 auf 0,50.' },
+      feedback: { correct: 'Korrekt geändert.', wrong: 'Ändere den Wert in L3 auf 0,50.' },
     },
     {
       type: 'formulaRange',
@@ -132,8 +132,8 @@ export const personalabteilungTask: ExcelTask = {
       label: 'Summe der Kosten (Spalte M)',
       expected: (row) => [`=SUMME(K${row}:L${row})`, `=K${row}+L${row}`],
       feedback: {
-        correct: '✅ Summe korrekt berechnet.',
-        wrong: '❌ Nutze die SUMME-Formel für Erstattung + Bewirtungskosten.',
+        correct: 'Summe korrekt berechnet.',
+        wrong: 'Nutze die SUMME-Formel für Erstattung + Bewirtungskosten.',
       },
     },
     {
@@ -142,14 +142,14 @@ export const personalabteilungTask: ExcelTask = {
       columnOffset: 0,
       direction: 'asc',
       label: 'Sortierung nach Nachname (A-Z)',
-      feedback: { correct: '✅ Korrekt sortiert.', wrong: '❌ Die Bewerber sind noch nicht alphabetisch nach Nachname sortiert.' },
+      feedback: { correct: 'Korrekt sortiert.', wrong: 'Die Bewerber sind noch nicht alphabetisch nach Nachname sortiert.' },
     },
     {
       type: 'filterActive',
       label: 'Filter aktiviert',
       feedback: {
-        correct: '✅ Filter ist aktiv.',
-        wrong: '❌ Aktiviere den Filter und zeige nur Abitur-Bewerber mit Informatik-Note 2 oder besser.',
+        correct: 'Filter ist aktiv.',
+        wrong: 'Aktiviere den Filter und zeige nur Abitur-Bewerber mit Informatik-Note 2 oder besser.',
       },
     },
   ],
