@@ -10,6 +10,9 @@ import { LAYOUT_TASKS } from '../../lib/word-layout/tasks';
 const toolLink =
   'flex min-h-[52px] items-center justify-between gap-3 border-t border-line-soft px-4 py-2 font-semibold text-ink no-underline transition-colors hover:bg-canvas';
 const count = 'font-werkbank-mono text-sm font-medium text-ink-muted';
+const subLink =
+  'flex min-h-11 items-center gap-3 border-t border-line-soft py-2 pr-4 pl-[52px] text-ink no-underline transition-colors hover:bg-canvas';
+const nr = 'font-werkbank-mono font-medium';
 const tileShell = 'flex flex-col overflow-hidden rounded-lg border border-line bg-surface';
 
 export default function DigitaleBildungIndex() {
@@ -24,6 +27,7 @@ export default function DigitaleBildungIndex() {
           <article className={tileShell}>
             <Link to="/digitale-bildung/excel-trainer" className="flex items-center gap-3 bg-[#0f7b4f] px-4 py-3.5 text-[22px] font-bold text-white no-underline">
               <Table2 size={26} aria-hidden="true" />
+              <span className={nr}>1</span>
               Excel
             </Link>
             <p className="m-0 flex-1 p-4 text-base leading-snug text-ink-soft">
@@ -37,22 +41,38 @@ export default function DigitaleBildungIndex() {
           <article className={tileShell}>
             <Link to="/digitale-bildung/word" className="flex items-center gap-3 bg-[#2456c9] px-4 py-3.5 text-[22px] font-bold text-white no-underline">
               <FileText size={26} aria-hidden="true" />
+              <span className={nr}>2</span>
               Word
             </Link>
             <Link to="/digitale-bildung/word/geschaeftsbrief" className={`${toolLink} border-t-0`}>
-              Geschäftsbrief nach DIN 5008 <span className={count}>5</span>
+              <span className="flex items-baseline gap-2.5">
+                <span className={`${nr} text-sm text-ink-muted`}>2.1</span>
+                Geschäftsbrief nach DIN 5008
+              </span>
+              <span className={count}>5</span>
             </Link>
-            <Link to="/digitale-bildung/word/layout/uebungen" className={toolLink}>
-              Digitale Übungen <span className={count}>{LAYOUT_TASKS.length}</span>
+            <Link to="/digitale-bildung/word/layout" className={toolLink}>
+              <span className="flex items-baseline gap-2.5">
+                <span className={`${nr} text-sm text-ink-muted`}>2.2</span>
+                Layouten mit Word
+              </span>
             </Link>
-            <Link to="/digitale-bildung/word/layout/arbeitsauftraege" className={toolLink}>
-              Arbeitsaufträge für Word <span className={count}>{ARBEITSAUFTRAEGE.length}</span>
+            <Link to="/digitale-bildung/word/layout/uebungen" className={subLink}>
+              <span className="flex-1">Digitale Übungen</span>
+              <span className={count}>{LAYOUT_TASKS.length}</span>
+            </Link>
+            <Link to="/digitale-bildung/word/layout/arbeitsauftraege" className={subLink}>
+              <span className="flex-1">Arbeitsaufträge für Word</span>
+              <span className={count}>{ARBEITSAUFTRAEGE.length}</span>
             </Link>
           </article>
 
           <article className="flex flex-col gap-1.5 rounded-lg border border-dashed border-line-strong bg-canvas p-4 text-ink-soft">
             <h2 className="m-0 flex items-center justify-between gap-2 text-xl font-bold">
-              PowerPoint
+              <span className="flex items-baseline gap-2.5">
+                <span className={nr}>3</span>
+                PowerPoint
+              </span>
               <span className="rounded border border-line-strong px-1.5 py-0.5 font-werkbank-mono text-[13px] font-medium">Demnächst</span>
             </h2>
             <p className="m-0 text-base leading-snug">Präsentationen strukturieren und gestalten.</p>
@@ -65,8 +85,11 @@ export default function DigitaleBildungIndex() {
             className="flex flex-col gap-1.5 rounded-lg border border-line bg-surface p-4 text-ink no-underline transition-[box-shadow,transform] duration-100 hover:-translate-y-px hover:shadow-md"
           >
             <span className="flex items-center justify-between gap-2 text-xl font-bold text-ki">
-              Mit einer KI umgehen
-              <ExternalLink size={20} role="img" aria-label="Externe Seite" />
+              <span className="flex items-baseline gap-2.5">
+                <span className={nr}>4</span>
+                Bau den Chatbot deiner Schule - KI verstehen
+              </span>
+              <ExternalLink size={20} className="shrink-0" role="img" aria-label="Externe Seite" />
             </span>
             <span className="text-base leading-snug text-ink-soft">
               Den sinnvollen und verantwortungsvollen Umgang mit KI-Assistenten lernen. Öffnet eine externe Seite.
