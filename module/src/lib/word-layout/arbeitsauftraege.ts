@@ -274,7 +274,7 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
     ],
     "thema": "Ausbildung",
     "titel": "Erstellung eines Infoblatts",
-    "szenario": "Sie absolvieren ein Praktikum bei der Ausbildungsberatung der Industrie- und Handelskammer. Für den Berufsorientierungstag an Schulen soll ein Infoblatt „Rechte und Pflichten für Azubis“ gestaltet werden. Der Text wurde bereits zur Verfügung gestellt (01 vorlage.docx). Sie passen lediglich das Layout nach folgenden Angaben an:",
+    "szenario": "Du machst ein Praktikum bei der Ausbildungsberatung der Industrie- und Handelskammer. Für den Berufsorientierungstag an Schulen soll ein Infoblatt „Rechte und Pflichten für Azubis“ gestaltet werden. Der Text wurde bereits zur Verfügung gestellt (01 vorlage.docx). Du passt nur das Layout nach folgenden Angaben an:",
     "start": 0,
     "rows": [
       {
@@ -537,7 +537,7 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
     ],
     "thema": "Schülerfirma",
     "titel": "Gestaltung eines Werbeflyers",
-    "szenario": "Die Schülerfirma „Pausenglück“ Ihrer Schule betreibt einen Pausenkiosk. Zum neuen Schuljahr soll ein Flyer im Querformat erstellt werden, der gefaltet an alle Klassen verteilt wird. Der Text liegt bereits vor (01 vorlage.docx). Sie passen lediglich das Layout nach folgenden Angaben an:",
+    "szenario": "Die Schülerfirma „Pausenglück“ deiner Schule betreibt einen Pausenkiosk. Zum neuen Schuljahr soll ein Flyer im Querformat erstellt werden, der gefaltet an alle Klassen verteilt wird. Der Text liegt bereits vor (01 vorlage.docx). Du passt nur das Layout nach folgenden Angaben an:",
     "start": 0,
     "rows": [
       {
@@ -814,7 +814,7 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
     ],
     "thema": "Dämmung Haus",
     "titel": "Erstellung eines Informationsflyers",
-    "szenario": "Sie absolvieren ein Praktikum bei der Verbraucherzentrale im Bereich der Energieberatung. Sie sollen einen Informationsflyer zum Thema „Durch richtiges Dämmen Heizkosten sparen“ anpassen. Der Text wurde bereits zur Verfügung gestellt (01 vorlage.docx). Sie passen lediglich das Layout nach folgenden Angaben an:",
+    "szenario": "Du machst ein Praktikum bei der Verbraucherzentrale im Bereich der Energieberatung. Du sollst einen Informationsflyer zum Thema „Durch richtiges Dämmen Heizkosten sparen“ anpassen. Der Text wurde bereits zur Verfügung gestellt (01 vorlage.docx). Du passt nur das Layout nach folgenden Angaben an:",
     "start": 0,
     "rows": [
       {
@@ -1016,7 +1016,7 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
     ],
     "thema": "Sparkasse",
     "titel": "Erstellung eines Werbeflyers",
-    "szenario": "Sie erstellen für Ihren Arbeitgeber, die Sparkasse, einen Werbeflyer für das neue Konto YOUNG für junge Leute. Öffne die passende Vorlagendatei und nimm folgende Änderungen vor:",
+    "szenario": "Du erstellst für deinen Arbeitgeber, die Sparkasse, einen Werbeflyer für das neue Konto YOUNG für junge Leute. Öffne die passende Vorlagendatei und nimm folgende Änderungen vor:",
     "start": 0,
     "rows": [
       {
@@ -1188,7 +1188,7 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
     ],
     "thema": "Wintersport",
     "titel": "Gestaltung eines Zeitungsartikels",
-    "szenario": "Sie sollen einen DIN-A4-Zeitungsartikel zum Thema „Wintersport“ anpassen. Der Text wurde bereits zur Verfügung gestellt (Vorlage.docx). Sie passen lediglich das Layout wie folgt an:",
+    "szenario": "Du sollst einen DIN-A4-Zeitungsartikel zum Thema „Wintersport“ anpassen. Der Text wurde bereits zur Verfügung gestellt (Vorlage.docx). Du passt nur das Layout wie folgt an:",
     "start": 1,
     "rows": [
       {
@@ -1419,7 +1419,7 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
     ],
     "thema": "Mallorca",
     "titel": "Erstellung eines Werbeflyers – Reisewelt Behrens",
-    "szenario": "Sie sind Angestellte/-r bei Reisewelt Behrens. Ihr Vorgesetzter, Christian Behrens, hat Sie gebeten, für das Reiseziel Mallorca einen DIN-A4-Werbeflyer zu erstellen. Der Text wurde bereits erstellt (Datei 01 vorlage.docx). Sie sollen lediglich das Layout an folgende Angaben anpassen:",
+    "szenario": "Du bist Angestellte/-r bei Reisewelt Behrens. Dein Vorgesetzter, Christian Behrens, hat dich gebeten, für das Reiseziel Mallorca einen DIN-A4-Werbeflyer zu erstellen. Der Text wurde bereits erstellt (Datei 01 vorlage.docx). Du sollst nur das Layout an folgende Angaben anpassen:",
     "start": 1,
     "rows": [
       {
@@ -1607,7 +1607,7 @@ export const ARBEITSAUFTRAEGE: Arbeitsauftrag[] = [
     ],
     "thema": "Bericht",
     "titel": "Gestaltung eines Berichts",
-    "szenario": "Für die Schülerzeitung hat die Klasse 10b eine Umfrage zur Smartphone-Nutzung durchgeführt. Die Ergebnisse sollen als einseitiger Bericht mit nummerierten Überschriften, Tabelle und Bild erscheinen. Der Text liegt bereits vor (01 vorlage.docx). Sie passen lediglich das Layout nach folgenden Angaben an:",
+    "szenario": "Für die Schülerzeitung hat die Klasse 10b eine Umfrage zur Smartphone-Nutzung durchgeführt. Die Ergebnisse sollen als einseitiger Bericht mit nummerierten Überschriften, Tabelle und Bild erscheinen. Der Text liegt bereits vor (01 vorlage.docx). Du passt nur das Layout nach folgenden Angaben an:",
     "start": 0,
     "rows": [
       {

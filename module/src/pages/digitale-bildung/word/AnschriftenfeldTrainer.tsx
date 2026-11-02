@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getAnschriftenfeldTaskById } from '../../../lib/geschaeftsbrief/anschriftenfeld-tasks';
 import { markAnschriftenfeldSeen, pickRandomAnschriftenfeldTask } from '../../../lib/geschaeftsbrief/anschriftenfeld-random';
 import type { AnschriftLine } from '../../../lib/geschaeftsbrief/types';
 import { AnschriftenfeldTippsButton } from './AnschriftenfeldTipps';
+import { ResultBanner, ShellPrimary, ShellSecondary, TrainerHeader, TrainerPage, TrainerSplit, briefLabelClass, shellSecondaryClass, trainerMainClass } from '../../../components/digitale-bildung/Werkbank';
 
 const difficultyLabel: Record<string, string> = {
   einfach: 'Einfach',
@@ -12,11 +13,11 @@ const difficultyLabel: Record<string, string> = {
 };
 
 const LOB = [
-  '🎉 Super gemacht! Dein Anschriftenfeld ist komplett richtig.',
-  '🌟 Hervorragend! Du hast alle Angaben richtig herausgesucht und korrekt angeordnet.',
-  '👏 Klasse! Jede Zeile sitzt – so kann der Brief verschickt werden.',
-  '🏆 Perfekt gelöst! Du hast dich von den Zusatzinfos nicht ablenken lassen.',
-  '💪 Stark! Das Anschriftenfeld entspricht genau der DIN 5008.',
+  'Super gemacht! Dein Anschriftenfeld ist komplett richtig.',
+  'Hervorragend! Du hast alle Angaben richtig herausgesucht und korrekt angeordnet.',
+  'Klasse! Jede Zeile sitzt – so kann der Brief verschickt werden.',
+  'Perfekt gelöst! Du hast dich von den Zusatzinfos nicht ablenken lassen.',
+  'Stark! Das Anschriftenfeld entspricht genau der DIN 5008.',
 ];
 
 export default function AnschriftenfeldTrainer() {
@@ -96,20 +97,20 @@ export default function AnschriftenfeldTrainer() {
           onChange={(e) => change(line.id, e.target.value)}
           placeholder={line.placeholder}
           aria-label="Zeile des Anschriftenfelds"
-          className={`w-full px-3 py-2 rounded-lg font-mono border-2 transition-all outline-none ${
-            small ? 'text-xs' : 'text-sm'
+          className={`w-full min-h-11 px-3 py-2 rounded-lg font-werkbank-mono border-2 transition-all outline-none ${
+            small ? 'text-[13px]' : 'text-[15px]'
           } ${
             showResult
               ? correct
-                ? 'bg-green-50 border-green-400 text-green-800'
-                : 'bg-red-50 border-red-400 text-red-800'
-              : 'bg-white border-slate-200 text-slate-800 focus:border-blue-400'
+                ? 'bg-correct-soft border-correct text-correct'
+                : 'bg-notyet-soft border-notyet text-notyet-ink'
+              : 'bg-surface border-line text-ink focus:border-tool'
           }`}
         />
         {showResult && (
           <p
-            className={`mt-1 text-xs rounded-lg px-3 py-2 ${
-              correct ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+            className={`mt-1 text-[13px] rounded-lg px-3 py-2 ${
+              correct ? 'bg-correct-soft text-correct' : 'bg-notyet-soft text-notyet-ink'
             }`}
           >
             {line.explanation}
@@ -119,14 +120,14 @@ export default function AnschriftenfeldTrainer() {
           <button
             type="button"
             onClick={() => setRevealed((prev) => ({ ...prev, [line.id]: true }))}
-            className="mt-1 text-xs font-semibold text-blue-700 hover:text-blue-900 underline"
+            className="mt-1 text-[13px] font-semibold text-tool-dark hover:text-ink underline"
           >
-            💡 Lösung für diese Zeile anzeigen
+            Lösung für diese Zeile anzeigen
           </button>
         )}
         {revealed[line.id] && (
-          <p className="mt-1 text-xs rounded-lg px-3 py-2 bg-blue-50 text-blue-900">
-            Lösung: <span className="font-mono font-semibold">{line.expected}</span>
+          <p className="mt-1 text-[13px] rounded-lg px-3 py-2 bg-tool-soft text-ink">
+            Lösung: <span className="font-werkbank-mono font-semibold">{line.expected}</span>
           </p>
         )}
       </div>
@@ -134,74 +135,55 @@ export default function AnschriftenfeldTrainer() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-gradient-to-br from-slate-800 to-slate-700 text-white py-6 px-4 relative">
-        <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
-          <Link
-            to="/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/uebersicht"
-            className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors"
-          >
-            ← Aufgabenübersicht
-          </Link>
-          <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-200 bg-white/10 rounded-full px-2 py-1 mb-2">
-            {difficultyLabel[task.difficulty] ?? task.difficulty}
-          </span>
-          <h1 className="text-xl font-bold">{task.title}</h1>
-        </div>
-      </header>
+    <TrainerPage tool="word">
+      <TrainerHeader
+        title={task.title}
+        meta={difficultyLabel[task.difficulty] ?? task.difficulty}
+        back={{ to: '/digitale-bildung/word/geschaeftsbrief/anschriftenfeld/uebersicht', label: 'Zur Aufgabenübersicht' }}
+        recent="Word · Anschriftenfeld"
+      >
+        <AnschriftenfeldTippsButton className={shellSecondaryClass} />
+        <ShellSecondary onClick={goToRandomTask}>Andere Aufgabe</ShellSecondary>
+        <ShellPrimary onClick={check} disabled={!allAnswered}>
+          Prüfen
+        </ShellPrimary>
+      </TrainerHeader>
 
+      <TrainerSplit
+        brief={
+          <>
+            <p className={briefLabelClass}>Arbeitsauftrag</p>
+            {task.arbeitsauftrag.split('\n\n').map((absatz, i) => (
+              <p key={i} className="m-0 mb-2 text-[17px] leading-normal whitespace-pre-line last:mb-0">
+                {absatz}
+              </p>
+            ))}
+          </>
+        }
+      >
       {refreshing ? (
-        <main className="flex-1 w-full max-w-4xl mx-auto p-6 flex flex-col items-center justify-center gap-3 text-slate-500">
-          <div className="w-8 h-8 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin" />
-          <p className="text-sm font-medium">Neue Aufgabe wird geladen …</p>
+        <main className="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-ink-muted">
+          <div className="w-8 h-8 border-4 border-line border-t-tool rounded-full animate-spin" />
+          <p className="text-[15px] font-medium">Neue Aufgabe wird geladen …</p>
         </main>
       ) : (
-      <main key={task.id} className="aufgabe-einblenden flex-1 w-full max-w-4xl mx-auto p-6 flex flex-col gap-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-2">📝 Arbeitsauftrag</p>
-          {task.arbeitsauftrag.split('\n\n').map((absatz, i) => (
-            <p key={i} className="text-slate-700 mb-2 last:mb-0 whitespace-pre-line">
-              {absatz}
-            </p>
-          ))}
-        </div>
-
-        {/* Anschriftenfeld: direkt ausfüllbar */}
-        <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-6 md:p-10 flex justify-center">
+      <main key={task.id} className={`aufgabe-einblenden ${trainerMainClass}`}>
+                {/* Anschriftenfeld: direkt ausfüllbar */}
+        <div className="bg-surface rounded-lg border border-line p-6 md:p-10 flex justify-center">
           <div className="w-full max-w-[460px]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">Anschriftenfeld</p>
-            <div className="border border-dashed border-slate-300 rounded-lg p-4 bg-slate-50">
-              <div className="text-[10px] text-slate-500 mb-2 font-mono">{task.senderLine}</div>
-              <div className="border-t border-slate-300 mb-3" />
+            <p className="text-[13px] font-semibold text-ink-muted mb-3">Anschriftenfeld</p>
+            <div className="border border-dashed border-line-strong rounded-lg p-4 bg-canvas">
+              <div className="text-[13px] text-ink-soft mb-2 font-werkbank-mono">{task.senderLine}</div>
+              <div className="border-t border-line-strong mb-3" />
               <div className="flex flex-col gap-3">{task.lines.map(renderRow)}</div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-slate-200">
-              <div className="text-sm font-semibold text-slate-600 mb-3">
+            <div className="mt-5 pt-4 border-t border-line">
+              <div className="text-[15px] font-semibold text-ink-soft mb-3">
                 {checked ? `${correctCount} / ${task.lines.length} Zeilen korrekt` : 'Noch nicht geprüft'}
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={check}
-                  disabled={!allAnswered}
-                  className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-                    allAnswered
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                  }`}
-                >
-                  Prüfen
-                </button>
-                <button
-                  onClick={goToRandomTask}
-                  className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors whitespace-nowrap"
-                >
-                  🔀 Andere Aufgabe
-                </button>
-                <AnschriftenfeldTippsButton className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors whitespace-nowrap" />
-              </div>
               {!allAnswered && (
-                <p className="mt-2 text-xs text-slate-400 text-center">
+                <p className="mt-2 text-[13px] text-ink-muted text-center">
                   Fülle alle Zeilen aus, bevor du prüfst.
                 </p>
               )}
@@ -209,32 +191,16 @@ export default function AnschriftenfeldTrainer() {
           </div>
         </div>
 
-        {allCorrect && (
-          <div className="bg-green-50 border-2 border-green-400 rounded-xl p-5 text-center">
-            <p className="text-green-800 font-semibold mb-3">
-              {usedSolution
-                ? '✅ Geschafft! Jetzt ist alles richtig. Versuch die nächste Aufgabe ganz ohne Lösungshilfe!'
-                : lob}
-            </p>
-            <button
-              onClick={goToRandomTask}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-            >
-              Nächste Aufgabe →
-            </button>
-          </div>
-        )}
-        {checked && !allCorrect && (
-          <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 text-center">
-            <p className="text-amber-800 font-semibold">
-              Noch nicht ganz richtig ({correctCount} / {task.lines.length}). Korrigiere die rot markierten Zeilen und
-              klicke erneut auf „Prüfen“. Wenn du nicht weiterkommst, kannst du dir die Lösung einzelner Zeilen anzeigen
-              lassen.
-            </p>
-          </div>
-        )}
+                <ResultBanner
+          allCorrect={allCorrect}
+          checked={checked}
+          correctText={usedSolution ? 'Jetzt stimmt alles. Versuch die nächste Aufgabe ganz ohne Lösungshilfe!' : lob}
+          wrongText={`${correctCount} von ${task.lines.length} Zeilen stimmen. Korrigiere die markierten Zeilen und klicke erneut auf „Prüfen“. Wenn du nicht weiterkommst, kannst du dir die Lösung einzelner Zeilen anzeigen lassen.`}
+          next={{ label: 'Nächste Aufgabe', onClick: goToRandomTask }}
+        />
       </main>
       )}
-    </div>
+      </TrainerSplit>
+    </TrainerPage>
   );
 }

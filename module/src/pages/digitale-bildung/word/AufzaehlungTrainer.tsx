@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AUFZAEHLUNG_TASKS, getAufzaehlungTaskById } from '../../../lib/geschaeftsbrief/aufzaehlung-tasks';
 import { AufzaehlungTippsButton } from './AufzaehlungTipps';
+import { ResultBanner, ShellPrimary, TrainerHeader, TrainerPage, TrainerSplit, briefLabelClass, shellSecondaryClass, trainerMainClass } from '../../../components/digitale-bildung/Werkbank';
 
 const difficultyLabel: Record<string, string> = {
   einfach: 'Einfach',
@@ -47,30 +48,28 @@ export default function AufzaehlungTrainer() {
   const allCorrect = checked && correctCount === task.lines.length;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-gradient-to-br from-slate-800 to-slate-700 text-white py-6 px-4 relative">
-        <div className="max-w-3xl mx-auto flex flex-col items-center text-center">
-          <Link
-            to="/digitale-bildung/word/geschaeftsbrief/aufzaehlung/uebersicht"
-            className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors"
-          >
-            ← Aufgabenübersicht
-          </Link>
-          <AufzaehlungTippsButton className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/20 text-white transition-colors" />
-          <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-200 bg-white/10 rounded-full px-2 py-1 mb-2">
-            {difficultyLabel[task.difficulty] ?? task.difficulty}
-          </span>
-          <h1 className="text-xl font-bold">{task.title}</h1>
-        </div>
-      </header>
+    <TrainerPage tool="word">
+      <TrainerHeader
+        title={task.title}
+        meta={difficultyLabel[task.difficulty] ?? task.difficulty}
+        back={{ to: '/digitale-bildung/word/geschaeftsbrief/aufzaehlung/uebersicht', label: 'Zur Aufgabenübersicht' }}
+        recent="Word · Aufzählung & Nummerierung"
+      >
+        <AufzaehlungTippsButton className={shellSecondaryClass} />
+        <ShellPrimary onClick={() => setChecked(true)} disabled={!allAnswered}>
+          Prüfen
+        </ShellPrimary>
+      </TrainerHeader>
 
-      <main className="flex-1 w-full max-w-3xl mx-auto p-6 flex flex-col gap-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-          <p className="text-slate-700 mb-3">{task.intro}</p>
-          <div className="border border-dashed border-slate-300 rounded-lg p-3 bg-slate-50 font-mono text-sm text-slate-800">
+      <TrainerSplit
+        brief={
+          <>
+            <p className={briefLabelClass}>Beispiel</p>
+            <p className="m-0 mb-3 text-[17px] leading-normal">{task.intro}</p>
+            <div className="border border-dashed border-line-strong rounded-lg p-3 bg-canvas font-werkbank-mono text-[15px] text-ink">
             {task.beispiel.map((zeile, i) =>
               zeile.text === '' ? (
-                <div key={i} className="text-slate-300">
+                <div key={i} className="text-ink-muted">
                   (Leerzeile)
                 </div>
               ) : (
@@ -80,15 +79,17 @@ export default function AufzaehlungTrainer() {
               ),
             )}
           </div>
-        </div>
-
+          </>
+        }
+      >
+      <main className={trainerMainClass}>
         <div className="flex flex-col gap-4">
           {task.lines.map((line) => {
             const chosenId = selections[line.id];
             const correct = line.options.find((o) => o.id === chosenId)?.correct ?? false;
             return (
-              <div key={line.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-                <p className="text-sm font-semibold text-slate-700 mb-3">{line.caption}</p>
+              <div key={line.id} className="bg-surface rounded-lg border border-line p-4">
+                <p className="text-[15px] font-semibold text-ink mb-3">{line.caption}</p>
                 <div className="flex flex-wrap gap-2">
                   {line.options.map((option) => {
                     const selected = chosenId === option.id;
@@ -97,17 +98,17 @@ export default function AufzaehlungTrainer() {
                       <button
                         key={option.id}
                         onClick={() => choose(line.id, option.id)}
-                        className={`px-3 py-2 rounded-lg text-sm font-medium border-2 transition-all text-left ${
+                        className={`min-h-11 px-3 py-2 rounded-lg text-[15px] font-medium border-2 transition-all text-left ${
                           showResult
                             ? option.correct
-                              ? 'bg-green-100 text-green-800 border-green-400'
-                              : 'bg-red-100 text-red-800 border-red-400'
+                              ? 'bg-correct-soft text-correct border-correct'
+                              : 'bg-notyet-soft text-notyet-ink border-notyet'
                             : selected
-                              ? 'bg-blue-100 text-blue-800 border-blue-400'
-                              : 'bg-slate-50 text-slate-700 border-transparent hover:border-slate-200'
+                              ? 'bg-tool-soft text-tool-dark border-tool'
+                              : 'bg-canvas text-ink border-transparent hover:border-line-strong'
                         }`}
                       >
-                        {showResult && (option.correct ? '✅ ' : '❌ ')}
+                        {showResult && (option.correct ? 'Richtig: ' : 'Noch nicht: ')}
                         {option.text}
                       </button>
                     );
@@ -115,8 +116,8 @@ export default function AufzaehlungTrainer() {
                 </div>
                 {checked && chosenId && (
                   <p
-                    className={`mt-3 text-sm rounded-lg px-3 py-2 ${
-                      correct ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                    className={`mt-3 text-[15px] rounded-lg px-3 py-2 ${
+                      correct ? 'bg-correct-soft text-correct' : 'bg-notyet-soft text-notyet-ink'
                     }`}
                   >
                     {line.explanation}
@@ -127,55 +128,30 @@ export default function AufzaehlungTrainer() {
           })}
         </div>
 
-        <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-4">
-          <div className="text-sm font-semibold text-slate-600 mb-3">
+        <div className="bg-surface rounded-lg border border-line p-4">
+          <div className="text-[15px] font-semibold text-ink-soft mb-3">
             {checked ? `${correctCount} / ${task.lines.length} Fragen korrekt` : 'Noch nicht geprüft'}
           </div>
-          <button
-            onClick={() => setChecked(true)}
-            disabled={!allAnswered}
-            className={`w-full px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-              allAnswered ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            Prüfen
-          </button>
           {!allAnswered && (
-            <p className="mt-2 text-xs text-slate-400 text-center">
+            <p className="mt-2 text-[13px] text-ink-muted text-center">
               Beantworte alle Fragen, bevor du prüfst.
             </p>
           )}
         </div>
 
-        {allCorrect && (
-          <div className="bg-green-50 border-2 border-green-400 rounded-xl p-5 text-center">
-            <p className="text-green-800 font-semibold mb-3">🎉 Super! Alle Fragen richtig beantwortet.</p>
-            {nextTask ? (
-              <button
-                onClick={() => navigate(`/digitale-bildung/word/geschaeftsbrief/aufzaehlung/${nextTask.id}`)}
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Nächste Aufgabe →
-              </button>
-            ) : (
-              <Link
-                to="/digitale-bildung/word/geschaeftsbrief/aufzaehlung/uebersicht"
-                className="inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Zur Aufgabenübersicht
-              </Link>
-            )}
-          </div>
-        )}
-        {checked && !allCorrect && (
-          <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 text-center">
-            <p className="text-amber-800 font-semibold">
-              Noch nicht ganz richtig ({correctCount} / {task.lines.length}). Korrigiere die rot markierten Antworten
-              und klicke erneut auf „Prüfen“.
-            </p>
-          </div>
-        )}
+                <ResultBanner
+          allCorrect={allCorrect}
+          checked={checked}
+          correctText="Alle Fragen sind richtig beantwortet."
+          wrongText={`${correctCount} von ${task.lines.length} Antworten stimmen. Korrigiere die markierten Antworten und klicke erneut auf „Prüfen“.`}
+          next={
+            nextTask
+              ? { label: 'Nächste Aufgabe', onClick: () => navigate(`/digitale-bildung/word/geschaeftsbrief/aufzaehlung/${nextTask.id}`) }
+              : { label: 'Zur Aufgabenübersicht', to: '/digitale-bildung/word/geschaeftsbrief/aufzaehlung/uebersicht' }
+          }
+        />
       </main>
-    </div>
+      </TrainerSplit>
+    </TrainerPage>
   );
 }

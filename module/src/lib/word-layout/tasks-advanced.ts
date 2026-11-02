@@ -196,7 +196,7 @@ const daemmung: LayoutTask = {
   kind: 'projekt',
   intro: 'Wie im Unterricht: Seitenränder, Spalten mit Trennlinie, Spaltenumbruch, hängender Einzug, Tabelle und Fußnote nach Vorgaben.',
   auftrag:
-    'Sie absolvieren ein Praktikum bei der Verbraucherzentrale im Bereich Energieberatung. Sie sollen einen Informationsflyer zum Thema „Durch richtiges Dämmen Heizkosten reduzieren“ anpassen. Der Text ist bereits vorhanden – Sie passen lediglich das Layout nach den folgenden Angaben an.\n\nDer Editor rechnet in Pixeln: 1 cm ≈ 37,8 px, 1 pt ≈ 1,33 px.',
+    'Du machst ein Praktikum bei der Verbraucherzentrale im Bereich Energieberatung. Du sollst einen Informationsflyer zum Thema „Durch richtiges Dämmen Heizkosten reduzieren“ anpassen. Der Text ist bereits vorhanden – du passt nur das Layout nach den folgenden Angaben an.\n\nDer Editor rechnet in Pixeln: 1 cm ≈ 37,8 px, 1 pt ≈ 1,33 px.',
   margins: { top: 2.5, bottom: 2.5, left: 2.5, right: 2.5 },
   baseFont: { family: 'Verdana', size: 11 },
   paragraphs: [
@@ -379,7 +379,7 @@ const sparkasse: LayoutTask = {
   kind: 'projekt',
   intro: 'Wie im Unterricht: Fußzeile, schmale Ränder, Spalten mit Abstand, Aufzählung, Tabellenformatierung und Fußnote.',
   auftrag:
-    'Sie erstellen für Ihren Arbeitgeber, die Sparkasse, einen Werbeflyer für das neue „PrivatKonto Young“ für junge Leute. Der Text ist vorgegeben. Nehmen Sie folgende Änderungen vor.\n\nDer Editor rechnet in Pixeln: 1 cm ≈ 37,8 px, 1 pt ≈ 1,33 px.',
+    'Du erstellst für deinen Arbeitgeber, die Sparkasse, einen Werbeflyer für das neue „PrivatKonto Young“ für junge Leute. Der Text ist vorgegeben. Nimm folgende Änderungen vor.\n\nDer Editor rechnet in Pixeln: 1 cm ≈ 37,8 px, 1 pt ≈ 1,33 px.',
   margins: { top: 2.5, bottom: 2, left: 2.5, right: 2.5 },
   baseFont: { family: 'Times New Roman', size: 12 },
   paragraphs: [

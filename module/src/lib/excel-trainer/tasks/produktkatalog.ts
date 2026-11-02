@@ -49,7 +49,7 @@ export const produktkatalogTask: ExcelTask = {
     '3. Sortiere die Daten alphabetisch nach Herstellern von A-Z.',
     '4. Färbe alle Zellen, bei denen noch kein Listen VKP eingetragen wurde, rot ein (bedingte Formatierung).',
     '5. Alle Produkte mit einem Leistungsindex von 5 sollen automatisch grün eingefärbt werden (bedingte Formatierung).',
-    '6. Alle Produkte sollen einen Rabatt in Höhe von 20 % erhalten (Zelle J1). Berechnen Sie den Rabattbetrag in Spalte I in Abhängigkeit von Zelle J1.',
+    '6. Alle Produkte sollen einen Rabatt in Höhe von 20 % erhalten (Zelle J1). Berechne den Rabattbetrag in Spalte I in Abhängigkeit von Zelle J1.',
   ],
   hint: 'Rabattbetrag = Listen VKP (Spalte H) × $J$1. Für die bedingte Formatierung: Regel "Zelle ist leer" für Spalte H bzw. "Zellwert = 5" für Spalte E.',
   seed,
@@ -59,13 +59,13 @@ export const produktkatalogTask: ExcelTask = {
       type: 'bold',
       range: `A1:H1`,
       label: 'Überschriften hervorgehoben',
-      feedback: { correct: '✅ Überschriften sind hervorgehoben.', wrong: '❌ Hebe die Überschriften optisch hervor (z. B. fett).' },
+      feedback: { correct: 'Überschriften sind hervorgehoben.', wrong: 'Hebe die Überschriften optisch hervor (z. B. fett).' },
     },
     {
       type: 'border',
       range: `A1:H${LAST_ROW}`,
       label: 'Rahmenlinien für die Tabelle',
-      feedback: { correct: '✅ Rahmenlinien vorhanden.', wrong: '❌ Versieh die komplette Tabelle mit Rahmenlinien.' },
+      feedback: { correct: 'Rahmenlinien vorhanden.', wrong: 'Versieh die komplette Tabelle mit Rahmenlinien.' },
     },
     {
       type: 'sortedByColumn',
@@ -73,14 +73,14 @@ export const produktkatalogTask: ExcelTask = {
       columnOffset: 0,
       direction: 'asc',
       label: 'Sortierung nach Hersteller (A-Z)',
-      feedback: { correct: '✅ Korrekt sortiert.', wrong: '❌ Sortiere die Daten alphabetisch nach Hersteller.' },
+      feedback: { correct: 'Korrekt sortiert.', wrong: 'Sortiere die Daten alphabetisch nach Hersteller.' },
     },
     {
       type: 'conditionalFormatExists',
       label: 'Bedingte Formatierung vorhanden',
       feedback: {
-        correct: '✅ Bedingte Formatierung(en) vorhanden.',
-        wrong: '❌ Lege bedingte Formatierungen für leere Listen-VKP-Zellen und Leistungsindex = 5 an.',
+        correct: 'Bedingte Formatierung(en) vorhanden.',
+        wrong: 'Lege bedingte Formatierungen für leere Listen-VKP-Zellen und Leistungsindex = 5 an.',
       },
     },
     {
@@ -91,8 +91,8 @@ export const produktkatalogTask: ExcelTask = {
       label: 'Rabattbetrag (Spalte I)',
       expected: (row) => [`=H${row}*$J$1`, `=H${row}*J1`],
       feedback: {
-        correct: '✅ Rabattbetrag korrekt berechnet.',
-        wrong: '❌ Rabattbetrag ist nicht in jeder Zeile korrekt.',
+        correct: 'Rabattbetrag korrekt berechnet.',
+        wrong: 'Rabattbetrag ist nicht in jeder Zeile korrekt.',
         hint: 'Verwende z. B. =H2*$J$1.',
       },
     },

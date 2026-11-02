@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ClipboardEvent, MouseEvent } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { UniverDoc, type UniverDocHandle } from '../../../components/word-trainer/UniverDoc';
 import {
   WORD_DOKUMENT_TASKS,
   getWordDokumentTaskById,
 } from '../../../lib/geschaeftsbrief/word-dokument-tasks';
 import type { ValidationResult } from '../../../lib/excel-trainer/types';
+import { ResultBanner, ResultRow, ShellPrimary, TrainerHeader, TrainerPage, TrainerSplit, briefLabelClass, trainerMainClass } from '../../../components/digitale-bildung/Werkbank';
 
 const difficultyLabel: Record<string, string> = {
   einfach: 'Einfach',
@@ -52,116 +53,73 @@ export default function VollstaendigerBriefDocTrainer() {
   const allCorrect = results !== null && totalCount > 0 && correctCount === totalCount;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-gradient-to-br from-slate-800 to-slate-700 text-white py-4 px-4 relative">
-        <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
-          <Link
-            to="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc/uebersicht"
-            className="absolute top-4 left-4 text-slate-300 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors"
-          >
-            ← Aufgabenübersicht
-          </Link>
-          <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue-200 bg-white/10 rounded-full px-2 py-1 mb-1">
-            {difficultyLabel[task.difficulty] ?? task.difficulty} · Word-Editor
-          </span>
-          <h1 className="text-lg font-bold">{task.title}</h1>
-        </div>
-      </header>
+    <TrainerPage tool="word">
+      <TrainerHeader
+        title={task.title}
+        meta={`${difficultyLabel[task.difficulty] ?? task.difficulty} · Word-Editor`}
+        back={{ to: '/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc/uebersicht', label: 'Zur Aufgabenübersicht' }}
+        recent="Word · Vollständiger Geschäftsbrief"
+      >
+        <ShellPrimary onClick={handleCheck}>Prüfen</ShellPrimary>
+      </TrainerHeader>
 
-      <main className="flex-1 w-full max-w-6xl mx-auto p-4 flex flex-col gap-4">
-        <details className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-          <summary className="text-xs font-semibold uppercase tracking-wide text-amber-700 cursor-pointer">
-            📝 Arbeitsauftrag
-          </summary>
-          {task.arbeitsauftrag.split('\n\n').map((absatz, i) => (
-            <p key={i} className="text-slate-700 mt-2 whitespace-pre-line text-sm">
-              {absatz}
-            </p>
-          ))}
-        </details>
-
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Brieftext (Referenz)</p>
-          <p className="text-xs text-slate-500 mb-2">
-            Lies den vorgegebenen Brieftext und tippe ihn vollständig und wortgenau in das Dokument unten ab. Der Text
-            lässt sich nicht kopieren – du musst ihn selbst schreiben.
-          </p>
-          <div
-            className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 text-sm text-slate-700 leading-relaxed flex flex-col gap-3"
-            style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-            onCopy={preventCopy}
-            onCut={preventCopy}
-            onContextMenu={preventCopy}
-          >
-            {task.brieftextReferenz.map((absatz, i) => (
-              <p key={i}>{absatz}</p>
+      <TrainerSplit
+        brief={
+          <>
+            <p className={briefLabelClass}>Arbeitsauftrag</p>
+            {task.arbeitsauftrag.split('\n\n').map((absatz, i) => (
+              <p key={i} className="m-0 mb-2 text-base leading-normal whitespace-pre-line">
+                {absatz}
+              </p>
             ))}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <p className={`${briefLabelClass} mt-4`}>Brieftext (Referenz)</p>
+            <p className="m-0 mb-2 text-[15px] text-ink-muted">
+              Tippe den Text vollständig und wortgenau in das Dokument ab. Er lässt sich nicht kopieren.
+            </p>
+            <div
+              className="flex flex-col gap-3 rounded-lg border border-dashed border-line-strong bg-canvas p-3 text-[15px] leading-relaxed"
+              style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+              onCopy={preventCopy}
+              onCut={preventCopy}
+              onContextMenu={preventCopy}
+            >
+              {task.brieftextReferenz.map((absatz, i) => (
+                <p key={i} className="m-0">
+                  {absatz}
+                </p>
+              ))}
+            </div>
+          </>
+        }
+      >
+      <main className={trainerMainClass}>
+        <div className="bg-surface rounded-lg border border-line overflow-hidden">
           <UniverDoc ref={docRef} task={task} />
         </div>
 
-        <div className="bg-white rounded-xl border-2 border-slate-300 shadow-sm p-4">
-          <div className="text-sm font-semibold text-slate-600 mb-3">
-            {results ? `${correctCount} / ${totalCount} Felder korrekt` : 'Noch nicht geprüft'}
-          </div>
-          <button
-            onClick={handleCheck}
-            className="w-full px-4 py-2.5 rounded-lg font-semibold text-sm bg-blue-600 hover:bg-blue-700 text-white transition-all"
-          >
-            Prüfen
-          </button>
-
-          {results && (
-            <div className="mt-4 flex flex-col gap-2">
-              {results.map((r, i) => (
-                <div
-                  key={i}
-                  className={`text-xs rounded-lg px-3 py-2 flex items-start gap-2 ${
-                    r.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-                  }`}
-                >
-                  <span className="font-semibold whitespace-nowrap">{r.label}:</span>
-                  <span>{r.message}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {allCorrect && (
-          <div className="bg-green-50 border-2 border-green-400 rounded-xl p-5 text-center">
-            <p className="text-green-800 font-semibold mb-3">🎉 Super! Der komplette Geschäftsbrief ist korrekt.</p>
-            {nextTask ? (
-              <button
-                onClick={() =>
-                  navigate(`/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc/${nextTask.id}`)
-                }
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Nächste Aufgabe →
-              </button>
-            ) : (
-              <Link
-                to="/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc/uebersicht"
-                className="inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm"
-              >
-                Zur Aufgabenübersicht
-              </Link>
-            )}
+        {results && (
+          <div className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-4">
+            {results.map((r, i) => (
+              <ResultRow key={i} ok={r.success}>
+                <strong>{r.label}:</strong> {r.message}
+              </ResultRow>
+            ))}
           </div>
         )}
-        {results && !allCorrect && (
-          <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 text-center">
-            <p className="text-amber-800 font-semibold">
-              Noch nicht ganz richtig ({correctCount} / {totalCount}). Korrigiere die rot markierten Felder im
-              Dokument und klicke erneut auf „Prüfen“.
-            </p>
-          </div>
-        )}
+
+                <ResultBanner
+          allCorrect={allCorrect}
+          checked={results !== null}
+          correctText="Der komplette Geschäftsbrief ist korrekt."
+          wrongText={`${correctCount} von ${totalCount} Punkten stimmen. Korrigiere das Dokument und klicke erneut auf „Prüfen“.`}
+          next={
+            nextTask
+              ? { label: 'Nächste Aufgabe', onClick: () => navigate(`/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc/${nextTask.id}`) }
+              : { label: 'Zur Aufgabenübersicht', to: '/digitale-bildung/word/geschaeftsbrief/vollstaendiger-brief-doc/uebersicht' }
+          }
+        />
       </main>
-    </div>
+      </TrainerSplit>
+    </TrainerPage>
   );
 }

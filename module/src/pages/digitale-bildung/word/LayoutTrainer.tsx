@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Check, RotateCcw, Square } from 'lucide-react';
+import { ShellPrimary, ShellSecondary, StepButtons, TrainerHeader } from '../../../components/digitale-bildung/Werkbank';
+import { useNavigate, useParams } from 'react-router-dom';
 import { UniverLayoutDoc, type UniverLayoutDocHandle } from '../../../components/word-trainer/UniverLayoutDoc';
 import { LAYOUT_TASKS, getLayoutTask, runLayoutChecks } from '../../../lib/word-layout/tasks';
 import { readLayoutDocument } from '../../../lib/word-layout/grading';
@@ -157,82 +159,44 @@ function Trainer({ task }: { task: LayoutTask }) {
   };
 
   return (
-    <div className="fixed inset-0 z-30 flex flex-col bg-slate-100">
-      {/* Kopfleiste */}
-      <header className="shrink-0 bg-slate-800 text-white px-3 py-2 flex items-center gap-2">
-        <Link to="/digitale-bildung/word/layout/uebungen" className="shrink-0 text-slate-300 hover:text-white text-sm px-2 py-1.5 rounded-md hover:bg-white/10" title="Zur Aufgabenübersicht">
-          ← <span className="hidden sm:inline">Übersicht</span>
-        </Link>
-        <h1 className="flex-1 min-w-0 truncate text-sm sm:text-base font-semibold">{task.title}</h1>
-        <span className="shrink-0 hidden sm:inline text-xs text-slate-300">
-          {doneCount}/{task.steps.length} erledigt
-        </span>
-        <button onClick={handleReset} className="shrink-0 text-xs px-2.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20" title="Dokument zurücksetzen">
-          ↺<span className="hidden md:inline"> Neu beginnen</span>
-        </button>
-        <button onClick={() => setShowExport(true)} className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-md bg-red-600 hover:bg-red-700">
-          ⬇ Speichern
-        </button>
-      </header>
+    <div data-tool="word" className="werkbank font-werkbank fixed inset-0 z-30 flex flex-col bg-canvas text-ink">
+      <TrainerHeader
+        title={task.title}
+        meta={`${doneCount}/${task.steps.length} erledigt`}
+        back={{ to: '/digitale-bildung/word/layout/uebungen', label: 'Zur Aufgabenübersicht' }}
+        recent="Word · Digitale Übung"
+      >
+        <StepButtons count={task.steps.length} current={current} done={doneFlags} label="Auftrag" onSelect={goTo} />
+        <ShellSecondary onClick={handleReset} title="Dokument zurücksetzen">
+          <RotateCcw size={18} aria-hidden="true" />
+          <span className="hidden md:inline">Neu beginnen</span>
+        </ShellSecondary>
+        <ShellPrimary onClick={() => setShowExport(true)}>Speichern</ShellPrimary>
+      </TrainerHeader>
 
-      <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
+      <div className="flex-1 min-h-0 flex flex-col lg:flex-row-reverse">
         {/* Arbeitsauftrag */}
-        <aside className="shrink-0 lg:w-80 xl:w-96 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 max-h-[38dvh] lg:max-h-none overflow-y-auto">
+        <aside className="shrink-0 lg:w-80 xl:w-96 bg-surface border-b lg:border-b-0 lg:border-l border-line max-h-[38dvh] lg:max-h-none overflow-y-auto">
           <div className="p-3 flex flex-col gap-3">
-            {/* Navigation */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => goTo(current - 1)}
-                disabled={current === 0}
-                className="w-10 h-10 shrink-0 rounded-lg border border-slate-300 text-lg disabled:opacity-30 hover:bg-slate-50"
-                aria-label="Vorheriger Auftrag"
-              >
-                ‹
-              </button>
-              <div className="flex-1 flex flex-wrap justify-center gap-1">
-                {task.steps.map((s, i) => (
-                  <button
-                    key={s.title}
-                    onClick={() => goTo(i)}
-                    title={`Auftrag ${i + 1}: ${s.title}`}
-                    aria-label={`Auftrag ${i + 1}`}
-                    className={`w-6 h-6 rounded-full text-[11px] font-bold transition-all ${
-                      i === current ? 'ring-2 ring-offset-1 ring-blue-500' : ''
-                    } ${doneFlags[i] ? 'bg-green-500 text-white' : i === current ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'}`}
-                  >
-                    {doneFlags[i] ? '✓' : i + 1}
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => goTo(current + 1)}
-                disabled={current === task.steps.length - 1}
-                className="w-10 h-10 shrink-0 rounded-lg border border-slate-300 text-lg disabled:opacity-30 hover:bg-slate-50"
-                aria-label="Nächster Auftrag"
-              >
-                ›
-              </button>
-            </div>
-
             {/* Situation */}
-            <div className="rounded-lg bg-amber-50 border border-amber-200 text-sm">
-              <button onClick={() => setShowSituation((v) => !v)} className="w-full text-left px-3 py-2 font-semibold text-amber-800 flex justify-between">
-                <span>📝 Situation</span>
+            <div className="rounded-lg bg-canvas border border-line text-[15px]">
+              <button onClick={() => setShowSituation((v) => !v)} className="w-full text-left px-3 py-2 font-semibold text-ink flex justify-between">
+                <span>Situation</span>
                 <span>{showSituation ? '▴' : '▾'}</span>
               </button>
-              {showSituation && <p className="px-3 pb-3 text-amber-900 whitespace-pre-line text-[13px] leading-snug">{task.auftrag}</p>}
+              {showSituation && <p className="px-3 pb-3 text-ink whitespace-pre-line text-[15px] leading-snug">{task.auftrag}</p>}
             </div>
 
             {allDone ? (
-              <div className="rounded-lg bg-green-50 border-2 border-green-400 p-4 text-center">
-                <p className="text-green-800 font-bold mb-1">🎉 Alle Aufträge erledigt!</p>
-                <p className="text-sm text-green-800 mb-3">Speichere jetzt deinen Arbeitsnachweis.</p>
+              <div className="rounded-lg bg-correct-soft border-2 border-correct p-4 text-center">
+                <p className="text-correct font-bold mb-1">Alle Aufträge erledigt!</p>
+                <p className="text-[15px] text-correct mb-3">Speichere jetzt deinen Arbeitsnachweis.</p>
                 <div className="flex flex-col gap-2">
-                  <button onClick={() => setShowExport(true)} className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-sm">
-                    ⬇ Arbeitsnachweis speichern
+                  <button onClick={() => setShowExport(true)} className="px-4 py-2.5 bg-tool hover:bg-tool-dark text-white rounded-lg font-semibold text-[15px]">
+                    Arbeitsnachweis speichern
                   </button>
                   {nextTask && (
-                    <button onClick={() => navigate(`/digitale-bildung/word/layout/${nextTask.id}`)} className="px-4 py-2 bg-white border border-slate-300 rounded-lg font-semibold text-sm">
+                    <button onClick={() => navigate(`/digitale-bildung/word/layout/${nextTask.id}`)} className="px-4 py-2 bg-surface border border-line-strong rounded-lg font-semibold text-[15px]">
                       Nächste Aufgabe →
                     </button>
                   )}
@@ -241,19 +205,19 @@ function Trainer({ task }: { task: LayoutTask }) {
             ) : null}
 
             {/* Aktueller Auftrag */}
-            <section className={`rounded-lg border-2 p-3 transition-colors ${celebrate || doneFlags[current] ? 'border-green-400 bg-green-50' : 'border-blue-200 bg-blue-50/40'}`}>
-              <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">
+            <section className={`rounded-lg border-2 p-3 transition-colors ${celebrate || doneFlags[current] ? 'border-correct bg-correct-soft' : 'border-line bg-tool-soft/40'}`}>
+              <p className="text-[13px] font-semibold text-tool-dark">
                 Auftrag {current + 1} von {task.steps.length}
               </p>
-              <h2 className="text-base font-bold text-slate-800 leading-snug">{step.title}</h2>
+              <h2 className="text-base font-bold text-ink leading-snug">{step.title}</h2>
               {step.target && (
-                <p className="mt-2 text-sm text-slate-800">
-                  <span className="font-semibold">📍 Wo: </span>
+                <p className="mt-2 text-[15px] text-ink">
+                  <span className="font-semibold">Wo: </span>
                   {step.target}
                 </p>
               )}
-              <div className="mt-2 text-sm text-slate-700">
-                <span className="font-semibold text-slate-800">✏️ Was:</span>
+              <div className="mt-2 text-[15px] text-ink">
+                <span className="font-semibold text-ink">Was:</span>
                 <ul className="list-disc ml-5 mt-1 space-y-0.5">
                   {step.instruction.split('\n').map((line) => (
                     <li key={line}>{line}</li>
@@ -267,7 +231,7 @@ function Trainer({ task }: { task: LayoutTask }) {
                     <button
                       key={tool}
                       onClick={() => docRef.current?.openTool(tool)}
-                      className="text-xs font-semibold px-2.5 py-1.5 rounded-md bg-white border border-slate-300 hover:bg-slate-50"
+                      className="text-[13px] font-semibold min-h-11 px-3 py-1.5 rounded-md bg-surface border border-line-strong hover:bg-canvas"
                     >
                       {TOOL_LABEL[tool]}
                     </button>
@@ -275,7 +239,7 @@ function Trainer({ task }: { task: LayoutTask }) {
                   {step.tools.some((t) => t === 'kopfzeile' || t === 'fusszeile') && (
                     <button
                       onClick={() => docRef.current?.leaveHeaderFooter()}
-                      className="text-xs font-semibold px-2.5 py-1.5 rounded-md bg-white border border-slate-300 hover:bg-slate-50"
+                      className="text-[13px] font-semibold min-h-11 px-3 py-1.5 rounded-md bg-surface border border-line-strong hover:bg-canvas"
                     >
                       ↩ Zurück zum Text
                     </button>
@@ -288,11 +252,11 @@ function Trainer({ task }: { task: LayoutTask }) {
                 {step.checks.map((check, i) => {
                   const ok = stepResults?.[i]?.success;
                   return (
-                    <li key={check.label} className={`text-xs flex gap-1.5 ${ok ? 'text-green-700' : 'text-slate-600'}`}>
-                      <span className="shrink-0 w-4 text-center">{ok ? '✅' : '⬜'}</span>
+                    <li key={check.label} className={`text-[13px] flex gap-1.5 ${ok ? 'text-correct' : 'text-ink-soft'}`}>
+                      {ok ? <Check size={18} strokeWidth={2.5} className="shrink-0" aria-hidden="true" /> : <Square size={16} className="mt-0.5 shrink-0" aria-hidden="true" />}
                       <span>
                         {check.label}
-                        {showHints && !ok && <span className="block text-amber-800 mt-0.5">💡 {check.hint}</span>}
+                        {showHints && !ok && <span className="block text-ink mt-0.5">{check.hint}</span>}
                       </span>
                     </li>
                   );
@@ -300,31 +264,31 @@ function Trainer({ task }: { task: LayoutTask }) {
               </ul>
 
               {celebrate ? (
-                <p className="mt-3 text-sm font-bold text-green-700">✓ Erledigt! Gleich geht es weiter …</p>
+                <p className="mt-3 text-[15px] font-bold text-correct">✓ Erledigt! Gleich geht es weiter …</p>
               ) : (
                 !doneFlags[current] &&
                 open.length > 0 && (
-                  <button onClick={() => setShowHints((v) => !v)} className="mt-3 text-xs font-semibold text-amber-800 underline">
-                    {showHints ? 'Tipps ausblenden' : '💡 Tipps anzeigen'}
+                  <button onClick={() => setShowHints((v) => !v)} className="mt-1 min-h-11 text-[15px] font-semibold text-tool-dark underline">
+                    {showHints ? 'Tipps ausblenden' : 'Tipps anzeigen'}
                   </button>
                 )
               )}
               {!celebrate && doneFlags[current] && current < task.steps.length - 1 && (
-                <button onClick={() => goTo(current + 1)} className="mt-3 w-full px-3 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-semibold">
+                <button onClick={() => goTo(current + 1)} className="mt-3 w-full min-h-11 px-3 py-2 rounded-lg bg-tool hover:bg-tool-dark text-white text-[15px] font-semibold">
                   Weiter zu Auftrag {current + 2} ›
                 </button>
               )}
             </section>
 
-            <p className="text-[11px] text-slate-500 leading-snug">
-              {restored ? '💾 Dein letzter Stand wurde wiederhergestellt. ' : '💾 '}
+            <p className="text-[13px] text-ink-soft leading-snug">
+              {restored ? 'Dein letzter Stand wurde wiederhergestellt. ' : ''}
               Änderungen werden automatisch im Browser gesichert. Erfüllte Vorgaben werden sofort abgehakt.
             </p>
           </div>
         </aside>
 
         {/* Dokument */}
-        <main className="flex-1 min-h-[320px] min-w-0 bg-white">
+        <main className="flex-1 min-h-[320px] min-w-0 bg-surface">
           <UniverLayoutDoc ref={docRef} task={task} onRestored={setRestored} />
         </main>
       </div>
@@ -371,35 +335,35 @@ function ExportDialog({ task, docRef, onClose }: { task: LayoutTask; docRef: Rea
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-5" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 bg-black/40 werkbank-light flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-surface rounded-lg shadow-xl w-full max-w-md p-5" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-start mb-2">
-          <h2 className="text-lg font-bold text-slate-800">📄 Arbeitsnachweis speichern</h2>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-800 text-xl leading-none px-1" aria-label="Schließen">
+          <h2 className="text-lg font-bold text-ink">Arbeitsnachweis speichern</h2>
+          <button onClick={onClose} className="text-ink-soft hover:text-ink text-xl leading-none px-1" aria-label="Schließen">
             ×
           </button>
         </div>
-        <p className="text-xs text-slate-500 mb-4">
+        <p className="text-[13px] text-ink-soft mb-4">
           Die Word-Datei enthält dein gestaltetes Dokument. Das PDF enthält zusätzlich ein Deckblatt mit deinem Namen und dem Prüfergebnis – das gibst
           du deiner Lehrkraft ab.
         </p>
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <label className="text-xs font-semibold text-slate-600 col-span-2 sm:col-span-1">
+          <label className="text-[13px] font-semibold text-ink-soft col-span-2 sm:col-span-1">
             Vor- und Nachname
             <input
               value={student.name}
               onChange={(e) => setStudent({ ...student, name: e.target.value })}
               placeholder="z. B. Lena Huber"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-normal"
+              className="mt-1 w-full rounded-lg border border-line-strong px-3 py-2 text-[15px] font-normal"
             />
           </label>
-          <label className="text-xs font-semibold text-slate-600 col-span-2 sm:col-span-1">
+          <label className="text-[13px] font-semibold text-ink-soft col-span-2 sm:col-span-1">
             Klasse
             <input
               value={student.klasse}
               onChange={(e) => setStudent({ ...student, klasse: e.target.value })}
               placeholder="z. B. 10b"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-normal"
+              className="mt-1 w-full rounded-lg border border-line-strong px-3 py-2 text-[15px] font-normal"
             />
           </label>
         </div>
@@ -407,20 +371,20 @@ function ExportDialog({ task, docRef, onClose }: { task: LayoutTask; docRef: Rea
           <button
             onClick={() => handleExport('pdf')}
             disabled={exporting !== null || !student.name.trim()}
-            className="px-4 py-2.5 rounded-lg font-semibold text-sm bg-red-700 hover:bg-red-800 disabled:opacity-50 text-white"
+            className="px-4 py-2.5 rounded-lg font-semibold text-[15px] bg-tool hover:bg-tool-dark disabled:opacity-50 text-white"
           >
-            {exporting === 'pdf' ? 'PDF wird erstellt …' : '⬇ Als PDF mit Prüfergebnis'}
+            {exporting === 'pdf' ? 'PDF wird erstellt …' : 'Als PDF mit Prüfergebnis'}
           </button>
           <button
             onClick={() => handleExport('docx')}
             disabled={exporting !== null}
-            className="px-4 py-2.5 rounded-lg font-semibold text-sm bg-slate-700 hover:bg-slate-800 disabled:opacity-50 text-white"
+            className="px-4 py-2.5 rounded-lg font-semibold text-[15px] bg-shell hover:bg-shell-2 disabled:opacity-50 text-white"
           >
-            {exporting === 'docx' ? 'Wird erstellt …' : '⬇ Als Word-Datei (.docx)'}
+            {exporting === 'docx' ? 'Wird erstellt …' : 'Als Word-Datei (.docx)'}
           </button>
         </div>
-        {!student.name.trim() && <p className="text-xs text-slate-500 mt-2">Für das PDF bitte zuerst deinen Namen eintragen.</p>}
-        {error && <p className="text-xs text-red-700 mt-2">{error}</p>}
+        {!student.name.trim() && <p className="text-[13px] text-ink-soft mt-2">Für das PDF bitte zuerst deinen Namen eintragen.</p>}
+        {error && <p className="text-[13px] text-notyet-ink mt-2">{error}</p>}
       </div>
     </div>
   );
