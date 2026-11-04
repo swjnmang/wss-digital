@@ -10,7 +10,7 @@ Dieser Skill entwickelt **Einstiegs-Lernsituationen** für neue Mathe-Themen und
 - **Zielgruppe:** Schülerinnen und Schüler (SuS) der Wirtschaftsschule in Bayern, 15 bis 18 Jahre.
 - **Nur für den Themeneinstieg.** Vertiefende Übungsseiten laufen über den Skill `mathe-aufgaben`. Eine Lernsituation führt ein Thema ein und sichert die Kernidee, sie übt nicht ausführlich.
 - **Kein Lehrkraft-Material** auf der Seite. Alles richtet sich direkt an die SuS.
-- **Endgerät:** Tablet im **Querformat**. Jede Seite ist trotzdem **einspaltig** (siehe "Ruhiges Grunddesign"). Nach unten scrollen ist erlaubt, zur Seite nie.
+- **Endgerät:** Tablet im **Querformat**. Jede Seite ist trotzdem **einspaltig** (siehe "Grundgerüst"). Nach unten scrollen ist erlaubt, zur Seite nie.
 - **Neueste Umsetzung mit allen aktuellen Regeln** (5 Warm-up-Aufgaben, Kriterium Begriffe und Abkürzungen, Bonus-Spiel, Punkte und Bilanz): `mathe-trainer/src/pages/finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Der Vereinsbus) mit `BusRallye.tsx`. Vorlage für **Punkte nach Aufwand** (Balancing): `mathe-trainer/src/pages/lineare_funktionen/schnittpunkt_einstieg/LaserEinstieg.tsx` (Die Lasershow) mit dem Spiel `KugelTreffer.tsx`.
 - **Referenz-Umsetzung:** `mathe-trainer/src/pages/finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx` (Lenas Autogeld): eine Seite pro Phase und Phase 4 mit vier Übungsaufgaben. Achtung: Ihr "Problem lösen" hat noch den alten Aufbau mit `WegWahl`; maßgeblich für "Problem lösen" ist der Vereinsbus. Für Ausprobieren mit Live-Rückmeldung und Titelbilder zusätzlich `lineare_funktionen/nullstellen_einstieg/StromspeicherEinstieg.tsx` (nach neuer Fassung überarbeitet) und `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx` (noch ältere Aufteilung mit einer Aufgabe pro Seite) ansehen. Vor dem Bauen ansehen.
 - **Diese Datei ist die maßgebliche Fassung des Skills.** Der Skill „lernsituationen“ im claude.ai-Konto der Lehrkraft verweist nur hierher. Neue oder geänderte Regeln werden **nur hier** eingetragen (und bei Bedarf kurz in `mathe-trainer/CLAUDE.md`), dann wie üblich in `main` gemergt. Die Lehrkraft muss danach nichts neu hochladen.
@@ -19,15 +19,16 @@ Dieser Skill entwickelt **Einstiegs-Lernsituationen** für neue Mathe-Themen und
 
 Lernsituationen dürfen **nicht nach Schema F** ablaufen. Gleichförmigkeit langweilt und demotiviert.
 
-- **Fest** sind die vier Phasen mit **genau einer Seite pro Phase**, der Aufbau von "Problem lösen" (Problem → Beispielrechnung mit Lernvideo zum Aufklappen → Ergebnisse abgleichen (ohne Fehlersuche) → Handlungsprodukt), die Seitenansicht, das **ruhige Grunddesign**, die didaktischen Leitlinien, die Pflichtfunktionen und die Schreib- und Rechenkonventionen.
-- **Variabel** sind Kontext, Dramaturgie (Format), Handlungsprodukt, Sozialformen, die Methoden innerhalb der Phasen und die **Identität** der Lernsituation.
-- **Ruhig, aber unverwechselbar:** Alle Lernsituationen haben dasselbe ruhige Gerüst, aber jede hat ein eigenes Gesicht (Abschnitt "Identität jeder Lernsituation"). Die SuS sollen auf jeder Seite sofort erkennen, in welcher Lernsituation sie sind.
+- **Fest** sind die vier Phasen mit **genau einer Seite pro Phase**, der Aufbau von "Problem lösen" (Problem → Beispielrechnung mit Lernvideo zum Aufklappen → Ergebnisse abgleichen (ohne Fehlersuche) → Handlungsprodukt), die Seitenansicht, das **Grundgerüst** (einspaltig, ein Fokus pro Seite, Bedienung, Feedbackfarben), die didaktischen Leitlinien, die Pflichtfunktionen und die Schreib- und Rechenkonventionen.
+- **Variabel** sind Kontext, Dramaturgie (Format), Handlungsprodukt, Sozialformen, die Methoden innerhalb der Phasen, die **Bildwelt** mit ihrer Unter-Variante und die **Identität** der Lernsituation.
+- **Drei Bildwelten statt eines Einheitslooks:** Jede Lernsituation gehört zu einer von drei Bildwelten (**Skizzenbuch**, **Reportage**, **Diorama**, Abschnitt "Bildwelten"). Die Bildwelt bestimmt Bilder, Schriften, Material und Stimmung; die Unter-Variante sorgt dafür, dass auch zwei Lernsituationen derselben Bildwelt verschieden aussehen. Bilder sind **echte, gerenderte Bilddateien** (WebP), keine flachen Inline-SVGs mehr.
+- **Unverwechselbar:** Jede Lernsituation hat zusätzlich ein eigenes Gesicht (Abschnitt "Identität jeder Lernsituation"). Die SuS sollen auf jeder Seite sofort erkennen, in welcher Lernsituation sie sind.
 - **Abwechslung wird geprüft**, nicht dem Zufall überlassen (Abschnitt "Abwechslung absichern").
 
 ## Ablauf
 
 ### 1. Log lesen
-Lies vor allem anderen `lernsituationen-log.md` im Repo (Abschnitt "Abwechslung absichern"). Notiere, welche Formate, Handlungsprodukte, Themenfarben und Kontextbereiche in den letzten drei Lernsituationen vorkamen. Existiert die Datei noch nicht, lege sie an und trage vorhandene Lernsituationen-Seiten aus dem Repo nachträglich ein.
+Lies vor allem anderen `lernsituationen-log.md` im Repo (Abschnitt "Abwechslung absichern"). Notiere, welche Formate, Handlungsprodukte, Bildwelten (mit Unter-Variante), Themenfarben und Kontextbereiche in den letzten drei Lernsituationen vorkamen. Existiert die Datei noch nicht, lege sie an und trage vorhandene Lernsituationen-Seiten aus dem Repo nachträglich ein.
 
 ### 2. Kurz nachfragen
 Stelle der Lehrkraft höchstens 4 Fragen, falls nicht schon beantwortet:
@@ -42,6 +43,7 @@ Schlage 2 bis 3 **komplette Kombinationen** vor. Jede besteht aus:
 - **Format** (aus dem Formatkatalog)
 - **Problem erkennen:** Woran merken die SuS, dass sie mit Raten oder Vorwissen nicht sicher weiterkommen?
 - **Handlungsprodukt** (aus dem Abschnitt "Handlungsprodukte", überwiegend analog)
+- **Bildwelt und Unter-Variante** (Abschnitt "Bildwelten"), passend zum Format und anders als in der letzten Lernsituation
 - **Identität:** Themenfarbe, Symbol, Titelbild und Leitobjekt (Abschnitt "Identität jeder Lernsituation")
 - einem Satz, warum die Kombination zum Inhalt passt und kognitiv aktiviert
 
@@ -61,19 +63,21 @@ Lege ein kompaktes Konzept vor:
 Baue die Seite erst nach Freigabe (außer die Lehrkraft will ausdrücklich direkt gebaut haben).
 
 ### 5. Design vorbereiten
-Lade **vor dem ersten Code** den Skill `frontend-design` mit dem Skill-Tool. Wende ihn innerhalb der Vorgaben aus "Ruhiges Grunddesign" und "Identität jeder Lernsituation" an: Diese Vorgaben haben Vorrang, `frontend-design` hilft bei Typografie, Abständen, Hierarchie, Fokus und beim Titelbild.
+Lade **vor dem ersten Code** den Skill `frontend-design` mit dem Skill-Tool. Wende ihn innerhalb der Vorgaben aus "Grundgerüst", "Bildwelten" und "Identität jeder Lernsituation" an: Diese Vorgaben haben Vorrang, `frontend-design` hilft bei Typografie, Abständen, Hierarchie, Fokus und bei den Bildern. Sieh dir die Beispielquelle der gewählten Bildwelt in `docs/skills/lernsituationen/bildwelten/` an, bevor du das erste Bild zeichnest.
 
 ### 6. Seite bauen und Auswahlseite umbauen
-Siehe Abschnitte "Die vier Phasen", "Seitenansicht", "Ruhiges Grunddesign", "Identität jeder Lernsituation" und "Digitale Umsetzung". **Immer dazu:** die Startseite des Themas so umbauen, dass die SuS zwischen der Lernsituation und den bereits vorhandenen Übungsaufgaben wählen (Abschnitt "Auswahlseite des Themas").
+Siehe Abschnitte "Die vier Phasen", "Seitenansicht", "Grundgerüst", "Bildwelten", "Identität jeder Lernsituation", "Bilder in Problem erkennen und Problem lösen" und "Digitale Umsetzung". Bilder zuerst als Quelle zeichnen, dann mit `scripts/bilder-rendern.cjs` rendern und einbinden. **Immer dazu:** die Startseite des Themas so umbauen, dass die SuS zwischen der Lernsituation und den bereits vorhandenen Übungsaufgaben wählen (Abschnitt "Auswahlseite des Themas").
 
 ### 7. Design prüfen
 Lade nach dem Bauen den Skill `design:design-critique` mit dem Skill-Tool. Erstelle mit Playwright Screenshots **jeder Seite** und der Startbox bei 1180 × 820 (Tablet quer) und bei 1920 × 1080 (breiter Monitor, muss ebenfalls einspaltig bleiben), bei Bedarf als ganze Seite (`full_page`), sieh sie dir an und prüfe sie mit der Design-Kritik, besonders:
 - Ist auf jeder Seite sofort klar, was das Wichtigste ist (Problem bzw. Auftrag)?
 - Erkennt man auf jeder Seite, in welcher Lernsituation man ist?
 - Gibt es überflüssige Rahmen, Kästen, Farbstreifen, Banner oder Farben?
+- Ist die Bildwelt durchgehend erkennbar (Bilder, Schriften, Material), und sehen alle Bilder der Lernsituation aus wie aus einer Hand?
+- Sind die gerenderten Bilder scharf (doppelte Auflösung), ihre Beschriftungen auf dem Tablet lesbar und nichts abgeschnitten oder überlappend?
 - Haben "Problem erkennen" und "Problem lösen" ein passendes Bild, oder ist dort nur Text?
 - Sind Skizzen und Graphen groß genug und ihre Beschriftungen gut lesbar?
-- Ist alles einspaltig, ruhig und auf dem Tablet gut bedienbar (Phasennamen nicht abgeschnitten, kein seitliches Scrollen)?
+- Ist alles einspaltig, aufgeräumt und auf dem Tablet gut bedienbar (Phasennamen nicht abgeschnitten, kein seitliches Scrollen)?
 
 Behebe die gefundenen Punkte, bevor du die Seite übergibst.
 
@@ -145,7 +149,7 @@ Sind mehrere Teilprobleme nötig (z. B. erst K, dann p, dann t), steht **jedes T
 
 ## Seitenansicht (Pflicht)
 
-Jede Lernsituation läuft in der Seitenansicht `SeitenLernsituation` aus `lineare_funktionen/lernsituation_kit/seiten.tsx` mit **`ruhig`** (ruhiges Grunddesign) und **`thema`** (Identität), eingebettet in `TaskShell` mit `kompakt`. Für Situation, Problem und Auftrag gibt es die Klassen `sl-text`, `sl-fokus` (mit `sl-fokus-titel`) und `sl-hinweis`. Lange Scrollseiten mit allen Phasen untereinander, Kachel-Übersichten und eigene Stepper werden nicht mehr gebaut.
+Jede Lernsituation läuft in der Seitenansicht `SeitenLernsituation` aus `lineare_funktionen/lernsituation_kit/seiten.tsx` mit **`ruhig`** (Grundgerüst), **`bildwelt`** (Bildwelt und Unter-Variante) (die Prop entsteht mit der ersten Lernsituation einer Bildwelt, siehe "Bildwelten") und **`thema`** (Identität), eingebettet in `TaskShell` mit `kompakt`. Für Situation, Problem und Auftrag gibt es die Klassen `sl-text`, `sl-fokus` (mit `sl-fokus-titel`) und `sl-hinweis`. Lange Scrollseiten mit allen Phasen untereinander, Kachel-Übersichten und eigene Stepper werden nicht mehr gebaut.
 
 - **Startbox:** Titelbild, Name der Lernsituation, Lernziel. Vor der ersten Seite bestätigen die SuS per Haken "Ich dokumentiere bei jeder Aufgabe alle Rechenschritte schriftlich in meinem Heft." Erst dann geht es los.
 - **Genau eine Seite pro Phase.** Die Lernsituation hat vier Seiten (`art`: `start`, `problem`, `loesen`, `sichern`), jede mit kurzem Titel. Mehrere Aufgaben einer Phase stehen untereinander auf dieser Seite, gegliedert mit `Abschnitt`.
@@ -305,9 +309,9 @@ Das Handlungsprodukt entsteht in **"Problem lösen"**: Direkt nach dem Problem u
 - **Begriffe und Abkürzungen (Pflicht-Kriterium):** Zusätzlich zu den inhaltlichen Kriterien steht in jeder Kriterienliste ein Punkt, der die SuS auffordert, unbekannte Begriffe zu erklären und aufzuschreiben, wofür jede Abkürzung der Formel steht. Die Abkürzungen und Begriffe werden im Kriterium ausdrücklich genannt (z. B. Rentenrechnung: „Unter deinem Aushang steht, was K_n, r, q und n bedeuten (r ist die Rate, auch Rente genannt) und was vorschüssig und nachschüssig heißt“).
 - Über mehrere Lernsituationen hinweg wechselt die **Art** des Produkts (Rechenweg, Brief, Spickzettel, Concept Map, Skizze …).
 
-## Ruhiges Grunddesign
+## Grundgerüst
 
-Alle Lernsituationen nutzen **dasselbe ruhige Gerüst**. Es gibt keine kontextabhängigen Looks mehr, die das Layout umbauen (kein Messenger-, Kassenbon-, Dashboard-, Werkstatt- oder Zeitungs-Look). Unterscheidbar werden die Lernsituationen über ihre **Identität** (nächster Abschnitt), nicht über Rahmen, Kästen oder Zusatzfarben.
+Alle Lernsituationen nutzen **dasselbe Gerüst**: Layout, Fokus, Bedienung und Feedback sind immer gleich. Die Bildwelt (nächster Abschnitt) legt sich wie eine Haut darüber: Sie ändert Bilder, Schriften, Untergrund und Material, aber **nie das Layout**. Messenger-, Kassenbon-, Dashboard- oder Werkstatt-Layouts, die die Seite umbauen, gibt es weiterhin nicht.
 
 **Layout**
 - **Immer einspaltig**, auch auf breiten Monitoren. Der Inhalt jeder Seite ist **so breit wie die Phasenleiste darüber** (höchstens 1180 px, Variable `--sl-breite` in `lernsituation_kit/seiten.css`), damit links und rechts keine breiten leeren Ränder entstehen. Auf Tablet und Smartphone wird er automatisch schmaler. Keine eigene, schmalere `max-width` für Seiten oder Texte setzen. Skizzen, Graphen und Bilder stehen mittig und bekommen eine eigene `max-width`, damit sie nicht riesig werden (Richtwerte siehe "Seitenansicht").
@@ -316,12 +320,12 @@ Alle Lernsituationen nutzen **dasselbe ruhige Gerüst**. Es gibt keine kontextab
 
 **Fokus und Hierarchie**
 - Pro Seite gibt es **genau einen Fokus**: das Problem bzw. den Auftrag. Nur dieses Element wird hervorgehoben (dezente Hintergrundfläche **oder** ein einzelner Rahmen).
-- Hierarchie entsteht über **Typografie und Weißraum**, nicht über Rahmen und Farben.
+- Hierarchie entsteht über **Typografie, Bilder und Weißraum**, nicht über Rahmen und Farben.
 - **Keine verschachtelten Kästen** (Kasten im Kasten). Höchstens eine gerahmte Fläche pro Seite, dazu die Skizze.
-- **Keine dekorativen Farbstreifen** am Rand, keine farbigen Banner, keine Icons ohne Funktion.
+- **Keine dekorativen Farbstreifen** am Rand, keine farbigen Banner, keine Icons ohne Funktion. Material der Bildwelt (Papier, Klebeband, Aufmacherbild, Bühne) ist erlaubt, wo der Abschnitt "Bildwelten" es vorsieht.
 
 **Farben**
-- Neutraler Grundton plus **eine Akzentfarbe**: die **Themenfarbe** der Lernsituation, für Buttons, Phasenleiste, Kennung und den Fokus-Bereich.
+- Grundton aus der Bildwelt (Papier, Weiß, Bühnengrau) plus **eine Akzentfarbe**: die **Themenfarbe** der Lernsituation, für Buttons, Phasenleiste, Kennung und den Fokus-Bereich. In den Bildern selbst sind weitere Farben erlaubt (Aquarell, Abendlicht, Spielwelt).
 - Grün und Rot nur für Feedback richtig/falsch (Tokens `--correct`, `--wrong`).
 - Keine unterschiedlichen Farben pro Phase innerhalb der Seite.
 
@@ -329,7 +333,28 @@ Alle Lernsituationen nutzen **dasselbe ruhige Gerüst**. Es gibt keine kontextab
 
 **Touch-Bedienung:** Buttons und Eingabefelder mindestens 44 × 44 px, ausreichender Abstand zwischen Tippzielen, Fließtext mindestens 17 px.
 
-Keine Animationen oder Effekte ohne Funktion.
+Keine Animationen oder Effekte ohne Funktion. Ausnahme Diorama: Das Bild darf sich nach einer Eingabe verändern (Live-Rückmeldung), siehe "Bildwelten".
+
+## Bildwelten (Pflicht)
+
+Jede Lernsituation gehört zu **genau einer** von drei Bildwelten und darin zu einer **Unter-Variante**. Die Bildwelt gilt für alle Seiten der Lernsituation: Startbox, Titelbild, alle Bilder, Schriften und Untergrund. Wähle sie nach Format und Kontext (Spalte "Passt zu") und nach der Abwechslungsregel. Entwurf zum Ansehen: https://claude.ai/artifact/RampraYwRXqHvQL37Pd7hB, Beispielquellen der Bilder in `docs/skills/lernsituationen/bildwelten/`.
+
+| | **A Skizzenbuch** | **B Reportage** | **C Diorama** |
+| --- | --- | --- | --- |
+| Idee | Ein Notizbuch, in dem jemand den Fall durchdenkt. Persönlich, nah am Heft der SuS | Ein Magazinartikel über die Situation. Realistisch, erwachsen | Eine kleine 3D-Spielwelt auf einer schwebenden Insel. Mengen und Veränderungen werden greifbar |
+| Bilder | Bleistift- oder Fineliner-Skizzen mit Wackel-Strich, Aquarellflecken, handschriftliche Pfeile und Notizen mit den gegebenen Größen, Klebeband | Großes Aufmacherbild mit Licht, Tiefenunschärfe, Vignette und Filmkorn; kleine Detailbilder (Kontoauszug, Angebot, Werkstatt) | Isometrische Szene aus Quadern mit weichem Schatten, klaren Flächen und kurzen Beschriftungen; die Mathematik ist als Objekt sichtbar (Münzstapel, Füllstand, Kisten) |
+| Seite | Untergrund Papier (Raster je Unter-Variante), Bilder leicht schräg mit weißem Rand wie eingeklebt, Auftrag als Notizzettel (`sl-fokus`) | Aufmacherbild in voller Breite über der ersten Seite mit Kicker und Schlagzeile darauf, Einleitung mit Initiale, ein Zitat einer beteiligten Person, Bildnachweis-Zeile | Heller, kühler Bühnen-Untergrund, Bilder mit großem Radius, Auftrag als weiße Karte mit Fortschrittsbalken (`sl-fokus`), Knöpfe mit kleiner Kante nach unten |
+| Schriften | Überschriften und Bild-Notizen **Caveat** (Handschrift), Fließtext **Nunito** | Überschriften **Fraunces**, Fließtext **Source Serif 4**, Bedienung und Labels **IBM Plex Sans** | Überschriften **Fredoka**, Fließtext **Nunito Sans** |
+| Passt zu | Fehlerdetektiv, Rätsel, Experimentierlabor, Geometrie, Skizzen, Graphen | Entscheidungsfall, Beratungsauftrag, Rollenspiel, Finanzmathematik, Kalkulation | Kundenauftrag, Maschine, Simulation, Wachstum, Mengen, Lager, sehr spielerische Einstiege |
+| Unter-Varianten | kariert + Bleistift + Aquarell · Packpapier + schwarzer Fineliner · Tafel + Kreide (dunkler Untergrund, helle Schrift) · blanko + blauer Kugelschreiber | Abendlicht in Vollfarbe · Duoton (Schwarz + Themenfarbe) · Zeitung in Schwarzweiß · Hochglanz hell | Sommerwiese am Tag · Nacht mit Lichtern · Holzspielzeug · Winter mit Schnee |
+
+**Regeln für alle Bildwelten**
+- **Nur das Layout bleibt fest** (Abschnitt "Grundgerüst"): eine Spalte, ein Fokus, Phasenleiste, Eingabefelder, Feedback grün/rot, Touch-Ziele. Die Bildwelt ändert Untergrund, Schriften, Bildsprache und die Form von Fokus-Fläche und Knöpfen.
+- **Lesbarkeit geht vor Stil:** Handschrift (Caveat) nur für Überschriften, Kennung und Notizen in Bildern, nie für Aufgabentexte, Formeln oder Eingaben. Fließtext mindestens 17 px, Kontrast mindestens 4,5 : 1 auch auf Papier, Packpapier oder Tafel.
+- **Themenfarbe bleibt die Akzentfarbe** (Knöpfe, Phasenleiste, Kennung). Sie wird in den Bildern aufgegriffen: Skizzenbuch als Tinte oder Aquarell, Reportage als Duoton oder Schriftzug, Diorama als Hauptobjekt.
+- **Schriften** kommen über `@fontsource` (wie Caveat schon heute). Fehlt ein Paket, wird es beim ersten Einsatz der Bildwelt mit `npm install @fontsource/<name>` ergänzt und in `bildwelten.css` importiert; das gilt als freigegeben.
+- **Umsetzung im Code:** `SeitenLernsituation` bekommt `bildwelt={{ welt: 'skizzenbuch' | 'reportage' | 'diorama', variante: '…' }}`. Daraus entstehen die Klassen `sl-welt-<welt>` und `sl-variante-<variante>`; alle Stile der Bildwelten stehen in `lineare_funktionen/lernsituation_kit/bildwelten.css`. **Existiert die Bildwelt dort noch nicht, baut die erste Lernsituation dieser Bildwelt sie dort allgemein auf** (Prop, Klassen, Schriften, Untergrund, Fokus, Knöpfe, Bildrahmen) und hält die Seite selbst frei von eigenen Bildwelt-Stilen. Spätere Lernsituationen ergänzen nur ihre Unter-Variante.
+- **Diorama darf sich bewegen:** Bei Ausprobieren mit Live-Rückmeldung darf das Diorama-Bild zwischen vorbereiteten Zuständen wechseln (z. B. `zustand-1.webp` … `zustand-3.webp`, oder eine Inline-SVG-Ebene über dem gerenderten Bild für Werte der SuS). Sonst keine Animationen.
 
 ## Identität jeder Lernsituation (Pflicht)
 
@@ -337,10 +362,10 @@ Jede Lernsituation bekommt ein eigenes Gesicht, damit sie sich von den anderen u
 
 1. **Themenfarbe** aus der Palette `THEMEN` in `seiten.tsx`: blau, petrol, violett, beere, ocker, schiefer, indigo, kupfer. Alle sind mit weißer Schrift kontraststark; Grün und Rot gibt es bewusst nicht, weil sie für richtig/falsch reserviert sind. Die Farbe passt zum Kontext (z. B. Kupfer für Metallbau, Indigo für Nacht und Energie, Petrol für Wasser oder Umwelt, Beere für Freizeit) und ersetzt innerhalb der Lernsituation die Standardfarbe Blau. Keine neuen Farben ohne Kontrastprüfung (weiße Schrift mindestens 4,5 : 1).
 2. **Kennung:** ein passendes Font-Awesome-Symbol (`icon`, z. B. `fa-archway`, `fa-battery-half`, `fa-helicopter`, `fa-piggy-bank`) und ein kurzer Name (2–3 Wörter, z. B. "Der Torbogen"). Beides steht als Kennung links in der Phasenleiste auf **jeder** Seite (auf schmaleren Bildschirmen nur das Symbol), als Überschrift der Startbox und auf der Karte der Auswahlseite.
-3. **Titelbild:** ein eigenes, flaches SVG-Sachbild der Situation (`bild`) oben in der Startbox, etwa 720 × 250. Es zeigt die Szene mit den wichtigsten Größen (z. B. Hofeinfahrt mit Torbogen und den Maßen 2 m, 3 m, 4 m). Flächen in Themenfarbe und Themenfarbe-hell, Linien in `--ink`, keine Fotos, keine Verläufe, keine Figuren mit Gesichtern.
+3. **Titelbild:** ein eigenes, gerendertes Bild der Situation in der Bildwelt (`bild`, z. B. `<img src={titelbild} alt="…" />`) oben in der Startbox, Seitenverhältnis 2 : 1 (Quelle 1200 × 600, gerendert in doppelter Auflösung). Es zeigt die Szene mit den wichtigsten gegebenen Größen (z. B. Hofeinfahrt mit Torbogen und den Maßen 2 m, 3 m, 4 m). In der Reportage ist das Titelbild das Aufmacherbild. Keine Figuren mit erkennbaren Gesichtern, keine echten Marken oder Logos.
 4. **Leitobjekt:** ein Gegenstand, eine Person oder ein Gerät aus der Situation, das durch alle Phasen trägt und benannt wird (z. B. die Biegemaschine: in Phase 2 wird ausprobiert, in Phase 3 "die Gleichung für die Biegemaschine", in Phase 4 der Rückbezug). Es taucht in Seitentiteln, Rückmeldungen und im Rückbezug auf.
 
-Die Identität bleibt im ruhigen Rahmen: keine zusätzlichen Kästen, Banner oder Farbstreifen, keine zweite Akzentfarbe, keine Animationen. Die Skizzen in den Aufgaben verwenden für das Wichtigste (Bogen, Graph, aktueller Versuch) die Themenfarbe.
+Die Identität bleibt im Rahmen von Grundgerüst und Bildwelt: keine zusätzlichen Kästen, Banner oder Farbstreifen, keine zweite Akzentfarbe. Die Bilder und Graphen verwenden für das Wichtigste (Bogen, Graph, aktueller Versuch, Leitobjekt) die Themenfarbe.
 
 ## Bilder in Problem erkennen und Problem lösen (Pflicht)
 
@@ -349,10 +374,17 @@ Die Seiten "Problem erkennen" und "Problem lösen" bestehen nie nur aus Text. Je
 - **Funktionen (lineare, quadratische):** Funktionsgraph oder Skizze der Situation mit den gegebenen Größen (z. B. Torbogen, Ladestand des Stromspeichers), bei Ausprobieren mit Live-Rückmeldung.
 - **Finanzmathematik, Prozente, kaufmännisches Rechnen:** ein hübsches Sachbild, z. B. die Angebote als Sparschwein und Tresor, eine Zeitleiste der Zinstage, eine Pinnwand mit den Fragen ("K = ?", "p = ?", "t = ?"), ein Zielbalken, zwei Sparkonten, die Formel mit farbig markierter gesuchter Größe.
 - **Beim Handlungsprodukt** ein kleines Bild, das zeigt, was entstehen soll (Brief mit Umschlag, Karteikarte, Plakat, Concept Map).
-- **Gestaltung:** flache Inline-SVGs im Stil des Titelbilds: Flächen in Themenfarbe und Themenfarbe-hell (`var(--primary)`, `var(--primary-soft)`), Linien in `var(--ink)`, Münzen und Akzente in `var(--highlight)`, keine Fotos, keine Verläufe, keine Figuren mit Gesichtern. Einbinden in der Klasse `zk-bild` (Rahmen, 300 px hoch) bzw. `zk-bild-klein` (bis 190 px) oder `bk-graph` bei Graphen. Beschriftungen im SVG mindestens 15 px, damit sie auf dem Tablet lesbar bleiben. Immer mit `role="img"` und einer `aria-label`, die den Inhalt beschreibt.
+- **Echte Bilddateien:** Sachbilder, Titelbild und das Bild zum Handlungsprodukt sind gerenderte **WebP-Dateien** in der Bildwelt der Lernsituation, keine flachen Inline-SVGs. Ablauf:
+  1. Quelle zeichnen: je Bild eine Datei `bilder-quelle/<name>.bild.html` im Ordner der Lernsituation (neben der `.tsx`) mit einem Element `id="bild"` (meist ein SVG 1200 × 600, kleine Bilder 800 × 400). Erlaubt sind alle Mittel, die ein Bild realistischer machen: SVG-Filter (`feTurbulence`, `feDisplacementMap` für Wackel-Strich, Papier, Aquarell und Filmkorn), Verläufe, Unschärfe, Licht, Schatten, Google Fonts, Skripte, die die Szene berechnen (Diorama: isometrische Quader wie in der Beispielquelle).
+  2. Rendern: `node scripts/bilder-rendern.cjs <ordner der Lernsituation>` (aus `mathe-trainer/`) erzeugt aus jeder Quelle `bilder/<name>.webp` in doppelter Auflösung. Einzelnes Bild: `node scripts/bilder-rendern.cjs <quelle.bild.html> <ziel.webp>`.
+  3. Ansehen: jedes gerenderte Bild mit dem Read-Werkzeug ansehen und Überlappungen, abgeschnittene Teile und unlesbare Beschriftungen beheben, dann neu rendern.
+  4. Einbinden: `import busBild from './bilder/bus.webp'` und `<img src={busBild} alt="…" className="zk-bild" />` (bzw. `zk-bild-klein`). Quelle und WebP werden beide committet, damit Bilder später angepasst werden können. Richtwert: ein Bild höchstens etwa 250 KB.
+- **Beschriftungen im Bild** mindestens 15 px auf dem Tablet (in der Quelle 1200 px breit also mindestens etwa 22 px). Jedes Bild hat einen `alt`-Text, der den Inhalt mit den gegebenen Größen beschreibt.
+- **Live-Rückmeldung bleibt Code:** Funktionsgraphen, Wertetabellen und alles, was sich mit den Eingaben der SuS ändert, bleiben Inline-SVG (`bk-graph`). Sie übernehmen Schrift und Farben der Bildwelt (Skizzenbuch: Wackel-Filter und Bleistiftgrau, Reportage: feine Linien wie eine Infografik, Diorama: kräftige Flächen). Ein gerendertes Bild darf als Hintergrund darunter liegen.
+- Keine Figuren mit erkennbaren Gesichtern, keine echten Marken oder Logos, keine Fotos aus dem Netz.
 - **Nicht zu viel verraten:** Das Bild zeigt nur das Gegebene. Es nimmt die Lösung nicht vorweg (keine Zinsen, keine Nullstelle, kein Ergebnis im Bild, bevor die SuS gerechnet haben).
 - Auch Warm-up und "Wissen prüfen und vertiefen" dürfen Bilder haben, wo sie helfen. Pflicht sind sie dort nicht.
-- Beispiele: `AngeboteBild` und `BriefBild` in `finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx`, `PinnwandBild` und `FormelBild` in `KasseEinstieg.tsx`, `ZweiKonten` und `WachstumGraph` in `finanzmathe/zinseszins_lernsituation/`.
+- Inhaltliche Beispiele (was ein Bild zeigen kann; noch im alten flachen SVG-Stil): `AngeboteBild` und `BriefBild` in `finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx`, `PinnwandBild` und `FormelBild` in `KasseEinstieg.tsx`, `ZweiKonten` und `WachstumGraph` in `finanzmathe/zinseszins_lernsituation/`. Beispiele im neuen Stil: `docs/skills/lernsituationen/bildwelten/*.bild.html`.
 
 ## Auswahlaufgaben (Multiple Choice)
 
@@ -364,8 +396,8 @@ Die Seiten "Problem erkennen" und "Problem lösen" bestehen nie nur aus Text. Je
 
 ## Abwechslung absichern
 
-- Im Repo liegt `lernsituationen-log.md` mit einer Tabelle: Datum, Thema, Seite, Format, Lernprodukt (Handlungsprodukt), Optik/Layout, Kontextbereich, Sozialformen. In der Spalte Optik/Layout steht seit dem ruhigen Grunddesign die **Identität**: Themenfarbe, Symbol, Leitobjekt (z. B. "Kupfer, fa-archway, Biegemaschine").
-- **Regel:** Gegenüber den letzten drei Lernsituationen unterscheidet sich eine neue Lernsituation **mindestens in Format, Art des Handlungsprodukts und Themenfarbe**, möglichst auch im Kontextbereich. Symbol, Titelbild und Leitobjekt sind immer neu. Die vier Phasen-Seiten, die Seitenansicht und das ruhige Gerüst sind immer gleich und zählen nicht als Wiederholung.
+- Im Repo liegt `lernsituationen-log.md` mit einer Tabelle: Datum, Thema, Seite, Format, Lernprodukt (Handlungsprodukt), Optik/Layout, Kontextbereich, Sozialformen. In der Spalte Optik/Layout stehen **Bildwelt / Unter-Variante** und die **Identität**: Themenfarbe, Symbol, Leitobjekt (z. B. "Skizzenbuch / Packpapier + Fineliner; Kupfer, fa-archway, Biegemaschine"). Lernsituationen vor dem 2026-11-04 haben noch keine Bildwelt.
+- **Regel:** Gegenüber den letzten drei Lernsituationen unterscheidet sich eine neue Lernsituation **mindestens in Format, Art des Handlungsprodukts und Themenfarbe**, möglichst auch im Kontextbereich. **Die Bildwelt ist eine andere als in der direkt vorherigen Lernsituation**; unter den letzten drei kommen möglichst alle drei Bildwelten vor. Wird eine Bildwelt wieder genutzt, ist die Unter-Variante eine andere als beim letzten Mal in dieser Bildwelt. Symbol, Titelbild und Leitobjekt sind immer neu. Die vier Phasen-Seiten, die Seitenansicht und das Grundgerüst sind immer gleich und zählen nicht als Wiederholung.
 - Handlungsprodukte sind **überwiegend analog**; ihre Art wechselt.
 - Wünscht die Lehrkraft ausdrücklich eine Wiederholung, ist das erlaubt. Weise dann kurz auf die Wiederholung hin.
 
@@ -402,12 +434,12 @@ Anforderungen an einen guten Kontext:
 
 - **Konventionen von `mathe-aufgaben` gelten:** KaTeX, Merkhilfe der Wirtschaftsschule Bayern für Formeln und Abkürzungen, nachvollziehbare Rechenwege, Eingabefelder mit grün/rot und Lob. In Lernsituationen prüft sich jedes Feld selbst (richtig sofort grün, falsch nach kurzer Pause rot), ohne Button "Prüfen".
 - **Bausteine aus `mathe-trainer/src/pages/lineare_funktionen/lernsituation_kit/`:**
-  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Optionen `ruhig` und `thema`), Typ `Seite = { art, titel, frei?, bedingung?, pflicht?, inhalt: (fertig) => … }` mit `fertig()` bzw. `fertig.teil('schluessel')`, `Abschnitt` (Zwischenüberschrift), `Aufklappbar` (Satzanfänge; `breit` für volle Breite), `BeispielMitVideo` (Beispielrechnung mit Lernvideo), `Handlungsprodukt` (Auftrag), `BonusSpiel`; `WegWahl` nur noch in älteren Lernsituationen, `LernsituationKarte` (Karte für die Auswahlseite), `THEMEN`, Typ `Thema`
+  - `seiten.tsx`: `SeitenLernsituation` (Startbox, Seiten, Phasenleiste, "Weiter", Optionen `ruhig`, `bildwelt` und `thema`), Typ `Seite = { art, titel, frei?, bedingung?, pflicht?, inhalt: (fertig) => … }` mit `fertig()` bzw. `fertig.teil('schluessel')`, `Abschnitt` (Zwischenüberschrift), `Aufklappbar` (Satzanfänge; `breit` für volle Breite), `BeispielMitVideo` (Beispielrechnung mit Lernvideo), `Handlungsprodukt` (Auftrag), `BonusSpiel`; `WegWahl` nur noch in älteren Lernsituationen, `LernsituationKarte` (Karte für die Auswahlseite), `THEMEN`, Typ `Thema`
   - `kit.tsx`: `CheckCard` (mit `rechnung`, `wertetabelle`, `fields`, `solution`, `help`, `onSolved`, `loesungNachFehler`, `onFehler`, `onEingabe`, `ohnePunkte`, `profi`, `punkte`), `McCard` (`onSolved`), `TrackedCheck`/`TrackedMc` (für Bereiche mit Nachverfolgung), `SchrittHilfen`, `Hilfen` (`HeftHinweis` wird in der Seitenansicht nicht angezeigt)
   - `phasen.tsx`: `PHASEN` (Namen und Reihenfolge der vier Phasen)
   - `Beispiel` aus `daten_und_zufall/lernpfad/kit.tsx` für Rechenbeispiele (`offen` zeigt alle Schritte, `ab` setzt die Schrittnummerierung fort)
   - `TaskShell` mit `kompakt`
-- **Am bestehenden Code orientieren:** Sieh dir vor dem Bauen die Referenz-Umsetzungen an und übernimm Navigation, Grundstyles, Identität (`Titelbild`, `THEMA`) und Komponenten für den festen Kern. Bestehende Styles, die dem ruhigen Grunddesign widersprechen (Farbstreifen, verschachtelte Rahmen, Banner, `ZweiSpalten`, eigene Look-CSS wie `teamchat.css`), werden **nicht** übernommen. Führe keine neuen Frameworks oder Bibliotheken ein, ohne zu fragen.
+- **Am bestehenden Code orientieren:** Sieh dir vor dem Bauen die Referenz-Umsetzungen an und übernimm Navigation, Grundstyles, Identität (`Titelbild`, `THEMA`) und Komponenten für den festen Kern. Bestehende Styles, die dem Grundgerüst widersprechen (Farbstreifen, verschachtelte Rahmen, Banner, `ZweiSpalten`, eigene Look-CSS wie `teamchat.css`), werden **nicht** übernommen. Führe keine neuen Frameworks oder Bibliotheken ein, ohne zu fragen (Ausnahme: `@fontsource`-Schriften der Bildwelten). Bilder werden mit `scripts/bilder-rendern.cjs` gerendert (Playwright, nur beim Erstellen, nicht im Build).
 - **Festlegung merken:** Vermutungen und Versuche bleiben im Seitenzustand und werden am Ende von "Problem lösen" ("Das hältst du fest") wieder angezeigt. Kein Login. Wenn `localStorage` genutzt wird, immer mit try/catch.
 - **Interaktive Elemente** einsetzen, wo sie das Denken unterstützen: Ausprobieren mit Live-Graph, Schieberegler, auszufüllende Tabellen, Code-Schlösser, Drag-and-drop. Nicht als Dekoration.
 - **Tablet zuerst, einspaltig, Smartphone bedienbar:** Primär Tablet im Querformat, einspaltig; nach unten scrollen ist überall erlaubt, seitlich nie.
@@ -415,7 +447,7 @@ Anforderungen an einen guten Kontext:
 
 ## Checkliste vor der Abgabe
 
-- [ ] Das Log wurde gelesen, die neue Situation unterscheidet sich von den letzten drei mindestens in Format, Art des Handlungsprodukts und Themenfarbe, und sie ist eingetragen.
+- [ ] Das Log wurde gelesen, die neue Situation unterscheidet sich von den letzten drei mindestens in Format, Art des Handlungsprodukts und Themenfarbe, die Bildwelt ist eine andere als in der direkt vorherigen Lernsituation, und sie ist mit Bildwelt / Unter-Variante eingetragen.
 - [ ] Genau vier Phasen in fester Reihenfolge, **jede auf genau einer Seite**: Warm-up, Problem erkennen, Problem lösen, Wissen prüfen und vertiefen.
 - [ ] Das Warm-up hat mindestens 5 Aufgaben, alle in `pflicht`, jede sichtbar nummeriert mit „a) Kurzname“, „b) …“ (`title` der Karte).
 - [ ] Das Lernvideo des Themas (aus den Übungsaufgaben) ist in `BeispielMitVideo` eingebettet; gibt es keines, ist es als offener Punkt genannt.
@@ -442,14 +474,16 @@ Anforderungen an einen guten Kontext:
 - [ ] Der Kontext passt zur Lebenswelt von 15- bis 18-Jährigen, die Zahlen sind realistisch.
 - [ ] Festlegung bzw. Versuche werden am Ende von "Problem lösen" wieder aufgegriffen.
 - [ ] Mindestens zwei Darstellungen werden verknüpft.
-- [ ] "Problem erkennen" und "Problem lösen" haben je mindestens ein inhaltliches Bild (Graph, Skizze oder Sachbild im Stil des Titelbilds), das nichts von der Lösung verrät; beim Handlungsprodukt zeigt ein kleines Bild, was entstehen soll.
+- [ ] "Problem erkennen" und "Problem lösen" haben je mindestens ein inhaltliches Bild (gerendertes Sachbild in der Bildwelt oder Graph), das nichts von der Lösung verrät; beim Handlungsprodukt zeigt ein kleines Bild, was entstehen soll.
+- [ ] Titelbild und Sachbilder sind echte WebP-Dateien aus `bilder-quelle/*.bild.html`, mit `scripts/bilder-rendern.cjs` gerendert, angesehen und fehlerfrei; Quelle und WebP sind committet, jedes Bild hat einen `alt`-Text.
 - [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat 2 bis 4 Kriterien zum Abhaken, dazu das Kriterium „unbekannte Begriffe und Bedeutung der Abkürzungen der Formel aufschreiben“ mit den konkreten Abkürzungen.
 - [ ] "Wissen prüfen und vertiefen" hat mindestens 3, besser 4 passende Übungsaufgaben (Basis bis Erweiterung) und darunter die Abschluss-Buttons.
 - [ ] Gamification an: `SeitenLernsituation` mit `punkte`, Profi-Aufgabe mit `profi`, `<Bilanz />` am Ende der letzten Seite; die Punkte wurden im Test nachgerechnet.
 - [ ] Punkte nach Aufwand: jede Aufgabe hat `punkte={…}` nach der Richtwert-Tabelle (Abruf 2, Kernaufgabe 10 bis 15 …), "Problem lösen" bringt etwa 40 % der Pflichtpunkte, das Warm-up höchstens 20 %; das Bonus-Spiel bringt höchstens so viel wie die beste Übung; die Verteilung steht als Kommentar in der Datei.
 - [ ] Im Test geprüft: Eine Tipp-Pause mitten in einer richtigen Eingabe (z. B. „0“, Pause, „,5“) kostet keine Punkte.
 - [ ] Nach allen Pflicht-Übungen wird ein thematisch passendes Bonus-Spiel freigeschaltet (`BonusSpiel`), das das Wissen spielerisch prüft, auf dem Tablet bedienbar ist und "Nochmal spielen" anbietet.
-- [ ] Ruhiges Grunddesign: einspaltig (auch bei 1920 × 1080), ein Fokus pro Seite, keine verschachtelten Kästen, keine Farbstreifen oder Banner, eine Akzentfarbe, Touch-Ziele mindestens 44 px.
+- [ ] Grundgerüst: einspaltig (auch bei 1920 × 1080), ein Fokus pro Seite, keine verschachtelten Kästen, keine Farbstreifen oder Banner, eine Akzentfarbe, Touch-Ziele mindestens 44 px.
+- [ ] Bildwelt durchgehend: `bildwelt` an `SeitenLernsituation`, Stile nur in `bildwelten.css`, Schriften der Bildwelt geladen, alle Bilder im Stil der Bildwelt und Unter-Variante; Aufgabentexte nicht in Handschrift.
 - [ ] Identität vollständig: Themenfarbe (anders als in den letzten drei Lernsituationen), Symbol und Name als Kennung in der Leiste, eigenes Titelbild in der Startbox, Leitobjekt durch alle Phasen.
 - [ ] `frontend-design` vor dem Bauen geladen, `design:design-critique` mit Screenshots danach angewendet und die Punkte behoben.
 - [ ] Bei keiner Auswahlaufgabe ist Antwort A richtig.
@@ -460,7 +494,7 @@ Anforderungen an einen guten Kontext:
 
 ## Beispiele in verschiedenen Formaten
 
-Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle nutzen das ruhige Grunddesign mit eigener Identität. Beispiel R ist die Referenz für den Aufbau mit einer Seite pro Phase; A bis E beschreiben Format und Inhalt und werden beim Bauen genauso auf vier Seiten verteilt.
+Die Beispiele zeigen die Bandbreite. Sie sind keine Vorlagen zum Kopieren. Alle nutzen das Grundgerüst mit eigener Identität; ab 2026-11-04 kommt eine Bildwelt dazu. Beispiel R ist die Referenz für den Aufbau mit einer Seite pro Phase; A bis E beschreiben Format und Inhalt und werden beim Bauen genauso auf vier Seiten verteilt.
 
 ### R. Rollenspiel / Beratungsauftrag: Tageszinsen (umgesetzt: Lenas Autogeld, Referenz)
 - **Rechenbeispiel:** nur zwei Schritte (Zinstage nach der Bankregel zählen, alles in die Zinsformel einsetzen), keine Zwischenschritte über Jahres- und Tageszinsen.

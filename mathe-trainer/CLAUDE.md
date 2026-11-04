@@ -85,7 +85,13 @@ Ruhiges Grunddesign (seit 2026-10-23, Vorlage `TorbogenEinstieg.tsx`): `SeitenLe
 Monitoren, kein `ZweiSpalten`), Inhalt so breit wie die Phasenleiste (`--sl-breite`, höchstens 1180 px, seit 2026-10-29), kein seitliches Scrollen; eine Akzentfarbe, keine Farbstreifen, keine verschachtelten Kästen,
 keine Kontext-Looks; pro Seite ist nur der Auftrag hervorgehoben (`sl-fokus`). Jede Lernsituation hat trotzdem eine eigene Identität
 (Prop `thema`: Themenfarbe aus `THEMEN`, Symbol, Name, Titelbild, dazu ein Leitobjekt), damit sie nicht wie alle anderen aussieht. Reihenfolge in „Problem lösen“ immer: Problem → Beispielrechnung mit Lernvideo (aufklappbar) →
-Ergebnisse abgleichen → Handlungsprodukt. Bei Auswahlaufgaben ist Antwort A nie die richtige. Details: `docs/skills/lernsituationen/SKILL.md`.
+Ergebnisse abgleichen → Handlungsprodukt. Bei Auswahlaufgaben ist Antwort A nie die richtige.
+Bildwelten (seit 2026-11-04): Jede neue Lernsituation gehört zu einer von drei Bildwelten, **Skizzenbuch**, **Reportage** oder **Diorama**,
+jeweils mit Unter-Variante (Prop `bildwelt` an `SeitenLernsituation`, Stile nur in `lernsituation_kit/bildwelten.css`; die erste Lernsituation
+einer Bildwelt baut diese dort auf). Die Bildwelt ändert Bilder, Schriften und Untergrund, nie das Layout; zweimal hintereinander dieselbe
+Bildwelt gibt es nicht. Titelbild und Sachbilder sind echte WebP-Dateien: Quelle `bilder-quelle/<name>.bild.html` (Element `id="bild"`) im
+Ordner der Lernsituation, rendern mit `node scripts/bilder-rendern.cjs <ordner>`, Quelle und WebP committen. Graphen mit Live-Rückmeldung
+bleiben Inline-SVG. Beispielquellen: `docs/skills/lernsituationen/bildwelten/`. Details: `docs/skills/lernsituationen/SKILL.md`.
 Eingabefelder in Lernsituationen prüfen sich selbst (richtig sofort grün, falsch nach kurzer Tipp-Pause oder beim Verlassen rot),
 ohne Prüfen-Button: `CheckCard` macht das automatisch, eigene Eingabe-Bausteine nutzen `useLiveCheck` aus `lernsituation_kit/kit.tsx`.
 Nur Auswahlaufgaben (`McCard`) behalten „Prüfen“.
