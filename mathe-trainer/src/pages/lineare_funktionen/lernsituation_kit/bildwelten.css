@@ -8,6 +8,12 @@
 @import '@fontsource/nunito/800.css';
 @import '@fontsource/caveat/600.css';
 @import '@fontsource/caveat/700.css';
+@import '@fontsource/fredoka/500.css';
+@import '@fontsource/fredoka/600.css';
+@import '@fontsource/nunito-sans/400.css';
+@import '@fontsource/nunito-sans/600.css';
+@import '@fontsource/nunito-sans/700.css';
+@import '@fontsource/nunito-sans/800.css';
 
 /* Gemeinsam: eingeklebte bzw. eingebundene Bilder (gerenderte WebP-Dateien) */
 .sl-foto { margin: 0 auto; width: 100%; max-width: 860px; }
@@ -108,6 +114,98 @@
 /* Formeln in handschriftlichen Überschriften nicht riesig werden lassen */
 .sl-welt-skizzenbuch .sl-abschnitt-titel .katex,
 .sl-welt-skizzenbuch .sl-titel .katex { font-size: 0.72em; }
+
+/* ══ C Diorama ══════════════════════════════════════════════════════════════════════════════════════════════
+   Eine kleine 3D-Spielwelt auf einer schwebenden Insel: heller, kühler Bühnen-Untergrund, Bilder mit großem Radius,
+   Auftrag als weiße Karte mit Fortschrittsbalken (--sl-fortschritt aus seiten.tsx), Knöpfe mit kleiner Kante nach unten.
+   Überschriften Fredoka, Fließtext Nunito Sans. Unter-Varianten setzen Untergrund und Bühnenfarben. */
+.sl-welt-diorama {
+  --font-body: 'Nunito Sans', 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Fredoka', 'Nunito Sans', 'Segoe UI', system-ui, sans-serif;
+  --di-tinte: #22313d;
+  --di-buehne: #eef4f7;
+  --di-kante: rgba(22, 52, 70, 0.28);
+  --di-schatten: 0 1px 0 rgba(22, 52, 70, 0.05), 0 22px 36px -26px rgba(22, 52, 70, 0.5);
+  --di-rund: 22px;
+  font-family: var(--font-body);
+}
+/* Sommerwiese am Tag: Himmel oben hell, zur Bühne hin kühles Blaugrau */
+.sl-welt-diorama.sl-variante-sommerwiese {
+  --di-untergrund: radial-gradient(130% 90% at 50% -10%, #fbfdfe 0%, #eaf2f6 55%, #dde9f0 100%);
+  --grid: #d6e5ee;
+}
+
+/* Startbox und jede Seite stehen als Bühne auf dem Untergrund */
+.sl-start.sl-welt-diorama,
+.sl-welt-diorama .sl-seite {
+  background: var(--di-untergrund, var(--di-buehne));
+  border: 0;
+  border-radius: 28px;
+  box-shadow: var(--di-schatten);
+}
+.sl-welt-diorama .sl-seite { padding: 24px clamp(16px, 3vw, 36px) 32px; margin-top: 10px; }
+.sl-start.sl-welt-diorama { max-width: 880px; padding: 0 clamp(16px, 3vw, 34px) 30px; }
+.sl-start.sl-welt-diorama .sl-start-bild { width: calc(100% + 2 * clamp(16px, 3vw, 34px)); margin: 0 calc(-1 * clamp(16px, 3vw, 34px)) 4px; background: none; }
+
+/* Runde, freundliche Überschriften */
+.sl-welt-diorama .sl-titel,
+.sl-start.sl-welt-diorama h2 { font: 600 32px/1.12 var(--font-display); color: var(--di-tinte); letter-spacing: -0.01em; }
+.sl-start.sl-welt-diorama h2 { color: var(--primary); }
+.sl-welt-diorama .sl-abschnitt-titel { font: 600 23px/1.2 var(--font-display); color: var(--di-tinte); }
+.sl-welt-diorama .sl-marke { font: 600 17px/1 var(--font-display); }
+.sl-welt-diorama .sl-text,
+.sl-welt-diorama .sl-start-ziel { font-size: 18px; color: var(--di-tinte); }
+
+/* Fokus = weiße Karte mit Fortschrittsbalken (Anteil gelöster Pflichtaufgaben der Seite) */
+.sl-welt-diorama .sl-fokus {
+  position: relative; overflow: hidden; margin-top: 4px; padding: 22px 22px 18px;
+  background: #fff; border-radius: var(--di-rund); box-shadow: var(--di-schatten);
+}
+.sl-welt-diorama .sl-fokus::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 7px; background: var(--primary-soft);
+}
+.sl-welt-diorama .sl-fokus::after {
+  content: ''; position: absolute; top: 0; left: 0; height: 7px; width: calc(var(--sl-fortschritt, 0) * 100%);
+  background: var(--primary); border-radius: 0 7px 7px 0; transition: width 0.4s ease;
+}
+.sl-welt-diorama .sl-fokus-titel { font: 600 23px/1.2 var(--font-display); color: var(--primary); }
+.sl-start.sl-welt-diorama .sl-start-regel { background: #fff; border-radius: var(--di-rund); box-shadow: var(--di-schatten); }
+.sl-start.sl-welt-diorama .sl-start-check { background: #fff; border: 1.5px solid var(--line); border-radius: 16px; }
+
+/* Karten: weiße Bausteine mit weichem Schatten */
+.sl-welt-diorama .sl-seite .lp-ex.bk-panel,
+.sl-welt-diorama .sl-seite .lp-example,
+.sl-welt-diorama .sl-seite .bk-graph {
+  background: #fff; border: 1px solid rgba(22, 52, 70, 0.1); border-radius: var(--di-rund); box-shadow: var(--di-schatten);
+}
+/* Graphen innerhalb einer Karte ohne eigenen Rahmen (kein Kasten im Kasten) */
+.sl-welt-diorama .sl-seite .lp-ex .bk-graph,
+.sl-welt-diorama .sl-seite .lp-example .bk-graph { border: 0; box-shadow: none; background: transparent; }
+/* Knöpfe mit kleiner Kante nach unten, beim Antippen sinken sie ein */
+.sl-welt-diorama .sl-seite .bk-btn,
+.sl-start.sl-welt-diorama .bk-btn,
+.sl-welt-diorama .sl-bar .bk-btn { border-radius: 14px; box-shadow: 0 3px 0 var(--di-kante); }
+.sl-welt-diorama .sl-seite .bk-btn:active:not(:disabled),
+.sl-start.sl-welt-diorama .bk-btn:active:not(:disabled),
+.sl-welt-diorama .sl-bar .bk-btn:active:not(:disabled) { box-shadow: none; transform: translateY(3px); }
+.sl-welt-diorama .sl-phasen li { border-radius: 14px; background: #fff; }
+.sl-welt-diorama .sl-weiter-gesperrt { background: rgba(255, 255, 255, 0.7); border-radius: var(--di-rund); }
+
+/* Gerenderte Bilder: großer Radius, Schatten wie ein Spielbrett */
+.sl-welt-diorama .sl-foto { border-radius: 26px; overflow: hidden; box-shadow: var(--di-schatten); }
+.sl-welt-diorama .bk-graph svg text { font-family: var(--font-body); }
+.sl-welt-diorama .sl-abschnitt-titel .katex,
+.sl-welt-diorama .sl-titel .katex { font-size: 0.85em; }
+
+@media (max-width: 560px) {
+  .sl-welt-diorama .sl-titel, .sl-start.sl-welt-diorama h2 { font-size: 27px; }
+  .sl-welt-diorama .sl-seite { border-radius: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sl-welt-diorama .sl-fokus::after { transition: none; }
+  .sl-welt-diorama .bk-btn:active { transform: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .sl-welt-skizzenbuch .sl-fokus, .sl-welt-skizzenbuch .sl-foto { transform: none; }

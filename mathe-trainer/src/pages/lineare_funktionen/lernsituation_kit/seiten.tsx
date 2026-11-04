@@ -36,7 +36,7 @@ export type Thema = { name: string; farbe: keyof typeof THEMEN; icon: string; bi
 export type Bildwelt =
   | { welt: 'skizzenbuch'; variante: 'kariert' }
   | { welt: 'reportage'; variante: string }
-  | { welt: 'diorama'; variante: string };
+  | { welt: 'diorama'; variante: 'sommerwiese' | string };
 
 const weltKlassen = (b?: Bildwelt) => (b ? ` sl-welt sl-welt-${b.welt} sl-variante-${b.variante}` : '');
 
@@ -282,7 +282,13 @@ function SeitenAnsicht({
       </div>
       <HeftBestaetigtCtx.Provider value={true}>
         {seiten.map((s, i) => (
-          <section key={i} hidden={i !== nr} className={`sl-seite et-${s.art}`}>
+          <section
+            key={i}
+            hidden={i !== nr}
+            className={`sl-seite et-${s.art}`}
+            // Anteil gelöster Pflichtaufgaben, z. B. für den Fortschrittsbalken am Auftrag in der Bildwelt Diorama
+            style={{ '--sl-fortschritt': erledigt[i] ? 1 : s.pflicht?.length ? (s.pflicht.filter((k) => teile[i]?.includes(k)).length / s.pflicht.length) : 0 } as CSSProperties}
+          >
             <div className="sl-kopf">
               <h2 className="sl-titel">
                 <span className="sl-kicker">{PHASEN.find((p) => p.art === s.art)?.title}</span>

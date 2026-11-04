@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- Bildwelt Diorama / Sommerwiese, Titelbild „Der Bikepark“: schwebende Wiese mit Starthügel, den drei geplanten Auffahrten A, B, C,
+     einem Fahrrad und dem Planungsschild des Jugendrats. Rendern: node scripts/bilder-rendern.cjs src/pages/lineare_funktionen/steigung_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const ox=545,oy=118,c=Math.cos(Math.PI/6),s=Math.sin(Math.PI/6);
+const P=(x,y,z)=>[ox+(x-y)*c, oy+(x+y)*s - z];
+const poly=(pts,fill,extra='')=>'<polygon points="'+pts.map(p=>P(...p).join(',')).join(' ')+'" fill="'+fill+'" '+extra+'/>';
+function box(x,y,z,w,d,h,top,left,right){return poly([[x,y+d,z],[x+w,y+d,z],[x+w,y+d,z+h],[x,y+d,z+h]],left)+poly([[x+w,y,z],[x+w,y+d,z],[x+w,y+d,z+h],[x+w,y,z+h]],right)+poly([[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]],top);}
+function keil(x,y0,W,L,H,name){
+  let g=poly([[x,y0+L,0],[x+W,y0+L,0],[x+W,y0,H],[x,y0,H]],'#e7b46a','stroke="rgba(0,0,0,.12)"');
+  for(let i=1;i<8;i++){const t=i/8,yy=y0+L*(1-t);g+='<line x1="'+P(x,yy,H*t)[0]+'" y1="'+P(x,yy,H*t)[1]+'" x2="'+P(x+W,yy,H*t)[0]+'" y2="'+P(x+W,yy,H*t)[1]+'" stroke="rgba(90,55,20,.28)" stroke-width="2"/>';}
+  g+=poly([[x+W,y0+L,0],[x+W,y0,0],[x+W,y0,H]],'#c98b3c');
+  const [lx,ly]=P(x+W,y0+L*0.25,H*0.32);
+  g+='<text x="'+(lx+6)+'" y="'+(ly+12)+'" font-family="Fredoka" font-size="34" font-weight="600" fill="#fff">'+name+'</text>';
+  return g;
+}
+const u=24;
+let g='';
+g+=box(-40,-40,-56,560,350,56,'#9fd18f','#8a6a45','#73573a');
+g+=box(-40,-40,-8,560,350,8,'#9fd18f','#78b06b','#679a5c');
+// Weg
+g+=poly([[-40,270,0.5],[520,270,0.5],[520,305,0.5],[-40,305,0.5]],'#e9dcc0');
+// Starthügel hinten
+g+=box(-30,-30,0,150,110,70,'#8cc47d','#7a5a35','#6a4a2a');
+g+=box(-30,-30,70,150,110,6,'#9fd18f','#78b06b','#679a5c');
+// Fahne auf dem Hügel
+{const [fx,fy]=P(40,20,76);g+='<line x1="'+fx+'" y1="'+fy+'" x2="'+fx+'" y2="'+(fy-70)+'" stroke="#4b3a2a" stroke-width="4"/><path d="M'+fx+' '+(fy-70)+' l46 12 l-46 12 z" fill="#0e6670"/>';}
+const W=50;
+[{n:'A',L:6,H:3,x:170},{n:'B',L:4,H:3,x:290},{n:'C',L:4,H:2,x:410}].forEach(r=>{g+=keil(r.x,40+(6-r.L)*u/2,W,r.L*u,r.H*u,r.n);});
+// Bäume
+[[500,-25],[500,30],[-25,300],[470,300]].forEach(([x,y])=>{g+=box(x-4,y-4,0,8,8,26,'#8a6a45','#7a5a35','#6a4a2a');const [px,py]=P(x,y,26);g+='<circle cx="'+px+'" cy="'+(py-22)+'" r="26" fill="#4f9a5d"/><circle cx="'+(px-9)+'" cy="'+(py-30)+'" r="12" fill="#6bb877"/>';});
+// Fahrrad auf dem Weg
+{const [bx,by]=P(220,288,0);g+='<g transform="translate('+bx+' '+(by-26)+')" stroke="#24323f" stroke-width="4" fill="none" stroke-linecap="round"><circle cx="-26" cy="0" r="20"/><circle cx="26" cy="0" r="20"/><path d="M-26 0 L-6 -26 L18 -26 L26 0 M-6 -26 L4 0 L18 -26 M-26 0 L4 0" stroke="#0e6670" stroke-width="5"/><path d="M-10 -34 L0 -34 M18 -26 L14 -38 L24 -40"/></g>';}
+// Planungsschild
+{const [sx,sy]=P(60,240,0);g+='<line x1="'+sx+'" y1="'+sy+'" x2="'+sx+'" y2="'+(sy-84)+'" stroke="#6a4a2a" stroke-width="6"/><rect x="'+(sx-88)+'" y="'+(sy-160)+'" width="176" height="84" rx="12" fill="#fff" stroke="#24323f" stroke-width="3"/><text x="'+sx+'" y="'+(sy-126)+'" text-anchor="middle" font-family="Fredoka" font-size="25" font-weight="600" fill="#0e6670">Bikepark</text><text x="'+sx+'" y="'+(sy-96)+'" text-anchor="middle" font-family="Fredoka" font-size="22" font-weight="500" fill="#24323f">in Planung</text>';}
+const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600"><defs><radialGradient id="bg" cx=".5" cy=".35" r=".85"><stop offset="0" stop-color="#f6f9fb"/><stop offset="1" stop-color="#d6e4ec"/></radialGradient><filter id="sh"><feGaussianBlur stdDeviation="20"/></filter></defs><rect width="1200" height="600" fill="url(#bg)"/>'
++'<g fill="#fff" opacity=".85"><ellipse cx="170" cy="110" rx="70" ry="22"/><ellipse cx="215" cy="98" rx="46" ry="22"/><ellipse cx="1010" cy="80" rx="80" ry="22"/><ellipse cx="1060" cy="68" rx="44" ry="20"/></g>'
++'<ellipse cx="600" cy="560" rx="340" ry="26" fill="#5b6b7a" opacity=".22" filter="url(#sh)"/>'+g+'</svg>';
+document.getElementById('bild').innerHTML=svg;
+</script>
+</body></html>
