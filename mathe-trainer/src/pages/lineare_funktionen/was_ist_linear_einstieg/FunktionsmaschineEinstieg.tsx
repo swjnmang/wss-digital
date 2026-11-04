@@ -488,20 +488,26 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
             onSolved={fertig.teil('c')}
             punkte={2}
             title="c) Proportionale Zuordnung"
-            prompt={
-              <>
-                <p>Die Zuordnung ist proportional. Was gehört zu 5?</p>
-                <Protokoll
-                  paare={[
-                    { x: 1, y: 4 },
-                    { x: 2, y: 8 },
-                  ]}
-                  label="Wertetabelle: zu 1 gehört 4, zu 2 gehört 8"
-                />
-              </>
+            prompt={<p>Die Zuordnung ist proportional. Vervollständige die Wertetabelle.</p>}
+            wertetabelle={{ x: ['1', '2', '5', '-3'], y: ['4', '8', { luecke: 'y5' }, { luecke: 'ym3' }] }}
+            fields={[
+              { kind: 'num', key: 'y5', label: 'y-Wert zu x gleich 5', expected: 20 },
+              { kind: 'num', key: 'ym3', label: 'y-Wert zu x gleich minus 3', expected: -12 },
+            ]}
+            solution={
+              <p>
+                Zu 1 gehört 4, also wird immer mal 4 gerechnet: <M>{'5 \\cdot 4 = 20'}</M> und <M>{'(-3) \\cdot 4 = -12'}</M>.
+              </p>
             }
-            fields={[{ kind: 'num', key: 'y', label: <>Zu 5 gehört <M>{'y ='}</M></>, expected: 20 }]}
-            solution={<p>Zu 1 gehört 4, also wird immer mal 4 gerechnet: <M>{'5 \\cdot 4 = 20'}</M>.</p>}
+            help={
+              <Hilfen
+                steps={[
+                  <>Schau, was zu <M>{'x = 1'}</M> gehört. Mit dieser Zahl wird jeder x-Wert malgenommen.</>,
+                  <>Zu 1 gehört 4, zu 2 gehört 8: Es wird immer mal 4 gerechnet. Das gilt auch für negative x-Werte.</>,
+                  <><M>{'5 \\cdot 4'}</M> und <M>{'(-3) \\cdot 4'}</M>. Plus mal Minus ergibt Minus.</>,
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('d')}
@@ -636,7 +642,7 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
                 title="Regel in Worten"
                 prompt={<p>Schau dir das Protokoll an. Wie wird aus jedem x-Wert der y-Wert? Prüfe den Satz an mehreren Paaren, auch an einem mit Minus.</p>}
                 options={[
-                  { text: 'Jeder y-Wert ist um 2 größer als der x-Wert.', feedback: 'Das passt nur zum Paar (2 | 4). Prüfe (1 | 2): 1 + 2 = 3, die Maschine gibt aber 2 aus.' },
+                  { text: 'Jeder y-Wert ist das Dreifache vom x-Wert.', feedback: 'Prüfe (3 | 6): Das Dreifache von 3 wäre 9, die Maschine gibt aber 6 aus.' },
                   { text: 'Jeder x-Wert ist das Doppelte vom y-Wert.', feedback: 'Hier sind x und y vertauscht. Bei (3 | 6) ist 6 das Doppelte von 3. Also ist der y-Wert das Doppelte.' },
                   { text: 'Jeder y-Wert ist das Doppelte vom x-Wert, also 2-mal der x-Wert.', correct: true, feedback: 'Genau: 2 · 3 = 6 und 2 · (−4) = −8. Die Maschine nimmt jedes x mal 2.' },
                   { text: 'Jeder y-Wert ist die Hälfte vom x-Wert.', feedback: 'Die Hälfte von 3 wäre 1,5. Die Maschine gibt bei 3 aber 6 aus.' },
@@ -699,7 +705,7 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
               title="Satz für Maschine B"
               prompt={<p>Welcher Satz beschreibt die Regel von Maschine B?</p>}
               options={[
-                { text: 'Jeder y-Wert ist um 2 kleiner als der x-Wert.', feedback: 'Prüfe (1 | −2): 1 − 2 = −1, die Maschine gibt aber −2 aus.' },
+                { text: 'Jeder y-Wert ist das Dreifache vom x-Wert, aber mit umgekehrtem Vorzeichen.', feedback: 'Prüfe (1 | −2): (−3) · 1 = −3, die Maschine gibt aber −2 aus.' },
                 { text: 'Jeder y-Wert ist das Doppelte vom x-Wert.', feedback: 'Das Doppelte von 1 wäre 2, die Maschine gibt aber −2 aus. Das Vorzeichen dreht sich um.' },
                 { text: 'Jeder y-Wert ist die Hälfte vom x-Wert, aber mit umgekehrtem Vorzeichen.', feedback: 'Die Hälfte von 3 wäre 1,5. Hier wurde x : y statt y : x gerechnet.' },
                 {
@@ -766,8 +772,8 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
                   feedback: 'Genau: Bei x = 1 ist die Gerade bei −2, bei x = −2 bei 4. Alle Punkte aus dem Protokoll liegen darauf.',
                 },
                 {
-                  text: <MiniGraph linie={{ m: 0, t: -2 }} label="Waagrechte Gerade, die die y-Achse bei −2 schneidet" />,
-                  feedback: 'Bei dieser waagrechten Geraden kommt für jedes x −2 heraus. Das wäre die Gleichung y = −2, nicht y = −2x.',
+                  text: <MiniGraph linie={{ m: -4 }} label="Gerade durch den Ursprung, die sehr steil nach rechts fällt" />,
+                  feedback: 'Diese Gerade ist zu steil: Bei x = 1 ist sie schon bei −4, Maschine B gibt aber −2 aus.',
                 },
               ]}
             />
@@ -903,8 +909,8 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
                 </>
               }
               options={[
-                { text: <M>{'y = x + 2'}</M>, feedback: 'Das passt nur zum ersten Paar: 1 + 2 = 3. Prüfe das zweite Paar: 2 + 2 = 4, nicht 6.' },
-                { text: <M>{'y = x + 3'}</M>, feedback: 'Hier wird 3 addiert. Dann käme bei x = 1 aber 4 heraus. Prüfe mit y : x, mit welcher Zahl malgenommen wird.' },
+                { text: <M>{'y = 6x'}</M>, feedback: 'Bei x = 1 käme dann 6 heraus, nicht 3. Die 6 ist nur der y-Wert bei x = 2. Rechne y : x.' },
+                { text: <M>{'y = \\tfrac{1}{3}x'}</M>, feedback: 'Hier wurde x : y statt y : x gerechnet. Bei x = 3 käme dann 1 heraus, nicht 9.' },
                 { text: <M>{'y = 3x'}</M>, correct: true, feedback: '3 : 1 = 3, 6 : 2 = 3, 9 : 3 = 3. Immer mal 3, also y = 3x.' },
                 { text: <M>{'y = 9x'}</M>, feedback: 'Bei x = 1 käme dann 9 heraus, nicht 3. Die 9 ist nur der letzte y-Wert.' },
               ]}
@@ -940,9 +946,9 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
                     <MiniProtokoll
                       name="Maschine 3"
                       paare={[
-                        [1, 5],
-                        [2, 5],
-                        [3, 5],
+                        [1, 0],
+                        [2, 0],
+                        [3, 0],
                       ]}
                     />
                     <MiniProtokoll
@@ -961,7 +967,7 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
                 { text: 'Maschine 2', feedback: 'Maschine 2 nimmt jedes x mal −3. Negative Zahlen sind erlaubt, sie ist eine Funktion.' },
                 {
                   text: 'Maschine 3',
-                  feedback: 'Bei Maschine 3 kommt immer 5 heraus. Das ist erlaubt: Verschiedene x dürfen dasselbe y haben. Verboten ist nur, dass ein x zwei verschiedene y bekommt.',
+                  feedback: 'Maschine 3 nimmt jedes x mal 0, es kommt immer 0 heraus. Das ist erlaubt: Verschiedene x dürfen dasselbe y haben. Verboten ist nur, dass ein x zwei verschiedene y bekommt.',
                 },
                 { text: 'Maschine 4', correct: true, feedback: 'Genau: Für x = 2 kommt einmal 4 und einmal −4 heraus. Zu einem x gehören zwei y, das ist keine Funktion.' },
               ]}

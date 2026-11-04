@@ -277,6 +277,19 @@ function SeitenAnsicht({
                 </button>
               </div>
             )}
+            {/* Noch nicht alles gelöst: Am Seitenende steht statt „Weiter“ ein Hinweis, was noch fehlt */}
+            {!erledigt[i] && i < seiten.length - 1 && (
+              <div className="sl-weiter-unten sl-weiter-gesperrt" role="status">
+                <i className="fa-solid fa-lock" aria-hidden="true" />
+                <p>
+                  <strong>
+                    {s.bedingung ? `Um weiterzukommen: ${s.bedingung}` : 'Um weiterzukommen, musst du alle Aufgaben dieser Seite richtig lösen.'}
+                  </strong>{' '}
+                  {offen(i) && <>Stand: {offen(i)}. </>}
+                  Dann erscheint hier der Knopf „Weiter“.
+                </p>
+              </div>
+            )}
           </section>
         ))}
       </HeftBestaetigtCtx.Provider>

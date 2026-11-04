@@ -124,6 +124,19 @@
   .ls-rechnung-u { padding-left: 4px; }
   .ls-rechnung .ls-gap.lp-input-sm { width: 52px; padding: 4px 2px; }
 }
+/* Wertetabelle mit Lücken (CheckCard wertetabelle): Lücken direkt in der Tabelle */
+.ls-wt-wrap { max-width: 100%; overflow-x: auto; }
+.ls-wt { border-collapse: collapse; font-size: 19px; }
+.ls-wt th, .ls-wt td { border: 1.5px solid var(--line-strong); height: 52px; min-width: 60px; padding: 4px 10px; text-align: center; vertical-align: middle; background: var(--surface); }
+.ls-wt th { background: var(--surface-sunken); }
+.ls-wt td.ls-wt-luecke { padding: 4px; }
+.ls-wt .ls-gap.lp-input-sm { width: 72px; }
+@media (max-width: 520px) {
+  .ls-wt { font-size: 16px; }
+  .ls-wt th, .ls-wt td { min-width: 40px; padding: 4px 6px; }
+  .ls-wt td.ls-wt-luecke { padding: 3px; }
+  .ls-wt .ls-gap.lp-input-sm { width: 52px; padding: 4px 2px; }
+}
 /* Fallback, falls die Zeilen trotzdem zu breit sind (lange Schrittnamen): Umformung unter der rechten Seite */
 .ls-rechnung.ls-rechnung-eng, .sl-seite .ls-rechnung.ls-rechnung-eng { grid-template-columns: auto auto; }
 .ls-rechnung-eng .ls-rechnung-u { grid-column: 2; padding-left: 0; margin-top: -4px; }

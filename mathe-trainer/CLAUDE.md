@@ -71,7 +71,7 @@ nicht nur auf einen Feature-Branch. Vorher `main` aktualisieren und mergen, kein
 
 Jede Lernsituation hat genau vier Phasen in fester Reihenfolge: **1 Warm-up**, **2 Problem erkennen**, **3 Problem lösen**,
 **4 Wissen prüfen und vertiefen** (mindestens 3–4 Übungsaufgaben). Seit 2026-10-24 steht **jede Phase auf genau einer Seite**
-(`Seite.pflicht` + `fertig.teil('…')`, „Weiter“ erst, wenn alle Pflichtaufgaben gelöst sind; dann steht „Weiter zu …“ automatisch auch am Seitenende). „Problem lösen“ (seit 2026-10-25): Problem oben, `BeispielMitVideo`
+(`Seite.pflicht` + `fertig.teil('…')`, „Weiter“ erst, wenn alle Pflichtaufgaben gelöst sind; dann steht „Weiter zu …“ automatisch auch am Seitenende, vorher dort der Hinweis „Um weiterzukommen, musst du alle Aufgaben dieser Seite richtig lösen“). „Problem lösen“ (seit 2026-10-25): Problem oben, `BeispielMitVideo`
 (ein breiter Knopf, oben das Rechenbeispiel, danach das eingebettete Lernvideo, nie davor), „Vergleiche deine Ergebnisse“ (CheckCard nur mit den Endergebnissen
 aus dem Heft, `Hilfen`, `loesungNachFehler`), **keine** Fehlersuche (kein Kasten „Prüfe deine Zwischenergebnisse …“ unter
 den Ergebnissen, seit 2026-10-27 entfernt), ggf. Entscheidung, Handlungsprodukt mit Kriterien, Rückbezug und Merke. Hat „Problem lösen“ mehrere Teilprobleme, steht jedes auf einer eigenen Seite (Ausnahme von „eine Seite pro Phase“, seit 2026-10-30, Vorlage `LaborEinstieg.tsx`); Teil 2 erst nach richtig gelöstem Teil 1 usw. Keine `WegWahl` mehr. Vorlage: `VereinsbusEinstieg.tsx`. Seitenansicht und Phasen sonst wie `finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx`. Namen und Reihenfolge der Phasen stehen nur in `PHASEN`
