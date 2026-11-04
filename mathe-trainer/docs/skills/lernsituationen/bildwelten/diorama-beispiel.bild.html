@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- Bildwelt Diorama, Beispiel Vereinsbus: isometrische Insel, per Skript aus Quadern gebaut (box, poly, P)
+     Rendern: node scripts/bilder-rendern.cjs <diese Datei> <ziel.webp>  (Element #bild wird gerendert) -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Gochi+Hand&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const W=1200,H=600,ox=600,oy=140,k=1;
+const c=Math.cos(Math.PI/6),s=Math.sin(Math.PI/6);
+const P=(x,y,z)=>[ox+(x-y)*c*k, oy+(x+y)*s*k - z*k];
+const poly=(pts,fill,extra='')=>'<polygon points="'+pts.map(p=>P(...p).join(',')).join(' ')+'" fill="'+fill+'" '+extra+'/>';
+function box(x,y,z,w,d,h,top,left,right){return poly([[x,y+d,z],[x+w,y+d,z],[x+w,y+d,z+h],[x,y+d,z+h]],left)+poly([[x+w,y,z],[x+w,y+d,z],[x+w,y+d,z+h],[x+w,y,z+h]],right)+poly([[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]],top);}
+let g='';
+// floating island
+g+=box(-20,-20,-60,440,440,60,'#9fd18f','#9a7650','#7f6040');g+=box(-20,-20,-8,440,440,8,'#9fd18f','#6fa465','#5d8c55');
+g+=poly([[-20,-20,0],[420,-20,0],[420,420,0],[-20,420,0]],'#9fd18f');
+// path
+g+=poly([[150,-20,0.5],[230,-20,0.5],[230,420,0.5],[150,420,0.5]],'#e9dcc0');
+// clubhouse
+g+=box(10,20,0,120,150,80,'#f4efe6','#e3d9c7','#cfc3ad');
+g+=poly([[10,20,80],[130,20,80],[130,95,120],[10,95,120]],'#d86b4a');
+g+=poly([[10,95,120],[130,95,120],[130,170,80],[10,170,80]],'#b8553a');
+g+=poly([[130,20,80],[130,95,120],[130,170,80]],'#c45f43');
+for(let i=0;i<3;i++){g+=poly([[130.5,35+i*45,30],[130.5,60+i*45,30],[130.5,60+i*45,55],[130.5,35+i*45,55]],'#7fb3d5');}
+// bus
+const bx=260,by=110;
+g+=box(bx,by,6,90,200,70,'#ffffff','#2f6db3','#255a96');
+g+=poly([[bx,by+200,6],[bx+90,by+200,6],[bx+90,by+200,28],[bx,by+200,28]],'#1f4e79')+poly([[bx+90,by,6],[bx+90,by+200,6],[bx+90,by+200,28],[bx+90,by,28]],'#1a4268');
+for(let i=0;i<4;i++){g+=poly([[bx+90.5,by+15+i*45,45],[bx+90.5,by+50+i*45,45],[bx+90.5,by+50+i*45,68],[bx+90.5,by+15+i*45,68]],'#bfe0f5');}
+g+=poly([[bx+5,by+200.5,40],[bx+85,by+200.5,40],[bx+85,by+200.5,70],[bx+5,by+200.5,70]],'#bfe0f5');
+[[bx+90,by+40],[bx+90,by+160]].forEach(([x,y])=>{const [px,py]=P(x,y,8);g+='<ellipse cx="'+px+'" cy="'+py+'" rx="13" ry="17" fill="#222" transform="rotate(-30 '+px+' '+py+')"/>';});
+// coin stacks: savings per year
+const stacks=[1,2,3,4,5];
+stacks.forEach((n,i)=>{const x=60+i*0, y=230+i*38; for(let j=0;j<n*2;j++){const [px,py]=P(x+i*0,y,4+j*7);g+='<ellipse cx="'+px+'" cy="'+(py+3)+'" rx="17" ry="9" fill="#c99a2e"/><ellipse cx="'+px+'" cy="'+py+'" rx="17" ry="9" fill="#f2c94c"/>';}});
+// trees
+[[395,10],[395,60],[380,400],[300,405],[10,400]].forEach(([x,y])=>{g+=box(x-4,y-4,0,8,8,26,'#8a6a45','#7a5a35','#6a4a2a');const [px,py]=P(x,y,26);g+='<circle cx="'+px+'" cy="'+(py-22)+'" r="26" fill="#4f9a5d"/><circle cx="'+(px-8)+'" cy="'+(py-30)+'" r="12" fill="#6bb877"/>';});
+// labels
+const [lx,ly]=P(60,420,0);
+const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600"><defs><radialGradient id="bg" cx=".5" cy=".4" r=".8"><stop offset="0" stop-color="#f3efe4"/><stop offset="1" stop-color="#dfe7ee"/></radialGradient><filter id="sh"><feGaussianBlur stdDeviation="18"/></filter></defs><rect width="1200" height="600" fill="url(#bg)"/><ellipse cx="600" cy="560" rx="330" ry="28" fill="#5b6b7a" opacity=".25" filter="url(#sh)"/>'+g+
+'<g font-family="Inter, sans-serif" font-weight="700" fill="#24323f"><text x="120" y="510" font-size="22">Jahr 1 … Jahr 5</text><text x="120" y="538" font-size="18" font-weight="500" fill="#53606c">je 4.000 € Rücklage</text><text x="930" y="150" font-size="22">Ziel: 24.000 €</text><text x="930" y="178" font-size="18" font-weight="500" fill="#53606c">neuer Vereinsbus</text></g>'+
+'<path d="M200 488 L268 318" stroke="#24323f" stroke-width="2" fill="none" stroke-dasharray="4 5"/><path d="M925 160 L780 265" stroke="#24323f" stroke-width="2" fill="none" stroke-dasharray="4 5"/></svg>';
+document.getElementById('bild').innerHTML=svg;
+</script>
+</body></html>

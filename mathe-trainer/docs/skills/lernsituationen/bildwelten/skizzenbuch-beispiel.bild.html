@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- Bildwelt Skizzenbuch, Beispiel Vereinsbus: kariertes Papier, Bleistift mit Wackel-Filter, Aquarell-Flecken, Handschrift-Notizen
+     Rendern: node scripts/bilder-rendern.cjs <diese Datei> <ziel.webp>  (Element #bild wird gerendert) -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Gochi+Hand&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+
+<svg id="bild" xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+ <defs>
+  <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+   <path d="M24 0H0V24" fill="none" stroke="#9fb7c9" stroke-width="0.8" opacity=".55"/>
+  </pattern>
+  <filter id="paper"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="3"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .42  0 0 0 .09 0"/><feComposite in2="SourceGraphic" operator="in"/><feBlend in2="SourceGraphic" mode="multiply"/></filter>
+  <filter id="wobble"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="5"/></filter>
+  <filter id="wobble2"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="21"/><feDisplacementMap in="SourceGraphic" scale="4"/></filter>
+  <filter id="pencil"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"/><feColorMatrix in="n" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.6 1.25" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in"/></filter>
+  <filter id="wash" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".022" numOctaves="4" seed="11"/><feDisplacementMap in="SourceGraphic" scale="46"/><feGaussianBlur stdDeviation="2.2"/></filter>
+  <filter id="washEdge" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="3" seed="4"/><feDisplacementMap in="SourceGraphic" scale="30"/><feMorphology operator="erode" radius="1"/></filter>
+ </defs>
+ <rect width="1200" height="600" fill="#fbf8f1"/>
+ <rect width="1200" height="600" fill="url(#grid)"/>
+ <rect width="1200" height="600" fill="#fbf8f1" filter="url(#paper)" opacity=".9"/>
+ <!-- tape -->
+ <rect x="40" y="24" width="150" height="38" fill="#e9c46a" opacity=".55" transform="rotate(-6 115 43)"/>
+ <rect x="1010" y="22" width="150" height="38" fill="#e9c46a" opacity=".55" transform="rotate(5 1085 41)"/>
+ <!-- watercolor washes -->
+ <g style="mix-blend-mode:multiply">
+  <ellipse cx="520" cy="330" rx="330" ry="150" fill="#c98a2e" opacity=".33" filter="url(#wash)"/>
+  <ellipse cx="560" cy="470" rx="420" ry="40" fill="#6b8f71" opacity=".35" filter="url(#wash)"/>
+  <ellipse cx="980" cy="180" rx="120" ry="90" fill="#4f7ca8" opacity=".22" filter="url(#wash)"/>
+ </g>
+ <!-- bus pencil drawing -->
+ <g fill="none" stroke="#2c2a27" stroke-linecap="round" stroke-linejoin="round" filter="url(#pencil)">
+  <g filter="url(#wobble)" stroke-width="3.2">
+   <path d="M230 455 L230 270 Q232 228 278 224 L720 220 Q790 222 812 275 L842 360 Q850 385 850 410 L850 455 Z"/>
+   <path d="M262 290 L262 350 L700 346 L700 288 Z"/>
+   <path d="M376 289 L376 349 M488 288 L488 348 M598 288 L598 347"/>
+   <path d="M720 288 L770 288 L806 350 L720 350 Z"/>
+   <path d="M232 390 L848 392"/>
+   <path d="M610 360 L610 452 M690 360 L690 452" />
+   <circle cx="345" cy="458" r="44"/><circle cx="345" cy="458" r="18"/>
+   <circle cx="720" cy="458" r="44"/><circle cx="720" cy="458" r="18"/>
+   <path d="M820 405 L846 405 L846 425 L824 425 Z"/>
+  </g>
+  <g filter="url(#wobble2)" stroke-width="1.6" opacity=".75">
+   <path d="M236 458 L236 268 Q238 232 280 228 L716 224 Q786 226 806 278 L836 362"/>
+   
+   <path d="M120 503 L1080 500"/>
+   <path d="M150 512 L300 511 M820 510 L1040 508" opacity=".6"/>
+  </g>
+ </g>
+ <!-- hatching shadow -->
+ <g stroke="#2c2a27" stroke-width="1.2" opacity=".35" filter="url(#wobble2)">
+  <path d="M250 505 l14 -10"/><path d="M272 505 l14 -10"/><path d="M294 505 l14 -10"/><path d="M316 505 l14 -10"/><path d="M338 505 l14 -10"/><path d="M360 505 l14 -10"/><path d="M382 505 l14 -10"/><path d="M404 505 l14 -10"/><path d="M426 505 l14 -10"/><path d="M448 505 l14 -10"/><path d="M470 505 l14 -10"/><path d="M492 505 l14 -10"/><path d="M514 505 l14 -10"/><path d="M536 505 l14 -10"/><path d="M558 505 l14 -10"/><path d="M580 505 l14 -10"/><path d="M602 505 l14 -10"/><path d="M624 505 l14 -10"/><path d="M646 505 l14 -10"/><path d="M668 505 l14 -10"/><path d="M690 505 l14 -10"/><path d="M712 505 l14 -10"/><path d="M734 505 l14 -10"/><path d="M756 505 l14 -10"/><path d="M778 505 l14 -10"/><path d="M800 505 l14 -10"/><path d="M822 505 l14 -10"/><path d="M844 505 l14 -10"/>
+ </g>
+ <!-- label on bus -->
+ <text x="330" y="425" font-family="Gochi Hand" font-size="30" fill="#2c2a27" opacity=".85" transform="rotate(-1 330 425)">SV Grünwald</text>
+ <!-- annotations -->
+ <g font-family="Caveat" fill="#1f4e79" font-weight="700">
+  <text x="850" y="150" font-size="40" transform="rotate(-4 850 150)">neuer Bus in 5 Jahren?</text>
+  <text x="880" y="198" font-size="34" transform="rotate(-4 880 198)">kostet ca. 24.000 €</text>
+  <path d="M935 214 C 900 240, 860 238, 820 248" stroke="#1f4e79" stroke-width="3" fill="none" filter="url(#wobble2)"/>
+  <path d="M820 248 l16 -12 M820 248 l18 6" stroke="#1f4e79" stroke-width="3" fill="none"/>
+  <text x="70" y="170" font-size="36" transform="rotate(-3 70 170)">jedes Jahr</text>
+  <text x="70" y="212" font-size="36" transform="rotate(-3 70 212)">4.000 € zurücklegen</text>
+  <path d="M150 226 C 170 262, 205 270, 232 278" stroke="#1f4e79" stroke-width="3" fill="none" filter="url(#wobble2)"/>
+  <path d="M232 278 l-18 -2 M232 278 l-8 -16" stroke="#1f4e79" stroke-width="3" fill="none"/>
+ </g>
+ <g font-family="Caveat" fill="#b5462e" font-weight="700">
+  <text x="900" y="420" font-size="44" transform="rotate(3 900 420)">reicht das?</text>
+  <path d="M900 432 q 90 10 180 2" stroke="#b5462e" stroke-width="3" fill="none" filter="url(#wobble2)"/>
+  <text x="935" y="482" font-size="32" transform="rotate(3 935 482)">Zins: 3 % p. a.</text>
+ </g>
+</svg>
+</body></html>
