@@ -1,7 +1,8 @@
 import { useId, type ReactNode } from 'react'
 import { fmt } from '../../daten_und_zufall/lernpfad/kit'
 
-// Bilder der Lernsituation „Die Funktionsmaschine“: Koordinatensystem, die Maschine (Leitobjekt), Titelbild und Karteikarte.
+// Bilder der Lernsituation „Die Funktionsmaschine“: Koordinatensystem und die Maschine (Leitobjekt). Titelbild und Karteikarte sind
+// gerenderte WebP-Dateien (bilder-quelle/*.bild.html → bilder/*.webp, Bildwelt Skizzenbuch).
 // Flächen in Themenfarbe und Themenfarbe-hell, Linien in --ink, Ausgaben und neue Punkte in --highlight.
 
 /** Zahl als Text mit Komma und echtem Minus, z. B. „−1,5“ */
@@ -225,89 +226,6 @@ export function MaschinenBild({
         <text x="498" y="208" textAnchor="middle" fontSize={!lauf && fehler ? 19 : 23} fontWeight="800" fill={!lauf && fehler ? 'var(--wrong-ink)' : 'var(--ink)'}>
           {ausgabe}
         </text>
-      </g>
-    </svg>
-  )
-}
-
-/* ── Identität ───────────────────────────────────────────────────────────── */
-
-/** Titelbild der Startbox: Zahlen wandern in die Maschine, die Ausgabe ist noch offen; rechts deuten Punkte auf einer Geraden den Graphen an */
-export function Titelbild() {
-  return (
-    <svg
-      viewBox="0 0 720 250"
-      role="img"
-      aria-label="Eine Funktionsmaschine mit Zahnrädern. Oben wird die Zahl 2 eingeworfen, in der Mitte steht eine geheime Regel mit Fragezeichen, rechts kommt eine unbekannte Zahl y heraus. Daneben liegen drei Zahlenkärtchen und ein Koordinatensystem mit Punkten auf einer Geraden."
-    >
-      {/* Zahlenkärtchen, die auf den Einwurf warten */}
-      {[
-        { x: 22, y: 30, n: '5', r: -8 },
-        { x: 70, y: 18, n: '−3', r: 6 },
-        { x: 128, y: 34, n: '0', r: -4 },
-      ].map((k) => (
-        <g key={k.n} transform={`rotate(${k.r} ${k.x + 22} ${k.y + 22})`}>
-          <rect x={k.x} y={k.y} width="44" height="44" rx="8" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-          <text x={k.x + 22} y={k.y + 30} textAnchor="middle" fontSize="21" fontWeight="800" fill="var(--ink)">
-            {k.n}
-          </text>
-        </g>
-      ))}
-      <MaschinenBild name="Funktionsmaschine" ein="2" label="" platz={{ x: 140, y: 44, width: 440, height: 196 }} />
-      {/* Koordinatensystem mit drei Punkten auf einer Geraden durch den Ursprung */}
-      <g transform="translate(652 130)">
-        <line x1="-54" x2="54" y1="0" y2="0" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="0" x2="0" y1="80" y2="-80" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="-44" y1="66" x2="44" y2="-66" stroke="var(--primary)" strokeWidth="3" strokeDasharray="8 6" />
-        {[-24, 12, 34].map((x) => (
-          <circle key={x} cx={x} cy={-1.5 * x} r="7" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        ))}
-      </g>
-    </svg>
-  )
-}
-
-/** Handlungsprodukt: Karteikarte „Maschinen-Steckbrief“ mit vier Feldern und Stift */
-export function SteckbriefBild() {
-  return (
-    <svg
-      viewBox="0 0 720 200"
-      role="img"
-      aria-label="Eine Karteikarte mit der Überschrift Maschinen-Steckbrief. Sie ist in vier Felder geteilt: Regel in Worten, Wertetabelle, Graph und Gleichung. Daneben liegt ein Stift."
-    >
-      <rect x="120" y="10" width="460" height="182" rx="8" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="120" y="10" width="460" height="38" rx="8" fill="var(--primary-soft)" />
-      <line x1="120" x2="580" y1="48" y2="48" stroke="var(--primary)" strokeWidth="2" />
-      <text x="140" y="37" fontSize="20" fontWeight="800" fill="var(--ink)">
-        Maschinen-Steckbrief: Maschine B
-      </text>
-      <line x1="350" x2="350" y1="48" y2="192" stroke="var(--line-strong)" strokeWidth="2" />
-      <line x1="120" x2="580" y1="120" y2="120" stroke="var(--line-strong)" strokeWidth="2" />
-      <text x="134" y="70" fontSize="15" fontWeight="700" fill="var(--primary)">
-        Regel in Worten
-      </text>
-      <line x1="134" x2="320" y1="96" y2="96" stroke="var(--line-strong)" strokeWidth="2" />
-      <text x="364" y="70" fontSize="15" fontWeight="700" fill="var(--primary)">
-        Wertetabelle
-      </text>
-      {[0, 1, 2, 3, 4].map((i) => (
-        <rect key={i} x={364 + i * 40} y="80" width="40" height="30" fill="none" stroke="var(--line-strong)" strokeWidth="1.5" />
-      ))}
-      <text x="134" y="142" fontSize="15" fontWeight="700" fill="var(--primary)">
-        Graph
-      </text>
-      <line x1="200" x2="300" y1="158" y2="158" stroke="var(--ink)" strokeWidth="1.5" />
-      <line x1="250" x2="250" y1="126" y2="188" stroke="var(--ink)" strokeWidth="1.5" />
-      <line x1="226" y1="134" x2="274" y2="182" stroke="var(--primary)" strokeWidth="3" />
-      <text x="364" y="142" fontSize="15" fontWeight="700" fill="var(--primary)">
-        Gleichung
-      </text>
-      <text x="364" y="174" fontSize="22" fontWeight="800" fontStyle="italic" fill="var(--ink)">
-        y = …
-      </text>
-      <g transform="rotate(-35 650 120)">
-        <rect x="600" y="110" width="110" height="18" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-        <polygon points="600,110 584,119 600,128" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
       </g>
     </svg>
   )

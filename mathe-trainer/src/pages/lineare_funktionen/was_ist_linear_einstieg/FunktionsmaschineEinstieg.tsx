@@ -2,11 +2,13 @@ import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent, type
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, parseInput } from '../../daten_und_zufall/lernpfad/kit'
 import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
-import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
+import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Bildwelt, type Seite, type Thema } from '../lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
 import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
 import { parseLinearEquation } from '../../../utils/parseLinearEquation'
-import { Bruecke, KoSystem, MaschinenBild, Protokoll, SteckbriefBild, Titelbild, zahl, type Linie } from './bilder'
+import { Bruecke, KoSystem, MaschinenBild, Protokoll, zahl, type Linie } from './bilder'
+import titelBild from './bilder/titel.webp'
+import steckbriefBild from './bilder/steckbrief.webp'
 import ZeichenRoboter from './ZeichenRoboter'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './funktionsmaschine.css'
@@ -31,9 +33,24 @@ import './funktionsmaschine.css'
 // Punkte nach Aufwand: Warm-up 6 × 2 = 12, Tipp 3, Satz A 3, Satz B 3, Kernaufgabe 15, Graph wählen 4, Steckbrief 5, Übungen 4/4/5/8,
 // Profi 8 (Pflicht zusammen 66: Warm-up 12 = 18 %, Problem lösen 27 = 41 %, Übungen 21 = 32 %), Bonus-Spiel 4 Runden à 2 = 8 wie die beste Übung.
 // Identität: Themenfarbe Schiefer, Symbol fa-gears, Titelbild Funktionsmaschine mit Zahlenkärtchen, Leitobjekt die Funktionsmaschine.
+// Bildwelt Skizzenbuch / kariert (seit 2026-11-04): Titelbild und Steckbrief sind gerenderte WebP-Dateien aus bilder-quelle/*.bild.html
+// (node scripts/bilder-rendern.cjs src/pages/lineare_funktionen/was_ist_linear_einstieg), Maschine und Graphen bleiben Code mit Bleistiftstrich.
 // Wird als Modus „Lernsituation“ auf der Seite „Was ist eine lineare Funktion?“ angezeigt.
 
-const THEMA: Thema = { name: 'Die Funktionsmaschine', farbe: 'schiefer', icon: 'fa-gears', bild: <Titelbild /> }
+const THEMA: Thema = {
+  name: 'Die Funktionsmaschine',
+  farbe: 'schiefer',
+  icon: 'fa-gears',
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Bleistiftskizze einer Funktionsmaschine mit Zahnrädern auf kariertem Papier. Die Zahlenkärtchen 5, −3 und 0 fliegen in den Einwurf, oben steht x = 2, in der Mitte eine geheime Regel mit Fragezeichen, rechts die Ausgabe y = ?. Notizen: Zahl x rein, Zahl y raus, Welche Regel steckt dahinter?"
+    />
+  ),
+}
+const BILDWELT: Bildwelt = { welt: 'skizzenbuch', variante: 'kariert' }
 
 /* ── Maschine A (Problem erkennen): y = 2x ───────────────────────────────── */
 
@@ -132,7 +149,7 @@ function MaschineA({
   const paare = paareAus([...START_A, ...wuerfe], M_A)
   return (
     <div className="fm-tipp" data-no-autocheck>
-      <div className="fm-maschine">
+      <div className="fm-maschine sl-skizze">
         <MaschinenBild
           name="Maschine A"
           ein={lauf ? lauf.x : letzter === undefined ? undefined : zahl(letzter)}
@@ -255,7 +272,7 @@ function Grenze({ onWurf, onFehler }: { onWurf: (x: number) => void; onFehler: (
       </div>
       {leer && <p className="sl-hinweis">Trage eine Zahl ein, z. B. 40.</p>}
       {(lauf || ergebnis) && (
-        <div className="fm-maschine">
+        <div className="fm-maschine sl-skizze">
           <MaschinenBild
             name="Maschine A"
             ein={lauf ? lauf.x : ergebnis?.ein}
@@ -779,9 +796,14 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
             />
           </Abschnitt>
           <Handlungsprodukt titel="Maschinen-Steckbrief für Maschine B">
-            <div className="zk-bild zk-bild-klein">
-              <SteckbriefBild />
-            </div>
+            <figure className="sl-foto sl-foto-klein">
+              <img
+                src={steckbriefBild}
+                width={1200}
+                height={480}
+                alt="Eingeklebte Karteikarte mit der Überschrift Maschinen-Steckbrief: Maschine B. Vier leere Felder: Regel in Worten, Wertetabelle mit den Zeilen x und y, Graph mit Achsenkreuz und Gleichung y = … Daneben liegt ein Bleistift."
+              />
+            </figure>
             <p className="sl-text">
               Gestalte auf einer Karteikarte oder im Heft einen Steckbrief für Maschine B. Teile ihn in vier Felder: Regel in Worten, Wertetabelle für <M>x</M> von −2 bis 2, Graph
               und Funktionsgleichung. Schreibe darunter einen Satz, warum Maschine B eine Funktion ist.
@@ -1096,6 +1118,7 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             Du knackst die geheimen Regeln von Funktionsmaschinen. Dabei lernst du, was eine Funktion ist und wie du sie als Wertetabelle, Funktionsgraph und Funktionsgleichung{' '}
