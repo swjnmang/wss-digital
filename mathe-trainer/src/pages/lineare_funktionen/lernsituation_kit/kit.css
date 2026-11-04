@@ -101,7 +101,10 @@
 /* Lückenrechnung: Eingabefelder direkt in der Gleichung, Gleichheitszeichen untereinander */
 .ls-rechnung {
   display: grid;
-  grid-template-columns: auto minmax(0, auto) 1fr;
+  /* Alle Spalten auto (keine 1fr-Spalte): Neben einer 1fr-Spalte wird die rechte Seite nur so breit wie ihr
+     breitestes Stück (das Eingabefeld), dann rutscht das „=“ über die Lücke. */
+  grid-template-columns: auto auto auto;
+  justify-content: start;
   align-items: center;
   gap: 10px 8px;
   font-size: 19px;
@@ -110,7 +113,7 @@
 }
 .ls-rechnung-zeile { display: contents; }
 .ls-rechnung-l { justify-self: end; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
-/* Rechte Seite darf auf schmalen Bildschirmen umbrechen */
+/* Rechte Seite darf nur umbrechen, wenn sie wirklich nicht in die Karte passt */
 .ls-rechnung-r { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 4px; min-width: 0; }
 .ls-rechnung-u { color: var(--ink-muted); white-space: nowrap; padding-left: 10px; }
 /* Schmale Bildschirme: Umformung bleibt rechts neben der Gleichung, dafür kleinere Schrift und Lücken */
