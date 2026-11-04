@@ -52,8 +52,8 @@
 .et-head-text { flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .et-kicker { font: 700 13px/1.2 var(--font-body); letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.9; }
 .et-head h2 { margin: 0; font: 800 24px/1.2 var(--font-display); color: #fff; }
-.et-meta { display: flex; flex-wrap: wrap; gap: 8px; }
-.et-meta .ls-chip { border-color: transparent; }
+div.et-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+div.et-meta .ls-chip { border-color: transparent; }
 .et-body { display: flex; flex-direction: column; gap: 18px; padding: 18px; background: var(--et-soft); }
 @media (max-width: 639px) { .et-body { padding: 14px 10px; } .et-head { padding: 12px 14px; } }
 .et-body p { margin: 0; font-size: 17px; line-height: 1.6; color: var(--ink); }
