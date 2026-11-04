@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- Bildwelt Diorama / Sommerwiese, Bild zum Handlungsprodukt: Bauplan-Skizze für den Jugendrat (Blatt auf der Bühne).
+     Zeigt nur die Form des Produkts (Koordinatensystem, Auffahrten vom Ursprung, ein Steigungsdreieck mit Δx, Δy, m = ?), keine Lösung. -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:480px"></div>
+<script>
+// Blatt (gerade Aufsicht), Raster 1 m = 40 px
+const X0=380, Y0=420, k=38;
+const sx=a=>X0+a*k, sy=b=>Y0-b*k;
+let g='';
+for(let i=0;i<=9;i++) g+='<line x1="'+sx(i)+'" y1="'+sy(0)+'" x2="'+sx(i)+'" y2="'+sy(7)+'" stroke="#d3e3ec" stroke-width="1.5"/>';
+for(let j=0;j<=7;j++) g+='<line x1="'+sx(0)+'" y1="'+sy(j)+'" x2="'+sx(9)+'" y2="'+sy(j)+'" stroke="#d3e3ec" stroke-width="1.5"/>';
+g+='<line x1="'+sx(0)+'" y1="'+sy(0)+'" x2="'+(sx(9)+18)+'" y2="'+sy(0)+'" stroke="#24323f" stroke-width="3"/><line x1="'+sx(0)+'" y1="'+sy(0)+'" x2="'+sx(0)+'" y2="'+(sy(7)-18)+'" stroke="#24323f" stroke-width="3"/>';
+g+='<text x="'+(sx(9)+10)+'" y="'+(sy(0)+30)+'" font-family="Fredoka" font-size="24" font-weight="500" fill="#24323f">x in m</text><text x="'+(sx(0)+14)+'" y="'+(sy(7)-2)+'" text-anchor="start" font-family="Fredoka" font-size="24" font-weight="500" fill="#24323f">y in m</text>';
+// zwei blasse Auffahrten (nur angedeutet) und eine mit Steigungsdreieck
+g+='<line x1="'+sx(0)+'" y1="'+sy(0)+'" x2="'+sx(8)+'" y2="'+sy(6.2)+'" stroke="#9fb3bf" stroke-width="4" stroke-linecap="round"/>';
+g+='<line x1="'+sx(0)+'" y1="'+sy(0)+'" x2="'+sx(8.6)+'" y2="'+sy(2.4)+'" stroke="#9fb3bf" stroke-width="4" stroke-linecap="round"/>';
+g+='<polygon points="'+sx(2)+','+sy(1.1)+' '+sx(7)+','+sy(1.1)+' '+sx(7)+','+sy(3.85)+'" fill="#f2c94c" opacity=".55"/>';
+g+='<line x1="'+sx(0)+'" y1="'+sy(0)+'" x2="'+sx(8.4)+'" y2="'+sy(4.62)+'" stroke="#0e6670" stroke-width="6" stroke-linecap="round"/>';
+g+='<path d="M'+sx(2)+' '+sy(1.1)+' H'+sx(7)+' V'+sy(3.85)+'" stroke="#24323f" stroke-width="3.5" stroke-dasharray="10 7" fill="none"/>';
+const T=(x,y,txt,col,anchor='start',size=28)=>'<text x="'+x+'" y="'+y+'" text-anchor="'+anchor+'" font-family="Fredoka" font-size="'+size+'" font-weight="600" fill="'+col+'" paint-order="stroke" stroke="#fff" stroke-width="7" stroke-linejoin="round">'+txt+'</text>';
+g+=T((sx(2)+sx(7))/2, sy(1.1)+30,'Δx = ?','#24323f','middle');
+g+=T(sx(7)+12, sy(2.5)+10,'Δy = ?','#24323f');
+g+=T(sx(8.5)+8, sy(4.6)-4,'m = ?','#0e6670');
+const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480"><defs><radialGradient id="bg" cx=".5" cy=".4" r=".85"><stop offset="0" stop-color="#f6f9fb"/><stop offset="1" stop-color="#dbe7ee"/></radialGradient><filter id="sh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#2a4a5c" flood-opacity=".28"/></filter></defs><rect width="1200" height="480" fill="url(#bg)"/>'
++'<g transform="rotate(-1.5 600 240)"><rect x="250" y="34" width="700" height="420" rx="22" fill="#fff" filter="url(#sh)"/>'
++'<text x="290" y="78" font-family="Fredoka" font-size="32" font-weight="600" fill="#0e6670">Bauplan-Skizze für den Jugendrat</text>'+g+'</g>'
+// Bleistift
++'<g transform="translate(985 330) rotate(-58)"><rect x="0" y="-9" width="150" height="18" rx="3" fill="#f2c94c"/><rect x="0" y="-9" width="150" height="6" fill="#f7da7a"/><rect x="138" y="-9" width="16" height="18" rx="3" fill="#e58c8c"/><polygon points="0,-9 -24,0 0,9" fill="#e9d2a8"/><polygon points="-16,-3 -24,0 -16,3" fill="#24323f"/></g>'
++'</svg>';
+document.getElementById('bild').innerHTML=svg;
+</script>
+</body></html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- Bildwelt Diorama / Sommerwiese, Lernsituation „Der Bikepark“: die drei geplanten Auffahrten A, B, C als Holzkeile auf einer Wiese.
+     A: 6 m lang, 3 m hoch · B: 4 m lang, 3 m hoch · C: 4 m lang, 2 m hoch (verrät die Steigung nicht).
+     Rendern: node scripts/bilder-rendern.cjs src/pages/lineare_funktionen/steigung_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const ox=430,oy=96,c=Math.cos(Math.PI/6),s=Math.sin(Math.PI/6);
+const P=(x,y,z)=>[ox+(x-y)*c, oy+(x+y)*s - z];
+const poly=(pts,fill,extra='')=>'<polygon points="'+pts.map(p=>P(...p).join(',')).join(' ')+'" fill="'+fill+'" '+extra+'/>';
+function box(x,y,z,w,d,h,top,left,right){return poly([[x,y+d,z],[x+w,y+d,z],[x+w,y+d,z+h],[x,y+d,z+h]],left)+poly([[x+w,y,z],[x+w,y+d,z],[x+w,y+d,z+h],[x+w,y,z+h]],right)+poly([[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]],top);}
+// Keil: unten bei y0+L, oben (Höhe H) bei y0 – steigt auf dem Bild nach rechts oben; die Dreiecksseite zeigt nach vorn
+function keil(x,y0,W,L,H){
+  let g=poly([[x,y0+L,0],[x+W,y0+L,0],[x+W,y0,H],[x,y0,H]],'#e7b46a','stroke="rgba(0,0,0,.12)"');
+  for(let i=1;i<9;i++){const t=i/9,yy=y0+L*(1-t);g+='<line x1="'+P(x,yy,H*t)[0]+'" y1="'+P(x,yy,H*t)[1]+'" x2="'+P(x+W,yy,H*t)[0]+'" y2="'+P(x+W,yy,H*t)[1]+'" stroke="rgba(90,55,20,.28)" stroke-width="2"/>';}
+  g+=poly([[x+W,y0+L,0],[x+W,y0,0],[x+W,y0,H]],'#c98b3c');
+  return g;
+}
+const u=32;
+let g='';
+g+=box(-40,-40,-46,560,330,46,'#9fd18f','#8a6a45','#73573a');
+g+=box(-40,-40,-8,560,330,8,'#9fd18f','#78b06b','#679a5c');
+g+=poly([[-40,250,0.5],[520,250,0.5],[520,290,0.5],[-40,290,0.5]],'#e9dcc0');
+const W=60;
+const rampen=[{n:'A',L:6,H:3,x:20},{n:'B',L:4,H:3,x:190},{n:'C',L:4,H:2,x:360}];
+const Y=0;
+rampen.forEach(r=>{const y0=Y+(6-r.L)*u/2; g+=keil(r.x,y0,W,r.L*u,r.H*u);});
+[[505,-25],[505,40],[-25,275],[480,275]].forEach(([x,y])=>{g+=box(x-4,y-4,0,8,8,24,'#8a6a45','#7a5a35','#6a4a2a');const [px,py]=P(x,y,24);g+='<circle cx="'+px+'" cy="'+(py-20)+'" r="24" fill="#4f9a5d"/><circle cx="'+(px-8)+'" cy="'+(py-28)+'" r="11" fill="#6bb877"/>';});
+let t='';
+rampen.forEach((r,i)=>{
+  const y0=Y+(6-r.L)*u/2;
+  const [sx,sy]=P(r.x+W, y0+r.L*u*0.25, r.H*u*0.3);
+  const tx=[170,480,790][i], ty=[575,575,575][i];
+  t+='<path d="M'+sx+' '+sy+' L'+(tx+60)+' '+(ty-72)+'" stroke="#24323f" stroke-width="2" fill="none" stroke-dasharray="4 5"/><circle cx="'+sx+'" cy="'+sy+'" r="5" fill="#24323f"/>';
+  t+='<g font-family="Fredoka, sans-serif" paint-order="stroke" stroke="#eef4f7" stroke-width="8" stroke-linejoin="round"><text x="'+tx+'" y="'+(ty-32)+'" font-size="34" font-weight="600" fill="#0e6670">Auffahrt '+r.n+'</text>';
+  t+='<text x="'+tx+'" y="'+ty+'" font-size="25" font-weight="500" fill="#24323f">'+r.L+' m lang, '+r.H+' m hoch</text></g>';
+});
+const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600"><defs><radialGradient id="bg" cx=".45" cy=".35" r=".85"><stop offset="0" stop-color="#f6f9fb"/><stop offset="1" stop-color="#dbe7ee"/></radialGradient><filter id="sh"><feGaussianBlur stdDeviation="18"/></filter></defs><rect width="1200" height="600" fill="url(#bg)"/><ellipse cx="640" cy="416" rx="330" ry="24" fill="#5b6b7a" opacity=".22" filter="url(#sh)"/>'+g+t+'</svg>';
+document.getElementById('bild').innerHTML=svg;
+</script>
+</body></html>

@@ -1,0 +1,27 @@
+/* Lernsituation „Der Bikepark“ (Präfix bp-). Gerüst und Bildwelt Diorama kommen aus lernsituation_kit (seiten.css, bildwelten.css);
+   hier stehen nur die Bausteine dieser Seite: Graphen, Auswahlknöpfe und das Bonus-Spiel. */
+
+/* Graphen in gut lesbarer Größe, mittig */
+.bp-bild { padding: 8px; }
+.bp-bild svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+.bp-bild-klein svg { max-height: 320px; }
+
+/* Vermutung und Auffahrten auflegen: große Tippziele, auf dem Handy zweispaltig */
+.bp-wahl-block { display: flex; flex-direction: column; gap: 12px; }
+.bp-wahl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.bp-wahl-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.bp-wahl .bk-btn { min-height: 52px; justify-content: center; font-size: 18px; white-space: normal; text-align: center; line-height: 1.25; }
+@media (max-width: 640px) {
+  .bp-wahl, .bp-wahl-3 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+.bp-punkt { display: inline-block; width: 16px; height: 16px; border-radius: 5px; border: 2px solid #fff; flex: none; }
+
+/* Bonus-Spiel */
+.bp-spiel { display: flex; flex-direction: column; gap: 12px; }
+.bp-spiel-kopf { display: flex; justify-content: space-between; align-items: center; font: 600 20px/1.2 var(--font-display); }
+.bp-muenzen { display: inline-flex; gap: 6px; font-size: 20px; color: var(--line-strong); }
+.bp-muenze-an { color: var(--highlight); }
+.bp-spiel-frage { margin: 0; font-size: 18px; }
+.bp-spiel-bild { display: block; width: 100%; max-width: 460px; height: auto; margin: 0 auto; }
+.bp-spiel-ende { margin: 0; font-size: 18px; line-height: 1.5; }
+.bp-spiel-ende i { color: var(--primary); }
