@@ -297,6 +297,8 @@ type NumField = { kind: 'num'; key: string; label: ReactNode; expected: number; 
 export type Seg = string | { luecke: string; breit?: boolean }
 /** Zeile einer Lückenrechnung: linke Seite = rechte Seite, optional mit Umformung (TeX, z. B. '\\mid -3') */
 export type Zeile = { l: Seg[]; r: Seg[]; u?: string }
+/** Wertetabelle mit Lücken: Zeilen x und y (Kopf als TeX), Zellen als TeX-Text oder Lücke. Die SuS vervollständigen die Tabelle selbst. */
+export type Wertetabelle = { kopf?: [string, string]; x: Seg[]; y: Seg[] }
 type SelectField = { kind: 'select'; key: string; label: ReactNode; options: string[]; expected: number }
 /** Vollständig eingetippte lineare Funktionsgleichung, z. B. „y = 0,2x + 1“ (m und t sind die richtigen Werte) */
 type GleichungField = { kind: 'gleichung'; key: string; label: ReactNode; m: number; t: number; tol?: number }
@@ -327,6 +329,7 @@ export function CheckCard({
   prompt,
   lead,
   rechnung,
+  wertetabelle,
   fields,
   fieldsRow = false,
   solution,
@@ -348,6 +351,8 @@ export function CheckCard({
   lead?: ReactNode
   /** Rechnung mit Lücken: Die Zahlenfelder, auf die eine Lücke verweist, stehen direkt in der Gleichung statt darunter */
   rechnung?: Zeile[]
+  /** Wertetabelle mit Lücken: Die Zahlenfelder, auf die eine Lücke verweist, stehen direkt in der Tabelle statt darunter */
+  wertetabelle?: Wertetabelle
   fields: CField[]
   /** Felder nebeneinander statt untereinander */
   fieldsRow?: boolean
@@ -427,7 +432,7 @@ export function CheckCard({
     return () => ro.disconnect()
   }, [rechnung])
 
-  const inlineKeys = new Set((rechnung ?? []).flatMap((z) => [...z.l, ...z.r]).flatMap((seg) => (typeof seg === 'string' ? [] : [seg.luecke])))
+  const inlineKeys = new Set([...(rechnung ?? []).flatMap((z) => [...z.l, ...z.r]), ...(wertetabelle ? [...wertetabelle.x, ...wertetabelle.y] : [])].flatMap((seg) => (typeof seg === 'string' ? [] : [seg.luecke])))
   const listFields = fields.filter((f) => !inlineKeys.has(f.key))
 
   const segment = (seg: Seg, i: number) => {
@@ -456,6 +461,26 @@ export function CheckCard({
       <CardHead title={title} level={level} />
       <div className="lp-ex-prompt">{prompt}</div>
       {rechnen && <HeftHinweis />}
+      {wertetabelle && (
+        <div className="ls-wt-wrap">
+          <table className="ls-wt">
+            <tbody>
+              {(['x', 'y'] as const).map((z, zi) => (
+                <tr key={z}>
+                  <th scope="row">
+                    <InlineMath math={wertetabelle.kopf?.[zi] ?? z} />
+                  </th>
+                  {wertetabelle[z].map((seg, i) => (
+                    <td key={i} className={typeof seg === 'string' ? undefined : 'ls-wt-luecke'}>
+                      {segment(seg, i)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
       {rechnung && (
         <div className="ls-rechnung" ref={rechnungRef}>
           {rechnung.map((z, i) => (

@@ -7,11 +7,12 @@ import { zahl } from './bilder'
 // Bonus-Spiel „Zeichenroboter“ am Ende der Lernsituation „Die Funktionsmaschine“: Zwei Münzen liegen im Koordinatensystem
 // auf einer Geraden durch den Ursprung. Die SuS wählen die Funktionsgleichung, mit der der Roboter eine Gerade durch beide
 // Münzen zeichnet. Die Gerade wird erst nach der Wahl gezeichnet, damit man sie nicht ablesen kann.
-// Die falschen Gleichungen sind typische Fehler: Vorzeichen von m falsch, Kehrwert (x : y statt y : x), plus statt mal.
+// Die falschen Gleichungen sind typische Fehler: Vorzeichen von m falsch, Kehrwert (x : y statt y : x), y-Wert einer Münze als m genommen.
+// Nur Gleichungen vom Typ y = m · x (kein + t, das kommt erst in der nächsten Lernsituation).
 // Vier Runden, jede Runde mit beiden Münzen bringt eine Münze (je 2 Punkte, zusammen höchstens 8 wie die beste Übungsaufgabe).
 // Bedienung: Gleichung antippen oder Pfeiltasten, dann „Zeichnen!“ bzw. Enter. Keine Uhr.
 
-type Fehler = 'richtig' | 'vorzeichen' | 'kehrwert' | 'plus'
+type Fehler = 'richtig' | 'vorzeichen' | 'kehrwert' | 'ywert'
 type Wahl = { m: number; t: number; art: Fehler }
 type Runde = { muenzen: { x: number; y: number }[]; wahl: Wahl[] }
 type Phase = 'start' | 'wahl' | 'zeichnen' | 'ergebnis' | 'ende'
@@ -42,11 +43,14 @@ function neueRunde(): Runde {
       { x: x1, y: m * x1 },
       { x: x2, y: m * x2 },
     ]
+    // Typischer Fehler: der y-Wert der Münze wird als m genommen (nur, wenn er sich von den anderen Wahlen unterscheidet)
+    const mY = m * x1
+    if ([m, -m, 1 / m].some((v) => Math.abs(v - mY) < 1e-9)) continue
     const wahl: Wahl[] = [
       { m, t: 0, art: 'richtig' },
       { m: -m, t: 0, art: 'vorzeichen' },
       { m: 1 / m, t: 0, art: 'kehrwert' },
-      { m: 1, t: m * x1 - x1, art: 'plus' },
+      { m: mY, t: 0, art: 'ywert' },
     ]
     return { muenzen, wahl: mischen(wahl) }
   }
@@ -64,7 +68,7 @@ const ERKLAERUNG: Record<Fehler, string> = {
   richtig: 'Treffer! Die Gerade geht durch beide Münzen.',
   vorzeichen: 'Bei dieser Gleichung stimmt das Vorzeichen von m nicht: Die Gerade steigt statt zu fallen (oder umgekehrt). Rechne bei einer Münze y : x und achte auf das Minus.',
   kehrwert: 'Hier wurde x : y statt y : x gerechnet. m bekommst du, wenn du y durch x teilst.',
-  plus: 'Hier wurde eine Zahl addiert statt malgenommen. Die Gerade geht nicht durch den Ursprung und trifft nur eine Münze.',
+  ywert: 'Hier wurde der y-Wert einer Münze als m genommen. m bekommst du, wenn du bei einer Münze y durch x teilst.',
 }
 
 export default function ZeichenRoboter() {
