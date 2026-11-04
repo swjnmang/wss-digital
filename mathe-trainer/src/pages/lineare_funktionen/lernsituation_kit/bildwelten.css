@@ -1,0 +1,118 @@
+/* Bildwelten der Lernsituationen (SeitenLernsituation mit bildwelt, siehe docs/skills/lernsituationen/SKILL.md, Abschnitt „Bildwelten“).
+   Eine Bildwelt ändert Untergrund, Schriften, Bildsprache und die Form von Fokus, Karten und Knöpfen, nie das Layout.
+   Klassen: .sl-welt-<welt> und .sl-variante-<variante> an der Startbox und an der Seitenansicht. */
+
+@import '@fontsource/nunito/400.css';
+@import '@fontsource/nunito/600.css';
+@import '@fontsource/nunito/700.css';
+@import '@fontsource/nunito/800.css';
+@import '@fontsource/caveat/600.css';
+@import '@fontsource/caveat/700.css';
+
+/* Gemeinsam: eingeklebte bzw. eingebundene Bilder (gerenderte WebP-Dateien) */
+.sl-foto { margin: 0 auto; width: 100%; max-width: 860px; }
+.sl-foto img { display: block; width: 100%; height: auto; }
+.sl-foto-klein { max-width: 620px; }
+.sl-start-bild img { display: block; width: 100%; height: auto; }
+
+/* ══ A Skizzenbuch ═══════════════════════════════════════════════════════════════════════════════════════════
+   Ein Notizbuch, in dem jemand den Fall durchdenkt: Papier, Bleistift, Aquarell, Notizzettel, Klebeband.
+   Handschrift (Caveat) nur für Titel, Kennung und Notizen, nie für Aufgaben, Formeln oder Eingaben. */
+.sl-welt-skizzenbuch {
+  --font-body: 'Nunito', 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Nunito', 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --font-hand: 'Caveat', 'Segoe Print', cursive;
+  --sk-papier: #fbf8f1;
+  --sk-raster: rgba(110, 150, 185, 0.2);
+  --sk-bleistift: #2c2a27;
+  --sk-tinte: #1f4e79;
+  --sk-zettel: #fff4b8;
+  --sk-band: rgba(233, 196, 106, 0.62);
+  --sk-schatten: 0 1px 0 rgba(44, 42, 39, 0.06), 0 14px 26px -18px rgba(44, 42, 39, 0.45);
+  --sk-rund: 14px 4px 12px 5px / 5px 12px 4px 14px;
+  --grid: #d3e0ea;
+  font-family: var(--font-body);
+}
+/* Untergrund kariert (5-mm-Raster) */
+.sl-welt-skizzenbuch.sl-variante-kariert { --sk-untergrund: linear-gradient(var(--sk-raster) 1px, transparent 1px) 0 0 / 24px 24px, linear-gradient(90deg, var(--sk-raster) 1px, transparent 1px) 0 0 / 24px 24px, var(--sk-papier); }
+
+/* Startbox und jede Seite sind ein Blatt im Notizbuch */
+.sl-start.sl-welt-skizzenbuch,
+.sl-welt-skizzenbuch .sl-seite {
+  position: relative;
+  background: var(--sk-untergrund, var(--sk-papier));
+  border: 0;
+  border-radius: 3px;
+  box-shadow: var(--sk-schatten);
+}
+.sl-welt-skizzenbuch .sl-seite { padding: 26px clamp(16px, 3vw, 40px) 34px; margin-top: 10px; }
+.sl-start.sl-welt-skizzenbuch { max-width: 860px; padding: 0 clamp(16px, 3vw, 34px) 30px; }
+.sl-start.sl-welt-skizzenbuch .sl-start-bild { width: calc(100% + 2 * clamp(16px, 3vw, 34px)); margin: 0 calc(-1 * clamp(16px, 3vw, 34px)) 4px; background: none; }
+/* Klebeband oben an jedem Blatt */
+.sl-welt-skizzenbuch .sl-seite::before,
+.sl-welt-skizzenbuch .sl-seite::after {
+  content: ''; position: absolute; top: -9px; width: 110px; height: 26px; background: var(--sk-band); pointer-events: none;
+}
+.sl-welt-skizzenbuch .sl-seite::before { left: 28px; transform: rotate(-4deg); }
+.sl-welt-skizzenbuch .sl-seite::after { right: 28px; transform: rotate(3deg); }
+
+/* Handschrift für Titel, Kennung und Zwischenüberschriften */
+.sl-welt-skizzenbuch .sl-titel,
+.sl-start.sl-welt-skizzenbuch h2 { font: 700 38px/1.05 var(--font-hand); color: var(--sk-bleistift); }
+.sl-welt-skizzenbuch .sl-abschnitt-titel { font: 700 31px/1.1 var(--font-hand); color: var(--sk-bleistift); }
+.sl-welt-skizzenbuch .sl-abschnitt-titel i { font-size: 20px; }
+.sl-welt-skizzenbuch .sl-marke { font: 700 22px/1 var(--font-hand); background: transparent; color: var(--sk-bleistift); }
+.sl-welt-skizzenbuch .sl-text,
+.sl-welt-skizzenbuch .sl-start-ziel { font-size: 18px; color: var(--sk-bleistift); }
+
+/* Fokus = Notizzettel mit Klebestreifen */
+.sl-welt-skizzenbuch .sl-fokus {
+  position: relative; margin-top: 8px; padding: 18px 20px 16px;
+  background: var(--sk-zettel); border-radius: 2px; box-shadow: 0 10px 18px -14px rgba(44, 42, 39, 0.55);
+  transform: rotate(-0.3deg);
+}
+.sl-welt-skizzenbuch .sl-fokus::before {
+  content: ''; position: absolute; top: -11px; left: 50%; width: 96px; height: 22px; margin-left: -48px;
+  background: var(--sk-band); transform: rotate(-2deg); pointer-events: none;
+}
+.sl-welt-skizzenbuch .sl-fokus-titel { font: 700 28px/1.1 var(--font-hand); color: var(--sk-tinte); }
+.sl-start.sl-welt-skizzenbuch .sl-start-regel { background: var(--sk-zettel); border-radius: 2px; box-shadow: 0 10px 18px -14px rgba(44, 42, 39, 0.55); }
+.sl-start.sl-welt-skizzenbuch .sl-start-check { background: #fff; border: 2px solid var(--sk-bleistift); border-radius: var(--sk-rund); }
+
+/* Karten: weiße Zettel mit Bleistiftrand */
+.sl-welt-skizzenbuch .sl-seite .lp-ex.bk-panel,
+.sl-welt-skizzenbuch .sl-seite .lp-example,
+.sl-welt-skizzenbuch .sl-seite .bk-graph {
+  background: #fff; border: 1.5px solid rgba(44, 42, 39, 0.6); border-radius: var(--sk-rund);
+  box-shadow: 2px 3px 0 rgba(44, 42, 39, 0.12);
+}
+/* Knöpfe wie mit dem Stift umrandet */
+.sl-welt-skizzenbuch .sl-seite .bk-btn,
+.sl-start.sl-welt-skizzenbuch .bk-btn { border: 2px solid var(--sk-bleistift); border-radius: var(--sk-rund); box-shadow: 2px 2px 0 var(--sk-bleistift); }
+.sl-welt-skizzenbuch .sl-seite .bk-btn:active,
+.sl-start.sl-welt-skizzenbuch .bk-btn:active { box-shadow: none; }
+.sl-welt-skizzenbuch .sl-phasen li { border-radius: var(--sk-rund); background: #fff; }
+.sl-welt-skizzenbuch .sl-weiter-gesperrt { background: #fff; border-color: rgba(44, 42, 39, 0.45); border-radius: var(--sk-rund); }
+
+/* Eingeklebte Bilder: weißer Rand, leicht schräg */
+.sl-welt-skizzenbuch .sl-foto { background: #fff; padding: 8px; box-shadow: var(--sk-schatten); transform: rotate(-0.5deg); }
+.sl-welt-skizzenbuch .sl-foto:nth-of-type(even) { transform: rotate(0.5deg); }
+
+/* Skizzen mit Bleistiftstrich: Umrisse leicht wackelig (Filter #sl-skizze aus seiten.tsx), nur an Zeichnungen mit dicken Linien
+   (Klasse sl-skizze, z. B. die Maschine). Koordinatensysteme bleiben exakt, damit man genau ablesen kann; sie bekommen nur Bleistiftfarben. */
+.sl-welt-skizzenbuch .sl-skizze svg rect,
+.sl-welt-skizzenbuch .sl-skizze svg polygon,
+.sl-welt-skizzenbuch .sl-skizze svg circle { filter: url(#sl-skizze); }
+.sl-welt-skizzenbuch .bk-graph { --ink: var(--sk-bleistift); }
+.sl-welt-skizzenbuch .bk-graph svg text { font-family: var(--font-body); }
+/* Formeln in handschriftlichen Überschriften nicht riesig werden lassen */
+.sl-welt-skizzenbuch .sl-abschnitt-titel .katex,
+.sl-welt-skizzenbuch .sl-titel .katex { font-size: 0.72em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sl-welt-skizzenbuch .sl-fokus, .sl-welt-skizzenbuch .sl-foto { transform: none; }
+}
+@media (max-width: 560px) {
+  .sl-welt-skizzenbuch .sl-titel, .sl-start.sl-welt-skizzenbuch h2 { font-size: 32px; }
+  .sl-welt-skizzenbuch .sl-seite::after { display: none; }
+}

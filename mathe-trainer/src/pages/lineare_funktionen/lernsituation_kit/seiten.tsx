@@ -7,6 +7,7 @@ import { PunkteAnzeige, PunkteGruppeCtx, PunkteProvider } from './punkte';
 import { VideoEmbed } from '../../../components/VideoButton';
 import './phasen.css';
 import './seiten.css';
+import './bildwelten.css';
 
 // Seitenansicht einer Lernsituation: zuerst eine Startbox, in der die SuS bestätigen, dass sie alle Rechenschritte im Heft
 // dokumentieren. Danach eine Seite pro Phase. „Weiter“ wird erst frei, wenn die Seite erledigt ist (fertig() bzw. alle fertig.teil() der pflicht wurden
@@ -27,6 +28,30 @@ export const THEMEN = {
 
 /** Identität einer Lernsituation: Name, Themenfarbe, Symbol (Font-Awesome-Klasse) und Titelbild für die Startbox */
 export type Thema = { name: string; farbe: keyof typeof THEMEN; icon: string; bild?: ReactNode };
+
+/**
+ * Bildwelt einer Lernsituation (siehe docs/skills/lernsituationen/SKILL.md, Abschnitt „Bildwelten“): ändert Bilder, Schriften und
+ * Untergrund, nie das Layout. Stile in bildwelten.css über die Klassen sl-welt-<welt> und sl-variante-<variante>.
+ */
+export type Bildwelt =
+  | { welt: 'skizzenbuch'; variante: 'kariert' }
+  | { welt: 'reportage'; variante: string }
+  | { welt: 'diorama'; variante: string };
+
+const weltKlassen = (b?: Bildwelt) => (b ? ` sl-welt sl-welt-${b.welt} sl-variante-${b.variante}` : '');
+
+/** SVG-Filter der Bildwelt Skizzenbuch: leicht wackeliger Bleistiftstrich für Skizzen und Graphen (CSS: filter: url(#sl-skizze)) */
+function WeltFilter({ bildwelt }: { bildwelt?: Bildwelt }) {
+  if (bildwelt?.welt !== 'skizzenbuch') return null;
+  return (
+    <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: 'absolute' }}>
+      <filter id="sl-skizze" filterUnits="userSpaceOnUse" x="-2000" y="-2000" width="6000" height="6000">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7" />
+        <feDisplacementMap in="SourceGraphic" scale="3" />
+      </filter>
+    </svg>
+  );
+}
 
 const themaStil = (t?: Thema) =>
   t
@@ -59,6 +84,7 @@ export type Seite = {
 
 /**
  * ruhig: ruhiges Grunddesign (eine Spalte, eine Akzentfarbe, keine Farbstreifen), siehe docs/skills/lernsituationen/SKILL.md.
+ * bildwelt: Bildwelt mit Unter-Variante (Skizzenbuch, Reportage, Diorama), siehe bildwelten.css.
  * punkte: Gamification (Punkte in der Leiste, Abzüge für Hilfen und Lösungsweg, Serien-Bonus; Bilanz mit <Bilanz /> aus punkte.tsx).
  */
 export function SeitenLernsituation(props: {
@@ -66,6 +92,7 @@ export function SeitenLernsituation(props: {
   seiten: Seite[];
   ruhig?: boolean;
   thema?: Thema;
+  bildwelt?: Bildwelt;
   punkte?: boolean;
 }) {
   const { pathname } = useLocation();
@@ -90,12 +117,14 @@ function SeitenAnsicht({
   seiten,
   ruhig = false,
   thema,
+  bildwelt,
   neuBeginnen,
 }: {
   ziel: ReactNode;
   seiten: Seite[];
   ruhig?: boolean;
   thema?: Thema;
+  bildwelt?: Bildwelt;
   neuBeginnen: () => void;
 }) {
   // Der Stand überlebt Zurück und Neuladen (30 Minuten ab der letzten Aktion, siehe utils/sitzung.ts)
@@ -126,9 +155,10 @@ function SeitenAnsicht({
   if (!bestaetigt) {
     return (
       <div
-        className={`sl-start${ruhig ? ' sl-ruhig' : ''}${thema ? ' sl-thema' : ''}`}
+        className={`sl-start${ruhig ? ' sl-ruhig' : ''}${thema ? ' sl-thema' : ''}${weltKlassen(bildwelt)}`}
         style={themaStil(thema)}
       >
+        <WeltFilter bildwelt={bildwelt} />
         {thema?.bild ? (
           <div className="sl-start-bild">{thema.bild}</div>
         ) : (
@@ -183,9 +213,10 @@ function SeitenAnsicht({
 
   return (
     <div
-      className={`sl${ruhig ? ' sl-ruhig' : ''}${thema ? ' sl-thema' : ''}`}
+      className={`sl${ruhig ? ' sl-ruhig' : ''}${thema ? ' sl-thema' : ''}${weltKlassen(bildwelt)}`}
       style={themaStil(thema)}
     >
+      <WeltFilter bildwelt={bildwelt} />
       <div className="sl-bar">
         {thema && (
           <span className="sl-marke" title={thema.name}>
