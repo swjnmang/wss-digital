@@ -1,0 +1,47 @@
+/* Lernsituation Annuitätendarlehen „Die Solaranlage“ (Präfix sa-). Farben kommen über --primary aus dem Thema,
+   Untergrund, Schriften und Bildrahmen aus der Bildwelt (bildwelten.css, Skizzenbuch / kugelschreiber). */
+
+/* Tilgungsplan wie in den Übungsaufgaben */
+.sa-plan { white-space: nowrap; }
+.sa-plan td { text-align: right; font-variant-numeric: tabular-nums; }
+.sa-plan-eingabe th { white-space: normal; min-width: 64px; }
+.sa-plan-eingabe td { padding: 4px 6px; }
+.sa-plan-fest td, .sa-plan-fest th { color: var(--ink-muted); }
+.sa-feld { width: 120px; min-height: 44px; font-size: 17px; padding: 4px 8px; text-align: right; }
+
+/* Festlegung und Darlehensrechner */
+.sa-wahl { display: flex; flex-direction: column; gap: 12px; }
+.sa-rechner { display: flex; flex-direction: column; gap: 12px; }
+.sa-rechner-titel { margin: 6px 0 0; font: 700 28px/1.1 var(--font-hand, var(--font-display)); color: var(--primary); }
+.sa-rechner-titel i { font-size: 20px; margin-right: 6px; }
+.sa-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; font-size: 17px; }
+.sa-eingabe-feld { display: inline-flex; align-items: center; gap: 6px; }
+.sa-eingabe .bk-btn { min-height: 48px; }
+.sa-diagramm svg { display: block; width: 100%; height: auto; max-width: 760px; margin: 0 auto; }
+.sa-anzeige { display: flex; gap: 10px; align-items: flex-start; font-size: 17px; line-height: 1.5; padding: 10px 14px; border-radius: 10px; background: var(--primary-soft); }
+.sa-anzeige i { color: var(--primary); margin-top: 4px; }
+.sa-anzeige-ok { background: var(--correct-soft); }
+.sa-anzeige-ok i { color: var(--correct); }
+.sa-erkenntnis { margin: 0; }
+
+/* Bonus-Spiel Schuldenberg */
+.sa-spiel { display: flex; flex-direction: column; gap: 12px; }
+.sa-spiel-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 800 17px/1.3 var(--font-display); color: var(--primary); }
+.sa-muenzen { display: flex; gap: 6px; font-size: 20px; color: var(--line-strong); }
+.sa-muenzen .sa-muenze-an { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.sa-spiel-bild { display: block; width: 100%; height: auto; max-height: 260px; }
+.sa-spiel-frage { margin: 0; font-size: 18px; line-height: 1.5; }
+.sa-spiel-muenzen { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 620px) { .sa-spiel-muenzen { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sa-muenze {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 64px; padding: 8px;
+  border: 2.5px solid var(--ink); border-radius: 999px; background: var(--highlight); color: var(--ink);
+  font: 800 18px/1.2 var(--font-body); font-variant-numeric: tabular-nums; cursor: pointer;
+}
+.sa-muenze small { font-size: 13px; font-weight: 700; opacity: 0.7; }
+.sa-muenze:disabled { cursor: default; opacity: 0.55; }
+.sa-muenze.sa-muenze-richtig { background: var(--correct-soft); border-color: var(--correct); opacity: 1; }
+.sa-muenze.sa-muenze-falsch { background: var(--wrong-soft); border-color: var(--wrong); opacity: 1; }
+.sa-muenze:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.sa-spiel-ende { margin: 0; font: 800 20px/1.4 var(--font-display); color: var(--ink); }
+.sa-spiel-ende i { color: var(--primary); margin-right: 6px; }

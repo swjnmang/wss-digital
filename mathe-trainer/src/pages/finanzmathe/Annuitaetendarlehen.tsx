@@ -312,7 +312,7 @@ export default function Annuitaetendarlehen() {
   );
 
   return (
-    <TaskShell title="Annuitätendarlehen: Tilgungsplan" width="wide">
+    <TaskShell title="Annuitätendarlehen: Tilgungsplan" width="wide" parent={{ to: '/finanzmathe/annuitaetendarlehen', label: 'Annuitätendarlehen' }}>
     <div className="flex flex-col">
       <div className="flex flex-col items-center w-full">
         <div className="bk-panel w-full max-w-5xl flex flex-col items-center p-6 sm:p-8">

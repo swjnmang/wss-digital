@@ -1,0 +1,40 @@
+<!doctype html>
+<!-- Lernsituation „Die Solaranlage“: Handlungsprodukt Beratungsblatt (kleines Bild, 800 × 400). Bildwelt Skizzenbuch / blanko + Kugelschreiber. -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<svg id="bild" xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+ <defs>
+  <filter id="paper"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="3"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .52  0 0 0 .07 0"/><feComposite in2="SourceGraphic" operator="in"/><feBlend in2="SourceGraphic" mode="multiply"/></filter>
+  <filter id="wobble"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="4"/></filter>
+  <filter id="wobble2"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="21"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+  <filter id="kuli"><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="9" result="n"/><feColorMatrix in="n" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.2 1.35" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in"/></filter>
+  <filter id="marker" x="-10%" y="-30%" width="120%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".04 .3" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="9"/></filter>
+ </defs>
+ <rect width="800" height="400" fill="#f3f4f7"/>
+ <g transform="rotate(-2 400 200)">
+  <rect x="200" y="22" width="400" height="360" fill="#fdfdfb" stroke="#b9bfd0" stroke-width="1.5"/>
+  <rect x="200" y="22" width="400" height="360" fill="#fdfdfb" filter="url(#paper)"/>
+  <g font-family="Caveat" font-weight="700" fill="#24389c">
+   <text x="224" y="70" font-size="34">Beratungsblatt Fr. Lorenz</text>
+   <path d="M224 82 q 160 -4 300 -2" stroke="#24389c" stroke-width="2.5" fill="none" filter="url(#wobble2)"/>
+   <text x="224" y="118" font-size="24">K₀ = 27.500 € − 3.500 € = …</text>
+  </g>
+  <g stroke="#1f3290" stroke-width="2" fill="none" filter="url(#wobble2)">
+   <path d="M224 140 H576 M224 168 H576 M224 196 H576 M224 224 H576"/>
+   <path d="M264 140 V224 M368 140 V224 M420 140 V224 M472 140 V224"/>
+  </g>
+  <g font-family="Caveat" font-weight="700" fill="#24389c" font-size="22">
+   <text x="236" y="161">v</text><text x="276" y="161">Schuld</text><text x="386" y="161">T</text><text x="438" y="161">Z</text><text x="500" y="161">A</text>
+   <text x="238" y="189">1</text><text x="238" y="217">2</text>
+   <text x="224" y="262" font-size="25">A = …   T₁ = …   T₂ = …</text>
+   <text x="224" y="304" font-size="25">Liebe Frau Lorenz, …</text>
+  </g>
+  <g stroke="#24389c" stroke-width="1.6" opacity=".5" filter="url(#wobble2)"><path d="M224 330 H560 M224 356 H520"/></g>
+ </g>
+ <!-- Kugelschreiber -->
+ <g transform="rotate(32 660 260)">
+  <rect x="640" y="150" width="18" height="190" rx="8" fill="#2a3f9e" stroke="#1b2766" stroke-width="2"/>
+  <path d="M640 340 L649 372 L658 340 Z" fill="#cfd3de" stroke="#1b2766" stroke-width="2"/>
+  <rect x="636" y="150" width="26" height="22" rx="4" fill="#1b2766"/>
+ </g>
+</svg>
+</body></html>

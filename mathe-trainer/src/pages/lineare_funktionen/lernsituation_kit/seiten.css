@@ -184,4 +184,6 @@
 /* Sehr schmale Bildschirme: etwas weniger Abstand in der Leiste, damit „Weiter“ auch bei dreistelligen Punkten nicht übersteht */
 @media (max-width: 460px) {
   .sl-bar { gap: 5px; }
+  /* Seitenzähler (nur bei mehreren Teilen in „Problem lösen“) ausblenden, die Phasenleiste zeigt die Phase */
+  .sl-ruhig .sl-zaehler { display: none; }
 }
