@@ -11,7 +11,7 @@ Dieser Skill entwickelt **Einstiegs-Lernsituationen** für neue Mathe-Themen und
 - **Nur für den Themeneinstieg.** Vertiefende Übungsseiten laufen über den Skill `mathe-aufgaben`. Eine Lernsituation führt ein Thema ein und sichert die Kernidee, sie übt nicht ausführlich.
 - **Kein Lehrkraft-Material** auf der Seite. Alles richtet sich direkt an die SuS.
 - **Endgerät:** Tablet im **Querformat**. Jede Seite ist trotzdem **einspaltig** (siehe "Grundgerüst"). Nach unten scrollen ist erlaubt, zur Seite nie.
-- **Neueste Umsetzung mit allen aktuellen Regeln** (5 Warm-up-Aufgaben, Kriterium Begriffe und Abkürzungen, Bonus-Spiel, Punkte und Bilanz): `mathe-trainer/src/pages/finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Der Vereinsbus) mit `BusRallye.tsx`. Vorlage für **Punkte nach Aufwand** (Balancing): `mathe-trainer/src/pages/lineare_funktionen/schnittpunkt_einstieg/LaserEinstieg.tsx` (Die Lasershow) mit dem Spiel `KugelTreffer.tsx`.
+- **Neueste Umsetzung mit allen aktuellen Regeln** (5 Warm-up-Aufgaben, Bonus-Spiel, Punkte und Bilanz; die Kriterien des Handlungsprodukts dort noch in der alten Form, maßgeblich ist der Abschnitt "Handlungsprodukte"): `mathe-trainer/src/pages/finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Der Vereinsbus) mit `BusRallye.tsx`. Vorlage für **Punkte nach Aufwand** (Balancing): `mathe-trainer/src/pages/lineare_funktionen/schnittpunkt_einstieg/LaserEinstieg.tsx` (Die Lasershow) mit dem Spiel `KugelTreffer.tsx`.
 - **Vorlage Bildwelt Diorama** (Unter-Variante `sommerwiese`, isometrische Keile per Skript in `bilder-quelle/`): `mathe-trainer/src/pages/lineare_funktionen/steigung_einstieg/BikeparkEinstieg.tsx` (Der Bikepark).
 - **Vorlage Bildwelt Skizzenbuch** (Prop `bildwelt`, `bildwelten.css`, gerenderte Bilder in `bilder-quelle/` und `bilder/`, Maschine mit Bleistiftstrich über die Klasse `sl-skizze`): `mathe-trainer/src/pages/lineare_funktionen/was_ist_linear_einstieg/FunktionsmaschineEinstieg.tsx` (Die Funktionsmaschine).
 - **Referenz-Umsetzung:** `mathe-trainer/src/pages/finanzmathe/zinsrechnung_einstieg/AutogeldEinstieg.tsx` (Lenas Autogeld): eine Seite pro Phase und Phase 4 mit vier Übungsaufgaben. Achtung: Ihr "Problem lösen" hat noch den alten Aufbau mit `WegWahl`; maßgeblich für "Problem lösen" ist der Vereinsbus. Für Ausprobieren mit Live-Rückmeldung und Titelbilder zusätzlich `lineare_funktionen/nullstellen_einstieg/StromspeicherEinstieg.tsx` (nach neuer Fassung überarbeitet) und `quadratische_funktionen/funktionsgleichung_einstieg/TorbogenEinstieg.tsx` (noch ältere Aufteilung mit einer Aufgabe pro Seite) ansehen. Vor dem Bauen ansehen.
@@ -56,7 +56,7 @@ Lege ein kompaktes Konzept vor:
 - Lernziel in einem Satz
 - Plan der vier Phasen-Seiten: je Phase die Aufgaben, die Pflichtaufgaben für "Weiter" und die ungefähre Zeit
 - Das Problem in einem Satz (gegeben, gesucht), das passende Rechenbeispiel mit anderen Zahlen und die Ergebnisfelder
-- Handlungsprodukt mit 2 bis 4 Kriterien, dazu immer das Kriterium „Begriffe und Abkürzungen“
+- Handlungsprodukt mit den drei festen Kriterien (Abschnitt "Handlungsprodukte")
 - Passendes Lernvideo für das Rechenbeispiel (aus den Übungsaufgaben des Themas), falls vorhanden
 - Hilfen (drei gestufte Hilfen beim Ergebnis-Abgleich) und Niveaustufen
 - Der Aha- oder Widerspruchsmoment
@@ -142,7 +142,7 @@ Alles auf einer Seite, **immer in dieser Reihenfolge** von oben nach unten:
 3. **„Vergleiche deine Ergebnisse“** (`Abschnitt` mit einer `CheckCard`): Die SuS rechnen im Heft und tippen nur ihre **Endergebnisse** in die Felder („Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.“). Die Felder sind als Fragen formuliert (z. B. „Wie viel Geld ist am Ende des 6. Jahres auf dem Konto, wenn …?“), keine Vorstrukturierung des Rechenwegs. Dazu drei gestufte `Hilfen`, `loesungNachFehler`. Es gibt **keine** Wahl „Selbst rechnen / Mit Lösungsschema“ mehr (`WegWahl` nicht mehr verwenden).
 4. **Keine Fehlersuche:** Unter dem Ergebnis-Abgleich steht **kein** Kasten „Fehlersuche: Wo steckt der Fehler?“ bzw. „Prüfe deine Zwischenergebnisse …“ mit Feldern für Zwischenergebnisse (die Komponente `Fehlersuche` gibt es nicht mehr, seit 2026-10-27). Wer einen Fehler hat, nutzt die gestuften `Hilfen` und den Lösungsweg nach dem Fehlversuch.
 5. **Entscheidung** (wenn die Situation eine verlangt), z. B. per Auswahl "Welches Angebot empfiehlst du?".
-6. **Handlungsprodukt** (`Handlungsprodukt`): Auftrag, das Handlungsprodukt im Heft zu gestalten (Abschnitt "Handlungsprodukte"), mit kleinem Bild (Brief, Karteikarte, Plakat) und aufklappbaren Satzanfängen. Darunter die **Kriterien zum Abhaken** ("Ist deine Antwort vollständig?"). Ein Kriterium ist **immer**: unbekannte Begriffe und die Bedeutung aller Abkürzungen der Formel aufschreiben, konkret für das Thema benannt (z. B. „Was bedeuten K_n, r, q und n? r ist die Rate (Rente) …, außerdem: vorschüssig, nachschüssig“).
+6. **Handlungsprodukt** (`Handlungsprodukt`): Auftrag, das Handlungsprodukt im Heft zu gestalten (Abschnitt "Handlungsprodukte"), mit kleinem Bild (Brief, Karteikarte, Plakat) und aufklappbaren Satzanfängen. Darunter die **Kriterien zum Abhaken** ("Ist dein Aushang vollständig?"): immer genau die **drei kurzen festen Kriterien** aus dem Abschnitt "Handlungsprodukte" (`standardKriterien`), keine längere Liste.
 7. **"Das hältst du fest"**, sobald die Rechnung gelöst ist: Rückbezug auf die Festlegung bzw. die Versuche aus Phase 2 und der Merkkasten.
 
 Vorlage: `finanzmathe/rentenrechnung_einstieg/VereinsbusEinstieg.tsx` (Seite „Der Kontostand für den Vereinsbus“).
@@ -310,8 +310,12 @@ Das Handlungsprodukt entsteht in **"Problem lösen"**: Direkt nach dem Problem u
   - **Mehrere Darstellungen** → Hefteintrag mit Situation, Tabelle, Graph und Term
   - **Geschichte** → Comic-Strip in drei Bildern, Plakat
 - **Digital nur ausnahmsweise,** wenn es deutlich besser passt (z. B. eine eigene Aufgabe mit Prüffunktion erstellen und tauschen).
-- Jedes Handlungsprodukt hat einen klaren Auftrag und **2 bis 4 Kriterien**, die die SuS auf derselben Seite abhaken (`Kriterien`, Pflichtaufgabe). Satzanfänge oder ein Gerüst gibt es zum Aufklappen.
-- **Begriffe und Abkürzungen (Pflicht-Kriterium):** Zusätzlich zu den inhaltlichen Kriterien steht in jeder Kriterienliste ein Punkt, der die SuS auffordert, unbekannte Begriffe zu erklären und aufzuschreiben, wofür jede Abkürzung der Formel steht. Die Abkürzungen und Begriffe werden im Kriterium ausdrücklich genannt (z. B. Rentenrechnung: „Unter deinem Aushang steht, was K_n, r, q und n bedeuten (r ist die Rate, auch Rente genannt) und was vorschüssig und nachschüssig heißt“).
+- Jedes Handlungsprodukt hat einen klaren Auftrag. Was hineingehört (Rechnung, Skizze, Empfehlung …), steht im Auftrag und in den aufklappbaren Satzanfängen, **nicht** in den Kriterien.
+- **Kriterien zum Abhaken (seit 2026-11-05, Pflicht):** Unter dem Handlungsprodukt steht der Abschnitt „Ist dein <Produkt> vollständig?“ mit **genau diesen drei kurzen Kriterien** in dieser Reihenfolge (`Kriterien` mit `items={standardKriterien(…)}` aus `finanzmathe/zins_kit/zins_kit.tsx`, Pflichtaufgabe):
+  1. „Ich habe das Problem vollständig gelöst und alle Rechenschritte schriftlich festgehalten.“
+  2. „Ich habe einen Antwortsatz notiert, der das Problem beantwortet.“ (der Empfänger darf genannt werden, z. B. `standardKriterien('an Frau Kaya')` → „… einen Antwortsatz an Frau Kaya notiert …“)
+  3. „Offene Fragen habe ich mir notiert, damit ich sie klären kann.“
+- Keine weiteren Kriterien: keine Stolpersteine, keine Liste mit Begriffen und Abkürzungen, keine inhaltlichen Einzelpunkte. Jedes Kriterium passt in eine Zeile.
 - Über mehrere Lernsituationen hinweg wechselt die **Art** des Produkts (Rechenweg, Brief, Spickzettel, Concept Map, Skizze …).
 
 ## Grundgerüst
@@ -482,7 +486,7 @@ Anforderungen an einen guten Kontext:
 - [ ] Mindestens zwei Darstellungen werden verknüpft.
 - [ ] "Problem erkennen" und "Problem lösen" haben je mindestens ein inhaltliches Bild (gerendertes Sachbild in der Bildwelt oder Graph), das nichts von der Lösung verrät; beim Handlungsprodukt zeigt ein kleines Bild, was entstehen soll.
 - [ ] Titelbild und Sachbilder sind echte WebP-Dateien aus `bilder-quelle/*.bild.html`, mit `scripts/bilder-rendern.cjs` gerendert, angesehen und fehlerfrei; Quelle und WebP sind committet, jedes Bild hat einen `alt`-Text.
-- [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat 2 bis 4 Kriterien zum Abhaken, dazu das Kriterium „unbekannte Begriffe und Bedeutung der Abkürzungen der Formel aufschreiben“ mit den konkreten Abkürzungen.
+- [ ] Das Handlungsprodukt wird in "Problem lösen" eingefordert, ist überwiegend analog, passt zum Inhalt und hat genau die drei festen Kriterien zum Abhaken (`standardKriterien`: Problem gelöst und Rechenschritte festgehalten, Antwortsatz, offene Fragen notiert).
 - [ ] "Wissen prüfen und vertiefen" hat mindestens 3, besser 4 passende Übungsaufgaben (Basis bis Erweiterung) und darunter die Abschluss-Buttons.
 - [ ] Gamification an: `SeitenLernsituation` mit `punkte`, Profi-Aufgabe mit `profi`, `<Bilanz />` am Ende der letzten Seite; die Punkte wurden im Test nachgerechnet.
 - [ ] Punkte nach Aufwand: jede Aufgabe hat `punkte={…}` nach der Richtwert-Tabelle (Abruf 2, Kernaufgabe 10 bis 15 …), "Problem lösen" bringt etwa 40 % der Pflichtpunkte, das Warm-up höchstens 20 %; das Bonus-Spiel bringt höchstens so viel wie die beste Übung; die Verteilung steht als Kommentar in der Datei.

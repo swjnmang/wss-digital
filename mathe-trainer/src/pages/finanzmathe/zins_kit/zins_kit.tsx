@@ -115,6 +115,16 @@ export function Vermutung<C extends string>({
   )
 }
 
+/**
+ * Die drei festen Kriterien jedes Handlungsprodukts (seit 2026-11-05, siehe docs/skills/lernsituationen/SKILL.md, „Handlungsprodukte“):
+ * Problem gelöst und Rechenschritte festgehalten, Antwortsatz, offene Fragen. empfaenger nennt optional, an wen der Antwortsatz geht.
+ */
+export const standardKriterien = (empfaenger?: string): ReactNode[] => [
+  'Ich habe das Problem vollständig gelöst und alle Rechenschritte schriftlich festgehalten.',
+  `Ich habe einen Antwortsatz ${empfaenger ? `${empfaenger} ` : ''}notiert, der das Problem beantwortet.`,
+  'Offene Fragen habe ich mir notiert, damit ich sie klären kann.',
+]
+
 /** Kriterien zum Abhaken; onAlle, sobald alle abgehakt sind */
 export function Kriterien({ items, onAlle }: { items: ReactNode[]; onAlle: () => void }) {
   const [haken, setHaken] = useState(items.map(() => false))

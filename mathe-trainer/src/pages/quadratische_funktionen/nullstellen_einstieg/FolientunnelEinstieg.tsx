@@ -5,7 +5,7 @@ import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/
 import { CheckCard, ErklaerungCtx, Hilfen, Loesungsweg, McCard, SchrittHilfen, TrackedCheck, TrackedMc } from '../../lineare_funktionen/lernsituation_kit/kit'
 import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Bildwelt, type Seite, type Thema } from '../../lineare_funktionen/lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../../lineare_funktionen/lernsituation_kit/punkte'
-import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import { Kriterien, standardKriterien } from '../../finanzmathe/zins_kit/zins_kit'
 import TunnelSpiel from './TunnelSpiel'
 import titelBild from './bilder/titel.webp'
 import beetplanBild from './bilder/beetplan.webp'
@@ -706,13 +706,13 @@ export default function FolientunnelEinstieg({ erklaerung, onBack, onPractice }:
                 src={anleitungBild}
                 width={1200}
                 height={480}
-                alt="Karteikarte an einer Pinnwand mit der Überschrift Arbeitsanweisung: Nullstellen berechnen. Links stehen fünf Schritte: y = 0 setzen, a, b, c notieren, Mitternachtsformel, x₁ mit plus und x₂ mit minus, N₁ und N₂ angeben. Rechts die Überschriften Stolpersteine und Beispiel: Folientunnel mit leeren Zeilen."
+                alt="Karteikarte an einer Pinnwand mit der Überschrift Arbeitsanweisung: Nullstellen berechnen. Links stehen fünf Schritte: y = 0 setzen, a, b, c notieren, Mitternachtsformel, x₁ mit plus und x₂ mit minus, N₁ und N₂ angeben. Rechts die Überschriften Offene Fragen und Beispiel: Folientunnel mit leeren Zeilen."
               />
               <figcaption>So ähnlich kann deine Arbeitsanweisung aussehen.</figcaption>
             </figure>
             <p className="sl-text">
               Frau Kaya möchte, dass auch die anderen Azubis solche Bögen berechnen können. Schreibe dafür eine Arbeitsanweisung auf eine Karteikarte oder ins Heft: die fünf
-              Schritte mit dem Folientunnel als Beispiel, darunter die Stolpersteine und deine Antwort an Frau Kaya.
+              Schritte mit dem Folientunnel als Beispiel und darunter deine Antwort an Frau Kaya.
             </p>
             <Aufklappbar label="Satzanfänge ansehen" icon="fa-comment-dots">
               <ul className="zk-liste">
@@ -726,19 +726,7 @@ export default function FolientunnelEinstieg({ erklaerung, onBack, onPractice }:
           <Abschnitt titel="Ist deine Arbeitsanweisung vollständig?">
             <Kriterien
               onAlle={fertig.teil('produkt')}
-              items={[
-                <>
-                  Alle fünf Schritte stehen in der richtigen Reihenfolge da, jeweils mit der Rechnung für den Folientunnel: <M>{'y = 0'}</M> setzen, <M>a</M>, <M>b</M>, <M>c</M>{' '}
-                  notieren, Mitternachtsformel, <M>{'x_1'}</M> und <M>{'x_2'}</M> getrennt rechnen, <M>{'N_1'}</M> und <M>{'N_2'}</M> angeben.
-                </>,
-                <>Mindestens zwei Stolpersteine sind erklärt, z. B. Klammern um negative Zahlen und zwei Rechnungen wegen <M>{'\\pm'}</M>.</>,
-                'Am Ende steht die Breite am Boden mit Rechnung und deine Antwort an Frau Kaya in einem Satz.',
-                <>
-                  Darunter steht, was die Begriffe und Abkürzungen bedeuten: Nullstelle, Koeffizienten <M>a</M>, <M>b</M>, <M>c</M>, <M>{'x_1'}</M> und <M>{'x_2'}</M>,{' '}
-                  <M>{'N_1'}</M> und <M>{'N_2'}</M>, das Zeichen <M>{'\\pm'}</M> (plus-minus) und Mitternachtsformel (Lösungsformel). Erkläre auch alle anderen Wörter, die für dich
-                  neu waren.
-                </>,
-              ]}
+              items={standardKriterien('an Frau Kaya')}
             />
           </Abschnitt>
           {geloest && (
