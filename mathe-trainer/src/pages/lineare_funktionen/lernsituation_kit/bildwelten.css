@@ -50,6 +50,22 @@
 /* Untergrund kariert (5-mm-Raster) */
 .sl-welt-skizzenbuch.sl-variante-kariert { --sk-untergrund: linear-gradient(var(--sk-raster) 1px, transparent 1px) 0 0 / 24px 24px, linear-gradient(90deg, var(--sk-raster) 1px, transparent 1px) 0 0 / 24px 24px, var(--sk-papier); }
 
+/* Untergrund blanko + blauer Kugelschreiber (Beratungsblock): weißes Papier ohne Raster, Titel und Notizen in Kugelschreiber-Blau,
+   statt Klebeband eine Lochreihe der Spiralbindung oben am Blatt, Auftrag als hellgelber Zettel mit Textmarker-Strich. */
+.sl-welt-skizzenbuch.sl-variante-kugelschreiber { --sk-papier: #fdfdfb; --sk-tinte: #24389c; --sk-zettel: #fff8d6; --sk-untergrund: var(--sk-papier); }
+.sl-welt-skizzenbuch.sl-variante-kugelschreiber .sl-titel,
+.sl-start.sl-welt-skizzenbuch.sl-variante-kugelschreiber h2,
+.sl-welt-skizzenbuch.sl-variante-kugelschreiber .sl-abschnitt-titel,
+.sl-welt-skizzenbuch.sl-variante-kugelschreiber .sl-marke { color: var(--sk-tinte); }
+.sl-welt-skizzenbuch.sl-variante-kugelschreiber .sl-seite::before {
+  left: 24px; right: 24px; width: auto; top: 10px; height: 10px; transform: none;
+  background: radial-gradient(circle, rgba(44, 42, 39, 0.35) 3.5px, transparent 4.5px) 0 0 / 26px 10px repeat-x;
+}
+.sl-welt-skizzenbuch.sl-variante-kugelschreiber .sl-seite::after { display: none; }
+.sl-welt-skizzenbuch.sl-variante-kugelschreiber .sl-seite { padding-top: 36px; }
+.sl-welt-skizzenbuch.sl-variante-kugelschreiber .sl-fokus::before { background: rgba(255, 225, 77, 0.55); height: 14px; top: -6px; transform: rotate(-1deg); }
+.sl-welt-skizzenbuch.sl-variante-kugelschreiber .sl-foto { transform: none; box-shadow: 0 1px 0 rgba(44, 42, 39, 0.06), 0 10px 22px -18px rgba(44, 42, 39, 0.5); }
+
 /* Startbox und jede Seite sind ein Blatt im Notizbuch */
 .sl-start.sl-welt-skizzenbuch,
 .sl-welt-skizzenbuch .sl-seite {

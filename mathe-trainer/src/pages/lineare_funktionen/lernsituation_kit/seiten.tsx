@@ -43,7 +43,7 @@ export type Thema = {
  * Untergrund, nie das Layout. Stile in bildwelten.css über die Klassen sl-welt-<welt> und sl-variante-<variante>.
  */
 export type Bildwelt =
-  | { welt: 'skizzenbuch'; variante: 'kariert' }
+  | { welt: 'skizzenbuch'; variante: 'kariert' | 'kugelschreiber' }
   | { welt: 'reportage'; variante: 'abendlicht' | string }
   | { welt: 'diorama'; variante: 'sommerwiese' | string };
 

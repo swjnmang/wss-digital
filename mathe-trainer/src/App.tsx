@@ -101,6 +101,8 @@ import Ratendarlehen from './pages/finanzmathe/Ratendarlehen';
 import RatendarlehenMenu from './pages/finanzmathe/RatendarlehenMenu';
 import RatendarlehenLernsituation from './pages/finanzmathe/RatendarlehenLernsituation';
 import Annuitaetendarlehen from './pages/finanzmathe/Annuitaetendarlehen';
+import AnnuitaetendarlehenMenu from './pages/finanzmathe/AnnuitaetendarlehenMenu';
+import AnnuitaetendarlehenLernsituation from './pages/finanzmathe/AnnuitaetendarlehenLernsituation';
 import ZinsenTest from './pages/finanzmathe/ZinsenTest';
 import GemischteFinanzaufgaben from './pages/finanzmathe/GemischteFinanzaufgaben';
 import Anwendungsaufgaben from './pages/finanzmathe/Anwendungsaufgaben';
@@ -336,7 +338,9 @@ export default function App() {
           <Route path="/finanzmathe/ratendarlehen" element={<RatendarlehenMenu />} />
           <Route path="/finanzmathe/ratendarlehen/ueben" element={<Ratendarlehen />} />
           <Route path="/finanzmathe/ratendarlehen/lernsituation" element={<RatendarlehenLernsituation />} />
-          <Route path="/finanzmathe/annuitaetendarlehen" element={<Annuitaetendarlehen />} />
+          <Route path="/finanzmathe/annuitaetendarlehen" element={<AnnuitaetendarlehenMenu />} />
+          <Route path="/finanzmathe/annuitaetendarlehen/ueben" element={<Annuitaetendarlehen />} />
+          <Route path="/finanzmathe/annuitaetendarlehen/lernsituation" element={<AnnuitaetendarlehenLernsituation />} />
           <Route path="/finanzmathe/gemischte-aufgaben" element={<GemischteFinanzaufgaben />} />
           <Route path="/finanzmathe/anwendungsaufgaben" element={<Anwendungsaufgaben />} />
           <Route path="/finanzmathe/anwendungsaufgaben/escape-room-zinseszins" element={<EscapeRoomZinseszins />} />

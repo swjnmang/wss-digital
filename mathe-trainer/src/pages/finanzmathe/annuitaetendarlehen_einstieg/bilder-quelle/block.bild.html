@@ -1,0 +1,50 @@
+<!doctype html>
+<!-- Lernsituation „Die Solaranlage“: Seite des Beratungsblocks mit den gegebenen Größen (Problem erkennen, Problem lösen Teil 1).
+     Zeigt nur das Gegebene: Darlehen, Annuität, Zinsen und Tilgung stehen als Fragezeichen da. Bildwelt Skizzenbuch / blanko + Kugelschreiber. -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<svg id="bild" xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+ <defs>
+  <filter id="paper"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="3"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .52  0 0 0 .07 0"/><feComposite in2="SourceGraphic" operator="in"/><feBlend in2="SourceGraphic" mode="multiply"/></filter>
+  <filter id="wobble"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="4"/></filter>
+  <filter id="wobble2"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="21"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+  <filter id="kuli"><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="9" result="n"/><feColorMatrix in="n" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.2 1.35" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in"/></filter>
+  <filter id="marker" x="-10%" y="-30%" width="120%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".04 .3" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="9"/></filter>
+ </defs>
+ <rect width="1200" height="600" fill="#fdfdfb"/>
+ <rect width="1200" height="600" fill="#fdfdfb" filter="url(#paper)"/>
+ <!-- Spiralbindung des Blocks -->
+ <g stroke="#2c2a27" stroke-width="3" fill="none" opacity=".55">
+  <path d="M60 40 h1080" stroke-dasharray="2 22"/>
+ </g>
+ <g font-family="Caveat" font-weight="700" fill="#24389c">
+  <text x="90" y="100" font-size="46" transform="rotate(-1 90 100)">Finanzierung Solaranlage</text>
+  <path d="M90 116 q 230 -6 440 -4" stroke="#24389c" stroke-width="3" fill="none" filter="url(#wobble2)"/>
+  <text x="110" y="190" font-size="40">Kaufpreis</text><text x="470" y="190" font-size="40" text-anchor="end">27.500 €</text>
+  <text x="110" y="248" font-size="40">− Eigenkapital</text><text x="470" y="248" font-size="40" text-anchor="end">3.500 €</text>
+  <path d="M110 268 L480 266" stroke="#24389c" stroke-width="3" filter="url(#wobble2)"/>
+  <path d="M110 276 L480 274" stroke="#24389c" stroke-width="2" filter="url(#wobble2)"/>
+  <text x="110" y="326" font-size="40">Darlehen</text><text x="470" y="326" font-size="44" text-anchor="end">? €</text>
+  <text x="110" y="410" font-size="40">Zinssatz: 4,5 % p. a.</text>
+  <text x="110" y="466" font-size="40">Laufzeit: 12 Jahre</text>
+  <text x="110" y="522" font-size="40">Rückzahlung: jedes Jahr gleich viel</text>
+ </g>
+ <!-- Skizze: eine Jahresrate aus Zinsen und Tilgung -->
+ <g stroke="#1f3290" stroke-width="3" fill="none" stroke-linejoin="round" filter="url(#kuli)">
+  <g filter="url(#wobble)">
+   <rect x="760" y="170" width="170" height="330"/>
+   <path d="M760 330 H930"/>
+  </g>
+  <g stroke-width="1.6" opacity=".55" filter="url(#wobble2)">
+   <path d="M766 186 l40 -14 M766 214 l60 -22 M766 242 l90 -34 M766 270 l120 -46 M766 298 l150 -56 M770 324 l156 -58 M800 330 l126 -48 M850 330 l76 -30 M890 330 l36 -14"/>
+  </g>
+ </g>
+ <rect x="742" y="120" width="210" height="44" fill="#ffe14d" opacity=".6" filter="url(#marker)"/>
+ <g font-family="Caveat" font-weight="700" fill="#24389c">
+  <text x="756" y="154" font-size="42">Annuität A = ?</text>
+  <text x="960" y="260" font-size="38">Zinsen = ?</text>
+  <text x="960" y="424" font-size="38">Tilgung = ?</text>
+  <path d="M955 250 l-16 0 M955 414 l-16 0" stroke="#24389c" stroke-width="3"/>
+  <text x="760" y="560" font-size="32" fill="#4a5bb0">1. Jahr</text>
+ </g>
+</svg>
+</body></html>

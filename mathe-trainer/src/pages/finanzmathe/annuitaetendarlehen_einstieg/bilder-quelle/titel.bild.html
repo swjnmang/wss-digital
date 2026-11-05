@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- Lernsituation „Die Solaranlage“, Titelbild. Bildwelt Skizzenbuch / blanko + blauer Kugelschreiber.
+     Ein Haus mit Solaranlage und Stromspeicher als Kugelschreiber-Skizze auf weißem Papier, dazu Notizen aus dem Beratungsgespräch.
+     Rendern (aus mathe-trainer/): node scripts/bilder-rendern.cjs src/pages/finanzmathe/annuitaetendarlehen_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<svg id="bild" xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+ <defs>
+  <filter id="paper"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="3"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .52  0 0 0 .07 0"/><feComposite in2="SourceGraphic" operator="in"/><feBlend in2="SourceGraphic" mode="multiply"/></filter>
+  <filter id="wobble"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="4"/></filter>
+  <filter id="wobble2"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="21"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+  <filter id="kuli"><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="9" result="n"/><feColorMatrix in="n" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.2 1.35" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in"/></filter>
+  <filter id="marker" x="-10%" y="-30%" width="120%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".04 .3" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="9"/></filter>
+ </defs>
+ <rect width="1200" height="600" fill="#fdfdfb"/>
+ <rect width="1200" height="600" fill="#fdfdfb" filter="url(#paper)"/>
+ <!-- Sonne -->
+ <g stroke="#2a3f9e" stroke-width="2.6" fill="none" stroke-linecap="round" filter="url(#kuli)">
+  <g filter="url(#wobble2)">
+   <circle cx="150" cy="120" r="42"/>
+   <path d="M150 52v-22 M150 188v22 M82 120h-22 M218 120h22 M102 72l-15-15 M198 168l15 15 M198 72l15-15 M102 168l-15 15"/>
+  </g>
+ </g>
+ <!-- Haus mit Solaranlage -->
+ <g stroke="#1f3290" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#kuli)">
+  <g filter="url(#wobble)" stroke-width="3.4">
+   <path d="M150 500 L150 330 L340 190 L530 330 L530 500 Z"/>
+   <path d="M120 352 L340 186 L560 352"/>
+   <rect x="210" y="380" width="80" height="70"/>
+   <path d="M250 380 V450 M210 415 H290"/>
+   <rect x="390" y="400" width="70" height="100"/>
+   <circle cx="448" cy="452" r="4"/>
+  </g>
+  <!-- Module auf dem Dach (rechte Dachfläche) -->
+  <g filter="url(#wobble2)" stroke-width="2.6">
+   <path d="M356 214 L512 330 L470 356 L318 242 Z"/>
+   <path d="M395 243 L354 270 M434 272 L393 299 M473 301 L432 328"/>
+   <path d="M337 228 L491 343"/>
+   <path d="M168 330 L320 216 L284 248 L176 330" stroke-width="2"/>
+  </g>
+  <!-- Schraffur der Module -->
+  <g stroke-width="1.3" opacity=".6" filter="url(#wobble2)">
+   <path d="M345 236 l20 15 M360 226 l20 15 M378 251 l20 15 M393 241 l20 15 M412 276 l20 15 M427 266 l20 15 M450 302 l20 15 M466 292 l20 15"/>
+  </g>
+  <!-- Stromspeicher neben dem Haus -->
+  <g filter="url(#wobble)" stroke-width="3">
+   <rect x="565" y="400" width="74" height="100" rx="8"/>
+   <path d="M590 418 h24 M602 410 v16" />
+   <path d="M584 450 h36 v26 h-36 z"/>
+   <path d="M584 463 h18" stroke-width="5"/>
+  </g>
+  <path d="M530 470 C 548 470, 552 470, 565 470" stroke-width="2.4" stroke-dasharray="6 6"/>
+  <!-- Boden -->
+  <g filter="url(#wobble2)" stroke-width="2.2" opacity=".85">
+   <path d="M70 502 L700 500"/>
+   <path d="M100 512 L240 511 M420 511 L660 509" opacity=".6"/>
+  </g>
+ </g>
+ <!-- Notizen aus dem Beratungsgespräch -->
+ <g font-family="Caveat" fill="#24389c" font-weight="700">
+  <text x="760" y="112" font-size="46" transform="rotate(-2 760 112)">Beratung Fr. Lorenz</text>
+  <path d="M760 128 q 170 -8 330 -6" stroke="#24389c" stroke-width="3" fill="none" filter="url(#wobble2)"/>
+  <text x="770" y="196" font-size="38" transform="rotate(-2 770 196)">Solaranlage + Speicher:</text>
+  <text x="800" y="244" font-size="44" transform="rotate(-2 800 244)">27.500 €</text>
+  <text x="770" y="306" font-size="38" transform="rotate(-2 770 306)">Eigenkapital: 3.500 €</text>
+  <text x="770" y="366" font-size="38" transform="rotate(-2 770 366)">Rest: Annuitätendarlehen</text>
+  <text x="770" y="414" font-size="38" transform="rotate(-2 770 414)">4,5 % p. a., 12 Jahre</text>
+  <text x="770" y="474" font-size="36" transform="rotate(-2 770 474)">jedes Jahr dieselbe Rate</text>
+ </g>
+ <!-- Textmarker und Frage -->
+ <rect x="790" y="500" width="250" height="56" fill="#ffe14d" opacity=".6" filter="url(#marker)" transform="rotate(-2 915 528)"/>
+ <text x="808" y="542" font-family="Caveat" font-weight="700" font-size="48" fill="#24389c" transform="rotate(-2 808 542)">Rate = ?</text>
+</svg>
+</body></html>

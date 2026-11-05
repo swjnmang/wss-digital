@@ -1,0 +1,50 @@
+<!doctype html>
+<!-- Lernsituation „Die Solaranlage“: angefangener Tilgungsplan auf dem Beratungsblock (Problem lösen, Teil 2). Jahr 1 ist ausgefüllt
+     (wurde in Teil 1 gerechnet), Jahr 2 ist offen. Bildwelt Skizzenbuch / blanko + Kugelschreiber. -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<svg id="bild" xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+ <defs>
+  <filter id="paper"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="3"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .52  0 0 0 .07 0"/><feComposite in2="SourceGraphic" operator="in"/><feBlend in2="SourceGraphic" mode="multiply"/></filter>
+  <filter id="wobble"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="4"/></filter>
+  <filter id="wobble2"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="21"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+  <filter id="kuli"><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="9" result="n"/><feColorMatrix in="n" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.2 1.35" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in"/></filter>
+  <filter id="marker" x="-10%" y="-30%" width="120%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".04 .3" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="9"/></filter>
+ </defs>
+ <rect width="1200" height="600" fill="#fdfdfb"/>
+ <rect width="1200" height="600" fill="#fdfdfb" filter="url(#paper)"/>
+ <g stroke="#2c2a27" stroke-width="3" fill="none" opacity=".55"><path d="M60 40 h1080" stroke-dasharray="2 22"/></g>
+ <g font-family="Caveat" font-weight="700" fill="#24389c">
+  <text x="80" y="104" font-size="48" transform="rotate(-1 80 104)">Tilgungsplan Fr. Lorenz</text>
+  <path d="M80 120 q 220 -6 420 -4" stroke="#24389c" stroke-width="3" fill="none" filter="url(#wobble2)"/>
+ </g>
+ <g stroke="#1f3290" stroke-width="2.6" fill="none" filter="url(#wobble2)">
+  <path d="M70 230 H1130 M70 330 H1130 M70 430 H1130"/>
+  <path d="M170 160 V450 M440 160 V450 M670 160 V450 M900 160 V450"/>
+ </g>
+ <g font-family="Caveat" font-weight="700" fill="#24389c" font-size="34">
+  <text x="120" y="208" text-anchor="middle">Jahr</text>
+  <text x="305" y="190" text-anchor="middle">Schuld am</text><text x="305" y="220" text-anchor="middle">Jahresanfang</text>
+  <text x="555" y="208" text-anchor="middle">Tilgung</text>
+  <text x="785" y="208" text-anchor="middle">Zinsen</text>
+  <text x="1015" y="208" text-anchor="middle">Annuität</text>
+  <g font-size="40">
+   <text x="120" y="296" text-anchor="middle">1</text>
+   <text x="420" y="296" text-anchor="end">24.000,00</text>
+   <text x="650" y="296" text-anchor="end">1.551,99</text>
+   <text x="880" y="296" text-anchor="end">1.080,00</text>
+   <text x="1110" y="296" text-anchor="end">2.631,99</text>
+   <text x="120" y="396" text-anchor="middle">2</text>
+   <text x="305" y="396" text-anchor="middle">?</text>
+   <text x="555" y="396" text-anchor="middle">?</text>
+   <text x="785" y="396" text-anchor="middle">?</text>
+   <text x="1015" y="396" text-anchor="middle">?</text>
+  </g>
+ </g>
+ <rect x="470" y="352" width="170" height="60" fill="#ffe14d" opacity=".55" filter="url(#marker)"/>
+ <g font-family="Caveat" font-weight="700" fill="#24389c">
+  <text x="380" y="520" font-size="40" transform="rotate(-2 380 520)">Tilgung im 2. Jahr: dieselbe Formel wie im 1. Jahr?</text>
+  <path d="M560 480 C 556 462, 556 446, 556 428" stroke="#24389c" stroke-width="3" fill="none" filter="url(#wobble2)"/>
+  <path d="M556 426 l-10 14 M556 426 l10 14" stroke="#24389c" stroke-width="3" fill="none"/>
+ </g>
+</svg>
+</body></html>
