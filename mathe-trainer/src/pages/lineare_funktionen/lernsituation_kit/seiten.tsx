@@ -27,7 +27,16 @@ export const THEMEN = {
 } as const;
 
 /** Identität einer Lernsituation: Name, Themenfarbe, Symbol (Font-Awesome-Klasse) und Titelbild für die Startbox */
-export type Thema = { name: string; farbe: keyof typeof THEMEN; icon: string; bild?: ReactNode };
+export type Thema = {
+  name: string;
+  farbe: keyof typeof THEMEN;
+  icon: string;
+  bild?: ReactNode;
+  /** Bildwelt Reportage: Kicker über der Schlagzeile auf dem Aufmacherbild, z. B. „Aus der Ausbildung“ */
+  kicker?: string;
+  /** Bildwelt Reportage: Bildnachweis-Zeile unter dem Aufmacherbild */
+  bildzeile?: string;
+};
 
 /**
  * Bildwelt einer Lernsituation (siehe docs/skills/lernsituationen/SKILL.md, Abschnitt „Bildwelten“): ändert Bilder, Schriften und
@@ -35,7 +44,7 @@ export type Thema = { name: string; farbe: keyof typeof THEMEN; icon: string; bi
  */
 export type Bildwelt =
   | { welt: 'skizzenbuch'; variante: 'kariert' }
-  | { welt: 'reportage'; variante: string }
+  | { welt: 'reportage'; variante: 'abendlicht' | string }
   | { welt: 'diorama'; variante: 'sommerwiese' | string };
 
 const weltKlassen = (b?: Bildwelt) => (b ? ` sl-welt sl-welt-${b.welt} sl-variante-${b.variante}` : '');
@@ -159,14 +168,24 @@ function SeitenAnsicht({
         style={themaStil(thema)}
       >
         <WeltFilter bildwelt={bildwelt} />
-        {thema?.bild ? (
+        {bildwelt?.welt === 'reportage' && thema?.bild ? (
+          // Reportage: Aufmacherbild in voller Breite mit Kicker und Schlagzeile darauf, darunter der Bildnachweis
+          <figure className="sl-start-aufmacher">
+            <div className="sl-start-bild">{thema.bild}</div>
+            <h2>
+              {thema.kicker && <span className="sl-start-kicker">{thema.kicker}</span>}
+              {thema.name}
+            </h2>
+            {thema.bildzeile && <figcaption className="sl-start-bildzeile">{thema.bildzeile}</figcaption>}
+          </figure>
+        ) : thema?.bild ? (
           <div className="sl-start-bild">{thema.bild}</div>
         ) : (
           <div className="sl-start-icon">
             <i className={`fa-solid ${thema?.icon ?? 'fa-pen-to-square'}`} aria-hidden="true" />
           </div>
         )}
-        <h2>{thema ? thema.name : 'Bevor es losgeht'}</h2>
+        {!(bildwelt?.welt === 'reportage' && thema?.bild) && <h2>{thema ? thema.name : 'Bevor es losgeht'}</h2>}
         <p className="sl-start-ziel">{ziel}</p>
         <div className="sl-start-regel">
           <strong>Deine Arbeitsweise:</strong> Bearbeite jede Aufgabe in deinem Heft und schreibe

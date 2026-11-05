@@ -1,0 +1,40 @@
+/* Lernsituation „Der Folientunnel“ (Bildwelt Reportage). Präfix ft-. Bildwelt-Stile stehen in lernsituation_kit/bildwelten.css. */
+
+.ft-graph svg { display: block; width: 100%; max-width: 640px; height: auto; margin: 0 auto; }
+
+.ft-wahl-block { display: flex; flex-direction: column; gap: 12px; }
+.ft-wahl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.ft-wahl .bk-btn { min-height: 52px; justify-content: center; text-align: center; white-space: normal; }
+@media (max-width: 640px) { .ft-wahl { grid-template-columns: 1fr; } }
+
+.ft-labor { display: flex; flex-direction: column; gap: 12px; }
+.ft-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 19px; }
+.ft-eingabe .lp-input { min-height: 44px; }
+.ft-eingabe .bk-btn { min-height: 44px; margin-left: 6px; }
+.ft-anzeige { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: 4px; background: var(--primary-soft); font-size: 17px; line-height: 1.45; }
+.ft-anzeige > i { margin-top: 3px; color: var(--primary); }
+.ft-anzeige-ok { background: var(--correct-soft); color: var(--correct-ink); }
+.ft-anzeige-ok > i { color: var(--correct); }
+
+/* Rechnungen der drei Azubis in „Wer hat recht?“ */
+.ft-plaene { display: flex; flex-direction: column; gap: 10px; }
+.ft-plan { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 10px 14px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); }
+.ft-plan-name { font: 600 16px/1.2 var(--font-ui, var(--font-display)); }
+.ft-plan .katex-display { position: relative; margin: 2px 0; overflow-x: auto; overflow-y: hidden; }
+
+/* Breite Formeln im Rechenbeispiel und in den Lösungen scrollen in sich, die Seite bleibt fest */
+.sl-welt-reportage .lp-example .katex-display,
+.sl-welt-reportage .lp-ex .katex-display { position: relative; overflow-x: auto; overflow-y: hidden; }
+
+/* Bonus-Spiel „Folie spannen“ */
+.ft-spiel { display: flex; flex-direction: column; gap: 12px; }
+.ft-spiel-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 600 17px/1.3 var(--font-ui, var(--font-display)); color: var(--primary); }
+.ft-muenzen { display: flex; gap: 6px; font-size: 20px; color: var(--line-strong); }
+.ft-muenzen .ft-muenze-an { color: var(--highlight); -webkit-text-stroke: 1px var(--ink); }
+.ft-spiel-frage { margin: 0; font-size: 19px; line-height: 1.6; }
+.ft-spiel-bild { display: block; width: 100%; height: auto; max-height: 320px; user-select: none; }
+.ft-paare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ft-paare .bk-btn { min-height: 52px; justify-content: center; font-size: 17px; }
+@media (max-width: 520px) { .ft-paare { grid-template-columns: 1fr; } }
+.ft-spiel-ende { margin: 0; font: 600 20px/1.4 var(--font-display); }
+.ft-spiel-ende i { color: var(--primary); margin-right: 6px; }

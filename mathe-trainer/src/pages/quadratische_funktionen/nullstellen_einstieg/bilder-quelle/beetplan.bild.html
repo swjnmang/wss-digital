@@ -1,0 +1,52 @@
+<!doctype html>
+<!-- Bildwelt Reportage / Abendlicht, Detailbild „Beetplan der Meisterin“: Planskizze auf der Werkbank im Abendlicht.
+     Zeigt nur das Gegebene: den Bogen im Querschnitt, drei Beete à 0,85 m und zwei Wege à 0,45 m (zusammen 3,45 m), keine Fußpunkte. -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=IBM+Plex+Sans:wght@500;600&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>{
+// Planblatt: Boden bei y = 430, 1 m = 160 px, Beetplan beginnt bei x0
+const k=160, BY=430, x0=600-3.45*k/2;
+const sx=m=>x0+m*k;
+// Bogen im Querschnitt (nur angedeutet, etwas breiter als der Plan)
+const bl=600-3.5*k/2-2, br=600+3.5*k/2+2, oben=120;
+let d='';for(let i=0;i<=48;i++){const t=i/48,x=bl+(br-bl)*t,u=2*t-1;d+=(i?'L':'M')+x.toFixed(1)+' '+(BY-(BY-oben)*(1-u*u)).toFixed(1)+' ';}
+let g='<path d="'+d+'" fill="none" stroke="#3b4a6b" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 0"/>';
+g+='<line x1="'+(bl-60)+'" y1="'+BY+'" x2="'+(br+60)+'" y2="'+BY+'" stroke="#2a2724" stroke-width="3"/>';
+const teile=[['Beet',0.85],['Weg',0.45],['Beet',0.85],['Weg',0.45],['Beet',0.85]];
+let m=0;
+const H=(x,y,t,size=34,anchor='middle',col='#2a2724')=>'<text x="'+x+'" y="'+y+'" text-anchor="'+anchor+'" font-family="Caveat" font-weight="700" font-size="'+size+'" fill="'+col+'">'+t+'</text>';
+teile.forEach(([n,w])=>{const a=sx(m),b=sx(m+w);
+ if(n==='Beet'){g+='<rect x="'+(a+3)+'" y="'+(BY-34)+'" width="'+(b-a-6)+'" height="34" rx="6" fill="#7a9a55" opacity=".85"/>';
+  for(let j=0;j<3;j++)g+='<ellipse cx="'+(a+(b-a)*(j+0.5)/3)+'" cy="'+(BY-44)+'" rx="15" ry="13" fill="#4f7a3c"/>';}
+ else g+='<rect x="'+(a+3)+'" y="'+(BY-10)+'" width="'+(b-a-6)+'" height="10" fill="#c9b08a"/>';
+ g+=H((a+b)/2, BY+44, String(w).replace('.',',')+' m', 32);
+ g+='<line x1="'+a+'" y1="'+(BY+8)+'" x2="'+a+'" y2="'+(BY+22)+'" stroke="#2a2724" stroke-width="2"/>';
+ m+=w;});
+g+='<line x1="'+sx(3.45)+'" y1="'+(BY+8)+'" x2="'+sx(3.45)+'" y2="'+(BY+22)+'" stroke="#2a2724" stroke-width="2"/>';
+// Gesamtmaß
+g+='<line x1="'+sx(0)+'" y1="'+(BY+70)+'" x2="'+sx(3.45)+'" y2="'+(BY+70)+'" stroke="#a0275e" stroke-width="3"/>';
+g+='<path d="M'+sx(0)+' '+(BY+70)+' l14 -8 v16 z M'+sx(3.45)+' '+(BY+70)+' l-14 -8 v16 z" fill="#a0275e"/>';
+g+=H(600, BY+108, 'zusammen 3,45 m', 40, 'middle', '#a0275e');
+g+=H(br-30, oben+80, 'Passt das', 34, 'start', '#3b4a6b')+H(br-30, oben+114, 'auf den Boden?', 34, 'start', '#3b4a6b');
+g+=H(bl-10, 90, 'Beetplan Folientunnel', 44, 'start');
+const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600"><defs>'
++'<linearGradient id="holz" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b4631"/><stop offset="1" stop-color="#2e1d14"/></linearGradient>'
++'<filter id="maser"><feTurbulence type="fractalNoise" baseFrequency=".004 .12" numOctaves="3" seed="3"/><feColorMatrix values="0 0 0 0 .2  0 0 0 0 .12  0 0 0 0 .06  0 0 0 .5 0"/></filter>'
++'<radialGradient id="licht" cx=".82" cy=".2" r=".9"><stop offset="0" stop-color="#ffd59a" stop-opacity=".55"/><stop offset=".5" stop-color="#ffb46b" stop-opacity=".15"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></radialGradient>'
++'<radialGradient id="vig" cx=".5" cy=".5" r=".78"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></radialGradient>'
++'<filter id="papier"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="8"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .45  0 0 0 .08 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>'
++'<filter id="schatten" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="-18" dy="22" stdDeviation="18" flood-color="#000" flood-opacity=".55"/></filter>'
++'<filter id="unscharf"><feGaussianBlur stdDeviation="5"/></filter>'
++'<filter id="korn"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="5"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .22 0"/></filter>'
++'</defs><rect width="1200" height="600" fill="url(#holz)"/><rect width="1200" height="600" filter="url(#maser)"/>'
+// unscharfe Gegenstände im Hintergrund: Blumentopf, Gießkanne
++'<g filter="url(#unscharf)" opacity=".85"><path d="M1060 40 L1150 40 L1135 140 L1075 140 Z" fill="#b5562f"/><ellipse cx="1105" cy="40" rx="48" ry="10" fill="#8a3e20"/><ellipse cx="1100" cy="24" rx="40" ry="26" fill="#3f6b36"/>'
++'<path d="M24 470 Q 30 420 90 420 L150 420 Q 175 425 175 470 L175 560 L24 560 Z" fill="#3c6f8a"/></g>'
++'<g transform="rotate(-1.2 600 300)" filter="url(#schatten)"><rect x="110" y="28" width="980" height="560" rx="3" fill="#f7f3ea"/><rect x="110" y="28" width="980" height="560" fill="#fff" filter="url(#papier)"/>'
++(()=>{let s='';for(let y=60;y<580;y+=28)s+='<line x1="110" y1="'+y+'" x2="1090" y2="'+y+'" stroke="#9fb6cf" stroke-opacity=".25"/>';return s;})()
++g+'</g>'
+// Bleistift
++'<g transform="translate(1010 520) rotate(-24)"><rect x="0" y="-9" width="170" height="18" rx="3" fill="#2f3b58"/><polygon points="0,-9 -26,0 0,9" fill="#e6cfa2"/><polygon points="-17,-3 -26,0 -17,3" fill="#222"/></g>'
++'<rect width="1200" height="600" fill="url(#licht)" style="mix-blend-mode:soft-light"/><rect width="1200" height="600" fill="url(#vig)"/><rect width="1200" height="600" filter="url(#korn)" style="mix-blend-mode:overlay"/></svg>';
+document.getElementById('bild').innerHTML=svg;
+}</script></body></html>
