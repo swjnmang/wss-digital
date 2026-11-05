@@ -1,0 +1,59 @@
+<!doctype html>
+<!-- Bildwelt Reportage / Abendlicht, Aufmacherbild „Der Folientunnel“: gebrauchter Folientunnel auf dem Gelände einer Gärtnerei im Abendlicht.
+     Zeigt nur das Gegebene: den parabelförmigen Bogen und die gesuchte Breite am Boden („? m“), keine Nullstellen. -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500;600&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>{
+// Vorderer Bogen als Parabel: Fußpunkte bei x = 300 und 820 (Boden y = 492), Scheitel y = 168
+const L=300, R=820, B=492, H=168;
+const bogen=(l,r,b,h,n=40)=>{let d='';for(let i=0;i<=n;i++){const t=i/n,x=l+(r-l)*t,u=2*t-1,y=b-(b-h)*(1-u*u);d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}return d;};
+// hinterer Bogen (Fluchtpunkt rechts oben)
+const L2=700, R2=1010, B2=438, H2=246;
+let rippen='';
+for(let k=1;k<=5;k++){const t=k/6;const l=L+(L2-L)*t,r=R+(R2-R)*t,b=B+(B2-B)*t,h=H+(H2-H)*t;rippen+='<path d="'+bogen(l,r,b,h)+'" fill="none" stroke="#f3e6d8" stroke-opacity=".55" stroke-width="'+(4-2.2*t)+'"/>';}
+// Längslinien (Folienfalten) vom vorderen zum hinteren Bogen
+let laengs='';
+for(let i=1;i<10;i++){const t=i/10,u=2*t-1;const x1=L+(R-L)*t,y1=B-(B-H)*(1-u*u),x2=L2+(R2-L2)*t,y2=B2-(B2-H2)*(1-u*u);laengs+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="#fff6ea" stroke-opacity=".22" stroke-width="2"/>';}
+// Beete im Inneren (blass, durch die Folie)
+let beete='';
+[[0.2,'#5f7f4a'],[0.5,'#6b8a4f'],[0.8,'#5f7f4a']].forEach(([t,c])=>{const x1=L+(R-L)*t,x2=L2+(R2-L2)*t;beete+='<path d="M'+(x1-48)+' '+(B-6)+' L'+(x1+48)+' '+(B-6)+' L'+(x2+24)+' '+(B2-4)+' L'+(x2-24)+' '+(B2-4)+' Z" fill="'+c+'" opacity=".55"/>';for(let j=0;j<6;j++){const s=j/6,x=x1+(x2-x1)*s,y=B-6+(B2-B)*s;beete+='<ellipse cx="'+x+'" cy="'+(y-16+6*s)+'" rx="'+(30-14*s)+'" ry="'+(22-10*s)+'" fill="#3f6b36" opacity="'+(0.55-0.25*s)+'"/>';}});
+let bäume='';for(let i=0;i<34;i++){const x=i*38-10,r=26+((i*37)%17),y=372-((i*53)%28);bäume+='<ellipse cx="'+x+'" cy="'+y+'" rx="'+r+'" ry="'+(r+8)+'" fill="#2b2a38"/>';}
+const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600"><defs>'
++'<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26304f"/><stop offset=".42" stop-color="#874a62"/><stop offset=".72" stop-color="#e48a52"/><stop offset="1" stop-color="#f7c681"/></linearGradient>'
++'<radialGradient id="sun" cx=".9" cy=".62" r=".42"><stop offset="0" stop-color="#fff4d6" stop-opacity=".95"/><stop offset=".3" stop-color="#ffd08a" stop-opacity=".5"/><stop offset="1" stop-color="#ffd08a" stop-opacity="0"/></radialGradient>'
++'<linearGradient id="boden" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a4a3a"/><stop offset="1" stop-color="#1e1915"/></linearGradient>'
++'<linearGradient id="folie" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fbe9d3" stop-opacity=".34"/><stop offset=".6" stop-color="#ffe2b8" stop-opacity=".5"/><stop offset="1" stop-color="#fff1d6" stop-opacity=".72"/></linearGradient>'
++'<linearGradient id="innen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3036" stop-opacity=".55"/><stop offset="1" stop-color="#1d1a1c" stop-opacity=".75"/></linearGradient>'
++'<radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".62"/></radialGradient>'
++'<filter id="unscharf"><feGaussianBlur stdDeviation="3"/></filter><filter id="weich"><feGaussianBlur stdDeviation="12"/></filter>'
++'<filter id="korn"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .24 0"/></filter>'
++'</defs>'
++'<rect width="1200" height="600" fill="url(#sky)"/><rect width="1200" height="600" fill="url(#sun)"/>'
++'<g filter="url(#unscharf)"><path d="M0 380 Q 200 340 420 362 T 820 350 T 1200 366 L1200 440 L0 440 Z" fill="#3c3445"/>'+bäume
+// zweiter, alter Tunnel im Hintergrund
++'<path d="'+bogen(40,250,430,330)+' Z" fill="#e9c9a8" opacity=".35"/></g>'
++'<rect x="0" y="420" width="1200" height="180" fill="url(#boden)"/>'
++'<path d="M0 430 L1200 412" stroke="#f7c681" stroke-opacity=".25" stroke-width="3"/>'
+// Schatten des Tunnels
++'<ellipse cx="660" cy="500" rx="420" ry="30" fill="#000" opacity=".45" filter="url(#weich)"/>'
+// hintere Fläche (Inneres)
++'<path d="'+bogen(L,R,B,H)+' L'+R2+' '+B2+' L'+L2+' '+B2+' Z" fill="url(#innen)"/>'
++'<path d="'+bogen(L2,R2,B2,H2)+' Z" fill="#ffd9a3" opacity=".45"/>'
++beete
+// Folienhaut: Dachfläche zwischen vorderem und hinterem Bogen
++'<path d="'+bogen(L,R,B,H)+bogen(R2,L2,B2,H2).replace('M','L')+'Z" fill="url(#folie)" opacity=".75"/>'
++laengs+rippen
+// vorderer Bogen (Stahlrohr) und Eingang
++'<path d="'+bogen(L,R,B,H)+'" fill="none" stroke="#fbeee0" stroke-width="7" stroke-linecap="round"/>'
++'<path d="'+bogen(L,R,B,H)+'" fill="none" stroke="#9a5a3a" stroke-opacity=".35" stroke-width="2" transform="translate(3 3)"/>'
+// Gegenlicht-Schimmer
++'<circle cx="980" cy="380" r="150" fill="#fff0cc" opacity=".22" filter="url(#weich)"/>'
+// Maßband am Boden zwischen den Fußpunkten
++'<line x1="'+(L+8)+'" y1="'+(B+30)+'" x2="'+(R-8)+'" y2="'+(B+30)+'" stroke="#f6d35b" stroke-width="12"/>'
++(()=>{let s='';for(let x=L+18;x<R-10;x+=26)s+='<line x1="'+x+'" y1="'+(B+24)+'" x2="'+x+'" y2="'+(B+31)+'" stroke="#3a2e10" stroke-width="2"/>';return s;})()
++'<rect x="'+(L-14)+'" y="'+(B+14)+'" width="28" height="32" rx="5" fill="#d9483b"/>'
++'<rect x="'+((L+R)/2-150)+'" y="'+(B+50)+'" width="300" height="44" rx="8" fill="#1f1a1c" fill-opacity=".85"/>'
++'<text x="'+((L+R)/2)+'" y="'+(B+79)+'" text-anchor="middle" font-family="IBM Plex Sans" font-weight="600" font-size="25" fill="#fff6e6">Breite am Boden: ? m</text>'
++'<rect width="1200" height="600" fill="url(#vig)"/><rect width="1200" height="600" filter="url(#korn)" style="mix-blend-mode:overlay"/></svg>';
+document.getElementById('bild').innerHTML=svg;
+}</script></body></html>

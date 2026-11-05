@@ -45,6 +45,8 @@ import {
 } from './quadratischShared'
 import TaskShell from '../../components/layout/TaskShell'
 import { useBackHandler } from '../../hooks/useBackHandler'
+import { LernsituationKarte } from '../lineare_funktionen/lernsituation_kit/seiten'
+import FolientunnelEinstieg from './nullstellen_einstieg/FolientunnelEinstieg'
 
 // Sechs Aufgaben gleichzeitig auf der Seite
 const TOTAL_TASKS = 6
@@ -1295,8 +1297,13 @@ function DiskriminanteErklaerung() {
 export default function Nullstellen() {
   const navigate = useNavigate()
   const [level, setLevel] = useState<Level | null>(null)
+  // Einstiegs-Lernsituation „Der Folientunnel“ als eigener Modus neben den Schwierigkeitsgraden
+  const [lernsituation, setLernsituation] = useState(false)
   // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
-  useBackHandler(level !== null, () => chooseLevel(null))
+  useBackHandler(lernsituation || level !== null, () => {
+    setLernsituation(false)
+    chooseLevel(null)
+  })
   const [round, setRound] = useState(0)
   const [solved, setSolved] = useState<Record<number, boolean>>({})
   const [streak, setStreak] = useState(0)
@@ -1332,14 +1339,40 @@ export default function Nullstellen() {
     </div>
   )
 
+  if (lernsituation) {
+    return (
+      <FolientunnelEinstieg
+        erklaerung={<Erklaerung level="einfach" />}
+        onBack={() => {
+          setLernsituation(false)
+          window.scrollTo({ top: 0 })
+        }}
+        onPractice={() => {
+          setLernsituation(false)
+          chooseLevel('einfach')
+        }}
+      />
+    )
+  }
+
   if (!level) {
     return (
-      <TaskShell title="Nullstellen berechnen" width="narrow">
+      <TaskShell title="Nullstellen berechnen" width="wide">
         <div className="flex flex-col gap-6">
           {header}
-          <div className={panel}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Wähle deinen Schwierigkeitsgrad</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div className={`${panel} flex flex-col`}>
+            <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
+            <LernsituationKarte
+              className="flex-1"
+              thema={{ name: 'Der Folientunnel', farbe: 'beere', icon: 'fa-leaf' }}
+              beschreibung="Neu beim Thema? Prüfe für eine Gärtnerei, ob ein Beetplan in einen Folientunnel passt, und lerne dabei, Nullstellen mit der Mitternachtsformel zu berechnen."
+              onClick={() => setLernsituation(true)}
+            />
+          </div>
+          <div className={`${panel} lg:col-span-3 flex flex-col`}>
+            <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
               <button
                 onClick={() => chooseLevel('einfach')}
                 className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
@@ -1367,6 +1400,7 @@ export default function Nullstellen() {
                 <p className="text-sm text-white/90">Koeffizienten mit Brüchen und Funktionen in Scheitelform, Ergebnisse teils gerundet.</p>
               </button>
             </div>
+          </div>
           </div>
         </div>
       </TaskShell>

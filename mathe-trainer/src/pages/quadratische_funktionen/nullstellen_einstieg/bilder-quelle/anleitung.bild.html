@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- Bildwelt Reportage / Abendlicht, Bild zum Handlungsprodukt: Arbeitsanweisung auf einer Karteikarte, an der Pinnwand im Pausenraum der Gärtnerei.
+     Zeigt nur die Form des Produkts (Überschrift, Schritte 1–5 als Linien, Stolpersteine, Beispiel), keine Lösung. -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:480px"></div>
+<script>{
+const H=(x,y,t,size=34,col='#2a2724',w=700)=>'<text x="'+x+'" y="'+y+'" font-family="Caveat" font-weight="'+w+'" font-size="'+size+'" fill="'+col+'">'+t+'</text>';
+let k='';
+k+=H(330,108,'Arbeitsanweisung: Nullstellen berechnen',38,'#a0275e');
+const zeilen=['1. y = 0 setzen','2. a, b, c notieren','3. Mitternachtsformel …','4. x₁ mit + und x₂ mit −','5. N₁ und N₂ angeben'];
+zeilen.forEach((z,i)=>{k+=H(345,160+i*44,z,32);});
+k+=H(660,170,'Stolpersteine:',32,'#3b4a6b');
+k+='<path d="M670 202 h190 M670 242 h150 M670 282 h170" stroke="#8a8478" stroke-width="2.5" stroke-linecap="round"/>';
+k+=H(660,340,'Beispiel: Folientunnel',32,'#3b4a6b');
+k+='<path d="M670 374 h190 M670 410 h130" stroke="#8a8478" stroke-width="2.5" stroke-linecap="round"/>';
+const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480"><defs>'
++'<filter id="kork"><feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="3" seed="2"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .38  0 0 0 0 .22  0 0 0 .9 0"/></filter>'
++'<radialGradient id="licht" cx=".85" cy=".15" r=".9"><stop offset="0" stop-color="#ffd59a" stop-opacity=".5"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></radialGradient>'
++'<radialGradient id="vig" cx=".5" cy=".5" r=".8"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>'
++'<filter id="schatten" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="-10" dy="16" stdDeviation="12" flood-color="#000" flood-opacity=".5"/></filter>'
++'<filter id="unscharf"><feGaussianBlur stdDeviation="4"/></filter>'
++'<filter id="korn"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="6"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .22 0"/></filter>'
++'</defs><rect width="1200" height="480" fill="#9c6b43"/><rect width="1200" height="480" filter="url(#kork)" opacity=".55"/>'
++'<g filter="url(#unscharf)"><rect x="40" y="60" width="200" height="140" fill="#e9e1cf" transform="rotate(-6 140 130)"/><rect x="960" y="270" width="190" height="160" fill="#f2d16b" transform="rotate(5 1050 350)"/></g>'
++'<g transform="rotate(-1.5 600 240)" filter="url(#schatten)"><rect x="300" y="44" width="600" height="400" rx="4" fill="#fbf9f3"/>'
++'<line x1="300" y1="126" x2="900" y2="126" stroke="#d76b8f" stroke-width="2.5"/>'
++(()=>{let s='';for(let y=170;y<440;y+=44)s+='<line x1="300" y1="'+(y-8)+'" x2="900" y2="'+(y-8)+'" stroke="#9fb6cf" stroke-opacity=".35"/>';return s;})()
++k+'</g>'
++'<circle cx="600" cy="58" r="13" fill="#a0275e"/><circle cx="596" cy="54" r="4" fill="#f3b3cb"/>'
++'<rect width="1200" height="480" fill="url(#licht)" style="mix-blend-mode:soft-light"/><rect width="1200" height="480" fill="url(#vig)"/><rect width="1200" height="480" filter="url(#korn)" style="mix-blend-mode:overlay"/></svg>';
+document.getElementById('bild').innerHTML=svg;
+}</script></body></html>

@@ -14,6 +14,14 @@
 @import '@fontsource/nunito-sans/600.css';
 @import '@fontsource/nunito-sans/700.css';
 @import '@fontsource/nunito-sans/800.css';
+@import '@fontsource/fraunces/500.css';
+@import '@fontsource/fraunces/600.css';
+@import '@fontsource/fraunces/500-italic.css';
+@import '@fontsource/source-serif-4/400.css';
+@import '@fontsource/source-serif-4/600.css';
+@import '@fontsource/source-serif-4/400-italic.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
 
 /* Gemeinsam: eingeklebte bzw. eingebundene Bilder (gerenderte WebP-Dateien) */
 .sl-foto { margin: 0 auto; width: 100%; max-width: 860px; }
@@ -114,6 +122,104 @@
 /* Formeln in handschriftlichen Überschriften nicht riesig werden lassen */
 .sl-welt-skizzenbuch .sl-abschnitt-titel .katex,
 .sl-welt-skizzenbuch .sl-titel .katex { font-size: 0.72em; }
+
+/* ══ B Reportage ═════════════════════════════════════════════════════════════════════════════════════════════
+   Ein Magazinartikel über die Situation: Aufmacherbild in voller Breite mit Kicker und Schlagzeile darauf, Bildnachweis-Zeile,
+   Einleitung mit Initiale, Zitat einer beteiligten Person (.sl-zitat), Detailbilder mit Bildunterschrift (figcaption).
+   Überschriften Fraunces, Fließtext Source Serif 4, Bedienung und Labels IBM Plex Sans. Fokus = Infokasten in der Themenfarbe.
+   Unter-Varianten setzen Untergrund und Tönung (abendlicht: warmes Weiß, Bilder in Vollfarbe). */
+.sl-welt-reportage {
+  --font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-ui: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --rp-tinte: #1e1c22;
+  --rp-grau: #5b5762;
+  --rp-linie: rgba(30, 28, 34, 0.16);
+  --rp-blatt: #ffffff;
+  --rp-schatten: 0 1px 0 rgba(30, 28, 34, 0.04), 0 18px 40px -30px rgba(30, 28, 34, 0.55);
+  font-family: var(--font-body);
+}
+/* Abendlicht in Vollfarbe: kaum getöntes Weiß, die Wärme kommt aus den Bildern */
+.sl-welt-reportage.sl-variante-abendlicht { --rp-untergrund: #fdfcfb; --grid: #e7e3e0; }
+
+/* Startbox und Seiten: ein Blatt Magazinpapier */
+.sl-start.sl-welt-reportage,
+.sl-welt-reportage .sl-seite {
+  background: var(--rp-untergrund, var(--rp-blatt));
+  border: 0; border-radius: 4px; box-shadow: var(--rp-schatten); color: var(--rp-tinte);
+}
+.sl-welt-reportage .sl-seite { padding: 28px clamp(16px, 3.4vw, 48px) 36px; margin-top: 10px; }
+.sl-start.sl-welt-reportage { max-width: 920px; padding: 0 clamp(16px, 3.4vw, 44px) 32px; }
+
+/* Aufmacher: Bild in voller Breite, Kicker und Schlagzeile oben links im Bild, Bildnachweis darunter */
+.sl-start-aufmacher { position: relative; margin: 0 calc(-1 * clamp(16px, 3.4vw, 44px)) 6px; }
+.sl-start.sl-welt-reportage .sl-start-bild { width: 100%; margin: 0; background: #26304f; }
+.sl-start-aufmacher h2 {
+  position: absolute; left: clamp(16px, 3.4vw, 44px); top: clamp(14px, 3vw, 34px); right: 30%;
+  margin: 0; color: #fff; font: 600 clamp(30px, 5.2vw, 52px)/1.02 var(--font-display); letter-spacing: -0.015em;
+  text-shadow: 0 2px 18px rgba(20, 16, 30, 0.55);
+}
+.sl-start.sl-welt-reportage.sl-thema .sl-start-aufmacher h2 { color: #fff; font-size: clamp(30px, 5.2vw, 52px); }
+.sl-start-kicker { display: block; margin-bottom: 8px; font: 600 16px/1.2 var(--font-ui); letter-spacing: 0.02em; color: #ffe2c2; text-shadow: none; }
+.sl-start-bildzeile { padding: 6px clamp(16px, 3.4vw, 44px) 0; font: 500 13px/1.4 var(--font-ui); color: var(--rp-grau); text-align: right; }
+/* Einleitung mit Initiale */
+.sl-start.sl-welt-reportage .sl-start-ziel { font-size: 19px; line-height: 1.6; color: var(--rp-tinte); }
+.sl-start.sl-welt-reportage .sl-start-ziel::first-letter,
+.sl-welt-reportage .sl-seite.et-problem .sl-kopf + .sl-text::first-letter {
+  float: left; margin: 6px 10px 0 0; font: 600 64px/0.82 var(--font-display); color: var(--primary);
+}
+
+/* Titel wie Magazin-Überschriften, Bedienung und Labels in IBM Plex Sans */
+.sl-welt-reportage .sl-titel { font: 600 34px/1.1 var(--font-display); color: var(--rp-tinte); letter-spacing: -0.01em; }
+.sl-welt-reportage .sl-abschnitt-titel { font: 600 24px/1.2 var(--font-display); color: var(--rp-tinte); }
+.sl-welt-reportage .sl-abschnitt-titel i { font-size: 18px; color: var(--primary); }
+.sl-welt-reportage .sl-text { font-size: 19px; line-height: 1.62; color: var(--rp-tinte); }
+.sl-welt-reportage .sl-hinweis,
+.sl-welt-reportage .sl-sperre { font-family: var(--font-ui); font-size: 15px; color: var(--rp-grau); }
+.sl-welt-reportage .sl-marke { font: 600 15px/1 var(--font-ui); }
+.sl-welt-reportage .sl-phasen,
+.sl-welt-reportage .bk-btn,
+.sl-welt-reportage .lp-ex-title,
+.sl-welt-reportage .lp-level,
+.sl-welt-reportage .ls-criteria { font-family: var(--font-ui); }
+.sl-welt-reportage .sl-phasen li { border-radius: 4px; background: #fff; }
+
+/* Fokus = Infokasten in der Themenfarbe, ohne Rahmen */
+.sl-welt-reportage .sl-fokus { margin-top: 6px; padding: 18px 22px; background: var(--primary-soft); border: 0; border-radius: 4px; }
+.sl-welt-reportage .sl-fokus-titel { font: 600 17px/1.3 var(--font-ui); color: var(--primary); }
+.sl-welt-reportage .sl-fokus p:not(.sl-fokus-titel) { font-size: 19px; line-height: 1.58; }
+.sl-start.sl-welt-reportage .sl-start-regel { background: var(--primary-soft); border-radius: 4px; font-size: 18px; }
+.sl-start.sl-welt-reportage .sl-start-check { background: #fff; border: 1.5px solid var(--rp-linie); border-radius: 4px; font: 600 16px/1.4 var(--font-ui); }
+
+/* Karten: weißes Papier mit feiner Linie, Graphen wie Infografiken */
+.sl-welt-reportage .sl-seite .lp-ex.bk-panel,
+.sl-welt-reportage .sl-seite .lp-example,
+.sl-welt-reportage .sl-seite .bk-graph { background: #fff; border: 1px solid var(--rp-linie); border-radius: 4px; box-shadow: none; }
+.sl-welt-reportage .sl-seite .lp-ex .bk-graph,
+.sl-welt-reportage .sl-seite .lp-example .bk-graph { border: 0; }
+.sl-welt-reportage .bk-graph svg text { font-family: var(--font-ui); }
+.sl-welt-reportage .sl-seite .bk-btn,
+.sl-start.sl-welt-reportage .bk-btn,
+.sl-welt-reportage .sl-bar .bk-btn { border-radius: 4px; font-weight: 600; }
+.sl-welt-reportage .sl-weiter-gesperrt { background: #fff; border-radius: 4px; font-family: var(--font-ui); }
+
+/* Detailbilder mit Bildunterschrift */
+.sl-welt-reportage .sl-foto { box-shadow: var(--rp-schatten); }
+.sl-welt-reportage .sl-foto figcaption { padding: 8px 2px 0; font: 500 14px/1.45 var(--font-ui); color: var(--rp-grau); }
+
+/* Zitat einer beteiligten Person */
+.sl-zitat { margin: 8px 0; padding: 0 clamp(0px, 4vw, 48px); border: 0; }
+.sl-zitat p { margin: 0; font: italic 500 25px/1.38 var(--font-display, Georgia); color: var(--primary); }
+.sl-zitat footer { margin-top: 8px; padding: 0; border: 0; text-align: left; font: 500 15px/1.4 var(--font-ui, system-ui); color: var(--rp-grau, var(--ink-muted)); }
+.sl-welt-reportage .sl-abschnitt-titel .katex,
+.sl-welt-reportage .sl-titel .katex { font-size: 0.82em; }
+
+@media (max-width: 560px) {
+  .sl-welt-reportage .sl-titel { font-size: 28px; }
+  .sl-start-aufmacher h2 { right: 16px; }
+  .sl-start-kicker { font-size: 14px; }
+  .sl-zitat p { font-size: 21px; }
+}
 
 /* ══ C Diorama ══════════════════════════════════════════════════════════════════════════════════════════════
    Eine kleine 3D-Spielwelt auf einer schwebenden Insel: heller, kühler Bühnen-Untergrund, Bilder mit großem Radius,
