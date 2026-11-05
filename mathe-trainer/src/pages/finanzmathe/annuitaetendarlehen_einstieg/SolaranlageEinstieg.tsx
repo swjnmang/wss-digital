@@ -43,13 +43,15 @@ import './solaranlage.css'
 // T₂, T₃ … verwenden (statt T_v = T₁ · q^(v−1)), Zinsen nicht über die Schuld am Jahresanfang bzw. über Z = A − T bestimmen können.
 // Problem erkennen: Festlegung (Tilgt Frau Lorenz im 2. Jahr gleich viel, weniger oder mehr?), dann im Darlehensrechner der Bank zuerst den
 // Darlehensbetrag, dann Jahresraten ausprobieren (Live-Diagramm der Restschuld). Der Nachbar rechnet wie beim Ratendarlehen
-// 24.000 : 12 + 1.080 = 3.080 €: Damit wäre das Darlehen schon im 10. Jahr abbezahlt. Raten trifft die Annuität nicht auf den Cent.
+// 24.000 : 12 + 1.080 = 3.080 €: Damit wäre das Darlehen schon im 10. Jahr abbezahlt. Probieren trifft die Annuität nicht auf den Cent.
 // Problem lösen in zwei Teilen: Teil 1 die 1. Zeile (K₀, A, T₁, Z₁), Teil 2 die 2. Zeile (Schuld, T₂ = T₁ · q, Z₂ auf zwei Wegen, A),
 // je Beispielrechnung (Wärmepumpe von Herrn Brandt, 18.000 €, 4 %, 10 Jahre) mit Lernvideo → Ergebnisse im Tilgungsplan abgleichen.
-// Aha: Die Rate bleibt gleich, die Tilgung steigt (1.551,99 € → 1.621,83 €), weil die Zinsen sinken. Mit der T₁-Formel käme 1.451,63 € heraus.
+// Aha: Die Annuität bleibt gleich, die Tilgung steigt (1.551,99 € → 1.621,83 €), weil die Zinsen sinken. Mit der T₁-Formel käme 1.451,63 € heraus.
 // Lernprodukt analog: Beratungsblatt für Frau Lorenz (K₀, Tilgungsplan für 2 Jahre, Formeln, Antwort).
 // Phase 4: Annuität eines Autokredits (K₀ erkennen), Wer hat recht? (T₁-Formel für T₂), Zinsen auf zwei Wegen (Lückenrechnung),
 // 5. Jahr für Frau Lorenz (T₅ = T₁ · q⁴), Profi Zinsen insgesamt. Bonus-Spiel „Schuldenberg“.
+// Begriffe: Annuität = jährliche Zahlung aus Zinsen + Tilgung (nie „Rate“ dafür, Rate bzw. Tilgungsrate meint nur die Tilgung).
+// Taschenrechner: Potenzen und Brüche werden in einem Zug eingetippt, gerundet wird nur das Endergebnis (keine gerundeten Zwischenwerte wie q^n).
 // Punkte nach Aufwand: Warm-up 2/3/4/2/3 = 14, Festlegung 3, Ausprobieren 3, Teil 1: 12, Teil 2: 12, Antwort 3, Beratungsblatt 5,
 // Übungen 4/5/6/8, Profi 9. Pflicht zusammen 75: Warm-up 14 = 19 %, Problem lösen 32 = 43 %, Übungen 23 = 31 %;
 // Bonus-Spiel 4 Runden à 2 = 8 wie die beste Übung.
@@ -67,7 +69,7 @@ const THEMA: Thema = {
       src={titelBild}
       width={1200}
       height={600}
-      alt="Kugelschreiber-Skizze eines Hauses mit Solaranlage auf dem Dach und einem Stromspeicher. Daneben Notizen aus der Beratung von Frau Lorenz: Solaranlage und Speicher 27.500 €, Eigenkapital 3.500 €, Rest als Annuitätendarlehen mit 4,5 % p. a. und 12 Jahren, jedes Jahr dieselbe Rate. Mit Textmarker: Rate = ?"
+      alt="Kugelschreiber-Skizze eines Hauses mit Solaranlage auf dem Dach und einem Stromspeicher. Daneben Notizen aus der Beratung von Frau Lorenz: Solaranlage und Speicher 27.500 €, Eigenkapital 3.500 €, Rest als Annuitätendarlehen mit 4,5 % p. a. und 12 Jahren, jedes Jahr dieselbe Annuität. Mit Textmarker: Annuität = ?"
     />
   ),
 }
@@ -256,7 +258,7 @@ function TilgungsplanCheck({
 
 type Wahl = 'gleich' | 'weniger' | 'mehr'
 const WAHL: Record<Wahl, string> = {
-  gleich: 'Genauso viel wie im 1. Jahr. Die Rate ist ja jedes Jahr gleich.',
+  gleich: 'Genauso viel wie im 1. Jahr. Die Annuität ist ja jedes Jahr gleich.',
   weniger: 'Weniger als im 1. Jahr.',
   mehr: 'Mehr als im 1. Jahr.',
 }
@@ -275,7 +277,7 @@ function Festlegung({ wahl, fest, onWahl, onFest }: { wahl: Wahl | null; fest: b
   return (
     <div className="sa-wahl" data-no-autocheck>
       <p className="sl-text">
-        Frau Lorenz zahlt jedes Jahr dieselbe Rate. Wie viel tilgt sie im 2. Jahr, verglichen mit dem 1. Jahr?
+        Frau Lorenz zahlt jedes Jahr dieselbe Annuität, also denselben Betrag aus Zinsen und Tilgung. Wie viel tilgt sie im 2. Jahr, verglichen mit dem 1. Jahr?
       </p>
       <div className="ls-options" role="radiogroup" aria-label="Deine Vermutung">
         {(Object.keys(WAHL) as Wahl[]).map((w) => (
@@ -302,12 +304,12 @@ function Festlegung({ wahl, fest, onWahl, onFest }: { wahl: Wahl | null; fest: b
   )
 }
 
-/** Schuld am Ende jedes Jahres bei einer jährlichen Rate (Schuld · q − Rate) */
-const verlauf = (rate: number) => {
+/** Schuld am Ende jedes Jahres bei einer Annuität (Schuld · q − Annuität) */
+const verlauf = (annuitaet: number) => {
   const werte = [K0]
   let k = K0
   for (let v = 1; v <= N; v++) {
-    k = k * Q - rate
+    k = k * Q - annuitaet
     werte.push(k)
   }
   return werte
@@ -330,8 +332,8 @@ function SchuldDiagramm({ raten }: { raten: number[] }) {
         role="img"
         aria-label={
           werte && rest !== null
-            ? `Schuld am Ende jedes Jahres bei einer Rate von ${euro(aktuell)}: Start 24.000 €, nach 12 Jahren ${rest > 0 ? `noch ${euro(rest)}` : 'nichts mehr'}.`
-            : 'Diagramm der Schuld über 12 Jahre, noch ohne Rate. Start: 24.000 €.'
+            ? `Schuld am Ende jedes Jahres bei einer Annuität von ${euro(aktuell)}: Start 24.000 €, nach 12 Jahren ${rest > 0 ? `noch ${euro(rest)}` : 'nichts mehr'}.`
+            : 'Diagramm der Schuld über 12 Jahre, noch ohne Annuität. Start: 24.000 €.'
         }
       >
         {[0, 5000, 10000, 15000, 20000, 25000].map((k) => (
@@ -427,8 +429,8 @@ function Darlehensrechner({ frei, onFertig }: { frei: boolean; onFertig: () => v
 
   const senden = () => {
     const p = parseInput(eingabe)
-    if (!p) return setMeldung('Gib eine Rate in Euro ein, z. B. 2500.')
-    if (p.value < 500 || p.value > 10000) return setMeldung('Probiere eine Rate zwischen 500 € und 10.000 €.')
+    if (!p) return setMeldung('Gib eine Annuität in Euro ein, z. B. 2500.')
+    if (p.value < 500 || p.value > 10000) return setMeldung('Probiere eine Annuität zwischen 500 € und 10.000 €.')
     setMeldung(null)
     setRaten((r) => [...r, p.value])
   }
@@ -483,12 +485,12 @@ function Darlehensrechner({ frei, onFertig }: { frei: boolean; onFertig: () => v
           {kOk && (
             <>
               <p className="sl-text">
-                Richtig: Die Bank leiht Frau Lorenz <strong>24.000 €</strong>. Jetzt probierst du Jahresraten aus. Der Rechner zeigt dir, wie viel Schuld am Ende
+                Richtig: Die Bank leiht Frau Lorenz <strong>24.000 €</strong>. Jetzt probierst du verschiedene Annuitäten aus. Der Rechner zeigt dir, wie viel Schuld am Ende
                 jedes Jahres übrig bleibt. Nach 12 Jahren soll die Schuld genau 0 € sein.
               </p>
               <SchuldDiagramm raten={raten} />
               <div className="sa-eingabe">
-                <label htmlFor={`${uid}-r`}>Jährliche Rate:</label>
+                <label htmlFor={`${uid}-r`}>Annuität pro Jahr:</label>
                 <span className="sa-eingabe-feld">
                   <input
                     id={`${uid}-r`}
@@ -518,14 +520,14 @@ function Darlehensrechner({ frei, onFertig }: { frei: boolean; onFertig: () => v
                 <div className={`sa-anzeige${Math.abs(rest) <= 5 ? ' sa-anzeige-ok' : ''}`} role="status">
                   <i className="fa-solid fa-calculator" aria-hidden="true" />
                   <span>
-                    <strong>Versuch {raten.length}:</strong> Rate {euro(letzte)}.{' '}
+                    <strong>Versuch {raten.length}:</strong> Annuität {euro(letzte)}.{' '}
                     {Math.abs(rest) <= 5
                       ? `Sehr nah dran! Nach 12 Jahren bleibt fast nichts übrig (${rest >= 0 ? `${euro(rest)} Rest` : `${euro(-rest)} zu viel bezahlt`}).`
                       : letzte <= Z1
-                        ? 'Die Rate reicht nicht einmal für die Zinsen des 1. Jahres. Die Schuld wird jedes Jahr größer.'
+                        ? 'Diese Annuität reicht nicht einmal für die Zinsen des 1. Jahres. Es bleibt nichts für die Tilgung, die Schuld wird jedes Jahr größer.'
                         : rest > 0
-                          ? `Nach 12 Jahren hat Frau Lorenz noch ${euro(rest)} Schulden. Die Rate ist zu niedrig.`
-                          : `Schon im ${fertigJahr}. Jahr ist alles abbezahlt. Mit dieser Rate zahlt Frau Lorenz mehr als nötig.`}
+                          ? `Nach 12 Jahren hat Frau Lorenz noch ${euro(rest)} Schulden. Die Annuität ist zu niedrig.`
+                          : `Schon im ${fertigJahr}. Jahr ist alles abbezahlt. Mit dieser Annuität zahlt Frau Lorenz mehr als nötig.`}
                   </span>
                 </div>
               )}
@@ -547,7 +549,7 @@ function Erkenntnis() {
   return (
     <p className="sl-text sa-erkenntnis" role="status">
       <strong>Schon gemerkt?</strong> Mit der Rechnung des Nachbarn (<M>{'24\\,000 : 12 + 1\\,080 = 3\\,080'}</M> €) wäre Frau Lorenz schon im 10. Jahr fertig: Sie
-      würde zu viel bezahlen. So rechnet man beim Ratendarlehen, bei dem die Raten jedes Jahr kleiner werden. Durch Probieren kommst du der richtigen Rate zwar näher,
+      würde zu viel bezahlen. So rechnet man beim Ratendarlehen, bei dem die Tilgung jedes Jahr gleich bleibt und die Annuität sinkt. Durch Probieren kommst du der richtigen Annuität zwar näher,
       aber auf den Cent genau triffst du sie kaum. Auf der nächsten Seite lernst du die Formeln, mit denen die Bank die Annuität, die Tilgung und die Zinsen berechnet.
     </p>
   )
@@ -592,11 +594,11 @@ const BSP1_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     title: <>Die Annuität <M>A</M> mit der Formel aus der Merkhilfe</>,
     body: (
       <>
-        <p>Die Annuität ist die Jahresrate. Sie ist in allen 10 Jahren gleich hoch.</p>
+        <p>Die Annuität ist der Betrag, den Herr Brandt jedes Jahr an die Bank zahlt: Zinsen plus Tilgung. Sie ist in allen 10 Jahren gleich hoch.</p>
         <MB>{'A = K_0 \\cdot \\dfrac{q^n \\cdot (q - 1)}{q^n - 1}'}</MB>
         <MB>{'A = 18\\,000 \\cdot \\dfrac{1{,}04^{10} \\cdot (1{,}04 - 1)}{1{,}04^{10} - 1}'}</MB>
         <MB>{'A = 2\\,219{,}24 \\text{ €}'}</MB>
-        <p>Tipp für den Taschenrechner: Zähler und Nenner jeweils in Klammern eingeben.</p>
+        <p>Tipp für den Taschenrechner: Zähler und Nenner jeweils in Klammern eingeben und alles in einem Zug rechnen. Runde nur das Ergebnis auf Cent, nie die Potenz.</p>
       </>
     ),
   },
@@ -783,7 +785,7 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
             prompt={
               <p>
                 Bei einem Ratendarlehen ist die Schuld am Anfang des Jahres 20.000 €. In diesem Jahr werden 2.500 € getilgt, der Zinssatz beträgt 4 % p.a. Berechne
-                die Zinsen, die Jahresrate (Annuität) und die Schuld am Anfang des nächsten Jahres.
+                die Zinsen, die Annuität (Zinsen + Tilgung) und die Schuld am Anfang des nächsten Jahres.
               </p>
             }
             rechnung={[
@@ -808,7 +810,7 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
             help={
               <Hilfen
                 steps={[
-                  <>Eine Jahresrate besteht aus zwei Teilen: Zinsen und Tilgung.</>,
+                  <>Die Annuität besteht aus zwei Teilen: Zinsen und Tilgung.</>,
                   <>Die Zinsen rechnest du für die Schuld am Jahresanfang. Von der Schuld ziehst du nur die Tilgung ab, nicht die Zinsen.</>,
                   <>
                     <M>{'Z = 20\\,000 \\cdot 0{,}04'}</M>, dann <M>{'A = 2\\,500 + Z'}</M>.
@@ -820,25 +822,19 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
           <CheckCard
             onSolved={fertig.teil('d')}
             punkte={2}
-            title="d) Potenz mit dem Taschenrechner"
-            prompt={<p>Berechne mit dem Taschenrechner und runde auf 4 Nachkommastellen.</p>}
-            rechnung={[
-              { l: ['1{,}045^{12}'], r: [{ luecke: 'p1' }] },
-              { l: ['1{,}04^{10}'], r: [{ luecke: 'p2' }] },
-            ]}
-            fields={[
-              { kind: 'num', key: 'p1', label: '1,045 hoch 12', expected: 1.045 ** 12, tol: 0.0001 },
-              { kind: 'num', key: 'p2', label: '1,04 hoch 10', expected: 1.04 ** 10, tol: 0.0001 },
-            ]}
+            title="d) Potenz in einem Zug"
+            prompt={
+              <p>
+                10.000 € liegen 5 Jahre lang zu 3 % p.a. auf einem Konto, die Zinsen werden mitverzinst. Berechne den Kontostand mit dem Taschenrechner in einem Zug.
+                Runde nur das Ergebnis auf Cent.
+              </p>
+            }
+            rechnung={[{ l: ['K_5 = 10\\,000 \\cdot 1{,}03^5'], r: [{ luecke: 'k5', breit: true }] }]}
+            fields={[{ kind: 'num', key: 'k5', label: 'Kontostand nach 5 Jahren in Euro', expected: 10000 * 1.03 ** 5, tol: 0.01 }]}
             solution={
               <>
-                <Loesungsweg
-                  schritte={[
-                    { titel: 'Erste Potenz', tex: '1{,}045^{12} \\approx 1{,}6959' },
-                    { titel: 'Zweite Potenz', tex: '1{,}04^{10} \\approx 1{,}4802' },
-                  ]}
-                />
-                <p>Am Taschenrechner: Basis eingeben, dann die Potenztaste (z. B. ^ oder xʸ), dann den Exponenten.</p>
+                <Loesungsweg schritte={[{ titel: 'In einem Zug eintippen', tex: 'K_5 = 10\\,000 \\cdot 1{,}03^5 = 11\\,592{,}74 \\text{ €}' }]} />
+                <p>Am Taschenrechner: 10000 × 1,03, dann die Potenztaste (z. B. ^ oder xʸ) und 5. Nicht zuerst die Potenz runden, sonst entstehen Rundungsfehler.</p>
               </>
             }
           />
@@ -846,20 +842,29 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
             onSolved={fertig.teil('e')}
             punkte={3}
             title="e) Bruch mit Klammern"
-            prompt={<p>Berechne mit dem Taschenrechner. Achte darauf, Zähler und Nenner jeweils in Klammern einzugeben.</p>}
+            prompt={
+              <p>
+                Berechne mit dem Taschenrechner in einem Zug. Setze Zähler und Nenner jeweils in Klammern und runde nur das Ergebnis (beim ersten Bruch ist es glatt,
+                beim zweiten auf Cent).
+              </p>
+            }
             rechnung={[
               { l: ['\\dfrac{1{,}2 \\cdot 0{,}05}{1{,}2 - 1}'], r: [{ luecke: 'b1' }] },
-              { l: ['\\dfrac{0{,}06}{1{,}5 - 1}'], r: [{ luecke: 'b2' }] },
+              { l: ['8\\,000 \\cdot \\dfrac{1{,}05^4 \\cdot 0{,}05}{1{,}05^4 - 1}'], r: [{ luecke: 'b2', breit: true }] },
             ]}
             fields={[
               { kind: 'num', key: 'b1', label: 'erster Bruch', expected: 0.3, tol: 0.0001 },
-              { kind: 'num', key: 'b2', label: 'zweiter Bruch', expected: 0.12, tol: 0.0001 },
+              { kind: 'num', key: 'b2', label: 'zweiter Term in Euro', expected: (8000 * 1.05 ** 4 * 0.05) / (1.05 ** 4 - 1), tol: 0.01 },
             ]}
             solution={
               <Loesungsweg
                 schritte={[
                   { titel: 'Erster Bruch: Zähler und Nenner einzeln', tex: ['\\dfrac{1{,}2 \\cdot 0{,}05}{1{,}2 - 1} = \\dfrac{0{,}06}{0{,}2}', '= 0{,}3'] },
-                  { titel: 'Zweiter Bruch', tex: ['\\dfrac{0{,}06}{1{,}5 - 1} = \\dfrac{0{,}06}{0{,}5}', '= 0{,}12'] },
+                  {
+                    titel: 'Zweiter Term in einem Zug',
+                    text: <p>Eingabe zum Beispiel: 8000 × (1,05^4 × 0,05) ÷ (1,05^4 − 1). Die Potenz wird nicht gerundet.</p>,
+                    tex: '8\\,000 \\cdot \\dfrac{1{,}05^4 \\cdot 0{,}05}{1{,}05^4 - 1} = 2\\,256{,}09',
+                  },
                 ]}
               />
             }
@@ -867,9 +872,9 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
               <Hilfen
                 steps={[
                   <>Der Bruchstrich wirkt wie eine Klammer um Zähler und Nenner.</>,
-                  <>Rechne zuerst den Zähler aus, dann den Nenner, und teile danach.</>,
+                  <>Tippe den Zähler in Klammern ein, dann ÷, dann den Nenner in Klammern. Runde nichts zwischendurch.</>,
                   <>
-                    <M>{'1{,}2 \\cdot 0{,}05 = 0{,}06'}</M> und <M>{'1{,}2 - 1 = 0{,}2'}</M>, also <M>{'0{,}06 : 0{,}2'}</M>.
+                    Zweiter Term: <M>{'8\\,000 \\cdot (1{,}05^4 \\cdot 0{,}05) : (1{,}05^4 - 1)'}</M>
                   </>,
                 ]}
               />
@@ -880,9 +885,9 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
     },
     {
       art: 'problem',
-      titel: 'Wie hoch ist die Rate für die Solaranlage?',
+      titel: 'Wie hoch ist die Annuität für die Solaranlage?',
       pflicht: ['fest', 'rechner'],
-      bedingung: 'Halte deine Vermutung fest und probiere im Darlehensrechner mindestens drei Raten aus.',
+      bedingung: 'Halte deine Vermutung fest und probiere im Darlehensrechner mindestens drei Annuitäten aus.',
       inhalt: (fertig) => (
         <>
           <p className="sl-text">
@@ -891,20 +896,20 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
           </p>
           <p className="sl-text">
             Den Rest leiht ihr die Bank als <strong>Annuitätendarlehen</strong> mit <strong>4,5 % p.a.</strong> und einer Laufzeit von <strong>12 Jahren</strong>. Bei
-            einem Annuitätendarlehen zahlt man jedes Jahr dieselbe Rate, die <strong>Annuität</strong>. Sie besteht aus Zinsen und Tilgung. Gesucht ist die Höhe dieser
-            Rate.
+            einem Annuitätendarlehen zahlt man jedes Jahr denselben Betrag an die Bank, die <strong>Annuität</strong>. Sie besteht aus den Zinsen und der Tilgung (dem
+            Teil, der die Schuld verringert). Gesucht ist die Höhe der Annuität.
           </p>
           <Zitat wer="Frau Lorenz">
             <p>
-              „Mein Nachbar sagt: Schuld durch 12 Jahre, dann noch die Zinsen dazu, fertig. Stimmt das? Und tilge ich dann jedes Jahr gleich viel, wenn die Rate immer
-              gleich ist?“
+              „Mein Nachbar sagt: Schuld durch 12 Jahre, dann noch die Zinsen dazu, fertig. Stimmt das? Und tilge ich dann jedes Jahr gleich viel, wenn ich immer
+              denselben Betrag zahle?“
             </p>
           </Zitat>
           <div className="sl-fokus">
             <p className="sl-fokus-titel">Dein Auftrag: Erst vermuten, dann ausprobieren</p>
             <p>
               Lege dich zuerst fest: Tilgt Frau Lorenz im 2. Jahr gleich viel, weniger oder mehr? Probiere danach im Darlehensrechner der Bank aus, ohne Formel: Mit
-              welcher jährlichen Rate ist das Darlehen nach genau 12 Jahren abbezahlt? Probiere auch die Idee des Nachbarn aus.
+              welcher Annuität ist das Darlehen nach genau 12 Jahren abbezahlt? Probiere auch die Idee des Nachbarn aus.
             </p>
           </div>
           <figure className="sl-foto">
@@ -1053,7 +1058,7 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
                   feedback: 'Gleich bleibt nur die Summe aus Zinsen und Tilgung. Schau in deinen Tilgungsplan: Die Zinsen werden kleiner.',
                 },
                 {
-                  text: 'Nein, sie tilgt mehr: im 1. Jahr 1.551,99 €, im 2. Jahr 1.621,83 €. Die Schuld wird kleiner, also auch die Zinsen. Der Rest der gleichen Rate geht in die Tilgung.',
+                  text: 'Nein, sie tilgt mehr: im 1. Jahr 1.551,99 €, im 2. Jahr 1.621,83 €. Die Schuld wird kleiner, also auch die Zinsen. Der Rest der gleichen Annuität geht in die Tilgung.',
                   correct: true,
                   feedback: (
                     <>
@@ -1097,7 +1102,7 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
             <Aufklappbar label="Satzanfänge ansehen" icon="fa-comment-dots">
               <ul className="zk-liste">
                 <li>„Die Bank leiht Ihnen nicht 27.500 €, sondern nur …, weil …“</li>
-                <li>„Ihre Rate (Annuität) beträgt jedes Jahr …“</li>
+                <li>„Ihre Annuität (Zinsen + Tilgung) beträgt jedes Jahr …“</li>
                 <li>„Im 1. Jahr zahlen Sie davon … Zinsen und tilgen …, im 2. Jahr …“</li>
                 <li>„Die Rechnung Ihres Nachbarn passt nicht, weil …“</li>
                 <li>
@@ -1118,10 +1123,10 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
                   Zu jedem Wert die Formel mit eingesetzten Zahlen: <M>A</M>, <M>{'T_1'}</M>, <M>{'T_2 = T_1 \\cdot q'}</M>, die Zinsen über die Schuld am Jahresanfang
                   oder mit <M>{'A - T'}</M>
                 </>,
-                'Eine Antwort an Frau Lorenz: Wie hoch ist die Rate, und warum steigt die Tilgung, obwohl die Rate gleich bleibt?',
+                'Eine Antwort an Frau Lorenz: Wie hoch ist die Annuität, und warum steigt die Tilgung, obwohl die Annuität gleich bleibt?',
                 <>
                   Unter deinem Beratungsblatt steht, wofür die Abkürzungen stehen: <M>{'K_0'}</M> (Darlehensbetrag, Schuld am Anfang des 1. Jahres), <M>A</M> (Annuität,
-                  jährliche Rate), <M>{'T_1'}</M> und <M>{'T_v'}</M> (Tilgung im 1. bzw. im <M>v</M>-ten Jahr), <M>Z</M> (Zinsen), <M>p</M> (Zinssatz), <M>q</M>{' '}
+                  jährliche Zahlung aus Zinsen und Tilgung), <M>{'T_1'}</M> und <M>{'T_v'}</M> (Tilgung im 1. bzw. im <M>v</M>-ten Jahr), <M>Z</M> (Zinsen), <M>p</M> (Zinssatz), <M>q</M>{' '}
                   (Zinsfaktor), <M>n</M> (Laufzeit in Jahren) und <M>v</M> (Nummer des Jahres). Außerdem erklärst du die Begriffe Annuitätendarlehen, Tilgung, Restschuld und
                   Eigenkapital und alle anderen Wörter, die für dich neu waren.
                 </>,
@@ -1381,15 +1386,15 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
               }
               fieldsRow
               fields={[
-                { kind: 'num', key: 'alle', label: 'alle Raten zusammen:', expected: r2(N * A), unit: '€', tol: 0.1 },
+                { kind: 'num', key: 'alle', label: 'alle Annuitäten zusammen:', expected: r2(N * A), unit: '€', tol: 0.1 },
                 { kind: 'num', key: 'zges', label: 'Zinsen insgesamt:', expected: r2(N * A - K0), unit: '€', tol: 0.1 },
               ]}
               loesungNachFehler
               solution={
                 <Loesungsweg
                   schritte={[
-                    { titel: 'Alle Raten zusammen', tex: '12 \\cdot 2\\,631{,}99 = 31\\,583{,}88 \\text{ €}' },
-                    { titel: 'Zinsen = alle Raten minus Darlehen', tex: '31\\,583{,}88 - 24\\,000 = 7\\,583{,}88 \\text{ €}' },
+                    { titel: 'Alle Annuitäten zusammen', tex: '12 \\cdot 2\\,631{,}99 = 31\\,583{,}88 \\text{ €}' },
+                    { titel: 'Zinsen = alle Annuitäten minus Darlehen', tex: '31\\,583{,}88 - 24\\,000 = 7\\,583{,}88 \\text{ €}' },
                   ]}
                 />
               }
@@ -1397,7 +1402,7 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
                 <Hilfen
                   steps={[
                     <>Frau Lorenz überweist 12-mal dieselbe Annuität. Was davon ist nicht Tilgung?</>,
-                    <>Alle Raten zusammen minus das geliehene Geld ergibt die Zinsen.</>,
+                    <>Alle Annuitäten zusammen minus das geliehene Geld ergibt die Zinsen.</>,
                     <>
                       <M>{'12 \\cdot 2\\,631{,}99'}</M>, davon ziehst du <M>{'24\\,000'}</M> ab.
                     </>,
@@ -1455,7 +1460,7 @@ function Rueckbezug({ wahl }: { wahl: Wahl | null }) {
     <div className="ls-back">
       <p>
         <strong>Du hattest vermutet:</strong> {WAHL[wahl]}{' '}
-        {wahl === 'mehr' ? 'Das stimmt!' : 'Tatsächlich tilgt Frau Lorenz mehr.'} Im 1. Jahr tilgt sie {euro(T1)}, im 2. Jahr {euro(T2)}. Die Rate bleibt gleich, aber
+        {wahl === 'mehr' ? 'Das stimmt!' : 'Tatsächlich tilgt Frau Lorenz mehr.'} Im 1. Jahr tilgt sie {euro(T1)}, im 2. Jahr {euro(T2)}. Die Annuität bleibt gleich, aber
         die Zinsen sinken von {euro(Z1)} auf {euro(Z2)}, weil die Schuld kleiner geworden ist. Mit der Formel für <M>{'T_1'}</M> und der neuen Schuld käme fälschlich{' '}
         {euro(T2_FALSCH)} heraus. Und die Rechnung des Nachbarn ({euro(NACHBAR)}) war zu hoch: Die richtige Annuität ist {euro(A)}.
       </p>
