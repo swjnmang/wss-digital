@@ -158,6 +158,15 @@
 /* Abendlicht in Vollfarbe: kaum getöntes Weiß, die Wärme kommt aus den Bildern */
 .sl-welt-reportage.sl-variante-abendlicht { --rp-untergrund: #fdfcfb; --grid: #e7e3e0; }
 
+/* Duoton (Schwarz + Themenfarbe): Bilder nur in Schwarz, Grau und der Themenfarbe, kühles Weiß; der Auftrag steht in einem Kasten
+   mit schwarzem Rahmen statt auf einer Farbfläche, Überschriften in der Themenfarbe (Vorlage: Miras drei Fragen) */
+.sl-welt-reportage.sl-variante-duoton { --rp-untergrund: #fbfbfa; --rp-tinte: #161616; --grid: #e4e2e0; }
+.sl-welt-reportage.sl-variante-duoton .sl-titel { color: var(--primary); }
+.sl-welt-reportage.sl-variante-duoton .sl-fokus { background: #fff; border: 2px solid var(--rp-tinte); }
+.sl-welt-reportage.sl-variante-duoton .sl-fokus-titel { color: var(--rp-tinte); text-transform: uppercase; letter-spacing: 0.06em; font-size: 15px; }
+.sl-welt-reportage.sl-variante-duoton .sl-zitat p { color: var(--rp-tinte); }
+.sl-start.sl-welt-reportage.sl-variante-duoton .sl-start-bild { background: #161616; }
+
 /* Startbox und Seiten: ein Blatt Magazinpapier */
 .sl-start.sl-welt-reportage,
 .sl-welt-reportage .sl-seite {
@@ -256,6 +265,18 @@
   --di-untergrund: radial-gradient(130% 90% at 50% -10%, #fbfdfe 0%, #eaf2f6 55%, #dde9f0 100%);
   --grid: #d6e5ee;
 }
+
+/* Holzspielzeug: warmer Untergrund wie heller Ahorn, Kanten und Schatten in Holzbraun (Vorlage: Die Münztürme) */
+.sl-welt-diorama.sl-variante-holzspielzeug {
+  --di-untergrund: radial-gradient(130% 90% at 50% -10%, #fffcf6 0%, #f7ecdc 55%, #efdfc8 100%);
+  --di-tinte: #33261a;
+  --di-kante: rgba(122, 79, 34, 0.38);
+  --di-schatten: 0 1px 0 rgba(122, 79, 34, 0.06), 0 22px 36px -26px rgba(122, 79, 34, 0.55);
+  --grid: #ecdcc4;
+}
+.sl-welt-diorama.sl-variante-holzspielzeug .sl-seite .lp-ex.bk-panel,
+.sl-welt-diorama.sl-variante-holzspielzeug .sl-seite .lp-example,
+.sl-welt-diorama.sl-variante-holzspielzeug .sl-seite .bk-graph { border-color: rgba(122, 79, 34, 0.14); }
 
 /* Startbox und jede Seite stehen als Bühne auf dem Untergrund */
 .sl-start.sl-welt-diorama,

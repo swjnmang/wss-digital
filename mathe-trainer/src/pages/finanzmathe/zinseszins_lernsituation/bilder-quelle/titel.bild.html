@@ -1,0 +1,58 @@
+<!doctype html>
+<!-- Bildwelt Diorama / Holzspielzeug, Titelbild „Die Münztürme“: Spielbrett aus Holz mit zwei gleich hohen Münztürmen (Mira, Jonas),
+     je 5.000 €, 3 % p. a., nach 10 Jahren: ? Rendern: node scripts/bilder-rendern.cjs src/pages/finanzmathe/zinseszins_lernsituation -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+// Gemeinsame Helfer für die Diorama-Bilder „Die Münztürme“ (Holzspielzeug): isometrische Quader, Münzstapel, Schilder.
+const c=Math.cos(Math.PI/6),s=Math.sin(Math.PI/6);
+let ox=600,oy=150;
+const setO=(x,y)=>{ox=x;oy=y};
+const P=(x,y,z)=>[ox+(x-y)*c, oy+(x+y)*s - z];
+const poly=(pts,fill,extra='')=>'<polygon points="'+pts.map(p=>P(...p).join(',')).join(' ')+'" fill="'+fill+'" '+extra+'/>';
+function box(x,y,z,w,d,h,top,left,right,extra=''){return poly([[x,y+d,z],[x+w,y+d,z],[x+w,y+d,z+h],[x,y+d,z+h]],left,extra)+poly([[x+w,y,z],[x+w,y+d,z],[x+w,y+d,z+h],[x+w,y,z+h]],right,extra)+poly([[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]],top,extra);}
+// Holzmaserung auf einer Deckfläche
+function maserung(x,y,z,w,d,n=9){let g='';for(let i=1;i<n;i++){const yy=y+d*i/n;const a=P(x,yy,z),b=P(x+w,yy,z);g+='<path d="M'+a[0]+' '+a[1]+' Q'+((a[0]+b[0])/2)+' '+((a[1]+b[1])/2+(i%2?3:-3))+' '+b[0]+' '+b[1]+'" stroke="rgba(120,70,25,.16)" stroke-width="2" fill="none"/>';}return g;}
+// Münzstapel: n Münzen auf (x,y,z), Radius r, Dicke t
+function stapel(x,y,z,n,r=34,t=11,farbe='#e9b949',rand='#b8861f',hell='#f6d77a'){
+  let g='';const [cx,cy]=P(x,y,z);
+  for(let i=0;i<n;i++){const yy=cy-i*t;
+    g+='<path d="M'+(cx-r)+' '+yy+' v'+(-t)+' a'+r+' '+(r*0.55)+' 0 0 0 '+(2*r)+' 0 v'+t+' a'+r+' '+(r*0.55)+' 0 0 1 '+(-2*r)+' 0 z" fill="'+rand+'"/>';
+    g+='<line x1="'+(cx-r)+'" y1="'+(yy-t/2)+'" x2="'+(cx+r)+'" y2="'+(yy-t/2)+'" stroke="rgba(0,0,0,.08)" stroke-width="1"/>';
+  }
+  const top=cy-n*t;
+  g+='<ellipse cx="'+cx+'" cy="'+top+'" rx="'+r+'" ry="'+(r*0.55)+'" fill="'+farbe+'"/>';
+  g+='<ellipse cx="'+cx+'" cy="'+top+'" rx="'+(r*0.66)+'" ry="'+(r*0.36)+'" fill="none" stroke="'+hell+'" stroke-width="3"/>';
+  return {g,top,cx};
+}
+// Holzschild mit Text an einem Stab
+function schild(cx,cy,zeilen,w=170,farbe='#8a5800'){const h=22+zeilen.length*34;let g='<line x1="'+cx+'" y1="'+cy+'" x2="'+cx+'" y2="'+(cy-50)+'" stroke="#7a4f22" stroke-width="6" stroke-linecap="round"/>';
+  g+='<rect x="'+(cx-w/2)+'" y="'+(cy-50-h)+'" width="'+w+'" height="'+h+'" rx="14" fill="#fffaf0" stroke="#7a4f22" stroke-width="4"/>';
+  zeilen.forEach((z,i)=>{g+='<text x="'+cx+'" y="'+(cy-50-h+44+i*34)+'" text-anchor="middle" font-family="Fredoka" font-size="'+(i?24:29)+'" font-weight="600" fill="'+(i?'#3a2a18':farbe)+'">'+z+'</text>';});
+  return g;}
+function hintergrund(w,h){return '<defs><radialGradient id="bg" cx=".5" cy=".3" r=".9"><stop offset="0" stop-color="#fffaf2"/><stop offset="1" stop-color="#ecdcc4"/></radialGradient><filter id="sh"><feGaussianBlur stdDeviation="20"/></filter><marker id="pf" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#8a5800"/></marker></defs><rect width="'+w+'" height="'+h+'" fill="url(#bg)"/>';}
+</script>
+<script>
+setO(560,140);
+let g='';
+g+=box(-40,-40,-50,480,360,50,'#dcae72','#b9824a','#a06d3a');
+g+=maserung(-40,-40,0,480,360);
+// Spielfelder auf gleicher Tiefe (x + y gleich), Mira links, Jonas rechts
+const feld=(x,y)=>poly([[x-60,y-60,.5],[x+60,y-60,.5],[x+60,y+60,.5],[x-60,y+60,.5]],'#f3dcb3','stroke="#c4935a" stroke-width="3"');
+g+=feld(90,190)+feld(250,30);
+const m=stapel(90,190,0,10,46,13);g+=m.g;
+const j=stapel(250,30,0,10,46,13);g+=j.g;
+[m,j].forEach(t=>{g+='<text x="'+t.cx+'" y="'+(t.top-36)+'" text-anchor="middle" font-family="Fredoka" font-size="56" font-weight="600" fill="#8a5800">?</text>';});
+// Namensschilder vorn
+{const [x,y]=P(200,300,0);g+=schild(x,y+40,['Mira','5.000 €'],176);}
+{const [x,y]=P(400,140,0);g+=schild(x,y+40,['Jonas','5.000 €'],176);}
+// Würfel mit Zinssatz (hinten links) und Kalenderblock (hinten rechts)
+g+=box(-20,250,0,64,64,64,'#fff4e0','#e2c497','#d1b080','stroke="#b98b4e" stroke-width="2"');
+{const [x,y]=P(12,282,64);g+='<text x="'+x+'" y="'+(y+9)+'" text-anchor="middle" font-family="Fredoka" font-size="27" font-weight="600" fill="#8a5800">3 %</text>';}
+g+=box(370,240,0,84,60,50,'#fff4e0','#e2c497','#d1b080','stroke="#b98b4e" stroke-width="2"');
+{const [x,y]=P(412,270,50);g+='<text x="'+x+'" y="'+(y+9)+'" text-anchor="middle" font-family="Fredoka" font-size="21" font-weight="600" fill="#3a2a18">10 Jahre</text>';}
+const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">'+hintergrund(1200,600)
++'<ellipse cx="600" cy="560" rx="360" ry="26" fill="#7a5a3a" opacity=".25" filter="url(#sh)"/>'+g+'</svg>';
+document.getElementById('bild').innerHTML=svg;
+</script>
+</body></html>

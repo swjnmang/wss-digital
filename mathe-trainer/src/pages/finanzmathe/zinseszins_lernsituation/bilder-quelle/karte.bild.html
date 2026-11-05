@@ -1,0 +1,23 @@
+<!doctype html>
+<!-- Bildwelt Diorama / Holzspielzeug, Handlungsprodukt „Concept Map: Zins oder Zinseszins?“: ein Blatt auf dem Holztisch mit
+     leeren Begriffskärtchen und Verbindungslinien, daneben Holzmünzen und ein Stift. Zeigt nur die Form, keine Lösung. -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:480px"></div>
+<script>
+let g='';
+// Holztisch
+g+='<rect width="1200" height="480" fill="#d9a86a"/>';
+for(let i=0;i<14;i++){const y=20+i*34;g+='<path d="M0 '+y+' Q300 '+(y+(i%2?6:-6))+' 600 '+y+' T1200 '+y+'" stroke="rgba(120,70,25,.15)" stroke-width="3" fill="none"/>';}
+// Blatt
+g+='<rect x="236" y="34" width="728" height="420" rx="14" fill="#5b3a17" opacity=".25" filter="url(#sh)"/>';
+g+='<rect x="230" y="24" width="728" height="420" rx="14" fill="#fffdf8" stroke="#c4935a" stroke-width="3"/>';
+const karte=(x,y,w,t,haupt)=>'<rect x="'+(x-w/2)+'" y="'+(y-30)+'" width="'+w+'" height="60" rx="16" fill="'+(haupt?'#fbf0da':'#fff')+'" stroke="'+(haupt?'#8a5800':'#b98b4e')+'" stroke-width="'+(haupt?4:3)+'"/><text x="'+x+'" y="'+(y+9)+'" text-anchor="middle" font-family="Fredoka" font-size="'+(haupt?27:24)+'" font-weight="600" fill="'+(haupt?'#8a5800':'#3a2a18')+'">'+t+'</text>';
+const knoten=[[594,234,300,'Zins oder Zinseszins?',1],[380,96,220,'Zins'],[808,96,240,'Zinseszins'],[372,372,220,'Formel …'],[594,392,170,'Graph …'],[816,372,230,'Beispiel …']];
+knoten.slice(1).forEach(([x,y])=>{g+='<line x1="594" y1="234" x2="'+x+'" y2="'+y+'" stroke="#8a5800" stroke-width="3" stroke-dasharray="8 6"/>';});
+knoten.forEach(([x,y,w,t,h])=>{g+=karte(x,y,w,t,h);});
+// Holzmünzen links, Stift rechts
+[[110,150],[140,190],[96,232]].forEach(([x,y])=>{g+='<ellipse cx="'+x+'" cy="'+(y+8)+'" rx="44" ry="26" fill="#b8861f"/><ellipse cx="'+x+'" cy="'+y+'" rx="44" ry="26" fill="#e9b949"/><ellipse cx="'+x+'" cy="'+y+'" rx="29" ry="17" fill="none" stroke="#f6d77a" stroke-width="3"/>';});
+g+='<g transform="translate(1060 300) rotate(-35)"><rect x="-110" y="-12" width="200" height="24" rx="6" fill="#8a5800"/><rect x="60" y="-12" width="30" height="24" fill="#e9c47a"/><path d="M90 -12 L122 0 L90 12 z" fill="#f3dcb3"/><path d="M112 -4 L122 0 L112 4 z" fill="#3a2a18"/></g>';
+document.getElementById('bild').innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480"><defs><filter id="sh"><feGaussianBlur stdDeviation="10"/></filter></defs>'+g+'</svg>';
+</script>
+</body></html>

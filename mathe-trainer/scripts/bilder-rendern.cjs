@@ -57,9 +57,13 @@ async function rendern(page, quelle, ziel, qualitaet) {
     auftraege.push([a, b || a.replace(/\.bild\.html$|\.html$/, '') + '.webp']);
   }
   const browser = await chromium.launch();
-  const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1400, height: 900 } });
   try {
-    for (const [quelle, ziel] of auftraege) await rendern(page, quelle, ziel, Number(q) || 0.86);
+    // Jede Quelle bekommt eine frische Seite: Skripte mehrerer Quellen teilen sonst ihre globalen Variablen (let/const kollidieren)
+    for (const [quelle, ziel] of auftraege) {
+      const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1400, height: 900 } });
+      await rendern(page, quelle, ziel, Number(q) || 0.86);
+      await page.close();
+    }
   } finally {
     await browser.close();
   }
