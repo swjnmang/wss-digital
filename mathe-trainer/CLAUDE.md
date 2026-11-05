@@ -97,8 +97,9 @@ ohne Prüfen-Button: `CheckCard` macht das automatisch, eigene Eingabe-Bausteine
 Nur Auswahlaufgaben (`McCard`) behalten „Prüfen“.
 Warm-up: mindestens 5 kurze Aufgaben, alle Pflicht, jede sichtbar nummeriert (Kartentitel „a) Kurzname“, „b) …“; `seiten.css` zeigt die Titel auf der Warm-up-Seite an). Beim Rechenbeispiel in „Problem lösen“ ist immer das passende Lernvideo eingebettet
 (`BeispielMitVideo` mit `video`), falls es eines gibt; die Videos sind meist schon bei den Übungsaufgaben des Themas verlinkt und werden von dort übernommen.
-Die Kriterien des Handlungsprodukts enthalten immer einen Punkt „unbekannte Begriffe und die Bedeutung aller Abkürzungen der Formel aufschreiben“,
-mit den konkreten Abkürzungen des Themas (z. B. Rentenrechnung: r = Rate bzw. Rente).
+Die Kriterien des Handlungsprodukts („Ist dein … vollständig?“) sind seit 2026-11-05 immer genau drei kurze feste Punkte
+(`standardKriterien(…)` aus `finanzmathe/zins_kit/zins_kit.tsx`): Problem vollständig gelöst und Rechenschritte festgehalten, Antwortsatz notiert,
+offene Fragen notiert. Keine Stolpersteine, keine Begriffs- und Abkürzungslisten, keine weiteren Punkte.
 Ganz am Ende („Wissen prüfen und vertiefen“, unter den Übungen) wird nach allen Pflicht-Übungen ein kleines thematisch passendes Mathe-Spiel
 freigeschaltet (`BonusSpiel` aus `lernsituation_kit/seiten.tsx`; Beispiele `quadratische_funktionen/MarioSpiel.tsx`,
 `finanzmathe/rentenrechnung_einstieg/BusRallye.tsx`; Regeln und Ideen im Skill).
