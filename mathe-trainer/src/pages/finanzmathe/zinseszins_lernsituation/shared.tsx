@@ -2,7 +2,7 @@ import { useId, useState, type ChangeEvent } from 'react'
 import { M, fmt, tex } from '../../daten_und_zufall/lernpfad/kit'
 import './zinseszins.css'
 
-// Gemeinsame Bausteine der beiden Zinseszins-Lernsituationen („Wer hat nach 10 Jahren mehr?“ und „Miras drei Fragen“):
+// Gemeinsame Bausteine der beiden Zinseszins-Lernsituationen („Die Münztürme“ und „Miras drei Fragen“):
 // Zahlenhelfer und der Wachstumsgraph (Jonas: Zinsen ausgezahlt, Mira: Zinsen bleiben auf dem Konto).
 
 /* ── Zahlen ──────────────────────────────────────────────────────────────── */

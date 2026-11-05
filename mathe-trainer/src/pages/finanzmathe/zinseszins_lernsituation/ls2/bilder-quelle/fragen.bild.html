@@ -1,0 +1,35 @@
+<!doctype html>
+<!-- Bildwelt Reportage / Duoton (Schwarz + Kupfer), Detailbild „Miras drei Fragen“ (Problem erkennen): drei Karteikarten an einer
+     dunklen Pinnwand, je eine Frage mit der gesuchten Größe (K₀ = ?, p = ?, n = ?) und den gegebenen Werten. Nur Gegebenes, kein Ergebnis. -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500;600&family=Fraunces:ital,wght@0,600;1,500&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const karten=[
+ {x:70,r:-3,nr:'Frage 1',g:'K₀ = ?',z:['In 8 Jahren','6.000 € haben','bei 3 %']},
+ {x:440,r:2,nr:'Frage 2',g:'p = ?',z:['Aus 5.000 €','werden 6.000 €','in 6 Jahren']},
+ {x:810,r:-1.5,nr:'Frage 3',g:'n = ?',z:['5.000 € bei 3 %','Wann sind es','10.000 €?']},
+];
+let g='';
+karten.forEach(k=>{
+ g+='<g transform="translate('+k.x+' 110) rotate('+k.r+' 160 190)">';
+ g+='<rect x="8" y="14" width="320" height="380" rx="6" fill="#000" opacity=".55" filter="url(#weich)"/>';
+ g+='<rect x="0" y="0" width="320" height="380" rx="6" fill="#efebe6"/>';
+ g+='<rect x="0" y="0" width="320" height="380" rx="6" fill="url(#papier)" opacity=".5"/>';
+ g+='<line x1="24" x2="296" y1="74" y2="74" stroke="#9a4515" stroke-width="3"/>';
+ g+='<text x="24" y="56" font-family="IBM Plex Sans" font-size="26" font-weight="600" fill="#161616" letter-spacing="1">'+k.nr.toUpperCase()+'</text>';
+ g+='<text x="160" y="170" text-anchor="middle" font-family="Fraunces" font-size="72" font-weight="600" fill="#9a4515">'+k.g+'</text>';
+ k.z.forEach((t,i)=>{g+='<text x="160" y="'+(250+i*42)+'" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="30" font-weight="500" fill="#161616">'+t+'</text>';});
+ g+='<circle cx="160" cy="18" r="13" fill="#9a4515"/><circle cx="156" cy="14" r="4" fill="#f3b98e"/>';
+ g+='</g>';
+});
+document.getElementById('bild').innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600"><defs>'
++'<radialGradient id="bg" cx=".5" cy=".4" r=".8"><stop offset="0" stop-color="#3a332f"/><stop offset="1" stop-color="#121110"/></radialGradient>'
++'<filter id="weich"><feGaussianBlur stdDeviation="9"/></filter>'
++'<filter id="kork"><feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="3" seed="2"/><feColorMatrix values="0 0 0 0 .3  0 0 0 0 .26  0 0 0 0 .22  0 0 0 .35 0"/></filter>'
++'<filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="1.05" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .18 0"/></filter>'
++'<pattern id="papier" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#e6e0d8"/><circle cx="2" cy="2" r=".7" fill="#d6cfc6"/></pattern>'
++'<radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></radialGradient>'
++'</defs><rect width="1200" height="600" fill="url(#bg)"/><rect width="1200" height="600" filter="url(#kork)"/>'+g
++'<rect width="1200" height="600" fill="url(#vig)"/><rect width="1200" height="600" filter="url(#grain)" opacity=".5"/></svg>';
+</script>
+</body></html>

@@ -11,13 +11,13 @@ const aufgaben = [
 const LERNSITUATIONEN: { teil: string; thema: Pick<Thema, 'name' | 'farbe' | 'icon'>; path: string; desc: string }[] = [
   {
     teil: 'Lernsituation 1 · Endkapital',
-    thema: { name: 'Wer hat nach 10 Jahren mehr?', farbe: 'violett', icon: 'fa-seedling' },
+    thema: { name: 'Die Münztürme', farbe: 'ocker', icon: 'fa-coins' },
     path: '/finanzmathe/zinseszins/lernsituation',
     desc: 'Mira lässt die Zinsen auf dem Konto, Jonas lässt sie auszahlen. Finde heraus, wie Zinseszins wirkt, und berechne das Endkapital.',
   },
   {
     teil: 'Lernsituation 2 · Anfangskapital, Zinssatz, Laufzeit',
-    thema: { name: 'Miras drei Fragen', farbe: 'ocker', icon: 'fa-hourglass-half' },
+    thema: { name: 'Miras drei Fragen', farbe: 'kupfer', icon: 'fa-hourglass-half' },
     path: '/finanzmathe/zinseszins/lernsituation-2',
     desc: 'Wie viel muss Mira anlegen, welcher Zinssatz steckt im Angebot, wann hat sich ihr Geld verdoppelt? Stelle die Zinseszinsformel um.',
   },

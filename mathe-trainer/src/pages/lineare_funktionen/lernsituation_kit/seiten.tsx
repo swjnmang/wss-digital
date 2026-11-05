@@ -44,8 +44,8 @@ export type Thema = {
  */
 export type Bildwelt =
   | { welt: 'skizzenbuch'; variante: 'kariert' | 'kugelschreiber' }
-  | { welt: 'reportage'; variante: 'abendlicht' | string }
-  | { welt: 'diorama'; variante: 'sommerwiese' | string };
+  | { welt: 'reportage'; variante: 'abendlicht' | 'duoton' | string }
+  | { welt: 'diorama'; variante: 'sommerwiese' | 'holzspielzeug' | string };
 
 const weltKlassen = (b?: Bildwelt) => (b ? ` sl-welt sl-welt-${b.welt} sl-variante-${b.variante}` : '');
 

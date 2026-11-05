@@ -1,0 +1,30 @@
+<!doctype html>
+<!-- Bildwelt Reportage / Duoton (Schwarz + Kupfer), Handlungsprodukt „Artikel für die Schülerzeitung“: aufgeschlagene Zeitungsseite mit
+     Rubrik Geld-Check, Schlagzeile, drei Spalten für die drei Fragen (nur Platzhalterzeilen) und einem Kasten für die Formel. Keine Lösung. -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500;600&family=Fraunces:ital,wght@0,600;1,500&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:480px"></div>
+<script>
+let g='';
+const X=190,W=820;
+g+='<rect x="'+(X+10)+'" y="34" width="'+W+'" height="440" fill="#000" opacity=".5" filter="url(#weich)"/>';
+g+='<rect x="'+X+'" y="22" width="'+W+'" height="440" fill="#f2efea"/>';
+g+='<text x="'+(X+34)+'" y="66" font-family="IBM Plex Sans" font-size="20" font-weight="600" fill="#9a4515" letter-spacing="2">SCHÜLERZEITUNG · GELD-CHECK</text>';
+g+='<line x1="'+(X+34)+'" x2="'+(X+W-34)+'" y1="80" y2="80" stroke="#161616" stroke-width="3"/>';
+g+='<text x="'+(X+34)+'" y="132" font-family="Fraunces" font-size="46" font-weight="600" fill="#161616">Miras drei Fragen</text>';
+g+='<text x="'+(X+34)+'" y="168" font-family="Fraunces" font-style="italic" font-size="22" font-weight="500" fill="#4a4a4a">Was die Zinseszinsformel alles verrät</text>';
+const sp=[['1','K₀ = ?'],['2','p = ?'],['3','n = ?']];
+sp.forEach(([n,t],i)=>{const x=X+34+i*256;
+ g+='<text x="'+x+'" y="214" font-family="Fraunces" font-size="30" font-weight="600" fill="#9a4515">'+n+'. '+t+'</text>';
+ for(let j=0;j<6;j++){const w=j===5?120:220-((i+j)%3)*18;g+='<rect x="'+x+'" y="'+(234+j*26)+'" width="'+w+'" height="9" rx="3" fill="#bdb6ad"/>';}
+});
+g+='<rect x="'+(X+34)+'" y="400" width="'+(W-68)+'" height="44" fill="none" stroke="#161616" stroke-width="2"/>';
+g+='<text x="'+(X+W/2)+'" y="430" text-anchor="middle" font-family="IBM Plex Sans" font-size="21" font-weight="600" fill="#161616">Antwort an Mira: …</text>';
+// Stift
+g+='<g transform="translate(1080 330) rotate(-60)"><rect x="-120" y="-10" width="210" height="20" rx="5" fill="#161616"/><rect x="70" y="-10" width="20" height="20" fill="#9a4515"/><path d="M90 -10 L118 0 L90 10 z" fill="#d8cfc4"/><path d="M110 -3 L118 0 L110 3 z" fill="#161616"/></g>';
+document.getElementById('bild').innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480"><defs>'
++'<radialGradient id="bg" cx=".5" cy=".4" r=".8"><stop offset="0" stop-color="#4a423d"/><stop offset="1" stop-color="#1a1817"/></radialGradient>'
++'<filter id="weich"><feGaussianBlur stdDeviation="10"/></filter>'
++'<filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="1.05" numOctaves="2" seed="5"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .16 0"/></filter>'
++'</defs><rect width="1200" height="480" fill="url(#bg)"/>'+g+'<rect width="1200" height="480" filter="url(#grain)" opacity=".5"/></svg>';
+</script>
+</body></html>
