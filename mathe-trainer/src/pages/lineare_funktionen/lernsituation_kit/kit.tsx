@@ -6,7 +6,7 @@ import { fieldCheckClass } from '../../../utils/fieldCheck'
 import { checkLinearEquation } from '../../../utils/parseLinearEquation'
 import { checkQuadraticEquation } from '../../../utils/parseFunctionEquation'
 import GleichungEingabe from '../../../components/GleichungEingabe'
-import { checkNumber, fmt, pick } from '../../daten_und_zufall/lernpfad/kit'
+import { MB, checkNumber, fmt, pick } from '../../daten_und_zufall/lernpfad/kit'
 import { AufgabePunkteCtx, punkteText, usePunkteAufgabe } from './punkte'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './kit.css'
@@ -14,6 +14,29 @@ import './kit.css'
 // Gemeinsame Bausteine der Einstiegs-Lernsituationen (Schnittpunkt, Nullstellen …). Die vier festen Phasen stehen in phasen.tsx.
 // Hier: Sozialformen, Niveaustufen, gestufte Hilfen, Aufgabenkarten mit automatischer Prüfung je Feld, Auswahlaufgaben mit Prüfen
 // mit diagnostischem Feedback und der aufklappbare Infoteil der Übungsseite.
+
+/**
+ * Lösungsweg Schritt für Schritt (für solution an CheckCard/McCard): je Rechenschritt eine nummerierte Zeile mit kurzer Benennung,
+ * darunter die Rechnung linksbündig, jede Gleichung in einer eigenen Zeile. Nie mehrere Schritte nebeneinander (kein \qquad).
+ * Brüche als \dfrac schreiben, damit sie gut lesbar sind.
+ */
+export function Loesungsweg({ schritte }: { schritte: { titel: ReactNode; text?: ReactNode; tex?: string | string[] }[] }) {
+  return (
+    <ol className="ls-loesung">
+      {schritte.map((s, i) => (
+        <li key={i}>
+          <span className="ls-loesung-titel">{s.titel}</span>
+          {s.text && <div className="ls-loesung-text">{s.text}</div>}
+          {(Array.isArray(s.tex) ? s.tex : s.tex ? [s.tex] : []).map((t, j) => (
+            <div key={j} className="ls-loesung-zeile">
+              <MB>{t}</MB>
+            </div>
+          ))}
+        </li>
+      ))}
+    </ol>
+  )
+}
 
 /** Infoteil der Übungsseite (Erklärung, Beispiel, Erklärvideo) */
 export const ErklaerungCtx = createContext<ReactNode>(null)

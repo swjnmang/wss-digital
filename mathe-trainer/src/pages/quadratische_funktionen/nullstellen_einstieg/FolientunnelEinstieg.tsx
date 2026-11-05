@@ -2,7 +2,7 @@ import { useEffect, useId, useState, type ChangeEvent, type KeyboardEvent, type 
 import TaskShell from '../../../components/layout/TaskShell'
 import { useSitzungState } from '../../../hooks/useSitzung'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, ErklaerungCtx, Hilfen, McCard, SchrittHilfen, TrackedCheck, TrackedMc } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { CheckCard, ErklaerungCtx, Hilfen, Loesungsweg, McCard, SchrittHilfen, TrackedCheck, TrackedMc } from '../../lineare_funktionen/lernsituation_kit/kit'
 import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Bildwelt, type Seite, type Thema } from '../../lineare_funktionen/lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../../lineare_funktionen/lernsituation_kit/punkte'
 import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
@@ -329,7 +329,7 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
         <p>
           <M>a</M> steht vor dem <M>{'x^2'}</M>, <M>b</M> vor dem <M>x</M>, <M>c</M> ist die Zahl ohne <M>x</M>. Achtung: Vorzeichen mitnehmen.
         </p>
-        <MB>{'a = 2, \\qquad b = 1, \\qquad c = -2'}</MB>
+        <MB>{'a = 2 \\qquad b = 1 \\qquad c = -2'}</MB>
       </>
     ),
   },
@@ -354,7 +354,8 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
         <p>
           Unter der Wurzel steht <M>{'1 + 16 = 17'}</M>, also <M>{'\\sqrt{17} \\approx 4{,}123'}</M>.
         </p>
-        <MB>{'x_1 = \\frac{-1 + \\sqrt{17}}{4} \\approx 0{,}78 \\qquad x_2 = \\frac{-1 - \\sqrt{17}}{4} \\approx -1{,}28'}</MB>
+        <MB>{'x_1 = \\dfrac{-1 + \\sqrt{17}}{4} \\approx 0{,}78'}</MB>
+        <MB>{'x_2 = \\dfrac{-1 - \\sqrt{17}}{4} \\approx -1{,}28'}</MB>
         <p>
           Tipp für den Taschenrechner: Setze Zähler und Nenner in Klammern, z. B. <M>{'(-1 + \\sqrt{17}) : (2 \\cdot 2)'}</M>.
         </p>
@@ -393,12 +394,18 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 ]
 
 const LOESUNG_KERN = (
-  <>
-    <MB>{'-0{,}8x^2 - 0{,}16x + 2{,}442 = 0 \\qquad a = -0{,}8, \\; b = -0{,}16, \\; c = 2{,}442'}</MB>
-    <MB>{'x_{1,2} = \\frac{-(-0{,}16) \\pm \\sqrt{(-0{,}16)^2 - 4 \\cdot (-0{,}8) \\cdot 2{,}442}}{2 \\cdot (-0{,}8)} = \\frac{0{,}16 \\pm \\sqrt{7{,}84}}{-1{,}6} = \\frac{0{,}16 \\pm 2{,}8}{-1{,}6}'}</MB>
-    <MB>{'x_1 = \\frac{0{,}16 + 2{,}8}{-1{,}6} = -1{,}85 \\qquad x_2 = \\frac{0{,}16 - 2{,}8}{-1{,}6} = 1{,}65'}</MB>
-    <MB>{'N_1(-1{,}85 \\mid 0), \\quad N_2(1{,}65 \\mid 0), \\qquad \\text{Breite} = 1{,}65 - (-1{,}85) = 3{,}5 \\text{ m}'}</MB>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: <><M>{'y = 0'}</M> setzen</>, tex: '-0{,}8x^2 - 0{,}16x + 2{,}442 = 0' },
+      { titel: <><M>a</M>, <M>b</M> und <M>c</M> notieren</>, tex: 'a = -0{,}8 \\qquad b = -0{,}16 \\qquad c = 2{,}442' },
+      { titel: 'In die Mitternachtsformel einsetzen', tex: 'x_{1,2} = \\dfrac{-(-0{,}16) \\pm \\sqrt{(-0{,}16)^2 - 4 \\cdot (-0{,}8) \\cdot 2{,}442}}{2 \\cdot (-0{,}8)}' },
+      { titel: 'Wurzel und Nenner ausrechnen', tex: ['x_{1,2} = \\dfrac{0{,}16 \\pm \\sqrt{7{,}84}}{-1{,}6}', 'x_{1,2} = \\dfrac{0{,}16 \\pm 2{,}8}{-1{,}6}'] },
+      { titel: <><M>{'x_1'}</M> mit <M>+</M> berechnen</>, tex: 'x_1 = \\dfrac{0{,}16 + 2{,}8}{-1{,}6} = \\dfrac{2{,}96}{-1{,}6} = -1{,}85' },
+      { titel: <><M>{'x_2'}</M> mit <M>-</M> berechnen</>, tex: 'x_2 = \\dfrac{0{,}16 - 2{,}8}{-1{,}6} = \\dfrac{-2{,}64}{-1{,}6} = 1{,}65' },
+      { titel: 'Koordinaten angeben', tex: ['N_1(-1{,}85 \\mid 0)', 'N_2(1{,}65 \\mid 0)'] },
+      { titel: 'Breite am Boden: rechter minus linker Fußpunkt', tex: '1{,}65 - (-1{,}85) = 3{,}5 \\text{ m}' },
+    ]}
+  />
 )
 
 /** Eingetippte Zahl, sonst null (für die Fähnchen im Graphen) */
@@ -484,7 +491,14 @@ export default function FolientunnelEinstieg({ erklaerung, onBack, onPractice }:
               { kind: 'num', key: 'c1', label: 'minus 3 in Klammern zum Quadrat', expected: 9 },
               { kind: 'num', key: 'c2', label: 'minus 0,5 in Klammern zum Quadrat', expected: 0.25 },
             ]}
-            solution={<MB>{'(-3)^2 = (-3) \\cdot (-3) = 9 \\qquad (-0{,}5)^2 = 0{,}25'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Minus mal Minus ergibt Plus', tex: '(-3)^2 = (-3) \\cdot (-3) = 9' },
+                  { titel: 'Genauso mit Dezimalzahl', tex: '(-0{,}5)^2 = (-0{,}5) \\cdot (-0{,}5) = 0{,}25' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -512,7 +526,15 @@ export default function FolientunnelEinstieg({ erklaerung, onBack, onPractice }:
               { kind: 'num', key: 'd1', label: 'Wert des Terms', expected: 25 },
               { kind: 'num', key: 'd2', label: 'Wurzel aus 25', expected: 5 },
             ]}
-            solution={<MB>{'(-3)^2 - 4 \\cdot 2 \\cdot (-2) = 9 - (-16) = 9 + 16 = 25 \\qquad \\sqrt{25} = 5'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Einzeln ausrechnen', tex: ['(-3)^2 = 9', '4 \\cdot 2 \\cdot (-2) = -16'] },
+                  { titel: 'Zusammenrechnen', tex: '9 - (-16) = 9 + 16 = 25' },
+                  { titel: 'Wurzel ziehen', tex: '\\sqrt{25} = 5' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -536,7 +558,14 @@ export default function FolientunnelEinstieg({ erklaerung, onBack, onPractice }:
               { kind: 'num', key: 'e1', label: 'Bruch mit plus', expected: 2 },
               { kind: 'num', key: 'e2', label: 'Bruch mit minus', expected: -0.5 },
             ]}
-            solution={<MB>{'\\frac{3 + 5}{4} = \\frac{8}{4} = 2 \\qquad \\frac{3 - 5}{4} = \\frac{-2}{4} = -0{,}5'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Mit Plus', tex: '\\dfrac{3 + 5}{2 \\cdot 2} = \\dfrac{8}{4} = 2' },
+                  { titel: 'Mit Minus', tex: '\\dfrac{3 - 5}{2 \\cdot 2} = \\dfrac{-2}{4} = -0{,}5' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -834,11 +863,20 @@ export default function FolientunnelEinstieg({ erklaerung, onBack, onPractice }:
               ]}
               solution={
                 <>
-                  <MB>{'x_{1,2} = \\frac{-3 \\pm \\sqrt{3^2 - 4 \\cdot (-2) \\cdot 4}}{2 \\cdot (-2)} = \\frac{-3 \\pm \\sqrt{41}}{-4}'}</MB>
-                  <MB>{'x_1 = \\frac{-3 + 6{,}403}{-4} \\approx -0{,}85 \\qquad x_2 = \\frac{-3 - 6{,}403}{-4} \\approx 2{,}35'}</MB>
-                  <p>
-                    Also <M>{'N_1(-0{,}85 \\mid 0)'}</M> und <M>{'N_2(2{,}35 \\mid 0)'}</M>. Weil <M>a</M> negativ ist, liegt <M>{'x_1'}</M> links.
-                  </p>
+                  <Loesungsweg
+                    schritte={[
+                      { titel: <><M>a</M>, <M>b</M> und <M>c</M> notieren</>, tex: 'a = -2 \\qquad b = 3 \\qquad c = 4' },
+                      { titel: 'In die Mitternachtsformel einsetzen', tex: 'x_{1,2} = \\dfrac{-3 \\pm \\sqrt{3^2 - 4 \\cdot (-2) \\cdot 4}}{2 \\cdot (-2)}' },
+                      { titel: 'Wurzel und Nenner ausrechnen', tex: ['x_{1,2} = \\dfrac{-3 \\pm \\sqrt{41}}{-4}', 'x_{1,2} \\approx \\dfrac{-3 \\pm 6{,}403}{-4}'] },
+                      { titel: <><M>{'x_1'}</M> mit <M>+</M> berechnen</>, tex: 'x_1 \\approx \\dfrac{-3 + 6{,}403}{-4} = \\dfrac{3{,}403}{-4} \\approx -0{,}85' },
+                      { titel: <><M>{'x_2'}</M> mit <M>-</M> berechnen</>, tex: 'x_2 \\approx \\dfrac{-3 - 6{,}403}{-4} = \\dfrac{-9{,}403}{-4} \\approx 2{,}35' },
+                      {
+                        titel: 'Koordinaten angeben',
+                        tex: ['N_1(-0{,}85 \\mid 0)', 'N_2(2{,}35 \\mid 0)'],
+                        text: <>Weil <M>a</M> negativ ist, liegt <M>{'x_1'}</M> hier links.</>,
+                      },
+                    ]}
+                  />
                 </>
               }
               help={
@@ -888,12 +926,24 @@ export default function FolientunnelEinstieg({ erklaerung, onBack, onPractice }:
               ]}
               solution={
                 <>
-                  <MB>{'x_{1,2} = \\frac{-1 \\pm \\sqrt{1^2 - 4 \\cdot (-0{,}25) \\cdot 0{,}6}}{2 \\cdot (-0{,}25)} = \\frac{-1 \\pm \\sqrt{1{,}6}}{-0{,}5}'}</MB>
-                  <MB>{'x_1 \\approx \\frac{-1 + 1{,}265}{-0{,}5} \\approx -0{,}53 \\qquad x_2 \\approx \\frac{-1 - 1{,}265}{-0{,}5} \\approx 4{,}53'}</MB>
-                  <p>
-                    Das Wasser kommt erst ab <M>{'x = 0'}</M> aus der Düse. Die Nullstelle <M>{'x_1 \\approx -0{,}53'}</M> liegt hinter dem Sprinkler und hat hier keine Bedeutung. Das
-                    Wasser trifft 4,53 m rechts vom Sprinkler auf den Boden.
-                  </p>
+                  <Loesungsweg
+                    schritte={[
+                      { titel: <><M>a</M>, <M>b</M> und <M>c</M> notieren</>, tex: 'a = -0{,}25 \\qquad b = 1 \\qquad c = 0{,}6' },
+                      { titel: 'In die Mitternachtsformel einsetzen', tex: 'x_{1,2} = \\dfrac{-1 \\pm \\sqrt{1^2 - 4 \\cdot (-0{,}25) \\cdot 0{,}6}}{2 \\cdot (-0{,}25)}' },
+                      { titel: 'Wurzel und Nenner ausrechnen', tex: ['x_{1,2} = \\dfrac{-1 \\pm \\sqrt{1{,}6}}{-0{,}5}', 'x_{1,2} \\approx \\dfrac{-1 \\pm 1{,}265}{-0{,}5}'] },
+                      { titel: <><M>{'x_1'}</M> mit <M>+</M> berechnen</>, tex: 'x_1 \\approx \\dfrac{-1 + 1{,}265}{-0{,}5} = \\dfrac{0{,}265}{-0{,}5} \\approx -0{,}53' },
+                      { titel: <><M>{'x_2'}</M> mit <M>-</M> berechnen</>, tex: 'x_2 \\approx \\dfrac{-1 - 1{,}265}{-0{,}5} = \\dfrac{-2{,}265}{-0{,}5} \\approx 4{,}53' },
+                      {
+                        titel: 'Im Sachzusammenhang deuten',
+                        text: (
+                          <>
+                            Das Wasser kommt erst ab <M>{'x = 0'}</M> aus der Düse und fliegt nach rechts. <M>{'x_1 \\approx -0{,}53'}</M> liegt hinter dem Sprinkler und hat hier keine
+                            Bedeutung. Das Wasser trifft 4,53 m rechts vom Sprinkler auf den Boden.
+                          </>
+                        ),
+                      },
+                    ]}
+                  />
                 </>
               }
               help={

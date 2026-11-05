@@ -150,3 +150,15 @@
 /* Vollständig eingetippte Funktionsgleichung (CheckCard-Feld kind: 'gleichung') */
 .ls-gleichung { display: inline-flex; flex-direction: column; gap: 6px; max-width: 100%; }
 .ls-gleichung-hinweis { font-size: 15px; line-height: 1.4; color: var(--wrong-ink); max-width: 420px; }
+
+/* Lösungsweg Schritt für Schritt (Loesungsweg): nummeriert, linksbündig, eine Gleichung pro Zeile, Brüche mit Luft nach oben und unten */
+.ls-loesung { list-style: none; counter-reset: ls-schritt; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; text-align: left; }
+.ls-loesung > li { counter-increment: ls-schritt; position: relative; padding-left: 40px; min-width: 0; }
+.ls-loesung > li::before {
+  content: counter(ls-schritt); position: absolute; left: 0; top: 0; width: 28px; height: 28px; display: grid; place-items: center;
+  border-radius: 999px; background: var(--correct); color: #fff; font: 700 15px/1 var(--font-ui, var(--font-body));
+}
+.ls-loesung-titel { display: block; font-weight: 700; line-height: 28px; }
+.ls-loesung-text { margin-top: 2px; line-height: 1.5; }
+.ls-loesung .katex-display { position: relative; margin: 4px 0 0; padding: 10px 0 8px; text-align: left; overflow-x: auto; overflow-y: hidden; }
+.ls-loesung .katex-display > .katex { text-align: left; }

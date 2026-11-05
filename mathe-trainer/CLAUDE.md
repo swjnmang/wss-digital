@@ -131,6 +131,10 @@ Regler und Erkunden brauchen keinen Rechenweg. Keine zusätzlichen Sätze „Hal
 In der Seitenansicht (`SeitenLernsituation`) bestätigen die SuS das Aufschreiben einmal in der Startbox; dort zeigen die Aufgaben
 keinen Heft-Hinweis mehr (automatisch über `HeftBestaetigtCtx` in `kit.tsx`).
 
+Lösungswege in Lernsituationen (seit 2026-11-05): Jeder Lösungsweg mit mehreren Rechenschritten nutzt `Loesungsweg` aus
+`lineare_funktionen/lernsituation_kit/kit.tsx` (`schritte={[{ titel, tex?, text? }]}`): je Schritt eine nummerierte Zeile mit kurzer Benennung,
+Rechnung linksbündig, eine Gleichung pro Zeile, Brüche als `\dfrac`. Keine Ketten mehrerer Schritte in einer Zeile, kein `x_1 = … \qquad x_2 = …`.
+
 Lücken in Gleichungen und Rechnungen: Zahlenwerte, die die SuS in eine Gleichung einsetzen oder ergänzen, tragen sie **direkt in der
 Gleichung** ein, nicht in ein extra Feld neben oder unter der Rechnung (kein `\square`/`\fbox{?}` im TeX mit Feld daneben). Dafür in der
 `CheckCard` die Prop `rechnung` nutzen: Jede Zeile `{ l: [...], r: [...], u?: '\\mid -3' }` besteht aus TeX-Stücken und Lücken
