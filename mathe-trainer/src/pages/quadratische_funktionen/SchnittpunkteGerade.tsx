@@ -44,6 +44,7 @@ import {
 } from './quadratischShared'
 import TaskShell from '../../components/layout/TaskShell'
 import SkateEinstieg from './schnittpunkte_einstieg/SkateEinstieg'
+import { LernsituationKarte } from '../lineare_funktionen/lernsituation_kit/seiten'
 import { useBackHandler } from '../../hooks/useBackHandler'
 
 // Sechs Aufgaben gleichzeitig auf der Seite
@@ -973,22 +974,14 @@ export default function SchnittpunkteGerade() {
           {header}
           <div className={`${panel} flex flex-col`}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-            <button
+            <LernsituationKarte
+              thema={{ name: 'Der Skatepark', farbe: 'beere', icon: 'fa-person-skating' }}
+              beschreibung="Neu beim Thema? Finde beim Trick-Contest heraus, wie oft ein Sprung die Lichtschranke kreuzt, und lerne dabei, die Schnittpunkte von Parabel und Gerade zu berechnen."
               onClick={() => {
                 setLernsituation(true)
                 window.scrollTo({ top: 0 })
               }}
-              style={{ background: 'var(--primary)' }}
-              className="rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-            >
-              <p className="text-lg font-bold mb-1 text-white">Löst der Sprung die Lichtschranke aus?</p>
-              <p className="text-xl mb-2 text-white">
-                <i className="fa-solid fa-person-skating" aria-hidden="true" />
-              </p>
-              <p className="text-sm text-white/90">
-                Neu beim Thema? Finde im Skatepark-Labor heraus, wie oft sich eine Parabel und eine Gerade schneiden können, und lerne dabei, die Schnittpunkte zu berechnen.
-              </p>
-            </button>
+            />
           </div>
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>

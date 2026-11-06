@@ -1,0 +1,24 @@
+<!doctype html>
+<!-- Der Skatepark, Handlungsprodukt Spickzettel. Bildwelt Siebdruck / dreifarbig: drei kleine Skizzen (zwei, ein, kein Schnittpunkt).
+     Rendern: node scripts/bilder-rendern.cjs src/pages/quadratische_funktionen/schnittpunkte_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&display=swap" rel="stylesheet">
+<style>body{margin:0} text{font-family:'Bricolage Grotesque';font-variation-settings:'wdth' 75,'opsz' 96}</style>
+<script src="_siebdruck.js"></script></head><body><div id="bild"></div>
+<script>
+const skizze = (ox, t) => {
+  const P = (x) => `${ox + 30 + x * 34},${330 - (-0.25 * x * x + x + 3) * 34}`;
+  const bahn = Array.from({ length: 41 }, (_, i) => i / 10 * 1.5).map(P).join(' ');
+  return { bahn: `<polyline points="${bahn}" fill="none" stroke-width="7" stroke-linecap="round"/>`, gerade: `<line x1="${ox + 10}" y1="${330 - (t + 0.3) * 34}" x2="${ox + 230}" y2="${330 - (t - 3.2) * 34}" stroke-width="6" stroke-dasharray="16 9"/>` };
+};
+const s = [skizze(20, 5), skizze(280, 5.25 + 0.3), skizze(540, 6.8)];
+const gelb = `<rect x="0" y="0" width="800" height="70" stroke="none"/>` + [20, 280, 540].map((x) => `<rect x="${x}" y="350" width="240" height="40" stroke="none"/>`).join('');
+const pink = s.map((k) => k.gerade).join('');
+const beere = s.map((k) => k.bahn).join('') + `<text x="24" y="52" font-size="44" font-weight="800" stroke="none">SCHNITTPUNKTE: 2 · 1 · 0</text>` +
+  [['Wurzel > 0', 20], ['Wurzel = 0', 280], ['Wurzel < 0', 540]].map(([t, x]) => `<text x="${x + 120}" y="380" font-size="30" font-weight="700" text-anchor="middle" stroke="none">${t}</text>`).join('');
+SD.bild(800, 400, [
+  { farbe: '#ffcf2e', svg: gelb },
+  { farbe: '#ff4f98', versatz: [4, -2], svg: pink },
+  { farbe: '#a0275e', versatz: [-2, 1], svg: beere },
+]);
+</script>
+</body></html>
