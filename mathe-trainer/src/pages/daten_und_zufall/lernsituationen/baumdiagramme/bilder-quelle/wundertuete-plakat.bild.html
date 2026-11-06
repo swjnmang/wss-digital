@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- Die Wundertüte, Handlungsprodukt: Plakat „So gewinnst du bei der Wundertüte“ mit Baumdiagramm. Bildwelt Siebdruck / Linolschnitt.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/baumdiagramme -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&display=swap" rel="stylesheet">
+<style>body{margin:0} text{font-family:'Bricolage Grotesque';font-variation-settings:'wdth' 75,'opsz' 96}</style>
+<script src="_siebdruck.js"></script></head><body><div id="bild"></div>
+<script>
+const schwarz = `<rect x="10" y="10" width="780" height="380" fill="none" stroke-width="12"/>
+ <rect x="10" y="10" width="780" height="80" stroke="none"/>
+ <text x="400" y="66" text-anchor="middle" font-size="46" font-weight="800" fill="#f1efe9" stroke="none">SO GEWINNST DU</text>
+ <circle cx="90" cy="240" r="10" stroke="none"/>
+ ${[150, 240, 330].map(y => `<path d="M90 240 L240 ${y}" stroke-width="5" fill="none"/><circle cx="250" cy="${y}" r="9" stroke="none"/>` + [-28, 0, 28].map(d => `<path d="M250 ${y} L380 ${y + d}" stroke-width="3" fill="none"/>`).join('')).join('')}
+ ${['H', 'T', 'N'].map((t, i) => `<text x="255" y="${140 + i * 90}" font-size="30" font-weight="800" stroke="none">${t}</text>`).join('')}
+ <text x="440" y="170" font-size="34" font-weight="700" stroke="none">Pfad: malnehmen</text>
+ <text x="440" y="230" font-size="34" font-weight="700" stroke="none">Pfade: addieren</text>
+ <text x="440" y="290" font-size="34" font-weight="700" stroke="none">P(HH) = …</text>
+ <path d="M440 320 L740 320" stroke-width="4" stroke-dasharray="14 10"/>`;
+SD.bild(800, 400, [{ farbe: '#1a1a1a', svg: schwarz }], '#f1efe9');
+</script>
+</body></html>
