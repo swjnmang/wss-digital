@@ -30,7 +30,8 @@ import '../../daten_und_zufall/lernpfad/lernpfad.css'
 // (der Rechner zeigt den Kontostand): Nach 33 Jahren sind es schon über 13.000 €. Aha: Mit Zinseszins verdoppelt sich das Geld viel
 // schneller (nach 23,45 Jahren, also nach 24 vollen Jahren), und für Frage 1 und 2 hilft Probieren kaum weiter.
 // Problem lösen in drei Teilen (eine Seite je Teilproblem), je Problem → Beispielrechnung mit Lernvideo → Ergebnis abgleichen:
-// Teil 1 K_0 = 6.000 : 1,03⁸ = 4.736,46 €, Teil 2 q = (6.000 : 5.000)^(1/6), p ≈ 3,09 %, Teil 3 n = lg 2 : lg 1,03 ≈ 23,45 → 24 Jahre.
+// Teil 1 K_0 = 6.000 : 1,03⁸ = 4.736,46 €, Teil 2 q = (6.000 : 5.000)^(1/6), p ≈ 3,09 %, Teil 3 n = log_1,03(2) ≈ 23,45 → 24 Jahre
+// (Logarithmus mit der log-Taste des Taschenrechners, bei der die Basis q direkt eingegeben wird, nicht über lg … : lg …).
 // Auf Teil 3 folgen Urteil über die Faustregel, Handlungsprodukt (Artikel für die Schülerzeitung, analog), Rückbezug und Merke.
 // Punkte nach Aufwand: Warm-up 3/2/2/2/2 = 11, Schätzung 3, Ausprobieren 3, Kernaufgaben 3 × 10, Urteil 3, Artikel 5, Übungen 4/6/6/7,
 // Profi 8 (Pflicht zusammen 78: Warm-up 11 = 14 %, Problem erkennen 6 = 8 %, Problem lösen 38 = 49 % wegen drei Teilproblemen,
@@ -222,22 +223,18 @@ const BEISPIEL: Record<Groesse, { titel: string; aufgabe: ReactNode; steps: { ti
       { title: 'Bekannte Werte einsetzen', body: <MB>{'4\\,500 = 3\\,000 \\cdot 1{,}04^n'}</MB> },
       { title: 'Durch das Anfangskapital teilen', body: <><MB>{'\\dfrac{4\\,500}{3\\,000} = 1{,}04^n'}</MB><MB>{'1{,}5 = 1{,}04^n'}</MB></> },
       {
-        title: 'Logarithmus anwenden',
+        title: <>Mit dem Logarithmus nach <M>n</M> auflösen</>,
         body: (
           <>
             <p>
-              <M>n</M> steht in der Hochzahl. Der Logarithmus (Taste <M>{'\\lg'}</M> oder log) holt die Hochzahl nach vorn: <M>{'\\lg(a^n) = n \\cdot \\lg a'}</M>.
+              <M>n</M> steht in der Hochzahl. Gesucht ist die Hochzahl, mit der aus <M>{'1{,}04'}</M> die Zahl <M>{'1{,}5'}</M> wird. Das ist der Logarithmus zur Basis{' '}
+              <M>{'1{,}04'}</M>:
             </p>
-            <MB>{'\\lg 1{,}5 = n \\cdot \\lg 1{,}04'}</MB>
-          </>
-        ),
-      },
-      {
-        title: <>Nach <M>n</M> auflösen</>,
-        body: (
-          <>
-            <MB>{'n = \\dfrac{\\lg 1{,}5}{\\lg 1{,}04}'}</MB>
+            <MB>{'n = \\log_{1{,}04} 1{,}5'}</MB>
             <MB>{`n \\approx ${zt(Math.log(1.5) / Math.log(1.04), 2)}`}</MB>
+            <p>
+              Am Taschenrechner: Taste <M>{'\\log_{\\square}\\square'}</M>, unten die Basis <M>{'1{,}04'}</M> eintippen, dann <M>{'1{,}5'}</M>.
+            </p>
           </>
         ),
       },
@@ -273,8 +270,7 @@ const LOESUNG: Record<Groesse, ReactNode> = {
       schritte={[
         { titel: 'Bekannte Werte einsetzen', tex: '10\\,000 = 5\\,000 \\cdot 1{,}03^n' },
         { titel: 'Durch das Anfangskapital teilen', tex: '2 = 1{,}03^n' },
-        { titel: 'Logarithmus anwenden', tex: '\\lg 2 = n \\cdot \\lg 1{,}03' },
-        { titel: <>Nach <M>n</M> auflösen</>, tex: ['n = \\dfrac{\\lg 2}{\\lg 1{,}03}', `n \\approx ${zt(N_DOPPEL, 2)}`] },
+        { titel: <>Mit dem Logarithmus nach <M>n</M> auflösen</>, tex: ['n = \\log_{1{,}03} 2', `n \\approx ${zt(N_DOPPEL, 2)}`] },
         { titel: 'Auf volle Jahre aufrunden', text: <>Nach 23 Jahren sind es erst {eur(kn(5000, 3, 23))}, nach 24 Jahren {eur(kn(5000, 3, 24))}.</> },
       ]}
     />
@@ -624,10 +620,10 @@ export default function DreiFragenEinstieg({ onBack, onPractice, onPrev }: { onB
                   steps={[
                     <>Setze ein und teile zuerst durch das Anfangskapital. Dann steht nur noch <M>{'1{,}03^n'}</M> da.</>,
                     <>
-                      <M>{'2 = 1{,}03^n'}</M>. Wie im Beispiel: Der Logarithmus holt die Hochzahl nach vorn.
+                      <M>{'2 = 1{,}03^n'}</M>. Wie im Beispiel: Die Hochzahl bekommst du mit dem Logarithmus zur Basis <M>{'1{,}03'}</M>.
                     </>,
                     <>
-                      <M>{'n = \\lg 2 : \\lg 1{,}03'}</M>. Zinsen gibt es am Jahresende, deshalb rundest du auf volle Jahre auf.
+                      <M>{'n = \\log_{1{,}03} 2'}</M> mit der log-Taste, Basis <M>{'1{,}03'}</M>. Zinsen gibt es am Jahresende, deshalb rundest du auf volle Jahre auf.
                     </>,
                   ]}
                 />
@@ -692,7 +688,7 @@ export default function DreiFragenEinstieg({ onBack, onPractice, onPrev }: { onB
                     <M>{'p = (q - 1) \\cdot 100'}</M>
                   </li>
                   <li>
-                    Laufzeit gesucht: durch <M>{'K_0'}</M> teilen, dann den Logarithmus anwenden, <M>{'n = \\dfrac{\\lg \\frac{K_n}{K_0}}{\\lg q}'}</M>, auf volle Jahre
+                    Laufzeit gesucht: durch <M>{'K_0'}</M> teilen, dann den Logarithmus zur Basis <M>q</M> nehmen, <M>{'n = \\log_{q} \\dfrac{K_n}{K_0}'}</M> (log-Taste, Basis <M>q</M> eintippen), auf volle Jahre
                     aufrunden
                   </li>
                   <li>Zwischenergebnisse im Taschenrechner stehen lassen, nur das Endergebnis runden.</li>
@@ -778,7 +774,7 @@ export default function DreiFragenEinstieg({ onBack, onPractice, onPrev }: { onB
                 <Loesungsweg
                   schritte={[
                     { titel: <>Verdoppeln heißt: <M>{'K_n : K_0 = 2'}</M></>, tex: '2 = 1{,}05^n' },
-                    { titel: 'Logarithmus anwenden', tex: ['n = \\dfrac{\\lg 2}{\\lg 1{,}05}', `n \\approx ${zt(Math.log(2) / Math.log(1.05), 2)}`] },
+                    { titel: 'Logarithmus zur Basis q', tex: ['n = \\log_{1{,}05} 2', `n \\approx ${zt(Math.log(2) / Math.log(1.05), 2)}`] },
                     { titel: 'Auf volle Jahre aufrunden', text: 'Nach 15 vollen Jahren ist das Geld zum ersten Mal verdoppelt.' },
                   ]}
                 />
@@ -788,10 +784,10 @@ export default function DreiFragenEinstieg({ onBack, onPractice, onPrev }: { onB
                   steps={[
                     <>Du kennst kein Anfangskapital. Das brauchst du auch nicht: Verdoppeln heißt <M>{'\\frac{K_n}{K_0} = 2'}</M>.</>,
                     <>
-                      <M>{'2 = 1{,}05^n'}</M>. Wende den Logarithmus an.
+                      <M>{'2 = 1{,}05^n'}</M>. Nimm den Logarithmus zur Basis <M>{'1{,}05'}</M>.
                     </>,
                     <>
-                      <M>{'n = \\lg 2 : \\lg 1{,}05'}</M>, dann aufrunden.
+                      <M>{'n = \\log_{1{,}05} 2'}</M>, dann aufrunden.
                     </>,
                   ]}
                 />
@@ -813,7 +809,7 @@ export default function DreiFragenEinstieg({ onBack, onPractice, onPrev }: { onB
                 <Loesungsweg
                   schritte={[
                     { titel: <>Ein Viertel mehr heißt: <M>{'K_n : K_0 = 1{,}25'}</M></>, tex: '1{,}25 = 1{,}025^n' },
-                    { titel: 'Logarithmus anwenden', tex: ['n = \\dfrac{\\lg 1{,}25}{\\lg 1{,}025}', `n \\approx ${zt(Math.log(1.25) / Math.log(1.025), 2)}`] },
+                    { titel: 'Logarithmus zur Basis q', tex: ['n = \\log_{1{,}025} 1{,}25', `n \\approx ${zt(Math.log(1.25) / Math.log(1.025), 2)}`] },
                     { titel: 'Auf volle Jahre aufrunden', text: 'Nach 9 Jahren fehlt noch ein kleines Stück, nach 10 vollen Jahren ist es geschafft.' },
                   ]}
                 />
@@ -826,7 +822,7 @@ export default function DreiFragenEinstieg({ onBack, onPractice, onPrev }: { onB
                       <M>{'1{,}25 = 1{,}025^n'}</M>
                     </>,
                     <>
-                      <M>{'n = \\lg 1{,}25 : \\lg 1{,}025'}</M>, dann aufrunden.
+                      <M>{'n = \\log_{1{,}025} 1{,}25'}</M>, dann aufrunden.
                     </>,
                   ]}
                 />
@@ -846,8 +842,8 @@ export default function DreiFragenEinstieg({ onBack, onPractice, onPrev }: { onB
                 </p>
               }
               options={[
-                { text: 'Sie ergibt 12 Jahre, genau ist es fast 17 Jahre.', feedback: <>17 Jahre wären 100 : 6, die Regel ohne Zinseszins. Rechne <M>{'\\lg 2 : \\lg 1{,}06'}</M>.</> },
-                { text: 'Sie ergibt 12 Jahre, genau sind es 11,90 Jahre. Sie passt sehr gut.', correct: true, feedback: <>Genau: <M>{'\\lg 2 : \\lg 1{,}06 \\approx 11{,}90'}</M>. Die 72er-Regel berücksichtigt den Zinseszins.</> },
+                { text: 'Sie ergibt 12 Jahre, genau ist es fast 17 Jahre.', feedback: <>17 Jahre wären 100 : 6, die Regel ohne Zinseszins. Rechne <M>{'\\log_{1{,}06} 2'}</M>.</> },
+                { text: 'Sie ergibt 12 Jahre, genau sind es 11,90 Jahre. Sie passt sehr gut.', correct: true, feedback: <>Genau: <M>{'\\log_{1{,}06} 2 \\approx 11{,}90'}</M>. Die 72er-Regel berücksichtigt den Zinseszins.</> },
                 { text: 'Sie ergibt 12 Jahre, genau sind es 6 Jahre.', feedback: <>In 6 Jahren wächst das Geld bei 6 % nur auf das <M>{'1{,}06^6 \\approx 1{,}42'}</M>-Fache.</> },
                 { text: 'Man kann sie nicht prüfen, weil kein Betrag gegeben ist.', feedback: <>Für die Verdopplung brauchst du keinen Betrag: <M>{'2 = 1{,}06^n'}</M>.</> },
               ]}

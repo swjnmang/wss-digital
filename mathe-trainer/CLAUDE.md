@@ -132,6 +132,9 @@ Regler und Erkunden brauchen keinen Rechenweg. Keine zusätzlichen Sätze „Hal
 In der Seitenansicht (`SeitenLernsituation`) bestätigen die SuS das Aufschreiben einmal in der Startbox; dort zeigen die Aufgaben
 keinen Heft-Hinweis mehr (automatisch über `HeftBestaetigtCtx` in `kit.tsx`).
 
+Logarithmus (seit 2026-11-06): Hochzahlen wie die Laufzeit n berechnen die SuS mit der log-Taste, bei der sie die Basis direkt eingeben:
+`n = \log_{q} \frac{K_n}{K_0}` (z. B. `n = \log_{1{,}03} 2`), nicht über `\frac{\lg 2}{\lg 1{,}03}`.
+
 Lösungswege in Lernsituationen (seit 2026-11-05): Jeder Lösungsweg mit mehreren Rechenschritten nutzt `Loesungsweg` aus
 `lineare_funktionen/lernsituation_kit/kit.tsx` (`schritte={[{ titel, tex?, text? }]}`): je Schritt eine nummerierte Zeile mit kurzer Benennung,
 Rechnung linksbündig, eine Gleichung pro Zeile, Brüche als `\dfrac`. Keine Ketten mehrerer Schritte in einer Zeile, kein `x_1 = … \qquad x_2 = …`.
