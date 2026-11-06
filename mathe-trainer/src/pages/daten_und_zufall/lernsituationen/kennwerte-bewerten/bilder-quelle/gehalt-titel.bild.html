@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- Das Durchschnittsgehalt, Titelbild. Bildwelt Skizzenbuch / kariert: Bleistiftskizze der Medienwerkstatt Pixelhof mit Schild „Ø-Gehalt 4.200 €!“, Aquarell in Kupfer.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/kennwerte-bewerten -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet"><style>body{margin:0}</style><script src="_skizze.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+let g = SK.papier(1200, 600) + SK.tape(40, 24, -6) + SK.tape(1010, 22, 5);
+g += SK.wash(SK.fleck(520, 300, 300, 170, '#9a4515', .28) + SK.fleck(560, 500, 440, 40, '#6b8f71', .3) + SK.fleck(960, 200, 150, 110, '#e9c46a', .35));
+// Bürohaus
+g += SK.stift('<path d="M300 500 V150 H720 V500"/><path d="M280 150 H740"/><path d="M470 500 V400 H550 V500"/>' +
+  [0,1,2].map(r => [0,1,2,3].map(c => `<rect x="${330 + c * 95}" y="${180 + r * 70}" width="60" height="44"/>`).join('')).join('') +
+  '<path d="M80 500 H1120"/>');
+g += SK.hand(510, 135, 'Medienwerkstatt Pixelhof', 40, '#2c2a27', 'middle');
+// Schild
+g += SK.stift('<path d="M880 500 V330"/><rect x="780" y="210" width="300" height="130" rx="6"/>');
+g += SK.hand(930, 262, 'Wir suchen dich!', 36, '#2c2a27', 'middle', -2) + SK.hand(930, 316, 'Ø-Gehalt 4.200 €!', 44, '#9a4515', 'middle', -2);
+// Notiz
+g += SK.hand(90, 250, '8 Leute …', 34, '#2c2a27', 'start', -4) + SK.hand(90, 292, 'wer verdient', 34, '#2c2a27', 'start', -4) + SK.hand(90, 334, 'wirklich so viel?', 34, '#9a4515', 'start', -4);
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${SK.defs}${g}</svg>`;
+</script>
+</body></html>

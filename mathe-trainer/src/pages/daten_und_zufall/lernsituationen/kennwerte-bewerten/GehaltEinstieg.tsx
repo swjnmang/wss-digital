@@ -1,9 +1,10 @@
 import { useEffect, useId, useState, type ChangeEvent, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TaskShell from '../../../../components/layout/TaskShell';
+import { useSitzungState } from '../../../../hooks/useSitzung';
 import { Beispiel, M, MB, Merke, fmt } from '../../lernpfad/kit';
 import { mean, median } from '../../lernpfad/stats';
-import { CheckCard, Hilfen, McCard, TrackedMc } from '../../../lineare_funktionen/lernsituation_kit/kit';
+import { CheckCard, Hilfen, Loesungsweg, McCard, TrackedMc } from '../../../lineare_funktionen/lernsituation_kit/kit';
 import {
   Abschnitt,
   Aufklappbar,
@@ -11,11 +12,15 @@ import {
   BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../../lineare_funktionen/lernsituation_kit/seiten';
 import { Bilanz } from '../../../lineare_funktionen/lernsituation_kit/punkte';
-import { Kriterien, Vermutung, Zitat, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import { Kriterien, Vermutung, Zitat, standardKriterien, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import titelBild from './bilder/gehalt-titel.webp';
+import anzeigeBild from './bilder/gehalt-anzeige.webp';
+import briefBild from './bilder/gehalt-brief.webp';
 import '../../lernpfad/lernpfad.css';
 import BallonAufstieg from './BallonAufstieg';
 import './gehalt.css';
@@ -29,6 +34,8 @@ import './gehalt.css';
 // Punkte (Pflicht gesamt 61): Warm-up 12 (a 2, b 2, c 3, d 2, e 3), Problem erkennen 6 (Festlegung 3, Beobachtung 3),
 // Problem lösen 26 (Ergebnisse 11, Rückwärtsrechnung 7, Empfehlung 3, Kriterien 5), Übungen 17 (Üb. 1: 4, Üb. 2: 6, Üb. 3: 7),
 // dazu Profi-Aufgabe 9 und Bonus-Spiel höchstens 8 (4 Runden à 2).
+// Bildwelt Skizzenbuch / kariert: Titelbild, Stellenanzeige und Brief sind gerenderte WebP-Dateien aus bilder-quelle/gehalt-*.bild.html
+// (Bausteine in bilder-quelle/_skizze.js); Gehaltsliste und Gehalts-Labor bleiben live.
 
 /** Lernvideo zu den statistischen Kennwerten (bei den Übungsaufgaben des Themas verlinkt) */
 export const VIDEO_KENNWERTE = 'https://www.youtube.com/watch?v=UxKgca3l1G4';
@@ -56,55 +63,20 @@ const WAHL: Record<Wahl, string> = {
 
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
-/** Titelbild: Bürohaus der Medienwerkstatt, davor ein Schild mit dem beworbenen Durchschnittsgehalt */
-function Titelbild() {
-  return (
-    <svg
-      viewBox="0 0 720 252"
-      role="img"
-      aria-label="Ein Bürohaus mit Fenstern und einer Eingangstür. Davor steht ein Schild mit der Aufschrift: Wir suchen Verstärkung, Durchschnittsgehalt 4.200 Euro. Links liegen Geldscheine und Münzen."
-    >
-      <rect x="0" y="206" width="720" height="46" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="206" y2="206" stroke="var(--ink)" strokeWidth="2" />
-      {/* Bürohaus */}
-      <rect x="300" y="40" width="250" height="166" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      {[0, 1, 2].map((r) =>
-        [0, 1, 2, 3].map((c) => (
-          <rect key={`${r}${c}`} x={322 + c * 56} y={60 + r * 42} width="34" height="28" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        )),
-      )}
-      <rect x="400" y="160" width="50" height="46" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <line x1="425" x2="425" y1="160" y2="206" stroke="var(--ink)" strokeWidth="2" />
-      {/* Schild */}
-      <line x1="140" x2="140" y1="110" y2="206" stroke="var(--ink)" strokeWidth="5" />
-      <line x1="270" x2="270" y1="110" y2="206" stroke="var(--ink)" strokeWidth="5" />
-      <rect x="110" y="30" width="190" height="104" rx="8" fill="var(--surface)" stroke="var(--ink)" strokeWidth="3" />
-      <text x="205" y="62" textAnchor="middle" fontSize="18" fontWeight="800" fill="var(--ink)">
-        Wir suchen
-      </text>
-      <text x="205" y="84" textAnchor="middle" fontSize="18" fontWeight="800" fill="var(--ink)">
-        Verstärkung!
-      </text>
-      <rect x="126" y="94" width="158" height="30" rx="6" fill="var(--primary)" />
-      <text x="205" y="115" textAnchor="middle" fontSize="18" fontWeight="800" fill="#fff">
-        Ø 4.200 € Gehalt
-      </text>
-      {/* Geldscheine und Münzen */}
-      <rect x="590" y="176" width="86" height="34" rx="4" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <circle cx="633" cy="193" r="9" fill="none" stroke="var(--ink)" strokeWidth="2" />
-      {[0, 1, 2].map((k) => (
-        <ellipse key={k} cx="700" cy={198 - k * 10} rx="16" ry="6" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-      ))}
-    </svg>
-  );
-}
-
 const THEMA: Thema = {
   name: 'Das Durchschnittsgehalt',
   farbe: 'kupfer',
   icon: 'fa-money-bill-wave',
-  bild: <Titelbild />,
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Bleistiftskizze auf kariertem Papier: das Bürohaus der Medienwerkstatt Pixelhof, davor ein Schild: Wir suchen dich! Ø-Gehalt 4.200 €! Daneben notiert: 8 Leute … wer verdient wirklich so viel?"
+    />
+  ),
 };
+const BILDWELT: Bildwelt = { welt: 'skizzenbuch', variante: 'kariert' };
 
 /* ── Leitobjekt: die Gehaltsliste als Balken ─────────────────────────────── */
 
@@ -228,61 +200,6 @@ function GehaltLabor({ onTreffer }: { onTreffer: () => void }) {
   );
 }
 
-/** Die Stellenanzeige (Problem erkennen) */
-function AnzeigeBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 200"
-        role="img"
-        aria-label="Stellenanzeige der Medienwerkstatt Pixelhof: Wir suchen Verstärkung für unser Team von 8 Beschäftigten. Durchschnittsgehalt 4.200 Euro brutto im Monat."
-      >
-        <rect x="150" y="8" width="420" height="184" rx="10" fill="var(--surface)" stroke="var(--ink)" strokeWidth="3" />
-        <rect x="150" y="8" width="420" height="44" rx="10" fill="var(--primary)" />
-        <text x="360" y="38" textAnchor="middle" fontSize="20" fontWeight="800" fill="#fff">
-          Medienwerkstatt Pixelhof
-        </text>
-        <text x="360" y="82" textAnchor="middle" fontSize="20" fontWeight="800" fill="var(--ink)">
-          Wir suchen Verstärkung!
-        </text>
-        <text x="360" y="112" textAnchor="middle" fontSize="17" fill="var(--ink)">
-          Ein starkes Team mit 8 Beschäftigten
-        </text>
-        <rect x="200" y="128" width="320" height="46" rx="8" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="360" y="158" textAnchor="middle" fontSize="22" fontWeight="800" fill="var(--ink)">
-          Durchschnittsgehalt: 4.200 €
-        </text>
-      </svg>
-    </div>
-  );
-}
-
-/** Handlungsprodukt: Brief an Mia */
-function BriefBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Ein Brief mit Umschlag. Auf dem Briefbogen steht: Liebe Mia, ist der Durchschnitt aussagekräftig? Darunter Linien für die Rechnung und die Empfehlung."
-      >
-        <rect x="170" y="30" width="400" height="150" rx="8" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-        <path d="M170 38 L370 120 L570 38" fill="none" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="210" y="8" width="320" height="130" rx="4" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="226" y="36" fontSize="17" fontWeight="800" fill="var(--ink)">
-          Liebe Mia,
-        </text>
-        <text x="226" y="62" fontSize="16" fill="var(--ink)">
-          Der Durchschnitt 4.200 € ist …
-        </text>
-        <line x1="226" x2="500" y1="84" y2="84" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="226" x2="500" y1="104" y2="104" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="226" x2="440" y1="124" y2="124" stroke="var(--ink)" strokeWidth="2" />
-      </svg>
-    </div>
-  );
-}
-
 /* ── Rechenbeispiel: Kfz-Werkstatt ───────────────────────────────────────── */
 
 const BSP_AUFGABE = (
@@ -327,19 +244,23 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     body: (
       <>
         <p>Summe aller 7 Gehälter bei Mittelwert 3.500 €: Mittelwert mal Anzahl. Davon zieht man die bisherige Summe ab.</p>
-        <MB>{'7 \\cdot 3\\,500 = 24\\,500 \\text{ €} \\qquad 24\\,500 - 20\\,400 = 4\\,100 \\text{ €}'}</MB>
+        <MB>{'7 \\cdot 3\\,500 = 24\\,500 \\text{ €}'}</MB>
+        <MB>{'24\\,500 - 20\\,400 = 4\\,100 \\text{ €}'}</MB>
       </>
     ),
   },
 ];
 
 const LOESUNG_KERN = (
-  <>
-    <MB>{'\\bar{x} = \\frac{2\\,100 + 2\\,300 + 2\\,400 + 2\\,500 + 2\\,600 + 2\\,700 + 2\\,800 + 16\\,200}{8} = \\frac{33\\,600}{8} = 4\\,200 \\text{ €}'}</MB>
-    <MB>{'\\text{Median} = \\frac{2\\,500 + 2\\,600}{2} = 2\\,550 \\text{ €}'}</MB>
-    <MB>{'\\text{ohne Geschäftsführung: } \\bar{x} = \\frac{17\\,400}{7} \\approx 2\\,485{,}71 \\text{ €}'}</MB>
-    <p>Der Ausreißer ist das Gehalt der Geschäftsführung: 16.200 €.</p>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'Summe aller 8 Gehälter', tex: '2\\,100 + 2\\,300 + 2\\,400 + 2\\,500 + 2\\,600 + 2\\,700 + 2\\,800 + 16\\,200 = 33\\,600' },
+      { titel: 'Mittelwert', tex: '\\bar{x} = \\dfrac{33\\,600}{8} = 4\\,200 \\text{ €}' },
+      { titel: 'Median (Mitte zwischen 4. und 5. Wert)', tex: '\\text{Median} = \\dfrac{2\\,500 + 2\\,600}{2} = 2\\,550 \\text{ €}' },
+      { titel: 'Mittelwert ohne Geschäftsführung', tex: '\\bar{x} = \\dfrac{17\\,400}{7} \\approx 2\\,485{,}71 \\text{ €}' },
+      { titel: 'Ausreißer', text: 'Der Ausreißer ist das Gehalt der Geschäftsführung: 16.200 €.' },
+    ]}
+  />
 );
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
@@ -348,9 +269,9 @@ export default function GehaltEinstieg() {
   const navigate = useNavigate();
   const onBack = () => navigate('/daten-und-zufall/kennwerte-bewerten');
   const onPractice = () => navigate('/daten-und-zufall/kennwerte-bewerten/ueben');
-  const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 3500, fest: false });
-  const [geloest, setGeloest] = useState(false);
-  const [uebungen, setUebungen] = useState<string[]>([]);
+  const [fest, setFest] = useSitzungState<Festlegung<Wahl>>('gh-fest', { wahl: null, wert: 3500, fest: false });
+  const [geloest, setGeloest] = useSitzungState('gh-geloest', false);
+  const [uebungen, setUebungen] = useSitzungState<string[]>('gh-uebungen', []);
 
   const seiten: Seite[] = [
     {
@@ -400,7 +321,14 @@ export default function GehaltEinstieg() {
               { kind: 'num', key: 's', label: 'Spannweite =', expected: 14 },
               { kind: 'num', key: 'mo', label: 'Modalwert =', expected: 5 },
             ]}
-            solution={<MB>{'17 - 3 = 14 \\qquad \\text{Modalwert} = 5 \\text{ (kommt 3-mal vor)}'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Spannweite', tex: '17 - 3 = 14' },
+                  { titel: 'Modalwert', text: '5, denn die 5 kommt 3-mal vor.' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('e')}
@@ -408,7 +336,14 @@ export default function GehaltEinstieg() {
             punkte={3}
             prompt={<p>Fünf Werte haben den Mittelwert 6. Wie groß ist die Summe aller fünf Werte?</p>}
             fields={[{ kind: 'num', key: 'sum', label: 'Summe =', expected: 30 }]}
-            solution={<MB>{'\\bar{x} = \\frac{\\text{Summe}}{5} = 6 \\;\\Rightarrow\\; \\text{Summe} = 5 \\cdot 6 = 30'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Ansatz', tex: '\\bar{x} = \\dfrac{\\text{Summe}}{5} = 6' },
+                  { titel: 'Summe = Mittelwert mal Anzahl', tex: '\\text{Summe} = 5 \\cdot 6 = 30' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -450,7 +385,14 @@ export default function GehaltEinstieg() {
               Geschäftsführung verdienen muss, damit der Durchschnitt wirklich 4.200 € beträgt.
             </p>
           </div>
-          <AnzeigeBild />
+          <figure className="sl-foto">
+            <img
+              src={anzeigeBild}
+              width={1200}
+              height={600}
+              alt="Die Stellenanzeige der Medienwerkstatt Pixelhof, ins karierte Heft geklebt: Wir suchen Verstärkung! Ein starkes Team mit 8 Beschäftigten. Durchschnittsgehalt 4.200 €. Mit Bleistift eingekreist und notiert: Echt? Durchschnitt von wem?"
+            />
+          </figure>
           <Vermutung
             optionen={WAHL}
             regler={{
@@ -569,10 +511,13 @@ export default function GehaltEinstieg() {
               fields={[{ kind: 'num', key: 'neu', label: 'Welches Gehalt muss die neunte Person bekommen?', expected: NEU_GEHALT, unit: '€', tol: 0.5 }]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'9 \\cdot 4\\,500 = 40\\,500 \\text{ €}'}</MB>
-                  <MB>{'40\\,500 - 33\\,600 = 6\\,900 \\text{ €}'}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Nötige Summe aller 9 Gehälter', tex: '9 \\cdot 4\\,500 = 40\\,500 \\text{ €}' },
+                    { titel: 'Bisherige Summe abziehen', tex: '40\\,500 - 33\\,600 = 6\\,900 \\text{ €}' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -615,7 +560,14 @@ export default function GehaltEinstieg() {
             />
           </Abschnitt>
           <Handlungsprodukt titel="Antwortbrief an Mia">
-            <BriefBild />
+            <figure className="sl-foto sl-foto-klein">
+              <img
+                src={briefBild}
+                width={800}
+                height={400}
+                alt="Kariertes Heftblatt: Liebe Mia, der Durchschnitt 4.200 € ist … Darunter Schreiblinien, rechts eine Bleistiftskizze mit sieben ähnlich hohen Balken und einem sehr hohen Balken GF."
+              />
+            </figure>
             <p className="sl-text">
               Schreibe in deinem Heft einen kurzen Brief an Mia. Erkläre ihr, wie aussagekräftig der Durchschnitt 4.200 € in der Stellenanzeige ist.
               Zeige deine Rechnung für Mittelwert und Median, nenne den Ausreißer und sage, welchen Kennwert die Firma ehrlicherweise in die Anzeige
@@ -627,26 +579,11 @@ export default function GehaltEinstieg() {
                 <li>„Der Ausreißer ist …, denn er liegt weit über den anderen Gehältern.“</li>
                 <li>„Der Median ist …, das heißt: Die Hälfte der Beschäftigten verdient weniger als …“</li>
                 <li>„Ehrlicher wäre in der Anzeige …“</li>
-                <li>
-                  „Abkürzungen und Begriffe: <M>{'\\bar{x}'}</M> bedeutet …, der Median ist …, ein Ausreißer ist …“
-                </li>
               </ul>
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist dein Brief vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                'Die Rechnung für den Mittelwert und den Median aller 8 Gehälter',
-                'Der Ausreißer ist genannt und du erklärst, warum er den Mittelwert nach oben zieht',
-                'Eine klare Empfehlung, welcher Kennwert das typische Gehalt ehrlich beschreibt',
-                'Ein Satz, wie die Firma ihre Anzeige ehrlicher formulieren könnte',
-                <>
-                  Unter deinem Brief steht, was die Abkürzung <M>{'\\bar{x}'}</M> (Mittelwert, arithmetisches Mittel) bedeutet. Außerdem erklärst du die
-                  Begriffe Median (Zentralwert), Ausreißer, Spannweite und alle anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an Mia')} />
           </Abschnitt>
           {geloest && (
             <Abschnitt titel="Das hältst du fest">
@@ -780,10 +717,15 @@ export default function GehaltEinstieg() {
               ]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'5 \\cdot 2\\,800 = 14\\,000 \\qquad 14\\,000 - (2\\,200 + 2\\,400 + 2\\,600 + 2\\,600) = 14\\,000 - 9\\,800 = 4\\,200 \\text{ €}'}</MB>
-                  <MB>{'2\\,200 \\;\\; 2\\,400 \\;\\; \\underline{2\\,600} \\;\\; 2\\,600 \\;\\; 4\\,200 \\quad\\Rightarrow\\quad \\text{Median} = 2\\,600 \\text{ €}'}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Summe aller 5 Gehälter', tex: '5 \\cdot 2\\,800 = 14\\,000' },
+                    { titel: 'Bekannte Gehälter', tex: '2\\,200 + 2\\,400 + 2\\,600 + 2\\,600 = 9\\,800' },
+                    { titel: 'Fehlendes Gehalt', tex: '14\\,000 - 9\\,800 = 4\\,200 \\text{ €}' },
+                    { titel: 'Ordnen, Median ist der 3. Wert', tex: '2\\,200 \;\; 2\\,400 \;\; \\underline{2\\,600} \;\; 2\\,600 \;\; 4\\,200', text: 'Median = 2.600 €' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -813,11 +755,14 @@ export default function GehaltEinstieg() {
               fields={[{ kind: 'num', key: 'gf', label: 'Gehalt der Geschäftsführung:', expected: 23400, unit: '€', tol: 0.5 }]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'\\bar{x} = 2 \\cdot 2\\,550 = 5\\,100 \\qquad 8 \\cdot 5\\,100 = 40\\,800 \\text{ €}'}</MB>
-                  <MB>{'40\\,800 - 17\\,400 = 23\\,400 \\text{ €}'}</MB>
-                  <p>Der Median bleibt bei 2.550 €, denn die Geschäftsführung steht weiterhin ganz am Ende der geordneten Liste.</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Ziel-Mittelwert', tex: '\\bar{x} = 2 \\cdot 2\\,550 = 5\\,100' },
+                    { titel: 'Nötige Summe aller 8 Gehälter', tex: '8 \\cdot 5\\,100 = 40\\,800 \\text{ €}' },
+                    { titel: 'Gehalt der Geschäftsführung', tex: '40\\,800 - 17\\,400 = 23\\,400 \\text{ €}', text: 'Der Median bleibt bei 2.550 €, denn die Geschäftsführung steht weiterhin ganz am Ende der geordneten Liste.' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -866,6 +811,7 @@ export default function GehaltEinstieg() {
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             In dieser Lernsituation prüfst du die Stellenanzeige einer Firma. Du lernst, wann der Mittelwert täuscht, wie ein Ausreißer wirkt und
