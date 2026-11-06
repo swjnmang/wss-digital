@@ -1,0 +1,29 @@
+<!doctype html>
+<!-- Der Pausenkiosk, Titelbild. Bildwelt Comic / pop: drei Panels (Umfrage-Zettel, Zettelstapel mit 40 Antworten, vier Getränke auf dem Tresen).
+     Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/daten-ordnen -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_comic.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const C = CO('#8a5800', '#fbf0da');
+const ink = '#141414';
+const zettel = (x, y, rot, txt) => `<g transform="rotate(${rot} ${x + 70} ${y + 45})"><rect x="${x}" y="${y}" width="140" height="90" fill="#fff" stroke="${ink}" stroke-width="4"/><text x="${x + 70}" y="${y + 58}" font-family="Comic Neue" font-weight="700" font-size="28" text-anchor="middle" fill="${ink}">${txt}</text></g>`;
+const flasche = (x, y, farbe, label) => `<g stroke="${ink}" stroke-width="5" stroke-linejoin="round"><rect x="${x}" y="${y}" width="58" height="150" rx="14" fill="${farbe}"/><rect x="${x + 16}" y="${y - 34}" width="26" height="40" fill="${farbe}"/><rect x="${x + 12}" y="${y - 46}" width="34" height="14" fill="#fff"/><rect x="${x - 4}" y="${y + 50}" width="66" height="46" fill="#fff"/></g><text x="${x + 29}" y="${y + 82}" font-family="Bangers" font-size="22" text-anchor="middle" fill="${ink}">${label}</text>`;
+let s = '';
+s += C.panel('p1', '24,24 380,24 366,576 24,576', 'url(#pT)',
+  C.kasten(44, 50, 310, 70, 'Umfrage im Kiosk', 36, -2) +
+  `<g transform="rotate(-4 200 330)"><rect x="70" y="170" width="260" height="320" fill="#fff" stroke="${ink}" stroke-width="6"/>` +
+  `<text x="200" y="230" font-family="Comic Neue" font-weight="700" font-size="28" text-anchor="middle" fill="${ink}">Welches Getränk</text>` +
+  `<text x="200" y="266" font-family="Comic Neue" font-weight="700" font-size="28" text-anchor="middle" fill="${ink}">kaufst du in der</text>` +
+  `<text x="200" y="302" font-family="Comic Neue" font-weight="700" font-size="28" text-anchor="middle" fill="${ink}">Pause am liebsten?</text>` +
+  `<line x1="100" y1="400" x2="300" y2="400" stroke="${ink}" stroke-width="4"/><text x="200" y="390" font-family="Comic Neue" font-weight="700" font-size="36" text-anchor="middle" fill="#8a5800">Eistee</text></g>`);
+s += C.panel('p2', '396,24 820,24 806,576 382,576', 'url(#pF)',
+  zettel(470, 380, -8, 'Wasser') + zettel(560, 330, 6, 'Eistee') + zettel(480, 280, -3, 'Kakao') + zettel(580, 230, 9, 'Wasser') + zettel(500, 190, -6, 'Apfelschorle') +
+  C.laut(430, 140, '40 ZETTEL!', 72, -6) + C.blase(560, 440, 230, 100, 600, 420, ['Und jetzt?'], 32));
+s += C.panel('p3', '836,24 1176,24 1176,576 822,576', 'url(#pG)',
+  `<rect x="822" y="420" width="360" height="160" fill="#c98a2b" stroke="${ink}" stroke-width="6"/>` +
+  flasche(870, 260, '#9fd3ef', 'W') + flasche(940, 260, '#f5c400', 'A') + flasche(1010, 260, '#e98a3c', 'E') + flasche(1080, 260, '#8a5a3a', 'K') +
+  C.blase(850, 60, 300, 110, 1000, 210, ['Was bestellen', 'wir mehr?'], 32));
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${C.defs}${C.papier(1200, 600)}${s}${C.korn(1200, 600)}</svg>`;
+</script>
+</body></html>

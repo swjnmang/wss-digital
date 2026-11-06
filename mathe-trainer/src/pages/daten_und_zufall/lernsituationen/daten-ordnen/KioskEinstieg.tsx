@@ -1,9 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TaskShell from '../../../../components/layout/TaskShell';
+import { useSitzungState } from '../../../../hooks/useSitzung';
 import { Beispiel, M, MB, Merke, QuerTabelle, Reihe } from '../../lernpfad/kit';
 import { Striche } from '../../lernpfad/DatenOrdnen';
-import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../../../lineare_funktionen/lernsituation_kit/kit';
+import { CheckCard, Hilfen, Loesungsweg, McCard, TrackedCheck, TrackedMc } from '../../../lineare_funktionen/lernsituation_kit/kit';
 import {
   Abschnitt,
   Aufklappbar,
@@ -11,11 +12,15 @@ import {
   BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../../lineare_funktionen/lernsituation_kit/seiten';
 import { Bilanz } from '../../../lineare_funktionen/lernsituation_kit/punkte';
-import { Kriterien, Vermutung, Zitat, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import { Kriterien, Vermutung, Zitat, standardKriterien, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import titelBild from './bilder/kiosk-titel.webp';
+import brandlBild from './bilder/kiosk-brandl.webp';
+import plakatBild from './bilder/kiosk-plakat.webp';
 import '../../lernpfad/lernpfad.css';
 import ZettelSpiel from './ZettelSpiel';
 import './kiosk.css';
@@ -27,6 +32,8 @@ import './kiosk.css';
 // Handlungsprodukt analog: Plakat „Kiosk-Umfrage“ mit Strichliste, Häufigkeitstabelle und Empfehlung im Heft.
 // Identität: Themenfarbe Ocker, Symbol fa-store, Titelbild Schulkiosk mit Zettelstapel, Leitobjekt der Zettelstapel bzw. die Strichliste.
 // Punkte (Pflicht): Warm-up 2+2+2+2+3 = 11, Problem erkennen 3+3+3 = 9, Problem lösen 14+4+5 = 23, Übungen 4+6+7 = 17, gesamt 60.
+// Bildwelt Comic / pop: Titelbild, Frau Brandl am Kühlschrank und das Plakat sind gerenderte WebP-Dateien aus bilder-quelle/kiosk-*.bild.html
+// (Bausteine in bilder-quelle/_comic.js); die Urliste bleibt live.
 // Profi 8, Bonus-Spiel höchstens 4 Runden · 2 = 8. Kein passendes Lernvideo zu Urliste und Häufigkeitstabelle bekannt: Beispiel ohne Video.
 
 /* ── Daten ───────────────────────────────────────────────────────────────── */
@@ -60,109 +67,20 @@ const WAHL: Record<Wahl, string> = {
 
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
-/** Titelbild: der Schulkiosk mit Markise, vier Getränken auf dem Tresen und dem Zettelstapel mit den Antworten */
-function Titelbild() {
-  return (
-    <svg
-      viewBox="0 0 720 252"
-      role="img"
-      aria-label="Ein Schulkiosk mit gestreifter Markise. Auf dem Tresen stehen vier Getränke, rechts davon liegt ein hoher Zettelstapel mit der Aufschrift 40 Zettel."
-    >
-      <rect x="0" y="206" width="720" height="46" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="206" y2="206" stroke="var(--ink)" strokeWidth="2" />
-      {/* Kiosk */}
-      <rect x="60" y="64" width="420" height="142" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="84" y="108" width="372" height="98" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      {Array.from({ length: 9 }, (_, i) => (
-        <path
-          key={i}
-          d={`M${48 + i * 48} 26 L${96 + i * 48} 26 L${100 + i * 48} 70 Q${72 + i * 48} 84 ${44 + i * 48} 70 Z`}
-          fill={i % 2 === 0 ? 'var(--primary)' : 'var(--surface)'}
-          stroke="var(--ink)"
-          strokeWidth="2"
-        />
-      ))}
-      <rect x="60" y="176" width="420" height="30" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      {/* Getränke auf dem Tresen */}
-      <g stroke="var(--ink)" strokeWidth="2">
-        <rect x="116" y="130" width="30" height="46" rx="6" fill="var(--primary-soft)" />
-        <rect x="124" y="120" width="14" height="12" fill="var(--surface)" />
-        <rect x="200" y="136" width="36" height="40" rx="4" fill="var(--highlight)" />
-        <rect x="290" y="126" width="30" height="50" rx="6" fill="var(--surface)" />
-        <rect x="298" y="116" width="14" height="12" fill="var(--primary)" />
-        <rect x="380" y="140" width="34" height="36" rx="4" fill="var(--primary)" />
-      </g>
-      <text x="270" y="198" textAnchor="middle" fontSize="16" fontWeight="800" fill="#fff">
-        PAUSENKIOSK
-      </text>
-      {/* Zettelstapel */}
-      {[0, 1, 2, 3, 4, 5].map((i) => (
-        <rect
-          key={i}
-          x={540 - (i % 2) * 4}
-          y={190 - i * 9}
-          width="120"
-          height="9"
-          rx="1.5"
-          fill="var(--surface)"
-          stroke="var(--ink)"
-          strokeWidth="1.5"
-        />
-      ))}
-      <rect x="548" y="124" width="104" height="14" rx="1.5" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-      <text x="600" y="108" textAnchor="middle" fontSize="18" fontWeight="800" fill="var(--ink)">
-        40 Zettel
-      </text>
-    </svg>
-  );
-}
-
 const THEMA: Thema = {
   name: 'Der Pausenkiosk',
   farbe: 'ocker',
   icon: 'fa-store',
-  bild: <Titelbild />,
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Comic in drei Panels: ein Umfragezettel mit der Frage Welches Getränk kaufst du in der Pause am liebsten?, ein Haufen aus 40 Zetteln mit Wasser, Eistee, Kakao und Apfelschorle, und vier Flaschen auf dem Kiosk-Tresen mit der Frage: Was bestellen wir mehr?"
+    />
+  ),
 };
-
-/** Leitobjekt: der Zettelstapel mit den 40 Antworten */
-function ZettelstapelBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Ein hoher Stapel Zettel mit der Frage: Welches Getränk kaufst du in der Pause am liebsten? Daneben die Zahl 40 und ein Fragezeichen."
-      >
-        {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-          <rect
-            key={i}
-            x={210 - (i % 3) * 5}
-            y={150 - i * 14}
-            width="170"
-            height="14"
-            rx="2"
-            fill="var(--surface)"
-            stroke="var(--ink)"
-            strokeWidth="2"
-          />
-        ))}
-        <rect x="218" y="32" width="150" height="16" rx="2" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="1.5" />
-        <text x="293" y="26" textAnchor="middle" fontSize="16" fontWeight="800" fill="var(--ink)">
-          Dein Lieblingsgetränk?
-        </text>
-        <text x="410" y="108" fontSize="40" fontWeight="800" fill="var(--primary)">
-          40
-        </text>
-        <text x="410" y="136" fontSize="18" fill="var(--ink)">
-          Antworten
-        </text>
-        <text x="540" y="116" fontSize="56" fontWeight="800" fill="var(--primary)">
-          ?
-        </text>
-      </svg>
-    </div>
-  );
-}
+const BILDWELT: Bildwelt = { welt: 'comic', variante: 'pop' };
 
 /** Die Urliste: 40 Zettel in der Reihenfolge, in der sie auf dem Stapel liegen */
 function Urliste() {
@@ -179,74 +97,6 @@ function Urliste() {
       <p className="ki-legende">
         <strong>W</strong> Wasser · <strong>A</strong> Apfelschorle · <strong>E</strong> Eistee · <strong>K</strong> Kakao
       </p>
-    </div>
-  );
-}
-
-/** Tafel des Kiosks: die Tabelle ist noch leer */
-function TafelBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Eine Kreidetafel des Kiosks mit einer leeren Tabelle. Spalten: Getränk, Strichliste, Anzahl. Zeilen: Wasser, Apfelschorle, Eistee, Kakao. Die Zellen für Striche und Anzahl sind noch leer."
-      >
-        <rect x="110" y="6" width="500" height="178" rx="10" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="126" y="18" width="468" height="154" rx="4" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        {['Getränk', 'Strichliste', 'Anzahl H'].map((t, i) => (
-          <text key={t} x={[142, 300, 500][i]} y="46" fontSize="17" fontWeight="800" fill="var(--primary)">
-            {t}
-          </text>
-        ))}
-        <line x1="126" x2="594" y1="56" y2="56" stroke="var(--ink)" strokeWidth="2" />
-        {SORTEN.map((s, i) => (
-          <g key={s.k}>
-            <text x="142" y={82 + i * 28} fontSize="17" fill="var(--ink)">
-              {s.name}
-            </text>
-            <text x="300" y={82 + i * 28} fontSize="17" fill="var(--ink-muted)">
-              …
-            </text>
-            <text x="520" y={82 + i * 28} fontSize="17" fontWeight="800" fill="var(--primary)">
-              ?
-            </text>
-          </g>
-        ))}
-      </svg>
-    </div>
-  );
-}
-
-/** Handlungsprodukt: Plakat für die Pinnwand im Kiosk */
-function PlakatBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Ein Plakat mit der Überschrift Kiosk-Umfrage. Darauf eine Strichliste, eine Häufigkeitstabelle mit vier Zeilen und ein Kasten für die Empfehlung."
-      >
-        <rect x="150" y="6" width="420" height="178" rx="10" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="170" y="16" width="380" height="160" rx="4" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="360" y="44" textAnchor="middle" fontSize="20" fontWeight="800" fill="var(--ink)">
-          Kiosk-Umfrage
-        </text>
-        {[0, 1, 2, 3].map((i) => (
-          <g key={i}>
-            <rect x="190" y={56 + i * 22} width="70" height="18" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="1.5" />
-            <rect x="260" y={56 + i * 22} width="110" height="18" fill="var(--surface)" stroke="var(--ink)" strokeWidth="1.5" />
-            <rect x="370" y={56 + i * 22} width="30" height="18" fill="var(--surface)" stroke="var(--ink)" strokeWidth="1.5" />
-          </g>
-        ))}
-        <rect x="416" y="56" width="120" height="84" rx="6" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-        <text x="476" y="86" textAnchor="middle" fontSize="16" fontWeight="800" fill="var(--ink)">
-          Empfehlung:
-        </text>
-        <text x="476" y="108" textAnchor="middle" fontSize="16" fill="var(--ink)">
-          …
-        </text>
-      </svg>
     </div>
   );
 }
@@ -328,6 +178,14 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 /** Lösungsweg für den Pausenkiosk */
 const LOESUNG = (
   <>
+    <Loesungsweg
+      schritte={[
+        { titel: 'Strichliste anlegen', text: 'Jeden Zettel der Urliste der Reihe nach mit einem Strich beim passenden Getränk erfassen, dann abstreichen.' },
+        { titel: 'Striche zählen (Häufigkeitstabelle)', text: `Wasser ${H.W}, Apfelschorle ${H.A}, Eistee ${H.E}, Kakao ${H.K}.` },
+        { titel: 'Kontrolle', tex: `${H.W} + ${H.A} + ${H.E} + ${H.K} = ${N} = n` },
+        { titel: 'Rangfolge', text: `Platz 1 Eistee (${H.E}), Platz 2 Wasser (${H.W}), Platz 3 Apfelschorle (${H.A}), Platz 4 Kakao (${H.K}).` },
+      ]}
+    />
     <QuerTabelle
       rows={[
         { head: 'Getränk', cells: SORTEN.map((s) => s.name) },
@@ -335,10 +193,6 @@ const LOESUNG = (
         { head: <M>H</M>, cells: SORTEN.map((s) => String(H[s.k])) },
       ]}
     />
-    <MB>{`${H.W} + ${H.A} + ${H.E} + ${H.K} = ${N} = n`}</MB>
-    <p>
-      Rangfolge: Platz 1 Eistee ({H.E}), Platz 2 Wasser ({H.W}), Platz 3 Apfelschorle ({H.A}), Platz 4 Kakao ({H.K}).
-    </p>
   </>
 );
 
@@ -351,10 +205,10 @@ const fehlH = (t: number) => FEHLTAGE.filter((v) => v === t).length;
 
 export default function KioskEinstieg() {
   const navigate = useNavigate();
-  const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 15, fest: false });
-  const [gezaehlt, setGezaehlt] = useState<string[]>([]);
-  const [geloest, setGeloest] = useState(false);
-  const [uebungen, setUebungen] = useState<string[]>([]);
+  const [fest, setFest] = useSitzungState<Festlegung<Wahl>>('ki-fest', { wahl: null, wert: 15, fest: false });
+  const [gezaehlt, setGezaehlt] = useSitzungState<string[]>('ki-gezaehlt', []);
+  const [geloest, setGeloest] = useSitzungState('ki-geloest', false);
+  const [uebungen, setUebungen] = useSitzungState<string[]>('ki-uebungen', []);
   const gez = (k: string) => () => setGezaehlt((g) => (g.includes(k) ? g : [...g, k]));
 
   const seiten: Seite[] = [
@@ -364,7 +218,7 @@ export default function KioskEinstieg() {
       pflicht: ['a', 'b', 'c', 'd', 'e'],
       inhalt: (fertig) => (
         <>
-          <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich.</p>
+          <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich. Einzelarbeit, ca. 10 Minuten.</p>
           <CheckCard
             onSolved={fertig.teil('a')}
             title="a) Strichliste lesen"
@@ -444,7 +298,14 @@ export default function KioskEinstieg() {
               </p>
             }
             fields={[{ kind: 'num', key: 'e', label: 'Kunst:', expected: 3 }]}
-            solution={<MB>{'25 - (9 + 6 + 7) = 25 - 22 = 3'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Bekannte Anzahlen addieren', tex: '9 + 6 + 7 = 22' },
+                  { titel: 'Von der Gesamtzahl abziehen', tex: '25 - 22 = 3' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -489,7 +350,14 @@ export default function KioskEinstieg() {
               nach, wie oft Wasser und Eistee vorkommen.
             </p>
           </div>
-          <ZettelstapelBild />
+          <figure className="sl-foto">
+            <img
+              src={brandlBild}
+              width={1200}
+              height={600}
+              alt="Comic in zwei Panels: Frau Brandl, die Kioskleiterin, hält einen Zettel mit Wasser hoch und sagt: Gefühlt stand bei jedem zweiten Zettel Wasser drauf! Daneben der Kühlschrank des Kiosks, unten ist Platz für genau eine Kiste."
+            />
+          </figure>
           <Urliste />
           <Vermutung
             optionen={WAHL}
@@ -602,7 +470,6 @@ export default function KioskEinstieg() {
               </p>
             </div>
             <Urliste />
-            <TafelBild />
             <BeispielMitVideo>
               <Beispiel offen title="Die Lieblingseissorte beim Sommerfest" aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE} />
             </BeispielMitVideo>
@@ -649,6 +516,7 @@ export default function KioskEinstieg() {
                 onSolved={fertig.teil('empfehlung')}
                 title="Empfehlung an Frau Brandl"
                 punkte={4}
+                rechnen={false}
                 prompt={<p>Welches Getränk empfiehlst du Frau Brandl für die zusätzliche Kiste?</p>}
                 options={[
                   {
@@ -672,7 +540,14 @@ export default function KioskEinstieg() {
               />
             </Abschnitt>
             <Handlungsprodukt titel="Plakat „Kiosk-Umfrage“">
-              <PlakatBild />
+              <figure className="sl-foto sl-foto-klein">
+                <img
+                  src={plakatBild}
+                  width={800}
+                  height={400}
+                  alt="Comic-Plakat Kiosk-Umfrage: eine Tabelle mit Wasser, Apfelschorle, Eistee und Kakao, die Anzahlen noch offen, daneben ein Kasten Empfehlung."
+                />
+              </figure>
               <p className="sl-text">
                 Gestalte in deinem Heft ein Plakat für die Pinnwand im Kiosk. Zeige, wie du die 40 Zettel geordnet hast: mit Strichliste und
                 Häufigkeitstabelle. Schreibe darunter deine Empfehlung an Frau Brandl.
@@ -683,28 +558,11 @@ export default function KioskEinstieg() {
                   <li>„Am häufigsten wurde … genannt, nämlich …-mal. Am seltensten …“</li>
                   <li>„Die Summe aller Anzahlen ist …, das passt zu n = …“</li>
                   <li>„Unsere Empfehlung: … Der Abstand zum zweiten Platz beträgt nur …“</li>
-                  <li>
-                    „Wörter erklärt: Urliste = …, Strichliste = …, Häufigkeitstabelle = …, absolute Häufigkeit <M>H</M> = …, <M>n</M> = …“
-                  </li>
                 </ul>
               </Aufklappbar>
             </Handlungsprodukt>
             <Abschnitt titel="Ist dein Plakat vollständig?">
-              <Kriterien
-                onAlle={fertig.teil('produkt')}
-                items={[
-                  'Eine Strichliste mit Fünferbündeln, in der alle 40 Zettel erfasst sind',
-                  <>
-                    Eine Häufigkeitstabelle mit allen vier Getränken und ihrer Anzahl <M>H</M>, dazu die Kontrolle, dass die Summe 40 ergibt
-                  </>,
-                  'Eine klare Empfehlung an Frau Brandl mit Begründung und dem Hinweis, wie knapp es ist',
-                  <>
-                    Unter deinem Plakat steht, was die Wörter Urliste, Strichliste, Häufigkeitstabelle und Rangfolge bedeuten und wofür die
-                    Abkürzungen <M>n</M> (Anzahl aller Daten) und <M>H</M> (absolute Häufigkeit) stehen. Außerdem erklärst du alle anderen
-                    Wörter, die für dich neu waren.
-                  </>,
-                ]}
-              />
+              <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an Frau Brandl')} />
             </Abschnitt>
             {geloest && (
               <Abschnitt titel="Das hältst du fest">
@@ -737,6 +595,7 @@ export default function KioskEinstieg() {
     {
       art: 'sichern',
       titel: 'Übungsaufgaben',
+      pflicht: ['1', '2', '3'],
       inhalt: (fertig) => (
         <>
           <p className="sl-text">
@@ -855,6 +714,13 @@ export default function KioskEinstieg() {
               loesungNachFehler
               solution={
                 <>
+                  <Loesungsweg
+                    schritte={[
+                      { titel: 'Strichliste und Häufigkeiten', text: `H(0) = ${fehlH(0)}, H(1) = ${fehlH(1)}, H(2) = ${fehlH(2)}, H(3) = ${fehlH(3)}` },
+                      { titel: 'Kontrolle', tex: `${fehlH(0)} + ${fehlH(1)} + ${fehlH(2)} + ${fehlH(3)} = 20 = n` },
+                      { titel: 'Mindestens 2 Tage: 2 oder 3 Tage', tex: `${fehlH(2)} + ${fehlH(3)} = ${fehlH(2) + fehlH(3)}` },
+                    ]}
+                  />
                   <QuerTabelle
                     rows={[
                       { head: 'Fehltage', cells: ['0', '1', '2', '3'] },
@@ -862,11 +728,8 @@ export default function KioskEinstieg() {
                       { head: <M>H</M>, cells: [0, 1, 2, 3].map((t) => String(fehlH(t))) },
                     ]}
                   />
-                  <MB>{`${fehlH(0)} + ${fehlH(1)} + ${fehlH(2)} + ${fehlH(3)} = 20 = n`}</MB>
-                  <p>
-                    Mindestens 2 Tage fehlten {fehlH(2)} + {fehlH(3)} = {fehlH(2) + fehlH(3)} Personen.
-                  </p>
                 </>
+
               }
               help={
                 <Hilfen
@@ -900,14 +763,14 @@ export default function KioskEinstieg() {
               ]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'45 - 12 - 9 = 24'}</MB>
-                  <p>
-                    Auf Wasser und Kakao zusammen entfallen 24 Nennungen. Wasser ist doppelt so groß wie Kakao, also drei gleiche Teile:{' '}
-                    <M>{'24 : 3 = 8'}</M>.
-                  </p>
-                  <p>Kakao: 8, Wasser: 16. Kontrolle: 12 + 9 + 16 + 8 = 45 ✓</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Nennungen für Wasser und Kakao zusammen', tex: '45 - 12 - 9 = 24' },
+                    { titel: 'Drei gleiche Teile (Kakao 1 Teil, Wasser 2 Teile)', tex: '24 : 3 = 8' },
+                    { titel: 'Ergebnis', text: 'Kakao: 8, Wasser: 16.', tex: '12 + 9 + 16 + 8 = 45' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -956,6 +819,7 @@ export default function KioskEinstieg() {
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             In dieser Lernsituation wertest du als Praktikant im Pausenkiosk eine Umfrage aus. Du lernst, wie du aus einer ungeordneten
