@@ -42,21 +42,18 @@
 
 .dr-hinweis { margin: 0; font: 700 14px/1.3 var(--font-body); color: var(--ink-muted); }
 
-/* Station: Aufgabe links, Graph mit Ringen rechts (ab Tablet-Breite); Hilfe-Buttons unter der Rechnung statt daneben */
-.dr-zwei { display: grid; gap: 12px; align-items: start; }
-.dr-zwei > * { min-width: 0; }
-@media (min-width: 900px) {
-  .dr-zwei { grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); }
-  .sl-seite .dr-zwei .lp-ex.bk-panel:has(> .ls-help-schritte) > .ls-rechnung { order: 0; flex: 1 1 100%; }
-  .sl-seite .dr-zwei .lp-ex.bk-panel:has(> .ls-help-schritte) > .lp-ex-actions { order: 1; flex: 0 0 auto; }
-  .sl-seite .dr-zwei .lp-ex.bk-panel > .ls-help-schritte { order: 1; flex: 1 1 auto; }
-  .sl-seite .dr-zwei .lp-ex.bk-panel:has(> .ls-help-schritte) > .lp-feedback { order: 2; flex: 1 1 100%; }
-  .sl-seite .dr-zwei .lp-ex.bk-panel:has(> .ls-help-schritte) > .lp-solution { order: 3; flex: 1 1 100%; }
-}
-.dr-map-kompakt { margin-bottom: 8px; }
-.dr-map-kompakt li { padding: 2px 8px; min-height: 30px; font-size: 13px; }
-.dr-map-kompakt .dr-digit { min-width: 28px; height: 22px; font-size: 14px; }
-.dr-zwei > div > .dr-map { margin-bottom: 8px; }
-.dr-links { display: flex; flex-direction: column; gap: 12px; }
-.dr-links > * { margin: 0; }
-@media (min-width: 900px) { .dr-zwei.dr-zwei-gleich { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); } }
+/* Bonus-Spiel „Ring-Check“ */
+.rc-spiel { display: flex; flex-direction: column; gap: 10px; }
+.rc-kopf { display: flex; justify-content: space-between; align-items: center; font: 700 16px/1.2 var(--font-body); }
+.rc-muenze-an { color: var(--highlight); margin-left: 4px; }
+.rc-muenze-aus { color: var(--line-strong); margin-left: 4px; }
+.rc-gleichung { margin: 0; font-size: 19px; font-weight: 700; }
+.rc-feld { width: 100%; height: auto; display: block; }
+.rc-text { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.rc-text p { margin: 0; font-size: 17px; line-height: 1.5; }
+.dr-code-zeile { display: flex; justify-content: center; }
+
+/* Rechnungen im „Wer hat recht?“ (wie in der Lasershow) */
+.lz-plan { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); }
+.lz-plan-name { font: 800 17px/1.2 var(--font-display); }
+.lz-plan .katex-display { margin: 0; overflow-x: auto; overflow-y: hidden; }

@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- Der Drohnen-Parcours, Titelbild. Bildwelt Comic / retro: drei Panels (Plakat Lichtshow, Drohne vor den Ringen, Hangar-Tor mit Code-Schloss).
+     Rendern: node scripts/bilder-rendern.cjs src/pages/lineare_funktionen/punkt_gerade_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_comic.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const C = CO('#8a5800', '#f4e2b8');
+const ink = '#2a211b';
+const drohne = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})" stroke="${ink}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+ <line x1="-70" y1="-10" x2="70" y2="-10"/><rect x="-34" y="-26" width="68" height="34" rx="10" fill="#8a5800"/><circle cx="0" cy="-9" r="9" fill="#f2b632"/>
+ <ellipse cx="-70" cy="-20" rx="34" ry="7" fill="#fff"/><ellipse cx="70" cy="-20" rx="34" ry="7" fill="#fff"/><line x1="-70" y1="-10" x2="-70" y2="-20"/><line x1="70" y1="-10" x2="70" y2="-20"/>
+ <line x1="-20" y1="8" x2="-28" y2="22"/><line x1="20" y1="8" x2="28" y2="22"/></g>`;
+const ring = (x, y, r, name) => `<ellipse cx="${x}" cy="${y}" rx="${r * 0.55}" ry="${r}" fill="none" stroke="${ink}" stroke-width="12"/><ellipse cx="${x}" cy="${y}" rx="${r * 0.55}" ry="${r}" fill="none" stroke="#f2b632" stroke-width="6"/><text x="${x}" y="${y - r - 14}" font-family="Bangers" font-size="34" text-anchor="middle" fill="${ink}">${name}</text>`;
+let s = '';
+// Panel 1: Plakat
+s += C.panel('p1', '24,24 330,24 314,576 24,576', 'url(#pT)',
+  `<g transform="rotate(-4 170 300)"><rect x="60" y="120" width="220" height="300" fill="#fff" stroke="${ink}" stroke-width="5"/>
+  <text x="170" y="190" font-family="Bangers" font-size="44" text-anchor="middle" fill="#8a5800">SCHULFEST</text>
+  <text x="170" y="250" font-family="Bangers" font-size="40" text-anchor="middle" fill="${ink}">LICHTSHOW</text>
+  <text x="170" y="290" font-family="Comic Neue" font-weight="700" font-size="24" text-anchor="middle" fill="${ink}">mit Drohne</text>
+  <circle cx="120" cy="350" r="22" fill="none" stroke="#f2b632" stroke-width="8"/><circle cx="170" cy="365" r="22" fill="none" stroke="#f2b632" stroke-width="8"/><circle cx="220" cy="350" r="22" fill="none" stroke="#f2b632" stroke-width="8"/></g>` +
+  C.kasten(46, 470, 250, 70, 'Freitag, 21 Uhr', 30, 2));
+// Panel 2: Drohne fliegt geradlinig auf die Ringe zu
+s += C.panel('p2', '346,24 850,24 836,576 330,576', 'url(#pF)',
+  `<line x1="380" y1="500" x2="830" y2="140" stroke="#8a5800" stroke-width="5" stroke-dasharray="16 12"/>` +
+  ring(560, 330, 56, 'A') + ring(660, 280, 52, 'B') + ring(760, 190, 50, 'C') +
+  drohne(450, 450, 0.9) + C.blase(370, 50, 300, 100, 470, 410, ['Trifft sie jeden', 'Ring in der Mitte?'], 28) +
+  `<text x="470" y="550" font-family="Comic Neue" font-weight="700" font-size="28" fill="${ink}">Flugbahn: y = 0,5x + 2</text>`);
+// Panel 3: Hangar-Tor mit Code-Schloss
+s += C.panel('p3', '866,24 1176,24 1176,576 852,576', 'url(#pG)',
+  `<rect x="890" y="170" width="262" height="380" fill="#c9b48a" stroke="${ink}" stroke-width="6"/>` +
+  [0, 1, 2, 3, 4, 5].map((i) => `<line x1="890" x2="1152" y1="${220 + i * 55}" y2="${220 + i * 55}" stroke="${ink}" stroke-width="3"/>`).join('') +
+  `<rect x="926" y="300" width="190" height="110" rx="10" fill="#fff" stroke="${ink}" stroke-width="5"/><text x="1021" y="340" font-family="Bangers" font-size="30" text-anchor="middle" fill="${ink}">CODE</text>` +
+  [0, 1, 2].map((i) => `<rect x="${944 + i * 56}" y="352" width="44" height="44" rx="6" fill="#fbe8b8" stroke="${ink}" stroke-width="4"/><text x="${966 + i * 56}" y="386" font-family="Bangers" font-size="32" text-anchor="middle" fill="${ink}">?</text>`).join('') +
+  C.kasten(884, 60, 270, 74, 'HANGAR-TOR', 38, -2));
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${C.defs}${C.papier(1200, 600)}${s}${C.korn(1200, 600)}</svg>`;
+</script>
+</body></html>
