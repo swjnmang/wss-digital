@@ -1,0 +1,115 @@
+<!doctype html>
+<!-- Bildwelt Bauplan, Beispiel Vereinsbus, Unter-Variante Blaupause: weiße Linien auf Cyanblau, Raster, Maßlinien, Schriftfeld
+     Rendern: node scripts/bilder-rendern.cjs <diese Datei> <ziel.webp>  (Element #bild wird gerendert) -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+
+<svg id="bild" xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+ <defs>
+  <!-- Papier der Blaupause: wolkig ungleichmäßig belichtet -->
+  <filter id="papier" x="0" y="0" width="100%" height="100%">
+   <feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="3" seed="4" result="wolke"/>
+   <feColorMatrix in="wolke" type="matrix" values="0 0 0 0 .05  0 0 0 0 .2  0 0 0 0 .42  0 0 0 .55 0"/>
+   <feComposite in2="SourceGraphic" operator="over"/>
+  </filter>
+  <filter id="korn" x="0" y="0" width="100%" height="100%">
+   <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/>
+   <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .07 0"/>
+  </filter>
+  <!-- Linien leicht ausgefranst wie gedruckt -->
+  <filter id="druck"><feTurbulence type="fractalNoise" baseFrequency="1.4" seed="3"/><feDisplacementMap in="SourceGraphic" scale="1.3"/></filter>
+  <pattern id="raster" width="20" height="20" patternUnits="userSpaceOnUse">
+   <path d="M20 0H0V20" fill="none" stroke="#ffffff" stroke-opacity=".09" stroke-width="1"/>
+  </pattern>
+  <pattern id="raster100" width="100" height="100" patternUnits="userSpaceOnUse">
+   <path d="M100 0H0V100" fill="none" stroke="#ffffff" stroke-opacity=".16" stroke-width="1"/>
+  </pattern>
+  <marker id="pf" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="12" markerHeight="12" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+   <path d="M0 1.5 L10 5 L0 8.5 Z" fill="#fff"/>
+  </marker>
+  <pattern id="schraffur" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+   <line x1="0" y1="0" x2="0" y2="8" stroke="#fff" stroke-opacity=".55" stroke-width="1.4"/>
+  </pattern>
+ </defs>
+
+ <rect width="1200" height="600" fill="#1d5596"/>
+ <rect width="1200" height="600" fill="#1d5596" filter="url(#papier)"/>
+ <rect width="1200" height="600" fill="url(#raster)"/>
+ <rect width="1200" height="600" fill="url(#raster100)"/>
+ <!-- Zeichnungsrahmen -->
+ <rect x="24" y="24" width="1152" height="552" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="2.5"/>
+ <rect x="32" y="32" width="1136" height="536" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1"/>
+
+ <g filter="url(#druck)" fill="none" stroke="#fff" stroke-linejoin="round" stroke-linecap="round">
+  <!-- Bus Seitenansicht -->
+  <path d="M120 400 V200 Q120 172 150 170 H560 Q610 172 640 222 L676 300 V400 Z" stroke-width="3.2"/>
+  <!-- Fenster -->
+  <g stroke-width="2">
+   <rect x="148" y="196" width="88" height="62"/><rect x="250" y="196" width="88" height="62"/>
+   <rect x="352" y="196" width="88" height="62"/><rect x="454" y="196" width="84" height="62"/>
+   <path d="M556 196 H598 L630 258 H556 Z"/>
+  </g>
+  <!-- Tür, Zierlinie -->
+  <path d="M500 278 V400 M540 278 V400" stroke-width="2"/>
+  <path d="M120 300 H676" stroke-width="1.6" stroke-dasharray="14 6"/>
+  <!-- Radkästen und Räder -->
+  <path d="M168 400 A44 44 0 0 1 256 400 M528 400 A44 44 0 0 1 616 400" stroke-width="2.4"/>
+  <circle cx="212" cy="402" r="36" stroke-width="3"/><circle cx="212" cy="402" r="14" stroke-width="2"/>
+  <circle cx="572" cy="402" r="36" stroke-width="3"/><circle cx="572" cy="402" r="14" stroke-width="2"/>
+  <!-- Mittellinien der Achsen -->
+  <path d="M212 352 V452 M162 402 H262 M572 352 V452 M522 402 H622" stroke-width="1" stroke-dasharray="18 4 3 4" stroke-opacity=".8"/>
+  <!-- Boden -->
+  <path d="M80 438 H720" stroke-width="2"/>
+  <rect x="80" y="438" width="640" height="12" fill="url(#schraffur)" stroke="none"/>
+  <!-- Scheinwerfer -->
+  <rect x="656" y="320" width="16" height="22" stroke-width="2"/>
+ </g>
+
+ <!-- Maßlinie oben: Zeitraum in Jahren -->
+ <g fill="none" stroke="#fff" stroke-width="1.4">
+  <path d="M120 162 V112 M676 290 V112" stroke-opacity=".7"/>
+  <path d="M120 124 H676" marker-start="url(#pf)" marker-end="url(#pf)"/>
+  <!-- Teilung in 5 Jahre -->
+  <path d="M231 118 V130 M342 118 V130 M454 118 V130 M565 118 V130" stroke-width="1.6"/>
+ </g>
+ <g font-family="Barlow Condensed" font-weight="600" fill="#fff" text-anchor="middle">
+  <rect x="318" y="88" width="160" height="28" fill="#1d5596"/>
+  <text x="398" y="111" font-size="26" letter-spacing=".5">Laufzeit 5 Jahre</text>
+  <text x="176" y="150" font-size="22" fill-opacity=".9">1</text><text x="287" y="150" font-size="22" fill-opacity=".9">2</text>
+  <text x="398" y="150" font-size="22" fill-opacity=".9">3</text><text x="510" y="150" font-size="22" fill-opacity=".9">4</text>
+  <text x="621" y="150" font-size="22" fill-opacity=".9">5</text>
+ </g>
+
+ <!-- Positionsnummern mit Hinweislinien -->
+ <g fill="none" stroke="#fff" stroke-width="1.4">
+  <path d="M300 350 L300 498"/><circle cx="300" cy="350" r="4" fill="#fff"/>
+  <path d="M656 330 L760 250"/><circle cx="656" cy="330" r="4" fill="#fff"/>
+ </g>
+ <g font-family="Barlow Condensed" fill="#fff">
+  <circle cx="300" cy="518" r="20" fill="none" stroke="#fff" stroke-width="2"/>
+  <text x="300" y="527" font-size="24" font-weight="700" text-anchor="middle">1</text>
+  <text x="330" y="512" font-size="26" font-weight="600">Rücklage 4.000 € am Ende jedes Jahres</text>
+  <text x="330" y="540" font-size="22" font-weight="500" fill-opacity=".8">Sparkonto mit 3 % p. a.</text>
+  <circle cx="780" cy="238" r="20" fill="none" stroke="#fff" stroke-width="2"/>
+  <text x="780" y="247" font-size="24" font-weight="700" text-anchor="middle">2</text>
+  <text x="810" y="232" font-size="26" font-weight="600">Neuer Kleinbus</text>
+  <text x="810" y="260" font-size="22" font-weight="500" fill-opacity=".8">Preis ca. 24.000 €</text>
+ </g>
+
+ <!-- Schriftfeld rechts unten -->
+ <g font-family="Barlow Condensed" fill="#fff">
+  <g fill="none" stroke="#fff" stroke-width="1.8">
+   <rect x="800" y="372" width="368" height="196" fill="#1a4d88"/>
+   <path d="M800 420 H1168 M800 466 H1168 M800 512 H1168 M940 420 V568"/>
+  </g>
+  <text x="816" y="406" font-size="30" font-weight="700" letter-spacing=".6">Projekt Vereinsbus</text>
+  <text x="816" y="450" font-size="20" font-weight="500" fill-opacity=".75">Ziel</text>
+  <text x="956" y="452" font-size="26" font-weight="600">24.000 €</text>
+  <text x="816" y="496" font-size="20" font-weight="500" fill-opacity=".75">Rate</text>
+  <text x="956" y="498" font-size="26" font-weight="600">4.000 € / Jahr</text>
+  <text x="816" y="542" font-size="20" font-weight="500" fill-opacity=".75">Prüfen</text>
+  <text x="956" y="545" font-size="26" font-weight="700">Reicht das?</text>
+ </g>
+
+ <rect width="1200" height="600" filter="url(#korn)"/>
+</svg>
+</body></html>

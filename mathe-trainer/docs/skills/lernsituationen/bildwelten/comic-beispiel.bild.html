@@ -1,0 +1,118 @@
+<!doctype html>
+<!-- Bildwelt Comic, Beispiel Vereinsbus, Unter-Variante Pop-Raster: drei Panels, dicke Tusche, Rasterpunkte, Sprechblasen, Erzählkasten.
+     Keine Gesichter: Sprecher stehen außerhalb des Panels (Blasenschwanz zeigt hinaus) oder sind nur Hände, Rücken, Gegenstände.
+     Rendern: node scripts/bilder-rendern.cjs <diese Datei> <ziel.webp>  (Element #bild wird gerendert) -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+
+<svg id="bild" xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+ <defs>
+  <!-- Rasterpunkte in Themenfarbe (hier Blau) und Gelb -->
+  <pattern id="punkteBlau" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(20)">
+   <rect width="14" height="14" fill="#dfeafb"/><circle cx="7" cy="7" r="3.6" fill="#2f6db3"/>
+  </pattern>
+  <pattern id="punkteGelb" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+   <rect width="12" height="12" fill="#fff6c9"/><circle cx="6" cy="6" r="3.2" fill="#f5c400"/>
+  </pattern>
+  <pattern id="punkteFein" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+   <rect width="9" height="9" fill="#ffffff"/><circle cx="4.5" cy="4.5" r="1.6" fill="#9db7da"/>
+  </pattern>
+  <!-- Papier eines Heftes, leicht vergilbt, mit Druckkorn -->
+  <filter id="korn" x="0" y="0" width="100%" height="100%">
+   <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="9"/>
+   <feColorMatrix type="matrix" values="0 0 0 0 .2  0 0 0 0 .15  0 0 0 0 .05  0 0 0 .08 0"/>
+  </filter>
+  <clipPath id="p1"><polygon points="24,24 392,24 372,576 24,576"/></clipPath>
+  <clipPath id="p2"><polygon points="408,24 700,24 690,576 388,576"/></clipPath>
+  <clipPath id="p3"><polygon points="716,24 1176,24 1176,576 706,576"/></clipPath>
+ </defs>
+
+ <rect width="1200" height="600" fill="#fbf8ef"/>
+
+ <!-- Panel 1: Vereinskasse, Münzen klimpern -->
+ <g clip-path="url(#p1)">
+  <rect width="420" height="600" fill="url(#punkteBlau)"/>
+  <!-- Speedlines aus der Kasse -->
+  <g stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".9">
+   <path d="M205 395 L60 300"/><path d="M205 395 L120 250"/><path d="M205 395 L330 255"/><path d="M205 395 L370 330"/>
+  </g>
+  <!-- Geldkassette -->
+  <g stroke="#111" stroke-width="6" stroke-linejoin="round">
+   <path d="M80 410 L300 410 L300 520 L80 520 Z" fill="#c8c8c8"/>
+   <path d="M80 410 L120 370 L340 370 L300 410 Z" fill="#e8e8e8"/>
+   <path d="M300 410 L340 370 L340 480 L300 520 Z" fill="#9a9a9a"/>
+   <rect x="168" y="448" width="44" height="30" rx="4" fill="#f5c400"/>
+  </g>
+  <!-- fallende Münzen -->
+  <g stroke="#111" stroke-width="5">
+   <ellipse cx="160" cy="330" rx="24" ry="10" fill="#f5c400"/>
+   <ellipse cx="225" cy="295" rx="24" ry="10" fill="#f5c400" transform="rotate(-18 225 295)"/>
+   <ellipse cx="270" cy="342" rx="24" ry="10" fill="#f5c400" transform="rotate(14 270 342)"/>
+  </g>
+  <!-- Geräuschwort -->
+  <text x="150" y="556" font-family="Bangers" font-size="58" fill="#f5c400" stroke="#111" stroke-width="5" paint-order="stroke" transform="rotate(-6 150 556)" letter-spacing="2">KLING!</text>
+  <!-- Sprechblase, Sprecher außerhalb des Panels -->
+  <path d="M44 60 H360 Q374 60 374 74 V188 Q374 202 360 202 H120 L40 250 L84 202 H44 Q30 202 30 188 V74 Q30 60 44 60 Z" fill="#fff" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
+  <g font-family="Comic Neue" font-weight="700" fill="#111" font-size="29" text-anchor="middle">
+   <text x="202" y="110">Jedes Jahr legen</text><text x="202" y="146">wir 4.000 € zurück,</text><text x="202" y="182">zu 3 % aufs Konto!</text>
+  </g>
+ </g>
+
+ <!-- Panel 2: Zeitsprung -->
+ <g clip-path="url(#p2)">
+  <rect x="380" width="330" height="600" fill="url(#punkteFein)"/>
+  <!-- Kalenderblätter fliegen -->
+  <g stroke="#111" stroke-width="5" stroke-linejoin="round" font-family="Bangers" text-anchor="middle">
+   <g transform="rotate(-14 470 330)"><rect x="420" y="280" width="100" height="110" fill="#fff"/><rect x="420" y="280" width="100" height="26" fill="#2f6db3"/><text x="470" y="370" font-size="54" stroke="none" fill="#111">1</text></g>
+   <g transform="rotate(10 590 250)"><rect x="545" y="200" width="90" height="100" fill="#fff"/><rect x="545" y="200" width="90" height="24" fill="#2f6db3"/><text x="590" y="282" font-size="50" stroke="none" fill="#111">3</text></g>
+   <g transform="rotate(-6 560 450)"><rect x="505" y="390" width="110" height="120" fill="#fff"/><rect x="505" y="390" width="110" height="28" fill="#2f6db3"/><text x="560" y="490" font-size="60" stroke="none" fill="#111">5</text></g>
+  </g>
+  <!-- Bewegungsbögen -->
+  <g fill="none" stroke="#111" stroke-width="4" stroke-linecap="round">
+   <path d="M430 420 Q450 470 490 500"/><path d="M640 330 Q665 370 650 410"/><path d="M455 250 Q470 215 510 205"/>
+  </g>
+  <!-- Erzählkasten -->
+  <g transform="rotate(-2 545 80)">
+   <rect x="418" y="46" width="262" height="78" fill="#f5c400" stroke="#111" stroke-width="5"/>
+   <text x="549" y="98" font-family="Bangers" font-size="34" text-anchor="middle" fill="#111" letter-spacing="1">5 Jahre später …</text>
+  </g>
+ </g>
+
+ <!-- Panel 3: der neue Bus mit Preisschild -->
+ <g clip-path="url(#p3)">
+  <rect x="700" width="500" height="600" fill="url(#punkteGelb)"/>
+  <!-- Strahlenkranz -->
+  <g fill="#fff" opacity=".85">
+   <polygon points="940,380 760,170 800,150"/><polygon points="940,380 1150,180 1176,220"/><polygon points="940,380 1176,330 1176,380"/><polygon points="940,380 720,330 720,290"/>
+  </g>
+  <!-- Bus -->
+  <g stroke="#111" stroke-width="6" stroke-linejoin="round">
+   <path d="M760 500 V320 Q760 296 786 294 H1040 Q1082 296 1104 340 L1130 410 V500 Z" fill="#ffffff"/>
+   <path d="M760 430 H1130 V452 H760 Z" fill="#2f6db3"/>
+   <g fill="#bfe0f5" stroke-width="5">
+    <rect x="782" y="318" width="70" height="58"/><rect x="866" y="318" width="70" height="58"/><rect x="950" y="318" width="64" height="58"/>
+    <path d="M1030 318 H1066 L1094 376 H1030 Z"/>
+   </g>
+   <circle cx="830" cy="502" r="34" fill="#222"/><circle cx="830" cy="502" r="12" fill="#ddd"/>
+   <circle cx="1060" cy="502" r="34" fill="#222"/><circle cx="1060" cy="502" r="12" fill="#ddd"/>
+  </g>
+  <!-- Preisschild -->
+  <g transform="rotate(8 1040 250) translate(-60 0)" stroke="#111" stroke-width="5" stroke-linejoin="round">
+   <path d="M1004 210 H1158 V290 H1004 L974 250 Z" fill="#fff"/>
+   <circle cx="990" cy="250" r="6" fill="#111"/>
+   <text x="1084" y="264" font-family="Bangers" font-size="38" text-anchor="middle" fill="#111" stroke="none" letter-spacing="1">24.000 €</text>
+  </g>
+  <!-- Gedankenblase von außerhalb -->
+  <g stroke="#111" stroke-width="5" fill="#fff">
+   <ellipse cx="860" cy="110" rx="128" ry="62"/>
+   <circle cx="760" cy="196" r="14"/><circle cx="738" cy="226" r="8"/>
+  </g>
+  <text x="860" y="124" font-family="Comic Neue" font-weight="700" font-size="34" text-anchor="middle" fill="#111">Reicht das?!</text>
+ </g>
+
+ <!-- Panelrahmen -->
+ <g fill="none" stroke="#111" stroke-width="7" stroke-linejoin="round">
+  <polygon points="24,24 392,24 372,576 24,576"/><polygon points="408,24 700,24 690,576 388,576"/><polygon points="716,24 1176,24 1176,576 706,576"/>
+ </g>
+ <rect width="1200" height="600" filter="url(#korn)"/>
+</svg>
+</body></html>
