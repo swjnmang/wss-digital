@@ -1,0 +1,15 @@
+<!doctype html>
+<!-- Das Durchschnittsgehalt, Handlungsprodukt: Antwortbrief an Mia auf kariertem Papier. Bildwelt Skizzenbuch / kariert.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/kennwerte-bewerten -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet"><style>body{margin:0}</style><script src="_skizze.js"></script></head><body>
+<div id="bild" style="width:800px;height:400px"></div>
+<script>
+let g = SK.papier(800, 400) + SK.tape(30, 16, -6) + SK.tape(620, 14, 5);
+g += SK.wash(SK.fleck(640, 290, 120, 90, '#9a4515', .25));
+g += SK.hand(70, 100, 'Liebe Mia,', 46) + SK.hand(70, 160, 'der Durchschnitt 4.200 € ist …', 36);
+g += SK.stift([210, 260, 310].map(y => `<path d="M70 ${y} H500"/>`).join(''), 2.5);
+g += SK.stift('<path d="M560 330 V200"/>' + [2100,2300,2400,2500,2600,2700,2800].map((v, i) => `<rect x="${575 + i * 22}" y="${330 - v / 40}" width="14" height="${v / 40}"/>`).join('') + '<rect x="735" y="130" width="14" height="200"/><path d="M560 330 H760"/>', 2.5);
+g += SK.hand(742, 120, 'GF', 26, '#9a4515', 'middle');
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">${SK.defs}${g}</svg>`;
+</script>
+</body></html>
