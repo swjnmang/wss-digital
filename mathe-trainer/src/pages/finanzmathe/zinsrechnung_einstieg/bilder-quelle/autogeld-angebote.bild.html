@@ -1,0 +1,24 @@
+<!doctype html>
+<!-- Lenas Autogeld, die beiden Angebote. Bildwelt Skizzenbuch / Packpapier: Sparschwein (Tagesgeld 2,4 %) und Tresor (Festgeld 3,0 %, 90 Tage fest).
+     Rendern: node scripts/bilder-rendern.cjs src/pages/finanzmathe/zinsrechnung_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_packpapier.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const P = PP('#0e6670'), T = P.T;
+let g = P.fleck(300, 330, 200, 130) + P.fleck(900, 330, 200, 130, '#0e6670', 0.3);
+g += `<g filter="url(#liner)" fill="none" stroke="${T}" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="290" cy="340" rx="140" ry="95" fill="#fff" fill-opacity=".45"/><circle cx="420" cy="330" r="34" fill="#fff" fill-opacity=".45"/><circle cx="412" cy="322" r="4" fill="${T}"/><circle cx="428" cy="338" r="4" fill="${T}"/>
+ <path d="M320 252 L344 210 L362 258"/><rect x="250" y="246" width="70" height="12" rx="4" fill="${T}"/>
+ <path d="M200 420 v40 M250 430 v40 M330 430 v40 M380 420 v40"/>
+ <rect x="790" y="230" width="230" height="210" rx="12" fill="#fff" fill-opacity=".45"/><circle cx="905" cy="335" r="44"/><line x1="905" y1="335" x2="928" y2="312"/>
+ <path d="M990 236 v-26 a24 24 0 0 1 48 0 v26"/><rect x="976" y="230" width="76" height="56" rx="8" fill="#fff" fill-opacity=".6"/>
+ <line x1="600" y1="80" x2="600" y2="540" stroke-dasharray="14 12" stroke-width="3"/>
+</g>`;
+g += `<g font-family="Caveat" font-weight="700" fill="${T}">
+ <text x="80" y="110" font-size="58">A: Tagesgeld</text><text x="80" y="160" font-size="44" fill="#0e4a52">2,4 % pro Jahr</text><text x="140" y="540" font-size="40">jederzeit verfügbar</text>
+ <text x="680" y="110" font-size="58">B: Festgeld</text><text x="680" y="160" font-size="44" fill="#0e4a52">3,0 % pro Jahr</text><text x="760" y="540" font-size="40">90 Tage fest</text>
+</g>`;
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${P.defs}${P.grund(1200, 600)}${g}</svg>`;
+</script>
+</body></html>
