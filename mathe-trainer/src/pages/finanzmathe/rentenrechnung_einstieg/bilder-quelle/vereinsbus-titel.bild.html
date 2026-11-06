@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- Der Vereinsbus, Titelbild. Bildwelt Diorama / Winter: verschneite Insel mit Vereinsheim, Elektro-Kleinbus mit Preisschild 33.000 € und sechs Münzstapeln (6 × 5.000 €).
+     Rendern: node scripts/bilder-rendern.cjs src/pages/finanzmathe/rentenrechnung_einstieg -->
+<html><head><meta charset="utf-8"><style>body{margin:0}</style><script src="_winter.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const { P, poly, box, baum, flocken, insel, hinter } = DI(600, 150);
+let g = insel(-20, -20, 440, 440);
+// Weg mit Reifenspuren
+g += poly([[150, -20, 0.5], [230, -20, 0.5], [230, 420, 0.5], [150, 420, 0.5]], '#e3ebf2');
+g += poly([[168, -20, 0.6], [176, -20, 0.6], [176, 420, 0.6], [168, 420, 0.6]], '#c9d6e2') + poly([[204, -20, 0.6], [212, -20, 0.6], [212, 420, 0.6], [204, 420, 0.6]], '#c9d6e2');
+// Vereinsheim mit Schneedach
+g += box(10, 20, 0, 120, 150, 80, '#f4efe6', '#e3d9c7', '#cfc3ad');
+g += poly([[10, 20, 80], [130, 20, 80], [130, 95, 120], [10, 95, 120]], '#ffffff');
+g += poly([[10, 95, 120], [130, 95, 120], [130, 170, 80], [10, 170, 80]], '#e8eef5');
+g += poly([[130, 20, 80], [130, 95, 120], [130, 170, 80]], '#4a6d8c');
+for (let i = 0; i < 3; i++) g += poly([[130.5, 35 + i * 45, 30], [130.5, 60 + i * 45, 30], [130.5, 60 + i * 45, 55], [130.5, 35 + i * 45, 55]], '#ffd98a');
+// Fahne
+{ const [fx, fy] = P(70, 20, 120); g += `<line x1="${fx}" y1="${fy}" x2="${fx}" y2="${fy - 70}" stroke="#3a4a5a" stroke-width="3"/><polygon points="${fx},${fy - 70} ${fx + 34},${fy - 60} ${fx},${fy - 50}" fill="#4a6d8c"/>`; }
+// Kleinbus (Schieferblau) mit Schneehaube
+const bx = 260, by = 110;
+g += box(bx, by, 6, 90, 200, 70, '#ffffff', '#4a6d8c', '#3b5872');
+g += poly([[bx, by + 200, 6], [bx + 90, by + 200, 6], [bx + 90, by + 200, 28], [bx, by + 200, 28]], '#2e4459') + poly([[bx + 90, by, 6], [bx + 90, by + 200, 6], [bx + 90, by + 200, 28], [bx + 90, by, 28]], '#2a3e51');
+for (let i = 0; i < 4; i++) g += poly([[bx + 90.5, by + 15 + i * 45, 45], [bx + 90.5, by + 50 + i * 45, 45], [bx + 90.5, by + 50 + i * 45, 68], [bx + 90.5, by + 15 + i * 45, 68]], '#d6ebf8');
+g += poly([[bx + 5, by + 200.5, 40], [bx + 85, by + 200.5, 40], [bx + 85, by + 200.5, 70], [bx + 5, by + 200.5, 70]], '#d6ebf8');
+[[bx + 90, by + 40], [bx + 90, by + 160]].forEach(([x, y]) => { const [px, py] = P(x, y, 8); g += `<ellipse cx="${px}" cy="${py}" rx="13" ry="17" fill="#222" transform="rotate(-30 ${px} ${py})"/>`; });
+{ const [px, py] = P(bx + 90.5, by + 110, 20); g += `<path d="M${px - 4} ${py - 12} l-8 12 h8 l-6 12" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`; }
+// Sechs Münzstapel (gleich hoch: 6 gleiche Raten)
+for (let i = 0; i < 6; i++) { const x = 50, y = 215 + i * 32; for (let j = 0; j < 6; j++) { const [px, py] = P(x, y, 4 + j * 7); g += `<ellipse cx="${px}" cy="${py + 3}" rx="16" ry="8" fill="#c99a2e"/><ellipse cx="${px}" cy="${py}" rx="16" ry="8" fill="#f2c94c"/>`; } }
+// Bäume
+[[395, 10], [395, 60], [380, 400], [300, 405], [10, 400]].forEach(([x, y]) => (g += baum(x, y)));
+// Schneemann
+{ const [px, py] = P(395, 300, 0); g += `<circle cx="${px}" cy="${py - 16}" r="18" fill="#fff" stroke="#c9d6e2"/><circle cx="${px}" cy="${py - 44}" r="12" fill="#fff" stroke="#c9d6e2"/><circle cx="${px + 4}" cy="${py - 46}" r="2" fill="#333"/><polygon points="${px + 6},${py - 43} ${px + 16},${py - 41} ${px + 6},${py - 39}" fill="#e67e22"/>`; }
+const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">' + hinter(1200, 600) +
+  '<ellipse cx="600" cy="570" rx="330" ry="26" fill="#5b6b7a" opacity=".25" filter="url(#sh)"/>' + g + flocken(1200, 600) +
+  '<g font-family="Inter, Helvetica, sans-serif" font-weight="700" fill="#1f2d3d"><text x="110" y="500" font-size="24">6 × 5.000 €</text><text x="110" y="528" font-size="18" font-weight="500" fill="#4c5a68">je eine Rate pro Jahr</text>' +
+  '<text x="930" y="150" font-size="24">Ziel: 33.000 €</text><text x="930" y="178" font-size="18" font-weight="500" fill="#4c5a68">Elektro-Kleinbus</text></g>' +
+  '<path d="M200 480 L262 400" stroke="#1f2d3d" stroke-width="2" fill="none" stroke-dasharray="4 5"/><path d="M925 160 L790 265" stroke="#1f2d3d" stroke-width="2" fill="none" stroke-dasharray="4 5"/></svg>';
+document.getElementById('bild').innerHTML = svg;
+</script>
+</body></html>
