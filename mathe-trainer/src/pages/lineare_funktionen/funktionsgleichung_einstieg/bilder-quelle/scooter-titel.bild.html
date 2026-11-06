@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- Die Scooter-App, Titelbild. Bildwelt Comic / pop: drei Panels (Guthaben, Fahrt zum See, Wegweiser 30 min).
+     Rendern: node scripts/bilder-rendern.cjs src/pages/lineare_funktionen/funktionsgleichung_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_comic.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const C = CO('#0e6670', '#d9eef0');
+const ink = '#141414';
+const handy = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})" stroke="${ink}" stroke-width="5" stroke-linejoin="round">
+ <rect x="0" y="0" width="200" height="330" rx="28" fill="#fff"/><rect x="18" y="26" width="164" height="54" rx="8" fill="#0e6670"/>
+ <text x="100" y="62" font-family="Bangers" font-size="30" fill="#fff" stroke="none" text-anchor="middle" letter-spacing="1">GUTHABEN</text>
+ <text x="100" y="150" font-family="Bangers" font-size="62" fill="${ink}" stroke="none" text-anchor="middle">7,20 €</text>
+ <rect x="18" y="200" width="164" height="54" rx="8" fill="#fff6c9"/>
+ <text x="100" y="236" font-family="Comic Neue" font-weight="700" font-size="26" fill="${ink}" stroke="none" text-anchor="middle">Tarif: ???</text>
+ <circle cx="100" cy="300" r="12" fill="#ddd"/></g>`;
+const scooter = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})" stroke="${ink}" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+ <rect x="-6" y="-34" width="150" height="14" rx="7" fill="#0e6670"/><line x1="136" y1="-28" x2="160" y2="-150"/><line x1="146" y1="-152" x2="186" y2="-146"/>
+ <circle cx="6" cy="-16" r="20" fill="#fff"/><circle cx="148" cy="-16" r="20" fill="#fff"/><rect x="96" y="-48" width="30" height="14" rx="3" fill="#f5c400" stroke-width="4"/></g>`;
+let s = '';
+s += C.panel('p1', '24,24 380,24 360,576 24,576', 'url(#pT)',
+  handy(92, 150) + C.blase(44, 48, 300, 84, 260, 170, ['Reicht das für', '30 Minuten?'], 30));
+s += C.panel('p2', '396,24 820,24 806,576 376,576', 'url(#pF)',
+  `<path d="M376 470 Q600 420 806 440 L806 576 L376 576 Z" fill="#e8dfc4" stroke="${ink}" stroke-width="5"/>` +
+  `<g stroke="#0e6670" stroke-width="6" stroke-linecap="round" opacity=".8"><path d="M420 330 H520"/><path d="M400 370 H500"/><path d="M430 410 H540"/></g>` +
+  scooter(540, 470, 1.15) + C.laut(430, 250, 'WUSCH!', 64, -8) + C.kasten(430, 50, 350, 70, 'Ab zum Badesee …', 36, -2));
+s += C.panel('p3', '836,24 1176,24 1176,576 822,576', 'url(#pG)',
+  `<ellipse cx="1010" cy="560" rx="230" ry="60" fill="#8fd0d6" stroke="${ink}" stroke-width="5"/>` +
+  `<g stroke="${ink}" stroke-width="6" stroke-linejoin="round"><line x1="960" y1="520" x2="960" y2="250"/>` +
+  `<polygon points="880,210 1090,210 1124,250 1090,290 880,290" fill="#fff"/></g>` +
+  `<text x="992" y="246" font-family="Bangers" font-size="40" text-anchor="middle" fill="${ink}" letter-spacing="1">BADESEE</text>` +
+  `<text x="992" y="280" font-family="Comic Neue" font-weight="700" font-size="28" text-anchor="middle" fill="${ink}">30 min</text>` +
+  C.blase(860, 60, 290, 96, 950, 196, ['Was kostet das?'], 30));
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${C.defs}${C.papier(1200, 600)}${s}${C.korn(1200, 600)}</svg>`;
+</script>
+</body></html>
