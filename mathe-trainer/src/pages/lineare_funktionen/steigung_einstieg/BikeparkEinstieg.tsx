@@ -372,12 +372,11 @@ export default function BikeparkEinstieg() {
             title="b) Wie weit nach rechts?"
             prompt={
               <p>
-                Du gehst auf der x-Achse von <M>{'x = 2'}</M> bis <M>{'x = 6'}</M>. Wie weit ist das?
+                Du gehst auf der x-Achse von <M>{'x = 2'}</M> bis <M>{'x = 6'}</M>. Wie viele Längeneinheiten liegen entlang der x-Achse dazwischen?
               </p>
             }
-            rechnung={[{ l: ['6 - 2'], r: [{ luecke: 'b' }] }]}
-            fields={[{ kind: 'num', key: 'b', label: 'Abstand von 2 bis 6', expected: 4 }]}
-            solution={<MB>{'6 - 2 = 4'}</MB>}
+            fields={[{ kind: 'num', key: 'b', label: 'Längeneinheiten', expected: 4 }]}
+            solution={<p><M>{'6 - 2 = 4'}</M>, also 4 Längeneinheiten nach rechts.</p>}
             help={
               <Hilfen
                 steps={[
@@ -394,12 +393,11 @@ export default function BikeparkEinstieg() {
             title="c) Rauf oder runter?"
             prompt={
               <p>
-                Ein Punkt liegt erst bei <M>{'y = 5'}</M>, dann bei <M>{'y = 2'}</M>. Um wie viel hat sich <M>y</M> verändert? Geht es nach unten, ist die Änderung negativ.
+                Ein Punkt liegt erst bei <M>{'y = 5'}</M>, dann bei <M>{'y = 2'}</M>. Um wie viele Längeneinheiten hat sich <M>y</M> verändert? Geht es nach unten, gib die Änderung als negative Zahl an.
               </p>
             }
-            rechnung={[{ l: ['2 - 5'], r: [{ luecke: 'c' }] }]}
-            fields={[{ kind: 'num', key: 'c', label: 'Änderung von 5 auf 2', expected: -3 }]}
-            solution={<p><M>{'2 - 5 = -3'}</M>, also 3 nach unten.</p>}
+            fields={[{ kind: 'num', key: 'c', label: 'Änderung in Längeneinheiten', expected: -3 }]}
+            solution={<p><M>{'2 - 5 = -3'}</M>, also 3 Längeneinheiten nach unten.</p>}
             help={
               <Hilfen
                 steps={[
