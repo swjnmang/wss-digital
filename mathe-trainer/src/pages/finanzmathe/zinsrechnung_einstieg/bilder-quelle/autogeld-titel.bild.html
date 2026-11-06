@@ -1,0 +1,28 @@
+<!doctype html>
+<!-- Lenas Autogeld, Titelbild. Bildwelt Skizzenbuch / Packpapier: Fineliner-Skizze Auto, Kalenderblatt 14.10., Erspartes 4.800 €, Notiz mit Lenas Rechnung.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/finanzmathe/zinsrechnung_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_packpapier.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const P = PP('#0e6670'), T = P.T;
+let g = P.fleck(470, 400, 260, 70) + P.fleck(1000, 230, 120, 120, '#fff', 0.35);
+g += `<g filter="url(#liner)" fill="none" stroke="${T}" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M250 430 V370 Q250 352 270 349 L350 340 L405 285 Q414 276 430 276 L560 276 Q575 276 584 288 L630 338 L690 347 Q714 352 714 375 V430 Z" fill="#fff" fill-opacity=".35"/>
+ <path d="M372 338 L418 296 L482 296 L482 338 Z"/><path d="M502 296 L556 296 L594 338 L502 338 Z"/>
+ <circle cx="350" cy="432" r="36" fill="#d8bf95"/><circle cx="350" cy="432" r="13"/><circle cx="610" cy="432" r="36" fill="#d8bf95"/><circle cx="610" cy="432" r="13"/>
+ <line x1="180" y1="470" x2="790" y2="470" stroke-width="3"/>
+ <rect x="860" y="110" width="180" height="170" rx="10" fill="#fff" fill-opacity=".85"/><line x1="860" y1="156" x2="1040" y2="156"/>
+ <ellipse cx="120" cy="400" rx="56" ry="15" fill="#fff" fill-opacity=".5"/><ellipse cx="120" cy="380" rx="56" ry="15" fill="#fff" fill-opacity=".5"/><ellipse cx="120" cy="360" rx="56" ry="15" fill="#fff" fill-opacity=".5"/><ellipse cx="120" cy="340" rx="56" ry="15" fill="#fff" fill-opacity=".5"/>
+
+</g>`;
+g += `<g font-family="Caveat" font-weight="700" fill="${T}">
+ <text x="950" y="146" font-size="34" text-anchor="middle">Oktober</text><text x="950" y="250" font-size="96" text-anchor="middle">14</text>
+ <text x="120" y="300" font-size="44" text-anchor="middle">4.800 €</text>
+ <text x="70" y="110" font-size="44">heute: 16.05.</text>
+ <text x="850" y="380" font-size="40" fill="#0e4a52">3 % von 4.800 €</text><text x="850" y="428" font-size="40" fill="#0e4a52">= 144 € ?</text>
+ <text x="470" y="540" font-size="40" text-anchor="middle">Lenas erstes Auto</text>
+</g>`;
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${P.defs}${P.grund(1200, 600)}${g}</svg>`;
+</script>
+</body></html>

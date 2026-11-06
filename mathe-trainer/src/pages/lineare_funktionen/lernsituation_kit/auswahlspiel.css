@@ -1,0 +1,14 @@
+/* Bonus-Spiel-Baustein „Auswahl-Spiel“ (AuswahlSpiel.tsx) */
+.as-spiel { display: flex; flex-direction: column; gap: 12px; }
+.as-kopf { display: flex; justify-content: space-between; align-items: center; font: 700 16px/1.2 var(--font-body); }
+.as-muenze-an { color: var(--highlight); margin-left: 4px; }
+.as-muenze-aus { color: var(--line-strong); margin-left: 4px; }
+.as-frage { font-size: 19px; line-height: 1.55; }
+.as-frage p { margin: 0; }
+.as-ziele { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.as-ziel { min-height: 72px; flex-direction: column; justify-content: center; gap: 4px; font-size: 19px; }
+.as-ziel > i { font-size: 22px; color: var(--primary); }
+.as-ziel.as-richtig { background: var(--correct-soft); border-color: var(--correct); color: var(--correct-ink); }
+.as-ziel.as-falsch { background: var(--wrong-soft); border-color: var(--wrong); color: var(--wrong-ink); }
+.as-text { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; font-size: 17px; line-height: 1.5; }
+.as-text p { margin: 0; }

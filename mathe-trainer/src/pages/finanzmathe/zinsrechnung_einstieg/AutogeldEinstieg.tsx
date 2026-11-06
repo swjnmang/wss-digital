@@ -1,31 +1,32 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import TaskShell from '../../../components/layout/TaskShell';
+import { useSitzungState } from '../../../hooks/useSitzung';
 import { Beispiel, M, MB, Merke } from '../../daten_und_zufall/lernpfad/kit';
 import {
   CheckCard,
   Hilfen,
+  Loesungsweg,
   McCard,
-  SchrittHilfen,
   TrackedCheck,
   TrackedMc,
 } from '../../lineare_funktionen/lernsituation_kit/kit';
 import {
   Abschnitt,
   Aufklappbar,
+  BeispielMitVideo,
+  BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
-  WegWahl,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../lineare_funktionen/lernsituation_kit/seiten';
-import {
-  Kriterien,
-  VideoAufklappen,
-  Vermutung,
-  Zitat,
-  euro,
-  type Festlegung,
-} from '../zins_kit/zins_kit';
+import { Kriterien, Vermutung, euro, standardKriterien, type Festlegung } from '../zins_kit/zins_kit';
+import { Bilanz } from '../../lineare_funktionen/lernsituation_kit/punkte';
+import AuswahlSpiel, { mischen, zufall, type AuswahlRunde } from '../../lineare_funktionen/lernsituation_kit/AuswahlSpiel';
+import titelBild from './bilder/autogeld-titel.webp';
+import angeboteBild from './bilder/autogeld-angebote.webp';
+import briefBild from './bilder/autogeld-brief.webp';
 import '../../daten_und_zufall/lernpfad/lernpfad.css';
 
 // Lernsituation Zinsrechnung 1 „Lenas Autogeld“: Zinsen für einige Tage berechnen (ca. 45 bis 60 min).
@@ -34,7 +35,12 @@ import '../../daten_und_zufall/lernpfad/lernpfad.css';
 // Es wird immer tagesgenau gerechnet (Bankregel: jeder Monat 30 Zinstage, das Jahr 360), nie mit Monaten.
 // Aha: Der höhere Zinssatz (Festgeld) bringt weniger, weil das Geld kürzer verzinst wird, und „3 % p.a.“ heißt nicht 3 % vom Betrag.
 // Identität: Themenfarbe Petrol, Symbol Auto, Titelbild Auto mit Kalenderblatt, Leitobjekt die Zinstage-Leiste (A 148 Tage, B 90 Tage).
-// Die Festlegung bleibt nur im Seitenzustand.
+// Problem lösen: Problem → Beispielrechnung Jonas mit Lernvideo → Ergebnisse abgleichen → Empfehlung → Antwort an Lena (analog)
+// → Rückbezug und Merke. Phase 4: drei Übungen und Profi-Aufgabe, Bonus-Spiel „Zins-Tresor“.
+// Punkte nach Aufwand: Warm-up 2/3/3/3/2 = 13, Festlegung 3, Kernaufgabe 14, Empfehlung 4, Antwort 5, Übungen 4/6/8, Profi 9
+// (Pflicht zusammen 65: Warm-up 20 %, Problem lösen 23 = 35 %, Übungen 18 = 28 %), Bonus-Spiel 4 Runden à 2.
+// Bildwelt Skizzenbuch / Packpapier: Titelbild, Angebote und Brief sind gerenderte WebP-Dateien aus bilder-quelle/autogeld-*.bild.html
+// (Bausteine in bilder-quelle/_packpapier.js); die Zinstage-Leiste bleibt Inline-SVG.
 
 export const VIDEO_ZINSEN = 'https://www.youtube.com/watch?v=bCjboGGTRGs';
 
@@ -57,180 +63,22 @@ const WAHL: Record<Wahl, string> = {
 
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
-/** Titelbild: Lenas erstes Auto, daneben das Kalenderblatt des Autokaufs und ihr Erspartes */
-function Titelbild() {
-  return (
-    <svg
-      viewBox="0 0 720 252"
-      role="img"
-      aria-label="Ein kleines Auto, daneben ein Kalenderblatt mit dem 14.10. und ein Stapel Münzen mit 4.800 Euro."
-    >
-      <rect x="0" y="206" width="720" height="46" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="206" y2="206" stroke="var(--ink)" strokeWidth="2" />
-      {[60, 180, 300, 420, 540, 660].map((x) => (
-        <rect key={x} x={x} y="226" width="56" height="6" rx="3" fill="var(--surface)" />
-      ))}
-      {/* Auto */}
-      <path
-        d="M150 196 L150 158 Q150 146 162 144 L214 138 L250 104 Q256 98 266 98 L352 98 Q362 98 368 106 L398 140 L440 146 Q456 149 456 164 L456 196 Z"
-        fill="var(--primary)"
-        stroke="var(--ink)"
-        strokeWidth="2"
-      />
-      <path
-        d="M232 138 L262 110 L304 110 L304 138 Z"
-        fill="var(--primary-soft)"
-        stroke="var(--ink)"
-        strokeWidth="2"
-      />
-      <path
-        d="M318 110 L354 110 L380 138 L318 138 Z"
-        fill="var(--primary-soft)"
-        stroke="var(--ink)"
-        strokeWidth="2"
-      />
-      <circle cx="222" cy="198" r="24" fill="var(--ink)" />
-      <circle cx="222" cy="198" r="10" fill="var(--surface)" />
-      <circle cx="390" cy="198" r="24" fill="var(--ink)" />
-      <circle cx="390" cy="198" r="10" fill="var(--surface)" />
-      <rect x="440" y="156" width="14" height="10" rx="2" fill="var(--highlight)" />
-      {/* Kalenderblatt */}
-      <rect
-        x="520"
-        y="44"
-        width="132"
-        height="128"
-        rx="10"
-        fill="var(--surface)"
-        stroke="var(--ink)"
-        strokeWidth="2"
-      />
-      <rect x="520" y="44" width="132" height="34" rx="10" fill="var(--primary)" />
-      <rect x="520" y="66" width="132" height="12" fill="var(--primary)" />
-      <text x="586" y="68" textAnchor="middle" fontSize="18" fontWeight="700" fill="#fff">
-        Oktober
-      </text>
-      <text x="586" y="140" textAnchor="middle" fontSize="50" fontWeight="800" fill="var(--ink)">
-        14
-      </text>
-      {/* Erspartes */}
-      {[0, 1, 2, 3].map((i) => (
-        <ellipse
-          key={i}
-          cx="70"
-          cy={192 - i * 14}
-          rx="38"
-          ry="10"
-          fill="var(--highlight)"
-          stroke="var(--ink)"
-          strokeWidth="2"
-        />
-      ))}
-      <text x="70" y="128" textAnchor="middle" fontSize="20" fontWeight="800" fill="var(--ink)">
-        4.800 €
-      </text>
-    </svg>
-  );
-}
-
 const THEMA: Thema = {
   name: 'Lenas Autogeld',
   farbe: 'petrol',
   icon: 'fa-car-side',
-  bild: <Titelbild />,
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Skizze auf Packpapier: Lenas erstes Auto, daneben ihr Erspartes von 4.800 € und ein Kalenderblatt mit dem 14. Oktober. Notiert: heute 16.05. und Lenas Rechnung: 3 % von 4.800 € = 144 €?"
+    />
+  ),
 };
+const BILDWELT: Bildwelt = { welt: 'skizzenbuch', variante: 'packpapier' };
 
 /* ── Bilder für „Problem erkennen“ und „Problem lösen“ ─────────────────── */
-
-/** Die beiden Angebote als Sachbild: Sparschwein (Tagesgeld, jederzeit verfügbar) und Tresor (Festgeld, 90 Tage fest) */
-function AngeboteBild() {
-  return (
-    <div className="zk-bild">
-      <svg viewBox="0 0 720 230" role="img" aria-label="Zwei Angebote der Bank. A: Tagesgeld mit 2,4 Prozent pro Jahr, jederzeit verfügbar, dargestellt als Sparschwein. B: Festgeld mit 3,0 Prozent pro Jahr, 90 Tage fest angelegt, dargestellt als Tresor mit Schloss.">
-        {/* Karte A */}
-        <rect x="12" y="12" width="336" height="206" rx="16" fill="var(--surface)" stroke="var(--line)" strokeWidth="2" />
-        <rect x="12" y="12" width="336" height="44" rx="16" fill="var(--primary-soft)" />
-        <rect x="12" y="40" width="336" height="16" fill="var(--primary-soft)" />
-        <text x="32" y="42" fontSize="20" fontWeight="800" fill="var(--ink)">
-          A: Tagesgeld
-        </text>
-        <ellipse cx="104" cy="148" rx="62" ry="44" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-        <circle cx="164" cy="146" r="16" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-        <circle cx="160" cy="143" r="3" fill="var(--ink)" />
-        <circle cx="168" cy="149" r="3" fill="var(--ink)" />
-        <polygon points="120,108 134,88 142,112" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-        <circle cx="136" cy="132" r="4" fill="#fff" />
-        <rect x="66" y="184" width="14" height="20" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="120" y="184" width="14" height="20" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="86" y="104" width="34" height="7" rx="3" fill="var(--ink)" />
-        <ellipse cx="103" cy="84" rx="16" ry="6" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-        <text x="196" y="132" fontSize="32" fontWeight="800" fill="var(--primary)">
-          2,4 %
-        </text>
-        <text x="198" y="156" fontSize="16" fill="var(--ink-muted)">
-          pro Jahr
-        </text>
-        <text x="198" y="188" fontSize="15" fontWeight="700" fill="var(--ink)">
-          jederzeit verfügbar
-        </text>
-        {/* Karte B */}
-        <rect x="372" y="12" width="336" height="206" rx="16" fill="var(--surface)" stroke="var(--line)" strokeWidth="2" />
-        <rect x="372" y="12" width="336" height="44" rx="16" fill="var(--primary-soft)" />
-        <rect x="372" y="40" width="336" height="16" fill="var(--primary-soft)" />
-        <text x="392" y="42" fontSize="20" fontWeight="800" fill="var(--ink)">
-          B: Festgeld
-        </text>
-        <rect x="400" y="84" width="124" height="112" rx="10" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="412" y="96" width="100" height="88" rx="6" fill="none" stroke="#fff" strokeWidth="2" opacity="0.6" />
-        <circle cx="462" cy="140" r="22" fill="#fff" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="462" y1="140" x2="474" y2="128" stroke="var(--ink)" strokeWidth="3" strokeLinecap="round" />
-        <rect x="410" y="196" width="16" height="10" fill="var(--ink)" />
-        <rect x="498" y="196" width="16" height="10" fill="var(--ink)" />
-        <path d="M510 92 v-12 a12 12 0 0 1 24 0 v12" fill="none" stroke="var(--ink)" strokeWidth="4" />
-        <rect x="504" y="90" width="36" height="28" rx="5" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="556" y="132" fontSize="32" fontWeight="800" fill="var(--primary)">
-          3,0 %
-        </text>
-        <text x="558" y="156" fontSize="16" fill="var(--ink-muted)">
-          pro Jahr
-        </text>
-        <text x="558" y="188" fontSize="15" fontWeight="700" fill="var(--ink)">
-          90 Tage fest
-        </text>
-      </svg>
-    </div>
-  )
-}
-
-/** Handlungsprodukt: Antwortbrief an Lena mit Umschlag und Stift */
-function BriefBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg viewBox="0 0 720 190" role="img" aria-label="Ein Briefumschlag an Lena und ein Blatt mit dem Anfang der Antwort: Liebe Lena, ich empfehle dir …">
-        <rect x="40" y="40" width="230" height="140" rx="10" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-        <polyline points="40,44 155,120 270,44" fill="none" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="222" y="54" width="34" height="40" rx="3" fill="var(--primary)" />
-        <text x="72" y="164" fontSize="18" fontWeight="700" fill="var(--ink)">
-          An: Lena
-        </text>
-        <rect x="320" y="14" width="300" height="168" rx="6" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="344" y="50" fontSize="20" fontStyle="italic" fill="var(--ink)">
-          Liebe Lena,
-        </text>
-        <text x="344" y="80" fontSize="18" fontStyle="italic" fill="var(--ink-muted)">
-          ich empfehle dir …
-        </text>
-        {[108, 132, 156].map((y) => (
-          <line key={y} x1="344" x2="596" y1={y} y2={y} stroke="var(--line)" strokeWidth="2" />
-        ))}
-        <g transform="rotate(-35 660 120)">
-          <rect x="600" y="110" width="120" height="18" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-          <polygon points="600,110 584,119 600,128" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        </g>
-      </svg>
-    </div>
-  )
-}
 
 /* ── Leitobjekt: die Zinstage-Leiste ────────────────────────────────────── */
 
@@ -352,22 +200,52 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
   },
 ];
 
-/** Lösungsweg zu Lenas Zinsen (für beide Wege: selbst rechnen und Lösungsschema) */
+/** Lösungsweg zu Lenas Zinsen */
 const LOESUNG = (
-  <>
-    <p>Vom 16.05. bis zum 16.10. sind es 5 volle Monate, der 14.10. liegt 2 Tage davor:</p>
-    <MB>{'t = 5 \\cdot 30 - 2 = 148 \\text{ Tage}'}</MB>
-    <MB>
-      {
-        'Z_A = \\frac{4\\,800 \\cdot 2{,}4 \\cdot 148}{100 \\cdot 360} = 47{,}36 \\text{ €} \\qquad Z_B = \\frac{4\\,800 \\cdot 3 \\cdot 90}{100 \\cdot 360} = 36{,}00 \\text{ €}'
-      }
-    </MB>
-    <p>
-      Die 144 € aus Lenas Nachricht sind die Zinsen für ein ganzes Jahr. Beim Festgeld gibt es nur
-      90 Tage lang Zinsen.
-    </p>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'Zinstage nach der Bankregel', text: 'Vom 16.05. bis zum 16.10. sind es 5 volle Monate, der 14.10. liegt 2 Tage davor.', tex: 't = 5 \\cdot 30 - 2 = 148 \\text{ Tage}' },
+      { titel: 'Zinsen mit Angebot A (148 Tage)', tex: 'Z_A = \\dfrac{4\\,800 \\cdot 2{,}4 \\cdot 148}{100 \\cdot 360} = 47{,}36 \\text{ €}' },
+      { titel: 'Zinsen mit Angebot B (nur 90 Tage)', tex: 'Z_B = \\dfrac{4\\,800 \\cdot 3 \\cdot 90}{100 \\cdot 360} = 36{,}00 \\text{ €}' },
+      { titel: 'Lenas 144 € einordnen', text: 'Die 144 € sind die Zinsen für ein ganzes Jahr. Beim Festgeld gibt es nur 90 Tage lang Zinsen.' },
+    ]}
+  />
 );
+
+/* ── Bonus-Spiel: Zins-Tresor ────────────────────────────────────────────── */
+
+const fmtEuro = (v: number) => `${v.toFixed(2).replace('.', ',')} €`;
+/** Eine Runde: K, p, t; richtig ist K·p·t/36 000, falsch: ganzes Jahr, 365 Tage, Monate statt Tage */
+function zinsRunden(): AuswahlRunde[] {
+  return Array.from({ length: 4 }, () => {
+    for (;;) {
+      const K = zufall([1200, 1800, 2400, 3000, 3600, 4500, 6000]);
+      const p = zufall([1.5, 2, 2.4, 3, 3.6]);
+      const monate = zufall([2, 3, 4, 5]);
+      const t = monate * 30;
+      const z = (K * p * t) / 36000;
+      const jahr = (K * p) / 100;
+      const tage365 = (K * p * t) / 36500;
+      const mon = (K * p * monate) / 36000;
+      const werte = [z, jahr, tage365, mon].map((v) => Math.round(v * 100) / 100);
+      if (new Set(werte).size < 4) continue;
+      return {
+        frage: (
+          <p>
+            <M>{`K = ${String(K).replace(/\B(?=(\d{3})+(?!\d))/g, '.')} \\text{ €}`}</M>, <M>{`p = ${String(p).replace('.', '{,}')}\\,\\%`}</M> p.a., <M>{`t = ${t}`}</M> Zinstage. Welcher Tresor enthält die
+            richtigen Zinsen?
+          </p>
+        ),
+        ziele: mischen([
+          { text: fmtEuro(werte[0]), richtig: true, erklaerung: <>Richtig: <M>{'Z = \\frac{K \\cdot p \\cdot t}{100 \\cdot 360}'}</M>.</> },
+          { text: fmtEuro(werte[1]), erklaerung: 'Das sind die Zinsen für ein ganzes Jahr. Das Geld liegt aber nur einige Tage.' },
+          { text: fmtEuro(werte[2]), erklaerung: 'Hier wurde mit 365 Tagen gerechnet. Die Bank rechnet das Jahr mit 360 Zinstagen.' },
+          { text: fmtEuro(werte[3]), erklaerung: 'Hier wurden Monate statt Tage eingesetzt. In die Formel gehören die Zinstage.' },
+        ]),
+      };
+    }
+  });
+}
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
@@ -380,19 +258,25 @@ export default function AutogeldEinstieg({
   onPractice: () => void;
   onNext: () => void;
 }) {
-  const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 100, fest: false });
-  const [geloest, setGeloest] = useState(false);
+  const [fest, setFest] = useSitzungState<Festlegung<Wahl>>('ag-fest', { wahl: null, wert: 100, fest: false });
+  const [geloest, setGeloest] = useSitzungState('ag-geloest', false);
+  const [uebungen, setUebungen] = useSitzungState<string[]>('ag-uebungen', []);
+  const uebung = (k: string, fertig: () => void) => () => {
+    fertig();
+    setUebungen((u) => (u.includes(k) ? u : [...u, k]));
+  };
 
   const seiten: Seite[] = [
     {
       art: 'start',
       titel: 'Aufwärmen',
-      pflicht: ['a', 'b', 'c'],
+      pflicht: ['a', 'b', 'c', 'd', 'e'],
       inhalt: (fertig) => (
         <>
-          <p className="sl-text">Diese drei kurzen Aufgaben brauchst du gleich.</p>
+          <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich. Einzelarbeit, ca. 10 Minuten.</p>
           <CheckCard
             onSolved={fertig.teil('a')}
+            punkte={2}
             title="a) Zinsen für ein Jahr"
             prompt={
               <p>
@@ -405,6 +289,7 @@ export default function AutogeldEinstieg({
           />
           <CheckCard
             onSolved={fertig.teil('b')}
+            punkte={3}
             title="b) Vom Jahr auf den Tag"
             prompt={
               <p>
@@ -418,15 +303,17 @@ export default function AutogeldEinstieg({
               { kind: 'num', key: 't50', label: '50 Tage:', expected: 15, unit: '€' },
             ]}
             solution={
-              <MB>
-                {
-                  '108 \\text{ €} : 360 = 0{,}30 \\text{ €} \\qquad 0{,}30 \\text{ €} \\cdot 50 = 15 \\text{ €}'
-                }
-              </MB>
-            }
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Ein Tag', tex: '108 \\text{ €} : 360 = 0{,}30 \\text{ €}' },
+                  { titel: '50 Tage', tex: '0{,}30 \\text{ €} \\cdot 50 = 15 \\text{ €}' },
+                ]}
+              />
+              }
           />
           <CheckCard
             onSolved={fertig.teil('c')}
+            punkte={3}
             title="c) Zinstage"
             prompt={
               <>
@@ -447,12 +334,37 @@ export default function AutogeldEinstieg({
               { kind: 'num', key: 'b', label: 'bis 20.06.:', expected: 105, unit: 'Tage' },
             ]}
             solution={
-              <>
-                <MB>{'3 \\cdot 30 = 90 \\text{ Tage}'}</MB>
-                <p>Bis zum 20.06. kommen noch 15 Tage dazu (vom 5. bis zum 20.):</p>
-                <MB>{'90 + 15 = 105 \\text{ Tage}'}</MB>
-              </>
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Bis zum 05.06.: 3 volle Monate', tex: '3 \\cdot 30 = 90 \\text{ Tage}' },
+                  { titel: 'Bis zum 20.06.: 15 Tage dazu', tex: '90 + 15 = 105 \\text{ Tage}' },
+                ]}
+              />
+              }
+          />
+          <CheckCard
+            onSolved={fertig.teil('d')}
+            punkte={3}
+            title="d) Einen Bruch in einem Zug eintippen"
+            prompt={
+              <p>
+                Berechne <M>{'\\dfrac{2\\,000 \\cdot 3 \\cdot 45}{100 \\cdot 360}'}</M>. Tippe den ganzen Bruch in einem Zug in den Taschenrechner.
+              </p>
             }
+            fields={[{ kind: 'num', key: 'z', label: 'Ergebnis:', expected: 7.5, unit: '€' }]}
+            solution={<MB>{'\\dfrac{2\\,000 \\cdot 3 \\cdot 45}{100 \\cdot 360} = \\dfrac{270\\,000}{36\\,000} = 7{,}50'}</MB>}
+          />
+          <McCard
+            onSolved={fertig.teil('e')}
+            punkte={2}
+            title="e) Der 31. eines Monats"
+            prompt={<p>Wie viele Zinstage liegen nach der Bankregel zwischen dem 31.03. und dem 30.04.?</p>}
+            options={[
+              { text: '31 Tage', feedback: 'Im Kalender stimmt das fast, aber die Bank zählt den 31. wie den 30.' },
+              { text: '29 Tage', feedback: 'Der 31.03. zählt wie der 30.03. Bis zum 30.04. ist das genau ein Monat.' },
+              { text: '30 Tage', correct: true, feedback: 'Der 31.03. zählt wie der 30.03., bis zum 30.04. ist es ein Monat, also 30 Zinstage.' },
+              { text: '1 Monat, also t = 1', feedback: 'In die Formel gehören Tage, nicht Monate.' },
+            ]}
           />
         </>
       ),
@@ -466,15 +378,21 @@ export default function AutogeldEinstieg({
           <p className="sl-text">
             Du machst eine Ausbildung in einer Bank. Heute bekommst du diese Anfrage einer Kundin:
           </p>
-          <Zitat wer="Lena, 18 Jahre">
+          <blockquote className="sl-zitat">
             <p>
-              Hallo, ich habe 4.800 € gespart. Am 14.10. kaufe ich mein erstes Auto, bis dahin soll
-              das Geld Zinsen bringen. Heute ist der 16.05. Das Festgeld hat den höheren Zinssatz.
-              Dann bekomme ich doch 3 % von 4.800 €, also 144 €, oder? Welches Angebot soll ich
-              nehmen?
+              „Hallo, ich habe 4.800 € gespart. Am 14.10. kaufe ich mein erstes Auto, bis dahin soll das Geld Zinsen bringen. Heute ist der 16.05. Das Festgeld hat den
+              höheren Zinssatz. Dann bekomme ich doch 3 % von 4.800 €, also 144 €, oder? Welches Angebot soll ich nehmen?“
             </p>
-          </Zitat>
-          <AngeboteBild />
+            <footer>Lena, 18 Jahre</footer>
+          </blockquote>
+          <figure className="sl-foto">
+            <img
+              src={angeboteBild}
+              width={1200}
+              height={600}
+              alt="Skizze auf Packpapier mit den zwei Angeboten der Bank. A: Tagesgeld, 2,4 % pro Jahr, jederzeit verfügbar, als Sparschwein. B: Festgeld, 3,0 % pro Jahr, 90 Tage fest, als Tresor mit Schloss."
+            />
+          </figure>
           <ZinstageLeiste />
           <p className="sl-hinweis">
             „p.a.“ heißt „pro Jahr“ (lateinisch: per annum). Nach den 90 Tagen kommt das Festgeld
@@ -536,166 +454,32 @@ export default function AutogeldEinstieg({
               </p>
             </div>
             <ZinstageLeiste />
-            <Aufklappbar label="Rechenbeispiel ansehen">
-              <Beispiel
-                offen
-                title="Wie viel Zinsen bekommt Jonas?"
-                aufgabe={BSP_AUFGABE}
-                steps={BSP_SCHRITTE}
-              />
-              <VideoAufklappen src={VIDEO_ZINSEN} title="Erklärvideo: Zinsen berechnen" />
-            </Aufklappbar>
-            <Handlungsprodukt titel="Antwort an Lena">
-              <BriefBild />
-              <p className="sl-text">
-                Schreibe Lena in deinem Heft eine Antwort. Rechne darin die Zinstage und die Zinsen
-                für beide Angebote vor und gib ihr eine klare Empfehlung. Trage deine Ergebnisse
-                danach unten ein und prüfe sie.
-              </p>
-              <Aufklappbar label="Satzanfänge ansehen" icon="fa-comment-dots">
-                <ul className="zk-liste">
-                  <li>„Liebe Lena, vielen Dank für deine Anfrage. Ich empfehle dir …“</li>
-                  <li>
-                    „Dein Geld liegt vom 16.05. bis zum 14.10. auf dem Konto, das sind … Zinstage.“
-                  </li>
-                  <li>„Mit dem Tagesgeld bekommst du …, mit dem Festgeld nur …, weil …“</li>
-                  <li>„Die 144 € würdest du nur bekommen, wenn …“</li>
-                </ul>
-              </Aufklappbar>
-            </Handlungsprodukt>
-            <Abschnitt titel="Deine Ergebnisse prüfen">
-              <WegWahl
-                selbst={
-                  <CheckCard
-                    onSolved={geloestMelden}
-                    title="Lenas Zinsen"
-                    prompt={<p>Trage die Ergebnisse aus deinem Heft ein und prüfe sie.</p>}
-                    fields={[
-                      {
-                        kind: 'num',
-                        key: 't',
-                        label: 'Zinstage bis zum Autokauf:',
-                        expected: T_GESAMT,
-                        unit: 'Tage',
-                      },
-                      {
-                        kind: 'num',
-                        key: 'a',
-                        label: 'Zinsen mit Angebot A:',
-                        expected: ZINS_A,
-                        unit: '€',
-                      },
-                      {
-                        kind: 'num',
-                        key: 'b',
-                        label: 'Zinsen mit Angebot B:',
-                        expected: ZINS_B,
-                        unit: '€',
-                      },
+            <BeispielMitVideo video={VIDEO_ZINSEN} videoTitel="Lernvideo: Zinsen berechnen">
+              <Beispiel offen title="Wie viel Zinsen bekommt Jonas?" aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE} />
+            </BeispielMitVideo>
+            <Abschnitt titel="Vergleiche deine Ergebnisse">
+              <CheckCard
+                onSolved={geloestMelden}
+                punkte={14}
+                title="Lenas Zinsen"
+                prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
+                fields={[
+                  { kind: 'num', key: 't', label: 'Wie viele Zinstage liegen bis zum Autokauf?', expected: T_GESAMT, unit: 'Tage' },
+                  { kind: 'num', key: 'a', label: 'Wie viel Zinsen bringt Angebot A?', expected: ZINS_A, unit: '€' },
+                  { kind: 'num', key: 'b', label: 'Wie viel Zinsen bringt Angebot B?', expected: ZINS_B, unit: '€' },
+                ]}
+                loesungNachFehler
+                solution={LOESUNG}
+                help={
+                  <Hilfen
+                    steps={[
+                      <>Zähle zuerst die vollen Monate vom 16.05. bis zum 16.10. (je 30 Tage). Der 14.10. liegt 2 Tage vor dem 16.10.</>,
+                      <>Setze wie im Beispiel mit Jonas in die Zinsformel ein. Bei Angebot B gibt es nur 90 Zinstage.</>,
+                      <>
+                        <M>{'t = 5 \\cdot 30 - 2'}</M>. Angebot A: <M>{'Z = \\frac{4\\,800 \\cdot 2{,}4 \\cdot t}{100 \\cdot 360}'}</M>. Angebot B:{' '}
+                        <M>{'Z = \\frac{4\\,800 \\cdot 3 \\cdot 90}{100 \\cdot 360}'}</M>.
+                      </>,
                     ]}
-                    loesungNachFehler
-                    solution={LOESUNG}
-                    help={
-                      <Hilfen
-                        steps={[
-                          <>
-                            Zähle zuerst die vollen Monate vom 16.05. bis zum 16.10. (je 30 Tage).
-                            Der 14.10. liegt 2 Tage vor dem 16.10.
-                          </>,
-                          <>
-                            Setze wie im Beispiel mit Jonas in die Zinsformel ein. Bei Angebot B
-                            gibt es nur 90 Zinstage.
-                          </>,
-                          <>
-                            <M>{'t = 5 \\cdot 30 - 2'}</M>. Angebot A:{' '}
-                            <M>{'Z = \\frac{4\\,800 \\cdot 2{,}4 \\cdot t}{100 \\cdot 360}'}</M>.
-                            Angebot B:{' '}
-                            <M>{'Z = \\frac{4\\,800 \\cdot 3 \\cdot 90}{100 \\cdot 360}'}</M>.
-                          </>,
-                        ]}
-                      />
-                    }
-                  />
-                }
-                schema={
-                  <CheckCard
-                    onSolved={geloestMelden}
-                    title="Lenas Zinsen mit Lösungsschema"
-                    prompt={
-                      <p>
-                        Rechne in deinem Heft nach diesem Schema wie im Beispiel und trage die
-                        Ergebnisse ein.
-                      </p>
-                    }
-                    rechnung={[
-                      {
-                        l: ['t'],
-                        r: ['\\text{volle Monate} \\cdot 30 \\pm \\text{Tage} =', { luecke: 't' }],
-                        u: '\\text{① Zinstage}',
-                      },
-                      {
-                        l: ['Z_A'],
-                        r: [
-                          '\\frac{K \\cdot p \\cdot t}{100 \\cdot 360} =',
-                          { luecke: 'a' },
-                          '\\text{ €}',
-                        ],
-                        u: '\\text{② Angebot A}',
-                      },
-                      {
-                        l: ['Z_B'],
-                        r: [
-                          '\\frac{K \\cdot p \\cdot 90}{100 \\cdot 360} =',
-                          { luecke: 'b' },
-                          '\\text{ €}',
-                        ],
-                        u: '\\text{③ Angebot B}',
-                      },
-                    ]}
-                    fields={[
-                      { kind: 'num', key: 't', label: 'Zinstage', expected: T_GESAMT },
-                      { kind: 'num', key: 'a', label: 'Zinsen A', expected: ZINS_A },
-                      { kind: 'num', key: 'b', label: 'Zinsen B', expected: ZINS_B },
-                    ]}
-                    loesungNachFehler
-                    solution={LOESUNG}
-                    help={
-                      <SchrittHilfen
-                        schritte={[
-                          {
-                            kurz: '①',
-                            titel: 'Zinstage',
-                            hilfe: (
-                              <>
-                                Vom 16.05. bis zum 16.10. sind es 5 volle Monate zu je 30 Tagen. Der
-                                14.10. liegt 2 Tage davor, also ziehst du 2 ab.
-                              </>
-                            ),
-                          },
-                          {
-                            kurz: '②',
-                            titel: 'Angebot A',
-                            hilfe: (
-                              <>
-                                Setze <M>{'K = 4\\,800'}</M>, <M>{'p = 2{,}4'}</M> und die Zinstage
-                                aus ① ein:{' '}
-                                <M>{'\\frac{4\\,800 \\cdot 2{,}4 \\cdot 148}{36\\,000}'}</M>.
-                              </>
-                            ),
-                          },
-                          {
-                            kurz: '③',
-                            titel: 'Angebot B',
-                            hilfe: (
-                              <>
-                                Das Festgeld bekommt nur 90 Tage lang Zinsen:{' '}
-                                <M>{'\\frac{4\\,800 \\cdot 3 \\cdot 90}{36\\,000}'}</M>.
-                              </>
-                            ),
-                          },
-                        ]}
-                      />
-                    }
                   />
                 }
               />
@@ -703,6 +487,8 @@ export default function AutogeldEinstieg({
             <Abschnitt titel="Deine Empfehlung">
               <McCard
                 onSolved={fertig.teil('empfehlung')}
+                punkte={4}
+                rechnen
                 title="Empfehlung"
                 prompt={<p>Welche Empfehlung gibst du Lena?</p>}
                 options={[
@@ -730,16 +516,30 @@ export default function AutogeldEinstieg({
                 ]}
               />
             </Abschnitt>
+            <Handlungsprodukt titel="Antwort an Lena">
+              <figure className="sl-foto sl-foto-klein">
+                <img
+                  src={briefBild}
+                  width={800}
+                  height={400}
+                  alt="Skizze auf Packpapier: ein Briefumschlag an Lena und ein Blatt mit dem Anfang der Antwort: Liebe Lena, ich empfehle dir …"
+                />
+              </figure>
+              <p className="sl-text">
+                Schreibe Lena in deinem Heft eine Antwort. Rechne darin die Zinstage und die Zinsen für beide Angebote vor, erkläre, warum ihre 144 € nicht stimmen, und gib
+                ihr eine klare Empfehlung.
+              </p>
+              <Aufklappbar label="Satzanfänge ansehen" icon="fa-comment-dots">
+                <ul className="zk-liste">
+                  <li>„Liebe Lena, vielen Dank für deine Anfrage. Ich empfehle dir …“</li>
+                  <li>„Dein Geld liegt vom 16.05. bis zum 14.10. auf dem Konto, das sind … Zinstage.“</li>
+                  <li>„Mit dem Tagesgeld bekommst du …, mit dem Festgeld nur …, weil …“</li>
+                  <li>„Die 144 € würdest du nur bekommen, wenn …“</li>
+                </ul>
+              </Aufklappbar>
+            </Handlungsprodukt>
             <Abschnitt titel="Ist deine Antwort an Lena vollständig?">
-              <Kriterien
-                onAlle={fertig.teil('produkt')}
-                items={[
-                  'Eine klare Empfehlung: Welches Angebot soll Lena nehmen?',
-                  'Die Zinstage und die Rechnung für beide Angebote',
-                  'Eine Erklärung, warum Lenas 144 € nicht stimmen',
-                  'Eine Erklärung, warum der höhere Zinssatz hier weniger bringt',
-                ]}
-              />
+              <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an Lena')}               />
             </Abschnitt>
             {geloest && (
               <Abschnitt titel="Das hältst du fest">
@@ -773,14 +573,17 @@ export default function AutogeldEinstieg({
     {
       art: 'sichern',
       titel: 'Übungsaufgaben',
+      pflicht: ['1', '2', '3'],
       inhalt: (fertig) => (
         <>
           <p className="sl-text">
-            Prüfe und vertiefe dein Wissen mit vier Aufgaben. Die letzte ist für Profis.
+            Prüfe und vertiefe dein Wissen mit drei Aufgaben, die vierte ist für Profis. Wenn du die drei Pflichtaufgaben gelöst hast, wartet unten ein Spiel auf dich.
+            Einzelarbeit, ca. 20 Minuten.
           </p>
           <Abschnitt titel="Übung 1: Wie viel Zinsen?">
             <TrackedMc
-              onSolved={fertig.teil('1')}
+              onSolved={uebung('1', fertig.teil('1'))}
+              punkte={4}
               topic="Zinsrechnung-Einstieg: Tageszinsen (Basis)"
               title="Übung 1"
               rechnen
@@ -814,7 +617,8 @@ export default function AutogeldEinstieg({
           </Abschnitt>
           <Abschnitt titel="Übung 2: Wer hat recht?">
             <TrackedMc
-              onSolved={fertig.teil('2')}
+              onSolved={uebung('2', fertig.teil('2'))}
+              punkte={6}
               topic="Zinsrechnung-Einstieg: Zinstage (Standard)"
               title="Übung 2"
               rechnen
@@ -852,7 +656,8 @@ export default function AutogeldEinstieg({
           </Abschnitt>
           <Abschnitt titel="Übung 3: Zinstage und Zinsen ganz allein">
             <TrackedCheck
-              onSolved={fertig.teil('3')}
+              onSolved={uebung('3', fertig.teil('3'))}
+              punkte={8}
               topic="Zinsrechnung-Einstieg: Zinstage und Zinsen (Erweiterung)"
               title="Übung 3"
               level="erweiterung"
@@ -869,17 +674,12 @@ export default function AutogeldEinstieg({
                 { kind: 'num', key: 'z', label: <M>{'Z ='}</M>, expected: 24.75, unit: '€' },
               ]}
               solution={
-                <>
-                  <p>
-                    Der 31.01. zählt wie der 30.01. Vom 30.01. bis zum 30.06. wären es 5 Monate, der
-                    15.06. liegt 15 Tage davor:
-                  </p>
-                  <MB>
-                    {
-                      't = 5 \\cdot 30 - 15 = 135 \\qquad Z = \\frac{3\\,000 \\cdot 2{,}2 \\cdot 135}{100 \\cdot 360} = 24{,}75 \\text{ €}'
-                    }
-                  </MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Zinstage nach der Bankregel', text: 'Der 31.01. zählt wie der 30.01. Bis zum 30.06. wären es 5 Monate, der 15.06. liegt 15 Tage davor.', tex: 't = 5 \\cdot 30 - 15 = 135' },
+                    { titel: 'In die Zinsformel einsetzen', tex: 'Z = \\dfrac{3\\,000 \\cdot 2{,}2 \\cdot 135}{100 \\cdot 360} = 24{,}75 \\text{ €}' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -903,6 +703,8 @@ export default function AutogeldEinstieg({
           <Abschnitt titel="Übung 4 für Profis: Geht es noch besser?">
             <CheckCard
               title="Festgeld und Tagesgeld kombinieren"
+              profi
+              punkte={9}
               level="erweiterung"
               prompt={
                 <p>
@@ -919,18 +721,13 @@ export default function AutogeldEinstieg({
               ]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>
-                    {
-                      '148 - 90 = 58 \\text{ Tage} \\qquad Z = \\frac{4\\,800 \\cdot 2{,}4 \\cdot 58}{100 \\cdot 360} = 18{,}56 \\text{ €}'
-                    }
-                  </MB>
-                  <MB>{'36{,}00 \\text{ €} + 18{,}56 \\text{ €} = 54{,}56 \\text{ €}'}</MB>
-                  <p>
-                    Das sind 7,20 € mehr als nur mit dem Tagesgeld. Dafür muss Lena das Geld nach 90
-                    Tagen selbst umbuchen.
-                  </p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Restliche Tage für das Tagesgeld', tex: '148 - 90 = 58 \\text{ Tage}' },
+                    { titel: 'Tagesgeld-Zinsen', tex: 'Z = \\dfrac{4\\,800 \\cdot 2{,}4 \\cdot 58}{100 \\cdot 360} = 18{,}56 \\text{ €}' },
+                    { titel: 'Zinsen insgesamt', tex: '36{,}00 \\text{ €} + 18{,}56 \\text{ €} = 54{,}56 \\text{ €}', text: 'Das sind 7,20 € mehr als nur mit dem Tagesgeld. Dafür muss Lena das Geld nach 90 Tagen selbst umbuchen.' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -953,6 +750,15 @@ export default function AutogeldEinstieg({
               }
             />
           </Abschnitt>
+          <BonusSpiel frei={uebungen.length === 3} titel="Zins-Tresor">
+            <AuswahlSpiel
+              neueRunden={zinsRunden}
+              symbol="fa-vault"
+              start={<p>In jeder Runde siehst du Kapital, Zinssatz und Zinstage. Nur ein Tresor enthält die richtigen Zinsen. Rechne und öffne ihn.</p>}
+              tipp="Tipp: Z = K · p · t : (100 · 360), mit t in Tagen."
+            />
+          </BonusSpiel>
+          <Bilanz />
           <div className="sl-ende">
             <p>
               Du kannst jetzt Zinsen für einige Tage berechnen. In der nächsten Lernsituation drehst
@@ -985,7 +791,9 @@ export default function AutogeldEinstieg({
     >
       <SeitenLernsituation
         ruhig
+        punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             In dieser Lernsituation berätst du eine Kundin. Du lernst, wie du Zinsen berechnest,
