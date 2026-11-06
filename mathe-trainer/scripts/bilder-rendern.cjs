@@ -15,8 +15,8 @@ const path = require('path');
 const { chromium } = require('playwright');
 
 async function rendern(page, quelle, ziel, qualitaet) {
-  const html = fs.readFileSync(quelle, 'utf8');
-  await page.setContent(html, { waitUntil: 'networkidle' });
+  // Als Datei öffnen, damit Quellen gemeinsame Skripte aus ihrem Ordner einbinden können (z. B. <script src="_blaupause.js">)
+  await page.goto('file://' + path.resolve(quelle), { waitUntil: 'networkidle' });
   await page.evaluate(() => document.fonts.ready);
   const el = page.locator('#bild');
   if ((await el.count()) === 0) throw new Error(`${quelle}: kein Element mit id="bild"`);
