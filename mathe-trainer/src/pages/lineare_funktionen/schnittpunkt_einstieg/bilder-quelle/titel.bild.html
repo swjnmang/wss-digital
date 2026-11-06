@@ -1,0 +1,61 @@
+<!doctype html>
+<!-- Die Lasershow, Titelbild. Bildwelt Diorama / nacht: isometrische Partyinsel bei Nacht, zwei Bodenlaser kreuzen sich in der Spiegelkugel.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/lineare_funktionen/schnittpunkt_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const ox=560,oy=200,k=0.86;
+const c=Math.cos(Math.PI/6),s=Math.sin(Math.PI/6);
+const P=(x,y,z)=>[ox+(x-y)*c*k, oy+((x+y)*s - z)*k];
+const pts=a=>a.map(p=>P(...p).join(',')).join(' ');
+const poly=(a,fill,extra='')=>`<polygon points="${pts(a)}" fill="${fill}" ${extra}/>`;
+function box(x,y,z,w,d,h,top,left,right){return poly([[x,y+d,z],[x+w,y+d,z],[x+w,y+d,z+h],[x,y+d,z+h]],left)+poly([[x+w,y,z],[x+w,y+d,z],[x+w,y+d,z+h],[x+w,y,z+h]],right)+poly([[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]],top);}
+const line=(a,b,st,w,extra='')=>{const [x1,y1]=P(...a),[x2,y2]=P(...b);return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${st}" stroke-width="${w}" stroke-linecap="round" ${extra}/>`;};
+let g='';
+// schwebende Insel
+g+=box(-10,-10,-70,420,330,62,'#3b4677','#2a3157','#222849');
+g+=box(-10,-10,-8,420,330,8,'#4b5891','#39436f','#2f385e');
+// Tanzfläche aus Kacheln
+for(let i=0;i<6;i++)for(let j=0;j<4;j++){const on=(i*3+j*5)%7<2;g+=poly([[120+i*40,90+j*40,0.5],[158+i*40,90+j*40,0.5],[158+i*40,128+j*40,0.5],[120+i*40,128+j*40,0.5]],on?'#7f74e8':'#555f9c');}
+// Traverse auf zwei Stützen
+g+=box(4,164,0,12,12,262,'#9aa3c9','#7a83ad','#69729b');
+// Bodenlaser und Strahlen (Laser bei x=110 und x=390 an der Vorderkante, Kugel bei x=250,z=170)
+const L1=[60,300,0],L2=[392,40,0],K=[226,170,205];
+g+=box(L1[0]-14,L1[1]-14,0,28,28,18,'#d9dcef','#9ba1c6','#878db6');
+g+=box(L2[0]-14,L2[1]-14,0,28,28,18,'#d9dcef','#9ba1c6','#878db6');
+const beam=(a,col)=>{const b=[a[0]+(K[0]-a[0])*1.35,a[1]+(K[1]-a[1])*1.35,a[2]+(K[2]-a[2])*1.35];return line([a[0],a[1],18],b,col,16,'opacity=".22"')+line([a[0],a[1],18],b,col,4.5);};
+g+=beam(L1,'#a99cff');
+g+=beam(L2,'#ff7fd0');
+// Seil und Spiegelkugel
+g+=line([K[0],K[1],262],[K[0],K[1],K[2]+20],'#c9cdf0',2);
+g+=box(392,164,0,12,12,262,'#9aa3c9','#7a83ad','#69729b');
+g+=box(4,164,262,400,12,10,'#b8bfe2','#8b93bf','#7880ad');
+const [kx,ky]=P(...K);
+g+=`<circle cx="${kx}" cy="${ky}" r="64" fill="url(#halo)"/>`;
+g+=`<circle cx="${kx}" cy="${ky}" r="21" fill="url(#kugel)" stroke="#e8eaff" stroke-width="2"/>`;
+g+=`<path d="M${kx-21} ${ky} h42 M${kx} ${ky-21} v42 M${kx-16} ${ky-12} q16 10 32 0 M${kx-16} ${ky+12} q16 -10 32 0" stroke="#5b5f8f" stroke-width="1.4" fill="none" opacity=".7"/>`;
+// Lichtflecken auf dem Boden
+[[200,140],[300,250],[330,120],[160,230]].forEach(([x,y],i)=>{const [px,py]=P(x,y,1);g+=`<ellipse cx="${px}" cy="${py}" rx="22" ry="12" fill="${i%2?'#ff9fdd':'#c4baff'}" opacity=".45"/>`;});
+const [l1x,l1y]=P(L1[0],L1[1],0),[l2x,l2y]=P(L2[0],L2[1],0);
+const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+<defs>
+ <radialGradient id="bg" cx=".45" cy=".35" r=".85"><stop offset="0" stop-color="#2c3770"/><stop offset=".6" stop-color="#18204a"/><stop offset="1" stop-color="#0e1330"/></radialGradient>
+ <radialGradient id="halo"><stop offset="0" stop-color="#fff6c8" stop-opacity=".75"/><stop offset=".35" stop-color="#d9c8ff" stop-opacity=".25"/><stop offset="1" stop-color="#d9c8ff" stop-opacity="0"/></radialGradient>
+ <radialGradient id="kugel" cx=".35" cy=".35"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#c9cce6"/><stop offset="1" stop-color="#7d82ad"/></radialGradient>
+ <filter id="sh"><feGaussianBlur stdDeviation="18"/></filter>
+</defs>
+<rect width="1200" height="600" fill="url(#bg)"/>
+${Array.from({length:40},(_,i)=>`<circle cx="${(i*197)%1200}" cy="${(i*83)%220}" r="${i%3?1.2:2}" fill="#fff" opacity="${.25+(i%4)*.12}"/>`).join('')}
+<ellipse cx="560" cy="575" rx="360" ry="22" fill="#000" opacity=".45" filter="url(#sh)"/>
+${g}
+<g font-family="Fredoka, sans-serif" fill="#f2f3ff">
+ <text x="880" y="150" font-size="30" font-weight="600">Spiegelkugel</text>
+ <text x="880" y="188" font-size="26" font-weight="500" fill="#d6d9f5">genau hier: S(? | ?)</text>
+ <text x="${l1x-250}" y="${l1y+64}" font-size="24" font-weight="600" fill="#c4baff">Strahl 1: y = 0,5x + 2</text>
+ <text x="${l2x+30}" y="${l2y+40}" font-size="24" font-weight="600" fill="#ffa8e0">Strahl 2: y = −x + 4,4</text>
+</g>
+<path d="M872 156 L${kx+30} ${ky-6}" stroke="#d6d9f5" stroke-width="2" stroke-dasharray="5 6" fill="none"/>
+</svg>`;
+document.getElementById('bild').innerHTML=svg;
+</script>
+</body></html>

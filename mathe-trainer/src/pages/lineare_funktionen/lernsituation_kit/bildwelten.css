@@ -22,6 +22,28 @@
 @import '@fontsource/source-serif-4/400-italic.css';
 @import '@fontsource/ibm-plex-sans/500.css';
 @import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/barlow/400.css';
+@import '@fontsource/barlow/500.css';
+@import '@fontsource/barlow/600.css';
+@import '@fontsource/barlow-condensed/500.css';
+@import '@fontsource/barlow-condensed/600.css';
+@import '@fontsource/barlow-condensed/700.css';
+@import '@fontsource/bangers/400.css';
+@import '@fontsource/atkinson-hyperlegible/400.css';
+@import '@fontsource/atkinson-hyperlegible/700.css';
+@import '@fontsource/instrument-sans/400.css';
+@import '@fontsource/instrument-sans/500.css';
+@import '@fontsource/instrument-sans/600.css';
+
+/* Siebdruck: Bricolage Grotesque mit allen Achsen (Breite 75–100 %, Gewicht 200–800) */
+@font-face {
+  font-family: 'Bricolage Siebdruck';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  src: url('../../../../node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-standard-normal.woff2') format('woff2-variations');
+}
 
 /* Gemeinsam: eingeklebte bzw. eingebundene Bilder (gerenderte WebP-Dateien) */
 .sl-foto { margin: 0 auto; width: 100%; max-width: 860px; }
@@ -356,4 +378,314 @@
 @media (max-width: 560px) {
   .sl-welt-skizzenbuch .sl-titel, .sl-start.sl-welt-skizzenbuch h2 { font-size: 32px; }
   .sl-welt-skizzenbuch .sl-seite::after { display: none; }
+}
+
+/* ══ Dunkle Bühnen (Skizzenbuch / tafel, Diorama / nacht) ════════════════════════════════════════════════════
+   Text auf dem Untergrund wird hell, alles in Karten (Aufgaben, Beispiele, Graphen, Hinweise) bleibt dunkel auf Weiß. */
+.sl-dunkel .sl-seite,
+.sl-start.sl-dunkel { --ink: #f4f3ec; --ink-muted: #cfd2d8; --line: rgba(255, 255, 255, 0.28); --line-strong: rgba(255, 255, 255, 0.5); color: var(--ink); }
+.sl-dunkel .sl-seite .lp-ex.bk-panel,
+.sl-dunkel .sl-seite .lp-example,
+.sl-dunkel .sl-seite .bk-graph,
+.sl-dunkel .sl-seite .sl-fokus,
+.sl-dunkel .sl-seite .sl-weiter-gesperrt,
+.sl-dunkel .sl-seite .lp-feedback,
+.sl-dunkel .sl-seite .ls-help-card,
+.sl-dunkel .sl-seite .lp-merke,
+.sl-dunkel .sl-seite .ls-back,
+.sl-start.sl-dunkel .sl-start-regel,
+.sl-start.sl-dunkel .sl-start-check { --ink: #1b2433; --ink-muted: #5b6472; --line: #e3e6eb; --line-strong: #c3c8d0; color: var(--ink); }
+.sl-dunkel .sl-seite .sl-weiter-gesperrt { background: #fff; }
+.sl-dunkel .sl-seite .bk-btn:not(.bk-btn-primary) { background: #fff; color: #1b2433; }
+
+/* ══ C Diorama / nacht: Spielwelt bei Nacht mit Lichtern (Vorlage: Die Lasershow) ═══════════════════════════ */
+.sl-welt-diorama.sl-variante-nacht {
+  --di-untergrund: radial-gradient(120% 80% at 50% -10%, #33407a 0%, #1d2550 55%, #141a3a 100%);
+  --di-tinte: #f2f3ff;
+  --di-kante: rgba(0, 0, 0, 0.45);
+  --di-schatten: 0 1px 0 rgba(0, 0, 0, 0.2), 0 22px 40px -24px rgba(5, 8, 30, 0.8);
+  --grid: #e3e6f2;
+}
+.sl-welt-diorama.sl-variante-nacht .sl-titel,
+.sl-welt-diorama.sl-variante-nacht .sl-abschnitt-titel,
+.sl-welt-diorama.sl-variante-nacht .sl-text { color: #f2f3ff; }
+.sl-start.sl-welt-diorama.sl-variante-nacht h2 { color: #fff; }
+.sl-start.sl-welt-diorama.sl-variante-nacht .sl-start-ziel { color: #e3e5f7; }
+.sl-welt-diorama.sl-variante-nacht .sl-fokus-titel { color: var(--primary); }
+
+/* Diorama / winter: Schnee und kühles Licht (Vorlage: Der Vereinsbus) */
+.sl-welt-diorama.sl-variante-winter {
+  --di-untergrund: radial-gradient(130% 90% at 50% -10%, #ffffff 0%, #eef3f8 50%, #dde6ef 100%);
+  --di-tinte: #1f2d3d;
+  --di-kante: rgba(40, 70, 105, 0.3);
+  --grid: #dfe7ef;
+}
+
+/* ══ A Skizzenbuch / tafel: Kreide auf dunkelgrüner Tafel (Vorlage: Das Rechenlabor) ════════════════════════
+   Titel und Notizen in Kreideweiß, Karten als weiße Zettel auf der Tafel, Auftrag als gelber Zettel. */
+.sl-welt-skizzenbuch.sl-variante-tafel {
+  --sk-papier: #26372f;
+  --sk-untergrund: radial-gradient(120% 90% at 30% 0%, #2f4339 0%, #26372f 55%, #1f2e27 100%);
+  --sk-bleistift: #f3f1e7;
+  --sk-tinte: #1f4e79;
+  --sk-band: rgba(240, 236, 220, 0.35);
+  --grid: #d8dfe5;
+}
+.sl-welt-skizzenbuch.sl-variante-tafel .sl-seite .lp-ex.bk-panel,
+.sl-welt-skizzenbuch.sl-variante-tafel .sl-seite .lp-example,
+.sl-welt-skizzenbuch.sl-variante-tafel .sl-seite .bk-graph { border-color: rgba(255, 255, 255, 0.5); box-shadow: 0 10px 20px -16px rgba(0, 0, 0, 0.8); }
+.sl-welt-skizzenbuch.sl-variante-tafel .sl-seite .lp-ex .bk-graph,
+.sl-welt-skizzenbuch.sl-variante-tafel .sl-seite .lp-example .bk-graph { --ink: #2c2a27; }
+.sl-welt-skizzenbuch.sl-variante-tafel .sl-seite .bk-btn,
+.sl-start.sl-welt-skizzenbuch.sl-variante-tafel .bk-btn { border-color: #f3f1e7; box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5); }
+.sl-welt-skizzenbuch.sl-variante-tafel .sl-foto { background: #f3f1e7; }
+.sl-start.sl-welt-skizzenbuch.sl-variante-tafel h2 { color: #f3f1e7; }
+
+/* Skizzenbuch / packpapier: braunes Packpapier, schwarzer Fineliner (Vorlage: Lenas Autogeld) */
+.sl-welt-skizzenbuch.sl-variante-packpapier {
+  --sk-papier: #e2cfae;
+  --sk-untergrund: radial-gradient(140% 100% at 20% 0%, #e9d8bb 0%, #dcc6a2 60%, #d4bc95 100%);
+  --sk-bleistift: #1c1a17;
+  --sk-tinte: #1c1a17;
+  --sk-zettel: #fffdf6;
+  --sk-band: rgba(255, 255, 255, 0.55);
+  --grid: #e8dcc8;
+}
+
+/* ══ B Reportage / hochglanz: helles Hochglanzmagazin, kühles Weiß, kräftige Fotos (Vorlage: Der Korbwurf) ═══ */
+.sl-welt-reportage.sl-variante-hochglanz { --rp-untergrund: #ffffff; --rp-tinte: #141820; --grid: #e6e9ee; }
+.sl-welt-reportage.sl-variante-hochglanz .sl-titel { font-weight: 600; letter-spacing: -0.02em; }
+.sl-welt-reportage.sl-variante-hochglanz .sl-fokus { background: var(--primary-soft); border-radius: 0; border-left: 0; }
+.sl-start.sl-welt-reportage.sl-variante-hochglanz .sl-start-bild { background: #1a2230; }
+
+/* Reportage / zeitung: Zeitung in Schwarzweiß, Bilder gerastert, Auftrag zwischen zwei Linien (Vorlage: Die Schlagzeile) */
+.sl-welt-reportage.sl-variante-zeitung { --rp-untergrund: #f7f6f2; --rp-tinte: #151515; --grid: #e2e0da; }
+.sl-welt-reportage.sl-variante-zeitung .sl-fokus { background: transparent; border-top: 3px solid var(--rp-tinte); border-bottom: 1px solid var(--rp-tinte); border-radius: 0; padding-left: 0; padding-right: 0; }
+.sl-welt-reportage.sl-variante-zeitung .sl-fokus-titel { color: var(--rp-tinte); }
+.sl-start.sl-welt-reportage.sl-variante-zeitung .sl-start-bild { background: #222; }
+.sl-welt-reportage.sl-variante-zeitung .sl-foto { box-shadow: none; }
+
+/* ══ D Bauplan ═══════════════════════════════════════════════════════════════════════════════════════════════
+   Eine technische Zeichnung des Falls: helles Zeichenpapier mit 5-mm-Raster, Bilder mit Passerkreuzen an den Ecken,
+   Auftrag als Schriftfeld (Doppelrahmen, Kopfzeile in der Themenfarbe), eckige Knöpfe.
+   Überschriften und Maße Barlow Condensed, Fließtext Barlow. Unter-Varianten: blaupause, millimeter, cad, lasercut. */
+.sl-welt-bauplan {
+  --font-body: 'Barlow', 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Barlow Condensed', 'Barlow', 'Segoe UI', system-ui, sans-serif;
+  --bp-tusche: #17283d;
+  --bp-papier: #f8fafc;
+  --bp-raster: rgba(29, 85, 150, 0.075);
+  --bp-raster-grob: rgba(29, 85, 150, 0.13);
+  --bp-mass: 20px;
+  --grid: #dbe4ee;
+  font-family: var(--font-body);
+}
+.sl-welt-bauplan.sl-variante-millimeter { --bp-papier: #fdfcf8; --bp-raster: rgba(214, 112, 40, 0.13); --bp-raster-grob: rgba(214, 112, 40, 0.24); --bp-mass: 10px; --bp-tusche: #1a1a1a; --grid: #f0dcc9; }
+.sl-welt-bauplan.sl-variante-cad { --bp-papier: #f4f5f7; --bp-raster: rgba(40, 46, 56, 0.06); --bp-raster-grob: rgba(40, 46, 56, 0.1); --bp-tusche: #20252d; --grid: #dfe2e7; }
+.sl-welt-bauplan.sl-variante-lasercut { --bp-papier: #f6efe3; --bp-raster: rgba(120, 80, 40, 0.07); --bp-raster-grob: rgba(120, 80, 40, 0.12); --bp-tusche: #2b2016; --grid: #eadfcc; }
+
+.sl-start.sl-welt-bauplan,
+.sl-welt-bauplan .sl-seite {
+  background:
+    linear-gradient(var(--bp-raster-grob) 1px, transparent 1px) 0 0 / calc(var(--bp-mass) * 5) calc(var(--bp-mass) * 5),
+    linear-gradient(90deg, var(--bp-raster-grob) 1px, transparent 1px) 0 0 / calc(var(--bp-mass) * 5) calc(var(--bp-mass) * 5),
+    linear-gradient(var(--bp-raster) 1px, transparent 1px) 0 0 / var(--bp-mass) var(--bp-mass),
+    linear-gradient(90deg, var(--bp-raster) 1px, transparent 1px) 0 0 / var(--bp-mass) var(--bp-mass),
+    var(--bp-papier);
+  border: 1.5px solid var(--bp-tusche);
+  outline: 1px solid var(--bp-tusche); outline-offset: -7px;
+  border-radius: 0; box-shadow: none; color: var(--bp-tusche);
+}
+.sl-welt-bauplan .sl-seite { padding: 26px clamp(18px, 3vw, 40px) 34px; margin-top: 10px; }
+.sl-start.sl-welt-bauplan { max-width: 900px; padding: 0 clamp(18px, 3vw, 36px) 30px; }
+.sl-start.sl-welt-bauplan .sl-start-bild { width: calc(100% + 2 * clamp(18px, 3vw, 36px)); margin: 0 calc(-1 * clamp(18px, 3vw, 36px)) 4px; background: none; border-bottom: 1.5px solid var(--bp-tusche); }
+
+.sl-welt-bauplan .sl-titel,
+.sl-start.sl-welt-bauplan h2,
+.sl-start.sl-welt-bauplan.sl-thema h2 { font: 700 36px/1.05 var(--font-display); color: var(--bp-tusche); letter-spacing: 0.005em; }
+.sl-welt-bauplan .sl-abschnitt-titel { font: 600 26px/1.15 var(--font-display); color: var(--bp-tusche); }
+.sl-welt-bauplan .sl-abschnitt-titel i { font-size: 19px; color: var(--primary); }
+.sl-welt-bauplan .sl-marke { font: 600 18px/1 var(--font-display); border-radius: 2px; }
+.sl-welt-bauplan .sl-marke i { border-radius: 2px; }
+.sl-welt-bauplan .sl-text,
+.sl-start.sl-welt-bauplan .sl-start-ziel { font-size: 18px; line-height: 1.55; color: var(--bp-tusche); }
+.sl-welt-bauplan .sl-phasen li { border-radius: 2px; background: #fff; font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+
+/* Fokus = Schriftfeld: Doppelrahmen, Kopfzeile in der Themenfarbe */
+.sl-welt-bauplan .sl-fokus { margin-top: 6px; padding: 0 18px 14px; background: #fff; border: 3px double var(--bp-tusche); border-radius: 0; }
+.sl-welt-bauplan .sl-fokus-titel { margin: 0 -18px 6px; padding: 7px 18px 6px; border-bottom: 1.5px solid var(--bp-tusche); font: 600 21px/1.2 var(--font-display); color: var(--primary); }
+.sl-start.sl-welt-bauplan .sl-start-regel { background: #fff; border: 3px double var(--bp-tusche); border-radius: 0; }
+.sl-start.sl-welt-bauplan .sl-start-check { background: #fff; border: 1.5px solid var(--bp-tusche); border-radius: 0; }
+
+/* Karten: weiße Blätter mit feiner Tuschelinie */
+.sl-welt-bauplan .sl-seite .lp-ex.bk-panel,
+.sl-welt-bauplan .sl-seite .lp-example,
+.sl-welt-bauplan .sl-seite .bk-graph { background: #fff; border: 1.5px solid var(--bp-tusche); border-radius: 0; box-shadow: none; }
+.sl-welt-bauplan .sl-seite .lp-ex .bk-graph,
+.sl-welt-bauplan .sl-seite .lp-example .bk-graph { border: 0; }
+.sl-welt-bauplan .bk-graph svg text { font-family: var(--font-display); font-size: 15px; }
+.sl-welt-bauplan .sl-seite .bk-btn,
+.sl-start.sl-welt-bauplan .bk-btn,
+.sl-welt-bauplan .sl-bar .bk-btn { border-radius: 2px; font-family: var(--font-display); font-size: 17px; font-weight: 600; letter-spacing: 0.01em; }
+.sl-welt-bauplan .sl-seite input,
+.sl-welt-bauplan .sl-seite select { border-radius: 2px; }
+.sl-welt-bauplan .sl-weiter-gesperrt { background: #fff; border-color: var(--bp-tusche); border-radius: 0; }
+
+/* Gerenderte Bilder: randlos mit Passerkreuzen an den vier Ecken */
+.sl-welt-bauplan .sl-foto {
+  position: relative; padding: 12px;
+  background:
+    linear-gradient(var(--bp-tusche), var(--bp-tusche)) 0 0 / 18px 1.5px no-repeat,
+    linear-gradient(var(--bp-tusche), var(--bp-tusche)) 0 0 / 1.5px 18px no-repeat,
+    linear-gradient(var(--bp-tusche), var(--bp-tusche)) 100% 0 / 18px 1.5px no-repeat,
+    linear-gradient(var(--bp-tusche), var(--bp-tusche)) 100% 0 / 1.5px 18px no-repeat,
+    linear-gradient(var(--bp-tusche), var(--bp-tusche)) 0 100% / 18px 1.5px no-repeat,
+    linear-gradient(var(--bp-tusche), var(--bp-tusche)) 0 100% / 1.5px 18px no-repeat,
+    linear-gradient(var(--bp-tusche), var(--bp-tusche)) 100% 100% / 18px 1.5px no-repeat,
+    linear-gradient(var(--bp-tusche), var(--bp-tusche)) 100% 100% / 1.5px 18px no-repeat;
+}
+.sl-welt-bauplan .sl-foto figcaption { padding: 8px 2px 0; font: 500 16px/1.4 var(--font-display); color: var(--bp-tusche); }
+.sl-welt-bauplan .sl-abschnitt-titel .katex,
+.sl-welt-bauplan .sl-titel .katex { font-size: 0.8em; }
+
+/* ══ E Comic ═════════════════════════════════════════════════════════════════════════════════════════════════
+   Die Situation als Bildergeschichte: jede Seite ein Heftblatt mit Tuscherand und hartem Versatzschatten, Bilder als Panels,
+   Auftrag als Erzählkasten, Knöpfe mit dickem Rand, die beim Drücken einsinken.
+   Überschriften Bangers, Fließtext Atkinson Hyperlegible. Unter-Varianten: pop, retro, manga, storyboard. */
+.sl-welt-comic {
+  --font-body: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Bangers', 'Impact', system-ui, sans-serif;
+  --co-tusche: #161616;
+  --co-papier: #fffdf8;
+  --co-kasten: #ffe45c;
+  --co-rand: 3px;
+  --co-versatz: 5px;
+  --co-raster: radial-gradient(circle, rgba(22, 22, 22, 0.06) 1.3px, transparent 1.8px) 0 0 / 11px 11px;
+  --grid: #e4e4e4;
+  font-family: var(--font-body);
+}
+.sl-welt-comic.sl-variante-retro { --co-papier: #f7efd8; --co-tusche: #2a211b; --co-kasten: #f4c44f; --co-raster: radial-gradient(circle, rgba(170, 120, 40, 0.1) 1.3px, transparent 1.8px) 0 0 / 11px 11px; --grid: #eadfc4; }
+.sl-welt-comic.sl-variante-manga { --co-papier: #ffffff; --co-kasten: #ffffff; --co-raster: radial-gradient(circle, rgba(0, 0, 0, 0.07) 1px, transparent 1.4px) 0 0 / 7px 7px; }
+.sl-welt-comic.sl-variante-storyboard { --co-papier: #f6f6f4; --co-tusche: #33363b; --co-kasten: #e9eaec; --co-rand: 2px; --co-versatz: 0px; --co-raster: none; --grid: #e2e3e5; }
+
+.sl-start.sl-welt-comic,
+.sl-welt-comic .sl-seite {
+  background: var(--co-raster), var(--co-papier);
+  border: var(--co-rand) solid var(--co-tusche); border-radius: 3px;
+  box-shadow: var(--co-versatz) var(--co-versatz) 0 var(--co-tusche); color: var(--co-tusche);
+}
+.sl-welt-comic .sl-seite { padding: 24px clamp(16px, 3vw, 38px) 32px; margin: 10px auto 8px; width: calc(100% - var(--co-versatz)); }
+.sl-start.sl-welt-comic { max-width: 880px; padding: 0 clamp(16px, 3vw, 34px) 30px; }
+.sl-start.sl-welt-comic .sl-start-bild { width: calc(100% + 2 * clamp(16px, 3vw, 34px)); margin: 0 calc(-1 * clamp(16px, 3vw, 34px)) 4px; background: none; border-bottom: var(--co-rand) solid var(--co-tusche); }
+
+.sl-welt-comic .sl-titel,
+.sl-start.sl-welt-comic h2,
+.sl-start.sl-welt-comic.sl-thema h2 { font: 400 40px/1.02 var(--font-display); letter-spacing: 0.025em; color: var(--co-tusche); }
+.sl-start.sl-welt-comic.sl-thema h2 { color: var(--primary); }
+.sl-welt-comic .sl-abschnitt-titel { font: 400 29px/1.1 var(--font-display); letter-spacing: 0.025em; color: var(--co-tusche); }
+.sl-welt-comic .sl-abschnitt-titel i { font-size: 20px; color: var(--primary); }
+.sl-welt-comic .sl-marke { font: 400 20px/1 var(--font-display); letter-spacing: 0.03em; border: 2px solid var(--co-tusche); }
+.sl-welt-comic .sl-text,
+.sl-start.sl-welt-comic .sl-start-ziel { font-size: 18px; line-height: 1.55; color: var(--co-tusche); }
+.sl-welt-comic .sl-phasen li { border: 2px solid var(--co-tusche); border-radius: 3px; background: #fff; }
+
+/* Fokus = Erzählkasten */
+.sl-welt-comic .sl-fokus { margin-top: 6px; padding: 14px 18px; background: var(--co-kasten); border: var(--co-rand) solid var(--co-tusche); border-radius: 0; box-shadow: 4px 4px 0 var(--co-tusche); transform: rotate(-0.4deg); }
+.sl-welt-comic .sl-fokus-titel { font: 400 25px/1.1 var(--font-display); letter-spacing: 0.03em; color: var(--co-tusche); }
+.sl-welt-comic.sl-variante-manga .sl-fokus,
+.sl-welt-comic.sl-variante-storyboard .sl-fokus { transform: none; }
+.sl-start.sl-welt-comic .sl-start-regel { background: var(--co-kasten); border: var(--co-rand) solid var(--co-tusche); border-radius: 0; }
+.sl-start.sl-welt-comic .sl-start-check { background: #fff; border: 2px solid var(--co-tusche); border-radius: 3px; }
+
+/* Karten mit Tuscherand und kleinem harten Schatten */
+.sl-welt-comic .sl-seite .lp-ex.bk-panel,
+.sl-welt-comic .sl-seite .lp-example,
+.sl-welt-comic .sl-seite .bk-graph { background: #fff; border: 2.5px solid var(--co-tusche); border-radius: 4px; box-shadow: calc(var(--co-versatz) * 0.6) calc(var(--co-versatz) * 0.6) 0 var(--co-tusche); }
+.sl-welt-comic .sl-seite .lp-ex .bk-graph,
+.sl-welt-comic .sl-seite .lp-example .bk-graph { border: 0; box-shadow: none; }
+.sl-welt-comic .sl-seite .bk-btn,
+.sl-start.sl-welt-comic .bk-btn,
+.sl-welt-comic .sl-bar .bk-btn { border: 2.5px solid var(--co-tusche); border-radius: 4px; box-shadow: 3px 3px 0 var(--co-tusche); font-weight: 700; }
+.sl-welt-comic .sl-seite .bk-btn:active:not(:disabled),
+.sl-start.sl-welt-comic .bk-btn:active:not(:disabled),
+.sl-welt-comic .sl-bar .bk-btn:active:not(:disabled) { box-shadow: none; transform: translate(3px, 3px); }
+.sl-welt-comic .sl-weiter-gesperrt { background: #fff; border-color: var(--co-tusche); border-radius: 4px; }
+
+/* Bilder als Panels */
+.sl-welt-comic .sl-foto { border: var(--co-rand) solid var(--co-tusche); box-shadow: var(--co-versatz) var(--co-versatz) 0 var(--co-tusche); background: #fff; }
+.sl-welt-comic .sl-foto figcaption { padding: 8px 12px; border-top: 2px solid var(--co-tusche); font: 700 15px/1.4 var(--font-body); }
+.sl-welt-comic .bk-graph svg text { font-family: var(--font-body); }
+.sl-welt-comic .sl-abschnitt-titel .katex,
+.sl-welt-comic .sl-titel .katex { font-size: 0.7em; letter-spacing: 0; }
+
+/* ══ F Siebdruck ═════════════════════════════════════════════════════════════════════════════════════════════
+   Ein gedrucktes Plakat aus zwei oder drei Druckfarben: ungestrichenes Papier mit Korn, große schmale Überschriften,
+   Bilder randlos, Auftrag als vollflächig bedruckte Fläche mit leichtem Passerversatz der zweiten Farbe, flächige Knöpfe.
+   Überschriften Bricolage Grotesque (schmal, fett), Fließtext Instrument Sans.
+   Unter-Varianten setzen die zweite Druckfarbe: zweifarbig (Leuchtpink), schwarz, dreifarbig (Gelb), linolschnitt (Schwarz, Papier). */
+.sl-welt-siebdruck {
+  --font-body: 'Instrument Sans', 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Bricolage Siebdruck', 'Instrument Sans', 'Arial Narrow', system-ui, sans-serif;
+  --sd-papier: #f1efe9;
+  --sd-tinte: #1d1d1f;
+  --sd-zweit: #ff4f98;
+  --sd-korn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .25 0 0 0 0 .22 0 0 0 0 .18 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23k)'/%3E%3C/svg%3E");
+  --grid: #e2dfd7;
+  font-family: var(--font-body);
+}
+.sl-welt-siebdruck.sl-variante-schwarz { --sd-zweit: #1d1d1f; }
+.sl-welt-siebdruck.sl-variante-dreifarbig { --sd-zweit: #ffcf2e; }
+.sl-welt-siebdruck.sl-variante-linolschnitt { --sd-zweit: #1a1714; --sd-papier: #f3ede1; }
+
+.sl-start.sl-welt-siebdruck,
+.sl-welt-siebdruck .sl-seite { background: var(--sd-korn), var(--sd-papier); border: 0; border-radius: 0; box-shadow: none; color: var(--sd-tinte); }
+.sl-welt-siebdruck .sl-seite { padding: 26px clamp(16px, 3.2vw, 44px) 34px; margin-top: 10px; }
+.sl-start.sl-welt-siebdruck { max-width: 900px; padding: 0 clamp(16px, 3.2vw, 40px) 30px; }
+.sl-start.sl-welt-siebdruck .sl-start-bild { width: calc(100% + 2 * clamp(16px, 3.2vw, 40px)); margin: 0 calc(-1 * clamp(16px, 3.2vw, 40px)) 6px; background: none; }
+
+.sl-welt-siebdruck .sl-titel,
+.sl-start.sl-welt-siebdruck h2,
+.sl-start.sl-welt-siebdruck.sl-thema h2 { font: 800 46px/0.98 var(--font-display); font-stretch: 75%; letter-spacing: -0.01em; color: var(--primary); }
+.sl-welt-siebdruck .sl-abschnitt-titel { font: 800 30px/1.05 var(--font-display); font-stretch: 75%; color: var(--sd-tinte); }
+.sl-welt-siebdruck .sl-abschnitt-titel i { font-size: 20px; color: var(--primary); }
+.sl-welt-siebdruck .sl-marke { font: 800 19px/1 var(--font-display); font-stretch: 75%; border-radius: 0; }
+.sl-welt-siebdruck .sl-marke i { border-radius: 0; }
+.sl-welt-siebdruck .sl-text,
+.sl-start.sl-welt-siebdruck .sl-start-ziel { font-size: 18px; line-height: 1.55; color: var(--sd-tinte); }
+.sl-welt-siebdruck .sl-phasen li { border-radius: 0; background: #fff; }
+
+/* Fokus = bedruckte Fläche, die zweite Farbe leicht versetzt dahinter */
+.sl-welt-siebdruck .sl-fokus { margin-top: 6px; padding: 16px 20px; background: var(--primary-soft); border-radius: 0; box-shadow: 6px -4px 0 color-mix(in srgb, var(--sd-zweit) 55%, transparent); }
+.sl-welt-siebdruck .sl-fokus-titel { font: 800 26px/1.05 var(--font-display); font-stretch: 75%; color: var(--primary); }
+.sl-start.sl-welt-siebdruck .sl-start-regel { background: var(--primary-soft); border-radius: 0; box-shadow: 6px -4px 0 color-mix(in srgb, var(--sd-zweit) 55%, transparent); }
+.sl-start.sl-welt-siebdruck .sl-start-check { background: #fff; border: 2px solid var(--sd-tinte); border-radius: 0; }
+
+/* Karten: weißes Papier, ohne Rundung, Schatten in der zweiten Farbe */
+.sl-welt-siebdruck .sl-seite .lp-ex.bk-panel,
+.sl-welt-siebdruck .sl-seite .lp-example,
+.sl-welt-siebdruck .sl-seite .bk-graph { background: #fff; border: 0; border-radius: 0; box-shadow: 4px 4px 0 color-mix(in srgb, var(--sd-zweit) 40%, transparent); }
+.sl-welt-siebdruck .sl-seite .lp-ex .bk-graph,
+.sl-welt-siebdruck .sl-seite .lp-example .bk-graph { box-shadow: none; }
+.sl-welt-siebdruck .sl-seite .bk-btn,
+.sl-start.sl-welt-siebdruck .bk-btn,
+.sl-welt-siebdruck .sl-bar .bk-btn { border-radius: 0; font-weight: 600; }
+.sl-welt-siebdruck .sl-seite input,
+.sl-welt-siebdruck .sl-seite select { border-radius: 0; }
+.sl-welt-siebdruck .sl-weiter-gesperrt { background: #fff; border-radius: 0; }
+
+/* Bilder randlos ohne Radius */
+.sl-welt-siebdruck .sl-foto { box-shadow: none; }
+.sl-welt-siebdruck .sl-foto figcaption { padding: 8px 0 0; font: 500 15px/1.4 var(--font-body); color: var(--sd-tinte); }
+.sl-welt-siebdruck .bk-graph svg text { font-family: var(--font-body); }
+.sl-welt-siebdruck .sl-abschnitt-titel .katex,
+.sl-welt-siebdruck .sl-titel .katex { font-size: 0.72em; }
+
+@media (max-width: 560px) {
+  .sl-welt-bauplan .sl-titel, .sl-start.sl-welt-bauplan h2, .sl-start.sl-welt-bauplan.sl-thema h2 { font-size: 30px; }
+  .sl-welt-comic .sl-titel, .sl-start.sl-welt-comic h2, .sl-start.sl-welt-comic.sl-thema h2 { font-size: 33px; }
+  .sl-welt-siebdruck .sl-titel, .sl-start.sl-welt-siebdruck h2, .sl-start.sl-welt-siebdruck.sl-thema h2 { font-size: 36px; }
+  .sl-welt-comic .sl-fokus { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sl-welt-comic .bk-btn:active { transform: none; }
 }

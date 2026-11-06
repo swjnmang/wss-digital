@@ -1,11 +1,14 @@
 import { useEffect, useId, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
+import { useSitzungState } from '../../../hooks/useSitzung'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, ErklaerungCtx, Hilfen, McCard, TrackedCheck, TrackedMc, tx } from '../lernsituation_kit/kit'
-import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
+import { CheckCard, ErklaerungCtx, Hilfen, Loesungsweg, McCard, TrackedCheck, TrackedMc, tx } from '../lernsituation_kit/kit'
+import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Bildwelt, type Seite, type Thema } from '../lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
 import KugelTreffer from './KugelTreffer'
-import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import { Kriterien, standardKriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import titelBild from './bilder/titel.webp'
+import karteikarteBild from './bilder/karteikarte.webp'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './lasershow.css'
 
@@ -22,7 +25,9 @@ import './lasershow.css'
 // Punkte nach Aufwand: Warm-up 2–4, Laserpult 3, Teil 1 und 2 je 12, Spickzettel 5, Übungen 4/5/6/8, Profi 8 (Pflicht zusammen 69:
 // Warm-up 14 = 20 %, Problem lösen 29 = 42 %, Übungen 23 = 33 %), Bonus-Spiel 4 Runden à 2 (höchstens 8 wie die beste Übung).
 // Identität: Themenfarbe Indigo (Nacht, Party), Symbol fa-compact-disc, Titelbild Partyraum mit Lasern und Spiegelkugel,
-// Leitobjekt das Laserpult mit der Spiegelkugel. Die Versuche bleiben nur im Seitenzustand (kein Speichern).
+// Leitobjekt das Laserpult mit der Spiegelkugel. Bildwelt Diorama / nacht: Titelbild und Spickzettel sind gerenderte WebP-Dateien aus
+// bilder-quelle/*.bild.html (node scripts/bilder-rendern.cjs src/pages/lineare_funktionen/schnittpunkt_einstieg); die Seitenansicht
+// des Partyraums mit Live-Rückmeldung bleibt Inline-SVG. Teil 1 und Teil 2 von „Problem lösen“ stehen auf eigenen Seiten.
 // Wird als Modus „Lernsituation“ auf der Seite „Schnittpunkt zweier Geraden“ angezeigt; der Infoteil (Erklärung mit
 // Erklärvideo) kommt von dort und steht im Rechenbeispiel zum Aufklappen.
 
@@ -60,39 +65,20 @@ const meter = (v: number) => `${fmt(v, 2).replace('-', '−')} m`
 
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
-/** Titelbild der Startbox: Partyraum in der Seitenansicht, zwei Bodenlaser kreuzen sich in der Spiegelkugel über der Tanzfläche */
-function Titelbild() {
-  return (
-    <svg viewBox="0 0 720 252" role="img" aria-label="Partyraum bei Nacht: Zwei Laser auf dem Boden strahlen schräg nach oben und kreuzen sich in einer Spiegelkugel, die an einem Seil von der Decke hängt. Links steht das DJ-Pult.">
-      <rect x="0" y="0" width="720" height="22" fill="var(--primary)" />
-      <rect x="0" y="212" width="720" height="40" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="212" y2="212" stroke="var(--ink)" strokeWidth="2" />
-      {/* Strahlen */}
-      <line x1="90" y1="206" x2="560" y2="22" stroke="var(--primary)" strokeWidth="6" strokeLinecap="round" />
-      <line x1="650" y1="206" x2="350" y2="22" stroke="var(--ink)" strokeWidth="4" strokeDasharray="14 8" strokeLinecap="round" />
-      {/* Bodenlaser */}
-      <rect x="70" y="190" width="40" height="22" rx="4" fill="var(--ink)" />
-      <rect x="630" y="190" width="40" height="22" rx="4" fill="var(--ink)" />
-      {/* Spiegelkugel am Seil im Kreuzungspunkt */}
-      <line x1="440" x2="440" y1="22" y2="98" stroke="var(--ink)" strokeWidth="2" />
-      <circle cx="440" cy="117" r="22" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
-      <path d="M418 117 h44 M440 95 v44 M424 102 q16 15 32 0 M424 132 q16 -15 32 0" fill="none" stroke="var(--ink)" strokeWidth="1.5" opacity="0.6" />
-      {/* DJ-Pult mit Plattenteller */}
-      <rect x="200" y="150" width="120" height="62" rx="6" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <ellipse cx="236" cy="150" rx="22" ry="6" fill="var(--ink)" />
-      <ellipse cx="286" cy="150" rx="22" ry="6" fill="var(--ink)" />
-      <text x="260" y="190" textAnchor="middle" fontSize="20" fontWeight="800" fill="var(--ink)">
-        DJ
-      </text>
-      {/* Lichtpunkte auf dem Boden */}
-      {[380, 470, 540].map((x) => (
-        <ellipse key={x} cx={x} cy="230" rx="16" ry="5" fill="var(--primary-soft)" />
-      ))}
-    </svg>
-  )
+const THEMA: Thema = {
+  name: 'Die Lasershow',
+  farbe: 'indigo',
+  icon: 'fa-compact-disc',
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Eine kleine Partybühne bei Nacht als schwebende Insel: Zwei Bodenlaser strahlen schräg nach oben und kreuzen sich in einer Spiegelkugel, die an einer Traverse hängt. Beschriftet: Strahl 1: y = 0,5x + 2, Strahl 2: y = −x + 4,4, Spiegelkugel genau hier: S(? | ?)."
+    />
+  ),
 }
-
-const THEMA: Thema = { name: 'Die Lasershow', farbe: 'indigo', icon: 'fa-compact-disc', bild: <Titelbild /> }
+const BILDWELT: Bildwelt = { welt: 'diorama', variante: 'nacht' }
 
 /* ── Leitobjekt: Seitenansicht des Partyraums mit Strahlen und Spiegelkugel ─ */
 
@@ -337,37 +323,6 @@ function Laserpult({ versuche, onEinstellen }: { versuche: Kugel[]; onEinstellen
 
 /* ── Phase 3: Bilder und Rechenbeispiele ─────────────────────────────────── */
 
-/** Handlungsprodukt: Karteikarte „Schnittpunkt berechnen“ mit Stift */
-function KarteikarteBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg viewBox="0 0 720 190" role="img" aria-label="Eine Karteikarte mit der Überschrift Schnittpunkt berechnen, darunter nummerierte Zeilen für die Schritte und eine kleine Skizze von zwei sich kreuzenden Geraden.">
-        <rect x="150" y="14" width="420" height="168" rx="8" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="150" y="14" width="420" height="40" rx="8" fill="var(--primary-soft)" />
-        <line x1="150" x2="570" y1="54" y2="54" stroke="var(--primary)" strokeWidth="2" />
-        <text x="172" y="42" fontSize="21" fontWeight="800" fill="var(--ink)">
-          Schnittpunkt berechnen
-        </text>
-        {[1, 2, 3, 4].map((n, i) => (
-          <g key={n}>
-            <text x="172" y={84 + i * 26} fontSize="17" fontWeight="700" fill="var(--primary)">
-              {n}.
-            </text>
-            <line x1="194" x2={i % 2 ? 380 : 420} y1={80 + i * 26} y2={80 + i * 26} stroke="var(--line-strong)" strokeWidth="2" />
-          </g>
-        ))}
-        <line x1="450" y1="166" x2="548" y2="76" stroke="var(--primary)" strokeWidth="3" />
-        <line x1="450" y1="86" x2="548" y2="160" stroke="var(--ink)" strokeWidth="2.5" strokeDasharray="8 4" />
-        <circle cx="498" cy="122" r="6" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        <g transform="rotate(-35 640 120)">
-          <rect x="590" y="110" width="110" height="18" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-          <polygon points="590,110 574,119 590,128" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        </g>
-      </svg>
-    </div>
-  )
-}
-
 const BSP1_AUFGABE = (
   <p>
     Im Schultheater leuchten zwei Scheinwerfer schräg über die Bühne. Scheinwerfer 1: <M>{'y = 0{,}5x + 1'}</M>, Scheinwerfer 2: <M>{'y = -2x + 6'}</M>. In welchem
@@ -463,7 +418,8 @@ const BSP2_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     title: 'Einsetzen und den Punkt angeben',
     body: (
       <>
-        <MB>{'x = 2{:}\\quad y = 2 + 2 = 4 \\qquad \\text{Probe: } y = -2 \\cdot 2 + 8 = 4 \\;\\checkmark'}</MB>
+        <MB>{'x = 2{:}\\quad y = 2 + 2 = 4'}</MB>
+        <MB>{'\\text{Probe: } y = -2 \\cdot 2 + 8 = 4 \\;\\checkmark'}</MB>
         <p>
           Die Strahlen kreuzen sich in <M>{'S(2 \\mid 4)'}</M>.
         </p>
@@ -472,31 +428,35 @@ const BSP2_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
   },
 ]
 
-/** Lösungsweg Teil 1 (für beide Wege: selbst rechnen und Lösungsschema) */
+/** Lösungsweg Teil 1 */
 const LOESUNG1 = (
-  <>
-    <MB>
-      {
-        '\\begin{aligned} 0{,}5x + 2 &= -x + 4{,}4 && \\mid +x \\\\ 1{,}5x + 2 &= 4{,}4 && \\mid -2 \\\\ 1{,}5x &= 2{,}4 && \\mid :1{,}5 \\\\ x_S &= 1{,}6 \\end{aligned}'
-      }
-    </MB>
-    <MB>{'x = 1{,}6{:}\\quad y = 0{,}5 \\cdot 1{,}6 + 2 = 2{,}8 \\qquad \\text{Probe: } y = -1{,}6 + 4{,}4 = 2{,}8 \\;\\checkmark'}</MB>
-    <p>
-      Die Kugel muss bei <M>{'S(1{,}6 \\mid 2{,}8)'}</M> hängen: 1,6 m rechts der Bühnenmitte in 2,8 m Höhe.
-    </p>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'Die Terme gleichsetzen', tex: '0{,}5x + 2 = -x + 4{,}4' },
+      { titel: <>Alle <M>x</M> auf eine Seite bringen</>, tex: ['0{,}5x + 2 = -x + 4{,}4 \\quad \\mid +x', '1{,}5x + 2 = 4{,}4'] },
+      { titel: 'Die Zahl auf die andere Seite bringen', tex: ['1{,}5x + 2 = 4{,}4 \\quad \\mid -2', '1{,}5x = 2{,}4'] },
+      { titel: <>Durch die Zahl vor <M>x</M> teilen</>, tex: ['1{,}5x = 2{,}4 \\quad \\mid :1{,}5', 'x_S = 1{,}6'] },
+      { titel: <><M>{'x_S'}</M> in Strahl 1 einsetzen</>, tex: 'y = 0{,}5 \\cdot 1{,}6 + 2 = 2{,}8' },
+      { titel: 'Probe mit Strahl 2', tex: 'y = -1{,}6 + 4{,}4 = 2{,}8 \\;\\checkmark' },
+      { titel: 'Den Punkt angeben', tex: 'S(1{,}6 \\mid 2{,}8)', text: 'Die Kugel muss 1,6 m rechts der Bühnenmitte in 2,8 m Höhe hängen.' },
+    ]}
+  />
 )
 
 /** Lösungsweg Teil 2 */
 const LOESUNG2 = (
-  <>
-    <MB>{'m = \\frac{4 - 0}{1 - 5} = \\frac{4}{-4} = -1 \\qquad 0 = -1 \\cdot 5 + t \\;\\Rightarrow\\; t = 5 \\qquad \\text{Strahl 3: } y = -x + 5'}</MB>
-    <MB>{'\\begin{aligned} 0{,}5x + 2 &= -x + 5 && \\mid +x \\\\ 1{,}5x + 2 &= 5 && \\mid -2 \\\\ 1{,}5x &= 3 && \\mid :1{,}5 \\\\ x_S &= 2 \\end{aligned}'}</MB>
-    <MB>{'x = 2{:}\\quad y = 0{,}5 \\cdot 2 + 2 = 3 \\qquad \\text{Probe: } y = -2 + 5 = 3 \\;\\checkmark'}</MB>
-    <p>
-      Für die zweite Show hängt die Kugel bei <M>{'S(2 \\mid 3)'}</M>.
-    </p>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: <>Steigung von Strahl 3 aus <M>R</M> und <M>D</M></>, tex: 'm = \\dfrac{4 - 0}{1 - 5} = \\dfrac{4}{-4} = -1' },
+      { titel: <><M>{'R(5 \\mid 0)'}</M> einsetzen und <M>t</M> berechnen</>, tex: ['0 = -1 \\cdot 5 + t \\quad \\mid +5', 't = 5'] },
+      { titel: 'Gleichung von Strahl 3', tex: 'y = -x + 5' },
+      { titel: 'Die Terme gleichsetzen', tex: '0{,}5x + 2 = -x + 5' },
+      { titel: 'Nach x auflösen', tex: ['0{,}5x + 2 = -x + 5 \\quad \\mid +x', '1{,}5x + 2 = 5 \\quad \\mid -2', '1{,}5x = 3 \\quad \\mid :1{,}5', 'x_S = 2'] },
+      { titel: <><M>{'x_S'}</M> in Strahl 1 einsetzen</>, tex: 'y = 0{,}5 \\cdot 2 + 2 = 3' },
+      { titel: 'Probe mit Strahl 3', tex: 'y = -2 + 5 = 3 \\;\\checkmark' },
+      { titel: 'Den Punkt angeben', tex: 'S(2 \\mid 3)', text: 'Für die zweite Show hängt die Kugel 2 m rechts der Bühnenmitte in 3 m Höhe.' },
+    ]}
+  />
 )
 
 /* ── Phase 4: Wer hat recht? ─────────────────────────────────────────────── */
@@ -513,9 +473,9 @@ function Plan({ name, tex }: { name: string; tex: string }) {
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erklaerung: ReactNode; onBack: () => void; onPractice: () => void }) {
-  const [versuche, setVersuche] = useState<Kugel[]>([])
-  const [geloest, setGeloest] = useState(false)
-  const [uebungen, setUebungen] = useState<string[]>([])
+  const [versuche, setVersuche] = useSitzungState<Kugel[]>('lz-versuche', [])
+  const [geloest, setGeloest] = useSitzungState('lz-geloest', false)
+  const [uebungen, setUebungen] = useSitzungState<string[]>('lz-uebungen', [])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
     fertig()
@@ -555,7 +515,14 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               { kind: 'num', key: 'k1', label: 'Zahl vor x in der ersten Zeile', expected: 1.5 },
               { kind: 'num', key: 'k2', label: 'Zahl vor x in der zweiten Zeile', expected: 1.5 },
             ]}
-            solution={<MB>{'0{,}5x + 1x = 1{,}5x \\qquad 2x - 0{,}5x = 1{,}5x'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erste Zeile: Zahlen vor x addieren', tex: '0{,}5x + 1x = 1{,}5x' },
+                  { titel: 'Zweite Zeile: Zahlen vor x subtrahieren', tex: '2x - 0{,}5x = 1{,}5x' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('c')}
@@ -568,7 +535,14 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             }
             lead={<M>{'1{,}5x + 2 = 5 \\qquad \\Rightarrow'}</M>}
             fields={[{ kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 2 }]}
-            solution={<MB>{'\\begin{aligned} 1{,}5x + 2 &= 5 && \\mid -2 \\\\ 1{,}5x &= 3 && \\mid :1{,}5 \\\\ x &= 2 \\end{aligned}'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Die Zahl ohne x wegbringen', tex: ['1{,}5x + 2 = 5 \\quad \\mid -2', '1{,}5x = 3'] },
+                  { titel: <>Durch die Zahl vor <M>x</M> teilen</>, tex: ['1{,}5x = 3 \\quad \\mid :1{,}5', 'x = 2'] },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -588,7 +562,14 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             prompt={<p>Löse die Gleichung nach <M>x</M> auf. Achte beim Teilen auf das Vorzeichen.</p>}
             lead={<M>{'-2x + 7 = 1 \\qquad \\Rightarrow'}</M>}
             fields={[{ kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 3 }]}
-            solution={<MB>{'\\begin{aligned} -2x + 7 &= 1 && \\mid -7 \\\\ -2x &= -6 && \\mid :(-2) \\\\ x &= 3 \\end{aligned}'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Die Zahl ohne x wegbringen', tex: ['-2x + 7 = 1 \\quad \\mid -7', '-2x = -6'] },
+                  { titel: <>Durch <M>{'-2'}</M> teilen</>, tex: ['-2x = -6 \\quad \\mid :(-2)', 'x = 3'] },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -616,12 +597,13 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               { kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 2 },
             ]}
             solution={
-              <>
-                <MB>{'m = \\frac{2 - 0}{0 - (-4)} = \\frac{2}{4} = 0{,}5'}</MB>
-                <p>
-                  <M>{'Q(0 \\mid 2)'}</M> liegt auf der y-Achse, also ist <M>{'t = 2'}</M>. Der Strahl hat die Gleichung <M>{'y = 0{,}5x + 2'}</M>.
-                </p>
-              </>
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Steigung aus zwei Punkten', tex: 'm = \\dfrac{2 - 0}{0 - (-4)} = \\dfrac{2}{4} = 0{,}5' },
+                  { titel: <><M>t</M> ablesen</>, text: <><M>{'Q(0 \\mid 2)'}</M> liegt auf der y-Achse.</>, tex: 't = 2' },
+                  { titel: 'Gleichung angeben', tex: 'y = 0{,}5x + 2' },
+                ]}
+              />
             }
             help={
               <Hilfen
@@ -671,16 +653,16 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
     },
     {
       art: 'loesen',
-      titel: 'Die Position der Spiegelkugel berechnen',
-      pflicht: ['teil1', 'teil2', 'produkt'],
+      titel: 'Teil 1: Die Position der Spiegelkugel berechnen',
+      bedingung: 'Berechne die Position der Spiegelkugel richtig, dann geht es zu Teil 2.',
       inhalt: (fertig) => {
         const teil1Melden = () => {
-          fertig.teil('teil1')()
+          fertig()
           setGeloest(true)
         }
         return (
           <>
-            <p className="sl-hinweis">Einzelarbeit, Teil 2 auch in Partnerarbeit, ca. 45 Minuten.</p>
+            <p className="sl-hinweis">Einzelarbeit, ca. 25 Minuten.</p>
             <div className="sl-fokus">
               <p className="sl-fokus-titel">Deine Aufgabe: Berechne, wo sich die beiden Strahlen kreuzen</p>
               <p>
@@ -692,7 +674,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
             <BeispielMitVideo video={VIDEO_SCHNITTPUNKT} videoTitel="Lernvideo: Schnittpunkt zweier Geraden berechnen">
               <Beispiel offen title="Wo kreuzen sich die Scheinwerfer im Schultheater?" aufgabe={BSP1_AUFGABE} steps={BSP1_SCHRITTE} />
             </BeispielMitVideo>
-            <Abschnitt titel="Teil 1: Vergleiche deine Ergebnisse">
+            <Abschnitt titel="Vergleiche deine Ergebnisse">
               <CheckCard
                 onSolved={teil1Melden}
                 punkte={12}
@@ -720,53 +702,72 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 }
               />
             </Abschnitt>
-            <Abschnitt titel="Teil 2: Die zweite Show">
-              <div className="sl-fokus">
-                <p className="sl-fokus-titel">Deine Aufgabe: Wo hängt die Kugel bei der zweiten Show?</p>
-                <p>
-                  Für die zweite Show wird Strahl 2 durch einen neuen Strahl 3 ersetzt: Der Bodenlaser steht bei <M>{'R(5 \\mid 0)'}</M> und zielt auf den Deckenspiegel{' '}
-                  <M>{'D(1 \\mid 4)'}</M>. Strahl 1 bleibt. Stelle zuerst die Gleichung von Strahl 3 auf und berechne dann den Schnittpunkt mit Strahl 1.
-                </p>
-              </div>
-              <RaumBild
-                strahlen={['s1', 's3']}
-                punkte={[
-                  { x: 5, y: 0, text: 'R(5 | 0)', rechts: false },
-                  { x: 1, y: 4, text: 'D(1 | 4)', rechts: true },
-                ]}
-                label="Seitenansicht mit Strahl 1 und dem neuen Strahl 3 vom Bodenlaser R(5 | 0) zum Deckenspiegel D(1 | 4)."
-              />
-              <BeispielMitVideo>
-                <Beispiel offen title="Erst die Gleichung, dann der Schnittpunkt" aufgabe={BSP2_AUFGABE} steps={BSP2_SCHRITTE} />
-              </BeispielMitVideo>
-              <CheckCard
-                onSolved={fertig.teil('teil2')}
-                punkte={12}
-                title="Zweite Show"
-                prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
-                fields={[
-                  { kind: 'num', key: 'x', label: <>Wie weit rechts der Bühnenmitte hängt die Kugel bei der zweiten Show? <M>{'x_S ='}</M></>, expected: 2, unit: 'm' },
-                  { kind: 'num', key: 'y', label: <>In welcher Höhe hängt sie? <M>{'y_S ='}</M></>, expected: 3, unit: 'm' },
-                ]}
-                loesungNachFehler
-                solution={LOESUNG2}
-                help={
-                  <Hilfen
-                    steps={[
-                      <>Wie im Rechenbeispiel: Zuerst brauchst du die Gleichung von Strahl 3, erst dann kannst du gleichsetzen.</>,
-                      <>
-                        Steigung aus <M>R</M> und <M>D</M>, dann <M>R</M> in <M>{'y = mx + t'}</M> einsetzen. Danach wie in Teil 1 gleichsetzen.
-                      </>,
-                      <>
-                        <M>{'m = \\frac{4 - 0}{1 - 5}'}</M>. Mit <M>{'R(5 \\mid 0)'}</M>: <M>{'0 = m \\cdot 5 + t'}</M>. Dann <M>{'0{,}5x + 2 = mx + t'}</M>.
-                      </>,
-                    ]}
-                  />
-                }
-              />
+          </>
+        )
+      },
+    },
+    {
+      art: 'loesen',
+      titel: 'Teil 2: Die zweite Show',
+      pflicht: ['teil2', 'produkt'],
+      inhalt: (fertig) => {
+        return (
+          <>
+            <p className="sl-hinweis">Einzel- oder Partnerarbeit, ca. 20 Minuten.</p>
+            <div className="sl-fokus">
+              <p className="sl-fokus-titel">Deine Aufgabe: Wo hängt die Kugel bei der zweiten Show?</p>
+              <p>
+                Für die zweite Show wird Strahl 2 durch einen neuen Strahl 3 ersetzt: Der Bodenlaser steht bei <M>{'R(5 \\mid 0)'}</M> und zielt auf den Deckenspiegel{' '}
+                <M>{'D(1 \\mid 4)'}</M>. Strahl 1 bleibt. Stelle zuerst die Gleichung von Strahl 3 auf und berechne dann den Schnittpunkt mit Strahl 1.
+              </p>
+            </div>
+            <RaumBild
+              strahlen={['s1', 's3']}
+              punkte={[
+                { x: 5, y: 0, text: 'R(5 | 0)', rechts: false },
+                { x: 1, y: 4, text: 'D(1 | 4)', rechts: true },
+              ]}
+              label="Seitenansicht mit Strahl 1 und dem neuen Strahl 3 vom Bodenlaser R(5 | 0) zum Deckenspiegel D(1 | 4)."
+            />
+            <BeispielMitVideo>
+              <Beispiel offen title="Erst die Gleichung, dann der Schnittpunkt" aufgabe={BSP2_AUFGABE} steps={BSP2_SCHRITTE} />
+            </BeispielMitVideo>
+            <Abschnitt titel="Vergleiche deine Ergebnisse">
+            <CheckCard
+              onSolved={fertig.teil('teil2')}
+              punkte={12}
+              title="Zweite Show"
+              prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
+              fields={[
+                { kind: 'num', key: 'x', label: <>Wie weit rechts der Bühnenmitte hängt die Kugel bei der zweiten Show? <M>{'x_S ='}</M></>, expected: 2, unit: 'm' },
+                { kind: 'num', key: 'y', label: <>In welcher Höhe hängt sie? <M>{'y_S ='}</M></>, expected: 3, unit: 'm' },
+              ]}
+              loesungNachFehler
+              solution={LOESUNG2}
+              help={
+                <Hilfen
+                  steps={[
+                    <>Wie im Rechenbeispiel: Zuerst brauchst du die Gleichung von Strahl 3, erst dann kannst du gleichsetzen.</>,
+                    <>
+                      Steigung aus <M>R</M> und <M>D</M>, dann <M>R</M> in <M>{'y = mx + t'}</M> einsetzen. Danach wie in Teil 1 gleichsetzen.
+                    </>,
+                    <>
+                      <M>{'m = \\frac{4 - 0}{1 - 5}'}</M>. Mit <M>{'R(5 \\mid 0)'}</M>: <M>{'0 = m \\cdot 5 + t'}</M>. Dann <M>{'0{,}5x + 2 = mx + t'}</M>.
+                    </>,
+                  ]}
+                />
+              }
+            />
             </Abschnitt>
             <Handlungsprodukt titel="Spickzettel „Schnittpunkt berechnen“">
-              <KarteikarteBild />
+              <figure className="sl-foto sl-foto-klein">
+                <img
+                  src={karteikarteBild}
+                  width={800}
+                  height={400}
+                  alt="Eine Karteikarte mit der Überschrift Schnittpunkt berechnen und vier nummerierten Schritten: Terme gleichsetzen, x auf eine Seite, x einsetzen und Probe, S angeben. Daneben zwei sich kreuzende Geraden mit markiertem Schnittpunkt."
+                />
+              </figure>
               <p className="sl-text">
                 Gestalte in deinem Heft oder auf einer Karteikarte einen Spickzettel „Schnittpunkt berechnen“. Schreibe die Schritte auf und rechne darauf die Position der
                 Spiegelkugel aus Teil 1 als Beispiel vor. Mit ihm kannst du später jede Schnittpunkt-Aufgabe lösen.
@@ -784,20 +785,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               </Aufklappbar>
             </Handlungsprodukt>
             <Abschnitt titel="Ist dein Spickzettel vollständig?">
-              <Kriterien
-                onAlle={fertig.teil('produkt')}
-                items={[
-                  'Ein Satz, warum man die Terme gleichsetzt (im Schnittpunkt sind die y-Werte gleich)',
-                  'Alle Schritte in der richtigen Reihenfolge, mit den Umformungen wie „| +x“ und „| −2“',
-                  'Die Rechnung für die Spiegelkugel mit Probe und dem Schnittpunkt S',
-                  'Eine Warnung vor einem typischen Fehler, z. B. Vorzeichen oder nur x angeben',
-                  <>
-                    Auf deinem Spickzettel steht, wofür die Abkürzungen stehen: <M>S</M> (Schnittpunkt), <M>{'x_S'}</M> und <M>{'y_S'}</M> (seine Koordinaten),{' '}
-                    <M>m</M> (Steigung) und <M>t</M> (y-Achsenabschnitt). Außerdem erklärst du die Begriffe „Terme gleichsetzen“ und „Probe“ und alle anderen Wörter, die
-                    für dich neu waren.
-                  </>,
-                ]}
-              />
+              <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien()}               />
             </Abschnitt>
             {geloest && (
               <Abschnitt titel="Das hältst du fest">
@@ -910,10 +898,15 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 { kind: 'num', key: 'y', label: <M>{'y_S ='}</M>, expected: 2.2 },
               ]}
               solution={
-                <>
-                  <MB>{'\\begin{aligned} -0{,}4x + 3{,}2 &= 0{,}6x + 0{,}7 && \\mid +0{,}4x \\\\ 3{,}2 &= x + 0{,}7 && \\mid -0{,}7 \\\\ x_S &= 2{,}5 \\end{aligned}'}</MB>
-                  <MB>{'x = 2{,}5{:}\\quad y = -0{,}4 \\cdot 2{,}5 + 3{,}2 = 2{,}2 \\qquad S(2{,}5 \\mid 2{,}2)'}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Die Terme gleichsetzen', tex: '-0{,}4x + 3{,}2 = 0{,}6x + 0{,}7' },
+                    { titel: <>Alle <M>x</M> nach rechts bringen</>, tex: ['-0{,}4x + 3{,}2 = 0{,}6x + 0{,}7 \\quad \\mid +0{,}4x', '3{,}2 = x + 0{,}7'] },
+                    { titel: 'Die Zahl auf die andere Seite bringen', tex: ['3{,}2 = x + 0{,}7 \\quad \\mid -0{,}7', 'x_S = 2{,}5'] },
+                    { titel: <><M>{'x_S'}</M> einsetzen</>, tex: 'y = -0{,}4 \\cdot 2{,}5 + 3{,}2 = 2{,}2' },
+                    { titel: 'Den Punkt angeben', tex: 'S(2{,}5 \\mid 2{,}2)' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -949,12 +942,13 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
                 { kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 2 },
               ]}
               solution={
-                <>
-                  <MB>{'m = \\frac{2 - 0}{0 - 4} = -0{,}5 \\qquad t = 2 \\;\\; (S \\text{ liegt auf der y-Achse})'}</MB>
-                  <p>
-                    Der Strahl braucht die Gleichung <M>{'y = -0{,}5x + 2'}</M>. Er geht durch den Laser und durch <M>{'S(0 \\mid 2)'}</M>.
-                  </p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: <>Steigung aus Laser <M>{'(4 \\mid 0)'}</M> und Kugel <M>{'S(0 \\mid 2)'}</M></>, tex: 'm = \\dfrac{2 - 0}{0 - 4} = -0{,}5' },
+                    { titel: <><M>t</M> ablesen</>, text: <><M>S</M> liegt auf der y-Achse.</>, tex: 't = 2' },
+                    { titel: 'Gleichung angeben', tex: 'y = -0{,}5x + 2' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -1032,6 +1026,7 @@ export default function LaserEinstieg({ erklaerung, onBack, onPractice }: { erkl
               Du baust als Azubi in der Veranstaltungstechnik eine Lasershow auf. Du lernst, wie du den Schnittpunkt zweier Geraden berechnest, indem du die Terme gleichsetzt.
             </>
           }
+          bildwelt={BILDWELT}
           seiten={seiten}
         />
       </TaskShell>
