@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TaskShell from '../../../../components/layout/TaskShell'
+import { useSitzungState } from '../../../../hooks/useSitzung'
 import { Beispiel, M, MB, Merke, fmt } from '../../lernpfad/kit'
-import { CheckCard, Hilfen, McCard } from '../../../lineare_funktionen/lernsituation_kit/kit'
+import { CheckCard, Hilfen, Loesungsweg, McCard } from '../../../lineare_funktionen/lernsituation_kit/kit'
 import {
   Abschnitt,
   Aufklappbar,
@@ -10,14 +11,17 @@ import {
   BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../../lineare_funktionen/lernsituation_kit/seiten'
 import { Bilanz } from '../../../lineare_funktionen/lernsituation_kit/punkte'
-import { Kriterien, Vermutung, Zitat, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit'
+import { Kriterien, Vermutung, Zitat, standardKriterien, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit'
+import titelBild from './bilder/gluecksrad-titel.webp'
+import aushangBild from './bilder/gluecksrad-aushang.webp'
 import { metaFor } from '../meta'
 import '../../lernpfad/lernpfad.css'
-import { AushangBild, Gluecksrad, Titelbild } from './GluecksradBilder'
+import { Gluecksrad } from './GluecksradBilder'
 import GluecksradLabor, { type Zaehlung } from './GluecksradLabor'
 import GluecksradSpiel from './GluecksradSpiel'
 import './gluecksrad.css'
@@ -34,7 +38,20 @@ import './gluecksrad.css'
 // Lernvideo: keines zu diesem Lernschritt bei den Übungsaufgaben verlinkt (offener Punkt), deshalb nur die Beispielrechnung.
 
 const META = metaFor('zufallsexperimente')
-const THEMA: Thema = { ...META.thema, bild: <Titelbild /> }
+// Bildwelt Diorama / Holzspielzeug: Titelbild und Aushang sind gerenderte WebP-Dateien aus bilder-quelle/gluecksrad-*.bild.html
+// (Bausteine in bilder-quelle/_holz.js); das Glücksrad zum Drehen bleibt live.
+const THEMA: Thema = {
+  ...META.thema,
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Der Stand der SMV als Holzspielzeug: ein Tresen mit gestreifter Markise, Bauklötze mit S, M und V und ein großes Glücksrad mit 12 Feldern (ein goldenes Feld mit Stern, drei blaue Felder mit Punkt, acht helle Felder). Daneben ein Schild: Bei uns gewinnt jeder Vierte!"
+    />
+  ),
+}
+const BILDWELT: Bildwelt = { welt: 'diorama', variante: 'holzspielzeug' }
 
 type Wahl = 'weniger' | 'vier' | 'mehr'
 const WAHL: Record<Wahl, string> = {
@@ -96,24 +113,25 @@ const BSP_SCHRITTE: { title: string; body: ReactNode }[] = [
 ]
 
 const LOESUNG = (
-  <>
-    <MB>{'|\\Omega| = 12'}</MB>
-    <MB>{'P(\\text{Hauptgewinn}) = \\frac{1}{12} \\approx 8{,}3\\,\\%'}</MB>
-    <MB>{'P(\\text{Gewinn}) = \\frac{1 + 3}{12} = \\frac{4}{12} = \\frac{1}{3} \\approx 33{,}3\\,\\%'}</MB>
-    <MB>{'P(\\text{Niete}) = 1 - P(\\text{Gewinn}) = 1 - \\frac{1}{3} = \\frac{2}{3} \\approx 66{,}7\\,\\%'}</MB>
-    <p>Es gewinnt also jeder Dritte, nicht jeder Vierte.</p>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'Alle Ergebnisse (12 gleich große Felder)', tex: '|\\Omega| = 12' },
+      { titel: 'Hauptgewinn', tex: 'P(\\text{Hauptgewinn}) = \\dfrac{1}{12} \\approx 8{,}3\\,\\%' },
+      { titel: 'Gewinn (Hauptgewinn oder Trostpreis)', tex: 'P(\\text{Gewinn}) = \\dfrac{1 + 3}{12} = \\dfrac{1}{3} \\approx 33{,}3\\,\\%' },
+      { titel: 'Niete als Gegenereignis', tex: 'P(\\text{Niete}) = 1 - \\dfrac{1}{3} = \\dfrac{2}{3} \\approx 66{,}7\\,\\%', text: 'Es gewinnt also jeder Dritte, nicht jeder Vierte.' },
+    ]}
+  />
 )
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function GluecksradEinstieg() {
   const navigate = useNavigate()
-  const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 25, fest: false })
-  const [labor, setLabor] = useState<Zaehlung>({ n: 0, gewinne: 0 })
-  const [genug, setGenug] = useState(false)
-  const [geloest, setGeloest] = useState(false)
-  const [uebungen, setUebungen] = useState<string[]>([])
+  const [fest, setFest] = useSitzungState<Festlegung<Wahl>>('gr-fest', { wahl: null, wert: 25, fest: false })
+  const [labor, setLabor] = useSitzungState<Zaehlung>('gr-labor', { n: 0, gewinne: 0 })
+  const [genug, setGenug] = useSitzungState('gr-genug', false)
+  const [geloest, setGeloest] = useSitzungState('gr-geloest', false)
+  const [uebungen, setUebungen] = useSitzungState<string[]>('gr-uebungen', [])
   const uebung = (key: string, fertig: (key: string) => () => void) => () => {
     fertig(key)()
     setUebungen((u) => (u.includes(key) ? u : [...u, key]))
@@ -137,7 +155,14 @@ export default function GluecksradEinstieg() {
               { kind: 'num', key: 'a1', label: <M>{'\\frac{3}{4} ='}</M>, expected: 0.75, tol: 0.0005 },
               { kind: 'num', key: 'a2', label: <M>{'\\frac{1}{8} ='}</M>, expected: 0.125, tol: 0.0005 },
             ]}
-            solution={<MB>{'\\frac{3}{4} = 3 : 4 = 0{,}75 \\qquad \\frac{1}{8} = 1 : 8 = 0{,}125'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erster Bruch', tex: '\\dfrac{3}{4} = 3 : 4 = 0{,}75' },
+                  { titel: 'Zweiter Bruch', tex: '\\dfrac{1}{8} = 1 : 8 = 0{,}125' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('b')}
@@ -149,7 +174,14 @@ export default function GluecksradEinstieg() {
               { kind: 'num', key: 'b1', label: <M>{'35\\,\\% ='}</M>, expected: 0.35, tol: 0.0005 },
               { kind: 'num', key: 'b2', label: <M>{'12{,}5\\,\\% ='}</M>, expected: 0.125, tol: 0.0005 },
             ]}
-            solution={<MB>{'35\\,\\% = \\frac{35}{100} = 0{,}35 \\qquad 12{,}5\\,\\% = \\frac{12{,}5}{100} = 0{,}125'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: '35 %', tex: '35\\,\\% = \\dfrac{35}{100} = 0{,}35' },
+                  { titel: '12,5 %', tex: '12{,}5\\,\\% = \\dfrac{12{,}5}{100} = 0{,}125' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('c')}
@@ -179,7 +211,14 @@ export default function GluecksradEinstieg() {
               { kind: 'num', key: 'd1', label: <M>{'1 - 0{,}35 ='}</M>, expected: 0.65, tol: 0.0005 },
               { kind: 'num', key: 'd2', label: <M>{'1 - \\frac{3}{8} ='}</M>, expected: 0.625, tol: 0.0005 },
             ]}
-            solution={<MB>{'1 - 0{,}35 = 0{,}65 \\qquad 1 - \\frac{3}{8} = \\frac{8}{8} - \\frac{3}{8} = \\frac{5}{8} = 0{,}625'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erste Rechnung', tex: '1 - 0{,}35 = 0{,}65' },
+                  { titel: 'Zweite Rechnung', tex: '1 - \\dfrac{3}{8} = \\dfrac{5}{8} = 0{,}625' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -373,7 +412,14 @@ export default function GluecksradEinstieg() {
             />
           </Abschnitt>
           <Handlungsprodukt titel="Aushang „Unser faires Glücksrad“">
-            <AushangBild />
+            <figure className="sl-foto sl-foto-klein">
+              <img
+                src={aushangBild}
+                width={800}
+                height={400}
+                alt="Eine Holztafel mit dem Aushang Unser faires Glücksrad: links ein kleines Rad mit 12 Feldern, rechts P(Hauptgewinn) = …, P(Gewinn) = …, P(Niete) = … und Jeder … gewinnt!"
+              />
+            </figure>
             <p className="sl-text">
               Gestalte in deinem Heft einen Aushang für den Stand der SMV. Zeichne das Rad mit seinen 12 Feldern, schreibe die
               Wahrscheinlichkeiten als Bruch und in Prozent auf und verbessere den Werbespruch.
@@ -384,26 +430,11 @@ export default function GluecksradEinstieg() {
                 <li>„Die Wahrscheinlichkeit für den Hauptgewinn ist …“</li>
                 <li>„Gewonnen hat, wer … oder … dreht. Das sind … von … Feldern.“</li>
                 <li>„Das Gegenereignis von „Gewinn“ ist „Niete“, denn …“</li>
-                <li>
-                  „Abkürzungen: <M>{'\\Omega'}</M> = …, <M>E</M> = …, <M>{'P(E)'}</M> = …, <M>{'\\overline{E}'}</M> = …“
-                </li>
               </ul>
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist dein Aushang vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                'Das Rad ist mit 12 gleich großen Feldern gezeichnet und die Felder sind beschriftet',
-                'P(Hauptgewinn), P(Trostpreis), P(Gewinn) und P(Niete) stehen als Bruch und in Prozent da',
-                'Der Werbespruch ist mit einer Rechnung richtiggestellt („Jeder Dritte gewinnt“)',
-                <>
-                  Unter deinem Aushang steht, was <M>{'\\Omega'}</M> (Ergebnismenge, alle möglichen Ergebnisse), <M>E</M> (Ereignis),{' '}
-                  <M>{'P(E)'}</M> (Wahrscheinlichkeit von E) und <M>{'\\overline{E}'}</M> (Gegenereignis) bedeuten. Außerdem erklärst du den
-                  Begriff Laplace-Experiment und alle anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an die SMV')} />
           </Abschnitt>
           {geloest && (
             <Abschnitt titel="Das hältst du fest">
@@ -431,11 +462,12 @@ export default function GluecksradEinstieg() {
     {
       art: 'sichern',
       titel: 'Übungsaufgaben',
+      pflicht: ['1', '2', '3'],
       inhalt: (fertig) => (
         <>
           <p className="sl-text">
-            Prüfe und vertiefe dein Wissen mit vier Aufgaben. Die letzte ist für Profis. Hast du Übung 1 bis 3 gelöst, wird unten ein Spiel
-            freigeschaltet.
+            Prüfe und vertiefe dein Wissen mit drei Aufgaben, die vierte ist für Profis. Wenn du die drei Pflichtaufgaben gelöst hast, wartet unten ein
+            Spiel auf dich. Einzelarbeit, ca. 20 Minuten.
           </p>
           <Abschnitt titel="Übung 1: Der Würfel">
             <McCard
@@ -495,10 +527,14 @@ export default function GluecksradEinstieg() {
               ]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'P(\\text{Gewinn}) = \\frac{g}{20} = 0{,}3 \\quad \\mid \\cdot 20 \\qquad g = 6'}</MB>
-                  <p>Die übrigen Felder sind Nieten: 20 − 6 = 14.</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Laplace-Formel ansetzen', tex: '\\dfrac{g}{20} = 0{,}3' },
+                    { titel: 'Mit 20 multiplizieren', tex: 'g = 0{,}3 \\cdot 20 = 6' },
+                    { titel: 'Nieten', tex: '20 - 6 = 14' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -535,10 +571,14 @@ export default function GluecksradEinstieg() {
               ]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'\\text{Hauptgewinn: } 0{,}05 \\cdot 20 = 1 \\qquad \\text{Niete: } 0{,}65 \\cdot 20 = 13'}</MB>
-                  <p>Trostpreise: 20 − 1 − 13 = 6 Felder, das sind 30 %.</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Hauptgewinn', tex: '0{,}05 \\cdot 20 = 1' },
+                    { titel: 'Nieten', tex: '0{,}65 \\cdot 20 = 13' },
+                    { titel: 'Trostpreise', tex: '20 - 1 - 13 = 6', text: 'Das sind 30 % der Felder.' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -587,6 +627,7 @@ export default function GluecksradEinstieg() {
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             In dieser Lernsituation prüfst du das Glücksrad der SMV am Schulfest. Du lernst, wie du die Wahrscheinlichkeit eines Ereignisses
