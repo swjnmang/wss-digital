@@ -12,6 +12,3 @@
 .rd-plan tfoot td, .rd-plan tfoot th { font-weight: 800; background: var(--surface-sunken); }
 
 /* Tilgungsplan zum Ausfüllen */
-.rd-plan-eingabe th { white-space: normal; min-width: 64px; }
-.rd-plan-eingabe td { padding: 4px 6px; }
-.rd-feld { width: 116px; min-height: 44px; font-size: 17px; padding: 4px 8px; text-align: right; }

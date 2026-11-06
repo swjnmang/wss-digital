@@ -1,0 +1,58 @@
+<!doctype html>
+<!-- Der neue Backofen, Titelbild. Bildwelt Reportage / Abendlicht: die Bäckerei Sommer am frühen Abend, vor der Tür steht der neue Etagenofen auf einer Palette.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/finanzmathe/ratendarlehen_einstieg -->
+<html><head><meta charset="utf-8"><style>body{margin:0}</style></head><body>
+<svg id="bild" xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+ <defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304f"/><stop offset=".5" stop-color="#8a5068"/><stop offset=".85" stop-color="#e8955a"/><stop offset="1" stop-color="#f7c784"/></linearGradient>
+  <linearGradient id="wand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c79a7b"/><stop offset="1" stop-color="#7c5544"/></linearGradient>
+  <linearGradient id="boden" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b5a55"/><stop offset="1" stop-color="#2a2226"/></linearGradient>
+  <linearGradient id="fenster" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe2a3"/><stop offset="1" stop-color="#f0a650"/></linearGradient>
+  <linearGradient id="ofen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5b6066"/><stop offset=".45" stop-color="#d8dade"/><stop offset=".6" stop-color="#b8bbc0"/><stop offset="1" stop-color="#4c5056"/></linearGradient>
+  <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff1c8" stop-opacity=".9"/><stop offset="1" stop-color="#ffcf87" stop-opacity="0"/></radialGradient>
+  <radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
+  <filter id="blur"><feGaussianBlur stdDeviation="2.5"/></filter>
+  <filter id="soft"><feGaussianBlur stdDeviation="12"/></filter>
+  <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .2 0"/></filter>
+ </defs>
+ <rect width="1200" height="600" fill="url(#sky)"/>
+ <g filter="url(#blur)">
+  <rect x="0" y="180" width="120" height="300" fill="#3a2f3d"/><rect x="900" y="150" width="300" height="330" fill="#3a2f3d"/>
+  <rect x="940" y="200" width="40" height="50" fill="#f7cf88" opacity=".7"/><rect x="1020" y="200" width="40" height="50" fill="#f7cf88" opacity=".5"/><rect x="1100" y="280" width="40" height="50" fill="#f7cf88" opacity=".7"/>
+ </g>
+ <!-- Bäckerei -->
+ <rect x="120" y="120" width="620" height="360" fill="url(#wand)"/>
+ <rect x="120" y="120" width="620" height="70" fill="#5a2f22"/>
+  <g>
+  <path d="M120 190 L740 190 L760 250 L100 250 Z" fill="#9a4b2e"/>
+  <path d="M100 250 L760 250" stroke="#5a2f22" stroke-width="4"/>
+  <path d="M180 190 L170 250 M260 190 L255 250 M340 190 L340 250 M420 190 L425 250 M500 190 L510 250 M580 190 L595 250 M660 190 L680 250" stroke="#e7b48a" stroke-width="18" opacity=".55"/>
+ </g>
+ <rect x="160" y="280" width="340" height="170" fill="url(#fenster)"/>
+ <rect x="160" y="280" width="340" height="170" fill="none" stroke="#3a2420" stroke-width="10"/>
+ <line x1="160" y1="380" x2="500" y2="380" stroke="#3a2420" stroke-width="6"/>
+ <g fill="#b0642d" stroke="#6e3a18" stroke-width="2"><ellipse cx="220" cy="362" rx="38" ry="16"/><ellipse cx="320" cy="360" rx="38" ry="16"/><ellipse cx="420" cy="362" rx="38" ry="16"/><circle cx="250" cy="420" r="14"/><circle cx="300" cy="422" r="14"/><circle cx="370" cy="420" r="14"/><circle cx="430" cy="422" r="14"/></g>
+ <rect x="560" y="290" width="120" height="190" fill="#3a2420"/><rect x="574" y="304" width="92" height="90" fill="url(#fenster)" opacity=".9"/>
+ <text x="330" y="325" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-weight="700" font-size="36" fill="#7a3a1c">Bäckerei Sommer</text>
+ <circle cx="330" cy="365" r="200" fill="url(#glow)" opacity=".35"/>
+ <!-- Boden -->
+ <rect x="0" y="480" width="1200" height="120" fill="url(#boden)"/>
+ <path d="M0 480 L1200 480" stroke="#f7c784" stroke-opacity=".4" stroke-width="2"/>
+ <!-- Neuer Etagenofen auf Palette -->
+ <ellipse cx="900" cy="560" rx="170" ry="18" fill="#000" opacity=".5" filter="url(#soft)"/>
+ <rect x="770" y="530" width="260" height="22" fill="#a07a4c"/><rect x="770" y="552" width="260" height="8" fill="#6b4e2e"/>
+ <rect x="790" y="250" width="220" height="280" rx="8" fill="url(#ofen)"/>
+ <g fill="#2b2e33"><rect x="810" y="275" width="180" height="62" rx="4"/><rect x="810" y="352" width="180" height="62" rx="4"/><rect x="810" y="429" width="180" height="62" rx="4"/></g>
+ <g fill="#f3a44b" opacity=".85"><rect x="828" y="290" width="144" height="10" rx="5"/><rect x="828" y="367" width="144" height="10" rx="5"/><rect x="828" y="444" width="144" height="10" rx="5"/></g>
+ <path d="M800 258 L860 258 L830 520 L800 520 Z" fill="#fff" opacity=".12"/>
+ <!-- Preisschild -->
+ <line x1="990" y1="262" x2="1040" y2="214" stroke="#2b2422" stroke-width="3"/>
+ <g transform="rotate(7 1080 210)">
+  <rect x="1010" y="160" width="160" height="96" rx="10" fill="#fdf6e8" stroke="#2b2422" stroke-width="3"/>
+  <text x="1090" y="204" text-anchor="middle" font-family="Helvetica, Arial" font-weight="700" font-size="32" fill="#2b2422">60.000 €</text>
+  <text x="1090" y="236" text-anchor="middle" font-family="Helvetica, Arial" font-size="22" fill="#5b4a44">5 Jahre · 5 %</text>
+ </g>
+ <rect width="1200" height="600" fill="url(#vig)"/>
+ <rect width="1200" height="600" filter="url(#grain)" style="mix-blend-mode:overlay"/>
+</svg>
+</body></html>

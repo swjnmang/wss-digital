@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- Der neue Backofen, Handlungsprodukt: Heftseite mit Tilgungsplan, Balkendiagramm und Budget-Linie im Abendlicht. Bildwelt Reportage / Abendlicht.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/finanzmathe/ratendarlehen_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style></head><body>
+<svg id="bild" xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+ <defs>
+  <linearGradient id="tisch" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a5a3a"/><stop offset="1" stop-color="#3e2618"/></linearGradient>
+  <pattern id="karo" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0 L0 0 0 16" fill="none" stroke="#b9c6d6" stroke-width="1"/></pattern>
+  <radialGradient id="licht" cx=".8" cy=".1" r=".9"><stop offset="0" stop-color="#ffd59a" stop-opacity=".45"/><stop offset="1" stop-color="#ffd59a" stop-opacity="0"/></radialGradient>
+  <filter id="schatten"><feDropShadow dx="8" dy="10" stdDeviation="8" flood-opacity=".45"/></filter>
+  <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .16 0"/></filter>
+ </defs>
+ <rect width="800" height="400" fill="url(#tisch)"/>
+ <g transform="rotate(-2 400 200)" filter="url(#schatten)">
+  <rect x="70" y="30" width="660" height="340" fill="#fbfbf7"/><rect x="70" y="30" width="660" height="340" fill="url(#karo)"/>
+  <text x="100" y="80" font-family="Caveat, cursive" font-weight="700" font-size="40" fill="#1d2a4a">Tilgungsplan Backofen</text>
+  <g stroke="#1d2a4a" stroke-width="2" fill="none">
+   <rect x="100" y="104" width="300" height="216"/>
+   <path d="M100 140 H400 M100 176 H400 M100 212 H400 M100 248 H400 M100 284 H400 M140 104 V320 M220 104 V320 M310 104 V320"/>
+  </g>
+  <rect x="100" y="104" width="300" height="36" fill="#9a4b2e" opacity=".25"/>
+  <g stroke="#1d2a4a" stroke-width="2.5"><line x1="450" y1="320" x2="700" y2="320"/><line x1="450" y1="104" x2="450" y2="320"/></g>
+  <g fill="#9a4b2e" opacity=".85">
+   <rect x="470" y="128" width="30" height="192"/><rect x="516" y="136" width="30" height="184"/><rect x="562" y="144" width="30" height="176"/><rect x="608" y="152" width="30" height="168"/><rect x="654" y="160" width="30" height="160"/>
+  </g>
+  <line x1="450" y1="134" x2="700" y2="134" stroke="#1d2a4a" stroke-width="3" stroke-dasharray="10 6"/>
+  <text x="560" y="352" font-family="Caveat, cursive" font-size="26" fill="#1d2a4a">Budget: 14.500 €</text>
+ </g>
+ <g transform="rotate(-30 700 360)"><rect x="600" y="352" width="200" height="16" fill="#e2a33c"/><polygon points="800,352 824,360 800,368" fill="#f2d4a6"/></g>
+ <rect width="800" height="400" fill="url(#licht)"/>
+ <rect width="800" height="400" filter="url(#grain)" style="mix-blend-mode:overlay"/>
+</svg>
+</body></html>
