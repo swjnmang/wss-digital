@@ -1,10 +1,13 @@
 import { useEffect, useId, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
+import { useSitzungState } from '../../../hooks/useSitzung'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, ErklaerungCtx, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
-import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
+import { CheckCard, ErklaerungCtx, Hilfen, Loesungsweg, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
+import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Bildwelt, type Seite, type Thema } from '../lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
-import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import { Kriterien, standardKriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import titelBild from './bilder/stromspeicher-titel.webp'
+import nachrichtBild from './bilder/stromspeicher-nachricht.webp'
 import AkkuCountdown from './AkkuCountdown'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
 import './stromspeicher.css'
@@ -19,7 +22,8 @@ import './stromspeicher.css'
 // Bonus-Spiel 4 Runden à 2 (Pflicht zusammen 61: Warm-up 12 = 20 %, Problem lösen 24 = 39 %, Übungen 22 = 36 %).
 // Identität: Themenfarbe Indigo (Nacht), Symbol Batterie, Titelbild Haus mit Solaranlage bei Nacht, Leitobjekt der Stromspeicher.
 // Kontext Gesellschaft und Umwelt (Energie). Versuche bleiben nur im Seitenzustand.
-// Ruhiges Grunddesign: eine Spalte, pro Seite ist nur der Auftrag hervorgehoben. Nach unten scrollen ist erlaubt, seitlich nie.
+// Bildwelt Bauplan / CAD dunkel: Titelbild (Schnitt durch das Haus mit Speicher) und Nachricht sind gerenderte WebP-Dateien aus
+// bilder-quelle/stromspeicher-*.bild.html (gemeinsame Bausteine in bilder-quelle/_cad.js); der Ladegraph mit Live-Rückmeldung bleibt Inline-SVG.
 
 /** Lernvideo aus den Übungsaufgaben „Nullstellen berechnen“ */
 const VIDEO_NULLSTELLEN = 'https://www.youtube.com/watch?v=yIaIp8YaZp4'
@@ -43,55 +47,20 @@ const kwh = (v: number) => `${fmt(v, 2).replace('-', '−')} kWh`
 
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
-/** Titelbild: Haus mit Solaranlage bei Nacht, Stromspeicher mit Ladestand im Keller */
-function Titelbild() {
-  return (
-    <svg viewBox="0 0 720 252" role="img" aria-label="Haus mit Solaranlage bei Nacht. Der Stromspeicher im Keller zeigt um 20 Uhr einen Ladestand von 2,5 kWh.">
-      <circle cx="96" cy="62" r="30" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <circle cx="110" cy="54" r="26" fill="var(--primary-soft)" />
-      {[
-        [190, 40],
-        [600, 34],
-        [655, 92],
-        [540, 70],
-      ].map(([x, y]) => (
-        <circle key={`${x}-${y}`} cx={x} cy={y} r="3" fill="var(--primary)" />
-      ))}
-      <rect x="0" y="212" width="720" height="40" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="212" y2="212" stroke="var(--ink)" strokeWidth="2" />
-      {/* Haus */}
-      <rect x="250" y="112" width="230" height="100" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <polygon points="236,114 365,40 494,114" fill="var(--primary)" />
-      {[0, 1, 2].map((i) => (
-        <polygon
-          key={i}
-          points={`${300 + i * 44},${90 - i * 0} ${336 + i * 44},${70} ${356 + i * 44},${81} ${320 + i * 44},${101}`}
-          fill="var(--ink)"
-          opacity="0.75"
-        />
-      ))}
-      <rect x="282" y="138" width="44" height="40" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="400" y="148" width="40" height="64" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      {/* Stromspeicher mit Ladestand */}
-      <rect x="540" y="128" width="74" height="84" rx="8" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="566" y="120" width="22" height="9" rx="2" fill="var(--ink)" />
-      <rect x="550" y="174" width="54" height="28" rx="4" fill="var(--primary)" />
-      <rect x="550" y="138" width="54" height="36" rx="4" fill="none" stroke="var(--line)" strokeDasharray="4 3" />
-      <text x="577" y="111" textAnchor="middle" fontSize="17" fontWeight="700" fill="var(--ink)">
-        2,5 kWh
-      </text>
-      <line x1="482" x2="540" y1="190" y2="190" stroke="var(--ink)" strokeWidth="2" strokeDasharray="6 4" />
-      <text x="640" y="160" fontSize="17" fontWeight="700" fill="var(--ink)">
-        20:00
-      </text>
-      <text x="640" y="182" fontSize="15" fill="var(--ink-muted)">
-        −0,4 kWh/h
-      </text>
-    </svg>
-  )
+const THEMA: Thema = {
+  name: 'Der Stromspeicher',
+  farbe: 'indigo',
+  icon: 'fa-battery-half',
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Technische Zeichnung auf dunklem Grund: Schnitt durch ein Haus mit Solarmodulen auf dem Dach und einem Stromspeicher im Keller. Beschriftet: Stromspeicher um 20:00 Uhr 2,5 kWh, Verbrauch 0,4 kWh pro Stunde. Im Schriftfeld: Ladestand y = −0,4x + 2,5, x Stunden ab 20 Uhr, leer um ?:?? Uhr."
+    />
+  ),
 }
-
-const THEMA: Thema = { name: 'Der Stromspeicher', farbe: 'indigo', icon: 'fa-battery-half', bild: <Titelbild /> }
+const BILDWELT: Bildwelt = { welt: 'bauplan', variante: 'cad' }
 
 /* ── Graph: Ladestand über der Zeit ─────────────────────────────────────── */
 
@@ -237,33 +206,6 @@ function Ausprobieren({ auftrag, versuche, onTesten }: { auftrag: ReactNode; ver
 
 /* ── Phase 3: Bilder und Rechenbeispiel (E-Bike-Akku) ───────────────────── */
 
-/** Handlungsprodukt: Nachricht an Familie Demir mit kleiner Skizze des Ladestands */
-function NachrichtBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg viewBox="0 0 720 190" role="img" aria-label="Ein Notizzettel mit der Überschrift Liebe Familie Demir, darunter Zeilen für die Rechnung und eine kleine Skizze einer fallenden Geraden, daneben ein Stift.">
-        <rect x="150" y="14" width="420" height="168" rx="8" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="150" y="14" width="420" height="40" rx="8" fill="var(--primary-soft)" />
-        <line x1="150" x2="570" y1="54" y2="54" stroke="var(--primary)" strokeWidth="2" />
-        <text x="172" y="42" fontSize="21" fontWeight="800" fill="var(--ink)">
-          Liebe Familie Demir,
-        </text>
-        {[0, 1, 2, 3].map((i) => (
-          <line key={i} x1="172" x2={i % 2 ? 380 : 420} y1={82 + i * 26} y2={82 + i * 26} stroke="var(--line-strong)" strokeWidth="2" />
-        ))}
-        <line x1="450" x2="450" y1="72" y2="164" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="450" x2="552" y1="152" y2="152" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="450" y1="84" x2="530" y2="152" stroke="var(--primary)" strokeWidth="3.5" />
-        <circle cx="530" cy="152" r="6" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        <g transform="rotate(-35 640 120)">
-          <rect x="590" y="110" width="110" height="18" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-          <polygon points="590,110 574,119 590,128" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        </g>
-      </svg>
-    </div>
-  )
-}
-
 const BSP_AUFGABE = (
   <p>
     Der Akku eines E-Bikes hat beim Losfahren <M>{'0{,}6'}</M> kWh. Ladestand nach <M>x</M> Stunden Fahrt: <M>{'y = -0{,}15x + 0{,}6'}</M>. Lena fährt um 9 Uhr los. Wann ist
@@ -297,7 +239,8 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     title: 'Nullstelle angeben, Probe machen und deuten',
     body: (
       <>
-        <MB>{'N(4 \\mid 0) \\qquad \\text{Probe: } x = 4{:}\\; y = -0{,}15 \\cdot 4 + 0{,}6 = 0 \\;\\checkmark'}</MB>
+        <MB>{'N(4 \\mid 0)'}</MB>
+        <MB>{'\\text{Probe: } x = 4{:}\\; y = -0{,}15 \\cdot 4 + 0{,}6 = 0 \\;\\checkmark'}</MB>
         <p>Nach 4 Stunden Fahrt ist der Akku leer. Lena ist um 9 Uhr losgefahren, also ist der Akku um 13 Uhr leer.</p>
       </>
     ),
@@ -306,13 +249,16 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 
 /** Lösungsweg für den Stromspeicher */
 const LOESUNG = (
-  <>
-    <MB>{'\\begin{aligned} -0{,}4x + 2{,}5 &= 0 && \\mid -2{,}5 \\\\ -0{,}4x &= -2{,}5 && \\mid :(-0{,}4) \\\\ x_N &= 6{,}25 \\end{aligned}'}</MB>
-    <MB>{'N(6{,}25 \\mid 0) \\qquad \\text{Probe: } x = 6{,}25{:}\\; y = -0{,}4 \\cdot 6{,}25 + 2{,}5 = 0 \\;\\checkmark'}</MB>
-    <p>
-      <M>{'6{,}25'}</M> Stunden sind 6 Stunden und <M>{'0{,}25 \\cdot 60 = 15'}</M> Minuten. 20 Uhr plus 6 h 15 min ergibt 2:15 Uhr.
-    </p>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: <><M>{'y = 0'}</M> setzen</>, tex: '-0{,}4x + 2{,}5 = 0' },
+      { titel: <>Die Zahl ohne <M>x</M> wegbringen</>, tex: ['-0{,}4x + 2{,}5 = 0 \\quad \\mid -2{,}5', '-0{,}4x = -2{,}5'] },
+      { titel: <>Durch die Zahl vor <M>x</M> teilen</>, tex: ['-0{,}4x = -2{,}5 \\quad \\mid :(-0{,}4)', 'x_N = 6{,}25'] },
+      { titel: 'Nullstelle angeben', tex: 'N(6{,}25 \\mid 0)' },
+      { titel: 'Probe', tex: 'x = 6{,}25{:}\\; y = -0{,}4 \\cdot 6{,}25 + 2{,}5 = 0 \\;\\checkmark' },
+      { titel: 'In eine Uhrzeit umrechnen', tex: '0{,}25 \\cdot 60 = 15', text: <><M>{'6{,}25'}</M> Stunden sind 6 Stunden und 15 Minuten. 20 Uhr plus 6 h 15 min ergibt 2:15 Uhr.</> },
+    ]}
+  />
 )
 
 /* ── Phase 4: Wer hat recht? ─────────────────────────────────────────────── */
@@ -329,9 +275,9 @@ function Plan({ name, tex: t }: { name: string; tex: string }) {
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }: { erklaerung: ReactNode; onBack: () => void; onPractice: () => void }) {
-  const [versuche, setVersuche] = useState<number[]>([])
-  const [geloest, setGeloest] = useState(false)
-  const [uebungen, setUebungen] = useState<string[]>([])
+  const [versuche, setVersuche] = useSitzungState<number[]>('ss-versuche', [])
+  const [geloest, setGeloest] = useSitzungState('ss-geloest', false)
+  const [uebungen, setUebungen] = useSitzungState<string[]>('ss-uebungen', [])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
     fertig()
@@ -369,7 +315,14 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
             }
             lead={<M>{'-2x + 10 = 4 \\qquad \\Rightarrow'}</M>}
             fields={[{ kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 3 }]}
-            solution={<MB>{'\\begin{aligned} -2x + 10 &= 4 && \\mid -10 \\\\ -2x &= -6 && \\mid :(-2) \\\\ x &= 3 \\end{aligned}'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Die Zahl ohne x wegbringen', tex: ['-2x + 10 = 4 \\quad \\mid -10', '-2x = -6'] },
+                  { titel: <>Durch <M>{'-2'}</M> teilen</>, tex: ['-2x = -6 \\quad \\mid :(-2)', 'x = 3'] },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -405,7 +358,9 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
             prompt={<p>Löse die Gleichung. Achte beim Teilen auf das Vorzeichen.</p>}
             lead={<M>{'-0{,}5x = -3 \\qquad \\Rightarrow'}</M>}
             fields={[{ kind: 'num', key: 'x', label: <M>{'x ='}</M>, expected: 6 }]}
-            solution={<MB>{'\\begin{aligned} -0{,}5x &= -3 && \\mid :(-0{,}5) \\\\ x &= 6 \\end{aligned}'}</MB>}
+            solution={
+              <Loesungsweg schritte={[{ titel: <>Durch <M>{'-0{,}5'}</M> teilen</>, tex: ['-0{,}5x = -3 \\quad \\mid :(-0{,}5)', 'x = 6'] }]} />
+            }
             help={
               <Hilfen
                 steps={[
@@ -568,7 +523,14 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
             />
           </Abschnitt>
           <Handlungsprodukt titel="Nachricht an Familie Demir">
-            <NachrichtBild />
+            <figure className="sl-foto sl-foto-klein">
+              <img
+                src={nachrichtBild}
+                width={800}
+                height={400}
+                alt="Technische Zeichnung einer Nachricht: Liebe Familie Demir, mit vier Kästchen zum Abhaken: Leer heißt y = 0, Rechnung mit Probe, Nullstelle N, Uhrzeit. Daneben eine fallende Gerade mit markierter Nullstelle N."
+              />
+            </figure>
             <p className="sl-text">
               Familie Demir möchte wissen, ab wann sie in dieser Nacht Strom aus dem Netz kaufen muss. Schreibe ihr in deinem Heft eine kurze Nachricht mit deiner Rechnung, einer
               Skizze des Ladestands und der Uhrzeit.
@@ -587,20 +549,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist deine Nachricht vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                <>Ein Satz, warum man den Term gleich 0 setzt (leer heißt <M>{'y = 0'}</M>)</>,
-                <>Die Rechnung mit allen Umformungen wie <M>{'\\mid -2{,}5'}</M> und <M>{'\\mid :(-0{,}4)'}</M>, dazu die Probe</>,
-                'Eine Skizze des Graphen mit beschrifteten Achsen, in der die Nullstelle N markiert ist',
-                'Ein Antwortsatz mit der Uhrzeit, zu der der Speicher leer ist',
-                <>
-                  In deiner Nachricht steht, wofür die Abkürzungen stehen: <M>{'x_N'}</M> (Nullstelle), <M>{'N(x_N \\mid 0)'}</M> (Schnittpunkt mit der x-Achse), <M>m</M>{' '}
-                  (Steigung, hier der Verbrauch pro Stunde) und <M>t</M> (y-Achsenabschnitt, hier der Ladestand um 20 Uhr). Außerdem erklärst du den Begriff „Nullstelle“ und
-                  alle anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an Familie Demir')}             />
           </Abschnitt>
           {geloest && (
             <Abschnitt titel="Das hältst du fest">
@@ -723,13 +672,12 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
               }
               fields={[{ kind: 'num', key: 't', label: <M>{'t ='}</M>, expected: 4, unit: 'kWh' }]}
               solution={
-                <>
-                  <p>
-                    Bei <M>{'x = 10'}</M> muss <M>{'y = 0'}</M> sein:
-                  </p>
-                  <MB>{'\\begin{aligned} -0{,}4 \\cdot 10 + t &= 0 \\\\ -4 + t &= 0 && \\mid +4 \\\\ t &= 4 \\end{aligned}'}</MB>
-                  <p>Um 20 Uhr müssen mindestens 4 kWh im Speicher sein.</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: <>Bei <M>{'x = 10'}</M> muss <M>{'y = 0'}</M> sein</>, tex: '-0{,}4 \\cdot 10 + t = 0' },
+                    { titel: <>Nach <M>t</M> auflösen</>, tex: ['-4 + t = 0 \\quad \\mid +4', 't = 4'], text: 'Um 20 Uhr müssen mindestens 4 kWh im Speicher sein.' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -797,6 +745,7 @@ export default function StromspeicherEinstieg({ erklaerung, onBack, onPractice }
           ruhig
           punkte
           thema={THEMA}
+          bildwelt={BILDWELT}
           ziel={<>In dieser Lernsituation lernst du, wie du die Nullstelle einer linearen Funktion berechnest und was sie in einer Situation bedeutet.</>}
           seiten={seiten}
         />
