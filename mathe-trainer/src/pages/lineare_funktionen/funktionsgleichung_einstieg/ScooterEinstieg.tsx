@@ -1,11 +1,15 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
+import { useSitzungState } from '../../../hooks/useSitzung'
 import GleichungEingabe from '../../../components/GleichungEingabe'
 import { Beispiel, M, MB, Merke, fmt } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
-import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
+import { CheckCard, Hilfen, Loesungsweg, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
+import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Bildwelt, type Seite, type Thema } from '../lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
-import { Kriterien, Vermutung, type Festlegung } from '../../finanzmathe/zins_kit/zins_kit'
+import { Kriterien, Vermutung, standardKriterien, type Festlegung } from '../../finanzmathe/zins_kit/zins_kit'
+import titelBild from './bilder/scooter-titel.webp'
+import appBild from './bilder/scooter-app.webp'
+import anleitungBild from './bilder/scooter-anleitung.webp'
 import { formatLinearEquation, parseLinearEquation, texLinearEquation } from '../../../utils/parseLinearEquation'
 import ScooterRoute from './ScooterRoute'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
@@ -27,7 +31,8 @@ import './scooter.css'
 // (Pflicht zusammen 68: Warm-up 12 = 18 %, Problem lösen 24 = 35 %, Übungen 26 = 38 %).
 // Identität: Themenfarbe Petrol, Symbol Smartphone, Titelbild Weg zum Badesee mit E-Scooter, Leitobjekt die Scooter-App
 // (Fahrtenverlauf und Tarif-Rechner). Kontext Privatleben (Freizeit, Mobilität). Festlegung und Versuche bleiben im Seitenzustand.
-// Ruhiges Grunddesign: eine Spalte, pro Seite ist nur der Auftrag hervorgehoben. Nach unten scrollen ist erlaubt, seitlich nie.
+// Bildwelt Comic / pop: Titelbild (drei Panels), Fahrtenverlauf der App und Anleitung sind gerenderte WebP-Dateien aus
+// bilder-quelle/scooter-*.bild.html (gemeinsame Bausteine in bilder-quelle/_comic.js); der Tarif-Graph mit Live-Rückmeldung bleibt Inline-SVG.
 
 /** Lernvideo aus den Übungsaufgaben „Funktionsgleichung aufstellen“ (ab 1:44) */
 const VIDEO_FUNKTIONSGLEICHUNG = 'https://youtu.be/r8vCu72ojYw?t=104'
@@ -49,103 +54,32 @@ const euro = (v: number) => `${fmt(v, 2, true).replace('-', '−')} €`
 
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
-/** E-Scooter als flache Zeichnung; (x, y) = Aufstandspunkt des Hinterrads */
-function ScooterForm({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
-  return (
-    <g transform={`translate(${x} ${y}) scale(${s})`}>
-      <rect x="-4" y="-22" width="92" height="9" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <line x1="84" y1="-18" x2="98" y2="-92" stroke="var(--ink)" strokeWidth="5" strokeLinecap="round" />
-      <line x1="88" y1="-94" x2="112" y2="-90" stroke="var(--ink)" strokeWidth="5" strokeLinecap="round" />
-      <circle cx="4" cy="-12" r="12" fill="var(--surface)" stroke="var(--ink)" strokeWidth="3" />
-      <circle cx="90" cy="-12" r="12" fill="var(--surface)" stroke="var(--ink)" strokeWidth="3" />
-      <rect x="60" y="-30" width="18" height="8" rx="2" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-    </g>
-  )
+const THEMA: Thema = {
+  name: 'Die Scooter-App',
+  farbe: 'petrol',
+  icon: 'fa-mobile-screen-button',
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Comic in drei Bildern: Ein Handy zeigt das Guthaben 7,20 € und Tarif: ???, dazu die Frage: Reicht das für 30 Minuten? Im zweiten Bild fährt ein E-Scooter los, Überschrift: Ab zum Badesee. Im dritten Bild ein Wegweiser: Badesee, 30 min, und die Frage: Was kostet das?"
+    />
+  ),
 }
-
-/** Titelbild: Weg zum Badesee, E-Scooter, Wegweiser „Badesee 30 min“, Handy mit Guthaben */
-function Titelbild() {
-  return (
-    <svg viewBox="0 0 720 252" role="img" aria-label="Ein E-Scooter auf einem Weg. Ein Wegweiser zeigt: Badesee, 30 Minuten. Auf dem Handy steht ein Guthaben von 7,20 Euro.">
-      <circle cx="640" cy="54" r="26" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-      {/* See */}
-      <ellipse cx="590" cy="214" rx="150" ry="34" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      {[0, 1, 2].map((i) => (
-        <path key={i} d={`M ${528 + i * 44} ${206 + (i % 2) * 14} q 9 -7 18 0 q 9 7 18 0`} fill="none" stroke="var(--primary)" strokeWidth="2.5" />
-      ))}
-      {/* Baum */}
-      <line x1="470" y1="196" x2="470" y2="128" stroke="var(--ink)" strokeWidth="4" />
-      <circle cx="470" cy="112" r="34" fill="var(--primary)" />
-      {/* Weg */}
-      <path d="M 0 232 L 470 232 Q 500 232 520 220" fill="none" stroke="var(--ink)" strokeWidth="2" />
-      <line x1="0" x2="440" y1="252" y2="252" stroke="var(--ink)" strokeWidth="2" />
-      {[0, 1, 2, 3, 4, 5].map((i) => (
-        <line key={i} x1={30 + i * 72} x2={62 + i * 72} y1="242" y2="242" stroke="var(--line-strong)" strokeWidth="3" strokeLinecap="round" />
-      ))}
-      <ScooterForm x={150} y={232} />
-      {/* Wegweiser */}
-      <line x1="380" y1="232" x2="380" y2="110" stroke="var(--ink)" strokeWidth="4" />
-      <polygon points="330,92 452,92 470,112 452,132 330,132" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <text x="392" y="109" textAnchor="middle" fontSize="17" fontWeight="800" fill="var(--ink)">
-        Badesee
-      </text>
-      <text x="392" y="127" textAnchor="middle" fontSize="15" fill="var(--ink)">
-        30 min
-      </text>
-      {/* Handy mit Guthaben */}
-      <rect x="40" y="28" width="96" height="150" rx="14" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
-      <rect x="50" y="44" width="76" height="22" rx="4" fill="var(--primary)" />
-      <text x="88" y="60" textAnchor="middle" fontSize="13" fontWeight="700" fill="var(--surface)">
-        Guthaben
-      </text>
-      <text x="88" y="96" textAnchor="middle" fontSize="20" fontWeight="800" fill="var(--ink)">
-        7,20 €
-      </text>
-      <text x="88" y="132" textAnchor="middle" fontSize="15" fill="var(--ink-muted)">
-        Tarif: ?
-      </text>
-    </svg>
-  )
-}
-
-const THEMA: Thema = { name: 'Die Scooter-App', farbe: 'petrol', icon: 'fa-mobile-screen-button', bild: <Titelbild /> }
+const BILDWELT: Bildwelt = { welt: 'comic', variante: 'pop' }
 
 /** Leitobjekt: Fahrtenverlauf der Scooter-App (nur die gegebenen Fahrten, kein Tarif) */
 function AppBild() {
   return (
-    <div className="zk-bild">
-      <svg viewBox="0 0 720 300" role="img" aria-label="Fahrtenverlauf der Scooter-App: Fahrt 1 am Montag, 8 Minuten, 2,60 Euro. Fahrt 2 am Mittwoch, 20 Minuten, 5,00 Euro. Guthaben 7,20 Euro. Der Tarif wird nicht angezeigt.">
-        <rect x="200" y="10" width="320" height="282" rx="28" fill="var(--surface)" stroke="var(--ink)" strokeWidth="3" />
-        <rect x="216" y="30" width="288" height="44" rx="10" fill="var(--primary)" />
-        <text x="360" y="59" textAnchor="middle" fontSize="20" fontWeight="800" fill="var(--surface)">
-          Meine Fahrten
-        </text>
-        {FAHRTEN.map((f, i) => (
-          <g key={f.name} transform={`translate(0 ${88 + i * 66})`}>
-            <rect x="216" y="0" width="288" height="56" rx="10" fill="var(--primary-soft)" />
-            <text x="232" y="24" fontSize="17" fontWeight="700" fill="var(--ink)">
-              {f.name}, {f.tag}
-            </text>
-            <text x="232" y="46" fontSize="16" fill="var(--ink-muted)">
-              {f.x} Minuten
-            </text>
-            <text x="490" y="38" textAnchor="end" fontSize="21" fontWeight="800" fill="var(--ink)">
-              {euro(f.y)}
-            </text>
-          </g>
-        ))}
-        <line x1="216" x2="504" y1="232" y2="232" stroke="var(--line)" strokeWidth="2" />
-        <text x="232" y="262" fontSize="17" fill="var(--ink)">
-          Guthaben
-        </text>
-        <text x="490" y="262" textAnchor="end" fontSize="19" fontWeight="800" fill="var(--ink)">
-          {euro(GUTHABEN)}
-        </text>
-        <text x="232" y="284" fontSize="15" fill="var(--ink-muted)">
-          Tarif: wird nicht angezeigt
-        </text>
-      </svg>
-    </div>
+    <figure className="sl-foto">
+      <img
+        src={appBild}
+        width={1200}
+        height={600}
+        alt="Comic-Bild der Scooter-App, Meine Fahrten: Fahrt 1 am Montag, 8 Minuten, 2,60 €. Fahrt 2 am Mittwoch, 20 Minuten, 5,00 €. Guthaben 7,20 €. Tarif: wird nicht angezeigt. Sprechblasen fragen: Wie viel kostet die Minute? Und was kostet das Entsperren?"
+      />
+    </figure>
   )
 }
 
@@ -299,36 +233,6 @@ function TarifRechner({ versuche, onTesten }: { versuche: Versuch[]; onTesten: (
 
 /* ── Phase 3: Bilder und Rechenbeispiel (Fahrradverleih) ─────────────────── */
 
-/** Handlungsprodukt: Karteikarte „Tarif knacken“ mit drei Schritten und kleiner Skizze */
-function KarteBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg viewBox="0 0 720 190" role="img" aria-label="Eine Karteikarte mit der Überschrift Tarif knacken, darunter drei nummerierte Schritte und eine kleine Skizze einer Geraden durch zwei Punkte.">
-        <rect x="150" y="12" width="420" height="170" rx="8" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="150" y="12" width="420" height="40" rx="8" fill="var(--primary-soft)" />
-        <line x1="150" x2="570" y1="52" y2="52" stroke="var(--primary)" strokeWidth="2" />
-        <text x="172" y="40" fontSize="21" fontWeight="800" fill="var(--ink)">
-          Tarif knacken
-        </text>
-        {[0, 1, 2].map((i) => (
-          <g key={i}>
-            <circle cx="182" cy={84 + i * 34} r="11" fill="var(--primary)" />
-            <text x="182" y={89 + i * 34} textAnchor="middle" fontSize="14" fontWeight="800" fill="var(--surface)">
-              {i + 1}
-            </text>
-            <line x1="202" x2={i === 1 ? 380 : 410} y1={86 + i * 34} y2={86 + i * 34} stroke="var(--line-strong)" strokeWidth="2" />
-          </g>
-        ))}
-        <line x1="444" x2="444" y1="70" y2="166" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="444" x2="552" y1="166" y2="166" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="444" y1="140" x2="552" y2="84" stroke="var(--primary)" strokeWidth="3.5" />
-        <circle cx="470" cy="126" r="6" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        <circle cx="528" cy="96" r="6" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-      </svg>
-    </div>
-  )
-}
-
 const BSP_AUFGABE = (
   <p>
     Ein Fahrradverleih am See verlangt eine feste Gebühr und einen Preis pro Stunde. Mia hat für 2 Stunden 9 € bezahlt, Tom für 5 Stunden 15 €. Wie lautet die
@@ -370,24 +274,36 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
   },
   {
     title: 'Die Gleichung vollständig aufschreiben und die Probe machen',
-    body: <MB>{'y = 2x + 5 \\qquad \\text{Probe mit } P_2{:}\\; x = 5{:}\\; y = 2 \\cdot 5 + 5 = 15 \\;\\checkmark'}</MB>,
+    body: (
+      <>
+        <MB>{'y = 2x + 5'}</MB>
+        <MB>{'\\text{Probe mit } P_2{:}\\; x = 5{:}\\; y = 2 \\cdot 5 + 5 = 15 \\;\\checkmark'}</MB>
+      </>
+    ),
   },
   {
     title: 'Die Gleichung nutzen',
-    body: <MB>{'x = 3{:}\\quad y = 2 \\cdot 3 + 5 = 11 \\qquad \\text{3 Stunden kosten 11 €.}'}</MB>,
+    body: (
+      <>
+        <MB>{'x = 3{:}\\quad y = 2 \\cdot 3 + 5 = 11'}</MB>
+        <p>3 Stunden kosten 11 €.</p>
+      </>
+    ),
   },
 ]
 
 /** Lösungsweg für den Scooter-Tarif */
 const LOESUNG = (
-  <>
-    <MB>{'P_1(8 \\mid 2{,}6) \\qquad P_2(20 \\mid 5)'}</MB>
-    <MB>{'m = \\dfrac{5 - 2{,}6}{20 - 8} = \\dfrac{2{,}4}{12} = 0{,}2'}</MB>
-    <MB>{'\\begin{aligned} 2{,}6 &= 0{,}2 \\cdot 8 + t \\\\ 2{,}6 &= 1{,}6 + t && \\mid -1{,}6 \\\\ t &= 1 \\end{aligned}'}</MB>
-    <MB>{'y = 0{,}2x + 1 \\qquad \\text{Probe: } x = 20{:}\\; y = 0{,}2 \\cdot 20 + 1 = 5 \\;\\checkmark'}</MB>
-    <MB>{'x = 30{:}\\quad y = 0{,}2 \\cdot 30 + 1 = 7'}</MB>
-    <p>Eine Fahrt von 30 Minuten kostet 7,00 €: 1 € fürs Entsperren und 0,20 € pro Minute.</p>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'Die beiden Fahrten als Punkte', tex: 'P_1(8 \\mid 2{,}6) \\qquad P_2(20 \\mid 5)' },
+      { titel: <>Steigung <M>m</M> berechnen</>, tex: 'm = \\dfrac{5 - 2{,}6}{20 - 8} = \\dfrac{2{,}4}{12} = 0{,}2' },
+      { titel: <><M>m</M> und <M>{'P_1'}</M> einsetzen, nach <M>t</M> auflösen</>, tex: ['2{,}6 = 0{,}2 \\cdot 8 + t', '2{,}6 = 1{,}6 + t \\quad \\mid -1{,}6', 't = 1'] },
+      { titel: 'Gleichung aufschreiben', tex: 'y = 0{,}2x + 1' },
+      { titel: <>Probe mit <M>{'P_2'}</M></>, tex: 'x = 20{:}\\; y = 0{,}2 \\cdot 20 + 1 = 5 \\;\\checkmark' },
+      { titel: 'Preis für 30 Minuten', tex: 'x = 30{:}\\; y = 0{,}2 \\cdot 30 + 1 = 7', text: 'Eine Fahrt von 30 Minuten kostet 7,00 €: 1 € fürs Entsperren und 0,20 € pro Minute.' },
+    ]}
+  />
 )
 
 /* ── Phase 4: Gleichung aus dem Graphen ─────────────────────────────────── */
@@ -464,16 +380,16 @@ function Plan({ name, tex: t }: { name: string; tex: string }) {
 type Wahl = 'reicht' | 'reichtNicht'
 
 export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => void; onPractice: () => void }) {
-  const [vermutung, setVermutung] = useState<Festlegung<Wahl>>({ wahl: null, wert: 8, fest: false })
-  const [versuche, setVersuche] = useState<Versuch[]>([])
-  const [geloest, setGeloest] = useState(false)
+  const [vermutung, setVermutung] = useSitzungState<Festlegung<Wahl>>('sc-vermutung', { wahl: null, wert: 8, fest: false })
+  const [versuche, setVersuche] = useSitzungState<Versuch[]>('sc-versuche', [])
+  const [geloest, setGeloest] = useSitzungState('sc-geloest', false)
   /** in „Problem lösen“ eingetippte Gleichung, wird live in den Graphen gezeichnet */
   const [eigeneGleichung, setEigeneGleichung] = useState('')
   const eigene = parseLinearEquation(eigeneGleichung)
   const eigeneLinie: Linie[] = eigene.ok
     ? [{ m: eigene.m, t: eigene.t, aktuell: true, treffer: Math.abs(eigene.m - M_TARIF) < 0.001 && Math.abs(eigene.t - T_TARIF) < 0.001 }]
     : []
-  const [uebungen, setUebungen] = useState<string[]>([])
+  const [uebungen, setUebungen] = useSitzungState<string[]>('sc-uebungen', [])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
     fertig()
@@ -547,7 +463,14 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
               { kind: 'num', key: 'p', label: '3 mal x', expected: 6 },
               { kind: 'num', key: 't', label: 't', expected: 5 },
             ]}
-            solution={<MB>{'\\begin{aligned} 11 &= 3 \\cdot 2 + t \\\\ 11 &= 6 + t && \\mid -6 \\\\ t &= 5 \\end{aligned}'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Einsetzen', tex: ['11 = 3 \\cdot 2 + t', '11 = 6 + t'] },
+                  { titel: <>Nach <M>t</M> auflösen</>, tex: ['11 = 6 + t \\quad \\mid -6', 't = 5'] },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -727,7 +650,14 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
             />
           </Abschnitt>
           <Handlungsprodukt titel="Anleitung: So knackst du einen Tarif">
-            <KarteBild />
+            <figure className="sl-foto sl-foto-klein">
+              <img
+                src={anleitungBild}
+                width={800}
+                height={400}
+                alt="Comic-Bild einer Karteikarte: Tarif knacken mit drei Schritten: zwei Fahrten als Punkte, Steigung m berechnen, t berechnen und Probe machen. Daneben eine Gerade durch zwei Punkte und das Wort Geknackt!"
+              />
+            </figure>
             <p className="sl-text">
               Deine Freundin Lina nutzt einen anderen Anbieter. In ihrer App stehen zwei Fahrten: 10 Minuten für 3,40&nbsp;€ und 25 Minuten für 7,90&nbsp;€. Schreibe ihr in deinem
               Heft (oder auf einer Karteikarte) eine Schritt-für-Schritt-Anleitung, wie sie aus zwei Fahrten die Gleichung des Tarifs aufstellt. Rechne jeden Schritt an ihren
@@ -744,21 +674,7 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist deine Anleitung vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                <>
-                  Die Schritte stehen in der richtigen Reihenfolge: Punkte aufschreiben, <M>m</M> mit <M>{'\\dfrac{y_2 - y_1}{x_2 - x_1}'}</M> berechnen, <M>t</M> berechnen,
-                  Gleichung aufschreiben
-                </>,
-                <>Jeder Schritt ist an Linas Fahrten vorgerechnet, am Ende steht ihre vollständige Gleichung <M>{'y = \\ldots'}</M></>,
-                <>
-                  In deiner Anleitung steht, wofür die Abkürzungen stehen: <M>x</M> (Fahrzeit in Minuten), <M>y</M> (Preis in €), <M>m</M> (Steigung, hier der Preis pro
-                  Minute), <M>t</M> (y-Achsenabschnitt, hier die Entsperrgebühr), <M>{'P_1(x_1 \\mid y_1)'}</M> und <M>{'P_2(x_2 \\mid y_2)'}</M> (die beiden Punkte).
-                  Außerdem erklärst du die Begriffe „Funktionsgleichung“, „Steigung“, „y-Achsenabschnitt“ und alle anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an Lina')}             />
           </Abschnitt>
           {geloest && (
             <Abschnitt titel="Das hältst du fest">
@@ -863,14 +779,14 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
               }
               fields={[{ kind: 'gleichung', key: 'gl', label: 'Funktionsgleichung:', m: 0.5, t: 2, tol: 0.001 }]}
               solution={
-                <>
-                  <MB>{'m = \\dfrac{4 - 1}{4 - (-2)} = \\dfrac{3}{6} = 0{,}5'}</MB>
-                  <MB>{'\\begin{aligned} 1 &= 0{,}5 \\cdot (-2) + t \\\\ 1 &= -1 + t && \\mid +1 \\\\ t &= 2 \\end{aligned}'}</MB>
-                  <MB>{'y = 0{,}5x + 2'}</MB>
-                  <p>
-                    Probe mit <M>{'P_2'}</M>: <M>{'x = 4{:}\\; y = 0{,}5 \\cdot 4 + 2 = 4'}</M>. Im Graphen siehst du außerdem: Die Gerade schneidet die y-Achse bei 2.
-                  </p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: <>Steigung <M>m</M> berechnen</>, tex: 'm = \\dfrac{4 - 1}{4 - (-2)} = \\dfrac{3}{6} = 0{,}5' },
+                    { titel: <><M>{'P_1'}</M> einsetzen, nach <M>t</M> auflösen</>, tex: ['1 = 0{,}5 \\cdot (-2) + t', '1 = -1 + t \\quad \\mid +1', 't = 2'] },
+                    { titel: 'Gleichung aufschreiben', tex: 'y = 0{,}5x + 2' },
+                    { titel: <>Probe mit <M>{'P_2'}</M></>, tex: 'x = 4{:}\\; y = 0{,}5 \\cdot 4 + 2 = 4 \\;\\checkmark', text: 'Im Graphen siehst du außerdem: Die Gerade schneidet die y-Achse bei 2.' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -904,12 +820,13 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
               }
               fields={[{ kind: 'gleichung', key: 'gl', label: 'Gleichung des Taxi-Tarifs:', m: 2.2, t: 3.8, tol: 0.001 }]}
               solution={
-                <>
-                  <MB>{'m = \\dfrac{25{,}8 - 12{,}6}{10 - 4} = \\dfrac{13{,}2}{6} = 2{,}2'}</MB>
-                  <MB>{'\\begin{aligned} 12{,}6 &= 2{,}2 \\cdot 4 + t \\\\ 12{,}6 &= 8{,}8 + t && \\mid -8{,}8 \\\\ t &= 3{,}8 \\end{aligned}'}</MB>
-                  <MB>{'y = 2{,}2x + 3{,}8'}</MB>
-                  <p>Jeder Kilometer kostet 2,20 €, die Grundgebühr ist 3,80 €.</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: <>Steigung <M>m</M> berechnen</>, tex: 'm = \\dfrac{25{,}8 - 12{,}6}{10 - 4} = \\dfrac{13{,}2}{6} = 2{,}2' },
+                    { titel: <>Einen Punkt einsetzen, nach <M>t</M> auflösen</>, tex: ['12{,}6 = 2{,}2 \\cdot 4 + t', '12{,}6 = 8{,}8 + t \\quad \\mid -8{,}8', 't = 3{,}8'] },
+                    { titel: 'Gleichung aufschreiben', tex: 'y = 2{,}2x + 3{,}8', text: 'Jeder Kilometer kostet 2,20 €, die Grundgebühr ist 3,80 €.' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -942,12 +859,14 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
                 { kind: 'num', key: 'y40', label: 'Akkustand nach 40 Minuten:', expected: 20, unit: '%' },
               ]}
               solution={
-                <>
-                  <MB>{'m = \\dfrac{50 - 80}{25 - 10} = \\dfrac{-30}{15} = -2'}</MB>
-                  <MB>{'\\begin{aligned} 80 &= -2 \\cdot 10 + t \\\\ 80 &= -20 + t && \\mid +20 \\\\ t &= 100 \\end{aligned}'}</MB>
-                  <MB>{'y = -2x + 100 \\qquad x = 40{:}\\; y = -2 \\cdot 40 + 100 = 20'}</MB>
-                  <p>Der Akku startet mit 100 % und verliert 2 % pro Minute. Nach 40 Minuten sind noch 20 % übrig.</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: <>Steigung <M>m</M> berechnen</>, tex: 'm = \\dfrac{50 - 80}{25 - 10} = \\dfrac{-30}{15} = -2' },
+                    { titel: <>Einen Punkt einsetzen, nach <M>t</M> auflösen</>, tex: ['80 = -2 \\cdot 10 + t', '80 = -20 + t \\quad \\mid +20', 't = 100'] },
+                    { titel: 'Gleichung aufschreiben', tex: 'y = -2x + 100' },
+                    { titel: 'Akkustand nach 40 Minuten', tex: 'x = 40{:}\\; y = -2 \\cdot 40 + 100 = 20', text: 'Der Akku startet mit 100 % und verliert 2 % pro Minute. Nach 40 Minuten sind noch 20 % übrig.' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -1009,6 +928,7 @@ export default function ScooterEinstieg({ onBack, onPractice }: { onBack: () => 
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={<>In dieser Lernsituation lernst du, wie du aus zwei Punkten die Funktionsgleichung einer Geraden aufstellst und was <M>m</M> und <M>t</M> in einer Situation bedeuten.</>}
         seiten={seiten}
       />
