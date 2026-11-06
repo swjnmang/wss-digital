@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- Das Freiwurf-Duell, Titelbild. Bildwelt Siebdruck / zweifarbig (Themenfarbe Petrol + Leuchtpink): Turnierplakat mit Korb, Ball und den drei Trefferbilanzen.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/haeufigkeiten -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&display=swap" rel="stylesheet">
+<style>body{margin:0} text{font-family:'Bricolage Grotesque';font-variation-settings:'wdth' 75,'opsz' 96}</style>
+<script src="_siebdruck.js"></script></head><body><div id="bild"></div>
+<script>
+const pink = `<circle cx="930" cy="250" r="190" fill="RASTER" stroke="none"/>
+ <circle cx="760" cy="150" r="54" stroke="none"/>
+ <rect x="60" y="250" width="26" height="70" stroke="none"/><rect x="60" y="340" width="26" height="70" stroke="none"/><rect x="60" y="430" width="26" height="70" stroke="none"/>`;
+const petrol = `<text x="60" y="130" font-size="104" font-weight="800" stroke="none">FREIWURF-DUELL</text>
+ <text x="60" y="200" font-size="40" font-weight="700" stroke="none">Wer fährt zum Schulturnier?</text>
+ ${[['Mia', '18 von 24'], ['Jonas', '21 von 30'], ['Lena', '27 von 40']].map(([n, t], i) => `<rect x="60" y="${250 + i * 90}" width="440" height="70" fill="none" stroke-width="5"/><text x="110" y="${300 + i * 90}" font-size="44" font-weight="800" stroke="none">${n}</text><text x="480" y="${300 + i * 90}" text-anchor="end" font-size="44" font-weight="700" stroke="none">${t}</text>`).join('')}
+ <text x="80" y="560" font-size="30" font-weight="600" stroke="none">Treffer von Würfen</text>
+ <rect x="880" y="80" width="230" height="150" fill="none" stroke-width="10"/><rect x="950" y="140" width="90" height="70" fill="none" stroke-width="8"/>
+ <line x1="1100" y1="230" x2="1100" y2="600" stroke-width="22"/>
+ <path d="M900 250 L1090 250" stroke-width="12"/>
+ ${[0,1,2,3,4,5].map(i => `<line x1="${910 + i * 34}" y1="250" x2="${930 + i * 26}" y2="360" stroke-width="5"/>`).join('')}
+ <path d="M915 360 L1070 360" stroke-width="5"/>
+ <path d="M760 96 Q790 150 760 204 M706 150 L814 150 M724 110 Q760 150 796 110 M724 190 Q760 150 796 190" fill="none" stroke-width="6"/>
+ <path d="M640 520 Q700 300 760 210" fill="none" stroke-width="5" stroke-dasharray="18 14"/>`;
+SD.bild(1200, 600, [
+  { farbe: '#ff4f98', svg: pink },
+  { farbe: '#0e6670', versatz: [4, -3], svg: petrol },
+]);
+</script>
+</body></html>

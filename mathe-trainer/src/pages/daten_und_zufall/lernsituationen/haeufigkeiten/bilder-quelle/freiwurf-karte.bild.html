@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- Das Freiwurf-Duell, Handlungsprodukt: Karteikarte „So vergleiche ich fair“. Bildwelt Siebdruck / zweifarbig.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/haeufigkeiten -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&display=swap" rel="stylesheet">
+<style>body{margin:0} text{font-family:'Bricolage Grotesque';font-variation-settings:'wdth' 75,'opsz' 96}</style>
+<script src="_siebdruck.js"></script></head><body><div id="bild"></div>
+<script>
+const pink = `<rect x="0" y="0" width="800" height="110" stroke="none"/><circle cx="680" cy="270" r="80" fill="RASTER" stroke="none"/>`;
+const petrol = `<text x="400" y="78" text-anchor="middle" font-size="60" font-weight="800" stroke="none">SO VERGLEICHE ICH FAIR</text>
+ <text x="60" y="180" font-size="40" font-weight="700" stroke="none">Formel: h = …</text>
+ <text x="60" y="250" font-size="40" font-weight="700" stroke="none">Beispiel: …</text>
+ <text x="60" y="320" font-size="40" font-weight="700" stroke="none">Merke: …</text>
+ ${[195, 265, 335].map(y => `<line x1="60" y1="${y}" x2="560" y2="${y}" stroke-width="3"/>`).join('')}
+ <text x="680" y="290" text-anchor="middle" font-size="64" font-weight="800" stroke="none">%</text>
+ <rect x="8" y="8" width="784" height="384" fill="none" stroke-width="6"/>`;
+SD.bild(800, 400, [
+  { farbe: '#ff4f98', svg: pink },
+  { farbe: '#0e6670', versatz: [3, -2], svg: petrol },
+]);
+</script>
+</body></html>

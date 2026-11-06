@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TaskShell from '../../../../components/layout/TaskShell';
+import { useSitzungState } from '../../../../hooks/useSitzung';
 import { Beispiel, M, MB, Merke } from '../../lernpfad/kit';
-import { CheckCard, Hilfen, McCard } from '../../../lineare_funktionen/lernsituation_kit/kit';
+import { CheckCard, Hilfen, Loesungsweg, McCard } from '../../../lineare_funktionen/lernsituation_kit/kit';
 import {
   Abschnitt,
   Aufklappbar,
@@ -10,11 +11,14 @@ import {
   BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../../lineare_funktionen/lernsituation_kit/seiten';
 import { Bilanz } from '../../../lineare_funktionen/lernsituation_kit/punkte';
-import { Kriterien, Vermutung, Zitat, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import { Kriterien, Vermutung, Zitat, standardKriterien, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import titelBild from './bilder/freiwurf-titel.webp';
+import karteBild from './bilder/freiwurf-karte.webp';
 import '../../lernpfad/lernpfad.css';
 import KorbwurfSpiel from './KorbwurfSpiel';
 import './freiwurf.css';
@@ -31,7 +35,9 @@ import './freiwurf.css';
 // Punkte nach Aufwand: Warm-up 2/2/3/2/2 = 11, Problem erkennen 3 + 4 = 7, Problem lösen 14 + 4 + 5 = 23, Übungen 4/6/7 = 17,
 // Profi 8 (Pflicht zusammen 58: Warm-up 19 %, Problem lösen 40 %, Übungen 29 %), Bonus-Spiel 4 Runden à 2 = 8 (wie die Profi-Übung).
 // Identität: Themenfarbe Petrol, Symbol fa-basketball, Titelbild Sporthalle mit Korb und Anzeigetafel, Leitobjekt der Basketballkorb
-// mit Trefferanzeige (Treffer H von Würfen n). Die Festlegung bleibt nur im Seitenzustand.
+// mit Trefferanzeige (Treffer H von Würfen n).
+// Bildwelt Siebdruck / zweifarbig (Petrol + Leuchtpink): Titelbild und Karteikarte sind gerenderte WebP-Dateien aus
+// bilder-quelle/freiwurf-*.bild.html (Bausteine in bilder-quelle/_siebdruck.js); die Trefferkörbe bleiben live.
 
 /** Lernvideo „absolute und relative Häufigkeit“ */
 export const VIDEO_HAEUFIGKEIT = 'https://www.youtube.com/watch?v=PBRoDcPymec';
@@ -56,48 +62,20 @@ const WAHL: Record<Wahl, string> = {
 
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
-/** Titelbild: Sporthalle mit Korb, Ball im Flug und Anzeigetafel */
-function Titelbild() {
-  return (
-    <svg
-      viewBox="0 0 720 252"
-      role="img"
-      aria-label="Eine Sporthalle. Rechts ein Basketballkorb am Brett, ein Ball fliegt in hohem Bogen darauf zu. Links eine Anzeigetafel mit der Aufschrift: Treffer 18, Würfe 24."
-    >
-      <rect x="0" y="206" width="720" height="46" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="206" y2="206" stroke="var(--ink)" strokeWidth="2" />
-      <circle cx="300" cy="206" r="46" fill="none" stroke="var(--line-strong)" strokeWidth="2" />
-      {/* Anzeigetafel */}
-      <rect x="40" y="30" width="230" height="124" rx="10" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="54" y="44" width="202" height="96" rx="6" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="1.5" />
-      <text x="100" y="72" textAnchor="middle" fontSize="16" fontWeight="700" fill="var(--ink)">Treffer</text>
-      <text x="210" y="72" textAnchor="middle" fontSize="16" fontWeight="700" fill="var(--ink)">Würfe</text>
-      <text x="100" y="124" textAnchor="middle" fontSize="44" fontWeight="800" fill="var(--primary)">18</text>
-      <text x="210" y="124" textAnchor="middle" fontSize="44" fontWeight="800" fill="var(--primary)">24</text>
-      <line x1="155" x2="155" y1="56" y2="130" stroke="var(--ink)" strokeWidth="1.5" />
-      <line x1="120" x2="120" y1="154" y2="206" stroke="var(--ink)" strokeWidth="5" />
-      <line x1="190" x2="190" y1="154" y2="206" stroke="var(--ink)" strokeWidth="5" />
-      {/* Korb */}
-      <line x1="640" x2="640" y1="60" y2="206" stroke="var(--ink)" strokeWidth="6" />
-      <rect x="610" y="30" width="62" height="74" rx="4" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
-      <rect x="626" y="62" width="30" height="24" fill="none" stroke="var(--ink)" strokeWidth="2" />
-      <line x1="610" x2="560" y1="92" y2="92" stroke="var(--highlight)" strokeWidth="6" strokeLinecap="round" />
-      <path d="M562 92 L572 134 M576 92 L580 138 M592 92 L590 138 M606 92 L598 134 M562 108 Q584 118 606 108 M566 122 Q584 130 602 122" stroke="var(--ink)" strokeWidth="1.5" fill="none" />
-      {/* Ball im Flug */}
-      <path d="M340 190 Q440 -10 560 80" stroke="var(--ink)" strokeWidth="2" strokeDasharray="6 8" fill="none" />
-      <circle cx="470" cy="46" r="20" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-      <path d="M450 46 H490 M470 26 V66" stroke="var(--ink)" strokeWidth="1.5" />
-      <circle cx="338" cy="190" r="14" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-    </svg>
-  );
-}
-
 const THEMA: Thema = {
   name: 'Das Freiwurf-Duell',
   farbe: 'petrol',
   icon: 'fa-basketball',
-  bild: <Titelbild />,
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Siebdruck-Plakat in Petrol und Pink: Freiwurf-Duell. Wer fährt zum Schulturnier? Mia 18 von 24, Jonas 21 von 30, Lena 27 von 40 Treffer. Rechts ein Basketballkorb, ein Ball fliegt darauf zu."
+    />
+  ),
 };
+const BILDWELT: Bildwelt = { welt: 'siebdruck', variante: 'zweifarbig' };
 
 /* ── Leitobjekt: der Basketballkorb mit Trefferanzeige ───────────────────── */
 
@@ -141,37 +119,6 @@ function Trefferkoerbe({ ergebnis = false }: { ergebnis?: boolean }) {
             </g>
           );
         })}
-      </svg>
-    </div>
-  );
-}
-
-/** Handlungsprodukt: Karteikarte */
-function KarteBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Eine Karteikarte mit der Überschrift: So vergleiche ich fair. Darunter drei Zeilen für Formel, Beispiel und Merksatz."
-      >
-        <rect x="150" y="10" width="420" height="170" rx="10" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="150" y="10" width="420" height="40" rx="10" fill="var(--primary)" />
-        <text x="360" y="38" textAnchor="middle" fontSize="20" fontWeight="800" fill="#fff">
-          So vergleiche ich fair
-        </text>
-        {[78, 108, 138, 166].map((y) => (
-          <line key={y} x1="172" x2="548" y1={y} y2={y} stroke="var(--line-strong)" strokeWidth="1.5" />
-        ))}
-        <text x="176" y="72" fontSize="17" fill="var(--ink)">
-          <tspan fontStyle="italic">Formel:</tspan> h = …
-        </text>
-        <text x="176" y="102" fontSize="17" fill="var(--ink)">
-          <tspan fontStyle="italic">Beispiel:</tspan> …
-        </text>
-        <text x="176" y="132" fontSize="17" fill="var(--ink)">
-          <tspan fontStyle="italic">Merke:</tspan> …
-        </text>
       </svg>
     </div>
   );
@@ -222,21 +169,23 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 ];
 
 const LOESUNG = (
-  <>
-    <MB>{'\\text{Mia: } h = \\frac{18}{24} = 0{,}75 = 75\\,\\%'}</MB>
-    <MB>{'\\text{Jonas: } h = \\frac{21}{30} = 0{,}7 = 70\\,\\%'}</MB>
-    <MB>{'\\text{Lena: } h = \\frac{27}{40} = 0{,}675 = 67{,}5\\,\\%'}</MB>
-    <p>Mia hat die beste Trefferquote, obwohl Lena die meisten Treffer hat.</p>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'Mia', tex: 'h = \\dfrac{18}{24} = 0{,}75 = 75\\,\\%' },
+      { titel: 'Jonas', tex: 'h = \\dfrac{21}{30} = 0{,}7 = 70\\,\\%' },
+      { titel: 'Lena', tex: 'h = \\dfrac{27}{40} = 0{,}675 = 67{,}5\\,\\%' },
+      { titel: 'Vergleichen', text: 'Mia hat die beste Trefferquote, obwohl Lena die meisten Treffer hat.' },
+    ]}
+  />
 );
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function FreiwurfEinstieg() {
   const navigate = useNavigate();
-  const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 65, fest: false });
-  const [geloest, setGeloest] = useState(false);
-  const [uebungen, setUebungen] = useState<string[]>([]);
+  const [fest, setFest] = useSitzungState<Festlegung<Wahl>>('fw-fest', { wahl: null, wert: 65, fest: false });
+  const [geloest, setGeloest] = useSitzungState('fw-geloest', false);
+  const [uebungen, setUebungen] = useSitzungState<string[]>('fw-uebungen', []);
   const uebungFertig = (key: string) => () => setUebungen((u) => (u.includes(key) ? u : [...u, key]));
 
   const seiten: Seite[] = [
@@ -257,7 +206,14 @@ export default function FreiwurfEinstieg() {
               { kind: 'num', key: 'a1', label: <M>{'\\frac{3}{4} ='}</M>, expected: 0.75, tol: 0.0001 },
               { kind: 'num', key: 'a2', label: <M>{'\\frac{9}{20} ='}</M>, expected: 0.45, tol: 0.0001 },
             ]}
-            solution={<MB>{'\\frac{3}{4} = 3 : 4 = 0{,}75 \\qquad \\frac{9}{20} = 9 : 20 = 0{,}45'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erster Bruch', tex: '\\dfrac{3}{4} = 3 : 4 = 0{,}75' },
+                  { titel: 'Zweiter Bruch', tex: '\\dfrac{9}{20} = 9 : 20 = 0{,}45' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('b')}
@@ -269,7 +225,14 @@ export default function FreiwurfEinstieg() {
               { kind: 'num', key: 'b1', label: <M>{'0{,}35 ='}</M>, expected: 35, unit: '%', tol: 0.0001 },
               { kind: 'num', key: 'b2', label: <M>{'0{,}6 ='}</M>, expected: 60, unit: '%', tol: 0.0001 },
             ]}
-            solution={<MB>{'0{,}35 = 35\\,\\% \\qquad 0{,}6 = 0{,}60 = 60\\,\\%'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erste Zahl', tex: '0{,}35 = 35\\,\\%' },
+                  { titel: 'Zweite Zahl', tex: '0{,}6 = 0{,}60 = 60\\,\\%' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('c')}
@@ -281,7 +244,14 @@ export default function FreiwurfEinstieg() {
               { kind: 'num', key: 'c1', label: <M>{'25\\,\\% \\text{ von } 80 ='}</M>, expected: 20, tol: 0.0001 },
               { kind: 'num', key: 'c2', label: <M>{'10\\,\\% \\text{ von } 350 ='}</M>, expected: 35, tol: 0.0001 },
             ]}
-            solution={<MB>{'25\\,\\% \\text{ von } 80 = 80 : 4 = 20 \\qquad 10\\,\\% \\text{ von } 350 = 350 : 10 = 35'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: '25 % sind ein Viertel', tex: '80 : 4 = 20' },
+                  { titel: '10 % sind ein Zehntel', tex: '350 : 10 = 35' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('d')}
@@ -289,7 +259,14 @@ export default function FreiwurfEinstieg() {
             punkte={2}
             prompt={<p>Eine Spielerin trifft 5 von 8 Würfen. Wie viele Treffer wären es bei 40 Würfen mit der gleichen Quote?</p>}
             fields={[{ kind: 'num', key: 'd', label: 'Treffer bei 40 Würfen:', expected: 25, tol: 0.0001 }]}
-            solution={<MB>{'40 : 8 = 5 \\qquad 5 \\cdot 5 = 25 \\text{ Treffer}'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Wie oft passen 8 Würfe in 40?', tex: '40 : 8 = 5' },
+                  { titel: 'Treffer mit demselben Faktor', tex: '5 \\cdot 5 = 25 \\text{ Treffer}' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -388,7 +365,16 @@ export default function FreiwurfEinstieg() {
                   { kind: 'num', key: 'mia', label: 'Mia bei 120 Würfen:', expected: 90, unit: 'Treffer', tol: 0.0001 },
                   { kind: 'num', key: 'jonas', label: 'Jonas bei 120 Würfen:', expected: 84, unit: 'Treffer', tol: 0.0001 },
                 ]}
-                solution={<MB>{'120 : 24 = 5,\\ 18 \\cdot 5 = 90 \\qquad 120 : 30 = 4,\\ 21 \\cdot 4 = 84'}</MB>}
+                solution={
+                  <Loesungsweg
+                    schritte={[
+                      { titel: 'Mia: Faktor', tex: '120 : 24 = 5' },
+                      { titel: 'Mia: Treffer', tex: '18 \\cdot 5 = 90' },
+                      { titel: 'Jonas: Faktor', tex: '120 : 30 = 4' },
+                      { titel: 'Jonas: Treffer', tex: '21 \\cdot 4 = 84' },
+                    ]}
+                  />
+                }
                 help={
                   <Hilfen
                     steps={[
@@ -492,7 +478,14 @@ export default function FreiwurfEinstieg() {
               />
             </Abschnitt>
             <Handlungsprodukt titel="Spickzettel „So vergleiche ich fair“">
-              <KarteBild />
+              <figure className="sl-foto sl-foto-klein">
+                <img
+                  src={karteBild}
+                  width={800}
+                  height={400}
+                  alt="Siebdruck-Karteikarte in Petrol und Pink: So vergleiche ich fair. Darunter die Zeilen Formel: h = …, Beispiel: … und Merke: …, rechts ein Prozentzeichen."
+                />
+              </figure>
               <p className="sl-text">
                 Gestalte in deinem Heft eine Karteikarte (Spickzettel) „So vergleiche ich fair“. Schreibe die Formel für die relative
                 Häufigkeit auf, rechne ein eigenes Beispiel mit zwei Spielern vor und erkläre in einem Merksatz, warum die meisten Treffer
@@ -504,28 +497,11 @@ export default function FreiwurfEinstieg() {
                   <li>„Die relative Häufigkeit ist …, sie berechnet sich so: …“</li>
                   <li>„Mein Beispiel: … hat … von … getroffen, also ist …“</li>
                   <li>„Mehr Treffer heißt nicht bessere Quote, weil …“</li>
-                  <li>
-                    „Abkürzungen: <M>H</M> = …, <M>h</M> = …, <M>n</M> = …“
-                  </li>
                 </ul>
               </Aufklappbar>
             </Handlungsprodukt>
             <Abschnitt titel="Ist dein Spickzettel vollständig?">
-              <Kriterien
-                onAlle={fertig.teil('produkt')}
-                items={[
-                  <>
-                    Die Formel <M>{'h = \\frac{H}{n}'}</M> steht auf der Karte
-                  </>,
-                  'Ein eigenes Beispiel mit zwei Spielern und der Rechnung in Prozent',
-                  'Ein Merksatz, warum die meisten Treffer nicht die beste Quote bedeuten',
-                  <>
-                    Auf der Karte steht, wofür die Abkürzungen stehen: <M>H</M> (absolute Häufigkeit, Anzahl der Treffer), <M>h</M>{' '}
-                    (relative Häufigkeit, Anteil der Treffer) und <M>n</M> (Anzahl aller Würfe). Außerdem erklärst du die Wörter
-                    „absolut“, „relativ“ und „Trefferquote“ und alle anderen Begriffe, die für dich neu waren.
-                  </>,
-                ]}
-              />
+              <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien()} />
             </Abschnitt>
             {geloest && (
               <Abschnitt titel="Das hältst du fest">
@@ -662,10 +638,14 @@ export default function FreiwurfEinstieg() {
               ]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'h_{\\text{Lkw}} = \\frac{36}{150} = 0{,}24 = 24\\,\\%'}</MB>
-                  <MB>{'h_{\\text{kein Lkw}} = \\frac{150 - 36}{150} = \\frac{114}{150} = 0{,}76 = 76\\,\\% \\quad \\text{oder} \\quad 100\\,\\% - 24\\,\\% = 76\\,\\%'}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Lkw', tex: 'h = \\dfrac{36}{150} = 0{,}24 = 24\\,\\%' },
+                    { titel: 'Kein Lkw: restliche Fahrzeuge', tex: '150 - 36 = 114' },
+                    { titel: 'Kein Lkw: relative Häufigkeit', tex: 'h = \\dfrac{114}{150} = 0{,}76 = 76\\,\\%', text: 'Oder kürzer: 100 % − 24 % = 76 %.' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -703,11 +683,14 @@ export default function FreiwurfEinstieg() {
               ]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'H = h \\cdot n = 0{,}75 \\cdot 40 = 30'}</MB>
-                  <MB>{'30 - 21 = 9'}</MB>
-                  <p>Jonas muss 9 der letzten 10 Würfe treffen.</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Formel umstellen', tex: 'H = h \\cdot n' },
+                    { titel: 'Treffer insgesamt', tex: 'H = 0{,}75 \\cdot 40 = 30' },
+                    { titel: 'Davon noch nötig', tex: '30 - 21 = 9', text: 'Jonas muss 9 der letzten 10 Würfe treffen.' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -758,6 +741,7 @@ export default function FreiwurfEinstieg() {
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             In dieser Lernsituation hilfst du Trainer Kern bei einer Nominierung. Du lernst, wie du mit der relativen Häufigkeit Gruppen
