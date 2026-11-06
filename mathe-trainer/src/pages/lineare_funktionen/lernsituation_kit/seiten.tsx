@@ -43,11 +43,17 @@ export type Thema = {
  * Untergrund, nie das Layout. Stile in bildwelten.css über die Klassen sl-welt-<welt> und sl-variante-<variante>.
  */
 export type Bildwelt =
-  | { welt: 'skizzenbuch'; variante: 'kariert' | 'kugelschreiber' }
-  | { welt: 'reportage'; variante: 'abendlicht' | 'duoton' | string }
-  | { welt: 'diorama'; variante: 'sommerwiese' | 'holzspielzeug' | string };
+  | { welt: 'skizzenbuch'; variante: 'kariert' | 'kugelschreiber' | 'tafel' | 'packpapier' }
+  | { welt: 'reportage'; variante: 'abendlicht' | 'duoton' | 'hochglanz' | 'zeitung' }
+  | { welt: 'diorama'; variante: 'sommerwiese' | 'holzspielzeug' | 'nacht' | 'winter' }
+  | { welt: 'bauplan'; variante: 'blaupause' | 'millimeter' | 'cad' | 'lasercut' }
+  | { welt: 'comic'; variante: 'pop' | 'retro' | 'manga' | 'storyboard' }
+  | { welt: 'siebdruck'; variante: 'zweifarbig' | 'schwarz' | 'dreifarbig' | 'linolschnitt' };
 
-const weltKlassen = (b?: Bildwelt) => (b ? ` sl-welt sl-welt-${b.welt} sl-variante-${b.variante}` : '');
+/** Unter-Varianten mit dunklem Untergrund: Text auf dem Untergrund hell, Karten bleiben weiß (Klasse sl-dunkel) */
+const DUNKEL = ['tafel', 'nacht'];
+const weltKlassen = (b?: Bildwelt) =>
+  b ? ` sl-welt sl-welt-${b.welt} sl-variante-${b.variante}${DUNKEL.includes(b.variante) ? ' sl-dunkel' : ''}` : '';
 
 /** SVG-Filter der Bildwelt Skizzenbuch: leicht wackeliger Bleistiftstrich für Skizzen und Graphen (CSS: filter: url(#sl-skizze)) */
 function WeltFilter({ bildwelt }: { bildwelt?: Bildwelt }) {
@@ -93,7 +99,7 @@ export type Seite = {
 
 /**
  * ruhig: ruhiges Grunddesign (eine Spalte, eine Akzentfarbe, keine Farbstreifen), siehe docs/skills/lernsituationen/SKILL.md.
- * bildwelt: Bildwelt mit Unter-Variante (Skizzenbuch, Reportage, Diorama), siehe bildwelten.css.
+ * bildwelt: Bildwelt mit Unter-Variante (Skizzenbuch, Reportage, Diorama, Bauplan, Comic, Siebdruck), siehe bildwelten.css.
  * punkte: Gamification (Punkte in der Leiste, Abzüge für Hilfen und Lösungsweg, Serien-Bonus; Bilanz mit <Bilanz /> aus punkte.tsx).
  */
 export function SeitenLernsituation(props: {
