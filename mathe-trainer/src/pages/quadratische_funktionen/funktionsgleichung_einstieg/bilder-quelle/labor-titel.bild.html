@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- Das Gleichungs-Labor, Titelbild. Bildwelt Skizzenbuch / Tafel: zwei Gleichungen und zwei Geraden in Kreide, Schnittpunkt S(? | ?).
+     Rendern: node scripts/bilder-rendern.cjs src/pages/quadratische_funktionen/funktionsgleichung_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_tafel.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const K = TAFEL.K, V = '#c9b6ff', G = '#ffe08a';
+// Koordinatensystem rechts: 1 LE = 54 px, Ursprung bei (640, 470)
+const X = (x) => 640 + x * 54, Y = (y) => 470 - y * 54;
+let g = `<g filter="url(#kreide)" font-family="Caveat" font-weight="700" fill="${K}">`;
+g += `<text x="70" y="140" font-size="64">I:  3x + 2y = 12</text><text x="70" y="230" font-size="64">II:  x + 2y = 7</text>`;
+g += `<text x="70" y="330" font-size="44" fill="${G}">Gesucht: (x | y)</text><text x="70" y="390" font-size="40">… das für beide passt</text>`;
+g += `<line x1="${X(-0.5)}" y1="${Y(0)}" x2="${X(9.8)}" y2="${Y(0)}" stroke="${K}" stroke-width="4"/><line x1="${X(0)}" y1="${Y(-0.6)}" x2="${X(0)}" y2="${Y(7.6)}" stroke="${K}" stroke-width="4"/>`;
+for (let i = 1; i <= 9; i++) g += `<line x1="${X(i)}" y1="${Y(0) - 7}" x2="${X(i)}" y2="${Y(0) + 7}" stroke="${K}" stroke-width="3"/>`;
+for (let i = 1; i <= 7; i++) g += `<line x1="${X(0) - 7}" y1="${Y(i)}" x2="${X(0) + 7}" y2="${Y(i)}" stroke="${K}" stroke-width="3"/>`;
+// I: y = 6 − 1,5x ; II: y = 3,5 − 0,5x
+g += `<line x1="${X(0)}" y1="${Y(6)}" x2="${X(4)}" y2="${Y(0)}" stroke="${V}" stroke-width="6" stroke-linecap="round"/>`;
+g += `<line x1="${X(0)}" y1="${Y(3.5)}" x2="${X(7)}" y2="${Y(0)}" stroke="${G}" stroke-width="6" stroke-linecap="round"/>`;
+g += `<text x="${X(0.5)}" y="${Y(6.4)}" font-size="40" fill="${V}">I</text><text x="${X(6.2)}" y="${Y(0.9)}" font-size="40" fill="${G}">II</text>`;
+g += `<circle cx="${X(2.5)}" cy="${Y(2.25)}" r="20" fill="none" stroke="${K}" stroke-width="4" stroke-dasharray="7 6"/><text x="${X(3)}" y="${Y(3.2)}" font-size="46">S( ? | ? )</text>`;
+g += `</g>`;
+// Kreidestück und Schwamm auf der Ablage
+g += `<rect x="900" y="560" width="70" height="18" rx="6" fill="#f3f1e7"/><rect x="1000" y="552" width="120" height="30" rx="6" fill="#d8c27a"/>`;
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${TAFEL.defs}${TAFEL.grund(1200, 600)}${g}</svg>`;
+</script>
+</body></html>

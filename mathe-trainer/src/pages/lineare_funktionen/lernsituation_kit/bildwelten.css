@@ -689,3 +689,9 @@
 @media (prefers-reduced-motion: reduce) {
   .sl-welt-comic .bk-btn:active { transform: none; }
 }
+
+/* Smartphone: Bildwelt-Seiten brauchen weniger Innenabstand, damit breite Lückenrechnungen nicht über den Rand ragen */
+@media (max-width: 440px) {
+  .sl-welt .sl-seite { padding-left: 10px; padding-right: 10px; }
+  .sl-welt .sl-seite .lp-ex.bk-panel { padding-left: 12px; padding-right: 12px; }
+}

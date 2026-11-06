@@ -1,7 +1,8 @@
 import { useEffect, useId, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
+import { useSitzungState } from '../../../hooks/useSitzung'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, Hilfen, McCard, SchrittHilfen, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { CheckCard, Hilfen, Loesungsweg, McCard, SchrittHilfen, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
 import {
   Abschnitt,
   Aufklappbar,
@@ -9,11 +10,14 @@ import {
   BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../lineare_funktionen/lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../../lineare_funktionen/lernsituation_kit/punkte'
-import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import { Kriterien, standardKriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import titelBild from './bilder/labor-titel.webp'
+import flussBild from './bilder/labor-fluss.webp'
 import { LgsBlock, LgsWeg } from '../../../components/LgsWeg'
 import BallonLabor from './BallonLabor'
 import { glTex, type Gl } from './gleichungen'
@@ -30,6 +34,8 @@ import './labor.css'
 // Teil 1 subtrahieren (gleiche Zahl vor einer Variablen), Teil 2 addieren (Gegenzahlen), Teil 3 erst eine Gleichung multiplizieren.
 // Handlungsprodukt analog: Entscheidungs-Flussdiagramm „Welcher Weg?“ im Heft (Kriterium Begriffe: LGS, I, II, Koeffizient, Lösungspaar, Gegenzahl, Probe).
 // Identität: Themenfarbe Violett, Symbol fa-flask, Titelbild Labortafel mit zwei Gleichungen und zwei Geraden, Leitobjekt das Gleichungs-Labor.
+// Bildwelt Skizzenbuch / Tafel: Titelbild und Flussdiagramm sind gerenderte Kreidezeichnungen aus bilder-quelle/labor-*.bild.html
+// (Bausteine in bilder-quelle/_tafel.js); Graphen und Labor mit Live-Rückmeldung bleiben Inline-SVG auf weißen Karten.
 // Punkte nach Aufwand: Warm-up 2/2/2/3/4, Punkt-Test 3, Teil 1 10, Teil 2 10, Teil 3 12, Flussdiagramm 5, Übungen 4/6/7/8, Profi 9,
 // Bonus-Spiel 4 Münzen à 2 (Pflicht zusammen 78: Warm-up 17 %, Problem erkennen 4 %, Problem lösen 47 %, Übungen 32 %).
 
@@ -61,72 +67,20 @@ const abstand = (p: Paar) => Math.hypot(p.x - LOES1.x, p.y - LOES1.y)
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
 /** Titelbild: Labortafel mit zwei Gleichungen, daneben ein Koordinatensystem mit zwei Geraden und zwei Glaskolben */
-function Titelbild() {
-  return (
-    <svg
-      viewBox="0 0 720 252"
-      role="img"
-      aria-label="Eine Labortafel mit den Gleichungen I: 4x + 3y = 18 und II: 4x − y = 2, darunter ein Plus- und ein Minuszeichen. Rechts ein Koordinatensystem mit zwei Geraden, die sich in einem Punkt mit Fragezeichen schneiden. Davor zwei Glaskolben."
-    >
-      <rect x="0" y="214" width="720" height="38" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="214" y2="214" stroke="var(--ink)" strokeWidth="2" />
-      {/* Tafel */}
-      <rect x="34" y="22" width="360" height="176" rx="10" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2.5" />
-      <rect x="48" y="36" width="332" height="148" rx="6" fill="var(--primary-soft)" />
-      <text x="70" y="80" fontSize="26" fontWeight="800" fill="var(--ink)">
-        I: 4x + 3y = 18
-      </text>
-      <text x="70" y="122" fontSize="26" fontWeight="800" fill="var(--ink)">
-        II: 4x − y = 2
-      </text>
-      <line x1="70" x2="300" y1="140" y2="140" stroke="var(--ink)" strokeWidth="3" />
-      <circle cx="330" cy="92" r="20" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-      <text x="330" y="101" textAnchor="middle" fontSize="26" fontWeight="800" fill="var(--ink)">
-        ±
-      </text>
-      <text x="70" y="172" fontSize="24" fontWeight="800" fill="var(--ink)">
-        ? = ?
-      </text>
-      {/* Koordinatensystem */}
-      <g>
-        <rect x="430" y="22" width="256" height="176" rx="8" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <line key={`v${i}`} x1={450 + i * 44} x2={450 + i * 44} y1="36" y2="186" stroke="var(--grid)" />
-        ))}
-        {[0, 1, 2, 3].map((i) => (
-          <line key={`h${i}`} x1="444" x2="672" y1={52 + i * 44} y2={52 + i * 44} stroke="var(--grid)" />
-        ))}
-        <line x1="450" x2="672" y1="176" y2="176" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="450" x2="450" y1="36" y2="186" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="462" x2="660" y1="48" y2="168" stroke="var(--primary)" strokeWidth="4" strokeLinecap="round" />
-        <line x1="462" x2="660" y1="150" y2="72" stroke="var(--ink)" strokeWidth="3" strokeDasharray="10 6" strokeLinecap="round" />
-        <circle cx="565" cy="110" r="16" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" strokeDasharray="4 3" />
-        <text x="565" y="117" textAnchor="middle" fontSize="20" fontWeight="800" fill="var(--ink)">
-          ?
-        </text>
-      </g>
-      {/* Glaskolben */}
-      {[
-        { x: 120, fl: 'var(--primary)' },
-        { x: 200, fl: 'var(--highlight)' },
-      ].map((k) => (
-        <g key={k.x}>
-          <path
-            d={`M${k.x - 10} 168 v16 L${k.x - 30} 212 h60 L${k.x + 10} 184 v-16 Z`}
-            fill="var(--surface)"
-            stroke="var(--ink)"
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-          />
-          <path d={`M${k.x - 21} 200 L${k.x - 30} 212 h60 L${k.x + 21} 200 Z`} fill={k.fl} />
-          <line x1={k.x - 14} x2={k.x + 14} y1="168" y2="168" stroke="var(--ink)" strokeWidth="2.5" />
-        </g>
-      ))}
-    </svg>
-  )
+const THEMA: Thema = {
+  name: 'Das Gleichungs-Labor',
+  farbe: 'violett',
+  icon: 'fa-flask',
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Eine Tafel mit Kreide: Links stehen die Gleichungen I: 3x + 2y = 12 und II: x + 2y = 7, darunter: Gesucht (x | y), das für beide passt. Rechts ein Koordinatensystem mit den beiden Geraden, ihr Schnittpunkt ist eingekreist und mit S(? | ?) beschriftet."
+    />
+  ),
 }
-
-const THEMA: Thema = { name: 'Das Gleichungs-Labor', farbe: 'violett', icon: 'fa-flask', bild: <Titelbild /> }
+const BILDWELT: Bildwelt = { welt: 'skizzenbuch', variante: 'tafel' }
 
 /* ── Graph: zwei Geraden im Koordinatensystem ───────────────────────────── */
 
@@ -431,42 +385,6 @@ function GleichungsLabor({
 /* ── Phase 3: Bilder und Rechenbeispiele ─────────────────────────────────── */
 
 /** Handlungsprodukt: Flussdiagramm „Welcher Weg?“ mit Frage-Raute und drei Wegen */
-function FlussdiagrammBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Ein Flussdiagramm auf einer Heftseite: oben eine Raute mit der Frage, welche Zahlen vor x oder y stehen. Drei Pfeile führen zu den Kästen subtrahieren, addieren und erst multiplizieren. Alle drei führen zum Kasten einsetzen und Probe."
-      >
-        <rect x="96" y="6" width="528" height="178" rx="6" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <polygon points="360,16 470,44 360,72 250,44" fill="var(--primary-soft)" stroke="var(--primary)" strokeWidth="2.5" />
-        <text x="360" y="50" textAnchor="middle" fontSize="16" fontWeight="800" fill="var(--ink)">
-          Zahlen vor x oder y?
-        </text>
-        {[
-          { x: 190, t: 'gleich: I − II' },
-          { x: 360, t: 'Gegenzahl: I + II' },
-          { x: 530, t: 'sonst: erst mal k' },
-        ].map((k) => (
-          <g key={k.x}>
-            <line x1="360" x2={k.x} y1="72" y2="98" stroke="var(--ink)" strokeWidth="2" />
-            <rect x={k.x - 78} y="98" width="156" height="32" rx="6" fill="var(--surface)" stroke="var(--primary)" strokeWidth="2.5" />
-            <text x={k.x} y="120" textAnchor="middle" fontSize="15" fontWeight="700" fill="var(--ink)">
-              {k.t}
-            </text>
-            <line x1={k.x} x2="360" y1="130" y2="150" stroke="var(--ink)" strokeWidth="2" />
-          </g>
-        ))}
-        <rect x="270" y="150" width="180" height="28" rx="6" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="360" y="170" textAnchor="middle" fontSize="15" fontWeight="800" fill="#fff">
-          einsetzen und Probe
-        </text>
-      </svg>
-    </div>
-  )
-}
-
 const BSP1_AUFGABE = (
   <>
     <MB>{'\\begin{aligned} \\text{I: } 5x + 3y &= 21 \\\\ \\text{II: } 2x + 3y &= 12 \\end{aligned}'}</MB>
@@ -731,10 +649,10 @@ export default function LaborEinstieg({
   onPrev: () => void
   onNext: () => void
 }) {
-  const [versuche, setVersuche] = useState<Paar[]>([])
-  const [entdeckt, setEntdeckt] = useState<string | null>(null)
-  const [geloest, setGeloest] = useState<string[]>([])
-  const [uebungen, setUebungen] = useState<string[]>([])
+  const [versuche, setVersuche] = useSitzungState<Paar[]>('gl-versuche', [])
+  const [entdeckt, setEntdeckt] = useSitzungState<string | null>('gl-entdeckt', null)
+  const [geloest, setGeloest] = useSitzungState<string[]>('gl-geloest', [])
+  const [uebungen, setUebungen] = useSitzungState<string[]>('gl-uebungen', [])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
     fertig()
@@ -811,7 +729,14 @@ export default function LaborEinstieg({
               { kind: 'num', key: 'b', label: 'Zahl vor y', expected: 6 },
               { kind: 'num', key: 'c', label: 'rechte Seite', expected: 8 },
             ]}
-            solution={<MB>{'(x + 3y) \\cdot 2 = 4 \\cdot 2 \\quad\\Rightarrow\\quad 2x + 6y = 8'}</MB>}
+            solution={
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Beide Seiten mit 2 multiplizieren', tex: '(x + 3y) \\cdot 2 = 4 \\cdot 2' },
+                    { titel: 'Ausmultiplizieren', tex: '2x + 6y = 8' },
+                  ]}
+                />
+              }
             help={
               <Hilfen
                 steps={[
@@ -843,7 +768,14 @@ export default function LaborEinstieg({
               { kind: 'num', key: 'r', label: 'rechte Seite nach minus 4', expected: 9 },
               { kind: 'num', key: 'y', label: 'Wert von y', expected: 3 },
             ]}
-            solution={<MB>{'\\begin{aligned} 2 \\cdot 2 + 3y &= 13 \\\\ 4 + 3y &= 13 && \\mid -4 \\\\ 3y &= 9 && \\mid :3 \\\\ y &= 3 \\end{aligned}'}</MB>}
+            solution={
+                <Loesungsweg
+                  schritte={[
+                    { titel: <><M>{'x = 2'}</M> einsetzen</>, tex: ['2 \\cdot 2 + 3y = 13', '4 + 3y = 13'] },
+                    { titel: <>Nach <M>y</M> auflösen</>, tex: ['4 + 3y = 13 \\quad \\mid -4', '3y = 9 \\quad \\mid :3', 'y = 3'] },
+                  ]}
+                />
+              }
             help={
               <Hilfen
                 steps={[
@@ -873,8 +805,14 @@ export default function LaborEinstieg({
               { kind: 'num', key: 'y', label: <M>{'y ='}</M>, expected: 3 },
             ]}
             solution={
-              <MB>{'\\begin{aligned} 2x - 1 &= -x + 5 && \\mid +x \\\\ 3x - 1 &= 5 && \\mid +1 \\\\ 3x &= 6 && \\mid :3 \\\\ x &= 2 \\qquad y = 2 \\cdot 2 - 1 = 3 \\end{aligned}'}</MB>
-            }
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Die Terme gleichsetzen', tex: '2x - 1 = -x + 5' },
+                    { titel: <>Nach <M>x</M> auflösen</>, tex: ['2x - 1 = -x + 5 \\quad \\mid +x', '3x - 1 = 5 \\quad \\mid +1', '3x = 6 \\quad \\mid :3', 'x = 2'] },
+                    { titel: <><M>x</M> einsetzen</>, tex: 'y = 2 \\cdot 2 - 1 = 3' },
+                  ]}
+                />
+              }
             help={
               <Hilfen
                 steps={[
@@ -1097,7 +1035,14 @@ export default function LaborEinstieg({
             />
           </Abschnitt>
           <Handlungsprodukt titel="Flussdiagramm „Welcher Weg?“">
-            <FlussdiagrammBild />
+            <figure className="sl-foto sl-foto-klein">
+              <img
+                src={flussBild}
+                width={800}
+                height={400}
+                alt="Ein Flussdiagramm in Kreide: oben die Frage Zahl vor x oder y?, darunter drei Wege: gleich, dann I − II; Gegenzahl, dann I + II; sonst erst mal k. Alle drei führen zu: einsetzen, Probe."
+              />
+            </figure>
             <p className="sl-text">
               Zeichne in deinem Heft ein Flussdiagramm, mit dem du bei jedem Gleichungssystem den passenden Weg findest. Oben steht die Frage, welche Zahlen vor <M>x</M> oder{' '}
               <M>y</M> stehen. Drei Pfeile führen zu den Wegen subtrahieren, addieren und erst multiplizieren. Unten treffen sich alle Wege beim Einsetzen und bei der Probe. Schreibe
@@ -1113,19 +1058,7 @@ export default function LaborEinstieg({
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist dein Flussdiagramm vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                'Die Startfrage: Welche Zahlen stehen vor x oder vor y?',
-                'Drei Wege mit Pfeilen: gleiche Zahl → subtrahieren, Gegenzahlen → addieren, sonst → erst eine Gleichung multiplizieren',
-                'Zu jedem Weg ein Beispiel von dieser Seite mit der Rechnung (z. B. „I − II“, „I + II“, „II · 2“)',
-                'Der gemeinsame Schluss: die zweite Variable durch Einsetzen berechnen und die Probe machen',
-                <>
-                  Unter deinem Flussdiagramm erklärst du die Begriffe und Abkürzungen: LGS (lineares Gleichungssystem), I und II (die beiden Gleichungen), Lösungspaar{' '}
-                  <M>{'(x \\mid y)'}</M>, Koeffizient (die Zahl vor einer Variablen), Gegenzahl, Probe und alle anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien()}             />
           </Abschnitt>
           {geloest.length === 3 && (
             <Abschnitt titel="Das hältst du fest">
@@ -1421,6 +1354,7 @@ export default function LaborEinstieg({
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             Im Gleichungs-Labor lernst du das Additions- und Subtraktionsverfahren kennen. Damit löst du Gleichungssysteme, auch wenn die Gleichungen nicht nach <M>y</M> aufgelöst
