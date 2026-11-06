@@ -4,6 +4,7 @@ import { type Q, val, parseAnswer, isIncomplete, Tex, GREEN, RED, PRAISE, pick, 
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import EscapeEinstieg from './scheitelpunkt_einstieg/EscapeEinstieg'
+import { LernsituationKarte } from '../lineare_funktionen/lernsituation_kit/seiten'
 import { useBackHandler } from '../../hooks/useBackHandler'
 import { type Level, type Feld, LEVEL_LABEL, ANZAHL_AUFGABEN, neueAufgabe } from './scheitelpunkt_uebung/aufgaben'
 
@@ -446,22 +447,14 @@ export default function Scheitelpunkt() {
           {header}
           <div className={`${panel} flex flex-col`}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-            <button
+            <LernsituationKarte
+              thema={{ name: 'Das Lichtwerk', farbe: 'schiefer', icon: 'fa-door-closed' }}
+              beschreibung="Neu beim Thema? Du bist im Lager eingeschlossen. Knacke den Türcode aus dem Brunnen-Modell und lerne dabei, den Scheitelpunkt einer Parabel zu berechnen."
               onClick={() => {
                 setLernsituation(true)
                 window.scrollTo({ top: 0 })
               }}
-              style={{ background: 'var(--primary)' }}
-              className="rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-            >
-              <p className="text-lg font-bold mb-1 text-white">Eingeschlossen im Lichtwerk</p>
-              <p className="text-xl mb-2 text-white">
-                <i className="fa-solid fa-door-closed" aria-hidden="true" />
-              </p>
-              <p className="text-sm text-white/90">
-                Neu beim Thema? Knackt den Türcode im Escape-Room und findet dabei heraus, wie du den Scheitelpunkt einer Parabel aus der allgemeinen Form berechnest.
-              </p>
-            </button>
+            />
           </div>
           <div className={panel}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
