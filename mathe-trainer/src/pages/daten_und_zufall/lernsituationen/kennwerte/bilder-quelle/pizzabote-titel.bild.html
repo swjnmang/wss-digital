@@ -1,0 +1,34 @@
+<!doctype html>
+<!-- Der Pizzabote, Titelbild. Bildwelt Comic / Storyboard (graue Marker + Beere): drei Szenen (Werbung „20 min!“, Klasse wartet mit Stoppuhr, Roller mit Karton).
+     Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/kennwerte -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style><script src="_storyboard.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const S = SB('#a0275e');
+let g = '';
+// Szene 1: Werbeplakat der zwei Pizzerien
+g += S.rahmen(30, 70, 360, 470, 1, 'Totale', 
+  S.grau('M30 430 H390 V540 H30 Z', 0) +
+  S.grau('M70 120 H350 V400 H70 Z', 0) + S.linie('M70 120 H350 V400 H70 Z') +
+  S.notiz(210, 180, 'Blitz-Pizza', 34, 'middle') + S.notiz(210, 230, '&amp; Mamma Mia', 30, 'middle') +
+  S.akz('M110 260 H310 V360 H110 Z') + `<text x="210" y="330" text-anchor="middle" font-family="Bangers" font-size="60" fill="#fff">20 MIN!</text>` +
+  S.notiz(210, 500, '„Wir liefern in 20 Minuten!“', 22, 'middle'));
+// Szene 2: Stoppuhr groß
+g += S.rahmen(420, 70, 360, 470, 2, 'Nah', 
+  S.grau('M420 70 H780 V540 H420 Z', 0) +
+  `<circle cx="600" cy="320" r="140" fill="#fff"/>` + S.grau('M600 180 A140 140 0 0 1 740 320 L600 320 Z', 1) +
+  S.linie('M600 180 A140 140 0 1 1 599 180') + S.linie('M580 150 H620 M600 150 V180') + S.linie('M600 320 L690 250', 6) +
+  `<text x="600" y="420" text-anchor="middle" font-family="Bangers" font-size="64" fill="#a0275e">44 MIN?!</text>` +
+  S.notiz(600, 520, 'Jonas stoppt mit', 24, 'middle'));
+// Szene 3: Roller mit Pizzakarton
+g += S.rahmen(810, 70, 360, 470, 3, 'Halbtotale, Fahrt', 
+  S.grau('M810 420 H1170 V540 H810 Z', 1) +
+  S.linie('M860 420 Q900 300 980 330 L1060 330 L1100 420') + `<circle cx="880" cy="430" r="34" fill="#fff"/><circle cx="1100" cy="430" r="34" fill="#fff"/>` +
+  S.linie('M880 430 m-34 0 a34 34 0 1 0 68 0 a34 34 0 1 0 -68 0') + S.linie('M1100 430 m-34 0 a34 34 0 1 0 68 0 a34 34 0 1 0 -68 0') +
+  S.akz('M960 250 H1100 V310 H960 Z') + S.linie('M960 250 H1100 V310 H960 Z') + `<text x="1030" y="290" text-anchor="middle" font-family="Bangers" font-size="30" fill="#fff">PIZZA</text>` +
+  S.linie('M1060 330 L1080 200 M1060 200 H1110', 5) +
+  S.linie('M830 300 H900 M820 340 H880 M840 380 H910', 3) +
+  S.notiz(990, 140, 'Wer ist im Schnitt', 26, 'middle') + S.notiz(990, 172, 'schneller?', 26, 'middle'));
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${S.defs}${S.papier(1200, 600)}${g}${S.korn(1200, 600)}</svg>`;
+</script>
+</body></html>

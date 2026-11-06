@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TaskShell from '../../../../components/layout/TaskShell';
+import { useSitzungState } from '../../../../hooks/useSitzung';
 import { Beispiel, M, MB, Merke, QuerTabelle } from '../../lernpfad/kit';
-import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../../../lineare_funktionen/lernsituation_kit/kit';
+import { CheckCard, Hilfen, Loesungsweg, McCard, TrackedCheck, TrackedMc } from '../../../lineare_funktionen/lernsituation_kit/kit';
 import {
   Abschnitt,
   Aufklappbar,
@@ -10,11 +11,14 @@ import {
   BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../../lineare_funktionen/lernsituation_kit/seiten';
 import { Bilanz } from '../../../lineare_funktionen/lernsituation_kit/punkte';
-import { Kriterien, Vermutung, Zitat, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import { Kriterien, Vermutung, Zitat, standardKriterien, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import titelBild from './bilder/pizzabote-titel.webp';
+import steckbriefBild from './bilder/pizzabote-steckbrief.webp';
 import { metaFor } from '../meta';
 import PizzaRallye from './PizzaRallye';
 import '../../lernpfad/lernpfad.css';
@@ -30,6 +34,8 @@ import './pizzabote.css';
 // (die Lieferzeiten sind kleine Pizzen auf der Zahlengerade).
 // Punkte (Pflicht): Warm-up 2+2+2+2+3 = 11 (19 %), Problem erkennen 3+2+2 = 7, Problem lösen 15+4+5 = 24 (41 %),
 // Übungen 4+6+7 = 17 (29 %), zusammen 59. Profi-Aufgabe 9, Bonus-Spiel höchstens 4 · 2 = 8.
+// Bildwelt Comic / Storyboard (graue Marker + Beere): Titelbild und Steckbrief sind gerenderte WebP-Dateien aus
+// bilder-quelle/pizzabote-*.bild.html (Bausteine in bilder-quelle/_storyboard.js); die Zahlengerade bleibt live.
 
 /** Lernvideo zu den statistischen Kennwerten (auch bei den Übungsaufgaben unter /daten-und-zufall/statistische-kennwerte verlinkt) */
 export const VIDEO_KENNWERTE = 'https://www.youtube.com/watch?v=UxKgca3l1G4';
@@ -60,63 +66,18 @@ const WAHL: Record<Wahl, string> = {
 
 const META = metaFor('kennwerte');
 
-/** Titelbild: Roller mit Pizzakarton, daneben ein offener Pizzakarton und die Stoppuhr mit dem Versprechen „20 min“ */
-function Titelbild() {
-  return (
-    <svg
-      viewBox="0 0 720 252"
-      role="img"
-      aria-label="Ein Pizzabote auf einem Roller mit Pizzakarton auf dem Gepäckträger. Links ein offener Pizzakarton und eine Stoppuhr mit dem Versprechen 20 Minuten."
-    >
-      <rect x="0" y="206" width="720" height="46" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="206" y2="206" stroke="var(--ink)" strokeWidth="2" />
-      {/* Stoppuhr */}
-      <rect x="62" y="30" width="22" height="12" rx="3" fill="var(--ink)" />
-      <rect x="54" y="40" width="38" height="8" rx="3" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <circle cx="73" cy="104" r="54" fill="var(--surface)" stroke="var(--ink)" strokeWidth="3" />
-      <path d="M73 104 L73 66 A38 38 0 0 1 106 85 Z" fill="var(--primary-soft)" />
-      <line x1="73" x2="73" y1="104" y2="64" stroke="var(--ink)" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="73" cy="104" r="5" fill="var(--ink)" />
-      {[0, 1, 2, 3].map((k) => (
-        <line key={k} x1="73" x2="73" y1="54" y2="62" stroke="var(--ink)" strokeWidth="3" transform={`rotate(${k * 90} 73 104)`} />
-      ))}
-      <text x="73" y="184" textAnchor="middle" fontSize="20" fontWeight="800" fill="var(--ink)">
-        20 min
-      </text>
-      {/* offener Pizzakarton */}
-      <polygon points="160,120 300,120 316,86 176,86" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <polygon points="150,196 310,196 310,140 150,140" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <ellipse cx="230" cy="140" rx="86" ry="22" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <ellipse cx="230" cy="138" rx="66" ry="15" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-      {[198, 222, 246, 266].map((x, i) => (
-        <circle key={x} cx={x} cy={134 + (i % 2) * 6} r="5" fill="var(--primary)" stroke="var(--ink)" strokeWidth="1.5" />
-      ))}
-      <line x1="230" x2="230" y1="124" y2="152" stroke="var(--ink)" strokeWidth="2" />
-      <line x1="196" x2="264" y1="132" y2="146" stroke="var(--ink)" strokeWidth="2" />
-      {/* Roller mit Pizzabote */}
-      <rect x="402" y="96" width="76" height="52" rx="6" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2.5" />
-      <circle cx="440" cy="122" r="16" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <path d="M440 110 L440 122 L450 122" fill="none" stroke="var(--ink)" strokeWidth="2.5" strokeLinecap="round" />
-      <path
-        d="M420 202 L420 168 Q420 154 436 154 L560 154 Q584 154 590 172 L600 202 Z"
-        fill="var(--primary)"
-        stroke="var(--ink)"
-        strokeWidth="2.5"
-      />
-      <path d="M560 154 L574 100 L612 100" fill="none" stroke="var(--ink)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="502" cy="108" r="15" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2.5" />
-      <path d="M502 124 L508 154 M508 140 L560 128" fill="none" stroke="var(--ink)" strokeWidth="6" strokeLinecap="round" />
-      <circle cx="446" cy="204" r="22" fill="var(--ink)" />
-      <circle cx="446" cy="204" r="8" fill="var(--surface)" />
-      <circle cx="580" cy="204" r="22" fill="var(--ink)" />
-      <circle cx="580" cy="204" r="8" fill="var(--surface)" />
-      <line x1="650" x2="690" y1="150" y2="150" stroke="var(--ink)" strokeWidth="3" strokeLinecap="round" opacity="0.4" />
-      <line x1="640" x2="700" y1="168" y2="168" stroke="var(--ink)" strokeWidth="3" strokeLinecap="round" opacity="0.4" />
-    </svg>
-  );
-}
-
-const THEMA: Thema = { ...META.thema, bild: <Titelbild /> };
+const THEMA: Thema = {
+  ...META.thema,
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Storyboard in drei Szenen: ein Werbeplakat von Blitz-Pizza und Mamma Mia mit „20 min!“, eine Stoppuhr mit „44 min?!“ und ein Roller mit Pizzakarton und der Frage: Wer ist im Schnitt schneller?"
+    />
+  ),
+};
+const BILDWELT: Bildwelt = { welt: 'comic', variante: 'storyboard' };
 
 /* ── Leitobjekt: Zahlengerade mit Pizzen und Stoppuhr-Marke ─────────────── */
 
@@ -192,39 +153,6 @@ function Zahlengerade({ reihen }: { reihen: { name: string; daten: number[] }[] 
   );
 }
 
-/** Handlungsprodukt: Steckbrief auf einer Karteikarte */
-function SteckbriefBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Eine Karteikarte mit der Überschrift Steckbrief Blitz-Pizza. Oben eine kleine Zahlengerade mit Punkten, darunter vier Zeilen für Spannweite, Modalwert, Median und Mittelwert und eine Zeile für das Urteil."
-      >
-        <rect x="150" y="6" width="420" height="178" rx="10" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="150" y="6" width="420" height="34" rx="10" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="170" y="30" fontSize="19" fontWeight="800" fill="var(--ink)">
-          Steckbrief: Blitz-Pizza
-        </text>
-        <circle cx="540" cy="23" r="9" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="176" x2="544" y1="70" y2="70" stroke="var(--ink)" strokeWidth="2" />
-        {[190, 205, 213, 228, 246, 262, 270, 292, 336, 470].map((x, i) => (
-          <circle key={i} cx={x} cy="62" r="5.5" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-        ))}
-        <text x="176" y="102" fontSize="17" fill="var(--ink)">
-          Spannweite: …  Modalwert: …
-        </text>
-        <text x="176" y="128" fontSize="17" fill="var(--ink)">
-          Median: …  Mittelwert: …
-        </text>
-        <text x="176" y="160" fontSize="17" fill="var(--ink)">
-          <tspan fontStyle="italic">Mein Urteil:</tspan> …
-        </text>
-      </svg>
-    </div>
-  );
-}
-
 /* ── Rechenbeispiel: Sushi-Lieferdienst ─────────────────────────────────── */
 
 // 8 Lieferzeiten, sortiert 22 24 25 28 30 30 30 35: R = 13, x_mod = 30, x_med = (28 + 30) : 2 = 29, Summe 224, Mittel 28
@@ -282,12 +210,16 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 
 /** Lösungsweg für die Blitz-Pizza */
 const LOESUNG = (
-  <>
-    <MB>{'12 \\;\\; 14 \\;\\; 15 \\;\\; 15 \\;\\; 16 \\;\\; 17 \\;\\; 18 \\;\\; 19 \\;\\; 20 \\;\\; 44 \\qquad n = 10'}</MB>
-    <MB>{'R = 44 - 12 = 32 \\text{ min} \\qquad x_{mod} = 15 \\text{ min}'}</MB>
-    <MB>{'x_{med} = \\frac{16 + 17}{2} = 16{,}5 \\text{ min}'}</MB>
-    <MB>{'\\overline{x} = \\frac{12 + 14 + 15 + 15 + 16 + 17 + 18 + 19 + 20 + 44}{10} = \\frac{190}{10} = 19 \\text{ min}'}</MB>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'Werte ordnen (n = 10)', tex: '12 \;\; 14 \;\; 15 \;\; 15 \;\; 16 \;\; 17 \;\; 18 \;\; 19 \;\; 20 \;\; 44' },
+      { titel: 'Spannweite', tex: 'R = 44 - 12 = 32 \\text{ min}' },
+      { titel: 'Modalwert', tex: 'x_{mod} = 15 \\text{ min}' },
+      { titel: 'Median (Mitte zwischen 5. und 6. Wert)', tex: 'x_{med} = \\dfrac{16 + 17}{2} = 16{,}5 \\text{ min}' },
+      { titel: 'Summe', tex: '12 + 14 + 15 + 15 + 16 + 17 + 18 + 19 + 20 + 44 = 190' },
+      { titel: 'Arithmetisches Mittel', tex: '\\overline{x} = \\dfrac{190}{10} = 19 \\text{ min}' },
+    ]}
+  />
 );
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
@@ -296,10 +228,10 @@ export default function PizzaboteEinstieg() {
   const navigate = useNavigate();
   const onBack = () => navigate('/daten-und-zufall/kennwerte');
   const onPractice = () => navigate('/daten-und-zufall/kennwerte/ueben');
-  const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 28, fest: false });
-  const [extrem, setExtrem] = useState<string[]>([]);
-  const [geloest, setGeloest] = useState(false);
-  const [uebungen, setUebungen] = useState<string[]>([]);
+  const [fest, setFest] = useSitzungState<Festlegung<Wahl>>('pb-fest', { wahl: null, wert: 28, fest: false });
+  const [extrem, setExtrem] = useSitzungState<string[]>('pb-extrem', []);
+  const [geloest, setGeloest] = useSitzungState('pb-geloest', false);
+  const [uebungen, setUebungen] = useSitzungState<string[]>('pb-uebungen', []);
   const extremGeprueft = (k: string) => () => setExtrem((e) => (e.includes(k) ? e : [...e, k]));
 
   const seiten: Seite[] = [
@@ -333,7 +265,14 @@ export default function PizzaboteEinstieg() {
               { kind: 'num', key: 's', label: 'Summe:', expected: 75, tol: 0 },
               { kind: 'num', key: 'q', label: 'Summe : 5 =', expected: 15, tol: 0 },
             ]}
-            solution={<MB>{'14 + 9 + 21 + 12 + 19 = 75 \\qquad 75 : 5 = 15'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Summe', tex: '14 + 9 + 21 + 12 + 19 = 75' },
+                  { titel: 'Durch 5 teilen', tex: '75 : 5 = 15' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('c')}
@@ -345,7 +284,14 @@ export default function PizzaboteEinstieg() {
               { kind: 'num', key: 'm1', label: <M>{'16 \\text{ und } 17\\colon'}</M>, expected: 16.5 },
               { kind: 'num', key: 'm2', label: <M>{'24 \\text{ und } 30\\colon'}</M>, expected: 27 },
             ]}
-            solution={<MB>{'\\frac{16 + 17}{2} = 16{,}5 \\qquad \\frac{24 + 30}{2} = 27'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Zwischen 16 und 17', tex: '\\dfrac{16 + 17}{2} = 16{,}5' },
+                  { titel: 'Zwischen 24 und 30', tex: '\\dfrac{24 + 30}{2} = 27' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('d')}
@@ -370,7 +316,14 @@ export default function PizzaboteEinstieg() {
               { kind: 'num', key: 'u', label: <M>{'44 - 12 ='}</M>, expected: 32, tol: 0 },
               { kind: 'num', key: 'r', label: <M>{'182 : 9 \\approx'}</M>, expected: 20.2, tol: 0.0001 },
             ]}
-            solution={<MB>{'44 - 12 = 32 \\qquad 182 : 9 = 20{,}222\\ldots \\approx 20{,}2'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Unterschied', tex: '44 - 12 = 32' },
+                  { titel: 'Teilen und runden', tex: '182 : 9 = 20{,}222\\ldots \\approx 20{,}2' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -591,7 +544,14 @@ export default function PizzaboteEinstieg() {
               />
             </Abschnitt>
             <Handlungsprodukt titel="Kennwerte-Steckbrief für die Klasse">
-              <SteckbriefBild />
+              <figure className="sl-foto sl-foto-klein">
+                <img
+                  src={steckbriefBild}
+                  width={800}
+                  height={400}
+                  alt="Storyboard-Karte Steckbrief: Blitz-Pizza mit einer Zahlengerade von 10 bis 46 und zehn Punkten (einer weit rechts bei 44), darunter Spannweite, Modalwert, Median, Mittelwert und ein Feld Mein Urteil."
+                />
+              </figure>
               <p className="sl-text">
                 Gestalte in deinem Heft eine Karteikarte „Steckbrief: Blitz-Pizza“. Zeichne die zehn Lieferzeiten als Punkte auf eine
                 Zahlengerade, schreibe deine vier Kennwerte mit Rechenweg auf und gib der Klasse ein klares Urteil.
@@ -607,20 +567,7 @@ export default function PizzaboteEinstieg() {
               </Aufklappbar>
             </Handlungsprodukt>
             <Abschnitt titel="Ist dein Steckbrief vollständig?">
-              <Kriterien
-                onAlle={fertig.teil('produkt')}
-                items={[
-                  'Eine Zahlengerade mit allen 10 Lieferzeiten als Punkten',
-                  'Alle vier Kennwerte mit Rechenweg (geordnete Liste für den Median, Summe für das Mittel)',
-                  'Ein klares Urteil, das mindestens zwei Kennwerte als Begründung nennt',
-                  <>
-                    Unter deinem Steckbrief steht, wofür die Begriffe und Abkürzungen stehen: <strong>Spannweite</strong> (<M>R</M>, größter
-                    minus kleinster Wert), <strong>Modalwert</strong> (<M>{'x_{mod}'}</M>), <strong>Median</strong> (<M>{'x_{med}'}</M>),{' '}
-                    <strong>arithmetisches Mittel</strong> (<M>{'\\overline{x}'}</M>) und <M>n</M> (Anzahl der Werte). Außerdem erklärst du alle
-                    Wörter, die für dich neu waren.
-                  </>,
-                ]}
-              />
+              <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('für die Klasse')} />
             </Abschnitt>
             {geloest && (
               <Abschnitt titel="Das hältst du fest">
@@ -653,11 +600,12 @@ export default function PizzaboteEinstieg() {
     {
       art: 'sichern',
       titel: 'Übungsaufgaben',
+      pflicht: ['1', '2', '3'],
       inhalt: (fertig) => (
         <>
           <p className="sl-text">
-            Prüfe und vertiefe dein Wissen mit vier Aufgaben. Die letzte ist für Profis. Hast du Übung 1 bis 3 gelöst, wird unten ein
-            Spiel freigeschaltet.
+            Prüfe und vertiefe dein Wissen mit drei Aufgaben, die vierte ist für Profis. Wenn du die drei Pflichtaufgaben gelöst hast, wartet unten ein
+            Spiel auf dich. Einzelarbeit, ca. 20 Minuten.
           </p>
           <Abschnitt titel="Übung 1: Wie lange warten die Anrufer?">
             <TrackedMc
@@ -758,11 +706,16 @@ export default function PizzaboteEinstieg() {
                 { kind: 'num', key: 'x', label: 'Mittelwert:', expected: 22, unit: 'min', tol: 0.001 },
               ]}
               solution={
-                <>
-                  <MB>{'18 \\;\\; 18 \\;\\; 18 \\;\\; \\mathbf{20} \\;\\; 24 \\;\\; 26 \\;\\; 30 \\qquad n = 7'}</MB>
-                  <MB>{'R = 30 - 18 = 12 \\quad x_{mod} = 18 \\quad x_{med} = 20 \\quad \\overline{x} = \\frac{154}{7} = 22'}</MB>
-                  <p>Bei 7 Werten ist der Median der 4. Wert der geordneten Liste.</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Werte ordnen (n = 7)', tex: '18 \;\; 18 \;\; 18 \;\; \\mathbf{20} \;\; 24 \;\; 26 \;\; 30' },
+                    { titel: 'Spannweite', tex: 'R = 30 - 18 = 12' },
+                    { titel: 'Modalwert', tex: 'x_{mod} = 18' },
+                    { titel: 'Median (4. Wert)', tex: 'x_{med} = 20' },
+                    { titel: 'Arithmetisches Mittel', tex: '\\overline{x} = \\dfrac{154}{7} = 22' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -797,10 +750,15 @@ export default function PizzaboteEinstieg() {
               ]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'\\frac{18 + 22 + 25 + 17 + 19 + 21 + x}{7} = 20 \\;\\Rightarrow\\; 122 + x = 140 \\;\\Rightarrow\\; x = 18'}</MB>
-                  <MB>{'17 \\;\\; 18 \\;\\; 18 \\;\\; \\mathbf{19} \\;\\; 21 \\;\\; 22 \\;\\; 25 \\;\\Rightarrow\\; x_{med} = 19'}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Nötige Summe aller 7 Werte', tex: '7 \\cdot 20 = 140' },
+                    { titel: 'Summe der 6 bekannten Werte', tex: '18 + 22 + 25 + 17 + 19 + 21 = 122' },
+                    { titel: 'Siebte Lieferzeit', tex: 'x = 140 - 122 = 18' },
+                    { titel: 'Werte ordnen, Median ist der 4. Wert', tex: '17 \;\; 18 \;\; 18 \;\; \\mathbf{19} \;\; 21 \;\; 22 \;\; 25' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -851,6 +809,7 @@ export default function PizzaboteEinstieg() {
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             In dieser Lernsituation findest du heraus, welche Pizzeria im Schnitt schneller liefert. Du lernst, wie Spannweite, Modalwert,
