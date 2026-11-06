@@ -1,0 +1,24 @@
+<!doctype html>
+<!-- Der neue Radweg, Handlungsprodukt Planskizze. Bildwelt Bauplan / Millimeterpapier: zwei parallele Geraden mit gleichem Steigungsdreieck, eine Senkrechte mit gedrehtem Dreieck.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/lineare_funktionen/parallel_senkrecht_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_millimeter.js"></script></head><body>
+<div id="bild" style="width:800px;height:400px"></div>
+<script>
+const T = MM.T, A = '#1d3f9e';
+const X = (x) => 120 + x * 40, Y = (y) => 340 - y * 40;
+let g = '';
+const gerade = (m, t, x1, x2, farbe, w = 4) => `<line x1="${X(x1)}" y1="${Y(m * x1 + t)}" x2="${X(x2)}" y2="${Y(m * x2 + t)}" stroke="${farbe}" stroke-width="${w}" stroke-linecap="round"/>`;
+g += gerade(0.5, 3, -2, 9, T) + gerade(0.5, 0.5, -1, 10, A) + gerade(-2, 10, 3, 5.2, A);
+// Steigungsdreiecke 2 nach rechts, 1 nach oben
+const dreieck = (x, y, farbe) => `<polygon points="${X(x)},${Y(y)} ${X(x + 2)},${Y(y)} ${X(x + 2)},${Y(y + 1)}" fill="${farbe}" fill-opacity=".12" stroke="${farbe}" stroke-width="2" stroke-dasharray="6 4"/>`;
+g += dreieck(0, 3, T) + dreieck(5, 3, A);
+// gedrehtes Dreieck an der Senkrechten: 1 nach rechts, 2 nach unten
+g += `<polygon points="${X(3.6)},${Y(2.8)} ${X(4.6)},${Y(2.8)} ${X(4.6)},${Y(0.8)}" fill="${A}" fill-opacity=".12" stroke="${A}" stroke-width="2" stroke-dasharray="6 4"/>`;
+// rechter Winkel am Schnittpunkt (x=2.8, y=4.4) der Senkrechten mit der oberen Geraden
+g += `<circle cx="${X(2.8)}" cy="${Y(4.4)}" r="5" fill="${T}"/>`;
+g += `<g font-family="Barlow Condensed" font-weight="600" font-size="24" fill="${T}"><text x="${X(8.3)}" y="${Y(7.4)}">Gleise</text><text x="${X(8.6)}" y="${Y(4.6)}" fill="${A}">Radweg ∥</text><text x="${X(5.1)}" y="${Y(0.2)}" fill="${A}">Brücke ⊥</text>
+<text x="${X(10.6)}" y="${Y(6.6)}" font-size="22">m₁ = m₂</text><text x="${X(10.6)}" y="${Y(5.9)}" font-size="22">m₁ · m₂ = −1</text></g>`;
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">${MM.defs}${MM.grund(800, 400)}${g}${MM.korn(800, 400)}</svg>`;
+</script>
+</body></html>
