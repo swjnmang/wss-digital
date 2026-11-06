@@ -7,6 +7,7 @@ import { useTaskTracking } from '../../hooks/useTaskTracking';
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import DrohneEinstieg from './punkt_gerade_einstieg/DrohneEinstieg'
+import { LernsituationKarte } from './lernsituation_kit/seiten'
 import { useBackHandler } from '../../hooks/useBackHandler';
 
 // Sechs Aufgaben auf einer Seite (je zwei pro Aufgabentyp)
@@ -881,22 +882,14 @@ export default function PunktGerade() {
           {header}
           <div className={`${panel} flex flex-col`}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-            <button
+            <LernsituationKarte
+              thema={{ name: 'Der Drohnen-Parcours', farbe: 'ocker', icon: 'fa-plane-up' }}
+              beschreibung="Neu beim Thema? Finde heraus, welche Leuchtringe die Drohne bei der Lichtshow trifft, knacke den Code fürs Hangar-Tor und lerne dabei die Punktprobe."
               onClick={() => {
                 setLernsituation(true);
                 window.scrollTo({ top: 0 });
               }}
-              style={{ background: 'var(--primary)' }}
-              className="rounded-2xl text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-            >
-              <p className="text-lg font-bold mb-1 text-white">Drohnen-Parcours</p>
-              <p className="text-xl mb-2 text-white">
-                <i className="fa-solid fa-plane-up" aria-hidden="true" />
-              </p>
-              <p className="text-sm text-white/90">
-                Neu beim Thema? Finde heraus, welche Leuchtringe eine Drohne trifft, und lerne dabei die Punktprobe.
-              </p>
-            </button>
+            />
           </div>
           <div className={`${panel} text-center`}>
             <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>

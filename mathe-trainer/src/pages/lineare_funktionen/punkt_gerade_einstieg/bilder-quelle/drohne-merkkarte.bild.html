@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- Der Drohnen-Parcours, Handlungsprodukt Merkkarte „Punktprobe“. Bildwelt Comic / retro.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/lineare_funktionen/punkt_gerade_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_comic.js"></script></head><body>
+<div id="bild" style="width:800px;height:400px"></div>
+<script>
+const C = CO('#8a5800', '#f4e2b8');
+const ink = '#2a211b';
+let inhalt = `<g transform="rotate(-2 400 210)"><rect x="100" y="66" width="600" height="290" fill="#fffaf0" stroke="${ink}" stroke-width="6"/>
+<rect x="100" y="66" width="600" height="64" fill="#8a5800" stroke="${ink}" stroke-width="6"/>
+<text x="130" y="112" font-family="Bangers" font-size="42" fill="#fff" letter-spacing="2">PUNKTPROBE</text>`;
+['x-Wert einsetzen', 'y-Wert ausrechnen', 'mit dem Punkt vergleichen'].forEach((t, i) => {
+  const y = 182 + i * 56;
+  inhalt += `<circle cx="150" cy="${y - 10}" r="20" fill="#f2b632" stroke="${ink}" stroke-width="4"/><text x="150" y="${y}" font-family="Bangers" font-size="28" text-anchor="middle" fill="${ink}">${i + 1}</text><text x="186" y="${y}" font-family="Comic Neue" font-weight="700" font-size="28" fill="${ink}">${t}</text>`;
+});
+inhalt += `<line x1="530" y1="330" x2="680" y2="180" stroke="#8a5800" stroke-width="6" stroke-linecap="round"/><circle cx="590" cy="270" r="11" fill="#9fd08a" stroke="${ink}" stroke-width="4"/><circle cx="650" cy="290" r="11" fill="#f08a6a" stroke="${ink}" stroke-width="4"/></g>`;
+const s = C.panel('p', '18,18 782,18 782,382 18,382', 'url(#pF)', inhalt);
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">${C.defs}${C.papier(800, 400)}${s}${C.korn(800, 400)}</svg>`;
+</script>
+</body></html>
