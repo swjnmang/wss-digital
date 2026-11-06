@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- Der neue Radweg, Titelbild. Bildwelt Bauplan / Millimeterpapier: Stadtplan mit Bahnlinie, Bahnhof B, Punkt R und Schriftfeld.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/lineare_funktionen/parallel_senkrecht_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_millimeter.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const T = MM.T, A = '#1d3f9e';
+// Plan: 1 Kästchen (40 px) = 1 LE, Ursprung bei (260, 360)
+const X = (x) => 260 + x * 40, Y = (y) => 360 - y * 40;
+let g = '';
+// Häuserblöcke (Stadtplan)
+[[-5, 7, 3, 2], [3.5, 7.5, 2.5, 1.5], [12, -1.5, 2, 2.5], [-4, -2.5, 3, 1.5]].forEach(([x, y, w, h]) => {
+  g += `<rect x="${X(x)}" y="${Y(y)}" width="${w * 40}" height="${h * 40}" fill="#ece6d8" stroke="${T}" stroke-width="1.5"/>`;
+});
+// Bahnlinie y = 0,5x + 1 als Gleis mit Schwellen
+const bahn = (x) => 0.5 * x + 1;
+const ang = Math.atan2(-20, 40) * 180 / Math.PI;
+g += `<g filter="url(#tusche)">`;
+for (let x = -6; x <= 14; x += 0.5) { g += `<line x1="${X(x)}" y1="${Y(bahn(x)) - 12}" x2="${X(x)}" y2="${Y(bahn(x)) + 12}" stroke="${T}" stroke-width="3" transform="rotate(${ang + 90} ${X(x)} ${Y(bahn(x))})" stroke-opacity=".75"/>`; }
+g += `<line x1="${X(-6)}" y1="${Y(bahn(-6)) - 5}" x2="${X(14)}" y2="${Y(bahn(14)) - 5}" stroke="${T}" stroke-width="3"/><line x1="${X(-6)}" y1="${Y(bahn(-6)) + 5}" x2="${X(14)}" y2="${Y(bahn(14)) + 5}" stroke="${T}" stroke-width="3"/></g>`;
+g += `<text x="${X(9.2)}" y="${Y(bahn(9.2)) - 22}" font-family="Barlow Condensed" font-weight="600" font-size="26" fill="${T}" transform="rotate(${ang} ${X(9.2)} ${Y(bahn(9.2)) - 22})">Bahnlinie y = 0,5x + 1</text>`;
+// Bahnhof B(2 | 2) und Punkt R(4 | −1)
+g += `<rect x="${X(0.4)}" y="${Y(5.6)}" width="${2.4 * 40}" height="${1.4 * 40}" fill="#fff" stroke="${T}" stroke-width="2.5"/><text x="${X(1.6)}" y="${Y(4.7)}" font-family="Barlow Condensed" font-weight="700" font-size="24" text-anchor="middle" fill="${T}">Bahnhof</text>`;
+[[2, 2, 'B(2 | 2)', 16, 34], [4, -1, 'R(4 | −1)', 16, 32]].forEach(([x, y, t, dx, dy]) => {
+  g += `<circle cx="${X(x)}" cy="${Y(y)}" r="9" fill="${A}" stroke="${T}" stroke-width="2.5"/><text x="${X(x) + dx}" y="${Y(y) + dy}" font-family="Barlow Condensed" font-weight="700" font-size="28" fill="${A}">${t}</text>`;
+});
+// Fragen: Radweg durch R parallel? Brücke bei B senkrecht?
+g += `<g font-family="Barlow Condensed" font-weight="600" font-size="24" fill="${T}">
+ <text x="${X(3.2)}" y="${Y(-2.6)}">Radweg parallel zu den Gleisen?</text>
+ <text x="${X(-5.4)}" y="${Y(3.6)}">Brücke senkrecht über die Gleise?</text></g>`;
+g += `<path d="M${X(-2.5)} ${Y(3.3)} Q ${X(0)} ${Y(3.2)} ${X(1.7)} ${Y(2.3)}" fill="none" stroke="${T}" stroke-width="1.4" marker-end="url(#pf)"/>`;
+g += MM.feld(820, 40, 340, 'Bauamt, Planung', [['Maßstab', '1 Kästchen = 100 m'], ['Radweg', 'durch R, ∥ Gleise'], ['Brücke', 'bei B, 90°']], A);
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${MM.defs}${MM.grund(1200, 600)}${g}${MM.korn(1200, 600)}</svg>`;
+</script>
+</body></html>

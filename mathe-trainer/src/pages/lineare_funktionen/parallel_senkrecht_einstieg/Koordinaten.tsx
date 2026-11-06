@@ -84,7 +84,7 @@ export function Koordinaten({
         gitter(xMin + 0.01, xMax - 0.01)
           .filter((v) => v !== 0 && v % beschriftung === 0)
           .map((v) => (
-            <text key={`tx${v}`} x={gx(v)} y={gy(0) + 19} textAnchor="middle" fontSize="15" fill="var(--ink-muted)">
+            <text key={`tx${v}`} x={gx(v)} y={gy(0) + 24} textAnchor="middle" fontSize="21" fill="var(--ink-muted)">
               {zahl(v)}
             </text>
           ))}
@@ -93,7 +93,7 @@ export function Koordinaten({
         gitter(yMin + 0.01, yMax - 0.01)
           .filter((v) => v !== 0 && v % beschriftung === 0)
           .map((v) => (
-            <text key={`ty${v}`} x={gx(0) - 7} y={gy(v) + 5} textAnchor="end" fontSize="15" fill="var(--ink-muted)">
+            <text key={`ty${v}`} x={gx(0) - 7} y={gy(v) + 5} textAnchor="end" fontSize="21" fill="var(--ink-muted)">
               {zahl(v)}
             </text>
           ))}
@@ -130,7 +130,7 @@ export function Koordinaten({
                   x={(gx(d.x) + gx(x2)) / 2}
                   y={gy(d.y) + (d.dy > 0 ? 20 : -8)}
                   textAnchor="middle"
-                  fontSize="16"
+                  fontSize="22"
                   fontWeight="800"
                   fill={farbe}
                   stroke="var(--surface)"
@@ -145,7 +145,7 @@ export function Koordinaten({
                   x={gx(x2) + (d.dx > 0 ? 7 : -7)}
                   y={(gy(d.y) + gy(y2)) / 2 + 6}
                   textAnchor={d.dx > 0 ? 'start' : 'end'}
-                  fontSize="16"
+                  fontSize="22"
                   fontWeight="800"
                   fill={farbe}
                   stroke="var(--surface)"
@@ -200,7 +200,7 @@ export function Koordinaten({
                 x={px + (mitte[0] / nm) * (r + 22)}
                 y={py + (mitte[1] / nm) * (r + 22) + 6}
                 textAnchor="middle"
-                fontSize="16"
+                fontSize="22"
                 fontWeight="800"
                 fill={farbe}
                 stroke="var(--surface)"
@@ -223,7 +223,7 @@ export function Koordinaten({
               x={gx(x)}
               y={gy(l.m * x + l.t) - 12}
               textAnchor="end"
-              fontSize="16"
+              fontSize="22"
               fontWeight="800"
               fill={l.farbe ?? 'var(--primary)'}
               stroke="var(--surface)"
@@ -241,7 +241,7 @@ export function Koordinaten({
             x={gx(p.x) + (p.links ? -12 : 12)}
             y={gy(p.y) + (p.unten ? 24 : -11)}
             textAnchor={p.links ? 'end' : 'start'}
-            fontSize="17"
+            fontSize="23"
             fontWeight="800"
             fill="var(--ink)"
             stroke="var(--surface)"

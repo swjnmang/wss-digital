@@ -1,10 +1,13 @@
 import { useEffect, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
+import { useSitzungState } from '../../../hooks/useSitzung'
 import { Beispiel, M, MB, Merke, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
-import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Seite, type Thema } from '../lernsituation_kit/seiten'
+import { CheckCard, Hilfen, Loesungsweg, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
+import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Bildwelt, type Seite, type Thema } from '../lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
-import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import { Kriterien, standardKriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import titelBild from './bilder/radweg-titel.webp'
+import skizzeBild from './bilder/radweg-skizze.webp'
 import { Koordinaten, winkelZwischen, type Linie } from './Koordinaten'
 import BrueckenBauer from './BrueckenBauer'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
@@ -25,7 +28,8 @@ import './radweg.css'
 // (Pflicht zusammen 61: Warm-up 11 = 18 %, Problem erkennen 5 = 8 %, Problem lösen 23 = 38 %, Übungen 22 = 36 %).
 // Identität: Themenfarbe Blau, Symbol Fahrrad, Titelbild Bahnlinie mit Bahnhof, Radweg und Brücke, Leitobjekt der Planungstisch
 // des Bauamts. Kontext Gesellschaft und Umwelt (Mobilität, Stadtplanung). Versuche bleiben im Seitenzustand.
-// Ruhiges Grunddesign: eine Spalte, pro Seite ist nur der Auftrag hervorgehoben. Nach unten scrollen ist erlaubt, seitlich nie.
+// Bildwelt Bauplan / Millimeterpapier: Titelbild (Stadtplan mit Schriftfeld) und Planskizze sind gerenderte WebP-Dateien aus
+// bilder-quelle/radweg-*.bild.html (Bausteine in bilder-quelle/_millimeter.js); der Planungstisch mit Live-Rückmeldung bleibt Inline-SVG.
 
 /** Lernvideo „Parallele und senkrechte Geraden“ */
 const VIDEO_PARALLEL_SENKRECHT = 'https://www.youtube.com/watch?v=Jpu96O3QmQc'
@@ -53,51 +57,20 @@ const gleichungTex = (m: number, t: number) => {
 
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
-/** Titelbild: Bahnlinie mit Bahnhof, darunter der geplante Radweg (parallel), quer darüber die Brücke mit „90°?“ */
-function Titelbild() {
-  return (
-    <svg viewBox="0 0 720 252" role="img" aria-label="Eine Bahnlinie läuft schräg durch die Stadt. Daneben steht ein Bahnhof. Gestrichelt ist ein geplanter Radweg parallel zu den Gleisen eingezeichnet, quer darüber eine geplante Fußgängerbrücke mit der Frage: rechter Winkel?">
-      <rect x="0" y="0" width="720" height="252" fill="var(--surface)" />
-      <circle cx="70" cy="50" r="24" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-      <g transform="rotate(-14 360 140)">
-        {/* Gleise mit Schwellen */}
-        {Array.from({ length: 30 }, (_, i) => (
-          <line key={i} x1={-60 + i * 30} x2={-60 + i * 30} y1="122" y2="154" stroke="var(--ink)" strokeWidth="5" />
-        ))}
-        <line x1="-80" x2="820" y1="128" y2="128" stroke="var(--ink)" strokeWidth="4" />
-        <line x1="-80" x2="820" y1="148" y2="148" stroke="var(--ink)" strokeWidth="4" />
-        {/* geplanter Radweg parallel zu den Gleisen */}
-        <rect x="-80" y="196" width="900" height="22" fill="var(--primary-soft)" />
-        <line x1="-80" x2="820" y1="207" y2="207" stroke="var(--primary)" strokeWidth="3" strokeDasharray="16 10" />
-        {/* geplante Brücke quer über die Gleise */}
-        <rect x="430" y="58" width="34" height="172" rx="4" fill="var(--primary)" fillOpacity="0.85" stroke="var(--ink)" strokeWidth="2" />
-        <polyline points="464,108 482,108 482,128" fill="none" stroke="var(--ink)" strokeWidth="2.5" />
-        {/* Fahrrad auf dem Radweg */}
-        <g transform="translate(150 196)">
-          <circle cx="0" cy="0" r="14" fill="none" stroke="var(--ink)" strokeWidth="3" />
-          <circle cx="44" cy="0" r="14" fill="none" stroke="var(--ink)" strokeWidth="3" />
-          <polyline points="0,0 16,-22 36,-22 44,0" fill="none" stroke="var(--ink)" strokeWidth="3" strokeLinejoin="round" />
-          <line x1="16" y1="-22" x2="22" y2="0" stroke="var(--ink)" strokeWidth="3" />
-          <line x1="36" y1="-22" x2="38" y2="-32" stroke="var(--ink)" strokeWidth="3" />
-        </g>
-      </g>
-      {/* Bahnhof */}
-      <rect x="196" y="58" width="132" height="64" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <polygon points="186,58 262,22 338,58" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="246" y="84" width="32" height="38" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <text x="262" y="50" textAnchor="middle" fontSize="15" fontWeight="800" fill="var(--surface)">
-        Bahnhof
-      </text>
-      {/* Frage an der Brücke */}
-      <rect x="520" y="70" width="104" height="40" rx="8" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <text x="572" y="97" textAnchor="middle" fontSize="20" fontWeight="800" fill="var(--ink)">
-        90° ?
-      </text>
-    </svg>
-  )
+const THEMA: Thema = {
+  name: 'Der neue Radweg',
+  farbe: 'blau',
+  icon: 'fa-bicycle',
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Stadtplan auf Millimeterpapier: Die Bahnlinie y = 0,5x + 1 läuft schräg durch die Stadt, am Bahnhof liegt der Punkt B(2 | 2), unterhalb der Punkt R(4 | −1). Fragen: Brücke senkrecht über die Gleise? Radweg parallel zu den Gleisen? Im Schriftfeld: Bauamt, Planung, 1 Kästchen = 100 m."
+    />
+  ),
 }
-
-const THEMA: Thema = { name: 'Der neue Radweg', farbe: 'blau', icon: 'fa-bicycle', bild: <Titelbild /> }
+const BILDWELT: Bildwelt = { welt: 'bauplan', variante: 'millimeter' }
 
 /** Leitobjekt: der Planungstisch, ein Stadtplan als Koordinatensystem mit Bahnlinie, Bahnhof B und Punkt R */
 function Plan({ linien = [], winkel, kreuzung }: { linien?: Linie[]; winkel?: number; kreuzung?: { x: number; y: number } }) {
@@ -320,32 +293,6 @@ function BeispielSenkrecht() {
   )
 }
 
-/** Handlungsprodukt: Planskizze im Heft (kariertes Blatt mit drei Geraden, Steigungsdreiecken und rechtem Winkel) */
-function SkizzeBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg viewBox="0 0 720 190" role="img" aria-label="Ein kariertes Heftblatt mit einer Planskizze: zwei parallele Geraden mit gleichen Steigungsdreiecken, eine dritte Gerade senkrecht dazu mit markiertem rechtem Winkel und Gleichungen daneben.">
-        <rect x="170" y="10" width="380" height="172" rx="6" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        {Array.from({ length: 18 }, (_, i) => (
-          <line key={`v${i}`} x1={170 + (i + 1) * 20} x2={170 + (i + 1) * 20} y1="10" y2="182" stroke="var(--grid)" />
-        ))}
-        {Array.from({ length: 8 }, (_, i) => (
-          <line key={`h${i}`} x1="170" x2="550" y1={10 + (i + 1) * 20} y2={10 + (i + 1) * 20} stroke="var(--grid)" />
-        ))}
-        <line x1="190" y1="130" x2="450" y2="40" stroke="var(--ink)" strokeWidth="4" />
-        <line x1="230" y1="170" x2="490" y2="80" stroke="var(--primary)" strokeWidth="4" />
-        <line x1="312" y1="29.5" x2="364" y2="180" stroke="var(--primary)" strokeWidth="4" />
-        <polygon points="250,109 310,109 310,88" fill="var(--primary)" fillOpacity="0.15" stroke="var(--ink)" strokeWidth="2" strokeDasharray="6 4" />
-        <polygon points="370,124 430,124 430,103" fill="var(--primary)" fillOpacity="0.15" stroke="var(--primary)" strokeWidth="2" strokeDasharray="6 4" />
-        <polyline points="341.3,77.6 345.3,88.9 333.9,92.8" fill="none" stroke="var(--ink)" strokeWidth="2" />
-        {[0, 1, 2].map((i) => (
-          <line key={i} x1="470" x2="540" y1={36 + i * 16} y2={36 + i * 16} stroke="var(--line-strong)" strokeWidth="3" strokeLinecap="round" />
-        ))}
-      </svg>
-    </div>
-  )
-}
-
 const BSP_AUFGABE = (
   <p>
     Im Stadtpark verläuft die Hauptallee entlang der Geraden <M>{'g{:}\\; y = 1{,}5x - 0{,}5'}</M>. Ein neuer Weg <M>h</M> soll <strong>parallel</strong> zur Allee
@@ -422,11 +369,15 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
         <p>
           Weg <M>h</M> mit <M>{'m = 1{,}5'}</M> und <M>{'P(1 \\mid 4)'}</M>:
         </p>
-        <MB>{'\\begin{aligned} 4 &= 1{,}5 \\cdot 1 + t \\\\ 4 &= 1{,}5 + t && \\mid -1{,}5 \\\\ t &= 2{,}5 \\end{aligned}'}</MB>
+        <MB>{'4 = 1{,}5 \\cdot 1 + t'}</MB>
+        <MB>{'4 = 1{,}5 + t \\quad \\mid -1{,}5'}</MB>
+        <MB>{'t = 2{,}5'}</MB>
         <p>
           Steg <M>s</M> mit <M>{'m = -\\tfrac{2}{3}'}</M> und <M>{'Q(3 \\mid 4)'}</M>:
         </p>
-        <MB>{'\\begin{aligned} 4 &= -\\tfrac{2}{3} \\cdot 3 + t \\\\ 4 &= -2 + t && \\mid +2 \\\\ t &= 6 \\end{aligned}'}</MB>
+        <MB>{'4 = -\\tfrac{2}{3} \\cdot 3 + t'}</MB>
+        <MB>{'4 = -2 + t \\quad \\mid +2'}</MB>
+        <MB>{'t = 6'}</MB>
       </>
     ),
   },
@@ -434,7 +385,8 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     title: 'Die Gleichungen vollständig aufschreiben',
     body: (
       <>
-        <MB>{'h{:}\\; y = 1{,}5x + 2{,}5 \\qquad s{:}\\; y = -\\tfrac{2}{3}x + 6'}</MB>
+        <MB>{'h{:}\\; y = 1{,}5x + 2{,}5'}</MB>
+        <MB>{'s{:}\\; y = -\\tfrac{2}{3}x + 6'}</MB>
         <p>
           Kontrolle: <M>h</M> hat dieselbe Steigung wie <M>g</M>, aber ein anderes <M>t</M>, also sind <M>g</M> und <M>h</M> parallel und nicht dieselbe Gerade. Für{' '}
           <M>s</M> gilt <M>{'1{,}5 \\cdot \\left(-\\tfrac{2}{3}\\right) = -1'}</M>, also steht <M>s</M> senkrecht auf <M>g</M>.
@@ -446,15 +398,17 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 
 /** Lösungsweg für Radweg und Brücke */
 const LOESUNG = (
-  <>
-    <p>Radweg (parallel, gleiche Steigung wie die Bahnlinie) durch <M>{'R(4 \\mid -1)'}</M>:</p>
-    <MB>{'m_R = 0{,}5 \\qquad \\begin{aligned} -1 &= 0{,}5 \\cdot 4 + t \\\\ -1 &= 2 + t && \\mid -2 \\\\ t &= -3 \\end{aligned} \\qquad y = 0{,}5x - 3'}</MB>
-    <p>Brücke (senkrecht, Steigungsdreieck „2 nach rechts, 1 nach oben“ gedreht zu „1 nach rechts, 2 nach unten“) durch <M>{'B(2 \\mid 2)'}</M>:</p>
-    <MB>{'m_B = -\\dfrac{1}{0{,}5} = -2 \\qquad \\begin{aligned} 2 &= -2 \\cdot 2 + t \\\\ 2 &= -4 + t && \\mid +4 \\\\ t &= 6 \\end{aligned} \\qquad y = -2x + 6'}</MB>
-    <p>
-      Probe: <M>{'0{,}5 \\cdot (-2) = -1'}</M>, die Brücke steht senkrecht auf den Gleisen.
-    </p>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'Radweg: Steigung der Bahnlinie übernehmen (parallel)', tex: 'm_R = 0{,}5' },
+      { titel: <><M>{'R(4 \\mid -1)'}</M> einsetzen, nach <M>t</M> auflösen</>, tex: ['-1 = 0{,}5 \\cdot 4 + t', '-1 = 2 + t \\quad \\mid -2', 't = -3'] },
+      { titel: 'Gleichung des Radwegs', tex: 'y = 0{,}5x - 3' },
+      { titel: 'Brücke: Steigungsdreieck drehen (senkrecht)', text: '„2 nach rechts, 1 nach oben“ wird zu „1 nach rechts, 2 nach unten“.', tex: 'm_B = -\\dfrac{1}{0{,}5} = -2' },
+      { titel: <><M>{'B(2 \\mid 2)'}</M> einsetzen, nach <M>t</M> auflösen</>, tex: ['2 = -2 \\cdot 2 + t', '2 = -4 + t \\quad \\mid +4', 't = 6'] },
+      { titel: 'Gleichung der Brücke', tex: 'y = -2x + 6' },
+      { titel: 'Probe', tex: '0{,}5 \\cdot (-2) = -1', text: 'Die Brücke steht senkrecht auf den Gleisen.' },
+    ]}
+  />
 )
 
 /* ── Phase 4: Wer hat recht? ─────────────────────────────────────────────── */
@@ -485,10 +439,10 @@ function ZweiGeraden() {
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => void; onPractice: () => void }) {
-  const [radweg, setRadweg] = useState<number[]>([])
-  const [bruecke, setBruecke] = useState<number[]>([])
-  const [geloest, setGeloest] = useState(false)
-  const [uebungen, setUebungen] = useState<string[]>([])
+  const [radweg, setRadweg] = useSitzungState<number[]>('rw-radweg', [])
+  const [bruecke, setBruecke] = useSitzungState<number[]>('rw-bruecke', [])
+  const [geloest, setGeloest] = useSitzungState('rw-geloest', false)
+  const [uebungen, setUebungen] = useSitzungState<string[]>('rw-uebungen', [])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
     fertig()
@@ -565,7 +519,14 @@ export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => v
               { kind: 'num', key: 'p', label: '2 · 3', expected: 6 },
               { kind: 'num', key: 't', label: 't', expected: -2 },
             ]}
-            solution={<MB>{'\\begin{aligned} 4 &= 2 \\cdot 3 + t \\\\ 4 &= 6 + t && \\mid -6 \\\\ t &= -2 \\end{aligned}'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Einsetzen', tex: ['4 = 2 \\cdot 3 + t', '4 = 6 + t'] },
+                  { titel: <>Nach <M>t</M> auflösen</>, tex: ['4 = 6 + t \\quad \\mid -6', 't = -2'] },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -717,7 +678,14 @@ export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => v
             />
           </Abschnitt>
           <Handlungsprodukt titel="Planskizze für das Bauamt">
-            <SkizzeBild />
+            <figure className="sl-foto sl-foto-klein">
+              <img
+                src={skizzeBild}
+                width={800}
+                height={400}
+                alt="Planskizze auf Millimeterpapier: Gleise und Radweg als parallele Geraden mit gleichem Steigungsdreieck (2 nach rechts, 1 nach oben), dazu die Brücke senkrecht mit gedrehtem Steigungsdreieck. Notiert: m₁ = m₂ und m₁ · m₂ = −1."
+              />
+            </figure>
             <p className="sl-text">
               Zeichne in deinem Heft (kariert, ein Kästchen ist eine Einheit) die Planskizze für das Bauamt: die Bahnlinie, den Radweg und die Brücke mit ihren Gleichungen.
               Zeige mit Steigungsdreiecken, <strong>warum</strong> der Radweg parallel und die Brücke senkrecht ist.
@@ -732,19 +700,7 @@ export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => v
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist deine Planskizze vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                <>Bahnlinie, Radweg und Brücke sind sauber eingezeichnet und mit ihren Gleichungen beschriftet, die Punkte <M>R</M> und <M>B</M> sind markiert.</>,
-                <>An der Bahnlinie und am Radweg steht dasselbe Steigungsdreieck (2 nach rechts, 1 nach oben), daneben „parallel, weil <M>{'m_1 = m_2'}</M>“.</>,
-                <>An der Brücke steht das um 90° gedrehte Steigungsdreieck, der rechte Winkel bei <M>B</M> ist markiert, daneben die Probe <M>{'m_1 \\cdot m_2 = -1'}</M>.</>,
-                <>
-                  Unter deiner Skizze steht, wofür die Abkürzungen stehen: <M>m</M> (Steigung), <M>t</M> (y-Achsenabschnitt), <M>{'m_1'}</M> und <M>{'m_2'}</M> (die
-                  Steigungen der beiden Geraden), die Zeichen <M>{'\\parallel'}</M> (parallel) und <M>{'\\perp'}</M> (senkrecht). Außerdem erklärst du die Begriffe
-                  „parallel“, „senkrecht“ (auch „orthogonal“), „Kehrwert“, „Steigungsdreieck“ und alle anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien()}             />
           </Abschnitt>
           {geloest && (
             <Abschnitt titel="Das hältst du fest">
@@ -853,11 +809,13 @@ export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => v
               }
               fields={[{ kind: 'gleichung', key: 'gl', label: 'Gleichung von h:', m: -4, t: 5, tol: 0.001 }]}
               solution={
-                <>
-                  <MB>{'m_h = -\\dfrac{1}{0{,}25} = -4'}</MB>
-                  <MB>{'\\begin{aligned} 1 &= -4 \\cdot 1 + t \\\\ 1 &= -4 + t && \\mid +4 \\\\ t &= 5 \\end{aligned}'}</MB>
-                  <MB>{'h{:}\\; y = -4x + 5'}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Steigung der Senkrechten', tex: 'm_h = -\\dfrac{1}{0{,}25} = -4' },
+                    { titel: <><M>P</M> einsetzen, nach <M>t</M> auflösen</>, tex: ['1 = -4 \\cdot 1 + t', '1 = -4 + t \\quad \\mid +4', 't = 5'] },
+                    { titel: 'Gleichung', tex: 'h{:}\\; y = -4x + 5' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -890,10 +848,14 @@ export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => v
                 { kind: 'gleichung', key: 'gl', label: 'Gleichung des Fußwegs:', m: -0.5, t: 4, tol: 0.001 },
               ]}
               solution={
-                <>
-                  <MB>{'m_{\\text{Straße}} = \\dfrac{3 - (-3)}{2 - (-1)} = \\dfrac{6}{3} = 2 \\qquad m_{\\text{Fußweg}} = -\\dfrac{1}{2} = -0{,}5'}</MB>
-                  <MB>{'\\begin{aligned} 3 &= -0{,}5 \\cdot 2 + t \\\\ 3 &= -1 + t && \\mid +1 \\\\ t &= 4 \\end{aligned} \\qquad y = -0{,}5x + 4'}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Steigung der Straße', tex: 'm_{\\text{Straße}} = \\dfrac{3 - (-3)}{2 - (-1)} = \\dfrac{6}{3} = 2' },
+                    { titel: 'Steigung des Fußwegs (senkrecht)', tex: 'm_{\\text{Fußweg}} = -\\dfrac{1}{2} = -0{,}5' },
+                    { titel: <><M>B</M> einsetzen, nach <M>t</M> auflösen</>, tex: ['3 = -0{,}5 \\cdot 2 + t', '3 = -1 + t \\quad \\mid +1', 't = 4'] },
+                    { titel: 'Gleichung des Fußwegs', tex: 'y = -0{,}5x + 4' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -958,6 +920,7 @@ export default function RadwegEinstieg({ onBack, onPractice }: { onBack: () => v
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={<>In dieser Lernsituation lernst du, woran du parallele und senkrechte Geraden an ihrer Steigung erkennst, wie du das mit dem Steigungsdreieck begründest und wie du ihre Gleichungen aufstellst.</>}
         seiten={seiten}
       />
