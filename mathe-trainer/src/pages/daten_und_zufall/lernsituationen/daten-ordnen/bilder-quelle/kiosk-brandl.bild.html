@@ -1,0 +1,29 @@
+<!doctype html>
+<!-- Der Pausenkiosk: Frau Brandl blättert die Zettel durch und tippt auf Wasser; im Kühlschrank ist Platz für genau eine Kiste. Bildwelt Comic / pop.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/daten-ordnen -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_comic.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const C = CO('#8a5800', '#fbf0da');
+const ink = '#141414';
+const person = (x, y) => `<g stroke="${ink}" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M${x - 90} ${y + 260} Q${x - 90} ${y + 110} ${x} ${y + 110} Q${x + 90} ${y + 110} ${x + 90} ${y + 260} Z" fill="#8a5800"/>
+ <circle cx="${x}" cy="${y + 40}" r="62" fill="#f3c9a0"/><path d="M${x - 62} ${y + 30} Q${x - 50} ${y - 40} ${x} ${y - 26} Q${x + 60} ${y - 40} ${x + 64} ${y + 30} Q${x + 30} ${y} ${x - 62} ${y + 30} Z" fill="#5a3a22"/>
+ <circle cx="${x - 20}" cy="${y + 44}" r="6" fill="${ink}"/><circle cx="${x + 22}" cy="${y + 44}" r="6" fill="${ink}"/><path d="M${x - 18} ${y + 72} Q${x} ${y + 84} ${x + 20} ${y + 72}" fill="none"/>
+ <rect x="${x + 40}" y="${y + 140}" width="110" height="74" fill="#fff" transform="rotate(-10 ${x + 95} ${y + 177})"/></g>
+ <text x="${x + 96}" y="${y + 186}" font-family="Comic Neue" font-weight="700" font-size="24" text-anchor="middle" fill="${ink}" transform="rotate(-10 ${x + 95} ${y + 177})">Wasser</text>`;
+let s = '';
+s += C.panel('p1', '24,24 690,24 670,576 24,576', 'url(#pT)',
+  person(250, 260) + C.blase(330, 50, 340, 150, 300, 260, ['Gefühlt stand bei', 'jedem zweiten Zettel', 'Wasser drauf!'], 30) +
+  C.kasten(44, 470, 380, 70, 'Frau Brandl, Kioskleiterin', 30, -2));
+s += C.panel('p2', '706,24 1176,24 1176,576 690,576', 'url(#pF)',
+  `<g stroke="${ink}" stroke-width="6" stroke-linejoin="round"><rect x="780" y="80" width="320" height="470" rx="18" fill="#eef6fb"/>` +
+  [0, 1, 2].map(i => `<line x1="780" y1="${220 + i * 110}" x2="1100" y2="${220 + i * 110}"/>`).join('') +
+  [0, 1, 2, 3].map(i => `<rect x="${800 + i * 72}" y="${150}" width="56" height="70" fill="${['#9fd3ef', '#f5c400', '#e98a3c', '#8a5a3a'][i]}"/>`).join('') +
+  [0, 1, 2, 3].map(i => `<rect x="${800 + i * 72}" y="${260}" width="56" height="70" fill="${['#e98a3c', '#9fd3ef', '#f5c400', '#9fd3ef'][i]}"/>`).join('') +
+  `<rect x="800" y="440" width="280" height="90" fill="#fff" stroke-dasharray="14 10"/></g>` +
+  C.laut(812, 500, 'PLATZ FÜR 1 KISTE', 40, -3));
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${C.defs}${C.papier(1200, 600)}${s}${C.korn(1200, 600)}</svg>`;
+</script>
+</body></html>
