@@ -523,7 +523,7 @@
 .sl-welt-bauplan .sl-seite .bk-graph { background: #fff; border: 1.5px solid var(--bp-tusche); border-radius: 0; box-shadow: none; }
 .sl-welt-bauplan .sl-seite .lp-ex .bk-graph,
 .sl-welt-bauplan .sl-seite .lp-example .bk-graph { border: 0; }
-.sl-welt-bauplan .bk-graph svg text { font-family: var(--font-display); font-size: 15px; }
+.sl-welt-bauplan .bk-graph svg text { font-family: var(--font-display); }
 .sl-welt-bauplan .sl-seite .bk-btn,
 .sl-start.sl-welt-bauplan .bk-btn,
 .sl-welt-bauplan .sl-bar .bk-btn { border-radius: 2px; font-family: var(--font-display); font-size: 17px; font-weight: 600; letter-spacing: 0.01em; }

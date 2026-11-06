@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- Der Torbogen, Handlungsprodukt Auftragsblatt. Bildwelt Bauplan / Blaupause: Blatt mit Skizze, nummerierten Schritten und Feld für die Gleichung.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/quadratische_funktionen/funktionsgleichung_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_blaupause.js"></script></head><body>
+<div id="bild" style="width:800px;height:400px"></div>
+<script>
+let g = '';
+// Skizze links
+const X = (m) => 90 + m * 52, Y = (m) => 300 - m * 52;
+const bogen = Array.from({ length: 41 }, (_, i) => i / 10).map((m) => `${X(m)},${Y(-0.25 * (m - 2) ** 2 + 3)}`).join(' ');
+g += `<line x1="60" x2="330" y1="${Y(0)}" y2="${Y(0)}" stroke="#fff" stroke-width="2"/><rect x="60" y="${Y(0)}" width="270" height="10" fill="url(#schraffur)"/>`;
+g += `<rect x="${X(0) - 6}" y="${Y(2)}" width="12" height="${Y(0) - Y(2)}" fill="none" stroke="#fff" stroke-width="2.5"/><rect x="${X(4) - 6}" y="${Y(2)}" width="12" height="${Y(0) - Y(2)}" fill="none" stroke="#fff" stroke-width="2.5"/>`;
+g += `<polyline points="${bogen}" fill="none" stroke="#fff" stroke-width="4"/>`;
+[['S', 2, 3, 0, -16], ['P', 0, 2, -16, -10], ['Q', 4, 2, 16, -10]].forEach(([n, x, y, dx, dy]) => {
+  g += `<circle cx="${X(x)}" cy="${Y(y)}" r="6" fill="#1d5596" stroke="#fff" stroke-width="2.5"/><text x="${X(x) + dx}" y="${Y(y) + dy}" font-family="Barlow Condensed" font-weight="700" font-size="24" fill="#fff" text-anchor="${dx < 0 ? 'end' : dx > 0 ? 'start' : 'middle'}">${n}</text>`;
+});
+// Schritte rechts
+g += `<g font-family="Barlow Condensed" fill="#fff"><text x="380" y="92" font-size="32" font-weight="700">Auftragsblatt Torbogen</text>`;
+['S in die Scheitelform', 'P einsetzen, a berechnen', 'Scheitelform', 'allgemeine Form, Probe mit Q'].forEach((t, i) => {
+  const y = 136 + i * 46;
+  g += `<circle cx="396" cy="${y - 8}" r="15" fill="none" stroke="#fff" stroke-width="2"/><text x="396" y="${y}" font-size="21" font-weight="700" text-anchor="middle">${i + 1}</text><text x="424" y="${y}" font-size="24" font-weight="500">${t}</text>`;
+});
+g += `<rect x="380" y="316" width="370" height="46" fill="#1a4d88" stroke="#fff" stroke-width="1.8"/><text x="396" y="347" font-size="24" font-weight="600">An die Maschine: y = …</text></g>`;
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">${BP.defs}${BP.grund(800, 400)}${g}${BP.korn(800, 400)}</svg>`;
+</script>
+</body></html>

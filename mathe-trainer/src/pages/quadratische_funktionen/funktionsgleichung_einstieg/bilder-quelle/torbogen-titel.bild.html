@@ -1,0 +1,34 @@
+<!doctype html>
+<!-- Der Torbogen, Titelbild. Bildwelt Bauplan / Blaupause: Ansicht der Hofeinfahrt mit Torbogen, Maßlinien und Schriftfeld.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/quadratische_funktionen/funktionsgleichung_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_blaupause.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+// 1 m = 80 px, Boden bei y = 470, linker Pfosten bei x = 300
+const X = (m) => 300 + m * 80, Y = (m) => 470 - m * 80;
+const bogen = Array.from({ length: 81 }, (_, i) => i / 20).map((m) => `${X(m)},${Y(-0.25 * (m - 2) ** 2 + 3)}`).join(' ');
+let g = '';
+// Hauswände links und rechts (geschnitten, schraffiert)
+g += `<rect x="70" y="${Y(3.6)}" width="${X(0) - 90 - 70}" height="${Y(0) - Y(3.6)}" fill="none" stroke="#fff" stroke-width="3"/>`;
+g += `<rect x="${X(4) + 80}" y="${Y(2.9)}" width="190" height="${Y(0) - Y(2.9)}" fill="none" stroke="#fff" stroke-width="3"/>`;
+g += `<rect x="96" y="${Y(2.6)}" width="70" height="66" fill="none" stroke="#fff" stroke-width="2"/><rect x="${X(4) + 140}" y="${Y(2.3)}" width="70" height="66" fill="none" stroke="#fff" stroke-width="2"/>`;
+// Boden
+g += `<line x1="50" x2="1150" y1="${Y(0)}" y2="${Y(0)}" stroke="#fff" stroke-width="2.5"/><rect x="50" y="${Y(0)}" width="1100" height="14" fill="url(#schraffur)"/>`;
+// Pfosten und Bogen
+g += `<g filter="url(#druck)"><rect x="${X(0) - 9}" y="${Y(2)}" width="18" height="${Y(0) - Y(2)}" fill="none" stroke="#fff" stroke-width="3"/><rect x="${X(4) - 9}" y="${Y(2)}" width="18" height="${Y(0) - Y(2)}" fill="none" stroke="#fff" stroke-width="3"/>
+<polyline points="${bogen}" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/></g>`;
+// Mittellinie
+g += `<line x1="${X(2)}" x2="${X(2)}" y1="${Y(0) + 20}" y2="${Y(3.5)}" stroke="#fff" stroke-width="1.2" stroke-dasharray="18 5 3 5" stroke-opacity=".8"/>`;
+// Maße
+g += BP.mass(X(0), Y(0) + 54, X(4), Y(0) + 54, '4 m');
+g += `<line x1="${X(0)}" x2="${X(0)}" y1="${Y(0) + 6}" y2="${Y(0) + 64}" stroke="#fff" stroke-opacity=".7"/><line x1="${X(4)}" x2="${X(4)}" y1="${Y(0) + 6}" y2="${Y(0) + 64}" stroke="#fff" stroke-opacity=".7"/>`;
+g += BP.mass(X(0) - 44, Y(0), X(0) - 44, Y(2), '2 m');
+g += `<line x1="${X(0) - 52}" x2="${X(0) - 10}" y1="${Y(2)}" y2="${Y(2)}" stroke="#fff" stroke-opacity=".7"/>`;
+g += BP.mass(X(2) + 46, Y(0), X(2) + 46, Y(3), '3 m');
+g += `<line x1="${X(2)}" x2="${X(2) + 56}" y1="${Y(3)}" y2="${Y(3)}" stroke="#fff" stroke-opacity=".7"/>`;
+g += BP.feld(820, 56, 330, 'Auftrag Torbogen', [['Material', 'Stahlrohr'], ['Bogen', 'Parabel'], ['Maschine', 'y = ? x² + ? x + ?']]);
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${BP.defs}${BP.grund(1200, 600)}${g}${BP.korn(1200, 600)}</svg>`;
+document.getElementById('bild').innerHTML = svg;
+</script>
+</body></html>

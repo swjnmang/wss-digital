@@ -1,7 +1,8 @@
 import { useEffect, useId, useState, type ChangeEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
+import { useSitzungState } from '../../../hooks/useSitzung'
 import { Beispiel, M, MB, Merke, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, Hilfen, McCard, SchrittHilfen, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { CheckCard, Hilfen, Loesungsweg, McCard, SchrittHilfen, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
 import {
   Abschnitt,
   Aufklappbar,
@@ -9,11 +10,14 @@ import {
   BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../lineare_funktionen/lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../../lineare_funktionen/lernsituation_kit/punkte'
-import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import { Kriterien, standardKriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import titelBild from './bilder/torbogen-titel.webp'
+import auftragBild from './bilder/torbogen-auftrag.webp'
 import { LERNVIDEO_FALL1 } from '../FunktionsgleichungAufstellen'
 import BogenKran from './BogenKran'
 import '../../daten_und_zufall/lernpfad/lernpfad.css'
@@ -31,7 +35,10 @@ import './torbogen.css'
 // Fehlerhafte Azubi-Pläne kommen erst in Phase 4, wenn die SuS den Weg selbst gerechnet haben.
 // Punkte nach Aufwand: Warm-up 2/2/2/3/2, Biegemaschine 3, Ergebnis-Abgleich 15, Auftragsblatt 5, Übungen 4/6/6, Profi 8
 // (Pflicht zusammen 50: Warm-up 22 %, Problem lösen 40 %, Übungen 32 %).
-// Die Versuche an der Maschine bleiben nur im Seitenzustand (kein Speichern) und werden in „Das hältst du fest“ wieder aufgegriffen.
+// Die Versuche an der Maschine werden in „Das hältst du fest“ wieder aufgegriffen.
+// Bildwelt Bauplan / Blaupause: Titelbild (Ansicht der Hofeinfahrt mit Maßen und Schriftfeld) und Auftragsblatt sind gerenderte
+// WebP-Dateien aus bilder-quelle/torbogen-*.bild.html (gemeinsame Bausteine in bilder-quelle/_blaupause.js); die Skizze der Einfahrt
+// mit Live-Rückmeldung bleibt Inline-SVG.
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
@@ -95,42 +102,20 @@ function ProblemText() {
 
 /* ── Identität: Titelbild, Themenfarbe Kupfer (Metallbau), Leitobjekt Biegemaschine ───── */
 
-/** Titelbild der Startbox: Hofeinfahrt zwischen zwei Hauswänden, Torbogen aus Stahlrohr mit den Maßen aus dem Auftrag */
-function Titelbild() {
-  // Maßstab: 1 m = 46 px, Boden bei y = 212, linker Pfosten bei x = 268
-  const X = (m: number) => 268 + m * 46
-  const Y = (m: number) => 212 - m * 46
-  const bogen = Array.from({ length: 41 }, (_, i) => i / 10).map((m) => `${X(m)},${Y(-0.25 * (m - 2) ** 2 + 3)}`).join(' ')
-  return (
-    <svg viewBox="0 0 720 252" role="img" aria-label="Hofeinfahrt mit einem Torbogen aus Stahlrohr: 4 m breit, Pfosten 2 m hoch, in der Mitte 3 m hoch">
-      <rect x="0" y="212" width="720" height="40" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="212" y2="212" stroke="var(--ink)" strokeWidth="2" />
-      {/* Hauswände links und rechts */}
-      <rect x="40" y="70" width="200" height="142" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <polygon points="30,72 140,22 250,72" fill="var(--primary)" opacity="0.85" />
-      <rect x="80" y="110" width="44" height="40" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="160" y="140" width="44" height="72" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="480" y="90" width="200" height="122" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <polygon points="470,92 580,46 690,92" fill="var(--primary)" opacity="0.85" />
-      <rect x="520" y="126" width="44" height="40" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="600" y="126" width="44" height="40" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      {/* Torbogen */}
-      <rect x={X(0) - 6} y={Y(2)} width="12" height={Y(0) - Y(2)} fill="var(--ink-muted)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x={X(4) - 6} y={Y(2)} width="12" height={Y(0) - Y(2)} fill="var(--ink-muted)" stroke="var(--ink)" strokeWidth="2" />
-      <polyline points={bogen} fill="none" stroke="var(--primary)" strokeWidth="7" strokeLinecap="round" />
-      {/* Maße */}
-      <line x1={X(2)} x2={X(2)} y1={Y(0)} y2={Y(3) + 6} stroke="var(--ink)" strokeWidth="1.5" strokeDasharray="5 4" />
-      <text x={X(2) + 8} y={Y(1.5)} fontSize="17" fontWeight="700" fill="var(--ink)">3 m</text>
-      <text x={X(0) + 12} y={Y(1)} fontSize="17" fontWeight="700" fill="var(--ink)">2 m</text>
-      <line x1={X(0)} x2={X(4)} y1="224" y2="224" stroke="var(--ink)" strokeWidth="1.5" />
-      <line x1={X(0)} x2={X(0)} y1="218" y2="230" stroke="var(--ink)" strokeWidth="1.5" />
-      <line x1={X(4)} x2={X(4)} y1="218" y2="230" stroke="var(--ink)" strokeWidth="1.5" />
-      <text x={X(2)} y="246" textAnchor="middle" fontSize="17" fontWeight="700" fill="var(--ink)">4 m</text>
-    </svg>
-  )
+const THEMA: Thema = {
+  name: 'Der Torbogen',
+  farbe: 'kupfer',
+  icon: 'fa-archway',
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Bauplan als Blaupause: Hofeinfahrt zwischen zwei Häusern mit einem parabelförmigen Torbogen. Maße: 4 m breit, Pfosten 2 m hoch, in der Mitte 3 m hoch. Im Schriftfeld steht: Auftrag Torbogen, Material Stahlrohr, Bogen Parabel, Maschine y = ? x² + ? x + ?."
+    />
+  ),
 }
-
-const THEMA: Thema = { name: 'Der Torbogen', farbe: 'kupfer', icon: 'fa-archway', bild: <Titelbild /> }
+const BILDWELT: Bildwelt = { welt: 'bauplan', variante: 'blaupause' }
 
 /* ── Sachbild: Hofeinfahrt mit Torbogen ──────────────────────────────────── */
 
@@ -320,42 +305,6 @@ function Biegemaschine({ auftrag, versuche, onSenden }: { auftrag: ReactNode; ve
   )
 }
 
-/** Handlungsprodukt: Auftragsblatt für die Kollegin an der Biegemaschine */
-function AuftragsblattBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Ein Auftragsblatt auf einem Klemmbrett mit der Überschrift Auftrag Torbogen. Links eine kleine Skizze mit Bogen und zwei Pfosten, rechts Zeilen für die Rechnung und die Gleichung für die Maschine."
-      >
-        <rect x="170" y="10" width="380" height="174" rx="10" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="190" y="26" width="340" height="150" rx="4" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="320" y="2" width="80" height="20" rx="6" fill="var(--ink-muted)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="360" y="54" textAnchor="middle" fontSize="19" fontWeight="800" fill="var(--ink)">
-          Auftrag Torbogen
-        </text>
-        {/* kleine Skizze */}
-        <line x1="206" x2="320" y1="160" y2="160" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="218" y="122" width="7" height="38" fill="var(--ink-muted)" />
-        <rect x="301" y="122" width="7" height="38" fill="var(--ink-muted)" />
-        <path d="M221 122 Q263 74 305 122" fill="none" stroke="var(--primary)" strokeWidth="5" strokeLinecap="round" />
-        <circle cx="263" cy="98" r="5" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-        {/* Zeilen */}
-        <text x="340" y="88" fontSize="16" fill="var(--ink)" fontStyle="italic">
-          ① ② ③ ④ …
-        </text>
-        {[104, 124].map((y) => (
-          <line key={y} x1="340" x2="512" y1={y} y2={y} stroke="var(--line-strong)" strokeWidth="2" />
-        ))}
-        <text x="340" y="154" fontSize="16" fill="var(--ink)">
-          <tspan fontStyle="italic">An die Maschine:</tspan> y = …
-        </text>
-      </svg>
-    </div>
-  )
-}
-
 // Farben im Lösungsweg: Werte des Scheitelpunkts blau, Werte des Punkts P grün, der berechnete Formfaktor a orange
 const FS = (t: string) => `\\textcolor{#1d4ed8}{${t}}`
 const FP = (t: string) => `\\textcolor{#15803d}{${t}}`
@@ -418,22 +367,16 @@ const BSP_SCHRITTE = [
 
 /** Lösungsweg für den Torbogen */
 const LOESUNG = (
-  <>
-    <p>
-      ① Scheitelpunkt <M>{FS('S(2 \\mid 3)')}</M> einsetzen:
-    </p>
-    <MB>{`\\begin{aligned} y &= a(x - ${FS('x_S')})^2 + ${FS('y_S')} \\\\ y &= a(x - ${FS('2')})^2 + ${FS('3')} \\end{aligned}`}</MB>
-    <p>
-      ② Pfosten <M>{FP('P(0 \\mid 2)')}</M> einsetzen (<M>{FP('x = 0')}</M>, <M>{FP('y = 2')}</M>) und nach <M>a</M> auflösen:
-    </p>
-    <MB>{`\\begin{aligned} ${FP('2')} &= a \\cdot (${FP('0')} - 2)^2 + 3 \\\\ 2 &= 4a + 3 && \\mid -3 \\\\ -1 &= 4a && \\mid :4 \\\\ a &= ${FA('-0{,}25')} \\end{aligned}`}</MB>
-    <p>
-      ③ <M>{FA('a = -0{,}25')}</M> einsetzen, Scheitelform:
-    </p>
-    <MB>{`y = ${FA('-0{,}25')}(x - 2)^2 + 3`}</MB>
-    <p>④ In die allgemeine Form umwandeln:</p>
-    <MB>{'\\begin{aligned} y &= -0{,}25 \\cdot [(x - 2) \\cdot (x - 2)] + 3 \\\\ y &= -0{,}25 \\cdot [x^2 - 4x + 4] + 3 \\\\ y &= -0{,}25x^2 + x - 1 + 3 \\\\ y &= -0{,}25x^2 + x + 2 \\end{aligned}'}</MB>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: <>Scheitelpunkt <M>{FS('S(2 \\mid 3)')}</M> in die Scheitelform einsetzen</>, tex: [`y = a(x - ${FS('x_S')})^2 + ${FS('y_S')}`, `y = a(x - ${FS('2')})^2 + ${FS('3')}`] },
+      { titel: <>Pfosten <M>{FP('P(0 \\mid 2)')}</M> einsetzen</>, tex: [`${FP('2')} = a \\cdot (${FP('0')} - 2)^2 + 3`, '2 = 4a + 3'] },
+      { titel: <>Nach <M>a</M> auflösen</>, tex: ['2 = 4a + 3 \\quad \\mid -3', '-1 = 4a \\quad \\mid :4', `a = ${FA('-0{,}25')}`] },
+      { titel: 'Scheitelform angeben', tex: `y = ${FA('-0{,}25')}(x - 2)^2 + 3` },
+      { titel: 'Klammer auflösen', tex: ['y = -0{,}25 \\cdot [(x - 2) \\cdot (x - 2)] + 3', 'y = -0{,}25 \\cdot [x^2 - 4x + 4] + 3'] },
+      { titel: <>Jeden Summanden mit <M>a</M> multiplizieren und zusammenfassen</>, tex: ['y = -0{,}25x^2 + x - 1 + 3', 'y = -0{,}25x^2 + x + 2'] },
+    ]}
+  />
 )
 
 /** Plan eines Azubis mit nummerierten Rechenschritten (für „Wer hat recht?“); die Zeilen eines Schritts stehen untereinander, am = ausgerichtet */
@@ -463,9 +406,9 @@ const SCHRITTE = ['Schritt 1 (Scheitel einsetzen)', 'Schritt 2 (a berechnen)', '
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBack: () => void; onPractice: () => void; onNext: () => void }) {
-  const [versuche, setVersuche] = useState<Versuch[]>([])
-  const [geloest, setGeloest] = useState(false)
-  const [uebungen, setUebungen] = useState<string[]>([])
+  const [versuche, setVersuche] = useSitzungState<Versuch[]>('tb-versuche', [])
+  const [geloest, setGeloest] = useSitzungState('tb-geloest', false)
+  const [uebungen, setUebungen] = useSitzungState<string[]>('tb-uebungen', [])
   const uebung = (k: string, fertig: () => void) => () => {
     fertig()
     setUebungen((u) => (u.includes(k) ? u : [...u, k]))
@@ -537,12 +480,12 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
               { kind: 'num', key: 'ys', label: 'Zahl am Ende mit Vorzeichen', expected: -1 },
             ]}
             solution={
-              <>
-                <MB>{'y = a(x - 3)^2 + (-1) = a(x - 3)^2 - 1'}</MB>
-                <p>
-                  <M>{'x_S = 3'}</M> kommt in die Klammer, <M>{'y_S = -1'}</M> ans Ende.
-                </p>
-              </>
+              <Loesungsweg
+                schritte={[
+                  { titel: <><M>{'x_S = 3'}</M> in die Klammer, <M>{'y_S = -1'}</M> ans Ende</>, tex: 'y = a(x - 3)^2 + (-1)' },
+                  { titel: 'Vorzeichen zusammenfassen', tex: 'y = a(x - 3)^2 - 1' },
+                ]}
+              />
             }
           />
           <CheckCard
@@ -555,7 +498,14 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
               { kind: 'num', key: 'q1', label: <M>{'(0 - 2)^2 ='}</M>, expected: 4 },
               { kind: 'num', key: 'q2', label: <M>{'(1 - 4)^2 ='}</M>, expected: 9 },
             ]}
-            solution={<MB>{'(0 - 2)^2 = (-2) \\cdot (-2) = 4 \\qquad (1 - 4)^2 = (-3) \\cdot (-3) = 9'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erste Klammer', tex: '(0 - 2)^2 = (-2) \\cdot (-2) = 4' },
+                  { titel: 'Zweite Klammer', tex: '(1 - 4)^2 = (-3) \\cdot (-3) = 9' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('d')}
@@ -567,7 +517,14 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
               </p>
             }
             fields={[{ kind: 'num', key: 'a', label: <M>{'a ='}</M>, expected: 1 }]}
-            solution={<MB>{'\\begin{aligned} 7 &= 4a + 3 && \\mid -3 \\\\ 4 &= 4a && \\mid :4 \\\\ a &= 1 \\end{aligned}'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Die 3 wegbringen', tex: ['7 = 4a + 3 \\quad \\mid -3', '4 = 4a'] },
+                  { titel: 'Durch 4 teilen', tex: ['4 = 4a \\quad \\mid :4', 'a = 1'] },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('e')}
@@ -590,7 +547,12 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
               { kind: 'num', key: 'c2', label: 'Zahl ohne x mit Vorzeichen', expected: -4.5 },
             ]}
             solution={
-              <MB>{'\\begin{aligned} (x - 3)^2 &= (x - 3)(x - 3) = x^2 - 6x + 9 \\\\ -0{,}5 \\cdot (x^2 - 6x + 9) &= -0{,}5x^2 + 3x - 4{,}5 \\end{aligned}'}</MB>
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erste Zeile: Klammer mal Klammer', tex: ['(x - 3)^2 = (x - 3)(x - 3)', '(x - 3)^2 = x^2 - 6x + 9'] },
+                  { titel: <>Zweite Zeile: jeden Summanden mit <M>{'-0{,}5'}</M> multiplizieren</>, tex: '-0{,}5 \\cdot (x^2 - 6x + 9) = -0{,}5x^2 + 3x - 4{,}5' },
+                ]}
+              />
             }
           />
         </>
@@ -675,7 +637,14 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
             />
           </Abschnitt>
           <Handlungsprodukt titel="Auftragsblatt für die Biegemaschine">
-            <AuftragsblattBild />
+            <figure className="sl-foto sl-foto-klein">
+              <img
+                src={auftragBild}
+                width={800}
+                height={400}
+                alt="Auftragsblatt Torbogen als Blaupause: links eine Skizze des Bogens mit S, P und Q, rechts vier nummerierte Schritte: S in die Scheitelform, P einsetzen und a berechnen, Scheitelform, allgemeine Form mit Probe mit Q. Unten ein Feld: An die Maschine: y = …"
+              />
+            </figure>
             <p className="sl-text">
               Deine Kollegin an der Biegemaschine will nachvollziehen, wie du auf die Gleichung kommst. Gestalte in deinem Heft ein Auftragsblatt: Skizze der Einfahrt, deine
               Rechnung in nummerierten Schritten, die Gleichung für die Maschine und eine Probe.
@@ -691,23 +660,7 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist dein Auftragsblatt vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                <>
-                  Eine Skizze der Einfahrt im Koordinatensystem mit <M>{'S(2 \\mid 3)'}</M>, <M>{'P(0 \\mid 2)'}</M> und <M>{'Q(4 \\mid 2)'}</M>
-                </>,
-                <>Die Rechnung in nummerierten Schritten: Scheitelpunkt einsetzen, Pfosten einsetzen und <M>a</M> berechnen, in die allgemeine Form umwandeln</>,
-                <>
-                  Die Gleichung in Scheitelform und in allgemeiner Form, dazu die Probe mit dem rechten Pfosten: <M>{'x = 4'}</M> einsetzen ergibt <M>{'y = 2'}</M>
-                </>,
-                <>
-                  Unter deinem Auftragsblatt steht, wofür die Abkürzungen stehen: <M>S</M> (Scheitelpunkt, höchster Punkt des Bogens), <M>{'x_S'}</M> und <M>{'y_S'}</M>{' '}
-                  (Koordinaten des Scheitelpunkts), <M>a</M> (Formfaktor: Vorzeichen und Steilheit), <M>b</M> und <M>c</M> (Zahl vor <M>x</M> und Zahl ohne <M>x</M> in der
-                  allgemeinen Form). Außerdem erklärst du die Begriffe Scheitelform und allgemeine Form und alle anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an meine Kollegin an der Biegemaschine')}             />
           </Abschnitt>
           {geloest && (
             <Abschnitt titel="Das hältst du fest">
@@ -883,10 +836,14 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
                 { kind: 'num', key: 'c', label: 'Zahl ohne x mit Vorzeichen', expected: -0.5 },
               ]}
               solution={
-                <>
-                  <MB>{`\\begin{aligned} y &= a(x - ${FS('3')})^2 + ${FS('4')} \\\\ ${FP('2')} &= a \\cdot (${FP('1')} - 3)^2 + 4 = 4a + 4 && \\mid -4 \\\\ -2 &= 4a && \\mid :4 \\\\ a &= ${FA('-0{,}5')} \\end{aligned}`}</MB>
-                  <MB>{`\\begin{aligned} y &= ${FA('-0{,}5')} \\cdot [x^2 - 6x + 9] + 4 \\\\ y &= -0{,}5x^2 + 3x - 4{,}5 + 4 \\\\ y &= -0{,}5x^2 + 3x - 0{,}5 \\end{aligned}`}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Scheitelpunkt einsetzen', tex: `y = a(x - ${FS('3')})^2 + ${FS('4')}` },
+                    { titel: <>Punkt <M>P</M> einsetzen</>, tex: [`${FP('2')} = a \\cdot (${FP('1')} - 3)^2 + 4`, '2 = 4a + 4'] },
+                    { titel: <>Nach <M>a</M> auflösen</>, tex: ['2 = 4a + 4 \\quad \\mid -4', '-2 = 4a \\quad \\mid :4', `a = ${FA('-0{,}5')}`] },
+                    { titel: 'In die allgemeine Form umwandeln', tex: [`y = ${FA('-0{,}5')} \\cdot [x^2 - 6x + 9] + 4`, 'y = -0{,}5x^2 + 3x - 4{,}5 + 4', 'y = -0{,}5x^2 + 3x - 0{,}5'] },
+                  ]}
+                />
               }
               help={
                 <SchrittHilfen
@@ -956,12 +913,13 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
                 { kind: 'select', key: 's', label: 'Der Bogen wird …', options: ['flacher', 'steiler'], expected: 1 },
               ]}
               solution={
-                <>
-                  <MB>{'\\begin{aligned} 2 &= a(0 - 2)^2 + 3{,}5 \\\\ 2 &= 4a + 3{,}5 && \\mid -3{,}5 \\\\ -1{,}5 &= 4a && \\mid :4 \\\\ a &= -0{,}375 \\end{aligned}'}</MB>
-                  <p>
-                    Vorher war <M>{'a = -0{,}25'}</M>. Der Betrag von <M>a</M> ist größer geworden, also ist die Parabel schmaler und steiler.
-                  </p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: <>Pfosten <M>P</M> in den neuen Ansatz einsetzen</>, tex: ['2 = a(0 - 2)^2 + 3{,}5', '2 = 4a + 3{,}5'] },
+                    { titel: <>Nach <M>a</M> auflösen</>, tex: ['2 = 4a + 3{,}5 \\quad \\mid -3{,}5', '-1{,}5 = 4a \\quad \\mid :4', 'a = -0{,}375'] },
+                    { titel: 'Vergleichen', text: <>Vorher war <M>{'a = -0{,}25'}</M>. Der Betrag von <M>a</M> ist größer geworden, also ist die Parabel schmaler und steiler.</> },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -1017,6 +975,7 @@ export default function TorbogenEinstieg({ onBack, onPractice, onNext }: { onBac
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={<>In dieser Lernsituation lernst du, wie du die Funktionsgleichung einer Parabel aufstellst, wenn du den Scheitelpunkt und einen weiteren Punkt kennst.</>}
         seiten={seiten}
       />
