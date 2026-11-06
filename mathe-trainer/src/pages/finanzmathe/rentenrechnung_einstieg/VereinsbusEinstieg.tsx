@@ -1,9 +1,11 @@
 import { useState, type ReactNode } from 'react';
 import TaskShell from '../../../components/layout/TaskShell';
+import { useSitzungState } from '../../../hooks/useSitzung';
 import { Beispiel, M, MB, Merke } from '../../daten_und_zufall/lernpfad/kit';
 import {
   CheckCard,
   Hilfen,
+  Loesungsweg,
   McCard,
   TrackedCheck,
   TrackedMc,
@@ -15,11 +17,14 @@ import {
   Handlungsprodukt,
   SeitenLernsituation,
   BeispielMitVideo,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../lineare_funktionen/lernsituation_kit/seiten';
 import { Bilanz } from '../../lineare_funktionen/lernsituation_kit/punkte';
-import { Kriterien, Vermutung, Zitat, euro, type Festlegung } from '../zins_kit/zins_kit';
+import { Kriterien, Vermutung, Zitat, euro, standardKriterien, type Festlegung } from '../zins_kit/zins_kit';
+import titelBild from './bilder/vereinsbus-titel.webp';
+import aushangBild from './bilder/vereinsbus-aushang.webp';
 import '../../daten_und_zufall/lernpfad/lernpfad.css';
 import BusRallye from './BusRallye';
 import './rentenrechnung.css';
@@ -32,7 +37,11 @@ import './rentenrechnung.css';
 // Aha: Der Vorstand rechnet mit 30.000 € plus rund 900 € Zinsen. Allein die erste Rate bringt schon 970,26 € Zinsen, insgesamt
 // sind es 3.312,31 €. Am Jahresanfang eingezahlt reicht es für den Bus (33.312,31 €), am Jahresende nicht (32.342,05 €).
 // Identität: Themenfarbe Schiefer, Symbol Kleinbus, Titelbild Vereinsheim mit Kleinbus, Leitobjekt der Raten-Zeitstrahl
-// (wie lange jede Rate verzinst wird). Die Festlegung bleibt nur im Seitenzustand.
+// (wie lange jede Rate verzinst wird).
+// Punkte nach Aufwand: Warm-up 2/3/2/2/3 = 12, Festlegung, 1. und 6. Rate je 3, Kernaufgabe 14, Empfehlung 4, Aushang, Übungen 4/6/8, Profi 9;
+// Bonus-Spiel „Vereinsbus-Rallye“ höchstens 8.
+// Bildwelt Diorama / Winter: Titelbild und Aushang sind gerenderte WebP-Dateien aus bilder-quelle/vereinsbus-*.bild.html (Bausteine in
+// bilder-quelle/_winter.js); der Raten-Zeitstrahl bleibt Inline-SVG.
 
 /** Lernvideo zum Endwert (auch bei den Übungsaufgaben unter /finanzmathe/endwert/ueben verlinkt) */
 export const VIDEO_ENDWERT = 'https://www.youtube.com/watch?v=46OXNN-TSFM';
@@ -61,76 +70,20 @@ const WAHL: Record<Wahl, string> = {
 
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
-/** Titelbild: das Vereinsheim am Sportplatz, davor der Elektro-Kleinbus mit Preisschild und die sechs Raten als Münzstapel */
-function Titelbild() {
-  return (
-    <svg
-      viewBox="0 0 720 252"
-      role="img"
-      aria-label="Ein Vereinsheim mit Fahne am Sportplatz, davor ein Kleinbus mit Preisschild 33.000 Euro. Links sechs gleich hohe Münzstapel für sechs Einzahlungen."
-    >
-      <rect x="0" y="206" width="720" height="46" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="206" y2="206" stroke="var(--ink)" strokeWidth="2" />
-      {/* Sechs Raten */}
-      {[0, 1, 2, 3, 4, 5].map((i) => (
-        <g key={i}>
-          {[0, 1, 2].map((k) => (
-            <ellipse
-              key={k}
-              cx={40 + i * 42}
-              cy={194 - k * 12}
-              rx="17"
-              ry="6"
-              fill="var(--highlight)"
-              stroke="var(--ink)"
-              strokeWidth="1.5"
-            />
-          ))}
-        </g>
-      ))}
-      <text x="145" y="150" textAnchor="middle" fontSize="18" fontWeight="800" fill="var(--ink)">
-        6 × 5.000 €
-      </text>
-      {/* Vereinsheim */}
-      <rect x="300" y="96" width="190" height="110" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <polygon points="288,98 395,46 502,98" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="330" y="124" width="40" height="34" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="420" y="124" width="40" height="34" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="378" y="150" width="34" height="56" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <line x1="470" x2="470" y1="20" y2="70" stroke="var(--ink)" strokeWidth="3" />
-      <polygon points="470,20 506,30 470,40" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-      {/* Kleinbus */}
-      <path
-        d="M512 196 L512 120 Q512 108 524 108 L640 108 Q660 108 670 126 L692 160 Q698 168 698 178 L698 196 Z"
-        fill="var(--primary)"
-        stroke="var(--ink)"
-        strokeWidth="2"
-      />
-      {[528, 566, 604].map((x) => (
-        <rect key={x} x={x} y="120" width="30" height="30" rx="4" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      ))}
-      <path d="M642 120 L660 120 L680 152 L642 152 Z" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <circle cx="548" cy="198" r="18" fill="var(--ink)" />
-      <circle cx="548" cy="198" r="7" fill="var(--surface)" />
-      <circle cx="664" cy="198" r="18" fill="var(--ink)" />
-      <circle cx="664" cy="198" r="7" fill="var(--surface)" />
-      <path d="M594 166 l-8 14 h8 l-6 12" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Preisschild */}
-      <line x1="610" x2="610" y1="108" y2="78" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="560" y="48" width="104" height="32" rx="6" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <text x="612" y="70" textAnchor="middle" fontSize="18" fontWeight="800" fill="var(--ink)">
-        33.000 €
-      </text>
-    </svg>
-  );
-}
-
 const THEMA: Thema = {
   name: 'Der Vereinsbus',
   farbe: 'schiefer',
   icon: 'fa-van-shuttle',
-  bild: <Titelbild />,
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Diorama einer verschneiten Insel: das Vereinsheim mit Fahne, davor ein Elektro-Kleinbus (Ziel: 33.000 €) und sechs gleich hohe Münzstapel für sechs Raten zu je 5.000 €. Dazu Tannen und ein Schneemann."
+    />
+  ),
 };
+const BILDWELT: Bildwelt = { welt: 'diorama', variante: 'winter' };
 
 /* ── Leitobjekt: der Raten-Zeitstrahl ───────────────────────────────────── */
 
@@ -269,36 +222,6 @@ function ZeitstrahlUmschalten({ werte }: { werte?: number[] }) {
   );
 }
 
-/** Handlungsprodukt: Aushang an der Pinnwand des Vereinsheims */
-function AushangBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Ein Aushang an der Pinnwand mit der Überschrift: Reicht es für den Vereinsbus? Darauf ein kleiner Zeitstrahl mit sechs Münzstapeln, eine Rechnung und eine Empfehlung."
-      >
-        <rect x="150" y="6" width="420" height="178" rx="10" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="186" y="18" width="348" height="160" rx="4" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <circle cx="360" cy="18" r="8" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="360" y="52" textAnchor="middle" fontSize="20" fontWeight="800" fill="var(--ink)">
-          Reicht es für den Vereinsbus?
-        </text>
-        <line x1="214" x2="506" y1="96" y2="96" stroke="var(--ink)" strokeWidth="2" />
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <ellipse key={i} cx={222 + i * 44} cy="86" rx="12" ry="5" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-        ))}
-        <text x="214" y="126" fontSize="17" fill="var(--ink)">
-          <tspan fontStyle="italic">Unsere Rechnung:</tspan> …
-        </text>
-        <text x="214" y="156" fontSize="17" fill="var(--ink)">
-          <tspan fontStyle="italic">Unsere Empfehlung:</tspan> …
-        </text>
-      </svg>
-    </div>
-  );
-}
-
 /* ── Rechenbeispiel: Tischtennisabteilung ───────────────────────────────── */
 
 const BSP_AUFGABE = (
@@ -356,23 +279,24 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 
 /** Lösungsweg für den Vereinsbus (für beide Wege: selbst rechnen und Lösungsschema) */
 const LOESUNG = (
-  <>
-    <MB>{'q = 1 + \\frac{3}{100} = 1{,}03 \\qquad \\frac{1{,}03^6 - 1}{1{,}03 - 1} = 6{,}468410'}</MB>
-    <MB>{'\\text{Jahresende: } K_6 = 5\\,000 \\cdot 6{,}468410 = 32\\,342{,}05 \\text{ €}'}</MB>
-    <MB>{'\\text{Jahresanfang: } K_6 = 5\\,000 \\cdot 1{,}03 \\cdot 6{,}468410 = 33\\,312{,}31 \\text{ €}'}</MB>
-    <p>
-      Am Jahresanfang eingezahlt reicht es für den Bus (33.000 €). Am Jahresende eingezahlt fehlen 657,95 €.
-    </p>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'Zinsfaktor', tex: 'q = 1 + \\dfrac{3}{100} = 1{,}03' },
+      { titel: 'Bruch der Rentenformel', tex: '\\dfrac{1{,}03^6 - 1}{1{,}03 - 1} = 6{,}468410' },
+      { titel: 'Einzahlung am Jahresanfang (vorschüssig)', tex: 'K_6 = 5\\,000 \\cdot 1{,}03 \\cdot 6{,}468410 = 33\\,312{,}31 \\text{ €}' },
+      { titel: 'Einzahlung am Jahresende (nachschüssig)', tex: 'K_6 = 5\\,000 \\cdot 6{,}468410 = 32\\,342{,}05 \\text{ €}' },
+      { titel: 'Mit dem Buspreis vergleichen', text: 'Am Jahresanfang eingezahlt reicht es für den Bus (33.000 €). Am Jahresende eingezahlt fehlen 657,95 €.' },
+    ]}
+  />
 );
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () => void; onPractice: () => void }) {
-  const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 31000, fest: false });
-  const [raten, setRaten] = useState<number[]>([]);
-  const [geloest, setGeloest] = useState(false);
-  const [uebungen, setUebungen] = useState<string[]>([]);
+  const [fest, setFest] = useSitzungState<Festlegung<Wahl>>('vb-fest', { wahl: null, wert: 31000, fest: false });
+  const [raten, setRaten] = useSitzungState<number[]>('vb-raten', []);
+  const [geloest, setGeloest] = useSitzungState('vb-geloest', false);
+  const [uebungen, setUebungen] = useSitzungState<string[]>('vb-uebungen', []);
   const rateGeprueft = (i: number) => () => setRaten((r) => (r.includes(i) ? r : [...r, i]));
 
   const seiten: Seite[] = [
@@ -382,9 +306,10 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
       pflicht: ['a', 'b', 'c', 'd', 'e'],
       inhalt: (fertig) => (
         <>
-          <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich.</p>
+          <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich. Einzelarbeit, ca. 10 Minuten.</p>
           <CheckCard
             onSolved={fertig.teil('a')}
+            punkte={2}
             title="a) Zinsfaktor"
             rechnen={false}
             prompt={<p>Wie heißt der Zinsfaktor <M>q</M> zu diesen Zinssätzen?</p>}
@@ -393,10 +318,18 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
               { kind: 'num', key: 'q3', label: <M>{'p = 3\\,\\%\\colon\\ q ='}</M>, expected: 1.03, tol: 0.0001 },
               { kind: 'num', key: 'q25', label: <M>{'p = 2{,}5\\,\\%\\colon\\ q ='}</M>, expected: 1.025, tol: 0.0001 },
             ]}
-            solution={<MB>{'q = 1 + \\frac{3}{100} = 1{,}03 \\qquad q = 1 + \\frac{2{,}5}{100} = 1{,}025'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'p = 3 %', tex: 'q = 1 + \\dfrac{3}{100} = 1{,}03' },
+                  { titel: 'p = 2,5 %', tex: 'q = 1 + \\dfrac{2{,}5}{100} = 1{,}025' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('b')}
+            punkte={3}
             title="b) Zinseszins"
             prompt={
               <p>
@@ -409,6 +342,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
           />
           <CheckCard
             onSolved={fertig.teil('c')}
+            punkte={2}
             title="c) Wie lange liegt das Geld?"
             rechnen={false}
             prompt={
@@ -431,6 +365,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
           />
           <CheckCard
             onSolved={fertig.teil('d')}
+            punkte={2}
             title="d) Potenz mit dem Taschenrechner"
             prompt={<p>Berechne mit dem Taschenrechner und runde auf 4 Nachkommastellen.</p>}
             fieldsRow
@@ -439,14 +374,17 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
               { kind: 'num', key: 'p10', label: <M>{'1{,}02^{10} \\approx'}</M>, expected: 1.02 ** 10, tol: 0.0001 },
             ]}
             solution={
-              <>
-                <MB>{'1{,}03^6 \\approx 1{,}1941 \\qquad 1{,}02^{10} \\approx 1{,}2190'}</MB>
-                <p>Am Taschenrechner: Basis eingeben, dann die Potenztaste (z. B. ^ oder xʸ), dann den Exponenten.</p>
-              </>
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erste Potenz', tex: '1{,}03^6 \\approx 1{,}1941' },
+                  { titel: 'Zweite Potenz', tex: '1{,}02^{10} \\approx 1{,}2190', text: 'Am Taschenrechner: Basis eingeben, dann die Potenztaste (z. B. ^ oder xʸ), dann den Exponenten.' },
+                ]}
+              />
             }
           />
           <CheckCard
             onSolved={fertig.teil('e')}
+            punkte={3}
             title="e) Bruch mit Klammern"
             prompt={
               <p>
@@ -459,7 +397,12 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
               { kind: 'num', key: 'b2', label: <M>{'\\dfrac{1{,}5^2 - 1}{1{,}5 - 1} ='}</M>, expected: 2.5 },
             ]}
             solution={
-              <MB>{'\\frac{1{,}2 - 1}{1{,}04 - 1} = \\frac{0{,}2}{0{,}04} = 5 \\qquad \\frac{1{,}5^2 - 1}{1{,}5 - 1} = \\frac{2{,}25 - 1}{0{,}5} = \\frac{1{,}25}{0{,}5} = 2{,}5'}</MB>
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erster Bruch', tex: '\\dfrac{1{,}2 - 1}{1{,}04 - 1} = \\dfrac{0{,}2}{0{,}04} = 5' },
+                  { titel: 'Zweiter Bruch', tex: '\\dfrac{1{,}5^2 - 1}{1{,}5 - 1} = \\dfrac{1{,}25}{0{,}5} = 2{,}5' },
+                ]}
+              />
             }
             help={
               <Hilfen
@@ -540,6 +483,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                   fertig.teil('r1')();
                   rateGeprueft(0)();
                 }}
+                punkte={3}
                 title="Die 1. Rate"
                 prompt={<p>Wie viel sind die 5.000 € vom Anfang des 1. Jahres am Ende des 6. Jahres wert?</p>}
                 fields={[{ kind: 'num', key: 'k', label: '1. Rate am Ende:', expected: RATE1, unit: '€', tol: 0.02 }]}
@@ -561,6 +505,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                   fertig.teil('r6')();
                   rateGeprueft(5)();
                 }}
+                punkte={3}
                 title="Die 6. Rate"
                 prompt={<p>Wie viel sind die 5.000 € vom Anfang des 6. Jahres am Ende des 6. Jahres wert?</p>}
                 fields={[{ kind: 'num', key: 'k', label: '6. Rate am Ende:', expected: RATE6, unit: '€', tol: 0.02 }]}
@@ -617,6 +562,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
             <Abschnitt titel="Vergleiche deine Ergebnisse">
               <CheckCard
                 onSolved={geloestMelden}
+                punkte={14}
                 title="Kontostand am Ende des 6. Jahres"
                 prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
                 fields={[
@@ -645,6 +591,8 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
             <Abschnitt titel="Deine Empfehlung">
               <McCard
                 onSolved={fertig.teil('empfehlung')}
+                punkte={4}
+                rechnen
                 title="Empfehlung an den Vorstand"
                 prompt={<p>Welche Empfehlung gibst du dem Vorstand?</p>}
                 options={[
@@ -671,7 +619,14 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
               />
             </Abschnitt>
             <Handlungsprodukt titel="Aushang für die Mitgliederversammlung">
-              <AushangBild />
+              <figure className="sl-foto sl-foto-klein">
+                <img
+                  src={aushangBild}
+                  width={800}
+                  height={400}
+                  alt="Eine verschneite Pinnwand vor dem Vereinsheim mit einem Aushang: Reicht es für den Bus? Darunter ein Zeitstrahl mit sechs Münzen und die Zeilen Unsere Rechnung und Unsere Empfehlung."
+                />
+              </figure>
               <p className="sl-text">
                 Gestalte in deinem Heft einen Aushang für die Pinnwand im Vereinsheim. Zeichne den Zeitstrahl der sechs Raten, schreibe
                 deine Rechnung für beide Einzahlungstermine sauber auf und gib dem Vorstand eine klare Empfehlung.
@@ -682,28 +637,11 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                   <li>„Die 1. Rate wird … Jahre verzinst, die letzte nur …“</li>
                   <li>„Zahlen wir am Jahresanfang ein, haben wir am Ende …, am Jahresende nur …“</li>
                   <li>„Der Vorstand hat nur mit 900 € Zinsen gerechnet. In Wirklichkeit sind es …, weil …“</li>
-                  <li>
-                    „Abkürzungen: <M>{'K_n'}</M> = …, <M>r</M> = Rate (Rente), <M>q</M> = …, <M>n</M> = … Vorschüssig heißt …“
-                  </li>
                 </ul>
               </Aufklappbar>
             </Handlungsprodukt>
             <Abschnitt titel="Ist dein Aushang vollständig?">
-              <Kriterien
-                onAlle={fertig.teil('produkt')}
-                items={[
-                  'Ein Zeitstrahl mit allen 6 Raten und wie lange jede verzinst wird',
-                  'Die Rechnung mit der Rentenformel für den Jahresanfang und das Jahresende',
-                  'Eine klare Empfehlung: Wann soll der Verein einzahlen?',
-                  'Eine Erklärung, warum die Rechnung des Vorstands (30.900 €) zu niedrig ist',
-                  <>
-                    Unter deinem Aushang steht, wofür die Abkürzungen der Formel stehen: <M>{'K_n'}</M> (Endwert, Kontostand nach{' '}
-                    <M>n</M> Jahren), <M>r</M> (Rate, auch Rente genannt), <M>q</M> (Zinsfaktor), <M>p</M> (Zinssatz) und <M>n</M> (Anzahl
-                    der Jahre). Außerdem erklärst du die Begriffe vorschüssig und nachschüssig und alle anderen Wörter, die für dich neu
-                    waren.
-                  </>,
-                ]}
-              />
+              <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an den Vorstand')} />
             </Abschnitt>
             {geloest && (
               <Abschnitt titel="Das hältst du fest">
@@ -736,11 +674,12 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
     {
       art: 'sichern',
       titel: 'Übungsaufgaben',
+      pflicht: ['1', '2', '3'],
       inhalt: (fertig) => (
         <>
           <p className="sl-text">
-            Prüfe und vertiefe dein Wissen mit vier Aufgaben. Die letzte ist für Profis. Hast du Übung 1 bis 3 gelöst, wird unten ein
-            Spiel freigeschaltet.
+            Prüfe und vertiefe dein Wissen mit drei Aufgaben, die vierte ist für Profis. Wenn du die drei Pflichtaufgaben gelöst hast, wartet unten ein
+            Spiel auf dich. Einzelarbeit, ca. 20 Minuten.
           </p>
           <Abschnitt titel="Übung 1: Wie viel ist auf dem Konto?">
             <TrackedMc
@@ -748,6 +687,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                 fertig.teil('1')();
                 setUebungen((u) => (u.includes('1') ? u : [...u, '1']));
               }}
+              punkte={4}
               topic="Rentenrechnung-Einstieg: Endwert nachschüssig (Basis)"
               title="Übung 1"
               rechnen
@@ -787,6 +727,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                 fertig.teil('2')();
                 setUebungen((u) => (u.includes('2') ? u : [...u, '2']));
               }}
+              punkte={6}
               topic="Rentenrechnung-Einstieg: vorschüssig oder nachschüssig (Standard)"
               title="Übung 2"
               rechnen
@@ -828,6 +769,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                 fertig.teil('3')();
                 setUebungen((u) => (u.includes('3') ? u : [...u, '3']));
               }}
+              punkte={8}
               topic="Rentenrechnung-Einstieg: Endwert vorschüssig (Standard)"
               title="Übung 3"
               level="standard"
@@ -843,10 +785,14 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
                 { kind: 'num', key: 'z', label: 'Zinsen:', expected: 600 * 1.03 * ((1.03 ** 8 - 1) / 0.03) - 4800, unit: '€', tol: 0.5 },
               ]}
               solution={
-                <>
-                  <MB>{'K_8 = 600 \\cdot 1{,}03 \\cdot \\frac{1{,}03^8 - 1}{1{,}03 - 1} = 5\\,495{,}46 \\text{ €}'}</MB>
-                  <MB>{'\\text{Zinsen} = 5\\,495{,}46 - 8 \\cdot 600 = 695{,}46 \\text{ €}'}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Formel für den Jahresanfang', tex: 'K_8 = 600 \\cdot 1{,}03 \\cdot \\dfrac{1{,}03^8 - 1}{1{,}03 - 1}' },
+                    { titel: 'Ausrechnen', tex: 'K_8 = 5\\,495{,}46 \\text{ €}' },
+                    { titel: 'Zinsen', tex: '5\\,495{,}46 \\text{ €} - 8 \\cdot 600 \\text{ €} = 695{,}46 \\text{ €}' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -868,6 +814,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
               title="Welche Rate braucht der Verein?"
               level="erweiterung"
               profi
+              punkte={9}
               prompt={
                 <p>
                   Der Kassenwart bleibt dabei: Der Verein zahlt erst am Jahresende ein. Wie hoch muss die jährliche Rate mindestens sein,
@@ -877,11 +824,14 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
               fields={[{ kind: 'num', key: 'r', label: <M>{'r ='}</M>, expected: BUS / FAKTOR, unit: '€', tol: 0.5 }]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'33\\,000 = r \\cdot \\frac{1{,}03^6 - 1}{1{,}03 - 1} = r \\cdot 6{,}468410 \\quad \\mid : 6{,}468410'}</MB>
-                  <MB>{'r = \\frac{33\\,000}{6{,}468410} = 5\\,101{,}72 \\text{ €}'}</MB>
-                  <p>Bei Einzahlung am Jahresende braucht der Verein also rund 102 € mehr pro Jahr.</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Endwert einsetzen', tex: '33\\,000 = r \\cdot \\dfrac{1{,}03^6 - 1}{1{,}03 - 1}' },
+                    { titel: 'Bruch ausrechnen', tex: '33\\,000 = r \\cdot 6{,}468410' },
+                    { titel: 'Durch 6,468410 teilen', tex: 'r = \\dfrac{33\\,000}{6{,}468410} = 5\\,101{,}72 \\text{ €}', text: 'Bei Einzahlung am Jahresende braucht der Verein also rund 102 € mehr pro Jahr.' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -932,6 +882,7 @@ export default function VereinsbusEinstieg({ onBack, onPractice }: { onBack: () 
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             In dieser Lernsituation hilfst du deinem Sportverein beim Sparen für einen Kleinbus. Du lernst, wie viel regelmäßige
