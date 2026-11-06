@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- Der Skatepark, Titelbild. Bildwelt Siebdruck / dreifarbig (Gelb, Leuchtpink, Themenfarbe Beere): Plakat Trick-Contest mit Sprungbahn und Lichtschranke.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/quadratische_funktionen/schnittpunkte_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&display=swap" rel="stylesheet">
+<style>body{margin:0} text{font-family:'Bricolage Grotesque';font-variation-settings:'wdth' 75,'opsz' 96}</style>
+<script src="_siebdruck.js"></script></head><body><div id="bild"></div>
+<script>
+// Koordinaten: 1 m = 70 px, Boden bei y = 520, Absprung (x = 0) bei 470 px
+const X = (x) => 470 + x * 70, Y = (y) => 520 - y * 70;
+const bahn = Array.from({ length: 61 }, (_, i) => i / 10).map((x) => `${X(x)},${Y(-0.25 * x * x + x + 3)}`).join(' ');
+const gelb = `<circle cx="1010" cy="150" r="120" fill="RASTER" stroke="none"/><rect x="0" y="520" width="1200" height="80" stroke="none"/>
+ <rect x="${X(-1.4)}" y="${Y(3)}" width="${X(0) - X(-1.4)}" height="${Y(0) - Y(3)}" stroke="none"/>`;
+const pink = `<line x1="${X(0)}" y1="${Y(4)}" x2="${X(9.5)}" y2="${Y(-0.75)}" stroke-width="9" stroke-dasharray="26 14" fill="none"/>
+ <rect x="${X(0) - 14}" y="${Y(4) - 22}" width="28" height="44" stroke="none"/><line x1="${X(0)}" y1="${Y(4)}" x2="${X(0)}" y2="${Y(3)}" stroke-width="6"/>
+ <text x="60" y="350" font-size="40" font-weight="700" stroke="none">Lichtschranke</text><text x="60" y="392" font-size="34" font-weight="600" stroke="none">y = −0,5x + t</text>`;
+const beere = `<polyline points="${bahn}" fill="none" stroke-width="12" stroke-linecap="round"/>
+ <text x="60" y="120" font-size="92" font-weight="800" stroke="none">TRICK-CONTEST</text>
+ <text x="60" y="190" font-size="40" font-weight="700" stroke="none">Wie oft kreuzt der Sprung</text><text x="60" y="236" font-size="40" font-weight="700" stroke="none">die Lichtschranke?</text>
+ <text x="${X(3.6)}" y="${Y(4.2)}" font-size="34" font-weight="700" stroke="none">Sprungbahn</text>
+ <text x="${X(3.6)}" y="${Y(4.2) + 36}" font-size="30" font-weight="600" stroke="none">y = −0,25x² + x + 3</text>`;
+SD.bild(1200, 600, [
+  { farbe: '#ffcf2e', svg: gelb },
+  { farbe: '#ff4f98', versatz: [5, -3], svg: pink },
+  { farbe: '#a0275e', versatz: [-2, 2], svg: beere },
+]);
+</script>
+</body></html>

@@ -1,0 +1,15 @@
+/* Lernsituation „Der Skatepark“ (Siebdruck / dreifarbig). Der feste Kern kommt aus lernsituation_kit. */
+.sk-regler { display: flex; flex-direction: column; gap: 10px; }
+.sk-anzeige { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 18px; }
+.sk-spiel { display: flex; flex-direction: column; gap: 10px; }
+.sk-kopf { display: flex; justify-content: space-between; align-items: center; font: 700 16px/1.2 var(--font-body); }
+.sk-muenze-an { color: var(--highlight); margin-left: 4px; }
+.sk-muenze-aus { color: var(--line-strong); margin-left: 4px; }
+.sk-gleichung { margin: 0; font-size: 19px; line-height: 1.7; }
+.sk-tore { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sk-tore .bk-btn { min-height: 52px; justify-content: center; font-size: 18px; }
+.sk-tore .sk-richtig { background: var(--correct-soft); border-color: var(--correct); color: var(--correct-ink); }
+.sk-tore .sk-falsch { background: var(--wrong-soft); border-color: var(--wrong); color: var(--wrong-ink); }
+.sk-feld { width: 100%; height: auto; display: block; }
+.sk-text { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.sk-text p { margin: 0; font-size: 17px; line-height: 1.5; }
