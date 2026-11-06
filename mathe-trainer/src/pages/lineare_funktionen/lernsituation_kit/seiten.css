@@ -29,6 +29,14 @@
 .sl-on { border-color: var(--et) !important; background: var(--et-soft) !important; color: var(--ink) !important; }
 .sl-on .sl-no, .sl-done .sl-no { background: var(--et); color: #fff; }
 .sl-done { border-color: var(--et) !important; }
+/* Bereits erreichte Phasen sind anklickbar (zurück zu gelösten Phasen, vor bis zur aktuell offenen Phase) */
+.sl-phasen li.sl-klickbar { padding: 0; }
+.sl-phase-knopf {
+  display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0; min-height: inherit; padding: 2px 8px;
+  border: 0; border-radius: inherit; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.sl-phase-knopf:hover { background: var(--et-soft); color: var(--ink); }
+.sl-phase-knopf:focus-visible { outline: 2px solid var(--et); outline-offset: 2px; }
 .sl-zaehler { flex: none; font: 700 14px/1.2 var(--font-body); color: var(--ink-muted); white-space: nowrap; }
 @media (max-width: 760px) {
   .sl-name { display: none; }
