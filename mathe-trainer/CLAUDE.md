@@ -86,7 +86,7 @@ Monitoren, kein `ZweiSpalten`), Inhalt so breit wie die Phasenleiste (`--sl-brei
 keine Kontext-Looks; pro Seite ist nur der Auftrag hervorgehoben (`sl-fokus`). Jede Lernsituation hat trotzdem eine eigene Identität
 (Prop `thema`: Themenfarbe aus `THEMEN`, Symbol, Name, Titelbild, dazu ein Leitobjekt), damit sie nicht wie alle anderen aussieht. Reihenfolge in „Problem lösen“ immer: Problem → Beispielrechnung mit Lernvideo (aufklappbar) →
 Ergebnisse abgleichen → Handlungsprodukt. Bei Auswahlaufgaben ist Antwort A nie die richtige.
-Bildwelten (seit 2026-11-04): Jede neue Lernsituation gehört zu einer von drei Bildwelten, **Skizzenbuch**, **Reportage** oder **Diorama**,
+Bildwelten (seit 2026-11-04): Jede neue Lernsituation gehört zu einer von sechs Bildwelten, **Skizzenbuch**, **Reportage**, **Diorama**, **Bauplan**, **Comic** oder **Siebdruck** (die letzten drei seit 2026-11-06),
 jeweils mit Unter-Variante (Prop `bildwelt` an `SeitenLernsituation`, Stile nur in `lernsituation_kit/bildwelten.css`; die erste Lernsituation
 einer Bildwelt baut diese dort auf). Die Bildwelt ändert Bilder, Schriften und Untergrund, nie das Layout; zweimal hintereinander dieselbe
 Bildwelt gibt es nicht. Titelbild und Sachbilder sind echte WebP-Dateien: Quelle `bilder-quelle/<name>.bild.html` (Element `id="bild"`) im

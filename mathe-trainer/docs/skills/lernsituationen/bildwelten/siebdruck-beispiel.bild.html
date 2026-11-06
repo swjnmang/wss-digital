@@ -1,0 +1,60 @@
+<!doctype html>
+<!-- Bildwelt Siebdruck, Beispiel Vereinsbus, Unter-Variante Zwei Farben (Themenfarbe + Leuchtpink):
+     flächige Druckfarben, die sich beim Überdrucken mischen (mix-blend-mode multiply), leichter Passerversatz, Rasterpunkte, Papierkorn.
+     Rendern: node scripts/bilder-rendern.cjs <diese Datei> <ziel.webp>  (Element #bild wird gerendert) -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&display=swap" rel="stylesheet">
+<style>
+ body{margin:0}
+ #bild{position:relative;width:1200px;height:600px;background:#efeee9;overflow:hidden}
+ .ebene{position:absolute;inset:0}
+ .ebene svg{display:block}
+ .blau{mix-blend-mode:multiply}
+ .pink{mix-blend-mode:multiply;transform:translate(5px,-3px)}  /* Passerversatz */
+ .tx{font-family:'Bricolage Grotesque';font-variation-settings:'wdth' 75,'opsz' 96}
+</style></head><body>
+<div id="bild">
+ <!-- Druckgang 1: Leuchtpink -->
+ <div class="ebene pink"><svg width="1200" height="600" viewBox="0 0 1200 600">
+  <defs>
+   <pattern id="raster" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(15)"><circle cx="8" cy="8" r="5" fill="#ff4f98"/></pattern>
+   <filter id="rauh"><feTurbulence type="fractalNoise" baseFrequency=".75" seed="2"/><feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.7 1.3"/><feComposite in="SourceGraphic" operator="in"/></filter>
+  </defs>
+  <g filter="url(#rauh)">
+   <!-- Sonne aus Rasterpunkten, fünf Ringe = fünf Jahre -->
+   <circle cx="800" cy="250" r="210" fill="url(#raster)"/>
+   <g fill="none" stroke="#ff4f98" stroke-width="10">
+    <circle cx="800" cy="250" r="60"/><circle cx="800" cy="250" r="100"/><circle cx="800" cy="250" r="140"/><circle cx="800" cy="250" r="180"/>
+   </g>
+   <!-- Straße -->
+   <rect x="0" y="470" width="1200" height="130" fill="#ff4f98"/>
+   <!-- Zielbetrag -->
+   <text x="62" y="408" class="tx" font-size="128" font-weight="800" fill="#ff4f98" letter-spacing="-2">24.000 €</text>
+  </g>
+ </svg></div>
+
+ <!-- Druckgang 2: Themenfarbe (hier Blau) -->
+ <div class="ebene blau"><svg width="1200" height="600" viewBox="0 0 1200 600">
+  <defs>
+   <filter id="rauh2"><feTurbulence type="fractalNoise" baseFrequency=".7" seed="5"/><feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.7 1.3"/><feComposite in="SourceGraphic" operator="in"/></filter>
+   <pattern id="streifen" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="5" fill="#1659b8"/></pattern>
+  </defs>
+  <g filter="url(#rauh2)">
+   <!-- Bus als Fläche, Fenster ausgespart -->
+   <path fill="#1659b8" fill-rule="evenodd" d="
+     M600 500 V318 Q600 290 630 288 H1000 Q1050 290 1076 338 L1110 412 V500 Z
+     M626 312 h86 v64 h-86 Z M728 312 h86 v64 h-86 Z M830 312 h86 v64 h-86 Z
+     M934 312 h50 v64 h-50 Z M1000 312 h34 l30 64 h-64 Z"/>
+   <circle cx="680" cy="504" r="38" fill="#1659b8"/><circle cx="1030" cy="504" r="38" fill="#1659b8"/>
+   <!-- Fahrbahnmarkierung -->
+   <rect x="0" y="548" width="1200" height="20" fill="url(#streifen)"/>
+   <!-- Textblock -->
+   <text x="64" y="132" class="tx" font-size="64" font-weight="800" fill="#1659b8">Reicht das</text>
+   <text x="64" y="200" class="tx" font-size="64" font-weight="800" fill="#1659b8">für den neuen Bus?</text>
+   <text x="66" y="462" class="tx" font-size="34" font-weight="600" fill="#1659b8">5 Jahre lang je 4.000 €, 3 % Zins</text>
+  </g>
+ </svg></div>
+
+ <!-- Papierkorn obenauf -->
+ <div class="ebene"><svg width="1200" height="600"><filter id="korn"><feTurbulence type="fractalNoise" baseFrequency=".95" numOctaves="2" seed="11"/><feColorMatrix type="matrix" values="0 0 0 0 .3  0 0 0 0 .28  0 0 0 0 .22  0 0 0 .09 0"/></filter><rect width="1200" height="600" filter="url(#korn)"/></svg></div>
+</div>
+</body></html>
