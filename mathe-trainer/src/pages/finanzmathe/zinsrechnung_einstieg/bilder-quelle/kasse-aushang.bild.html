@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- Die Abschlussfahrt-Kasse, Handlungsprodukt: leerer Aushang für die Pinnwand. Bildwelt Siebdruck / schwarz.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/finanzmathe/zinsrechnung_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&display=swap" rel="stylesheet">
+<style>body{margin:0} text{font-family:'Bricolage Grotesque';font-variation-settings:'wdth' 75,'opsz' 96}</style>
+<script src="_siebdruck.js"></script></head><body><div id="bild"></div>
+<script>
+const beere = `<rect x="0" y="0" width="800" height="120" stroke="none"/>
+ <text x="400" y="84" text-anchor="middle" font-size="62" font-weight="800" fill="#f1efe9" stroke="none">AN ALLE IN DER 10b!</text>
+ <circle cx="680" cy="300" r="70" fill="RASTER" stroke="none"/>`;
+const schwarz = `<text x="60" y="190" font-size="40" font-weight="800" stroke="none">So reicht es fürs Grillen:</text>
+ ${[0,1,2,3].map(i => `<line x1="60" x2="${i % 2 ? 520 : 580}" y1="${240 + i * 38}" y2="${240 + i * 38}" stroke-width="4"/>`).join('')}
+ <text x="680" y="320" text-anchor="middle" font-size="58" font-weight="800" stroke="none">72 €</text>
+ <rect x="10" y="10" width="780" height="380" fill="none" stroke-width="6"/>`;
+SD.bild(800, 400, [
+  { farbe: '#a0275e', svg: beere },
+  { farbe: '#1d1d1f', versatz: [3, -2], svg: schwarz },
+]);
+</script>
+</body></html>
