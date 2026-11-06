@@ -259,20 +259,44 @@ function SeitenAnsicht({
           <i className="fa-solid fa-arrow-left" aria-hidden="true" />
         </button>
         <ol className="sl-phasen" aria-label="Phasen der Lernsituation">
-          {PHASEN.map((p, i) => (
-            <li
-              key={p.art}
-              className={`et-bar-${p.art}${i === phaseIdx ? ' sl-on' : ''}${
-                i < phaseIdx ? ' sl-done' : ''
-              }`}
-              aria-current={i === phaseIdx ? 'step' : undefined}
-            >
-              <span className="sl-no">
-                {i < phaseIdx ? <i className="fa-solid fa-check" aria-hidden="true" /> : i + 1}
-              </span>
-              <span className="sl-name">{p.title}</span>
-            </li>
-          ))}
+          {PHASEN.map((p, i) => {
+            // Seiten dieser Phase; anklickbar ist eine Phase erst, wenn alle Seiten davor gelöst sind
+            const idx = seiten.flatMap((s, j) => (s.art === p.art ? [j] : []));
+            const erreicht = idx.length > 0 && erledigt.slice(0, idx[0]).every(Boolean);
+            const geschafft = idx.length > 0 && idx.every((j) => erledigt[j]);
+            const ziel = idx.find((j) => !erledigt[j]) ?? idx[0];
+            const klickbar = erreicht && i !== phaseIdx;
+            const inhalt = (
+              <>
+                <span className="sl-no">
+                  {geschafft || i < phaseIdx ? <i className="fa-solid fa-check" aria-hidden="true" /> : i + 1}
+                </span>
+                <span className="sl-name">{p.title}</span>
+              </>
+            );
+            return (
+              <li
+                key={p.art}
+                className={`et-bar-${p.art}${i === phaseIdx ? ' sl-on' : ''}${
+                  geschafft || i < phaseIdx ? ' sl-done' : ''
+                }${klickbar ? ' sl-klickbar' : ''}`}
+                aria-current={i === phaseIdx ? 'step' : undefined}
+              >
+                {klickbar ? (
+                  <button
+                    type="button"
+                    className="sl-phase-knopf"
+                    title={`Zu „${p.title}“ wechseln`}
+                    onClick={() => setNr(ziel)}
+                  >
+                    {inhalt}
+                  </button>
+                ) : (
+                  inhalt
+                )}
+              </li>
+            );
+          })}
         </ol>
         {!(ruhig && seiten.length === PHASEN.length) && (
           <span className="sl-zaehler" aria-label={`Seite ${nr + 1} von ${seiten.length}`}>
