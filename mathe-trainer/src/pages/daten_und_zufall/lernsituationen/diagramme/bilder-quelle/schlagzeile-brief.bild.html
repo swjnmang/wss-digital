@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- Die Schlagzeile, Handlungsprodukt: Heftseite „Richtigstellung an den Stadtboten“ mit Säulen- und Kreisskizze. Bildwelt Reportage / Zeitung.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/diagramme -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Source+Serif+4:wght@400;700&display=swap" rel="stylesheet"><style>body{margin:0}</style><script src="_zeitung.js"></script></head><body>
+<div id="bild" style="width:800px;height:400px"></div>
+<script>
+const ink = '#1a1a1a';
+let g = `<rect width="800" height="400" fill="#cfcac0"/>`;
+g += `<g transform="rotate(-1.5 400 200)" filter="url(#schatten)"><rect x="60" y="24" width="680" height="352" fill="#f4f1ea"/>`;
+g += `<text x="90" y="78" font-family="Fraunces" font-weight="900" font-size="34" fill="${ink}">Richtigstellung an den Stadtboten</text>`;
+g += `<line x1="90" y1="96" x2="710" y2="96" stroke="${ink}" stroke-width="2"/>`;
+g += `<line x1="100" y1="300" x2="100" y2="130" stroke="${ink}" stroke-width="3"/><line x1="100" y1="300" x2="320" y2="300" stroke="${ink}" stroke-width="3"/>`;
+[150, 153, 157, 162].forEach((h, i) => { g += `<rect x="${120 + i * 50}" y="${300 - h}" width="34" height="${h}" fill="url(#raster)" stroke="${ink}" stroke-width="2"/>`; });
+g += `<text x="108" y="296" font-family="Source Serif 4" font-weight="700" font-size="18" fill="${ink}">0</text>`;
+g += `<circle cx="440" cy="215" r="85" fill="url(#rasterHell)" stroke="${ink}" stroke-width="3"/><path d="M440 215 L440 130 M440 215 L520 240 M440 215 L380 275 M440 215 L360 200" stroke="${ink}" stroke-width="3"/>`;
+g += ZT.zeilen(560, 140, 150, 9, 22);
+g += `</g>`;
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">${ZT.defs}${g}${ZT.korn(800, 400)}</svg>`;
+</script>
+</body></html>

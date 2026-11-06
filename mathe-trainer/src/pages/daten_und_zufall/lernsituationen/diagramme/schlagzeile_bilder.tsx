@@ -124,7 +124,6 @@ export function Zeitung({ ehrlich = false }: { ehrlich?: boolean }) {
   );
 }
 
-/** Titelbild der Startbox: Zeitungsseite mit Lupe über der abgeschnittenen Achse */
 export function Titelbild() {
   return (
     <svg
@@ -219,7 +218,6 @@ export function KreisBild({
   );
 }
 
-/** Problem lösen: Umfragezettel und ein leerer Kreis, in den die Sektoren noch eingezeichnet werden müssen */
 export function UmfrageBild() {
   const zeilen: [string, number][] = [
     ['Bus', 54],
@@ -262,7 +260,6 @@ export function UmfrageBild() {
   );
 }
 
-/** Handlungsprodukt: Seite im Heft mit Leserbrief, Säulen und Kreis */
 export function LeserbriefBild() {
   return (
     <div className="zk-bild zk-bild-klein">

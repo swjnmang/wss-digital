@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- Die Schlagzeile: Umfragezettel „Wie kommst du zur Schule?“ (120 Jugendliche) und ein leerer Kreis für das Kreisdiagramm. Bildwelt Reportage / Zeitung.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/diagramme -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Source+Serif+4:wght@400;700&display=swap" rel="stylesheet"><style>body{margin:0}</style><script src="_zeitung.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const ink = '#1a1a1a';
+let g = `<rect width="1200" height="600" fill="#cfcac0"/>`;
+g += `<g transform="rotate(-2 330 300)" filter="url(#schatten)"><rect x="80" y="50" width="500" height="500" fill="#f4f1ea"/>`;
+g += `<text x="110" y="120" font-family="Fraunces" font-weight="900" font-size="40" fill="${ink}">Umfrage</text><text x="110" y="164" font-family="Source Serif 4" font-size="28" fill="${ink}">Wie kommst du zur Schule?</text>`;
+g += `<text x="110" y="206" font-family="Source Serif 4" font-weight="700" font-size="26" fill="#555">120 Jugendliche befragt</text>`;
+[['Bus', 54], ['Fahrrad', 30], ['zu Fuß', 24], ['Elterntaxi', 12]].forEach(([t, v], i) => { g += `<line x1="110" y1="${262 + i * 64}" x2="550" y2="${262 + i * 64}" stroke="#aaa" stroke-width="2"/><text x="110" y="${300 + i * 64}" font-family="Source Serif 4" font-size="34" fill="${ink}">${t}</text><text x="540" y="${300 + i * 64}" text-anchor="end" font-family="Source Serif 4" font-weight="700" font-size="34" fill="${ink}">${v}</text>`; });
+g += `</g>`;
+g += `<g filter="url(#schatten)"><rect x="660" y="60" width="470" height="480" fill="#f4f1ea"/></g>`;
+g += `<circle cx="895" cy="300" r="170" fill="url(#rasterHell)" stroke="${ink}" stroke-width="5"/>`;
+g += `<text x="895" y="340" text-anchor="middle" font-family="Fraunces" font-weight="900" font-size="120" fill="${ink}">?</text>`;
+g += `<text x="895" y="515" text-anchor="middle" font-family="Source Serif 4" font-weight="700" font-size="28" fill="${ink}">Winkel = ?</text>`;
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${ZT.defs}${g}${ZT.korn(1200, 600)}</svg>`;
+</script>
+</body></html>

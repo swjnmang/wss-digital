@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TaskShell from '../../../../components/layout/TaskShell';
+import { useSitzungState } from '../../../../hooks/useSitzung';
 import { Beispiel, M, MB, Merke } from '../../lernpfad/kit';
-import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../../../lineare_funktionen/lernsituation_kit/kit';
+import { CheckCard, Hilfen, Loesungsweg, McCard, TrackedCheck, TrackedMc } from '../../../lineare_funktionen/lernsituation_kit/kit';
 import {
   Abschnitt,
   Aufklappbar,
@@ -10,15 +10,19 @@ import {
   BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../../lineare_funktionen/lernsituation_kit/seiten';
 import { Bilanz } from '../../../lineare_funktionen/lernsituation_kit/punkte';
-import { Kriterien, Vermutung, Zitat, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import { Kriterien, Vermutung, standardKriterien, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import titelBild from './bilder/schlagzeile-titel.webp';
+import umfrageBild from './bilder/schlagzeile-umfrage.webp';
+import briefBild from './bilder/schlagzeile-brief.webp';
 import '../../lernpfad/lernpfad.css';
 import { metaFor } from '../meta';
 import LuegenCheck from './LuegenCheck';
-import { KreisBild, LeserbriefBild, MiniSaeulen, Titelbild, UmfrageBild, Zeitung } from './schlagzeile_bilder';
+import { KreisBild, MiniSaeulen, Zeitung } from './schlagzeile_bilder';
 import './schlagzeile.css';
 
 // Lernsituation 5.3 „Die Schlagzeile“: Diagramme lesen, erstellen und hinterfragen (ca. 45 min).
@@ -32,7 +36,22 @@ import './schlagzeile.css';
 // Punkte (Pflicht): Warm-up 5 × 2 = 10 (19 %) · Problem erkennen 3 + 3 = 6 · Problem lösen 14 + 3 + 5 = 22 (41 %) ·
 // Übungen 4 + 5 + 6 = 15 · Profi 9 (zählt nicht zu den Sternen) · Bonus-Spiel 4 Runden × 2 = 8. Pflicht insgesamt 53.
 
-const THEMA: Thema = { ...metaFor('diagramme').thema, bild: <Titelbild /> };
+// Bildwelt Reportage / Zeitung (Schwarzweiß): Titelbild, Umfragezettel und Richtigstellung sind gerenderte WebP-Dateien aus
+// bilder-quelle/schlagzeile-*.bild.html (Bausteine in bilder-quelle/_zeitung.js); die Zeitungsseite mit Lupe und die Diagramme bleiben live.
+const THEMA: Thema = {
+  ...metaFor('diagramme').thema,
+  kicker: 'Aus der Redaktion des Stadtboten',
+  bildzeile: 'Die Titelseite liegt zur Kontrolle auf dem Tisch. Stimmt die Schlagzeile? Illustration: Mathe-Trainer',
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Titelseite der Zeitung Der Stadtbote mit der Schlagzeile Stromkosten explodieren! Darunter ein Säulendiagramm für 2021 bis 2024, dessen senkrechte Achse einen Zickzack-Knick hat. Eine Lupe liegt über dem Knick."
+    />
+  ),
+};
+const BILDWELT: Bildwelt = { welt: 'reportage', variante: 'zeitung' };
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
@@ -69,7 +88,10 @@ const BSP_SCHRITTE = [
     body: (
       <>
         <p>Teile die absolute Häufigkeit <M>H</M> durch die Gesamtzahl <M>n</M>:</p>
-        <MB>{'h = \\frac{H}{n}: \\quad \\frac{40}{80} = 0{,}5 \\quad \\frac{20}{80} = 0{,}25 \\quad \\frac{16}{80} = 0{,}2 \\quad \\frac{4}{80} = 0{,}05'}</MB>
+        <MB>{'\\text{Wasser: } \\tfrac{40}{80} = 0{,}5'}</MB>
+        <MB>{'\\text{Saft: } \\tfrac{20}{80} = 0{,}25'}</MB>
+        <MB>{'\\text{Cola: } \\tfrac{16}{80} = 0{,}2'}</MB>
+        <MB>{'\\text{Tee: } \\tfrac{4}{80} = 0{,}05'}</MB>
       </>
     ),
   },
@@ -79,8 +101,10 @@ const BSP_SCHRITTE = [
       <>
         <p>Der ganze Kreis hat <M>{'360^\\circ'}</M>. Jeder Sektor bekommt den Anteil <M>h</M> davon:</p>
         <MB>{'\\alpha = h \\cdot 360^\\circ'}</MB>
-        <MB>{'\\text{Wasser: } 0{,}5 \\cdot 360^\\circ = 180^\\circ \\quad \\text{Saft: } 0{,}25 \\cdot 360^\\circ = 90^\\circ'}</MB>
-        <MB>{'\\text{Cola: } 0{,}2 \\cdot 360^\\circ = 72^\\circ \\quad \\text{Tee: } 0{,}05 \\cdot 360^\\circ = 18^\\circ'}</MB>
+        <MB>{'\\text{Wasser: } 0{,}5 \\cdot 360^\\circ = 180^\\circ'}</MB>
+        <MB>{'\\text{Saft: } 0{,}25 \\cdot 360^\\circ = 90^\\circ'}</MB>
+        <MB>{'\\text{Cola: } 0{,}2 \\cdot 360^\\circ = 72^\\circ'}</MB>
+        <MB>{'\\text{Tee: } 0{,}05 \\cdot 360^\\circ = 18^\\circ'}</MB>
       </>
     ),
   },
@@ -96,22 +120,26 @@ const BSP_SCHRITTE = [
 ];
 
 const LOESUNG = (
-  <>
-    <MB>{'n = 54 + 30 + 24 + 12 = 120'}</MB>
-    <MB>{'\\text{Bus: } \\tfrac{54}{120} \\cdot 360^\\circ = 162^\\circ \\qquad \\text{Fahrrad: } \\tfrac{30}{120} \\cdot 360^\\circ = 90^\\circ'}</MB>
-    <MB>{'\\text{zu Fuß: } \\tfrac{24}{120} \\cdot 360^\\circ = 72^\\circ \\qquad \\text{Elterntaxi: } \\tfrac{12}{120} \\cdot 360^\\circ = 36^\\circ'}</MB>
-    <p>Kontrolle: <M>{'162^\\circ + 90^\\circ + 72^\\circ + 36^\\circ = 360^\\circ'}</M>.</p>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'Gesamtzahl', tex: 'n = 54 + 30 + 24 + 12 = 120' },
+      { titel: 'Bus', tex: '\\dfrac{54}{120} \\cdot 360^\\circ = 162^\\circ' },
+      { titel: 'Fahrrad', tex: '\\dfrac{30}{120} \\cdot 360^\\circ = 90^\\circ' },
+      { titel: 'zu Fuß', tex: '\\dfrac{24}{120} \\cdot 360^\\circ = 72^\\circ' },
+      { titel: 'Elterntaxi', tex: '\\dfrac{12}{120} \\cdot 360^\\circ = 36^\\circ' },
+      { titel: 'Kontrolle', tex: '162^\\circ + 90^\\circ + 72^\\circ + 36^\\circ = 360^\\circ' },
+    ]}
+  />
 );
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function SchlagzeileEinstieg() {
   const navigate = useNavigate();
-  const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 100, fest: false });
-  const [ehrlich, setEhrlich] = useState(false);
-  const [geloest, setGeloest] = useState(false);
-  const [uebungen, setUebungen] = useState<string[]>([]);
+  const [fest, setFest] = useSitzungState<Festlegung<Wahl>>('sz-fest', { wahl: null, wert: 100, fest: false });
+  const [ehrlich, setEhrlich] = useSitzungState('sz-ehrlich', false);
+  const [geloest, setGeloest] = useSitzungState('sz-geloest', false);
+  const [uebungen, setUebungen] = useSitzungState<string[]>('sz-uebungen', []);
   const uebungFertig = (key: string, fertig: (k: string) => () => void) => () => {
     fertig(key)();
     setUebungen((u) => (u.includes(key) ? u : [...u, key]));
@@ -124,7 +152,7 @@ export default function SchlagzeileEinstieg() {
       pflicht: ['a', 'b', 'c', 'd', 'e'],
       inhalt: (fertig) => (
         <>
-          <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich.</p>
+          <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich. Einzelarbeit, ca. 10 Minuten.</p>
           <CheckCard
             onSolved={fertig.teil('a')}
             title="a) Relative Häufigkeit"
@@ -143,7 +171,14 @@ export default function SchlagzeileEinstieg() {
               { kind: 'num', key: 'v', label: 'Ein Viertel:', expected: 90, unit: '°', tol: 0.01 },
               { kind: 'num', key: 'z', label: 'Ein Zehntel:', expected: 36, unit: '°', tol: 0.01 },
             ]}
-            solution={<MB>{'\\tfrac{1}{4} \\cdot 360^\\circ = 90^\\circ \\qquad \\tfrac{1}{10} \\cdot 360^\\circ = 36^\\circ'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Ein Viertel', tex: '\\tfrac{1}{4} \\cdot 360^\\circ = 90^\\circ' },
+                  { titel: 'Ein Zehntel', tex: '\\tfrac{1}{10} \\cdot 360^\\circ = 36^\\circ' },
+                ]}
+              />
+            }
           />
           <div>
             <MiniSaeulen
@@ -213,9 +248,10 @@ export default function SchlagzeileEinstieg() {
             Das Diagramm zeigt die monatlichen Stromkosten einer Familie von 2021 bis 2024. Gesucht ist, um wie viel Prozent die Kosten von
             2021 bis 2024 wirklich gestiegen sind.
           </p>
-          <Zitat wer="Die Chefredakteurin">
+          <blockquote className="sl-zitat">
             <p>„Seht euch die Säulen an: 2024 ist ein Vielfaches von 2021. Das ist unsere Schlagzeile!“</p>
-          </Zitat>
+            <footer>Die Chefredakteurin</footer>
+          </blockquote>
           <div className="sl-fokus">
             <p className="sl-fokus-titel">Dein Auftrag: Erst schätzen, dann die Lupe benutzen</p>
             <p>
@@ -314,7 +350,14 @@ export default function SchlagzeileEinstieg() {
               <M>{'360^\\circ'}</M> ergeben.
             </p>
           </div>
-          <UmfrageBild />
+          <figure className="sl-foto">
+            <img
+              src={umfrageBild}
+              width={1200}
+              height={600}
+              alt="Links ein Umfragezettel: Wie kommst du zur Schule? 120 Jugendliche befragt. Bus 54, Fahrrad 30, zu Fuß 24, Elterntaxi 12. Rechts ein leerer Kreis mit Fragezeichen: Winkel = ?"
+            />
+          </figure>
           <BeispielMitVideo videoTitel="Lernvideo: Kreisdiagramm zeichnen">
             <Beispiel offen title="Das Lieblingsgetränk" aufgabe={BSP_AUFGABE} steps={BSP_SCHRITTE} />
           </BeispielMitVideo>
@@ -378,7 +421,14 @@ export default function SchlagzeileEinstieg() {
             />
           </Abschnitt>
           <Handlungsprodukt titel="Richtigstellung an den Stadtboten">
-            <LeserbriefBild />
+            <figure className="sl-foto sl-foto-klein">
+              <img
+                src={briefBild}
+                width={800}
+                height={400}
+                alt="Eine Heftseite mit der Überschrift Richtigstellung an den Stadtboten. Darauf ein Säulendiagramm mit Achse ab 0, ein Kreisdiagramm mit vier Sektoren und Textzeilen."
+              />
+            </figure>
             <p className="sl-text">
               Schreibe in deinem Heft eine kurze Richtigstellung an die Chefredakteurin. Zeichne dazu ein ehrliches Säulendiagramm der
               Stromkosten (Achse ab 0) und das Kreisdiagramm der Schulwege mit deinen berechneten Winkeln. Erkläre, welchen Trick die erste
@@ -390,27 +440,11 @@ export default function SchlagzeileEinstieg() {
                 <li>„Die senkrechte Achse beginnt bei …, deshalb wirkt die Säule für 2024 …“</li>
                 <li>„Rechnet man nach, sind die Kosten nur um … % gestiegen, nämlich von … € auf … €.“</li>
                 <li>„Im Kreisdiagramm gehört zum Bus der Winkel …, weil …“</li>
-                <li>
-                  „Abkürzungen: <M>H</M> = …, <M>h</M> = …, <M>n</M> = …, <M>{'\\alpha'}</M> = …“
-                </li>
               </ul>
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist deine Richtigstellung vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                'Ein Säulendiagramm der Stromkosten, dessen Achse bei 0 beginnt und das beschriftet ist',
-                'Ein Kreisdiagramm der Schulwege mit allen vier Winkeln, deren Summe 360° ergibt',
-                'Eine Erklärung, welchen Trick die erste Titelseite benutzt hat und wie groß der echte Anstieg ist',
-                'Eine klare Forderung an die Redaktion: Wie soll die Schlagzeile lauten?',
-                <>
-                  Unter deiner Richtigstellung steht, wofür die Abkürzungen stehen: <M>H</M> (absolute Häufigkeit), <M>h</M> (relative
-                  Häufigkeit), <M>n</M> (Gesamtzahl der Befragten) und <M>{'\\alpha'}</M> (Winkel des Sektors). Außerdem erklärst du die
-                  Begriffe Säulendiagramm, Kreisdiagramm, Sektor und Achse und alle anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an die Chefredakteurin')} />
           </Abschnitt>
           {geloest && (
             <Abschnitt titel="Das hältst du fest">
@@ -435,6 +469,7 @@ export default function SchlagzeileEinstieg() {
     {
       art: 'sichern',
       titel: 'Übungsaufgaben',
+      pflicht: ['1', '2', '3'],
       inhalt: (fertig) => (
         <>
           <p className="sl-text">
@@ -513,10 +548,15 @@ export default function SchlagzeileEinstieg() {
                 { kind: 'num', key: 'd', label: 'Dana:', expected: 36, unit: '°', tol: 0.5 },
               ]}
               solution={
-                <>
-                  <MB>{'\\tfrac{12}{30} \\cdot 360^\\circ = 144^\\circ \\quad \\tfrac{9}{30} \\cdot 360^\\circ = 108^\\circ \\quad \\tfrac{6}{30} \\cdot 360^\\circ = 72^\\circ \\quad \\tfrac{3}{30} \\cdot 360^\\circ = 36^\\circ'}</MB>
-                  <p>Kontrolle: Alle vier Winkel ergeben zusammen 360°.</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Ayla', tex: '\\tfrac{12}{30} \\cdot 360^\\circ = 144^\\circ' },
+                    { titel: 'Ben', tex: '\\tfrac{9}{30} \\cdot 360^\\circ = 108^\\circ' },
+                    { titel: 'Cem', tex: '\\tfrac{6}{30} \\cdot 360^\\circ = 72^\\circ' },
+                    { titel: 'Dana', tex: '\\tfrac{3}{30} \\cdot 360^\\circ = 36^\\circ', text: 'Kontrolle: Alle vier Winkel ergeben zusammen 360°.' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -552,10 +592,13 @@ export default function SchlagzeileEinstieg() {
               ]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'h = \\frac{54^\\circ}{360^\\circ} = 0{,}15 = 15\\,\\%'}</MB>
-                  <MB>{'H = h \\cdot n = 0{,}15 \\cdot 240 = 36'}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Anteil aus dem Winkel', tex: 'h = \\dfrac{54^\\circ}{360^\\circ} = 0{,}15 = 15\\,\\%' },
+                    { titel: 'Anzahl', tex: 'H = h \\cdot n = 0{,}15 \\cdot 240 = 36' },
+                  ]}
+                />
+
               }
               help={
                 <Hilfen
@@ -606,6 +649,7 @@ export default function SchlagzeileEinstieg() {
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             In dieser Lernsituation prüfst du als Praktikantin oder Praktikant beim „Stadtboten“, ob ein Diagramm die Wahrheit sagt. Du
