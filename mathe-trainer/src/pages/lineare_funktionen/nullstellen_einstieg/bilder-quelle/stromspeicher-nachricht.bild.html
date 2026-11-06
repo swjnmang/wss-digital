@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- Der Stromspeicher, Handlungsprodukt Nachricht an Familie Demir. Bildwelt Bauplan / CAD dunkel.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/lineare_funktionen/nullstellen_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_cad.js"></script></head><body>
+<div id="bild" style="width:800px;height:400px"></div>
+<script>
+const C = CAD('#8f86ff'), L = C.L, A = C.A;
+let g = `<rect x="60" y="40" width="680" height="320" fill="#20252d" stroke="${L}" stroke-width="2"/><rect x="60" y="40" width="680" height="56" fill="${A}" fill-opacity=".25"/><line x1="60" x2="740" y1="96" y2="96" stroke="${L}" stroke-width="2"/>`;
+g += `<text x="82" y="78" font-family="Barlow Condensed" font-weight="700" font-size="30" fill="#fff">Liebe Familie Demir,</text>`;
+['Leer heißt: y = 0', 'Rechnung mit Probe', 'Nullstelle N( … | 0)', 'Uhrzeit: … Uhr'].forEach((t, i) => {
+  const y = 142 + i * 52;
+  g += `<rect x="84" y="${y - 22}" width="26" height="26" fill="none" stroke="${L}" stroke-width="2"/><text x="124" y="${y}" font-family="Barlow Condensed" font-weight="500" font-size="26" fill="${L}">${t}</text>`;
+});
+// Skizze: fallende Gerade mit Nullstelle
+g += `<line x1="470" y1="320" x2="470" y2="120" stroke="${L}" stroke-width="2" marker-end="url(#pf)"/><line x1="470" y1="300" x2="712" y2="300" stroke="${L}" stroke-width="2" marker-end="url(#pf)"/>`;
+g += `<line x1="470" y1="150" x2="650" y2="300" stroke="${A}" stroke-width="4"/><circle cx="650" cy="300" r="8" fill="#20252d" stroke="#ffd36a" stroke-width="3"/><text x="650" y="334" font-family="Barlow Condensed" font-weight="700" font-size="24" fill="#ffd36a" text-anchor="middle">N</text>`;
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">${C.defs}${C.grund(800, 400)}${g}</svg>`;
+</script>
+</body></html>
