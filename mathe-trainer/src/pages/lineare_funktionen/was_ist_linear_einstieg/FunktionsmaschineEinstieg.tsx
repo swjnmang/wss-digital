@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
 import { Beispiel, M, MB, Merke, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
+import { CheckCard, Hilfen, Loesungsweg, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
 import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Bildwelt, type Seite, type Thema } from '../lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
-import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import { Kriterien, standardKriterien } from '../../finanzmathe/zins_kit/zins_kit'
 import { parseLinearEquation } from '../../../utils/parseLinearEquation'
 import { Bruecke, KoSystem, MaschinenBild, Protokoll, zahl, type Linie } from './bilder'
 import titelBild from './bilder/titel.webp'
@@ -335,7 +335,9 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     title: <>Die Regel finden: bei jedem Paar <M>y : x</M> rechnen</>,
     body: (
       <>
-        <MB>{'1 : 2 = 0{,}5 \\qquad 2 : 4 = 0{,}5 \\qquad (-3) : (-6) = 0{,}5'}</MB>
+        <MB>{'1 : 2 = 0{,}5'}</MB>
+        <MB>{'2 : 4 = 0{,}5'}</MB>
+        <MB>{'(-3) : (-6) = 0{,}5'}</MB>
         <p>
           Es kommt immer dieselbe Zahl heraus. Die Maschine nimmt also jedes <M>x</M> mal <M>{'0{,}5'}</M>. Diese Zahl heißt <M>m</M>: <M>{'m = 0{,}5'}</M>.
         </p>
@@ -375,7 +377,8 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     title: <><M>x</M> einsetzen und ausrechnen</>,
     body: (
       <>
-        <MB>{'x = 10{:}\\quad y = 0{,}5 \\cdot 10 = 5 \\qquad x = -8{:}\\quad y = 0{,}5 \\cdot (-8) = -4'}</MB>
+        <MB>{'x = 10{:}\\quad y = 0{,}5 \\cdot 10 = 5'}</MB>
+        <MB>{'x = -8{:}\\quad y = 0{,}5 \\cdot (-8) = -4'}</MB>
         <p>Plus mal Minus ergibt Minus. Maschine Z gibt bei 10 also 5 aus, bei −8 gibt sie −4 aus.</p>
       </>
     ),
@@ -408,13 +411,16 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 ]
 
 const LOESUNG_B = (
-  <>
-    <MB>{'4 : (-2) = -2 \\qquad (-2) : 1 = -2 \\qquad (-6) : 3 = -2 \\qquad \\Rightarrow\\; m = -2'}</MB>
-    <p>
-      Maschine B nimmt jedes <M>x</M> mal <M>{'-2'}</M>. Ihre Funktionsgleichung lautet <M>{'y = -2x'}</M>.
-    </p>
-    <MB>{'x = 10{:}\\quad y = -2 \\cdot 10 = -20 \\qquad x = -7{:}\\quad y = -2 \\cdot (-7) = 14'}</MB>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'y durch x für jeden Punkt', tex: '4 : (-2) = -2' },
+      { titel: 'Zweiter Punkt', tex: '(-2) : 1 = -2' },
+      { titel: 'Dritter Punkt', tex: '(-6) : 3 = -2', text: 'Immer −2: Maschine B nimmt jedes x mal −2.' },
+      { titel: 'Funktionsgleichung', tex: 'y = -2x' },
+      { titel: 'x = 10 einsetzen', tex: 'y = -2 \\cdot 10 = -20' },
+      { titel: 'x = −7 einsetzen', tex: 'y = -2 \\cdot (-7) = 14' },
+    ]}
+  />
 )
 
 /** Kleiner Graph für eine Antwortmöglichkeit */
@@ -474,7 +480,14 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
               { kind: 'num', key: 'a1', label: 'Ergebnis von 5 mal minus 2', expected: -10 },
               { kind: 'num', key: 'a2', label: 'Ergebnis von minus 2 mal minus 3', expected: 6 },
             ]}
-            solution={<MB>{'5 \\cdot (-2) = -10 \\qquad (-2) \\cdot (-3) = 6'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erstes Produkt', tex: '5 \\cdot (-2) = -10' },
+                  { titel: 'Zweites Produkt', tex: '(-2) \\cdot (-3) = 6' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -539,7 +552,14 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
               { kind: 'num', key: 'd1', label: 'Ergebnis von 18 geteilt durch 6', expected: 3 },
               { kind: 'num', key: 'd2', label: 'Ergebnis von minus 8 geteilt durch 4', expected: -2 },
             ]}
-            solution={<MB>{'18 : 6 = 3 \\qquad (-8) : 4 = -2'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erster Quotient', tex: '18 : 6 = 3' },
+                  { titel: 'Zweiter Quotient', tex: '(-8) : 4 = -2' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -839,21 +859,7 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist dein Steckbrief vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                'Alle vier Felder zeigen dieselbe Maschine: Jede Spalte deiner Wertetabelle ist ein Punkt in deinem Graphen.',
-                <>
-                  Der Graph ist eine Gerade durch den Ursprung <M>{'(0 \\mid 0)'}</M>, die Achsen sind mit <M>x</M> und <M>y</M> beschriftet.
-                </>,
-                'Unter dem Steckbrief steht: „Maschine B ist eine Funktion, weil zu jedem x genau ein y gehört.“',
-                <>
-                  Auf deinem Steckbrief steht, was die Begriffe bedeuten: Funktion, Wertetabelle, Funktionsgraph, Funktionsgleichung, Ursprung. Außerdem steht dort, wofür die
-                  Buchstaben stehen: <M>x</M> (die Zahl, die du einwirfst), <M>y</M> (die Zahl, die herauskommt) und <M>m</M> (die Zahl, mit der <M>x</M> malgenommen wird). Erkläre
-                  auch alle anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien()} />
           </Abschnitt>
           {geloest && (
             <Abschnitt titel="Das hältst du fest">
@@ -1029,7 +1035,15 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
               }
               rechnung={[{ l: ['-20'], r: ['4 \\cdot (', { luecke: 'x' }, ')'] }]}
               fields={[{ kind: 'num', key: 'x', label: 'eingeworfene Zahl x', expected: -5 }]}
-              solution={<MB>{'\\begin{aligned} -20 &= 4x && \\mid :4 \\\\ x &= -5 \\end{aligned} \\qquad \\text{Probe: } 4 \\cdot (-5) = -20 \\;\\checkmark'}</MB>}
+              solution={
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Gleichung aufstellen', tex: '-20 = 4x' },
+                    { titel: 'Durch 4 teilen', tex: 'x = -5' },
+                    { titel: 'Probe', tex: '4 \\cdot (-5) = -20' },
+                  ]}
+                />
+              }
               help={
                 <Hilfen
                   steps={[
@@ -1070,7 +1084,13 @@ export default function FunktionsmaschineEinstieg({ onBack, onPractice }: { onBa
               fields={[{ kind: 'gleichung', key: 'gl', label: 'Funktionsgleichung', m: -0.5, t: 0 }]}
               solution={
                 <>
-                  <MB>{'(-1) : 2 = -0{,}5 \\qquad 2 : (-4) = -0{,}5 \\qquad \\Rightarrow\\; y = -0{,}5x'}</MB>
+                  <Loesungsweg
+                    schritte={[
+                      { titel: 'Punkt (2 | −1)', tex: '(-1) : 2 = -0{,}5' },
+                      { titel: 'Punkt (−4 | 2)', tex: '2 : (-4) = -0{,}5' },
+                      { titel: 'Funktionsgleichung', tex: 'y = -0{,}5x' },
+                    ]}
+                  />
                 </>
               }
               help={

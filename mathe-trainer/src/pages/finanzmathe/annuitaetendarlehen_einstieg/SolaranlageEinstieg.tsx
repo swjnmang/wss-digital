@@ -27,7 +27,7 @@ import {
   type Thema,
 } from '../../lineare_funktionen/lernsituation_kit/seiten'
 import { AufgabePunkteCtx, Bilanz, PUNKTE, punkteText, usePunkteAufgabe } from '../../lineare_funktionen/lernsituation_kit/punkte'
-import { Kriterien, Zitat, euro } from '../zins_kit/zins_kit'
+import { Kriterien, standardKriterien, Zitat, euro } from '../zins_kit/zins_kit'
 import SchuldenbergSpiel from './SchuldenbergSpiel'
 import titelBild from './bilder/titel.webp'
 import blockBild from './bilder/block.webp'
@@ -1105,33 +1105,11 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
                 <li>„Ihre Annuität (Zinsen + Tilgung) beträgt jedes Jahr …“</li>
                 <li>„Im 1. Jahr zahlen Sie davon … Zinsen und tilgen …, im 2. Jahr …“</li>
                 <li>„Die Rechnung Ihres Nachbarn passt nicht, weil …“</li>
-                <li>
-                  „Abkürzungen: <M>{'K_0'}</M> = …, <M>A</M> = …, <M>{'T_1'}</M> = …, <M>{'T_v'}</M> = …, <M>Z</M> = …, <M>q</M> = …, <M>n</M> = …, <M>v</M> = …“
-                </li>
               </ul>
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist dein Beratungsblatt vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                <>
-                  Die Berechnung des Darlehens: <M>{'K_0'}</M> = Kaufpreis minus Eigenkapital
-                </>,
-                'Der Tilgungsplan für das 1. und 2. Jahr mit den Spalten Jahr, Schuld am Jahresanfang, Tilgung, Zinsen und Annuität',
-                <>
-                  Zu jedem Wert die Formel mit eingesetzten Zahlen: <M>A</M>, <M>{'T_1'}</M>, <M>{'T_2 = T_1 \\cdot q'}</M>, die Zinsen über die Schuld am Jahresanfang
-                  oder mit <M>{'A - T'}</M>
-                </>,
-                'Eine Antwort an Frau Lorenz: Wie hoch ist die Annuität, und warum steigt die Tilgung, obwohl die Annuität gleich bleibt?',
-                <>
-                  Unter deinem Beratungsblatt steht, wofür die Abkürzungen stehen: <M>{'K_0'}</M> (Darlehensbetrag, Schuld am Anfang des 1. Jahres), <M>A</M> (Annuität,
-                  jährliche Zahlung aus Zinsen und Tilgung), <M>{'T_1'}</M> und <M>{'T_v'}</M> (Tilgung im 1. bzw. im <M>v</M>-ten Jahr), <M>Z</M> (Zinsen), <M>p</M> (Zinssatz), <M>q</M>{' '}
-                  (Zinsfaktor), <M>n</M> (Laufzeit in Jahren) und <M>v</M> (Nummer des Jahres). Außerdem erklärst du die Begriffe Annuitätendarlehen, Tilgung, Restschuld und
-                  Eigenkapital und alle anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an Frau Lorenz')} />
           </Abschnitt>
           {jahr2Geloest && (
             <Abschnitt titel="Das hältst du fest">

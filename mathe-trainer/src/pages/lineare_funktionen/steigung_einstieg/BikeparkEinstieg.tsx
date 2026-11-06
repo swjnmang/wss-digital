@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import TaskShell from '../../../components/layout/TaskShell'
 import { useSitzungState } from '../../../hooks/useSitzung'
 import { Beispiel, M, MB, Merke, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
+import { CheckCard, Hilfen, Loesungsweg, McCard, TrackedCheck, TrackedMc } from '../lernsituation_kit/kit'
 import { Abschnitt, Aufklappbar, BeispielMitVideo, BonusSpiel, Handlungsprodukt, SeitenLernsituation, type Bildwelt, type Seite, type Thema } from '../lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../lernsituation_kit/punkte'
-import { Kriterien } from '../../finanzmathe/zins_kit/zins_kit'
+import { Kriterien, standardKriterien } from '../../finanzmathe/zins_kit/zins_kit'
 import { FARBE, Plan, type Rampe } from './grafik'
 import RampenRallye from './RampenRallye'
 import titelBild from './bilder/titel.webp'
@@ -301,7 +301,13 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 const LOESUNG_KERN = (
   <>
     <p>Jede Auffahrt ist selbst ein Steigungsdreieck: Die Länge ist <M>{'\\Delta x'}</M>, die Höhe ist <M>{'\\Delta y'}</M>.</p>
-    <MB>{'m_A = \\frac{3}{6} = 0{,}5 \\qquad m_B = \\frac{3}{4} = 0{,}75 \\qquad m_C = \\frac{2}{4} = 0{,}5'}</MB>
+    <Loesungsweg
+      schritte={[
+        { titel: 'Auffahrt A', tex: 'm_A = \\dfrac{3}{6} = 0{,}5' },
+        { titel: 'Auffahrt B', tex: 'm_B = \\dfrac{3}{4} = 0{,}75' },
+        { titel: 'Auffahrt C', tex: 'm_C = \\dfrac{2}{4} = 0{,}5' },
+      ]}
+    />
   </>
 )
 
@@ -393,7 +399,7 @@ export default function BikeparkEinstieg() {
             }
             rechnung={[{ l: ['2 - 5'], r: [{ luecke: 'c' }] }]}
             fields={[{ kind: 'num', key: 'c', label: 'Änderung von 5 auf 2', expected: -3 }]}
-            solution={<MB>{'2 - 5 = -3 \\qquad \\text{(3 nach unten)}'}</MB>}
+            solution={<p><M>{'2 - 5 = -3'}</M>, also 3 nach unten.</p>}
             help={
               <Hilfen
                 steps={[
@@ -417,7 +423,14 @@ export default function BikeparkEinstieg() {
               { kind: 'num', key: 'd1', label: 'ein Halb als Dezimalzahl', expected: 0.5 },
               { kind: 'num', key: 'd2', label: 'drei Viertel als Dezimalzahl', expected: 0.75 },
             ]}
-            solution={<MB>{'\\frac{1}{2} = 1 : 2 = 0{,}5 \\qquad \\frac{3}{4} = 3 : 4 = 0{,}75'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erster Bruch', tex: '\\dfrac{1}{2} = 1 : 2 = 0{,}5' },
+                  { titel: 'Zweiter Bruch', tex: '\\dfrac{3}{4} = 3 : 4 = 0{,}75' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -607,19 +620,7 @@ export default function BikeparkEinstieg() {
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist deine Bauplan-Skizze vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                <>Alle drei Auffahrten stehen in einem Koordinatensystem, jede beginnt im Ursprung <M>{'(0 \\mid 0)'}</M>, die Achsen sind beschriftet (x in m, y in m).</>,
-                <>An jeder Auffahrt ist ein Steigungsdreieck eingezeichnet, mit <M>{'\\Delta x'}</M> und <M>{'\\Delta y'}</M> beschriftet, daneben <M>{'m = \\frac{\\Delta y}{\\Delta x}'}</M> als Bruch und als Dezimalzahl.</>,
-                'Darunter steht deine Empfehlung in einem Satz: welche Auffahrt die Einsteiger-Regel nicht einhält und warum.',
-                <>
-                  Unter der Skizze steht, was die Begriffe und Abkürzungen bedeuten: <M>m</M> (Steigung: so viel geht es pro 1 nach rechts nach oben), <M>{'\\Delta'}</M> (Delta,
-                  Differenz), <M>{'\\Delta x'}</M> (wie weit nach rechts), <M>{'\\Delta y'}</M> (wie weit nach oben oder unten), Steigungsdreieck und Ursprungsgerade. Erkläre auch alle
-                  anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an den Jugendrat')} />
           </Abschnitt>
           {geloest && (
             <Abschnitt titel="Das hältst du fest">
@@ -709,7 +710,14 @@ export default function BikeparkEinstieg() {
                 { kind: 'num', key: 'dy', label: 'Delta y', expected: -1 },
                 { kind: 'num', key: 'm', label: 'Steigung m', expected: -0.5, tol: 0.001 },
               ]}
-              solution={<MB>{'\\Delta x = 2, \\quad \\Delta y = -1 \\quad \\Rightarrow \\quad m = \\frac{-1}{2} = -0{,}5'}</MB>}
+              solution={
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Steigungsdreieck ablesen', text: 'Δx = 2 nach rechts, Δy = −1 (1 nach unten)' },
+                    { titel: 'Steigung', tex: 'm = \\dfrac{-1}{2} = -0{,}5' },
+                  ]}
+                />
+              }
               help={
                 <Hilfen
                   steps={[
