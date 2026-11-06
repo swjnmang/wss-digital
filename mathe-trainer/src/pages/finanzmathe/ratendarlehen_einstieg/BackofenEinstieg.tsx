@@ -1,28 +1,25 @@
-import { useState, type ChangeEvent, type FocusEvent, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import TaskShell from '../../../components/layout/TaskShell';
-import { Beispiel, M, MB, Merke, checkNumber } from '../../daten_und_zufall/lernpfad/kit';
-import { fieldCheckClass } from '../../../utils/fieldCheck';
-import {
-  CardHead,
-  CheckCard,
-  Feedback,
-  Hilfen,
-  useLiveCheck,
-  McCard,
-  SchrittHilfen,
-  TrackedCheck,
-  TrackedMc,
-} from '../../lineare_funktionen/lernsituation_kit/kit';
+import { useSitzungState } from '../../../hooks/useSitzung';
+import { Beispiel, M, MB, Merke } from '../../daten_und_zufall/lernpfad/kit';
+import { CheckCard, Hilfen, Loesungsweg, McCard, TrackedCheck, TrackedMc } from '../../lineare_funktionen/lernsituation_kit/kit';
 import {
   Abschnitt,
   Aufklappbar,
+  BeispielMitVideo,
+  BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
-  WegWahl,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../lineare_funktionen/lernsituation_kit/seiten';
-import { Kriterien, Vermutung, Zitat, euro, type Festlegung } from '../zins_kit/zins_kit';
+import { Bilanz } from '../../lineare_funktionen/lernsituation_kit/punkte';
+import AuswahlSpiel, { mischen, zufall, type AuswahlRunde } from '../../lineare_funktionen/lernsituation_kit/AuswahlSpiel';
+import { Kriterien, Vermutung, euro, standardKriterien, type Festlegung } from '../zins_kit/zins_kit';
+import titelBild from './bilder/backofen-titel.webp';
+import angebotBild from './bilder/backofen-angebot.webp';
+import heftBild from './bilder/backofen-heft.webp';
 import '../../daten_und_zufall/lernpfad/lernpfad.css';
 import './ratendarlehen.css';
 
@@ -34,7 +31,14 @@ import './ratendarlehen.css';
 // Aha: Frau Sommer rechnet mit 5 · 3.000 € = 15.000 € Zinsen. Weil die Schuld jedes Jahr kleiner wird, sind es nur 9.000 €,
 // und die Rate sinkt: Nur im 1. Jahr (15.000 €) liegt sie über dem Budget von 14.500 €.
 // Identität: Themenfarbe Kupfer, Symbol Brot, Titelbild Bäckerei mit neuem Ofen, Leitobjekt das Raten-Diagramm
-// (in Phase 2 die Vermutung, in Phase 3 der echte Tilgungsplan gegen die Budget-Linie). Die Festlegung bleibt nur im Seitenzustand.
+// (in Phase 2 die Vermutung, in Phase 3 der echte Tilgungsplan gegen die Budget-Linie).
+// Problem lösen in zwei Teilen (Teil 1 Tilgungsplan und Budget, Teil 2 das 10. Jahr direkt mit der Merkhilfe), Teil 2 erst nach Teil 1.
+// Punkte nach Aufwand: Warm-up 3/3/3/2/2 = 13, Festlegung, Teil 1 14, Entscheidung 4, Teil 2 10, Tilgungsplan im Heft, Übungen 4/6/8, Profi 9;
+// Bonus-Spiel „Raten-Bäckerei“ 4 Runden à 2.
+// Bildwelt Reportage / Abendlicht: Titelbild, Angebot und Heftseite sind gerenderte WebP-Dateien aus bilder-quelle/backofen-*.bild.html;
+// das Raten-Diagramm bleibt Inline-SVG.
+
+export const VIDEO_RATENDARLEHEN = 'https://youtu.be/w_UjVYwD_Xo';
 
 /* ── Situation ───────────────────────────────────────────────────────────── */
 
@@ -74,167 +78,22 @@ const tausend = (v: number) => v.toLocaleString('de-DE');
 
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
-/** Titelbild: die Bäckerei Sommer, daneben wird der neue Etagenofen mit Preisschild geliefert */
-function Titelbild() {
-  return (
-    <svg
-      viewBox="0 0 720 252"
-      role="img"
-      aria-label="Eine kleine Bäckerei mit Markise und Broten im Schaufenster. Daneben steht ein neuer Backofen mit drei Ofentüren und einem Preisschild: 60.000 Euro, 5 Jahre, 5 Prozent pro Jahr."
-    >
-      <rect x="0" y="214" width="720" height="38" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="214" y2="214" stroke="var(--ink)" strokeWidth="2" />
-      {/* Bäckerei */}
-      <rect x="40" y="58" width="360" height="156" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="40" y="30" width="360" height="34" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <text x="220" y="54" textAnchor="middle" fontSize="20" fontWeight="800" fill="#fff">
-        Bäckerei Sommer
-      </text>
-      {/* Markise */}
-      {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-        <path
-          key={i}
-          d={`M${40 + i * 40} 64 h40 v22 a20 12 0 0 1 -40 0 Z`}
-          fill={i % 2 === 0 ? 'var(--primary)' : 'var(--primary-soft)'}
-          stroke="var(--ink)"
-          strokeWidth="2"
-        />
-      ))}
-      {/* Schaufenster mit Broten */}
-      <rect x="64" y="112" width="200" height="82" rx="4" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <line x1="64" x2="264" y1="168" y2="168" stroke="var(--ink)" strokeWidth="2" />
-      {[100, 164, 228].map((x) => (
-        <ellipse key={x} cx={x} cy="154" rx="26" ry="13" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-      ))}
-      {[124, 196].map((x) => (
-        <circle key={x} cx={x} cy="182" r="9" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-      ))}
-      {/* Tür */}
-      <rect x="296" y="112" width="74" height="102" rx="3" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="306" y="122" width="54" height="40" rx="2" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="1.5" />
-      <circle cx="358" cy="176" r="4" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-      {/* Neuer Etagenofen */}
-      <rect x="452" y="64" width="176" height="140" rx="8" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      {[76, 118, 160].map((y) => (
-        <g key={y}>
-          <rect x="466" y={y} width="148" height="34" rx="4" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-          <rect x="500" y={y + 6} width="80" height="6" rx="3" fill="var(--ink)" />
-        </g>
-      ))}
-      <rect x="462" y="204" width="16" height="10" fill="var(--ink)" />
-      <rect x="602" y="204" width="16" height="10" fill="var(--ink)" />
-      {/* Preisschild */}
-      <line x1="610" y1="64" x2="640" y2="34" stroke="var(--ink)" strokeWidth="2" />
-      <g transform="rotate(8 650 40)">
-        <rect x="604" y="14" width="108" height="62" rx="8" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="658" y="42" textAnchor="middle" fontSize="20" fontWeight="800" fill="var(--ink)">
-          60.000 €
-        </text>
-        <text x="658" y="64" textAnchor="middle" fontSize="15" fill="var(--ink-muted)">
-          5 Jahre · 5 %
-        </text>
-      </g>
-    </svg>
-  );
-}
-
 const THEMA: Thema = {
   name: 'Der neue Backofen',
   farbe: 'kupfer',
   icon: 'fa-bread-slice',
-  bild: <Titelbild />,
+  kicker: 'Aus der Bäckerei Sommer',
+  bildzeile: 'Der neue Etagenofen steht schon vor der Tür, bezahlt ist er noch nicht. Illustration: Mathe-Trainer',
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Die Bäckerei Sommer am frühen Abend, im Schaufenster leuchten Brote. Vor der Tür steht ein neuer Etagenofen mit drei Ofentüren auf einer Palette, am Preisschild: 60.000 €, 5 Jahre, 5 %."
+    />
+  ),
 };
-
-/* ── Bilder für „Problem erkennen“ und „Problem lösen“ ─────────────────── */
-
-/** Das Kreditangebot der Bank und Frau Sommers Budget als Sachbild */
-function AngebotBild() {
-  return (
-    <div className="zk-bild">
-      <svg
-        viewBox="0 0 720 230"
-        role="img"
-        aria-label="Links das Angebot der Bank: Ratendarlehen über 60.000 Euro, Laufzeit 5 Jahre, Zinssatz 5 Prozent pro Jahr, jedes Jahr gleich hohe Tilgung. Rechts Frau Sommers Budget: höchstens 14.500 Euro pro Jahr."
-      >
-        {/* Angebot */}
-        <rect x="12" y="12" width="420" height="206" rx="16" fill="var(--surface)" stroke="var(--line)" strokeWidth="2" />
-        <rect x="12" y="12" width="420" height="44" rx="16" fill="var(--primary-soft)" />
-        <rect x="12" y="40" width="420" height="16" fill="var(--primary-soft)" />
-        <text x="32" y="42" fontSize="20" fontWeight="800" fill="var(--ink)">
-          Angebot der Bank: Ratendarlehen
-        </text>
-        {[
-          ['Darlehen', '60.000 €'],
-          ['Laufzeit', '5 Jahre'],
-          ['Zinssatz', '5 % p.a.'],
-          ['Tilgung', 'jedes Jahr gleich hoch'],
-        ].map(([a, b], i) => (
-          <g key={a}>
-            <text x="32" y={92 + i * 36} fontSize="18" fill="var(--ink-muted)">
-              {a}
-            </text>
-            <text x="150" y={92 + i * 36} fontSize="18" fontWeight="700" fill="var(--ink)">
-              {b}
-            </text>
-          </g>
-        ))}
-        {/* Budget */}
-        <rect x="456" y="12" width="252" height="206" rx="16" fill="var(--surface)" stroke="var(--line)" strokeWidth="2" />
-        <rect x="456" y="12" width="252" height="44" rx="16" fill="var(--primary-soft)" />
-        <rect x="456" y="40" width="252" height="16" fill="var(--primary-soft)" />
-        <text x="476" y="42" fontSize="20" fontWeight="800" fill="var(--ink)">
-          Budget pro Jahr
-        </text>
-        {[0, 1, 2, 3, 4].map((i) => (
-          <ellipse key={i} cx="526" cy={190 - i * 14} rx="38" ry="10" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        ))}
-        <text x="582" y="140" fontSize="17" fill="var(--ink-muted)">
-          höchstens
-        </text>
-        <text x="582" y="170" fontSize="24" fontWeight="800" fill="var(--primary)">
-          14.500 €
-        </text>
-      </svg>
-    </div>
-  );
-}
-
-/** Handlungsprodukt: Heftseite mit Tilgungsplan und Balkendiagramm */
-function HeftBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Eine Heftseite mit der Überschrift Tilgungsplan Backofen, links eine Tabelle mit fünf Zeilen, rechts ein Balkendiagramm mit fünf Balken und einer gestrichelten Budget-Linie."
-      >
-        <rect x="60" y="10" width="600" height="172" rx="6" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="84" y="40" fontSize="18" fontWeight="700" fontStyle="italic" fill="var(--ink)">
-          Tilgungsplan Backofen
-        </text>
-        {/* Tabelle */}
-        {[56, 76, 96, 116, 136, 156].map((y) => (
-          <line key={y} x1="84" x2="360" y1={y} y2={y} stroke="var(--line-strong)" strokeWidth="1.5" />
-        ))}
-        {[84, 124, 184, 244, 300, 360].map((x) => (
-          <line key={x} x1={x} x2={x} y1="56" y2="156" stroke="var(--line-strong)" strokeWidth="1.5" />
-        ))}
-        <rect x="84" y="56" width="276" height="20" fill="var(--primary-soft)" />
-        {/* Balken */}
-        <line x1="400" x2="636" y1="156" y2="156" stroke="var(--ink)" strokeWidth="2" />
-        <line x1="400" x2="400" y1="50" y2="156" stroke="var(--ink)" strokeWidth="2" />
-        {[0, 1, 2, 3, 4].map((i) => (
-          <rect key={i} x={416 + i * 44} y={64 + i * 8} width="28" height={92 - i * 8} fill="var(--primary)" stroke="var(--ink)" strokeWidth="1.5" />
-        ))}
-        <line x1="400" x2="636" y1="70" y2="70" stroke="var(--ink)" strokeWidth="2" strokeDasharray="6 4" />
-        <g transform="rotate(-35 660 120)">
-          <rect x="610" y="150" width="110" height="16" rx="4" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-          <polygon points="610,150 594,158 610,166" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-        </g>
-      </svg>
-    </div>
-  );
-}
+const BILDWELT: Bildwelt = { welt: 'reportage', variante: 'abendlicht' };
 
 /* ── Leitobjekt: das Raten-Diagramm ─────────────────────────────────────── */
 
@@ -405,114 +264,6 @@ function PlanTabelle({
   );
 }
 
-const SPALTEN = [
-  { key: 'schuld', titel: 'Schuld am Jahresanfang' },
-  { key: 'tilgung', titel: 'Tilgung' },
-  { key: 'zinsen', titel: 'Zinsen' },
-  { key: 'annuitaet', titel: 'Annuität' },
-] as const;
-type Spalte = (typeof SPALTEN)[number]['key'];
-
-/**
- * Tilgungsplan zum Ausfüllen wie in der Übung „Tilgungsplan ausfüllen“: eine Zeile pro Jahr, optional eine Summenzeile.
- * Jedes Feld prüft sich selbst (richtig sofort grün, falsch nach kurzer Pause rot), „Lösungsweg zeigen“ erst nach einem Fehlversuch.
- */
-function TilgungsplanCheck({
-  title,
-  prompt,
-  zeilen,
-  summe,
-  solution,
-  help,
-  onSolved,
-}: {
-  title: ReactNode;
-  prompt: ReactNode;
-  zeilen: ({ jahr: number } & Record<Spalte, number>)[];
-  summe?: Partial<Record<Spalte, number>>;
-  solution: ReactNode;
-  help: ReactNode;
-  onSolved: () => void;
-}) {
-  const felder = [
-    ...zeilen.flatMap((z) => SPALTEN.map((sp) => ({ key: `${z.jahr}-${sp.key}`, expected: z[sp.key] }))),
-    ...SPALTEN.flatMap((sp) => (summe?.[sp.key] !== undefined ? [{ key: `summe-${sp.key}`, expected: summe[sp.key] as number }] : [])),
-  ];
-  const { values, marks, status, praise, malFalsch, setValue, blur } = useLiveCheck(
-    felder.map((f) => ({ key: f.key, pruefe: (v: string) => checkNumber(v, f.expected) })),
-    { onSolved, onSchonGeloest: onSolved },
-  );
-  const [zeigen, setZeigen] = useState(false);
-
-  const feld = (key: string, label: string) => (
-    <input
-      type="text"
-      inputMode="decimal"
-      autoComplete="off"
-      placeholder="?"
-      aria-label={label}
-      className={`bk-input rd-feld ${fieldCheckClass(marks[key])}`}
-      value={values[key] ?? ''}
-      onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(key, e.target.value)}
-      onBlur={(e: FocusEvent<HTMLInputElement>) => blur(key, e.currentTarget.value)}
-    />
-  );
-
-  return (
-    <div className="lp-ex bk-panel">
-      <CardHead title={title} />
-      <div className="lp-ex-prompt">{prompt}</div>
-      <div className="lp-table-wrap">
-        <table className="lp-table rd-plan rd-plan-eingabe">
-          <thead>
-            <tr>
-              <th>Jahr</th>
-              {SPALTEN.map((sp) => (
-                <th key={sp.key}>{sp.titel} in €</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {zeilen.map((z) => (
-              <tr key={z.jahr}>
-                <th>{z.jahr}</th>
-                {SPALTEN.map((sp) => (
-                  <td key={sp.key}>{feld(`${z.jahr}-${sp.key}`, `${sp.titel}, Jahr ${z.jahr}`)}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-          {summe && (
-            <tfoot>
-              <tr>
-                <th>Summe</th>
-                {SPALTEN.map((sp) => (
-                  <td key={sp.key}>{summe[sp.key] !== undefined && feld(`summe-${sp.key}`, `${sp.titel}, Summe`)}</td>
-                ))}
-              </tr>
-            </tfoot>
-          )}
-        </table>
-      </div>
-      {(malFalsch || status === 'ok') && (
-        <div className="bk-actions lp-ex-actions">
-          <button type="button" className="bk-btn" onClick={() => setZeigen((z) => !z)}>
-            <i className="fa-solid fa-route" aria-hidden="true" /> {zeigen ? 'Lösungsweg ausblenden' : 'Lösungsweg zeigen'}
-          </button>
-        </div>
-      )}
-      <Feedback status={status} praise={praise} />
-      {help}
-      {zeigen && (
-        <div className="bk-solution lp-solution">
-          <div className="bk-solution-title">Lösungsweg</div>
-          {solution}
-        </div>
-      )}
-    </div>
-  );
-}
-
 /* ── Rechenbeispiel 1: Friseursalon ─────────────────────────────────────── */
 
 // 24.000 €, 4 Jahre, 6 % p.a.: T = 6.000; Zinsen 1.440, 1.080, 720, 360 (zusammen 3.600)
@@ -545,7 +296,8 @@ const BSP1_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     body: (
       <>
         <p>Die Zinsen werden für die Schuld am Jahresanfang berechnet. Die Annuität ist Tilgung plus Zinsen.</p>
-        <MB>{'Z_1 = 24\\,000 \\text{ €} \\cdot 0{,}06 = 1\\,440 \\text{ €} \\qquad A_1 = 6\\,000 \\text{ €} + 1\\,440 \\text{ €} = 7\\,440 \\text{ €}'}</MB>
+        <MB>{'Z_1 = 24\\,000 \\text{ €} \\cdot 0{,}06 = 1\\,440 \\text{ €}'}</MB>
+        <MB>{'A_1 = 6\\,000 \\text{ €} + 1\\,440 \\text{ €} = 7\\,440 \\text{ €}'}</MB>
         <MB>{'K_1 = 24\\,000 \\text{ €} - 6\\,000 \\text{ €} = 18\\,000 \\text{ €}'}</MB>
       </>
     ),
@@ -555,7 +307,8 @@ const BSP1_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     body: (
       <>
         <p>Im 2. Jahr gibt es nur noch Zinsen für die Restschuld von 18.000 €:</p>
-        <MB>{'Z_2 = 18\\,000 \\text{ €} \\cdot 0{,}06 = 1\\,080 \\text{ €} \\qquad A_2 = 6\\,000 \\text{ €} + 1\\,080 \\text{ €} = 7\\,080 \\text{ €}'}</MB>
+        <MB>{'Z_2 = 18\\,000 \\text{ €} \\cdot 0{,}06 = 1\\,080 \\text{ €}'}</MB>
+        <MB>{'A_2 = 6\\,000 \\text{ €} + 1\\,080 \\text{ €} = 7\\,080 \\text{ €}'}</MB>
       </>
     ),
   },
@@ -616,43 +369,87 @@ const BSP2_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 
 const LOESUNG_PLAN = (
   <>
-    <MB>{'T = \\frac{60\\,000 \\text{ €}}{5} = 12\\,000 \\text{ €}'}</MB>
-    <MB>{'Z_1 = 60\\,000 \\text{ €} \\cdot 0{,}05 = 3\\,000 \\text{ €} \\qquad A_1 = 12\\,000 \\text{ €} + 3\\,000 \\text{ €} = 15\\,000 \\text{ €}'}</MB>
-    <MB>{'K_1 = 60\\,000 \\text{ €} - 12\\,000 \\text{ €} = 48\\,000 \\text{ €} \\qquad Z_2 = 48\\,000 \\text{ €} \\cdot 0{,}05 = 2\\,400 \\text{ €}'}</MB>
-    <PlanTabelle
-      zeilen={PLAN.map((r) => ({ ...r, tilgung: T }))}
-      summe={{ zinsen: Z_GES, tilgung: K0, annuitaet: K0 + Z_GES }}
+    <Loesungsweg
+      schritte={[
+        { titel: 'Tilgung', tex: 'T = \\dfrac{60\\,000 \\text{ €}}{5} = 12\\,000 \\text{ €}' },
+        { titel: 'Zinsen im 1. Jahr', tex: 'Z_1 = 60\\,000 \\text{ €} \\cdot 0{,}05 = 3\\,000 \\text{ €}' },
+        { titel: 'Annuität im 1. Jahr', tex: 'A_1 = 12\\,000 \\text{ €} + 3\\,000 \\text{ €} = 15\\,000 \\text{ €}' },
+        { titel: 'Restschuld nach dem 1. Jahr', tex: 'K_1 = 60\\,000 \\text{ €} - 12\\,000 \\text{ €} = 48\\,000 \\text{ €}' },
+        { titel: 'Zinsen und Annuität im 2. Jahr', tex: 'Z_2 = 48\\,000 \\text{ €} \\cdot 0{,}05 = 2\\,400 \\text{ €}', text: 'A₂ = 12.000 € + 2.400 € = 14.400 €. So geht es weiter bis zum 5. Jahr.' },
+        { titel: 'Annuität im 5. Jahr', tex: 'A_5 = 12\\,000 \\text{ €} + 12\\,000 \\text{ €} \\cdot 0{,}05 = 12\\,600 \\text{ €}' },
+        { titel: 'Zinsen insgesamt', tex: 'Z = 3\\,000 + 2\\,400 + 1\\,800 + 1\\,200 + 600 = 9\\,000 \\text{ €}' },
+      ]}
     />
-    <p>
-      Die Zinsen sinken jedes Jahr um 600 €. Zusammen sind es 9.000 €, nicht 15.000 €: Die 5 % gibt es nur auf die Schuld, die noch übrig ist.
-    </p>
+    <PlanTabelle zeilen={PLAN.map((r) => ({ ...r, tilgung: T }))} summe={{ zinsen: Z_GES, tilgung: K0, annuitaet: K0 + Z_GES }} />
+    <p>Die Zinsen sinken jedes Jahr um 600 €. Zusammen sind es 9.000 €, nicht 15.000 €: Die 5 % gibt es nur auf die Schuld, die noch übrig ist.</p>
   </>
 );
 
 const LOESUNG_JAHR10 = (
-  <>
-    <MB>{'T = \\frac{60\\,000 \\text{ €}}{15} = 4\\,000 \\text{ €} \\qquad K_9 = T \\cdot (n - 9) = 4\\,000 \\text{ €} \\cdot 6 = 24\\,000 \\text{ €}'}</MB>
-    <MB>{'Z_{10} = 4\\,000 \\text{ €} \\cdot 0{,}05 \\cdot (15 - 10 + 1) = 1\\,200 \\text{ €} \\qquad A_{10} = 4\\,000 \\text{ €} + 1\\,200 \\text{ €} = 5\\,200 \\text{ €}'}</MB>
-  </>
+  <Loesungsweg
+    schritte={[
+      { titel: 'Tilgung', tex: 'T = \\dfrac{60\\,000 \\text{ €}}{15} = 4\\,000 \\text{ €}' },
+      { titel: 'Schuld zu Beginn des 10. Jahres', tex: 'K_9 = 4\\,000 \\text{ €} \\cdot (15 - 9) = 24\\,000 \\text{ €}' },
+      { titel: 'Zinsen im 10. Jahr', tex: 'Z_{10} = 4\\,000 \\text{ €} \\cdot 0{,}05 \\cdot (15 - 10 + 1) = 1\\,200 \\text{ €}' },
+      { titel: 'Annuität im 10. Jahr', tex: 'A_{10} = 4\\,000 \\text{ €} + 1\\,200 \\text{ €} = 5\\,200 \\text{ €}' },
+    ]}
+  />
 );
+
+/* ── Bonus-Spiel: Raten-Bäckerei ─────────────────────────────────────────── */
+
+/** Eine Runde: Ratendarlehen K0, n, p, Jahr v; gesucht ist die Annuität A_v. Falsch: Zinsen auf K0, n − v statt n − v + 1, nur die Zinsen */
+function ratenRunden(): AuswahlRunde[] {
+  return Array.from({ length: 4 }, () => {
+    for (;;) {
+      const n = zufall([4, 5, 8, 10]);
+      const k0 = n * zufall([2000, 3000, 4000, 5000, 6000]);
+      const p = zufall([3, 4, 5, 6]);
+      const v = zufall([2, 3, 4]);
+      const t = k0 / n;
+      const z = (t * (n - v + 1) * p) / 100;
+      const werte = [t + z, t + (k0 * p) / 100, t + (t * (n - v) * p) / 100, z];
+      if (new Set(werte).size < 4) continue;
+      return {
+        frage: (
+          <p>
+            Ratendarlehen: <M>{`K_0 = ${tausend(k0).replace('.', '.')} \\text{ €},\; n = ${n},\; p = ${p}\\,\\%`}</M>. Wie hoch ist die Annuität im {v}. Jahr?
+          </p>
+        ),
+        ziele: mischen([
+          { text: euro(werte[0]), richtig: true, erklaerung: <>Richtig: <M>{'A_v = T + T \\cdot (q - 1) \\cdot (n - v + 1)'}</M>.</> },
+          { text: euro(werte[1]), erklaerung: 'Hier wurden die Zinsen vom ganzen Darlehen berechnet. Im Jahr v ist die Schuld schon kleiner.' },
+          { text: euro(werte[2]), erklaerung: 'Hier wurde mit n − v gerechnet. Zu Beginn des Jahres v sind noch n − v + 1 Tilgungen offen.' },
+          { text: euro(werte[3]), erklaerung: 'Das sind nur die Zinsen. Zur Annuität gehört auch die Tilgung.' },
+        ]),
+      };
+    }
+  });
+}
 
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () => void; onPractice: () => void }) {
-  const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 5000, fest: false });
-  const [planGeloest, setPlanGeloest] = useState(false);
-  const [jahrGeloest, setJahrGeloest] = useState(false);
+  const [fest, setFest] = useSitzungState<Festlegung<Wahl>>('bo-fest', { wahl: null, wert: 5000, fest: false });
+  const [planGeloest, setPlanGeloest] = useSitzungState('bo-plan', false);
+  const [jahrGeloest, setJahrGeloest] = useSitzungState('bo-jahr', false);
+  const [uebungen, setUebungen] = useSitzungState<string[]>('bo-uebungen', []);
+  const uebung = (k: string, fertig: () => void) => () => {
+    fertig();
+    setUebungen((u) => (u.includes(k) ? u : [...u, k]));
+  };
 
   const seiten: Seite[] = [
     {
       art: 'start',
       titel: 'Aufwärmen',
-      pflicht: ['a', 'b', 'c'],
+      pflicht: ['a', 'b', 'c', 'd', 'e'],
       inhalt: (fertig) => (
         <>
-          <p className="sl-text">Diese drei kurzen Aufgaben brauchst du gleich.</p>
+          <p className="sl-text">Diese fünf kurzen Aufgaben brauchst du gleich. Einzelarbeit, ca. 10 Minuten.</p>
           <CheckCard
             onSolved={fertig.teil('a')}
+            punkte={2}
             title="a) Zinsen für ein Jahr"
             prompt={<p>Ein Kredit über 25.000 € kostet 4 % Zinsen pro Jahr. Wie viel Zinsen fallen in einem Jahr an?</p>}
             fields={[{ kind: 'num', key: 'z', label: <M>{'Z ='}</M>, expected: 1000, unit: '€' }]}
@@ -660,6 +457,7 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
           />
           <CheckCard
             onSolved={fertig.teil('b')}
+            punkte={3}
             title="b) In gleichen Teilen zurückzahlen"
             prompt={
               <p>
@@ -672,10 +470,18 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
               { kind: 'num', key: 'teil', label: 'Ein Teil:', expected: 300, unit: '€' },
               { kind: 'num', key: 'rest', label: 'Rest nach 2 Teilen:', expected: 1200, unit: '€' },
             ]}
-            solution={<MB>{'1\\,800 \\text{ €} : 6 = 300 \\text{ €} \\qquad 1\\,800 \\text{ €} - 2 \\cdot 300 \\text{ €} = 1\\,200 \\text{ €}'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Ein Teil', tex: '1\\,800 \\text{ €} : 6 = 300 \\text{ €}' },
+                  { titel: 'Rest nach 2 Teilen', tex: '1\\,800 \\text{ €} - 2 \\cdot 300 \\text{ €} = 1\\,200 \\text{ €}' },
+                ]}
+              />
+            }
           />
           <CheckCard
             onSolved={fertig.teil('c')}
+            punkte={3}
             title="c) Zinssatz und Zinsfaktor"
             prompt={
               <p>
@@ -687,7 +493,41 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
               { kind: 'num', key: 'd', label: <M>{'\\frac{p}{100} ='}</M>, expected: 0.035, tol: 0.00001 },
               { kind: 'num', key: 'q', label: <M>{'q ='}</M>, expected: 1.035, tol: 0.00001 },
             ]}
-            solution={<MB>{'\\frac{3{,}5}{100} = 0{,}035 \\qquad q = 1 + 0{,}035 = 1{,}035'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Als Dezimalzahl', tex: '\\dfrac{3{,}5}{100} = 0{,}035' },
+                  { titel: 'Zinsfaktor', tex: 'q = 1 + 0{,}035 = 1{,}035' },
+                ]}
+              />
+            }
+          />
+          <CheckCard
+            onSolved={fertig.teil('d')}
+            punkte={3}
+            title="d) Die Schuld wird kleiner"
+            prompt={<p>Ein Kredit über 20.000 € kostet 5 % Zinsen pro Jahr. Nach einem Jahr sind 4.000 € zurückgezahlt. Wie viel Zinsen fallen im 2. Jahr an?</p>}
+            fields={[{ kind: 'num', key: 'z', label: <M>{'Z_2 ='}</M>, expected: 800, unit: '€' }]}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Schuld zu Beginn des 2. Jahres', tex: '20\\,000 \\text{ €} - 4\\,000 \\text{ €} = 16\\,000 \\text{ €}' },
+                  { titel: 'Zinsen im 2. Jahr', tex: '16\\,000 \\text{ €} \\cdot 0{,}05 = 800 \\text{ €}' },
+                ]}
+              />
+            }
+          />
+          <McCard
+            onSolved={fertig.teil('e')}
+            punkte={2}
+            title="e) Was ist eine Annuität?"
+            prompt={<p>Ein Kreditnehmer zahlt in einem Jahr 3.000 € Tilgung und 450 € Zinsen an die Bank. Welche Aussage stimmt?</p>}
+            options={[
+              { text: 'Die Annuität sind die 450 € Zinsen.', feedback: 'Die Zinsen sind nur ein Teil der Jahresrate.' },
+              { text: 'Die Annuität sind die 3.000 € Tilgung.', feedback: 'Die Tilgung ist nur ein Teil der Jahresrate.' },
+              { text: 'Die Annuität ist die Jahresrate: 3.000 € + 450 € = 3.450 €.', correct: true, feedback: 'Genau: Annuität = Tilgung + Zinsen.' },
+              { text: 'Die Annuität ist die Restschuld nach dem Jahr.', feedback: 'Die Restschuld ist das, was nach der Tilgung noch übrig ist. Die Annuität ist die Zahlung im Jahr.' },
+            ]}
           />
         </>
       ),
@@ -702,18 +542,22 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
             Du machst eine Ausbildung zur Kauffrau oder zum Kaufmann für Büromanagement in der Bäckerei Sommer. Der alte Backofen ist kaputt und
             verbraucht viel Strom. Ein neuer, sparsamer Etagenofen kostet 60.000 €. Die Inhaberin bittet dich um Hilfe:
           </p>
-          <Zitat wer="Frau Sommer, Inhaberin">
+          <blockquote className="sl-zitat">
             <p>
-              Die Bank bietet mir ein Ratendarlehen an: 60.000 € für 5 Jahre zu 5 % Zinsen pro Jahr. Ich zahle jedes Jahr den gleichen Teil der
-              Schuld zurück, dazu kommen die Zinsen. Mehr als 14.500 € im Jahr kann ich dafür aber nicht ausgeben.
+              „Die Bank bietet mir ein Ratendarlehen an: 60.000 € für 5 Jahre zu 5 % Zinsen pro Jahr. Ich zahle jedes Jahr den gleichen Teil der Schuld
+              zurück, dazu kommen die Zinsen. Mehr als 14.500 € im Jahr kann ich dafür aber nicht ausgeben. 5 % von 60.000 € sind 3.000 € Zinsen, in 5
+              Jahren also 15.000 €. Das ist doch viel zu teuer, oder?“
             </p>
-            <p>5 % von 60.000 € sind 3.000 € Zinsen, in 5 Jahren also 15.000 €. Das ist doch viel zu teuer, oder?</p>
-          </Zitat>
-          <AngebotBild />
-          <p className="sl-text">
-            Gegeben sind das Darlehen <M>{'K_0 = 60\\,000'}</M> €, die Laufzeit <M>{'n = 5'}</M> Jahre und der Zinssatz <M>{'p = 5\\,\\%'}</M>. Gesucht
-            ist, wie viel Frau Sommer in jedem Jahr an die Bank zahlt (Tilgung plus Zinsen) und wie viel Zinsen sie insgesamt zahlt.
-          </p>
+            <footer>Frau Sommer, Inhaberin der Bäckerei</footer>
+          </blockquote>
+          <figure className="sl-foto">
+            <img
+              src={angebotBild}
+              width={1200}
+              height={600}
+              alt="Auf dem Tisch in der Backstube liegt das Angebot der Bank: Ratendarlehen, 60.000 €, 5 Jahre, 5 % p.a., Tilgung jedes Jahr gleich hoch. Daneben Frau Sommers Zettel: Mein Budget, höchstens 14.500 € pro Jahr."
+            />
+          </figure>
           <p className="sl-hinweis">
             <strong>Tilgung</strong> heißt Rückzahlung eines Teils der Schuld. Die Zinsen berechnet die Bank jedes Jahr für die Schuld am Jahresanfang.
             Die Jahresrate aus Tilgung und Zinsen heißt <strong>Annuität</strong>.
@@ -744,292 +588,211 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
               </>
             )}
           />
-          {fest.fest && (
-            <p className="sl-text">
-              Ob deine Vermutung stimmt und ob das Budget in jedem Jahr reicht, kannst du ohne Rechnung nicht sicher sagen. Gleich erstellst du dafür
-              einen Tilgungsplan.
-            </p>
-          )}
         </>
       ),
     },
     {
       art: 'loesen',
-      titel: 'Der Tilgungsplan für den Ofen',
-      pflicht: ['plan', 'entscheidung', 'produkt', 'jahr10'],
-      inhalt: (fertig) => {
-        const planMelden = () => {
-          fertig.teil('plan')();
-          setPlanGeloest(true);
-        };
-        const jahrMelden = () => {
-          fertig.teil('jahr10')();
-          setJahrGeloest(true);
-        };
-        return (
-          <>
-            <div className="sl-fokus">
-              <p className="sl-fokus-titel">Deine Aufgabe: Erstelle den Tilgungsplan und beantworte Frau Sommers Frage</p>
-              <p>
-                Das Ratendarlehen über 60.000 € läuft 5 Jahre zu 5 % p.a., die Tilgung ist jedes Jahr gleich hoch. Berechne für jedes Jahr die Schuld
-                am Jahresanfang, die Zinsen, die Tilgung und die Annuität. Prüfe, ob das Budget von 14.500 € in jedem Jahr reicht, und berechne die
-                Zinsen insgesamt.
-              </p>
-            </div>
-            <RatenDiagramm modus={planGeloest ? 'plan' : 'leer'} />
-            <Aufklappbar label="Rechenbeispiel ansehen">
-              <Beispiel offen title="Der Kredit des Friseursalons" aufgabe={BSP1_AUFGABE} steps={BSP1_SCHRITTE} />
+      titel: 'Teil 1: Der Tilgungsplan für den Ofen',
+      pflicht: ['plan', 'entscheidung'],
+      bedingung: 'Löse Teil 1 richtig, dann geht es zu Teil 2.',
+      inhalt: (fertig) => (
+        <>
+          <div className="sl-fokus">
+            <p className="sl-fokus-titel">Deine Aufgabe: Erstelle den Tilgungsplan und beantworte Frau Sommers Frage</p>
+            <p>
+              Das Ratendarlehen über 60.000 € läuft 5 Jahre zu 5 % p.a., die Tilgung ist jedes Jahr gleich hoch. Lege in deinem Heft den Tilgungsplan an:
+              für jedes Jahr die Schuld am Jahresanfang, die Zinsen, die Tilgung und die Annuität, dazu eine Summenzeile. Prüfe, ob das Budget von
+              14.500 € in jedem Jahr reicht.
+            </p>
+          </div>
+          <RatenDiagramm modus={planGeloest ? 'plan' : 'leer'} />
+          <BeispielMitVideo video={VIDEO_RATENDARLEHEN} videoTitel="Lernvideo: Ratendarlehen und Tilgungsplan">
+            <Beispiel offen title="Der Kredit des Friseursalons" aufgabe={BSP1_AUFGABE} steps={BSP1_SCHRITTE} />
+          </BeispielMitVideo>
+          <Abschnitt titel="Vergleiche deine Ergebnisse">
+            <CheckCard
+              onSolved={() => {
+                fertig.teil('plan')();
+                setPlanGeloest(true);
+              }}
+              punkte={14}
+              title="Tilgungsplan für den Ofen"
+              prompt={<p>Trage die Ergebnisse aus deinem Tilgungsplan ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
+              fields={[
+                { kind: 'num', key: 't', label: 'Tilgung pro Jahr:', expected: T, unit: '€' },
+                { kind: 'num', key: 'a1', label: 'Annuität im 1. Jahr:', expected: PLAN[0].annuitaet, unit: '€' },
+                { kind: 'num', key: 'a2', label: 'Annuität im 2. Jahr:', expected: PLAN[1].annuitaet, unit: '€' },
+                { kind: 'num', key: 'a5', label: 'Annuität im 5. Jahr:', expected: PLAN[4].annuitaet, unit: '€' },
+                { kind: 'num', key: 'zg', label: 'Zinsen insgesamt:', expected: Z_GES, unit: '€' },
+              ]}
+              loesungNachFehler
+              solution={LOESUNG_PLAN}
+              help={
+                <Hilfen
+                  steps={[
+                    <>Beim Ratendarlehen ist die Tilgung jedes Jahr gleich. Die Zinsen gibt es nur auf die Schuld, die am Jahresanfang noch übrig ist.</>,
+                    <>
+                      Wie beim Friseursalon: erst <M>{'T = \\frac{K_0}{n}'}</M>, dann Jahr für Jahr Zinsen von der Schuld am Jahresanfang, Annuität = Tilgung +
+                      Zinsen, neue Schuld = alte Schuld − Tilgung.
+                    </>,
+                    <>
+                      <M>{'T = 60\\,000 : 5'}</M>. 1. Jahr: <M>{'Z_1 = 60\\,000 \\cdot 0{,}05'}</M>. 2. Jahr: <M>{'Z_2 = (60\\,000 - T) \\cdot 0{,}05'}</M>. Für die
+                      Zinsen insgesamt addierst du alle 5 Zinsbeträge.
+                    </>,
+                  ]}
+                />
+              }
+            />
+          </Abschnitt>
+          <Abschnitt titel="Deine Antwort an Frau Sommer">
+            <McCard
+              onSolved={fertig.teil('entscheidung')}
+              punkte={4}
+              rechnen
+              title="Reicht das Budget?"
+              prompt={<p>Frau Sommer kann pro Jahr höchstens 14.500 € zahlen. Was sagst du ihr?</p>}
+              options={[
+                {
+                  text: (
+                    <>
+                      Nein, in keinem Jahr: Sie zahlt jedes Jahr <M>{'12\\,000 \\text{ €} + 3\\,000 \\text{ €} = 15\\,000 \\text{ €}'}</M>.
+                    </>
+                  ),
+                  feedback: '3.000 € Zinsen gibt es nur im 1. Jahr. Danach ist die Schuld kleiner, also auch die Zinsen. Schau in deinen Tilgungsplan.',
+                },
+                {
+                  text: 'Ja, in jedem Jahr: Die Annuität liegt immer unter 14.500 €.',
+                  feedback: 'Schau dir das 1. Jahr an: 12.000 € Tilgung plus 3.000 € Zinsen sind 15.000 €. Das ist mehr als 14.500 €.',
+                },
+                {
+                  text: 'Nur im 1. Jahr fehlen 500 €. Ab dem 2. Jahr reicht das Budget, weil die Annuität jedes Jahr um 600 € sinkt.',
+                  correct: true,
+                  feedback:
+                    'Genau. Im 1. Jahr sind es 15.000 €, im 2. Jahr nur noch 14.400 €. Die 500 € für das 1. Jahr könnte Frau Sommer zum Beispiel aus ihren Rücklagen nehmen.',
+                },
+                {
+                  text: 'Erst ab dem 3. Jahr reicht das Budget.',
+                  feedback: (
+                    <>
+                      Im 2. Jahr beträgt die Annuität <M>{'12\\,000 \\text{ €} + 2\\,400 \\text{ €} = 14\\,400 \\text{ €}'}</M>. Das liegt schon unter 14.500 €.
+                    </>
+                  ),
+                },
+              ]}
+            />
+          </Abschnitt>
+        </>
+      ),
+    },
+    {
+      art: 'loesen',
+      titel: 'Teil 2: Direkt ins 10. Jahr',
+      pflicht: ['jahr10', 'produkt'],
+      inhalt: (fertig) => (
+        <>
+          <blockquote className="sl-zitat">
+            <p>„Und wenn ich die Laufzeit auf 15 Jahre verlängere? Wie viel zahle ich dann zum Beispiel im 10. Jahr?“</p>
+            <footer>Frau Sommer</footer>
+          </blockquote>
+          <div className="sl-fokus">
+            <p className="sl-fokus-titel">Deine Aufgabe: Berechne das 10. Jahr direkt</p>
+            <p>
+              Ein Tilgungsplan über 15 Jahre dauert lange. Mit den Formeln aus der Merkhilfe berechnest du ein Jahr direkt. Gegeben sind{' '}
+              <M>{'K_0 = 60\\,000'}</M> €, <M>{'n = 15'}</M>, <M>{'p = 5\\,\\%'}</M> und das Jahr <M>{'v = 10'}</M>. Gesucht sind die Tilgung, die Schuld zu
+              Beginn des 10. Jahres, die Zinsen und die Annuität im 10. Jahr.
+            </p>
+          </div>
+          <BeispielMitVideo video={VIDEO_RATENDARLEHEN} videoTitel="Lernvideo: Ratendarlehen und Tilgungsplan">
+            <Beispiel offen title="Ein Jahr direkt berechnen" aufgabe={BSP2_AUFGABE} steps={BSP2_SCHRITTE} />
+          </BeispielMitVideo>
+          <Abschnitt titel="Vergleiche deine Ergebnisse">
+            <CheckCard
+              onSolved={() => {
+                fertig.teil('jahr10')();
+                setJahrGeloest(true);
+              }}
+              punkte={10}
+              title="Das 10. Jahr"
+              prompt={<p>Trage die Ergebnisse aus deinem Heft ein.</p>}
+              fieldsRow
+              fields={[
+                { kind: 'num', key: 't', label: <M>{'T ='}</M>, expected: T2, unit: '€' },
+                { kind: 'num', key: 'k9', label: <M>{'K_9 ='}</M>, expected: K9, unit: '€' },
+                { kind: 'num', key: 'z10', label: <M>{'Z_{10} ='}</M>, expected: Z10, unit: '€' },
+                { kind: 'num', key: 'a10', label: <M>{'A_{10} ='}</M>, expected: A10, unit: '€' },
+              ]}
+              loesungNachFehler
+              solution={LOESUNG_JAHR10}
+              help={
+                <Hilfen
+                  steps={[
+                    <>Zu Beginn des 10. Jahres sind 9 Tilgungen bezahlt. Wie viele sind noch offen?</>,
+                    <>
+                      Wie im Beispiel: <M>{'T = \\frac{K_0}{n}'}</M>, <M>{'K_9 = T \\cdot (n - 9)'}</M>, <M>{'Z_v = T \\cdot (q - 1) \\cdot (n - v + 1)'}</M>,{' '}
+                      <M>{'A_v = T + Z_v'}</M>.
+                    </>,
+                    <>
+                      <M>{'T = 60\\,000 : 15 = 4\\,000'}</M>. Es sind noch <M>{'15 - 10 + 1 = 6'}</M> Tilgungen offen: <M>{'Z_{10} = 4\\,000 \\cdot 0{,}05 \\cdot 6'}</M>.
+                    </>,
+                  ]}
+                />
+              }
+            />
+          </Abschnitt>
+          <Handlungsprodukt titel="Tilgungsplan für Frau Sommer">
+            <figure className="sl-foto sl-foto-klein">
+              <img
+                src={heftBild}
+                width={800}
+                height={400}
+                alt="Eine karierte Heftseite mit der Überschrift Tilgungsplan Backofen: links eine Tabelle, rechts ein Balkendiagramm mit fünf sinkenden Balken und einer gestrichelten Budget-Linie bei 14.500 €."
+              />
+            </figure>
+            <p className="sl-text">
+              Ergänze deinen Tilgungsplan im Heft um ein Balkendiagramm der Annuitäten mit der Budget-Linie bei 14.500 €. Schreibe darunter eine Antwort an
+              Frau Sommer: Reicht ihr Budget, warum sind es nicht 15.000 € Zinsen, und wie viel zahlt sie im 10. Jahr, wenn sie 15 Jahre wählt?
+            </p>
+            <Aufklappbar label="Satzanfänge ansehen" icon="fa-comment-dots">
+              <ul className="zk-liste">
+                <li>„Liebe Frau Sommer, im 1. Jahr zahlen Sie … €, danach …“</li>
+                <li>„Insgesamt zahlen Sie nur … € Zinsen, weil …“</li>
+                <li>„Bei 15 Jahren Laufzeit zahlen Sie im 10. Jahr …“</li>
+              </ul>
             </Aufklappbar>
-            <Handlungsprodukt titel="Tilgungsplan für Frau Sommer">
-              <HeftBild />
-              <p className="sl-text">
-                Lege in deinem Heft den Tilgungsplan für den Ofen-Kredit an: eine Tabelle mit allen 5 Jahren und einer Summenzeile, darunter ein
-                Balkendiagramm der Annuitäten mit der Budget-Linie bei 14.500 €. Schreibe zum Schluss einen Antwortsatz an Frau Sommer. Übertrage deinen
-                Tilgungsplan danach unten in die Tabelle.
-              </p>
-            </Handlungsprodukt>
-            <Abschnitt titel="Deine Ergebnisse prüfen">
-              <WegWahl
-                selbst={
-                  <TilgungsplanCheck
-                    onSolved={planMelden}
-                    title="Tilgungsplan für den Ofen"
-                    prompt={<p>Übertrage deinen Tilgungsplan aus dem Heft in die Tabelle und prüfe ihn.</p>}
-                    zeilen={PLAN.map((r) => ({ jahr: r.jahr, schuld: r.schuld, tilgung: T, zinsen: r.zinsen, annuitaet: r.annuitaet }))}
-                    summe={{ tilgung: K0, zinsen: Z_GES, annuitaet: K0 + Z_GES }}
-                    solution={LOESUNG_PLAN}
-                    help={
-                      <Hilfen
-                        steps={[
-                          <>Beim Ratendarlehen ist die Tilgung jedes Jahr gleich. Die Zinsen gibt es nur auf die Schuld, die am Jahresanfang noch übrig ist.</>,
-                          <>
-                            Wie beim Friseursalon: erst <M>{'T = \\frac{K_0}{n}'}</M>, dann Jahr für Jahr Zinsen von der Schuld am Jahresanfang, Annuität = Tilgung
-                            + Zinsen, neue Schuld = alte Schuld − Tilgung.
-                          </>,
-                          <>
-                            <M>{'T = 60\\,000 : 5'}</M>. 1. Jahr: <M>{'Z_1 = 60\\,000 \\cdot 0{,}05'}</M>. 2. Jahr: Die Schuld ist um <M>T</M> kleiner, also{' '}
-                            <M>{'Z_2 = (60\\,000 - T) \\cdot 0{,}05'}</M>. Für die Zinsen insgesamt addierst du alle 5 Zinsbeträge.
-                          </>,
-                        ]}
-                      />
-                    }
-                  />
-                }
-                schema={
-                  <CheckCard
-                    onSolved={planMelden}
-                    title="Tilgungsplan mit Lösungsschema"
-                    prompt={<p>Rechne in deinem Heft nach diesem Schema wie im Beispiel und trage die Ergebnisse ein.</p>}
-                    rechnung={[
-                      { l: ['T'], r: ['\\frac{K_0}{n} =', { luecke: 't', breit: true }, '\\text{ €}'], u: '\\text{① Tilgung}' },
-                      { l: ['Z_1'], r: ['K_0 \\cdot 0{,}05 =', { luecke: 'z1', breit: true }, '\\text{ €}'], u: '\\text{② Zinsen Jahr 1}' },
-                      { l: ['A_1'], r: ['T + Z_1 =', { luecke: 'a1', breit: true }, '\\text{ €}'], u: '\\text{③ Annuität Jahr 1}' },
-                      { l: ['K_1'], r: ['K_0 - T =', { luecke: 'k1', breit: true }, '\\text{ €}'], u: '\\text{④ Restschuld}' },
-                      { l: ['Z_2'], r: ['K_1 \\cdot 0{,}05 =', { luecke: 'z2', breit: true }, '\\text{ €}'], u: '\\text{⑤ Zinsen Jahr 2}' },
-                      { l: ['A_2'], r: ['T + Z_2 =', { luecke: 'a2', breit: true }, '\\text{ €}'], u: '\\text{⑥ Annuität Jahr 2}' },
-                      { l: ['A_5'], r: ['T + K_4 \\cdot 0{,}05 =', { luecke: 'a5', breit: true }, '\\text{ €}'], u: '\\text{⑦ Annuität Jahr 5}' },
-                      { l: ['Z_{ges}'], r: ['Z_1 + Z_2 + Z_3 + Z_4 + Z_5 =', { luecke: 'zg', breit: true }, '\\text{ €}'], u: '\\text{⑧ Zinsen insgesamt}' },
-                    ]}
-                    fields={[
-                      { kind: 'num', key: 't', label: 'Tilgung', expected: T },
-                      { kind: 'num', key: 'z1', label: 'Zinsen Jahr 1', expected: PLAN[0].zinsen },
-                      { kind: 'num', key: 'a1', label: 'Annuität Jahr 1', expected: PLAN[0].annuitaet },
-                      { kind: 'num', key: 'k1', label: 'Restschuld', expected: PLAN[0].rest },
-                      { kind: 'num', key: 'z2', label: 'Zinsen Jahr 2', expected: PLAN[1].zinsen },
-                      { kind: 'num', key: 'a2', label: 'Annuität Jahr 2', expected: PLAN[1].annuitaet },
-                      { kind: 'num', key: 'a5', label: 'Annuität Jahr 5', expected: PLAN[4].annuitaet },
-                      { kind: 'num', key: 'zg', label: 'Zinsen insgesamt', expected: Z_GES },
-                    ]}
-                    loesungNachFehler
-                    solution={LOESUNG_PLAN}
-                    help={
-                      <SchrittHilfen
-                        schritte={[
-                          { kurz: '①', titel: 'Tilgung', hilfe: <>Teile das Darlehen durch die Laufzeit: <M>{'60\\,000 \\text{ €} : 5'}</M>.</> },
-                          { kurz: '②', titel: 'Zinsen Jahr 1', hilfe: <>Im 1. Jahr ist noch die ganze Schuld da: <M>{'60\\,000 \\text{ €} \\cdot 0{,}05'}</M>.</> },
-                          { kurz: '③', titel: 'Annuität Jahr 1', hilfe: <>Addiere die Tilgung aus ① und die Zinsen aus ②.</> },
-                          { kurz: '④', titel: 'Restschuld', hilfe: <>Nach dem 1. Jahr ist die Schuld um eine Tilgung kleiner: 60.000 € minus das Ergebnis aus ①.</> },
-                          { kurz: '⑤', titel: 'Zinsen Jahr 2', hilfe: <>Rechne 5 % von der Restschuld aus ④, nicht mehr von 60.000 €.</> },
-                          { kurz: '⑥', titel: 'Annuität Jahr 2', hilfe: <>Tilgung aus ① plus Zinsen aus ⑤.</> },
-                          {
-                            kurz: '⑦',
-                            titel: 'Annuität Jahr 5',
-                            hilfe: (
-                              <>
-                                Vor dem 5. Jahr sind 4 Tilgungen bezahlt, es bleibt <M>{'K_4 = 60\\,000 \\text{ €} - 4 \\cdot T'}</M>. Davon 5 % Zinsen, dazu die Tilgung.
-                              </>
-                            ),
-                          },
-                          {
-                            kurz: '⑧',
-                            titel: 'Zinsen insgesamt',
-                            hilfe: <>Rechne in deiner Tabelle die Zinsen aller 5 Jahre aus und addiere sie. Sie werden jedes Jahr um 600 € kleiner.</>,
-                          },
-                        ]}
-                      />
-                    }
-                  />
-                }
-              />
+          </Handlungsprodukt>
+          <Abschnitt titel="Ist dein Tilgungsplan vollständig?">
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an Frau Sommer')} />
+          </Abschnitt>
+          {planGeloest && jahrGeloest && (
+            <Abschnitt titel="Das hältst du fest">
+              <Rueckbezug fest={fest} />
+              <Merke title="Ratendarlehen">
+                <ul>
+                  <li>
+                    Die <strong>Tilgung</strong> ist jedes Jahr gleich: <M>{'T = \\frac{K_0}{n}'}</M>
+                  </li>
+                  <li>
+                    Die <strong>Zinsen</strong> gibt es nur auf die Schuld am Jahresanfang. Diese Schuld wird jedes Jahr um <M>T</M> kleiner, also sinken die
+                    Zinsen jedes Jahr um denselben Betrag.
+                  </li>
+                  <li>
+                    Die <strong>Annuität</strong> ist Tilgung plus Zinsen: <M>{'A_v = T + Z_v'}</M>. Beim Ratendarlehen ist sie im 1. Jahr am höchsten und
+                    sinkt dann.
+                  </li>
+                  <li>
+                    Die Zinsen insgesamt sind kleiner als <M>{'K_0 \\cdot \\frac{p}{100} \\cdot n'}</M>, weil die Schuld nicht die ganze Zeit gleich hoch ist.
+                  </li>
+                </ul>
+                <p>Formeln aus der Merkhilfe für ein beliebiges Jahr <M>v</M>:</p>
+                <MB>{'K_v = T \\cdot (n - v)'}</MB>
+                <MB>{'Z_v = T \\cdot (q - 1) \\cdot (n - v + 1)'}</MB>
+                <MB>{'A_v = T + Z_v'}</MB>
+              </Merke>
             </Abschnitt>
-            <Abschnitt titel="Deine Antwort an Frau Sommer">
-              <McCard
-                onSolved={fertig.teil('entscheidung')}
-                title="Reicht das Budget?"
-                prompt={<p>Frau Sommer kann pro Jahr höchstens 14.500 € zahlen. Was sagst du ihr?</p>}
-                options={[
-                  {
-                    text: (
-                      <>
-                        Nein, in keinem Jahr: Sie zahlt jedes Jahr <M>{'12\\,000 \\text{ €} + 3\\,000 \\text{ €} = 15\\,000 \\text{ €}'}</M>.
-                      </>
-                    ),
-                    feedback:
-                      '3.000 € Zinsen gibt es nur im 1. Jahr. Danach ist die Schuld kleiner, also auch die Zinsen. Schau in deinen Tilgungsplan.',
-                  },
-                  {
-                    text: 'Ja, in jedem Jahr: Die Annuität liegt immer unter 14.500 €.',
-                    feedback: 'Schau dir das 1. Jahr an: 12.000 € Tilgung plus 3.000 € Zinsen sind 15.000 €. Das ist mehr als 14.500 €.',
-                  },
-                  {
-                    text: 'Nur im 1. Jahr fehlen 500 €. Ab dem 2. Jahr reicht das Budget, weil die Annuität jedes Jahr um 600 € sinkt.',
-                    correct: true,
-                    feedback:
-                      'Genau. Im 1. Jahr sind es 15.000 €, im 2. Jahr nur noch 14.400 €. Die 500 € für das 1. Jahr könnte Frau Sommer zum Beispiel aus ihren Rücklagen nehmen.',
-                  },
-                  {
-                    text: 'Erst ab dem 3. Jahr reicht das Budget.',
-                    feedback: (
-                      <>
-                        Im 2. Jahr beträgt die Annuität <M>{'12\\,000 \\text{ €} + 2\\,400 \\text{ €} = 14\\,400 \\text{ €}'}</M>. Das liegt schon unter 14.500 €.
-                      </>
-                    ),
-                  },
-                ]}
-              />
-            </Abschnitt>
-            <Abschnitt titel="Ist dein Tilgungsplan vollständig?">
-              <Kriterien
-                onAlle={fertig.teil('produkt')}
-                items={[
-                  'Die Tabelle hat alle 5 Jahre: Schuld am Jahresanfang, Zinsen, Tilgung und Annuität',
-                  'Eine Summenzeile mit den Zinsen und den Annuitäten insgesamt',
-                  'Ein Balkendiagramm der Annuitäten (Tilgung und Zinsen) mit der Budget-Linie bei 14.500 €',
-                  'Ein Antwortsatz an Frau Sommer: Reicht das Budget, und warum sind es nicht 15.000 € Zinsen?',
-                ]}
-              />
-            </Abschnitt>
-            <Abschnitt titel="Teil 2: Direkt ins 10. Jahr">
-              <Zitat wer="Frau Sommer">
-                <p>Und wenn ich die Laufzeit auf 15 Jahre verlängere? Wie viel zahle ich dann zum Beispiel im 10. Jahr?</p>
-              </Zitat>
-              <p className="sl-text">
-                Ein Tilgungsplan über 15 Jahre dauert lange. Mit den Formeln aus der Merkhilfe berechnest du ein Jahr direkt. Gegeben sind{' '}
-                <M>{'K_0 = 60\\,000'}</M> €, <M>{'n = 15'}</M>, <M>{'p = 5\\,\\%'}</M> und das Jahr <M>{'v = 10'}</M>. Gesucht sind die Tilgung, die Schuld
-                zu Beginn des 10. Jahres, die Zinsen und die Annuität im 10. Jahr.
-              </p>
-              <Aufklappbar label="Rechenbeispiel ansehen">
-                <Beispiel offen title="Ein Jahr direkt berechnen" aufgabe={BSP2_AUFGABE} steps={BSP2_SCHRITTE} />
-              </Aufklappbar>
-              <WegWahl
-                selbst={
-                  <TilgungsplanCheck
-                    onSolved={jahrMelden}
-                    title="Das 10. Jahr"
-                    prompt={<p>Trage die Werte für das 10. Jahr aus deinem Heft in die Zeile des Tilgungsplans ein und prüfe sie.</p>}
-                    zeilen={[{ jahr: V2, schuld: K9, tilgung: T2, zinsen: Z10, annuitaet: A10 }]}
-                    solution={LOESUNG_JAHR10}
-                    help={
-                      <Hilfen
-                        steps={[
-                          <>Zu Beginn des 10. Jahres sind 9 Tilgungen bezahlt. Wie viele sind noch offen?</>,
-                          <>
-                            Wie im Beispiel: <M>{'T = \\frac{K_0}{n}'}</M>, <M>{'K_9 = T \\cdot (n - 9)'}</M>, <M>{'Z_v = T \\cdot (q - 1) \\cdot (n - v + 1)'}</M>,{' '}
-                            <M>{'A_v = T + Z_v'}</M>.
-                          </>,
-                          <>
-                            <M>{'T = 60\\,000 : 15 = 4\\,000'}</M>. Es sind noch <M>{'15 - 10 + 1 = 6'}</M> Tilgungen offen:{' '}
-                            <M>{'Z_{10} = 4\\,000 \\cdot 0{,}05 \\cdot 6'}</M>.
-                          </>,
-                        ]}
-                      />
-                    }
-                  />
-                }
-                schema={
-                  <CheckCard
-                    onSolved={jahrMelden}
-                    title="Das 10. Jahr mit Lösungsschema"
-                    prompt={<p>Rechne in deinem Heft nach diesem Schema und trage die Ergebnisse ein.</p>}
-                    rechnung={[
-                      { l: ['T'], r: ['\\frac{K_0}{n} =', { luecke: 't', breit: true }, '\\text{ €}'], u: '\\text{① Tilgung}' },
-                      { l: ['K_9'], r: ['T \\cdot (n - 9) =', { luecke: 'k9', breit: true }, '\\text{ €}'], u: '\\text{② Schuld Anfang Jahr 10}' },
-                      { l: ['Z_{10}'], r: ['T \\cdot (q - 1) \\cdot (n - v + 1) =', { luecke: 'z10', breit: true }, '\\text{ €}'], u: '\\text{③ Zinsen}' },
-                      { l: ['A_{10}'], r: ['T + Z_{10} =', { luecke: 'a10', breit: true }, '\\text{ €}'], u: '\\text{④ Annuität}' },
-                    ]}
-                    fields={[
-                      { kind: 'num', key: 't', label: 'Tilgung', expected: T2 },
-                      { kind: 'num', key: 'k9', label: 'Schuld Anfang Jahr 10', expected: K9 },
-                      { kind: 'num', key: 'z10', label: 'Zinsen Jahr 10', expected: Z10 },
-                      { kind: 'num', key: 'a10', label: 'Annuität Jahr 10', expected: A10 },
-                    ]}
-                    loesungNachFehler
-                    solution={LOESUNG_JAHR10}
-                    help={
-                      <SchrittHilfen
-                        schritte={[
-                          { kurz: '①', titel: 'Tilgung', hilfe: <>Jetzt sind es 15 Jahre: <M>{'60\\,000 \\text{ €} : 15'}</M>.</> },
-                          {
-                            kurz: '②',
-                            titel: 'Schuld Anfang Jahr 10',
-                            hilfe: <>Nach 9 Jahren sind 9 Tilgungen bezahlt, offen sind <M>{'15 - 9 = 6'}</M>. Rechne <M>{'T \\cdot 6'}</M>.</>,
-                          },
-                          {
-                            kurz: '③',
-                            titel: 'Zinsen',
-                            hilfe: (
-                              <>
-                                <M>{'q - 1 = 0{,}05'}</M> und <M>{'n - v + 1 = 15 - 10 + 1 = 6'}</M>. Rechne <M>{'T \\cdot 0{,}05 \\cdot 6'}</M>. Das sind 5 % der
-                                Schuld aus ②.
-                              </>
-                            ),
-                          },
-                          { kurz: '④', titel: 'Annuität', hilfe: <>Addiere die Tilgung aus ① und die Zinsen aus ③.</> },
-                        ]}
-                      />
-                    }
-                  />
-                }
-              />
-            </Abschnitt>
-            {planGeloest && jahrGeloest && (
-              <Abschnitt titel="Das hältst du fest">
-                <Rueckbezug fest={fest} />
-                <Merke title="Ratendarlehen">
-                  <ul>
-                    <li>
-                      Die <strong>Tilgung</strong> ist jedes Jahr gleich: <M>{'T = \\frac{K_0}{n}'}</M>
-                    </li>
-                    <li>
-                      Die <strong>Zinsen</strong> gibt es nur auf die Schuld am Jahresanfang. Diese Schuld wird jedes Jahr um <M>T</M> kleiner, also
-                      sinken die Zinsen jedes Jahr um denselben Betrag.
-                    </li>
-                    <li>
-                      Die <strong>Annuität</strong> ist Tilgung plus Zinsen: <M>{'A_v = T + Z_v'}</M>. Beim Ratendarlehen ist sie im 1. Jahr am höchsten
-                      und sinkt dann.
-                    </li>
-                    <li>
-                      Die Zinsen insgesamt sind kleiner als <M>{'K_0 \\cdot \\frac{p}{100} \\cdot n'}</M>, weil die Schuld nicht die ganze Zeit gleich hoch ist.
-                    </li>
-                  </ul>
-                  <p>Formeln aus der Merkhilfe für ein beliebiges Jahr <M>v</M>:</p>
-                  <MB>{'K_v = T \\cdot (n - v) \\qquad Z_v = T \\cdot (q - 1) \\cdot (n - v + 1) \\qquad A_v = T + Z_v'}</MB>
-                </Merke>
-              </Abschnitt>
-            )}
-          </>
-        );
-      },
+          )}
+        </>
+      ),
     },
     {
       art: 'sichern',
@@ -1037,10 +800,14 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
       pflicht: ['1', '2', '3'],
       inhalt: (fertig) => (
         <>
-          <p className="sl-text">Prüfe und vertiefe dein Wissen mit vier Aufgaben. Die letzte ist für Profis.</p>
+          <p className="sl-text">
+            Prüfe und vertiefe dein Wissen mit drei Aufgaben, die vierte ist für Profis. Wenn du die drei Pflichtaufgaben gelöst hast, wartet unten ein Spiel
+            auf dich. Einzelarbeit, ca. 20 Minuten.
+          </p>
           <Abschnitt titel="Übung 1: Die erste Annuität">
             <TrackedMc
-              onSolved={fertig.teil('1')}
+              onSolved={uebung('1', fertig.teil('1'))}
+              punkte={4}
               topic="Ratendarlehen-Einstieg: Annuität im 1. Jahr (Basis)"
               title="Übung 1"
               rechnen
@@ -1058,12 +825,7 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
                 {
                   text: '6.600 €',
                   correct: true,
-                  feedback: (
-                    <>
-                      <M>{'T = 40\\,000 \\text{ €} : 8 = 5\\,000 \\text{ €}'}</M>, <M>{'Z_1 = 40\\,000 \\text{ €} \\cdot 0{,}04 = 1\\,600 \\text{ €}'}</M>,{' '}
-                      <M>{'A_1 = 5\\,000 \\text{ €} + 1\\,600 \\text{ €} = 6\\,600 \\text{ €}'}</M>.
-                    </>
-                  ),
+                  feedback: 'T = 40.000 € : 8 = 5.000 €, Z₁ = 40.000 € · 0,04 = 1.600 €, A₁ = 5.000 € + 1.600 € = 6.600 €.',
                 },
                 {
                   text: '6.400 €',
@@ -1075,7 +837,8 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
           </Abschnitt>
           <Abschnitt titel="Übung 2: Wer hat recht?">
             <TrackedMc
-              onSolved={fertig.teil('2')}
+              onSolved={uebung('2', fertig.teil('2'))}
+              punkte={6}
               topic="Ratendarlehen-Einstieg: Zinsen im Jahr v (Standard)"
               title="Übung 2"
               rechnen
@@ -1124,14 +887,15 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
           </Abschnitt>
           <Abschnitt titel="Übung 3: Mitten im Kredit">
             <TrackedCheck
-              onSolved={fertig.teil('3')}
+              onSolved={uebung('3', fertig.teil('3'))}
+              punkte={8}
               topic="Ratendarlehen-Einstieg: Schuld, Zinsen und Annuität im Jahr v (Standard)"
               title="Übung 3"
               level="standard"
               prompt={
                 <p>
-                  Für ein Elektro-Lieferauto nimmt ein Getränkehandel ein Ratendarlehen über 50.000 € auf, Laufzeit 10 Jahre, Zinssatz 4,5 % p.a.
-                  Berechne die Schuld zu Beginn des 7. Jahres, die Zinsen und die Annuität im 7. Jahr.
+                  Für ein Elektro-Lieferauto nimmt ein Getränkehandel ein Ratendarlehen über 50.000 € auf, Laufzeit 10 Jahre, Zinssatz 4,5 % p.a. Berechne
+                  die Schuld zu Beginn des 7. Jahres, die Zinsen und die Annuität im 7. Jahr.
                 </p>
               }
               fields={[
@@ -1140,18 +904,21 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
                 { kind: 'num', key: 'a7', label: <M>{'A_7 ='}</M>, expected: 5900, unit: '€' },
               ]}
               solution={
-                <>
-                  <MB>{'T = \\frac{50\\,000 \\text{ €}}{10} = 5\\,000 \\text{ €} \\qquad K_6 = 5\\,000 \\text{ €} \\cdot (10 - 6) = 20\\,000 \\text{ €}'}</MB>
-                  <MB>{'Z_7 = 5\\,000 \\text{ €} \\cdot 0{,}045 \\cdot (10 - 7 + 1) = 900 \\text{ €} \\qquad A_7 = 5\\,000 \\text{ €} + 900 \\text{ €} = 5\\,900 \\text{ €}'}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Tilgung', tex: 'T = \\dfrac{50\\,000 \\text{ €}}{10} = 5\\,000 \\text{ €}' },
+                    { titel: 'Schuld zu Beginn des 7. Jahres', tex: 'K_6 = 5\\,000 \\text{ €} \\cdot (10 - 6) = 20\\,000 \\text{ €}' },
+                    { titel: 'Zinsen im 7. Jahr', tex: 'Z_7 = 5\\,000 \\text{ €} \\cdot 0{,}045 \\cdot (10 - 7 + 1) = 900 \\text{ €}' },
+                    { titel: 'Annuität im 7. Jahr', tex: 'A_7 = 5\\,000 \\text{ €} + 900 \\text{ €} = 5\\,900 \\text{ €}' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
                   steps={[
                     <>Erst die Tilgung, dann die Schuld, die zu Beginn des 7. Jahres noch übrig ist.</>,
                     <>
-                      Nach 6 Jahren sind 6 Tilgungen bezahlt: <M>{'K_6 = T \\cdot (n - 6)'}</M>. Dann <M>{'Z_7 = K_6 \\cdot 0{,}045'}</M> und{' '}
-                      <M>{'A_7 = T + Z_7'}</M>.
+                      Nach 6 Jahren sind 6 Tilgungen bezahlt: <M>{'K_6 = T \\cdot (n - 6)'}</M>. Dann <M>{'Z_7 = K_6 \\cdot 0{,}045'}</M> und <M>{'A_7 = T + Z_7'}</M>.
                     </>,
                     <>
                       <M>{'T = 50\\,000 : 10 = 5\\,000'}</M>, <M>{'K_6 = 5\\,000 \\cdot 4'}</M>, <M>{'Z_7 = 20\\,000 \\cdot 0{,}045'}</M>.
@@ -1164,11 +931,13 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
           <Abschnitt titel="Übung 4 für Profis: Rückwärts gedacht">
             <CheckCard
               title="Kredit und Zinssatz finden"
+              profi
+              punkte={9}
               level="erweiterung"
               prompt={
                 <p>
-                  Eine Gärtnerei hat ein Ratendarlehen mit 8 Jahren Laufzeit. Im Kontoauszug steht nur: Annuität im 1. Jahr 5.850 €, davon 1.350 € Zinsen.
-                  Wie hoch war das Darlehen, und wie hoch ist der Zinssatz?
+                  Eine Gärtnerei hat ein Ratendarlehen mit 8 Jahren Laufzeit. Im Kontoauszug steht nur: Annuität im 1. Jahr 5.850 €, davon 1.350 € Zinsen. Wie
+                  hoch war das Darlehen, und wie hoch ist der Zinssatz?
                 </p>
               }
               fieldsRow
@@ -1178,10 +947,13 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
               ]}
               loesungNachFehler
               solution={
-                <>
-                  <MB>{'T = 5\\,850 \\text{ €} - 1\\,350 \\text{ €} = 4\\,500 \\text{ €} \\qquad K_0 = T \\cdot n = 4\\,500 \\text{ €} \\cdot 8 = 36\\,000 \\text{ €}'}</MB>
-                  <MB>{'p = \\frac{1\\,350 \\text{ €}}{36\\,000 \\text{ €}} \\cdot 100 = 3{,}75\\,\\%'}</MB>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'Tilgung', tex: 'T = 5\\,850 \\text{ €} - 1\\,350 \\text{ €} = 4\\,500 \\text{ €}' },
+                    { titel: 'Darlehen', tex: 'K_0 = T \\cdot n = 4\\,500 \\text{ €} \\cdot 8 = 36\\,000 \\text{ €}' },
+                    { titel: 'Zinssatz', tex: 'p = \\dfrac{1\\,350 \\text{ €}}{36\\,000 \\text{ €}} \\cdot 100 = 3{,}75\\,\\%' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -1196,10 +968,19 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
               }
             />
           </Abschnitt>
+          <BonusSpiel frei={uebungen.length === 3} titel="Raten-Bäckerei">
+            <AuswahlSpiel
+              neueRunden={ratenRunden}
+              symbol="fa-bread-slice"
+              start={<p>In jeder Runde siehst du ein Ratendarlehen und ein Jahr. Nur ein Brotkorb enthält die richtige Annuität für dieses Jahr. Rechne und tippe ihn an.</p>}
+              tipp="Tipp: Erst T = K₀ : n, dann die Zinsen auf die Schuld zu Beginn des Jahres (noch n − v + 1 Tilgungen offen), dann A = T + Z."
+            />
+          </BonusSpiel>
+          <Bilanz />
           <div className="sl-ende">
             <p>
-              Du kannst jetzt einen Tilgungsplan für ein Ratendarlehen aufstellen und ein Jahr direkt mit den Formeln berechnen. Bei den Übungsaufgaben
-              füllst du Tilgungspläne mit immer neuen Zahlen aus.
+              Du kannst jetzt einen Tilgungsplan für ein Ratendarlehen aufstellen und ein Jahr direkt mit den Formeln berechnen. Bei den Übungsaufgaben füllst du
+              Tilgungspläne mit immer neuen Zahlen aus.
             </p>
             <div className="bk-actions">
               <button type="button" className="bk-btn" onClick={onBack}>
@@ -1216,19 +997,16 @@ export default function BackofenEinstieg({ onBack, onPractice }: { onBack: () =>
   ];
 
   return (
-    <TaskShell
-      title="Ratendarlehen: Der neue Backofen"
-      width="wide"
-      kompakt
-      parent={{ to: '/finanzmathe/ratendarlehen', label: 'Ratendarlehen' }}
-    >
+    <TaskShell title="Ratendarlehen: Der neue Backofen" width="wide" kompakt parent={{ to: '/finanzmathe/ratendarlehen', label: 'Ratendarlehen' }}>
       <SeitenLernsituation
         ruhig
+        punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
-            In dieser Lernsituation hilfst du einer Bäckerei bei der Finanzierung eines neuen Ofens. Du lernst, wie ein Ratendarlehen zurückgezahlt
-            wird, und stellst einen Tilgungsplan auf.
+            In dieser Lernsituation hilfst du einer Bäckerei bei der Finanzierung eines neuen Ofens. Du lernst, wie ein Ratendarlehen zurückgezahlt wird, und
+            stellst einen Tilgungsplan auf.
           </>
         }
         seiten={seiten}
