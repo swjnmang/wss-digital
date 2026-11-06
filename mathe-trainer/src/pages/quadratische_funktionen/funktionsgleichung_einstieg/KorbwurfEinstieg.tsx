@@ -1,7 +1,8 @@
 import { useEffect, useId, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import TaskShell from '../../../components/layout/TaskShell'
+import { useSitzungState } from '../../../hooks/useSitzung'
 import { Beispiel, M, MB, Merke, Tabelle, fmt, parseInput } from '../../daten_und_zufall/lernpfad/kit'
-import { CheckCard, Hilfen, McCard, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
+import { CheckCard, Hilfen, Loesungsweg, McCard, tx } from '../../lineare_funktionen/lernsituation_kit/kit'
 import {
   Abschnitt,
   Aufklappbar,
@@ -9,11 +10,14 @@ import {
   BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../lineare_funktionen/lernsituation_kit/seiten'
 import { Bilanz, PUNKTE, usePunkteAufgabe } from '../../lineare_funktionen/lernsituation_kit/punkte'
-import { Kriterien, Vermutung, Zitat, type Festlegung } from '../../finanzmathe/zins_kit/zins_kit'
+import { Kriterien, Vermutung, standardKriterien, type Festlegung } from '../../finanzmathe/zins_kit/zins_kit'
+import titelBild from './bilder/korbwurf-titel.webp'
+import notizBild from './bilder/korbwurf-notiz.webp'
 import { LERNVIDEO_FALL2 } from '../FunktionsgleichungAufstellen'
 import Korbjaeger from './Korbjaeger'
 import { KORB_H, Spielfeld, hoehe, type Bahn, type BahnBild } from './Spielfeld'
@@ -32,7 +36,8 @@ import './korbwurf.css'
 // Aha: Jonas' Ball steigt am Anfang fast genauso wie Linas, ist bei x = 2 aber schon am höchsten Punkt und fliegt 85 cm unter dem Ring durch.
 // Handlungsprodukt analog: Analyse-Notiz für die Trainerin mit beschrifteter Skizze beider Bahnen, Gleichungen, Rechnung und Urteil.
 // Identität: Themenfarbe Ocker, Symbol fa-basketball, Titelbild Sporthalle mit Korb, gefilmter Bahn und „nicht gefilmt“-Bereich,
-// Leitobjekt die Videoanalyse-App. Festlegung und Versuche bleiben nur im Seitenzustand.
+// Leitobjekt die Videoanalyse-App. Bildwelt Reportage / Hochglanz: Aufmacherbild (Sporthalle) und Analyse-Notiz sind gerenderte
+// WebP-Dateien aus bilder-quelle/korbwurf-*.bild.html; das Spielfeld mit Live-Rückmeldung bleibt Inline-SVG.
 // Punkte nach Aufwand: Warm-up 2/2/3/2/2, Festlegung 3, App 3, Teil 1 12, Teil 2 14, Entscheidung 3, Analyse-Notiz 5, Übungen 4/6/5/8, Profi 9,
 // Bonus-Spiel 4 Münzen à 2 (Pflicht zusammen 74: Warm-up 15 %, Problem erkennen 8 %, Problem lösen 46 %, Übungen 31 %).
 
@@ -72,59 +77,22 @@ const bahnTex = (k: Bahn) =>
 
 /* ── Identität ───────────────────────────────────────────────────────────── */
 
-/** Titelbild: Sporthalle mit Korb, die gefilmte Wurfbahn mit P und Q, ein Bereich „nicht gefilmt“ und das Handy auf dem Stativ */
-function Titelbild() {
-  return (
-    <svg
-      viewBox="0 0 720 252"
-      role="img"
-      aria-label="Eine Sporthalle mit einem Basketballkorb rechts. Von links fliegt ein Ball auf einer gestrichelten Bahn, auf der zwei Messpunkte P und Q markiert sind. In der Mitte liegt ein grauer Bereich mit der Aufschrift nicht gefilmt und einem Fragezeichen. Links unten steht ein Handy auf einem Stativ."
-    >
-      <rect x="0" y="214" width="720" height="38" fill="var(--primary-soft)" />
-      <line x1="0" x2="720" y1="214" y2="214" stroke="var(--ink)" strokeWidth="2" />
-      {/* nicht gefilmter Bereich */}
-      <rect x="300" y="14" width="150" height="200" fill="var(--surface-sunken)" />
-      <text x="375" y="190" textAnchor="middle" fontSize="18" fontWeight="700" fill="var(--ink-muted)">
-        nicht gefilmt
-      </text>
-      <text x="375" y="120" textAnchor="middle" fontSize="44" fontWeight="800" fill="var(--ink-muted)">
-        ?
-      </text>
-      {/* Korb */}
-      <line x1="660" x2="660" y1="214" y2="72" stroke="var(--ink)" strokeWidth="6" />
-      <line x1="660" x2="612" y1="80" y2="80" stroke="var(--ink)" strokeWidth="4" />
-      <rect x="604" y="46" width="10" height="70" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
-      <path d="M548 100 L556 136 L596 136 L604 100" fill="none" stroke="var(--ink-muted)" strokeWidth="2" strokeDasharray="4 3" />
-      <line x1="546" x2="606" y1="100" y2="100" stroke="var(--primary)" strokeWidth="6" strokeLinecap="round" />
-      {/* gefilmte Bahn */}
-      <path d="M120 150 Q 210 62 300 42" fill="none" stroke="var(--primary)" strokeWidth="4" strokeDasharray="10 7" strokeLinecap="round" />
-      <path d="M450 46 Q 520 64 568 96" fill="none" stroke="var(--line-strong)" strokeWidth="3" strokeDasharray="3 6" strokeLinecap="round" />
-      {[
-        { x: 178, y: 96, t: 'P' },
-        { x: 246, y: 60, t: 'Q' },
-      ].map((p) => (
-        <g key={p.t}>
-          <circle cx={p.x} cy={p.y} r="7" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="2" />
-          <text x={p.x - 6} y={p.y - 14} fontSize="18" fontWeight="800" fill="var(--ink)">
-            {p.t}
-          </text>
-        </g>
-      ))}
-      {/* Ball */}
-      <circle cx="120" cy="150" r="16" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <path d="M104 150 h32 M120 134 v32 M109 139 q11 11 0 22 M131 139 q-11 11 0 22" fill="none" stroke="var(--ink)" strokeWidth="1.5" />
-      {/* Handy auf Stativ */}
-      <line x1="50" x2="36" y1="186" y2="214" stroke="var(--ink)" strokeWidth="3" />
-      <line x1="50" x2="64" y1="186" y2="214" stroke="var(--ink)" strokeWidth="3" />
-      <line x1="50" x2="50" y1="186" y2="214" stroke="var(--ink)" strokeWidth="3" />
-      <rect x="30" y="150" width="40" height="36" rx="5" fill="var(--ink)" />
-      <rect x="35" y="155" width="30" height="26" rx="3" fill="var(--primary-soft)" />
-      <circle cx="50" cy="168" r="6" fill="var(--primary)" />
-    </svg>
-  )
+const THEMA: Thema = {
+  name: 'Der Korbwurf',
+  farbe: 'ocker',
+  icon: 'fa-basketball',
+  kicker: 'Aus der Basketball-AG',
+  bildzeile: 'Die Videoanalyse bricht mitten im Wurf ab. Illustration: Mathe-Trainer',
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Eine helle Sporthalle mit Basketballkorb rechts. Von links fliegt ein Ball auf einer gestrichelten Bahn mit den Messpunkten P und Q. Danach folgt ein grauer Bereich mit der Aufschrift nicht gefilmt und einem Fragezeichen. Vorne links steht ein Handy auf einem Stativ."
+    />
+  ),
 }
-
-const THEMA: Thema = { name: 'Der Korbwurf', farbe: 'ocker', icon: 'fa-basketball', bild: <Titelbild /> }
+const BILDWELT: Bildwelt = { welt: 'reportage', variante: 'hochglanz' }
 
 /** Spielfeld in der Seitenbreite */
 function Feld(props: Parameters<typeof Spielfeld>[0]) {
@@ -248,38 +216,6 @@ function AnalyseApp({ versuche, onZeichnen }: { versuche: Versuch[]; onZeichnen:
 
 /* ── Phase 3: Bilder und Rechenbeispiele ─────────────────────────────────── */
 
-/** Handlungsprodukt: Notizzettel „Analyse für die Trainerin“ mit Skizze und Zeilen */
-function NotizBild() {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Ein Notizzettel mit der Überschrift Wurfanalyse für die Trainerin. Links eine kleine Skizze mit zwei Wurfbahnen und einem Korb, rechts Zeilen für die Gleichungen, die Rechnung und das Urteil."
-      >
-        <rect x="120" y="10" width="480" height="172" rx="6" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <rect x="120" y="10" width="480" height="38" rx="6" fill="var(--primary-soft)" />
-        <text x="140" y="36" fontSize="20" fontWeight="800" fill="var(--ink)">
-          Wurfanalyse für die Trainerin
-        </text>
-        <line x1="140" x2="140" y1="170" y2="64" stroke="var(--ink)" strokeWidth="1.5" />
-        <line x1="140" x2="330" y1="170" y2="170" stroke="var(--ink)" strokeWidth="1.5" />
-        <path d="M146 140 Q 220 40 300 110" fill="none" stroke="var(--primary)" strokeWidth="3" />
-        <path d="M146 148 Q 200 90 260 170" fill="none" stroke="var(--ink)" strokeWidth="2.5" strokeDasharray="6 4" />
-        <line x1="290" x2="318" y1="110" y2="110" stroke="var(--primary)" strokeWidth="4" />
-        <line x1="318" x2="318" y1="86" y2="130" stroke="var(--ink)" strokeWidth="3" />
-        <text x="360" y="80" fontSize="16" fill="var(--ink)">
-          Lina: y = … Jonas: y = …
-        </text>
-        <path d="M360 104 h210 M360 128 h210" stroke="var(--line-strong)" strokeWidth="2" />
-        <text x="360" y="160" fontSize="16" fontWeight="700" fill="var(--ink)">
-          Urteil: …
-        </text>
-      </svg>
-    </div>
-  )
-}
-
 const BSP1_AUFGABE = (
   <p>
     Emil wirft mit derselben Krümmung <M>{'a = -0{,}5'}</M>. Die App misst <M>{'P(1 \\mid 3)'}</M> und <M>{'Q(2 \\mid 3{,}5)'}</M>. Stelle die Gleichung seiner Wurfbahn auf und
@@ -343,7 +279,12 @@ const BSP2_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
       <M>c</M> einsetzen, dann P und Q
     </>,
     body: (
-      <MB>{'\\begin{aligned} 3 &= a + b + 2 && \\mid -2 \\quad\\Rightarrow\\quad \\text{I: } a + b = 1 \\\\ 3{,}6 &= 4a + 2b + 2 && \\mid -2 \\quad\\Rightarrow\\quad \\text{II: } 4a + 2b = 1{,}6 \\end{aligned}'}</MB>
+      <>
+        <MB>{'3 = a + b + 2 \\quad \\mid -2'}</MB>
+        <MB>{'\\text{I: } a + b = 1'}</MB>
+        <MB>{'3{,}6 = 4a + 2b + 2 \\quad \\mid -2'}</MB>
+        <MB>{'\\text{II: } 4a + 2b = 1{,}6'}</MB>
+      </>
     ),
   },
   {
@@ -376,112 +317,31 @@ const BSP2_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
   },
 ]
 
-/** Lösungsweg Schritt für Schritt, im selben Aufbau wie die Rechenbeispiele */
-function LoesungsSchritte({ steps, fazit }: { steps: { title: ReactNode; body: ReactNode }[]; fazit: ReactNode }) {
-  return (
-    <>
-      <ol className="lp-example-steps">
-        {steps.map((s, i) => (
-          <li key={i}>
-            <div className="lp-example-step-title">
-              Schritt {i + 1}: {s.title}
-            </div>
-            <div className="lp-example-step-body">{s.body}</div>
-          </li>
-        ))}
-      </ol>
-      <p>{fazit}</p>
-    </>
-  )
-}
-
 const LOESUNG1 = (
-  <LoesungsSchritte
-    steps={[
-      {
-        title: <>Den bekannten Wert <M>a</M> einsetzen</>,
-        body: <MB>{'y = -0{,}5x^2 + bx + c'}</MB>,
-      },
-      {
-        title: <>Punkt <M>{'P(1 \\mid 3{,}8)'}</M> einsetzen: Gleichung I</>,
-        body: <MB>{'\\begin{aligned} 3{,}8 &= -0{,}5 \\cdot 1^2 + b \\cdot 1 + c \\\\ 3{,}8 &= -0{,}5 + b + c && \\mid +0{,}5 \\\\ \\text{I: } b + c &= 4{,}3 \\end{aligned}'}</MB>,
-      },
-      {
-        title: <>Punkt <M>{'Q(2 \\mid 4{,}55)'}</M> einsetzen: Gleichung II</>,
-        body: <MB>{'\\begin{aligned} 4{,}55 &= -0{,}5 \\cdot 2^2 + b \\cdot 2 + c \\\\ 4{,}55 &= -2 + 2b + c && \\mid +2 \\\\ \\text{II: } 2b + c &= 6{,}55 \\end{aligned}'}</MB>,
-      },
-      {
-        title: 'Das Gleichungssystem mit dem Subtraktionsverfahren lösen',
-        body: (
-          <>
-            <p>
-              Vor <M>c</M> steht in beiden Gleichungen 1. Rechne II − I, dann fällt <M>c</M> weg. Setze <M>b</M> danach in I ein:
-            </p>
-            <MB>{'\\begin{aligned} \\text{II: } 2b + c &= 6{,}55 \\\\ \\text{I: } b + c &= 4{,}3 \\\\ \\hline \\text{II} - \\text{I: } b &= 2{,}25 \\\\ \\text{in I: } 2{,}25 + c &= 4{,}3 && \\mid -2{,}25 \\\\ c &= 2{,}05 \\end{aligned}'}</MB>
-          </>
-        ),
-      },
-      {
-        title: 'Funktionsgleichung angeben und die Höhe bei der Korbmitte berechnen',
-        body: (
-          <>
-            <MB>{'y = -0{,}5x^2 + 2{,}25x + 2{,}05'}</MB>
-            <MB>{'x = 4{:}\\quad y = -0{,}5 \\cdot 4^2 + 2{,}25 \\cdot 4 + 2{,}05 = -8 + 9 + 2{,}05 = 3{,}05'}</MB>
-          </>
-        ),
-      },
+  <Loesungsweg
+    schritte={[
+      { titel: <>Den bekannten Wert <M>a</M> einsetzen</>, tex: 'y = -0{,}5x^2 + bx + c' },
+      { titel: <>Punkt <M>{'P(1 \\mid 3{,}8)'}</M> einsetzen: Gleichung I</>, tex: ['3{,}8 = -0{,}5 \\cdot 1^2 + b \\cdot 1 + c', '3{,}8 = -0{,}5 + b + c \\quad \\mid +0{,}5', '\\text{I: } b + c = 4{,}3'] },
+      { titel: <>Punkt <M>{'Q(2 \\mid 4{,}55)'}</M> einsetzen: Gleichung II</>, tex: ['4{,}55 = -0{,}5 \\cdot 2^2 + b \\cdot 2 + c', '4{,}55 = -2 + 2b + c \\quad \\mid +2', '\\text{II: } 2b + c = 6{,}55'] },
+      { titel: <>II − I rechnen, <M>c</M> fällt weg</>, tex: '\\text{II} - \\text{I: } b = 2{,}25' },
+      { titel: <><M>b</M> in I einsetzen</>, tex: ['2{,}25 + c = 4{,}3 \\quad \\mid -2{,}25', 'c = 2{,}05'] },
+      { titel: 'Funktionsgleichung angeben', tex: 'y = -0{,}5x^2 + 2{,}25x + 2{,}05' },
+      { titel: 'Höhe bei der Korbmitte', tex: ['x = 4{:}\\quad y = -0{,}5 \\cdot 4^2 + 2{,}25 \\cdot 4 + 2{,}05', 'y = -8 + 9 + 2{,}05 = 3{,}05'], text: 'Der Ball ist bei der Korbmitte genau auf Ringhöhe (3,05 m): Linas Wurf ist ein Treffer.' },
     ]}
-    fazit="Bei der Korbmitte ist der Ball genau auf Ringhöhe (3,05 m): Linas Wurf ist ein Treffer."
   />
 )
 const LOESUNG2 = (
-  <LoesungsSchritte
-    steps={[
-      {
-        title: <>Den bekannten Wert <M>c</M> einsetzen</>,
-        body: <MB>{'y = ax^2 + bx + 2{,}2'}</MB>,
-      },
-      {
-        title: <>Punkt <M>{'P(1 \\mid 3{,}4)'}</M> einsetzen: Gleichung I</>,
-        body: <MB>{'\\begin{aligned} 3{,}4 &= a \\cdot 1^2 + b \\cdot 1 + 2{,}2 \\\\ 3{,}4 &= a + b + 2{,}2 && \\mid -2{,}2 \\\\ \\text{I: } a + b &= 1{,}2 \\end{aligned}'}</MB>,
-      },
-      {
-        title: <>Punkt <M>{'Q(2 \\mid 3{,}8)'}</M> einsetzen: Gleichung II</>,
-        body: <MB>{'\\begin{aligned} 3{,}8 &= a \\cdot 2^2 + b \\cdot 2 + 2{,}2 \\\\ 3{,}8 &= 4a + 2b + 2{,}2 && \\mid -2{,}2 \\\\ \\text{II: } 4a + 2b &= 1{,}6 \\end{aligned}'}</MB>,
-      },
-      {
-        title: 'Gleichung I passend multiplizieren',
-        body: (
-          <>
-            <p>
-              Vor <M>b</M> stehen 1 und 2. Multipliziere I auf beiden Seiten mit 2, dann steht in beiden Gleichungen <M>{'2b'}</M>:
-            </p>
-            <MB>{'\\begin{aligned} \\text{I: } a + b &= 1{,}2 && \\mid \\cdot 2 \\\\ \\text{I} \\cdot 2{:}\; 2a + 2b &= 2{,}4 \\end{aligned}'}</MB>
-          </>
-        ),
-      },
-      {
-        title: 'Das Gleichungssystem mit dem Subtraktionsverfahren lösen',
-        body: (
-          <>
-            <p>
-              Rechne II − I · 2, dann fällt <M>b</M> weg. Setze <M>a</M> danach in I ein:
-            </p>
-            <MB>{'\\begin{aligned} \\text{II: } 4a + 2b &= 1{,}6 \\\\ \\text{I} \\cdot 2{:}\; 2a + 2b &= 2{,}4 \\\\ \\hline \\text{II} - \\text{I} \\cdot 2{:}\; 2a &= -0{,}8 && \\mid :2 \\\\ a &= -0{,}4 \\\\ \\text{in I: } -0{,}4 + b &= 1{,}2 && \\mid +0{,}4 \\\\ b &= 1{,}6 \\end{aligned}'}</MB>
-          </>
-        ),
-      },
-      {
-        title: 'Funktionsgleichung angeben und die Höhe bei der Korbmitte berechnen',
-        body: (
-          <>
-            <MB>{'y = -0{,}4x^2 + 1{,}6x + 2{,}2'}</MB>
-            <MB>{'x = 4{:}\\quad y = -0{,}4 \\cdot 4^2 + 1{,}6 \\cdot 4 + 2{,}2 = -6{,}4 + 6{,}4 + 2{,}2 = 2{,}2'}</MB>
-          </>
-        ),
-      },
+  <Loesungsweg
+    schritte={[
+      { titel: <>Den bekannten Wert <M>c</M> einsetzen</>, tex: 'y = ax^2 + bx + 2{,}2' },
+      { titel: <>Punkt <M>{'P(1 \\mid 3{,}4)'}</M> einsetzen: Gleichung I</>, tex: ['3{,}4 = a \\cdot 1^2 + b \\cdot 1 + 2{,}2', '3{,}4 = a + b + 2{,}2 \\quad \\mid -2{,}2', '\\text{I: } a + b = 1{,}2'] },
+      { titel: <>Punkt <M>{'Q(2 \\mid 3{,}8)'}</M> einsetzen: Gleichung II</>, tex: ['3{,}8 = a \\cdot 2^2 + b \\cdot 2 + 2{,}2', '3{,}8 = 4a + 2b + 2{,}2 \\quad \\mid -2{,}2', '\\text{II: } 4a + 2b = 1{,}6'] },
+      { titel: 'Gleichung I mit 2 multiplizieren', tex: '\\text{I} \\cdot 2{:}\; 2a + 2b = 2{,}4' },
+      { titel: <>II − I · 2 rechnen, <M>b</M> fällt weg</>, tex: ['2a = -0{,}8 \\quad \\mid :2', 'a = -0{,}4'] },
+      { titel: <><M>a</M> in I einsetzen</>, tex: ['-0{,}4 + b = 1{,}2 \\quad \\mid +0{,}4', 'b = 1{,}6'] },
+      { titel: 'Funktionsgleichung angeben', tex: 'y = -0{,}4x^2 + 1{,}6x + 2{,}2' },
+      { titel: 'Höhe bei der Korbmitte', tex: ['x = 4{:}\\quad y = -0{,}4 \\cdot 4^2 + 1{,}6 \\cdot 4 + 2{,}2', 'y = -6{,}4 + 6{,}4 + 2{,}2 = 2{,}2'], text: 'Der Ball ist bei der Korbmitte nur 2,2 m hoch, 85 cm unter dem Ring: Jonas’ Wurf ist zu kurz.' },
     ]}
-    fazit="Bei der Korbmitte ist der Ball nur 2,2 m hoch, 85 cm unter dem Ring: Jonas' Wurf ist zu kurz."
   />
 )
 
@@ -489,10 +349,10 @@ const LOESUNG2 = (
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBack: () => void; onPractice: () => void; onPrev: () => void }) {
-  const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 3, fest: false })
-  const [versuche, setVersuche] = useState<Versuch[]>([])
-  const [geloest, setGeloest] = useState<string[]>([])
-  const [uebungen, setUebungen] = useState<string[]>([])
+  const [fest, setFest] = useSitzungState<Festlegung<Wahl>>('kw-fest', { wahl: null, wert: 3, fest: false })
+  const [versuche, setVersuche] = useSitzungState<Versuch[]>('kw-versuche', [])
+  const [geloest, setGeloest] = useSitzungState<string[]>('kw-geloest', [])
+  const [uebungen, setUebungen] = useSitzungState<string[]>('kw-uebungen', [])
   /** Pflicht-Übung melden: schaltet „Weiter“ und das Bonus-Spiel frei */
   const uebung = (k: string, fertig: () => void) => () => {
     fertig()
@@ -551,7 +411,14 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
               { kind: 'num', key: 'k', label: 'Zahl vor b', expected: 2 },
               { kind: 'num', key: 'r', label: 'rechte Seite', expected: 7 },
             ]}
-            solution={<MB>{'5 = -0{,}5 \\cdot 4 + 2b + c = -2 + 2b + c \\quad\\Rightarrow\\quad 2b + c = 7'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Einsetzen', tex: ['5 = -0{,}5 \\cdot 2^2 + b \\cdot 2 + c', '5 = -2 + 2b + c'] },
+                  { titel: 'Die Zahl auf die rechte Seite bringen', tex: ['5 = -2 + 2b + c \\quad \\mid +2', '2b + c = 7'] },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -581,7 +448,14 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
               { kind: 'num', key: 'b', label: <M>{'b ='}</M>, expected: 3 },
               { kind: 'num', key: 'c', label: <M>{'c ='}</M>, expected: -1 },
             ]}
-            solution={<MB>{'\\text{I} - \\text{II: } 2b = 6 \\;\\Rightarrow\\; b = 3 \\qquad \\text{in II: } 3 + c = 2 \\;\\Rightarrow\\; c = -1'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: <>I − II rechnen, <M>c</M> fällt weg</>, tex: ['2b = 6 \\quad \\mid :2', 'b = 3'] },
+                  { titel: <><M>b</M> in II einsetzen</>, tex: ['3 + c = 2 \\quad \\mid -3', 'c = -1'] },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -610,7 +484,14 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
               { kind: 'num', key: 'b', label: 'Zahl vor b', expected: 2 },
               { kind: 'num', key: 'c', label: 'rechte Seite', expected: 3 },
             ]}
-            solution={<MB>{'(a + b) \\cdot 2 = 1{,}5 \\cdot 2 \\quad\\Rightarrow\\quad 2a + 2b = 3'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Beide Seiten mit 2 multiplizieren', tex: '(a + b) \\cdot 2 = 1{,}5 \\cdot 2' },
+                  { titel: 'Ausmultiplizieren', tex: '2a + 2b = 3' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -659,9 +540,10 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
             Du bist in der Basketball-AG für die Videoanalyse zuständig. Mit einer App filmt ihr Freiwürfe. Die App misst die Höhe des Balls an jeder Stelle (<M>x</M> = Entfernung vom
             Abwurfpunkt in m, <M>y</M> = Höhe in m). Die Korbmitte liegt bei <M>{'K(4 \\mid 3{,}05)'}</M>.
           </p>
-          <Zitat wer="Trainerin Frau Okafor">
+          <blockquote className="sl-zitat">
             <p>„Bei Linas Wurf ist jemand durchs Bild gelaufen, das Ende fehlt. Ging der Ball rein oder nicht? Kannst du das aus dem Video herausfinden?“</p>
-          </Zitat>
+            <footer>Frau Okafor, Trainerin der Basketball-AG</footer>
+          </blockquote>
           <p className="sl-text">
             Die Bahn eines Wurfs ist eine Parabel <M>{'y = ax^2 + bx + c'}</M>. Aus der Abwurfgeschwindigkeit ist die Krümmung bekannt: <M>{'a = -0{,}5'}</M>. Gemessen hat sie
             zwei Punkte: <M>{'P(1 \\mid 3{,}8)'}</M> und <M>{'Q(2 \\mid 4{,}55)'}</M>. Gesucht sind <M>b</M> und <M>c</M> und damit die Höhe des Balls bei der Korbmitte.
@@ -850,7 +732,15 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
             </Abschnitt>
           )}
           <Handlungsprodukt titel="Analyse-Notiz für die Trainerin">
-            <NotizBild />
+            <figure className="sl-foto sl-foto-klein">
+              <img
+                src={notizBild}
+                width={800}
+                height={400}
+                alt="Ein Notizblatt auf dem Hallenboden: Wurfanalyse für Frau Okafor, mit einer Skizze zweier Wurfbahnen und dem Korb sowie Zeilen für Linas und Jonas' Gleichung, die Höhe bei x = 4 und das Urteil."
+              />
+              <figcaption>So könnte deine Analyse-Notiz aussehen.</figcaption>
+            </figure>
             <p className="sl-text">
               Schreibe in deinem Heft eine Analyse-Notiz für Frau Okafor. Zeichne ein Koordinatensystem mit Korb und beiden Wurfbahnen, schreibe die Gleichungen I und II und deine
               Rechnung für beide Würfe sauber auf und gib ein klares Urteil mit einem Tipp für Jonas.
@@ -866,20 +756,7 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
             </Aufklappbar>
           </Handlungsprodukt>
           <Abschnitt titel="Ist deine Analyse-Notiz vollständig?">
-            <Kriterien
-              onAlle={fertig.teil('produkt')}
-              items={[
-                'Eine beschriftete Skizze: Achsen mit Einheiten, Korb K(4 | 3,05), beide Bahnen mit den Messpunkten P und Q',
-                'Für beide Würfe die Gleichungen I und II und das Lösen mit dem Additions- und Subtraktionsverfahren (z. B. „II − I“, „I · 2“)',
-                'Beide Bahngleichungen und die Höhe bei x = 4 als Rechnung „x einsetzen“',
-                'Ein klares Urteil für beide Würfe und ein Tipp für Jonas',
-                <>
-                  Unter deiner Notiz steht, wofür die Abkürzungen stehen: <M>x</M> (Entfernung vom Abwurf in m), <M>y</M> (Höhe in m), <M>a</M> (Krümmung der Bahn), <M>b</M>,{' '}
-                  <M>c</M> (Abwurfhöhe, der y-Achsenabschnitt), I und II (die beiden Gleichungen), P, Q (Messpunkte) und K (Korbmitte). Außerdem erklärst du die Begriffe
-                  „Gleichungssystem“ und „Scheitelpunkt“ und alle anderen Wörter, die für dich neu waren.
-                </>,
-              ]}
-            />
+            <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an Frau Okafor')}             />
           </Abschnitt>
           {geloest.length === 2 && (
             <Abschnitt titel="Das hältst du fest">
@@ -967,13 +844,14 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
                 { kind: 'num', key: 'h', label: 'Höhe:', expected: 5, unit: 'm' },
               ]}
               solution={
-                <>
-                  <MB>{'\\begin{aligned} \\text{I: } a + c &= 4 \\\\ \\text{II: } 4a + c &= 1 \\\\ \\hline \\text{II} - \\text{I: } 3a &= -3 && \\mid :3 \\\\ a &= -1 \\end{aligned}'}</MB>
-                  <MB>{'\\text{in I: } -1 + c = 4 \\;\\Rightarrow\\; c = 5 \\qquad y = -x^2 + 5'}</MB>
-                  <p>
-                    Der Scheitelpunkt liegt auf der y-Achse bei <M>{'S(0 \\mid 5)'}</M>: Die Fontäne spritzt 5 m hoch.
-                  </p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: <>P und Q in <M>{'y = ax^2 + c'}</M> einsetzen</>, tex: ['\\text{I: } a + c = 4', '\\text{II: } 4a + c = 1'] },
+                    { titel: <>II − I rechnen, <M>c</M> fällt weg</>, tex: ['3a = -3 \\quad \\mid :3', 'a = -1'] },
+                    { titel: <><M>a</M> in I einsetzen</>, tex: ['-1 + c = 4 \\quad \\mid +1', 'c = 5'] },
+                    { titel: 'Gleichung und Höhe', tex: 'y = -x^2 + 5', text: <>Der Scheitelpunkt liegt auf der y-Achse bei <M>{'S(0 \\mid 5)'}</M>: Die Fontäne spritzt 5 m hoch.</> },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -1036,13 +914,14 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
                 { kind: 'num', key: 'h', label: 'Abwurfhöhe:', expected: 2.25, unit: 'm' },
               ]}
               solution={
-                <>
-                  <MB>{'\\begin{aligned} 3{,}95 &= -0{,}5 + b + c && \\Rightarrow\\; \\text{I: } b + c = 4{,}45 \\\\ 3{,}05 &= -8 + 4b + c && \\Rightarrow\\; \\text{II: } 4b + c = 11{,}05 \\end{aligned}'}</MB>
-                  <MB>{'\\text{II} - \\text{I: } 3b = 6{,}6 \\;\\Rightarrow\\; b = 2{,}2 \\qquad \\text{in I: } c = 4{,}45 - 2{,}2 = 2{,}25'}</MB>
-                  <p>
-                    Abgeworfen wurde bei <M>{'x = 0'}</M> in der Höhe <M>{'y = c = 2{,}25'}</M> m.
-                  </p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: 'P einsetzen: Gleichung I', tex: ['3{,}95 = -0{,}5 + b + c \\quad \\mid +0{,}5', '\\text{I: } b + c = 4{,}45'] },
+                    { titel: 'K einsetzen: Gleichung II', tex: ['3{,}05 = -8 + 4b + c \\quad \\mid +8', '\\text{II: } 4b + c = 11{,}05'] },
+                    { titel: <>II − I rechnen, <M>c</M> fällt weg</>, tex: ['3b = 6{,}6 \\quad \\mid :3', 'b = 2{,}2'] },
+                    { titel: <><M>b</M> in I einsetzen</>, tex: ['2{,}2 + c = 4{,}45 \\quad \\mid -2{,}2', 'c = 2{,}25'], text: <>Abgeworfen wurde bei <M>{'x = 0'}</M> in der Höhe <M>{'y = c = 2{,}25'}</M> m.</> },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -1077,11 +956,12 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
                 { kind: 'num', key: 'y', label: <M>{'y_S \\approx'}</M>, expected: 4.58, tol: 0.006, unit: 'm' },
               ]}
               solution={
-                <>
-                  <MB>{'x_S = -\\frac{b}{2a} = -\\frac{2{,}25}{2 \\cdot (-0{,}5)} = 2{,}25'}</MB>
-                  <MB>{'x = 2{,}25{:}\\; y_S = -0{,}5 \\cdot 2{,}25^2 + 2{,}25 \\cdot 2{,}25 + 2{,}05 \\approx 4{,}58'}</MB>
-                  <p>Der Ball fliegt höchstens etwa 4,58 m hoch, also weit unter der Hallendecke.</p>
-                </>
+                <Loesungsweg
+                  schritte={[
+                    { titel: <><M>{'x_S'}</M> berechnen</>, tex: 'x_S = -\\dfrac{b}{2a} = -\\dfrac{2{,}25}{2 \\cdot (-0{,}5)} = 2{,}25' },
+                    { titel: <><M>{'x_S'}</M> einsetzen</>, tex: 'y_S = -0{,}5 \\cdot 2{,}25^2 + 2{,}25 \\cdot 2{,}25 + 2{,}05 \\approx 4{,}58', text: 'Der Ball fliegt höchstens etwa 4,58 m hoch, also weit unter der Hallendecke.' },
+                  ]}
+                />
               }
               help={
                 <Hilfen
@@ -1135,6 +1015,7 @@ export default function KorbwurfEinstieg({ onBack, onPractice, onPrev }: { onBac
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             Du wertest für die Basketball-AG Videos von Freiwürfen aus. Du stellst die Gleichung einer Wurfbahn auf, wenn ein Wert (<M>a</M>, <M>b</M> oder <M>c</M>) und zwei Punkte
