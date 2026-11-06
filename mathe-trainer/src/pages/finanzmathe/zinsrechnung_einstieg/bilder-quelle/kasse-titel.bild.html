@@ -1,0 +1,31 @@
+<!doctype html>
+<!-- Die Abschlussfahrt-Kasse, Titelbild. Bildwelt Siebdruck / schwarz (Themenfarbe Beere + Schwarz): Plakat mit Reisebus, Klassenkasse und der Frage nach 72 € Zinsen.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/finanzmathe/zinsrechnung_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&display=swap" rel="stylesheet">
+<style>body{margin:0} text{font-family:'Bricolage Grotesque';font-variation-settings:'wdth' 75,'opsz' 96}</style>
+<script src="_siebdruck.js"></script></head><body><div id="bild"></div>
+<script>
+const beere = `<circle cx="1000" cy="160" r="122" stroke="none"/><circle cx="1000" cy="160" r="142" fill="none" stroke="RASTER" stroke-width="16"/>
+ <rect x="0" y="520" width="1200" height="80" stroke="none"/>
+ <rect x="80" y="300" width="560" height="190" rx="26" stroke="none"/>
+ <text x="60" y="118" font-size="96" font-weight="800" stroke="none">ABSCHLUSSFAHRT 10b</text>
+ <text x="1000" y="172" text-anchor="middle" font-size="100" font-weight="800" fill="#f1efe9" stroke="none">72 €</text>
+ <text x="1000" y="222" text-anchor="middle" font-size="34" font-weight="700" fill="#f1efe9" stroke="none">fürs Grillen?</text>`;
+const schwarz = `<text x="60" y="180" font-size="44" font-weight="700" stroke="none">01.02. bis 01.08. · 3 % p.a.</text>
+ ${[0,1,2,3,4].map(i => `<rect x="${112 + i * 86}" y="322" width="70" height="62" rx="8" fill="#f1efe9" stroke-width="6"/>`).join('')}
+ <text x="320" y="446" text-anchor="middle" font-size="40" font-weight="800" stroke="none">KLASSE 10b</text>
+ <rect x="572" y="322" width="46" height="124" rx="8" fill="#f1efe9" stroke-width="6"/>
+ <rect x="80" y="300" width="560" height="190" rx="26" fill="none" stroke-width="8"/>
+ <circle cx="190" cy="500" r="40" stroke="none"/><circle cx="190" cy="500" r="15" fill="#f1efe9" stroke="none"/>
+ <circle cx="530" cy="500" r="40" stroke="none"/><circle cx="530" cy="500" r="15" fill="#f1efe9" stroke="none"/>
+ <rect x="790" y="370" width="300" height="150" rx="12" fill="none" stroke-width="8"/>
+ <path d="M790 404 Q940 330 1090 404" fill="none" stroke-width="8"/>
+ <rect x="912" y="380" width="56" height="22" rx="4" stroke="none"/>
+ <text x="940" y="490" text-anchor="middle" font-size="58" font-weight="800" stroke="none">3.600 €</text>
+ <text x="940" y="350" text-anchor="middle" font-size="30" font-weight="700" stroke="none">Klassenkasse</text>`;
+SD.bild(1200, 600, [
+  { farbe: '#a0275e', svg: beere },
+  { farbe: '#1d1d1f', versatz: [3, -2], svg: schwarz },
+]);
+</script>
+</body></html>
