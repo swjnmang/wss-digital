@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TaskShell from '../../../../components/layout/TaskShell';
+import { useSitzungState } from '../../../../hooks/useSitzung';
 import { Beispiel, M, MB, Merke } from '../../lernpfad/kit';
-import { CheckCard, Hilfen, McCard, TrackedCheck, TrackedMc } from '../../../lineare_funktionen/lernsituation_kit/kit';
+import { CheckCard, Hilfen, Loesungsweg, McCard, TrackedCheck, TrackedMc } from '../../../lineare_funktionen/lernsituation_kit/kit';
 import {
   Abschnitt,
   Aufklappbar,
@@ -10,14 +11,17 @@ import {
   BonusSpiel,
   Handlungsprodukt,
   SeitenLernsituation,
+  type Bildwelt,
   type Seite,
   type Thema,
 } from '../../../lineare_funktionen/lernsituation_kit/seiten';
 import { Bilanz } from '../../../lineare_funktionen/lernsituation_kit/punkte';
-import { Kriterien, Vermutung, Zitat, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import { Kriterien, Vermutung, Zitat, standardKriterien, type Festlegung } from '../../../finanzmathe/zins_kit/zins_kit';
+import titelBild from './bilder/wundertuete-titel.webp';
+import plakatBild from './bilder/wundertuete-plakat.webp';
 import '../../lernpfad/lernpfad.css';
 import { metaFor } from '../meta';
-import { ANORDNUNG, BaumBild, PlakatBild, Titelbild, Tuete, TuetenBaum, Ziehen } from './Tueten';
+import { ANORDNUNG, BaumBild, Tuete, TuetenBaum, Ziehen } from './Tueten';
 import PfadeJagd from './PfadeJagd';
 import './wundertuete.css';
 
@@ -51,15 +55,34 @@ const WAHL: Record<Wahl, string> = {
   weniger: 'Es ist weniger als 4 %.',
 };
 
-const THEMA: Thema = { ...metaFor('baumdiagramme').thema, bild: <Titelbild /> };
+// Bildwelt Siebdruck / Linolschnitt (Schwarz auf Papier): Titelbild und Plakat sind gerenderte WebP-Dateien aus
+// bilder-quelle/wundertuete-*.bild.html (Bausteine in bilder-quelle/_siebdruck.js); Tüte, Ziehen und Baumdiagramme bleiben live.
+const THEMA: Thema = {
+  ...metaFor('baumdiagramme').thema,
+  bild: (
+    <img
+      src={titelBild}
+      width={1200}
+      height={600}
+      alt="Linolschnitt in Schwarz: Wundertüte, 2 Lose ziehen, ohne Zurücklegen. Links drei Lose mit H, T und N, rechts eine große schwarze Tüte mit Fragezeichen und Sternen."
+    />
+  ),
+};
+const BILDWELT: Bildwelt = { welt: 'siebdruck', variante: 'linolschnitt' };
 
 /** Pfadwahrscheinlichkeiten der Wundertüte als Nennerliste (Neunzigstel) */
 const LOESUNG = (
   <>
     <TuetenBaum werte hi={['HH']} label="Baumdiagramm der Wundertüte mit allen neun Pfaden und ihren Wahrscheinlichkeiten in Neunzigsteln. Der Pfad HH ist hervorgehoben." />
-    <MB>{'P(HH) = \\frac{2}{10} \\cdot \\frac{1}{9} = \\frac{2}{90} = \\frac{1}{45} \\approx 2{,}2\\,\\%'}</MB>
-    <MB>{'P(\\text{genau ein H}) = P(HT) + P(HN) + P(TH) + P(NH) = \\frac{6 + 10 + 6 + 10}{90} = \\frac{32}{90} = \\frac{16}{45} \\approx 35{,}6\\,\\%'}</MB>
-    <MB>{'P(\\text{mindestens ein Gewinn}) = 1 - P(NN) = 1 - \\frac{5}{10} \\cdot \\frac{4}{9} = 1 - \\frac{20}{90} = \\frac{70}{90} = \\frac{7}{9} \\approx 77{,}8\\,\\%'}</MB>
+    <Loesungsweg
+      schritte={[
+        { titel: 'Zwei Hauptgewinne (Produktregel)', tex: 'P(HH) = \\dfrac{2}{10} \\cdot \\dfrac{1}{9} = \\dfrac{2}{90} \\approx 2{,}2\\,\\%' },
+        { titel: 'Genau ein H: vier Pfade addieren', tex: 'P(HT) + P(HN) + P(TH) + P(NH) = \\dfrac{6 + 10 + 6 + 10}{90}' },
+        { titel: 'Genau ein H: Ergebnis', tex: 'P(\\text{genau ein H}) = \\dfrac{32}{90} \\approx 35{,}6\\,\\%' },
+        { titel: 'Zwei Nieten', tex: 'P(NN) = \\dfrac{5}{10} \\cdot \\dfrac{4}{9} = \\dfrac{20}{90}' },
+        { titel: 'Mindestens ein Gewinn (Gegenereignis)', tex: '1 - \\dfrac{20}{90} = \\dfrac{70}{90} \\approx 77{,}8\\,\\%' },
+      ]}
+    />
   </>
 );
 
@@ -116,7 +139,8 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     body: (
       <>
         <p>„Genau ein Gewinn“ erreichst du auf zwei Pfaden: erst G, dann N, oder erst N, dann G.</p>
-        <MB>{'P(GN) = \\frac{2}{8} \\cdot \\frac{6}{7} = \\frac{12}{56} \\qquad P(NG) = \\frac{6}{8} \\cdot \\frac{2}{7} = \\frac{12}{56}'}</MB>
+        <MB>{'P(GN) = \\frac{2}{8} \\cdot \\frac{6}{7} = \\frac{12}{56}'}</MB>
+        <MB>{'P(NG) = \\frac{6}{8} \\cdot \\frac{2}{7} = \\frac{12}{56}'}</MB>
         <MB>{'P(\\text{genau ein Gewinn}) = \\frac{12}{56} + \\frac{12}{56} = \\frac{24}{56} = \\frac{3}{7} \\approx 42{,}9\\,\\%'}</MB>
       </>
     ),
@@ -139,10 +163,10 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 
 export default function WundertueteEinstieg() {
   const navigate = useNavigate();
-  const [fest, setFest] = useState<Festlegung<Wahl>>({ wahl: null, wert: 4, fest: false });
-  const [zugGeloest, setZugGeloest] = useState(false);
-  const [geloest, setGeloest] = useState(false);
-  const [uebungen, setUebungen] = useState<string[]>([]);
+  const [fest, setFest] = useSitzungState<Festlegung<Wahl>>('wt-fest', { wahl: null, wert: 4, fest: false });
+  const [zugGeloest, setZugGeloest] = useSitzungState('wt-zug', false);
+  const [geloest, setGeloest] = useSitzungState('wt-geloest', false);
+  const [uebungen, setUebungen] = useSitzungState<string[]>('wt-uebungen', []);
 
   const seiten: Seite[] = [
     {
@@ -180,7 +204,14 @@ export default function WundertueteEinstieg() {
               { kind: 'num', key: 'c1', label: <M>{'\\frac{3}{5} \\cdot \\frac{2}{3} ='}</M>, expected: 0.4, tol: TOL },
               { kind: 'num', key: 'c2', label: <M>{'\\frac{1}{4} \\cdot \\frac{2}{9} ='}</M>, expected: 1 / 18, tol: TOL },
             ]}
-            solution={<MB>{'\\frac{3}{5} \\cdot \\frac{2}{3} = \\frac{6}{15} = \\frac{2}{5} = 0{,}4 \\qquad \\frac{1}{4} \\cdot \\frac{2}{9} = \\frac{2}{36} = \\frac{1}{18} \\approx 0{,}0556'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erstes Produkt', tex: '\\dfrac{3}{5} \\cdot \\dfrac{2}{3} = \\dfrac{6}{15} = \\dfrac{2}{5} = 0{,}4' },
+                  { titel: 'Zweites Produkt', tex: '\\dfrac{1}{4} \\cdot \\dfrac{2}{9} = \\dfrac{2}{36} = \\dfrac{1}{18} \\approx 0{,}0556' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -205,7 +236,14 @@ export default function WundertueteEinstieg() {
               { kind: 'num', key: 'd1', label: <M>{'\\frac{1}{6} + \\frac{1}{3} ='}</M>, expected: 0.5, tol: TOL },
               { kind: 'num', key: 'd2', label: <M>{'\\frac{2}{15} + \\frac{1}{5} ='}</M>, expected: 1 / 3, tol: TOL },
             ]}
-            solution={<MB>{'\\frac{1}{6} + \\frac{1}{3} = \\frac{1}{6} + \\frac{2}{6} = \\frac{3}{6} = \\frac{1}{2} \\qquad \\frac{2}{15} + \\frac{1}{5} = \\frac{2}{15} + \\frac{3}{15} = \\frac{5}{15} = \\frac{1}{3}'}</MB>}
+            solution={
+              <Loesungsweg
+                schritte={[
+                  { titel: 'Erste Summe', tex: '\\dfrac{1}{6} + \\dfrac{2}{6} = \\dfrac{3}{6} = \\dfrac{1}{2}' },
+                  { titel: 'Zweite Summe', tex: '\\dfrac{2}{15} + \\dfrac{3}{15} = \\dfrac{5}{15} = \\dfrac{1}{3}' },
+                ]}
+              />
+            }
             help={
               <Hilfen
                 steps={[
@@ -426,7 +464,14 @@ export default function WundertueteEinstieg() {
               />
             </Abschnitt>
             <Handlungsprodukt titel="Plakat „So gewinnst du bei der Wundertüte“">
-              <PlakatBild />
+              <figure className="sl-foto sl-foto-klein">
+                <img
+                  src={plakatBild}
+                  width={800}
+                  height={400}
+                  alt="Linolschnitt-Plakat So gewinnst du: ein Baumdiagramm mit H, T und N und je drei Ästen im 2. Zug, daneben Pfad: malnehmen, Pfade: addieren, P(HH) = …"
+                />
+              </figure>
               <p className="sl-text">
                 Gestalte in deinem Heft ein Plakat für den Losstand. Zeichne das Baumdiagramm der Wundertüte mit allen Pfaden, schreibe deine Rechnung für die drei Ereignisse
                 auf und erkläre, warum Jonas’ 4 % nicht stimmen.
@@ -437,25 +482,11 @@ export default function WundertueteEinstieg() {
                   <li>„Die Wahrscheinlichkeit eines Pfades berechne ich, indem ich …“</li>
                   <li>„Gehören mehrere Pfade zu einem Ereignis, dann …“</li>
                   <li>„Jonas hat 4 % gerechnet. Das stimmt nicht, weil …“</li>
-                  <li>
-                    „<M>{'P(E)'}</M> bedeutet …, ein Pfad ist …, ohne Zurücklegen heißt …“
-                  </li>
                 </ul>
               </Aufklappbar>
             </Handlungsprodukt>
             <Abschnitt titel="Ist dein Plakat vollständig?">
-              <Kriterien
-                onAlle={fertig.teil('produkt')}
-                items={[
-                  'Ein Baumdiagramm mit zwei Zügen, allen neun Pfaden und den Wahrscheinlichkeiten an jedem Ast (im 2. Zug mit 9 Losen im Nenner)',
-                  'Die Rechnung für die drei Ereignisse mit Produktregel (Pfad malnehmen) und Summenregel bzw. Gegenereignis (Pfade addieren), dazu die Kontrolle: Alle Pfade ergeben zusammen 1',
-                  'Eine Erklärung, warum Jonas mit 4 % falsch liegt und warum sich die Wahrscheinlichkeit im 2. Zug ändert',
-                  <>
-                    Auf dem Plakat steht, was die Begriffe und Abkürzungen bedeuten: <M>{'P(E)'}</M> (Wahrscheinlichkeit des Ereignisses <M>E</M>), <M>{'\\overline{E}'}</M> (Gegenereignis), Pfad, Pfadregeln (Produktregel und Summenregel),
-                    mit Zurücklegen und ohne Zurücklegen sowie alle anderen Wörter, die für dich neu waren.
-                  </>,
-                ]}
-              />
+              <Kriterien onAlle={fertig.teil('produkt')} items={standardKriterien('an die Besucher des Losstands')} />
             </Abschnitt>
             {geloest && (
               <Abschnitt titel="Das hältst du fest">
@@ -582,11 +613,16 @@ export default function WundertueteEinstieg() {
                 ]}
                 loesungNachFehler
                 solution={
-                  <>
-                    <MB>{'P(RG) + P(GR) = \\frac{3}{5} \\cdot \\frac{2}{4} + \\frac{2}{5} \\cdot \\frac{3}{4} = \\frac{6}{20} + \\frac{6}{20} = \\frac{12}{20} = 0{,}6'}</MB>
-                    <MB>{'P(\\text{mindestens eine rote}) = 1 - P(GG) = 1 - \\frac{2}{5} \\cdot \\frac{1}{4} = 1 - \\frac{2}{20} = 0{,}9'}</MB>
-                  </>
-                }
+                  <Loesungsweg
+                    schritte={[
+                      { titel: 'Zwei verschiedene Farben: zwei Pfade', tex: 'P(RG) + P(GR) = \\dfrac{3}{5} \\cdot \\dfrac{2}{4} + \\dfrac{2}{5} \\cdot \\dfrac{3}{4}' },
+                      { titel: 'Ausrechnen', tex: '\\dfrac{6}{20} + \\dfrac{6}{20} = \\dfrac{12}{20} = 0{,}6' },
+                      { titel: 'Zwei gelbe (Gegenereignis)', tex: 'P(GG) = \\dfrac{2}{5} \\cdot \\dfrac{1}{4} = \\dfrac{2}{20}' },
+                      { titel: 'Mindestens eine rote', tex: '1 - \\dfrac{2}{20} = 0{,}9' },
+                    ]}
+                  />
+
+              }
                 help={
                   <Hilfen
                     steps={[
@@ -618,12 +654,14 @@ export default function WundertueteEinstieg() {
                 ]}
                 loesungNachFehler
                 solution={
-                  <>
-                    <MB>{'P(HH) = \\frac{2}{10} \\cdot \\frac{2}{10} = 0{,}04 = 4\\,\\%'}</MB>
-                    <MB>{'\\frac{0{,}04}{2/90} = \\frac{0{,}04}{0{,}0222} = 1{,}8'}</MB>
-                    <p>Jonas’ 4 % wären also richtig gewesen, wenn die Lose zurückgelegt würden. Mit Zurücklegen ist es 1,8-mal so wahrscheinlich.</p>
-                  </>
-                }
+                  <Loesungsweg
+                    schritte={[
+                      { titel: 'Mit Zurücklegen bleibt die Tüte gleich', tex: 'P(HH) = \\dfrac{2}{10} \\cdot \\dfrac{2}{10} = 0{,}04 = 4\\,\\%' },
+                      { titel: 'Faktor gegenüber ohne Zurücklegen', tex: '0{,}04 : \\dfrac{2}{90} = 1{,}8', text: 'Jonas’ 4 % wären also richtig gewesen, wenn die Lose zurückgelegt würden.' },
+                    ]}
+                  />
+
+              }
                 help={
                   <Hilfen
                     steps={[
@@ -664,6 +702,7 @@ export default function WundertueteEinstieg() {
         ruhig
         punkte
         thema={THEMA}
+        bildwelt={BILDWELT}
         ziel={
           <>
             In dieser Lernsituation betreust du den Losstand beim Schulfest. Du lernst, mit einem Baumdiagramm Wahrscheinlichkeiten für zwei Züge hintereinander zu berechnen und die

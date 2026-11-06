@@ -1,0 +1,22 @@
+<!doctype html>
+<!-- Die Wundertüte, Titelbild. Bildwelt Siebdruck / Linolschnitt (Schwarz auf Papier, Schnittspuren): Losstand mit Wundertüte und zwei gezogenen Losen.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/baumdiagramme -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&display=swap" rel="stylesheet">
+<style>body{margin:0} text{font-family:'Bricolage Grotesque';font-variation-settings:'wdth' 75,'opsz' 96}</style>
+<script src="_siebdruck.js"></script></head><body><div id="bild"></div>
+<script>
+// Schnittspuren: helle Kerben in schwarzen Flächen (in Papierfarbe gezeichnet)
+const kerben = (x, y, w, h, n, seed) => { let r = seed, g = ''; const rnd = () => ((r = (r * 9301 + 49297) % 233280) / 233280); for (let i = 0; i < n; i++) { const xx = x + rnd() * w, yy = y + rnd() * h, l = 16 + rnd() * 40; g += `<path d="M${xx} ${yy} q${l / 2} ${-4 - rnd() * 6} ${l} 0" stroke="#f1efe9" stroke-width="${2 + rnd() * 3}" fill="none" stroke-linecap="round"/>`; } return g; };
+const schwarz = `<rect x="0" y="0" width="1200" height="600" fill="none" stroke-width="18"/>
+ <text x="70" y="140" font-size="110" font-weight="800" stroke="none">WUNDERTÜTE</text>
+ <text x="70" y="200" font-size="40" font-weight="700" stroke="none">2 Lose ziehen, ohne Zurücklegen</text>
+ <path d="M650 560 L700 250 Q760 210 850 220 Q940 210 1000 250 L1050 560 Z" stroke="none"/>
+ <path d="M690 250 Q720 170 770 200 M1010 250 Q980 170 930 200" fill="none" stroke-width="14"/>
+ ${kerben(690, 280, 330, 260, 34, 5)}
+ <text x="850" y="430" text-anchor="middle" font-size="110" font-weight="800" fill="#f1efe9" stroke="none">?</text>
+ ${[['H', 140, 300, -8], ['T', 300, 330, 6], ['N', 450, 300, -4]].map(([t, x, y, r]) => `<g transform="rotate(${r} ${x + 55} ${y + 80})"><rect x="${x}" y="${y}" width="110" height="160" rx="8" stroke="none"/><rect x="${x + 12}" y="${y + 12}" width="86" height="136" rx="4" fill="#f1efe9" stroke="none"/><text x="${x + 55}" y="${y + 112}" text-anchor="middle" font-size="84" font-weight="800" stroke="none">${t}</text></g>`).join('')}
+ <path d="M100 540 L600 540" stroke-width="10"/>
+ ${[[980, 60], [1080, 110], [1160, 40], [1130, 180]].map(([x, y]) => `<path d="M${x} ${y} l10 20 l22 3 l-16 15 l4 22 l-20 -10 l-20 10 l4 -22 l-16 -15 l22 -3 Z" stroke="none"/>`).join('')}`;
+SD.bild(1200, 600, [{ farbe: '#1a1a1a', svg: schwarz }], '#f1efe9');
+</script>
+</body></html>

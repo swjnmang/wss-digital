@@ -17,65 +17,6 @@ export const N_LOSE = 10;
 
 const losFarbe = (l: Los) => (l === 'H' ? 'var(--highlight)' : l === 'T' ? 'var(--primary-soft)' : 'var(--surface)');
 
-/* ── Titelbild ───────────────────────────────────────────────────────────── */
-
-/** Titelbild: Losstand beim Schulfest mit Girlande, Tisch und der Wundertüte voller Lose */
-export function Titelbild() {
-  return (
-    <svg
-      viewBox="0 0 720 252"
-      role="img"
-      aria-label="Ein Losstand beim Schulfest: Über dem Tisch hängt eine Girlande mit Wimpeln, auf dem Tisch steht die Wundertüte mit zehn Losen und ein Schild mit der Aufschrift Zwei Lose ziehen."
-    >
-      <rect x="0" y="206" width="720" height="46" fill="var(--surface-sunken)" />
-      <line x1="0" x2="720" y1="206" y2="206" stroke="var(--ink)" strokeWidth="2" />
-      {/* Girlande */}
-      <path d="M20 22 Q360 90 700 22" fill="none" stroke="var(--ink)" strokeWidth="2" />
-      {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => {
-        const t = (i + 0.5) / 11;
-        const x = 20 + t * 680;
-        const y = 22 + 4 * t * (1 - t) * 34;
-        return (
-          <polygon
-            key={i}
-            points={`${x - 16},${y + 1} ${x + 16},${y + 1} ${x},${y + 36}`}
-            fill={i % 2 ? 'var(--primary)' : 'var(--highlight)'}
-            stroke="var(--ink)"
-            strokeWidth="1.5"
-          />
-        );
-      })}
-      {/* Tisch */}
-      <rect x="90" y="160" width="540" height="22" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="110" y="182" width="16" height="24" fill="var(--ink)" />
-      <rect x="594" y="182" width="16" height="24" fill="var(--ink)" />
-      {/* Wundertüte */}
-      <path d="M300 160 L284 92 L316 108 L340 84 L364 108 L388 84 L412 108 L436 92 L420 160 Z" fill="var(--primary)" stroke="var(--ink)" strokeWidth="2" />
-      <rect x="290" y="112" width="140" height="14" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-      <text x="360" y="148" textAnchor="middle" fontSize="18" fontWeight="800" fill="#fff">
-        Wundertüte
-      </text>
-      {/* Lose auf dem Tisch */}
-      {[0, 1, 2, 3].map((i) => (
-        <g key={i} transform={`translate(${110 + i * 58}, ${146 - (i % 2) * 6}) rotate(${i % 2 ? 8 : -6})`}>
-          <rect width="46" height="30" rx="3" fill={i === 1 ? 'var(--highlight)' : 'var(--surface)'} stroke="var(--ink)" strokeWidth="1.5" />
-          <text x="23" y="22" textAnchor="middle" fontSize="17" fontWeight="800" fill="var(--ink)">
-            {i === 1 ? 'H' : 'N'}
-          </text>
-        </g>
-      ))}
-      {/* Schild */}
-      <rect x="480" y="106" width="130" height="50" rx="6" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-      <text x="545" y="128" textAnchor="middle" fontSize="16" fontWeight="800" fill="var(--ink)">
-        Zwei Lose
-      </text>
-      <text x="545" y="148" textAnchor="middle" fontSize="16" fontWeight="800" fill="var(--ink)">
-        ziehen!
-      </text>
-    </svg>
-  );
-}
-
 /* ── Die Wundertüte (Leitobjekt) ─────────────────────────────────────────── */
 
 const SLOT_W = 62;
@@ -342,49 +283,6 @@ export function Ziehen({ onFertig, ziel = 30 }: { onFertig: () => void; ziel?: n
       ) : (
         <p className="sl-hinweis">Ziehe mindestens {ziel} Doppelzüge. Jedes gezogene Los bleibt draußen, bis die Tüte wieder gefüllt wird.</p>
       )}
-    </div>
-  );
-}
-
-/** Kleines Bild für das Handlungsprodukt: das Plakat mit dem Baum */
-export function PlakatBild(): ReactNode {
-  return (
-    <div className="zk-bild zk-bild-klein">
-      <svg
-        viewBox="0 0 720 190"
-        role="img"
-        aria-label="Ein Plakat mit der Überschrift: So gewinnst du bei der Wundertüte. Darauf ein kleines Baumdiagramm mit zwei Zügen, eine Rechnung und der Kasten Pfadregeln."
-      >
-        <rect x="110" y="6" width="500" height="178" rx="8" fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="360" y="34" textAnchor="middle" fontSize="19" fontWeight="800" fill="var(--ink)">
-          So gewinnst du bei der Wundertüte
-        </text>
-        <g stroke="var(--ink)" strokeWidth="2" fill="none">
-          <line x1="140" y1="104" x2="200" y2="72" />
-          <line x1="140" y1="104" x2="200" y2="136" />
-          <line x1="200" y1="72" x2="260" y2="56" />
-          <line x1="200" y1="72" x2="260" y2="88" />
-          <line x1="200" y1="136" x2="260" y2="120" />
-          <line x1="200" y1="136" x2="260" y2="152" />
-        </g>
-        <circle cx="140" cy="104" r="5" fill="var(--ink)" />
-        {[56, 88, 120, 152].map((y) => (
-          <circle key={y} cx="266" cy={y} r="6" fill="var(--highlight)" stroke="var(--ink)" strokeWidth="1.5" />
-        ))}
-        <rect x="320" y="50" width="270" height="52" rx="4" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2" />
-        <text x="332" y="73" fontSize="16" fill="var(--ink)">
-          Produktregel: malnehmen
-        </text>
-        <text x="332" y="94" fontSize="16" fill="var(--ink)">
-          Summenregel: addieren
-        </text>
-        <text x="320" y="132" fontSize="16" fontStyle="italic" fill="var(--ink)">
-          Unsere Rechnung: …
-        </text>
-        <text x="320" y="158" fontSize="16" fontStyle="italic" fill="var(--ink)">
-          Das bedeuten die Begriffe: …
-        </text>
-      </svg>
     </div>
   );
 }
