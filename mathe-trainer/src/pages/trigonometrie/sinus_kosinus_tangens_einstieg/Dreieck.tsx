@@ -101,8 +101,9 @@ export default function Dreieck({
       <line x1={A[0]} y1={A[1]} x2={B[0]} y2={B[1]} stroke={farbe('boden')} strokeWidth={rollen ? 6 : 3} strokeLinecap="round" />
       <line x1={B[0]} y1={B[1]} x2={C[0]} y2={C[1]} stroke={farbe('ruecken')} strokeWidth={rollen ? 6 : 3} strokeLinecap="round" />
       <line x1={C[0]} y1={C[1]} x2={A[0]} y2={A[1]} stroke={farbe('schraeg')} strokeWidth={rollen ? 6 : 3} strokeLinecap="round" />
-      <path d={`M${B[0] - 18} ${B[1]} V${B[1] - 18} H${B[0]}`} fill="none" stroke="var(--ink)" strokeWidth="1.6" />
-      <circle cx={B[0] - 9} cy={B[1] - 9} r="2.4" fill="var(--ink)" />
+      {/* rechter Winkel: Viertelkreis mit Punkt */}
+      <path d={`M${B[0] - 20} ${B[1]} A20 20 0 0 1 ${B[0]} ${B[1] - 20}`} fill="none" stroke="var(--ink)" strokeWidth="1.8" />
+      <circle cx={B[0] - 7.5} cy={B[1] - 7.5} r="2.6" fill="var(--ink)" />
       <text x={(A[0] + B[0]) / 2} y={A[1] + 30} textAnchor="middle" fontSize="20" fontWeight="700" fill={farbe('boden')}>
         {labels.boden}
       </text>

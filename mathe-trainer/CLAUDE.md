@@ -135,6 +135,8 @@ Regler und Erkunden brauchen keinen Rechenweg. Keine zusätzlichen Sätze „Hal
 In der Seitenansicht (`SeitenLernsituation`) bestätigen die SuS das Aufschreiben einmal in der Startbox; dort zeigen die Aufgaben
 keinen Heft-Hinweis mehr (automatisch über `HeftBestaetigtCtx` in `kit.tsx`).
 
+Rechte Winkel (seit 2026-11-07): in Lernsituationen immer als Viertelkreis mit Punkt markieren, nie als Quadrat (Skizzen, Graphen, gerenderte Bilder).
+
 Einheiten (seit 2026-11-07): In Sachaufgaben der Lernsituationen wählen die SuS die Einheit selbst aus einer Auswahlliste mit 2–3 Distraktoren. Dafür genügt `unit` am Zahlenfeld der `CheckCard` (auch bei Lücken in `rechnung`); Distraktoren in `EINHEIT_DISTRAKTOREN` (`lernsituation_kit/kit.tsx`). Keine Einheit im Feldnamen („in Euro“) oder als TeX hinter der Lücke. Rein algebraische Aufgaben ohne Einheit.
 
 Taschenrechner (seit 2026-11-07): Die SuS haben in Lernsituationen im Normalfall immer einen Taschenrechner griffbereit. Keine reinen

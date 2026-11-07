@@ -29,7 +29,7 @@ window.SEITE = ({ loecher = false, schild = false } = {}) => {
   g += `<path d="M${A[0]} ${A[1]} L${A[0] + r} ${A[1]} A${r} ${r} 0 0 0 ${A[0] + r * Math.cos(a)} ${A[1] - r * Math.sin(a)} Z" fill="#f6c445" fill-opacity=".85" stroke="#22313d" stroke-width="2.5"/>`;
   g += lab(A[0] + r + 16, A[1] - 16, 'α = ?', '#22313d', 32, 'start');
   g += lab((A[0] + T[0]) / 2 - 30, (A[1] + T[1]) / 2 - 34, 'Modul 1,72 m', '#0e6670', 34);
-  g += `<path d="M${T[0] - 22} ${A[1]} v-22 h22" fill="none" stroke="#22313d" stroke-width="2.5"/>`;
+  g += `<path d="M${T[0] - 36} ${A[1]} A28 28 0 0 1 ${T[0] - 8} ${A[1] - 28}" fill="none" stroke="#22313d" stroke-width="2.5"/><circle cx="${T[0] - 19}" cy="${A[1] - 11}" r="4" fill="#22313d"/>`;
   if (loecher) {
     [0.8, 0.95].forEach((h) => { const y = A[1] - h * m; g += `<circle cx="${T[0]}" cy="${y}" r="7" fill="#fff" stroke="#22313d" stroke-width="2.5"/>` + `<line x1="${T[0] + 14}" y1="${y}" x2="${T[0] + 48}" y2="${y}" stroke="#22313d" stroke-width="2"/>` + lab(T[0] + 56, y + 10, h.toFixed(2).replace('.', ',') + ' m', '#22313d', 30, 'start'); });
     g += lab(T[0] + 56, A[1] - 0.4 * m, 'Lochraster', '#5b6670', 26, 'start');

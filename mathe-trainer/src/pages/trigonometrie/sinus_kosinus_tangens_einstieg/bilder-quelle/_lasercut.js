@@ -48,9 +48,9 @@ window.LC = {
     return `<path d="M${cx} ${cy} L${ax} ${ay} A${r} ${r} 0 0 0 ${bx} ${by} Z" fill="${farbe}" fill-opacity=".22" stroke="${farbe}" stroke-width="2.5"/>` +
       `<text x="${lx}" y="${ly + 10}" text-anchor="middle" font-family="Barlow Condensed" font-weight="700" font-size="30" fill="${farbe}">${label}</text>`;
   },
-  /** Rechter Winkel als kleines Quadrat mit Punkt; Ecke (x, y), Richtungen ux/uy der beiden Schenkel */
-  rechter: (x, y, sx, sy, s = 26, farbe = '#3b230e') =>
-    `<path d="M${x + sx * s} ${y} L${x + sx * s} ${y + sy * s} L${x} ${y + sy * s}" fill="none" stroke="${farbe}" stroke-width="2"/><circle cx="${x + sx * s * 0.5}" cy="${y + sy * s * 0.5}" r="3" fill="${farbe}"/>`,
+  /** Rechter Winkel als Viertelkreis mit Punkt (nie als Quadrat); Ecke (x, y), Richtungen sx/sy der beiden Schenkel */
+  rechter: (x, y, sx, sy, s = 28, farbe = '#3b230e') =>
+    `<path d="M${x + sx * s} ${y} A${s} ${s} 0 0 ${sx * sy > 0 ? 1 : 0} ${x} ${y + sy * s}" fill="none" stroke="${farbe}" stroke-width="2.2"/><circle cx="${x + sx * s * 0.38}" cy="${y + sy * s * 0.38}" r="3.2" fill="${farbe}"/>`,
   /** Schriftfeld wie auf einer technischen Zeichnung, aber eingraviert */
   feld: (x, y, w, titel, zeilen) => {
     const zh = 40, h = 48 + zeilen.length * zh, T = '#3b230e';
