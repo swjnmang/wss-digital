@@ -26,8 +26,8 @@ const BEISPIELE: Record<string, Beispiel> = {
     untertitel: 'Die Nullstelle ist der Punkt, an dem die Gerade die x-Achse schneidet. Dort gilt y = 0.',
     karten: [
       { art: 'lernsituation', kicker: 'Lernsituation', titel: 'Der Stromspeicher', icon: 'fa-battery-half', farbe: 'indigo', text: 'Finde heraus, wann der Stromspeicher einer Solaranlage in der Nacht leer ist, und lerne dabei, wie man die Nullstelle berechnet.' },
-      { art: 'uebung', kicker: 'Stufe 1 · Einfach', titel: 'Einfach', formel: 'y = 2x − 6', icon: UEBUNG_ICON, text: 'Ganzzahlige Steigungen – die Nullstelle ist immer eine ganze Zahl.' },
-      { art: 'uebung', kicker: 'Stufe 2 · Fortgeschritten', titel: 'Fortgeschritten', formel: 'y = 3 − 2,5x', icon: UEBUNG_ICON, text: 'Dezimalzahlen, wechselnde Schreibweise – die Nullstelle ist keine ganze Zahl.' },
+      { art: 'uebung', kicker: 'Stufe 1', titel: 'Einfach', formel: 'y = 2x − 6', icon: UEBUNG_ICON, text: 'Ganzzahlige Steigungen – die Nullstelle ist immer eine ganze Zahl.' },
+      { art: 'uebung', kicker: 'Stufe 2', titel: 'Fortgeschritten', formel: 'y = 3 − 2,5x', icon: UEBUNG_ICON, text: 'Dezimalzahlen, wechselnde Schreibweise – die Nullstelle ist keine ganze Zahl.' },
     ],
   },
   ratendarlehen: {
@@ -51,11 +51,14 @@ const BEISPIELE: Record<string, Beispiel> = {
   },
 }
 
-type Variante = 'v1' | 'v2' | 'v3'
+type Variante = 'v1' | 'v2' | 'v3' | 'v4' | 'v5' | 'v6'
 const VARIANTEN: { id: Variante; name: string; info: string }[] = [
   { id: 'v1', name: 'Variante 1 · Ruhig', info: 'Alle Kästen weiß und gleich gebaut. Farbe nur als Kante oben und im Symbol: Lernsituationen in ihrer Themenfarbe, Übungsaufgaben immer in Füller-Blau.' },
   { id: 'v2', name: 'Variante 2 · Farbflächen', info: 'Lernsituationen als Farbfläche in ihrer Themenfarbe, alle Übungsaufgaben einheitlich in Schiefergrau (kein Grün/Rot mehr). Kräftig, aber nur zwei Farbrollen.' },
   { id: 'v3', name: 'Variante 3 · Liste', info: 'Gleich hohe Zeilen wie im Inhaltsverzeichnis, links ein Symbolfeld (Lernsituation farbig gefüllt, Übung hellblau). Am kompaktesten, viel Platz für viele Übungen.' },
+  { id: 'v4', name: 'Variante 4 · Kleine Kacheln', info: 'Kleine weiße Kacheln, vier nebeneinander. Symbol und Titel in einer Zeile, Farbe nur als schmale Kante links (Lernsituation in Themenfarbe, Übung in Füller-Blau). Kein „Starten“-Text, die ganze Kachel ist der Knopf.' },
+  { id: 'v5', name: 'Variante 5 · Schmale Zeilen', info: 'Sehr flache Zeilen, drei nebeneinander: kleines farbiges Symbol, Titel und eine Zeile Beschreibung. Am platzsparendsten, alles auf einen Blick.' },
+  { id: 'v6', name: 'Variante 6 · Kleine Farbkacheln', info: 'Kleine Kacheln, vier nebeneinander: Lernsituationen in ihrer Themenfarbe gefüllt, Übungen hellblau mit blauer Schrift. Farbig, aber kompakt und ruhig.' },
 ]
 
 function KarteView({ k, variante, onClick }: { k: Karte; variante: Variante; onClick: () => void }) {
@@ -72,7 +75,7 @@ function KarteView({ k, variante, onClick }: { k: Karte; variante: Variante; onC
   )
   return (
     <button type="button" className={`ts-card ts-${k.art}`} style={style} onClick={onClick}>
-      {variante === 'v3' ? (
+      {variante === 'v3' || variante === 'v5' ? (
         <>
           <span className="ts-icon" aria-hidden="true"><i className={`fa-solid ${k.icon}`} /></span>
           <span className="ts-body">
@@ -81,6 +84,20 @@ function KarteView({ k, variante, onClick }: { k: Karte; variante: Variante; onC
             {inhalt}
           </span>
           <i className="fa-solid fa-chevron-right ts-chev" aria-hidden="true" />
+        </>
+      ) : variante === 'v4' || variante === 'v6' ? (
+        <>
+          <span className="ts-top">
+            <span className="ts-icon" aria-hidden="true"><i className={`fa-solid ${k.icon}`} /></span>
+            <span className="ts-tt">
+              <span className="ts-kicker">{k.kicker}</span>
+              <span className="ts-title">{k.titel}</span>
+            </span>
+          </span>
+          <p className="ts-desc">
+            {k.formel && <span className="ts-formel-inline">{k.formel}</span>}
+            {k.text}
+          </p>
         </>
       ) : (
         <>
