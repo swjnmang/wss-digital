@@ -135,6 +135,10 @@ Regler und Erkunden brauchen keinen Rechenweg. Keine zusätzlichen Sätze „Hal
 In der Seitenansicht (`SeitenLernsituation`) bestätigen die SuS das Aufschreiben einmal in der Startbox; dort zeigen die Aufgaben
 keinen Heft-Hinweis mehr (automatisch über `HeftBestaetigtCtx` in `kit.tsx`).
 
+Taschenrechner (seit 2026-11-07): Die SuS haben in Lernsituationen im Normalfall immer einen Taschenrechner griffbereit. Keine reinen
+Eintipp-Aufgaben („Berechne 3 % von 4 800 €“); Aufgaben verlangen auch mit Taschenrechner Denkarbeit: Ansatz finden, Größen zuordnen,
+umstellen, Ergebnis deuten, Plausibilität prüfen, begründen. Rechnen ohne Taschenrechner nur, wenn es ausdrücklich in der Aufgabe steht. Details im Skill.
+
 Logarithmus (seit 2026-11-06): Hochzahlen wie die Laufzeit n berechnen die SuS mit der log-Taste, bei der sie die Basis direkt eingeben:
 `n = \log_{q} \frac{K_n}{K_0}` (z. B. `n = \log_{1{,}03} 2`), nicht über `\frac{\lg 2}{\lg 1{,}03}`.
 
