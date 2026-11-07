@@ -6,7 +6,7 @@ import { useBackHandler } from '../../hooks/useBackHandler'
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import LaserEinstieg from './schnittpunkt_einstieg/LaserEinstieg'
-import { LernsituationKarte } from './lernsituation_kit/seiten'
+import { ThemaStart } from './lernsituation_kit/themastart'
 
 const TOTAL_TASKS = 6
 
@@ -827,43 +827,28 @@ export default function Schnittpunkt() {
 
   if (!level) {
     return (
-      <TaskShell title="Schnittpunkt zweier Geraden" width="narrow">
+      <TaskShell title="Schnittpunkt zweier Geraden" width="wide">
         <div className="flex flex-col gap-6">
           {header}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className={`${panel} flex flex-col`}>
-              <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-              <LernsituationKarte
-                className="flex-1"
-                thema={{ name: 'Die Lasershow', farbe: 'indigo', icon: 'fa-compact-disc' }}
-                beschreibung="Neu beim Thema? Hänge die Spiegelkugel für die Abschlussparty genau dorthin, wo sich zwei Laserstrahlen kreuzen, und lerne dabei, wie man den Schnittpunkt berechnet."
-                onClick={() => setLernsituation(true)}
-              />
-            </div>
-            <div className={`${panel} sm:col-span-2 flex flex-col`}>
-              <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
-              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button
-                  onClick={() => chooseLevel('einfach')}
-                  className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-                >
-                  <p className="text-lg font-bold mb-1 text-white">Einfach</p>
-                  <p className="text-xl font-serif italic mb-2 text-white">y = 2x − 1</p>
-                  <p className="text-sm text-white/90">Ganze Zahlen in den Gleichungen. Es gibt immer genau einen Schnittpunkt.</p>
-                </button>
-                <button
-                  onClick={() => chooseLevel('fortgeschritten')}
-                  className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-                >
-                  <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
-                  <p className="text-xl font-serif italic mb-2 text-white">
-                    y = <Frac num={1} den={2} />x + 3
-                  </p>
-                  <p className="text-sm text-white/90">Brüche in den Gleichungen – und manchmal gibt es keinen Schnittpunkt, weil die Geraden parallel sind.</p>
-                </button>
-              </div>
-            </div>
-          </div>
+          <ThemaStart
+            lernsituationen={[
+              {
+                thema: { name: 'Die Lasershow', farbe: 'indigo', icon: 'fa-compact-disc' },
+                beschreibung: 'Hänge die Spiegelkugel für die Abschlussparty genau dorthin, wo sich zwei Laserstrahlen kreuzen, und lerne dabei, wie man den Schnittpunkt berechnet.',
+                onClick: () => setLernsituation(true),
+              },
+            ]}
+            uebungen={[
+              { kicker: 'Stufe 1', titel: 'Einfach', formel: 'y = 2x − 1', beschreibung: 'Ganze Zahlen in den Gleichungen. Es gibt immer genau einen Schnittpunkt.', onClick: () => chooseLevel('einfach') },
+              {
+                kicker: 'Stufe 2',
+                titel: 'Fortgeschritten',
+                formel: <>y = <Frac num={1} den={2} />x + 3</>,
+                beschreibung: 'Brüche in den Gleichungen – und manchmal gibt es keinen Schnittpunkt, weil die Geraden parallel sind.',
+                onClick: () => chooseLevel('fortgeschritten'),
+              },
+            ]}
+          />
         </div>
       </TaskShell>
     )

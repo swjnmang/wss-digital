@@ -45,7 +45,7 @@ import {
 } from './quadratischShared'
 import TaskShell from '../../components/layout/TaskShell'
 import { useBackHandler } from '../../hooks/useBackHandler'
-import { LernsituationKarte } from '../lineare_funktionen/lernsituation_kit/seiten'
+import { ThemaStart } from '../lineare_funktionen/lernsituation_kit/themastart'
 import FolientunnelEinstieg from './nullstellen_einstieg/FolientunnelEinstieg'
 
 // Sechs Aufgaben gleichzeitig auf der Seite
@@ -1360,48 +1360,20 @@ export default function Nullstellen() {
       <TaskShell title="Nullstellen berechnen" width="wide">
         <div className="flex flex-col gap-6">
           {header}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          <div className={`${panel} flex flex-col`}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-            <LernsituationKarte
-              className="flex-1"
-              thema={{ name: 'Der Folientunnel', farbe: 'beere', icon: 'fa-leaf' }}
-              beschreibung="Neu beim Thema? Prüfe für eine Gärtnerei, ob ein Beetplan in einen Folientunnel passt, und lerne dabei, Nullstellen mit der Mitternachtsformel zu berechnen."
-              onClick={() => setLernsituation(true)}
-            />
-          </div>
-          <div className={`${panel} lg:col-span-3 flex flex-col`}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <button
-                onClick={() => chooseLevel('einfach')}
-                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Einfach</p>
-                <Tex display className="text-lg mb-2 text-white" tex="y = ax^2 + bx + c" />
-                <p className="text-sm text-white/90">Ganzzahlige Koeffizienten ohne Brüche, die Nullstellen sind ganze Zahlen.</p>
-              </button>
-              <button
-                onClick={() => chooseLevel('diskriminante')}
-                className="rounded-2xl bg-amber-500 hover:bg-amber-600 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Mittel</p>
-                <p className="font-semibold text-white mb-1">Anzahl der Nullstellen mit der Diskriminante bestimmen</p>
-                <Tex display className="text-lg mb-2 text-white" tex="D = b^2 - 4ac" />
-                <p className="text-sm text-white/90">Berechne die Diskriminante und gib an, wie viele Nullstellen der Funktionsgraph hat.</p>
-              </button>
-              <button
-                onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
-                <Tex display className="text-lg mb-1 text-white" tex="y = ax^2 + bx + c" />
-                <Tex display className="text-lg mb-2 text-white" tex="y = a(x - x_S)^2 + y_S" />
-                <p className="text-sm text-white/90">Koeffizienten mit Brüchen und Funktionen in Scheitelform, Ergebnisse teils gerundet.</p>
-              </button>
-            </div>
-          </div>
-          </div>
+          <ThemaStart
+            lernsituationen={[
+              {
+                thema: { name: 'Der Folientunnel', farbe: 'beere', icon: 'fa-leaf' },
+                beschreibung: 'Prüfe für eine Gärtnerei, ob ein Beetplan in einen Folientunnel passt, und lerne dabei, Nullstellen mit der Mitternachtsformel zu berechnen.',
+                onClick: () => setLernsituation(true),
+              },
+            ]}
+            uebungen={[
+              { kicker: 'Stufe 1', titel: 'Einfach', formel: <Tex tex="y = ax^2 + bx + c" />, beschreibung: 'Ganzzahlige Koeffizienten ohne Brüche, die Nullstellen sind ganze Zahlen.', onClick: () => chooseLevel('einfach') },
+              { kicker: 'Stufe 2', titel: 'Mittel: Diskriminante', formel: <Tex tex="D = b^2 - 4ac" />, beschreibung: 'Berechne die Diskriminante und gib an, wie viele Nullstellen der Funktionsgraph hat.', onClick: () => chooseLevel('diskriminante') },
+              { kicker: 'Stufe 3', titel: 'Fortgeschritten', formel: <Tex tex="y = a(x - x_S)^2 + y_S" />, beschreibung: 'Koeffizienten mit Brüchen und Funktionen in Scheitelform, Ergebnisse teils gerundet.', onClick: () => chooseLevel('fortgeschritten') },
+            ]}
+          />
         </div>
       </TaskShell>
     )

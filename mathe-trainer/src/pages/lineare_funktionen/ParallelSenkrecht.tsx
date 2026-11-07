@@ -7,7 +7,7 @@ import { fieldCheckClass } from '../../utils/fieldCheck'
 import GleichungEingabe from '../../components/GleichungEingabe'
 import { checkLinearEquation } from '../../utils/parseLinearEquation'
 import { useBackHandler } from '../../hooks/useBackHandler'
-import { LernsituationKarte } from './lernsituation_kit/seiten'
+import { ThemaStart } from './lernsituation_kit/themastart'
 import RadwegEinstieg from './parallel_senkrecht_einstieg/RadwegEinstieg'
 
 // ===== MathDisplay Komponente =====
@@ -192,34 +192,26 @@ export default function ParallelSenkrecht() {
   if (ansicht === 'ueben') return <ParallelSenkrechtUeben />
 
   return (
-    <TaskShell title="Parallele und senkrechte Geraden" width="narrow">
+    <TaskShell title="Parallele und senkrechte Geraden" width="wide">
       <div className="flex flex-col gap-6">
-        <p className="text-center text-slate-600">Parallele und senkrechte Geraden an ihrer Steigung erkennen und ihre Gleichungen aufstellen.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bk-panel text-center flex flex-col">
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-            <LernsituationKarte
-              className="flex-1"
-              thema={{ name: 'Der neue Radweg', farbe: 'blau', icon: 'fa-bicycle' }}
-              beschreibung="Neu beim Thema? Plane im Bauamt einen Radweg parallel zur Bahnlinie und eine Brücke senkrecht über die Gleise und entdecke dabei, was das Steigungsdreieck verrät."
-              onClick={() => setAnsicht('lernsituation')}
-            />
-          </div>
-          <div className="bk-panel text-center flex flex-col">
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
-            <button
-              type="button"
-              onClick={() => zeige('ueben')}
-              className="flex-1 rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-            >
-              <p className="text-lg font-bold mb-1 text-white">Gemischte Aufgaben</p>
-              <p className="text-xl mb-2 text-white">
-                <i className="fa-solid fa-lines-leaning" aria-hidden="true" />
-              </p>
-              <p className="text-sm text-white/90">Parallel oder senkrecht prüfen, Gerade durch einen Punkt aufstellen und Geraden zuordnen.</p>
-            </button>
-          </div>
-        </div>
+        <p className="text-slate-600">Parallele und senkrechte Geraden an ihrer Steigung erkennen und ihre Gleichungen aufstellen.</p>
+        <ThemaStart
+          lernsituationen={[
+            {
+              thema: { name: 'Der neue Radweg', farbe: 'blau', icon: 'fa-bicycle' },
+              beschreibung: 'Plane im Bauamt einen Radweg parallel zur Bahnlinie und eine Brücke senkrecht über die Gleise und entdecke dabei, was das Steigungsdreieck verrät.',
+              onClick: () => setAnsicht('lernsituation'),
+            },
+          ]}
+          uebungen={[
+            {
+              titel: 'Gemischte Aufgaben',
+              icon: 'fa-lines-leaning',
+              beschreibung: 'Parallel oder senkrecht prüfen, Gerade durch einen Punkt aufstellen und Geraden zuordnen.',
+              onClick: () => zeige('ueben'),
+            },
+          ]}
+        />
       </div>
     </TaskShell>
   )

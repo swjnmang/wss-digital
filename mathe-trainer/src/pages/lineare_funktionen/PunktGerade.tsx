@@ -7,7 +7,7 @@ import { useTaskTracking } from '../../hooks/useTaskTracking';
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import DrohneEinstieg from './punkt_gerade_einstieg/DrohneEinstieg'
-import { LernsituationKarte } from './lernsituation_kit/seiten'
+import { ThemaStart } from './lernsituation_kit/themastart'
 import { useBackHandler } from '../../hooks/useBackHandler';
 
 // Sechs Aufgaben auf einer Seite (je zwei pro Aufgabentyp)
@@ -877,36 +877,25 @@ export default function PunktGerade() {
 
   if (!level) {
     return (
-      <TaskShell title="Punkt auf Gerade prüfen" width="narrow">
+      <TaskShell title="Punkt auf Gerade prüfen" width="wide">
         <div className="flex flex-col gap-6">
           {header}
-          <div className={`${panel} flex flex-col`}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-            <LernsituationKarte
-              thema={{ name: 'Der Drohnen-Parcours', farbe: 'ocker', icon: 'fa-plane-up' }}
-              beschreibung="Neu beim Thema? Finde heraus, welche Leuchtringe die Drohne bei der Lichtshow trifft, knacke den Code fürs Hangar-Tor und lerne dabei die Punktprobe."
-              onClick={() => {
-                setLernsituation(true);
-                window.scrollTo({ top: 0 });
-              }}
-            />
-          </div>
-          <div className={`${panel} text-center`}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
-            <div className="flex flex-col gap-4">
-              {LEVELS.map((l) => (
-                <button
-                  key={l.level}
-                  onClick={() => chooseLevel(l.level)}
-                  className={`rounded-xl ${l.color} text-white p-5 shadow-sm transition-colors`}
-                >
-                  <p className="text-lg font-bold mb-1 text-white">{LEVEL_LABEL[l.level]}</p>
-                  <p className="text-xl font-serif italic mb-2 text-white">{l.example}</p>
-                  <p className="text-sm text-white/90">{l.desc}</p>
-                </button>
-              ))}
-            </div>
-          </div>
+          <ThemaStart
+            lernsituationen={[
+              {
+                thema: { name: 'Der Drohnen-Parcours', farbe: 'ocker', icon: 'fa-plane-up' },
+                beschreibung: 'Finde heraus, welche Leuchtringe die Drohne bei der Lichtshow trifft, knacke den Code fürs Hangar-Tor und lerne dabei die Punktprobe.',
+                onClick: () => setLernsituation(true),
+              },
+            ]}
+            uebungen={LEVELS.map((l, i) => ({
+              kicker: `Stufe ${i + 1}`,
+              titel: LEVEL_LABEL[l.level],
+              formel: l.example,
+              beschreibung: l.desc,
+              onClick: () => chooseLevel(l.level),
+            }))}
+          />
         </div>
       </TaskShell>
     );

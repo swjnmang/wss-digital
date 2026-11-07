@@ -11,7 +11,7 @@ import TaskShell from '../../components/layout/TaskShell'
 import { InlineMath } from 'react-katex'
 import 'katex/dist/katex.min.css'
 import { useBackHandler } from '../../hooks/useBackHandler'
-import { LernsituationKarte } from './lernsituation_kit/seiten'
+import { ThemaStart } from './lernsituation_kit/themastart'
 import ScooterEinstieg from './funktionsgleichung_einstieg/ScooterEinstieg'
 
 declare global {
@@ -213,43 +213,22 @@ export default function Funktionsgleichung(){
 
   if (ansicht === 'auswahl') {
     return (
-      <TaskShell title="Funktionsgleichung aufstellen" width="narrow">
+      <TaskShell title="Funktionsgleichung aufstellen" width="wide">
         <div className="flex flex-col gap-6">
-          <p className="text-center text-slate-600">Aus zwei Punkten oder einem Graphen die Gleichung y = mx + t einer Geraden aufstellen.</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bk-panel text-center flex flex-col">
-              <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-              <LernsituationKarte
-                className="flex-1"
-                thema={{ name: 'Die Scooter-App', farbe: 'petrol', icon: 'fa-mobile-screen-button' }}
-                beschreibung="Neu beim Thema? Knacke den Tarif deiner E-Scooter-App aus zwei Fahrten und lerne dabei, wie man die Funktionsgleichung aus zwei Punkten aufstellt."
-                onClick={() => setAnsicht('lernsituation')}
-              />
-            </div>
-            <div className="bk-panel text-center sm:col-span-2 flex flex-col">
-              <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
-              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => ueben('twoPoints')}
-                  className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-                >
-                  <p className="text-lg font-bold mb-1 text-white">Aus zwei Punkten</p>
-                  <p className="text-xl font-serif italic mb-2 text-white">P₁(1|2), P₂(4|5)</p>
-                  <p className="text-sm text-white/90">Zwei Punkte sind gegeben. Du tippst die ganze Gleichung ein.</p>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => ueben('readGraph')}
-                  className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-                >
-                  <p className="text-lg font-bold mb-1 text-white">Graph ablesen</p>
-                  <p className="text-xl font-serif italic mb-2 text-white">y = ?</p>
-                  <p className="text-sm text-white/90">Klicke zwei Punkte auf dem Graphen an und bestimme rechnerisch die Gleichung.</p>
-                </button>
-              </div>
-            </div>
-          </div>
+          <p className="text-slate-600">Aus zwei Punkten oder einem Graphen die Gleichung y = mx + t einer Geraden aufstellen.</p>
+          <ThemaStart
+            lernsituationen={[
+              {
+                thema: { name: 'Die Scooter-App', farbe: 'petrol', icon: 'fa-mobile-screen-button' },
+                beschreibung: 'Knacke den Tarif deiner E-Scooter-App aus zwei Fahrten und lerne dabei, wie man die Funktionsgleichung aus zwei Punkten aufstellt.',
+                onClick: () => setAnsicht('lernsituation'),
+              },
+            ]}
+            uebungen={[
+              { kicker: 'Stufe 1', titel: 'Aus zwei Punkten', formel: 'P₁(1|2), P₂(4|5)', beschreibung: 'Zwei Punkte sind gegeben. Du tippst die ganze Gleichung ein.', onClick: () => ueben('twoPoints') },
+              { kicker: 'Stufe 2', titel: 'Graph ablesen', formel: 'y = ?', icon: 'fa-chart-line', beschreibung: 'Klicke zwei Punkte auf dem Graphen an und bestimme rechnerisch die Gleichung.', onClick: () => ueben('readGraph') },
+            ]}
+          />
         </div>
       </TaskShell>
     )

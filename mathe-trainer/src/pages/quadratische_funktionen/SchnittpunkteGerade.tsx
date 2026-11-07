@@ -44,7 +44,7 @@ import {
 } from './quadratischShared'
 import TaskShell from '../../components/layout/TaskShell'
 import SkateEinstieg from './schnittpunkte_einstieg/SkateEinstieg'
-import { LernsituationKarte } from '../lineare_funktionen/lernsituation_kit/seiten'
+import { ThemaStart } from '../lineare_funktionen/lernsituation_kit/themastart'
 import { useBackHandler } from '../../hooks/useBackHandler'
 
 // Sechs Aufgaben gleichzeitig auf der Seite
@@ -969,43 +969,22 @@ export default function SchnittpunkteGerade() {
 
   if (!level) {
     return (
-      <TaskShell title="Schnittpunkte von Parabel und Gerade" width="narrow">
+      <TaskShell title="Schnittpunkte von Parabel und Gerade" width="wide">
         <div className="flex flex-col gap-6">
           {header}
-          <div className={`${panel} flex flex-col`}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-            <LernsituationKarte
-              thema={{ name: 'Der Skatepark', farbe: 'beere', icon: 'fa-person-skating' }}
-              beschreibung="Neu beim Thema? Finde beim Trick-Contest heraus, wie oft ein Sprung die Lichtschranke kreuzt, und lerne dabei, die Schnittpunkte von Parabel und Gerade zu berechnen."
-              onClick={() => {
-                setLernsituation(true)
-                window.scrollTo({ top: 0 })
-              }}
-            />
-          </div>
-          <div className={panel}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button
-                onClick={() => chooseLevel('einfach')}
-                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Einfach</p>
-                <Tex display className="text-lg mb-1 text-white" tex="p\colon\; y = ax^2 + bx + c" />
-                <Tex display className="text-lg mb-2 text-white" tex="g\colon\; y = mx + t" />
-                <p className="text-sm text-white/90">Ganzzahlige Koeffizienten ohne Brüche, die Schnittpunkte haben ganzzahlige Koordinaten.</p>
-              </button>
-              <button
-                onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
-                <Tex display className="text-lg mb-1 text-white" tex="p\colon\; y = ax^2 + bx + c" />
-                <Tex display className="text-lg mb-2 text-white" tex="p\colon\; y = a(x - x_S)^2 + y_S" />
-                <p className="text-sm text-white/90">Mit Brüchen und Parabeln in Scheitelform, Ergebnisse teils gerundet.</p>
-              </button>
-            </div>
-          </div>
+          <ThemaStart
+            lernsituationen={[
+              {
+                thema: { name: 'Der Skatepark', farbe: 'beere', icon: 'fa-person-skating' },
+                beschreibung: 'Finde beim Trick-Contest heraus, wie oft ein Sprung die Lichtschranke kreuzt, und lerne dabei, die Schnittpunkte von Parabel und Gerade zu berechnen.',
+                onClick: () => setLernsituation(true),
+              },
+            ]}
+            uebungen={[
+              { kicker: 'Stufe 1', titel: 'Einfach', formel: <Tex tex="y = ax^2 + bx + c,\; y = mx + t" />, beschreibung: 'Ganzzahlige Koeffizienten ohne Brüche, die Schnittpunkte haben ganzzahlige Koordinaten.', onClick: () => chooseLevel('einfach') },
+              { kicker: 'Stufe 2', titel: 'Fortgeschritten', formel: <Tex tex="y = a(x - x_S)^2 + y_S" />, beschreibung: 'Mit Brüchen und Parabeln in Scheitelform, Ergebnisse teils gerundet.', onClick: () => chooseLevel('fortgeschritten') },
+            ]}
+          />
         </div>
       </TaskShell>
     )
