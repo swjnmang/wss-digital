@@ -16,7 +16,7 @@ import {
 } from '../../lineare_funktionen/lernsituation_kit/seiten';
 import { Bilanz } from '../../lineare_funktionen/lernsituation_kit/punkte';
 import { Kriterien, standardKriterien } from '../../finanzmathe/zins_kit/zins_kit';
-import Dreieck, { RollenLegende } from './Dreieck';
+import Dreieck from './Dreieck';
 import LaserVorschau, { istTreffer, winkelVon, type Versuch } from './LaserVorschau';
 import ZuschnittSpiel from './ZuschnittSpiel';
 import titelBild from './bilder/handystaender-titel.webp';
@@ -32,7 +32,7 @@ import './handystaender.css';
 // In „Problem lösen“ prüfen sie Jules Prototyp ohne Geodreieck: drei Seitenverhältnisse bilden, benennen und mit dem Taschenrechner vergleichen.
 // Aha: Nicht die Größe bestimmt den Winkel, sondern das Seitenverhältnis. Genau dieses Verhältnis liefert der Taschenrechner:
 // tan(70°) ≈ 2,75 ist das Verhältnis Rücken : Boden, das in der Vorschau gesucht war.
-// Lernprodukt analog: Werkstatt-Karte im Heft (beschriftete Skizze des Seitenteils mit H, GK, AK, drei Verhältnissen und Antwort an Jule).
+// Lernprodukt analog: Werkstatt-Karte im Heft (beschriftete Skizze des Seitenteils mit Hypotenuse, Gegenkathete, Ankathete, drei Verhältnissen und Antwort an Jule).
 // Identität: Themenfarbe Ocker (Sperrholz), Symbol Tablet, Titelbild Handyständer mit Bauteilen, Leitobjekt das Seitenteil des Ständers.
 // Bildwelt Bauplan / Lasercut: Titelbild und Sachbilder sind gerenderte WebP-Dateien aus bilder-quelle/handystaender-*.bild.html
 // (Bausteine in bilder-quelle/_lasercut.js); Vorschau, Skizzen und Spiel bleiben Inline-SVG.
@@ -77,36 +77,62 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
   {
     title: (
       <>
-        Seiten vom Winkel <M>\alpha</M> aus benennen
+        Die Seiten vom Winkel <M>\alpha</M> aus benennen
       </>
     ),
     body: (
       <>
+        <p>
+          In einem rechtwinkligen Dreieck haben die Seiten feste Namen. Welche Seite welchen Namen bekommt, hängt davon ab, von welchem
+          Winkel aus du schaust. Hier schaust du vom Winkel <M>\alpha</M> unten vorne aus:
+        </p>
         <div className="hs-skizze hs-skizze-klein">
           <Dreieck
             boden={8}
             ruecken={15}
             rollen
-            labels={{ boden: 'AK = 8 cm', ruecken: 'GK = 15 cm', schraeg: 'H = 17 cm' }}
+            labels={{ boden: 'Ankathete 8 cm', ruecken: 'Gegenkathete 15 cm', schraeg: 'Hypotenuse 17 cm' }}
+            breite={620}
             label="Seitenteil 8 cm, 15 cm, 17 cm. Vom Winkel Alpha aus: Hypotenuse 17 cm, Gegenkathete 15 cm, Ankathete 8 cm."
           />
         </div>
-        <RollenLegende winkel="α" />
-        <p>
-          Die Hypotenuse liegt dem rechten Winkel gegenüber: die Auflage, 17 cm. Die Gegenkathete liegt <M>\alpha</M> gegenüber: der Rücken,
-          15 cm. Die Ankathete liegt an <M>\alpha</M> an: der Boden, 8 cm.
-        </p>
+        <ul className="hs-begriffe">
+          <li>
+            Die <strong>Hypotenuse</strong> ist die längste Seite. Sie liegt dem rechten Winkel gegenüber: die Auflage mit 17 cm.
+          </li>
+          <li>
+            Die <strong>Gegenkathete</strong> liegt dem Winkel <M>\alpha</M> gegenüber: der Rücken mit 15 cm.
+          </li>
+          <li>
+            Die <strong>Ankathete</strong> liegt direkt am Winkel <M>\alpha</M> an, ist aber nicht die Hypotenuse: der Boden mit 8 cm.
+          </li>
+        </ul>
       </>
     ),
   },
   {
-    title: 'Die drei Seitenverhältnisse bilden',
+    title: 'Drei Seiten durcheinander teilen',
     body: (
       <>
-        <p>Jedes Verhältnis hat einen eigenen Namen:</p>
-        <MB>{'\\sin(\\alpha) = \\dfrac{\\text{GK}}{\\text{H}} = \\dfrac{15}{17} \\approx 0{,}88'}</MB>
-        <MB>{'\\cos(\\alpha) = \\dfrac{\\text{AK}}{\\text{H}} = \\dfrac{8}{17} \\approx 0{,}47'}</MB>
-        <MB>{'\\tan(\\alpha) = \\dfrac{\\text{GK}}{\\text{AK}} = \\dfrac{15}{8} \\approx 1{,}88'}</MB>
+        <p>
+          Teilst du zwei Seiten durcheinander, bekommst du ein Seitenverhältnis. In der Vorschau hast du schon eines benutzt: Rücken durch
+          Boden. Im rechtwinkligen Dreieck sind drei Verhältnisse so wichtig, dass sie eigene Namen haben:{' '}
+          <strong>Sinus</strong>, <strong>Kosinus</strong> und <strong>Tangens</strong>. Man schreibt sie kurz <M>{'\\sin'}</M>,{' '}
+          <M>{'\\cos'}</M> und <M>{'\\tan'}</M>. <M>{'\\sin(\\alpha)'}</M> liest man „Sinus von Alpha“.
+        </p>
+        <p>
+          Der <strong>Sinus</strong> von <M>\alpha</M> ist die Gegenkathete geteilt durch die Hypotenuse:
+        </p>
+        <MB>{'\\sin(\\alpha) = \\dfrac{\\text{Gegenkathete}}{\\text{Hypotenuse}} = \\dfrac{15}{17} \\approx 0{,}88'}</MB>
+        <p>
+          Der <strong>Kosinus</strong> von <M>\alpha</M> ist die Ankathete geteilt durch die Hypotenuse:
+        </p>
+        <MB>{'\\cos(\\alpha) = \\dfrac{\\text{Ankathete}}{\\text{Hypotenuse}} = \\dfrac{8}{17} \\approx 0{,}47'}</MB>
+        <p>
+          Der <strong>Tangens</strong> von <M>\alpha</M> ist die Gegenkathete geteilt durch die Ankathete. Das ist genau dein Verhältnis
+          Rücken durch Boden aus der Vorschau:
+        </p>
+        <MB>{'\\tan(\\alpha) = \\dfrac{\\text{Gegenkathete}}{\\text{Ankathete}} = \\dfrac{15}{8} \\approx 1{,}88'}</MB>
       </>
     ),
   },
@@ -115,8 +141,8 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     body: (
       <>
         <p>
-          Stelle den Taschenrechner auf Grad (Anzeige D oder DEG). Die Tasten sin, cos und tan liefern dir für jeden Winkel das passende
-          Verhältnis, z. B. für <M>{'62^\\circ'}</M>:
+          Der Taschenrechner kennt diese drei Verhältnisse für jeden Winkel. Stelle ihn auf Grad (Anzeige D oder DEG). Tippe dann zum
+          Beispiel die Taste sin und danach 62 ein. Für <M>{'62^\\circ'}</M> zeigt er:
         </p>
         <MB>{'\\sin(62^\\circ) \\approx 0{,}88'}</MB>
         <MB>{'\\cos(62^\\circ) \\approx 0{,}47'}</MB>
@@ -134,10 +160,10 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 const LOESUNG_KERN = (
   <Loesungsweg
     schritte={[
-      { titel: 'Seiten von α aus benennen', text: 'Hypotenuse H = 17,6 cm (Auflage), Gegenkathete GK = 16,5 cm (Rücken), Ankathete AK = 6 cm (Boden).' },
-      { titel: 'Sinus bilden', tex: '\\sin(\\alpha) = \\dfrac{\\text{GK}}{\\text{H}} = \\dfrac{16{,}5}{17{,}6} \\approx 0{,}94' },
-      { titel: 'Kosinus bilden', tex: '\\cos(\\alpha) = \\dfrac{\\text{AK}}{\\text{H}} = \\dfrac{6}{17{,}6} \\approx 0{,}34' },
-      { titel: 'Tangens bilden', tex: '\\tan(\\alpha) = \\dfrac{\\text{GK}}{\\text{AK}} = \\dfrac{16{,}5}{6} = 2{,}75' },
+      { titel: 'Seiten von α aus benennen', text: 'Hypotenuse 17,6 cm (Auflage), Gegenkathete 16,5 cm (Rücken), Ankathete 6 cm (Boden).' },
+      { titel: 'Sinus bilden', tex: '\\sin(\\alpha) = \\dfrac{\\text{Gegenkathete}}{\\text{Hypotenuse}} = \\dfrac{16{,}5}{17{,}6} \\approx 0{,}94' },
+      { titel: 'Kosinus bilden', tex: '\\cos(\\alpha) = \\dfrac{\\text{Ankathete}}{\\text{Hypotenuse}} = \\dfrac{6}{17{,}6} \\approx 0{,}34' },
+      { titel: 'Tangens bilden', tex: '\\tan(\\alpha) = \\dfrac{\\text{Gegenkathete}}{\\text{Ankathete}} = \\dfrac{16{,}5}{6} = 2{,}75' },
       { titel: 'Mit dem Taschenrechner vergleichen', tex: '\\tan(70^\\circ) \\approx 2{,}75', text: 'Auch sin(70°) ≈ 0,94 und cos(70°) ≈ 0,34 passen. Der Prototyp hat also 70°.' },
     ]}
   />
@@ -333,9 +359,12 @@ export default function HandystaenderEinstieg({ onBack, onPractice }: { onBack: 
             <p className="sl-fokus-titel">Deine Aufgabe: Prüfe den Prototyp ohne Geodreieck</p>
             <p>
               Jule hat selbst ein Seitenteil geschnitten: Boden 6 cm, Rücken 16,5 cm, Auflage 17,6 cm. Ein Geodreieck gibt es in der Werkstatt
-              nicht. Bilde in deinem Heft zum Winkel <M>\alpha</M> die drei Seitenverhältnisse Sinus, Kosinus und Tangens (auf zwei
-              Nachkommastellen) und vergleiche sie mit den Werten des Taschenrechners für <M>{'70^\\circ'}</M>. Hat der Prototyp die gewünschten{' '}
-              <M>{'70^\\circ'}</M>?
+              nicht. Finde trotzdem heraus, ob das Seitenteil die gewünschten <M>{'70^\\circ'}</M> hat.
+            </p>
+            <p>
+              Das Werkzeug dafür lernst du im Beispiel unten kennen: drei Seitenverhältnisse mit den Namen Sinus, Kosinus und Tangens. Berechne
+              sie in deinem Heft für Jules Prototyp (auf zwei Nachkommastellen) und vergleiche sie mit den Werten, die der Taschenrechner für{' '}
+              <M>{'70^\\circ'}</M> anzeigt.
             </p>
           </div>
           <figure className="sl-foto">
@@ -372,8 +401,8 @@ export default function HandystaenderEinstieg({ onBack, onPractice }: { onBack: 
                     <>Gehe vor wie im Beispiel: Benenne zuerst vom Winkel <M>\alpha</M> aus Hypotenuse, Gegenkathete und Ankathete.</>,
                     <>
                       Die Auflage (17,6 cm) ist die Hypotenuse, der Rücken (16,5 cm) liegt <M>\alpha</M> gegenüber, der Boden (6 cm) liegt an{' '}
-                      <M>\alpha</M> an. Dann gilt <M>{'\\sin = \\frac{\\text{GK}}{\\text{H}}'}</M>, <M>{'\\cos = \\frac{\\text{AK}}{\\text{H}}'}</M>,{' '}
-                      <M>{'\\tan = \\frac{\\text{GK}}{\\text{AK}}'}</M>.
+                      <M>\alpha</M> an. Sinus ist Gegenkathete durch Hypotenuse, Kosinus ist Ankathete durch Hypotenuse, Tangens ist
+                      Gegenkathete durch Ankathete.
                     </>,
                     <>
                       <M>{'\\sin(\\alpha) = \\frac{16{,}5}{17{,}6}'}</M>, <M>{'\\cos(\\alpha) = \\frac{6}{17{,}6}'}</M>,{' '}
@@ -418,12 +447,12 @@ export default function HandystaenderEinstieg({ onBack, onPractice }: { onBack: 
                 src={karteBild}
                 width={800}
                 height={400}
-                alt="Eine Werkstatt-Karte aus Holz: links die Skizze eines rechtwinkligen Dreiecks mit Winkel Alpha und den farbig beschrifteten Seiten H, GK und AK, rechts angefangene Zeilen sin Alpha gleich, cos Alpha gleich, tan Alpha gleich und Antwort an Jule."
+                alt="Eine Werkstatt-Karte aus Holz: links die Skizze eines rechtwinkligen Dreiecks mit Winkel Alpha und den farbig beschrifteten Seiten Hypotenuse, Gegenkathete und Ankathete, rechts angefangene Zeilen sin Alpha gleich, cos Alpha gleich, tan Alpha gleich und Antwort an Jule."
               />
             </figure>
             <p className="sl-text">
-              Gestalte in deinem Heft eine Werkstatt-Karte zu Jules Prototyp. Zeichne das Seitenteil, markiere <M>\alpha</M> und beschrifte H, GK
-              und AK in drei Farben. Schreibe Sinus, Kosinus und Tangens als Bruch und als Dezimalzahl dazu, daneben die Werte des Taschenrechners
+              Gestalte in deinem Heft eine Werkstatt-Karte zu Jules Prototyp. Zeichne das Seitenteil, markiere <M>\alpha</M> und beschrifte Hypotenuse,
+              Gegenkathete und Ankathete in drei Farben. Schreibe Sinus, Kosinus und Tangens als Bruch und als Dezimalzahl dazu, daneben die Werte des Taschenrechners
               für <M>{'70^\\circ'}</M>, und beantworte Jules Frage.
             </p>
             <Aufklappbar label="Satzanfänge ansehen" icon="fa-comment-dots">
@@ -448,6 +477,7 @@ export default function HandystaenderEinstieg({ onBack, onPractice }: { onBack: 
                     ruecken={3}
                     rollen
                     labels={{ boden: 'Ankathete', ruecken: 'Gegenkathete', schraeg: 'Hypotenuse' }}
+                    breite={520}
                     label="Rechtwinkliges Dreieck mit Winkel Alpha: Hypotenuse gegenüber dem rechten Winkel, Gegenkathete gegenüber Alpha, Ankathete an Alpha."
                   />
                 </div>
@@ -577,7 +607,7 @@ export default function HandystaenderEinstieg({ onBack, onPractice }: { onBack: 
               solution={
                 <Loesungsweg
                   schritte={[
-                    { titel: 'Seiten von α aus benennen', text: 'H = 25 cm, GK = 7 cm (Rücken), AK = 24 cm (Boden).' },
+                    { titel: 'Seiten von α aus benennen', text: 'Hypotenuse 25 cm, Gegenkathete 7 cm (Rücken), Ankathete 24 cm (Boden).' },
                     { titel: 'Sinus', tex: '\\sin(\\alpha) = \\dfrac{7}{25} = 0{,}28' },
                     { titel: 'Kosinus', tex: '\\cos(\\alpha) = \\dfrac{24}{25} = 0{,}96' },
                     { titel: 'Tangens', tex: '\\tan(\\alpha) = \\dfrac{7}{24} \\approx 0{,}29' },

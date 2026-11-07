@@ -55,7 +55,11 @@
 .sl-seite .lp-ex.bk-panel { padding: 12px 18px; gap: 8px; }
 .sl-seite .lp-ex-prompt { gap: 6px; }
 .sl-seite .ls-heft { margin: 0; padding: 4px 10px; font-size: 14px; }
-.sl-seite .katex-display { margin: 0.15em 0; }
+.sl-seite .katex-display { margin: 0.45em 0; }
+/* Abgesetzte Formeln in Rechenbeispielen und Merkkästen: genug Luft zwischen untereinanderstehenden Brüchen, keine Scrollleiste */
+.sl-seite .lp-example span.katex-display,
+.sl-seite .lp-merke-body span.katex-display { margin: 0.75em 0; padding: 0.3em 0; overflow-y: hidden; }
+.sl-seite .lp-example-step-body { overflow-y: hidden; }
 .sl-seite .ls-rechnung { gap: 6px 8px; }
 @media (min-width: 700px) {
   .sl-seite .ls-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
@@ -166,6 +170,8 @@
 .sl-produkt .sl-abschnitt-titel i { color: var(--primary); }
 .sl-bonus .sl-abschnitt-titel i { color: var(--primary); }
 .sl-aufklappbar { display: flex; flex-direction: column; gap: 10px; }
+/* Aufgeklappter Inhalt: Rechenbeispiel und Lernvideo stehen mit deutlichem Abstand untereinander, das Video klebt nie am Kasten */
+.sl-aufklappbar-inhalt { display: flex; flex-direction: column; gap: 28px; }
 .sl-aufklappbar .bk-btn, .sl-wegwahl-knoepfe .bk-btn { min-height: 44px; }
 .sl-wegwahl { display: flex; flex-direction: column; gap: 10px; }
 .sl-wegwahl-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; }

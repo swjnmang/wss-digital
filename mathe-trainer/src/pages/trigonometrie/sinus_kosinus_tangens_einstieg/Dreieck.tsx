@@ -67,7 +67,7 @@ export default function Dreieck({
   const rA = Math.min(46, bw * 0.45);
   const rC = Math.min(40, rh * 0.3);
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} className="hs-dreieck">
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} className="hs-dreieck" style={{ maxWidth: W }}>
       {(winkel === 'alpha' || winkel === 'beide') && (
         <>
           <path d={bogen(A[0], A[1], rA, 0, alphaGrad)} fill="var(--primary)" fillOpacity=".18" stroke="var(--primary)" strokeWidth="2" />
