@@ -428,9 +428,9 @@ export default function FreiwurfEinstieg() {
                 punkte={14}
                 prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
                 fields={[
-                  { kind: 'num', key: 'mia', label: 'Wie hoch ist die relative Häufigkeit der Treffer bei Mia (in Prozent)?', expected: 75, unit: '%', tol: 0.0051 },
-                  { kind: 'num', key: 'jonas', label: 'Wie hoch ist sie bei Jonas (in Prozent)?', expected: 70, unit: '%', tol: 0.0051 },
-                  { kind: 'num', key: 'lena', label: 'Wie hoch ist sie bei Lena (in Prozent)?', expected: 67.5, unit: '%', tol: 0.0051 },
+                  { kind: 'num', key: 'mia', label: 'Wie hoch ist die relative Häufigkeit der Treffer bei Mia?', expected: 75, unit: '%', tol: 0.0051 },
+                  { kind: 'num', key: 'jonas', label: 'Wie hoch ist sie bei Jonas?', expected: 70, unit: '%', tol: 0.0051 },
+                  { kind: 'num', key: 'lena', label: 'Wie hoch ist sie bei Lena?', expected: 67.5, unit: '%', tol: 0.0051 },
                 ]}
                 loesungNachFehler
                 solution={LOESUNG}

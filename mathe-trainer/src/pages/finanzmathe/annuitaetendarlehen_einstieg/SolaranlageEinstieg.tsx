@@ -794,9 +794,9 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
               { l: ['\\text{neue Schuld}'], r: [{ luecke: 'k', breit: true }] },
             ]}
             fields={[
-              { kind: 'num', key: 'z', label: 'Zinsen in Euro', expected: 800, tol: 0.01 },
-              { kind: 'num', key: 'a', label: 'Annuität in Euro', expected: 3300, tol: 0.01 },
-              { kind: 'num', key: 'k', label: 'Schuld am Anfang des nächsten Jahres in Euro', expected: 17500, tol: 0.01 },
+              { kind: 'num', key: 'z', label: 'Zinsen', expected: 800, unit: '€', tol: 0.01 },
+              { kind: 'num', key: 'a', label: 'Annuität', expected: 3300, unit: '€', tol: 0.01 },
+              { kind: 'num', key: 'k', label: 'Schuld am Anfang des nächsten Jahres', expected: 17500, unit: '€', tol: 0.01 },
             ]}
             solution={
               <Loesungsweg
@@ -830,7 +830,7 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
               </p>
             }
             rechnung={[{ l: ['K_5 = 10\\,000 \\cdot 1{,}03^5'], r: [{ luecke: 'k5', breit: true }] }]}
-            fields={[{ kind: 'num', key: 'k5', label: 'Kontostand nach 5 Jahren in Euro', expected: 10000 * 1.03 ** 5, tol: 0.01 }]}
+            fields={[{ kind: 'num', key: 'k5', label: 'Kontostand nach 5 Jahren', expected: 10000 * 1.03 ** 5, unit: '€', tol: 0.01 }]}
             solution={
               <>
                 <Loesungsweg schritte={[{ titel: 'In einem Zug eintippen', tex: 'K_5 = 10\\,000 \\cdot 1{,}03^5 = 11\\,592{,}74 \\text{ €}' }]} />
@@ -854,7 +854,7 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
             ]}
             fields={[
               { kind: 'num', key: 'b1', label: 'erster Bruch', expected: 0.3, tol: 0.0001 },
-              { kind: 'num', key: 'b2', label: 'zweiter Term in Euro', expected: (8000 * 1.05 ** 4 * 0.05) / (1.05 ** 4 - 1), tol: 0.01 },
+              { kind: 'num', key: 'b2', label: 'zweiter Term', unit: '€', expected: (8000 * 1.05 ** 4 * 0.05) / (1.05 ** 4 - 1), tol: 0.01 },
             ]}
             solution={
               <Loesungsweg
@@ -1282,10 +1282,10 @@ export default function SolaranlageEinstieg({ onBack, onPractice }: { onBack: ()
                 { l: ['Z_2 = A - T_2'], r: [{ luecke: 'z2b', breit: true }], u: '\\text{Weg 2}' },
               ]}
               fields={[
-                { kind: 'num', key: 'k1', label: 'Schuld am Anfang des 2. Jahres', expected: 28609.73, tol: TOL },
-                { kind: 'num', key: 'z2a', label: 'Zinsen im 2. Jahr, Weg 1', expected: 1430.49, tol: TOL },
-                { kind: 'num', key: 't2', label: 'Tilgung im 2. Jahr', expected: 1459.78, tol: TOL },
-                { kind: 'num', key: 'z2b', label: 'Zinsen im 2. Jahr, Weg 2', expected: 1430.49, tol: TOL },
+                { kind: 'num', key: 'k1', label: 'Schuld am Anfang des 2. Jahres', expected: 28609.73, unit: '€', tol: TOL },
+                { kind: 'num', key: 'z2a', label: 'Zinsen im 2. Jahr, Weg 1', expected: 1430.49, unit: '€', tol: TOL },
+                { kind: 'num', key: 't2', label: 'Tilgung im 2. Jahr', expected: 1459.78, unit: '€', tol: TOL },
+                { kind: 'num', key: 'z2b', label: 'Zinsen im 2. Jahr, Weg 2', expected: 1430.49, unit: '€', tol: TOL },
               ]}
               solution={
                 <Loesungsweg

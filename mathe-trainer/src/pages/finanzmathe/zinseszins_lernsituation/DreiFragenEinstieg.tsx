@@ -362,12 +362,12 @@ export default function DreiFragenEinstieg({ onBack, onPractice, onPrev }: { onB
             rechnen={false}
             prompt={<p>Welcher Zinssatz gehört zu diesen Zinsfaktoren?</p>}
             rechnung={[
-              { l: ['q = 1{,}045:\\quad p'], r: [{ luecke: 'c1' }, '\\,\\%'] },
-              { l: ['q = 1{,}0325:\\quad p'], r: [{ luecke: 'c2' }, '\\,\\%'] },
+              { l: ['q = 1{,}045:\\quad p'], r: [{ luecke: 'c1' }] },
+              { l: ['q = 1{,}0325:\\quad p'], r: [{ luecke: 'c2' }] },
             ]}
             fields={[
-              { kind: 'num', key: 'c1', label: 'Zinssatz zu 1,045', expected: 4.5, tol: 0.0001 },
-              { kind: 'num', key: 'c2', label: 'Zinssatz zu 1,0325', expected: 3.25, tol: 0.0001 },
+              { kind: 'num', key: 'c1', label: 'Zinssatz zu 1,045', expected: 4.5, unit: '%', tol: 0.0001 },
+              { kind: 'num', key: 'c2', label: 'Zinssatz zu 1,0325', expected: 3.25, unit: '%', tol: 0.0001 },
             ]}
             solution={<Loesungsweg schritte={[{ titel: <>Zinssatz: <M>{'p = (q - 1) \\cdot 100'}</M></>, tex: ['p = (1{,}045 - 1) \\cdot 100 = 4{,}5\\,\\%', 'p = (1{,}0325 - 1) \\cdot 100 = 3{,}25\\,\\%'] }]} />}
           />

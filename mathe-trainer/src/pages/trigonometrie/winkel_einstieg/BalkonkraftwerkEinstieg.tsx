@@ -235,8 +235,8 @@ export default function BalkonkraftwerkEinstieg({ onBack, onPractice }: { onBack
                 In einem rechtwinkligen Dreieck ist <M>{'\\alpha = 27{,}7^\\circ'}</M>. Wie groß ist der andere spitze Winkel <M>\beta</M>?
               </p>
             }
-            rechnung={[{ l: ['\\beta'], r: [{ luecke: 'b' }, '^\\circ'] }]}
-            fields={[{ kind: 'num', key: 'b', label: 'β', expected: 62.3, tol: 0.051 }]}
+            rechnung={[{ l: ['\\beta'], r: [{ luecke: 'b' }] }]}
+            fields={[{ kind: 'num', key: 'b', label: 'β', expected: 62.3, unit: '°', tol: 0.051 }]}
             solution={
               <Loesungsweg
                 schritte={[
