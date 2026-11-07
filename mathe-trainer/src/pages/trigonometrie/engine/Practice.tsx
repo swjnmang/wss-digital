@@ -15,7 +15,7 @@ import {
   type TopicConfig,
 } from './types';
 import { useBackHandler } from '../../../hooks/useBackHandler';
-import { LernsituationKarte } from '../../lineare_funktionen/lernsituation_kit/seiten';
+import { ThemaStart } from '../../lineare_funktionen/lernsituation_kit/themastart';
 
 const TOTAL_TASKS = 6;
 /** So lange muss eine falsche Eingabe stehen bleiben, bis sie rot wird und als Versuch zählt. */
@@ -462,63 +462,60 @@ export default function Practice({ cfg }: { cfg: TopicConfig }) {
   const mitLernsituation = !!cfg.lernsituation && !level;
 
   return (
-    <TaskShell title={cfg.title} subtitle={cfg.subtitle} width="narrow">
+    <TaskShell title={cfg.title} subtitle={cfg.subtitle} width={mitLernsituation ? 'wide' : 'narrow'}>
       <div className="flex flex-col gap-6">
 
-        <Erklaerung cfg={cfg} />
+        {/* Startansicht mit Lernsituation: oben Lernsituation und Übungsaufgaben, die Erklärung kommt nach der Wahl einer Stufe */}
+        {!mitLernsituation && <Erklaerung cfg={cfg} />}
 
-        <div className={mitLernsituation ? 'grid grid-cols-1 md:grid-cols-3 gap-4' : 'contents'}>
-        {mitLernsituation && cfg.lernsituation && (
-          <div className={`${panel} flex flex-col`}>
-            <h2 className="text-xl font-extrabold text-ink mb-4 text-center">Lernsituation</h2>
-            <LernsituationKarte
-              className="flex-1"
-              thema={cfg.lernsituation.karte.thema}
-              beschreibung={cfg.lernsituation.karte.beschreibung}
-              onClick={() => setLernsituation(true)}
-            />
+        {mitLernsituation && cfg.lernsituation ? (
+          <ThemaStart
+            lernsituationen={[{ ...cfg.lernsituation.karte, onClick: () => setLernsituation(true) }]}
+            uebungen={cfg.levels.map((l, i) => ({
+              kicker: `Stufe ${i + 1}`,
+              titel: LEVEL_LABEL[l.id],
+              formel: l.example ? <Rich text={l.example} /> : undefined,
+              beschreibung: <Rich text={l.description} />,
+              onClick: () => chooseLevel(l.id),
+            }))}
+          />
+        ) : (
+          <div id="aufgaben" className={`${panel} text-center scroll-mt-4`}>
+            <h2 className="text-xl font-extrabold text-ink mb-4">
+              {level ? `Schwierigkeitsgrad: ${LEVEL_LABEL[level]}` : 'Wähle deinen Schwierigkeitsgrad'}
+            </h2>
+            <div
+              className={`grid grid-cols-1 gap-3 ${
+                cfg.levels.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
+              }`}
+            >
+              {cfg.levels.map((l) => (
+                <button
+                  key={l.id}
+                  onClick={() => chooseLevel(l.id)}
+                  className={`rounded-2xl text-white p-4 border-2 border-edge shadow-hard text-left transition-all hover:-translate-y-0.5 ${
+                    LEVEL_STYLE[l.id]
+                  } ${level && level !== l.id ? 'opacity-50 hover:opacity-90' : ''} ${
+                    level === l.id ? 'ring-4 ring-offset-2 ring-ink' : ''
+                  }`}
+                >
+                  <p className="text-lg font-bold mb-1 text-inherit">{LEVEL_LABEL[l.id]}</p>
+                  {l.example && (
+                    <p className="text-base mb-1 text-inherit">
+                      <Rich text={l.example} />
+                    </p>
+                  )}
+                  <p className="text-sm text-inherit opacity-90">
+                    <Rich text={l.description} />
+                  </p>
+                </button>
+              ))}
+            </div>
+            {cfg.roundingNote && level && (
+              <p className="text-sm text-muted mt-4">{cfg.roundingNote}</p>
+            )}
           </div>
         )}
-        <div id="aufgaben" className={`${panel} text-center scroll-mt-4 ${mitLernsituation ? 'md:col-span-2' : ''}`}>
-          <h2 className="text-xl font-extrabold text-ink mb-4">
-            {level
-              ? `Schwierigkeitsgrad: ${LEVEL_LABEL[level]}`
-              : cfg.lernsituation
-              ? 'Übungsaufgaben'
-              : 'Wähle deinen Schwierigkeitsgrad'}
-          </h2>
-          <div
-            className={`grid grid-cols-1 gap-3 ${
-              mitLernsituation ? '' : cfg.levels.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
-            }`}
-          >
-            {cfg.levels.map((l) => (
-              <button
-                key={l.id}
-                onClick={() => chooseLevel(l.id)}
-                className={`rounded-2xl text-white p-4 border-2 border-edge shadow-hard text-left transition-all hover:-translate-y-0.5 ${
-                  LEVEL_STYLE[l.id]
-                } ${level && level !== l.id ? 'opacity-50 hover:opacity-90' : ''} ${
-                  level === l.id ? 'ring-4 ring-offset-2 ring-ink' : ''
-                }`}
-              >
-                <p className="text-lg font-bold mb-1 text-inherit">{LEVEL_LABEL[l.id]}</p>
-                {l.example && (
-                  <p className="text-base mb-1 text-inherit">
-                    <Rich text={l.example} />
-                  </p>
-                )}
-                <p className="text-sm text-inherit opacity-90">
-                  <Rich text={l.description} />
-                </p>
-              </button>
-            ))}
-          </div>
-          {cfg.roundingNote && level && (
-            <p className="text-sm text-muted mt-4">{cfg.roundingNote}</p>
-          )}
-        </div>
-        </div>
 
         {level &&
           tasks.map((task, i) => (

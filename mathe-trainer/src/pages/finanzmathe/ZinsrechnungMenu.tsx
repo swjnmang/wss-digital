@@ -1,7 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom'
 import { type MenuItem } from '../../components/layout/MenuPage';
 import TaskShell from '../../components/layout/TaskShell'
-import { LernsituationKarte, type Thema } from '../lineare_funktionen/lernsituation_kit/seiten'
+import { type Thema } from '../lineare_funktionen/lernsituation_kit/seiten'
+import { ThemaStart } from '../lineare_funktionen/lernsituation_kit/themastart'
 
 export const aufgaben: MenuItem[] = [
   { title: 'Zinsrechnung üben', desc: 'Berechne Zinsen, Kapital, Zinssatz oder Laufzeit.', path: '/finanzmathe/zinsrechnung/ueben', icon: 'fa-solid fa-percent' },
@@ -26,36 +26,12 @@ const LERNSITUATIONEN: { teil: string; thema: Pick<Thema, 'name' | 'farbe' | 'ic
 
 // Auswahl mit den Einstiegs-Lernsituationen (Teil 1 und Teil 2) und den bisherigen Seiten als Übungsaufgaben
 export default function ZinsrechnungMenu() {
-  const navigate = useNavigate()
   return (
     <TaskShell title="Zinsrechnung" subtitle="Wähle die Lernsituation oder eine Übungsaufgabe aus." width="wide">
-      <div className="flex flex-col gap-6">
-        <div className="bk-panel text-center flex flex-col">
-          <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {LERNSITUATIONEN.map((l) => (
-              <div key={l.path} className="flex">
-                <LernsituationKarte className="w-full" teil={l.teil} thema={l.thema} beschreibung={l.desc} onClick={() => navigate(l.path)} />
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="bk-panel">
-          <h2 className="text-lg font-bold text-slate-800 mb-4 text-center">Übungsaufgaben</h2>
-          <div className="bk-topics">
-            {aufgaben.map((it, i) => (
-              <Link key={it.path} to={it.path} className="bk-topic">
-                <span className="bk-topic-no">{i + 1}</span>
-                <span className="bk-topic-text">
-                  <strong>{it.title}</strong>
-                  {it.desc && <small>{it.desc}</small>}
-                </span>
-                <i className="fa-solid fa-chevron-right" aria-hidden="true" />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
+      <ThemaStart
+        lernsituationen={LERNSITUATIONEN.map((l) => ({ teil: l.teil, thema: l.thema, beschreibung: l.desc, to: l.path }))}
+        uebungen={aufgaben.map((it) => ({ titel: it.title, beschreibung: it.desc, to: it.path, icon: it.icon }))}
+      />
     </TaskShell>
   );
 }

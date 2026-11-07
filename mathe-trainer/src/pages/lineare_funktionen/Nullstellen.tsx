@@ -7,7 +7,7 @@ import { useTaskTracking } from '../../hooks/useTaskTracking';
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import StromspeicherEinstieg from './nullstellen_einstieg/StromspeicherEinstieg'
-import { LernsituationKarte } from './lernsituation_kit/seiten'
+import { ThemaStart } from './lernsituation_kit/themastart'
 import { useBackHandler } from '../../hooks/useBackHandler';
 
 // Sechs Aufgaben auf einer Seite
@@ -550,47 +550,22 @@ export default function Nullstellen() {
 
   if (!level) {
     return (
-      <TaskShell title="Nullstellen berechnen" width="narrow">
+      <TaskShell title="Nullstellen berechnen" width="wide">
         <div className="flex flex-col gap-6">
           {header}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className={`${panel} flex flex-col`}>
-              <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-              <LernsituationKarte
-                className="flex-1"
-                thema={{ name: 'Der Stromspeicher', farbe: 'indigo', icon: 'fa-battery-half' }}
-                beschreibung="Neu beim Thema? Finde heraus, wann der Stromspeicher einer Solaranlage in der Nacht leer ist, und lerne dabei, wie man die Nullstelle berechnet."
-                onClick={() => setLernsituation(true)}
-              />
-            </div>
-            <div className={`${panel} sm:col-span-2 flex flex-col`}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">
-              Übungsaufgaben
-            </h2>
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button
-                onClick={() => chooseLevel('einfach')}
-                className="rounded-2xl bg-green-600 hover:bg-green-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Einfach</p>
-                <p className="text-xl font-serif italic mb-2 text-white">y = 2x − 6</p>
-                <p className="text-sm text-white/90">
-                  Ganzzahlige Steigungen – die Nullstelle ist immer eine ganze Zahl.
-                </p>
-              </button>
-              <button
-                onClick={() => chooseLevel('fortgeschritten')}
-                className="rounded-2xl bg-red-600 hover:bg-red-700 text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5"
-              >
-                <p className="text-lg font-bold mb-1 text-white">Fortgeschritten</p>
-                <p className="text-xl font-serif italic mb-2 text-white">y = 3 − 2,5x</p>
-                <p className="text-sm text-white/90">
-                  Dezimalzahlen, wechselnde Schreibweise – die Nullstelle ist keine ganze Zahl.
-                </p>
-              </button>
-            </div>
-            </div>
-          </div>
+          <ThemaStart
+            lernsituationen={[
+              {
+                thema: { name: 'Der Stromspeicher', farbe: 'indigo', icon: 'fa-battery-half' },
+                beschreibung: 'Finde heraus, wann der Stromspeicher einer Solaranlage in der Nacht leer ist, und lerne dabei, wie man die Nullstelle berechnet.',
+                onClick: () => setLernsituation(true),
+              },
+            ]}
+            uebungen={[
+              { kicker: 'Stufe 1', titel: 'Einfach', formel: 'y = 2x − 6', beschreibung: 'Ganzzahlige Steigungen – die Nullstelle ist immer eine ganze Zahl.', onClick: () => chooseLevel('einfach') },
+              { kicker: 'Stufe 2', titel: 'Fortgeschritten', formel: 'y = 3 − 2,5x', beschreibung: 'Dezimalzahlen, wechselnde Schreibweise – die Nullstelle ist keine ganze Zahl.', onClick: () => chooseLevel('fortgeschritten') },
+            ]}
+          />
         </div>
       </TaskShell>
     );

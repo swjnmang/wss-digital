@@ -4,7 +4,7 @@ import { type Q, val, parseAnswer, isIncomplete, Tex, GREEN, RED, PRAISE, pick, 
 import { VideoEmbed } from '../../components/VideoButton'
 import TaskShell from '../../components/layout/TaskShell'
 import EscapeEinstieg from './scheitelpunkt_einstieg/EscapeEinstieg'
-import { LernsituationKarte } from '../lineare_funktionen/lernsituation_kit/seiten'
+import { ThemaStart } from '../lineare_funktionen/lernsituation_kit/themastart'
 import { useBackHandler } from '../../hooks/useBackHandler'
 import { type Level, type Feld, LEVEL_LABEL, ANZAHL_AUFGABEN, neueAufgabe } from './scheitelpunkt_uebung/aufgaben'
 
@@ -442,39 +442,28 @@ export default function Scheitelpunkt() {
 
   if (!level) {
     return (
-      <TaskShell title="Scheitelpunkt berechnen" width="narrow">
+      <TaskShell title="Scheitelpunkt berechnen" width="wide">
         <div className="flex flex-col gap-6">
           {header}
-          <div className={`${panel} flex flex-col`}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Lernsituation</h2>
-            <LernsituationKarte
-              thema={{ name: 'Das Lichtwerk', farbe: 'schiefer', icon: 'fa-door-closed' }}
-              beschreibung="Neu beim Thema? Du bist im Lager eingeschlossen. Knacke den Türcode aus dem Brunnen-Modell und lerne dabei, den Scheitelpunkt einer Parabel zu berechnen."
-              onClick={() => {
-                setLernsituation(true)
-                window.scrollTo({ top: 0 })
-              }}
-            />
-          </div>
-          <div className={panel}>
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Übungsaufgaben</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {LEVEL_KARTEN.map((karte) => (
-                <button
-                  key={karte.level}
-                  onClick={() => chooseLevel(karte.level)}
-                  className={`rounded-2xl ${karte.farbe} text-white p-5 border-2 border-edge shadow-hard text-left transition-transform hover:-translate-y-0.5`}
-                >
-                  <p className="text-lg font-bold mb-1 text-white">{LEVEL_LABEL[karte.level]}</p>
-                  <Tex display className="text-xl mb-2 text-white" tex={karte.tex} />
-                  <p className="text-sm text-white/90">{karte.text}</p>
-                </button>
-              ))}
-            </div>
-            <p className="text-sm text-slate-600 mt-4">
-              Jede Runde besteht aus sieben verschiedenen Aufgabenarten: von „Schritt für Schritt“ über Fehlersuche bis zur Sachaufgabe.
-            </p>
-          </div>
+          <ThemaStart
+            lernsituationen={[
+              {
+                thema: { name: 'Das Lichtwerk', farbe: 'schiefer', icon: 'fa-door-closed' },
+                beschreibung: 'Du bist im Lager eingeschlossen. Knacke den Türcode aus dem Brunnen-Modell und lerne dabei, den Scheitelpunkt einer Parabel zu berechnen.',
+                onClick: () => setLernsituation(true),
+              },
+            ]}
+            uebungen={LEVEL_KARTEN.map((karte, i) => ({
+              kicker: `Stufe ${i + 1}`,
+              titel: LEVEL_LABEL[karte.level],
+              formel: <Tex tex={karte.tex} />,
+              beschreibung: karte.text,
+              onClick: () => chooseLevel(karte.level),
+            }))}
+          />
+          <p className="text-sm text-slate-600">
+            Jede Runde besteht aus sieben verschiedenen Aufgabenarten: von „Schritt für Schritt“ über Fehlersuche bis zur Sachaufgabe.
+          </p>
         </div>
       </TaskShell>
     )

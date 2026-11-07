@@ -114,8 +114,10 @@ so viel wie die beste Übung; „Problem lösen“ bringt etwa 40 % der Pflichtp
 Keine Austausch-Phase: kein Stopp-Kasten „Besprecht eure Ergebnisse mit der Klasse“, kein „Vergleicht eure Wege“ und keine
 aufklappbaren Lösungswege anderer („Du arbeitest allein? So haben andere gedacht …“).
 
-Zu jeder neuen Lernsituation wird die Startseite des Themas zur Auswahl „Lernsituation“ / „Übungsaufgaben“ umgebaut (Karte
-`LernsituationKarte` aus `lernsituation_kit/seiten.tsx` in der Themenfarbe; Varianten A und B in `docs/skills/lernsituationen/SKILL.md`).
+Zu jeder neuen Lernsituation wird die Startseite des Themas zur Auswahl „Lernsituation“ / „Übungsaufgaben“ umgebaut, immer mit
+`ThemaStart` aus `lernsituation_kit/themastart.tsx` (seit 2026-11-07): oben die Lernsituation(en), darunter die Übungsaufgaben, alle Kästen
+weiß und gleich groß, Farbe nur als Kante oben und im Symbol (Lernsituation in Themenfarbe, Übungen in Füller-Blau, kein Grün/Rot für Stufen);
+Varianten A und B in `docs/skills/lernsituationen/SKILL.md`.
 Hat eine Übungsseite eine Einstiegs-Lernsituation (Karte „Lernsituation“ in der Auswahl), heißt der Bereich darunter mit den
 Schwierigkeitsgraden immer **„Übungsaufgaben“** (nicht „Wähle deinen Schwierigkeitsgrad“). Das gilt für alle Seiten des Mathe-Trainers,
 auch für künftige. Die Scheitelform wird als `y = a(x − x_S)² + y_S` geschrieben, nicht mit d und e.

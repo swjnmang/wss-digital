@@ -99,7 +99,6 @@ import EndwertMenu from './pages/finanzmathe/EndwertMenu';
 import EndwertLernsituation from './pages/finanzmathe/EndwertLernsituation';
 import Ratendarlehen from './pages/finanzmathe/Ratendarlehen';
 import RatendarlehenMenu from './pages/finanzmathe/RatendarlehenMenu';
-import StartseitenEntwurf from './pages/entwurf/StartseitenEntwurf';
 import RatendarlehenLernsituation from './pages/finanzmathe/RatendarlehenLernsituation';
 import Annuitaetendarlehen from './pages/finanzmathe/Annuitaetendarlehen';
 import AnnuitaetendarlehenMenu from './pages/finanzmathe/AnnuitaetendarlehenMenu';
@@ -337,7 +336,6 @@ export default function App() {
           <Route path="/finanzmathe/endwert/ueben" element={<Endwert />} />
           <Route path="/finanzmathe/endwert/lernsituation" element={<EndwertLernsituation />} />
           <Route path="/finanzmathe/ratendarlehen" element={<RatendarlehenMenu />} />
-          <Route path="/entwurf/startseite" element={<StartseitenEntwurf />} />
           <Route path="/finanzmathe/ratendarlehen/ueben" element={<Ratendarlehen />} />
           <Route path="/finanzmathe/ratendarlehen/lernsituation" element={<RatendarlehenLernsituation />} />
           <Route path="/finanzmathe/annuitaetendarlehen" element={<AnnuitaetendarlehenMenu />} />

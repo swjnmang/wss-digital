@@ -222,7 +222,7 @@ export const cfg: TopicConfig = {
     karte: {
       thema: THEMA_HANDYSTAENDER,
       beschreibung:
-        'Neu beim Thema? Baue mit dem Lasercutter einen Tablet-Ständer mit genau 70° Neigung und entdecke dabei, was Sinus, Kosinus und Tangens bedeuten.',
+        'Baue mit dem Lasercutter einen Tablet-Ständer mit genau 70° Neigung und entdecke dabei, was Sinus, Kosinus und Tangens bedeuten.',
     },
     render: (p) => <HandystaenderEinstieg {...p} />,
   },

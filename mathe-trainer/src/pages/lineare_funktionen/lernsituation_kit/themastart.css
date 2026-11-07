@@ -1,0 +1,24 @@
+/* Startseite eines Themas mit Lernsituation(en) und Übungsaufgaben (ThemaStart, Skill „Lernsituationen“, Abschnitt „Auswahlseite des Themas“).
+   Weiße, gleich große Kästen; Farbe nur als Kante oben und im Symbol: Lernsituation in ihrer Themenfarbe, Übungsaufgaben in Füller-Blau. */
+
+.ts { display: flex; flex-direction: column; gap: 28px; }
+.ts-section { display: flex; flex-direction: column; gap: 12px; }
+.ts-head { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 16px; flex-wrap: wrap; padding-bottom: 8px; border-bottom: 1.5px solid var(--line); }
+.ts-head h2 { margin: 0; font: 700 20px/1.2 var(--font-display); color: var(--ink); text-align: left; }
+.ts-head p { margin: 0; color: var(--ink-muted); font-size: 15px; }
+
+/* Ein Raster für beide Bereiche: gleiche Spaltenbreite, also gleich große Kästen */
+.ts-grid { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 600px) { .ts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .ts-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.ts-card { --c: var(--primary); --c-soft: var(--primary-soft); position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 8px; min-height: 176px; padding: 24px 18px 16px; border: 1.5px solid var(--edge); border-radius: var(--radius); background: var(--surface); color: var(--ink); text-align: left; text-decoration: none; cursor: pointer; font: inherit; transition: transform .12s ease, box-shadow .12s ease; }
+.ts-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: var(--c); }
+.ts-card:hover { transform: translateY(-2px); box-shadow: 0 6px 0 -2px var(--edge); color: var(--ink); }
+.ts-card:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.ts-kicker { display: flex; align-items: center; gap: 10px; font: 700 13px/1.2 var(--font-body); color: var(--ink-muted); letter-spacing: .02em; }
+.ts-icon { width: 40px; height: 40px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 18px; background: var(--c-soft); color: var(--c); }
+.ts-title { margin: 0; font: 700 19px/1.25 var(--font-display); color: var(--ink); hyphens: auto; }
+.ts-card .ts-formel { margin: 0; font: italic 18px/1.2 Georgia, 'Times New Roman', serif; color: var(--ink); }
+.ts-card .ts-desc { margin: 0; font-size: 15px; line-height: 1.4; color: var(--ink-muted); }
+.ts-go { margin-top: auto; display: inline-flex; align-items: center; gap: 8px; padding-top: 6px; font: 700 15px/1 var(--font-body); color: var(--c); }
