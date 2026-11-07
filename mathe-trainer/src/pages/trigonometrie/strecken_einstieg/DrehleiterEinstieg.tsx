@@ -207,14 +207,14 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
             title="c) Unbekannte im Zähler"
             prompt={<p>Löse die Gleichung nach <M>x</M> auf.</p>}
             rechnung={[
-              { l: ['\\dfrac{x}{8}'], r: ['0{,}6'], u: '\\mid \\cdot 8' },
+              { l: ['\\dfrac{x}{8}'], r: ['0{,}6'] },
               { l: ['x'], r: [{ luecke: 'x' }] },
             ]}
             fields={[{ kind: 'num', key: 'x', label: 'x', expected: 4.8 }]}
             solution={
               <Loesungsweg
                 schritte={[
-                  { titel: 'Beide Seiten mal 8', tex: 'x = 0{,}6 \\cdot 8' },
+                  { titel: 'Beide Seiten mal 8', tex: ['\\dfrac{x}{8} = 0{,}6 \\quad \\mid \\cdot 8', 'x = 0{,}6 \\cdot 8'] },
                   { titel: 'Ausrechnen', tex: 'x = 4{,}8' },
                 ]}
               />
@@ -237,16 +237,15 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
             title="d) Unbekannte im Nenner"
             prompt={<p>Jetzt steht <M>x</M> im Nenner. Löse nach <M>x</M> auf.</p>}
             rechnung={[
-              { l: ['\\dfrac{12}{x}'], r: ['0{,}4'], u: '\\mid \\cdot x' },
-              { l: ['12'], r: ['0{,}4 \\cdot x'], u: '\\mid : 0{,}4' },
+              { l: ['\\dfrac{12}{x}'], r: ['0{,}4'] },
               { l: ['x'], r: [{ luecke: 'x' }] },
             ]}
             fields={[{ kind: 'num', key: 'x', label: 'x', expected: 30 }]}
             solution={
               <Loesungsweg
                 schritte={[
-                  { titel: 'Beide Seiten mal x', tex: '12 = 0{,}4 \\cdot x' },
-                  { titel: 'Beide Seiten durch 0,4', tex: 'x = \\dfrac{12}{0{,}4} = 30' },
+                  { titel: 'Beide Seiten mal x', tex: ['\\dfrac{12}{x} = 0{,}4 \\quad \\mid \\cdot x', '12 = 0{,}4 \\cdot x'] },
+                  { titel: 'Beide Seiten durch 0,4', tex: ['12 = 0{,}4 \\cdot x \\quad \\mid : 0{,}4', 'x = \\dfrac{12}{0{,}4} = 30'] },
                 ]}
               />
             }
