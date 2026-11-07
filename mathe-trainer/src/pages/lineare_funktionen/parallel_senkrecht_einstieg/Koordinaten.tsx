@@ -2,7 +2,7 @@ import { useId, type ReactNode } from 'react'
 
 // Koordinatensystem für die Lernsituation „Der neue Radweg“ mit gleich großen Einheiten in x- und y-Richtung,
 // damit ein rechter Winkel auch auf dem Bildschirm rechtwinklig aussieht. Zeichnet Geraden, Steigungsdreiecke,
-// Punkte und einen Winkel (Bogen bzw. Quadrat bei 90°) zwischen zwei Geraden.
+// Punkte und einen Winkel (Bogen, bei 90° Viertelkreis mit Punkt) zwischen zwei Geraden.
 
 export type Linie = { m: number; t: number; farbe?: string; dicke?: number; blass?: boolean; bahn?: boolean; name?: string; nameX?: number }
 /** Steigungsdreieck: von (x | y) aus dx waagrecht, dann dy senkrecht; Beschriftung der beiden Katheten */
@@ -171,16 +171,19 @@ export function Koordinaten({
         const grad = winkelZwischen(wk.m1, wk.m2)
         const recht = Math.abs(grad - 90) < 0.5
         if (recht) {
-          const s = 18
-          // beim rechten Winkel die zweite Richtung so wählen, dass das Quadrat zwischen den Schenkeln liegt
+          // rechter Winkel: Viertelkreis zwischen den Schenkeln mit Punkt darin (nie als Quadrat)
+          const s = 22
+          const dreh = d1[0] * d2[1] - d1[1] * d2[0]
           return (
-            <polyline
-              key={i}
-              points={`${px + d1[0] * s},${py + d1[1] * s} ${px + (d1[0] + d2[0]) * s},${py + (d1[1] + d2[1]) * s} ${px + d2[0] * s},${py + d2[1] * s}`}
-              fill="none"
-              stroke={farbe}
-              strokeWidth="2.5"
-            />
+            <g key={i}>
+              <path
+                d={`M ${px + d1[0] * s} ${py + d1[1] * s} A ${s} ${s} 0 0 ${dreh > 0 ? 1 : 0} ${px + d2[0] * s} ${py + d2[1] * s}`}
+                fill="none"
+                stroke={farbe}
+                strokeWidth="2.5"
+              />
+              <circle cx={px + (d1[0] + d2[0]) * s * 0.3} cy={py + (d1[1] + d2[1]) * s * 0.3} r="3" fill={farbe} />
+            </g>
           )
         }
         const r = 36

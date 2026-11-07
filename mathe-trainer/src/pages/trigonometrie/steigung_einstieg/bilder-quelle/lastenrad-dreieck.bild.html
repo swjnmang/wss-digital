@@ -11,7 +11,7 @@ const dreieck = (x0, h, name) => {
   return { pink: `<polygon points="${x0},${y0} ${x0 + L},${y0} ${x0 + L},${y0 - hh}" fill="RASTER" stroke="none"/>
       <path d="M${x0} ${y0} L${x0 + 90} ${y0} A90 90 0 0 0 ${x0 + 90 * Math.cos(Math.atan(h / 100))} ${y0 - 90 * Math.sin(Math.atan(h / 100))} Z" stroke="none"/>`,
     indigo: `<polygon points="${x0},${y0} ${x0 + L},${y0} ${x0 + L},${y0 - hh}" fill="none" stroke-width="8" stroke-linejoin="round"/>
-      <path d="M${x0 + L - 26} ${y0} v-26 h26" fill="none" stroke-width="4"/>
+      <path d="M${x0 + L - 30} ${y0} A30 30 0 0 1 ${x0 + L} ${y0 - 30}" fill="none" stroke-width="4"/><circle cx="${x0 + L - 11}" cy="${y0 - 11}" r="4.5" stroke="none"/>
       <text x="${x0 + L / 2}" y="${y0 + 52}" text-anchor="middle" font-size="38" font-weight="700" stroke="none">100 m waagrecht</text>
       <text x="${x0 + L + 16}" y="${y0 - hh / 2 + 14}" font-size="40" font-weight="800" stroke="none">${h} m</text>
       <text x="${x0 + 10}" y="${y0 - 70}" font-size="40" font-weight="800" stroke="none">α = ?</text><path d="M${x0 + 40} ${y0 - 60} Q${x0 + 60} ${y0 - 30} ${x0 + 70} ${y0 - 8}" fill="none" stroke-width="4"/>

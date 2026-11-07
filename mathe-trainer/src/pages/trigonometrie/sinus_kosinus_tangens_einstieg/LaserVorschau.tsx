@@ -46,7 +46,9 @@ function Vorschau({ v }: { v: Versuch | null }) {
     >
       <path d={`M${A} L${B} L${C} Z`} fill="var(--primary-soft)" stroke="var(--ink)" strokeWidth="3" strokeLinejoin="round" />
       <path d={`M${A[0]} ${A[1]} L${A[0] + r} ${A[1]} A${r} ${r} 0 0 0 ${bx} ${by} Z`} fill={farbe} fillOpacity=".25" stroke={farbe} strokeWidth="2.5" />
-      <path d={`M${B[0] - 16} ${B[1]} V${B[1] - 16} H${B[0]}`} fill="none" stroke="var(--ink)" strokeWidth="1.6" />
+      {/* rechter Winkel: Viertelkreis mit Punkt */}
+      <path d={`M${B[0] - 20} ${B[1]} A20 20 0 0 1 ${B[0]} ${B[1] - 20}`} fill="none" stroke="var(--ink)" strokeWidth="1.8" />
+      <circle cx={B[0] - 7.5} cy={B[1] - 7.5} r="2.6" fill="var(--ink)" />
       <text x={(A[0] + B[0]) / 2} y={A[1] + 30} textAnchor="middle" fontSize="20" fontWeight="700" fill="var(--ink)">
         {zahl(v.boden)} cm
       </text>
