@@ -1,0 +1,56 @@
+/* Entwurf: einheitliche Startseite eines Themas mit Lernsituation(en) und Übungsaufgaben (drei Varianten zum Vergleich) */
+
+.ts { display: flex; flex-direction: column; gap: 28px; }
+.ts-section { display: flex; flex-direction: column; gap: 12px; }
+.ts-head { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 16px; flex-wrap: wrap; padding-bottom: 8px; border-bottom: 1.5px solid var(--line); }
+.ts-head h2 { margin: 0; font: 700 20px/1.2 var(--font-display); color: var(--ink); }
+.ts-head p { margin: 0; color: var(--ink-muted); font-size: 15px; }
+
+/* Ein Raster für beide Bereiche: gleiche Spaltenbreite, also gleich große Kästen */
+.ts-grid { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 600px) { .ts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .ts-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.ts-card { --c: var(--primary); --c-soft: var(--primary-soft); position: relative; display: flex; flex-direction: column; gap: 8px; min-height: 176px; padding: 18px 18px 16px; border: 1.5px solid var(--edge); border-radius: var(--radius); background: var(--surface); color: var(--ink); text-align: left; text-decoration: none; cursor: pointer; font: inherit; transition: transform .12s ease, box-shadow .12s ease; }
+.ts-card:hover { transform: translateY(-2px); box-shadow: 0 6px 0 -2px var(--edge); }
+.ts-card:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.ts-kicker { display: flex; align-items: center; gap: 10px; font: 700 13px/1.2 var(--font-body); color: var(--ink-muted); letter-spacing: .02em; }
+.ts-icon { width: 40px; height: 40px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 18px; }
+.ts-title { margin: 0; font: 700 19px/1.25 var(--font-display); }
+.ts-formel { margin: 0; font: italic 18px/1.2 Georgia, 'Times New Roman', serif; }
+.ts-desc { margin: 0; font-size: 15px; line-height: 1.4; color: var(--ink-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ts-go { margin-top: auto; display: inline-flex; align-items: center; gap: 8px; padding-top: 6px; font: 700 15px/1 var(--font-body); color: var(--c); }
+
+/* Variante 1 · Ruhig: weiße Karten, Farbe nur als Kante oben und im Symbol */
+.ts-v1 .ts-card { padding-top: 24px; overflow: hidden; }
+.ts-v1 .ts-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: var(--c); }
+.ts-v1 .ts-icon { background: var(--c-soft); color: var(--c); }
+
+/* Variante 2 · Farbflächen: Lernsituationen in ihrer Themenfarbe, alle Übungen in einem Ton (Schiefer) */
+.ts-v2 .ts-card { background: var(--c); color: #fff; border-color: var(--edge); }
+.ts-v2 .ts-kicker, .ts-v2 .ts-desc { color: rgba(255, 255, 255, .88); }
+.ts-v2 .ts-icon { background: rgba(255, 255, 255, .16); color: #fff; }
+.ts-v2 .ts-go { color: #fff; }
+.ts-v2 .ts-uebung { --c: #3c5466; }
+
+/* Variante 3 · Liste: gleich hohe Zeilen, farbiges Symbolfeld links */
+.ts-v3 .ts-grid { gap: 10px; }
+@media (min-width: 1000px) { .ts-v3 .ts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ts-v3 .ts-card { flex-direction: row; align-items: center; gap: 16px; min-height: 104px; padding: 14px 16px; }
+.ts-v3 .ts-icon { width: 64px; height: 64px; border-radius: 12px; font-size: 26px; background: var(--c); color: #fff; align-self: stretch; height: auto; min-height: 64px; }
+.ts-v3 .ts-uebung .ts-icon { background: var(--c-soft); color: var(--c); }
+.ts-v3 .ts-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.ts-v3 .ts-kicker { font-size: 12.5px; }
+.ts-v3 .ts-title { font-size: 17px; }
+.ts-v3 .ts-formel { font-size: 16px; }
+.ts-v3 .ts-desc { font-size: 14px; -webkit-line-clamp: 2; }
+.ts-v3 .ts-chev { flex: none; color: var(--ink-muted); font-size: 16px; }
+@media (max-width: 420px) { .ts-v3 .ts-icon { width: 48px; min-height: 48px; font-size: 20px; } }
+
+/* Umschalter der Entwurfsseite */
+.ts-demo-bar { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; padding: 14px 16px; border: 1.5px dashed var(--line-strong); border-radius: var(--radius); background: var(--surface-sunken); }
+.ts-demo-bar b { font-size: 14px; color: var(--ink-muted); margin-right: 4px; }
+.ts-demo-note { margin: 0; color: var(--ink-muted); font-size: 15px; }
+.ts-card .ts-formel { color: inherit; }
+.ts-card .ts-desc { color: var(--ink-muted); }
+.ts-v2 .ts-card .ts-desc { color: rgba(255, 255, 255, .88); }
