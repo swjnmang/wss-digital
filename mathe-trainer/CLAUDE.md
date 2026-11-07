@@ -96,7 +96,7 @@ Eingabefelder in Lernsituationen prüfen sich selbst (richtig sofort grün, fals
 ohne Prüfen-Button: `CheckCard` macht das automatisch, eigene Eingabe-Bausteine nutzen `useLiveCheck` aus `lernsituation_kit/kit.tsx`.
 Nur Auswahlaufgaben (`McCard`) behalten „Prüfen“.
 Neue Begriffe (seit 2026-11-07): Das Rechenbeispiel erklärt jeden neuen Begriff zuerst in ganzen Sätzen, Formeln mit ausgeschriebenen Begriffen statt Abkürzungen (kein GK, AK, H); abgesetzte Formeln mit Abstand (kommt aus `seiten.css`), das Lernvideo steht mit Abstand unter dem Beispiel (`.sl-aufklappbar-inhalt`).
-Warm-up: mindestens 5 kurze Aufgaben, alle Pflicht, jede sichtbar nummeriert (Kartentitel „a) Kurzname“, „b) …“; `seiten.css` zeigt die Titel auf der Warm-up-Seite an). Beim Rechenbeispiel in „Problem lösen“ ist immer das passende Lernvideo eingebettet
+Warm-up: Gleichungen ohne vorgegebene Umformungen (nur Auftrag, Gleichung und `x = [ ]`; die Umformungen stehen erst im Lösungsweg, seit 2026-11-07). Warm-up: mindestens 5 kurze Aufgaben, alle Pflicht, jede sichtbar nummeriert (Kartentitel „a) Kurzname“, „b) …“; `seiten.css` zeigt die Titel auf der Warm-up-Seite an). Beim Rechenbeispiel in „Problem lösen“ ist immer das passende Lernvideo eingebettet
 (`BeispielMitVideo` mit `video`), falls es eines gibt; die Videos sind meist schon bei den Übungsaufgaben des Themas verlinkt und werden von dort übernommen.
 Die Kriterien des Handlungsprodukts („Ist dein … vollständig?“) sind seit 2026-11-05 immer genau drei kurze feste Punkte
 (`standardKriterien(…)` aus `finanzmathe/zins_kit/zins_kit.tsx`): Problem vollständig gelöst und Rechenschritte festgehalten, Antwortsatz notiert,
