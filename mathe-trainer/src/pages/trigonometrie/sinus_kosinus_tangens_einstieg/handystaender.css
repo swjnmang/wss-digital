@@ -1,0 +1,38 @@
+/* Lernsituation „Der Handyständer“ (Bauplan / Lasercut). Themenfarbe kommt über --primary aus thema, Bildwelt-Stile in bildwelten.css. */
+
+.hs-skizze { display: flex; justify-content: center; }
+.hs-skizze .hs-dreieck { width: 100%; max-width: 440px; height: auto; }
+.hs-skizze-klein .hs-dreieck { max-width: 380px; }
+.hs-dreieck text { font-family: var(--font-display, inherit); }
+.hs-legende { margin: 0; text-align: center; font-size: 17px; font-weight: 600; }
+
+.hs-labor { display: flex; flex-direction: column; gap: 12px; }
+.hs-vorschau-rahmen { display: flex; justify-content: center; padding: 8px; }
+.hs-vorschau { width: 100%; max-width: 620px; height: auto; }
+.hs-vorschau text { font-family: var(--font-display, inherit); }
+
+.hs-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 19px; }
+.hs-eingabe label { font-weight: 700; }
+.hs-eingabe .lp-input { min-height: 44px; width: 96px; }
+.hs-eingabe .bk-btn { min-height: 44px; margin-left: 6px; }
+
+.hs-anzeige {
+  display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 8px 14px;
+  background: var(--primary-soft); color: var(--ink); font-size: 17px; line-height: 1.45;
+}
+.hs-anzeige > i { margin-top: 3px; color: var(--primary); font-size: 18px; }
+.hs-anzeige-ok { background: var(--correct-soft); color: var(--correct-ink); }
+.hs-anzeige-ok > i { color: var(--correct); }
+
+.hs-tabelle-rahmen { max-width: 100%; overflow-x: auto; }
+.hs-tabelle { width: 100%; border-collapse: collapse; background: #fff; font-size: 17px; font-variant-numeric: tabular-nums; }
+.hs-tabelle caption { text-align: left; padding: 0 0 6px; font: 600 19px/1.2 var(--font-display, inherit); }
+.hs-tabelle th, .hs-tabelle td { padding: 6px 10px; border: 1.5px solid var(--bp-tusche, var(--line)); text-align: right; }
+.hs-tabelle th { background: var(--primary-soft); font-family: var(--font-display, inherit); font-weight: 600; text-align: center; }
+.hs-tabelle td:first-child { text-align: center; }
+.hs-tabelle .hs-treffer td { background: var(--correct-soft); color: var(--correct-ink); font-weight: 700; }
+@media (max-width: 480px) { .hs-tabelle { font-size: 15px; } .hs-tabelle th, .hs-tabelle td { padding: 5px 6px; } }
+
+.hs-spiel-frage { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.hs-spiel-frage .hs-dreieck { width: 100%; max-width: 420px; height: auto; }
+.hs-spiel-frage p { margin: 0; font-size: 18px; }

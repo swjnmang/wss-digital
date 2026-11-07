@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- Der Handyständer, Problem erkennen: Jules Wunsch, ein Tablet-Ständer mit genau 70° Neigung. Gegeben ist nur der Winkel,
+     Boden und Rücken sind gesucht (Fragezeichen). Bildwelt Bauplan / Lasercut.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/trigonometrie/sinus_kosinus_tangens_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_lasercut.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const W = 1200, H = 600;
+let g = LC.defs + LC.grund(W, H);
+// Seitenteil mit 70°: Boden 150 px, Rücken 150 · tan 70° (gestrichelt: noch nicht zugeschnitten)
+const bo = 150, ru = bo * Math.tan(70 * Math.PI / 180), A = [230, 520], B = [230 + bo, 520], C = [230 + bo, 520 - ru];
+g += `<path d="M${A[0] - 50} ${A[1]} H${B[0] + 40}" stroke="#3b230e" stroke-width="3"/>`;
+g += `<path d="M${A} L${B} L${C} Z" fill="#f3dfb7" fill-opacity=".55" stroke="#3b230e" stroke-width="3" stroke-dasharray="14 8" stroke-linejoin="round"/>`;
+// Tablet an der schrägen Kante
+const L = Math.hypot(bo, ru), ux = bo / L, uy = -ru / L, nx = uy, ny = -ux;
+const p = (t, d) => [A[0] + ux * t + nx * d, A[1] + uy * t + ny * d];
+g += `<path d="M${p(10, 6)} L${p(400, 6)} L${p(400, 26)} L${p(10, 26)} Z" fill="#2f3438" stroke="#15181b" stroke-width="3" stroke-linejoin="round" filter="url(#lc-schatten)"/>`;
+g += `<path d="M${p(24, 9)} L${p(386, 9)} L${p(386, 13)} L${p(24, 13)} Z" fill="#7d93a3"/>`;
+g += LC.rechter(B[0], B[1], -1, -1);
+g += LC.winkel(A[0], A[1], 70, 0, 70, '70°', LC.A, 104);
+g += LC.mass(A[0], A[1], B[0], B[1], 'Boden ?', 46);
+g += LC.mass(B[0], B[1], C[0], C[1], 'Rücken ?', 40);
+{ const [lx, ly] = p(230, 70); g += LC.gravur(lx, ly, 'Auflage', 28, 'middle', '#4a2b10', 700, -70); }
+
+// Jules Wunsch als Schriftfeld und eingravierte Notiz
+g += LC.feld(640, 70, 470, 'Jules Wunsch: Tablet-Ständer', [['Neigung α', 'genau 70°'], ['Boden', '?'], ['Rücken', '?'], ['Material', '4 mm Sperrholz']]);
+g += LC.gravur(640, 380, '„Mit 70° spiegelt nichts und ich sehe', 28, 'start', '#3b230e', 600);
+g += LC.gravur(640, 416, 'beim Rezepte-Kochen alles. Wie lang', 28, 'start', '#3b230e', 600);
+g += LC.gravur(640, 452, 'müssen Boden und Rücken sein?“', 28, 'start', '#3b230e', 600);
+g += LC.gravur(640, 492, 'Jule', 24, 'start', '#8a5800', 700);
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${g}</svg>`;
+</script></body></html>

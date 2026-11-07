@@ -15,6 +15,7 @@ import {
   type TopicConfig,
 } from './types';
 import { useBackHandler } from '../../../hooks/useBackHandler';
+import { LernsituationKarte } from '../../lineare_funktionen/lernsituation_kit/seiten';
 
 const TOTAL_TASKS = 6;
 /** So lange muss eine falsche Eingabe stehen bleiben, bis sie rot wird und als Versuch zählt. */
@@ -378,8 +379,13 @@ function Erklaerung({ cfg }: { cfg: TopicConfig }) {
 export default function Practice({ cfg }: { cfg: TopicConfig }) {
   const navigate = useNavigate();
   const [level, setLevel] = useState<Level | null>(null);
+  // Einstiegs-Lernsituation als eigener Modus neben den Schwierigkeitsgraden (falls das Thema eine hat)
+  const [lernsituation, setLernsituation] = useState(false);
   // Zurück-Button im Kopf führt zuerst zur Auswahl auf dieser Seite
-  useBackHandler(level !== null, () => chooseLevel(null));
+  useBackHandler(lernsituation || level !== null, () => {
+    setLernsituation(false);
+    chooseLevel(null);
+  });
   const [round, setRound] = useState(0);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [versions, setVersions] = useState<number[]>(() => Array(TOTAL_TASKS).fill(0));
@@ -436,21 +442,54 @@ export default function Practice({ cfg }: { cfg: TopicConfig }) {
     document.getElementById('aufgaben')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  if (lernsituation && cfg.lernsituation) {
+    return (
+      <>
+        {cfg.lernsituation.render({
+          onBack: () => {
+            setLernsituation(false);
+            window.scrollTo({ top: 0 });
+          },
+          onPractice: () => {
+            setLernsituation(false);
+            chooseLevel(cfg.levels[0].id);
+          },
+        })}
+      </>
+    );
+  }
+
+  const mitLernsituation = !!cfg.lernsituation && !level;
+
   return (
     <TaskShell title={cfg.title} subtitle={cfg.subtitle} width="narrow">
       <div className="flex flex-col gap-6">
 
         <Erklaerung cfg={cfg} />
 
-        <div id="aufgaben" className={`${panel} text-center scroll-mt-4`}>
+        <div className={mitLernsituation ? 'grid grid-cols-1 md:grid-cols-3 gap-4' : 'contents'}>
+        {mitLernsituation && cfg.lernsituation && (
+          <div className={`${panel} flex flex-col`}>
+            <h2 className="text-xl font-extrabold text-ink mb-4 text-center">Lernsituation</h2>
+            <LernsituationKarte
+              className="flex-1"
+              thema={cfg.lernsituation.karte.thema}
+              beschreibung={cfg.lernsituation.karte.beschreibung}
+              onClick={() => setLernsituation(true)}
+            />
+          </div>
+        )}
+        <div id="aufgaben" className={`${panel} text-center scroll-mt-4 ${mitLernsituation ? 'md:col-span-2' : ''}`}>
           <h2 className="text-xl font-extrabold text-ink mb-4">
             {level
               ? `Schwierigkeitsgrad: ${LEVEL_LABEL[level]}`
+              : cfg.lernsituation
+              ? 'Übungsaufgaben'
               : 'Wähle deinen Schwierigkeitsgrad'}
           </h2>
           <div
             className={`grid grid-cols-1 gap-3 ${
-              cfg.levels.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
+              mitLernsituation ? '' : cfg.levels.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
             }`}
           >
             {cfg.levels.map((l) => (
@@ -478,6 +517,7 @@ export default function Practice({ cfg }: { cfg: TopicConfig }) {
           {cfg.roundingNote && level && (
             <p className="text-sm text-muted mt-4">{cfg.roundingNote}</p>
           )}
+        </div>
         </div>
 
         {level &&

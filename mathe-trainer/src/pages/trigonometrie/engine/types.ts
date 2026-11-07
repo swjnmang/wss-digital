@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { Thema } from '../../lineare_funktionen/lernsituation_kit/seiten';
 
 /**
  * Texte (Aufgabe, Tipps, Lösung, Auswahloptionen) dürfen Formeln in $…$ (KaTeX),
@@ -69,4 +70,12 @@ export interface TopicConfig {
   generate: Generator;
   /** Hinweis über den Aufgaben, z. B. zur Rundung */
   roundingNote?: string;
+  /**
+   * Einstiegs-Lernsituation als eigener Modus der Seite (Variante A im Lernsituationen-Skill): In der Startansicht stehen dann
+   * nebeneinander „Lernsituation“ (Karte in der Themenfarbe) und „Übungsaufgaben“ (die Schwierigkeitsgrade).
+   */
+  lernsituation?: {
+    karte: { thema: Pick<Thema, 'name' | 'farbe' | 'icon'>; beschreibung: ReactNode };
+    render: (p: { onBack: () => void; onPractice: () => void }) => ReactNode;
+  };
 }
