@@ -1,140 +1,132 @@
 import { useEffect, useId, useState, type ChangeEvent, type KeyboardEvent } from 'react';
-import { M } from '../../daten_und_zufall/lernpfad/kit';
 import { PUNKTE, usePunkteAufgabe } from '../../lineare_funktionen/lernsituation_kit/punkte';
 import { parseFlexibleNumber } from '../../../utils/parseFlexibleNumber';
 
-// Problem erkennen: Schätzduell an der Drehleiter. Die Leiter ist 30 m ausgefahren und um 70° aufgerichtet. Die SuS schätzen, wie hoch
-// die Leiterspitze über dem Drehpunkt liegt. Der Gruppenführer meldet nur „zu hoch“ oder „zu niedrig“, die Skizze zeichnet die Schätzung
-// als Linie an die Wand. Auf 5 cm genau trifft man durch Schätzen kaum. Freigabe nach drei Schätzungen oder einem Treffer.
+// Problem erkennen: Leiter ausfahren. Das Fenster liegt 26 m über dem Drehpunkt, die Leiter steht immer unter 70°. Die SuS tippen eine
+// Leiterlänge ein; das Fahrzeug fährt so weit an die Wand, dass die Spitze an der Fassade anliegt, und die Skizze zeigt, ob die Spitze
+// unter, über oder genau am Fenster ankommt. Auf 5 cm genau trifft man die Länge durch Probieren kaum. Freigabe nach drei Versuchen
+// oder einem Treffer.
 
-export const LEITER = 30;
+export const FENSTER = 26;
 export const WINKEL = 70;
-export const HOEHE = LEITER * Math.sin((WINKEL * Math.PI) / 180);
-export const ABSTAND = LEITER * Math.cos((WINKEL * Math.PI) / 180);
-export const istTreffer = (h: number) => Math.abs(h - HOEHE) <= 0.05;
+const rad = (WINKEL * Math.PI) / 180;
+/** gesuchte Leiterlänge: Fensterhöhe geteilt durch sin(70°) */
+export const LEITER = FENSTER / Math.sin(rad);
+/** Abstand des Drehpunkts von der Hauswand bei dieser Leiterlänge */
+export const ABSTAND = LEITER * Math.cos(rad);
+export const MAX_LEITER = 30;
+export const istTreffer = (l: number) => Math.abs(l - LEITER) <= 0.05;
 const zahl = (x: number, d = 2) => x.toLocaleString('de-DE', { maximumFractionDigits: d });
 
-function Skizze({ schaetzungen }: { schaetzungen: number[] }) {
+function Skizze({ versuche }: { versuche: number[] }) {
   const W = 560;
-  const H = 400;
-  const s = 11; // Pixel pro Meter
-  const D: [number, number] = [150, H - 50]; // Drehpunkt
-  const wandX = D[0] + ABSTAND * s;
-  const spitze: [number, number] = [wandX, D[1] - HOEHE * s];
-  const y = (h: number) => D[1] - h * s;
-  const letzte = schaetzungen[schaetzungen.length - 1];
-  const r = 46;
-  const w = (WINKEL * Math.PI) / 180;
+  const H = 410;
+  const s = 11.5; // Pixel pro Meter
+  const boden = H - 50;
+  const wandX = 330; // Hausfassade (fest)
+  const y = (h: number) => boden - h * s;
+  const letzte = versuche[versuche.length - 1];
+  const tusche = 'var(--co-tusche, #141414)';
+  // Das Fahrzeug steht so, dass die Spitze an der Fassade anliegt: Drehpunkt um L · cos(70°) vor der Wand
+  const L = letzte !== undefined ? Math.min(letzte, 34) : null;
+  const D: [number, number] | null = L !== null ? [wandX - L * Math.cos(rad) * s, boden] : null;
+  const spitzeY = L !== null ? y(L * Math.sin(rad)) : 0;
+  const treffer = letzte !== undefined && istTreffer(letzte);
+  const farbe = treffer ? 'var(--correct)' : 'var(--primary)';
+  const r = 40;
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
       role="img"
       className="dl-skizze"
-      aria-label={`Skizze: Drehleiter 30 Meter lang, um 70 Grad aufgerichtet, die Spitze lehnt an der Hauswand. Die Höhe der Spitze über dem Drehpunkt ist gesucht.${
-        letzte !== undefined ? ` Deine letzte Schätzung ${zahl(letzte)} Meter ist als Linie an der Wand eingezeichnet.` : ''
+      aria-label={`Skizze: Hauswand mit dem Fenster 26 Meter über dem Drehpunkt. ${
+        letzte !== undefined
+          ? `Deine Leiter ist ${zahl(letzte)} Meter lang und um 70 Grad aufgerichtet. Ihre Spitze liegt ${
+              treffer ? 'genau am Fenster' : letzte < LEITER ? 'unter dem Fenster' : 'über dem Fenster'
+            }.`
+          : 'Noch keine Leiter ausgefahren.'
       }`}
     >
-      {/* Hauswand mit Fenstern */}
-      <rect x={wandX} y={20} width={W - wandX - 10} height={D[1] - 20 + 30} fill="var(--primary-soft)" stroke="var(--co-tusche, #141414)" strokeWidth="4" />
-      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-        <rect key={i} x={wandX + 40} y={D[1] - 18 - i * 40} width="44" height="26" fill="#fff" stroke="var(--co-tusche, #141414)" strokeWidth="3" />
+      {/* Hauswand; das Fenster sitzt direkt an der Fassade, wo die Leiter anliegt */}
+      <rect x={wandX} y={12} width={W - wandX - 10} height={boden - 12 + 30} fill="var(--primary-soft)" stroke={tusche} strokeWidth="4" />
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <rect key={i} x={wandX + 110} y={boden - 30 - i * 44} width="44" height="26" fill="#fff" stroke={tusche} strokeWidth="3" />
       ))}
-      {/* Boden und Fahrzeug */}
-      <line x1="0" y1={D[1] + 30} x2={W} y2={D[1] + 30} stroke="var(--co-tusche, #141414)" strokeWidth="4" />
-      <rect x={D[0] - 120} y={D[1] - 6} width="170" height="30" rx="6" fill="var(--primary)" stroke="var(--co-tusche, #141414)" strokeWidth="4" />
-      {/* Winkel */}
-      <path
-        d={`M${D[0]} ${D[1]} L${D[0] + r} ${D[1]} A${r} ${r} 0 0 0 ${D[0] + r * Math.cos(w)} ${D[1] - r * Math.sin(w)} Z`}
-        fill="#f5c400"
-        fillOpacity=".55"
-        stroke="var(--co-tusche, #141414)"
-        strokeWidth="2.5"
-      />
-      <line x1={D[0]} y1={D[1]} x2={wandX} y2={D[1]} stroke="var(--co-tusche, #141414)" strokeWidth="2" strokeDasharray="8 6" />
-      <text x={D[0] + r + 8} y={D[1] - 12} fontSize="22" fontWeight="700" fill="var(--co-tusche, #141414)">
-        70°
+      <rect x={wandX + 2} y={y(FENSTER) - 18} width="56" height="36" fill="#f5c400" stroke={tusche} strokeWidth="3" />
+      <line x1={wandX + 58} y1={y(FENSTER)} x2={W - 10} y2={y(FENSTER)} stroke={tusche} strokeWidth="2" strokeDasharray="6 6" />
+      <text x={wandX + 68} y={y(FENSTER) - 8} fontSize="20" fontWeight="700" fill={tusche}>
+        Fenster 26 m
       </text>
-      {/* Leiter mit Sprossen */}
-      <line x1={D[0]} y1={D[1]} x2={spitze[0]} y2={spitze[1]} stroke="var(--co-tusche, #141414)" strokeWidth="12" strokeLinecap="round" />
-      <line x1={D[0]} y1={D[1]} x2={spitze[0]} y2={spitze[1]} stroke="#e9e3d2" strokeWidth="6" strokeLinecap="round" strokeDasharray="4 10" />
-      <text
-        x={(D[0] + spitze[0]) / 2 - 18}
-        y={(D[1] + spitze[1]) / 2}
-        textAnchor="end"
-        fontSize="22"
-        fontWeight="700"
-        fill="var(--co-tusche, #141414)"
-      >
-        Leiter 30 m
-      </text>
-      <circle cx={D[0]} cy={D[1]} r="7" fill="#fff" stroke="var(--co-tusche, #141414)" strokeWidth="3" />
-      <text x={D[0] - 12} y={D[1] - 14} textAnchor="end" fontSize="18" fontWeight="700" fill="var(--co-tusche, #141414)">
-        Drehpunkt
-      </text>
-      {/* gesuchte Höhe */}
-      <line x1={wandX - 14} y1={D[1]} x2={wandX - 14} y2={spitze[1]} stroke="var(--primary)" strokeWidth="3" />
-      <text x={wandX - 22} y={D[1] - 40} textAnchor="end" fontSize="26" fontWeight="800" fill="var(--primary)">
-        h = ?
-      </text>
-      {/* Fenster mit der Übungspuppe in 26 m Höhe */}
-      <rect x={wandX + 110} y={y(26) - 14} width="56" height="30" fill="#f5c400" stroke="var(--co-tusche, #141414)" strokeWidth="3" />
-      <text x={wandX + 174} y={y(26) + 8} fontSize="18" fontWeight="700" fill="var(--co-tusche, #141414)">
-        26 m
-      </text>
-      {/* frühere Schätzungen blass, aktuelle kräftig */}
-      {schaetzungen.map((h, i) => {
-        const aktuell = i === schaetzungen.length - 1;
-        if (h > 34 || h < 0) return null;
-        const farbe = istTreffer(h) ? 'var(--correct)' : aktuell ? 'var(--primary)' : '#9aa3ab';
-        return (
-          <g key={i} opacity={aktuell ? 1 : 0.55}>
-            <line x1={wandX} y1={y(h)} x2={W - 10} y2={y(h)} stroke={farbe} strokeWidth={aktuell ? 4 : 2} strokeDasharray="10 6" />
-            {aktuell && (
-              <text x={W - 16} y={y(h) - 8} textAnchor="end" fontSize="20" fontWeight="800" fill={farbe}>
-                {zahl(h)} m
-              </text>
-            )}
-          </g>
-        );
-      })}
+      {/* Boden */}
+      <line x1="0" y1={boden + 30} x2={W} y2={boden + 30} stroke={tusche} strokeWidth="4" />
+      {D === null ? (
+        <text x={wandX / 2} y={boden - 40} textAnchor="middle" fontSize="19" fill="var(--ink-muted)">
+          Gib eine Leiterlänge ein.
+        </text>
+      ) : (
+        <>
+          {/* frühere Versuche blass: nur die Höhe der Spitze an der Wand */}
+          {versuche.slice(0, -1).map((v, i) => {
+            const h = Math.min(v, 34) * Math.sin(rad);
+            return <circle key={i} cx={wandX} cy={y(h)} r="6" fill="#9aa3ab" opacity=".7" />;
+          })}
+          <rect x={D[0] - 140} y={D[1] - 6} width="170" height="30" rx="6" fill="var(--primary)" stroke={tusche} strokeWidth="4" />
+          <path
+            d={`M${D[0]} ${D[1]} L${D[0] + r} ${D[1]} A${r} ${r} 0 0 0 ${D[0] + r * Math.cos(rad)} ${D[1] - r * Math.sin(rad)} Z`}
+            fill="#f5c400"
+            fillOpacity=".6"
+            stroke={tusche}
+            strokeWidth="2.5"
+          />
+          <text x={D[0] + r + 6} y={D[1] - 10} fontSize="20" fontWeight="700" fill={tusche}>
+            70°
+          </text>
+          <line x1={D[0]} y1={D[1]} x2={wandX} y2={spitzeY} stroke={tusche} strokeWidth="12" strokeLinecap="round" />
+          <line x1={D[0]} y1={D[1]} x2={wandX} y2={spitzeY} stroke={treffer ? '#bfe8cc' : '#e9e3d2'} strokeWidth="6" strokeLinecap="round" strokeDasharray="4 10" />
+          <circle cx={wandX} cy={spitzeY} r="7" fill={farbe} stroke={tusche} strokeWidth="2" />
+          <text x={(D[0] + wandX) / 2 - 22} y={(D[1] + spitzeY) / 2} textAnchor="end" fontSize="21" fontWeight="700" fill={farbe}>
+            Leiter {zahl(letzte!)} m
+          </text>
+          <circle cx={D[0]} cy={D[1]} r="6" fill="#fff" stroke={tusche} strokeWidth="3" />
+        </>
+      )}
     </svg>
   );
 }
 
-export default function LeiterSchaetzung({ schaetzungen, onSchaetzen }: { schaetzungen: number[]; onSchaetzen: (h: number) => void }) {
+export default function LeiterSchaetzung({ versuche, onAusfahren }: { versuche: number[]; onAusfahren: (l: number) => void }) {
   const uid = useId();
   const [eingabe, setEingabe] = useState('');
   const [fehler, setFehler] = useState<string | null>(null);
-  const treffer = schaetzungen.some(istTreffer);
-  const frei = schaetzungen.length >= 3 || treffer;
+  const treffer = versuche.some(istTreffer);
+  const frei = versuche.length >= 3 || treffer;
   const pt = usePunkteAufgabe({ wert: PUNKTE.festlegung, serie: false });
   useEffect(() => {
     if (frei) pt.geloest();
   }, [frei, pt]);
 
-  const melden = () => {
-    const h = parseFlexibleNumber(eingabe.replace(/m/i, '').trim());
-    if (!Number.isFinite(h)) return setFehler('Gib eine Zahl in Metern ein, z. B. 25 oder 27,5.');
-    if (h <= 0 || h > 60) return setFehler('Die Spitze liegt irgendwo zwischen 0 m und 30 m über dem Drehpunkt.');
+  const ausfahren = () => {
+    const l = parseFlexibleNumber(eingabe.replace(/m/i, '').trim());
+    if (!Number.isFinite(l)) return setFehler('Gib eine Länge in Metern ein, z. B. 25 oder 27,5.');
+    if (l <= 0) return setFehler('Die Leiter muss ein Stück ausgefahren werden.');
+    if (l > MAX_LEITER) return setFehler('Die Drehleiter lässt sich höchstens 30 m weit ausfahren.');
     setFehler(null);
-    onSchaetzen(h);
+    onAusfahren(l);
   };
   const enter = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') melden();
+    if (e.key === 'Enter') ausfahren();
   };
-  const letzte = schaetzungen[schaetzungen.length - 1];
+  const letzte = versuche[versuche.length - 1];
 
   return (
     <div className="dl-labor" data-no-autocheck>
       <div className="bk-graph dl-rahmen">
-        <Skizze schaetzungen={schaetzungen} />
+        <Skizze versuche={versuche} />
       </div>
       <div className="dl-eingabe">
-        <label htmlFor={`${uid}-h`}>
-          Meine Schätzung: <M>h =</M>
-        </label>
+        <label htmlFor={`${uid}-l`}>Leiter ausfahren auf</label>
         <input
-          id={`${uid}-h`}
+          id={`${uid}-l`}
           type="text"
           inputMode="decimal"
           autoComplete="off"
@@ -144,8 +136,8 @@ export default function LeiterSchaetzung({ schaetzungen, onSchaetzen }: { schaet
           onKeyDown={enter}
         />
         <span>m</span>
-        <button type="button" className="bk-btn bk-btn-primary" onClick={melden}>
-          <i className="fa-solid fa-tower-broadcast" aria-hidden="true" /> An den Gruppenführer funken
+        <button type="button" className="bk-btn bk-btn-primary" onClick={ausfahren}>
+          <i className="fa-solid fa-arrows-up-to-line" aria-hidden="true" /> Leiter ausfahren
         </button>
       </div>
       {fehler && (
@@ -157,20 +149,20 @@ export default function LeiterSchaetzung({ schaetzungen, onSchaetzen }: { schaet
         <p className={`dl-anzeige ${istTreffer(letzte) ? 'dl-anzeige-ok' : ''}`} role="status">
           <i className="fa-solid fa-tower-broadcast" aria-hidden="true" />
           <span>
-            <strong>Gruppenführer, Schätzung {schaetzungen.length}:</strong>{' '}
+            <strong>Gruppenführer, Versuch {versuche.length}:</strong>{' '}
             {istTreffer(letzte)
-              ? `„${zahl(letzte)} m, das stimmt auf 5 cm genau. Treffer!“`
-              : letzte > HOEHE
-                ? `„${zahl(letzte)} m ist zu hoch. Ich brauche den Wert auf 5 cm genau.“`
-                : `„${zahl(letzte)} m ist zu niedrig. Ich brauche den Wert auf 5 cm genau.“`}
+              ? `„${zahl(letzte)} m, die Spitze liegt genau am Fenster. Treffer!“`
+              : letzte < LEITER
+                ? `„Mit ${zahl(letzte)} m bleibt die Spitze unter dem Fenster. Ich brauche die Länge auf 5 cm genau.“`
+                : `„Mit ${zahl(letzte)} m liegt die Spitze über dem Fenster. Ich brauche die Länge auf 5 cm genau.“`}
           </span>
         </p>
       )}
       {frei && (
         <p className="sl-hinweis">
-          {treffer ? 'Treffer! Für die nächste Leiterstellung müsstest du aber wieder lange schätzen. ' : 'Auf 5 cm genau triffst du durch Schätzen kaum. '}
-          Mit dem Satz des Pythagoras kommst du auch nicht weiter: Du kennst nur eine Seite des Dreiecks, die Leiter mit 30 m. Dafür kennst du
-          den Winkel. Gleich lernst du, wie du mit Sinus und Kosinus aus einer Seite und einem Winkel die fehlenden Seiten berechnest.
+          {treffer ? 'Treffer! Für das nächste Fenster müsstest du aber wieder lange probieren. ' : 'Auf 5 cm genau triffst du die Länge durch Probieren kaum. '}
+          Mit dem Satz des Pythagoras kommst du auch nicht weiter: Du kennst nur eine Seite des Dreiecks, die Höhe von 26 m. Dafür kennst du den
+          Winkel. Gleich lernst du, wie du mit dem Sinus aus einer Seite und einem Winkel die Länge der Leiter berechnest.
         </p>
       )}
     </div>
