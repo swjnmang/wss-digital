@@ -1,0 +1,24 @@
+<!doctype html>
+<!-- Der Handyständer, Problem lösen: Jules Prototyp-Seitenteil mit Boden 6 cm, Rücken 16,5 cm, Auflage 17,6 cm. Der Winkel α ist
+     markiert, aber nicht angegeben (70°?). Bildwelt Bauplan / Lasercut.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/trigonometrie/sinus_kosinus_tangens_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_lasercut.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const W = 1200, H = 600;
+let g = LC.defs + LC.grund(W, H);
+// 1 cm = 26 px
+const s = 26, A = [300, 530], B = [300 + 6 * s, 530], C = [300 + 6 * s, 530 - 16.5 * s];
+g += LC.teil(`M${A} L${B} L${C} Z`);
+g += LC.rechter(B[0], B[1], -1, -1);
+g += LC.winkel(A[0], A[1], 62, 0, Math.atan2(16.5, 6) * 180 / Math.PI, 'α');
+g += LC.mass(A[0], A[1], B[0], B[1], '6 cm', 40);
+g += LC.mass(B[0], B[1], C[0], C[1], '16,5 cm', 44);
+g += LC.mass(C[0], C[1], A[0], A[1], '17,6 cm', 48);
+// Schriftfeld: Prüfauftrag
+g += LC.feld(640, 90, 470, 'Prüfung Prototyp', [['Kundin', 'Jule'], ['Soll', 'α = 70°'], ['Ist', 'α = ?'], ['Werkzeug', 'Bauplan + Taschenrechner']]);
+g += LC.gravur(640, 400, 'Kein Geodreieck in der Werkstatt.', 28, 'start', '#3b230e', 600);
+g += LC.gravur(640, 436, 'Passt der Winkel trotzdem?', 28, 'start', '#3b230e', 600);
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${g}</svg>`;
+</script></body></html>

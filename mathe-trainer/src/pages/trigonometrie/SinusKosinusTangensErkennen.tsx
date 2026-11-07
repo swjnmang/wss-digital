@@ -17,6 +17,7 @@ import {
   type RT,
 } from './engine/rightTriangle';
 import { pick, randInt, shuffle } from './engine/util';
+import HandystaenderEinstieg, { THEMA_HANDYSTAENDER } from './sinus_kosinus_tangens_einstieg/HandystaenderEinstieg';
 
 const FNS: Fn[] = ['sin', 'cos', 'tan'];
 const PAIRS: [Role, Role][] = [
@@ -217,6 +218,14 @@ export const cfg: TopicConfig = {
     { id: 'schwer', description: 'Derselbe Quotient von beiden spitzen Winkeln aus betrachtet.' },
   ],
   generate,
+  lernsituation: {
+    karte: {
+      thema: THEMA_HANDYSTAENDER,
+      beschreibung:
+        'Neu beim Thema? Baue mit dem Lasercutter einen Tablet-Ständer mit genau 70° Neigung und entdecke dabei, was Sinus, Kosinus und Tangens bedeuten.',
+    },
+    render: (p) => <HandystaenderEinstieg {...p} />,
+  },
 };
 
 export default function SinusKosinusTangensErkennen() {
