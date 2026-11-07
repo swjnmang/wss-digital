@@ -1,0 +1,34 @@
+<!doctype html>
+<!-- Die Drehleiter, Titelbild. Bildwelt Comic / pop (Themenfarbe Kupfer): drei Panels (Übung am Samstag, Drehleiter 30 m bei 70°, Fenster in 26 m Höhe).
+     Rendern: node scripts/bilder-rendern.cjs src/pages/trigonometrie/strecken_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_comic.js"></script><script src="_drehleiter.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const C = CO('#9a4515', '#fbece3');
+const ink = DL.ink;
+let s = '';
+// Panel 1: Schulgebäude, Alarm
+s += C.panel('p1', '24,24 380,24 360,576 24,576', 'url(#pT)',
+  DL.haus(60, 210, 600, 280, '#fff') +
+  `<rect x="60" y="560" width="320" height="40" fill="#cfc6b0" stroke="${ink}" stroke-width="5"/>` +
+  C.kasten(44, 50, 310, 70, 'SAMSTAG: ÜBUNG!', 36, -3) +
+  C.laut(70, 185, 'TATÜ-TATA!', 50, -6));
+// Panel 2: Drehleiter 30 m, 70°
+s += C.panel('p2', '396,24 820,24 806,576 376,576', 'url(#pF)',
+  `<rect x="376" y="530" width="450" height="60" fill="#cfc6b0" stroke="${ink}" stroke-width="5"/>` +
+  DL.fahrzeug(560, 462, 380, 70, 1) +
+  DL.winkel(560, 462, 70, 62, '70°', 40) +
+  `<text x="${560 + 190 * Math.cos(DL.rad(70)) - 26}" y="${462 - 190 * Math.sin(DL.rad(70))}" text-anchor="end" font-family="Bangers" font-size="44" fill="${ink}" stroke="#fff" stroke-width="7" paint-order="stroke" letter-spacing="1">30 m</text>` +
+  C.laut(640, 150, 'SURRR!', 50, 8));
+// Panel 3: Fenster in 26 m Höhe
+s += C.panel('p3', '836,24 1176,24 1176,576 822,576', 'url(#pG)',
+  `<rect x="970" y="40" width="210" height="560" fill="#fff" stroke="${ink}" stroke-width="6"/>` +
+  `<rect x="1010" y="200" width="90" height="70" fill="#f5c400" stroke="${ink}" stroke-width="5"/>` +
+  `<path d="M1030 270 v-40 a25 25 0 0 1 50 0 v40" fill="#fff" stroke="${ink}" stroke-width="4"/>` +
+  `<rect x="1010" y="330" width="90" height="70" fill="#d6eef2" stroke="${ink}" stroke-width="4"/><rect x="1010" y="450" width="90" height="70" fill="#d6eef2" stroke="${ink}" stroke-width="4"/>` +
+  DL.mass(940, 235, 560, '26 m', 44) +
+  C.blase(846, 56, 320, 110, 1040, 196, ['Reicht die Leiter', 'bis zum Fenster?'], 30));
+document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${C.defs}${C.papier(1200, 600)}${s}${C.korn(1200, 600)}</svg>`;
+</script>
+</body></html>

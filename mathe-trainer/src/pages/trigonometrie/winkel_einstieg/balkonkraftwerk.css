@@ -1,0 +1,28 @@
+/* Lernsituation „Das Balkonkraftwerk“ (Präfix bkw-). Gerüst und Bildwelt Diorama kommen aus lernsituation_kit (seiten.css, bildwelten.css);
+   hier stehen nur die Bausteine dieser Seite: Skizzen, Winkel-Labor und Spiel. */
+
+.bkw-skizze-klein { display: flex; justify-content: center; }
+.bkw-skizze-klein .hs-dreieck { width: 100%; height: auto; }
+.bkw-skizze-klein .hs-dreieck text, .bkw-spiel-frage .hs-dreieck text { font-family: var(--font-display, inherit); }
+
+.bkw-labor { display: flex; flex-direction: column; gap: 12px; }
+.bkw-rahmen { display: flex; justify-content: center; padding: 8px; }
+.bkw-labor-bild { width: 100%; max-width: 620px; height: auto; }
+.bkw-labor-bild text { font-family: var(--font-display, inherit); letter-spacing: 0.02em; }
+
+.bkw-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 19px; }
+.bkw-eingabe label { font-weight: 700; }
+.bkw-eingabe .lp-input { min-height: 44px; width: 110px; }
+.bkw-eingabe .bk-btn { min-height: 44px; margin-left: 6px; white-space: normal; }
+
+.bkw-anzeige {
+  display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 8px 14px;
+  background: var(--primary-soft); color: var(--ink); font-size: 17px; line-height: 1.45;
+}
+.bkw-anzeige > i { margin-top: 3px; color: var(--primary); font-size: 18px; }
+.bkw-anzeige-ok { background: var(--correct-soft); color: var(--correct-ink); }
+.bkw-anzeige-ok > i { color: var(--correct); }
+
+.bkw-spiel-frage { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.bkw-spiel-frage .hs-dreieck { width: 100%; height: auto; }
+.bkw-spiel-frage p { margin: 0; font-size: 18px; }

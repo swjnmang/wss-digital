@@ -28,6 +28,7 @@ import {
   texU,
   UNITS,
 } from './engine/util';
+import DrehleiterEinstieg, { THEMA_DREHLEITER } from './strecken_einstieg/DrehleiterEinstieg';
 
 // Gesuchte Seite steht im Zähler (einfach) bzw. auch im Nenner (mittel)
 type Case = { fn: Fn; givenRole: Role; askedRole: Role };
@@ -260,6 +261,14 @@ export const cfg: TopicConfig = {
     },
   ],
   generate,
+  lernsituation: {
+    karte: {
+      thema: THEMA_DREHLEITER,
+      beschreibung:
+        'Plane mit der Jugendfeuerwehr einen Einsatz: Reicht die 30 m lange Drehleiter bei 70° bis zum Fenster? Du lernst, fehlende Seiten mit Sinus und Kosinus zu berechnen.',
+    },
+    render: (p) => <DrehleiterEinstieg {...p} />,
+  },
 };
 
 export default function RechtwinkligStrecken() {

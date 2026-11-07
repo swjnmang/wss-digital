@@ -1,0 +1,25 @@
+<!doctype html>
+<!-- Das Lastenrad, Problem erkennen. Bildwelt Siebdruck / zweifarbig: zwei Steigungsschilder (18 % Kirchbergstraße, 25 % Bahnhofsrampe) und das Datenblatt (bis 12°).
+     Rendern: node scripts/bilder-rendern.cjs src/pages/trigonometrie/steigung_einstieg -->
+<html><head><meta charset="utf-8"><script src="_lastenrad.js"></script><script>document.write(LR.kopf)</script>
+<style>body{margin:0} text{font-family:'Bricolage Grotesque';font-variation-settings:'wdth' 75,'opsz' 96}</style>
+<script src="_siebdruck.js"></script></head><body><div id="bild"></div>
+<script>
+const pink = `<polygon points="210,90 360,350 60,350" fill="RASTER" stroke="none"/><polygon points="570,90 720,350 420,350" fill="RASTER" stroke="none"/>
+  <rect x="820" y="70" width="330" height="80" stroke="none"/>`;
+const indigo = `${LR.schild(210, 240, '18 %', 'Kirchbergstraße')}${LR.schild(570, 240, '25 %', 'Bahnhofsrampe')}
+  <rect x="820" y="70" width="330" height="430" fill="none" stroke-width="8"/>
+  <rect x="820" y="70" width="330" height="80" stroke="none"/>
+  <text x="985" y="125" text-anchor="middle" font-size="40" font-weight="800" fill="#f1efe9" stroke="none">DATENBLATT</text>
+  <text x="850" y="200" font-size="32" font-weight="700" stroke="none">Lastenrad „Kita 3“</text>
+  <text x="850" y="250" font-size="28" font-weight="600" stroke="none">Zuladung: 120 kg</text>
+  <text x="850" y="292" font-size="28" font-weight="600" stroke="none">Motor: 250 W</text>
+  <text x="850" y="360" font-size="30" font-weight="700" stroke="none">Steigfähigkeit</text>
+  <text x="850" y="410" font-size="30" font-weight="700" stroke="none">voll beladen:</text>
+  <text x="850" y="476" font-size="64" font-weight="800" stroke="none">bis 12°</text>`;
+SD.bild(1200, 600, [
+  { farbe: LR.PINK, svg: pink },
+  { farbe: LR.INDIGO, versatz: [4, -3], svg: indigo },
+]);
+</script>
+</body></html>

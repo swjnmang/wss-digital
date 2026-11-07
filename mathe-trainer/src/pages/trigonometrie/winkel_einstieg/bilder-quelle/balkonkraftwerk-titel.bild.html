@@ -1,0 +1,35 @@
+<!doctype html>
+<!-- Das Balkonkraftwerk, Titelbild. Bildwelt Diorama / Sommerwiese: schwebende Wiese mit Wohnhaus, Garage, schrägem Solarmodul auf dem Garagendach,
+     Sonne und Schild „ideal 30° bis 35°“. Rendern: node scripts/bilder-rendern.cjs src/pages/trigonometrie/winkel_einstieg -->
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<script src="_iso.js"></script></head><body>
+<div id="bild" style="width:1200px;height:600px"></div>
+<script>
+const I = ISO(560, 130);
+let g = '';
+g += `<ellipse cx="600" cy="560" rx="360" ry="26" fill="#5b6b7a" opacity=".22" filter="url(#sh)"/>`;
+g += I.insel(-40, -40, 560, 380);
+// Einfahrt
+g += I.poly([[300, 120, 0.5], [500, 120, 0.5], [500, 240, 0.5], [300, 240, 0.5]], '#e9dcc0');
+// Wohnhaus
+g += I.box(20, 0, 0, 250, 200, 170, '#e6e1d8', '#f5f2ec', '#dcd6cc');
+g += I.box(14, -6, 170, 262, 212, 12, '#b9644a', '#a65840', '#934c37');
+[[60, 200], [150, 200]].forEach(([x, y]) => { g += I.poly([[x, y, 60], [x + 50, y, 60], [x + 50, y, 110], [x, y, 110]], '#cfe6ee', 'stroke="#22313d" stroke-width="2"'); });
+// Garage
+g += I.box(300, 0, 0, 200, 120, 100, '#d9d4cb', '#ece8e1', '#d3cdc3');
+g += I.poly([[340, 120, 0], [460, 120, 0], [460, 120, 76], [340, 120, 76]], '#b8c2c9', 'stroke="#22313d" stroke-width="2"');
+// Modul auf dem Garagendach
+g += I.modul(320, 100, 100, 150, 90, 28);
+// Bäume
+[[500, 300], [-20, 300], [480, -25]].forEach(([x, y]) => { g += I.baum(x, y); });
+// Schild
+g += I.schild(250, 300, ['Neigung ideal', '30° bis 35°']);
+// Sonne
+g += `<g transform="translate(1040 120)"><circle r="46" fill="#f6c445"/>${[...Array(10)].map((_, i) => `<line x1="0" y1="-62" x2="0" y2="-82" stroke="#f6c445" stroke-width="7" stroke-linecap="round" transform="rotate(${i * 36})"/>`).join('')}</g>`;
+// Beschriftung Modul
+const [mx, my] = I.P(470, 55, 140);
+g += `<line x1="${mx + 4}" y1="${my}" x2="${mx + 70}" y2="${my - 40}" stroke="#24323f" stroke-width="3"/>` + I.label(mx + 76, my - 46, 'Modul 1,72 m', '#0e6670', 30, 'start');
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${I.hintergrund(1200, 600)}<g fill="#fff" opacity=".85"><ellipse cx="170" cy="110" rx="70" ry="22"/><ellipse cx="215" cy="98" rx="46" ry="22"/><ellipse cx="880" cy="70" rx="70" ry="20"/></g><g transform="translate(150 95) scale(0.78)">${g}</g></svg>`;
+document.getElementById('bild').innerHTML = svg;
+</script>
+</body></html>

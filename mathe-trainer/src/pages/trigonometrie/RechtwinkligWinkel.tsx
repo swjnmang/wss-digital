@@ -17,6 +17,7 @@ import {
   type RT,
 } from './engine/rightTriangle';
 import { deg, fmtU, pick, randFloat, randInt, round, texDeg, texU, UNITS } from './engine/util';
+import BalkonkraftwerkEinstieg, { THEMA_BALKONKRAFTWERK } from './winkel_einstieg/BalkonkraftwerkEinstieg';
 
 const FNS: Fn[] = ['sin', 'cos', 'tan'];
 
@@ -172,6 +173,14 @@ export const cfg: TopicConfig = {
     { id: 'schwer', description: 'Berechne beide spitzen Winkel des Dreiecks.' },
   ],
   generate,
+  lernsituation: {
+    karte: {
+      thema: THEMA_BALKONKRAFTWERK,
+      beschreibung:
+        'Ist Aylas Solarmodul auf dem Garagendach steil genug? Du lernst, aus zwei Seiten eines rechtwinkligen Dreiecks den Winkel zu berechnen.',
+    },
+    render: (p) => <BalkonkraftwerkEinstieg {...p} />,
+  },
 };
 
 export default function RechtwinkligWinkel() {

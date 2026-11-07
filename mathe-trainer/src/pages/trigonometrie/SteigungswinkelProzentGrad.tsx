@@ -4,6 +4,7 @@ import Practice from './engine/Practice';
 import Rich from '../raum_und_form/engine/Rich';
 import TriangleFigure, { COLOR_ASKED, COLOR_GIVEN, type Mark } from './engine/TriangleFigure';
 import type { Level, Task, TopicConfig } from './engine/types';
+import LastenradEinstieg, { THEMA_LASTENRAD } from './steigung_einstieg/LastenradEinstieg';
 import { cap, deg, fmt, pick, randFloat, randInt, sinD, tanD, tex, texDeg } from './engine/util';
 
 const ROADS = [
@@ -334,6 +335,14 @@ export const cfg: TopicConfig = {
     },
   ],
   generate,
+  lernsituation: {
+    karte: {
+      thema: THEMA_LASTENRAD,
+      beschreibung:
+        'Berate als Azubi im Fahrradladen eine Kundin: Schafft ein Lastenrad mit 12° die Straße mit 18 %? Du lernst, Steigungen zwischen Prozent und Grad umzurechnen.',
+    },
+    render: (p) => <LastenradEinstieg {...p} />,
+  },
 };
 
 export default function SteigungswinkelProzentGrad() {
