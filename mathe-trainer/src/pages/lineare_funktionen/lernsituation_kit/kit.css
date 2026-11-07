@@ -162,3 +162,17 @@
 .ls-loesung-text { margin-top: 2px; line-height: 1.5; }
 .ls-loesung .katex-display { position: relative; margin: 4px 0 0; padding: 10px 0 8px; text-align: left; overflow-x: auto; overflow-y: hidden; }
 .ls-loesung .katex-display > .katex { text-align: left; }
+
+/* Einheit zum Auswählen hinter einem Zahlenfeld (seit 2026-11-07): schmale Auswahlliste statt fester Einheit */
+.ls-select.ls-einheit { min-width: 0; width: auto; min-height: 44px; padding-right: 28px; margin-left: 6px; }
+.ls-luecke-einheit { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
+.lp-num:has(.ls-einheit) { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+@media (max-width: 480px) {
+  .ls-select.ls-einheit { padding-left: 6px; padding-right: 22px; margin-left: 2px; font-size: 16px; }
+  .ls-luecke-einheit .lp-input-md { width: 110px; }
+}
+/* Auf schmalen Bildschirmen darf die Einheit unter die Lücke rutschen, bevor die Rechnung seitlich übersteht */
+@media (max-width: 640px) {
+  .ls-rechnung-r:has(.ls-einheit) { flex-wrap: wrap; min-width: 0; }
+  .ls-luecke-einheit { flex-wrap: wrap; white-space: normal; }
+}

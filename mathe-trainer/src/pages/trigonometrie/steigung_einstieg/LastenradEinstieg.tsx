@@ -508,11 +508,11 @@ export default function LastenradEinstieg({ onBack, onPractice }: { onBack: () =
               }
               rechnung={[
                 { l: ['\\tan(12^\\circ)'], r: [{ luecke: 'q', breit: true }] },
-                { l: ['p'], r: [{ luecke: 'p', breit: true }, '\\,\\%'] },
+                { l: ['p'], r: [{ luecke: 'p' }] },
               ]}
               fields={[
                 { kind: 'num', key: 'q', label: 'tan(12°)', expected: Math.tan(rad(12)), tol: 0.00051 },
-                { kind: 'num', key: 'p', label: 'p', expected: GRENZE_PROZENT, tol: 0.051 },
+                { kind: 'num', key: 'p', label: 'p', expected: GRENZE_PROZENT, unit: '%', tol: 0.051 },
               ]}
               solution={
                 <Loesungsweg

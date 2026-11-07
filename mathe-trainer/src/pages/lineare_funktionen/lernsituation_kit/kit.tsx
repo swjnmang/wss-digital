@@ -314,7 +314,59 @@ export function useLiveCheck(
   return { values, marks, status, praise, malFalsch, setValue, blur }
 }
 
-type NumField = { kind: 'num'; key: string; label: ReactNode; expected: number; unit?: string; tol?: number }
+/**
+ * Zahlenfeld. Mit unit wählen die SuS die Einheit selbst aus einer Liste (richtige Einheit und 2–3 typische Verwechslungen,
+ * siehe EINHEIT_DISTRAKTOREN). einheiten ersetzt die Distraktoren, einheiten: false zeigt die Einheit nur als Text (z. B. bei „mal“).
+ */
+type NumField = { kind: 'num'; key: string; label: ReactNode; expected: number; unit?: string; tol?: number; einheiten?: string[] | false }
+
+/**
+ * Einheiten zum Auswählen (seit 2026-11-07): In Sachaufgaben tippen die SuS nur die Zahl, die Einheit wählen sie selbst. Jede Einheit hat
+ * 2–3 Distraktoren mit typischen Verwechslungen (Länge/Fläche, Grad/Prozent, kW/kWh, Euro/Prozent …). Einheiten, die hier fehlen
+ * (z. B. „mal“, „Treffer“), stehen weiter als Text hinter dem Feld.
+ */
+export const EINHEIT_DISTRAKTOREN: Record<string, string[]> = {
+  '€': ['%', 'ct', '€ pro Jahr'],
+  ct: ['€', '%', 'ct pro kWh'],
+  '%': ['€', '°', '‰'],
+  '% p.a.': ['€', '% pro Tag', '€ pro Jahr'],
+  '°': ['%', 'm', '°C'],
+  mm: ['cm', 'mm²', 'm'],
+  cm: ['m', 'cm²', 'cm³'],
+  m: ['m²', 'cm', '°'],
+  km: ['m', 'km²', 'km/h'],
+  'cm²': ['cm', 'cm³', 'm²'],
+  'm²': ['m', 'm³', 'cm²'],
+  'cm³': ['cm²', 'cm', 'l'],
+  'm³': ['m²', 'm', 'l'],
+  s: ['min', 'h', 'm/s'],
+  min: ['h', 's', '€ pro min'],
+  h: ['min', 'km/h', 'Tage'],
+  Tage: ['Monate', 'Jahre', 'Wochen'],
+  Jahre: ['Monate', 'Tage', '%'],
+  Jahren: ['Monaten', 'Tagen', 'Wochen'],
+  'vollen Jahren': ['vollen Monaten', 'vollen Tagen', 'vollen Wochen'],
+  kWh: ['kW', 'W', 'h'],
+  kW: ['kWh', 'W', 'h'],
+  Liter: ['m³', 'cm³', 'kg'],
+  l: ['m³', 'cm³', 'kg'],
+}
+
+/** stabile kleine Zahl aus einem Schlüssel (für die Position der richtigen Einheit) */
+const kleinHash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
+
+/** Auswahlliste der Einheiten eines Zahlenfelds; die richtige Einheit steht nie an erster Stelle */
+export function einheitAuswahl(f: { key: string; unit?: string; einheiten?: string[] | false }): { options: string[]; expected: number } | null {
+  if (!f.unit || f.einheiten === false) return null
+  const distraktoren = (f.einheiten ?? EINHEIT_DISTRAKTOREN[f.unit])?.filter((e) => e !== f.unit)
+  if (!distraktoren || distraktoren.length < 2) return null
+  const pos = 1 + (kleinHash(f.key + f.unit) % distraktoren.length)
+  const options = [...distraktoren]
+  options.splice(pos, 0, f.unit)
+  return { options, expected: pos }
+}
+const EINHEIT_KEY = '__einheit'
+
 
 /** Teil einer Lückenrechnung: TeX-Text oder eine Lücke (Schlüssel eines Zahlenfelds der Karte) */
 export type Seg = string | { luecke: string; breit?: boolean }
@@ -403,8 +455,13 @@ export function CheckCard({
   const uid = useId()
   const [showSolution, setShowSolution] = useSitzungState('loesung', false)
   const pt = usePunkteAufgabe({ wert: punkte, profi, zaehlt: !ohnePunkte })
+  // Einheiten zum Auswählen laufen als eigene Auswahlfelder mit (Schlüssel <feld>__einheit)
+  const einheitFelder: SelectField[] = fields.flatMap((f) => {
+    const a = f.kind === 'num' ? einheitAuswahl(f) : null
+    return a ? [{ kind: 'select' as const, key: f.key + EINHEIT_KEY, label: 'Einheit', ...a }] : []
+  })
   const { values, marks, status, praise, malFalsch, setValue, blur } = useLiveCheck(
-    fields.map((f) => ({
+    [...fields, ...einheitFelder].map((f) => ({
       key: f.key,
       sofort: f.kind === 'select',
       pruefe: (v: string) =>
@@ -458,11 +515,33 @@ export function CheckCard({
   const inlineKeys = new Set([...(rechnung ?? []).flatMap((z) => [...z.l, ...z.r]), ...(wertetabelle ? [...wertetabelle.x, ...wertetabelle.y] : [])].flatMap((seg) => (typeof seg === 'string' ? [] : [seg.luecke])))
   const listFields = fields.filter((f) => !inlineKeys.has(f.key))
 
+  /** Auswahlliste der Einheit hinter einem Zahlenfeld (oder die Einheit als Text, wenn es keine Auswahl gibt) */
+  const einheit = (f: CField) => {
+    if (f.kind !== 'num' || !f.unit) return null
+    const e = einheitFelder.find((x) => x.key === f.key + EINHEIT_KEY)
+    if (!e) return <span className="lp-unit">{f.unit}</span>
+    return (
+      <select
+        aria-label={`Einheit${typeof f.label === 'string' ? ` zu ${f.label}` : ''}`}
+        className={`bk-input lp-select ls-select ls-einheit ${fieldCheckClass(marks[e.key])}`}
+        value={values[e.key] ?? ''}
+        onChange={(ev: ChangeEvent<HTMLSelectElement>) => setValue(e.key, ev.target.value)}
+      >
+        <option value="">Einheit</option>
+        {e.options.map((o, i) => (
+          <option key={i} value={i}>
+            {o}
+          </option>
+        ))}
+      </select>
+    )
+  }
+
   const segment = (seg: Seg, i: number) => {
     if (typeof seg === 'string') return <InlineMath key={i} math={seg} />
     const f = fields.find((x) => x.key === seg.luecke)
     if (!f || f.kind === 'gleichung' || f.kind === 'parabel') return null
-    return (
+    const feld = (
       <input
         key={i}
         type="text"
@@ -476,6 +555,15 @@ export function CheckCard({
         onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(f.key, e.target.value)}
         onBlur={(e: FocusEvent<HTMLInputElement>) => blur(f.key, e.currentTarget.value)}
       />
+    )
+    const e = einheit(f)
+    return e ? (
+      <span key={i} className="ls-luecke-einheit">
+        {feld}
+        {e}
+      </span>
+    ) : (
+      feld
     )
   }
 
@@ -569,7 +657,7 @@ export function CheckCard({
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(f.key, e.target.value)}
                     onBlur={(e: FocusEvent<HTMLInputElement>) => blur(f.key, e.currentTarget.value)}
                   />
-                  {f.kind === 'num' && f.unit && <span className="lp-unit">{f.unit}</span>}
+                  {einheit(f)}
                 </span>
               )}
             </div>

@@ -565,11 +565,11 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
               }
               rechnung={[
                 { l: ['h'], r: [{ luecke: 'a' }, '\\,\\text{m} \\cdot \\tan(68^\\circ)'] },
-                { l: ['h'], r: [{ luecke: 'h', breit: true }, '\\,\\text{m}'] },
+                { l: ['h'], r: [{ luecke: 'h', breit: true }] },
               ]}
               fields={[
                 { kind: 'num', key: 'a', label: 'Ankathete', expected: 9 },
-                { kind: 'num', key: 'h', label: 'h', expected: 9 * Math.tan((68 * Math.PI) / 180), tol: 0.011 },
+                { kind: 'num', key: 'h', label: 'h', unit: 'm', expected: 9 * Math.tan((68 * Math.PI) / 180), tol: 0.011 },
               ]}
               solution={
                 <Loesungsweg

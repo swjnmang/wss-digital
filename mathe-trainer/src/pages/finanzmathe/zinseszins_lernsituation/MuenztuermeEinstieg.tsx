@@ -370,10 +370,10 @@ export default function MuenztuermeEinstieg({ onBack, onPractice, onNext }: { on
                   { l: ['K_3'], r: ['K_2 + Z_3 =', { luecke: 'k3', breit: true }] },
                 ]}
                 fields={[
-                  { kind: 'num', key: 'z2', label: 'Zinsen im Jahr 2', expected: Z2, tol: 0.011 },
-                  { kind: 'num', key: 'k2', label: 'Kapital am Ende von Jahr 2', expected: K2, tol: 0.011 },
-                  { kind: 'num', key: 'z3', label: 'Zinsen im Jahr 3', expected: Z3, tol: 0.011 },
-                  { kind: 'num', key: 'k3', label: 'Kapital am Ende von Jahr 3', expected: K3, tol: 0.011 },
+                  { kind: 'num', key: 'z2', label: 'Zinsen im Jahr 2', expected: Z2, unit: '€', tol: 0.011 },
+                  { kind: 'num', key: 'k2', label: 'Kapital am Ende von Jahr 2', expected: K2, unit: '€', tol: 0.011 },
+                  { kind: 'num', key: 'z3', label: 'Zinsen im Jahr 3', expected: Z3, unit: '€', tol: 0.011 },
+                  { kind: 'num', key: 'k3', label: 'Kapital am Ende von Jahr 3', expected: K3, unit: '€', tol: 0.011 },
                 ]}
                 onEingabe={setLaborEingabe}
                 solution={
