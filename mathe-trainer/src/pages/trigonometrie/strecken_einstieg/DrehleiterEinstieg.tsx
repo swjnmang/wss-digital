@@ -17,7 +17,7 @@ import {
 import { Bilanz } from '../../lineare_funktionen/lernsituation_kit/punkte';
 import { Kriterien, standardKriterien } from '../../finanzmathe/zins_kit/zins_kit';
 import Dreieck from '../sinus_kosinus_tangens_einstieg/Dreieck';
-import LeiterSchaetzung, { ABSTAND, HOEHE, istTreffer } from './LeiterSchaetzung';
+import LeiterSchaetzung, { ABSTAND, LEITER, istTreffer } from './LeiterSchaetzung';
 import LeiterSpiel from './LeiterSpiel';
 import titelBild from './bilder/drehleiter-titel.webp';
 import uebungBild from './bilder/drehleiter-uebung.webp';
@@ -27,15 +27,16 @@ import '../../daten_und_zufall/lernpfad/lernpfad.css';
 import './drehleiter.css';
 
 // Lernsituation „Die Drehleiter“: Streckenlängen im rechtwinkligen Dreieck mit Sinus und Kosinus berechnen (ca. 60 bis 90 min).
-// Format Entscheidungsfall: Bei der Übung der Jugendfeuerwehr wird die Drehleiter 30 m ausgefahren und um 70° aufgerichtet. Reicht sie bis
-// zum Fenster 26 m über dem Drehpunkt, und wie weit vor der Wand muss der Drehpunkt stehen? In „Problem erkennen“ schätzen die SuS die
-// Höhe der Leiterspitze, der Gruppenführer meldet nur „zu hoch“ oder „zu niedrig“. Pythagoras hilft nicht: Bekannt ist nur eine Seite.
-// Aha: Ein Winkel und eine Seite reichen. Höhe = 30 m · sin(70°) ≈ 28,19 m, Abstand = 30 m · cos(70°) ≈ 10,26 m.
+// Format Entscheidungsfall: Bei der Übung der Jugendfeuerwehr wartet eine Übungspuppe an einem Fenster 26 m über dem Drehpunkt der Leiter.
+// Die Leiter steht immer unter 70°. Wie weit muss sie ausgefahren werden, damit die Spitze genau am Fenster anliegt, und reicht die 30-m-Leiter?
+// In „Problem erkennen“ tippen die SuS Leiterlängen ein; das Fahrzeug fährt so an die Wand, dass die Spitze an der Fassade anliegt, und die
+// Skizze zeigt, ob sie unter, über oder am Fenster ankommt. Pythagoras hilft nicht: Bekannt ist nur eine Seite.
+// Aha: Ein Winkel und eine Seite reichen. Leiter = 26 m : sin(70°) ≈ 27,67 m (die gesuchte Seite steht im Nenner), Abstand ≈ 9,46 m.
 // Lernprodukt analog: Spickzettel (Karteikarte) „Fehlende Seite berechnen in drei Schritten“ mit Skizze und eigenem Beispiel.
 // Identität: Themenfarbe Kupfer, Symbol Feuerlöscher, Titelbild Übungseinsatz mit Drehleiter, Leitobjekt die Drehleiter.
 // Bildwelt Comic / Pop: Titelbild und Sachbilder sind gerenderte WebP-Dateien aus bilder-quelle/drehleiter-*.bild.html
-// (Bausteine in bilder-quelle/_comic.js); Skizze zum Schätzen, Dreiecke und Spiel bleiben Inline-SVG.
-// Punkte nach Aufwand (Pflicht 62): Warm-up 2/2/3/3/2 = 12 (19 %), Schätzen 3, Kernaufgabe 14, Entscheidung 4, Spickzettel 5
+// (Bausteine in bilder-quelle/_comic.js); Leiter-Skizze, Dreiecke und Spiel bleiben Inline-SVG.
+// Punkte nach Aufwand (Pflicht 62): Warm-up 2/2/3/3/2 = 12 (19 %), Ausprobieren 3, Kernaufgabe 14, Entscheidung 4, Spickzettel 5
 // (Problem lösen 23 = 37 %), Übungen 4/6/6/8 = 24 (39 %); Profi 9; Bonus-Spiel „Leiter-Einsatz“ höchstens 8.
 
 /** Lernvideo zum Thema (auch bei den Übungsaufgaben unter /trigonometrie/rechtwinklig-strecken verlinkt) */
@@ -52,7 +53,7 @@ export const THEMA_DREHLEITER: Thema = {
       src={titelBild}
       width={1200}
       height={600}
-      alt="Comic in drei Bildern: Übung der Jugendfeuerwehr am Samstag. Ein Hochhaus mit einem markierten Fenster, ein Drehleiterfahrzeug mit 30 Meter langer Leiter, um 70 Grad aufgerichtet, und die Frage: Reicht die Leiter bis zum Fenster?"
+      alt="Comic in drei Bildern: Übung der Jugendfeuerwehr am Samstag. Ein Hochhaus, ein Drehleiterfahrzeug mit höchstens 30 Meter langer Leiter, um 70 Grad aufgerichtet, und ein Fenster 26 Meter hoch direkt an der Fassade mit der Frage: Wie weit muss die Leiter raus?"
     />
   ),
 };
@@ -61,21 +62,21 @@ const BILDWELT: Bildwelt = { welt: 'comic', variante: 'pop' };
 const LOESUNG_KERN = (
   <Loesungsweg
     schritte={[
-      { titel: 'Seiten vom Winkel aus benennen', text: 'Leiter 30 m = Hypotenuse, Höhe h = Gegenkathete, Abstand d = Ankathete.' },
-      { titel: 'Sinus für die Höhe aufschreiben', tex: '\\sin(70^\\circ) = \\dfrac{h}{30\\,\\text{m}}' },
-      { titel: 'Nach h umstellen (mal 30 m)', tex: ['h = 30\\,\\text{m} \\cdot \\sin(70^\\circ)', 'h \\approx 28{,}19\\,\\text{m}'] },
-      { titel: 'Kosinus für den Abstand aufschreiben', tex: '\\cos(70^\\circ) = \\dfrac{d}{30\\,\\text{m}}' },
-      { titel: 'Nach d umstellen (mal 30 m)', tex: ['d = 30\\,\\text{m} \\cdot \\cos(70^\\circ)', 'd \\approx 10{,}26\\,\\text{m}'] },
+      { titel: 'Seiten vom Winkel aus benennen', text: 'Höhe 26 m = Gegenkathete, Leiter L = Hypotenuse (gesucht), Abstand d = Ankathete (gesucht).' },
+      { titel: 'Sinus aufschreiben', tex: '\\sin(70^\\circ) = \\dfrac{26\\,\\text{m}}{L}' },
+      { titel: 'Beide Seiten mal L', tex: 'L \\cdot \\sin(70^\\circ) = 26\\,\\text{m}' },
+      { titel: 'Beide Seiten durch sin(70°)', tex: ['L = \\dfrac{26\\,\\text{m}}{\\sin(70^\\circ)}', 'L \\approx 27{,}67\\,\\text{m}'] },
+      { titel: 'Abstand mit dem Kosinus', tex: ['d = L \\cdot \\cos(70^\\circ)', 'd \\approx 9{,}46\\,\\text{m}'], text: 'Mit dem ungerundeten L weiterrechnen. Auch möglich: d = 26 m : tan(70°).' },
     ]}
   />
 );
 
-/* ── Rechenbeispiel: Anlegeleiter 6 m, 75° ─────────────────────────────── */
+/* ── Rechenbeispiel: Anlegeleiter bis 5,80 m Höhe, 75° ─────────────────── */
 
 const BSP_AUFGABE = (
   <p>
-    Im Gerätehaus lehnt eine 6 m lange Anlegeleiter an der Wand. Sie ist um <M>{'75^\\circ'}</M> gegen den Boden geneigt. Wie hoch reicht sie,
-    und wie weit steht ihr Fuß von der Wand weg?
+    Im Gerätehaus soll eine Anlegeleiter bis zu einer Luke in 5,80 m Höhe reichen. Sie wird um <M>{'75^\\circ'}</M> gegen den Boden geneigt
+    aufgestellt. Wie lang muss die Leiter sein, und wie weit steht ihr Fuß von der Wand weg?
   </p>
 );
 const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
@@ -92,10 +93,10 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
           <Dreieck
             boden={Math.cos((75 * Math.PI) / 180)}
             ruecken={Math.sin((75 * Math.PI) / 180)}
-            labels={{ boden: 'Abstand ?', ruecken: 'Höhe ?', schraeg: 'Leiter 6 m' }}
+            labels={{ boden: 'Abstand ?', ruecken: 'Höhe 5,80 m', schraeg: 'Leiter ?' }}
             winkelText="75°"
             breite={460}
-            label="Anlegeleiter 6 Meter, um 75 Grad geneigt. Gesucht sind die Höhe an der Wand und der Abstand am Boden."
+            label="Anlegeleiter um 75 Grad geneigt, sie soll 5,80 Meter hoch reichen. Gesucht sind die Länge der Leiter und der Abstand am Boden."
           />
         </div>
       </>
@@ -106,10 +107,10 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     body: (
       <>
         <p>
-          Bekannt ist die Hypotenuse, gesucht ist die Gegenkathete. Beide kommen im Sinus vor. Der Sinus ist die Gegenkathete geteilt durch die
-          Hypotenuse:
+          Bekannt ist die Gegenkathete (Höhe), gesucht ist die Hypotenuse (Leiter). Beide kommen im Sinus vor. Der Sinus ist die Gegenkathete
+          geteilt durch die Hypotenuse:
         </p>
-        <MB>{'\\sin(75^\\circ) = \\dfrac{\\text{Höhe}}{6\\,\\text{m}}'}</MB>
+        <MB>{'\\sin(75^\\circ) = \\dfrac{5{,}80\\,\\text{m}}{\\text{Leiter}}'}</MB>
       </>
     ),
   },
@@ -117,12 +118,13 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     title: 'Nach der gesuchten Seite umstellen',
     body: (
       <>
-        <p>Die Höhe steht im Zähler. Multipliziere beide Seiten der Gleichung mit 6 m:</p>
-        <MB>{'\\text{Höhe} = 6\\,\\text{m} \\cdot \\sin(75^\\circ)'}</MB>
-        <p>
-          Tippe das in einem Zug in den Taschenrechner (auf Grad, DEG) und runde erst am Ende:
-        </p>
-        <MB>{'\\text{Höhe} \\approx 5{,}80\\,\\text{m}'}</MB>
+        <p>Die gesuchte Leiter steht im Nenner. Multipliziere zuerst beide Seiten mit der Leiter:</p>
+        <MB>{'\\text{Leiter} \\cdot \\sin(75^\\circ) = 5{,}80\\,\\text{m}'}</MB>
+        <p>Teile dann beide Seiten durch <M>{'\\sin(75^\\circ)'}</M>:</p>
+        <MB>{'\\text{Leiter} = \\dfrac{5{,}80\\,\\text{m}}{\\sin(75^\\circ)}'}</MB>
+        <p>Tippe das in einem Zug in den Taschenrechner (auf Grad, DEG) und runde erst am Ende:</p>
+        <MB>{'\\text{Leiter} \\approx 6{,}00\\,\\text{m}'}</MB>
+        <p>Kurzer Check: Die Leiter ist länger als die Höhe. Das muss so sein, denn die Hypotenuse ist die längste Seite.</p>
       </>
     ),
   },
@@ -130,13 +132,10 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
     title: 'Den Abstand mit dem Kosinus berechnen',
     body: (
       <>
-        <p>Der Abstand ist die Ankathete. Der Kosinus ist die Ankathete geteilt durch die Hypotenuse:</p>
-        <MB>{'\\cos(75^\\circ) = \\dfrac{\\text{Abstand}}{6\\,\\text{m}}'}</MB>
-        <p>Wieder mal 6 m:</p>
-        <MB>{'\\text{Abstand} = 6\\,\\text{m} \\cdot \\cos(75^\\circ) \\approx 1{,}55\\,\\text{m}'}</MB>
-        <p>
-          Kurzer Check: Beide Katheten sind kürzer als die Leiter. Das muss so sein, denn die Hypotenuse ist die längste Seite.
-        </p>
+        <p>Jetzt kennst du die Leiter. Der Abstand ist die Ankathete. Der Kosinus ist die Ankathete geteilt durch die Hypotenuse:</p>
+        <MB>{'\\cos(75^\\circ) = \\dfrac{\\text{Abstand}}{\\text{Leiter}}'}</MB>
+        <p>Hier steht die gesuchte Seite im Zähler. Mal Leiter (ungerundet weiterrechnen):</p>
+        <MB>{'\\text{Abstand} = \\text{Leiter} \\cdot \\cos(75^\\circ) \\approx 1{,}55\\,\\text{m}'}</MB>
       </>
     ),
   },
@@ -145,7 +144,7 @@ const BSP_SCHRITTE: { title: ReactNode; body: ReactNode }[] = [
 /* ── Seite ───────────────────────────────────────────────────────────────── */
 
 export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () => void; onPractice: () => void }) {
-  const [schaetzungen, setSchaetzungen] = useSitzungState<number[]>('dl-schaetzungen', []);
+  const [schaetzungen, setSchaetzungen] = useSitzungState<number[]>('dl-versuche', []);
   const [geloest, setGeloest] = useSitzungState('dl-geloest', false);
   const [uebungen, setUebungen] = useSitzungState<string[]>('dl-uebungen', []);
   const uebung = (nr: string, fertig: () => void) => () => {
@@ -287,24 +286,25 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
     },
     {
       art: 'problem',
-      titel: 'Reicht die Leiter bis zum Fenster?',
+      titel: 'Wie weit muss die Leiter raus?',
       pflicht: ['schaetzen'],
-      bedingung: 'Funke mindestens drei Schätzungen an den Gruppenführer (oder triff auf 5 cm genau), dann geht es weiter.',
+      bedingung: 'Fahre die Leiter mindestens dreimal aus (oder triff die Länge auf 5 cm genau), dann geht es weiter.',
       inhalt: (fertig) => (
         <>
           <p className="sl-text">
-            Du bist in der Jugendfeuerwehr. Am Samstag übt deine Gruppe mit der Drehleiter am Schulgebäude. Die Leiter ist 30 m ausgefahren und
-            um <M>{'70^\\circ'}</M> aufgerichtet, steiler darf sie bei dieser Übung nicht stehen. Ihre Spitze soll an der Hauswand anliegen.
+            Du bist in der Jugendfeuerwehr. Am Samstag übt deine Gruppe mit der Drehleiter am Schulgebäude. Im obersten Stock wartet eine
+            Übungspuppe an einem Fenster, das 26 m über dem Drehpunkt der Leiter liegt. Die Leiter wird um <M>{'70^\\circ'}</M> aufgerichtet, steiler
+            darf sie bei dieser Übung nicht stehen. Ihre Spitze soll direkt am Fenster an der Hauswand anliegen. Ausfahren lässt sie sich höchstens 30 m.
           </p>
           <p className="sl-text">
-            Im obersten Stock wartet eine Übungspuppe an einem Fenster, das 26 m über dem Drehpunkt der Leiter liegt. Gegeben sind also die
-            Leiterlänge 30 m und der Winkel <M>{'70^\\circ'}</M>. Gesucht ist, wie hoch die Leiterspitze über dem Drehpunkt liegt.
+            Gegeben sind also die Höhe des Fensters, 26 m über dem Drehpunkt, und der Winkel <M>{'70^\\circ'}</M>. Gesucht ist, wie weit die Leiter
+            ausgefahren werden muss.
           </p>
           <div className="sl-fokus">
-            <p className="sl-fokus-titel">Dein Auftrag: Schätze, ohne zu rechnen</p>
+            <p className="sl-fokus-titel">Dein Auftrag: Probier es aus, ohne zu rechnen</p>
             <p>
-              Funke dem Gruppenführer deine Schätzung für die Höhe <M>h</M> der Leiterspitze. Er sagt dir nur, ob sie zu hoch oder zu niedrig ist.
-              Schaffst du den Wert auf 5 cm genau?
+              Tippe ein, wie weit die Leiter ausgefahren werden soll. Das Fahrzeug fährt dann so an die Wand, dass die Spitze an der Fassade anliegt.
+              Die Skizze zeigt, ob die Spitze unter, über oder genau am Fenster ankommt. Schaffst du die Länge auf 5 cm genau?
             </p>
           </div>
           <p className="sl-hinweis">Einzel- oder Partnerarbeit, ca. 8 Minuten.</p>
@@ -313,13 +313,13 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
               src={uebungBild}
               width={1200}
               height={600}
-              alt="Comic in zwei Bildern: Links das Drehleiterfahrzeug vor dem Schulgebäude, die Leiter ist 30 Meter lang und um 70 Grad aufgerichtet, die Höhe der Spitze ist mit einem Fragezeichen markiert. Rechts eine Sprechblase des Gruppenführers: Ich brauche die Höhe auf 5 Zentimeter genau. Das Fenster liegt 26 Meter über dem Drehpunkt."
+              alt="Comic in zwei Bildern: Links das Drehleiterfahrzeug vor dem Schulgebäude, die Leiter ist um 70 Grad aufgerichtet und liegt direkt am Fenster an der Fassade an. Das Fenster liegt 26 Meter über dem Drehpunkt, die Länge der Leiter ist mit einem Fragezeichen markiert. Rechts eine Sprechblase des Gruppenführers: Wie weit muss die Leiter raus? Auf 5 Zentimeter genau!"
             />
-            <figcaption>Die Übung: Bekannt sind nur die Leiterlänge und der Winkel.</figcaption>
+            <figcaption>Die Übung: Bekannt sind nur die Höhe des Fensters und der Winkel.</figcaption>
           </figure>
           <LeiterSchaetzung
-            schaetzungen={schaetzungen}
-            onSchaetzen={(h) => {
+            versuche={schaetzungen}
+            onAusfahren={(h) => {
               const neu = [...schaetzungen, h];
               setSchaetzungen(neu);
               if (neu.length >= 3 || neu.some(istTreffer)) fertig.teil('schaetzen')();
@@ -337,9 +337,9 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
           <div className="sl-fokus">
             <p className="sl-fokus-titel">Deine Aufgabe: Berechne den Einsatzplan</p>
             <p>
-              Die Drehleiter ist 30 m lang und um <M>{'70^\\circ'}</M> aufgerichtet. Berechne, wie hoch die Leiterspitze über dem Drehpunkt liegt
-              (Höhe <M>h</M>) und wie weit der Drehpunkt von der Hauswand entfernt sein muss (Abstand <M>d</M>), damit die Spitze an der Wand anliegt.
-              Runde auf zwei Nachkommastellen.
+              Das Fenster liegt 26 m über dem Drehpunkt, die Leiter steht unter <M>{'70^\\circ'}</M>. Berechne, wie weit die Leiter ausgefahren werden
+              muss (Länge <M>L</M>), damit ihre Spitze genau am Fenster anliegt, und wie weit der Drehpunkt dann von der Hauswand entfernt ist
+              (Abstand <M>d</M>). Runde auf zwei Nachkommastellen.
             </p>
             <p>
               Das Werkzeug dafür lernst du im Beispiel unten kennen: Mit Sinus und Kosinus berechnest du aus einer Seite und einem Winkel die
@@ -351,7 +351,7 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
               src={einsatzBild}
               width={1200}
               height={600}
-              alt="Comic: Einsatzplan an einer Tafel im Feuerwehrauto. Ein rechtwinkliges Dreieck aus Leiter, Hauswand und Boden. Die Leiter ist 30 Meter lang, der Winkel am Drehpunkt beträgt 70 Grad. Die Höhe h und der Abstand d sind mit Fragezeichen markiert."
+              alt="Comic: Einsatzplan an einer Tafel im Feuerwehrauto. Ein rechtwinkliges Dreieck aus Leiter, Hauswand und Boden. Das Fenster an der Wand liegt 26 Meter hoch, der Winkel am Drehpunkt beträgt 70 Grad. Die Länge L der Leiter und der Abstand d sind mit Fragezeichen markiert."
             />
           </figure>
           <BeispielMitVideo video={VIDEO_STRECKEN} videoTitel="Lernvideo: Streckenlänge mit Sinus, Kosinus und Tangens">
@@ -367,8 +367,8 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
               title="Der Einsatzplan"
               prompt={<p>Trage die Ergebnisse aus deinem Heft ein. Jedes Feld zeigt dir sofort, ob es stimmt.</p>}
               fields={[
-                { kind: 'num', key: 'h', label: <>Wie hoch liegt die Leiterspitze über dem Drehpunkt?</>, expected: HOEHE, unit: 'm', tol: 0.011 },
-                { kind: 'num', key: 'd', label: <>Wie weit muss der Drehpunkt von der Hauswand entfernt sein?</>, expected: ABSTAND, unit: 'm', tol: 0.011 },
+                { kind: 'num', key: 'l', label: <>Wie weit muss die Leiter ausgefahren werden?</>, expected: LEITER, unit: 'm', tol: 0.011 },
+                { kind: 'num', key: 'd', label: <>Wie weit ist der Drehpunkt dann von der Hauswand entfernt?</>, expected: ABSTAND, unit: 'm', tol: 0.011 },
               ]}
               loesungNachFehler
               solution={LOESUNG_KERN}
@@ -377,11 +377,11 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
                   steps={[
                     <>Gehe vor wie im Beispiel: Benenne zuerst vom Winkel <M>{'70^\\circ'}</M> aus Hypotenuse, Gegenkathete und Ankathete.</>,
                     <>
-                      Die Leiter (30 m) ist die Hypotenuse, die Höhe ist die Gegenkathete, der Abstand die Ankathete. Für die Höhe brauchst du den
-                      Sinus, für den Abstand den Kosinus.
+                      Die Höhe (26 m) ist die Gegenkathete, die Leiter die Hypotenuse, der Abstand die Ankathete. Höhe und Leiter stehen im Sinus,
+                      die Leiter steht dort im Nenner.
                     </>,
                     <>
-                      <M>{'h = 30\\,\\text{m} \\cdot \\sin(70^\\circ)'}</M> und <M>{'d = 30\\,\\text{m} \\cdot \\cos(70^\\circ)'}</M>. Taschenrechner auf Grad (DEG) stellen.
+                      <M>{'L = 26\\,\\text{m} : \\sin(70^\\circ)'}</M>, danach <M>{'d = L \\cdot \\cos(70^\\circ)'}</M>. Taschenrechner auf Grad (DEG) stellen.
                     </>,
                   ]}
                 />
@@ -394,24 +394,24 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
               punkte={4}
               rechnen
               title="Meldung an den Gruppenführer"
-              prompt={<p>Was meldest du dem Gruppenführer? Das Fenster liegt 26 m über dem Drehpunkt.</p>}
+              prompt={<p>Was meldest du dem Gruppenführer? Die Leiter lässt sich höchstens 30 m ausfahren.</p>}
               options={[
                 {
-                  text: 'Reicht nicht: 30 m · cos(70°) ≈ 10,26 m, das ist viel weniger als 26 m.',
-                  feedback: '10,26 m ist der Abstand am Boden (Ankathete). Die Höhe ist die Gegenkathete, dafür brauchst du den Sinus.',
+                  text: 'Die Leiter auf 24,43 m ausfahren (26 m · sin(70°)), das reicht locker.',
+                  feedback: 'Die Leiter kann nicht kürzer sein als die Höhe, denn sie ist die Hypotenuse. Die Leiter steht im Nenner: 26 m : sin(70°).',
                 },
                 {
-                  text: 'Reicht: Die Spitze liegt etwa 28,19 m über dem Drehpunkt. Der Drehpunkt muss etwa 10,26 m vor der Wand stehen.',
+                  text: 'Die Leiter auf etwa 27,67 m ausfahren, der Drehpunkt steht etwa 9,46 m vor der Wand. Die 30-m-Leiter reicht.',
                   correct: true,
-                  feedback: 'Genau. 28,19 m sind mehr als 26 m. Die Leiter reicht, wenn das Fahrzeug im richtigen Abstand steht.',
+                  feedback: 'Genau. 27,67 m sind weniger als 30 m. Mit dem richtigen Abstand liegt die Spitze genau am Fenster.',
                 },
                 {
-                  text: 'Reicht immer: 30 m sind mehr als 26 m, der Winkel spielt keine Rolle.',
-                  feedback: 'Die Leiter steht schräg. Je flacher sie steht, desto niedriger kommt die Spitze. Der Winkel entscheidet mit.',
+                  text: 'Die Leiter auf genau 26 m ausfahren, denn das Fenster liegt 26 m hoch.',
+                  feedback: 'Die Leiter steht schräg. Bei 26 m Länge bleibt ihre Spitze unter dem Fenster, erst eine senkrechte Leiter käme 26 m hoch.',
                 },
                 {
-                  text: 'Reicht: Der Drehpunkt muss etwa 28,19 m vor der Wand stehen.',
-                  feedback: '28,19 m ist die Höhe. Der Abstand ist die Ankathete: 30 m · cos(70°) ≈ 10,26 m.',
+                  text: 'Die Leiter reicht nicht, denn 26 m : cos(70°) ≈ 76 m.',
+                  feedback: 'Der Kosinus verbindet Ankathete und Hypotenuse. Die 26 m sind aber die Gegenkathete, also brauchst du den Sinus.',
                 },
               ]}
             />
@@ -435,7 +435,7 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
                 <li>„Schritt 1: Ich benenne die Seiten vom Winkel aus: …“</li>
                 <li>„Schritt 2: Ich wähle die Winkelfunktion, in der die bekannte und die gesuchte Seite vorkommen: …“</li>
                 <li>„Schritt 3: Ich stelle nach der gesuchten Seite um und rechne: …“</li>
-                <li>„Meldung: Die Leiterspitze liegt … über dem Drehpunkt, das Fahrzeug muss …“</li>
+                <li>„Meldung: Die Leiter muss auf … ausgefahren werden, das Fahrzeug steht …“</li>
               </ul>
             </Aufklappbar>
           </Handlungsprodukt>
@@ -451,10 +451,11 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
                   <li>Die Winkelfunktion wählen, in der die bekannte und die gesuchte Seite vorkommen.</li>
                   <li>Nach der gesuchten Seite umstellen, einsetzen und mit dem Taschenrechner (auf DEG) ausrechnen.</li>
                 </ol>
-                <p>Ist die Hypotenuse bekannt, gilt:</p>
+                <p>Steht die gesuchte Seite im Zähler, multiplizierst du, zum Beispiel:</p>
                 <MB>{'\\text{Gegenkathete} = \\text{Hypotenuse} \\cdot \\sin(\\alpha)'}</MB>
-                <MB>{'\\text{Ankathete} = \\text{Hypotenuse} \\cdot \\cos(\\alpha)'}</MB>
-                <p>Steht die gesuchte Seite im Nenner, teilst du am Ende durch die Winkelfunktion. Die Hypotenuse ist immer die längste Seite.</p>
+                <p>Steht die gesuchte Seite im Nenner, teilst du durch die Winkelfunktion, zum Beispiel:</p>
+                <MB>{'\\text{Hypotenuse} = \\dfrac{\\text{Gegenkathete}}{\\sin(\\alpha)}'}</MB>
+                <p>Die Hypotenuse ist immer die längste Seite. Damit kannst du dein Ergebnis prüfen.</p>
               </Merke>
             </Abschnitt>
           )}
@@ -505,36 +506,36 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
             <TrackedMc
               onSolved={uebung('2', fertig.teil('2'))}
               punkte={6}
-              topic="Strecken-Einstieg: gesuchte Seite im Nenner (Standard)"
+              topic="Strecken-Einstieg: gesuchte Seite im Zähler (Standard)"
               title="Übung 2"
               level="standard"
               prompt={
                 <>
                   <div className="dl-skizze-klein">
                     <Dreieck
-                      boden={Math.cos((75 * Math.PI) / 180)}
-                      ruecken={Math.sin((75 * Math.PI) / 180)}
-                      labels={{ boden: '', ruecken: '18 m', schraeg: 'Leiter ?' }}
-                      winkelText="75°"
+                      boden={Math.cos((70 * Math.PI) / 180)}
+                      ruecken={Math.sin((70 * Math.PI) / 180)}
+                      labels={{ boden: '', ruecken: 'Höhe ?', schraeg: 'Leiter 30 m' }}
+                      winkelText="70°"
                       breite={420}
-                      label="Drehleiter um 75 Grad aufgerichtet, die Spitze soll 18 Meter über dem Drehpunkt liegen. Gesucht ist die Leiterlänge."
+                      label="Drehleiter 30 Meter, um 70 Grad aufgerichtet. Gesucht ist die Höhe der Spitze über dem Drehpunkt."
                     />
                   </div>
                   <p>
-                    Die Spitze der Drehleiter soll bei <M>{'75^\\circ'}</M> genau 18 m über dem Drehpunkt liegen. Wie weit muss die Leiter ausgefahren
-                    werden? Mia rechnet <M>{'18 \\cdot \\sin(75^\\circ) \\approx 17{,}39'}</M>, Tom rechnet <M>{'18 : \\sin(75^\\circ) \\approx 18{,}64'}</M>.
+                    Jetzt wird die Leiter ganz ausgefahren, auf 30 m, und wieder um <M>{'70^\\circ'}</M> aufgerichtet. Wie hoch über dem Drehpunkt liegt
+                    die Spitze? Mia rechnet <M>{'30 \\cdot \\sin(70^\\circ) \\approx 28{,}19'}</M>, Tom rechnet <M>{'30 : \\sin(70^\\circ) \\approx 31{,}93'}</M>.
                   </p>
                 </>
               }
               options={[
-                { text: 'Mia, denn bei Sinus wird immer multipliziert.', feedback: 'Hier ist die Leiter gesucht, sie steht im Nenner: sin(75°) = 18 m : Leiter. Dann wird geteilt.' },
+                { text: 'Tom, denn beim Sinus wird immer geteilt.', feedback: 'Hier ist die Höhe gesucht, sie steht im Zähler: sin(70°) = Höhe : 30 m. Dann wird mit 30 m multipliziert.' },
                 { text: 'Keiner von beiden: Ohne zweite Seite braucht man den Satz des Pythagoras.', feedback: 'Ein Winkel und eine Seite reichen. Die Winkelfunktionen verbinden sie.' },
                 {
-                  text: 'Tom: Die Leiter steht im Nenner, also wird durch sin(75°) geteilt. Sie muss länger als 18 m sein.',
+                  text: 'Mia: Die Höhe steht im Zähler, also wird mit 30 m multipliziert. Sie muss kleiner als 30 m sein.',
                   correct: true,
-                  feedback: 'Genau. Aus sin(75°) = 18 m : Leiter folgt Leiter = 18 m : sin(75°) ≈ 18,64 m. Mias Leiter wäre kürzer als die Höhe, das geht nicht.',
+                  feedback: 'Genau. Aus sin(70°) = Höhe : 30 m folgt Höhe = 30 m · sin(70°) ≈ 28,19 m. Toms Höhe wäre größer als die Leiter lang ist, das geht nicht.',
                 },
-                { text: 'Beide, die Ergebnisse unterscheiden sich kaum.', feedback: 'Fast 1,30 m Unterschied sind bei einer Rettung viel. Nur eine Rechnung ist richtig.' },
+                { text: 'Beide, es kommt auf den Taschenrechner an.', feedback: 'Fast 4 m Unterschied: Nur eine Rechnung passt zur Formel. Prüfe, ob die gesuchte Seite im Zähler oder im Nenner steht.' },
               ]}
             />
           </Abschnitt>
@@ -719,15 +720,15 @@ export default function DrehleiterEinstieg({ onBack, onPractice }: { onBack: () 
 /** Rückbezug auf die Schätzungen aus Phase 2 */
 function Rueckbezug({ schaetzungen }: { schaetzungen: number[] }) {
   if (!schaetzungen.length) return null;
-  const beste = schaetzungen.reduce((a, b) => (Math.abs(b - HOEHE) < Math.abs(a - HOEHE) ? b : a));
+  const beste = schaetzungen.reduce((a, b) => (Math.abs(b - LEITER) < Math.abs(a - LEITER) ? b : a));
   const z = (x: number) => x.toLocaleString('de-DE', { maximumFractionDigits: 2 });
   return (
     <div className="ls-back">
       <p>
-        <strong>Du hattest geschätzt:</strong> {schaetzungen.length} {schaetzungen.length === 1 ? 'Schätzung' : 'Schätzungen'}, am nächsten dran war{' '}
-        {z(beste)} m (daneben um {z(Math.abs(beste - HOEHE))} m). {istTreffer(beste) ? 'Ein Treffer!' : ''} Mit dem Sinus bekommst du den genauen Wert
-        mit einer einzigen Rechnung: <M>{'h = 30\\,\\text{m} \\cdot \\sin(70^\\circ) \\approx 28{,}19\\,\\text{m}'}</M>. Die Leiter reicht also bis zum
-        Fenster in 26 m Höhe.
+        <strong>Du hattest probiert:</strong> {schaetzungen.length} {schaetzungen.length === 1 ? 'Leiterlänge' : 'Leiterlängen'}, am nächsten dran war{' '}
+        {z(beste)} m (daneben um {z(Math.abs(beste - LEITER))} m). {istTreffer(beste) ? 'Ein Treffer!' : ''} Mit dem Sinus bekommst du die genaue Länge
+        mit einer einzigen Rechnung: <M>{'L = 26\\,\\text{m} : \\sin(70^\\circ) \\approx 27{,}67\\,\\text{m}'}</M>. Die 30-m-Leiter reicht also bis zum
+        Fenster.
       </p>
     </div>
   );

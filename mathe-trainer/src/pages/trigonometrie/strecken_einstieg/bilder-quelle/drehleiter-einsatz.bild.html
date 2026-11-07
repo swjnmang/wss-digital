@@ -23,15 +23,15 @@ s += C.panel('p1', '24,24 1176,24 1170,576 30,576', 'url(#pT)',
   `<line x1="${B[0]}" y1="${B[1]}" x2="${S[0]}" y2="${S[1]}" stroke="${ink}" stroke-width="6"/>` +
   `<path d="M${B[0] - 26} ${B[1]} v-26 h26" fill="none" stroke="${ink}" stroke-width="4"/>` +
   DL.winkel(A[0], A[1], w, 60, '', 42).replace(/<line[^>]*\/>/, '') + `<text x="${A[0] - 40}" y="${A[1] - 26}" text-anchor="end" font-family="Lilita One" font-size="46" fill="${ink}" letter-spacing="1">70°</text><path d="M${A[0] - 36} ${A[1] - 40} Q${A[0] + 4} ${A[1] - 60} ${A[0] + 30} ${A[1] - 26}" fill="none" stroke="${ink}" stroke-width="3"/>` +
-  `<text x="${(A[0] + S[0]) / 2 - 30}" y="${(A[1] + S[1]) / 2}" text-anchor="end" font-family="Lilita One" font-size="46" fill="${k}" letter-spacing="1">Leiter 30 m</text>` +
-  `<text x="${B[0] + 22}" y="${(B[1] + S[1]) / 2 + 14}" font-family="Comic Neue" font-weight="700" font-style="italic" font-size="46" fill="${ink}">h = ?</text>` +
+  `<text x="${(A[0] + S[0]) / 2 - 30}" y="${(A[1] + S[1]) / 2}" text-anchor="end" font-family="Lilita One" font-size="46" fill="${k}" letter-spacing="1">Leiter L = ?</text>` +
+  `<text x="${B[0] + 22}" y="${(B[1] + S[1]) / 2 + 14}" font-family="Comic Neue" font-weight="700" font-size="46" fill="${ink}">26 m</text>` +
   `<text x="${(A[0] + B[0]) / 2}" y="${A[1] + 46}" text-anchor="middle" font-family="Comic Neue" font-weight="700" font-style="italic" font-size="44" fill="${ink}">d = ?</text>` +
-  `<text x="${B[0] + 22}" y="${S[1] + 10}" font-family="Comic Neue" font-weight="700" font-size="28" fill="${ink}">Spitze an der Wand</text>` +
+  `<rect x="${B[0] - 4}" y="${S[1] - 26}" width="52" height="36" fill="#f5c400" stroke="${ink}" stroke-width="4"/><text x="${B[0] + 58}" y="${S[1] + 4}" font-family="Comic Neue" font-weight="700" font-size="28" fill="${ink}">Fenster</text>` +
   `<text x="${A[0] - 20}" y="${A[1] + 46}" text-anchor="end" font-family="Comic Neue" font-weight="700" font-size="28" fill="${ink}">Drehpunkt</text>` +
   // Notizzettel rechts
   `<g transform="rotate(4 900 380)"><rect x="790" y="260" width="230" height="200" fill="#fff6c9" stroke="${ink}" stroke-width="5"/>` +
   `<text x="905" y="310" text-anchor="middle" font-family="Lilita One" font-size="34" fill="${ink}" letter-spacing="1">GESUCHT</text>` +
-  `<text x="905" y="360" text-anchor="middle" font-family="Comic Neue" font-weight="700" font-size="26" fill="${ink}">Höhe h der Spitze</text>` +
+  `<text x="905" y="360" text-anchor="middle" font-family="Comic Neue" font-weight="700" font-size="26" fill="${ink}">Länge L der Leiter</text>` +
   `<text x="905" y="400" text-anchor="middle" font-family="Comic Neue" font-weight="700" font-size="26" fill="${ink}">Abstand d</text>` +
   `<text x="905" y="434" text-anchor="middle" font-family="Comic Neue" font-weight="700" font-size="26" fill="${ink}">zur Wand</text></g>`);
 document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${C.defs}${C.papier(1200, 600)}${s}${C.korn(1200, 600)}</svg>`;

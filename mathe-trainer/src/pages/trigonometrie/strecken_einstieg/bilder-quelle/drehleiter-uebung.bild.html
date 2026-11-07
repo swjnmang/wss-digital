@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Die Drehleiter, Problem erkennen. Bildwelt Comic / pop: links Fahrzeug mit Leiter (30 m, 70°) an der Wand, Höhe h gesucht; rechts das Funkgerät des Gruppenführers.
+<!-- Die Drehleiter, Problem erkennen. Bildwelt Comic / pop: links Fahrzeug mit Leiter (70°), Spitze am Fenster direkt an der Fassade (26 m), Leiterlänge gesucht; rechts das Funkgerät des Gruppenführers.
      Rendern: node scripts/bilder-rendern.cjs src/pages/trigonometrie/strecken_einstieg -->
 <html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Lilita+One&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
 <script src="_comic.js"></script><script src="_drehleiter.js"></script></head><body>
@@ -13,19 +13,19 @@ let s = '';
 s += C.panel('p1', '24,24 760,24 744,576 24,576', 'url(#pF)',
   `<rect x="24" y="536" width="740" height="60" fill="#cfc6b0" stroke="${ink}" stroke-width="5"/>` +
   DL.haus(ex, 30, 536, 340, '#fbece3') +
-  `<rect x="${ex + 130}" y="${ey + 22}" width="70" height="50" fill="#f5c400" stroke="${ink}" stroke-width="4"/>` +
+  `<rect x="${ex + 6}" y="${ey - 40}" width="150" height="${dy - ey + 46}" fill="#fbece3"/>` +
   DL.fahrzeug(dx, dy, len, w, 1) +
   DL.winkel(dx, dy, w, 64, '70°', 42) +
-  `<text x="${dx + 210 * Math.cos(DL.rad(w)) - 40}" y="${dy - 210 * Math.sin(DL.rad(w))}" text-anchor="end" font-family="Lilita One" font-size="46" fill="${ink}" stroke="#fff" stroke-width="7" paint-order="stroke" letter-spacing="1">30 m</text>` +
-  `<rect x="${ex+6}" y="${ey-6}" width="110" height="${dy-ey+12}" fill="#fbece3"/>` + DL.mass(ex + 36, ey, dy, 'h = ?', 50, false, 'Comic Neue') +
-  `<text x="${ex + 130}" y="${ey + 110}" font-family="Lilita One" font-size="34" fill="${ink}" stroke="#fff" stroke-width="6" paint-order="stroke" letter-spacing="1">Fenster: 26 m</text>` +
+  `<text x="${dx + 210 * Math.cos(DL.rad(w)) - 40}" y="${dy - 210 * Math.sin(DL.rad(w))}" text-anchor="end" font-family="Lilita One" font-size="46" fill="${ink}" stroke="#fff" stroke-width="7" paint-order="stroke" letter-spacing="1">Leiter ?</text>` +
+  `<rect x="${ex + 4}" y="${ey - 34}" width="74" height="52" fill="#f5c400" stroke="${ink}" stroke-width="4"/><line x1="${ex + 41}" y1="${ey - 34}" x2="${ex + 41}" y2="${ey + 18}" stroke="${ink}" stroke-width="3"/>` + DL.mass(ex + 132, ey, dy, '26 m', 46, true, 'Lilita One') +
+  `<text x="${ex + 6}" y="${ey + 52}" font-family="Lilita One" font-size="28" fill="${ink}" stroke="#fff" stroke-width="6" paint-order="stroke" letter-spacing="1">Fenster</text>` +
   C.kasten(44, 44, 290, 64, 'Die Übung', 38, -2));
 // Panel 2: Funkgerät
 s += C.panel('p2', '780,24 1176,24 1176,576 766,576', 'url(#pT)',
   `<g stroke="${ink}" stroke-width="6" stroke-linejoin="round"><rect x="900" y="330" width="150" height="230" rx="18" fill="#2b2b2b"/><rect x="1010" y="250" width="16" height="90" fill="#2b2b2b"/>
    <rect x="920" y="352" width="110" height="60" rx="6" fill="#d6eef2"/>${[0, 1, 2].map(i => `<line x1="925" y1="${450 + i * 26}" x2="1025" y2="${450 + i * 26}" stroke="#777" stroke-width="5"/>`).join('')}</g>` +
   `<text x="975" y="392" text-anchor="middle" font-family="Lilita One" font-size="24" fill="${ink}">KANAL 4</text>` +
-  C.blase(796, 56, 364, 196, 960, 330, ['Wie hoch liegt die', 'Leiterspitze über', 'dem Drehpunkt?', 'Auf 5 cm genau!'], 30) +
+  C.blase(796, 56, 364, 196, 960, 330, ['Wie weit muss die', 'Leiter raus, damit sie', 'am Fenster anliegt?', 'Auf 5 cm genau!'], 30) +
   C.laut(800, 330, 'KRRZ!', 48, -10));
 document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${C.defs}${C.papier(1200, 600)}${s}${C.korn(1200, 600)}</svg>`;
 </script>
