@@ -1,0 +1,22 @@
+<!doctype html>
+<!-- Das Lastenrad, Titelbild. Bildwelt Siebdruck / zweifarbig (Indigo + Leuchtpink): Plakat „18 % oder 12°?“ mit Lastenrad am Hang.
+     Rendern: node scripts/bilder-rendern.cjs src/pages/trigonometrie/steigung_einstieg -->
+<html><head><meta charset="utf-8"><script src="_lastenrad.js"></script><script>document.write(LR.kopf)</script>
+<style>body{margin:0} text{font-family:'Bricolage Grotesque';font-variation-settings:'wdth' 75,'opsz' 96}</style>
+<script src="_siebdruck.js"></script></head><body><div id="bild"></div>
+<script>
+const pink = `<polygon points="440,600 1200,600 1200,330" fill="RASTER" stroke="none"/><circle cx="1080" cy="110" r="70" stroke="none"/>
+  <rect x="60" y="430" width="380" height="16" stroke="none"/>`;
+const indigo = `<text x="60" y="170" font-size="150" font-weight="800" stroke="none">18 % ODER</text>
+  <text x="60" y="330" font-size="150" font-weight="800" stroke="none">12°?</text>
+  <text x="60" y="410" font-size="40" font-weight="700" stroke="none">Schafft das Lastenrad den Berg?</text>
+  <text x="60" y="510" font-size="34" font-weight="600" stroke="none">Datenblatt: bis 12°</text>
+  <text x="60" y="556" font-size="34" font-weight="600" stroke="none">Kirchbergstraße: 18 %</text>
+  <line x1="440" y1="600" x2="1200" y2="330" stroke-width="10"/>
+  ${LR.rad(780, 600 - 270 * ((780 - 440) / 760) - 6, 1, 19.6)}`;
+SD.bild(1200, 600, [
+  { farbe: LR.PINK, svg: pink },
+  { farbe: LR.INDIGO, versatz: [4, -3], svg: indigo },
+]);
+</script>
+</body></html>

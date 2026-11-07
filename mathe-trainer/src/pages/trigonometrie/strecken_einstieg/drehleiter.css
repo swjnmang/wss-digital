@@ -1,0 +1,28 @@
+/* Lernsituation „Die Drehleiter“ (Präfix dl-). Gerüst und Bildwelt Comic kommen aus lernsituation_kit (seiten.css, bildwelten.css);
+   hier stehen nur die Bausteine dieser Seite: Skizzen, Schätzduell und Spiel. */
+
+.dl-skizze-klein { display: flex; justify-content: center; }
+.dl-skizze-klein .hs-dreieck { width: 100%; height: auto; }
+.dl-skizze-klein .hs-dreieck text, .dl-spiel-frage .hs-dreieck text { font-family: var(--font-display, inherit); }
+
+.dl-labor { display: flex; flex-direction: column; gap: 12px; }
+.dl-rahmen { display: flex; justify-content: center; padding: 8px; }
+.dl-skizze { width: 100%; max-width: 620px; height: auto; }
+.dl-skizze text { font-family: var(--font-display, inherit); letter-spacing: 0.02em; }
+
+.dl-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 19px; }
+.dl-eingabe label { font-weight: 700; }
+.dl-eingabe .lp-input { min-height: 44px; width: 110px; }
+.dl-eingabe .bk-btn { min-height: 44px; margin-left: 6px; white-space: normal; }
+
+.dl-anzeige {
+  display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 8px 14px;
+  background: var(--primary-soft); color: var(--ink); font-size: 17px; line-height: 1.45;
+}
+.dl-anzeige > i { margin-top: 3px; color: var(--primary); font-size: 18px; }
+.dl-anzeige-ok { background: var(--correct-soft); color: var(--correct-ink); }
+.dl-anzeige-ok > i { color: var(--correct); }
+
+.dl-spiel-frage { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.dl-spiel-frage .hs-dreieck { width: 100%; height: auto; }
+.dl-spiel-frage p { margin: 0; font-size: 18px; }

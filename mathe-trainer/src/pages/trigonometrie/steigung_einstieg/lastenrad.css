@@ -1,0 +1,28 @@
+/* Lernsituation „Das Lastenrad“ (Präfix lr-). Gerüst und Bildwelt Siebdruck kommen aus lernsituation_kit (seiten.css, bildwelten.css);
+   hier stehen nur die Bausteine dieser Seite: Skizzen, Testrampe und Spiel. */
+
+.lr-skizze-klein { display: flex; justify-content: center; }
+.lr-skizze-klein .hs-dreieck { width: 100%; height: auto; }
+.lr-skizze-klein .hs-dreieck text, .lr-spiel-frage .hs-dreieck text { font-family: var(--font-display, inherit); }
+
+.lr-labor { display: flex; flex-direction: column; gap: 12px; }
+.lr-rahmen { display: flex; justify-content: center; padding: 8px; }
+.lr-rampe { width: 100%; max-width: 620px; height: auto; }
+.lr-rampe text { font-family: var(--font-display, inherit); letter-spacing: 0.02em; }
+
+.lr-eingabe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 19px; }
+.lr-eingabe label { font-weight: 700; }
+.lr-eingabe .lp-input { min-height: 44px; width: 110px; }
+.lr-eingabe .bk-btn { min-height: 44px; margin-left: 6px; white-space: normal; }
+
+.lr-anzeige {
+  display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 8px 14px;
+  background: var(--primary-soft); color: var(--ink); font-size: 17px; line-height: 1.45;
+}
+.lr-anzeige > i { margin-top: 3px; color: var(--primary); font-size: 18px; }
+.lr-anzeige-ok { background: var(--correct-soft); color: var(--correct-ink); }
+.lr-anzeige-ok > i { color: var(--correct); }
+
+.lr-spiel-frage { margin: 0; }
+.lr-klein { margin: 0; text-align: center; font-size: 15px; color: var(--ink-muted, #555); }
+p.lr-spiel-frage { font-size: 20px; text-align: center; }
