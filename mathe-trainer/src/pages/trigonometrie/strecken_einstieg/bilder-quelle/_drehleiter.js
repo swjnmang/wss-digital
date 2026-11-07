@@ -35,7 +35,7 @@ window.DL = (() => {
     const tx = dx + (r + 14) * Math.cos(rad(w / 2)) + 8, ty = dy - (r + 14) * Math.sin(rad(w / 2)) + 10;
     return `<path d="M${dx} ${dy} L${dx + r} ${dy} A${r} ${r} 0 0 0 ${x2} ${y2} Z" fill="#f5c400" stroke="${ink}" stroke-width="4"/>
       <line x1="${dx}" y1="${dy}" x2="${dx + r + 40}" y2="${dy}" stroke="${ink}" stroke-width="3" stroke-dasharray="10 7"/>
-      <text x="${tx}" y="${ty}" font-family="Bangers" font-size="${fs}" fill="${ink}" letter-spacing="1">${text}</text>`;
+      <text x="${tx}" y="${ty}" font-family="Lilita One" font-size="${fs}" fill="${ink}" letter-spacing="1">${text}</text>`;
   };
   // Hauswand mit Fensterraster ab x, Boden bei yb, oben bis yt
   const haus = (x, yt, yb, breite, fill = '#fff') => {
@@ -44,7 +44,7 @@ window.DL = (() => {
     return `<rect x="${x}" y="${yt}" width="${breite}" height="${yb - yt}" fill="${fill}" stroke="${ink}" stroke-width="6"/>${f}`;
   };
   // senkrechter Maßpfeil mit Beschriftung
-  const mass = (x, y1, y2, text, fs = 34, links = true, schrift = 'Bangers') => `<g stroke="${ink}" stroke-width="4" fill="${ink}">
+  const mass = (x, y1, y2, text, fs = 34, links = true, schrift = 'Lilita One') => `<g stroke="${ink}" stroke-width="4" fill="${ink}">
     <line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}"/>
     <path d="M${x} ${y1} l-9 16 h18 z" stroke-width="2"/><path d="M${x} ${y2} l-9 -16 h18 z" stroke-width="2"/></g>
     <text x="${links ? x - 14 : x + 14}" y="${(y1 + y2) / 2 + fs * 0.35}" text-anchor="${links ? 'end' : 'start'}" font-family="${schrift}" font-weight="700" font-size="${fs}" fill="${ink}" stroke="#fff" stroke-width="6" paint-order="stroke" letter-spacing="1">${text}</text>`;

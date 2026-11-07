@@ -1,7 +1,7 @@
 <!doctype html>
 <!-- Das Lichtwerk, Titelbild. Bildwelt Comic / manga: Schwarzweiß mit Rasterfolie, drei Panels (Tür fällt zu, Code-Display, Brunnen-Strahl).
      Rendern: node scripts/bilder-rendern.cjs src/pages/quadratische_funktionen/scheitelpunkt_einstieg -->
-<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Lilita+One&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
 <script src="_comic.js"></script></head><body>
 <div id="bild" style="width:1200px;height:600px"></div>
 <script>
@@ -16,8 +16,8 @@ s += C.panel('p1', '24,24 420,24 400,576 24,576', 'url(#pF)',
 // Panel 2: Türdisplay mit Code
 s += C.panel('p2', '436,24 800,24 786,576 416,576', '#fff',
   `<rect x="470" y="120" width="290" height="230" rx="16" fill="#2b2b2b" stroke="${ink}" stroke-width="7"/>` +
-  `<text x="615" y="180" font-family="Bangers" font-size="40" text-anchor="middle" fill="#fff" letter-spacing="2">TÜRCODE</text>` +
-  [0, 1, 2, 3].map((i) => `<rect x="${492 + i * 64}" y="210" width="54" height="64" rx="6" fill="#fff" stroke="${ink}" stroke-width="3"/><text x="${519 + i * 64}" y="256" font-family="Bangers" font-size="40" text-anchor="middle" fill="${ink}">?</text>`).join('') +
+  `<text x="615" y="180" font-family="Lilita One" font-size="40" text-anchor="middle" fill="#fff" letter-spacing="2">TÜRCODE</text>` +
+  [0, 1, 2, 3].map((i) => `<rect x="${492 + i * 64}" y="210" width="54" height="64" rx="6" fill="#fff" stroke="${ink}" stroke-width="3"/><text x="${519 + i * 64}" y="256" font-family="Lilita One" font-size="40" text-anchor="middle" fill="${ink}">?</text>`).join('') +
   `<text x="615" y="320" font-family="Comic Neue" font-weight="700" font-size="22" text-anchor="middle" fill="#ddd">4 Teile</text>` +
   C.blase(440, 400, 330, 140, 600, 360, ['Die Zahlen stecken', 'im Brunnen, den ich', 'letzte Woche gebaut hab!'], 26));
 // Panel 3: Brunnen-Strahl als Parabel, höchster Punkt mit Fragezeichen
@@ -27,7 +27,7 @@ s += C.panel('p3', '816,24 1176,24 1176,576 802,576', 'url(#pT)',
   `<rect x="802" y="${Y(0)}" width="380" height="80" fill="#fff" stroke="${ink}" stroke-width="5"/>` +
   `<rect x="${X(0) - 10}" y="${Y(1)}" width="20" height="${Y(0) - Y(1)}" fill="${ink}"/><rect x="${X(7)}" y="${Y(1)}" width="60" height="${Y(0) - Y(1)}" fill="#fff" stroke="${ink}" stroke-width="5"/>` +
   `<polyline points="${strahl}" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/><polyline points="${strahl}" fill="none" stroke="${ink}" stroke-width="5" stroke-dasharray="14 8" stroke-linecap="round"/>` +
-  `<text x="${X(3.5)}" y="${Y(5.9) - 18}" font-family="Bangers" font-size="64" text-anchor="middle" fill="#fff" stroke="${ink}" stroke-width="5" paint-order="stroke">?</text>` +
+  `<text x="${X(3.5)}" y="${Y(5.9) - 18}" font-family="Lilita One" font-size="64" text-anchor="middle" fill="#fff" stroke="${ink}" stroke-width="5" paint-order="stroke">?</text>` +
   C.kasten(836, 44, 310, 62, 'Wie hoch spritzt er?', 30, -2));
 document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">${C.defs}${C.papier(1200, 600)}${s}${C.korn(1200, 600)}</svg>`;
 </script>

@@ -1,14 +1,14 @@
 <!doctype html>
 <!-- Der Pausenkiosk, Titelbild. Bildwelt Comic / pop: drei Panels (Umfrage-Zettel, Zettelstapel mit 40 Antworten, vier Getränke auf dem Tresen).
      Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/daten-ordnen -->
-<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Lilita+One&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
 <script src="_comic.js"></script></head><body>
 <div id="bild" style="width:1200px;height:600px"></div>
 <script>
 const C = CO('#8a5800', '#fbf0da');
 const ink = '#141414';
 const zettel = (x, y, rot, txt) => `<g transform="rotate(${rot} ${x + 70} ${y + 45})"><rect x="${x}" y="${y}" width="140" height="90" fill="#fff" stroke="${ink}" stroke-width="4"/><text x="${x + 70}" y="${y + 58}" font-family="Comic Neue" font-weight="700" font-size="28" text-anchor="middle" fill="${ink}">${txt}</text></g>`;
-const flasche = (x, y, farbe, label) => `<g stroke="${ink}" stroke-width="5" stroke-linejoin="round"><rect x="${x}" y="${y}" width="58" height="150" rx="14" fill="${farbe}"/><rect x="${x + 16}" y="${y - 34}" width="26" height="40" fill="${farbe}"/><rect x="${x + 12}" y="${y - 46}" width="34" height="14" fill="#fff"/><rect x="${x - 4}" y="${y + 50}" width="66" height="46" fill="#fff"/></g><text x="${x + 29}" y="${y + 82}" font-family="Bangers" font-size="22" text-anchor="middle" fill="${ink}">${label}</text>`;
+const flasche = (x, y, farbe, label) => `<g stroke="${ink}" stroke-width="5" stroke-linejoin="round"><rect x="${x}" y="${y}" width="58" height="150" rx="14" fill="${farbe}"/><rect x="${x + 16}" y="${y - 34}" width="26" height="40" fill="${farbe}"/><rect x="${x + 12}" y="${y - 46}" width="34" height="14" fill="#fff"/><rect x="${x - 4}" y="${y + 50}" width="66" height="46" fill="#fff"/></g><text x="${x + 29}" y="${y + 82}" font-family="Lilita One" font-size="22" text-anchor="middle" fill="${ink}">${label}</text>`;
 let s = '';
 s += C.panel('p1', '24,24 380,24 366,576 24,576', 'url(#pT)',
   C.kasten(44, 50, 310, 70, 'Umfrage im Kiosk', 36, -2) +

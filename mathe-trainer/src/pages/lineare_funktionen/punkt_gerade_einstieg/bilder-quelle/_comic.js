@@ -22,6 +22,6 @@ window.CO = (farbe, hell) => ({
     return `<path d="${path}" fill="#fff" stroke="#2a211b" stroke-width="5" stroke-linejoin="round"/>` +
       zeilen.map((z, i) => `<text x="${x + w / 2}" y="${y0 + i * lh}" font-family="Comic Neue" font-weight="700" font-size="${fs}" text-anchor="middle" fill="#2a211b">${z}</text>`).join('');
   },
-  kasten: (x, y, w, h, text, fs = 34, rot = -2) => `<g transform="rotate(${rot} ${x + w / 2} ${y + h / 2})"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#f2b632" stroke="#2a211b" stroke-width="5"/><text x="${x + w / 2}" y="${y + h / 2 + fs * 0.36}" font-family="Bangers" font-size="${fs}" text-anchor="middle" fill="#2a211b" letter-spacing="1">${text}</text></g>`,
+  kasten: (x, y, w, h, text, fs = 34, rot = -2) => `<g transform="rotate(${rot} ${x + w / 2} ${y + h / 2})"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#f2b632" stroke="#2a211b" stroke-width="5"/><text x="${x + w / 2}" y="${y + h / 2 + fs * 0.36}" font-family="Lilita One" font-size="${fs}" text-anchor="middle" fill="#2a211b" letter-spacing="1">${text}</text></g>`,
   laut: (x, y, text, fs = 56, rot = -6, fill = '#f2b632') => `<text x="${x}" y="${y}" font-family="Bangers" font-size="${fs}" fill="${fill}" stroke="#2a211b" stroke-width="5" paint-order="stroke" transform="rotate(${rot} ${x} ${y})" letter-spacing="2">${text}</text>`,
 });
