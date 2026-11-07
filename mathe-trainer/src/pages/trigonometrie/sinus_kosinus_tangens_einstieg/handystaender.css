@@ -1,8 +1,9 @@
 /* Lernsituation „Der Handyständer“ (Bauplan / Lasercut). Themenfarbe kommt über --primary aus thema, Bildwelt-Stile in bildwelten.css. */
 
 .hs-skizze { display: flex; justify-content: center; }
-.hs-skizze .hs-dreieck { width: 100%; max-width: 440px; height: auto; }
-.hs-skizze-klein .hs-dreieck { max-width: 380px; }
+.hs-skizze .hs-dreieck { width: 100%; height: auto; }
+.hs-begriffe { margin: 6px 0 0; padding-left: 22px; list-style: disc; display: flex; flex-direction: column; gap: 4px; }
+.lp-example-steps .hs-begriffe li { border-left: 0; padding: 0; animation: none; }
 .hs-dreieck text { font-family: var(--font-display, inherit); }
 .hs-legende { margin: 0; text-align: center; font-size: 17px; font-weight: 600; }
 
@@ -34,5 +35,5 @@
 @media (max-width: 480px) { .hs-tabelle { font-size: 15px; } .hs-tabelle th, .hs-tabelle td { padding: 5px 6px; } }
 
 .hs-spiel-frage { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.hs-spiel-frage .hs-dreieck { width: 100%; max-width: 420px; height: auto; }
+.hs-spiel-frage .hs-dreieck { width: 100%; height: auto; }
 .hs-spiel-frage p { margin: 0; font-size: 18px; }

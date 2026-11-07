@@ -17,13 +17,13 @@ const A = [120, 320], B = [250, 320], C = [250, 140];
 g += `<path d="M${A} L${B}" stroke="#2c6b74" stroke-width="7" stroke-linecap="round"/><path d="M${B} L${C}" stroke="#8a5800" stroke-width="7" stroke-linecap="round"/><path d="M${C} L${A}" stroke="#3b230e" stroke-width="7" stroke-linecap="round"/>`;
 g += LC.winkel(A[0], A[1], 36, 0, 54, 'α', LC.A, 56);
 g += LC.rechter(B[0], B[1], -1, -1, 20);
-g += LC.gravur(185, 352, 'AK', 24, 'middle', '#2c6b74', 700) + LC.gravur(274, 238, 'GK', 24, 'start', '#8a5800', 700) + LC.gravur(160, 210, 'H', 26, 'end', '#3b230e', 700);
+g += LC.gravur(185, 350, 'Ankathete', 22, 'middle', '#2c6b74', 700) + LC.gravur(262, 236, 'Gegen-', 22, 'start', '#8a5800', 700) + LC.gravur(262, 260, 'kathete', 22, 'start', '#8a5800', 700) + LC.gravur(172, 214, 'Hypotenuse', 22, 'end', '#3b230e', 700, -54);
 // Zeilen
 const z = [['sin α =', '— : —'], ['cos α =', '— : —'], ['tan α =', '— : —'], ['Antwort an Jule:', '']];
 z.forEach(([k, v], i) => {
   const y = 160 + i * 50;
-  g += LC.gravur(340, y, k, 28, 'start', '#3b230e', 700) + LC.gravur(470, y, v, 26, 'start', '#8a5800', 600);
-  g += `<line x1="${i === 3 ? 530 : 470}" x2="700" y1="${y + 8}" y2="${y + 8}" stroke="#3b230e" stroke-opacity=".45" stroke-width="1.5" stroke-dasharray="4 5"/>`;
+  g += LC.gravur(372, y, k, 28, 'start', '#3b230e', 700) + LC.gravur(500, y, v, 26, 'start', '#8a5800', 600);
+  g += `<line x1="${i === 3 ? 560 : 500}" x2="700" y1="${y + 8}" y2="${y + 8}" stroke="#3b230e" stroke-opacity=".45" stroke-width="1.5" stroke-dasharray="4 5"/>`;
 });
 document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${g}</svg>`;
 </script></body></html>
