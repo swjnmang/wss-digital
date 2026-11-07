@@ -1,7 +1,7 @@
 <!doctype html>
 <!-- Die Drehleiter, Titelbild. Bildwelt Comic / pop (Themenfarbe Kupfer): drei Panels (Übung am Samstag, Drehleiter 30 m bei 70°, Fenster in 26 m Höhe).
      Rendern: node scripts/bilder-rendern.cjs src/pages/trigonometrie/strecken_einstieg -->
-<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Lilita+One&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style>
 <script src="_comic.js"></script><script src="_drehleiter.js"></script></head><body>
 <div id="bild" style="width:1200px;height:600px"></div>
 <script>
@@ -12,14 +12,14 @@ let s = '';
 s += C.panel('p1', '24,24 380,24 360,576 24,576', 'url(#pT)',
   DL.haus(60, 210, 600, 280, '#fff') +
   `<rect x="60" y="560" width="320" height="40" fill="#cfc6b0" stroke="${ink}" stroke-width="5"/>` +
-  C.kasten(44, 50, 310, 70, 'SAMSTAG: ÜBUNG!', 36, -3) +
+  C.kasten(44, 50, 310, 70, 'SAMSTAG: ÜBUNG!', 29, -3) +
   C.laut(70, 185, 'TATÜ-TATA!', 50, -6));
 // Panel 2: Drehleiter 30 m, 70°
 s += C.panel('p2', '396,24 820,24 806,576 376,576', 'url(#pF)',
   `<rect x="376" y="530" width="450" height="60" fill="#cfc6b0" stroke="${ink}" stroke-width="5"/>` +
   DL.fahrzeug(560, 462, 380, 70, 1) +
   DL.winkel(560, 462, 70, 62, '70°', 40) +
-  `<text x="${560 + 190 * Math.cos(DL.rad(70)) - 26}" y="${462 - 190 * Math.sin(DL.rad(70))}" text-anchor="end" font-family="Bangers" font-size="44" fill="${ink}" stroke="#fff" stroke-width="7" paint-order="stroke" letter-spacing="1">30 m</text>` +
+  `<text x="${560 + 190 * Math.cos(DL.rad(70)) - 26}" y="${462 - 190 * Math.sin(DL.rad(70))}" text-anchor="end" font-family="Lilita One" font-size="44" fill="${ink}" stroke="#fff" stroke-width="7" paint-order="stroke" letter-spacing="1">30 m</text>` +
   C.laut(640, 150, 'SURRR!', 50, 8));
 // Panel 3: Fenster in 26 m Höhe
 s += C.panel('p3', '836,24 1176,24 1176,576 822,576', 'url(#pG)',

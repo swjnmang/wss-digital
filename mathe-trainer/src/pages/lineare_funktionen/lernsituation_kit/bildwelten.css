@@ -28,7 +28,7 @@
 @import '@fontsource/barlow-condensed/500.css';
 @import '@fontsource/barlow-condensed/600.css';
 @import '@fontsource/barlow-condensed/700.css';
-@import '@fontsource/bangers/400.css';
+@import '@fontsource/lilita-one/400.css';
 @import '@fontsource/atkinson-hyperlegible/400.css';
 @import '@fontsource/atkinson-hyperlegible/700.css';
 @import '@fontsource/instrument-sans/400.css';
@@ -551,10 +551,11 @@
 /* ══ E Comic ═════════════════════════════════════════════════════════════════════════════════════════════════
    Die Situation als Bildergeschichte: jede Seite ein Heftblatt mit Tuscherand und hartem Versatzschatten, Bilder als Panels,
    Auftrag als Erzählkasten, Knöpfe mit dickem Rand, die beim Drücken einsinken.
-   Überschriften Bangers, Fließtext Atkinson Hyperlegible. Unter-Varianten: pop, retro, manga, storyboard. */
+   Überschriften Lilita One (kräftig, aber mit gut lesbaren Ziffern und Gradzeichen; Bangers war zu verschnörkelt, seit 2026-11-07),
+   Fließtext Atkinson Hyperlegible. Unter-Varianten: pop, retro, manga, storyboard. */
 .sl-welt-comic {
   --font-body: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
-  --font-display: 'Bangers', 'Impact', system-ui, sans-serif;
+  --font-display: 'Lilita One', 'Atkinson Hyperlegible', system-ui, sans-serif;
   --co-tusche: #161616;
   --co-papier: #fffdf8;
   --co-kasten: #ffe45c;
@@ -580,18 +581,18 @@
 
 .sl-welt-comic .sl-titel,
 .sl-start.sl-welt-comic h2,
-.sl-start.sl-welt-comic.sl-thema h2 { font: 400 40px/1.02 var(--font-display); letter-spacing: 0.025em; color: var(--co-tusche); }
+.sl-start.sl-welt-comic.sl-thema h2 { font: 400 34px/1.1 var(--font-display); letter-spacing: 0.01em; color: var(--co-tusche); }
 .sl-start.sl-welt-comic.sl-thema h2 { color: var(--primary); }
-.sl-welt-comic .sl-abschnitt-titel { font: 400 29px/1.1 var(--font-display); letter-spacing: 0.025em; color: var(--co-tusche); }
+.sl-welt-comic .sl-abschnitt-titel { font: 400 25px/1.15 var(--font-display); letter-spacing: 0.01em; color: var(--co-tusche); }
 .sl-welt-comic .sl-abschnitt-titel i { font-size: 20px; color: var(--primary); }
-.sl-welt-comic .sl-marke { font: 400 20px/1 var(--font-display); letter-spacing: 0.03em; border: 2px solid var(--co-tusche); }
+.sl-welt-comic .sl-marke { font: 400 18px/1 var(--font-display); letter-spacing: 0.01em; border: 2px solid var(--co-tusche); }
 .sl-welt-comic .sl-text,
 .sl-start.sl-welt-comic .sl-start-ziel { font-size: 18px; line-height: 1.55; color: var(--co-tusche); }
 .sl-welt-comic .sl-phasen li { border: 2px solid var(--co-tusche); border-radius: 3px; background: #fff; }
 
 /* Fokus = Erzählkasten */
 .sl-welt-comic .sl-fokus { margin-top: 6px; padding: 14px 18px; background: var(--co-kasten); border: var(--co-rand) solid var(--co-tusche); border-radius: 0; box-shadow: 4px 4px 0 var(--co-tusche); transform: rotate(-0.4deg); }
-.sl-welt-comic .sl-fokus-titel { font: 400 25px/1.1 var(--font-display); letter-spacing: 0.03em; color: var(--co-tusche); }
+.sl-welt-comic .sl-fokus-titel { font: 400 22px/1.2 var(--font-display); letter-spacing: 0.01em; color: var(--co-tusche); }
 .sl-welt-comic.sl-variante-manga .sl-fokus,
 .sl-welt-comic.sl-variante-storyboard .sl-fokus { transform: none; }
 .sl-start.sl-welt-comic .sl-start-regel { background: var(--co-kasten); border: var(--co-rand) solid var(--co-tusche); border-radius: 0; }

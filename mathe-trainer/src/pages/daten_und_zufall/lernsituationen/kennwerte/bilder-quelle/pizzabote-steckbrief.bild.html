@@ -1,17 +1,17 @@
 <!doctype html>
 <!-- Der Pizzabote, Handlungsprodukt: Storyboard-Karte „Steckbrief Blitz-Pizza“ mit Zahlengerade und vier Kennwerten. Bildwelt Comic / Storyboard.
      Rendern: node scripts/bilder-rendern.cjs src/pages/daten_und_zufall/lernsituationen/kennwerte -->
-<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style><script src="_storyboard.js"></script></head><body>
+<html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Lilita+One&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"><style>body{margin:0}</style><script src="_storyboard.js"></script></head><body>
 <div id="bild" style="width:800px;height:400px"></div>
 <script>
 const S = SB('#a0275e');
 const X = (v) => 90 + (v - 10) * 17;
 let inhalt = S.grau('M40 60 H760 V360 H40 Z', 0) +
-  `<text x="70" y="120" font-family="Bangers" font-size="40" letter-spacing="1" fill="#2b2b2b">STECKBRIEF: BLITZ-PIZZA</text>` +
+  `<text x="70" y="120" font-family="Lilita One" font-size="40" letter-spacing="1" fill="#2b2b2b">STECKBRIEF: BLITZ-PIZZA</text>` +
   `<line x1="${X(10)}" y1="192" x2="${X(46)}" y2="192" stroke="#2b2b2b" stroke-width="4"/>` + [10, 20, 30, 40].map(v => `<line x1="${X(v)}" y1="184" x2="${X(v)}" y2="200" stroke="#2b2b2b" stroke-width="3"/>`).join("") + [12, 14, 15, 15, 16, 17, 18, 19, 20, 44].map((v, i, a) => `<circle cx="${X(v)}" cy="${180 - (a.slice(0, i).filter(w => w === v).length) * 15}" r="7" fill="#a0275e"/>`).join('') +
   [10, 20, 30, 40].map(v => S.notiz(X(v), 222, String(v), 20, 'middle')).join('') +
   S.notiz(70, 280, 'Spannweite: …   Modalwert: …', 26) + S.notiz(70, 320, 'Median: …   Mittelwert: …', 26) +
-  S.akz('M560 250 H740 V340 H560 Z') + `<text x="650" y="305" text-anchor="middle" font-family="Bangers" font-size="30" fill="#fff">MEIN URTEIL</text>`;
+  S.akz('M560 250 H740 V340 H560 Z') + `<text x="650" y="305" text-anchor="middle" font-family="Lilita One" font-size="30" fill="#fff">MEIN URTEIL</text>`;
 const g = S.rahmen(40, 60, 720, 300, 4, 'Heft, Draufsicht', inhalt);
 document.getElementById('bild').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">${S.defs}${S.papier(800, 400)}${g}${S.korn(800, 400)}</svg>`;
 </script>

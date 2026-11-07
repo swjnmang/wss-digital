@@ -9,7 +9,7 @@ window.SB = (akzent) => ({
   korn: (w, h) => `<rect width="${w}" height="${h}" filter="url(#korn)"/>`,
   // Bildrahmen mit Szenen-Nummer und Kameraangabe darüber
   rahmen: (x, y, w, h, szene, kamera, inhalt) =>
-    `<text x="${x}" y="${y - 12}" font-family="Bangers" font-size="26" letter-spacing="1" fill="#2b2b2b">SZENE ${szene}</text>` +
+    `<text x="${x}" y="${y - 12}" font-family="Lilita One" font-size="26" letter-spacing="1" fill="#2b2b2b">SZENE ${szene}</text>` +
     `<text x="${x + w}" y="${y - 12}" text-anchor="end" font-family="Comic Neue" font-weight="700" font-size="22" fill="#777">${kamera}</text>` +
     `<clipPath id="c${szene}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath><g clip-path="url(#c${szene})"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff"/>${inhalt}</g>` +
     `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="#2b2b2b" stroke-width="4"/>`,
